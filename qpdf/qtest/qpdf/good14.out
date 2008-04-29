@@ -1,0 +1,39 @@
+-- stream 0 --
+A %here is a comment
+B % here is another with CR
+A B 
+
+one
+two
+three lines
+(string with \r\nCRNL)
+ and another
+   indentation
+(\001B%DEF)<01>
+<8a8b>
+(ab)
+<8c>(Ý) ) >
+<610062> (MOO)
+-- stream 1 --
+This stream does end with a newline.
+// tests:
+//   bad tokens preserved
+//   comments
+//   indentation
+//   CR/NL inside string literal -- changed to \r or \n, newline follows
+//   whitespace in hexstring (removed)
+//   strings normalized
+//   newlines normalized
+//   names normalized
+//   trailing space (preserved)
+//   final newline added
+
+/bad#name
+  
+/good name
+/bad#00name
+-- stream 2 --
+(This stream ends with a \001 bad token
+-- stream 3 --
+<AB X
+test 3 done

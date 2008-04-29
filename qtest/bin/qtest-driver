@@ -1,0 +1,798 @@
+#!/usr/bin/env perl
+#
+# This file is part of qtest.
+#
+# Copyright 1993-2007, Jay Berkenbilt
+#
+# QTest is distributed under the terms of version 2.0 of the Artistic
+# license which may be found in the source distribution.
+#
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+use IO::Handle;
+use IO::File;
+use IO::Socket;
+use Cwd 'abs_path';
+use Cwd;
+use Config;
+use File::Copy;
+use File::Basename;
+use File::Spec;
+
+my $whoami = basename($0);
+my $dirname = dirname(abs_path($0));
+my $cwd = getcwd();
+my $top = dirname($dirname);
+my $module_dir = "$top/module";
+my $qtc_dir = "$top/QTC/perl";
+
+unshift(@INC, $module_dir, $qtc_dir);
+require QTC;
+require TestDriver;
+
+if ((@ARGV == 1) && ($ARGV[0] eq '--version'))
+{
+    print "$whoami version 1.1\n";
+    exit 0;
+}
+if ((@ARGV == 1) && ($ARGV[0] eq '--print-path'))
+{
+    print $top, "\n";
+    exit 0;
+}
+
+my @bindirs = ();
+my $datadir = undef;
+my $covdir = '.';
+my $stdout_tty = (-t STDOUT) ? "1" : "0";
+
+while (@ARGV)
+{
+    my $arg = shift(@ARGV);
+    if ($arg eq '-bindirs')
+    {
+	usage() unless @ARGV;
+	push(@bindirs, split(':', shift(@ARGV)));
+    }
+    elsif ($arg eq '-datadir')
+    {
+	usage() unless @ARGV;
+	$datadir = shift(@ARGV);
+    }
+    elsif ($arg eq '-covdir')
+    {
+	usage() unless @ARGV;
+	$covdir = shift(@ARGV);
+    }
+    elsif ($arg =~ m/^-stdout-tty=([01])$/)
+    {
+	$stdout_tty = $1;
+    }
+    else
+    {
+	usage();
+    }
+}
+usage() unless defined($datadir);
+if (@bindirs)
+{
+    my @path = ();
+    foreach my $d (@bindirs)
+    {
+	my $abs = abs_path($d) or
+	    fatal("can't canonicalize path to bindir $d: $!");
+	push(@path, $abs);
+    }
+    my $path = join(':', @path) . ':' . $ENV{'PATH'};
+    # Delete and explicitly recreate the PATH environment variable.
+    # This seems to be more reliable.  If we just reassign, in some
+    # cases, the modified environment is not inherited by the child
+    # process.  (This happens when qtest-driver is invoked from ant
+    # running from gjc-compat.  I have no idea how or why.)
+    delete $ENV{'PATH'};
+    $ENV{'PATH'} = $path;
+}
+
+if ($stdout_tty)
+{
+    TestDriver::get_tty_features();
+}
+
+my $pid = undef;
+my $pid_cleanup = new TestDriver::PidKiller(\$pid);
+
+# $in_testsuite is whether the test driver itself is being run from a
+# test suite!  Check before we set the environment variable.
+my $in_testsuite = $ENV{'IN_TESTSUITE'} || 0;
+
+$ENV{'IN_TESTSUITE'} = 1;
+
+# Temporary path is intended to be easy to locate so its contents can
+# be inspected by impatient test suite runners.  It is not intended to
+# be a "secure" (unpredictable) path.
+my $tempdir = File::Spec->tmpdir() . "/testtemp.$$";
+
+my $file_cleanup = new TestDriver::TmpFileDeleter([$tempdir]);
+
+$| = 1;
+$SIG{'PIPE'} = 'IGNORE';
+$SIG{'INT'} = $SIG{'HUP'} = $SIG{'TERM'} = $SIG{'QUIT'} = sub { exit 2 };
+
+TestDriver::rmrf($tempdir);
+fatal("removal of $tempdir failed") if -e "$tempdir";
+
+mkdir($tempdir, 0777) || die "mkdir $tempdir: $!\n";
+$tempdir = abs_path($tempdir) or
+    fatal("can't canonicalize path to $tempdir: $!");
+
+my $errors = 0;
+
+my $tc_input = undef;
+my $tc_scope = undef;
+my @testcov = (<$covdir/*.testcov>);
+if (@testcov > 1)
+{
+    fatal("more than one testcov file exists");
+}
+elsif (@testcov)
+{
+    &QTC::TC("testdriver", "coverage directory",
+	     ($covdir eq '.' ? 1 : 0));
+    $tc_input = $testcov[0];
+    $tc_input =~ s,^\./,,;
+    $tc_scope = basename($tc_input);
+    $tc_scope =~ s/\.testcov$// or
+	fatal("can't get scope from testcov filename");
+}
+
+my $testlogfile = 'qtest.log';
+my $testxmlfile = 'qtest-results.xml';
+unlink $testlogfile;
+unlink $testxmlfile;
+
+my $totmissing = 0;
+my $totextra = 0;
+my $tottests = 0;
+my $totpasses = 0;
+my $totfails = 0;
+my $totxpasses = 0;
+my $totxfails = 0;
+
+my $now = ($in_testsuite ? '---timestamp---' : localtime(time));
+my $msg = "STARTING TESTS on $now";
+print "\n";
+print_and_log(('*' x length($msg)) . "\n$msg\n" .
+	      ('*' x length($msg)) . "\n\n");
+
+my $tc_log = undef;
+my $tc_winlog = undef;
+my %tc_cases = ();
+my %tc_ignored_scopes = ();
+parse_tc_file();
+tc_do_initial_checks();
+
+my $tests_to_run;
+defined($tests_to_run = $ENV{"TESTS"}) or $tests_to_run = "";
+my @tests = ();
+if ($tests_to_run ne "")
+{
+    @tests = split(/\s+/, $tests_to_run);
+    for (@tests)
+    {
+	&QTC::TC("testdriver", "driver tests specified");
+	$_ = "$datadir/$_.test";
+    }
+}
+else
+{
+    &QTC::TC("testdriver", "driver tests not specified");
+    @tests = <$datadir/*.test>;
+}
+
+print_xml("<?xml version=\"1.0\"?>\n" .
+	  "<qtest-results version=\"1\" timestamp=\"$now\"");
+if (defined $tc_log)
+{
+    print_xml(" coverage-scope=\"$tc_scope\"");
+}
+print_xml(">\n");
+foreach my $test (@tests)
+{
+    print_and_log("\nRunning $test\n");
+    print_xml(" <testsuite file=\"$test\">\n");
+    my @results = run_test($test);
+    if (scalar(@results) != 5)
+    {
+	error("test driver $test returned invalid results");
+    }
+    else
+    {
+	my ($ntests, $passes, $fails, $xpasses, $xfails) = @results;
+	my $actual = $passes + $fails + $xpasses + $xfails;
+	my $extra = 0;
+	my $missing = 0;
+	if ($actual > $ntests)
+	{
+	    &QTC::TC("testdriver", "driver extra tests");
+	    my $n = ($actual - $ntests);
+	    print_and_log(sprintf("\n*** WARNING: saw $n extra test%s\n\n",
+				  ($n == 1 ? "" : "s")));
+	    $extra = $n;
+	}
+	elsif ($actual < $ntests)
+	{
+	    &QTC::TC("testdriver", "driver missing tests");
+	    my $n = ($ntests - $actual);
+	    print_and_log(sprintf("\n*** WARNING: missing $n test%s\n\n",
+				  ($n == 1 ? "" : "s")));
+	    $missing = $n;
+	}
+
+	$totmissing += $missing;
+	$totextra += $extra;
+	$totpasses += $passes;
+	$totfails += $fails;
+	$totxpasses += $xpasses;
+	$totxfails += $xfails;
+	$tottests += ($passes + $fails + $xpasses + $xfails);
+
+	my $passed = (($extra == 0) && ($missing == 0) &&
+		      ($fails == 0) && ($xpasses == 0));
+
+	print_xml("  <testsummary\n" .
+		  "   overall-outcome=\"" .($passed ? 'pass' : 'fail') . "\"\n".
+		  "   total-cases=\"$actual\"\n" .
+		  "   passes=\"$passes\"\n" .
+		  "   failures=\"$fails\"\n" .
+		  "   unexpected-passes=\"$xpasses\"\n" .
+		  "   expected-failures=\"$xfails\"\n" .
+		  "   missing-cases=\"$missing\"\n" .
+		  "   extra-cases=\"$extra\"\n");
+	print_xml("  />\n");
+    }
+    print_xml(" </testsuite>\n");
+}
+
+my $coverage_okay = 1;
+tc_do_final_checks();
+
+my $okay = ((($totpasses + $totxfails) == $tottests) &&
+	    ($errors == 0) && ($totmissing == 0) && ($totextra == 0) &&
+	    ($coverage_okay));
+
+print "\n";
+print_and_pad("Overall test suite");
+if ($okay)
+{
+    &QTC::TC("testdriver", "driver overall pass");
+    print_results(pass(), pass());
+}
+else
+{
+    &QTC::TC("testdriver", "driver overall fail");
+    print_results(fail(), pass());
+    print "\nFailure summary may be found in $testlogfile\n";
+}
+
+my $summary = "\nTESTS COMPLETE.  Summary:\n\n";
+$summary .=
+    sprintf("Total tests: %d\n" .
+	    "Passes: %d\n" .
+	    "Failures: %d\n" .
+	    "Unexpected Passes: %d\n" .
+	    "Expected Failures: %d\n" .
+	    "Missing Tests: %d\n" .
+	    "Extra Tests: %d\n",
+	    $tottests, $totpasses, $totfails, $totxpasses, $totxfails,
+	    $totmissing, $totextra);
+
+print_and_log($summary);
+print "\n";
+
+print_xml(" <testsummary\n" .
+	  "  overall-outcome=\"" . ($okay ? 'pass' : 'fail') . "\"\n" .
+	  "  total-cases=\"$tottests\"\n" .
+	  "  passes=\"$totpasses\"\n" .
+	  "  failures=\"$totfails\"\n" .
+	  "  unexpected-passes=\"$totxpasses\"\n" .
+	  "  expected-failures=\"$totxfails\"\n" .
+	  "  missing-cases=\"$totmissing\"\n" .
+	  "  extra-cases=\"$totextra\"\n");
+if (defined $tc_log)
+{
+    print_xml("  coverage-outcome=\"" .
+	      ($coverage_okay ? 'pass' : 'fail') . "\"\n");
+}
+print_xml(" />\n" .
+	  "</qtest-results>\n");
+
+exit ($okay ? 0 : 2);
+
+sub run_test
+{
+    my $prog = shift;
+    my @results = ();
+
+    # Open a socket for communication with subsidiary test drivers.
+    # Exchange some handshaking information over this socket.  When
+    # the subsidiary test suite exits, it reports its results over the
+    # socket.
+
+    my $use_socketpair = (defined $Config{d_sockpair});
+    if ($Config{'osname'} eq 'cygwin')
+    {
+	$use_socketpair = 0;
+    }
+
+    my $listensock;
+    my $for_parent;
+    my $for_child;
+
+    my @comm_args = ();
+
+    if ($use_socketpair)
+    {
+	socketpair($for_child, $for_parent, AF_UNIX, SOCK_STREAM, PF_UNSPEC)
+	    or fatal("socketpair: $!");
+	my $fd = fileno($for_child);
+	close($for_child);
+	close($for_parent);
+	local $^F = $fd; # prevent control fd from being closed on exec
+	socketpair($for_child, $for_parent, AF_UNIX, SOCK_STREAM, PF_UNSPEC)
+	    or fatal("socketpair: $!");
+	if (fileno($for_child) != $fd)
+	{
+	    fatal("FOR_CHILD socket has wrong file descriptor number: got " .
+		  fileno($for_child) . "; wanted $fd");
+	}
+	$for_parent->autoflush(1);
+	$for_child->autoflush(1);
+	binmode $for_parent;
+	binmode $for_child;
+	@comm_args = ('-fd', $fd);
+    }
+    else
+    {
+	$listensock = IO::Socket::INET->new(
+	    Listen => 1, Proto => 'tcp', LocalPort => 0) or
+	    fatal("listen: $!");
+	my ($s_port, $s_addr) = unpack_sockaddr_in($listensock->sockname());
+	@comm_args = ('-port', $s_port);
+    }
+
+    my $pid = fork;
+    fatal("fork failed: $!") unless defined $pid;
+    if ($pid == 0)
+    {
+	if ($use_socketpair)
+	{
+	    close($for_parent);
+	}
+	chdir($datadir) or fatal("chdir $datadir failed: $!");
+
+	if (defined $tc_log)
+	{
+	    # Set these environment variables in the child process so
+	    # that we can actually use the coverage system
+	    # successfully to test the test driver itself.
+	    $ENV{'TC_SCOPE'} = $tc_scope;
+	    $ENV{'TC_FILENAME'} = $tc_log;
+	    if (defined $tc_winlog)
+	    {
+		$ENV{'TC_WIN_FILENAME'} = $tc_winlog;
+	    }
+	}
+
+	# Clear this environment variable so that nested test suites
+	# don't inherit the value from this test suite.  Note that as
+	# of perl 5.8.7 in cygwin, deleting an environment variable
+	# doesn't work.
+	$ENV{'TESTS'} = "";
+
+	exec +('perl', '-I', $module_dir, '-I', $qtc_dir,
+	       basename($prog),
+	       @comm_args,
+	       '-origdir', $cwd,
+	       '-tempdir', $tempdir,
+	       '-testlog', "$cwd/$testlogfile",
+	       '-testxml', "$cwd/$testxmlfile",
+	       "-stdout-tty=$stdout_tty") or
+		   fatal("exec $prog failed: $!");
+    }
+    if ($use_socketpair)
+    {
+	close($for_child);
+    }
+    else
+    {
+	$for_parent = $listensock->accept() or die $!;
+	$for_parent->autoflush();
+	$listensock->close();
+    }
+
+    eval
+    {
+	# Either CHLD or PIPE here indicates premature exiting of
+	# subsidiary process which will be detected by either a
+	# protocol error or a timeout on the select below.
+	local $SIG{'CHLD'} = local $SIG{'PIPE'} = 'IGNORE';
+	print $for_parent "TEST_DRIVER 1\n"
+	    or die "--child--\n";
+	my $rin = '';
+	vec($rin, fileno($for_parent), 1) = 1;
+	my $nfound = select($rin, '', '', 5);
+	if ($nfound == 0)
+	{
+	    fatal("timed out waiting for input on $for_parent");
+	}
+	# Setting to DEFAULT should be unnecessary because of "local"
+	# above, but there seems to be a race condition that this
+	# helps to correct.
+	$SIG{'CHLD'} = $SIG{'PIPE'} = 'DEFAULT';
+    };
+    if ($@)
+    {
+	if ($@ =~ m/--child--/)
+	{
+	    error("subsidiary test driver exited");
+	}
+	else
+	{
+	    die $@;
+	}
+    }
+    else
+    {
+	my $line = <$for_parent>;
+	if (! ((defined $line) && ($line =~ m/^TEST_DRIVER_CLIENT 1$/)))
+	{
+	    error("invalid protocol with subdiary test driver");
+	    kill 1, $pid;
+	}
+	waitpid $pid, 0;
+	my $results = <$for_parent>;
+	close($for_parent);
+	if (! ((defined $results) && ($results =~ m/^\d+(?: \d+){4}$/)))
+	{
+	    &QTC::TC("testdriver", "driver test returned invalid results");
+	    error("invalid results from subsidiary test driver");
+	}
+	else
+	{
+	    @results = split(/ /, $results);
+	}
+    }
+    @results;
+}
+
+sub parse_tc_file
+{
+    return unless defined $tc_input;
+
+    my $tc = new IO::File("<$tc_input") or fatal("can't read $tc_input: $!");
+    while (<$tc>)
+    {
+	s/\r?\n$//s;
+	next if m/^\#/;
+	next if m/^\s*$/;
+	if (m/^ignored-scope: (\S+)$/)
+	{
+	    $tc_ignored_scopes{$1} = 1;
+	}
+	elsif (m/^\s*?(\S.+?)\s+(\d+)$/)
+	{
+	    my ($case, $n) = ($1, $2);
+	    if (exists $tc_cases{$case})
+	    {
+		&QTC::TC("testdriver", "driver duplicate coverage case");
+		error("$tc_input:$.: duplicate case");
+	    }
+	    $tc_cases{$case} = $n;
+	}
+	else
+	{
+	    error("$tc_input:$.: invalid syntax");
+	}
+    }
+    $tc->close();
+}
+
+sub tc_do_initial_checks
+{
+    return unless defined $tc_input;
+
+    if (! exists $ENV{'TC_SRCS'})
+    {
+	fatal("TC_SRCS must be set");
+    }
+
+    my @tc_srcs = (grep { m/\S/ } (split(/\s+/, $ENV{'TC_SRCS'})));
+
+    my %seen_cases = ();
+    foreach my $src (@tc_srcs)
+    {
+	my $s = new IO::File("<$src") or die "$whoami: open $src: $!\n";
+	binmode $s;
+	while (<$s>)
+	{
+	    # Look for coverage calls in the source subject to certain
+	    # lexical constraints
+	    my ($lscope, $case);
+	    if (m/^\s*\&?QTC(?:::|\.)TC\(\"([^\"]+)\",\s*\"([^\"]+)\"/)
+	    {
+		# C++, Java, Perl, etc.
+		($lscope, $case) = ($1, $2);
+	    }
+	    elsif (m/^[^\#]*\$\(call QTC.TC,([^,]+),([^,\)]+)/)
+	    {
+		# make
+		($lscope, $case) = ($1, $2);
+	    }
+	    if ((defined $lscope) && (defined $case))
+	    {
+		if ($lscope eq $tc_scope)
+		{
+		    push(@{$seen_cases{$case}}, [$src, $.]);
+		}
+		elsif (exists $tc_ignored_scopes{$lscope})
+		{
+		    &QTC::TC("testdriver", "driver ignored scope");
+		}
+		else
+		{
+		    &QTC::TC("testdriver", "driver out-of-scope case");
+		    error("$src:$.: out-of-scope coverage case");
+		}
+	    }
+	}
+	$s->close();
+    }
+
+    my %wanted_cases = %tc_cases;
+    foreach my $case (sort keys %seen_cases)
+    {
+	my $wanted = 1;
+	my $whybad = undef;
+	if (exists $wanted_cases{$case})
+	{
+	    delete $wanted_cases{$case};
+	}
+	else
+	{
+	    &QTC::TC("testdriver", "driver unregistered coverage case");
+	    $wanted = 0;
+	    $whybad = "unregistered";
+	}
+	if (scalar(@{$seen_cases{$case}}) > $wanted)
+	{
+	    $whybad = $whybad || "duplicate";
+	    foreach my $d (@{$seen_cases{$case}})
+	    {
+		my ($file, $lineno) = @$d;
+		&QTC::TC("testdriver", "driver coverage error in src",
+			 ($whybad eq 'unregistered' ? 0 :
+			  $whybad eq 'duplicate' ? 1 :
+			  9999));
+		error("$file:$lineno: $whybad coverage case \"$case\"");
+	    }
+	}
+    }
+    foreach my $case (sort keys %wanted_cases)
+    {
+	&QTC::TC("testdriver", "driver unseen coverage case");
+	error("$whoami: coverage case \"$case\" was not seen");
+    }
+
+    fatal("errors detected; exiting") if $errors;
+
+    $tc_log = "$cwd/$tc_scope.cov_out";
+    if ($^O eq 'cygwin')
+    {
+	chop(my $f = `cygpath --windows $tc_log`);
+	$tc_winlog = $f;
+    }
+    unlink $tc_log;
+    print_and_log("Test coverage active in scope $tc_scope\n");
+}
+
+sub tc_do_final_checks
+{
+    return unless (defined $tc_log);
+
+    my %seen_cases = ();
+    my $tc = new IO::File("<$tc_log");
+    if ($tc)
+    {
+	binmode $tc;
+	while (<$tc>)
+	{
+	    s/\r?\n$//s;
+	    next if m/^\#/;
+	    next if m/^\s*$/;
+	    if (m/^(.+) (\d+)$/)
+	    {
+		$seen_cases{$1}{$2} = 1;
+	    }
+	}
+	$tc->close();
+    }
+
+    my $testlog = open_log();
+
+    $testlog->print("\nTest coverage results:\n");
+
+    my @problems = ();
+    foreach my $c (sort keys %tc_cases)
+    {
+	my ($case, $n) = ($c, $tc_cases{$c});
+	for (my $i = 0; $i <= $n; ++$i)
+	{
+	    if (exists $seen_cases{$c}{$i})
+	    {
+		delete $seen_cases{$c}{$i};
+	    }
+	    else
+	    {
+		&QTC::TC("testdriver", "driver missing coverage case");
+		push(@problems, "missing: $c $i");
+	    }
+	}
+    }
+    foreach my $c (sort keys %seen_cases)
+    {
+	foreach my $n (sort { $a <=> $b } (keys %{$seen_cases{$c}}))
+	{
+	    &QTC::TC("testdriver", "driver extra coverage case");
+	    push(@problems, "extra: $c $n");
+	}
+    }
+
+    if (@problems)
+    {
+	my $testxml = open_xml();
+	$testxml->print(" <coverage-errors count=\"" .
+			scalar(@problems) . "\">\n");
+	foreach my $p (@problems)
+	{
+	    $testlog->print("$p\n");
+	    $testxml->print("  <coverage-error case=\"$p\"/>\n");
+	}
+	$testxml->print(" </coverage-errors>\n");
+	$testxml->close();
+	$testlog->print("coverage errors: " . scalar(@problems) . "\n");
+    }
+    my $passed = (@problems == 0);
+    $testlog->print("\nCoverage analysis: ", ($passed ? 'PASSED' : 'FAILED'),
+		    "\n");
+    $testlog->close();
+
+    print "\n";
+    print_and_pad("Coverage analysis");
+    if ($passed)
+    {
+	print_results(pass(), pass());
+	my $passlog = $tc_log;
+	$passlog =~ s/(\.[^\.]+)$/-passed$1/;
+	copy($tc_log, $passlog);
+    }
+    else
+    {
+	$coverage_okay = 0;
+	print_results(fail(), pass());
+    }
+}
+
+sub open_binary
+{
+    my $file = shift;
+    my $fh = new IO::File(">>$file") or fatal("can't open $file: $!");
+    binmode $fh;
+    $fh;
+}
+
+sub open_log
+{
+    open_binary($testlogfile);
+}
+
+sub open_xml
+{
+    open_binary($testxmlfile);
+}
+
+sub print_and_log
+{
+    my $fh = open_log();
+    print @_;
+    print $fh @_;
+    $fh->close();
+}
+
+sub print_xml
+{
+    my $fh = open_xml();
+    print $fh @_;
+    $fh->close();
+}
+
+sub print_and_pad
+{
+    TestDriver::print_and_pad(@_);
+}
+
+sub print_results
+{
+    TestDriver::print_results(@_);
+}
+
+sub pass
+{
+    TestDriver->PASS;
+}
+
+sub fail
+{
+    TestDriver->FAIL;
+}
+
+sub error
+{
+    my $msg = shift;
+    warn $msg, "\n";
+    ++$errors;
+}
+
+sub fatal
+{
+    my $msg = shift;
+    warn "$whoami: $msg\n";
+    exit 2;
+}
+
+sub usage
+{
+    warn "
+Usage: $whoami --print-path
+
+Prints full path to ${whoami}'s installation directory and exits.
+
+ - OR -
+
+Usage: $whoami options
+
+Options include:
+
+  -datadir datadir
+  -bindirs bindir[:bindir...]
+  [ -covdir [coverage-dir] ]
+  [ -stdout-tty=[01] ]
+
+Subsidiary test programs are run with the -bindirs argument (a
+colon-separated list of directories, which may be relative but will be
+internally converted to absolute) prepended to the path and with the
+-datadir argument set as the current working directory.
+
+By default, this program runs datadir/*.test as subsidiary test
+suites.  If the TESTS environment variable is set, it is taken to be a
+space-separated list of test suite names.  For each name n,
+datadir/n.test is run.
+
+Test coverage support is built in.  If a file whose name matches
+*.testcov in the coverage directory (which defaults to \".\") that is
+a valid test coverage file, the full path to the file into which test
+coverage results are written will be placed in the TC_FILENAME
+environment variable.  (If running under cygwin, the Windows path will
+be in TC_WIN_FILENAME.)  The test coverage scope, which is equal to
+the part of the testcov file name excluding the extension, is placed
+in the TC_SCOPE environment variable.
+
+If the -stdout-tty option is passed, its value overrides ${whoami}'s
+determination of whether standard output is a terminal.  This can be
+useful for cases in which another program is invoking ${whoami} and
+passing its output through a pipe to a terminal.
+
+";
+    exit 2;
+
+}

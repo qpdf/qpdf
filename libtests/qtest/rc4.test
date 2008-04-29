@@ -1,0 +1,45 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+chdir("rc4") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('RC4');
+
+cleanup();
+
+my @tests = ('0123456789abcdef',
+	     '0123456789abcdef',
+	     '0000000000000000',
+	     'ef012345',
+	     '0123456789abcdef');
+
+my $n = 0;
+foreach my $key (@tests)
+{
+    ++$n;
+    $td->runtest("test $n",
+		 {$td->COMMAND => "rc4 $key test$n.in tmp1-$n.out"},
+		 {$td->STRING => "", $td->EXIT_STATUS => 0});
+    $td->runtest("check output",
+		 {$td->FILE => "tmp1-$n.out"},
+		 {$td->FILE => "test$n.out"});
+    $td->runtest("test $n reverse",
+		 {$td->COMMAND => "rc4 $key test$n.out tmp2-$n.out"},
+		 {$td->STRING => "", $td->EXIT_STATUS => 0});
+    $td->runtest("check output",
+		 {$td->FILE => "tmp2-$n.out"},
+		 {$td->FILE => "test$n.in"});
+}
+
+cleanup();
+
+$td->report(4 * scalar(@tests));
+
+sub cleanup
+{
+    system("rm -f tmp*-*");
+}

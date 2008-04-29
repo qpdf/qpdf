@@ -1,0 +1,165 @@
+#!/usr/bin/env perl
+#
+# This program creates a source distribution of qpdf.  For details,
+# see README.maintainer.
+#
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+use Cwd;
+use IO::File;
+
+my $whoami = ($0 =~ m,([^/\\]*)$,) ? $1 : $0;
+#my $dirname = ($0 =~ m,(.*)[/\\][^/\\]+$,) ? $1 : ".";
+
+usage() unless @ARGV >= 1;
+my $srcdir = shift(@ARGV);
+my $run_tests = 1;
+if (@ARGV)
+{
+    if ($ARGV[0] eq '--no-tests')
+    {
+	$run_tests = 0;
+    }
+    else
+    {
+	usage();
+    }
+}
+$srcdir =~ s,/$,,;
+usage() unless $srcdir =~ m/^qpdf-(\d+\.\d+(?:\.(a|b|rc)\d+)?)$/;
+my $version = $1;
+usage() unless -d $srcdir;
+
+my $pwd = getcwd();
+cd($srcdir);
+
+# Check versions
+my $fh = safe_open("configure.ac");
+my $config_version = 'unknown';
+while (<$fh>)
+{
+    if (m/^AC_INIT\(qpdf,([^\)]+)\)/)
+    {
+	$config_version = $1;
+	last;
+    }
+}
+$fh->close();
+
+$fh = safe_open("qpdf/qpdf.cc");
+my $code_version = 'unknown';
+while (<$fh>)
+{
+    if (m/whoami << \" version ([^\"]+)\"/)
+    {
+	$code_version = $1;
+	last;
+    }
+}
+$fh->close();
+
+$fh = safe_open("manual/qpdf-manual.xml");
+my $doc_version = 'unknown';
+while (<$fh>)
+{
+    if (m/swversion "([^\"]+)\"/)
+    {
+	$doc_version = $1;
+	last;
+    }
+}
+$fh->close();
+
+$fh = safe_open("qpdf.spec");
+my $spec_version = 'unknown';
+while (<$fh>)
+{
+    if (m/Version: (.*)$/)
+    {
+	$spec_version = $1;
+	last;
+    }
+}
+
+my $version_error = 0;
+if ($version ne $config_version)
+{
+    print "$whoami: configure.ac version = $config_version\n";
+    $version_error = 1;
+}
+if ($version ne $code_version)
+{
+    print "$whoami: qpdf.cc version = $code_version\n";
+    $version_error = 1;
+}
+if ($version ne $doc_version)
+{
+    print "$whoami: qpdf-manual.xml version = $doc_version\n";
+    $version_error = 1;
+}
+if ($version ne $spec_version)
+{
+    print "$whoami: qpdf.spec version = $spec_version\n";
+    $version_error = 1;
+}
+if ($version_error)
+{
+    die "$whoami: version numbers are not consistent\n";
+}
+
+run("autoconf");
+run("./configure --enable-doc-maintenance");
+run("make build_manual");
+run("make distclean");
+cd($pwd);
+run("tar czvf $srcdir.tar.gz-candidate $srcdir");
+if ($run_tests)
+{
+    cd($srcdir);
+    run("./configure");
+    run("make check");
+    cd($pwd);
+}
+rename "$srcdir.tar.gz-candidate", "$srcdir.tar.gz" or die;
+
+print "
+Source distribution created as $srcdir.tar.gz
+You can now remove $srcdir.
+If this is a release, don't forget to tag the version control system and
+make a backup of the release tar file.
+
+";
+
+sub safe_open
+{
+    my $file = shift;
+    my $fh = new IO::File("<$file") or die "$whoami: can't open $file: $!";
+    $fh;
+}
+
+sub run
+{
+    my $cmd = shift;
+    system($cmd) == 0 or die "$whoami: $cmd failed\n";
+}
+
+sub cd
+{
+    my $dir = shift;
+    chdir($dir) or die;
+}
+
+sub usage
+{
+    die "
+Usage: $whoami qpdf-version [ --no-tests ]
+
+qpdf-version must be a directory containing a pristine export of that
+version of qpdf from the version control system.  Use of --no-tests
+can be used for internally testing releases, but do not use it for a
+real release.
+
+";
+}

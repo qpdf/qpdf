@@ -1,0 +1,21 @@
+WARNING: bad28.pdf: offset 395: expected endobj
+/QTest is indirect
+/QTest is a stream.  Dictionary: << /Length 44 >>
+Raw stream data:
+BT
+  /F1 24 Tf
+  72 720 Td
+  (Potato) Tj
+ET
+
+Uncompressed stream data:
+BT
+  /F1 24 Tf
+  72 720 Td
+  (Potato) Tj
+ET
+
+End of stream data
+unparse: 4 0 R
+unparseResolved: 4 0 R
+test 0 done

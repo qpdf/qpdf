@@ -1,0 +1,117 @@
+ignored-scope: libtests
+QPDF lindict null found 0
+QPDF lindict searching after null 0
+QPDF err expected endobj 0
+QPDF err wrong objid/generation 0
+QPDF check objid 1
+QPDF check generation 1
+QPDF check obj 1
+QPDF hint table length indirect 0
+QPDF hint table length direct 0
+QPDF P absent in lindict 0
+QPDF P present in lindict 0
+QPDF expected n n obj 0
+QPDF lindict found newline 0
+QPDF /L mismatch 0
+QPDF err /T mismatch 0
+QPDF err /O mismatch 0
+QPDF opt direct pages resource 1
+QPDF opt inheritable keys 0
+QPDF opt no inheritable keys 0
+QPDF opt erase empty key ancestor 0
+QPDF opt resource inherited 0
+QPDF opt page resource hides ancestor 0
+QPDF opt key ancestors depth > 1 0
+QPDF opt loop detected 0
+QPDF categorize pagemode present 1
+QPDF categorize pagemode outlines 1
+QPDF warn /E mismatch 0
+QPDF lin outlines in part 1
+QPDF lin nshared_total > nshared_first_page 1
+QPDF lin part 8 empty 1
+QPDF lin check shared past first page 0
+QPDF opt flatten array scalar 0
+QPDF opt flatten dict scalar 0
+main QTest implicit 0
+main QTest indirect 1
+main QTest null 0
+main QTest bool 1
+main QTest int 0
+main QTest real 0
+main QTest name 0
+main QTest string 0
+main QTest array 0
+main QTest array indirect 1
+main QTest dictionary 0
+main QTest dictionary indirect 1
+main QTest stream 0
+QPDFWriter write to stdout 0
+QPDFWriter write to file 0
+QPDF lin write nshared_total > nshared_first_page 1
+QPDFWriter encrypted hint stream 0
+QPDF opt inherited scalar 0
+QPDF xref reused object 0
+QPDF xref gen > 0 1
+QPDF xref size mismatch 0
+QPDF not a pdf file 0
+QPDF can't find startxref 0
+QPDF invalid xref 0
+QPDF invalid xref entry 0
+QPDF missing trailer 0
+QPDF trailer lacks size 0
+QPDF trailer size not integer 0
+QPDF trailer prev not integer 0
+QPDF bad brace 0
+QPDF bad array close 0
+QPDF dictionary odd number of elements 0
+QPDF stream without length 0
+QPDF stream length not integer 0
+QPDF missing endstream 0
+QPDF bad dictionary close 0
+QPDF can't find xref 0
+QPDF_Tokenizer bad ) 0
+QPDF_Tokenizer bad > 0
+QPDF_Tokenizer bad ( 0
+QPDF_Tokenizer null in name 0
+QPDF_Tokenizer bad name 0
+QPDF_Stream invalid filter 0
+QPDF UseOutlines but no Outlines 0
+QPDFObjectHandle clone bool 0
+QPDFObjectHandle clone null 0
+QPDFObjectHandle clone integer 0
+QPDFObjectHandle clone real 0
+QPDFObjectHandle clone name 0
+QPDFObjectHandle clone string 0
+QPDFObjectHandle clone array 0
+QPDFObjectHandle clone dictionary 0
+QPDFObjectHandle makeDirect loop 0
+QPDFObjectHandle ERR clone stream 0
+QPDFTokenizer allow pound anywhere in name 0
+QPDF indirect last obj from xref 1
+QPDF default for xref stream field 0 0
+QPDF prev key in xref stream dictionary 0
+QPDF prev key in trailer dictionary 0
+QPDF found xref stream 0
+QPDF ignoring XRefStm in trailer 0
+QPDF xref deleted object 0
+QPDF_Stream PNG filter 0
+QPDF xref /Index is null 0
+QPDF xref /Index is array 1
+QPDFWriter copy Extends 0
+QPDFWriter encrypt object stream 0
+QPDFWriter uncompressing page dictionary 0
+QPDFWriter uncompressing root 0
+QPDFWriter compressing uncompressed stream 0
+QPDF exclude indirect length 0
+QPDFWriter generate >1 ostream 0
+QPDF exclude encryption dictionary 0
+QPDF loop detected traversing objects 0
+QPDF reconstructed xref table 0
+QPDF recovered in readObjectAtOffset 0
+QPDF recovered stream length 0
+QPDF found wrong endstream in recovery 0
+QPDFObjectHandle indirect to unknown 0
+QPDF_Stream pipeStreamData with null pipeline 0
+QPDFWriter not recompressing /FlateDecode 0
+QPDF piping xref stream from encrypted file 0
+unable to filter 0

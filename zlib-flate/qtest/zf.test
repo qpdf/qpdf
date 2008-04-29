@@ -1,0 +1,26 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+require TestDriver;
+
+my $td = new TestDriver('zlib-flate');
+
+$td->runtest("compress",
+	     {$td->COMMAND => "zlib-flate -compress < 1.uncompressed"},
+	     {$td->FILE => "1.compressed",
+	      $td->EXIT_STATUS => 0});
+
+$td->runtest("uncompress",
+	     {$td->COMMAND => "zlib-flate -uncompress < 1.compressed"},
+	     {$td->FILE => "1.uncompressed",
+	      $td->EXIT_STATUS => 0});
+
+$td->runtest("error",
+	     {$td->COMMAND => "zlib-flate -uncompress < 1.uncompressed"},
+	     {$td->REGEXP => "flate: inflate: data: .*\n",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->report(3);

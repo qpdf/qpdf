@@ -1,0 +1,68 @@
+General
+=======
+
+ * See whether we can do anything with /V > 3 in the encryption
+   dictionary.  (V = 4 is Crypt Filters.)
+
+ * The second xref stream for linearized files has to be padded only
+   because we need file_size as computed in pass 1 to be accurate.  If
+   we were not allowing writing to a pipe, we could seek back to the
+   beginning and fill in the value of /L in the linearization
+   dictionary as an optimization to alleviate the need for this
+   padding.  Doing so would require us to pad the /L value
+   individually and also to save the file descriptor and determine
+   whether it's seekable.  This is probably not worth bothering with.
+
+ * The whole xref handling code in the QPDF object allows the same
+   object with more than one generation to coexist, but a lot of logic
+   assumes this isn't the case.  Anything that creates mappings only
+   with the object number and not the generation is this way,
+   including most of the interaction between QPDFWriter and QPDF.  If
+   we wanted to allow the same object with more than one generation to
+   coexist, which I'm not sure is allowed, we could fix this by
+   changing xref_table.  Alternatively, we could detect and disallow
+   that case.  In fact, it appears that Adobe reader and other PDF
+   viewing software silently ignores objects of this type, so this is
+   probably not a big deal.
+
+ * Pl_PNGFilter is only partially implemented.  If we ever decoded
+   images, we'd have to finish implementing it along with the other
+   filter decode parameters and types.  For just handling xref
+   streams, there's really no need as it wouldn't make sense to use
+   any kind of predictor other than 12 (PNG UP filter).
+
+ * If we ever want to have check mode check the integrity of the free
+   list, this can be done by looking at the code from prior to the
+   object stream support of 4/5/2008.  It's in an if (0) block and
+   there's a comment about it.  There's also something about it in
+   qpdf.test -- search for "free table".  On the other hand, the value
+   of doing this seems very low since no viewer seems to care, so it's
+   probably not worth it.
+
+ * Embedded files streams: figure out why running qpdf over the pdf
+   1.7 spec results in a file that crashes acrobat reader when you try
+   to save nested documents.
+
+ * QPDFObjectHandle::getPageImages() doesn't notice images in
+   inherited resource dictionaries.  See comments in that function.
+
+Splitting by Pages
+==================
+
+Although qpdf does not currently support splitting a file into pages,
+the work done for linearization covers almost all the work.  To do
+page splitting.  If this functionality is needed, study
+obj_user_to_objects and object_to_obj_users created in
+QPDF_optimization for ideas.  It's quite possible that the information
+computed by calculateLinearizationData is actually sufficient to do
+page splitting in many circumstances.  That code knows which objects
+are used by which pages, though it doesn't do anything page-specific
+with outlines, thumbnails, page labels, or anything else.
+
+Another approach would be to traverse only pages that are being output
+taking care not to traverse into the pages tree, and then to fabricate
+a new pages tree.
+
+Either way, care must be taken to handle other things such as
+outlines, page labels, thumbnails, threads, etc. in a sensible way.
+This may include simply omitting information other than page content.

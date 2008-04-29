@@ -1,0 +1,11 @@
+[ -> 6 ] Isís 1 -> 5: /XYZ null null null
+[ -> 12 ] Amanda 1.1 -> 11: /Fit
+[ -> 13 ] Isosicle 1.1.1 -> 12: /FitV 100
+[ -> 19 ] Isosicle 1.1.1.1 -> 18: /XYZ null null null
+[ -> 20 ] Isosicle 1.1.1.2 -> 19: /XYZ null null null
+[ -> 13 ] Isosicle 1.1.2 -> 12: /XYZ null null null
+[ -> 23 ] Isosicle 1.1.2.1 -> 22: /XYZ null null null
+[ -> 14 ] Sandy ÷Σανδι÷ 1.2 -> 13: /FitH 792
+[ -> 2 ] Trepsichord 1.2.1 -> 1: /FitR 66 714 180 770
+[ -> 1 ] Trepsicle 1.2.2 -> 0: /XYZ null null null
+[ -> 16 ] Trepak 2 -> 15: /XYZ 66 756 3

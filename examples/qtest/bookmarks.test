@@ -1,0 +1,49 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+chdir("bookmarks");
+
+require TestDriver;
+
+my $td = new TestDriver('pdf-bookmarks');
+
+foreach my $show ("", " -show-open")
+{
+    foreach my $style ("", " -lines", " -numbers")
+    {
+	my $out = "test.$show.$style.out";
+	$out =~ s/ //g;
+	$td->runtest("show:$show, style:$style",
+		     {$td->COMMAND => "pdf-bookmarks $show $style 1.pdf"},
+		     {$td->FILE => $out, $td->EXIT_STATUS => 0},
+		     $td->NORMALIZE_NEWLINES);
+    }
+}
+$td->runtest("no bookmarks",
+	     {$td->COMMAND => "pdf-bookmarks 2.pdf"},
+	     {$td->STRING => "2.pdf has no bookmarks\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("bad",
+	     {$td->COMMAND => "pdf-bookmarks 3.pdf"},
+	     {$td->STRING => "pdf-bookmarks processing file 3.pdf: " .
+		  "3.pdf: offset 0: not a PDF file\n",
+		  $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("encrypted, targets",
+	     {$td->COMMAND => "pdf-bookmarks -show-targets 4.pdf user"},
+	     {$td->FILE => "encrypted.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("bookmarks deleted",
+	     {$td->COMMAND => "pdf-bookmarks 5.pdf user"},
+	     {$td->STRING => "5.pdf has no bookmarks\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->report(10);

@@ -1,0 +1,568 @@
+WARNING: end of first page section (/E) mismatch: /E = 2656; computed = 1768..1770
+WARNING: object count mismatch for page 0: hint table = 7; computed = 4
+WARNING: page 0 has shared identifier entries
+WARNING: page 0: shared object 105: in hint table but not computed list
+WARNING: object count mismatch for page 1: hint table = 3; computed = 2
+WARNING: page 1: shared object 110: in hint table but not computed list
+WARNING: page 1: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 2: hint table = 3; computed = 2
+WARNING: page 2: shared object 110: in hint table but not computed list
+WARNING: page 2: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 3: hint table = 3; computed = 2
+WARNING: page 3: shared object 110: in hint table but not computed list
+WARNING: page 3: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 4: hint table = 3; computed = 2
+WARNING: page 4: shared object 110: in hint table but not computed list
+WARNING: page 4: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 5: hint table = 3; computed = 2
+WARNING: page 5: shared object 110: in hint table but not computed list
+WARNING: page 5: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 6: hint table = 3; computed = 2
+WARNING: page 6: shared object 110: in hint table but not computed list
+WARNING: page 6: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 7: hint table = 3; computed = 2
+WARNING: page 7: shared object 110: in hint table but not computed list
+WARNING: page 7: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 8: hint table = 3; computed = 2
+WARNING: page 8: shared object 110: in hint table but not computed list
+WARNING: page 8: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 9: hint table = 3; computed = 2
+WARNING: page 9: shared object 110: in hint table but not computed list
+WARNING: page 9: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 10: hint table = 3; computed = 2
+WARNING: page 10: shared object 110: in hint table but not computed list
+WARNING: page 10: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 11: hint table = 3; computed = 2
+WARNING: page 11: shared object 110: in hint table but not computed list
+WARNING: page 11: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 12: hint table = 3; computed = 2
+WARNING: page 12: shared object 110: in hint table but not computed list
+WARNING: page 12: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 13: hint table = 3; computed = 2
+WARNING: page 13: shared object 110: in hint table but not computed list
+WARNING: page 13: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 14: hint table = 3; computed = 2
+WARNING: page 14: shared object 110: in hint table but not computed list
+WARNING: page 14: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 15: hint table = 3; computed = 2
+WARNING: page 15: shared object 110: in hint table but not computed list
+WARNING: page 15: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 16: hint table = 3; computed = 2
+WARNING: page 16: shared object 110: in hint table but not computed list
+WARNING: page 16: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 17: hint table = 3; computed = 2
+WARNING: page 17: shared object 110: in hint table but not computed list
+WARNING: page 17: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 18: hint table = 3; computed = 2
+WARNING: page 18: shared object 110: in hint table but not computed list
+WARNING: page 18: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 19: hint table = 3; computed = 2
+WARNING: page 19: shared object 110: in hint table but not computed list
+WARNING: page 19: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 20: hint table = 3; computed = 2
+WARNING: page 20: shared object 110: in hint table but not computed list
+WARNING: page 20: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 21: hint table = 3; computed = 2
+WARNING: page 21: shared object 110: in hint table but not computed list
+WARNING: page 21: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 22: hint table = 3; computed = 2
+WARNING: page 22: shared object 110: in hint table but not computed list
+WARNING: page 22: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 23: hint table = 3; computed = 2
+WARNING: page 23: shared object 110: in hint table but not computed list
+WARNING: page 23: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 24: hint table = 3; computed = 2
+WARNING: page 24: shared object 110: in hint table but not computed list
+WARNING: page 24: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 25: hint table = 3; computed = 2
+WARNING: page 25: shared object 110: in hint table but not computed list
+WARNING: page 25: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 26: hint table = 3; computed = 2
+WARNING: page 26: shared object 110: in hint table but not computed list
+WARNING: page 26: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 27: hint table = 3; computed = 2
+WARNING: page 27: shared object 110: in hint table but not computed list
+WARNING: page 27: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 28: hint table = 3; computed = 2
+WARNING: page 28: shared object 110: in hint table but not computed list
+WARNING: page 28: shared object 111: in hint table but not computed list
+WARNING: object count mismatch for page 29: hint table = 3; computed = 2
+WARNING: page 29: shared object 110: in hint table but not computed list
+WARNING: page 29: shared object 111: in hint table but not computed list
+lin8.pdf: linearization data:
+
+file_size: 24875
+first_page_object: 105
+first_page_end: 2656
+npages: 30
+xref_zero_offset: 22687
+first_page: 0
+H_offset: 1052
+H_length: 217
+
+Page Offsets Hint Table
+
+min_nobjects: 3
+first_page_offset: 1269
+nbits_delta_nobjects: 3
+min_page_length: 583
+nbits_delta_page_length: 10
+min_content_offset: 0
+nbits_delta_content_offset: 0
+min_content_length: 0
+nbits_delta_content_length: 10
+nbits_nshared_objects: 3
+nbits_shared_identifier: 3
+nbits_shared_numerator: 4
+shared_denominator: 8
+Page 0:
+  nobjects: 7
+  length: 1387
+  content_offset: 0
+  content_length: 804
+  nshared_objects: 4
+    identifier 0: 0
+    numerator 0: 0
+    identifier 1: 0
+    numerator 1: 0
+    identifier 2: 0
+    numerator 2: 0
+    identifier 3: 0
+    numerator 3: 0
+Page 1:
+  nobjects: 3
+  length: 583
+  content_offset: 0
+  content_length: 0
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 2:
+  nobjects: 3
+  length: 583
+  content_offset: 0
+  content_length: 0
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 3:
+  nobjects: 3
+  length: 587
+  content_offset: 0
+  content_length: 4
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 4:
+  nobjects: 3
+  length: 594
+  content_offset: 0
+  content_length: 11
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 5:
+  nobjects: 3
+  length: 586
+  content_offset: 0
+  content_length: 3
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 6:
+  nobjects: 3
+  length: 592
+  content_offset: 0
+  content_length: 9
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 7:
+  nobjects: 3
+  length: 586
+  content_offset: 0
+  content_length: 3
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 8:
+  nobjects: 3
+  length: 594
+  content_offset: 0
+  content_length: 11
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 9:
+  nobjects: 3
+  length: 587
+  content_offset: 0
+  content_length: 4
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 10:
+  nobjects: 3
+  length: 592
+  content_offset: 0
+  content_length: 9
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 11:
+  nobjects: 3
+  length: 591
+  content_offset: 0
+  content_length: 8
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 12:
+  nobjects: 3
+  length: 593
+  content_offset: 0
+  content_length: 10
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 13:
+  nobjects: 3
+  length: 593
+  content_offset: 0
+  content_length: 10
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 14:
+  nobjects: 3
+  length: 593
+  content_offset: 0
+  content_length: 10
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 15:
+  nobjects: 3
+  length: 592
+  content_offset: 0
+  content_length: 9
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 16:
+  nobjects: 3
+  length: 593
+  content_offset: 0
+  content_length: 10
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 17:
+  nobjects: 3
+  length: 592
+  content_offset: 0
+  content_length: 9
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 18:
+  nobjects: 3
+  length: 593
+  content_offset: 0
+  content_length: 10
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 19:
+  nobjects: 3
+  length: 592
+  content_offset: 0
+  content_length: 9
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 20:
+  nobjects: 3
+  length: 592
+  content_offset: 0
+  content_length: 9
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 21:
+  nobjects: 3
+  length: 591
+  content_offset: 0
+  content_length: 8
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 22:
+  nobjects: 3
+  length: 593
+  content_offset: 0
+  content_length: 10
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 23:
+  nobjects: 3
+  length: 593
+  content_offset: 0
+  content_length: 10
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 24:
+  nobjects: 3
+  length: 592
+  content_offset: 0
+  content_length: 9
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 25:
+  nobjects: 3
+  length: 592
+  content_offset: 0
+  content_length: 9
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 26:
+  nobjects: 3
+  length: 593
+  content_offset: 0
+  content_length: 10
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 27:
+  nobjects: 3
+  length: 592
+  content_offset: 0
+  content_length: 9
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 28:
+  nobjects: 3
+  length: 593
+  content_offset: 0
+  content_length: 10
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+Page 29:
+  nobjects: 3
+  length: 592
+  content_offset: 0
+  content_length: 9
+  nshared_objects: 4
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+    identifier 2: 5
+    numerator 2: 0
+    identifier 3: 6
+    numerator 3: 0
+
+Shared Objects Hint Table
+
+first_shared_obj: 0
+first_shared_offset: 0
+nshared_first_page: 7
+nshared_total: 7
+nbits_nobjects: 0
+min_group_length: 35
+nbits_delta_group_length: 10
+Shared Object 0:
+  group length: 214
+Shared Object 1:
+  group length: 134
+Shared Object 2:
+  group length: 118
+Shared Object 3:
+  group length: 35
+Shared Object 4:
+  group length: 249
+Shared Object 5:
+  group length: 56
+Shared Object 6:
+  group length: 581
+
+Outlines Hint Table
+
+first_object: 89
+first_object_offset: 20067
+nobjects: 12
+group_length: 2069

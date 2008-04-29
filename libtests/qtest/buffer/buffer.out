@@ -1,0 +1,11 @@
+count: 10
+count: 21
+size: 21
+data: 1234567890abcdefghij
+count: 32
+size: 11
+data: qwertyuiop
+INTERNAL ERROR: Pl_Buffer::getBuffer() called when not ready
+size: 9
+data: mooquack
+done

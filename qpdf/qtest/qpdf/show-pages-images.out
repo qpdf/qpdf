@@ -1,0 +1,11 @@
+page 1: 5 0 R
+  images:
+    /Im1: 8 0 R, 555 x 600
+    /Im2: 9 0 R, 185 x 200
+  content:
+    7 0 R
+page 2: 6 0 R
+  images:
+    /Im2: 9 0 R, 185 x 200
+  content:
+    10 0 R

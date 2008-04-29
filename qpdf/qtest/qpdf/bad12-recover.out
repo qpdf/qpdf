@@ -1,0 +1,7 @@
+WARNING: bad12.pdf: reported number of objects (9) inconsistent with actual number of objects (8)
+/QTest is implicit
+/QTest is direct
+/QTest is null
+unparse: null
+unparseResolved: null
+test 1 done

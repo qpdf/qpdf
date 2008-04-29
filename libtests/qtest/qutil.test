@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+chdir("qutil") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('qutil');
+
+$td->runtest("QUtil",
+	     {$td->COMMAND => "qutil"},
+	     {$td->FILE => "qutil.out",
+	      $td->EXIT_STATUS => 0});
+
+$td->report(1);

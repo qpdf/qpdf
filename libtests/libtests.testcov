@@ -1,0 +1,18 @@
+ignored-scope: qpdf
+Pl_LZWDecoder intermediate reset 0
+Pl_LZWDecoder last was table size 0
+Pl_ASCII85Decoder ignore space 0
+Pl_ASCII85Decoder read z 0
+Pl_ASCII85Decoder no-op flush 0
+Pl_ASCII85Decoder partial flush 1
+bits leftover 1
+bits bit_offset 2
+bits iterations 2
+bits zero bits wanted 0
+bits write iterations 2
+bits write leftover 0
+bits write pipeline 0
+bits write zero bits 0
+Pl_ASCIIHexDecoder ignore space 0
+Pl_ASCIIHexDecoder no-op flush 0
+Pl_ASCIIHexDecoder partial flush 1

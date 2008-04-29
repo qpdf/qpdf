@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+chdir("lzw") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('lzw');
+
+$td->runtest("decode",
+	     {$td->COMMAND => "lzw < lzw1.in"},
+	     {$td->FILE => "lzw1.out",
+	      $td->EXIT_STATUS => 0});
+
+$td->report(1);

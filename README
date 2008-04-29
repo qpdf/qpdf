@@ -1,0 +1,32 @@
+This is the QPDF package.  Information about it can be found at
+http://qpdf.qbilt.org.
+
+QPDF is copyright (c) 2005-2008 Jay Berkenbilt
+
+This software may be distributed under the terms of version 2 of the
+Artistic License which may be found in the source distribution as
+"Artistic-2.0".  It is provided "as is" without express or implied
+warranty.
+
+To install this software, you can run
+
+./configure
+make
+make install
+
+For more detailed information, see the "INSTALL" in this directory.
+
+The QPDF package provides some executables and a software library.  A
+user's manual can be found in the "doc" directory.  The docbook
+sources to the user's manual can be found in the "manual" directory.
+
+The software library is just libqpdf, and all the header files are in
+the qpdf subdirectory.  If you link with -lqpdf and your system does
+not know how to read libtool .la files, then you will also need to
+link with -lpcre and -lz.
+
+To learn about using the library, please read comments in the header
+files in include/qpdf, especially QPDF.hh, QPDFObjectHandle.hh, and
+QPDFWriter.hh.  You can also study the code of qpdf/qpdf.cc, which
+exercises most of the public interface.  There are additional example
+programs in the examples directory.

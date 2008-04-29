@@ -1,0 +1,73 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+use File::Copy;
+use Digest::MD5;
+
+chdir("flate") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('flate');
+
+cleanup();
+
+open(F, ">farbage") or die;
+print F "q" x 10000, "\n";
+print F "w" x 10000, "\n";
+print F "e" x 10000, "\n";
+print F "r" x 10000, "\n";
+print F "t" x 10000, "\n";
+print F "y" x 10000, "\n";
+print F "u" x 10000, "\n";
+print F "i" x 10000, "\n";
+print F "o" x 10000, "\n";
+print F "p" x 10000, "\n";
+close(F);
+
+check_file("farbage", "a6449c61db5b0645c0693b7560b77a60");
+
+$td->runtest("run driver",
+	     {$td->COMMAND => "flate farbage"},,
+	     {$td->STRING => "bytes written to o3: 100010\ndone\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+check_file("farbage", "a6449c61db5b0645c0693b7560b77a60");
+
+$td->runtest("compressed file correct",
+	     {$td->FILE => "farbage.1"},
+	     {$td->FILE => "compressed"});
+
+$td->runtest("uncompress filter works",
+	     {$td->FILE => "farbage"},
+	     {$td->FILE => "farbage.2"});
+
+$td->runtest("double filter works",
+	     {$td->FILE => "farbage"},
+	     {$td->FILE => "farbage.3"});
+
+cleanup();
+
+$td->report(6);
+
+sub cleanup
+{
+    system("rm -f farbage*");
+}
+
+sub check_file
+{
+    my ($file, $sum) = @_;
+    open(F, "<$file") or die "open $file";
+    my $md5 = new Digest::MD5;
+    $md5->addfile(*F);
+    close(F);
+    my $result = $md5->hexdigest;
+    $td->runtest("check $file",
+		 {$td->STRING => "$result\n"},
+		 {$td->STRING => "$sum\n"});
+}

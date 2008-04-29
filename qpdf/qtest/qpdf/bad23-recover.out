@@ -1,0 +1,21 @@
+WARNING: bad23.pdf: offset 341: attempting to recover stream length
+/QTest is indirect
+/QTest is a stream.  Dictionary: << /Length () >>
+Raw stream data:
+BT
+  /F1 24 Tf
+  72 720 Td
+  (Potato) Tj
+ET
+
+Uncompressed stream data:
+BT
+  /F1 24 Tf
+  72 720 Td
+  (Potato) Tj
+ET
+
+End of stream data
+unparse: 4 0 R
+unparseResolved: 4 0 R
+test 1 done

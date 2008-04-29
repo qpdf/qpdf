@@ -1,0 +1,18 @@
+\" This file is not processed by autoconf, but rather by build.mk in
+\" the manual directory.
+.TH FIX-QDF "1" "April 2008" "fix-qdf version @PACKAGE_VERSION@" "User Commands"
+.SH NAME
+fix-qdf \- repair PDF files in QDF form after editing
+.SH SYNOPSIS
+.B qpdf
+< \fIinfilename\fR > \fIoutfilename\fR
+.SH DESCRIPTION
+The fix-qdf program is part of the qpdf package.
+.PP
+The fix-qdf program reads a PDF file in QDF form and writes out
+the same file with stream lengths, cross-reference table entries, and
+object stream offset tables regenerated.
+.PP
+For details about fix-qdf and about PDF files in QDF mode, please see
+the qpdf manual, which can be found in @docdir@/qpdf-manual.html or
+@docdir@/qpdf-manual.pdf.

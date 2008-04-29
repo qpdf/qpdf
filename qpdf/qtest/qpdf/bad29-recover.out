@@ -1,0 +1,4 @@
+WARNING: bad29.pdf: offset 0: file is damaged
+WARNING: bad29.pdf: offset 742: null character not allowed in name token
+WARNING: Attempting to reconstruct cross-reference table
+bad29.pdf: offset 742: null character not allowed in name token

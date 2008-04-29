@@ -1,0 +1,4 @@
+WARNING: bad7.pdf: offset 0: file is damaged
+WARNING: bad7.pdf: offset 698: expected trailer dictionary
+WARNING: Attempting to reconstruct cross-reference table
+bad7.pdf: unable to find trailer dictionary while recovering damanged file

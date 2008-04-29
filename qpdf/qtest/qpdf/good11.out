@@ -1,0 +1,6 @@
+/QTest is direct
+/QTest is a dictionary
+  /a is direct
+unparse: << /a (a) /b 8 0 R >>
+unparseResolved: << /a (a) /b 8 0 R >>
+test 1 done

@@ -1,0 +1,63 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+use File::Copy;
+use Digest::MD5;
+
+chdir("png_filter") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('png_filter');
+
+cleanup();
+
+$td->runtest("decode columns = 4",
+	     {$td->COMMAND => "png_filter decode in1 4"},
+	     {$td->STRING => "done\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("check output",
+	     {$td->FILE => "out"},
+	     {$td->FILE => "out1"});
+
+$td->runtest("decode columns = 5",
+	     {$td->COMMAND => "png_filter decode in2 5"},
+	     {$td->STRING => "done\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("check output",
+	     {$td->FILE => "out"},
+	     {$td->FILE => "out2"});
+
+$td->runtest("encode columns = 4",
+	     {$td->COMMAND => "png_filter encode out1 4"},
+	     {$td->STRING => "done\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("check output",
+	     {$td->FILE => "out"},
+	     {$td->FILE => "in1"});
+
+$td->runtest("encode columns = 5",
+	     {$td->COMMAND => "png_filter encode out2 5"},
+	     {$td->STRING => "done\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("check output",
+	     {$td->FILE => "out"},
+	     {$td->FILE => "in2"});
+
+cleanup();
+
+$td->report(8);
+
+sub cleanup
+{
+    unlink "out";
+}

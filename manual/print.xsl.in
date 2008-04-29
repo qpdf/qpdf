@@ -1,0 +1,69 @@
+<?xml version='1.0'?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:fo="http://www.w3.org/1999/XSL/Format"
+                version="1.0">
+ <xsl:import href="@DOCBOOK_FO@"/>
+ <xsl:import href="common.xsl"/>
+ <xsl:param name="local.l10n.xml" select="document('')"/>
+ <l:i18n xmlns:l="http://docbook.sourceforge.net/xmlns/l10n/1.0">
+  <l:l10n language="en">
+   <l:context name="xref">
+    <l:template name="page.citation" text=", page %p"/>
+   </l:context>
+  </l:l10n>
+ </l:i18n>
+ <!--  This should give us bookmarks, but it's broken for fop      -->
+ <!--  0.94 and stylesheets 1.73.2.                                -->
+<!--
+ <xsl:param name="fop.extensions" select="1"/>
+-->
+ <xsl:param name="paper.type" select="'USLetter'"/>
+ <xsl:param name="insert.xref.page.number" select="'yes'"/>
+<!--
+ <xsl:param name="admon.graphics.path">
+  /tmp/z/docbook-xsl-1.73.2/images/
+ </xsl:param>
+ <xsl:param name="admon.graphics" select="1"/>
+-->
+ <xsl:param name="shade.verbatim" select="1"/>
+ <xsl:attribute-set name="shade.verbatim.style">
+  <xsl:attribute name="background-color">#F0F0F0</xsl:attribute>
+  <xsl:attribute name="border-width">0.5pt</xsl:attribute>
+  <xsl:attribute name="border-style">solid</xsl:attribute>
+  <xsl:attribute name="border-color">#575757</xsl:attribute>
+  <xsl:attribute name="padding">3pt</xsl:attribute>
+ </xsl:attribute-set>
+ <xsl:attribute-set name="xref.properties">
+  <xsl:attribute name="color">#00c</xsl:attribute>
+ </xsl:attribute-set>
+ <fo:page-sequence language="en"/>
+ <fo:block hyphenate="true"/>
+
+ <xsl:template match="property">
+  <xsl:call-template name="inline.boldseq"/>
+ </xsl:template>
+ <xsl:template match="classname">
+  <fo:inline font-family="sans-serif" font-weight="bold">
+   <xsl:call-template name="inline.italicseq"/>
+  </fo:inline>
+ </xsl:template>
+ <xsl:template match="filename">
+  <xsl:call-template name="inline.italicseq"/>
+ </xsl:template>
+ <xsl:template match="varname">
+  <xsl:call-template name="inline.italicseq"/>
+ </xsl:template>
+ <xsl:template match="function">
+  <xsl:call-template name="inline.italicseq"/>
+ </xsl:template>
+ <xsl:template match="envar">
+  <xsl:call-template name="inline.italicseq"/>
+ </xsl:template>
+ <xsl:template match="type">
+  <xsl:call-template name="inline.monoseq"/>
+ </xsl:template>
+ <xsl:template match="option">
+  <xsl:call-template name="inline.boldseq"/>
+ </xsl:template>
+
+</xsl:stylesheet>

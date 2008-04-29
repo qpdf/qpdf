@@ -1,0 +1,9 @@
+WARNING: bad4.pdf: offset 0: file is damaged
+WARNING: bad4.pdf: offset 547: xref syntax invalid
+WARNING: Attempting to reconstruct cross-reference table
+/QTest is implicit
+/QTest is direct
+/QTest is null
+unparse: null
+unparseResolved: null
+test 1 done

@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+chdir("ascii85") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('ascii85');
+
+$td->runtest("decode",
+	     {$td->COMMAND => "ascii85 < base85.in"},
+	     {$td->FILE => "binary.out",
+	      $td->EXIT_STATUS => 0});
+
+$td->runtest("partial decode",
+	     {$td->COMMAND => "echo '\@<5skEHbu7\$3~>' | ascii85"},
+	     {$td->STRING => "asdfqwer\n",
+	      $td->EXIT_STATUS => 0});
+
+$td->report(2);

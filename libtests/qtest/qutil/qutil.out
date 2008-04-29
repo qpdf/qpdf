@@ -1,0 +1,30 @@
+16059
+0016059
+16059  
+3.141590
+3.142
+1000.123000
+exception 1: INTERNAL ERROR: Util::int_to_string has been called with a padding value greater than its internal limit
+exception 2: INTERNAL ERROR: Util::int_to_string has been called with a padding value greater than its internal limit
+exception 3: INTERNAL ERROR: Util::int_to_string has been called with a padding value greater than its internal limit
+exception 4: INTERNAL ERROR: Util::double_to_string has been called with a number and a decimal places specification that would break an internal limit
+exception 5: INTERNAL ERROR: Util::double_to_string has been called with a number and a decimal places specification that would break an internal limit
+one
+7
+compare okay
+----
+before open
+exception: open file: No such file or directory
+----
+before fopen
+exception: fopen file: No such file or directory
+----
+IN_TESTSUITE: 1: 1
+HAGOOGAMAGOOGLE: 0
+----
+0x41 -> A
+0xf7 -> ÷
+0x3c0 -> π
+0x16059 -> f0 96 81 99
+0x7fffffff -> fd bf bf bf bf bf
+0x80000000: bounds error in QUtil::toUTF8

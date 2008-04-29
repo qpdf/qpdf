@@ -1,0 +1,122 @@
+%PDF-1.3
+1 0 obj
+<<
+  /Type /Catalog
+  /Pages 2 0 R
+>>
+endobj
+
+2 0 obj
+<<
+  /Type /Pages
+  /Kids [
+    3 0 R
+  ]
+  /Count 1
+>>
+
+3 0 obj
+<<
+  /Type /Page
+  /Parent 2 0 R
+  /MediaBox [0 0 612 792]
+  /Contents 4 0 R
+  /Resources <<
+    /ProcSet 5 0 R
+    /Font <<
+      /F1 6 0 R
+    >>
+  >>
+>>
+endobj
+
+4 0 obj
+<<
+  /Length 44
+>>
+stream
+BT
+  /F1 24 Tf
+  72 720 Td
+  (Potato) Tj
+ET
+endstream
+
+5 0 obj
+[
+  /PDF
+  /Text
+]
+endobj
+
+6 0 obj
+<<
+  /Type /Font
+  /Subtype /Type1
+  /Name /F1
+  /BaseFont /Helvetica
+  /Encoding /WinAnsiEncoding
+>>
+endobj
+
+xref
+0 7
+0000000000 65535 f 
+0000000009 00000 n 
+0000000063 00000 n 
+0000000128 00000 n 
+0000000300 00000 n 
+0000000389 00000 n 
+0000000424 00000 n 
+trailer <<
+  /Size 7
+  /Root 1 0 R
+>>
+startxref
+542
+%%EOF
+
+3 0 obj
+<<
+  /Type /Page
+  /Parent 2 0 R
+  /MediaBox [0 0 612 792]
+  /Contents 7 0 R
+  /Resources <<
+    /ProcSet 5 0 R
+    /Font <<
+      /F1 6 0 R
+    >>
+  >>
+>>
+endobj
+
+7 0 obj
+<<
+  /Length 48
+>>
+stream
+BT
+  /F1 24 Tf
+  72 720 Td
+  (Sandwiches) Tj
+ET
+endstream
+endobj
+
+xref
+0 1
+0000000006 65535 f 
+3 2
+0000000750 00000 n 
+0000000000 00000 f 
+7 1
+0000000922 00000 n 
+trailer <<
+  /Size 8
+  /Root 1 0 R
+  /Prev 542
+>>
+startxref
+1022
+%%EOF

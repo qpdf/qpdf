@@ -1,0 +1,59 @@
+byte offset = 0, bit offset = 7, bits available = 64
+bits read: 5, result = 30
+byte offset = 0, bit offset = 2, bits available = 59
+bits read: 4, result = 10
+byte offset = 1, bit offset = 6, bits available = 55
+bits read: 6, result = 10
+byte offset = 1, bit offset = 0, bits available = 49
+bits read: 9, result = 357
+byte offset = 3, bit offset = 7, bits available = 40
+bits read: 9, result = 242
+byte offset = 4, bit offset = 6, bits available = 31
+bits read: 2, result = 0
+byte offset = 4, bit offset = 4, bits available = 29
+bits read: 1, result = 1
+byte offset = 4, bit offset = 3, bits available = 28
+bits read: 0, result = 0
+byte offset = 4, bit offset = 3, bits available = 28
+bits read: 25, result = 5320361
+byte offset = 7, bit offset = 2, bits available = 3
+exception: overflow reading bit stream
+byte offset = 7, bit offset = 2, bits available = 3
+bits read: 3, result = 3
+byte offset = 8, bit offset = 7, bits available = 0
+
+byte offset = 0, bit offset = 7, bits available = 64
+bits read: 32, result = 4111820153
+byte offset = 4, bit offset = 7, bits available = 32
+bits read: 32, result = 310998347
+byte offset = 8, bit offset = 7, bits available = 0
+
+4111820153
+4111820153
+310998347
+
+61
+21
+101
+
+ch = f0, bit_offset = 2
+ch = 00, bit_offset = 6
+ch = 14, bit_offset = 0
+ch = 14, bit_offset = 0
+ch = 00, bit_offset = 7
+f5 15 65
+
+ch = 00, bit_offset = 6
+ch = 00, bit_offset = 4
+ch = 10, bit_offset = 3
+ch = 48, bit_offset = 2
+ch = 00, bit_offset = 7
+79 12 89 75 4b
+
+ch = 00, bit_offset = 7
+ch = 00, bit_offset = 7
+f5 15 65 79 12 89 75 4b
+
+f0 ab
+
+done

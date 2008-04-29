@@ -1,0 +1,34 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+chdir("pcre") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('pcre');
+
+$td->runtest("PCRE",
+	     {$td->COMMAND => "pcre"},
+	     {$td->FILE => "pcre.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+chop(my $supported = `pcre --unicode-classes-supported`);
+if ($supported)
+{
+    $td->runtest("unicode character classes",
+		 {$td->COMMAND => "pcre --unicode-classes"},
+		 {$td->FILE => "pcre-unicode-classes.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
+else
+{
+    $td->runtest("unicode classes are not supported",
+		 {$td->STRING => "1"},
+		 {$td->STRING => "1"});
+}
+
+$td->report(2);

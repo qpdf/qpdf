@@ -1,0 +1,9 @@
+WARNING: bad32.pdf: offset 0: file is damaged
+WARNING: bad32.pdf: offset 307: expected 4 0 obj
+WARNING: Attempting to reconstruct cross-reference table
+/QTest is implicit
+/QTest is indirect
+/QTest is null
+unparse: 4 0 R
+unparseResolved: null
+test 1 done

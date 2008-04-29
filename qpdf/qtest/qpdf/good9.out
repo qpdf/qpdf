@@ -1,0 +1,5 @@
+/QTest is direct
+/QTest is a string with value ¡Hola!
+unparse: (¡Hola!)
+unparseResolved: (¡Hola!)
+test 1 done

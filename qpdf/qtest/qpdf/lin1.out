@@ -1,0 +1,378 @@
+WARNING: end of first page section (/E) mismatch: /E = 1827; computed = 3889..3891
+WARNING: page 0 has shared identifier entries
+WARNING: page 0: shared object 62: in hint table but not computed list
+lin1.pdf: linearization data:
+
+file_size: 13103
+first_page_object: 62
+first_page_end: 1827
+npages: 30
+xref_zero_offset: 11776
+first_page: 0
+H_offset: 1211
+H_length: 203
+
+Page Offsets Hint Table
+
+min_nobjects: 2
+first_page_offset: 1414
+nbits_delta_nobjects: 4
+min_page_length: 259
+nbits_delta_page_length: 12
+min_content_offset: 0
+nbits_delta_content_offset: 0
+min_content_length: 0
+nbits_delta_content_length: 12
+nbits_nshared_objects: 2
+nbits_shared_identifier: 2
+nbits_shared_numerator: 4
+shared_denominator: 8
+Page 0:
+  nobjects: 16
+  length: 2477
+  content_offset: 0
+  content_length: 2218
+  nshared_objects: 2
+    identifier 0: 0
+    numerator 0: 0
+    identifier 1: 0
+    numerator 1: 0
+Page 1:
+  nobjects: 2
+  length: 259
+  content_offset: 0
+  content_length: 0
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 2:
+  nobjects: 2
+  length: 259
+  content_offset: 0
+  content_length: 0
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 3:
+  nobjects: 2
+  length: 259
+  content_offset: 0
+  content_length: 0
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 4:
+  nobjects: 2
+  length: 259
+  content_offset: 0
+  content_length: 0
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 5:
+  nobjects: 2
+  length: 261
+  content_offset: 0
+  content_length: 2
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 6:
+  nobjects: 2
+  length: 262
+  content_offset: 0
+  content_length: 3
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 7:
+  nobjects: 2
+  length: 262
+  content_offset: 0
+  content_length: 3
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 8:
+  nobjects: 2
+  length: 262
+  content_offset: 0
+  content_length: 3
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 9:
+  nobjects: 2
+  length: 262
+  content_offset: 0
+  content_length: 3
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 10:
+  nobjects: 2
+  length: 263
+  content_offset: 0
+  content_length: 4
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 11:
+  nobjects: 2
+  length: 263
+  content_offset: 0
+  content_length: 4
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 12:
+  nobjects: 2
+  length: 263
+  content_offset: 0
+  content_length: 4
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 13:
+  nobjects: 2
+  length: 263
+  content_offset: 0
+  content_length: 4
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 14:
+  nobjects: 2
+  length: 263
+  content_offset: 0
+  content_length: 4
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 15:
+  nobjects: 2
+  length: 263
+  content_offset: 0
+  content_length: 4
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 16:
+  nobjects: 2
+  length: 263
+  content_offset: 0
+  content_length: 4
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 17:
+  nobjects: 2
+  length: 263
+  content_offset: 0
+  content_length: 4
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 18:
+  nobjects: 2
+  length: 263
+  content_offset: 0
+  content_length: 4
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 19:
+  nobjects: 2
+  length: 263
+  content_offset: 0
+  content_length: 4
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 20:
+  nobjects: 2
+  length: 263
+  content_offset: 0
+  content_length: 4
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 21:
+  nobjects: 2
+  length: 263
+  content_offset: 0
+  content_length: 4
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 22:
+  nobjects: 2
+  length: 263
+  content_offset: 0
+  content_length: 4
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 23:
+  nobjects: 2
+  length: 263
+  content_offset: 0
+  content_length: 4
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 24:
+  nobjects: 2
+  length: 263
+  content_offset: 0
+  content_length: 4
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 25:
+  nobjects: 2
+  length: 263
+  content_offset: 0
+  content_length: 4
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 26:
+  nobjects: 2
+  length: 263
+  content_offset: 0
+  content_length: 4
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 27:
+  nobjects: 2
+  length: 263
+  content_offset: 0
+  content_length: 4
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 28:
+  nobjects: 2
+  length: 263
+  content_offset: 0
+  content_length: 4
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+Page 29:
+  nobjects: 2
+  length: 263
+  content_offset: 0
+  content_length: 4
+  nshared_objects: 2
+    identifier 0: 2
+    numerator 0: 0
+    identifier 1: 3
+    numerator 1: 0
+
+Shared Objects Hint Table
+
+first_shared_obj: 0
+first_shared_offset: 0
+nshared_first_page: 16
+nshared_total: 16
+nbits_nobjects: 0
+min_group_length: 34
+nbits_delta_group_length: 9
+Shared Object 0:
+  group length: 157
+Shared Object 1:
+  group length: 105
+Shared Object 2:
+  group length: 117
+Shared Object 3:
+  group length: 34
+Shared Object 4:
+  group length: 82
+Shared Object 5:
+  group length: 191
+Shared Object 6:
+  group length: 144
+Shared Object 7:
+  group length: 168
+Shared Object 8:
+  group length: 291
+Shared Object 9:
+  group length: 165
+Shared Object 10:
+  group length: 162
+Shared Object 11:
+  group length: 182
+Shared Object 12:
+  group length: 201
+Shared Object 13:
+  group length: 150
+Shared Object 14:
+  group length: 164
+Shared Object 15:
+  group length: 164
+
+Outlines Hint Table
+
+first_object: 66
+first_object_offset: 1827
+nobjects: 12
+group_length: 2064

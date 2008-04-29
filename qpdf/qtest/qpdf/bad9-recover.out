@@ -1,0 +1,9 @@
+WARNING: bad9.pdf: offset 0: file is damaged
+WARNING: bad9.pdf: offset 712: trailer dictionary lacks /Size key
+WARNING: Attempting to reconstruct cross-reference table
+/QTest is implicit
+/QTest is direct
+/QTest is null
+unparse: null
+unparseResolved: null
+test 1 done

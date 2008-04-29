@@ -1,0 +1,142 @@
+%PDF-1.3 -*- coding: no-conversion -*-
+%¿›þ¢
+1 0 obj
+<<
+  /Type /Catalog
+  /Pages 2 0 R
+>>
+endobj
+
+2 0 obj
+<<
+  /Type /Pages
+  /Kids [
+    3 0 R
+  ]
+  /Count 1
+>>
+endobj
+
+3 0 obj
+<<
+  /Type /Page
+  /Parent 2 0 R
+  /MediaBox [0 0 612 792]
+  /Contents 4 0 R
+  /Resources <<
+    /ProcSet 5 0 R
+    /Font <<
+      /F1 6 0 R
+    >>
+  >>
+>>
+endobj
+
+4 0 obj
+<<
+  /Length 44
+>>
+stream
+BT
+  /F1 24 Tf
+  72 720 Td
+  (Potato) Tj
+ET
+endstream
+endobj
+
+5 0 obj
+[
+  /PDF
+  /Text
+]
+endobj
+
+6 0 obj
+<<
+  /Type /Font
+  /Subtype /Type1
+  /Name /F1
+  /BaseFont /Helvetica
+  /Encoding /WinAnsiEncoding
+>>
+endobj
+
+7 0 obj
+<< /Length 9 0 R >>
+stream
+A %here is a comment
+B % here is another with CR
+A B 
+onetwothree lines
+(string with 
+CRNL) and another
+   indentation
+(B%DEF)()
+<8A
+8B><6162><8c><DD> ) >
+(a\000b) <4D4F4F>endstreamendobj
+
+8 0 obj
+<< /Length 385 >>
+stream
+This stream does end with a newline.
+// tests:
+//   bad tokens preserved
+//   comments
+//   indentation
+//   CR/NL inside string literal -- changed to \r or \n, newline follows
+//   whitespace in hexstring (removed)
+//   strings normalized
+//   newlines normalized
+//   names normalized
+//   trailing space (preserved)
+//   final newline added
+
+/bad#name
+  
+/g#6f#6Fd name
+/bad#00name
+endstream
+endobj
+
+9 0 obj
+181
+endobj
+
+10 0 obj
+<< /Length 40 >>
+stream
+(This stream ends with a \001 bad token
+endstream
+endobj
+
+11 0 obj
+<< /Length 5 >>
+stream
+<AB X
+endstream
+endobj
+
+xref
+0 12
+0000000000 65535 f 
+0000000045 00000 n 
+0000000099 00000 n 
+0000000171 00000 n 
+0000000343 00000 n 
+0000000439 00000 n 
+0000000474 00000 n 
+0000000592 00000 n 
+0000000827 00000 n 
+0000001263 00000 n 
+0000001283 00000 n 
+0000001374 00000 n 
+trailer <<
+  /Size 12
+  /Root 1 0 R
+  /QStreams [ 7 0 R 8 0 R 10 0 R 11 0 R ]
+>>
+startxref
+1430
+%%EOF

@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+chdir("npages");
+
+require TestDriver;
+
+my $td = new TestDriver('pdf-npages');
+
+$td->runtest("normal",
+	     {$td->COMMAND => "pdf-npages minimal.pdf"},
+	     {$td->STRING => "1\n", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("error",
+	     {$td->COMMAND => "pdf-npages bad"},
+	     {$td->STRING => "pdf-npages: bad: offset 0: not a PDF file\n",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->report(2);

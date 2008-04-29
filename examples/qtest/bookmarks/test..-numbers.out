@@ -1,0 +1,11 @@
+1. Trepak 2 -> 15: /XYZ 66 756 3
+2. Isis 1 -> 5: /XYZ null null null
+2.1. Amanda 1.1 -> 11: /Fit
+2.1.1. Isosicle 1.1.1 -> 12: /FitV 100
+2.1.1.1. Isosicle 1.1.1.1 -> 18: /XYZ null null null
+2.1.1.2. Isosicle 1.1.1.2 -> 19: /XYZ null null null
+2.1.2. Isosicle 1.1.2 -> 12: /XYZ null null null
+2.1.2.1. Isosicle 1.1.2.1 -> 22: /XYZ null null null
+2.2. Sandy 1.2 -> 13: /FitH 792
+2.2.1. Trepsichord 1.2.1 -> 1: /FitR 66 714 180 770
+2.2.2. Trepsicle 1.2.2 -> 0: /XYZ null null null

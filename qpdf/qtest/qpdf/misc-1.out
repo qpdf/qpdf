@@ -1,0 +1,15 @@
+page 1:
+  images:
+    /Im1: 5100 x 6600
+  content:
+    5 0 R
+end page 1
+page 2:
+  images:
+    /Im2: 5100 x 6600
+    /Im3: 305 x 305
+    /Im4: 305 x 305
+  content:
+    11 0 R
+end page 2
+test 5 done

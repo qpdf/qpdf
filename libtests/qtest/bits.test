@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+chdir("bits") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('bits');
+
+$td->runtest("bits",
+	     {$td->COMMAND => "bits"},
+	     {$td->FILE => "bits.out",
+	      $td->EXIT_STATUS => 0});
+
+$td->report(1);

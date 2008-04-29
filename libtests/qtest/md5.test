@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+chdir("md5") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('md5');
+
+$td->runtest("md5",
+	     {$td->COMMAND => "md5"},
+	     {$td->FILE => "md5.out",
+	      $td->EXIT_STATUS => 0});
+
+$td->report(1);
