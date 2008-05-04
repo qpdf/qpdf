@@ -1,3 +1,7 @@
+2008-05-03  Jay Berkenbilt  <ejb@ql.org>
+
+	* libqpdf/PCRE.cc: added missing include of <string.h>
+
 2008-04-26  Jay Berkenbilt  <ejb@ql.org>
 
 	* 2.0: initial public release

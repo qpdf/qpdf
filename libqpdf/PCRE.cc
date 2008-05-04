@@ -1,9 +1,9 @@
 
-
 #include <qpdf/PCRE.hh>
 #include <qpdf/QUtil.hh>
 
 #include <iostream>
+#include <strlen.h>
 
 PCRE::Exception::Exception(std::string const& message)
 {
