@@ -235,7 +235,7 @@ QPDFWriter::setEncryptionParameters(
     for (std::set<int>::iterator iter = bits_to_clear.begin();
 	 iter != bits_to_clear.end(); ++iter)
     {
-	P |= ((1 << (*iter)) - 1);
+	P |= (1 << ((*iter) - 1));
     }
     P = ~P;
 
