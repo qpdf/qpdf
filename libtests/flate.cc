@@ -5,6 +5,8 @@
 
 #include <iostream>
 #include <errno.h>
+#include <string.h>
+#include <stdlib.h>
 
 FILE* safe_fopen(char const* filename, char const* mode)
 {

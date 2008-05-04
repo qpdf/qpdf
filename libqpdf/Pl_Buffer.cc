@@ -2,6 +2,7 @@
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/QEXC.hh>
 #include <assert.h>
+#include <string.h>
 
 Pl_Buffer::Pl_Buffer(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next),

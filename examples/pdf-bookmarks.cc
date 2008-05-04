@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string.h>
+#include <stdlib.h>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/QTC.hh>

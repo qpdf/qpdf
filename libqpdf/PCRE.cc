@@ -3,7 +3,7 @@
 #include <qpdf/QUtil.hh>
 
 #include <iostream>
-#include <strlen.h>
+#include <string.h>
 
 PCRE::Exception::Exception(std::string const& message)
 {

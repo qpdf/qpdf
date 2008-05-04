@@ -2,6 +2,7 @@
 
 #include <qpdf/Pl_StdioFile.hh>
 #include <iostream>
+#include <stdlib.h>
 
 int main()
 {
@@ -29,7 +30,7 @@ int main()
     catch (std::exception& e)
     {
 	std::cerr << e.what() << std::endl;
-	exit(2);
+	 exit(2);
     }
 
     return 0;

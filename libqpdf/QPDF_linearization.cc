@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <assert.h>
 #include <math.h>
+#include <string.h>
 
 template <class T>
 static void

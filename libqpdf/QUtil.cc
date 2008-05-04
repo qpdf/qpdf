@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <string.h>
 #ifdef _WIN32
 #include <Windows.h>
 #include <direct.h>

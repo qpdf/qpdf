@@ -2,6 +2,7 @@
 #include <qpdf/Pl_QPDFTokenizer.hh>
 #include <qpdf/QPDF_String.hh>
 #include <qpdf/QPDF_Name.hh>
+#include <string.h>
 
 Pl_QPDFTokenizer::Pl_QPDFTokenizer(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next),

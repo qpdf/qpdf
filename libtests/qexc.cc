@@ -2,6 +2,7 @@
 #include <qpdf/QEXC.hh>
 #include <iostream>
 #include <errno.h>
+#include <stdlib.h>
 
 void do_terminate()
 {

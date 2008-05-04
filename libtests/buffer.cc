@@ -2,6 +2,7 @@
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/Pl_Count.hh>
 #include <qpdf/Pl_Discard.hh>
+#include <stdlib.h>
 
 typedef unsigned char* uc;
 

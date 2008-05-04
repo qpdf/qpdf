@@ -1,6 +1,6 @@
-2008-05-03  Jay Berkenbilt  <ejb@ql.org>
+2008-05-04  Jay Berkenbilt  <ejb@ql.org>
 
-	* libqpdf/PCRE.cc: added missing include of <string.h>
+	* updated several files for gcc 4.3 (extra includes)
 
 2008-04-26  Jay Berkenbilt  <ejb@ql.org>
 

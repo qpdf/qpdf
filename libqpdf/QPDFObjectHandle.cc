@@ -16,6 +16,8 @@
 #include <qpdf/QEXC.hh>
 #include <qpdf/QUtil.hh>
 
+#include <stdlib.h>
+
 QPDFObjectHandle::QPDFObjectHandle() :
     initialized(false),
     objid(0),

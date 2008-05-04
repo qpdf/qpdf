@@ -1,6 +1,8 @@
 
 #include <qpdf/QPDF_Name.hh>
 
+#include <string.h>
+
 QPDF_Name::QPDF_Name(std::string const& name) :
     name(name)
 {

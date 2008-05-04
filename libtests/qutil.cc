@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <qpdf/QUtil.hh>
+#include <string.h>
 
 #ifdef _WIN32
 # include <io.h>

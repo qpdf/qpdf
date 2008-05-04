@@ -9,6 +9,7 @@
 #include <qpdf/QPDFWriter.hh>
 #include <iostream>
 #include <string.h>
+#include <stdlib.h>
 #include <map>
 
 static char const* whoami = 0;

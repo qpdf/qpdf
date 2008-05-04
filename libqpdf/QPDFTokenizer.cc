@@ -9,6 +9,8 @@
 #include <qpdf/QEXC.hh>
 #include <qpdf/QTC.hh>
 
+#include <string.h>
+
 // See note above about ctype.
 static bool is_hex_digit(char ch)
 {
