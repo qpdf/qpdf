@@ -478,7 +478,7 @@ int main(int argc, char* argv[])
     bool r2_extract = true;
     bool r2_annotate = true;
     bool r3_accessibility = true;
-    bool r3_extract = true;;
+    bool r3_extract = true;
     QPDFWriter::r3_print_e r3_print = QPDFWriter::r3p_full;
     QPDFWriter::r3_modify_e r3_modify = QPDFWriter::r3m_all;
 
