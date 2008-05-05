@@ -85,7 +85,7 @@ class QPDF
     struct EncryptionData
     {
 	// This class holds data read from the encryption dictionary.
-	EncryptionData(int V, int R, int Length_bytes, long P,
+	EncryptionData(int V, int R, int Length_bytes, int P,
 		       std::string const& O, std::string const& U,
 		       std::string const& id1) :
 	    V(V),
@@ -101,7 +101,7 @@ class QPDF
 	int V;
 	int R;
 	int Length_bytes;
-	long P;
+	int P;
 	std::string O;
 	std::string U;
 	std::string id1;
@@ -115,7 +115,7 @@ class QPDF
 
     static void compute_encryption_O_U(
 	char const* user_password, char const* owner_password,
-	int V, int R, int key_len, unsigned long P,
+	int V, int R, int key_len, int P,
 	std::string const& id1,
 	std::string& O, std::string& U);
     std::string const& getUserPassword() const;

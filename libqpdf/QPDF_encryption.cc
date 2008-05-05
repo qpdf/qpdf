@@ -427,7 +427,7 @@ QPDF::decryptStream(Pipeline*& pipeline, int objid, int generation,
 void
 QPDF::compute_encryption_O_U(
     char const* user_password, char const* owner_password,
-    int V, int R, int key_len, unsigned long P,
+    int V, int R, int key_len, int P,
     std::string const& id1, std::string& O, std::string& U)
 {
     EncryptionData data(V, R, key_len, P, "", "", id1);
