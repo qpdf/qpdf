@@ -5,6 +5,9 @@
 #include <string>
 #include <qpdf/QEXC.hh>
 #include <qpdf/qpdf-config.h>
+#ifdef HAVE_INTTYPES_H
+# include <inttypes.h>
+#endif
 
 class MD5
 {
