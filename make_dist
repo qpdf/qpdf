@@ -110,6 +110,7 @@ if ($version_error)
 }
 
 run("autoconf");
+run("autoheader");
 run("./configure --enable-doc-maintenance");
 run("make build_manual");
 run("make distclean");

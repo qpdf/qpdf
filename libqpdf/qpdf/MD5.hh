@@ -4,6 +4,7 @@
 
 #include <string>
 #include <qpdf/QEXC.hh>
+#include <qpdf/qpdf-config.h>
 
 class MD5
 {
@@ -49,10 +50,10 @@ class MD5
     typedef void *POINTER;
 
     // UINT2 defines a two byte word
-    typedef unsigned short int UINT2;
+    typedef uint16_t UINT2;
 
     // UINT4 defines a four byte word
-    typedef unsigned long int UINT4;
+    typedef uint32_t UINT4;
 
     void init();
     void update(unsigned char *, unsigned int);

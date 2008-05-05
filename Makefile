@@ -92,12 +92,13 @@ $(foreach B,$(BUILD_ITEMS),$(eval \
 
 distclean: clean
 	$(RM) -r autoconf.mk autom4te.cache config.log config.status libtool
+	$(RM) libqpdf/qpdf/qpdf-config.h
 	$(RM) manual/html.xsl
 	$(RM) manual/print.xsl
 	$(RM) doc/*.1
 
 maintainer-clean: distclean
-	$(RM) configure doc/qpdf-manual.*
+	$(RM) configure doc/qpdf-manual.* libqpdf/qpdf/qpdf-config.h.in
 
 .PHONY: $(TEST_TARGETS)
 $(foreach B,$(TEST_ITEMS),$(eval \
@@ -140,5 +141,10 @@ QTEST=$(abspath qtest/bin/qtest-driver)
 $(TEST_TARGETS):
 	@echo running qtest-driver for $(subst check_,,$@)
 	@(cd $(subst check_,,$@)/$(OUTPUT_DIR); \
-         TC_SRCS="$(foreach T,$(TC_SRCS_$(subst check_,,$@)),../../$(T))" \
-	 $(QTEST) -bindirs .:.. -datadir ../qtest -covdir ..)
+         if TC_SRCS="$(foreach T,$(TC_SRCS_$(subst check_,,$@)),../../$(T))" \
+	 $(QTEST) -bindirs .:.. -datadir ../qtest -covdir ..; then \
+	    true; \
+	 else \
+	    cat -v qtest.log; \
+	    false; \
+	 fi)

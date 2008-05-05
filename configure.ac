@@ -7,6 +7,7 @@ AC_INIT(qpdf,2.0)
 dnl No AC_CONFIG_HEADERS.  If this changes, update README.maintainer.
 AC_CONFIG_FILES([autoconf.mk])
 AC_CONFIG_FILES([manual/html.xsl manual/print.xsl])
+AC_CONFIG_HEADERS([libqpdf/qpdf/qpdf-config.h])
 
 AC_PROG_CC
 AC_PROG_CXX
@@ -17,6 +18,10 @@ AC_CHECK_HEADER(zlib.h,,[MISSING_ZLIB_H=1; MISSING_ANY=1])
 AC_SEARCH_LIBS(deflate,z zlib,,[MISSING_ZLIB=1; MISSING_ANY=1])
 AC_CHECK_HEADER(pcre.h,,[MISSING_PCRE_H=1; MISSING_ANY=1])
 AC_SEARCH_LIBS(pcre_compile,pcre,,[MISSING_PCRE=1; MISSING_ANY=1])
+
+AC_TYPE_INT16_T
+AC_TYPE_INT32_T
+AC_TYPE_INT64_T
 
 AC_MSG_CHECKING(for gnu make >= 3.81)
 make_okay=0
