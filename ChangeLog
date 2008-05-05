@@ -1,5 +1,12 @@
 2008-05-04  Jay Berkenbilt  <ejb@ql.org>
 
+	* do not assume size_t is unsigned int
+
+	* removed locale-specific tests.  These were really to check bugs
+	in perl 5.8.0 and are obsolete now.  They also make the test suite
+	fail in some environments that don't have all the locales fully
+	configured.
+
 	* updated several files for gcc 4.3 (extra includes)
 
 2008-04-26  Jay Berkenbilt  <ejb@ql.org>
