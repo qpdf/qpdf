@@ -1,6 +1,8 @@
-2008-05-04  Jay Berkenbilt  <ejb@ql.org>
+2008-05-05  Jay Berkenbilt  <ejb@ql.org>
 
 	* fix internal MD5 header to be 64-bit clean
+
+2008-05-04  Jay Berkenbilt  <ejb@ql.org>
 
 	* do not assume size_t is unsigned int
 
