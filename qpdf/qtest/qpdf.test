@@ -216,7 +216,7 @@ my @goodfiles = ("implicit null",			# 1
 		 "lots of compressible objects",	# 20
 		 );
 
-$n_tests += (9 * @goodfiles) + 6;
+$n_tests += (3 * @goodfiles) + 6;
 
 my %goodtest_overrides = ('14' => 3);
 my %goodtest_flags =
@@ -226,17 +226,14 @@ my %goodtest_flags =
 for (my $i = 1; $i <= scalar(@goodfiles); ++$i)
 {
     my $n = $goodtest_overrides{$i} || 1;
-    foreach my $lang (qw(C en_US en_US.UTF-8))
-    {
-	$td->runtest("$goodfiles[$i-1], ($lang)",
-		     {$td->COMMAND => "test_driver $n good$i.pdf"},
-		     {$td->FILE => "good$i.out",
-		      $td->EXIT_STATUS => 0});
-	my $xflags = $goodtest_flags{$i} || '';
-	check_pdf("create qdf",
-		  "qpdf --static-id -qdf $xflags good$i.pdf",
-		  "good$i.qdf", 0);
-    }
+    $td->runtest("$goodfiles[$i-1]",
+		 {$td->COMMAND => "test_driver $n good$i.pdf"},
+		 {$td->FILE => "good$i.out",
+		  $td->EXIT_STATUS => 0});
+    my $xflags = $goodtest_flags{$i} || '';
+    check_pdf("create qdf",
+	      "qpdf --static-id -qdf $xflags good$i.pdf",
+	      "good$i.qdf", 0);
 }
 
 check_pdf("no normalization",
@@ -798,17 +795,14 @@ foreach my $file (@files)
 show_ntests();
 # ----------
 $td->notify("--- fix-qdf Tests ---");
-$n_tests += 6;
+$n_tests += 2;
 
-foreach my $lang qw(C en_US en_US.UTF-8)
+for (my $n = 1; $n <= 2; ++$n)
 {
-    for (my $n = 1; $n <= 2; ++$n)
-    {
-	$td->runtest("fix-qdf $n (LANG=$lang)",
-		     {$td->COMMAND => "LANG=$lang fix-qdf fix$n.qdf"},
-		     {$td->FILE => "fix$n.qdf.out",
-		      $td->EXIT_STATUS => 0});
-    }
+    $td->runtest("fix-qdf $n",
+		 {$td->COMMAND => "fix-qdf fix$n.qdf"},
+		 {$td->FILE => "fix$n.qdf.out",
+		  $td->EXIT_STATUS => 0});
 }
 
 show_ntests();

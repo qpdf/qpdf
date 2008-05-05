@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-require 5.008;
+require 5.008_001;
 BEGIN { $^W = 1; }
 use strict;
 
