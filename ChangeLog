@@ -1,5 +1,7 @@
 2008-05-04  Jay Berkenbilt  <ejb@ql.org>
 
+	* fix internal MD5 header to be 64-bit clean
+
 	* do not assume size_t is unsigned int
 
 	* removed locale-specific tests.  These were really to check bugs
