@@ -28,7 +28,7 @@ if (@ARGV)
     }
 }
 $srcdir =~ s,/$,,;
-usage() unless $srcdir =~ m/^qpdf-(\d+\.\d+(?:\.(a|b|rc)\d+)?)$/;
+usage() unless $srcdir =~ m/^qpdf-(\d+\.\d+(?:\.(a|b|rc)?\d+)?)$/;
 my $version = $1;
 usage() unless -d $srcdir;
 
