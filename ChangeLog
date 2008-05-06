@@ -1,17 +1,25 @@
+2008-05-06  Jay Berkenbilt  <ejb@ql.org>
+
+	* make/rules.mk: fix logic with .dep generation for .lo files so
+	that dependencies work properly with libtool
+
 2008-05-05  Jay Berkenbilt  <ejb@ql.org>
 
-	* fix internal MD5 header to be 64-bit clean
+	* libqpdf/qpdf/MD5.hh: fix header to be 64-bit clean
+
+	* configure.ac: add tests for sized integer types
 
 2008-05-04  Jay Berkenbilt  <ejb@ql.org>
 
-	* do not assume size_t is unsigned int
+	* libqpdf/QPDF_encryption.cc: do not assume size_t is unsigned int
 
-	* removed locale-specific tests.  These were really to check bugs
-	in perl 5.8.0 and are obsolete now.  They also make the test suite
-	fail in some environments that don't have all the locales fully
-	configured.
+	* qpdf/qtest/qpdf.test: removed locale-specific tests.  These were
+	really to check bugs in perl 5.8.0 and are obsolete now.  They
+	also make the test suite fail in some environments that don't have
+	all the locales fully configured.
 
-	* updated several files for gcc 4.3 (extra includes)
+	* various: updated several files for gcc 4.3 by adding missing
+	includes (string.h, stdlib.h)
 
 2008-04-26  Jay Berkenbilt  <ejb@ql.org>
 

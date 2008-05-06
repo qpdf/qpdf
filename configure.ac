@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl This config.in requires autoconf 2.5 or greater.
 
-AC_PREREQ(2.59)
+AC_PREREQ(2.60)
 AC_INIT(qpdf,2.0)
 
 dnl No AC_CONFIG_HEADERS.  If this changes, update README.maintainer.

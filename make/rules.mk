@@ -26,6 +26,17 @@ else
 depflags=
 endif
 
+# Usage: $(call libdepflags,$(basename obj))
+# Usage: $(call fixdeps,$(basename obj))
+ifeq ($(GENDEPS),1)
+libdepflags=-MD -MF $(1).tdep -MP
+fixdeps=sed -e 's/\.o:/.lo:/' < $(1).tdep > $(1).dep
+
+else
+libdepflags=
+fixdeps=
+endif
+
 #                       1   2
 # Usage: $(call compile,src,includes)
 define compile
@@ -38,11 +49,12 @@ endef
 #                          1   2
 # Usage: $(call libcompile,src,includes)
 define libcompile
-	$(LIBTOOL) --mode=compile \
+	$(LIBTOOL) --quiet --mode=compile \
 		$(CXX) $(CPPFLAGS) $(CXXFLAGS) \
-		$(call depflags,$(basename $(call src_to_obj,$(1)))) \
+		$(call libdepflags,$(basename $(call src_to_obj,$(1)))) \
 		$(foreach I,$(2),-I$(I)) \
-		-c $(1) -o $(call src_to_obj,$(1))
+		-c $(1) -o $(call src_to_obj,$(1)); \
+	$(call fixdeps,$(basename $(call src_to_obj,$(1))))
 endef
 
 #                       1    2       3       4        5
