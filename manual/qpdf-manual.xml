@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "2.0">
-<!ENTITY lastreleased "April 29, 2008">
+<!ENTITY swversion "2.0.1">
+<!ENTITY lastreleased "May 6, 2008">
 ]>
 <book>
  <bookinfo>
@@ -1961,4 +1961,37 @@ print "\n";
    </para>
   </sect1>
  </chapter>
+ <appendix id="ref.release-notes">
+  <title>Release Notes</title>
+  <variablelist>
+   <varlistentry>
+    <term>2.0.1: May 6, 2008</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <para>
+         No changes in functionality or interface.  This release
+         includes fixes to the source code so that qpdf compiles
+         properly and passes its test suite on a broader range of
+         platforms.  See <filename>ChangeLog</filename> in the source
+         distribution for details.
+        </para>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>2.0: April 29, 2008</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <para>
+         First public release.
+        </para>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+   </varlistentry>
+  </variablelist>
+ </appendix>
 </book>
