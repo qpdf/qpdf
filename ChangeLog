@@ -1,4 +1,11 @@
+2008-05-07  Jay Berkenbilt  <ejb@ql.org>
+
+	* qtest/bin/qtest-driver (run_test): increase timeout for qtest to
+	be more tolerant of slow machines
+
 2008-05-06  Jay Berkenbilt  <ejb@ql.org>
+
+	* 2.0.1: release
 
 	* make/rules.mk: fix logic with .dep generation for .lo files so
 	that dependencies work properly with libtool
