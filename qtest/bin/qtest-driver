@@ -421,7 +421,7 @@ sub run_test
 	    or die "--child--\n";
 	my $rin = '';
 	vec($rin, fileno($for_parent), 1) = 1;
-	my $nfound = select($rin, '', '', 5);
+	my $nfound = select($rin, '', '', 60);
 	if ($nfound == 0)
 	{
 	    fatal("timed out waiting for input on $for_parent");
