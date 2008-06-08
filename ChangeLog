@@ -1,3 +1,8 @@
+2008-06-07  Jay Berkenbilt  <ejb@ql.org>
+
+	* qpdf/qtest/qpdf/diff-encrypted: change == to = so that the test
+	suite passes when /bin/sh is not bash
+
 2008-05-07  Jay Berkenbilt  <ejb@ql.org>
 
 	* qtest/bin/qtest-driver (run_test): increase timeout for qtest to
