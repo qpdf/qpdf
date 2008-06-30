@@ -19,7 +19,7 @@ Release Reminders
    Last updated: 2008.
 
  * To construct a source distribution from a pristine checkout,
-   make_release does the following:
+   make_dist does the following:
 
     autoconf
     autoheader
