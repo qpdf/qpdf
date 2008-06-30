@@ -13,7 +13,7 @@ Release Reminders
      qpdf/qpdf.cc
      manual/qpdf-manual.xml
 
-   make_dist does this automatically.
+   make_dist verifies this consistency.
 
  * Each year, update copyright notices.  Just search for Copyright.
    Last updated: 2008.

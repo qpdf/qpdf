@@ -1,3 +1,10 @@
+2008-06-30  Jay Berkenbilt  <ejb@ql.org>
+
+	* 2.0.2: release
+
+	* updated embedded qtest to version 1.2 (includes previous
+	changes)
+
 2008-06-07  Jay Berkenbilt  <ejb@ql.org>
 
 	* qpdf/qtest/qpdf/diff-encrypted: change == to = so that the test

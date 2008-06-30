@@ -139,7 +139,10 @@ sub get_tty_features
 	    no strict;
 	    local $^W = 0;
 	    local *X;
-	    require 'sys/ioctl.ph';
+	    {
+		local $SIG{'__WARN__'} = sub {};
+		require 'sys/ioctl.ph';
+	    }
 	    if ((defined &TIOCGWINSZ) && open(X, "+</dev/tty"))
 	    {
 		my $winsize = "";
@@ -671,6 +674,8 @@ sub runtest
     my $pid = undef;
     my $pid_killer = new TestDriver::PidKiller(\$pid);
     my $in = new IO::Handle;
+    my $use_tempfile = ($^O eq 'MSWin32');
+    my $tempout_status = undef;
     if (defined $in_string)
     {
 	&QTC::TC("testdriver", "TestDriver input string");
@@ -687,11 +692,30 @@ sub runtest
     }
     elsif (defined $in_command)
     {
-	$pid = open($in, "-|");
-	croak +__PACKAGE__, "->runtest: fork failed: $!\n" unless defined $pid;
+	my $tempfilename = "$tempdir/tempout";
+	my $tempfile = undef;
+	if ($use_tempfile)
+	{
+	    $tempfile = new IO::File(">$tempfilename") or
+		die +(+__PACKAGE__,
+		      "->runtest: unable to create $tempfilename: $!\n");
+	    $pid = fork;
+	    croak +__PACKAGE__, "->runtest: fork failed: $!\n"
+		unless defined $pid;
+	}
+	else
+	{
+	    $pid = open($in, "-|");
+	    croak +__PACKAGE__, "->runtest: fork failed: $!\n"
+		unless defined $pid;
+	}
 	if ($pid == 0)
 	{
 	    # child
+	    if (defined $tempfile)
+	    {
+		open(STDOUT, ">&", $tempfile);
+	    }
 	    open(STDERR, ">&STDOUT");
 	    open(STDIN, '<', \ "");
 	    if (ref($in_command) eq 'ARRAY')
@@ -709,6 +733,19 @@ sub runtest
 		    croak+(+__PACKAGE__,
 			   "->runtest: unable to run command ",
 			   $in_command, "\n");
+	    }
+	}
+	else
+	{
+	    if (defined $tempfile)
+	    {
+		waitpid($pid, 0);
+		$tempout_status = $?;
+		$pid = undef;
+		open($in, "<$tempfilename") or
+		    croak +(+__PACKAGE__,
+			    "->runtest: unable to read from" .
+			    " input file $tempfilename: $!\n");
 	    }
 	}
     }
@@ -768,22 +805,25 @@ sub runtest
 	last if defined $exit_status;
     }
     $in->close();
+    if (defined $tempout_status)
+    {
+	$exit_status = $tempout_status;
+    }
     if (defined $in_command)
     {
 	if (! defined $exit_status)
 	{
 	    $exit_status = $?;
 	}
-	if (($exit_status > 0) && ($exit_status < 256))
+	if (WIFSIGNALED($exit_status))
 	{
 	    &QTC::TC("testdriver", "TestDriver exit status signal");
-	    $exit_status &= 127; # clear core dump flag
-	    $exit_status = "SIG:$exit_status";
+	    $exit_status = "SIG:" . WTERMSIG($exit_status);
 	}
-	else
+	elsif (WIFEXITED($exit_status))
 	{
 	    &QTC::TC("testdriver", "TestDriver exit status number");
-	    $exit_status >>= 8;
+	    $exit_status = WEXITSTATUS($exit_status);
 	}
     }
     $? = 0;
@@ -1533,28 +1573,44 @@ sub rmrf
 sub safe_pipe
 {
     my ($cmd, $outfile) = @_;
-    my $pid = open(C, "-|");
     my $result = 0;
 
-    if ($pid)
+    if ($^O eq 'MSWin32')
     {
-	# parent
-	my $out = new IO::File(">$outfile") or
-	    die +__PACKAGE__, ": can't open $outfile: $!\n";
-	binmode C;
-	while (<C>)
+	my @cmd = @$cmd;
+	my $cmd_str = shift(@cmd);
+	while (@cmd)
 	{
-	    $out->print($_);
+	    my $arg = shift(@cmd);
+	    $cmd_str .= " \"$arg\"";
 	}
-	close(C);
-	$result = $?;
-	$out->close();
+	$cmd_str .= " > $outfile 2>&1";
+	$result = system($cmd_str);
     }
     else
     {
-	# child
-	open(STDERR, ">&STDOUT");
-	exec(@$cmd) || die +__PACKAGE__, ": $cmd->[0] failed: $!\n";
+	my $pid = open(C, "-|");
+
+	if ($pid)
+	{
+	    # parent
+	    my $out = new IO::File(">$outfile") or
+		die +__PACKAGE__, ": can't open $outfile: $!\n";
+	    binmode C;
+	    while (<C>)
+	    {
+		$out->print($_);
+	    }
+	    close(C);
+	    $result = $?;
+	    $out->close();
+	}
+	else
+	{
+	    # child
+	    open(STDERR, ">&STDOUT");
+	    exec(@$cmd) || die +__PACKAGE__, ": $cmd->[0] failed: $!\n";
+	}
     }
 
     $result;

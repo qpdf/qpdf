@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "2.0.1">
-<!ENTITY lastreleased "May 6, 2008">
+<!ENTITY swversion "2.0.2">
+<!ENTITY lastreleased "June 30, 2008">
 ]>
 <book>
  <bookinfo>
@@ -1964,6 +1964,21 @@ print "\n";
  <appendix id="ref.release-notes">
   <title>Release Notes</title>
   <variablelist>
+   <varlistentry>
+    <term>2.0.2: June 30, 2008</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Update test suite to work properly with a
+         non-<comamnd>bash</comamnd> <filename>/bin/sh</filename> and
+         with Perl 5.10.  No changes were made to the actual qpdf
+         source code itself for this release.
+        </para>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+   </varlistentry>
    <varlistentry>
     <term>2.0.1: May 6, 2008</term>
      <listitem>
