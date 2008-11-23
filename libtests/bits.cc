@@ -3,6 +3,7 @@
 #include <qpdf/BitWriter.hh>
 #include <qpdf/Pl_Buffer.hh>
 #include <iostream>
+#include <stdio.h>
 
 // See comments in bits.cc
 #define BITS_TESTING 1
