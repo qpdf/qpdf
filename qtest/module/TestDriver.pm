@@ -940,8 +940,8 @@ sub runtest
     # $outcome_text is for the human-readable.  We need something
     # different for the xml file.
     $testxml->print("  <testcase\n" .
-		    "   testid=\"$category $testnum\"\n" .
-		    "   description=\"$description\"\n" .
+		    "   testid=\"" . xmlify($category, 1) . " $testnum\"\n" .
+		    "   description=\"" . xmlify($description, 1) . "\"\n" .
 		    "   outcome=\"" .
 		    (($outcome eq PASS)
 		     ? ($passed ? "pass" : "unexpected-pass")
@@ -957,7 +957,7 @@ sub runtest
 			 $testnum, $description);
 	my $cwd = getcwd();
 	$testlog->print("cwd: $cwd\n");
-	$testxml->print("   <cwd>$cwd</cwd>\n");
+	$testxml->print("   <cwd>" . xmlify($cwd) . "</cwd>\n");
 	my $cmd = $in_command;
 	if ((defined $cmd) && (ref($cmd) eq 'ARRAY'))
 	{
@@ -966,7 +966,7 @@ sub runtest
 	if (defined $cmd)
 	{
 	    $testlog->print("command: $cmd\n");
-	    $testxml->print("   <command>$cmd</command>\n");
+	    $testxml->print("   <command>" . xmlify($cmd) . "</command>\n");
 	}
 	if (defined $out_file)
 	{
@@ -975,7 +975,8 @@ sub runtest
 	    # real output was original in a file.
 	    $testlog->print("expected output in $out_file\n");
 	    $testxml->print(
-		"   <expected-output-file>$out_file</expected-output-file>\n");
+		"   <expected-output-file>" . xmlify($out_file) .
+		"</expected-output-file>\n");
 	}
 
 	# It would be nice if we could filter out internal calls for
@@ -984,7 +985,7 @@ sub runtest
 	$testlog->print(Carp::longmess());
 
 	$testxml->print("   <stacktrace>test failure" .
-			Carp::longmess() .
+			xmlify(Carp::longmess()) .
 			"</stacktrace>\n");
 
 	if (! $status_match)
@@ -1014,7 +1015,7 @@ sub runtest
 		{
 		    $testlog->print("\n");
 		}
-		$testxml->print("regexp: " . $out_regexp);
+		$testxml->print("regexp: " . xmlify($out_regexp));
 	    }
 	    else
 	    {
@@ -1169,6 +1170,18 @@ sub write_file_to_fh
     }
 }
 
+sub xmlify
+{
+    my ($str, $attr) = @_;
+    $attr = 0 unless defined $attr;
+    $str =~ s/\&/\&amp;/g;
+    $str =~ s/</&lt;/g;
+    $str =~ s/>/&gt;/g;
+    $str =~ s/\"/&quot;/g if $attr;
+    $str =~ s/([\000-\010\013-\037\177-\377])/sprintf("&#x%02x;", ord($1))/ge;
+    $str;
+}
+
 sub xml_write_file_to_fh
 {
     my ($file, $out) = @_;
@@ -1178,11 +1191,7 @@ sub xml_write_file_to_fh
 	binmode $in;
 	while (defined ($_ = <$in>))
 	{
-	    s/\&/\&amp;/g;
-	    s/</&lt;/g;
-	    s/>/&gt;/g;
-	    s/([\000-\011\013-\037\177-\377])/sprintf("&#x%02x;", ord($1))/ge;
-	    $out->print($_);
+	    $out->print(xmlify($_));
 	}
 	$in->close();
     }
