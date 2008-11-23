@@ -2,6 +2,8 @@
 #include <qpdf/QPDF_String.hh>
 
 #include <qpdf/QUtil.hh>
+#include <qpdf/QTC.hh>
+
 // DO NOT USE ctype -- it is locale dependent for some things, and
 // it's not worth the risk of including it in case it may accidentally
 // be used.
@@ -159,12 +161,42 @@ QPDF_String::getUTF8Val() const
 	(this->val[0] == '\xfe') && (this->val[1] == '\xff'))
     {
 	// This is a Unicode string using big-endian UTF-16.  This
-	// code is not actually correct as it doesn't properly handle
-	// characters past 0xffff.
+	// code uses unsigned long and unsigned short to hold
+	// codepoint values.  It requires unsigned long to be at least
+	// 32 bits and unsigned short to be at least 16 bits, but it
+	// will work fine if they are larger.
+	unsigned long codepoint = 0L;
 	for (unsigned int i = 2; i < len; i += 2)
 	{
-	    result += QUtil::toUTF8(((unsigned char) this->val[i] << 8) +
-				    ((unsigned char) this->val[i+1]));
+	    // Convert from UTF16-BE.  If we get a malformed
+	    // codepoint, this code will generate incorrect output
+	    // without giving a warning.  Specifically, a high
+	    // codepoint not followed by a low codepoint will be
+	    // discarded, and a low codepoint not preceded by a high
+	    // codepoint will just get its low 10 bits output.
+	    unsigned short bits =
+		(((unsigned char) this->val[i]) << 8) +
+		((unsigned char) this->val[i+1]);
+	    if ((bits & 0xFC00) == 0xD800)
+	    {
+		codepoint = 0x10000 + ((bits & 0x3FF) << 10);
+		continue;
+	    }
+	    else if ((bits & 0xFC00) == 0xDC00)
+	    {
+		if (codepoint != 0)
+		{
+		    QTC::TC("qpdf", "QPDF_String non-trivial UTF-16");
+		}
+		codepoint += bits & 0x3FF;
+	    }
+	    else
+	    {
+		codepoint = bits;
+	    }
+
+	    result += QUtil::toUTF8(codepoint);
+	    codepoint = 0;
 	}
     }
     else

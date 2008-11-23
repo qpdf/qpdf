@@ -1,3 +1,9 @@
+2008-11-23  Jay Berkenbilt  <ejb@ql.org>
+
+	* libqpdf/QPDF_String.cc (QPDF_String::getUTF8Val): handle
+	UTF-16BE properly rather than just treating the string as a string
+	of 16-bit characters.
+
 2008-06-30  Jay Berkenbilt  <ejb@ql.org>
 
 	* 2.0.2: release

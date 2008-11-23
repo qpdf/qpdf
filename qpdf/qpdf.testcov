@@ -115,3 +115,4 @@ QPDF_Stream pipeStreamData with null pipeline 0
 QPDFWriter not recompressing /FlateDecode 0
 QPDF piping xref stream from encrypted file 0
 unable to filter 0
+QPDF_String non-trivial UTF-16 0
