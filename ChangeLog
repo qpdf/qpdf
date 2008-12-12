@@ -1,3 +1,8 @@
+2008-12-11  Jay Berkenbilt  <ejb@ql.org>
+
+	* qpdf/qpdf.cc (main): Accept -help and -version as well as --help
+	and --version
+
 2008-11-23  Jay Berkenbilt  <ejb@ql.org>
 
 	* Include stdio.h in a few files for proper compilation with (yet

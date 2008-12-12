@@ -436,7 +436,9 @@ int main(int argc, char* argv[])
 	whoami += 3;
     }
 
-    if ((argc == 2) && (strcmp(argv[1], "--version") == 0))
+    if ((argc == 2) &&
+	((strcmp(argv[1], "--version") == 0) ||
+	 (strcmp(argv[1], "-version") == 0)))
     {
 	// make_dist looks for the line of code here that actually
 	// prints the version number, so read make_dist if you change
@@ -459,7 +461,9 @@ int main(int argc, char* argv[])
 	exit(0);
     }
 
-    if ((argc == 2) && (strcmp(argv[1], "--help") == 0))
+    if ((argc == 2) &&
+	((strcmp(argv[1], "--help") == 0) ||
+	 (strcmp(argv[1], "-help") == 0)))
     {
 	std::cout << help;
 	exit(0);
