@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "2.0.2">
-<!ENTITY lastreleased "June 30, 2008">
+<!ENTITY swversion "2.0.3">
+<!ENTITY lastreleased "February 15, 2009">
 ]>
 <book>
  <bookinfo>
@@ -16,7 +16,7 @@
    <firstname>Jay</firstname><surname>Berkenbilt</surname>
   </author>
   <copyright>
-   <year>2005&ndash;2008</year>
+   <year>2005&ndash;2009</year>
    <holder>Jay Berkenbilt</holder>
   </copyright>
  </bookinfo>

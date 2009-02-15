@@ -1,3 +1,7 @@
+2009-02-15  Jay Berkenbilt  <ejb@ql.org>
+
+	* 2.0.3: release
+
 2008-12-11  Jay Berkenbilt  <ejb@ql.org>
 
 	* qpdf/qpdf.cc (main): Accept -help and -version as well as --help
