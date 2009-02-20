@@ -3,13 +3,18 @@
 #include <qpdf/Pl_StdioFile.hh>
 #include <iostream>
 #include <stdlib.h>
+#include <string.h>
 
-int main()
+int main(int argc, char* argv[])
 {
+    bool early_code_change = true;
+    if ((argc == 2) && (strcmp(argv[1], "--no-early-code-change") == 0))
+    {
+	early_code_change = false;
+    }
+
     Pl_StdioFile out("stdout", stdout);
-    // We don't exercise LZWDecoder with early code change false
-    // because we have no way to generate such an LZW stream.
-    Pl_LZWDecoder decode("decode", &out, true);
+    Pl_LZWDecoder decode("decode", &out, early_code_change);
 
     try
     {

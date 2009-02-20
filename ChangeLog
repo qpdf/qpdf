@@ -1,3 +1,10 @@
+2009-02-19  Jay Berkenbilt  <ejb@ql.org>
+
+	* libqpdf/Pl_LZWDecoder.cc: correct logic error for previously
+	untested case of running the LZW decoder without the "early code
+	change" flag.  Thanks to a bug report from "Atom Smasher", I
+	finally was able to obtain an input stream compressed in this way.
+
 2009-02-15  Jay Berkenbilt  <ejb@ql.org>
 
 	* 2.0.3: release

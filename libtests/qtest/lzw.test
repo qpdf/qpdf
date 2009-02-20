@@ -9,9 +9,31 @@ require TestDriver;
 
 my $td = new TestDriver('lzw');
 
-$td->runtest("decode",
-	     {$td->COMMAND => "lzw < lzw1.in"},
-	     {$td->FILE => "lzw1.out",
+cleanup();
+
+$td->runtest("decode: early code change",
+	     {$td->COMMAND => "lzw < lzw1.in > tmp"},
+	     {$td->STRING => "",
 	      $td->EXIT_STATUS => 0});
 
-$td->report(1);
+$td->runtest("check output",
+	     {$td->FILE => "tmp"},
+	     {$td->FILE => "lzw1.out"});
+
+$td->runtest("decode: no early code change",
+	     {$td->COMMAND => "lzw --no-early-code-change < lzw2.in > tmp"},
+	     {$td->STRING => "",
+	      $td->EXIT_STATUS => 0});
+
+$td->runtest("check output",
+	     {$td->FILE => "tmp"},
+	     {$td->FILE => "lzw2.out"});
+
+cleanup();
+
+$td->report(4);
+
+sub cleanup
+{
+    unlink "tmp";
+}
