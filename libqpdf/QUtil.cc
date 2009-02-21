@@ -152,7 +152,7 @@ QUtil::toUTF8(unsigned long uval)
     // '0' for its (n+1)th highest bit where n is the total number of
     // bytes required.  Subsequent bytes start with '10' and have the
     // remaining 6 bits free for encoding.  For example, an 11-bit
-    // unicode value can be stored in two bytes where the first is
+    // Unicode value can be stored in two bytes where the first is
     // 110zzzzz, the second is 10zzzzzz, and the z's represent the
     // remaining bits.
 

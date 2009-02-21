@@ -1,5 +1,7 @@
 2009-02-20  Jay Berkenbilt  <ejb@ql.org>
 
+	* Fix many typos in comments and strings.
+
 	* qpdf/qpdf.cc: in --check mode, if there are warnings but no
 	errors, exit with a status of 3.
 

@@ -2083,7 +2083,7 @@ QPDF::generateHintStream(std::map<int, QPDFXRefEntry> const& xref,
     calculateHOutline(xref, lengths, obj_renumber);
 
     // Write the hint stream itself into a compressed memory buffer.
-    // Write through a couter so we can get offsets.
+    // Write through a counter so we can get offsets.
     Pl_Buffer hint_stream("hint stream");
     Pl_Flate f("compress hint stream", &hint_stream, Pl_Flate::a_deflate);
     Pl_Count c("count", &f);

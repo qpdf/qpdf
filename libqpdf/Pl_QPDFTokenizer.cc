@@ -58,7 +58,7 @@ Pl_QPDFTokenizer::processChar(char ch)
 {
     if (this->pass_through)
     {
-	// We're not noramlizing anymore -- just write this without
+	// We're not normalizing anymore -- just write this without
 	// looking at it.
 	writeNext(&ch, 1);
 	return;
@@ -79,12 +79,12 @@ Pl_QPDFTokenizer::processChar(char ch)
 	{
 	    // Uh oh.... we're not sophisticated enough to handle
 	    // inline images safely.  We'd have to to set up all the
-	    // filters and pipe the iamge data through it until the
+	    // filters and pipe the image data through it until the
 	    // filtered output was the right size for an image of the
 	    // specified dimensions.  Then we'd either have to write
 	    // out raw image data or continue to write filtered data,
 	    // resuming normalization when we get to the end.
-	    // Insetad, for now, we'll just turn off noramlization for
+	    // Instead, for now, we'll just turn off normalization for
 	    // the remainder of this stream.
 	    this->pass_through = true;
 	    if (this->unread_char)

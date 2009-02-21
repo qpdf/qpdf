@@ -190,7 +190,7 @@ class QPDFWriter
 
     // Calls finish on the current pipeline and pops the pipeline
     // stack until the top of stack is a previous active top of stack,
-    // and restores the pipeline to that point.  Deletes any piplines
+    // and restores the pipeline to that point.  Deletes any pipelines
     // that it pops.  If the bp argument is non-null and any of the
     // stack items are of type Pl_Buffer, the buffer is retrieved.
     void popPipelineStack(PointerHolder<Buffer>* bp = 0);

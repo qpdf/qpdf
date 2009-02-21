@@ -22,7 +22,7 @@ QPDF_Name::normalizeName(std::string const& name)
     for (unsigned int i = 1; i < name.length(); ++i)
     {
 	char ch = name[i];
-	// Don't use locale/ctype here; follow PDF spec guidlines.
+	// Don't use locale/ctype here; follow PDF spec guidelines.
 	if (strchr("#()<>[]{}/%", ch) || (ch < 33) || (ch > 126))
 	{
 	    sprintf(num, "#%02x", (unsigned char) ch);

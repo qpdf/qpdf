@@ -186,7 +186,7 @@ QPDFObjectHandle::getRealValue()
     return dynamic_cast<QPDF_Real*>(obj.getPointer())->getVal();
 }
 
-// Name acessors
+// Name accessors
 
 std::string
 QPDFObjectHandle::getName()
@@ -211,7 +211,7 @@ QPDFObjectHandle::getUTF8Value()
     return dynamic_cast<QPDF_String*>(obj.getPointer())->getUTF8Val();
 }
 
-// Array acessors
+// Array accessors
 
 int
 QPDFObjectHandle::getArrayNItems()
@@ -236,7 +236,7 @@ QPDFObjectHandle::setArrayItem(int n, QPDFObjectHandle const& item)
     return dynamic_cast<QPDF_Array*>(obj.getPointer())->setItem(n, item);
 }
 
-// Dictionary accesors
+// Dictionary accessors
 
 bool
 QPDFObjectHandle::hasKey(std::string const& key)
@@ -323,7 +323,7 @@ QPDFObjectHandle::getPageImages()
     // value is null or an empty dictionary, you are supposed to walk
     // up the page tree until you find a /Resources dictionary.  As of
     // this writing, I don't have any test files that use inherited
-    // resources, and hand-generating one won't be a good test beacuse
+    // resources, and hand-generating one won't be a good test because
     // any mistakes in my understanding would be present in both the
     // code and the test file.
 

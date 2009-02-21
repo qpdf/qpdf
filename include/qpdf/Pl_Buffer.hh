@@ -13,7 +13,7 @@
 // accumulated so far.  getBuffer() may be called only after calling
 // finish() and before calling any subsequent write().  At that point,
 // a dynamically allocated Buffer object is returned and the internal
-// buffer is reset.  The caller is responseible for deleting the
+// buffer is reset.  The caller is responsible for deleting the
 // returned Buffer.
 //
 // For this pipeline, "next" may be null.  If a next pointer is

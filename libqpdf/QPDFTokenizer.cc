@@ -259,7 +259,7 @@ QPDFTokenizer::presentCharacter(char ch)
     {
 	if (strchr(" \t\n\v\f\r()<>[]{}/%", ch) != 0)
 	{
-	    // A C-loacle whitespace character or delimiter terminates
+	    // A C-locale whitespace character or delimiter terminates
 	    // token.  It is important to unread the whitespace
 	    // character even though it is ignored since it may be the
 	    // newline after a stream keyword.  Removing it here could

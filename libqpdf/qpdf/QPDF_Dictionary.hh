@@ -23,7 +23,7 @@ class QPDF_Dictionary: public QPDFObject
     QPDFObjectHandle getKey(std::string const&);
     std::set<std::string> getKeys();
 
-    // Repalce value of key, adding it if it does not exist
+    // Replace value of key, adding it if it does not exist
     void replaceKey(std::string const& key, QPDFObjectHandle const&);
     // Remove key, doing nothing if key does not exist
     void removeKey(std::string const& key);

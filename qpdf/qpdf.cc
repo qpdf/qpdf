@@ -107,7 +107,7 @@ Values for stream data options:\n\
   preserve              leave all stream data as is\n\
   uncompress            uncompress stream data when possible\n\
 \n\
-Values for object strea mode:\n\
+Values for object stream mode:\n\
 \n\
   preserve                  preserve original object streams (default)\n\
   disable                   don't write any object streams\n\
@@ -142,8 +142,11 @@ stream data to be written to standard output.\n\
 If --filtered-stream-data is given and --normalize-content=y is also\n\
 given, qpdf will attempt to normalize the stream data as if it is a\n\
 page content stream.  This attempt will be made even if it is not a\n\
-page content stream, in which case it will produce unusuable results.\n\
+page content stream, in which case it will produce unusable results.\n\
 \n\
+Ordinarily, qpdf exits with a status of 0 on success or a status of 2\n\
+if any errors occurred.  In --check mode, if there were warnings but not\n\
+errors, qpdf exits with a status of 3.\n\
 \n";
 
 void usage(std::string const& msg)

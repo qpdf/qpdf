@@ -37,7 +37,7 @@ class MD5
     // testing)
     void print();
 
-    // returns the digest as a hexademical string
+    // returns the digest as a hexadecimal string
     std::string unparse();
 
     // Convenience functions

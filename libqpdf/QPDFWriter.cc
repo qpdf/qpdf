@@ -160,7 +160,7 @@ QPDFWriter::setR3EncryptionParameters(
     //   None
     //   Only Document Assembly
     //   Only Form Field Fill-in or Signing
-    //   Comment AUthoring, Form Field Fill-in or Signing
+    //   Comment Authoring, Form Field Fill-in or Signing
     //   General Editing, Comment and Form Field Authoring
 
     // Allowed printing menu:
@@ -197,7 +197,7 @@ QPDFWriter::setR3EncryptionParameters(
     switch (modify)
     {
       case r3m_none:
-	clear.insert(11);	// document essembly
+	clear.insert(11);	// document assembly
 
       case r3m_assembly:
 	clear.insert(9);	// filling in form fields
@@ -226,7 +226,7 @@ QPDFWriter::setEncryptionParameters(
     // PDF specification refers to bits with the low bit numbered 1.
     // We have to convert this into a bit field.
 
-    // Specification always requirse bits 1 and 2 to be cleared.
+    // Specification always requires bits 1 and 2 to be cleared.
     bits_to_clear.insert(1);
     bits_to_clear.insert(2);
 
@@ -754,7 +754,7 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	{
 	    // Don't filter if the stream is already compressed with
 	    // FlateDecode.  We don't want to make it worse by getting
-	    // rid of a predictor or otherwising messing with it.  We
+	    // rid of a predictor or otherwise messing with it.  We
 	    // should also avoid messing with anything that's
 	    // compressed with a lossy compression scheme, but we
 	    // don't support any of those right now.

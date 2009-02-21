@@ -465,7 +465,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
 	// streams.
 
 	throw QPDFExc(this->file.getName() + ": unable to find trailer "
-		      "dictionary while recovering damanged file");
+		      "dictionary while recovering damaged file");
     }
 
     // We could iterate through the objects looking for streams and
