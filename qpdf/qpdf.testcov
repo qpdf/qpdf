@@ -116,3 +116,4 @@ QPDFWriter not recompressing /FlateDecode 0
 QPDF piping xref stream from encrypted file 0
 unable to filter 0
 QPDF_String non-trivial UTF-16 0
+QPDF xref overwrite object 0

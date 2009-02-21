@@ -152,7 +152,7 @@ for (my $i = 1; $i <= scalar(@badfiles); ++$i)
 show_ntests();
 # ----------
 $td->notify("--- Recovery Tests ---");
-$n_tests += @badfiles + 2;
+$n_tests += @badfiles + 6;
 
 # Recovery tests.  These are mostly after-the-fact -- when recovery
 # was implemented, some degree of recovery was possible on many of the
@@ -188,6 +188,29 @@ $td->runtest("recover heifer file",
 $td->runtest("check output",
 	     {$td->FILE => "a.pdf"},
 	     {$td->FILE => "heifer.qdf"});
+
+# See if we can recover the cross reference table on a file that has
+# been appended to even when it deletes and reuses objects.  We can't
+# completely do it in the case of deleted objects, but we can get
+# mostly there.
+$td->runtest("good replaced page contents",
+	     {$td->COMMAND =>
+		  "qpdf --static-id -qdf append-page-content.pdf a.pdf"},
+	     {$td->STRING => "",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "append-page-content-good.qdf"});
+$td->runtest("damaged replaced page contents",
+	     {$td->COMMAND => "qpdf --static-id -qdf" .
+		  " append-page-content-damaged.pdf a.pdf"},
+	     {$td->FILE => "append-page-content-damaged.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "append-page-content-damaged.qdf"});
 
 show_ntests();
 # ----------
