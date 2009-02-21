@@ -69,5 +69,5 @@ $(OBJS_libqpdf): libqpdf/$(OUTPUT_DIR)/%.lo: libqpdf/%.cc
 # * Otherwise, increment REVISION
 
 libqpdf/$(OUTPUT_DIR)/libqpdf.la: $(OBJS_libqpdf)
-	$(call makelib,$(OBJS_libqpdf),$@,1,1,0)
+	$(call makelib,$(OBJS_libqpdf),$@,1,2,0)
 
