@@ -333,7 +333,8 @@ class QPDF
     int read_xrefTable(off_t offset);
     int read_xrefStream(off_t offset);
     int processXRefStream(off_t offset, QPDFObjectHandle& xref_stream);
-    void insertXrefEntry(int obj, int f0, int f1, int f2);
+    void insertXrefEntry(int obj, int f0, int f1, int f2,
+			 bool overwrite = false);
     QPDFObjectHandle readObject(
 	InputSource*, int objid, int generation,
 	bool in_object_stream);

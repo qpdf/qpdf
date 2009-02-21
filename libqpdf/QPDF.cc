@@ -435,7 +435,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
 		int obj = atoi(m.getMatch(1).c_str());
 		int gen = atoi(m.getMatch(2).c_str());
 		int offset = this->file.getLastOffset();
-		insertXrefEntry(obj, 1, offset, gen);
+		insertXrefEntry(obj, 1, offset, gen, true);
 	    }
 	    else if ((! this->trailer.isInitialized()) &&
 		     trailer_re.match(line.c_str()))
@@ -865,11 +865,15 @@ QPDF::processXRefStream(off_t xref_offset, QPDFObjectHandle& xref_obj)
 }
 
 void
-QPDF::insertXrefEntry(int obj, int f0, int f1, int f2)
+QPDF::insertXrefEntry(int obj, int f0, int f1, int f2, bool overwrite)
 {
     // Populate the xref table in such a way that the first reference
     // to an object that we see, which is the one in the latest xref
-    // table in which it appears, is the one that gets stored.
+    // table in which it appears, is the one that gets stored.  This
+    // works because we are reading more recent appends before older
+    // ones.  Exception: if overwrite is true, then replace any
+    // existing object.  This is used in xref recovery mode, which
+    // reads the file from beginning to end.
 
     // If there is already an entry for this object and generation in
     // the table, it means that a later xref table has registered this
@@ -879,8 +883,16 @@ QPDF::insertXrefEntry(int obj, int f0, int f1, int f2)
 	ObjGen og(obj, gen);
 	if (this->xref_table.count(og))
 	{
-	    QTC::TC("qpdf", "QPDF xref reused object");
-	    return;
+	    if (overwrite)
+	    {
+		QTC::TC("qpdf", "QPDF xref overwrite object");
+		this->xref_table.erase(og);
+	    }
+	    else
+	    {
+		QTC::TC("qpdf", "QPDF xref reused object");
+		return;
+	    }
 	}
 	if (this->deleted_objects.count(obj))
 	{
