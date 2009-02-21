@@ -1,5 +1,8 @@
 2009-02-20  Jay Berkenbilt  <ejb@ql.org>
 
+	* qpdf/qpdf.cc: in --check mode, if there are warnings but no
+	errors, exit with a status of 3.
+
 	* libqpdf/QPDF.cc (QPDF::insertXrefEntry): when recovering the
 	cross-reference table, have objects we encounter later in the file
 	supersede those we found earlier.  This improves the chances of

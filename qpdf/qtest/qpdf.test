@@ -152,7 +152,7 @@ for (my $i = 1; $i <= scalar(@badfiles); ++$i)
 show_ntests();
 # ----------
 $td->notify("--- Recovery Tests ---");
-$n_tests += @badfiles + 6;
+$n_tests += @badfiles + 7;
 
 # Recovery tests.  These are mostly after-the-fact -- when recovery
 # was implemented, some degree of recovery was possible on many of the
@@ -211,6 +211,11 @@ $td->runtest("damaged replaced page contents",
 $td->runtest("check output",
 	     {$td->FILE => "a.pdf"},
 	     {$td->FILE => "append-page-content-damaged.qdf"});
+$td->runtest("run check on damaged file",
+	     {$td->COMMAND => "qpdf --check append-page-content-damaged.pdf"},
+	     {$td->FILE => "append-page-content-damaged-check.out",
+	      $td->EXIT_STATUS => 3},
+	     $td->NORMALIZE_NEWLINES);
 
 show_ntests();
 # ----------

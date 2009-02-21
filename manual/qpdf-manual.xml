@@ -741,7 +741,13 @@ make
         Checks file structure and well as encryption and
         linearization.  A file for which <option>--check</option>
         reports no errors may still have errors in stream data but
-        should otherwise be otherwise structurally sound.
+        should otherwise be otherwise structurally sound.  If
+        <option>--check</option> any errors, qpdf will exit with a
+        status of 2.  There are some recoverable conditions that
+        <option>--check</option> detects.  These are issued as
+        warnings instead of errors.  If qpdf finds no errors but finds
+        warnings, it will exit with a status of 3 (as of
+        version&nbsp;2.0.4).
        </para>
       </listitem>
      </varlistentry>

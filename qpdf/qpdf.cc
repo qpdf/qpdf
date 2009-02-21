@@ -875,7 +875,15 @@ int main(int argc, char* argv[])
 		}
 		if (okay)
 		{
-		    std::cout << "No errors found" << std::endl;
+		    if (! pdf.getWarnings().empty())
+		    {
+			// special exit status for warnings without errors
+			exit(3);
+		    }
+		    else
+		    {
+			std::cout << "No errors found" << std::endl;
+		    }
 		}
 	    }
 	}

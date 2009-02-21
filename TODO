@@ -4,9 +4,6 @@
  * Spell check to fix types in messages and comments.  Known type in
    "damanged".
 
- * Exit with a different exit code if warning are found during check
-   mode.
-
 
 General
 =======
