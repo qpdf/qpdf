@@ -53,6 +53,10 @@ General
  * QPDFObjectHandle::getPageImages() doesn't notice images in
    inherited resource dictionaries.  See comments in that function.
 
+ * Based on an idea suggested by user "Atom Smasher", consider
+   providing some mechanism to recover earlier versions of a file
+   embedded prior to appended sections.
+
 Splitting by Pages
 ==================
 
