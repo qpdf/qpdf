@@ -932,7 +932,9 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
 	    {
 		writeString("%% Object stream: object " +
 			    QUtil::int_to_string(new_obj) + ", index " +
-			    QUtil::int_to_string(count) + "\n");
+			    QUtil::int_to_string(count) +
+			    "; original object ID: " +
+			    QUtil::int_to_string(obj) + "\n");
 	    }
 	    if (pass == 1)
 	    {
@@ -1026,6 +1028,12 @@ QPDFWriter::writeObject(QPDFObjectHandle object, int object_stream_index)
     }
     if (object_stream_index == -1)
     {
+	if (this->qdf_mode)
+	{
+	    writeString("%% Original object ID: " +
+			QUtil::int_to_string(object.getObjectID()) + " " +
+			QUtil::int_to_string(object.getGeneration()) + "\n");
+	}
 	openObject(new_id);
 	setDataKey(new_id);
 	unparseObject(object, 0, 0);
