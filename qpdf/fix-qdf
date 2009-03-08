@@ -72,6 +72,7 @@ my $st_done = ++$cur_state;
 
 my @ostream = ();
 my @ostream_offsets = ();
+my @ostream_discarded = ();
 my $ostream_idx = 0;
 my $ostream_id = 0;
 my $ostream_extends = "";
@@ -130,13 +131,17 @@ while (defined($line = get_line()))
     }
     elsif ($state == $st_in_ostream_dict)
     {
-	if ($line =~ m,/Extends (\d+ 0 R),)
-	{
-	    $ostream_extends = $1;
-	}
-	elsif ($line =~ m/^stream/)
+	if ($line =~ m/^stream/)
 	{
 	    $state = $st_in_ostream_offsets;
+	}
+	else
+	{
+	    push(@ostream_discarded, $line);
+	    if ($line =~ m,/Extends (\d+ 0 R),)
+	    {
+		$ostream_extends = $1;
+	    }
 	}
 	# discard line
     }
@@ -148,6 +153,10 @@ while (defined($line = get_line()))
 	    $stream_start = $last_offset;
 	    $state = $st_in_ostream_outer;
 	    push(@ostream, $line);
+	}
+	else
+	{
+	    push(@ostream_discarded, $line);
 	}
 	# discard line
     }
@@ -327,16 +336,20 @@ sub write_ostream
 	++$onum;
 	$offsets .= "$onum $_\n";
     }
+    my $offset_adjust = length($offsets);
     $first += length($offsets);
     $stream_length += length($offsets);
-    print "  /Length $stream_length\n";
-    print "  /N $n\n";
-    print "  /First $first\n";
+    my $dict_data = "";
+    $dict_data .= "  /Length $stream_length\n";
+    $dict_data .= "  /N $n\n";
+    $dict_data .= "  /First $first\n";
     if ($ostream_extends)
     {
-	print "  /Extends $ostream_extends\n";
+	$dict_data .= "  /Extends $ostream_extends\n";
     }
-    print ">>\n";
+    $dict_data .= ">>\n";
+    $offset_adjust += length($dict_data);
+    print $dict_data;
     print "stream\n";
     print $offsets;
     foreach (@ostream)
@@ -344,9 +357,16 @@ sub write_ostream
 	print $_;
     }
 
+    for (@ostream_discarded)
+    {
+	$offset -= length($_);
+    }
+    $offset += $offset_adjust;
+
     $ostream_idx = 0;
     $ostream_id = 0;
     @ostream = ();
     @ostream_offsets = ();
+    @ostream_discarded = ();
     $ostream_extends = "";
 }
