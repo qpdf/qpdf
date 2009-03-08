@@ -199,7 +199,7 @@ Pl_LZWDecoder::handleCode(int code)
 		}
 	    }
 	    unsigned int last_idx = 258 + table_size;
-	    if (last_idx + code_change_delta == 4096)
+	    if (last_idx + code_change_delta == 4097)
 	    {
 		throw QEXC::General("LZWDecoder: table full");
 	    }
