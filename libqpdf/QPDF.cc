@@ -10,6 +10,7 @@
 #include <qpdf/QUtil.hh>
 #include <qpdf/PCRE.hh>
 #include <qpdf/Pipeline.hh>
+#include <qpdf/Pl_Discard.hh>
 
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDF_Null.hh>
@@ -1810,21 +1811,49 @@ QPDF::pipeStreamData(int objid, int generation,
 	}
     }
 
-    this->file.seek(offset, SEEK_SET);
-    char buf[10240];
-    while (length > 0)
+    try
     {
-	size_t to_read = (sizeof(buf) < length ? sizeof(buf) : length);
-	size_t len = this->file.read(buf, to_read);
-	if (len == 0)
+	this->file.seek(offset, SEEK_SET);
+	char buf[10240];
+	while (length > 0)
 	{
-	    throw QPDFExc(this->file.getName(), this->file.getLastOffset(),
-			  "unexpected EOF reading stream data");
+	    size_t to_read = (sizeof(buf) < length ? sizeof(buf) : length);
+	    size_t len = this->file.read(buf, to_read);
+	    if (len == 0)
+	    {
+		throw QPDFExc(this->file.getName(), this->file.getLastOffset(),
+			      "unexpected EOF reading stream data");
+	    }
+	    length -= len;
+	    pipeline->write((unsigned char*)buf, len);
 	}
-	length -= len;
-	pipeline->write((unsigned char*)buf, len);
+    }
+    catch (QEXC::General& e)
+    {
+	QTC::TC("qpdf", "QPDF decoding error warning");
+	warn(QPDFExc(this->file.getName(), this->file.getLastOffset(),
+		     "error decoding stream data for object " +
+		     QUtil::int_to_string(objid) + " " +
+		     QUtil::int_to_string(generation) + ": " + e.unparse()));
     }
     pipeline->finish();
+}
+
+void
+QPDF::decodeStreams()
+{
+    for (std::map<ObjGen, QPDFXRefEntry>::iterator iter =
+	     this->xref_table.begin();
+	 iter != this->xref_table.end(); ++iter)
+    {
+	ObjGen const& og = (*iter).first;
+	QPDFObjectHandle obj = getObjectByID(og.obj, og.gen);
+	if (obj.isStream())
+	{
+	    Pl_Discard pl;
+	    obj.pipeStreamData(&pl, true, false, false);
+	}
+    }
 }
 
 std::vector<QPDFObjectHandle> const&

@@ -1,3 +1,22 @@
+2009-03-08  Jay Berkenbilt  <ejb@ql.org>
+
+	* qpdf/fix-qdf (write_ostream): Adjust offsets while writing
+	object streams to account for changes in the length of the
+	dictionary and offset tables.
+
+	* qpdf/qpdf.cc (main): In check mode, in addition to checking
+	structure of file, attempt to decode all stream data.
+
+	* libqpdf/QPDFWriter.cc (QPDFWriter::writeObject): In QDF mode,
+	write a comment to the QDF file that indicates the object ID from
+	the original file.
+
+	* libqpdf/QPDF.cc (QPDF::pipeStreamData): Issue a warning instead
+	of failing if there is a problem found while decoding stream.
+
+	* qpdf/qpdf.cc: Exit with a status of 3 if warnings were found
+	regardless of what mode we're in.
+
 2009-02-21  Jay Berkenbilt  <ejb@ql.org>
 
 	* 2.0.4: release

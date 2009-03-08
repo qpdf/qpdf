@@ -183,7 +183,7 @@ for (my $i = 1; $i <= scalar(@badfiles); ++$i)
 $td->runtest("recover heifer file",
 	     {$td->COMMAND => "qpdf --static-id -qdf heifer.pdf a.pdf"},
 	     {$td->FILE => "heifer.out",
-	      $td->EXIT_STATUS => 0},
+	      $td->EXIT_STATUS => 3},
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
 	     {$td->FILE => "a.pdf"},
@@ -206,7 +206,7 @@ $td->runtest("damaged replaced page contents",
 	     {$td->COMMAND => "qpdf --static-id -qdf" .
 		  " append-page-content-damaged.pdf a.pdf"},
 	     {$td->FILE => "append-page-content-damaged.out",
-	      $td->EXIT_STATUS => 0},
+	      $td->EXIT_STATUS => 3},
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
 	     {$td->FILE => "a.pdf"},
@@ -282,7 +282,7 @@ check_pdf("no recompression",
 show_ntests();
 # ----------
 $td->notify("--- Object Stream Tests ---");
-$n_tests += 36 * 4;
+$n_tests += 36 * 6;
 $n_compare_pdfs += 36;
 
 for (my $n = 16; $n <= 19; ++$n)
@@ -294,7 +294,7 @@ for (my $n = 16; $n <= 19; ++$n)
     {
 	foreach my $qdf ('-qdf', '', '-encrypt "" x 128 --')
 	{
-	    # 4 tests + 1 compare_pdfs
+	    # 6 tests + 1 compare_pdfs
 	    $td->runtest("object stream mode",
 			 {$td->COMMAND =>
 			      "qpdf --static-id $flags $qdf $in a.pdf"},
@@ -316,6 +316,12 @@ for (my $n = 16; $n <= 19; ++$n)
 	    $td->runtest("compare files",
 			 {$td->FILE => "a.qdf"},
 			 {$td->FILE => "b.qdf"});
+	    $td->runtest("fix-qdf identity check",
+			 {$td->COMMAND => "fix-qdf a.qdf >| b.pdf"},
+			 {$td->STRING => "", $td->EXIT_STATUS => 0});
+	    $td->runtest("compare files",
+			 {$td->FILE => "a.qdf"},
+			 {$td->FILE => "b.qdf"});
 	}
     }
     flush_tiff_cache();
@@ -324,12 +330,14 @@ for (my $n = 16; $n <= 19; ++$n)
 show_ntests();
 # ----------
 $td->notify("--- Specific File Tests ---");
-$n_tests += 1;
+$n_tests += 2;
+$n_compare_pdfs += 1;
 
 # Special PDF files that caused problems at some point
 
 # This file is a PDF 1.1 file with /# as a name and with
-# inconsistencies in its free table.
+# inconsistencies in its free table.  It also has LZW streams that
+# happen to test boundary conditions in the LZW decoder.
 $td->runtest("old and complex",
 	     {$td->COMMAND => "qpdf --check old-and-complex.pdf"},
 	     {$td->STRING => +("checking old-and-complex.pdf\n" .
@@ -338,6 +346,12 @@ $td->runtest("old and complex",
 			       "No errors found\n"),
 			       $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("convert to qdf",
+	     {$td->COMMAND => "qpdf --qdf old-and-complex.pdf a.qdf"},
+	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+
+compare_pdfs("old-and-complex.pdf", "a.qdf");
 
 show_ntests();
 # ----------
@@ -823,12 +837,17 @@ foreach my $file (@files)
 show_ntests();
 # ----------
 $td->notify("--- fix-qdf Tests ---");
-$n_tests += 2;
+$n_tests += 4;
 
 for (my $n = 1; $n <= 2; ++$n)
 {
     $td->runtest("fix-qdf $n",
 		 {$td->COMMAND => "fix-qdf fix$n.qdf"},
+		 {$td->FILE => "fix$n.qdf.out",
+		  $td->EXIT_STATUS => 0});
+
+    $td->runtest("identity fix-qdf $n",
+		 {$td->COMMAND => "fix-qdf fix$n.qdf.out"},
 		 {$td->FILE => "fix$n.qdf.out",
 		  $td->EXIT_STATUS => 0});
 }

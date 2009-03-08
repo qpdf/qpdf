@@ -160,6 +160,10 @@ class QPDF
     // dictionaries) with direct objects.
     void flattenScalarReferences();
 
+    // Decode all streams, discarding the output.  Used to check
+    // correctness of stream encoding.
+    void decodeStreams();
+
     // For QPDFWriter:
 
     // Remove /ID, /Encrypt, and /Prev keys from the trailer

@@ -12,6 +12,9 @@
 
 #include <qpdf/QPDFWriter.hh>
 
+static int const EXIT_ERROR = 2;
+static int const EXIT_WARNING = 3;
+
 static char const* whoami = 0;
 
 // Note: let's not be too noisy about documenting the fact that this
@@ -158,7 +161,7 @@ void usage(std::string const& msg)
 	<< "Usage: " << whoami << " [options] infile outfile" << std::endl
 	<< "For detailed help, run " << whoami << " --help" << std::endl
 	<< std::endl;
-    exit(2);
+    exit(EXIT_ERROR);
 }
 
 static void show_encryption(QPDF& pdf)
@@ -752,7 +755,7 @@ int main(int argc, char* argv[])
 		}
 		else
 		{
-		    exit(2);
+		    exit(EXIT_ERROR);
 		}
 	    }
 	    if (show_linearization)
@@ -777,7 +780,7 @@ int main(int argc, char* argv[])
 			    QTC::TC("qpdf", "unable to filter");
 			    std::cerr << "Unable to filter stream data."
 				      << std::endl;
-			    exit(2);
+			    exit(EXIT_ERROR);
 			}
 			else
 			{
@@ -869,6 +872,8 @@ int main(int argc, char* argv[])
 			// traversal of file, so any structural errors
 			// would be exposed.
 			pdf.flattenScalarReferences();
+			// Also explicitly decode all streams.
+			pdf.decodeStreams();
 			okay = true;
 		    }
 		}
@@ -880,8 +885,7 @@ int main(int argc, char* argv[])
 		{
 		    if (! pdf.getWarnings().empty())
 		    {
-			// special exit status for warnings without errors
-			exit(3);
+			exit(EXIT_WARNING);
 		    }
 		    else
 		    {
@@ -946,11 +950,15 @@ int main(int argc, char* argv[])
 	    }
 	    w.write();
 	}
+	if (! pdf.getWarnings().empty())
+	{
+	    exit(EXIT_WARNING);
+	}
     }
     catch (std::exception& e)
     {
 	std::cerr << e.what() << std::endl;
-	exit(2);
+	exit(EXIT_ERROR);
     }
 
     return 0;
