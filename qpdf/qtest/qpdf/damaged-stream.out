@@ -1,0 +1,4 @@
+checking damaged-stream.pdf
+File is not encrypted
+File is not linearized
+WARNING: damaged-stream.pdf: offset 426: error decoding stream data for object 5 0: LZWDecoder: bad code received
