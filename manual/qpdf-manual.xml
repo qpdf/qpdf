@@ -645,6 +645,17 @@ make
       </listitem>
      </varlistentry>
      <varlistentry>
+      <term><option>--no-original-object-ids</option></term>
+      <listitem>
+       <para>
+        Suppresses inclusion of original object ID comments in QDF
+        files.  This can be useful when generating QDF files for test
+        purposes, particularly when comparing them to determine
+        whether two PDF files have identical content.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
       <term><option>-show-encryption</option></term>
       <listitem>
        <para>

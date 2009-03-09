@@ -74,6 +74,12 @@ class QPDFWriter
     // suites.
     void setStaticID(bool);
 
+    // Suppress inclusion of comments indicating original object IDs
+    // when writing QDF files.  This can also be useful for testing,
+    // particularly when using comparison of two qdf files to
+    // determine whether two PDF files have identical content.
+    void setSuppressOriginalObjectIDs(bool);
+
     // Preserve encryption.  The default is true unless prefilering,
     // content normalization, or qdf mode has been selected in which
     // case encryption is never preserved.  Encryption is also not
@@ -208,6 +214,7 @@ class QPDFWriter
     stream_data_e stream_data_mode;
     bool qdf_mode;
     bool static_id;
+    bool suppress_original_object_ids;
     bool direct_stream_lengths;
     bool encrypted;
     bool preserve_encryption;

@@ -181,7 +181,8 @@ for (my $i = 1; $i <= scalar(@badfiles); ++$i)
 # This heifer file was a real file that contained errors that Acrobat
 # Reader can recover.  We can recover it too.
 $td->runtest("recover heifer file",
-	     {$td->COMMAND => "qpdf --static-id -qdf heifer.pdf a.pdf"},
+	     {$td->COMMAND => "qpdf --static-id --no-original-object-ids" .
+		  " -qdf heifer.pdf a.pdf"},
 	     {$td->FILE => "heifer.out",
 	      $td->EXIT_STATUS => 3},
 	     $td->NORMALIZE_NEWLINES);
@@ -195,7 +196,8 @@ $td->runtest("check output",
 # mostly there.
 $td->runtest("good replaced page contents",
 	     {$td->COMMAND =>
-		  "qpdf --static-id -qdf append-page-content.pdf a.pdf"},
+		  "qpdf --static-id -qdf --no-original-object-ids" .
+		  " append-page-content.pdf a.pdf"},
 	     {$td->STRING => "",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
@@ -203,7 +205,8 @@ $td->runtest("check output",
 	     {$td->FILE => "a.pdf"},
 	     {$td->FILE => "append-page-content-good.qdf"});
 $td->runtest("damaged replaced page contents",
-	     {$td->COMMAND => "qpdf --static-id -qdf" .
+	     {$td->COMMAND =>
+		  "qpdf --static-id -qdf --no-original-object-ids" .
 		  " append-page-content-damaged.pdf a.pdf"},
 	     {$td->FILE => "append-page-content-damaged.out",
 	      $td->EXIT_STATUS => 3},
@@ -295,7 +298,7 @@ for (my $n = 16; $n <= 19; ++$n)
 	foreach my $qdf ('-qdf', '', '-encrypt "" x 128 --')
 	{
 	    # 4 tests + 1 compare_pdfs * 36 cases
-	    # 2 tests + 1 compare_pdfs * 12 cases
+	    # 2 additional tests * 12 cases
 	    $td->runtest("object stream mode",
 			 {$td->COMMAND =>
 			      "qpdf --static-id $flags $qdf $in a.pdf"},
@@ -313,25 +316,17 @@ for (my $n = 16; $n <= 19; ++$n)
 	    }
 	    $td->runtest("convert to qdf",
 			 {$td->COMMAND =>
-			      "qpdf --static-id -qdf -decrypt" .
+			      "qpdf --static-id --no-original-object-ids" .
+			      " -qdf -decrypt" .
 			      " -object-streams=disable $in a.qdf"},
 			 {$td->STRING => "",
 			  $td->EXIT_STATUS => 0});
 	    $td->runtest("convert output to qdf",
 			 {$td->COMMAND =>
-			      "qpdf --static-id -qdf" .
-			      " -object-streams=disable a.pdf b.qdf"},
+			      "qpdf --static-id --no-original-object-ids" .
+			      " -qdf -object-streams=disable a.pdf b.qdf"},
 			 {$td->STRING => "",
 			  $td->EXIT_STATUS => 0});
-	    # XXX The comparison is broken because of the new original
-	    # object comments.  We need a script that compares qpdfs
-	    # by normalizing those comments (like replacing the object
-	    # IDs with nnn) and then diffs.  That will work here and
-	    # in some of the other failure cases.  For the rest where
-	    # we're actually checking the qdf itself, we will need to
-	    # store the new qdf files with the object IDs.  That can't
-	    # be done blindly -- we need to make sure the output is
-	    # correct!
 	    $td->runtest("compare files",
 			 {$td->FILE => "a.qdf"},
 			 {$td->FILE => "b.qdf"});
@@ -515,12 +510,12 @@ foreach my $base (@linearized_files)
 # that their qdf files are identical.  The next two tests have the
 # same expected output files and different input files.
 check_pdf("modified",
-	  "qpdf --static-id --qdf delete-and-reuse.pdf",
-	  "delete-and-reuse.qdf",
+	  "qpdf --static-id --qdf --no-original-object-ids" .
+	  " delete-and-reuse.pdf", "delete-and-reuse.qdf",
 	  0);
 check_pdf("linearized and modified",
-	  "qpdf --static-id --qdf lin-delete-and-reuse.pdf",
-	  "delete-and-reuse.qdf", # not lin-delete-and-reuse.qdf
+	  "qpdf --static-id --qdf --no-original-object-ids" .
+	  " lin-delete-and-reuse.pdf", "delete-and-reuse.qdf", # same output
 	  0);
 
 $td->runtest("check linearized and modified",
@@ -648,7 +643,7 @@ foreach my $d (@encrypted_files)
     # Test writing to stdout
     $td->runtest("decrypt $file",
 		 {$td->COMMAND =>
-		      "qpdf --static-id -qdf" .
+		      "qpdf --static-id -qdf --no-original-object-ids" .
 		      " --password=\"$pass\" enc-$file.pdf -" .
 		      " > $file.enc"},
 		 {$td->STRING => "",
@@ -680,7 +675,8 @@ foreach my $d (@encrypted_files)
 	my $eflags = "-encrypt \"$upass\" \"$opass\" $bits $xeflags --";
 	$td->runtest("encrypt $file",
 		     {$td->COMMAND =>
-			  "qpdf --static-id -qdf $eflags $file.enc $file.enc2"},
+			  "qpdf --static-id --no-original-object-ids -qdf" .
+			  " $eflags $file.enc $file.enc2"},
 		     {$td->STRING => "",
 		      $td->EXIT_STATUS => 0});
 	$td->runtest("check /P",
@@ -692,7 +688,8 @@ foreach my $d (@encrypted_files)
 		     $td->NORMALIZE_NEWLINES);
 	$td->runtest("decrypt again",
 		     {$td->COMMAND =>
-			  "qpdf --static-id -qdf --password=\"$pass\"" .
+			  "qpdf --static-id --no-original-object-ids -qdf" .
+			  " --password=\"$pass\"" .
 			  " $file.enc2 $file.enc3"},
 		     {$td->STRING => "",
 		      $td->EXIT_STATUS => 0});

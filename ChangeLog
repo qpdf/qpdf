@@ -1,3 +1,10 @@
+2009-03-09  Jay Berkenbilt  <ejb@ql.org>
+
+	* libqpdf/Pl_LZWDecoder.cc: adjust LZWDecoder full table
+	detection, now having been able to adequately test boundary
+	conditions both and with and without early code change.  Also
+	compared implementation with other LZW decoders.
+
 2009-03-08  Jay Berkenbilt  <ejb@ql.org>
 
 	* qpdf/fix-qdf (write_ostream): Adjust offsets while writing
@@ -10,6 +17,9 @@
 	* libqpdf/QPDFWriter.cc (QPDFWriter::writeObject): In QDF mode,
 	write a comment to the QDF file before each object that indicates
 	the object ID of the corresponding object from the original file.
+	Add --no-original-object-ids flag to qpdf and
+	setSuppressOriginalObjectIDs() method to QPDFWriter to turn this
+	behavior off.
 
 	* libqpdf/QPDF.cc (QPDF::pipeStreamData): Issue a warning instead
 	of failing if there is a problem found while decoding stream.

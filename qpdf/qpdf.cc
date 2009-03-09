@@ -127,6 +127,7 @@ These options can be useful for digging into PDF files or for use in\n\
 automated test suites for software that uses the qpdf library.\n\
 \n\
 --static-id               generate static /ID: FOR TESTING ONLY!\n\
+--no-original-object-ids  suppress original object ID comments in qdf mode\n\
 --show-encryption         quickly show encryption parameters\n\
 --check-linearization     check file integrity and linearization status\n\
 --show-linearization      check and show all linearization data\n\
@@ -503,6 +504,7 @@ int main(int argc, char* argv[])
     bool qdf_mode = false;
 
     bool static_id = false;
+    bool suppress_original_object_id = false;
     bool show_encryption = false;
     bool check_linearization = false;
     bool show_linearization = false;
@@ -636,6 +638,10 @@ int main(int argc, char* argv[])
 	    else if (strcmp(arg, "static-id") == 0)
 	    {
 		static_id = true;
+	    }
+	    else if (strcmp(arg, "no-original-object-ids") == 0)
+	    {
+		suppress_original_object_id = true;
 	    }
 	    else if (strcmp(arg, "show-encryption") == 0)
 	    {
@@ -920,6 +926,10 @@ int main(int argc, char* argv[])
 	    if (static_id)
 	    {
 		w.setStaticID(true);
+	    }
+	    if (suppress_original_object_id)
+	    {
+		w.setSuppressOriginalObjectIDs(true);
 	    }
 	    if (encrypt)
 	    {

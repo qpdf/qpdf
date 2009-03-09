@@ -32,6 +32,7 @@ QPDFWriter::QPDFWriter(QPDF& pdf, char const* filename) :
     stream_data_mode(s_compress),
     qdf_mode(false),
     static_id(false),
+    suppress_original_object_ids(false),
     direct_stream_lengths(true),
     encrypted(false),
     preserve_encryption(true),
@@ -102,6 +103,12 @@ void
 QPDFWriter::setStaticID(bool val)
 {
     this->static_id = val;
+}
+
+void
+QPDFWriter::setSuppressOriginalObjectIDs(bool val)
+{
+    this->suppress_original_object_ids = val;
 }
 
 void
@@ -932,9 +939,13 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
 	    {
 		writeString("%% Object stream: object " +
 			    QUtil::int_to_string(new_obj) + ", index " +
-			    QUtil::int_to_string(count) +
-			    "; original object ID: " +
-			    QUtil::int_to_string(obj) + "\n");
+			    QUtil::int_to_string(count));
+		if (! this->suppress_original_object_ids)
+		{
+		    writeString("; original object ID: " +
+				QUtil::int_to_string(obj));
+		}
+		writeString("\n");
 	    }
 	    if (pass == 1)
 	    {
@@ -1028,7 +1039,7 @@ QPDFWriter::writeObject(QPDFObjectHandle object, int object_stream_index)
     }
     if (object_stream_index == -1)
     {
-	if (this->qdf_mode)
+	if (this->qdf_mode && (! this->suppress_original_object_ids))
 	{
 	    writeString("%% Original object ID: " +
 			QUtil::int_to_string(object.getObjectID()) + " " +
