@@ -87,7 +87,8 @@ sub run_and_cmp
 		 {$td->STRING => $out,
 		  $td->EXIT_STATUS => 0});
     $td->runtest("$dsc output",
-		 {$td->COMMAND => "$qpdf --static-id -qdf $fout -"},
+		 {$td->COMMAND => "$qpdf --static-id" .
+		      " --no-original-object-ids -qdf $fout -"},
 		 {$td->FILE => $fexp,
 		  $td->EXIT_STATUS => 0});
 }
