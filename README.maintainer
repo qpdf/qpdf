@@ -2,6 +2,7 @@ Release Reminders
 =================
 
  * Increment shared library version information as needed
+   (libqpdf/build.mk)
 
  * Add a release entry to ChangeLog
 

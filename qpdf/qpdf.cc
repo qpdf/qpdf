@@ -456,7 +456,7 @@ int main(int argc, char* argv[])
 	//               1         2         3         4         5         6         7         8
 	//      12345678901234567890123456789012345678901234567890123456789012345678901234567890
 	std::cout
-	    << whoami << " version 2.0.4+" << std::endl
+	    << whoami << " version 2.0.5" << std::endl
 	    << "Copyright (c) 2005-2009 Jay Berkenbilt"
 	    << std::endl
 	    << "This software may be distributed under the terms of version 2 of the"

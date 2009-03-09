@@ -1,5 +1,7 @@
 2009-03-09  Jay Berkenbilt  <ejb@ql.org>
 
+	* 2.0.5: release
+
 	* libqpdf/Pl_LZWDecoder.cc: adjust LZWDecoder full table
 	detection, now having been able to adequately test boundary
 	conditions both and with and without early code change.  Also
