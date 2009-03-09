@@ -8,8 +8,8 @@
 	structure of file, attempt to decode all stream data.
 
 	* libqpdf/QPDFWriter.cc (QPDFWriter::writeObject): In QDF mode,
-	write a comment to the QDF file that indicates the object ID from
-	the original file.
+	write a comment to the QDF file before each object that indicates
+	the object ID of the corresponding object from the original file.
 
 	* libqpdf/QPDF.cc (QPDF::pipeStreamData): Issue a warning instead
 	of failing if there is a problem found while decoding stream.

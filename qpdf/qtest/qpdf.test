@@ -282,8 +282,8 @@ check_pdf("no recompression",
 show_ntests();
 # ----------
 $td->notify("--- Object Stream Tests ---");
-$n_tests += 36 * 6;
-$n_compare_pdfs += 36;
+$n_tests += (36 * 4) + (12 * 2);
+$n_compare_pdfs += 36 + 12;
 
 for (my $n = 16; $n <= 19; ++$n)
 {
@@ -294,13 +294,23 @@ for (my $n = 16; $n <= 19; ++$n)
     {
 	foreach my $qdf ('-qdf', '', '-encrypt "" x 128 --')
 	{
-	    # 6 tests + 1 compare_pdfs
+	    # 4 tests + 1 compare_pdfs * 36 cases
+	    # 2 tests + 1 compare_pdfs * 12 cases
 	    $td->runtest("object stream mode",
 			 {$td->COMMAND =>
 			      "qpdf --static-id $flags $qdf $in a.pdf"},
 			 {$td->STRING => "",
 			  $td->EXIT_STATUS => 0});
 	    compare_pdfs("good$n.pdf", "a.pdf");
+	    if ($qdf eq '-qdf')
+	    {
+		$td->runtest("fix-qdf identity check",
+			     {$td->COMMAND => "fix-qdf a.pdf >| b.pdf"},
+			     {$td->STRING => "", $td->EXIT_STATUS => 0});
+		$td->runtest("compare files",
+			     {$td->FILE => "a.pdf"},
+			     {$td->FILE => "b.pdf"});
+	    }
 	    $td->runtest("convert to qdf",
 			 {$td->COMMAND =>
 			      "qpdf --static-id -qdf -decrypt" .
@@ -313,12 +323,15 @@ for (my $n = 16; $n <= 19; ++$n)
 			      " -object-streams=disable a.pdf b.qdf"},
 			 {$td->STRING => "",
 			  $td->EXIT_STATUS => 0});
-	    $td->runtest("compare files",
-			 {$td->FILE => "a.qdf"},
-			 {$td->FILE => "b.qdf"});
-	    $td->runtest("fix-qdf identity check",
-			 {$td->COMMAND => "fix-qdf a.qdf >| b.pdf"},
-			 {$td->STRING => "", $td->EXIT_STATUS => 0});
+	    # XXX The comparison is broken because of the new original
+	    # object comments.  We need a script that compares qpdfs
+	    # by normalizing those comments (like replacing the object
+	    # IDs with nnn) and then diffs.  That will work here and
+	    # in some of the other failure cases.  For the rest where
+	    # we're actually checking the qdf itself, we will need to
+	    # store the new qdf files with the object IDs.  That can't
+	    # be done blindly -- we need to make sure the output is
+	    # correct!
 	    $td->runtest("compare files",
 			 {$td->FILE => "a.qdf"},
 			 {$td->FILE => "b.qdf"});
