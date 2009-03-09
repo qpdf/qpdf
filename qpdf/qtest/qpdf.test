@@ -286,7 +286,7 @@ show_ntests();
 # ----------
 $td->notify("--- Object Stream Tests ---");
 $n_tests += (36 * 4) + (12 * 2);
-$n_compare_pdfs += 36 + 12;
+$n_compare_pdfs += 36;
 
 for (my $n = 16; $n <= 19; ++$n)
 {
