@@ -1,6 +1,8 @@
-2009-03-09  Jay Berkenbilt  <ejb@ql.org>
+2009-03-10  Jay Berkenbilt  <ejb@ql.org>
 
 	* 2.0.5: release
+
+2009-03-09  Jay Berkenbilt  <ejb@ql.org>
 
 	* libqpdf/Pl_LZWDecoder.cc: adjust LZWDecoder full table
 	detection, now having been able to adequately test boundary
