@@ -1,7 +1,7 @@
 // Write bits into a bit stream.  See BitStream for reading.
 
-#ifndef __THIS_FILE_Q__
-#define __THIS_FILE_Q__
+#ifndef __BITWRITER_HH__
+#define __BITWRITER_HH__
 
 class Pipeline;
 
@@ -21,4 +21,4 @@ class BitWriter
     unsigned int bit_offset;
 };
 
-#endif // __THIS_FILE_Q__
+#endif // __BITWRITER_HH__
