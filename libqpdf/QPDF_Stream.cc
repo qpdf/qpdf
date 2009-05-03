@@ -143,8 +143,8 @@ QPDF_Stream::filterable(std::vector<std::string>& filters,
     }
     else
     {
-	throw QPDFExc(qpdf->getFilename(), this->offset,
-		      "invalid decode parameters object type for this stream");
+	// Ignore for now -- some filter types, like CCITTFaxDecode,
+	// use types other than dictionary for this.
     }
 
     if ((predictor > 1) && (columns == 0))
