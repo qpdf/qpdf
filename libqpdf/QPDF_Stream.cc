@@ -145,6 +145,8 @@ QPDF_Stream::filterable(std::vector<std::string>& filters,
     {
 	// Ignore for now -- some filter types, like CCITTFaxDecode,
 	// use types other than dictionary for this.
+	QTC::TC("qpdf", "QPDF_Stream ignore non-dictionary DecodeParms");
+
 	filterable = false;
     }
 

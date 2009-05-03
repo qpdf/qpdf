@@ -81,7 +81,7 @@ flush_tiff_cache();
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 3;
+$n_tests += 4;
 
 foreach (my $i = 1; $i <= 3; ++$i)
 {
@@ -90,6 +90,13 @@ foreach (my $i = 1; $i <= 3; ++$i)
 		 {$td->FILE => "misc-$i.out", $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
 }
+
+# Make sure we ignore decode parameters that we don't understand
+$td->runtest("unknown decode parameters",
+	     {$td->COMMAND => "qpdf --check fax-decode-parms.pdf"},
+	     {$td->FILE => "fax-decode-parms.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
 
 show_ntests();
 # ----------
