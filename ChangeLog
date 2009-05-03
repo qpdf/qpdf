@@ -1,3 +1,10 @@
+2009-05-03  Jay Berkenbilt  <ejb@ql.org>
+
+	* 2.0.6. release
+
+	* libqpdf/QPDF_Stream.cc (filterable): ignore /DecodeParms if it's
+	not a type we recognize.  (Fixes qpdf-Bugs-2779746.)
+
 2009-03-10  Jay Berkenbilt  <ejb@ql.org>
 
 	* 2.0.5: release
