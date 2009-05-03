@@ -145,6 +145,7 @@ QPDF_Stream::filterable(std::vector<std::string>& filters,
     {
 	// Ignore for now -- some filter types, like CCITTFaxDecode,
 	// use types other than dictionary for this.
+	filterable = false;
     }
 
     if ((predictor > 1) && (columns == 0))
