@@ -6,7 +6,11 @@
 #include <string.h>
 #include <iostream>
 #include <stdlib.h>
-#include <unistd.h>
+#ifdef _WIN32
+# include <io.h>
+#else
+# include <unistd.h>
+#endif
 
 static char const* whoami = 0;
 
