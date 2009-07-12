@@ -1,6 +1,7 @@
 #include <qpdf/Pl_LZWDecoder.hh>
 
 #include <qpdf/Pl_StdioFile.hh>
+#include <qpdf/QUtil.hh>
 #include <iostream>
 #include <stdlib.h>
 #include <string.h>
@@ -8,21 +9,36 @@
 int main(int argc, char* argv[])
 {
     bool early_code_change = true;
-    if ((argc == 2) && (strcmp(argv[1], "--no-early-code-change") == 0))
+    if ((argc == 4) && (strcmp(argv[3], "--no-early-code-change") == 0))
     {
 	early_code_change = false;
     }
 
-    Pl_StdioFile out("stdout", stdout);
-    Pl_LZWDecoder decode("decode", &out, early_code_change);
+    if (argc < 3)
+    {
+	std::cerr << "Usage: lzw infile outfile [ --no-early-code-change ]"
+		  << std::endl;
+	exit(2);
+    }
 
     try
     {
+	char* infilename = argv[1];
+	char* outfilename = argv[2];
+
+	FILE* infile = QUtil::fopen_wrapper("open input file",
+					    fopen(infilename, "rb"));
+	FILE* outfile = QUtil::fopen_wrapper("open output file",
+					     fopen(outfilename, "wb"));
+
+	Pl_StdioFile out("output", outfile);
+	Pl_LZWDecoder decode("decode", &out, early_code_change);
+
 	unsigned char buf[10000];
 	bool done = false;
 	while (! done)
 	{
-	    int len = read(0, buf, sizeof(buf));
+	    int len = fread(buf, 1, sizeof(buf), infile);
 	    if (len <= 0)
 	    {
 		done = true;

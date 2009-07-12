@@ -532,7 +532,7 @@ int main(int argc, char* argv[])
 		// Be lax about -arg vs --arg
 		++arg;
 	    }
-	    char* parameter = strchr(arg, '=');
+	    char* parameter = (char*)strchr(arg, '=');
 	    if (parameter)
 	    {
 		*parameter++ = 0;

@@ -12,6 +12,7 @@ my $td = new TestDriver('ph');
 $td->runtest("PointerHolder",
 	     {$td->COMMAND => "pointer_holder"},
 	     {$td->FILE => "ph.out",
-	      $td->EXIT_STATUS => 0});
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
 
 $td->report(1);

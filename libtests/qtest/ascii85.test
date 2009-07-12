@@ -17,6 +17,7 @@ $td->runtest("decode",
 $td->runtest("partial decode",
 	     {$td->COMMAND => "echo '\@<5skEHbu7\$3~>' | ascii85"},
 	     {$td->STRING => "asdfqwer\n",
-	      $td->EXIT_STATUS => 0});
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
 
 $td->report(2);

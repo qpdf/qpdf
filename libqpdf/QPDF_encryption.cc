@@ -45,7 +45,7 @@ QPDF::trim_user_password(std::string& user_password)
 	return;
     }
 
-    char* p = 0;
+    char const* p = 0;
     while ((p = strchr(cstr, '\x28')) != 0)
     {
 	if (memcmp(p, padding_string, len - (p - cstr)) == 0)

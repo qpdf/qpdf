@@ -16,7 +16,7 @@ $td->runtest("PCRE",
 	     $td->NORMALIZE_NEWLINES);
 
 chop(my $supported = `pcre --unicode-classes-supported`);
-if ($supported)
+if ($supported =~ m/^1/)
 {
     $td->runtest("unicode character classes",
 		 {$td->COMMAND => "pcre --unicode-classes"},

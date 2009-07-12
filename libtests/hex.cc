@@ -15,7 +15,7 @@ int main()
 	bool done = false;
 	while (! done)
 	{
-	    int len = read(0, buf, sizeof(buf));
+	    int len = fread(buf, 1, sizeof(buf), stdin);
 	    if (len <= 0)
 	    {
 		done = true;

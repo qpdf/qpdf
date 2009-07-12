@@ -12,6 +12,7 @@ my $td = new TestDriver('md5');
 $td->runtest("md5",
 	     {$td->COMMAND => "md5"},
 	     {$td->FILE => "md5.out",
-	      $td->EXIT_STATUS => 0});
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
 
 $td->report(1);

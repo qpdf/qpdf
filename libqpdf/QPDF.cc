@@ -241,7 +241,7 @@ QPDF::ObjGen::ObjGen(int o = 0, int g = 0) :
 }
 
 bool
-QPDF::ObjGen::ObjGen::operator<(ObjGen const& rhs) const
+QPDF::ObjGen::operator<(ObjGen const& rhs) const
 {
     return ((this->obj < rhs.obj) ||
 	    ((this->obj == rhs.obj) && (this->gen < rhs.gen)));

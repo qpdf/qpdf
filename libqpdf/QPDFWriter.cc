@@ -1110,7 +1110,7 @@ QPDFWriter::generateID()
 	// the file yet.  This scheme should be fine though.
 
 	std::string seed;
-	seed += QUtil::int_to_string((int)time(0));
+	seed += QUtil::int_to_string((int)QUtil::get_current_time());
 	seed += " QPDF ";
 	seed += filename;
 	seed += " ";

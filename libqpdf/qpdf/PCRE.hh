@@ -5,6 +5,9 @@
 #ifndef __PCRE_HH__
 #define __PCRE_HH__
 
+#ifdef _WIN32
+# define PCRE_STATIC
+#endif
 #include <pcre.h>
 #include <string>
 

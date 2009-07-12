@@ -37,6 +37,8 @@ namespace QUtil
     // non-null, initializes it with the value of the variable.
     bool get_env(std::string const& var, std::string* value = 0);
 
+    time_t get_current_time();
+
     // Return a string containing the byte representation of the UTF-8
     // encoding for the unicode value passed in.
     std::string toUTF8(unsigned long uval);

@@ -12,6 +12,7 @@ my $td = new TestDriver('qutil');
 $td->runtest("QUtil",
 	     {$td->COMMAND => "qutil"},
 	     {$td->FILE => "qutil.out",
-	      $td->EXIT_STATUS => 0});
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
 
 $td->report(1);

@@ -624,7 +624,7 @@ QPDF::maxEnd(ObjUser const& ou)
     assert(this->obj_user_to_objects.count(ou) > 0);
     std::set<ObjGen> const& ogs = this->obj_user_to_objects[ou];
     int end = 0;
-    for (std::set<ObjGen>::iterator iter = ogs.begin();
+    for (std::set<ObjGen>::const_iterator iter = ogs.begin();
 	 iter != ogs.end(); ++iter)
     {
 	ObjGen const& og = *iter;
