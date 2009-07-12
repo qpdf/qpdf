@@ -4,7 +4,6 @@ dnl This config.in requires autoconf 2.5 or greater.
 AC_PREREQ(2.60)
 AC_INIT(qpdf,2.0.6)
 
-dnl No AC_CONFIG_HEADERS.  If this changes, update README.maintainer.
 AC_CONFIG_FILES([autoconf.mk])
 AC_CONFIG_FILES([manual/html.xsl manual/print.xsl])
 AC_CONFIG_HEADERS([libqpdf/qpdf/qpdf-config.h])
