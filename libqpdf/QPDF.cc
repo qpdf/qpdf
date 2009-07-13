@@ -1342,7 +1342,8 @@ QPDF::readToken(InputSource* input)
 	}
 	else
 	{
-	    if (isspace(ch) && (input->getLastOffset() == offset))
+	    if (isspace((unsigned char)ch) &&
+		(input->getLastOffset() == offset))
 	    {
 		++offset;
 	    }
@@ -1460,7 +1461,7 @@ QPDF::readObjectAtOffset(off_t offset, int exp_objid, int exp_generation,
 	    char ch;
 	    if (this->file.read(&ch, 1))
 	    {
-		if (! isspace(ch))
+		if (! isspace((unsigned char)ch))
 		{
 		    this->file.seek(-1, SEEK_CUR);
 		    break;
