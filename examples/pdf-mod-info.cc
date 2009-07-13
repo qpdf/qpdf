@@ -8,7 +8,6 @@
 #include <iostream>
 #include <string.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 static char const* version = "1.1";
 static char const* whoami = 0;
