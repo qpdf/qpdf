@@ -1,4 +1,3 @@
-
 #include <qpdf/Pl_Flate.hh>
 #include <qpdf/Pl_StdioFile.hh>
 
@@ -6,6 +5,7 @@
 #include <string.h>
 #include <iostream>
 #include <stdlib.h>
+#include <fcntl.h>
 #ifdef _WIN32
 # include <io.h>
 #else
@@ -63,6 +63,9 @@ int main(int argc, char* argv[])
 	usage();
     }
 
+#ifdef _WIN32
+    _setmode(_fileno(stdout), _O_BINARY);
+#endif
     Pl_StdioFile* out = new Pl_StdioFile("stdout", stdout);
     Pl_Flate* flate = new Pl_Flate("flate", out, action);
 
