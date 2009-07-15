@@ -14,18 +14,14 @@ my @tests =
     (['general exception', 2],
      ['internal error', 3],
      ['system exception', 2],
-     ['library exception', 3, "uncaught exception: .+\n"], # fails on VC7?
      );
 
 for (my $i = 0; $i < scalar(@tests); ++$i)
 {
-    my $output = +((-f "test$i.out")
-		   ? {$td->FILE => "test$i.out"}
-		   : {$td->REGEXP => $tests[$i]->[2]});
-    $output->{$td->EXIT_STATUS} = $tests[$i]->[1];
     $td->runtest($tests[$i]->[0],
 		 {$td->COMMAND => "qexc $i"},
-		 $output,
+		 {$td->FILE => "test$i.out",
+		  $td->EXIT_STATUS => $tests[$i]->[1]},
 		 $td->NORMALIZE_NEWLINES);
 }
 

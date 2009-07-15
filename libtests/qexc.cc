@@ -4,20 +4,6 @@
 #include <errno.h>
 #include <stdlib.h>
 
-void do_terminate()
-{
-    try
-    {
-	throw;
-    }
-    catch (std::exception& e)
-    {
-	std::cerr << "uncaught exception: " << e.what() << std::endl;
-	exit(3);
-    }
-    exit(4);
-}
-
 void f(int n)
 {
     switch (n)
@@ -33,19 +19,11 @@ void f(int n)
       case 2:
 	throw QEXC::System("doing something", EINVAL);
 	break;
-
-      case 3:
-	{
-	    int a = -1;
-	    new char[a];
-	}
-	break;
     }
 }
 
 int main(int argc, char* argv[])
 {
-    std::set_terminate(do_terminate);
     if (argc != 2)
     {
 	std::cerr << "usage: qexc n" << std::endl;
@@ -61,6 +39,15 @@ int main(int argc, char* argv[])
 	std::cerr << "exception: " << e.unparse() << std::endl;
 	std::cerr << "what: " << e.what() << std::endl;
 	exit(2);
+    }
+    catch (std::exception& e)
+    {
+	std::cerr << "uncaught exception: " << e.what() << std::endl;
+	exit(3);
+    }
+    catch (...)
+    {
+	exit(4);
     }
     return 0;
 }
