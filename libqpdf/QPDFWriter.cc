@@ -50,6 +50,7 @@ QPDFWriter::QPDFWriter(QPDF& pdf, char const* filename) :
 	this->filename = "standard output";
 	QTC::TC("qpdf", "QPDFWriter write to stdout");
 	file = stdout;
+	QUtil::binary_stdout();
     }
     else
     {

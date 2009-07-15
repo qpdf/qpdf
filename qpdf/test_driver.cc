@@ -126,6 +126,7 @@ void runtest(int n, char const* filename)
 
 	    std::cout << "Raw stream data:" << std::endl;
 	    std::cout.flush();
+	    QUtil::binary_stdout();
 	    PointerHolder<Pl_StdioFile> out = new Pl_StdioFile("raw", stdout);
 	    qtest.pipeStreamData(out.getPointer(), false, false, false);
 
@@ -133,6 +134,7 @@ void runtest(int n, char const* filename)
 	    if (qtest.pipeStreamData(0, true, false, false))
 	    {
 		std::cout.flush();
+		QUtil::binary_stdout();
 		out = new Pl_StdioFile("filtered", stdout);
 		qtest.pipeStreamData(out.getPointer(), true, false, false);
 		std::cout << std::endl << "End of stream data" << std::endl;
@@ -172,6 +174,7 @@ void runtest(int n, char const* filename)
 	QPDFObjectHandle kids = pages.getKey("/Kids");
 	QPDFObjectHandle page = kids.getArrayItem(1); // second page
 	QPDFObjectHandle contents = page.getKey("/Contents");
+	QUtil::binary_stdout();
 	PointerHolder<Pl_StdioFile> out = new Pl_StdioFile("filtered", stdout);
 	contents.pipeStreamData(out.getPointer(), true, false, false);
     }
@@ -183,6 +186,7 @@ void runtest(int n, char const* filename)
 	    QPDFObjectHandle stream = streams.getArrayItem(i);
 	    std::cout << "-- stream " << i << " --" << std::endl;
 	    std::cout.flush();
+	    QUtil::binary_stdout();
 	    PointerHolder<Pl_StdioFile> out =
 		new Pl_StdioFile("tokenized stream", stdout);
 	    stream.pipeStreamData(out.getPointer(), true, true, false);

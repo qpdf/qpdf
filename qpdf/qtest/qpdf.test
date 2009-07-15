@@ -267,7 +267,8 @@ for (my $i = 1; $i <= scalar(@goodfiles); ++$i)
     $td->runtest("$goodfiles[$i-1]",
 		 {$td->COMMAND => "test_driver $n good$i.pdf"},
 		 {$td->FILE => "good$i.out",
-		  $td->EXIT_STATUS => 0});
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
     my $xflags = $goodtest_flags{$i} || '';
     check_pdf("create qdf",
 	      "qpdf --static-id -qdf $xflags good$i.pdf",
@@ -461,7 +462,8 @@ $td->runtest("unfilterable stream data",
 	     {$td->COMMAND => "qpdf encrypted-with-images.pdf" .
 		  " --show-object=8 --filtered-stream-data"},
 	     {$td->FILE => "show-unfilterable.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("show-xref-by-id",
 	     {$td->COMMAND => "qpdf encrypted-with-images.pdf" .
@@ -837,7 +839,8 @@ foreach my $file (@files)
 	    $td->runtest("check status",
 			 {$td->COMMAND => "qpdf --check a.pdf"},
 			 {$td->FILE => "$base.$n.check",
-			  $td->EXIT_STATUS => 0});
+			  $td->EXIT_STATUS => 0},
+			 $td->NORMALIZE_NEWLINES);
 
 	    compare_pdfs($file, "a.pdf");
 

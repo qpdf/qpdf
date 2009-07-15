@@ -2,6 +2,11 @@
 #include <iostream>
 #include <string.h>
 #include <stdlib.h>
+#include <fcntl.h>
+
+#ifdef _WIN32
+# include <io.h>
+#endif
 
 #include <qpdf/QUtil.hh>
 #include <qpdf/QTC.hh>
@@ -15,7 +20,7 @@
 static int const EXIT_ERROR = 2;
 static int const EXIT_WARNING = 3;
 
-static char const* whoami = 0;
+static char* whoami = 0;
 
 // Note: let's not be too noisy about documenting the fact that this
 // software purposely fails to enforce the distinction between user
@@ -429,7 +434,12 @@ parse_encrypt_options(
 
 int main(int argc, char* argv[])
 {
-    if ((whoami = strrchr(argv[0], '/')) == NULL)
+#ifdef _WIN32
+    char pathsep = '\\';
+#else
+    char pathsep = '/';
+#endif
+    if ((whoami = strrchr(argv[0], pathsep)) == NULL)
     {
 	whoami = argv[0];
     }
@@ -437,6 +447,13 @@ int main(int argc, char* argv[])
     {
 	++whoami;
     }
+#ifdef _WIN32
+    if ((strlen(whoami) > 4) &&
+	(strcmp(whoami + strlen(whoami) - 4, ".exe") == 0))
+    {
+	whoami[strlen(whoami) - 4] = '\0';
+    }
+#endif
     // For libtool's sake....
     if (strncmp(whoami, "lt-", 3) == 0)
     {
@@ -790,6 +807,7 @@ int main(int argc, char* argv[])
 			}
 			else
 			{
+			    QUtil::binary_stdout();
 			    Pl_StdioFile out("stdout", stdout);
 			    obj.pipeStreamData(&out, filter, normalize, false);
 			}

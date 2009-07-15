@@ -5,9 +5,11 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fcntl.h>
 #ifdef _WIN32
 #include <Windows.h>
 #include <direct.h>
+#include <io.h>
 #else
 #include <unistd.h>
 #endif
@@ -102,6 +104,14 @@ QUtil::copy_string(std::string const& str)
     result[str.length()] = '\0';
     memcpy(result, str.c_str(), str.length());
     return result;
+}
+
+void
+QUtil::binary_stdout()
+{
+#ifdef _WIN32
+    _setmode(_fileno(stdout), _O_BINARY);
+#endif
 }
 
 bool

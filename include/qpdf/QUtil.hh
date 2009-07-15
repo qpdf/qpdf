@@ -32,6 +32,9 @@ namespace QUtil
 
     char* copy_string(std::string const&);
 
+    // Set stdout to binary mode
+    void binary_stdout();
+
     // Get the value of an environment variable in a portable fashion.
     // Returns true iff the variable is defined.  If `value' is
     // non-null, initializes it with the value of the variable.
