@@ -7,12 +7,6 @@
 #include <iostream>
 #include <stdlib.h>
 
-#ifdef _WIN32
-# include <io.h>
-#else
-# include <unistd.h>
-#endif
-
 int main(int argc, char* argv[])
 {
     if (argc != 4)

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include <qpdf/QPDF.hh>
+#include <qpdf/QUtil.hh>
 
 static char const* whoami = 0;
 
@@ -15,14 +16,8 @@ void usage()
 
 int main(int argc, char* argv[])
 {
-    if ((whoami = strrchr(argv[0], '/')) == NULL)
-    {
-	whoami = argv[0];
-    }
-    else
-    {
-	++whoami;
-    }
+    whoami = QUtil::getWhoami(argv[0]);
+
     // For libtool's sake....
     if (strncmp(whoami, "lt-", 3) == 0)
     {

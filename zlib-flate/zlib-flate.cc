@@ -7,11 +7,6 @@
 #include <iostream>
 #include <stdlib.h>
 #include <fcntl.h>
-#ifdef _WIN32
-# include <io.h>
-#else
-# include <unistd.h>
-#endif
 
 static char const* whoami = 0;
 
@@ -65,6 +60,7 @@ int main(int argc, char* argv[])
     }
 
     QUtil::binary_stdout();
+    QUtil::binary_stdin();
     Pl_StdioFile* out = new Pl_StdioFile("stdout", stdout);
     Pl_Flate* flate = new Pl_Flate("flate", out, action);
 
@@ -74,7 +70,7 @@ int main(int argc, char* argv[])
 	bool done = false;
 	while (! done)
 	{
-	    int len = read(0, buf, sizeof(buf));
+	    int len = fread(buf, 1, sizeof(buf), stdin);
 	    if (len <= 0)
 	    {
 		done = true;

@@ -32,8 +32,12 @@ namespace QUtil
 
     char* copy_string(std::string const&);
 
-    // Set stdout to binary mode
+    // Set stdin, stdout to binary mode
     void binary_stdout();
+    void binary_stdin();
+
+    // May modify argv0
+    char* getWhoami(char* argv0);
 
     // Get the value of an environment variable in a portable fashion.
     // Returns true iff the variable is defined.  If `value' is

@@ -77,14 +77,8 @@ int main(int argc, char* argv[])
     bool static_id = false;
     std::map<std::string, std::string> Keys;
 
-    if ((whoami = strrchr(argv[0], '/')) == NULL)
-    {
-	whoami = argv[0];
-    }
-    else
-    {
-	++whoami;
-    }
+    whoami = QUtil::getWhoami(argv[0]);
+
     // For libtool's sake....
     if (strncmp(whoami, "lt-", 3) == 0)
     {
@@ -161,6 +155,9 @@ int main(int argc, char* argv[])
 	usage();
     }
 
+    std::string fl_tmp = fl_out;
+    fl_tmp += ".tmp";
+
     try
     {
 	QPDF file;
@@ -198,13 +195,21 @@ int main(int argc, char* argv[])
 		fileinfo.replaceKey(it->first, elt);
 	    }
 	}
-	std::string fl_tmp = fl_out;
-	fl_tmp += ".tmp";
 	QPDFWriter w(file, fl_tmp.c_str());
 	w.setStreamDataMode(QPDFWriter::s_preserve);
 	w.setLinearization(true);
 	w.setStaticID(static_id);
 	w.write();
+    }
+    catch (std::exception& e)
+    {
+	std::cerr << e.what() << std::endl;
+	exit(2);
+    }
+
+    try
+    {
+	(void) unlink(fl_out);
 	QUtil::os_wrapper("rename " + fl_tmp + " " + std::string(fl_out),
 			  rename(fl_tmp.c_str(), fl_out));
     }

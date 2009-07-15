@@ -18,32 +18,38 @@ cleanup();
 $td->runtest("usage #1",
 	     {$td->COMMAND => "$prg -in target.pdf"},
 	     {$td->FILE => "usage.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("usage #2",
 	     {$td->COMMAND => "$prg -key abc -val def"},
 	     {$td->FILE => "usage.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("usage #3",
 	     {$td->COMMAND => "$prg -key abc -val def abc"},
 	     {$td->FILE => "usage.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("usage #4",
 	     {$td->COMMAND => "$prg -in source1.pdf -key /date -val 01/01/01 -val 12/12/12"},
 	     {$td->FILE => "usage.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("dump #1",
 	     {$td->COMMAND => "$prg --dump -in files/source1.pdf"},
 	     {$td->FILE => "dump.out",
-	      $td->EXIT_STATUS => 0});
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("dump #2",
 	     {$td->COMMAND => "$prg --dump -in files/no-info.pdf"},
 	     {$td->STRING => "",
-	      $td->EXIT_STATUS => 0});
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("dump #3",
 	     {$td->COMMAND => "$prg --dump -in files/empty-info.pdf"},
