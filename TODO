@@ -1,5 +1,16 @@
-2.0.4
-=====
+2.1
+===
+
+ * Translate the encryption dictionary data to human-readable form
+
+ * Improve the error message generated when processing the broken
+   files...ideally we should provide the object number currently being
+   read
+
+ * Have --check report the version number of the PDF file
+
+ * See if it is possible to support rewriting a file in place or at
+   least to detect and block this
 
  * Spell check to fix types in messages and comments.  Known type in
    "damanged".
