@@ -53,6 +53,7 @@ load_vector_vector(BitStream& bit_stream,
     bit_stream.skipToNextByte();
 }
 
+DLL_EXPORT
 bool
 QPDF::checkLinearization()
 {
@@ -69,6 +70,7 @@ QPDF::checkLinearization()
     return result;
 }
 
+DLL_EXPORT
 bool
 QPDF::isLinearized()
 {
@@ -982,6 +984,7 @@ QPDF::checkHOutlines(std::list<std::string>& warnings)
     }
 }
 
+DLL_EXPORT
 void
 QPDF::showLinearizationData()
 {
@@ -1739,6 +1742,7 @@ QPDF::pushOutlinesToPart(
     }
 }
 
+DLL_EXPORT
 void
 QPDF::getLinearizedParts(
     std::map<int, int> const& object_stream_data,
@@ -2070,6 +2074,7 @@ QPDF::writeHGeneric(BitWriter& w, HGeneric& t)
     w.writeBits(t.group_length, 32);			    // 4
 }
 
+DLL_EXPORT
 void
 QPDF::generateHintStream(std::map<int, QPDFXRefEntry> const& xref,
 			 std::map<int, size_t> const& lengths,

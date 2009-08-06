@@ -11,6 +11,7 @@ static bool tc_active(char const* const scope)
     return (QUtil::get_env("TC_SCOPE", &value) && (value == scope));
 }
 
+DLL_EXPORT
 void QTC::TC(char const* const scope, char const* const ccase, int n)
 {
     static std::set<std::pair<std::string, int> > cache;

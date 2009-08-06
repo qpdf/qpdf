@@ -8,6 +8,8 @@
 #ifndef __QPDFTOKENIZER_HH__
 #define __QPDFTOKENIZER_HH__
 
+#include <qpdf/DLL.hh>
+
 #include <string>
 #include <stdio.h>
 
@@ -35,14 +37,17 @@ class QPDFTokenizer
     class Token
     {
       public:
+	DLL_EXPORT
 	Token() : type(tt_bad) {}
 
+	DLL_EXPORT
 	Token(token_type_e type, std::string const& value) :
 	    type(type),
 	    value(value)
 	{
 	}
 
+	DLL_EXPORT
 	Token(token_type_e type, std::string const& value,
 	      std::string raw_value, std::string error_message) :
 	    type(type),
@@ -51,22 +56,27 @@ class QPDFTokenizer
 	    error_message(error_message)
 	{
 	}
+	DLL_EXPORT
 	token_type_e getType() const
 	{
 	    return this->type;
 	}
+	DLL_EXPORT
 	std::string const& getValue() const
 	{
 	    return this->value;
 	}
+	DLL_EXPORT
 	std::string const& getRawValue() const
 	{
 	    return this->raw_value;
 	}
+	DLL_EXPORT
 	std::string const& getErrorMessage() const
 	{
 	    return this->error_message;
 	}
+	DLL_EXPORT
 	bool operator==(Token const& rhs)
 	{
 	    // Ignore fields other than type and value
@@ -82,6 +92,7 @@ class QPDFTokenizer
 	std::string error_message;
     };
 
+    DLL_EXPORT
     QPDFTokenizer();
 
     // PDF files with version < 1.2 allowed the pound character
@@ -89,6 +100,7 @@ class QPDFTokenizer
     // character was allowed only when followed by two hexadecimal
     // digits.  This method should be called when parsing a PDF file
     // whose version is older than 1.2.
+    DLL_EXPORT
     void allowPoundAnywhereInName();
 
     // Mode of operation:
@@ -99,19 +111,23 @@ class QPDFTokenizer
 
     // It these are called when a token is available, an exception
     // will be thrown.
+    DLL_EXPORT
     void presentCharacter(char ch);
+    DLL_EXPORT
     void presentEOF();
 
     // If a token is available, return true and initialize token with
     // the token, unread_char with whether or not we have to unread
     // the last character, and if unread_char, ch with the character
     // to unread.
+    DLL_EXPORT
     bool getToken(Token& token, bool& unread_char, char& ch);
 
     // This function returns true of the current character is between
     // tokens (i.e., white space that is not part of a string) or is
     // part of a comment.  A tokenizing filter can call this to
     // determine whether to output the character.
+    DLL_EXPORT
     bool betweenTokens();
 
   private:

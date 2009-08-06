@@ -19,9 +19,13 @@
 class Pl_Discard: public Pipeline
 {
   public:
+    DLL_EXPORT
     Pl_Discard();
+    DLL_EXPORT
     virtual ~Pl_Discard();
+    DLL_EXPORT
     virtual void write(unsigned char*, int);
+    DLL_EXPORT
     virtual void finish();
 };
 

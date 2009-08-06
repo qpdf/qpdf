@@ -18,11 +18,13 @@ class Pl_Flate: public Pipeline
     class Exception: public Pipeline::Exception
     {
       public:
+	DLL_EXPORT
 	Exception(std::string const& message) :
 	    Pipeline::Exception(message)
 	{
 	}
 
+	DLL_EXPORT
 	virtual ~Exception() throw ()
 	{
 	}
@@ -32,11 +34,15 @@ class Pl_Flate: public Pipeline
 
     enum action_e { a_inflate, a_deflate };
 
+    DLL_EXPORT
     Pl_Flate(char const* identifier, Pipeline* next,
 	     action_e action, int out_bufsize = def_bufsize);
+    DLL_EXPORT
     virtual ~Pl_Flate();
 
+    DLL_EXPORT
     virtual void write(unsigned char* data, int len);
+    DLL_EXPORT
     virtual void finish();
 
   private:

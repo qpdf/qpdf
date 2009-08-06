@@ -8,12 +8,16 @@
 #ifndef __QPDFOBJECT_HH__
 #define __QPDFOBJECT_HH__
 
+#include <qpdf/DLL.hh>
+
 #include <string>
 
 class QPDFObject
 {
   public:
+    DLL_EXPORT
     virtual ~QPDFObject() {}
+    DLL_EXPORT
     virtual std::string unparse() = 0;
 };
 

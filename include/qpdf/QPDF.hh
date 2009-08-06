@@ -13,6 +13,8 @@
 #include <map>
 #include <list>
 
+#include <qpdf/DLL.hh>
+
 #include <qpdf/QPDFXRefEntry.hh>
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFTokenizer.hh>
@@ -26,7 +28,9 @@ class QPDFExc;
 class QPDF
 {
   public:
+    DLL_EXPORT
     QPDF();
+    DLL_EXPORT
     ~QPDF();
 
     // Associate a file with a QPDF object and do initial parsing of
@@ -36,6 +40,7 @@ class QPDF
     // potentially ask for information about the PDF file are called.
     // Prior to calling this, the only methods that are allowed are
     // those that set parameters.
+    DLL_EXPORT
     void processFile(char const* filename, char const* password = "");
 
     // Parameter settings
@@ -44,18 +49,21 @@ class QPDF
     // (one that contains both cross-reference streams and
     // cross-reference tables).  This can be useful for testing to
     // ensure that a hybrid file would work with an older reader.
+    DLL_EXPORT
     void setIgnoreXRefStreams(bool);
 
     // By default, any warnings are issued to stderr as they are
     // encountered.  If this is called with a true value, reporting of
     // warnings is suppressed.  You may still retrieve warnings by
     // calling getWarnings.
+    DLL_EXPORT
     void setSuppressWarnings(bool);
 
     // By default, QPDF will try to recover if it finds certain types
     // of errors in PDF files.  If turned off, it will throw an
     // exception on the first such problem it finds without attempting
     // recovery.
+    DLL_EXPORT
     void setAttemptRecovery(bool);
 
     // Other public methods
@@ -65,19 +73,26 @@ class QPDF
     // throws an exception.  Note that if setSuppressWarnings was not
     // called or was called with a false value, any warnings retrieved
     // here will have already been issued to stderr.
+    DLL_EXPORT
     std::vector<std::string> getWarnings();
 
+    DLL_EXPORT
     std::string getFilename() const;
+    DLL_EXPORT
     std::string getPDFVersion() const;
+    DLL_EXPORT
     QPDFObjectHandle getTrailer();
+    DLL_EXPORT
     QPDFObjectHandle getRoot();
 
     // Install this object handle as an indirect object and return an
     // indirect reference to it.
+    DLL_EXPORT
     QPDFObjectHandle makeIndirectObject(QPDFObjectHandle);
 
     // Retrieve an object by object ID and generation.  Returns an
     // indirect reference to it.
+    DLL_EXPORT
     QPDFObjectHandle getObjectByID(int objid, int generation);
 
     // Encryption support
@@ -85,6 +100,7 @@ class QPDF
     struct EncryptionData
     {
 	// This class holds data read from the encryption dictionary.
+	DLL_EXPORT
 	EncryptionData(int V, int R, int Length_bytes, int P,
 		       std::string const& O, std::string const& U,
 		       std::string const& id1) :
@@ -107,28 +123,35 @@ class QPDF
 	std::string id1;
     };
 
+    DLL_EXPORT
     static void trim_user_password(std::string& user_password);
+    DLL_EXPORT
     static std::string compute_data_key(
 	std::string const& encryption_key, int objid, int generation);
+    DLL_EXPORT
     static std::string compute_encryption_key(
 	std::string const& password, EncryptionData const& data);
 
+    DLL_EXPORT
     static void compute_encryption_O_U(
 	char const* user_password, char const* owner_password,
 	int V, int R, int key_len, int P,
 	std::string const& id1,
 	std::string& O, std::string& U);
+    DLL_EXPORT
     std::string const& getUserPassword() const;
 
     // Linearization support
 
     // Returns true iff the file starts with a linearization parameter
     // dictionary.  Does no additional validation.
+    DLL_EXPORT
     bool isLinearized();
 
     // Performs various sanity checks on a linearized file.  Return
     // true if no errors or warnings.  Otherwise, return false and
     // output errors and warnings to stdout.
+    DLL_EXPORT
     bool checkLinearization();
 
     // Calls checkLinearization() and, if possible, prints normalized
@@ -136,9 +159,11 @@ class QPDF
     // includes adding min values to delta values and adjusting
     // offsets based on the location and size of the primary hint
     // stream.
+    DLL_EXPORT
     void showLinearizationData();
 
     // Shows the contents of the cross-reference table
+    DLL_EXPORT
     void showXRefTable();
 
     // Optimization support -- see doc/optimization.  Implemented in
@@ -152,26 +177,31 @@ class QPDF
     // This is available so that the test suite can make sure that a
     // linearized file is already optimized.  When called in this way,
     // optimize() still populates the object <-> user maps
+    DLL_EXPORT
     void optimize(std::map<int, int> const& object_stream_data,
 		  bool allow_changes = true);
 
     // Replace all references to indirect objects that are "scalars"
     // (i.e., things that don't have children: not arrays, streams, or
     // dictionaries) with direct objects.
+    DLL_EXPORT
     void flattenScalarReferences();
 
     // Decode all streams, discarding the output.  Used to check
     // correctness of stream encoding.
+    DLL_EXPORT
     void decodeStreams();
 
     // For QPDFWriter:
 
     // Remove /ID, /Encrypt, and /Prev keys from the trailer
     // dictionary since these are regenerated during write.
+    DLL_EXPORT
     void trimTrailerForWrite();
 
     // Get lists of all objects in order according to the part of a
     // linearized file that they belong to.
+    DLL_EXPORT
     void getLinearizedParts(
 	std::map<int, int> const& object_stream_data,
 	std::vector<QPDFObjectHandle>& part4,
@@ -180,6 +210,7 @@ class QPDF
 	std::vector<QPDFObjectHandle>& part8,
 	std::vector<QPDFObjectHandle>& part9);
 
+    DLL_EXPORT
     void generateHintStream(std::map<int, QPDFXRefEntry> const& xref,
 			    std::map<int, size_t> const& lengths,
 			    std::map<int, int> const& obj_renumber,
@@ -187,15 +218,18 @@ class QPDF
 			    int& S, int& O);
 
     // Map object to object stream that contains it
+    DLL_EXPORT
     void getObjectStreamData(std::map<int, int>&);
     // Get a list of objects that would be permitted in an object
     // stream
+    DLL_EXPORT
     std::vector<int> getCompressibleObjects();
 
     // Convenience routines for common functions.  See also
     // QPDFObjectHandle.hh for additional convenience routines.
 
     // Traverse page tree return all /Page objects.
+    DLL_EXPORT
     std::vector<QPDFObjectHandle> const& getAllPages();
 
     // Resolver class is restricted to QPDFObjectHandle so that only

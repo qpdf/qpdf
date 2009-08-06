@@ -19,6 +19,8 @@
 #include <set>
 #include <map>
 
+#include <qpdf/DLL.hh>
+
 #include <qpdf/QPDFXRefEntry.hh>
 
 #include <qpdf/PointerHolder.hh>
@@ -33,7 +35,9 @@ class QPDFWriter
 {
   public:
     // Passing null as filename means write to stdout
+    DLL_EXPORT
     QPDFWriter(QPDF& pdf, char const* filename);
+    DLL_EXPORT
     ~QPDFWriter();
 
     // Set the value of object stream mode.  In disable mode, we never
@@ -44,6 +48,7 @@ class QPDFWriter
     // object streams and a cross-reference stream if there are object
     // streams.  The default is o_preserve.
     enum object_stream_e { o_disable, o_preserve, o_generate };
+    DLL_EXPORT
     void setObjectStreamMode(object_stream_e);
 
     // Set value of stream data mode.  In uncompress mode, we attempt
@@ -52,6 +57,7 @@ class QPDFWriter
     // if we can apply all filters and the stream is not already
     // optimally compressed, recompress the stream.
     enum stream_data_e { s_uncompress, s_preserve, s_compress };
+    DLL_EXPORT
     void setStreamDataMode(stream_data_e);
 
     // Set value of content stream normalization.  The default is
@@ -61,6 +67,7 @@ class QPDFWriter
     // damage the content stream.  This flag should be used only for
     // debugging and experimenting with PDF content streams.  Never
     // use it for production files.
+    DLL_EXPORT
     void setContentNormalization(bool);
 
     // Set QDF mode.  QDF mode causes special "pretty printing" of
@@ -68,22 +75,26 @@ class QPDFWriter
     // Resulting PDF files can be edited in a text editor and then run
     // through fix-qdf to update cross reference tables and stream
     // lengths.
+    DLL_EXPORT
     void setQDFMode(bool);
 
     // Cause a static /ID value to be generated.  Use only in test
     // suites.
+    DLL_EXPORT
     void setStaticID(bool);
 
     // Suppress inclusion of comments indicating original object IDs
     // when writing QDF files.  This can also be useful for testing,
     // particularly when using comparison of two qdf files to
     // determine whether two PDF files have identical content.
+    DLL_EXPORT
     void setSuppressOriginalObjectIDs(bool);
 
     // Preserve encryption.  The default is true unless prefilering,
     // content normalization, or qdf mode has been selected in which
     // case encryption is never preserved.  Encryption is also not
     // preserved if we explicitly set encryption parameters.
+    DLL_EXPORT
     void setPreserveEncryption(bool);
 
     // Set up for encrypted output.  Disables stream prefiltering and
@@ -91,6 +102,7 @@ class QPDFWriter
     // parameters sets the PDF version to at least 1.3, and setting R3
     // encryption parameters pushes the PDF version number to at least
     // 1.4.
+    DLL_EXPORT
     void setR2EncryptionParameters(
 	char const* user_password, char const* owner_password,
 	bool allow_print, bool allow_modify,
@@ -109,6 +121,7 @@ class QPDFWriter
 	r3m_assembly,		// allow only document assembly
 	r3m_none		// allow no modification
     };
+    DLL_EXPORT
     void setR3EncryptionParameters(
 	char const* user_password, char const* owner_password,
 	bool allow_accessibility, bool allow_extract,
@@ -116,8 +129,10 @@ class QPDFWriter
 
     // Create linearized output.  Disables qdf mode, content
     // normalization, and stream prefiltering.
+    DLL_EXPORT
     void setLinearization(bool);
 
+    DLL_EXPORT
     void write();
 
   private:

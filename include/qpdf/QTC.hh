@@ -8,8 +8,11 @@
 #ifndef __QTC_HH__
 #define __QTC_HH__
 
+#include <qpdf/DLL.hh>
+
 namespace QTC
 {
+    DLL_EXPORT
     void TC(char const* const scope, char const* const ccase, int n = 0);
 };
 

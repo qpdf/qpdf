@@ -3,6 +3,7 @@
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QUtil.hh>
 
+DLL_EXPORT
 QPDFXRefEntry::QPDFXRefEntry() :
     type(0),
     field1(0),
@@ -10,6 +11,7 @@ QPDFXRefEntry::QPDFXRefEntry() :
 {
 }
 
+DLL_EXPORT
 QPDFXRefEntry::QPDFXRefEntry(int type, int field1, int field2) :
     type(type),
     field1(field1),
@@ -21,12 +23,14 @@ QPDFXRefEntry::QPDFXRefEntry(int type, int field1, int field2) :
     }
 }
 
+DLL_EXPORT
 int
 QPDFXRefEntry::getType() const
 {
     return this->type;
 }
 
+DLL_EXPORT
 int
 QPDFXRefEntry::getOffset() const
 {
@@ -38,6 +42,7 @@ QPDFXRefEntry::getOffset() const
     return this->field1;
 }
 
+DLL_EXPORT
 int
 QPDFXRefEntry::getObjStreamNumber() const
 {
@@ -49,6 +54,7 @@ QPDFXRefEntry::getObjStreamNumber() const
     return this->field1;
 }
 
+DLL_EXPORT
 int
 QPDFXRefEntry::getObjStreamIndex() const
 {

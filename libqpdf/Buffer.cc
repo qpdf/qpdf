@@ -3,22 +3,26 @@
 
 #include <string.h>
 
+DLL_EXPORT
 Buffer::Buffer()
 {
     init(0);
 }
 
+DLL_EXPORT
 Buffer::Buffer(unsigned long size)
 {
     init(size);
 }
 
+DLL_EXPORT
 Buffer::Buffer(Buffer const& rhs)
 {
     init(0);
     copy(rhs);
 }
 
+DLL_EXPORT
 Buffer&
 Buffer::operator=(Buffer const& rhs)
 {
@@ -26,6 +30,7 @@ Buffer::operator=(Buffer const& rhs)
     return *this;
 }
 
+DLL_EXPORT
 Buffer::~Buffer()
 {
     destroy();
@@ -60,18 +65,21 @@ Buffer::destroy()
     this->buf = 0;
 }
 
+DLL_EXPORT
 unsigned long
 Buffer::getSize() const
 {
     return this->size;
 }
 
+DLL_EXPORT
 unsigned char const*
 Buffer::getBuffer() const
 {
     return this->buf;
 }
 
+DLL_EXPORT
 unsigned char*
 Buffer::getBuffer()
 {

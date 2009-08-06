@@ -3,6 +3,7 @@
 
 #include <qpdf/QUtil.hh>
 
+DLL_EXPORT
 Pl_Flate::Pl_Flate(char const* identifier, Pipeline* next,
 		   action_e action, int out_bufsize) :
     Pipeline(identifier, next),
@@ -21,6 +22,7 @@ Pl_Flate::Pl_Flate(char const* identifier, Pipeline* next,
     zstream.avail_out = out_bufsize;
 }
 
+DLL_EXPORT
 Pl_Flate::~Pl_Flate()
 {
     if (this->outbuf)
@@ -30,6 +32,7 @@ Pl_Flate::~Pl_Flate()
     }
 }
 
+DLL_EXPORT
 void
 Pl_Flate::write(unsigned char* data, int len)
 {
@@ -117,6 +120,7 @@ Pl_Flate::handleData(unsigned char* data, int len, int flush)
     }
 }
 
+DLL_EXPORT
 void
 Pl_Flate::finish()
 {

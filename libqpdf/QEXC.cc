@@ -3,29 +3,34 @@
 #include <string.h>
 #include <errno.h>
 
+DLL_EXPORT
 QEXC::Base::Base()
 {
     // nothing needed
 }
 
+DLL_EXPORT
 QEXC::Base::Base(std::string const& message) :
     message(message)
 {
     // nothing needed
 }
 
+DLL_EXPORT
 std::string const&
 QEXC::Base::unparse() const
 {
     return this->message;
 }
 
+DLL_EXPORT
 void
 QEXC::Base::setMessage(std::string const& message)
 {
     this->message = message;
 }
 
+DLL_EXPORT
 const char*
 QEXC::Base::what() const throw()
 {
@@ -36,17 +41,20 @@ QEXC::Base::what() const throw()
     return this->unparse().c_str();
 }
 
+DLL_EXPORT
 QEXC::General::General()
 {
     // nothing needed
 }
 
+DLL_EXPORT
 QEXC::General::General(std::string const& message) :
     Base(message)
 {
     // nothing needed
 }
 
+DLL_EXPORT
 QEXC::System::System(std::string const& prefix, int sys_errno)
 {
     // Note: using sys_errno in case errno is a macro.
@@ -54,12 +62,14 @@ QEXC::System::System(std::string const& prefix, int sys_errno)
     this->setMessage(prefix + ": " + strerror(sys_errno));
 }
 
+DLL_EXPORT
 int
 QEXC::System::getErrno() const
 {
     return this->sys_errno;
 }
 
+DLL_EXPORT
 QEXC::Internal::Internal(std::string const& message) :
     Base("INTERNAL ERROR: " + message)
 {

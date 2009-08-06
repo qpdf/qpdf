@@ -24,11 +24,13 @@ class Pl_StdioFile: public Pipeline
     class Exception: public Pipeline::Exception
     {
       public:
+	DLL_EXPORT
 	Exception(std::string const& message) :
 	    Pipeline::Exception(message)
 	{
 	}
 
+	DLL_EXPORT
 	virtual ~Exception() throw ()
 	{
 	}
@@ -36,10 +38,14 @@ class Pl_StdioFile: public Pipeline
 
     // f is externally maintained; this class just writes to and
     // flushes it.  It does not close it.
+    DLL_EXPORT
     Pl_StdioFile(char const* identifier, FILE* f);
+    DLL_EXPORT
     virtual ~Pl_StdioFile();
 
+    DLL_EXPORT
     virtual void write(unsigned char* buf, int len);
+    DLL_EXPORT
     virtual void finish();
 
   private:

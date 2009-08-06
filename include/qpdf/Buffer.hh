@@ -8,16 +8,26 @@
 #ifndef __BUFFER_HH__
 #define __BUFFER_HH__
 
+#include <qpdf/DLL.hh>
+
 class Buffer
 {
   public:
+    DLL_EXPORT
     Buffer();
+    DLL_EXPORT
     Buffer(unsigned long size);
+    DLL_EXPORT
     Buffer(Buffer const&);
+    DLL_EXPORT
     Buffer& operator=(Buffer const&);
+    DLL_EXPORT
     ~Buffer();
+    DLL_EXPORT
     unsigned long getSize() const;
+    DLL_EXPORT
     unsigned char const* getBuffer() const;
+    DLL_EXPORT
     unsigned char* getBuffer();
 
   private:

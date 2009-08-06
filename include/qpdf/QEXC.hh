@@ -8,6 +8,8 @@
 #ifndef __QEXC_HH__
 #define __QEXC_HH__
 
+#include <qpdf/DLL.hh>
+
 #include <string>
 #include <exception>
 #include <errno.h>
@@ -69,13 +71,19 @@ namespace QEXC
 	// Application/library code should not generally catch this
 	// directly.  See above for caveats.
       public:
+	DLL_EXPORT
 	Base();
+	DLL_EXPORT
 	Base(std::string const& message);
+	DLL_EXPORT
 	virtual ~Base() throw() {}
+	DLL_EXPORT
 	virtual std::string const& unparse() const;
+	DLL_EXPORT
 	virtual const char* what() const throw();
 
       protected:
+	DLL_EXPORT
 	void setMessage(std::string const& message);
 
       private:
@@ -87,8 +95,11 @@ namespace QEXC
 	// This is the base class for normal user/library-defined
 	// error conditions.
       public:
+	DLL_EXPORT
 	General();
+	DLL_EXPORT
 	General(std::string const& message);
+	DLL_EXPORT
 	virtual ~General() throw() {};
     };
 
@@ -100,15 +111,20 @@ namespace QEXC
     class Internal: public Base
     {
       public:
+	DLL_EXPORT
 	Internal(std::string const& message);
+	DLL_EXPORT
 	virtual ~Internal() throw() {};
     };
 
     class System: public General
     {
       public:
+	DLL_EXPORT
 	System(std::string const& prefix, int sys_errno);
+	DLL_EXPORT
 	virtual ~System() throw() {};
+	DLL_EXPORT
 	int getErrno() const;
 
       private:

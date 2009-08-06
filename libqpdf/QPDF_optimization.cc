@@ -58,6 +58,7 @@ QPDF::ObjUser::operator<(ObjUser const& rhs) const
     return false;
 }
 
+DLL_EXPORT
 void
 QPDF::flattenScalarReferences()
 {
@@ -140,6 +141,7 @@ QPDF::flattenScalarReferences()
     }
 }
 
+DLL_EXPORT
 void
 QPDF::optimize(std::map<int, int> const& object_stream_data,
 	       bool allow_changes)
