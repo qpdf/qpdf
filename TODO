@@ -1,6 +1,12 @@
 2.1
 ===
 
+ * Add ability to create new streams or replace stream data.  Consider
+   stream data sources to include a file and offset, a buffer, or a
+   some kind of callback mechanism.  Find messages exchanged with
+   Stefan Heinsen <stefan.heinsen@gmx.de> in August, 2009.  He seems
+   to like to send encrypted mail.  (key 01FCC336)
+
  * Translate the encryption dictionary data to human-readable form
 
  * Improve the error message generated when processing the broken
