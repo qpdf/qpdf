@@ -113,19 +113,17 @@ QPDF::isLinearized()
 	}
 	else
 	{
-	    if ((p = (char*)memchr(p, '\0', tbuf_size - (p - buf))) != 0)
+	    p = (char*)memchr(p, '\0', tbuf_size - (p - buf));
+	    assert(p != 0);
+	    while ((p - buf < tbuf_size) && (*p == 0))
 	    {
-		QTC::TC("qpdf", "QPDF lindict null found");
-		while ((p - buf < tbuf_size) && (*p == 0))
-		{
-		    ++p;
-		}
-		if ((p - buf) == tbuf_size)
-		{
-		    break;
-		}
-		QTC::TC("qpdf", "QPDF lindict searching after null");
+		++p;
 	    }
+	    if ((p - buf) == tbuf_size)
+	    {
+		break;
+	    }
+	    QTC::TC("qpdf", "QPDF lindict searching after null");
 	}
     }
 

@@ -147,7 +147,7 @@ PCRE::Match::nMatches() const
     return this->nmatches;
 }
 
-PCRE::PCRE(char const* pattern, int options) throw (Exception)
+PCRE::PCRE(char const* pattern, int options) throw (PCRE::Exception)
 {
     char const *errptr;
     int erroffset;

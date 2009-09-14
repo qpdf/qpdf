@@ -15,6 +15,7 @@ FILE* safe_fopen(char const* filename, char const* mode)
     {
 	std::cerr << "fopen " << filename << " failed: " << strerror(errno)
 		  << std::endl;
+	exit(2);
     }
     return result;
 }
