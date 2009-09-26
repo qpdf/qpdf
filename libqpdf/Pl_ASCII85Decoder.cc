@@ -3,6 +3,7 @@
 #include <qpdf/QTC.hh>
 #include <string.h>
 
+DLL_EXPORT
 Pl_ASCII85Decoder::Pl_ASCII85Decoder(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next),
     pos(0),
@@ -11,10 +12,12 @@ Pl_ASCII85Decoder::Pl_ASCII85Decoder(char const* identifier, Pipeline* next) :
     memset(this->inbuf, 117, 5);
 }
 
+DLL_EXPORT
 Pl_ASCII85Decoder::~Pl_ASCII85Decoder()
 {
 }
 
+DLL_EXPORT
 void
 Pl_ASCII85Decoder::write(unsigned char* buf, int len)
 {
@@ -123,6 +126,7 @@ Pl_ASCII85Decoder::flush()
     memset(this->inbuf, 117, 5);
 }
 
+DLL_EXPORT
 void
 Pl_ASCII85Decoder::finish()
 {
