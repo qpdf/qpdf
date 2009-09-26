@@ -45,9 +45,9 @@ General Build Stuff
 
 QPDF uses autoconf and libtool but does not use automake.  The only
 files distributed with the qpdf source distribution that are not
-controlled are "configure", "libqpdf/qpdf/qpdf-config.h.in", and some
-documentation.  See above for the steps required to prepare a source
-distribution.
+controlled are "configure", "libqpdf/qpdf/qpdf-config.h.in",
+"aclocal.m4", and some documentation.  See above for the steps
+required to prepare a source distribution.
 
 A small handful of additional files have been taken from autotools
 programs.  These should probably be updated from time to time.
