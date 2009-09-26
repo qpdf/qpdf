@@ -22,8 +22,9 @@ Release Reminders
  * To construct a source distribution from a pristine checkout,
    make_dist does the following:
 
-    autoconf
+    aclocal -I m4
     autoheader
+    autoconf
     ./configure --enable-doc-maintenance
     make build_manual
     make distclean
@@ -51,20 +52,19 @@ distribution.
 A small handful of additional files have been taken from autotools
 programs.  These should probably be updated from time to time.
 
- * config.guess, config.sub, ltmain.sh: these were created by running
-   libtoolize -c.  To update, run libtoolize -f -c or remove the files
-   and rerun libtoolize.
+ * config.guess, config.sub, ltmain.sh, and the m4 directory: these
+   were created by running libtoolize -c.  To update, run libtoolize
+   -f -c or remove the files and rerun libtoolize.
 
  * Other files copied as indicated:
 
-   cp /usr/share/aclocal/libtool.m4 aclocal.m4
-   cp /usr/share/automake-1.10/install-sh .
-   cp /usr/share/automake-1.10/mkinstalldirs .
+   cp /usr/share/automake-1.11/install-sh .
+   cp /usr/share/automake-1.11/mkinstalldirs .
 
-The entire contents of aclocal.m4 came from libtool.m4.  If we had
-some additional local parts, we could manually combine them or we
-could run aclocal.  For now, the simple copy statement above is
-sufficient.
+The entire contents of the m4 directory came from libtool.m4.  If we
+had some additional local parts, we could also add those to the m4
+directory.  In order for this to work, it is necessary to run "aclocal
+-I m4" before running autoheader and autoconf.
 
 If building or editing documentation, configure with
 --enable-doc-maintenance.  This will ensure that all tools or files
