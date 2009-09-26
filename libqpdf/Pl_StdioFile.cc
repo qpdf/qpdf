@@ -1,6 +1,6 @@
-
 #include <qpdf/Pl_StdioFile.hh>
-
+#include <qpdf/QUtil.hh>
+#include <stdexcept>
 #include <errno.h>
 
 DLL_EXPORT
@@ -25,8 +25,8 @@ Pl_StdioFile::write(unsigned char* buf, int len)
 	so_far = fwrite(buf, 1, len, this->file);
 	if (so_far == 0)
 	{
-	    throw QEXC::System(this->identifier + ": Pl_StdioFile::write",
-			       errno);
+	    QUtil::throw_system_error(
+		this->identifier + ": Pl_StdioFile::write");
 	}
 	else
 	{
@@ -46,7 +46,8 @@ Pl_StdioFile::finish()
     }
     else
     {
-	throw QEXC::Internal(this->identifier +
-			     ": Pl_StdioFile::finish: stream already closed");
+	throw std::logic_error(
+	    this->identifier +
+	    ": Pl_StdioFile::finish: stream already closed");
     }
 }

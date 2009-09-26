@@ -1,6 +1,6 @@
 #include <qpdf/Pl_ASCIIHexDecoder.hh>
-#include <qpdf/QEXC.hh>
 #include <qpdf/QTC.hh>
+#include <stdexcept>
 #include <string.h>
 #include <ctype.h>
 
@@ -61,8 +61,9 @@ Pl_ASCIIHexDecoder::write(unsigned char* buf, int len)
 		char t[2];
 		t[0] = ch;
 		t[1] = 0;
-		throw QEXC::General(
-		    std::string("character out of range during base Hex decode: ") + t);
+		throw std::runtime_error(
+		    std::string("character out of range"
+				" during base Hex decode: ") + t);
 	    }
 	    break;
 	}

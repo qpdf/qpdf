@@ -1,7 +1,7 @@
 #include <qpdf/Pl_LZWDecoder.hh>
 
-#include <qpdf/QEXC.hh>
 #include <qpdf/QTC.hh>
+#include <stdexcept>
 #include <string.h>
 #include <assert.h>
 
@@ -185,7 +185,7 @@ Pl_LZWDecoder::handleCode(int code)
 		unsigned int idx = code - 258;
 		if (idx > table_size)
 		{
-		    throw QEXC::General("LZWDecoder: bad code received");
+		    throw std::runtime_error("LZWDecoder: bad code received");
 		}
 		else if (idx == table_size)
 		{
@@ -204,7 +204,7 @@ Pl_LZWDecoder::handleCode(int code)
 	    unsigned int new_idx = 258 + table_size;
 	    if (new_idx == 4096)
 	    {
-		throw QEXC::General("LZWDecoder: table full");
+		throw std::runtime_error("LZWDecoder: table full");
 	    }
 	    addToTable(next);
 	    unsigned int change_idx = new_idx + code_change_delta;

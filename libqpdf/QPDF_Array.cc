@@ -1,7 +1,5 @@
-
 #include <qpdf/QPDF_Array.hh>
-
-#include <qpdf/QEXC.hh>
+#include <stdexcept>
 
 QPDF_Array::QPDF_Array(std::vector<QPDFObjectHandle> const& items) :
     items(items)
@@ -37,7 +35,8 @@ QPDF_Array::getItem(int n) const
 {
     if ((n < 0) || (n >= (int)this->items.size()))
     {
-	throw QEXC::Internal("bounds array accessing QPDF_Array element");
+	throw std::logic_error(
+	    "INTERNAL ERROR: bounds array accessing QPDF_Array element");
     }
     return this->items[n];
 }

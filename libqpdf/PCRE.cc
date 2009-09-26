@@ -1,19 +1,13 @@
-
 #include <qpdf/PCRE.hh>
 #include <qpdf/QUtil.hh>
 
+#include <stdexcept>
 #include <iostream>
 #include <string.h>
 
 DLL_EXPORT
-PCRE::Exception::Exception(std::string const& message)
-{
-    this->setMessage("PCRE error: " + message);
-}
-
-DLL_EXPORT
 PCRE::NoBackref::NoBackref() :
-    Exception("no match")
+    std::logic_error("PCRE error: no match")
 {
 }
 
@@ -87,7 +81,6 @@ PCRE::Match::operator bool()
 DLL_EXPORT
 std::string
 PCRE::Match::getMatch(int n, int flags)
-    throw(QEXC::General, Exception)
 {
     // This method used to be implemented in terms of
     // pcre_get_substring, but that function gives you an empty string
@@ -116,7 +109,7 @@ PCRE::Match::getMatch(int n, int flags)
 
 DLL_EXPORT
 void
-PCRE::Match::getOffsetLength(int n, int& offset, int& length) throw(Exception)
+PCRE::Match::getOffsetLength(int n, int& offset, int& length)
 {
     if ((this->nmatches < 0) ||
 	(n > this->nmatches - 1) ||
@@ -130,7 +123,7 @@ PCRE::Match::getOffsetLength(int n, int& offset, int& length) throw(Exception)
 
 DLL_EXPORT
 int
-PCRE::Match::getOffset(int n) throw(Exception)
+PCRE::Match::getOffset(int n)
 {
     int offset;
     int length;
@@ -140,7 +133,7 @@ PCRE::Match::getOffset(int n) throw(Exception)
 
 DLL_EXPORT
 int
-PCRE::Match::getLength(int n) throw(Exception)
+PCRE::Match::getLength(int n)
 {
     int offset;
     int length;
@@ -156,7 +149,7 @@ PCRE::Match::nMatches() const
 }
 
 DLL_EXPORT
-PCRE::PCRE(char const* pattern, int options) throw (PCRE::Exception)
+PCRE::PCRE(char const* pattern, int options)
 {
     char const *errptr;
     int erroffset;
@@ -171,7 +164,7 @@ PCRE::PCRE(char const* pattern, int options) throw (PCRE::Exception)
 			  " failed at offset " +
 			  QUtil::int_to_string(erroffset) + ": " +
 			  errptr);
-	throw Exception(message);
+	throw std::runtime_error("PCRE error: " + message);
     }
 }
 
@@ -184,7 +177,6 @@ PCRE::~PCRE()
 DLL_EXPORT
 PCRE::Match
 PCRE::match(char const* subject, int options, int startoffset, int size)
-    throw (QEXC::General, Exception)
 {
     if (size == -1)
     {
@@ -210,12 +202,12 @@ PCRE::match(char const* subject, int options, int startoffset, int size)
 
 	  case PCRE_ERROR_BADOPTION:
 	    message = "bad option passed to PCRE::match()";
-	    throw Exception(message);
+	    throw std::logic_error(message);
 	    break;
 
 	  case PCRE_ERROR_NOMEMORY:
 	    message = "insufficient memory";
-	    throw Exception(message);
+	    throw std::runtime_error(message);
 	    break;
 
 	  case PCRE_ERROR_NULL:
@@ -223,7 +215,7 @@ PCRE::match(char const* subject, int options, int startoffset, int size)
 	  case PCRE_ERROR_UNKNOWN_NODE:
 	  default:
 	    message = "pcre_exec returned " + QUtil::int_to_string(status);
-	    throw QEXC::Internal(message);
+	    throw std::logic_error(message);
 	}
     }
 
@@ -258,9 +250,9 @@ PCRE::test(int n)
 	{
 	    PCRE pcre1("a**");
 	}
-	catch (Exception& e)
+	catch (std::exception& e)
 	{
-	    std::cout << e.unparse() << std::endl;
+	    std::cout << e.what() << std::endl;
 	}
 
 	PCRE pcre2("^([^\\s:]*)\\s*:\\s*(.*?)\\s*$");
@@ -281,17 +273,17 @@ PCRE::test(int n)
 	    {
 		std::cout << m2.getMatch(3) << std::endl;
 	    }
-	    catch (Exception& e)
+	    catch (std::exception& e)
 	    {
-		std::cout << e.unparse() << std::endl;
+		std::cout << e.what() << std::endl;
 	    }
 	    try
 	    {
 		std::cout << m2.getOffset(3) << std::endl;
 	    }
-	    catch (Exception& e)
+	    catch (std::exception& e)
 	    {
-		std::cout << e.unparse() << std::endl;
+		std::cout << e.what() << std::endl;
 	    }
 	}
 	PCRE pcre3("^(a+)(b+)?$");
@@ -312,9 +304,9 @@ PCRE::test(int n)
 		std::cout << "can't see this" << std::endl;
 	    }
 	}
-	catch (Exception& e)
+	catch (std::exception& e)
 	{
-	    std::cout << e.unparse() << std::endl;
+	    std::cout << e.what() << std::endl;
 	}
 
 	// backref: 1   2 3        4      5
@@ -370,8 +362,8 @@ PCRE::test(int n)
 	    }
 	}
     }
-    catch (QEXC::General& e)
+    catch (std::exception& e)
     {
-	std::cout << "unexpected exception: " << e.unparse() << std::endl;
+	std::cout << "unexpected exception: " << e.what() << std::endl;
     }
 }

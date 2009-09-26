@@ -1,4 +1,3 @@
-
 #include <qpdf/MD5.hh>
 #include <qpdf/Pl_MD5.hh>
 #include <qpdf/Pl_Discard.hh>

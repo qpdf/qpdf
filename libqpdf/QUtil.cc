@@ -1,4 +1,4 @@
-
+#include <qpdf/DLL.hh>
 #include <qpdf/QUtil.hh>
 #include <stdio.h>
 #include <errno.h>
@@ -25,9 +25,9 @@ QUtil::int_to_string(int num, int fullpad)
     // -2 or -1 to leave space for the possible negative sign and for NUL...
     if (abs(fullpad) > (int)sizeof(t) - ((num < 0)?2:1))
     {
-	throw QEXC::Internal("Util::int_to_string has been called with "
-			     "a padding value greater than its internal "
-			     "limit");
+	throw std::logic_error("Util::int_to_string has been called with "
+			       "a padding value greater than its internal "
+			       "limit");
     }
 
     if (fullpad)
@@ -62,9 +62,9 @@ QUtil::double_to_string(double num, int decimal_places)
     // always pass in those cases.
     if (decimal_places + 1 + (int)lhs.length() > (int)sizeof(t) - 1)
     {
-	throw QEXC::Internal("Util::double_to_string has been called with "
-			     "a number and a decimal places specification "
-			     "that would break an internal limit");
+	throw std::logic_error("Util::double_to_string has been called with "
+			       "a number and a decimal places specification "
+			       "that would break an internal limit");
     }
 
     if (decimal_places)
@@ -79,23 +79,30 @@ QUtil::double_to_string(double num, int decimal_places)
 }
 
 DLL_EXPORT
+void
+QUtil::throw_system_error(std::string const& description)
+{
+    throw std::runtime_error(description + ": " + strerror(errno));
+}
+
+DLL_EXPORT
 int
-QUtil::os_wrapper(std::string const& description, int status) throw (QEXC::System)
+QUtil::os_wrapper(std::string const& description, int status)
 {
     if (status == -1)
     {
-	throw QEXC::System(description, errno);
+	throw_system_error(description);
     }
     return status;
 }
 
 DLL_EXPORT
 FILE*
-QUtil::fopen_wrapper(std::string const& description, FILE* f) throw (QEXC::System)
+QUtil::fopen_wrapper(std::string const& description, FILE* f)
 {
     if (f == 0)
     {
-	throw QEXC::System(description, errno);
+	throw_system_error(description);
     }
     return f;
 }
@@ -240,7 +247,7 @@ QUtil::toUTF8(unsigned long uval)
 
     if (uval > 0x7fffffff)
     {
-	throw QEXC::General("bounds error in QUtil::toUTF8");
+	throw std::runtime_error("bounds error in QUtil::toUTF8");
     }
     else if (uval < 128)
     {
@@ -267,7 +274,7 @@ QUtil::toUTF8(unsigned long uval)
 	    --cur_byte;
 	    if (cur_byte < bytes)
 	    {
-		throw QEXC::Internal("QUtil::toUTF8: overflow error");
+		throw std::logic_error("QUtil::toUTF8: overflow error");
 	    }
 	}
 	// If maxval is k bits long, the high (7 - k) bits of the

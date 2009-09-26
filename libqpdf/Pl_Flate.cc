@@ -1,4 +1,3 @@
-
 #include <qpdf/Pl_Flate.hh>
 
 #include <qpdf/QUtil.hh>
@@ -38,7 +37,7 @@ Pl_Flate::write(unsigned char* data, int len)
 {
     if (this->outbuf == 0)
     {
-	throw Exception(
+	throw std::logic_error(
 	    this->identifier +
 	    ": Pl_Flate: write() called after finish() called");
     }
@@ -197,6 +196,6 @@ Pl_Flate::checkError(char const* prefix, int error_code)
 	    }
 	}
 
-	throw Exception(msg);
+	throw std::runtime_error(msg);
     }
 }

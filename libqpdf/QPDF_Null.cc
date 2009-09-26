@@ -1,4 +1,3 @@
-
 #include <qpdf/QPDF_Null.hh>
 
 QPDF_Null::~QPDF_Null()

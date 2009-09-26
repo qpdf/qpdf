@@ -15,21 +15,6 @@
 class Pl_Flate: public Pipeline
 {
   public:
-    class Exception: public Pipeline::Exception
-    {
-      public:
-	DLL_EXPORT
-	Exception(std::string const& message) :
-	    Pipeline::Exception(message)
-	{
-	}
-
-	DLL_EXPORT
-	virtual ~Exception() throw ()
-	{
-	}
-    };
-
     static int const def_bufsize = 65536;
 
     enum action_e { a_inflate, a_deflate };

@@ -1,4 +1,3 @@
-
 #ifndef __QPDF_BOOL_HH__
 #define __QPDF_BOOL_HH__
 

@@ -1,2 +1,1 @@
-
 #include <qpdf/QPDFObject.hh>

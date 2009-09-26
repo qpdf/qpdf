@@ -1,4 +1,3 @@
-
 #include <qpdf/QTC.hh>
 
 #include <set>

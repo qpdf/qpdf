@@ -1,4 +1,3 @@
-
 #include <qpdf/QPDF_Real.hh>
 
 QPDF_Real::QPDF_Real(std::string const& val) :

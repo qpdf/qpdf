@@ -1,4 +1,3 @@
-
 #ifndef __PL_ASCII85DECODER_HH__
 #define __PL_ASCII85DECODER_HH__
 

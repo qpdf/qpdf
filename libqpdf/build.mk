@@ -22,7 +22,6 @@ SRCS_libqpdf = \
 	libqpdf/Pl_QPDFTokenizer.cc \
 	libqpdf/Pl_RC4.cc \
 	libqpdf/Pl_StdioFile.cc \
-	libqpdf/QEXC.cc \
 	libqpdf/QPDF.cc \
 	libqpdf/QPDFExc.cc \
 	libqpdf/QPDFObject.cc \
@@ -69,5 +68,5 @@ $(OBJS_libqpdf): libqpdf/$(OUTPUT_DIR)/%.lo: libqpdf/%.cc
 # * Otherwise, increment REVISION
 
 libqpdf/$(OUTPUT_DIR)/libqpdf.la: $(OBJS_libqpdf)
-	$(call makelib,$(OBJS_libqpdf),$@,2,1,1)
+	$(call makelib,$(OBJS_libqpdf),$@,3,0,0)
 

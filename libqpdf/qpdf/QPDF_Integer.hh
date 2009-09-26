@@ -1,4 +1,3 @@
-
 #ifndef __QPDF_INTEGER_HH__
 #define __QPDF_INTEGER_HH__
 

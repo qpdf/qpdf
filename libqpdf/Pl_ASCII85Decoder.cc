@@ -1,6 +1,6 @@
 #include <qpdf/Pl_ASCII85Decoder.hh>
-#include <qpdf/QEXC.hh>
 #include <qpdf/QTC.hh>
+#include <stdexcept>
 #include <string.h>
 
 DLL_EXPORT
@@ -40,7 +40,7 @@ Pl_ASCII85Decoder::write(unsigned char* buf, int len)
 	    }
 	    else
 	    {
-		throw QEXC::General(
+		throw std::runtime_error(
 		    "broken end-of-data sequence in base 85 data");
 	    }
 	}
@@ -65,7 +65,7 @@ Pl_ASCII85Decoder::write(unsigned char* buf, int len)
 	      case 'z':
 		if (pos != 0)
 		{
-		    throw QEXC::General(
+		    throw std::runtime_error(
 			"unexpected z during base 85 decode");
 		}
 		else
@@ -78,8 +78,8 @@ Pl_ASCII85Decoder::write(unsigned char* buf, int len)
 	      default:
 		if ((buf[i] < 33) || (buf[i] > 117))
 		{
-		    throw QEXC::General
-			("character out of range during base 85 decode");
+		    throw std::runtime_error(
+			"character out of range during base 85 decode");
 		}
 		else
 		{

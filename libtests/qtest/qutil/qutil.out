@@ -4,11 +4,11 @@
 3.141590
 3.142
 1000.123000
-exception 1: INTERNAL ERROR: Util::int_to_string has been called with a padding value greater than its internal limit
-exception 2: INTERNAL ERROR: Util::int_to_string has been called with a padding value greater than its internal limit
-exception 3: INTERNAL ERROR: Util::int_to_string has been called with a padding value greater than its internal limit
-exception 4: INTERNAL ERROR: Util::double_to_string has been called with a number and a decimal places specification that would break an internal limit
-exception 5: INTERNAL ERROR: Util::double_to_string has been called with a number and a decimal places specification that would break an internal limit
+exception 1: Util::int_to_string has been called with a padding value greater than its internal limit
+exception 2: Util::int_to_string has been called with a padding value greater than its internal limit
+exception 3: Util::int_to_string has been called with a padding value greater than its internal limit
+exception 4: Util::double_to_string has been called with a number and a decimal places specification that would break an internal limit
+exception 5: Util::double_to_string has been called with a number and a decimal places specification that would break an internal limit
 one
 7
 compare okay

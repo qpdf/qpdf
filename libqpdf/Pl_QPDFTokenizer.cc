@@ -1,7 +1,7 @@
-
 #include <qpdf/Pl_QPDFTokenizer.hh>
 #include <qpdf/QPDF_String.hh>
 #include <qpdf/QPDF_Name.hh>
+#include <stdexcept>
 #include <string.h>
 
 Pl_QPDFTokenizer::Pl_QPDFTokenizer(char const* identifier, Pipeline* next) :
@@ -134,8 +134,9 @@ Pl_QPDFTokenizer::checkUnread()
 	processChar(this->char_to_unread);
 	if (this->unread_char)
 	{
-	    throw QEXC::Internal("unread_char still true after processing "
-				 "unread character");
+	    throw std::logic_error(
+		"INTERNAL ERROR: unread_char still true after processing "
+		"unread character");
 	}
     }
 }

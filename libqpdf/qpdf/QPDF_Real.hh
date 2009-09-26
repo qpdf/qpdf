@@ -1,4 +1,3 @@
-
 #ifndef __QPDF_REAL_HH__
 #define __QPDF_REAL_HH__
 

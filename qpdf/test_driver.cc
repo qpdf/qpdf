@@ -284,8 +284,8 @@ void runtest(int n, char const* filename)
     }
     else
     {
-	throw QEXC::General(std::string("invalid test ") +
-			    QUtil::int_to_string(n));
+	throw std::runtime_error(std::string("invalid test ") +
+				 QUtil::int_to_string(n));
     }
 
     std::cout << "test " << n << " done" << std::endl;

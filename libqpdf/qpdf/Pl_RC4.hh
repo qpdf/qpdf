@@ -1,4 +1,3 @@
-
 #ifndef __PL_RC4_HH__
 #define __PL_RC4_HH__
 
@@ -9,21 +8,6 @@
 class Pl_RC4: public Pipeline
 {
   public:
-    class Exception: public Pipeline::Exception
-    {
-      public:
-	DLL_EXPORT
-	Exception(std::string const& message) :
-	    Pipeline::Exception(message)
-	{
-	}
-
-	DLL_EXPORT
-	virtual ~Exception() throw()
-	{
-	}
-    };
-
     static int const def_bufsize = 65536;
 
     // key_len of -1 means treat key_data as a null-terminated string

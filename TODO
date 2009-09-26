@@ -1,6 +1,11 @@
 2.1
 ===
 
+ * Be able to trap I/O errors separately from other errors; especially
+   be able to separate errors that the user can fix (like permission
+   errors) from errors that they probably can't fix like corrupted PDF
+   files, unsupported filters, or internal errors.
+
  * Add ability to create new streams or replace stream data.  Consider
    stream data sources to include a file and offset, a buffer, or a
    some kind of callback mechanism.  Find messages exchanged with

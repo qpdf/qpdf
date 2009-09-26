@@ -1,6 +1,5 @@
-
 #include <qpdf/Pl_Buffer.hh>
-#include <qpdf/QEXC.hh>
+#include <stdexcept>
 #include <assert.h>
 #include <string.h>
 
@@ -50,7 +49,7 @@ Pl_Buffer::getBuffer()
 {
     if (! this->ready)
     {
-	throw QEXC::Internal("Pl_Buffer::getBuffer() called when not ready");
+	throw std::logic_error("Pl_Buffer::getBuffer() called when not ready");
     }
 
     Buffer* b = new Buffer(this->total_size);

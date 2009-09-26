@@ -1,4 +1,3 @@
-
 #include <qpdf/QPDFTokenizer.hh>
 
 // DO NOT USE ctype -- it is locale dependent for some things, and
@@ -6,9 +5,9 @@
 // be used.
 
 #include <qpdf/PCRE.hh>
-#include <qpdf/QEXC.hh>
 #include <qpdf/QTC.hh>
 
+#include <stdexcept>
 #include <string.h>
 
 // See note above about ctype.
@@ -55,8 +54,9 @@ QPDFTokenizer::presentCharacter(char ch)
 
     if (state == st_token_ready)
     {
-	throw QEXC::Internal("QPDF tokenizer presented character "
-			     "while token is waiting");
+	throw std::logic_error(
+	    "INTERNAL ERROR: QPDF tokenizer presented character "
+	    "while token is waiting");
     }
 
     char orig_ch = ch;
@@ -237,8 +237,9 @@ QPDFTokenizer::presentCharacter(char ch)
 	    // last_char_was_bs is set/cleared below as appropriate
 	    if (bs_num_count)
 	    {
-		throw QEXC::Internal("QPDFTokenizer: bs_num_count != 0 "
-				     "when ch == '\\'");
+		throw std::logic_error(
+		    "INTERNAL ERROR: QPDFTokenizer: bs_num_count != 0 "
+		    "when ch == '\\'");
 	    }
 	}
 	else if (ch == '(')
@@ -333,7 +334,8 @@ QPDFTokenizer::presentCharacter(char ch)
     }
     else
     {
-	throw QEXC::Internal("invalid state while reading token");
+	throw std::logic_error(
+	    "INTERNAL ERROR: invalid state while reading token");
     }
 
     if ((state == st_token_ready) && (type == tt_word))

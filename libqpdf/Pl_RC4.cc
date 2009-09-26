@@ -1,6 +1,4 @@
-
 #include <qpdf/Pl_RC4.hh>
-
 #include <qpdf/QUtil.hh>
 
 DLL_EXPORT
@@ -30,7 +28,7 @@ Pl_RC4::write(unsigned char* data, int len)
 {
     if (this->outbuf == 0)
     {
-	throw Exception(
+	throw std::logic_error(
 	    this->identifier +
 	    ": Pl_RC4: write() called after finish() called");
     }

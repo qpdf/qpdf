@@ -1,4 +1,3 @@
-
 #include <qpdf/Pl_Discard.hh>
 
 // Exercised in md5 test suite

@@ -5,7 +5,7 @@ data: 1234567890abcdefghij
 count: 32
 size: 11
 data: qwertyuiop
-INTERNAL ERROR: Pl_Buffer::getBuffer() called when not ready
+Pl_Buffer::getBuffer() called when not ready
 size: 9
 data: mooquack
 done

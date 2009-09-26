@@ -1,4 +1,3 @@
-
 #include <qpdf/RC4.hh>
 
 #include <string.h>

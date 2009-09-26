@@ -78,8 +78,9 @@ QPDF::flattenScalarReferences()
 	{
 	    if (node.isScalar())
 	    {
-		throw QEXC::Internal(
-		    "flattenScalarReferences landed at indirect scalar");
+		throw std::logic_error(
+		    "INTERNAL ERROR:"
+		    " flattenScalarReferences landed at indirect scalar");
 	    }
 	    ObjGen og(node.getObjectID(), node.getGeneration());
 	    if (visited.count(og) > 0)
@@ -124,7 +125,8 @@ QPDF::flattenScalarReferences()
 		{
 		    // QPDF_Dictionary.getKeys() never returns null
 		    // keys.
-		    throw QEXC::Internal("dictionary with null key found");
+		    throw std::logic_error(
+			"INTERNAL ERROR: dictionary with null key found");
 		}
 		else if (oh.isScalar())
 		{

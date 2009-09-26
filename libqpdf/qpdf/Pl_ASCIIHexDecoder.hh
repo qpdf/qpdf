@@ -1,4 +1,3 @@
-
 #ifndef __PL_ASCIIHEXDECODER_HH__
 #define __PL_ASCIIHEXDECODER_HH__
 

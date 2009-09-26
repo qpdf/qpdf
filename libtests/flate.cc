@@ -105,9 +105,9 @@ int main(int argc, char* argv[])
     {
 	run(filename);
     }
-    catch (QEXC::General& e)
+    catch (std::exception& e)
     {
-	std::cout << e.unparse() << std::endl;
+	std::cout << e.what() << std::endl;
     }
     return 0;
 }

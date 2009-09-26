@@ -1,4 +1,3 @@
-
 #include <qpdf/BitStream.hh>
 #include <qpdf/BitWriter.hh>
 #include <qpdf/Pl_Buffer.hh>

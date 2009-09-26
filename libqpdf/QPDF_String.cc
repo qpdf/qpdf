@@ -1,4 +1,3 @@
-
 #include <qpdf/QPDF_String.hh>
 
 #include <qpdf/QUtil.hh>

@@ -1,4 +1,3 @@
-
 #include <qpdf/QPDFWriter.hh>
 
 #include <assert.h>
@@ -479,8 +478,8 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
 	}
 	else if (object.isScalar())
 	{
-	    throw QEXC::Internal(
-		"QPDFWriter::enqueueObject: indirect scalar: " +
+	    throw std::logic_error(
+		"INTERNAL ERROR: QPDFWriter::enqueueObject: indirect scalar: " +
 		std::string(this->filename) + " " +
 		QUtil::int_to_string(object.getObjectID()) + " " +
 		QUtil::int_to_string(object.getGeneration()));
@@ -559,8 +558,8 @@ QPDFWriter::unparseChild(QPDFObjectHandle child, int level, int flags)
     {
 	if (child.isScalar())
 	{
-	    throw QEXC::Internal(
-		"QPDFWriter::unparseChild: indirect scalar: " +
+	    throw std::logic_error(
+		"INTERNAL ERROR: QPDFWriter::unparseChild: indirect scalar: " +
 		QUtil::int_to_string(child.getObjectID()) + " " +
 		QUtil::int_to_string(child.getGeneration()));
 	}
@@ -1599,7 +1598,7 @@ QPDFWriter::writeXRefStream(int xref_id, int max_id, int max_offset,
 	    break;
 
 	  default:
-	    throw QEXC::Internal("invalid type writing xref stream");
+	    throw std::logic_error("invalid type writing xref stream");
 	    break;
 	}
     }

@@ -1,4 +1,3 @@
-
 #include <qpdf/PCRE.hh>
 #include <iostream>
 #include <string.h>
@@ -12,7 +11,7 @@ int main(int argc, char* argv[])
 	    PCRE("^([\\p{L}]+)", PCRE_UTF8);
 	    std::cout << "1" << std::endl;
 	}
-	catch (PCRE::Exception& e)
+	catch (std::exception& e)
 	{
 	    std::cout << "0" << std::endl;
 	}

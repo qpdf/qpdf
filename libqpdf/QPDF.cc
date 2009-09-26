@@ -1,4 +1,3 @@
-
 #include <qpdf/QPDF.hh>
 
 #include <vector>
@@ -197,7 +196,8 @@ QPDF::BufferInputSource::seek(off_t offset, int whence)
 	break;
 
       default:
-	throw QEXC::Internal("invalid argument to BufferInputSource::seek");
+	throw std::logic_error(
+	    "INTERNAL ERROR: invalid argument to BufferInputSource::seek");
 	break;
     }
 }
@@ -392,7 +392,7 @@ QPDF::parse()
 void
 QPDF::warn(QPDFExc const& e)
 {
-    this->warnings.push_back(e.unparse());
+    this->warnings.push_back(e.what());
     if (! this->suppress_warnings)
     {
 	std::cerr << "WARNING: " << this->warnings.back() << std::endl;
@@ -956,8 +956,8 @@ QPDF::showXRefTable()
 	    break;
 
 	  default:
-	    throw QEXC::Internal("unknown cross-reference table type while"
-				 " showing xref_table");
+	    throw std::logic_error("unknown cross-reference table type while"
+				   " showing xref_table");
 	    break;
 	}
 	std::cout << std::endl;
@@ -988,7 +988,8 @@ QPDF::readObjectInternal(InputSource* input,
 	// Although dictionaries and arrays arbitrarily nest, these
 	// variables indicate what is at the top of the stack right
 	// now, so they can, by definition, never both be true.
-	throw QEXC::Internal("readObjectInternal: in_dict && in_array");
+	throw std::logic_error(
+	    "INTERNAL ERROR: readObjectInternal: in_dict && in_array");
     }
 
     QPDFObjectHandle object;
@@ -1121,9 +1122,10 @@ QPDF::readObjectInternal(InputSource* input,
 	}
 	else if (! object.isInitialized())
 	{
-	    throw QEXC::Internal(std::string("uninitialized object (token = ") +
-				 QUtil::int_to_string(token.getType()) +
-				 ", " + token.getValue() + ")");
+	    throw std::logic_error(
+		"INTERNAL ERROR: uninitialized object (token = " +
+		QUtil::int_to_string(token.getType()) +
+		", " + token.getValue() + ")");
 	}
 	else
 	{
@@ -1846,13 +1848,13 @@ QPDF::pipeStreamData(int objid, int generation,
 	    pipeline->write((unsigned char*)buf, len);
 	}
     }
-    catch (QEXC::General& e)
+    catch (std::runtime_error& e)
     {
 	QTC::TC("qpdf", "QPDF decoding error warning");
 	warn(QPDFExc(this->file.getName(), this->file.getLastOffset(),
 		     "error decoding stream data for object " +
 		     QUtil::int_to_string(objid) + " " +
-		     QUtil::int_to_string(generation) + ": " + e.unparse()));
+		     QUtil::int_to_string(generation) + ": " + e.what()));
     }
     pipeline->finish();
 }

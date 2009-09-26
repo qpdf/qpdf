@@ -1,4 +1,3 @@
-
 #include <qpdf/Pl_Count.hh>
 
 DLL_EXPORT

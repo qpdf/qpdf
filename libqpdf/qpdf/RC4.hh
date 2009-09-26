@@ -1,4 +1,3 @@
-
 #ifndef __RC4_HH__
 #define __RC4_HH__
 

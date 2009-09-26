@@ -1,5 +1,3 @@
-
-
 #include <qpdf/BitWriter.hh>
 
 // See comments in bits.cc

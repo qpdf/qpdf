@@ -1,4 +1,3 @@
-
 #ifndef __QPDF_ARRAY_HH__
 #define __QPDF_ARRAY_HH__
 

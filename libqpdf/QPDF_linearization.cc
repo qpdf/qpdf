@@ -1177,8 +1177,9 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     {
 	// Note that we can't call optimize here because we don't know
 	// whether it should be called with or without allow changes.
-	throw QEXC::Internal("QPDF::calculateLinearizationData "
-			     "called before optimize()");
+	throw std::logic_error(
+	    "INTERNAL ERROR: QPDF::calculateLinearizationData "
+	    "called before optimize()");
     }
 
     // Separate objects into the categories sufficient for us to
@@ -1336,8 +1337,9 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 		break;
 
 	      case ObjUser::ou_bad:
-		throw QEXC::Internal("QPDF::calculateLinearizationData: "
-				     "invalid user type");
+		throw std::logic_error(
+		    "INTERNAL ERROR: QPDF::calculateLinearizationData: "
+		    "invalid user type");
 		break;
 	    }
 	}
@@ -1444,8 +1446,9 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     ObjGen first_page_og(pages[0].getObjectID(), pages[0].getGeneration());
     if (! lc_first_page_private.count(first_page_og))
     {
-	throw QEXC::Internal("QPDF::calculateLinearizationData: first page "
-			     "object not in lc_first_page_private");
+	throw std::logic_error(
+	    "INTERNAL ERROR: QPDF::calculateLinearizationData: first page "
+	    "object not in lc_first_page_private");
     }
     lc_first_page_private.erase(first_page_og);
     this->c_linp.first_page_object = pages[0].getObjectID();
@@ -1492,7 +1495,8 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 	ObjGen page_og(pages[i].getObjectID(), pages[i].getGeneration());
 	if (! lc_other_page_private.count(page_og))
 	{
-	    throw QEXC::Internal(
+	    throw std::logic_error(
+		"INTERNAL ERROR: "
 		"QPDF::calculateLinearizationData: page object for page " +
 		QUtil::int_to_string(i) + " not in lc_other_page_private");
 	}
@@ -1522,8 +1526,9 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     // That should have covered all part7 objects.
     if (! lc_other_page_private.empty())
     {
-	throw QEXC::Internal(
-	    "QPDF::calculateLinearizationData: lc_other_page_private is "
+	throw std::logic_error(
+	    "INTERNAL ERROR:"
+	    " QPDF::calculateLinearizationData: lc_other_page_private is "
 	    "not empty after generation of part7");
     }
 
@@ -1601,7 +1606,8 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     }
     if (! lc_thumbnail_private.empty())
     {
-	throw QEXC::Internal(
+	throw std::logic_error(
+	    "INTERNAL ERROR: "
 	    "QPDF::calculateLinearizationData: lc_thumbnail_private "
 	    "not empty after placing thumbnails");
     }
@@ -1633,11 +1639,12 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     unsigned int num_wanted = this->object_to_obj_users.size();
     if (num_placed != num_wanted)
     {
-	throw QEXC::Internal("QPDF::calculateLinearizationData: wrong "
-			     "number of objects placed (num_placed = " +
-			     QUtil::int_to_string(num_placed) +
-			     "; number of objects: " +
-			     QUtil::int_to_string(num_wanted));
+	throw std::logic_error(
+	    "INTERNAL ERROR: QPDF::calculateLinearizationData: wrong "
+	    "number of objects placed (num_placed = " +
+	    QUtil::int_to_string(num_placed) +
+	    "; number of objects: " +
+	    QUtil::int_to_string(num_wanted));
     }
 
     // Calculate shared object hint table information including

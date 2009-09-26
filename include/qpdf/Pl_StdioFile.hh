@@ -21,21 +21,6 @@
 class Pl_StdioFile: public Pipeline
 {
   public:
-    class Exception: public Pipeline::Exception
-    {
-      public:
-	DLL_EXPORT
-	Exception(std::string const& message) :
-	    Pipeline::Exception(message)
-	{
-	}
-
-	DLL_EXPORT
-	virtual ~Exception() throw ()
-	{
-	}
-    };
-
     // f is externally maintained; this class just writes to and
     // flushes it.  It does not close it.
     DLL_EXPORT

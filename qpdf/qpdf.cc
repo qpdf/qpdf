@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <string.h>
 #include <stdlib.h>
@@ -943,7 +942,7 @@ int main(int argc, char* argv[])
 		}
 		else
 		{
-		    throw QEXC::Internal("bad encryption keylen");
+		    throw std::logic_error("bad encryption keylen");
 		}
 	    }
 	    if (linearize)

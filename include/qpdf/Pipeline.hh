@@ -31,27 +31,11 @@
 #define __PIPELINE_HH__
 
 #include <qpdf/DLL.hh>
-
-#include <qpdf/QEXC.hh>
+#include <string>
 
 class Pipeline
 {
   public:
-    class Exception: public QEXC::General
-    {
-      public:
-	DLL_EXPORT
-	Exception(std::string const& message) :
-	    QEXC::General(message)
-	{
-	}
-
-	DLL_EXPORT
-	virtual ~Exception() throw()
-	{
-	}
-    };
-
     DLL_EXPORT
     Pipeline(char const* identifier, Pipeline* next);
 

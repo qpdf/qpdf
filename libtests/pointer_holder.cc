@@ -1,4 +1,3 @@
-
 #include <qpdf/PointerHolder.hh>
 
 #include <iostream>

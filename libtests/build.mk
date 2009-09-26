@@ -9,7 +9,6 @@ BINS_libtests = \
 	pcre \
 	png_filter \
 	pointer_holder \
-	qexc \
 	qutil \
 	rc4
 

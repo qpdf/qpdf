@@ -1,4 +1,3 @@
-
 #include <qpdf/Buffer.hh>
 
 #include <string.h>

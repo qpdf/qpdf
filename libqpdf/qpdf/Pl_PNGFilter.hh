@@ -19,21 +19,6 @@
 class Pl_PNGFilter: public Pipeline
 {
   public:
-    class Exception: public Pipeline::Exception
-    {
-      public:
-	DLL_EXPORT
-	Exception(std::string const& message) :
-	    Pipeline::Exception(message)
-	{
-	}
-
-	DLL_EXPORT
-	virtual ~Exception() throw ()
-	{
-	}
-    };
-
     // Encoding is not presently supported
     enum action_e { a_encode, a_decode };
 

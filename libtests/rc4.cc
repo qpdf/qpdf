@@ -1,4 +1,3 @@
-
 #include <qpdf/Pl_RC4.hh>
 #include <qpdf/Pl_StdioFile.hh>
 

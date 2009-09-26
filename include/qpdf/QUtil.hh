@@ -8,12 +8,12 @@
 #ifndef __QUTIL_HH__
 #define __QUTIL_HH__
 
+#include <qpdf/DLL.hh>
 #include <string>
 #include <list>
+#include <stdexcept>
 #include <stdio.h>
 #include <sys/stat.h>
-
-#include <qpdf/QEXC.hh>
 
 namespace QUtil
 {
@@ -24,15 +24,25 @@ namespace QUtil
     DLL_EXPORT
     std::string double_to_string(double, int decimal_places = 0);
 
-    // If status is -1, convert the current value of errno to a
-    // QEXC::System exception.  Otherwise, return status.
+    // Throw std::runtime_error with a string formed by appending to
+    // "description: " the standard string corresponding to the
+    // current value of errno.
     DLL_EXPORT
-    int os_wrapper(std::string const& description, int status)
-	throw (QEXC::System);
+    void throw_system_error(std::string const& description);
 
+    // The status argument is assumed to be the return value of a
+    // standard library call that sets errno when it fails.  If status
+    // is -1, convert the current value of errno to a
+    // std::runtime_error that includes the standard error string.
+    // Otherwise, return status.
     DLL_EXPORT
-    FILE* fopen_wrapper(std::string const&, FILE*)
-	throw (QEXC::System);
+    int os_wrapper(std::string const& description, int status);
+
+    // The FILE* argument is assumed to be the return of fopen.  If
+    // null, throw std::runtime_error.  Otherwise, return the FILE*
+    // argument.
+    DLL_EXPORT
+    FILE* fopen_wrapper(std::string const&, FILE*);
 
     DLL_EXPORT
     char* copy_string(std::string const&);

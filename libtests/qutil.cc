@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <stdio.h>
 #include <sys/types.h>
@@ -27,9 +26,9 @@ void string_conversion_test()
 	// int_to_string bounds error
 	std::cout << QUtil::int_to_string(1, 50) << std::endl;
     }
-    catch(QEXC::Internal &e)
+    catch (std::logic_error &e)
     {
-	std::cout << "exception 1: " << e.unparse() << std::endl;
+	std::cout << "exception 1: " << e.what() << std::endl;
     }
 
     try
@@ -37,9 +36,9 @@ void string_conversion_test()
 	// QUtil::int_to_string bounds error
 	std::cout << QUtil::int_to_string(1, -50) << std::endl;
     }
-    catch(QEXC::Internal &e)
+    catch (std::logic_error& e)
     {
-	std::cout << "exception 2: " << e.unparse() << std::endl;
+	std::cout << "exception 2: " << e.what() << std::endl;
     }
 
     try
@@ -47,9 +46,9 @@ void string_conversion_test()
 	// QUtil::int_to_string bounds error
 	std::cout << QUtil::int_to_string(-1, 49) << std::endl;
     }
-    catch(QEXC::Internal &e)
+    catch (std::logic_error& e)
     {
-	std::cout << "exception 3: " << e.unparse() << std::endl;
+	std::cout << "exception 3: " << e.what() << std::endl;
     }
 
 
@@ -58,9 +57,9 @@ void string_conversion_test()
 	// QUtil::double_to_string bounds error
 	std::cout << QUtil::double_to_string(3.14159, 1024) << std::endl;
     }
-    catch(QEXC::Internal &e)
+    catch (std::logic_error& e)
     {
-	std::cout << "exception 4: " << e.unparse() << std::endl;
+	std::cout << "exception 4: " << e.what() << std::endl;
     }
 
     try
@@ -68,9 +67,9 @@ void string_conversion_test()
 	// QUtil::double_to_string bounds error
 	std::cout << QUtil::double_to_string(1000.0, 95) << std::endl;
     }
-    catch(QEXC::Internal &e)
+    catch (std::logic_error& e)
     {
-	std::cout << "exception 5: " << e.unparse() << std::endl;
+	std::cout << "exception 5: " << e.what() << std::endl;
     }
 
     std::string embedded_null = "one";
@@ -101,9 +100,9 @@ void os_wrapper_test()
 	std::cout << "after open" << std::endl;
 	(void) close(fd);
     }
-    catch (QEXC::System& s)
+    catch (std::runtime_error& s)
     {
-	std::cout << "exception: " << s.unparse() << std::endl;
+	std::cout << "exception: " << s.what() << std::endl;
     }
 }
 
@@ -118,9 +117,9 @@ void fopen_wrapper_test()
 	std::cout << "after fopen" << std::endl;
 	(void) fclose(f);
     }
-    catch (QEXC::System& s)
+    catch (std::runtime_error& s)
     {
-	std::cout << "exception: " << s.unparse() << std::endl;
+	std::cout << "exception: " << s.what() << std::endl;
     }
 }
 
@@ -171,7 +170,7 @@ void to_utf8_test()
     {
 	print_utf8(0x80000000UL);
     }
-    catch (QEXC::General& e)
+    catch (std::runtime_error& e)
     {
 	std::cout << "0x80000000: " << e.what() << std::endl;
     }

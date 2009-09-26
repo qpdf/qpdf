@@ -1,4 +1,3 @@
-
 #ifndef __PL_LZWDECODER_HH__
 #define __PL_LZWDECODER_HH__
 

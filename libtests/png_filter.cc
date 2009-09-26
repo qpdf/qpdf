@@ -1,4 +1,3 @@
-
 #include <qpdf/Pl_PNGFilter.hh>
 #include <qpdf/Pl_StdioFile.hh>
 
@@ -79,9 +78,9 @@ int main(int argc, char* argv[])
     {
 	run(filename, encode, columns);
     }
-    catch (QEXC::General& e)
+    catch (std::exception& e)
     {
-	std::cout << e.unparse() << std::endl;
+	std::cout << e.what() << std::endl;
     }
     return 0;
 }

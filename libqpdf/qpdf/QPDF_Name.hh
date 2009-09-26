@@ -1,4 +1,3 @@
-
 #ifndef __QPDF_NAME_HH__
 #define __QPDF_NAME_HH__
 

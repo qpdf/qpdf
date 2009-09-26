@@ -386,7 +386,8 @@ QPDF::getKeyForObject(int objid, int generation)
 {
     if (! this->encrypted)
     {
-	throw QEXC::Internal("request for encryption key in non-encrypted PDF");
+	throw std::logic_error(
+	    "request for encryption key in non-encrypted PDF");
     }
 
     if (! ((objid == this->cached_key_objid) &&

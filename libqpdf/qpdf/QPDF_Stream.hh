@@ -1,4 +1,3 @@
-
 #ifndef __QPDF_STREAM_HH__
 #define __QPDF_STREAM_HH__
 

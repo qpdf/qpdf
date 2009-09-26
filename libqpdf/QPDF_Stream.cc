@@ -1,7 +1,5 @@
-
 #include <qpdf/QPDF_Stream.hh>
 
-#include <qpdf/QEXC.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/Pipeline.hh>
 #include <qpdf/Pl_Flate.hh>
@@ -17,6 +15,8 @@
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/Pl_QPDFTokenizer.hh>
 
+#include <stdexcept>
+
 QPDF_Stream::QPDF_Stream(QPDF* qpdf, int objid, int generation,
 			 QPDFObjectHandle stream_dict,
 			 off_t offset, int length) :
@@ -29,8 +29,9 @@ QPDF_Stream::QPDF_Stream(QPDF* qpdf, int objid, int generation,
 {
     if (! stream_dict.isDictionary())
     {
-	throw QEXC::Internal("stream object instantiated with non-dictionary "
-			     "object for dictionary");
+	throw std::logic_error(
+	    "stream object instantiated with non-dictionary "
+	    "object for dictionary");
     }
 }
 
@@ -298,8 +299,9 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline, bool filter,
 	    }
 	    else
 	    {
-		throw QEXC::Internal("QPDFStream: unknown filter "
-				     "encountered after check");
+		throw std::logic_error(
+		    "INTERNAL ERROR: QPDFStream: unknown filter "
+		    "encountered after check");
 	    }
 	}
     }

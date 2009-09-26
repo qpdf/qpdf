@@ -1,4 +1,3 @@
-
 #ifndef __QPDF_DICTIONARY_HH__
 #define __QPDF_DICTIONARY_HH__
 

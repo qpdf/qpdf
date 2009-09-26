@@ -28,6 +28,7 @@
 /////////////////////////////////////////////////////////////////////////
 
 #include <qpdf/MD5.hh>
+#include <qpdf/QUtil.hh>
 
 #include <stdio.h>
 #include <memory.h>
@@ -330,15 +331,12 @@ void MD5::encodeDataIncrementally(char const* data, int len)
 
 DLL_EXPORT
 void MD5::encodeFile(char const *filename, int up_to_size)
-    throw (QEXC::System)
 {
-    FILE *file;
     unsigned char buffer[1024];
 
-    if ((file = fopen (filename, "rb")) == NULL)
-    {
-	throw QEXC::System(std::string("MD5: can't open ") + filename, errno);
-    }
+    FILE *file = QUtil::fopen_wrapper(
+	std::string("MD5: open ") + filename,
+	fopen(filename, "rb"));
 
     int len;
     int so_far = 0;
@@ -365,7 +363,8 @@ void MD5::encodeFile(char const *filename, int up_to_size)
 	// Assume, perhaps incorrectly, that errno was set by the
 	// underlying call to read....
 	(void) fclose(file);
-	throw QEXC::System(std::string("MD5: read error on ") + filename, errno);
+	QUtil::throw_system_error(
+	    std::string("MD5: read error on ") + filename);
     }
     (void) fclose(file);
 
@@ -446,7 +445,7 @@ MD5::checkFileChecksum(char const* const checksum,
 	std::string actual_checksum = getFileChecksum(filename, up_to_size);
 	result = (checksum == actual_checksum);
     }
-    catch (QEXC::System)
+    catch (std::runtime_error)
     {
 	// Ignore -- return false
     }

@@ -8,9 +8,10 @@
 #ifndef __QPDFEXC_HH__
 #define __QPDFEXC_HH__
 
-#include <qpdf/QEXC.hh>
+#include <qpdf/DLL.hh>
+#include <stdexcept>
 
-class QPDFExc: public QEXC::General
+class QPDFExc: public std::runtime_error
 {
   public:
     DLL_EXPORT

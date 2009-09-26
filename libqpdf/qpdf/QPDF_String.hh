@@ -1,4 +1,3 @@
-
 #ifndef __QPDF_STRING_HH__
 #define __QPDF_STRING_HH__
 

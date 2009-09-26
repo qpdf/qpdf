@@ -1,4 +1,3 @@
-
 #include <qpdf/QPDF_Bool.hh>
 
 QPDF_Bool::QPDF_Bool(bool val) :

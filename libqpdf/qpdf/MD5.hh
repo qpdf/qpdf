@@ -1,10 +1,8 @@
-
 #ifndef __MD5_HH__
 #define __MD5_HH__
 
 #include <string>
 #include <qpdf/DLL.hh>
-#include <qpdf/QEXC.hh>
 #include <qpdf/qpdf-config.h>
 #ifdef HAVE_INTTYPES_H
 # include <inttypes.h>
@@ -26,8 +24,7 @@ class MD5
 
     // encodes file and finalizes
     DLL_EXPORT
-    void encodeFile(char const* filename, int up_to_size = -1)
-	throw(QEXC::System);
+    void encodeFile(char const* filename, int up_to_size = -1);
 
     // appends string to current md5 object
     DLL_EXPORT

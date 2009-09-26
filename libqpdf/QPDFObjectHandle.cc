@@ -1,4 +1,3 @@
-
 #include <qpdf/QPDFObjectHandle.hh>
 
 #include <qpdf/QPDF.hh>
@@ -13,9 +12,9 @@
 #include <qpdf/QPDF_Stream.hh>
 
 #include <qpdf/QTC.hh>
-#include <qpdf/QEXC.hh>
 #include <qpdf/QUtil.hh>
 
+#include <stdexcept>
 #include <stdlib.h>
 
 DLL_EXPORT
@@ -114,7 +113,7 @@ QPDFObjectHandle::getNumericValue()
     }
     else
     {
-	throw QEXC::Internal("getNumericValue called for non-numeric object");
+	throw std::logic_error("getNumericValue called for non-numeric object");
     }
     return result;
 }
@@ -416,9 +415,10 @@ QPDFObjectHandle::getPageContents()
 	    }
 	    else
 	    {
-		throw QEXC::General("unknown item type while inspecting "
-				    "element of /Contents array in page "
-				    "dictionary");
+		throw std::runtime_error(
+		    "unknown item type while inspecting "
+		    "element of /Contents array in page "
+		    "dictionary");
 	    }
 	}
     }
@@ -428,8 +428,8 @@ QPDFObjectHandle::getPageContents()
     }
     else
     {
-	throw QEXC::General("unknown object type inspecting /Contents "
-			    "key in page dictionary");
+	throw std::runtime_error("unknown object type inspecting /Contents "
+				 "key in page dictionary");
     }
 
     return result;
@@ -542,7 +542,8 @@ QPDFObjectHandle::makeDirectInternal(std::set<int>& visited)
     if (isStream())
     {
 	QTC::TC("qpdf", "QPDFObjectHandle ERR clone stream");
-	throw QEXC::General("attempt to make a stream into a direct object");
+	throw std::runtime_error(
+	    "attempt to make a stream into a direct object");
     }
 
     int cur_objid = this->objid;
@@ -551,8 +552,9 @@ QPDFObjectHandle::makeDirectInternal(std::set<int>& visited)
 	if (visited.count(cur_objid))
 	{
 	    QTC::TC("qpdf", "QPDFObjectHandle makeDirect loop");
-	    throw QEXC::General("loop detected while converting object from "
-				"indirect to direct");
+	    throw std::runtime_error(
+		"loop detected while converting object from "
+		"indirect to direct");
 	}
 	visited.insert(cur_objid);
     }
@@ -620,8 +622,8 @@ QPDFObjectHandle::makeDirectInternal(std::set<int>& visited)
     }
     else
     {
-	throw QEXC::Internal("QPDFObjectHandle::makeIndirect: "
-			     "unknown object type");
+	throw std::logic_error("QPDFObjectHandle::makeIndirect: "
+			       "unknown object type");
     }
 
     this->obj = new_obj;
@@ -644,8 +646,8 @@ QPDFObjectHandle::assertInitialized() const
 {
     if (! this->initialized)
     {
-	throw QEXC::Internal("operation attempted on uninitialized "
-			     "QPDFObjectHandle");
+	throw std::logic_error("operation attempted on uninitialized "
+			       "QPDFObjectHandle");
     }
 }
 
@@ -654,8 +656,8 @@ QPDFObjectHandle::assertType(char const* type_name, bool istype)
 {
     if (! istype)
     {
-	throw QEXC::Internal(std::string("operation for ") + type_name +
-			     " object attempted on object of wrong type");
+	throw std::logic_error(std::string("operation for ") + type_name +
+			       " object attempted on object of wrong type");
     }
 }
 
@@ -665,7 +667,7 @@ QPDFObjectHandle::assertPageObject()
     if (! (this->isDictionary() && this->hasKey("/Type") &&
 	   (this->getKey("/Type").getName() == "/Page")))
     {
-	throw QEXC::Internal("page operation called on non-Page object");
+	throw std::logic_error("page operation called on non-Page object");
     }
 }
 

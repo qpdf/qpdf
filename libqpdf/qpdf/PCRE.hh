@@ -10,9 +10,9 @@
 #endif
 #include <pcre.h>
 #include <string>
+#include <stdexcept>
 
 #include <qpdf/DLL.hh>
-#include <qpdf/QEXC.hh>
 
 // Note: this class does not encapsulate all features of the PCRE
 // package -- only those that I actually need right now are here.
@@ -20,18 +20,9 @@
 class PCRE
 {
   public:
-    class Exception: public QEXC::General
-    {
-      public:
-	DLL_EXPORT
-	Exception(std::string const& message);
-	DLL_EXPORT
-	virtual ~Exception() throw() {}
-    };
-
     // This is thrown when an attempt is made to access a non-existent
     // back reference.
-    class NoBackref: public Exception
+    class NoBackref: public std::logic_error
     {
       public:
 	DLL_EXPORT
@@ -65,14 +56,13 @@ class PCRE
 
 	// see getMatch flags below
 	DLL_EXPORT
-	std::string getMatch(int n, int flags = 0)
-	    throw(QEXC::General, Exception);
+	std::string getMatch(int n, int flags = 0);
 	DLL_EXPORT
-	void getOffsetLength(int n, int& offset, int& length) throw(Exception);
+	void getOffsetLength(int n, int& offset, int& length);
 	DLL_EXPORT
-	int getOffset(int n) throw(Exception);
+	int getOffset(int n);
 	DLL_EXPORT
-	int getLength(int n) throw(Exception);
+	int getLength(int n);
 
 	// nMatches returns the number of available matches including
 	// match 0 which is the whole string.  In other words, if you
@@ -105,14 +95,13 @@ class PCRE
     // The value passed in as options is passed to pcre_exec.  See man
     // pcreapi for details.
     DLL_EXPORT
-    PCRE(char const* pattern, int options = 0) throw(Exception);
+    PCRE(char const* pattern, int options = 0);
     DLL_EXPORT
     ~PCRE();
 
     DLL_EXPORT
     Match match(char const* subject, int options = 0, int startoffset = 0,
-		int size = -1)
-	throw(QEXC::General, Exception);
+		int size = -1);
 
     DLL_EXPORT
     static void test(int n = 0);

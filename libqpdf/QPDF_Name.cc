@@ -1,4 +1,3 @@
-
 #include <qpdf/QPDF_Name.hh>
 
 #include <string.h>

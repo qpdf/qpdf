@@ -1,4 +1,3 @@
-
 #ifndef __PL_QPDFTOKENIZER_HH__
 #define __PL_QPDFTOKENIZER_HH__
 

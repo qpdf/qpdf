@@ -1,4 +1,3 @@
-
 #include <qpdf/QPDF_Dictionary.hh>
 
 #include <qpdf/QPDF_Null.hh>
