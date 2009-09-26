@@ -3,6 +3,7 @@
 #define __MD5_HH__
 
 #include <string>
+#include <qpdf/DLL.hh>
 #include <qpdf/QEXC.hh>
 #include <qpdf/qpdf-config.h>
 #ifdef HAVE_INTTYPES_H

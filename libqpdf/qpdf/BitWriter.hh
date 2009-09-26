@@ -3,6 +3,8 @@
 #ifndef __BITWRITER_HH__
 #define __BITWRITER_HH__
 
+#include <qpdf/DLL.hh>
+
 class Pipeline;
 
 class BitWriter

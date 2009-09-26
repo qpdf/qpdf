@@ -1,5 +1,3 @@
-
-
 #include <qpdf/BitStream.hh>
 
 // See comments in bits.cc

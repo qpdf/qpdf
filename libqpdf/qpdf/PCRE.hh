@@ -11,6 +11,7 @@
 #include <pcre.h>
 #include <string>
 
+#include <qpdf/DLL.hh>
 #include <qpdf/QEXC.hh>
 
 // Note: this class does not encapsulate all features of the PCRE
