@@ -6,6 +6,7 @@
 #define BITS_READ 1
 #include "bits.icc"
 
+DLL_EXPORT
 BitStream::BitStream(unsigned char const* p, int nbytes) :
     start(p),
     nbytes(nbytes)
@@ -13,6 +14,7 @@ BitStream::BitStream(unsigned char const* p, int nbytes) :
     reset();
 }
 
+DLL_EXPORT
 void
 BitStream::reset()
 {
@@ -21,6 +23,7 @@ BitStream::reset()
     bits_available = 8 * nbytes;
 }
 
+DLL_EXPORT
 unsigned long
 BitStream::getBits(int nbits)
 {
@@ -28,6 +31,7 @@ BitStream::getBits(int nbits)
 		     this->bits_available, nbits);
 }
 
+DLL_EXPORT
 void
 BitStream::skipToNextByte()
 {

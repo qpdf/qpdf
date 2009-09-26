@@ -6,6 +6,7 @@
 #define BITS_WRITE 1
 #include "bits.icc"
 
+DLL_EXPORT
 BitWriter::BitWriter(Pipeline* pl) :
     pl(pl),
     ch(0),
@@ -13,12 +14,14 @@ BitWriter::BitWriter(Pipeline* pl) :
 {
 }
 
+DLL_EXPORT
 void
 BitWriter::writeBits(unsigned long val, int bits)
 {
     write_bits(this->ch, this->bit_offset, val, bits, this->pl);
 }
 
+DLL_EXPORT
 void
 BitWriter::flush()
 {

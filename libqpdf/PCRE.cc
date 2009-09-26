@@ -5,31 +5,37 @@
 #include <iostream>
 #include <string.h>
 
+DLL_EXPORT
 PCRE::Exception::Exception(std::string const& message)
 {
     this->setMessage("PCRE error: " + message);
 }
 
+DLL_EXPORT
 PCRE::NoBackref::NoBackref() :
     Exception("no match")
 {
 }
 
+DLL_EXPORT
 PCRE::Match::Match(int nbackrefs, char const* subject)
 {
     this->init(-1, nbackrefs, subject);
 }
 
+DLL_EXPORT
 PCRE::Match::~Match()
 {
     this->destroy();
 }
 
+DLL_EXPORT
 PCRE::Match::Match(Match const& rhs)
 {
     this->copy(rhs);
 }
 
+DLL_EXPORT
 PCRE::Match&
 PCRE::Match::operator=(Match const& rhs)
 {
@@ -72,12 +78,13 @@ PCRE::Match::destroy()
     delete [] this->ovector;
 }
 
+DLL_EXPORT
 PCRE::Match::operator bool()
 {
     return (this->nmatches >= 0);
 }
 
-
+DLL_EXPORT
 std::string
 PCRE::Match::getMatch(int n, int flags)
     throw(QEXC::General, Exception)
@@ -107,6 +114,7 @@ PCRE::Match::getMatch(int n, int flags)
     return std::string(this->subject).substr(offset, length);
 }
 
+DLL_EXPORT
 void
 PCRE::Match::getOffsetLength(int n, int& offset, int& length) throw(Exception)
 {
@@ -120,7 +128,7 @@ PCRE::Match::getOffsetLength(int n, int& offset, int& length) throw(Exception)
     length = this->ovector[n * 2 + 1] - offset;
 }
 
-
+DLL_EXPORT
 int
 PCRE::Match::getOffset(int n) throw(Exception)
 {
@@ -130,7 +138,7 @@ PCRE::Match::getOffset(int n) throw(Exception)
     return offset;
 }
 
-
+DLL_EXPORT
 int
 PCRE::Match::getLength(int n) throw(Exception)
 {
@@ -140,13 +148,14 @@ PCRE::Match::getLength(int n) throw(Exception)
     return length;
 }
 
-
+DLL_EXPORT
 int
 PCRE::Match::nMatches() const
 {
     return this->nmatches;
 }
 
+DLL_EXPORT
 PCRE::PCRE(char const* pattern, int options) throw (PCRE::Exception)
 {
     char const *errptr;
@@ -166,11 +175,13 @@ PCRE::PCRE(char const* pattern, int options) throw (PCRE::Exception)
     }
 }
 
+DLL_EXPORT
 PCRE::~PCRE()
 {
     pcre_free(this->code);
 }
 
+DLL_EXPORT
 PCRE::Match
 PCRE::match(char const* subject, int options, int startoffset, int size)
     throw (QEXC::General, Exception)
@@ -219,6 +230,7 @@ PCRE::match(char const* subject, int options, int startoffset, int size)
     return result;
 }
 
+DLL_EXPORT
 void
 PCRE::test(int n)
 {

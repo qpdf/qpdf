@@ -3,16 +3,19 @@
 
 #include <qpdf/QEXC.hh>
 
+DLL_EXPORT
 Pl_MD5::Pl_MD5(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next),
     in_progress(false)
 {
 }
 
+DLL_EXPORT
 Pl_MD5::~Pl_MD5()
 {
 }
 
+DLL_EXPORT
 void
 Pl_MD5::write(unsigned char* buf, int len)
 {
@@ -25,6 +28,7 @@ Pl_MD5::write(unsigned char* buf, int len)
     this->getNext()->write(buf, len);
 }
 
+DLL_EXPORT
 void
 Pl_MD5::finish()
 {
@@ -32,6 +36,7 @@ Pl_MD5::finish()
     this->in_progress = false;
 }
 
+DLL_EXPORT
 std::string
 Pl_MD5::getHexDigest()
 {

@@ -22,7 +22,9 @@ class PCRE
     class Exception: public QEXC::General
     {
       public:
+	DLL_EXPORT
 	Exception(std::string const& message);
+	DLL_EXPORT
 	virtual ~Exception() throw() {}
     };
 
@@ -31,7 +33,9 @@ class PCRE
     class NoBackref: public Exception
     {
       public:
+	DLL_EXPORT
 	NoBackref();
+	DLL_EXPORT
 	virtual ~NoBackref() throw() {}
     };
 
@@ -39,10 +43,15 @@ class PCRE
     {
 	friend class PCRE;
       public:
+	DLL_EXPORT
 	Match(int nbackrefs, char const* subject);
+	DLL_EXPORT
 	Match(Match const&);
+	DLL_EXPORT
 	Match& operator=(Match const&);
+	DLL_EXPORT
 	~Match();
+	DLL_EXPORT
 	operator bool();
 
 	// All the back reference accessing routines may throw the
@@ -54,10 +63,14 @@ class PCRE
 	// and not matching at all.
 
 	// see getMatch flags below
+	DLL_EXPORT
 	std::string getMatch(int n, int flags = 0)
 	    throw(QEXC::General, Exception);
+	DLL_EXPORT
 	void getOffsetLength(int n, int& offset, int& length) throw(Exception);
+	DLL_EXPORT
 	int getOffset(int n) throw(Exception);
+	DLL_EXPORT
 	int getLength(int n) throw(Exception);
 
 	// nMatches returns the number of available matches including
@@ -67,6 +80,7 @@ class PCRE
 	// will return the whole string, getMatch(1) will return the
 	// text that matched the backreference, and getMatch(2) will
 	// throw an exception because it is out of range.
+	DLL_EXPORT
 	int nMatches() const;
 
 	// Flags for getMatch
@@ -89,13 +103,17 @@ class PCRE
 
     // The value passed in as options is passed to pcre_exec.  See man
     // pcreapi for details.
+    DLL_EXPORT
     PCRE(char const* pattern, int options = 0) throw(Exception);
+    DLL_EXPORT
     ~PCRE();
 
+    DLL_EXPORT
     Match match(char const* subject, int options = 0, int startoffset = 0,
 		int size = -1)
 	throw(QEXC::General, Exception);
 
+    DLL_EXPORT
     static void test(int n = 0);
 
   private:

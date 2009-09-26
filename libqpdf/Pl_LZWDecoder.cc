@@ -5,6 +5,7 @@
 #include <string.h>
 #include <assert.h>
 
+DLL_EXPORT
 Pl_LZWDecoder::Pl_LZWDecoder(char const* identifier, Pipeline* next,
 			     bool early_code_change) :
     Pipeline(identifier, next),
@@ -20,11 +21,12 @@ Pl_LZWDecoder::Pl_LZWDecoder(char const* identifier, Pipeline* next,
     memset(buf, 0, 3);
 }
 
-
+DLL_EXPORT
 Pl_LZWDecoder::~Pl_LZWDecoder()
 {
 }
 
+DLL_EXPORT
 void
 Pl_LZWDecoder::write(unsigned char* bytes, int len)
 {
@@ -43,6 +45,7 @@ Pl_LZWDecoder::write(unsigned char* bytes, int len)
     }
 }
 
+DLL_EXPORT
 void
 Pl_LZWDecoder::finish()
 {

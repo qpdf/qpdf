@@ -1,4 +1,3 @@
-
 #ifndef __PL_PNGFILTER_HH__
 #define __PL_PNGFILTER_HH__
 
@@ -23,11 +22,13 @@ class Pl_PNGFilter: public Pipeline
     class Exception: public Pipeline::Exception
     {
       public:
+	DLL_EXPORT
 	Exception(std::string const& message) :
 	    Pipeline::Exception(message)
 	{
 	}
 
+	DLL_EXPORT
 	virtual ~Exception() throw ()
 	{
 	}
@@ -36,12 +37,16 @@ class Pl_PNGFilter: public Pipeline
     // Encoding is not presently supported
     enum action_e { a_encode, a_decode };
 
+    DLL_EXPORT
     Pl_PNGFilter(char const* identifier, Pipeline* next,
 		 action_e action, unsigned int columns,
 		 unsigned int bytes_per_pixel);
+    DLL_EXPORT
     virtual ~Pl_PNGFilter();
 
+    DLL_EXPORT
     virtual void write(unsigned char* data, int len);
+    DLL_EXPORT
     virtual void finish();
 
   private:

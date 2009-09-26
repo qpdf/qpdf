@@ -295,16 +295,19 @@ void MD5::decode(UINT4 *output, unsigned char *input, unsigned int len)
 
 // Public functions
 
+DLL_EXPORT
 MD5::MD5()
 {
     init();
 }
 
+DLL_EXPORT
 void MD5::reset()
 {
     init();
 }
 
+DLL_EXPORT
 void MD5::encodeString(char const* str)
 {
     unsigned int len = strlen(str);
@@ -313,16 +316,19 @@ void MD5::encodeString(char const* str)
     final();
 }
 
+DLL_EXPORT
 void MD5::appendString(char const* input_string)
 {
     update((unsigned char *)input_string, strlen(input_string));
 }
 
+DLL_EXPORT
 void MD5::encodeDataIncrementally(char const* data, int len)
 {
     update((unsigned char *)data, len);
 }
 
+DLL_EXPORT
 void MD5::encodeFile(char const *filename, int up_to_size)
     throw (QEXC::System)
 {
@@ -366,12 +372,14 @@ void MD5::encodeFile(char const *filename, int up_to_size)
     final();
 }
 
+DLL_EXPORT
 void MD5::digest(Digest result)
 {
     final();
     memcpy(result, digest_val, sizeof(digest_val));
 }
 
+DLL_EXPORT
 void MD5::print()
 {
     final();
@@ -384,6 +392,7 @@ void MD5::print()
     printf("\n");
 }
 
+DLL_EXPORT
 std::string MD5::unparse()
 {
     final();
@@ -399,6 +408,7 @@ std::string MD5::unparse()
     return result;
 }
 
+DLL_EXPORT
 std::string
 MD5::getDataChecksum(char const* buf, int len)
 {
@@ -407,6 +417,7 @@ MD5::getDataChecksum(char const* buf, int len)
     return m.unparse();
 }
 
+DLL_EXPORT
 std::string
 MD5::getFileChecksum(char const* filename, int up_to_size)
 {
@@ -415,6 +426,7 @@ MD5::getFileChecksum(char const* filename, int up_to_size)
     return m.unparse();
 }
 
+DLL_EXPORT
 bool
 MD5::checkDataChecksum(char const* const checksum,
 		       char const* buf, int len)
@@ -423,6 +435,7 @@ MD5::checkDataChecksum(char const* const checksum,
     return (checksum == actual_checksum);
 }
 
+DLL_EXPORT
 bool
 MD5::checkFileChecksum(char const* const checksum,
 		       char const* filename, int up_to_size)

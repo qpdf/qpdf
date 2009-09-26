@@ -16,10 +16,15 @@
 class Pl_MD5: public Pipeline
 {
   public:
+    DLL_EXPORT
     Pl_MD5(char const* identifier, Pipeline* next);
+    DLL_EXPORT
     virtual ~Pl_MD5();
+    DLL_EXPORT
     virtual void write(unsigned char*, int);
+    DLL_EXPORT
     virtual void finish();
+    DLL_EXPORT
     std::string getHexDigest();
 
   private:
