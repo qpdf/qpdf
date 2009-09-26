@@ -99,6 +99,7 @@ distclean: clean
 
 maintainer-clean: distclean
 	$(RM) configure doc/qpdf-manual.* libqpdf/qpdf/qpdf-config.h.in
+	$(RM) aclocal.m4
 
 .PHONY: $(TEST_TARGETS)
 $(foreach B,$(TEST_ITEMS),$(eval \
