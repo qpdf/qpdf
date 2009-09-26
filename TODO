@@ -18,7 +18,7 @@
  * See if it is possible to support rewriting a file in place or at
    least to detect and block this
 
- * Spell check to fix types in messages and comments.  Known type in
+ * Spell check to fix typos in messages and comments.  Known typo in
    "damanged".
 
 
