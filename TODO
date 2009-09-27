@@ -1,11 +1,6 @@
 2.1
 ===
 
- * Be able to trap I/O errors separately from other errors; especially
-   be able to separate errors that the user can fix (like permission
-   errors) from errors that they probably can't fix like corrupted PDF
-   files, unsupported filters, or internal errors.
-
  * Add ability to create new streams or replace stream data.  Consider
    stream data sources to include a file and offset, a buffer, or a
    some kind of callback mechanism.  Find messages exchanged with
@@ -16,12 +11,18 @@
    files...ideally we should provide the object number currently being
    read
 
- * See if it is possible to support rewriting a file in place or at
-   least to detect and block this
-
 
 General
 =======
+
+ * It might be nice to be able to trap I/O errors separately from
+   other errors; especially be able to separate errors that the user
+   can fix (like permission errors) from errors that they probably
+   can't fix like corrupted PDF files, unsupported filters, or
+   internal errors.  However, only QPDF::processFile(), which does the
+   initial read, and QPDFWriter::QPDFWriter(), which does the initial
+   write, are at all likely to generate such errors for a case other
+   than a catastrophic failure.
 
  * See whether we can do anything with /V > 3 in the encryption
    dictionary.  (V = 4 is Crypt Filters.)
