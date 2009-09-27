@@ -83,11 +83,11 @@ QPDF_BOOL qpdf_more_warnings(qpdf_data qpdf)
 DLL_EXPORT
 char const* qpdf_next_error(qpdf_data qpdf)
 {
-    QTC::TC("qpdf", "qpdf-c called qpdf_next_error");
     if (qpdf_more_errors(qpdf))
     {
 	qpdf->tmp_string = qpdf->error;
 	qpdf->error.clear();
+	QTC::TC("qpdf", "qpdf-c qpdf_next_error returned error");
 	return qpdf->tmp_string.c_str();
     }
     else
@@ -99,11 +99,11 @@ char const* qpdf_next_error(qpdf_data qpdf)
 DLL_EXPORT
 char const* qpdf_next_warning(qpdf_data qpdf)
 {
-    QTC::TC("qpdf", "qpdf-c called qpdf_next_warning");
     if (qpdf_more_warnings(qpdf))
     {
 	qpdf->tmp_string = qpdf->warnings.front();
 	qpdf->warnings.pop_front();
+	QTC::TC("qpdf", "qpdf-c qpdf_next_warning returned warning");
 	return qpdf->tmp_string.c_str();
     }
     else

@@ -858,6 +858,8 @@ int main(int argc, char* argv[])
 		std::cout << "checking " << infilename << std::endl;
 		try
 		{
+		    std::cout << "PDF Version: " << pdf.getPDFVersion()
+			      << std::endl;
 		    ::show_encryption(pdf);
 		    if (pdf.isLinearized())
 		    {

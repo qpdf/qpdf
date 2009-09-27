@@ -122,8 +122,8 @@ qpdf-c called qpdf_init 0
 qpdf-c called qpdf_cleanup 0
 qpdf-c called qpdf_more_errors 0
 qpdf-c called qpdf_more_warnings 0
-qpdf-c called qpdf_next_error 0
-qpdf-c called qpdf_next_warning 0
+qpdf-c qpdf_next_error returned error 0
+qpdf-c qpdf_next_warning returned warning 0
 qpdf-c called qpdf_set_suppress_warnings 0
 qpdf-c called qpdf_set_ignore_xref_streams 0
 qpdf-c called qpdf_set_attempt_recovery 0

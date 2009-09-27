@@ -39,7 +39,10 @@ class QPDF
     // lifetime.  This method must be called before any methods that
     // potentially ask for information about the PDF file are called.
     // Prior to calling this, the only methods that are allowed are
-    // those that set parameters.
+    // those that set parameters.  If the input file is not
+    // encrypted,either a null password or an empty password can be
+    // used.  If the file is encrypted, either the user password or
+    // the owner password may be supplied.
     DLL_EXPORT
     void processFile(char const* filename, char const* password = 0);
 

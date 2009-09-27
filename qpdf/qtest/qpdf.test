@@ -159,7 +159,7 @@ for (my $i = 1; $i <= scalar(@badfiles); ++$i)
 show_ntests();
 # ----------
 $td->notify("--- Recovery Tests ---");
-$n_tests += @badfiles + 7;
+$n_tests += @badfiles + 8;
 
 # Recovery tests.  These are mostly after-the-fact -- when recovery
 # was implemented, some degree of recovery was possible on many of the
@@ -225,6 +225,12 @@ $td->runtest("run check on damaged file",
 	     {$td->COMMAND => "qpdf --check append-page-content-damaged.pdf"},
 	     {$td->FILE => "append-page-content-damaged-check.out",
 	      $td->EXIT_STATUS => 3},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check with C API",
+	     {$td->COMMAND =>
+		  "qpdf-ctest 1 append-page-content-damaged.pdf '' ''"},
+	     {$td->FILE => "append-page-content-damaged-c-check.out",
+	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 show_ntests();
@@ -346,7 +352,7 @@ for (my $n = 16; $n <= 19; ++$n)
 show_ntests();
 # ----------
 $td->notify("--- Specific File Tests ---");
-$n_tests += 3;
+$n_tests += 4;
 $n_compare_pdfs += 1;
 
 # Special PDF files that caused problems at some point
@@ -356,11 +362,13 @@ $n_compare_pdfs += 1;
 # happen to test boundary conditions in the LZW decoder.
 $td->runtest("old and complex",
 	     {$td->COMMAND => "qpdf --check old-and-complex.pdf"},
-	     {$td->STRING => +("checking old-and-complex.pdf\n" .
-			       "File is not encrypted\n" .
-			       "File is not linearized\n" .
-			       "No errors found\n"),
-			       $td->EXIT_STATUS => 0},
+	     {$td->FILE => "old-and-complex-check.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("old and complex (C API)",
+	     {$td->COMMAND => "qpdf-ctest 1 old-and-complex.pdf '' ''"},
+	     {$td->FILE => "old-and-complex-c-check.out",
+	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("convert to qdf",
@@ -534,19 +542,13 @@ check_pdf("linearized and modified",
 
 $td->runtest("check linearized and modified",
 	     {$td->COMMAND => "qpdf --check lin-delete-and-reuse.pdf"},
-	     {$td->STRING => +("checking lin-delete-and-reuse.pdf\n" .
-			       "File is not encrypted\n" .
-			       "File is not linearized\n" .
-			       "No errors found\n"),
-			       $td->EXIT_STATUS => 0},
+	     {$td->FILE => "lin-delete-and-reuse-check.out",
+	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("check multiple modifications",
 	     {$td->COMMAND => "qpdf --check multiple-mods.pdf"},
-	     {$td->STRING => +("checking multiple-mods.pdf\n" .
-			       "File is not encrypted\n" .
-			       "File is not linearized\n" .
-			       "No errors found\n"),
-			       $td->EXIT_STATUS => 0},
+	     {$td->FILE => "multiple-mods-check.out",
+	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 foreach my $base (@to_linearize)
@@ -812,7 +814,7 @@ my @flags = (["-qdf",						# 1
 	      "no arguments"],
 	     );
 
-$n_tests += (@files * @flags  * 2 * 2);
+$n_tests += (@files * @flags  * 2 * 3);
 $n_compare_pdfs += (@files * @flags * 2);
 $n_acroread += (@files * @flags * 2);
 
@@ -825,6 +827,7 @@ foreach my $file (@files)
 	my $n = 0;
 	my $oflags = "--object-streams=$o";
 	my $odescrip = "os:" . substr($o, 0, 1);
+	my $osuf = ($o eq 'generate' ? "-ogen" : "");
 	foreach my $d (@flags)
 	{
 	    my ($flags, $fdescrip) = @$d;
@@ -838,7 +841,13 @@ foreach my $file (@files)
 
 	    $td->runtest("check status",
 			 {$td->COMMAND => "qpdf --check a.pdf"},
-			 {$td->FILE => "$base.$n.check",
+			 {$td->FILE => "$base.$n$osuf.check",
+			  $td->EXIT_STATUS => 0},
+			 $td->NORMALIZE_NEWLINES);
+
+	    $td->runtest("check with C API",
+			 {$td->COMMAND => [qw(qpdf-ctest 1 a.pdf), "", ""]},
+			 {$td->FILE => "$base.$n$osuf.c-check",
 			  $td->EXIT_STATUS => 0},
 			 $td->NORMALIZE_NEWLINES);
 
