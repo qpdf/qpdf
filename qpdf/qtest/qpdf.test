@@ -298,6 +298,56 @@ check_pdf("no recompression",
 
 show_ntests();
 # ----------
+$td->notify("--- C API Tests ---");
+
+my @capi = (
+    [2, 'no options'],
+    [3, 'normalized content'],
+    [4, 'ignore xref streams'],
+    [5, 'linearized'],
+    [6, 'object streams'],
+    [7, 'qdf'],
+    [8, 'no original object ids'],
+    [9, 'uncompressed streams'],
+    );
+$n_tests += (2 * @capi) + 3;
+foreach my $d (@capi)
+{
+    my ($n, $description) = @$d;
+    my $outfile = $description;
+    $outfile =~ s/ /-/g;
+    $outfile = "c-$outfile.pdf";
+    $td->runtest($description,
+		 {$td->COMMAND => "qpdf-ctest $n hybrid-xref.pdf '' a.pdf"},
+		 {$td->STRING => "", $td->EXIT_STATUS => 0});
+    $td->runtest("check $description",
+		 {$td->FILE => "a.pdf"},
+		 {$td->FILE => $outfile});
+}
+$td->runtest("write to bad file name",
+	     {$td->COMMAND => "qpdf-ctest 2 hybrid-xref.pdf '' /:a:/:b:"},
+	     {$td->REGEXP => "error: open /:a:/:b:: .*",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("write damaged to bad file name",
+	     {$td->COMMAND => "qpdf-ctest 2 append-page-content-damaged.pdf" .
+		  " '' /:a:/:b:"},
+	     {$td->REGEXP =>
+		  "warning:(?s:.*)\n" .
+		  "error: open /:a:/:b:: .*",
+		  $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("write damaged",
+	     {$td->COMMAND => "qpdf-ctest 2 append-page-content-damaged.pdf" .
+		  " '' a.pdf"},
+	     {$td->FILE => "c-write-damaged.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+show_ntests();
+# ----------
 $td->notify("--- Object Stream Tests ---");
 $n_tests += (36 * 4) + (12 * 2);
 $n_compare_pdfs += 36;

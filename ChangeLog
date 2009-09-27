@@ -1,3 +1,15 @@
+2009-09-27  Jay Berkenbilt  <ejb@ql.org>
+
+	* The function QPDF::getUserPassword returned the user password
+	with the required padding as specified by the PDF specification.
+	This is seldom useful to users.  This function has been replaced
+	by QPDF::getPaddedUserPassword.  Call the new
+	QPDF::getTrimmedUserPassword to retreive the user password in a
+	human-readable format.
+
+	* qpdf/qpdf.cc (main): qpdf --check now prints the PDF version
+	number in addition to its other output.
+
 2009-09-26  Jay Berkenbilt  <ejb@ql.org>
 
 	* Removed all references to QEXC; now using std::runtime_error and
