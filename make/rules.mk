@@ -4,6 +4,11 @@ define src_to_obj
 $(foreach F,$(1),$(dir $(F))$(OUTPUT_DIR)/$(patsubst %.cc,%.o,$(notdir $(F))))
 endef
 
+# Usage: $(call c_src_to_obj,srcs)
+define c_src_to_obj
+$(foreach F,$(1),$(dir $(F))$(OUTPUT_DIR)/$(patsubst %.c,%.o,$(notdir $(F))))
+endef
+
 # Usage: $(call src_to_lobj,srcs)
 define src_to_lobj
 $(foreach F,$(1),$(dir $(F))$(OUTPUT_DIR)/$(patsubst %.cc,%.lo,$(notdir $(F))))
@@ -44,6 +49,15 @@ define compile
 		$(call depflags,$(basename $(call src_to_obj,$(1)))) \
 		$(foreach I,$(2),-I$(I)) \
 		-c $(1) -o $(call src_to_obj,$(1))
+endef
+
+#                       1   2
+# Usage: $(call c_compile,src,includes)
+define c_compile
+	$(CC) $(CPPFLAGS) $(CFLAGS) \
+		$(call depflags,$(basename $(call src_to_obj,$(1)))) \
+		$(foreach I,$(2),-I$(I)) \
+		-c $(1) -o $(call c_src_to_obj,$(1))
 endef
 
 #                          1   2
