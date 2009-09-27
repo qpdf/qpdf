@@ -463,3 +463,185 @@ QPDF::isEncrypted() const
 {
     return this->encrypted;
 }
+
+DLL_EXPORT
+bool
+QPDF::isEncrypted(int& R, int& P)
+{
+    if (this->encrypted)
+    {
+	QPDFObjectHandle trailer = getTrailer();
+	QPDFObjectHandle encrypt = trailer.getKey("/Encrypt");
+	QPDFObjectHandle Pkey = encrypt.getKey("/P");
+	QPDFObjectHandle Rkey = encrypt.getKey("/R");
+	P = Pkey.getIntValue();
+	R = Rkey.getIntValue();
+	return true;
+    }
+    else
+    {
+	return false;
+    }
+}
+
+static bool
+is_bit_set(int P, int bit)
+{
+    // Bits in P are numbered from 1 in the spec
+    return (P & (1 << (bit - 1)));
+}
+
+DLL_EXPORT
+bool
+QPDF::allowAccessibility()
+{
+    int R = 0;
+    int P = 0;
+    bool status = true;
+    if (isEncrypted(R, P))
+    {
+	if (R < 3)
+	{
+	    status = is_bit_set(P, 5);
+	}
+	else
+	{
+	    status = is_bit_set(P, 10);
+	}
+    }
+    return status;
+}
+
+DLL_EXPORT
+bool
+QPDF::allowExtractAll()
+{
+    int R = 0;
+    int P = 0;
+    bool status = true;
+    if (isEncrypted(R, P))
+    {
+	status = is_bit_set(P, 5);
+    }
+    return status;
+}
+
+DLL_EXPORT
+bool
+QPDF::allowPrintLowRes()
+{
+    int R = 0;
+    int P = 0;
+    bool status = true;
+    if (isEncrypted(R, P))
+    {
+	status = is_bit_set(P, 3);
+    }
+    return status;
+}
+
+DLL_EXPORT
+bool
+QPDF::allowPrintHighRes()
+{
+    int R = 0;
+    int P = 0;
+    bool status = true;
+    if (isEncrypted(R, P))
+    {
+	status = is_bit_set(P, 3);
+	if ((R >= 3) && (! is_bit_set(P, 12)))
+	{
+	    status = false;
+	}
+    }
+    return status;
+}
+
+DLL_EXPORT
+bool
+QPDF::allowModifyAssembly()
+{
+    int R = 0;
+    int P = 0;
+    bool status = true;
+    if (isEncrypted(R, P))
+    {
+	if (R < 3)
+	{
+	    status = is_bit_set(P, 4);
+	}
+	else
+	{
+	    status = is_bit_set(P, 11);
+	}
+    }
+    return status;
+}
+
+DLL_EXPORT
+bool
+QPDF::allowModifyForm()
+{
+    int R = 0;
+    int P = 0;
+    bool status = true;
+    if (isEncrypted(R, P))
+    {
+	if (R < 3)
+	{
+	    status = is_bit_set(P, 6);
+	}
+	else
+	{
+	    status = is_bit_set(P, 9);
+	}
+    }
+    return status;
+}
+
+DLL_EXPORT
+bool
+QPDF::allowModifyAnnotation()
+{
+    int R = 0;
+    int P = 0;
+    bool status = true;
+    if (isEncrypted(R, P))
+    {
+	status = is_bit_set(P, 6);
+    }
+    return status;
+}
+
+DLL_EXPORT
+bool
+QPDF::allowModifyOther()
+{
+    int R = 0;
+    int P = 0;
+    bool status = true;
+    if (isEncrypted(R, P))
+    {
+	status = is_bit_set(P, 4);
+    }
+    return status;
+}
+
+DLL_EXPORT
+bool
+QPDF::allowModifyAll()
+{
+    int R = 0;
+    int P = 0;
+    bool status = true;
+    if (isEncrypted(R, P))
+    {
+	status = (is_bit_set(P, 4) && is_bit_set(P, 6));
+	if (R >= 3)
+	{
+	    status = status && (is_bit_set(P, 9) && is_bit_set(P, 11));
+	}
+    }
+    return status;
+}

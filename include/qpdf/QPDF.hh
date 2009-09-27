@@ -128,6 +128,29 @@ class QPDF
     DLL_EXPORT
     bool isEncrypted() const;
 
+    DLL_EXPORT
+    bool isEncrypted(int& R, int& P);
+
+    // Encryption permissions -- not enforced by QPDF
+    DLL_EXPORT
+    bool allowAccessibility();
+    DLL_EXPORT
+    bool allowExtractAll();
+    DLL_EXPORT
+    bool allowPrintLowRes();
+    DLL_EXPORT
+    bool allowPrintHighRes();
+    DLL_EXPORT
+    bool allowModifyAssembly();
+    DLL_EXPORT
+    bool allowModifyForm();
+    DLL_EXPORT
+    bool allowModifyAnnotation();
+    DLL_EXPORT
+    bool allowModifyOther();
+    DLL_EXPORT
+    bool allowModifyAll();
+
     // Helper function to trim padding from user password.  Calling
     // trim_user_password on the result of getPaddedUserPassword gives
     // getTrimmedUserPassword's result.

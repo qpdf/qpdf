@@ -165,21 +165,44 @@ void usage(std::string const& msg)
     exit(EXIT_ERROR);
 }
 
+static std::string show_bool(bool v)
+{
+    return v ? "allowed" : "not allowed";
+}
+
 static void show_encryption(QPDF& pdf)
 {
     // Extract /P from /Encrypt
-    if (! pdf.isEncrypted())
+    int R = 0;
+    int P = 0;
+    if (! pdf.isEncrypted(R, P))
     {
 	std::cout << "File is not encrypted" << std::endl;
     }
     else
     {
-	QPDFObjectHandle trailer = pdf.getTrailer();
-	QPDFObjectHandle encrypt = trailer.getKey("/Encrypt");
-	QPDFObjectHandle P = encrypt.getKey("/P");
-	std::cout << "P = " << P.getIntValue() << std::endl;
+	std::cout << "R = " << R << std::endl;
+	std::cout << "P = " << P << std::endl;
 	std::string user_password = pdf.getTrimmedUserPassword();
 	std::cout << "User password = " << user_password << std::endl;
+	std::cout << "extract for accessibility: "
+		  << show_bool(pdf.allowAccessibility()) << std::endl;
+	std::cout << "extract for any purpose: "
+		  << show_bool(pdf.allowExtractAll()) << std::endl;
+	std::cout << "print low resolution: "
+		  << show_bool(pdf.allowPrintLowRes()) << std::endl;
+	std::cout << "print high resolution: "
+		  << show_bool(pdf.allowPrintHighRes()) << std::endl;
+	std::cout << "modify document assembly: "
+		  << show_bool(pdf.allowModifyAssembly()) << std::endl;
+	std::cout << "modify forms: "
+		  << show_bool(pdf.allowModifyForm()) << std::endl;
+	std::cout << "modify annotations: "
+		  << show_bool(pdf.allowModifyAnnotation()) << std::endl;
+	std::cout << "modify other: "
+		  << show_bool(pdf.allowModifyOther()) << std::endl;
+	std::cout << "modify anything: "
+		  << show_bool(pdf.allowModifyAll()) << std::endl;
     }
 }
 

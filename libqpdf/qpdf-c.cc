@@ -186,6 +186,69 @@ QPDF_BOOL qpdf_is_encrypted(qpdf_data qpdf)
 }
 
 DLL_EXPORT
+QPDF_BOOL qpdf_allow_accessibility(qpdf_data qpdf)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_allow_accessibility");
+    return qpdf->qpdf->allowAccessibility();
+}
+
+DLL_EXPORT
+QPDF_BOOL qpdf_allow_extract_all(qpdf_data qpdf)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_allow_extract_all");
+    return qpdf->qpdf->allowExtractAll();
+}
+
+DLL_EXPORT
+QPDF_BOOL qpdf_allow_print_low_res(qpdf_data qpdf)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_allow_print_low_res");
+    return qpdf->qpdf->allowPrintLowRes();
+}
+
+DLL_EXPORT
+QPDF_BOOL qpdf_allow_print_high_res(qpdf_data qpdf)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_allow_print_high_res");
+    return qpdf->qpdf->allowPrintHighRes();
+}
+
+DLL_EXPORT
+QPDF_BOOL qpdf_allow_modify_assembly(qpdf_data qpdf)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_allow_modify_assembly");
+    return qpdf->qpdf->allowModifyAssembly();
+}
+
+DLL_EXPORT
+QPDF_BOOL qpdf_allow_modify_form(qpdf_data qpdf)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_allow_modify_form");
+    return qpdf->qpdf->allowModifyForm();
+}
+
+DLL_EXPORT
+QPDF_BOOL qpdf_allow_modify_annotation(qpdf_data qpdf)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_allow_modify_annotation");
+    return qpdf->qpdf->allowModifyAnnotation();
+}
+
+DLL_EXPORT
+QPDF_BOOL qpdf_allow_modify_other(qpdf_data qpdf)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_allow_modify_other");
+    return qpdf->qpdf->allowModifyOther();
+}
+
+DLL_EXPORT
+QPDF_BOOL qpdf_allow_modify_all(qpdf_data qpdf)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_allow_modify_all");
+    return qpdf->qpdf->allowModifyAll();
+}
+
+DLL_EXPORT
 QPDF_ERROR_CODE qpdf_init_write(qpdf_data qpdf, char const* filename)
 {
     QPDF_ERROR_CODE status = QPDF_SUCCESS;

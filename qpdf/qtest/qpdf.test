@@ -683,33 +683,48 @@ $td->notify("--- Encryption Tests ---");
 # resulting files were saved and manually checked with Acrobat 5.0 to
 # ensure that the security settings were as intended.
 
-# Values: basename, password, encryption flags, /P Encrypt key.
+# Values: basename, password, encryption flags, /P Encrypt key,
+# extract-for-accessibility, extract-for-any-purpose,
+# print-low-res, print-high-res, modify-assembly, modify-forms,
+# modify-annotate, modify-other, modify-all
 my @encrypted_files =
     (['base', ''],
      ['R3,V2', '',
-      '-accessibility=n -extract=n -print=full -modify=all', -532],
+      '-accessibility=n -extract=n -print=full -modify=all', -532,
+      0, 0, 1, 1, 1, 1, 1, 1, 1],
      ['R3,V2,U=view', 'view',
-      '-accessibility=y -extract=n -print=none -modify=none', -3392],
+      '-accessibility=y -extract=n -print=none -modify=none', -3392,
+      1, 0, 0, 0, 0, 0, 0, 0, 0],
      ['R3,V2,O=master', 'master',
-      '-accessibility=n -extract=y -print=none -modify=annotate', -2576],
+      '-accessibility=n -extract=y -print=none -modify=annotate', -2576,
+      0, 1, 0, 0, 1, 1, 1, 0, 0],
      ['R3,V2,O=master', '',
-      '-accessibility=n -extract=n -print=none -modify=form', -2624],
+      '-accessibility=n -extract=n -print=none -modify=form', -2624,
+      0, 0, 0, 0, 1, 1, 0, 0, 0],
      ['R3,V2,U=view,O=master', 'view',
-      '-accessibility=n -extract=n -print=none -modify=assembly', -2880],
+      '-accessibility=n -extract=n -print=none -modify=assembly', -2880,
+      0, 0, 0, 0, 1, 0, 0, 0, 0],
      ['R3,V2,U=view,O=master', 'master',
-      '-accessibility=n -print=low', -2564],
+      '-accessibility=n -print=low', -2564,
+      0, 1, 1, 0, 1, 1, 1, 1, 1],
      ['R2,V1', '',
-      '-print=n -modify=n -extract=n -annotate=n', -64],
+      '-print=n -modify=n -extract=n -annotate=n', -64,
+      0, 0, 0, 0, 0, 0, 0, 0, 0],
      ['R2,V1,U=view', 'view',
-      '-print=y -modify=n -extract=n -annotate=n', -60],
+      '-print=y -modify=n -extract=n -annotate=n', -60,
+      0, 0, 1, 1, 0, 0, 0, 0, 0],
      ['R2,V1,O=master', 'master',
-      '-print=n -modify=y -extract=n -annotate=n', -56],
+      '-print=n -modify=y -extract=n -annotate=n', -56,
+      0, 0, 0, 0, 1, 0, 0, 1, 0],
      ['R2,V1,O=master', '',
-      '-print=n -modify=n -extract=y -annotate=n', -48],
+      '-print=n -modify=n -extract=y -annotate=n', -48,
+      1, 1, 0, 0, 0, 0, 0, 0, 0],
      ['R2,V1,U=view,O=master', 'view',
-      '-print=n -modify=n -extract=n -annotate=y', -32],
+      '-print=n -modify=n -extract=n -annotate=y', -32,
+      0, 0, 0, 0, 0, 1, 1, 0, 0],
      ['R2,V1,U=view,O=master', 'master',
-      '', -4],
+      '', -4,
+      1, 1, 1, 1, 1, 1, 1, 1, 1],
      ['long-password', 'asdf asdf asdf asdf asdf asdf qwer'],
      ['long-password', 'asdf asdf asdf asdf asdf asdf qw']);
 
@@ -732,7 +747,23 @@ $td->runtest("recheck encrypted file",
 
 foreach my $d (@encrypted_files)
 {
-    my ($file, $pass, $xeflags, $P) = @$d;
+    my ($file, $pass, $xeflags, $P,
+	$accessible, $extract, $printlow, $printhigh,
+	$modifyassembly, $modifyform, $modifyannot,
+	$modifyother, $modifyall) = @$d;
+
+    my $f = sub { $_[0] ? "allowed" : "not allowed" };
+    my $enc_details =
+	"extract for accessibility: " . &$f($accessible) . "\n" .
+	"extract for any purpose: " . &$f($extract) . "\n" .
+	"print low resolution: " . &$f($printlow) . "\n" .
+	"print high resolution: " . &$f($printhigh) . "\n" .
+	"modify document assembly: " . &$f($modifyassembly) . "\n" .
+	"modify forms: " . &$f($modifyform) . "\n" .
+	"modify annotations: " . &$f($modifyannot) . "\n" .
+	"modify other: " . &$f($modifyother) . "\n" .
+	"modify anything: " . &$f($modifyall) . "\n";
+
     # Test writing to stdout
     $td->runtest("decrypt $file",
 		 {$td->COMMAND =>
@@ -776,8 +807,9 @@ foreach my $d (@encrypted_files)
 		     {$td->COMMAND =>
 			  "qpdf --show-encryption --password=\"$pass\"" .
 			  " $file.enc2"},
-		     {$td->STRING => "P = $P\nUser password = $upass\n",
-		      $td->EXIT_STATUS => 0},
+		     {$td->STRING => "R = $R\nP = $P\n" .
+			  "User password = $upass\n$enc_details",
+			  $td->EXIT_STATUS => 0},
 		     $td->NORMALIZE_NEWLINES);
 	$td->runtest("decrypt again",
 		     {$td->COMMAND =>
@@ -799,8 +831,9 @@ foreach my $d (@encrypted_files)
 		     {$td->COMMAND =>
 			  "qpdf --show-encryption --password=\"$pass\"" .
 			  " $file.enc4"},
-		     {$td->STRING => "P = $P\nUser password = $upass\n",
-		      $td->EXIT_STATUS => 0},
+		     {$td->STRING => "R = $R\nP = $P\n" .
+			  "User password = $upass\n$enc_details",
+			  $td->EXIT_STATUS => 0},
 		     $td->NORMALIZE_NEWLINES);
     }
 }
@@ -828,8 +861,9 @@ $td->runtest("linearize encrypted file",
 	     {$td->STRING => "",
 	      $td->EXIT_STATUS => 0});
 $td->runtest("check encryption",
-	     {$td->COMMAND => "qpdf --show-encryption a.pdf"},
-	     {$td->STRING => "P = -60\nUser password = \n",
+	     {$td->COMMAND => "qpdf --show-encryption a.pdf",
+	      $td->FILTER => "grep -v allowed"},
+	     {$td->STRING => "R = 2\nP = -60\nUser password = \n",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("check linearization",
@@ -844,8 +878,9 @@ $td->runtest("linearize and encrypt file",
 	     {$td->STRING => "",
 	      $td->EXIT_STATUS => 0});
 $td->runtest("check encryption",
-	     {$td->COMMAND => "qpdf --show-encryption --password=owner a.pdf"},
-	     {$td->STRING => "P = -4\nUser password = user\n",
+	     {$td->COMMAND => "qpdf --show-encryption --password=owner a.pdf",
+	      $td->FILTER => "grep -v allowed"},
+	     {$td->STRING => "R = 3\nP = -4\nUser password = user\n",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("check linearization",

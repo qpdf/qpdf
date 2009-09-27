@@ -29,6 +29,24 @@ static void test01(char const* infile,
     if (qpdf_is_encrypted(qpdf))
     {
 	printf("user password: %s\n", qpdf_get_user_password(qpdf));
+	printf("extract for accessibility: %d\n",
+	       qpdf_allow_accessibility(qpdf));
+	printf("extract for any purpose: %d\n",
+	       qpdf_allow_extract_all(qpdf));
+	printf("print low resolution: %d\n",
+	       qpdf_allow_print_low_res(qpdf));
+	printf("print high resolution: %d\n",
+	       qpdf_allow_print_high_res(qpdf));
+	printf("modify document assembly: %d\n",
+	       qpdf_allow_modify_assembly(qpdf));
+	printf("modify forms: %d\n",
+	       qpdf_allow_modify_form(qpdf));
+	printf("modify annotations: %d\n",
+	       qpdf_allow_modify_annotation(qpdf));
+	printf("modify other: %d\n",
+	       qpdf_allow_modify_other(qpdf));
+	printf("modify anything: %d\n",
+	       qpdf_allow_modify_all(qpdf));
     }
     report_errors();
 }

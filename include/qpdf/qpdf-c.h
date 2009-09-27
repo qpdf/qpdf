@@ -161,6 +161,25 @@ extern "C" {
     DLL_EXPORT
     QPDF_BOOL qpdf_is_encrypted(qpdf_data qpdf);
 
+    DLL_EXPORT
+    QPDF_BOOL qpdf_allow_accessibility(qpdf_data qpdf);
+    DLL_EXPORT
+    QPDF_BOOL qpdf_allow_extract_all(qpdf_data qpdf);
+    DLL_EXPORT
+    QPDF_BOOL qpdf_allow_print_low_res(qpdf_data qpdf);
+    DLL_EXPORT
+    QPDF_BOOL qpdf_allow_print_high_res(qpdf_data qpdf);
+    DLL_EXPORT
+    QPDF_BOOL qpdf_allow_modify_assembly(qpdf_data qpdf);
+    DLL_EXPORT
+    QPDF_BOOL qpdf_allow_modify_form(qpdf_data qpdf);
+    DLL_EXPORT
+    QPDF_BOOL qpdf_allow_modify_annotation(qpdf_data qpdf);
+    DLL_EXPORT
+    QPDF_BOOL qpdf_allow_modify_other(qpdf_data qpdf);
+    DLL_EXPORT
+    QPDF_BOOL qpdf_allow_modify_all(qpdf_data qpdf);
+
     /* WRITE FUNCTIONS */
 
     /* Set up for writing.  No writing is actually performed until the
