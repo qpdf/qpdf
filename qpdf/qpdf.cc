@@ -168,18 +168,17 @@ void usage(std::string const& msg)
 static void show_encryption(QPDF& pdf)
 {
     // Extract /P from /Encrypt
-    QPDFObjectHandle trailer = pdf.getTrailer();
-    QPDFObjectHandle encrypt = trailer.getKey("/Encrypt");
-    if (encrypt.isNull())
+    if (! pdf.isEncrypted())
     {
 	std::cout << "File is not encrypted" << std::endl;
     }
     else
     {
+	QPDFObjectHandle trailer = pdf.getTrailer();
+	QPDFObjectHandle encrypt = trailer.getKey("/Encrypt");
 	QPDFObjectHandle P = encrypt.getKey("/P");
 	std::cout << "P = " << P.getIntValue() << std::endl;
-	std::string user_password = pdf.getUserPassword();
-	QPDF::trim_user_password(user_password);
+	std::string user_password = pdf.getTrimmedUserPassword();
 	std::cout << "User password = " << user_password << std::endl;
     }
 }

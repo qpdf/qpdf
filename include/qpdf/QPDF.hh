@@ -123,6 +123,12 @@ class QPDF
     };
 
     DLL_EXPORT
+    bool isEncrypted() const;
+
+    // Helper function to trim padding from user password.  Calling
+    // trim_user_password on the result of getPaddedUserPassword gives
+    // getTrimmedUserPassword's result.
+    DLL_EXPORT
     static void trim_user_password(std::string& user_password);
     DLL_EXPORT
     static std::string compute_data_key(
@@ -137,8 +143,14 @@ class QPDF
 	int V, int R, int key_len, int P,
 	std::string const& id1,
 	std::string& O, std::string& U);
+    // Return the full user password as stored in the PDF file.  If
+    // you are attempting to recover the user password in a
+    // user-presentable form, call getTrimmedUserPassword() instead.
     DLL_EXPORT
-    std::string const& getUserPassword() const;
+    std::string const& getPaddedUserPassword() const;
+    // Return human-readable form of user password.
+    DLL_EXPORT
+    std::string getTrimmedUserPassword() const;
 
     // Linearization support
 

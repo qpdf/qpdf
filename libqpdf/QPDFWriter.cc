@@ -277,7 +277,7 @@ QPDFWriter::copyEncryptionParameters()
 	    encrypt.getKey("/O").getStringValue(),
 	    encrypt.getKey("/U").getStringValue(),
 	    this->id1,		// this->id1 == the other file's id1
-	    pdf.getUserPassword());
+	    pdf.getPaddedUserPassword());
     }
 }
 

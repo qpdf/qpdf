@@ -443,7 +443,23 @@ QPDF::compute_encryption_O_U(
 
 DLL_EXPORT
 std::string const&
-QPDF::getUserPassword() const
+QPDF::getPaddedUserPassword() const
 {
     return this->user_password;
+}
+
+DLL_EXPORT
+std::string
+QPDF::getTrimmedUserPassword() const
+{
+    std::string result = this->user_password;
+    trim_user_password(result);
+    return result;
+}
+
+DLL_EXPORT
+bool
+QPDF::isEncrypted() const
+{
+    return this->encrypted;
 }

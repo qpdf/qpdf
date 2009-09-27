@@ -43,7 +43,8 @@ SRCS_libqpdf = \
 	libqpdf/QPDF_optimization.cc \
 	libqpdf/QTC.cc \
 	libqpdf/QUtil.cc \
-	libqpdf/RC4.cc
+	libqpdf/RC4.cc \
+	libqpdf/qpdf-c.cc
 
 # -----
 
