@@ -38,8 +38,8 @@ static void test02(char const* infile,
 		   char const* outfile)
 {
     qpdf_set_suppress_warnings(qpdf, QPDF_TRUE);
-    qpdf_read(qpdf, infile, password);
-    if (qpdf_init_write(qpdf, outfile) == QPDF_SUCCESS)
+    if (((qpdf_read(qpdf, infile, password) & QPDF_ERRORS) == 0) &&
+	((qpdf_init_write(qpdf, outfile) & QPDF_ERRORS) == 0))
     {
 	qpdf_set_static_ID(qpdf, QPDF_TRUE);
 	qpdf_write(qpdf);
@@ -132,6 +132,15 @@ static void test09(char const* infile,
     report_errors();
 }
 
+static void test10(char const* infile,
+		   char const* password,
+		   char const* outfile)
+{
+    qpdf_set_attempt_recovery(qpdf, QPDF_FALSE);
+    qpdf_read(qpdf, infile, password);
+    report_errors();
+}
+
 int main(int argc, char* argv[])
 {
     char* whoami = 0;
@@ -174,6 +183,7 @@ int main(int argc, char* argv[])
 	  (n == 7) ? test07 :
 	  (n == 8) ? test08 :
 	  (n == 9) ? test09 :
+	  (n == 10) ? test10 :
 	  0);
 
     if (fn == 0)

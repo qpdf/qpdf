@@ -135,9 +135,10 @@ my @badfiles = ("not a PDF file", 			# 1
 		"invalid stream /Filter",		# 30
 		"unknown stream /Filter",		# 31
 		"obj/gen mismatch",			# 32
+		"invalid stream /Filter and xref",	# 33
 		);
 
-$n_tests += @badfiles;
+$n_tests += @badfiles + 5;
 
 # Test 6 contains errors in the free table consistency, but we no
 # longer have any consistency check for this since it is not important
@@ -156,6 +157,32 @@ for (my $i = 1; $i <= scalar(@badfiles); ++$i)
 		 $td->NORMALIZE_NEWLINES);
 }
 
+$td->runtest("C API: errors",
+	     {$td->COMMAND => "qpdf-ctest 2 bad1.pdf '' a.pdf"},
+	     {$td->FILE => "c-read-errors.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("C API: warnings and errors",
+	     {$td->COMMAND => "qpdf-ctest 2 bad17.pdf '' a.pdf"},
+	     {$td->FILE => "c-read-warnings-and-errors.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("C API: errors writing",
+	     {$td->COMMAND => "qpdf-ctest 2 bad30.pdf '' a.pdf"},
+	     {$td->FILE => "c-write-errors.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("C API: errors and warnings writing",
+	     {$td->COMMAND => "qpdf-ctest 2 bad33.pdf '' a.pdf"},
+	     {$td->FILE => "c-write-warnings-and-errors.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("C API: no recovery",
+	     {$td->COMMAND => "qpdf-ctest 10 bad33.pdf '' a.pdf"},
+	     {$td->FILE => "c-no-recovery.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 show_ntests();
 # ----------
 $td->notify("--- Recovery Tests ---");
@@ -167,7 +194,7 @@ $n_tests += @badfiles + 8;
 # though in some cases it may.  Acrobat Reader would not be able to
 # recover any of these files any better.
 my %recover_failures = ();
-for (1, 7, 13..21, 24..27, 29..30)
+for (1, 7, 13..21, 24..27, 29..30, 33)
 {
     $recover_failures{$_} = 1;
 }
