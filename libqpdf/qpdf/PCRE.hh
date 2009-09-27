@@ -27,7 +27,6 @@ class PCRE
       public:
 	DLL_EXPORT
 	NoBackref();
-	DLL_EXPORT
 	virtual ~NoBackref() throw() {}
     };
 
