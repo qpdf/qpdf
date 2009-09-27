@@ -17,7 +17,7 @@ $(foreach B,$(CBINS_qpdf),$(eval \
   OBJS_$(B) = $(call c_src_to_obj,qpdf/$(B).c)))
 
 ifeq ($(GENDEPS),1)
--include $(foreach B,$(BINS_qpdf),$(call obj_to_dep,$(OBJS_$(B))))
+-include $(foreach B,$(BINS_qpdf) $(CBINS_qpdf),$(call obj_to_dep,$(OBJS_$(B))))
 endif
 
 $(foreach B,$(BINS_qpdf),$(eval \

@@ -1,0 +1,32 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+chdir("linearize") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('linearize');
+
+my $qpdf = $ENV{'QPDF_BIN'} or die;
+
+$td->runtest("linearize",
+	     {$td->COMMAND => "pdf-linearize input.pdf '' a.pdf"},
+	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+
+$td->runtest("check",
+	     {$td->COMMAND => "$qpdf --check a.pdf"},
+	     {$td->FILE => "check.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cleanup();
+
+$td->report(2);
+
+sub cleanup
+{
+    unlink "a.pdf";
+}
