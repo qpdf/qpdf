@@ -41,7 +41,7 @@ class QPDF
     // Prior to calling this, the only methods that are allowed are
     // those that set parameters.
     DLL_EXPORT
-    void processFile(char const* filename, char const* password = "");
+    void processFile(char const* filename, char const* password = 0);
 
     // Parameter settings
 

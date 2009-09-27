@@ -271,7 +271,10 @@ void
 QPDF::processFile(char const* filename, char const* password)
 {
     this->file.setFilename(filename);
-    this->provided_password = password;
+    if (password)
+    {
+	this->provided_password = password;
+    }
     parse();
 }
 
