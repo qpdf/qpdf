@@ -37,17 +37,14 @@ class QPDFTokenizer
     class Token
     {
       public:
-	DLL_EXPORT
 	Token() : type(tt_bad) {}
 
-	DLL_EXPORT
 	Token(token_type_e type, std::string const& value) :
 	    type(type),
 	    value(value)
 	{
 	}
 
-	DLL_EXPORT
 	Token(token_type_e type, std::string const& value,
 	      std::string raw_value, std::string error_message) :
 	    type(type),
@@ -56,27 +53,22 @@ class QPDFTokenizer
 	    error_message(error_message)
 	{
 	}
-	DLL_EXPORT
 	token_type_e getType() const
 	{
 	    return this->type;
 	}
-	DLL_EXPORT
 	std::string const& getValue() const
 	{
 	    return this->value;
 	}
-	DLL_EXPORT
 	std::string const& getRawValue() const
 	{
 	    return this->raw_value;
 	}
-	DLL_EXPORT
 	std::string const& getErrorMessage() const
 	{
 	    return this->error_message;
 	}
-	DLL_EXPORT
 	bool operator==(Token const& rhs)
 	{
 	    // Ignore fields other than type and value

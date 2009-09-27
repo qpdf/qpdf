@@ -100,7 +100,6 @@ class QPDF
     struct EncryptionData
     {
 	// This class holds data read from the encryption dictionary.
-	DLL_EXPORT
 	EncryptionData(int V, int R, int Length_bytes, int P,
 		       std::string const& O, std::string const& U,
 		       std::string const& id1) :
