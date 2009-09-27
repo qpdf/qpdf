@@ -15,7 +15,6 @@
 class QPDFObject
 {
   public:
-    DLL_EXPORT
     virtual ~QPDFObject() {}
     DLL_EXPORT
     virtual std::string unparse() = 0;
