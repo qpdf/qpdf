@@ -851,6 +851,31 @@ $td->runtest("invalid password",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
+my @cenc = (
+    [11, 'hybrid-xref.pdf', "''", 'r2', ""],
+    [12, 'hybrid-xref.pdf', "''", 'r3', ""],
+    [13, 'c-r2.pdf', 'user1', 'decrypt with user',
+     "user password: user1\n"],
+    [13, 'c-r3.pdf', 'owner2', 'decrypt with owner',
+     "user password: user2\n"],
+    );
+$n_tests += 2 * @cenc;
+
+foreach my $d (@cenc)
+{
+    my ($n, $infile, $pass, $description, $output) = @$d;
+    my $outfile = $description;
+    $outfile =~ s/ /-/g;
+    my $outfile = "c-$outfile.pdf";
+    $td->runtest("C API encryption: $description",
+		 {$td->COMMAND => "qpdf-ctest $n $infile $pass a.pdf"},
+		 {$td->STRING => $output, $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+    $td->runtest("check $description",
+		 {$td->FILE => "a.pdf"},
+		 {$td->FILE => $outfile});
+}
+
 # Test combinations of linearization and encryption.  Note that we do
 # content checks on encrypted and linearized files in various
 # combinations below.  Here we are just making sure that they are

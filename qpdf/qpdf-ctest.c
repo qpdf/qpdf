@@ -159,6 +159,46 @@ static void test10(char const* infile,
     report_errors();
 }
 
+static void test11(char const* infile,
+		   char const* password,
+		   char const* outfile)
+{
+    qpdf_read(qpdf, infile, password);
+    qpdf_init_write(qpdf, outfile);
+    qpdf_set_static_ID(qpdf, QPDF_TRUE);
+    qpdf_set_r2_encryption_parameters(
+	qpdf, "user1", "owner1", QPDF_FALSE, QPDF_TRUE, QPDF_TRUE, QPDF_TRUE);
+    qpdf_write(qpdf);
+    report_errors();
+}
+
+static void test12(char const* infile,
+		   char const* password,
+		   char const* outfile)
+{
+    qpdf_read(qpdf, infile, password);
+    qpdf_init_write(qpdf, outfile);
+    qpdf_set_static_ID(qpdf, QPDF_TRUE);
+    qpdf_set_r3_encryption_parameters(
+	qpdf, "user2", "owner2", QPDF_TRUE, QPDF_TRUE,
+	QPDF_R3_PRINT_LOW, QPDF_R3_MODIFY_ALL);
+    qpdf_write(qpdf);
+    report_errors();
+}
+
+static void test13(char const* infile,
+		   char const* password,
+		   char const* outfile)
+{
+    qpdf_read(qpdf, infile, password);
+    printf("user password: %s\n", qpdf_get_user_password(qpdf));
+    qpdf_init_write(qpdf, outfile);
+    qpdf_set_static_ID(qpdf, QPDF_TRUE);
+    qpdf_set_preserve_encryption(qpdf, QPDF_FALSE);
+    qpdf_write(qpdf);
+    report_errors();
+}
+
 int main(int argc, char* argv[])
 {
     char* whoami = 0;
@@ -202,6 +242,9 @@ int main(int argc, char* argv[])
 	  (n == 8) ? test08 :
 	  (n == 9) ? test09 :
 	  (n == 10) ? test10 :
+	  (n == 11) ? test11 :
+	  (n == 12) ? test12 :
+	  (n == 13) ? test13 :
 	  0);
 
     if (fn == 0)

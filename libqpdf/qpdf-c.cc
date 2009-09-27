@@ -376,10 +376,10 @@ void qpdf_set_r3_encryption_parameters(
 	((print == QPDF_R3_PRINT_LOW) ? QPDFWriter::r3p_low :
 	 (print == QPDF_R3_PRINT_NONE) ? QPDFWriter::r3p_none :
 	 QPDFWriter::r3p_full),
-	((print == QPDF_R3_MODIFY_ANNOTATE) ? QPDFWriter::r3m_annotate :
-	 (print == QPDF_R3_MODIFY_FORM) ? QPDFWriter::r3m_form :
-	 (print == QPDF_R3_MODIFY_ASSEMBLY) ? QPDFWriter::r3m_assembly :
-	 (print == QPDF_R3_MODIFY_NONE) ? QPDFWriter::r3m_none :
+	((modify == QPDF_R3_MODIFY_ANNOTATE) ? QPDFWriter::r3m_annotate :
+	 (modify == QPDF_R3_MODIFY_FORM) ? QPDFWriter::r3m_form :
+	 (modify == QPDF_R3_MODIFY_ASSEMBLY) ? QPDFWriter::r3m_assembly :
+	 (modify == QPDF_R3_MODIFY_NONE) ? QPDFWriter::r3m_none :
 	 QPDFWriter::r3m_all));
 }
 
