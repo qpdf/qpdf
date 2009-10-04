@@ -1,3 +1,9 @@
+2009-10-04  Jay Berkenbilt  <ejb@ql.org>
+
+	* libqpdf/QPDF.cc (processXRefStream): warn and ignore extra xref
+	stream entries when stream is larger than reported size.  This
+	used to be a fatal error.  (Fixes qpdf-Bugs-2872265.)
+
 2009-09-27  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add several methods to query permissions controlled by the

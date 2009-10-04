@@ -787,10 +787,18 @@ QPDF::processXRefStream(off_t xref_offset, QPDFObjectHandle& xref_obj)
 
     if (expected_size != actual_size)
     {
-	throw QPDFExc(this->file.getName(), xref_offset,
-		      "Cross-reference stream data has the wrong size;"
-		      " expected = " + QUtil::int_to_string(expected_size) +
-		      "; actual = " + QUtil::int_to_string(actual_size));
+	QPDFExc x(this->file.getName(), xref_offset,
+		  "Cross-reference stream data has the wrong size;"
+		  " expected = " + QUtil::int_to_string(expected_size) +
+		  "; actual = " + QUtil::int_to_string(actual_size));
+	if (expected_size > actual_size)
+	{
+	    throw x;
+	}
+	else
+	{
+	    warn(x);
+	}
     }
 
     int cur_chunk = 0;

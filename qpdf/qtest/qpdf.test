@@ -81,7 +81,7 @@ flush_tiff_cache();
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 4;
+$n_tests += 7;
 
 foreach (my $i = 1; $i <= 3; ++$i)
 {
@@ -95,6 +95,23 @@ foreach (my $i = 1; $i <= 3; ++$i)
 $td->runtest("unknown decode parameters",
 	     {$td->COMMAND => "qpdf --check fax-decode-parms.pdf"},
 	     {$td->FILE => "fax-decode-parms.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+# Handle xref stream with more entries than reported (bug 2872265)
+$td->runtest("xref with short size",
+	     {$td->COMMAND => "qpdf --show-xref xref-with-short-size.pdf"},
+	     {$td->FILE => "xref-with-short-size.out",
+	      $td->EXIT_STATUS => 3},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("recover xref with short size",
+	     {$td->COMMAND => "qpdf xref-with-short-size.pdf a.pdf"},
+	     {$td->FILE => "xref-with-short-size-recover.out",
+	      $td->EXIT_STATUS => 3},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("show new xref stream",
+	     {$td->COMMAND => "qpdf --show-xref a.pdf"},
+	     {$td->FILE => "xref-with-short-size-new.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 

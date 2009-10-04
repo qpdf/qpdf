@@ -1,0 +1,13 @@
+1/0: uncompressed; offset = 15
+2/0: compressed; stream = 1, index = 0
+3/0: compressed; stream = 1, index = 1
+4/0: compressed; stream = 1, index = 2
+5/0: compressed; stream = 1, index = 3
+6/0: compressed; stream = 1, index = 4
+7/0: compressed; stream = 1, index = 5
+8/0: compressed; stream = 1, index = 6
+9/0: compressed; stream = 1, index = 7
+10/0: compressed; stream = 1, index = 8
+11/0: uncompressed; offset = 674
+12/0: uncompressed; offset = 801
+13/0: uncompressed; offset = 16194
