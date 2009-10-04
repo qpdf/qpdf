@@ -1,5 +1,21 @@
+Now
+===
+
+ * Add functions to set minimum version and to force pdf version
+
+ * Make multiple calls to init_write safe; document that write
+   parameter settings must be repeated
+
+ * qpdf_is_encrypted returns false for encrypted file when incorrect
+   password is given
+
+
 2.1
 ===
+
+ * "Delphi wrapper unit 'qpdf.pas' created by Zarko Gajic
+   (http://delphi.about.com). .. use at your own risk and for whatever
+   the purpose you want .. no support provided. Sample code provided."
 
  * Add ability to create new streams or replace stream data.  Consider
    stream data sources to include a file and offset, a buffer, or a
