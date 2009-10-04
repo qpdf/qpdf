@@ -35,7 +35,7 @@ class QPDF
 
     // Associate a file with a QPDF object and do initial parsing of
     // the file.  PDF objects are not read until they are needed.  A
-    // QPDF object may be associated with only on file in its
+    // QPDF object may be associated with only one file in its
     // lifetime.  This method must be called before any methods that
     // potentially ask for information about the PDF file are called.
     // Prior to calling this, the only methods that are allowed are
