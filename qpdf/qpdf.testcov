@@ -153,3 +153,8 @@ qpdf-c called qpdf_allow_modify_form 0
 qpdf-c called qpdf_allow_modify_annotation 0
 qpdf-c called qpdf_allow_modify_other 0
 qpdf-c called qpdf_allow_modify_all 0
+QPDFWriter increasing minimum version 0
+QPDFWriter using forced PDF version 0
+qpdf-c called qpdf_set_minimum_pdf_version 0
+qpdf-c called qpdf_force_pdf_version 0
+qpdf-c called qpdf_init_write multiple times 0

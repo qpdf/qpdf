@@ -252,6 +252,12 @@ DLL_EXPORT
 QPDF_ERROR_CODE qpdf_init_write(qpdf_data qpdf, char const* filename)
 {
     QPDF_ERROR_CODE status = QPDF_SUCCESS;
+    if (qpdf->qpdf_writer)
+    {
+	QTC::TC("qpdf", "qpdf-c called qpdf_init_write multiple times");
+	delete qpdf->qpdf_writer;
+	qpdf->qpdf_writer = 0;
+    }
     try
     {
 	qpdf->qpdf_writer = new QPDFWriter(*(qpdf->qpdf), filename);
@@ -388,6 +394,20 @@ void qpdf_set_linearization(qpdf_data qpdf, QPDF_BOOL value)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_set_linearization");
     qpdf->qpdf_writer->setLinearization(value);
+}
+
+DLL_EXPORT
+void qpdf_set_minimum_pdf_version(qpdf_data qpdf, char const* version)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_set_minimum_pdf_version");
+    qpdf->qpdf_writer->setMinimumPDFVersion(version);
+}
+
+DLL_EXPORT
+void qpdf_force_pdf_version(qpdf_data qpdf, char const* version)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_force_pdf_version");
+    qpdf->qpdf_writer->forcePDFVersion(version);
 }
 
 DLL_EXPORT

@@ -20,7 +20,8 @@ static void report_errors()
 
 static void test01(char const* infile,
 		   char const* password,
-		   char const* outfile)
+		   char const* outfile,
+		   char const* outfile2)
 {
     qpdf_read(qpdf, infile, password);
     printf("version: %s\n", qpdf_get_pdf_version(qpdf));
@@ -53,7 +54,8 @@ static void test01(char const* infile,
 
 static void test02(char const* infile,
 		   char const* password,
-		   char const* outfile)
+		   char const* outfile,
+		   char const* outfile2)
 {
     qpdf_set_suppress_warnings(qpdf, QPDF_TRUE);
     if (((qpdf_read(qpdf, infile, password) & QPDF_ERRORS) == 0) &&
@@ -67,7 +69,8 @@ static void test02(char const* infile,
 
 static void test03(char const* infile,
 		   char const* password,
-		   char const* outfile)
+		   char const* outfile,
+		   char const* outfile2)
 {
     qpdf_read(qpdf, infile, password);
     qpdf_init_write(qpdf, outfile);
@@ -79,7 +82,8 @@ static void test03(char const* infile,
 
 static void test04(char const* infile,
 		   char const* password,
-		   char const* outfile)
+		   char const* outfile,
+		   char const* outfile2)
 {
     qpdf_set_ignore_xref_streams(qpdf, QPDF_TRUE);
     qpdf_read(qpdf, infile, password);
@@ -91,7 +95,8 @@ static void test04(char const* infile,
 
 static void test05(char const* infile,
 		   char const* password,
-		   char const* outfile)
+		   char const* outfile,
+		   char const* outfile2)
 {
     qpdf_read(qpdf, infile, password);
     qpdf_init_write(qpdf, outfile);
@@ -103,7 +108,8 @@ static void test05(char const* infile,
 
 static void test06(char const* infile,
 		   char const* password,
-		   char const* outfile)
+		   char const* outfile,
+		   char const* outfile2)
 {
     qpdf_read(qpdf, infile, password);
     qpdf_init_write(qpdf, outfile);
@@ -115,7 +121,8 @@ static void test06(char const* infile,
 
 static void test07(char const* infile,
 		   char const* password,
-		   char const* outfile)
+		   char const* outfile,
+		   char const* outfile2)
 {
     qpdf_read(qpdf, infile, password);
     qpdf_init_write(qpdf, outfile);
@@ -127,7 +134,8 @@ static void test07(char const* infile,
 
 static void test08(char const* infile,
 		   char const* password,
-		   char const* outfile)
+		   char const* outfile,
+		   char const* outfile2)
 {
     qpdf_read(qpdf, infile, password);
     qpdf_init_write(qpdf, outfile);
@@ -140,7 +148,8 @@ static void test08(char const* infile,
 
 static void test09(char const* infile,
 		   char const* password,
-		   char const* outfile)
+		   char const* outfile,
+		   char const* outfile2)
 {
     qpdf_read(qpdf, infile, password);
     qpdf_init_write(qpdf, outfile);
@@ -152,7 +161,8 @@ static void test09(char const* infile,
 
 static void test10(char const* infile,
 		   char const* password,
-		   char const* outfile)
+		   char const* outfile,
+		   char const* outfile2)
 {
     qpdf_set_attempt_recovery(qpdf, QPDF_FALSE);
     qpdf_read(qpdf, infile, password);
@@ -161,7 +171,8 @@ static void test10(char const* infile,
 
 static void test11(char const* infile,
 		   char const* password,
-		   char const* outfile)
+		   char const* outfile,
+		   char const* outfile2)
 {
     qpdf_read(qpdf, infile, password);
     qpdf_init_write(qpdf, outfile);
@@ -174,7 +185,8 @@ static void test11(char const* infile,
 
 static void test12(char const* infile,
 		   char const* password,
-		   char const* outfile)
+		   char const* outfile,
+		   char const* outfile2)
 {
     qpdf_read(qpdf, infile, password);
     qpdf_init_write(qpdf, outfile);
@@ -188,7 +200,8 @@ static void test12(char const* infile,
 
 static void test13(char const* infile,
 		   char const* password,
-		   char const* outfile)
+		   char const* outfile,
+		   char const* outfile2)
 {
     qpdf_read(qpdf, infile, password);
     printf("user password: %s\n", qpdf_get_user_password(qpdf));
@@ -199,15 +212,33 @@ static void test13(char const* infile,
     report_errors();
 }
 
+static void test14(char const* infile,
+		   char const* password,
+		   char const* outfile,
+		   char const* outfile2)
+{
+    qpdf_read(qpdf, infile, password);
+    qpdf_init_write(qpdf, outfile);
+    qpdf_set_static_ID(qpdf, QPDF_TRUE);
+    qpdf_set_minimum_pdf_version(qpdf, "1.6");
+    qpdf_write(qpdf);
+    qpdf_init_write(qpdf, outfile2);
+    qpdf_set_static_ID(qpdf, QPDF_TRUE);
+    qpdf_force_pdf_version(qpdf, "1.4");
+    qpdf_write(qpdf);
+    report_errors();
+}
+
 int main(int argc, char* argv[])
 {
     char* whoami = 0;
     char* p = 0;
     int n = 0;
-    char const* infile;
-    char const* password;
-    char const* outfile;
-    void (*fn)(char const*, char const*, char const*) = 0;
+    char const* infile = 0;
+    char const* password = 0;
+    char const* outfile = 0;
+    char const* outfile2 = 0;
+    void (*fn)(char const*, char const*, char const*, char const*) = 0;
 
     if ((p = strrchr(argv[0], '/')) != NULL)
     {
@@ -221,7 +252,7 @@ int main(int argc, char* argv[])
     {
 	whoami = argv[0];
     }
-    if (argc != 5)
+    if (argc < 5)
     {
 	fprintf(stderr, "usage: %s n infile password outfile\n", whoami);
 	exit(2);
@@ -231,6 +262,7 @@ int main(int argc, char* argv[])
     infile = argv[2];
     password = argv[3];
     outfile = argv[4];
+    outfile2 = (argc > 5 ? argv[5] : 0);
 
     fn = ((n == 1) ? test01 :
 	  (n == 2) ? test02 :
@@ -245,6 +277,7 @@ int main(int argc, char* argv[])
 	  (n == 11) ? test11 :
 	  (n == 12) ? test12 :
 	  (n == 13) ? test13 :
+	  (n == 14) ? test14 :
 	  0);
 
     if (fn == 0)
@@ -254,7 +287,7 @@ int main(int argc, char* argv[])
     }
 
     qpdf = qpdf_init();
-    fn(infile, password, outfile);
+    fn(infile, password, outfile, outfile2);
     qpdf_cleanup(&qpdf);
     assert(qpdf == 0);
 

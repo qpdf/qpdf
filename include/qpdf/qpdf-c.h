@@ -189,7 +189,12 @@ extern "C" {
     /* Supply the name of the file to be written and initialize the
      * qpdf_data object to handle writing operations.  This function
      * also attempts to create the file.  The PDF data is not written
-     * until the call to qpdf_write.
+     * until the call to qpdf_write.  qpdf_init_write may be called
+     * multiple times for the same qpdf_data object.  When
+     * qpdf_init_write is called, all information from previous calls
+     * to functions that set write parameters (qpdf_set_linearization,
+     * etc.) is lost, so any write parameter functions must be called
+     * again.
      */
     DLL_EXPORT
     QPDF_ERROR_CODE qpdf_init_write(qpdf_data qpdf, char const* filename);
@@ -255,6 +260,12 @@ extern "C" {
 
     DLL_EXPORT
     void qpdf_set_linearization(qpdf_data qpdf, QPDF_BOOL value);
+
+    DLL_EXPORT
+    void qpdf_set_minimum_pdf_version(qpdf_data qpdf, char const* version);
+
+    DLL_EXPORT
+    void qpdf_force_pdf_version(qpdf_data qpdf, char const* version);
 
     /* Do actual write operation. */
     DLL_EXPORT

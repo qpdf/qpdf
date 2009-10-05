@@ -81,7 +81,7 @@ flush_tiff_cache();
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 7;
+$n_tests += 14;
 
 foreach (my $i = 1; $i <= 3; ++$i)
 {
@@ -112,6 +112,44 @@ $td->runtest("recover xref with short size",
 $td->runtest("show new xref stream",
 	     {$td->COMMAND => "qpdf --show-xref a.pdf"},
 	     {$td->FILE => "xref-with-short-size-new.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+# Min/Force version
+$td->runtest("set min version",
+	     {$td->COMMAND => "qpdf --min-version=1.6 good1.pdf a.pdf"},
+	     {$td->STRING => "",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check version",
+	     {$td->COMMAND => "qpdf --check a.pdf"},
+	     {$td->FILE => "min-version.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("force version",
+	     {$td->COMMAND => "qpdf --force-version=1.4 a.pdf b.pdf"},
+	     {$td->STRING => "",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check version",
+	     {$td->COMMAND => "qpdf --check b.pdf"},
+	     {$td->FILE => "forced-version.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+unlink "a.pdf", "b.pdf" or die;
+$td->runtest("C API: min/force versions",
+	     {$td->COMMAND => "qpdf-ctest 14 object-stream.pdf '' a.pdf b.pdf"},
+	     {$td->STRING => "",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("C check version 1",
+	     {$td->COMMAND => "qpdf --check a.pdf"},
+	     {$td->FILE => "min-version.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("C check version 2",
+	     {$td->COMMAND => "qpdf --check b.pdf"},
+	     {$td->FILE => "forced-version.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -883,7 +921,7 @@ foreach my $d (@cenc)
     my ($n, $infile, $pass, $description, $output) = @$d;
     my $outfile = $description;
     $outfile =~ s/ /-/g;
-    my $outfile = "c-$outfile.pdf";
+    $outfile = "c-$outfile.pdf";
     $td->runtest("C API encryption: $description",
 		 {$td->COMMAND => "qpdf-ctest $n $infile $pass a.pdf"},
 		 {$td->STRING => $output, $td->EXIT_STATUS => 0},

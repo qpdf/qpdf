@@ -103,6 +103,8 @@ familiar with the PDF file format or who are PDF developers.\n\
 --object-streams=mode     controls handing of object streams\n\
 --ignore-xref-streams     tells qpdf to ignore any cross-reference streams\n\
 --qdf                     turns on \"QDF mode\" (below)\n\
+--min-version=version     sets the minimum PDF version of the output file\n\
+--force-version=version   forces this to be the PDF version of the output file\n\
 \n\
 Values for stream data options:\n\
 \n\
@@ -119,6 +121,12 @@ Values for object stream mode:\n\
 In qdf mode, by default, content normalization is turned on, and the\n\
 stream data mode is set to uncompress.\n\
 \n\
+Setting the minimum PDF version of the output file may raise the version\n\
+but will never lower it.  Forcing the PDF version of the output file may\n\
+set the PDF version to a lower value than actually allowed by the file's\n\
+contents.  You should only do this if you have no other possible way to\n\
+open the file or if you know that the file definitely doesn't include\n\
+features not supported later versions.\n\
 \n\
 Testing, Inspection, and Debugging Options\n\
 ------------------------------------------\n\
@@ -518,6 +526,8 @@ int main(int argc, char* argv[])
     QPDFWriter::object_stream_e object_stream_mode = QPDFWriter::o_preserve;
     bool ignore_xref_streams = false;
     bool qdf_mode = false;
+    std::string min_version;
+    std::string force_version;
 
     bool static_id = false;
     bool suppress_original_object_id = false;
@@ -650,6 +660,24 @@ int main(int argc, char* argv[])
 	    else if (strcmp(arg, "qdf") == 0)
 	    {
 		qdf_mode = true;
+	    }
+	    else if (strcmp(arg, "min-version") == 0)
+	    {
+		if (parameter == 0)
+		{
+		    usage("--min-version be given as"
+			  "--min-version=version");
+		}
+		min_version = parameter;
+	    }
+	    else if (strcmp(arg, "force-version") == 0)
+	    {
+		if (parameter == 0)
+		{
+		    usage("--force-version be given as"
+			  "--force-version=version");
+		}
+		force_version = parameter;
 	    }
 	    else if (strcmp(arg, "static-id") == 0)
 	    {
@@ -976,6 +1004,14 @@ int main(int argc, char* argv[])
 	    if (object_stream_set)
 	    {
 		w.setObjectStreamMode(object_stream_mode);
+	    }
+	    if (! min_version.empty())
+	    {
+		w.setMinimumPDFVersion(min_version);
+	    }
+	    if (! force_version.empty())
+	    {
+		w.forcePDFVersion(force_version);
 	    }
 	    w.write();
 	}

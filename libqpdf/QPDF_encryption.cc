@@ -289,6 +289,11 @@ QPDF::initializeEncryption()
 	return;
     }
 
+    // Go ahead and set this->encryption here.  That way, isEncrypted
+    // will return true even if there were errors reading the
+    // encryption dictionary.
+    this->encrypted = true;
+
     QPDFObjectHandle id_obj = this->trailer.getKey("/ID");
     if (! (id_obj.isArray() &&
 	   (id_obj.getArrayNItems() == 2) &&
@@ -377,7 +382,6 @@ QPDF::initializeEncryption()
 	throw QPDFExc(this->file.getName() + ": invalid password");
     }
 
-    this->encrypted = true;
     this->encryption_key = compute_encryption_key(this->user_password, data);
 }
 

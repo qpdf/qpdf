@@ -1,15 +1,3 @@
-Now
-===
-
- * Add functions to set minimum version and to force pdf version
-
- * Make multiple calls to init_write safe; document that write
-   parameter settings must be repeated
-
- * qpdf_is_encrypted returns false for encrypted file when incorrect
-   password is given
-
-
 2.1
 ===
 

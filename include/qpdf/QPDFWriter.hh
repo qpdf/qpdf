@@ -34,7 +34,13 @@ class Pl_Count;
 class QPDFWriter
 {
   public:
-    // Passing null as filename means write to stdout
+    // Passing null as filename means write to stdout.  QPDFWriter
+    // will create a zero-length output file upon construction.  If
+    // write fails, the empty or partially written file will not be
+    // deleted.  This is by design: sometimes the partial file may be
+    // useful for tracking down problems.  If your application doesn't
+    // want the partially written file to be left behind, you should
+    // delete it the eventual call to write fails.
     DLL_EXPORT
     QPDFWriter(QPDF& pdf, char const* filename);
     DLL_EXPORT
@@ -77,6 +83,30 @@ class QPDFWriter
     // lengths.
     DLL_EXPORT
     void setQDFMode(bool);
+
+    // Set the minimum PDF version.  If the PDF version of the input
+    // file (or previously set minimum version) is less than the
+    // version passed to this method, the PDF version of the output
+    // file will be set to this value.  If the original PDF file's
+    // version or previously set minimum version is already this
+    // version or later, the original file's version will be used.
+    // QPDFWriter automatically sets the minimum version to 1.4 when
+    // R3 encryption parameters are used, and to 1.5 when object
+    // streams are used.
+    DLL_EXPORT
+    void setMinimumPDFVersion(std::string const&);
+
+    // Force the PDF version of the output file to be a given version.
+    // Use of this function may create PDF files that will not work
+    // properly with older PDF viewers.  When a PDF version is set
+    // using this function, qpdf will use this version even if the
+    // file contains features that are not supported in that version
+    // of PDF.  In other words, you should only use this function if
+    // you are sure the PDF file in question has no features of newer
+    // versions of PDF or if you are willing to create files that old
+    // viewers may try to open but not be able to properly interpret.
+    DLL_EXPORT
+    void forcePDFVersion(std::string const&);
 
     // Cause a static /ID value to be generated.  Use only in test
     // suites.
@@ -241,6 +271,7 @@ class QPDFWriter
     std::string id1;		// for /ID key of
     std::string id2;		// trailer dictionary
     std::string min_pdf_version;
+    std::string forced_pdf_version;
     int encryption_dict_objid;
     std::string cur_data_key;
     std::list<PointerHolder<Pipeline> > to_delete;

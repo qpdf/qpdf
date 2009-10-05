@@ -100,6 +100,37 @@ QPDFWriter::setQDFMode(bool val)
 }
 
 void
+QPDFWriter::setMinimumPDFVersion(std::string const& version)
+{
+    bool set_version = false;
+    if (this->min_pdf_version.empty())
+    {
+	set_version = true;
+    }
+    else
+    {
+	float v = atof(version.c_str());
+	float mv = atof(this->min_pdf_version.c_str());
+	if (v > mv)
+	{
+	    QTC::TC("qpdf", "QPDFWriter increasing minimum version");
+	    set_version = true;
+	}
+    }
+
+    if (set_version)
+    {
+	this->min_pdf_version = version;
+    }
+}
+
+void
+QPDFWriter::forcePDFVersion(std::string const& version)
+{
+    this->forced_pdf_version = version;
+}
+
+void
 QPDFWriter::setStaticID(bool val)
 {
     this->static_id = val;
@@ -147,7 +178,7 @@ QPDFWriter::setR2EncryptionParameters(
 	clear.insert(6);
     }
 
-    this->min_pdf_version = "1.3";
+    setMinimumPDFVersion("1.3");
     setEncryptionParameters(user_password, owner_password, 1, 2, 5, clear);
 }
 
@@ -221,7 +252,7 @@ QPDFWriter::setR3EncryptionParameters(
 	// no default so gcc warns for missing cases
     }
 
-    this->min_pdf_version = "1.4";
+    setMinimumPDFVersion("1.4");
     setEncryptionParameters(user_password, owner_password, 2, 3, 16, clear);
 }
 
@@ -1361,7 +1392,7 @@ QPDFWriter::write()
 
     if (! this->object_stream_to_objects.empty())
     {
-	this->min_pdf_version = "1.5";
+	setMinimumPDFVersion("1.5");
     }
 
     generateID();
@@ -1417,15 +1448,12 @@ QPDFWriter::writeEncryptionDictionary()
 void
 QPDFWriter::writeHeader()
 {
-    std::string version = pdf.getPDFVersion();
-    if (! this->min_pdf_version.empty())
+    setMinimumPDFVersion(pdf.getPDFVersion());
+    std::string version = this->min_pdf_version;
+    if (! this->forced_pdf_version.empty())
     {
-	float ov = atof(version.c_str());
-	float mv = atof(this->min_pdf_version.c_str());
-	if (mv > ov)
-	{
-	    version = this->min_pdf_version;
-	}
+	QTC::TC("qpdf", "QPDFWriter using forced PDF version");
+	version = this->forced_pdf_version;
     }
 
     writeString("%PDF-");
