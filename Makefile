@@ -63,6 +63,9 @@ $(foreach B,$(BUILD_ITEMS),$(eval \
 %.mk: ;
 make/%.mk: ;
 
+#XXX
+##BUILDRULES := libtool
+BUILDRULES := gcc
 include make/rules.mk
 
 DUMMY := $(shell mkdir $(foreach B,$(BUILD_ITEMS),$(B)/$(OUTPUT_DIR)) 2>/dev/null)

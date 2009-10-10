@@ -1,5 +1,5 @@
 TARGETS_libqpdf = \
-	libqpdf/$(OUTPUT_DIR)/libqpdf.la
+	$(foreach L,$(call libname,qpdf),libqpdf/$(OUTPUT_DIR)/$(L))
 
 INCLUDES_libqpdf = include libqpdf
 
@@ -54,7 +54,7 @@ ifeq ($(GENDEPS),1)
 -include $(call lobj_to_dep,$(OBJS_libqpdf))
 endif
 
-$(OBJS_libqpdf): libqpdf/$(OUTPUT_DIR)/%.lo: libqpdf/%.cc
+$(OBJS_libqpdf): libqpdf/$(OUTPUT_DIR)/%.$(LOBJ): libqpdf/%.cc
 	$(call libcompile,$<,$(INCLUDES_libqpdf))
 
 # Last three arguments to makelib are CURRENT,REVISION,AGE.
@@ -68,6 +68,5 @@ $(OBJS_libqpdf): libqpdf/$(OUTPUT_DIR)/%.lo: libqpdf/%.cc
 #
 # * Otherwise, increment REVISION
 
-libqpdf/$(OUTPUT_DIR)/libqpdf.la: $(OBJS_libqpdf)
+$(TARGETS_libqpdf): $(OBJS_libqpdf)
 	$(call makelib,$(OBJS_libqpdf),$@,3,0,0)
-

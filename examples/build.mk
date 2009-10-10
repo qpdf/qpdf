@@ -1,7 +1,7 @@
 BINS_examples = pdf-bookmarks pdf-mod-info pdf-npages
 CBINS_examples = pdf-linearize
 
-TARGETS_examples = $(foreach B,$(BINS_examples) $(CBINS_examples),examples/$(OUTPUT_DIR)/$(B))
+TARGETS_examples = $(foreach B,$(BINS_examples) $(CBINS_examples),examples/$(OUTPUT_DIR)/$(call binname,$(B)))
 
 $(TARGETS_examples): $(TARGETS_qpdf)
 
@@ -22,13 +22,13 @@ ifeq ($(GENDEPS),1)
 endif
 
 $(foreach B,$(BINS_examples),$(eval \
-  $(OBJS_$(B)): examples/$(OUTPUT_DIR)/%.o: examples/$(B).cc ; \
+  $(OBJS_$(B)): examples/$(OUTPUT_DIR)/%.$(OBJ): examples/$(B).cc ; \
 	$(call compile,examples/$(B).cc,$(INCLUDES_examples))))
 
 $(foreach B,$(CBINS_examples),$(eval \
-  $(OBJS_$(B)): examples/$(OUTPUT_DIR)/%.o: examples/$(B).c ; \
+  $(OBJS_$(B)): examples/$(OUTPUT_DIR)/%.$(OBJ): examples/$(B).c ; \
 	$(call c_compile,examples/$(B).c,$(INCLUDES_examples))))
 
 $(foreach B,$(BINS_examples) $(CBINS_examples),$(eval \
-  examples/$(OUTPUT_DIR)/$(B): $(OBJS_$(B)) ; \
+  examples/$(OUTPUT_DIR)/$(call binname,$(B)): $(OBJS_$(B)) ; \
 	$(call makebin,$(OBJS_$(B)),$$@)))

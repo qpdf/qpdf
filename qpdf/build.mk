@@ -1,7 +1,7 @@
 BINS_qpdf = qpdf test_driver
 CBINS_qpdf = qpdf-ctest
 
-TARGETS_qpdf = $(foreach B,$(BINS_qpdf) $(CBINS_qpdf),qpdf/$(OUTPUT_DIR)/$(B))
+TARGETS_qpdf = $(foreach B,$(BINS_qpdf) $(CBINS_qpdf),qpdf/$(OUTPUT_DIR)/$(call binname,$(B)))
 
 $(TARGETS_qpdf): $(TARGETS_libqpdf)
 
@@ -21,13 +21,13 @@ ifeq ($(GENDEPS),1)
 endif
 
 $(foreach B,$(BINS_qpdf),$(eval \
-  $(OBJS_$(B)): qpdf/$(OUTPUT_DIR)/%.o: qpdf/$(B).cc ; \
+  $(OBJS_$(B)): qpdf/$(OUTPUT_DIR)/%.$(OBJ): qpdf/$(B).cc ; \
 	$(call compile,qpdf/$(B).cc,$(INCLUDES_qpdf))))
 
 $(foreach B,$(CBINS_qpdf),$(eval \
-  $(OBJS_$(B)): qpdf/$(OUTPUT_DIR)/%.o: qpdf/$(B).c ; \
+  $(OBJS_$(B)): qpdf/$(OUTPUT_DIR)/%.$(OBJ): qpdf/$(B).c ; \
 	$(call c_compile,qpdf/$(B).c,$(INCLUDES_qpdf))))
 
 $(foreach B,$(BINS_qpdf) $(CBINS_qpdf),$(eval \
-  qpdf/$(OUTPUT_DIR)/$(B): $(OBJS_$(B)) ; \
+  qpdf/$(OUTPUT_DIR)/$(call binname,$(B)): $(OBJS_$(B)) ; \
 	$(call makebin,$(OBJS_$(B)),$$@)))

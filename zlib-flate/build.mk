@@ -1,5 +1,5 @@
 TARGETS_zlib-flate = \
-	zlib-flate/$(OUTPUT_DIR)/zlib-flate
+	zlib-flate/$(OUTPUT_DIR)/$(call binname,zlib-flate)
 
 $(TARGETS_zlib-flate): $(TARGETS_libqpdf)
 
@@ -18,5 +18,5 @@ endif
 $(OBJS_zlib-flate): zlib-flate/$(OUTPUT_DIR)/%.o: zlib-flate/%.cc
 	$(call compile,$<,$(INCLUDES_zlib-flate))
 
-zlib-flate/$(OUTPUT_DIR)/zlib-flate: $(OBJS_zlib-flate)
+zlib-flate/$(OUTPUT_DIR)/$(call binname,zlib-flate): $(OBJS_zlib-flate)
 	$(call makebin,$(OBJS_zlib-flate),$@)

@@ -12,7 +12,7 @@ BINS_libtests = \
 	qutil \
 	rc4
 
-TARGETS_libtests = $(foreach B,$(BINS_libtests),libtests/$(OUTPUT_DIR)/$(B))
+TARGETS_libtests = $(foreach B,$(BINS_libtests),libtests/$(OUTPUT_DIR)/$(call binname,$(B)))
 
 $(TARGETS_libtests): $(TARGETS_libqpdf)
 
@@ -31,9 +31,9 @@ ifeq ($(GENDEPS),1)
 endif
 
 $(foreach B,$(BINS_libtests),$(eval \
-  $(OBJS_$(B)): libtests/$(OUTPUT_DIR)/%.o: libtests/$(B).cc ; \
+  $(OBJS_$(B)): libtests/$(OUTPUT_DIR)/%.$(OBJ): libtests/$(B).cc ; \
 	$(call compile,libtests/$(B).cc,$(INCLUDES_libtests))))
 
 $(foreach B,$(BINS_libtests),$(eval \
-  libtests/$(OUTPUT_DIR)/$(B): $(OBJS_$(B)) ; \
+  libtests/$(OUTPUT_DIR)/$(call binname,$(B)): $(OBJS_$(B)) ; \
 	$(call makebin,$(OBJS_$(B)),$$@)))
