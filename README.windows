@@ -1,19 +1,55 @@
+By default, qpdf builds on UNIX and UNIX-like systems with simple
+./configure; make; make install comamnds.  It ordinarily uses libtool
+to build libraries and link executables.
 
-cygwin requirements: in addition to basic abuild requirements, need
-ghostscript and tiff utils in order to run image comparison tests.
-However, they may not work anyway.  (As of this writing, ghostscript
-chokes on some of the files; haven't investigated.)  export
-SKIP_TEST_COMPARE_IMAGES=1 to avoid running them.
+As an alternative, the build system can use its own built-in rules.
+The available build rules can be found in the make directory; all the
+files except rules.mk are build rules.  The gcc-linux rules are there
+primarily for testing the build system.  They are not intended to be
+used in production since, in a Linux environment, it's better to use
+the default libtool rules.
 
-Must add libqpdf/build to PATH.
+For building on Windows, autoconf and libtool don't generate a working
+build for either mingw (as of this writing) or MS Visual C++.  We use
+our own rules instead.  In addition, the external dependencies (pcre
+and zlib) are often not present on Windows systems.
 
-To debug a crash in MSVC's debugger, start an instance of Visual C++.
-When the abort/retry/ignore dialog pops up, first attach the process
-from within visual C++, and then click Retry.
-
-Basic procedure for building with mingw is to run configure and build
-in msys and then run the test suite in cygwin with GENDEPS=0.
-
-Also have to deal with gcc runtime DLL.
+If you have MSYS and Mingw installed, you can run configure as follows:
 
 ./configure --disable-test-compare-images --enable-build-external-libs --with-buildrules=mingw
+
+From there, run
+
+make
+
+at the top level directory to build everything.  Building with mingw
+from a cygwin environment is not likely to work.  However, you have to
+have a cygwin environment to run the test suite.  Once you have built
+qpdf using mingw, you can test as follows:
+
+From your MSYS environment:
+
+ * Run objdump qpdf/build/qpdf.exe | grep DLL
+
+ * Copy the gcc runtime DLL into libqpdf/build
+
+From a Cygwin environment:
+
+ * Add the full path libqpdf/build to your path
+
+ * Run
+
+   make check GENDEPS=0
+
+This will run the qtest-based test suite, which requires cygwin.  You
+need perl, gnu diffutils, and basic shell commands.
+
+As of this writing, the image comparison tests confuse ghostscript in
+cygwin, but there's a chance they might work at some point.  If you
+want to run them, you need ghostscript and tiff utils as well.  Then
+omit --disable-test-compare-images from your configure statement.
+
+If you are building with MSVC and want to debug a crash in MSVC's
+debugger, first start an instance of Visual C++.  Then run qpdf.  When
+the abort/retry/ignore dialog pops up, first attach the process from
+within visual C++, and then click Retry in qpdf.
