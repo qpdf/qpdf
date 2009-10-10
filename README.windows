@@ -15,3 +15,5 @@ Basic procedure for building with mingw is to run configure and build
 in msys and then run the test suite in cygwin with GENDEPS=0.
 
 Also have to deal with gcc runtime DLL.
+
+./configure --disable-test-compare-images --enable-build-external-libs --with-buildrules=mingw

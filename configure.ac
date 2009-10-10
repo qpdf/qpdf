@@ -15,10 +15,29 @@ AC_HEADER_STDC
 LT_INIT([win32-dll])
 AC_PROG_LIBTOOL
 
-AC_CHECK_HEADER(zlib.h,,[MISSING_ZLIB_H=1; MISSING_ANY=1])
-AC_SEARCH_LIBS(deflate,z zlib,,[MISSING_ZLIB=1; MISSING_ANY=1])
-AC_CHECK_HEADER(pcre.h,,[MISSING_PCRE_H=1; MISSING_ANY=1])
-AC_SEARCH_LIBS(pcre_compile,pcre,,[MISSING_PCRE=1; MISSING_ANY=1])
+AC_SUBST(BUILD_EXTERNAL_LIBS)
+BUILD_EXTERNAL_LIBS=0
+AC_MSG_CHECKING(for whether to build external libraries)
+AC_ARG_ENABLE(build-external-libs,
+   AS_HELP_STRING([--enable-build-external-libs],
+		  [whether to build external libraries]),
+   [if test "$enableval" = "yes"; then
+      BUILD_EXTERNAL_LIBS=1;
+    else
+      BUILD_EXTERNAL_LIBS=0;
+    fi], [BUILD_INTERNAL_LIBS=0])
+if test "$BUILD_INTERNAL_LIBS" = "0"; then
+   AC_MSG_RESULT(no)
+else
+   AC_MSG_RESULT(yes)
+fi
+
+if test "$BUILD_INTERNAL_LIBS" = "0"; then
+   AC_CHECK_HEADER(zlib.h,,[MISSING_ZLIB_H=1; MISSING_ANY=1])
+   AC_SEARCH_LIBS(deflate,z zlib,,[MISSING_ZLIB=1; MISSING_ANY=1])
+   AC_CHECK_HEADER(pcre.h,,[MISSING_PCRE_H=1; MISSING_ANY=1])
+   AC_SEARCH_LIBS(pcre_compile,pcre,,[MISSING_PCRE=1; MISSING_ANY=1])
+fi
 
 AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
@@ -80,22 +99,33 @@ else
    CFLAGS=$oCFLAGS
 fi
 
-AC_MSG_CHECKING(for whether to use -Werror)
-AC_ARG_ENABLE(werror,
-   AS_HELP_STRING([--enable-werror],
-		  [whether to use werror (default is yes if -Wall works)]),
-   [if test "$enableval" = "yes"; then
-      qpdf_USE_WERROR=1;
-    else
-      qpdf_USE_WERROR=0;
-    fi], [qpdf_USE_WERROR=$qpdf_USE_WALL])
-if test "$qpdf_USE_WERROR" = "1"; then
-   AC_MSG_RESULT(yes)
-   CFLAGS="$CFLAGS -Werror"
-   CXXFLAGS="$CXXFLAGS -Werror"
-else
-   AC_MSG_RESULT(no)
+if test "$BUILD_EXTERNAL_LIBS" = "0"; then
+   AC_MSG_CHECKING(for whether to use -Werror)
+   AC_ARG_ENABLE(werror,
+      AS_HELP_STRING([--enable-werror],
+		     [whether to use werror (default is yes if -Wall works)]),
+      [if test "$enableval" = "yes"; then
+	 qpdf_USE_WERROR=1;
+       else
+	 qpdf_USE_WERROR=0;
+       fi], [qpdf_USE_WERROR=$qpdf_USE_WALL])
+   if test "$qpdf_USE_WERROR" = "1"; then
+      AC_MSG_RESULT(yes)
+      CFLAGS="$CFLAGS -Werror"
+      CXXFLAGS="$CXXFLAGS -Werror"
+   else
+      AC_MSG_RESULT(no)
+   fi
 fi
+
+AC_MSG_CHECKING(which build rules to use)
+AC_SUBST(BUILDRULES)
+AC_ARG_WITH(buildrules,
+   AS_HELP_STRING([--with-buildrules=rules],
+		  [which build rules to use; see README]),
+   [BUILDRULES=$withval],
+   [BUILDRULES=libtool])
+AC_MSG_RESULT($BUILDRULES)
 
 AC_SUBST(SKIP_TEST_COMPARE_IMAGES)
 AC_ARG_ENABLE(test-compare-images,
@@ -282,6 +312,15 @@ fi
 
 if test "$MISSING_ANY" = "1"; then
   AC_MSG_ERROR(some required prerequisites were not found)
+fi
+
+# Do this last so it doesn't interfere with other tests.
+if test "$BUILD_EXTERNAL_LIBS" = "1"; then
+   if test "$BUILDRULES" = "libtool"; then
+      AC_MSG_ERROR([BUILDRULES=libtool is not supported when building external libraries])
+   fi
+   LDFLAGS="$LDFLAGS -Lexternal-libs/build"
+   LIBS="$LIBS -lexternal"
 fi
 
 AC_OUTPUT()

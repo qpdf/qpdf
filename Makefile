@@ -30,8 +30,7 @@
 # install to install in a separate location.  This is useful for
 # packagers.
 
-#XXX
-BUILD_ITEMS = manual external-libs libqpdf zlib-flate libtests qpdf examples
+BUILD_ITEMS := manual libqpdf zlib-flate libtests qpdf examples
 OUTPUT_DIR = build
 ALL_TARGETS =
 
@@ -53,9 +52,9 @@ include autoconf.mk
 
 endif
 
-#XXX
-##BUILDRULES := libtool
-BUILDRULES := gcc-linux
+ifeq ($(BUILD_EXTERNAL_LIBS),1)
+  BUILD_ITEMS := external-libs $(BUILD_ITEMS)
+endif
 
 # Prevent gnu make from trying to rebuild .dep files
 $(foreach B,$(BUILD_ITEMS),$(eval \

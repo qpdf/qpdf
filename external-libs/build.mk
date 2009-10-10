@@ -1,6 +1,5 @@
 TARGETS_external-libs = external-libs/$(OUTPUT_DIR)/libexternal.a
-INCLUDES_external-libs = external-libs/zlib external-libs/pcre \
-	external-libs/$(OUTPUT_DIR)
+INCLUDES_external-libs = external-libs/zlib external-libs/pcre
 
 SRCS_external-libs_zlib = \
 	external-libs/zlib/adler32.c \
@@ -51,7 +50,7 @@ $(OBJS_external-libs_zlib): external-libs/$(OUTPUT_DIR)/%.$(LOBJ): external-libs
 	$(call c_libcompile,$<,$(INCLUDES_external-libs))
 
 $(OBJS_external-libs_pcre): external-libs/$(OUTPUT_DIR)/%.$(LOBJ): external-libs/pcre/%.c
-	$(call c_libcompile,$<,$(INCLUDES_external-libs))
+	$(call c_libcompile,$<,$(INCLUDES_external-libs) external-libs/$(OUTPUT_DIR))
 
 $(TARGETS_external-libs): $(OBJS_external-libs)
 	$(call makeslib,$(OBJS_external-libs),$(TARGETS_external-libs))

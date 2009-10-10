@@ -2,7 +2,7 @@ TARGETS_libqpdf = libqpdf/$(OUTPUT_DIR)/$(call libname,qpdf)
 
 $(TARGETS_libqpdf): $(TARGETS_external-libs)
 
-INCLUDES_libqpdf = include libqpdf
+INCLUDES_libqpdf = include libqpdf $(INCLUDES_external-libs)
 
 SRCS_libqpdf = \
 	libqpdf/BitStream.cc \
