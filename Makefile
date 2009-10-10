@@ -30,7 +30,8 @@
 # install to install in a separate location.  This is useful for
 # packagers.
 
-BUILD_ITEMS = manual libqpdf zlib-flate libtests qpdf examples
+#XXX
+BUILD_ITEMS = manual external-libs libqpdf zlib-flate libtests qpdf examples
 OUTPUT_DIR = build
 ALL_TARGETS =
 

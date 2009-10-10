@@ -28,7 +28,7 @@ endef
 # Usage: $(call c_compile,src,includes)
 define c_compile
 	$(CC) $(CPPFLAGS) $(CFLAGS) \
-		$(call depflags,$(basename $(call src_to_obj,$(1)))) \
+		$(call depflags,$(basename $(call c_src_to_obj,$(1)))) \
 		$(foreach I,$(2),-I$(I)) \
 		-c $(1) -o $(call c_src_to_obj,$(1))
 endef
@@ -38,6 +38,12 @@ define libcompile
 		$(call depflags,$(basename $(call src_to_obj,$(1)))) \
 		$(foreach I,$(2),-I$(I)) \
 		-c $(1) -o $(call src_to_obj,$(1))
+endef
+define c_libcompile
+	$(CC) $(CPPFLAGS) $(CXXFLAGS) -fpic \
+		$(call depflags,$(basename $(call c_src_to_lobj,$(1)))) \
+		$(foreach I,$(2),-I$(I)) \
+		-c $(1) -o $(call c_src_to_obj,$(1))
 endef
 
 
@@ -52,7 +58,7 @@ endef
 #                       1    2       3       4        5
 # Usage: $(call makelib,objs,library,current,revision,age)
 define makelib
-	$(RM) $2
+	$(RM) $(2) $(2).*
 	major=$$(( $(3) - $(5))); \
 	versuffix=$$major.$5.$4; \
 	$(CXX) $(CXXFLAGS) -shared -o $(2).$$versuffix $(1) \
