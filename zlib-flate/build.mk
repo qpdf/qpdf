@@ -3,7 +3,7 @@ TARGETS_zlib-flate = \
 
 $(TARGETS_zlib-flate): $(TARGETS_libqpdf)
 
-INCLUDES_zlib-flate = include
+INCLUDES_zlib-flate = include $(INCLUDES_external-libs)
 
 SRCS_zlib-flate = zlib-flate/zlib-flate.cc
 
