@@ -18,6 +18,13 @@ If you have MSYS and Mingw installed, you can run configure as follows:
 
 ./configure --disable-test-compare-images --enable-build-external-libs --with-buildrules=mingw
 
+To build with msvc, you must be running in a shell environment that
+puts the MSVC tools in your path.  Then you can run
+
+XXX WHAT?
+
+./configure --disable-test-compare-images --enable-build-external-libs --with-buildrules=msvc
+
 From there, run
 
 make

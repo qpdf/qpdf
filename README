@@ -8,13 +8,17 @@ Artistic License which may be found in the source distribution as
 "Artistic-2.0".  It is provided "as is" without express or implied
 warranty.
 
-To install this software, you can run
+For UNIX and UNIX-like systems, you can usually get by with just
 
 ./configure
 make
 make install
 
-For more detailed information, see the "INSTALL" in this directory.
+For more detailed general information, see the "INSTALL" file in this
+directory.
+
+For specific information about building qpdf on Windows, see
+"README.windows".
 
 The QPDF package provides some executables and a software library.  A
 user's manual can be found in the "doc" directory.  The docbook

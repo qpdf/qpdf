@@ -1,6 +1,18 @@
-Other than Abuild files, these files are the only changes from
-pristine extracted sources.  For pcre, use pcre 4.5.  For zlib, we
-used 1.2.3.3 from debian (dfsg).  These files:
+NOTE: These copies of external libraries are not used by default.  You
+must explicitly specific --enable-build-external-libraries on the
+command-line in order to use them.  This is not recommended unless you
+have no other option.  It can be especially useful for building on
+Windows.
+
+----------------------------------------------------------------------
+
+The pcre and zlib directories here contain pcre 4.5 and zlib 1.2.3.3
+from debian (dfsg).  All files were removed that are not either
+required to build or that contain some kind of copyright or
+acknowledgment information.  Other than as described below, everything
+else was left unmodified.
+
+These files:
 
 ./pcre/pcre.h
 ./pcre/config.h
