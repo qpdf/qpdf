@@ -5,7 +5,7 @@ LOBJ=o
 
 # Usage: $(call libname,base)
 define libname
-lib$(1).a lib$(1).so
+lib$(1).so
 endef
 
 # Usage: $(call binname,base)
@@ -41,22 +41,25 @@ define libcompile
 endef
 
 
+#                        1    2
+# Usage: $(call makeslib,objs,library)
+define makeslib
+	$(RM) $2
+	ar cru $(2) $(1)
+	ranlib $(2)
+endef
+
 #                       1    2       3       4        5
 # Usage: $(call makelib,objs,library,current,revision,age)
 define makelib
 	$(RM) $2
-	if [ "$(findstring .a,$(2))" = ".a" ]; then \
-		ar cru $(2) $(1); \
-		ranlib $(2); \
-	else \
-		major=$$(( $(3) - $(5))); \
-	  	versuffix=$$major.$5.$4; \
-		$(CXX) $(CXXFLAGS) -shared -o $(2).$$versuffix $(1) \
-			-Wl,--soname -Wl,`basename $(2)`.$$major \
-			$(LDFLAGS) $(LIBS); \
-		ln -s `basename $(2)`.$$versuffix $(2); \
-		ln -s `basename $(2)`.$$versuffix $(2).$$major; \
-	fi
+	major=$$(( $(3) - $(5))); \
+	versuffix=$$major.$5.$4; \
+	$(CXX) $(CXXFLAGS) -shared -o $(2).$$versuffix $(1) \
+		-Wl,--soname -Wl,`basename $(2)`.$$major \
+		$(LDFLAGS) $(LIBS); \
+	ln -s `basename $(2)`.$$versuffix $(2); \
+	ln -s `basename $(2)`.$$versuffix $(2).$$major
 endef
 
 #                       1    2

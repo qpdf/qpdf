@@ -35,11 +35,17 @@ endef
 
 libcompile = $(compile)
 
+#                        1    2
+# Usage: $(call makeslib,objs,library)
+define makeslib
+	$(RM) $2
+	ar cru $(2) $(1)
+	ranlib $(2)
+endef
+
 #                       1    2       3       4        5
 # Usage: $(call makelib,objs,library,current,revision,age)
 define makelib
-	ar cru $(2) $(1);
-	ranlib $(2);
 	echo `echo $(2) | sed -e 's,/lib\(.*\).a,/\1,'`$(3).dll
 	dlltool -l $(2) -D $$(basename `echo $(2) | sed -e 's,/lib\(.*\).a,/\1,'`$(3).dll) $(1); \
 	$(CXX) -shared -o `echo $(2) | sed -e 's,/lib\(.*\).a,/\1,'`$(3).dll \

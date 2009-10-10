@@ -10,3 +10,8 @@ Must add libqpdf/build to PATH.
 To debug a crash in MSVC's debugger, start an instance of Visual C++.
 When the abort/retry/ignore dialog pops up, first attach the process
 from within visual C++, and then click Retry.
+
+Basic procedure for building with mingw is to run configure and build
+in msys and then run the test suite in cygwin with GENDEPS=0.
+
+Also have to deal with gcc runtime DLL.

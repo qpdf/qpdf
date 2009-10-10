@@ -54,7 +54,7 @@ endif
 
 #XXX
 ##BUILDRULES := libtool
-BUILDRULES := gcc
+BUILDRULES := gcc-linux
 
 # Prevent gnu make from trying to rebuild .dep files
 $(foreach B,$(BUILD_ITEMS),$(eval \

@@ -57,6 +57,14 @@ define libcompile
 	$(call fixdeps,$(basename $(call src_to_obj,$(1))))
 endef
 
+#                        1    2
+# Usage: $(call makeslib,objs,library)
+define makeslib
+	$(RM) $2
+	ar cru $(2) $(1)
+	ranlib $(2)
+endef
+
 #                       1    2       3       4        5
 # Usage: $(call makelib,objs,library,current,revision,age)
 define makelib

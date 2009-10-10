@@ -1,5 +1,4 @@
-TARGETS_libqpdf = \
-	$(foreach L,$(call libname,qpdf),libqpdf/$(OUTPUT_DIR)/$(L))
+TARGETS_libqpdf = libqpdf/$(OUTPUT_DIR)/$(call libname,qpdf)
 
 INCLUDES_libqpdf = include libqpdf
 
