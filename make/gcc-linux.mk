@@ -45,8 +45,8 @@ endef
 # Usage: $(call makeslib,objs,library)
 define makeslib
 	$(RM) $2
-	ar cru $(2) $(1)
-	ranlib $(2)
+	$(AR) cru $(2) $(1)
+	$(RANLIB) $(2)
 endef
 
 #                       1    2       3       4        5
