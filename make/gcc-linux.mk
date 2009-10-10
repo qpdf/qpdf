@@ -1,3 +1,10 @@
+#
+# This file primarily exists for making it possible to test the build
+# system and external library support from Linux.  However, its use is
+# strongly discouraged; use the (default) libtool rules for building
+# on Linux.
+#
+
 # --- Required interface definitions ---
 
 OBJ=o
