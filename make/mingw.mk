@@ -34,6 +34,7 @@ define c_compile
 endef
 
 libcompile = $(compile)
+c_libcompile = $(c_compile)
 
 #                        1    2
 # Usage: $(call makeslib,objs,library)
