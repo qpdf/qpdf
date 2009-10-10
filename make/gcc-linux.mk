@@ -35,15 +35,15 @@ endef
 
 define libcompile
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -fpic \
-		$(call depflags,$(basename $(call src_to_obj,$(1)))) \
+		$(call depflags,$(basename $(call src_to_lobj,$(1)))) \
 		$(foreach I,$(2),-I$(I)) \
-		-c $(1) -o $(call src_to_obj,$(1))
+		-c $(1) -o $(call src_to_lobj,$(1))
 endef
 define c_libcompile
 	$(CC) $(CPPFLAGS) $(CXXFLAGS) -fpic \
 		$(call depflags,$(basename $(call c_src_to_lobj,$(1)))) \
 		$(foreach I,$(2),-I$(I)) \
-		-c $(1) -o $(call c_src_to_obj,$(1))
+		-c $(1) -o $(call c_src_to_lobj,$(1))
 endef
 
 

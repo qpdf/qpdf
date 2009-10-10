@@ -10,7 +10,7 @@ endef
 
 # Usage: $(call binname,base)
 define binname
-$(1)
+$(1).exe
 endef
 
 # --- Required rule definitions ---
