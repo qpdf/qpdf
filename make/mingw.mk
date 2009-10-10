@@ -40,7 +40,9 @@ libcompile = $(compile)
 define makelib
 	ar cru $(2) $(1);
 	ranlib $(2);
-	dlltool -l $(2) -D `echo $(2) | sed -e 's,lib\(.*\).a,\1'`$(3).dll \
+	echo `echo $(2) | sed -e 's,/lib\(.*\).a,/\1,'`$(3).dll
+	dlltool -l $(2) -D $$(basename `echo $(2) | sed -e 's,/lib\(.*\).a,/\1,'`$(3).dll) $(1); \
+	$(CXX) -shared -o `echo $(2) | sed -e 's,/lib\(.*\).a,/\1,'`$(3).dll \
 		$(1) $(LDFLAGS) $(LIBS)
 endef
 
