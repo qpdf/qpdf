@@ -1,0 +1,79 @@
+<html>
+<head>
+<title>pcresample specification</title>
+</head>
+<body bgcolor="#FFFFFF" text="#00005A" link="#0066FF" alink="#3399FF" vlink="#2222BB">
+This HTML document has been generated automatically from the original man page.
+If there is any nonsense in it, please consult the man page, in case the
+conversion went wrong.<br>
+<ul>
+<li><a name="TOC1" href="#SEC1">PCRE SAMPLE PROGRAM</a>
+</ul>
+<br><a name="SEC1" href="#TOC1">PCRE SAMPLE PROGRAM</a><br>
+<P>
+A simple, complete demonstration program, to get you started with using PCRE,
+is supplied in the file <i>pcredemo.c</i> in the PCRE distribution.
+</P>
+<P>
+The program compiles the regular expression that is its first argument, and
+matches it against the subject string in its second argument. No PCRE options
+are set, and default character tables are used. If matching succeeds, the
+program outputs the portion of the subject that matched, together with the
+contents of any captured substrings.
+</P>
+<P>
+If the -g option is given on the command line, the program then goes on to
+check for further matches of the same regular expression in the same subject
+string. The logic is a little bit tricky because of the possibility of matching
+an empty string. Comments in the code explain what is going on.
+</P>
+<P>
+On a Unix system that has PCRE installed in <i>/usr/local</i>, you can compile
+the demonstration program using a command like this:
+</P>
+<P>
+<pre>
+  gcc -o pcredemo pcredemo.c -I/usr/local/include \
+      -L/usr/local/lib -lpcre
+</PRE>
+</P>
+<P>
+Then you can run simple tests like this:
+</P>
+<P>
+<pre>
+  ./pcredemo 'cat|dog' 'the cat sat on the mat'
+  ./pcredemo -g 'cat|dog' 'the dog sat on the cat'
+</PRE>
+</P>
+<P>
+Note that there is a much more comprehensive test program, called
+<b>pcretest</b>, which supports many more facilities for testing regular
+expressions and the PCRE library. The <b>pcredemo</b> program is provided as a
+simple coding example.
+</P>
+<P>
+On some operating systems (e.g. Solaris) you may get an error like this when
+you try to run <b>pcredemo</b>:
+</P>
+<P>
+<pre>
+  ld.so.1: a.out: fatal: libpcre.so.0: open failed: No such file or directory
+</PRE>
+</P>
+<P>
+This is caused by the way shared library support works on those systems. You
+need to add
+</P>
+<P>
+<pre>
+  -R/usr/local/lib
+</PRE>
+</P>
+<P>
+to the compile command to get round this problem.
+</P>
+<P>
+Last updated: 28 January 2003
+<br>
+Copyright &copy; 1997-2003 University of Cambridge.

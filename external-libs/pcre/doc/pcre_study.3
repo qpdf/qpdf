@@ -1,0 +1,36 @@
+.TH PCRE 3
+.SH NAME
+PCRE - Perl-compatible regular expressions
+.SH SYNOPSIS
+.rs
+.sp
+.B #include <pcre.h>
+.PP
+.SM
+.br
+.B pcre_extra *pcre_study(const pcre *\fIcode\fR, int \fIoptions\fR,
+.ti +5n
+.B const char **\fIerrptr\fR);
+
+.SH DESCRIPTION
+.rs
+.sp
+This function studies a compiled pattern, to see if additional information can
+be extracted that might speed up matching. Its arguments are:
+
+  \fIcode\fR       A compiled regular expression
+  \fIoptions\fR    Options for \fBpcre_study()\fR
+  \fIerrptr\fR     Where to put an error message
+
+If the function returns NULL, either it could not find any additional
+information, or there was an error. You can tell the difference by looking at
+the error value. It is NULL in first case.
+
+There are currently no options defined; the value of the second argument should
+always be zero.
+
+There is a complete description of the PCRE API in the
+.\" HREF
+\fBpcreapi\fR
+.\"
+page.

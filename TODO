@@ -1,6 +1,11 @@
 2.1
 ===
 
+ * Remember to update documentation with Windows build instructions.
+   Search for Windows (case insensitive to be safe).
+
+ * Do something better with external-libraries.
+
  * "Delphi wrapper unit 'qpdf.pas' created by Zarko Gajic
    (http://delphi.about.com). .. use at your own risk and for whatever
    the purpose you want .. no support provided. Sample code provided."

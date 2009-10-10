@@ -1,0 +1,53 @@
+.TH PCRE 3
+.SH NAME
+PCRE - Perl-compatible regular expressions
+.SH SYNOPSIS
+.rs
+.sp
+.B #include <pcre.h>
+.PP
+.SM
+.br
+.B int pcre_fullinfo(const pcre *\fIcode\fR, "const pcre_extra *\fIextra\fR,"
+.ti +5n
+.B int \fIwhat\fR, void *\fIwhere\fR);
+
+.SH DESCRIPTION
+.rs
+.sp
+This function returns information about a compiled pattern. Its arguments are:
+
+  \fIcode\fR    Compiled regular expression
+  \fIextra\fR   Result of \fBpcre_study()\fR or NULL
+  \fIwhat\fR    What information is required
+  \fIwhere\fR   Where to put the information
+
+The following information is available:
+
+  PCRE_INFO_BACKREFMAX     Number of highest back reference
+  PCRE_INFO_CAPTURECOUNT   Number of capturing subpatterns
+  PCRE_INFO_FIRSTBYTE      Fixed first byte for a match, or
+                             -1 for start of string
+                                or after newline, or
+                             -2 otherwise
+  PCRE_INFO_FIRSTTABLE     Table of first bytes
+                             (after studying)
+  PCRE_INFO_LASTLITERAL    Literal last byte required
+  PCRE_INFO_NAMECOUNT      Number of named subpatterns
+  PCRE_INFO_NAMEENTRYSIZE  Size of name table entry
+  PCRE_INFO_NAMETABLE      Pointer to name table
+  PCRE_INFO_OPTIONS        Options used for compilation
+  PCRE_INFO_SIZE           Size of compiled pattern
+
+The yield of the function is zero on success or:
+
+  PCRE_ERROR_NULL       the argument \fIcode\fR was NULL
+                        the argument \fIwhere\fR was NULL
+  PCRE_ERROR_BADMAGIC   the "magic number" was not found
+  PCRE_ERROR_BADOPTION  the value of \fIwhat\fR was invalid
+
+There is a complete description of the PCRE API in the
+.\" HREF
+\fBpcreapi\fR
+.\"
+page.

@@ -1,0 +1,26 @@
+.TH PCRE 3
+.SH NAME
+PCRE - Perl-compatible regular expressions
+.SH SYNOPSIS
+.rs
+.sp
+.B #include <pcre.h>
+.PP
+.SM
+.br
+.B const unsigned char *pcre_maketables(void);
+
+.SH DESCRIPTION
+.rs
+.sp
+This function builds a set of character tables which can be passed to
+\fBpcre_compile()\fR to override PCRE's internal, built-in tables (which were
+made by \fBpcre_maketables()\fR when PCRE was compiled). You might want to do
+this if you are using a non-standard locale. The function yields a pointer to
+the tables.
+
+There is a complete description of the PCRE API in the
+.\" HREF
+\fBpcreapi\fR
+.\"
+page.

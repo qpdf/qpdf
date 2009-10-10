@@ -1,0 +1,117 @@
+<html>
+<head>
+<title>pcrecallout specification</title>
+</head>
+<body bgcolor="#FFFFFF" text="#00005A" link="#0066FF" alink="#3399FF" vlink="#2222BB">
+This HTML document has been generated automatically from the original man page.
+If there is any nonsense in it, please consult the man page, in case the
+conversion went wrong.<br>
+<ul>
+<li><a name="TOC1" href="#SEC1">PCRE CALLOUTS</a>
+<li><a name="TOC2" href="#SEC2">RETURN VALUES</a>
+</ul>
+<br><a name="SEC1" href="#TOC1">PCRE CALLOUTS</a><br>
+<P>
+<b>int (*pcre_callout)(pcre_callout_block *);</b>
+</P>
+<P>
+PCRE provides a feature called "callout", which is a means of temporarily
+passing control to the caller of PCRE in the middle of pattern matching. The
+caller of PCRE provides an external function by putting its entry point in the
+global variable <i>pcre_callout</i>. By default, this variable contains NULL,
+which disables all calling out.
+</P>
+<P>
+Within a regular expression, (?C) indicates the points at which the external
+function is to be called. Different callout points can be identified by putting
+a number less than 256 after the letter C. The default value is zero.
+For example, this pattern has two callout points:
+</P>
+<P>
+<pre>
+  (?C1)\dabc(?C2)def
+</PRE>
+</P>
+<P>
+During matching, when PCRE reaches a callout point (and <i>pcre_callout</i> is
+set), the external function is called. Its only argument is a pointer to a
+<b>pcre_callout</b> block. This contains the following variables:
+</P>
+<P>
+<pre>
+  int          <i>version</i>;
+  int          <i>callout_number</i>;
+  int         *<i>offset_vector</i>;
+  const char  *<i>subject</i>;
+  int          <i>subject_length</i>;
+  int          <i>start_match</i>;
+  int          <i>current_position</i>;
+  int          <i>capture_top</i>;
+  int          <i>capture_last</i>;
+  void        *<i>callout_data</i>;
+</PRE>
+</P>
+<P>
+The <i>version</i> field is an integer containing the version number of the
+block format. The current version is zero. The version number may change in
+future if additional fields are added, but the intention is never to remove any
+of the existing fields.
+</P>
+<P>
+The <i>callout_number</i> field contains the number of the callout, as compiled
+into the pattern (that is, the number after ?C).
+</P>
+<P>
+The <i>offset_vector</i> field is a pointer to the vector of offsets that was
+passed by the caller to <b>pcre_exec()</b>. The contents can be inspected in
+order to extract substrings that have been matched so far, in the same way as
+for extracting substrings after a match has completed.
+</P>
+<P>
+The <i>subject</i> and <i>subject_length</i> fields contain copies the values
+that were passed to <b>pcre_exec()</b>.
+</P>
+<P>
+The <i>start_match</i> field contains the offset within the subject at which the
+current match attempt started. If the pattern is not anchored, the callout
+function may be called several times for different starting points.
+</P>
+<P>
+The <i>current_position</i> field contains the offset within the subject of the
+current match pointer.
+</P>
+<P>
+The <i>capture_top</i> field contains one more than the number of the highest
+numbered captured substring so far. If no substrings have been captured,
+the value of <i>capture_top</i> is one.
+</P>
+<P>
+The <i>capture_last</i> field contains the number of the most recently captured
+substring.
+</P>
+<P>
+The <i>callout_data</i> field contains a value that is passed to
+<b>pcre_exec()</b> by the caller specifically so that it can be passed back in
+callouts. It is passed in the <i>pcre_callout</i> field of the <b>pcre_extra</b>
+data structure. If no such data was passed, the value of <i>callout_data</i> in
+a <b>pcre_callout</b> block is NULL. There is a description of the
+<b>pcre_extra</b> structure in the <b>pcreapi</b> documentation.
+</P>
+<br><a name="SEC2" href="#TOC1">RETURN VALUES</a><br>
+<P>
+The callout function returns an integer. If the value is zero, matching
+proceeds as normal. If the value is greater than zero, matching fails at the
+current point, but backtracking to test other possibilities goes ahead, just as
+if a lookahead assertion had failed. If the value is less than zero, the match
+is abandoned, and <b>pcre_exec()</b> returns the value.
+</P>
+<P>
+Negative values should normally be chosen from the set of PCRE_ERROR_xxx
+values. In particular, PCRE_ERROR_NOMATCH forces a standard "no match" failure.
+The error number PCRE_ERROR_CALLOUT is reserved for use by callout functions;
+it will never be used by PCRE itself.
+</P>
+<P>
+Last updated: 21 January 2003
+<br>
+Copyright &copy; 1997-2003 University of Cambridge.

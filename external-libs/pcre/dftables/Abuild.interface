@@ -1,0 +1,1 @@
+declare DFTABLES_DIR filename = $(ABUILD_OUTPUT_DIR)

@@ -1,0 +1,24 @@
+.TH PCRE 3
+.SH NAME
+PCRE - Perl-compatible regular expressions
+.SH SYNOPSIS
+.rs
+.sp
+.B #include <pcre.h>
+.PP
+.SM
+.br
+.B void pcre_free_substring_list(const char **\fIstringptr\fR);
+
+.SH DESCRIPTION
+.rs
+.sp
+This is a convenience function for freeing the store obtained by a previous
+call to \fBpcre_get_substring_list()\fR. Its only argument is a pointer to the
+list of string pointers.
+
+There is a complete description of the PCRE API in the
+.\" HREF
+\fBpcreapi\fR
+.\"
+page.

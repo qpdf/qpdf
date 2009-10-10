@@ -1,0 +1,92 @@
+.TH PCRE 3
+.SH NAME
+PCRE - Perl-compatible regular expressions
+.SH PCRE CALLOUTS
+.rs
+.sp
+.B int (*pcre_callout)(pcre_callout_block *);
+.PP
+PCRE provides a feature called "callout", which is a means of temporarily
+passing control to the caller of PCRE in the middle of pattern matching. The
+caller of PCRE provides an external function by putting its entry point in the
+global variable \fIpcre_callout\fR. By default, this variable contains NULL,
+which disables all calling out.
+
+Within a regular expression, (?C) indicates the points at which the external
+function is to be called. Different callout points can be identified by putting
+a number less than 256 after the letter C. The default value is zero.
+For example, this pattern has two callout points:
+
+  (?C1)\dabc(?C2)def
+
+During matching, when PCRE reaches a callout point (and \fIpcre_callout\fR is
+set), the external function is called. Its only argument is a pointer to a
+\fBpcre_callout\fR block. This contains the following variables:
+
+  int          \fIversion\fR;
+  int          \fIcallout_number\fR;
+  int         *\fIoffset_vector\fR;
+  const char  *\fIsubject\fR;
+  int          \fIsubject_length\fR;
+  int          \fIstart_match\fR;
+  int          \fIcurrent_position\fR;
+  int          \fIcapture_top\fR;
+  int          \fIcapture_last\fR;
+  void        *\fIcallout_data\fR;
+
+The \fIversion\fR field is an integer containing the version number of the
+block format. The current version is zero. The version number may change in
+future if additional fields are added, but the intention is never to remove any
+of the existing fields.
+
+The \fIcallout_number\fR field contains the number of the callout, as compiled
+into the pattern (that is, the number after ?C).
+
+The \fIoffset_vector\fR field is a pointer to the vector of offsets that was
+passed by the caller to \fBpcre_exec()\fR. The contents can be inspected in
+order to extract substrings that have been matched so far, in the same way as
+for extracting substrings after a match has completed.
+
+The \fIsubject\fR and \fIsubject_length\fR fields contain copies the values
+that were passed to \fBpcre_exec()\fR.
+
+The \fIstart_match\fR field contains the offset within the subject at which the
+current match attempt started. If the pattern is not anchored, the callout
+function may be called several times for different starting points.
+
+The \fIcurrent_position\fR field contains the offset within the subject of the
+current match pointer.
+
+The \fIcapture_top\fR field contains one more than the number of the highest
+numbered captured substring so far. If no substrings have been captured,
+the value of \fIcapture_top\fR is one.
+
+The \fIcapture_last\fR field contains the number of the most recently captured
+substring.
+
+The \fIcallout_data\fR field contains a value that is passed to
+\fBpcre_exec()\fR by the caller specifically so that it can be passed back in
+callouts. It is passed in the \fIpcre_callout\fR field of the \fBpcre_extra\fR
+data structure. If no such data was passed, the value of \fIcallout_data\fR in
+a \fBpcre_callout\fR block is NULL. There is a description of the
+\fBpcre_extra\fR structure in the \fBpcreapi\fR documentation.
+
+
+.SH RETURN VALUES
+.rs
+.sp
+The callout function returns an integer. If the value is zero, matching
+proceeds as normal. If the value is greater than zero, matching fails at the
+current point, but backtracking to test other possibilities goes ahead, just as
+if a lookahead assertion had failed. If the value is less than zero, the match
+is abandoned, and \fBpcre_exec()\fR returns the value.
+
+Negative values should normally be chosen from the set of PCRE_ERROR_xxx
+values. In particular, PCRE_ERROR_NOMATCH forces a standard "no match" failure.
+The error number PCRE_ERROR_CALLOUT is reserved for use by callout functions;
+it will never be used by PCRE itself.
+
+.in 0
+Last updated: 21 January 2003
+.br
+Copyright (c) 1997-2003 University of Cambridge.

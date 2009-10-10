@@ -1,0 +1,12 @@
+
+cygwin requirements: in addition to basic abuild requirements, need
+ghostscript and tiff utils in order to run image comparison tests.
+However, they may not work anyway.  (As of this writing, ghostscript
+chokes on some of the files; haven't investigated.)  export
+SKIP_TEST_COMPARE_IMAGES=1 to avoid running them.
+
+Must add libqpdf/build to PATH.
+
+To debug a crash in MSVC's debugger, start an instance of Visual C++.
+When the abort/retry/ignore dialog pops up, first attach the process
+from within visual C++, and then click Retry.

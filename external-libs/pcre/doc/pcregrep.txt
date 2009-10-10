@@ -1,0 +1,124 @@
+PCREGREP(1)                                                        PCREGREP(1)
+
+
+
+NAME
+       pcregrep - a grep with Perl-compatible regular expressions.
+
+SYNOPSIS
+       pcregrep [-Vcfhilnrsuvx] [long options] [pattern] [file1 file2 ...]
+
+
+DESCRIPTION
+
+       pcregrep  searches  files  for  character  patterns, in the same way as
+       other grep commands do, but it uses the PCRE regular expression library
+       to support patterns that are compatible with the regular expressions of
+       Perl 5. See pcrepattern for a full description of syntax and  semantics
+       of the regular expressions that PCRE supports.
+
+       A pattern must be specified on the command line unless the -f option is
+       used (see below).
+
+       If no files are  specified,  pcregrep  reads  the  standard  input.  By
+       default,  each  line that matches the pattern is copied to the standard
+       output, and if there is more than one file, the file  name  is  printed
+       before  each line of output. However, there are options that can change
+       how pcregrep behaves.
+
+       Lines are limited to BUFSIZ characters. BUFSIZ is defined in <stdio.h>.
+       The newline character is removed from the end of each line before it is
+       matched against the pattern.
+
+
+OPTIONS
+
+
+       -V        Write the version number of the PCRE library  being  used  to
+                 the standard error stream.
+
+       -c        Do  not print individual lines; instead just print a count of
+                 the number of lines that would otherwise have  been  printed.
+                 If  several  files  are given, a count is printed for each of
+                 them.
+
+       -ffilename
+                 Read a number of patterns from the file, one  per  line,  and
+                 match  all of them against each line of input. A line is out-
+                 put if any of the patterns match it.  When  -f  is  used,  no
+                 pattern  is  taken  from  the command line; all arguments are
+                 treated as file names. There is a maximum  of  100  patterns.
+                 Trailing white space is removed, and blank lines are ignored.
+                 An empty file contains  no  patterns  and  therefore  matches
+                 nothing.
+
+       -h        Suppress printing of filenames when searching multiple files.
+
+       -i        Ignore upper/lower case distinctions during comparisons.
+
+       -l        Instead of printing lines from  the  files,  just  print  the
+                 names  of  the  files  containing  lines that would have been
+                 printed. Each file name is printed once, on a separate  line.
+
+       -n        Precede each line by its line number in the file.
+
+       -r        If  any  file  is  a directory, recursively scan the files it
+                 contains. Without -r a directory is scanned as a normal file.
+
+       -s        Work  silently,  that  is,  display nothing except error mes-
+                 sages.  The exit status indicates whether  any  matches  were
+                 found.
+
+       -u        Operate  in UTF-8 mode. This option is available only if PCRE
+                 has been compiled with UTF-8 support. Both  the  pattern  and
+                 each  subject  line  are assumed to be valid strings of UTF-8
+                 characters.
+
+       -v        Invert the sense of the match, so that  lines  which  do  not
+                 match the pattern are now the ones that are found.
+
+       -x        Force  the  pattern to be anchored (it must start matching at
+                 the beginning of the line) and in  addition,  require  it  to
+                 match  the  entire line. This is equivalent to having ^ and $
+                 characters at the start and end of each alternative branch in
+                 the regular expression.
+
+
+LONG OPTIONS
+
+       Long  forms  of all the options are available, as in GNU grep. They are
+       shown in the following table:
+
+         -c   --count
+         -h   --no-filename
+         -i   --ignore-case
+         -l   --files-with-matches
+         -n   --line-number
+         -r   --recursive
+         -s   --no-messages
+         -u   --utf-8
+         -V   --version
+         -v   --invert-match
+         -x   --line-regex
+         -x   --line-regexp
+
+       In addition, --file=filename is equivalent to  -ffilename,  and  --help
+       shows the list of options and then exits.
+
+
+DIAGNOSTICS
+
+       Exit status is 0 if any matches were found, 1 if no matches were found,
+       and 2 for syntax errors or inacessible  files  (even  if  matches  were
+       found).
+
+
+
+AUTHOR
+
+       Philip Hazel <ph10@cam.ac.uk>
+       University Computing Service
+       Cambridge CB2 3QG, England.
+
+Last updated: 03 February 2003
+Copyright (c) 1997-2003 University of Cambridge.

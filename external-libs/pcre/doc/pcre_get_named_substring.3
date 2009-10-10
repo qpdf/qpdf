@@ -1,0 +1,40 @@
+.TH PCRE 3
+.SH NAME
+PCRE - Perl-compatible regular expressions
+.SH SYNOPSIS
+.rs
+.sp
+.B #include <pcre.h>
+.PP
+.SM
+.br
+.B int pcre_get_named_substring(const pcre *\fIcode\fR,
+.ti +5n
+.B const char *\fIsubject\fR, int *\fIovector\fR,
+.ti +5n
+.B int \fIstringcount\fR, const char *\fIstringname\fR,
+.ti +5n
+.B const char **\fIstringptr\fR);
+
+.SH DESCRIPTION
+.rs
+.sp
+This is a convenience function for extracting a captured substring by name. The
+arguments are:
+
+  \fIcode\fR          Compiled pattern
+  \fIsubject\fR       Subject that has been successfully matched
+  \fIovector\fR       Offset vector that \fBpcre_exec()\fR used
+  \fIstringcount\fR   Value returned by \fBpcre_exec()\fR
+  \fIstringname\fR    Name of the required substring
+  \fIstringptr\fR     Where to put the string pointer
+
+The yield is the length of the extracted substring, PCRE_ERROR_NOMEMORY if
+sufficient memory could not be obtained, or PCRE_ERROR_NOSUBSTRING if the
+string name is invalid.
+
+There is a complete description of the PCRE API in the
+.\" HREF
+\fBpcreapi\fR
+.\"
+page.

@@ -1,4 +1,3 @@
-
 # This makefile is inspired by abuild (http://www.abuild.org), which
 # was used during the development of qpdf.  The goal here is to have a
 # non-recursive build with all the proper dependencies so we can start
@@ -53,6 +52,10 @@ include autoconf.mk
 
 endif
 
+#XXX
+##BUILDRULES := libtool
+BUILDRULES := gcc
+
 # Prevent gnu make from trying to rebuild .dep files
 $(foreach B,$(BUILD_ITEMS),$(eval \
   $(B)/$(OUTPUT_DIR)/%.dep: ;))
@@ -63,9 +66,6 @@ $(foreach B,$(BUILD_ITEMS),$(eval \
 %.mk: ;
 make/%.mk: ;
 
-#XXX
-##BUILDRULES := libtool
-BUILDRULES := gcc
 include make/rules.mk
 
 DUMMY := $(shell mkdir $(foreach B,$(BUILD_ITEMS),$(B)/$(OUTPUT_DIR)) 2>/dev/null)

@@ -1,0 +1,33 @@
+.TH PCRE 3
+.SH NAME
+PCRE - Perl-compatible regular expressions
+.SH SYNOPSIS
+.rs
+.sp
+.B #include <pcre.h>
+.PP
+.SM
+.br
+.B int pcre_get_substring_list(const char *\fIsubject\fR,
+.ti +5n
+.B int *\fIovector\fR, int \fIstringcount\fR, "const char ***\fIlistptr\fR);"
+
+.SH DESCRIPTION
+.rs
+.sp
+This is a convenience function for extracting a list of all the captured
+substrings. The arguments are:
+
+  \fIsubject\fR       Subject that has been successfully matched
+  \fIovector\fR       Offset vector that \fBpcre_exec\fR used
+  \fIstringcount\fR   Value returned by \fBpcre_exec\fR
+  \fIlistptr\fR       Where to put a pointer to the list
+
+The yield is zero on success or PCRE_ERROR_NOMEMORY if sufficient memory could
+not be obtained.
+
+There is a complete description of the PCRE API in the
+.\" HREF
+\fBpcreapi\fR
+.\"
+page.

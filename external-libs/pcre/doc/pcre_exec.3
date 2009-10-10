@@ -1,0 +1,48 @@
+.TH PCRE 3
+.SH NAME
+PCRE - Perl-compatible regular expressions
+.SH SYNOPSIS
+.rs
+.sp
+.B #include <pcre.h>
+.PP
+.SM
+.br
+.B int pcre_exec(const pcre *\fIcode\fR, "const pcre_extra *\fIextra\fR,"
+.ti +5n
+.B "const char *\fIsubject\fR," int \fIlength\fR, int \fIstartoffset\fR,
+.ti +5n
+.B int \fIoptions\fR, int *\fIovector\fR, int \fIovecsize\fR);
+
+.SH DESCRIPTION
+.rs
+.sp
+This function matches a compiled regular expression against a given subject
+string, and returns offsets to capturing subexpressions. Its arguments are:
+
+  \fIcode\fR         Points to the compiled pattern
+  \fIextra\fR        Points to an associated \fBpcre_extra\fR structure,
+                 or is NULL
+  \fIsubject\fR      Points to the subject string
+  \fIlength\fR       Length of the subject string, in bytes
+  \fIstartoffset\fR  Offset in bytes in the subject at which to
+                 start matching
+  \fIoptions\fR      Option bits
+  \fIovector\fR      Points to a vector of ints for result offsets
+  \fIovecsize\fR     Size of the vector (a multiple of 3)
+
+The options are:
+
+  PCRE_ANCHORED      Match only at the first position
+  PCRE_NOTBOL        Subject is not the beginning of a line
+  PCRE_NOTEOL        Subject is not the end of a line
+  PCRE_NOTEMPTY      An empty string is not a valid match
+  PCRE_NO_UTF8_CHECK Do not check the subject for UTF-8
+                       validity (only relevant if PCRE_UTF8
+                       was set at compile time)
+
+There is a complete description of the PCRE API in the
+.\" HREF
+\fBpcreapi\fR
+.\"
+page.

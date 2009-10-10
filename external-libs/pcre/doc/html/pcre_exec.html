@@ -1,0 +1,58 @@
+<html>
+<head>
+<title>pcre_exec specification</title>
+</head>
+<body bgcolor="#FFFFFF" text="#00005A" link="#0066FF" alink="#3399FF" vlink="#2222BB">
+This HTML document has been generated automatically from the original man page.
+If there is any nonsense in it, please consult the man page, in case the
+conversion went wrong.<br>
+<br><b>
+SYNOPSIS
+</b><br>
+<P>
+<b>#include &#60;pcre.h&#62;</b>
+</P>
+<P>
+<b>int pcre_exec(const pcre *<i>code</i>, const pcre_extra *<i>extra</i>,</b>
+<b>const char *<i>subject</i>, int <i>length</i>, int <i>startoffset</i>,</b>
+<b>int <i>options</i>, int *<i>ovector</i>, int <i>ovecsize</i>);</b>
+</P>
+<br><b>
+DESCRIPTION
+</b><br>
+<P>
+This function matches a compiled regular expression against a given subject
+string, and returns offsets to capturing subexpressions. Its arguments are:
+</P>
+<P>
+<pre>
+  <i>code</i>         Points to the compiled pattern
+  <i>extra</i>        Points to an associated <b>pcre_extra</b> structure,
+                 or is NULL
+  <i>subject</i>      Points to the subject string
+  <i>length</i>       Length of the subject string, in bytes
+  <i>startoffset</i>  Offset in bytes in the subject at which to
+                 start matching
+  <i>options</i>      Option bits
+  <i>ovector</i>      Points to a vector of ints for result offsets
+  <i>ovecsize</i>     Size of the vector (a multiple of 3)
+</PRE>
+</P>
+<P>
+The options are:
+</P>
+<P>
+<pre>
+  PCRE_ANCHORED      Match only at the first position
+  PCRE_NOTBOL        Subject is not the beginning of a line
+  PCRE_NOTEOL        Subject is not the end of a line
+  PCRE_NOTEMPTY      An empty string is not a valid match
+  PCRE_NO_UTF8_CHECK Do not check the subject for UTF-8
+                       validity (only relevant if PCRE_UTF8
+                       was set at compile time)
+</PRE>
+</P>
+<P>
+There is a complete description of the PCRE API in the
+<a href="pcreapi.html"><b>pcreapi</b></a>
+page.

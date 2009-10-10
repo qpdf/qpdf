@@ -1,0 +1,37 @@
+.TH PCRE 3
+.SH NAME
+PCRE - Perl-compatible regular expressions
+.SH SYNOPSIS
+.rs
+.sp
+.B #include <pcre.h>
+.PP
+.SM
+.br
+.B int pcre_copy_substring(const char *\fIsubject\fR, int *\fIovector\fR,
+.ti +5n
+.B int \fIstringcount\fR, int \fIstringnumber\fR, char *\fIbuffer\fR,
+.ti +5n
+.B int \fIbuffersize\fR);
+
+.SH DESCRIPTION
+.rs
+.sp
+This is a convenience function for extracting a captured substring into a given
+buffer. The arguments are:
+
+  \fIsubject\fR       Subject that has been successfully matched
+  \fIovector\fR       Offset vector that \fBpcre_exec()\fR used
+  \fIstringcount\fR   Value returned by \fBpcre_exec()\fR
+  \fIstringnumber\fR  Number of the required substring
+  \fIbuffer\fR        Buffer to receive the string
+  \fIbuffersize\fR    Size of buffer
+
+The yield is the legnth of the string, PCRE_ERROR_NOMEMORY if the buffer was
+too small, or PCRE_ERROR_NOSUBSTRING if the string number is invalid.
+
+There is a complete description of the PCRE API in the
+.\" HREF
+\fBpcreapi\fR
+.\"
+page.
