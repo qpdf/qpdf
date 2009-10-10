@@ -16,7 +16,7 @@ TARGETS_libtests = $(foreach B,$(BINS_libtests),libtests/$(OUTPUT_DIR)/$(call bi
 
 $(TARGETS_libtests): $(TARGETS_libqpdf)
 
-INCLUDES_libtests = include libqpdf
+INCLUDES_libtests = include libqpdf $(INCLUDES_external-libs)
 
 TC_SRCS_libtests = $(wildcard libqpdf/*.cc) $(wildcard libtests/*.cc) \
 	libqpdf/bits.icc
