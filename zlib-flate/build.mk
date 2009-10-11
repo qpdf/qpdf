@@ -19,4 +19,4 @@ $(OBJS_zlib-flate): zlib-flate/$(OUTPUT_DIR)/%.$(OBJ): zlib-flate/%.cc
 	$(call compile,$<,$(INCLUDES_zlib-flate))
 
 zlib-flate/$(OUTPUT_DIR)/$(call binname,zlib-flate): $(OBJS_zlib-flate)
-	$(call makebin,$(OBJS_zlib-flate),$@)
+	$(call makebin,$(OBJS_zlib-flate),$@,$(LDFLAGS) $(LDFLAGS_libqpdf),$(LIBS) $(LIBS_libqpdf))

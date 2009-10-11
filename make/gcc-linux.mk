@@ -62,22 +62,21 @@ define makeslib
 	$(RANLIB) $(2)
 endef
 
-#                       1    2       3       4        5
-# Usage: $(call makelib,objs,library,current,revision,age)
+#                       1    2       3       4    5       6        7
+# Usage: $(call makelib,objs,library,ldflags,libs,current,revision,age)
 define makelib
 	$(RM) $(2) $(2).*
-	major=$$(( $(3) - $(5))); \
-	versuffix=$$major.$5.$4; \
+	major=$$(( $(5) - $(7))); \
+	versuffix=$$major.$(7).$(6); \
 	$(CXX) $(CXXFLAGS) -shared -o $(2).$$versuffix $(1) \
 		-Wl,--soname -Wl,`basename $(2)`.$$major \
-		$(LDFLAGS) $(LIBS); \
+		$(3) $(4); \
 	ln -s `basename $(2)`.$$versuffix $(2); \
 	ln -s `basename $(2)`.$$versuffix $(2).$$major
 endef
 
-#                       1    2
-# Usage: $(call makebin,objs,binary)
+#                       1    2      3       4
+# Usage: $(call makebin,objs,binary,ldflags,libs)
 define makebin
-	$(CXX) $(CXXFLAGS) $(1) -o $(2) $(LDFLAGS) \
-		-Llibqpdf/$(OUTPUT_DIR) -lqpdf $(LIBS)
+	$(CXX) $(CXXFLAGS) $(1) -o $(2) $(LDFLAGS) $(3) $(4)
 endef

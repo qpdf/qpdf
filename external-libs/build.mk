@@ -54,6 +54,5 @@ OBJS_dftables = $(call c_src_to_obj,external-libs/pcre/dftables.c)
 $(OBJS_dftables): external-libs/pcre/dftables.c
 	$(call c_compile,$<,)
 
-external-libs/$(OUTPUT_DIR)/$(call binname,dftables): LIBS=
 external-libs/$(OUTPUT_DIR)/$(call binname,dftables): $(OBJS_dftables)
-	$(call makebin,$(OBJS_dftables),$@)
+	$(call makebin,$(OBJS_dftables),$@,,)

@@ -31,4 +31,4 @@ $(foreach B,$(CBINS_examples),$(eval \
 
 $(foreach B,$(BINS_examples) $(CBINS_examples),$(eval \
   examples/$(OUTPUT_DIR)/$(call binname,$(B)): $(OBJS_$(B)) ; \
-	$(call makebin,$(OBJS_$(B)),$$@)))
+	$(call makebin,$(OBJS_$(B)),$$@,$(LDFLAGS) $(LDFLAGS_libqpdf),$(LIBS) $(LIBS_libqpdf))))

@@ -3,6 +3,8 @@ TARGETS_libqpdf = libqpdf/$(OUTPUT_DIR)/$(call libname,qpdf)
 $(TARGETS_libqpdf): $(TARGETS_external-libs)
 
 INCLUDES_libqpdf = include libqpdf $(INCLUDES_external-libs)
+LDFLAGS_libqpdf = -Llibqpdf/$(OUTPUT_DIR)
+LIBS_libqpdf = -lqpdf
 
 SRCS_libqpdf = \
 	libqpdf/BitStream.cc \
@@ -70,4 +72,4 @@ $(OBJS_libqpdf): libqpdf/$(OUTPUT_DIR)/%.$(LOBJ): libqpdf/%.cc
 # * Otherwise, increment REVISION
 
 $(TARGETS_libqpdf): $(OBJS_libqpdf)
-	$(call makelib,$(OBJS_libqpdf),$@,3,0,0)
+	$(call makelib,$(OBJS_libqpdf),$@,$(LDFLAGS),$(LIBS),3,0,0)

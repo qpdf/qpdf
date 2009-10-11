@@ -76,18 +76,16 @@ define makeslib
 	$(RANLIB) $(2)
 endef
 
-#                       1    2       3       4        5
-# Usage: $(call makelib,objs,library,current,revision,age)
+#                       1    2       3       4    5       6        7
+# Usage: $(call makelib,objs,library,ldflags,libs,current,revision,age)
 define makelib
 	$(LIBTOOL) --mode=link \
-		$(CXX) $(CXXFLAGS) -o $(2) $(1) $(LDFLAGS) $(LIBS) \
-		 -rpath $(libdir) -version-info $(3):$(4):$(5)
+		$(CXX) $(CXXFLAGS) -o $(2) $(1) $(3) $(4) \
+		 -rpath $(libdir) -version-info $(5):$(6):$(7)
 endef
 
-#                       1    2
-# Usage: $(call makebin,objs,binary)
+#                       1    2      3       4
+# Usage: $(call makebin,objs,binary,ldflags,libs)
 define makebin
-	$(LIBTOOL) --mode=link \
-		$(CXX) $(CXXFLAGS) $(1) -o $(2) $(LDFLAGS) \
-		-Llibqpdf/$(OUTPUT_DIR) -lqpdf $(LIBS)
+	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(1) -o $(2) $(3) $(4)
 endef
