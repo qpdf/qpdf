@@ -10,7 +10,8 @@
    Consider making the "install" target do something useful for
    Windows.  Update README.windows in this case including taking out
    the mention of strip since it should be handled by the install
-   step.
+   step.  Determine whether -g with strip is different from not -g
+   with strip.
 
  * Add comments for the security functions that map them back to the
    items in Adobe's products.
