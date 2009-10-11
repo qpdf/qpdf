@@ -55,5 +55,5 @@ endef
 #                       1    2      3       4
 # Usage: $(call makebin,objs,binary,ldflags,libs)
 define makebin
-	$(CXX) $(CXXFLAGS) $(1) -o $(2) $(3) $(4)
+	$(CXX) $(CXXFLAGS) -static-libgcc $(1) -o $(2) $(3) $(4)
 endef
