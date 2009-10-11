@@ -25,13 +25,11 @@ cygwin, though it's possible that it could be made to work with gcc
 
 From your MSYS prompt, run
 
-  CFLAGS=-O2 CXXFLAGS=-O2 ./configure --disable-test-compare-images --enable-build-external-libs --with-buildrules=mingw
+  ./configure --disable-test-compare-images --enable-build-external-libs --with-buildrules=mingw
   make
 
-Omit the CFLAGS and CXXFLAGS values if you want debugging information.
-You may also want to strip the DLL and executables to create much
-smaller files.  When done, you should copy the gcc runtime DLL into
-the libqpdf/build directory.  You can find the path to it by running
+When done, you should copy the gcc runtime DLL into the libqpdf/build
+directory.  You can find the path to it by running
 
   objdump -p qpdf/build/qpdf.exe | grep DLL
   type -P libgcc_s_dw2-1.dll
@@ -96,6 +94,21 @@ to edit msvc.mk to change /MD to /MDd to build a debugging version.
 Note that you must redistribute the Microsoft runtime DLLs.  Linking
 with static runtime won't work; see "Static Runtime" below for
 details.
+
+Installing
+==========
+
+As of this writing, make install doesn't work with Windows since it is
+hard-coded to use libtool.  Until that time, you can install manually
+by looking at the install target in Makefile and gathering up the
+appropriate pieces by hand.  If building with mingw, be sure to run
+strip on the DLL and EXE files to make them much smaller.  This is not
+necessary with msvc since it stores debugging information in a
+separate file.  Note that, in both cases, compiling with debugging
+flags adds extra data to the symbol table and not to the resulting
+executables.  (Compiling with debugging flags, with msvc, is distinct
+from directing the compiler to use debugging runtime libraries, which
+does make a difference.)
 
 Static Runtime
 ==============
