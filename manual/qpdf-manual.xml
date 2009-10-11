@@ -179,11 +179,10 @@ make
     <filename>INSTALL</filename> files in the source distribution.
    </para>
    <para>
-    There is currently no support for building qpdf on Windows.  The
-    code is reasonably portable, however, and making it work on
-    Windows would probably be reasonably straightforward.  A
-    significant amount of the code in QPDF has been known to work on
-    Windows in the past.
+    Building on Windows is a little bit more complicated.  For
+    details, please see <filename>README.windows</filename> in the
+    source distribution.  You can also download a binary distribution
+    for Windows.
    </para>
    <para>
     There are some other things you can do with the build.  Although

@@ -1,62 +1,89 @@
-By default, qpdf builds on UNIX and UNIX-like systems with simple
-./configure; make; make install comamnds.  It ordinarily uses libtool
-to build libraries and link executables.
+Common Setup
+============
 
-As an alternative, the build system can use its own built-in rules.
-The available build rules can be found in the make directory; all the
-files except rules.mk are build rules.  The gcc-linux rules are there
-primarily for testing the build system.  They are not intended to be
-used in production since, in a Linux environment, it's better to use
-the default libtool rules.
-
-For building on Windows, autoconf and libtool don't generate a working
-build for either mingw (as of this writing) or MS Visual C++.  We use
-our own rules instead.  In addition, the external dependencies (pcre
-and zlib) are often not present on Windows systems.
-
-If you have MSYS and Mingw installed, you can run configure as follows:
-
-./configure --disable-test-compare-images --enable-build-external-libs --with-buildrules=mingw
-
-To build with msvc, you must be running in a shell environment that
-puts the MSVC tools in your path.  Then you can run
-
-CC=cl CXX="cl /TP /GR" CPPFLAGS=-DHAVE_VSNPRINTF ./configure --disable-test-compare-images --enable-build-external-libs --with-buildrules=msvc
-
-This is tested with MSVC .NET 2008 Express.
-
-From there, run
-
-make
-
-at the top level directory to build everything.  Building with mingw
-from a cygwin environment is not likely to work.  However, you have to
-have a cygwin environment to run the test suite.  Once you have built
-qpdf using mingw, you can test as follows:
-
-From your MSYS environment:
-
- * Run objdump qpdf/build/qpdf.exe | grep DLL
-
- * Copy the gcc runtime DLL into libqpdf/build
-
-From a Cygwin environment:
-
- * Add the full path libqpdf/build to your path
-
- * Run
-
-   make check GENDEPS=0
-
-This will run the qtest-based test suite, which requires cygwin.  You
-need perl, gnu diffutils, and basic shell commands.
+To be able to run qpdf's test suite, you must have cygwin installed.
+This is because qpdf's test suite uses qtest, which requires cygwin
+perl on Windows.  (Hopefully a future version of qtest will work with
+ActiveState Perl.)  You must have at least perl and gnu diffutils
+installed to run the test suite.
 
 As of this writing, the image comparison tests confuse ghostscript in
 cygwin, but there's a chance they might work at some point.  If you
 want to run them, you need ghostscript and tiff utils as well.  Then
-omit --disable-test-compare-images from your configure statement.
+omit --disable-test-compare-images from the configure statements given
+below.
+
+Building with MinGW
+===================
+
+QPDF is known to build and pass its test suite with MSYS-1.0.11 and
+gcc 4.4.0 with C++ support.  You can fully configure and build qpdf in
+this environment, though cygwin is required to run the test suite.
+You will most likely not be able to build qpdf with mingw using
+cygwin, though it's possible that it could be made to work with gcc
+-mno-cygwin.
+
+From your MSYS prompt, run
+
+  ./configure --disable-test-compare-images --enable-build-external-libs --with-buildrules=mingw
+  make
+
+When done, you should copy the gcc runtime dll into the libqpdf/build
+directory.  You can find the path to it by running
+
+  objdump -p qpdf/build/qpdf.exe | grep DLL
+  type -P libgcc_s_dw2-1.dll
+
+replacing libgcc_s_dw2-1.dll with whatever gcc DLL is shown, if
+different.
+
+From your cygwin prompt, add the absolute path to the libqpdf/build
+directory to your PATH.  Make sure you can run the qpdf command by
+typing qpdf/build/qpdf and making sure you get a help message rather
+than an error loading the DLL or no output at all.  Run the test suite
+by typing
+
+  make check GENDEPS=0
+
+from your cygwin prompt.  The GENDEPS=0 is necessary to prevent the
+build system in cygwin from trying to interpret the MSYS/Windows paths
+embedded in the dependency files.  If all goes well, you should get a
+passing test suite.
+
+Building with MSVC .NET 2008 Express
+====================================
+
+These instructions would likely work with newer version of MSVC or
+with full version of MSVC.  They may also work with .NET 2005.  They
+have only been tested with .NET 2008 Express.
+
+It's possible that the MSVC build may work from MSYS, but since cygwin
+is needed to run the test suite, these have only been tested from
+cygwin.
+
+You should first set up your environment to be able to run MSVC from
+the command line.  There is usually a batch file included with MSVC
+that does this.  From that cmd prompt, you can start your cygwin
+shell.
+
+Configure as follows:
+
+  CC=cl CXX="cl /TP /GR" CPPFLAGS=-DHAVE_VSNPRINTF ./configure --disable-test-compare-images --enable-build-external-libs --with-buildrules=msvc
+  make
+
+Then add the full path to the libqpdf/build directory to your path and
+run
+
+  make check
+
+to run the test suite.
 
 If you are building with MSVC and want to debug a crash in MSVC's
 debugger, first start an instance of Visual C++.  Then run qpdf.  When
 the abort/retry/ignore dialog pops up, first attach the process from
 within visual C++, and then click Retry in qpdf.
+
+A release version of qpdf is built by default.  You will probably have
+to edit msvc.mk to change /MD to /MDd to build a debugging version.
+It has also been attempted to build qpdf with /MT, but it does not
+pass its test suite in this configuration.  I have not investigated.

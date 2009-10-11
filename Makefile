@@ -23,7 +23,9 @@
 # and make maintainer-clean to remove everything that is generated
 # including things distributed with the source distribution.  You can
 # pass CLEAN=1 to prevent this Makefile from complaining if
-# ./configure has not been run.
+# ./configure has not been run.  If you are cleaning from Windows, you
+# may also need to add BUILD_EXTERNAL_LIBS=1 to make sure you can that
+# as well.
 
 # The install target works as usual and obeys --prefix and so forth
 # passed to ./configure.  You can also pass DESTDIR=/dir to make
