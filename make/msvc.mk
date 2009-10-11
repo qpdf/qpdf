@@ -28,7 +28,7 @@ endef
 define c_compile
 	cl /nologo /Zi /Gy /EHsc /MD $(CPPFLAGS) $(CXXFLAGS) \
 		$(foreach I,$(2),-I$(I)) \
-		/c $(1) /Fo$(call src_to_obj,$(1))
+		/c $(1) /Fo$(call c_src_to_obj,$(1))
 endef
 
 libcompile = $(compile)
@@ -43,11 +43,10 @@ endef
 #                       1    2       3       4        5
 # Usage: $(call makelib,objs,library,current,revision,age)
 define makelib
-	dll=
-	cl /nologo /Zi /Gy /EHsc /MD /TP /GR /LD /Fe$(basename $(2))$(3).dll \
+	cl /nologo /Zi /Gy /EHsc /MD /LD /Fe$(basename $(2))$(3).dll $(1) \
 		/link /incremental:no \
 		$(foreach L,$(subst -L,,$(LDFLAGS)),/LIBPATH:$(L)) \
-		$(foreach L,$(subst -l,,$(LIBS)),$(L).lib) $(1)
+		$(foreach L,$(subst -l,,$(LIBS)),$(L).lib)
 	if [ -f $(basename $(2))$(3).dll.manifest ]; then \
 		mt.exe -nologo -manifest $(basename $(2))$(3).dll.manifest \
 			-outputresource:$(basename $(2))$(3).dll\;2; \
@@ -57,10 +56,10 @@ endef
 #                       1    2
 # Usage: $(call makebin,objs,binary)
 define makebin
-	cl /nologo /Zi /Gy /EHsc /MD /TP /GR /OUT:$(2) \
-		/link /incremental:no \
+	cl /nologo /Zi /Gy /EHsc /MD $(1) \
+		/link /incremental:no /OUT:$(2) \
 		$(foreach L,$(subst -L,,$(LDFLAGS)),/LIBPATH:$(L)) \
-		$(foreach L,$(subst -l,,$(LIBS)),$(L).lib) $(1)
+		$(foreach L,$(subst -l,,$(LIBS)),$(L).lib)
 	if [ -f $(2).manifest ]; then \
 		mt.exe -nologo -manifest $(2).manifest \
 			-outputresource:$(2)\;2; \
