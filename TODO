@@ -50,7 +50,8 @@ General
    than a catastrophic failure.
 
  * See whether we can do anything with /V > 3 in the encryption
-   dictionary.  (V = 4 is Crypt Filters.)
+   dictionary.  (V = 4 is Crypt Filters.)  See
+   ~/Q/pdf-collection/R4-encrypt-PDF_Inside_and_Out.pdf
 
  * The second xref stream for linearized files has to be padded only
    because we need file_size as computed in pass 1 to be accurate.  If
