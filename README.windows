@@ -71,8 +71,13 @@ Configure as follows:
   CC=cl CXX="cl /TP /GR" CPPFLAGS=-DHAVE_VSNPRINTF ./configure --disable-test-compare-images --enable-build-external-libs --with-buildrules=msvc
   make
 
-Then add the full path to the libqpdf/build directory to your path and
-run
+The -DHAVE_VSNPRINTF is really only required for things that include
+zutil.h from zlib.  You don't have to worry about this when compiling
+against qpdf with MSVC -- only when building zlib.  It's harmless to
+include with the rest of the qpdf build.
+
+Once built, add the full path to the libqpdf/build directory to your
+path and run
 
   make check
 
