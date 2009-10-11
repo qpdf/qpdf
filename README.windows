@@ -25,11 +25,13 @@ cygwin, though it's possible that it could be made to work with gcc
 
 From your MSYS prompt, run
 
-  ./configure --disable-test-compare-images --enable-build-external-libs --with-buildrules=mingw
+  CFLAGS=-O2 CXXFLAGS=-O2 ./configure --disable-test-compare-images --enable-build-external-libs --with-buildrules=mingw
   make
 
-When done, you should copy the gcc runtime DLL into the libqpdf/build
-directory.  You can find the path to it by running
+Omit the CFLAGS and CXXFLAGS values if you want debugging information.
+You may also want to strip the DLL and executables to create much
+smaller files.  When done, you should copy the gcc runtime DLL into
+the libqpdf/build directory.  You can find the path to it by running
 
   objdump -p qpdf/build/qpdf.exe | grep DLL
   type -P libgcc_s_dw2-1.dll

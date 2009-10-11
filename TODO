@@ -8,7 +8,9 @@
  * Update release documentation to remember not to include debugging
    in the Windows release and to strip the DLL and executables.
    Consider making the "install" target do something useful for
-   Windows.
+   Windows.  Update README.windows in this case including taking out
+   the mention of strip since it should be handled by the install
+   step.
 
  * Add comments for the security functions that map them back to the
    items in Adobe's products.
