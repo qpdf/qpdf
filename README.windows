@@ -35,10 +35,8 @@ directory.  You can find the path to it by running
   type -P libgcc_s_dw2-1.dll
 
 replacing libgcc_s_dw2-1.dll with whatever gcc DLL is shown, if
-different.  For an unknown reason, building with -static-libgcc
-results in executables that fail their test suites.  I'm guessing this
-has to do with static data being duplicated between the DLL and the
-executable, but I don't really know.
+different.  Redistribution of this DLL is unavoidable as of this
+writing; see "Static Runtime" below for details.
 
 From your cygwin prompt, add the absolute path to the libqpdf/build
 directory to your PATH.  Make sure you can run the qpdf command by
@@ -93,8 +91,19 @@ within visual C++, and then click Retry in qpdf.
 
 A release version of qpdf is built by default.  You will probably have
 to edit msvc.mk to change /MD to /MDd to build a debugging version.
-It has also been attempted to build qpdf with /MT, but it does not
-pass its test suite in this configuration.  I have not investigated.
-Perhaps this is the same issue as with -static-libgcc with mingw.  In
-both cases, statically linking the runtime results in non-working
-executables/DLL.
+Note that you must redistribute the Microsoft runtime DLLs.  Linking
+with static runtime won't work; see "Static Runtime" below for
+details.
+
+Static Runtime
+==============
+
+Building the DLL and executables with static runtime does not work
+with either Visual C++ .NET 2008 (a.k.a. vc9) using /MT or with mingw
+(at least as of 4.4.0) using -static-libgcc.  The reason is that, in
+both cases, there is static data involved with exception handling, and
+when the runtime is linked in statically, exceptions cannot be thrown
+across the DLL to EXE boundary.  Since qpdf uses exception handling
+extensively for error handling, we have no choice but to redistribute
+the C++ runtime DLLs.  Maybe this will be addressed in a future
+version of the compilers.
