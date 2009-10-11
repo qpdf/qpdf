@@ -84,19 +84,30 @@ else
    AC_MSG_RESULT(no)
 fi
 
-qpdf_USE_WALL=0
-AC_MSG_CHECKING(for whether $CC supports -Wall)
-oCFLAGS=$CFLAGS
-CFLAGS="$CFLAGS -Wall"
-AC_TRY_COMPILE([], [int a = 1; int b = a; a = b;],
-	       qpdf_USE_WALL=1,
-	       qpdf_USE_WALL=0)
-if test "$qpdf_USE_WALL" = "1"; then
-   AC_MSG_RESULT(yes)
-   CXXFLAGS="$CXXFLAGS -Wall"
-else
-   AC_MSG_RESULT(no)
-   CFLAGS=$oCFLAGS
+AC_MSG_CHECKING(which build rules to use)
+AC_SUBST(BUILDRULES)
+AC_ARG_WITH(buildrules,
+   AS_HELP_STRING([--with-buildrules=rules],
+		  [which build rules to use; see README]),
+   [BUILDRULES=$withval],
+   [BUILDRULES=libtool])
+AC_MSG_RESULT($BUILDRULES)
+
+if test "$BUILDRULES" != "msvc"; then
+   qpdf_USE_WALL=0
+   AC_MSG_CHECKING(for whether $CC supports -Wall)
+   oCFLAGS=$CFLAGS
+   CFLAGS="$CFLAGS -Wall"
+   AC_TRY_COMPILE([], [int a = 1; int b = a; a = b;],
+		  qpdf_USE_WALL=1,
+		  qpdf_USE_WALL=0)
+   if test "$qpdf_USE_WALL" = "1"; then
+      AC_MSG_RESULT(yes)
+      CXXFLAGS="$CXXFLAGS -Wall"
+   else
+      AC_MSG_RESULT(no)
+      CFLAGS=$oCFLAGS
+   fi
 fi
 
 if test "$BUILD_EXTERNAL_LIBS" = "0"; then
@@ -117,15 +128,6 @@ if test "$BUILD_EXTERNAL_LIBS" = "0"; then
       AC_MSG_RESULT(no)
    fi
 fi
-
-AC_MSG_CHECKING(which build rules to use)
-AC_SUBST(BUILDRULES)
-AC_ARG_WITH(buildrules,
-   AS_HELP_STRING([--with-buildrules=rules],
-		  [which build rules to use; see README]),
-   [BUILDRULES=$withval],
-   [BUILDRULES=libtool])
-AC_MSG_RESULT($BUILDRULES)
 
 AC_SUBST(SKIP_TEST_COMPARE_IMAGES)
 AC_ARG_ENABLE(test-compare-images,

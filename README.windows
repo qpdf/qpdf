@@ -21,9 +21,9 @@ If you have MSYS and Mingw installed, you can run configure as follows:
 To build with msvc, you must be running in a shell environment that
 puts the MSVC tools in your path.  Then you can run
 
-XXX WHAT?
+CC=cl CXX="cl /TP /GR" CPPFLAGS=-DHAVE_VSNPRINTF ./configure --disable-test-compare-images --enable-build-external-libs --with-buildrules=msvc
 
-./configure --disable-test-compare-images --enable-build-external-libs --with-buildrules=msvc
+This is tested with MSVC .NET 2008 Express.
 
 From there, run
 
