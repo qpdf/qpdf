@@ -1,7 +1,10 @@
 2.1
 ===
 
- * For mingw, try --static-libstdc++
+ * For some reason, /MT with msvc and -static-libgcc with mingw both
+   produce lots of test suite failures.  Why do some things work and
+   some things not work?  Is it static data in PCRE or zlib?  Is it
+   something in my code?
 
  * Update documentation to reflect new command line flags and any
    other relevant changes.  Should read through ChangeLog and the
