@@ -6,7 +6,9 @@
    manual before releasing 2.1.
 
  * Update release documentation to remember not to include debugging
-   in the Windows release.
+   in the Windows release and to strip the DLL and executables.
+   Consider making the "install" target do something useful for
+   Windows.
 
  * Add comments for the security functions that map them back to the
    items in Adobe's products.
