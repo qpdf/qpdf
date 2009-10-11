@@ -48,12 +48,12 @@ endef
 # Usage: $(call makelib,objs,library,ldflags,libs,current,revision,age)
 define makelib
 	dlltool -l $(2) -D $$(basename `echo $(2) | sed -e 's,/lib\(.*\).a,/\1,'`$(5).dll) $(1); \
-	$(CXX) -shared -o `echo $(2) | sed -e 's,/lib\(.*\).a,/\1,'`$(5).dll \
+	$(CXX) -shared -static-libgcc -o `echo $(2) | sed -e 's,/lib\(.*\).a,/\1,'`$(5).dll \
 		$(1) $(3) $(4)
 endef
 
 #                       1    2      3       4
 # Usage: $(call makebin,objs,binary,ldflags,libs)
 define makebin
-	$(CXX) $(CXXFLAGS) -static-libgcc $(1) -o $(2) $(3) $(4)
+	$(CXX) $(CXXFLAGS) $(1) -o $(2) $(3) $(4)
 endef
