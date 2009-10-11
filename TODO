@@ -1,14 +1,12 @@
 2.1
 ===
 
- * For some reason, /MT with msvc and -static-libgcc with mingw both
-   produce lots of test suite failures.  Why do some things work and
-   some things not work?  Is it static data in PCRE or zlib?  Is it
-   something in my code?
-
  * Update documentation to reflect new command line flags and any
    other relevant changes.  Should read through ChangeLog and the
    manual before releasing 2.1.
+
+ * Update release documentation to remember not to include debugging
+   in the Windows release.
 
  * Add comments for the security functions that map them back to the
    items in Adobe's products.
@@ -23,27 +21,9 @@
    through all error messages to try to include all these fields as
    appropriate.  Make sure invalid password is specifically
    detectable.  I/O errors and so forth should also be
-   distinguishable.
-
- * Test DLL works on a fresh XP installation
-
- * "Delphi wrapper unit 'qpdf.pas' created by Zarko Gajic
-   (http://delphi.about.com). .. use at your own risk and for whatever
-   the purpose you want .. no support provided. Sample code provided."
-
- * Add ability to create new streams or replace stream data.  Consider
-   stream data sources to include a file and offset, a buffer, or a
-   some kind of callback mechanism.  Find messages exchanged with
-   Stefan Heinsen <stefan.heinsen@gmx.de> in August, 2009.  He seems
-   to like to send encrypted mail.  (key 01FCC336)
-
- * Improve the error message generated when processing the broken
-   files...ideally we should provide the object number currently being
-   read
-
-
-General
-=======
+   distinguishable.  Make sure all errors include information about
+   the most recent read location including byte offset and
+   object/generation number.
 
  * It might be nice to be able to trap I/O errors separately from
    other errors; especially be able to separate errors that the user
@@ -54,9 +34,28 @@ General
    write, are at all likely to generate such errors for a case other
    than a catastrophic failure.
 
+ * "Delphi wrapper unit 'qpdf.pas' created by Zarko Gajic
+   (http://delphi.about.com). .. use at your own risk and for whatever
+   the purpose you want .. no support provided. Sample code provided."
+
+2.2
+===
+
+ * Add ability to create new streams or replace stream data.  Consider
+   stream data sources to include a file and offset, a buffer, or a
+   some kind of callback mechanism.  Find messages exchanged with
+   Stefan Heinsen <stefan.heinsen@gmx.de> in August, 2009.  He seems
+   to like to send encrypted mail.  (key 01FCC336)
+
  * See whether we can do anything with /V > 3 in the encryption
    dictionary.  (V = 4 is Crypt Filters.)  See
    ~/Q/pdf-collection/R4-encrypt-PDF_Inside_and_Out.pdf
+
+ * Look at page splitting.
+
+
+General
+=======
 
  * The second xref stream for linearized files has to be padded only
    because we need file_size as computed in pass 1 to be accurate.  If
@@ -122,5 +121,6 @@ taking care not to traverse into the pages tree, and then to fabricate
 a new pages tree.
 
 Either way, care must be taken to handle other things such as
-outlines, page labels, thumbnails, threads, etc. in a sensible way.
-This may include simply omitting information other than page content.
+outlines, page labels, thumbnails, threads, zones, etc. in a sensible
+way.  This may include simply omitting information other than page
+content.
