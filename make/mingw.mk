@@ -48,7 +48,7 @@ endef
 # Usage: $(call makelib,objs,library,ldflags,libs,current,revision,age)
 define makelib
 	dlltool -l $(2) -D $$(basename `echo $(2) | sed -e 's,/lib\(.*\).a,/\1,'`$(5).dll) $(1); \
-	$(CXX) -shared -static-libgcc -o `echo $(2) | sed -e 's,/lib\(.*\).a,/\1,'`$(5).dll \
+	$(CXX) -shared -o `echo $(2) | sed -e 's,/lib\(.*\).a,/\1,'`$(5).dll \
 		$(1) $(3) $(4)
 endef
 
