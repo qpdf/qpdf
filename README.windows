@@ -28,14 +28,17 @@ From your MSYS prompt, run
   ./configure --disable-test-compare-images --enable-build-external-libs --with-buildrules=mingw
   make
 
-When done, you should copy the gcc runtime dll into the libqpdf/build
+When done, you should copy the gcc runtime DLL into the libqpdf/build
 directory.  You can find the path to it by running
 
   objdump -p qpdf/build/qpdf.exe | grep DLL
   type -P libgcc_s_dw2-1.dll
 
 replacing libgcc_s_dw2-1.dll with whatever gcc DLL is shown, if
-different.
+different.  For an unknown reason, building with -static-libgcc
+results in executables that fail their test suites.  I'm guessing this
+has to do with static data being duplicated between the DLL and the
+executable, but I don't really know.
 
 From your cygwin prompt, add the absolute path to the libqpdf/build
 directory to your PATH.  Make sure you can run the qpdf command by
@@ -92,3 +95,6 @@ A release version of qpdf is built by default.  You will probably have
 to edit msvc.mk to change /MD to /MDd to build a debugging version.
 It has also been attempted to build qpdf with /MT, but it does not
 pass its test suite in this configuration.  I have not investigated.
+Perhaps this is the same issue as with -static-libgcc with mingw.  In
+both cases, statically linking the runtime results in non-working
+executables/DLL.
