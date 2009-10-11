@@ -1,6 +1,8 @@
 2.1
 ===
 
+ * For mingw, try --static-libstdc++
+
  * Update documentation to reflect new command line flags and any
    other relevant changes.  Should read through ChangeLog and the
    manual before releasing 2.1.
