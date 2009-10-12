@@ -6,8 +6,7 @@
 #include <qpdf/Buffer.hh>
 #include <vector>
 
-DLL_EXPORT
-class Pl_LZWDecoder: public Pipeline
+class DLL_EXPORT Pl_LZWDecoder: public Pipeline
 {
   public:
     Pl_LZWDecoder(char const* identifier, Pipeline* next,

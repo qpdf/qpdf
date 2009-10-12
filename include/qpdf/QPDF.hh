@@ -25,8 +25,7 @@ class BitStream;
 class BitWriter;
 class QPDFExc;
 
-DLL_EXPORT
-class QPDF
+class DLL_EXPORT QPDF
 {
   public:
     QPDF();

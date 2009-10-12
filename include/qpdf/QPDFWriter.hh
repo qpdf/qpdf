@@ -31,8 +31,7 @@ class QPDF;
 class QPDFObjectHandle;
 class Pl_Count;
 
-DLL_EXPORT
-class QPDFWriter
+class DLL_EXPORT QPDFWriter
 {
   public:
     // Passing null as filename means write to stdout.  QPDFWriter

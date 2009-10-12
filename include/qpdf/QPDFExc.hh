@@ -11,8 +11,7 @@
 #include <qpdf/DLL.hh>
 #include <stdexcept>
 
-DLL_EXPORT
-class QPDFExc: public std::runtime_error
+class DLL_EXPORT QPDFExc: public std::runtime_error
 {
   public:
     QPDFExc(std::string const& message);

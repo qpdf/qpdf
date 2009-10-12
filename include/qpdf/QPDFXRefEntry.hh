@@ -10,8 +10,7 @@
 
 #include <qpdf/DLL.hh>
 
-DLL_EXPORT
-class QPDFXRefEntry
+class DLL_EXPORT QPDFXRefEntry
 {
   public:
     // Type constants are from the PDF spec section

@@ -13,8 +13,7 @@
 #include <string>
 #include <stdio.h>
 
-DLL_EXPORT
-class QPDFTokenizer
+class DLL_EXPORT QPDFTokenizer
 {
   public:
     enum token_type_e

@@ -24,8 +24,7 @@
 #include <qpdf/Buffer.hh>
 #include <list>
 
-DLL_EXPORT
-class Pl_Buffer: public Pipeline
+class DLL_EXPORT Pl_Buffer: public Pipeline
 {
   public:
     Pl_Buffer(char const* identifier, Pipeline* next = 0);

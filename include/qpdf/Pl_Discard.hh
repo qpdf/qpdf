@@ -16,8 +16,7 @@
 
 #include <qpdf/Pipeline.hh>
 
-DLL_EXPORT
-class Pl_Discard: public Pipeline
+class DLL_EXPORT Pl_Discard: public Pipeline
 {
   public:
     Pl_Discard();

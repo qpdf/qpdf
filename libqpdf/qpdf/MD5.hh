@@ -8,8 +8,7 @@
 # include <inttypes.h>
 #endif
 
-DLL_EXPORT
-class MD5
+class DLL_EXPORT MD5
 {
   public:
     typedef unsigned char Digest[16];

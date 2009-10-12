@@ -12,8 +12,7 @@
 
 #include <string>
 
-DLL_EXPORT
-class QPDFObject
+class DLL_EXPORT QPDFObject
 {
   public:
     virtual ~QPDFObject() {}

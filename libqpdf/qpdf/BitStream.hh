@@ -5,8 +5,7 @@
 
 #include <qpdf/DLL.hh>
 
-DLL_EXPORT
-class BitStream
+class DLL_EXPORT BitStream
 {
   public:
     BitStream(unsigned char const* p, int nbytes);

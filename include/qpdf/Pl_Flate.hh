@@ -12,8 +12,7 @@
 
 #include <zlib.h>
 
-DLL_EXPORT
-class Pl_Flate: public Pipeline
+class DLL_EXPORT Pl_Flate: public Pipeline
 {
   public:
     static int const def_bufsize = 65536;

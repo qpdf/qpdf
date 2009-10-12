@@ -5,8 +5,7 @@
 
 #include <qpdf/RC4.hh>
 
-DLL_EXPORT
-class Pl_RC4: public Pipeline
+class DLL_EXPORT Pl_RC4: public Pipeline
 {
   public:
     static int const def_bufsize = 65536;

@@ -3,8 +3,7 @@
 
 #include <qpdf/Pipeline.hh>
 
-DLL_EXPORT
-class Pl_ASCIIHexDecoder: public Pipeline
+class DLL_EXPORT Pl_ASCIIHexDecoder: public Pipeline
 {
   public:
     Pl_ASCIIHexDecoder(char const* identifier, Pipeline* next);

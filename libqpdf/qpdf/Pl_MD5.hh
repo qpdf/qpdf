@@ -12,8 +12,7 @@
 #include <qpdf/Pipeline.hh>
 #include <qpdf/MD5.hh>
 
-DLL_EXPORT
-class Pl_MD5: public Pipeline
+class DLL_EXPORT Pl_MD5: public Pipeline
 {
   public:
     Pl_MD5(char const* identifier, Pipeline* next);

@@ -16,8 +16,7 @@
 
 #include <qpdf/Pipeline.hh>
 
-DLL_EXPORT
-class Pl_PNGFilter: public Pipeline
+class DLL_EXPORT Pl_PNGFilter: public Pipeline
 {
   public:
     // Encoding is not presently supported

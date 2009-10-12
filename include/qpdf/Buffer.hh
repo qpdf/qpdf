@@ -10,8 +10,7 @@
 
 #include <qpdf/DLL.hh>
 
-DLL_EXPORT
-class Buffer
+class DLL_EXPORT Buffer
 {
   public:
     Buffer();

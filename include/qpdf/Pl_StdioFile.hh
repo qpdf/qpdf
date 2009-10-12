@@ -18,8 +18,7 @@
 // This pipeline is reusable.
 //
 
-DLL_EXPORT
-class Pl_StdioFile: public Pipeline
+class DLL_EXPORT Pl_StdioFile: public Pipeline
 {
   public:
     // f is externally maintained; this class just writes to and

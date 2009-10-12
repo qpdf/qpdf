@@ -7,8 +7,7 @@
 
 class Pipeline;
 
-DLL_EXPORT
-class BitWriter
+class DLL_EXPORT BitWriter
 {
   public:
     // Write bits to the pipeline.  It is the caller's responsibility

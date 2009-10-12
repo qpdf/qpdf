@@ -17,8 +17,7 @@
 // Note: this class does not encapsulate all features of the PCRE
 // package -- only those that I actually need right now are here.
 
-DLL_EXPORT
-class PCRE
+class DLL_EXPORT PCRE
 {
   public:
     // This is thrown when an attempt is made to access a non-existent

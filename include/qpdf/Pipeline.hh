@@ -33,8 +33,7 @@
 #include <qpdf/DLL.hh>
 #include <string>
 
-DLL_EXPORT
-class Pipeline
+class DLL_EXPORT Pipeline
 {
   public:
     Pipeline(char const* identifier, Pipeline* next);

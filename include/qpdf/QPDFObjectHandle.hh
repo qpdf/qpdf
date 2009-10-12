@@ -23,8 +23,7 @@
 class Pipeline;
 class QPDF;
 
-DLL_EXPORT
-class QPDFObjectHandle
+class DLL_EXPORT QPDFObjectHandle
 {
   public:
     QPDFObjectHandle();

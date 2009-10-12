@@ -13,8 +13,7 @@
 
 #include <qpdf/Pipeline.hh>
 
-DLL_EXPORT
-class Pl_Count: public Pipeline
+class DLL_EXPORT Pl_Count: public Pipeline
 {
   public:
     Pl_Count(char const* identifier, Pipeline* next);
