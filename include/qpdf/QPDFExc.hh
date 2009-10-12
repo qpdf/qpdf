@@ -11,15 +11,13 @@
 #include <qpdf/DLL.hh>
 #include <stdexcept>
 
+DLL_EXPORT
 class QPDFExc: public std::runtime_error
 {
   public:
-    DLL_EXPORT
     QPDFExc(std::string const& message);
-    DLL_EXPORT
     QPDFExc(std::string const& filename, int offset,
 	    std::string const& message);
-    DLL_EXPORT
     virtual ~QPDFExc() throw ();
 };
 

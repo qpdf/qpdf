@@ -1,14 +1,12 @@
 #include <qpdf/Pipeline.hh>
 #include <stdexcept>
 
-DLL_EXPORT
 Pipeline::Pipeline(char const* identifier, Pipeline* next) :
     identifier(identifier),
     next(next)
 {
 }
 
-DLL_EXPORT
 Pipeline::~Pipeline()
 {
 }

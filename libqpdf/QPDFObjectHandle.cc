@@ -17,7 +17,6 @@
 #include <stdexcept>
 #include <stdlib.h>
 
-DLL_EXPORT
 QPDFObjectHandle::QPDFObjectHandle() :
     initialized(false),
     objid(0),
@@ -42,7 +41,6 @@ QPDFObjectHandle::QPDFObjectHandle(QPDFObject* data) :
 {
 }
 
-DLL_EXPORT
 bool
 QPDFObjectHandle::isInitialized() const
 {
@@ -59,7 +57,6 @@ class QPDFObjectTypeAccessor
     }
 };
 
-DLL_EXPORT
 bool
 QPDFObjectHandle::isBool()
 {
@@ -67,7 +64,6 @@ QPDFObjectHandle::isBool()
     return QPDFObjectTypeAccessor<QPDF_Bool>::check(obj.getPointer());
 }
 
-DLL_EXPORT
 bool
 QPDFObjectHandle::isNull()
 {
@@ -75,7 +71,6 @@ QPDFObjectHandle::isNull()
     return QPDFObjectTypeAccessor<QPDF_Null>::check(obj.getPointer());
 }
 
-DLL_EXPORT
 bool
 QPDFObjectHandle::isInteger()
 {
@@ -83,7 +78,6 @@ QPDFObjectHandle::isInteger()
     return QPDFObjectTypeAccessor<QPDF_Integer>::check(obj.getPointer());
 }
 
-DLL_EXPORT
 bool
 QPDFObjectHandle::isReal()
 {
@@ -91,14 +85,12 @@ QPDFObjectHandle::isReal()
     return QPDFObjectTypeAccessor<QPDF_Real>::check(obj.getPointer());
 }
 
-DLL_EXPORT
 bool
 QPDFObjectHandle::isNumber()
 {
     return (isInteger() || isReal());
 }
 
-DLL_EXPORT
 double
 QPDFObjectHandle::getNumericValue()
 {
@@ -118,7 +110,6 @@ QPDFObjectHandle::getNumericValue()
     return result;
 }
 
-DLL_EXPORT
 bool
 QPDFObjectHandle::isName()
 {
@@ -126,7 +117,6 @@ QPDFObjectHandle::isName()
     return QPDFObjectTypeAccessor<QPDF_Name>::check(obj.getPointer());
 }
 
-DLL_EXPORT
 bool
 QPDFObjectHandle::isString()
 {
@@ -134,7 +124,6 @@ QPDFObjectHandle::isString()
     return QPDFObjectTypeAccessor<QPDF_String>::check(obj.getPointer());
 }
 
-DLL_EXPORT
 bool
 QPDFObjectHandle::isArray()
 {
@@ -142,7 +131,6 @@ QPDFObjectHandle::isArray()
     return QPDFObjectTypeAccessor<QPDF_Array>::check(obj.getPointer());
 }
 
-DLL_EXPORT
 bool
 QPDFObjectHandle::isDictionary()
 {
@@ -150,7 +138,6 @@ QPDFObjectHandle::isDictionary()
     return QPDFObjectTypeAccessor<QPDF_Dictionary>::check(obj.getPointer());
 }
 
-DLL_EXPORT
 bool
 QPDFObjectHandle::isStream()
 {
@@ -158,7 +145,6 @@ QPDFObjectHandle::isStream()
     return QPDFObjectTypeAccessor<QPDF_Stream>::check(obj.getPointer());
 }
 
-DLL_EXPORT
 bool
 QPDFObjectHandle::isIndirect()
 {
@@ -166,7 +152,6 @@ QPDFObjectHandle::isIndirect()
     return (this->objid != 0);
 }
 
-DLL_EXPORT
 bool
 QPDFObjectHandle::isScalar()
 {
@@ -175,7 +160,6 @@ QPDFObjectHandle::isScalar()
 
 // Bool accessors
 
-DLL_EXPORT
 bool
 QPDFObjectHandle::getBoolValue()
 {
@@ -185,7 +169,6 @@ QPDFObjectHandle::getBoolValue()
 
 // Integer accessors
 
-DLL_EXPORT
 int
 QPDFObjectHandle::getIntValue()
 {
@@ -195,7 +178,6 @@ QPDFObjectHandle::getIntValue()
 
 // Real accessors
 
-DLL_EXPORT
 std::string
 QPDFObjectHandle::getRealValue()
 {
@@ -205,7 +187,6 @@ QPDFObjectHandle::getRealValue()
 
 // Name accessors
 
-DLL_EXPORT
 std::string
 QPDFObjectHandle::getName()
 {
@@ -215,7 +196,6 @@ QPDFObjectHandle::getName()
 
 // String accessors
 
-DLL_EXPORT
 std::string
 QPDFObjectHandle::getStringValue()
 {
@@ -223,7 +203,6 @@ QPDFObjectHandle::getStringValue()
     return dynamic_cast<QPDF_String*>(obj.getPointer())->getVal();
 }
 
-DLL_EXPORT
 std::string
 QPDFObjectHandle::getUTF8Value()
 {
@@ -233,7 +212,6 @@ QPDFObjectHandle::getUTF8Value()
 
 // Array accessors
 
-DLL_EXPORT
 int
 QPDFObjectHandle::getArrayNItems()
 {
@@ -241,7 +219,6 @@ QPDFObjectHandle::getArrayNItems()
     return dynamic_cast<QPDF_Array*>(obj.getPointer())->getNItems();
 }
 
-DLL_EXPORT
 QPDFObjectHandle
 QPDFObjectHandle::getArrayItem(int n)
 {
@@ -251,7 +228,6 @@ QPDFObjectHandle::getArrayItem(int n)
 
 // Array mutators
 
-DLL_EXPORT
 void
 QPDFObjectHandle::setArrayItem(int n, QPDFObjectHandle const& item)
 {
@@ -261,7 +237,6 @@ QPDFObjectHandle::setArrayItem(int n, QPDFObjectHandle const& item)
 
 // Dictionary accessors
 
-DLL_EXPORT
 bool
 QPDFObjectHandle::hasKey(std::string const& key)
 {
@@ -269,7 +244,6 @@ QPDFObjectHandle::hasKey(std::string const& key)
     return dynamic_cast<QPDF_Dictionary*>(obj.getPointer())->hasKey(key);
 }
 
-DLL_EXPORT
 QPDFObjectHandle
 QPDFObjectHandle::getKey(std::string const& key)
 {
@@ -277,7 +251,6 @@ QPDFObjectHandle::getKey(std::string const& key)
     return dynamic_cast<QPDF_Dictionary*>(obj.getPointer())->getKey(key);
 }
 
-DLL_EXPORT
 std::set<std::string>
 QPDFObjectHandle::getKeys()
 {
@@ -287,7 +260,6 @@ QPDFObjectHandle::getKeys()
 
 // Dictionary mutators
 
-DLL_EXPORT
 void
 QPDFObjectHandle::replaceKey(std::string const& key,
 			    QPDFObjectHandle const& value)
@@ -297,7 +269,6 @@ QPDFObjectHandle::replaceKey(std::string const& key,
 	obj.getPointer())->replaceKey(key, value);
 }
 
-DLL_EXPORT
 void
 QPDFObjectHandle::removeKey(std::string const& key)
 {
@@ -306,7 +277,6 @@ QPDFObjectHandle::removeKey(std::string const& key)
 }
 
 // Stream accessors
-DLL_EXPORT
 QPDFObjectHandle
 QPDFObjectHandle::getDict()
 {
@@ -314,7 +284,6 @@ QPDFObjectHandle::getDict()
     return dynamic_cast<QPDF_Stream*>(obj.getPointer())->getDict();
 }
 
-DLL_EXPORT
 PointerHolder<Buffer>
 QPDFObjectHandle::getStreamData()
 {
@@ -322,7 +291,6 @@ QPDFObjectHandle::getStreamData()
     return dynamic_cast<QPDF_Stream*>(obj.getPointer())->getStreamData();
 }
 
-DLL_EXPORT
 bool
 QPDFObjectHandle::pipeStreamData(Pipeline* p, bool filter,
 				 bool normalize, bool compress)
@@ -332,21 +300,18 @@ QPDFObjectHandle::pipeStreamData(Pipeline* p, bool filter,
 	p, filter, normalize, compress);
 }
 
-DLL_EXPORT
 int
 QPDFObjectHandle::getObjectID() const
 {
     return this->objid;
 }
 
-DLL_EXPORT
 int
 QPDFObjectHandle::getGeneration() const
 {
     return this->generation;
 }
 
-DLL_EXPORT
 std::map<std::string, QPDFObjectHandle>
 QPDFObjectHandle::getPageImages()
 {
@@ -395,7 +360,6 @@ QPDFObjectHandle::getPageImages()
     return result;
 }
 
-DLL_EXPORT
 std::vector<QPDFObjectHandle>
 QPDFObjectHandle::getPageContents()
 {
@@ -435,7 +399,6 @@ QPDFObjectHandle::getPageContents()
     return result;
 }
 
-DLL_EXPORT
 std::string
 QPDFObjectHandle::unparse()
 {
@@ -452,7 +415,6 @@ QPDFObjectHandle::unparse()
     return result;
 }
 
-DLL_EXPORT
 std::string
 QPDFObjectHandle::unparseResolved()
 {
@@ -466,56 +428,48 @@ QPDFObjectHandle::newIndirect(QPDF* qpdf, int objid, int generation)
     return QPDFObjectHandle(qpdf, objid, generation);
 }
 
-DLL_EXPORT
 QPDFObjectHandle
 QPDFObjectHandle::newBool(bool value)
 {
     return QPDFObjectHandle(new QPDF_Bool(value));
 }
 
-DLL_EXPORT
 QPDFObjectHandle
 QPDFObjectHandle::newNull()
 {
     return QPDFObjectHandle(new QPDF_Null());
 }
 
-DLL_EXPORT
 QPDFObjectHandle
 QPDFObjectHandle::newInteger(int value)
 {
     return QPDFObjectHandle(new QPDF_Integer(value));
 }
 
-DLL_EXPORT
 QPDFObjectHandle
 QPDFObjectHandle::newReal(std::string const& value)
 {
     return QPDFObjectHandle(new QPDF_Real(value));
 }
 
-DLL_EXPORT
 QPDFObjectHandle
 QPDFObjectHandle::newName(std::string const& name)
 {
     return QPDFObjectHandle(new QPDF_Name(name));
 }
 
-DLL_EXPORT
 QPDFObjectHandle
 QPDFObjectHandle::newString(std::string const& str)
 {
     return QPDFObjectHandle(new QPDF_String(str));
 }
 
-DLL_EXPORT
 QPDFObjectHandle
 QPDFObjectHandle::newArray(std::vector<QPDFObjectHandle> const& items)
 {
     return QPDFObjectHandle(new QPDF_Array(items));
 }
 
-DLL_EXPORT
 QPDFObjectHandle
 QPDFObjectHandle::newDictionary(
     std::map<std::string, QPDFObjectHandle> const& items)

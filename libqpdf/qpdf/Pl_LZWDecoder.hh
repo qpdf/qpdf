@@ -6,17 +6,14 @@
 #include <qpdf/Buffer.hh>
 #include <vector>
 
+DLL_EXPORT
 class Pl_LZWDecoder: public Pipeline
 {
   public:
-    DLL_EXPORT
     Pl_LZWDecoder(char const* identifier, Pipeline* next,
 		  bool early_code_change);
-    DLL_EXPORT
     virtual ~Pl_LZWDecoder();
-    DLL_EXPORT
     virtual void write(unsigned char* buf, int len);
-    DLL_EXPORT
     virtual void finish();
 
   private:

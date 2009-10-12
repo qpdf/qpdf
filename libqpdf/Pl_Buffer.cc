@@ -3,7 +3,6 @@
 #include <assert.h>
 #include <string.h>
 
-DLL_EXPORT
 Pl_Buffer::Pl_Buffer(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next),
     ready(false),
@@ -11,12 +10,10 @@ Pl_Buffer::Pl_Buffer(char const* identifier, Pipeline* next) :
 {
 }
 
-DLL_EXPORT
 Pl_Buffer::~Pl_Buffer()
 {
 }
 
-DLL_EXPORT
 void
 Pl_Buffer::write(unsigned char* buf, int len)
 {
@@ -32,7 +29,6 @@ Pl_Buffer::write(unsigned char* buf, int len)
     }
 }
 
-DLL_EXPORT
 void
 Pl_Buffer::finish()
 {
@@ -43,7 +39,6 @@ Pl_Buffer::finish()
     }
 }
 
-DLL_EXPORT
 Buffer*
 Pl_Buffer::getBuffer()
 {

@@ -13,23 +13,18 @@
 
 #include <qpdf/Pipeline.hh>
 
+DLL_EXPORT
 class Pl_Count: public Pipeline
 {
   public:
-    DLL_EXPORT
     Pl_Count(char const* identifier, Pipeline* next);
-    DLL_EXPORT
     virtual ~Pl_Count();
-    DLL_EXPORT
     virtual void write(unsigned char*, int);
-    DLL_EXPORT
     virtual void finish();
     // Returns the number of bytes written
-    DLL_EXPORT
     int getCount() const;
     // Returns the last character written, or '\0' if no characters
     // have been written (in which case getCount() returns 0)
-    DLL_EXPORT
     unsigned char getLastChar() const;
 
   private:

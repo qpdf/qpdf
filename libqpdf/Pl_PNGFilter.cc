@@ -2,7 +2,6 @@
 #include <stdexcept>
 #include <string.h>
 
-DLL_EXPORT
 Pl_PNGFilter::Pl_PNGFilter(char const* identifier, Pipeline* next,
 			   action_e action, unsigned int columns,
 			   unsigned int bytes_per_pixel) :
@@ -23,14 +22,12 @@ Pl_PNGFilter::Pl_PNGFilter(char const* identifier, Pipeline* next,
     this->incoming = (action == a_encode ? columns : columns + 1);
 }
 
-DLL_EXPORT
 Pl_PNGFilter::~Pl_PNGFilter()
 {
     delete [] buf1;
     delete [] buf2;
 }
 
-DLL_EXPORT
 void
 Pl_PNGFilter::write(unsigned char* data, int len)
 {
@@ -132,7 +129,6 @@ Pl_PNGFilter::encodeRow()
     }
 }
 
-DLL_EXPORT
 void
 Pl_PNGFilter::finish()
 {

@@ -12,11 +12,11 @@
 
 #include <string>
 
+DLL_EXPORT
 class QPDFObject
 {
   public:
     virtual ~QPDFObject() {}
-    DLL_EXPORT
     virtual std::string unparse() = 0;
 };
 

@@ -24,22 +24,18 @@
 #include <qpdf/Buffer.hh>
 #include <list>
 
+DLL_EXPORT
 class Pl_Buffer: public Pipeline
 {
   public:
-    DLL_EXPORT
     Pl_Buffer(char const* identifier, Pipeline* next = 0);
-    DLL_EXPORT
     virtual ~Pl_Buffer();
-    DLL_EXPORT
     virtual void write(unsigned char*, int);
-    DLL_EXPORT
     virtual void finish();
 
     // Each call to getBuffer() resets this object -- see notes above.
     // The caller is responsible for deleting the returned Buffer
     // object.
-    DLL_EXPORT
     Buffer* getBuffer();
 
   private:

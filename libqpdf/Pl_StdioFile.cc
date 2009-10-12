@@ -3,19 +3,16 @@
 #include <stdexcept>
 #include <errno.h>
 
-DLL_EXPORT
 Pl_StdioFile::Pl_StdioFile(char const* identifier, FILE* f) :
     Pipeline(identifier, 0),
     file(f)
 {
 }
 
-DLL_EXPORT
 Pl_StdioFile::~Pl_StdioFile()
 {
 }
 
-DLL_EXPORT
 void
 Pl_StdioFile::write(unsigned char* buf, int len)
 {
@@ -36,7 +33,6 @@ Pl_StdioFile::write(unsigned char* buf, int len)
     }
 }
 
-DLL_EXPORT
 void
 Pl_StdioFile::finish()
 {

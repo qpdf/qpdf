@@ -16,14 +16,12 @@ static bool is_hex_digit(char ch)
     return (strchr("0123456789abcdefABCDEF", ch) != 0);
 }
 
-DLL_EXPORT
 QPDFTokenizer::QPDFTokenizer() :
     pound_special_in_name(true)
 {
     reset();
 }
 
-DLL_EXPORT
 void
 QPDFTokenizer::allowPoundAnywhereInName()
 {
@@ -46,7 +44,6 @@ QPDFTokenizer::reset()
     last_char_was_bs = false;
 }
 
-DLL_EXPORT
 void
 QPDFTokenizer::presentCharacter(char ch)
 {
@@ -423,7 +420,6 @@ QPDFTokenizer::presentCharacter(char ch)
     }
 }
 
-DLL_EXPORT
 void
 QPDFTokenizer::presentEOF()
 {
@@ -445,7 +441,6 @@ QPDFTokenizer::presentEOF()
     }
 }
 
-DLL_EXPORT
 bool
 QPDFTokenizer::getToken(Token& token, bool& unread_char, char& ch)
 {
@@ -460,7 +455,6 @@ QPDFTokenizer::getToken(Token& token, bool& unread_char, char& ch)
     return ready;
 }
 
-DLL_EXPORT
 bool
 QPDFTokenizer::betweenTokens()
 {

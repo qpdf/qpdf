@@ -32,7 +32,6 @@ pad_or_truncate_password(std::string const& password, char k1[key_bytes])
     memcpy(k1 + password_bytes, padding_string, pad_bytes);
 }
 
-DLL_EXPORT
 void
 QPDF::trim_user_password(std::string& user_password)
 {
@@ -98,7 +97,6 @@ iterate_rc4(unsigned char* data, int data_len,
     delete [] key;
 }
 
-DLL_EXPORT
 std::string
 QPDF::compute_data_key(std::string const& encryption_key,
 		       int objid, int generation)
@@ -122,7 +120,6 @@ QPDF::compute_data_key(std::string const& encryption_key,
 		       std::min(result.length(), (size_t) 16));
 }
 
-DLL_EXPORT
 std::string
 QPDF::compute_encryption_key(
     std::string const& password, EncryptionData const& data)
@@ -432,7 +429,6 @@ QPDF::decryptStream(Pipeline*& pipeline, int objid, int generation,
     heap.push_back(pipeline);
 }
 
-DLL_EXPORT
 void
 QPDF::compute_encryption_O_U(
     char const* user_password, char const* owner_password,
@@ -445,14 +441,12 @@ QPDF::compute_encryption_O_U(
     U = compute_U_value(user_password, data);
 }
 
-DLL_EXPORT
 std::string const&
 QPDF::getPaddedUserPassword() const
 {
     return this->user_password;
 }
 
-DLL_EXPORT
 std::string
 QPDF::getTrimmedUserPassword() const
 {
@@ -461,14 +455,12 @@ QPDF::getTrimmedUserPassword() const
     return result;
 }
 
-DLL_EXPORT
 bool
 QPDF::isEncrypted() const
 {
     return this->encrypted;
 }
 
-DLL_EXPORT
 bool
 QPDF::isEncrypted(int& R, int& P)
 {
@@ -495,7 +487,6 @@ is_bit_set(int P, int bit)
     return (P & (1 << (bit - 1)));
 }
 
-DLL_EXPORT
 bool
 QPDF::allowAccessibility()
 {
@@ -516,7 +507,6 @@ QPDF::allowAccessibility()
     return status;
 }
 
-DLL_EXPORT
 bool
 QPDF::allowExtractAll()
 {
@@ -530,7 +520,6 @@ QPDF::allowExtractAll()
     return status;
 }
 
-DLL_EXPORT
 bool
 QPDF::allowPrintLowRes()
 {
@@ -544,7 +533,6 @@ QPDF::allowPrintLowRes()
     return status;
 }
 
-DLL_EXPORT
 bool
 QPDF::allowPrintHighRes()
 {
@@ -562,7 +550,6 @@ QPDF::allowPrintHighRes()
     return status;
 }
 
-DLL_EXPORT
 bool
 QPDF::allowModifyAssembly()
 {
@@ -583,7 +570,6 @@ QPDF::allowModifyAssembly()
     return status;
 }
 
-DLL_EXPORT
 bool
 QPDF::allowModifyForm()
 {
@@ -604,7 +590,6 @@ QPDF::allowModifyForm()
     return status;
 }
 
-DLL_EXPORT
 bool
 QPDF::allowModifyAnnotation()
 {
@@ -618,7 +603,6 @@ QPDF::allowModifyAnnotation()
     return status;
 }
 
-DLL_EXPORT
 bool
 QPDF::allowModifyOther()
 {
@@ -632,7 +616,6 @@ QPDF::allowModifyOther()
     return status;
 }
 
-DLL_EXPORT
 bool
 QPDF::allowModifyAll()
 {

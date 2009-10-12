@@ -4,7 +4,6 @@
 #include <string.h>
 #include <ctype.h>
 
-DLL_EXPORT
 Pl_ASCIIHexDecoder::Pl_ASCIIHexDecoder(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next),
     pos(0),
@@ -13,12 +12,10 @@ Pl_ASCIIHexDecoder::Pl_ASCIIHexDecoder(char const* identifier, Pipeline* next) :
     strcpy(this->inbuf, "00");
 }
 
-DLL_EXPORT
 Pl_ASCIIHexDecoder::~Pl_ASCIIHexDecoder()
 {
 }
 
-DLL_EXPORT
 void
 Pl_ASCIIHexDecoder::write(unsigned char* buf, int len)
 {
@@ -104,7 +101,6 @@ Pl_ASCIIHexDecoder::flush()
     strcpy(this->inbuf, "00");
 }
 
-DLL_EXPORT
 void
 Pl_ASCIIHexDecoder::finish()
 {

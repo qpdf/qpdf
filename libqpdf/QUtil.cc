@@ -14,7 +14,6 @@
 #include <unistd.h>
 #endif
 
-DLL_EXPORT
 std::string
 QUtil::int_to_string(int num, int fullpad)
 {
@@ -42,7 +41,6 @@ QUtil::int_to_string(int num, int fullpad)
     return std::string(t);
 }
 
-DLL_EXPORT
 std::string
 QUtil::double_to_string(double num, int decimal_places)
 {
@@ -78,14 +76,12 @@ QUtil::double_to_string(double num, int decimal_places)
     return std::string(t);
 }
 
-DLL_EXPORT
 void
 QUtil::throw_system_error(std::string const& description)
 {
     throw std::runtime_error(description + ": " + strerror(errno));
 }
 
-DLL_EXPORT
 int
 QUtil::os_wrapper(std::string const& description, int status)
 {
@@ -96,7 +92,6 @@ QUtil::os_wrapper(std::string const& description, int status)
     return status;
 }
 
-DLL_EXPORT
 FILE*
 QUtil::fopen_wrapper(std::string const& description, FILE* f)
 {
@@ -107,7 +102,6 @@ QUtil::fopen_wrapper(std::string const& description, FILE* f)
     return f;
 }
 
-DLL_EXPORT
 char*
 QUtil::copy_string(std::string const& str)
 {
@@ -118,7 +112,6 @@ QUtil::copy_string(std::string const& str)
     return result;
 }
 
-DLL_EXPORT
 void
 QUtil::binary_stdout()
 {
@@ -127,7 +120,6 @@ QUtil::binary_stdout()
 #endif
 }
 
-DLL_EXPORT
 void
 QUtil::binary_stdin()
 {
@@ -136,7 +128,6 @@ QUtil::binary_stdin()
 #endif
 }
 
-DLL_EXPORT
 char*
 QUtil::getWhoami(char* argv0)
 {
@@ -164,7 +155,6 @@ QUtil::getWhoami(char* argv0)
     return whoami;
 }
 
-DLL_EXPORT
 bool
 QUtil::get_env(std::string const& var, std::string* value)
 {
@@ -202,7 +192,6 @@ QUtil::get_env(std::string const& var, std::string* value)
 #endif
 }
 
-DLL_EXPORT
 time_t
 QUtil::get_current_time()
 {
@@ -229,7 +218,6 @@ QUtil::get_current_time()
 #endif
 }
 
-DLL_EXPORT
 std::string
 QUtil::toUTF8(unsigned long uval)
 {

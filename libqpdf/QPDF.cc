@@ -247,7 +247,6 @@ QPDF::ObjGen::operator<(ObjGen const& rhs) const
 	    ((this->obj == rhs.obj) && (this->gen < rhs.gen)));
 }
 
-DLL_EXPORT
 QPDF::QPDF() :
     encrypted(false),
     encryption_initialized(false),
@@ -261,12 +260,10 @@ QPDF::QPDF() :
 {
 }
 
-DLL_EXPORT
 QPDF::~QPDF()
 {
 }
 
-DLL_EXPORT
 void
 QPDF::processFile(char const* filename, char const* password)
 {
@@ -278,28 +275,24 @@ QPDF::processFile(char const* filename, char const* password)
     parse();
 }
 
-DLL_EXPORT
 void
 QPDF::setIgnoreXRefStreams(bool val)
 {
     this->ignore_xref_streams = val;
 }
 
-DLL_EXPORT
 void
 QPDF::setSuppressWarnings(bool val)
 {
     this->suppress_warnings = val;
 }
 
-DLL_EXPORT
 void
 QPDF::setAttemptRecovery(bool val)
 {
     this->attempt_recovery = val;
 }
 
-DLL_EXPORT
 std::vector<std::string>
 QPDF::getWarnings()
 {
@@ -944,7 +937,6 @@ QPDF::insertXrefEntry(int obj, int f0, int f1, int f2, bool overwrite)
     }
 }
 
-DLL_EXPORT
 void
 QPDF::showXRefTable()
 {
@@ -1631,7 +1623,6 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
     }
 }
 
-DLL_EXPORT
 QPDFObjectHandle
 QPDF::makeIndirectObject(QPDFObjectHandle oh)
 {
@@ -1646,14 +1637,12 @@ QPDF::makeIndirectObject(QPDFObjectHandle oh)
     return QPDFObjectHandle::Factory::newIndirect(this, next.obj, next.gen);
 }
 
-DLL_EXPORT
 QPDFObjectHandle
 QPDF::getObjectByID(int objid, int generation)
 {
     return QPDFObjectHandle::Factory::newIndirect(this, objid, generation);
 }
 
-DLL_EXPORT
 void
 QPDF::trimTrailerForWrite()
 {
@@ -1676,35 +1665,30 @@ QPDF::trimTrailerForWrite()
     this->trailer.removeKey("/XRefStm");
 }
 
-DLL_EXPORT
 std::string
 QPDF::getFilename() const
 {
     return this->file.getName();
 }
 
-DLL_EXPORT
 std::string
 QPDF::getPDFVersion() const
 {
     return this->pdf_version;
 }
 
-DLL_EXPORT
 QPDFObjectHandle
 QPDF::getTrailer()
 {
     return this->trailer;
 }
 
-DLL_EXPORT
 QPDFObjectHandle
 QPDF::getRoot()
 {
     return this->trailer.getKey("/Root");
 }
 
-DLL_EXPORT
 void
 QPDF::getObjectStreamData(std::map<int, int>& omap)
 {
@@ -1721,7 +1705,6 @@ QPDF::getObjectStreamData(std::map<int, int>& omap)
     }
 }
 
-DLL_EXPORT
 std::vector<int>
 QPDF::getCompressibleObjects()
 {
@@ -1870,7 +1853,6 @@ QPDF::pipeStreamData(int objid, int generation,
     pipeline->finish();
 }
 
-DLL_EXPORT
 void
 QPDF::decodeStreams()
 {
@@ -1888,7 +1870,6 @@ QPDF::decodeStreams()
     }
 }
 
-DLL_EXPORT
 std::vector<QPDFObjectHandle> const&
 QPDF::getAllPages()
 {

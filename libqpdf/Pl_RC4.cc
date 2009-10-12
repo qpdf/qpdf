@@ -1,7 +1,6 @@
 #include <qpdf/Pl_RC4.hh>
 #include <qpdf/QUtil.hh>
 
-DLL_EXPORT
 Pl_RC4::Pl_RC4(char const* identifier, Pipeline* next,
 	       unsigned char const* key_data, int key_len,
 	       int out_bufsize) :
@@ -12,7 +11,6 @@ Pl_RC4::Pl_RC4(char const* identifier, Pipeline* next,
     this->outbuf = new unsigned char[out_bufsize];
 }
 
-DLL_EXPORT
 Pl_RC4::~Pl_RC4()
 {
     if (this->outbuf)
@@ -22,7 +20,6 @@ Pl_RC4::~Pl_RC4()
     }
 }
 
-DLL_EXPORT
 void
 Pl_RC4::write(unsigned char* data, int len)
 {
@@ -46,7 +43,6 @@ Pl_RC4::write(unsigned char* data, int len)
     }
 }
 
-DLL_EXPORT
 void
 Pl_RC4::finish()
 {
