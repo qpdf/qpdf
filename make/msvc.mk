@@ -19,6 +19,9 @@ endef
 CFLAGS := $(filter-out -g,$(CFLAGS))
 CXXFLAGS := $(filter-out -g,$(CXXFLAGS))
 
+clean::
+	$(RM) *.pdb
+
 # --- Required rule definitions ---
 
 #                       1   2
