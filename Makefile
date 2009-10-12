@@ -89,7 +89,7 @@ CLEAN_TARGETS = $(foreach B,$(BUILD_ITEMS),clean_$(B))
 export QPDF_BIN = $(abspath qpdf/$(OUTPUT_DIR)/qpdf)
 export SKIP_TEST_COMPARE_IMAGES
 
-clean: $(CLEAN_TARGETS)
+clean:: $(CLEAN_TARGETS)
 
 .PHONY: $(CLEAN_TARGETS)
 $(foreach B,$(BUILD_ITEMS),$(eval \
