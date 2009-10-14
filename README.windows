@@ -2,19 +2,15 @@ Common Setup
 ============
 
 To be able to build qpdf and run its test suite, you must have either
-Cygwin or MSYS from MinGW (>= 1.0.11) installed.
-
- qpdf's test suite, you must have cygwin installed.
-This is because qpdf's test suite uses qtest, which requires cygwin
-perl on Windows.  (Hopefully a future version of qtest will work with
-ActiveState Perl.)  You must have at least perl and gnu diffutils
-installed to run the test suite.
+Cygwin or MSYS from MinGW (>= 1.0.11) installed.  If you want to build
+with Microsoft Visual C++, either Cygwin or MSYS will do.  If you want
+to build with MinGW, you must use MSYS rather than Cygwin.
 
 As of this writing, the image comparison tests confuse ghostscript in
 cygwin, but there's a chance they might work at some point.  If you
 want to run them, you need ghostscript and tiff utils as well.  Then
 omit --disable-test-compare-images from the configure statements given
-below.
+below.  The image comparison tests have not been tried under MSYS.
 
 Building with MinGW
 ===================
@@ -31,39 +27,22 @@ From your MSYS prompt, run
   ./configure --disable-test-compare-images --enable-build-external-libs --with-buildrules=mingw
   make
 
-When done, you should copy the gcc runtime DLL into the libqpdf/build
-directory.  You can find the path to it by running
+Add the absolute path to the libqpdf/build directory to your PATH.
+Make sure you can run the qpdf command by typing qpdf/build/qpdf and
+making sure you get a help message rather than an error loading the
+DLL or no output at all.  Run the test suite by typing
 
-  objdump -p qpdf/build/qpdf.exe | grep DLL
-  type -P libgcc_s_dw2-1.dll
+  make check
 
-replacing libgcc_s_dw2-1.dll with whatever gcc DLL is shown, if
-different.  Redistribution of this DLL is unavoidable as of this
-writing; see "Static Runtime" below for details.
-
-From your cygwin prompt, add the absolute path to the libqpdf/build
-directory to your PATH.  Make sure you can run the qpdf command by
-typing qpdf/build/qpdf and making sure you get a help message rather
-than an error loading the DLL or no output at all.  Run the test suite
-by typing
-
-  make check GENDEPS=0
-
-from your cygwin prompt.  The GENDEPS=0 is necessary to prevent the
-build system in cygwin from trying to interpret the MSYS/Windows paths
-embedded in the dependency files.  If all goes well, you should get a
-passing test suite.
+If all goes well, you should get a passing test suite.
 
 Building with MSVC .NET 2008 Express
 ====================================
 
 These instructions would likely work with newer version of MSVC or
 with full version of MSVC.  They may also work with .NET 2005.  They
-have only been tested with .NET 2008 Express.
-
-It's possible that the MSVC build may work from MSYS, but since cygwin
-is needed to run the test suite, these have only been tested from
-cygwin.
+have only been tested with .NET 2008 Express.  You may follow these
+instructions from either Cygwin or from MSYS.
 
 You should first set up your environment to be able to run MSVC from
 the command line.  There is usually a batch file included with MSVC
@@ -97,6 +76,33 @@ to edit msvc.mk to change /MD to /MDd to build a debugging version.
 Note that you must redistribute the Microsoft runtime DLLs.  Linking
 with static runtime won't work; see "Static Runtime" below for
 details.
+
+Runtime DLLs
+============
+
+Both build methods create executables and DLLs that are dependent on
+the compiler's runtime DLLs.  You can find out which DLLs are required
+by using objdump.  For any DLLs that are not standard on any Windows
+system, you will need to copy those into the directory with the exe
+and the qpdf DLL in order for the application to work outside the
+development environment.  You don't need KERNEL32.dll, or msvcrt.dll
+as those are standard.
+
+To discover which DLLs you need, you can run
+
+  objdump -p qpdf/build/qpdf.exe | grep DLL
+
+To find the path to the DLL, you can use type -P, as in
+
+  type -P libgcc_s_dw2-1.dll
+
+replacing libgcc_s_dw2-1.dll with whatever gcc DLL is shown, if
+different.  For MSVC, you will probably need two DLLs.  Keep in mind
+that Microsoft does not allow redistribution of the debugging DLLs.
+qpdf's build does not depend on them by default, however.
+
+Redistribution of the runtime DLL is unavoidable as of this writing;
+see "Static Runtime" below for details.
 
 Installing
 ==========
