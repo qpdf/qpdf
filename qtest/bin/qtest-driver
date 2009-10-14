@@ -604,6 +604,10 @@ sub tc_do_initial_checks
 	chop(my $f = `cygpath --windows $tc_log`);
 	$tc_winlog = $f;
     }
+    elsif ($^O eq 'MSWin32')
+    {
+	$tc_winlog = $tc_log;
+    }
     unlink $tc_log;
     print_and_log("Test coverage active in scope $tc_scope\n");
 }
