@@ -1,7 +1,10 @@
 Common Setup
 ============
 
-To be able to run qpdf's test suite, you must have cygwin installed.
+To be able to build qpdf and run its test suite, you must have either
+Cygwin or MSYS from MinGW (>= 1.0.11) installed.
+
+ qpdf's test suite, you must have cygwin installed.
 This is because qpdf's test suite uses qtest, which requires cygwin
 perl on Windows.  (Hopefully a future version of qtest will work with
 ActiveState Perl.)  You must have at least perl and gnu diffutils

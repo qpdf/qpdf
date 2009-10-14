@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
 
     char* fl_in = 0;
     char* fl_out = 0;
-    char* cur_key = 0;
+    std::string cur_key;
 
     for (int i = 1; i < argc; ++i)
     {
@@ -120,18 +120,22 @@ int main(int argc, char* argv[])
 	{
 	    QTC::TC("examples", "pdf-mod-info -key");
 	    cur_key = argv[i];
+	    if (! ((cur_key.length() > 0) && (cur_key[0] == '/')))
+	    {
+		cur_key = "/" + cur_key;
+	    }
 	    Keys[cur_key] = "";
 	}
 	else if ((! strcmp(argv[i], "-val")) && (++i < argc))
 	{
-	    if (cur_key == 0)
+	    if (cur_key.empty())
 	    {
 		QTC::TC("examples", "pdf-mod-info usage wrong val");
 		usage();
 	    }
 	    QTC::TC("examples", "pdf-mod-info -val");
 	    Keys[cur_key] = argv[i];
-	    cur_key = 0;
+	    cur_key.clear();
 	}
 	else
 	{
