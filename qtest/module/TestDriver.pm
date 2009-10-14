@@ -34,27 +34,6 @@ sub DESTROY
     defined($$pid) && $$pid && kill 15, $$pid;
 }
 
-package TestDriver::TmpFileDeleter;
-
-use vars qw($f_files);
-$f_files = 'files';
-
-sub new
-{
-    my $class = shift;
-    my $rep = +{+__PACKAGE__ => {} };
-    $rep->{+__PACKAGE__}{$f_files} = shift;
-    bless $rep, $class;
-}
-
-sub DESTROY
-{
-    local $?;
-    my $rep = shift;
-    my $files = ($rep->{+__PACKAGE__}{$f_files});
-    map { TestDriver::rmrf($_) } @$files;
-}
-
 package TestDriver;
 
 use IO::Handle;
@@ -122,6 +101,14 @@ my $color_red = "";
 my $color_magenta = "";
 my $color_emph = "";
 
+# MSWin32 support
+my $in_windows = 0;
+my $winbin = undef;
+if ($^O eq 'MSWin32')
+{
+    $in_windows = 1;
+}
+
 sub get_tty_features
 {
     my $got_size = 0;
@@ -157,6 +144,17 @@ sub get_tty_features
     }
     eval
     {
+	if ($in_windows)
+	{
+	    eval
+	    {
+		# If you don't have this module, you may want to set
+		# the environment variable ANSI_COLORS_DISABLED to 1
+		# to avoid "garbage" output around PASSED, FAILED,
+		# etc.
+		require Win32::Console::ANSI;
+	    }
+	}
 	require Term::ANSIColor;
 	$color_reset = Term::ANSIColor::RESET();
 	$color_green = Term::ANSIColor::GREEN();
@@ -243,7 +241,8 @@ sub new
 	   ($ARGV[10] =~ m/^-stdout-tty=([01])$/) &&
 	   (-d $ARGV[5])))
     {
-	die +__PACKAGE__, ": improper invocation of test driver $0\n";
+	die +__PACKAGE__, ": improper invocation of test driver $0 (" .
+	    join(' ', @ARGV) . ")\n";
     }
     my $fd = ($ARGV[0] eq '-fd') ? $ARGV[1] : undef;
     my $port = ($ARGV[0] eq '-port') ? $ARGV[1] : undef;
@@ -435,7 +434,9 @@ sub prompt
     {
 	print "To avoid question, place answer in" .
 	    " environment variable \$$env\n";
-	if (-t STDIN)
+	# Note: ActiveState perl 5.10.1 gives the wrong answer for -t
+	# STDIN.
+	if ((-t STDIN) && (-t STDOUT))
 	{
 	    print "$msg ";
 	    chop($answer = <STDIN>);
@@ -506,10 +507,13 @@ sub get_start_dir
 
 #      EXIT_STATUS: the exit status of the command.  Required iff the
 #      intput is specified by COMMAND.  A value of undef means that we
-#      don't care about the exit status of a command.  An integer
-#      value is the ordinary exit status of a command.  A string of
-#      the form SIG:n indicates that the program has exited with
-#      signal n.
+#      don't care about the exit status of a command.  The special
+#      value of '!0' means we allow any abnormal exit status but we
+#      don't care what the specific exit status is.  An integer value
+#      is the ordinary exit status of a command.  A string of the form
+#      SIG:n indicates that the program has exited with signal n.
+#      Note that SIG:n is not reliable in a Windows (non-Cygwin)
+#      environment.
 
 #      THREAD_DATA: If specified, the test output is expected to
 #      contain multithreaded output with output lines marked by thread
@@ -674,7 +678,7 @@ sub runtest
     my $pid = undef;
     my $pid_killer = new TestDriver::PidKiller(\$pid);
     my $in = new IO::Handle;
-    my $use_tempfile = ($^O eq 'MSWin32');
+    my $use_tempfile = $in_windows;
     my $tempout_status = undef;
     if (defined $in_string)
     {
@@ -692,60 +696,48 @@ sub runtest
     }
     elsif (defined $in_command)
     {
-	my $tempfilename = "$tempdir/tempout";
-	my $tempfile = undef;
+	if (ref($in_command) eq 'ARRAY')
+	{
+	    &QTC::TC("testdriver", "TestDriver input command array");
+	}
+	elsif (ref($in_command) eq '')
+	{
+	    &QTC::TC("testdriver", "TestDriver input command string");
+	}
+
 	if ($use_tempfile)
 	{
-	    $tempfile = new IO::File(">$tempfilename") or
-		die +(+__PACKAGE__,
-		      "->runtest: unable to create $tempfilename: $!\n");
-	    $pid = fork;
-	    croak +__PACKAGE__, "->runtest: fork failed: $!\n"
-		unless defined $pid;
+	    my $tempout = "$tempdir/tempout";
+	    $tempout_status = $rep->winrun(
+		$in_command, File::Spec->devnull(), $tempout);
+	    open($in, "<$tempout") or
+		croak +(+__PACKAGE__,
+			"->runtest: unable to read from" .
+			" input file $tempout: $!\n");
 	}
 	else
 	{
 	    $pid = open($in, "-|");
 	    croak +__PACKAGE__, "->runtest: fork failed: $!\n"
 		unless defined $pid;
-	}
-	if ($pid == 0)
-	{
-	    # child
-	    if (defined $tempfile)
+	    if ($pid == 0)
 	    {
-		open(STDOUT, ">&", $tempfile);
-	    }
-	    open(STDERR, ">&STDOUT");
-	    open(STDIN, '<', \ "");
-	    if (ref($in_command) eq 'ARRAY')
-	    {
-		&QTC::TC("testdriver", "TestDriver input command array");
-		exec @$in_command or
-		    croak+(+__PACKAGE__,
-			   "->runtest: unable to run command ",
-			   join(' ', @$in_command), "\n");
-	    }
-	    else
-	    {
-		&QTC::TC("testdriver", "TestDriver input command string");
-		exec $in_command or
-		    croak+(+__PACKAGE__,
-			   "->runtest: unable to run command ",
-			   $in_command, "\n");
-	    }
-	}
-	else
-	{
-	    if (defined $tempfile)
-	    {
-		waitpid($pid, 0);
-		$tempout_status = $?;
-		$pid = undef;
-		open($in, "<$tempfilename") or
-		    croak +(+__PACKAGE__,
-			    "->runtest: unable to read from" .
-			    " input file $tempfilename: $!\n");
+		open(STDERR, ">&STDOUT");
+		open(STDIN, '<', \ "");
+		if (ref($in_command) eq 'ARRAY')
+		{
+		    exec @$in_command or
+			croak+(+__PACKAGE__,
+			       "->runtest: unable to run command ",
+			       join(' ', @$in_command), "\n");
+		}
+		else
+		{
+		    exec $in_command or
+			croak+(+__PACKAGE__,
+			       "->runtest: unable to run command ",
+			       $in_command, "\n");
+		}
 	    }
 	}
     }
@@ -758,21 +750,46 @@ sub runtest
     # Open file handle into which to write the actual output
     my $actual = new IO::File;
     my $actual_file = "$tempdir/actual";
+
     if (defined $in_filter)
     {
 	&QTC::TC("testdriver", "TestDriver filter defined");
+	if ($use_tempfile)
+	{
+	    my $filter_file = "$tempdir/filter";
+	    open(F, ">$filter_file.1") or
+		croak+(+__PACKAGE__,
+		       "->runtest: unable to create $filter_file.1: $!\n");
+	    binmode F;
+	    while (<$in>)
+	    {
+		print F;
+	    }
+	    $in->close();
+	    close(F);
+	    $rep->winrun($in_filter, "$filter_file.1", $filter_file);
+	    open($in, "<$filter_file") or
+		croak +(+__PACKAGE__,
+			"->runtest: unable to read from" .
+			" input file $filter_file: $!\n");
+	    binmode $in;
+	    $in_filter = undef;
+	}
+    }
+    if (defined $in_filter)
+    {
 	# Write through filter to actual file
 	open($actual, "| $in_filter > $actual_file") or
-	    croak +(+__PACKAGE__, ": pipe to filter $in_filter failed: $!\n");
-	binmode $actual;
+	    croak +(+__PACKAGE__,
+		    ": pipe to filter $in_filter failed: $!\n");
     }
     else
     {
 	&QTC::TC("testdriver", "TestDriver filter not defined");
 	open($actual, ">$actual_file") or
 	    die +(+__PACKAGE__, ": write to $actual_file failed: $!\n");
-	binmode $actual;
     }
+    binmode $actual;
 
     # Write from input to actual output, normalizing spaces and
     # newlines if needed
@@ -815,15 +832,42 @@ sub runtest
 	{
 	    $exit_status = $?;
 	}
-	if (WIFSIGNALED($exit_status))
+	my $exit_status_number = 0;
+	my $exit_status_signal = 0;
+	if ($in_windows)
 	{
-	    &QTC::TC("testdriver", "TestDriver exit status signal");
+	    # WIFSIGNALED et al are not defined.  This is emperically
+	    # what happens with MSYS 1.0.11 and ActiveState Perl
+	    # 5.10.1.
+	    if ($exit_status & 0x8000)
+	    {
+		$exit_status_signal = 1;
+		$exit_status = ($exit_status & 0xfff) >> 8;
+		$exit_status = "SIG:$exit_status";
+	    }
+	    elsif ($exit_status >= 256)
+	    {
+		$exit_status_number = 1;
+		$exit_status = $exit_status >> 8;
+	    }
+	}
+	elsif (WIFSIGNALED($exit_status))
+	{
+	    $exit_status_signal = 1;
 	    $exit_status = "SIG:" . WTERMSIG($exit_status);
 	}
 	elsif (WIFEXITED($exit_status))
 	{
-	    &QTC::TC("testdriver", "TestDriver exit status number");
+	    $exit_status_number = 1;
 	    $exit_status = WEXITSTATUS($exit_status);
+	}
+	if ($exit_status_number)
+	{
+	    &QTC::TC("testdriver", "TestDriver exit status number");
+	}
+	if ($exit_status_signal)
+	{
+	    &QTC::TC("testdriver", "TestDriver exit status signal");
 	}
     }
     $? = 0;
@@ -837,9 +881,15 @@ sub runtest
 
     # Compare exit statuses.  This expression is always true when the
     # input was not from a command.
-    my $status_match = ((! defined $out_exit_status) ||
-			((defined $exit_status) &&
-			 ($exit_status eq $out_exit_status)));
+    if ((defined $out_exit_status) && ($out_exit_status eq '!0'))
+    {
+	&QTC::TC("testdriver", "TestDriver non-zero exit status");
+    }
+    my $status_match =
+	((! defined $out_exit_status) ||
+	 ((defined $exit_status) &&
+	  ( (($out_exit_status eq '!0') && ($exit_status ne 0)) ||
+	    ($exit_status eq $out_exit_status) )));
 
     # Compare actual output with expected output.
     my $expected_file = undef;
@@ -923,9 +973,9 @@ sub runtest
 	else
 	{
 	    $output_diff = "$tempdir/difference";
-	    my $r = safe_pipe(['diff', '-a', '-u',
-			       $expected_file, $actual_file],
-			      $output_diff);
+	    my $r = $rep->safe_pipe(['diff', '-a', '-u',
+				     $expected_file, $actual_file],
+				    $output_diff);
 	    $output_match = ($r == 0);
 	}
     }
@@ -1228,6 +1278,7 @@ sub print_testid
     my $tc_filename = $ENV{'TC_FILENAME'} || "";
     if ($tc_filename && open(F, ">>$tc_filename"))
     {
+	binmode F;
 	printf F "# $category %2d (%s)\n", $testnum, $description;
 	close(F);
     }
@@ -1331,6 +1382,7 @@ sub analyze_threaded_output
     my ($file, $threads, $seqgroups, $errors) = @_;
     my $sequence_checking = 1;
     open(F, "<$file") or die +__PACKAGE__, ": can't open $file: $!\n";
+    binmode F;
     my $cur_thread = undef;
     while (<F>)
     {
@@ -1375,6 +1427,10 @@ sub handle_line
 	    push(@$errors,
 		 "$file:$.: no input file for thread $thread; " .
 		 "sequence checking abandoned\n");
+	}
+	else
+	{
+	    binmode $fh;
 	}
 	$threads->{$thread} = $fh;
     }
@@ -1463,6 +1519,7 @@ sub output_line
 {
     my ($file, $line) = @_;
     open(O, ">>$file") or die +__PACKAGE__, ": can't open $file: $!\n";
+    binmode O;
     print O $line or die +__PACKAGE__, ": can't append to $file: $!\n";
     close(O) or die +__PACKAGE__, ": close $file failed: $!\n";
 }
@@ -1473,6 +1530,7 @@ sub create_if_missing
     if (! -e $file)
     {
 	open(O, ">$file") or die +__PACKAGE__, ": can't create $file: $!\n";
+	binmode O;
 	print O $line;
 	close(O);
     }
@@ -1485,6 +1543,7 @@ sub split_combined
     my $tempdir = $rep->_tempdir();
 
     open(C, "<$combined") or die +__PACKAGE__, ": can't open $combined: $!\n";
+    binmode C;
     my %files = ();
     my $last_thread_fh = undef;
     while (<C>)
@@ -1544,6 +1603,7 @@ sub cache_open
 	unlink $file;
 	my $fh = new IO::File(">$file") or
 	    die +__PACKAGE__, ": can't open $file: $!\n";
+	binmode $fh;
 	$cache->{$file} = $fh;
     }
     $cache->{$file};
@@ -1581,20 +1641,13 @@ sub rmrf
 
 sub safe_pipe
 {
+    my $rep = shift;
     my ($cmd, $outfile) = @_;
     my $result = 0;
 
-    if ($^O eq 'MSWin32')
+    if ($in_windows)
     {
-	my @cmd = @$cmd;
-	my $cmd_str = shift(@cmd);
-	while (@cmd)
-	{
-	    my $arg = shift(@cmd);
-	    $cmd_str .= " \"$arg\"";
-	}
-	$cmd_str .= " > $outfile 2>&1";
-	$result = system($cmd_str);
+	$result = $rep->winrun($cmd, File::Spec->devnull(), $outfile);
     }
     else
     {
@@ -1624,6 +1677,105 @@ sub safe_pipe
 
     $result;
 }
+
+sub winrun
+{
+    # This function does several things to make running stuff on
+    # Windows look sort of like running things on UNIX.  It assumes
+    # MinGW perl is running in an MSYS/MinGW environment.
+    #
+    #  * When an MSYS/MinGW program is run with system("..."), its
+    #    newlines generate \r\n, but when it's run from MSYS sh, its
+    #    newlines generate \n.  We want \n for UNIX-like programs.
+    #
+    #  * system("...") in perl doesn't have any special magic to
+    #    handle #! lines in scripts.  A lot of test suites will count
+    #    on that.
+    #
+    #  * There's no Windows equivalent to execve with separate
+    #    arguments, so all sorts of fancy quoting is necessary when *
+    #    dealing with arguments with spaces, etc.
+    #
+    #  * Pipes work unreliably.  Fork emulation is very incomplete.
+    #
+    # To work around these issues, we ensure that everything is
+    # actually executed from the MSYS /bin/sh.  We find the actual
+    # path of that and then write a shell script which we explicitly
+    # invoke as an argument to /bin/sh.  If we have a string that we
+    # want executed with /bin/sh, we include the string in the shell
+    # script.  If we have an array, we pass the array on the
+    # commandline to the shell script and let it preserve spacing.  We
+    # also do our output redirection in the shell script itself since
+    # redirection of STDOUT and STDERR doesn't carry forward to
+    # programs invoked by programs we invoke.  Finally, we filter out
+    # errors generated by the script itself, since it is supposed to
+    # be an invisible buffer for smoother execution of programs.
+    # Experience shows that its output comes from things like printing
+    # the names of signals generated by subsidiary programs.
+
+    my $rep = shift;
+    my ($in_command, $in, $out) = @_;
+    my $tempdir = $rep->_tempdir();
+    my $tempfilename = "$tempdir/winrun.tmp";
+    if (! defined $winbin)
+    {
+	my $comspec = $ENV{'COMSPEC'};
+	$comspec =~ s,\\,/,g;
+	if ((system("sh -c 'cd /bin; $comspec /c cd'" .
+		    " > $tempfilename") == 0) &&
+	    open(F, "<$tempfilename"))
+	{
+	    $winbin = <F>;
+	    close(F);
+	    $winbin =~ s,[\r\n],,g;
+	    $winbin =~ s,\\,/,g;
+	}
+	if (! defined $winbin)
+	{
+	    die +__PACKAGE__, ": unable to find windows path to /bin\n";
+	}
+    }
+    my $script = "$tempdir/tmpscript";
+    open(F, ">$script") or
+	croak +(+__PACKAGE__,
+		"->runtest: unable to open $script to write: $!\n");
+    binmode F;
+    print F "exec >$tempfilename\n";
+    print F "exec 2>&1\n";
+    print F "exec <$in\n";
+    my @cmd = ("$winbin/sh", $script);
+    if (ref($in_command) eq 'ARRAY')
+    {
+	# For debugging, write out the args
+	foreach my $arg (@$in_command)
+	{
+	    print F "# $arg\n";
+	}
+	print F '"$@"', "\n";
+	push(@cmd, @$in_command);
+    }
+    else
+    {
+	print F "$in_command\n";
+    }
+    close(F);
+    my $status = system @cmd;
+    if (open(IN, "<$tempfilename") &&
+	open(OUT, ">$out"))
+    {
+	binmode IN;
+	binmode OUT;
+	while (<IN>)
+	{
+	    next if m/^$script:/;
+	    print OUT;
+	}
+	close(IN);
+	close(OUT);
+    }
+    $status;
+}
+
 1;
 
 #

@@ -33,7 +33,7 @@ require TestDriver;
 
 if ((@ARGV == 1) && ($ARGV[0] eq '--version'))
 {
-    print "$whoami version 1.3\n";
+    print "$whoami version 1.4\n";
     exit 0;
 }
 if ((@ARGV == 1) && ($ARGV[0] eq '--print-path'))
@@ -84,7 +84,8 @@ if (@bindirs)
 	    fatal("can't canonicalize path to bindir $d: $!");
 	push(@path, $abs);
     }
-    my $path = join(':', @path) . ':' . $ENV{'PATH'};
+    my $sep = ($^O eq 'MSWin32' ? ';' : ':');
+    my $path = join($sep, @path) . $sep . $ENV{'PATH'};
     # Delete and explicitly recreate the PATH environment variable.
     # This seems to be more reliable.  If we just reassign, in some
     # cases, the modified environment is not inherited by the child
@@ -112,8 +113,18 @@ $ENV{'IN_TESTSUITE'} = 1;
 # be inspected by impatient test suite runners.  It is not intended to
 # be a "secure" (unpredictable) path.
 my $tempdir = File::Spec->tmpdir() . "/testtemp.$$";
+my $thispid = $$;
 
-my $file_cleanup = new TestDriver::TmpFileDeleter([$tempdir]);
+END
+{
+    # We have to make sure we don't call this from the child
+    # qtest-driver when fork is called.
+    if ((defined $thispid) && ($$ == $thispid) && (defined $tempdir))
+    {
+	local $?;
+	TestDriver::rmrf($tempdir) if -d $tempdir;
+    }
+}
 
 $| = 1;
 $SIG{'PIPE'} = 'IGNORE';
@@ -471,6 +482,7 @@ sub parse_tc_file
     return unless defined $tc_input;
 
     my $tc = new IO::File("<$tc_input") or fatal("can't read $tc_input: $!");
+    binmode $tc;
     while (<$tc>)
     {
 	s/\r?\n$//s;
@@ -480,7 +492,7 @@ sub parse_tc_file
 	{
 	    $tc_ignored_scopes{$1} = 1;
 	}
-	elsif (m/^\s*?(\S.+?)\s+(\d+)$/)
+	elsif (m/^\s*?(\S.+?)\s+(\d+)\s*$/)
 	{
 	    my ($case, $n) = ($1, $2);
 	    if (exists $tc_cases{$case})
@@ -602,6 +614,7 @@ sub tc_do_final_checks
 
     my %seen_cases = ();
     my $tc = new IO::File("<$tc_log");
+    binmode $tc;
     if ($tc)
     {
 	binmode $tc;
@@ -610,7 +623,7 @@ sub tc_do_final_checks
 	    s/\r?\n$//s;
 	    next if m/^\#/;
 	    next if m/^\s*$/;
-	    if (m/^(.+) (\d+)$/)
+	    if (m/^(.+) (\d+)\s*$/)
 	    {
 		$seen_cases{$1}{$2} = 1;
 	    }
