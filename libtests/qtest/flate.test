@@ -16,6 +16,7 @@ my $td = new TestDriver('flate');
 cleanup();
 
 open(F, ">farbage") or die;
+binmode F;
 print F "q" x 10000, "\n";
 print F "w" x 10000, "\n";
 print F "e" x 10000, "\n";
