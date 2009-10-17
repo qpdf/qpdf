@@ -141,7 +141,7 @@ class DLL_EXPORT QPDF
 
     static void compute_encryption_O_U(
 	char const* user_password, char const* owner_password,
-	int V, int R, int key_len, int P,
+	int V, int R, int key_len, int P, bool encrypt_metadata,
 	std::string const& id1,
 	std::string& O, std::string& U);
     // Return the full user password as stored in the PDF file.  If
@@ -398,10 +398,12 @@ class DLL_EXPORT QPDF
 
     // methods to support encryption -- implemented in QPDF_encryption.cc
     void initializeEncryption();
-    std::string getKeyForObject(int objid, int generation);
+    std::string getKeyForObject(int objid, int generation, bool use_aes);
     void decryptString(std::string&, int objid, int generation);
-    void decryptStream(Pipeline*& pipeline, int objid, int generation,
-		       std::vector<PointerHolder<Pipeline> >& heap);
+    void decryptStream(
+	Pipeline*& pipeline, int objid, int generation,
+	QPDFObjectHandle& stream_dict,
+	std::vector<PointerHolder<Pipeline> >& heap);
 
     // Linearization Hint table structures.
     // Naming conventions:
@@ -735,7 +737,9 @@ class DLL_EXPORT QPDF
     bool ignore_xref_streams;
     bool suppress_warnings;
     bool attempt_recovery;
-    bool encryption_use_aes;
+    int encryption_V;
+    bool encrypt_metadata;
+    QPDFObjectHandle encryption_dictionary;
     std::string provided_password;
     std::string user_password;
     std::string encryption_key;

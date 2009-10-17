@@ -5,11 +5,14 @@
 
 #include <qpdf/QPDFExc.hh>
 
+#include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/Pl_RC4.hh>
+#include <qpdf/Pl_AES_PDF.hh>
 #include <qpdf/RC4.hh>
 #include <qpdf/MD5.hh>
 
+#include <assert.h>
 #include <string.h>
 
 static char const padding_string[] = {
@@ -123,9 +126,6 @@ QPDF::compute_data_key(std::string const& encryption_key,
     md5.digest(digest);
     return std::string((char*) digest,
 		       std::min(result.length(), (size_t) 16));
-
-    // XXX Item 4 in Algorithm 3.1 mentions CBC and a random number.
-    // We still have to incorporate that.
 }
 
 std::string
@@ -322,7 +322,8 @@ QPDF::initializeEncryption()
 		      "incorrect length");
     }
 
-    QPDFObjectHandle encryption_dict = this->trailer.getKey("/Encrypt");
+    this->encryption_dictionary = this->trailer.getKey("/Encrypt");
+    QPDFObjectHandle& encryption_dict = this->encryption_dictionary;
     if (! encryption_dict.isDictionary())
     {
 	throw QPDFExc(this->file.getName(), this->file.getLastOffset(),
@@ -360,12 +361,7 @@ QPDF::initializeEncryption()
 		      "Unsupported /R or /V in encryption dictionary");
     }
 
-    // XXX remove this check to continue implementing R4.
-    if ((R == 4) || (V == 4))
-    {
-	throw QPDFExc(this->file.getName(), this->file.getLastOffset(),
-		      "PDF >= 1.5 encryption support is not fully implemented");
-    }
+    this->encryption_V = V;
 
     if (! ((O.length() == key_bytes) && (U.length() == key_bytes)))
     {
@@ -385,19 +381,21 @@ QPDF::initializeEncryption()
 	}
     }
 
-    bool encrypt_metadata = true;
+    this->encrypt_metadata = true;
     if ((V >= 4) && (encryption_dict.getKey("/EncryptMetadata").isBool()))
     {
-	encrypt_metadata =
+	this->encrypt_metadata =
 	    encryption_dict.getKey("/EncryptMetadata").getBoolValue();
     }
-    // XXX not really...
-    if (R >= 4)
+
+    // XXX warn if /SubFilter is present
+    if (V == 4)
     {
-	this->encryption_use_aes = true;
+	// XXX get CF
     }
-    EncryptionData data(V, R, Length / 8, P, O, U, id1, encrypt_metadata);
-    if (check_owner_password(this->user_password, this->provided_password, data))
+    EncryptionData data(V, R, Length / 8, P, O, U, id1, this->encrypt_metadata);
+    if (check_owner_password(
+	    this->user_password, this->provided_password, data))
     {
 	// password supplied was owner password; user_password has
 	// been initialized
@@ -415,7 +413,7 @@ QPDF::initializeEncryption()
 }
 
 std::string
-QPDF::getKeyForObject(int objid, int generation)
+QPDF::getKeyForObject(int objid, int generation, bool use_aes)
 {
     if (! this->encrypted)
     {
@@ -427,8 +425,7 @@ QPDF::getKeyForObject(int objid, int generation)
 	   (generation == this->cached_key_generation)))
     {
 	this->cached_object_encryption_key =
-	    compute_data_key(this->encryption_key, objid, generation,
-			     this->encryption_use_aes);
+	    compute_data_key(this->encryption_key, objid, generation, use_aes);
 	this->cached_key_objid = objid;
 	this->cached_key_generation = generation;
     }
@@ -443,23 +440,62 @@ QPDF::decryptString(std::string& str, int objid, int generation)
     {
 	return;
     }
-    std::string key = getKeyForObject(objid, generation);
-    char* tmp = QUtil::copy_string(str);
-    unsigned int vlen = str.length();
-    RC4 rc4((unsigned char const*)key.c_str(), key.length());
-    rc4.process((unsigned char*)tmp, vlen);
-    str = std::string(tmp, vlen);
-    delete [] tmp;
+    bool use_aes = false;	// XXX
+    std::string key = getKeyForObject(objid, generation, use_aes);
+    if (use_aes)
+    {
+	// XXX
+	throw std::logic_error("XXX");
+    }
+    else
+    {
+	unsigned int vlen = str.length();
+	char* tmp = QUtil::copy_string(str);
+	RC4 rc4((unsigned char const*)key.c_str(), key.length());
+	rc4.process((unsigned char*)tmp, vlen);
+	str = std::string(tmp, vlen);
+	delete [] tmp;
+    }
 }
 
 void
 QPDF::decryptStream(Pipeline*& pipeline, int objid, int generation,
+		    QPDFObjectHandle& stream_dict,
 		    std::vector<PointerHolder<Pipeline> >& heap)
 {
-    std::string key = getKeyForObject(objid, generation);
-    if (this->encryption_use_aes)
+    bool decrypt = true;
+    std::string type;
+    if (stream_dict.getKey("/Type").isName())
     {
-	throw std::logic_error("aes not yet implemented"); // XXX
+	type = stream_dict.getKey("/Type").getName();
+    }
+    if (type == "/XRef")
+    {
+	QTC::TC("qpdf", "QPDF piping xref stream from encrypted file");
+	decrypt = false;
+    }
+    bool use_aes = false;
+    if (this->encryption_V == 4)
+    {
+	if ((! this->encrypt_metadata) && (type == "/Metadata"))
+	{
+	    // XXX no test case for this
+	    decrypt = false;
+	}
+	// XXX check crypt filter; if not found, use StmF; see TODO
+	use_aes = true;		// XXX
+    }
+    if (! decrypt)
+    {
+	return;
+    }
+
+    std::string key = getKeyForObject(objid, generation, use_aes);
+    if (use_aes)
+    {
+	assert(key.length() == Pl_AES_PDF::key_size);
+	pipeline = new Pl_AES_PDF("AES stream decryption", pipeline,
+				  false, (unsigned char*) key.c_str());
     }
     else
     {
@@ -472,11 +508,10 @@ QPDF::decryptStream(Pipeline*& pipeline, int objid, int generation,
 void
 QPDF::compute_encryption_O_U(
     char const* user_password, char const* owner_password,
-    int V, int R, int key_len, int P,
+    int V, int R, int key_len, int P, bool encrypt_metadata,
     std::string const& id1, std::string& O, std::string& U)
 {
-    EncryptionData data(V, R, key_len, P, "", "", id1,
-			/*XXX encrypt_metadata*/true);
+    EncryptionData data(V, R, key_len, P, "", "", id1, encrypt_metadata);
     data.O = compute_O_value(user_password, owner_password, data);
     O = data.O;
     U = compute_U_value(user_password, data);

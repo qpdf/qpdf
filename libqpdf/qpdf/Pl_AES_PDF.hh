@@ -18,17 +18,24 @@ class DLL_EXPORT Pl_AES_PDF: public Pipeline
     virtual void write(unsigned char* data, int len);
     virtual void finish();
 
+    // For testing only; PDF always uses CBC
+    void disableCBC();
+
   private:
     void flush(bool discard_padding);
+    void initializeVector();
 
     static unsigned int const buf_size = 16;
 
     bool encrypt;
+    bool cbc_mode;
+    bool first;
     unsigned int offset;
     unsigned char key[key_size];
     uint32_t rk[key_size + 28];
     unsigned char inbuf[buf_size];
     unsigned char outbuf[buf_size];
+    unsigned char cbc_block[buf_size];
     unsigned int nrounds;
 };
 

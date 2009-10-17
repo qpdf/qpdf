@@ -43,6 +43,49 @@
    (http://delphi.about.com). .. use at your own risk and for whatever
    the purpose you want .. no support provided. Sample code provided."
 
+ * Implement as much of R = 4 encryption as possible.  Already able to
+   decode AES-128-CBC and check passwords.
+
+   aes test suite: use fips-197 test vector with cbc disabled; encrypt
+   and decrypt some other files including multiples of 16 and not to
+   test cbc mode.
+
+   /Encrypt keys (if V == 4)
+
+     /StmF - name of crypt filter for streams; default /Identity
+     /StrF - name of crypt filter for strings; default /Identity
+     /EFF - crypt filter for embedded files without their own crypt
+       filters; default is to use /StmF
+
+     /CF - keys are crypt filter names, values are are crypt
+     dictionaries
+
+     Individual streams may also have crypt filters.  Filter type
+     /Crypt; /DecodeParms must contain a Crypt filter decode
+     parameters dictionary whose /Name entry specifies the particular
+     filter to be used.  If /Name is missing, use /Identity.
+     /DecodeParms << /Crypt << /Name /XYZ >> >> where /XYZ is
+     /Identity or a key in /CF.
+
+     /Identity means not to encrypt.
+
+     Crypt Dictionaries
+
+       /Type (optional) /CryptFilter
+       /CFM:
+         /V2 - use rc4
+         /AESV2 - use aes
+       /Length - supposed to be key length, but the one file I have
+         has a bogus value for it, so I'm ignoring it.
+
+       We will ignore remaining fields and values.
+
+   Remember to honor /EncryptMetadata; applies to streams of /Type
+   /Metadata
+
+   When we write encrypted files, we must remember to omit any
+   encryption filter settings from original streams.
+
 2.2
 ===
 
@@ -51,22 +94,6 @@
    some kind of callback mechanism.  Find messages exchanged with
    Stefan Heinsen <stefan.heinsen@gmx.de> in August, 2009.  He seems
    to like to send encrypted mail.  (key 01FCC336)
-
- * See whether we can do anything with /V > 3 in the encryption
-   dictionary.  (V = 4 is Crypt Filters.)  See
-   ~/Q/pdf-collection/R4-encrypt-PDF_Inside_and_Out.pdf
-
-   Search for XXX in the code.  Implementation has been started.
-
-   Algorithms from PDF Spec in QPDF_encrypt.cc have been updated.  We
-   can at least properly verify the user password with an R4 file.  In
-   order to finish the job, we need an aes-128-cbc implementation.
-   Then we can fill in the gaps for the aes pipeline and actually run
-   the test suite.  The pipeline may be able to hard-code the
-   initialization vector stuff by taking the first block of input and
-   by writing a random block for output.  The padding is already in
-   the code, but the initialization vector is not since I accidentally
-   started using an aes256 implementation instead of aes128-cbc.
 
  * Look at page splitting.
 
@@ -109,9 +136,9 @@ General
    of doing this seems very low since no viewer seems to care, so it's
    probably not worth it.
 
- * Embedded files streams: figure out why running qpdf over the pdf
-   1.7 spec results in a file that crashes acrobat reader when you try
-   to save nested documents.
+ * Embedded file streams: figure out why running qpdf over the pdf 1.7
+   spec results in a file that crashes acrobat reader when you try to
+   save nested documents.
 
  * QPDFObjectHandle::getPageImages() doesn't notice images in
    inherited resource dictionaries.  See comments in that function.

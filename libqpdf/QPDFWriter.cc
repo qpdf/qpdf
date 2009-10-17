@@ -281,7 +281,8 @@ QPDFWriter::setEncryptionParameters(
     std::string O;
     std::string U;
     QPDF::compute_encryption_O_U(
-	user_password, owner_password, V, R, key_len, P, this->id1, O, U);
+	user_password, owner_password, V, R, key_len, P,
+	/*XXX encrypt_metadata*/true, this->id1, O, U);
     setEncryptionParametersInternal(
 	V, R, key_len, P, O, U, this->id1, user_password);
 }

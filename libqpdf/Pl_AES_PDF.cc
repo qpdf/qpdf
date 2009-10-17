@@ -1,16 +1,19 @@
 #include <qpdf/Pl_AES_PDF.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/MD5.hh>
 #include <cstring>
 #include <assert.h>
 #include <stdexcept>
 #include <qpdf/rijndael.h>
-
-// XXX Still need CBC
+#include <string>
+#include <stdlib.h>
 
 Pl_AES_PDF::Pl_AES_PDF(char const* identifier, Pipeline* next,
 		       bool encrypt, unsigned char key[key_size]) :
     Pipeline(identifier, next),
     encrypt(encrypt),
+    cbc_mode(true),
+    first(true),
     offset(0),
     nrounds(0)
 {
@@ -21,6 +24,7 @@ Pl_AES_PDF::Pl_AES_PDF(char const* identifier, Pipeline* next,
     std::memset(this->rk, 0, sizeof(this->rk));
     std::memset(this->inbuf, 0, this->buf_size);
     std::memset(this->outbuf, 0, this->buf_size);
+    std::memset(this->cbc_block, 0, this->buf_size);
     if (encrypt)
     {
 	this->nrounds = rijndaelSetupEncrypt(this->rk, this->key, keybits);
@@ -35,6 +39,12 @@ Pl_AES_PDF::Pl_AES_PDF(char const* identifier, Pipeline* next,
 Pl_AES_PDF::~Pl_AES_PDF()
 {
     // nothing needed
+}
+
+void
+Pl_AES_PDF::disableCBC()
+{
+    this->cbc_mode = false;
 }
 
 void
@@ -91,16 +101,79 @@ Pl_AES_PDF::finish()
 }
 
 void
+Pl_AES_PDF::initializeVector()
+{
+    std::string seed_str;
+    seed_str += QUtil::int_to_string((int)QUtil::get_current_time());
+    seed_str += " QPDF aes random";
+    MD5 m;
+    m.encodeString(seed_str.c_str());
+    MD5::Digest digest;
+    m.digest(digest);
+    assert(sizeof(digest) >= sizeof(unsigned int));
+    unsigned int seed;
+    memcpy((void*)(&seed), digest, sizeof(unsigned int));
+    srandom(seed);
+    for (unsigned int i = 0; i < this->buf_size; ++i)
+    {
+	this->cbc_block[i] = (unsigned char)(random() & 0xff);
+    }
+}
+
+void
 Pl_AES_PDF::flush(bool strip_padding)
 {
     assert(this->offset == this->buf_size);
+
+    if (first)
+    {
+	first = false;
+	if (this->cbc_mode)
+	{
+	    if (encrypt)
+	    {
+		// Set cbc_block to a random initialization vector and
+		// write it to the output stream
+		initializeVector();
+		getNext()->write(this->cbc_block, this->buf_size);
+	    }
+	    else
+	    {
+		// Take the first block of input as the initialization
+		// vector.  There's nothing to write at this time.
+		memcpy(this->cbc_block, this->inbuf, this->buf_size);
+		this->offset = 0;
+		return;
+	    }
+	}
+    }
+
     if (this->encrypt)
     {
+	if (this->cbc_mode)
+	{
+	    for (unsigned int i = 0; i < this->buf_size; ++i)
+	    {
+		this->inbuf[i] ^= this->cbc_block[i];
+	    }
+	}
 	rijndaelEncrypt(this->rk, this->nrounds, this->inbuf, this->outbuf);
+	if (this->cbc_mode)
+	{
+	    memcpy(this->cbc_block, this->outbuf, this->buf_size);
+	}
     }
     else
     {
 	rijndaelDecrypt(this->rk, this->nrounds, this->inbuf, this->outbuf);
+	if (this->cbc_mode)
+	{
+	    for (unsigned int i = 0; i < this->buf_size; ++i)
+	    {
+		this->outbuf[i] ^= this->cbc_block[i];
+	    }
+	    memcpy(this->cbc_block, this->inbuf, this->buf_size);
+	}
     }
     unsigned int bytes = this->buf_size;
     if (strip_padding)

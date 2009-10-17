@@ -253,7 +253,8 @@ QPDF::QPDF() :
     ignore_xref_streams(false),
     suppress_warnings(false),
     attempt_recovery(true),
-    encryption_use_aes(false),
+    encryption_V(0),
+    encrypt_metadata(true),
     cached_key_objid(0),
     cached_key_generation(0),
     first_xref_item_offset(0),
@@ -1813,17 +1814,7 @@ QPDF::pipeStreamData(int objid, int generation,
     std::vector<PointerHolder<Pipeline> > to_delete;
     if (this->encrypted)
     {
-	bool xref_stream = false;
-	if (stream_dict.getKey("/Type").isName() &&
-	    (stream_dict.getKey("/Type").getName() == "/XRef"))
-	{
-	    QTC::TC("qpdf", "QPDF piping xref stream from encrypted file");
-	    xref_stream = true;
-	}
-	if (! xref_stream)
-	{
-	    decryptStream(pipeline, objid, generation, to_delete);
-	}
+	decryptStream(pipeline, objid, generation, stream_dict, to_delete);
     }
 
     try
