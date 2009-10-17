@@ -92,14 +92,15 @@ class DLL_EXPORT QPDF
 	// This class holds data read from the encryption dictionary.
 	EncryptionData(int V, int R, int Length_bytes, int P,
 		       std::string const& O, std::string const& U,
-		       std::string const& id1) :
+		       std::string const& id1, bool encrypt_metadata) :
 	    V(V),
 	    R(R),
 	    Length_bytes(Length_bytes),
 	    P(P),
 	    O(O),
 	    U(U),
-	    id1(id1)
+	    id1(id1),
+	    encrypt_metadata(encrypt_metadata)
 	{
 	}
 
@@ -110,6 +111,7 @@ class DLL_EXPORT QPDF
 	std::string O;
 	std::string U;
 	std::string id1;
+	bool encrypt_metadata;
     };
 
     bool isEncrypted() const;
@@ -132,7 +134,8 @@ class DLL_EXPORT QPDF
     // getTrimmedUserPassword's result.
     static void trim_user_password(std::string& user_password);
     static std::string compute_data_key(
-	std::string const& encryption_key, int objid, int generation);
+	std::string const& encryption_key, int objid, int generation,
+	bool use_aes);
     static std::string compute_encryption_key(
 	std::string const& password, EncryptionData const& data);
 
@@ -732,6 +735,7 @@ class DLL_EXPORT QPDF
     bool ignore_xref_streams;
     bool suppress_warnings;
     bool attempt_recovery;
+    bool encryption_use_aes;
     std::string provided_password;
     std::string user_password;
     std::string encryption_key;

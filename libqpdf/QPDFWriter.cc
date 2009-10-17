@@ -326,7 +326,8 @@ QPDFWriter::setEncryptionParametersInternal(
     encryption_dictionary["/O"] = QPDF_String(O).unparse(true);
     encryption_dictionary["/U"] = QPDF_String(U).unparse(true);
     this->encrypted = true;
-    QPDF::EncryptionData encryption_data(V, R, key_len, P, O, U, this->id1);
+    QPDF::EncryptionData encryption_data(V, R, key_len, P, O, U, this->id1,
+					 /*XXX encrypt_metadata*/true);
     this->encryption_key = QPDF::compute_encryption_key(
 	user_password, encryption_data);
 }
@@ -335,7 +336,7 @@ void
 QPDFWriter::setDataKey(int objid)
 {
     this->cur_data_key = QPDF::compute_data_key(
-	this->encryption_key, objid, 0);
+	this->encryption_key, objid, 0, /*XXX use_aes */false);
 }
 
 int

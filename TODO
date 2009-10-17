@@ -56,6 +56,18 @@
    dictionary.  (V = 4 is Crypt Filters.)  See
    ~/Q/pdf-collection/R4-encrypt-PDF_Inside_and_Out.pdf
 
+   Search for XXX in the code.  Implementation has been started.
+
+   Algorithms from PDF Spec in QPDF_encrypt.cc have been updated.  We
+   can at least properly verify the user password with an R4 file.  In
+   order to finish the job, we need an aes-128-cbc implementation.
+   Then we can fill in the gaps for the aes pipeline and actually run
+   the test suite.  The pipeline may be able to hard-code the
+   initialization vector stuff by taking the first block of input and
+   by writing a random block for output.  The padding is already in
+   the code, but the initialization vector is not since I accidentally
+   started using an aes256 implementation instead of aes128-cbc.
+
  * Look at page splitting.
 
 

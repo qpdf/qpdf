@@ -8,6 +8,32 @@ Artistic License which may be found in the source distribution as
 "Artistic-2.0".  It is provided "as is" without express or implied
 warranty.
 
+
+Licensing terms of embedded software
+====================================
+
+Some additional software with additional licensing terms is embedded
+within the qpdf source distribution in "external-libs".  This software
+is not actually used by the qpdf build unless the
+--enable-build-external-libs option is passed to ./configure.  These
+packages have their own licensing terms, both of which are compatible
+with qpdf's license.
+
+Zlib's license can be read in external-libs/zlib/zlib.h
+
+PCRE's licensing terms can be found in external-libs/pcre/LICENSE.
+PCRE's licensing terms require that we include the following
+information:
+
+   Regular expression support is provided by the PCRE library package,
+   which is open source software, written by Philip Hazel, and
+   copyright by the University of Cambridge, England.
+
+The sources to PCRE can be independently obtained from
+
+   ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/
+
+
 Building on UNIX/Linux
 ======================
 
@@ -24,11 +50,11 @@ Building on Windows
 ===================
 
 QPDF is known to build and pass its test suite with mingw (gcc 4.4.0)
-and Microsoft Visual C++ .NET 2008 Express.  In both cases, cygwin is
-required to run the test suite.  Either cygwin or MSYS is required to
-build as well in order to get make and other related tools.  The MSVC
-build has only been tested under cygwin.  The mingw build requires
-MSYS and will probably not work with cygwin.
+and Microsoft Visual C++ .NET 2008 Express.  Either cygwin or MSYS
+plus ActivateState Perl is required to build as well in order to get
+make and other related tools.  The MSVC works with either cygwin or
+MSYS.  The mingw build requires MSYS and will probably not work with
+cygwin.
 
 For details on how to build under Windows, see README.windows.
 

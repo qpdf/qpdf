@@ -253,6 +253,7 @@ QPDF::QPDF() :
     ignore_xref_streams(false),
     suppress_warnings(false),
     attempt_recovery(true),
+    encryption_use_aes(false),
     cached_key_objid(0),
     cached_key_generation(0),
     first_xref_item_offset(0),
