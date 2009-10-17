@@ -1,13 +1,18 @@
 #ifndef H__RIJNDAEL
 #define H__RIJNDAEL
 
-int rijndaelSetupEncrypt(unsigned long *rk, const unsigned char *key,
+#include <qpdf/qpdf-config.h>
+#ifdef HAVE_INTTYPES_H
+# include <inttypes.h>
+#endif
+
+int rijndaelSetupEncrypt(uint32_t *rk, const unsigned char *key,
   int keybits);
-int rijndaelSetupDecrypt(unsigned long *rk, const unsigned char *key,
+int rijndaelSetupDecrypt(uint32_t *rk, const unsigned char *key,
   int keybits);
-void rijndaelEncrypt(const unsigned long *rk, int nrounds,
+void rijndaelEncrypt(const uint32_t *rk, int nrounds,
   const unsigned char plaintext[16], unsigned char ciphertext[16]);
-void rijndaelDecrypt(const unsigned long *rk, int nrounds,
+void rijndaelDecrypt(const uint32_t *rk, int nrounds,
   const unsigned char ciphertext[16], unsigned char plaintext[16]);
 
 #define KEYLENGTH(keybits) ((keybits)/8)

@@ -1,8 +1,8 @@
 #define FULL_UNROLL
 
-#include "rijndael.h"
+#include "qpdf/rijndael.h"
 
-typedef unsigned long u32;
+typedef uint32_t u32;
 typedef unsigned char u8;
 
 static const u32 Te0[256] =

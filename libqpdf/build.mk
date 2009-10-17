@@ -48,7 +48,8 @@ SRCS_libqpdf = \
 	libqpdf/QTC.cc \
 	libqpdf/QUtil.cc \
 	libqpdf/RC4.cc \
-	libqpdf/qpdf-c.cc
+	libqpdf/qpdf-c.cc \
+	libqpdf/rijndael.cc
 
 # -----
 

@@ -3,20 +3,38 @@
 #include <cstring>
 #include <assert.h>
 #include <stdexcept>
+#include <qpdf/rijndael.h>
+
+// XXX Still need CBC
 
 Pl_AES_PDF::Pl_AES_PDF(char const* identifier, Pipeline* next,
-		       bool encrypt, unsigned char* key_data) :
+		       bool encrypt, unsigned char key[key_size]) :
     Pipeline(identifier, next),
     encrypt(encrypt),
-    offset(0)
+    offset(0),
+    nrounds(0)
 {
-    std::memset(this->buf, 0, this->buf_size);
-    // XXX init
+    static int const keybits = 128;
+    assert(key_size == KEYLENGTH(keybits));
+    assert(sizeof(this->rk) / sizeof(uint32_t) == RKLENGTH(keybits));
+    std::memcpy(this->key, key, key_size);
+    std::memset(this->rk, 0, sizeof(this->rk));
+    std::memset(this->inbuf, 0, this->buf_size);
+    std::memset(this->outbuf, 0, this->buf_size);
+    if (encrypt)
+    {
+	this->nrounds = rijndaelSetupEncrypt(this->rk, this->key, keybits);
+    }
+    else
+    {
+	this->nrounds = rijndaelSetupDecrypt(this->rk, this->key, keybits);
+    }
+    assert(this->nrounds == NROUNDS(keybits));
 }
 
 Pl_AES_PDF::~Pl_AES_PDF()
 {
-    // XXX finalize
+    // nothing needed
 }
 
 void
@@ -35,7 +53,7 @@ Pl_AES_PDF::write(unsigned char* data, int len)
 	unsigned int available = this->buf_size - this->offset;
 	int bytes = (bytes_left < available ? bytes_left : available);
 	bytes_left -= bytes;
-	std::memcpy(this->buf + this->offset, p, bytes);
+	std::memcpy(this->inbuf + this->offset, p, bytes);
 	this->offset += bytes;
 	p += bytes;
     }
@@ -54,7 +72,7 @@ Pl_AES_PDF::finish()
 	// specification, including providing an entire block of padding
 	// if the input was a multiple of 16 bytes.
 	unsigned char pad = this->buf_size - this->offset;
-	memset(this->buf + this->offset, pad, pad);
+	memset(this->inbuf + this->offset, pad, pad);
 	this->offset = this->buf_size;
 	flush(false);
     }
@@ -78,22 +96,22 @@ Pl_AES_PDF::flush(bool strip_padding)
     assert(this->offset == this->buf_size);
     if (this->encrypt)
     {
-	// XXX encrypt this->buf
+	rijndaelEncrypt(this->rk, this->nrounds, this->inbuf, this->outbuf);
     }
     else
     {
-	// XXX decrypt this->buf
+	rijndaelDecrypt(this->rk, this->nrounds, this->inbuf, this->outbuf);
     }
     unsigned int bytes = this->buf_size;
     if (strip_padding)
     {
-	unsigned char last = this->buf[this->buf_size - 1];
+	unsigned char last = this->outbuf[this->buf_size - 1];
 	if (last <= this->buf_size)
 	{
 	    bool strip = true;
 	    for (unsigned int i = 1; i <= last; ++i)
 	    {
-		if (this->buf[this->buf_size - i] != last)
+		if (this->outbuf[this->buf_size - i] != last)
 		{
 		    strip = false;
 		    break;
@@ -105,6 +123,6 @@ Pl_AES_PDF::flush(bool strip_padding)
 	    }
 	}
     }
-    getNext()->write(this->buf, bytes);
+    getNext()->write(this->outbuf, bytes);
     this->offset = 0;
 }
