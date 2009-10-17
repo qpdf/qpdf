@@ -8,22 +8,33 @@
 
 static void usage()
 {
-    std::cerr << "Usage: aes { -encrypt | -decrypt }"
+    std::cerr << "Usage: aes [+-]cbc { -encrypt | -decrypt }"
 	      << " hex-key infile outfile" << std::endl;
     exit(2);
 }
 
 int main(int argc, char* argv[])
 {
-    if (argc != 5)
+    if (argc != 6)
     {
 	usage();
    }
 
-    char* action = argv[1];
-    char* hexkey = argv[2];
-    char* infilename = argv[3];
-    char* outfilename = argv[4];
+    char* cbc = argv[1];
+    char* action = argv[2];
+    char* hexkey = argv[3];
+    char* infilename = argv[4];
+    char* outfilename = argv[5];
+
+    bool cbc_mode = true;
+    if (strcmp(cbc, "-cbc") == 0)
+    {
+	cbc_mode = false;
+    }
+    else if (strcmp(cbc, "+cbc") != 0)
+    {
+	usage();
+    }
 
     bool encrypt = true;
     if (strcmp(action, "-decrypt") == 0)
@@ -72,6 +83,10 @@ int main(int argc, char* argv[])
 
     Pl_StdioFile* out = new Pl_StdioFile("stdout", outfile);
     Pl_AES_PDF* aes = new Pl_AES_PDF("aes_128_cbc", out, encrypt, key);
+    if (! cbc_mode)
+    {
+	aes->disableCBC();
+    }
 
     // 16 < buffer size, buffer_size is not a multiple of 8 for testing
     unsigned char buf[83];

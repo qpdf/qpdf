@@ -1,0 +1,71 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+use File::stat;
+
+chdir("aes") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('AES');
+
+cleanup();
+
+my $key = '000102030405060708090a0b0c0d0e0f';
+$td->runtest("encrypt test vector",
+	     {$td->COMMAND => "aes -cbc -encrypt $key test-vector.clear tmp1"},
+	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+	     {$td->FILE => "tmp1"},
+	     {$td->FILE => "test-vector.cipher"});
+$td->runtest("decrypt test vector",
+	     {$td->COMMAND => "aes -cbc -decrypt $key tmp1 tmp2"},
+	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+	     {$td->FILE => "tmp2"},
+	     {$td->FILE => "test-vector.clear"});
+
+$key = '243f6a8885243f6a8885243f6a888524';
+foreach my $d (['data1', 17072], ['data2', 16032])
+{
+    my ($file, $size) = @$d;
+    $td->runtest("encrypt $file",
+		 {$td->COMMAND => "aes +cbc -encrypt $key $file tmp1"},
+		 {$td->STRING => "", $td->EXIT_STATUS => 0});
+    # sleep one second so random number will get a different seed
+    sleep(1);
+    $td->runtest("encrypt $file again",
+		 {$td->COMMAND => "aes +cbc -encrypt $key $file tmp2"},
+		 {$td->STRING => "", $td->EXIT_STATUS => 0});
+    foreach my $f (qw(tmp1 tmp2))
+    {
+	$td->runtest("check size",
+		     {$td->STRING => sprintf("%d\n", stat($f)->size)},
+		     {$td->STRING => "$size\n"});
+    }
+    $td->runtest("verify files are different",
+		 {$td->COMMAND => "cmp tmp1 tmp2"},
+		 {$td->REGEXP => '.*', $td->EXIT_STATUS => '!0'});
+    $td->runtest("decrypt $file",
+		 {$td->COMMAND => "aes +cbc -decrypt $key tmp1 tmp3"},
+		 {$td->STRING => "", $td->EXIT_STATUS => 0});
+    $td->runtest("decrypt $file again",
+		 {$td->COMMAND => "aes +cbc -decrypt $key tmp2 tmp4"},
+		 {$td->STRING => "", $td->EXIT_STATUS => 0});
+    $td->runtest("check output",
+		 {$td->FILE => "tmp3"},
+		 {$td->FILE => $file});
+    $td->runtest("check output",
+		 {$td->FILE => "tmp4"},
+		 {$td->FILE => $file});
+}
+
+cleanup();
+
+$td->report(22);
+
+sub cleanup
+{
+    system("rm -f tmp?");
+}
