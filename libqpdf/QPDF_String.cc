@@ -9,6 +9,10 @@
 #include <string.h>
 
 // See above about ctype.
+static bool is_ascii_printable(unsigned char ch)
+{
+    return ((ch >= 32) && (ch <= 126));
+}
 static bool is_iso_latin1_printable(unsigned char ch)
 {
     return (((ch >= 32) && (ch <= 126)) || (ch >= 160));
@@ -40,12 +44,13 @@ QPDF_String::unparse(bool force_binary)
 	for (unsigned int i = 0; i < this->val.length(); ++i)
 	{
 	    char ch = this->val[i];
-	    // Note: do not use locale to determine printability.  The PDF
-	    // specification accepts arbitrary binary data.  Some locales
-	    // imply multibyte characters.  We'll consider something
-	    // printable if it is printable in ISO-Latin-1.  We'll code
-	    // this manually rather than being rude and setting locale.
-	    if ((ch == 0) || (! (is_iso_latin1_printable(ch) ||
+	    // Note: do not use locale to determine printability.  The
+	    // PDF specification accepts arbitrary binary data.  Some
+	    // locales imply multibyte characters.  We'll consider
+	    // something printable if it is printable in 7-bit ASCII.
+	    // We'll code this manually rather than being rude and
+	    // setting locale.
+	    if ((ch == 0) || (! (is_ascii_printable(ch) ||
 				 strchr("\n\r\t\b\f", ch))))
 	    {
 		++nonprintable;
@@ -64,10 +69,7 @@ QPDF_String::unparse(bool force_binary)
 	}
 
 	// Use hex notation if more than 20% of the characters are not
-	// printable in the current locale.  Uniformly distributed random
-	// characters will not pass this test even with ISO-Latin-1 in
-	// which 76% are either printable or in the set of standard
-	// escaped characters.
+	// printable in plain ASCII.
 	if (5 * nonprintable > val.length())
 	{
 	    use_hexstring = true;
