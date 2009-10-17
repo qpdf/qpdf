@@ -12,7 +12,7 @@ class DLL_EXPORT Pl_AES_PDF: public Pipeline
     // key_data should be a pointer to key_size bytes of data
     static unsigned int const key_size = 16;
     Pl_AES_PDF(char const* identifier, Pipeline* next,
-	       bool encrypt, unsigned char key[key_size]);
+	       bool encrypt, unsigned char const key[key_size]);
     virtual ~Pl_AES_PDF();
 
     virtual void write(unsigned char* data, int len);

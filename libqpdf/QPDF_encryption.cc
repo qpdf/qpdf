@@ -9,6 +9,7 @@
 #include <qpdf/QUtil.hh>
 #include <qpdf/Pl_RC4.hh>
 #include <qpdf/Pl_AES_PDF.hh>
+#include <qpdf/Pl_Buffer.hh>
 #include <qpdf/RC4.hh>
 #include <qpdf/MD5.hh>
 
@@ -281,6 +282,27 @@ check_owner_password(std::string& user_password,
     return result;
 }
 
+QPDF::encryption_method_e
+QPDF::interpretCF(QPDFObjectHandle cf)
+{
+    if (cf.isName())
+    {
+	std::string filter = cf.getName();
+	if (this->crypt_filters.count(filter) != 0)
+	{
+	    return this->crypt_filters[filter];
+	}
+	else
+	{
+	    return e_unknown;
+	}
+    }
+    else
+    {
+	return e_none;
+    }
+}
+
 void
 QPDF::initializeEncryption()
 {
@@ -322,8 +344,7 @@ QPDF::initializeEncryption()
 		      "incorrect length");
     }
 
-    this->encryption_dictionary = this->trailer.getKey("/Encrypt");
-    QPDFObjectHandle& encryption_dict = this->encryption_dictionary;
+    QPDFObjectHandle encryption_dict = this->trailer.getKey("/Encrypt");
     if (! encryption_dict.isDictionary())
     {
 	throw QPDFExc(this->file.getName(), this->file.getLastOffset(),
@@ -335,6 +356,12 @@ QPDF::initializeEncryption()
     {
 	throw QPDFExc(this->file.getName(), this->file.getLastOffset(),
 		      "unsupported encryption filter");
+    }
+    if (! encryption_dict.getKey("/SubFilter").isNull())
+    {
+	warn(QPDFExc(this->file.getName(), this->file.getLastOffset(),
+		     "file uses encryption SubFilters,"
+		     " which qpdf does not support"));
     }
 
     if (! (encryption_dict.getKey("/V").isInteger() &&
@@ -388,10 +415,55 @@ QPDF::initializeEncryption()
 	    encryption_dict.getKey("/EncryptMetadata").getBoolValue();
     }
 
-    // XXX warn if /SubFilter is present
     if (V == 4)
     {
-	// XXX get CF
+	QPDFObjectHandle CF = encryption_dict.getKey("/CF");
+	std::set<std::string> keys = CF.getKeys();
+	for (std::set<std::string>::iterator iter = keys.begin();
+	     iter != keys.end(); ++iter)
+	{
+	    std::string const& filter = *iter;
+	    QPDFObjectHandle cdict = CF.getKey(filter);
+	    if (cdict.isDictionary())
+	    {
+		encryption_method_e method = e_none;
+		if (cdict.getKey("/CFM").isName())
+		{
+		    std::string method_name = cdict.getKey("/CFM").getName();
+		    if (method_name == "/V2")
+		    {
+			// XXX coverage
+			method = e_rc4;
+		    }
+		    else if (method_name == "/AESV2")
+		    {
+			// XXX coverage
+			method = e_aes;
+		    }
+		    else
+		    {
+			// Don't complain now -- maybe we won't need
+			// to reference this type.
+			method = e_unknown;
+		    }
+		}
+		this->crypt_filters[filter] = method;
+	    }
+	}
+
+	QPDFObjectHandle StmF = encryption_dict.getKey("/StmF");
+	QPDFObjectHandle StrF = encryption_dict.getKey("/StrF");
+	QPDFObjectHandle EFF = encryption_dict.getKey("/EFF");
+	this->cf_stream = interpretCF(StmF);
+	this->cf_string = interpretCF(StrF);
+	if (EFF.isName())
+	{
+	    this->cf_file = interpretCF(EFF);
+	}
+	else
+	{
+	    this->cf_file = this->cf_stream;
+	}
     }
     EncryptionData data(V, R, Length / 8, P, O, U, id1, this->encrypt_metadata);
     if (check_owner_password(
@@ -440,15 +512,50 @@ QPDF::decryptString(std::string& str, int objid, int generation)
     {
 	return;
     }
-    bool use_aes = false;	// XXX
+    bool use_aes = false;
+    if (this->encryption_V == 4)
+    {
+	switch (this->cf_string)
+	{
+	  case e_none:
+	    return;
+
+	  case e_aes:
+	    use_aes = true;
+	    break;
+
+	  case e_rc4:
+	    break;
+
+	  default:
+	    warn(QPDFExc(this->file.getName(), this->file.getLastOffset(),
+			 "unknown encryption filter for strings"
+			 " (check /StrF in /Encrypt dictionary);"
+			 " strings may be decrypted improperly"));
+	    // To avoid repeated warnings, reset cf_string.  Assume
+	    // we'd want to use AES if V == 4.
+	    this->cf_string = e_aes;
+	    break;
+	}
+    }
+
     std::string key = getKeyForObject(objid, generation, use_aes);
     if (use_aes)
     {
-	// XXX
-	throw std::logic_error("XXX");
+	// XXX coverage
+	assert(key.length() == Pl_AES_PDF::key_size);
+	Pl_Buffer bufpl("decrypted string");
+	Pl_AES_PDF pl("aes decrypt string", &bufpl, false,
+		      (unsigned char const*)key.c_str());
+	pl.write((unsigned char*)str.c_str(), str.length());
+	pl.finish();
+	Buffer* buf = bufpl.getBuffer();
+	str = std::string((char*)buf->getBuffer(), (size_t)buf->getSize());
+	delete buf;
     }
     else
     {
+	QTC::TC("qpdf", "QPDF_encryption rc4 decode string");
 	unsigned int vlen = str.length();
 	char* tmp = QUtil::copy_string(str);
 	RC4 rc4((unsigned char const*)key.c_str(), key.length());
@@ -463,7 +570,6 @@ QPDF::decryptStream(Pipeline*& pipeline, int objid, int generation,
 		    QPDFObjectHandle& stream_dict,
 		    std::vector<PointerHolder<Pipeline> >& heap)
 {
-    bool decrypt = true;
     std::string type;
     if (stream_dict.getKey("/Type").isName())
     {
@@ -471,34 +577,77 @@ QPDF::decryptStream(Pipeline*& pipeline, int objid, int generation,
     }
     if (type == "/XRef")
     {
-	QTC::TC("qpdf", "QPDF piping xref stream from encrypted file");
-	decrypt = false;
+	QTC::TC("qpdf", "QPDF_encryption xref stream from encrypted file");
+	return;
     }
     bool use_aes = false;
     if (this->encryption_V == 4)
     {
-	if ((! this->encrypt_metadata) && (type == "/Metadata"))
-	{
-	    // XXX no test case for this
-	    decrypt = false;
-	}
-	// XXX check crypt filter; if not found, use StmF; see TODO
-	use_aes = true;		// XXX
-    }
-    if (! decrypt)
-    {
-	return;
-    }
+	encryption_method_e method = e_unknown;
+	std::string method_source = "/StmF from /Encrypt dictionary";
 
+	if (stream_dict.getKey("/DecodeParms").isDictionary())
+	{
+	    QPDFObjectHandle decode_parms = stream_dict.getKey("/DecodeParms");
+	    if (decode_parms.getKey("/Crypt").isDictionary())
+	    {
+		// XXX coverage
+		QPDFObjectHandle crypt = decode_parms.getKey("/Crypt");
+		method = interpretCF(crypt.getKey("/Name"));
+		method_source = "stream's Crypt decode parameters";
+	    }
+	}
+
+	if (method == e_unknown)
+	{
+	    if ((! this->encrypt_metadata) && (type == "/Metadata"))
+	    {
+		// XXX coverage
+		method = e_none;
+	    }
+	    else
+	    {
+		method = this->cf_stream;
+	    }
+	    // XXX What about embedded file streams?
+	}
+	use_aes = false;
+	switch (this->cf_stream)
+	{
+	  case e_none:
+	    return;
+	    break;
+
+	  case e_aes:
+	    use_aes = true;
+	    break;
+
+	  case e_rc4:
+	    break;
+
+	  default:
+	    // filter local to this stream.
+	    warn(QPDFExc(this->file.getName(), this->file.getLastOffset(),
+			 "unknown encryption filter for streams"
+			 " (check " + method_source + ");"
+			 " streams may be decrypted improperly"));
+	    // To avoid repeated warnings, reset cf_stream.  Assume
+	    // we'd want to use AES if V == 4.
+	    this->cf_stream = e_aes;
+	    break;
+	}
+    }
     std::string key = getKeyForObject(objid, generation, use_aes);
     if (use_aes)
     {
+	// XXX coverage
 	assert(key.length() == Pl_AES_PDF::key_size);
 	pipeline = new Pl_AES_PDF("AES stream decryption", pipeline,
 				  false, (unsigned char*) key.c_str());
     }
     else
     {
+	QTC::TC("qpdf", "QPDF_encryption rc4 decode stream");
 	pipeline = new Pl_RC4("RC4 stream decryption", pipeline,
 			      (unsigned char*) key.c_str(), key.length());
     }

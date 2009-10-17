@@ -9,7 +9,7 @@
 #include <stdlib.h>
 
 Pl_AES_PDF::Pl_AES_PDF(char const* identifier, Pipeline* next,
-		       bool encrypt, unsigned char key[key_size]) :
+		       bool encrypt, unsigned char const key[key_size]) :
     Pipeline(identifier, next),
     encrypt(encrypt),
     cbc_mode(true),

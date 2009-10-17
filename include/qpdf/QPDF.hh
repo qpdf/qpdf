@@ -87,6 +87,7 @@ class DLL_EXPORT QPDF
 
     // Encryption support
 
+    enum encryption_method_e { e_none, e_unknown, e_rc4, e_aes };
     struct EncryptionData
     {
 	// This class holds data read from the encryption dictionary.
@@ -397,6 +398,7 @@ class DLL_EXPORT QPDF
 			     std::vector<QPDFObjectHandle>& result);
 
     // methods to support encryption -- implemented in QPDF_encryption.cc
+    encryption_method_e interpretCF(QPDFObjectHandle);
     void initializeEncryption();
     std::string getKeyForObject(int objid, int generation, bool use_aes);
     void decryptString(std::string&, int objid, int generation);
@@ -739,7 +741,10 @@ class DLL_EXPORT QPDF
     bool attempt_recovery;
     int encryption_V;
     bool encrypt_metadata;
-    QPDFObjectHandle encryption_dictionary;
+    std::map<std::string, encryption_method_e> crypt_filters;
+    encryption_method_e cf_stream;
+    encryption_method_e cf_string;
+    encryption_method_e cf_file;
     std::string provided_password;
     std::string user_password;
     std::string encryption_key;

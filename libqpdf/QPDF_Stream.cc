@@ -136,6 +136,11 @@ QPDF_Stream::filterable(std::vector<std::string>& filters,
 		    filterable = false;
 		}
 	    }
+	    else if (key == "/Crypt")
+	    {
+		// XXX untested
+		// we handle this in decryptStream
+	    }
 	    else
 	    {
 		filterable = false;
@@ -212,7 +217,8 @@ QPDF_Stream::filterable(std::vector<std::string>& filters,
 	 iter != filters.end(); ++iter)
     {
 	std::string const& filter = *iter;
-	if (! ((filter == "/FlateDecode") ||
+	if (! ((filter == "/Crypt") ||
+	       (filter == "/FlateDecode") ||
 	       (filter == "/LZWDecode") ||
 	       (filter == "/ASCII85Decode") ||
 	       (filter == "/ASCIIHexDecode")))
@@ -266,7 +272,11 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline, bool filter,
 	     iter != filters.rend(); ++iter)
 	{
 	    std::string const& filter = *iter;
-	    if (filter == "/FlateDecode")
+	    if (filter == "/Crypt")
+	    {
+		// Ignore -- handled by pipeStreamData
+	    }
+	    else if (filter == "/FlateDecode")
 	    {
 		if (predictor == 12)
 		{
