@@ -7,6 +7,11 @@
 #include <qpdf/rijndael.h>
 #include <string>
 #include <stdlib.h>
+#include <qpdf/qpdf-config.h>
+#ifndef HAVE_RANDOM
+# define random rand
+# define srandom srand
+#endif
 
 Pl_AES_PDF::Pl_AES_PDF(char const* identifier, Pipeline* next,
 		       bool encrypt, unsigned char const key[key_size]) :

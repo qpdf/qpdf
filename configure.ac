@@ -41,6 +41,7 @@ fi
 
 AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
+AC_CHECK_FUNCS(random)
 
 AC_MSG_CHECKING(for gnu make >= 3.81)
 make_okay=0
