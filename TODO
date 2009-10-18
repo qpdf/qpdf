@@ -44,7 +44,13 @@
    the purpose you want .. no support provided. Sample code provided."
 
  * Test cases for metadata: make sure we get uncompressed metadata for
-   all --stream-data modes unless encrypted.
+   all --stream-data modes unless encrypted.  Have check_metadata
+   function in the test suite that should report whether the metadata
+   is compressed (by looking at the /Filter key in the stream
+   dictionary) and tries to extract it filtered to make sure
+   encryption/decryption works.  We should also grep for some string
+   for encrypted files where it's not supposed to be encrypted to make
+   sure it's also not compressed.
 
  * R = 4, V = 4 encryption.
 
