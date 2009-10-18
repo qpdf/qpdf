@@ -55,11 +55,11 @@
 
     - figure out a way to test crypt filters defined on a stream
 
+    - test extraction of metadata with and without encrypted metadata
+
     - would be nice to test strings and streams with different
       encryption types, but without sample data, we'd have to write
       them ourselves which is not that useful
-
-    - figure out why xpdf can open my files but not acroread
 
     - figure out how to look at the metadata so I can tell whether
       /EncryptMetadata is working the way it's supposed to

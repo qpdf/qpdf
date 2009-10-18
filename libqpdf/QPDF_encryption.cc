@@ -612,7 +612,7 @@ QPDF::decryptStream(Pipeline*& pipeline, int objid, int generation,
 	    // XXX What about embedded file streams?
 	}
 	use_aes = false;
-	switch (this->cf_stream)
+	switch (method)
 	{
 	  case e_none:
 	    return;

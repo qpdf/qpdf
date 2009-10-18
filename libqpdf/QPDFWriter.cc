@@ -363,11 +363,14 @@ QPDFWriter::setEncryptionParametersInternal(
     }
     if (V == 4)
     {
-	encryption_dictionary["/StmF"] = "/CF1";
-	encryption_dictionary["/StrF"] = "/CF1";
+	// The spec says the value for the crypt filter key can be
+	// anything, and xpdf seems to agree.  However, Adobe Reader
+	// won't open our files unless we use /StdCF.
+	encryption_dictionary["/StmF"] = "/StdCF";
+	encryption_dictionary["/StrF"] = "/StdCF";
 	std::string method = (this->encrypt_use_aes ? "/AESV2" : "/V2");
 	encryption_dictionary["/CF"] =
-	    "<< /CF1 << /AuthEvent /DocOpen /CFM " + method + " >> >>";
+	    "<< /StdCF << /AuthEvent /DocOpen /CFM " + method + " >> >>";
     }
 
     this->encrypted = true;
