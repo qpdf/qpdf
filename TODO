@@ -43,6 +43,9 @@
    (http://delphi.about.com). .. use at your own risk and for whatever
    the purpose you want .. no support provided. Sample code provided."
 
+ * Test cases for metadata: make sure we get uncompressed metadata for
+   all --stream-data modes unless encrypted.
+
  * R = 4, V = 4 encryption.
 
     - Update C API for R4 encryption
