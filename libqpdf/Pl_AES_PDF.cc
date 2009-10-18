@@ -1,6 +1,5 @@
 #include <qpdf/Pl_AES_PDF.hh>
 #include <qpdf/QUtil.hh>
-#include <qpdf/MD5.hh>
 #include <cstring>
 #include <assert.h>
 #include <stdexcept>
@@ -111,17 +110,10 @@ Pl_AES_PDF::initializeVector()
     static bool seeded_random = false;
     if (! seeded_random)
     {
-	std::string seed_str;
-	seed_str += QUtil::int_to_string((int)QUtil::get_current_time());
-	seed_str += " QPDF aes random";
-	MD5 m;
-	m.encodeString(seed_str.c_str());
-	MD5::Digest digest;
-	m.digest(digest);
-	assert(sizeof(digest) >= sizeof(unsigned int));
-	unsigned int seed;
-	memcpy((void*)(&seed), digest, sizeof(unsigned int));
-	srandom(seed);
+	// Seed the random number generator with something simple, but
+	// just to be interesting, don't use the unmodified current
+	// time....
+	srandom((int)QUtil::get_current_time() ^ 0xcccc);
 	seeded_random = true;
     }
     for (unsigned int i = 0; i < this->buf_size; ++i)
