@@ -72,6 +72,9 @@ Additional flags are dependent upon key length.\n\
     --extract=[yn]           allow other text/graphic extraction\n\
     --print=print-opt        control printing access\n\
     --modify=modify-opt      control modify access\n\
+    --cleartext-metadata     prevents encryption of metadata\n\
+    --use-aes=[yn]           indicates whether to use AES encryption\n\
+    --force-V4               forces use of V=4 encryption handler\n\
 \n\
     print-opt may be:\n\
 \n\
@@ -88,6 +91,14 @@ Additional flags are dependent upon key length.\n\
       none                  allow no modifications\n\
 \n\
 The default for each permission option is to be fully permissive.\n\
+\n\
+Specifying cleartext-metadata forces the PDF version to at least 1.5.\n\
+Specifying use of AES forces the PDF version to at least 1.6.  These\n\
+options are both off by default.\n\
+\n\
+The --force-V4 flag forces the V=4 encryption handler introduced in PDF 1.5\n\
+to be used even if not otherwise needed.  This option is primarily useful\n\
+for testing qpdf and has no other practical use.\n\
 \n\
 \n\
 Advanced Transformation Options\n\
@@ -220,7 +231,8 @@ parse_encrypt_options(
     std::string& user_password, std::string& owner_password, int& keylen,
     bool& r2_print, bool& r2_modify, bool& r2_extract, bool& r2_annotate,
     bool& r3_accessibility, bool& r3_extract,
-    QPDFWriter::r3_print_e& r3_print, QPDFWriter::r3_modify_e& r3_modify)
+    QPDFWriter::r3_print_e& r3_print, QPDFWriter::r3_modify_e& r3_modify,
+    bool& force_V4, bool& cleartext_metadata, bool& use_aes)
 {
     if (cur_arg + 3 >= argc)
     {
@@ -450,6 +462,65 @@ parse_encrypt_options(
 		usage("-accessibility invalid for 40-bit keys");
 	    }
 	}
+	else if (strcmp(arg, "cleartext-metadata") == 0)
+	{
+	    if (parameter)
+	    {
+		usage("--cleartext-metadata does not take a parameter");
+	    }
+	    if (keylen == 40)
+	    {
+		usage("--cleartext-metadata is invalid for 40-bit keys");
+	    }
+	    else
+	    {
+		cleartext_metadata = true;
+	    }
+	}
+	else if (strcmp(arg, "force-V4") == 0)
+	{
+	    if (parameter)
+	    {
+		usage("--force-V4 does not take a parameter");
+	    }
+	    if (keylen == 40)
+	    {
+		usage("--force-V4 is invalid for 40-bit keys");
+	    }
+	    else
+	    {
+		force_V4 = true;
+	    }
+	}
+	else if (strcmp(arg, "use-aes") == 0)
+	{
+	    if (parameter == 0)
+	    {
+		usage("--use-aes must be given as --extract=option");
+	    }
+	    std::string val = parameter;
+	    bool result = false;
+	    if (val == "y")
+	    {
+		result = true;
+	    }
+	    else if (val == "n")
+	    {
+		result = false;
+	    }
+	    else
+	    {
+		usage("invalid -use-aes parameter");
+	    }
+	    if (keylen == 40)
+	    {
+		usage("use-aes is invalid for 40-bit keys");
+	    }
+	    else
+	    {
+		use_aes = result;
+	    }
+	}
 	else
 	{
 	    usage(std::string("invalid encryption parameter --") + arg);
@@ -516,6 +587,9 @@ int main(int argc, char* argv[])
     bool r3_extract = true;
     QPDFWriter::r3_print_e r3_print = QPDFWriter::r3p_full;
     QPDFWriter::r3_modify_e r3_modify = QPDFWriter::r3m_all;
+    bool force_V4 = false;
+    bool cleartext_metadata = false;
+    bool use_aes = false;
 
     bool stream_data_set = false;
     QPDFWriter::stream_data_e stream_data_mode = QPDFWriter::s_compress;
@@ -582,7 +656,8 @@ int main(int argc, char* argv[])
 		    argc, argv, ++i,
 		    user_password, owner_password, keylen,
 		    r2_print, r2_modify, r2_extract, r2_annotate,
-		    r3_accessibility, r3_extract, r3_print, r3_modify);
+		    r3_accessibility, r3_extract, r3_print, r3_modify,
+		    force_V4, cleartext_metadata, use_aes);
 		encrypt = true;
 	    }
 	    else if (strcmp(arg, "decrypt") == 0)
@@ -988,9 +1063,19 @@ int main(int argc, char* argv[])
 		}
 		else if (keylen == 128)
 		{
-		    w.setR3EncryptionParameters(
-			user_password.c_str(), owner_password.c_str(),
-			r3_accessibility, r3_extract, r3_print, r3_modify);
+		    if (force_V4 || cleartext_metadata || use_aes)
+		    {
+			w.setR4EncryptionParameters(
+			    user_password.c_str(), owner_password.c_str(),
+			    r3_accessibility, r3_extract, r3_print, r3_modify,
+			    !cleartext_metadata, use_aes);
+		    }
+		    else
+		    {
+			w.setR3EncryptionParameters(
+			    user_password.c_str(), owner_password.c_str(),
+			    r3_accessibility, r3_extract, r3_print, r3_modify);
+		    }
 		}
 		else
 		{

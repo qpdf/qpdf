@@ -118,9 +118,10 @@ class DLL_EXPORT QPDFWriter
 
     // Set up for encrypted output.  Disables stream prefiltering and
     // content normalization.  Note that setting R2 encryption
-    // parameters sets the PDF version to at least 1.3, and setting R3
+    // parameters sets the PDF version to at least 1.3, setting R3
     // encryption parameters pushes the PDF version number to at least
-    // 1.4.
+    // 1.4, and setting R4 parameters pushes the version to at least
+    // 1.5, or if AES is used, 1.6.
     void setR2EncryptionParameters(
 	char const* user_password, char const* owner_password,
 	bool allow_print, bool allow_modify,
@@ -143,6 +144,11 @@ class DLL_EXPORT QPDFWriter
 	char const* user_password, char const* owner_password,
 	bool allow_accessibility, bool allow_extract,
 	r3_print_e print, r3_modify_e modify);
+    void setR4EncryptionParameters(
+	char const* user_password, char const* owner_password,
+	bool allow_accessibility, bool allow_extract,
+	r3_print_e print, r3_modify_e modify,
+	bool encrypt_metadata, bool use_aes);
 
     // Create linearized output.  Disables qdf mode, content
     // normalization, and stream prefiltering.
@@ -182,6 +188,11 @@ class DLL_EXPORT QPDFWriter
     void preserveObjectStreams();
     void generateObjectStreams();
     void generateID();
+    void interpretR3EncryptionParameters(
+	std::set<int>& bits_to_clear,
+	char const* user_password, char const* owner_password,
+	bool allow_accessibility, bool allow_extract,
+	r3_print_e print, r3_modify_e modify);
     void setEncryptionParameters(
 	char const* user_password, char const* owner_password,
 	int V, int R, int key_len, std::set<int>& bits_to_clear);
@@ -231,6 +242,7 @@ class DLL_EXPORT QPDFWriter
     // stack items are of type Pl_Buffer, the buffer is retrieved.
     void popPipelineStack(PointerHolder<Buffer>* bp = 0);
 
+    void adjustAESStreamLength(unsigned long& length);
     void pushEncryptionFilter();
     void pushDiscardFilter();
 
@@ -251,6 +263,8 @@ class DLL_EXPORT QPDFWriter
     bool linearized;
     object_stream_e object_stream_mode;
     std::string encryption_key;
+    bool encrypt_metadata;
+    bool encrypt_use_aes;
     std::map<std::string, std::string> encryption_dictionary;
 
     std::string id1;		// for /ID key of
@@ -267,7 +281,7 @@ class DLL_EXPORT QPDFWriter
     std::map<int, size_t> lengths;
     int next_objid;
     int cur_stream_length_id;
-    int cur_stream_length;
+    unsigned long cur_stream_length;
     bool added_newline;
     int max_ostream_index;
     std::set<int> normalized_streams;

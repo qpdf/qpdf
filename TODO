@@ -43,48 +43,53 @@
    (http://delphi.about.com). .. use at your own risk and for whatever
    the purpose you want .. no support provided. Sample code provided."
 
- * Implement as much of R = 4 encryption as possible.  Already able to
-   decode AES-128-CBC and check passwords.
+ * R = 4, V = 4 encryption.
 
-   aes test suite: use fips-197 test vector with cbc disabled; encrypt
-   and decrypt some other files including multiples of 16 and not to
-   test cbc mode.
+    - Update C API for R4 encryption
 
-   /Encrypt keys (if V == 4)
+    - When we write encrypted files, we must remember to omit any
+      encryption filter settings from original streams.
 
-     /StmF - name of crypt filter for streams; default /Identity
-     /StrF - name of crypt filter for strings; default /Identity
-     /EFF - crypt filter for embedded files without their own crypt
-       filters; default is to use /StmF
+    - test various combinations with and without cleartext-metadata
+      and aes in compression tests
 
-     /CF - keys are crypt filter names, values are are crypt
-     dictionaries
+    - figure out a way to test crypt filters defined on a stream
 
-     Individual streams may also have crypt filters.  Filter type
-     /Crypt; /DecodeParms must contain a Crypt filter decode
-     parameters dictionary whose /Name entry specifies the particular
-     filter to be used.  If /Name is missing, use /Identity.
-     /DecodeParms << /Crypt << /Name /XYZ >> >> where /XYZ is
-     /Identity or a key in /CF.
+    - would be nice to test strings and streams with different
+      encryption types, but without sample data, we'd have to write
+      them ourselves which is not that useful
 
-     /Identity means not to encrypt.
+    - figure out why xpdf can open my files but not acroread
 
-     Crypt Dictionaries
+    - figure out how to look at the metadata so I can tell whether
+      /EncryptMetadata is working the way it's supposed to
 
-       /Type (optional) /CryptFilter
-       /CFM:
-         /V2 - use rc4
-         /AESV2 - use aes
-       /Length - supposed to be key length, but the one file I have
-         has a bogus value for it, so I'm ignoring it.
+    - Do something with embedded files, but what and how?
 
-       We will ignore remaining fields and values.
+    - General notes:
 
-   Remember to honor /EncryptMetadata; applies to streams of /Type
-   /Metadata
+      /CF - keys are crypt filter names, values are are crypt
+      dictionaries
 
-   When we write encrypted files, we must remember to omit any
-   encryption filter settings from original streams.
+      Individual streams may also have crypt filters.  Filter type
+      /Crypt; /DecodeParms must contain a Crypt filter decode
+      parameters dictionary whose /Name entry specifies the particular
+      filter to be used.  If /Name is missing, use /Identity.
+      /DecodeParms << /Crypt << /Name /XYZ >> >> where /XYZ is
+      /Identity or a key in /CF.
+
+      /Identity means not to encrypt.
+
+      Crypt Dictionaries
+
+	/Type (optional) /CryptFilter
+	/CFM:
+	  /V2 - use rc4
+	  /AESV2 - use aes
+	/Length - supposed to be key length, but the one file I have
+	  has a bogus value for it, so I'm ignoring it.
+
+	We will ignore remaining fields and values.
 
 2.2
 ===
