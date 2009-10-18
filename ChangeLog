@@ -1,3 +1,14 @@
+2009-10-18  Jay Berkenbilt  <ejb@ql.org>
+
+	* libqpdf/QPDFWriter.cc (unparseObject): avoid compressing
+	Metadata streams if possible.
+
+2009-10-04  Jay Berkenbilt  <ejb@ql.org>
+
+	* Implement support AES encrypt and crypt filters.  Implementation
+	is not fully tested due to lack of test data but has been tested
+	for several cases.
+
 2009-10-04  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add methods to QPDFWriter and corresponding command line

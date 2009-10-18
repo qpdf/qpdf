@@ -860,6 +860,12 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	}
 	QPDFObjectHandle stream_dict = object.getDict();
 
+	bool is_metadata = false;
+	if (stream_dict.getKey("/Type").isName() &&
+	    (stream_dict.getKey("/Type").getName() == "/Metadata"))
+	{
+	    is_metadata = true;
+	}
 	bool filter = (this->stream_data_mode != s_preserve);
 	if (this->stream_data_mode == s_compress)
 	{
@@ -878,7 +884,14 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	}
 	bool normalize = false;
 	bool compress = false;
-	if (this->normalize_content && normalized_streams.count(old_id))
+	if (is_metadata &&
+	    ((! this->encrypted) || (this->encrypt_metadata == false)))
+	{
+	    QTC::TC("qpdf", "QPDFWriter not compressing metadata");
+	    filter = true;
+	    compress = false;
+	}
+	else if (this->normalize_content && normalized_streams.count(old_id))
 	{
 	    normalize = true;
 	    filter = true;
@@ -907,10 +920,7 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	}
 
 	this->cur_stream_length = stream_data.getPointer()->getSize();
-	if (this->encrypted &&
-	    stream_dict.getKey("/Type").isName() &&
-	    (stream_dict.getKey("/Type").getName() == "/Metadata") &&
-	    (! this->encrypt_metadata))
+	if (is_metadata && this->encrypted && (! this->encrypt_metadata))
 	{
 	    // Don't encrypt stream data for the metadata stream
 	    this->cur_data_key.clear();

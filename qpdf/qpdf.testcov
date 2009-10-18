@@ -160,3 +160,4 @@ qpdf-c called qpdf_force_pdf_version 0
 qpdf-c called qpdf_init_write multiple times 0
 QPDF_encryption rc4 decode string 0
 QPDF_encryption rc4 decode stream 0
+QPDFWriter not compressing metadata 0

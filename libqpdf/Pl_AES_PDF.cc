@@ -108,17 +108,22 @@ Pl_AES_PDF::finish()
 void
 Pl_AES_PDF::initializeVector()
 {
-    std::string seed_str;
-    seed_str += QUtil::int_to_string((int)QUtil::get_current_time());
-    seed_str += " QPDF aes random";
-    MD5 m;
-    m.encodeString(seed_str.c_str());
-    MD5::Digest digest;
-    m.digest(digest);
-    assert(sizeof(digest) >= sizeof(unsigned int));
-    unsigned int seed;
-    memcpy((void*)(&seed), digest, sizeof(unsigned int));
-    srandom(seed);
+    static bool seeded_random = false;
+    if (! seeded_random)
+    {
+	std::string seed_str;
+	seed_str += QUtil::int_to_string((int)QUtil::get_current_time());
+	seed_str += " QPDF aes random";
+	MD5 m;
+	m.encodeString(seed_str.c_str());
+	MD5::Digest digest;
+	m.digest(digest);
+	assert(sizeof(digest) >= sizeof(unsigned int));
+	unsigned int seed;
+	memcpy((void*)(&seed), digest, sizeof(unsigned int));
+	srandom(seed);
+	seeded_random = true;
+    }
     for (unsigned int i = 0; i < this->buf_size; ++i)
     {
 	this->cbc_block[i] = (unsigned char)((random() & 0xff0) >> 4);
