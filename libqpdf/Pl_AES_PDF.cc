@@ -121,7 +121,7 @@ Pl_AES_PDF::initializeVector()
     srandom(seed);
     for (unsigned int i = 0; i < this->buf_size; ++i)
     {
-	this->cbc_block[i] = (unsigned char)(random() & 0xff);
+	this->cbc_block[i] = (unsigned char)((random() & 0xff0) >> 4);
     }
 }
 
