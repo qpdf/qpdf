@@ -620,6 +620,51 @@ $td->runtest("show-xref-by-id-filtered",
 
 show_ntests();
 # ----------
+$td->notify("--- Clear-text Metadata Tests ---");
+$n_tests += 42;
+
+# args: file, exp_encrypted, exp_cleartext
+check_metadata("compressed-metadata.pdf", 0, 0);
+check_metadata("enc-base.pdf", 0, 1);
+
+foreach my $f (qw(compressed-metadata.pdf enc-base.pdf))
+{
+    foreach my $w (qw(compress preserve))
+    {
+	$td->runtest("$w streams",
+		     {$td->COMMAND => "qpdf --stream-data=$w $f a.pdf"},
+		     {$td->STRING => "", $td->EXIT_STATUS => 0});
+	check_metadata("a.pdf", 0, 1);
+	$td->runtest("encrypt normally",
+		     {$td->COMMAND =>
+			  "qpdf --encrypt '' '' 128 -- a.pdf b.pdf"},
+		     {$td->STRING => "", $td->EXIT_STATUS => 0});
+	check_metadata("b.pdf", 1, 0);
+	unlink "b.pdf";
+	$td->runtest("encrypt V4",
+		     {$td->COMMAND =>
+			  "qpdf --encrypt '' '' 128 --force-V4 -- a.pdf b.pdf"},
+		     {$td->STRING => "", $td->EXIT_STATUS => 0});
+	check_metadata("b.pdf", 1, 0);
+	unlink "b.pdf";
+	$td->runtest("encrypt with cleartext metadata",
+		     {$td->COMMAND =>
+			  "qpdf --encrypt '' '' 128 --cleartext-metadata --" .
+			  " a.pdf b.pdf"},
+		     {$td->STRING => "", $td->EXIT_STATUS => 0});
+	check_metadata("b.pdf", 1, 1);
+	unlink "b.pdf";
+	$td->runtest("encrypt with aes and cleartext metadata",
+		     {$td->COMMAND =>
+			  "qpdf --encrypt '' '' 128" .
+			  " --cleartext-metadata --use-aes=y -- a.pdf b.pdf"},
+		     {$td->STRING => "", $td->EXIT_STATUS => 0});
+	check_metadata("b.pdf", 1, 1);
+    }
+}
+
+show_ntests();
+# ----------
 $td->notify("--- Linearization Tests ---");
 # $n_tests incremented after initialization of @linearized_files and
 # @to_linearize.
@@ -1190,6 +1235,17 @@ sub compare_pdfs
 		  $td->EXIT_STATUS => $exp});
 
     system("rm -rf tif1 tif2");
+}
+
+sub check_metadata
+{
+    my ($file, $exp_encrypted, $exp_cleartext) = @_;
+    my $out = "encrypted=$exp_encrypted; cleartext=$exp_cleartext\n" .
+	"test 6 done\n";
+    $td->runtest("check metadata: $file",
+		 {$td->COMMAND => "test_driver 6 $file"},
+		 {$td->STRING => $out, $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
 }
 
 sub get_md5_checksum

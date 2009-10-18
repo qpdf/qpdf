@@ -791,14 +791,15 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
     }
     else if (object.isDictionary())
     {
-	// XXX Must not preserve Crypt filters from original stream
-	// dictionary
 	writeString("<<");
 	writeStringQDF("\n");
 	std::set<std::string> keys = object.getKeys();
 	for (std::set<std::string>::iterator iter = keys.begin();
 	     iter != keys.end(); ++iter)
 	{
+	    // I'm not fully clear on /Crypt keys in /DecodeParms.  If
+	    // one is found, we refuse to filter, so we should be
+	    // safe.
 	    std::string const& key = *iter;
 	    if ((flags & f_filtered) &&
 		((key == "/Filter") ||

@@ -6,6 +6,7 @@
 #include <qpdf/QUtil.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/Pl_StdioFile.hh>
+#include <qpdf/Pl_Buffer.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <iostream>
 #include <string.h>
@@ -281,6 +282,31 @@ void runtest(int n, char const* filename)
 			  << std::endl;
 	    }
 	}
+    }
+    else if (n == 6)
+    {
+	QPDFObjectHandle root = pdf.getRoot();
+	QPDFObjectHandle metadata = root.getKey("/Metadata");
+	if (! metadata.isStream())
+	{
+	    throw std::logic_error("test 6 run on file with no metadata");
+	}
+	Pl_Buffer bufpl("buffer");
+	metadata.pipeStreamData(&bufpl, false, false, false);
+	Buffer* buf = bufpl.getBuffer();
+	unsigned char const* data = buf->getBuffer();
+	bool cleartext = false;
+	if ((buf->getSize() > 9) &&
+	    (strncmp((char const*)data, "<?xpacket", 9) == 0))
+	{
+	    cleartext = true;
+	}
+	delete buf;
+	std::cout << "encrypted="
+		  << (pdf.isEncrypted() ? 1 : 0)
+		  << "; cleartext="
+		  << (cleartext ? 1 : 0)
+		  << std::endl;
     }
     else
     {

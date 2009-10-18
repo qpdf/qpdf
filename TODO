@@ -43,15 +43,6 @@
    (http://delphi.about.com). .. use at your own risk and for whatever
    the purpose you want .. no support provided. Sample code provided."
 
- * Test cases for metadata: make sure we get uncompressed metadata for
-   all --stream-data modes unless encrypted.  Have check_metadata
-   function in the test suite that should report whether the metadata
-   is compressed (by looking at the /Filter key in the stream
-   dictionary) and tries to extract it filtered to make sure
-   encryption/decryption works.  We should also grep for some string
-   for encrypted files where it's not supposed to be encrypted to make
-   sure it's also not compressed.
-
  * R = 4, V = 4 encryption.
 
     - Update C API for R4 encryption
@@ -64,7 +55,7 @@
 
     - figure out a way to test crypt filters defined on a stream
 
-    - test extraction of metadata with and without encrypted metadata
+    - test combinations of linearization and v4 encryption
 
     - would be nice to test strings and streams with different
       encryption types, but without sample data, we'd have to write
@@ -115,6 +106,29 @@
 General
 =======
 
+ * Handle embedded files.  PDF Reference 1.7 section 3.10, "File
+   Specifications", discusses this.  Once we can definitely recongize
+   all embedded files in a docucment, we can update the encryption
+   code to handle it properly.  In QPDF_encryption.cc, search for
+   cf_file.  Remove exception thrown if cf_file is different from
+   cf_stream, and write code in the stream decryption section to use
+   cf_file instead of cf_stream.  In general, add interfaces to
+   get the list of embedded files and to extract them.  To handle
+   general embedded files associated with the whole document, follow
+   root -> /Names -> /EmbeddedFiles -> /Names to get to the file
+   specification dictionaries.  Then, in each file specification
+   dictionary, follow /EF -> /F to the actual stream.
+
+ * The description of Crypt filters is unclear with respect to how to
+   use them to override /StmF for specific streams.  I'm not sure
+   whether qpdf will do the right thing for any specific individual
+   streams that might have crypt filters.  The specification seems to
+   imply that only embedded file streams and metadata streams can have
+   crypt filters, and there are already special cases in the code to
+   handle those.  Most likely, it won't be a problem, but someday
+   someone may find a file that qpdf doesn't work on because of crypt
+   filters.
+
  * The second xref stream for linearized files has to be padded only
    because we need file_size as computed in pass 1 to be accurate.  If
    we were not allowing writing to a pipe, we could seek back to the
@@ -149,10 +163,6 @@ General
    qpdf.test -- search for "free table".  On the other hand, the value
    of doing this seems very low since no viewer seems to care, so it's
    probably not worth it.
-
- * Embedded file streams: figure out why running qpdf over the pdf 1.7
-   spec results in a file that crashes acrobat reader when you try to
-   save nested documents.
 
  * QPDFObjectHandle::getPageImages() doesn't notice images in
    inherited resource dictionaries.  See comments in that function.

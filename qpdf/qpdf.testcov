@@ -161,3 +161,9 @@ qpdf-c called qpdf_init_write multiple times 0
 QPDF_encryption rc4 decode string 0
 QPDF_encryption rc4 decode stream 0
 QPDFWriter not compressing metadata 0
+QPDF_encryption CFM V2 0
+QPDF_encryption CFM AESV2 0
+QPDF_encryption aes decode string 0
+QPDF_encryption cleartext metadata 0
+QPDF_encryption aes decode stream 0
+QPDF_encryption stream crypt filter 0

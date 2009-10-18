@@ -292,6 +292,10 @@ QPDF::interpretCF(QPDFObjectHandle cf)
 	{
 	    return this->crypt_filters[filter];
 	}
+	else if (filter == "/Identity")
+	{
+	    return e_none;
+	}
 	else
 	{
 	    return e_unknown;
@@ -299,6 +303,7 @@ QPDF::interpretCF(QPDFObjectHandle cf)
     }
     else
     {
+	// Default: /Identity
 	return e_none;
     }
 }
@@ -432,12 +437,12 @@ QPDF::initializeEncryption()
 		    std::string method_name = cdict.getKey("/CFM").getName();
 		    if (method_name == "/V2")
 		    {
-			// XXX coverage
+			QTC::TC("qpdf", "QPDF_encryption CFM V2");
 			method = e_rc4;
 		    }
 		    else if (method_name == "/AESV2")
 		    {
-			// XXX coverage
+			QTC::TC("qpdf", "QPDF_encryption CFM AESV2");
 			method = e_aes;
 		    }
 		    else
@@ -463,6 +468,15 @@ QPDF::initializeEncryption()
 	else
 	{
 	    this->cf_file = this->cf_stream;
+	}
+	if (this->cf_file != this->cf_stream)
+	{
+	    throw QPDFExc(this->file.getName(), this->file.getLastOffset(),
+			  "This document has embedded files that are"
+			  " encrypted differently from the rest of the file."
+			  "  qpdf does not presently support this due to"
+			  " lack of test data; if possible, please submit"
+			  " a bug report that includes this file.");
 	}
     }
     EncryptionData data(V, R, Length / 8, P, O, U, id1, this->encrypt_metadata);
@@ -542,7 +556,7 @@ QPDF::decryptString(std::string& str, int objid, int generation)
     std::string key = getKeyForObject(objid, generation, use_aes);
     if (use_aes)
     {
-	// XXX coverage
+	QTC::TC("qpdf", "QPDF_encryption aes decode string");
 	assert(key.length() == Pl_AES_PDF::key_size);
 	Pl_Buffer bufpl("decrypted string");
 	Pl_AES_PDF pl("aes decrypt string", &bufpl, false,
@@ -586,30 +600,33 @@ QPDF::decryptStream(Pipeline*& pipeline, int objid, int generation,
 	encryption_method_e method = e_unknown;
 	std::string method_source = "/StmF from /Encrypt dictionary";
 
-	if (stream_dict.getKey("/DecodeParms").isDictionary())
-	{
-	    QPDFObjectHandle decode_parms = stream_dict.getKey("/DecodeParms");
-	    if (decode_parms.getKey("/Crypt").isDictionary())
-	    {
-		// XXX coverage
-		QPDFObjectHandle crypt = decode_parms.getKey("/Crypt");
-		method = interpretCF(crypt.getKey("/Name"));
-		method_source = "stream's Crypt decode parameters";
-	    }
-	}
+	// NOTE: the section in the PDF specification on crypt filters
+	// seems to suggest that there might be a /Crypt key in
+	// /DecodeParms whose value is a crypt filter (.e.g., << /Name
+	// /StdCF >>), but implementation notes suggest this can only
+	// happen for metadata streams, and emperical observation
+	// suggests that they are otherwise ignored.  Not having been
+	// able to find a sample file that uses crypt filters in any
+	// way other than /StrF and /StmF, I'm not really sure what to
+	// do about this.  If we were to override the encryption on a
+	// per-stream basis using crypt filters, set method_source to
+	// something useful in the error message for unknown
+	// encryption methods (search for method_source).
 
 	if (method == e_unknown)
 	{
 	    if ((! this->encrypt_metadata) && (type == "/Metadata"))
 	    {
-		// XXX coverage
+		QTC::TC("qpdf", "QPDF_encryption cleartext metadata");
 		method = e_none;
 	    }
 	    else
 	    {
+		// NOTE: We should should use cf_file if this is an
+		// embedded file, but we can't yet detect embedded
+		// file streams as such.
 		method = this->cf_stream;
 	    }
-	    // XXX What about embedded file streams?
 	}
 	use_aes = false;
 	switch (method)
@@ -640,7 +657,7 @@ QPDF::decryptStream(Pipeline*& pipeline, int objid, int generation,
     std::string key = getKeyForObject(objid, generation, use_aes);
     if (use_aes)
     {
-	// XXX coverage
+	QTC::TC("qpdf", "QPDF_encryption aes decode stream");
 	assert(key.length() == Pl_AES_PDF::key_size);
 	pipeline = new Pl_AES_PDF("AES stream decryption", pipeline,
 				  false, (unsigned char*) key.c_str());
