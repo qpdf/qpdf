@@ -1078,6 +1078,23 @@ $td->runtest("make sure there is no xref stream",
 	     {$td->REGEXP => "\\s*0\\s*", $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+# Look at some actual V4 files
+$n_tests += 8;
+foreach my $d (['--force-V4', 'V4'],
+	       ['--cleartext-metadata', 'V4-clearmeta'],
+	       ['--use-aes=y', 'V4-aes'],
+	       ['--cleartext-metadata --use-aes=y', 'V4-aes-clearmeta'])
+{
+    my ($args, $out) = @$d;
+    $td->runtest("encrypt $args",
+		 {$td->COMMAND => "qpdf --static-aes-iv --static-id" .
+		      " --encrypt '' '' 128 $args -- enc-base.pdf a.pdf"},
+		 {$td->STRING => "", $td->EXIT_STATUS => 0});
+    $td->runtest("check output",
+		 {$td->FILE => "a.pdf"},
+		 {$td->FILE => "$out.pdf"});
+}
+
 show_ntests();
 # ----------
 $td->notify("--- Content Preservation Tests ---");
