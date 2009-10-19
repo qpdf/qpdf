@@ -1,5 +1,11 @@
 2009-10-18  Jay Berkenbilt  <ejb@ql.org>
 
+	* If forcing version, disable object stream creation and/or
+	encryption if previous specifications are incompatible with new
+	version.  It is still possible that PDF content, compression
+	schemes, etc., may be incompatible with the new version, but at
+	least this way, older viewers will at least have a chance.
+
 	* libqpdf/QPDFWriter.cc (unparseObject): avoid compressing
 	Metadata streams if possible.
 

@@ -98,6 +98,12 @@ class DLL_EXPORT QPDFWriter
     // you are sure the PDF file in question has no features of newer
     // versions of PDF or if you are willing to create files that old
     // viewers may try to open but not be able to properly interpret.
+    // If any encryption has been applied to the document either
+    // explicitly or by preserving the encryption of the source
+    // document, forcing the PDF version to a value too low to support
+    // that type of encryption will explicitly disable decryption.
+    // Additionally, forcing to a version below 1.5 will disable
+    // object streams.
     void forcePDFVersion(std::string const&);
 
     // Cause a static /ID value to be generated.  Use only in test
@@ -193,6 +199,7 @@ class DLL_EXPORT QPDFWriter
 	char const* user_password, char const* owner_password,
 	bool allow_accessibility, bool allow_extract,
 	r3_print_e print, r3_modify_e modify);
+    void disableIncompatbleEncryption(float v);
     void setEncryptionParameters(
 	char const* user_password, char const* owner_password,
 	int V, int R, int key_len, std::set<int>& bits_to_clear);

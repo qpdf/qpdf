@@ -998,14 +998,14 @@ $td->runtest("check linearization",
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("linearize and encrypt file",
 	     {$td->COMMAND =>
-		  "qpdf --linearize --encrypt user owner 128 --" .
+		  "qpdf --linearize --encrypt user owner 128 --use-aes=y --" .
 		  " lin-special.pdf a.pdf"},
 	     {$td->STRING => "",
 	      $td->EXIT_STATUS => 0});
 $td->runtest("check encryption",
 	     {$td->COMMAND => "qpdf --show-encryption --password=owner a.pdf",
 	      $td->FILTER => "grep -v allowed"},
-	     {$td->STRING => "R = 3\nP = -4\nUser password = user\n",
+	     {$td->STRING => "R = 4\nP = -4\nUser password = user\n",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("check linearization",
@@ -1013,6 +1013,68 @@ $td->runtest("check linearization",
 		  " --password=user a.pdf"},
 	     {$td->STRING => "a.pdf: no linearization errors\n",
 	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+# Test AES encryption in various ways.
+$n_tests += 14;
+$td->runtest("encrypt with AES",
+	     {$td->COMMAND => "qpdf --encrypt '' '' 128 --use-aes=y --" .
+		  " enc-base.pdf a.pdf"},
+	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check encryption",
+	     {$td->COMMAND => "qpdf --show-encryption a.pdf",
+	      $td->FILTER => "grep -v allowed"},
+	     {$td->STRING => "R = 4\nP = -4\nUser password = \n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("convert original to qdf",
+	     {$td->COMMAND => "qpdf --static-id --no-original-object-ids" .
+		  " --qdf --min-version=1.6 enc-base.pdf a.qdf"},
+	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("convert encrypted to qdf",
+	     {$td->COMMAND => "qpdf --static-id --no-original-object-ids" .
+		  " --qdf a.pdf b.qdf"},
+	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("compare files",
+	     {$td->FILE => 'a.qdf'},
+	     {$td->FILE => 'b.qdf'});
+$td->runtest("linearize with AES and object streams",
+	     {$td->COMMAND => "qpdf --encrypt '' '' 128 --use-aes=y --" .
+		  " --linearize --object-streams=generate enc-base.pdf a.pdf"},
+	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check encryption",
+	     {$td->COMMAND => "qpdf --show-encryption a.pdf",
+	      $td->FILTER => "grep -v allowed"},
+	     {$td->STRING => "R = 4\nP = -4\nUser password = \n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("linearize original",
+	     {$td->COMMAND => "qpdf --linearize --object-streams=generate" .
+		  " enc-base.pdf b.pdf"},
+	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("convert linearized original to qdf",
+	     {$td->COMMAND => "qpdf --static-id --no-original-object-ids" .
+		  " --qdf --object-streams=generate --min-version=1.6" .
+		  " b.pdf a.qdf"},
+	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("convert encrypted to qdf",
+	     {$td->COMMAND => "qpdf --static-id --no-original-object-ids" .
+		  " --qdf --object-streams=generate a.pdf b.qdf"},
+	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("compare files",
+	     {$td->FILE => 'a.qdf'},
+	     {$td->FILE => 'b.qdf'});
+$td->runtest("force version on aes encrypted",
+	     {$td->COMMAND => "qpdf --force-version=1.4 a.pdf b.pdf"},
+	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check",
+	     {$td->COMMAND => "qpdf --check b.pdf"},
+	     {$td->FILE => "aes-forced-check.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("make sure there is no xref stream",
+	     {$td->COMMAND => "grep /ObjStm b.pdf | wc -l"},
+	     {$td->REGEXP => "\\s*0\\s*", $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 show_ntests();

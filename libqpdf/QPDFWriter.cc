@@ -345,6 +345,52 @@ QPDFWriter::copyEncryptionParameters()
 }
 
 void
+QPDFWriter::disableIncompatbleEncryption(float v)
+{
+    if (! this->encrypted)
+    {
+	return;
+    }
+
+    bool disable = false;
+    if (v < 1.3)
+    {
+	disable = true;
+    }
+    else
+    {
+	int V = atoi(encryption_dictionary["/V"].c_str());
+	int R = atoi(encryption_dictionary["/R"].c_str());
+	if (v < 1.4)
+	{
+	    if ((V > 1) || (R > 2))
+	    {
+		disable = true;
+	    }
+	}
+	else if (v < 1.5)
+	{
+	    if ((V > 2) || (R > 3))
+	    {
+		disable = true;
+	    }
+	}
+	else if (v < 1.6)
+	{
+	    if (this->encrypt_use_aes)
+	    {
+		disable = true;
+	    }
+	}
+    }
+    if (disable)
+    {
+	QTC::TC("qpdf", "QPDFWriter forced version disabled encryption");
+	this->encrypted = false;
+    }
+}
+
+void
 QPDFWriter::setEncryptionParametersInternal(
     int V, int R, int key_len, long P,
     std::string const& O, std::string const& U,
@@ -965,7 +1011,7 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 		Buffer* buf = bufpl.getBuffer();
 		val = QPDF_String(
 		    std::string((char*)buf->getBuffer(),
-				(size_t)buf->getSize())).unparse();
+				(size_t)buf->getSize())).unparse(true);
 		delete buf;
 	    }
 	    else
@@ -1421,6 +1467,17 @@ QPDFWriter::write()
     if (preserve_encryption)
     {
 	copyEncryptionParameters();
+    }
+
+    if (! this->forced_pdf_version.empty())
+    {
+	float v = atof(this->forced_pdf_version.c_str());
+	disableIncompatbleEncryption(v);
+	if (v < 1.5)
+	{
+	    QTC::TC("qpdf", "QPDFWriter forcing object stream disable");
+	    this->object_stream_mode = o_disable;
+	}
     }
 
     if (this->qdf_mode || this->normalize_content ||

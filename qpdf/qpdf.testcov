@@ -166,4 +166,5 @@ QPDF_encryption CFM AESV2 0
 QPDF_encryption aes decode string 0
 QPDF_encryption cleartext metadata 0
 QPDF_encryption aes decode stream 0
-QPDF_encryption stream crypt filter 0
+QPDFWriter forcing object stream disable 0
+QPDFWriter forced version disabled encryption 0
