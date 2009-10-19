@@ -8,7 +8,7 @@
 #ifndef __QPDFTOKENIZER_HH__
 #define __QPDFTOKENIZER_HH__
 
-#include <qpdf/DLL.hh>
+#include <qpdf/DLL.h>
 
 #include <string>
 #include <stdio.h>

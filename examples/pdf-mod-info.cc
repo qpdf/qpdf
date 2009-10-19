@@ -200,7 +200,7 @@ int main(int argc, char* argv[])
 	    }
 	}
 	QPDFWriter w(file, fl_tmp.c_str());
-	w.setStreamDataMode(QPDFWriter::s_preserve);
+	w.setStreamDataMode(qpdf_s_preserve);
 	w.setLinearization(true);
 	w.setStaticID(static_id);
 	w.write();

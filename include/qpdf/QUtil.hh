@@ -8,7 +8,7 @@
 #ifndef __QUTIL_HH__
 #define __QUTIL_HH__
 
-#include <qpdf/DLL.hh>
+#include <qpdf/DLL.h>
 #include <string>
 #include <list>
 #include <stdexcept>

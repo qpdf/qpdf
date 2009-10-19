@@ -233,7 +233,7 @@ parse_encrypt_options(
     std::string& user_password, std::string& owner_password, int& keylen,
     bool& r2_print, bool& r2_modify, bool& r2_extract, bool& r2_annotate,
     bool& r3_accessibility, bool& r3_extract,
-    QPDFWriter::r3_print_e& r3_print, QPDFWriter::r3_modify_e& r3_modify,
+    qpdf_r3_print_e& r3_print, qpdf_r3_modify_e& r3_modify,
     bool& force_V4, bool& cleartext_metadata, bool& use_aes)
 {
     if (cur_arg + 3 >= argc)
@@ -310,15 +310,15 @@ parse_encrypt_options(
 	    {
 		if (val == "full")
 		{
-		    r3_print = QPDFWriter::r3p_full;
+		    r3_print = qpdf_r3p_full;
 		}
 		else if (val == "low")
 		{
-		    r3_print = QPDFWriter::r3p_low;
+		    r3_print = qpdf_r3p_low;
 		}
 		else if (val == "none")
 		{
-		    r3_print = QPDFWriter::r3p_none;
+		    r3_print = qpdf_r3p_none;
 		}
 		else
 		{
@@ -352,23 +352,23 @@ parse_encrypt_options(
 	    {
 		if (val == "all")
 		{
-		    r3_modify = QPDFWriter::r3m_all;
+		    r3_modify = qpdf_r3m_all;
 		}
 		else if (val == "annotate")
 		{
-		    r3_modify = QPDFWriter::r3m_annotate;
+		    r3_modify = qpdf_r3m_annotate;
 		}
 		else if (val == "form")
 		{
-		    r3_modify = QPDFWriter::r3m_form;
+		    r3_modify = qpdf_r3m_form;
 		}
 		else if (val == "assembly")
 		{
-		    r3_modify = QPDFWriter::r3m_assembly;
+		    r3_modify = qpdf_r3m_assembly;
 		}
 		else if (val == "none")
 		{
-		    r3_modify = QPDFWriter::r3m_none;
+		    r3_modify = qpdf_r3m_none;
 		}
 		else
 		{
@@ -587,19 +587,19 @@ int main(int argc, char* argv[])
     bool r2_annotate = true;
     bool r3_accessibility = true;
     bool r3_extract = true;
-    QPDFWriter::r3_print_e r3_print = QPDFWriter::r3p_full;
-    QPDFWriter::r3_modify_e r3_modify = QPDFWriter::r3m_all;
+    qpdf_r3_print_e r3_print = qpdf_r3p_full;
+    qpdf_r3_modify_e r3_modify = qpdf_r3m_all;
     bool force_V4 = false;
     bool cleartext_metadata = false;
     bool use_aes = false;
 
     bool stream_data_set = false;
-    QPDFWriter::stream_data_e stream_data_mode = QPDFWriter::s_compress;
+    qpdf_stream_data_e stream_data_mode = qpdf_s_compress;
     bool normalize_set = false;
     bool normalize = false;
     bool suppress_recovery = false;
     bool object_stream_set = false;
-    QPDFWriter::object_stream_e object_stream_mode = QPDFWriter::o_preserve;
+    qpdf_object_stream_e object_stream_mode = qpdf_o_preserve;
     bool ignore_xref_streams = false;
     bool qdf_mode = false;
     std::string min_version;
@@ -677,15 +677,15 @@ int main(int argc, char* argv[])
 		stream_data_set = true;
 		if (strcmp(parameter, "compress") == 0)
 		{
-		    stream_data_mode = QPDFWriter::s_compress;
+		    stream_data_mode = qpdf_s_compress;
 		}
 		else if (strcmp(parameter, "preserve") == 0)
 		{
-		    stream_data_mode = QPDFWriter::s_preserve;
+		    stream_data_mode = qpdf_s_preserve;
 		}
 		else if (strcmp(parameter, "uncompress") == 0)
 		{
-		    stream_data_mode = QPDFWriter::s_uncompress;
+		    stream_data_mode = qpdf_s_uncompress;
 		}
 		else
 		{
@@ -716,15 +716,15 @@ int main(int argc, char* argv[])
 		object_stream_set = true;
 		if (strcmp(parameter, "disable") == 0)
 		{
-		    object_stream_mode = QPDFWriter::o_disable;
+		    object_stream_mode = qpdf_o_disable;
 		}
 		else if (strcmp(parameter, "preserve") == 0)
 		{
-		    object_stream_mode = QPDFWriter::o_preserve;
+		    object_stream_mode = qpdf_o_preserve;
 		}
 		else if (strcmp(parameter, "generate") == 0)
 		{
-		    object_stream_mode = QPDFWriter::o_generate;
+		    object_stream_mode = qpdf_o_generate;
 		}
 		else
 		{

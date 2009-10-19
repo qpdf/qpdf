@@ -8,7 +8,7 @@
 #ifndef __BUFFER_HH__
 #define __BUFFER_HH__
 
-#include <qpdf/DLL.hh>
+#include <qpdf/DLL.h>
 
 class DLL_EXPORT Buffer
 {

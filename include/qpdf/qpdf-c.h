@@ -61,7 +61,8 @@
  *     primarily on differences between the C and C++ API.
  */
 
-#include <qpdf/DLL.hh>
+#include <qpdf/DLL.h>
+#include <qpdf/Constants.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -199,20 +200,13 @@ extern "C" {
     DLL_EXPORT
     QPDF_ERROR_CODE qpdf_init_write(qpdf_data qpdf, char const* filename);
 
-#   define QPDF_OBJECT_STREAM_DISABLE 0
-#   define QPDF_OBJECT_STREAM_PRESERVE 1
-#   define QPDF_OBJECT_STREAM_GENERATE 2
-
-    /* For mode, pass one of the QPDF_OBJECT_STREAM constants. */
     DLL_EXPORT
-    void qpdf_set_object_stream_mode(qpdf_data qpdf, int mode);
+    void qpdf_set_object_stream_mode(qpdf_data qpdf,
+				     enum qpdf_object_stream_e mode);
 
-#   define QPDF_STREAM_DATA_UNCOMPRESS 0
-#   define QPDF_STREAM_DATA_PRESERVE 1
-#   define QPDF_STREAM_DATA_COMPRESS 2
-    /* For mode, pass one of the QPDF_STREAM_DATA constants. */
     DLL_EXPORT
-    void qpdf_set_stream_data_mode(qpdf_data qpdf, int mode);
+    void qpdf_set_stream_data_mode(qpdf_data qpdf,
+				   enum qpdf_stream_data_e mode);
 
     DLL_EXPORT
     void qpdf_set_content_normalization(qpdf_data qpdf, QPDF_BOOL value);
@@ -245,30 +239,17 @@ extern "C" {
 	QPDF_BOOL allow_print, QPDF_BOOL allow_modify,
 	QPDF_BOOL allow_extract, QPDF_BOOL allow_annotate);
 
-#   define QPDF_R3_PRINT_FULL 0
-#   define QPDF_R3_PRINT_LOW 1
-#   define QPDF_R3_PRINT_NONE 2
-
-#   define QPDF_R3_MODIFY_ALL 0
-#   define QPDF_R3_MODIFY_ANNOTATE 1
-#   define QPDF_R3_MODIFY_FORM 2
-#   define QPDF_R3_MODIFY_ASSEMBLY 3
-#   define QPDF_R3_MODIFY_NONE 4
-
-    /* Value of print should be one of the QPDF_R3_PRINT constants.
-     * Value of modify should be one of the QPDF_R3_MODIFY constants.
-     */
     DLL_EXPORT
     void qpdf_set_r3_encryption_parameters(
 	qpdf_data qpdf, char const* user_password, char const* owner_password,
 	QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
-	int print, int modify);
+	enum qpdf_r3_print_e print, enum qpdf_r3_modify_e modify);
 
     DLL_EXPORT
     void qpdf_set_r4_encryption_parameters(
 	qpdf_data qpdf, char const* user_password, char const* owner_password,
 	QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
-	int print, int modify,
+	enum qpdf_r3_print_e print, enum qpdf_r3_modify_e modify,
 	QPDF_BOOL encrypt_metadata, QPDF_BOOL use_aes);
 
     DLL_EXPORT

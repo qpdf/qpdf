@@ -3,7 +3,7 @@
 #ifndef __BITSTREAM_HH__
 #define __BITSTREAM_HH__
 
-#include <qpdf/DLL.hh>
+#include <qpdf/DLL.h>
 
 class DLL_EXPORT BitStream
 {

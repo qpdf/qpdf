@@ -12,7 +12,7 @@
 #include <string>
 #include <stdexcept>
 
-#include <qpdf/DLL.hh>
+#include <qpdf/DLL.h>
 
 // Note: this class does not encapsulate all features of the PCRE
 // package -- only those that I actually need right now are here.

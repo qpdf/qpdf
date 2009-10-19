@@ -13,7 +13,7 @@
 #include <map>
 #include <list>
 
-#include <qpdf/DLL.hh>
+#include <qpdf/DLL.h>
 
 #include <qpdf/QPDFXRefEntry.hh>
 #include <qpdf/QPDFObjectHandle.hh>

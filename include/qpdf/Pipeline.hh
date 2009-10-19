@@ -30,7 +30,7 @@
 #ifndef __PIPELINE_HH__
 #define __PIPELINE_HH__
 
-#include <qpdf/DLL.hh>
+#include <qpdf/DLL.h>
 #include <string>
 
 class DLL_EXPORT Pipeline

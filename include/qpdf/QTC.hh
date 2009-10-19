@@ -8,7 +8,7 @@
 #ifndef __QTC_HH__
 #define __QTC_HH__
 
-#include <qpdf/DLL.hh>
+#include <qpdf/DLL.h>
 
 namespace QTC
 {

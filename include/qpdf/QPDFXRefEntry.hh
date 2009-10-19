@@ -8,7 +8,7 @@
 #ifndef __QPDFXREFENTRY_HH__
 #define __QPDFXREFENTRY_HH__
 
-#include <qpdf/DLL.hh>
+#include <qpdf/DLL.h>
 
 class DLL_EXPORT QPDFXRefEntry
 {

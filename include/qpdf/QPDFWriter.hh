@@ -19,7 +19,8 @@
 #include <set>
 #include <map>
 
-#include <qpdf/DLL.hh>
+#include <qpdf/DLL.h>
+#include <qpdf/Constants.h>
 
 #include <qpdf/QPDFXRefEntry.hh>
 
@@ -51,16 +52,14 @@ class DLL_EXPORT QPDFWriter
     // generate a conventional cross-reference table if there are no
     // object streams and a cross-reference stream if there are object
     // streams.  The default is o_preserve.
-    enum object_stream_e { o_disable, o_preserve, o_generate };
-    void setObjectStreamMode(object_stream_e);
+    void setObjectStreamMode(qpdf_object_stream_e);
 
     // Set value of stream data mode.  In uncompress mode, we attempt
     // to uncompress any stream that we can.  In preserve mode, we
     // preserve any filtering applied to streams.  In compress mode,
     // if we can apply all filters and the stream is not already
     // optimally compressed, recompress the stream.
-    enum stream_data_e { s_uncompress, s_preserve, s_compress };
-    void setStreamDataMode(stream_data_e);
+    void setStreamDataMode(qpdf_stream_data_e);
 
     // Set value of content stream normalization.  The default is
     // "false".  If true, we attempt to normalize newlines inside of
@@ -137,28 +136,14 @@ class DLL_EXPORT QPDFWriter
 	char const* user_password, char const* owner_password,
 	bool allow_print, bool allow_modify,
 	bool allow_extract, bool allow_annotate);
-    enum r3_print_e
-    {
-	r3p_full,		// allow all printing
-	r3p_low,		// allow only low-resolution printing
-	r3p_none		// allow no printing
-    };
-    enum r3_modify_e
-    {
-	r3m_all,		// allow all modification
-	r3m_annotate,		// allow comment authoring and form operations
-	r3m_form,		// allow form field fill-in or signing
-	r3m_assembly,		// allow only document assembly
-	r3m_none		// allow no modification
-    };
     void setR3EncryptionParameters(
 	char const* user_password, char const* owner_password,
 	bool allow_accessibility, bool allow_extract,
-	r3_print_e print, r3_modify_e modify);
+	qpdf_r3_print_e print, qpdf_r3_modify_e modify);
     void setR4EncryptionParameters(
 	char const* user_password, char const* owner_password,
 	bool allow_accessibility, bool allow_extract,
-	r3_print_e print, r3_modify_e modify,
+	qpdf_r3_print_e print, qpdf_r3_modify_e modify,
 	bool encrypt_metadata, bool use_aes);
 
     // Create linearized output.  Disables qdf mode, content
@@ -203,7 +188,7 @@ class DLL_EXPORT QPDFWriter
 	std::set<int>& bits_to_clear,
 	char const* user_password, char const* owner_password,
 	bool allow_accessibility, bool allow_extract,
-	r3_print_e print, r3_modify_e modify);
+	qpdf_r3_print_e print, qpdf_r3_modify_e modify);
     void disableIncompatbleEncryption(float v);
     void setEncryptionParameters(
 	char const* user_password, char const* owner_password,
@@ -265,7 +250,7 @@ class DLL_EXPORT QPDFWriter
     bool normalize_content_set;
     bool normalize_content;
     bool stream_data_mode_set;
-    stream_data_e stream_data_mode;
+    qpdf_stream_data_e stream_data_mode;
     bool qdf_mode;
     bool static_id;
     bool suppress_original_object_ids;
@@ -273,7 +258,7 @@ class DLL_EXPORT QPDFWriter
     bool encrypted;
     bool preserve_encryption;
     bool linearized;
-    object_stream_e object_stream_mode;
+    qpdf_object_stream_e object_stream_mode;
     std::string encryption_key;
     bool encrypt_metadata;
     bool encrypt_use_aes;

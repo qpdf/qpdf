@@ -7,4 +7,4 @@
 # define DLL_EXPORT
 #endif
 
-#endif // __QPDF_DLL_HH__
+#endif /* __QPDF_DLL_HH__ */

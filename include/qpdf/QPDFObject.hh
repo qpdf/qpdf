@@ -8,7 +8,7 @@
 #ifndef __QPDFOBJECT_HH__
 #define __QPDFOBJECT_HH__
 
-#include <qpdf/DLL.hh>
+#include <qpdf/DLL.h>
 
 #include <string>
 

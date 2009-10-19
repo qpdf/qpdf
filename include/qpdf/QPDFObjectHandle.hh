@@ -13,7 +13,7 @@
 #include <set>
 #include <map>
 
-#include <qpdf/DLL.hh>
+#include <qpdf/DLL.h>
 
 #include <qpdf/PointerHolder.hh>
 #include <qpdf/Buffer.hh>

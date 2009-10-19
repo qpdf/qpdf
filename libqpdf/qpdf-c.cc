@@ -251,48 +251,16 @@ QPDF_ERROR_CODE qpdf_init_write(qpdf_data qpdf, char const* filename)
     return status;
 }
 
-void qpdf_set_object_stream_mode(qpdf_data qpdf, int mode)
+void qpdf_set_object_stream_mode(qpdf_data qpdf, qpdf_object_stream_e mode)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_set_object_stream_mode");
-    QPDFWriter::object_stream_e omode = QPDFWriter::o_preserve;
-    switch (mode)
-    {
-      case QPDF_OBJECT_STREAM_DISABLE:
-	omode = QPDFWriter::o_disable;
-	break;
-
-      case QPDF_OBJECT_STREAM_GENERATE:
-	omode = QPDFWriter::o_generate;
-	break;
-
-      default:
-	// already set to o_preserve; treate out of range values as
-	// the default.
-	break;
-    }
-
-    qpdf->qpdf_writer->setObjectStreamMode(omode);
+    qpdf->qpdf_writer->setObjectStreamMode(mode);
 }
 
-void qpdf_set_stream_data_mode(qpdf_data qpdf, int mode)
+void qpdf_set_stream_data_mode(qpdf_data qpdf, qpdf_stream_data_e mode)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_set_stream_data_mode");
-    QPDFWriter::stream_data_e smode = QPDFWriter::s_preserve;
-    switch (mode)
-    {
-      case QPDF_STREAM_DATA_UNCOMPRESS:
-	smode = QPDFWriter::s_uncompress;
-	break;
-
-      case QPDF_STREAM_DATA_COMPRESS:
-	smode = QPDFWriter::s_compress;
-	break;
-
-      default:
-	// Treat anything else as default
-	break;
-    }
-    qpdf->qpdf_writer->setStreamDataMode(smode);
+    qpdf->qpdf_writer->setStreamDataMode(mode);
 }
 
 void qpdf_set_content_normalization(qpdf_data qpdf, QPDF_BOOL value)
@@ -346,39 +314,24 @@ void qpdf_set_r2_encryption_parameters(
 void qpdf_set_r3_encryption_parameters(
     qpdf_data qpdf, char const* user_password, char const* owner_password,
     QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
-    int print, int modify)
+    qpdf_r3_print_e print, qpdf_r3_modify_e modify)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_set_r3_encryption_parameters");
     qpdf->qpdf_writer->setR3EncryptionParameters(
 	user_password, owner_password,
-	allow_accessibility, allow_extract,
-	((print == QPDF_R3_PRINT_LOW) ? QPDFWriter::r3p_low :
-	 (print == QPDF_R3_PRINT_NONE) ? QPDFWriter::r3p_none :
-	 QPDFWriter::r3p_full),
-	((modify == QPDF_R3_MODIFY_ANNOTATE) ? QPDFWriter::r3m_annotate :
-	 (modify == QPDF_R3_MODIFY_FORM) ? QPDFWriter::r3m_form :
-	 (modify == QPDF_R3_MODIFY_ASSEMBLY) ? QPDFWriter::r3m_assembly :
-	 (modify == QPDF_R3_MODIFY_NONE) ? QPDFWriter::r3m_none :
-	 QPDFWriter::r3m_all));
+	allow_accessibility, allow_extract, print, modify);
 }
 
 void qpdf_set_r4_encryption_parameters(
     qpdf_data qpdf, char const* user_password, char const* owner_password,
     QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
-    int print, int modify, QPDF_BOOL encrypt_metadata, QPDF_BOOL use_aes)
+    qpdf_r3_print_e print, qpdf_r3_modify_e modify,
+    QPDF_BOOL encrypt_metadata, QPDF_BOOL use_aes)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_set_r4_encryption_parameters");
     qpdf->qpdf_writer->setR4EncryptionParameters(
 	user_password, owner_password,
-	allow_accessibility, allow_extract,
-	((print == QPDF_R3_PRINT_LOW) ? QPDFWriter::r3p_low :
-	 (print == QPDF_R3_PRINT_NONE) ? QPDFWriter::r3p_none :
-	 QPDFWriter::r3p_full),
-	((modify == QPDF_R3_MODIFY_ANNOTATE) ? QPDFWriter::r3m_annotate :
-	 (modify == QPDF_R3_MODIFY_FORM) ? QPDFWriter::r3m_form :
-	 (modify == QPDF_R3_MODIFY_ASSEMBLY) ? QPDFWriter::r3m_assembly :
-	 (modify == QPDF_R3_MODIFY_NONE) ? QPDFWriter::r3m_none :
-	 QPDFWriter::r3m_all),
+	allow_accessibility, allow_extract, print, modify,
 	encrypt_metadata, use_aes);
 }
 

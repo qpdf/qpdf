@@ -29,7 +29,7 @@ QPDFWriter::QPDFWriter(QPDF& pdf, char const* filename) :
     normalize_content_set(false),
     normalize_content(false),
     stream_data_mode_set(false),
-    stream_data_mode(s_compress),
+    stream_data_mode(qpdf_s_compress),
     qdf_mode(false),
     static_id(false),
     suppress_original_object_ids(false),
@@ -37,7 +37,7 @@ QPDFWriter::QPDFWriter(QPDF& pdf, char const* filename) :
     encrypted(false),
     preserve_encryption(true),
     linearized(false),
-    object_stream_mode(o_preserve),
+    object_stream_mode(qpdf_o_preserve),
     encrypt_metadata(true),
     encrypt_use_aes(false),
     encryption_dict_objid(0),
@@ -77,13 +77,13 @@ QPDFWriter::~QPDFWriter()
 }
 
 void
-QPDFWriter::setObjectStreamMode(object_stream_e mode)
+QPDFWriter::setObjectStreamMode(qpdf_object_stream_e mode)
 {
     this->object_stream_mode = mode;
 }
 
 void
-QPDFWriter::setStreamDataMode(stream_data_e mode)
+QPDFWriter::setStreamDataMode(qpdf_stream_data_e mode)
 {
     this->stream_data_mode_set = true;
     this->stream_data_mode = mode;
@@ -198,7 +198,7 @@ void
 QPDFWriter::setR3EncryptionParameters(
     char const* user_password, char const* owner_password,
     bool allow_accessibility, bool allow_extract,
-    r3_print_e print, r3_modify_e modify)
+    qpdf_r3_print_e print, qpdf_r3_modify_e modify)
 {
     std::set<int> clear;
     interpretR3EncryptionParameters(
@@ -212,7 +212,7 @@ void
 QPDFWriter::setR4EncryptionParameters(
     char const* user_password, char const* owner_password,
     bool allow_accessibility, bool allow_extract,
-    r3_print_e print, r3_modify_e modify,
+    qpdf_r3_print_e print, qpdf_r3_modify_e modify,
     bool encrypt_metadata, bool use_aes)
 {
     std::set<int> clear;
@@ -230,7 +230,7 @@ QPDFWriter::interpretR3EncryptionParameters(
     std::set<int>& clear,
     char const* user_password, char const* owner_password,
     bool allow_accessibility, bool allow_extract,
-    r3_print_e print, r3_modify_e modify)
+    qpdf_r3_print_e print, qpdf_r3_modify_e modify)
 {
     // Acrobat 5 security options:
 
@@ -263,13 +263,13 @@ QPDFWriter::interpretR3EncryptionParameters(
     // statements).  Each option clears successively more access bits.
     switch (print)
     {
-      case r3p_none:
+      case qpdf_r3p_none:
 	clear.insert(3);	// any printing
 
-      case r3p_low:
+      case qpdf_r3p_low:
 	clear.insert(12);	// high resolution printing
 
-      case r3p_full:
+      case qpdf_r3p_full:
 	break;
 
 	// no default so gcc warns for missing cases
@@ -277,19 +277,19 @@ QPDFWriter::interpretR3EncryptionParameters(
 
     switch (modify)
     {
-      case r3m_none:
+      case qpdf_r3m_none:
 	clear.insert(11);	// document assembly
 
-      case r3m_assembly:
+      case qpdf_r3m_assembly:
 	clear.insert(9);	// filling in form fields
 
-      case r3m_form:
+      case qpdf_r3m_form:
 	clear.insert(6);	// modify annotations, fill in form fields
 
-      case r3m_annotate:
+      case qpdf_r3m_annotate:
 	clear.insert(4);	// other modifications
 
-      case r3m_all:
+      case qpdf_r3m_all:
 	break;
 
 	// no default so gcc warns for missing cases
@@ -922,8 +922,8 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	{
 	    is_metadata = true;
 	}
-	bool filter = (this->stream_data_mode != s_preserve);
-	if (this->stream_data_mode == s_compress)
+	bool filter = (this->stream_data_mode != qpdf_s_preserve);
+	if (this->stream_data_mode == qpdf_s_compress)
 	{
 	    // Don't filter if the stream is already compressed with
 	    // FlateDecode.  We don't want to make it worse by getting
@@ -952,7 +952,7 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	    normalize = true;
 	    filter = true;
 	}
-	else if (filter && (this->stream_data_mode == s_compress))
+	else if (filter && (this->stream_data_mode == qpdf_s_compress))
 	{
 	    compress = true;
 	    QTC::TC("qpdf", "QPDFWriter compressing uncompressed stream");
@@ -1107,7 +1107,8 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
 
 	    // Set up a stream to write the stream data into a buffer.
 	    Pipeline* next = pushPipeline(new Pl_Buffer("object stream"));
-	    if (! ((this->stream_data_mode == s_uncompress) || this->qdf_mode))
+	    if (! ((this->stream_data_mode == qpdf_s_uncompress) ||
+		   this->qdf_mode))
 	    {
 		compressed = true;
 		next = pushPipeline(
@@ -1455,7 +1456,7 @@ QPDFWriter::write()
 	}
 	if (! this->stream_data_mode_set)
 	{
-	    this->stream_data_mode = s_uncompress;
+	    this->stream_data_mode = qpdf_s_uncompress;
 	}
     }
 
@@ -1465,7 +1466,7 @@ QPDFWriter::write()
 	this->preserve_encryption = false;
     }
     else if (this->normalize_content ||
-	     (this->stream_data_mode == s_uncompress) ||
+	     (this->stream_data_mode == qpdf_s_uncompress) ||
 	     this->qdf_mode)
     {
 	// Encryption makes looking at contents pretty useless.  If
@@ -1485,12 +1486,12 @@ QPDFWriter::write()
 	if (v < 1.5)
 	{
 	    QTC::TC("qpdf", "QPDFWriter forcing object stream disable");
-	    this->object_stream_mode = o_disable;
+	    this->object_stream_mode = qpdf_o_disable;
 	}
     }
 
     if (this->qdf_mode || this->normalize_content ||
-	(this->stream_data_mode == s_uncompress))
+	(this->stream_data_mode == qpdf_s_uncompress))
     {
 	initializeSpecialStreams();
     }
@@ -1506,15 +1507,15 @@ QPDFWriter::write()
 
     switch (this->object_stream_mode)
     {
-      case o_disable:
+      case qpdf_o_disable:
 	// no action required
 	break;
 
-      case o_preserve:
+      case qpdf_o_preserve:
 	preserveObjectStreams();
 	break;
 
-      case o_generate:
+      case qpdf_o_generate:
 	generateObjectStreams();
 	break;
 
@@ -1760,7 +1761,7 @@ QPDFWriter::writeXRefStream(int xref_id, int max_id, int max_offset,
 
     Pipeline* p = pushPipeline(new Pl_Buffer("xref stream"));
     bool compressed = false;
-    if (! ((this->stream_data_mode == s_uncompress) || this->qdf_mode))
+    if (! ((this->stream_data_mode == qpdf_s_uncompress) || this->qdf_mode))
     {
 	compressed = true;
 	p = pushPipeline(

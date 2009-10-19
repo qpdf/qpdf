@@ -1,4 +1,3 @@
-#include <qpdf/DLL.hh>
 #include <qpdf/QUtil.hh>
 #include <stdio.h>
 #include <errno.h>
