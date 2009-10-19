@@ -140,6 +140,15 @@ QPDFWriter::setStaticID(bool val)
 }
 
 void
+QPDFWriter::setStaticAesIV(bool val)
+{
+    if (val)
+    {
+	Pl_AES_PDF::useStaticIV();
+    }
+}
+
+void
 QPDFWriter::setSuppressOriginalObjectIDs(bool val)
 {
     this->suppress_original_object_ids = val;

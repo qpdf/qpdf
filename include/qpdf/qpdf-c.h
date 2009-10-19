@@ -226,6 +226,12 @@ extern "C" {
     DLL_EXPORT
     void qpdf_set_static_ID(qpdf_data qpdf, QPDF_BOOL value);
 
+    /* Never use qpdf_set_static_aes_IV except in test suites to
+     * create predictable AES encrypted output.
+     */
+    DLL_EXPORT
+    void qpdf_set_static_aes_IV(qpdf_data qpdf, QPDF_BOOL value);
+
     DLL_EXPORT
     void qpdf_set_suppress_original_object_IDs(
 	qpdf_data qpdf, QPDF_BOOL value);
@@ -257,6 +263,13 @@ extern "C" {
 	qpdf_data qpdf, char const* user_password, char const* owner_password,
 	QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
 	int print, int modify);
+
+    DLL_EXPORT
+    void qpdf_set_r4_encryption_parameters(
+	qpdf_data qpdf, char const* user_password, char const* owner_password,
+	QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
+	int print, int modify,
+	QPDF_BOOL encrypt_metadata, QPDF_BOOL use_aes);
 
     DLL_EXPORT
     void qpdf_set_linearization(qpdf_data qpdf, QPDF_BOOL value);

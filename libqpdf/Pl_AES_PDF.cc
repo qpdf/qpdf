@@ -12,6 +12,8 @@
 # define srandom srand
 #endif
 
+bool Pl_AES_PDF::use_static_iv = false;
+
 Pl_AES_PDF::Pl_AES_PDF(char const* identifier, Pipeline* next,
 		       bool encrypt, unsigned char const key[key_size]) :
     Pipeline(identifier, next),
@@ -49,6 +51,12 @@ void
 Pl_AES_PDF::disableCBC()
 {
     this->cbc_mode = false;
+}
+
+void
+Pl_AES_PDF::useStaticIV()
+{
+    use_static_iv = true;
 }
 
 void
@@ -116,9 +124,19 @@ Pl_AES_PDF::initializeVector()
 	srandom((int)QUtil::get_current_time() ^ 0xcccc);
 	seeded_random = true;
     }
-    for (unsigned int i = 0; i < this->buf_size; ++i)
+    if (use_static_iv)
     {
-	this->cbc_block[i] = (unsigned char)((random() & 0xff0) >> 4);
+	for (unsigned int i = 0; i < this->buf_size; ++i)
+	{
+	    this->cbc_block[i] = 14 * (1 + i);
+	}
+    }
+    else
+    {
+	for (unsigned int i = 0; i < this->buf_size; ++i)
+	{
+	    this->cbc_block[i] = (unsigned char)((random() & 0xff0) >> 4);
+	}
     }
 }
 

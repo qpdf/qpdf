@@ -313,6 +313,12 @@ void qpdf_set_static_ID(qpdf_data qpdf, QPDF_BOOL value)
     qpdf->qpdf_writer->setStaticID(value);
 }
 
+void qpdf_set_static_aes_IV(qpdf_data qpdf, QPDF_BOOL value)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_set_static_aes_IV");
+    qpdf->qpdf_writer->setStaticAesIV(value);
+}
+
 void qpdf_set_suppress_original_object_IDs(
     qpdf_data qpdf, QPDF_BOOL value)
 {
@@ -354,6 +360,26 @@ void qpdf_set_r3_encryption_parameters(
 	 (modify == QPDF_R3_MODIFY_ASSEMBLY) ? QPDFWriter::r3m_assembly :
 	 (modify == QPDF_R3_MODIFY_NONE) ? QPDFWriter::r3m_none :
 	 QPDFWriter::r3m_all));
+}
+
+void qpdf_set_r4_encryption_parameters(
+    qpdf_data qpdf, char const* user_password, char const* owner_password,
+    QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
+    int print, int modify, QPDF_BOOL encrypt_metadata, QPDF_BOOL use_aes)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_set_r4_encryption_parameters");
+    qpdf->qpdf_writer->setR4EncryptionParameters(
+	user_password, owner_password,
+	allow_accessibility, allow_extract,
+	((print == QPDF_R3_PRINT_LOW) ? QPDFWriter::r3p_low :
+	 (print == QPDF_R3_PRINT_NONE) ? QPDFWriter::r3p_none :
+	 QPDFWriter::r3p_full),
+	((modify == QPDF_R3_MODIFY_ANNOTATE) ? QPDFWriter::r3m_annotate :
+	 (modify == QPDF_R3_MODIFY_FORM) ? QPDFWriter::r3m_form :
+	 (modify == QPDF_R3_MODIFY_ASSEMBLY) ? QPDFWriter::r3m_assembly :
+	 (modify == QPDF_R3_MODIFY_NONE) ? QPDFWriter::r3m_none :
+	 QPDFWriter::r3m_all),
+	encrypt_metadata, use_aes);
 }
 
 void qpdf_set_linearization(qpdf_data qpdf, QPDF_BOOL value)

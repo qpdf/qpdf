@@ -229,6 +229,22 @@ static void test14(char const* infile,
     report_errors();
 }
 
+static void test15(char const* infile,
+		   char const* password,
+		   char const* outfile,
+		   char const* outfile2)
+{
+    qpdf_read(qpdf, infile, password);
+    qpdf_init_write(qpdf, outfile);
+    qpdf_set_static_ID(qpdf, QPDF_TRUE);
+    qpdf_set_static_aes_IV(qpdf, QPDF_TRUE);
+    qpdf_set_r4_encryption_parameters(
+	qpdf, "user2", "owner2", QPDF_TRUE, QPDF_TRUE,
+	QPDF_R3_PRINT_LOW, QPDF_R3_MODIFY_ALL, QPDF_TRUE, QPDF_TRUE);
+    qpdf_write(qpdf);
+    report_errors();
+}
+
 int main(int argc, char* argv[])
 {
     char* whoami = 0;
@@ -278,6 +294,7 @@ int main(int argc, char* argv[])
 	  (n == 12) ? test12 :
 	  (n == 13) ? test13 :
 	  (n == 14) ? test14 :
+	  (n == 15) ? test15 :
 	  0);
 
     if (fn == 0)

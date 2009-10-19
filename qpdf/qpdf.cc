@@ -146,6 +146,8 @@ These options can be useful for digging into PDF files or for use in\n\
 automated test suites for software that uses the qpdf library.\n\
 \n\
 --static-id               generate static /ID: FOR TESTING ONLY!\n\
+--static-aes-iv           use a static initialization vector for AES-CBC\n\
+                          This is option is not secure!  FOR TESTING ONLY!\n\
 --no-original-object-ids  suppress original object ID comments in qdf mode\n\
 --show-encryption         quickly show encryption parameters\n\
 --check-linearization     check file integrity and linearization status\n\
@@ -604,6 +606,7 @@ int main(int argc, char* argv[])
     std::string force_version;
 
     bool static_id = false;
+    bool static_aes_iv = false;
     bool suppress_original_object_id = false;
     bool show_encryption = false;
     bool check_linearization = false;
@@ -757,6 +760,10 @@ int main(int argc, char* argv[])
 	    else if (strcmp(arg, "static-id") == 0)
 	    {
 		static_id = true;
+	    }
+	    else if (strcmp(arg, "static-aes-iv") == 0)
+	    {
+		static_aes_iv = true;
 	    }
 	    else if (strcmp(arg, "no-original-object-ids") == 0)
 	    {
@@ -1048,6 +1055,10 @@ int main(int argc, char* argv[])
 	    if (static_id)
 	    {
 		w.setStaticID(true);
+	    }
+	    if (static_aes_iv)
+	    {
+		w.setStaticAesIV(true);
 	    }
 	    if (suppress_original_object_id)
 	    {

@@ -110,6 +110,11 @@ class DLL_EXPORT QPDFWriter
     // suites.
     void setStaticID(bool);
 
+    // Use a fixed initialization vector for AES-CBC encryption.  This
+    // is not secure.  It should be used only in test suites for
+    // creating predictable encrypted output.
+    void setStaticAesIV(bool);
+
     // Suppress inclusion of comments indicating original object IDs
     // when writing QDF files.  This can also be useful for testing,
     // particularly when using comparison of two qdf files to

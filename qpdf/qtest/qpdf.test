@@ -954,6 +954,7 @@ $td->runtest("invalid password",
 my @cenc = (
     [11, 'hybrid-xref.pdf', "''", 'r2', ""],
     [12, 'hybrid-xref.pdf', "''", 'r3', ""],
+    [15, 'hybrid-xref.pdf', "''", 'r4', ""],
     [13, 'c-r2.pdf', 'user1', 'decrypt with user',
      "user password: user1\n"],
     [13, 'c-r3.pdf', 'owner2', 'decrypt with owner',

@@ -168,3 +168,5 @@ QPDF_encryption cleartext metadata 0
 QPDF_encryption aes decode stream 0
 QPDFWriter forcing object stream disable 0
 QPDFWriter forced version disabled encryption 0
+qpdf-c called qpdf_set_r4_encryption_parameters 0
+qpdf-c called qpdf_set_static_aes_IV 0

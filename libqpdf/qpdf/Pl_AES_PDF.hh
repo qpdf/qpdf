@@ -20,12 +20,15 @@ class DLL_EXPORT Pl_AES_PDF: public Pipeline
 
     // For testing only; PDF always uses CBC
     void disableCBC();
+    // For testing only: use a fixed initialization vector for CBC
+    static void useStaticIV();
 
   private:
     void flush(bool discard_padding);
     void initializeVector();
 
     static unsigned int const buf_size = 16;
+    static bool use_static_iv;
 
     bool encrypt;
     bool cbc_mode;
