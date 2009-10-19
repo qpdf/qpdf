@@ -1,3 +1,11 @@
+2009-10-19  Jay Berkenbilt  <jberkenb@argonst.com>
+
+	* Include information about the last object read in most error
+	messages.  Most of the time, this will provide a good hint as to
+	which object contains the error, but it's possible that the last
+	object read may not necessarily be the one that has the error if
+	the erroneous object was previously read and cached.
+
 2009-10-18  Jay Berkenbilt  <ejb@ql.org>
 
 	* If forcing version, disable object stream creation and/or

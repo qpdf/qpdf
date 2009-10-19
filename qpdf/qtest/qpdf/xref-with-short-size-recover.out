@@ -1,2 +1,2 @@
-WARNING: xref-with-short-size.pdf: offset 16227: Cross-reference stream data has the wrong size; expected = 52; actual = 56
+WARNING: xref-with-short-size.pdf (xref stream, file position 16227): Cross-reference stream data has the wrong size; expected = 52; actual = 56
 qpdf: operation succeeded with warnings; resulting file may have some problems

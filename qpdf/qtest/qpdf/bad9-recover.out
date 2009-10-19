@@ -1,5 +1,5 @@
-WARNING: bad9.pdf: offset 0: file is damaged
-WARNING: bad9.pdf: offset 712: trailer dictionary lacks /Size key
+WARNING: bad9.pdf: file is damaged
+WARNING: bad9.pdf (trailer, file position 712): trailer dictionary lacks /Size key
 WARNING: Attempting to reconstruct cross-reference table
 /QTest is implicit
 /QTest is direct

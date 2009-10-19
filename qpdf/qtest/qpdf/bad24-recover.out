@@ -1,2 +1,2 @@
-WARNING: bad24.pdf: offset 341: attempting to recover stream length
-bad24.pdf: offset 341: unable to recover stream data
+WARNING: bad24.pdf (object 4 0, file position 341): attempting to recover stream length
+bad24.pdf (object 4 0, file position 341): unable to recover stream data

@@ -1,4 +1,4 @@
-WARNING: bad22.pdf: offset 341: attempting to recover stream length
+WARNING: bad22.pdf (object 4 0, file position 341): attempting to recover stream length
 /QTest is indirect
 /QTest is a stream.  Dictionary: << /Qength 44 >>
 Raw stream data:

@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <stdio.h>
 
 #include <qpdf/QUtil.hh>
 #include <qpdf/QTC.hh>
@@ -533,6 +534,7 @@ parse_encrypt_options(
 int main(int argc, char* argv[])
 {
     whoami = QUtil::getWhoami(argv[0]);
+    setlinebuf(stdout);
 
     // For libtool's sake....
     if (strncmp(whoami, "lt-", 3) == 0)
@@ -892,7 +894,15 @@ int main(int argc, char* argv[])
 	    }
 	    if (show_linearization)
 	    {
-		pdf.showLinearizationData();
+		if (pdf.isLinearized())
+		{
+		    pdf.showLinearizationData();
+		}
+		else
+		{
+		    std::cout << infilename << " is not linearized"
+			      << std::endl;
+		}
 	    }
 	    if (show_xref)
 	    {

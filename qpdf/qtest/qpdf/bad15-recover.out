@@ -1,4 +1,4 @@
-WARNING: bad15.pdf: offset 0: file is damaged
-WARNING: bad15.pdf: offset 753: unexpected array close token
+WARNING: bad15.pdf: file is damaged
+WARNING: bad15.pdf (trailer, file position 753): unexpected array close token
 WARNING: Attempting to reconstruct cross-reference table
-bad15.pdf: offset 753: unexpected array close token
+bad15.pdf (trailer, file position 753): unexpected array close token

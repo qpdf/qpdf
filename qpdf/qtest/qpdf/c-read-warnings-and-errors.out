@@ -1,4 +1,4 @@
-warning: bad17.pdf: offset 0: file is damaged
-warning: bad17.pdf: offset 753: dictionary ending here has an odd number of elements
+warning: bad17.pdf: file is damaged
+warning: bad17.pdf (trailer, file position 753): dictionary ending here has an odd number of elements
 warning: Attempting to reconstruct cross-reference table
-error: bad17.pdf: offset 753: dictionary ending here has an odd number of elements
+error: bad17.pdf (trailer, file position 753): dictionary ending here has an odd number of elements

@@ -191,6 +191,8 @@ my @badfiles = ("not a PDF file", 			# 1
 		"unknown stream /Filter",		# 31
 		"obj/gen mismatch",			# 32
 		"invalid stream /Filter and xref",	# 33
+		"obj/gen in wrong place",		# 34
+		"object stream of wrong type",		# 35
 		);
 
 $n_tests += @badfiles + 5;
@@ -249,7 +251,7 @@ $n_tests += @badfiles + 8;
 # though in some cases it may.  Acrobat Reader would not be able to
 # recover any of these files any better.
 my %recover_failures = ();
-for (1, 7, 13..21, 24..27, 29..30, 33)
+for (1, 7, 13..21, 24, 29..30, 33, 35)
 {
     $recover_failures{$_} = 1;
 }

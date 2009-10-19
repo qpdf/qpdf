@@ -175,7 +175,8 @@ QPDF::readLinearizationData()
 
     if (! isLinearized())
     {
-	throw QPDFExc(this->file.getName() + " is not linearized");
+	throw std::logic_error("called readLinearizationData for file"
+			       " that is not linearized");
     }
 
     // /L is read and stored in linp by isLinearized()
@@ -193,7 +194,10 @@ QPDF::readLinearizationData()
 	   T.isInteger() &&
 	   (P.isInteger() || P.isNull())))
     {
-	throw QPDFExc("some keys in linearization dictionary are of "
+	throw QPDFExc(qpdf_e_damaged_pdf, this->file.getName(),
+		      "linearization dictionary",
+		      this->file.getLastOffset(),
+		      "some keys in linearization dictionary are of "
 		      "the wrong type");
     }
 
@@ -201,7 +205,10 @@ QPDF::readLinearizationData()
     unsigned int n_H_items = H.getArrayNItems();
     if (! ((n_H_items == 2) || (n_H_items == 4)))
     {
-	throw QPDFExc("H has the wrong number of items");
+	throw QPDFExc(qpdf_e_damaged_pdf, this->file.getName(),
+		      "linearization dictionary",
+		      this->file.getLastOffset(),
+		      "H has the wrong number of items");
     }
 
     std::vector<int> H_items;
@@ -214,7 +221,10 @@ QPDF::readLinearizationData()
 	}
 	else
 	{
-	    throw QPDFExc("some H items are of the wrong type");
+	    throw QPDFExc(qpdf_e_damaged_pdf, this->file.getName(),
+			  "linearization dictionary",
+			  this->file.getLastOffset(),
+			  "some H items are of the wrong type");
 	}
     }
 
@@ -301,13 +311,17 @@ QPDF::readHintStream(Pipeline& pl, off_t offset, size_t length)
 {
     int obj;
     int gen;
-    QPDFObjectHandle H = readObjectAtOffset(offset, 0, 0, obj, gen);
+    QPDFObjectHandle H = readObjectAtOffset(
+	false, offset, "linearization hint stream", 0, 0, obj, gen);
     ObjCache& oc = this->obj_cache[ObjGen(obj, gen)];
     off_t min_end_offset = oc.end_before_space;
     off_t max_end_offset = oc.end_after_space;
     if (! H.isStream())
     {
-	throw QPDFExc("hint table is not a stream");
+	throw QPDFExc(qpdf_e_damaged_pdf, this->file.getName(),
+		      "linearization dictionary",
+		      this->file.getLastOffset(),
+		      "hint table is not a stream");
     }
 
     QPDFObjectHandle Hdict = H.getDict();
@@ -340,7 +354,10 @@ QPDF::readHintStream(Pipeline& pl, off_t offset, size_t length)
 	std::cout << "expected = " << computed_end
 		  << "; actual = " << min_end_offset << ".."
 		  << max_end_offset << std::endl;
-	throw QPDFExc("hint table length mismatch");
+	throw QPDFExc(qpdf_e_damaged_pdf, this->file.getName(),
+		      "linearization dictionary",
+		      this->file.getLastOffset(),
+		      "hint table length mismatch");
     }
     H.pipeStreamData(&pl, true, false, false);
     return Hdict;
@@ -651,8 +668,7 @@ QPDF::getLinearizationOffset(ObjGen const& og)
 	break;
 
       default:
-	throw QPDFExc(
-	    this->file.getName(), 0,
+	throw std::logic_error(
 	    "getLinearizationOffset called for xref entry not of type 1 or 2");
 	break;
     }

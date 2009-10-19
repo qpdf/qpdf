@@ -337,14 +337,16 @@ QPDF::initializeEncryption()
 	   (id_obj.getArrayNItems() == 2) &&
 	   id_obj.getArrayItem(0).isString()))
     {
-	throw QPDFExc(this->file.getName(), this->file.getLastOffset(),
+	throw QPDFExc(qpdf_e_damaged_pdf, this->file.getName(),
+		      "trailer", this->file.getLastOffset(),
 		      "invalid /ID in trailer dictionary");
     }
 
     std::string id1 = id_obj.getArrayItem(0).getStringValue();
     if (id1.length() != id_bytes)
     {
-	throw QPDFExc(this->file.getName(), this->file.getLastOffset(),
+	throw QPDFExc(qpdf_e_damaged_pdf, this->file.getName(),
+		      "trailer", this->file.getLastOffset(),
 		      "first /ID string in trailer dictionary has "
 		      "incorrect length");
     }
@@ -352,19 +354,23 @@ QPDF::initializeEncryption()
     QPDFObjectHandle encryption_dict = this->trailer.getKey("/Encrypt");
     if (! encryption_dict.isDictionary())
     {
-	throw QPDFExc(this->file.getName(), this->file.getLastOffset(),
+	throw QPDFExc(qpdf_e_damaged_pdf, this->file.getName(),
+		      this->last_object_description,
+		      this->file.getLastOffset(),
 		      "/Encrypt in trailer dictionary is not a dictionary");
     }
 
     if (! (encryption_dict.getKey("/Filter").isName() &&
 	   (encryption_dict.getKey("/Filter").getName() == "/Standard")))
     {
-	throw QPDFExc(this->file.getName(), this->file.getLastOffset(),
+	throw QPDFExc(qpdf_e_damaged_pdf, this->file.getName(),
+		      "encryption dictionary", this->file.getLastOffset(),
 		      "unsupported encryption filter");
     }
     if (! encryption_dict.getKey("/SubFilter").isNull())
     {
-	warn(QPDFExc(this->file.getName(), this->file.getLastOffset(),
+	warn(QPDFExc(qpdf_e_unsupported, this->file.getName(),
+		     "encryption dictionary", this->file.getLastOffset(),
 		     "file uses encryption SubFilters,"
 		     " which qpdf does not support"));
     }
@@ -375,7 +381,8 @@ QPDF::initializeEncryption()
 	   encryption_dict.getKey("/U").isString() &&
 	   encryption_dict.getKey("/P").isInteger()))
     {
-	throw QPDFExc(this->file.getName(), this->file.getLastOffset(),
+	throw QPDFExc(qpdf_e_damaged_pdf, this->file.getName(),
+		      "encryption dictionary", this->file.getLastOffset(),
 		      "some encryption dictionary parameters are missing "
 		      "or the wrong type");
     }
@@ -389,7 +396,8 @@ QPDF::initializeEncryption()
     if (! (((R == 2) || (R == 3) || (R == 4)) &&
 	   ((V == 1) || (V == 2) || (V == 4))))
     {
-	throw QPDFExc(this->file.getName(), this->file.getLastOffset(),
+	throw QPDFExc(qpdf_e_unsupported, this->file.getName(),
+		      "encryption dictionary", this->file.getLastOffset(),
 		      "Unsupported /R or /V in encryption dictionary");
     }
 
@@ -397,7 +405,8 @@ QPDF::initializeEncryption()
 
     if (! ((O.length() == key_bytes) && (U.length() == key_bytes)))
     {
-	throw QPDFExc(this->file.getName(), this->file.getLastOffset(),
+	throw QPDFExc(qpdf_e_damaged_pdf, this->file.getName(),
+		      "encryption dictionary", this->file.getLastOffset(),
 		      "incorrect length for /O and/or /P in "
 		      "encryption dictionary");
     }
@@ -408,7 +417,8 @@ QPDF::initializeEncryption()
 	Length = encryption_dict.getKey("/Length").getIntValue();
 	if ((Length % 8) || (Length < 40) || (Length > 128))
 	{
-	    throw QPDFExc(this->file.getName(), this->file.getLastOffset(),
+	    throw QPDFExc(qpdf_e_damaged_pdf, this->file.getName(),
+			  "encryption dictionary", this->file.getLastOffset(),
 			  "invalid /Length value in encryption dictionary");
 	}
     }
@@ -471,7 +481,8 @@ QPDF::initializeEncryption()
 	}
 	if (this->cf_file != this->cf_stream)
 	{
-	    throw QPDFExc(this->file.getName(), this->file.getLastOffset(),
+	    throw QPDFExc(qpdf_e_unsupported, this->file.getName(),
+			  "encryption dictionary", this->file.getLastOffset(),
 			  "This document has embedded files that are"
 			  " encrypted differently from the rest of the file."
 			  "  qpdf does not presently support this due to"
@@ -492,7 +503,8 @@ QPDF::initializeEncryption()
     }
     else
     {
-	throw QPDFExc(this->file.getName() + ": invalid password");
+	throw QPDFExc(qpdf_e_password, this->file.getName(),
+		      "", 0, "invalid password");
     }
 
     this->encryption_key = compute_encryption_key(this->user_password, data);
@@ -542,7 +554,9 @@ QPDF::decryptString(std::string& str, int objid, int generation)
 	    break;
 
 	  default:
-	    warn(QPDFExc(this->file.getName(), this->file.getLastOffset(),
+	    warn(QPDFExc(qpdf_e_damaged_pdf, this->file.getName(),
+			 this->last_object_description,
+			 this->file.getLastOffset(),
 			 "unknown encryption filter for strings"
 			 " (check /StrF in /Encrypt dictionary);"
 			 " strings may be decrypted improperly"));
@@ -554,28 +568,47 @@ QPDF::decryptString(std::string& str, int objid, int generation)
     }
 
     std::string key = getKeyForObject(objid, generation, use_aes);
-    if (use_aes)
+    try
     {
-	QTC::TC("qpdf", "QPDF_encryption aes decode string");
-	assert(key.length() == Pl_AES_PDF::key_size);
-	Pl_Buffer bufpl("decrypted string");
-	Pl_AES_PDF pl("aes decrypt string", &bufpl, false,
-		      (unsigned char const*)key.c_str());
-	pl.write((unsigned char*)str.c_str(), str.length());
-	pl.finish();
-	Buffer* buf = bufpl.getBuffer();
-	str = std::string((char*)buf->getBuffer(), (size_t)buf->getSize());
-	delete buf;
+	if (use_aes)
+	{
+	    QTC::TC("qpdf", "QPDF_encryption aes decode string");
+	    assert(key.length() == Pl_AES_PDF::key_size);
+	    Pl_Buffer bufpl("decrypted string");
+	    Pl_AES_PDF pl("aes decrypt string", &bufpl, false,
+			  (unsigned char const*)key.c_str());
+	    pl.write((unsigned char*)str.c_str(), str.length());
+	    pl.finish();
+	    PointerHolder<Buffer> buf = bufpl.getBuffer();
+	    str = std::string((char*)buf.getPointer()->getBuffer(),
+			      (size_t)buf.getPointer()->getSize());
+	}
+	else
+	{
+	    QTC::TC("qpdf", "QPDF_encryption rc4 decode string");
+	    unsigned int vlen = str.length();
+	    // Using PointerHolder will cause a new char[] to be deleted
+	    // with delete instead of delete [], but it's okay since the
+	    // array is of a fundamental type, so there is no destructor
+	    // to be called.  Using PointerHolder guarantees that tmp will
+	    // be freed even if rc4.process throws an exception.
+	    PointerHolder<char> tmp = QUtil::copy_string(str);
+	    RC4 rc4((unsigned char const*)key.c_str(), key.length());
+	    rc4.process((unsigned char*)tmp.getPointer(), vlen);
+	    str = std::string(tmp.getPointer(), vlen);
+	}
     }
-    else
+    catch (QPDFExc& e)
     {
-	QTC::TC("qpdf", "QPDF_encryption rc4 decode string");
-	unsigned int vlen = str.length();
-	char* tmp = QUtil::copy_string(str);
-	RC4 rc4((unsigned char const*)key.c_str(), key.length());
-	rc4.process((unsigned char*)tmp, vlen);
-	str = std::string(tmp, vlen);
-	delete [] tmp;
+	throw;
+    }
+    catch (std::runtime_error& e)
+    {
+	throw QPDFExc(qpdf_e_damaged_pdf, this->file.getName(),
+		      this->last_object_description, this->file.getLastOffset(),
+		      "error decrypting string for object " +
+		      QUtil::int_to_string(objid) + " " +
+		      QUtil::int_to_string(generation) + ": " + e.what());
     }
 }
 
@@ -645,7 +678,9 @@ QPDF::decryptStream(Pipeline*& pipeline, int objid, int generation,
 
 	  default:
 	    // filter local to this stream.
-	    warn(QPDFExc(this->file.getName(), this->file.getLastOffset(),
+	    warn(QPDFExc(qpdf_e_damaged_pdf, this->file.getName(),
+			 this->last_object_description,
+			 this->file.getLastOffset(),
 			 "unknown encryption filter for streams"
 			 " (check " + method_source + ");"
 			 " streams may be decrypted improperly"));

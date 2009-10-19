@@ -371,9 +371,11 @@ class DLL_EXPORT QPDF
     int processXRefStream(off_t offset, QPDFObjectHandle& xref_stream);
     void insertXrefEntry(int obj, int f0, int f1, int f2,
 			 bool overwrite = false);
+    void setLastObjectDescription(std::string const& description,
+				  int objid, int generation);
     QPDFObjectHandle readObject(
-	InputSource*, int objid, int generation,
-	bool in_object_stream);
+	InputSource*, std::string const& description,
+	int objid, int generation, bool in_object_stream);
     QPDFObjectHandle readObjectInternal(
 	InputSource* input, int objid, int generation,
 	bool in_object_stream,
@@ -383,7 +385,8 @@ class DLL_EXPORT QPDF
     QPDFTokenizer::Token readToken(InputSource*);
 
     QPDFObjectHandle readObjectAtOffset(
-	off_t offset,
+	bool attempt_recovery,
+	off_t offset, std::string const& description,
 	int exp_objid, int exp_generation,
 	int& act_objid, int& act_generation);
     PointerHolder<QPDFObject> resolve(int objid, int generation);
@@ -734,6 +737,7 @@ class DLL_EXPORT QPDF
 
     QPDFTokenizer tokenizer;
     FileInputSource file;
+    std::string last_object_description;
     bool encrypted;
     bool encryption_initialized;
     bool ignore_xref_streams;

@@ -9,6 +9,7 @@
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <iostream>
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <map>
@@ -319,6 +320,7 @@ void runtest(int n, char const* filename)
 
 int main(int argc, char* argv[])
 {
+    setlinebuf(stdout);
     if ((whoami = strrchr(argv[0], '/')) == NULL)
     {
 	whoami = argv[0];

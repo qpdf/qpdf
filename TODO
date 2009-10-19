@@ -16,25 +16,10 @@
  * Add comments for the security functions that map them back to the
    items in Adobe's products.
 
- * Add error codes to QPDFException.  Change the error interface so
-   that warnings and errors are pointers that can be queried using
-   more C API functions.  We need a way to get a full string as well
-   as an error code, file name, offset, and message.  We should go
-   through all error messages to try to include all these fields as
-   appropriate.  Make sure invalid password is specifically
-   detectable.  I/O errors and so forth should also be
-   distinguishable.  Make sure all errors include information about
-   the most recent read location including byte offset and
-   object/generation number.
-
- * It might be nice to be able to trap I/O errors separately from
-   other errors; especially be able to separate errors that the user
-   can fix (like permission errors) from errors that they probably
-   can't fix like corrupted PDF files, unsupported filters, or
-   internal errors.  However, only QPDF::processFile(), which does the
-   initial read, and QPDFWriter::QPDFWriter(), which does the initial
-   write, are at all likely to generate such errors for a case other
-   than a catastrophic failure.
+ * Change the C error interface so that warnings and errors are
+   pointers that can be queried using more C API functions.  We need a
+   way to get a full string as well as an error code, file name,
+   offset, and message.
 
  * "Delphi wrapper unit 'qpdf.pas' created by Zarko Gajic
    (http://delphi.about.com). .. use at your own risk and for whatever

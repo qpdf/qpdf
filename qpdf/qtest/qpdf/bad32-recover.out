@@ -1,6 +1,7 @@
-WARNING: bad32.pdf: offset 0: file is damaged
-WARNING: bad32.pdf: offset 307: expected 4 0 obj
+WARNING: bad32.pdf: file is damaged
+WARNING: bad32.pdf (object 4 0, file position 307): expected 4 0 obj
 WARNING: Attempting to reconstruct cross-reference table
+WARNING: bad32.pdf: object 4 0 not found in file after regenerating cross reference table
 /QTest is implicit
 /QTest is indirect
 /QTest is null

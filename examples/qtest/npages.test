@@ -16,7 +16,7 @@ $td->runtest("normal",
 
 $td->runtest("error",
 	     {$td->COMMAND => "pdf-npages bad"},
-	     {$td->STRING => "pdf-npages: bad: offset 0: not a PDF file\n",
+	     {$td->STRING => "pdf-npages: bad: not a PDF file\n",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 

@@ -1,9 +1,9 @@
-WARNING: bad33.pdf: offset 0: file is damaged
-WARNING: bad33.pdf: offset 1771: xref not found
+WARNING: bad33.pdf: file is damaged
+WARNING: bad33.pdf (file position 1771): xref not found
 WARNING: Attempting to reconstruct cross-reference table
 /QTest is indirect
 /QTest is a stream.  Dictionary: << /Filter (FlateDecode) /Length 123 >>
 Raw stream data:
 xœ%11û¼b;tà4| wXIDì Øå÷8G·«Í>rQ¨uŠOÒêEŒ:©IWìÃPlíµII)Ãr´p4~;§ÎAs/òÒ…jcúú¾÷s§åözû»T.?®uæ§<¼…Ğ*6ä
 Uncompressed stream data:
-bad33.pdf: offset 629: invalid filter object type for this stream
+bad33.pdf (file position 629): stream filter type is not name or array

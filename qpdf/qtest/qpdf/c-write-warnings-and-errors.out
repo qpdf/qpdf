@@ -1,4 +1,4 @@
-warning: bad33.pdf: offset 0: file is damaged
-warning: bad33.pdf: offset 1771: xref not found
+warning: bad33.pdf: file is damaged
+warning: bad33.pdf (file position 1771): xref not found
 warning: Attempting to reconstruct cross-reference table
-error: bad33.pdf: offset 629: invalid filter object type for this stream
+error: bad33.pdf (file position 629): stream filter type is not name or array

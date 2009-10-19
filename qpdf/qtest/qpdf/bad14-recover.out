@@ -1,4 +1,4 @@
-WARNING: bad14.pdf: offset 0: file is damaged
-WARNING: bad14.pdf: offset 753: unexpected brace token
+WARNING: bad14.pdf: file is damaged
+WARNING: bad14.pdf (trailer, file position 753): unexpected brace token
 WARNING: Attempting to reconstruct cross-reference table
-bad14.pdf: offset 753: unexpected brace token
+bad14.pdf (trailer, file position 753): unexpected brace token

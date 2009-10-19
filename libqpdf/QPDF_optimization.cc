@@ -233,9 +233,12 @@ QPDF::optimizePagesTree(
 	    {
 		if (! allow_changes)
 		{
-		    throw QPDFExc(this->file.getName() +
-				  ": optimize detected an "
-				  "inheritable resource");
+		    throw QPDFExc(qpdf_e_internal, this->file.getName(),
+				  this->last_object_description,
+				  this->file.getLastOffset(),
+				  "optimize detected an "
+				  "inheritable resource when called "
+				  "in no-change mode");
 		}
 
 		// This is an inheritable resource
@@ -338,7 +341,10 @@ QPDF::optimizePagesTree(
     }
     else
     {
-	throw QPDFExc(this->file.getName() + ": invalid Type in page tree");
+	throw QPDFExc(qpdf_e_damaged_pdf, this->file.getName(),
+		      this->last_object_description,
+		      this->file.getLastOffset(),
+		      "invalid Type in page tree");
     }
 }
 

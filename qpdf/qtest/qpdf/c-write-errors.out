@@ -1,1 +1,1 @@
-error: bad30.pdf: offset 629: invalid filter object type for this stream
+error: bad30.pdf (file position 629): stream filter type is not name or array

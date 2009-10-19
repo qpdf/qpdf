@@ -1,4 +1,4 @@
-WARNING: bad20.pdf: offset 0: file is damaged
-WARNING: bad20.pdf: offset 753: invalid character (q) in hexstring
+WARNING: bad20.pdf: file is damaged
+WARNING: bad20.pdf (trailer, file position 753): invalid character (q) in hexstring
 WARNING: Attempting to reconstruct cross-reference table
-bad20.pdf: offset 753: invalid character (q) in hexstring
+bad20.pdf (trailer, file position 753): invalid character (q) in hexstring

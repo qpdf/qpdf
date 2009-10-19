@@ -59,7 +59,7 @@ QPDF_Stream::getStreamData()
     Pl_Buffer buf("stream data buffer");
     if (! pipeStreamData(&buf, true, false, false))
     {
-	throw QPDFExc("getStreamData called on unfilterable stream");
+	throw std::logic_error("getStreamData called on unfilterable stream");
     }
     return buf.getBuffer();
 }
@@ -208,8 +208,9 @@ QPDF_Stream::filterable(std::vector<std::string>& filters,
     if (! filters_okay)
     {
 	QTC::TC("qpdf", "QPDF_Stream invalid filter");
-	throw QPDFExc(qpdf->getFilename(), this->offset,
-		      "invalid filter object type for this stream");
+	throw QPDFExc(qpdf_e_damaged_pdf, qpdf->getFilename(),
+		      "", this->offset,
+		      "stream filter type is not name or array");
     }
 
     // `filters' now contains a list of filters to be applied in

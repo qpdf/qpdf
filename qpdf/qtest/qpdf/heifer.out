@@ -1,5 +1,5 @@
-WARNING: heifer.pdf: offset 0: file is damaged
-WARNING: heifer.pdf: offset 92741: xref not found
+WARNING: heifer.pdf: file is damaged
+WARNING: heifer.pdf (file position 92741): xref not found
 WARNING: Attempting to reconstruct cross-reference table
-WARNING: heifer.pdf: offset 51: attempting to recover stream length
+WARNING: heifer.pdf (object 2 0, file position 51): attempting to recover stream length
 qpdf: operation succeeded with warnings; resulting file may have some problems

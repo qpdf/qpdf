@@ -1,5 +1,5 @@
-WARNING: bad5.pdf: offset 0: file is damaged
-WARNING: bad5.pdf: offset 591: invalid xref entry (obj=2)
+WARNING: bad5.pdf: file is damaged
+WARNING: bad5.pdf (xref table, file position 591): invalid xref entry (obj=2)
 WARNING: Attempting to reconstruct cross-reference table
 /QTest is implicit
 /QTest is direct

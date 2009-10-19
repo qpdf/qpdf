@@ -16,7 +16,8 @@ QPDFXRefEntry::QPDFXRefEntry(int type, int field1, int field2) :
 {
     if ((type < 1) || (type > 2))
     {
-	throw QPDFExc("invalid xref type " + QUtil::int_to_string(type));
+	throw std::logic_error(
+	    "invalid xref type " + QUtil::int_to_string(type));
     }
 }
 
@@ -31,7 +32,7 @@ QPDFXRefEntry::getOffset() const
 {
     if (this->type != 1)
     {
-	throw QPDFExc(
+	throw std::logic_error(
 	    "getOffset called for xref entry of type != 1");
     }
     return this->field1;
@@ -42,7 +43,7 @@ QPDFXRefEntry::getObjStreamNumber() const
 {
     if (this->type != 2)
     {
-	throw QPDFExc(
+	throw std::logic_error(
 	    "getObjStreamNumber called for xref entry of type != 2");
     }
     return this->field1;
@@ -53,7 +54,7 @@ QPDFXRefEntry::getObjStreamIndex() const
 {
     if (this->type != 2)
     {
-	throw QPDFExc(
+	throw std::logic_error(
 	    "getObjStreamIndex called for xref entry of type != 2");
     }
     return this->field2;
