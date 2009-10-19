@@ -1,9 +1,6 @@
 2.1
 ===
 
- * Really need to handle /Crypt filter for Metadata.  Search for crypt
-   below.
-
  * Update documentation to reflect new command line flags and any
    other relevant changes.  Should read through ChangeLog and the
    manual before releasing 2.1.
@@ -83,10 +80,13 @@ General
    filters.  There is an example in the spec of using a crypt filter
    on a metadata stream.
 
-   When we write encrypted files, we must remember to omit any
-   encryption filter settings from original streams.
-
-   We need a way to test this.
+   For now, we notice /Crypt filters and decode parameters consistent
+   with the example in the PDF specification, and the right thing
+   happens for metadata filters that happen to be uncompressed or
+   otherwise compressed in a way we can filter.  This should handle
+   all normal cases, but it's more or less just a guess since I don't
+   have any test files that actually use stream-specific crypt filters
+   in them.
 
  * The second xref stream for linearized files has to be padded only
    because we need file_size as computed in pass 1 to be accurate.  If

@@ -600,18 +600,19 @@ QPDF::decryptStream(Pipeline*& pipeline, int objid, int generation,
 	encryption_method_e method = e_unknown;
 	std::string method_source = "/StmF from /Encrypt dictionary";
 
-	// NOTE: the section in the PDF specification on crypt filters
-	// seems to suggest that there might be a /Crypt key in
-	// /DecodeParms whose value is a crypt filter (.e.g., << /Name
-	// /StdCF >>), but implementation notes suggest this can only
-	// happen for metadata streams, and emperical observation
-	// suggests that they are otherwise ignored.  Not having been
-	// able to find a sample file that uses crypt filters in any
-	// way other than /StrF and /StmF, I'm not really sure what to
-	// do about this.  If we were to override the encryption on a
-	// per-stream basis using crypt filters, set method_source to
-	// something useful in the error message for unknown
-	// encryption methods (search for method_source).
+	if (stream_dict.getKey("/Filter").isOrHasName("/Crypt") &&
+	    stream_dict.getKey("/DecodeParms").isDictionary())
+	{
+	    QPDFObjectHandle decode_parms = stream_dict.getKey("/DecodeParms");
+	    if (decode_parms.getKey("/Type").isName() &&
+		(decode_parms.getKey("/Type").getName() ==
+		 "/CryptFilterDecodeParms"))
+	    {
+		QTC::TC("qpdf", "QPDF_encryption stream crypt filter");
+		method = interpretCF(decode_parms.getKey("/Name"));
+		method_source = "stream's Crypt decode parameters";
+	    }
+	}
 
 	if (method == e_unknown)
 	{

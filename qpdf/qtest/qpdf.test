@@ -1079,7 +1079,7 @@ $td->runtest("make sure there is no xref stream",
 	     $td->NORMALIZE_NEWLINES);
 
 # Look at some actual V4 files
-$n_tests += 8;
+$n_tests += 10;
 foreach my $d (['--force-V4', 'V4'],
 	       ['--cleartext-metadata', 'V4-clearmeta'],
 	       ['--use-aes=y', 'V4-aes'],
@@ -1094,6 +1094,14 @@ foreach my $d (['--force-V4', 'V4'],
 		 {$td->FILE => "a.pdf"},
 		 {$td->FILE => "$out.pdf"});
 }
+# Crypt Filter
+$td->runtest("decrypt with crypt filter",
+	     {$td->COMMAND => "qpdf --decrypt --static-id" .
+		  " metadata-crypt-filter.pdf a.pdf"},
+	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+	     {$td->FILE => 'a.pdf'},
+	     {$td->FILE => 'decrypted-crypt-filter.pdf'});
 
 show_ntests();
 # ----------

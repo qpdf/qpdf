@@ -77,14 +77,14 @@ class DLL_EXPORT QPDFObjectHandle
     bool isNumber();
     double getNumericValue();
 
-    // Methods for name objects
+    // Methods for name objects; see also name and array objects
     std::string getName();
 
     // Methods for string objects
     std::string getStringValue();
     std::string getUTF8Value();
 
-    // Methods for array objects
+    // Methods for array objects; see also name and array objects
     int getArrayNItems();
     QPDFObjectHandle getArrayItem(int n);
 
@@ -92,6 +92,9 @@ class DLL_EXPORT QPDFObjectHandle
     bool hasKey(std::string const&);
     QPDFObjectHandle getKey(std::string const&);
     std::set<std::string> getKeys();
+
+    // Methods for name and array objects
+    bool isOrHasName(std::string const&);
 
     // Mutator methods.  Use with caution.
 

@@ -258,6 +258,29 @@ QPDFObjectHandle::getKeys()
     return dynamic_cast<QPDF_Dictionary*>(obj.getPointer())->getKeys();
 }
 
+// Array and Name accessors
+bool
+QPDFObjectHandle::isOrHasName(std::string const& value)
+{
+    if (isName() && (getName() == value))
+    {
+	return true;
+    }
+    else if (isArray())
+    {
+	int n = getArrayNItems();
+	for (int i = 0; i < n; ++i)
+	{
+	    QPDFObjectHandle item = getArrayItem(0);
+	    if (item.isName() && (item.getName() == value))
+	    {
+		return true;
+	    }
+	}
+    }
+    return false;
+}
+
 // Dictionary mutators
 
 void
