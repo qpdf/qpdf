@@ -30,14 +30,6 @@ struct _qpdf_data
     // Parameters for functions we call
     char const* filename;
     char const* password;
-
-    // must set filename and password
-    void call_read();
-
-    // must set filename
-    void call_init_write();
-
-    void call_write();
 };
 
 _qpdf_data::_qpdf_data() :
@@ -52,43 +44,29 @@ _qpdf_data::~_qpdf_data()
     delete qpdf;
 }
 
-void
-_qpdf_data::call_read()
+// must set qpdf->filename and qpdf->password
+static void call_read(qpdf_data qpdf)
 {
-    qpdf->processFile(filename, password);
+    qpdf->qpdf->processFile(qpdf->filename, qpdf->password);
 }
 
-void
-_qpdf_data::call_init_write()
+// must set qpdf->filename
+static void call_init_write(qpdf_data qpdf)
 {
-    if (qpdf_writer)
-    {
-	QTC::TC("qpdf", "qpdf-c called qpdf_init_write multiple times");
-	delete qpdf_writer;
-	qpdf_writer = 0;
-    }
-    try
-    {
-	qpdf_writer = new QPDFWriter(*qpdf, filename);
-    }
-    catch (...)
-    {
-	throw;
-    }
+    qpdf->qpdf_writer = new QPDFWriter(*(qpdf->qpdf), qpdf->filename);
 }
 
-void
-_qpdf_data::call_write()
+static void call_write(qpdf_data qpdf)
 {
-    qpdf_writer->write();
+    qpdf->qpdf_writer->write();
 }
 
-static QPDF_ERROR_CODE trap_errors(qpdf_data qpdf, void (_qpdf_data::*fn)())
+static QPDF_ERROR_CODE trap_errors(qpdf_data qpdf, void (*fn)(qpdf_data))
 {
     QPDF_ERROR_CODE status = QPDF_SUCCESS;
     try
     {
-	(qpdf->*fn)();
+	fn(qpdf);
     }
     catch (QPDFExc& e)
     {
@@ -227,7 +205,7 @@ QPDF_ERROR_CODE qpdf_read(qpdf_data qpdf, char const* filename,
     QPDF_ERROR_CODE status = QPDF_SUCCESS;
     qpdf->filename = filename;
     qpdf->password = password;
-    status = trap_errors(qpdf, &_qpdf_data::call_read);
+    status = trap_errors(qpdf, &call_read);
     QTC::TC("qpdf", "qpdf-c called qpdf_read", status);
     return status;
 }
@@ -315,8 +293,14 @@ QPDF_BOOL qpdf_allow_modify_all(qpdf_data qpdf)
 QPDF_ERROR_CODE qpdf_init_write(qpdf_data qpdf, char const* filename)
 {
     QPDF_ERROR_CODE status = QPDF_SUCCESS;
+    if (qpdf->qpdf_writer)
+    {
+	QTC::TC("qpdf", "qpdf-c called qpdf_init_write multiple times");
+	delete qpdf->qpdf_writer;
+	qpdf->qpdf_writer = 0;
+    }
     qpdf->filename = filename;
-    status = trap_errors(qpdf, &_qpdf_data::call_init_write);
+    status = trap_errors(qpdf, &call_init_write);
     QTC::TC("qpdf", "qpdf-c called qpdf_init_write", status);
     return status;
 }
@@ -426,7 +410,7 @@ void qpdf_force_pdf_version(qpdf_data qpdf, char const* version)
 QPDF_ERROR_CODE qpdf_write(qpdf_data qpdf)
 {
     QPDF_ERROR_CODE status = QPDF_SUCCESS;
-    status = trap_errors(qpdf, &_qpdf_data::call_write);
+    status = trap_errors(qpdf, &call_write);
     QTC::TC("qpdf", "qpdf-c called qpdf_write", status);
     return status;
 }
