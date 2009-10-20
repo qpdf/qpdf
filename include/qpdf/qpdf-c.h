@@ -131,7 +131,7 @@ extern "C" {
     DLL_EXPORT
     char const* qpdf_get_error_filename(qpdf_data q, qpdf_error e);
     DLL_EXPORT
-    off_t qpdf_get_error_file_position(qpdf_data q, qpdf_error e);
+    unsigned long qpdf_get_error_file_position(qpdf_data q, qpdf_error e);
     DLL_EXPORT
     char const* qpdf_get_error_message_detail(qpdf_data q, qpdf_error e);
 

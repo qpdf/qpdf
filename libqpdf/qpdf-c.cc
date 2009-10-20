@@ -173,7 +173,7 @@ char const* qpdf_get_error_filename(qpdf_data qpdf, qpdf_error e)
     return e->exc.getPointer()->getFilename().c_str();
 }
 
-off_t qpdf_get_error_file_position(qpdf_data qpdf, qpdf_error e)
+unsigned long qpdf_get_error_file_position(qpdf_data qpdf, qpdf_error e)
 {
     return e->exc.getPointer()->getFilePosition();
 }
