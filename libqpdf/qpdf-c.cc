@@ -51,7 +51,7 @@ static void call_read(qpdf_data qpdf)
 }
 
 // must set qpdf->filename
-void call_init_write(qpdf_data qpdf)
+static void call_init_write(qpdf_data qpdf)
 {
     qpdf->qpdf_writer = new QPDFWriter(*(qpdf->qpdf), qpdf->filename);
 }
