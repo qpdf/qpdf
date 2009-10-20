@@ -12,7 +12,8 @@
    the mention of strip since it should be handled by the install
    step.  Determine whether -g with strip is different from not -g
    with strip.  Make sure release includes building for both
-   compilers.
+   compilers.  Make sure it works to link with the static library when
+   the dll is not in the same directory.
 
  * Add comments for the security functions that map them back to the
    items in Adobe's products.
