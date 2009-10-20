@@ -1,4 +1,4 @@
 WARNING: append-page-content-damaged.pdf: file is damaged
 WARNING: append-page-content-damaged.pdf: can't find startxref
-WARNING: Attempting to reconstruct cross-reference table
+WARNING: append-page-content-damaged.pdf: Attempting to reconstruct cross-reference table
 qpdf: operation succeeded with warnings; resulting file may have some problems

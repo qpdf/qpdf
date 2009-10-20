@@ -63,12 +63,14 @@
 
 #include <qpdf/DLL.h>
 #include <qpdf/Constants.h>
+#include <fcntl.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
     typedef struct _qpdf_data* qpdf_data;
+    typedef struct _qpdf_error* qpdf_error;
 
     /* Many functions return an integer error code.  Codes are defined
      * below.  See comments at the top of the file for details.  Note
@@ -97,21 +99,42 @@ extern "C" {
 
     /* ERROR REPORTING */
 
-    /* Returns 1 if there are any errors or warnings, and zero
+    /* Returns the error condition, if any.  The return value is a
+     * pointer to data that will become invalid the next time an error
+     * occurs or after this function is called gain.
+     */
+    DLL_EXPORT
+    qpdf_error qpdf_get_error(qpdf_data qpdf);
+
+    /* Returns 1 if there are any unretrieved warnings, and zero
      * otherwise.
      */
     DLL_EXPORT
-    QPDF_BOOL qpdf_more_errors(qpdf_data qpdf);
-    DLL_EXPORT
     QPDF_BOOL qpdf_more_warnings(qpdf_data qpdf);
 
-    /* If there are any errors/warnings, returns a pointer to the next
-     * error or warning.  Otherwise returns a null pointer.
+    /* If there are any warnings, returns a pointer to the next
+     * warning.  Otherwise returns a null pointer.
      */
     DLL_EXPORT
-    char const* qpdf_next_error(qpdf_data qpdf);
+    qpdf_error qpdf_next_warning(qpdf_data qpdf);
+
+    /* Extract fields of the error. */
+
+    /* Use this function to get a full error message suitable for
+     * showing to the user. */
     DLL_EXPORT
-    char const* qpdf_next_warning(qpdf_data qpdf);
+    char const* qpdf_get_error_full_text(qpdf_data q, qpdf_error e);
+
+    /* Use these functions to extract individual fields from the
+     * error; see QPDFExc.hh for details. */
+    DLL_EXPORT
+    enum qpdf_error_code_e qpdf_get_error_code(qpdf_data q, qpdf_error e);
+    DLL_EXPORT
+    char const* qpdf_get_error_filename(qpdf_data q, qpdf_error e);
+    DLL_EXPORT
+    off_t qpdf_get_error_file_position(qpdf_data q, qpdf_error e);
+    DLL_EXPORT
+    char const* qpdf_get_error_message_detail(qpdf_data q, qpdf_error e);
 
     /* By default, warnings are written to stderr.  Passing true to
      * this function will prevent warnings from being written to

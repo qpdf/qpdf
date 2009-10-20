@@ -1,6 +1,6 @@
 WARNING: bad3.pdf: file is damaged
 WARNING: bad3.pdf (file position 542): xref not found
-WARNING: Attempting to reconstruct cross-reference table
+WARNING: bad3.pdf: Attempting to reconstruct cross-reference table
 /QTest is implicit
 /QTest is direct
 /QTest is null

@@ -70,7 +70,7 @@ class DLL_EXPORT QPDF
     // throws an exception.  Note that if setSuppressWarnings was not
     // called or was called with a false value, any warnings retrieved
     // here will have already been issued to stderr.
-    std::vector<std::string> getWarnings();
+    std::vector<QPDFExc> getWarnings();
 
     std::string getFilename() const;
     std::string getPDFVersion() const;
@@ -761,7 +761,7 @@ class DLL_EXPORT QPDF
     std::map<ObjGen, ObjCache> obj_cache;
     QPDFObjectHandle trailer;
     std::vector<QPDFObjectHandle> all_pages;
-    std::vector<std::string> warnings;
+    std::vector<QPDFExc> warnings;
 
     // Linearization data
     int first_xref_item_offset;	// actual value from file

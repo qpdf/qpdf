@@ -1,6 +1,6 @@
 WARNING: bad10.pdf: file is damaged
 WARNING: bad10.pdf (trailer, file position 712): /Size key in trailer dictionary is not an integer
-WARNING: Attempting to reconstruct cross-reference table
+WARNING: bad10.pdf: Attempting to reconstruct cross-reference table
 /QTest is implicit
 /QTest is direct
 /QTest is null

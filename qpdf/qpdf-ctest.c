@@ -8,13 +8,24 @@ static qpdf_data qpdf = 0;
 
 static void report_errors()
 {
+    qpdf_error e = 0;
     while (qpdf_more_warnings(qpdf))
     {
-	printf("warning: %s\n", qpdf_next_warning(qpdf));
+	e = qpdf_next_warning(qpdf);
+	printf("warning: %s\n", qpdf_get_error_full_text(qpdf, e));
+	printf("  code: %d\n", qpdf_get_error_code(qpdf, e));
+	printf("  file: %s\n", qpdf_get_error_filename(qpdf, e));
+	printf("  pos : %ld\n", qpdf_get_error_file_position(qpdf, e));
+	printf("  text: %s\n", qpdf_get_error_message_detail(qpdf, e));
     }
-    while (qpdf_more_errors(qpdf))
+    e = qpdf_get_error(qpdf);
+    if (e)
     {
-	printf("error: %s\n", qpdf_next_error(qpdf));
+	printf("error: %s\n", qpdf_get_error_full_text(qpdf, e));
+	printf("  code: %d\n", qpdf_get_error_code(qpdf, e));
+	printf("  file: %s\n", qpdf_get_error_filename(qpdf, e));
+	printf("  pos : %ld\n", qpdf_get_error_file_position(qpdf, e));
+	printf("  text: %s\n", qpdf_get_error_message_detail(qpdf, e));
     }
 }
 

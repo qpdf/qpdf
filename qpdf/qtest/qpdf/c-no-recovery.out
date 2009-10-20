@@ -1,1 +1,5 @@
 error: bad33.pdf (file position 1771): xref not found
+  code: 5
+  file: bad33.pdf
+  pos : 1771
+  text: xref not found

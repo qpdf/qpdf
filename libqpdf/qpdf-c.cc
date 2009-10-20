@@ -3,10 +3,16 @@
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QTC.hh>
+#include <qpdf/QPDFExc.hh>
 
 #include <list>
 #include <string>
 #include <stdexcept>
+
+struct _qpdf_error
+{
+    PointerHolder<QPDFExc> exc;
+};
 
 struct _qpdf_data
 {
@@ -16,9 +22,22 @@ struct _qpdf_data
     QPDF* qpdf;
     QPDFWriter* qpdf_writer;
 
-    std::string error;
-    std::list<std::string> warnings;
+    PointerHolder<QPDFExc> error;
+    _qpdf_error tmp_error;
+    std::list<QPDFExc> warnings;
     std::string tmp_string;
+
+    // Parameters for functions we call
+    char const* filename;
+    char const* password;
+
+    // must set filename and password
+    void call_read();
+
+    // must set filename
+    void call_init_write();
+
+    void call_write();
 };
 
 _qpdf_data::_qpdf_data() :
@@ -31,6 +50,65 @@ _qpdf_data::~_qpdf_data()
 {
     delete qpdf_writer;
     delete qpdf;
+}
+
+void
+_qpdf_data::call_read()
+{
+    qpdf->processFile(filename, password);
+}
+
+void
+_qpdf_data::call_init_write()
+{
+    if (qpdf_writer)
+    {
+	QTC::TC("qpdf", "qpdf-c called qpdf_init_write multiple times");
+	delete qpdf_writer;
+	qpdf_writer = 0;
+    }
+    try
+    {
+	qpdf_writer = new QPDFWriter(*qpdf, filename);
+    }
+    catch (...)
+    {
+	throw;
+    }
+}
+
+void
+_qpdf_data::call_write()
+{
+    qpdf_writer->write();
+}
+
+static QPDF_ERROR_CODE trap_errors(qpdf_data qpdf, void (_qpdf_data::*fn)())
+{
+    QPDF_ERROR_CODE status = QPDF_SUCCESS;
+    try
+    {
+	(qpdf->*fn)();
+    }
+    catch (QPDFExc& e)
+    {
+	qpdf->error = new QPDFExc(e);
+	status |= QPDF_ERRORS;
+    }
+    catch (std::runtime_error& e)
+    {
+	qpdf->error = new QPDFExc(qpdf_e_system, "", "", 0, e.what());
+    }
+    catch (std::exception& e)
+    {
+	qpdf->error = new QPDFExc(qpdf_e_internal, "", "", 0, e.what());
+    }
+
+    if (qpdf_more_warnings(qpdf))
+    {
+	status |= QPDF_WARNINGS;
+    }
+    return status;
 }
 
 qpdf_data qpdf_init()
@@ -48,19 +126,13 @@ void qpdf_cleanup(qpdf_data* qpdf)
     *qpdf = 0;
 }
 
-QPDF_BOOL qpdf_more_errors(qpdf_data qpdf)
-{
-    QTC::TC("qpdf", "qpdf-c called qpdf_more_errors");
-    return (qpdf->error.empty() ? QPDF_FALSE : QPDF_TRUE);
-}
-
 QPDF_BOOL qpdf_more_warnings(qpdf_data qpdf)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_more_warnings");
 
     if (qpdf->warnings.empty())
     {
-	std::vector<std::string> w = qpdf->qpdf->getWarnings();
+	std::vector<QPDFExc> w = qpdf->qpdf->getWarnings();
 	if (! w.empty())
 	{
 	    qpdf->warnings.assign(w.begin(), w.end());
@@ -76,14 +148,14 @@ QPDF_BOOL qpdf_more_warnings(qpdf_data qpdf)
     }
 }
 
-char const* qpdf_next_error(qpdf_data qpdf)
+qpdf_error qpdf_get_error(qpdf_data qpdf)
 {
-    if (qpdf_more_errors(qpdf))
+    if (qpdf->error.getPointer())
     {
-	qpdf->tmp_string = qpdf->error;
-	qpdf->error.clear();
+	qpdf->tmp_error.exc = qpdf->error;
+	qpdf->error = 0;
 	QTC::TC("qpdf", "qpdf-c qpdf_next_error returned error");
-	return qpdf->tmp_string.c_str();
+	return &qpdf->tmp_error;
     }
     else
     {
@@ -91,19 +163,44 @@ char const* qpdf_next_error(qpdf_data qpdf)
     }
 }
 
-char const* qpdf_next_warning(qpdf_data qpdf)
+qpdf_error qpdf_next_warning(qpdf_data qpdf)
 {
     if (qpdf_more_warnings(qpdf))
     {
-	qpdf->tmp_string = qpdf->warnings.front();
+	qpdf->tmp_error.exc = new QPDFExc(qpdf->warnings.front());
 	qpdf->warnings.pop_front();
 	QTC::TC("qpdf", "qpdf-c qpdf_next_warning returned warning");
-	return qpdf->tmp_string.c_str();
+	return &qpdf->tmp_error;
     }
     else
     {
 	return 0;
     }
+}
+
+char const* qpdf_get_error_full_text(qpdf_data qpdf, qpdf_error e)
+{
+    return e->exc.getPointer()->what();
+}
+
+enum qpdf_error_code_e qpdf_get_error_code(qpdf_data qpdf, qpdf_error e)
+{
+    return e->exc.getPointer()->getErrorCode();
+}
+
+char const* qpdf_get_error_filename(qpdf_data qpdf, qpdf_error e)
+{
+    return e->exc.getPointer()->getFilename().c_str();
+}
+
+off_t qpdf_get_error_file_position(qpdf_data qpdf, qpdf_error e)
+{
+    return e->exc.getPointer()->getFilePosition();
+}
+
+char const* qpdf_get_error_message_detail(qpdf_data qpdf, qpdf_error e)
+{
+    return e->exc.getPointer()->getMessageDetail().c_str();
 }
 
 void qpdf_set_suppress_warnings(qpdf_data qpdf, QPDF_BOOL value)
@@ -128,19 +225,9 @@ QPDF_ERROR_CODE qpdf_read(qpdf_data qpdf, char const* filename,
 			  char const* password)
 {
     QPDF_ERROR_CODE status = QPDF_SUCCESS;
-    try
-    {
-	qpdf->qpdf->processFile(filename, password);
-    }
-    catch (std::exception& e)
-    {
-	qpdf->error = e.what();
-	status |= QPDF_ERRORS;
-    }
-    if (qpdf_more_warnings(qpdf))
-    {
-	status |= QPDF_WARNINGS;
-    }
+    qpdf->filename = filename;
+    qpdf->password = password;
+    status = trap_errors(qpdf, &_qpdf_data::call_read);
     QTC::TC("qpdf", "qpdf-c called qpdf_read", status);
     return status;
 }
@@ -228,25 +315,8 @@ QPDF_BOOL qpdf_allow_modify_all(qpdf_data qpdf)
 QPDF_ERROR_CODE qpdf_init_write(qpdf_data qpdf, char const* filename)
 {
     QPDF_ERROR_CODE status = QPDF_SUCCESS;
-    if (qpdf->qpdf_writer)
-    {
-	QTC::TC("qpdf", "qpdf-c called qpdf_init_write multiple times");
-	delete qpdf->qpdf_writer;
-	qpdf->qpdf_writer = 0;
-    }
-    try
-    {
-	qpdf->qpdf_writer = new QPDFWriter(*(qpdf->qpdf), filename);
-    }
-    catch (std::exception& e)
-    {
-	qpdf->error = e.what();
-	status |= QPDF_ERRORS;
-    }
-    if (qpdf_more_warnings(qpdf))
-    {
-	status |= QPDF_WARNINGS;
-    }
+    qpdf->filename = filename;
+    status = trap_errors(qpdf, &_qpdf_data::call_init_write);
     QTC::TC("qpdf", "qpdf-c called qpdf_init_write", status);
     return status;
 }
@@ -356,19 +426,7 @@ void qpdf_force_pdf_version(qpdf_data qpdf, char const* version)
 QPDF_ERROR_CODE qpdf_write(qpdf_data qpdf)
 {
     QPDF_ERROR_CODE status = QPDF_SUCCESS;
-    try
-    {
-	qpdf->qpdf_writer->write();
-    }
-    catch (std::exception& e)
-    {
-	qpdf->error = e.what();
-	status |= QPDF_ERRORS;
-    }
-    if (qpdf_more_warnings(qpdf))
-    {
-	status |= QPDF_WARNINGS;
-    }
+    status = trap_errors(qpdf, &_qpdf_data::call_write);
     QTC::TC("qpdf", "qpdf-c called qpdf_write", status);
     return status;
 }

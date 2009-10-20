@@ -54,3 +54,33 @@ QPDFExc::createWhat(std::string const& filename,
     result += message;
     return result;
 }
+
+qpdf_error_code_e
+QPDFExc::getErrorCode() const
+{
+    return this->error_code;
+}
+
+std::string const&
+QPDFExc::getFilename() const
+{
+    return this->filename;
+}
+
+std::string const&
+QPDFExc::getObject() const
+{
+    return this->object;
+}
+
+off_t
+QPDFExc::getFilePosition() const
+{
+    return this->offset;
+}
+
+std::string const&
+QPDFExc::getMessageDetail() const
+{
+    return this->message;
+}

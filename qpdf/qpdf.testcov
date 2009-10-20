@@ -120,7 +120,6 @@ QPDF decoding error warning 0
 QPDF_Stream ignore non-dictionary DecodeParms 0
 qpdf-c called qpdf_init 0
 qpdf-c called qpdf_cleanup 0
-qpdf-c called qpdf_more_errors 0
 qpdf-c called qpdf_more_warnings 0
 qpdf-c qpdf_next_error returned error 0
 qpdf-c qpdf_next_warning returned warning 0

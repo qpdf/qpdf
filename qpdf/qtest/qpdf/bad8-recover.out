@@ -1,6 +1,6 @@
 WARNING: bad8.pdf: file is damaged
 WARNING: bad8.pdf (file position 543): xref not found
-WARNING: Attempting to reconstruct cross-reference table
+WARNING: bad8.pdf: Attempting to reconstruct cross-reference table
 /QTest is implicit
 /QTest is direct
 /QTest is null

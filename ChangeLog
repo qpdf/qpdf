@@ -1,5 +1,9 @@
 2009-10-19  Jay Berkenbilt  <jberkenb@argonst.com>
 
+	* include/qpdf/QPDF.hh (QPDF): getWarnings now returns a list of
+	QPDFExc rather than a list of strings.  This way, warnings may be
+	inspected in more detail.
+
 	* Include information about the last object read in most error
 	messages.  Most of the time, this will provide a good hint as to
 	which object contains the error, but it's possible that the last

@@ -1,1 +1,5 @@
 error: bad1.pdf: not a PDF file
+  code: 5
+  file: bad1.pdf
+  pos : 0
+  text: not a PDF file

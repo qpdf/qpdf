@@ -300,10 +300,10 @@ QPDF::setAttemptRecovery(bool val)
     this->attempt_recovery = val;
 }
 
-std::vector<std::string>
+std::vector<QPDFExc>
 QPDF::getWarnings()
 {
-    std::vector<std::string> result = this->warnings;
+    std::vector<QPDFExc> result = this->warnings;
     this->warnings.clear();
     return result;
 }
@@ -397,10 +397,10 @@ QPDF::parse()
 void
 QPDF::warn(QPDFExc const& e)
 {
-    this->warnings.push_back(e.what());
+    this->warnings.push_back(e);
     if (! this->suppress_warnings)
     {
-	std::cerr << "WARNING: " << this->warnings.back() << std::endl;
+	std::cerr << "WARNING: " << this->warnings.back().what() << std::endl;
     }
 }
 
@@ -424,7 +424,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
     warn(QPDFExc(qpdf_e_damaged_pdf, this->file.getName(), "", 0,
 		 "file is damaged"));
     warn(e);
-    warn(QPDFExc(qpdf_e_damaged_pdf, "", "", 0,
+    warn(QPDFExc(qpdf_e_damaged_pdf, this->file.getName(), "", 0,
 		 "Attempting to reconstruct cross-reference table"));
 
     // Delete all references to type 1 (uncompressed) objects

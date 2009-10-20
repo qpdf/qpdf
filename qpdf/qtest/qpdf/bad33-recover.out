@@ -1,6 +1,6 @@
 WARNING: bad33.pdf: file is damaged
 WARNING: bad33.pdf (file position 1771): xref not found
-WARNING: Attempting to reconstruct cross-reference table
+WARNING: bad33.pdf: Attempting to reconstruct cross-reference table
 /QTest is indirect
 /QTest is a stream.  Dictionary: << /Filter (FlateDecode) /Length 123 >>
 Raw stream data:

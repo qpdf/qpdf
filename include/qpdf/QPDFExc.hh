@@ -11,7 +11,7 @@
 #include <qpdf/DLL.h>
 #include <qpdf/Constants.h>
 #include <stdexcept>
-#include <stddef.h>
+#include <fcntl.h>
 
 class DLL_EXPORT QPDFExc: public std::runtime_error
 {
@@ -36,8 +36,8 @@ class DLL_EXPORT QPDFExc: public std::runtime_error
     qpdf_error_code_e getErrorCode() const;
     std::string const& getFilename() const;
     std::string const& getObject() const;
-    off_t getOffset() const;
-    std::string const& getMessage() const;
+    off_t getFilePosition() const;
+    std::string const& getMessageDetail() const;
 
   private:
     static std::string createWhat(std::string const& filename,
