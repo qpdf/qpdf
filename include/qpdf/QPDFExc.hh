@@ -10,8 +10,8 @@
 
 #include <qpdf/DLL.h>
 #include <qpdf/Constants.h>
-#include <stdexcept>
-#include <memory.h>
+#include <qpdf/QUtil.hh>
+
 
 class DLL_EXPORT QPDFExc: public std::runtime_error
 {
