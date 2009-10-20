@@ -2,6 +2,7 @@
 #define __PL_AES_PDF_HH__
 
 #include <qpdf/Pipeline.hh>
+#include <qpdf/qpdf-config.h>
 
 // This pipeline implements AES-128 with CBC and block padding as
 // specified in the PDF specification.
