@@ -830,7 +830,7 @@ my @encrypted_files =
      ['long-password', 'asdf asdf asdf asdf asdf asdf qwer'],
      ['long-password', 'asdf asdf asdf asdf asdf asdf qw']);
 
-$n_tests += 3 + (2 * (@encrypted_files)) + (6 * (@encrypted_files - 3)) + 0;
+$n_tests += 3 + (2 * (@encrypted_files)) + (6 * (@encrypted_files - 3)) + 9;
 
 $td->runtest("encrypted file",
 	     {$td->COMMAND => "test_driver 2 U25A0.pdf"},
@@ -1243,7 +1243,7 @@ sub calc_ntests
 
 sub show_ntests
 {
-    if (0)
+    if (1)
     {
 	$td->emphasize("tests so far: ". calc_ntests());
     }
