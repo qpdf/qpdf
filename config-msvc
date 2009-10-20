@@ -1,0 +1,2 @@
+#!/bin/sh
+CC=cl CXX="cl /TP /GR" CPPFLAGS=-DHAVE_VSNPRINTF ./configure --disable-test-compare-images --enable-build-external-libs --with-buildrules=msvc

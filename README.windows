@@ -25,6 +25,13 @@ cygwin, though it's possible that it could be made to work with gcc
 From your MSYS prompt, run
 
   ./configure --disable-test-compare-images --enable-build-external-libs --with-buildrules=mingw
+
+or
+
+  ./config-mingw
+
+and then
+
   make
 
 Add the absolute path to the libqpdf/build directory to your PATH.
@@ -52,6 +59,13 @@ shell.
 Configure as follows:
 
   CC=cl CXX="cl /TP /GR" CPPFLAGS=-DHAVE_VSNPRINTF ./configure --disable-test-compare-images --enable-build-external-libs --with-buildrules=msvc
+
+or
+
+  ./config-msvc
+
+and then
+
   make
 
 The -DHAVE_VSNPRINTF is really only required for things that include

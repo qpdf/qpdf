@@ -534,7 +534,7 @@ parse_encrypt_options(
 int main(int argc, char* argv[])
 {
     whoami = QUtil::getWhoami(argv[0]);
-    setlinebuf(stdout);
+    setvbuf(stdout, (char *) NULL, _IOLBF, 0);
 
     // For libtool's sake....
     if (strncmp(whoami, "lt-", 3) == 0)

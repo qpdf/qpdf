@@ -320,7 +320,7 @@ void runtest(int n, char const* filename)
 
 int main(int argc, char* argv[])
 {
-    setlinebuf(stdout);
+    setvbuf(stdout, (char *) NULL, _IOLBF, 0);
     if ((whoami = strrchr(argv[0], '/')) == NULL)
     {
 	whoami = argv[0];
