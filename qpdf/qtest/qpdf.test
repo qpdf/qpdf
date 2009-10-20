@@ -1243,7 +1243,7 @@ sub calc_ntests
 
 sub show_ntests
 {
-    if (1)
+    if (0)
     {
 	$td->emphasize("tests so far: ". calc_ntests());
     }
