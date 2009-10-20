@@ -63,7 +63,11 @@
 
 #include <qpdf/DLL.h>
 #include <qpdf/Constants.h>
-#include <fcntl.h>
+#ifdef _WIN32
+# include <io.h>
+#else
+# include <fcntl.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
