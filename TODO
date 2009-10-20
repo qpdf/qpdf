@@ -16,11 +16,6 @@
  * Add comments for the security functions that map them back to the
    items in Adobe's products.
 
- * Change the C error interface so that warnings and errors are
-   pointers that can be queried using more C API functions.  We need a
-   way to get a full string as well as an error code, file name,
-   offset, and message.
-
  * "Delphi wrapper unit 'qpdf.pas' created by Zarko Gajic
    (http://delphi.about.com). .. use at your own risk and for whatever
    the purpose you want .. no support provided. Sample code provided."

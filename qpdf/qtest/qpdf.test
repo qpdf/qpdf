@@ -830,7 +830,7 @@ my @encrypted_files =
      ['long-password', 'asdf asdf asdf asdf asdf asdf qwer'],
      ['long-password', 'asdf asdf asdf asdf asdf asdf qw']);
 
-$n_tests += 3 + (2 * (@encrypted_files)) + (6 * (@encrypted_files - 3)) + 8;
+$n_tests += 3 + (2 * (@encrypted_files)) + (6 * (@encrypted_files - 3)) + 0;
 
 $td->runtest("encrypted file",
 	     {$td->COMMAND => "test_driver 2 U25A0.pdf"},
@@ -951,6 +951,10 @@ $td->runtest("invalid password",
 		  " enc-R2,V1,U=view.pdf a.qdf"},
 	     {$td->STRING => "enc-R2,V1,U=view.pdf: invalid password\n",
 	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("C API: invalid password",
+	     {$td->COMMAND => "qpdf-ctest 2 enc-R2,V1,U=view.pdf '' a.qdf"},
+	     {$td->FILE => "c-invalid-password.out", $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 my @cenc = (

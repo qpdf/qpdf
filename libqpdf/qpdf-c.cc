@@ -51,7 +51,7 @@ static void call_read(qpdf_data qpdf)
 }
 
 // must set qpdf->filename
-static void call_init_write(qpdf_data qpdf)
+void call_init_write(qpdf_data qpdf)
 {
     qpdf->qpdf_writer = new QPDFWriter(*(qpdf->qpdf), qpdf->filename);
 }
@@ -76,10 +76,12 @@ static QPDF_ERROR_CODE trap_errors(qpdf_data qpdf, void (*fn)(qpdf_data))
     catch (std::runtime_error& e)
     {
 	qpdf->error = new QPDFExc(qpdf_e_system, "", "", 0, e.what());
+	status |= QPDF_ERRORS;
     }
     catch (std::exception& e)
     {
 	qpdf->error = new QPDFExc(qpdf_e_internal, "", "", 0, e.what());
+	status |= QPDF_ERRORS;
     }
 
     if (qpdf_more_warnings(qpdf))
