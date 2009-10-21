@@ -127,6 +127,14 @@ QUtil::binary_stdin()
 #endif
 }
 
+void
+QUtil::setLineBuf(FILE* f)
+{
+#ifndef _WIN32
+    setvbuf(f, (char *) NULL, _IOLBF, 0);
+#endif
+}
+
 char*
 QUtil::getWhoami(char* argv0)
 {

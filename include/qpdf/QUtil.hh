@@ -52,6 +52,10 @@ namespace QUtil
     void binary_stdout();
     QPDF_DLL
     void binary_stdin();
+    // Set stdout to line buffered
+    QPDF_DLL
+    void setLineBuf(FILE*);
+
 
     // May modify argv0
     QPDF_DLL
