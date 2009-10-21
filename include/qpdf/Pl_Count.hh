@@ -24,7 +24,6 @@ class Pl_Count: public Pipeline
     virtual void write(unsigned char*, int);
     DLL_EXPORT
     virtual void finish();
-    DLL_EXPORT
     // Returns the number of bytes written
     DLL_EXPORT
     int getCount() const;
