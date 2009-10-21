@@ -9,14 +9,14 @@
 class Pl_LZWDecoder: public Pipeline
 {
   public:
-    DLL_EXPORT
+    QPDF_DLL
     Pl_LZWDecoder(char const* identifier, Pipeline* next,
 		  bool early_code_change);
-    DLL_EXPORT
+    QPDF_DLL
     virtual ~Pl_LZWDecoder();
-    DLL_EXPORT
+    QPDF_DLL
     virtual void write(unsigned char* buf, int len);
-    DLL_EXPORT
+    QPDF_DLL
     virtual void finish();
 
   private:

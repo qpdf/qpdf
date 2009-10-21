@@ -22,16 +22,16 @@ class Pl_PNGFilter: public Pipeline
     // Encoding is not presently supported
     enum action_e { a_encode, a_decode };
 
-    DLL_EXPORT
+    QPDF_DLL
     Pl_PNGFilter(char const* identifier, Pipeline* next,
 		 action_e action, unsigned int columns,
 		 unsigned int bytes_per_pixel);
-    DLL_EXPORT
+    QPDF_DLL
     virtual ~Pl_PNGFilter();
 
-    DLL_EXPORT
+    QPDF_DLL
     virtual void write(unsigned char* data, int len);
-    DLL_EXPORT
+    QPDF_DLL
     virtual void finish();
 
   private:

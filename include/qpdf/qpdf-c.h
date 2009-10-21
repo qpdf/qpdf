@@ -87,13 +87,13 @@ extern "C" {
     /* Returns dynamically allocated qpdf_data pointer; must be freed
      * by calling qpdf_cleanup.
      */
-    DLL_EXPORT
+    QPDF_DLL
     qpdf_data qpdf_init();
 
     /* Pass a pointer to the qpdf_data pointer created by qpdf_init to
      * clean up resources.
      */
-    DLL_EXPORT
+    QPDF_DLL
     void qpdf_cleanup(qpdf_data* qpdf);
 
     /* ERROR REPORTING */
@@ -102,37 +102,37 @@ extern "C" {
      * pointer to data that will become invalid the next time an error
      * occurs or after this function is called gain.
      */
-    DLL_EXPORT
+    QPDF_DLL
     qpdf_error qpdf_get_error(qpdf_data qpdf);
 
     /* Returns 1 if there are any unretrieved warnings, and zero
      * otherwise.
      */
-    DLL_EXPORT
+    QPDF_DLL
     QPDF_BOOL qpdf_more_warnings(qpdf_data qpdf);
 
     /* If there are any warnings, returns a pointer to the next
      * warning.  Otherwise returns a null pointer.
      */
-    DLL_EXPORT
+    QPDF_DLL
     qpdf_error qpdf_next_warning(qpdf_data qpdf);
 
     /* Extract fields of the error. */
 
     /* Use this function to get a full error message suitable for
      * showing to the user. */
-    DLL_EXPORT
+    QPDF_DLL
     char const* qpdf_get_error_full_text(qpdf_data q, qpdf_error e);
 
     /* Use these functions to extract individual fields from the
      * error; see QPDFExc.hh for details. */
-    DLL_EXPORT
+    QPDF_DLL
     enum qpdf_error_code_e qpdf_get_error_code(qpdf_data q, qpdf_error e);
-    DLL_EXPORT
+    QPDF_DLL
     char const* qpdf_get_error_filename(qpdf_data q, qpdf_error e);
-    DLL_EXPORT
+    QPDF_DLL
     unsigned long qpdf_get_error_file_position(qpdf_data q, qpdf_error e);
-    DLL_EXPORT
+    QPDF_DLL
     char const* qpdf_get_error_message_detail(qpdf_data q, qpdf_error e);
 
     /* By default, warnings are written to stderr.  Passing true to
@@ -140,17 +140,17 @@ extern "C" {
      * stderr.  They will still be available by calls to
      * qpdf_next_warning.
      */
-    DLL_EXPORT
+    QPDF_DLL
     void qpdf_set_suppress_warnings(qpdf_data qpdf, QPDF_BOOL value);
 
     /* READ FUNCTIONS */
 
     /* READ PARAMETER FUNCTIONS -- must be called before qpdf_read */
 
-    DLL_EXPORT
+    QPDF_DLL
     void qpdf_set_ignore_xref_streams(qpdf_data qpdf, QPDF_BOOL value);
 
-    DLL_EXPORT
+    QPDF_DLL
     void qpdf_set_attempt_recovery(qpdf_data qpdf, QPDF_BOOL value);
 
     /* Calling qpdf_read causes processFile to be called in the C++
@@ -158,14 +158,14 @@ extern "C" {
      * only read as needed.  For files without passwords, pass a null
      * pointer as the password.
      */
-    DLL_EXPORT
+    QPDF_DLL
     QPDF_ERROR_CODE qpdf_read(qpdf_data qpdf, char const* filename,
 			      char const* password);
 
     /* Read functions below must be called after qpdf_read. */
 
     /* Return the version of the PDF file. */
-    DLL_EXPORT
+    QPDF_DLL
     char const* qpdf_get_pdf_version(qpdf_data qpdf);
 
     /* Return the user password.  If the file is opened using the
@@ -173,34 +173,34 @@ extern "C" {
      * function.  If the file is opened using the user password, this
      * function will return that user password.
      */
-    DLL_EXPORT
+    QPDF_DLL
     char const* qpdf_get_user_password(qpdf_data qpdf);
 
     /* Indicate whether the input file is linearized. */
-    DLL_EXPORT
+    QPDF_DLL
     QPDF_BOOL qpdf_is_linearized(qpdf_data qpdf);
 
     /* Indicate whether the input file is encrypted. */
-    DLL_EXPORT
+    QPDF_DLL
     QPDF_BOOL qpdf_is_encrypted(qpdf_data qpdf);
 
-    DLL_EXPORT
+    QPDF_DLL
     QPDF_BOOL qpdf_allow_accessibility(qpdf_data qpdf);
-    DLL_EXPORT
+    QPDF_DLL
     QPDF_BOOL qpdf_allow_extract_all(qpdf_data qpdf);
-    DLL_EXPORT
+    QPDF_DLL
     QPDF_BOOL qpdf_allow_print_low_res(qpdf_data qpdf);
-    DLL_EXPORT
+    QPDF_DLL
     QPDF_BOOL qpdf_allow_print_high_res(qpdf_data qpdf);
-    DLL_EXPORT
+    QPDF_DLL
     QPDF_BOOL qpdf_allow_modify_assembly(qpdf_data qpdf);
-    DLL_EXPORT
+    QPDF_DLL
     QPDF_BOOL qpdf_allow_modify_form(qpdf_data qpdf);
-    DLL_EXPORT
+    QPDF_DLL
     QPDF_BOOL qpdf_allow_modify_annotation(qpdf_data qpdf);
-    DLL_EXPORT
+    QPDF_DLL
     QPDF_BOOL qpdf_allow_modify_other(qpdf_data qpdf);
-    DLL_EXPORT
+    QPDF_DLL
     QPDF_BOOL qpdf_allow_modify_all(qpdf_data qpdf);
 
     /* WRITE FUNCTIONS */
@@ -219,72 +219,72 @@ extern "C" {
      * etc.) is lost, so any write parameter functions must be called
      * again.
      */
-    DLL_EXPORT
+    QPDF_DLL
     QPDF_ERROR_CODE qpdf_init_write(qpdf_data qpdf, char const* filename);
 
-    DLL_EXPORT
+    QPDF_DLL
     void qpdf_set_object_stream_mode(qpdf_data qpdf,
 				     enum qpdf_object_stream_e mode);
 
-    DLL_EXPORT
+    QPDF_DLL
     void qpdf_set_stream_data_mode(qpdf_data qpdf,
 				   enum qpdf_stream_data_e mode);
 
-    DLL_EXPORT
+    QPDF_DLL
     void qpdf_set_content_normalization(qpdf_data qpdf, QPDF_BOOL value);
 
-    DLL_EXPORT
+    QPDF_DLL
     void qpdf_set_qdf_mode(qpdf_data qpdf, QPDF_BOOL value);
 
     /* Never use qpdf_set_static_ID except in test suites to suppress
      * generation of a random /ID.
      */
-    DLL_EXPORT
+    QPDF_DLL
     void qpdf_set_static_ID(qpdf_data qpdf, QPDF_BOOL value);
 
     /* Never use qpdf_set_static_aes_IV except in test suites to
      * create predictable AES encrypted output.
      */
-    DLL_EXPORT
+    QPDF_DLL
     void qpdf_set_static_aes_IV(qpdf_data qpdf, QPDF_BOOL value);
 
-    DLL_EXPORT
+    QPDF_DLL
     void qpdf_set_suppress_original_object_IDs(
 	qpdf_data qpdf, QPDF_BOOL value);
 
-    DLL_EXPORT
+    QPDF_DLL
     void qpdf_set_preserve_encryption(qpdf_data qpdf, QPDF_BOOL value);
 
-    DLL_EXPORT
+    QPDF_DLL
     void qpdf_set_r2_encryption_parameters(
 	qpdf_data qpdf, char const* user_password, char const* owner_password,
 	QPDF_BOOL allow_print, QPDF_BOOL allow_modify,
 	QPDF_BOOL allow_extract, QPDF_BOOL allow_annotate);
 
-    DLL_EXPORT
+    QPDF_DLL
     void qpdf_set_r3_encryption_parameters(
 	qpdf_data qpdf, char const* user_password, char const* owner_password,
 	QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
 	enum qpdf_r3_print_e print, enum qpdf_r3_modify_e modify);
 
-    DLL_EXPORT
+    QPDF_DLL
     void qpdf_set_r4_encryption_parameters(
 	qpdf_data qpdf, char const* user_password, char const* owner_password,
 	QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
 	enum qpdf_r3_print_e print, enum qpdf_r3_modify_e modify,
 	QPDF_BOOL encrypt_metadata, QPDF_BOOL use_aes);
 
-    DLL_EXPORT
+    QPDF_DLL
     void qpdf_set_linearization(qpdf_data qpdf, QPDF_BOOL value);
 
-    DLL_EXPORT
+    QPDF_DLL
     void qpdf_set_minimum_pdf_version(qpdf_data qpdf, char const* version);
 
-    DLL_EXPORT
+    QPDF_DLL
     void qpdf_force_pdf_version(qpdf_data qpdf, char const* version);
 
     /* Do actual write operation. */
-    DLL_EXPORT
+    QPDF_DLL
     QPDF_ERROR_CODE qpdf_write(qpdf_data qpdf);
 
 #ifdef __cplusplus

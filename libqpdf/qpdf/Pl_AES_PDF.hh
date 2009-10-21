@@ -12,22 +12,22 @@ class Pl_AES_PDF: public Pipeline
   public:
     // key_data should be a pointer to key_size bytes of data
     static unsigned int const key_size = 16;
-    DLL_EXPORT
+    QPDF_DLL
     Pl_AES_PDF(char const* identifier, Pipeline* next,
 	       bool encrypt, unsigned char const key[key_size]);
-    DLL_EXPORT
+    QPDF_DLL
     virtual ~Pl_AES_PDF();
 
-    DLL_EXPORT
+    QPDF_DLL
     virtual void write(unsigned char* data, int len);
-    DLL_EXPORT
+    QPDF_DLL
     virtual void finish();
 
     // For testing only; PDF always uses CBC
-    DLL_EXPORT
+    QPDF_DLL
     void disableCBC();
     // For testing only: use a fixed initialization vector for CBC
-    DLL_EXPORT
+    QPDF_DLL
     static void useStaticIV();
 
   private:

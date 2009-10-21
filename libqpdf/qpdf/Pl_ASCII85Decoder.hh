@@ -6,13 +6,13 @@
 class Pl_ASCII85Decoder: public Pipeline
 {
   public:
-    DLL_EXPORT
+    QPDF_DLL
     Pl_ASCII85Decoder(char const* identifier, Pipeline* next);
-    DLL_EXPORT
+    QPDF_DLL
     virtual ~Pl_ASCII85Decoder();
-    DLL_EXPORT
+    QPDF_DLL
     virtual void write(unsigned char* buf, int len);
-    DLL_EXPORT
+    QPDF_DLL
     virtual void finish();
 
   private:

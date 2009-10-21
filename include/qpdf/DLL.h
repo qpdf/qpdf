@@ -1,10 +1,10 @@
 #ifndef __QPDF_DLL_HH__
 #define __QPDF_DLL_HH__
 
-#ifdef _WIN32
-# define DLL_EXPORT __declspec(dllexport)
+#if defined(_WIN32) && defined(DLL_EXPORT)
+# define QPDF_DLL __declspec(dllexport)
 #else
-# define DLL_EXPORT
+# define QPDF_DLL
 #endif
 
 #endif /* __QPDF_DLL_HH__ */

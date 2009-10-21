@@ -19,15 +19,15 @@ class Pl_Flate: public Pipeline
 
     enum action_e { a_inflate, a_deflate };
 
-    DLL_EXPORT
+    QPDF_DLL
     Pl_Flate(char const* identifier, Pipeline* next,
 	     action_e action, int out_bufsize = def_bufsize);
-    DLL_EXPORT
+    QPDF_DLL
     virtual ~Pl_Flate();
 
-    DLL_EXPORT
+    QPDF_DLL
     virtual void write(unsigned char* data, int len);
-    DLL_EXPORT
+    QPDF_DLL
     virtual void finish();
 
   private:

@@ -19,15 +19,15 @@ namespace QUtil
 {
     // This is a collection of useful utility functions that don't
     // really go anywhere else.
-    DLL_EXPORT
+    QPDF_DLL
     std::string int_to_string(int, int length = 0);
-    DLL_EXPORT
+    QPDF_DLL
     std::string double_to_string(double, int decimal_places = 0);
 
     // Throw std::runtime_error with a string formed by appending to
     // "description: " the standard string corresponding to the
     // current value of errno.
-    DLL_EXPORT
+    QPDF_DLL
     void throw_system_error(std::string const& description);
 
     // The status argument is assumed to be the return value of a
@@ -35,40 +35,40 @@ namespace QUtil
     // is -1, convert the current value of errno to a
     // std::runtime_error that includes the standard error string.
     // Otherwise, return status.
-    DLL_EXPORT
+    QPDF_DLL
     int os_wrapper(std::string const& description, int status);
 
     // The FILE* argument is assumed to be the return of fopen.  If
     // null, throw std::runtime_error.  Otherwise, return the FILE*
     // argument.
-    DLL_EXPORT
+    QPDF_DLL
     FILE* fopen_wrapper(std::string const&, FILE*);
 
-    DLL_EXPORT
+    QPDF_DLL
     char* copy_string(std::string const&);
 
     // Set stdin, stdout to binary mode
-    DLL_EXPORT
+    QPDF_DLL
     void binary_stdout();
-    DLL_EXPORT
+    QPDF_DLL
     void binary_stdin();
 
     // May modify argv0
-    DLL_EXPORT
+    QPDF_DLL
     char* getWhoami(char* argv0);
 
     // Get the value of an environment variable in a portable fashion.
     // Returns true iff the variable is defined.  If `value' is
     // non-null, initializes it with the value of the variable.
-    DLL_EXPORT
+    QPDF_DLL
     bool get_env(std::string const& var, std::string* value = 0);
 
-    DLL_EXPORT
+    QPDF_DLL
     time_t get_current_time();
 
     // Return a string containing the byte representation of the UTF-8
     // encoding for the unicode value passed in.
-    DLL_EXPORT
+    QPDF_DLL
     std::string toUTF8(unsigned long uval);
 };
 

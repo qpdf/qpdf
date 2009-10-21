@@ -33,8 +33,23 @@ define c_compile
 		-c $(1) -o $(call c_src_to_obj,$(1))
 endef
 
-libcompile = $(compile)
-c_libcompile = $(c_compile)
+#                       1   2
+# Usage: $(call libcompile,src,includes)
+define libcompile
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -DDLL_EXPORT \
+		$(call depflags,$(basename $(call src_to_obj,$(1)))) \
+		$(foreach I,$(2),-I$(I)) \
+		-c $(1) -o $(call src_to_obj,$(1))
+endef
+
+#                       1   2
+# Usage: $(call c_libcompile,src,includes)
+define c_libcompile
+	$(CC) $(CPPFLAGS) $(CFLAGS) -DDLL_EXPORT \
+		$(call depflags,$(basename $(call src_to_obj,$(1)))) \
+		$(foreach I,$(2),-I$(I)) \
+		-c $(1) -o $(call c_src_to_obj,$(1))
+endef
 
 #                        1    2
 # Usage: $(call makeslib,objs,library)

@@ -15,15 +15,15 @@
 class Pl_MD5: public Pipeline
 {
   public:
-    DLL_EXPORT
+    QPDF_DLL
     Pl_MD5(char const* identifier, Pipeline* next);
-    DLL_EXPORT
+    QPDF_DLL
     virtual ~Pl_MD5();
-    DLL_EXPORT
+    QPDF_DLL
     virtual void write(unsigned char*, int);
-    DLL_EXPORT
+    QPDF_DLL
     virtual void finish();
-    DLL_EXPORT
+    QPDF_DLL
     std::string getHexDigest();
 
   private:

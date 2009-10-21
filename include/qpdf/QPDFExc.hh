@@ -15,13 +15,13 @@
 class QPDFExc: public std::runtime_error
 {
   public:
-    DLL_EXPORT
+    QPDF_DLL
     QPDFExc(qpdf_error_code_e error_code,
 	    std::string const& filename,
 	    std::string const& object,
 	    off_t offset,
 	    std::string const& message);
-    DLL_EXPORT
+    QPDF_DLL
     virtual ~QPDFExc() throw ();
 
     // To get a complete error string, call what(), provided by
@@ -34,15 +34,15 @@ class QPDFExc: public std::runtime_error
     // the underlying issue, but it is more programmer-friendly than
     // trying to parse a string that is subject to change.
 
-    DLL_EXPORT
+    QPDF_DLL
     qpdf_error_code_e getErrorCode() const;
-    DLL_EXPORT
+    QPDF_DLL
     std::string const& getFilename() const;
-    DLL_EXPORT
+    QPDF_DLL
     std::string const& getObject() const;
-    DLL_EXPORT
+    QPDF_DLL
     off_t getFilePosition() const;
-    DLL_EXPORT
+    QPDF_DLL
     std::string const& getMessageDetail() const;
 
   private:

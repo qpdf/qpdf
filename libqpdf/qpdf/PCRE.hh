@@ -25,7 +25,7 @@ class PCRE
     class NoBackref: public std::logic_error
     {
       public:
-	DLL_EXPORT
+	QPDF_DLL
 	NoBackref();
 	virtual ~NoBackref() throw() {}
     };
@@ -34,15 +34,15 @@ class PCRE
     {
 	friend class PCRE;
       public:
-	DLL_EXPORT
+	QPDF_DLL
 	Match(int nbackrefs, char const* subject);
-	DLL_EXPORT
+	QPDF_DLL
 	Match(Match const&);
-	DLL_EXPORT
+	QPDF_DLL
 	Match& operator=(Match const&);
-	DLL_EXPORT
+	QPDF_DLL
 	~Match();
-	DLL_EXPORT
+	QPDF_DLL
 	operator bool();
 
 	// All the back reference accessing routines may throw the
@@ -54,13 +54,13 @@ class PCRE
 	// and not matching at all.
 
 	// see getMatch flags below
-	DLL_EXPORT
+	QPDF_DLL
 	std::string getMatch(int n, int flags = 0);
-	DLL_EXPORT
+	QPDF_DLL
 	void getOffsetLength(int n, int& offset, int& length);
-	DLL_EXPORT
+	QPDF_DLL
 	int getOffset(int n);
-	DLL_EXPORT
+	QPDF_DLL
 	int getLength(int n);
 
 	// nMatches returns the number of available matches including
@@ -70,7 +70,7 @@ class PCRE
 	// will return the whole string, getMatch(1) will return the
 	// text that matched the backreference, and getMatch(2) will
 	// throw an exception because it is out of range.
-	DLL_EXPORT
+	QPDF_DLL
 	int nMatches() const;
 
 	// Flags for getMatch
@@ -93,16 +93,16 @@ class PCRE
 
     // The value passed in as options is passed to pcre_exec.  See man
     // pcreapi for details.
-	DLL_EXPORT
+    QPDF_DLL
     PCRE(char const* pattern, int options = 0);
-	DLL_EXPORT
+    QPDF_DLL
     ~PCRE();
 
-	DLL_EXPORT
+    QPDF_DLL
     Match match(char const* subject, int options = 0, int startoffset = 0,
 		int size = -1);
 
-	DLL_EXPORT
+    QPDF_DLL
     static void test(int n = 0);
 
   private:

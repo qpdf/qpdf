@@ -26,58 +26,58 @@ class QPDF;
 class QPDFObjectHandle
 {
   public:
-    DLL_EXPORT
+    QPDF_DLL
     QPDFObjectHandle();
-    DLL_EXPORT
+    QPDF_DLL
     bool isInitialized() const;
 
     // Exactly one of these will return true for any object.
-    DLL_EXPORT
+    QPDF_DLL
     bool isBool();
-    DLL_EXPORT
+    QPDF_DLL
     bool isNull();
-    DLL_EXPORT
+    QPDF_DLL
     bool isInteger();
-    DLL_EXPORT
+    QPDF_DLL
     bool isReal();
-    DLL_EXPORT
+    QPDF_DLL
     bool isName();
-    DLL_EXPORT
+    QPDF_DLL
     bool isString();
-    DLL_EXPORT
+    QPDF_DLL
     bool isArray();
-    DLL_EXPORT
+    QPDF_DLL
     bool isDictionary();
-    DLL_EXPORT
+    QPDF_DLL
     bool isStream();
 
     // This returns true in addition to the query for the specific
     // type for indirect objects.
-    DLL_EXPORT
+    QPDF_DLL
     bool isIndirect();
 
     // True for everything except array, dictionary, and stream
-    DLL_EXPORT
+    QPDF_DLL
     bool isScalar();
 
     // Public factory methods
 
-    DLL_EXPORT
+    QPDF_DLL
     static QPDFObjectHandle newNull();
-    DLL_EXPORT
+    QPDF_DLL
     static QPDFObjectHandle newBool(bool value);
-    DLL_EXPORT
+    QPDF_DLL
     static QPDFObjectHandle newInteger(int value);
-    DLL_EXPORT
+    QPDF_DLL
     static QPDFObjectHandle newReal(std::string const& value);
-    DLL_EXPORT
+    QPDF_DLL
     static QPDFObjectHandle newName(std::string const& name);
-    DLL_EXPORT
+    QPDF_DLL
     static QPDFObjectHandle newString(std::string const& str);
-    DLL_EXPORT
+    QPDF_DLL
     static QPDFObjectHandle newArray(
 	std::vector<QPDFObjectHandle> const& items);
-    DLL_EXPORT
+    QPDF_DLL
     static QPDFObjectHandle newDictionary(
 	std::map<std::string, QPDFObjectHandle> const& items);
 
@@ -86,78 +86,78 @@ class QPDFObjectHandle
     // type, an exception is thrown.
 
     // Methods for bool objects
-    DLL_EXPORT
+    QPDF_DLL
     bool getBoolValue();
 
     // Methods for integer objects
-    DLL_EXPORT
+    QPDF_DLL
     int getIntValue();
 
     // Methods for real objects
-    DLL_EXPORT
+    QPDF_DLL
     std::string getRealValue();
 
     // Methods that work for both integer and real objects
-    DLL_EXPORT
+    QPDF_DLL
     bool isNumber();
-    DLL_EXPORT
+    QPDF_DLL
     double getNumericValue();
 
     // Methods for name objects; see also name and array objects
-    DLL_EXPORT
+    QPDF_DLL
     std::string getName();
 
     // Methods for string objects
-    DLL_EXPORT
+    QPDF_DLL
     std::string getStringValue();
-    DLL_EXPORT
+    QPDF_DLL
     std::string getUTF8Value();
 
     // Methods for array objects; see also name and array objects
-    DLL_EXPORT
+    QPDF_DLL
     int getArrayNItems();
-    DLL_EXPORT
+    QPDF_DLL
     QPDFObjectHandle getArrayItem(int n);
 
     // Methods for dictionary objects
-    DLL_EXPORT
+    QPDF_DLL
     bool hasKey(std::string const&);
-    DLL_EXPORT
+    QPDF_DLL
     QPDFObjectHandle getKey(std::string const&);
-    DLL_EXPORT
+    QPDF_DLL
     std::set<std::string> getKeys();
 
     // Methods for name and array objects
-    DLL_EXPORT
+    QPDF_DLL
     bool isOrHasName(std::string const&);
 
     // Mutator methods.  Use with caution.
 
     // Recursively copy this object, making it direct.  Throws an
     // exception if a loop is detected or any sub-object is a stream.
-    DLL_EXPORT
+    QPDF_DLL
     void makeDirect();
 
     // Mutator methods for array objects
-    DLL_EXPORT
+    QPDF_DLL
     void setArrayItem(int, QPDFObjectHandle const&);
 
     // Mutator methods for dictionary objects
 
     // Replace value of key, adding it if it does not exist
-    DLL_EXPORT
+    QPDF_DLL
     void replaceKey(std::string const& key, QPDFObjectHandle const&);
     // Remove key, doing nothing if key does not exist
-    DLL_EXPORT
+    QPDF_DLL
     void removeKey(std::string const& key);
 
     // Methods for stream objects
-    DLL_EXPORT
+    QPDF_DLL
     QPDFObjectHandle getDict();
 
     // Returns filtered (uncompressed) stream data.  Throws an
     // exception if the stream is filtered and we can't decode it.
-    DLL_EXPORT
+    QPDF_DLL
     PointerHolder<Buffer> getStreamData();
 
     // Write stream data through the given pipeline.  A null pipeline
@@ -177,19 +177,19 @@ class QPDFObjectHandle
     // value of this function to determine whether or not the /Filter
     // and /DecodeParms keys in the stream dictionary should be
     // replaced if writing a new stream object.
-    DLL_EXPORT
+    QPDF_DLL
     bool pipeStreamData(Pipeline*, bool filter,
 			bool normalize, bool compress);
 
     // return 0 for direct objects
-    DLL_EXPORT
+    QPDF_DLL
     int getObjectID() const;
-    DLL_EXPORT
+    QPDF_DLL
     int getGeneration() const;
 
-    DLL_EXPORT
+    QPDF_DLL
     std::string unparse();
-    DLL_EXPORT
+    QPDF_DLL
     std::string unparseResolved();
 
     // Convenience routines for commonly performed functions
@@ -199,7 +199,7 @@ class QPDFObjectHandle
     // function does not presently support inherited resources.  See
     // comment in the source for details.  Return value is a map from
     // XObject name to the image object, which is always a stream.
-    DLL_EXPORT
+    QPDF_DLL
     std::map<std::string, QPDFObjectHandle> getPageImages();
 
     // Throws an exception if this is not a Page object.  Returns a
@@ -207,7 +207,7 @@ class QPDFObjectHandle
     // the given page.  This routine allows the caller to not care
     // whether there are one or more than one content streams for a
     // page.
-    DLL_EXPORT
+    QPDF_DLL
     std::vector<QPDFObjectHandle> getPageContents();
 
     // Initializers for objects.  This Factory class gives the QPDF

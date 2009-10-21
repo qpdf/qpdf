@@ -12,7 +12,7 @@
 
 namespace QTC
 {
-    DLL_EXPORT
+    QPDF_DLL
     void TC(char const* const scope, char const* const ccase, int n = 0);
 };
 

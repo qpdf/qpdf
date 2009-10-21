@@ -84,7 +84,7 @@ class QPDFTokenizer
 	std::string error_message;
     };
 
-    DLL_EXPORT
+    QPDF_DLL
     QPDFTokenizer();
 
     // PDF files with version < 1.2 allowed the pound character
@@ -92,7 +92,7 @@ class QPDFTokenizer
     // character was allowed only when followed by two hexadecimal
     // digits.  This method should be called when parsing a PDF file
     // whose version is older than 1.2.
-    DLL_EXPORT
+    QPDF_DLL
     void allowPoundAnywhereInName();
 
     // Mode of operation:
@@ -103,23 +103,23 @@ class QPDFTokenizer
 
     // It these are called when a token is available, an exception
     // will be thrown.
-    DLL_EXPORT
+    QPDF_DLL
     void presentCharacter(char ch);
-    DLL_EXPORT
+    QPDF_DLL
     void presentEOF();
 
     // If a token is available, return true and initialize token with
     // the token, unread_char with whether or not we have to unread
     // the last character, and if unread_char, ch with the character
     // to unread.
-    DLL_EXPORT
+    QPDF_DLL
     bool getToken(Token& token, bool& unread_char, char& ch);
 
     // This function returns true of the current character is between
     // tokens (i.e., white space that is not part of a string) or is
     // part of a comment.  A tokenizing filter can call this to
     // determine whether to output the character.
-    DLL_EXPORT
+    QPDF_DLL
     bool betweenTokens();
 
   private:

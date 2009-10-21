@@ -13,50 +13,50 @@ class MD5
   public:
     typedef unsigned char Digest[16];
 
-    DLL_EXPORT
+    QPDF_DLL
     MD5();
-    DLL_EXPORT
+    QPDF_DLL
     void reset();
 
     // encodes string and finalizes
-    DLL_EXPORT
+    QPDF_DLL
     void encodeString(char const* input_string);
 
     // encodes file and finalizes
-    DLL_EXPORT
+    QPDF_DLL
     void encodeFile(char const* filename, int up_to_size = -1);
 
     // appends string to current md5 object
-    DLL_EXPORT
+    QPDF_DLL
     void appendString(char const* input_string);
 
     // appends arbitrary data to current md5 object
-    DLL_EXPORT
+    QPDF_DLL
     void encodeDataIncrementally(char const* input_data, int len);
 
     // computes a raw digest
-    DLL_EXPORT
+    QPDF_DLL
     void digest(Digest);
 
     // prints the digest to stdout terminated with \r\n (primarily for
     // testing)
-    DLL_EXPORT
+    QPDF_DLL
     void print();
 
     // returns the digest as a hexadecimal string
-    DLL_EXPORT
+    QPDF_DLL
     std::string unparse();
 
     // Convenience functions
-    DLL_EXPORT
+    QPDF_DLL
     static std::string getDataChecksum(char const* buf, int len);
-    DLL_EXPORT
+    QPDF_DLL
     static std::string getFileChecksum(char const* filename,
 				       int up_to_size = -1);
-    DLL_EXPORT
+    QPDF_DLL
     static bool checkDataChecksum(char const* const checksum,
 				  char const* buf, int len);
-    DLL_EXPORT
+    QPDF_DLL
     static bool checkFileChecksum(char const* const checksum,
 				  char const* filename, int up_to_size = -1);
 

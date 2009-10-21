@@ -23,14 +23,14 @@ class Pl_StdioFile: public Pipeline
   public:
     // f is externally maintained; this class just writes to and
     // flushes it.  It does not close it.
-    DLL_EXPORT
+    QPDF_DLL
     Pl_StdioFile(char const* identifier, FILE* f);
-    DLL_EXPORT
+    QPDF_DLL
     virtual ~Pl_StdioFile();
 
-    DLL_EXPORT
+    QPDF_DLL
     virtual void write(unsigned char* buf, int len);
-    DLL_EXPORT
+    QPDF_DLL
     virtual void finish();
 
   private:

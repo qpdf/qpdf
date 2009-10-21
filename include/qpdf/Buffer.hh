@@ -13,21 +13,21 @@
 class Buffer
 {
   public:
-    DLL_EXPORT
+    QPDF_DLL
     Buffer();
-    DLL_EXPORT
+    QPDF_DLL
     Buffer(unsigned long size);
-    DLL_EXPORT
+    QPDF_DLL
     Buffer(Buffer const&);
-    DLL_EXPORT
+    QPDF_DLL
     Buffer& operator=(Buffer const&);
-    DLL_EXPORT
+    QPDF_DLL
     ~Buffer();
-    DLL_EXPORT
+    QPDF_DLL
     unsigned long getSize() const;
-    DLL_EXPORT
+    QPDF_DLL
     unsigned char const* getBuffer() const;
-    DLL_EXPORT
+    QPDF_DLL
     unsigned char* getBuffer();
 
   private:

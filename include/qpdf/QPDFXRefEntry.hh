@@ -19,18 +19,18 @@ class QPDFXRefEntry
     // 1 = "uncompressed"; field 1 = offset
     // 2 = "compressed"; field 1 = object stream number, field 2 = index
 
-    DLL_EXPORT
+    QPDF_DLL
     QPDFXRefEntry();
-    DLL_EXPORT
+    QPDF_DLL
     QPDFXRefEntry(int type, int field1, int field2);
 
-    DLL_EXPORT
+    QPDF_DLL
     int getType() const;
-    DLL_EXPORT
+    QPDF_DLL
     int getOffset() const;	// only for type 1
-    DLL_EXPORT
+    QPDF_DLL
     int getObjStreamNumber() const; // only for type 2
-    DLL_EXPORT
+    QPDF_DLL
     int getObjStreamIndex() const;	// only for type 2
 
   private:

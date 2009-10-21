@@ -42,9 +42,9 @@ class QPDFWriter
     // useful for tracking down problems.  If your application doesn't
     // want the partially written file to be left behind, you should
     // delete it the eventual call to write fails.
-    DLL_EXPORT
+    QPDF_DLL
     QPDFWriter(QPDF& pdf, char const* filename);
-    DLL_EXPORT
+    QPDF_DLL
     ~QPDFWriter();
 
     // Set the value of object stream mode.  In disable mode, we never
@@ -54,7 +54,7 @@ class QPDFWriter
     // generate a conventional cross-reference table if there are no
     // object streams and a cross-reference stream if there are object
     // streams.  The default is o_preserve.
-    DLL_EXPORT
+    QPDF_DLL
     void setObjectStreamMode(qpdf_object_stream_e);
 
     // Set value of stream data mode.  In uncompress mode, we attempt
@@ -62,7 +62,7 @@ class QPDFWriter
     // preserve any filtering applied to streams.  In compress mode,
     // if we can apply all filters and the stream is not already
     // optimally compressed, recompress the stream.
-    DLL_EXPORT
+    QPDF_DLL
     void setStreamDataMode(qpdf_stream_data_e);
 
     // Set value of content stream normalization.  The default is
@@ -72,7 +72,7 @@ class QPDFWriter
     // damage the content stream.  This flag should be used only for
     // debugging and experimenting with PDF content streams.  Never
     // use it for production files.
-    DLL_EXPORT
+    QPDF_DLL
     void setContentNormalization(bool);
 
     // Set QDF mode.  QDF mode causes special "pretty printing" of
@@ -80,7 +80,7 @@ class QPDFWriter
     // Resulting PDF files can be edited in a text editor and then run
     // through fix-qdf to update cross reference tables and stream
     // lengths.
-    DLL_EXPORT
+    QPDF_DLL
     void setQDFMode(bool);
 
     // Set the minimum PDF version.  If the PDF version of the input
@@ -92,7 +92,7 @@ class QPDFWriter
     // QPDFWriter automatically sets the minimum version to 1.4 when
     // R3 encryption parameters are used, and to 1.5 when object
     // streams are used.
-    DLL_EXPORT
+    QPDF_DLL
     void setMinimumPDFVersion(std::string const&);
 
     // Force the PDF version of the output file to be a given version.
@@ -110,32 +110,32 @@ class QPDFWriter
     // that type of encryption will explicitly disable decryption.
     // Additionally, forcing to a version below 1.5 will disable
     // object streams.
-    DLL_EXPORT
+    QPDF_DLL
     void forcePDFVersion(std::string const&);
 
     // Cause a static /ID value to be generated.  Use only in test
     // suites.
-    DLL_EXPORT
+    QPDF_DLL
     void setStaticID(bool);
 
     // Use a fixed initialization vector for AES-CBC encryption.  This
     // is not secure.  It should be used only in test suites for
     // creating predictable encrypted output.
-    DLL_EXPORT
+    QPDF_DLL
     void setStaticAesIV(bool);
 
     // Suppress inclusion of comments indicating original object IDs
     // when writing QDF files.  This can also be useful for testing,
     // particularly when using comparison of two qdf files to
     // determine whether two PDF files have identical content.
-    DLL_EXPORT
+    QPDF_DLL
     void setSuppressOriginalObjectIDs(bool);
 
     // Preserve encryption.  The default is true unless prefilering,
     // content normalization, or qdf mode has been selected in which
     // case encryption is never preserved.  Encryption is also not
     // preserved if we explicitly set encryption parameters.
-    DLL_EXPORT
+    QPDF_DLL
     void setPreserveEncryption(bool);
 
     // Set up for encrypted output.  Disables stream prefiltering and
@@ -144,17 +144,17 @@ class QPDFWriter
     // encryption parameters pushes the PDF version number to at least
     // 1.4, and setting R4 parameters pushes the version to at least
     // 1.5, or if AES is used, 1.6.
-    DLL_EXPORT
+    QPDF_DLL
     void setR2EncryptionParameters(
 	char const* user_password, char const* owner_password,
 	bool allow_print, bool allow_modify,
 	bool allow_extract, bool allow_annotate);
-    DLL_EXPORT
+    QPDF_DLL
     void setR3EncryptionParameters(
 	char const* user_password, char const* owner_password,
 	bool allow_accessibility, bool allow_extract,
 	qpdf_r3_print_e print, qpdf_r3_modify_e modify);
-    DLL_EXPORT
+    QPDF_DLL
     void setR4EncryptionParameters(
 	char const* user_password, char const* owner_password,
 	bool allow_accessibility, bool allow_extract,
@@ -163,16 +163,13 @@ class QPDFWriter
 
     // Create linearized output.  Disables qdf mode, content
     // normalization, and stream prefiltering.
-    DLL_EXPORT
+    QPDF_DLL
     void setLinearization(bool);
 
-    DLL_EXPORT
+    QPDF_DLL
     void write();
 
   private:
-    QPDFWriter(QPDFWriter const&);
-    QPDFWriter& operator=(QPDFWriter const&);
-
     // flags used by unparseObject
     static int const f_stream = 	1 << 0;
     static int const f_filtered =	1 << 1;

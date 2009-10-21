@@ -8,13 +8,13 @@
 class BitStream
 {
   public:
-    DLL_EXPORT
+    QPDF_DLL
     BitStream(unsigned char const* p, int nbytes);
-    DLL_EXPORT
+    QPDF_DLL
     void reset();
-    DLL_EXPORT
+    QPDF_DLL
     unsigned long getBits(int nbits);
-    DLL_EXPORT
+    QPDF_DLL
     void skipToNextByte();
 
   private:
