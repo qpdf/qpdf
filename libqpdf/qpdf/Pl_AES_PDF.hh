@@ -7,21 +7,27 @@
 // This pipeline implements AES-128 with CBC and block padding as
 // specified in the PDF specification.
 
-class DLL_EXPORT Pl_AES_PDF: public Pipeline
+class Pl_AES_PDF: public Pipeline
 {
   public:
     // key_data should be a pointer to key_size bytes of data
     static unsigned int const key_size = 16;
+    DLL_EXPORT
     Pl_AES_PDF(char const* identifier, Pipeline* next,
 	       bool encrypt, unsigned char const key[key_size]);
+    DLL_EXPORT
     virtual ~Pl_AES_PDF();
 
+    DLL_EXPORT
     virtual void write(unsigned char* data, int len);
+    DLL_EXPORT
     virtual void finish();
 
     // For testing only; PDF always uses CBC
+    DLL_EXPORT
     void disableCBC();
     // For testing only: use a fixed initialization vector for CBC
+    DLL_EXPORT
     static void useStaticIV();
 
   private:

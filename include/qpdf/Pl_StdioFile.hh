@@ -18,15 +18,19 @@
 // This pipeline is reusable.
 //
 
-class DLL_EXPORT Pl_StdioFile: public Pipeline
+class Pl_StdioFile: public Pipeline
 {
   public:
     // f is externally maintained; this class just writes to and
     // flushes it.  It does not close it.
+    DLL_EXPORT
     Pl_StdioFile(char const* identifier, FILE* f);
+    DLL_EXPORT
     virtual ~Pl_StdioFile();
 
+    DLL_EXPORT
     virtual void write(unsigned char* buf, int len);
+    DLL_EXPORT
     virtual void finish();
 
   private:

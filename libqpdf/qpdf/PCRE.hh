@@ -17,7 +17,7 @@
 // Note: this class does not encapsulate all features of the PCRE
 // package -- only those that I actually need right now are here.
 
-class DLL_EXPORT PCRE
+class PCRE
 {
   public:
     // This is thrown when an attempt is made to access a non-existent
@@ -25,6 +25,7 @@ class DLL_EXPORT PCRE
     class NoBackref: public std::logic_error
     {
       public:
+	DLL_EXPORT
 	NoBackref();
 	virtual ~NoBackref() throw() {}
     };
@@ -33,10 +34,15 @@ class DLL_EXPORT PCRE
     {
 	friend class PCRE;
       public:
+	DLL_EXPORT
 	Match(int nbackrefs, char const* subject);
+	DLL_EXPORT
 	Match(Match const&);
+	DLL_EXPORT
 	Match& operator=(Match const&);
+	DLL_EXPORT
 	~Match();
+	DLL_EXPORT
 	operator bool();
 
 	// All the back reference accessing routines may throw the
@@ -48,9 +54,13 @@ class DLL_EXPORT PCRE
 	// and not matching at all.
 
 	// see getMatch flags below
+	DLL_EXPORT
 	std::string getMatch(int n, int flags = 0);
+	DLL_EXPORT
 	void getOffsetLength(int n, int& offset, int& length);
+	DLL_EXPORT
 	int getOffset(int n);
+	DLL_EXPORT
 	int getLength(int n);
 
 	// nMatches returns the number of available matches including
@@ -60,6 +70,7 @@ class DLL_EXPORT PCRE
 	// will return the whole string, getMatch(1) will return the
 	// text that matched the backreference, and getMatch(2) will
 	// throw an exception because it is out of range.
+	DLL_EXPORT
 	int nMatches() const;
 
 	// Flags for getMatch
@@ -82,12 +93,16 @@ class DLL_EXPORT PCRE
 
     // The value passed in as options is passed to pcre_exec.  See man
     // pcreapi for details.
+	DLL_EXPORT
     PCRE(char const* pattern, int options = 0);
+	DLL_EXPORT
     ~PCRE();
 
+	DLL_EXPORT
     Match match(char const* subject, int options = 0, int startoffset = 0,
 		int size = -1);
 
+	DLL_EXPORT
     static void test(int n = 0);
 
   private:

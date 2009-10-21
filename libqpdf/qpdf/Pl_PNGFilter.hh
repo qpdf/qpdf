@@ -16,18 +16,22 @@
 
 #include <qpdf/Pipeline.hh>
 
-class DLL_EXPORT Pl_PNGFilter: public Pipeline
+class Pl_PNGFilter: public Pipeline
 {
   public:
     // Encoding is not presently supported
     enum action_e { a_encode, a_decode };
 
+    DLL_EXPORT
     Pl_PNGFilter(char const* identifier, Pipeline* next,
 		 action_e action, unsigned int columns,
 		 unsigned int bytes_per_pixel);
+    DLL_EXPORT
     virtual ~Pl_PNGFilter();
 
+    DLL_EXPORT
     virtual void write(unsigned char* data, int len);
+    DLL_EXPORT
     virtual void finish();
 
   private:

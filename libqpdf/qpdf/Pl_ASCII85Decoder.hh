@@ -3,12 +3,16 @@
 
 #include <qpdf/Pipeline.hh>
 
-class DLL_EXPORT Pl_ASCII85Decoder: public Pipeline
+class Pl_ASCII85Decoder: public Pipeline
 {
   public:
+    DLL_EXPORT
     Pl_ASCII85Decoder(char const* identifier, Pipeline* next);
+    DLL_EXPORT
     virtual ~Pl_ASCII85Decoder();
+    DLL_EXPORT
     virtual void write(unsigned char* buf, int len);
+    DLL_EXPORT
     virtual void finish();
 
   private:

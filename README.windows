@@ -68,6 +68,12 @@ and then
 
   make
 
+NOTE: automated dependencies are not generated with the msvc build.
+If you're planning on making modifications, you should probably work
+with mingw.  If there is a need, I can add dependency information to
+the msvc build, but since I only use it for generating release
+versions, I haven't bothered.
+
 The -DHAVE_VSNPRINTF is really only required for things that include
 zutil.h from zlib.  You don't have to worry about this when compiling
 against qpdf with MSVC -- only when building zlib.  It's harmless to

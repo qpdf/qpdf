@@ -10,7 +10,7 @@
 
 #include <qpdf/DLL.h>
 
-class DLL_EXPORT QPDFXRefEntry
+class QPDFXRefEntry
 {
   public:
     // Type constants are from the PDF spec section
@@ -19,12 +19,18 @@ class DLL_EXPORT QPDFXRefEntry
     // 1 = "uncompressed"; field 1 = offset
     // 2 = "compressed"; field 1 = object stream number, field 2 = index
 
+    DLL_EXPORT
     QPDFXRefEntry();
+    DLL_EXPORT
     QPDFXRefEntry(int type, int field1, int field2);
 
+    DLL_EXPORT
     int getType() const;
+    DLL_EXPORT
     int getOffset() const;	// only for type 1
+    DLL_EXPORT
     int getObjStreamNumber() const; // only for type 2
+    DLL_EXPORT
     int getObjStreamIndex() const;	// only for type 2
 
   private:

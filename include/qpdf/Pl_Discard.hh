@@ -16,12 +16,16 @@
 
 #include <qpdf/Pipeline.hh>
 
-class DLL_EXPORT Pl_Discard: public Pipeline
+class Pl_Discard: public Pipeline
 {
   public:
+    DLL_EXPORT
     Pl_Discard();
+    DLL_EXPORT
     virtual ~Pl_Discard();
+    DLL_EXPORT
     virtual void write(unsigned char*, int);
+    DLL_EXPORT
     virtual void finish();
 };
 

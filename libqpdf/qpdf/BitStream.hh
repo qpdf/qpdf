@@ -5,12 +5,16 @@
 
 #include <qpdf/DLL.h>
 
-class DLL_EXPORT BitStream
+class BitStream
 {
   public:
+    DLL_EXPORT
     BitStream(unsigned char const* p, int nbytes);
+    DLL_EXPORT
     void reset();
+    DLL_EXPORT
     unsigned long getBits(int nbits);
+    DLL_EXPORT
     void skipToNextByte();
 
   private:

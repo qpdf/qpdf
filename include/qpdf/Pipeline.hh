@@ -33,20 +33,25 @@
 #include <qpdf/DLL.h>
 #include <string>
 
-class DLL_EXPORT Pipeline
+class Pipeline
 {
   public:
+    DLL_EXPORT
     Pipeline(char const* identifier, Pipeline* next);
 
+    DLL_EXPORT
     virtual ~Pipeline();
 
     // Subclasses should implement write and finish to do their jobs
     // and then, if they are not end-of-line pipelines, call
     // getNext()->write or getNext()->finish.
+    DLL_EXPORT
     virtual void write(unsigned char* data, int len) = 0;
+    DLL_EXPORT
     virtual void finish() = 0;
 
   protected:
+    DLL_EXPORT
     Pipeline* getNext(bool allow_null = false);
     std::string identifier;
 
