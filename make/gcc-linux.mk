@@ -80,3 +80,8 @@ endef
 define makebin
 	$(CXX) $(CXXFLAGS) $(1) -o $(2) $(LDFLAGS) $(3) $(4)
 endef
+
+# Install target
+
+install: all
+	@echo Automated installation is not supported for buildrules=$(BUILDRULES)

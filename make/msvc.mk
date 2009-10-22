@@ -88,3 +88,9 @@ define makebin
 			-outputresource:$(2)\;2; \
 	fi
 endef
+
+# Install target
+
+INSTALL_DIR = install-msvc
+include make/installwin.mk
+install: installwin

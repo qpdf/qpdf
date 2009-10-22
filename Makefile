@@ -120,7 +120,9 @@ all: $(ALL_TARGETS) ;
 
 check: $(TEST_TARGETS)
 
-install_docs::
+# Install targets are in the make directory in the rules-specific make
+# fragments.
+
 install: all
 	./mkinstalldirs $(DESTDIR)$(libdir)
 	./mkinstalldirs $(DESTDIR)$(bindir)

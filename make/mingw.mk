@@ -72,3 +72,11 @@ endef
 define makebin
 	$(CXX) $(CXXFLAGS) $(1) -o $(2) $(3) $(4)
 endef
+
+# Install target
+
+INSTALL_DIR = install-mingw
+include make/installwin.mk
+install: installwin
+	strip $(INSTALL_DIR)/bin/*.exe
+	strip $(INSTALL_DIR)/bin/*.dll

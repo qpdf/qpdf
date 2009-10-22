@@ -89,3 +89,30 @@ endef
 define makebin
 	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(1) -o $(2) $(3) $(4)
 endef
+
+# Install target
+
+install: all
+	./mkinstalldirs $(DESTDIR)$(libdir)
+	./mkinstalldirs $(DESTDIR)$(bindir)
+	./mkinstalldirs $(DESTDIR)$(includedir)/qpdf
+	./mkinstalldirs $(DESTDIR)$(docdir)
+	./mkinstalldirs $(DESTDIR)$(mandir)/man1
+	$(LIBTOOL) --mode=install install -s -c \
+		libqpdf/$(OUTPUT_DIR)/libqpdf.la \
+		$(DESTDIR)$(libdir)/libqpdf.la
+	$(LIBTOOL) --finish $(DESTDIR)$(libdir)
+	$(RM) $(DESTDIR)$(libdir)/libqpdf.la
+	$(LIBTOOL) --mode=install install -s -c \
+		qpdf/$(OUTPUT_DIR)/qpdf \
+		$(DESTDIR)$(bindir)/qpdf
+	$(LIBTOOL) --mode=install install -s -c \
+		zlib-flate/$(OUTPUT_DIR)/zlib-flate \
+		$(DESTDIR)$(bindir)/zlib-flate
+	cp qpdf/fix-qdf $(DESTDIR)$(bindir)
+	cp include/qpdf/*.h $(DESTDIR)$(includedir)/qpdf
+	cp include/qpdf/*.hh $(DESTDIR)$(includedir)/qpdf
+	cp doc/stylesheet.css $(DESTDIR)$(docdir)
+	cp doc/qpdf-manual.html $(DESTDIR)$(docdir)
+	cp doc/qpdf-manual.pdf $(DESTDIR)$(docdir)
+	cp doc/*.1 $(DESTDIR)$(mandir)/man1
