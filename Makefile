@@ -131,6 +131,7 @@ install: all
 		libqpdf/$(OUTPUT_DIR)/libqpdf.la \
 		$(DESTDIR)$(libdir)/libqpdf.la
 	$(LIBTOOL) --finish $(DESTDIR)$(libdir)
+	$(RM) $(DESTDIR)$(libdir)/libqpdf.la
 	$(LIBTOOL) --mode=install install -s -c \
 		qpdf/$(OUTPUT_DIR)/qpdf \
 		$(DESTDIR)$(bindir)/qpdf
@@ -138,6 +139,7 @@ install: all
 		zlib-flate/$(OUTPUT_DIR)/zlib-flate \
 		$(DESTDIR)$(bindir)/zlib-flate
 	cp qpdf/fix-qdf $(DESTDIR)$(bindir)
+	cp include/qpdf/*.h $(DESTDIR)$(includedir)/qpdf
 	cp include/qpdf/*.hh $(DESTDIR)$(includedir)/qpdf
 	cp doc/stylesheet.css $(DESTDIR)$(docdir)
 	cp doc/qpdf-manual.html $(DESTDIR)$(docdir)
