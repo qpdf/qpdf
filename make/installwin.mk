@@ -1,5 +1,6 @@
 installwin: all
 	$(RM) -r $(INSTALL_DIR)
+	mkdir $(INSTALL_DIR)
 	mkdir $(INSTALL_DIR)/bin
 	mkdir $(INSTALL_DIR)/lib
 	mkdir $(INSTALL_DIR)/include
