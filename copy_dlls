@@ -19,7 +19,7 @@ while (<O>)
     {
 	my $dll = $1;
 	$dll =~ tr/A-Z/a-z/;
-	next if $dll =~ m/^(kernel32|msvcr)\.dll$/;
+	next if $dll =~ m/^(kernel32|msvcrt)\.dll$/;
 	$dlls{$dll} = 1;
     }
 }
@@ -66,7 +66,6 @@ foreach my $f (@final)
     print "Copying $f to $destdir\n";
     system("cp -p $f $destdir") == 0 or
 	die "$whoami: copy $f to $destdir failed\n";
-    print $f, "\n";
 }
 
 sub get_manifest_dirs

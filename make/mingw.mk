@@ -79,5 +79,5 @@ INSTALL_DIR = install-mingw
 STATIC_LIB_NAME = libqpdf.a
 include make/installwin.mk
 install: installwin
-	strip $(INSTALL_DIR)/bin/*.exe
-	strip $(INSTALL_DIR)/bin/*.dll
+	strip $(DEST)/bin/*.exe
+	strip $(DEST)/bin/*.dll
