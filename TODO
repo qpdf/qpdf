@@ -13,6 +13,30 @@
    building them.  Remember to remove -DHAVE_VSNPRINTF from
    config-msvc and to remove --enable-build-external-libs from both.
 
+   mingw:
+
+   for pcre
+
+   ./configure --disable-shared --disable-cpp --prefix=...
+   make
+   make install
+
+   for zlib
+
+   ./conifgure --prefix=...
+   make
+   make install
+
+   for qpdf
+
+   CFLAGS="-IC:/path/to/pcre... -IC:/path/to/zlib..." \
+   LDFLAGS="-LC:/path/to/pcre... -LC:/path/to/zlib..." \
+   ./configure --disable-test-compare-images --with-buildrules=mingw
+
+   msvc:
+
+   
+
  * Windows release: config for both compilers, make install.  Create
    zip files.  Probably should put the compiler name somewhere in the
    directory (qpdf-version-compiler?).  Need some kind of "what to
