@@ -8,15 +8,16 @@
  * Write documentation section on source-level API changes between 2.0
    and 2.1.
 
- * Update release documentation to remember not to include debugging
-   in the Windows release and to strip the DLL and executables.
-   Consider making the "install" target do something useful for
-   Windows.  Update README.windows in this case including taking out
-   the mention of strip since it should be handled by the install
-   step.  Determine whether -g with strip is different from not -g
-   with strip.  Make sure release includes building for both
-   compilers.  Make sure it works to link with the static library when
-   the dll is not in the same directory.
+ * Windows release: config for both compilers, make install.  Create
+   zip files.  Probably should put the compiler name somewhere in the
+   directory (qpdf-version-compiler?).  Need some kind of "what to
+   download" file.
+
+ * Make install for windows: copy system DLLs as needed excluding
+   msvcrt and kernel32.  Update README.windows in this case including
+   taking out the mention of strip since it should be handled by the
+   install step.  Make sure it works to link with the static library
+   when the dll is not in the same directory.
 
  * Add comments for the security functions that map them back to the
    items in Adobe's products.
