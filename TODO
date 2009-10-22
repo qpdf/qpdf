@@ -8,16 +8,15 @@
  * Write documentation section on source-level API changes between 2.0
    and 2.1.
 
+ * Really need to get rid of embedded external libs.  We can either
+   provide them separately for Windows or provide instructions for
+   building them.  Remember to remove -DHAVE_VSNPRINTF from
+   config-msvc and to remove --enable-build-external-libs from both.
+
  * Windows release: config for both compilers, make install.  Create
    zip files.  Probably should put the compiler name somewhere in the
    directory (qpdf-version-compiler?).  Need some kind of "what to
    download" file.
-
- * Make install for windows: copy system DLLs as needed excluding
-   msvcrt and kernel32.  Update README.windows in this case including
-   taking out the mention of strip since it should be handled by the
-   install step.  Make sure it works to link with the static library
-   when the dll is not in the same directory.
 
  * Add comments for the security functions that map them back to the
    items in Adobe's products.

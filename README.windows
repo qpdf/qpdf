@@ -16,23 +16,22 @@ Building with MinGW
 ===================
 
 QPDF is known to build and pass its test suite with MSYS-1.0.11 and
-gcc 4.4.0 with C++ support.  You can fully configure and build qpdf in
-this environment, though cygwin is required to run the test suite.
-You will most likely not be able to build qpdf with mingw using
-cygwin, though it's possible that it could be made to work with gcc
--mno-cygwin.
+gcc 4.4.0 with C++ support.  If you also have ActiveState Perl in your
+path, you can fully configure, build, and test qpdf in this
+environment.  You will most likely not be able to build qpdf with
+mingw using cygwin.
 
 From your MSYS prompt, run
-
-  ./configure --disable-test-compare-images --enable-build-external-libs --with-buildrules=mingw
-
-or
 
   ./config-mingw
 
 and then
 
   make
+
+Note that ./config-mingw just runs ./configure with specific
+arguments, so you can look at it, make adjustments, and manually run
+configure instead.
 
 Add the absolute path to the libqpdf/build directory to your PATH.
 Make sure you can run the qpdf command by typing qpdf/build/qpdf and
@@ -43,13 +42,20 @@ DLL or no output at all.  Run the test suite by typing
 
 If all goes well, you should get a passing test suite.
 
+To create an installation directory, run make install.  This will
+create install-mingw/qpdf-VERSION and populate it.  The binary
+download of qpdf for Windows with mingw is created from this
+directory.
+
+
 Building with MSVC .NET 2008 Express
 ====================================
 
 These instructions would likely work with newer version of MSVC or
 with full version of MSVC.  They may also work with .NET 2005.  They
-have only been tested with .NET 2008 Express.  You may follow these
-instructions from either Cygwin or from MSYS.
+have only been tested with .NET 2008 Express (VC9.0).  You may follow
+these instructions from either Cygwin or from MSYS, though only MSYS
+is regularly tested.
 
 You should first set up your environment to be able to run MSVC from
 the command line.  There is usually a batch file included with MSVC
@@ -58,26 +64,21 @@ shell.
 
 Configure as follows:
 
-  CC=cl CXX="cl /TP /GR" CPPFLAGS=-DHAVE_VSNPRINTF ./configure --disable-test-compare-images --enable-build-external-libs --with-buildrules=msvc
-
-or
-
   ./config-msvc
 
 and then
 
   make
 
+Note that ./config-msvc just runs ./configure with specific arguments,
+so you can look at it, make adjustments, and manually run configure
+instead.
+
 NOTE: automated dependencies are not generated with the msvc build.
 If you're planning on making modifications, you should probably work
 with mingw.  If there is a need, I can add dependency information to
 the msvc build, but since I only use it for generating release
 versions, I haven't bothered.
-
-The -DHAVE_VSNPRINTF is really only required for things that include
-zutil.h from zlib.  You don't have to worry about this when compiling
-against qpdf with MSVC -- only when building zlib.  It's harmless to
-include with the rest of the qpdf build.
 
 Once built, add the full path to the libqpdf/build directory to your
 path and run
@@ -91,53 +92,25 @@ debugger, first start an instance of Visual C++.  Then run qpdf.  When
 the abort/retry/ignore dialog pops up, first attach the process from
 within visual C++, and then click Retry in qpdf.
 
-A release version of qpdf is built by default.  You will probably have
-to edit msvc.mk to change /MD to /MDd to build a debugging version.
-Note that you must redistribute the Microsoft runtime DLLs.  Linking
-with static runtime won't work; see "Static Runtime" below for
-details.
+A release version of qpdf is built by default.  If you want to link
+against debugging libraries, you will have to change /MD to /MDd in
+make/msvc.mk.  Note that you must redistribute the Microsoft runtime
+DLLs.  Linking with static runtime (/MT) won't work; see "Static
+Runtime" below for details.
+
 
 Runtime DLLs
 ============
 
 Both build methods create executables and DLLs that are dependent on
-the compiler's runtime DLLs.  You can find out which DLLs are required
-by using objdump.  For any DLLs that are not standard on any Windows
-system, you will need to copy those into the directory with the exe
-and the qpdf DLL in order for the application to work outside the
-development environment.  You don't need KERNEL32.dll, or msvcrt.dll
-as those are standard.
-
-To discover which DLLs you need, you can run
-
-  objdump -p qpdf/build/qpdf.exe | grep DLL
-
-To find the path to the DLL, you can use type -P, as in
-
-  type -P libgcc_s_dw2-1.dll
-
-replacing libgcc_s_dw2-1.dll with whatever gcc DLL is shown, if
-different.  For MSVC, you will probably need two DLLs.  Keep in mind
-that Microsoft does not allow redistribution of the debugging DLLs.
-qpdf's build does not depend on them by default, however.
+the compiler's runtime DLLs.  When you run make install, the
+installation process will automatically detect the DLLs and copy them
+into the installation bin directory.  Look at the copy_dlls script for
+details on how this is accomplished.
 
 Redistribution of the runtime DLL is unavoidable as of this writing;
 see "Static Runtime" below for details.
 
-Installing
-==========
-
-As of this writing, make install doesn't work with Windows since it is
-hard-coded to use libtool.  Until that time, you can install manually
-by looking at the install target in Makefile and gathering up the
-appropriate pieces by hand.  If building with mingw, be sure to run
-strip on the DLL and EXE files to make them much smaller.  This is not
-necessary with msvc since it stores debugging information in a
-separate file.  Note that, in both cases, compiling with debugging
-flags adds extra data to the symbol table and not to the resulting
-executables.  (Compiling with debugging flags, with msvc, is distinct
-from directing the compiler to use debugging runtime libraries, which
-does make a difference.)
 
 Static Runtime
 ==============
