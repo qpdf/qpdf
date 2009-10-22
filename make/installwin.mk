@@ -15,4 +15,4 @@ installwin: all
 	cp include/qpdf/*.hh $(INSTALL_DIR)/include/qpdf
 	cp doc/stylesheet.css $(INSTALL_DIR)/doc
 	cp doc/qpdf-manual.html $(INSTALL_DIR)/doc
-	cp doc/qpdf-manual.pdf $(DESTDIR)$(docdir)
+	cp doc/qpdf-manual.pdf $(INSTALL_DIR)/doc
