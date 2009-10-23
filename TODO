@@ -22,6 +22,10 @@
    download" file.  Remember external-libs in installation....zlib.h
    at least is needed.
 
+ * Make sure the scripts in external-libs are distributed.  We only
+   don't want the dists distributed.  Rework as necessary.  The end
+   user should be able to reproduce this whole thing.
+
  * Add comments for the security functions that map them back to the
    items in Adobe's products.
 
