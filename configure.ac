@@ -15,16 +15,16 @@ AC_HEADER_STDC
 LT_INIT([win32-dll])
 AC_PROG_LIBTOOL
 
-AC_SUBST(BUILD_EXTERNAL_LIBS)
-BUILD_EXTERNAL_LIBS=0
-AC_MSG_CHECKING(for whether to build external libraries)
-AC_ARG_ENABLE(build-external-libs,
-   AS_HELP_STRING([--enable-build-external-libs],
-		  [whether to build external libraries]),
+AC_SUBST(USE_EXTERNAL_LIBS)
+USE_EXTERNAL_LIBS=0
+AC_MSG_CHECKING(for whether to use external libraries distribution)
+AC_ARG_ENABLE(external-libs,
+   AS_HELP_STRING([--enable-external-libs],
+		  [whether to use external libraries distribution]),
    [if test "$enableval" = "yes"; then
-      BUILD_EXTERNAL_LIBS=1;
+      USE_EXTERNAL_LIBS=1;
     else
-      BUILD_EXTERNAL_LIBS=0;
+      USE_EXTERNAL_LIBS=0;
     fi], [BUILD_INTERNAL_LIBS=0])
 if test "$BUILD_INTERNAL_LIBS" = "0"; then
    AC_MSG_RESULT(no)
@@ -111,7 +111,7 @@ if test "$BUILDRULES" != "msvc"; then
    fi
 fi
 
-if test "$BUILD_EXTERNAL_LIBS" = "0"; then
+if test "$USE_EXTERNAL_LIBS" = "0"; then
    AC_MSG_CHECKING(for whether to use -Werror)
    AC_ARG_ENABLE(werror,
       AS_HELP_STRING([--enable-werror],
@@ -318,12 +318,12 @@ if test "$MISSING_ANY" = "1"; then
 fi
 
 # Do this last so it doesn't interfere with other tests.
-if test "$BUILD_EXTERNAL_LIBS" = "1"; then
+if test "$USE_EXTERNAL_LIBS" = "1"; then
    if test "$BUILDRULES" = "libtool"; then
       AC_MSG_ERROR([BUILDRULES=libtool is not supported when building external libraries])
    fi
-   LDFLAGS="$LDFLAGS -Lexternal-libs/build"
-   LIBS="$LIBS -lexternal"
+   LDFLAGS="$LDFLAGS -Lext/lib-$BUILDRULES
+   LIBS="$LIBS -lz -lpcre"
 fi
 
 AC_OUTPUT()

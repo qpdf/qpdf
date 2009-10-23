@@ -1,8 +1,6 @@
 TARGETS_libqpdf = libqpdf/$(OUTPUT_DIR)/$(call libname,qpdf)
 
-$(TARGETS_libqpdf): $(TARGETS_external-libs)
-
-INCLUDES_libqpdf = include libqpdf $(INCLUDES_external-libs)
+INCLUDES_libqpdf = include libqpdf
 LDFLAGS_libqpdf = -Llibqpdf/$(OUTPUT_DIR)
 LIBS_libqpdf = -lqpdf
 
