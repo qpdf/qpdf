@@ -106,9 +106,18 @@ extern "C" {
 
     /* ERROR REPORTING */
 
+    /* Returns 1 if there is an error condition.  The error condition
+     * can be retrieved by a single call to qpdf_get_error.
+     */
+    QPDF_DLL
+    QPDF_BOOL qpdf_has_error(qpdf_data qpdf);
+
     /* Returns the error condition, if any.  The return value is a
-     * pointer to data that will become invalid the next time an error
-     * occurs or after this function is called gain.
+     * pointer to data that will become invalid after the next call to
+     * this function, qpdf_next_warning, or qpdf_destroy.  After this
+     * function is called, qpdf_has_error will return QPDF_FALSE until
+     * the next error condition occurs.  If there is no error
+     * condition, this function returns a null pointer.
      */
     QPDF_DLL
     qpdf_error qpdf_get_error(qpdf_data qpdf);
@@ -133,7 +142,8 @@ extern "C" {
     char const* qpdf_get_error_full_text(qpdf_data q, qpdf_error e);
 
     /* Use these functions to extract individual fields from the
-     * error; see QPDFExc.hh for details. */
+     * error; see QPDFExc.hh for details.  It is invalid for e to be a
+     * null pointer for any of these calls. */
     QPDF_DLL
     enum qpdf_error_code_e qpdf_get_error_code(qpdf_data q, qpdf_error e);
     QPDF_DLL

@@ -24,7 +24,6 @@ int main(int argc, char* argv[])
     int warnings = 0;
     int errors = 0;
     char* p = 0;
-    qpdf_error e = 0;
 
     if ((p = strrchr(argv[0], '/')) != NULL)
     {
@@ -57,11 +56,11 @@ int main(int argc, char* argv[])
 	printf("warning: %s\n",
 	       qpdf_get_error_full_text(qpdf, qpdf_next_warning(qpdf)));
     }
-    e = qpdf_get_error(qpdf);
-    if (e)
+    if (qpdf_has_error(qpdf))
     {
 	errors = 1;
-	printf("error: %s\n", qpdf_get_error_full_text(qpdf, e));
+	printf("error: %s\n",
+	       qpdf_get_error_full_text(qpdf, qpdf_get_error(qpdf)));
     }
     qpdf_cleanup(&qpdf);
     if (errors)

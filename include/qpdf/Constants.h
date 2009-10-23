@@ -17,8 +17,7 @@
 
 enum qpdf_error_code_e
 {
-    qpdf_e_success = 0,
-    qpdf_e_internal,		/* logic/programming error -- indicates bug */
+    qpdf_e_internal = 1, 	/* logic/programming error -- indicates bug */
     qpdf_e_system,		/* I/O error, memory error, etc. */
     qpdf_e_unsupported,		/* PDF feature not (yet) supported by qpdf */
     qpdf_e_password,		/* incorrect password for encrypted file */

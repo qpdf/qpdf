@@ -121,7 +121,7 @@ QPDF_Stream ignore non-dictionary DecodeParms 0
 qpdf-c called qpdf_init 0
 qpdf-c called qpdf_cleanup 0
 qpdf-c called qpdf_more_warnings 0
-qpdf-c qpdf_next_error returned error 0
+qpdf-c qpdf_get_error returned error 0
 qpdf-c qpdf_next_warning returned warning 0
 qpdf-c called qpdf_set_suppress_warnings 0
 qpdf-c called qpdf_set_ignore_xref_streams 0
@@ -172,3 +172,4 @@ qpdf-c called qpdf_set_static_aes_IV 0
 QPDF_encryption stream crypt filter 0
 QPDF ERR object stream with wrong type 0
 QPDF object gone after xref reconstruction 0
+qpdf-c called qpdf_has_error 0

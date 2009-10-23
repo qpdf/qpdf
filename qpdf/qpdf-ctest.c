@@ -18,9 +18,9 @@ static void report_errors()
 	printf("  pos : %ld\n", qpdf_get_error_file_position(qpdf, e));
 	printf("  text: %s\n", qpdf_get_error_message_detail(qpdf, e));
     }
-    e = qpdf_get_error(qpdf);
-    if (e)
+    if (qpdf_has_error(qpdf))
     {
+	e = qpdf_get_error(qpdf);
 	printf("error: %s\n", qpdf_get_error_full_text(qpdf, e));
 	printf("  code: %d\n", qpdf_get_error_code(qpdf, e));
 	printf("  file: %s\n", qpdf_get_error_filename(qpdf, e));

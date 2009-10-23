@@ -128,13 +128,19 @@ QPDF_BOOL qpdf_more_warnings(qpdf_data qpdf)
     }
 }
 
+QPDF_BOOL qpdf_has_error(qpdf_data qpdf)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_has_error");
+    return (qpdf->error.getPointer() ? QPDF_TRUE : QPDF_FALSE);
+}
+
 qpdf_error qpdf_get_error(qpdf_data qpdf)
 {
     if (qpdf->error.getPointer())
     {
 	qpdf->tmp_error.exc = qpdf->error;
 	qpdf->error = 0;
-	QTC::TC("qpdf", "qpdf-c qpdf_next_error returned error");
+	QTC::TC("qpdf", "qpdf-c qpdf_get_error returned error");
 	return &qpdf->tmp_error;
     }
     else
