@@ -8,13 +8,23 @@
  * Write documentation section on source-level API changes between 2.0
    and 2.1.
 
- * Document building external libs.  From ../external-libs, in an msys
-   environment that supports both mingw and msvc, run ./build.sh.  The
-   resulting zip file should be extracted into qpdf, and
-   --enable-external-libs should be passed to configure.  Updated
-   README on this.  Check everything.  Document that you don't have to
-   use --enable-external-libs if you want to let configure find it in
-   the normal way.  That does work for mingw.
+ * Create the following packages:
+
+    - qpdf source package
+
+    - external-libs-src.zip -- includes build.sh, clean.sh, clwrap,
+      and dist; from ../external-libs
+
+    - external-libs-bin.zip -- precompiled external libraries
+
+    - qpdf-bin-mingw.zip -- qpdf executable, dll, and development
+      files built with mingw
+
+    - qpdf-bin-msvc.zip -- qpdf executable, dll, and development files
+      built with msvc
+
+    - README-what-to-download.txt -- descriptions of what to download
+      on Windows, etc.
 
  * Windows release: config for both compilers, make install.  Create
    zip files.  Probably should put the compiler name somewhere in the
