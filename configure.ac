@@ -321,7 +321,7 @@ if test "$USE_EXTERNAL_LIBS" = "1"; then
    if test "$BUILDRULES" = "libtool"; then
       AC_MSG_ERROR([BUILDRULES=libtool is not supported when building external libraries])
    fi
-   LDFLAGS="$LDFLAGS -Lext/lib-$BUILDRULES
+   LDFLAGS="$LDFLAGS -Lext/lib-$BUILDRULES"
    LIBS="$LIBS -lz -lpcre"
 fi
 
