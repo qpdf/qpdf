@@ -33,6 +33,8 @@ static void report_errors()
 	e = qpdf_get_error(qpdf);
 	assert(e == 0);
 	assert(qpdf_get_error_code(qpdf, e) == qpdf_e_success);
+	// Call these to ensure that they can be called on a null
+	// error pointer.
 	(void)qpdf_get_error_full_text(qpdf, e);
 	(void)qpdf_get_error_filename(qpdf, e);
 	(void)qpdf_get_error_file_position(qpdf, e);
