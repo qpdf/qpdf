@@ -12,26 +12,10 @@ warranty.
 Licensing terms of embedded software
 ====================================
 
-Some additional software with additional licensing terms is embedded
-within the qpdf source distribution in "external-libs".  This software
-is not actually used by the qpdf build unless the
---enable-build-external-libs option is passed to ./configure.  These
-packages have their own licensing terms, both of which are compatible
-with qpdf's license.
-
-Zlib's license can be read in external-libs/zlib/zlib.h
-
-PCRE's licensing terms can be found in external-libs/pcre/LICENSE.
-PCRE's licensing terms require that we include the following
-information:
-
-   Regular expression support is provided by the PCRE library package,
-   which is open source software, written by Philip Hazel, and
-   copyright by the University of Cambridge, England.
-
-The sources to PCRE can be independently obtained from
-
-   ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/
+QPDF makes use of zlib and pcre for its functionality.  These packages
+can be downloaded separately from their own download locations, or
+they can be downloaded in the external-libs area of the qpdf download
+site.
 
 The Rijndael encryption implementation used as the basis for AES
 encryption and decryption support comes from Philip J. Erdelsky's
