@@ -35,7 +35,7 @@ endef
 #                       1   2
 # Usage: $(call c_compile,src,includes)
 define c_compile
-	cl /nologo /Zi /Gy /EHsc /MD $(CPPFLAGS) $(CXXFLAGS) \
+	cl /nologo /O2 /Zi /Gy /EHsc /MD $(CPPFLAGS) $(CXXFLAGS) \
 		$(foreach I,$(2),-I$(I)) \
 		/c $(1) /Fo$(call c_src_to_obj,$(1))
 endef
@@ -43,7 +43,7 @@ endef
 #                       1   2
 # Usage: $(call libcompile,src,includes)
 define libcompile
-	cl /nologo /Zi /Gy /EHsc /MD /TP /GR $(CPPFLAGS) $(CXXFLAGS) \
+	cl /nologo /O2 /Zi /Gy /EHsc /MD /TP /GR $(CPPFLAGS) $(CXXFLAGS) \
 		-DDLL_EXPORT $(foreach I,$(2),-I$(I)) \
 		/c $(1) /Fo$(call src_to_obj,$(1))
 endef
@@ -51,7 +51,7 @@ endef
 #                       1   2
 # Usage: $(call c_libcompile,src,includes)
 define c_libcompile
-	cl /nologo /Zi /Gy /EHsc /MD $(CPPFLAGS) $(CXXFLAGS) \
+	cl /nologo /O2 /Zi /Gy /EHsc /MD $(CPPFLAGS) $(CXXFLAGS) \
 		-DDLL_EXPORT $(foreach I,$(2),-I$(I)) \
 		/c $(1) /Fo$(call c_src_to_obj,$(1))
 endef
@@ -65,7 +65,7 @@ endef
 #                       1    2       3       4    5       6        7
 # Usage: $(call makelib,objs,library,ldflags,libs,current,revision,age)
 define makelib
-	cl /nologo /Zi /Gy /EHsc /MD /LD /Fe$(basename $(2))$(5).dll $(1) \
+	cl /nologo /O2 /Zi /Gy /EHsc /MD /LD /Fe$(basename $(2))$(5).dll $(1) \
 		/link /incremental:no \
 		$(foreach L,$(subst -L,,$(3)),/LIBPATH:$(L)) \
 		$(foreach L,$(subst -l,,$(4)),$(L).lib)
@@ -79,7 +79,7 @@ endef
 #                       1    2      3       4
 # Usage: $(call makebin,objs,binary,ldflags,libs)
 define makebin
-	cl /nologo /Zi /Gy /EHsc /MD $(1) \
+	cl /nologo /O2 /Zi /Gy /EHsc /MD $(1) \
 		/link /incremental:no /OUT:$(2) \
 		$(foreach L,$(subst -L,,$(3)),/LIBPATH:$(L)) \
 		$(foreach L,$(subst -l,,$(4)),$(L).lib)
