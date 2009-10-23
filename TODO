@@ -17,7 +17,8 @@
  * Windows release: config for both compilers, make install.  Create
    zip files.  Probably should put the compiler name somewhere in the
    directory (qpdf-version-compiler?).  Need some kind of "what to
-   download" file.
+   download" file.  Remember external-libs in installation....zlib.h
+   at least is needed.
 
  * Add comments for the security functions that map them back to the
    items in Adobe's products.
