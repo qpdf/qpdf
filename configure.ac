@@ -15,7 +15,6 @@ AC_HEADER_STDC
 LT_INIT([win32-dll])
 AC_PROG_LIBTOOL
 
-AC_SUBST(USE_EXTERNAL_LIBS)
 USE_EXTERNAL_LIBS=0
 AC_MSG_CHECKING(for whether to use external libraries distribution)
 AC_ARG_ENABLE(external-libs,
