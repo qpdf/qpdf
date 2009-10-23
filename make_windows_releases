@@ -5,6 +5,7 @@ if [ ! -d external-libs ]; then
 fi
 
 set -e
+set -x
 cwd=`pwd`
 PATH=$cwd/libqpdf/build:$PATH
 
