@@ -1,0 +1,23 @@
+#!/bin/sh
+if [ ! -d external-libs ]; then
+   echo "Please extract qpdf-external-libs-bin.zip and try again"
+   exit 2
+fi
+
+set -e
+cwd=`pwd`
+PATH=$cwd/libqpdf/build:$PATH
+
+./config-mingw
+make check install
+make distclean
+./config-msvc
+make check install
+make distclean
+
+cp -p README-windows-install.txt install-mingw/README.txt
+cp -p README-windows-install.txt install-msvc/README.txt
+
+echo ""
+echo "Create qpdf-VERSION-bin-mingw.zip from install-mingw."
+echo "Create qpdf-VERSION-bin-msvc.zip from install-msvc."
