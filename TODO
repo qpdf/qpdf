@@ -8,34 +8,11 @@
  * Write documentation section on source-level API changes between 2.0
    and 2.1.
 
- * Really need to get rid of embedded external libs.  We can either
-   provide them separately for Windows or provide instructions for
-   building them.  Remember to remove -DHAVE_VSNPRINTF from
-   config-msvc and to remove --enable-build-external-libs from both.
-
-   mingw:
-
-   for pcre
-
-   ./configure --disable-shared --disable-cpp --prefix=...
-   make
-   make install
-
-   for zlib
-
-   ./conifgure --prefix=...
-   make
-   make install
-
-   for qpdf
-
-   CFLAGS="-IC:/path/to/pcre... -IC:/path/to/zlib..." \
-   LDFLAGS="-LC:/path/to/pcre... -LC:/path/to/zlib..." \
-   ./configure --disable-test-compare-images --with-buildrules=mingw
-
-   msvc:
-
-   
+ * Document building external libs.  From ../external-libs, in an msys
+   environment that supports both mingw and msvc, run ./build.sh.  The
+   resulting zip file should be extracted into qpdf, and
+   --enable-external-libs should be passed to configure.  Updated
+   README on this.  Check everything.
 
  * Windows release: config for both compilers, make install.  Create
    zip files.  Probably should put the compiler name somewhere in the
