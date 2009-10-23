@@ -12,7 +12,9 @@
    environment that supports both mingw and msvc, run ./build.sh.  The
    resulting zip file should be extracted into qpdf, and
    --enable-external-libs should be passed to configure.  Updated
-   README on this.  Check everything.
+   README on this.  Check everything.  Document that you don't have to
+   use --enable-external-libs if you want to let configure find it in
+   the normal way.  That does work for mingw.
 
  * Windows release: config for both compilers, make install.  Create
    zip files.  Probably should put the compiler name somewhere in the
