@@ -21,6 +21,8 @@ make distclean
 cp -p README-windows-install.txt install-mingw/README.txt
 cp -p README-windows-install.txt install-msvc/README.txt
 
+set +x
+
 echo ""
 echo "Create qpdf-VERSION-bin-mingw.zip from install-mingw."
 echo "Create qpdf-VERSION-bin-msvc.zip from install-msvc."
