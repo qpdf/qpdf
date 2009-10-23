@@ -1,4 +1,5 @@
 #include <qpdf/Pl_Flate.hh>
+#include <zlib.h>
 
 #include <qpdf/QUtil.hh>
 
@@ -10,7 +11,14 @@ Pl_Flate::Pl_Flate(char const* identifier, Pipeline* next,
     initialized(false)
 {
     this->outbuf = new unsigned char[out_bufsize];
+    // Indirect through zdata to reach the z_stream so we don't have
+    // to include zlib.h in Pl_Flate.hh.  This means people using
+    // shared library versions of qpdf don't have to have zlib
+    // development files available, which particularly helps in a
+    // Windows environment.
+    this->zdata = new z_stream;
 
+    z_stream& zstream = *((z_stream*) this->zdata);
     zstream.zalloc = (alloc_func)0;
     zstream.zfree = (free_func)0;
     zstream.opaque = (voidpf)0;
@@ -27,6 +35,8 @@ Pl_Flate::~Pl_Flate()
 	delete [] this->outbuf;
 	this->outbuf = 0;
     }
+    delete (z_stream*)this->zdata;
+    this->zdata = 0;
 }
 
 void
@@ -44,19 +54,20 @@ Pl_Flate::write(unsigned char* data, int len)
 void
 Pl_Flate::handleData(unsigned char* data, int len, int flush)
 {
-    this->zstream.next_in = data;
-    this->zstream.avail_in = len;
+    z_stream& zstream = *((z_stream*) this->zdata);
+    zstream.next_in = data;
+    zstream.avail_in = len;
 
     if (! this->initialized)
     {
 	int err = Z_OK;
 	if (this->action == a_deflate)
 	{
-	    err = deflateInit(&this->zstream, Z_DEFAULT_COMPRESSION);
+	    err = deflateInit(&zstream, Z_DEFAULT_COMPRESSION);
 	}
 	else
 	{
-	    err = inflateInit(&this->zstream);
+	    err = inflateInit(&zstream);
 	}
 	checkError("Init", err);
 	this->initialized = true;
@@ -69,11 +80,11 @@ Pl_Flate::handleData(unsigned char* data, int len, int flush)
     {
 	if (action == a_deflate)
 	{
-	    err = deflate(&this->zstream, flush);
+	    err = deflate(&zstream, flush);
 	}
 	else
 	{
-	    err = inflate(&this->zstream, flush);
+	    err = inflate(&zstream, flush);
 	}
 	switch (err)
 	{
@@ -91,20 +102,20 @@ Pl_Flate::handleData(unsigned char* data, int len, int flush)
 
 	  case Z_OK:
 	    {
-		if ((this->zstream.avail_in == 0) &&
-		    (this->zstream.avail_out > 0))
+		if ((zstream.avail_in == 0) &&
+		    (zstream.avail_out > 0))
 		{
 		    // There is nothing left to read, and there was
 		    // sufficient buffer space to write everything we
 		    // needed, so we're done for now.
 		    done = true;
 		}
-		uLong ready = (this->out_bufsize - this->zstream.avail_out);
+		uLong ready = (this->out_bufsize - zstream.avail_out);
 		if (ready > 0)
 		{
 		    this->getNext()->write(this->outbuf, ready);
-		    this->zstream.next_out = this->outbuf;
-		    this->zstream.avail_out = this->out_bufsize;
+		    zstream.next_out = this->outbuf;
+		    zstream.avail_out = this->out_bufsize;
 		}
 	    }
 	    break;
@@ -123,17 +134,18 @@ Pl_Flate::finish()
     {
 	if (this->initialized)
 	{
+	    z_stream& zstream = *((z_stream*) this->zdata);
 	    unsigned char buf[1];
 	    buf[0] = '\0';
 	    handleData(buf, 0, Z_FINISH);
 	    int err = Z_OK;
 	    if (action == a_deflate)
 	    {
-		err = deflateEnd(&this->zstream);
+		err = deflateEnd(&zstream);
 	    }
 	    else
 	    {
-		err = inflateEnd(&this->zstream);
+		err = inflateEnd(&zstream);
 	    }
 	    checkError("End", err);
 	}
@@ -147,15 +159,16 @@ Pl_Flate::finish()
 void
 Pl_Flate::checkError(char const* prefix, int error_code)
 {
+    z_stream& zstream = *((z_stream*) this->zdata);
     if (error_code != Z_OK)
     {
 	char const* action_str = (action == a_deflate ? "deflate" : "inflate");
 	std::string msg =
 	    this->identifier + ": " + action_str + ": " + prefix + ": ";
 
-	if (this->zstream.msg)
+	if (zstream.msg)
 	{
-	    msg += this->zstream.msg;
+	    msg += zstream.msg;
 	}
 	else
 	{

@@ -10,8 +10,6 @@
 
 #include <qpdf/Pipeline.hh>
 
-#include <zlib.h>
-
 class Pl_Flate: public Pipeline
 {
   public:
@@ -38,7 +36,7 @@ class Pl_Flate: public Pipeline
     int out_bufsize;
     action_e action;
     bool initialized;
-    z_stream zstream;
+    void* zdata;
 };
 
 #endif // __PL_FLATE_HH__
