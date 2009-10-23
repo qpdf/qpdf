@@ -18,9 +18,10 @@ static void report_errors()
 	printf("  pos : %ld\n", qpdf_get_error_file_position(qpdf, e));
 	printf("  text: %s\n", qpdf_get_error_message_detail(qpdf, e));
     }
-    e = qpdf_get_error(qpdf);
     if (qpdf_has_error(qpdf))
     {
+	e = qpdf_get_error(qpdf);
+	assert(qpdf_has_error(qpdf) == QPDF_FALSE);
 	printf("error: %s\n", qpdf_get_error_full_text(qpdf, e));
 	printf("  code: %d\n", qpdf_get_error_code(qpdf, e));
 	printf("  file: %s\n", qpdf_get_error_filename(qpdf, e));
@@ -29,6 +30,7 @@ static void report_errors()
     }
     else
     {
+	e = qpdf_get_error(qpdf);
 	assert(e == 0);
 	assert(qpdf_get_error_code(qpdf, e) == qpdf_e_success);
 	(void)qpdf_get_error_full_text(qpdf, e);
