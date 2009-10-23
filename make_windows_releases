@@ -8,6 +8,8 @@ set -e
 cwd=`pwd`
 PATH=$cwd/libqpdf/build:$PATH
 
+rm -rf install-mingw install-msvc
+
 ./config-mingw
 make check install
 make distclean
