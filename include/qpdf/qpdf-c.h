@@ -142,8 +142,7 @@ extern "C" {
     char const* qpdf_get_error_full_text(qpdf_data q, qpdf_error e);
 
     /* Use these functions to extract individual fields from the
-     * error; see QPDFExc.hh for details.  It is invalid for e to be a
-     * null pointer for any of these calls. */
+     * error; see QPDFExc.hh for details. */
     QPDF_DLL
     enum qpdf_error_code_e qpdf_get_error_code(qpdf_data q, qpdf_error e);
     QPDF_DLL

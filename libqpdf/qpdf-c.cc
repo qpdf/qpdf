@@ -166,26 +166,46 @@ qpdf_error qpdf_next_warning(qpdf_data qpdf)
 
 char const* qpdf_get_error_full_text(qpdf_data qpdf, qpdf_error e)
 {
+    if (e == 0)
+    {
+	return "";
+    }
     return e->exc.getPointer()->what();
 }
 
 enum qpdf_error_code_e qpdf_get_error_code(qpdf_data qpdf, qpdf_error e)
 {
+    if (e == 0)
+    {
+	return qpdf_e_success;
+    }
     return e->exc.getPointer()->getErrorCode();
 }
 
 char const* qpdf_get_error_filename(qpdf_data qpdf, qpdf_error e)
 {
+    if (e == 0)
+    {
+	return "";
+    }
     return e->exc.getPointer()->getFilename().c_str();
 }
 
 unsigned long qpdf_get_error_file_position(qpdf_data qpdf, qpdf_error e)
 {
+    if (e == 0)
+    {
+	return 0;
+    }
     return e->exc.getPointer()->getFilePosition();
 }
 
 char const* qpdf_get_error_message_detail(qpdf_data qpdf, qpdf_error e)
 {
+    if (e == 0)
+    {
+	return "";
+    }
     return e->exc.getPointer()->getMessageDetail().c_str();
 }
 
