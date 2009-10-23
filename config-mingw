@@ -1,2 +1,2 @@
 #!/bin/sh
-./configure --disable-test-compare-images --enable-build-external-libs --with-buildrules=mingw
+./configure --disable-test-compare-images --enable-external-libs --with-buildrules=mingw
