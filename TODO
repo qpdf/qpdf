@@ -8,36 +8,34 @@
  * Write documentation section on source-level API changes between 2.0
    and 2.1.
 
+ * Add comments for the security functions that map them back to the
+   items in Adobe's products.
+
  * Create the following packages:
-
-    - qpdf source package
-
-    - external-libs-src.zip -- includes build.sh, clean.sh, clwrap,
-      and dist; from ../external-libs
-
-    - external-libs-bin.zip -- precompiled external libraries
-
-    - qpdf-bin-mingw.zip -- qpdf executable, dll, and development
-      files built with mingw
-
-    - qpdf-bin-msvc.zip -- qpdf executable, dll, and development files
-      built with msvc
 
     - README-what-to-download.txt -- descriptions of what to download
       on Windows, etc.
 
- * Windows release: config for both compilers, make install.  Create
-   zip files.  Probably should put the compiler name somewhere in the
-   directory (qpdf-version-compiler?).  Need some kind of "what to
-   download" file.  Remember external-libs in installation....zlib.h
-   at least is needed.
+ * make_windows_releases:
 
- * Make sure the scripts in external-libs are distributed.  We only
-   don't want the dists distributed.  Rework as necessary.  The end
-   user should be able to reproduce this whole thing.
+    - make sure external-libs exists; if not, tell the user to extract
+      it
 
- * Add comments for the security functions that map them back to the
-   items in Adobe's products.
+    - set path to include libqpdf/build
+
+    - ./config-mingw; make check install
+
+    - make distclean
+
+    - ./config-msvc; make check install
+
+    - instruct the user to create qpdf-vvv-bin-mingw.zip and
+      qpdf-vvv-bin-msvc.zip from the contents of the install-mingw and
+      install-msys directories.
+
+    *** still have to make sure libqpdf.a/qpdf.lib doesn't have to be
+        in the same directory as the dll, but I'm pretty sure it
+        doesn't.
 
  * "Delphi wrapper unit 'qpdf.pas' created by Zarko Gajic
    (http://delphi.about.com). .. use at your own risk and for whatever

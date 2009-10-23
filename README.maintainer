@@ -37,10 +37,28 @@ Release Reminders
    internally testing releases, you can run make_dist with the
    --no-tests option.
 
+ * To create a source release of external libs, do an export from the
+   version control system into a directory called qpdf-external-libs
+   and just make a zip file of the result called
+   qpdf-external-libs-src.zip.  See the README.txt file there for
+   information on creating binary external libs releases.
+
+ * To create Windows binary releases, extract the qpdf source
+   distribution in Windows (MSYS + MINGW, MSVC) and run
+   ./make_windows_releases from there.  You will have to manually
+   create zip files from the install-mingw and install-msys
+   directories; instructions are echoed by the script.
+
+ * Remember to copy README-what-to-download.txt separately onto the
+   download area and make it the default for Windows platforms.
+
  * Remember to update documentation in the "files" subdirectory of the
    website on sourceforge.net.
 
  * Create a tag in the version control system.
+
+ * When releasing on source forge, external-libs distributions go in
+   external-libs/yyyymmdd, and qpdf distributions go in qpdf/vvv
 
 General Build Stuff
 ===================

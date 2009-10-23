@@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl This config.in requires autoconf 2.5 or greater.
 
 AC_PREREQ(2.60)
-AC_INIT(qpdf,2.1.a1)
+AC_INIT(qpdf,2.1.rc1)
 
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_FILES([autoconf.mk])
@@ -110,7 +110,7 @@ if test "$BUILDRULES" != "msvc"; then
    fi
 fi
 
-if test "$USE_EXTERNAL_LIBS" = "0"; then
+if test "$BUILDRULES" != "msvc"; then
    AC_MSG_CHECKING(for whether to use -Werror)
    AC_ARG_ENABLE(werror,
       AS_HELP_STRING([--enable-werror],
@@ -318,9 +318,9 @@ fi
 
 # Do this last so it doesn't interfere with other tests.
 if test "$USE_EXTERNAL_LIBS" = "1"; then
-   if test "$BUILDRULES" = "libtool"; then
-      AC_MSG_ERROR([BUILDRULES=libtool is not supported when building external libraries])
-   fi
+   # Don't actually check for the presence of this -- we document that
+   # the user can run this and then edit autoconf.mk if they have too
+   # much trouble getting it to work with a different compiler.
    CPPFLAGS="$CPPFLAGS -Iexternal-libs/include"
    LDFLAGS="$LDFLAGS -Lexternal-libs/lib-$BUILDRULES"
    LIBS="$LIBS -lz -lpcre"
