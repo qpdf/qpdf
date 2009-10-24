@@ -1,8 +1,6 @@
-2009-10-25  Jay Berkenbilt  <ejb@ql.org>
+2009-10-24  Jay Berkenbilt  <ejb@ql.org>
 
 	* 2.1.rc1: release
-
-2009-10-24  Jay Berkenbilt  <ejb@ql.org>
 
 	* Provide interfaces for getting qpdf's own version number
 
