@@ -100,6 +100,7 @@ distclean: clean
 maintainer-clean: distclean
 	$(RM) configure doc/qpdf-manual.* libqpdf/qpdf/qpdf-config.h.in
 	$(RM) aclocal.m4
+	$(RM) -r install-mingw install-msvc external-libs
 
 .PHONY: $(TEST_TARGETS)
 $(foreach B,$(TEST_ITEMS),$(eval \
