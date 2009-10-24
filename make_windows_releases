@@ -31,4 +31,4 @@ cd ..
 set +x
 
 echo ""
-echo "$v-bin-mingw.zip adn $v-bin-msvc.zip have been created."
+echo "$v-bin-mingw.zip and $v-bin-msvc.zip have been created."
