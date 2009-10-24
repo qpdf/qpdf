@@ -52,7 +52,7 @@ $fh = safe_open("libqpdf/QPDF.cc");
 my $code_version = 'unknown';
 while (<$fh>)
 {
-    if (m/QPDF::qpdf_version = ([^\"]+)\"/)
+    if (m/QPDF::qpdf_version = \"([^\"]+)\"/)
     {
 	$code_version = $1;
 	last;
@@ -91,7 +91,7 @@ if ($version ne $config_version)
 }
 if ($version ne $code_version)
 {
-    print "$whoami: qpdf.cc version = $code_version\n";
+    print "$whoami: QPDF.cc version = $code_version\n";
     $version_error = 1;
 }
 if ($version ne $doc_version)
