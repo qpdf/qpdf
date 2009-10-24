@@ -81,11 +81,16 @@ flush_tiff_cache();
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 15;
+$n_tests += 16;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
 	     {$td->REGEXP => "qpdf version \\S+\n.*", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("C API: qpdf version",
+	     {$td->COMMAND => "qpdf-ctest --version"},
+	     {$td->REGEXP => "qpdf-ctest version \\S+\n",
+	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 foreach (my $i = 1; $i <= 3; ++$i)

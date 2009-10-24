@@ -92,6 +92,10 @@ extern "C" {
 #   define QPDF_TRUE 1
 #   define QPDF_FALSE 0
 
+    /* Returns the version of the qpdf software */
+    QPDF_DLL
+    char const* qpdf_get_qpdf_version();
+
     /* Returns dynamically allocated qpdf_data pointer; must be freed
      * by calling qpdf_cleanup.
      */

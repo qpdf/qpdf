@@ -2,7 +2,11 @@
 
 	* 2.1.rc1: release
 
-2009-10-19  Jay Berkenbilt  <jberkenb@argonst.com>
+2009-10-24  Jay Berkenbilt  <ejb@ql.org>
+
+	* Provide interfaces for getting qpdf's own version number
+
+2009-10-19  Jay Berkenbilt  <ejb@ql.org>
 
 	* include/qpdf/QPDF.hh (QPDF): getWarnings now returns a list of
 	QPDFExc rather than a list of strings.  This way, warnings may be

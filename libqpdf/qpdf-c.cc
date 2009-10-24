@@ -91,6 +91,12 @@ static QPDF_ERROR_CODE trap_errors(qpdf_data qpdf, void (*fn)(qpdf_data))
     return status;
 }
 
+char const* qpdf_get_qpdf_version()
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_get_qpdf_version");
+    return QPDF::QPDFVersion().c_str();
+}
+
 qpdf_data qpdf_init()
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_init");

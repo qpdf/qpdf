@@ -292,6 +292,12 @@ int main(int argc, char* argv[])
     {
 	whoami = argv[0];
     }
+    if ((argc == 2) && (strcmp(argv[1], "--version") == 0))
+    {
+	printf("qpdf-ctest version %s\n", qpdf_get_qpdf_version());
+	return 0;
+    }
+
     if (argc < 5)
     {
 	fprintf(stderr, "usage: %s n infile password outfile\n", whoami);
