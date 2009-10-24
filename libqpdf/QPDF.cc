@@ -15,6 +15,8 @@
 #include <qpdf/QPDF_Null.hh>
 #include <qpdf/QPDF_Dictionary.hh>
 
+std::string QPDF::qpdf_version = "2.1.rc1";
+
 void
 QPDF::InputSource::setLastOffset(off_t offset)
 {
@@ -247,6 +249,12 @@ QPDF::ObjGen::operator<(ObjGen const& rhs) const
 {
     return ((this->obj < rhs.obj) ||
 	    ((this->obj == rhs.obj) && (this->gen < rhs.gen)));
+}
+
+std::string const&
+QPDF::QPDFVersion()
+{
+    return QPDF::qpdf_version;
 }
 
 QPDF::QPDF() :

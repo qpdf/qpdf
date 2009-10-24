@@ -18,8 +18,8 @@ make distclean
 make check install
 make distclean
 
-cp -p README-windows-install.txt install-mingw/README.txt
-cp -p README-windows-install.txt install-msvc/README.txt
+cp -p README-windows-install.txt install-mingw/qpdf*/README.txt
+cp -p README-windows-install.txt install-msvc/qpdf*/README.txt
 
 set +x
 

@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "2.1.a1">
-<!ENTITY lastreleased "XXX, 2009">
+<!ENTITY swversion "2.1.rc1">
+<!ENTITY lastreleased "October 25, 2009">
 ]>
 <book>
  <bookinfo>
@@ -218,7 +218,9 @@ make
     <option>outfilename</option> does not have to be seekable, even
     when generating linearized files.  Specifying
     &ldquo;<option>-</option>&rdquo; as <option>outfilename</option>
-    means to write to standard output.
+    means to write to standard output.  However, you can't specify the
+    same file as both the input and the output because qpdf reads data
+    from the input file as it writes to the output file.
    </para>
    <para>
     Most options require an output file, but some testing or
@@ -399,7 +401,8 @@ make
        <para>
         Controls modify access.
         <option><replaceable>modify-opt</replaceable></option> may be
-        one of the following:
+        one of the following, each of which implies all the options
+        that follow it:
         <itemizedlist>
          <listitem>
           <para>
@@ -427,6 +430,40 @@ make
           </para>
          </listitem>
         </itemizedlist>
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--cleartext-metadata</option></term>
+      <listitem>
+       <para>
+        If specified, any metadata stream in the document will be left
+        unencrypted even if the rest of the document is encrypted.
+        This also forces the PDF version to be at least 1.5.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--use-aes=[yn]</option></term>
+      <listitem>
+       <para>
+        If <option>--use-aes=y</option> is specified, AES encryption
+        will be used instead of RC4 encryption.  This forces the PDF
+        version to be at least 1.6.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--force-V4</option></term>
+      <listitem>
+       <para>
+        Use of this option forces the <literal>/V</literal> and
+        <literal>/R</literal> parameters in the document's encryption
+        dictionary to be set to the value <literal>4</literal>.  As
+        qpdf will automatically do this when required, there is no
+        reason to ever use this option.  It exists primarily for use
+        in testing qpdf itself.  This option also forces the PDF
+        version to be at least 1.5.
        </para>
       </listitem>
      </varlistentry>
@@ -530,6 +567,50 @@ make
        <para>
         Turns on QDF mode.  For additional information on QDF, please
         see <xref linkend="ref.qdf"/>.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--min-version=<replaceable>version</replaceable></option></term>
+      <listitem>
+       <para>
+        Forces the PDF version of the output file to be at least
+        <replaceable>version</replaceable>.  In other words, if the
+        input file has a lower version than the specified version, the
+        specified version will be used.  If the input file has a
+        higher version, the input file's original version will be
+        used.  It is seldom necessary to use this option since qpdf
+        will automatically increase the version as needed when adding
+        features that require newer PDF readers.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--force-version=<replaceable>version</replaceable></option></term>
+      <listitem>
+       <para>
+        This option forces the PDF version to be the exact version
+        specified <emphasis>even when the file may have content that
+        is not supported in that version</emphasis>.  In some cases,
+        forcing the output file's PDF version to be lower than that of
+        the input file will cause qpdf to disable certain features of
+        the document.  Specifically, AES encryption is disabled if the
+        version is less than 1.6, cleartext metadata and object
+        streams are disabled if less than 1.5, 128-bit encryption keys
+        are disabled if less than 1.4, and all encryption is disabled
+        if less than 1.3.  Even with these precautions, qpdf won't be
+        able to do things like eliminate use of newer image
+        compression schemes, transparency groups, or other features
+        that may have been added in more recent versions of PDF.
+       </para>
+       <para>
+        As a general rule, with the exception of big structural things
+        like the use of object streams or AES encryption, PDF viewers
+        are supposed to ignore features in files that they don't
+        support from newer versions.  This means that forcing the
+        version to a lower version may make it possible to open your
+        PDF file with an older version, though bear in mind that some
+        of the original document's functionality may be lost.
        </para>
       </listitem>
      </varlistentry>
@@ -1985,7 +2066,169 @@ print "\n";
  </chapter>
  <appendix id="ref.release-notes">
   <title>Release Notes</title>
+  <para>
+   For a detailed list of changes, please see the file
+   <filename>ChangeLog</filename> in the source distribution.
+  </para>
   <variablelist>
+   <varlistentry>
+    <term>2.1.rc1: October 25, 2009</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        This is the first version of qpdf to include Windows support.
+        On Windows, it is possible to build a DLL.  Additionally, a
+        partial C-language API has been introduced, which makes it
+        possible to call qpdf functions from non-C++ environments.  I
+        am very grateful to Zarko Gagic (<ulink
+        url="http://delphi.about.com/">http://delphi.about.com/</ulink>)
+        for tirelessly testing numerous pre-release versions of this
+        DLL and providing many excellent suggestions on improving the
+        interface.
+       </para>
+       <para>
+        For programming to the C interface, please see the header file
+        <filename>qpdf/qpdf-c.h</filename> and the example
+        <filename>examples/pdf-linearize.c</filename>.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Zarko Gajic has written a Delphi wrapper for qpdf, which can
+        be downloaded from qpdf's download side.  Zarko's Delphi
+        wrapper is released with the same licensing terms as qpdf
+        itself and comes with this disclaimer: &ldquo;Delphi wrapper
+        unit <filename>qpdf.pas</filename> created by Zarko Gajic
+        (<ulink
+        url="http://delphi.about.com/">http://delphi.about.com/</ulink>).
+        Use at your own risk and for whatever purpose you want.  No
+        support is provided.  Sample code is provided.&rdquo;
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Support has been added for AES encryption and crypt filters.
+        Although qpdf does not presently support files that use
+        PKI-based encryption, with the addition of AES and crypt
+        filters, qpdf is now be able to open most encrypted files
+        created with newer versions of Acrobat or other PDF creation
+        software.  Note that I have not been able to get very many
+        files encrypted in this way, so it's possible there could
+        still be some cases that qpdf can't handle.  Please report
+        them if you find them.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Many error messages have been improved to include more
+        information in hopes of making qpdf a more useful tool for PDF
+        experts to use in manually recovering damaged PDF files.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Attempt to avoid compressing metadata streams if possible.
+        This is consistent with other PDF creation applications.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Provide new command-line options for AES encrypt, cleartext
+        metadata, and setting the minimum and forced PDF versions of
+        output files.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Add additional methods to the <classname>QPDF</classname>
+        object for querying the document's permissions.  Although qpdf
+        does not enforce these permissions, it does make them
+        available so that applications that use qpdf can enforce
+        permissions.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        The <option>--check</option> option to <command>qpdf</command>
+        has been extended to include some additional information.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        There have been a handful of non-compatible API changes.  For
+        details, see <xref linkend="ref.upgrading-to-2.1"/>.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>2.0.6: May 3, 2009</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Do not attempt to uncompress streams that have decode
+        parameters we don't recognize.  Earlier versions of qpdf would
+        have rejected files with such streams.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>2.0.5: March 10, 2009</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Improve error handling in the LZW decoder, and fix a small
+        error introduced in the previous version with regard to
+        handling full tables.  The LZW decoder has been more strongly
+        verified in this release.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>2.0.4: February 21, 2009</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Include proper support for LZW streams encoded without the
+        &ldquo;early code change&rdquo; flag.  Special thanks to Atom
+        Smasher who reported the problem and provided an input file
+        compressed in this way, which I did not previously have.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Implement some improvements to file recovery logic.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>2.0.3: February 15, 2009</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Compile cleanly with gcc 4.4.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Handle strings encoded as UTF-16BE properly.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
     <term>2.0.2: June 30, 2008</term>
     <listitem>
@@ -2030,5 +2273,88 @@ print "\n";
     </listitem>
    </varlistentry>
   </variablelist>
+ </appendix>
+ <appendix id="ref.upgrading-to-2.1">
+  <title>Upgrading from 2.0 to 2.1</title>
+  <para>
+   Although, as a general rule, we like to avoid introducing
+   source-level incompatibilities in qpdf's interface, there were a
+   few non-compatible changes made in this version.  A considerable
+   amount of source code that uses qpdf will probably compile without
+   any changes, but in some cases, you may have to update your code.
+   The changes are enumerated here.  There are also some new
+   interfaces; for those, please refer to the header files.
+  </para>
+  <itemizedlist>
+   <listitem>
+    <para>
+     QPDF's exception handling mechanism now uses
+     <classname>std::logic_error</classname> for internal errors and
+     <classname>std::runtime_error</classname> for runtime errors in
+     favor of the now removed <classname>QEXC</classname> classes used
+     in previous versions.  The <classname>QEXC</classname> exception
+     classes predated the addition of the
+     <filename>&lt;stdexcept&gt;</filename> header file to the C++
+     standard library.  Most of the exceptions thrown by the qpdf
+     library itself are still of type <classname>QPDFExc</classname>
+     which is now derived from
+     <classname>std::runtime_error</classname>.  Programs that caught
+     an instance of <classname>std::exception</classname> and
+     displayed it by calling the <function>what()</function> method
+     will not need to be changed.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     The <classname>QPDFExc</classname> class now internally
+     represents various fields of the error condition and provides
+     interfaces for querying them.  Among the fields is a numeric
+     error code that can help applications act differently on (a small
+     number of) different error conditions.  See
+     <filename>QPDFExc.hh</filename> for details.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Warnings can be retrieved from qpdf as instances of
+     <classname>QPDFExc</classname> instead of strings.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     The nested <classname>QPDF::EncryptionData</classname> class's
+     constructor takes an additional argument.  This class is
+     primarily intended to be used by
+     <classname>QPDFWriter</classname>.  There's not really anything
+     useful an end-user application could do with it.  It probably
+     shouldn't really be part of the public interface to begin with.
+     Likewise, some of the methods for computing internal encryption
+     dictionary parameters have changed to support
+     <literal>/R=4</literal> encryption.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     The method <function>QPDF::getUserPassword</function> has been
+     removed since it didn't do what people would think it did.  There
+     are now two new methods:
+     <function>QPDF::getPaddedUserPassword</function> and
+     <function>QPDF::getTrimmedUserPassword</function>.  The first one
+     does what the old <function>QPDF::getUserPassword</function>
+     method used to do, which is to return the password with possible
+     binary padding as specified by the PDF specification.  The second
+     one returns a human-readable password string.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     The enumerated types that used to be nested in
+     <classname>QPDFWriter</classname> have moved to top-level
+     enumerated types and are now defined in the file
+     <filename>qpdf/Constants.h</filename>.  This enables them to be
+     shared by both the C and C++ interfaces.
+    </para>
+   </listitem>
+  </itemizedlist>
  </appendix>
 </book>

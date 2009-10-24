@@ -11,7 +11,7 @@ Release Reminders
 
      configure.ac
      qpdf.spec
-     qpdf/qpdf.cc
+     libqpdf/QPDF.cc
      manual/qpdf-manual.xml
 
    make_dist verifies this consistency.
@@ -55,7 +55,8 @@ Release Reminders
  * Remember to update documentation in the "files" subdirectory of the
    website on sourceforge.net.
 
- * Create a tag in the version control system.
+ * Create a tag in the version control system, and make backups of the
+   actual releases.
 
  * When releasing on source forge, external-libs distributions go in
    external-libs/yyyymmdd, and qpdf distributions go in qpdf/vvv

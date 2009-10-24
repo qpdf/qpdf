@@ -48,11 +48,11 @@ while (<$fh>)
 }
 $fh->close();
 
-$fh = safe_open("qpdf/qpdf.cc");
+$fh = safe_open("libqpdf/QPDF.cc");
 my $code_version = 'unknown';
 while (<$fh>)
 {
-    if (m/whoami << \" version ([^\"]+)\"/)
+    if (m/QPDF::qpdf_version = ([^\"]+)\"/)
     {
 	$code_version = $1;
 	last;

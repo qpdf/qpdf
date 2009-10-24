@@ -1,46 +1,8 @@
 2.1
 ===
 
- * Update documentation to reflect new command line flags and any
-   other relevant changes.  Should read through ChangeLog and the
-   manual before releasing 2.1.
-
- * Write documentation section on source-level API changes between 2.0
-   and 2.1.
-
- * Add comments for the security functions that map them back to the
-   items in Adobe's products.
-
- * Create the following packages:
-
-    - README-what-to-download.txt -- descriptions of what to download
-      on Windows, etc.
-
- * make_windows_releases:
-
-    - make sure external-libs exists; if not, tell the user to extract
-      it
-
-    - set path to include libqpdf/build
-
-    - ./config-mingw; make check install
-
-    - make distclean
-
-    - ./config-msvc; make check install
-
-    - instruct the user to create qpdf-vvv-bin-mingw.zip and
-      qpdf-vvv-bin-msvc.zip from the contents of the install-mingw and
-      install-msys directories.
-
-    *** still have to make sure libqpdf.a/qpdf.lib doesn't have to be
-        in the same directory as the dll, but I'm pretty sure it
-        doesn't.
-
- * "Delphi wrapper unit 'qpdf.pas' created by Zarko Gajic
-   (http://delphi.about.com). .. use at your own risk and for whatever
-   the purpose you want .. no support provided. Sample code provided."
-
+ * Remove rc1 from version; search for rc1 in release notes as
+   well...just change rc1 to 2.1 and update the date.
 
 2.2
 ===

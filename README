@@ -9,6 +9,18 @@ Artistic License which may be found in the source distribution as
 warranty.
 
 
+Prerequisites
+=============
+
+QPDF depends on external libraries "zlib" and "pcre".  These are part
+of virtually all Linux distributions and are readily available;
+download information appears in the documentation.  You can also
+download the external library distributions in source from from qpdf's
+download site.  For Windows, you can download pre-built binary
+verisons of those libraries for some compilers; see README.windows for
+additional details.
+
+
 Licensing terms of embedded software
 ====================================
 
@@ -71,9 +83,11 @@ user's manual can be found in the "doc" directory.  The docbook
 sources to the user's manual can be found in the "manual" directory.
 
 The software library is just libqpdf, and all the header files are in
-the qpdf subdirectory.  If you link with -lqpdf and your system does
-not know how to read libtool .la files, then you will also need to
-link with -lpcre and -lz.
+the qpdf subdirectory.  If you link statically with -lqpdf, then you
+will also need to link with -lpcre and -lz.  The shared qpdf library
+is linked with -lpcre and -lz, and none of qpdf's public header files
+directly include files from pcre or libz, so in many cases, qpdf's
+development files are self contained.
 
 To learn about using the library, please read comments in the header
 files in include/qpdf, especially QPDF.hh, QPDFObjectHandle.hh, and

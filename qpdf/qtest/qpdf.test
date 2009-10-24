@@ -81,7 +81,12 @@ flush_tiff_cache();
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 14;
+$n_tests += 15;
+
+$td->runtest("qpdf version",
+	     {$td->COMMAND => "qpdf --version"},
+	     {$td->REGEXP => "qpdf version \\S+\n.*", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
 
 foreach (my $i = 1; $i <= 3; ++$i)
 {

@@ -1,10 +1,10 @@
 Summary: Command-line tools and library for transforming PDF files
 Name: qpdf
-Version: 2.1.a1
+Version: 2.1.rc1
 Release: 1%{?dist}
 License: Artistic
 Group: System Environment/Libraries
-URL: http://sourceforge.net/projects/qpdf/
+URL: http://qpdf.sourceforge.net/
 
 Source: %{name}-%{version}.tar.gz
 

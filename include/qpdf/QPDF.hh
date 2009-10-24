@@ -28,6 +28,10 @@ class QPDFExc;
 class QPDF
 {
   public:
+    // Get the current version of the QPDF software
+    QPDF_DLL
+    static std::string const& QPDFVersion();
+
     QPDF_DLL
     QPDF();
     QPDF_DLL
@@ -304,6 +308,8 @@ class QPDF
     friend class Pipe;
 
   private:
+    static std::string qpdf_version;
+
     class InputSource
     {
       public:

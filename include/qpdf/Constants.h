@@ -48,13 +48,13 @@ enum qpdf_r3_print_e
     qpdf_r3p_low,		/* allow only low-resolution printing */
     qpdf_r3p_none		/* allow no printing */
 };
-enum qpdf_r3_modify_e
+enum qpdf_r3_modify_e		/* Allowed changes: */
 {
-    qpdf_r3m_all = 0,		/* allow all modification */
-    qpdf_r3m_annotate,	      /* allow comment authoring and form operations */
-    qpdf_r3m_form,		/* allow form field fill-in or signing */
-    qpdf_r3m_assembly,		/* allow only document assembly */
-    qpdf_r3m_none		/* allow no modification */
+    qpdf_r3m_all = 0,		/* General editing, comments, forms */
+    qpdf_r3m_annotate,	        /* Comments, form field fill-in, and signing */
+    qpdf_r3m_form,		/* form field fill-in and signing */
+    qpdf_r3m_assembly,		/* only document assembly */
+    qpdf_r3m_none		/* no modifications */
 };
 
 #endif /* __QPDFCONSTANTS_H__ */

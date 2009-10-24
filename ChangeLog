@@ -1,3 +1,7 @@
+2009-10-25  Jay Berkenbilt  <ejb@ql.org>
+
+	* 2.1.rc1: release
+
 2009-10-19  Jay Berkenbilt  <jberkenb@argonst.com>
 
 	* include/qpdf/QPDF.hh (QPDF): getWarnings now returns a list of
@@ -20,6 +24,12 @@
 
 	* libqpdf/QPDFWriter.cc (unparseObject): avoid compressing
 	Metadata streams if possible.
+
+2009-10-13  Jay Berkenbilt  <ejb@ql.org>
+
+	* Upgrade embedded qtest to version 1.4, which allows the test
+	suite to be run in Windows with MSYS and ActiveState Perl rather
+	than requiring Cygwin perl.
 
 2009-10-04  Jay Berkenbilt  <ejb@ql.org>
 
@@ -60,7 +70,7 @@
 
 2009-05-03  Jay Berkenbilt  <ejb@ql.org>
 
-	* 2.0.6. release
+	* 2.0.6: release
 
 	* libqpdf/QPDF_Stream.cc (filterable): ignore /DecodeParms if it's
 	not a type we recognize.  (Fixes qpdf-Bugs-2779746.)
