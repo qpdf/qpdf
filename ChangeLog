@@ -1,3 +1,12 @@
+2009-10-26  Jay Berkenbilt  <ejb@ql.org>
+
+	* Work around failure of PCRE test case; this test case exercises
+	an aspect of PCRE that qpdf does not use, and the test fails with
+	the version of PCRE on Red Hat Enterprise Linux 5, so we ignore
+	failure on this particular test case.
+
+	* Fix RPM .spec file to include "C" examples
+
 2009-10-24  Jay Berkenbilt  <ejb@ql.org>
 
 	* 2.1.rc1: release

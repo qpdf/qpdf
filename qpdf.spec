@@ -60,9 +60,9 @@ rm -rf $RPM_BUILD_ROOT
 # autoconf.
 cp -a $RPM_BUILD_ROOT%{_datadir}/doc/%{name}-%{version} install-docs
 mkdir -p install-examples/examples
-cp -p examples/*.cc install-examples/examples
+cp -p examples/*.cc examples/*.c install-examples/examples
 # Red Hat doesn't ship .la files.
-rm -rf $RPM_BUILD_ROOT%{_libdir}/libqpdf.la
+rm -f $RPM_BUILD_ROOT%{_libdir}/libqpdf.la
 
 %post -p /sbin/ldconfig
 
