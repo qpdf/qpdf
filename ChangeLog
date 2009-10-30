@@ -1,3 +1,10 @@
+2009-10-30  Jay Berkenbilt  <ejb@ql.org>
+
+	* 2.1: release
+
+	* libqpdf/QPDF.cc: be more forgiving of extraneous whitespace in
+	the xref table and while recovering from error conditions.
+
 2009-10-26  Jay Berkenbilt  <ejb@ql.org>
 
 	* Work around failure of PCRE test case; this test case exercises
