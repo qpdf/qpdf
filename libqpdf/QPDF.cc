@@ -15,7 +15,7 @@
 #include <qpdf/QPDF_Null.hh>
 #include <qpdf/QPDF_Dictionary.hh>
 
-std::string QPDF::qpdf_version = "2.1.rc1";
+std::string QPDF::qpdf_version = "2.1";
 
 void
 QPDF::InputSource::setLastOffset(off_t offset)
@@ -425,9 +425,9 @@ QPDF::setTrailer(QPDFObjectHandle obj)
 void
 QPDF::reconstruct_xref(QPDFExc& e)
 {
-    static PCRE obj_re("^(\\d+) (\\d+) obj\\b");
-    static PCRE endobj_re("^endobj\\b");
-    static PCRE trailer_re("^trailer\\b");
+    static PCRE obj_re("^\\s*(\\d+)\\s+(\\d+)\\s+obj\\b");
+    static PCRE endobj_re("^\\s*endobj\\b");
+    static PCRE trailer_re("^\\s*trailer\\b");
 
     warn(QPDFExc(qpdf_e_damaged_pdf, this->file.getName(), "", 0,
 		 "file is damaged"));
@@ -561,7 +561,7 @@ QPDF::read_xref(off_t xref_offset)
 int
 QPDF::read_xrefTable(off_t xref_offset)
 {
-    static PCRE xref_first_re("^(\\d+)\\s+(\\d+)");
+    static PCRE xref_first_re("^\\s*(\\d+)\\s+(\\d+)");
     static PCRE xref_entry_re("(?s:(^\\d{10}) (\\d{5}) ([fn])[ \r\n]{2}$)");
 
     std::vector<ObjGen> deleted_items;
@@ -1350,7 +1350,7 @@ int
 QPDF::recoverStreamLength(InputSource* input,
 			  int objid, int generation, off_t stream_offset)
 {
-    static PCRE endobj_re("^endobj\\b");
+    static PCRE endobj_re("^\\s*endobj\\b");
 
     // Try to reconstruct stream length by looking for
     // endstream(\r\n?|\n)endobj
