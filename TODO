@@ -13,7 +13,8 @@
    Stefan Heinsen <stefan.heinsen@gmx.de> in August, 2009.  He seems
    to like to send encrypted mail.  (key 01FCC336)
 
- * Look at page splitting.
+ * Look at page splitting.  Subramanyam provided a test file; see
+   ../misc/article-threads.pdf.
 
 
 General
