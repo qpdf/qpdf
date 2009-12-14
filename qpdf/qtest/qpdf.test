@@ -26,15 +26,11 @@ my $have_acroread = 0;
 
 if ($compare_images)
 {
-    # check for acroread
-    my @path = split(':', $ENV{'PATH'});
-    foreach my $p (@path)
+    # check for working acroread
+    if (system("acroread -toPostScript -pairs good1.pdf a.ps" .
+	       " >/dev/null 2>&1") == 0)
     {
-	if (-x "$p/acroread")
-	{
-	    $have_acroread = 1;
-	    last;
-	}
+	$have_acroread = 1;
     }
 }
 
