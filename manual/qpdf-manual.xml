@@ -6,7 +6,7 @@
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
 <!ENTITY swversion "2.1.1">
-<!ENTITY lastreleased "December 13, 2009">
+<!ENTITY lastreleased "December 14, 2009">
 ]>
 <book>
  <bookinfo>
@@ -2072,13 +2072,14 @@ print "\n";
   </para>
   <variablelist>
    <varlistentry>
-    <term>2.1.1: December 13, 2009</term>
+    <term>2.1.1: December 14, 2009</term>
     <listitem>
      <itemizedlist>
       <listitem>
        <para>
         No changes in functionality; insert missing include in an
-        internal library header file to support gcc 4.4.
+        internal library header file to support gcc 4.4, and update
+        test suite to ignore broken Adobe Reader installations.
        </para>
       </listitem>
      </itemizedlist>
