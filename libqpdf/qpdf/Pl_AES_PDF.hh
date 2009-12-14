@@ -3,6 +3,9 @@
 
 #include <qpdf/Pipeline.hh>
 #include <qpdf/qpdf-config.h>
+#ifdef HAVE_STDINT_H
+# include <stdint.h>
+#endif
 
 // This pipeline implements AES-128 with CBC and block padding as
 // specified in the PDF specification.

@@ -1,3 +1,10 @@
+2009-12-13  Jay Berkenbilt  <ejb@ql.org>
+
+	* 2.1.1: release
+
+	* libqpdf/qpdf/Pl_AES_PDF.hh: include <stdint.h>, if available, so
+	we have valid definitions of uint32_t.
+
 2009-10-30  Jay Berkenbilt  <ejb@ql.org>
 
 	* 2.1: release
