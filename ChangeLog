@@ -1,6 +1,11 @@
-2009-12-13  Jay Berkenbilt  <ejb@ql.org>
+2009-12-14  Jay Berkenbilt  <ejb@ql.org>
 
 	* 2.1.1: release
+
+	* qpdf/qtest/qpdf.test: improve test for acroread to make sure it
+	actually works and is not just present in the path.
+
+2009-12-13  Jay Berkenbilt  <ejb@ql.org>
 
 	* libqpdf/qpdf/Pl_AES_PDF.hh: include <stdint.h>, if available, so
 	we have valid definitions of uint32_t.
