@@ -1734,14 +1734,15 @@ QPDFWriter::writeXRefStream(int objid, int max_id, int max_offset,
 			    trailer_e which, int first, int last, int size)
 {
     return writeXRefStream(objid, max_id, max_offset,
-			   which, first, last, size, 0, 0, 0, 0);
+			   which, first, last, size, 0, 0, 0, 0, false);
 }
 
 int
 QPDFWriter::writeXRefStream(int xref_id, int max_id, int max_offset,
 			    trailer_e which, int first, int last, int size,
 			    int prev, int hint_id,
-			    int hint_offset, int hint_length)
+			    int hint_offset, int hint_length,
+			    bool skip_compression)
 {
     int xref_offset = this->pipeline->getCount();
     int space_before_zero = xref_offset - 1;
@@ -1764,8 +1765,14 @@ QPDFWriter::writeXRefStream(int xref_id, int max_id, int max_offset,
     if (! ((this->stream_data_mode == qpdf_s_uncompress) || this->qdf_mode))
     {
 	compressed = true;
-	p = pushPipeline(
-	    new Pl_Flate("compress xref", p, Pl_Flate::a_deflate));
+	if (! skip_compression)
+	{
+	    // Write the stream dictionary for compression but don't
+	    // actually compress.  This helps us with computation of
+	    // padding for pass 1 of linearization.
+	    p = pushPipeline(
+		new Pl_Flate("compress xref", p, Pl_Flate::a_deflate));
+	}
 	p = pushPipeline(
 	    new Pl_PNGFilter(
 		"pngify xref", p, Pl_PNGFilter::a_encode, esize, 0));
@@ -2024,12 +2031,15 @@ QPDFWriter::writeLinearized()
 	    // Must pad here too.
 	    if (pass == 1)
 	    {
-		// first_half_max_obj_offset is very likely to fall
-		// within the first 64K of the document (thus
-		// requiring two bytes for offsets) since it is the
-		// offset of the last uncompressed object in page 1.
-		// We allow for it to do otherwise though.
-		first_half_max_obj_offset = 65535;
+		// Set first_half_max_obj_offset to a value large
+		// enough to force four bytes to be reserved for each
+		// file offset.  This would provide adequate space for
+		// the xref stream as long as the last object in page
+		// 1 starts with in the first 4 GB of the file, which
+		// is extremely likely.  In the second pass, we will
+		// know the actual value for this, but it's okay if
+		// it's smaller.
+		first_half_max_obj_offset = 1 << 25;
 	    }
 	    pos = this->pipeline->getCount();
 	    writeXRefStream(first_half_xref, first_half_end,
@@ -2037,19 +2047,24 @@ QPDFWriter::writeLinearized()
 			    t_lin_first, first_half_start, first_half_end,
 			    first_trailer_size,
 			    hint_length + second_xref_offset,
-			    hint_id, hint_offset, hint_length);
+			    hint_id, hint_offset, hint_length,
+			    (pass == 1));
 	    int endpos = this->pipeline->getCount();
 	    if (pass == 1)
 	    {
 		// Pad so we have enough room for the real xref
-		// stream.  In an extremely unlikely worst case,
-		// first_half_max_obj_offset could be enough larger to
-		// require two extra bytes beyond what we calculated
-		// in pass 1.  This means we need to save two extra
-		// bytes for each xref entry.  To that, we'll add 10
-		// extra bytes for number length increases.
+		// stream.  We've written the stream without
+		// compression (but with all the stream dictionary
+		// parameters to enable it) and assuming a very
+		// generous allowance for writing file offsets.  We
+		// need a little extra padding to allow for zlib's
+		// output to be larger than its input (6 bytes plus 5
+		// bytes per 16K), and then we'll add 10 extra bytes
+		// for number length increases.
+
+		unsigned int xref_bytes = endpos - pos;
 		int possible_extra =
-		    10 + (2 * (first_half_end - first_half_start + 1));
+		    16 + (5 * ((xref_bytes + 16383) / 16384));
 		for (int i = 0; i < possible_extra; ++i)
 		{
 		    writeString(" ");
@@ -2064,6 +2079,8 @@ QPDFWriter::writeLinearized()
 		{
 		    writeString(" ");
 		}
+		// A failure of this insertion means we didn't allow
+		// enough padding for the first pass xref stream.
 		assert(this->pipeline->getCount() == first_xref_end);
 	    }
 	    writeString("\n");
