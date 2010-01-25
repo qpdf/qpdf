@@ -21,7 +21,7 @@ Release Reminders
  * Update release date in manual/qpdf-manual.xml
 
  * Each year, update copyright notices.  Just search for Copyright.
-   Last updated: 2009.
+   Last updated: 2010.
 
  * To construct a source distribution from a pristine checkout,
    make_dist does the following:
