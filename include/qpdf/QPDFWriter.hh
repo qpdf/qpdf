@@ -240,7 +240,8 @@ class QPDFWriter
 			int prev,
 			int hint_id,
 			int hint_offset,
-			int hint_length);
+			int hint_length,
+			bool skip_compression);
 
     // When filtering subsections, push additional pipelines to the
     // stack.  When ready to switch, activate the pipeline stack.
