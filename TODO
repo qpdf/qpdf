@@ -23,9 +23,9 @@ General
 ------------------------------
 Index: QPDFWriter.cc
 ===================================================================
---- QPDFWriter.cc	(revision 920)
+--- QPDFWriter.cc	(revision 932)
 +++ QPDFWriter.cc	(working copy)
-@@ -1958,11 +1960,15 @@
+@@ -1965,11 +1965,15 @@
  
      // Write file in two passes.  Part numbers refer to PDF spec 1.4.
  
@@ -42,17 +42,7 @@ Index: QPDFWriter.cc
  	}
  
  	// Part 1: header
-@@ -2037,7 +2043,8 @@
- 			    t_lin_first, first_half_start, first_half_end,
- 			    first_trailer_size,
- 			    hint_length + second_xref_offset,
--			    hint_id, hint_offset, hint_length);
-+			    hint_id, hint_offset, hint_length,
-+			    (pass == 1));
- 	    int endpos = this->pipeline->getCount();
- 	    if (pass == 1)
- 	    {
-@@ -2187,6 +2194,8 @@
+@@ -2204,6 +2208,8 @@
  
  	    // Restore hint offset
  	    this->xref[hint_id] = QPDFXRefEntry(1, hint_offset, 0);
