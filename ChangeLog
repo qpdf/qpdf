@@ -1,3 +1,12 @@
+2010-01-24  Jay Berkenbilt  <ejb@ql.org>
+
+	* 2.1.2: release
+
+	* libqpdf/QPDFWriter.cc: fix logic error in padding calculation.
+	When writing linearized files with cross reference streams, the
+	padding calculation failed to take differences in sizes of
+	compressed data between pass 1 and pass 2 into consideration.
+
 2009-12-14  Jay Berkenbilt  <ejb@ql.org>
 
 	* 2.1.1: release
