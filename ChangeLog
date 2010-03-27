@@ -1,5 +1,7 @@
 2010-03-27  Jay Berkenbilt  <ejb@ql.org>
 
+	* 2.1.3: release
+
 	* libqpdf/QPDF_optimization.cc (flattenScalarReferences): Flatten
 	scalar references for unreferenced objects as well as those seen
 	during traversal of the file.  This matters when preserving object

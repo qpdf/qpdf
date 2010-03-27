@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "2.1.2">
-<!ENTITY lastreleased "January 24, 2010">
+<!ENTITY swversion "2.1.3">
+<!ENTITY lastreleased "March 27, 2010">
 ]>
 <book>
  <bookinfo>
@@ -2071,6 +2071,26 @@ print "\n";
    <filename>ChangeLog</filename> in the source distribution.
   </para>
   <variablelist>
+   <varlistentry>
+    <term>2.1.3: March 27, 2010</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Fix bug that could cause a failure when rewriting PDF files
+        that contain object streams with unreferenced objects that in
+        turn reference indirect scalars.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Don't complain about (invalid) AES streams that aren't a
+        multiple of 16 bytes.  Instead, pad them before decrypting.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
     <term>2.1.2: January 24, 2010</term>
     <listitem>
