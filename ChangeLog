@@ -1,3 +1,18 @@
+2010-03-27  Jay Berkenbilt  <ejb@ql.org>
+
+	* libqpdf/QPDF_optimization.cc (flattenScalarReferences): Flatten
+	scalar references for unreferenced objects as well as those seen
+	during traversal of the file.  This matters when preserving object
+	streams that contain unreferenced objects with indirect scalars.
+	(Fixes qpdf-Bugs-2974522.)  Updated TODO with a description of a
+	possibly better fix involving removal of flattenScalarReferences.
+
+	* libqpdf/Pl_AES_PDF.cc (finish): Don't complain if an AES input
+	buffer is not a multiple of 16 bytes.  Instead, just pad with
+	nulls and hope for the best.  PDF files have been encountered "in
+	the wild" that contain AES buffers that aren't a multiple of 16
+	bytes.
+
 2010-01-24  Jay Berkenbilt  <ejb@ql.org>
 
 	* 2.1.2: release

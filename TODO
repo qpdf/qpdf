@@ -15,6 +15,32 @@
 General
 =======
 
+ * See whether it's possible to remove the call to
+   flattenScalarReferences.  I can't easily figure out why I do it,
+   but removing it causes strange test failures in linearization.  I
+   would have to study the optimization and linearization code to
+   figure out why I added this to begin with and what in the code
+   assumes it's the case.  For enqueueObject and unparseChild in
+   QPDFWriter, simply removing the checks for indirect scalars seems
+   sufficient.
+
+   To pursue this, remove the call to flattenScalarReferences in
+   QPDFWriter.cc and disable the logic_error exceptions for indirect
+   scalars.  Just search for flattenScalarReferences in QPDFWriter.cc
+   since the logic errors have comments that mention
+   flattenScalarReferences.  Then run the test suite.  Several files
+   that explicitly test flattening of scalar references fail, but the
+   indirect scalars are properly preserved and written.  But then
+   there are some linearized files that have a bunch of unreferenced
+   objects that contain scalars.  Need to figure out what these are
+   and why they're there.  Maybe they're objects that used to be
+   stream lengths.  Probably we just need to make sure don't traverse
+   through a stream's /Length stream when enqueueing stream
+   dictionaries.
+
+   If flattenScalarReferences is removed, a new method will be needed
+   for checking PDF files.
+
  * For debugging linearization bugs, consider adding an option to save
    pass 1 of linearization.  This code is sufficient.  Change the
    interface to allow specification of a pass1 file, which would
