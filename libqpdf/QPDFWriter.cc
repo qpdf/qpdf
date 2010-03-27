@@ -635,6 +635,8 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
 	}
 	else if (object.isScalar())
 	{
+	    // flattenScalarReferences is supposed to have removed all
+	    // indirect scalars.
 	    throw std::logic_error(
 		"INTERNAL ERROR: QPDFWriter::enqueueObject: indirect scalar: " +
 		std::string(this->filename) + " " +
@@ -715,6 +717,8 @@ QPDFWriter::unparseChild(QPDFObjectHandle child, int level, int flags)
     {
 	if (child.isScalar())
 	{
+	    // flattenScalarReferences is supposed to have removed all
+	    // indirect scalars.
 	    throw std::logic_error(
 		"INTERNAL ERROR: QPDFWriter::unparseChild: indirect scalar: " +
 		QUtil::int_to_string(child.getObjectID()) + " " +
