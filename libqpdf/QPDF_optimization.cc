@@ -69,18 +69,25 @@ QPDF::flattenScalarReferences()
     queue.push_back(this->trailer);
     std::set<ObjGen> visited;
 
+    // Add every object in the xref table to the queue.  This ensures
+    // that we flatten scalar references in unreferenced objects.
+    // This becomes important if we are preserving object streams in a
+    // file that has unreferenced objects in its object streams.  (See
+    // QPDF bug 2974522 at SourceForge.)
+    for (std::map<ObjGen, QPDFXRefEntry>::iterator iter =
+	     this->xref_table.begin();
+	 iter != this->xref_table.end(); ++iter)
+    {
+	ObjGen const& og = (*iter).first;
+	queue.push_back(getObjectByID(og.obj, og.gen));
+    }
+
     while (! queue.empty())
     {
 	QPDFObjectHandle node = queue.front();
 	queue.pop_front();
 	if (node.isIndirect())
 	{
-	    if (node.isScalar())
-	    {
-		throw std::logic_error(
-		    "INTERNAL ERROR:"
-		    " flattenScalarReferences landed at indirect scalar");
-	    }
 	    ObjGen og(node.getObjectID(), node.getGeneration());
 	    if (visited.count(og) > 0)
 	    {

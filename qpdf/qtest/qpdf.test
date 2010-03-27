@@ -77,7 +77,7 @@ flush_tiff_cache();
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 16;
+$n_tests += 18;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -120,6 +120,19 @@ $td->runtest("show new xref stream",
 	     {$td->FILE => "xref-with-short-size-new.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
+
+# Handle file with object stream containing an unreferenced object
+# that in turn contains an indirect scalar (bug 2974522).
+$td->runtest("unreferenced indirect scalar",
+	     {$td->COMMAND =>
+		  "qpdf --qdf --static-id --object-streams=preserve" .
+		  " unreferenced-indirect-scalar.pdf a.qdf"},
+	     {$td->STRING => "",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "a.qdf"},
+	     {$td->FILE => "unreferenced-indirect-scalar.out"});
 
 # Min/Force version
 $td->runtest("set min version",
