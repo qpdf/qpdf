@@ -36,10 +36,16 @@ General
    and why they're there.  Maybe they're objects that used to be
    stream lengths.  Probably we just need to make sure don't traverse
    through a stream's /Length stream when enqueueing stream
-   dictionaries.
+   dictionaries.  This could potentially happen with any object that
+   QPDFWriter replaces when writing out files.  Such objects would be
+   orphaned in the newly written file.  This could be fixed, but it
+   may not be worth fixing.
 
    If flattenScalarReferences is removed, a new method will be needed
    for checking PDF files.
+
+ * See if we can avoid preserving unreferenced objects in objet
+   streams even when preserving the object streams.
 
  * For debugging linearization bugs, consider adding an option to save
    pass 1 of linearization.  This code is sufficient.  Change the
