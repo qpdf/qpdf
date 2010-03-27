@@ -33,9 +33,9 @@ Release Reminders
 
  * To create a source release, do an export from the version control
    system to a directory called qpdf-version.  From the parent of that
-   directory, run make_dist with the directory as an argument.  For
-   internally testing releases, you can run make_dist with the
-   --no-tests option.
+   directory, run make_dist with the directory as an argument.
+   Remember to have fop in your path.  For internally testing
+   releases, you can run make_dist with the --no-tests option.
 
  * To create a source release of external libs, do an export from the
    version control system into a directory called qpdf-external-libs
@@ -59,6 +59,7 @@ Release Reminders
 
  * When releasing on source forge, external-libs distributions go in
    external-libs/yyyymmdd, and qpdf distributions go in qpdf/vvv
+
 
 General Build Stuff
 ===================
