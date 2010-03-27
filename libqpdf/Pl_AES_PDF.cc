@@ -102,10 +102,15 @@ Pl_AES_PDF::finish()
     {
 	if (this->offset != this->buf_size)
 	{
-	    throw std::runtime_error(
-		"aes encrypted stream length was not a multiple of " +
-		QUtil::int_to_string(this->buf_size) + " bytes (offset = " +
-		QUtil::int_to_string(this->offset) + ")");
+	    // This is never supposed to happen as the output is
+	    // always supposed to be padded.  However, we have
+	    // encountered files for which the output is not a
+	    // multiple of the block size.  In this case, pad with
+	    // zeroes and hope for the best.
+	    assert(this->buf_size > this->offset);
+	    std::memset(this->inbuf + this->offset, 0,
+			this->buf_size - this->offset);
+	    this->offset = this->buf_size;
 	}
 	flush(true);
     }
