@@ -109,9 +109,7 @@ if ($version_error)
     die "$whoami: version numbers are not consistent\n";
 }
 
-run("aclocal -I m4");
-run("autoheader");
-run("autoconf");
+run("./autogen.sh");
 run("./configure --enable-doc-maintenance");
 run("make build_manual");
 run("make distclean");

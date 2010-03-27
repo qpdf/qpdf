@@ -26,9 +26,7 @@ Release Reminders
  * To construct a source distribution from a pristine checkout,
    make_dist does the following:
 
-    aclocal -I m4
-    autoheader
-    autoconf
+    ./autogen.sh
     ./configure --enable-doc-maintenance
     make build_manual
     make distclean
