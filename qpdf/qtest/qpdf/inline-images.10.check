@@ -13,4 +13,5 @@ modify annotations: allowed
 modify other: allowed
 modify anything: allowed
 File is not linearized
-No errors found
+No syntax or stream encoding errors found; the file may still contain
+errors that qpdf cannot detect

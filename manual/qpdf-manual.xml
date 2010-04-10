@@ -2072,6 +2072,9 @@ print "\n";
   </para>
   <variablelist>
    <varlistentry>
+<!--
+clarified check output
+-->
     <term>2.1.3: March 27, 2010</term>
     <listitem>
      <itemizedlist>

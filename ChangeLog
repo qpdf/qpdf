@@ -1,3 +1,10 @@
+2010-04-10  Jay Berkenbilt  <ejb@ql.org>
+
+	* qpdf/qpdf.cc (main): Since qpdf --check only checks syntax and
+	stream encoding without doing any semantic checks, make the output
+	clearer when no errors around found.  This is inspired by
+	qpdf-Bugs-2983225.
+
 2010-03-27  Jay Berkenbilt  <ejb@ql.org>
 
 	* 2.1.3: release

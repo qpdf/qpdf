@@ -2,4 +2,5 @@ checking b.pdf
 PDF Version: 1.4
 File is not encrypted
 File is not linearized
-No errors found
+No syntax or stream encoding errors found; the file may still contain
+errors that qpdf cannot detect

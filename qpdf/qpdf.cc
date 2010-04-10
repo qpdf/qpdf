@@ -1034,7 +1034,11 @@ int main(int argc, char* argv[])
 		    }
 		    else
 		    {
-			std::cout << "No errors found" << std::endl;
+			std::cout << "No syntax or stream encoding errors"
+				  << " found; the file may still contain"
+				  << std::endl
+				  << "errors that qpdf cannot detect"
+				  << std::endl;
 		    }
 		}
 	    }
