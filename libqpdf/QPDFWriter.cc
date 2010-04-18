@@ -2145,18 +2145,16 @@ QPDFWriter::writeLinearized()
 		writeXRefStream(second_half_xref,
 				second_half_end, second_xref_offset,
 				t_lin_second, 0, second_half_end,
-				second_trailer_size/*,
-				0, 0, 0, 0, (pass == 1)*/);
-///	    int endpos = this->pipeline->getCount();
+				second_trailer_size,
+				0, 0, 0, 0, (pass == 1));
+	    int endpos = this->pipeline->getCount();
 
 	    if (pass == 1)
 	    {
 		// Pad so we have enough room for the real xref
 		// stream.  See comments for previous xref stream on
 		// how we calculate the padding.
-
-///		writePad(calculateXrefStreamPadding(endpos - pos));
-		writePad(99);
+		writePad(calculateXrefStreamPadding(endpos - pos));
 		writeString("\n");
 		second_xref_end = this->pipeline->getCount();
 	    }

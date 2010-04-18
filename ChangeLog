@@ -1,3 +1,14 @@
+2010-04-18  Jay Berkenbilt  <ejb@ql.org>
+
+	* 2.1.4: release
+
+	* libqpdf/QPDFWriter.cc (writeLinearized): the padding calculation
+	fix in 2.1.2 was applied in only one place but it was needed in
+	two places since there are actually two cross reference streams in
+	a linearized file.  The new padding calculation is now used for
+	both streams.  Hopefully this should put an end to linearization
+	padding problems.  (Fixes qpdf-Bugs-2979219.)
+
 2010-04-10  Jay Berkenbilt  <ejb@ql.org>
 
 	* qpdf/qpdf.cc (main): Since qpdf --check only checks syntax and
