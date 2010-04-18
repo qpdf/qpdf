@@ -498,6 +498,15 @@ QPDFWriter::writeStringNoQDF(std::string const& str)
     }
 }
 
+void
+QPDFWriter::writePad(int nspaces)
+{
+    for (int i = 0; i < nspaces; ++i)
+    {
+	writeString(" ");
+    }
+}
+
 Pipeline*
 QPDFWriter::pushPipeline(Pipeline* p)
 {
@@ -770,10 +779,7 @@ QPDFWriter::writeTrailer(trailer_e which, int size, bool xref_stream, int prev)
 		    writeString(QUtil::int_to_string(prev));
 		    int nspaces = pos + 11 - this->pipeline->getCount();
 		    assert(nspaces >= 0);
-		    for (int i = 0; i < nspaces; ++i)
-		    {
-			writeString(" ");
-		    }
+		    writePad(nspaces);
 		}
 	    }
 	    else
@@ -1855,6 +1861,20 @@ QPDFWriter::writeXRefStream(int xref_id, int max_id, int max_offset,
     return space_before_zero;
 }
 
+int
+QPDFWriter::calculateXrefStreamPadding(int xref_bytes)
+{
+    // This routine is called right after a linearization first pass
+    // xref stream has been written without compression.  Calculate
+    // the amount of padding that would be required in the worst case,
+    // assuming the number of uncompressed bytes remains the same.
+    // The worst case for zlib is that the output is larger than the
+    // input by 6 bytes plus 5 bytes per 16K, and then we'll add 10
+    // extra bytes for number length increases.
+
+    return 16 + (5 * ((xref_bytes + 16383) / 16384));
+}
+
 void
 QPDFWriter::writeLinearized()
 {
@@ -2016,10 +2036,7 @@ QPDFWriter::writeLinearized()
 	static int const pad = 150;
 	int spaces = (pos + pad - this->pipeline->getCount());
 	assert(spaces >= 0);
-	for (int i = 0; i < spaces; ++i)
-	{
-	    writeString(" ");
-	}
+	writePad(spaces);
 	writeString("\n");
 
 	// Part 3: first page cross reference table and trailer.
@@ -2057,32 +2074,16 @@ QPDFWriter::writeLinearized()
 	    if (pass == 1)
 	    {
 		// Pad so we have enough room for the real xref
-		// stream.  We've written the stream without
-		// compression (but with all the stream dictionary
-		// parameters to enable it) and assuming a very
-		// generous allowance for writing file offsets.  We
-		// need a little extra padding to allow for zlib's
-		// output to be larger than its input (6 bytes plus 5
-		// bytes per 16K), and then we'll add 10 extra bytes
-		// for number length increases.
-
-		unsigned int xref_bytes = endpos - pos;
-		int possible_extra =
-		    16 + (5 * ((xref_bytes + 16383) / 16384));
-		for (int i = 0; i < possible_extra; ++i)
-		{
-		    writeString(" ");
-		}
+		// stream.
+		writePad(calculateXrefStreamPadding(endpos - pos));
 		first_xref_end = this->pipeline->getCount();
 	    }
 	    else
 	    {
 		// Pad so that the next object starts at the same
 		// place as in pass 1.
-		for (int i = 0; i < first_xref_end - endpos; ++i)
-		{
-		    writeString(" ");
-		}
+		writePad(first_xref_end - endpos);
+
 		// A failure of this insertion means we didn't allow
 		// enough padding for the first pass xref stream.
 		assert(this->pipeline->getCount() == first_xref_end);
@@ -2139,27 +2140,23 @@ QPDFWriter::writeLinearized()
 	second_xref_offset = this->pipeline->getCount();
 	if (need_xref_stream)
 	{
+	    pos = this->pipeline->getCount();
 	    space_before_zero =
 		writeXRefStream(second_half_xref,
 				second_half_end, second_xref_offset,
 				t_lin_second, 0, second_half_end,
-				second_trailer_size);
+				second_trailer_size/*,
+				0, 0, 0, 0, (pass == 1)*/);
+///	    int endpos = this->pipeline->getCount();
+
 	    if (pass == 1)
 	    {
-		// Add some padding -- we need an accurate file_size
-		// number, and this could change if the pass 2 xref
-		// stream compresses differently.  There shouldn't be
-		// much difference, so we'll just pad 100 characters.
-		// This is unscientific though, and may not always
-		// work.  The only way we could really get around this
-		// would be to seek back to the beginning of the file
-		// and update /L in the linearization dictionary, but
-		// that would be the only thing in the design that
-		// would require the output file to be seekable.
-		for (int i = 0; i < 99; ++i)
-		{
-		    writeString(" ");
-		}
+		// Pad so we have enough room for the real xref
+		// stream.  See comments for previous xref stream on
+		// how we calculate the padding.
+
+///		writePad(calculateXrefStreamPadding(endpos - pos));
+		writePad(99);
 		writeString("\n");
 		second_xref_end = this->pipeline->getCount();
 	    }
@@ -2167,12 +2164,9 @@ QPDFWriter::writeLinearized()
 	    {
 		// Make the file size the same.
 		int pos = this->pipeline->getCount();
-		while (pos < second_xref_end + hint_length - 1)
-		{
-		    ++pos;
-		    writeString(" ");
-		}
+		writePad(second_xref_end + hint_length - 1 - pos);
 		writeString("\n");
+
 		// If this assertion fails, maybe we didn't have
 		// enough padding above.
 		assert(this->pipeline->getCount() ==
