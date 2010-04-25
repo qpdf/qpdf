@@ -44,9 +44,10 @@ Release Reminders
    information on creating binary external libs releases.
 
  * To create Windows binary releases, extract the qpdf source
-   distribution in Windows (MSYS + MINGW, MSVC) and run
-   ./make_windows_releases from there.  You will need to have zip in
-   your path.
+   distribution in Windows (MSYS + MINGW, MSVC).  From the extracted
+   directory, extract the binary distribution of the external
+   libraries.  Run ./make_windows_releases from there.  You will need
+   to have zip in your path.
 
  * Remember to copy README-what-to-download.txt separately onto the
    download area and make it the default for Windows platforms.
