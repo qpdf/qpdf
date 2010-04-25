@@ -24,7 +24,6 @@ static char const padding_string[] = {
 };
 
 static unsigned int const O_key_bytes = sizeof(MD5::Digest);
-static unsigned int const id_bytes = 16;
 static unsigned int const key_bytes = 32;
 
 void
@@ -145,7 +144,7 @@ QPDF::compute_encryption_key(
     pbytes[2] = (char) ((data.P >> 16) & 0xff);
     pbytes[3] = (char) ((data.P >> 24) & 0xff);
     md5.encodeDataIncrementally(pbytes, 4);
-    md5.encodeDataIncrementally(data.id1.c_str(), id_bytes);
+    md5.encodeDataIncrementally(data.id1.c_str(), data.id1.length());
     if ((data.R >= 4) && (! data.encrypt_metadata))
     {
 	char bytes[4];
@@ -343,14 +342,6 @@ QPDF::initializeEncryption()
     }
 
     std::string id1 = id_obj.getArrayItem(0).getStringValue();
-    if (id1.length() != id_bytes)
-    {
-	throw QPDFExc(qpdf_e_damaged_pdf, this->file.getName(),
-		      "trailer", this->file.getLastOffset(),
-		      "first /ID string in trailer dictionary has "
-		      "incorrect length");
-    }
-
     QPDFObjectHandle encryption_dict = this->trailer.getKey("/Encrypt");
     if (! encryption_dict.isDictionary())
     {

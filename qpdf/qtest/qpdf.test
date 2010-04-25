@@ -77,7 +77,7 @@ flush_tiff_cache();
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 18;
+$n_tests += 22;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -133,6 +133,24 @@ $td->runtest("unreferenced indirect scalar",
 $td->runtest("check output",
 	     {$td->FILE => "a.qdf"},
 	     {$td->FILE => "unreferenced-indirect-scalar.out"});
+
+# Encrypt files whose /ID strings are other than 32 bytes long (bug
+# 2991412).
+foreach my $file (qw(short-id long-id))
+{
+    $td->runtest("encrypt $file.pdf",
+		 {$td->COMMAND =>
+		      "qpdf --encrypt '' pass 40 -- $file.pdf a.pdf"},
+		 {$td->STRING => "",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("check $file.pdf",
+		 {$td->COMMAND => "qpdf --check a.pdf"},
+		 {$td->FILE => "$file-check.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
 
 # Min/Force version
 $td->runtest("set min version",
