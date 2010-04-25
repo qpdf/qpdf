@@ -1,3 +1,11 @@
+2010-04-25  Jay Berkenbilt  <ejb@ql.org>
+
+	* 2.1.5: release
+
+	* libqpdf/QPDF_encryption.cc (compute_encryption_key): remove
+	restrictions on length of file identifier string.  (Fixes
+	qpdf-Bugs-2991412.)
+
 2010-04-18  Jay Berkenbilt  <ejb@ql.org>
 
 	* 2.1.4: release

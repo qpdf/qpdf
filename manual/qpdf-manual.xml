@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "2.1.4">
-<!ENTITY lastreleased "April 18, 2010">
+<!ENTITY swversion "2.1.5">
+<!ENTITY lastreleased "April 25, 2010">
 ]>
 <book>
  <bookinfo>
@@ -2071,6 +2071,22 @@ print "\n";
    <filename>ChangeLog</filename> in the source distribution.
   </para>
   <variablelist>
+   <varlistentry>
+    <term>2.1.5: April 25, 2010</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Remove restriction of file identifier strings to 16 bytes.
+        This unnecessary restriction was preventing qpdf from being
+        able to encrypt or decrypt files with identifier strings that
+        were not exactly 16 bytes long.  The specification imposes no
+        such restriction.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
     <term>2.1.4: April 18, 2010</term>
     <listitem>
