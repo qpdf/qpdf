@@ -1,3 +1,38 @@
+Bug
+===
+
+ * Running
+
+   valgrind --leak-check=full .../qpdf --check memory-leak.pdf
+
+   shows a number of QPDFObjects that were not deallocated.  They all
+   seem to be objects allocated by dereference() while in
+   flattenScalarReferences.
+
+   I'm not sure at this time how it's possible that this memory is
+   leaked because everything is based on PointerHolder.  I've already
+   ruled out the way the cache is handled...the objects in the cache
+   overlap with the leaked objects, but they are not exactly the
+   leaked objects.
+
+   Most files don't exhibit leaks, but all files that have outlines
+   do.  I don't know whether it's because of circular object
+   references.
+
+   General debugging: put a break point on 'stop_here()' and run qpdf
+   --check memory-leak.pdf in gdb.  For simplicity, configure with
+   --disabled-shared CFLAGS=-g CXXFLAGS=-g.  This will cause gdb to
+   stop at the point of allocation of all the objects that are leaked.
+   I'm still not sure which of these is the one that valgrind is
+   complaining about, and I'm not really even sure that they're
+   legitimate, though it's hard to imagine that they aren't.
+
+
+Next
+====
+
+ * Work in contrib/vc6.  See email from stronghorse@tom.com
+
 2.2
 ===
 
