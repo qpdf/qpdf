@@ -540,7 +540,7 @@ QPDFObjectHandle::makeDirectInternal(std::set<int>& visited)
     this->objid = 0;
     this->generation = 0;
 
-    QPDFObject* new_obj = 0;
+    PointerHolder<QPDFObject> new_obj;
 
     if (isBool())
     {
