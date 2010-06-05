@@ -541,7 +541,7 @@ QPDF::read_xref(off_t xref_offset)
     int max_obj = 0;
     if (! xref_table.empty())
     {
-	(*(xref_table.rbegin())).first.obj;
+	max_obj = (*(xref_table.rbegin())).first.obj;
     }
     if (! this->deleted_objects.empty())
     {
