@@ -104,9 +104,12 @@ QPDF::flattenScalarReferences()
 		QPDFObjectHandle oh = node.getArrayItem(i);
 		if (oh.isScalar())
 		{
-		    QTC::TC("qpdf", "QPDF opt flatten array scalar");
-		    oh.makeDirect();
-		    node.setArrayItem(i, oh);
+		    if (oh.isIndirect())
+		    {
+			QTC::TC("qpdf", "QPDF opt flatten array scalar");
+			oh.makeDirect();
+			node.setArrayItem(i, oh);
+		    }
 		}
 		else
 		{
@@ -136,9 +139,12 @@ QPDF::flattenScalarReferences()
 		}
 		else if (oh.isScalar())
 		{
-		    QTC::TC("qpdf", "QPDF opt flatten dict scalar");
-		    oh.makeDirect();
-		    dict.replaceKey(key, oh);
+		    if (oh.isIndirect())
+		    {
+			QTC::TC("qpdf", "QPDF opt flatten dict scalar");
+			oh.makeDirect();
+			dict.replaceKey(key, oh);
+		    }
 		}
 		else
 		{
