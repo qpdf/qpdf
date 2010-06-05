@@ -538,7 +538,11 @@ QPDF::read_xref(off_t xref_offset)
     }
 
     int size = this->trailer.getKey("/Size").getIntValue();
-    int max_obj = (*(xref_table.rbegin())).first.obj;
+    int max_obj = 0;
+    if (! xref_table.empty())
+    {
+	(*(xref_table.rbegin())).first.obj;
+    }
     if (! this->deleted_objects.empty())
     {
 	max_obj = std::max(max_obj, *(this->deleted_objects.rbegin()));
