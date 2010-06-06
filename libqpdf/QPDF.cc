@@ -277,6 +277,20 @@ QPDF::QPDF() :
 
 QPDF::~QPDF()
 {
+    // If two objects are mutually referential (through each object
+    // having an array or dictionary that contains an indirect
+    // reference to the other), the circular references in the
+    // PointerHolder objects will prevent the objects from being
+    // deleted.  Walk through all objects in the object cache, which
+    // is those objects that we read from the file, and break all
+    // resolved references.  At this point, obviously no one is still
+    // using the QPDF object, but we'll explicitly clear the xref
+    // table anyway just to prevent any possibility of resolve()
+    // succeeding.  Note that we can't break references like this at
+    // any time when the QPDF object is active.  If we do, the next
+    // reference will reread the object from the file, which would
+    // have the effect of undoing any modifications that may have been
+    // made to any of the objects.
     this->xref_table.clear();
     for (std::map<ObjGen, ObjCache>::iterator iter = this->obj_cache.begin();
 	 iter != obj_cache.end(); ++iter)
