@@ -363,7 +363,7 @@ my @goodfiles = ("implicit null",			# 1
 		 "direct null",				# 2
 		 "unresolved null",			# 3
 		 "indirect null",			# 4
-		 "indirect bool",			# 5
+		 "indirect bool, real",			# 5
 		 "direct bool",				# 6
 		 "integer",				# 7
 		 "real, ASCIIHexDecode",		# 8

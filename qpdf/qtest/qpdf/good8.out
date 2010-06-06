@@ -1,5 +1,5 @@
-/QTest is direct
+/QTest is indirect
 /QTest is a real number with value 3.14159
-unparse: 3.14159
+unparse: 7 0 R
 unparseResolved: 3.14159
 test 1 done
