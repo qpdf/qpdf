@@ -32,7 +32,10 @@ General
    figure out why I added this to begin with and what in the code
    assumes it's the case.  For enqueueObject and unparseChild in
    QPDFWriter, simply removing the checks for indirect scalars seems
-   sufficient.
+   sufficient.  Looking back at the branch in the apex epub
+   repository, before flattening scalar references, there was special
+   case code in QPDFWriter to avoid writing out indirect nulls.  It's
+   still not obvious to me why I did it though.
 
    To pursue this, remove the call to flattenScalarReferences in
    QPDFWriter.cc and disable the logic_error exceptions for indirect
@@ -54,7 +57,7 @@ General
    If flattenScalarReferences is removed, a new method will be needed
    for checking PDF files.
 
- * See if we can avoid preserving unreferenced objects in objet
+ * See if we can avoid preserving unreferenced objects in object
    streams even when preserving the object streams.
 
  * For debugging linearization bugs, consider adding an option to save
