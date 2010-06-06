@@ -13,6 +13,17 @@ QPDF_Dictionary::~QPDF_Dictionary()
 {
 }
 
+void
+QPDF_Dictionary::releaseResolved()
+{
+    for (std::map<std::string, QPDFObjectHandle>::iterator iter =
+	     this->items.begin();
+	 iter != this->items.end(); ++iter)
+    {
+	QPDFObjectHandle::ReleaseResolver::releaseResolved((*iter).second);
+    }
+}
+
 std::string
 QPDF_Dictionary::unparse()
 {

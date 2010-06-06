@@ -277,6 +277,13 @@ QPDF::QPDF() :
 
 QPDF::~QPDF()
 {
+    this->xref_table.clear();
+    for (std::map<ObjGen, ObjCache>::iterator iter = this->obj_cache.begin();
+	 iter != obj_cache.end(); ++iter)
+    {
+	QPDFObject::ObjAccessor::releaseResolved(
+	    (*iter).second.object.getPointer());
+    }
 }
 
 void

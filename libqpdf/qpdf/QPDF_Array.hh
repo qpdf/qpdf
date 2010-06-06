@@ -16,6 +16,9 @@ class QPDF_Array: public QPDFObject
     QPDFObjectHandle getItem(int n) const;
     void setItem(int, QPDFObjectHandle const&);
 
+  protected:
+    virtual void releaseResolved();
+
   private:
     std::vector<QPDFObjectHandle> items;
 };

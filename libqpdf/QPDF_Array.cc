@@ -10,6 +10,16 @@ QPDF_Array::~QPDF_Array()
 {
 }
 
+void
+QPDF_Array::releaseResolved()
+{
+    for (std::vector<QPDFObjectHandle>::iterator iter = this->items.begin();
+	 iter != this->items.end(); ++iter)
+    {
+	QPDFObjectHandle::ReleaseResolver::releaseResolved(*iter);
+    }
+}
+
 std::string
 QPDF_Array::unparse()
 {

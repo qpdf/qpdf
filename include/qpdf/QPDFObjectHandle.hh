@@ -22,6 +22,8 @@
 
 class Pipeline;
 class QPDF;
+class QPDF_Dictionary;
+class QPDF_Array;
 
 class QPDFObjectHandle
 {
@@ -247,6 +249,20 @@ class QPDFObjectHandle
     };
     friend class ObjAccessor;
 
+    // Provide access to specific classes for recursive
+    // reverseResolved().
+    class ReleaseResolver
+    {
+	friend class QPDF_Dictionary;
+	friend class QPDF_Array;
+      private:
+	static void releaseResolved(QPDFObjectHandle& o)
+	{
+	    o.releaseResolved();
+	}
+    };
+    friend class ReleaseResolver;
+
   private:
     QPDFObjectHandle(QPDF*, int objid, int generation);
     QPDFObjectHandle(QPDFObject*);
@@ -262,6 +278,7 @@ class QPDFObjectHandle
     void assertPageObject();
     void dereference();
     void makeDirectInternal(std::set<int>& visited);
+    void releaseResolved();
 
     bool initialized;
 

@@ -1,3 +1,9 @@
+2010-06-06  Jay Berkenbilt  <ejb@ql.org>
+
+	* Fix memory leak for QPDF objects whose underlying PDF objects
+	contain circular references.  Thanks to Jian Ma
+	<stronghorse@tom.com> for calling my attention to the memory leak.
+
 2010-04-25  Jay Berkenbilt  <ejb@ql.org>
 
 	* 2.1.5: release
