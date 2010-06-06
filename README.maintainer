@@ -4,7 +4,7 @@ Release Reminders
  * Increment shared library version information as needed
    (libqpdf/build.mk)
 
- * Update release notes in manual
+ * Update release notes in manual -- look at diffs and ChangeLog
 
  * Add a release entry to ChangeLog
 
