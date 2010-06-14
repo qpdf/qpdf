@@ -12,6 +12,13 @@ Next
    Stefan Heinsen <stefan.heinsen@gmx.de> in August, 2009.  He seems
    to like to send encrypted mail.  (key 01FCC336)
 
+ * Add helper routines for manipulating page content streams.
+   Operations should include ability to convert page contents from a
+   stream to an array of streams and to append or prepend to the page
+   contents.  See message from stronghorse@tom.com ("Suggestion for
+   qpdf") from 2010-06-09 and my response.  Consider providing an
+   example program that adds the line he suggests.
+
  * Look at page splitting.  Subramanyam provided a test file; see
    ../misc/article-threads.pdf.  Email Q-Count: 431864 from
    2009-11-03.
