@@ -3,6 +3,8 @@ Next
 
  * Work in contrib/vc6.  See email from stronghorse@tom.com
 
+ * Stop using float for version comparisons.
+
 2.2
 ===
 
@@ -18,6 +20,10 @@ Next
    contents.  See message from stronghorse@tom.com ("Suggestion for
    qpdf") from 2010-06-09 and my response.  Consider providing an
    example program that adds the line he suggests.
+
+ * Add function to get all images.  Should be able to return a map of
+   pages to a list of images or something similar.  Can use
+   QPDFObjectHandle::getPageImages.  Look at pdf-billinfo for ideas.
 
  * Look at page splitting.  Subramanyam provided a test file; see
    ../misc/article-threads.pdf.  Email Q-Count: 431864 from
