@@ -118,7 +118,7 @@ QPDFWriter::setMinimumPDFVersion(std::string const& version)
 	int min_minor = 0;
 	parseVersion(version, old_major, old_minor);
 	parseVersion(this->min_pdf_version, min_major, min_minor);
-	if (compareVersions(old_minor, old_minor, min_minor, min_minor) > 0)
+	if (compareVersions(old_major, old_minor, min_major, min_minor) > 0)
 	{
 	    QTC::TC("qpdf", "QPDFWriter increasing minimum version");
 	    set_version = true;
