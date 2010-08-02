@@ -12,6 +12,19 @@ Next
    Stefan Heinsen <stefan.heinsen@gmx.de> in August, 2009.  He seems
    to like to send encrypted mail.  (key 01FCC336)
 
+   It appears that the only thing in the code that actually has to
+   change is the QPDF_Stream object.  When replacing stream data, we
+   have to mutate the stream's dictionary to adjust /Filter,
+   /DecodeParms, and /Length.  We should probably just provide a
+   method to replace the stream data, /Filter, and /DecodeParms all at
+   once.  If new values are provided, then pipeStreamData can use the
+   new values, and we essentially then lose the original values.  The
+   code for replacing stream data would be to use getStreamData to get
+   the old data and then to replace it all before any calls that would
+   cause QPDFWriter to write new stream data.  Will have to go through
+   QPDF_Stream.cc carefully line by line to make sure everything is
+   adjusted properly.
+
  * Add helper routines for manipulating page content streams.
    Operations should include ability to convert page contents from a
    stream to an array of streams and to append or prepend to the page
