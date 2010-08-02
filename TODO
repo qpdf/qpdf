@@ -1,8 +1,6 @@
 Next
 ====
 
- * Check for references to qpdf.qbilt.org in docs or debian files.
-
  * Work in contrib/vc6.  See email from stronghorse@tom.com
 
  * Stop using float for version comparisons.
