@@ -174,3 +174,5 @@ QPDF ERR object stream with wrong type 0
 QPDF object gone after xref reconstruction 0
 qpdf-c called qpdf_has_error 0
 qpdf-c called qpdf_get_qpdf_version 0
+QPDF_Stream pipe original stream data 0
+QPDF_Stream pipe replaced stream data 0

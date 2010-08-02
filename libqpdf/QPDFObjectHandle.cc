@@ -362,13 +362,6 @@ QPDFObjectHandle::replaceStreamData(PointerHolder<Buffer> data,
 	data, filter, decode_parms);
 }
 
-void
-QPDFObjectHandle::replaceStreamData(PointerHolder<StreamDataHandler> dh)
-{
-    assertType("Stream", isStream());
-    dynamic_cast<QPDF_Stream*>(obj.getPointer())->replaceStreamData(dh);
-}
-
 int
 QPDFObjectHandle::getObjectID() const
 {

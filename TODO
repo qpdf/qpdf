@@ -25,6 +25,9 @@ Next
    QPDF_Stream.cc carefully line by line to make sure everything is
    adjusted properly.
 
+   Don't forget to provide a method that provides a pipeline through
+   which the stream data is to be piped.
+
  * Add helper routines for manipulating page content streams.
    Operations should include ability to convert page contents from a
    stream to an array of streams and to append or prepend to the page
