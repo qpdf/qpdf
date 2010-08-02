@@ -207,7 +207,9 @@ class QPDFWriter
 	char const* user_password, char const* owner_password,
 	bool allow_accessibility, bool allow_extract,
 	qpdf_r3_print_e print, qpdf_r3_modify_e modify);
-    void disableIncompatbleEncryption(float v);
+    void disableIncompatibleEncryption(int major, int minor);
+    void parseVersion(std::string const& version, int& major, int& minor) const;
+    int compareVersions(int major1, int minor1, int major2, int minor2) const;
     void setEncryptionParameters(
 	char const* user_password, char const* owner_password,
 	int V, int R, int key_len, std::set<int>& bits_to_clear);

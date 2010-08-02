@@ -3,8 +3,6 @@ Next
 
  * Work in contrib/vc6.  See email from stronghorse@tom.com
 
- * Stop using float for version comparisons.
-
 2.2
 ===
 

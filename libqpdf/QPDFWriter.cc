@@ -112,9 +112,13 @@ QPDFWriter::setMinimumPDFVersion(std::string const& version)
     }
     else
     {
-	float v = atof(version.c_str());
-	float mv = atof(this->min_pdf_version.c_str());
-	if (v > mv)
+	int old_major = 0;
+	int old_minor = 0;
+	int min_major = 0;
+	int min_minor = 0;
+	parseVersion(version, old_major, old_minor);
+	parseVersion(this->min_pdf_version, min_major, min_minor);
+	if (compareVersions(old_minor, old_minor, min_minor, min_minor) > 0)
 	{
 	    QTC::TC("qpdf", "QPDFWriter increasing minimum version");
 	    set_version = true;
@@ -354,7 +358,7 @@ QPDFWriter::copyEncryptionParameters()
 }
 
 void
-QPDFWriter::disableIncompatbleEncryption(float v)
+QPDFWriter::disableIncompatibleEncryption(int major, int minor)
 {
     if (! this->encrypted)
     {
@@ -362,7 +366,7 @@ QPDFWriter::disableIncompatbleEncryption(float v)
     }
 
     bool disable = false;
-    if (v < 1.3)
+    if (compareVersions(major, minor, 1, 3) < 0)
     {
 	disable = true;
     }
@@ -370,21 +374,21 @@ QPDFWriter::disableIncompatbleEncryption(float v)
     {
 	int V = atoi(encryption_dictionary["/V"].c_str());
 	int R = atoi(encryption_dictionary["/R"].c_str());
-	if (v < 1.4)
+	if (compareVersions(major, minor, 1, 4) < 0)
 	{
 	    if ((V > 1) || (R > 2))
 	    {
 		disable = true;
 	    }
 	}
-	else if (v < 1.5)
+	else if (compareVersions(major, minor, 1, 5) < 0)
 	{
 	    if ((V > 2) || (R > 3))
 	    {
 		disable = true;
 	    }
 	}
-	else if (v < 1.6)
+	else if (compareVersions(major, minor, 1, 6) < 0)
 	{
 	    if (this->encrypt_use_aes)
 	    {
@@ -396,6 +400,53 @@ QPDFWriter::disableIncompatbleEncryption(float v)
     {
 	QTC::TC("qpdf", "QPDFWriter forced version disabled encryption");
 	this->encrypted = false;
+    }
+}
+
+void
+QPDFWriter::parseVersion(std::string const& version,
+			 int& major, int& minor) const
+{
+    major = atoi(version.c_str());
+    minor = 0;
+    size_t p = version.find('.');
+    if ((p != std::string::npos) && (version.length() > p))
+    {
+	minor = atoi(version.substr(p + 1).c_str());
+    }
+    std::string tmp = QUtil::int_to_string(major) + "." +
+	QUtil::int_to_string(minor);
+    if (tmp != version)
+    {
+	throw std::logic_error(
+	    "INTERNAL ERROR: QPDFWriter::parseVersion"
+	    " called with invalid version number " + version);
+    }
+}
+
+int
+QPDFWriter::compareVersions(int major1, int minor1,
+			    int major2, int minor2) const
+{
+    if (major1 < major2)
+    {
+	return -1;
+    }
+    else if (major1 > major2)
+    {
+	return 1;
+    }
+    else if (minor1 < minor2)
+    {
+	return -1;
+    }
+    else if (minor1 > minor2)
+    {
+	return 1;
+    }
+    else
+    {
+	return 0;
     }
 }
 
@@ -1491,9 +1542,11 @@ QPDFWriter::write()
 
     if (! this->forced_pdf_version.empty())
     {
-	float v = atof(this->forced_pdf_version.c_str());
-	disableIncompatbleEncryption(v);
-	if (v < 1.5)
+	int major = 0;
+	int minor = 0;
+	parseVersion(this->forced_pdf_version, major, minor);
+	disableIncompatibleEncryption(major, minor);
+	if (compareVersions(major, minor, 1, 5) < 0)
 	{
 	    QTC::TC("qpdf", "QPDFWriter forcing object stream disable");
 	    this->object_stream_mode = qpdf_o_disable;
