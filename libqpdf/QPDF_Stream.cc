@@ -319,9 +319,30 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline, bool filter,
 	}
     }
 
+    // XXX handle stream_data and stream_data_handler
     QPDF::Pipe::pipeStreamData(this->qpdf, this->objid, this->generation,
 			       this->offset, this->length,
 			       this->stream_dict, pipeline);
 
     return filter;
+}
+
+void
+QPDF_Stream::replaceStreamData(PointerHolder<Buffer> data,
+			       QPDFObjectHandle filter,
+			       QPDFObjectHandle decode_parms)
+{
+    this->stream_data = data;
+    this->stream_dict.replaceOrRemoveKey("/Filter", filter);
+    this->stream_dict.replaceOrRemoveKey("/DecodeParms", decode_parms);
+    this->stream_dict.replaceKey("/Length",
+				 QPDFObjectHandle::newInteger(
+				     data.getPointer()->getSize()));
+}
+
+void
+QPDF_Stream::replaceStreamData(
+    PointerHolder<QPDFObjectHandle::StreamDataHandler> dh)
+{
+    this->stream_data_handler = dh;
 }

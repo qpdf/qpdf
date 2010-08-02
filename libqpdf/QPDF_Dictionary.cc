@@ -92,3 +92,17 @@ QPDF_Dictionary::removeKey(std::string const& key)
     // no-op if key does not exist
     this->items.erase(key);
 }
+
+void
+QPDF_Dictionary::replaceOrRemoveKey(std::string const& key,
+				    QPDFObjectHandle value)
+{
+    if (value.isNull())
+    {
+	removeKey(key);
+    }
+    else
+    {
+	replaceKey(key, value);
+    }
+}

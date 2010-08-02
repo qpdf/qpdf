@@ -319,6 +319,15 @@ QPDFObjectHandle::removeKey(std::string const& key)
     return dynamic_cast<QPDF_Dictionary*>(obj.getPointer())->removeKey(key);
 }
 
+void
+QPDFObjectHandle::replaceOrRemoveKey(std::string const& key,
+				     QPDFObjectHandle value)
+{
+    assertType("Dictionary", isDictionary());
+    return dynamic_cast<QPDF_Dictionary*>(
+	obj.getPointer())->replaceOrRemoveKey(key, value);
+}
+
 // Stream accessors
 QPDFObjectHandle
 QPDFObjectHandle::getDict()
@@ -341,6 +350,23 @@ QPDFObjectHandle::pipeStreamData(Pipeline* p, bool filter,
     assertType("Stream", isStream());
     return dynamic_cast<QPDF_Stream*>(obj.getPointer())->pipeStreamData(
 	p, filter, normalize, compress);
+}
+
+void
+QPDFObjectHandle::replaceStreamData(PointerHolder<Buffer> data,
+				    QPDFObjectHandle filter,
+				    QPDFObjectHandle decode_parms)
+{
+    assertType("Stream", isStream());
+    dynamic_cast<QPDF_Stream*>(obj.getPointer())->replaceStreamData(
+	data, filter, decode_parms);
+}
+
+void
+QPDFObjectHandle::replaceStreamData(PointerHolder<StreamDataHandler> dh)
+{
+    assertType("Stream", isStream());
+    dynamic_cast<QPDF_Stream*>(obj.getPointer())->replaceStreamData(dh);
 }
 
 int

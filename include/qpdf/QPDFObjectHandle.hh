@@ -152,6 +152,9 @@ class QPDFObjectHandle
     // Remove key, doing nothing if key does not exist
     QPDF_DLL
     void removeKey(std::string const& key);
+    // If the object is null, remove the key.  Otherwise, replace it.
+    QPDF_DLL
+    void replaceOrRemoveKey(std::string const& key, QPDFObjectHandle);
 
     // Methods for stream objects
     QPDF_DLL
@@ -182,6 +185,64 @@ class QPDFObjectHandle
     QPDF_DLL
     bool pipeStreamData(Pipeline*, bool filter,
 			bool normalize, bool compress);
+
+    // Replace this stream's stream data with the given data buffer,
+    // and replace the /Filter and /DecodeParms keys in the stream
+    // dictionary with the given values.  (If either value is empty,
+    // the corresponding key is removed.)  The stream's /Length key is
+    // replaced with the length of the data buffer.  The stream is
+    // interpreted as if the data read from the file, after any
+    // decryption filters have been applied, is as presented.
+    QPDF_DLL
+    void replaceStreamData(PointerHolder<Buffer> data,
+			   QPDFObjectHandle filter,
+			   QPDFObjectHandle decode_parms);
+    class StreamDataHandler
+    {
+      public:
+	QPDF_DLL
+	virtual ~StreamDataHandler()
+	{
+	}
+
+	// See replaceStreamData(StreamDataHandler) below for a
+	// description of how to override this function.
+	virtual void
+	replaceStreamData(Buffer const& in_data,
+			  std::string const& in_filter,
+			  std::string const& in_decode_parms,
+			  bool filtered,
+			  Buffer& out_data,
+			  std::string& out_filter,
+			  std::string& out_decode_parms,
+			  bool& persist) = 0;
+    };
+    // Provide a hook for doing dynamic replacement of the stream's
+    // data.  When the stream's data is accessed either with
+    // pipeStreamData or with getStreamData, if the stream doesn't
+    // already have replacement data, an attempt is first made to
+    // filter the stream's original data.  If the attempt is
+    // successful, the stream's filtered original data is passed to
+    // the handler as in_data, and filtered is true.  If the original
+    // data cannot be processed, then in_data is the original raw data
+    // (after any decryption filters have been applied) and filtered
+    // is false.  If the original input data has no filters applied,
+    // the filtered is true.  This way, if filtered is true, the
+    // caller knows that in_data contains the fully filtered data.
+    // The handler then provides replacement data, /Filter, and
+    // /DecodeParms (handled is in the simpler form of
+    // replaceStreamData above).  If the persist argument is set to
+    // true, then the replacement data is stored in the stream object
+    // where it will be used on subsequent attempts to retrieve the
+    // data (rather than calling the handler).  If persist is set to
+    // false, then the data will be used that one time and not saved.
+    // In that case, the handler will be invoked again if the stream
+    // data is accessed another time.  Writing a handler that sets
+    // persist to true essentially allows delaying the computation of
+    // the stream data, while setting it to false reduces the amount
+    // of memory that is used.
+    QPDF_DLL
+    void replaceStreamData(PointerHolder<StreamDataHandler> dh);
 
     // return 0 for direct objects
     QPDF_DLL

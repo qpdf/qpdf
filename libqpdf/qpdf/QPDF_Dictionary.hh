@@ -26,6 +26,8 @@ class QPDF_Dictionary: public QPDFObject
     void replaceKey(std::string const& key, QPDFObjectHandle const&);
     // Remove key, doing nothing if key does not exist
     void removeKey(std::string const& key);
+    // If object is null, replace key; otherwise, remove key
+    void replaceOrRemoveKey(std::string const& key, QPDFObjectHandle);
 
   protected:
     virtual void releaseResolved();

@@ -18,17 +18,19 @@ class QPDF_Stream: public QPDFObject
     virtual std::string unparse();
     QPDFObjectHandle getDict() const;
 
-    // See comments in QPDFObjectHandle.hh
+    // See comments in QPDFObjectHandle.hh for these methods.
     bool pipeStreamData(Pipeline*, bool filter,
 			bool normalize, bool compress);
-
-    // See comments in QPDFObjectHandle.hh
     PointerHolder<Buffer> getStreamData();
+    void replaceStreamData(PointerHolder<Buffer> data,
+			   QPDFObjectHandle filter,
+			   QPDFObjectHandle decode_parms);
+    void replaceStreamData(
+	PointerHolder<QPDFObjectHandle::StreamDataHandler> dh);
 
   private:
     bool filterable(std::vector<std::string>& filters,
 		    int& predictor, int& columns, bool& early_code_change);
-
 
     QPDF* qpdf;
     int objid;
@@ -36,6 +38,8 @@ class QPDF_Stream: public QPDFObject
     QPDFObjectHandle stream_dict;
     off_t offset;
     int length;
+    PointerHolder<QPDFObjectHandle::StreamDataHandler> stream_data_handler;
+    PointerHolder<Buffer> stream_data;
 };
 
 #endif // __QPDF_STREAM_HH__
