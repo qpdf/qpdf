@@ -7,6 +7,7 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/Pl_Buffer.hh>
+#include <qpdf/Pl_Flate.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <iostream>
 #include <stdio.h>
@@ -308,6 +309,45 @@ void runtest(int n, char const* filename)
 		  << "; cleartext="
 		  << (cleartext ? 1 : 0)
 		  << std::endl;
+    }
+    else if (n == 7)
+    {
+	QPDFObjectHandle root = pdf.getRoot();
+	QPDFObjectHandle qstream = root.getKey("/QStream");
+	if (! qstream.isStream())
+	{
+	    throw std::logic_error("test 7 run on file with no QStream");
+	}
+	PointerHolder<Buffer> b = new Buffer(20);
+	unsigned char* bp = b.getPointer()->getBuffer();
+	memcpy(bp, (char*)"new data for stream\n", 20); // no null!
+	qstream.replaceStreamData(
+	    b, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
+	QPDFWriter w(pdf, "a.pdf");
+	w.setStaticID(true);
+	w.setStreamDataMode(qpdf_s_preserve);
+	w.write();
+    }
+    else if (n == 8)
+    {
+	QPDFObjectHandle root = pdf.getRoot();
+	QPDFObjectHandle qstream = root.getKey("/QStream");
+	if (! qstream.isStream())
+	{
+	    throw std::logic_error("test 7 run on file with no QStream");
+	}
+	Pl_Buffer p1("buffer");
+	Pl_Flate p2("compress", &p1, Pl_Flate::a_deflate);
+	p2.write((unsigned char*)"new data for stream\n", 20); // no null!
+	p2.finish();
+	PointerHolder<Buffer> b = p1.getBuffer();
+	qstream.replaceStreamData(
+	    b, QPDFObjectHandle::newName("/FlateDecode"),
+	    QPDFObjectHandle::newNull());
+	QPDFWriter w(pdf, "a.pdf");
+	w.setStaticID(true);
+	w.setStreamDataMode(qpdf_s_preserve);
+	w.write();
     }
     else
     {
