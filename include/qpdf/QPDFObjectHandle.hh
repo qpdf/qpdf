@@ -288,13 +288,21 @@ class QPDFObjectHandle
     QPDF_DLL
     std::map<std::string, QPDFObjectHandle> getPageImages();
 
-    // Throws an exception if this is not a Page object.  Returns a
-    // vector of stream objects representing the content streams for
-    // the given page.  This routine allows the caller to not care
-    // whether there are one or more than one content streams for a
-    // page.
+    // Returns a vector of stream objects representing the content
+    // streams for the given page.  This routine allows the caller to
+    // not care whether there are one or more than one content streams
+    // for a page.  Throws an exception if this is not a Page object.
     QPDF_DLL
     std::vector<QPDFObjectHandle> getPageContents();
+
+    // Add the given object as a new content stream for this page.  If
+    // parameter 'first' is true, add to the beginning.  Otherwise,
+    // add to the end.  This routine automatically converts the page
+    // contents to an array if it is a scalar, allowing the caller not
+    // to care what the initial structure is.  Throws an exception if
+    // this is not a Page object.
+    QPDF_DLL
+    void addPageContents(QPDFObjectHandle contents, bool first);
 
     // Initializers for objects.  This Factory class gives the QPDF
     // class specific permission to call factory methods without

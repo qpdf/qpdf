@@ -1,3 +1,10 @@
+2010-08-05  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add new methods to QPDFObjectHandle: replaceStreamData and
+	newStream.  These methods allow users of the qpdf library to add
+	new streams and to replace data of existing streams.  Examples are
+	provided.
+
 2010-06-06  Jay Berkenbilt  <ejb@ql.org>
 
 	* Fix memory leak for QPDF objects whose underlying PDF objects

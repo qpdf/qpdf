@@ -427,6 +427,24 @@ void runtest(int n, char const* filename)
 	w.setStreamDataMode(qpdf_s_preserve);
 	w.write();
     }
+    else if (n == 10)
+    {
+	PointerHolder<Buffer> b1 = new Buffer(37);
+	unsigned char* bp = b1.getPointer()->getBuffer();
+	memcpy(bp, (char*)"BT /F1 12 Tf 72 620 Td (Baked) Tj ET\n", 37);
+	PointerHolder<Buffer> b2 = new Buffer(38);
+	bp = b2.getPointer()->getBuffer();
+	memcpy(bp, (char*)"BT /F1 18 Tf 72 520 Td (Mashed) Tj ET\n", 38);
+
+	std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
+	pages[0].addPageContents(QPDFObjectHandle::newStream(&pdf, b1), true);
+	pages[0].addPageContents(QPDFObjectHandle::newStream(&pdf, b2), false);
+
+	QPDFWriter w(pdf, "a.pdf");
+	w.setStaticID(true);
+	w.setStreamDataMode(qpdf_s_preserve);
+	w.write();
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +
