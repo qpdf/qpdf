@@ -1779,7 +1779,11 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
 QPDFObjectHandle
 QPDF::makeIndirectObject(QPDFObjectHandle oh)
 {
-    ObjGen o1 = (*(this->obj_cache.rbegin())).first;
+    ObjGen o1(0, 0);
+    if (! this->obj_cache.empty())
+    {
+	o1 = (*(this->obj_cache.rbegin())).first;
+    }
     ObjGen o2 = (*(this->xref_table.rbegin())).first;
     QTC::TC("qpdf", "QPDF indirect last obj from xref",
 	    (o2.obj > o1.obj) ? 1 : 0);

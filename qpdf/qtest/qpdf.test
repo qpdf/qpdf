@@ -77,7 +77,7 @@ flush_tiff_cache();
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 26;
+$n_tests += 28;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -104,7 +104,6 @@ $td->runtest("replace stream data",
 $td->runtest("check output",
 	     {$td->FILE => "a.pdf"},
 	     {$td->FILE => "replaced-stream-data.out"});
-
 $td->runtest("replace stream data compressed",
 	     {$td->COMMAND => "test_driver 8 qstream.pdf"},
 	     {$td->FILE => "test8.out", $td->EXIT_STATUS => 0},
@@ -112,6 +111,13 @@ $td->runtest("replace stream data compressed",
 $td->runtest("check output",
 	     {$td->FILE => "a.pdf"},
 	     {$td->FILE => "replaced-stream-data-flate.out"});
+$td->runtest("new streams",
+	     {$td->COMMAND => "test_driver 9 minimal.pdf"},
+	     {$td->FILE => "test9.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("new stream",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "new-streams.pdf"});
 
 # Make sure we ignore decode parameters that we don't understand
 $td->runtest("unknown decode parameters",

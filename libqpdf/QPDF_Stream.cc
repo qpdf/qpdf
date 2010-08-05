@@ -40,6 +40,19 @@ QPDF_Stream::~QPDF_Stream()
 {
 }
 
+void
+QPDF_Stream::setObjGen(int objid, int generation)
+{
+    if (! ((this->objid == 0) && (this->generation == 0)))
+    {
+	throw std::logic_error(
+	    "attempt to set object ID and generation of a stream"
+	    " that already has them");
+    }
+    this->objid = objid;
+    this->generation = generation;
+}
+
 std::string
 QPDF_Stream::unparse()
 {
@@ -352,6 +365,12 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline, bool filter,
 		" bytes instead of expected " +
 		QUtil::int_to_string(desired_length) + " bytes");
 	}
+    }
+    else if (this->offset == 0)
+    {
+	QTC::TC("qpdf", "QPDF_Stream pipe no stream data");
+	throw std::logic_error(
+	    "pipeStreamData called for stream with no data");
     }
     else
     {

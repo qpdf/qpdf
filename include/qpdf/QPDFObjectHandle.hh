@@ -28,6 +28,34 @@ class QPDF_Array;
 class QPDFObjectHandle
 {
   public:
+    // This class is used by replaceStreamData.  It provides an
+    // alternative way of associating stream data with a stream.  See
+    // comments on replaceStreamData and newStream for additional
+    // details.
+    class StreamDataProvider
+    {
+      public:
+	QPDF_DLL
+	virtual ~StreamDataProvider()
+	{
+	}
+	// The implementation of this function must write the
+	// unencrypted, raw stream data to the given pipeline.  Every
+	// call to provideStreamData for a given stream must write the
+	// same data.  The number of bytes written must agree with the
+	// length provided at the time the StreamDataProvider object
+	// was associated with the stream.  The object ID and
+	// generation passed to this method are those that belong to
+	// the stream on behalf of which the provider is called.  They
+	// may be ignored or used by the implementation for indexing
+	// or other purposes.  This information is made available just
+	// to make it more convenient to use a single
+	// StreamDataProvider object to provide data for multiple
+	// streams.
+	virtual void provideStreamData(int objid, int generation,
+				       Pipeline* pipeline) = 0;
+    };
+
     QPDF_DLL
     QPDFObjectHandle();
     QPDF_DLL
@@ -82,6 +110,30 @@ class QPDFObjectHandle
     QPDF_DLL
     static QPDFObjectHandle newDictionary(
 	std::map<std::string, QPDFObjectHandle> const& items);
+
+    // Create a new stream and associate it with the given qpdf
+    // object.  A subsequent call must be made to replaceStreamData()
+    // to provide data for the stream.  The stream's dictionary may be
+    // retrieved by calling getDict(), and the resulting dictionary
+    // may be modified.
+    QPDF_DLL
+    static QPDFObjectHandle newStream(QPDF* qpdf);
+
+    // Create a new stream and associate it with the given qpdf
+    // object.  Use the given buffer as the stream data.  The stream
+    // dictionary's /Length key will automatically be set to the size
+    // of the data buffer.  If additional keys are required, the
+    // stream's dictionary may be retrieved by calling getDict(), and
+    // the resulting dictionary may be modified.  This method is just
+    // a convient wrapper around the newStream() and
+    // replaceStreamData().  It is a convenience methods for streams
+    // that require no parameters beyond the stream length.  Note that
+    // you don't have to deal with compression yourself if you use
+    // QPDFWriter.  By default, QPDFWriter will automatically compress
+    // uncompressed stream data.  Example programs are provided that
+    // illustrate this.
+    QPDF_DLL
+    static QPDFObjectHandle newStream(QPDF* qpdf, PointerHolder<Buffer> data);
 
     // Accessor methods.  If an accessor method that is valid for only
     // a particular object type is called on an object of the wrong
@@ -198,34 +250,17 @@ class QPDFObjectHandle
 			   QPDFObjectHandle const& filter,
 			   QPDFObjectHandle const& decode_parms);
 
-    class StreamDataProvider
-    {
-      public:
-	QPDF_DLL
-	virtual ~StreamDataProvider()
-	{
-	}
-	// See replaceStreamData below for details on how to override
-	// this method.
-	virtual void provideStreamData(int objid, int generation,
-				       Pipeline* pipeline) = 0;
-    };
     // As above, replace this stream's stream data.  Instead of
     // directly providing a buffer with the stream data, call the
-    // given provider's provideStreamData method.  The method is to
-    // write the unencrypted, raw stream data to the provided
-    // pipeline.  The stream's /Length key will be set to the length
-    // as provided.  This must match the number of bytes written to
-    // the pipeline.  The provider must write exactly the same data to
-    // the pipeline every time it is called.  The method is invoked
-    // with the object ID and generation number, which are just there
-    // to be available to the handler in case it is useful for
-    // indexing purposes.  This makes it easier to reuse the same
-    // StreamDataProvider object for multiple streams.  Although it is
-    // more complex to use this form of replaceStreamData, it makes it
-    // possible to avoid allocating memory for the stream data.
-    // Example programs are provided that use both forms of
-    // replaceStreamData.
+    // given provider's provideStreamData method.  See comments on the
+    // StreamDataProvider class (defined above) for details on the
+    // method.  The provider must write the number of bytes as
+    // indicated by the length parameter, and the data must be
+    // consistent with filter and decode_parms as provided.  Although
+    // it is more complex to use this form of replaceStreamData than
+    // the one that takes a buffer, it makes it possible to avoid
+    // allocating memory for the stream data.  Example programs are
+    // provided that use both forms of replaceStreamData.
     QPDF_DLL
     void replaceStreamData(PointerHolder<StreamDataProvider> provider,
 			   QPDFObjectHandle const& filter,

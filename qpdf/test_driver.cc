@@ -398,6 +398,35 @@ void runtest(int n, char const* filename)
 	w.setStreamDataMode(qpdf_s_preserve);
 	w.write();
     }
+    else if (n == 9)
+    {
+	QPDFObjectHandle root = pdf.getRoot();
+	PointerHolder<Buffer> b1 = new Buffer(20);
+	unsigned char* bp = b1.getPointer()->getBuffer();
+	memcpy(bp, (char*)"data for new stream\n", 20); // no null!
+	QPDFObjectHandle qstream = QPDFObjectHandle::newStream(&pdf, b1);
+	QPDFObjectHandle rstream = QPDFObjectHandle::newStream(&pdf);
+	try
+	{
+	    rstream.getStreamData();
+	    std::cout << "oops -- getStreamData didn't throw" << std::endl;
+	}
+	catch (std::logic_error const& e)
+	{
+	    std::cout << "exception: " << e.what() << std::endl;
+	}
+	PointerHolder<Buffer> b2 = new Buffer(22);
+	bp = b2.getPointer()->getBuffer();
+	memcpy(bp, (char*)"data for other stream\n", 22); // no null!
+	rstream.replaceStreamData(
+	    b2, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
+	root.replaceKey("/QStream", qstream);
+	root.replaceKey("/RStream", rstream);
+	QPDFWriter w(pdf, "a.pdf");
+	w.setStaticID(true);
+	w.setStreamDataMode(qpdf_s_preserve);
+	w.write();
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +

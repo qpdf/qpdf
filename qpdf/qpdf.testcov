@@ -178,3 +178,6 @@ QPDF_Stream pipe original stream data 0
 QPDF_Stream pipe replaced stream data 0
 QPDF_Stream pipe use stream provider 0
 QPDF_Stream provider length mismatch 0
+QPDFObjectHandle newStream 0
+QPDFObjectHandle newStream with data 0
+QPDF_Stream pipe no stream data 0

@@ -561,6 +561,30 @@ QPDFObjectHandle::newStream(QPDF* qpdf, int objid, int generation,
 				stream_dict, offset, length));
 }
 
+QPDFObjectHandle
+QPDFObjectHandle::newStream(QPDF* qpdf)
+{
+    QTC::TC("qpdf", "QPDFObjectHandle newStream");
+    std::map<std::string, QPDFObjectHandle> keys;
+    QPDFObjectHandle stream_dict = newDictionary(keys);
+    QPDFObjectHandle result = qpdf->makeIndirectObject(
+	QPDFObjectHandle(
+	    new QPDF_Stream(qpdf, 0, 0, stream_dict, 0, 0)));
+    result.dereference();
+    QPDF_Stream* stream = dynamic_cast<QPDF_Stream*>(result.obj.getPointer());
+    stream->setObjGen(result.getObjectID(), result.getGeneration());
+    return result;
+}
+
+QPDFObjectHandle
+QPDFObjectHandle::newStream(QPDF* qpdf, PointerHolder<Buffer> data)
+{
+    QTC::TC("qpdf", "QPDFObjectHandle newStream with data");
+    QPDFObjectHandle result = newStream(qpdf);
+    result.replaceStreamData(data, newNull(), newNull());
+    return result;
+}
+
 void
 QPDFObjectHandle::makeDirectInternal(std::set<int>& visited)
 {
@@ -649,7 +673,7 @@ QPDFObjectHandle::makeDirectInternal(std::set<int>& visited)
     }
     else
     {
-	throw std::logic_error("QPDFObjectHandle::makeIndirect: "
+	throw std::logic_error("QPDFObjectHandle::makeDirectInternal: "
 			       "unknown object type");
     }
 

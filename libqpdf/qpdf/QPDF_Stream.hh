@@ -31,6 +31,11 @@ class QPDF_Stream: public QPDFObject
 	QPDFObjectHandle const& decode_parms,
 	size_t length);
 
+    // Replace object ID and generation.  This may only be called if
+    // object ID and generation are 0.  It is used by QPDFObjectHandle
+    // when adding streams to files.
+    void setObjGen(int objid, int generation);
+
   private:
     void replaceFilterData(QPDFObjectHandle const& filter,
 			   QPDFObjectHandle const& decode_parms,
