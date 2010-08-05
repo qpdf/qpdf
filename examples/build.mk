@@ -1,4 +1,4 @@
-BINS_examples = pdf-bookmarks pdf-mod-info pdf-npages
+BINS_examples = pdf-bookmarks pdf-mod-info pdf-npages double-page-size
 CBINS_examples = pdf-linearize
 
 TARGETS_examples = $(foreach B,$(BINS_examples) $(CBINS_examples),examples/$(OUTPUT_DIR)/$(call binname,$(B)))

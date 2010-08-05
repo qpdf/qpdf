@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+chdir("double-page-size") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('double-page-size');
+
+cleanup();
+
+$td->runtest("double page size",
+	     {$td->COMMAND => "double-page-size in.pdf a.pdf"},
+	     {$td->STRING => "double-page-size: new file written to a.pdf\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "out.pdf"});
+
+cleanup();
+
+$td->report(2);
+
+sub cleanup
+{
+    unlink 'a.pdf';
+}

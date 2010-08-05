@@ -1,0 +1,69 @@
+%PDF-1.3
+%¿÷¢þ
+1 0 obj
+<< /Pages 2 0 R /Type /Catalog >>
+endobj
+2 0 obj
+<< /Count 2 /Kids [ 3 0 R 4 0 R ] /Type /Pages >>
+endobj
+3 0 obj
+<< /Contents [ 5 0 R 6 0 R ] /MediaBox [ 0.00 0.00 1224.00 1584.00 ] /Parent 2 0 R /Resources << /Font << /F1 7 0 R >> /ProcSet 8 0 R >> /Type /Page >>
+endobj
+4 0 obj
+<< /Contents [ 9 0 R 10 0 R ] /MediaBox [ 0.00 0.00 1224.00 1584.00 ] /Parent 2 0 R /Resources << /Font << /F1 7 0 R >> /ProcSet 8 0 R >> /Type /Page >>
+endobj
+5 0 obj
+<< /Length 15 >>
+stream
+2 0 0 2 0 0 cm
+endstream
+endobj
+6 0 obj
+<< /Length 44 >>
+stream
+BT
+  /F1 24 Tf
+  72 720 Td
+  (Potato) Tj
+ET
+endstream
+endobj
+7 0 obj
+<< /BaseFont /Helvetica /Encoding /WinAnsiEncoding /Name /F1 /Subtype /Type1 /Type /Font >>
+endobj
+8 0 obj
+[ /PDF /Text ]
+endobj
+9 0 obj
+<< /Length 15 >>
+stream
+2 0 0 2 0 0 cm
+endstream
+endobj
+10 0 obj
+<< /Length 43 >>
+stream
+BT
+  /F1 24 Tf
+  72 720 Td
+  (Salad) Tj
+ET
+endstream
+endobj
+xref
+0 11
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000129 00000 n 
+0000000296 00000 n 
+0000000464 00000 n 
+0000000528 00000 n 
+0000000621 00000 n 
+0000000728 00000 n 
+0000000758 00000 n 
+0000000822 00000 n 
+trailer << /Root 1 0 R /Size 11 /ID [<071a6499182be9cfc990b11d0c4e5bc0><31415926535897932384626433832795>] >>
+startxref
+915
+%%EOF

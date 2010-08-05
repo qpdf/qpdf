@@ -1,5 +1,9 @@
 2010-08-05  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add QPDFObjectHandle::addPageContents, a convenience routine for
+	appending or prepending new streams to a page's content streams.
+	The "double-page-size" example illustrates its use.
+
 	* Add new methods to QPDFObjectHandle: replaceStreamData and
 	newStream.  These methods allow users of the qpdf library to add
 	new streams and to replace data of existing streams.  Examples are

@@ -7,9 +7,9 @@ Next
    in August, 2009.  He seems to like to send encrypted mail (key
    01FCC336).  Tell him about newStream and replaceStreamData.
 
- * Tell stronghorse@tom.com about QPDFObjectHandle::addPageContents.
-   See message from stronghorse@tom.com ("Suggestion for qpdf") from
-   2010-06-09 and my response.
+ * Tell stronghorse@tom.com about QPDFObjectHandle::addPageContents
+   and double-page-size example.  See message from stronghorse@tom.com
+   ("Suggestion for qpdf") from 2010-06-09 and my response.
 
 2.2
 ===
@@ -18,8 +18,6 @@ Next
    image.  Use QPDF::getAllPages and QPDFObjectHandle::getPageImages
    along with new stream data and dictionary manipulation.
 
- * Add example program for addPageContents using suggestion from
-   stronghorse@tom.com's message above.
 
 General
 =======
