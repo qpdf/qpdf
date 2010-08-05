@@ -23,10 +23,18 @@ class QPDF_Stream: public QPDFObject
 			bool normalize, bool compress);
     PointerHolder<Buffer> getStreamData();
     void replaceStreamData(PointerHolder<Buffer> data,
-			   QPDFObjectHandle filter,
-			   QPDFObjectHandle decode_parms);
+			   QPDFObjectHandle const& filter,
+			   QPDFObjectHandle const& decode_parms);
+    void replaceStreamData(
+	PointerHolder<QPDFObjectHandle::StreamDataProvider> provider,
+	QPDFObjectHandle const& filter,
+	QPDFObjectHandle const& decode_parms,
+	size_t length);
 
   private:
+    void replaceFilterData(QPDFObjectHandle const& filter,
+			   QPDFObjectHandle const& decode_parms,
+			   size_t length);
     bool filterable(std::vector<std::string>& filters,
 		    int& predictor, int& columns, bool& early_code_change);
 
@@ -37,6 +45,7 @@ class QPDF_Stream: public QPDFObject
     off_t offset;
     int length;
     PointerHolder<Buffer> stream_data;
+    PointerHolder<QPDFObjectHandle::StreamDataProvider> stream_provider;
 };
 
 #endif // __QPDF_STREAM_HH__

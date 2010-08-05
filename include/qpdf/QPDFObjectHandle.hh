@@ -195,8 +195,42 @@ class QPDFObjectHandle
     // decryption filters have been applied, is as presented.
     QPDF_DLL
     void replaceStreamData(PointerHolder<Buffer> data,
-			   QPDFObjectHandle filter,
-			   QPDFObjectHandle decode_parms);
+			   QPDFObjectHandle const& filter,
+			   QPDFObjectHandle const& decode_parms);
+
+    class StreamDataProvider
+    {
+      public:
+	QPDF_DLL
+	virtual ~StreamDataProvider()
+	{
+	}
+	// See replaceStreamData below for details on how to override
+	// this method.
+	virtual void provideStreamData(int objid, int generation,
+				       Pipeline* pipeline) = 0;
+    };
+    // As above, replace this stream's stream data.  Instead of
+    // directly providing a buffer with the stream data, call the
+    // given provider's provideStreamData method.  The method is to
+    // write the unencrypted, raw stream data to the provided
+    // pipeline.  The stream's /Length key will be set to the length
+    // as provided.  This must match the number of bytes written to
+    // the pipeline.  The provider must write exactly the same data to
+    // the pipeline every time it is called.  The method is invoked
+    // with the object ID and generation number, which are just there
+    // to be available to the handler in case it is useful for
+    // indexing purposes.  This makes it easier to reuse the same
+    // StreamDataProvider object for multiple streams.  Although it is
+    // more complex to use this form of replaceStreamData, it makes it
+    // possible to avoid allocating memory for the stream data.
+    // Example programs are provided that use both forms of
+    // replaceStreamData.
+    QPDF_DLL
+    void replaceStreamData(PointerHolder<StreamDataProvider> provider,
+			   QPDFObjectHandle const& filter,
+			   QPDFObjectHandle const& decode_parms,
+			   size_t length);
 
     // return 0 for direct objects
     QPDF_DLL

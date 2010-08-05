@@ -176,3 +176,5 @@ qpdf-c called qpdf_has_error 0
 qpdf-c called qpdf_get_qpdf_version 0
 QPDF_Stream pipe original stream data 0
 QPDF_Stream pipe replaced stream data 0
+QPDF_Stream pipe use stream provider 0
+QPDF_Stream provider length mismatch 0

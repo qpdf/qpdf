@@ -354,12 +354,23 @@ QPDFObjectHandle::pipeStreamData(Pipeline* p, bool filter,
 
 void
 QPDFObjectHandle::replaceStreamData(PointerHolder<Buffer> data,
-				    QPDFObjectHandle filter,
-				    QPDFObjectHandle decode_parms)
+				    QPDFObjectHandle const& filter,
+				    QPDFObjectHandle const& decode_parms)
 {
     assertType("Stream", isStream());
     dynamic_cast<QPDF_Stream*>(obj.getPointer())->replaceStreamData(
 	data, filter, decode_parms);
+}
+
+void
+QPDFObjectHandle::replaceStreamData(PointerHolder<StreamDataProvider> provider,
+				    QPDFObjectHandle const& filter,
+				    QPDFObjectHandle const& decode_parms,
+				    size_t length)
+{
+    assertType("Stream", isStream());
+    dynamic_cast<QPDF_Stream*>(obj.getPointer())->replaceStreamData(
+	provider, filter, decode_parms, length);
 }
 
 int

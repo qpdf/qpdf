@@ -23,6 +23,39 @@ void usage()
     exit(2);
 }
 
+class Provider: public QPDFObjectHandle::StreamDataProvider
+{
+  public:
+    Provider(PointerHolder<Buffer> b) :
+	b(b),
+	bad_length(false)
+    {
+    }
+    virtual ~Provider()
+    {
+    }
+    virtual void provideStreamData(int objid, int generation,
+				   Pipeline* p)
+    {
+	p->write(b.getPointer()->getBuffer(),
+		 b.getPointer()->getSize());
+	if (this->bad_length)
+	{
+	    unsigned char ch = ' ';
+	    p->write(&ch, 1);
+	}
+	p->finish();
+    }
+    void badLength(bool v)
+    {
+	this->bad_length = v;
+    }
+
+  private:
+    PointerHolder<Buffer> b;
+    bool bad_length;
+};
+
 void runtest(int n, char const* filename)
 {
     QPDF pdf;
@@ -341,9 +374,25 @@ void runtest(int n, char const* filename)
 	p2.write((unsigned char*)"new data for stream\n", 20); // no null!
 	p2.finish();
 	PointerHolder<Buffer> b = p1.getBuffer();
+	// This is a bogus way to use StreamDataProvider, but it does
+	// adequately test its functionality.
+	Provider* provider = new Provider(b);
+	PointerHolder<QPDFObjectHandle::StreamDataProvider> p = provider;
 	qstream.replaceStreamData(
-	    b, QPDFObjectHandle::newName("/FlateDecode"),
-	    QPDFObjectHandle::newNull());
+	    p, QPDFObjectHandle::newName("/FlateDecode"),
+	    QPDFObjectHandle::newNull(),
+	    b.getPointer()->getSize());
+	provider->badLength(true);
+	try
+	{
+	    qstream.getStreamData();
+	    std::cout << "oops -- getStreamData didn't throw" << std::endl;
+	}
+	catch (std::logic_error const& e)
+	{
+	    std::cout << "exception: " << e.what() << std::endl;
+	}
+	provider->badLength(false);
 	QPDFWriter w(pdf, "a.pdf");
 	w.setStaticID(true);
 	w.setStreamDataMode(qpdf_s_preserve);

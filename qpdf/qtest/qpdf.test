@@ -107,7 +107,7 @@ $td->runtest("check output",
 
 $td->runtest("replace stream data compressed",
 	     {$td->COMMAND => "test_driver 8 qstream.pdf"},
-	     {$td->STRING => "test 8 done\n", $td->EXIT_STATUS => 0},
+	     {$td->FILE => "test8.out", $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
 	     {$td->FILE => "a.pdf"},
