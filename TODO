@@ -17,17 +17,17 @@ Next
    qpdf") from 2010-06-09 and my response.  Consider providing an
    example program that adds the line he suggests.
 
- * Add function to get all images.  Should be able to return a map of
-   pages to a list of images or something similar.  Can use
-   QPDFObjectHandle::getPageImages.  Look at pdf-billinfo for ideas.
-
- * Look at page splitting.  Subramanyam provided a test file; see
-   ../misc/article-threads.pdf.  Email Q-Count: 431864 from
-   2009-11-03.
+ * Create an example that does some kind of manipulation on every
+   image.  Use QPDF::getAllPages and QPDFObjectHandle::getPageImages
+   along with new stream data and dictionary manipulation.
 
 
 General
 =======
+
+ * Look at page splitting.  Subramanyam provided a test file; see
+   ../misc/article-threads.pdf.  Email Q-Count: 431864 from
+   2009-11-03.  See also "Splitting by Pages" below.
 
  * Provide an option to copy encryption parameters from another file.
    This would make it possible to decrypt a file, manually work with
