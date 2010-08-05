@@ -3,14 +3,12 @@ Next
 
  * Work in contrib/vc6.  See email from stronghorse@tom.com
 
+ * Find messages exchanged with Stefan Heinsen <stefan.heinsen@gmx.de>
+   in August, 2009.  He seems to like to send encrypted mail (key
+   01FCC336).  Tell him about newStream and replaceStreamData.
+
 2.2
 ===
-
- * Add ability to create new streams or replace stream data.  Consider
-   stream data sources to include a file and offset, a buffer, or a
-   some kind of callback mechanism.  Find messages exchanged with
-   Stefan Heinsen <stefan.heinsen@gmx.de> in August, 2009.  He seems
-   to like to send encrypted mail.  (key 01FCC336)
 
  * Add helper routines for manipulating page content streams.
    Operations should include ability to convert page contents from a
