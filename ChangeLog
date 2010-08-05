@@ -6,8 +6,9 @@
 
 	* Add new methods to QPDFObjectHandle: replaceStreamData and
 	newStream.  These methods allow users of the qpdf library to add
-	new streams and to replace data of existing streams.  Examples are
-	provided.
+	new streams and to replace data of existing streams.  The
+	"double-page-size" and "tweak-images" examples illustrate their
+	use.
 
 2010-06-06  Jay Berkenbilt  <ejb@ql.org>
 
