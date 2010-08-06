@@ -5,19 +5,12 @@ Next
 
  * Find messages exchanged with Stefan Heinsen <stefan.heinsen@gmx.de>
    in August, 2009.  He seems to like to send encrypted mail (key
-   01FCC336).  Tell him about newStream and replaceStreamData.
+   01FCC336).  Tell him about newStream, replaceStreamData, and the
+   invert-images example.
 
  * Tell stronghorse@tom.com about QPDFObjectHandle::addPageContents
    and double-page-size example.  See message from stronghorse@tom.com
    ("Suggestion for qpdf") from 2010-06-09 and my response.
-
-2.2
-===
-
- * Create an example (tweak-images) that does some kind of
-   manipulation on every image.  Use QPDF::getAllPages and
-   QPDFObjectHandle::getPageImages along with new stream data and
-   dictionary manipulation.
 
 
 General

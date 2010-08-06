@@ -1,0 +1,32 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+chdir("invert-images") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('invert-images');
+
+cleanup();
+
+$td->runtest("double page size",
+	     {$td->COMMAND => "pdf-invert-images in.pdf a.pdf"},
+	     {$td->STRING =>
+		  "pdf-invert-images: new file written to a.pdf\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "out.pdf"});
+
+cleanup();
+
+$td->report(2);
+
+sub cleanup
+{
+    unlink 'a.pdf';
+}
