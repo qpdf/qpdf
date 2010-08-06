@@ -2072,6 +2072,49 @@ print "\n";
   </para>
   <variablelist>
    <varlistentry>
+    <term>2.2.0.rc1: XXX, 2010</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Add new methods to <classname>QPDFObjectHandle</classname>
+        (<function>newStream</function> and
+        <function>replaceStreamData</function> for creating new
+        streams and replacing stream data.  This makes it possible to
+        perform a wide range of operations that were not previously
+        possible.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Add new helper method in
+        <classname>QPDFObjectHandle</classname>
+        (<function>addPageContents</function>) for appending or
+        prepending new content streams to a page.  This method makes
+        it possible to manipulate content streams without having to be
+        concerned whether a page's contents are a single stream or an
+        array of streams.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Provide two new examples:
+        <command>pdf-double-page-size</command> and
+        <command>pdf-invert-images</command> that illustrate the newly
+        added interfaces.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Fix a memory leak that would cause loss of a few bytes for
+        every object involved in a cycle of object references.  Thanks
+        to Jian Ma for calling my attention to the leak.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
     <term>2.1.5: April 25, 2010</term>
     <listitem>
      <itemizedlist>
