@@ -19,6 +19,8 @@ void usage()
 
 static void doubleBoxSize(QPDFObjectHandle& page, char const* box_name)
 {
+    // If there is a box of this name, replace it with a new box whose
+    // elements are double the values of the original box.
     QPDFObjectHandle box = page.getKey(box_name);
     if (box.isNull())
     {
