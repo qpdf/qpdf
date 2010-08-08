@@ -62,9 +62,9 @@ endef
 #                       1    2       3       4    5       6        7
 # Usage: $(call makelib,objs,library,ldflags,libs,current,revision,age)
 define makelib
-	major=$$(( $(5) - $(7))); \
-	dlltool -l $(2) -D $$(basename `echo $(2) | sed -e 's,/lib\(.*\).a,/\1,'`$(major).dll) $(1); \
-	$(CXX) -shared -o `echo $(2) | sed -e 's,/lib\(.*\).a,/\1,'`$(major).dll \
+	major=$$(( $(5) - $(7) )); \
+	dlltool -l $(2) -D $$(basename `echo $(2) | sed -e 's,/lib\(.*\).a,/\1,'`)$${major}.dll $(1) && \
+	$(CXX) -shared -o `echo $(2) | sed -e 's,/lib\(.*\).a,/\1,'`$${major}.dll \
 		$(1) $(3) $(4)
 endef
 
