@@ -1,3 +1,7 @@
+2010-08-08  Jay Berkenbilt  <ejb@ql.org>
+
+	* 2.2.rc1: release
+
 2010-08-05  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add QPDFObjectHandle::addPageContents, a convenience routine for
