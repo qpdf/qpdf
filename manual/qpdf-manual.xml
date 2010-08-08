@@ -2098,6 +2098,15 @@ print "\n";
       </listitem>
       <listitem>
        <para>
+        Add new method in <classname>QPDFObjectHandle</classname>:
+        <function>replaceOrRemoveKey</function>, which replaces a
+        dictionary key
+        with a given value unless the value is null, in which case it
+        removes the key instead.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
         Provide two new examples:
         <command>pdf-double-page-size</command> and
         <command>pdf-invert-images</command> that illustrate the newly
