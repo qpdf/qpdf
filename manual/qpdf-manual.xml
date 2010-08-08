@@ -1033,7 +1033,7 @@ make
     <filename>include/qpdf</filename> to your include path.
    </para>
    <para>
-    When linking against the qpdf library, you may also need to
+    When linking against the qpdf static library, you may also need to
     specify <literal>-lpcre -lz</literal> on your link command.  If
     your system understands how to read libtool
     <filename>.la</filename> files, this may not be necessary.
