@@ -1,3 +1,8 @@
+2010-08-09  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add QPDFObjectHandle::getRawStreamData to return raw
+	(unfiltered) stream data.
+
 2010-08-08  Jay Berkenbilt  <ejb@ql.org>
 
 	* 2.2.rc1: release

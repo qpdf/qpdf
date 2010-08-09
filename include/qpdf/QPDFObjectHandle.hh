@@ -216,6 +216,9 @@ class QPDFObjectHandle
     // exception if the stream is filtered and we can't decode it.
     QPDF_DLL
     PointerHolder<Buffer> getStreamData();
+    // Returns unfiltered (raw) stream data.
+    QPDF_DLL
+    PointerHolder<Buffer> getRawStreamData();
 
     // Write stream data through the given pipeline.  A null pipeline
     // value may be used if all you want to do is determine whether a

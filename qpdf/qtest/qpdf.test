@@ -111,7 +111,7 @@ $td->runtest("new stream",
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 22;
+$n_tests += 23;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -130,6 +130,11 @@ foreach (my $i = 1; $i <= 3; ++$i)
 		 {$td->FILE => "misc-$i.out", $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
 }
+
+$td->runtest("get stream data",
+	     {$td->COMMAND => "test_driver 11 stream-data.pdf"},
+	     {$td->FILE => "test11.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
 
 # Make sure we ignore decode parameters that we don't understand
 $td->runtest("unknown decode parameters",

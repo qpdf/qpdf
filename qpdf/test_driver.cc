@@ -445,6 +445,23 @@ void runtest(int n, char const* filename)
 	w.setStreamDataMode(qpdf_s_preserve);
 	w.write();
     }
+    else if (n == 11)
+    {
+	QPDFObjectHandle root = pdf.getRoot();
+	QPDFObjectHandle qstream = root.getKey("/QStream");
+	PointerHolder<Buffer> b1 = qstream.getStreamData();
+	PointerHolder<Buffer> b2 = qstream.getRawStreamData();
+	if ((b1.getPointer()->getSize() == 7) &&
+	    (memcmp(b1.getPointer()->getBuffer(), "potato\n", 7) == 0))
+	{
+	    std::cout << "filtered stream data okay" << std::endl;
+	}
+	if ((b2.getPointer()->getSize() == 15) &&
+	    (memcmp(b2.getPointer()->getBuffer(), "706F7461746F0A\n", 15) == 0))
+	{
+	    std::cout << "raw stream data okay" << std::endl;
+	}
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +

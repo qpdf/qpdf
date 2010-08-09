@@ -343,6 +343,13 @@ QPDFObjectHandle::getStreamData()
     return dynamic_cast<QPDF_Stream*>(obj.getPointer())->getStreamData();
 }
 
+PointerHolder<Buffer>
+QPDFObjectHandle::getRawStreamData()
+{
+    assertType("Stream", isStream());
+    return dynamic_cast<QPDF_Stream*>(obj.getPointer())->getRawStreamData();
+}
+
 bool
 QPDFObjectHandle::pipeStreamData(Pipeline* p, bool filter,
 				 bool normalize, bool compress)

@@ -2107,6 +2107,16 @@ print "\n";
       </listitem>
       <listitem>
        <para>
+        Add new method in <classname>QPDFObjectHandle</classname>:
+        <function>getRawStreamData</function>, which returns the raw
+        (unfiltered) stream data into a buffer.  This complements the
+        <function>getStreamData</function> method, which returns the
+        filtered (uncompressed) stream data and can only be used when
+        the stream's data is filterable.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
         Provide two new examples:
         <command>pdf-double-page-size</command> and
         <command>pdf-invert-images</command> that illustrate the newly

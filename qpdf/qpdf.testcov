@@ -183,3 +183,5 @@ QPDFObjectHandle newStream with data 0
 QPDF_Stream pipe no stream data 0
 QPDFObjectHandle prepend page contents 0
 QPDFObjectHandle append page contents 0
+QPDF_Stream getRawStreamData 0
+QPDF_Stream getStreamData 0

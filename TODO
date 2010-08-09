@@ -1,8 +1,6 @@
 2.2.0
 =====
 
- * Add QPDFObjectHandle::getRawStreamData()
-
  * shared library version information already bumped for 2.2.rc1;
    replace 2.2.rc1 with 2.2.0 in manual and update in other places for
    2.2.0.

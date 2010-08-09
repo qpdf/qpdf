@@ -75,6 +75,16 @@ QPDF_Stream::getStreamData()
     {
 	throw std::logic_error("getStreamData called on unfilterable stream");
     }
+    QTC::TC("qpdf", "QPDF_Stream getStreamData");
+    return buf.getBuffer();
+}
+
+PointerHolder<Buffer>
+QPDF_Stream::getRawStreamData()
+{
+    Pl_Buffer buf("stream data buffer");
+    pipeStreamData(&buf, false, false, false);
+    QTC::TC("qpdf", "QPDF_Stream getRawStreamData");
     return buf.getBuffer();
 }
 
