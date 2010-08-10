@@ -16,6 +16,20 @@ General
    ../misc/article-threads.pdf.  Email Q-Count: 431864 from
    2009-11-03.  See also "Splitting by Pages" below.
 
+ * Consider writing a PDF merge utility.  With 2.2, it would be
+   possible to have a StreamDataProvider that would allow stream data
+   to be directly copied from one PDF file to another.  One possible
+   strategy would be to have a program that adds all the pages of one
+   file to the end of another file.  The basic
+   strategy would be to create a table that adds new streams to the
+   original file, mapping the new streams' obj/gen to a stream in the
+   file whose pages are being appended.  The StreamDataProvider, when
+   asked, could simply pipe the streams of the file being appended to
+   the provided pipeline and could copy the filter and decode
+   parameters from the original file.  Being able to do this requires
+   a lot of the same logic as being able to do splitting, so a general
+   split/merge program would be a great addition.
+
  * Provide an option to copy encryption parameters from another file.
    This would make it possible to decrypt a file, manually work with
    it, and then re-encrypt it using the original encryption parameters
