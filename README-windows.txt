@@ -12,6 +12,11 @@ want to run them, you need ghostscript and tiff utils as well.  Then
 omit --disable-test-compare-images from the configure statements given
 below.  The image comparison tests have not been tried under MSYS.
 
+Jian Ma <stronghorse@tom.com> has generously provided a port of QPDF
+that works with Microsoft VC6.  Several changes are required, but they
+are well documented in his port.  You can find the VC6 port in the
+contrib area of the qpdf download area.
+
 
 External Libraries
 ==================

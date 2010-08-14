@@ -182,7 +182,10 @@ make
     Building on Windows is a little bit more complicated.  For
     details, please see <filename>README-windows.txt</filename> in the
     source distribution.  You can also download a binary distribution
-    for Windows.
+    for Windows.  There is a port of qpdf in the
+    <filename>contrib</filename> area generously contributed by Jian
+    Ma.  This is also discussed in more detail in
+    <filename>README-windows.txt</filename>.
    </para>
    <para>
     There are some other things you can do with the build.  Although
