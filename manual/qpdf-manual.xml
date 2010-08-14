@@ -180,7 +180,7 @@ make
    </para>
    <para>
     Building on Windows is a little bit more complicated.  For
-    details, please see <filename>README.windows</filename> in the
+    details, please see <filename>README-windows.txt</filename> in the
     source distribution.  You can also download a binary distribution
     for Windows.
    </para>

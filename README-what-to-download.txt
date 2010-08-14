@@ -21,8 +21,8 @@ download.
 
    If you want to build qpdf for Windows yourself with either MINGW's
    gcc 4.4 or VC9, you can download this file and extract it inside
-   the qpdf source distribution.  Please refer to README.windows in
-   the qpdf source distribution for additional details.
+   the qpdf source distribution.  Please refer to README-windows.txt
+   in the qpdf source distribution for additional details.
 
  * qpdf-external-libs-src.zip
 

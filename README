@@ -17,8 +17,8 @@ of virtually all Linux distributions and are readily available;
 download information appears in the documentation.  You can also
 download the external library distributions in source from from qpdf's
 download site.  For Windows, you can download pre-built binary
-verisons of those libraries for some compilers; see README.windows for
-additional details.
+verisons of those libraries for some compilers; see README-windows.txt
+for additional details.
 
 
 Licensing terms of embedded software
@@ -61,7 +61,7 @@ make and other related tools.  The MSVC works with either cygwin or
 MSYS.  The mingw build requires MSYS and will probably not work with
 cygwin.
 
-For details on how to build under Windows, see README.windows.
+For details on how to build under Windows, see README-windows.txt.
 
 
 Additional Notes on Build
@@ -73,7 +73,7 @@ obeying the compiler specified with configure.  This can be enabled by
 passing --with-buildrules=buildrules where buildrules corresponds to
 one of the .mk files (other than rules.mk) in the make directory.
 This should never be necessary on a UNIX system, but may be necessary
-on a Windows system.  See README.windows for details.  There is a
+on a Windows system.  See README-windows.txt for details.  There is a
 gcc-linux.mk file enable "gcc-linux" build rules, but it is intended
 to help test the build system; Linux users should build with the
 "libtools" rules, which are enabled by default.
