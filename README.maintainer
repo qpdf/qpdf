@@ -20,6 +20,9 @@ Release Reminders
 
  * Update release date in manual/qpdf-manual.xml
 
+ * Check TODO file to make sure all planned items for the release are
+   done or retargeted.
+
  * Each year, update copyright notices.  Just search for Copyright.
    Last updated: 2010.
 

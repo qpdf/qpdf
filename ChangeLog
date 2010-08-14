@@ -1,5 +1,7 @@
 2010-08-14  Jay Berkenbilt  <ejb@ql.org>
 
+	* 2.2.0: release
+
 	* Rename README.windows to README-windows.txt and convert its line
 	endings to Windows-style line endings.  Also mention Jian Ma's VC6
 	port in the manual and README-windows.txt.
