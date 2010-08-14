@@ -2059,6 +2059,6 @@ QPDF::getAllPagesInternal(QPDFObjectHandle cur_pages,
 	throw QPDFExc(qpdf_e_damaged_pdf, this->file.getName(),
 		      this->last_object_description,
 		      this->file.getLastOffset(),
-		      + ": invalid Type in page tree");
+		      ": invalid Type in page tree");
     }
 }
