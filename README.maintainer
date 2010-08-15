@@ -55,8 +55,8 @@ Release Reminders
  * Remember to copy README-what-to-download.txt separately onto the
    download area and make it the default for Windows platforms.
 
- * Remember to update documentation in the "files" subdirectory of the
-   website on sourceforge.net.
+ * Remember to update the web page including putting new documentation
+   in the "files" subdirectory of the website on sourceforge.net.
 
  * Create a tag in the version control system, and make backups of the
    actual releases.
