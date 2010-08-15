@@ -1,6 +1,11 @@
 General
 =======
 
+ * QPDF::checkLinearization writes things to std::cout, which makes it
+   hard for GUIs that want to display the result.  Go through all
+   library code and get rid of use of std::cout and std::cerr,
+   replacing them with some better mechanism.
+
  * Look at page splitting.  Subramanyam provided a test file; see
    ../misc/article-threads.pdf.  Email Q-Count: 431864 from
    2009-11-03.  See also "Splitting by Pages" below.
