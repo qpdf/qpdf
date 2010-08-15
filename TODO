@@ -6,6 +6,9 @@ General
    library code and get rid of use of std::cout and std::cerr,
    replacing them with some better mechanism.
 
+ * In general, take a fresh look at private methods to see which, if
+   any, should be protected.
+
  * Look at page splitting.  Subramanyam provided a test file; see
    ../misc/article-threads.pdf.  Email Q-Count: 431864 from
    2009-11-03.  See also "Splitting by Pages" below.
