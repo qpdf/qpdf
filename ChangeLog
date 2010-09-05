@@ -1,3 +1,12 @@
+2010-09-05  Jay Berkenbilt  <ejb@ql.org>
+
+	* libqpdf/QPDF_Stream.cc (filterable): Handle inline image filter
+	abbreviations as stream filter abbreviations.  Although this is
+	not technically allowed by the PDF specification, table H.1 in the
+	pre-ISO spec indicates that Adobe's readers accept them.  Thanks
+	to Jian Ma <stronghorse@tom.com> for bringing this to my
+	attention.
+
 2010-08-14  Jay Berkenbilt  <ejb@ql.org>
 
 	* 2.2.0: release

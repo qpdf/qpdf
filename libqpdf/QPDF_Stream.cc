@@ -18,6 +18,8 @@
 
 #include <stdexcept>
 
+std::map<std::string, std::string> QPDF_Stream::filter_abbreviations;
+
 QPDF_Stream::QPDF_Stream(QPDF* qpdf, int objid, int generation,
 			 QPDFObjectHandle stream_dict,
 			 off_t offset, int length) :
@@ -93,6 +95,21 @@ QPDF_Stream::filterable(std::vector<std::string>& filters,
 			int& predictor, int& columns,
 			bool& early_code_change)
 {
+    if (filter_abbreviations.empty())
+    {
+	// The PDF specification provides these filter abbreviations
+	// for use in inline images, but according to table H.1 in the
+	// pre-ISO versions of the PDF specification, Adobe Reader
+	// also accepts them for stream filters.
+	filter_abbreviations["/AHx"] = "/ASCIIHexDecode";
+	filter_abbreviations["/A85"] = "/ASCII85Decode";
+	filter_abbreviations["/LZW"] = "/LZWDecode";
+	filter_abbreviations["/Fl"] = "/FlateDecode";
+	filter_abbreviations["/RL"] = "/RunLengthDecode";
+	filter_abbreviations["/CCF"] = "/CCITTFaxDecode";
+	filter_abbreviations["/DCT"] = "/DCTDecode";
+    }
+
     // Initialize values to their defaults as per the PDF spec
     predictor = 1;
     columns = 0;
@@ -243,7 +260,14 @@ QPDF_Stream::filterable(std::vector<std::string>& filters,
     for (std::vector<std::string>::iterator iter = filters.begin();
 	 iter != filters.end(); ++iter)
     {
-	std::string const& filter = *iter;
+	std::string& filter = *iter;
+
+	if (filter_abbreviations.count(filter))
+	{
+	    QTC::TC("qpdf", "QPDF_Stream expand filter abbreviation");
+	    filter = filter_abbreviations[filter];
+	}
+
 	if (! ((filter == "/Crypt") ||
 	       (filter == "/FlateDecode") ||
 	       (filter == "/LZWDecode") ||

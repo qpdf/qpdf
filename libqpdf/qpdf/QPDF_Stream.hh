@@ -38,6 +38,8 @@ class QPDF_Stream: public QPDFObject
     void setObjGen(int objid, int generation);
 
   private:
+    static std::map<std::string, std::string> filter_abbreviations;
+
     void replaceFilterData(QPDFObjectHandle const& filter,
 			   QPDFObjectHandle const& decode_parms,
 			   size_t length);

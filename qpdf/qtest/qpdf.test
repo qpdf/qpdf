@@ -111,7 +111,7 @@ $td->runtest("new stream",
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 23;
+$n_tests += 25;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -228,6 +228,16 @@ $td->runtest("C check version 2",
 	     {$td->FILE => "forced-version.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
+
+# Stream filter abbreviations from table H.1
+$td->runtest("stream filter abbreviations",
+	     {$td->COMMAND => "qpdf --static-id filter-abbreviation.pdf a.pdf"},
+	     {$td->STRING => "",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "filter-abbreviation.out"});
 
 show_ntests();
 # ----------

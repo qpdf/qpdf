@@ -993,7 +993,9 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	    // compressed with a lossy compression scheme, but we
 	    // don't support any of those right now.
 	    QPDFObjectHandle filter_obj = stream_dict.getKey("/Filter");
-	    if (filter_obj.isName() && (filter_obj.getName() == "/FlateDecode"))
+	    if (filter_obj.isName() &&
+		((filter_obj.getName() == "/FlateDecode") ||
+		 (filter_obj.getName() == "/Fl")))
 	    {
 		QTC::TC("qpdf", "QPDFWriter not recompressing /FlateDecode");
 		filter = false;
