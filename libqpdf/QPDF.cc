@@ -1197,6 +1197,20 @@ QPDF::readObjectInternal(InputSource* input,
 		    olist.pop_back();
 		    olist.pop_back();
 		}
+		else if ((value == "endobj") &&
+			 (! (in_array || in_dictionary)))
+		{
+		    // Nothing in the PDF spec appears to allow empty
+		    // objects, but they have been encountered in
+		    // actual PDF files and Adobe Reader appears to
+		    // ignore them.
+		    warn(QPDFExc(qpdf_e_damaged_pdf, input->getName(),
+				 this->last_object_description,
+				 input->getLastOffset(),
+				 "empty object treated as null"));
+		    object = QPDFObjectHandle::newNull();
+		    input->seek(input->getLastOffset(), SEEK_SET);
+		}
 		else
 		{
 		    throw QPDFExc(qpdf_e_damaged_pdf, input->getName(),

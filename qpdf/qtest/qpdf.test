@@ -111,7 +111,7 @@ $td->runtest("new stream",
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 25;
+$n_tests += 26;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -238,6 +238,12 @@ $td->runtest("stream filter abbreviations",
 $td->runtest("check output",
 	     {$td->FILE => "a.pdf"},
 	     {$td->FILE => "filter-abbreviation.out"});
+
+$td->runtest("empty object",
+	     {$td->COMMAND => "qpdf -show-object=7,0 empty-object.pdf"},
+	     {$td->FILE => "empty-object.out",
+	      $td->EXIT_STATUS => 3},
+	     $td->NORMALIZE_NEWLINES);
 
 show_ntests();
 # ----------

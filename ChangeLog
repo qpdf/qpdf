@@ -1,5 +1,8 @@
 2010-09-05  Jay Berkenbilt  <ejb@ql.org>
 
+	* libqpdf/QPDF.cc (readObjectInternal): Recognize empty objects
+	and treat them as null.
+
 	* libqpdf/QPDF_Stream.cc (filterable): Handle inline image filter
 	abbreviations as stream filter abbreviations.  Although this is
 	not technically allowed by the PDF specification, table H.1 in the
