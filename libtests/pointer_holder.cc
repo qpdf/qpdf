@@ -12,6 +12,7 @@ class Object
     Object();
     ~Object();
     void hello();
+    void hello() const;
 
   private:
     static int next_id;
@@ -38,7 +39,20 @@ Object::hello()
     std::cout << "calling Object::hello for " << this->id << std::endl;
 }
 
+void
+Object::hello() const
+{
+    std::cout << "calling Object::hello const for " << this->id << std::endl;
+}
+
 typedef PointerHolder<Object> ObjectHolder;
+
+void callHello(ObjectHolder const& oh)
+{
+    oh.getPointer()->hello();
+    oh->hello();
+    (*oh).hello();
+}
 
 int main(int argc, char* argv[])
 {
@@ -74,6 +88,9 @@ int main(int argc, char* argv[])
     }
 
     ol1.front().getPointer()->hello();
+    ol1.front()->hello();
+    (*ol1.front()).hello();
+    callHello(ol1.front());
     ol1.pop_front();
     std::cout << "goodbye" << std::endl;
     return 0;

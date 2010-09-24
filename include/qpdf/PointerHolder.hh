@@ -124,6 +124,24 @@ class PointerHolder
 	    return this->data->refcount;
 	}
 
+    T const& operator*() const
+    {
+        return *this->data->pointer;
+    }
+    T& operator*()
+    {
+        return *this->data->pointer;
+    }
+
+    T const* operator->() const
+    {
+        return this->data->pointer;
+    }
+    T* operator->()
+    {
+        return this->data->pointer;
+    }
+
   private:
     void init(Data* data)
 	{
