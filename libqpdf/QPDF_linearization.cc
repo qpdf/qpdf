@@ -87,10 +87,10 @@ QPDF::isLinearized()
     static int const tbuf_size = 1025;
 
     char* buf = new char[tbuf_size];
-    this->file.seek(0, SEEK_SET);
+    this->file->seek(0, SEEK_SET);
     PointerHolder<char> b(buf);	// guarantee deletion
     memset(buf, '\0', tbuf_size);
-    this->file.read(buf, tbuf_size - 1);
+    this->file->read(buf, tbuf_size - 1);
 
     static PCRE lindict_re("(?s:(\\d+)\\s+0\\s+obj\\s*<<)");
 
@@ -147,8 +147,8 @@ QPDF::isLinearized()
     if (L.isInteger())
     {
 	int Li = L.getIntValue();
-	this->file.seek(0, SEEK_END);
-	if (Li != this->file.tell())
+	this->file->seek(0, SEEK_END);
+	if (Li != this->file->tell())
 	{
 	    QTC::TC("qpdf", "QPDF /L mismatch");
 	    return false;
@@ -194,9 +194,9 @@ QPDF::readLinearizationData()
 	   T.isInteger() &&
 	   (P.isInteger() || P.isNull())))
     {
-	throw QPDFExc(qpdf_e_damaged_pdf, this->file.getName(),
+	throw QPDFExc(qpdf_e_damaged_pdf, this->file->getName(),
 		      "linearization dictionary",
-		      this->file.getLastOffset(),
+		      this->file->getLastOffset(),
 		      "some keys in linearization dictionary are of "
 		      "the wrong type");
     }
@@ -205,9 +205,9 @@ QPDF::readLinearizationData()
     unsigned int n_H_items = H.getArrayNItems();
     if (! ((n_H_items == 2) || (n_H_items == 4)))
     {
-	throw QPDFExc(qpdf_e_damaged_pdf, this->file.getName(),
+	throw QPDFExc(qpdf_e_damaged_pdf, this->file->getName(),
 		      "linearization dictionary",
-		      this->file.getLastOffset(),
+		      this->file->getLastOffset(),
 		      "H has the wrong number of items");
     }
 
@@ -221,9 +221,9 @@ QPDF::readLinearizationData()
 	}
 	else
 	{
-	    throw QPDFExc(qpdf_e_damaged_pdf, this->file.getName(),
+	    throw QPDFExc(qpdf_e_damaged_pdf, this->file->getName(),
 			  "linearization dictionary",
-			  this->file.getLastOffset(),
+			  this->file->getLastOffset(),
 			  "some H items are of the wrong type");
 	}
     }
@@ -318,9 +318,9 @@ QPDF::readHintStream(Pipeline& pl, off_t offset, size_t length)
     off_t max_end_offset = oc.end_after_space;
     if (! H.isStream())
     {
-	throw QPDFExc(qpdf_e_damaged_pdf, this->file.getName(),
+	throw QPDFExc(qpdf_e_damaged_pdf, this->file->getName(),
 		      "linearization dictionary",
-		      this->file.getLastOffset(),
+		      this->file->getLastOffset(),
 		      "hint table is not a stream");
     }
 
@@ -354,9 +354,9 @@ QPDF::readHintStream(Pipeline& pl, off_t offset, size_t length)
 	std::cout << "expected = " << computed_end
 		  << "; actual = " << min_end_offset << ".."
 		  << max_end_offset << std::endl;
-	throw QPDFExc(qpdf_e_damaged_pdf, this->file.getName(),
+	throw QPDFExc(qpdf_e_damaged_pdf, this->file->getName(),
 		      "linearization dictionary",
-		      this->file.getLastOffset(),
+		      this->file->getLastOffset(),
 		      "hint table length mismatch");
     }
     H.pipeStreamData(&pl, true, false, false);
@@ -509,24 +509,25 @@ QPDF::checkLinearizationInternal()
     }
 
     // T: offset of whitespace character preceding xref entry for object 0
-    this->file.seek(p.xref_zero_offset, SEEK_SET);
+    this->file->seek(p.xref_zero_offset, SEEK_SET);
     while (1)
     {
 	char ch;
-	this->file.read(&ch, 1);
+	this->file->read(&ch, 1);
 	if (! ((ch == ' ') || (ch == '\r') || (ch == '\n')))
 	{
-	    this->file.seek(-1, SEEK_CUR);
+	    this->file->seek(-1, SEEK_CUR);
 	    break;
 	}
     }
-    if (this->file.tell() != this->first_xref_item_offset)
+    if (this->file->tell() != this->first_xref_item_offset)
     {
 	QTC::TC("qpdf", "QPDF err /T mismatch");
 	errors.push_back("space before first xref item (/T) mismatch "
 			 "(computed = " +
 			 QUtil::int_to_string(this->first_xref_item_offset) +
-			 "; file = " + QUtil::int_to_string(this->file.tell()));
+			 "; file = " +
+			 QUtil::int_to_string(this->file->tell()));
     }
 
     // P: first page number -- Implementation note 124 says Acrobat
@@ -1014,7 +1015,7 @@ QPDF::showLinearizationData()
 void
 QPDF::dumpLinearizationDataInternal()
 {
-    std::cout << this->file.getName() << ": linearization data:" << std::endl
+    std::cout << this->file->getName() << ": linearization data:" << std::endl
 	      << std::endl;
 
     std::cout

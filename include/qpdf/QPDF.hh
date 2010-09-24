@@ -423,15 +423,16 @@ class QPDF
     void setLastObjectDescription(std::string const& description,
 				  int objid, int generation);
     QPDFObjectHandle readObject(
-	InputSource*, std::string const& description,
+	PointerHolder<InputSource>, std::string const& description,
 	int objid, int generation, bool in_object_stream);
     QPDFObjectHandle readObjectInternal(
-	InputSource* input, int objid, int generation,
+	PointerHolder<InputSource> input, int objid, int generation,
 	bool in_object_stream,
 	bool in_array, bool in_dictionary);
     int recoverStreamLength(
-	InputSource* input, int objid, int generation, off_t stream_offset);
-    QPDFTokenizer::Token readToken(InputSource*);
+	PointerHolder<InputSource> input, int objid, int generation,
+	off_t stream_offset);
+    QPDFTokenizer::Token readToken(PointerHolder<InputSource>);
 
     QPDFObjectHandle readObjectAtOffset(
 	bool attempt_recovery,
@@ -785,7 +786,7 @@ class QPDF
 
 
     QPDFTokenizer tokenizer;
-    FileInputSource file;
+    PointerHolder<InputSource> file;
     std::string last_object_description;
     bool encrypted;
     bool encryption_initialized;
