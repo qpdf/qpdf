@@ -1,3 +1,41 @@
+2.2.1
+=====
+
+Add interface for working with in-memory PDF files.  Here's some code
+to work with.
+
+    Pl_Buffer b("b");
+    FILE* f = QUtil::fopen_wrapper(std::string("open ") + filename,
+				   fopen(filename, "rb"));
+    unsigned char buf[1024];
+    size_t bytes_read = 0;
+    while (true)
+    {
+	size_t len = fread(buf, 1, sizeof(buf), f);
+	if (len == 0)
+	{
+	    if (ferror(f))
+	    {
+		throw QPDFExc(qpdf_e_system,
+			      filename, "",
+			      0,
+			      "read");
+	    }
+	    else
+	    {
+		b.finish();
+		break;
+	    }
+	}
+	else
+	{
+	    b.write(buf, len);
+	    bytes_read += len;
+	}
+    }
+    fclose(f);
+    this->file = new BufferInputSource(filename, b.getBuffer());
+
 General
 =======
 
