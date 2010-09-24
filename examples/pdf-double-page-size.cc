@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
 
     // Copy text into a buffer without the null terminator
     PointerHolder<Buffer> b = new Buffer(strlen(content));
-    unsigned char* bp = b.getPointer()->getBuffer();
+    unsigned char* bp = b->getBuffer();
     memcpy(bp, (unsigned char*)content, strlen(content));
 
     try

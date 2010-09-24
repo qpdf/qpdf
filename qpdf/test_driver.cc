@@ -37,8 +37,7 @@ class Provider: public QPDFObjectHandle::StreamDataProvider
     virtual void provideStreamData(int objid, int generation,
 				   Pipeline* p)
     {
-	p->write(b.getPointer()->getBuffer(),
-		 b.getPointer()->getSize());
+	p->write(b->getBuffer(), b->getSize());
 	if (this->bad_length)
 	{
 	    unsigned char ch = ' ';
@@ -352,7 +351,7 @@ void runtest(int n, char const* filename)
 	    throw std::logic_error("test 7 run on file with no QStream");
 	}
 	PointerHolder<Buffer> b = new Buffer(20);
-	unsigned char* bp = b.getPointer()->getBuffer();
+	unsigned char* bp = b->getBuffer();
 	memcpy(bp, (char*)"new data for stream\n", 20); // no null!
 	qstream.replaceStreamData(
 	    b, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
@@ -380,8 +379,7 @@ void runtest(int n, char const* filename)
 	PointerHolder<QPDFObjectHandle::StreamDataProvider> p = provider;
 	qstream.replaceStreamData(
 	    p, QPDFObjectHandle::newName("/FlateDecode"),
-	    QPDFObjectHandle::newNull(),
-	    b.getPointer()->getSize());
+	    QPDFObjectHandle::newNull(), b->getSize());
 	provider->badLength(true);
 	try
 	{
@@ -402,7 +400,7 @@ void runtest(int n, char const* filename)
     {
 	QPDFObjectHandle root = pdf.getRoot();
 	PointerHolder<Buffer> b1 = new Buffer(20);
-	unsigned char* bp = b1.getPointer()->getBuffer();
+	unsigned char* bp = b1->getBuffer();
 	memcpy(bp, (char*)"data for new stream\n", 20); // no null!
 	QPDFObjectHandle qstream = QPDFObjectHandle::newStream(&pdf, b1);
 	QPDFObjectHandle rstream = QPDFObjectHandle::newStream(&pdf);
@@ -416,7 +414,7 @@ void runtest(int n, char const* filename)
 	    std::cout << "exception: " << e.what() << std::endl;
 	}
 	PointerHolder<Buffer> b2 = new Buffer(22);
-	bp = b2.getPointer()->getBuffer();
+	bp = b2->getBuffer();
 	memcpy(bp, (char*)"data for other stream\n", 22); // no null!
 	rstream.replaceStreamData(
 	    b2, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
@@ -430,10 +428,10 @@ void runtest(int n, char const* filename)
     else if (n == 10)
     {
 	PointerHolder<Buffer> b1 = new Buffer(37);
-	unsigned char* bp = b1.getPointer()->getBuffer();
+	unsigned char* bp = b1->getBuffer();
 	memcpy(bp, (char*)"BT /F1 12 Tf 72 620 Td (Baked) Tj ET\n", 37);
 	PointerHolder<Buffer> b2 = new Buffer(38);
-	bp = b2.getPointer()->getBuffer();
+	bp = b2->getBuffer();
 	memcpy(bp, (char*)"BT /F1 18 Tf 72 520 Td (Mashed) Tj ET\n", 38);
 
 	std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
@@ -451,13 +449,13 @@ void runtest(int n, char const* filename)
 	QPDFObjectHandle qstream = root.getKey("/QStream");
 	PointerHolder<Buffer> b1 = qstream.getStreamData();
 	PointerHolder<Buffer> b2 = qstream.getRawStreamData();
-	if ((b1.getPointer()->getSize() == 7) &&
-	    (memcmp(b1.getPointer()->getBuffer(), "potato\n", 7) == 0))
+	if ((b1->getSize() == 7) &&
+	    (memcmp(b1->getBuffer(), "potato\n", 7) == 0))
 	{
 	    std::cout << "filtered stream data okay" << std::endl;
 	}
-	if ((b2.getPointer()->getSize() == 15) &&
-	    (memcmp(b2.getPointer()->getBuffer(), "706F7461746F0A\n", 15) == 0))
+	if ((b2->getSize() == 15) &&
+	    (memcmp(b2->getBuffer(), "706F7461746F0A\n", 15) == 0))
 	{
 	    std::cout << "raw stream data okay" << std::endl;
 	}

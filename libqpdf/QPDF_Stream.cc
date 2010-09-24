@@ -370,16 +370,15 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline, bool filter,
     if (this->stream_data.getPointer())
     {
 	QTC::TC("qpdf", "QPDF_Stream pipe replaced stream data");
-	Buffer& b = *(this->stream_data.getPointer());
-	pipeline->write(b.getBuffer(), b.getSize());
+	pipeline->write(this->stream_data->getBuffer(),
+			this->stream_data->getSize());
 	pipeline->finish();
     }
     else if (this->stream_provider.getPointer())
     {
-	QPDFObjectHandle::StreamDataProvider& p =
-	    (*this->stream_provider.getPointer());
 	Pl_Count count("stream provider count", pipeline);
-	p.provideStreamData(this->objid, this->generation, &count);
+	this->stream_provider->provideStreamData(
+	    this->objid, this->generation, &count);
 	size_t actual_length = count.getCount();
 	size_t desired_length =
 	    this->stream_dict.getKey("/Length").getIntValue();
@@ -424,7 +423,7 @@ QPDF_Stream::replaceStreamData(PointerHolder<Buffer> data,
 {
     this->stream_data = data;
     this->stream_provider = 0;
-    replaceFilterData(filter, decode_parms, data.getPointer()->getSize());
+    replaceFilterData(filter, decode_parms, data->getSize());
 }
 
 void

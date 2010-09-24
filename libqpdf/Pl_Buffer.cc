@@ -51,9 +51,8 @@ Pl_Buffer::getBuffer()
     unsigned char* p = b->getBuffer();
     while (! this->data.empty())
     {
-	PointerHolder<Buffer> bph = this->data.front();
+	PointerHolder<Buffer> bp = this->data.front();
 	this->data.pop_front();
-	Buffer* bp = bph.getPointer();
 	size_t bytes = bp->getSize();
 	memcpy(p, bp->getBuffer(), bytes);
 	p += bytes;

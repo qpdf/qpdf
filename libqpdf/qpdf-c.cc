@@ -176,7 +176,7 @@ char const* qpdf_get_error_full_text(qpdf_data qpdf, qpdf_error e)
     {
 	return "";
     }
-    return e->exc.getPointer()->what();
+    return e->exc->what();
 }
 
 enum qpdf_error_code_e qpdf_get_error_code(qpdf_data qpdf, qpdf_error e)
@@ -185,7 +185,7 @@ enum qpdf_error_code_e qpdf_get_error_code(qpdf_data qpdf, qpdf_error e)
     {
 	return qpdf_e_success;
     }
-    return e->exc.getPointer()->getErrorCode();
+    return e->exc->getErrorCode();
 }
 
 char const* qpdf_get_error_filename(qpdf_data qpdf, qpdf_error e)
@@ -194,7 +194,7 @@ char const* qpdf_get_error_filename(qpdf_data qpdf, qpdf_error e)
     {
 	return "";
     }
-    return e->exc.getPointer()->getFilename().c_str();
+    return e->exc->getFilename().c_str();
 }
 
 unsigned long qpdf_get_error_file_position(qpdf_data qpdf, qpdf_error e)
@@ -203,7 +203,7 @@ unsigned long qpdf_get_error_file_position(qpdf_data qpdf, qpdf_error e)
     {
 	return 0;
     }
-    return e->exc.getPointer()->getFilePosition();
+    return e->exc->getFilePosition();
 }
 
 char const* qpdf_get_error_message_detail(qpdf_data qpdf, qpdf_error e)
@@ -212,7 +212,7 @@ char const* qpdf_get_error_message_detail(qpdf_data qpdf, qpdf_error e)
     {
 	return "";
     }
-    return e->exc.getPointer()->getMessageDetail().c_str();
+    return e->exc->getMessageDetail().c_str();
 }
 
 void qpdf_set_suppress_warnings(qpdf_data qpdf, QPDF_BOOL value)

@@ -854,7 +854,7 @@ QPDF::processXRefStream(off_t xref_offset, QPDFObjectHandle& xref_obj)
     int expected_size = entry_size * num_entries;
 
     PointerHolder<Buffer> bp = xref_obj.getStreamData();
-    int actual_size = bp.getPointer()->getSize();
+    int actual_size = bp->getSize();
 
     if (expected_size != actual_size)
     {
@@ -878,7 +878,7 @@ QPDF::processXRefStream(off_t xref_offset, QPDFObjectHandle& xref_obj)
 
     bool saw_first_compressed_object = false;
 
-    unsigned char const* data = bp.getPointer()->getBuffer();
+    unsigned char const* data = bp->getBuffer();
     for (int i = 0; i < num_entries; ++i)
     {
 	// Read this entry
@@ -1199,6 +1199,20 @@ QPDF::readObjectInternal(PointerHolder<InputSource> input,
 			olist[olist.size() - 1].getIntValue());
 		    olist.pop_back();
 		    olist.pop_back();
+		}
+		else if ((value == "endobj") &&
+			 (! (in_array || in_dictionary)))
+		{
+		    // Nothing in the PDF spec appears to allow empty
+		    // objects, but they have been encountered in
+		    // actual PDF files and Adobe Reader appears to
+		    // ignore them.
+		    warn(QPDFExc(qpdf_e_damaged_pdf, input->getName(),
+				 this->last_object_description,
+				 input->getLastOffset(),
+				 "empty object treated as null"));
+		    object = QPDFObjectHandle::newNull();
+		    input->seek(input->getLastOffset(), SEEK_SET);
 		}
 		else
 		{

@@ -48,8 +48,8 @@ ImageInverter::provideStreamData(int objid, int generation,
     // image data.  Then invert the image data and write the inverted
     // data to the pipeline.
     PointerHolder<Buffer> data = this->image_data[objid][generation];
-    size_t size = data.getPointer()->getSize();
-    unsigned char* buf = data.getPointer()->getBuffer();
+    size_t size = data->getSize();
+    unsigned char* buf = data->getBuffer();
     unsigned char ch;
     for (size_t i = 0; i < size; ++i)
     {
@@ -142,8 +142,7 @@ int main(int argc, char* argv[])
 			    p,
 			    QPDFObjectHandle::newNull(),
 			    QPDFObjectHandle::newNull(),
-			    inv->image_data[objid][gen].getPointer()->
-			        getSize());
+			    inv->image_data[objid][gen]->getSize());
 		    }
 		}
 	    }

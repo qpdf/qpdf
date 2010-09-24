@@ -528,7 +528,7 @@ std::string
 QPDFObjectHandle::unparseResolved()
 {
     dereference();
-    return this->obj.getPointer()->unparse();
+    return this->obj->unparse();
 }
 
 QPDFObjectHandle

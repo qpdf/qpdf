@@ -571,8 +571,7 @@ QPDF::decryptString(std::string& str, int objid, int generation)
 	    pl.write((unsigned char*)str.c_str(), str.length());
 	    pl.finish();
 	    PointerHolder<Buffer> buf = bufpl.getBuffer();
-	    str = std::string((char*)buf.getPointer()->getBuffer(),
-			      (size_t)buf.getPointer()->getSize());
+	    str = std::string((char*)buf->getBuffer(), (size_t)buf->getSize());
 	}
 	else
 	{
