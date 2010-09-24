@@ -1,3 +1,15 @@
+2010-09-24  Jay Berkenbilt  <ejb@ql.org>
+
+	* libqpdf/QPDF.cc: change private "file" method to be a
+	PointerHolder<InputSource> to prepare qpdf for being able to work
+	with PDF files loaded into memory in addition to working with
+	files on disk.
+
+	* include/qpdf/PointerHolder.hh: add operator* and operator->
+	methods so that PointerHolder objects can be used like pointers.
+	This is consistent with the smart pointer objects in the next
+	revision of C++.
+
 2010-09-05  Jay Berkenbilt  <ejb@ql.org>
 
 	* libqpdf/QPDF.cc (readObjectInternal): Recognize empty objects
