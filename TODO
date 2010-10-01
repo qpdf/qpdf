@@ -1,25 +1,5 @@
-2.2.1
-=====
-
- * Remove cerr and cout from QPDF*.cc
-
- * QPDF::checkLinearization writes things to std::cout, which makes it
-   hard for GUIs that want to display the result.  Go through all
-   library code and get rid of use of std::cout and std::cerr,
-   replacing them with some better mechanism.  To avoid changing the
-   ABI, add two new methods: one that takes a std::ostream& and one
-   that takes a reference to a std::vector<std::string>.  The real
-   code should append to the vector.  The ostream version should
-   remember to catch exceptions, output the vector elements, and
-   rethrow if needed.  The old version should call the ostream version
-   with std::cout.
-
-
 General
 =======
-
- * In general, take a fresh look at private methods to see which, if
-   any, should be protected.
 
  * Look at page splitting.  Subramanyam provided a test file; see
    ../misc/article-threads.pdf.  Email Q-Count: 431864 from

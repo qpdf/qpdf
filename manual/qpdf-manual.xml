@@ -2080,14 +2080,7 @@ print "\n";
      <itemizedlist>
       <listitem>
        <para>
-        Add new method <classname>QPDF::processMemoryFile</classname>
-        for operating on PDF files that are loaded into memory rather
-        than in a file on disk.
-       </para>
-      </listitem>
-      <listitem>
-       <para>
-        Add new method <classname>QPDF::setOutputStreams</classname>
+        Add new method <function>QPDF::setOutputStreams</function>
         to replace <varname>std::cout</varname> and
         <varname>std::cerr</varname> with other streams for generation
         of diagnostic messages and error messages.  This can be useful
@@ -2100,6 +2093,13 @@ print "\n";
         error stream is for warnings.  Note also that output of
         warnings is suppressed when
         <literal>setSuppressWarnings(true)</literal> is called.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Add new method <function>QPDF::processMemoryFile</function>
+        for operating on PDF files that are loaded into memory rather
+        than in a file on disk.
        </para>
       </listitem>
       <listitem>
