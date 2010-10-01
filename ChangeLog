@@ -1,5 +1,7 @@
 2010-10-01  Jay Berkenbilt  <ejb@ql.org>
 
+	* 2.2.1: release
+
 	* include/qpdf/QPDF.hh: Add setOutputStreams method to allow
 	redirection of library-generated output/error to alternative
 	streams.
