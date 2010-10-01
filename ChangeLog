@@ -1,3 +1,8 @@
+2010-10-01  Jay Berkenbilt  <ejb@ql.org>
+
+	* include/qpdf/QPDF.hh: Add processMemoryFile method for
+	processing a PDF file from a memory buffer instead of a file.
+
 2010-09-24  Jay Berkenbilt  <ejb@ql.org>
 
 	* libqpdf/QPDF.cc: change private "file" method to be a

@@ -58,11 +58,53 @@ class Provider: public QPDFObjectHandle::StreamDataProvider
 void runtest(int n, char const* filename)
 {
     QPDF pdf;
+    PointerHolder<char> file_buf;
     if (n == 0)
     {
 	pdf.setAttemptRecovery(false);
     }
-    pdf.processFile(filename);
+    if (n % 2 == 0)
+    {
+	pdf.processFile(filename);
+    }
+    else
+    {
+	// Exercise processMemoryFile
+	FILE* f = QUtil::fopen_wrapper(std::string("open ") + filename,
+				       fopen(filename, "rb"));
+	fseek(f, 0, SEEK_END);
+	size_t size = (size_t) ftell(f);
+	fseek(f, 0, SEEK_SET);
+	file_buf = new char[size];
+	char* buf_p = file_buf.getPointer();
+	size_t bytes_read = 0;
+	size_t len = 0;
+	while ((len = fread(buf_p + bytes_read, 1, size - bytes_read, f)) > 0)
+	{
+	    bytes_read += len;
+	}
+	if (bytes_read != size)
+	{
+	    if (ferror(f))
+	    {
+		throw std::runtime_error(
+		    std::string("failure reading file ") + filename +
+		    " into memory: read " +
+		    QUtil::int_to_string(bytes_read) + "; wanted " +
+		    QUtil::int_to_string(size));
+	    }
+	    else
+	    {
+		throw std::logic_error(
+		    std::string("premature eof reading file ") + filename +
+		    " into memory: read " +
+		    QUtil::int_to_string(bytes_read) + "; wanted " +
+		    QUtil::int_to_string(size));
+	    }
+	}
+	fclose(f);
+	pdf.processMemoryFile(filename, buf_p, size);
+    }
 
     if ((n == 0) || (n == 1))
     {

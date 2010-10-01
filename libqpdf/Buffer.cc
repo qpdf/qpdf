@@ -4,17 +4,22 @@
 
 Buffer::Buffer()
 {
-    init(0);
+    init(0, 0, true);
 }
 
 Buffer::Buffer(unsigned long size)
 {
-    init(size);
+    init(size, 0, true);
+}
+
+Buffer::Buffer(unsigned char* buf, unsigned long size)
+{
+    init(size, buf, false);
 }
 
 Buffer::Buffer(Buffer const& rhs)
 {
-    init(0);
+    init(0, 0, true);
     copy(rhs);
 }
 
@@ -31,10 +36,18 @@ Buffer::~Buffer()
 }
 
 void
-Buffer::init(unsigned long size)
+Buffer::init(unsigned long size, unsigned char* buf, bool own_memory)
 {
+    this->own_memory = own_memory;
     this->size = size;
-    this->buf = (size ? new unsigned char[size] : 0);
+    if (own_memory)
+    {
+	this->buf = (size ? new unsigned char[size] : 0);
+    }
+    else
+    {
+	this->buf = buf;
+    }
 }
 
 void
@@ -43,7 +56,7 @@ Buffer::copy(Buffer const& rhs)
     if (this != &rhs)
     {
 	this->destroy();
-	this->init(rhs.size);
+	this->init(rhs.size, 0, true);
 	if (this->size)
 	{
 	    memcpy(this->buf, rhs.buf, this->size);
@@ -54,7 +67,10 @@ Buffer::copy(Buffer const& rhs)
 void
 Buffer::destroy()
 {
-    delete [] this->buf;
+    if (this->own_memory)
+    {
+	delete [] this->buf;
+    }
     this->size = 0;
     this->buf = 0;
 }

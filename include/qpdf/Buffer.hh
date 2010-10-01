@@ -15,8 +15,17 @@ class Buffer
   public:
     QPDF_DLL
     Buffer();
+
+    // Create a Buffer object whose memory is owned by the class and
+    // will be freed when the Buffer object is destroyed.
     QPDF_DLL
     Buffer(unsigned long size);
+
+    // Create a Buffer object whose memory is owned by the caller and
+    // will not be freed when the Buffer is destroyed.
+    QPDF_DLL
+    Buffer(unsigned char* buf, unsigned long size);
+
     QPDF_DLL
     Buffer(Buffer const&);
     QPDF_DLL
@@ -31,10 +40,11 @@ class Buffer
     unsigned char* getBuffer();
 
   private:
-    void init(unsigned long size);
+    void init(unsigned long size, unsigned char* buf, bool own_memory);
     void copy(Buffer const&);
     void destroy();
 
+    bool own_memory;
     unsigned long size;
     unsigned char* buf;
 };

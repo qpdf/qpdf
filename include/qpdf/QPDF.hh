@@ -50,6 +50,15 @@ class QPDF
     QPDF_DLL
     void processFile(char const* filename, char const* password = 0);
 
+    // Parse a PDF file loaded into a memory buffer.  This works
+    // exactly like processFile except that the PDF file is in memory
+    // instead of on disk.  The description appears in any warning or
+    // error message in place of the file name.
+    QPDF_DLL
+    void processMemoryFile(char const* description,
+			   char const* buf, size_t length,
+			   char const* password = 0);
+
     // Parameter settings
 
     // If true, ignore any cross-reference streams in a hybrid file
@@ -362,7 +371,8 @@ class QPDF
     class BufferInputSource: public InputSource
     {
       public:
-	BufferInputSource(std::string const& description, Buffer* buf);
+	BufferInputSource(std::string const& description, Buffer* buf,
+			  bool own_memory = false);
 	virtual ~BufferInputSource();
 	virtual std::string const& getName() const;
 	virtual off_t tell();
@@ -372,6 +382,7 @@ class QPDF
 	virtual void unreadCh(char ch);
 
       private:
+	bool own_memory;
 	std::string description;
 	Buffer* buf;
 	off_t cur_offset;
@@ -410,7 +421,7 @@ class QPDF
 	off_t end_after_space;
     };
 
-    void parse();
+    void parse(char const* password);
     void warn(QPDFExc const& e);
     void setTrailer(QPDFObjectHandle obj);
     void read_xref(off_t offset);

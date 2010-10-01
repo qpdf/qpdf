@@ -159,7 +159,8 @@ QPDF::FileInputSource::unreadCh(char ch)
 }
 
 QPDF::BufferInputSource::BufferInputSource(std::string const& description,
-					   Buffer* buf) :
+					   Buffer* buf, bool own_memory) :
+    own_memory(own_memory),
     description(description),
     buf(buf),
     cur_offset(0)
@@ -168,6 +169,10 @@ QPDF::BufferInputSource::BufferInputSource(std::string const& description,
 
 QPDF::BufferInputSource::~BufferInputSource()
 {
+    if (own_memory)
+    {
+	delete this->buf;
+    }
 }
 
 std::string const&
@@ -192,7 +197,7 @@ QPDF::BufferInputSource::seek(off_t offset, int whence)
 	break;
 
       case SEEK_END:
-	this->cur_offset = this->buf->getSize() - offset;
+	this->cur_offset = this->buf->getSize() + offset;
 	break;
 
       case SEEK_CUR:
@@ -306,11 +311,19 @@ QPDF::processFile(char const* filename, char const* password)
     FileInputSource* fi = new FileInputSource();
     this->file = fi;
     fi->setFilename(filename);
-    if (password)
-    {
-	this->provided_password = password;
-    }
-    parse();
+    parse(password);
+}
+
+void
+QPDF::processMemoryFile(char const* description,
+			char const* buf, size_t length,
+			char const* password)
+{
+    this->file =
+	new BufferInputSource(description,
+			      new Buffer((unsigned char*)buf, length),
+			      true);
+    parse(password);
 }
 
 void
@@ -340,10 +353,15 @@ QPDF::getWarnings()
 }
 
 void
-QPDF::parse()
+QPDF::parse(char const* password)
 {
     static PCRE header_re("^%PDF-(1.\\d+)\\b");
     static PCRE eof_re("(?s:startxref\\s+(\\d+)\\s+%%EOF\\b)");
+
+    if (password)
+    {
+	this->provided_password = password;
+    }
 
     std::string line = this->file->readLine();
     PCRE::Match m1 = header_re.match(line.c_str());
