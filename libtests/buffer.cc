@@ -2,6 +2,7 @@
 #include <qpdf/Pl_Count.hh>
 #include <qpdf/Pl_Discard.hh>
 #include <stdlib.h>
+#include <stdexcept>
 
 typedef unsigned char* uc;
 
@@ -49,6 +50,14 @@ int main()
 	std::cout << "size: " << b->getSize() << std::endl;
 	std::cout << "data: " << b->getBuffer() << std::endl;
 	delete b;
+
+	unsigned char lbuf[10];
+	Buffer b1(lbuf, 10);
+	if (! ((b1.getBuffer() == lbuf) &&
+	       (b1.getSize() == 10)))
+	{
+	    throw std::logic_error("hand-created buffer is not as expected");
+	}
     }
     catch (std::exception& e)
     {
