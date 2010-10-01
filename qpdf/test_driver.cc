@@ -10,6 +10,7 @@
 #include <qpdf/Pl_Flate.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <iostream>
+#include <sstream>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -501,6 +502,22 @@ void runtest(int n, char const* filename)
 	{
 	    std::cout << "raw stream data okay" << std::endl;
 	}
+    }
+    else if (n == 12)
+    {
+	pdf.setOutputStreams(0, 0);
+	pdf.showLinearizationData();
+    }
+    else if (n == 13)
+    {
+	std::ostringstream out;
+	std::ostringstream err;
+	pdf.setOutputStreams(&out, &err);
+	pdf.showLinearizationData();
+	std::cout << "---output---" << std::endl
+		  << out.str()
+		  << "---error---" << std::endl
+		  << err.str();
     }
     else
     {

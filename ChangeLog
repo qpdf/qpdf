@@ -1,5 +1,9 @@
 2010-10-01  Jay Berkenbilt  <ejb@ql.org>
 
+	* include/qpdf/QPDF.hh: Add setOutputStreams method to allow
+	redirection of library-generated output/error to alternative
+	streams.
+
 	* include/qpdf/QPDF.hh: Add processMemoryFile method for
 	processing a PDF file from a memory buffer instead of a file.
 

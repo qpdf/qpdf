@@ -267,6 +267,8 @@ QPDF::QPDF() :
     encryption_initialized(false),
     ignore_xref_streams(false),
     suppress_warnings(false),
+    out_stream(&std::cout),
+    err_stream(&std::cerr),
     attempt_recovery(true),
     encryption_V(0),
     encrypt_metadata(true),
@@ -330,6 +332,13 @@ void
 QPDF::setIgnoreXRefStreams(bool val)
 {
     this->ignore_xref_streams = val;
+}
+
+void
+QPDF::setOutputStreams(std::ostream* out, std::ostream* err)
+{
+    this->out_stream = out ? out : &std::cout;
+    this->err_stream = err ? err : &std::cerr;
 }
 
 void
@@ -449,7 +458,8 @@ QPDF::warn(QPDFExc const& e)
     this->warnings.push_back(e);
     if (! this->suppress_warnings)
     {
-	std::cerr << "WARNING: " << this->warnings.back().what() << std::endl;
+	*err_stream << "WARNING: "
+		    << this->warnings.back().what() << std::endl;
     }
 }
 
@@ -1045,16 +1055,16 @@ QPDF::showXRefTable()
     {
 	ObjGen const& og = (*iter).first;
 	QPDFXRefEntry const& entry = (*iter).second;
-	std::cout << og.obj << "/" << og.gen << ": ";
+	*out_stream << og.obj << "/" << og.gen << ": ";
 	switch (entry.getType())
 	{
 	  case 1:
-	    std::cout << "uncompressed; offset = " << entry.getOffset();
+	    *out_stream << "uncompressed; offset = " << entry.getOffset();
 	    break;
 
 	  case 2:
-	    std::cout << "compressed; stream = " << entry.getObjStreamNumber()
-		      << ", index = " << entry.getObjStreamIndex();
+	    *out_stream << "compressed; stream = " << entry.getObjStreamNumber()
+			<< ", index = " << entry.getObjStreamIndex();
 	    break;
 
 	  default:
@@ -1062,7 +1072,7 @@ QPDF::showXRefTable()
 				   " showing xref_table");
 	    break;
 	}
-	std::cout << std::endl;
+	*out_stream << std::endl;
     }
 }
 

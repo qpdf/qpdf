@@ -12,6 +12,7 @@
 #include <string>
 #include <map>
 #include <list>
+#include <iostream>
 
 #include <qpdf/DLL.h>
 
@@ -61,6 +62,21 @@ class QPDF
 
     // Parameter settings
 
+    // By default, warning messages are issued to std::cerr and output
+    // messages printed by certain check calls are issued to
+    // std::cout.  This method allows you to specify alternative
+    // streams for this purpose.  Note that no normal QPDF operations
+    // generate output to std::cout, so for applications that just
+    // wish to avoid creating output and don't call any check
+    // functions, calling setSuppressWarnings(true) is sufficient.
+    // Applications that wish to present check or warning information
+    // to users may replace the output and error streams to capture
+    // the output and errors for other use.  A null value for either
+    // stream will cause QPDF to use std::cout or std::cerr as
+    // appropriate.
+    QPDF_DLL
+    void setOutputStreams(std::ostream* out_stream, std::ostream* err_stream);
+
     // If true, ignore any cross-reference streams in a hybrid file
     // (one that contains both cross-reference streams and
     // cross-reference tables).  This can be useful for testing to
@@ -68,7 +84,8 @@ class QPDF
     QPDF_DLL
     void setIgnoreXRefStreams(bool);
 
-    // By default, any warnings are issued to stderr as they are
+    // By default, any warnings are issued to std::cerr or the error
+    // stream specified in a call to setOutputStreams as they are
     // encountered.  If this is called with a true value, reporting of
     // warnings is suppressed.  You may still retrieve warnings by
     // calling getWarnings.
@@ -88,7 +105,7 @@ class QPDF
     // clear the list.  This method may be called even if processFile
     // throws an exception.  Note that if setSuppressWarnings was not
     // called or was called with a false value, any warnings retrieved
-    // here will have already been issued to stderr.
+    // here will have already been output.
     QPDF_DLL
     std::vector<QPDFExc> getWarnings();
 
@@ -204,12 +221,14 @@ class QPDF
 
     // Performs various sanity checks on a linearized file.  Return
     // true if no errors or warnings.  Otherwise, return false and
-    // output errors and warnings to stdout.
+    // output errors and warnings to std::cout or the output stream
+    // specified in a call to setOutputStreams.
     QPDF_DLL
     bool checkLinearization();
 
     // Calls checkLinearization() and, if possible, prints normalized
-    // contents of some of the hints tables to stdout.  Normalization
+    // contents of some of the hints tables to std::cout or the output
+    // stream specified in a call to setOutputStreams.  Normalization
     // includes adding min values to delta values and adjusting
     // offsets based on the location and size of the primary hint
     // stream.
@@ -803,6 +822,8 @@ class QPDF
     bool encryption_initialized;
     bool ignore_xref_streams;
     bool suppress_warnings;
+    std::ostream* out_stream;
+    std::ostream* err_stream;
     bool attempt_recovery;
     int encryption_V;
     bool encrypt_metadata;
