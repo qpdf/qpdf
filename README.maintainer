@@ -1,6 +1,9 @@
 Release Reminders
 =================
 
+ * If any interfaces were added or changed, check C API to see whether
+   changes are appropriate there as well.
+
  * Increment shared library version information as needed
    (libqpdf/build.mk)
 
