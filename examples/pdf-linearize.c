@@ -17,9 +17,9 @@ static void usage()
 
 int main(int argc, char* argv[])
 {
-    char* infile = argv[1];
-    char* password = argv[2];
-    char* outfile = argv[3];
+    char* infile = NULL;
+    char* password = NULL;
+    char* outfile = NULL;
     qpdf_data qpdf = qpdf_init();
     int warnings = 0;
     int errors = 0;
@@ -42,6 +42,10 @@ int main(int argc, char* argv[])
     {
 	usage();
     }
+
+    infile = argv[1];
+    password = argv[2];
+    outfile = argv[3];
 
     if (((qpdf_read(qpdf, infile, password) & QPDF_ERRORS) == 0) &&
 	((qpdf_init_write(qpdf, outfile) & QPDF_ERRORS) == 0))
