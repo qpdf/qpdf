@@ -28,7 +28,9 @@ struct _qpdf_data
     std::string tmp_string;
 
     // Parameters for functions we call
-    char const* filename;
+    char const* filename;	// or description
+    char const* buffer;
+    unsigned long size;
     char const* password;
 };
 
@@ -48,6 +50,13 @@ _qpdf_data::~_qpdf_data()
 static void call_read(qpdf_data qpdf)
 {
     qpdf->qpdf->processFile(qpdf->filename, qpdf->password);
+}
+
+// must set qpdf->filename, qpdf->buffer, qpdf->size, and qpdf->password
+static void call_read_memory(qpdf_data qpdf)
+{
+    qpdf->qpdf->processMemoryFile(qpdf->filename, qpdf->buffer,
+				  qpdf->size, qpdf->password);
 }
 
 // must set qpdf->filename
@@ -241,6 +250,22 @@ QPDF_ERROR_CODE qpdf_read(qpdf_data qpdf, char const* filename,
     qpdf->password = password;
     status = trap_errors(qpdf, &call_read);
     QTC::TC("qpdf", "qpdf-c called qpdf_read", status);
+    return status;
+}
+
+QPDF_ERROR_CODE qpdf_read_memory(qpdf_data qpdf,
+				 char const* description,
+				 char const* buffer,
+				 unsigned long size,
+				 char const* password)
+{
+    QPDF_ERROR_CODE status = QPDF_SUCCESS;
+    qpdf->filename = description;
+    qpdf->buffer = buffer;
+    qpdf->size = size;
+    qpdf->password = password;
+    status = trap_errors(qpdf, &call_read_memory);
+    QTC::TC("qpdf", "qpdf-c called qpdf_read_memory", status);
     return status;
 }
 

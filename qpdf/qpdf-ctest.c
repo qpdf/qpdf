@@ -3,7 +3,9 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
+static char* whoami = 0;
 static qpdf_data qpdf = 0;
 
 static void report_errors()
@@ -40,6 +42,57 @@ static void report_errors()
 	(void)qpdf_get_error_file_position(qpdf, e);
 	(void)qpdf_get_error_message_detail(qpdf, e);
     }
+}
+
+static void read_file_into_memory(char const* filename,
+				  char** buf, unsigned long* size)
+{
+    char* buf_p = 0;
+    FILE* f = NULL;
+    size_t bytes_read = 0;
+    size_t len = 0;
+
+    f = fopen(filename, "rb");
+    if (f == NULL)
+    {
+	fprintf(stderr, "%s: unable to open %s: %s\n",
+		whoami, filename, strerror(errno));
+	exit(2);
+    }
+    fseek(f, 0, SEEK_END);
+    *size = (unsigned long) ftell(f);
+    fseek(f, 0, SEEK_SET);
+    *buf = malloc(*size);
+    if (*buf == NULL)
+    {
+	fprintf(stderr, "%s: unable to allocate %lu bytes\n",
+		whoami, *size);
+	exit(2);
+    }
+    buf_p = *buf;
+    bytes_read = 0;
+    len = 0;
+    while ((len = fread(buf_p + bytes_read, 1, *size - bytes_read, f)) > 0)
+    {
+	bytes_read += len;
+    }
+    if (bytes_read != *size)
+    {
+	if (ferror(f))
+	{
+	    fprintf(stderr, "%s: failure reading file %s into memory:",
+		    whoami, filename);
+	}
+	else
+	{
+	    fprintf(stderr, "%s: premature EOF reading file %s:",
+		    whoami, filename);
+	}
+	fprintf(stderr, " read %lu, wanted %lu\n",
+		(unsigned long) bytes_read, (unsigned long) size);
+	exit(2);
+    }
+    fclose(f);
 }
 
 static void test01(char const* infile,
@@ -135,7 +188,10 @@ static void test06(char const* infile,
 		   char const* outfile,
 		   char const* outfile2)
 {
-    qpdf_read(qpdf, infile, password);
+    char* buf = NULL;
+    unsigned long size = 0;
+    read_file_into_memory(infile, &buf, &size);
+    qpdf_read_memory(qpdf, infile, buf, size, password);
     qpdf_init_write(qpdf, outfile);
     qpdf_set_static_ID(qpdf, QPDF_TRUE);
     qpdf_set_object_stream_mode(qpdf, qpdf_o_generate);
@@ -271,7 +327,6 @@ static void test15(char const* infile,
 
 int main(int argc, char* argv[])
 {
-    char* whoami = 0;
     char* p = 0;
     int n = 0;
     char const* infile = 0;

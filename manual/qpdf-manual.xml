@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "2.2.1">
-<!ENTITY lastreleased "October 1, 2010">
+<!ENTITY swversion "2.2.2">
+<!ENTITY lastreleased "October 4, 2010">
 ]>
 <book>
  <bookinfo>
@@ -2074,6 +2074,21 @@ print "\n";
    <filename>ChangeLog</filename> in the source distribution.
   </para>
   <variablelist>
+   <varlistentry>
+    <term>2.2.2: October 4, 2010</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Add new function <function>qpdf_read_memory</function>
+        to the C API to call
+        <function>QPDF::processMemoryFile</function>.  This was an
+        omission in qpdf 2.2.1.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
     <term>2.2.1: October 1, 2010</term>
     <listitem>
