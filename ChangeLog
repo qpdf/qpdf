@@ -1,3 +1,10 @@
+2010-10-04  Jay Berkenbilt  <ejb@ql.org>
+
+	* 2.2.2: release
+
+	* include/qpdf/qpdf-c.h: Add qpdf_read_memory to C API to call
+	QPDF::processMemoryFile.
+
 2010-10-01  Jay Berkenbilt  <ejb@ql.org>
 
 	* 2.2.1: release
