@@ -1,6 +1,9 @@
 General
 =======
 
+ * Update qpdf docs about non-ascii passwords.  See thread from
+   2010-12-07,08 for details.
+
  * Look at page splitting.  Subramanyam provided a test file; see
    ../misc/article-threads.pdf.  Email Q-Count: 431864 from
    2009-11-03.  See also "Splitting by Pages" below.
