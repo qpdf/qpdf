@@ -95,9 +95,9 @@ QPDF::isLinearized()
     static PCRE lindict_re("(?s:(\\d+)\\s+0\\s+obj\\s*<<)");
 
     off_t offset = -1;
-    int lindict_obj = 0;
+    int lindict_obj = -1;
     char* p = buf;
-    while (lindict_obj == 0)
+    while (lindict_obj == -1)
     {
 	PCRE::Match m(lindict_re.match(p));
 	if (m)
@@ -312,7 +312,7 @@ QPDF::readHintStream(Pipeline& pl, off_t offset, size_t length)
     int obj;
     int gen;
     QPDFObjectHandle H = readObjectAtOffset(
-	false, offset, "linearization hint stream", 0, 0, obj, gen);
+	false, offset, "linearization hint stream", -1, 0, obj, gen);
     ObjCache& oc = this->obj_cache[ObjGen(obj, gen)];
     off_t min_end_offset = oc.end_before_space;
     off_t max_end_offset = oc.end_after_space;

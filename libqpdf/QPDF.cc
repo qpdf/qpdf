@@ -782,7 +782,7 @@ QPDF::read_xrefStream(off_t xref_offset)
 	try
 	{
 	    xref_obj = readObjectAtOffset(
-		false, xref_offset, "xref stream", 0, 0, xobj, xgen);
+		false, xref_offset, "xref stream", -1, 0, xobj, xgen);
 	}
 	catch (QPDFExc& e)
 	{
@@ -1580,7 +1580,7 @@ QPDF::readObjectAtOffset(bool try_recovery,
 	objid = atoi(tobjid.getValue().c_str());
 	generation = atoi(tgen.getValue().c_str());
 
-	if (exp_objid &&
+	if ((exp_objid >= 0) &&
 	    (! ((objid == exp_objid) && (generation == exp_generation))))
 	{
 	    QTC::TC("qpdf", "QPDF err wrong objid/generation");
@@ -1593,7 +1593,7 @@ QPDF::readObjectAtOffset(bool try_recovery,
     }
     catch (QPDFExc& e)
     {
-	if (exp_objid && try_recovery && this->attempt_recovery)
+	if ((exp_objid >= 0) && try_recovery && this->attempt_recovery)
 	{
 	    // Try again after reconstructing xref table
 	    reconstruct_xref(e);

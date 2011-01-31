@@ -111,7 +111,7 @@ $td->runtest("new stream",
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 28;
+$n_tests += 29;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -190,6 +190,14 @@ foreach my $file (qw(short-id long-id))
 		  $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
 }
+
+# Handle file with invalid xref table and object 0 as a regular object
+# (bug 3159950).
+$td->runtest("check obj0.pdf",
+	     {$td->COMMAND => "qpdf --check obj0.pdf"},
+	     {$td->FILE => "obj0-check.out",
+	      $td->EXIT_STATUS => 3},
+	     $td->NORMALIZE_NEWLINES);
 
 # Min/Force version
 $td->runtest("set min version",
