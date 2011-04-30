@@ -1257,8 +1257,8 @@ my @flags = (["-qdf",						# 1
 	      "no arguments"],
 	     );
 
-$n_tests += (@files * @flags  * 2 * 3);
-$n_compare_pdfs += (@files * @flags * 2);
+$n_tests += 1 + (@files * @flags  * 2 * 3);
+$n_compare_pdfs += 1 + (@files * @flags * 2);
 $n_acroread += (@files * @flags * 2);
 
 foreach my $file (@files)
@@ -1310,6 +1310,14 @@ foreach my $file (@files)
 	flush_tiff_cache();
     }
 }
+
+# inline-images-cr.pdf is xbkm938-dies.pdf from PDF collection
+$td->runtest("convert inline-images-cr to qdf",
+	     {$td->COMMAND => "qpdf --static-id --no-original-object-ids" .
+		  " --qdf inline-images-cr.pdf a.pdf"},
+	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+
+compare_pdfs("inline-images-cr.pdf", "a.pdf");
 
 show_ntests();
 # ----------

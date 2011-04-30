@@ -187,3 +187,4 @@ QPDF_Stream getRawStreamData 0
 QPDF_Stream getStreamData 0
 QPDF_Stream expand filter abbreviation 0
 qpdf-c called qpdf_read_memory 0
+Pl_QPDFTokenizer found EI 0

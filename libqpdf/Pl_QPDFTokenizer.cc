@@ -1,6 +1,7 @@
 #include <qpdf/Pl_QPDFTokenizer.hh>
 #include <qpdf/QPDF_String.hh>
 #include <qpdf/QPDF_Name.hh>
+#include <qpdf/QTC.hh>
 #include <stdexcept>
 #include <string.h>
 
@@ -11,8 +12,9 @@ Pl_QPDFTokenizer::Pl_QPDFTokenizer(char const* identifier, Pipeline* next) :
     last_char_was_cr(false),
     unread_char(false),
     char_to_unread('\0'),
-    pass_through(false)
+    in_inline_image(false)
 {
+    memset(this->image_buf, 0, IMAGE_BUF_SIZE);
 }
 
 Pl_QPDFTokenizer::~Pl_QPDFTokenizer()
@@ -56,11 +58,34 @@ Pl_QPDFTokenizer::writeToken(QPDFTokenizer::Token& token)
 void
 Pl_QPDFTokenizer::processChar(char ch)
 {
-    if (this->pass_through)
+    if (this->in_inline_image)
     {
-	// We're not normalizing anymore -- just write this without
-	// looking at it.
-	writeNext(&ch, 1);
+	// Scan through the input looking for EI surrounded by
+	// whitespace.  If that pattern appears in the inline image's
+	// representation, we're hosed, but this situation seems
+	// excessively unlikely, and this code path is only followed
+	// during content stream normalization, which is pretty much
+	// used for debugging and human inspection of PDF files.
+	memmove(this->image_buf,
+		this->image_buf + 1,
+		IMAGE_BUF_SIZE - 1);
+	this->image_buf[IMAGE_BUF_SIZE - 1] = ch;
+	if (strchr(" \t\n\v\f\r", this->image_buf[0]) &&
+	    (this->image_buf[1] == 'E') &&
+	    (this->image_buf[2] == 'I') &&
+	    strchr(" \t\n\v\f\r", this->image_buf[3]))
+	{
+	    // We've found an EI operator.  We've already written the
+	    // EI operator to output; terminate with a newline
+	    // character and resume normal processing.
+	    writeNext("\n", 1);
+	    this->in_inline_image = false;
+	    QTC::TC("qpdf", "Pl_QPDFTokenizer found EI");
+	}
+	else
+	{
+	    writeNext(&ch, 1);
+	}
 	return;
     }
 
@@ -75,18 +100,10 @@ Pl_QPDFTokenizer::processChar(char ch)
 	    this->newline_after_next_token = false;
 	}
 	if ((token.getType() == QPDFTokenizer::tt_word) &&
-	    (token.getValue() == "BI"))
+	    (token.getValue() == "ID"))
 	{
-	    // Uh oh.... we're not sophisticated enough to handle
-	    // inline images safely.  We'd have to to set up all the
-	    // filters and pipe the image data through it until the
-	    // filtered output was the right size for an image of the
-	    // specified dimensions.  Then we'd either have to write
-	    // out raw image data or continue to write filtered data,
-	    // resuming normalization when we get to the end.
-	    // Instead, for now, we'll just turn off normalization for
-	    // the remainder of this stream.
-	    this->pass_through = true;
+	    // Suspend normal scanning until we find an EI token.
+	    this->in_inline_image = true;
 	    if (this->unread_char)
 	    {
 		writeNext(&this->char_to_unread, 1);
@@ -156,7 +173,7 @@ void
 Pl_QPDFTokenizer::finish()
 {
     this->tokenizer.presentEOF();
-    if (! this->pass_through)
+    if (! this->in_inline_image)
     {
 	QPDFTokenizer::Token token;
 	if (tokenizer.getToken(token, this->unread_char, this->char_to_unread))

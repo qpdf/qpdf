@@ -33,7 +33,9 @@ class Pl_QPDFTokenizer: public Pipeline
     bool last_char_was_cr;
     bool unread_char;
     char char_to_unread;
-    bool pass_through;
+    bool in_inline_image;
+    static int const IMAGE_BUF_SIZE = 4; // must be >= 4
+    char image_buf[IMAGE_BUF_SIZE];
 };
 
 #endif // __PL_QPDFTOKENIZER_HH__

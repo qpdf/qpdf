@@ -1,3 +1,10 @@
+2011-04-30  Jay Berkenbilt  <ejb@ql.org>
+
+	* libqpdf/Pl_QPDFTokenizer.cc (processChar): When an inline image
+	is detected, suspend normalization only up to the end of the
+	inline image rather than for the remainder of the content stream.
+	(Fixes qpdf-Bugs 3152169.)
+
 2011-01-31  Jay Berkenbilt  <ejb@ql.org>
 
 	* libqpdf/QPDF.cc (readObjectAtOffset): use -1 rather than 0 when
