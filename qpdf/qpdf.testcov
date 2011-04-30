@@ -188,3 +188,7 @@ QPDF_Stream getStreamData 0
 QPDF_Stream expand filter abbreviation 0
 qpdf-c called qpdf_read_memory 0
 Pl_QPDFTokenizer found EI 0
+QPDF stream without newline 0
+QPDF stream with CR only 0
+QPDF stream with CRNL 0
+QPDF stream with NL only 0

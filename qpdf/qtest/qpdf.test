@@ -111,7 +111,7 @@ $td->runtest("new stream",
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 29;
+$n_tests += 31;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -264,6 +264,17 @@ $td->runtest("error/output redirection to strings",
 	     {$td->FILE => "linearized-and-warnings-2.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("odd terminators for stream keyword",
+	     {$td->COMMAND =>
+		  "qpdf --qdf --static-id" .
+		  " stream-line-enders.pdf a.qdf"},
+	     {$td->FILE => "stream-line-enders.out",
+	      $td->EXIT_STATUS => 3},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "a.qdf"},
+	     {$td->FILE => "stream-line-enders.qdf"});
 
 show_ntests();
 # ----------

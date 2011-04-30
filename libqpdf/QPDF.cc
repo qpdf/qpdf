@@ -1331,24 +1331,66 @@ QPDF::readObjectInternal(PointerHolder<InputSource> input,
 	    if (readToken(input) ==
 		QPDFTokenizer::Token(QPDFTokenizer::tt_word, "stream"))
 	    {
-		// Kill to next actual newline.  Do not use readLine()
-		// here -- streams are a special case.  The next
-		// single newline character marks the end of the
-		// stream token.  It is incorrect to strip subsequent
-		// carriage returns or newlines as they may be part of
-		// the stream.
+		// The PDF specification states that the word "stream"
+		// should be followed by either a carriage return and
+		// a newline or by a newline alone.  It specifically
+		// disallowed following it by a carriage return alone
+		// since, in that case, there would be no way to tell
+		// whether the NL in a CR NL sequence was part of the
+		// stream data.  However, some readers, including
+		// Adobe reader, accept a carriage return by itself
+		// when followed by a non-newline character, so that's
+		// what we do here.
 		{
 		    char ch;
-		    do
+		    if (input->read(&ch, 1) == 0)
 		    {
-			if (input->read(&ch, 1) == 0)
+			// A premature EOF here will result in some
+			// other problem that will get reported at
+			// another time.
+		    }
+		    else if (ch == '\n')
+		    {
+			// ready to read stream data
+			QTC::TC("qpdf", "QPDF stream with NL only");
+		    }
+		    else if (ch == '\r')
+		    {
+			// Read another character
+			if (input->read(&ch, 1) != 0)
 			{
-			    // A premature EOF here will result in
-			    // some other problem that will get
-			    // reported at another time.
-			    ch = '\n';
+			    if (ch == '\n')
+			    {
+				// Ready to read stream data
+				QTC::TC("qpdf", "QPDF stream with CRNL");
+			    }
+			    else
+			    {
+				// Treat the \r by itself as the
+				// whitespace after endstream and
+				// start reading stream data in spite
+				// of not having seen a newline.
+				QTC::TC("qpdf", "QPDF stream with CR only");
+				input->unreadCh(ch);
+				warn(QPDFExc(
+					 qpdf_e_damaged_pdf,
+					 input->getName(),
+					 this->last_object_description,
+					 input->tell(),
+					 "stream keyword followed"
+					 " by carriage return only"));
+			    }
 			}
-		    } while (ch != '\n');
+		    }
+		    else
+		    {
+			QTC::TC("qpdf", "QPDF stream without newline");
+			warn(QPDFExc(qpdf_e_damaged_pdf, input->getName(),
+				     this->last_object_description,
+				     input->tell(),
+				     "stream keyword not followed"
+				     " by proper line terminator"));
+		    }
 		}
 
 		// Must get offset before accessing any additional

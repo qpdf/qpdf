@@ -2,6 +2,11 @@
 
 	* 2.2.3: release
 
+	* libqpdf/QPDF.cc (readObjectInternal): Accept the case of the
+	stream keyword being followed by carriage return by itself.  While
+	this is not permitted by the specification, there are PDF files
+	that do this, and other readers can read them.
+
 	* libqpdf/Pl_QPDFTokenizer.cc (processChar): When an inline image
 	is detected, suspend normalization only up to the end of the
 	inline image rather than for the remainder of the content stream.

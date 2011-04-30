@@ -2080,6 +2080,12 @@ print "\n";
      <itemizedlist>
       <listitem>
        <para>
+        Handle some damaged streams with incorrect characters
+        following the stream keyword.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
         Improve handling of inline images when normalizing content
         streams.
        </para>
