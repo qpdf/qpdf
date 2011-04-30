@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "2.2.2">
-<!ENTITY lastreleased "October 4, 2010">
+<!ENTITY swversion "2.2.3">
+<!ENTITY lastreleased "April 30, 2011">
 ]>
 <book>
  <bookinfo>
@@ -16,7 +16,7 @@
    <firstname>Jay</firstname><surname>Berkenbilt</surname>
   </author>
   <copyright>
-   <year>2005&ndash;2010</year>
+   <year>2005&ndash;2011</year>
    <holder>Jay Berkenbilt</holder>
   </copyright>
  </bookinfo>
@@ -2074,6 +2074,26 @@ print "\n";
    <filename>ChangeLog</filename> in the source distribution.
   </para>
   <variablelist>
+   <varlistentry>
+    <term>2.2.3: April 30, 2011</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Improve handling of inline images when normalizing content
+        streams.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Enhance error recovery to properly handle files that use
+        object 0 as a regular object, which is specifically disallowed
+        by the spec.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
     <term>2.2.2: October 4, 2010</term>
     <listitem>

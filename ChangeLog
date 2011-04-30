@@ -1,5 +1,7 @@
 2011-04-30  Jay Berkenbilt  <ejb@ql.org>
 
+	* 2.2.3: release
+
 	* libqpdf/Pl_QPDFTokenizer.cc (processChar): When an inline image
 	is detected, suspend normalization only up to the end of the
 	inline image rather than for the remainder of the content stream.

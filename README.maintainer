@@ -27,7 +27,7 @@ Release Reminders
    done or retargeted.
 
  * Each year, update copyright notices.  Just search for Copyright.
-   Last updated: 2010.
+   Last updated: 2011.
 
  * To construct a source distribution from a pristine checkout,
    make_dist does the following:
