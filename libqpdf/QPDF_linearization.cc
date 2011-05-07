@@ -94,7 +94,6 @@ QPDF::isLinearized()
 
     static PCRE lindict_re("(?s:(\\d+)\\s+0\\s+obj\\s*<<)");
 
-    off_t offset = -1;
     int lindict_obj = -1;
     char* p = buf;
     while (lindict_obj == -1)
@@ -102,7 +101,6 @@ QPDF::isLinearized()
 	PCRE::Match m(lindict_re.match(p));
 	if (m)
 	{
-	    offset = m.getOffset(0) + (p - buf);
 	    lindict_obj = atoi(m.getMatch(1).c_str());
 	    if (m.getMatch(0).find('\n') != std::string::npos)
 	    {
