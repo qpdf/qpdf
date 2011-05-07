@@ -1,3 +1,8 @@
+2011-05-07  Jay Berkenbilt  <ejb@ql.org>
+
+	* libqpdf/QPDF_linearization.cc (isLinearized): remove unused
+	offset variable, found by a gcc 4.6 warning.
+
 2011-04-30  Jay Berkenbilt  <ejb@ql.org>
 
 	* 2.2.3: release
