@@ -98,15 +98,15 @@ install: all
 	./mkinstalldirs $(DESTDIR)$(includedir)/qpdf
 	./mkinstalldirs $(DESTDIR)$(docdir)
 	./mkinstalldirs $(DESTDIR)$(mandir)/man1
-	$(LIBTOOL) --mode=install install -s -c \
+	$(LIBTOOL) --mode=install install -c \
 		libqpdf/$(OUTPUT_DIR)/libqpdf.la \
 		$(DESTDIR)$(libdir)/libqpdf.la
 	$(LIBTOOL) --finish $(DESTDIR)$(libdir)
 	$(RM) $(DESTDIR)$(libdir)/libqpdf.la
-	$(LIBTOOL) --mode=install install -s -c \
+	$(LIBTOOL) --mode=install install -c \
 		qpdf/$(OUTPUT_DIR)/qpdf \
 		$(DESTDIR)$(bindir)/qpdf
-	$(LIBTOOL) --mode=install install -s -c \
+	$(LIBTOOL) --mode=install install -c \
 		zlib-flate/$(OUTPUT_DIR)/zlib-flate \
 		$(DESTDIR)$(bindir)/zlib-flate
 	cp qpdf/fix-qdf $(DESTDIR)$(bindir)

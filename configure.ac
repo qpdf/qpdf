@@ -114,12 +114,12 @@ if test "$BUILDRULES" != "msvc"; then
    AC_MSG_CHECKING(for whether to use -Werror)
    AC_ARG_ENABLE(werror,
       AS_HELP_STRING([--enable-werror],
-		     [whether to use werror (default is yes if -Wall works)]),
+		     [whether to use werror (default is no)]),
       [if test "$enableval" = "yes"; then
 	 qpdf_USE_WERROR=1;
        else
 	 qpdf_USE_WERROR=0;
-       fi], [qpdf_USE_WERROR=$qpdf_USE_WALL])
+       fi], [qpdf_USE_WERROR=0])
    if test "$qpdf_USE_WERROR" = "1"; then
       AC_MSG_RESULT(yes)
       CFLAGS="$CFLAGS -Werror"

@@ -1,3 +1,10 @@
+2011-06-23  Jay Berkenbilt  <ejb@ql.org>
+
+	* make/libtool.mk (install): Do not strip executables and shared
+	libraries during installation.  Leave that up to the packager.
+
+	* configure.ac: disable -Werror by default.
+
 2011-05-07  Jay Berkenbilt  <ejb@ql.org>
 
 	* libqpdf/QPDF_linearization.cc (isLinearized): remove unused

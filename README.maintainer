@@ -33,7 +33,7 @@ Release Reminders
    make_dist does the following:
 
     ./autogen.sh
-    ./configure --enable-doc-maintenance
+    ./configure --enable-doc-maintenance --enable-werror
     make build_manual
     make distclean
 

@@ -110,7 +110,7 @@ if ($version_error)
 }
 
 run("./autogen.sh");
-run("./configure --enable-doc-maintenance");
+run("./configure --enable-doc-maintenance --enable-werror");
 run("make build_manual");
 run("make distclean");
 cd($pwd);
