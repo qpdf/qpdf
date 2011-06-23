@@ -1,6 +1,8 @@
 Release Reminders
 =================
 
+ * Check all open issues in the sourceforge trackers.
+
  * If any interfaces were added or changed, check C API to see whether
    changes are appropriate there as well.
 
