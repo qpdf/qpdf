@@ -1,6 +1,12 @@
 Next
 ====
 
+ * Consider adding an option to configure.ac to strip binaries and
+   executables instead of just turning it off.
+
+ * Debian package: think about whether to make debug libraries and
+   whether required DEB_BUILT_OPTIONS are supported.
+
  * Look for %PDF header somewhere within the first 1024 bytes of the
    file.  Also accept headers of the form "%!PS−Adobe−N.n PDF−M.m".
    See Implementation notes 13 and 14 in appendix H of the PDF 1.7
