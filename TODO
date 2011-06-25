@@ -1,19 +1,10 @@
-Next
-====
-
- * Consider adding an option to configure.ac to strip binaries and
-   executables instead of just turning it off.
-
- * Debian package: think about whether to make debug libraries and
-   whether required DEB_BUILT_OPTIONS are supported.
+General
+=======
 
  * Look for %PDF header somewhere within the first 1024 bytes of the
    file.  Also accept headers of the form "%!PS−Adobe−N.n PDF−M.m".
    See Implementation notes 13 and 14 in appendix H of the PDF 1.7
    specification.  This is bug 3267974.
-
-General
-=======
 
  * Update qpdf docs about non-ascii passwords.  See thread from
    2010-12-07,08 for details.

@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "2.2.3">
-<!ENTITY lastreleased "April 30, 2011">
+<!ENTITY swversion "2.2.4">
+<!ENTITY lastreleased "June 25, 2011">
 ]>
 <book>
  <bookinfo>
@@ -2074,6 +2074,19 @@ print "\n";
    <filename>ChangeLog</filename> in the source distribution.
   </para>
   <variablelist>
+   <varlistentry>
+    <term>2.2.4: June 25, 2011</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Fix installation and compilation issues; no functionality
+        changes.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
     <term>2.2.3: April 30, 2011</term>
     <listitem>

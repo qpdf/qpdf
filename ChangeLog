@@ -1,5 +1,7 @@
 2011-06-25  Jay Berkenbilt  <ejb@ql.org>
 
+	* 2.2.4: release
+
 	* Update config.guess, config.sub, and libtool files
 
 2011-06-23  Jay Berkenbilt  <ejb@ql.org>
