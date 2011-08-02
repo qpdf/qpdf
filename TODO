@@ -1,3 +1,19 @@
+2.3
+===
+
+ * Add ability to delete, replace, and swap objects using indirect
+   object references.  This, along with the existing ability to
+   install new indirect objects, significantly increases range of
+   possible modifications.
+
+ * QPDFWriter: be able to save to a memory buffer
+
+ * Provide an API for returning the keys of a dictionary as a
+   std::map.  Do the corresponding thing for an array.  Provide an
+   example program that does dictionary and array copies perhaps as
+   part of the replace, swap, delete example.
+
+
 General
 =======
 
