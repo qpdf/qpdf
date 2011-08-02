@@ -13,6 +13,12 @@
    example program that does dictionary and array copies perhaps as
    part of the replace, swap, delete example.
 
+ * Figure out a way to update the C API with something that can
+   update dictionary keys at least with strings.  Make sure it is
+   possible to implement something akin to pdf-mod-info in C.
+
+ * If possible implement the other encrypted file types
+
 
 General
 =======
