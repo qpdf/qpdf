@@ -17,7 +17,10 @@
    update dictionary keys at least with strings.  Make sure it is
    possible to implement something akin to pdf-mod-info in C.
 
- * If possible implement the other encrypted file types
+ * If possible implement the other encrypted file types as reported in
+   bug 3173659.  See ../misc/encrypted-3173659/details.txt for a
+   detailed description of the problems and an extraction of all the
+   test files.
 
 
 General
