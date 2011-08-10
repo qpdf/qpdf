@@ -78,6 +78,13 @@ QPDF_Dictionary::getKeys()
     return result;
 }
 
+std::map<std::string, QPDFObjectHandle> const&
+QPDF_Dictionary::getAsMap() const
+{
+
+    return this->items;
+}
+
 void
 QPDF_Dictionary::replaceKey(std::string const& key,
 			    QPDFObjectHandle const& value)

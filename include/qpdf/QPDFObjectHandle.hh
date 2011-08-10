@@ -172,6 +172,8 @@ class QPDFObjectHandle
     int getArrayNItems();
     QPDF_DLL
     QPDFObjectHandle getArrayItem(int n);
+    QPDF_DLL
+    std::vector<QPDFObjectHandle> getArrayAsVector();
 
     // Methods for dictionary objects
     QPDF_DLL
@@ -180,6 +182,8 @@ class QPDFObjectHandle
     QPDFObjectHandle getKey(std::string const&);
     QPDF_DLL
     std::set<std::string> getKeys();
+    QPDF_DLL
+    std::map<std::string, QPDFObjectHandle> getDictAsMap();
 
     // Methods for name and array objects
     QPDF_DLL

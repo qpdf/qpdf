@@ -51,6 +51,12 @@ QPDF_Array::getItem(int n) const
     return this->items[n];
 }
 
+std::vector<QPDFObjectHandle> const&
+QPDF_Array::getAsVector() const
+{
+    return this->items;
+}
+
 void
 QPDF_Array::setItem(int n, QPDFObjectHandle const& oh)
 {

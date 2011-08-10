@@ -246,6 +246,13 @@ QPDFObjectHandle::getArrayItem(int n)
     return dynamic_cast<QPDF_Array*>(obj.getPointer())->getItem(n);
 }
 
+std::vector<QPDFObjectHandle>
+QPDFObjectHandle::getArrayAsVector()
+{
+    assertType("Array", isArray());
+    return dynamic_cast<QPDF_Array*>(obj.getPointer())->getAsVector();
+}
+
 // Array mutators
 
 void
@@ -276,6 +283,13 @@ QPDFObjectHandle::getKeys()
 {
     assertType("Dictionary", isDictionary());
     return dynamic_cast<QPDF_Dictionary*>(obj.getPointer())->getKeys();
+}
+
+std::map<std::string, QPDFObjectHandle>
+QPDFObjectHandle::getDictAsMap()
+{
+    assertType("Dictionary", isDictionary());
+    return dynamic_cast<QPDF_Dictionary*>(obj.getPointer())->getAsMap();
 }
 
 // Array and Name accessors

@@ -570,6 +570,20 @@ void runtest(int n, char const* filename)
 	std::cout << "swapped array: " << qdict.getArrayItem(0).getName()
 		  << std::endl;
 
+	// Exercise getAsMap and getAsArray
+	std::vector<QPDFObjectHandle> array_elements =
+	    qdict.getArrayAsVector();
+	std::map<std::string, QPDFObjectHandle> dict_items =
+	    qarray.getDictAsMap();
+	if ((array_elements.size() == 1) &&
+	    (array_elements[0].getName() == "/Array") &&
+	    (dict_items.size() == 1) &&
+	    (dict_items["/NewDict"].getIntValue() == 2))
+	{
+	    std::cout << "array and dictionary contents are correct"
+		      << std::endl;
+	}
+
 	QPDFWriter w(pdf, "a.pdf");
 	w.setStaticID(true);
 	w.setStreamDataMode(qpdf_s_preserve);
