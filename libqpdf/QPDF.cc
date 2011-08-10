@@ -1888,6 +1888,39 @@ QPDF::getObjectByID(int objid, int generation)
 }
 
 void
+QPDF::replaceObject(int objid, int generation, QPDFObjectHandle oh)
+{
+    if (oh.isIndirect())
+    {
+	QTC::TC("qpdf", "QPDF replaceObject called with indirect object");
+	throw std::logic_error(
+	    "QPDF::replaceObject called with indirect object handle");
+    }
+
+    // Force new object to appear in the cache
+    resolve(objid, generation);
+
+    // Replace the object in the object cache
+    ObjGen og(objid, generation);
+    this->obj_cache[og] =
+	ObjCache(QPDFObjectHandle::ObjAccessor::getObject(oh), -1, -1);
+}
+
+void
+QPDF::swapObjects(int objid1, int generation1, int objid2, int generation2)
+{
+    // Force objects to be loaded into cache; then swap them in the
+    // cache.
+    resolve(objid1, generation1);
+    resolve(objid2, generation2);
+    ObjGen og1(objid1, generation1);
+    ObjGen og2(objid2, generation2);
+    ObjCache t = this->obj_cache[og1];
+    this->obj_cache[og1] = this->obj_cache[og2];
+    this->obj_cache[og2] = t;
+}
+
+void
 QPDF::trimTrailerForWrite()
 {
     // Note that removing the encryption dictionary does not interfere

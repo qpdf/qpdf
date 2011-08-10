@@ -519,6 +519,62 @@ void runtest(int n, char const* filename)
 		  << "---error---" << std::endl
 		  << err.str();
     }
+    else if (n == 14)
+    {
+	// Exercise swap and replace.  This test case is designed for
+	// a specific file.
+	std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
+	if (pages.size() != 4)
+	{
+	    throw std::logic_error("test " + QUtil::int_to_string(n) +
+				   " not called 4-page file");
+	}
+	// Swap pages 2 and 3
+	pdf.swapObjects(pages[1].getObjectID(), pages[1].getGeneration(),
+			pages[2].getObjectID(), pages[2].getGeneration());
+	// Replace object and swap objects
+	QPDFObjectHandle trailer = pdf.getTrailer();
+	QPDFObjectHandle qdict = trailer.getKey("/QDict");
+	QPDFObjectHandle qarray = trailer.getKey("/QArray");
+	// Force qdict but not qarray to resolve
+	qdict.isDictionary();
+	std::map<std::string, QPDFObjectHandle> dict_keys;
+	dict_keys["/NewDict"] = QPDFObjectHandle::newInteger(2);
+	QPDFObjectHandle new_dict = QPDFObjectHandle::newDictionary(dict_keys);
+	try
+	{
+	    // Do it wrong first...
+	    pdf.replaceObject(qdict.getObjectID(), qdict.getGeneration(),
+			      qdict);
+	}
+	catch (std::logic_error)
+	{
+	    std::cout << "caught logic error as expected" << std::endl;
+	}
+	pdf.replaceObject(qdict.getObjectID(), qdict.getGeneration(),
+			  new_dict);
+	// Now qdict still points to the old dictionary
+	std::cout << "old dict: " << qdict.getKey("/Dict").getIntValue()
+		  << std::endl;
+	// Swap dict and array
+	pdf.swapObjects(qdict.getObjectID(), qdict.getGeneration(),
+			qarray.getObjectID(), qarray.getGeneration());
+	// Now qarray will resolve to new object but qdict is still
+	// the old object
+	std::cout << "old dict: " << qdict.getKey("/Dict").getIntValue()
+		  << std::endl;
+	std::cout << "new dict: " << qarray.getKey("/NewDict").getIntValue()
+		  << std::endl;
+	// Reread qdict, now pointing to an array
+	qdict = pdf.getObjectByID(qdict.getObjectID(), qdict.getGeneration());
+	std::cout << "swapped array: " << qdict.getArrayItem(0).getName()
+		  << std::endl;
+
+	QPDFWriter w(pdf, "a.pdf");
+	w.setStaticID(true);
+	w.setStreamDataMode(qpdf_s_preserve);
+	w.write();
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +

@@ -111,7 +111,7 @@ $td->runtest("new stream",
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 31;
+$n_tests += 33;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -275,6 +275,15 @@ $td->runtest("odd terminators for stream keyword",
 $td->runtest("check output",
 	     {$td->FILE => "a.qdf"},
 	     {$td->FILE => "stream-line-enders.qdf"});
+
+$td->runtest("swap and replace",
+	     {$td->COMMAND => "test_driver 14 test14-in.pdf"},
+	     {$td->FILE => "test14.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "test14-out.pdf"});
 
 show_ntests();
 # ----------

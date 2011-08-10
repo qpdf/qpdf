@@ -70,7 +70,7 @@ QPDFWriter::QPDFWriter(QPDF& pdf, char const* filename) :
 
 QPDFWriter::~QPDFWriter()
 {
-    if (file)
+    if (file && close_file)
     {
 	fclose(file);
     }
