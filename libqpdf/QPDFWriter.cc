@@ -383,6 +383,14 @@ QPDFWriter::copyEncryptionParameters()
 	{
 	    key_len = encrypt.getKey("/Length").getIntValue() / 8;
 	}
+	if (encrypt.hasKey("/EncryptMetadata") &&
+	    encrypt.getKey("/EncryptMetadata").isBool())
+	{
+	    this->encrypt_metadata =
+		encrypt.getKey("/EncryptMetadata").getBoolValue();
+	}
+	QTC::TC("qpdf", "QPDFWriter copy encrypt metadata",
+		this->encrypt_metadata ? 0 : 1);
 	setEncryptionParametersInternal(
 	    V,
 	    encrypt.getKey("/R").getIntValue(),

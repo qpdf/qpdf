@@ -755,7 +755,7 @@ $td->runtest("show-xref-by-id-filtered",
 show_ntests();
 # ----------
 $td->notify("--- Clear-text Metadata Tests ---");
-$n_tests += 42;
+$n_tests += 58;
 
 # args: file, exp_encrypted, exp_cleartext
 check_metadata("compressed-metadata.pdf", 0, 0);
@@ -787,13 +787,22 @@ foreach my $f (qw(compressed-metadata.pdf enc-base.pdf))
 			  " a.pdf b.pdf"},
 		     {$td->STRING => "", $td->EXIT_STATUS => 0});
 	check_metadata("b.pdf", 1, 1);
-	unlink "b.pdf";
+	$td->runtest("preserve encryption",
+		     {$td->COMMAND => "qpdf b.pdf c.pdf"},
+		     {$td->STRING => "", $td->EXIT_STATUS => 0});
+	check_metadata("c.pdf", 1, 1);
+	unlink "b.pdf", "c.pdf";
 	$td->runtest("encrypt with aes and cleartext metadata",
 		     {$td->COMMAND =>
 			  "qpdf --encrypt '' '' 128" .
 			  " --cleartext-metadata --use-aes=y -- a.pdf b.pdf"},
 		     {$td->STRING => "", $td->EXIT_STATUS => 0});
 	check_metadata("b.pdf", 1, 1);
+	$td->runtest("preserve encryption",
+		     {$td->COMMAND => "qpdf b.pdf c.pdf"},
+		     {$td->STRING => "", $td->EXIT_STATUS => 0});
+	check_metadata("c.pdf", 1, 1);
+	unlink "b.pdf", "c.pdf";
     }
 }
 

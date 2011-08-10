@@ -193,3 +193,4 @@ QPDF stream with CR only 0
 QPDF stream with CRNL 0
 QPDF stream with NL only 0
 QPDF replaceObject called with indirect object 0
+QPDFWriter copy encrypt metadata 1

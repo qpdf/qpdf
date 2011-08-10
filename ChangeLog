@@ -1,5 +1,10 @@
 2011-08-10  Jay Berkenbilt  <ejb@ql.org>
 
+	* libqpdf/QPDFWriter.cc (copyEncryptionParameters): preserve
+	whether metadata is encryption.  This fixes part of bug 3173659:
+	the password becomes invalid if qpdf copies an encrypted file with
+	cleartext-metadata.
+
 	* include/qpdf/QPDFWriter.hh: add a new constructor that takes
 	only a QPDF reference and leaves specification of output for
 	later.  Add methods setOutputFilename() to set the output to a
