@@ -1,6 +1,6 @@
 Summary: Command-line tools and library for transforming PDF files
 Name: qpdf
-Version: 2.2.4
+Version: 2.3.a1
 Release: 1%{?dist}
 License: Artistic
 Group: System Environment/Libraries
