@@ -584,10 +584,18 @@ void runtest(int n, char const* filename)
 		      << std::endl;
 	}
 
-	QPDFWriter w(pdf, "a.pdf");
+	// Exercise writing to memory buffer
+	QPDFWriter w(pdf);
+	w.setOutputMemory();
 	w.setStaticID(true);
 	w.setStreamDataMode(qpdf_s_preserve);
 	w.write();
+	Buffer* b = w.getBuffer();
+	FILE* f = QUtil::fopen_wrapper(std::string("open a.pdf"),
+				       fopen("a.pdf", "wb"));
+	fwrite(b->getBuffer(), b->getSize(), 1, f);
+	fclose(f);
+	delete b;
     }
     else
     {

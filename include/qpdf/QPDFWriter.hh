@@ -24,6 +24,7 @@
 
 #include <qpdf/QPDFXRefEntry.hh>
 
+#include <qpdf/Pl_Buffer.hh>
 #include <qpdf/PointerHolder.hh>
 #include <qpdf/Pipeline.hh>
 #include <qpdf/Buffer.hh>
@@ -35,6 +36,24 @@ class Pl_Count;
 class QPDFWriter
 {
   public:
+    // Construct a QPDFWriter object without specifying output.  You
+    // must call one of the output setting routines defined below.
+    QPDF_DLL
+    QPDFWriter(QPDF& pdf);
+
+    // Create a QPDFWriter object that writes its output to a file or
+    // to stdout.  This is equivalent to using the previous
+    // constructor and then calling setOutputFilename().  See
+    // setOutputFilename() for details.
+    QPDF_DLL
+    QPDFWriter(QPDF& pdf, char const* filename);
+    QPDF_DLL
+    ~QPDFWriter();
+
+    // Setting Output.  Output may be set only one time.  If you don't
+    // use the filename version of the QPDFWriter constructor, you
+    // must call exactly one of these methods.
+
     // Passing null as filename means write to stdout.  QPDFWriter
     // will create a zero-length output file upon construction.  If
     // write fails, the empty or partially written file will not be
@@ -42,10 +61,20 @@ class QPDFWriter
     // useful for tracking down problems.  If your application doesn't
     // want the partially written file to be left behind, you should
     // delete it the eventual call to write fails.
-    QPDF_DLL
-    QPDFWriter(QPDF& pdf, char const* filename);
-    QPDF_DLL
-    ~QPDFWriter();
+    void setOutputFilename(char const* filename);
+
+    // Indicate that QPDFWriter should create a memory buffer to
+    // contain the final PDF file.  Obtain the memory by calling
+    // getBuffer().
+    void setOutputMemory();
+
+    // Return the buffer object containing the PDF file.  If
+    // setOutputMemory() has been called, this method may be called
+    // exactly one time after write() has returned.  The caller is
+    // responsible for deleting the buffer when done.
+    Buffer* getBuffer();
+
+    // Setting Parameters
 
     // Set the value of object stream mode.  In disable mode, we never
     // generate any object streams.  In preserve mode, we preserve
@@ -177,6 +206,7 @@ class QPDFWriter
 
     enum trailer_e { t_normal, t_lin_first, t_lin_second };
 
+    void init();
     int bytesNeeded(unsigned long n);
     void writeBinary(unsigned long val, unsigned int bytes);
     void writeString(std::string const& str);
@@ -253,6 +283,7 @@ class QPDFWriter
     // clearPipelineStack is called.
     Pipeline* pushPipeline(Pipeline*);
     void activatePipelineStack();
+    void initializePipelineStack(Pipeline *);
 
     // Calls finish on the current pipeline and pops the pipeline
     // stack until the top of stack is a previous active top of stack,
@@ -269,6 +300,8 @@ class QPDFWriter
     char const* filename;
     FILE* file;
     bool close_file;
+    Pl_Buffer* buffer_pipeline;
+    Buffer* output_buffer;
     bool normalize_content_set;
     bool normalize_content;
     bool stream_data_mode_set;
