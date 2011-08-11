@@ -64,6 +64,7 @@ Release Reminders
    system to a directory called qpdf-version.  For example, from this
    directory:
 
+   rm -rf /tmp/qpdf-x.y.z
    git archive --prefix=qpdf-x.y.z/ HEAD . | (cd /tmp; tar xf -)
 
    From the parent of that directory, run make_dist with the directory
