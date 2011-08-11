@@ -1,30 +1,13 @@
 2.3
 ===
 
- * Add ability to delete, replace, and swap objects using indirect
-   object references.  This, along with the existing ability to
-   install new indirect objects, significantly increases range of
-   possible modifications.
-
- * QPDFWriter: be able to save to a memory buffer
-
- * Provide an API for returning the keys of a dictionary as a
-   std::map.  Do the corresponding thing for an array.  Provide an
-   example program that does dictionary and array copies perhaps as
-   part of the replace, swap, delete example.
+ * Provide an example of using replace and swap.  Maybe.
 
  * Figure out a way to update the C API with something that can
    update dictionary keys at least with strings.  Make sure it is
    possible to implement something akin to pdf-mod-info in C.
 
- * Fix bug: this->encrypt_metadata is not set when
-   copyEncryptionParameters is used.
-
- * If possible implement the other encrypted file types as reported in
-   bug 3173659.  See ../misc/encrypted-3173659/details.txt for a
-   detailed description of the problems and an extraction of all the
-   test files.
-
+ * Add C API for writing to memory if possible
 
 General
 =======
@@ -139,12 +122,14 @@ Index: QPDFWriter.cc
    code to handle it properly.  In QPDF_encryption.cc, search for
    cf_file.  Remove exception thrown if cf_file is different from
    cf_stream, and write code in the stream decryption section to use
-   cf_file instead of cf_stream.  In general, add interfaces to
-   get the list of embedded files and to extract them.  To handle
-   general embedded files associated with the whole document, follow
-   root -> /Names -> /EmbeddedFiles -> /Names to get to the file
-   specification dictionaries.  Then, in each file specification
-   dictionary, follow /EF -> /F to the actual stream.
+   cf_file instead of cf_stream.  In general, add interfaces to get
+   the list of embedded files and to extract them.  To handle general
+   embedded files associated with the whole document, follow root ->
+   /Names -> /EmbeddedFiles -> /Names to get to the file specification
+   dictionaries.  Then, in each file specification dictionary, follow
+   /EF -> /F to the actual stream.  There may be other places file
+   specification dictionaries may appear, and there are also /RF keys
+   with related files, so reread section 3.10 carefully.
 
  * The description of Crypt filters is unclear with respect to how to
    use them to override /StmF for specific streams.  I'm not sure
