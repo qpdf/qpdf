@@ -61,10 +61,14 @@ Release Reminders
     make distclean
 
  * To create a source release, do an export from the version control
-   system to a directory called qpdf-version.  From the parent of that
-   directory, run make_dist with the directory as an argument.
-   Remember to have fop in your path.  For internally testing
-   releases, you can run make_dist with the --no-tests option.
+   system to a directory called qpdf-version.  For example, from this
+   directory:
+
+   git archive --prefix=qpdf-x.y.z/ HEAD . | (cd /tmp; tar xf -)
+
+   From the parent of that directory, run make_dist with the directory
+   as an argument.  Remember to have fop in your path.  For internally
+   testing releases, you can run make_dist with the --no-tests option.
 
  * To create a source release of external libs, do an export from the
    version control system into a directory called qpdf-external-libs
