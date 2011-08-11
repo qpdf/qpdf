@@ -61,17 +61,20 @@ class QPDFWriter
     // useful for tracking down problems.  If your application doesn't
     // want the partially written file to be left behind, you should
     // delete it the eventual call to write fails.
+    QPDF_DLL
     void setOutputFilename(char const* filename);
 
     // Indicate that QPDFWriter should create a memory buffer to
     // contain the final PDF file.  Obtain the memory by calling
     // getBuffer().
+    QPDF_DLL
     void setOutputMemory();
 
     // Return the buffer object containing the PDF file.  If
     // setOutputMemory() has been called, this method may be called
     // exactly one time after write() has returned.  The caller is
     // responsible for deleting the buffer when done.
+    QPDF_DLL
     Buffer* getBuffer();
 
     // Setting Parameters
