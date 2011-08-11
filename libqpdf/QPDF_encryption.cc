@@ -472,6 +472,18 @@ QPDF::initializeEncryption()
 	}
 	if (this->cf_file != this->cf_stream)
 	{
+	    // The issue for qpdf is that it can't tell the difference
+	    // between an embedded file stream and a regular stream.
+	    // Search for a comment containing cf_file.  To fix this,
+	    // we need files with encrypted embedded files and
+	    // non-encrypted native streams and vice versa.  Also if
+	    // it is possible for them to be encrypted in different
+	    // ways, we should have some of those too.  In cases where
+	    // we can detect whether a stream is encrypted or not, we
+	    // might want to try to detecet that automatically in
+	    // defense of possible logic errors surrounding detection
+	    // of embedded file streams, unless that's really clear
+	    // from the specification.
 	    throw QPDFExc(qpdf_e_unsupported, this->file->getName(),
 			  "encryption dictionary", this->file->getLastOffset(),
 			  "This document has embedded files that are"
@@ -649,7 +661,9 @@ QPDF::decryptStream(Pipeline*& pipeline, int objid, int generation,
 	    {
 		// NOTE: We should should use cf_file if this is an
 		// embedded file, but we can't yet detect embedded
-		// file streams as such.
+		// file streams as such.  When fixing, search for all
+		// occurrences of cf_file to find a reference to this
+		// comment.
 		method = this->cf_stream;
 	    }
 	}
