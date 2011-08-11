@@ -1557,8 +1557,6 @@ QPDFWriter::generateObjectStreams()
 void
 QPDFWriter::write()
 {
-    // XXX Check output
-
     // Do preliminary setup
 
     if (this->linearized)
