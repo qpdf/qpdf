@@ -3,6 +3,7 @@
 #include <qpdf/Pl_Discard.hh>
 #include <stdlib.h>
 #include <stdexcept>
+#include <iostream>
 
 typedef unsigned char* uc;
 

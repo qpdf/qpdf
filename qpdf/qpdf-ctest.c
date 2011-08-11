@@ -337,6 +337,10 @@ static void test16(char const* infile,
 		   char const* outfile,
 		   char const* outfile2)
 {
+    unsigned long buflen = 0L;
+    unsigned char const* buf = 0;
+    FILE* f = 0;
+
     qpdf_read(qpdf, infile, password);
     print_info("/Author");
     print_info("/Producer");
@@ -347,11 +351,22 @@ static void test16(char const* infile,
     print_info("/Author");
     print_info("/Producer");
     print_info("/Creator");
-    qpdf_init_write(qpdf, outfile);
+    qpdf_init_write_memory(qpdf);
     qpdf_set_static_ID(qpdf, QPDF_TRUE);
     qpdf_set_static_aes_IV(qpdf, QPDF_TRUE);
     qpdf_set_stream_data_mode(qpdf, qpdf_s_uncompress);
     qpdf_write(qpdf);
+    f = fopen(outfile, "wb");
+    if (f == NULL)
+    {
+	fprintf(stderr, "%s: unable to open %s: %s\n",
+		whoami, outfile, strerror(errno));
+	exit(2);
+    }
+    buflen = qpdf_get_buffer_length(qpdf);
+    buf = qpdf_get_buffer(qpdf);
+    fwrite(buf, 1, buflen, f);
+    fclose(f);
     report_errors();
 }
 

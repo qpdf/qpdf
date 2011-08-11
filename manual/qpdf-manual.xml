@@ -2131,6 +2131,14 @@ print "\n";
         <literal>/Info</literal> dictionary.
        </para>
       </listitem>
+      <listitem>
+       <para>
+        Add functions <function>qpdf_init_write_memory</function>,
+        <function>qpdf_get_buffer_length</function>, and
+        <function>qpdf_get_buffer</function> to the C API for writing
+        PDF files to a memory buffer instead of a file.
+       </para>
+      </listitem>
      </itemizedlist>
     </listitem>
    </varlistentry>

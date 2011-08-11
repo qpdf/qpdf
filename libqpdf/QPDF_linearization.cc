@@ -88,7 +88,7 @@ QPDF::isLinearized()
 
     char* buf = new char[tbuf_size];
     this->file->seek(0, SEEK_SET);
-    PointerHolder<char> b(buf);	// guarantee deletion
+    PointerHolder<char> b(true, buf);
     memset(buf, '\0', tbuf_size);
     this->file->read(buf, tbuf_size - 1);
 

@@ -403,10 +403,9 @@ QPDF::parse(char const* password)
 	this->file->rewind();
     }
     char* buf = new char[tbuf_size + 1];
-    // Put buf in a PointerHolder to guarantee deletion of buf.  This
-    // calls delete rather than delete [], but it's okay since buf is
-    // an array of fundamental types.
-    PointerHolder<char> b(buf);
+    // Put buf in an array-style PointerHolder to guarantee deletion
+    // of buf.
+    PointerHolder<char> b(true, buf);
     memset(buf, '\0', tbuf_size + 1);
     this->file->read(buf, tbuf_size);
 

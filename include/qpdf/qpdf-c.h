@@ -285,6 +285,25 @@ extern "C" {
     QPDF_DLL
     QPDF_ERROR_CODE qpdf_init_write(qpdf_data qpdf, char const* filename);
 
+    /* Initialize for writing but indicate that the PDF file should be
+     * written to memory.  Call qpdf_get_buffer_length and
+     * qpdf_get_buffer to retrieve the resulting buffer.  The memory
+     * containing the PDF file will be destroyed when qpdf_cleanup is
+     * called.
+     */
+    QPDF_DLL
+    QPDF_ERROR_CODE qpdf_init_write_memory(qpdf_data qpdf);
+
+    /* Retrieve the buffer used if the file was written to memory.
+     * qpdf_get_buffer returns a null pointer if data was not written
+     * to memory.  The memory is freed when qpdf_cleanup is called or
+     * if a subsequent call to qpdf_init_write or
+     * qpdf_init_write_memory is called. */
+    QPDF_DLL
+    unsigned long qpdf_get_buffer_length(qpdf_data qpdf);
+    QPDF_DLL
+    unsigned char const* qpdf_get_buffer(qpdf_data qpdf);
+
     QPDF_DLL
     void qpdf_set_object_stream_mode(qpdf_data qpdf,
 				     enum qpdf_object_stream_e mode);

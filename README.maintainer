@@ -1,6 +1,27 @@
 Release Reminders
 =================
 
+ * Consider running tests with latest gcc and/or valgrind.  To do
+   this, replace, build with debugging and without shared libraries.
+   In build, create z and move each executable into z.  Then create a
+   script called exec-z that contains:
+
+   #!/bin/sh
+   exec valgrind --suppressions=/tmp/a.supp -q \
+      `dirname $0`/z/`basename $0` ${1+"$@"}
+
+   Symlink exec-v to each executable.  /tmp/a.supp can be populated
+   with suppressions for libraries, for example:
+
+   {
+      zlib1
+      Memcheck:Cond
+      fun:inflateReset2
+      fun:inflateInit2_
+   }
+
+   You can generate these by running valgrind with --gen-suppressions=yes.
+
  * Check all open issues in the sourceforge trackers.
 
  * If any interfaces were added or changed, check C API to see whether

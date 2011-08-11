@@ -8,8 +8,6 @@
 #ifndef __POINTERHOLDER_HH__
 #define __POINTERHOLDER_HH__
 
-#include <iostream>
-
 // This class is basically boost::shared_pointer but predates that by
 // several years.
 
@@ -45,43 +43,42 @@ class PointerHolder
     class Data
     {
       public:
-	Data(T* pointer, bool tracing) :
+	Data(T* pointer, bool array) :
 	    pointer(pointer),
-	    tracing(tracing),
+	    array(array),
 	    refcount(0)
 	    {
-		static int next_id = 0;
-		this->unique_id = ++next_id;
 	    }
 	~Data()
 	    {
-		if (this->tracing)
+		if (array)
 		{
-		    std::cerr << "PointerHolder deleting pointer "
-			 << (void*)pointer
-			 << std::endl;
+		    delete [] this->pointer;
 		}
-		delete this->pointer;
-		if (this->tracing)
+		else
 		{
-		    std::cerr << "PointerHolder done deleting pointer "
-			 << (void*)pointer
-			 << std::endl;
+		    delete this->pointer;
 		}
 	    }
 	T* pointer;
-	bool tracing;
+	bool array;
 	int refcount;
-	int unique_id;
       private:
 	Data(Data const&);
 	Data& operator=(Data const&);
     };
 
   public:
+    // "tracing" is not used but is kept for interface backward compatbility
     PointerHolder(T* pointer = 0, bool tracing = false)
 	{
-	    this->init(new Data(pointer, tracing));
+	    this->init(new Data(pointer, false));
+	}
+    // Special constructor indicating to free memory with delete []
+    // instead of delete
+    PointerHolder(bool, T* pointer)
+	{
+	    this->init(new Data(pointer, true));
 	}
     PointerHolder(PointerHolder const& rhs)
 	{
@@ -148,12 +145,6 @@ class PointerHolder
 	    this->data = data;
 	    {
 		++this->data->refcount;
-		if (this->data->tracing)
-		{
-		    std::cerr << "PointerHolder " << this->data->unique_id
-			 << " refcount increased to " << this->data->refcount
-			 << std::endl;
-		}
 	    }
 	}
     void copy(PointerHolder const& rhs)
@@ -167,13 +158,6 @@ class PointerHolder
 		if (--this->data->refcount == 0)
 		{
 		    gone = true;
-		}
-		if (this->data->tracing)
-		{
-		    std::cerr << "PointerHolder " << this->data->unique_id
-			 << " refcount decreased to "
-			 << this->data->refcount
-			 << std::endl;
 		}
 	    }
 	    if (gone)

@@ -76,7 +76,7 @@ void runtest(int n, char const* filename)
 	fseek(f, 0, SEEK_END);
 	size_t size = (size_t) ftell(f);
 	fseek(f, 0, SEEK_SET);
-	file_buf = new char[size];
+	file_buf = PointerHolder<char>(true, new char[size]);
 	char* buf_p = file_buf.getPointer();
 	size_t bytes_read = 0;
 	size_t len = 0;

@@ -589,12 +589,9 @@ QPDF::decryptString(std::string& str, int objid, int generation)
 	{
 	    QTC::TC("qpdf", "QPDF_encryption rc4 decode string");
 	    unsigned int vlen = str.length();
-	    // Using PointerHolder will cause a new char[] to be deleted
-	    // with delete instead of delete [], but it's okay since the
-	    // array is of a fundamental type, so there is no destructor
-	    // to be called.  Using PointerHolder guarantees that tmp will
+	    // Using PointerHolder guarantees that tmp will
 	    // be freed even if rc4.process throws an exception.
-	    PointerHolder<char> tmp = QUtil::copy_string(str);
+	    PointerHolder<char> tmp(true, QUtil::copy_string(str));
 	    RC4 rc4((unsigned char const*)key.c_str(), key.length());
 	    rc4.process((unsigned char*)tmp.getPointer(), vlen);
 	    str = std::string(tmp.getPointer(), vlen);
