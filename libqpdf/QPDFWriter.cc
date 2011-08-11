@@ -1778,6 +1778,7 @@ QPDFWriter::writeHintStream(int hint_id)
 
     unsigned char* hs = hint_buffer->getBuffer();
     unsigned long hlen = hint_buffer->getSize();
+    char last_char = hs[hlen - 1];
 
     writeString("<< /Filter /FlateDecode /S ");
     writeString(QUtil::int_to_string(S));
@@ -1799,7 +1800,7 @@ QPDFWriter::writeHintStream(int hint_id)
     writeBuffer(hint_buffer);
     popPipelineStack();
 
-    if (hs[hlen - 1] != '\n')
+    if (last_char != '\n')
     {
 	writeString("\n");
     }
