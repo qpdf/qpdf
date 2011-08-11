@@ -1,5 +1,11 @@
 2011-08-11  Jay Berkenbilt  <ejb@ql.org>
 
+	* 2.3.0: release
+
+	* include/qpdf/qpdf-c.h ("C"): add new methods
+	qpdf_init_write_memory, qpdf_get_buffer_length, and
+	qpdf_get_buffer to support writing to memory from the C API.
+
 	* include/qpdf/qpdf-c.h ("C"): add new methods qpdf_get_info_key
 	and qpdf_set_info_key for manipulating text fields of the /Info
 	dictionary.

@@ -15,7 +15,7 @@
 #include <qpdf/QPDF_Null.hh>
 #include <qpdf/QPDF_Dictionary.hh>
 
-std::string QPDF::qpdf_version = "2.3.a1";
+std::string QPDF::qpdf_version = "2.3.0";
 
 void
 QPDF::InputSource::setLastOffset(off_t offset)
