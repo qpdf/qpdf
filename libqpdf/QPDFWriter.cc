@@ -1102,11 +1102,12 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	writeString("\nstream\n");
 	pushEncryptionFilter();
 	writeBuffer(stream_data);
+	char last_char = this->pipeline->getLastChar();
 	popPipelineStack();
 
 	if (this->qdf_mode)
 	{
-	    if (this->pipeline->getLastChar() != '\n')
+	    if (last_char != '\n')
 	    {
 		writeString("\n");
 		this->added_newline = true;
@@ -1776,9 +1777,7 @@ QPDFWriter::writeHintStream(int hint_id)
     openObject(hint_id);
     setDataKey(hint_id);
 
-    unsigned char* hs = hint_buffer->getBuffer();
     unsigned long hlen = hint_buffer->getSize();
-    char last_char = hs[hlen - 1];
 
     writeString("<< /Filter /FlateDecode /S ");
     writeString(QUtil::int_to_string(S));
@@ -1798,6 +1797,7 @@ QPDFWriter::writeHintStream(int hint_id)
     }
     pushEncryptionFilter();
     writeBuffer(hint_buffer);
+    char last_char = this->pipeline->getLastChar();
     popPipelineStack();
 
     if (last_char != '\n')
