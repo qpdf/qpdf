@@ -8,6 +8,7 @@
 #include <list>
 #include <string>
 #include <stdexcept>
+#include <cstring>
 
 struct _qpdf_error
 {
@@ -281,6 +282,64 @@ char const* qpdf_get_user_password(qpdf_data qpdf)
     QTC::TC("qpdf", "qpdf-c called qpdf_get_user_password");
     qpdf->tmp_string = qpdf->qpdf->getTrimmedUserPassword();
     return qpdf->tmp_string.c_str();
+}
+
+char const* qpdf_get_info_key(qpdf_data qpdf, char const* key)
+{
+    char const* result = 0;
+    QPDFObjectHandle trailer = qpdf->qpdf->getTrailer();
+    if (trailer.hasKey("/Info"))
+    {
+	QPDFObjectHandle info = trailer.getKey("/Info");
+	if (info.hasKey(key))
+	{
+	    QPDFObjectHandle value = info.getKey(key);
+	    if (value.isString())
+	    {
+		qpdf->tmp_string = value.getStringValue();
+		result = qpdf->tmp_string.c_str();
+	    }
+	}
+    }
+    QTC::TC("qpdf", "qpdf-c get_info_key", (result == 0 ? 0 : 1));
+    return result;
+}
+
+void qpdf_set_info_key(qpdf_data qpdf, char const* key, char const* value)
+{
+    if ((key == 0) || (std::strlen(key) == 0) || (key[0] != '/'))
+    {
+	return;
+    }
+    QPDFObjectHandle value_object;
+    if (value)
+    {
+	QTC::TC("qpdf", "qpdf-c set_info_key to value");
+	value_object = QPDFObjectHandle::newString(value);
+    }
+    else
+    {
+	QTC::TC("qpdf", "qpdf-c set_info_key to null");
+	value_object = QPDFObjectHandle::newNull();
+    }
+
+    QPDFObjectHandle trailer = qpdf->qpdf->getTrailer();
+    if (! trailer.hasKey("/Info"))
+    {
+	QTC::TC("qpdf", "qpdf-c add info to trailer");
+	trailer.replaceKey(
+	    "/Info",
+	    qpdf->qpdf->makeIndirectObject(
+		QPDFObjectHandle::newDictionary(
+		    std::map<std::string, QPDFObjectHandle>())));
+    }
+    else
+    {
+	QTC::TC("qpdf", "qpdf-c set-info-key use existing info");
+    }
+
+    QPDFObjectHandle info = trailer.getKey("/Info");
+    info.replaceOrRemoveKey(key, value_object);
 }
 
 QPDF_BOOL qpdf_is_linearized(qpdf_data qpdf)

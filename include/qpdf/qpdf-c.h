@@ -199,17 +199,45 @@ extern "C" {
     /* Read functions below must be called after qpdf_read or
      * qpdf_read_memory. */
 
-    /* Return the version of the PDF file. */
+    /*
+     * NOTE: Functions that return char* are returning a pointer to an
+     * internal buffer that will be reused for each call to a function
+     * that returns a char*.  You must use or copy the value before
+     * calling any other qpdf library functions.
+     */
+
+    /* Return the version of the PDF file.  See warning above about
+     * functions that return char*. */
     QPDF_DLL
     char const* qpdf_get_pdf_version(qpdf_data qpdf);
 
     /* Return the user password.  If the file is opened using the
      * owner password, the user password may be retrieved using this
      * function.  If the file is opened using the user password, this
-     * function will return that user password.
+     * function will return that user password.  See warning above
+     * about functions that return char*.
      */
     QPDF_DLL
     char const* qpdf_get_user_password(qpdf_data qpdf);
+
+    /* Return the string value of a key in the document's Info
+     * dictionary.  The key parameter should include the leading
+     * slash, e.g. "/Author".  If the key is not present or has a
+     * non-string value, a null pointer is returned.  Otherwise, a
+     * pointer to an internal buffer is returned.  See warning above
+     * about functions that return char*.
+     */
+    QPDF_DLL
+    char const* qpdf_get_info_key(qpdf_data qpdf, char const* key);
+
+    /* Set a value in the info dictionary, possibly replacing an
+     * existing value.  The key must include the leading slash
+     * (e.g. "/Author").  Passing a null pointer as a value will
+     * remove the key from the info dictionary.  Otherwise, a copy
+     * will be made of the string that is passed in.
+     */
+    QPDF_DLL
+    void qpdf_set_info_key(qpdf_data qpdf, char const* key, char const* value);
 
     /* Indicate whether the input file is linearized. */
     QPDF_DLL

@@ -325,6 +325,36 @@ static void test15(char const* infile,
     report_errors();
 }
 
+static void print_info(char const* key)
+{
+    char const* value = qpdf_get_info_key(qpdf, key);
+    printf("Info key %s: %s\n",
+	   key, (value ? value : "(null)"));
+}
+
+static void test16(char const* infile,
+		   char const* password,
+		   char const* outfile,
+		   char const* outfile2)
+{
+    qpdf_read(qpdf, infile, password);
+    print_info("/Author");
+    print_info("/Producer");
+    print_info("/Creator");
+    qpdf_set_info_key(qpdf, "/Author", "Mr. Potato Head");
+    qpdf_set_info_key(qpdf, "/Producer", "QPDF libary");
+    qpdf_set_info_key(qpdf, "/Creator", 0);
+    print_info("/Author");
+    print_info("/Producer");
+    print_info("/Creator");
+    qpdf_init_write(qpdf, outfile);
+    qpdf_set_static_ID(qpdf, QPDF_TRUE);
+    qpdf_set_static_aes_IV(qpdf, QPDF_TRUE);
+    qpdf_set_stream_data_mode(qpdf, qpdf_s_uncompress);
+    qpdf_write(qpdf);
+    report_errors();
+}
+
 int main(int argc, char* argv[])
 {
     char* p = 0;
@@ -380,6 +410,7 @@ int main(int argc, char* argv[])
 	  (n == 13) ? test13 :
 	  (n == 14) ? test14 :
 	  (n == 15) ? test15 :
+	  (n == 16) ? test16 :
 	  0);
 
     if (fn == 0)

@@ -3,10 +3,6 @@
 
  * Provide an example of using replace and swap.  Maybe.
 
- * Figure out a way to update the C API with something that can
-   update dictionary keys at least with strings.  Make sure it is
-   possible to implement something akin to pdf-mod-info in C.
-
  * Add C API for writing to memory if possible
 
 General

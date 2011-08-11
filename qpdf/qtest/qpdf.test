@@ -111,7 +111,7 @@ $td->runtest("new stream",
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 33;
+$n_tests += 37;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -284,6 +284,26 @@ $td->runtest("swap and replace",
 $td->runtest("check output",
 	     {$td->FILE => "a.pdf"},
 	     {$td->FILE => "test14-out.pdf"});
+
+$td->runtest("C API info key functions",
+	     {$td->COMMAND => "qpdf-ctest 16 minimal.pdf '' a.pdf"},
+	     {$td->FILE => "c-info1.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "c-info-out.pdf"});
+unlink "a.pdf" or die;
+
+$td->runtest("C API info key functions",
+	     {$td->COMMAND => "qpdf-ctest 16 c-info2-in.pdf '' a.pdf"},
+	     {$td->FILE => "c-info2.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "c-info-out.pdf"});
+unlink "a.pdf" or die;
 
 show_ntests();
 # ----------

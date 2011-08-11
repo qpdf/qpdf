@@ -194,3 +194,8 @@ QPDF stream with CRNL 0
 QPDF stream with NL only 0
 QPDF replaceObject called with indirect object 0
 QPDFWriter copy encrypt metadata 1
+qpdf-c get_info_key 1
+qpdf-c set_info_key to value 0
+qpdf-c set_info_key to null 0
+qpdf-c set-info-key use existing info 0
+qpdf-c add info to trailer 0

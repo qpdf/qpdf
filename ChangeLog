@@ -1,3 +1,9 @@
+2011-08-11  Jay Berkenbilt  <ejb@ql.org>
+
+	* include/qpdf/qpdf-c.h ("C"): add new methods qpdf_get_info_key
+	and qpdf_set_info_key for manipulating text fields of the /Info
+	dictionary.
+
 2011-08-10  Jay Berkenbilt  <ejb@ql.org>
 
 	* libqpdf/QPDFWriter.cc (copyEncryptionParameters): preserve

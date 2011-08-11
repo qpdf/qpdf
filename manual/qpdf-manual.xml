@@ -2123,6 +2123,14 @@ print "\n";
         objects as vectors.
        </para>
       </listitem>
+      <listitem>
+       <para>
+        Add functions <function>qpdf_get_info_key</function> and
+        <function>qpdf_set_info_key</function> to the C API for
+        manipulating string fields of the document's
+        <literal>/Info</literal> dictionary.
+       </para>
+      </listitem>
      </itemizedlist>
     </listitem>
    </varlistentry>
