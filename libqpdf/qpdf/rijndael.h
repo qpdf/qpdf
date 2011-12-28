@@ -5,6 +5,9 @@
 #ifdef HAVE_INTTYPES_H
 # include <inttypes.h>
 #endif
+#ifdef HAVE_STDINT_H
+# include <stdint.h>
+#endif
 
 int rijndaelSetupEncrypt(uint32_t *rk, const unsigned char *key,
   int keybits);

@@ -1,5 +1,7 @@
 2011-12-28  Jay Berkenbilt  <ejb@ql.org>
 
+	* include <stdint.h> if available to support MSVC 2010
+
 	* Since PCRE is not necessarily thread safe, don't declare any
 	PCRE objects to be static.
 
