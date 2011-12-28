@@ -29,7 +29,7 @@ static char const* whoami = 0;
 
 static char const* help = "\
 \n\
-Usage: qpdf [ options ] infilename outfilename\n\
+Usage: qpdf [ options ] infilename [ outfilename ]\n\
 \n\
 An option summary appears below.  Please see the documentation for details.\n\
 \n\

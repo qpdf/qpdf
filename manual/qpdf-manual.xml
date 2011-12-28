@@ -728,6 +728,18 @@ make
       </listitem>
      </varlistentry>
      <varlistentry>
+      <term><option>--static-aes-iv</option></term>
+      <listitem>
+       <para>
+        Causes use of a static initialization vector for AES-CBC.
+        This is intended for testing only so that output files can be
+        reproducible.  Never use it for production files.  This option
+        in particular is not secure since it significantly weakens the
+        encryption.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
       <term><option>--no-original-object-ids</option></term>
       <listitem>
        <para>

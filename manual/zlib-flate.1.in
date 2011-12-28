@@ -4,18 +4,23 @@
 .SH NAME
 zlib-flate \- raw zlib compression program
 .SH SYNOPSIS
-.B qpdf
+.B zlib-flate
 \fI-compress | -uncompress\fR
 .SH DESCRIPTION
 The zlib-flate program is part of the qpdf package.
 .PP
-The zlib-flate program standard from input and writes to standard
-output either compressing or compressing its input using raw zlib
-compression.  This program is provided primarily as a debugging tool.
-It can be used to uncompress or compress raw PDF streams.
+The zlib-flate program reads from standard input and writes to
+standard output either compressing or compressing its input using raw
+zlib compression.  It can be used to uncompress or compress raw PDF
+streams or other data that is compressed with raw zlib compression.
+This program is provided primarily as a debugging tool, though it
+could be used for other purposes, such as being called from a script
+that creates simple PDF files.
 .PP
 This program should not be used as a general purpose compression
 tool.  Use something like gzip(1) instead.
 .PP
 For details about qpdf, please see the qpdf manual, which can be found
 in @docdir@/qpdf-manual.html or @docdir@/qpdf-manual.pdf.
+.SH "SEE ALSO"
+qpdf(1), gzip(1)

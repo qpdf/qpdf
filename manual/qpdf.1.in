@@ -5,7 +5,7 @@
 qpdf \- PDF transformation software
 .SH SYNOPSIS
 .B qpdf
-[ \fIoptions \fR] \fIinfilename outfilename\fR
+[ \fIoptions \fR] \fIinfilename [ outfilename ]\fR
 .SH DESCRIPTION
 The qpdf program is used to convert one PDF file to another equivalent
 PDF file.  It is capable of performing a variety of transformations
