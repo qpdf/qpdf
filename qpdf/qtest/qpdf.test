@@ -1463,10 +1463,18 @@ sub compare_pdfs
     }
     else
     {
+        # We discard gs's stderr since it has sometimes been known to
+        # complain about files that are not bad.  In particular, gs
+        # 9.04 can't handle empty xref sections such as those found in
+        # the hybrid xref cases.  We don't really care whether gs
+        # complains or not as long as it creates correct images.  If
+        # it doesn't create correct images, the test will fail, and we
+        # can run manually to see the error message.  If it does, then
+        # we don't care about the warning.
 	$td->runtest("convert original file to image",
 		     {$td->COMMAND =>
 			  "(cd tif1;" .
-			  " gs -q -dNOPAUSE -sDEVICE=tiff12nc" .
+			  " gs 2>/dev/null -q -dNOPAUSE -sDEVICE=tiff12nc" .
 			  " -sOutputFile=a.tif - < ../$f1)"},
 		     {$td->STRING => "",
 		      $td->EXIT_STATUS => 0});
@@ -1485,7 +1493,7 @@ sub compare_pdfs
 	$td->runtest("convert new file to image",
 		     {$td->COMMAND =>
 			  "(cd tif2;" .
-			  " gs -q -dNOPAUSE -sDEVICE=tiff12nc" .
+			  " gs 2>/dev/null -q -dNOPAUSE -sDEVICE=tiff12nc" .
 			  " -sOutputFile=a.tif - < ../$f2)"},
 		     {$td->STRING => "",
 		      $td->EXIT_STATUS => 0});

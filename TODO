@@ -5,10 +5,6 @@ Next
 
  * Fix documentation errors in debian bug reports
 
- * good17.pdf, good18.pdf, and hybrid-xref.pdf have incorrect hybrid
-   reference sections.  Review section 3.4 of the PDF specification
-   and make sure ghostscript doesn't complain about the files.
-
 General
 =======
 
