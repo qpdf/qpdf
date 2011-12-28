@@ -364,8 +364,8 @@ QPDF::getWarnings()
 void
 QPDF::parse(char const* password)
 {
-    static PCRE header_re("^%PDF-(1.\\d+)\\b");
-    static PCRE eof_re("(?s:startxref\\s+(\\d+)\\s+%%EOF\\b)");
+    PCRE header_re("^%PDF-(1.\\d+)\\b");
+    PCRE eof_re("(?s:startxref\\s+(\\d+)\\s+%%EOF\\b)");
 
     if (password)
     {
@@ -475,9 +475,9 @@ QPDF::setTrailer(QPDFObjectHandle obj)
 void
 QPDF::reconstruct_xref(QPDFExc& e)
 {
-    static PCRE obj_re("^\\s*(\\d+)\\s+(\\d+)\\s+obj\\b");
-    static PCRE endobj_re("^\\s*endobj\\b");
-    static PCRE trailer_re("^\\s*trailer\\b");
+    PCRE obj_re("^\\s*(\\d+)\\s+(\\d+)\\s+obj\\b");
+    PCRE endobj_re("^\\s*endobj\\b");
+    PCRE trailer_re("^\\s*trailer\\b");
 
     warn(QPDFExc(qpdf_e_damaged_pdf, this->file->getName(), "", 0,
 		 "file is damaged"));
@@ -615,8 +615,8 @@ QPDF::read_xref(off_t xref_offset)
 int
 QPDF::read_xrefTable(off_t xref_offset)
 {
-    static PCRE xref_first_re("^\\s*(\\d+)\\s+(\\d+)");
-    static PCRE xref_entry_re("(?s:(^\\d{10}) (\\d{5}) ([fn])[ \r\n]{2}$)");
+    PCRE xref_first_re("^\\s*(\\d+)\\s+(\\d+)");
+    PCRE xref_entry_re("(?s:(^\\d{10}) (\\d{5}) ([fn])[ \r\n]{2}$)");
 
     std::vector<ObjGen> deleted_items;
 
@@ -1461,7 +1461,7 @@ int
 QPDF::recoverStreamLength(PointerHolder<InputSource> input,
 			  int objid, int generation, off_t stream_offset)
 {
-    static PCRE endobj_re("^\\s*endobj\\b");
+    PCRE endobj_re("^\\s*endobj\\b");
 
     // Try to reconstruct stream length by looking for
     // endstream(\r\n?|\n)endobj

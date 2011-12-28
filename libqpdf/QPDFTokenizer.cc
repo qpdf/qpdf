@@ -47,7 +47,7 @@ QPDFTokenizer::reset()
 void
 QPDFTokenizer::presentCharacter(char ch)
 {
-    static PCRE num_re("^[\\+\\-]?(?:\\.\\d+|\\d+(?:\\.\\d+)?)$");
+    PCRE num_re("^[\\+\\-]?(?:\\.\\d+|\\d+(?:\\.\\d+)?)$");
 
     if (state == st_token_ready)
     {
