@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "2.3.0">
-<!ENTITY lastreleased "August 11, 2011">
+<!ENTITY swversion "2.3.1">
+<!ENTITY lastreleased "December 28, 2011">
 ]>
 <book>
  <bookinfo>
@@ -2086,6 +2086,35 @@ print "\n";
    <filename>ChangeLog</filename> in the source distribution.
   </para>
   <variablelist>
+   <varlistentry>
+    <term>2.3.1: December 28, 2011</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Fix thread-safety problem resulting from non-thread-safe use
+        of the PCRE library.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Made a few minor documentation fixes.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Add workaround for a bug that appears in some versions of
+        ghostscript to the test suite
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Fix minor build issue for Visual C++ 2010.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
     <term>2.3.0: August 11, 2011</term>
     <listitem>

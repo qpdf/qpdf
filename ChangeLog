@@ -1,5 +1,7 @@
 2011-12-28  Jay Berkenbilt  <ejb@ql.org>
 
+	* 2.3.1: release
+
 	* include <stdint.h> if available to support MSVC 2010
 
 	* Since PCRE is not necessarily thread safe, don't declare any
