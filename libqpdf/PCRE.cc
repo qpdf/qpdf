@@ -144,7 +144,7 @@ PCRE::PCRE(char const* pattern, int options)
     this->code = pcre_compile(pattern, options, &errptr, &erroffset, 0);
     if (this->code)
     {
-	this->nbackrefs = pcre_info(this->code, 0, 0);
+	pcre_fullinfo(this->code, 0, PCRE_INFO_CAPTURECOUNT, &(this->nbackrefs));
     }
     else
     {
