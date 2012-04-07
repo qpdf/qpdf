@@ -10,7 +10,7 @@ zlib-flate \- raw zlib compression program
 The zlib-flate program is part of the qpdf package.
 .PP
 The zlib-flate program reads from standard input and writes to
-standard output either compressing or compressing its input using raw
+standard output either compressing or uncompressing its input using raw
 zlib compression.  It can be used to uncompress or compress raw PDF
 streams or other data that is compressed with raw zlib compression.
 This program is provided primarily as a debugging tool, though it
