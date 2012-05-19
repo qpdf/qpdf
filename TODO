@@ -1,6 +1,12 @@
 Next
 ====
 
+ * Get rid of off_t.  size_t is okay.  Use autoconf to figure out what
+   type to use for offsets.
+
+ * Deal with portability issues from gcc 4.7.  See portability.patch
+   from debian package.
+
  * Do a Windows 64-bit build.  MSVC 2010 Professional x86_64 verified
    to build and test cleanly in 2.3.1.  Hopefully the next release
    will include 64-bit binary distributions and external libraries.
