@@ -90,7 +90,9 @@ Release Reminders
    in the "files" subdirectory of the website on sourceforge.net.
 
  * Create a tag in the version control system, and make backups of the
-   actual releases.
+   actual releases.  With git, use git tag -s to create a signed tag:
+
+   git tag -s release-qpdf-$version HEAD -m'qpdf $version'
 
  * When releasing on source forge, external-libs distributions go in
    external-libs/yyyymmdd, and qpdf distributions go in qpdf/vvv
