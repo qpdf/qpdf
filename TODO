@@ -57,6 +57,14 @@ LIBQPDF_3 {
     *;
 };
 
+ * Provide an option to copy encryption parameters from another file.
+   This would make it possible to decrypt a file, manually work with
+   it, and then re-encrypt it using the original encryption parameters
+   including a possibly unknown owner password.
+
+ * See if I can support the new encryption formats mentioned in the
+   open bug on sourceforge.  Check other sourceforge bugs.
+
 
 Better 64-bit support on Windows
 ================================
@@ -109,11 +117,6 @@ General
    parameters from the original file.  Being able to do this requires
    a lot of the same logic as being able to do splitting, so a general
    split/merge program would be a great addition.
-
- * Provide an option to copy encryption parameters from another file.
-   This would make it possible to decrypt a file, manually work with
-   it, and then re-encrypt it using the original encryption parameters
-   including a possibly unknown owner password.
 
  * See whether it's possible to remove the call to
    flattenScalarReferences.  I can't easily figure out why I do it,
