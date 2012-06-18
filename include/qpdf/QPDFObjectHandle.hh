@@ -410,6 +410,28 @@ class QPDFObjectHandle
 
     // Convenience routine: Throws if the assumption is violated.
     QPDF_DLL
+    void assertInitialized() const;
+
+    QPDF_DLL
+    void assertNull();
+    QPDF_DLL
+    void assertBool();
+    QPDF_DLL
+    void assertInteger();
+    QPDF_DLL
+    void assertReal();
+    QPDF_DLL
+    void assertName();
+    QPDF_DLL
+    void assertString();
+    QPDF_DLL
+    void assertArray();
+    QPDF_DLL
+    void assertDictionary();
+    QPDF_DLL
+    void assertStream();
+
+    QPDF_DLL
     void assertPageObject();
 
   private:
@@ -422,8 +444,7 @@ class QPDFObjectHandle
 	QPDF* qpdf, int objid, int generation,
 	QPDFObjectHandle stream_dict, qpdf_offset_t offset, size_t length);
 
-    void assertInitialized() const;
-    void assertType(char const* type_name, bool istype);
+    void assertType(char const* type_name, bool istype) const;
     void dereference();
     void makeDirectInternal(std::set<int>& visited);
     void releaseResolved();

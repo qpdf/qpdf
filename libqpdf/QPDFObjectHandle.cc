@@ -183,7 +183,7 @@ QPDFObjectHandle::isScalar()
 bool
 QPDFObjectHandle::getBoolValue()
 {
-    assertType("Boolean", isBool());
+    assertBool();
     return dynamic_cast<QPDF_Bool*>(obj.getPointer())->getVal();
 }
 
@@ -192,7 +192,7 @@ QPDFObjectHandle::getBoolValue()
 long long
 QPDFObjectHandle::getIntValue()
 {
-    assertType("Integer", isInteger());
+    assertInteger();
     return dynamic_cast<QPDF_Integer*>(obj.getPointer())->getVal();
 }
 
@@ -201,7 +201,7 @@ QPDFObjectHandle::getIntValue()
 std::string
 QPDFObjectHandle::getRealValue()
 {
-    assertType("Real", isReal());
+    assertReal();
     return dynamic_cast<QPDF_Real*>(obj.getPointer())->getVal();
 }
 
@@ -210,7 +210,7 @@ QPDFObjectHandle::getRealValue()
 std::string
 QPDFObjectHandle::getName()
 {
-    assertType("Name", isName());
+    assertName();
     return dynamic_cast<QPDF_Name*>(obj.getPointer())->getName();
 }
 
@@ -219,14 +219,14 @@ QPDFObjectHandle::getName()
 std::string
 QPDFObjectHandle::getStringValue()
 {
-    assertType("String", isString());
+    assertString();
     return dynamic_cast<QPDF_String*>(obj.getPointer())->getVal();
 }
 
 std::string
 QPDFObjectHandle::getUTF8Value()
 {
-    assertType("String", isString());
+    assertString();
     return dynamic_cast<QPDF_String*>(obj.getPointer())->getUTF8Val();
 }
 
@@ -235,21 +235,21 @@ QPDFObjectHandle::getUTF8Value()
 int
 QPDFObjectHandle::getArrayNItems()
 {
-    assertType("Array", isArray());
+    assertArray();
     return dynamic_cast<QPDF_Array*>(obj.getPointer())->getNItems();
 }
 
 QPDFObjectHandle
 QPDFObjectHandle::getArrayItem(int n)
 {
-    assertType("Array", isArray());
+    assertArray();
     return dynamic_cast<QPDF_Array*>(obj.getPointer())->getItem(n);
 }
 
 std::vector<QPDFObjectHandle>
 QPDFObjectHandle::getArrayAsVector()
 {
-    assertType("Array", isArray());
+    assertArray();
     return dynamic_cast<QPDF_Array*>(obj.getPointer())->getAsVector();
 }
 
@@ -258,35 +258,35 @@ QPDFObjectHandle::getArrayAsVector()
 void
 QPDFObjectHandle::setArrayItem(int n, QPDFObjectHandle const& item)
 {
-    assertType("Array", isArray());
+    assertArray();
     return dynamic_cast<QPDF_Array*>(obj.getPointer())->setItem(n, item);
 }
 
 void
 QPDFObjectHandle::setArrayFromVector(std::vector<QPDFObjectHandle> const& items)
 {
-    assertType("Array", isArray());
+    assertArray();
     return dynamic_cast<QPDF_Array*>(obj.getPointer())->setFromVector(items);
 }
 
 void
 QPDFObjectHandle::insertItem(int at, QPDFObjectHandle const& item)
 {
-    assertType("Array", isArray());
+    assertArray();
     return dynamic_cast<QPDF_Array*>(obj.getPointer())->insertItem(at, item);
 }
 
 void
 QPDFObjectHandle::appendItem(QPDFObjectHandle const& item)
 {
-    assertType("Array", isArray());
+    assertArray();
     return dynamic_cast<QPDF_Array*>(obj.getPointer())->appendItem(item);
 }
 
 void
 QPDFObjectHandle::eraseItem(int at)
 {
-    assertType("Array", isArray());
+    assertArray();
     return dynamic_cast<QPDF_Array*>(obj.getPointer())->eraseItem(at);
 }
 
@@ -295,28 +295,28 @@ QPDFObjectHandle::eraseItem(int at)
 bool
 QPDFObjectHandle::hasKey(std::string const& key)
 {
-    assertType("Dictionary", isDictionary());
+    assertDictionary();
     return dynamic_cast<QPDF_Dictionary*>(obj.getPointer())->hasKey(key);
 }
 
 QPDFObjectHandle
 QPDFObjectHandle::getKey(std::string const& key)
 {
-    assertType("Dictionary", isDictionary());
+    assertDictionary();
     return dynamic_cast<QPDF_Dictionary*>(obj.getPointer())->getKey(key);
 }
 
 std::set<std::string>
 QPDFObjectHandle::getKeys()
 {
-    assertType("Dictionary", isDictionary());
+    assertDictionary();
     return dynamic_cast<QPDF_Dictionary*>(obj.getPointer())->getKeys();
 }
 
 std::map<std::string, QPDFObjectHandle>
 QPDFObjectHandle::getDictAsMap()
 {
-    assertType("Dictionary", isDictionary());
+    assertDictionary();
     return dynamic_cast<QPDF_Dictionary*>(obj.getPointer())->getAsMap();
 }
 
@@ -349,7 +349,7 @@ void
 QPDFObjectHandle::replaceKey(std::string const& key,
 			    QPDFObjectHandle const& value)
 {
-    assertType("Dictionary", isDictionary());
+    assertDictionary();
     return dynamic_cast<QPDF_Dictionary*>(
 	obj.getPointer())->replaceKey(key, value);
 }
@@ -357,7 +357,7 @@ QPDFObjectHandle::replaceKey(std::string const& key,
 void
 QPDFObjectHandle::removeKey(std::string const& key)
 {
-    assertType("Dictionary", isDictionary());
+    assertDictionary();
     return dynamic_cast<QPDF_Dictionary*>(obj.getPointer())->removeKey(key);
 }
 
@@ -365,7 +365,7 @@ void
 QPDFObjectHandle::replaceOrRemoveKey(std::string const& key,
 				     QPDFObjectHandle value)
 {
-    assertType("Dictionary", isDictionary());
+    assertDictionary();
     return dynamic_cast<QPDF_Dictionary*>(
 	obj.getPointer())->replaceOrRemoveKey(key, value);
 }
@@ -374,21 +374,21 @@ QPDFObjectHandle::replaceOrRemoveKey(std::string const& key,
 QPDFObjectHandle
 QPDFObjectHandle::getDict()
 {
-    assertType("Stream", isStream());
+    assertStream();
     return dynamic_cast<QPDF_Stream*>(obj.getPointer())->getDict();
 }
 
 PointerHolder<Buffer>
 QPDFObjectHandle::getStreamData()
 {
-    assertType("Stream", isStream());
+    assertStream();
     return dynamic_cast<QPDF_Stream*>(obj.getPointer())->getStreamData();
 }
 
 PointerHolder<Buffer>
 QPDFObjectHandle::getRawStreamData()
 {
-    assertType("Stream", isStream());
+    assertStream();
     return dynamic_cast<QPDF_Stream*>(obj.getPointer())->getRawStreamData();
 }
 
@@ -396,7 +396,7 @@ bool
 QPDFObjectHandle::pipeStreamData(Pipeline* p, bool filter,
 				 bool normalize, bool compress)
 {
-    assertType("Stream", isStream());
+    assertStream();
     return dynamic_cast<QPDF_Stream*>(obj.getPointer())->pipeStreamData(
 	p, filter, normalize, compress);
 }
@@ -406,7 +406,7 @@ QPDFObjectHandle::replaceStreamData(PointerHolder<Buffer> data,
 				    QPDFObjectHandle const& filter,
 				    QPDFObjectHandle const& decode_parms)
 {
-    assertType("Stream", isStream());
+    assertStream();
     dynamic_cast<QPDF_Stream*>(obj.getPointer())->replaceStreamData(
 	data, filter, decode_parms);
 }
@@ -416,7 +416,7 @@ QPDFObjectHandle::replaceStreamData(PointerHolder<StreamDataProvider> provider,
 				    QPDFObjectHandle const& filter,
 				    QPDFObjectHandle const& decode_parms)
 {
-    assertType("Stream", isStream());
+    assertStream();
     dynamic_cast<QPDF_Stream*>(obj.getPointer())->replaceStreamData(
 	provider, filter, decode_parms);
 }
@@ -524,7 +524,7 @@ void
 QPDFObjectHandle::addPageContents(QPDFObjectHandle new_contents, bool first)
 {
     assertPageObject();
-    new_contents.assertType("Stream", new_contents.isStream());
+    new_contents.assertStream();
 
     std::vector<QPDFObjectHandle> orig_contents = getPageContents();
 
@@ -839,13 +839,67 @@ QPDFObjectHandle::assertInitialized() const
 }
 
 void
-QPDFObjectHandle::assertType(char const* type_name, bool istype)
+QPDFObjectHandle::assertType(char const* type_name, bool istype) const
 {
     if (! istype)
     {
 	throw std::logic_error(std::string("operation for ") + type_name +
 			       " object attempted on object of wrong type");
     }
+}
+
+void
+QPDFObjectHandle::assertNull()
+{
+    assertType("Null", isNull());
+}
+
+void
+QPDFObjectHandle::assertBool()
+{
+    assertType("Boolean", isBool());
+}
+
+void
+QPDFObjectHandle::assertInteger()
+{
+    assertType("Integer", isInteger());
+}
+
+void
+QPDFObjectHandle::assertReal()
+{
+    assertType("Real", isReal());
+}
+
+void
+QPDFObjectHandle::assertName()
+{
+    assertType("Name", isName());
+}
+
+void
+QPDFObjectHandle::assertString()
+{
+    assertType("String", isString());
+}
+
+void
+QPDFObjectHandle::assertArray()
+{
+    assertType("Array", isArray());
+}
+
+void
+QPDFObjectHandle::assertDictionary()
+{
+    assertType("Dictionary", isDictionary());
+}
+
+void
+QPDFObjectHandle::assertStream()
+{
+    assertType("Stream", isStream());
 }
 
 void
