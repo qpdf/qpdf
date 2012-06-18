@@ -2202,3 +2202,9 @@ QPDF::getAllPagesInternal(QPDFObjectHandle cur_pages,
 		      ": invalid Type in page tree");
     }
 }
+
+void
+QPDF::clearPagesCache()
+{
+    this->all_pages.clear();
+}

@@ -344,6 +344,9 @@ class QPDF
     QPDF_DLL
     std::vector<QPDFObjectHandle> const& getAllPages();
 
+    QPDF_DLL
+    void clearPagesCache();
+
     // Resolver class is restricted to QPDFObjectHandle so that only
     // it can resolve indirect references.
     class Resolver
