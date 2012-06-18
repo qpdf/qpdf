@@ -376,6 +376,10 @@ class QPDFObjectHandle
     };
     friend class ReleaseResolver;
 
+    // Convenience routine: Throws if the assumption is violated.
+    QPDF_DLL
+    void assertPageObject();
+
   private:
     QPDFObjectHandle(QPDF*, int objid, int generation);
     QPDFObjectHandle(QPDFObject*);
@@ -388,7 +392,6 @@ class QPDFObjectHandle
 
     void assertInitialized() const;
     void assertType(char const* type_name, bool istype);
-    void assertPageObject();
     void dereference();
     void makeDirectInternal(std::set<int>& visited);
     void releaseResolved();
