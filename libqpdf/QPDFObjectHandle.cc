@@ -262,6 +262,34 @@ QPDFObjectHandle::setArrayItem(int n, QPDFObjectHandle const& item)
     return dynamic_cast<QPDF_Array*>(obj.getPointer())->setItem(n, item);
 }
 
+void
+QPDFObjectHandle::setArrayFromVector(std::vector<QPDFObjectHandle> const& items)
+{
+    assertType("Array", isArray());
+    return dynamic_cast<QPDF_Array*>(obj.getPointer())->setFromVector(items);
+}
+
+void
+QPDFObjectHandle::insertItem(int at, QPDFObjectHandle const& item)
+{
+    assertType("Array", isArray());
+    return dynamic_cast<QPDF_Array*>(obj.getPointer())->insertItem(at, item);
+}
+
+void
+QPDFObjectHandle::appendItem(QPDFObjectHandle const& item)
+{
+    assertType("Array", isArray());
+    return dynamic_cast<QPDF_Array*>(obj.getPointer())->appendItem(item);
+}
+
+void
+QPDFObjectHandle::eraseItem(int at)
+{
+    assertType("Array", isArray());
+    return dynamic_cast<QPDF_Array*>(obj.getPointer())->eraseItem(at);
+}
+
 // Dictionary accessors
 
 bool

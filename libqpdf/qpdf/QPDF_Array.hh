@@ -12,10 +12,16 @@ class QPDF_Array: public QPDFObject
     QPDF_Array(std::vector<QPDFObjectHandle> const& items);
     virtual ~QPDF_Array();
     virtual std::string unparse();
+
     int getNItems() const;
     QPDFObjectHandle getItem(int n) const;
     std::vector<QPDFObjectHandle> const& getAsVector() const;
+
     void setItem(int, QPDFObjectHandle const&);
+    void setFromVector(std::vector<QPDFObjectHandle> const& items);
+    void insertItem(int at, QPDFObjectHandle const& item);
+    void appendItem(QPDFObjectHandle const& item);
+    void eraseItem(int at);
 
   protected:
     virtual void releaseResolved();

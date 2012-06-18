@@ -64,3 +64,35 @@ QPDF_Array::setItem(int n, QPDFObjectHandle const& oh)
     (void) getItem(n);
     this->items[n] = oh;
 }
+
+void
+QPDF_Array::setFromVector(std::vector<QPDFObjectHandle> const& items)
+{
+    this->items = items;
+}
+
+void
+QPDF_Array::insertItem(int at, QPDFObjectHandle const& item)
+{
+    // As special case, also allow insert beyond the end
+    if ((at < 0) || (at > (int)this->items.size()))
+    {
+	throw std::logic_error(
+	    "INTERNAL ERROR: bounds error accessing QPDF_Array element");
+    }
+    this->items.insert(this->items.begin() + at, item);
+}
+
+void
+QPDF_Array::appendItem(QPDFObjectHandle const& item)
+{
+    this->items.push_back(item);
+}
+
+void
+QPDF_Array::eraseItem(int at)
+{
+    // Call getItem for bounds checking
+    (void) getItem(at);
+    this->items.erase(this->items.begin() + at);
+}

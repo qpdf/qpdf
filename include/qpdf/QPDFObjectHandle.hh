@@ -200,6 +200,19 @@ class QPDFObjectHandle
     // Mutator methods for array objects
     QPDF_DLL
     void setArrayItem(int, QPDFObjectHandle const&);
+    QPDF_DLL
+    void setArrayFromVector(std::vector<QPDFObjectHandle> const& items);
+    // Insert an item before the item at the given position ("at") so
+    // that it has that position after insertion.  If "at" is equal to
+    // the size of the array, insert the item at the end.
+    QPDF_DLL
+    void insertItem(int at, QPDFObjectHandle const& item);
+    QPDF_DLL
+    void appendItem(QPDFObjectHandle const& item);
+    // Remove the item at that position, reducing the size of the
+    // array by one.
+    QPDF_DLL
+    void eraseItem(int at);
 
     // Mutator methods for dictionary objects
 
