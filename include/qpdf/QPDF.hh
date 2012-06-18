@@ -344,8 +344,23 @@ class QPDF
     QPDF_DLL
     std::vector<QPDFObjectHandle> const& getAllPages();
 
+    // QPDF internally caches the /Pages tree.  This method will clear
+    // the cache when e.g. direct modifications have been made.
     QPDF_DLL
     void clearPagesCache();
+
+    // Add new page at the beginning or the end of the current pdf
+    QPDF_DLL
+    void addPage(QPDFObjectHandle newpage, bool first);
+
+    // Add new page before or after refpage
+    QPDF_DLL
+    void addPageAt(QPDFObjectHandle newpage, bool before,
+                   QPDFObjectHandle const& refpage);
+
+    // Remove pageoh from the pdf.
+    QPDF_DLL
+    void removePage(QPDFObjectHandle const& pageoh);
 
     // Resolver class is restricted to QPDFObjectHandle so that only
     // it can resolve indirect references.
@@ -521,8 +536,17 @@ class QPDF
 			off_t offset, size_t length,
 			QPDFObjectHandle dict,
 			Pipeline* pipeline);
+
+    // methods to support page handling
+
     void getAllPagesInternal(QPDFObjectHandle cur_pages,
 			     std::vector<QPDFObjectHandle>& result);
+    // creates pageobj_to_pages_pos if necessary
+    // returns position, or -1 if not found
+    int findPage(int objid, int generation);
+    int findPage(QPDFObjectHandle const& pageoh); // convenience
+
+    void flattenPagesTree();
 
     // methods to support encryption -- implemented in QPDF_encryption.cc
     encryption_method_e interpretCF(QPDFObjectHandle);
@@ -887,6 +911,7 @@ class QPDF
     std::map<ObjGen, ObjCache> obj_cache;
     QPDFObjectHandle trailer;
     std::vector<QPDFObjectHandle> all_pages;
+    std::map<ObjGen, int> pageobj_to_pages_pos;
     std::vector<QPDFExc> warnings;
 
     // Linearization data
