@@ -46,7 +46,7 @@ QPDF_Array::getItem(int n) const
     if ((n < 0) || (n >= (int)this->items.size()))
     {
 	throw std::logic_error(
-	    "INTERNAL ERROR: bounds array accessing QPDF_Array element");
+	    "INTERNAL ERROR: bounds error accessing QPDF_Array element");
     }
     return this->items[n];
 }
