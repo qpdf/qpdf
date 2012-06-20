@@ -1,8 +1,8 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl This config.in requires autoconf 2.5 or greater.
 
-AC_PREREQ(2.60)
-AC_INIT(qpdf,2.3.1)
+AC_PREREQ([2.69])
+AC_INIT([qpdf],[2.3.1])
 
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_FILES([autoconf.mk])
@@ -13,7 +13,6 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_HEADER_STDC
 LT_INIT([win32-dll])
-AC_PROG_LIBTOOL
 
 USE_EXTERNAL_LIBS=0
 AC_MSG_CHECKING(for whether to use external libraries distribution)
@@ -67,9 +66,11 @@ AC_MSG_CHECKING(for whether $CC supports -MD -MF x.dep -MP)
 oCFLAGS=$CFLAGS
 rm -f x.dep
 CFLAGS="$CFLAGS -MD -MF x.dep -MP"
-AC_TRY_COMPILE([#include <stdio.h>], [FILE* a = stdout],
-	       qpdf_DEPFLAGS=yes,
-	       qpdf_DEPFLAGS=no)
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+                    [[#include <stdio.h>]], [[FILE* a = stdout]]
+                  )],
+                  [qpdf_DEPFLAGS=yes],
+                  [qpdf_DEPFLAGS=no])
 CFLAGS=$oCFLAGS
 if test "$qpdf_DEPFLAGS" = "yes"; then
    if ! grep stdio.h x.dep >/dev/null 2>&1; then
@@ -98,9 +99,8 @@ if test "$BUILDRULES" != "msvc"; then
    AC_MSG_CHECKING(for whether $CC supports -Wall)
    oCFLAGS=$CFLAGS
    CFLAGS="$CFLAGS -Wall"
-   AC_TRY_COMPILE([], [int a = 1; int b = a; a = b;],
-		  qpdf_USE_WALL=1,
-		  qpdf_USE_WALL=0)
+   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[int a = 1; int b = a; a = b;]])],
+                     [qpdf_USE_WALL=1],[qpdf_USE_WALL=0])
    if test "$qpdf_USE_WALL" = "1"; then
       AC_MSG_RESULT(yes)
       CXXFLAGS="$CXXFLAGS -Wall"
@@ -326,4 +326,4 @@ if test "$USE_EXTERNAL_LIBS" = "1"; then
    LIBS="$LIBS -lz -lpcre"
 fi
 
-AC_OUTPUT()
+AC_OUTPUT

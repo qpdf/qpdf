@@ -1,5 +1,8 @@
 # --- Required interface definitions ---
 
+# LIBTOOL needs bash
+SHELL=/bin/bash
+
 OBJ=o
 LOBJ=lo
 
