@@ -64,6 +64,8 @@ $(OBJS_libqpdf): libqpdf/$(OUTPUT_DIR)/%.$(LOBJ): libqpdf/%.cc
 #
 # * If any interfaces have been removed or changed, we are not binary
 #   compatible.  Increment CURRENT, and set AGE and REVISION to 0.
+#   Also update libqpdf.map, changing the numeric portion to match
+#   CURRENT.
 #
 # * Otherwise, if any interfaces have been added since the last
 #   public release, then increment CURRENT and AGE, and set REVISION
@@ -72,4 +74,4 @@ $(OBJS_libqpdf): libqpdf/$(OUTPUT_DIR)/%.$(LOBJ): libqpdf/%.cc
 # * Otherwise, increment REVISION
 
 $(TARGETS_libqpdf): $(OBJS_libqpdf)
-	$(call makelib,$(OBJS_libqpdf),$@,$(LDFLAGS),$(LIBS),7,1,4)
+	$(call makelib,$(OBJS_libqpdf),$@,$(LDFLAGS),$(LIBS),8,0,0)

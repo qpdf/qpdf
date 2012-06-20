@@ -4,58 +4,19 @@ Next
  * Get rid of off_t.  size_t is okay.  Use autoconf to figure out what
    type to use for offsets.
 
+ * Get rid of int/size_t/off_t inconsistencies.  MSVC 2010 can find
+   these if you add /w14267 to the compilation.  We might want to do
+   this by default.  The easiest way to fix this on Windows is to
+   modify msvc.mk to add this to both cl /c lines and run
+
+   make 2>&1 | tee build.log
+
  * Deal with portability issues from gcc 4.7.  See portability.patch
    from debian package.
 
  * Do a Windows 64-bit build.  MSVC 2010 Professional x86_64 verified
    to build and test cleanly in 2.3.1.  Hopefully the next release
    will include 64-bit binary distributions and external libraries.
-
- * Add versioned symbols.  Fix below to not use AM_CONDITIONAL.  Just
-   set some variable that can be part of LDFLAGS, like
-   LD_VERSION_SCRIPT, instead.
-
-# Check if LD supports linker scripts, and define conditional
-# HAVE_LD_VERSION_SCRIPT if so.  This functionality is currently
-# constrained to compilers using GNU ld on ELF systems or systems
-# which provide an adequate emulation thereof.
-AC_ARG_ENABLE([ld-version-script],
-  AS_HELP_STRING([--enable-ld-version-script],
-    [enable linker version script (default is disabled)]),
-    [have_ld_version_script=$enableval], [have_ld_version_script=no])
-if test "$have_ld_version_script" != no; then
-  AC_MSG_CHECKING([if LD -Wl,--version-script works])
-  save_LDFLAGS="$LDFLAGS"
-  LDFLAGS="$LDFLAGS -Wl,--version-script=conftest.map"
-  cat > conftest.map <<EOF
-VERS_1 {
-        global: sym;
-};
-
-VERS_2 {
-        global: sym;
-} VERS_1;
-EOF
-  AC_LINK_IFELSE([AC_LANG_PROGRAM([], [])],
-                 [have_ld_version_script=yes], [have_ld_version_script=no])
-  rm -f conftest.map
-  LDFLAGS="$save_LDFLAGS"
-  AC_MSG_RESULT($have_ld_version_script)
-fi
-AM_CONDITIONAL(HAVE_LD_VERSION_SCRIPT, test "$have_ld_version_script" = "yes")
-
-----
-
-if HAVE_LD_VERSION_SCRIPT
-libtiff_la_LDFLAGS += -Wl,--version-script=$(srcdir)/libtiff.map
-endif
-
-----
-
-LIBQPDF_3 {
-  global:
-    *;
-};
 
  * Provide an option to copy encryption parameters from another file.
    This would make it possible to decrypt a file, manually work with

@@ -41,6 +41,40 @@ AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
 AC_CHECK_FUNCS(random)
 
+# Check if LD supports linker scripts, and define conditional
+# HAVE_LD_VERSION_SCRIPT if so.  This functionality is currently
+# constrained to compilers using GNU ld on ELF systems or systems
+# which provide an adequate emulation thereof.
+AC_ARG_ENABLE([ld-version-script],
+  AS_HELP_STRING([--enable-ld-version-script],
+    [enable linker version script (default is disabled)]),
+    [have_ld_version_script=$enableval], [have_ld_version_script=yes])
+if test "$have_ld_version_script" != no; then
+  AC_MSG_CHECKING([if LD -Wl,--version-script works])
+  save_LDFLAGS="$LDFLAGS"
+  LDFLAGS="$LDFLAGS -Wl,--version-script=conftest.map"
+  cat > conftest.map <<EOF
+VERS_1 {
+        global: sym;
+};
+
+VERS_2 {
+        global: sym;
+} VERS_1;
+EOF
+  AC_LINK_IFELSE([AC_LANG_PROGRAM([], [])],
+                 [have_ld_version_script=yes], [have_ld_version_script=no])
+  rm -f conftest.map
+  LDFLAGS="$save_LDFLAGS"
+  AC_MSG_RESULT($have_ld_version_script)
+fi
+if test "$have_ld_version_script" = "yes"; then
+  HAVE_LD_VERSION_SCRIPT=1
+else
+  HAVE_LD_VERSION_SCRIPT=0
+fi
+AC_SUBST(HAVE_LD_VERSION_SCRIPT)
+
 AC_MSG_CHECKING(for gnu make >= 3.81)
 make_okay=0
 if make --version >/dev/null 2>&1; then

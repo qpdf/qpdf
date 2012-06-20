@@ -1,0 +1,4 @@
+LIBQPDF_8 {
+  global:
+    *;
+};

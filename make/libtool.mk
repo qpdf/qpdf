@@ -18,6 +18,12 @@ endef
 
 # --- Private definitions ---
 
+ifeq ($(HAVE_LD_VERSION_SCRIPT), 1)
+LD_VERSION_FLAGS=-Wl,--version-script=libqpdf.map
+else
+LD_VERSION_FLAGS=
+endif
+
 # Usage: $(call libdepflags,$(basename obj))
 # Usage: $(call fixdeps,$(basename obj))
 ifeq ($(GENDEPS),1)
@@ -83,7 +89,8 @@ endef
 # Usage: $(call makelib,objs,library,ldflags,libs,current,revision,age)
 define makelib
 	$(LIBTOOL) --mode=link \
-		$(CXX) $(CXXFLAGS) -o $(2) $(1) $(3) $(4) \
+		$(CXX) $(CXXFLAGS) $(LD_VERSION_FLAGS) \
+		 -o $(2) $(1) $(3) $(4) \
 		 -rpath $(libdir) -version-info $(5):$(6):$(7)
 endef
 
