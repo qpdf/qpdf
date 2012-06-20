@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
 	usage();
     }
 
-    unsigned int hexkeylen = strlen(hexkey);
+    unsigned int hexkeylen = (unsigned int)strlen(hexkey);
     unsigned int keylen = hexkeylen / 2;
     if (keylen != Pl_AES_PDF::key_size)
     {
@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
     bool done = false;
     while (! done)
     {
-	int len = fread(buf, 1, sizeof(buf), infile);
+	size_t len = fread(buf, 1, sizeof(buf), infile);
 	if (len <= 0)
 	{
 	    done = true;

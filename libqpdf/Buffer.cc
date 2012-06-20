@@ -7,12 +7,12 @@ Buffer::Buffer()
     init(0, 0, true);
 }
 
-Buffer::Buffer(unsigned long size)
+Buffer::Buffer(size_t size)
 {
     init(size, 0, true);
 }
 
-Buffer::Buffer(unsigned char* buf, unsigned long size)
+Buffer::Buffer(unsigned char* buf, size_t size)
 {
     init(size, buf, false);
 }
@@ -36,7 +36,7 @@ Buffer::~Buffer()
 }
 
 void
-Buffer::init(unsigned long size, unsigned char* buf, bool own_memory)
+Buffer::init(size_t size, unsigned char* buf, bool own_memory)
 {
     this->own_memory = own_memory;
     this->size = size;
@@ -75,7 +75,7 @@ Buffer::destroy()
     this->buf = 0;
 }
 
-unsigned long
+size_t
 Buffer::getSize() const
 {
     return this->size;

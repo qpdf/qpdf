@@ -46,7 +46,7 @@ print_buffer(Pl_Buffer* bp)
     bp->finish();
     Buffer* b = bp->getBuffer();
     unsigned char const* p = b->getBuffer();
-    unsigned long l = b->getSize();
+    size_t l = b->getSize();
     for (unsigned long i = 0; i < l; ++i)
     {
 	printf("%02x%s", (unsigned int)(p[i]),

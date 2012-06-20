@@ -20,7 +20,7 @@ class Pl_MD5: public Pipeline
     QPDF_DLL
     virtual ~Pl_MD5();
     QPDF_DLL
-    virtual void write(unsigned char*, int);
+    virtual void write(unsigned char*, size_t);
     QPDF_DLL
     virtual void finish();
     QPDF_DLL

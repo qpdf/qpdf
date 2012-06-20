@@ -175,7 +175,7 @@ QPDFTokenizer::presentCharacter(char ch)
 	    string_ignoring_newline = false;
 	}
 
-	unsigned int bs_num_count = strlen(bs_num_register);
+	size_t bs_num_count = strlen(bs_num_register);
 	bool ch_is_octal = ((ch >= '0') && (ch <= '7'));
 	if ((bs_num_count == 3) || ((bs_num_count > 0) && (! ch_is_octal)))
 	{

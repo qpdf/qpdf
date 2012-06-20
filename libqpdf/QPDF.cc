@@ -117,7 +117,7 @@ QPDF::FileInputSource::getName() const
 off_t
 QPDF::FileInputSource::tell()
 {
-    return ftell(this->file);
+    return QUtil::ftell_off_t(this->file);
 }
 
 void
@@ -126,7 +126,7 @@ QPDF::FileInputSource::seek(off_t offset, int whence)
     QUtil::os_wrapper(std::string("seek to ") + this->filename + ", offset " +
 		      QUtil::int_to_string(offset) + " (" +
 		      QUtil::int_to_string(whence) + ")",
-		      fseek(this->file, offset, whence));
+		      QUtil::fseek_off_t(this->file, offset, whence));
 }
 
 void
@@ -136,9 +136,9 @@ QPDF::FileInputSource::rewind()
 }
 
 size_t
-QPDF::FileInputSource::read(char* buffer, int length)
+QPDF::FileInputSource::read(char* buffer, size_t length)
 {
-    this->last_offset = ftell(this->file);
+    this->last_offset = QUtil::ftell_off_t(this->file);
     size_t len = fread(buffer, 1, length, this->file);
     if ((len == 0) && ferror(this->file))
     {
@@ -197,7 +197,7 @@ QPDF::BufferInputSource::seek(off_t offset, int whence)
 	break;
 
       case SEEK_END:
-	this->cur_offset = this->buf->getSize() + offset;
+	this->cur_offset = (off_t)this->buf->getSize() + offset;
 	break;
 
       case SEEK_CUR:
@@ -218,9 +218,9 @@ QPDF::BufferInputSource::rewind()
 }
 
 size_t
-QPDF::BufferInputSource::read(char* buffer, int length)
+QPDF::BufferInputSource::read(char* buffer, size_t length)
 {
-    off_t end_pos = this->buf->getSize();
+    off_t end_pos = (off_t) this->buf->getSize();
     if (this->cur_offset >= end_pos)
     {
 	this->last_offset = end_pos;
@@ -228,7 +228,7 @@ QPDF::BufferInputSource::read(char* buffer, int length)
     }
 
     this->last_offset = this->cur_offset;
-    size_t len = std::min((int)(end_pos - this->cur_offset), length);
+    size_t len = std::min((size_t)(end_pos - this->cur_offset), length);
     memcpy(buffer, buf->getBuffer() + this->cur_offset, len);
     this->cur_offset += len;
     return len;
@@ -432,7 +432,7 @@ QPDF::parse(char const* password)
 	    throw QPDFExc(qpdf_e_damaged_pdf, this->file->getName(), "", 0,
 			  "can't find startxref");
 	}
-	off_t xref_offset = atoi(m2.getMatch(1).c_str());
+	off_t xref_offset = atol(m2.getMatch(1).c_str());
 	read_xref(xref_offset);
     }
     catch (QPDFExc& e)
@@ -878,10 +878,10 @@ QPDF::processXRefStream(off_t xref_offset, QPDFObjectHandle& xref_obj)
 	entry_size += W[i];
     }
 
-    int expected_size = entry_size * num_entries;
+    size_t expected_size = entry_size * num_entries;
 
     PointerHolder<Buffer> bp = xref_obj.getStreamData();
-    int actual_size = bp->getSize();
+    size_t actual_size = bp->getSize();
 
     if (expected_size != actual_size)
     {
@@ -1396,7 +1396,7 @@ QPDF::readObjectInternal(PointerHolder<InputSource> input,
 		// objects since resolving a previously unresolved
 		// indirect object will change file position.
 		off_t stream_offset = input->tell();
-		int length = 0;
+		size_t length = 0;
 
 		try
 		{
@@ -1419,7 +1419,7 @@ QPDF::readObjectInternal(PointerHolder<InputSource> input,
 		    }
 
 		    length = length_obj.getIntValue();
-		    input->seek(stream_offset + length, SEEK_SET);
+		    input->seek(stream_offset + (off_t)length, SEEK_SET);
 		    if (! (readToken(input) ==
 			   QPDFTokenizer::Token(
 			       QPDFTokenizer::tt_word, "endstream")))
@@ -1457,7 +1457,7 @@ QPDF::readObjectInternal(PointerHolder<InputSource> input,
     return object;
 }
 
-int
+size_t
 QPDF::recoverStreamLength(PointerHolder<InputSource> input,
 			  int objid, int generation, off_t stream_offset)
 {
@@ -1474,7 +1474,7 @@ QPDF::recoverStreamLength(PointerHolder<InputSource> input,
     input->seek(stream_offset, SEEK_SET);
     std::string last_line;
     off_t last_line_offset = 0;
-    int length = 0;
+    size_t length = 0;
     while (input->tell() < eof)
     {
 	std::string line = input->readLine();

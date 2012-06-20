@@ -29,7 +29,7 @@ class Pl_StdioFile: public Pipeline
     virtual ~Pl_StdioFile();
 
     QPDF_DLL
-    virtual void write(unsigned char* buf, int len);
+    virtual void write(unsigned char* buf, size_t len);
     QPDF_DLL
     virtual void finish();
 

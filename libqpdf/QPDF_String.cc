@@ -157,7 +157,7 @@ std::string
 QPDF_String::getUTF8Val() const
 {
     std::string result;
-    unsigned int len = this->val.length();
+    size_t len = this->val.length();
     if ((len >= 2) && (len % 2 == 0) &&
 	(this->val[0] == '\xfe') && (this->val[1] == '\xff'))
     {

@@ -17,13 +17,13 @@ Pl_ASCIIHexDecoder::~Pl_ASCIIHexDecoder()
 }
 
 void
-Pl_ASCIIHexDecoder::write(unsigned char* buf, int len)
+Pl_ASCIIHexDecoder::write(unsigned char* buf, size_t len)
 {
     if (this->eod)
     {
 	return;
     }
-    for (int i = 0; i < len; ++i)
+    for (size_t i = 0; i < len; ++i)
     {
 	char ch = toupper(buf[i]);
 	switch (ch)

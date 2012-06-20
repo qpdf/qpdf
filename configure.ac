@@ -37,8 +37,29 @@ if test "$BUILD_INTERNAL_LIBS" = "0"; then
    AC_SEARCH_LIBS(pcre_compile,pcre,,[MISSING_PCRE=1; MISSING_ANY=1])
 fi
 
+AC_SYS_LARGEFILE
+AC_FUNC_FSEEKO
 AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
+
+AC_MSG_CHECKING(for whether printf supports %ll)
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+#include <stdio.h>
+#include <string.h>
+#include <sys/types.h>
+int
+main()
+{
+    long long a = 160591605916059ll;
+    char t[50];
+    sprintf(t, "%lld", a);
+}
+]])],[qpdf_PRINTF_LL=yes],[qpdf_PRINTF_LL=no])
+AC_MSG_RESULT($qpdf_PRINTF_LL)
+if test "$qpdf_PRINTF_LL" = "yes"; then
+   AC_DEFINE([HAVE_PRINTF_LL], [1], [Whether printf supports %ll])
+fi
+
 AC_CHECK_FUNCS(random)
 
 # Check if LD supports linker scripts, and define conditional

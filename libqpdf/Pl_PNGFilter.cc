@@ -29,10 +29,10 @@ Pl_PNGFilter::~Pl_PNGFilter()
 }
 
 void
-Pl_PNGFilter::write(unsigned char* data, int len)
+Pl_PNGFilter::write(unsigned char* data, size_t len)
 {
-    int left = this->incoming - this->pos;
-    unsigned int offset = 0;
+    size_t left = this->incoming - this->pos;
+    size_t offset = 0;
     while (len >= left)
     {
 	// finish off current row

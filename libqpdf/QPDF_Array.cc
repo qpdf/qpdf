@@ -37,7 +37,7 @@ QPDF_Array::unparse()
 int
 QPDF_Array::getNItems() const
 {
-    return this->items.size();
+    return (int)this->items.size();
 }
 
 QPDFObjectHandle

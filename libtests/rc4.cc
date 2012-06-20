@@ -17,8 +17,8 @@ int main(int argc, char* argv[])
     char* hexkey = argv[1];
     char* infilename = argv[2];
     char* outfilename = argv[3];
-    int hexkeylen = strlen(hexkey);
-    int keylen = hexkeylen / 2;
+    unsigned int hexkeylen = (unsigned int)strlen(hexkey);
+    unsigned int keylen = hexkeylen / 2;
     unsigned char* key = new unsigned char[keylen + 1];
     key[keylen] = '\0';
 
@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
     bool done = false;
     while (! done)
     {
-	int len = fread(buf, 1, sizeof(buf), infile);
+	size_t len = fread(buf, 1, sizeof(buf), infile);
 	if (len <= 0)
 	{
 	    done = true;

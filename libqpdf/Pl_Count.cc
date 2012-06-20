@@ -12,7 +12,7 @@ Pl_Count::~Pl_Count()
 }
 
 void
-Pl_Count::write(unsigned char* buf, int len)
+Pl_Count::write(unsigned char* buf, size_t len)
 {
     if (len)
     {
@@ -28,7 +28,7 @@ Pl_Count::finish()
     getNext()->finish();
 }
 
-int
+off_t
 Pl_Count::getCount() const
 {
     return this->count;

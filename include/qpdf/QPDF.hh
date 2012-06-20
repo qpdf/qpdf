@@ -388,7 +388,7 @@ class QPDF
 	virtual off_t tell() = 0;
 	virtual void seek(off_t offset, int whence) = 0;
 	virtual void rewind() = 0;
-	virtual size_t read(char* buffer, int length) = 0;
+	virtual size_t read(char* buffer, size_t length) = 0;
 	virtual void unreadCh(char ch) = 0;
 
       protected:
@@ -405,7 +405,7 @@ class QPDF
 	virtual off_t tell();
 	virtual void seek(off_t offset, int whence);
 	virtual void rewind();
-	virtual size_t read(char* buffer, int length);
+	virtual size_t read(char* buffer, size_t length);
 	virtual void unreadCh(char ch);
 
       private:
@@ -428,7 +428,7 @@ class QPDF
 	virtual off_t tell();
 	virtual void seek(off_t offset, int whence);
 	virtual void rewind();
-	virtual size_t read(char* buffer, int length);
+	virtual size_t read(char* buffer, size_t length);
 	virtual void unreadCh(char ch);
 
       private:
@@ -490,7 +490,7 @@ class QPDF
 	PointerHolder<InputSource> input, int objid, int generation,
 	bool in_object_stream,
 	bool in_array, bool in_dictionary);
-    int recoverStreamLength(
+    size_t recoverStreamLength(
 	PointerHolder<InputSource> input, int objid, int generation,
 	off_t stream_offset);
     QPDFTokenizer::Token readToken(PointerHolder<InputSource>);

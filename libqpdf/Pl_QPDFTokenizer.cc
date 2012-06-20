@@ -22,7 +22,7 @@ Pl_QPDFTokenizer::~Pl_QPDFTokenizer()
 }
 
 void
-Pl_QPDFTokenizer::writeNext(char const* buf, int len)
+Pl_QPDFTokenizer::writeNext(char const* buf, size_t len)
 {
     if (len)
     {
@@ -159,10 +159,10 @@ Pl_QPDFTokenizer::checkUnread()
 }
 
 void
-Pl_QPDFTokenizer::write(unsigned char* buf, int len)
+Pl_QPDFTokenizer::write(unsigned char* buf, size_t len)
 {
     checkUnread();
-    for (int i = 0; i < len; ++i)
+    for (size_t i = 0; i < len; ++i)
     {
 	processChar(buf[i]);
 	checkUnread();

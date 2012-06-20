@@ -15,7 +15,7 @@ Pl_Buffer::~Pl_Buffer()
 }
 
 void
-Pl_Buffer::write(unsigned char* buf, int len)
+Pl_Buffer::write(unsigned char* buf, size_t len)
 {
     Buffer* b = new Buffer(len);
     memcpy(b->getBuffer(), buf, len);

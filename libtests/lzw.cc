@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 	bool done = false;
 	while (! done)
 	{
-	    int len = fread(buf, 1, sizeof(buf), infile);
+	    size_t len = fread(buf, 1, sizeof(buf), infile);
 	    if (len <= 0)
 	    {
 		done = true;

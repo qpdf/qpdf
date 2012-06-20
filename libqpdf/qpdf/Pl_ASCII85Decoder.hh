@@ -11,7 +11,7 @@ class Pl_ASCII85Decoder: public Pipeline
     QPDF_DLL
     virtual ~Pl_ASCII85Decoder();
     QPDF_DLL
-    virtual void write(unsigned char* buf, int len);
+    virtual void write(unsigned char* buf, size_t len);
     QPDF_DLL
     virtual void finish();
 
@@ -19,8 +19,8 @@ class Pl_ASCII85Decoder: public Pipeline
     void flush();
 
     char inbuf[5];
-    int pos;
-    int eod;
+    size_t pos;
+    size_t eod;
 };
 
 #endif // __PL_ASCII85DECODER_HH__

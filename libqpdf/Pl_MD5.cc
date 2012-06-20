@@ -12,14 +12,27 @@ Pl_MD5::~Pl_MD5()
 }
 
 void
-Pl_MD5::write(unsigned char* buf, int len)
+Pl_MD5::write(unsigned char* buf, size_t len)
 {
     if (! this->in_progress)
     {
 	this->md5.reset();
 	this->in_progress = true;
     }
-    this->md5.encodeDataIncrementally((char*) buf, len);
+
+    // Write in chunks in case len is too big to fit in an int.
+    // Assume int is at least 32 bits.
+    static size_t const max_bytes = 1 << 30;
+    size_t bytes_left = len;
+    unsigned char* data = buf;
+    while (bytes_left > 0)
+    {
+	size_t bytes = (bytes_left >= max_bytes ? max_bytes : bytes_left);
+        this->md5.encodeDataIncrementally((char*) data, (int)bytes);
+	bytes_left -= bytes;
+        data += bytes;
+    }
+
     this->getNext()->write(buf, len);
 }
 

@@ -1,4 +1,5 @@
 #include <qpdf/QUtil.hh>
+#include <qpdf/qpdf-config.h>
 #include <stdio.h>
 #include <errno.h>
 #include <ctype.h>
@@ -14,7 +15,7 @@
 #endif
 
 std::string
-QUtil::int_to_string(int num, int fullpad)
+QUtil::int_to_string(long long num, int fullpad)
 {
     // This routine will need to be recompiled if an int can be longer than
     // 49 digits.
@@ -28,14 +29,20 @@ QUtil::int_to_string(int num, int fullpad)
 			       "limit");
     }
 
+#ifdef HAVE_PRINTF_LL
+# define PRINTF_LL "ll"
+#else
+# define PRINTF_LL "l"
+#endif
     if (fullpad)
     {
-	sprintf(t, "%0*d", fullpad, num);
+	sprintf(t, "%0*" PRINTF_LL "d", fullpad, num);
     }
     else
     {
-	sprintf(t, "%d", num);
+	sprintf(t, "%" PRINTF_LL "d", num);
     }
+#undef PRINTF_LL
 
     return std::string(t);
 }
@@ -99,6 +106,26 @@ QUtil::fopen_wrapper(std::string const& description, FILE* f)
 	throw_system_error(description);
     }
     return f;
+}
+
+int
+QUtil::fseek_off_t(FILE* stream, off_t offset, int whence)
+{
+#if HAVE_FSEEKO
+    return fseeko(stream, offset, whence);
+#else
+    return fseek(stream, offset, whence);
+#endif
+}
+
+off_t
+QUtil::ftell_off_t(FILE* stream)
+{
+#if HAVE_FSEEKO
+    return ftello(stream);
+#else
+    return ftell(stream);
+#endif
 }
 
 char*

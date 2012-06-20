@@ -12,7 +12,7 @@ BitWriter::BitWriter(Pipeline* pl) :
 }
 
 void
-BitWriter::writeBits(unsigned long val, int bits)
+BitWriter::writeBits(unsigned long val, unsigned int bits)
 {
     write_bits(this->ch, this->bit_offset, val, bits, this->pl);
 }

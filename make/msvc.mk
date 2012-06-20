@@ -19,6 +19,16 @@ endef
 CFLAGS := $(filter-out -g,$(CFLAGS))
 CXXFLAGS := $(filter-out -g,$(CXXFLAGS))
 
+# /WX makes all warnings errors.
+CFLAGS += /WX
+CXXFLAGS += /WX
+
+# /w14267 makes warning 4267 a level 1 warning.  This warning reports
+# potential issues between size_t, off_t, and non-compatible integer
+# types.
+CFLAGS += /w14267
+CXXFLAGS += /w14267
+
 clean::
 	$(RM) *.pdb
 
@@ -35,7 +45,7 @@ endef
 #                       1   2
 # Usage: $(call c_compile,src,includes)
 define c_compile
-	cl /nologo /O2 /Zi /Gy /EHsc /MD $(CPPFLAGS) $(CXXFLAGS) \
+	cl /nologo /O2 /Zi /Gy /EHsc /MD $(CPPFLAGS) $(CFLAGS) \
 		$(foreach I,$(2),-I$(I)) \
 		/c $(1) /Fo$(call c_src_to_obj,$(1))
 endef

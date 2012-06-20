@@ -604,7 +604,7 @@ QPDFObjectHandle::newDictionary(
 QPDFObjectHandle
 QPDFObjectHandle::newStream(QPDF* qpdf, int objid, int generation,
 			    QPDFObjectHandle stream_dict,
-			    off_t offset, int length)
+			    off_t offset, size_t length)
 {
     return QPDFObjectHandle(new QPDF_Stream(
 				qpdf, objid, generation,

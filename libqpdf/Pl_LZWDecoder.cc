@@ -25,9 +25,9 @@ Pl_LZWDecoder::~Pl_LZWDecoder()
 }
 
 void
-Pl_LZWDecoder::write(unsigned char* bytes, int len)
+Pl_LZWDecoder::write(unsigned char* bytes, size_t len)
 {
-    for (int i = 0; i < len; ++i)
+    for (size_t i = 0; i < len; ++i)
     {
 	this->buf[next++] = bytes[i];
 	if (this->next == 3)
@@ -131,7 +131,7 @@ Pl_LZWDecoder::addToTable(unsigned char next)
 	assert(idx < table.size());
 	Buffer& b = table[idx];
 	last_data = b.getBuffer();
-	last_size = b.getSize();
+	last_size = (unsigned int) b.getSize();
     }
 
     Buffer entry(1 + last_size);
@@ -170,7 +170,7 @@ Pl_LZWDecoder::handleCode(int code)
 	    // be what we read last plus the first character of what
 	    // we're reading now.
 	    unsigned char next = '\0';
-	    unsigned int table_size = table.size();
+	    unsigned int table_size = (unsigned int) table.size();
 	    if (code < 256)
 	    {
 		// just read < 256; last time's next was code
@@ -178,7 +178,7 @@ Pl_LZWDecoder::handleCode(int code)
 	    }
 	    else if (code > 257)
 	    {
-		unsigned int idx = code - 258;
+		size_t idx = code - 258;
 		if (idx > table_size)
 		{
 		    throw std::runtime_error("LZWDecoder: bad code received");

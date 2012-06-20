@@ -30,7 +30,7 @@ class Pl_PNGFilter: public Pipeline
     virtual ~Pl_PNGFilter();
 
     QPDF_DLL
-    virtual void write(unsigned char* data, int len);
+    virtual void write(unsigned char* data, size_t len);
     QPDF_DLL
     virtual void finish();
 
@@ -45,8 +45,8 @@ class Pl_PNGFilter: public Pipeline
     unsigned char* prev_row;
     unsigned char* buf1;
     unsigned char* buf2;
-    int pos;
-    int incoming;
+    size_t pos;
+    size_t incoming;
 };
 
 #endif // __PL_PNGFILTER_HH__

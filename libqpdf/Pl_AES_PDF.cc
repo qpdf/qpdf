@@ -60,9 +60,9 @@ Pl_AES_PDF::useStaticIV()
 }
 
 void
-Pl_AES_PDF::write(unsigned char* data, int len)
+Pl_AES_PDF::write(unsigned char* data, size_t len)
 {
-    unsigned int bytes_left = len;
+    size_t bytes_left = len;
     unsigned char* p = data;
 
     while (bytes_left > 0)
@@ -72,8 +72,8 @@ Pl_AES_PDF::write(unsigned char* data, int len)
 	    flush(false);
 	}
 
-	unsigned int available = this->buf_size - this->offset;
-	int bytes = (bytes_left < available ? bytes_left : available);
+	size_t available = this->buf_size - this->offset;
+	size_t bytes = (bytes_left < available ? bytes_left : available);
 	bytes_left -= bytes;
 	std::memcpy(this->inbuf + this->offset, p, bytes);
 	this->offset += bytes;
@@ -93,7 +93,7 @@ Pl_AES_PDF::finish()
 	// Pad as described in section 3.5.1 of version 1.7 of the PDF
 	// specification, including providing an entire block of padding
 	// if the input was a multiple of 16 bytes.
-	unsigned char pad = this->buf_size - this->offset;
+	unsigned char pad = (unsigned char) (this->buf_size - this->offset);
 	memset(this->inbuf + this->offset, pad, pad);
 	this->offset = this->buf_size;
 	flush(false);

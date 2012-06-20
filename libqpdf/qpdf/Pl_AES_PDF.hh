@@ -22,7 +22,7 @@ class Pl_AES_PDF: public Pipeline
     virtual ~Pl_AES_PDF();
 
     QPDF_DLL
-    virtual void write(unsigned char* data, int len);
+    virtual void write(unsigned char* data, size_t len);
     QPDF_DLL
     virtual void finish();
 
@@ -43,7 +43,7 @@ class Pl_AES_PDF: public Pipeline
     bool encrypt;
     bool cbc_mode;
     bool first;
-    unsigned int offset;
+    size_t offset;              // offset into memory buffer
     unsigned char key[key_size];
     uint32_t rk[key_size + 28];
     unsigned char inbuf[buf_size];

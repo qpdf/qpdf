@@ -46,7 +46,7 @@ class Pipeline
     // and then, if they are not end-of-line pipelines, call
     // getNext()->write or getNext()->finish.
     QPDF_DLL
-    virtual void write(unsigned char* data, int len) = 0;
+    virtual void write(unsigned char* data, size_t len) = 0;
     QPDF_DLL
     virtual void finish() = 0;
 

@@ -9,6 +9,7 @@
 #define __BUFFER_HH__
 
 #include <qpdf/DLL.h>
+#include <cstring>              // for size_t
 
 class Buffer
 {
@@ -19,12 +20,12 @@ class Buffer
     // Create a Buffer object whose memory is owned by the class and
     // will be freed when the Buffer object is destroyed.
     QPDF_DLL
-    Buffer(unsigned long size);
+    Buffer(size_t size);
 
     // Create a Buffer object whose memory is owned by the caller and
     // will not be freed when the Buffer is destroyed.
     QPDF_DLL
-    Buffer(unsigned char* buf, unsigned long size);
+    Buffer(unsigned char* buf, size_t size);
 
     QPDF_DLL
     Buffer(Buffer const&);
@@ -33,19 +34,19 @@ class Buffer
     QPDF_DLL
     ~Buffer();
     QPDF_DLL
-    unsigned long getSize() const;
+    size_t getSize() const;
     QPDF_DLL
     unsigned char const* getBuffer() const;
     QPDF_DLL
     unsigned char* getBuffer();
 
   private:
-    void init(unsigned long size, unsigned char* buf, bool own_memory);
+    void init(size_t size, unsigned char* buf, bool own_memory);
     void copy(Buffer const&);
     void destroy();
 
     bool own_memory;
-    unsigned long size;
+    size_t size;
     unsigned char* buf;
 };
 

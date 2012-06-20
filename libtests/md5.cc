@@ -54,7 +54,7 @@ int main(int, char*[])
 	    bool done = false;
 	    while (! done)
 	    {
-		int len = fread(buf, 1, sizeof(buf), f);
+		size_t len = fread(buf, 1, sizeof(buf), f);
 		if (len <= 0)
 		{
 		    done = true;

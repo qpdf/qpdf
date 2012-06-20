@@ -327,7 +327,7 @@ class QPDFObjectHandle
 	// object must be dictionary object
 	static QPDFObjectHandle newStream(
 	    QPDF* qpdf, int objid, int generation,
-	    QPDFObjectHandle stream_dict, off_t offset, int length)
+	    QPDFObjectHandle stream_dict, off_t offset, size_t length)
 	{
 	    return QPDFObjectHandle::newStream(
 		qpdf, objid, generation, stream_dict, offset, length);
@@ -371,7 +371,7 @@ class QPDFObjectHandle
     static QPDFObjectHandle newIndirect(QPDF*, int objid, int generation);
     static QPDFObjectHandle newStream(
 	QPDF* qpdf, int objid, int generation,
-	QPDFObjectHandle stream_dict, off_t offset, int length);
+	QPDFObjectHandle stream_dict, off_t offset, size_t length);
 
     void assertInitialized() const;
     void assertType(char const* type_name, bool istype);

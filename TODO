@@ -1,34 +1,11 @@
 Next
 ====
 
- * Get rid of off_t.  size_t is okay.  Use autoconf to figure out what
-   type to use for offsets.
-
- * Get rid of int/size_t/off_t inconsistencies.  MSVC 2010 can find
-   these if you add /w14267 to the compilation.  We might want to do
-   this by default.  The easiest way to fix this on Windows is to
-   modify msvc.mk to add this to both cl /c lines and run
-
-   make 2>&1 | tee build.log
-
- * Deal with portability issues from gcc 4.7.  See portability.patch
-   from debian package.
+*** ABI changes have been made.  build.mk has been updated.
 
  * Do a Windows 64-bit build.  MSVC 2010 Professional x86_64 verified
    to build and test cleanly in 2.3.1.  Hopefully the next release
    will include 64-bit binary distributions and external libraries.
-
- * Provide an option to copy encryption parameters from another file.
-   This would make it possible to decrypt a file, manually work with
-   it, and then re-encrypt it using the original encryption parameters
-   including a possibly unknown owner password.
-
- * See if I can support the new encryption formats mentioned in the
-   open bug on sourceforge.  Check other sourceforge bugs.
-
-
-Better 64-bit support on Windows
-================================
 
  * Building 64-bit libraries with MSVC works with existing build.sh as
    long as the x86_64 version of the compiler is in the path.
@@ -38,16 +15,13 @@ Better 64-bit support on Windows
    only been verified with MSVC 2010 so far; we still need to get it
    working with 64-bit mingw.
 
- * Get rid of int/size_t/off_t inconsistencies.  MSVC 2010 can find
-   these if you add /w14267 to the compilation.  We might want to do
-   this by default.  The easiest way to fix this on Windows is to
-   modify msvc.mk to add this to both cl /c lines and run
+ * Provide an option to copy encryption parameters from another file.
+   This would make it possible to decrypt a file, manually work with
+   it, and then re-encrypt it using the original encryption parameters
+   including a possibly unknown owner password.
 
-   make 2>&1 | tee build.log
-
-   Then, from emacs, compile with command cat build.log.
-
-   This will probably require ABI changes, but it seems worth doing.
+ * See if I can support the new encryption formats mentioned in the
+   open bug on sourceforge.  Check other sourceforge bugs.
 
 
 General

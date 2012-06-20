@@ -9,7 +9,7 @@ QPDFXRefEntry::QPDFXRefEntry() :
 {
 }
 
-QPDFXRefEntry::QPDFXRefEntry(int type, int field1, int field2) :
+QPDFXRefEntry::QPDFXRefEntry(int type, off_t field1, int field2) :
     type(type),
     field1(field1),
     field2(field2)
@@ -27,7 +27,7 @@ QPDFXRefEntry::getType() const
     return this->type;
 }
 
-int
+off_t
 QPDFXRefEntry::getOffset() const
 {
     if (this->type != 1)
@@ -46,7 +46,7 @@ QPDFXRefEntry::getObjStreamNumber() const
 	throw std::logic_error(
 	    "getObjStreamNumber called for xref entry of type != 2");
     }
-    return this->field1;
+    return (int) this->field1;
 }
 
 int

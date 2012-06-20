@@ -12,6 +12,7 @@
 // calling finish().
 
 #include <qpdf/Pipeline.hh>
+#include <qpdf/Types.h>
 
 class Pl_Count: public Pipeline
 {
@@ -21,19 +22,19 @@ class Pl_Count: public Pipeline
     QPDF_DLL
     virtual ~Pl_Count();
     QPDF_DLL
-    virtual void write(unsigned char*, int);
+    virtual void write(unsigned char*, size_t);
     QPDF_DLL
     virtual void finish();
     // Returns the number of bytes written
     QPDF_DLL
-    int getCount() const;
+    off_t getCount() const;
     // Returns the last character written, or '\0' if no characters
     // have been written (in which case getCount() returns 0)
     QPDF_DLL
     unsigned char getLastChar() const;
 
   private:
-    int count;
+    off_t count;
     unsigned char last_char;
 };
 

@@ -18,13 +18,13 @@ class Pl_QPDFTokenizer: public Pipeline
   public:
     Pl_QPDFTokenizer(char const* identifier, Pipeline* next);
     virtual ~Pl_QPDFTokenizer();
-    virtual void write(unsigned char* buf, int len);
+    virtual void write(unsigned char* buf, size_t len);
     virtual void finish();
 
   private:
     void processChar(char ch);
     void checkUnread();
-    void writeNext(char const*, int len);
+    void writeNext(char const*, size_t len);
     void writeToken(QPDFTokenizer::Token&);
 
     QPDFTokenizer tokenizer;

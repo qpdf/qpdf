@@ -3,7 +3,7 @@
 
 Pl_RC4::Pl_RC4(char const* identifier, Pipeline* next,
 	       unsigned char const* key_data, int key_len,
-	       int out_bufsize) :
+	       size_t out_bufsize) :
     Pipeline(identifier, next),
     out_bufsize(out_bufsize),
     rc4(key_data, key_len)
@@ -21,7 +21,7 @@ Pl_RC4::~Pl_RC4()
 }
 
 void
-Pl_RC4::write(unsigned char* data, int len)
+Pl_RC4::write(unsigned char* data, size_t len)
 {
     if (this->outbuf == 0)
     {
@@ -30,14 +30,15 @@ Pl_RC4::write(unsigned char* data, int len)
 	    ": Pl_RC4: write() called after finish() called");
     }
 
-    int bytes_left = len;
+    size_t bytes_left = len;
     unsigned char* p = data;
 
     while (bytes_left > 0)
     {
-	int bytes = (bytes_left < this->out_bufsize ? bytes_left : out_bufsize);
+	size_t bytes =
+            (bytes_left < this->out_bufsize ? bytes_left : out_bufsize);
 	bytes_left -= bytes;
-	rc4.process(p, bytes, outbuf);
+	rc4.process(p, (int)bytes, outbuf);
 	p += bytes;
 	getNext()->write(outbuf, bytes);
     }

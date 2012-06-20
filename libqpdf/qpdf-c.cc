@@ -462,10 +462,10 @@ static void qpdf_get_buffer_internal(qpdf_data qpdf)
     }
 }
 
-unsigned long qpdf_get_buffer_length(qpdf_data qpdf)
+size_t qpdf_get_buffer_length(qpdf_data qpdf)
 {
     qpdf_get_buffer_internal(qpdf);
-    unsigned long result = 0L;
+    size_t result = 0;
     if (qpdf->output_buffer)
     {
 	result = qpdf->output_buffer->getSize();

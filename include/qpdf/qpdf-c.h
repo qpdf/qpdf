@@ -71,6 +71,7 @@
 
 #include <qpdf/DLL.h>
 #include <qpdf/Constants.h>
+#include <qpdf/Types.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -300,7 +301,7 @@ extern "C" {
      * if a subsequent call to qpdf_init_write or
      * qpdf_init_write_memory is called. */
     QPDF_DLL
-    unsigned long qpdf_get_buffer_length(qpdf_data qpdf);
+    size_t qpdf_get_buffer_length(qpdf_data qpdf);
     QPDF_DLL
     unsigned char const* qpdf_get_buffer(qpdf_data qpdf);
 

@@ -166,7 +166,7 @@ PCRE::match(char const* subject, int options, int startoffset, int size)
 {
     if (size == -1)
     {
-	size = strlen(subject);
+	size = (int) strlen(subject);
     }
 
     Match result(this->nbackrefs, subject);

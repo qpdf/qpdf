@@ -40,7 +40,7 @@ Pl_Flate::~Pl_Flate()
 }
 
 void
-Pl_Flate::write(unsigned char* data, int len)
+Pl_Flate::write(unsigned char* data, size_t len)
 {
     if (this->outbuf == 0)
     {
@@ -48,7 +48,19 @@ Pl_Flate::write(unsigned char* data, int len)
 	    this->identifier +
 	    ": Pl_Flate: write() called after finish() called");
     }
-    handleData(data, len, Z_NO_FLUSH);
+
+    // Write in chunks in case len is too big to fit in an int.
+    // Assume int is at least 32 bits.
+    static size_t const max_bytes = 1 << 30;
+    size_t bytes_left = len;
+    unsigned char* buf = data;
+    while (bytes_left > 0)
+    {
+	size_t bytes = (bytes_left >= max_bytes ? max_bytes : bytes_left);
+        handleData(buf, (int)bytes, Z_NO_FLUSH);
+	bytes_left -= bytes;
+        buf += bytes;
+    }
 }
 
 void

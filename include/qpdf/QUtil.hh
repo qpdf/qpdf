@@ -9,6 +9,7 @@
 #define __QUTIL_HH__
 
 #include <qpdf/DLL.h>
+#include <qpdf/Types.h>
 #include <string>
 #include <list>
 #include <stdexcept>
@@ -20,7 +21,7 @@ namespace QUtil
     // This is a collection of useful utility functions that don't
     // really go anywhere else.
     QPDF_DLL
-    std::string int_to_string(int, int length = 0);
+    std::string int_to_string(long long, int length = 0);
     QPDF_DLL
     std::string double_to_string(double, int decimal_places = 0);
 
@@ -43,6 +44,12 @@ namespace QUtil
     // argument.
     QPDF_DLL
     FILE* fopen_wrapper(std::string const&, FILE*);
+
+    // Wrap around off_t versions of fseek and ftell if available
+    QPDF_DLL
+    int fseek_off_t(FILE* stream, off_t offset, int whence);
+    QPDF_DLL
+    off_t ftell_off_t(FILE* stream);
 
     QPDF_DLL
     char* copy_string(std::string const&);

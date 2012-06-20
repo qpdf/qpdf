@@ -11,7 +11,7 @@ class Pl_ASCIIHexDecoder: public Pipeline
     QPDF_DLL
     virtual ~Pl_ASCIIHexDecoder();
     QPDF_DLL
-    virtual void write(unsigned char* buf, int len);
+    virtual void write(unsigned char* buf, size_t len);
     QPDF_DLL
     virtual void finish();
 
@@ -19,7 +19,7 @@ class Pl_ASCIIHexDecoder: public Pipeline
     void flush();
 
     char inbuf[3];
-    int pos;
+    size_t pos;
     bool eod;
 };
 

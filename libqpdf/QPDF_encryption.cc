@@ -29,7 +29,7 @@ static unsigned int const key_bytes = 32;
 void
 pad_or_truncate_password(std::string const& password, char k1[key_bytes])
 {
-    int password_bytes = std::min((size_t) key_bytes, password.length());
+    int password_bytes = std::min(key_bytes, (unsigned int)password.length());
     int pad_bytes = key_bytes - password_bytes;
     memcpy(k1, password.c_str(), password_bytes);
     memcpy(k1 + password_bytes, padding_string, pad_bytes);
@@ -121,7 +121,7 @@ QPDF::compute_data_key(std::string const& encryption_key,
     }
 
     MD5 md5;
-    md5.encodeDataIncrementally(result.c_str(), result.length());
+    md5.encodeDataIncrementally(result.c_str(), (int)result.length());
     MD5::Digest digest;
     md5.digest(digest);
     return std::string((char*) digest,
@@ -144,7 +144,7 @@ QPDF::compute_encryption_key(
     pbytes[2] = (char) ((data.P >> 16) & 0xff);
     pbytes[3] = (char) ((data.P >> 24) & 0xff);
     md5.encodeDataIncrementally(pbytes, 4);
-    md5.encodeDataIncrementally(data.id1.c_str(), data.id1.length());
+    md5.encodeDataIncrementally(data.id1.c_str(), (int)data.id1.length());
     if ((data.R >= 4) && (! data.encrypt_metadata))
     {
 	char bytes[4];
@@ -218,7 +218,7 @@ compute_U_value_R3(std::string const& user_password,
     MD5 md5;
     md5.encodeDataIncrementally(
 	pad_or_truncate_password("").c_str(), key_bytes);
-    md5.encodeDataIncrementally(data.id1.c_str(), data.id1.length());
+    md5.encodeDataIncrementally(data.id1.c_str(), (int)data.id1.length());
     MD5::Digest digest;
     md5.digest(digest);
     iterate_rc4(digest, sizeof(MD5::Digest),
@@ -583,16 +583,16 @@ QPDF::decryptString(std::string& str, int objid, int generation)
 	    pl.write((unsigned char*)str.c_str(), str.length());
 	    pl.finish();
 	    PointerHolder<Buffer> buf = bufpl.getBuffer();
-	    str = std::string((char*)buf->getBuffer(), (size_t)buf->getSize());
+	    str = std::string((char*)buf->getBuffer(), buf->getSize());
 	}
 	else
 	{
 	    QTC::TC("qpdf", "QPDF_encryption rc4 decode string");
-	    unsigned int vlen = str.length();
+	    unsigned int vlen = (int)str.length();
 	    // Using PointerHolder guarantees that tmp will
 	    // be freed even if rc4.process throws an exception.
 	    PointerHolder<char> tmp(true, QUtil::copy_string(str));
-	    RC4 rc4((unsigned char const*)key.c_str(), key.length());
+	    RC4 rc4((unsigned char const*)key.c_str(), (int)key.length());
 	    rc4.process((unsigned char*)tmp.getPointer(), vlen);
 	    str = std::string(tmp.getPointer(), vlen);
 	}
@@ -704,7 +704,7 @@ QPDF::decryptStream(Pipeline*& pipeline, int objid, int generation,
     {
 	QTC::TC("qpdf", "QPDF_encryption rc4 decode stream");
 	pipeline = new Pl_RC4("RC4 stream decryption", pipeline,
-			      (unsigned char*) key.c_str(), key.length());
+			      (unsigned char*) key.c_str(), (int)key.length());
     }
     heap.push_back(pipeline);
 }

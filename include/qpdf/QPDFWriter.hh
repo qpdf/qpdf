@@ -21,6 +21,7 @@
 
 #include <qpdf/DLL.h>
 #include <qpdf/Constants.h>
+#include <qpdf/Types.h>
 
 #include <qpdf/QPDFXRefEntry.hh>
 
@@ -219,7 +220,7 @@ class QPDFWriter
     void writePad(int nspaces);
     void assignCompressedObjectNumbers(int objid);
     void enqueueObject(QPDFObjectHandle object);
-    void writeObjectStreamOffsets(std::vector<int>& offsets, int first_obj);
+    void writeObjectStreamOffsets(std::vector<off_t>& offsets, int first_obj);
     void writeObjectStream(QPDFObjectHandle object);
     void writeObject(QPDFObjectHandle object, int object_stream_index = -1);
     void writeTrailer(trailer_e which, int size,
@@ -229,7 +230,7 @@ class QPDFWriter
     void unparseObject(QPDFObjectHandle object, int level,
 		       unsigned int flags,
 		       // for stream dictionaries
-		       int stream_length, bool compress);
+		       size_t stream_length, bool compress);
     void unparseChild(QPDFObjectHandle child, int level, int flags);
     void initializeSpecialStreams();
     void preserveObjectStreams();
@@ -266,8 +267,8 @@ class QPDFWriter
 		       int prev,
 		       bool suppress_offsets,
 		       int hint_id,
-		       int hint_offset,
-		       int hint_length);
+		       off_t hint_offset,
+		       off_t hint_length);
     int writeXRefStream(int objid, int max_id, int max_offset,
 			trailer_e which, int first, int last, int size);
     int writeXRefStream(int objid, int max_id, int max_offset,
@@ -275,8 +276,8 @@ class QPDFWriter
 			// for linearization
 			int prev,
 			int hint_id,
-			int hint_offset,
-			int hint_length,
+			off_t hint_offset,
+			off_t hint_length,
 			bool skip_compression);
     int calculateXrefStreamPadding(int xref_bytes);
 
@@ -295,7 +296,7 @@ class QPDFWriter
     // stack items are of type Pl_Buffer, the buffer is retrieved.
     void popPipelineStack(PointerHolder<Buffer>* bp = 0);
 
-    void adjustAESStreamLength(unsigned long& length);
+    void adjustAESStreamLength(size_t& length);
     void pushEncryptionFilter();
     void pushDiscardFilter();
 
@@ -336,7 +337,7 @@ class QPDFWriter
     std::map<int, size_t> lengths;
     int next_objid;
     int cur_stream_length_id;
-    unsigned long cur_stream_length;
+    size_t cur_stream_length;
     bool added_newline;
     int max_ostream_index;
     std::set<int> normalized_streams;

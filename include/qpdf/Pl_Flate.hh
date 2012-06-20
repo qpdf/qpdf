@@ -24,7 +24,7 @@ class Pl_Flate: public Pipeline
     virtual ~Pl_Flate();
 
     QPDF_DLL
-    virtual void write(unsigned char* data, int len);
+    virtual void write(unsigned char* data, size_t len);
     QPDF_DLL
     virtual void finish();
 

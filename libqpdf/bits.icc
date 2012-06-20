@@ -95,7 +95,7 @@ read_bits(unsigned char const*& p, unsigned int& bit_offset,
 #ifdef BITS_WRITE
 static void
 write_bits(unsigned char& ch, unsigned int& bit_offset,
-	   unsigned long val, unsigned bits, Pipeline* pipeline)
+	   unsigned long val, unsigned int bits, Pipeline* pipeline)
 {
     if (bits > 32)
     {

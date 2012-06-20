@@ -14,18 +14,18 @@ class Pl_RC4: public Pipeline
     QPDF_DLL
     Pl_RC4(char const* identifier, Pipeline* next,
 	   unsigned char const* key_data, int key_len = -1,
-	   int out_bufsize = def_bufsize);
+	   size_t out_bufsize = def_bufsize);
     QPDF_DLL
     virtual ~Pl_RC4();
 
     QPDF_DLL
-    virtual void write(unsigned char* data, int len);
+    virtual void write(unsigned char* data, size_t len);
     QPDF_DLL
     virtual void finish();
 
   private:
     unsigned char* outbuf;
-    int out_bufsize;
+    size_t out_bufsize;
     RC4 rc4;
 };
 

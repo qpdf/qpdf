@@ -24,7 +24,7 @@ class Pl_Discard: public Pipeline
     QPDF_DLL
     virtual ~Pl_Discard();
     QPDF_DLL
-    virtual void write(unsigned char*, int);
+    virtual void write(unsigned char*, size_t);
     QPDF_DLL
     virtual void finish();
 };

@@ -308,7 +308,7 @@ void MD5::reset()
 
 void MD5::encodeString(char const* str)
 {
-    unsigned int len = strlen(str);
+    unsigned int len = (unsigned int)strlen(str);
 
     update((unsigned char *)str, len);
     final();
@@ -316,7 +316,7 @@ void MD5::encodeString(char const* str)
 
 void MD5::appendString(char const* input_string)
 {
-    update((unsigned char *)input_string, strlen(input_string));
+    update((unsigned char *)input_string, (unsigned int) strlen(input_string));
 }
 
 void MD5::encodeDataIncrementally(char const* data, int len)
@@ -332,7 +332,7 @@ void MD5::encodeFile(char const *filename, int up_to_size)
 	std::string("MD5: open ") + filename,
 	fopen(filename, "rb"));
 
-    int len;
+    size_t len;
     int so_far = 0;
     int to_try = 1024;
     do
@@ -344,7 +344,7 @@ void MD5::encodeFile(char const *filename, int up_to_size)
 	len = fread(buffer, 1, to_try, file);
 	if (len > 0)
 	{
-	    update(buffer, len);
+	    update(buffer, (unsigned int) len);
 	    so_far += len;
 	    if ((up_to_size >= 0) && (so_far >= up_to_size))
 	    {

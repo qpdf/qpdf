@@ -16,13 +16,13 @@ Pl_ASCII85Decoder::~Pl_ASCII85Decoder()
 }
 
 void
-Pl_ASCII85Decoder::write(unsigned char* buf, int len)
+Pl_ASCII85Decoder::write(unsigned char* buf, size_t len)
 {
     if (eod > 1)
     {
 	return;
     }
-    for (int i = 0; i < len; ++i)
+    for (size_t i = 0; i < len; ++i)
     {
 	if (eod > 1)
 	{

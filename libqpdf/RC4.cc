@@ -15,7 +15,7 @@ RC4::RC4(unsigned char const* key_data, int key_len)
 {
     if (key_len == -1)
     {
-	key_len = strlen((char*)key_data);
+	key_len = (int)strlen((char*)key_data);
     }
 
     for (int i = 0; i < 256; ++i)
