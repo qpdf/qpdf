@@ -15,6 +15,7 @@
 #include <iostream>
 
 #include <qpdf/DLL.h>
+#include <qpdf/Types.h>
 
 #include <qpdf/QPDFXRefEntry.hh>
 #include <qpdf/QPDFObjectHandle.hh>

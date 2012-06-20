@@ -14,6 +14,7 @@
 #include <map>
 
 #include <qpdf/DLL.h>
+#include <qpdf/Types.h>
 
 #include <qpdf/PointerHolder.hh>
 #include <qpdf/Buffer.hh>

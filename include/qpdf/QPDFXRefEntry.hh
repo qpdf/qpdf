@@ -9,6 +9,7 @@
 #define __QPDFXREFENTRY_HH__
 
 #include <qpdf/DLL.h>
+#include <qpdf/Types.h>
 
 class QPDFXRefEntry
 {
