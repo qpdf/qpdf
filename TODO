@@ -1,19 +1,28 @@
 Next
 ====
 
+Using FIXME as a marker for issues that must be resolved prior to
+release.
+
+https://github.com/qpdf/qpdf/wiki/pdftopdf
+
 *** ABI changes have been made.  build.mk has been updated.
 
- * Do a Windows 64-bit build.  MSVC 2010 Professional x86_64 verified
-   to build and test cleanly in 2.3.1.  Hopefully the next release
-   will include 64-bit binary distributions and external libraries.
+ * Reconsider dumping off_t in favor of qpdf_off_t defined as uint64_t.
 
- * Building 64-bit libraries with MSVC works with existing build.sh as
-   long as the x86_64 version of the compiler is in the path.
-   Currently this generates 32-bit mingw and 64-bit msvc.  We need to
-   figure out a way so that make_windows_releases builds both 32-bit
-   and 64-bit versions and puts them in a sensible place.  This has
-   only been verified with MSVC 2010 so far; we still need to get it
-   working with 64-bit mingw.
+ * 64-bit windows build, remaining steps
+
+    - new external-libs have been built and copied into
+      ~/Q/storage/releases/qpdf/external-libs.  Release is done in
+      git.  Just need to upload when ready.  Remember to document that
+      this version is needed for >= 2.4.
+
+    - make_windows_releases will need to be updated in a manner
+      similar to how external-libs build.sh was: run the two mingw
+      builds, then instruct to run the msvc builds in separately
+      configured shells
+
+    - update docs to indicate that MSVC 2010 is the supported version.
 
  * Provide an option to copy encryption parameters from another file.
    This would make it possible to decrypt a file, manually work with
@@ -23,6 +32,66 @@ Next
  * See if I can support the new encryption formats mentioned in the
    open bug on sourceforge.  Check other sourceforge bugs.
 
+ * Would be nice to confirm that it's working for > 4GB files.
+
+ * Splitting/merging concepts
+
+   newPDF() could create a PDF with just a trailer, no pages, and a
+   minimal info.  Then the page routines could be used to add pages to
+   it.
+
+   Starting with any pdf, you should be able to copy objects from
+   another pdf.  The copy should be smart about never traversing into
+   a /Page or /Pages.
+
+   We could provide a method of copying objects from one PDF into
+   another.  This would do whatever optimization is necessary (maybe
+   just optimizePagesTree) and then traverse the set of objects
+   specified to find all objects referenced by the set.  Each of those
+   would be copied over with a table mapping old ID to new ID.  This
+   would be done from bottom up most likely disallowing cycles or
+   handling them sanely.
+
+   Command line could be something like
+
+   --pages [ --new ] { file [password] numeric-range ... } ... --
+
+   The first file referenced would be the one whose other data would
+   be preserved (like trailer, info, encryption, outlines, etc.).
+   --new as first file would just use an empty file as the starting
+   point.
+
+   Example: to grab pages 1-5 from file1 and 11-15 from file2
+
+   --pages file1.pdf 1-5 file2.pdf 11-15 --
+
+   To implement this, we would remove all pages from file1 except
+   pages 1 through 5.  Then we would take pages 11 through 15 from
+   file2 and add them to a set for transfer.  This would end up
+   generating a list of indirect objects.  We would copy those objects
+   shallowly to the new PDF keeping track of the mapping and replacing
+   any indirect object keys as appropriate, much like QPDFWriter does.
+
+   When all the objects are registered, we would add those pages to
+   the result.
+
+   This approach could work for both splitting and merging.  It's
+   possible it could be implemented now without any new APIs, but most
+   of the work should be doable by the library with only a small set
+   of additions.
+
+   newPDF()
+   QPDFObjectCopier c(qpdf1, qpdf2)
+   QPDFObjectHandle obj = c.copyObject(<object from qpdf1>)
+     Without traversing pages, copies all indirect objects referenced
+     by <object from qpdf1> preserving referential integrity and
+     returns an object handle in qpdf2 of the same object.  If called
+     multiple times on the same object, retraverses in case there were
+     changes.
+
+   QPDFObjectHandle obj = c.getMapping(<object from qpdf1>)
+     find the object in qpdf2 corresponding to the object from qpdf1.
+     Return the null object if none.
 
 General
 =======
