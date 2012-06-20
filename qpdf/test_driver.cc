@@ -284,8 +284,28 @@ void runtest(int n, char const* filename)
 			 QPDFObjectHandle::newString("Mr. Potato Head"));
 	// qtest.A and qtest.B.A were originally the same object.
 	// They no longer are after makeDirect().  Mutate one of them
-	// and ensure the other is not changed.
-	qtest.getKey("/A").setArrayItem(1, QPDFObjectHandle::newInteger(5));
+	// and ensure the other is not changed.  These test cases are
+	// crafted around a specific set of input files.
+        QPDFObjectHandle A = qtest.getKey("/A");
+        if (A.getArrayItem(0).getIntValue() == 1)
+        {
+            // Test mutators
+            A.setArrayItem(1, QPDFObjectHandle::newInteger(5)); // 1 5 3
+            A.insertItem(2, QPDFObjectHandle::newInteger(10)); // 1 5 10 3
+            A.appendItem(QPDFObjectHandle::newInteger(12)); // 1 5 10 3 12
+            A.eraseItem(3); // 1 5 10 12
+            A.insertItem(4, QPDFObjectHandle::newInteger(6)); // 1 5 10 12 6
+            A.insertItem(0, QPDFObjectHandle::newInteger(9)); // 9 1 5 10 12 6
+        }
+        else
+        {
+            std::vector<QPDFObjectHandle> items;
+            items.push_back(QPDFObjectHandle::newInteger(14));
+            items.push_back(QPDFObjectHandle::newInteger(15));
+            items.push_back(QPDFObjectHandle::newInteger(9));
+            A.setArrayFromVector(items);
+        }
+
 	trailer.replaceKey("/Info", pdf.makeIndirectObject(qtest));
 	QPDFWriter w(pdf, 0);
 	w.setQDFMode(true);
