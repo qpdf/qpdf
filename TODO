@@ -8,6 +8,8 @@ https://github.com/qpdf/qpdf/wiki/pdftopdf
 
 *** ABI changes have been made.  build.mk has been updated.
 
+ * Add pkg-config
+
  * Reconsider dumping off_t in favor of qpdf_off_t defined as uint64_t.
 
  * 64-bit windows build, remaining steps
