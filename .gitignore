@@ -5,6 +5,8 @@ config.log
 config.status
 configure
 doc/fix-qdf.1
+doc/qpdf-manual.html
+doc/qpdf-manual.pdf
 doc/qpdf.1
 doc/zlib-flate.1
 examples/build/
@@ -14,6 +16,7 @@ libqpdf/qpdf/qpdf-config.h
 libqpdf/qpdf/qpdf-config.h.in
 libtests/build/
 libtool
+manual/build/
 manual/html.xsl
 manual/print.xsl
 qpdf/build/
