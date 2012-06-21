@@ -7,19 +7,19 @@ use File::Basename;
 
 my $whoami = basename($0);
 
-usage() unless @ARGV == 2;
-my ($file, $destdir) = @ARGV;
+usage() unless @ARGV == 3;
+my ($file, $destdir, $objdump) = @ARGV;
 my $filedir = dirname($file);
 
 my %dlls = ();
-open(O, "objdump -p $file|") or die "$whoami: can't run objdump\n";
+open(O, "$objdump -p $file|") or die "$whoami: can't run objdump\n";
 while (<O>)
 {
     if (m/^\s+DLL Name:\s+(.+\.dll)/i)
     {
 	my $dll = $1;
 	$dll =~ tr/A-Z/a-z/;
-	next if $dll =~ m/^(kernel32|msvcrt)\.dll$/;
+	next if $dll =~ m/^(kernel32|user32|msvcrt)\.dll$/;
 	$dlls{$dll} = 1;
     }
 }

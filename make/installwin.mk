@@ -10,7 +10,7 @@ installwin: all
 	mkdir $(DEST)/doc
 	cp libqpdf/$(OUTPUT_DIR)/$(STATIC_LIB_NAME) $(DEST)/lib
 	cp libqpdf/$(OUTPUT_DIR)/qpdf*.dll $(DEST)/bin
-	perl copy_dlls libqpdf/$(OUTPUT_DIR)/qpdf*.dll $(DEST)/bin
+	perl copy_dlls libqpdf/$(OUTPUT_DIR)/qpdf*.dll $(DEST)/bin $(OBJDUMP)
 	cp qpdf/$(OUTPUT_DIR)/qpdf.exe $(DEST)/bin
 	cp zlib-flate/$(OUTPUT_DIR)/zlib-flate.exe $(DEST)/bin
 	cp qpdf/fix-qdf $(DEST)/bin

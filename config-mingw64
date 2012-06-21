@@ -1,0 +1,10 @@
+#!/bin/sh
+./configure --disable-test-compare-images --enable-external-libs --with-windows-wordsize=64 --with-buildrules=mingw \
+    CC=x86_64-w64-mingw32-gcc \
+    CXX=x86_64-w64-mingw32-g++ \
+    LD=x86_64-w64-mingw32-ld \
+    AR=x86_64-w64-mingw32-ar \
+    RANLIB=x86_64-w64-mingw32-ranlib \
+    DLLTOOL=x86_64-w64-mingw32-dlltool \
+    STRIP=x86_64-w64-mingw32-strip \
+    OBJDUMP=x86_64-w64-mingw32-objdump

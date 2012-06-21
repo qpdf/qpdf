@@ -1,0 +1,24 @@
+#!/bin/sh
+if [ ! -d external-libs ]; then
+   echo "Please extract qpdf-external-libs-bin.zip and try again"
+   exit 2
+fi
+
+set -e
+set -x
+cwd=`pwd`
+PATH=$cwd/libqpdf/build:$PATH
+
+cd install-mingw32
+v=`ls -d qpdf-*`
+cd ..
+
+for i in mingw32 mingw64 msvc32 msvc64; do
+  cp -p README-windows-install.txt install-$i/$v/README.txt
+  (cd install-$i; zip -r ../$v-bin-$i.zip $v)
+done
+
+set +x
+
+echo ""
+echo "$v-bin-mingw{32,64}.zip and $v-bin-msvc{32,64}.zip have been created."

@@ -9,29 +9,19 @@ set -x
 cwd=`pwd`
 PATH=$cwd/libqpdf/build:$PATH
 
-rm -rf install-mingw install-msvc
+rm -rf install-mingw* install-msvc*
 
-./config-mingw
+./config-mingw64
 make check install
 make distclean
-./config-msvc
+./config-mingw32
 make check install
 make distclean
-
-cd install-mingw
-v=`ls -d qpdf-*`
-cd ..
-
-cp -p README-windows-install.txt install-mingw/$v/README.txt
-cp -p README-windows-install.txt install-msvc/$v/README.txt
-
-cd install-mingw
-zip -r ../$v-bin-mingw.zip $v
-cd ../install-msvc
-zip -r ../$v-bin-msvc.zip $v
-cd ..
 
 set +x
 
-echo ""
-echo "$v-bin-mingw.zip and $v-bin-msvc.zip have been created."
+echo ''
+echo 'Now run "./make_windows_releases-msvc 64" in a 64-bit MSVC environment'
+echo 'and "./make_windows_releases-msvc 32" in a 32-bit MSVC environment.'
+echo 'Then run "./make_windows_releases-msvc-finish".'
+echo ''
