@@ -1,6 +1,12 @@
 2012-06-21  Jay Berkenbilt  <ejb@ql.org>
 
-	* libqpdf/QPDF.cc: new processFile method that takes an open FILE*
+	* QPDF: add new APIs for adding and removing pages.  This includes
+	addPage(), addPageAt(), and removePage().  Also a method
+	updateAllPagesCache() is now available to force update of the
+	internal pages cache if you should modify the pages structure
+	manually.
+
+	* QPDF: new processFile method that takes an open FILE*
 	instead of a filename.
 
 2012-06-20  Jay Berkenbilt  <ejb@ql.org>
