@@ -45,8 +45,7 @@ QPDF::getAllPages()
 {
     if (this->all_pages.empty())
     {
-	getAllPagesInternal(
-	    this->trailer.getKey("/Root").getKey("/Pages"), this->all_pages);
+	getAllPagesInternal(getRoot().getKey("/Pages"), this->all_pages);
     }
     return this->all_pages;
 }
@@ -106,7 +105,7 @@ QPDF::flattenPagesTree()
     optimizePagesTree(true);
     getAllPages();
 
-    QPDFObjectHandle pages = this->trailer.getKey("/Root").getKey("/Pages");
+    QPDFObjectHandle pages = getRoot().getKey("/Pages");
 
     int const len = (int)this->all_pages.size();
     for (int pos = 0; pos < len; ++pos)
@@ -170,7 +169,7 @@ QPDF::insertPage(QPDFObjectHandle newpage, int pos)
             (pos == ((int)this->all_pages.size())) ? 1 : // insert at end
             2);                                   // insert in middle
 
-    QPDFObjectHandle pages = this->trailer.getKey("/Root").getKey("/Pages");
+    QPDFObjectHandle pages = getRoot().getKey("/Pages");
     QPDFObjectHandle kids = pages.getKey("/Kids");
     assert ((pos >= 0) && (pos <= (int)this->all_pages.size()));
 
@@ -197,7 +196,7 @@ QPDF::removePage(QPDFObjectHandle page)
             (pos == ((int)this->all_pages.size() - 1)) ? 1 : // remove at end
             2);                                       // remove in middle
 
-    QPDFObjectHandle pages = this->trailer.getKey("/Root").getKey("/Pages");
+    QPDFObjectHandle pages = getRoot().getKey("/Pages");
     QPDFObjectHandle kids = pages.getKey("/Kids");
 
     kids.eraseItem(pos);
