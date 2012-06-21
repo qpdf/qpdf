@@ -340,14 +340,26 @@ class QPDF
     // Convenience routines for common functions.  See also
     // QPDFObjectHandle.hh for additional convenience routines.
 
-    // Traverse page tree return all /Page objects.
+    // Page handling API
+
+    // Traverse page tree return all /Page objects.  Note that calls
+    // to page manipulation APIs will change the internal vector that
+    // this routine returns a pointer to.  If you don't want that,
+    // assign this to a regular vector rather than a const reference.
     QPDF_DLL
     std::vector<QPDFObjectHandle> const& getAllPages();
 
-    // QPDF internally caches the /Pages tree.  This method will clear
-    // the cache when e.g. direct modifications have been made.
+    // This method synchronizes QPDF's cache of the page structure
+    // with the actual /Pages tree.  If you restrict changes to the
+    // /Pages tree, including addition, removal, or replacement of
+    // pages or changes to any /Pages objects, to calls to these page
+    // handling APIs, you never need to call this method.  If you
+    // modify /Pages structures directly, you must call this method
+    // afterwards.  This method updates the internal list of pages, so
+    // after calling this method, any previous references returned by
+    // getAllPages() will be valid again.
     QPDF_DLL
-    void clearPagesCache();
+    void updateAllPagesCache();
 
     // Add new page at the beginning or the end of the current pdf
     QPDF_DLL
@@ -356,11 +368,11 @@ class QPDF
     // Add new page before or after refpage
     QPDF_DLL
     void addPageAt(QPDFObjectHandle newpage, bool before,
-                   QPDFObjectHandle const& refpage);
+                   QPDFObjectHandle refpage);
 
-    // Remove pageoh from the pdf.
+    // Remove page from the pdf.
     QPDF_DLL
-    void removePage(QPDFObjectHandle const& pageoh);
+    void removePage(QPDFObjectHandle page);
 
     // Resolver class is restricted to QPDFObjectHandle so that only
     // it can resolve indirect references.
@@ -541,12 +553,12 @@ class QPDF
 
     void getAllPagesInternal(QPDFObjectHandle cur_pages,
 			     std::vector<QPDFObjectHandle>& result);
-    // creates pageobj_to_pages_pos if necessary
-    // returns position, or -1 if not found
+    void insertPage(QPDFObjectHandle newpage, int pos);
     int findPage(int objid, int generation);
-    int findPage(QPDFObjectHandle const& pageoh); // convenience
-
+    int findPage(QPDFObjectHandle& page);
     void flattenPagesTree();
+    void insertPageobjToPage(QPDFObjectHandle const& obj, int pos,
+                             bool check_duplicate);
 
     // methods to support encryption -- implemented in QPDF_encryption.cc
     encryption_method_e interpretCF(QPDFObjectHandle);

@@ -203,3 +203,7 @@ qpdf-c called qpdf_init_write_memory 0
 exercise processFile(name) 0
 exercise processFile(FILE*) 0
 exercise processMemoryFile 0
+QPDF duplicate page reference 0
+QPDF remove page 2
+QPDF insert page 2
+QPDF updateAllPagesCache 0
