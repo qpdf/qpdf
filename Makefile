@@ -96,6 +96,7 @@ distclean: clean
 	$(RM) manual/html.xsl
 	$(RM) manual/print.xsl
 	$(RM) doc/*.1
+	$(RM) libqpdf.pc
 
 maintainer-clean: distclean
 	$(RM) configure doc/qpdf-manual.* libqpdf/qpdf/qpdf-config.h.in

@@ -7,6 +7,7 @@ AC_INIT([qpdf],[2.3.1])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_FILES([autoconf.mk])
 AC_CONFIG_FILES([manual/html.xsl manual/print.xsl])
+AC_CONFIG_FILES([libqpdf.pc])
 AC_CONFIG_HEADERS([libqpdf/qpdf/qpdf-config.h])
 
 AC_PROG_CC

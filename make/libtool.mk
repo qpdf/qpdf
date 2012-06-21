@@ -103,7 +103,7 @@ endef
 # Install target
 
 install: all
-	./mkinstalldirs $(DESTDIR)$(libdir)
+	./mkinstalldirs $(DESTDIR)$(libdir)/pkgconfig
 	./mkinstalldirs $(DESTDIR)$(bindir)
 	./mkinstalldirs $(DESTDIR)$(includedir)/qpdf
 	./mkinstalldirs $(DESTDIR)$(docdir)
@@ -126,3 +126,4 @@ install: all
 	cp doc/qpdf-manual.html $(DESTDIR)$(docdir)
 	cp doc/qpdf-manual.pdf $(DESTDIR)$(docdir)
 	cp doc/*.1 $(DESTDIR)$(mandir)/man1
+	cp libqpdf.pc $(DESTDIR)$(libdir)/pkgconfig

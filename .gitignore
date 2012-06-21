@@ -8,6 +8,7 @@ doc/fix-qdf.1
 doc/qpdf.1
 doc/zlib-flate.1
 examples/build/
+libqpdf.pc
 libqpdf/build/
 libqpdf/qpdf/qpdf-config.h
 libqpdf/qpdf/qpdf-config.h.in
