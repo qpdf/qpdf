@@ -1,30 +1,20 @@
 Next
 ====
 
-Using FIXME as a marker for issues that must be resolved prior to
-release.
-
-https://github.com/qpdf/qpdf/wiki/pdftopdf
-
 *** ABI changes have been made.  build.mk has been updated.
-
- * Add pkg-config
-
- * Reconsider dumping off_t in favor of qpdf_off_t defined as uint64_t.
 
  * 64-bit windows build, remaining steps
 
     - new external-libs have been built and copied into
       ~/Q/storage/releases/qpdf/external-libs.  Release is done in
       git.  Just need to upload when ready.  Remember to document that
-      this version is needed for >= 2.4.
+      this version is needed for > 2.3.1.
 
-    - make_windows_releases will need to be updated in a manner
-      similar to how external-libs build.sh was: run the two mingw
-      builds, then instruct to run the msvc builds in separately
-      configured shells
+    - update README-windows.txt docs to indicate that MSVC 2010 is the
+      supported version and to update the information about mingw.
 
-    - update docs to indicate that MSVC 2010 is the supported version.
+Soon
+====
 
  * Provide an option to copy encryption parameters from another file.
    This would make it possible to decrypt a file, manually work with
