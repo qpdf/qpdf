@@ -1,5 +1,7 @@
 2012-06-21  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add pkg-config files
+
 	* QPDFObjectHandle: add shallowCopy() method
 
 	* QPDF: add new APIs for adding and removing pages.  This includes
