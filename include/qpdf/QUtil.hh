@@ -10,6 +10,7 @@
 
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
+
 #include <string>
 #include <list>
 #include <stdexcept>

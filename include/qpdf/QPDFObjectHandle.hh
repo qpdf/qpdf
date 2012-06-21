@@ -8,13 +8,13 @@
 #ifndef __QPDFOBJECTHANDLE_HH__
 #define __QPDFOBJECTHANDLE_HH__
 
+#include <qpdf/DLL.h>
+#include <qpdf/Types.h>
+
 #include <string>
 #include <vector>
 #include <set>
 #include <map>
-
-#include <qpdf/DLL.h>
-#include <qpdf/Types.h>
 
 #include <qpdf/PointerHolder.hh>
 #include <qpdf/Buffer.hh>

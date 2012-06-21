@@ -1,7 +1,6 @@
 #ifndef __MD5_HH__
 #define __MD5_HH__
 
-#include <string>
 #include <qpdf/DLL.h>
 #include <qpdf/qpdf-config.h>
 #ifdef HAVE_INTTYPES_H
@@ -10,6 +9,7 @@
 #ifdef HAVE_STDINT_H
 # include <stdint.h>
 #endif
+#include <string>
 
 class MD5
 {

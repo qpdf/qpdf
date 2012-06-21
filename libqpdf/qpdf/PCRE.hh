@@ -5,14 +5,14 @@
 #ifndef __PCRE_HH__
 #define __PCRE_HH__
 
+#include <qpdf/DLL.h>
+
 #ifdef _WIN32
 # define PCRE_STATIC
 #endif
 #include <pcre.h>
 #include <string>
 #include <stdexcept>
-
-#include <qpdf/DLL.h>
 
 // Note: this class does not encapsulate all features of the PCRE
 // package -- only those that I actually need right now are here.

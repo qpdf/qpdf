@@ -70,8 +70,8 @@
  */
 
 #include <qpdf/DLL.h>
-#include <qpdf/Constants.h>
 #include <qpdf/Types.h>
+#include <qpdf/Constants.h>
 
 #ifdef __cplusplus
 extern "C" {

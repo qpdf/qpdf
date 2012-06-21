@@ -1,6 +1,10 @@
 #ifndef __QPDFTYPES_H__
 #define __QPDFTYPES_H__
 
+/* This file must be included before any system files.  It should be
+ * included right after <qpdf/DLL.h> within the library.
+ */
+
 /* Attempt to provide off_t and size_t on any recent platform.  To
  * make cross compilation easier and to be more portable across
  * platforms, QPDF avoids having any public header files use the

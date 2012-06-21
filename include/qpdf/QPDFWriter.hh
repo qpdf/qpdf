@@ -12,6 +12,9 @@
 #ifndef __QPDFWRITER_HH__
 #define __QPDFWRITER_HH__
 
+#include <qpdf/DLL.h>
+#include <qpdf/Types.h>
+
 #include <stdio.h>
 #include <string>
 #include <list>
@@ -19,9 +22,7 @@
 #include <set>
 #include <map>
 
-#include <qpdf/DLL.h>
 #include <qpdf/Constants.h>
-#include <qpdf/Types.h>
 
 #include <qpdf/QPDFXRefEntry.hh>
 

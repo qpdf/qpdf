@@ -1,8 +1,9 @@
 #ifndef __QPDF_STREAM_HH__
 #define __QPDF_STREAM_HH__
 
-#include <qpdf/QPDFObject.hh>
+#include <qpdf/Types.h>
 
+#include <qpdf/QPDFObject.hh>
 #include <qpdf/QPDFObjectHandle.hh>
 
 class Pipeline;

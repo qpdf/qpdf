@@ -8,14 +8,14 @@
 #ifndef __QPDF_HH__
 #define __QPDF_HH__
 
+#include <qpdf/DLL.h>
+#include <qpdf/Types.h>
+
 #include <stdio.h>
 #include <string>
 #include <map>
 #include <list>
 #include <iostream>
-
-#include <qpdf/DLL.h>
-#include <qpdf/Types.h>
 
 #include <qpdf/QPDFXRefEntry.hh>
 #include <qpdf/QPDFObjectHandle.hh>
