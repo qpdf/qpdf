@@ -779,6 +779,34 @@ void runtest(int n, char const* filename)
         pdf.removePage(pages[0]);
         std::cout << "you can't see this" << std::endl;
     }
+    else if (n == 18)
+    {
+        // Remove a page and re-insert it in the same file.
+        std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
+
+        // Remove pages from various places, checking to make sure
+        // that our pages reference is getting updated.
+        assert(pages.size() == 10);
+        QPDFObjectHandle page5 = pages[5];
+        pdf.removePage(page5);
+        pdf.addPage(page5, false);
+        assert(pages.size() == 10);
+        assert(pages.back().getObjectID() == page5.getObjectID());
+
+	QPDFWriter w(pdf, "a.pdf");
+	w.setStaticID(true);
+	w.setStreamDataMode(qpdf_s_preserve);
+	w.write();
+    }
+    else if (n == 19)
+    {
+        // Remove a page and re-insert it in the same file.
+        std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
+
+        // Try to insert a page that's already there.
+        pdf.addPage(pages[5], false);
+        std::cout << "you can't see this" << std::endl;
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +
