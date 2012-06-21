@@ -6,7 +6,7 @@
 2012-06-20  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add new array mutation routines to QPDFObjectHandle.
-	Implemented by Tobias Hoffner.
+	Implemented by Tobias Hoffmann.
 
 	* Rework APIs that use size_t, off_t, and primative integer types
 	so that size_t is used for sizes of memory and off_t is used for
