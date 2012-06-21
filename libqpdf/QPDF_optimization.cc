@@ -1,4 +1,4 @@
-// See "Optimization" sectino of manual.
+// See the "Optimization" section of the manual.
 
 #include <qpdf/QPDF.hh>
 
