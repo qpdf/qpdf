@@ -1,3 +1,24 @@
+2012-06-20  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add new array mutation routines to QPDFObjectHandle.
+	Implemented by Tobias Hoffner.
+
+	* Rework APIs that use size_t, off_t, and primative integer types
+	so that size_t is used for sizes of memory and off_t is used for
+	file offsets.  Also set _FILE_OFFSET_BITS so that large files can
+	be supported on 32-bit UNIX/Linux platforms.  The code assumes in
+	places that sizeof(off_t) >= sizeof(size_t).  This resulted in
+	non-compatible ABI changes and hopefully clears the way for QPDF
+	to work with files that are larger than 4 GiB in size.
+
+	* Add support for versioned symbols on ELF platforms.
+
+	* Various fixes for gcc 4.7
+
+2011-04-06  Jay Berkenbilt  <ejb@ql.org>
+
+        * Fix PCRE to stop using deprecated (and now dropped) interfaces.
+
 2011-12-28  Jay Berkenbilt  <ejb@ql.org>
 
 	* 2.3.1: release
