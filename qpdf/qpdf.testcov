@@ -207,3 +207,5 @@ QPDF duplicate page reference 0
 QPDF remove page 2
 QPDF insert page 2
 QPDF updateAllPagesCache 0
+QPDF insert non-indirect page 0
+QPDF insert indirect page 0

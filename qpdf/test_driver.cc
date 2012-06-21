@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 #include <map>
 
 static char const* whoami = 0;
@@ -56,8 +57,34 @@ class Provider: public QPDFObjectHandle::StreamDataProvider
     bool bad_length;
 };
 
+static void checkPageContents(QPDFObjectHandle page,
+                              std::string const& wanted_string)
+{
+    PointerHolder<Buffer> b1 =
+        page.getKey("/Contents").getStreamData();
+    std::string contents = std::string((char *)(b1->getBuffer()));
+    if (contents.find(wanted_string) == std::string::npos)
+    {
+        std::cout << "didn't find " << wanted_string << " in "
+                  << contents << std::endl;
+    }
+}
+
+static QPDFObjectHandle createPageContents(QPDF& pdf, std::string const& text)
+{
+    std::string contents = "BT /F1 15 Tf 72 720 Td (" + text + ") Tj ET\n";
+    PointerHolder<Buffer> b = new Buffer(contents.length());
+    unsigned char* bp = b->getBuffer();
+    memcpy(bp, (char*)contents.c_str(), contents.length());
+    return QPDFObjectHandle::newStream(&pdf, b);
+}
+
 void runtest(int n, char const* filename)
 {
+    // Most tests here are crafted to work on specific files.  Look at
+    // the test suite to see how the test is invoked to find the file
+    // that the test is supposed to operate on.
+
     QPDF pdf;
     PointerHolder<char> file_buf;
     FILE* filep = 0;
@@ -628,6 +655,129 @@ void runtest(int n, char const* filename)
 	fwrite(b->getBuffer(), b->getSize(), 1, f);
 	fclose(f);
 	delete b;
+    }
+    else if (n == 15)
+    {
+        std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
+        // Reference to original page numbers for this test case are
+        // numbered from 0.
+
+        // Remove pages from various places, checking to make sure
+        // that our pages reference is getting updated.
+        assert(pages.size() == 10);
+        pdf.removePage(pages.back()); // original page 9
+        assert(pages.size() == 9);
+        pdf.removePage(*pages.begin()); // original page 0
+        assert(pages.size() == 8);
+        checkPageContents(pages[4], "Original page 5");
+        pdf.removePage(pages[4]); // original page 5
+        assert(pages.size() == 7);
+        checkPageContents(pages[4], "Original page 6");
+        checkPageContents(pages[0], "Original page 1");
+        checkPageContents(pages[6], "Original page 8");
+
+        // Insert pages
+
+        // Create some content streams.
+        std::vector<QPDFObjectHandle> contents;
+        contents.push_back(createPageContents(pdf, "New page 1"));
+        contents.push_back(createPageContents(pdf, "New page 0"));
+        contents.push_back(createPageContents(pdf, "New page 5"));
+        contents.push_back(createPageContents(pdf, "New page 6"));
+        contents.push_back(createPageContents(pdf, "New page 11"));
+        contents.push_back(createPageContents(pdf, "New page 12"));
+
+        // Create some page objects.  Start with an existing
+        // dictionary and modify it.  Using the results of
+        // getDictAsMap to create a new dictionary effectively creates
+        // a shallow copy.
+        std::map<std::string, QPDFObjectHandle> page_dict_keys =
+            QPDFObjectHandle(pages[0]).getDictAsMap();
+        std::vector<QPDFObjectHandle> new_pages;
+        for (std::vector<QPDFObjectHandle>::iterator iter = contents.begin();
+             iter != contents.end(); ++iter)
+        {
+            // We will retain indirect object references to other
+            // indirect objects other than page content.
+            page_dict_keys["/Contents"] = *iter;
+            QPDFObjectHandle page =
+                QPDFObjectHandle::newDictionary(page_dict_keys);
+            if (iter == contents.begin())
+            {
+                // leave direct
+                new_pages.push_back(page);
+            }
+            else
+            {
+                new_pages.push_back(pdf.makeIndirectObject(page));
+            }
+        }
+
+        // Now insert the pages
+        pdf.addPage(new_pages[0], true);
+        checkPageContents(pages[0], "New page 1");
+        pdf.addPageAt(new_pages[1], true, pages[0]);
+        assert(pages[0].getObjectID() == new_pages[1].getObjectID());
+        pdf.addPageAt(new_pages[2], true, pages[5]);
+        assert(pages[5].getObjectID() == new_pages[2].getObjectID());
+        pdf.addPageAt(new_pages[3], false, pages[5]);
+        assert(pages[6].getObjectID() == new_pages[3].getObjectID());
+        assert(pages.size() == 11);
+        pdf.addPage(new_pages[4], false);
+        assert(pages[11].getObjectID() == new_pages[4].getObjectID());
+        pdf.addPageAt(new_pages[5], false, pages.back());
+        assert(pages.size() == 13);
+        checkPageContents(pages[0], "New page 0");
+        checkPageContents(pages[1], "New page 1");
+        checkPageContents(pages[5], "New page 5");
+        checkPageContents(pages[6], "New page 6");
+        checkPageContents(pages[11], "New page 11");
+        checkPageContents(pages[12], "New page 12");
+
+	QPDFWriter w(pdf, "a.pdf");
+	w.setStaticID(true);
+	w.setStreamDataMode(qpdf_s_preserve);
+	w.write();
+    }
+    else if (n == 16)
+    {
+        // Insert a page manually and then update the cache.
+        std::vector<QPDFObjectHandle> const& all_pages = pdf.getAllPages();
+
+        QPDFObjectHandle contents = createPageContents(pdf, "New page 10");
+        std::map<std::string, QPDFObjectHandle> page_dict_keys =
+            QPDFObjectHandle(all_pages[0]).getDictAsMap();
+        page_dict_keys["/Contents"] = contents;
+        QPDFObjectHandle page =
+            pdf.makeIndirectObject(
+                QPDFObjectHandle::newDictionary(page_dict_keys));
+
+        // Insert the page manually.
+	QPDFObjectHandle root = pdf.getRoot();
+	QPDFObjectHandle pages = root.getKey("/Pages");
+	QPDFObjectHandle kids = pages.getKey("/Kids");
+        page.replaceKey("/Parent", pages);
+        pages.replaceKey(
+            "/Count",
+            QPDFObjectHandle::newInteger(1 + (int)all_pages.size()));
+        kids.appendItem(page);
+        assert(all_pages.size() == 10);
+        pdf.updateAllPagesCache();
+        assert(all_pages.size() == 11);
+        assert(all_pages.back().getObjectID() == page.getObjectID());
+
+	QPDFWriter w(pdf, "a.pdf");
+	w.setStaticID(true);
+	w.setStreamDataMode(qpdf_s_preserve);
+	w.write();
+    }
+    else if (n == 17)
+    {
+        // The input file to this test case is broken to exercise an
+        // error condition.
+        std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
+        pdf.removePage(pages[0]);
+        std::cout << "you can't see this" << std::endl;
     }
     else
     {

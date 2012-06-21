@@ -110,6 +110,28 @@ $td->runtest("new stream",
 
 show_ntests();
 # ----------
+$td->notify("--- Page API Tests ---");
+$n_tests += 5;
+
+$td->runtest("basic page API",
+	     {$td->COMMAND => "test_driver 15 page_api_1.pdf"},
+	     {$td->STRING => "test 15 done\n", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "page_api_1-out.pdf"});
+$td->runtest("manual page manipulation",
+	     {$td->COMMAND => "test_driver 16 page_api_1.pdf"},
+	     {$td->STRING => "test 16 done\n", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "page_api_1-out2.pdf"});
+$td->runtest("duplicate page",
+	     {$td->COMMAND => "test_driver 17 page_api_2.pdf"},
+	     {$td->FILE => "page_api_2.out", $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+# ----------
 $td->notify("--- Miscellaneous Tests ---");
 $n_tests += 37;
 

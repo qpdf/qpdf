@@ -126,18 +126,23 @@ QPDF::insertPageobjToPage(QPDFObjectHandle const& obj, int pos,
                           bool check_duplicate)
 {
     ObjGen og(obj.getObjectID(), obj.getGeneration());
-    bool duplicate =
-        (! this->pageobj_to_pages_pos.insert(std::make_pair(og, pos)).second);
-    if (duplicate && check_duplicate)
+    if (check_duplicate)
     {
-        QTC::TC("qpdf", "QPDF duplicate page reference");
-        setLastObjectDescription("page " + QUtil::int_to_string(pos) +
-                                 " (numbered from zero)",
-                                 og.obj, og.gen);
-        throw QPDFExc(qpdf_e_pages, this->file->getName(),
-                      this->last_object_description, 0,
-                      "duplicate page reference found;"
-                      " this would cause loss of data");
+        if (! this->pageobj_to_pages_pos.insert(std::make_pair(og, pos)).second)
+        {
+            QTC::TC("qpdf", "QPDF duplicate page reference");
+            setLastObjectDescription("page " + QUtil::int_to_string(pos) +
+                                     " (numbered from zero)",
+                                     og.obj, og.gen);
+            throw QPDFExc(qpdf_e_pages, this->file->getName(),
+                          this->last_object_description, 0,
+                          "duplicate page reference found;"
+                          " this would cause loss of data");
+        }
+    }
+    else
+    {
+        this->pageobj_to_pages_pos[og] = pos;
     }
 }
 
@@ -149,6 +154,16 @@ QPDF::insertPage(QPDFObjectHandle newpage, int pos)
 
     flattenPagesTree();
     newpage.assertPageObject();
+
+    if (! newpage.isIndirect())
+    {
+        QTC::TC("qpdf", "QPDF insert non-indirect page");
+        newpage = this->makeIndirectObject(newpage);
+    }
+    else
+    {
+        QTC::TC("qpdf", "QPDF insert indirect page");
+    }
 
     QTC::TC("qpdf", "QPDF insert page",
             (pos == 0) ? 0 :                      // insert at beginning
