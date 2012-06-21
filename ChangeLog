@@ -1,3 +1,8 @@
+2012-06-21  Jay Berkenbilt  <ejb@ql.org>
+
+	* libqpdf/QPDF.cc: new processFile method that takes an open FILE*
+	instead of a filename.
+
 2012-06-20  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add new array mutation routines to QPDFObjectHandle.

@@ -200,3 +200,6 @@ qpdf-c set_info_key to null 0
 qpdf-c set-info-key use existing info 0
 qpdf-c add info to trailer 0
 qpdf-c called qpdf_init_write_memory 0
+exercise processFile(name) 0
+exercise processFile(FILE*) 0
+exercise processMemoryFile 0

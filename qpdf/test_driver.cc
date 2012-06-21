@@ -60,17 +60,29 @@ void runtest(int n, char const* filename)
 {
     QPDF pdf;
     PointerHolder<char> file_buf;
+    FILE* filep = 0;
     if (n == 0)
     {
 	pdf.setAttemptRecovery(false);
     }
     if (n % 2 == 0)
     {
-	pdf.processFile(filename);
+        if (n % 4 == 0)
+        {
+	    QTC::TC("qpdf", "exercise processFile(name)");
+            pdf.processFile(filename);
+        }
+        else
+        {
+	    QTC::TC("qpdf", "exercise processFile(FILE*)");
+            filep = QUtil::fopen_wrapper(std::string("open ") + filename,
+                                         fopen(filename, "rb"));
+            pdf.processFile(filep);
+        }
     }
     else
     {
-	// Exercise processMemoryFile
+        QTC::TC("qpdf", "exercise processMemoryFile");
 	FILE* f = QUtil::fopen_wrapper(std::string("open ") + filename,
 				       fopen(filename, "rb"));
 	fseek(f, 0, SEEK_END);
@@ -623,6 +635,10 @@ void runtest(int n, char const* filename)
 				 QUtil::int_to_string(n));
     }
 
+    if (filep)
+    {
+        fclose(filep);
+    }
     std::cout << "test " << n << " done" << std::endl;
 }
 

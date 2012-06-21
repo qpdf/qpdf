@@ -80,6 +80,7 @@ QPDF::InputSource::readLine()
 }
 
 QPDF::FileInputSource::FileInputSource() :
+    close_file(false),
     file(0)
 {
 }
@@ -89,8 +90,19 @@ QPDF::FileInputSource::setFilename(char const* filename)
 {
     destroy();
     this->filename = filename;
+    this->close_file = true;
     this->file = QUtil::fopen_wrapper(std::string("open ") + this->filename,
 				      fopen(this->filename.c_str(), "rb"));
+}
+
+void
+QPDF::FileInputSource::setFile(FILE* f)
+{
+    destroy();
+    this->filename = "stdio FILE";
+    this->close_file = false;
+    this->file = f;
+    this->seek(0, SEEK_SET);
 }
 
 QPDF::FileInputSource::~FileInputSource()
@@ -101,7 +113,7 @@ QPDF::FileInputSource::~FileInputSource()
 void
 QPDF::FileInputSource::destroy()
 {
-    if (this->file)
+    if (this->file && this->close_file)
     {
 	fclose(this->file);
 	this->file = 0;
@@ -313,6 +325,15 @@ QPDF::processFile(char const* filename, char const* password)
     FileInputSource* fi = new FileInputSource();
     this->file = fi;
     fi->setFilename(filename);
+    parse(password);
+}
+
+void
+QPDF::processFile(FILE* filep, char const* password)
+{
+    FileInputSource* fi = new FileInputSource();
+    this->file = fi;
+    fi->setFile(filep);
     parse(password);
 }
 
