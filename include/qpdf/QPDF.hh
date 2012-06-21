@@ -873,7 +873,8 @@ class QPDF
 
     // Methods to support optimization
 
-    void optimizePagesTree(
+    void optimizePagesTree(bool allow_changes);
+    void optimizePagesTreeInternal(
 	QPDFObjectHandle,
 	std::map<std::string, std::vector<QPDFObjectHandle> >&,
 	int& pageno, bool allow_changes);

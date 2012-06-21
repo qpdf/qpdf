@@ -167,15 +167,7 @@ QPDF::optimize(std::map<int, int> const& object_stream_data,
 
     // Traverse pages tree pushing all inherited resources down to the
     // page level.
-
-    // key_ancestors is a mapping of page attribute keys to a stack of
-    // Pages nodes that contain values for them.  pageno is the
-    // current page sequence number numbered from 0.
-    std::map<std::string, std::vector<QPDFObjectHandle> > key_ancestors;
-    int pageno = 0;
-    optimizePagesTree(this->trailer.getKey("/Root").getKey("/Pages"),
-		      key_ancestors, pageno, allow_changes);
-    assert(key_ancestors.empty());
+    optimizePagesTree(allow_changes);
 
     // Traverse document-level items
     std::set<std::string> keys = this->trailer.getKeys();
@@ -220,7 +212,23 @@ QPDF::optimize(std::map<int, int> const& object_stream_data,
 }
 
 void
-QPDF::optimizePagesTree(
+QPDF::optimizePagesTree(bool allow_changes)
+{
+    // Traverse pages tree pushing all inherited resources down to the
+    // page level.
+
+    // key_ancestors is a mapping of page attribute keys to a stack of
+    // Pages nodes that contain values for them.  pageno is the
+    // current page sequence number numbered from 0.
+    std::map<std::string, std::vector<QPDFObjectHandle> > key_ancestors;
+    int pageno = 0;
+    optimizePagesTreeInternal(this->trailer.getKey("/Root").getKey("/Pages"),
+                              key_ancestors, pageno, allow_changes);
+    assert(key_ancestors.empty());
+}
+
+void
+QPDF::optimizePagesTreeInternal(
     QPDFObjectHandle cur_pages,
     std::map<std::string, std::vector<QPDFObjectHandle> >& key_ancestors,
     int& pageno, bool allow_changes)
@@ -293,8 +301,8 @@ QPDF::optimizePagesTree(
 	int n = kids.getArrayNItems();
 	for (int i = 0; i < n; ++i)
 	{
-	    optimizePagesTree(kids.getArrayItem(i), key_ancestors, pageno,
-			      allow_changes);
+	    optimizePagesTreeInternal(
+                kids.getArrayItem(i), key_ancestors, pageno, allow_changes);
 	}
 
 	// For each inheritable key, pop the stack.  If the stack
