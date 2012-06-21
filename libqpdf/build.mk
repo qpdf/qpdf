@@ -43,6 +43,7 @@ SRCS_libqpdf = \
 	libqpdf/QPDF_encryption.cc \
 	libqpdf/QPDF_linearization.cc \
 	libqpdf/QPDF_optimization.cc \
+	libqpdf/QPDF_pages.cc \
 	libqpdf/QTC.cc \
 	libqpdf/QUtil.cc \
 	libqpdf/RC4.cc \
