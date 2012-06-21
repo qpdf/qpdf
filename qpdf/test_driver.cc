@@ -691,17 +691,15 @@ void runtest(int n, char const* filename)
         // dictionary and modify it.  Using the results of
         // getDictAsMap to create a new dictionary effectively creates
         // a shallow copy.
-        std::map<std::string, QPDFObjectHandle> page_dict_keys =
-            QPDFObjectHandle(pages[0]).getDictAsMap();
+        QPDFObjectHandle page_tempate = pages[0];
         std::vector<QPDFObjectHandle> new_pages;
         for (std::vector<QPDFObjectHandle>::iterator iter = contents.begin();
              iter != contents.end(); ++iter)
         {
             // We will retain indirect object references to other
             // indirect objects other than page content.
-            page_dict_keys["/Contents"] = *iter;
-            QPDFObjectHandle page =
-                QPDFObjectHandle::newDictionary(page_dict_keys);
+            QPDFObjectHandle page = page_tempate.shallowCopy();
+            page.replaceKey("/Contents", *iter);
             if (iter == contents.begin())
             {
                 // leave direct
@@ -745,12 +743,10 @@ void runtest(int n, char const* filename)
         std::vector<QPDFObjectHandle> const& all_pages = pdf.getAllPages();
 
         QPDFObjectHandle contents = createPageContents(pdf, "New page 10");
-        std::map<std::string, QPDFObjectHandle> page_dict_keys =
-            QPDFObjectHandle(all_pages[0]).getDictAsMap();
-        page_dict_keys["/Contents"] = contents;
         QPDFObjectHandle page =
             pdf.makeIndirectObject(
-                QPDFObjectHandle::newDictionary(page_dict_keys));
+                QPDFObjectHandle(all_pages[0]).shallowCopy());
+        page.replaceKey("/Contents", contents);
 
         // Insert the page manually.
 	QPDFObjectHandle root = pdf.getRoot();
@@ -805,6 +801,30 @@ void runtest(int n, char const* filename)
 
         // Try to insert a page that's already there.
         pdf.addPage(pages[5], false);
+        std::cout << "you can't see this" << std::endl;
+    }
+    else if (n == 20)
+    {
+        // Shallow copy an array
+	QPDFObjectHandle trailer = pdf.getTrailer();
+	QPDFObjectHandle qtest = trailer.getKey("/QTest");
+        QPDFObjectHandle copy = qtest.shallowCopy();
+        // Append shallow copy of a scalar
+        copy.appendItem(trailer.getKey("/Size").shallowCopy());
+        trailer.replaceKey("/QTest2", copy);
+
+	QPDFWriter w(pdf, "a.pdf");
+	w.setStaticID(true);
+	w.setStreamDataMode(qpdf_s_preserve);
+	w.write();
+    }
+    else if (n == 21)
+    {
+        // Try to shallow copy a stream
+        std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
+        QPDFObjectHandle page = pages[0];
+        QPDFObjectHandle contents = page.getKey("/Contents");
+        contents.shallowCopy();
         std::cout << "you can't see this" << std::endl;
     }
     else

@@ -144,7 +144,7 @@ $td->runtest("duplicate page",
 	     $td->NORMALIZE_NEWLINES);
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 37;
+$n_tests += 40;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -337,6 +337,18 @@ $td->runtest("check output",
 	     {$td->FILE => "a.pdf"},
 	     {$td->FILE => "c-info-out.pdf"});
 unlink "a.pdf" or die;
+
+$td->runtest("shallow copy an array",
+	     {$td->COMMAND => "test_driver 20 shallow_array.pdf"},
+	     {$td->STRING => "test 20 done\n", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "shallow_array-out.pdf"});
+$td->runtest("shallow copy a stream",
+	     {$td->COMMAND => "test_driver 21 shallow_array.pdf"},
+	     {$td->FILE => "shallow_stream.out", $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 
 show_ntests();
 # ----------

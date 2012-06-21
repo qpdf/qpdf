@@ -209,3 +209,7 @@ QPDF insert page 2
 QPDF updateAllPagesCache 0
 QPDF insert non-indirect page 0
 QPDF insert indirect page 0
+QPDFObjectHandle ERR shallow copy stream 0
+QPDFObjectHandle shallow copy array 0
+QPDFObjectHandle shallow copy dictionary 0
+QPDFObjectHandle shallow copy scalar 0

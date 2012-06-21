@@ -1,5 +1,7 @@
 2012-06-21  Jay Berkenbilt  <ejb@ql.org>
 
+	* QPDFObjectHandle: add shallowCopy() method
+
 	* QPDF: add new APIs for adding and removing pages.  This includes
 	addPage(), addPageAt(), and removePage().  Also a method
 	updateAllPagesCache() is now available to force update of the

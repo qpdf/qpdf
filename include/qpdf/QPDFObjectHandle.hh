@@ -190,6 +190,13 @@ class QPDFObjectHandle
     QPDF_DLL
     bool isOrHasName(std::string const&);
 
+    // Create a shallow copy of an object as a direct object.  Since
+    // this is a shallow copy, for dictionaries and arrays, any keys
+    // or items that were indirect objects will still be indirect
+    // objects that point to the same place.
+    QPDF_DLL
+    QPDFObjectHandle shallowCopy();
+
     // Mutator methods.  Use with caution.
 
     // Recursively copy this object, making it direct.  Throws an
