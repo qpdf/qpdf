@@ -27,14 +27,14 @@ class Pl_Count: public Pipeline
     virtual void finish();
     // Returns the number of bytes written
     QPDF_DLL
-    off_t getCount() const;
+    qpdf_offset_t getCount() const;
     // Returns the last character written, or '\0' if no characters
     // have been written (in which case getCount() returns 0)
     QPDF_DLL
     unsigned char getLastChar() const;
 
   private:
-    off_t count;
+    qpdf_offset_t count;
     unsigned char last_char;
 };
 

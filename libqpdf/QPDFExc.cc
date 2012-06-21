@@ -4,7 +4,7 @@
 QPDFExc::QPDFExc(qpdf_error_code_e error_code,
 		 std::string const& filename,
 		 std::string const& object,
-		 off_t offset,
+		 qpdf_offset_t offset,
 		 std::string const& message) :
     std::runtime_error(createWhat(filename, object, offset, message)),
     error_code(error_code),
@@ -22,7 +22,7 @@ QPDFExc::~QPDFExc() throw ()
 std::string
 QPDFExc::createWhat(std::string const& filename,
 		    std::string const& object,
-		    off_t offset,
+		    qpdf_offset_t offset,
 		    std::string const& message)
 {
     std::string result;
@@ -73,7 +73,7 @@ QPDFExc::getObject() const
     return this->object;
 }
 
-off_t
+qpdf_offset_t
 QPDFExc::getFilePosition() const
 {
     return this->offset;

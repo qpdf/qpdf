@@ -21,7 +21,7 @@ class QPDFExc: public std::runtime_error
     QPDFExc(qpdf_error_code_e error_code,
 	    std::string const& filename,
 	    std::string const& object,
-	    off_t offset,
+	    qpdf_offset_t offset,
 	    std::string const& message);
     QPDF_DLL
     virtual ~QPDFExc() throw ();
@@ -43,20 +43,20 @@ class QPDFExc: public std::runtime_error
     QPDF_DLL
     std::string const& getObject() const;
     QPDF_DLL
-    off_t getFilePosition() const;
+    qpdf_offset_t getFilePosition() const;
     QPDF_DLL
     std::string const& getMessageDetail() const;
 
   private:
     static std::string createWhat(std::string const& filename,
 				  std::string const& object,
-				  off_t offset,
+				  qpdf_offset_t offset,
 				  std::string const& message);
 
     qpdf_error_code_e error_code;
     std::string filename;
     std::string object;
-    off_t offset;
+    qpdf_offset_t offset;
     std::string message;
 };
 

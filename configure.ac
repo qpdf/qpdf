@@ -11,6 +11,7 @@ AC_CONFIG_FILES([libqpdf.pc])
 AC_CONFIG_HEADERS([libqpdf/qpdf/qpdf-config.h])
 
 AC_PROG_CC
+AC_PROG_CC_C99
 AC_PROG_CXX
 AC_HEADER_STDC
 LT_INIT([win32-dll])

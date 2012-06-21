@@ -1,5 +1,9 @@
 2012-06-21  Jay Berkenbilt  <ejb@ql.org>
 
+	* Instead of using off_t in the public APIs, use qpdf_offset_t
+	instead.  This is defined as long long in qpdf/Types.h.  If your
+	system doesn't support long long, you can redefine it.
+
 	* Add pkg-config files
 
 	* QPDFObjectHandle: add shallowCopy() method

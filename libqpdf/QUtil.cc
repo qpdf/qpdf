@@ -82,6 +82,16 @@ QUtil::double_to_string(double num, int decimal_places)
     return std::string(t);
 }
 
+long long
+QUtil::string_to_ll(char const* str)
+{
+#ifdef _MSC_VER
+    return _strtoi64(str, 0, 10);
+#else
+    return strtoll(str, 0, 10);
+#endif
+}
+
 void
 QUtil::throw_system_error(std::string const& description)
 {
@@ -109,22 +119,22 @@ QUtil::fopen_wrapper(std::string const& description, FILE* f)
 }
 
 int
-QUtil::fseek_off_t(FILE* stream, off_t offset, int whence)
+QUtil::fseek_off_t(FILE* stream, qpdf_offset_t offset, int whence)
 {
 #if HAVE_FSEEKO
-    return fseeko(stream, offset, whence);
+    return fseeko(stream, (off_t)offset, whence);
 #else
-    return fseek(stream, offset, whence);
+    return fseek(stream, (long)offset, whence);
 #endif
 }
 
-off_t
+qpdf_offset_t
 QUtil::ftell_off_t(FILE* stream)
 {
 #if HAVE_FSEEKO
-    return ftello(stream);
+    return (qpdf_offset_t)ftello(stream);
 #else
-    return ftell(stream);
+    return (qpdf_offset_t)ftell(stream);
 #endif
 }
 

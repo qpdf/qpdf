@@ -305,15 +305,15 @@ QPDF::readLinearizationData()
 }
 
 QPDFObjectHandle
-QPDF::readHintStream(Pipeline& pl, off_t offset, size_t length)
+QPDF::readHintStream(Pipeline& pl, qpdf_offset_t offset, size_t length)
 {
     int obj;
     int gen;
     QPDFObjectHandle H = readObjectAtOffset(
 	false, offset, "linearization hint stream", -1, 0, obj, gen);
     ObjCache& oc = this->obj_cache[ObjGen(obj, gen)];
-    off_t min_end_offset = oc.end_before_space;
-    off_t max_end_offset = oc.end_after_space;
+    qpdf_offset_t min_end_offset = oc.end_before_space;
+    qpdf_offset_t max_end_offset = oc.end_after_space;
     if (! H.isStream())
     {
 	throw QPDFExc(qpdf_e_damaged_pdf, this->file->getName(),
@@ -345,7 +345,7 @@ QPDF::readHintStream(Pipeline& pl, off_t offset, size_t length)
     {
 	QTC::TC("qpdf", "QPDF hint table length direct");
     }
-    off_t computed_end = offset + (off_t)length;
+    qpdf_offset_t computed_end = offset + (qpdf_offset_t)length;
     if ((computed_end < min_end_offset) ||
 	(computed_end > max_end_offset))
     {

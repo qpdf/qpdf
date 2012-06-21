@@ -221,7 +221,8 @@ class QPDFWriter
     void writePad(int nspaces);
     void assignCompressedObjectNumbers(int objid);
     void enqueueObject(QPDFObjectHandle object);
-    void writeObjectStreamOffsets(std::vector<off_t>& offsets, int first_obj);
+    void writeObjectStreamOffsets(
+        std::vector<qpdf_offset_t>& offsets, int first_obj);
     void writeObjectStream(QPDFObjectHandle object);
     void writeObject(QPDFObjectHandle object, int object_stream_index = -1);
     void writeTrailer(trailer_e which, int size,
@@ -268,8 +269,8 @@ class QPDFWriter
 		       int prev,
 		       bool suppress_offsets,
 		       int hint_id,
-		       off_t hint_offset,
-		       off_t hint_length);
+		       qpdf_offset_t hint_offset,
+		       qpdf_offset_t hint_length);
     int writeXRefStream(int objid, int max_id, int max_offset,
 			trailer_e which, int first, int last, int size);
     int writeXRefStream(int objid, int max_id, int max_offset,
@@ -277,8 +278,8 @@ class QPDFWriter
 			// for linearization
 			int prev,
 			int hint_id,
-			off_t hint_offset,
-			off_t hint_length,
+			qpdf_offset_t hint_offset,
+			qpdf_offset_t hint_length,
 			bool skip_compression);
     int calculateXrefStreamPadding(int xref_bytes);
 

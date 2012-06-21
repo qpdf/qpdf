@@ -22,7 +22,7 @@ std::map<std::string, std::string> QPDF_Stream::filter_abbreviations;
 
 QPDF_Stream::QPDF_Stream(QPDF* qpdf, int objid, int generation,
 			 QPDFObjectHandle stream_dict,
-			 off_t offset, size_t length) :
+			 qpdf_offset_t offset, size_t length) :
     qpdf(qpdf),
     objid(objid),
     generation(generation),
@@ -379,8 +379,8 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline, bool filter,
 	Pl_Count count("stream provider count", pipeline);
 	this->stream_provider->provideStreamData(
 	    this->objid, this->generation, &count);
-	off_t actual_length = count.getCount();
-	off_t desired_length =
+	qpdf_offset_t actual_length = count.getCount();
+	qpdf_offset_t desired_length =
 	    this->stream_dict.getKey("/Length").getIntValue();
 	if (actual_length == desired_length)
 	{

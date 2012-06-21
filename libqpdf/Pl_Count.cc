@@ -28,7 +28,7 @@ Pl_Count::finish()
     getNext()->finish();
 }
 
-off_t
+qpdf_offset_t
 Pl_Count::getCount() const
 {
     return this->count;

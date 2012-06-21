@@ -879,7 +879,7 @@ QPDFWriter::writeTrailer(trailer_e which, int size, bool xref_stream, int prev)
 		if (which == t_lin_first)
 		{
 		    writeString(" /Prev ");
-		    off_t pos = this->pipeline->getCount();
+		    qpdf_offset_t pos = this->pipeline->getCount();
 		    writeString(QUtil::int_to_string(prev));
 		    int nspaces = (int)(pos - this->pipeline->getCount() + 11);
 		    assert(nspaces >= 0);
@@ -1165,7 +1165,7 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 }
 
 void
-QPDFWriter::writeObjectStreamOffsets(std::vector<off_t>& offsets,
+QPDFWriter::writeObjectStreamOffsets(std::vector<qpdf_offset_t>& offsets,
 				     int first_obj)
 {
     for (unsigned int i = 0; i < offsets.size(); ++i)
@@ -1191,8 +1191,8 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
     int old_id = object.getObjectID();
     int new_id = obj_renumber[old_id];
 
-    std::vector<off_t> offsets;
-    off_t first = 0;
+    std::vector<qpdf_offset_t> offsets;
+    qpdf_offset_t first = 0;
 
     // Generate stream itself.  We have to do this in two passes so we
     // can calculate offsets in the first pass.
@@ -1210,7 +1210,7 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
 	    // Adjust offsets to skip over comment before first object
 
 	    first = offsets[0];
-	    for (std::vector<off_t>::iterator iter = offsets.begin();
+	    for (std::vector<qpdf_offset_t>::iterator iter = offsets.begin();
 		 iter != offsets.end(); ++iter)
 	    {
 		*iter -= first;
@@ -1820,13 +1820,14 @@ QPDFWriter::writeXRefTable(trailer_e which, int first, int last, int size)
 int
 QPDFWriter::writeXRefTable(trailer_e which, int first, int last, int size,
 			   int prev, bool suppress_offsets,
-			   int hint_id, off_t hint_offset, off_t hint_length)
+			   int hint_id, qpdf_offset_t hint_offset,
+                           qpdf_offset_t hint_length)
 {
     writeString("xref\n");
     writeString(QUtil::int_to_string(first));
     writeString(" ");
     writeString(QUtil::int_to_string(last - first + 1));
-    off_t space_before_zero = this->pipeline->getCount();
+    qpdf_offset_t space_before_zero = this->pipeline->getCount();
     writeString("\n");
     for (int i = first; i <= last; ++i)
     {
@@ -1868,10 +1869,11 @@ int
 QPDFWriter::writeXRefStream(int xref_id, int max_id, int max_offset,
 			    trailer_e which, int first, int last, int size,
 			    int prev, int hint_id,
-			    off_t hint_offset, off_t hint_length,
+			    qpdf_offset_t hint_offset,
+                            qpdf_offset_t hint_length,
 			    bool skip_compression)
 {
-    off_t xref_offset = this->pipeline->getCount();
+    qpdf_offset_t xref_offset = this->pipeline->getCount();
     int space_before_zero = xref_offset - 1;
 
     // field 1 contains offsets and object stream identifiers
@@ -2081,13 +2083,13 @@ QPDFWriter::writeLinearized()
 
     int part4_end_marker = part4.back().getObjectID();
     int part6_end_marker = part6.back().getObjectID();
-    off_t space_before_zero = 0;
-    off_t file_size = 0;
-    off_t part6_end_offset = 0;
-    off_t first_half_max_obj_offset = 0;
-    off_t second_xref_offset = 0;
-    off_t first_xref_end = 0;
-    off_t second_xref_end = 0;
+    qpdf_offset_t space_before_zero = 0;
+    qpdf_offset_t file_size = 0;
+    qpdf_offset_t part6_end_offset = 0;
+    qpdf_offset_t first_half_max_obj_offset = 0;
+    qpdf_offset_t second_xref_offset = 0;
+    qpdf_offset_t first_xref_end = 0;
+    qpdf_offset_t second_xref_end = 0;
 
     this->next_objid = part4_first_obj;
     enqueuePart(part4);
@@ -2101,7 +2103,7 @@ QPDFWriter::writeLinearized()
     enqueuePart(part9);
     assert(this->next_objid == after_second_half);
 
-    off_t hint_length = 0;
+    qpdf_offset_t hint_length = 0;
     PointerHolder<Buffer> hint_buffer;
 
     // Write file in two passes.  Part numbers refer to PDF spec 1.4.
@@ -2122,7 +2124,7 @@ QPDFWriter::writeLinearized()
 	// space if all numerical values in the parameter dictionary
 	// are 10 digits long plus a few extra characters for safety.
 
-	off_t pos = this->pipeline->getCount();
+	qpdf_offset_t pos = this->pipeline->getCount();
 	openObject(lindict_id);
 	writeString("<<");
 	if (pass == 2)
@@ -2158,8 +2160,8 @@ QPDFWriter::writeLinearized()
 
 	// Part 3: first page cross reference table and trailer.
 
-	off_t first_xref_offset = this->pipeline->getCount();
-	off_t hint_offset = 0;
+	qpdf_offset_t first_xref_offset = this->pipeline->getCount();
+	qpdf_offset_t hint_offset = 0;
 	if (pass == 2)
 	{
 	    hint_offset = this->xref[hint_id].getOffset();
@@ -2187,7 +2189,7 @@ QPDFWriter::writeLinearized()
 			    hint_length + second_xref_offset,
 			    hint_id, hint_offset, hint_length,
 			    (pass == 1));
-	    off_t endpos = this->pipeline->getCount();
+	    qpdf_offset_t endpos = this->pipeline->getCount();
 	    if (pass == 1)
 	    {
 		// Pad so we have enough room for the real xref
@@ -2264,7 +2266,7 @@ QPDFWriter::writeLinearized()
 				t_lin_second, 0, second_half_end,
 				second_trailer_size,
 				0, 0, 0, 0, (pass == 1));
-	    off_t endpos = this->pipeline->getCount();
+	    qpdf_offset_t endpos = this->pipeline->getCount();
 
 	    if (pass == 1)
 	    {
@@ -2278,14 +2280,14 @@ QPDFWriter::writeLinearized()
 	    else
 	    {
 		// Make the file size the same.
-		off_t pos = this->pipeline->getCount();
+		qpdf_offset_t pos = this->pipeline->getCount();
 		writePad(second_xref_end + hint_length - 1 - pos);
 		writeString("\n");
 
 		// If this assertion fails, maybe we didn't have
 		// enough padding above.
 		assert(this->pipeline->getCount() ==
-		       (off_t)(second_xref_end + hint_length));
+		       (qpdf_offset_t)(second_xref_end + hint_length));
 	    }
 	}
 	else
@@ -2313,7 +2315,7 @@ QPDFWriter::writeLinearized()
 	    activatePipelineStack();
 	    writeHintStream(hint_id);
 	    popPipelineStack(&hint_buffer);
-	    hint_length = (off_t)hint_buffer->getSize();
+	    hint_length = (qpdf_offset_t)hint_buffer->getSize();
 
 	    // Restore hint offset
 	    this->xref[hint_id] = QPDFXRefEntry(1, hint_offset, 0);
@@ -2358,7 +2360,7 @@ QPDFWriter::writeStandard()
     }
 
     // Now write out xref.  next_objid is now the number of objects.
-    off_t xref_offset = this->pipeline->getCount();
+    qpdf_offset_t xref_offset = this->pipeline->getCount();
     if (this->object_stream_to_objects.empty())
     {
 	// Write regular cross-reference table

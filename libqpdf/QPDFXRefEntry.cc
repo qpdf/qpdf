@@ -9,7 +9,7 @@ QPDFXRefEntry::QPDFXRefEntry() :
 {
 }
 
-QPDFXRefEntry::QPDFXRefEntry(int type, off_t field1, int field2) :
+QPDFXRefEntry::QPDFXRefEntry(int type, qpdf_offset_t field1, int field2) :
     type(type),
     field1(field1),
     field2(field2)
@@ -27,7 +27,7 @@ QPDFXRefEntry::getType() const
     return this->type;
 }
 
-off_t
+qpdf_offset_t
 QPDFXRefEntry::getOffset() const
 {
     if (this->type != 1)

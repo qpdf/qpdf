@@ -10,7 +10,6 @@
 
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
-
 #include <string>
 #include <list>
 #include <stdexcept>
@@ -25,6 +24,9 @@ namespace QUtil
     std::string int_to_string(long long, int length = 0);
     QPDF_DLL
     std::string double_to_string(double, int decimal_places = 0);
+
+    QPDF_DLL
+    long long string_to_ll(char const* str);
 
     // Throw std::runtime_error with a string formed by appending to
     // "description: " the standard string corresponding to the
@@ -48,9 +50,9 @@ namespace QUtil
 
     // Wrap around off_t versions of fseek and ftell if available
     QPDF_DLL
-    int fseek_off_t(FILE* stream, off_t offset, int whence);
+    int fseek_off_t(FILE* stream, qpdf_offset_t offset, int whence);
     QPDF_DLL
-    off_t ftell_off_t(FILE* stream);
+    qpdf_offset_t ftell_off_t(FILE* stream);
 
     QPDF_DLL
     char* copy_string(std::string const&);

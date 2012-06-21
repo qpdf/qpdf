@@ -14,7 +14,7 @@ class QPDF_Stream: public QPDFObject
   public:
     QPDF_Stream(QPDF*, int objid, int generation,
 		QPDFObjectHandle stream_dict,
-		off_t offset, size_t length);
+		qpdf_offset_t offset, size_t length);
     virtual ~QPDF_Stream();
     virtual std::string unparse();
     QPDFObjectHandle getDict() const;
@@ -51,7 +51,7 @@ class QPDF_Stream: public QPDFObject
     int objid;
     int generation;
     QPDFObjectHandle stream_dict;
-    off_t offset;
+    qpdf_offset_t offset;
     size_t length;
     PointerHolder<Buffer> stream_data;
     PointerHolder<QPDFObjectHandle::StreamDataProvider> stream_provider;

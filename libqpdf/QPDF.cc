@@ -18,12 +18,12 @@
 std::string QPDF::qpdf_version = "2.3.1";
 
 void
-QPDF::InputSource::setLastOffset(off_t offset)
+QPDF::InputSource::setLastOffset(qpdf_offset_t offset)
 {
     this->last_offset = offset;
 }
 
-off_t
+qpdf_offset_t
 QPDF::InputSource::getLastOffset() const
 {
     return this->last_offset;
@@ -36,7 +36,7 @@ QPDF::InputSource::readLine()
     // without caring what the exact terminator is.  Consume the
     // trailing newline characters but don't return them.
 
-    off_t offset = this->tell();
+    qpdf_offset_t offset = this->tell();
     std::string buf;
     enum { st_before_nl, st_at_nl } state = st_before_nl;
     char ch;
@@ -126,14 +126,14 @@ QPDF::FileInputSource::getName() const
     return this->filename;
 }
 
-off_t
+qpdf_offset_t
 QPDF::FileInputSource::tell()
 {
     return QUtil::ftell_off_t(this->file);
 }
 
 void
-QPDF::FileInputSource::seek(off_t offset, int whence)
+QPDF::FileInputSource::seek(qpdf_offset_t offset, int whence)
 {
     QUtil::os_wrapper(std::string("seek to ") + this->filename + ", offset " +
 		      QUtil::int_to_string(offset) + " (" +
@@ -193,14 +193,14 @@ QPDF::BufferInputSource::getName() const
     return this->description;
 }
 
-off_t
+qpdf_offset_t
 QPDF::BufferInputSource::tell()
 {
     return this->cur_offset;
 }
 
 void
-QPDF::BufferInputSource::seek(off_t offset, int whence)
+QPDF::BufferInputSource::seek(qpdf_offset_t offset, int whence)
 {
     switch (whence)
     {
@@ -209,7 +209,7 @@ QPDF::BufferInputSource::seek(off_t offset, int whence)
 	break;
 
       case SEEK_END:
-	this->cur_offset = (off_t)this->buf->getSize() + offset;
+	this->cur_offset = (qpdf_offset_t)this->buf->getSize() + offset;
 	break;
 
       case SEEK_CUR:
@@ -232,7 +232,7 @@ QPDF::BufferInputSource::rewind()
 size_t
 QPDF::BufferInputSource::read(char* buffer, size_t length)
 {
-    off_t end_pos = (off_t) this->buf->getSize();
+    qpdf_offset_t end_pos = (qpdf_offset_t) this->buf->getSize();
     if (this->cur_offset >= end_pos)
     {
 	this->last_offset = end_pos;
@@ -453,7 +453,7 @@ QPDF::parse(char const* password)
 	    throw QPDFExc(qpdf_e_damaged_pdf, this->file->getName(), "", 0,
 			  "can't find startxref");
 	}
-	off_t xref_offset = atol(m2.getMatch(1).c_str());
+	qpdf_offset_t xref_offset = QUtil::string_to_ll(m2.getMatch(1).c_str());
 	read_xref(xref_offset);
     }
     catch (QPDFExc& e)
@@ -524,7 +524,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
     }
 
     this->file->seek(0, SEEK_END);
-    off_t eof = this->file->tell();
+    qpdf_offset_t eof = this->file->tell();
     this->file->seek(0, SEEK_SET);
     bool in_obj = false;
     while (this->file->tell() < eof)
@@ -591,7 +591,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
 }
 
 void
-QPDF::read_xref(off_t xref_offset)
+QPDF::read_xref(qpdf_offset_t xref_offset)
 {
     std::map<int, int> free_table;
     while (xref_offset)
@@ -634,7 +634,7 @@ QPDF::read_xref(off_t xref_offset)
 }
 
 int
-QPDF::read_xrefTable(off_t xref_offset)
+QPDF::read_xrefTable(qpdf_offset_t xref_offset)
 {
     PCRE xref_first_re("^\\s*(\\d+)\\s+(\\d+)");
     PCRE xref_entry_re("(?s:(^\\d{10}) (\\d{5}) ([fn])[ \r\n]{2}$)");
@@ -692,7 +692,7 @@ QPDF::read_xrefTable(off_t xref_offset)
 		insertXrefEntry(i, 1, f1, f2);
 	    }
 	}
-	off_t pos = this->file->tell();
+	qpdf_offset_t pos = this->file->tell();
 	QPDFTokenizer::Token t = readToken(this->file);
 	if (t == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "trailer"))
 	{
@@ -791,7 +791,7 @@ QPDF::read_xrefTable(off_t xref_offset)
 }
 
 int
-QPDF::read_xrefStream(off_t xref_offset)
+QPDF::read_xrefStream(qpdf_offset_t xref_offset)
 {
     bool found = false;
     if (! this->ignore_xref_streams)
@@ -830,7 +830,7 @@ QPDF::read_xrefStream(off_t xref_offset)
 }
 
 int
-QPDF::processXRefStream(off_t xref_offset, QPDFObjectHandle& xref_obj)
+QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
 {
     QPDFObjectHandle dict = xref_obj.getDict();
     QPDFObjectHandle W_obj = dict.getKey("/W");
@@ -1123,7 +1123,7 @@ QPDF::readObject(PointerHolder<InputSource> input,
 		 int objid, int generation, bool in_object_stream)
 {
     setLastObjectDescription(description, objid, generation);
-    off_t offset = input->tell();
+    qpdf_offset_t offset = input->tell();
     QPDFObjectHandle object = readObjectInternal(
 	input, objid, generation, in_object_stream, false, false);
     // Override last_offset so that it points to the beginning of the
@@ -1149,7 +1149,7 @@ QPDF::readObjectInternal(PointerHolder<InputSource> input,
 
     QPDFObjectHandle object;
 
-    off_t offset = input->tell();
+    qpdf_offset_t offset = input->tell();
     std::vector<QPDFObjectHandle> olist;
     bool done = false;
     while (! done)
@@ -1347,7 +1347,7 @@ QPDF::readObjectInternal(PointerHolder<InputSource> input,
 	if (! in_object_stream)
 	{
 	    // check for stream
-	    off_t cur_offset = input->tell();
+	    qpdf_offset_t cur_offset = input->tell();
 	    if (readToken(input) ==
 		QPDFTokenizer::Token(QPDFTokenizer::tt_word, "stream"))
 	    {
@@ -1416,7 +1416,7 @@ QPDF::readObjectInternal(PointerHolder<InputSource> input,
 		// Must get offset before accessing any additional
 		// objects since resolving a previously unresolved
 		// indirect object will change file position.
-		off_t stream_offset = input->tell();
+		qpdf_offset_t stream_offset = input->tell();
 		size_t length = 0;
 
 		try
@@ -1440,7 +1440,8 @@ QPDF::readObjectInternal(PointerHolder<InputSource> input,
 		    }
 
 		    length = length_obj.getIntValue();
-		    input->seek(stream_offset + (off_t)length, SEEK_SET);
+		    input->seek(
+                        stream_offset + (qpdf_offset_t)length, SEEK_SET);
 		    if (! (readToken(input) ==
 			   QPDFTokenizer::Token(
 			       QPDFTokenizer::tt_word, "endstream")))
@@ -1480,7 +1481,8 @@ QPDF::readObjectInternal(PointerHolder<InputSource> input,
 
 size_t
 QPDF::recoverStreamLength(PointerHolder<InputSource> input,
-			  int objid, int generation, off_t stream_offset)
+			  int objid, int generation,
+                          qpdf_offset_t stream_offset)
 {
     PCRE endobj_re("^\\s*endobj\\b");
 
@@ -1491,10 +1493,10 @@ QPDF::recoverStreamLength(PointerHolder<InputSource> input,
 		 "attempting to recover stream length"));
 
     input->seek(0, SEEK_END);
-    off_t eof = input->tell();
+    qpdf_offset_t eof = input->tell();
     input->seek(stream_offset, SEEK_SET);
     std::string last_line;
-    off_t last_line_offset = 0;
+    qpdf_offset_t last_line_offset = 0;
     size_t length = 0;
     while (input->tell() < eof)
     {
@@ -1568,7 +1570,7 @@ QPDF::recoverStreamLength(PointerHolder<InputSource> input,
 QPDFTokenizer::Token
 QPDF::readToken(PointerHolder<InputSource> input)
 {
-    off_t offset = input->tell();
+    qpdf_offset_t offset = input->tell();
     QPDFTokenizer::Token token;
     bool unread_char;
     char char_to_unread;
@@ -1611,7 +1613,7 @@ QPDF::readToken(PointerHolder<InputSource> input)
 
 QPDFObjectHandle
 QPDF::readObjectAtOffset(bool try_recovery,
-			 off_t offset, std::string const& description,
+			 qpdf_offset_t offset, std::string const& description,
 			 int exp_objid, int exp_generation,
 			 int& objid, int& generation)
 {
@@ -1663,7 +1665,7 @@ QPDF::readObjectAtOffset(bool try_recovery,
 	    if (this->xref_table.count(og) &&
 		(this->xref_table[og].getType() == 1))
 	    {
-		off_t new_offset = this->xref_table[og].getOffset();
+		qpdf_offset_t new_offset = this->xref_table[og].getOffset();
 		QPDFObjectHandle result = readObjectAtOffset(
 		    false, new_offset, description,
 		    exp_objid, exp_generation, objid, generation);
@@ -1717,7 +1719,7 @@ QPDF::readObjectAtOffset(bool try_recovery,
 	// linearization hint tables.  Offsets and lengths of objects
 	// may imply the end of an object to be anywhere between these
 	// values.
-	off_t end_before_space = this->file->tell();
+	qpdf_offset_t end_before_space = this->file->tell();
 
 	// skip over spaces
 	while (true)
@@ -1738,7 +1740,7 @@ QPDF::readObjectAtOffset(bool try_recovery,
 			      "EOF after endobj");
 	    }
 	}
-	off_t end_after_space = this->file->tell();
+	qpdf_offset_t end_after_space = this->file->tell();
 
 	this->obj_cache[og] =
 	    ObjCache(QPDFObjectHandle::ObjAccessor::getObject(oh),
@@ -1768,7 +1770,7 @@ QPDF::resolve(int objid, int generation)
 	{
 	  case 1:
 	    {
-		off_t offset = entry.getOffset();
+		qpdf_offset_t offset = entry.getOffset();
 		// Object stored in cache by readObjectAtOffset
 		int aobjid;
 		int ageneration;
@@ -1812,8 +1814,10 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
     // For linearization data in the object, use the data from the
     // object stream for the objects in the stream.
     ObjGen stream_og(obj_stream_number, 0);
-    off_t end_before_space = this->obj_cache[stream_og].end_before_space;
-    off_t end_after_space = this->obj_cache[stream_og].end_after_space;
+    qpdf_offset_t end_before_space =
+        this->obj_cache[stream_og].end_before_space;
+    qpdf_offset_t end_after_space =
+        this->obj_cache[stream_og].end_after_space;
 
     QPDFObjectHandle dict = obj_stream.getDict();
     if (! (dict.getKey("/Type").isName() &&
@@ -2102,7 +2106,7 @@ QPDF::getCompressibleObjects()
 
 void
 QPDF::pipeStreamData(int objid, int generation,
-		     off_t offset, size_t length,
+		     qpdf_offset_t offset, size_t length,
 		     QPDFObjectHandle stream_dict,
 		     Pipeline* pipeline)
 {

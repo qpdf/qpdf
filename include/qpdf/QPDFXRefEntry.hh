@@ -23,12 +23,12 @@ class QPDFXRefEntry
     QPDF_DLL
     QPDFXRefEntry();
     QPDF_DLL
-    QPDFXRefEntry(int type, off_t field1, int field2);
+    QPDFXRefEntry(int type, qpdf_offset_t field1, int field2);
 
     QPDF_DLL
     int getType() const;
     QPDF_DLL
-    off_t getOffset() const;	// only for type 1
+    qpdf_offset_t getOffset() const;	// only for type 1
     QPDF_DLL
     int getObjStreamNumber() const; // only for type 2
     QPDF_DLL
@@ -36,7 +36,7 @@ class QPDFXRefEntry
 
   private:
     int type;
-    off_t field1;
+    qpdf_offset_t field1;
     int field2;
 };
 

@@ -394,7 +394,7 @@ class QPDF
 	friend class QPDF_Stream;
       private:
 	static void pipeStreamData(QPDF* qpdf, int objid, int generation,
-				   off_t offset, size_t length,
+				   qpdf_offset_t offset, size_t length,
 				   QPDFObjectHandle dict,
 				   Pipeline* pipeline)
 	{
@@ -418,19 +418,19 @@ class QPDF
 	{
 	}
 
-	void setLastOffset(off_t);
-	off_t getLastOffset() const;
+	void setLastOffset(qpdf_offset_t);
+	qpdf_offset_t getLastOffset() const;
 	std::string readLine();
 
 	virtual std::string const& getName() const = 0;
-	virtual off_t tell() = 0;
-	virtual void seek(off_t offset, int whence) = 0;
+	virtual qpdf_offset_t tell() = 0;
+	virtual void seek(qpdf_offset_t offset, int whence) = 0;
 	virtual void rewind() = 0;
 	virtual size_t read(char* buffer, size_t length) = 0;
 	virtual void unreadCh(char ch) = 0;
 
       protected:
-	off_t last_offset;
+	qpdf_offset_t last_offset;
     };
 
     class FileInputSource: public InputSource
@@ -441,8 +441,8 @@ class QPDF
         void setFile(FILE* filep);
 	virtual ~FileInputSource();
 	virtual std::string const& getName() const;
-	virtual off_t tell();
-	virtual void seek(off_t offset, int whence);
+	virtual qpdf_offset_t tell();
+	virtual void seek(qpdf_offset_t offset, int whence);
 	virtual void rewind();
 	virtual size_t read(char* buffer, size_t length);
 	virtual void unreadCh(char ch);
@@ -465,8 +465,8 @@ class QPDF
 			  bool own_memory = false);
 	virtual ~BufferInputSource();
 	virtual std::string const& getName() const;
-	virtual off_t tell();
-	virtual void seek(off_t offset, int whence);
+	virtual qpdf_offset_t tell();
+	virtual void seek(qpdf_offset_t offset, int whence);
 	virtual void rewind();
 	virtual size_t read(char* buffer, size_t length);
 	virtual void unreadCh(char ch);
@@ -475,7 +475,7 @@ class QPDF
 	bool own_memory;
 	std::string description;
 	Buffer* buf;
-	off_t cur_offset;
+	qpdf_offset_t cur_offset;
     };
 
     class ObjGen
@@ -498,8 +498,8 @@ class QPDF
 	{
 	}
 	ObjCache(PointerHolder<QPDFObject> object,
-		 off_t end_before_space,
-		 off_t end_after_space) :
+		 qpdf_offset_t end_before_space,
+		 qpdf_offset_t end_after_space) :
 	    object(object),
 	    end_before_space(end_before_space),
 	    end_after_space(end_after_space)
@@ -507,18 +507,18 @@ class QPDF
 	}
 
 	PointerHolder<QPDFObject> object;
-	off_t end_before_space;
-	off_t end_after_space;
+	qpdf_offset_t end_before_space;
+	qpdf_offset_t end_after_space;
     };
 
     void parse(char const* password);
     void warn(QPDFExc const& e);
     void setTrailer(QPDFObjectHandle obj);
-    void read_xref(off_t offset);
+    void read_xref(qpdf_offset_t offset);
     void reconstruct_xref(QPDFExc& e);
-    int read_xrefTable(off_t offset);
-    int read_xrefStream(off_t offset);
-    int processXRefStream(off_t offset, QPDFObjectHandle& xref_stream);
+    int read_xrefTable(qpdf_offset_t offset);
+    int read_xrefStream(qpdf_offset_t offset);
+    int processXRefStream(qpdf_offset_t offset, QPDFObjectHandle& xref_stream);
     void insertXrefEntry(int obj, int f0, int f1, int f2,
 			 bool overwrite = false);
     void setLastObjectDescription(std::string const& description,
@@ -532,12 +532,12 @@ class QPDF
 	bool in_array, bool in_dictionary);
     size_t recoverStreamLength(
 	PointerHolder<InputSource> input, int objid, int generation,
-	off_t stream_offset);
+	qpdf_offset_t stream_offset);
     QPDFTokenizer::Token readToken(PointerHolder<InputSource>);
 
     QPDFObjectHandle readObjectAtOffset(
 	bool attempt_recovery,
-	off_t offset, std::string const& description,
+	qpdf_offset_t offset, std::string const& description,
 	int exp_objid, int exp_generation,
 	int& act_objid, int& act_generation);
     PointerHolder<QPDFObject> resolve(int objid, int generation);
@@ -545,7 +545,7 @@ class QPDF
 
     // Calls finish() on the pipeline when done but does not delete it
     void pipeStreamData(int objid, int generation,
-			off_t offset, size_t length,
+			qpdf_offset_t offset, size_t length,
 			QPDFObjectHandle dict,
 			Pipeline* pipeline);
 
@@ -832,7 +832,8 @@ class QPDF
     void readLinearizationData();
     bool checkLinearizationInternal();
     void dumpLinearizationDataInternal();
-    QPDFObjectHandle readHintStream(Pipeline&, off_t offset, size_t length);
+    QPDFObjectHandle readHintStream(
+        Pipeline&, qpdf_offset_t offset, size_t length);
     void readHPageOffset(BitStream);
     void readHSharedObject(BitStream);
     void readHGeneric(BitStream, HGeneric&);
