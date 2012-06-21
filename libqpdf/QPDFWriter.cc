@@ -1431,11 +1431,12 @@ QPDFWriter::generateID()
 	seed += " ";
 	if (trailer.hasKey("/Info"))
 	{
-	    std::set<std::string> keys = trailer.getKeys();
+            QPDFObjectHandle info = trailer.getKey("/Info");
+	    std::set<std::string> keys = info.getKeys();
 	    for (std::set<std::string>::iterator iter = keys.begin();
 		 iter != keys.end(); ++iter)
 	    {
-		QPDFObjectHandle obj = trailer.getKey(*iter);
+		QPDFObjectHandle obj = info.getKey(*iter);
 		if (obj.isString())
 		{
 		    seed += " ";
