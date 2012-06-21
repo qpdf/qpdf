@@ -40,7 +40,7 @@ my $fh = safe_open("configure.ac");
 my $config_version = 'unknown';
 while (<$fh>)
 {
-    if (m/^AC_INIT\(qpdf,([^\)]+)\)/)
+    if (m/^AC_INIT\(\[qpdf\],\[([^\)]+)\]\)/)
     {
 	$config_version = $1;
 	last;
