@@ -167,7 +167,16 @@ QPDF::optimize(std::map<int, int> const& object_stream_data,
 
     // Traverse pages tree pushing all inherited resources down to the
     // page level.
-    optimizePagesTree(allow_changes);
+    pushInheritedAttributesToPage(allow_changes);
+    getAllPages();
+
+    // Traverse pages
+    int n = this->all_pages.size();
+    for (int pageno = 0; pageno < n; ++pageno)
+    {
+        updateObjectMaps(ObjUser(ObjUser::ou_page, pageno),
+                         this->all_pages[pageno]);
+    }
 
     // Traverse document-level items
     std::set<std::string> keys = this->trailer.getKeys();
@@ -212,26 +221,32 @@ QPDF::optimize(std::map<int, int> const& object_stream_data,
 }
 
 void
-QPDF::optimizePagesTree(bool allow_changes)
+QPDF::pushInheritedAttributesToPage()
+{
+    // Public API should not have access to allow_changes.
+    pushInheritedAttributesToPage(true);
+}
+
+void
+QPDF::pushInheritedAttributesToPage(bool allow_changes)
 {
     // Traverse pages tree pushing all inherited resources down to the
     // page level.
 
     // key_ancestors is a mapping of page attribute keys to a stack of
-    // Pages nodes that contain values for them.  pageno is the
-    // current page sequence number numbered from 0.
+    // Pages nodes that contain values for them.
     std::map<std::string, std::vector<QPDFObjectHandle> > key_ancestors;
-    int pageno = 0;
-    optimizePagesTreeInternal(this->trailer.getKey("/Root").getKey("/Pages"),
-                              key_ancestors, pageno, allow_changes);
+    pushInheritedAttributesToPageInternal(
+        this->trailer.getKey("/Root").getKey("/Pages"),
+        key_ancestors, allow_changes);
     assert(key_ancestors.empty());
 }
 
 void
-QPDF::optimizePagesTreeInternal(
+QPDF::pushInheritedAttributesToPageInternal(
     QPDFObjectHandle cur_pages,
     std::map<std::string, std::vector<QPDFObjectHandle> >& key_ancestors,
-    int& pageno, bool allow_changes)
+    bool allow_changes)
 {
     // Extract the underlying dictionary object
     std::string type = cur_pages.getKey("/Type").getName();
@@ -301,8 +316,8 @@ QPDF::optimizePagesTreeInternal(
 	int n = kids.getArrayNItems();
 	for (int i = 0; i < n; ++i)
 	{
-	    optimizePagesTreeInternal(
-                kids.getArrayItem(i), key_ancestors, pageno, allow_changes);
+            pushInheritedAttributesToPageInternal(
+                kids.getArrayItem(i), key_ancestors, allow_changes);
 	}
 
 	// For each inheritable key, pop the stack.  If the stack
@@ -350,15 +365,6 @@ QPDF::optimizePagesTreeInternal(
 		QTC::TC("qpdf", "QPDF opt page resource hides ancestor");
 	    }
 	}
-
-	// Traverse from this point, updating the mappings of object
-	// users to objects and objects to object users.
-
-	updateObjectMaps(ObjUser(ObjUser::ou_page, pageno), cur_pages);
-
-	// Increment pageno so that its value will be correct for the
-	// next page.
-	++pageno;
     }
     else
     {

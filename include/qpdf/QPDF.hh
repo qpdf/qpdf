@@ -374,6 +374,11 @@ class QPDF
     QPDF_DLL
     void updateAllPagesCache();
 
+    // The PDF /Pages tree allows inherited values.  Working with
+    // the pages of a pdf is much easier when the inheritance is
+    // resolved by explicitly setting the values in each /Page.
+    void pushInheritedAttributesToPage();
+
     // Add new page at the beginning or the end of the current pdf
     QPDF_DLL
     void addPage(QPDFObjectHandle newpage, bool first);
@@ -903,11 +908,11 @@ class QPDF
 
     // Methods to support optimization
 
-    void optimizePagesTree(bool allow_changes);
-    void optimizePagesTreeInternal(
+    void pushInheritedAttributesToPage(bool allow_changes);
+    void pushInheritedAttributesToPageInternal(
 	QPDFObjectHandle,
 	std::map<std::string, std::vector<QPDFObjectHandle> >&,
-	int& pageno, bool allow_changes);
+	bool allow_changes);
     void updateObjectMaps(ObjUser const& ou, QPDFObjectHandle oh);
     void updateObjectMapsInternal(ObjUser const& ou, QPDFObjectHandle oh,
 				  std::set<ObjGen>& visited, bool top);

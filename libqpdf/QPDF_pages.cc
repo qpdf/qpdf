@@ -102,7 +102,7 @@ QPDF::flattenPagesTree()
     }
 
     // Push inherited objects down to the /Page level
-    optimizePagesTree(true);
+    pushInheritedAttributesToPage();
     getAllPages();
 
     QPDFObjectHandle pages = getRoot().getKey("/Pages");
@@ -224,7 +224,6 @@ QPDF::addPageAt(QPDFObjectHandle newpage, bool before,
     }
     insertPage(newpage, refpos);
 }
-
 
 void
 QPDF::addPage(QPDFObjectHandle newpage, bool first)
