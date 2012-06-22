@@ -40,18 +40,20 @@ endif
 #                       1   2
 # Usage: $(call compile,src,includes)
 define compile
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) \
+	$(CXX) $(CXXFLAGS) \
 		$(call depflags,$(basename $(call src_to_obj,$(1)))) \
 		$(foreach I,$(2),-I$(I)) \
+		$(CPPFLAGS) \
 		-c $(1) -o $(call src_to_obj,$(1))
 endef
 
 #                       1   2
 # Usage: $(call c_compile,src,includes)
 define c_compile
-	$(CC) $(CPPFLAGS) $(CFLAGS) \
+	$(CC) $(CFLAGS) \
 		$(call depflags,$(basename $(call c_src_to_obj,$(1)))) \
 		$(foreach I,$(2),-I$(I)) \
+		$(CPPFLAGS) \
 		-c $(1) -o $(call c_src_to_obj,$(1))
 endef
 
@@ -59,9 +61,10 @@ endef
 # Usage: $(call libcompile,src,includes)
 define libcompile
 	$(LIBTOOL) --quiet --mode=compile \
-		$(CXX) $(CPPFLAGS) $(CXXFLAGS) \
+		$(CXX) $(CXXFLAGS) \
 		$(call libdepflags,$(basename $(call src_to_obj,$(1)))) \
 		$(foreach I,$(2),-I$(I)) \
+		$(CPPFLAGS) \
 		-c $(1) -o $(call src_to_obj,$(1)); \
 	$(call fixdeps,$(basename $(call src_to_obj,$(1))))
 endef
@@ -70,9 +73,10 @@ endef
 # Usage: $(call libcompile,src,includes)
 define c_libcompile
 	$(LIBTOOL) --quiet --mode=compile \
-		$(CC) $(CPPFLAGS) $(CXXFLAGS) \
+		$(CC) $(CXXFLAGS) \
 		$(call libdepflags,$(basename $(call c_src_to_obj,$(1)))) \
 		$(foreach I,$(2),-I$(I)) \
+		$(CPPFLAGS) \
 		-c $(1) -o $(call c_src_to_obj,$(1)); \
 	$(call fixdeps,$(basename $(call src_to_obj,$(1))))
 endef
@@ -90,14 +94,14 @@ endef
 define makelib
 	$(LIBTOOL) --mode=link \
 		$(CXX) $(CXXFLAGS) $(LD_VERSION_FLAGS) \
-		 -o $(2) $(1) $(3) $(4) \
+		 -o $(2) $(1) $(4) $(3) \
 		 -rpath $(libdir) -version-info $(5):$(6):$(7)
 endef
 
 #                       1    2      3       4
 # Usage: $(call makebin,objs,binary,ldflags,libs)
 define makebin
-	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(1) -o $(2) $(3) $(4)
+	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(1) -o $(2) $(4) $(3)
 endef
 
 # Install target

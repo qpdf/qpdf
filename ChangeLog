@@ -1,5 +1,11 @@
 2012-06-21  Jay Berkenbilt  <ejb@ql.org>
 
+	* make/libtool.mk: Place user-specified CPPFLAGS and LDFLAGS later
+	in the compilation so that if a user installs things in a
+	non-standard place that they have to tell the build about, earlier
+	versions of qpdf installed there won't break the build.  Thanks to
+	Macports for reporting this.  (Fixes bug 3468860.)
+
 	* Instead of using off_t in the public APIs, use qpdf_offset_t
 	instead.  This is defined as long long in qpdf/Types.h.  If your
 	system doesn't support long long, you can redefine it.
