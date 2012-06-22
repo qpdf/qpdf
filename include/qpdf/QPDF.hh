@@ -908,11 +908,12 @@ class QPDF
 
     // Methods to support optimization
 
-    void pushInheritedAttributesToPage(bool allow_changes);
+    void pushInheritedAttributesToPage(bool allow_changes,
+                                       bool warn_skipped_keys);
     void pushInheritedAttributesToPageInternal(
 	QPDFObjectHandle,
 	std::map<std::string, std::vector<QPDFObjectHandle> >&,
-	bool allow_changes);
+	bool allow_changes, bool warn_skipped_keys);
     void updateObjectMaps(ObjUser const& ou, QPDFObjectHandle oh);
     void updateObjectMapsInternal(ObjUser const& ou, QPDFObjectHandle oh,
 				  std::set<ObjGen>& visited, bool top);
