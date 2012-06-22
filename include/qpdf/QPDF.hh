@@ -69,6 +69,16 @@ class QPDF
 			   char const* buf, size_t length,
 			   char const* password = 0);
 
+    // Create a QPDF object for an empty PDF.  This PDF has no pages
+    // or objects other than a minimal trailer, a document catalog,
+    // and a /Pages tree containing zero pages.  Pages and other
+    // objects can be added to the file in the normal way, and the
+    // trailer and document catalog can be mutated.  Calling this
+    // method is equivalent to calling processFile on an equivalent
+    // PDF file.
+    QPDF_DLL
+    void emptyPDF();
+
     // Parameter settings
 
     // By default, warning messages are issued to std::cerr and output

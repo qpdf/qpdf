@@ -352,6 +352,17 @@ $td->runtest("shallow copy a stream",
 
 show_ntests();
 # ----------
+$td->notify("--- PDF From Scratch ---");
+$n_tests += 2;
+
+$td->runtest("basic qpdf from scratch",
+	     {$td->COMMAND => "pdf_from_scratch 0"},
+	     {$td->STRING => "test 0 done\n", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "from-scratch-0.pdf"});
+# ----------
 $td->notify("--- Error Condition Tests ---");
 # $n_tests incremented after initialization of badfiles below.
 

@@ -13,6 +13,35 @@ Next
     - update README-windows.txt docs to indicate that MSVC 2010 is the
       supported version and to update the information about mingw.
 
+ * Testing for files > 4GB
+
+    - Create a PDF from scratch.  Each page has a page number as text
+      and an image.  The image can be 5000x5000 pixels using 8-bit
+      gray scale.  It will be divided into 10 stripes of 500 pixels
+      each.  The left and right 500 pixels of each stripe will
+      alternate black and white.  The remaining part of the image will
+      have white stripes indicating 1 and black stripes indicating 0
+      with the most-significant bit on top to indicate the page
+      number.  In this way, every page will be unique and will consume
+      approximately 25 megabytes.  Creating 200 pages like this will
+      make a file that is 5 GB.
+
+    - The file will have to have object streams since a regular xref
+      table won't be able to support offsets that large.
+
+    - A separate test program can create this file and do various
+      manipulations on it.  This can be enabled with an environment
+      variable controlled by configure in much the same way image
+      comparison tests are enabled now.  The argument to
+      --enable-large-file-test should be a path that has enough disk
+      space to do the tests, probably enough space for two coipes of
+      the file.  The test program should also have an interactive mode
+      so we can generate the large file and then look at it with a
+      PDF viewer like Adobe Reader.
+
+ * Consider adding an example that uses the page APIs, or update the
+   documentation to refer the user to the test suite.
+
 Soon
 ====
 
@@ -23,8 +52,6 @@ Soon
 
  * See if I can support the new encryption formats mentioned in the
    open bug on sourceforge.  Check other sourceforge bugs.
-
- * Would be nice to confirm that it's working for > 4GB files.
 
  * Splitting/merging concepts
 

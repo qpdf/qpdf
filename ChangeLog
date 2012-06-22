@@ -1,5 +1,9 @@
 2012-06-21  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add QPDF::emptyPDF() to create an empty QPDF object suitable for
+	adding pages and other objects to.  pdf_from_scratch.cc is test
+	code that exercises it.
+
 	* make/libtool.mk: Place user-specified CPPFLAGS and LDFLAGS later
 	in the compilation so that if a user installs things in a
 	non-standard place that they have to tell the build about, earlier

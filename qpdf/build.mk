@@ -1,4 +1,4 @@
-BINS_qpdf = qpdf test_driver
+BINS_qpdf = qpdf test_driver pdf_from_scratch
 CBINS_qpdf = qpdf-ctest
 
 TARGETS_qpdf = $(foreach B,$(BINS_qpdf) $(CBINS_qpdf),qpdf/$(OUTPUT_DIR)/$(call binname,$(B)))
