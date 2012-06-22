@@ -43,6 +43,8 @@
 std::vector<QPDFObjectHandle> const&
 QPDF::getAllPages()
 {
+    // Note that pushInheritedAttributesToPage may also be used to
+    // initialize this->all_pages.
     if (this->all_pages.empty())
     {
 	getAllPagesInternal(getRoot().getKey("/Pages"), this->all_pages);
@@ -101,9 +103,9 @@ QPDF::flattenPagesTree()
         return;
     }
 
-    // Push inherited objects down to the /Page level
+    // Push inherited objects down to the /Page level.  As a side
+    // effect this->all_pages will also be generated.
     pushInheritedAttributesToPage(true, true);
-    getAllPages();
 
     QPDFObjectHandle pages = getRoot().getKey("/Pages");
 
@@ -228,14 +230,14 @@ QPDF::addPageAt(QPDFObjectHandle newpage, bool before,
 void
 QPDF::addPage(QPDFObjectHandle newpage, bool first)
 {
-    getAllPages();
     if (first)
     {
         insertPage(newpage, 0);
     }
     else
     {
-        insertPage(newpage, (int)this->all_pages.size());
+        insertPage(newpage,
+                   getRoot().getKey("/Pages").getKey("/Count").getIntValue());
     }
 }
 

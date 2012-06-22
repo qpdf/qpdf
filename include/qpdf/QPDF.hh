@@ -913,6 +913,7 @@ class QPDF
     void pushInheritedAttributesToPageInternal(
 	QPDFObjectHandle,
 	std::map<std::string, std::vector<QPDFObjectHandle> >&,
+	std::vector<QPDFObjectHandle>& all_pages,
 	bool allow_changes, bool warn_skipped_keys);
     void updateObjectMaps(ObjUser const& ou, QPDFObjectHandle oh);
     void updateObjectMapsInternal(ObjUser const& ou, QPDFObjectHandle oh,

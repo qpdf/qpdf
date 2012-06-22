@@ -166,9 +166,8 @@ QPDF::optimize(std::map<int, int> const& object_stream_data,
     }
 
     // Traverse pages tree pushing all inherited resources down to the
-    // page level.
+    // page level.  This also initializes this->all_pages.
     pushInheritedAttributesToPage(allow_changes, false);
-    getAllPages();
 
     // Traverse pages
     int n = this->all_pages.size();
@@ -236,9 +235,10 @@ QPDF::pushInheritedAttributesToPage(bool allow_changes, bool warn_skipped_keys)
     // key_ancestors is a mapping of page attribute keys to a stack of
     // Pages nodes that contain values for them.
     std::map<std::string, std::vector<QPDFObjectHandle> > key_ancestors;
+    this->all_pages.clear();
     pushInheritedAttributesToPageInternal(
         this->trailer.getKey("/Root").getKey("/Pages"),
-        key_ancestors, allow_changes, warn_skipped_keys);
+        key_ancestors, this->all_pages, allow_changes, warn_skipped_keys);
     assert(key_ancestors.empty());
 }
 
@@ -246,6 +246,7 @@ void
 QPDF::pushInheritedAttributesToPageInternal(
     QPDFObjectHandle cur_pages,
     std::map<std::string, std::vector<QPDFObjectHandle> >& key_ancestors,
+    std::vector<QPDFObjectHandle>& pages,
     bool allow_changes, bool warn_skipped_keys)
 {
     // Extract the underlying dictionary object
@@ -336,7 +337,7 @@ QPDF::pushInheritedAttributesToPageInternal(
 	for (int i = 0; i < n; ++i)
 	{
             pushInheritedAttributesToPageInternal(
-                kids.getArrayItem(i), key_ancestors,
+                kids.getArrayItem(i), key_ancestors, pages,
                 allow_changes, warn_skipped_keys);
 	}
 
@@ -385,6 +386,7 @@ QPDF::pushInheritedAttributesToPageInternal(
 		QTC::TC("qpdf", "QPDF opt page resource hides ancestor");
 	    }
 	}
+        pages.push_back(cur_pages);
     }
     else
     {
