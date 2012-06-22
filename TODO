@@ -37,7 +37,10 @@ Next
       space to do the tests, probably enough space for two coipes of
       the file.  The test program should also have an interactive mode
       so we can generate the large file and then look at it with a
-      PDF viewer like Adobe Reader.
+      PDF viewer like Adobe Reader.  The test suite should actually
+      read the file back in and look at all the page and stream
+      contents to make sure the file is really correct.  We need to
+      test normal writing and linearization.
 
  * Consider adding an example that uses the page APIs, or update the
    documentation to refer the user to the test suite.

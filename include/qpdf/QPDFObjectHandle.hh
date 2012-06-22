@@ -106,8 +106,12 @@ class QPDFObjectHandle
     QPDF_DLL
     static QPDFObjectHandle newString(std::string const& str);
     QPDF_DLL
+    static QPDFObjectHandle newArray();
+    QPDF_DLL
     static QPDFObjectHandle newArray(
 	std::vector<QPDFObjectHandle> const& items);
+    QPDF_DLL
+    static QPDFObjectHandle newDictionary();
     QPDF_DLL
     static QPDFObjectHandle newDictionary(
 	std::map<std::string, QPDFObjectHandle> const& items);

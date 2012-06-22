@@ -616,9 +616,21 @@ QPDFObjectHandle::newString(std::string const& str)
 }
 
 QPDFObjectHandle
+QPDFObjectHandle::newArray()
+{
+    return newArray(std::vector<QPDFObjectHandle>());
+}
+
+QPDFObjectHandle
 QPDFObjectHandle::newArray(std::vector<QPDFObjectHandle> const& items)
 {
     return QPDFObjectHandle(new QPDF_Array(items));
+}
+
+QPDFObjectHandle
+QPDFObjectHandle::newDictionary()
+{
+    return newDictionary(std::map<std::string, QPDFObjectHandle>());
 }
 
 QPDFObjectHandle

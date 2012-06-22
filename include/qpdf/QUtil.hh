@@ -14,7 +14,6 @@
 #include <list>
 #include <stdexcept>
 #include <stdio.h>
-#include <sys/stat.h>
 
 namespace QUtil
 {

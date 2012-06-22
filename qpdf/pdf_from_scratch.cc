@@ -40,49 +40,40 @@ void runtest(int n)
     {
         // Create a minimal PDF from scratch.
 
-        std::map<std::string, QPDFObjectHandle> keys;
-        std::vector<QPDFObjectHandle> items;
-
-        keys.clear();
-        keys["/Type"] = newName("/Font");
-        keys["/Subtype"] = newName("/Type1");
-        keys["/Name"] = newName("/F1");
-        keys["/BaseFont"] = newName("/Helvetica");
-        keys["/Encoding"] = newName("/WinAnsiEncoding");
         QPDFObjectHandle font = pdf.makeIndirectObject(
-            QPDFObjectHandle::newDictionary(keys));
+            QPDFObjectHandle::newDictionary());
+        font.replaceKey("/Type", newName("/Font"));
+        font.replaceKey("/Subtype", newName("/Type1"));
+        font.replaceKey("/Name", newName("/F1"));
+        font.replaceKey("/BaseFont", newName("/Helvetica"));
+        font.replaceKey("/Encoding", newName("/WinAnsiEncoding"));
 
-        items.clear();
-        items.push_back(newName("/PDF"));
-        items.push_back(newName("/Text"));
         QPDFObjectHandle procset = pdf.makeIndirectObject(
-            QPDFObjectHandle::newArray(items));
+            QPDFObjectHandle::newArray());
+        procset.appendItem(newName("/PDF"));
+        procset.appendItem(newName("/Text"));
 
         QPDFObjectHandle contents = createPageContents(pdf, "First Page");
 
-        items.clear();
-        items.push_back(QPDFObjectHandle::newInteger(0));
-        items.push_back(QPDFObjectHandle::newInteger(0));
-        items.push_back(QPDFObjectHandle::newInteger(612));
-        items.push_back(QPDFObjectHandle::newInteger(792));
-        QPDFObjectHandle mediabox = QPDFObjectHandle::newArray(items);
+        QPDFObjectHandle mediabox = QPDFObjectHandle::newArray();
+        mediabox.appendItem(QPDFObjectHandle::newInteger(0));
+        mediabox.appendItem(QPDFObjectHandle::newInteger(0));
+        mediabox.appendItem(QPDFObjectHandle::newInteger(612));
+        mediabox.appendItem(QPDFObjectHandle::newInteger(792));
 
-        keys.clear();
-        keys["/F1"] = font;
-        QPDFObjectHandle rfont = QPDFObjectHandle::newDictionary(keys);
+        QPDFObjectHandle rfont = QPDFObjectHandle::newDictionary();
+        rfont.replaceKey("/F1", font);
 
-        keys.clear();
-        keys["/ProcSet"] = procset;
-        keys["/Font"] = rfont;
-        QPDFObjectHandle resources = QPDFObjectHandle::newDictionary(keys);
+        QPDFObjectHandle resources = QPDFObjectHandle::newDictionary();
+        resources.replaceKey("/ProcSet", procset);
+        resources.replaceKey("/Font", rfont);
 
-        keys.clear();
-        keys["/Type"] = newName("/Page");
-        keys["/MediaBox"] = mediabox;
-        keys["/Contents"] = contents;
-        keys["/Resources"] = resources;
         QPDFObjectHandle page = pdf.makeIndirectObject(
-            QPDFObjectHandle::newDictionary(keys));
+            QPDFObjectHandle::newDictionary());
+        page.replaceKey("/Type", newName("/Page"));
+        page.replaceKey("/MediaBox", mediabox);
+        page.replaceKey("/Contents", contents);
+        page.replaceKey("/Resources", resources);
 
         pdf.addPage(page, true);
 

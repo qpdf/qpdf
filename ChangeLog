@@ -1,3 +1,10 @@
+2012-06-22  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add empty QPDFObjectHandle factories for array and dictionary.
+	With PDF-from-scratch capability, it is useful to be able to
+	create empty arrays and dictionaries and add keys to them.
+	Updated pdf_from_scratch.cc to use these interfaces.
+
 2012-06-21  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add QPDF::emptyPDF() to create an empty QPDF object suitable for

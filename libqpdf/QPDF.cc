@@ -370,7 +370,7 @@ QPDF::processMemoryFile(char const* description,
 void
 QPDF::emptyPDF()
 {
-    processMemoryFile("empty file", EMPTY_PDF, strlen(EMPTY_PDF));
+    processMemoryFile("empty PDF", EMPTY_PDF, strlen(EMPTY_PDF));
 }
 
 void
