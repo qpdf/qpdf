@@ -340,9 +340,7 @@ void qpdf_set_info_key(qpdf_data qpdf, char const* key, char const* value)
 	QTC::TC("qpdf", "qpdf-c add info to trailer");
 	trailer.replaceKey(
 	    "/Info",
-	    qpdf->qpdf->makeIndirectObject(
-		QPDFObjectHandle::newDictionary(
-		    std::map<std::string, QPDFObjectHandle>())));
+	    qpdf->qpdf->makeIndirectObject(QPDFObjectHandle::newDictionary()));
     }
     else
     {

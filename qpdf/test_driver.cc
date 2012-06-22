@@ -597,9 +597,8 @@ void runtest(int n, char const* filename)
 	QPDFObjectHandle qarray = trailer.getKey("/QArray");
 	// Force qdict but not qarray to resolve
 	qdict.isDictionary();
-	std::map<std::string, QPDFObjectHandle> dict_keys;
-	dict_keys["/NewDict"] = QPDFObjectHandle::newInteger(2);
-	QPDFObjectHandle new_dict = QPDFObjectHandle::newDictionary(dict_keys);
+	QPDFObjectHandle new_dict = QPDFObjectHandle::newDictionary();
+	new_dict.replaceKey("/NewDict", QPDFObjectHandle::newInteger(2));
 	try
 	{
 	    // Do it wrong first...

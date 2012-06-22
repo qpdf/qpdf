@@ -190,8 +190,7 @@ int main(int argc, char* argv[])
 		else
 		{
 		    QTC::TC("examples", "pdf-mod-info file no info");
-		    std::map<std::string, QPDFObjectHandle> vacant;
-		    fileinfo = fileinfo.newDictionary(vacant);
+		    fileinfo = QPDFObjectHandle::newDictionary();
 		    filetrailer.replaceKey("/Info", fileinfo);
 		}
 	    }

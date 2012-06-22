@@ -655,8 +655,7 @@ QPDFObjectHandle
 QPDFObjectHandle::newStream(QPDF* qpdf)
 {
     QTC::TC("qpdf", "QPDFObjectHandle newStream");
-    std::map<std::string, QPDFObjectHandle> keys;
-    QPDFObjectHandle stream_dict = newDictionary(keys);
+    QPDFObjectHandle stream_dict = newDictionary();
     QPDFObjectHandle result = qpdf->makeIndirectObject(
 	QPDFObjectHandle(
 	    new QPDF_Stream(qpdf, 0, 0, stream_dict, 0, 0)));
