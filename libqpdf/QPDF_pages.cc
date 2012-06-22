@@ -256,9 +256,9 @@ QPDF::findPage(int objid, int generation)
     if (it == this->pageobj_to_pages_pos.end())
     {
         setLastObjectDescription("page object", objid, generation);
-        QPDFExc(qpdf_e_pages, this->file->getName(),
-                this->last_object_description, 0,
-                "page object not referenced in /Pages tree");
+        throw QPDFExc(qpdf_e_pages, this->file->getName(),
+                      this->last_object_description, 0,
+                      "page object not referenced in /Pages tree");
     }
     return (*it).second;
 }
