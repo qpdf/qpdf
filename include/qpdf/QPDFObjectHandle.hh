@@ -98,7 +98,7 @@ class QPDFObjectHandle
     QPDF_DLL
     static QPDFObjectHandle newBool(bool value);
     QPDF_DLL
-    static QPDFObjectHandle newInteger(int value);
+    static QPDFObjectHandle newInteger(long long value);
     QPDF_DLL
     static QPDFObjectHandle newReal(std::string const& value);
     QPDF_DLL
@@ -150,7 +150,7 @@ class QPDFObjectHandle
 
     // Methods for integer objects
     QPDF_DLL
-    int getIntValue();
+    long long getIntValue();
 
     // Methods for real objects
     QPDF_DLL

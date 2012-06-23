@@ -189,7 +189,7 @@ QPDFObjectHandle::getBoolValue()
 
 // Integer accessors
 
-int
+long long
 QPDFObjectHandle::getIntValue()
 {
     assertType("Integer", isInteger());
@@ -592,7 +592,7 @@ QPDFObjectHandle::newNull()
 }
 
 QPDFObjectHandle
-QPDFObjectHandle::newInteger(int value)
+QPDFObjectHandle::newInteger(long long value)
 {
     return QPDFObjectHandle(new QPDF_Integer(value));
 }

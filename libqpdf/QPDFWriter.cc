@@ -881,6 +881,7 @@ QPDFWriter::writeTrailer(trailer_e which, int size, bool xref_stream, int prev)
 		    writeString(" /Prev ");
 		    qpdf_offset_t pos = this->pipeline->getCount();
 		    writeString(QUtil::int_to_string(prev));
+                    // XXX
 		    int nspaces = (int)(pos - this->pipeline->getCount() + 11);
 		    assert(nspaces >= 0);
 		    writePad(nspaces);

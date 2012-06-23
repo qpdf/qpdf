@@ -6,13 +6,13 @@
 class QPDF_Integer: public QPDFObject
 {
   public:
-    QPDF_Integer(int val);
+    QPDF_Integer(long long val);
     virtual ~QPDF_Integer();
     virtual std::string unparse();
-    int getVal() const;
+    long long getVal() const;
 
   private:
-    int val;
+    long long val;
 };
 
 #endif // __QPDF_INTEGER_HH__

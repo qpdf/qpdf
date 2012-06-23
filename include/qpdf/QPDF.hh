@@ -529,8 +529,8 @@ class QPDF
     void setTrailer(QPDFObjectHandle obj);
     void read_xref(qpdf_offset_t offset);
     void reconstruct_xref(QPDFExc& e);
-    int read_xrefTable(qpdf_offset_t offset);
-    int read_xrefStream(qpdf_offset_t offset);
+    qpdf_offset_t read_xrefTable(qpdf_offset_t offset);
+    qpdf_offset_t read_xrefStream(qpdf_offset_t offset);
     int processXRefStream(qpdf_offset_t offset, QPDFObjectHandle& xref_stream);
     void insertXrefEntry(int obj, int f0, int f1, int f2,
 			 bool overwrite = false);

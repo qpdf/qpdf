@@ -659,7 +659,7 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
     this->deleted_objects.clear();
 }
 
-int
+qpdf_offset_t
 QPDF::read_xrefTable(qpdf_offset_t xref_offset)
 {
     PCRE xref_first_re("^\\s*(\\d+)\\s+(\\d+)");
@@ -816,7 +816,7 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
     return xref_offset;
 }
 
-int
+qpdf_offset_t
 QPDF::read_xrefStream(qpdf_offset_t xref_offset)
 {
     bool found = false;
@@ -1247,7 +1247,7 @@ QPDF::readObjectInternal(PointerHolder<InputSource> input,
 
 	  case QPDFTokenizer::tt_integer:
 	    object = QPDFObjectHandle::newInteger(
-		atoi(token.getValue().c_str()));
+		QUtil::string_to_ll(token.getValue().c_str()));
 	    break;
 
 	  case QPDFTokenizer::tt_real:
@@ -1892,7 +1892,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
 	}
 
 	int num = atoi(tnum.getValue().c_str());
-	int offset = atoi(toffset.getValue().c_str());
+	int offset = QUtil::string_to_ll(toffset.getValue().c_str());
 	offsets[num] = offset + first;
     }
 
