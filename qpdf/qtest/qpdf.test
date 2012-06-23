@@ -111,7 +111,7 @@ $td->runtest("new stream",
 show_ntests();
 # ----------
 $td->notify("--- Page API Tests ---");
-$n_tests += 8;
+$n_tests += 9;
 
 $td->runtest("basic page API",
 	     {$td->COMMAND => "test_driver 15 page_api_1.pdf"},
@@ -141,6 +141,10 @@ $td->runtest("check output",
 $td->runtest("duplicate page",
 	     {$td->COMMAND => "test_driver 19 page_api_1.pdf"},
 	     {$td->FILE => "page_api_1.out", $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("remove page we don't have",
+	     {$td->COMMAND => "test_driver 22 page_api_1.pdf"},
+	     {$td->FILE => "page_api_1.out2", $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 # ----------
 $td->notify("--- Miscellaneous Tests ---");

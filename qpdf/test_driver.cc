@@ -826,6 +826,15 @@ void runtest(int n, char const* filename)
         contents.shallowCopy();
         std::cout << "you can't see this" << std::endl;
     }
+    else if (n == 22)
+    {
+        // Try to remove a page we don't have
+        std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
+        QPDFObjectHandle page = pages[0];
+        pdf.removePage(page);
+        pdf.removePage(page);
+        std::cout << "you can't see this" << std::endl;
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +
