@@ -55,10 +55,12 @@ class QPDF
     // Parse a PDF from a stdio FILE*.  The FILE must be open in
     // binary mode and must be seekable.  It may be open read only.
     // This works exactly like processFile except that the PDF file is
-    // read from an already opened FILE*.  The caller is responsible
-    // for closing the file.
+    // read from an already opened FILE*.  If close_file is true, the
+    // file will be closed at the end.  Otherwise, the caller is
+    // responsible for closing the file.
     QPDF_DLL
-    void processFile(FILE* file, char const* password = 0);
+    void processFile(char const* description, FILE* file,
+                     bool close_file, char const* password = 0);
 
     // Parse a PDF file loaded into a memory buffer.  This works
     // exactly like processFile except that the PDF file is in memory
@@ -449,7 +451,7 @@ class QPDF
       public:
 	FileInputSource();
 	void setFilename(char const* filename);
-        void setFile(FILE* filep);
+        void setFile(char const* description, FILE* filep, bool close_file);
 	virtual ~FileInputSource();
 	virtual std::string const& getName() const;
 	virtual qpdf_offset_t tell();

@@ -104,7 +104,7 @@ void runtest(int n, char const* filename)
 	    QTC::TC("qpdf", "exercise processFile(FILE*)");
             filep = QUtil::fopen_wrapper(std::string("open ") + filename,
                                          fopen(filename, "rb"));
-            pdf.processFile(filep);
+            pdf.processFile(filename, filep, false);
         }
     }
     else

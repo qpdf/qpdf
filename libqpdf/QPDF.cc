@@ -114,12 +114,13 @@ QPDF::FileInputSource::setFilename(char const* filename)
 }
 
 void
-QPDF::FileInputSource::setFile(FILE* f)
+QPDF::FileInputSource::setFile(
+    char const* description, FILE* filep, bool close_file)
 {
     destroy();
-    this->filename = "stdio FILE";
-    this->close_file = false;
-    this->file = f;
+    this->filename = description;
+    this->close_file = close_file;
+    this->file = filep;
     this->seek(0, SEEK_SET);
 }
 
@@ -347,11 +348,12 @@ QPDF::processFile(char const* filename, char const* password)
 }
 
 void
-QPDF::processFile(FILE* filep, char const* password)
+QPDF::processFile(char const* description, FILE* filep,
+                  bool close_file, char const* password)
 {
     FileInputSource* fi = new FileInputSource();
     this->file = fi;
-    fi->setFile(filep);
+    fi->setFile(description, filep, close_file);
     parse(password);
 }
 
