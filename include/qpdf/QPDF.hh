@@ -75,7 +75,8 @@ class QPDF
     // objects can be added to the file in the normal way, and the
     // trailer and document catalog can be mutated.  Calling this
     // method is equivalent to calling processFile on an equivalent
-    // PDF file.
+    // PDF file.  See the pdf-create.cc example for a demonstration of
+    // how to use this method to create a PDF file from scratch.
     QPDF_DLL
     void emptyPDF();
 

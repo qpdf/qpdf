@@ -1,0 +1,29 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+chdir("create") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('create');
+
+$td->runtest("create a simple PDF",
+	     {$td->COMMAND => "pdf-create a.pdf"},
+	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+
+$td->runtest("check",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "orange-square.pdf"});
+
+cleanup();
+
+$td->report(2);
+
+sub cleanup
+{
+    unlink "a.pdf";
+}

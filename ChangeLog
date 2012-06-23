@@ -1,5 +1,9 @@
 2012-06-22  Jay Berkenbilt  <ejb@ql.org>
 
+	* examples/pdf-create.cc: Provide an example of creating a PDF
+	from scratch.  This simple PDF has a single page with some text
+	and an image.
+
 	* Add empty QPDFObjectHandle factories for array and dictionary.
 	With PDF-from-scratch capability, it is useful to be able to
 	create empty arrays and dictionaries and add keys to them.
