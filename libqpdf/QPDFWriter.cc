@@ -1764,7 +1764,7 @@ QPDFWriter::writeHeader()
     writeString(version);
     // This string of binary characters would not be valid UTF-8, so
     // it really should be treated as binary.
-    writeString("\n%¿÷¢þ\n");
+    writeString("\n%\xbf\xf7\xa2\xfe\n");
     writeStringQDF("%QDF-1.0\n\n");
 }
 
