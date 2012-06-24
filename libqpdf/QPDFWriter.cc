@@ -882,8 +882,7 @@ QPDFWriter::writeTrailer(trailer_e which, int size, bool xref_stream,
 		    writeString(" /Prev ");
 		    qpdf_offset_t pos = this->pipeline->getCount();
 		    writeString(QUtil::int_to_string(prev));
-                    // XXX
-		    int nspaces = (int)(pos - this->pipeline->getCount() + 11);
+		    int nspaces = (int)(pos - this->pipeline->getCount() + 21);
 		    assert(nspaces >= 0);
 		    writePad(nspaces);
 		}
@@ -2122,9 +2121,10 @@ QPDFWriter::writeLinearized()
 	writeHeader();
 
 	// Part 2: linearization parameter dictionary.  Save enough
-	// space to write real dictionary.  150 characters is enough
+	// space to write real dictionary.  200 characters is enough
 	// space if all numerical values in the parameter dictionary
-	// are 10 digits long plus a few extra characters for safety.
+	// that contain offsets are 20 digits long plus a few extra
+	// characters for safety.
 
 	qpdf_offset_t pos = this->pipeline->getCount();
 	openObject(lindict_id);
@@ -2154,7 +2154,7 @@ QPDFWriter::writeLinearized()
 	}
 	writeString(" >>");
 	closeObject(lindict_id);
-	static int const pad = 150;
+	static int const pad = 200;
 	int spaces = (pos - this->pipeline->getCount() + pad);
 	assert(spaces >= 0);
 	writePad(spaces);
