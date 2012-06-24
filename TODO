@@ -13,16 +13,24 @@ Next
     - update README-windows.txt docs to indicate that MSVC 2010 is the
       supported version and to update the information about mingw.
 
- * Testing for files > 4GB
+ * Document that your compiler has to support long long.
 
-   The large file test can be enabled with an environment variable
-   controlled by configure in much the same way image comparison tests
-   are enabled now.  The argument to --width-large-file-test should be
-   a path that has enough disk space to do the tests, probably enough
-   space for two copies of the file.
+ * Figure out why we have to specify a stream's length in advance when
+   providing stream data, and remove this restriction if possible.
 
-   The tests will take a very long time (possibly hours) to run, so we
-   will run them infrequently.
+ * Provide an interface to provide stream data as a std::string.
+
+ * Add QPDFObjectHandle::newReal(double)
+
+ * Think about how you would do stream concatenation.  Maybe have some
+   kind of pipeline that blocks finish calls until told otherwise
+   would work so you could iterate through all the streams and call
+   pipeStreamData through that one and then finally call its real
+   finish.  Maybe call it Pl_Concatenate.
+
+ * Add a way to create new QPDFObjectHandles with a string
+   representation of them, such as
+   QPDFObjectHandle::parse("<< /a 1 /b 2 >>");
 
 
 Soon
