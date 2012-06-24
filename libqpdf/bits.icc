@@ -15,7 +15,7 @@
 // this code includes with the symbol defined.
 
 #ifdef BITS_READ
-static unsigned long
+static unsigned long long
 read_bits(unsigned char const*& p, unsigned int& bit_offset,
 	  unsigned int& bits_available, unsigned int bits_wanted)
 {
@@ -95,7 +95,7 @@ read_bits(unsigned char const*& p, unsigned int& bit_offset,
 #ifdef BITS_WRITE
 static void
 write_bits(unsigned char& ch, unsigned int& bit_offset,
-	   unsigned long val, unsigned int bits, Pipeline* pipeline)
+	   unsigned long long val, unsigned int bits, Pipeline* pipeline)
 {
     if (bits > 32)
     {

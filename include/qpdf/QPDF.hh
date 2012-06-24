@@ -337,7 +337,7 @@ class QPDF
 
     QPDF_DLL
     void generateHintStream(std::map<int, QPDFXRefEntry> const& xref,
-			    std::map<int, size_t> const& lengths,
+			    std::map<int, qpdf_offset_t> const& lengths,
 			    std::map<int, int> const& obj_renumber,
 			    PointerHolder<Buffer>& hint_stream,
 			    int& S, int& O);
@@ -531,8 +531,9 @@ class QPDF
     void reconstruct_xref(QPDFExc& e);
     qpdf_offset_t read_xrefTable(qpdf_offset_t offset);
     qpdf_offset_t read_xrefStream(qpdf_offset_t offset);
-    int processXRefStream(qpdf_offset_t offset, QPDFObjectHandle& xref_stream);
-    void insertXrefEntry(int obj, int f0, int f1, int f2,
+    qpdf_offset_t processXRefStream(
+        qpdf_offset_t offset, QPDFObjectHandle& xref_stream);
+    void insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2,
 			 bool overwrite = false);
     void setLastObjectDescription(std::string const& description,
 				  int objid, int generation);
@@ -609,13 +610,13 @@ class QPDF
 	}
 
 	int delta_nobjects;			  // 1
-	int delta_page_length;			  // 2
+	qpdf_offset_t delta_page_length;          // 2
 	int nshared_objects;			  // 3
 	// vectors' sizes = nshared_objects
 	std::vector<int> shared_identifiers;	  // 4
 	std::vector<int> shared_numerators;	  // 5
-	int delta_content_offset;		  // 6
-	int delta_content_length;		  // 7
+	qpdf_offset_t delta_content_offset;       // 6
+        qpdf_offset_t delta_content_length;       // 7
     };
 
     // PDF 1.4: Table F.3
@@ -639,7 +640,7 @@ class QPDF
 	}
 
 	int min_nobjects;			  // 1
-	int first_page_offset;			  // 2
+	qpdf_offset_t first_page_offset;          // 2
 	int nbits_delta_nobjects;		  // 3
 	int min_page_length;			  // 4
 	int nbits_delta_page_length;		  // 5
@@ -686,7 +687,7 @@ class QPDF
 	}
 
 	int first_shared_obj;			  // 1
-	int first_shared_offset;		  // 2
+	qpdf_offset_t first_shared_offset;        // 2
 	int nshared_first_page;			  // 3
 	int nshared_total;			  // 4
 	int nbits_nobjects;			  // 5
@@ -708,7 +709,7 @@ class QPDF
 	}
 
 	int first_object;			  // 1
-	int first_object_offset;		  // 2
+	qpdf_offset_t first_object_offset;        // 2
 	int nobjects;				  // 3
 	int group_length;			  // 4
     };
@@ -730,14 +731,14 @@ class QPDF
 	{
 	}
 
-	int file_size;		// /L
-	int first_page_object;	// /O
-	int first_page_end;	// /E
-	int npages;		// /N
-	int xref_zero_offset;	// /T
-	int first_page;		// /P
-        int H_offset;		// offset of primary hint stream
-	int H_length;		// length of primary hint stream
+	qpdf_offset_t file_size;        // /L
+	int first_page_object;          // /O
+	qpdf_offset_t first_page_end;	// /E
+	int npages;                     // /N
+	qpdf_offset_t xref_zero_offset;	// /T
+	int first_page;                 // /P
+        qpdf_offset_t H_offset;		// offset of primary hint stream
+	qpdf_offset_t H_length;		// length of primary hint stream
     };
 
     // Computed hint table value data structures.  These tables
@@ -851,7 +852,7 @@ class QPDF
     void readHSharedObject(BitStream);
     void readHGeneric(BitStream, HGeneric&);
     int maxEnd(ObjUser const& ou);
-    int getLinearizationOffset(ObjGen const&);
+    qpdf_offset_t getLinearizationOffset(ObjGen const&);
     QPDFObjectHandle getUncompressedObject(
 	QPDFObjectHandle&, std::map<int, int> const& object_stream_data);
     int lengthNextN(int first_object, int n,
@@ -878,19 +879,19 @@ class QPDF
 	std::map<int, int> const& object_stream_data);
     int outputLengthNextN(
 	int in_object, int n,
-	std::map<int, size_t> const& lengths,
+	std::map<int, qpdf_offset_t> const& lengths,
 	std::map<int, int> const& obj_renumber);
     void calculateHPageOffset(
 	std::map<int, QPDFXRefEntry> const& xref,
-	std::map<int, size_t> const& lengths,
+	std::map<int, qpdf_offset_t> const& lengths,
 	std::map<int, int> const& obj_renumber);
     void calculateHSharedObject(
 	std::map<int, QPDFXRefEntry> const& xref,
-	std::map<int, size_t> const& lengths,
+	std::map<int, qpdf_offset_t> const& lengths,
 	std::map<int, int> const& obj_renumber);
     void calculateHOutline(
 	std::map<int, QPDFXRefEntry> const& xref,
-	std::map<int, size_t> const& lengths,
+	std::map<int, qpdf_offset_t> const& lengths,
 	std::map<int, int> const& obj_renumber);
     void writeHPageOffset(BitWriter&);
     void writeHSharedObject(BitWriter&);
@@ -942,7 +943,7 @@ class QPDF
     std::vector<QPDFExc> warnings;
 
     // Linearization data
-    int first_xref_item_offset;	// actual value from file
+    qpdf_offset_t first_xref_item_offset; // actual value from file
     bool uncompressed_after_compressed;
 
     // Linearization parameter dictionary and hint table data: may be

@@ -13,7 +13,7 @@ class BitStream
     QPDF_DLL
     void reset();
     QPDF_DLL
-    unsigned long getBits(int nbits);
+    unsigned long long getBits(int nbits);
     QPDF_DLL
     void skipToNextByte();
 

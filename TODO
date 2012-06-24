@@ -15,32 +15,14 @@ Next
 
  * Testing for files > 4GB
 
-    - Create a PDF from scratch.  Each page has a page number as text
-      and an image.  The image can be 5000x5000 pixels using 8-bit
-      gray scale.  It will be divided into 10 stripes of 500 pixels
-      each.  The left and right 500 pixels of each stripe will
-      alternate black and white.  The remaining part of the image will
-      have white stripes indicating 1 and black stripes indicating 0
-      with the most-significant bit on top to indicate the page
-      number.  In this way, every page will be unique and will consume
-      approximately 25 megabytes.  Creating 200 pages like this will
-      make a file that is 5 GB.
+   The large file test can be enabled with an environment variable
+   controlled by configure in much the same way image comparison tests
+   are enabled now.  The argument to --width-large-file-test should be
+   a path that has enough disk space to do the tests, probably enough
+   space for two copies of the file.
 
-    - The file will have to have object streams since a regular xref
-      table won't be able to support offsets that large.
-
-    - A separate test program can create this file and do various
-      manipulations on it.  This can be enabled with an environment
-      variable controlled by configure in much the same way image
-      comparison tests are enabled now.  The argument to
-      --enable-large-file-test should be a path that has enough disk
-      space to do the tests, probably enough space for two coipes of
-      the file.  The test program should also have an interactive mode
-      so we can generate the large file and then look at it with a
-      PDF viewer like Adobe Reader.  The test suite should actually
-      read the file back in and look at all the page and stream
-      contents to make sure the file is really correct.  We need to
-      test normal writing and linearization.
+   The tests will take a very long time (possibly hours) to run, so we
+   will run them infrequently.
 
 
 Soon

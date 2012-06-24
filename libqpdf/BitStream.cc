@@ -19,7 +19,7 @@ BitStream::reset()
     bits_available = 8 * nbytes;
 }
 
-unsigned long
+unsigned long long
 BitStream::getBits(int nbits)
 {
     return read_bits(this->p, this->bit_offset,

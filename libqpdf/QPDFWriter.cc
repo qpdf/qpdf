@@ -540,7 +540,7 @@ QPDFWriter::setDataKey(int objid)
 }
 
 int
-QPDFWriter::bytesNeeded(unsigned long n)
+QPDFWriter::bytesNeeded(unsigned long long n)
 {
     int bytes = 0;
     while (n)
@@ -552,10 +552,10 @@ QPDFWriter::bytesNeeded(unsigned long n)
 }
 
 void
-QPDFWriter::writeBinary(unsigned long val, unsigned int bytes)
+QPDFWriter::writeBinary(unsigned long long val, unsigned int bytes)
 {
-    assert(bytes <= sizeof(unsigned long));
-    unsigned char data[sizeof(unsigned long)];
+    assert(bytes <= sizeof(unsigned long long));
+    unsigned char data[sizeof(unsigned long long)];
     for (unsigned int i = 0; i < bytes; ++i)
     {
 	data[bytes - i - 1] = (unsigned char)(val & 0xff);
@@ -849,7 +849,8 @@ QPDFWriter::unparseChild(QPDFObjectHandle child, int level, int flags)
 }
 
 void
-QPDFWriter::writeTrailer(trailer_e which, int size, bool xref_stream, int prev)
+QPDFWriter::writeTrailer(trailer_e which, int size, bool xref_stream,
+                         qpdf_offset_t prev)
 {
     QPDFObjectHandle trailer = pdf.getTrailer();
     if (! xref_stream)
@@ -1812,15 +1813,15 @@ QPDFWriter::writeHintStream(int hint_id)
     closeObject(hint_id);
 }
 
-int
+qpdf_offset_t
 QPDFWriter::writeXRefTable(trailer_e which, int first, int last, int size)
 {
     return writeXRefTable(which, first, last, size, 0, false, 0, 0, 0);
 }
 
-int
+qpdf_offset_t
 QPDFWriter::writeXRefTable(trailer_e which, int first, int last, int size,
-			   int prev, bool suppress_offsets,
+			   qpdf_offset_t prev, bool suppress_offsets,
 			   int hint_id, qpdf_offset_t hint_offset,
                            qpdf_offset_t hint_length)
 {
@@ -1838,7 +1839,7 @@ QPDFWriter::writeXRefTable(trailer_e which, int first, int last, int size,
 	}
 	else
 	{
-	    int offset = 0;
+	    qpdf_offset_t offset = 0;
 	    if (! suppress_offsets)
 	    {
 		offset = this->xref[i].getOffset();
@@ -1858,24 +1859,24 @@ QPDFWriter::writeXRefTable(trailer_e which, int first, int last, int size,
     return space_before_zero;
 }
 
-int
-QPDFWriter::writeXRefStream(int objid, int max_id, int max_offset,
+qpdf_offset_t
+QPDFWriter::writeXRefStream(int objid, int max_id, qpdf_offset_t max_offset,
 			    trailer_e which, int first, int last, int size)
 {
     return writeXRefStream(objid, max_id, max_offset,
 			   which, first, last, size, 0, 0, 0, 0, false);
 }
 
-int
-QPDFWriter::writeXRefStream(int xref_id, int max_id, int max_offset,
+qpdf_offset_t
+QPDFWriter::writeXRefStream(int xref_id, int max_id, qpdf_offset_t max_offset,
 			    trailer_e which, int first, int last, int size,
-			    int prev, int hint_id,
+			    qpdf_offset_t prev, int hint_id,
 			    qpdf_offset_t hint_offset,
                             qpdf_offset_t hint_length,
 			    bool skip_compression)
 {
     qpdf_offset_t xref_offset = this->pipeline->getCount();
-    int space_before_zero = xref_offset - 1;
+    qpdf_offset_t space_before_zero = xref_offset - 1;
 
     // field 1 contains offsets and object stream identifiers
     int f1_size = std::max(bytesNeeded(max_offset),
@@ -1921,7 +1922,7 @@ QPDFWriter::writeXRefStream(int xref_id, int max_id, int max_offset,
 
 	  case 1:
 	    {
-		int offset = e.getOffset();
+		qpdf_offset_t offset = e.getOffset();
 		if ((hint_id != 0) &&
 		    (i != hint_id) &&
 		    (offset >= hint_offset))
@@ -2309,7 +2310,7 @@ QPDFWriter::writeLinearized()
 
 	    // Save hint offset since it will be set to zero by
 	    // calling openObject.
-	    int hint_offset = this->xref[hint_id].getOffset();
+	    qpdf_offset_t hint_offset = this->xref[hint_id].getOffset();
 
 	    // Write hint stream to a buffer
 	    pushPipeline(new Pl_Buffer("hint buffer"));

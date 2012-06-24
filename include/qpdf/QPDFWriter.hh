@@ -212,8 +212,8 @@ class QPDFWriter
     enum trailer_e { t_normal, t_lin_first, t_lin_second };
 
     void init();
-    int bytesNeeded(unsigned long n);
-    void writeBinary(unsigned long val, unsigned int bytes);
+    int bytesNeeded(unsigned long long n);
+    void writeBinary(unsigned long long val, unsigned int bytes);
     void writeString(std::string const& str);
     void writeBuffer(PointerHolder<Buffer>&);
     void writeStringQDF(std::string const& str);
@@ -226,7 +226,7 @@ class QPDFWriter
     void writeObjectStream(QPDFObjectHandle object);
     void writeObject(QPDFObjectHandle object, int object_stream_index = -1);
     void writeTrailer(trailer_e which, int size,
-		      bool xref_stream, int prev = 0);
+		      bool xref_stream, qpdf_offset_t prev = 0);
     void unparseObject(QPDFObjectHandle object, int level,
 		       unsigned int flags);
     void unparseObject(QPDFObjectHandle object, int level,
@@ -263,24 +263,28 @@ class QPDFWriter
     void writeEncryptionDictionary();
     void writeHeader();
     void writeHintStream(int hint_id);
-    int writeXRefTable(trailer_e which, int first, int last, int size);
-    int writeXRefTable(trailer_e which, int first, int last, int size,
-		       // for linearization
-		       int prev,
-		       bool suppress_offsets,
-		       int hint_id,
-		       qpdf_offset_t hint_offset,
-		       qpdf_offset_t hint_length);
-    int writeXRefStream(int objid, int max_id, int max_offset,
-			trailer_e which, int first, int last, int size);
-    int writeXRefStream(int objid, int max_id, int max_offset,
-			trailer_e which, int first, int last, int size,
-			// for linearization
-			int prev,
-			int hint_id,
-			qpdf_offset_t hint_offset,
-			qpdf_offset_t hint_length,
-			bool skip_compression);
+    qpdf_offset_t writeXRefTable(
+        trailer_e which, int first, int last, int size);
+    qpdf_offset_t writeXRefTable(
+        trailer_e which, int first, int last, int size,
+        // for linearization
+        qpdf_offset_t prev,
+        bool suppress_offsets,
+        int hint_id,
+        qpdf_offset_t hint_offset,
+        qpdf_offset_t hint_length);
+    qpdf_offset_t writeXRefStream(
+        int objid, int max_id, qpdf_offset_t max_offset,
+        trailer_e which, int first, int last, int size);
+    qpdf_offset_t writeXRefStream(
+        int objid, int max_id, qpdf_offset_t max_offset,
+        trailer_e which, int first, int last, int size,
+        // for linearization
+        qpdf_offset_t prev,
+        int hint_id,
+        qpdf_offset_t hint_offset,
+        qpdf_offset_t hint_length,
+        bool skip_compression);
     int calculateXrefStreamPadding(int xref_bytes);
 
     // When filtering subsections, push additional pipelines to the
@@ -336,7 +340,7 @@ class QPDFWriter
     std::list<QPDFObjectHandle> object_queue;
     std::map<int, int> obj_renumber;
     std::map<int, QPDFXRefEntry> xref;
-    std::map<int, size_t> lengths;
+    std::map<int, qpdf_offset_t> lengths;
     int next_objid;
     int cur_stream_length_id;
     size_t cur_stream_length;

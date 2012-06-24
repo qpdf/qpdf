@@ -154,7 +154,7 @@ extern "C" {
     QPDF_DLL
     char const* qpdf_get_error_filename(qpdf_data q, qpdf_error e);
     QPDF_DLL
-    unsigned long qpdf_get_error_file_position(qpdf_data q, qpdf_error e);
+    unsigned long long qpdf_get_error_file_position(qpdf_data q, qpdf_error e);
     QPDF_DLL
     char const* qpdf_get_error_message_detail(qpdf_data q, qpdf_error e);
 
@@ -195,7 +195,7 @@ extern "C" {
     QPDF_ERROR_CODE qpdf_read_memory(qpdf_data qpdf,
 				     char const* description,
 				     char const* buffer,
-				     unsigned long size,
+				     unsigned long long size,
 				     char const* password);
 
     /* Read functions below must be called after qpdf_read or

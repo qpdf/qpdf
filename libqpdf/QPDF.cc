@@ -571,7 +571,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
 		in_obj = true;
 		int obj = atoi(m.getMatch(1).c_str());
 		int gen = atoi(m.getMatch(2).c_str());
-		int offset = this->file->getLastOffset();
+		qpdf_offset_t offset = this->file->getLastOffset();
 		insertXrefEntry(obj, 1, offset, gen, true);
 	    }
 	    else if ((! this->trailer.isInitialized()) &&
@@ -634,6 +634,11 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
 	}
     }
 
+    if (! this->trailer.isInitialized())
+    {
+        throw QPDFExc(qpdf_e_damaged_pdf, this->file->getName(), "", 0,
+                      "unable to find trailer while reading xref");
+    }
     int size = this->trailer.getKey("/Size").getIntValue();
     int max_obj = 0;
     if (! xref_table.empty())
@@ -704,7 +709,8 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
 		    QUtil::int_to_string(i) + ")");
 	    }
 
-	    int f1 = atoi(m2.getMatch(1).c_str());
+            // For xref_table, these will always be small enough to be ints 
+	    qpdf_offset_t f1 = QUtil::string_to_ll(m2.getMatch(1).c_str());
 	    int f2 = atoi(m2.getMatch(2).c_str());
 	    char type = m2.getMatch(3)[0];
 	    if (type == 'f')
@@ -855,7 +861,7 @@ QPDF::read_xrefStream(qpdf_offset_t xref_offset)
     return xref_offset;
 }
 
-int
+qpdf_offset_t
 QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
 {
     QPDFObjectHandle dict = xref_obj.getDict();
@@ -957,7 +963,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
     {
 	// Read this entry
 	unsigned char const* entry = data + (entry_size * i);
-	int fields[3];
+	qpdf_offset_t fields[3];
 	unsigned char const* p = entry;
 	for (int j = 0; j < 3; ++j)
 	{
@@ -1002,7 +1008,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
 	    // This is needed by checkLinearization()
 	    this->first_xref_item_offset = xref_offset;
 	}
-	insertXrefEntry(obj, fields[0], fields[1], fields[2]);
+	insertXrefEntry(obj, (int)fields[0], fields[1], (int)fields[2]);
     }
 
     if (! this->trailer.isInitialized())
@@ -1031,7 +1037,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
 }
 
 void
-QPDF::insertXrefEntry(int obj, int f0, int f1, int f2, bool overwrite)
+QPDF::insertXrefEntry(int obj, int f0, qpdf_offset_t f1, int f2, bool overwrite)
 {
     // Populate the xref table in such a way that the first reference
     // to an object that we see, which is the one in the latest xref
@@ -1558,7 +1564,7 @@ QPDF::recoverStreamLength(PointerHolder<InputSource> input,
 	    QPDFXRefEntry const& entry = (*iter).second;
 	    if (entry.getType() == 1)
 	    {
-		int obj_offset = entry.getOffset();
+		qpdf_offset_t obj_offset = entry.getOffset();
 		if ((obj_offset > stream_offset) &&
 		    ((this_obj_offset == 0) ||
 		     (this_obj_offset > obj_offset)))

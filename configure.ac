@@ -54,6 +54,14 @@ if test "$BUILD_INTERNAL_LIBS" = "0"; then
    AC_SEARCH_LIBS(pcre_compile,pcre,,[MISSING_PCRE=1; MISSING_ANY=1])
 fi
 
+LARGE_FILE_TEST_PATH=
+AC_SUBST(LARGE_FILE_TEST_PATH)
+AC_ARG_WITH(large-file-test-path,
+   AS_HELP_STRING([--with-large-file-test-path=path],
+		  [To enable testing of files > 4GB, give the path to a directory with at least 11 GB free.  The test suite will write temporary files to this directory.  Alternatively, just set the LARGE_FILE_TEST_PATH environment variable to the path before running the test suite.]),
+   [LARGE_FILE_TEST_PATH=$withval],
+   [LARGE_FILE_TEST_PATH=])
+
 AC_SYS_LARGEFILE
 AC_FUNC_FSEEKO
 AC_TYPE_UINT16_T

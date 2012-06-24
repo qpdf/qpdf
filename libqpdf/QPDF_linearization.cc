@@ -18,10 +18,10 @@
 #include <math.h>
 #include <string.h>
 
-template <class T>
+template <class T, class int_type>
 static void
 load_vector_int(BitStream& bit_stream, int nitems, std::vector<T>& vec,
-		int bits_wanted, int T::*field)
+		int bits_wanted, int_type T::*field)
 {
     // nitems times, read bits_wanted from the given bit stream,
     // storing results in the ith vector entry.
@@ -144,7 +144,7 @@ QPDF::isLinearized()
     QPDFObjectHandle L = candidate.getKey("/L");
     if (L.isInteger())
     {
-	int Li = L.getIntValue();
+	qpdf_offset_t Li = L.getIntValue();
 	this->file->seek(0, SEEK_END);
 	if (Li != this->file->tell())
 	{
@@ -649,11 +649,11 @@ QPDF::maxEnd(ObjUser const& ou)
     return end;
 }
 
-int
+qpdf_offset_t
 QPDF::getLinearizationOffset(ObjGen const& og)
 {
     QPDFXRefEntry entry = this->xref_table[og];
-    int result = 0;
+    qpdf_offset_t result = 0;
     switch (entry.getType())
     {
       case 1:
@@ -1787,7 +1787,7 @@ static inline int nbits(int val)
 int
 QPDF::outputLengthNextN(
     int in_object, int n,
-    std::map<int, size_t> const& lengths,
+    std::map<int, qpdf_offset_t> const& lengths,
     std::map<int, int> const& obj_renumber)
 {
     // Figure out the length of a series of n consecutive objects in
@@ -1808,7 +1808,7 @@ QPDF::outputLengthNextN(
 void
 QPDF::calculateHPageOffset(
     std::map<int, QPDFXRefEntry> const& xref,
-    std::map<int, size_t> const& lengths,
+    std::map<int, qpdf_offset_t> const& lengths,
     std::map<int, int> const& obj_renumber)
 {
     // Page Offset Hint Table
@@ -1900,7 +1900,7 @@ QPDF::calculateHPageOffset(
 void
 QPDF::calculateHSharedObject(
     std::map<int, QPDFXRefEntry> const& xref,
-    std::map<int, size_t> const& lengths,
+    std::map<int, qpdf_offset_t> const& lengths,
     std::map<int, int> const& obj_renumber)
 {
     CHSharedObject& cso = this->c_shared_object_data;
@@ -1946,7 +1946,7 @@ QPDF::calculateHSharedObject(
 void
 QPDF::calculateHOutline(
     std::map<int, QPDFXRefEntry> const& xref,
-    std::map<int, size_t> const& lengths,
+    std::map<int, qpdf_offset_t> const& lengths,
     std::map<int, int> const& obj_renumber)
 {
     HGeneric& cho = this->c_outline_data;
@@ -1967,10 +1967,10 @@ QPDF::calculateHOutline(
 	cho.first_object, ho.nobjects, lengths, obj_renumber);
 }
 
-template <class T>
+template <class T, class int_type>
 static void
 write_vector_int(BitWriter& w, int nitems, std::vector<T>& vec,
-		 int bits, int T::*field)
+		 int bits, int_type T::*field)
 {
     // nitems times, write bits bits from the given field of the ith
     // vector to the given bit writer.
@@ -2095,7 +2095,7 @@ QPDF::writeHGeneric(BitWriter& w, HGeneric& t)
 
 void
 QPDF::generateHintStream(std::map<int, QPDFXRefEntry> const& xref,
-			 std::map<int, size_t> const& lengths,
+			 std::map<int, qpdf_offset_t> const& lengths,
 			 std::map<int, int> const& obj_renumber,
 			 PointerHolder<Buffer>& hint_buffer,
 			 int& S, int& O)
