@@ -1,3 +1,13 @@
+2012-06-24  Jay Berkenbilt  <ejb@ql.org>
+
+	* Support PDF files larger than 4 GB.  This involved many changes
+	to the ABI to increase the size of integer types used in various
+	places as well as increasing the amount of padding used when
+	creating linearized files.  Automated tests for large files are
+	disabled by default.  Run ./configure --help for information on
+	enabling them.  Running the tests requires 11 GB of free disk
+	space and takes several minutes.
+
 2012-06-22  Jay Berkenbilt  <ejb@ql.org>
 
 	* examples/pdf-create.cc: Provide an example of creating a PDF
