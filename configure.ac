@@ -212,6 +212,17 @@ AC_ARG_ENABLE(test-compare-images,
     fi],
    [SKIP_TEST_COMPARE_IMAGES=0])
 
+AC_SUBST(SHOW_FAILED_TEST_OUTPUT)
+AC_ARG_ENABLE(show-failed-test-output,
+   AS_HELP_STRING([--enable-show-failed-test-output],
+		  [if specified, write failed test output to the console; useful for building on build servers where you can't easily open the test output files]),
+   [if test "$enableval" = "no"; then
+      SHOW_FAILED_TEST_OUTPUT=0
+    else
+      SHOW_FAILED_TEST_OUTPUT=1
+    fi],
+   [SHOW_FAILED_TEST_OUTPUT=0])
+
 AC_ARG_WITH(docbook-xsl,
    AS_HELP_STRING([--with-docbook-xsl=DIR],
 		  [location of docbook 4.x xml stylesheets]),

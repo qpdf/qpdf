@@ -126,7 +126,9 @@ $(TEST_TARGETS):
          if TC_SRCS="$(foreach T,$(TC_SRCS_$(subst check_,,$@)),../../$(T))" \
 	 $(QTEST) -bindirs .:.. -datadir ../qtest -covdir ..; then \
 	    true; \
-	 else \
+	 elif test "$(SHOW_FAILED_TEST_OUTPUT)" = "1"; then \
 	    cat -v qtest.log; \
+	    false; \
+	 else \
 	    false; \
 	 fi)
