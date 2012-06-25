@@ -1,3 +1,9 @@
+// NOTE: This test program doesn't do anything special to enable large
+// file support.  This is important since it verifies that programs
+// don't have to do anything special -- all the work is done
+// internally by the library as long as they don't do their own file
+// I/O.
+
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QPDFObjectHandle.hh>

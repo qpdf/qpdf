@@ -1,3 +1,4 @@
+#include <qpdf/qpdf-config.h>  // include first for large file support
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/QUtil.hh>
 #include <stdexcept>
