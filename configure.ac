@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl This config.in requires autoconf 2.5 or greater.
 
-AC_PREREQ([2.69])
+AC_PREREQ([2.68])
 AC_INIT([qpdf],[2.3.1])
 
 AC_CONFIG_MACRO_DIR([m4])
