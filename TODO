@@ -11,7 +11,9 @@ Next
       this version is needed for > 2.3.1.
 
     - update README-windows.txt docs to indicate that MSVC 2010 is the
-      supported version and to update the information about mingw.
+      supported version and to update the information about mingw,
+      including the need for the _FILE_OFFSET_BITS workaround on the
+      32-bit version.
 
  * Document that your compiler has to support long long.
 
