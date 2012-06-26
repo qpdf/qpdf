@@ -10,7 +10,7 @@ Release Reminders
    exec valgrind --suppressions=/tmp/a.supp -q \
       `dirname $0`/z/`basename $0` ${1+"$@"}
 
-   Symlink exec-v to each executable.  /tmp/a.supp can be populated
+   Symlink exec-z to each executable.  /tmp/a.supp can be populated
    with suppressions for libraries, for example:
 
    {
