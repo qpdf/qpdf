@@ -46,7 +46,7 @@ int width = 0;
 int height = 0;
 static unsigned char* buf = 0;
 
-static inline unsigned char get_pixel_color(int n, int row)
+static inline unsigned char get_pixel_color(int n, size_t row)
 {
     return (n & (1 << (nstripes - 1 - row))) ? '\xc0' : '\x40';
 }
@@ -82,7 +82,7 @@ ImageChecker::write(unsigned char* data, size_t len)
 {
     for (size_t i = 0; i < len; ++i)
     {
-        int y = (this->offset + i) / width / stripesize;
+        size_t y = (this->offset + i) / width / stripesize;
         unsigned char color = get_pixel_color(n, y);
         if (data[i] != color)
         {
