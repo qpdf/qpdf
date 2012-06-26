@@ -126,8 +126,14 @@ QUtil::fseek_off_t(FILE* stream, qpdf_offset_t offset, int whence)
 {
 #if HAVE_FSEEKO
     return fseeko(stream, (off_t)offset, whence);
+#elif HAVE_FSEEKO64
+    return fseeko64(stream, offset, whence);
 #else
+# ifdef _MSC_VER
+    return _fseeki64(stream, offset, whence);
+# else
     return fseek(stream, (long)offset, whence);
+# endif
 #endif
 }
 
@@ -136,8 +142,14 @@ QUtil::ftell_off_t(FILE* stream)
 {
 #if HAVE_FSEEKO
     return (qpdf_offset_t)ftello(stream);
+#elif HAVE_FSEEKO64
+    return (qpdf_offset_t)ftello64(stream);
 #else
+# ifdef _MSC_VER
+    return _ftelli64(stream);
+# else
     return (qpdf_offset_t)ftell(stream);
+# endif
 #endif
 }
 
