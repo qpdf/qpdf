@@ -3,6 +3,7 @@ BINS_libtests = \
 	ascii85 \
 	bits \
 	buffer \
+	concatenate \
 	flate \
 	hex \
 	lzw \
