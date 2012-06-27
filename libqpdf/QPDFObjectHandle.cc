@@ -604,6 +604,12 @@ QPDFObjectHandle::newReal(std::string const& value)
 }
 
 QPDFObjectHandle
+QPDFObjectHandle::newReal(double value)
+{
+    return QPDFObjectHandle(new QPDF_Real(value));
+}
+
+QPDFObjectHandle
 QPDFObjectHandle::newName(std::string const& name)
 {
     return QPDFObjectHandle(new QPDF_Name(name));

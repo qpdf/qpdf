@@ -102,6 +102,8 @@ class QPDFObjectHandle
     QPDF_DLL
     static QPDFObjectHandle newReal(std::string const& value);
     QPDF_DLL
+    static QPDFObjectHandle newReal(double value);
+    QPDF_DLL
     static QPDFObjectHandle newName(std::string const& name);
     QPDF_DLL
     static QPDFObjectHandle newString(std::string const& str);
