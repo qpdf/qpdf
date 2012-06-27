@@ -681,6 +681,15 @@ QPDFObjectHandle::newStream(QPDF* qpdf, PointerHolder<Buffer> data)
 }
 
 QPDFObjectHandle
+QPDFObjectHandle::newStream(QPDF* qpdf, std::string const& data)
+{
+    PointerHolder<Buffer> b = new Buffer(data.length());
+    unsigned char* bp = b->getBuffer();
+    memcpy(bp, (char*)data.c_str(), data.length());
+    return QPDFObjectHandle::newStream(qpdf, b);
+}
+
+QPDFObjectHandle
 QPDFObjectHandle::shallowCopy()
 {
     assertInitialized();

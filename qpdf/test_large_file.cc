@@ -173,11 +173,7 @@ std::string generate_page_contents(int pageno)
 
 static QPDFObjectHandle create_page_contents(QPDF& pdf, int pageno)
 {
-    std::string contents = generate_page_contents(pageno);
-    PointerHolder<Buffer> b = new Buffer(contents.length());
-    unsigned char* bp = b->getBuffer();
-    memcpy(bp, (char*)contents.c_str(), contents.length());
-    return QPDFObjectHandle::newStream(&pdf, b);
+    return QPDFObjectHandle::newStream(&pdf, generate_page_contents(pageno));
 }
 
 QPDFObjectHandle newName(std::string const& name)

@@ -65,10 +65,7 @@ static QPDFObjectHandle createPageContents(QPDF& pdf, std::string const& text)
     std::string contents =
         "BT /F1 24 Tf 72 720 Td (" + text + ") Tj ET\n"
         "q 144 0 0 144 234 324 cm /Im1 Do Q\n";
-    PointerHolder<Buffer> b = new Buffer(contents.length());
-    unsigned char* bp = b->getBuffer();
-    memcpy(bp, (char*)contents.c_str(), contents.length());
-    return QPDFObjectHandle::newStream(&pdf, b);
+    return QPDFObjectHandle::newStream(&pdf, contents);
 }
 
 QPDFObjectHandle newName(std::string const& name)

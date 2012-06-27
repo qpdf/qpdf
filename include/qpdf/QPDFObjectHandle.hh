@@ -142,6 +142,12 @@ class QPDFObjectHandle
     QPDF_DLL
     static QPDFObjectHandle newStream(QPDF* qpdf, PointerHolder<Buffer> data);
 
+    // Create new stream with data from string.  This method will
+    // create a copy of the data rather than using the user-provided
+    // buffer as in the PointerHolder<Buffer> version of newStream.
+    QPDF_DLL
+    static QPDFObjectHandle newStream(QPDF* qpdf, std::string const& data);
+
     // Accessor methods.  If an accessor method that is valid for only
     // a particular object type is called on an object of the wrong
     // type, an exception is thrown.
