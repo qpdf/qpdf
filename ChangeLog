@@ -1,3 +1,23 @@
+2012-06-27  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add Pl_Concatenate pipeline for stream concatenation also
+	implemented by Tobias Hoffmann.  Also added test code
+	(libtests/concatenate.cc).
+
+	* Add new methods implemented by Tobias Hoffmann:
+	QPDFObjectHandle::newReal(double) and
+	QPDFObjectHandle::newStream(QPDF*, std::string const&).
+
+2012-06-26  Jay Berkenbilt  <ejb@ql.org>
+
+	* Minor changes so that support for PDF files larger than 4GB
+	works well with 32-bit and 64-bit Linux and also with 32-bit and
+	64-bit Windows with both MSVC and mingw.
+
+	* Rework internal methods for doing recovery of the cross
+	reference tables for much greater efficiency both in terms of time
+	and memory usage.
+
 2012-06-24  Jay Berkenbilt  <ejb@ql.org>
 
 	* Support PDF files larger than 4 GB.  This involved many changes

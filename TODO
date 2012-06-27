@@ -20,16 +20,6 @@ Next
  * Figure out why we have to specify a stream's length in advance when
    providing stream data, and remove this restriction if possible.
 
- * Provide an interface to provide stream data as a std::string.
-
- * Add QPDFObjectHandle::newReal(double)
-
- * Think about how you would do stream concatenation.  Maybe have some
-   kind of pipeline that blocks finish calls until told otherwise
-   would work so you could iterate through all the streams and call
-   pipeStreamData through that one and then finally call its real
-   finish.  Maybe call it Pl_Concatenate.
-
  * Add a way to create new QPDFObjectHandles with a string
    representation of them, such as
    QPDFObjectHandle::parse("<< /a 1 /b 2 >>");
