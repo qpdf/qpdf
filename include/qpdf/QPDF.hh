@@ -433,8 +433,9 @@ class QPDF
 
 	void setLastOffset(qpdf_offset_t);
 	qpdf_offset_t getLastOffset() const;
-	std::string readLine();
+	std::string readLine(size_t max_line_length);
 
+        virtual qpdf_offset_t findAndSkipNextEOL() = 0;
 	virtual std::string const& getName() const = 0;
 	virtual qpdf_offset_t tell() = 0;
 	virtual void seek(qpdf_offset_t offset, int whence) = 0;
@@ -453,6 +454,7 @@ class QPDF
 	void setFilename(char const* filename);
         void setFile(char const* description, FILE* filep, bool close_file);
 	virtual ~FileInputSource();
+        virtual qpdf_offset_t findAndSkipNextEOL();
 	virtual std::string const& getName() const;
 	virtual qpdf_offset_t tell();
 	virtual void seek(qpdf_offset_t offset, int whence);
@@ -477,6 +479,7 @@ class QPDF
 	BufferInputSource(std::string const& description, Buffer* buf,
 			  bool own_memory = false);
 	virtual ~BufferInputSource();
+        virtual qpdf_offset_t findAndSkipNextEOL();
 	virtual std::string const& getName() const;
 	virtual qpdf_offset_t tell();
 	virtual void seek(qpdf_offset_t offset, int whence);

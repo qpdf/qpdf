@@ -49,53 +49,29 @@ QPDF::InputSource::getLastOffset() const
 }
 
 std::string
-QPDF::InputSource::readLine()
+QPDF::InputSource::readLine(size_t max_line_length)
 {
-    // Read a line terminated by one or more \r or \n characters
-    // without caring what the exact terminator is.  Consume the
-    // trailing newline characters but don't return them.
+    // Return at most max_line_length characters from the next line.
+    // Lines are terminated by one or more \r or \n characters.
+    // Consume the trailing newline characters but don't return them.
+    // After this is called, the file will be positioned after a line
+    // terminator or at the end of the file, and last_offset will
+    // point to position the file had when this method was called.
 
     qpdf_offset_t offset = this->tell();
-    std::string buf;
-    enum { st_before_nl, st_at_nl } state = st_before_nl;
-    char ch;
-    while (1)
-    {
-	size_t len = this->read(&ch, 1);
-	if (len == 0)
-	{
-	    break;
-	}
-
-	if (state == st_before_nl)
-	{
-	    if ((ch == '\012') || (ch == '\015'))
-	    {
-		state = st_at_nl;
-	    }
-	    else
-	    {
-		buf += ch;
-	    }
-	}
-	else if (state == st_at_nl)
-	{
-	    if ((ch == '\012') || (ch == '\015'))
-	    {
-		// do nothing
-	    }
-	    else
-	    {
-		// unread this character
-		this->unreadCh(ch);
-		break;
-	    }
-	}
-    }
-    // Override last offset to be where we started this line rather
-    // than before the last character read
+    char* buf = new char[max_line_length + 1];
+    PointerHolder<char> bp(true, buf);
+    memset(buf, '\0', max_line_length + 1);
+    this->read(buf, max_line_length);
+    this->seek(offset, SEEK_SET);
+    qpdf_offset_t eol = this->findAndSkipNextEOL();
     this->last_offset = offset;
-    return buf;
+    size_t line_length = eol - offset;
+    if (line_length < max_line_length)
+    {
+        buf[line_length] = '\0';
+    }
+    return std::string(buf);
 }
 
 QPDF::FileInputSource::FileInputSource() :
@@ -138,6 +114,51 @@ QPDF::FileInputSource::destroy()
 	fclose(this->file);
 	this->file = 0;
     }
+}
+
+qpdf_offset_t
+QPDF::FileInputSource::findAndSkipNextEOL()
+{
+    qpdf_offset_t result = 0;
+    bool done = false;
+    char buf[10240];
+    while (! done)
+    {
+        qpdf_offset_t cur_offset = QUtil::tell(this->file);
+        size_t len = this->read(buf, sizeof(buf));
+        if (len == 0)
+        {
+            done = true;
+            result = this->tell();
+        }
+        else
+        {
+            char* p1 = (char*)memchr((void*)buf, '\r', len);
+            char* p2 = (char*)memchr((void*)buf, '\n', len);
+            char* p = (p1 && p2) ? std::min(p1, p2) : p1 ? p1 : p2;
+            if (p)
+            {
+                result = cur_offset + (p - buf);
+                // We found \r or \n.  Keep reading until we get past
+                // \r and \n characters.
+                this->seek(result + 1, SEEK_SET);
+                char ch;
+                while (! done)
+                {
+                    if (this->read(&ch, 1) == 0)
+                    {
+                        done = true;
+                    }
+                    else if (! ((ch == '\r') || (ch == '\n')))
+                    {
+                        this->unreadCh(ch);
+                        done = true;
+                    }
+                }
+            }
+        }
+    }
+    return result;
 }
 
 std::string const&
@@ -205,6 +226,45 @@ QPDF::BufferInputSource::~BufferInputSource()
     {
 	delete this->buf;
     }
+}
+
+qpdf_offset_t
+QPDF::BufferInputSource::findAndSkipNextEOL()
+{
+    qpdf_offset_t end_pos = (qpdf_offset_t) this->buf->getSize();
+    if (this->cur_offset >= end_pos)
+    {
+	this->last_offset = end_pos;
+        this->cur_offset = end_pos;
+	return end_pos;
+    }
+
+    qpdf_offset_t result = 0;
+    size_t len = (size_t)(end_pos - this->cur_offset);
+    unsigned char const* buffer = this->buf->getBuffer();
+
+    void* start = (void*)(buffer + this->cur_offset);
+    unsigned char* p1 = (unsigned char*)memchr(start, '\r', len);
+    unsigned char* p2 = (unsigned char*)memchr(start, '\n', len);
+    unsigned char* p = (p1 && p2) ? std::min(p1, p2) : p1 ? p1 : p2;
+    if (p)
+    {
+        result = p - buffer;
+        this->cur_offset = result + 1;
+        ++p;
+        while ((this->cur_offset < end_pos) &&
+               ((*p == '\r') || (*p == '\n')))
+        {
+            ++p;
+            ++this->cur_offset;
+        }
+    }
+    else
+    {
+        this->cur_offset = end_pos;
+        result = end_pos;
+    }
+    return result;
 }
 
 std::string const&
@@ -420,7 +480,7 @@ QPDF::parse(char const* password)
 	this->provided_password = password;
     }
 
-    std::string line = this->file->readLine();
+    std::string line = this->file->readLine(20);
     PCRE::Match m1 = header_re.match(line.c_str());
     if (m1)
     {
@@ -556,7 +616,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
     bool in_obj = false;
     while (this->file->tell() < eof)
     {
-	std::string line = this->file->readLine();
+	std::string line = this->file->readLine(50);
 	if (in_obj)
 	{
 	    if (endobj_re.match(line.c_str()))
@@ -624,7 +684,7 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
     while (xref_offset)
     {
 	this->file->seek(xref_offset, SEEK_SET);
-	std::string line = this->file->readLine();
+	std::string line = this->file->readLine(50);
 	if (line == "xref")
 	{
 	    xref_offset = read_xrefTable(this->file->tell());
@@ -677,7 +737,7 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
     bool done = false;
     while (! done)
     {
-	std::string line = this->file->readLine();
+	std::string line = this->file->readLine(50);
 	PCRE::Match m1 = xref_first_re.match(line.c_str());
 	if (! m1)
 	{
@@ -1528,27 +1588,60 @@ QPDF::recoverStreamLength(PointerHolder<InputSource> input,
     input->seek(0, SEEK_END);
     qpdf_offset_t eof = input->tell();
     input->seek(stream_offset, SEEK_SET);
-    std::string last_line;
     qpdf_offset_t last_line_offset = 0;
     size_t length = 0;
+    static int const line_end_length = 12; // room for endstream\r\n\0
+    char last_line_end[line_end_length];
     while (input->tell() < eof)
     {
-	std::string line = input->readLine();
-	// Can't use regexp last_line since it might contain nulls
-	if (endobj_re.match(line.c_str()) &&
-	    (last_line.length() >= 9) &&
-	    (last_line.substr(last_line.length() - 9, 9) == "endstream"))
-	{
-	    // Stream probably ends right before "endstream", which
-	    // contains 9 characters.
-	    length = last_line_offset + last_line.length() - 9 - stream_offset;
-	    // Go back to where we would have been if we had just read
-	    // the endstream.
-	    input->seek(input->getLastOffset(), SEEK_SET);
-	    break;
+	std::string line = input->readLine(50);
+        qpdf_offset_t line_offset = input->getLastOffset();
+	if (endobj_re.match(line.c_str()))
+        {
+            qpdf_offset_t endstream_offset = 0;
+            if (last_line_offset >= line_end_length)
+            {
+                qpdf_offset_t cur_offset = input->tell();
+                // Read from the end of the last line, guaranteeing
+                // null termination
+                qpdf_offset_t search_offset =
+                    line_offset - (line_end_length - 1);
+                input->seek(search_offset, SEEK_SET);
+                memset(last_line_end, '\0', line_end_length);
+                input->read(last_line_end, line_end_length - 1);
+                input->seek(cur_offset, SEEK_SET);
+                // if endstream[\r\n] will fit in last_line_end, the
+                // 'e' has to be in one of the first three spots.
+                // Check explicitly rather than using strstr directly
+                // in case there are nulls right before endstream.
+                char* p = ((last_line_end[0] == 'e') ? last_line_end :
+                           (last_line_end[1] == 'e') ? last_line_end + 1 :
+                           (last_line_end[2] == 'e') ? last_line_end + 2 :
+                           0);
+                char* endstream_p = 0;
+                if (p)
+                {
+                    char* p1 = strstr(p, "endstream\n");
+                    char* p2 = strstr(p, "endstream\r");
+                    endstream_p = (p1 ? p1 : p2);
+                }
+                if (endstream_p)
+                {
+                    endstream_offset =
+                        search_offset + (endstream_p - last_line_end);
+                }
+            }
+            if (endstream_offset > 0)
+            {
+                // Stream probably ends right before "endstream"
+                length = endstream_offset - stream_offset;
+                // Go back to where we would have been if we had just
+                // read the endstream.
+                input->seek(line_offset, SEEK_SET);
+                break;
+            }
 	}
-	last_line = line;
-	last_line_offset = input->getLastOffset();
+	last_line_offset = line_offset;
     }
 
     if (length)
