@@ -15,6 +15,7 @@ SRCS_libqpdf = \
 	libqpdf/Pl_ASCII85Decoder.cc \
 	libqpdf/Pl_ASCIIHexDecoder.cc \
 	libqpdf/Pl_Buffer.cc \
+	libqpdf/Pl_Concatenate.cc \
 	libqpdf/Pl_Count.cc \
 	libqpdf/Pl_Discard.cc \
 	libqpdf/Pl_Flate.cc \
