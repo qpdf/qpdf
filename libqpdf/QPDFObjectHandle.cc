@@ -604,9 +604,9 @@ QPDFObjectHandle::newReal(std::string const& value)
 }
 
 QPDFObjectHandle
-QPDFObjectHandle::newReal(double value)
+QPDFObjectHandle::newReal(double value, int decimal_places)
 {
-    return QPDFObjectHandle(new QPDF_Real(value));
+    return QPDFObjectHandle(new QPDF_Real(value, decimal_places));
 }
 
 QPDFObjectHandle
@@ -683,6 +683,7 @@ QPDFObjectHandle::newStream(QPDF* qpdf, PointerHolder<Buffer> data)
 QPDFObjectHandle
 QPDFObjectHandle::newStream(QPDF* qpdf, std::string const& data)
 {
+    QTC::TC("qpdf", "QPDFObjectHandle newStream with string");
     PointerHolder<Buffer> b = new Buffer(data.length());
     unsigned char* bp = b->getBuffer();
     memcpy(bp, (char*)data.c_str(), data.length());

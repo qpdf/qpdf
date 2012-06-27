@@ -36,8 +36,7 @@ static void doubleBoxSize(QPDFObjectHandle& page, char const* box_name)
     {
 	doubled.push_back(
 	    QPDFObjectHandle::newReal(
-		QUtil::double_to_string(
-		    box.getArrayItem(i).getNumericValue() * 2.0, 2)));
+                box.getArrayItem(i).getNumericValue() * 2.0, 2));
     }
     page.replaceKey(box_name, QPDFObjectHandle::newArray(doubled));
 }

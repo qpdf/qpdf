@@ -102,7 +102,7 @@ class QPDFObjectHandle
     QPDF_DLL
     static QPDFObjectHandle newReal(std::string const& value);
     QPDF_DLL
-    static QPDFObjectHandle newReal(double value);
+    static QPDFObjectHandle newReal(double value, int decimal_places = 0);
     QPDF_DLL
     static QPDFObjectHandle newName(std::string const& name);
     QPDF_DLL
