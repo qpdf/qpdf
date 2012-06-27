@@ -149,7 +149,7 @@ QPDF::FileInputSource::getName() const
 qpdf_offset_t
 QPDF::FileInputSource::tell()
 {
-    return QUtil::ftell_off_t(this->file);
+    return QUtil::tell(this->file);
 }
 
 void
@@ -158,7 +158,7 @@ QPDF::FileInputSource::seek(qpdf_offset_t offset, int whence)
     QUtil::os_wrapper(std::string("seek to ") + this->filename + ", offset " +
 		      QUtil::int_to_string(offset) + " (" +
 		      QUtil::int_to_string(whence) + ")",
-		      QUtil::fseek_off_t(this->file, offset, whence));
+		      QUtil::seek(this->file, offset, whence));
 }
 
 void
@@ -170,7 +170,7 @@ QPDF::FileInputSource::rewind()
 size_t
 QPDF::FileInputSource::read(char* buffer, size_t length)
 {
-    this->last_offset = QUtil::ftell_off_t(this->file);
+    this->last_offset = QUtil::tell(this->file);
     size_t len = fread(buffer, 1, length, this->file);
     if ((len == 0) && ferror(this->file))
     {

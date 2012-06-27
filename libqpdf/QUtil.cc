@@ -122,7 +122,7 @@ QUtil::fopen_wrapper(std::string const& description, FILE* f)
 }
 
 int
-QUtil::fseek_off_t(FILE* stream, qpdf_offset_t offset, int whence)
+QUtil::seek(FILE* stream, qpdf_offset_t offset, int whence)
 {
 #if HAVE_FSEEKO
     return fseeko(stream, (off_t)offset, whence);
@@ -138,7 +138,7 @@ QUtil::fseek_off_t(FILE* stream, qpdf_offset_t offset, int whence)
 }
 
 qpdf_offset_t
-QUtil::ftell_off_t(FILE* stream)
+QUtil::tell(FILE* stream)
 {
 #if HAVE_FSEEKO
     return (qpdf_offset_t)ftello(stream);

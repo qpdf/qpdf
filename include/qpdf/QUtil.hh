@@ -49,9 +49,9 @@ namespace QUtil
 
     // Wrap around off_t versions of fseek and ftell if available
     QPDF_DLL
-    int fseek_off_t(FILE* stream, qpdf_offset_t offset, int whence);
+    int seek(FILE* stream, qpdf_offset_t offset, int whence);
     QPDF_DLL
-    qpdf_offset_t ftell_off_t(FILE* stream);
+    qpdf_offset_t tell(FILE* stream);
 
     QPDF_DLL
     char* copy_string(std::string const&);

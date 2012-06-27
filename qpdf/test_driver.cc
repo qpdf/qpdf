@@ -113,7 +113,7 @@ void runtest(int n, char const* filename)
 	FILE* f = QUtil::fopen_wrapper(std::string("open ") + filename,
 				       fopen(filename, "rb"));
 	fseek(f, 0, SEEK_END);
-	size_t size = (size_t) QUtil::ftell_off_t(f);
+	size_t size = (size_t) QUtil::tell(f);
 	fseek(f, 0, SEEK_SET);
 	file_buf = PointerHolder<char>(true, new char[size]);
 	char* buf_p = file_buf.getPointer();
