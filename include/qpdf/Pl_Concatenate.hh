@@ -23,7 +23,7 @@ class Pl_Concatenate: public Pipeline
     QPDF_DLL
     virtual void finish();
 
-    // At the very end, call manualFinish actually finish the rest of
+    // At the very end, call manualFinish to actually finish the rest of
     // the pipeline.
     QPDF_DLL
     void manualFinish();
