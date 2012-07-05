@@ -22,12 +22,15 @@
 %        +---- page 5
 %
 % Node (A) defines /MediaBox (direct) and /Resources (indirect)
-% Node (B) overrides /MediaBox
+% Node (B) overrides /MediaBox and defines /Rotate
+% Node (B) defines /Quack, a non-standard key, which is not inherited
 % Page 1 overrides /Resources
 % Page 4 overrides /Resources
-% Page 5 overrides /MediaBox
+% Page 5 overrides /MediaBox and /Rotate
 %
 % Page 5 provides the case of two levels of shadowing on a resource.
+%
+% Node (B)'s overriding of /Rotate exercises inheriting a scalar.
 %
 % The /MediaBox defined in node (B) is shared between pages 3 and 4
 % but not page 1.  The /MediaBox defined in node (A) is shared between
@@ -58,6 +61,7 @@ endobj
 >>
 endobj
 
+% Node (A)
 3 0 obj
 <<
   /Count 5
@@ -73,7 +77,6 @@ endobj
     792
   ]
   /Resources 7 0 R
-  /Quack 16059
   /Type /Pages
 >>
 endobj
@@ -97,6 +100,7 @@ endobj
 >>
 endobj
 
+% Node (B)
 6 0 obj
 <<
   /Count 3
@@ -112,6 +116,8 @@ endobj
     396
   ]
   /Parent 3 0 R
+  /Rotate 0
+  /Quack 16059
   /Type /Pages
 >>
 endobj
@@ -205,6 +211,7 @@ endobj
     306
     396
   ]
+  /Rotate 180
   /Parent 6 0 R
   /Type /Page
 >>
@@ -316,39 +323,39 @@ endobj
 xref
 0 29
 0000000000 65535 f 
-0000001161 00000 n 
-0000001244 00000 n 
-0000001319 00000 n 
-0000001501 00000 n 
-0000001601 00000 n 
-0000001672 00000 n 
-0000001829 00000 n 
-0000001923 00000 n 
-0000002024 00000 n 
-0000002043 00000 n 
-0000002138 00000 n 
-0000002241 00000 n 
-0000002271 00000 n 
-0000002366 00000 n 
-0000002526 00000 n 
-0000002644 00000 n 
-0000002763 00000 n 
-0000002799 00000 n 
-0000002947 00000 n 
-0000003050 00000 n 
-0000003093 00000 n 
-0000003196 00000 n 
-0000003216 00000 n 
-0000003359 00000 n 
-0000003462 00000 n 
-0000003482 00000 n 
-0000003504 00000 n 
-0000003526 00000 n 
+0000001331 00000 n 
+0000001414 00000 n 
+0000001500 00000 n 
+0000001667 00000 n 
+0000001767 00000 n 
+0000001849 00000 n 
+0000002033 00000 n 
+0000002127 00000 n 
+0000002228 00000 n 
+0000002247 00000 n 
+0000002342 00000 n 
+0000002445 00000 n 
+0000002475 00000 n 
+0000002570 00000 n 
+0000002730 00000 n 
+0000002862 00000 n 
+0000002981 00000 n 
+0000003017 00000 n 
+0000003165 00000 n 
+0000003268 00000 n 
+0000003311 00000 n 
+0000003414 00000 n 
+0000003434 00000 n 
+0000003577 00000 n 
+0000003680 00000 n 
+0000003700 00000 n 
+0000003722 00000 n 
+0000003744 00000 n 
 trailer <<
   /Root 1 0 R
   /Size 29
   /ID [<ce9551b56c5a7e3b5b0ba6fa0d281296><a74aa55a69070b600e39f9ed1ed6c4df>]
 >>
 startxref
-3545
+3763
 %%EOF

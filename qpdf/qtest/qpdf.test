@@ -149,7 +149,7 @@ $td->runtest("remove page we don't have",
 	     $td->NORMALIZE_NEWLINES);
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 40;
+$n_tests += 41;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -354,6 +354,10 @@ $td->runtest("shallow copy a stream",
 	     {$td->COMMAND => "test_driver 21 shallow_array.pdf"},
 	     {$td->FILE => "shallow_stream.out", $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
+$td->runtest("warn for unknown key in Pages",
+             {$td->COMMAND => "test_driver 23 lin-special.pdf"},
+             {$td->FILE => "pages-warning.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 show_ntests();
 # ----------

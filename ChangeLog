@@ -1,3 +1,10 @@
+2012-07-04  Jay Berkenbilt  <ejb@ql.org>
+
+	* Accept changes from Tobias Hoffmann: add public method
+	QPDF::pushInheritedAttributesToPage including warnings for
+	non-inherited keys that may be discarded from /Pages by
+	non-conformant PDF files when the /Pages tree is flattened.
+
 2012-06-27  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add Pl_Concatenate pipeline for stream concatenation also

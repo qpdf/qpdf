@@ -832,6 +832,12 @@ void runtest(int n, char const* filename)
         pdf.removePage(page);
         std::cout << "you can't see this" << std::endl;
     }
+    else if (n == 23)
+    {
+        // Try to remove a page we don't have
+        std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
+        pdf.removePage(pages.back());
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +
