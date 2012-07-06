@@ -1,3 +1,9 @@
+2012-07-05  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add QPDFWriter methods to write to an already open stdio FILE*.
+	Implementation and idea area based on contributions from Tobias
+	Hoffmann.
+
 2012-07-04  Jay Berkenbilt  <ejb@ql.org>
 
 	* Accept changes from Tobias Hoffmann: add public method

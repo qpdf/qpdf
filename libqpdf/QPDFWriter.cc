@@ -34,6 +34,14 @@ QPDFWriter::QPDFWriter(QPDF& pdf, char const* filename) :
     setOutputFilename(filename);
 }
 
+QPDFWriter::QPDFWriter(QPDF& pdf, char const* description,
+                       FILE *file, bool close_file) :
+    pdf(pdf)
+{
+    init();
+    setOutputFile(description, file, close_file);
+}
+
 void
 QPDFWriter::init()
 {
@@ -79,21 +87,31 @@ QPDFWriter::~QPDFWriter()
 void
 QPDFWriter::setOutputFilename(char const* filename)
 {
-    this->filename = filename;
+    char const* description = filename;
+    FILE* f = 0;
     if (filename == 0)
     {
-	this->filename = "standard output";
+	description = "standard output";
 	QTC::TC("qpdf", "QPDFWriter write to stdout");
-	file = stdout;
+	f = stdout;
 	QUtil::binary_stdout();
     }
     else
     {
 	QTC::TC("qpdf", "QPDFWriter write to file");
-	file = QUtil::fopen_wrapper(std::string("open ") + filename,
-				    fopen(filename, "wb+"));
+	f = QUtil::fopen_wrapper(std::string("open ") + filename,
+                                 fopen(filename, "wb+"));
 	close_file = true;
     }
+    setOutputFile(description, f, close_file);
+}
+
+void
+QPDFWriter::setOutputFile(char const* description, FILE* file, bool close_file)
+{
+    this->filename = description;
+    this->file = file;
+    this->close_file = close_file;
     Pipeline* p = new Pl_StdioFile("qpdf output", file);
     to_delete.push_back(p);
     initializePipelineStack(p);

@@ -728,7 +728,10 @@ void runtest(int n, char const* filename)
         checkPageContents(pages[11], "New page 11");
         checkPageContents(pages[12], "New page 12");
 
-	QPDFWriter w(pdf, "a.pdf");
+        // Exercise writing to FILE*
+        FILE* out =  QUtil::fopen_wrapper(std::string("open a.pdf"),
+                                          fopen("a.pdf", "wb"));
+	QPDFWriter w(pdf, "FILE* a.pdf", out, true);
 	w.setStaticID(true);
 	w.setStreamDataMode(qpdf_s_preserve);
 	w.write();

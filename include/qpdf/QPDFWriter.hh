@@ -49,6 +49,14 @@ class QPDFWriter
     // setOutputFilename() for details.
     QPDF_DLL
     QPDFWriter(QPDF& pdf, char const* filename);
+
+    // Create a QPDFWriter object that writes its output to an already
+    // open FILE*.  This is equivalent to calling the first
+    // constructor and then calling setOutputFile().  See
+    // setOutputFile() for details.
+    QPDF_DLL
+    QPDFWriter(QPDF& pdf, char const* description, FILE* file, bool close_file);
+
     QPDF_DLL
     ~QPDFWriter();
 
@@ -65,6 +73,14 @@ class QPDFWriter
     // delete it the eventual call to write fails.
     QPDF_DLL
     void setOutputFilename(char const* filename);
+
+    // Write to the given FILE*, which must be opened by the caller.
+    // If close_file is true, QPDFWriter will close the file.
+    // Otherwise, the caller must close the file.  The file does not
+    // need to be seekable; it will be written to in a single pass.
+    // It must be open in binary mode.
+    QPDF_DLL
+    void setOutputFile(char const* description, FILE* file, bool close_file);
 
     // Indicate that QPDFWriter should create a memory buffer to
     // contain the final PDF file.  Obtain the memory by calling
