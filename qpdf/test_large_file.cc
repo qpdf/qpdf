@@ -109,7 +109,6 @@ class ImageProvider: public QPDFObjectHandle::StreamDataProvider
     virtual ~ImageProvider();
     virtual void provideStreamData(int objid, int generation,
 				   Pipeline* pipeline);
-    size_t getLength() const;
 
   private:
     int n;
@@ -140,12 +139,6 @@ ImageProvider::provideStreamData(int objid, int generation,
         pipeline->write(buf, width * stripesize);
     }
     pipeline->finish();
-}
-
-size_t
-ImageProvider::getLength() const
-{
-    return width * height;
 }
 
 void usage()
@@ -229,8 +222,7 @@ static void create_pdf(char const* filename)
         PointerHolder<QPDFObjectHandle::StreamDataProvider> provider(p);
         image.replaceStreamData(provider,
                                 QPDFObjectHandle::newNull(),
-                                QPDFObjectHandle::newNull(),
-                                p->getLength());
+                                QPDFObjectHandle::newNull());
 
         QPDFObjectHandle xobject = QPDFObjectHandle::newDictionary();
         xobject.replaceKey("/Im1", image);

@@ -294,18 +294,31 @@ class QPDFObjectHandle
     // directly providing a buffer with the stream data, call the
     // given provider's provideStreamData method.  See comments on the
     // StreamDataProvider class (defined above) for details on the
-    // method.  The provider must write the number of bytes as
-    // indicated by the length parameter, and the data must be
-    // consistent with filter and decode_parms as provided.  Although
-    // it is more complex to use this form of replaceStreamData than
-    // the one that takes a buffer, it makes it possible to avoid
-    // allocating memory for the stream data.  Example programs are
-    // provided that use both forms of replaceStreamData.
+    // method.  The data must be consistent with filter and
+    // decode_parms as provided.  Although it is more complex to use
+    // this form of replaceStreamData than the one that takes a
+    // buffer, it makes it possible to avoid allocating memory for the
+    // stream data.  Example programs are provided that use both forms
+    // of replaceStreamData.
+
+    // Note about stream length: for any given stream, the provider
+    // must provide the same amount of data each time it is called.
+    // This is critical for making linearization work properly.
+    // Versions of qpdf before 3.0.0 required a length to be specified
+    // here.  Starting with version 3.0.0, this is no longer necessary
+    // (or permitted).  The first time the stream data provider is
+    // invoked for a given stream, the actual length is stored.
+    // Subsequent times, it is enforced that the length be the same as
+    // the first time.
+
+    // If you have gotten a compile error here while building code
+    // that worked with older versions of qpdf, just omit the length
+    // parameter.  You can also simplify your code by not having to
+    // compute the length in advance.
     QPDF_DLL
     void replaceStreamData(PointerHolder<StreamDataProvider> provider,
 			   QPDFObjectHandle const& filter,
-			   QPDFObjectHandle const& decode_parms,
-			   size_t length);
+			   QPDFObjectHandle const& decode_parms);
 
     // return 0 for direct objects
     QPDF_DLL

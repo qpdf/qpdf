@@ -478,7 +478,17 @@ void runtest(int n, char const* filename)
 	PointerHolder<QPDFObjectHandle::StreamDataProvider> p = provider;
 	qstream.replaceStreamData(
 	    p, QPDFObjectHandle::newName("/FlateDecode"),
-	    QPDFObjectHandle::newNull(), b->getSize());
+	    QPDFObjectHandle::newNull());
+	provider->badLength(false);
+	QPDFWriter w(pdf, "a.pdf");
+	w.setStaticID(true);
+        // Linearize to force the provider to be called multiple times.
+        w.setLinearization(true);
+	w.setStreamDataMode(qpdf_s_preserve);
+	w.write();
+
+        // Every time a provider pipes stream data, it has to provide
+        // the same amount of data.
 	provider->badLength(true);
 	try
 	{
@@ -489,11 +499,6 @@ void runtest(int n, char const* filename)
 	{
 	    std::cout << "exception: " << e.what() << std::endl;
 	}
-	provider->badLength(false);
-	QPDFWriter w(pdf, "a.pdf");
-	w.setStaticID(true);
-	w.setStreamDataMode(qpdf_s_preserve);
-	w.write();
     }
     else if (n == 9)
     {

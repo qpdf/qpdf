@@ -141,8 +141,7 @@ int main(int argc, char* argv[])
 			image.replaceStreamData(
 			    p,
 			    QPDFObjectHandle::newNull(),
-			    QPDFObjectHandle::newNull(),
-			    inv->image_data[objid][gen]->getSize());
+			    QPDFObjectHandle::newNull());
 		    }
 		}
 	    }

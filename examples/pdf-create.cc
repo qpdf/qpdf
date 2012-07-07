@@ -17,7 +17,6 @@ class ImageProvider: public QPDFObjectHandle::StreamDataProvider
     virtual ~ImageProvider();
     virtual void provideStreamData(int objid, int generation,
 				   Pipeline* pipeline);
-    size_t getLength() const;
 
   private:
     int width;
@@ -43,12 +42,6 @@ ImageProvider::provideStreamData(int objid, int generation,
         pipeline->write((unsigned char*)"\xff\x7f\x00", 3);
     }
     pipeline->finish();
-}
-
-size_t
-ImageProvider::getLength() const
-{
-    return 3 * width * height;
 }
 
 void usage()
@@ -111,8 +104,7 @@ static void create_pdf(char const* filename)
     PointerHolder<QPDFObjectHandle::StreamDataProvider> provider(p);
     image.replaceStreamData(provider,
                             QPDFObjectHandle::newNull(),
-                            QPDFObjectHandle::newNull(),
-                            p->getLength());
+                            QPDFObjectHandle::newNull());
 
     // Create direct objects as needed by the page dictionary.
     QPDFObjectHandle procset = QPDFObjectHandle::newArray();

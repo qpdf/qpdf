@@ -30,8 +30,7 @@ class QPDF_Stream: public QPDFObject
     void replaceStreamData(
 	PointerHolder<QPDFObjectHandle::StreamDataProvider> provider,
 	QPDFObjectHandle const& filter,
-	QPDFObjectHandle const& decode_parms,
-	size_t length);
+	QPDFObjectHandle const& decode_parms);
 
     // Replace object ID and generation.  This may only be called if
     // object ID and generation are 0.  It is used by QPDFObjectHandle

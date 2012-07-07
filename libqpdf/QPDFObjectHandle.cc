@@ -414,12 +414,11 @@ QPDFObjectHandle::replaceStreamData(PointerHolder<Buffer> data,
 void
 QPDFObjectHandle::replaceStreamData(PointerHolder<StreamDataProvider> provider,
 				    QPDFObjectHandle const& filter,
-				    QPDFObjectHandle const& decode_parms,
-				    size_t length)
+				    QPDFObjectHandle const& decode_parms)
 {
     assertType("Stream", isStream());
     dynamic_cast<QPDF_Stream*>(obj.getPointer())->replaceStreamData(
-	provider, filter, decode_parms, length);
+	provider, filter, decode_parms);
 }
 
 int

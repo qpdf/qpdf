@@ -1,3 +1,21 @@
+2012-07-07  Jay Berkenbilt  <ejb@ql.org>
+
+	* NOTE: BREAKING API CHANGE.  Remove previously required length
+	parameter from the version QPDFObjectHandle::replaceStreamData
+	that uses a stream data provider.  Prior to qpdf 3.0.0, you had to
+	compute the stream length in advance so that qpdf could internally
+	verify that the stream data had the same length every time the
+	provider was invoked.  Now this requirement is enforced a
+	different way, and the length parameter is no longer required.
+	Note that I take API-breaking changes very seriously and only did
+	it in this case since the lack of need to know length in advance
+	could significantly simplify people's code.  If you were
+	previously going to a lot of trouble to compute the length of the
+	new stream data in advance, you now no longer have to do that.
+	You can just drop the length parameter and remove any code that
+	was previously computing the length.  Thanks to Tobias Hoffmann
+	for pointing out how annoying the original interface was.
+
 2012-07-05  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add QPDFWriter methods to write to an already open stdio FILE*.
