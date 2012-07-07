@@ -903,6 +903,18 @@ QPDFObjectHandle::assertStream()
 }
 
 void
+QPDFObjectHandle::assertScalar()
+{
+    assertType("Scalar", isScalar());
+}
+
+void
+QPDFObjectHandle::assertNumber()
+{
+    assertType("Number", isNumber());
+}
+
+void
 QPDFObjectHandle::assertPageObject()
 {
     if (! (this->isDictionary() && this->hasKey("/Type") &&

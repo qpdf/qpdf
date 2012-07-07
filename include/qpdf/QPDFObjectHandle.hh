@@ -432,6 +432,10 @@ class QPDFObjectHandle
     void assertStream();
 
     QPDF_DLL
+    void assertScalar();
+    QPDF_DLL
+    void assertNumber();
+    QPDF_DLL
     void assertPageObject();
 
   private:
