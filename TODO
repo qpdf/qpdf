@@ -24,6 +24,10 @@ Next
    representation of them, such as
    QPDFObjectHandle::parse("<< /a 1 /b 2 >>");
 
+ * Document thread safety: One individual QPDF or QPDFWriter object
+   can only be used by one thread at a time, but multiple threads can
+   simultaneously use separate objects.
+
 
 Soon
 ====
