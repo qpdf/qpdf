@@ -161,7 +161,8 @@ class QPDF
     // be associated with the PDF file.  Note that replacing an object
     // with QPDFObjectHandle::newNull() effectively removes the object
     // from the file since a non-existent object is treated as a null
-    // object.
+    // object.  To replace a reserved object, call replaceReserved
+    // instead.
     QPDF_DLL
     void replaceObject(int objid, int generation, QPDFObjectHandle);
 
@@ -179,6 +180,15 @@ class QPDF
     QPDF_DLL
     void swapObjects(int objid1, int generation1,
 		     int objid2, int generation2);
+
+    // Replace a reserved object.  This is a wrapper around
+    // replaceObject but it guarantees that the underlying object is a
+    // reserved object.  After this call, reserved will be a reference
+    // to replacement.
+    QPDF_DLL
+    void
+    replaceReserved(QPDFObjectHandle reserved,
+                    QPDFObjectHandle replacement);
 
     // Encryption support
 

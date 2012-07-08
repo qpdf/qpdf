@@ -217,3 +217,4 @@ QPDFObjectHandle newStream with string 0
 QPDF unknown key not inherited 0
 QPDF_Stream provider length not provided 0
 QPDF_Stream unknown stream length 0
+QPDF replaceReserved 0

@@ -149,7 +149,7 @@ $td->runtest("remove page we don't have",
 	     $td->NORMALIZE_NEWLINES);
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 41;
+$n_tests += 43;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -358,6 +358,13 @@ $td->runtest("warn for unknown key in Pages",
              {$td->COMMAND => "test_driver 23 lin-special.pdf"},
              {$td->FILE => "pages-warning.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
+$td->runtest("reserved objects",
+             {$td->COMMAND => "test_driver 24 minimal.pdf"},
+             {$td->FILE => "reserved-objects.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "reserved-objects.pdf"});
 
 show_ntests();
 # ----------

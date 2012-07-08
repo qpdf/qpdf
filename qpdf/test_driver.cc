@@ -840,6 +840,82 @@ void runtest(int n, char const* filename)
         std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
         pdf.removePage(pages.back());
     }
+    else if (n == 24)
+    {
+        // Test behavior of reserved objects
+        QPDFObjectHandle res1 = QPDFObjectHandle::newReserved(&pdf);
+        QPDFObjectHandle res2 = QPDFObjectHandle::newReserved(&pdf);
+	QPDFObjectHandle trailer = pdf.getTrailer();
+        trailer.replaceKey("Array1", res1);
+        trailer.replaceKey("Array2", res2);
+
+        QPDFObjectHandle array1 = QPDFObjectHandle::newArray();
+        QPDFObjectHandle array2 = QPDFObjectHandle::newArray();
+        array1.appendItem(res2);
+        array1.appendItem(QPDFObjectHandle::newInteger(1));
+        array2.appendItem(res1);
+        array2.appendItem(QPDFObjectHandle::newInteger(2));
+        // Make sure trying to ask questions about a reserved object
+        // doesn't break it.
+        if (res1.isArray())
+        {
+            std::cout << "oops -- res1 is an array" << std::endl;
+        }
+        if (res1.isReserved())
+        {
+            std::cout << "res1 is still reserved after checking if array"
+                      << std::endl;
+        }
+        pdf.replaceReserved(res1, array1);
+        if (res1.isReserved())
+        {
+            std::cout << "oops -- res1 is still reserved" << std::endl;
+        }
+        else
+        {
+            std::cout << "res1 is no longer reserved" << std::endl;
+        }
+        res1.assertArray();
+        std::cout << "res1 is an array" << std::endl;
+
+        try
+        {
+            res2.unparseResolved();
+            std::cout << "oops -- didn't throw" << std::endl;
+        }
+        catch (std::logic_error e)
+        {
+            std::cout << "logic error: " << e.what() << std::endl;
+        }
+        try
+        {
+            res2.makeDirect();
+            std::cout << "oops -- didn't throw" << std::endl;
+        }
+        catch (std::logic_error e)
+        {
+            std::cout << "logic error: " << e.what() << std::endl;
+        }
+
+        pdf.replaceReserved(res2, array2);
+
+        res2.assertArray();
+        std::cout << "res2 is an array" << std::endl;
+
+        // Verify that the previously added reserved keys can be
+        // dereferenced properly now
+        int i1 = res1.getArrayItem(0).getArrayItem(1).getIntValue();
+        int i2 = res2.getArrayItem(0).getArrayItem(1).getIntValue();
+        if ((i1 == 2) && (i2 == 1))
+        {
+            std::cout << "circular access and lazy resolution worked" << std::endl;
+        }
+
+	QPDFWriter w(pdf, "a.pdf");
+	w.setStaticID(true);
+	w.setStreamDataMode(qpdf_s_preserve);
+	w.write();
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +

@@ -2057,6 +2057,18 @@ QPDF::replaceObject(int objid, int generation, QPDFObjectHandle oh)
 }
 
 void
+QPDF::replaceReserved(QPDFObjectHandle reserved,
+                      QPDFObjectHandle replacement)
+{
+    QTC::TC("qpdf", "QPDF replaceReserved");
+    reserved.assertReserved();
+    replaceObject(reserved.getObjectID(),
+                  reserved.getGeneration(),
+                  replacement);
+}
+
+
+void
 QPDF::swapObjects(int objid1, int generation1, int objid2, int generation2)
 {
     // Force objects to be loaded into cache; then swap them in the

@@ -10,6 +10,7 @@
 #include <qpdf/QPDF_Array.hh>
 #include <qpdf/QPDF_Dictionary.hh>
 #include <qpdf/QPDF_Stream.hh>
+#include <qpdf/QPDF_Reserved.hh>
 
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
@@ -20,7 +21,8 @@
 QPDFObjectHandle::QPDFObjectHandle() :
     initialized(false),
     objid(0),
-    generation(0)
+    generation(0),
+    reserved(false)
 {
 }
 
@@ -28,7 +30,8 @@ QPDFObjectHandle::QPDFObjectHandle(QPDF* qpdf, int objid, int generation) :
     initialized(true),
     qpdf(qpdf),
     objid(objid),
-    generation(generation)
+    generation(generation),
+    reserved(false)
 {
 }
 
@@ -37,7 +40,8 @@ QPDFObjectHandle::QPDFObjectHandle(QPDFObject* data) :
     qpdf(0),
     objid(0),
     generation(0),
-    obj(data)
+    obj(data),
+    reserved(false)
 {
 }
 
@@ -163,6 +167,14 @@ QPDFObjectHandle::isStream()
 {
     dereference();
     return QPDFObjectTypeAccessor<QPDF_Stream>::check(obj.getPointer());
+}
+
+bool
+QPDFObjectHandle::isReserved()
+{
+    // dereference will clear reserved if this has been replaced
+    dereference();
+    return this->reserved;
 }
 
 bool
@@ -568,6 +580,11 @@ QPDFObjectHandle::unparse()
 std::string
 QPDFObjectHandle::unparseResolved()
 {
+    if (this->reserved)
+    {
+        throw std::logic_error(
+            "QPDFObjectHandle: attempting to unparse a reserved object");
+    }
     dereference();
     return this->obj->unparse();
 }
@@ -690,6 +707,19 @@ QPDFObjectHandle::newStream(QPDF* qpdf, std::string const& data)
 }
 
 QPDFObjectHandle
+QPDFObjectHandle::newReserved(QPDF* qpdf)
+{
+    // Reserve a spot for this object by assigning it an object
+    // number, but then return an unresolved handle to the object.
+    QPDFObjectHandle reserved = qpdf->makeIndirectObject(
+	QPDFObjectHandle(new QPDF_Reserved()));
+    QPDFObjectHandle result =
+        newIndirect(qpdf, reserved.objid, reserved.generation);
+    result.reserved = true;
+    return result;
+}
+
+QPDFObjectHandle
 QPDFObjectHandle::shallowCopy()
 {
     assertInitialized();
@@ -744,6 +774,13 @@ QPDFObjectHandle::makeDirectInternal(std::set<int>& visited)
 		"indirect to direct");
 	}
 	visited.insert(cur_objid);
+    }
+
+    if (isReserved())
+    {
+        throw std::logic_error(
+            "QPDFObjectHandle: attempting to make a"
+            " reserved object handle direct");
     }
 
     dereference();
@@ -903,6 +940,12 @@ QPDFObjectHandle::assertStream()
 }
 
 void
+QPDFObjectHandle::assertReserved()
+{
+    assertType("Reserved", isReserved());
+}
+
+void
 QPDFObjectHandle::assertScalar()
 {
     assertType("Scalar", isScalar());
@@ -929,12 +972,21 @@ QPDFObjectHandle::dereference()
 {
     if (this->obj.getPointer() == 0)
     {
-	this->obj = QPDF::Resolver::resolve(
+        PointerHolder<QPDFObject> obj = QPDF::Resolver::resolve(
 	    this->qpdf, this->objid, this->generation);
-	if (this->obj.getPointer() == 0)
+	if (obj.getPointer() == 0)
 	{
 	    QTC::TC("qpdf", "QPDFObjectHandle indirect to unknown");
 	    this->obj = new QPDF_Null();
 	}
+        else if (dynamic_cast<QPDF_Reserved*>(obj.getPointer()))
+        {
+            // Do not resolve
+        }
+        else
+        {
+            this->reserved = false;
+            this->obj = obj;
+        }
     }
 }

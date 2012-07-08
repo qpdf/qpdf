@@ -39,6 +39,7 @@ SRCS_libqpdf = \
 	libqpdf/QPDF_Name.cc \
 	libqpdf/QPDF_Null.cc \
 	libqpdf/QPDF_Real.cc \
+	libqpdf/QPDF_Reserved.cc \
 	libqpdf/QPDF_Stream.cc \
 	libqpdf/QPDF_String.cc \
 	libqpdf/QPDF_encryption.cc \

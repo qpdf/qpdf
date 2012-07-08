@@ -1,0 +1,8 @@
+res1 is still reserved after checking if array
+res1 is no longer reserved
+res1 is an array
+logic error: QPDFObjectHandle: attempting to unparse a reserved object
+logic error: QPDFObjectHandle: attempting to make a reserved object handle direct
+res2 is an array
+circular access and lazy resolution worked
+test 24 done

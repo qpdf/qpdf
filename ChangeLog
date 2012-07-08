@@ -1,3 +1,12 @@
+2012-07-08  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add QPDFObjectHandle::newReserved to create a reserved object
+	and QPDF::replaceReserved to replace it with a real object.
+	QPDFObjectHandle::newReserved reserves an object ID in a QPDF
+	object and ensures that any references to it remain unresolved.
+	When QPDF::replaceReserved is later called, previous references to
+	the reserved object will properly resolve to the replaced object.
+
 2012-07-07  Jay Berkenbilt  <ejb@ql.org>
 
 	* NOTE: BREAKING API CHANGE.  Remove previously required length

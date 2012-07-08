@@ -81,6 +81,8 @@ class QPDFObjectHandle
     bool isDictionary();
     QPDF_DLL
     bool isStream();
+    QPDF_DLL
+    bool isReserved();
 
     // This returns true in addition to the query for the specific
     // type for indirect objects.
@@ -147,6 +149,24 @@ class QPDFObjectHandle
     // buffer as in the PointerHolder<Buffer> version of newStream.
     QPDF_DLL
     static QPDFObjectHandle newStream(QPDF* qpdf, std::string const& data);
+
+    // A reserved object is a special sentinel used for qpdf to
+    // reserve a spot for an object that is going to be added to the
+    // QPDF object.  Normally you don't have to use this type since
+    // you can just call QPDF::makeIndirectObject.  However, in some
+    // cases, if you have to create objects with circular references,
+    // you may need to create a reserved object so that you can have a
+    // reference to it and then replace the object later.  Reserved
+    // objects have the special property that they can't be resolved
+    // to direct objects.  This makes it possible to replace a
+    // reserved object with a new object while preserving existing
+    // references to them.  When you are ready to replace a reserved
+    // object with its replacement, use QPDF::replaceReserved for this
+    // purpose rather than the more general QPDF::replaceObject.  It
+    // is an error to try to write a QPDF with QPDFWriter if it has
+    // any reserved objects in it.
+    QPDF_DLL
+    static QPDFObjectHandle newReserved(QPDF* qpdf);
 
     // Accessor methods.  If an accessor method that is valid for only
     // a particular object type is called on an object of the wrong
@@ -430,6 +450,8 @@ class QPDFObjectHandle
     void assertDictionary();
     QPDF_DLL
     void assertStream();
+    QPDF_DLL
+    void assertReserved();
 
     QPDF_DLL
     void assertScalar();
@@ -459,6 +481,7 @@ class QPDFObjectHandle
     int objid;			// 0 for direct object
     int generation;
     PointerHolder<QPDFObject> obj;
+    bool reserved;
 };
 
 #endif // __QPDFOBJECTHANDLE_HH__
