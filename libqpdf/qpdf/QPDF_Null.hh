@@ -7,7 +7,7 @@ class QPDF_Null: public QPDFObject
 {
   public:
     virtual ~QPDF_Null();
-    std::string unparse();
+    virtual std::string unparse();
 };
 
 #endif // __QPDF_NULL_HH__
