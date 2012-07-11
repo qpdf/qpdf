@@ -687,14 +687,14 @@ void runtest(int n, char const* filename)
         // dictionary and modify it.  Using the results of
         // getDictAsMap to create a new dictionary effectively creates
         // a shallow copy.
-        QPDFObjectHandle page_tempate = pages[0];
+        QPDFObjectHandle page_template = pages[0];
         std::vector<QPDFObjectHandle> new_pages;
         for (std::vector<QPDFObjectHandle>::iterator iter = contents.begin();
              iter != contents.end(); ++iter)
         {
             // We will retain indirect object references to other
             // indirect objects other than page content.
-            QPDFObjectHandle page = page_tempate.shallowCopy();
+            QPDFObjectHandle page = page_template.shallowCopy();
             page.replaceKey("/Contents", *iter);
             if (iter == contents.begin())
             {
