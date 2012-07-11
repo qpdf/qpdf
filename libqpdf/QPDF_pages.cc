@@ -89,6 +89,7 @@ QPDF::updateAllPagesCache()
     QTC::TC("qpdf", "QPDF updateAllPagesCache");
     this->all_pages.clear();
     this->pageobj_to_pages_pos.clear();
+    this->pushed_inherited_attributes_to_pages = false;
     getAllPages();
 }
 
@@ -160,6 +161,12 @@ QPDF::insertPage(QPDFObjectHandle newpage, int pos)
     {
         QTC::TC("qpdf", "QPDF insert non-indirect page");
         newpage = this->makeIndirectObject(newpage);
+    }
+    else if (newpage.getOwningQPDF() != this)
+    {
+        QTC::TC("qpdf", "QPDF insert foreign page");
+        newpage.getOwningQPDF()->pushInheritedAttributesToPage();
+        newpage = this->copyForeignObject(newpage, true);
     }
     else
     {

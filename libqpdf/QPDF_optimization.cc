@@ -232,6 +232,14 @@ QPDF::pushInheritedAttributesToPage(bool allow_changes, bool warn_skipped_keys)
     // Traverse pages tree pushing all inherited resources down to the
     // page level.
 
+    // The record of whether we've done this is cleared by
+    // updateAllPagesCache().  If we're warning for skipped keys,
+    // re-traverse unconditionally.
+    if (this->pushed_inherited_attributes_to_pages && (! warn_skipped_keys))
+    {
+        return;
+    }
+
     // key_ancestors is a mapping of page attribute keys to a stack of
     // Pages nodes that contain values for them.
     std::map<std::string, std::vector<QPDFObjectHandle> > key_ancestors;
@@ -240,6 +248,7 @@ QPDF::pushInheritedAttributesToPage(bool allow_changes, bool warn_skipped_keys)
         this->trailer.getKey("/Root").getKey("/Pages"),
         key_ancestors, this->all_pages, allow_changes, warn_skipped_keys);
     assert(key_ancestors.empty());
+    this->pushed_inherited_attributes_to_pages = true;
 }
 
 void

@@ -1,3 +1,21 @@
+2012-07-11  Jay Berkenbilt  <ejb@ql.org>
+
+	* Added new APIs to copy objects from one QPDF to another.  This
+	includes letting QPDF::addPage() (and QPDF::addPageAt()) accept a
+	page object from another QPDF and adding
+	QPDF::copyForeignObject().  See QPDF.hh for details.
+
+	* Add method QPDFObjectHandle::getOwningQPDF() to return the QPDF
+	object associated with an indirect QPDFObjectHandle.
+
+	* Add convenience methods to QPDFObjectHandle: assertIndirect(),
+	isPageObject(), isPagesObject()
+
+	* Cache when QPDF::pushInheritedAttributesToPage() has been called
+	to avoid traversing the pages trees multiple times.  This state is
+	cleared by QPDF::updateAllPagesCache() and ignored by
+	QPDF::flattenPagesTree().
+
 2012-07-08  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add QPDFObjectHandle::newReserved to create a reserved object

@@ -28,76 +28,54 @@ Next
    can only be used by one thread at a time, but multiple threads can
    simultaneously use separate objects.
 
+ * Write some documentation about the design of copyForeignObject.
+
+ * copyForeignObject still to do:
+
+    - qpdf command
+
+      Command line could be something like
+
+      --pages [ --new ] { file [password] numeric-range ... } ... --
+
+      The first file referenced would be the one whose other data would
+      be preserved (like trailer, info, encryption, outlines, etc.).
+      --new as first file would just use an empty file as the starting
+      point.  Be explicit about whether outlines, etc., are handled.
+      They are not handled initially.
+
+      Example: to grab pages 1-5 from file1 and 11-15 from file2
+
+      --pages file1.pdf 1-5 file2.pdf 11-15 --
+
+      To implement this, we would remove all pages from file1 except
+      pages 1 through 5.  Then we would take pages 11 through 15 from
+      file2, copy them to the file, and add them as pages.
+
+    - document that makeIndirectObject doesn't handle foreign objects
+      automatically because copying a foreign object is a big enough
+      deal that it should be explicit.  However addPages* does handle
+      foreign page objects automatically.
+
+    - Test /Outlines and see whether there's any point in handling
+      them in the API.  Maybe just copying them over works.  What
+      about command line tool?  Also think about page labels.
+
+    - Tests through qpdf command line: copy pages from multiple PDFs
+      starting with one PDF and also starting with empty.
+
+ * (Hopefully) Provide an option to copy encryption parameters from
+   another file.  This would make it possible to decrypt a file,
+   manually work with it, and then re-encrypt it using the original
+   encryption parameters including a possibly unknown owner password.
+
 
 Soon
 ====
 
- * Provide an option to copy encryption parameters from another file.
-   This would make it possible to decrypt a file, manually work with
-   it, and then re-encrypt it using the original encryption parameters
-   including a possibly unknown owner password.
-
  * See if I can support the new encryption formats mentioned in the
    open bug on sourceforge.  Check other sourceforge bugs.
 
- * Splitting/merging concepts
-
-   newPDF() could create a PDF with just a trailer, no pages, and a
-   minimal info.  Then the page routines could be used to add pages to
-   it.
-
-   Starting with any pdf, you should be able to copy objects from
-   another pdf.  The copy should be smart about never traversing into
-   a /Page or /Pages.
-
-   We could provide a method of copying objects from one PDF into
-   another.  This would do whatever optimization is necessary (maybe
-   just optimizePagesTree) and then traverse the set of objects
-   specified to find all objects referenced by the set.  Each of those
-   would be copied over with a table mapping old ID to new ID.  This
-   would be done from bottom up most likely disallowing cycles or
-   handling them sanely.
-
-   Command line could be something like
-
-   --pages [ --new ] { file [password] numeric-range ... } ... --
-
-   The first file referenced would be the one whose other data would
-   be preserved (like trailer, info, encryption, outlines, etc.).
-   --new as first file would just use an empty file as the starting
-   point.
-
-   Example: to grab pages 1-5 from file1 and 11-15 from file2
-
-   --pages file1.pdf 1-5 file2.pdf 11-15 --
-
-   To implement this, we would remove all pages from file1 except
-   pages 1 through 5.  Then we would take pages 11 through 15 from
-   file2 and add them to a set for transfer.  This would end up
-   generating a list of indirect objects.  We would copy those objects
-   shallowly to the new PDF keeping track of the mapping and replacing
-   any indirect object keys as appropriate, much like QPDFWriter does.
-
-   When all the objects are registered, we would add those pages to
-   the result.
-
-   This approach could work for both splitting and merging.  It's
-   possible it could be implemented now without any new APIs, but most
-   of the work should be doable by the library with only a small set
-   of additions.
-
-   newPDF()
-   QPDFObjectCopier c(qpdf1, qpdf2)
-   QPDFObjectHandle obj = c.copyObject(<object from qpdf1>)
-     Without traversing pages, copies all indirect objects referenced
-     by <object from qpdf1> preserving referential integrity and
-     returns an object handle in qpdf2 of the same object.  If called
-     multiple times on the same object, retraverses in case there were
-     changes.
-
-   QPDFObjectHandle obj = c.getMapping(<object from qpdf1>)
-     find the object in qpdf2 corresponding to the object from qpdf1.
-     Return the null object if none.
 
 General
 =======
@@ -110,23 +88,11 @@ General
  * Update qpdf docs about non-ascii passwords.  See thread from
    2010-12-07,08 for details.
 
- * Look at page splitting.  Subramanyam provided a test file; see
-   ../misc/article-threads.pdf.  Email Q-Count: 431864 from
-   2009-11-03.  See also "Splitting by Pages" below.
-
- * Consider writing a PDF merge utility.  With 2.2, it would be
-   possible to have a StreamDataProvider that would allow stream data
-   to be directly copied from one PDF file to another.  One possible
-   strategy would be to have a program that adds all the pages of one
-   file to the end of another file.  The basic
-   strategy would be to create a table that adds new streams to the
-   original file, mapping the new streams' obj/gen to a stream in the
-   file whose pages are being appended.  The StreamDataProvider, when
-   asked, could simply pipe the streams of the file being appended to
-   the provided pipeline and could copy the filter and decode
-   parameters from the original file.  Being able to do this requires
-   a lot of the same logic as being able to do splitting, so a general
-   split/merge program would be a great addition.
+ * Consider impact of article threads on page splitting/merging.
+   Subramanyam provided a test file; see ../misc/article-threads.pdf.
+   Email Q-Count: 431864 from 2009-11-03.  Other things to consider:
+   outlines, page labels, thumbnails, zones.  There are probably
+   others.
 
  * See whether it's possible to remove the call to
    flattenScalarReferences.  I can't easily figure out why I do it,
@@ -279,26 +245,3 @@ Index: QPDFWriter.cc
 
  * From a suggestion in bug 3152169, consisder having an option to
    re-encode inline images with an ASCII encoding.
-
-
-Splitting by Pages
-==================
-
-Although qpdf does not currently support splitting a file into pages,
-the work done for linearization covers almost all the work.  To do
-page splitting.  If this functionality is needed, study
-obj_user_to_objects and object_to_obj_users created in
-QPDF_optimization for ideas.  It's quite possible that the information
-computed by calculateLinearizationData is actually sufficient to do
-page splitting in many circumstances.  That code knows which objects
-are used by which pages, though it doesn't do anything page-specific
-with outlines, thumbnails, page labels, or anything else.
-
-Another approach would be to traverse only pages that are being output
-taking care not to traverse into the pages tree, and then to fabricate
-a new pages tree.
-
-Either way, care must be taken to handle other things such as
-outlines, page labels, thumbnails, threads, zones, etc. in a sensible
-way.  This may include simply omitting information other than page
-content.

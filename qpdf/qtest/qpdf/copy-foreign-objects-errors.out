@@ -1,0 +1,3 @@
+logic error: QPDF::copyForeign called with object from this QPDF
+logic error: QPDF::copyForeign called with direct object handle
+test 28 done

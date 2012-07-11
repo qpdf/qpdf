@@ -379,6 +379,27 @@ $td->runtest("check output",
 	     {$td->FILE => "a.pdf"},
 	     {$td->FILE => "from-scratch-0.pdf"});
 # ----------
+$td->notify("--- Copy Foreign Objects ---");
+$n_tests += 7;
+
+foreach my $d ([25, 1], [26, 2], [27, 3])
+{
+    my ($testn, $outn) = @$d;
+    $td->runtest("copy objects $outn",
+                 {$td->COMMAND => "test_driver $testn" .
+                      " copy-foreign-objects-in.pdf"},
+                 {$td->STRING => "test $testn done\n", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("check output",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => "copy-foreign-objects-out$outn.pdf"});
+}
+$td->runtest("copy objects error",
+             {$td->COMMAND => "test_driver 28 copy-foreign-objects-in.pdf"},
+             {$td->FILE => "copy-foreign-objects-errors.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+# ----------
 $td->notify("--- Error Condition Tests ---");
 # $n_tests incremented after initialization of badfiles below.
 

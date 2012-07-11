@@ -1,0 +1,81 @@
+%PDF-1.3
+%¿÷¢þ
+1 0 obj
+<< /Pages 3 0 R /Type /Catalog >>
+endobj
+2 0 obj
+<< /O1 4 0 R /O2 5 0 R /O3 6 0 R /This-is-QTest true >>
+endobj
+3 0 obj
+<< /Count 2 /Kids [ 7 0 R 6 0 R ] /Type /Pages >>
+endobj
+4 0 obj
+[ /This-is-O1 /potato << /O2 [ 3.14159 << /O2 5 0 R >> 2.17828 ] >> /salad /O2 5 0 R /Stream1 8 0 R ]
+endobj
+5 0 obj
+<< /K1 [ 2.236 /O1 4 0 R 1.732 ] /O1 4 0 R /This-is-O2 true >>
+endobj
+6 0 obj
+<< /Contents 9 0 R /MediaBox [ 0 0 612 792 ] /Parent 3 0 R /Resources << /Font << /F1 10 0 R >> /ProcSet [ /PDF /Text ] >> /Rotate 180 /This-is-O3 true /Type /Page >>
+endobj
+7 0 obj
+<< /Contents 11 0 R /MediaBox [ 0 0 612 792 ] /Parent 3 0 R /Resources << /Font << /F1 12 0 R >> /ProcSet 13 0 R >> /Type /Page >>
+endobj
+8 0 obj
+<< /Stream2 14 0 R /This-is-Stream1 true /Length 18 >>
+stream
+This is stream 1.
+endstream
+endobj
+9 0 obj
+<< /Length 47 >>
+stream
+BT /F1 15 Tf 72 720 Td (Original page 2) Tj ET
+endstream
+endobj
+10 0 obj
+<< /BaseFont /Times-Roman /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font >>
+endobj
+11 0 obj
+<< /Length 44 >>
+stream
+BT
+  /F1 24 Tf
+  72 720 Td
+  (Potato) Tj
+ET
+endstream
+endobj
+12 0 obj
+<< /BaseFont /Helvetica /Encoding /WinAnsiEncoding /Name /F1 /Subtype /Type1 /Type /Font >>
+endobj
+13 0 obj
+[ /PDF /Text ]
+endobj
+14 0 obj
+<< /Stream1 8 0 R /This-is-Stream2 true /Length 18 >>
+stream
+This is stream 2.
+endstream
+endobj
+xref
+0 15
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000135 00000 n 
+0000000200 00000 n 
+0000000317 00000 n 
+0000000395 00000 n 
+0000000577 00000 n 
+0000000723 00000 n 
+0000000828 00000 n 
+0000000924 00000 n 
+0000001024 00000 n 
+0000001118 00000 n 
+0000001226 00000 n 
+0000001257 00000 n 
+trailer << /QTest 2 0 R /Root 1 0 R /Size 15 /ID [<31415926535897932384626433832795><31415926535897932384626433832795>] >>
+startxref
+1362
+%%EOF

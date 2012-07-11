@@ -916,6 +916,89 @@ void runtest(int n, char const* filename)
 	w.setStreamDataMode(qpdf_s_preserve);
 	w.write();
     }
+    else if (n == 25)
+    {
+        // The copy object tests are designed to work with a specific
+        // file.  Look at the test suite for the file, and look at the
+        // file for comments about the file's structure.
+
+        // Copy qtest without crossing page boundaries.  Should get O1
+        // and O2 and their streams but not O3 or any other pages.
+
+        QPDF newpdf;
+        newpdf.processFile("minimal.pdf");
+        QPDFObjectHandle qtest = pdf.getTrailer().getKey("/QTest");
+        newpdf.getTrailer().replaceKey(
+            "/QTest", newpdf.copyForeignObject(qtest));
+
+	QPDFWriter w(newpdf, "a.pdf");
+	w.setStaticID(true);
+	w.setStreamDataMode(qpdf_s_preserve);
+	w.write();
+    }
+    else if (n == 26)
+    {
+        // Copy the O3 page using addPage.  Copy qtest without
+        // crossing page boundaries.  In addition to previous results,
+        // should get page O3 but no other pages including the page
+        // that O3 points to.  Also, inherited object will have been
+        // pushed down and will be preserved.
+
+        QPDF newpdf;
+        newpdf.processFile("minimal.pdf");
+        QPDFObjectHandle qtest = pdf.getTrailer().getKey("/QTest");
+        QPDFObjectHandle O3 = qtest.getKey("/O3");
+        newpdf.addPage(O3, false);
+        newpdf.getTrailer().replaceKey(
+            "/QTest", newpdf.copyForeignObject(qtest));
+
+	QPDFWriter w(newpdf, "a.pdf");
+	w.setStaticID(true);
+	w.setStreamDataMode(qpdf_s_preserve);
+	w.write();
+    }
+    else if (n == 27)
+    {
+        // Copy O3 and the page O3 refers to before copying qtest.
+        // Should get qtest plus only the O3 page and the page that O3
+        // points to.  Inherited objects should be preserved.
+
+        QPDF newpdf;
+        newpdf.processFile("minimal.pdf");
+        QPDFObjectHandle qtest = pdf.getTrailer().getKey("/QTest");
+        QPDFObjectHandle O3 = qtest.getKey("/O3");
+        newpdf.addPage(O3.getKey("/OtherPage"), false);
+        newpdf.addPage(O3, false);
+        newpdf.getTrailer().replaceKey(
+            "/QTest", newpdf.copyForeignObject(qtest));
+
+	QPDFWriter w(newpdf, "a.pdf");
+	w.setStaticID(true);
+	w.setStreamDataMode(qpdf_s_preserve);
+	w.write();
+    }
+    else if (n == 28)
+    {
+        // Copy foreign object errors
+        try
+        {
+            pdf.copyForeignObject(pdf.getTrailer().getKey("/QTest"));
+            std::cout << "oops -- didn't throw" << std::endl;
+        }
+        catch (std::logic_error e)
+        {
+            std::cout << "logic error: " << e.what() << std::endl;
+        }
+        try
+        {
+            pdf.copyForeignObject(QPDFObjectHandle::newInteger(1));
+            std::cout << "oops -- didn't throw" << std::endl;
+        }
+        catch (std::logic_error e)
+        {
+            std::cout << "logic error: " << e.what() << std::endl;
+        }
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +

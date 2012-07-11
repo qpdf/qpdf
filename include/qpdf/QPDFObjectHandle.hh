@@ -222,6 +222,11 @@ class QPDFObjectHandle
     QPDF_DLL
     bool isOrHasName(std::string const&);
 
+    // Return the QPDF object that owns an indirect object.  Returns
+    // null for a direct object.
+    QPDF_DLL
+    QPDF* getOwningQPDF();
+
     // Create a shallow copy of an object as a direct object.  Since
     // this is a shallow copy, for dictionaries and arrays, any keys
     // or items that were indirect objects will still be indirect
@@ -454,9 +459,16 @@ class QPDFObjectHandle
     void assertReserved();
 
     QPDF_DLL
+    void assertIndirect();
+    QPDF_DLL
     void assertScalar();
     QPDF_DLL
     void assertNumber();
+
+    QPDF_DLL
+    bool isPageObject();
+    QPDF_DLL
+    bool isPagesObject();
     QPDF_DLL
     void assertPageObject();
 

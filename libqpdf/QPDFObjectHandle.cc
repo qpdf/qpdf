@@ -355,6 +355,14 @@ QPDFObjectHandle::isOrHasName(std::string const& value)
     return false;
 }
 
+// Indirect object accessors
+QPDF*
+QPDFObjectHandle::getOwningQPDF()
+{
+    // Will be null for direct objects
+    return this->qpdf;
+}
+
 // Dictionary mutators
 
 void
@@ -784,6 +792,7 @@ QPDFObjectHandle::makeDirectInternal(std::set<int>& visited)
     }
 
     dereference();
+    this->qpdf = 0;
     this->objid = 0;
     this->generation = 0;
 
@@ -946,6 +955,16 @@ QPDFObjectHandle::assertReserved()
 }
 
 void
+QPDFObjectHandle::assertIndirect()
+{
+    if (! isIndirect())
+    {
+	throw std::logic_error(
+            "operation for indirect object attempted on direct object");
+    }
+}
+
+void
 QPDFObjectHandle::assertScalar()
 {
     assertType("Scalar", isScalar());
@@ -957,11 +976,24 @@ QPDFObjectHandle::assertNumber()
     assertType("Number", isNumber());
 }
 
+bool
+QPDFObjectHandle::isPageObject()
+{
+    return (this->isDictionary() && this->hasKey("/Type") &&
+            (this->getKey("/Type").getName() == "/Page"));
+}
+
+bool
+QPDFObjectHandle::isPagesObject()
+{
+    return (this->isDictionary() && this->hasKey("/Type") &&
+            (this->getKey("/Type").getName() == "/Pages"));
+}
+
 void
 QPDFObjectHandle::assertPageObject()
 {
-    if (! (this->isDictionary() && this->hasKey("/Type") &&
-	   (this->getKey("/Type").getName() == "/Page")))
+    if (! isPageObject())
     {
 	throw std::logic_error("page operation called on non-Page object");
     }

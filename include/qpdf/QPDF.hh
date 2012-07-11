@@ -190,6 +190,28 @@ class QPDF
     replaceReserved(QPDFObjectHandle reserved,
                     QPDFObjectHandle replacement);
 
+    // Copy an object from another QPDF to this one.  The return value
+    // is an indirect reference to the copied object in this file.
+    // This method is intended to be used to copy non-page objects and
+    // will not copy page objects.  To copy page objects, pass the
+    // foreign page object directly to addPage (or addPageAt).  If you
+    // copy objects that contain references to pages, you should copy
+    // the pages first using addPage(At).  Otherwise references to the
+    // pages that have not been copied will be replaced with nulls.
+
+    // When copying objects with this method, object structure will be
+    // preserved, so all indirectly referenced indirect objects will
+    // be copied as well.  This includes any circular references that
+    // may exist.  The QPDF object keeps a record of what has already
+    // been copied, so shared objects will not be copied multiple
+    // times.  This also means that if you mutate an object that has
+    // already been copied and try to copy it again, it won't work
+    // since the modified object will not be recopied.  Therefore, you
+    // should do all mutation on the original file that you are going
+    // to do before you start copying its objects to a new file.
+    QPDF_DLL
+    QPDFObjectHandle copyForeignObject(QPDFObjectHandle foreign);
+
     // Encryption support
 
     enum encryption_method_e { e_none, e_unknown, e_rc4, e_aes };
@@ -380,7 +402,10 @@ class QPDF
     // modify /Pages structures directly, you must call this method
     // afterwards.  This method updates the internal list of pages, so
     // after calling this method, any previous references returned by
-    // getAllPages() will be valid again.
+    // getAllPages() will be valid again.  It also resets any state
+    // about having pushed inherited attributes in /Pages objects down
+    // to the pages, so if you add any inheritable attributes to a
+    // /Pages object, you should also call this method.
     QPDF_DLL
     void updateAllPagesCache();
 
@@ -389,11 +414,19 @@ class QPDF
     // resolved by explicitly setting the values in each /Page.
     void pushInheritedAttributesToPage();
 
-    // Add new page at the beginning or the end of the current pdf
+    // Add new page at the beginning or the end of the current pdf.
+    // The newpage parameter may be either a direct object, an
+    // indirect object from this QPDF, or an indirect object from
+    // another QPDF.  If it is a direct object, it will be made
+    // indirect.  If it is an indirect object from another QPDF, this
+    // method will call pushInheritedAttributesToPage on the other
+    // file and then copy the page to this QPDF using the same
+    // underlying code as copyForeignObject.
     QPDF_DLL
     void addPage(QPDFObjectHandle newpage, bool first);
 
-    // Add new page before or after refpage
+    // Add new page before or after refpage.  See comments for addPage
+    // for details about what newpage should be.
     QPDF_DLL
     void addPageAt(QPDFObjectHandle newpage, bool before,
                    QPDFObjectHandle refpage);
@@ -542,6 +575,29 @@ class QPDF
 	qpdf_offset_t end_after_space;
     };
 
+    class ObjCopier
+    {
+      public:
+        std::map<ObjGen, QPDFObjectHandle> object_map;
+        std::vector<QPDFObjectHandle> to_copy;
+        std::set<ObjGen> visiting;
+    };
+
+    class CopiedStreamDataProvider: public QPDFObjectHandle::StreamDataProvider
+    {
+      public:
+        virtual ~CopiedStreamDataProvider()
+        {
+        }
+	virtual void provideStreamData(int objid, int generation,
+				       Pipeline* pipeline);
+        void registerForeignStream(ObjGen const& local_og,
+                                   QPDFObjectHandle foreign_stream);
+
+      private:
+        std::map<ObjGen, QPDFObjectHandle> foreign_streams;
+    };
+
     void parse(char const* password);
     void warn(QPDFExc const& e);
     void setTrailer(QPDFObjectHandle obj);
@@ -601,6 +657,14 @@ class QPDF
 	Pipeline*& pipeline, int objid, int generation,
 	QPDFObjectHandle& stream_dict,
 	std::vector<PointerHolder<Pipeline> >& heap);
+
+    // Methods to support object copying
+    QPDFObjectHandle copyForeignObject(
+        QPDFObjectHandle foreign, bool allow_page);
+    void reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier,
+                        bool top);
+    QPDFObjectHandle replaceForeignIndirectObjects(
+        QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top);
 
     // Linearization Hint table structures.
     // Naming conventions:
@@ -960,7 +1024,12 @@ class QPDF
     QPDFObjectHandle trailer;
     std::vector<QPDFObjectHandle> all_pages;
     std::map<ObjGen, int> pageobj_to_pages_pos;
+    bool pushed_inherited_attributes_to_pages;
     std::vector<QPDFExc> warnings;
+    std::map<QPDF*, ObjCopier> object_copiers;
+    PointerHolder<QPDFObjectHandle::StreamDataProvider> copied_streams;
+    // copied_stream_data_provider is owned by copied_streams
+    CopiedStreamDataProvider* copied_stream_data_provider;
 
     // Linearization data
     qpdf_offset_t first_xref_item_offset; // actual value from file
