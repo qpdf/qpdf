@@ -503,10 +503,8 @@ void runtest(int n, char const* filename)
     else if (n == 9)
     {
 	QPDFObjectHandle root = pdf.getRoot();
-	PointerHolder<Buffer> b1 = new Buffer(20);
-	unsigned char* bp = b1->getBuffer();
-	memcpy(bp, (char*)"data for new stream\n", 20); // no null!
-	QPDFObjectHandle qstream = QPDFObjectHandle::newStream(&pdf, b1);
+	QPDFObjectHandle qstream = QPDFObjectHandle::newStream(
+            &pdf, "data for new stream\n");
 	QPDFObjectHandle rstream = QPDFObjectHandle::newStream(&pdf);
 	try
 	{
@@ -517,11 +515,11 @@ void runtest(int n, char const* filename)
 	{
 	    std::cout << "exception: " << e.what() << std::endl;
 	}
-	PointerHolder<Buffer> b2 = new Buffer(22);
-	bp = b2->getBuffer();
+	PointerHolder<Buffer> buf = new Buffer(22);
+	unsigned char* bp = buf->getBuffer();
 	memcpy(bp, (char*)"data for other stream\n", 22); // no null!
 	rstream.replaceStreamData(
-	    b2, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
+	    buf, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
 	root.replaceKey("/QStream", qstream);
 	root.replaceKey("/RStream", rstream);
 	QPDFWriter w(pdf, "a.pdf");
@@ -531,16 +529,13 @@ void runtest(int n, char const* filename)
     }
     else if (n == 10)
     {
-	PointerHolder<Buffer> b1 = new Buffer(37);
-	unsigned char* bp = b1->getBuffer();
-	memcpy(bp, (char*)"BT /F1 12 Tf 72 620 Td (Baked) Tj ET\n", 37);
-	PointerHolder<Buffer> b2 = new Buffer(38);
-	bp = b2->getBuffer();
-	memcpy(bp, (char*)"BT /F1 18 Tf 72 520 Td (Mashed) Tj ET\n", 38);
-
 	std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
-	pages[0].addPageContents(QPDFObjectHandle::newStream(&pdf, b1), true);
-	pages[0].addPageContents(QPDFObjectHandle::newStream(&pdf, b2), false);
+	pages[0].addPageContents(
+            QPDFObjectHandle::newStream(
+                &pdf, "BT /F1 12 Tf 72 620 Td (Baked) Tj ET\n"), true);
+	pages[0].addPageContents(
+            QPDFObjectHandle::newStream(
+                &pdf, "BT /F1 18 Tf 72 520 Td (Mashed) Tj ET\n"), false);
 
 	QPDFWriter w(pdf, "a.pdf");
 	w.setStaticID(true);
