@@ -360,9 +360,12 @@ class QPDFObjectHandle
 
     // Throws an exception if this is not a Page object.  Returns an
     // empty map if there are no images or no resources.  This
-    // function does not presently support inherited resources.  See
-    // comment in the source for details.  Return value is a map from
-    // XObject name to the image object, which is always a stream.
+    // function does not presently support inherited resources.  If
+    // this is a significant concern, call
+    // pushInheritedAttributesToPage() on the QPDF object that owns
+    // this page.  See comment in the source for details.  Return
+    // value is a map from XObject name to the image object, which is
+    // always a stream.
     QPDF_DLL
     std::map<std::string, QPDFObjectHandle> getPageImages();
 
