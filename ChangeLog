@@ -1,5 +1,8 @@
 2012-07-14  Jay Berkenbilt  <ejb@ql.org>
 
+	* QPDFWriter: add public copyEncryptionParameters to allow copying
+	encryption parameters from another file.
+
 	* QPDFWriter: detect if the user has inserted an indirect object
 	from another QPDF object and throw an exception directing the user
 	to copyForeignObject.

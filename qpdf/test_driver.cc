@@ -1024,6 +1024,17 @@ void runtest(int n, char const* filename1, char const* filename2)
             std::cout << "logic error: " << e.what() << std::endl;
         }
     }
+    else if (n == 30)
+    {
+        assert(filename2 != 0);
+        QPDF encrypted;
+        encrypted.processFile(filename2, "user");
+        QPDFWriter w(pdf, "b.pdf");
+	w.setStaticID(true);
+	w.setStreamDataMode(qpdf_s_preserve);
+        w.copyEncryptionParameters(encrypted);
+	w.write();
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +

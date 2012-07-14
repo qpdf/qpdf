@@ -389,10 +389,11 @@ QPDFWriter::setEncryptionParameters(
 }
 
 void
-QPDFWriter::copyEncryptionParameters()
+QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
 {
+    this->preserve_encryption = false;
     generateID();
-    QPDFObjectHandle trailer = this->pdf.getTrailer();
+    QPDFObjectHandle trailer = qpdf.getTrailer();
     if (trailer.hasKey("/Encrypt"))
     {
 	QPDFObjectHandle encrypt = trailer.getKey("/Encrypt");
@@ -410,6 +411,8 @@ QPDFWriter::copyEncryptionParameters()
 	}
 	QTC::TC("qpdf", "QPDFWriter copy encrypt metadata",
 		this->encrypt_metadata ? 0 : 1);
+        this->id1 =
+            trailer.getKey("/ID").getArrayItem(0).getStringValue();
 	setEncryptionParametersInternal(
 	    V,
 	    encrypt.getKey("/R").getIntValue(),
@@ -1625,7 +1628,7 @@ QPDFWriter::write()
 
     if (preserve_encryption)
     {
-	copyEncryptionParameters();
+	copyEncryptionParameters(this->pdf);
     }
 
     if (! this->forced_pdf_version.empty())

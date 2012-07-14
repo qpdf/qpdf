@@ -188,6 +188,11 @@ class QPDFWriter
     QPDF_DLL
     void setPreserveEncryption(bool);
 
+    // Copy encryption parameters from another QPDF object.  If you
+    // want to copy encryption from the object you are writing, call
+    // setPreserveEncryption(true) instead.
+    void copyEncryptionParameters(QPDF&);
+
     // Set up for encrypted output.  Disables stream prefiltering and
     // content normalization.  Note that setting R2 encryption
     // parameters sets the PDF version to at least 1.3, setting R3
@@ -269,7 +274,6 @@ class QPDFWriter
 	int V, int R, int key_len, long P,
 	std::string const& O, std::string const& U,
 	std::string const& id1, std::string const& user_password);
-    void copyEncryptionParameters();
     void setDataKey(int objid);
     int openObject(int objid = 0);
     void closeObject(int objid);

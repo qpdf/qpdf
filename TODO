@@ -64,10 +64,9 @@ Next
     - Tests through qpdf command line: copy pages from multiple PDFs
       starting with one PDF and also starting with empty.
 
- * (Hopefully) Provide an option to copy encryption parameters from
-   another file.  This would make it possible to decrypt a file,
-   manually work with it, and then re-encrypt it using the original
-   encryption parameters including a possibly unknown owner password.
+ * qpdf commandline: provide an option to copy encryption parameters
+   from another file, specifying file and password.  Search for "Copy
+   encryption parameters" in qpdf.test.
 
 
 Soon

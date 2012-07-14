@@ -1369,6 +1369,23 @@ $td->runtest("check output",
 	     {$td->FILE => 'a.pdf'},
 	     {$td->FILE => 'decrypted-crypt-filter.pdf'});
 
+# Copy encryption parameters
+$n_tests += 3;
+$td->runtest("create encrypted file",
+	     {$td->COMMAND =>
+		  "qpdf --encrypt user owner 128 --use-aes=y --extract=n --" .
+                  " minimal.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("copy encryption parameters",
+             {$td->COMMAND => "test_driver 30 minimal.pdf a.pdf"},
+             {$td->STRING => "test 30 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("checkout encryption",
+	     {$td->COMMAND => "qpdf --show-encryption b.pdf --password=owner"},
+	     {$td->FILE => "copied-encryption.out",
+	      $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
 show_ntests();
 # ----------
 $td->notify("--- Content Preservation Tests ---");

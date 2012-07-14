@@ -1,0 +1,12 @@
+R = 4
+P = -20
+User password = user
+extract for accessibility: allowed
+extract for any purpose: not allowed
+print low resolution: allowed
+print high resolution: allowed
+modify document assembly: allowed
+modify forms: allowed
+modify annotations: allowed
+modify other: allowed
+modify anything: allowed
