@@ -761,6 +761,15 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
 {
     if (object.isIndirect())
     {
+        if (object.getOwningQPDF() != &(this->pdf))
+        {
+            QTC::TC("qpdf", "QPDFWriter foreign object");
+            throw std::logic_error(
+                "QPDFObjectHandle from different QPDF found while writing."
+                "  Use QPDF::copyForeignObject to add objects from"
+                " another file.");
+        }
+
 	if (object.isNull())
 	{
 	    // This is a place-holder object for an object stream

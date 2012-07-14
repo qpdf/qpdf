@@ -1,3 +1,9 @@
+2012-07-14  Jay Berkenbilt  <ejb@ql.org>
+
+	* QPDFWriter: detect if the user has inserted an indirect object
+	from another QPDF object and throw an exception directing the user
+	to copyForeignObject.
+
 2012-07-11  Jay Berkenbilt  <ejb@ql.org>
 
 	* Added new APIs to copy objects from one QPDF to another.  This

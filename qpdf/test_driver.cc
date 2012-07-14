@@ -999,6 +999,26 @@ void runtest(int n, char const* filename)
             std::cout << "logic error: " << e.what() << std::endl;
         }
     }
+    else if (n == 29)
+    {
+        // Detect mixed objects in QPDFWriter
+        QPDF other;
+        other.processFile("minimal.pdf");
+        // Should use copyForeignObject instead
+        other.getTrailer().replaceKey(
+            "/QTest", pdf.getTrailer().getKey("/QTest"));
+
+        try
+        {
+            QPDFWriter w(other, "a.pdf");
+            w.write();
+            std::cout << "oops -- didn't throw" << std::endl;
+        }
+        catch (std::logic_error e)
+        {
+            std::cout << "logic error: " << e.what() << std::endl;
+        }
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +

@@ -1,0 +1,2 @@
+logic error: QPDFObjectHandle from different QPDF found while writing.  Use QPDF::copyForeignObject to add objects from another file.
+test 29 done
