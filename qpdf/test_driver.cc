@@ -21,7 +21,8 @@ static char const* whoami = 0;
 
 void usage()
 {
-    std::cerr << "Usage: " << whoami << " n filename" << std::endl;
+    std::cerr << "Usage: " << whoami << " n filename1 [filename2]"
+              << std::endl;
     exit(2);
 }
 
@@ -76,7 +77,7 @@ static QPDFObjectHandle createPageContents(QPDF& pdf, std::string const& text)
     return QPDFObjectHandle::newStream(&pdf, contents);
 }
 
-void runtest(int n, char const* filename)
+void runtest(int n, char const* filename1, char const* filename2)
 {
     // Most tests here are crafted to work on specific files.  Look at
     // the test suite to see how the test is invoked to find the file
@@ -94,21 +95,21 @@ void runtest(int n, char const* filename)
         if (n % 4 == 0)
         {
 	    QTC::TC("qpdf", "exercise processFile(name)");
-            pdf.processFile(filename);
+            pdf.processFile(filename1);
         }
         else
         {
 	    QTC::TC("qpdf", "exercise processFile(FILE*)");
-            filep = QUtil::fopen_wrapper(std::string("open ") + filename,
-                                         fopen(filename, "rb"));
-            pdf.processFile(filename, filep, false);
+            filep = QUtil::fopen_wrapper(std::string("open ") + filename1,
+                                         fopen(filename1, "rb"));
+            pdf.processFile(filename1, filep, false);
         }
     }
     else
     {
         QTC::TC("qpdf", "exercise processMemoryFile");
-	FILE* f = QUtil::fopen_wrapper(std::string("open ") + filename,
-				       fopen(filename, "rb"));
+	FILE* f = QUtil::fopen_wrapper(std::string("open ") + filename1,
+				       fopen(filename1, "rb"));
 	fseek(f, 0, SEEK_END);
 	size_t size = (size_t) QUtil::tell(f);
 	fseek(f, 0, SEEK_SET);
@@ -125,7 +126,7 @@ void runtest(int n, char const* filename)
 	    if (ferror(f))
 	    {
 		throw std::runtime_error(
-		    std::string("failure reading file ") + filename +
+		    std::string("failure reading file ") + filename1 +
 		    " into memory: read " +
 		    QUtil::int_to_string(bytes_read) + "; wanted " +
 		    QUtil::int_to_string(size));
@@ -133,14 +134,14 @@ void runtest(int n, char const* filename)
 	    else
 	    {
 		throw std::logic_error(
-		    std::string("premature eof reading file ") + filename +
+		    std::string("premature eof reading file ") + filename1 +
 		    " into memory: read " +
 		    QUtil::int_to_string(bytes_read) + "; wanted " +
 		    QUtil::int_to_string(size));
 	    }
 	}
 	fclose(f);
-	pdf.processMemoryFile(filename, buf_p, size);
+	pdf.processMemoryFile(filename1, buf_p, size);
     }
 
     if ((n == 0) || (n == 1))
@@ -925,8 +926,9 @@ void runtest(int n, char const* filename)
         // Copy qtest without crossing page boundaries.  Should get O1
         // and O2 and their streams but not O3 or any other pages.
 
+        assert(filename2 != 0);
         QPDF newpdf;
-        newpdf.processFile("minimal.pdf");
+        newpdf.processFile(filename2);
         QPDFObjectHandle qtest = pdf.getTrailer().getKey("/QTest");
         newpdf.getTrailer().replaceKey(
             "/QTest", newpdf.copyForeignObject(qtest));
@@ -944,8 +946,9 @@ void runtest(int n, char const* filename)
         // that O3 points to.  Also, inherited object will have been
         // pushed down and will be preserved.
 
+        assert(filename2 != 0);
         QPDF newpdf;
-        newpdf.processFile("minimal.pdf");
+        newpdf.processFile(filename2);
         QPDFObjectHandle qtest = pdf.getTrailer().getKey("/QTest");
         QPDFObjectHandle O3 = qtest.getKey("/O3");
         newpdf.addPage(O3, false);
@@ -963,8 +966,9 @@ void runtest(int n, char const* filename)
         // Should get qtest plus only the O3 page and the page that O3
         // points to.  Inherited objects should be preserved.
 
+        assert(filename2 != 0);
         QPDF newpdf;
-        newpdf.processFile("minimal.pdf");
+        newpdf.processFile(filename2);
         QPDFObjectHandle qtest = pdf.getTrailer().getKey("/QTest");
         QPDFObjectHandle O3 = qtest.getKey("/O3");
         newpdf.addPage(O3.getKey("/OtherPage"), false);
@@ -1002,8 +1006,9 @@ void runtest(int n, char const* filename)
     else if (n == 29)
     {
         // Detect mixed objects in QPDFWriter
+        assert(filename2 != 0);
         QPDF other;
-        other.processFile("minimal.pdf");
+        other.processFile(filename2);
         // Should use copyForeignObject instead
         other.getTrailer().replaceKey(
             "/QTest", pdf.getTrailer().getKey("/QTest"));
@@ -1049,7 +1054,7 @@ int main(int argc, char* argv[])
 	whoami += 3;
     }
 
-    if (argc != 3)
+    if ((argc < 3) || (argc > 4))
     {
 	usage();
     }
@@ -1057,8 +1062,9 @@ int main(int argc, char* argv[])
     try
     {
 	int n = atoi(argv[1]);
-	char const* filename = argv[2];
-	runtest(n, filename);
+	char const* filename1 = argv[2];
+        char const* filename2 = argv[3];
+	runtest(n, filename1, filename2);
     }
     catch (std::exception& e)
     {

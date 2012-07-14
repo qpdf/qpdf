@@ -366,7 +366,8 @@ $td->runtest("check output",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "reserved-objects.pdf"});
 $td->runtest("detect foreign object in write",
-             {$td->COMMAND => "test_driver 29 copy-foreign-objects-in.pdf"},
+             {$td->COMMAND => "test_driver 29" .
+                  " copy-foreign-objects-in.pdf minimal.pdf"},
              {$td->FILE => "foreign-in-write.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
@@ -391,7 +392,7 @@ foreach my $d ([25, 1], [26, 2], [27, 3])
     my ($testn, $outn) = @$d;
     $td->runtest("copy objects $outn",
                  {$td->COMMAND => "test_driver $testn" .
-                      " copy-foreign-objects-in.pdf"},
+                      " copy-foreign-objects-in.pdf minimal.pdf"},
                  {$td->STRING => "test $testn done\n", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
     $td->runtest("check output",
@@ -399,7 +400,8 @@ foreach my $d ([25, 1], [26, 2], [27, 3])
                  {$td->FILE => "copy-foreign-objects-out$outn.pdf"});
 }
 $td->runtest("copy objects error",
-             {$td->COMMAND => "test_driver 28 copy-foreign-objects-in.pdf"},
+             {$td->COMMAND => "test_driver 28" .
+                  " copy-foreign-objects-in.pdf minimal.pdf"},
              {$td->FILE => "copy-foreign-objects-errors.out",
               $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
