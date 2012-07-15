@@ -1,3 +1,9 @@
+2012-07-15  Jay Berkenbilt  <ejb@ql.org>
+
+	* libqpdf/QPDFWriter.cc (copyEncryptionParameters): Bug fix: qpdf
+	was not preserving whether or not AES encryption was being used
+	when copying encryption parameters.
+
 2012-07-14  Jay Berkenbilt  <ejb@ql.org>
 
 	* QPDFWriter: add public copyEncryptionParameters to allow copying

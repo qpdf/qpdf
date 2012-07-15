@@ -234,3 +234,4 @@ QPDF replace foreign indirect with null 0
 QPDF not copying pages object 0
 QPDF insert foreign page 0
 QPDFWriter foreign object 0
+QPDFWriter copy use_aes 1

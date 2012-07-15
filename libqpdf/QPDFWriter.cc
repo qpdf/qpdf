@@ -409,10 +409,34 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
 	    this->encrypt_metadata =
 		encrypt.getKey("/EncryptMetadata").getBoolValue();
 	}
+        if (V >= 4)
+        {
+            if (encrypt.hasKey("/CF") &&
+                encrypt.getKey("/CF").isDictionary() &&
+                encrypt.hasKey("/StmF") &&
+                encrypt.getKey("/StmF").isName())
+            {
+                // Determine whether to use AES from StmF.  QPDFWriter
+                // can't write files with different StrF and StmF.
+                QPDFObjectHandle CF = encrypt.getKey("/CF");
+                QPDFObjectHandle StmF = encrypt.getKey("/StmF");
+                if (CF.hasKey(StmF.getName()) &&
+                    CF.getKey(StmF.getName()).isDictionary())
+                {
+                    QPDFObjectHandle StmF_data = CF.getKey(StmF.getName());
+                    if (StmF_data.hasKey("/CFM") &&
+                        StmF_data.getKey("/CFM").isName() &&
+                        StmF_data.getKey("/CFM").getName() == "/AESV2")
+                    {
+                        this->encrypt_use_aes = true;
+                    }
+                }
+            }
+        }
 	QTC::TC("qpdf", "QPDFWriter copy encrypt metadata",
 		this->encrypt_metadata ? 0 : 1);
-        this->id1 =
-            trailer.getKey("/ID").getArrayItem(0).getStringValue();
+        QTC::TC("qpdf", "QPDFWriter copy use_aes",
+                this->encrypt_use_aes ? 0 : 1);
 	setEncryptionParametersInternal(
 	    V,
 	    encrypt.getKey("/R").getIntValue(),
