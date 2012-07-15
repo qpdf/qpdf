@@ -469,7 +469,8 @@ QPDFObjectHandle::getPageImages()
 
     // NOTE: If support of inherited resources (see above comment) is
     // implemented, edit comment in QPDFObjectHandle.hh for this
-    // function.
+    // function.  Also remove call to pushInheritedAttributesToPage
+    // from qpdf.cc when show_page_images is true.
 
     std::map<std::string, QPDFObjectHandle> result;
     if (this->hasKey("/Resources"))

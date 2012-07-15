@@ -945,6 +945,10 @@ int main(int argc, char* argv[])
 	    }
 	    if (show_pages)
 	    {
+                if (show_page_images)
+                {
+                    pdf.pushInheritedAttributesToPage();
+                }
 		std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
 		int pageno = 0;
 		for (std::vector<QPDFObjectHandle>::iterator iter =
