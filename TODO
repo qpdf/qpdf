@@ -34,7 +34,7 @@ Next
 
     - qpdf command
 
-      Command line could be something like
+      Command line could be something like (but not exactly)
 
       --pages [ --new ] { file [password] numeric-range ... } ... --
 
@@ -51,6 +51,9 @@ Next
       To implement this, we would remove all pages from file1 except
       pages 1 through 5.  Then we would take pages 11 through 15 from
       file2, copy them to the file, and add them as pages.
+
+      (Look at ~/source/examples/perl/numrange.pl for numeric range
+      parsing code.)
 
     - document that makeIndirectObject doesn't handle foreign objects
       automatically because copying a foreign object is a big enough
