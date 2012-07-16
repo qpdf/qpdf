@@ -251,7 +251,6 @@ QPDFWriter::setR2EncryptionParameters(
 	clear.insert(6);
     }
 
-    setMinimumPDFVersion("1.3");
     setEncryptionParameters(user_password, owner_password, 1, 2, 5, clear);
 }
 
@@ -265,7 +264,6 @@ QPDFWriter::setR3EncryptionParameters(
     interpretR3EncryptionParameters(
 	clear, user_password, owner_password,
 	allow_accessibility, allow_extract, print, modify);
-    setMinimumPDFVersion("1.4");
     setEncryptionParameters(user_password, owner_password, 2, 3, 16, clear);
 }
 
@@ -282,7 +280,6 @@ QPDFWriter::setR4EncryptionParameters(
 	allow_accessibility, allow_extract, print, modify);
     this->encrypt_use_aes = use_aes;
     this->encrypt_metadata = encrypt_metadata;
-    setMinimumPDFVersion(use_aes ? "1.6" : "1.5");
     setEncryptionParameters(user_password, owner_password, 4, 4, 16, clear);
 }
 
@@ -396,6 +393,8 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
     QPDFObjectHandle trailer = qpdf.getTrailer();
     if (trailer.hasKey("/Encrypt"))
     {
+        this->id1 =
+            trailer.getKey("/ID").getArrayItem(0).getStringValue();
 	QPDFObjectHandle encrypt = trailer.getKey("/Encrypt");
 	int V = encrypt.getKey("/V").getIntValue();
 	int key_len = 5;
@@ -445,7 +444,7 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
 	    encrypt.getKey("/O").getStringValue(),
 	    encrypt.getKey("/U").getStringValue(),
 	    this->id1,		// this->id1 == the other file's id1
-	    pdf.getPaddedUserPassword());
+	    qpdf.getPaddedUserPassword());
     }
 }
 
@@ -555,6 +554,16 @@ QPDFWriter::setEncryptionParametersInternal(
     encryption_dictionary["/P"] = QUtil::int_to_string(P);
     encryption_dictionary["/O"] = QPDF_String(O).unparse(true);
     encryption_dictionary["/U"] = QPDF_String(U).unparse(true);
+    setMinimumPDFVersion("1.3");
+    if (R == 3)
+    {
+        setMinimumPDFVersion("1.4");
+    }
+    else if (R >= 4)
+    {
+        setMinimumPDFVersion(this->encrypt_use_aes ? "1.6" : "1.5");
+    }
+
     if ((R >= 4) && (! encrypt_metadata))
     {
 	encryption_dictionary["/EncryptMetadata"] = "false";
@@ -573,7 +582,7 @@ QPDFWriter::setEncryptionParametersInternal(
 
     this->encrypted = true;
     QPDF::EncryptionData encryption_data(
-	V, R, key_len, P, O, U, this->id1, this->encrypt_metadata);
+	V, R, key_len, P, O, U, id1, this->encrypt_metadata);
     this->encryption_key = QPDF::compute_encryption_key(
 	user_password, encryption_data);
 }
