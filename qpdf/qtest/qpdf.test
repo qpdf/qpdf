@@ -1271,7 +1271,7 @@ $td->runtest("linearize and encrypt file",
 	      $td->EXIT_STATUS => 0});
 $td->runtest("check encryption",
 	     {$td->COMMAND => "qpdf --show-encryption --password=owner a.pdf",
-	      $td->FILTER => "grep -v allowed"},
+	      $td->FILTER => "grep -v allowed | grep -v method"},
 	     {$td->STRING => "R = 4\nP = -4\nUser password = user\n",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
@@ -1290,7 +1290,7 @@ $td->runtest("encrypt with AES",
 	     {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("check encryption",
 	     {$td->COMMAND => "qpdf --show-encryption a.pdf",
-	      $td->FILTER => "grep -v allowed"},
+	      $td->FILTER => "grep -v allowed | grep -v method"},
 	     {$td->STRING => "R = 4\nP = -4\nUser password = \n",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
@@ -1311,7 +1311,7 @@ $td->runtest("linearize with AES and object streams",
 	     {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("check encryption",
 	     {$td->COMMAND => "qpdf --show-encryption a.pdf",
-	      $td->FILTER => "grep -v allowed"},
+	      $td->FILTER => "grep -v allowed | grep -v method"},
 	     {$td->STRING => "R = 4\nP = -4\nUser password = \n",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
@@ -1345,7 +1345,7 @@ $td->runtest("make sure there is no xref stream",
 	     $td->NORMALIZE_NEWLINES);
 
 # Look at some actual V4 files
-$n_tests += 10;
+$n_tests += 14;
 foreach my $d (['--force-V4', 'V4'],
 	       ['--cleartext-metadata', 'V4-clearmeta'],
 	       ['--use-aes=y', 'V4-aes'],
@@ -1359,6 +1359,10 @@ foreach my $d (['--force-V4', 'V4'],
     $td->runtest("check output",
 		 {$td->FILE => "a.pdf"},
 		 {$td->FILE => "$out.pdf"});
+    $td->runtest("show encryption",
+		 {$td->COMMAND => "qpdf --show-encryption a.pdf"},
+		 {$td->FILE => "$out-encryption.out", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
 }
 # Crypt Filter
 $td->runtest("decrypt with crypt filter",
@@ -1370,7 +1374,11 @@ $td->runtest("check output",
 	     {$td->FILE => 'decrypted-crypt-filter.pdf'});
 
 # Copy encryption parameters
-$n_tests += 3;
+$n_tests += 10;
+$td->runtest("create reference qdf",
+             {$td->COMMAND =>
+                  "qpdf --qdf --no-original-object-ids minimal.pdf a.qdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("create encrypted file",
 	     {$td->COMMAND =>
 		  "qpdf --encrypt user owner 128 --use-aes=y --extract=n --" .
@@ -1380,11 +1388,42 @@ $td->runtest("copy encryption parameters",
              {$td->COMMAND => "test_driver 30 minimal.pdf a.pdf"},
              {$td->STRING => "test 30 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
-$td->runtest("checkout encryption",
+$td->runtest("check output encryption",
 	     {$td->COMMAND => "qpdf --show-encryption b.pdf --password=owner"},
 	     {$td->FILE => "copied-encryption.out",
 	      $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
+$td->runtest("convert to qdf",
+             {$td->COMMAND =>
+                  "qpdf --qdf b.pdf b.qdf" .
+                  " --password=owner --no-original-object-ids"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("compare qdf",
+             {$td->COMMAND => "./diff-ignore-ID-version a.qdf b.qdf"},
+             {$td->STRING => "okay\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("copy encryption with qpdf",
+             {$td->COMMAND =>
+                  "qpdf --copy-encryption=a.pdf".
+                  " --encryption-file-password=user" .
+                  " minimal.pdf c.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output encryption",
+	     {$td->COMMAND => "qpdf --show-encryption c.pdf --password=owner"},
+	     {$td->FILE => "copied-encryption.out",
+	      $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("convert to qdf",
+             {$td->COMMAND =>
+                  "qpdf --qdf c.pdf c.qdf" .
+                  " --password=owner --no-original-object-ids"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("compare qdf",
+             {$td->COMMAND => "./diff-ignore-ID-version a.qdf c.qdf"},
+             {$td->STRING => "okay\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
 
 show_ntests();
 # ----------
@@ -1753,6 +1792,5 @@ sub get_md5_checksum
 
 sub cleanup
 {
-    system("rm -rf *.ps *.pnm a.pdf a.qdf b.pdf b.qdf c.pdf" .
-	   " *.enc* tif1 tif2 tiff-cache");
+    system("rm -rf *.ps *.pnm ?.pdf ?.qdf *.enc* tif1 tif2 tiff-cache");
 }

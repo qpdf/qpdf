@@ -248,6 +248,12 @@ class QPDF
     QPDF_DLL
     bool isEncrypted(int& R, int& P);
 
+    QPDF_DLL
+    bool isEncrypted(int& R, int& P, int& V,
+                     encryption_method_e& stream_method,
+                     encryption_method_e& string_method,
+                     encryption_method_e& file_method);
+
     // Encryption permissions -- not enforced by QPDF
     QPDF_DLL
     bool allowAccessibility();

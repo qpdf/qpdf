@@ -58,12 +58,17 @@ class Provider: public QPDFObjectHandle::StreamDataProvider
     bool bad_length;
 };
 
-static void checkPageContents(QPDFObjectHandle page,
-                              std::string const& wanted_string)
+static std::string getPageContents(QPDFObjectHandle page)
 {
     PointerHolder<Buffer> b1 =
         page.getKey("/Contents").getStreamData();
-    std::string contents = std::string((char *)(b1->getBuffer()));
+    return std::string((char *)(b1->getBuffer()), b1->getSize()) + "\0";
+}
+
+static void checkPageContents(QPDFObjectHandle page,
+                              std::string const& wanted_string)
+{
+    std::string contents = getPageContents(page);
     if (contents.find(wanted_string) == std::string::npos)
     {
         std::cout << "didn't find " << wanted_string << " in "
@@ -1030,10 +1035,24 @@ void runtest(int n, char const* filename1, char const* filename2)
         QPDF encrypted;
         encrypted.processFile(filename2, "user");
         QPDFWriter w(pdf, "b.pdf");
-	w.setStaticID(true);
 	w.setStreamDataMode(qpdf_s_preserve);
         w.copyEncryptionParameters(encrypted);
 	w.write();
+
+        // Make sure the contents are actually the same
+        QPDF final;
+        final.processFile("b.pdf", "user");
+        std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
+        std::string orig_contents = getPageContents(pages[0]);
+        pages = final.getAllPages();
+        std::string new_contents = getPageContents(pages[0]);
+        if (orig_contents != new_contents)
+        {
+            std::cout << "oops -- page contents don't match" << std::endl
+                      << "original:\n" << orig_contents
+                      << "new:\n" << new_contents
+                      << std::endl;
+        }
     }
     else
     {

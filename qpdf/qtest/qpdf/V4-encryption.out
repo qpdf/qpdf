@@ -1,8 +1,8 @@
 R = 4
-P = -20
-User password = user
+P = -4
+User password = 
 extract for accessibility: allowed
-extract for any purpose: not allowed
+extract for any purpose: allowed
 print low resolution: allowed
 print high resolution: allowed
 modify document assembly: allowed
@@ -10,6 +10,6 @@ modify forms: allowed
 modify annotations: allowed
 modify other: allowed
 modify anything: allowed
-stream encryption method: AESv2
-string encryption method: AESv2
-file encryption method: AESv2
+stream encryption method: RC4
+string encryption method: RC4
+file encryption method: RC4

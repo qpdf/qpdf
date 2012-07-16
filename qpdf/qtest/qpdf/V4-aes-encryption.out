@@ -1,8 +1,8 @@
 R = 4
-P = -20
-User password = user
+P = -4
+User password = 
 extract for accessibility: allowed
-extract for any purpose: not allowed
+extract for any purpose: allowed
 print low resolution: allowed
 print high resolution: allowed
 modify document assembly: allowed

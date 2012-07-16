@@ -33,18 +33,29 @@ Usage: qpdf [ options ] infilename [ outfilename ]\n\
 \n\
 An option summary appears below.  Please see the documentation for details.\n\
 \n\
+Note that when contradictory options are provided, whichever options are\n\
+provided last take precedence.\n\
+\n\
 \n\
 Basic Options\n\
 -------------\n\
 \n\
 --password=password     specify a password for accessing encrypted files\n\
 --linearize             generated a linearized (web optimized) file\n\
+--copy-encryption=file  copy encryption parameters from specified file\n\
+--encryption-file-password=password\n\
+                        password used to open the file from which encryption\n\
+                        parameters are being copied\n\
 --encrypt options --    generate an encrypted file\n\
 --decrypt               remove any encryption on the file\n\
 \n\
-If neither --encrypt or --decrypt are given, qpdf will preserve any\n\
-encryption data associated with a file.\n\
+If none of --copy-encryption, --encrypt or --decrypt are given, qpdf will\n\
+preserve any encryption data associated with a file.\n\
 \n\
+Note that when copying encryption parameters from another file, all\n\
+parameters will be copied, including both user and owner passwords, even\n\
+if the user password is used to open the other file.  This works even if\n\
+the owner password is not known.\n\
 \n\
 Encryption Options\n\
 ------------------\n\
@@ -192,12 +203,39 @@ static std::string show_bool(bool v)
     return v ? "allowed" : "not allowed";
 }
 
+static std::string show_encryption_method(QPDF::encryption_method_e method)
+{
+    std::string result = "unknown";
+    switch (method)
+    {
+      case QPDF::e_none:
+        result = "none";
+        break;
+      case QPDF::e_unknown:
+        result = "unknown";
+        break;
+      case QPDF::e_rc4:
+        result = "RC4";
+        break;
+      case QPDF::e_aes:
+        result = "AESv2";
+        break;
+        // no default so gcc will warn for missing case
+    }
+    return result;
+}
+
 static void show_encryption(QPDF& pdf)
 {
     // Extract /P from /Encrypt
     int R = 0;
     int P = 0;
-    if (! pdf.isEncrypted(R, P))
+    int V = 0;
+    QPDF::encryption_method_e stream_method = QPDF::e_unknown;
+    QPDF::encryption_method_e string_method = QPDF::e_unknown;
+    QPDF::encryption_method_e file_method = QPDF::e_unknown;
+    if (! pdf.isEncrypted(R, P, V,
+                          stream_method, string_method, file_method))
     {
 	std::cout << "File is not encrypted" << std::endl;
     }
@@ -206,25 +244,34 @@ static void show_encryption(QPDF& pdf)
 	std::cout << "R = " << R << std::endl;
 	std::cout << "P = " << P << std::endl;
 	std::string user_password = pdf.getTrimmedUserPassword();
-	std::cout << "User password = " << user_password << std::endl;
-	std::cout << "extract for accessibility: "
-		  << show_bool(pdf.allowAccessibility()) << std::endl;
-	std::cout << "extract for any purpose: "
-		  << show_bool(pdf.allowExtractAll()) << std::endl;
-	std::cout << "print low resolution: "
-		  << show_bool(pdf.allowPrintLowRes()) << std::endl;
-	std::cout << "print high resolution: "
-		  << show_bool(pdf.allowPrintHighRes()) << std::endl;
-	std::cout << "modify document assembly: "
-		  << show_bool(pdf.allowModifyAssembly()) << std::endl;
-	std::cout << "modify forms: "
-		  << show_bool(pdf.allowModifyForm()) << std::endl;
-	std::cout << "modify annotations: "
-		  << show_bool(pdf.allowModifyAnnotation()) << std::endl;
-	std::cout << "modify other: "
-		  << show_bool(pdf.allowModifyOther()) << std::endl;
-	std::cout << "modify anything: "
+	std::cout << "User password = " << user_password << std::endl
+                  << "extract for accessibility: "
+		  << show_bool(pdf.allowAccessibility()) << std::endl
+                  << "extract for any purpose: "
+		  << show_bool(pdf.allowExtractAll()) << std::endl
+                  << "print low resolution: "
+		  << show_bool(pdf.allowPrintLowRes()) << std::endl
+                  << "print high resolution: "
+		  << show_bool(pdf.allowPrintHighRes()) << std::endl
+                  << "modify document assembly: "
+		  << show_bool(pdf.allowModifyAssembly()) << std::endl
+                  << "modify forms: "
+		  << show_bool(pdf.allowModifyForm()) << std::endl
+                  << "modify annotations: "
+		  << show_bool(pdf.allowModifyAnnotation()) << std::endl
+                  << "modify other: "
+		  << show_bool(pdf.allowModifyOther()) << std::endl
+                  << "modify anything: "
 		  << show_bool(pdf.allowModifyAll()) << std::endl;
+        if (V >= 4)
+        {
+            std::cout << "stream encryption method: "
+                      << show_encryption_method(stream_method) << std::endl
+                      << "string encryption method: "
+                      << show_encryption_method(string_method) << std::endl
+                      << "file encryption method: "
+                      << show_encryption_method(file_method) << std::endl;
+        }
     }
 }
 
@@ -579,6 +626,10 @@ int main(int argc, char* argv[])
     bool linearize = false;
     bool decrypt = false;
 
+    bool copy_encryption = false;
+    char const* encryption_file = 0;
+    char const* encryption_file_password = "";
+
     bool encrypt = false;
     std::string user_password;
     std::string owner_password;
@@ -664,11 +715,36 @@ int main(int argc, char* argv[])
 		    r3_accessibility, r3_extract, r3_print, r3_modify,
 		    force_V4, cleartext_metadata, use_aes);
 		encrypt = true;
+                decrypt = false;
+                copy_encryption = false;
 	    }
 	    else if (strcmp(arg, "decrypt") == 0)
 	    {
 		decrypt = true;
+                encrypt = false;
+                copy_encryption = false;
 	    }
+            else if (strcmp(arg, "copy-encryption") == 0)
+            {
+		if (parameter == 0)
+		{
+		    usage("--copy-encryption must be given as"
+			  "--copy_encryption=file");
+		}
+                encryption_file = parameter;
+                copy_encryption = true;
+                encrypt = false;
+                decrypt = false;
+            }
+            else if (strcmp(arg, "encryption-file-password") == 0)
+            {
+		if (parameter == 0)
+		{
+		    usage("--encryption-file-password must be given as"
+			  "--encryption-file-password=password");
+		}
+                encryption_file_password = parameter;
+            }
 	    else if (strcmp(arg, "stream-data") == 0)
 	    {
 		if (parameter == 0)
@@ -865,6 +941,7 @@ int main(int argc, char* argv[])
     try
     {
 	QPDF pdf;
+        QPDF encryption_pdf;
 	if (ignore_xref_streams)
 	{
 	    pdf.setIgnoreXRefStreams(true);
@@ -1082,6 +1159,12 @@ int main(int argc, char* argv[])
 	    {
 		w.setSuppressOriginalObjectIDs(true);
 	    }
+            if (copy_encryption)
+            {
+                encryption_pdf.processFile(
+                    encryption_file, encryption_file_password);
+                w.copyEncryptionParameters(encryption_pdf);
+            }
 	    if (encrypt)
 	    {
 		if (keylen == 40)

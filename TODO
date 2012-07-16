@@ -64,9 +64,11 @@ Next
     - Tests through qpdf command line: copy pages from multiple PDFs
       starting with one PDF and also starting with empty.
 
- * qpdf commandline: provide an option to copy encryption parameters
-   from another file, specifying file and password.  Search for "Copy
-   encryption parameters" in qpdf.test.
+ * Document --copy-encryption and --encryption-file-password in
+   manual.  Mention that the first half of /ID as well as all the
+   encryption parameters are copied.  Maybe mention about StrF and
+   StrM with respect to AES here and also with encryption
+   preservation.
 
 
 Soon
