@@ -231,6 +231,10 @@ QPDF::BufferInputSource::~BufferInputSource()
 qpdf_offset_t
 QPDF::BufferInputSource::findAndSkipNextEOL()
 {
+    if (this->cur_offset < 0)
+    {
+        throw std::logic_error("INTERNAL ERROR: BufferInputSource offset < 0");
+    }
     qpdf_offset_t end_pos = (qpdf_offset_t) this->buf->getSize();
     if (this->cur_offset >= end_pos)
     {
@@ -301,6 +305,12 @@ QPDF::BufferInputSource::seek(qpdf_offset_t offset, int whence)
 	    "INTERNAL ERROR: invalid argument to BufferInputSource::seek");
 	break;
     }
+
+    if (this->cur_offset < 0)
+    {
+        throw std::runtime_error(
+            this->description + ": seek before beginning of buffer");
+    }
 }
 
 void
@@ -312,6 +322,10 @@ QPDF::BufferInputSource::rewind()
 size_t
 QPDF::BufferInputSource::read(char* buffer, size_t length)
 {
+    if (this->cur_offset < 0)
+    {
+        throw std::logic_error("INTERNAL ERROR: BufferInputSource offset < 0");
+    }
     qpdf_offset_t end_pos = (qpdf_offset_t) this->buf->getSize();
     if (this->cur_offset >= end_pos)
     {
