@@ -10,6 +10,8 @@
 
 #include <qpdf/DLL.h>
 
+#include <qpdf/InputSource.hh>
+#include <qpdf/PointerHolder.hh>
 #include <string>
 #include <stdio.h>
 
@@ -121,6 +123,13 @@ class QPDFTokenizer
     // determine whether to output the character.
     QPDF_DLL
     bool betweenTokens();
+
+    // Read a token from an input source.  Context describes the
+    // context in which the token is being read and is used in the
+    // exception thrown if there is an error.
+    QPDF_DLL
+    Token readToken(PointerHolder<InputSource> input,
+                    std::string const& context);
 
   private:
     void reset();

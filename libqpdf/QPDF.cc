@@ -1419,45 +1419,7 @@ QPDF::recoverStreamLength(PointerHolder<InputSource> input,
 QPDFTokenizer::Token
 QPDF::readToken(PointerHolder<InputSource> input)
 {
-    qpdf_offset_t offset = input->tell();
-    QPDFTokenizer::Token token;
-    bool unread_char;
-    char char_to_unread;
-    while (! this->tokenizer.getToken(token, unread_char, char_to_unread))
-    {
-	char ch;
-	if (input->read(&ch, 1) == 0)
-	{
-	    throw QPDFExc(qpdf_e_damaged_pdf, input->getName(),
-			  this->last_object_description, offset,
-			  "EOF while reading token");
-	}
-	else
-	{
-	    if (isspace((unsigned char)ch) &&
-		(input->getLastOffset() == offset))
-	    {
-		++offset;
-	    }
-	    this->tokenizer.presentCharacter(ch);
-	}
-    }
-
-    if (unread_char)
-    {
-	input->unreadCh(char_to_unread);
-    }
-
-    if (token.getType() == QPDFTokenizer::tt_bad)
-    {
-	throw QPDFExc(qpdf_e_damaged_pdf, input->getName(),
-		      this->last_object_description, offset,
-		      token.getErrorMessage());
-    }
-
-    input->setLastOffset(offset);
-
-    return token;
+    return this->tokenizer.readToken(input, this->last_object_description);
 }
 
 QPDFObjectHandle

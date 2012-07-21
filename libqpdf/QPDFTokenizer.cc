@@ -6,6 +6,7 @@
 
 #include <qpdf/PCRE.hh>
 #include <qpdf/QTC.hh>
+#include <qpdf/QPDFExc.hh>
 
 #include <stdexcept>
 #include <string.h>
@@ -14,6 +15,10 @@
 static bool is_hex_digit(char ch)
 {
     return (strchr("0123456789abcdefABCDEF", ch) != 0);
+}
+static bool is_space(char ch)
+{
+    return (strchr(" \f\n\r\t\v", ch) != 0);
 }
 
 QPDFTokenizer::QPDFTokenizer() :
@@ -459,4 +464,48 @@ bool
 QPDFTokenizer::betweenTokens()
 {
     return ((state == st_top) || (state == st_in_comment));
+}
+
+QPDFTokenizer::Token
+QPDFTokenizer::readToken(PointerHolder<InputSource> input,
+                         std::string const& context)
+{
+    qpdf_offset_t offset = input->tell();
+    Token token;
+    bool unread_char;
+    char char_to_unread;
+    while (! getToken(token, unread_char, char_to_unread))
+    {
+	char ch;
+	if (input->read(&ch, 1) == 0)
+	{
+	    throw QPDFExc(qpdf_e_damaged_pdf, input->getName(),
+			  context, offset,
+			  "EOF while reading token");
+	}
+	else
+	{
+	    if (is_space((unsigned char)ch) &&
+		(input->getLastOffset() == offset))
+	    {
+		++offset;
+	    }
+	    presentCharacter(ch);
+	}
+    }
+
+    if (unread_char)
+    {
+	input->unreadCh(char_to_unread);
+    }
+
+    if (token.getType() == tt_bad)
+    {
+	throw QPDFExc(qpdf_e_damaged_pdf, input->getName(),
+		      context, offset, token.getErrorMessage());
+    }
+
+    input->setLastOffset(offset);
+
+    return token;
 }
