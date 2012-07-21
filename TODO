@@ -15,6 +15,9 @@ Next
       including the need for the _FILE_OFFSET_BITS workaround on the
       32-bit version.
 
+ * Large file test: test with a file > 10 GB.  Update the requirements
+   for disk space on large file tests.
+
  * Document that your compiler has to support long long.
 
  * Make sure that the release notes call attention to the one API
