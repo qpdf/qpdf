@@ -8,6 +8,9 @@ SRCS_libqpdf = \
 	libqpdf/BitStream.cc \
 	libqpdf/BitWriter.cc \
 	libqpdf/Buffer.cc \
+	libqpdf/BufferInputSource.cc \
+	libqpdf/FileInputSource.cc \
+	libqpdf/InputSource.cc \
 	libqpdf/MD5.cc \
 	libqpdf/PCRE.cc \
 	libqpdf/Pipeline.cc \

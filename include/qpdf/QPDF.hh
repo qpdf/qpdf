@@ -21,6 +21,7 @@
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFTokenizer.hh>
 #include <qpdf/Buffer.hh>
+#include <qpdf/InputSource.hh>
 
 class QPDF_Stream;
 class BitStream;
@@ -473,80 +474,6 @@ class QPDF
 
   private:
     static std::string qpdf_version;
-
-    class InputSource
-    {
-      public:
-	InputSource() :
-	    last_offset(0)
-	{
-	}
-	virtual ~InputSource()
-	{
-	}
-
-	void setLastOffset(qpdf_offset_t);
-	qpdf_offset_t getLastOffset() const;
-	std::string readLine(size_t max_line_length);
-
-        virtual qpdf_offset_t findAndSkipNextEOL() = 0;
-	virtual std::string const& getName() const = 0;
-	virtual qpdf_offset_t tell() = 0;
-	virtual void seek(qpdf_offset_t offset, int whence) = 0;
-	virtual void rewind() = 0;
-	virtual size_t read(char* buffer, size_t length) = 0;
-	virtual void unreadCh(char ch) = 0;
-
-      protected:
-	qpdf_offset_t last_offset;
-    };
-
-    class FileInputSource: public InputSource
-    {
-      public:
-	FileInputSource();
-	void setFilename(char const* filename);
-        void setFile(char const* description, FILE* filep, bool close_file);
-	virtual ~FileInputSource();
-        virtual qpdf_offset_t findAndSkipNextEOL();
-	virtual std::string const& getName() const;
-	virtual qpdf_offset_t tell();
-	virtual void seek(qpdf_offset_t offset, int whence);
-	virtual void rewind();
-	virtual size_t read(char* buffer, size_t length);
-	virtual void unreadCh(char ch);
-
-      private:
-	FileInputSource(FileInputSource const&);
-	FileInputSource& operator=(FileInputSource const&);
-
-	void destroy();
-
-        bool close_file;
-	std::string filename;
-	FILE* file;
-    };
-
-    class BufferInputSource: public InputSource
-    {
-      public:
-	BufferInputSource(std::string const& description, Buffer* buf,
-			  bool own_memory = false);
-	virtual ~BufferInputSource();
-        virtual qpdf_offset_t findAndSkipNextEOL();
-	virtual std::string const& getName() const;
-	virtual qpdf_offset_t tell();
-	virtual void seek(qpdf_offset_t offset, int whence);
-	virtual void rewind();
-	virtual size_t read(char* buffer, size_t length);
-	virtual void unreadCh(char ch);
-
-      private:
-	bool own_memory;
-	std::string description;
-	Buffer* buf;
-	qpdf_offset_t cur_offset;
-    };
 
     class ObjGen
     {
