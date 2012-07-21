@@ -20,15 +20,13 @@ Next
  * Make sure that the release notes call attention to the one API
    breaking change: removal of length from replaceStreamData.
 
- * Add a way to create new QPDFObjectHandles with a string
-   representation of them, such as
-   QPDFObjectHandle::parse("<< /a 1 /b 2 >>");
-
  * Document thread safety: One individual QPDF or QPDFWriter object
    can only be used by one thread at a time, but multiple threads can
    simultaneously use separate objects.
 
  * Write some documentation about the design of copyForeignObject.
+
+ * Mention QPDFObjectHandle::parse in the documentation.
 
  * copyForeignObject still to do:
 

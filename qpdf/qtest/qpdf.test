@@ -149,7 +149,7 @@ $td->runtest("remove page we don't have",
 	     $td->NORMALIZE_NEWLINES);
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 44;
+$n_tests += 45;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -369,6 +369,10 @@ $td->runtest("detect foreign object in write",
              {$td->COMMAND => "test_driver 29" .
                   " copy-foreign-objects-in.pdf minimal.pdf"},
              {$td->FILE => "foreign-in-write.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("parse objects from string",
+             {$td->COMMAND => "test_driver 31 minimal.pdf"}, # file not used
+             {$td->FILE => "parse-object.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 show_ntests();

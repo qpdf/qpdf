@@ -81,24 +81,28 @@ static void create_pdf(char const* filename)
     // Add an indirect object to contain a font descriptor for the
     // built-in Helvetica font.
     QPDFObjectHandle font = pdf.makeIndirectObject(
-        QPDFObjectHandle::newDictionary());
-    font.replaceKey("/Type", newName("/Font"));
-    font.replaceKey("/Subtype", newName("/Type1"));
-    font.replaceKey("/Name", newName("/F1"));
-    font.replaceKey("/BaseFont", newName("/Helvetica"));
-    font.replaceKey("/Encoding", newName("/WinAnsiEncoding"));
+        QPDFObjectHandle::parse(
+            "<<"
+            " /Type /Font"
+            " /Subtype /Type1"
+            " /Name /F1"
+            " /BaseFont /Helvetica"
+            " /Encoding /WinAnsiEncoding"
+            ">>"));
 
     // Create a stream to encode our image.  We don't have to set the
     // length or filters.  QPDFWriter will fill in the length and
     // compress the stream data using FlateDecode by default.
     QPDFObjectHandle image = QPDFObjectHandle::newStream(&pdf);
-    QPDFObjectHandle image_dict = image.getDict();
-    image_dict.replaceKey("/Type", newName("/XObject"));
-    image_dict.replaceKey("/Subtype", newName("/Image"));
-    image_dict.replaceKey("/ColorSpace", newName("/DeviceRGB"));
-    image_dict.replaceKey("/BitsPerComponent", newInteger(8));
-    image_dict.replaceKey("/Width", newInteger(100));
-    image_dict.replaceKey("/Height", newInteger(100));
+    image.replaceDict(QPDFObjectHandle::parse(
+                          "<<"
+                          " /Type /XObject"
+                          " /Subtype /Image"
+                          " /ColorSpace /DeviceRGB"
+                          " /BitsPerComponent 8"
+                          " /Width 100"
+                          " /Height 100"
+                          ">>"));
     // Provide the stream data.
     ImageProvider* p = new ImageProvider(100, 100);
     PointerHolder<QPDFObjectHandle::StreamDataProvider> provider(p);
@@ -107,10 +111,8 @@ static void create_pdf(char const* filename)
                             QPDFObjectHandle::newNull());
 
     // Create direct objects as needed by the page dictionary.
-    QPDFObjectHandle procset = QPDFObjectHandle::newArray();
-    procset.appendItem(newName("/PDF"));
-    procset.appendItem(newName("/Text"));
-    procset.appendItem(newName("/ImageC"));
+    QPDFObjectHandle procset = QPDFObjectHandle::parse(
+        "[/PDF /Text /ImageC]");
 
     QPDFObjectHandle rfont = QPDFObjectHandle::newDictionary();
     rfont.replaceKey("/F1", font);

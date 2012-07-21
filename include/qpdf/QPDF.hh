@@ -531,6 +531,23 @@ class QPDF
         std::map<ObjGen, QPDFObjectHandle> foreign_streams;
     };
 
+    class StringDecrypter: public QPDFObjectHandle::StringDecrypter
+    {
+        friend class QPDF;
+
+      public:
+        StringDecrypter(QPDF* qpdf, int objid, int gen);
+        virtual ~StringDecrypter()
+        {
+        }
+        virtual void decryptString(std::string& val);
+
+      private:
+        QPDF* qpdf;
+        int objid;
+        int gen;
+    };
+
     void parse(char const* password);
     void warn(QPDFExc const& e);
     void setTrailer(QPDFObjectHandle obj);
@@ -547,10 +564,6 @@ class QPDF
     QPDFObjectHandle readObject(
 	PointerHolder<InputSource>, std::string const& description,
 	int objid, int generation, bool in_object_stream);
-    QPDFObjectHandle readObjectInternal(
-	PointerHolder<InputSource> input, int objid, int generation,
-	bool in_object_stream,
-	bool in_array, bool in_dictionary);
     size_t recoverStreamLength(
 	PointerHolder<InputSource> input, int objid, int generation,
 	qpdf_offset_t stream_offset);

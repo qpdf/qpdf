@@ -38,25 +38,20 @@ void runtest(int n)
         // Create a minimal PDF from scratch.
 
         QPDFObjectHandle font = pdf.makeIndirectObject(
-            QPDFObjectHandle::newDictionary());
-        font.replaceKey("/Type", newName("/Font"));
-        font.replaceKey("/Subtype", newName("/Type1"));
-        font.replaceKey("/Name", newName("/F1"));
-        font.replaceKey("/BaseFont", newName("/Helvetica"));
-        font.replaceKey("/Encoding", newName("/WinAnsiEncoding"));
+            QPDFObjectHandle::parse("<<"
+                                    " /Type /Font"
+                                    " /Subtype /Type1"
+                                    " /Name /F1"
+                                    " /BaseFont /Helvetica"
+                                    " /Encoding /WinAnsiEncoding"
+                                    ">>"));
 
         QPDFObjectHandle procset = pdf.makeIndirectObject(
-            QPDFObjectHandle::newArray());
-        procset.appendItem(newName("/PDF"));
-        procset.appendItem(newName("/Text"));
+            QPDFObjectHandle::parse("[/PDF /Text]"));
 
         QPDFObjectHandle contents = createPageContents(pdf, "First Page");
 
-        QPDFObjectHandle mediabox = QPDFObjectHandle::newArray();
-        mediabox.appendItem(QPDFObjectHandle::newInteger(0));
-        mediabox.appendItem(QPDFObjectHandle::newInteger(0));
-        mediabox.appendItem(QPDFObjectHandle::newInteger(612));
-        mediabox.appendItem(QPDFObjectHandle::newInteger(792));
+        QPDFObjectHandle mediabox = QPDFObjectHandle::parse("[0 0 612 792]");
 
         QPDFObjectHandle rfont = QPDFObjectHandle::newDictionary();
         rfont.replaceKey("/F1", font);

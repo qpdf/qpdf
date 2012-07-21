@@ -11,6 +11,18 @@ BufferInputSource::BufferInputSource(std::string const& description,
 {
 }
 
+BufferInputSource::BufferInputSource(std::string const& description,
+                                     std::string const& contents) :
+    own_memory(true),
+    description(description),
+    buf(0),
+    cur_offset(0)
+{
+    this->buf = new Buffer(contents.length());
+    unsigned char* bp = buf->getBuffer();
+    memcpy(bp, (char*)contents.c_str(), contents.length());
+}
+
 BufferInputSource::~BufferInputSource()
 {
     if (own_memory)

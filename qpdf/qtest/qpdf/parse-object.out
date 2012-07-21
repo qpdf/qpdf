@@ -1,0 +1,4 @@
+[ /name 16059 3.14159 false << /key true /other [ (string1) (string2) ] >> null ]
+logic error parsing indirect: QPDFObjectHandle::parse called without context on an object with indirect references
+trailing data: parsed object (trailing test): trailing data found parsing object from string
+test 31 done

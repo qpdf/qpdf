@@ -18,6 +18,7 @@
 
 #include <qpdf/PointerHolder.hh>
 #include <qpdf/Buffer.hh>
+#include <qpdf/InputSource.hh>
 
 #include <qpdf/QPDFObject.hh>
 
@@ -25,6 +26,7 @@ class Pipeline;
 class QPDF;
 class QPDF_Dictionary;
 class QPDF_Array;
+class QPDFTokenizer;
 
 class QPDFObjectHandle
 {
@@ -55,6 +57,18 @@ class QPDFObjectHandle
 	// streams.
 	virtual void provideStreamData(int objid, int generation,
 				       Pipeline* pipeline) = 0;
+    };
+
+    // This class is used by parse to decrypt strings when reading an
+    // object that contains encrypted strings.
+    class StringDecrypter
+    {
+      public:
+        QPDF_DLL
+        virtual ~StringDecrypter()
+        {
+        }
+        virtual void decryptString(std::string& val) = 0;
     };
 
     QPDF_DLL
@@ -95,6 +109,30 @@ class QPDFObjectHandle
 
     // Public factory methods
 
+    // Construct an object of any type from a string representation of
+    // the object.  Throws QPDFExc with an empty filename and an
+    // offset into the string if there is an error.  Any indirect
+    // object syntax (obj gen R) will cause a logic_error exception to
+    // be thrown.  If object_description is provided, it will appear
+    // in the message of any QPDFExc exception thrown for invalid
+    // syntax.
+    QPDF_DLL
+    static QPDFObjectHandle parse(std::string const& object_str,
+                                  std::string const& object_description = "");
+
+    // Construct an object as above by reading from the given
+    // InputSource at its current position and using the tokenizer you
+    // supply.  Indirect objects and encrypted strings are permitted.
+    // This method is intended to be called by QPDF for parsing
+    // objects that are ready from the object's input stream.
+    QPDF_DLL
+    static QPDFObjectHandle parse(PointerHolder<InputSource> input,
+                                  std::string const& object_description,
+                                  QPDFTokenizer&, bool& empty,
+                                  StringDecrypter* decrypter,
+                                  QPDF* context);
+
+    // Type-specific factories
     QPDF_DLL
     static QPDFObjectHandle newNull();
     QPDF_DLL
@@ -124,7 +162,8 @@ class QPDFObjectHandle
     // object.  A subsequent call must be made to replaceStreamData()
     // to provide data for the stream.  The stream's dictionary may be
     // retrieved by calling getDict(), and the resulting dictionary
-    // may be modified.
+    // may be modified.  Alternatively, you can create a new
+    // dictionary and call replaceDict to install it.
     QPDF_DLL
     static QPDFObjectHandle newStream(QPDF* qpdf);
 
@@ -302,6 +341,15 @@ class QPDFObjectHandle
     QPDF_DLL
     bool pipeStreamData(Pipeline*, bool filter,
 			bool normalize, bool compress);
+
+    // Replace a stream's dictionary.  The new dictionary must be
+    // consistent with the stream's data.  This is most appropriately
+    // used when creating streams from scratch that will use a stream
+    // data provider and therefore start with an empty dictionary.  It
+    // may be more convenient in this case than calling getDict and
+    // modifying it for each key.  The pdf-create example does this.
+    QPDF_DLL
+    void replaceDict(QPDFObjectHandle);
 
     // Replace this stream's stream data with the given data buffer,
     // and replace the /Filter and /DecodeParms keys in the stream
@@ -489,6 +537,12 @@ class QPDFObjectHandle
     void dereference();
     void makeDirectInternal(std::set<int>& visited);
     void releaseResolved();
+    static QPDFObjectHandle parseInternal(
+        PointerHolder<InputSource> input,
+        std::string const& object_description,
+        QPDFTokenizer& tokenizer, bool& empty,
+        StringDecrypter* decrypter, QPDF* context,
+        bool in_array, bool in_dictionary);
 
     bool initialized;
 

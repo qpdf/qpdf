@@ -9,6 +9,8 @@ class BufferInputSource: public InputSource
   public:
     BufferInputSource(std::string const& description, Buffer* buf,
                       bool own_memory = false);
+    BufferInputSource(std::string const& description,
+                      std::string const& contents);
     virtual ~BufferInputSource();
     virtual qpdf_offset_t findAndSkipNextEOL();
     virtual std::string const& getName() const;

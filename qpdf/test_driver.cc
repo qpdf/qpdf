@@ -1054,6 +1054,38 @@ void runtest(int n, char const* filename1, char const* filename2)
                       << std::endl;
         }
     }
+    else if (n == 31)
+    {
+        // Test object parsing from a string.  The input file is not used.
+
+        QPDFObjectHandle o1 =
+            QPDFObjectHandle::parse(
+                "[/name 16059 3.14159 false\n"
+                " << /key true /other [ (string1) (string2) ] >> null]");
+        std::cout << o1.unparse() << std::endl;
+        QPDFObjectHandle o2 = QPDFObjectHandle::parse("   12345 \f  ");
+        assert(o2.isInteger() && (o2.getIntValue() == 12345));
+        try
+        {
+            QPDFObjectHandle::parse("[1 0 R]", "indirect test");
+            std::cout << "oops -- didn't throw" << std::endl;
+        }
+        catch (std::logic_error e)
+        {
+            std::cout << "logic error parsing indirect: " << e.what()
+                      << std::endl;
+        }
+        try
+        {
+            QPDFObjectHandle::parse("0 trailing", "trailing test");
+            std::cout << "oops -- didn't throw" << std::endl;
+        }
+        catch (std::runtime_error e)
+        {
+            std::cout << "trailing data: " << e.what()
+                      << std::endl;
+        }
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +

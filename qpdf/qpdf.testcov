@@ -60,13 +60,13 @@ QPDF missing trailer 0
 QPDF trailer lacks size 0
 QPDF trailer size not integer 0
 QPDF trailer prev not integer 0
-QPDF bad brace 0
-QPDF bad array close 0
-QPDF dictionary odd number of elements 0
+QPDFObjectHandle bad brace 0
+QPDFObjectHandle bad array close 0
+QPDFObjectHandle dictionary odd number of elements 0
 QPDF stream without length 0
 QPDF stream length not integer 0
 QPDF missing endstream 0
-QPDF bad dictionary close 0
+QPDFObjectHandle bad dictionary close 0
 QPDF can't find xref 0
 QPDF_Tokenizer bad ) 0
 QPDF_Tokenizer bad > 0
@@ -235,3 +235,5 @@ QPDF not copying pages object 0
 QPDF insert foreign page 0
 QPDFWriter foreign object 0
 QPDFWriter copy use_aes 1
+QPDFObjectHandle indirect without context 0
+QPDFObjectHandle trailing data in parse 0

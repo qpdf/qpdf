@@ -1,3 +1,13 @@
+2012-07-21  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add new method QPDFObjectHandle::replaceDict to replace a
+	stream's dictionary.  Use with caution; see comments in
+	QPDFObjectHandle.hh.
+
+	* Add new method QPDFObjectHandle::parse for creation of
+	QPDFObjectHandle objects from string representations of the
+	objects.  Thanks to Tobias Hoffmann for the idea.
+
 2012-07-15  Jay Berkenbilt  <ejb@ql.org>
 
 	* add new QPDF::isEncrypted method that returns some additional
