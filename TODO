@@ -24,46 +24,40 @@ Next
    can only be used by one thread at a time, but multiple threads can
    simultaneously use separate objects.
 
- * Write some documentation about the design of copyForeignObject.
-
  * Mention QPDFObjectHandle::parse in the documentation.
 
- * copyForeignObject still to do:
+ * Manual: empty --empty as an input file name option
 
-    - qpdf command
+ * copyForeignObject, merge/split documentation:
 
-      Command line could be something like (but not exactly)
+   document details of --pages option in manual.  Include nuances of
+   range parsing, such as backward ranges and "z".  Discuss
+   implications of using --empty vs. using one of the source files as
+   the original file including Outlines (which basically work) and
+   page labels (which don't).  Also mention trick of specifying two
+   different paths to the same file get duplication.
 
-      --pages [ --new ] { file [password] numeric-range ... } ... --
+   Command line is
 
-      The first file referenced would be the one whose other data would
-      be preserved (like trailer, info, encryption, outlines, etc.).
-      --new as first file would just use an empty file as the starting
-      point.  Be explicit about whether outlines, etc., are handled.
-      They are not handled initially.
+   --pages infile [ --password=pwd ] range ... --
 
-      Example: to grab pages 1-5 from file1 and 11-15 from file2
+   The regular input referenced would be the one whose other data
+   would be preserved (like trailer, info, encryption, outlines,
+   etc.).  It can be but doesn't have to be one of the files selected.
 
-      --pages file1.pdf 1-5 file2.pdf 11-15 --
+   Example: to grab pages 1-5 from file1 and 11-15 from file2 in
+   reverse:
 
-      To implement this, we would remove all pages from file1 except
-      pages 1 through 5.  Then we would take pages 11 through 15 from
-      file2, copy them to the file, and add them as pages.
+   qpdf file1.pdf out.pdf --pages file1.pdf 1-5 file2.pdf 15-11 --
 
-      (Look at ~/source/examples/perl/numrange.pl for numeric range
-      parsing code.)
+   Use comments in qpdf.cc to guide internals documentation when
+   discussing implementation.  Also see copyForeignObject as a source
+   for documentation.
 
-    - document that makeIndirectObject doesn't handle foreign objects
-      automatically because copying a foreign object is a big enough
-      deal that it should be explicit.  However addPages* does handle
-      foreign page objects automatically.
-
-    - Test /Outlines and see whether there's any point in handling
-      them in the API.  Maybe just copying them over works.  What
-      about command line tool?  Also think about page labels.
-
-    - Tests through qpdf command line: copy pages from multiple PDFs
-      starting with one PDF and also starting with empty.
+   Document that makeIndirectObject doesn't handle foreign objects
+   automatically because copying a foreign object is a big enough deal
+   that it should be explicit.  However addPages* does handle foreign
+   page objects automatically.
 
  * Document --copy-encryption and --encryption-file-password in
    manual.  Mention that the first half of /ID as well as all the

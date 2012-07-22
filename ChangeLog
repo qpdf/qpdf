@@ -1,5 +1,8 @@
 2012-07-21  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add --pages command-line option to qpdf to enable page-based
+	merging and splitting.
+
 	* Add new method QPDFObjectHandle::replaceDict to replace a
 	stream's dictionary.  Use with caution; see comments in
 	QPDFObjectHandle.hh.
