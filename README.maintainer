@@ -1,10 +1,11 @@
 Release Reminders
 =================
 
- * When making a release, always remember to run large file tests.
-   For a major release, consider running a spelling checker over the
-   source code to catch errors in variable names, strings, and
-   comments.
+ * When making a release, always remember to run large file tests and
+   image comparison tests (--enable-test-compare-images
+   --with-large-file-test-path=/path).  For a major release, consider
+   running a spelling checker over the source code to catch errors in
+   variable names, strings, and comments.
 
  * Consider running tests with latest gcc and/or valgrind.  To do
    this, replace, build with debugging and without shared libraries.

@@ -95,3 +95,27 @@ files in include/qpdf, especially QPDF.hh, QPDFObjectHandle.hh, and
 QPDFWriter.hh.  You can also study the code of qpdf/qpdf.cc, which
 exercises most of the public interface.  There are additional example
 programs in the examples directory.
+
+
+Additional Notes on Test Suite
+==============================
+
+By default, slow tests are disabled.  Slow tests include image
+comparison tests and large file tests.  Image comparison tests can be
+enabled by passing --enable-test-compare-images to ./configure.  Large
+file tests can be enabled by passing --with-large-file-test-path=path
+to ./configure or by setting the LARGE_FILE_TEST_PATH environment
+variable.  Run ./configure --help for additional options.  The test
+suite provides nearly full coverage even without these tests.  Unless
+you are making deep changes to the library or testing this on a new
+platform for the first time, there is no real reason to run these
+tests.  If you're just running the test suite to make sure that qpdf
+works for your build, the default tests are adequate.
+
+If you are packaging qpdf for a distribution and preparing a build
+that is run by an autobuilder, you may want to add the
+--enable-show-failed-test-output to configure options.  This way, if
+the test suite fails, test failure detail will be included in the
+build output.  Otherwise, you will have to have access to the
+qtest.log file from the build to view test failures.  The debian
+packages for qpdf enable this option, for example.

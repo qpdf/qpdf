@@ -1,5 +1,9 @@
 2012-07-21  Jay Berkenbilt  <ejb@ql.org>
 
+	* Change configure to have image comparison tests disabled by
+	default.  Update README and README.maintainer with information
+	about running them.
+
 	* Add --pages command-line option to qpdf to enable page-based
 	merging and splitting.
 

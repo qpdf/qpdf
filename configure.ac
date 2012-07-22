@@ -213,13 +213,13 @@ fi
 AC_SUBST(SKIP_TEST_COMPARE_IMAGES)
 AC_ARG_ENABLE(test-compare-images,
    AS_HELP_STRING([--enable-test-compare-images],
-		  [whether to compare images in test suite; enabled by default, enabling requires ghostscript and tiffcmp to be available]),
+		  [whether to compare images in test suite; disabled by default, enabling requires ghostscript and tiffcmp to be available]),
    [if test "$enableval" = "no"; then
       SKIP_TEST_COMPARE_IMAGES=1
     else
       SKIP_TEST_COMPARE_IMAGES=0
     fi],
-   [SKIP_TEST_COMPARE_IMAGES=0])
+   [SKIP_TEST_COMPARE_IMAGES=1])
 
 AC_SUBST(SHOW_FAILED_TEST_OUTPUT)
 AC_ARG_ENABLE(show-failed-test-output,
