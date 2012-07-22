@@ -837,7 +837,7 @@ QPDFPageData::QPDFPageData(QPDF* qpdf, char const* range) :
     qpdf(qpdf),
     orig_pages(qpdf->getAllPages())
 {
-    this->selected_pages = parse_numrange(range, this->orig_pages.size());
+    this->selected_pages = parse_numrange(range, (int)this->orig_pages.size());
 }
 
 int main(int argc, char* argv[])

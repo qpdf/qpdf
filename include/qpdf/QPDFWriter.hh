@@ -191,6 +191,7 @@ class QPDFWriter
     // Copy encryption parameters from another QPDF object.  If you
     // want to copy encryption from the object you are writing, call
     // setPreserveEncryption(true) instead.
+    QPDF_DLL
     void copyEncryptionParameters(QPDF&);
 
     // Set up for encrypted output.  Disables stream prefiltering and

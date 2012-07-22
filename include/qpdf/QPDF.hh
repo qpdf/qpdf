@@ -419,6 +419,7 @@ class QPDF
     // The PDF /Pages tree allows inherited values.  Working with
     // the pages of a pdf is much easier when the inheritance is
     // resolved by explicitly setting the values in each /Page.
+    QPDF_DLL
     void pushInheritedAttributesToPage();
 
     // Add new page at the beginning or the end of the current pdf.
