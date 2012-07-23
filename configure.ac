@@ -94,7 +94,7 @@ AC_CHECK_FUNCS(random)
 # which provide an adequate emulation thereof.
 AC_ARG_ENABLE([ld-version-script],
   AS_HELP_STRING([--enable-ld-version-script],
-    [enable linker version script (default is disabled)]),
+    [enable linker version script (default is enabled)]),
     [have_ld_version_script=$enableval], [have_ld_version_script=yes])
 if test "$have_ld_version_script" != no; then
   AC_MSG_CHECKING([if LD -Wl,--version-script works])
