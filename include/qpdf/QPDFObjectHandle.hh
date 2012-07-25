@@ -363,6 +363,15 @@ class QPDFObjectHandle
 			   QPDFObjectHandle const& filter,
 			   QPDFObjectHandle const& decode_parms);
 
+    // Replace the stream's stream data with the given string.
+    // This method will create a copy of the data rather than using
+    // the user-provided buffer as in the PointerHolder<Buffer> version
+    // of replaceStreamData.
+    QPDF_DLL
+    void replaceStreamData(std::string const& data,
+			   QPDFObjectHandle const& filter,
+			   QPDFObjectHandle const& decode_parms);
+
     // As above, replace this stream's stream data.  Instead of
     // directly providing a buffer with the stream data, call the
     // given provider's provideStreamData method.  See comments on the
