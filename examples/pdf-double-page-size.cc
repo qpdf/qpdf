@@ -61,12 +61,7 @@ int main(int argc, char* argv[])
     char const* password = (argc == 4) ? argv[3] : "";
 
     // Text to prepend to each page's contents
-    char const* content = "2 0 0 2 0 0 cm\n";
-
-    // Copy text into a buffer without the null terminator
-    PointerHolder<Buffer> b = new Buffer(strlen(content));
-    unsigned char* bp = b->getBuffer();
-    memcpy(bp, (unsigned char*)content, strlen(content));
+    std::string content = "2 0 0 2 0 0 cm\n";
 
     try
     {
@@ -80,7 +75,8 @@ int main(int argc, char* argv[])
 	    QPDFObjectHandle& page = *iter;
 
 	    // Prepend the buffer to the page's contents
-	    page.addPageContents(QPDFObjectHandle::newStream(&qpdf, b), true);
+	    page.addPageContents(
+                QPDFObjectHandle::newStream(&qpdf, content), true);
 
 	    // Double the size of each of the content boxes
 	    doubleBoxSize(page, "/MediaBox");

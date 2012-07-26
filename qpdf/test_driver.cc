@@ -455,11 +455,9 @@ void runtest(int n, char const* filename1, char const* filename2)
 	{
 	    throw std::logic_error("test 7 run on file with no QStream");
 	}
-	PointerHolder<Buffer> b = new Buffer(20);
-	unsigned char* bp = b->getBuffer();
-	memcpy(bp, (char*)"new data for stream\n", 20); // no null!
 	qstream.replaceStreamData(
-	    b, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
+	    "new data for stream\n",
+            QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
 	QPDFWriter w(pdf, "a.pdf");
 	w.setStaticID(true);
 	w.setStreamDataMode(qpdf_s_preserve);
@@ -509,8 +507,12 @@ void runtest(int n, char const* filename1, char const* filename2)
     else if (n == 9)
     {
 	QPDFObjectHandle root = pdf.getRoot();
+        // Explicitly exercise the Buffer version of newStream
+	PointerHolder<Buffer> buf = new Buffer(20);
+	unsigned char* bp = buf->getBuffer();
+	memcpy(bp, (char*)"data for new stream\n", 20); // no null!
 	QPDFObjectHandle qstream = QPDFObjectHandle::newStream(
-            &pdf, "data for new stream\n");
+            &pdf, buf);
 	QPDFObjectHandle rstream = QPDFObjectHandle::newStream(&pdf);
 	try
 	{
@@ -521,11 +523,9 @@ void runtest(int n, char const* filename1, char const* filename2)
 	{
 	    std::cout << "exception: " << e.what() << std::endl;
 	}
-	PointerHolder<Buffer> buf = new Buffer(22);
-	unsigned char* bp = buf->getBuffer();
-	memcpy(bp, (char*)"data for other stream\n", 22); // no null!
 	rstream.replaceStreamData(
-	    buf, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
+	    "data for other stream\n",
+            QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
 	root.replaceKey("/QStream", qstream);
 	root.replaceKey("/RStream", rstream);
 	QPDFWriter w(pdf, "a.pdf");

@@ -1,3 +1,9 @@
+2012-07-25  Jay Berkenbilt  <ejb@ql.org>
+
+	* From Tobias: add QPDFObjectHandle::replaceStreamData that takes
+	a std::string analogous to the QPDFObjectHandle::newStream that
+	takes a string that was added earlier.
+
 2012-07-21  Jay Berkenbilt  <ejb@ql.org>
 
 	* Change configure to have image comparison tests disabled by
