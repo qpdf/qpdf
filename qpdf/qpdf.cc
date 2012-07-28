@@ -75,6 +75,7 @@ Basic Options\n\
                         parameters are being copied\n\
 --encrypt options --    generate an encrypted file\n\
 --decrypt               remove any encryption on the file\n\
+--pages options --      select specific pages from one or more files\n\
 \n\
 If none of --copy-encryption, --encrypt or --decrypt are given, qpdf will\n\
 preserve any encryption data associated with a file.\n\
