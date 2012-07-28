@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "3.0.a0">
-<!ENTITY lastreleased "June 25, 2012">
+<!ENTITY swversion "3.0.rc1">
+<!ENTITY lastreleased "July 29, 2012">
 ]>
 <book>
  <bookinfo>
@@ -26,6 +26,8 @@
    QPDF is a program that does structural, content-preserving
    transformations on PDF files.  QPDF's website is located at <ulink
    url="http://qpdf.sourceforge.net/">http://qpdf.sourceforge.net/</ulink>.
+   QPDF's source code is hosted on github at <ulink
+   url="https://github.com/qpdf/qpdf">https://github.com/qpdf/qpdf</ulink>.
   </para>
   <para>
    QPDF has been released under the terms of <ulink
@@ -56,14 +58,28 @@
    about how they work.
   </para>
   <para>
-   QPDF is <emphasis>not</emphasis> a PDF content creation library, a
-   PDF viewer, or a program capable of converting PDF into other
-   formats.  In particular, QPDF knows nothing about the semantics of
-   PDF content streams.  If you are looking for something that can do
+   With QPDF, it is possible to copy objects from one PDF file into
+   another and to manipulate the list of pages in a PDF file.  This
+   makes it possible to merge and split PDF files.  The QPDF library
+   also makes it possible for you to create PDF files from scratch.
+   In this mode, you are responsible for supplying all the contents of
+   the file, while the QPDF library takes care off all the syntactical
+   representation of the objects, creation of cross references tables
+   and, if you use them, object streams, encryption, linearization,
+   and other syntactic details.  You are still responsible for
+   generating PDF content on your own.
+  </para>
+  <para>
+   QPDF has been designed with very few external dependencies, and it
+   is intentionally very lightweight.  QPDF is
+   <emphasis>not</emphasis> a PDF content creation library, a PDF
+   viewer, or a program capable of converting PDF into other formats.
+   In particular, QPDF knows nothing about the semantics of PDF
+   content streams.  If you are looking for something that can do
    that, you should look elsewhere.  However, once you have a valid
    PDF file, QPDF can be used to transform that file in ways perhaps
-   your original PDF creation can't handle.  For example, programs
-   generate simple PDF files but can't password-protect them,
+   your original PDF creation can't handle.  For example, many
+   programs generate simple PDF files but can't password-protect them,
    web-optimize them, or perform other transformations of that type.
   </para>
  </chapter>
@@ -112,17 +128,34 @@
        -u</command>.
       </para>
      </listitem>
+     <listitem>
+      <para>
+       A C++ compiler that works well with STL and has the <type>long
+       long</type> type.  Most modern C++ compilers should fit the
+       bill fine.  QPDF is tested with gcc and Microsoft Visual C++.
+      </para>
+     </listitem>
     </itemizedlist>
    </para>
    <para>
     Part of qpdf's test suite does comparisons of the contents PDF
-    files by converting them images and comparing the images.  You can
-    optionally disable this part of the test suite by running
-    <command>configure</command> with the
-    <option>--disable-test-compare-images</option> flag.  If you leave
-    this enabled, the following additional requirements are required
-    by the test suite.  Note that in no case are these items required
-    to use qpdf.
+    files by converting them images and comparing the images.  The
+    image comparison tests are disabled by default.  Those tests are
+    not required for determining correctness of a qpdf build if you
+    have not modified the code since the test suite also contains
+    expected output files that are compared literally.  The image
+    comparison tests provide an extra check to make sure that any
+    content transformations don't break the rendering of pages.
+    Transformations that affect the content streams themselves are off
+    by default and are only provided to help developers look into the
+    contents of PDF files.  If you are making deep changes to the
+    library that cause changes in the contents of the files that qpdf
+    generates, then you should enable the image comparison tests.
+    Enable them by running <command>configure</command> with the
+    <option>--enable-test-compare-images</option> flag.  If you enable
+    this, the following additional requirements are required by the
+    test suite.  Note that in no case are these items required to use
+    qpdf.
     <itemizedlist>
      <listitem>
       <para>
@@ -132,13 +165,12 @@
      <listitem>
       <para>
        GhostScript version 8.60 or newer: <ulink
-       url="http://pages.cs.wisc.edu/~ghost/">http://pages.cs.wisc.edu/~ghost/</ulink>
+       url="http://www.ghostscript.com">http://www.ghostscript.com</ulink>
       </para>
      </listitem>
     </itemizedlist>
-    This option is primarily intended for use by packagers of qpdf so
-    that they can avoid having the qpdf packages depend on tiff and
-    ghostscript software.
+    If you do not enable this, then you do not need to have tiff and
+    ghostscript.
    </para>
    <para>
     If Adobe Reader is installed as <command>acroread</command>, some
@@ -158,7 +190,7 @@
     To build the PDF version of the documentation, you need Apache fop
     (<ulink
     url="http://xml.apache.org/fop/">http://xml.apache.org/fop/</ulink>)
-    version 0.94 of higher.
+    version 0.94 or higher.
    </para>
   </sect1>
   <sect1 id="ref.building">
@@ -182,9 +214,9 @@ make
     Building on Windows is a little bit more complicated.  For
     details, please see <filename>README-windows.txt</filename> in the
     source distribution.  You can also download a binary distribution
-    for Windows.  There is a port of qpdf in the
-    <filename>contrib</filename> area generously contributed by Jian
-    Ma.  This is also discussed in more detail in
+    for Windows.  There is a port of qpdf to Visual C++ version 6 in
+    the <filename>contrib</filename> area generously contributed by
+    Jian Ma.  This is also discussed in more detail in
     <filename>README-windows.txt</filename>.
    </para>
    <para>
@@ -215,7 +247,12 @@ make
     identical to the input file but may have been structurally
     reorganized.  Also, orphaned objects will be removed from the
     file.  Many transformations are available as controlled by the
-    options below.
+    options below.  In place of <option>infilename</option>, the
+    parameter <option>--empty</option> may be specified.  This causes
+    qpdf to use a dummy input file that contains zero pages.  The only
+    normal use case for using <option>--empty</option> would be if you
+    were going to add pages from another source, as discussed in <xref
+    linkend="ref.page-selection"/>.
    </para>
    <para>
     <option>outfilename</option> does not have to be seekable, even
@@ -248,7 +285,35 @@ make
       <term><option>--linearize</option></term>
       <listitem>
        <para>
-        Causes generation of a linearized (web optimized) output file.
+        Causes generation of a linearized (web-optimized) output file.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--copy-encryption=file</option></term>
+      <listitem>
+       <para>
+        Encrypt the file using the same encryption parameters,
+        including user and owner password, as the specified file.  Use
+        <option>--encrypt-file-password</option> to specify a password
+        if one is needed to open this file.  Note that copying the
+        encryption parameters from a file also copies the first half
+        of <literal>/ID</literal> from the file since this is part of
+        the encryption parameters.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--encrypt-file-password=password</option></term>
+      <listitem>
+       <para>
+        If the file specified with <option>--copy-encryption</option>
+        requires a password, specify the password using this option.
+        Note that only one of the user or owner password is required.
+        Both passwords will be preserved since QPDF does not
+        distinguish between the two passwords.  It is possible to
+        preserve encryption parameters, including the owner password,
+        from a file even if you don't know the file's owner password.
        </para>
       </listitem>
      </varlistentry>
@@ -271,6 +336,16 @@ make
        </para>
       </listitem>
      </varlistentry>
+     <varlistentry>
+      <term><option>--pages options --</option></term>
+      <listitem>
+       <para>
+        Select specific pages from one or more input files.  See <xref
+        linkend="ref.page-selection"/> for details on how to do page
+        selection (splitting and merging).
+       </para>
+      </listitem>
+     </varlistentry>
     </variablelist>
    </para>
    <para>
@@ -288,6 +363,25 @@ make
     functionality is not intended to be used for bypassing copyright
     restrictions or other restrictions placed on files by their
     producers.
+   </para>
+   <para>
+    In all cases where qpdf allows specification of a password, care
+    must be taken if the password contains characters that fall
+    outside of the 7-bit US-ASCII character range to ensure that the
+    exact correct byte sequence is provided.  It is possible that a
+    future version of qpdf may handle this more gracefully.  For
+    example, if a password was encrypted using a password that was
+    encoded in ISO-8859-1 and your terminal is configured to use
+    UTF-8, the password you supply may not work properly.  There are
+    various approaches to handling this.  For example, if you are
+    using Linux and have the iconv executable (part of the ICU
+    package) installed, you could pass <option>--password=`echo
+    <replaceable>password</replaceable> | iconv -t
+    iso-8859-1`</option> to qpdf where
+    <replaceable>password</replaceable> is a password specified in
+    your terminal's locale.  A detailed discussion of this is out of
+    scope for this manual, but just be aware of this issue if you have
+    trouble with a password that contains 8-bit characters.
    </para>
   </sect1>
   <sect1 id="ref.encryption-options">
@@ -472,6 +566,126 @@ make
      </varlistentry>
     </variablelist>
     The default for each permission option is to be fully permissive.
+   </para>
+  </sect1>
+  <sect1 id="ref.page-selection">
+   <title>Page Selection Options</title>
+   <para>
+    Starting with qpdf 3.0, it is possible to split and merge PDF
+    files by selecting pages from one or more input files.  Whatever
+    file is given as the primary input file is used as the starting
+    point, but its pages are replaced with pages as specified.
+
+    <programlisting><option>--pages <replaceable>input-file</replaceable> [ <replaceable>--password=password</replaceable> ] <replaceable>page-range</replaceable> [ ... ] --</option>
+</programlisting>
+    Multiple input files may be specified.  Each one is given as the
+    name of the input file, an optional password (if required to open
+    the file), and the range of pages.  Note that
+    &ldquo;<option>--</option>&rdquo; terminates parsing of page
+    selection flags.
+   </para>
+   <para>
+    For each file that pages should be taken from, specify the file, a
+    password needed to open the file (if needed), and a page range.
+    If the primary input file file requires a password, that password
+    must be specified outside the <option>--pages</option> option and
+    does not need to be repeated inside the <option>--pages</option>.
+    The same file can be repeated multiple times.  If a file that is
+    repeated has a password, the password only has to be given the
+    first time.  All non-page data (info, outlines, page numbers,
+    etc.) are taken from the primary input file.  To discard these,
+    use <option>--empty</option> as the primary input.  One subtlety
+    about specifying passwords is that specifying a password as
+    <option>--encryption-file-password</option> doesn't prevent you
+    from having to repeat that password of that is also one of the
+    input files.  If in doubt, it's never an error to specify the
+    password multiple times.
+   </para>
+   <para>
+    It is not presently possible to specify the same page from the
+    same file directly more than once, but you can make this work by
+    specifying two different paths to the same file (such as by
+    putting <filename>./</filename> somewhere in the path).  This can
+    also be used if you want to repeat a page from one of the input
+    files in the output file.  This may be made more convenient in a
+    future version of qpdf if there is enough demand for this feature.
+   </para>
+   <para>
+    The page range is a set of numbers separated by commas, ranges of
+    numbers separated dashes, or combinations of those.  The character
+    &ldquo;z&rdquo; represents the last page.  Pages can appear in any
+    order.  Ranges can appear with a high number followed by a low
+    number, which causes the pages to appear in reverse.  Repeating a
+    number will cause an error, but you can use the workaround
+    discussed above should you really want to include the same page
+    twice.
+   </para>
+   <para>
+    Example page ranges:
+    <itemizedlist>
+     <listitem>
+      <para>
+       <literal>1,3,5-9,15-12</literal>: pages 1, 2, 3, 5, 6, 7, 8,
+       9, 15, 14, 13, and 12.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       <literal>z-1</literal>: all pages in the document in reverse
+      </para>
+     </listitem>
+    </itemizedlist>
+   </para>
+   <para>
+    Note that qpdf doesn't presently do anything special about other
+    constructs in a PDF file that may know about pages, so semantics
+    of splitting and merging vary across features.  For example, the
+    document's outlines (bookmarks) point to actual page objects, so
+    if you select some pages and not others, bookmarks that point to
+    pages that are in the output file will work, and remaining
+    bookmarks will not work.  On the other hand, page labels (page
+    numbers specified in the file) are just sequential, so page labels
+    will be messed up in the output file.  A future version of
+    <command>qpdf</command> may do a better job at handling these
+    issues.  (Note that the qpdf library already contains all of the
+    APIs required in order to implement this in your own application
+    if you need it.)  In the mean time, you can always use
+    <option>--empty</option> as the primary input file to avoid
+    copying all of that from the first file.  For example, to take
+    pages 1 through 5 from a <filename>infile.pdf</filename> while
+    preserving all metadata associated with that file, you could use
+
+    <programlisting><command>qpdf</command> <option>infile.pdf --pages infile.pdf 1-5 -- outfile.pdf</option>
+</programlisting>
+    If you wanted pages 1 through 5 from
+    <filename>infile.pdf</filename> but you wanted the rest of the
+    metadata to be dropped, you could instead run
+
+    <programlisting><command>qpdf</command> <option>--empty --pages infile.pdf 1-5 -- outfile.pdf</option>
+</programlisting>
+    If you wanted to take pages 1&ndash;5 from
+    <filename>file1.pdf</filename> and pages 11&ndash;15 from
+    <filename>file2.pdf</filename> in reverse, you would run
+
+    <programlisting><command>qpdf</command> <option>file1.pdf --pages file1.pdf 1-5 file2.pdf 15-11 -- outfile.pdf</option>
+</programlisting>
+    If, for some reason, you wanted to take the first page of an
+    encrypted file called <filename>encrypted.pdf</filename> with
+    password <literal>pass</literal> and repeat it twice in an output
+    file, and if you wanted to drop metadata (like page numbers and
+    outlines) but preserve encryption, you would use
+
+    <programlisting><command>qpdf</command> <option>--empty --copy-encryption=encrypted.pdf --encryption-file-password=pass
+--pages encrypted.pdf --password=pass 1 ./encrypted.pdf --password=pass 1 --
+outfile.pdf</option>
+</programlisting>
+    Note that we had to specify the password all three times because
+    giving a password as <option>--encryption-file-password</option>
+    doesn't count for page selection, and as far as qpdf is concerned,
+    <filename>encrypted.pdf</filename> and
+    <filename>./encrypted.pdf</filename> are separated files.  These
+    are all corner cases that most users should hopefully never have
+    to be bothered with.
    </para>
   </sect1>
   <sect1 id="ref.advanced-transformation">
@@ -1053,6 +1267,14 @@ make
     your system understands how to read libtool
     <filename>.la</filename> files, this may not be necessary.
    </para>
+   <para>
+    The qpdf library is safe to use in a multithreaded program, but no
+    individual <type>QPDF</type> object instance (including
+    <type>QPDF</type>, <type>QPDFObjectHandle</type>, or
+    <type>QPDFWriter</type>) can be used in more than one thread at a
+    time.  Multiple threads may simultaneously work with different
+    instances of these and all other QPDF objects.
+   </para>
  </chapter>
  <chapter id="ref.design">
   <title>Design and Library Notes</title>
@@ -1156,17 +1378,15 @@ make
     which objects are direct and which objects are indirect.
    </para>
    <para>
-    There is no public interface for creating instances of
-    QPDFObjectHandle.  They can be created only inside the QPDF
-    library.  This is generally done through a call to the private
-    method <function>QPDF::readObject</function> which uses
-    <classname>QPDFTokenizer</classname> to read an indirect object at
-    a given file position and return a
-    <classname>QPDFObjectHandle</classname> that encapsulates it.
-    There are also internal methods to create fabricated indirect
-    objects from existing direct objects or to change an indirect
-    object into a direct object, though these steps are not performed
-    except to support rewriting.
+    Instances of <classname>QPDFObjectHandle</classname> can be
+    directly created and modified using static factory methods in the
+    <classname>QPDFObjectHandle</classname> class. There are factory
+    methods for each type of object as well as a convenience method
+    <function>QPDFObjectHandle::parse</function> that creates an
+    object from a string representation of the object.  Existing
+    instances of <classname>QPDFObjectHandle</classname> can also be
+    modified in several ways.  See comments in
+    <filename>QPDFObjectHandle.hh</filename> for details.
    </para>
    <para>
     When the <classname>QPDF</classname> class creates a new object,
@@ -1375,6 +1595,86 @@ make
     strings given an encryption key.  This is used by
     <classname>QPDFWriter</classname> when it rewrites encrypted
     files.
+   </para>
+  </sect1>
+  <sect1 id="ref.adding-and-remove-pages">
+   <title>Adding and Removing Pages</title>
+   <para>
+    While qpdf's API has supported adding and modifying objects for
+    some time, version 3.0 introduces specific methods for adding and
+    removing pages.  These are largely convenience routines that
+    handle two tricky issues: pushing inheritable resources from the
+    <literal>/Pages</literal> tree down to individual pages and
+    manipulation of the <literal>/Pages</literal> tree itself.  For
+    details, see <function>addPage</function> and surrounding methods
+    in <filename>QPDF.hh</filename>.
+   </para>
+  </sect1>
+  <sect1 id="ref.reserved-objects">
+   <title>Reserving Object Numbers</title>
+   <para>
+    Version 3.0 of qpdf introduced the concept of reserved objects.
+    These are seldom needed for ordinary operations, but there are
+    cases in which you may want to add a series of indirect objects
+    with references to each other to a <classname>QPDF</classname>
+    object.  This causes a problem because you can't determine the
+    object ID that a new indirect object will have until you add it to
+    the <classname>QPDF</classname> object with
+    <function>QPDF::makeIndirectObject</function>.  The only way to
+    add two mutually referential objects to a
+    <classname>QPDF</classname> object prior to version 3.0 would be
+    to add the new objects first and then make them refer to each
+    other after adding them.  Now it is possible to create a
+    <firstterm>reserved object</firstterm> using
+    <function>QPDFObjectHandle::newReserved</function>.  This is an
+    indirect object that stays &ldquo;unresolved&rdquo; even if it is
+    queried for its type.  So now, if you want to create a set of
+    mutually referential objects, you can create reservations for each
+    one of them and use those reservations to construct the
+    references.  When finished, you can call
+    <function>QPDF::replaceReserved</function> to replace the reserved
+    objects with the real ones.  This functionality will never be
+    needed by most applications, but it is used internally by QPDF
+    when copying objects from other PDF files, as discussed in <xref
+    linkend="ref.foreign-objects"/>.  For an example of how to use
+    reserved objects, search for <function>newReserved</function> in
+    <filename>test_driver.cc</filename> in qpdf's sources.
+   </para>
+  </sect1>
+  <sect1 id="ref.foreign-objects">
+   <title>Copying Objects From Other PDF Files</title>
+   <para>
+    Version 3.0 of qpdf introduced the ability to copy objects into a
+    <classname>QPDF</classname> object from a different
+    <classname>QPDF</classname> object, which we refer to as
+    <firstterm>foreign objects</firstterm>.  This allows arbitrary
+    merging of PDF files.  The <command>qpdf</command> command-line
+    tool provides limited support for basic page selection, including
+    merging in pages from other files, but the library's API makes it
+    possible to implement arbitrarily complex merging operations.  The
+    main method for copying foreign objects is
+    <function>QPDF::copyForeignObject</function>.  This takes an
+    indirect object from another <classname>QPDF</classname> and
+    copies it recursively into this object while preserving all object
+    structure, including circular references.  This means you can add
+    a direct object that you create from scratch to a
+    <classname>QPDF</classname> object with
+    <function>QPDF::makeIndirectObject</function>, and you can add an
+    indirect object from another file with
+    <function>QPDF::copyForeignObject</function>.  The fact that
+    <function>QPDF::makeIndirectObject</function> does not
+    automatically detect a foreign object and copy it is an explicit
+    design decision.  Copying a foreign object seems like a
+    sufficiently significant thing to do that it should be done
+    explicitly.
+   </para>
+   <para>
+    The other way to copy foreign objects is by passing a page from
+    one <classname>QPDF</classname> to another by calling
+    <function>QPDF::addPage</function>.  In contrast to
+    <function>QPDF::makeIndirectObject</function>, this method
+    automatically distinguishes between indirect objects in the
+    current file, foreign objects, and direct objects.
    </para>
   </sect1>
   <sect1 id="ref.rewriting">
@@ -1892,8 +2192,8 @@ print "\n";
    <para>
     The specification recommends limiting the number of objects in
     object stream for efficiency in reading and decoding.  Acrobat 6
-    uses no more than objects per object stream for linearized files
-    and no more 200 objects per stream for non-linearized files.
+    uses no more than 100 objects per object stream for linearized
+    files and no more 200 objects per stream for non-linearized files.
     <classname>QPDFWriter</classname>, in object stream generation
     mode, never puts more than 100 objects in an object stream.
    </para>
@@ -2085,6 +2385,119 @@ print "\n";
    For a detailed list of changes, please see the file
    <filename>ChangeLog</filename> in the source distribution.
   </para>
+  <variablelist>
+   <varlistentry>
+    <term>3.0.rc1: July 29, 2012</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Acknowledgment: I would like to express gratitude for the
+        contributions of Tobias Hoffmann toward the release of qpdf
+        version 3.0.  He is responsible for most of the implementation
+        and design of the new API for manipulating pages, and
+        contributed code and ideas for many of the improvements made
+        in version 3.0.  Without his work, this release would
+        certainly not have happened as soon as it did, if at all.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <emphasis>Non-compatible API change:</emphasis> The version of
+        <function>QPDFObjectHandle::replaceStreamData</function> that
+        uses a <classname>StreamDataProvider</classname> no longer
+        requires (or accepts) a <varname>length</varname> parameter.
+        See <xref linkend="ref.upgrading-to-3.0"/> for an explanation.
+        While care is taken to avoid non-compatible API changes in
+        general, an exception was made this time because the new
+        interface offers an opportunity to significantly simplify
+        calling code.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Support has been added for large files.  The test suite
+        verifies support for files larger than 4 gigabytes, and manual
+        testing has verified support for files larger than 10
+        gigabytes.  Large file support is available for both 32-bit
+        and 64-bit platforms as long as the compiler and underlying
+        platforms support it.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Support for page selection (splitting and merging PDF files)
+        has been added to the <command>qpdf</command> command-line
+        tool.  See <xref linkend="ref.page-selection"/>.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Options have been added to the <command>qpdf</command>
+        command-line tool for copying encryption parameters from
+        another file.  See <xref linkend="ref.basic-options"/>.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        New methods have been added to the <classname>QPDF</classname>
+        object for adding and removing pages.  See <xref
+        linkend="ref.adding-and-remove-pages"/>.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        New methods have been added to the <classname>QPDF</classname>
+        object for copying objects from other PDF files.  See <xref
+        linkend="ref.foreign-objects"/>
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        A new method <function>QPDFObjectHandle::parse</function> has
+        been added for constructing
+        <classname>QPDFObjectHandle</classname> objects from a string
+        description.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Methods have been added to <classname>QPDFWriter</classname>
+        to allow writing to an already open stdio <type>FILE*</type>
+        addition to writing to standard output or a named file.
+        Methods have been added to <classname>QPDF</classname> to be
+        able to process a file from an already open stdio
+        <type>FILE*</type>.  This makes it possible to read and write
+        PDF from secure temporary files that have been unlinked prior
+        to being fully read or written.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        The <function>QPDF::emptyPDF</function> can be used to allow
+        creation of PDF files from scratch.  The example
+        <filename>examples/pdf-create.cc</filename> illustrates how it
+        can be used.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Several methods to take
+        <classname>PointerHolder&lt;Buffer&gt;</classname> can now
+        also accept <type>std::string</type> arguments.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Many new convenience methods have been added to the library,
+        most in <classname>QPDFObjectHandle</classname>.  See
+        <filename>ChangeLog</filename> for a full list.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+  </variablelist>
   <variablelist>
    <varlistentry>
     <term>2.3.1: December 28, 2011</term>
@@ -2727,5 +3140,48 @@ print "\n";
     </para>
    </listitem>
   </itemizedlist>
+ </appendix>
+ <appendix id="ref.upgrading-to-3.0">
+  <title>Upgrading to 3.0</title>
+  <para>
+   For the most part, the API for qpdf version 3.0 is backward
+   compatible with versions 2.1 and later.  There are two exceptions:
+   <itemizedlist>
+    <listitem>
+     <para>
+      The method
+      <function>QPDFObjectHandle::replaceStreamData</function> that
+      uses a <classname>StreamDataProvider</classname> to provide the
+      stream data no longer takes a <varname>length</varname>
+      parameter.  While it would have been easy enough to keep the
+      parameter for backward compatibility, in this case, the
+      parameter was removed since this provides the user an
+      opportunity to simplify the calling code.  This method was
+      introduced in version 2.2.  At the time, the
+      <varname>length</varname> parameter was required in order to
+      ensure that calls to the stream data provider returned the same
+      length for a specific stream every time they were invoked.  In
+      particular, the linearization code depends on this.  Instead,
+      qpdf 3.0 and newer check for that constraint explicitly.  The
+      first time the stream data provider is called for a specific
+      stream, the actual length is saved, and subsequent calls are
+      required to return the same number of bytes.  This means the
+      calling code no longer has to compute the length in advance,
+      which can be a significant simplification.  If your code fails
+      to compile because of the extra argument and you don't want to
+      make other changes to your code, just omit the argument.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Many methods take <type>long long</type> instead of other
+      integer types.  Most if not all existing code should compile
+      fine with this change since such parameters had always
+      previously been smaller types.  This change was required to
+      support files larger than two gigabytes in size.
+     </para>
+    </listitem>
+   </itemizedlist>
+  </para>
  </appendix>
 </book>

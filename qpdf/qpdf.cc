@@ -160,11 +160,6 @@ repeated multiple times.  All non-page data (info, outlines, page numbers,\n\
 etc. are taken from the primary input file.  To discard this, use --empty\n\
 as the primary input.\n\
 \n\
-It is not presently possible to specify the same page from the same\n\
-file directly more than once, but you can make this work by specifying\n\
-two different paths to the same file (such as by putting ./ somewhere\n\
-in the path).\n\
-\n\
 The page range is a set of numbers separated by commas, ranges of\n\
 numbers separated dashes, or combinations of those.  The character\n\
 \"z\" represents the last page.  Pages can appear in any order.  Ranges\n\

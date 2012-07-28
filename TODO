@@ -1,88 +1,20 @@
-Next
-====
-
-*** ABI changes have been made.  build.mk has been updated.
-
- * 64-bit windows build, remaining steps
-
-    - new external-libs have been built and copied into
-      ~/Q/storage/releases/qpdf/external-libs.  Release is done in
-      git.  Just need to upload when ready.  Remember to document that
-      this version is needed for > 2.3.1.
-
-    - update README-windows.txt docs to indicate that MSVC 2010 is the
-      supported version and to update the information about mingw,
-      including the need for the _FILE_OFFSET_BITS workaround on the
-      32-bit version.
-
- * Document that your compiler has to support long long.
-
- * Make sure that the release notes call attention to the one API
-   breaking change: removal of length from replaceStreamData.
-
- * Document thread safety: One individual QPDF or QPDFWriter object
-   can only be used by one thread at a time, but multiple threads can
-   simultaneously use separate objects.
-
- * Mention QPDFObjectHandle::parse in the documentation.
-
- * Manual: empty --empty as an input file name option
-
- * copyForeignObject, merge/split documentation:
-
-   document details of --pages option in manual.  Include nuances of
-   range parsing, such as backward ranges and "z".  Discuss
-   implications of using --empty vs. using one of the source files as
-   the original file including Outlines (which basically work) and
-   page labels (which don't).  Also mention trick of specifying two
-   different paths to the same file get duplication.
-
-   Command line is
-
-   --pages infile [ --password=pwd ] range ... --
-
-   The regular input referenced would be the one whose other data
-   would be preserved (like trailer, info, encryption, outlines,
-   etc.).  It can be but doesn't have to be one of the files selected.
-
-   Example: to grab pages 1-5 from file1 and 11-15 from file2 in
-   reverse:
-
-   qpdf file1.pdf out.pdf --pages file1.pdf 1-5 file2.pdf 15-11 --
-
-   Use comments in qpdf.cc to guide internals documentation when
-   discussing implementation.  Also see copyForeignObject as a source
-   for documentation.
-
-   Document that makeIndirectObject doesn't handle foreign objects
-   automatically because copying a foreign object is a big enough deal
-   that it should be explicit.  However addPages* does handle foreign
-   page objects automatically.
-
- * Document --copy-encryption and --encryption-file-password in
-   manual.  Mention that the first half of /ID as well as all the
-   encryption parameters are copied.  Maybe mention about StrF and
-   StrM with respect to AES here and also with encryption
-   preservation.
-
-
-Soon
-====
-
- * See if I can support the new encryption formats mentioned in the
-   open bug on sourceforge.  Check other sourceforge bugs.
-
-
 General
 =======
+
+ * See if I can support the encryption format used with /R 5 /V 5,
+   even though a qpdf-announce subscriber with an adobe.com email
+   address mentioned that this is deprecated.  There is also a new
+   encryption format coming in a future release, which may be better
+   to support.  As of the qpdf 3.0 release, the specification was not
+   publicly available yet.
+
+ * Consider the possibility of doing something locale-aware to support
+   non-ASCII passwords.  Update documentation if this is done.
 
  * Look for %PDF header somewhere within the first 1024 bytes of the
    file.  Also accept headers of the form "%!PS−Adobe−N.n PDF−M.m".
    See Implementation notes 13 and 14 in appendix H of the PDF 1.7
    specification.  This is bug 3267974.
-
- * Update qpdf docs about non-ascii passwords.  See thread from
-   2010-12-07,08 for details.
 
  * Consider impact of article threads on page splitting/merging.
    Subramanyam provided a test file; see ../misc/article-threads.pdf.

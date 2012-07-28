@@ -15,11 +15,20 @@ Prerequisites
 
 QPDF depends on external libraries "zlib" and "pcre".  These are part
 of virtually all Linux distributions and are readily available;
-download information appears in the documentation.  You can also
-download the external library distributions in source from from qpdf's
-download site.  For Windows, you can download pre-built binary
-verisons of those libraries for some compilers; see README-windows.txt
-for additional details.
+download information appears in the documentation.  For Windows, you
+can download pre-built binary verisons of those libraries for some
+compilers; see README-windows.txt for additional details.
+
+QPDF requires a C++ compiler that works with STL.  Your compiler must
+also support "long long".  Almost all modern compilers do.  If you are
+trying to port qpdf to a compiler that doesn't support long long, you
+could change all occurrences of "long long" to "long" in the source
+code, noting that this would break binary compatibility with other
+builds of qpdf.  Doing so would certainly prevent qpdf from working
+with files larger than 2 GB, but remaining functionality would most
+likely work fine.  If you built qpdf this way and it passed its test
+suite with large file support disabled, you could be confident that
+you had an otherwise working qpdf.
 
 
 Licensing terms of embedded software
@@ -49,20 +58,23 @@ For UNIX and UNIX-like systems, you can usually get by with just
 make
 make install
 
-For more detailed general information, see the "INSTALL" file in this
-directory.
+Packagers may set DESTDIR, in which case make install will install
+inside of DESTDIR, as is customary with many packages.  For more
+detailed general information, see the "INSTALL" file in this
+directory.  If you are already accustomed to building and installing
+software that uses autoconf, there's nothing new for you in the
+INSTALL file.
+
 
 Building on Windows
 ===================
 
-QPDF is known to build and pass its test suite with mingw (gcc 4.4.0)
-and Microsoft Visual C++ .NET 2008 Express.  Either cygwin or MSYS
-plus ActivateState Perl is required to build as well in order to get
-make and other related tools.  The MSVC works with either cygwin or
-MSYS.  The mingw build requires MSYS and will probably not work with
-cygwin.
-
-For details on how to build under Windows, see README-windows.txt.
+QPDF is known to build and pass its test suite with mingw (latest
+version tested: gcc 4.6.2), mingw64 (latest version tested: 4.7.0) and
+Microsoft Visual C++ 2010, both 32-bit and 64-bit versions.  MSYS plus
+ActivateState Perl is required to build as well in order to get make
+and other related tools.  See README-windows.txt for details on how to
+build under Windows, see README-windows.txt.
 
 
 Additional Notes on Build
@@ -94,7 +106,10 @@ To learn about using the library, please read comments in the header
 files in include/qpdf, especially QPDF.hh, QPDFObjectHandle.hh, and
 QPDFWriter.hh.  You can also study the code of qpdf/qpdf.cc, which
 exercises most of the public interface.  There are additional example
-programs in the examples directory.
+programs in the examples directory.  Reading all the source files in
+the qpdf directory (including the qpdf command-line tool and some test
+drivers) along with the code in the examples directory will give you a
+complete picture of every aspect of the public interface.
 
 
 Additional Notes on Test Suite
@@ -102,15 +117,21 @@ Additional Notes on Test Suite
 
 By default, slow tests are disabled.  Slow tests include image
 comparison tests and large file tests.  Image comparison tests can be
-enabled by passing --enable-test-compare-images to ./configure.  Large
-file tests can be enabled by passing --with-large-file-test-path=path
-to ./configure or by setting the LARGE_FILE_TEST_PATH environment
-variable.  Run ./configure --help for additional options.  The test
-suite provides nearly full coverage even without these tests.  Unless
-you are making deep changes to the library or testing this on a new
-platform for the first time, there is no real reason to run these
-tests.  If you're just running the test suite to make sure that qpdf
-works for your build, the default tests are adequate.
+enabled by passing --enable-test-compare-images to ./configure.  This
+was on by default in qpdf versions prior to 3.0, but is now off by
+default.  Large file tests can be enabled by passing
+--with-large-file-test-path=path to ./configure or by setting the
+QPDF_LARGE_FILE_TEST_PATH environment variable.  Run ./configure
+--help for additional options.  The test suite provides nearly full
+coverage even without these tests.  Unless you are making deep changes
+to the library that would impact the contents of the generated PDF
+files or testing this on a new platform for the first time, there is
+no real reason to run these tests.  If you're just running the test
+suite to make sure that qpdf works for your build, the default tests
+are adequate.  The configure rules for these tests do nothing other
+than setting variables in autoconf.mk, so you can feel free to turn
+these on and off directly in autoconf.mk rather than rerunning
+configure.
 
 If you are packaging qpdf for a distribution and preparing a build
 that is run by an autobuilder, you may want to add the

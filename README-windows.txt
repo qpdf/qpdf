@@ -1,21 +1,49 @@
 Common Setup
 ============
 
-To be able to build qpdf and run its test suite, you must have either
-Cygwin or MSYS from MinGW (>= 1.0.11) installed.  If you want to build
-with Microsoft Visual C++, either Cygwin or MSYS will do.  If you want
-to build with MinGW, you must use MSYS rather than Cygwin.
+You may need to disable antivirus software to run qpdf's test suite.
+
+To be able to build qpdf and run its test suite, you must have MSYS
+from MinGW installed, and you must have ActiveState Perl.  Here's what
+I did on my system:
+
+Install ActiveState perl.
+
+Grab the latest mingw-get-inst.  From the installation wizard, choose
+to install developer kit, C, and C++ support.  Once installed, you
+will have an icon to start an msys shell.  From the msys shell, run
+
+mingw-get install msys-unzip msys-zip mingw32-make
+
+Then replace perl and make with the appropriate versions:
+
+mv /bin/perl.exe /bin/msys-perl.exe
+mv /bin/make.exe /bin/msys-make.exe
+mv /mingw/bin/mingw32-make.exe /mingw/bin/make.exe
+
+Make sure perl --version shows ActiveState perl.
+
+To install MinGW-w64, first install msys and mingw32 as above.
+
+From MinGW-w64 download page, go to "Toolchains targetting
+Win64/Automated Builds" and find the latest mingw-w64 that runs under
+i686-mingw.  It will be called something like
+mingw-w64-bin_i686-mingw_yyyymmdd.zip.  The compiler binaries are
+32-bit, which (of course) runs on 64-bit Windows.  Extract this under
+C:\MinGW-w64, and add C:\MinGW-w64\bin and C:\MinGW-w64\lib\mingw to
+the path.
 
 As of this writing, the image comparison tests confuse ghostscript in
 cygwin, but there's a chance they might work at some point.  If you
-want to run them, you need ghostscript and tiff utils as well.  Then
-omit --disable-test-compare-images from the configure statements given
-below.  The image comparison tests have not been tried under MSYS.
+want to run them, you need ghostscript and tiff utils as well, and you
+will need to add --enable-test-compare-images from the configure
+statements given below.
 
 Jian Ma <stronghorse@tom.com> has generously provided a port of QPDF
 that works with Microsoft VC6.  Several changes are required, but they
 are well documented in his port.  You can find the VC6 port in the
-contrib area of the qpdf download area.
+contrib area of the qpdf download area.  It may not always be
+up-to-date with the latest official qpdf release.
 
 
 External Libraries
@@ -24,13 +52,14 @@ External Libraries
 In order to build qpdf, you must have copies of zlib and pcre.  The
 easy way to get them is to download them from the qpdf download area.
 There are packages called external-libs-bin.zip and
-external-libs-src.zip.  If you are building with MSVC 9 (.NET 2008) or
-MINGW 4.4, you can just extract the external-libs-bin.zip zip file
-into the top-level qpdf source tree.  It will create a directory
-called external-libs which contains header files and precompiled
-libraries.  Passing --enable-external-libs to ./configure (which is
-done automatically if you follow the instructions below) is sufficient
-to find them.
+external-libs-src.zip.  If you are building with MSVC 2010 or MINGW,
+you can just extract the qpdf-external-libs-bin.zip zip file into the
+top-level qpdf source tree.  Note that you need the 2012-06-20 version
+(at least) to build qpdf 3.0 or greater since this incldues 64-bit
+libaries.  It will create a directory called external-libs which
+contains header files and precompiled libraries.  Passing
+--enable-external-libs to ./configure (which is done automatically if
+you follow the instructions below) is sufficient to find them.
 
 You can also obtain pcre and zlib directly on your own and install
 them.  If you are using mingw, you can just set CPPFLAGS, LDFLAGS, and
@@ -44,27 +73,42 @@ CPPFLAGS, LDFLAGS, LIBS in the generated autoconf.mk file.  Note that
 you should use UNIX-like syntax (-I, -L, -l) even though this is not
 what cl takes on the command line.  qpdf's build rules will fix it.
 
+You can also download qpdf-external-libs-src.zip and follow the
+instructions in the README.txt there for how to build external libs.
+
 
 Building with MinGW
 ===================
 
-QPDF is known to build and pass its test suite with MSYS-1.0.11 and
-gcc 4.4.0 with C++ support.  If you also have ActiveState Perl in your
-path and the external-libs distribution described above, you can fully
-configure, build, and test qpdf in this environment.  You will most
-likely not be able to build qpdf with mingw using cygwin.
+QPDF is known to build and pass its test suite with mingw (latest
+version tested: gcc 4.6.2), mingw64 (latest version tested: 4.7.0) and
+Microsoft Visual C++ 2010, both 32-bit and 64-bit versions.  MSYS plus
+ActivateState Perl is required to build as well in order to get make
+and other related tools.  While it is possible that Cygwin could be
+used to build native Windows versions of qpdf, this configuration has
+not been tested recently.
 
 From your MSYS prompt, run
 
-  ./config-mingw
+  ./config-mingw32
+
+or
+
+  ./config-mingw64
 
 and then
 
   make
 
-Note that ./config-mingw just runs ./configure with specific
-arguments, so you can look at it, make adjustments, and manually run
-configure instead.
+Note that ./config-mingw32 and ./configure-mingw64 just run
+./configure with specific arguments, so you can look at it, make
+adjustments, and manually run configure instead.  Note also that
+config-mingw32 appends definition of _FILE_OFFSET_BITS=64 to
+qpdf-config.h since, as of the qpdf 3.0 release, the current versions
+of the autoconf tools did not correctly detect that mingw requires
+this to get large file support.  This workaround is only required for
+mingw32.  The 64-bit version of mingw works "out of the box" with
+large file support, as do both the 32-bit and 64-bit versions of MSVC.
 
 Add the absolute path to the libqpdf/build directory to your PATH.
 Make sure you can run the qpdf command by typing qpdf/build/qpdf and
@@ -80,26 +124,42 @@ create install-mingw/qpdf-VERSION and populate it.  The binary
 download of qpdf for Windows with mingw is created from this
 directory.
 
+You can also take a look at make_windows_releases for reference.  This
+is how the distributed Windows executables are created.
 
-Building with MSVC .NET 2008 Express
-====================================
+
+Building with MSVC 2010
+=======================
 
 These instructions would likely work with newer version of MSVC or
 with full version of MSVC.  They may also work with .NET 2005.  They
-have only been tested with .NET 2008 Express (VC9.0).  You may follow
-these instructions from either Cygwin or from MSYS, though only MSYS
-is regularly tested.
+have only been tested with Visual C++ 2010.  Earlier version of qpdf
+were built with MSVC 2008 Express.
 
 You should first set up your environment to be able to run MSVC from
 the command line.  There is usually a batch file included with MSVC
-that does this.  From that cmd prompt, you can start your cygwin
-shell.
+that does this.  Make sure that you start a command line environment
+configured for whichever of 32-bit or 64-bit output that you intend to
+build for.
+
+From that cmd prompt, you can start your msys shell by just running
+manually whatever command is associated with your msys shell icon.
 
 Configure as follows:
 
-  ./config-msvc
+  ./config-msvc 32
 
-and then
+or
+
+  ./config-msvc 64
+
+Note that you must pass the 32/64 option that matches your command
+line setup.  The scripts do not presently figure this out.  If you
+used the wrong argument, it would probably just build the size you
+have in your environment and then install the results in the wrong
+place.
+
+Once configured, run
 
   make
 
@@ -156,4 +216,5 @@ when the runtime is linked in statically, exceptions cannot be thrown
 across the DLL to EXE boundary.  Since qpdf uses exception handling
 extensively for error handling, we have no choice but to redistribute
 the C++ runtime DLLs.  Maybe this will be addressed in a future
-version of the compilers.
+version of the compilers.  This has not been retested with the
+toolchain versions used to create qpdf 3.0 distributions.

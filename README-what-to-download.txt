@@ -5,24 +5,41 @@ file.
 For Windows, there are several additional files that you might want to
 download.
 
- * qpdf-<version>-bin-mingw.zip
+ * qpdf-<version>-bin-mingw32.zip
 
    If you just want to use the qpdf commandline program or use the
    qpdf DLL's C-language interface, you can download this file.  You
    can also download this version if you are using MINGW's gcc 4.4 and
    want to program using the C++ interface.
 
- * qpdf-<version>-bin-msvc.zip
+ * qpdf-<version>-bin-mingw64.zip
+
+   A 64-bit version built with mingw.  Use this for 64-bit Windows
+   systems.  The 32-bit version will also work on Windows 64-bit.
+   Both the 32-bit and the 64-bit version support files over 2 GB in
+   size, but you may find it easier to integrate this with your own
+   software if you use the 64-bit version.
+
+ * qpdf-<version>-bin-msvc32.zip
 
    If you want to program using qpdf's C++ interface and you are using
-   Microsoft Visual C++ .NET 2008 (VC9), you can download this file.
+   Microsoft Visual C++ 2010 in 32-bit mode, you can download this
+   file.
+
+ * qpdf-<version>-bin-msvc64.zip
+
+   If you want to program using qpdf's C++ interface and you are using
+   Microsoft Visual C++ 2010 in 64-bit mode, you can download this
+   file.
 
  * qpdf-external-libs-bin.zip
 
-   If you want to build qpdf for Windows yourself with either MINGW's
-   gcc 4.4 or VC9, you can download this file and extract it inside
-   the qpdf source distribution.  Please refer to README-windows.txt
-   in the qpdf source distribution for additional details.
+   If you want to build qpdf for Windows yourself with either MINGW or
+   MSVC 2010, you can download this file and extract it inside the
+   qpdf source distribution.  Please refer to README-windows.txt in
+   the qpdf source distribution for additional details.  Note that you
+   need the 2012-06-20 version or later to be able to build qpdf 3.0
+   or newer.
 
  * qpdf-external-libs-src.zip
 
