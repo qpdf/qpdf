@@ -16,12 +16,12 @@ cleanup();
 my $td = new TestDriver('qpdf');
 
 my $compare_images = 1;
-if ((exists $ENV{'SKIP_TEST_COMPARE_IMAGES'}) &&
-    ($ENV{'SKIP_TEST_COMPARE_IMAGES'} eq '1'))
+if ((exists $ENV{'QPDF_SKIP_TEST_COMPARE_IMAGES'}) &&
+    ($ENV{'QPDF_SKIP_TEST_COMPARE_IMAGES'} eq '1'))
 {
     $compare_images = 0;
 }
-my $large_file_test_path = $ENV{'LARGE_FILE_TEST_PATH'} || undef;
+my $large_file_test_path = $ENV{'QPDF_LARGE_FILE_TEST_PATH'} || undef;
 
 my $have_acroread = 0;
 

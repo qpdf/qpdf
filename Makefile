@@ -81,8 +81,8 @@ CLEAN_TARGETS = $(foreach B,$(BUILD_ITEMS),clean_$(B))
 
 # For test suitse
 export QPDF_BIN = $(abspath qpdf/$(OUTPUT_DIR)/qpdf)
-export SKIP_TEST_COMPARE_IMAGES
-export LARGE_FILE_TEST_PATH
+export QPDF_SKIP_TEST_COMPARE_IMAGES
+export QPDF_LARGE_FILE_TEST_PATH
 
 clean:: $(CLEAN_TARGETS)
 

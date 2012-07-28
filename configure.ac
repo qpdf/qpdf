@@ -54,13 +54,13 @@ if test "$BUILD_INTERNAL_LIBS" = "0"; then
    AC_SEARCH_LIBS(pcre_compile,pcre,,[MISSING_PCRE=1; MISSING_ANY=1])
 fi
 
-LARGE_FILE_TEST_PATH=
-AC_SUBST(LARGE_FILE_TEST_PATH)
+QPDF_LARGE_FILE_TEST_PATH=
+AC_SUBST(QPDF_LARGE_FILE_TEST_PATH)
 AC_ARG_WITH(large-file-test-path,
    AS_HELP_STRING([--with-large-file-test-path=path],
-		  [To enable testing of files > 4GB, give the path to a directory with at least 11 GB free.  The test suite will write temporary files to this directory.  Alternatively, just set the LARGE_FILE_TEST_PATH environment variable to the path before running the test suite.]),
-   [LARGE_FILE_TEST_PATH=$withval],
-   [LARGE_FILE_TEST_PATH=])
+		  [To enable testing of files > 4GB, give the path to a directory with at least 11 GB free.  The test suite will write temporary files to this directory.  Alternatively, just set the QPDF_LARGE_FILE_TEST_PATH environment variable to the path before running the test suite.]),
+   [QPDF_LARGE_FILE_TEST_PATH=$withval],
+   [QPDF_LARGE_FILE_TEST_PATH=])
 
 AC_SYS_LARGEFILE
 AC_FUNC_FSEEKO
@@ -210,16 +210,16 @@ if test "$BUILDRULES" != "msvc"; then
    fi
 fi
 
-AC_SUBST(SKIP_TEST_COMPARE_IMAGES)
+AC_SUBST(QPDF_SKIP_TEST_COMPARE_IMAGES)
 AC_ARG_ENABLE(test-compare-images,
    AS_HELP_STRING([--enable-test-compare-images],
 		  [whether to compare images in test suite; disabled by default, enabling requires ghostscript and tiffcmp to be available]),
    [if test "$enableval" = "no"; then
-      SKIP_TEST_COMPARE_IMAGES=1
+      QPDF_SKIP_TEST_COMPARE_IMAGES=1
     else
-      SKIP_TEST_COMPARE_IMAGES=0
+      QPDF_SKIP_TEST_COMPARE_IMAGES=0
     fi],
-   [SKIP_TEST_COMPARE_IMAGES=1])
+   [QPDF_SKIP_TEST_COMPARE_IMAGES=1])
 
 AC_SUBST(SHOW_FAILED_TEST_OUTPUT)
 AC_ARG_ENABLE(show-failed-test-output,
