@@ -2490,6 +2490,43 @@ print "\n";
         <filename>ChangeLog</filename> for a full list.
        </para>
       </listitem>
+      <listitem>
+       <para>
+        When building on a platform that supports ELF shared libraries
+        (such as Linux), symbol versions are enabled by default.  They
+        can be disabled by passing
+        <option>--disable-ld-version-script</option> to
+        <command>./configure</command>.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Image comparison tests are off by default now since they are
+        not needed to verify a correct build or port of qpdf.  They
+        are needed only when changing the actual PDF output generated
+        by qpdf.  You should enable them if you are making deep
+        changes to qpdf itself.  See <filename>README</filename> for
+        details.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Large file tests are off by default but can be turned on with
+        <command>./configure</command> or by setting an environment
+        variable before running the test suite.  See
+        <filename>README</filename> for details.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        When qpdf's test suite fails, failures are not printed to the
+        terminal anymore by default.  Instead, find them in
+        <filename>build/qtest.log</filename>.  For packagers who are
+        building with an autobuilder, you can add the
+        <option>--enable-show-failed-test-output</option> option to
+        <command>./configure</command> to restore the old behavior.
+       </para>
+      </listitem>
      </itemizedlist>
     </listitem>
    </varlistentry>
