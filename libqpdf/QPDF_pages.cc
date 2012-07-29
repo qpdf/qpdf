@@ -151,7 +151,7 @@ QPDF::insertPageobjToPage(QPDFObjectHandle const& obj, int pos,
 void
 QPDF::insertPage(QPDFObjectHandle newpage, int pos)
 {
-    // pos is numbered from 0, so pos = 0 inserts at the begining and
+    // pos is numbered from 0, so pos = 0 inserts at the beginning and
     // pos = npages adds to the end.
 
     flattenPagesTree();

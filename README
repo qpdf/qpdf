@@ -16,7 +16,7 @@ Prerequisites
 QPDF depends on external libraries "zlib" and "pcre".  These are part
 of virtually all Linux distributions and are readily available;
 download information appears in the documentation.  For Windows, you
-can download pre-built binary verisons of those libraries for some
+can download pre-built binary versions of those libraries for some
 compilers; see README-windows.txt for additional details.
 
 QPDF requires a C++ compiler that works with STL.  Your compiler must
@@ -72,7 +72,7 @@ Building on Windows
 QPDF is known to build and pass its test suite with mingw (latest
 version tested: gcc 4.6.2), mingw64 (latest version tested: 4.7.0) and
 Microsoft Visual C++ 2010, both 32-bit and 64-bit versions.  MSYS plus
-ActivateState Perl is required to build as well in order to get make
+ActiveState Perl is required to build as well in order to get make
 and other related tools.  See README-windows.txt for details on how to
 build under Windows, see README-windows.txt.
 

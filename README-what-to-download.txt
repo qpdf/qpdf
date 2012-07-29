@@ -7,7 +7,7 @@ download.
 
  * qpdf-<version>-bin-mingw32.zip
 
-   If you just want to use the qpdf commandline program or use the
+   If you just want to use the qpdf command line program or use the
    qpdf DLL's C-language interface, you can download this file.  You
    can also download this version if you are using MINGW's gcc 4.4 and
    want to program using the C++ interface.

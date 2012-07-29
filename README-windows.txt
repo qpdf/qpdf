@@ -25,7 +25,7 @@ Make sure perl --version shows ActiveState perl.
 
 To install MinGW-w64, first install msys and mingw32 as above.
 
-From MinGW-w64 download page, go to "Toolchains targetting
+From MinGW-w64 download page, go to "Toolchains targeting
 Win64/Automated Builds" and find the latest mingw-w64 that runs under
 i686-mingw.  It will be called something like
 mingw-w64-bin_i686-mingw_yyyymmdd.zip.  The compiler binaries are
@@ -55,8 +55,8 @@ There are packages called external-libs-bin.zip and
 external-libs-src.zip.  If you are building with MSVC 2010 or MINGW,
 you can just extract the qpdf-external-libs-bin.zip zip file into the
 top-level qpdf source tree.  Note that you need the 2012-06-20 version
-(at least) to build qpdf 3.0 or greater since this incldues 64-bit
-libaries.  It will create a directory called external-libs which
+(at least) to build qpdf 3.0 or greater since this includes 64-bit
+libraries.  It will create a directory called external-libs which
 contains header files and precompiled libraries.  Passing
 --enable-external-libs to ./configure (which is done automatically if
 you follow the instructions below) is sufficient to find them.
@@ -83,7 +83,7 @@ Building with MinGW
 QPDF is known to build and pass its test suite with mingw (latest
 version tested: gcc 4.6.2), mingw64 (latest version tested: 4.7.0) and
 Microsoft Visual C++ 2010, both 32-bit and 64-bit versions.  MSYS plus
-ActivateState Perl is required to build as well in order to get make
+ActiveState Perl is required to build as well in order to get make
 and other related tools.  While it is possible that Cygwin could be
 used to build native Windows versions of qpdf, this configuration has
 not been tested recently.

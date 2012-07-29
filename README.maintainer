@@ -5,7 +5,7 @@ Release Reminders
    image comparison tests (--enable-test-compare-images
    --with-large-file-test-path=/path).  For a major release, consider
    running a spelling checker over the source code to catch errors in
-   variable names, strings, and comments.
+   variable names, strings, and comments.  Use ispell -p ispell-words.
 
  * Consider running tests with latest gcc and/or valgrind.  To do
    this, replace, build with debugging and without shared libraries.
@@ -101,7 +101,7 @@ Release Reminders
 
    git tag -s release-qpdf-$version HEAD -m'qpdf $version'
 
- * When releasing on source forge, external-libs distributions go in
+ * When releasing on sourceforge, external-libs distributions go in
    external-libs/yyyymmdd, and qpdf distributions go in qpdf/vvv
 
 

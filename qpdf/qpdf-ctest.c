@@ -350,7 +350,7 @@ static void test16(char const* infile,
     print_info("/Producer");
     print_info("/Creator");
     qpdf_set_info_key(qpdf, "/Author", "Mr. Potato Head");
-    qpdf_set_info_key(qpdf, "/Producer", "QPDF libary");
+    qpdf_set_info_key(qpdf, "/Producer", "QPDF library");
     qpdf_set_info_key(qpdf, "/Creator", 0);
     print_info("/Author");
     print_info("/Producer");

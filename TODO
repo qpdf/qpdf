@@ -96,8 +96,8 @@ Index: QPDFWriter.cc
 ------------------------------
 
  * Handle embedded files.  PDF Reference 1.7 section 3.10, "File
-   Specifications", discusses this.  Once we can definitely recongize
-   all embedded files in a docucment, we can update the encryption
+   Specifications", discusses this.  Once we can definitely recognize
+   all embedded files in a document, we can update the encryption
    code to handle it properly.  In QPDF_encryption.cc, search for
    cf_file.  Remove exception thrown if cf_file is different from
    cf_stream, and write code in the stream decryption section to use
@@ -171,5 +171,5 @@ Index: QPDFWriter.cc
    providing some mechanism to recover earlier versions of a file
    embedded prior to appended sections.
 
- * From a suggestion in bug 3152169, consisder having an option to
+ * From a suggestion in bug 3152169, consider having an option to
    re-encode inline images with an ASCII encoding.

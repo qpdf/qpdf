@@ -1083,7 +1083,7 @@ outfile.pdf</option>
     <option>--normalize-content=y</option> is also given, qpdf will
     attempt to normalize the stream data as if it is a page content
     stream.  This attempt will be made even if it is not a page
-    content stream, in which case it will produce unusuable results.
+    content stream, in which case it will produce unusable results.
    </para>
   </sect1>
  </chapter>
@@ -2861,7 +2861,7 @@ print "\n";
         On Windows, it is possible to build a DLL.  Additionally, a
         partial C-language API has been introduced, which makes it
         possible to call qpdf functions from non-C++ environments.  I
-        am very grateful to Zarko Gagic (<ulink
+        am very grateful to <!-- Žarko Gajić --> Zarko Gagic (<ulink
         url="http://delphi.about.com/">http://delphi.about.com/</ulink>)
         for tirelessly testing numerous pre-release versions of this
         DLL and providing many excellent suggestions on improving the

@@ -173,7 +173,7 @@ class QPDFObjectHandle
     // of the data buffer.  If additional keys are required, the
     // stream's dictionary may be retrieved by calling getDict(), and
     // the resulting dictionary may be modified.  This method is just
-    // a convient wrapper around the newStream() and
+    // a convenient wrapper around the newStream() and
     // replaceStreamData().  It is a convenience methods for streams
     // that require no parameters beyond the stream length.  Note that
     // you don't have to deal with compression yourself if you use

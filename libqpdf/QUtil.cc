@@ -1,4 +1,4 @@
-// Include qpdf-config.h first so off_t is gauaranteed to have the right size.
+// Include qpdf-config.h first so off_t is guaranteed to have the right size.
 #include <qpdf/qpdf-config.h>
 
 #include <qpdf/QUtil.hh>
