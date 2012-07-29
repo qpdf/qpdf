@@ -424,7 +424,7 @@ foreach my $d (@nrange_tests)
 
 # ----------
 $td->notify("--- Merging and Splitting ---");
-$n_tests += 4;
+$n_tests += 6;
 
 # Select pages from the same file multiple times including selecting
 # twice from an encrypted file and specifying the password only the
@@ -460,6 +460,15 @@ $td->runtest("merge three files",
 $td->runtest("check output",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "merge-three-files-2.pdf"});
+$td->runtest("avoid respecification of password",
+             {$td->COMMAND =>
+                  "qpdf --empty a.pdf --copy-encryption=20-pages.pdf" .
+                  " --encryption-file-password=user" .
+                  " --pages 20-pages.pdf 1,z -- --static-id"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "pages-copy-encryption.pdf"});
 # ----------
 $td->notify("--- PDF From Scratch ---");
 $n_tests += 2;

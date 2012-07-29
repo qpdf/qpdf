@@ -152,13 +152,14 @@ starting point, but its pages are replaced with pages as specified.\n\
 --pages file [ --password=password ] page-range ... --\n\
 \n\
 For each file that pages should be taken from, specify the file, a\n\
-password needed to open the file (if needed), and a page range.  The\n\
-password needs to be given only once per file.  If the input file file\n\
-requires a password, that password must be specified outside the\n\
---pages option and does not need to be repeated.  The same file can be\n\
-repeated multiple times.  All non-page data (info, outlines, page numbers,\n\
-etc. are taken from the primary input file.  To discard this, use --empty\n\
-as the primary input.\n\
+password needed to open the file (if any), and a page range.  The\n\
+password needs to be given only once per file.  If any of the input\n\
+files are the same as the primary input file or the file used to copy\n\
+encryption parameters (if specified), you do not need to repeat the\n\
+password here.  The same file can be repeated multiple times.  All\n\
+non-page data (info, outlines, page numbers, etc. are taken from the\n\
+primary input file.  To discard this, use --empty as the primary\n\
+input.\n\
 \n\
 The page range is a set of numbers separated by commas, ranges of\n\
 numbers separated dashes, or combinations of those.  The character\n\
@@ -880,13 +881,13 @@ int main(int argc, char* argv[])
 	exit(0);
     }
 
-    char const* password = "";
+    char const* password = 0;
     bool linearize = false;
     bool decrypt = false;
 
     bool copy_encryption = false;
     char const* encryption_file = 0;
-    char const* encryption_file_password = "";
+    char const* encryption_file_password = 0;
 
     bool encrypt = false;
     std::string user_password;
@@ -1282,7 +1283,7 @@ int main(int argc, char* argv[])
 			if (filter &&
 			    (! obj.pipeStreamData(0, true, false, false)))
 			{
-			    QTC::TC("qpdf", "unable to filter");
+			    QTC::TC("qpdf", "qpdf unable to filter");
 			    std::cerr << "Unable to filter stream data."
 				      << std::endl;
 			    exit(EXIT_ERROR);
@@ -1445,8 +1446,15 @@ int main(int argc, char* argv[])
                         PointerHolder<QPDF> qpdf_ph = new QPDF();
                         page_heap.push_back(qpdf_ph);
                         QPDF* qpdf = qpdf_ph.getPointer();
+                        char const* password = page_spec.password;
+                        if (encryption_file && (password == 0) &&
+                            (page_spec.filename == encryption_file))
+                        {
+                            QTC::TC("qpdf", "qpdf pages encryption password");
+                            password = encryption_file_password;
+                        }
                         qpdf->processFile(
-                            page_spec.filename.c_str(), page_spec.password);
+                            page_spec.filename.c_str(), password);
                         page_spec_qpdfs[page_spec.filename] = qpdf;
                     }
 

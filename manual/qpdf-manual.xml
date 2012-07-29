@@ -586,20 +586,16 @@ make
    </para>
    <para>
     For each file that pages should be taken from, specify the file, a
-    password needed to open the file (if needed), and a page range.
-    If the primary input file file requires a password, that password
-    must be specified outside the <option>--pages</option> option and
-    does not need to be repeated inside the <option>--pages</option>.
-    The same file can be repeated multiple times.  If a file that is
-    repeated has a password, the password only has to be given the
-    first time.  All non-page data (info, outlines, page numbers,
-    etc.) are taken from the primary input file.  To discard these,
-    use <option>--empty</option> as the primary input.  One subtlety
-    about specifying passwords is that specifying a password as
-    <option>--encryption-file-password</option> doesn't prevent you
-    from having to repeat that password of that is also one of the
-    input files.  If in doubt, it's never an error to specify the
-    password multiple times.
+    password needed to open the file (if any), and a page range.  The
+    password needs to be given only once per file.  If any of the
+    input files are the same as the primary input file or the file
+    used to copy encryption parameters (if specified), you do not need
+    to repeat the password here.  The same file can be repeated
+    multiple times.  If a file that is repeated has a password, the
+    password only has to be given the first time.  All non-page data
+    (info, outlines, page numbers, etc.) are taken from the primary
+    input file.  To discard these, use <option>--empty</option> as the
+    primary input.
    </para>
    <para>
     It is not presently possible to specify the same page from the
