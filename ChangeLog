@@ -1,3 +1,7 @@
+2012-07-29  Jay Berkenbilt  <ejb@ql.org>
+
+	* 3.0.rc1: release
+
 2012-07-25  Jay Berkenbilt  <ejb@ql.org>
 
 	* From Tobias: add QPDFObjectHandle::replaceStreamData that takes
