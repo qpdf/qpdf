@@ -9,8 +9,9 @@ download.
 
    If you just want to use the qpdf command line program or use the
    qpdf DLL's C-language interface, you can download this file.  You
-   can also download this version if you are using MINGW's gcc 4.4 and
-   want to program using the C++ interface.
+   can also download this version if you are using MINGW's gcc 4.6 (or
+   a binary compatible version) and want to program using the C++
+   interface.
 
  * qpdf-<version>-bin-mingw64.zip
 
@@ -39,7 +40,8 @@ download.
    qpdf source distribution.  Please refer to README-windows.txt in
    the qpdf source distribution for additional details.  Note that you
    need the 2012-06-20 version or later to be able to build qpdf 3.0
-   or newer.
+   or newer.  The 2009-10-24 version is required for qpdf 2.3.1 or
+   older.
 
  * qpdf-external-libs-src.zip
 
