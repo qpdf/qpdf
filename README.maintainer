@@ -50,7 +50,9 @@ Release Reminders
 
    make_dist verifies this consistency.
 
- * Update release date in manual/qpdf-manual.xml
+ * Update release date in manual/qpdf-manual.xml.  Remember to ensure
+   that the entities at the top of the document are consistent with
+   the release notes for both version and release date.
 
  * Check TODO file to make sure all planned items for the release are
    done or retargeted.
