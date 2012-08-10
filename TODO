@@ -1,3 +1,10 @@
+Next
+====
+
+ * Update release notes for 3.0.0 to mention pkg-config support.  Also
+   mention in latest release notes including that it was inadvertently
+   left out of the release notes for 3.0.0.
+
 General
 =======
 
