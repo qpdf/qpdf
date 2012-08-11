@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "3.0.0">
-<!ENTITY lastreleased "August 2, 2012">
+<!ENTITY swversion "3.0.1">
+<!ENTITY lastreleased "August 11, 2012">
 ]>
 <book>
  <bookinfo>
@@ -2383,6 +2383,31 @@ print "\n";
   </para>
   <variablelist>
    <varlistentry>
+    <term>3.0.1: August 11, 2012</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Version 3.0.0 included addition of files for
+        <command>pkg-config</command>, but this was not mentioned in
+        the release notes.  The release notes for 3.0.0 were updated
+        to mention this.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Bug fix: if an object stream ended with a scalar object not
+        followed by space, qpdf would incorrectly report that it
+        encountered a premature EOF.  This bug has been in qpdf since
+        version&nbsp;2.0.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  <variablelist>
+   <varlistentry>
     <term>3.0.0: August 2, 2012</term>
     <listitem>
      <itemizedlist>
@@ -2497,6 +2522,12 @@ print "\n";
         can be disabled by passing
         <option>--disable-ld-version-script</option> to
         <command>./configure</command>.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        The file <filename>libqpdf.pc</filename> is now installed to
+        support <command>pkg-config</command>.
        </para>
       </listitem>
       <listitem>
