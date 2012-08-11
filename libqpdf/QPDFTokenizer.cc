@@ -50,10 +50,90 @@ QPDFTokenizer::reset()
 }
 
 void
-QPDFTokenizer::presentCharacter(char ch)
+QPDFTokenizer::resolveLiteral()
 {
     PCRE num_re("^[\\+\\-]?(?:\\.\\d+|\\d+(?:\\.\\d+)?)$");
 
+    if ((val.length() > 0) && (val[0] == '/'))
+    {
+        type = tt_name;
+        // Deal with # in name token.  Note: '/' by itself is a
+        // valid name, so don't strip leading /.  That way we
+        // don't have to deal with the empty string as a name.
+        std::string nval = "/";
+        char const* valstr = val.c_str() + 1;
+        for (char const* p = valstr; *p; ++p)
+        {
+            if ((*p == '#') && this->pound_special_in_name)
+            {
+                if (p[1] && p[2] &&
+                    is_hex_digit(p[1]) && is_hex_digit(p[2]))
+                {
+                    char num[3];
+                    num[0] = p[1];
+                    num[1] = p[2];
+                    num[2] = '\0';
+                    char ch = (char)(strtol(num, 0, 16));
+                    if (ch == '\0')
+                    {
+                        type = tt_bad;
+                        QTC::TC("qpdf", "QPDF_Tokenizer null in name");
+                        error_message =
+                            "null character not allowed in name token";
+                        nval += "#00";
+                    }
+                    else
+                    {
+                        nval += ch;
+                    }
+                    p += 2;
+                }
+                else
+                {
+                    QTC::TC("qpdf", "QPDF_Tokenizer bad name");
+                    type = tt_bad;
+                    error_message = "invalid name token";
+                    nval += *p;
+                }
+            }
+            else
+            {
+                nval += *p;
+            }
+        }
+        val = nval;
+    }
+    else if (num_re.match(val.c_str()))
+    {
+        if (val.find('.') != std::string::npos)
+        {
+            type = tt_real;
+        }
+        else
+        {
+            type = tt_integer;
+        }
+    }
+    else if ((val == "true") || (val == "false"))
+    {
+        type = tt_bool;
+    }
+    else if (val == "null")
+    {
+        type = tt_null;
+    }
+    else
+    {
+        // I don't really know what it is, so leave it as tt_word.
+        // Lots of cases ($, #, etc.) other than actual words fall
+        // into this category, but that's okay at least for now.
+        type = tt_word;
+    }
+}
+
+void
+QPDFTokenizer::presentCharacter(char ch)
+{
     if (state == st_token_ready)
     {
 	throw std::logic_error(
@@ -342,81 +422,7 @@ QPDFTokenizer::presentCharacter(char ch)
 
     if ((state == st_token_ready) && (type == tt_word))
     {
-	if ((val.length() > 0) && (val[0] == '/'))
-	{
-	    type = tt_name;
-	    // Deal with # in name token.  Note: '/' by itself is a
-	    // valid name, so don't strip leading /.  That way we
-	    // don't have to deal with the empty string as a name.
-	    std::string nval = "/";
-	    char const* valstr = val.c_str() + 1;
-	    for (char const* p = valstr; *p; ++p)
-	    {
-		if ((*p == '#') && this->pound_special_in_name)
-		{
-		    if (p[1] && p[2] &&
-			is_hex_digit(p[1]) && is_hex_digit(p[2]))
-		    {
-			char num[3];
-			num[0] = p[1];
-			num[1] = p[2];
-			num[2] = '\0';
-			char ch = (char)(strtol(num, 0, 16));
-			if (ch == '\0')
-			{
-			    type = tt_bad;
-			    QTC::TC("qpdf", "QPDF_Tokenizer null in name");
-			    error_message =
-				"null character not allowed in name token";
-			    nval += "#00";
-			}
-			else
-			{
-			    nval += ch;
-			}
-			p += 2;
-		    }
-		    else
-		    {
-			QTC::TC("qpdf", "QPDF_Tokenizer bad name");
-			type = tt_bad;
-			error_message = "invalid name token";
-			nval += *p;
-		    }
-		}
-		else
-		{
-		    nval += *p;
-		}
-	    }
-	    val = nval;
-	}
-	else if (num_re.match(val.c_str()))
-	{
-	    if (val.find('.') != std::string::npos)
-	    {
-		type = tt_real;
-	    }
-	    else
-	    {
-		type = tt_integer;
-	    }
-	}
-	else if ((val == "true") || (val == "false"))
-	{
-	    type = tt_bool;
-	}
-	else if (val == "null")
-	{
-	    type = tt_null;
-	}
-	else
-	{
-	    // I don't really know what it is, so leave it as tt_word.
-	    // Lots of cases ($, #, etc.) other than actual words fall
-	    // into this category, but that's okay at least for now.
-	    type = tt_word;
-	}
+        resolveLiteral();
     }
 
     if (! (betweenTokens() || ((state == st_token_ready) && unread_char)))
