@@ -434,22 +434,19 @@ QPDFTokenizer::presentCharacter(char ch)
 void
 QPDFTokenizer::presentEOF()
 {
-    switch (state)
+    if (state == st_literal)
     {
-      case st_token_ready:
-      case st_top:
-	// okay
-	break;
-
-      case st_in_comment:
-	state = st_top;
-	break;
-
-      default:
+        QTC::TC("qpdf", "QPDF_Tokenizer EOF reading appendable token");
+        resolveLiteral();
+    }
+    else if (state != st_token_ready)
+    {
+        QTC::TC("qpdf", "QPDF_Tokenizer EOF reading token");
 	type = tt_bad;
 	error_message = "EOF while reading token";
-	state = st_token_ready;
     }
+
+    state = st_token_ready;
 }
 
 bool
@@ -480,14 +477,22 @@ QPDFTokenizer::readToken(PointerHolder<InputSource> input,
     Token token;
     bool unread_char;
     char char_to_unread;
+    bool presented_eof = false;
     while (! getToken(token, unread_char, char_to_unread))
     {
 	char ch;
 	if (input->read(&ch, 1) == 0)
 	{
-	    throw QPDFExc(qpdf_e_damaged_pdf, input->getName(),
-			  context, offset,
-			  "EOF while reading token");
+            if (! presented_eof)
+            {
+                presentEOF();
+                presented_eof = true;
+            }
+            else
+            {
+                throw std::logic_error(
+                    "getToken returned false after presenting EOF");
+            }
 	}
 	else
 	{

@@ -238,3 +238,5 @@ QPDFWriter copy use_aes 1
 QPDFObjectHandle indirect without context 0
 QPDFObjectHandle trailing data in parse 0
 qpdf pages encryption password 0
+QPDF_Tokenizer EOF reading token 0
+QPDF_Tokenizer EOF reading appendable token 0

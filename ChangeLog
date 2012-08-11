@@ -1,3 +1,8 @@
+2012-08-11  Jay Berkenbilt  <ejb@ql.org>
+
+	* Bug fix: let EOF terminate a literal token as well as
+	whitespace or comments.
+
 2012-07-31  Jay Berkenbilt  <ejb@ql.org>
 
 	* 3.0.0: release
