@@ -149,7 +149,7 @@ $td->runtest("remove page we don't have",
 	     $td->NORMALIZE_NEWLINES);
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 45;
+$n_tests += 47;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -373,6 +373,14 @@ $td->runtest("detect foreign object in write",
 $td->runtest("parse objects from string",
              {$td->COMMAND => "test_driver 31 minimal.pdf"}, # file not used
              {$td->FILE => "parse-object.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("EOF terminating literal tokens",
+             {$td->COMMAND => "qpdf --check eof-terminates-literal.pdf"},
+             {$td->FILE => "eof-terminates-literal.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("EOF reading token",
+             {$td->COMMAND => "qpdf --check eof-reading-token.pdf"},
+             {$td->FILE => "eof-reading-token.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 show_ntests();

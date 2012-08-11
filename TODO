@@ -5,11 +5,6 @@ Next
    mention in latest release notes including that it was inadvertently
    left out of the release notes for 3.0.0.
 
- * EOF while reading token causes a tokenizer error even when a valid
-   token is ready.  This can happen in an object stream if there is no
-   newline or whitespace character at the end and the last token in
-   the object stream is not an array or dictionary.
-
 
 General
 =======
