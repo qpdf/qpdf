@@ -80,6 +80,7 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/libqpdf.la
 %doc install-examples/examples
 %{_includedir}/*
 %{_libdir}/libqpdf*.so
+%{_libdir}/pkgconfig
 
 %files static
 %defattr(-,root,root)
