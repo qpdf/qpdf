@@ -1,3 +1,11 @@
+3.0.2
+=====
+
+ * QPDFWriter::setOutputMemory segfaults without setStaticID because
+   it doesn't set this->filename.  Be sure to have a test case that
+   exercises this.  Check the function that sets the ID carefully to
+   make sure other cases aren't missed.
+
 General
 =======
 
