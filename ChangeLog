@@ -1,3 +1,10 @@
+2012-09-06  Jay Berkenbilt  <ejb@ql.org>
+
+	* Bug fix: Writing after calling QPDFWriter::setOutputMemory()
+	would cause a segmentation fault because of an internal field not
+	being initialized, rendering that method useless.  This has been
+	corrected.
+
 2012-08-11  Jay Berkenbilt  <ejb@ql.org>
 
 	* 3.0.1: release

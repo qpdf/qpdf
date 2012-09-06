@@ -120,6 +120,7 @@ QPDFWriter::setOutputFile(char const* description, FILE* file, bool close_file)
 void
 QPDFWriter::setOutputMemory()
 {
+    this->filename = "memory buffer";
     this->buffer_pipeline = new Pl_Buffer("qpdf output");
     to_delete.push_back(this->buffer_pipeline);
     initializePipelineStack(this->buffer_pipeline);
@@ -1492,7 +1493,7 @@ QPDFWriter::generateID()
 	std::string seed;
 	seed += QUtil::int_to_string((int)QUtil::get_current_time());
 	seed += " QPDF ";
-	seed += filename;
+	seed += this->filename;
 	seed += " ";
 	if (trailer.hasKey("/Info"))
 	{

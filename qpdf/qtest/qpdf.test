@@ -149,7 +149,7 @@ $td->runtest("remove page we don't have",
 	     $td->NORMALIZE_NEWLINES);
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 47;
+$n_tests += 48;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -322,6 +322,11 @@ $td->runtest("swap and replace",
 $td->runtest("check output",
 	     {$td->FILE => "a.pdf"},
 	     {$td->FILE => "test14-out.pdf"});
+# Test 14 also exercises writing to memory without static ID.
+$td->runtest("check non-static ID version",
+             {$td->COMMAND => "./diff-ignore-ID-version a.pdf b.pdf"},
+             {$td->STRING => "okay\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 $td->runtest("C API info key functions",
 	     {$td->COMMAND => "qpdf-ctest 16 minimal.pdf '' a.pdf"},

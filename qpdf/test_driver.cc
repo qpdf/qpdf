@@ -646,17 +646,22 @@ void runtest(int n, char const* filename1, char const* filename2)
 	}
 
 	// Exercise writing to memory buffer
-	QPDFWriter w(pdf);
-	w.setOutputMemory();
-	w.setStaticID(true);
-	w.setStreamDataMode(qpdf_s_preserve);
-	w.write();
-	Buffer* b = w.getBuffer();
-	FILE* f = QUtil::fopen_wrapper(std::string("open a.pdf"),
-				       fopen("a.pdf", "wb"));
-	fwrite(b->getBuffer(), b->getSize(), 1, f);
-	fclose(f);
-	delete b;
+        for (int i = 0; i < 2; ++i)
+        {
+            QPDFWriter w(pdf);
+            w.setOutputMemory();
+            // Exercise setOutputMemory with and without static ID
+            w.setStaticID(i == 0);
+            w.setStreamDataMode(qpdf_s_preserve);
+            w.write();
+            Buffer* b = w.getBuffer();
+            std::string const filename = (i == 0 ? "a.pdf" : "b.pdf");
+            FILE* f = QUtil::fopen_wrapper("open " + filename,
+                                           fopen(filename.c_str(), "wb"));
+            fwrite(b->getBuffer(), b->getSize(), 1, f);
+            fclose(f);
+            delete b;
+        }
     }
     else if (n == 15)
     {
