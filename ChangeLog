@@ -1,5 +1,10 @@
 2012-09-06  Jay Berkenbilt  <ejb@ql.org>
 
+	* Make it possible to write the same QPDF object with two
+	different QPDFWriter objects that have both called
+	setLinearization(true) by making private method
+	QPDF::calculateLinearizationData() properly initialize its state.
+
 	* Bug fix: Writing after calling QPDFWriter::setOutputMemory()
 	would cause a segmentation fault because of an internal field not
 	being initialized, rendering that method useless.  This has been

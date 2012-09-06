@@ -1241,6 +1241,16 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 
     //   * outlines: part 6 or 9
 
+    this->part4.clear();
+    this->part6.clear();
+    this->part7.clear();
+    this->part8.clear();
+    this->part9.clear();
+    this->c_linp = LinParameters();
+    this->c_page_offset_data = CHPageOffset();
+    this->c_shared_object_data = CHSharedObject();
+    this->c_outline_data = HGeneric();
+
     QPDFObjectHandle root = getRoot();
     bool outlines_in_first_page = false;
     QPDFObjectHandle pagemode = root.getKey("/PageMode");
