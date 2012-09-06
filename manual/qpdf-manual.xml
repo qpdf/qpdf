@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "3.0.1">
-<!ENTITY lastreleased "August 11, 2012">
+<!ENTITY swversion "3.0.2">
+<!ENTITY lastreleased "September 6, 2012">
 ]>
 <book>
  <bookinfo>
@@ -2381,6 +2381,32 @@ print "\n";
    For a detailed list of changes, please see the file
    <filename>ChangeLog</filename> in the source distribution.
   </para>
+  <variablelist>
+   <varlistentry>
+    <term>3.0.2: September 6, 2012</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Bug fix: <function>QPDFWriter::setOutputMemory</function> did
+        not work when not used with
+        <function>QPDFWriter::setStaticID</function>, which made it
+        pretty much useless.  This has been fixed.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        New API call
+        <function>QPDFWriter::setExtraHeaderText</function> inserts
+        additional text near the header of the PDF file.  The intended
+        use case is to insert comments that may be consumed by a
+        downstream application, though other use cases may exist.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+  </variablelist>
   <variablelist>
    <varlistentry>
     <term>3.0.1: August 11, 2012</term>

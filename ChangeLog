@@ -1,5 +1,7 @@
 2012-09-06  Jay Berkenbilt  <ejb@ql.org>
 
+	* 3.0.2: release
+
 	* Add new method QPDFWriter::setExtraHeaderText to add extra text,
 	such as application-specific comments, to near the beginning of a
 	PDF file.  For linearized files, this appears after the
