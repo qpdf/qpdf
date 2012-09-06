@@ -1,0 +1,13 @@
+file: a.pdf
+linearized: no
+newline: no
+file: b.pdf
+linearized: yes
+newline: no
+file: c.pdf
+linearized: no
+newline: yes
+file: d.pdf
+linearized: yes
+newline: yes
+test 32 done

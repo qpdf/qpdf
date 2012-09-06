@@ -1091,6 +1091,27 @@ void runtest(int n, char const* filename1, char const* filename2)
                       << std::endl;
         }
     }
+    else if (n == 32)
+    {
+        // Extra header text
+        char const* filenames[] = {"a.pdf", "b.pdf", "c.pdf", "d.pdf"};
+        for (int i = 0; i < 4; ++i)
+        {
+            bool linearized = ((i & 1) != 0);
+            bool newline = ((i & 2) != 0);
+            QPDFWriter w(pdf, filenames[i]);
+            w.setStaticID(true);
+            std::cout
+                << "file: " << filenames[i] << std::endl
+                << "linearized: " << (linearized ? "yes" : "no") << std::endl
+                << "newline: " << (newline ? "yes" : "no") << std::endl;
+            w.setLinearization(linearized);
+            w.setExtraHeaderText(newline
+                                 ? "%% Comment with newline\n"
+                                 : "%% Comment\n% No newline");
+            w.write();
+        }
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +

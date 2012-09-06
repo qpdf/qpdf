@@ -1,5 +1,11 @@
 2012-09-06  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add new method QPDFWriter::setExtraHeaderText to add extra text,
+	such as application-specific comments, to near the beginning of a
+	PDF file.  For linearized files, this appears after the
+	linearization parameter dictionary.  For non-linearized files, it
+	appears right after the PDF header and non-ASCII comment.
+
 	* Make it possible to write the same QPDF object with two
 	different QPDFWriter objects that have both called
 	setLinearization(true) by making private method

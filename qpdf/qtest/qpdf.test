@@ -149,7 +149,7 @@ $td->runtest("remove page we don't have",
 	     $td->NORMALIZE_NEWLINES);
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 48;
+$n_tests += 53;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -387,6 +387,22 @@ $td->runtest("EOF reading token",
              {$td->COMMAND => "qpdf --check eof-reading-token.pdf"},
              {$td->FILE => "eof-reading-token.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
+$td->runtest("extra header text",
+             {$td->COMMAND => "test_driver 32 minimal.pdf"},
+             {$td->FILE => "test-32.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "extra-header-no-newline.pdf"});
+$td->runtest("check output",
+             {$td->FILE => "b.pdf"},
+             {$td->FILE => "extra-header-lin-no-newline.pdf"});
+$td->runtest("check output",
+             {$td->FILE => "c.pdf"},
+             {$td->FILE => "extra-header-newline.pdf"});
+$td->runtest("check output",
+             {$td->FILE => "d.pdf"},
+             {$td->FILE => "extra-header-lin-newline.pdf"});
 
 show_ntests();
 # ----------

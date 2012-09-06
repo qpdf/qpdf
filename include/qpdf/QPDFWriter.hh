@@ -163,6 +163,18 @@ class QPDFWriter
     QPDF_DLL
     void forcePDFVersion(std::string const&);
 
+    // Provide additional text to insert in the PDF file somewhere
+    // near the beginning of the file.  This can be used to add
+    // comments to the beginning of a PDF file, for example, if those
+    // comments are to be consumed by some other application.  No
+    // checks are performed to ensure that the text inserted here is
+    // valid PDF.  If you want to insert multiline comments, you will
+    // need to include \n in the string yourself and start each line
+    // with %.  An extra newline will be appended if one is not
+    // already present at the end of your text.
+    QPDF_DLL
+    void setExtraHeaderText(std::string const&);
+
     // Cause a static /ID value to be generated.  Use only in test
     // suites.
     QPDF_DLL
@@ -354,6 +366,7 @@ class QPDFWriter
     std::string id2;		// trailer dictionary
     std::string min_pdf_version;
     std::string forced_pdf_version;
+    std::string extra_header_text;
     int encryption_dict_objid;
     std::string cur_data_key;
     std::list<PointerHolder<Pipeline> > to_delete;
