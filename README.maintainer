@@ -92,7 +92,7 @@ Release Reminders
    to have zip in your path.
 
  * Remember to copy README-what-to-download.txt separately onto the
-   download area and make it the default for Windows platforms.
+   download area.
 
  * Remember to update the web page including putting new documentation
    in the "files" subdirectory of the website on sourceforge.net.
@@ -104,7 +104,9 @@ Release Reminders
    git tag -s release-qpdf-$version HEAD -m'qpdf $version'
 
  * When releasing on sourceforge, external-libs distributions go in
-   external-libs/yyyymmdd, and qpdf distributions go in qpdf/vvv
+   external-libs/yyyymmdd, and qpdf distributions go in qpdf/vvv.
+   Make the source package the default for all but Windows, and make
+   the 32-bit mingw build the default for Windows.
 
 
 General Build Stuff
