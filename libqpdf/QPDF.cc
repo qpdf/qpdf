@@ -138,9 +138,8 @@ void
 QPDF::processFile(char const* filename, char const* password)
 {
     FileInputSource* fi = new FileInputSource();
-    this->file = fi;
     fi->setFilename(filename);
-    parse(password);
+    processInputSource(fi, password);
 }
 
 void
@@ -148,9 +147,8 @@ QPDF::processFile(char const* description, FILE* filep,
                   bool close_file, char const* password)
 {
     FileInputSource* fi = new FileInputSource();
-    this->file = fi;
     fi->setFile(description, filep, close_file);
-    parse(password);
+    processInputSource(fi, password);
 }
 
 void
@@ -158,10 +156,18 @@ QPDF::processMemoryFile(char const* description,
 			char const* buf, size_t length,
 			char const* password)
 {
-    this->file =
+    processInputSource(
 	new BufferInputSource(description,
 			      new Buffer((unsigned char*)buf, length),
-			      true);
+			      true),
+        password);
+}
+
+void
+QPDF::processInputSource(PointerHolder<InputSource> source,
+                         char const* password)
+{
+    this->file = source;
     parse(password);
 }
 

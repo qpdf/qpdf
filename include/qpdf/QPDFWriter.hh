@@ -95,6 +95,15 @@ class QPDFWriter
     QPDF_DLL
     Buffer* getBuffer();
 
+    // Supply your own pipeline object.  Output will be written to
+    // this pipeline, and QPDFWriter will call finish() on the
+    // pipeline.  It is the caller's responsibility to manage the
+    // memory for the pipeline.  The pipeline is never deleted by
+    // QPDFWriter, which makes it possible for you to call additional
+    // methods on the pipeline after the writing is finished.
+    QPDF_DLL
+    void setOutputPipeline(Pipeline*);
+
     // Setting Parameters
 
     // Set the value of object stream mode.  In disable mode, we never

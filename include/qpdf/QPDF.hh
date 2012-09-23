@@ -72,6 +72,13 @@ class QPDF
 			   char const* buf, size_t length,
 			   char const* password = 0);
 
+    // Parse a PDF file loaded from a custom InputSource.  If you have
+    // your own method of retrieving a PDF file, you can subclass
+    // InputSource and use this method.
+    QPDF_DLL
+    void processInputSource(PointerHolder<InputSource>,
+                            char const* password = 0);
+
     // Create a QPDF object for an empty PDF.  This PDF has no pages
     // or objects other than a minimal trailer, a document catalog,
     // and a /Pages tree containing zero pages.  Pages and other

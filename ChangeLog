@@ -1,3 +1,10 @@
+2012-09-23  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add public methods QPDF::processInputSource and
+	QPDFWriter::setOutputPipeline to allow users to read from custom
+	input sources and to write to custom pipelines.  This allows the
+	maximum flexibility in sources for reading and writing PDF files.
+
 2012-09-06  Jay Berkenbilt  <ejb@ql.org>
 
 	* 3.0.2: release

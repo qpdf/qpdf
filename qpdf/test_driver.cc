@@ -1112,6 +1112,20 @@ void runtest(int n, char const* filename1, char const* filename2)
             w.write();
         }
     }
+    else if (n == 33)
+    {
+        // Test writing to a custom pipeline
+        Pl_Buffer p("buffer");
+        QPDFWriter w(pdf);
+        w.setStaticID(true);
+        w.setOutputPipeline(&p);
+        w.write();
+        PointerHolder<Buffer> b = p.getBuffer();
+        FILE* f = QUtil::fopen_wrapper("open a.pdf",
+                                       fopen("a.pdf", "wb"));
+        fwrite(b->getBuffer(), b->getSize(), 1, f);
+        fclose(f);
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +
