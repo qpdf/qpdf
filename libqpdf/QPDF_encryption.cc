@@ -26,6 +26,36 @@ static unsigned char const padding_string[] = {
 static unsigned int const O_key_bytes = sizeof(MD5::Digest);
 static unsigned int const key_bytes = 32;
 
+char *raw_key;
+int have_raw_key;
+
+#define ARCH_INDEX(x)                   ((unsigned int)(unsigned char)(x))
+
+char *itoa16 = (char*)"0123456789abcdef";
+char *itoa16u = (char*)"0123456789ABCDEF";
+char atoi16[0x100];
+int initialized = 0;
+
+void common_init(void)
+{
+    char *pos;
+
+    if (initialized)
+        return;
+
+    memset(atoi16, 0x7F, sizeof(atoi16));
+    for (pos = itoa16; pos <= &itoa16[15]; pos++)
+        atoi16[ARCH_INDEX(*pos)] = pos - itoa16;
+
+    atoi16['A'] = atoi16['a'];
+    atoi16['B'] = atoi16['b'];
+    atoi16['C'] = atoi16['c'];
+    atoi16['D'] = atoi16['d'];
+    atoi16['E'] = atoi16['e'];
+    atoi16['F'] = atoi16['f'];
+    initialized = 1;
+}
+
 void
 pad_or_truncate_password(std::string const& password, char k1[key_bytes])
 {
@@ -133,6 +163,15 @@ QPDF::compute_encryption_key(
     std::string const& password, EncryptionData const& data)
 {
     // Algorithm 3.2 from the PDF 1.7 Reference Manual
+    if(have_raw_key) {
+        int i;
+        unsigned char raw_key_bytes[5];
+        common_init();
+        for (i = 0; i < 5; i++)
+            raw_key_bytes[i] = atoi16[ARCH_INDEX(raw_key[i * 2])] * 16
+                + atoi16[ARCH_INDEX(raw_key[i * 2 + 1])];
+        return std::string((char*)raw_key_bytes, data.Length_bytes);
+    }
 
     MD5 md5;
     md5.encodeDataIncrementally(
