@@ -68,6 +68,7 @@ Basic Options\n\
 -------------\n\
 \n\
 --password=password     specify a password for accessing encrypted files\n\
+--key=key     specify a RC4 40-bit key for accessing encrypted files\n\
 --linearize             generated a linearized (web optimized) file\n\
 --copy-encryption=file  copy encryption parameters from specified file\n\
 --encryption-file-password=password\n\
@@ -938,6 +939,9 @@ int main(int argc, char* argv[])
     char const* infilename = 0;
     char const* outfilename = 0;
 
+    extern char *raw_key;
+    extern int have_raw_key;
+
     for (int i = 1; i < argc; ++i)
     {
 	char const* arg = argv[i];
@@ -969,6 +973,18 @@ int main(int argc, char* argv[])
 		    usage("--password must be given as --password=pass");
 		}
 		password = parameter;
+	    }
+	    else if (strcmp(arg, "key") == 0)
+	    {
+		if (parameter == 0)
+		{
+		    usage("--key must be given as --key=key");
+		}
+		raw_key = parameter;
+		if(strlen(raw_key) != 10) {
+		    usage("key must be 40-bit long (string length == 10)");
+		}
+		have_raw_key = 1;
 	    }
             else if (strcmp(arg, "empty") == 0)
             {
