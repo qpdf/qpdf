@@ -1,5 +1,9 @@
 2012-11-20  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add zlib and libpcre to Requires.private in the pkg-config file
+	to support static linking.  Thanks Tobias Hoffmann for pointing
+	out the omission.
+
 	* Ignore (with warning) non-freed objects in the xref table whose
 	offset is 0.  Some PDF producers (incorrectly) do this.  See
 	https://bugs.linuxfoundation.org/show_bug.cgi?id=1081.
