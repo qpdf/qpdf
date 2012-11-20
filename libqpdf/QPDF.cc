@@ -1253,6 +1253,21 @@ QPDF::readObjectAtOffset(bool try_recovery,
 			 int& objid, int& generation)
 {
     setLastObjectDescription(description, exp_objid, exp_generation);
+
+    // Special case: if offset is 0, just return null.  Some PDF
+    // writers, in particuar "Mac OS X 10.7.5 Quartz PDFContext", may
+    // store deleted objects in the xref table as "0000000000 00000
+    // n", which is not correct, but it won't hurt anything for to
+    // ignore these.
+    if (offset == 0)
+    {
+        QTC::TC("qpdf", "QPDF bogus 0 offset", 0);
+	warn(QPDFExc(qpdf_e_damaged_pdf, this->file->getName(),
+		     this->last_object_description, 0,
+		     "object has offset 0"));
+        return QPDFObjectHandle::newNull();
+    }
+
     this->file->seek(offset, SEEK_SET);
 
     QPDFTokenizer::Token tobjid = readToken(this->file);
