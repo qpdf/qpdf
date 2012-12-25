@@ -222,9 +222,11 @@ QPDF::parse(char const* password)
 	this->provided_password = password;
     }
 
-    // Find the header anywhere in the first 1024 bytes of the file.
-    char buffer[1044];
-    this->file->read(buffer, sizeof(buffer));
+    // Find the header anywhere in the first 1024 bytes of the file,
+    // plus add a little extra space for the header itself.
+    char buffer[1045];
+    memset(buffer, '\0', sizeof(buffer));
+    this->file->read(buffer, sizeof(buffer) - 1);
     std::string line(buffer);
     PCRE::Match m1 = header_re.match(line.c_str());
     if (m1)
