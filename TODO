@@ -1,12 +1,3 @@
-Next
-====
-
- * Find PDF header in the first 1024 bytes of the file.  Treat the
-   location of the PDF header as offset 0 for purposes of resolving
-   explicit file locations as this is what other implementations
-   appear to do.
-
-
 General
 =======
 

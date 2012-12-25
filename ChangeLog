@@ -1,3 +1,9 @@
+2012-12-25  Jay Berkenbilt  <ejb@ql.org>
+
+	* Allow PDF header to appear anywhere in the first 1024 bytes of
+	the file as recommended in the implementation notes of the Adobe
+	version of the PDF spec.
+
 2012-11-20  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add zlib and libpcre to Requires.private in the pkg-config file

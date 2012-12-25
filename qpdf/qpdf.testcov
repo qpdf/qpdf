@@ -243,3 +243,4 @@ QPDF_Tokenizer EOF reading appendable token 0
 QPDFWriter extra header text no newline 0
 QPDFWriter extra header text add newline 0
 QPDF bogus 0 offset 0
+QPDF global offset 0

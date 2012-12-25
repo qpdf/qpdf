@@ -149,7 +149,7 @@ $td->runtest("remove page we don't have",
 	     $td->NORMALIZE_NEWLINES);
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 56;
+$n_tests += 57;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -413,6 +413,10 @@ $td->runtest("check output",
 $td->runtest("object with zero offset",
              {$td->COMMAND => "qpdf --check zero-offset.pdf"},
              {$td->FILE => "zero-offset.out", $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check file with leading junk",
+             {$td->COMMAND => "qpdf --check leading-junk.pdf"},
+             {$td->FILE => "leading-junk.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 show_ntests();

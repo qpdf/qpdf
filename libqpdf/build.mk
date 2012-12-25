@@ -12,6 +12,7 @@ SRCS_libqpdf = \
 	libqpdf/FileInputSource.cc \
 	libqpdf/InputSource.cc \
 	libqpdf/MD5.cc \
+	libqpdf/OffsetInputSource.cc \
 	libqpdf/PCRE.cc \
 	libqpdf/Pipeline.cc \
 	libqpdf/Pl_AES_PDF.cc \

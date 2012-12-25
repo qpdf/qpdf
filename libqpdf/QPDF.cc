@@ -13,6 +13,7 @@
 #include <qpdf/Pl_Discard.hh>
 #include <qpdf/FileInputSource.hh>
 #include <qpdf/BufferInputSource.hh>
+#include <qpdf/OffsetInputSource.hh>
 
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDF_Null.hh>
@@ -213,7 +214,7 @@ QPDF::getWarnings()
 void
 QPDF::parse(char const* password)
 {
-    PCRE header_re("^%PDF-(1.\\d+)\\b");
+    PCRE header_re("\\A((?s).*?)%PDF-(1.\\d+)\\b");
     PCRE eof_re("(?s:startxref\\s+(\\d+)\\s+%%EOF\\b)");
 
     if (password)
@@ -221,11 +222,24 @@ QPDF::parse(char const* password)
 	this->provided_password = password;
     }
 
-    std::string line = this->file->readLine(20);
+    // Find the header anywhere in the first 1024 bytes of the file.
+    char buffer[1044];
+    this->file->read(buffer, sizeof(buffer));
+    std::string line(buffer);
     PCRE::Match m1 = header_re.match(line.c_str());
     if (m1)
     {
-	this->pdf_version = m1.getMatch(1);
+        size_t global_offset = m1.getMatch(1).length();
+        if (global_offset != 0)
+        {
+            // Emperical evidence strongly suggests that when there is
+            // leading material prior to the PDF header, all explicit
+            // offsets in the file are such that 0 points to the
+            // beginning of the header.
+            QTC::TC("qpdf", "QPDF global offset");
+            this->file = new OffsetInputSource(this->file, global_offset);
+        }
+	this->pdf_version = m1.getMatch(2);
 	if (atof(this->pdf_version.c_str()) < 1.2)
 	{
 	    this->tokenizer.allowPoundAnywhereInName();
