@@ -138,6 +138,13 @@ Index: QPDFWriter.cc
    specification dictionaries may appear, and there are also /RF keys
    with related files, so reread section 3.10 carefully.
 
+   A sourceforge user asks if qpdf can handle extracting and embedded
+   resources and references these tools, which may be useful as a
+   reference.
+
+   http://multivalent.sourceforge.net/Tools/pdf/Extract.html
+   http://multivalent.sourceforge.net/Tools/pdf/Embed.html
+
  * The description of Crypt filters is unclear with respect to how to
    use them to override /StmF for specific streams.  I'm not sure
    whether qpdf will do the right thing for any specific individual
