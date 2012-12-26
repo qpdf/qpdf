@@ -223,8 +223,10 @@ class QPDF
     // Encryption support
 
     enum encryption_method_e { e_none, e_unknown, e_rc4, e_aes };
-    struct EncryptionData
+    class EncryptionData
     {
+      public:
+
 	// This class holds data read from the encryption dictionary.
 	EncryptionData(int V, int R, int Length_bytes, int P,
 		       std::string const& O, std::string const& U,
@@ -239,6 +241,22 @@ class QPDF
 	    encrypt_metadata(encrypt_metadata)
 	{
 	}
+
+	int getV() const;
+	int getR() const;
+	int getLengthBytes() const;
+	int getP() const;
+	std::string const& getO() const;
+	std::string const& getU() const;
+	std::string const& getId1() const;
+	bool getEncryptMetadata() const;
+
+        void setO(std::string const&);
+        void setU(std::string const&);
+
+      private:
+        EncryptionData(EncryptionData const&);
+        EncryptionData& operator=(EncryptionData const&);
 
 	int V;
 	int R;

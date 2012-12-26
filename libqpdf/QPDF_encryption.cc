@@ -26,7 +26,67 @@ static unsigned char const padding_string[] = {
 static unsigned int const O_key_bytes = sizeof(MD5::Digest);
 static unsigned int const key_bytes = 32;
 
+int
+QPDF::EncryptionData::getV() const
+{
+    return this->V;
+}
+
+int
+QPDF::EncryptionData::getR() const
+{
+    return this->R;
+}
+
+int
+QPDF::EncryptionData::getLengthBytes() const
+{
+    return this->Length_bytes;
+}
+
+int
+QPDF::EncryptionData::getP() const
+{
+    return this->P;
+}
+
+std::string const&
+QPDF::EncryptionData::getO() const
+{
+    return this->O;
+}
+
+std::string const&
+QPDF::EncryptionData::getU() const
+{
+    return this->U;
+}
+
+std::string const&
+QPDF::EncryptionData::getId1() const
+{
+    return this->id1;
+}
+
+bool
+QPDF::EncryptionData::getEncryptMetadata() const
+{
+    return this->encrypt_metadata;
+}
+
 void
+QPDF::EncryptionData::setO(std::string const& O)
+{
+    this->O = O;
+}
+
+void
+QPDF::EncryptionData::setU(std::string const& U)
+{
+    this->U = U;
+}
+
+static void
 pad_or_truncate_password(std::string const& password, char k1[key_bytes])
 {
     int password_bytes = std::min(key_bytes, (unsigned int)password.length());
@@ -137,23 +197,25 @@ QPDF::compute_encryption_key(
     MD5 md5;
     md5.encodeDataIncrementally(
 	pad_or_truncate_password(password).c_str(), key_bytes);
-    md5.encodeDataIncrementally(data.O.c_str(), key_bytes);
+    md5.encodeDataIncrementally(data.getO().c_str(), key_bytes);
     char pbytes[4];
-    pbytes[0] = (char) (data.P & 0xff);
-    pbytes[1] = (char) ((data.P >> 8) & 0xff);
-    pbytes[2] = (char) ((data.P >> 16) & 0xff);
-    pbytes[3] = (char) ((data.P >> 24) & 0xff);
+    int P = data.getP();
+    pbytes[0] = (char) (P & 0xff);
+    pbytes[1] = (char) ((P >> 8) & 0xff);
+    pbytes[2] = (char) ((P >> 16) & 0xff);
+    pbytes[3] = (char) ((P >> 24) & 0xff);
     md5.encodeDataIncrementally(pbytes, 4);
-    md5.encodeDataIncrementally(data.id1.c_str(), (int)data.id1.length());
-    if ((data.R >= 4) && (! data.encrypt_metadata))
+    md5.encodeDataIncrementally(data.getId1().c_str(),
+                                (int)data.getId1().length());
+    if ((data.getR() >= 4) && (! data.getEncryptMetadata()))
     {
 	char bytes[4];
 	memset(bytes, 0xff, 4);
 	md5.encodeDataIncrementally(bytes, 4);
     }
     MD5::Digest digest;
-    iterate_md5_digest(md5, digest, ((data.R >= 3) ? 50 : 0));
-    return std::string((char*)digest, data.Length_bytes);
+    iterate_md5_digest(md5, digest, ((data.getR() >= 3) ? 50 : 0));
+    return std::string((char*)digest, data.getLengthBytes());
 }
 
 static void
@@ -171,7 +233,7 @@ compute_O_rc4_key(std::string const& user_password,
     md5.encodeDataIncrementally(
 	pad_or_truncate_password(password).c_str(), key_bytes);
     MD5::Digest digest;
-    iterate_md5_digest(md5, digest, ((data.R >= 3) ? 50 : 0));
+    iterate_md5_digest(md5, digest, ((data.getR() >= 3) ? 50 : 0));
     memcpy(key, digest, O_key_bytes);
 }
 
@@ -188,7 +250,8 @@ compute_O_value(std::string const& user_password,
     char upass[key_bytes];
     pad_or_truncate_password(user_password, upass);
     iterate_rc4((unsigned char*) upass, key_bytes,
-		O_key, data.Length_bytes, (data.R >= 3) ? 20 : 1, false);
+		O_key, data.getLengthBytes(),
+                (data.getR() >= 3) ? 20 : 1, false);
     return std::string(upass, key_bytes);
 }
 
@@ -203,7 +266,7 @@ compute_U_value_R2(std::string const& user_password,
     char udata[key_bytes];
     pad_or_truncate_password("", udata);
     iterate_rc4((unsigned char*) udata, key_bytes,
-		(unsigned char*)k1.c_str(), data.Length_bytes, 1, false);
+		(unsigned char*)k1.c_str(), data.getLengthBytes(), 1, false);
     return std::string(udata, key_bytes);
 }
 
@@ -218,11 +281,12 @@ compute_U_value_R3(std::string const& user_password,
     MD5 md5;
     md5.encodeDataIncrementally(
 	pad_or_truncate_password("").c_str(), key_bytes);
-    md5.encodeDataIncrementally(data.id1.c_str(), (int)data.id1.length());
+    md5.encodeDataIncrementally(data.getId1().c_str(),
+                                (int)data.getId1().length());
     MD5::Digest digest;
     md5.digest(digest);
     iterate_rc4(digest, sizeof(MD5::Digest),
-		(unsigned char*) k1.c_str(), data.Length_bytes, 20, false);
+		(unsigned char*) k1.c_str(), data.getLengthBytes(), 20, false);
     char result[key_bytes];
     memcpy(result, digest, sizeof(MD5::Digest));
     // pad with arbitrary data -- make it consistent for the sake of
@@ -238,7 +302,7 @@ static std::string
 compute_U_value(std::string const& user_password,
 		QPDF::EncryptionData const& data)
 {
-    if (data.R >= 3)
+    if (data.getR() >= 3)
     {
 	return compute_U_value_R3(user_password, data);
     }
@@ -253,8 +317,8 @@ check_user_password(std::string const& user_password,
     // Algorithm 3.6 from the PDF 1.7 Reference Manual
 
     std::string u_value = compute_U_value(user_password, data);
-    int to_compare = ((data.R >= 3) ? sizeof(MD5::Digest) : key_bytes);
-    return (memcmp(data.U.c_str(), u_value.c_str(), to_compare) == 0);
+    int to_compare = ((data.getR() >= 3) ? sizeof(MD5::Digest) : key_bytes);
+    return (memcmp(data.getU().c_str(), u_value.c_str(), to_compare) == 0);
 }
 
 static bool
@@ -267,9 +331,9 @@ check_owner_password(std::string& user_password,
     unsigned char key[O_key_bytes];
     compute_O_rc4_key(user_password, owner_password, data, key);
     unsigned char O_data[key_bytes];
-    memcpy(O_data, (unsigned char*) data.O.c_str(), key_bytes);
-    iterate_rc4(O_data, key_bytes, key, data.Length_bytes,
-		(data.R >= 3) ? 20 : 1, true);
+    memcpy(O_data, (unsigned char*) data.getO().c_str(), key_bytes);
+    iterate_rc4(O_data, key_bytes, key, data.getLengthBytes(),
+		(data.getR() >= 3) ? 20 : 1, true);
     std::string new_user_password =
 	std::string((char*)O_data, key_bytes);
     bool result = false;
@@ -716,9 +780,10 @@ QPDF::compute_encryption_O_U(
     std::string const& id1, std::string& O, std::string& U)
 {
     EncryptionData data(V, R, key_len, P, "", "", id1, encrypt_metadata);
-    data.O = compute_O_value(user_password, owner_password, data);
-    O = data.O;
-    U = compute_U_value(user_password, data);
+    data.setO(compute_O_value(user_password, owner_password, data));
+    O = data.getO();
+    data.setU(compute_U_value(user_password, data));
+    U = data.getU();
 }
 
 std::string const&
