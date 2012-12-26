@@ -230,6 +230,8 @@ class QPDF
 	// This class holds data read from the encryption dictionary.
 	EncryptionData(int V, int R, int Length_bytes, int P,
 		       std::string const& O, std::string const& U,
+                       std::string const& OE, std::string const& UE,
+                       std::string const& Perms,
 		       std::string const& id1, bool encrypt_metadata) :
 	    V(V),
 	    R(R),
@@ -237,6 +239,9 @@ class QPDF
 	    P(P),
 	    O(O),
 	    U(U),
+            OE(OE),
+            UE(UE),
+            Perms(Perms),
 	    id1(id1),
 	    encrypt_metadata(encrypt_metadata)
 	{
@@ -248,11 +253,19 @@ class QPDF
 	int getP() const;
 	std::string const& getO() const;
 	std::string const& getU() const;
+	std::string const& getOE() const;
+	std::string const& getUE() const;
+	std::string const& getPerms() const;
 	std::string const& getId1() const;
 	bool getEncryptMetadata() const;
 
         void setO(std::string const&);
         void setU(std::string const&);
+        void setV5EncryptionParameters(std::string const& O,
+                                       std::string const& OE,
+                                       std::string const& U,
+                                       std::string const& UE,
+                                       std::string const& Perms);
 
       private:
         EncryptionData(EncryptionData const&);
@@ -264,6 +277,9 @@ class QPDF
 	int P;
 	std::string O;
 	std::string U;
+        std::string OE;
+        std::string UE;
+        std::string Perms;
 	std::string id1;
 	bool encrypt_metadata;
     };

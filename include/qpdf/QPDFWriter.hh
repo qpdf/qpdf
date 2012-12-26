@@ -295,6 +295,7 @@ class QPDFWriter
     void setEncryptionParametersInternal(
 	int V, int R, int key_len, long P,
 	std::string const& O, std::string const& U,
+	std::string const& OE, std::string const& UE, std::string const& Perms,
 	std::string const& id1, std::string const& user_password);
     void setDataKey(int objid);
     int openObject(int objid = 0);

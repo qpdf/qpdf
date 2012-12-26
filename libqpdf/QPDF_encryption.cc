@@ -63,6 +63,24 @@ QPDF::EncryptionData::getU() const
 }
 
 std::string const&
+QPDF::EncryptionData::getOE() const
+{
+    return this->OE;
+}
+
+std::string const&
+QPDF::EncryptionData::getUE() const
+{
+    return this->UE;
+}
+
+std::string const&
+QPDF::EncryptionData::getPerms() const
+{
+    return this->Perms;
+}
+
+std::string const&
 QPDF::EncryptionData::getId1() const
 {
     return this->id1;
@@ -84,6 +102,21 @@ void
 QPDF::EncryptionData::setU(std::string const& U)
 {
     this->U = U;
+}
+
+void
+QPDF::EncryptionData::setV5EncryptionParameters(
+    std::string const& O,
+    std::string const& OE,
+    std::string const& U,
+    std::string const& UE,
+    std::string const& Perms)
+{
+    this->O = O;
+    this->OE = OE;
+    this->U = U;
+    this->UE = UE;
+    this->Perms = Perms;
 }
 
 static void
@@ -557,7 +590,8 @@ QPDF::initializeEncryption()
 			  " a bug report that includes this file.");
 	}
     }
-    EncryptionData data(V, R, Length / 8, P, O, U, id1, this->encrypt_metadata);
+    EncryptionData data(V, R, Length / 8, P, O, U, "", "", "",
+                        id1, this->encrypt_metadata);
     if (check_owner_password(
 	    this->user_password, this->provided_password, data))
     {
@@ -779,7 +813,8 @@ QPDF::compute_encryption_O_U(
     int V, int R, int key_len, int P, bool encrypt_metadata,
     std::string const& id1, std::string& O, std::string& U)
 {
-    EncryptionData data(V, R, key_len, P, "", "", id1, encrypt_metadata);
+    EncryptionData data(V, R, key_len, P, "", "", "", "", "",
+                        id1, encrypt_metadata);
     data.setO(compute_O_value(user_password, owner_password, data));
     O = data.getO();
     data.setU(compute_U_value(user_password, data));

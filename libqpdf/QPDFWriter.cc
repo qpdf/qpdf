@@ -406,7 +406,7 @@ QPDFWriter::setEncryptionParameters(
 	user_password, owner_password, V, R, key_len, P,
 	this->encrypt_metadata, this->id1, O, U);
     setEncryptionParametersInternal(
-	V, R, key_len, P, O, U, this->id1, user_password);
+	V, R, key_len, P, O, U, "", "", "", this->id1, user_password);
 }
 
 void
@@ -467,6 +467,9 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
 	    encrypt.getKey("/P").getIntValue(),
 	    encrypt.getKey("/O").getStringValue(),
 	    encrypt.getKey("/U").getStringValue(),
+            "",                 // XXXX OE
+            "",                 // XXXX UE
+            "",                 // XXXX Perms
 	    this->id1,		// this->id1 == the other file's id1
 	    qpdf.getPaddedUserPassword());
     }
@@ -569,8 +572,11 @@ void
 QPDFWriter::setEncryptionParametersInternal(
     int V, int R, int key_len, long P,
     std::string const& O, std::string const& U,
+    std::string const& OE, std::string const& UE, std::string const& Perms,
     std::string const& id1, std::string const& user_password)
 {
+    // XXXX OE, UE, Perms, V=5
+
     encryption_dictionary["/Filter"] = "/Standard";
     encryption_dictionary["/V"] = QUtil::int_to_string(V);
     encryption_dictionary["/Length"] = QUtil::int_to_string(key_len * 8);
@@ -606,7 +612,7 @@ QPDFWriter::setEncryptionParametersInternal(
 
     this->encrypted = true;
     QPDF::EncryptionData encryption_data(
-	V, R, key_len, P, O, U, id1, this->encrypt_metadata);
+	V, R, key_len, P, O, U, OE, UE, Perms, id1, this->encrypt_metadata);
     this->encryption_key = QPDF::compute_encryption_key(
 	user_password, encryption_data);
 }
