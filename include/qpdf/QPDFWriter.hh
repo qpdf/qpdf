@@ -153,6 +153,8 @@ class QPDFWriter
     // streams are used.
     QPDF_DLL
     void setMinimumPDFVersion(std::string const&);
+    QPDF_DLL
+    void setMinimumPDFVersion(std::string const&, int extension_level);
 
     // Force the PDF version of the output file to be a given version.
     // Use of this function may create PDF files that will not work
@@ -171,6 +173,8 @@ class QPDFWriter
     // object streams.
     QPDF_DLL
     void forcePDFVersion(std::string const&);
+    QPDF_DLL
+    void forcePDFVersion(std::string const&, int extension_level);
 
     // Provide additional text to insert in the PDF file somewhere
     // near the beginning of the file.  This can be used to add
@@ -251,6 +255,7 @@ class QPDFWriter
     static int const f_stream = 	1 << 0;
     static int const f_filtered =	1 << 1;
     static int const f_in_ostream =     1 << 2;
+    static int const f_in_extensions =  1 << 3;
 
     enum trailer_e { t_normal, t_lin_first, t_lin_second };
 
@@ -286,7 +291,8 @@ class QPDFWriter
 	char const* user_password, char const* owner_password,
 	bool allow_accessibility, bool allow_extract,
 	qpdf_r3_print_e print, qpdf_r3_modify_e modify);
-    void disableIncompatibleEncryption(int major, int minor);
+    void disableIncompatibleEncryption(int major, int minor,
+                                       int extension_level);
     void parseVersion(std::string const& version, int& major, int& minor) const;
     int compareVersions(int major1, int minor1, int major2, int minor2) const;
     void setEncryptionParameters(
@@ -375,8 +381,12 @@ class QPDFWriter
 
     std::string id1;		// for /ID key of
     std::string id2;		// trailer dictionary
+    std::string final_pdf_version;
+    int final_extension_level;
     std::string min_pdf_version;
+    int min_extension_level;
     std::string forced_pdf_version;
+    int forced_extension_level;
     std::string extra_header_text;
     int encryption_dict_objid;
     std::string cur_data_key;

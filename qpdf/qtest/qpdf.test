@@ -111,6 +111,55 @@ $td->runtest("new stream",
 
 show_ntests();
 # ----------
+$td->notify("--- Extensions Dictionary Tests ---");
+my @ext_inputs = ('minimal.pdf', 'extensions-adbe.pdf',
+                  'extensions-other.pdf', 'extensions-adbe-other.pdf');
+my @new_versions = ('1.3', '1.6', '1.7.1', '1.7.2', '1.7.3',
+                    '1.8', '1.8.0', '1.8.2', '1.8.5');
+$n_tests += (4 * @new_versions + 3) * @ext_inputs;
+foreach my $input (@ext_inputs)
+{
+    my $base = $input;
+    $base =~ s/\.pdf$//;
+    if ($base eq 'minimal')
+    {
+        $base = 'extensions-none';
+    }
+    foreach my $version (@new_versions)
+    {
+        foreach my $op (qw(min force))
+        {
+            $td->runtest("$input: $op version to $version",
+                         {$td->COMMAND =>
+                              "qpdf --static-id" .
+                              " --$op-version=$version $input a.pdf"},
+                         {$td->STRING => "", $td->EXIT_STATUS => 0});
+            $td->runtest("check version information",
+                         {$td->COMMAND => "test_driver 34 a.pdf"},
+                         {$td->FILE => "$base-$op-$version.out",
+                          $td->EXIT_STATUS => 0},
+                         $td->NORMALIZE_NEWLINES);
+            if (($op eq 'force') && ($version eq '1.8.5'))
+            {
+                # Look at the actual file for a few cases to make sure
+                # qdf and non-qdf output are okay
+                $td->runtest("check file",
+                             {$td->FILE => "a.pdf"},
+                             {$td->FILE => "$base-$op-$version.pdf"});
+                $td->runtest("$input: $op version to $version",
+                             {$td->COMMAND =>
+                                  "qpdf --qdf --static-id" .
+                                  " --$op-version=$version $input a.qdf"},
+                             {$td->STRING => "", $td->EXIT_STATUS => 0});
+                $td->runtest("check file",
+                             {$td->FILE => "a.qdf"},
+                             {$td->FILE => "$base-$op-$version.qdf"});
+            }
+        }
+    }
+}
+show_ntests();
+# ----------
 $td->notify("--- Page API Tests ---");
 $n_tests += 9;
 
@@ -147,6 +196,7 @@ $td->runtest("remove page we don't have",
 	     {$td->COMMAND => "test_driver 22 page_api_1.pdf"},
 	     {$td->FILE => "page_api_1.out2", $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
+show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
 $n_tests += 57;
@@ -466,6 +516,7 @@ foreach my $d (@nrange_tests)
                  $td->NORMALIZE_NEWLINES);
 }
 
+show_ntests();
 # ----------
 $td->notify("--- Merging and Splitting ---");
 $n_tests += 6;
@@ -513,6 +564,7 @@ $td->runtest("avoid respecification of password",
 $td->runtest("check output",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "pages-copy-encryption.pdf"});
+show_ntests();
 # ----------
 $td->notify("--- PDF From Scratch ---");
 $n_tests += 2;
@@ -524,6 +576,7 @@ $td->runtest("basic qpdf from scratch",
 $td->runtest("check output",
 	     {$td->FILE => "a.pdf"},
 	     {$td->FILE => "from-scratch-0.pdf"});
+show_ntests();
 # ----------
 $td->notify("--- Copy Foreign Objects ---");
 $n_tests += 7;
@@ -546,6 +599,7 @@ $td->runtest("copy objects error",
              {$td->FILE => "copy-foreign-objects-errors.out",
               $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
+show_ntests();
 # ----------
 $td->notify("--- Error Condition Tests ---");
 # $n_tests incremented after initialization of badfiles below.

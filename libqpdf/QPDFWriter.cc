@@ -64,6 +64,9 @@ QPDFWriter::init()
     object_stream_mode = qpdf_o_preserve;
     encrypt_metadata = true;
     encrypt_use_aes = false;
+    min_extension_level = 0;
+    final_extension_level = 0;
+    forced_extension_level = 0;
     encryption_dict_objid = 0;
     next_objid = 1;
     cur_stream_length_id = 0;
@@ -170,10 +173,19 @@ QPDFWriter::setQDFMode(bool val)
 void
 QPDFWriter::setMinimumPDFVersion(std::string const& version)
 {
+    setMinimumPDFVersion(version, 0);
+}
+
+void
+QPDFWriter::setMinimumPDFVersion(std::string const& version,
+                                 int extension_level)
+{
     bool set_version = false;
+    bool set_extension_level = false;
     if (this->min_pdf_version.empty())
     {
 	set_version = true;
+        set_extension_level = true;
     }
     else
     {
@@ -183,10 +195,22 @@ QPDFWriter::setMinimumPDFVersion(std::string const& version)
 	int min_minor = 0;
 	parseVersion(version, old_major, old_minor);
 	parseVersion(this->min_pdf_version, min_major, min_minor);
-	if (compareVersions(old_major, old_minor, min_major, min_minor) > 0)
+        int compare = compareVersions(
+            old_major, old_minor, min_major, min_minor);
+	if (compare > 0)
 	{
-	    QTC::TC("qpdf", "QPDFWriter increasing minimum version");
+	    QTC::TC("qpdf", "QPDFWriter increasing minimum version",
+                    extension_level == 0 ? 0 : 1);
 	    set_version = true;
+            set_extension_level = true;
+	}
+        else if (compare == 0)
+        {
+            if (extension_level > this->min_extension_level)
+            {
+                QTC::TC("qpdf", "QPDFWriter increasing extension level");
+                set_extension_level = true;
+            }
 	}
     }
 
@@ -194,12 +218,24 @@ QPDFWriter::setMinimumPDFVersion(std::string const& version)
     {
 	this->min_pdf_version = version;
     }
+    if (set_extension_level)
+    {
+        this->min_extension_level = extension_level;
+    }
 }
 
 void
 QPDFWriter::forcePDFVersion(std::string const& version)
 {
+    forcePDFVersion(version, 0);
+}
+
+void
+QPDFWriter::forcePDFVersion(std::string const& version,
+                            int extension_level)
+{
     this->forced_pdf_version = version;
+    this->forced_extension_level = extension_level;
 }
 
 void
@@ -476,7 +512,8 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
 }
 
 void
-QPDFWriter::disableIncompatibleEncryption(int major, int minor)
+QPDFWriter::disableIncompatibleEncryption(int major, int minor,
+                                          int extension_level)
 {
     if (! this->encrypted)
     {
@@ -513,6 +550,15 @@ QPDFWriter::disableIncompatibleEncryption(int major, int minor)
 		disable = true;
 	    }
 	}
+        else if ((compareVersions(major, minor, 1, 7) < 0) ||
+                 ((compareVersions(major, minor, 1, 7) == 0) &&
+                  extension_level < 3))
+        {
+            if ((V >= 5) || (R >= 5))
+            {
+                disable = true;
+            }
+        }
     }
     if (disable)
     {
@@ -584,14 +630,25 @@ QPDFWriter::setEncryptionParametersInternal(
     encryption_dictionary["/P"] = QUtil::int_to_string(P);
     encryption_dictionary["/O"] = QPDF_String(O).unparse(true);
     encryption_dictionary["/U"] = QPDF_String(U).unparse(true);
-    setMinimumPDFVersion("1.3");
-    if (R == 3)
+    if (V >= 5)
     {
         setMinimumPDFVersion("1.4");
     }
-    else if (R >= 4)
+    if (R >= 5)
+    {
+        setMinimumPDFVersion("1.7", 3);
+    }
+    else if (R == 4)
     {
         setMinimumPDFVersion(this->encrypt_use_aes ? "1.6" : "1.5");
+    }
+    else if (R == 3)
+    {
+        setMinimumPDFVersion("1.4");
+    }
+    else
+    {
+        setMinimumPDFVersion("1.3");
     }
 
     if ((R >= 4) && (! encrypt_metadata))
@@ -1005,7 +1062,7 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 			  unsigned int flags, size_t stream_length,
                           bool compress)
 {
-    unsigned int child_flags = flags & ~f_stream;
+    unsigned int child_flags = flags & ~f_stream & ~f_in_extensions;
 
     std::string indent;
     for (int i = 0; i < level; ++i)
@@ -1037,8 +1094,143 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
     }
     else if (object.isDictionary())
     {
+        // Handle special cases for specific dictionaries.
+
+        // Extensions dictionaries are complicated.  We have one of
+        // several cases:
+        //
+        // * We need ADBE
+        //    - We already have Extensions
+        //       - If it has the right ADBE, preserve it
+        //       - Otherwise, replace ADBE
+        //    - We don't have Extensions: create one from scratch
+        // * We don't want ADBE
+        //    - We already have Extensions
+        //       - If it only has ADBE, remove it
+        //       - If it has other things, keep those and remove ADBE
+        //    - We have no extensions: no action required
+        //
+        // We may be in the root dictionary, or we may be inside the
+        // extensions dictionary itself.  The latter is determined by
+        // the presence of the f_in_extensions flag.
+
+        bool is_root = false;
+        bool have_extensions_other = false;
+        bool have_extensions_adbe = false;
+
+        QPDFObjectHandle extensions;
+        if (object.getObjectID() == pdf.getRoot().getObjectID())
+        {
+            is_root = true;
+            if (object.hasKey("/Extensions") &&
+                object.getKey("/Extensions").isDictionary())
+            {
+                extensions = object.getKey("/Extensions");
+            }
+        }
+        else if (flags & f_in_extensions)
+        {
+            extensions = object;
+        }
+        if (extensions.isInitialized())
+        {
+            std::set<std::string> keys = extensions.getKeys();
+            if (keys.count("/ADBE") > 0)
+            {
+                have_extensions_adbe = true;
+                keys.erase("/ADBE");
+            }
+            if (keys.size() > 0)
+            {
+                have_extensions_other = true;
+            }
+        }
+
+        bool need_extensions_adbe = (this->final_extension_level > 0);
+
+        bool write_new_extensions = false;
+        bool write_new_adbe = false;
+        bool suppress_existing_extensions = false;
+        bool suppress_existing_adbe = false;
+        if (is_root)
+        {
+            if (need_extensions_adbe)
+            {
+                if (! (have_extensions_other || have_extensions_adbe))
+                {
+                    // We need Extensions and don't have it.  Create
+                    // it here.
+                    QTC::TC("qpdf", "QPDFWriter create Extensions",
+                            this->qdf_mode ? 0 : 1);
+                    write_new_extensions = true;
+                    suppress_existing_extensions = true;
+                }
+                else
+                {
+                    // Preserve existing Extensions and do the work
+                    // in the extensions dictionary.
+                }
+            }
+            else if (! have_extensions_other)
+            {
+                // We have Extensions dictionary and don't want one.
+                suppress_existing_extensions = true;
+                if (have_extensions_adbe)
+                {
+                    QTC::TC("qpdf", "QPDFWriter remove existing Extensions");
+                }
+            }
+        }
+        else if (flags & f_in_extensions)
+        {
+            QTC::TC("qpdf", "QPDFWriter preserve Extensions");
+            QPDFObjectHandle adbe = extensions.getKey("/ADBE");
+            if (adbe.isDictionary() &&
+                adbe.hasKey("/BaseVersion") &&
+                adbe.getKey("/BaseVersion").isName() &&
+                (adbe.getKey("/BaseVersion").getName() ==
+                 "/" + this->final_pdf_version) &&
+                adbe.hasKey("/ExtensionLevel") &&
+                adbe.getKey("/ExtensionLevel").isInteger() &&
+                (adbe.getKey("/ExtensionLevel").getIntValue() ==
+                 this->final_extension_level))
+            {
+                QTC::TC("qpdf", "QPDFWriter preserve ADBE");
+            }
+            else
+            {
+                suppress_existing_adbe = true;
+                if (need_extensions_adbe)
+                {
+                    write_new_adbe = true;
+                }
+            }
+        }
+
 	writeString("<<");
 	writeStringQDF("\n");
+
+        if (write_new_extensions || write_new_adbe)
+        {
+            writeStringQDF(indent);
+            writeStringQDF("  ");
+            writeStringNoQDF(" ");
+            if (write_new_extensions)
+            {
+                writeString("/Extensions << ");
+            }
+            writeString("/ADBE << /BaseVersion /");
+            writeString(this->final_pdf_version);
+            writeString(" /ExtensionLevel ");
+            writeString(QUtil::int_to_string(this->final_extension_level));
+            writeString(" >>");
+            if (write_new_extensions)
+            {
+                writeString(" >>");
+            }
+            writeStringQDF("\n");
+        }
+
 	std::set<std::string> keys = object.getKeys();
 	for (std::set<std::string>::iterator iter = keys.begin();
 	     iter != keys.end(); ++iter)
@@ -1057,12 +1249,27 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	    {
 		continue;
 	    }
+
+            bool is_extensions = (is_root && (key == "/Extensions"));
+            if (suppress_existing_extensions && is_extensions)
+            {
+                QTC::TC("qpdf", "QPDFWriter skip Extensions");
+                continue;
+            }
+            if (suppress_existing_adbe && (key == "/ADBE"))
+            {
+                QTC::TC("qpdf", "QPDFWriter skip ADBE");
+                continue;
+            }
+
+
 	    writeStringQDF(indent);
 	    writeStringQDF("  ");
 	    writeStringNoQDF(" ");
 	    writeString(QPDF_Name::normalizeName(key));
 	    writeString(" ");
-	    unparseChild(object.getKey(key), level + 1, child_flags);
+            unparseChild(object.getKey(key), level + 1,
+                         child_flags | (is_extensions ? f_in_extensions : 0));
 	    writeStringQDF("\n");
 	}
 
@@ -1706,12 +1913,17 @@ QPDFWriter::prepareFileForWrite()
 	else if (node.isDictionary() || node.isStream())
 	{
             bool is_stream = false;
+            bool is_root = false;
 	    QPDFObjectHandle dict = node;
 	    if (node.isStream())
 	    {
                 is_stream = true;
 		dict = node.getDict();
 	    }
+            else if (pdf.getRoot().getObjectID() == node.getObjectID())
+            {
+                is_root = true;
+            }
 
 	    std::set<std::string> keys = dict.getKeys();
 	    for (std::set<std::string>::iterator iter = keys.begin();
@@ -1720,18 +1932,42 @@ QPDFWriter::prepareFileForWrite()
 		std::string const& key = *iter;
 		QPDFObjectHandle oh = dict.getKey(key);
                 bool add_to_queue = true;
-                if (oh.isIndirect())
+                if (is_stream)
                 {
-                    if (is_stream)
+                    if (oh.isIndirect() &&
+                        ((key == "/Length") ||
+                         (key == "/Filter") ||
+                         (key == "/DecodeParms")))
                     {
-                        if ((key == "/Length") ||
-                            (key == "/Filter") ||
-                            (key == "/DecodeParms"))
+                        QTC::TC("qpdf", "QPDFWriter make stream key direct");
+                        add_to_queue = false;
+                        oh.makeDirect();
+                        dict.replaceKey(key, oh);
+                    }
+                }
+                else if (is_root)
+                {
+                    if ((key == "/Extensions") && (oh.isDictionary()))
+                    {
+                        bool extensions_indirect = false;
+                        if (oh.isIndirect())
                         {
-                            QTC::TC("qpdf", "QPDF make stream key direct");
+                            QTC::TC("qpdf", "QPDFWriter make Extensions direct");
+                            extensions_indirect = true;
                             add_to_queue = false;
-                            oh.makeDirect();
+                            oh = oh.shallowCopy();
                             dict.replaceKey(key, oh);
+                        }
+                        if (oh.hasKey("/ADBE"))
+                        {
+                            QPDFObjectHandle adbe = oh.getKey("/ADBE");
+                            if (adbe.isIndirect())
+                            {
+                                QTC::TC("qpdf", "QPDFWriter make ADBE direct",
+                                        extensions_indirect ? 0 : 1);
+                                adbe.makeDirect();
+                                oh.replaceKey("/ADBE", adbe);
+                            }
                         }
                     }
                 }
@@ -1791,7 +2027,8 @@ QPDFWriter::write()
 	int major = 0;
 	int minor = 0;
 	parseVersion(this->forced_pdf_version, major, minor);
-	disableIncompatibleEncryption(major, minor);
+	disableIncompatibleEncryption(major, minor,
+                                      this->forced_extension_level);
 	if (compareVersions(major, minor, 1, 5) < 0)
 	{
 	    QTC::TC("qpdf", "QPDFWriter forcing object stream disable");
@@ -1938,16 +2175,18 @@ QPDFWriter::writeEncryptionDictionary()
 void
 QPDFWriter::writeHeader()
 {
-    setMinimumPDFVersion(pdf.getPDFVersion());
-    std::string version = this->min_pdf_version;
+    setMinimumPDFVersion(pdf.getPDFVersion(), pdf.getExtensionLevel());
+    this->final_pdf_version = this->min_pdf_version;
+    this->final_extension_level = this->min_extension_level;
     if (! this->forced_pdf_version.empty())
     {
 	QTC::TC("qpdf", "QPDFWriter using forced PDF version");
-	version = this->forced_pdf_version;
+	this->final_pdf_version = this->forced_pdf_version;
+        this->final_extension_level = this->forced_extension_level;
     }
 
     writeString("%PDF-");
-    writeString(version);
+    writeString(this->final_pdf_version);
     // This string of binary characters would not be valid UTF-8, so
     // it really should be treated as binary.
     writeString("\n%\xbf\xf7\xa2\xfe\n");

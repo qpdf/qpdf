@@ -1126,6 +1126,13 @@ void runtest(int n, char const* filename1, char const* filename2)
         fwrite(b->getBuffer(), b->getSize(), 1, f);
         fclose(f);
     }
+    else if (n == 34)
+    {
+        // Look at Extensions dictionary
+        std::cout << "version: " << pdf.getPDFVersion() << std::endl
+                  << "extension level: " << pdf.getExtensionLevel() << std::endl
+                  << pdf.getRoot().getKey("/Extensions").unparse() << std::endl;
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +

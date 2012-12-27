@@ -189,6 +189,9 @@ familiar with the PDF file format or who are PDF developers.\n\
 --min-version=version     sets the minimum PDF version of the output file\n\
 --force-version=version   forces this to be the PDF version of the output file\n\
 \n\
+Version numbers may be expressed as major.minor.extension-level, so 1.7.3\n\
+means PDF version 1.7 at extension level 3.\n\
+\n\
 Values for stream data options:\n\
 \n\
   compress              recompress stream data when possible (default)\n\
@@ -838,6 +841,21 @@ QPDFPageData::QPDFPageData(QPDF* qpdf, char const* range) :
     this->selected_pages = parse_numrange(range, (int)this->orig_pages.size());
 }
 
+static void parse_version(std::string const& full_version_string,
+                          std::string& version, int& extension_level)
+{
+    PointerHolder<char> vp(true, QUtil::copy_string(full_version_string));
+    char* v = vp.getPointer();
+    char* p1 = strchr(v, '.');
+    char* p2 = (p1 ? strchr(1 + p1, '.') : 0);
+    if (p2 && *(p2 + 1))
+    {
+        *p2++ = '\0';
+        extension_level = atoi(p2);
+    }
+    version = v;
+}
+
 int main(int argc, char* argv[])
 {
     whoami = QUtil::getWhoami(argv[0]);
@@ -1370,8 +1388,14 @@ int main(int argc, char* argv[])
 		std::cout << "checking " << infilename << std::endl;
 		try
 		{
-		    std::cout << "PDF Version: " << pdf.getPDFVersion()
-			      << std::endl;
+                    int extension_level = pdf.getExtensionLevel();
+		    std::cout << "PDF Version: " << pdf.getPDFVersion();
+                    if (extension_level > 0)
+                    {
+                        std::cout << " extension level "
+                                  << pdf.getExtensionLevel();
+                    }
+                    std::cout << std::endl;
 		    ::show_encryption(pdf);
 		    if (pdf.isLinearized())
 		    {
@@ -1603,11 +1627,17 @@ int main(int argc, char* argv[])
 	    }
 	    if (! min_version.empty())
 	    {
-		w.setMinimumPDFVersion(min_version);
+                std::string version;
+                int extension_level = 0;
+                parse_version(min_version, version, extension_level);
+		w.setMinimumPDFVersion(version, extension_level);
 	    }
 	    if (! force_version.empty())
 	    {
-		w.forcePDFVersion(force_version);
+                std::string version;
+                int extension_level = 0;
+                parse_version(force_version, version, extension_level);
+		w.forcePDFVersion(version, extension_level);
 	    }
 	    w.write();
 	}

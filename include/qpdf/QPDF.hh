@@ -144,6 +144,8 @@ class QPDF
     QPDF_DLL
     std::string getPDFVersion() const;
     QPDF_DLL
+    int getExtensionLevel();
+    QPDF_DLL
     QPDFObjectHandle getTrailer();
     QPDF_DLL
     QPDFObjectHandle getRoot();

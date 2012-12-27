@@ -151,7 +151,7 @@ qpdf-c called qpdf_allow_modify_form 0
 qpdf-c called qpdf_allow_modify_annotation 0
 qpdf-c called qpdf_allow_modify_other 0
 qpdf-c called qpdf_allow_modify_all 0
-QPDFWriter increasing minimum version 0
+QPDFWriter increasing minimum version 1
 QPDFWriter using forced PDF version 0
 qpdf-c called qpdf_set_minimum_pdf_version 0
 qpdf-c called qpdf_force_pdf_version 0
@@ -243,4 +243,13 @@ QPDFWriter extra header text no newline 0
 QPDFWriter extra header text add newline 0
 QPDF bogus 0 offset 0
 QPDF global offset 0
-QPDF make stream key direct 0
+QPDFWriter make stream key direct 0
+QPDFWriter increasing extension level 0
+QPDFWriter make Extensions direct 0
+QPDFWriter make ADBE direct 1
+QPDFWriter preserve Extensions 0
+QPDFWriter create Extensions 1
+QPDFWriter skip ADBE 0
+QPDFWriter remove existing Extensions 0
+QPDFWriter skip Extensions 0
+QPDFWriter preserve ADBE 0
