@@ -29,8 +29,7 @@ QPDF lin outlines in part 1
 QPDF lin nshared_total > nshared_first_page 1
 QPDF lin part 8 empty 1
 QPDF lin check shared past first page 0
-QPDF opt flatten array scalar 0
-QPDF opt flatten dict scalar 0
+QPDFWriter flatten array null 0
 main QTest implicit 0
 main QTest indirect 1
 main QTest null 0
@@ -244,3 +243,4 @@ QPDFWriter extra header text no newline 0
 QPDFWriter extra header text add newline 0
 QPDF bogus 0 offset 0
 QPDF global offset 0
+QPDF make stream key direct 0

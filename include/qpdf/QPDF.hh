@@ -352,23 +352,7 @@ class QPDF
     void optimize(std::map<int, int> const& object_stream_data,
 		  bool allow_changes = true);
 
-    // Replace all references to indirect objects that are "scalars"
-    // (i.e., things that don't have children: not arrays, streams, or
-    // dictionaries) with direct objects.
-    QPDF_DLL
-    void flattenScalarReferences();
-
-    // Decode all streams, discarding the output.  Used to check
-    // correctness of stream encoding.
-    QPDF_DLL
-    void decodeStreams();
-
     // For QPDFWriter:
-
-    // Remove /ID, /Encrypt, and /Prev keys from the trailer
-    // dictionary since these are regenerated during write.
-    QPDF_DLL
-    void trimTrailerForWrite();
 
     // Get lists of all objects in order according to the part of a
     // linearized file that they belong to.

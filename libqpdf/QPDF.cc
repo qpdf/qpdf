@@ -1860,28 +1860,6 @@ QPDF::swapObjects(int objid1, int generation1, int objid2, int generation2)
     this->obj_cache[og2] = t;
 }
 
-void
-QPDF::trimTrailerForWrite()
-{
-    // Note that removing the encryption dictionary does not interfere
-    // with reading encrypted files.  QPDF loads all the information
-    // it needs from the encryption dictionary at the beginning and
-    // never looks at it again.
-    this->trailer.removeKey("/ID");
-    this->trailer.removeKey("/Encrypt");
-    this->trailer.removeKey("/Prev");
-
-    // Remove all trailer keys that potentially come from a
-    // cross-reference stream
-    this->trailer.removeKey("/Index");
-    this->trailer.removeKey("/W");
-    this->trailer.removeKey("/Length");
-    this->trailer.removeKey("/Filter");
-    this->trailer.removeKey("/DecodeParms");
-    this->trailer.removeKey("/Type");
-    this->trailer.removeKey("/XRefStm");
-}
-
 std::string
 QPDF::getFilename() const
 {
@@ -2066,21 +2044,4 @@ QPDF::pipeStreamData(int objid, int generation,
 		     QUtil::int_to_string(generation) + ": " + e.what()));
     }
     pipeline->finish();
-}
-
-void
-QPDF::decodeStreams()
-{
-    for (std::map<ObjGen, QPDFXRefEntry>::iterator iter =
-	     this->xref_table.begin();
-	 iter != this->xref_table.end(); ++iter)
-    {
-	ObjGen const& og = (*iter).first;
-	QPDFObjectHandle obj = getObjectByID(og.obj, og.gen);
-	if (obj.isStream())
-	{
-	    Pl_Discard pl;
-	    obj.pipeStreamData(&pl, true, false, false);
-	}
-    }
 }

@@ -18,7 +18,7 @@ endobj
     <01020300040560>
     (AB)
   ]
-  /indirect (hello)
+  /indirect 4 0 R
   /nesting <<
     /a [
       1
@@ -58,17 +58,22 @@ endobj
 <<
   /Count 1
   /Kids [
-    4 0 R
+    5 0 R
   ]
   /Type /Pages
 >>
 endobj
 
+%% Original object ID: 8 0
+4 0 obj
+(hello)
+endobj
+
 %% Page 1
 %% Original object ID: 3 0
-4 0 obj
+5 0 obj
 <<
-  /Contents 5 0 R
+  /Contents 6 0 R
   /MediaBox [
     0
     0
@@ -78,9 +83,9 @@ endobj
   /Parent 3 0 R
   /Resources <<
     /Font <<
-      /F1 7 0 R
+      /F1 8 0 R
     >>
-    /ProcSet 8 0 R
+    /ProcSet 9 0 R
   >>
   /Type /Page
 >>
@@ -88,9 +93,9 @@ endobj
 
 %% Contents for page 1
 %% Original object ID: 4 0
-5 0 obj
+6 0 obj
 <<
-  /Length 6 0 R
+  /Length 7 0 R
 >>
 stream
 BT
@@ -101,12 +106,12 @@ ET
 endstream
 endobj
 
-6 0 obj
+7 0 obj
 44
 endobj
 
 %% Original object ID: 6 0
-7 0 obj
+8 0 obj
 <<
   /BaseFont /Helvetica
   /Encoding /WinAnsiEncoding
@@ -117,7 +122,7 @@ endobj
 endobj
 
 %% Original object ID: 5 0
-8 0 obj
+9 0 obj
 [
   /PDF
   /Text
@@ -125,22 +130,23 @@ endobj
 endobj
 
 xref
-0 9
+0 10
 0000000000 65535 f 
 0000000052 00000 n 
 0000000133 00000 n 
-0000000578 00000 n 
-0000000687 00000 n 
-0000000929 00000 n 
-0000001028 00000 n 
-0000001074 00000 n 
-0000001219 00000 n 
+0000000576 00000 n 
+0000000675 00000 n 
+0000000736 00000 n 
+0000000978 00000 n 
+0000001077 00000 n 
+0000001123 00000 n 
+0000001268 00000 n 
 trailer <<
   /QTest 2 0 R
   /Root 1 0 R
-  /Size 9
+  /Size 10
   /ID [<31415926535897932384626433832795><31415926535897932384626433832795>]
 >>
 startxref
-1254
+1303
 %%EOF

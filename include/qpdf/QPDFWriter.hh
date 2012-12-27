@@ -299,6 +299,7 @@ class QPDFWriter
     void setDataKey(int objid);
     int openObject(int objid = 0);
     void closeObject(int objid);
+    void prepareFileForWrite();
     void writeStandard();
     void writeLinearized();
     void enqueuePart(std::vector<QPDFObjectHandle>& part);

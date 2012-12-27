@@ -834,16 +834,6 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
 	{
 	    // This is a place-holder object for an object stream
 	}
-	else if (object.isScalar())
-	{
-	    // flattenScalarReferences is supposed to have removed all
-	    // indirect scalars.
-	    throw std::logic_error(
-		"INTERNAL ERROR: QPDFWriter::enqueueObject: indirect scalar: " +
-		std::string(this->filename) + " " +
-		QUtil::int_to_string(object.getObjectID()) + " " +
-		QUtil::int_to_string(object.getGeneration()));
-	}
 	int objid = object.getObjectID();
 
 	if (obj_renumber.count(objid) == 0)
@@ -916,15 +906,6 @@ QPDFWriter::unparseChild(QPDFObjectHandle child, int level, int flags)
     }
     if (child.isIndirect())
     {
-	if (child.isScalar())
-	{
-	    // flattenScalarReferences is supposed to have removed all
-	    // indirect scalars.
-	    throw std::logic_error(
-		"INTERNAL ERROR: QPDFWriter::unparseChild: indirect scalar: " +
-		QUtil::int_to_string(child.getObjectID()) + " " +
-		QUtil::int_to_string(child.getGeneration()));
-	}
 	int old_id = child.getObjectID();
 	int new_id = obj_renumber[old_id];
 	writeString(QUtil::int_to_string(new_id));
@@ -1648,6 +1629,117 @@ QPDFWriter::generateObjectStreams()
 }
 
 void
+QPDFWriter::prepareFileForWrite()
+{
+    // Remove keys from the trailer that necessarily have to be
+    // replaced when writing the file.
+
+    QPDFObjectHandle trailer = pdf.getTrailer();
+
+    // Note that removing the encryption dictionary does not interfere
+    // with reading encrypted files.  QPDF loads all the information
+    // it needs from the encryption dictionary at the beginning and
+    // never looks at it again.
+    trailer.removeKey("/ID");
+    trailer.removeKey("/Encrypt");
+    trailer.removeKey("/Prev");
+
+    // Remove all trailer keys that potentially come from a
+    // cross-reference stream
+    trailer.removeKey("/Index");
+    trailer.removeKey("/W");
+    trailer.removeKey("/Length");
+    trailer.removeKey("/Filter");
+    trailer.removeKey("/DecodeParms");
+    trailer.removeKey("/Type");
+    trailer.removeKey("/XRefStm");
+
+    // Do a traversal of the entire PDF file structure replacing all
+    // indirect objects that QPDFWriter wants to be direct.  This
+    // includes stream lengths, stream filtering parameters, and
+    // document extension level information.  Also replace all
+    // indirect null references with direct nulls.  This way, the only
+    // indirect nulls queued for output will be object stream place
+    // holders.
+
+    std::list<QPDFObjectHandle> queue;
+    queue.push_back(pdf.getTrailer());
+    std::set<int> visited;
+
+    while (! queue.empty())
+    {
+	QPDFObjectHandle node = queue.front();
+	queue.pop_front();
+	if (node.isIndirect())
+	{
+	    if (visited.count(node.getObjectID()) > 0)
+	    {
+		continue;
+	    }
+	    visited.insert(node.getObjectID());
+	}
+
+	if (node.isArray())
+	{
+	    int nitems = node.getArrayNItems();
+	    for (int i = 0; i < nitems; ++i)
+	    {
+		QPDFObjectHandle oh = node.getArrayItem(i);
+                if (oh.isIndirect() && oh.isNull())
+                {
+                    QTC::TC("qpdf", "QPDFWriter flatten array null");
+                    oh.makeDirect();
+                    node.setArrayItem(i, oh);
+                }
+		else if (! oh.isScalar())
+		{
+		    queue.push_back(oh);
+		}
+	    }
+	}
+	else if (node.isDictionary() || node.isStream())
+	{
+            bool is_stream = false;
+	    QPDFObjectHandle dict = node;
+	    if (node.isStream())
+	    {
+                is_stream = true;
+		dict = node.getDict();
+	    }
+
+	    std::set<std::string> keys = dict.getKeys();
+	    for (std::set<std::string>::iterator iter = keys.begin();
+		 iter != keys.end(); ++iter)
+	    {
+		std::string const& key = *iter;
+		QPDFObjectHandle oh = dict.getKey(key);
+                bool add_to_queue = true;
+                if (oh.isIndirect())
+                {
+                    if (is_stream)
+                    {
+                        if ((key == "/Length") ||
+                            (key == "/Filter") ||
+                            (key == "/DecodeParms"))
+                        {
+                            QTC::TC("qpdf", "QPDF make stream key direct");
+                            add_to_queue = false;
+                            oh.makeDirect();
+                            dict.replaceKey(key, oh);
+                        }
+                    }
+                }
+
+                if (add_to_queue)
+                {
+                    queue.push_back(oh);
+		}
+	    }
+	}
+    }
+}
+
+void
 QPDFWriter::write()
 {
     // Do preliminary setup
@@ -1785,8 +1877,7 @@ QPDFWriter::write()
 
     generateID();
 
-    pdf.trimTrailerForWrite();
-    pdf.flattenScalarReferences();
+    prepareFileForWrite();
 
     if (this->linearized)
     {

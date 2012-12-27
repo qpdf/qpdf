@@ -1,3 +1,21 @@
+2012-12-27  Jay Berkenbilt  <ejb@ql.org>
+
+	* Removed public method QPDF::flattenScalarReferences.  Instead,
+	just flatten the scalar references we actually need to flatten.
+	Flattening scalar references was a wrong decision years ago and
+	has occasionally caused other problems, among which were that it
+	caused qpdf to visit otherwise unreferenced and possibly erroneous
+	objects in the file when it didn't have to.
+
+	* Removed public method QPDF::decodeStreams which was previously
+	used by qpdf --check but is no longer used.  The decodeStreams
+	method could generate false positives since it would attempt to
+	access all objects in the file including those that were not
+	referenced.
+
+	* Removed public method QPDF::trimTrailerForWrite, which was only
+	intended for use by QPDFWriter and which is no longer used.
+
 2012-12-25  Jay Berkenbilt  <ejb@ql.org>
 
 	* Allow PDF header to appear anywhere in the first 1024 bytes of

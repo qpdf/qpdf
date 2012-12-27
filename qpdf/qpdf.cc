@@ -8,6 +8,7 @@
 #include <qpdf/QUtil.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/Pl_StdioFile.hh>
+#include <qpdf/Pl_Discard.hh>
 #include <qpdf/PointerHolder.hh>
 
 #include <qpdf/QPDF.hh>
@@ -1381,12 +1382,14 @@ int main(int argc, char* argv[])
 		    else
 		    {
 			std::cout << "File is not linearized\n";
-			// calling flattenScalarReferences causes full
-			// traversal of file, so any structural errors
-			// would be exposed.
-			pdf.flattenScalarReferences();
-			// Also explicitly decode all streams.
-			pdf.decodeStreams();
+                        // Write the file no nowhere, uncompressing
+                        // streams.  This causes full file traversal
+                        // and decoding of all streams we can decode.
+                        QPDFWriter w(pdf);
+                        Pl_Discard discard;
+                        w.setOutputPipeline(&discard);
+                        w.setStreamDataMode(qpdf_s_uncompress);
+                        w.write();
 			okay = true;
 		    }
 		}

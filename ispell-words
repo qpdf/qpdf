@@ -206,7 +206,6 @@ debian
 declspec
 DecodeParms
 decodeRow
-decodeStreams
 decrypt
 decrypted
 decrypter
@@ -335,7 +334,6 @@ fl
 flate
 FlateDecode
 flattenPagesTree
-flattenScalarReferences
 fn
 fname
 fo

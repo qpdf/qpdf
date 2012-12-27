@@ -59,103 +59,6 @@ QPDF::ObjUser::operator<(ObjUser const& rhs) const
 }
 
 void
-QPDF::flattenScalarReferences()
-{
-    // Do a traversal of the entire PDF file structure replacing all
-    // indirect objects that are not arrays, streams, or dictionaries
-    // with direct objects.
-
-    std::list<QPDFObjectHandle> queue;
-    queue.push_back(this->trailer);
-    std::set<ObjGen> visited;
-
-    // Add every object in the xref table to the queue.  This ensures
-    // that we flatten scalar references in unreferenced objects.
-    // This becomes important if we are preserving object streams in a
-    // file that has unreferenced objects in its object streams.  (See
-    // QPDF bug 2974522 at SourceForge.)
-    for (std::map<ObjGen, QPDFXRefEntry>::iterator iter =
-	     this->xref_table.begin();
-	 iter != this->xref_table.end(); ++iter)
-    {
-	ObjGen const& og = (*iter).first;
-	queue.push_back(getObjectByID(og.obj, og.gen));
-    }
-
-    while (! queue.empty())
-    {
-	QPDFObjectHandle node = queue.front();
-	queue.pop_front();
-	if (node.isIndirect())
-	{
-	    ObjGen og(node.getObjectID(), node.getGeneration());
-	    if (visited.count(og) > 0)
-	    {
-		continue;
-	    }
-	    visited.insert(og);
-	}
-
-	if (node.isArray())
-	{
-	    int nitems = node.getArrayNItems();
-	    for (int i = 0; i < nitems; ++i)
-	    {
-		QPDFObjectHandle oh = node.getArrayItem(i);
-		if (oh.isScalar())
-		{
-		    if (oh.isIndirect())
-		    {
-			QTC::TC("qpdf", "QPDF opt flatten array scalar");
-			oh.makeDirect();
-			node.setArrayItem(i, oh);
-		    }
-		}
-		else
-		{
-		    queue.push_back(oh);
-		}
-	    }
-	}
-	else if (node.isDictionary() || node.isStream())
-	{
-	    QPDFObjectHandle dict = node;
-	    if (node.isStream())
-	    {
-		dict = node.getDict();
-	    }
-	    std::set<std::string> keys = dict.getKeys();
-	    for (std::set<std::string>::iterator iter = keys.begin();
-		 iter != keys.end(); ++iter)
-	    {
-		std::string const& key = *iter;
-		QPDFObjectHandle oh = dict.getKey(key);
-		if (oh.isNull())
-		{
-		    // QPDF_Dictionary.getKeys() never returns null
-		    // keys.
-		    throw std::logic_error(
-			"INTERNAL ERROR: dictionary with null key found");
-		}
-		else if (oh.isScalar())
-		{
-		    if (oh.isIndirect())
-		    {
-			QTC::TC("qpdf", "QPDF opt flatten dict scalar");
-			oh.makeDirect();
-			dict.replaceKey(key, oh);
-		    }
-		}
-		else
-		{
-		    queue.push_back(oh);
-		}
-	    }
-	}
-    }
-}
-
-void
 QPDF::optimize(std::map<int, int> const& object_stream_data,
 	       bool allow_changes)
 {
@@ -304,9 +207,7 @@ QPDF::pushInheritedAttributesToPageInternal(
 		    }
 		    else
 		    {
-			// Don't defeat flattenScalarReferences which
-			// would have already been called by this
-			// time.
+			// It's okay to copy scalars.
 			QTC::TC("qpdf", "QPDF opt inherited scalar");
 		    }
 		}
