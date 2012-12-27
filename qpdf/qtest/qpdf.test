@@ -1136,9 +1136,15 @@ foreach my $base (@to_linearize)
     foreach my $omode (qw(disable preserve generate))
     {
 	my $oarg = "-object-streams=$omode";
+        my $sdarg = "";
+        if (($base eq 'lin-special') || ($base eq 'object-stream'))
+        {
+            $sdarg = "--stream-data=uncompress";
+        }
 	$td->runtest("linearize $base ($omode)",
 		     {$td->COMMAND =>
-			  "qpdf -linearize $oarg --static-id $base.pdf a.pdf"},
+			  "qpdf -linearize $oarg $sdarg" .
+                          " --static-id $base.pdf a.pdf"},
 		     {$td->STRING => "",
 		      $td->EXIT_STATUS => 0});
 	$td->runtest("check linearization",
@@ -1155,12 +1161,12 @@ foreach my $base (@to_linearize)
 	# the table values.
 	$td->runtest("relinearize $base 1",
 		     {$td->COMMAND =>
-			  "qpdf -linearize --static-id a.pdf b.pdf"},
+			  "qpdf -linearize $sdarg --static-id a.pdf b.pdf"},
 		     {$td->STRING => "",
 		      $td->EXIT_STATUS => 0});
 	$td->runtest("relinearize $base 2",
 		     {$td->COMMAND =>
-			  "qpdf -linearize --static-id b.pdf c.pdf"},
+			  "qpdf -linearize $sdarg --static-id b.pdf c.pdf"},
 		     {$td->STRING => "",
 		      $td->EXIT_STATUS => 0});
 	$td->runtest("compare files ($omode)",
