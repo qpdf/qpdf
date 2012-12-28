@@ -88,6 +88,23 @@ void runtest(int n, char const* filename1, char const* filename2)
     // the test suite to see how the test is invoked to find the file
     // that the test is supposed to operate on.
 
+    if (n == 0)
+    {
+        // Throw in some random test cases that don't fit anywhere
+        // else.  This is in addition to whatever else is going on in
+        // test 0.
+
+        // The code to trim user passwords looks for 0x28 (which is
+        // "(") since it marks the beginning of the padding.  Exercise
+        // the code to make sure it skips over 0x28 characters that
+        // aren't part of padding.
+        std::string password(
+            "1234567890123456789012(45678\x28\xbf\x4e\x5e");
+        assert(password.length() == 32);
+        QPDF::trim_user_password(password);
+        assert(password == "1234567890123456789012(45678");
+    }
+
     QPDF pdf;
     PointerHolder<char> file_buf;
     FILE* filep = 0;

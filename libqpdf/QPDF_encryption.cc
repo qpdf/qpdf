@@ -141,14 +141,20 @@ QPDF::trim_user_password(std::string& user_password)
 	return;
     }
 
-    char const* p = 0;
-    while ((p = strchr(cstr, '\x28')) != 0)
+    char const* p1 = cstr;
+    char const* p2 = 0;
+    while ((p2 = strchr(p1, '\x28')) != 0)
     {
-	if (memcmp(p, padding_string, len - (p - cstr)) == 0)
+	if (memcmp(p2, padding_string, len - (p2 - cstr)) == 0)
 	{
-	    user_password = user_password.substr(0, p - cstr);
+	    user_password = user_password.substr(0, p2 - cstr);
 	    return;
 	}
+        else
+        {
+            QTC::TC("qpdf", "QPDF_encryption skip 0x28");
+            p1 = p2 + 1;
+        }
     }
 }
 
