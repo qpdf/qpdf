@@ -333,3 +333,42 @@ QUtil::toUTF8(unsigned long uval)
 
     return result;
 }
+
+long
+QUtil::random()
+{
+    static bool seeded_random = false;
+    if (! seeded_random)
+    {
+	// Seed the random number generator with something simple, but
+	// just to be interesting, don't use the unmodified current
+	// time....
+        QUtil::srandom((int)QUtil::get_current_time() ^ 0xcccc);
+	seeded_random = true;
+    }
+
+#ifdef HAVE_RANDOM
+    return ::random();
+#else
+    return rand();
+#endif
+}
+
+void
+QUtil::srandom(unsigned int seed)
+{
+#ifdef HAVE_RANDOM
+    ::srandom(seed);
+#else
+    srand(seed);
+#endif
+}
+
+void
+QUtil::initializeWithRandomBytes(unsigned char* data, size_t len)
+{
+    for (size_t i = 0; i < len; ++i)
+    {
+        data[i] = (unsigned char)((QUtil::random() & 0xff0) >> 4);
+    }
+}

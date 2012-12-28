@@ -6,11 +6,6 @@
 #include <qpdf/rijndael.h>
 #include <string>
 #include <stdlib.h>
-#include <qpdf/qpdf-config.h>
-#ifndef HAVE_RANDOM
-# define random rand
-# define srandom srand
-#endif
 
 bool Pl_AES_PDF::use_static_iv = false;
 
@@ -155,15 +150,6 @@ Pl_AES_PDF::finish()
 void
 Pl_AES_PDF::initializeVector()
 {
-    static bool seeded_random = false;
-    if (! seeded_random)
-    {
-	// Seed the random number generator with something simple, but
-	// just to be interesting, don't use the unmodified current
-	// time....
-	srandom((int)QUtil::get_current_time() ^ 0xcccc);
-	seeded_random = true;
-    }
     if (use_zero_iv)
     {
 	for (unsigned int i = 0; i < this->buf_size; ++i)
@@ -184,10 +170,7 @@ Pl_AES_PDF::initializeVector()
     }
     else
     {
-	for (unsigned int i = 0; i < this->buf_size; ++i)
-	{
-	    this->cbc_block[i] = (unsigned char)((random() & 0xff0) >> 4);
-	}
+        QUtil::initializeWithRandomBytes(this->cbc_block, this->buf_size);
     }
 }
 
