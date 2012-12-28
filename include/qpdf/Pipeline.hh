@@ -44,7 +44,13 @@ class Pipeline
 
     // Subclasses should implement write and finish to do their jobs
     // and then, if they are not end-of-line pipelines, call
-    // getNext()->write or getNext()->finish.
+    // getNext()->write or getNext()->finish.  It would be really nice
+    // if write could take unsigned char const*, but this would make
+    // it much more difficult to write pipelines around legacy
+    // interfaces whose calls don't want pointers to const data.  As a
+    // rule, pipelines should generally not be modifying the data
+    // passed to them.  They should, instead, create new data to pass
+    // downstream.
     QPDF_DLL
     virtual void write(unsigned char* data, size_t len) = 0;
     QPDF_DLL
