@@ -8,52 +8,86 @@
 
 static void usage()
 {
-    std::cerr << "Usage: aes [+-]cbc { -encrypt | -decrypt }"
-	      << " hex-key infile outfile" << std::endl;
+    std::cerr << "Usage: aes options hex-key infile outfile" << std::endl
+              << "  -cbc         -- disable CBC mode" << std::endl
+              << "  +cbc         -- enable CBC mode" << std::endl
+              << "  -encrypt     -- encrypt" << std::endl
+              << "  -decrypt     -- decrypt CBC mode" << std::endl
+              << "  -zero-iv     -- use zero initialization vector" << std::endl
+              << "  -static-iv   -- use static initialization vector" << std::endl
+              << "  -no-padding  -- disable padding" << std::endl
+              << "Options must precede key and file names." << std::endl;
     exit(2);
 }
 
 int main(int argc, char* argv[])
 {
-    if (argc != 6)
-    {
-	usage();
-   }
-
-    char* cbc = argv[1];
-    char* action = argv[2];
-    char* hexkey = argv[3];
-    char* infilename = argv[4];
-    char* outfilename = argv[5];
-
-    bool cbc_mode = true;
-    if (strcmp(cbc, "-cbc") == 0)
-    {
-	cbc_mode = false;
-    }
-    else if (strcmp(cbc, "+cbc") != 0)
-    {
-	usage();
-    }
-
     bool encrypt = true;
-    if (strcmp(action, "-decrypt") == 0)
+    bool cbc_mode = true;
+    char* hexkey = 0;
+    char* infilename = 0;
+    char* outfilename = 0;
+    bool zero_iv = false;
+    bool static_iv = false;
+    bool disable_padding = false;
+
+    for (int i = 1; i < argc; ++i)
     {
-	encrypt = false;
+        char* arg = argv[i];
+        if ((arg[0] == '-') || (arg[0] == '+'))
+        {
+            if (strcmp(arg, "-cbc") == 0)
+            {
+                cbc_mode = false;
+            }
+            else if (strcmp(arg, "+cbc") == 0)
+            {
+                cbc_mode = true;
+            }
+            else if (strcmp(arg, "-decrypt") == 0)
+            {
+                encrypt = false;
+            }
+            else if (strcmp(arg, "-encrypt") == 0)
+            {
+                encrypt = true;
+            }
+            else if (strcmp(arg, "-zero-iv") == 0)
+            {
+                zero_iv = true;
+            }
+            else if (strcmp(arg, "-static-iv") == 0)
+            {
+                static_iv = true;
+            }
+            else if (strcmp(arg, "-no-padding") == 0)
+            {
+                disable_padding = true;
+            }
+            else
+            {
+                usage();
+            }
+        }
+        else if (argc == i + 3)
+        {
+            hexkey = argv[i];
+            infilename = argv[i+1];
+            outfilename = argv[i+2];
+            break;
+        }
+        else
+        {
+            usage();
+        }
     }
-    else if (strcmp(action, "-encrypt") != 0)
+    if (outfilename == 0)
     {
-	usage();
+        usage();
     }
 
     unsigned int hexkeylen = (unsigned int)strlen(hexkey);
     unsigned int keylen = hexkeylen / 2;
-    if (keylen != Pl_AES_PDF::key_size)
-    {
-	std::cerr << "key length must be " << Pl_AES_PDF::key_size
-		  << " bytes" << std::endl;
-	exit(2);
-    }
 
     FILE* infile = fopen(infilename, "rb");
     if (infile == 0)
@@ -69,7 +103,7 @@ int main(int argc, char* argv[])
 	exit(2);
     }
 
-    unsigned char key[Pl_AES_PDF::key_size];
+    unsigned char* key = new unsigned char[keylen];
     for (unsigned int i = 0; i < strlen(hexkey); i += 2)
     {
 	char t[3];
@@ -82,10 +116,24 @@ int main(int argc, char* argv[])
     }
 
     Pl_StdioFile* out = new Pl_StdioFile("stdout", outfile);
-    Pl_AES_PDF* aes = new Pl_AES_PDF("aes_128_cbc", out, encrypt, key);
+    Pl_AES_PDF* aes = new Pl_AES_PDF("aes_128_cbc", out, encrypt, key, keylen);
+    delete [] key;
+    key = 0;
     if (! cbc_mode)
     {
 	aes->disableCBC();
+    }
+    if (zero_iv)
+    {
+        aes->useZeroIV();
+    }
+    else if (static_iv)
+    {
+        aes->useStaticIV();
+    }
+    if (disable_padding)
+    {
+        aes->disablePadding();
     }
 
     // 16 < buffer size, buffer_size is not a multiple of 8 for testing

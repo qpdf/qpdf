@@ -674,10 +674,10 @@ QPDF::decryptString(std::string& str, int objid, int generation)
 	if (use_aes)
 	{
 	    QTC::TC("qpdf", "QPDF_encryption aes decode string");
-	    assert(key.length() == Pl_AES_PDF::key_size);
 	    Pl_Buffer bufpl("decrypted string");
 	    Pl_AES_PDF pl("aes decrypt string", &bufpl, false,
-			  (unsigned char const*)key.c_str());
+			  (unsigned char const*)key.c_str(),
+                          (unsigned int)key.length());
 	    pl.write((unsigned char*)str.c_str(), str.length());
 	    pl.finish();
 	    PointerHolder<Buffer> buf = bufpl.getBuffer();
@@ -794,15 +794,16 @@ QPDF::decryptStream(Pipeline*& pipeline, int objid, int generation,
     if (use_aes)
     {
 	QTC::TC("qpdf", "QPDF_encryption aes decode stream");
-	assert(key.length() == Pl_AES_PDF::key_size);
 	pipeline = new Pl_AES_PDF("AES stream decryption", pipeline,
-				  false, (unsigned char*) key.c_str());
+				  false, (unsigned char*) key.c_str(),
+                                  (unsigned int) key.length());
     }
     else
     {
 	QTC::TC("qpdf", "QPDF_encryption rc4 decode stream");
 	pipeline = new Pl_RC4("RC4 stream decryption", pipeline,
-			      (unsigned char*) key.c_str(), (int)key.length());
+			      (unsigned char*) key.c_str(),
+                              (unsigned int) key.length());
     }
     heap.push_back(pipeline);
 }

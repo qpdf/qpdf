@@ -15,19 +15,24 @@
 bool Pl_AES_PDF::use_static_iv = false;
 
 Pl_AES_PDF::Pl_AES_PDF(char const* identifier, Pipeline* next,
-		       bool encrypt, unsigned char const key[key_size]) :
+		       bool encrypt, unsigned char const* key,
+                       unsigned int key_bytes) :
     Pipeline(identifier, next),
     encrypt(encrypt),
     cbc_mode(true),
     first(true),
     offset(0),
-    nrounds(0)
+    nrounds(0),
+    use_zero_iv(false),
+    disable_padding(false)
 {
-    static int const keybits = 128;
-    assert(key_size == KEYLENGTH(keybits));
-    assert(sizeof(this->rk) / sizeof(uint32_t) == RKLENGTH(keybits));
-    std::memcpy(this->key, key, key_size);
-    std::memset(this->rk, 0, sizeof(this->rk));
+    unsigned int keybits = 8 * key_bytes;
+    assert(key_bytes == KEYLENGTH(keybits));
+    this->key = new unsigned char[key_bytes];
+    this->rk = new uint32_t[RKLENGTH(keybits)];
+    unsigned int rk_bytes = RKLENGTH(keybits) * sizeof(uint32_t);
+    std::memcpy(this->key, key, key_bytes);
+    std::memset(this->rk, 0, rk_bytes);
     std::memset(this->inbuf, 0, this->buf_size);
     std::memset(this->outbuf, 0, this->buf_size);
     std::memset(this->cbc_block, 0, this->buf_size);
@@ -44,7 +49,20 @@ Pl_AES_PDF::Pl_AES_PDF(char const* identifier, Pipeline* next,
 
 Pl_AES_PDF::~Pl_AES_PDF()
 {
-    // nothing needed
+    delete [] this->key;
+    delete [] this->rk;
+}
+
+void
+Pl_AES_PDF::useZeroIV()
+{
+    this->use_zero_iv = true;
+}
+
+void
+Pl_AES_PDF::disablePadding()
+{
+    this->disable_padding = true;
 }
 
 void
@@ -90,13 +108,16 @@ Pl_AES_PDF::finish()
 	{
 	    flush(false);
 	}
-	// Pad as described in section 3.5.1 of version 1.7 of the PDF
-	// specification, including providing an entire block of padding
-	// if the input was a multiple of 16 bytes.
-	unsigned char pad = (unsigned char) (this->buf_size - this->offset);
-	memset(this->inbuf + this->offset, pad, pad);
-	this->offset = this->buf_size;
-	flush(false);
+        if (! this->disable_padding)
+        {
+            // Pad as described in section 3.5.1 of version 1.7 of the PDF
+            // specification, including providing an entire block of padding
+            // if the input was a multiple of 16 bytes.
+            unsigned char pad = (unsigned char) (this->buf_size - this->offset);
+            memset(this->inbuf + this->offset, pad, pad);
+            this->offset = this->buf_size;
+            flush(false);
+        }
     }
     else
     {
@@ -112,7 +133,7 @@ Pl_AES_PDF::finish()
 			this->buf_size - this->offset);
 	    this->offset = this->buf_size;
 	}
-	flush(true);
+	flush(! this->disable_padding);
     }
     getNext()->finish();
 }
@@ -136,6 +157,13 @@ Pl_AES_PDF::initializeVector()
 	    this->cbc_block[i] = 14 * (1 + i);
 	}
     }
+    else if (use_zero_iv)
+    {
+	for (unsigned int i = 0; i < this->buf_size; ++i)
+	{
+	    this->cbc_block[i] = 0;
+	}
+    }
     else
     {
 	for (unsigned int i = 0; i < this->buf_size; ++i)
@@ -157,12 +185,21 @@ Pl_AES_PDF::flush(bool strip_padding)
 	{
 	    if (encrypt)
 	    {
-		// Set cbc_block to a random initialization vector and
-		// write it to the output stream
+		// Set cbc_block to the initialization vector, and if
+		// not zero, write it to the output stream.
 		initializeVector();
-		getNext()->write(this->cbc_block, this->buf_size);
+                if (! this->use_zero_iv)
+                {
+                    getNext()->write(this->cbc_block, this->buf_size);
+                }
 	    }
-	    else
+	    else if (this->use_zero_iv)
+            {
+                // Initialize vector with zeroes; zero vector was not
+                // written to the beginning of the input file.
+                initializeVector();
+            }
+            else
 	    {
 		// Take the first block of input as the initialization
 		// vector.  There's nothing to write at this time.

@@ -7,17 +7,16 @@
 # include <stdint.h>
 #endif
 
-// This pipeline implements AES-128 with CBC and block padding as
-// specified in the PDF specification.
+// This pipeline implements AES-128 and AES-256 with CBC and block
+// padding as specified in the PDF specification.
 
 class Pl_AES_PDF: public Pipeline
 {
   public:
-    // key_data should be a pointer to key_size bytes of data
-    static unsigned int const key_size = 16;
     QPDF_DLL
+    // key should be a pointer to key_bytes bytes of data
     Pl_AES_PDF(char const* identifier, Pipeline* next,
-	       bool encrypt, unsigned char const key[key_size]);
+	       bool encrypt, unsigned char const* key, unsigned int key_bytes);
     QPDF_DLL
     virtual ~Pl_AES_PDF();
 
@@ -25,6 +24,13 @@ class Pl_AES_PDF: public Pipeline
     virtual void write(unsigned char* data, size_t len);
     QPDF_DLL
     virtual void finish();
+
+    // Use zero initialization vector; needed for AESV3
+    QPDF_DLL
+    void useZeroIV();
+    // Disable padding; needed for AESV3
+    QPDF_DLL
+    void disablePadding();
 
     // For testing only; PDF always uses CBC
     QPDF_DLL
@@ -44,12 +50,14 @@ class Pl_AES_PDF: public Pipeline
     bool cbc_mode;
     bool first;
     size_t offset;              // offset into memory buffer
-    unsigned char key[key_size];
-    uint32_t rk[key_size + 28];
+    unsigned char* key;
+    uint32_t* rk;
     unsigned char inbuf[buf_size];
     unsigned char outbuf[buf_size];
     unsigned char cbc_block[buf_size];
     unsigned int nrounds;
+    bool use_zero_iv;
+    bool disable_padding;
 };
 
 #endif // __PL_AES_PDF_HH__

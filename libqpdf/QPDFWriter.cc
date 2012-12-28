@@ -815,13 +815,14 @@ QPDFWriter::pushEncryptionFilter()
 	{
 	    p = new Pl_AES_PDF(
 		"aes stream encryption", this->pipeline, true,
-		(unsigned char*) this->cur_data_key.c_str());
+		(unsigned char*) this->cur_data_key.c_str(),
+                (unsigned int)this->cur_data_key.length());
 	}
 	else
 	{
 	    p = new Pl_RC4("rc4 stream encryption", this->pipeline,
 			   (unsigned char*) this->cur_data_key.c_str(),
-			   (int)this->cur_data_key.length());
+			   (unsigned int)this->cur_data_key.length());
 	}
 	pushPipeline(p);
     }
@@ -1415,7 +1416,8 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	    {
 		Pl_Buffer bufpl("encrypted string");
 		Pl_AES_PDF pl("aes encrypt string", &bufpl, true,
-			      (unsigned char const*)this->cur_data_key.c_str());
+			      (unsigned char const*)this->cur_data_key.c_str(),
+                              (unsigned int)this->cur_data_key.length());
 		pl.write((unsigned char*) val.c_str(), val.length());
 		pl.finish();
 		Buffer* buf = bufpl.getBuffer();
