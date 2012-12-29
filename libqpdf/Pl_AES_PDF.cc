@@ -24,6 +24,7 @@ Pl_AES_PDF::Pl_AES_PDF(char const* identifier, Pipeline* next,
     offset(0),
     nrounds(0),
     use_zero_iv(false),
+    use_specified_iv(false),
     disable_padding(false)
 {
     unsigned int keybits = 8 * key_bytes;
@@ -63,6 +64,19 @@ void
 Pl_AES_PDF::disablePadding()
 {
     this->disable_padding = true;
+}
+
+void
+Pl_AES_PDF::setIV(unsigned char const* iv, size_t bytes)
+{
+    if (bytes != this->buf_size)
+    {
+        throw std::logic_error(
+            "Pl_AES_PDF: specified initialization vector"
+            " size in bytes must be " + QUtil::int_to_string(bytes));
+    }
+    this->use_specified_iv = true;
+    memcpy(this->specified_iv, iv, bytes);
 }
 
 void
@@ -150,18 +164,22 @@ Pl_AES_PDF::initializeVector()
 	srandom((int)QUtil::get_current_time() ^ 0xcccc);
 	seeded_random = true;
     }
-    if (use_static_iv)
-    {
-	for (unsigned int i = 0; i < this->buf_size; ++i)
-	{
-	    this->cbc_block[i] = 14 * (1 + i);
-	}
-    }
-    else if (use_zero_iv)
+    if (use_zero_iv)
     {
 	for (unsigned int i = 0; i < this->buf_size; ++i)
 	{
 	    this->cbc_block[i] = 0;
+	}
+    }
+    else if (use_specified_iv)
+    {
+        std::memcpy(this->cbc_block, this->specified_iv, this->buf_size);
+    }
+    else if (use_static_iv)
+    {
+	for (unsigned int i = 0; i < this->buf_size; ++i)
+	{
+	    this->cbc_block[i] = 14 * (1 + i);
 	}
     }
     else
@@ -188,12 +206,12 @@ Pl_AES_PDF::flush(bool strip_padding)
 		// Set cbc_block to the initialization vector, and if
 		// not zero, write it to the output stream.
 		initializeVector();
-                if (! this->use_zero_iv)
+                if (! (this->use_zero_iv || this->use_specified_iv))
                 {
                     getNext()->write(this->cbc_block, this->buf_size);
                 }
 	    }
-	    else if (this->use_zero_iv)
+	    else if (this->use_zero_iv || this->use_specified_iv)
             {
                 // Initialize vector with zeroes; zero vector was not
                 // written to the beginning of the input file.

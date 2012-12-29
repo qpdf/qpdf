@@ -31,6 +31,10 @@ class Pl_AES_PDF: public Pipeline
     // Disable padding; needed for AESV3
     QPDF_DLL
     void disablePadding();
+    // Specify an initialization vector, which will not be included in
+    // the output.
+    QPDF_DLL
+    void setIV(unsigned char const* iv, size_t bytes);
 
     // For testing only; PDF always uses CBC
     QPDF_DLL
@@ -55,8 +59,10 @@ class Pl_AES_PDF: public Pipeline
     unsigned char inbuf[buf_size];
     unsigned char outbuf[buf_size];
     unsigned char cbc_block[buf_size];
+    unsigned char specified_iv[buf_size];
     unsigned int nrounds;
     bool use_zero_iv;
+    bool use_specified_iv;
     bool disable_padding;
 };
 
