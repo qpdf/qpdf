@@ -54,18 +54,27 @@ SRCS_libqpdf = \
 	libqpdf/QUtil.cc \
 	libqpdf/RC4.cc \
 	libqpdf/qpdf-c.cc \
-	libqpdf/rijndael.cc
+	libqpdf/rijndael.cc \
+	libqpdf/sha2.c \
+	libqpdf/sha2big.c
 
 # -----
 
-OBJS_libqpdf = $(call src_to_lobj,$(SRCS_libqpdf))
+CCSRCS_libqpdf = $(filter %.cc,$(SRCS_libqpdf))
+CSRCS_libqpdf = $(filter %.c,$(SRCS_libqpdf))
+
+CCOBJS_libqpdf = $(call src_to_lobj,$(CCSRCS_libqpdf))
+COBJS_libqpdf = $(call c_src_to_lobj,$(CSRCS_libqpdf))
+OBJS_libqpdf = $(CCOBJS_libqpdf) $(COBJS_libqpdf)
 
 ifeq ($(GENDEPS),1)
 -include $(call lobj_to_dep,$(OBJS_libqpdf))
 endif
 
-$(OBJS_libqpdf): libqpdf/$(OUTPUT_DIR)/%.$(LOBJ): libqpdf/%.cc
+$(CCOBJS_libqpdf): libqpdf/$(OUTPUT_DIR)/%.$(LOBJ): libqpdf/%.cc
 	$(call libcompile,$<,$(INCLUDES_libqpdf))
+$(COBJS_libqpdf): libqpdf/$(OUTPUT_DIR)/%.$(LOBJ): libqpdf/%.c
+	$(call c_libcompile,$<,$(INCLUDES_libqpdf))
 
 # Last three arguments to makelib are CURRENT,REVISION,AGE.
 #
