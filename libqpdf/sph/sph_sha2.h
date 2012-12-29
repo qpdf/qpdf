@@ -40,6 +40,10 @@
 #ifndef SPH_SHA2_H__
 #define SPH_SHA2_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stddef.h>
 #include "sph_types.h"
 
@@ -365,6 +369,10 @@ void sph_sha512_comp(const sph_u64 msg[16], sph_u64 val[8]);
 #define sph_sha512_comp   sph_sha384_comp
 #endif
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

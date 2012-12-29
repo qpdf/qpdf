@@ -12,7 +12,8 @@ BINS_libtests = \
 	png_filter \
 	pointer_holder \
 	qutil \
-	rc4
+	rc4 \
+	sha2
 
 TARGETS_libtests = $(foreach B,$(BINS_libtests),libtests/$(OUTPUT_DIR)/$(call binname,$(B)))
 

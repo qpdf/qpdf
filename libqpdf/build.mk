@@ -28,6 +28,7 @@ SRCS_libqpdf = \
 	libqpdf/Pl_PNGFilter.cc \
 	libqpdf/Pl_QPDFTokenizer.cc \
 	libqpdf/Pl_RC4.cc \
+	libqpdf/Pl_SHA2.cc \
 	libqpdf/Pl_StdioFile.cc \
 	libqpdf/QPDF.cc \
 	libqpdf/QPDFExc.cc \

@@ -1,0 +1,18 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+chdir("sha2") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('sha2');
+
+$td->runtest("sha2",
+	     {$td->COMMAND => "sha2"},
+	     {$td->FILE => "sha2.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->report(1);
