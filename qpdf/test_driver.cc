@@ -21,7 +21,7 @@ static char const* whoami = 0;
 
 void usage()
 {
-    std::cerr << "Usage: " << whoami << " n filename1 [filename2]"
+    std::cerr << "Usage: " << whoami << " n filename1 [arg2]"
               << std::endl;
     exit(2);
 }
@@ -82,7 +82,7 @@ static QPDFObjectHandle createPageContents(QPDF& pdf, std::string const& text)
     return QPDFObjectHandle::newStream(&pdf, contents);
 }
 
-void runtest(int n, char const* filename1, char const* filename2)
+void runtest(int n, char const* filename1, char const* arg2)
 {
     // Most tests here are crafted to work on specific files.  Look at
     // the test suite to see how the test is invoked to find the file
@@ -953,9 +953,9 @@ void runtest(int n, char const* filename1, char const* filename2)
         // Copy qtest without crossing page boundaries.  Should get O1
         // and O2 and their streams but not O3 or any other pages.
 
-        assert(filename2 != 0);
+        assert(arg2 != 0);
         QPDF newpdf;
-        newpdf.processFile(filename2);
+        newpdf.processFile(arg2);
         QPDFObjectHandle qtest = pdf.getTrailer().getKey("/QTest");
         newpdf.getTrailer().replaceKey(
             "/QTest", newpdf.copyForeignObject(qtest));
@@ -973,9 +973,9 @@ void runtest(int n, char const* filename1, char const* filename2)
         // that O3 points to.  Also, inherited object will have been
         // pushed down and will be preserved.
 
-        assert(filename2 != 0);
+        assert(arg2 != 0);
         QPDF newpdf;
-        newpdf.processFile(filename2);
+        newpdf.processFile(arg2);
         QPDFObjectHandle qtest = pdf.getTrailer().getKey("/QTest");
         QPDFObjectHandle O3 = qtest.getKey("/O3");
         newpdf.addPage(O3, false);
@@ -993,9 +993,9 @@ void runtest(int n, char const* filename1, char const* filename2)
         // Should get qtest plus only the O3 page and the page that O3
         // points to.  Inherited objects should be preserved.
 
-        assert(filename2 != 0);
+        assert(arg2 != 0);
         QPDF newpdf;
-        newpdf.processFile(filename2);
+        newpdf.processFile(arg2);
         QPDFObjectHandle qtest = pdf.getTrailer().getKey("/QTest");
         QPDFObjectHandle O3 = qtest.getKey("/O3");
         newpdf.addPage(O3.getKey("/OtherPage"), false);
@@ -1033,9 +1033,9 @@ void runtest(int n, char const* filename1, char const* filename2)
     else if (n == 29)
     {
         // Detect mixed objects in QPDFWriter
-        assert(filename2 != 0);
+        assert(arg2 != 0);
         QPDF other;
-        other.processFile(filename2);
+        other.processFile(arg2);
         // Should use copyForeignObject instead
         other.getTrailer().replaceKey(
             "/QTest", pdf.getTrailer().getKey("/QTest"));
@@ -1053,9 +1053,9 @@ void runtest(int n, char const* filename1, char const* filename2)
     }
     else if (n == 30)
     {
-        assert(filename2 != 0);
+        assert(arg2 != 0);
         QPDF encrypted;
-        encrypted.processFile(filename2, "user");
+        encrypted.processFile(arg2, "user");
         QPDFWriter w(pdf, "b.pdf");
 	w.setStreamDataMode(qpdf_s_preserve);
         w.copyEncryptionParameters(encrypted);
@@ -1189,8 +1189,8 @@ int main(int argc, char* argv[])
     {
 	int n = atoi(argv[1]);
 	char const* filename1 = argv[2];
-        char const* filename2 = argv[3];
-	runtest(n, filename1, filename2);
+        char const* arg2 = argv[3];
+	runtest(n, filename1, arg2);
     }
     catch (std::exception& e)
     {
