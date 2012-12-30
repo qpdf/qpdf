@@ -89,20 +89,11 @@ Index: QPDFWriter.cc
  }
 ------------------------------
 
- * Handle embedded files.  PDF Reference 1.7 section 3.10, "File
-   Specifications", discusses this.  Once we can definitely recognize
-   all embedded files in a document, we can update the encryption
-   code to handle it properly.  In QPDF_encryption.cc, search for
-   cf_file.  Remove exception thrown if cf_file is different from
-   cf_stream, and write code in the stream decryption section to use
-   cf_file instead of cf_stream.  In general, add interfaces to get
-   the list of embedded files and to extract them.  To handle general
-   embedded files associated with the whole document, follow root ->
-   /Names -> /EmbeddedFiles -> /Names to get to the file specification
-   dictionaries.  Then, in each file specification dictionary, follow
-   /EF -> /F to the actual stream.  There may be other places file
-   specification dictionaries may appear, and there are also /RF keys
-   with related files, so reread section 3.10 carefully.
+ * Provide APIs for embedded files.  See *attachments*.pdf in test
+   suite.  The private method findAttachmentStreams finds at least
+   cases for modern versions of Adobe Reader (>= 1.7, maybe earlier).
+   PDF Reference 1.7 section 3.10, "File Specifications", discusses
+   this.
 
    A sourceforge user asks if qpdf can handle extracting and embedded
    resources and references these tools, which may be useful as a

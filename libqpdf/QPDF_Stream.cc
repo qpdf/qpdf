@@ -91,6 +91,80 @@ QPDF_Stream::getRawStreamData()
 }
 
 bool
+QPDF_Stream::understandDecodeParams(
+    std::string const& filter, QPDFObjectHandle decode_obj,
+    int& predictor, int& columns, bool& early_code_change)
+{
+    bool filterable = true;
+    std::set<std::string> keys = decode_obj.getKeys();
+    for (std::set<std::string>::iterator iter = keys.begin();
+         iter != keys.end(); ++iter)
+    {
+        std::string const& key = *iter;
+        if ((filter == "/FlateDecode") && (key == "/Predictor"))
+        {
+            QPDFObjectHandle predictor_obj = decode_obj.getKey(key);
+            if (predictor_obj.isInteger())
+            {
+                predictor = predictor_obj.getIntValue();
+                if (! ((predictor == 1) || (predictor == 12)))
+                {
+                    filterable = false;
+                }
+            }
+            else
+            {
+                filterable = false;
+            }
+        }
+        else if ((filter == "/LZWDecode") && (key == "/EarlyChange"))
+        {
+            QPDFObjectHandle earlychange_obj = decode_obj.getKey(key);
+            if (earlychange_obj.isInteger())
+            {
+                int earlychange = earlychange_obj.getIntValue();
+                early_code_change = (earlychange == 1);
+                if (! ((earlychange == 0) || (earlychange == 1)))
+                {
+                    filterable = false;
+                }
+            }
+            else
+            {
+                filterable = false;
+            }
+        }
+        else if (key == "/Columns")
+        {
+            QPDFObjectHandle columns_obj = decode_obj.getKey(key);
+            if (columns_obj.isInteger())
+            {
+                columns = columns_obj.getIntValue();
+            }
+            else
+            {
+                filterable = false;
+            }
+        }
+        else if ((filter == "/Crypt") &&
+                 (((key == "/Type") || (key == "/Name")) &&
+                  (decode_obj.getKey("/Type").isNull() ||
+                   (decode_obj.getKey("/Type").isName() &&
+                    (decode_obj.getKey("/Type").getName() ==
+                     "/CryptFilterDecodeParms")))))
+        {
+            // we handle this in decryptStream
+        }
+        else
+        {
+            filterable = false;
+        }
+    }
+
+    return filterable;
+}
+
+bool
 QPDF_Stream::filterable(std::vector<std::string>& filters,
 			int& predictor, int& columns,
 			bool& early_code_change)
@@ -108,106 +182,6 @@ QPDF_Stream::filterable(std::vector<std::string>& filters,
 	filter_abbreviations["/RL"] = "/RunLengthDecode";
 	filter_abbreviations["/CCF"] = "/CCITTFaxDecode";
 	filter_abbreviations["/DCT"] = "/DCTDecode";
-    }
-
-    // Initialize values to their defaults as per the PDF spec
-    predictor = 1;
-    columns = 0;
-    early_code_change = true;
-
-    bool filterable = true;
-
-    // See if we can support any decode parameters that are specified.
-
-    QPDFObjectHandle decode_obj =
-	this->stream_dict.getKey("/DecodeParms");
-    if (decode_obj.isNull())
-    {
-	// no problem
-    }
-    else if (decode_obj.isDictionary())
-    {
-	std::set<std::string> keys = decode_obj.getKeys();
-	for (std::set<std::string>::iterator iter = keys.begin();
-	     iter != keys.end(); ++iter)
-	{
-	    std::string const& key = *iter;
-	    if (key == "/Predictor")
-	    {
-		QPDFObjectHandle predictor_obj = decode_obj.getKey(key);
-		if (predictor_obj.isInteger())
-		{
-		    predictor = predictor_obj.getIntValue();
-		    if (! ((predictor == 1) || (predictor == 12)))
-		    {
-			filterable = false;
-		    }
-		}
-		else
-		{
-		    filterable = false;
-		}
-	    }
-	    else if (key == "/EarlyChange")
-	    {
-		QPDFObjectHandle earlychange_obj = decode_obj.getKey(key);
-		if (earlychange_obj.isInteger())
-		{
-		    int earlychange = earlychange_obj.getIntValue();
-		    early_code_change = (earlychange == 1);
-		    if (! ((earlychange == 0) || (earlychange == 1)))
-		    {
-			filterable = false;
-		    }
-		}
-		else
-		{
-		    filterable = false;
-		}
-	    }
-	    else if (key == "/Columns")
-	    {
-		QPDFObjectHandle columns_obj = decode_obj.getKey(key);
-		if (columns_obj.isInteger())
-		{
-		    columns = columns_obj.getIntValue();
-		}
-		else
-		{
-		    filterable = false;
-		}
-	    }
-	    else if (((key == "/Type") || (key == "/Name")) &&
-		     decode_obj.getKey("/Type").isName() &&
-		     (decode_obj.getKey("/Type").getName() ==
-		      "/CryptFilterDecodeParms"))
-	    {
-		// we handle this in decryptStream
-	    }
-	    else
-	    {
-		filterable = false;
-	    }
-	}
-    }
-    else
-    {
-	// Ignore for now -- some filter types, like CCITTFaxDecode,
-	// use types other than dictionary for this.
-	QTC::TC("qpdf", "QPDF_Stream ignore non-dictionary DecodeParms");
-
-	filterable = false;
-    }
-
-    if ((predictor > 1) && (columns == 0))
-    {
-	// invalid
-	filterable = false;
-    }
-
-    if (! filterable)
-    {
-	return false;
     }
 
     // Check filters
@@ -254,8 +228,7 @@ QPDF_Stream::filterable(std::vector<std::string>& filters,
 		      "stream filter type is not name or array");
     }
 
-    // `filters' now contains a list of filters to be applied in
-    // order.  See which ones we can support.
+    bool filterable = true;
 
     for (std::vector<std::string>::iterator iter = filters.begin();
 	 iter != filters.end(); ++iter)
@@ -276,6 +249,79 @@ QPDF_Stream::filterable(std::vector<std::string>& filters,
 	{
 	    filterable = false;
 	}
+    }
+
+    if (! filterable)
+    {
+        return false;
+    }
+
+    // `filters' now contains a list of filters to be applied in
+    // order.  See which ones we can support.
+
+    // Initialize values to their defaults as per the PDF spec
+    predictor = 1;
+    columns = 0;
+    early_code_change = true;
+
+    // See if we can support any decode parameters that are specified.
+
+    QPDFObjectHandle decode_obj = this->stream_dict.getKey("/DecodeParms");
+    std::vector<QPDFObjectHandle> decode_parms;
+    if (decode_obj.isArray())
+    {
+        for (int i = 0; i < decode_obj.getArrayNItems(); ++i)
+        {
+            decode_parms.push_back(decode_obj.getArrayItem(i));
+        }
+    }
+    else
+    {
+        for (unsigned int i = 0; i < filters.size(); ++i)
+        {
+            decode_parms.push_back(decode_obj);
+        }
+    }
+
+    if (decode_parms.size() != filters.size())
+    {
+	throw QPDFExc(qpdf_e_damaged_pdf, qpdf->getFilename(),
+		      "", this->offset,
+		      "stream /DecodeParms length is"
+                      " inconsistent with filters");
+    }
+
+    for (unsigned int i = 0; i < filters.size(); ++i)
+    {
+        QPDFObjectHandle decode_item = decode_parms[i];
+        if (decode_item.isNull())
+        {
+            // okay
+        }
+        else if (decode_item.isDictionary())
+        {
+            if (! understandDecodeParams(
+                    filters[i], decode_item,
+                    predictor, columns, early_code_change))
+            {
+                filterable = false;
+            }
+        }
+        else
+        {
+            filterable = false;
+        }
+    }
+
+    if ((predictor > 1) && (columns == 0))
+    {
+	// invalid
+	filterable = false;
+    }
+
+    if (! filterable)
+    {
+	return false;
     }
 
     return filterable;

@@ -116,7 +116,6 @@ qpdf unable to filter 0
 QPDF_String non-trivial UTF-16 0
 QPDF xref overwrite object 0
 QPDF decoding error warning 0
-QPDF_Stream ignore non-dictionary DecodeParms 0
 qpdf-c called qpdf_init 0
 qpdf-c called qpdf_cleanup 0
 qpdf-c called qpdf_more_warnings 0

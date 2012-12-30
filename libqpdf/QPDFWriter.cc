@@ -470,27 +470,13 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
 	}
         if (V >= 4)
         {
-            if (encrypt.hasKey("/CF") &&
-                encrypt.getKey("/CF").isDictionary() &&
-                encrypt.hasKey("/StmF") &&
-                encrypt.getKey("/StmF").isName())
-            {
-                // Determine whether to use AES from StmF.  QPDFWriter
-                // can't write files with different StrF and StmF.
-                QPDFObjectHandle CF = encrypt.getKey("/CF");
-                QPDFObjectHandle StmF = encrypt.getKey("/StmF");
-                if (CF.hasKey(StmF.getName()) &&
-                    CF.getKey(StmF.getName()).isDictionary())
-                {
-                    QPDFObjectHandle StmF_data = CF.getKey(StmF.getName());
-                    if (StmF_data.hasKey("/CFM") &&
-                        StmF_data.getKey("/CFM").isName() &&
-                        StmF_data.getKey("/CFM").getName() == "/AESV2")
-                    {
-                        this->encrypt_use_aes = true;
-                    }
-                }
-            }
+            // When copying encryption parameters, use AES even if the
+            // original file did not.  Acrobat doesn't create files
+            // with V >= 4 that don't use AES, and the logic of
+            // figuring out whether AES is used or not is complicated
+            // with /StmF, /StrF, and /EFF all potentially having
+            // different values.
+            this->encrypt_use_aes = true;
         }
 	QTC::TC("qpdf", "QPDFWriter copy encrypt metadata",
 		this->encrypt_metadata ? 0 : 1);

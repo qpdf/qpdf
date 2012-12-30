@@ -314,6 +314,7 @@ QPDF::parse(char const* password)
     }
 
     initializeEncryption();
+    findAttachmentStreams();
 }
 
 void
@@ -2068,4 +2069,39 @@ QPDF::pipeStreamData(int objid, int generation,
 		     QUtil::int_to_string(generation) + ": " + e.what()));
     }
     pipeline->finish();
+}
+
+void
+QPDF::findAttachmentStreams()
+{
+    QPDFObjectHandle root = getRoot();
+    QPDFObjectHandle names = root.getKey("/Names");
+    if (! names.isDictionary())
+    {
+        return;
+    }
+    QPDFObjectHandle embeddedFiles = names.getKey("/EmbeddedFiles");
+    if (! embeddedFiles.isDictionary())
+    {
+        return;
+    }
+    names = embeddedFiles.getKey("/Names");
+    if (! names.isArray())
+    {
+        return;
+    }
+    for (int i = 0; i < names.getArrayNItems(); ++i)
+    {
+        QPDFObjectHandle item = names.getArrayItem(i);
+        if (item.isDictionary() &&
+            item.getKey("/Type").isName() &&
+            (item.getKey("/Type").getName() == "/Filespec") &&
+            item.getKey("/EF").isDictionary() &&
+            item.getKey("/EF").getKey("/F").isStream())
+        {
+            QPDFObjectHandle stream = item.getKey("/EF").getKey("/F");
+            this->attachment_streams.insert(
+                ObjGen(stream.getObjectID(), stream.getGeneration()));
+        }
+    }
 }

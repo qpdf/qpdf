@@ -45,6 +45,9 @@ class QPDF_Stream: public QPDFObject
     void replaceFilterData(QPDFObjectHandle const& filter,
 			   QPDFObjectHandle const& decode_parms,
 			   size_t length);
+    bool understandDecodeParams(
+        std::string const& filter, QPDFObjectHandle decode_params,
+        int& predictor, int& columns, bool& early_code_change);
     bool filterable(std::vector<std::string>& filters,
 		    int& predictor, int& columns, bool& early_code_change);
 

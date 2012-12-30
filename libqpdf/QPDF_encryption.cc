@@ -573,28 +573,6 @@ QPDF::initializeEncryption()
 	{
 	    this->cf_file = this->cf_stream;
 	}
-	if (this->cf_file != this->cf_stream)
-	{
-	    // The issue for qpdf is that it can't tell the difference
-	    // between an embedded file stream and a regular stream.
-	    // Search for a comment containing cf_file.  To fix this,
-	    // we need files with encrypted embedded files and
-	    // non-encrypted native streams and vice versa.  Also if
-	    // it is possible for them to be encrypted in different
-	    // ways, we should have some of those too.  In cases where
-	    // we can detect whether a stream is encrypted or not, we
-	    // might want to try to detecet that automatically in
-	    // defense of possible logic errors surrounding detection
-	    // of embedded file streams, unless that's really clear
-	    // from the specification.
-	    throw QPDFExc(qpdf_e_unsupported, this->file->getName(),
-			  "encryption dictionary", this->file->getLastOffset(),
-			  "This document has embedded files that are"
-			  " encrypted differently from the rest of the file."
-			  "  qpdf does not presently support this due to"
-			  " lack of test data; if possible, please submit"
-			  " a bug report that includes this file.");
-	}
     }
     EncryptionData data(V, R, Length / 8, P, O, U, "", "", "",
                         id1, this->encrypt_metadata);
@@ -737,18 +715,48 @@ QPDF::decryptStream(Pipeline*& pipeline, int objid, int generation,
 	encryption_method_e method = e_unknown;
 	std::string method_source = "/StmF from /Encrypt dictionary";
 
-	if (stream_dict.getKey("/Filter").isOrHasName("/Crypt") &&
-	    stream_dict.getKey("/DecodeParms").isDictionary())
-	{
-	    QPDFObjectHandle decode_parms = stream_dict.getKey("/DecodeParms");
-	    if (decode_parms.getKey("/Type").isName() &&
-		(decode_parms.getKey("/Type").getName() ==
-		 "/CryptFilterDecodeParms"))
-	    {
-		QTC::TC("qpdf", "QPDF_encryption stream crypt filter");
-		method = interpretCF(decode_parms.getKey("/Name"));
-		method_source = "stream's Crypt decode parameters";
-	    }
+	if (stream_dict.getKey("/Filter").isOrHasName("/Crypt"))
+        {
+            if (stream_dict.getKey("/DecodeParms").isDictionary())
+            {
+                QPDFObjectHandle decode_parms =
+                    stream_dict.getKey("/DecodeParms");
+                if (decode_parms.getKey("/Type").isName() &&
+                    (decode_parms.getKey("/Type").getName() ==
+                     "/CryptFilterDecodeParms"))
+                {
+                    QTC::TC("qpdf", "QPDF_encryption stream crypt filter");
+                    method = interpretCF(decode_parms.getKey("/Name"));
+                    method_source = "stream's Crypt decode parameters";
+                }
+            }
+            else if (stream_dict.getKey("/DecodeParms").isArray() &&
+                     stream_dict.getKey("/Filter").isArray())
+            {
+                QPDFObjectHandle filter = stream_dict.getKey("/Filter");
+                QPDFObjectHandle decode = stream_dict.getKey("/DecodeParms");
+                if (filter.getArrayNItems() == decode.getArrayNItems())
+                {
+                    for (int i = 0; i < filter.getArrayNItems(); ++i)
+                    {
+                        if (filter.getArrayItem(i).isName() &&
+                            (filter.getArrayItem(i).getName() == "/Crypt"))
+                        {
+                            QPDFObjectHandle crypt_params =
+                                decode.getArrayItem(i);
+                            if (crypt_params.isDictionary() &&
+                                crypt_params.getKey("/Name").isName())
+                            {
+// XXX                          QTC::TC("qpdf", "QPDF_encrypt crypt array");
+                                method = interpretCF(
+                                    crypt_params.getKey("/Name"));
+                                method_source = "stream's Crypt "
+                                    "decode parameters (array)";
+                            }
+                        }
+                    }
+                }
+            }
 	}
 
 	if (method == e_unknown)
@@ -760,12 +768,15 @@ QPDF::decryptStream(Pipeline*& pipeline, int objid, int generation,
 	    }
 	    else
 	    {
-		// NOTE: We should should use cf_file if this is an
-		// embedded file, but we can't yet detect embedded
-		// file streams as such.  When fixing, search for all
-		// occurrences of cf_file to find a reference to this
-		// comment.
-		method = this->cf_stream;
+                if (this->attachment_streams.count(
+                        ObjGen(objid, generation)) > 0)
+                {
+                    method = this->cf_file;
+                }
+                else
+                {
+                    method = this->cf_stream;
+                }
 	    }
 	}
 	use_aes = false;

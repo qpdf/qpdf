@@ -604,6 +604,7 @@ class QPDF
 	int& act_objid, int& act_generation);
     PointerHolder<QPDFObject> resolve(int objid, int generation);
     void resolveObjectsInStream(int obj_stream_number);
+    void findAttachmentStreams();
 
     // Calls finish() on the pipeline when done but does not delete it
     void pipeStreamData(int objid, int generation,
@@ -1004,6 +1005,7 @@ class QPDF
     PointerHolder<QPDFObjectHandle::StreamDataProvider> copied_streams;
     // copied_stream_data_provider is owned by copied_streams
     CopiedStreamDataProvider* copied_stream_data_provider;
+    std::set<ObjGen> attachment_streams;
 
     // Linearization data
     qpdf_offset_t first_xref_item_offset; // actual value from file
