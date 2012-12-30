@@ -932,7 +932,7 @@ for (my $n = 16; $n <= 19; ++$n)
 show_ntests();
 # ----------
 $td->notify("--- Specific File Tests ---");
-$n_tests += 4;
+$n_tests += 5;
 $n_compare_pdfs += 1;
 
 # Special PDF files that caused problems at some point
@@ -960,6 +960,10 @@ compare_pdfs("old-and-complex.pdf", "a.qdf");
 $td->runtest("damaged stream",
 	     {$td->COMMAND => "qpdf --check damaged-stream.pdf"},
 	     {$td->FILE => "damaged-stream.out", $td->EXIT_STATUS => 3},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("damaged stream (C)",
+	     {$td->COMMAND => "qpdf-ctest 2 damaged-stream.pdf '' a.pdf"},
+	     {$td->FILE => "damaged-stream-c-check.out", $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 show_ntests();
