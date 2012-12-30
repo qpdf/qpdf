@@ -271,7 +271,6 @@ class QPDFWriter
     static int const f_stream = 	1 << 0;
     static int const f_filtered =	1 << 1;
     static int const f_in_ostream =     1 << 2;
-    static int const f_in_extensions =  1 << 3;
 
     enum trailer_e { t_normal, t_lin_first, t_lin_second };
 

@@ -1135,7 +1135,8 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 			  unsigned int flags, size_t stream_length,
                           bool compress)
 {
-    unsigned int child_flags = flags & ~f_stream & ~f_in_extensions;
+    int old_id = object.getObjectID();
+    unsigned int child_flags = flags & ~f_stream;
 
     std::string indent;
     for (int i = 0; i < level; ++i)
@@ -1167,10 +1168,19 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
     }
     else if (object.isDictionary())
     {
+        // Make a shallow copy of this object so we can modify it
+        // safely without affecting the original.  This code makes
+        // assumptions about things that are made true in
+        // prepareFileForWrite, such as that certain things are direct
+        // objects so that replacing them doesn't leave unreferenced
+        // objects in the output.
+        object = object.shallowCopy();
+
         // Handle special cases for specific dictionaries.
 
-        // Extensions dictionaries are complicated.  We have one of
-        // several cases:
+        // Extensions dictionaries.
+
+        // We have one of several cases:
         //
         // * We need ADBE
         //    - We already have Extensions
@@ -1183,16 +1193,16 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
         //       - If it has other things, keep those and remove ADBE
         //    - We have no extensions: no action required
         //
-        // We may be in the root dictionary, or we may be inside the
-        // extensions dictionary itself.  The latter is determined by
-        // the presence of the f_in_extensions flag.
+        // Before writing, we guarantee that /Extensions, if present,
+        // is direct through the ADBE dictionary, so we can modify in
+        // place.
 
         bool is_root = false;
         bool have_extensions_other = false;
         bool have_extensions_adbe = false;
 
         QPDFObjectHandle extensions;
-        if (object.getObjectID() == pdf.getRoot().getObjectID())
+        if (old_id == pdf.getRoot().getObjectID())
         {
             is_root = true;
             if (object.hasKey("/Extensions") &&
@@ -1201,10 +1211,7 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
                 extensions = object.getKey("/Extensions");
             }
         }
-        else if (flags & f_in_extensions)
-        {
-            extensions = object;
-        }
+
         if (extensions.isInitialized())
         {
             std::set<std::string> keys = extensions.getKeys();
@@ -1221,10 +1228,6 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 
         bool need_extensions_adbe = (this->final_extension_level > 0);
 
-        bool write_new_extensions = false;
-        bool write_new_adbe = false;
-        bool suppress_existing_extensions = false;
-        bool suppress_existing_adbe = false;
         if (is_root)
         {
             if (need_extensions_adbe)
@@ -1235,26 +1238,23 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
                     // it here.
                     QTC::TC("qpdf", "QPDFWriter create Extensions",
                             this->qdf_mode ? 0 : 1);
-                    write_new_extensions = true;
-                    suppress_existing_extensions = true;
-                }
-                else
-                {
-                    // Preserve existing Extensions and do the work
-                    // in the extensions dictionary.
+                    extensions = QPDFObjectHandle::newDictionary();
+                    object.replaceKey("/Extensions", extensions);
                 }
             }
             else if (! have_extensions_other)
             {
                 // We have Extensions dictionary and don't want one.
-                suppress_existing_extensions = true;
                 if (have_extensions_adbe)
                 {
                     QTC::TC("qpdf", "QPDFWriter remove existing Extensions");
+                    object.removeKey("/Extensions");
+                    extensions = QPDFObjectHandle(); // uninitialized
                 }
             }
         }
-        else if (flags & f_in_extensions)
+
+        if (extensions.isInitialized())
         {
             QTC::TC("qpdf", "QPDFWriter preserve Extensions");
             QPDFObjectHandle adbe = extensions.getKey("/ADBE");
@@ -1272,77 +1272,54 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
             }
             else
             {
-                suppress_existing_adbe = true;
                 if (need_extensions_adbe)
                 {
-                    write_new_adbe = true;
+                    extensions.replaceKey(
+                        "/ADBE",
+                        QPDFObjectHandle::parse(
+                            "<< /BaseVersion /" + this->final_pdf_version +
+                            " /ExtensionLevel " +
+                            QUtil::int_to_string(this->final_extension_level) +
+                            " >>"));
                 }
+                else
+                {
+                    QTC::TC("qpdf", "QPDFWriter remove ADBE");
+                    extensions.removeKey("/ADBE");
+                }
+            }
+        }
+
+        // Stream dictionaries.
+
+        if (flags & f_stream)
+        {
+            // Suppress /Length since we will write it manually
+            object.removeKey("/Length");
+
+            // XXX BUG: /Crypt filters should always be removed.
+	    if (flags & f_filtered)
+            {
+                object.removeKey("/Filter");
+                object.removeKey("/DecodeParms");
             }
         }
 
 	writeString("<<");
 	writeStringQDF("\n");
 
-        if (write_new_extensions || write_new_adbe)
-        {
-            writeStringQDF(indent);
-            writeStringQDF("  ");
-            writeStringNoQDF(" ");
-            if (write_new_extensions)
-            {
-                writeString("/Extensions << ");
-            }
-            writeString("/ADBE << /BaseVersion /");
-            writeString(this->final_pdf_version);
-            writeString(" /ExtensionLevel ");
-            writeString(QUtil::int_to_string(this->final_extension_level));
-            writeString(" >>");
-            if (write_new_extensions)
-            {
-                writeString(" >>");
-            }
-            writeStringQDF("\n");
-        }
-
 	std::set<std::string> keys = object.getKeys();
 	for (std::set<std::string>::iterator iter = keys.begin();
 	     iter != keys.end(); ++iter)
 	{
-	    // I'm not fully clear on /Crypt keys in /DecodeParms.  If
-	    // one is found, we refuse to filter, so we should be
-	    // safe.
 	    std::string const& key = *iter;
-	    if ((flags & f_filtered) &&
-		((key == "/Filter") ||
-		 (key == "/DecodeParms")))
-	    {
-		continue;
-	    }
-	    if ((flags & f_stream) && (key == "/Length"))
-	    {
-		continue;
-	    }
-
-            bool is_extensions = (is_root && (key == "/Extensions"));
-            if (suppress_existing_extensions && is_extensions)
-            {
-                QTC::TC("qpdf", "QPDFWriter skip Extensions");
-                continue;
-            }
-            if (suppress_existing_adbe && (key == "/ADBE"))
-            {
-                QTC::TC("qpdf", "QPDFWriter skip ADBE");
-                continue;
-            }
-
 
 	    writeStringQDF(indent);
 	    writeStringQDF("  ");
 	    writeStringNoQDF(" ");
 	    writeString(QPDF_Name::normalizeName(key));
 	    writeString(" ");
-            unparseChild(object.getKey(key), level + 1,
-                         child_flags | (is_extensions ? f_in_extensions : 0));
+            unparseChild(object.getKey(key), level + 1, child_flags);
 	    writeStringQDF("\n");
 	}
 
@@ -1379,7 +1356,6 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
     else if (object.isStream())
     {
 	// Write stream data to a buffer.
-	int old_id = object.getObjectID();
 	int new_id = obj_renumber[old_id];
 	if (! this->direct_stream_lengths)
 	{

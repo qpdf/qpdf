@@ -134,7 +134,7 @@ foreach my $input (@ext_inputs)
                               "qpdf --static-id" .
                               " --$op-version=$version $input a.pdf"},
                          {$td->STRING => "", $td->EXIT_STATUS => 0});
-            $td->runtest("check version information",
+            $td->runtest("check version information ($op $version)",
                          {$td->COMMAND => "test_driver 34 a.pdf"},
                          {$td->FILE => "$base-$op-$version.out",
                           $td->EXIT_STATUS => 0},
