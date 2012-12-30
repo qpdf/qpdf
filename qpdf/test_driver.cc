@@ -112,7 +112,7 @@ void runtest(int n, char const* filename1, char const* arg2)
     {
 	pdf.setAttemptRecovery(false);
     }
-    if ((n == 35) && (arg2 != 0))
+    if (((n == 35) || (n == 36)) && (arg2 != 0))
     {
         // arg2 is password
 	pdf.processFile(filename1, arg2);
@@ -1212,6 +1212,37 @@ void runtest(int n, char const* filename1, char const* arg2)
                 data = t;
             }
             std::cout << filename << ":\n" << data << "--END--\n";
+        }
+    }
+    else if (n == 36)
+    {
+        // Extract raw unfilterable attachment
+
+        QPDFObjectHandle root = pdf.getRoot();
+        QPDFObjectHandle names = root.getKey("/Names");
+        QPDFObjectHandle embeddedFiles = names.getKey("/EmbeddedFiles");
+        names = embeddedFiles.getKey("/Names");
+        for (int i = 0; i < names.getArrayNItems(); ++i)
+        {
+            QPDFObjectHandle item = names.getArrayItem(i);
+            if (item.isDictionary() &&
+                item.getKey("/Type").isName() &&
+                (item.getKey("/Type").getName() == "/Filespec") &&
+                item.getKey("/EF").isDictionary() &&
+                item.getKey("/EF").getKey("/F").isStream() &&
+                (item.getKey("/F").getStringValue() == "attachment1.txt"))
+            {
+                std::string filename = item.getKey("/F").getStringValue();
+                QPDFObjectHandle stream = item.getKey("/EF").getKey("/F");
+                Pl_Buffer p1("buffer");
+                Pl_Flate p2("compress", &p1, Pl_Flate::a_inflate);
+                stream.pipeStreamData(&p2, false, false, false);
+                PointerHolder<Buffer> buf = p1.getBuffer();
+                std::string data = std::string(
+                    (char const*)buf->getBuffer(), buf->getSize());
+                std::cout << stream.getDict().unparse()
+                          << filename << ":\n" << data << "--END--\n";
+            }
         }
     }
     else

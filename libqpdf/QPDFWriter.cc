@@ -1297,11 +1297,52 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
             // Suppress /Length since we will write it manually
             object.removeKey("/Length");
 
-            // XXX BUG: /Crypt filters should always be removed.
 	    if (flags & f_filtered)
             {
+                // We will supply our own filter and decode
+                // parameters.
                 object.removeKey("/Filter");
                 object.removeKey("/DecodeParms");
+            }
+            else
+            {
+                // Make sure, no matter what else we have, that we
+                // don't have /Crypt in the output filters.
+                QPDFObjectHandle filter = object.getKey("/Filter");
+                QPDFObjectHandle decode_parms = object.getKey("/DecodeParms");
+                if (filter.isOrHasName("/Crypt"))
+                {
+                    if (filter.isName())
+                    {
+                        object.removeKey("/Filter");
+                        object.removeKey("/DecodeParms");
+                    }
+                    else
+                    {
+                        int idx = -1;
+                        for (int i = 0; i < filter.getArrayNItems(); ++i)
+                        {
+                            QPDFObjectHandle item = filter.getArrayItem(i);
+                            if (item.isName() && item.getName() == "/Crypt")
+                            {
+                                idx = i;
+                                break;
+                            }
+                        }
+                        if (idx >= 0)
+                        {
+                            // If filter is an array, then the code in
+                            // QPDF_Stream has already verified that
+                            // DecodeParms and Filters are arrays of
+                            // the same length, but if they weren't
+                            // for some reason, eraseItem does type
+                            // and bounds checking.
+                            QTC::TC("qpdf", "QPDFWriter remove Crypt");
+                            filter.eraseItem(idx);
+                            decode_parms.eraseItem(idx);
+                        }
+                    }
+                }
             }
         }
 

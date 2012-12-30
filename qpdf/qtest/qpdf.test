@@ -1701,12 +1701,12 @@ my @attachments = (
     'enc-XI-attachments-base.pdf',
     'enc-XI-R6,V5,U=attachment,encrypted-attachments.pdf',
     'enc-XI-R6,V5,U=view,attachments,cleartext-metadata.pdf');
-$n_tests += 4 * @attachments;
+$n_tests += 4 * @attachments + 3;
 foreach my $f (@attachments)
 {
     my $pass = '';
     my $tpass = '';
-    if ($f =~ m/U=([^,]+)/)
+    if ($f =~ m/U=([^,\.]+)/)
     {
         $pass = "--password=$1";
         $tpass = $1;
@@ -1726,6 +1726,23 @@ foreach my $f (@attachments)
                  {$td->FILE => "attachments.out", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
 }
+$td->runtest("unfilterable with crypt",
+             {$td->COMMAND =>
+                  "test_driver 36 unfilterable-with-crypt.pdf attachment"},
+             {$td->FILE => "unfilterable-with-crypt-before.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+unlink "a.pdf";
+$td->runtest("decrypt file",
+             {$td->COMMAND => "qpdf -decrypt --password=attachment" .
+                  " unfilterable-with-crypt.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("copy of unfilterable with crypt",
+             {$td->COMMAND =>
+                  "test_driver 36 a.pdf attachment"},
+             {$td->FILE => "unfilterable-with-crypt-after.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 show_ntests();
 # ----------

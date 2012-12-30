@@ -255,3 +255,4 @@ QPDFWriter preserve ADBE 0
 QPDF_encryption skip 0x28 0
 QPDF_encrypt crypt array 0
 QPDF_encryption CFM AESV3 0
+QPDFWriter remove Crypt 0
