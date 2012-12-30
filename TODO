@@ -1,32 +1,6 @@
 General
 =======
 
- * See if I can support the encryption format used with /R 5 /V 5
-   (AESV3), even though a qpdf-announce subscriber with an adobe.com
-   email address mentioned that this is deprecated.  There is also a
-   new encryption format coming in a future release (PDF 2.0), which
-   may be better to support.  As of the qpdf 3.0 release, the
-   specification was not publicly available yet.
-
-   AESV3 encryption is supported with PDF 1.7 extension level 3 and is
-   being deprecated, but there are plenty of files out there.  The
-   encryption format is decribed in adobe_supplement_iso32000.pdf.
-   Such a file must specify that it uses these extensions in its
-   document catalog:
-
-   <<
-     /Type /Catalog
-     /Extensions <<
-       /ADBE <<
-         /BaseVersion /1.7
-         /ExtensionLevel 3
-       >>
-     >>
-   >>
-
-   Possible sha256 implementations: http://sol-biotech.com/code/sha2/,
-   http://hashlib2plus.sourceforge.net/
-
  * Improve the random number seed to make it more secure so that we
    have stronger random numbers, particularly when multiple files are
    generated in the same second.  This code may need to be

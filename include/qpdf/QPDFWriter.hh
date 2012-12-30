@@ -223,8 +223,9 @@ class QPDFWriter
     // content normalization.  Note that setting R2 encryption
     // parameters sets the PDF version to at least 1.3, setting R3
     // encryption parameters pushes the PDF version number to at least
-    // 1.4, and setting R4 parameters pushes the version to at least
-    // 1.5, or if AES is used, 1.6.
+    // 1.4, setting R4 parameters pushes the version to at least 1.5,
+    // or if AES is used, 1.6, and setting R5 or R6 parameters pushes
+    // the version to at least 1.7 with extension level 3.
     QPDF_DLL
     void setR2EncryptionParameters(
 	char const* user_password, char const* owner_password,
@@ -241,6 +242,21 @@ class QPDFWriter
 	bool allow_accessibility, bool allow_extract,
 	qpdf_r3_print_e print, qpdf_r3_modify_e modify,
 	bool encrypt_metadata, bool use_aes);
+    // R5 is deprecated.  Do not use it for production use.  Writing
+    // R5 is supported by qpdf primarily to generate test files for
+    // applications that may need to test R5 support.
+    QPDF_DLL
+    void setR5EncryptionParameters(
+	char const* user_password, char const* owner_password,
+	bool allow_accessibility, bool allow_extract,
+	qpdf_r3_print_e print, qpdf_r3_modify_e modify,
+	bool encrypt_metadata);
+    QPDF_DLL
+    void setR6EncryptionParameters(
+	char const* user_password, char const* owner_password,
+	bool allow_accessibility, bool allow_extract,
+	qpdf_r3_print_e print, qpdf_r3_modify_e modify,
+	bool encrypt_metadata_aes);
 
     // Create linearized output.  Disables qdf mode, content
     // normalization, and stream prefiltering.
@@ -302,7 +318,8 @@ class QPDFWriter
 	int V, int R, int key_len, long P,
 	std::string const& O, std::string const& U,
 	std::string const& OE, std::string const& UE, std::string const& Perms,
-	std::string const& id1, std::string const& user_password);
+	std::string const& id1, std::string const& user_password,
+        std::string const& encryption_key);
     void setDataKey(int objid);
     int openObject(int objid = 0);
     void closeObject(int objid);
@@ -378,6 +395,8 @@ class QPDFWriter
     bool encrypt_metadata;
     bool encrypt_use_aes;
     std::map<std::string, std::string> encryption_dictionary;
+    int encryption_V;
+    int encryption_R;
 
     std::string id1;		// for /ID key of
     std::string id2;		// trailer dictionary

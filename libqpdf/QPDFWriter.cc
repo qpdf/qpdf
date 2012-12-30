@@ -67,6 +67,8 @@ QPDFWriter::init()
     min_extension_level = 0;
     final_extension_level = 0;
     forced_extension_level = 0;
+    encryption_V = 0;
+    encryption_R = 0;
     encryption_dict_objid = 0;
     next_objid = 1;
     cur_stream_length_id = 0;
@@ -344,6 +346,38 @@ QPDFWriter::setR4EncryptionParameters(
 }
 
 void
+QPDFWriter::setR5EncryptionParameters(
+    char const* user_password, char const* owner_password,
+    bool allow_accessibility, bool allow_extract,
+    qpdf_r3_print_e print, qpdf_r3_modify_e modify,
+    bool encrypt_metadata)
+{
+    std::set<int> clear;
+    interpretR3EncryptionParameters(
+	clear, user_password, owner_password,
+	allow_accessibility, allow_extract, print, modify);
+    this->encrypt_use_aes = true;
+    this->encrypt_metadata = encrypt_metadata;
+    setEncryptionParameters(user_password, owner_password, 5, 5, 32, clear);
+}
+
+void
+QPDFWriter::setR6EncryptionParameters(
+    char const* user_password, char const* owner_password,
+    bool allow_accessibility, bool allow_extract,
+    qpdf_r3_print_e print, qpdf_r3_modify_e modify,
+    bool encrypt_metadata)
+{
+    std::set<int> clear;
+    interpretR3EncryptionParameters(
+	clear, user_password, owner_password,
+	allow_accessibility, allow_extract, print, modify);
+    this->encrypt_use_aes = true;
+    this->encrypt_metadata = encrypt_metadata;
+    setEncryptionParameters(user_password, owner_password, 5, 6, 32, clear);
+}
+
+void
 QPDFWriter::interpretR3EncryptionParameters(
     std::set<int>& clear,
     char const* user_password, char const* owner_password,
@@ -426,6 +460,12 @@ QPDFWriter::setEncryptionParameters(
     bits_to_clear.insert(1);
     bits_to_clear.insert(2);
 
+    if (R > 3)
+    {
+        // Bit 10 is deprecated and should always be set.
+        bits_to_clear.erase(10);
+    }
+
     int P = 0;
     // Create the complement of P, then invert.
     for (std::set<int>::iterator iter = bits_to_clear.begin();
@@ -438,11 +478,26 @@ QPDFWriter::setEncryptionParameters(
     generateID();
     std::string O;
     std::string U;
-    QPDF::compute_encryption_O_U(
-	user_password, owner_password, V, R, key_len, P,
-	this->encrypt_metadata, this->id1, O, U);
+    std::string OE;
+    std::string UE;
+    std::string Perms;
+    std::string encryption_key;
+    if (V < 5)
+    {
+        QPDF::compute_encryption_O_U(
+            user_password, owner_password, V, R, key_len, P,
+            this->encrypt_metadata, this->id1, O, U);
+    }
+    else
+    {
+        QPDF::compute_encryption_parameters_V5(
+            user_password, owner_password, V, R, key_len, P,
+            this->encrypt_metadata, this->id1,
+            encryption_key, O, U, OE, UE, Perms);
+    }
     setEncryptionParametersInternal(
-	V, R, key_len, P, O, U, "", "", "", this->id1, user_password);
+	V, R, key_len, P, O, U, OE, UE, Perms,
+        this->id1, user_password, encryption_key);
 }
 
 void
@@ -482,6 +537,19 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
 		this->encrypt_metadata ? 0 : 1);
         QTC::TC("qpdf", "QPDFWriter copy use_aes",
                 this->encrypt_use_aes ? 0 : 1);
+        std::string OE;
+        std::string UE;
+        std::string Perms;
+        std::string encryption_key;
+        if (V >= 5)
+        {
+            QTC::TC("qpdf", "QPDFWriter copy V5");
+	    OE = encrypt.getKey("/OE").getStringValue();
+            UE = encrypt.getKey("/UE").getStringValue();
+	    Perms = encrypt.getKey("/Perms").getStringValue();
+            encryption_key = qpdf.getEncryptionKey();
+        }
+
 	setEncryptionParametersInternal(
 	    V,
 	    encrypt.getKey("/R").getIntValue(),
@@ -489,11 +557,12 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
 	    encrypt.getKey("/P").getIntValue(),
 	    encrypt.getKey("/O").getStringValue(),
 	    encrypt.getKey("/U").getStringValue(),
-            "",                 // XXXX OE
-            "",                 // XXXX UE
-            "",                 // XXXX Perms
+            OE,
+            UE,
+            Perms,
 	    this->id1,		// this->id1 == the other file's id1
-	    qpdf.getPaddedUserPassword());
+	    qpdf.getPaddedUserPassword(),
+            encryption_key);
     }
 }
 
@@ -605,10 +674,11 @@ QPDFWriter::setEncryptionParametersInternal(
     int V, int R, int key_len, long P,
     std::string const& O, std::string const& U,
     std::string const& OE, std::string const& UE, std::string const& Perms,
-    std::string const& id1, std::string const& user_password)
+    std::string const& id1, std::string const& user_password,
+    std::string const& encryption_key)
 {
-    // XXXX OE, UE, Perms, V=5
-
+    this->encryption_V = V;
+    this->encryption_R = R;
     encryption_dictionary["/Filter"] = "/Standard";
     encryption_dictionary["/V"] = QUtil::int_to_string(V);
     encryption_dictionary["/Length"] = QUtil::int_to_string(key_len * 8);
@@ -618,9 +688,15 @@ QPDFWriter::setEncryptionParametersInternal(
     encryption_dictionary["/U"] = QPDF_String(U).unparse(true);
     if (V >= 5)
     {
-        setMinimumPDFVersion("1.4");
+        encryption_dictionary["/OE"] = QPDF_String(OE).unparse(true);
+        encryption_dictionary["/UE"] = QPDF_String(UE).unparse(true);
+        encryption_dictionary["/Perms"] = QPDF_String(Perms).unparse(true);
     }
-    if (R >= 5)
+    if (R >= 6)
+    {
+        setMinimumPDFVersion("1.7", 8);
+    }
+    else if (R == 5)
     {
         setMinimumPDFVersion("1.7", 3);
     }
@@ -641,14 +717,16 @@ QPDFWriter::setEncryptionParametersInternal(
     {
 	encryption_dictionary["/EncryptMetadata"] = "false";
     }
-    if (V == 4)
+    if ((V == 4) || (V == 5))
     {
 	// The spec says the value for the crypt filter key can be
 	// anything, and xpdf seems to agree.  However, Adobe Reader
 	// won't open our files unless we use /StdCF.
 	encryption_dictionary["/StmF"] = "/StdCF";
 	encryption_dictionary["/StrF"] = "/StdCF";
-	std::string method = (this->encrypt_use_aes ? "/AESV2" : "/V2");
+	std::string method = (this->encrypt_use_aes
+                              ? ((V < 5) ? "/AESV2" : "/AESV3")
+                              : "/V2");
 	encryption_dictionary["/CF"] =
 	    "<< /StdCF << /AuthEvent /DocOpen /CFM " + method + " >> >>";
     }
@@ -656,15 +734,23 @@ QPDFWriter::setEncryptionParametersInternal(
     this->encrypted = true;
     QPDF::EncryptionData encryption_data(
 	V, R, key_len, P, O, U, OE, UE, Perms, id1, this->encrypt_metadata);
-    this->encryption_key = QPDF::compute_encryption_key(
-	user_password, encryption_data);
+    if (V < 5)
+    {
+        this->encryption_key = QPDF::compute_encryption_key(
+            user_password, encryption_data);
+    }
+    else
+    {
+        this->encryption_key = encryption_key;
+    }
 }
 
 void
 QPDFWriter::setDataKey(int objid)
 {
     this->cur_data_key = QPDF::compute_data_key(
-	this->encryption_key, objid, 0, this->encrypt_use_aes);
+	this->encryption_key, objid, 0,
+        this->encrypt_use_aes, this->encryption_V, this->encryption_R);
 }
 
 int

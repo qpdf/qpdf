@@ -1,5 +1,5 @@
 #!/bin/sh
-lines=$(expr + $(diff $1 $2 | egrep '^[<>]' | egrep -v 'Date' | wc -l))
+lines=$(expr + $(diff $1 $2 | egrep '^[<>]' | egrep -v '(Date|InstanceID)' | wc -l))
 if [ "$lines" = "0" ]; then
    echo okay
 else

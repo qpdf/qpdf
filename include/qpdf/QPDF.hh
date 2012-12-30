@@ -224,7 +224,7 @@ class QPDF
 
     // Encryption support
 
-    enum encryption_method_e { e_none, e_unknown, e_rc4, e_aes };
+    enum encryption_method_e { e_none, e_unknown, e_rc4, e_aes, e_aesv3 };
     class EncryptionData
     {
       public:
@@ -326,7 +326,7 @@ class QPDF
     QPDF_DLL
     static std::string compute_data_key(
 	std::string const& encryption_key, int objid, int generation,
-	bool use_aes);
+	bool use_aes, int encryption_V, int encryption_R);
     QPDF_DLL
     static std::string compute_encryption_key(
 	std::string const& password, EncryptionData const& data);
@@ -337,6 +337,14 @@ class QPDF
 	int V, int R, int key_len, int P, bool encrypt_metadata,
 	std::string const& id1,
 	std::string& O, std::string& U);
+    QPDF_DLL
+    static void compute_encryption_parameters_V5(
+	char const* user_password, char const* owner_password,
+	int V, int R, int key_len, int P, bool encrypt_metadata,
+	std::string const& id1,
+        std::string& encryption_key,
+	std::string& O, std::string& U,
+        std::string& OE, std::string& UE, std::string& Perms);
     // Return the full user password as stored in the PDF file.  If
     // you are attempting to recover the user password in a
     // user-presentable form, call getTrimmedUserPassword() instead.
@@ -345,6 +353,10 @@ class QPDF
     // Return human-readable form of user password.
     QPDF_DLL
     std::string getTrimmedUserPassword() const;
+    // Return the previously computed or retrieved encryption key for
+    // this file
+    QPDF_DLL
+    std::string getEncryptionKey() const;
 
     // Linearization support
 
@@ -628,6 +640,13 @@ class QPDF
     void initializeEncryption();
     std::string getKeyForObject(int objid, int generation, bool use_aes);
     void decryptString(std::string&, int objid, int generation);
+    static std::string compute_encryption_key_from_password(
+        std::string const& password, EncryptionData const& data);
+    static std::string recover_encryption_key_with_password(
+        std::string const& password, EncryptionData const& data);
+    static std::string recover_encryption_key_with_password(
+        std::string const& password, EncryptionData const& data,
+        bool& perms_valid);
     void decryptStream(
 	Pipeline*& pipeline, int objid, int generation,
 	QPDFObjectHandle& stream_dict,
@@ -981,6 +1000,7 @@ class QPDF
     std::ostream* err_stream;
     bool attempt_recovery;
     int encryption_V;
+    int encryption_R;
     bool encrypt_metadata;
     std::map<std::string, encryption_method_e> crypt_filters;
     encryption_method_e cf_stream;

@@ -243,6 +243,7 @@ QPDFWriter extra header text add newline 0
 QPDF bogus 0 offset 0
 QPDF global offset 0
 QPDFWriter make stream key direct 0
+QPDFWriter copy V5 0
 QPDFWriter increasing extension level 0
 QPDFWriter make Extensions direct 0
 QPDFWriter make ADBE direct 1
@@ -253,3 +254,5 @@ QPDFWriter remove existing Extensions 0
 QPDFWriter skip Extensions 0
 QPDFWriter preserve ADBE 0
 QPDF_encryption skip 0x28 0
+QPDF_encrypt crypt array 0
+QPDF_encryption CFM AESV3 0

@@ -97,7 +97,7 @@ Note that -- terminates parsing of encryption flags.\n\
 Either or both of the user password and the owner password may be\n\
 empty strings.\n\
 \n\
-key-length may be 40 or 128\n\
+key-length may be 40, 128, or 256\n\
 \n\
 Additional flags are dependent upon key length.\n\
 \n\
@@ -117,6 +117,11 @@ Additional flags are dependent upon key length.\n\
     --cleartext-metadata     prevents encryption of metadata\n\
     --use-aes=[yn]           indicates whether to use AES encryption\n\
     --force-V4               forces use of V=4 encryption handler\n\
+\n\
+  If 256, options are the same as 128 with these exceptions:\n\
+    --force-V4               this option is not available with 256-bit keys\n\
+    --use-aes                this option is always on with 256-bit keys\n\
+    --force-R5               forces use of deprecated R=5 encryption\n\
 \n\
     print-opt may be:\n\
 \n\
@@ -282,6 +287,9 @@ static std::string show_encryption_method(QPDF::encryption_method_e method)
         break;
       case QPDF::e_aes:
         result = "AESv2";
+        break;
+      case QPDF::e_aesv3:
+        result = "AESv3";
         break;
         // no default so gcc will warn for missing case
     }
@@ -485,7 +493,8 @@ parse_encrypt_options(
     bool& r2_print, bool& r2_modify, bool& r2_extract, bool& r2_annotate,
     bool& r3_accessibility, bool& r3_extract,
     qpdf_r3_print_e& r3_print, qpdf_r3_modify_e& r3_modify,
-    bool& force_V4, bool& cleartext_metadata, bool& use_aes)
+    bool& force_V4, bool& cleartext_metadata, bool& use_aes,
+    bool& force_R5)
 {
     if (cur_arg + 3 >= argc)
     {
@@ -502,9 +511,14 @@ parse_encrypt_options(
     {
 	keylen = 128;
     }
+    else if (len_str == "256")
+    {
+	keylen = 256;
+        use_aes = true;
+    }
     else
     {
-	usage("encryption key length must be 40 or 128");
+	usage("encryption key length must be 40, 128, or 256");
     }
     while (1)
     {
@@ -736,13 +750,28 @@ parse_encrypt_options(
 	    {
 		usage("--force-V4 does not take a parameter");
 	    }
-	    if (keylen == 40)
+	    if (keylen != 128)
 	    {
-		usage("--force-V4 is invalid for 40-bit keys");
+		usage("--force-V4 is invalid only for 128-bit keys");
 	    }
 	    else
 	    {
 		force_V4 = true;
+	    }
+	}
+	else if (strcmp(arg, "force-R5") == 0)
+	{
+	    if (parameter)
+	    {
+		usage("--force-R5 does not take a parameter");
+	    }
+	    if (keylen != 256)
+	    {
+		usage("--force-R5 is invalid only for 256-bit keys");
+	    }
+	    else
+	    {
+		force_R5 = true;
 	    }
 	}
 	else if (strcmp(arg, "use-aes") == 0)
@@ -765,10 +794,16 @@ parse_encrypt_options(
 	    {
 		usage("invalid -use-aes parameter");
 	    }
-	    if (keylen == 40)
+	    if ((keylen == 40) && result)
 	    {
 		usage("use-aes is invalid for 40-bit keys");
 	    }
+            else if ((keylen == 256) && (! result))
+            {
+                // qpdf would happily create files encrypted with RC4
+                // using /V=5, but Adobe reader can't read them.
+                usage("use-aes can't be disabled with 256-bit keys");
+            }
 	    else
 	    {
 		use_aes = result;
@@ -921,6 +956,7 @@ int main(int argc, char* argv[])
     qpdf_r3_print_e r3_print = qpdf_r3p_full;
     qpdf_r3_modify_e r3_modify = qpdf_r3m_all;
     bool force_V4 = false;
+    bool force_R5 = false;
     bool cleartext_metadata = false;
     bool use_aes = false;
 
@@ -1004,7 +1040,7 @@ int main(int argc, char* argv[])
 		    user_password, owner_password, keylen,
 		    r2_print, r2_modify, r2_extract, r2_annotate,
 		    r3_accessibility, r3_extract, r3_print, r3_modify,
-		    force_V4, cleartext_metadata, use_aes);
+		    force_V4, cleartext_metadata, use_aes, force_R5);
 		encrypt = true;
                 decrypt = false;
                 copy_encryption = false;
@@ -1610,6 +1646,23 @@ int main(int argc, char* argv[])
 			w.setR3EncryptionParameters(
 			    user_password.c_str(), owner_password.c_str(),
 			    r3_accessibility, r3_extract, r3_print, r3_modify);
+		    }
+		}
+		else if (keylen == 256)
+		{
+		    if (force_R5)
+                    {
+			w.setR5EncryptionParameters(
+			    user_password.c_str(), owner_password.c_str(),
+			    r3_accessibility, r3_extract, r3_print, r3_modify,
+			    !cleartext_metadata);
+		    }
+		    else
+		    {
+			w.setR6EncryptionParameters(
+			    user_password.c_str(), owner_password.c_str(),
+			    r3_accessibility, r3_extract, r3_print, r3_modify,
+			    !cleartext_metadata);
 		    }
 		}
 		else

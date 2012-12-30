@@ -112,7 +112,12 @@ void runtest(int n, char const* filename1, char const* arg2)
     {
 	pdf.setAttemptRecovery(false);
     }
-    if (n % 2 == 0)
+    if ((n == 35) && (arg2 != 0))
+    {
+        // arg2 is password
+	pdf.processFile(filename1, arg2);
+    }
+    else if (n % 2 == 0)
     {
         if (n % 4 == 0)
         {
@@ -1149,6 +1154,65 @@ void runtest(int n, char const* filename1, char const* arg2)
         std::cout << "version: " << pdf.getPDFVersion() << std::endl
                   << "extension level: " << pdf.getExtensionLevel() << std::endl
                   << pdf.getRoot().getKey("/Extensions").unparse() << std::endl;
+    }
+    else if (n == 35)
+    {
+        // Extract attachments
+
+        std::map<std::string, PointerHolder<Buffer> > attachments;
+        QPDFObjectHandle root = pdf.getRoot();
+        QPDFObjectHandle names = root.getKey("/Names");
+        QPDFObjectHandle embeddedFiles = names.getKey("/EmbeddedFiles");
+        names = embeddedFiles.getKey("/Names");
+        for (int i = 0; i < names.getArrayNItems(); ++i)
+        {
+            QPDFObjectHandle item = names.getArrayItem(i);
+            if (item.isDictionary() &&
+                item.getKey("/Type").isName() &&
+                (item.getKey("/Type").getName() == "/Filespec") &&
+                item.getKey("/EF").isDictionary() &&
+                item.getKey("/EF").getKey("/F").isStream())
+            {
+                std::string filename = item.getKey("/F").getStringValue();
+                QPDFObjectHandle stream = item.getKey("/EF").getKey("/F");
+                attachments[filename] = stream.getStreamData();
+            }
+        }
+        for (std::map<std::string, PointerHolder<Buffer> >::iterator iter =
+                 attachments.begin(); iter != attachments.end(); ++iter)
+        {
+            std::string const& filename = (*iter).first;
+            std::string data = std::string(
+                (char const*)(*iter).second->getBuffer(),
+                (*iter).second->getSize());
+            bool is_binary = false;
+            for (size_t i = 0; i < data.size(); ++i)
+            {
+                if (data[i] < 0)
+                {
+                    is_binary = true;
+                    break;
+                }
+            }
+            if (is_binary)
+            {
+                std::string t;
+                for (size_t i = 0; i < std::min(data.size(), (size_t)20); ++i)
+                {
+                    if ((data[i] >= 32) && (data[i] <= 126))
+                    {
+                        t += data[i];
+                    }
+                    else
+                    {
+                        t += ".";
+                    }
+                }
+                t += " (" + QUtil::int_to_string(data.size()) + " bytes)";
+                data = t;
+            }
+            std::cout << filename << ":\n" << data << "--END--\n";
+        }
     }
     else
     {

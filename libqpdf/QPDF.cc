@@ -97,6 +97,7 @@ QPDF::QPDF() :
     err_stream(&std::cerr),
     attempt_recovery(true),
     encryption_V(0),
+    encryption_R(0),
     encrypt_metadata(true),
     cf_stream(e_none),
     cf_string(e_none),
