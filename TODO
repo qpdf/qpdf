@@ -27,6 +27,13 @@ General
    Possible sha256 implementations: http://sol-biotech.com/code/sha2/,
    http://hashlib2plus.sourceforge.net/
 
+ * Improve the random number seed to make it more secure so that we
+   have stronger random numbers, particularly when multiple files are
+   generated in the same second.  This code may need to be
+   OS-specific.  Probably we should add a method in QUtil to seed with
+   a strong random number and call this automatically the first time
+   QUtil::random() is called.
+
  * Consider the possibility of doing something locale-aware to support
    non-ASCII passwords.  Update documentation if this is done.
 
