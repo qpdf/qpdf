@@ -322,6 +322,7 @@ class QPDFWriter
     void setDataKey(int objid);
     int openObject(int objid = 0);
     void closeObject(int objid);
+    QPDFObjectHandle getTrimmedTrailer();
     void prepareFileForWrite();
     void writeStandard();
     void writeLinearized();

@@ -1057,7 +1057,7 @@ void
 QPDFWriter::writeTrailer(trailer_e which, int size, bool xref_stream,
                          qpdf_offset_t prev)
 {
-    QPDFObjectHandle trailer = pdf.getTrailer();
+    QPDFObjectHandle trailer = getTrimmedTrailer();
     if (! xref_stream)
     {
 	writeString("trailer <<");
@@ -1932,20 +1932,19 @@ QPDFWriter::generateObjectStreams()
     }
 }
 
-void
-QPDFWriter::prepareFileForWrite()
+QPDFObjectHandle
+QPDFWriter::getTrimmedTrailer()
 {
     // Remove keys from the trailer that necessarily have to be
     // replaced when writing the file.
 
-    QPDFObjectHandle trailer = pdf.getTrailer();
+    QPDFObjectHandle trailer = pdf.getTrailer().shallowCopy();
 
-    // Note that removing the encryption dictionary does not interfere
-    // with reading encrypted files.  QPDF loads all the information
-    // it needs from the encryption dictionary at the beginning and
-    // never looks at it again.
+    // Remove encryption keys
     trailer.removeKey("/ID");
     trailer.removeKey("/Encrypt");
+
+    // Remove modification information
     trailer.removeKey("/Prev");
 
     // Remove all trailer keys that potentially come from a
@@ -1958,6 +1957,12 @@ QPDFWriter::prepareFileForWrite()
     trailer.removeKey("/Type");
     trailer.removeKey("/XRefStm");
 
+    return trailer;
+}
+
+void
+QPDFWriter::prepareFileForWrite()
+{
     // Do a traversal of the entire PDF file structure replacing all
     // indirect objects that QPDFWriter wants to be direct.  This
     // includes stream lengths, stream filtering parameters, and
@@ -1967,7 +1972,7 @@ QPDFWriter::prepareFileForWrite()
     // holders.
 
     std::list<QPDFObjectHandle> queue;
-    queue.push_back(pdf.getTrailer());
+    queue.push_back(getTrimmedTrailer());
     std::set<int> visited;
 
     while (! queue.empty())
@@ -2861,7 +2866,7 @@ QPDFWriter::writeStandard()
     writeString(this->extra_header_text);
 
     // Put root first on queue.
-    QPDFObjectHandle trailer = pdf.getTrailer();
+    QPDFObjectHandle trailer = getTrimmedTrailer();
     enqueueObject(trailer.getKey("/Root"));
 
     // Next place any other objects referenced from the trailer
