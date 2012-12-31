@@ -11,11 +11,6 @@ General
  * Consider the possibility of doing something locale-aware to support
    non-ASCII passwords.  Update documentation if this is done.
 
- * Look for %PDF header somewhere within the first 1024 bytes of the
-   file.  Also accept headers of the form "%!PS−Adobe−N.n PDF−M.m".
-   See Implementation notes 13 and 14 in appendix H of the PDF 1.7
-   specification.  This is bug 3267974.
-
  * Consider impact of article threads on page splitting/merging.
    Subramanyam provided a test file; see ../misc/article-threads.pdf.
    Email Q-Count: 431864 from 2009-11-03.  Other things to consider:
