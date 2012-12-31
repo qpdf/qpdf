@@ -235,7 +235,7 @@ QPDF::parse(char const* password)
         size_t global_offset = m1.getMatch(1).length();
         if (global_offset != 0)
         {
-            // Emperical evidence strongly suggests that when there is
+            // Empirical evidence strongly suggests that when there is
             // leading material prior to the PDF header, all explicit
             // offsets in the file are such that 0 points to the
             // beginning of the header.
@@ -1273,7 +1273,7 @@ QPDF::readObjectAtOffset(bool try_recovery,
     setLastObjectDescription(description, exp_objid, exp_generation);
 
     // Special case: if offset is 0, just return null.  Some PDF
-    // writers, in particuar "Mac OS X 10.7.5 Quartz PDFContext", may
+    // writers, in particular "Mac OS X 10.7.5 Quartz PDFContext", may
     // store deleted objects in the xref table as "0000000000 00000
     // n", which is not correct, but it won't hurt anything for to
     // ignore these.
