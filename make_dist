@@ -119,6 +119,7 @@ if ($run_tests)
 {
     cd($srcdir);
     run("./configure");
+    run("make -j8");
     run("make check");
     cd($pwd);
 }
