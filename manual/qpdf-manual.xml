@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "3.0.2">
-<!ENTITY lastreleased "September 6, 2012">
+<!ENTITY swversion "4.0.0">
+<!ENTITY lastreleased "December 31, 2012">
 ]>
 <book>
  <bookinfo>
@@ -402,8 +402,8 @@ make
    </para>
    <para>
     The value for
-    <option><replaceable>key-length</replaceable></option> may be 40
-    or 128.  The restriction flags are dependent upon key length.
+    <option><replaceable>key-length</replaceable></option> may be 40,
+    128, or 256.  The restriction flags are dependent upon key length.
     When no additional restrictions are given, the default is to be
     fully permissive.
    </para>
@@ -561,6 +561,44 @@ make
         reason to ever use this option.  It exists primarily for use
         in testing qpdf itself.  This option also forces the PDF
         version to be at least 1.5.
+       </para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+    If <option><replaceable>key-length</replaceable></option> is 256,
+    the minimum PDF version is 1.7 with extension level 8, and the
+    AES-based encryption format used is the PDF 2.0 encryption method
+    supported by Acrobat X.  the same options are available as with
+    128 bits with the following exceptions:
+    <variablelist>
+     <varlistentry>
+      <term><option>--use-aes</option></term>
+      <listitem>
+       <para>
+        This option is not available with 256-bit keys.  AES is always
+        used with 256-bit encryption keys.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--force-V4</option></term>
+      <listitem>
+       <para>
+        This option is not available with 256 keys.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--force-R5</option></term>
+      <listitem>
+       <para>
+        If specified, qpdf sets the minimum version to 1.7 at
+        extension level 3 and writes the deprecated encryption format
+        used by Acrobat version IX.  This option should not be used in
+        practice to generate PDF files that will be in general use,
+        but it can be useful to generate files if you are trying to
+        test proper support in another application for PDF files
+        encrypted in this way.
        </para>
       </listitem>
      </varlistentry>
@@ -796,6 +834,16 @@ outfile.pdf</option>
         will automatically increase the version as needed when adding
         features that require newer PDF readers.
        </para>
+       <para>
+        The version number may be expressed in the form
+        <replaceable>major.minor.extension-level</replaceable>, in
+        which case the version is interpreted as
+        <replaceable>major.minor</replaceable> at extension level
+        <replaceable>extension-level</replaceable>.  For example,
+        version <literal>1.7.8</literal> represents version 1.7 at
+        extension level 8.  Note that minimal syntax checking is done
+        on the command line.
+       </para>
       </listitem>
      </varlistentry>
      <varlistentry>
@@ -804,14 +852,19 @@ outfile.pdf</option>
        <para>
         This option forces the PDF version to be the exact version
         specified <emphasis>even when the file may have content that
-        is not supported in that version</emphasis>.  In some cases,
-        forcing the output file's PDF version to be lower than that of
-        the input file will cause qpdf to disable certain features of
-        the document.  Specifically, AES encryption is disabled if the
-        version is less than 1.6, cleartext metadata and object
-        streams are disabled if less than 1.5, 128-bit encryption keys
-        are disabled if less than 1.4, and all encryption is disabled
-        if less than 1.3.  Even with these precautions, qpdf won't be
+        is not supported in that version</emphasis>.  The version
+        number is interpreted in the same way as with
+        <option>--min-version</option> so that extension levels can be
+        set.  In some cases, forcing the output file's PDF version to
+        be lower than that of the input file will cause qpdf to
+        disable certain features of the document.  Specifically,
+        256-bit keys are disabled if the version is less than 1.7 with
+        extension level 8 (except R5 is disabled if less than 1.7 with
+        extension level 3), AES encryption is disabled if the version
+        is less than 1.6, cleartext metadata and object streams are
+        disabled if less than 1.5, 128-bit encryption keys are
+        disabled if less than 1.4, and all encryption is disabled if
+        less than 1.3.  Even with these precautions, qpdf won't be
         able to do things like eliminate use of newer image
         compression schemes, transparency groups, or other features
         that may have been added in more recent versions of PDF.
@@ -1591,6 +1644,31 @@ outfile.pdf</option>
     strings given an encryption key.  This is used by
     <classname>QPDFWriter</classname> when it rewrites encrypted
     files.
+   </para>
+   <para>
+    When copying encrypted files, unless otherwise directed, qpdf will
+    preserve any encryption in force in the original file.  qpdf can
+    do this with either the user or the owner password.  There is no
+    difference in capability based on which password is used.  When 40
+    or 128 bit encryption keys are used, the user password can be
+    recovered with the owner password.  With 256 keys, the user and
+    owner passwords are used independently to encrypt the actual
+    encryption key, so while either can be used, the owner password
+    can no longer be used to recover the user password.
+   </para>
+   <para>
+    Starting with version 4.0.0, qpdf can read files that are not
+    encrypted but that contain encrypted attachments, but it cannot
+    write such files.  qpdf also requires the password to be specified
+    in order to open the file, not just to extract attachments, since
+    once the file is open, all decryption is handled transparently.
+    When copying files like this while preserving encryption, qpdf
+    will apply the file's encryption to everything in the file, not
+    just to the attachments.  When decrypting the file, qpdf will
+    decrypt the attachments.  In general, when copying PDF files with
+    multiple encryption formats, qpdf will choose the newest format.
+    The only exception to this is that clear-text metadata will be
+    preserved as clear-text if it is that way in the original file.
    </para>
   </sect1>
   <sect1 id="ref.adding-and-remove-pages">
@@ -2381,6 +2459,179 @@ print "\n";
    For a detailed list of changes, please see the file
    <filename>ChangeLog</filename> in the source distribution.
   </para>
+  <variablelist>
+   <varlistentry>
+    <term>4.0.0: December 31, 2012</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Major enhancement: support has been added for newer encryption
+        schemes supported by version X of Adobe Acrobat.  This
+        includes use of 127-character passwords, 256-bit encryption
+        keys, and the encryption scheme specified in ISO 32000-2, the
+        PDF 2.0 specification.  This scheme can be chosen from the
+        command line by specifying use of 256-bit keys.  qpdf also
+        supports the deprecated encryption method used by Acrobat IX.
+        This encryption style has known security weaknesses and should
+        not be used in practice.  However, such files exist &ldquo;in
+        the wild,&rdquo; so support for this scheme is still useful.
+        New methods
+        <function>QPDFWriter::setR6EncryptionParameters</function>
+        (for the PDF 2.0 scheme) and
+        <function>QPDFWriter::setR5EncryptionParameters</function>
+        (for the deprecated scheme) have been added to enable these
+        new encryption schemes.  Corresponding functions have been
+        added to the C API as well.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Full support for Adobe extension levels in PDF version
+        information.  Starting with PDF version 1.7, corresponding to
+        ISO 32000, Adobe adds new functionality by increasing the
+        extension level rather than increasing the version.  This
+        support includes addition of the
+        <function>QPDF::getExtensionLevel</function> method for
+        retrieving the document's extension level, addition of
+        versions of
+        <function>QPDFWriter::setMinimumPDFVersion</function> and
+        <function>QPDFWriter::forcePDFVersion</function> that accept
+        an extension level, and extended syntax for specifying forced
+        and minimum versions on the command line as described in <xref
+        linkend="ref.advanced-transformation"/>.  Corresponding
+        functions have been added to the C API as well.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Minor fixes to prevent qpdf from referencing objects in the
+        file that are not referenced in the file's overall structure.
+        Most files don't have any such objects, but some files have
+        contain unreferenced objects with errors, so these fixes
+        prevent qpdf from needlessly rejecting or complaining about
+        such objects.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Add new generalized methods for reading and writing files
+        from/to programmer-defined sources.  The method
+        <function>QPDF::processInputSource</function> allows the
+        programmer to use any input source for the input file, and
+        <function>QPDFWriter::setOutputPipeline</function> allows the
+        programmer to write the output file through any pipeline.
+        These methods would make it possible to perform any number of
+        specialized operations, such as accessing external storage
+        systems, creating bindings for qpdf in other programming
+        languages that have their own I/O systems, etc.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Add new method <function>QPDF::getEncryptionKey</function> for
+        retrieving the underlying encryption key used in the file.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        This release includes a small handful of non-compatible API
+        changes.  While effort is made to avoid such changes, all the
+        non-compatible API changes in this version were to parts of
+        the API that would likely never be used outside the library
+        itself.  In all cases, the altered methods or structures were
+        parts of the <classname>QPDF</classname> that were public to
+        enable them to be called from either
+        <classname>QPDFWriter</classname> or were part of validation
+        code that was over-zealous in reporting problems in parts of
+        the file that would not ordinarily be referenced.  In no case
+        did any of the removed methods do anything worse that falsely
+        report error conditions in files that were broken in ways that
+        didn't matter.  The following public parts of the
+        <classname>QPDF</classname> class were changed in a
+        non-compatible way:
+        <itemizedlist>
+         <listitem>
+          <para>
+           Updated nested <classname>QPDF::EncryptionData</classname>
+           class to add fields needed by the newer encryption formats,
+           member variables changed to private so that future changes
+           will not require breaking backward compatibility.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Added additional parameters to
+           <function>compute_data_key</function>, which is used by
+           <classname>QPDFWriter</classname> to compute the encryption
+           key used to encrypt a specific object.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Removed the method
+           <function>flattenScalarReferences</function>.  This method
+           was previously used prior to writing a new PDF file, but it
+           has the undesired side effect of causing qpdf to read
+           objects in the file that were not referenced.  Some
+           otherwise files have unreferenced objects with errors in
+           them, so this could cause qpdf to reject files that would
+           be accepted by virtually all other PDF readers.  In fact,
+           qpdf relied on only a very small part of what
+           flattenScalarReferences did, so only this part has been
+           preserved, and it is now done directly inside
+           <classname>QPDFWriter</classname>.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Removed the method <function>decodeStreams</function>.
+           This method was used by the <option>--check</option> option
+           of the <command>qpdf</command> command-line tool to force
+           all streams in the file to be decoded, but it also suffered
+           from the problem of opening otherwise unreferenced streams
+           and thus could report false positive.  The
+           <option>--check</option> option now causes qpdf to go
+           through all the motions of writing a new file based on the
+           original one, so it will always reference and check exactly
+           those parts of a file that any ordinary viewer would check.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Removed the method
+           <function>trimTrailerForWrite</function>.  This method was
+           used by <classname>QPDFWriter</classname> to modify the
+           original QPDF object by removing fields from the trailer
+           dictionary that wouldn't apply to the newly written file.
+           This functionality, though generally harmless, was a poor
+           implementation and has been replaced by having QPDFWriter
+           filter these out when copying the trailer rather than
+           modifying the original QPDF object.  (Note that qpdf never
+           modifies the original file itself.)
+          </para>
+         </listitem>
+        </itemizedlist>
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Allow the PDF header to appear anywhere in the first 1024
+        bytes of the file.  This is consistent with what other readers
+        do.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Fix the <command>pkg-config</command> files to list zlib and
+        pcre in <function>Requires.private</function> to better
+        support static linking using <command>pkg-config</command>.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+  </variablelist>
   <variablelist>
    <varlistentry>
     <term>3.0.2: September 6, 2012</term>
@@ -3272,6 +3523,18 @@ print "\n";
      </para>
     </listitem>
    </itemizedlist>
+  </para>
+ </appendix>
+ <appendix id="ref.upgrading-to-4.0">
+  <title>Upgrading to 4.0</title>
+  <para>
+   While version 4.0 includes a few non-compatible API changes, it is
+   very unlikely that anyone's code would have used any of those parts
+   of the API since they generally required information that would
+   only be available inside the library.  In the unlikely event that
+   you should run into trouble, please see the ChangeLog.  See also
+   <xref linkend="ref.release-notes"/> for a complete list of the
+   non-compatible API changes made in this version.
   </para>
  </appendix>
 </book>
