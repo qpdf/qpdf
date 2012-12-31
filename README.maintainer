@@ -28,7 +28,7 @@ Release Reminders
 
    You can generate these by running valgrind with --gen-suppressions=yes.
 
- * Check all open issues in the sourceforge trackers.
+ * Check all open issues in the sourceforge trackers and on github.
 
  * If any interfaces were added or changed, check C API to see whether
    changes are appropriate there as well.
@@ -90,6 +90,8 @@ Release Reminders
    directory, extract the binary distribution of the external
    libraries.  Run ./make_windows_releases from there.  You will need
    to have zip in your path.
+
+ * Before releasing, rebuild and test debian package.
 
  * Remember to copy README-what-to-download.txt separately onto the
    download area.
