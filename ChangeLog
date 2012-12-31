@@ -1,5 +1,7 @@
 2012-12-31  Jay Berkenbilt  <ejb@ql.org>
 
+	* 4.0.0: release
+
 	* Add new methods qpdf_get_pdf_extension_level,
 	qpdf_set_r5_encryption_parameters,
 	qpdf_set_r6_encryption_parameters,
