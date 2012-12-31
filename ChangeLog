@@ -1,20 +1,111 @@
+2012-12-30  Jay Berkenbilt  <ejb@ql.org>
+
+	* Fix long-standing bug that could theoretically have resulted in
+	possible misinterpretation of decode parameters in streams.  As
+	far as I can tell, it is extremely unlikely that files with the
+	characteristics that would have triggered the bug actually exist
+	in cases that qpdf versions prior to 4.0.0 could have read.
+	Unencrypted files with encrypted attachments would have triggered
+	this bug, but qpdf versions prior to 4.0.0 already refused to open
+	such files.
+
+	* Fix long-standing bug in which a stream that used a crypt
+	filter and was otherwise not filterable by qpdf would be decrypted
+	properly but would retain the crypt filter indication in the
+	file.  There are no known ways to create files like this, so it is
+	unlikely that anyone ever hit this bug.
+
+2012-12-29  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add read/write support for both the deprecated Acrobat IX
+	encryption format and the Acrobat X/PDF 2.0 encryption format
+	using 256-bit AES keys.  Using the Acrobat IX format (R=5) forces
+	the version of the file to 1.7 with extension level 3.  Using the
+	PDF 2.0 format (R=6) forces it to 1.7 extension level 8.
+
+	* Add new method QPDF::getEncryptionKey to return the actual
+	encryption key used for encryption of data in the file.  The key
+	is returned as a std::string.
+
+	* Non-compatible API change: change signature of
+	QPDF::compute_data_key to take the R and V values from the
+	encryption dictionary.  There is no reason for any application
+	code to call this method since handling of encryption is done
+	automatically by the qpdf libary.  It is used internally by
+	QPDFWriter.
+
+	* Support reading and decryption of files whose main text is not
+	encrypted but whose attachments are.  More generally, support the
+	case of files and streams encrypted differently with some
+	limitations, described in the documentation.  This was not
+	previously supported due to lack of test files, but I created test
+	files using a trial version of Acrobat XI to fully implement this
+	case.
+
+	* Incorporate sha2 code from sphlib 3.0.  See README for
+	licensing.  Create private pipeline class for computing hashes
+	with sha256, sha384, and sha512.
+
+	* Allow specification of initialization vector when using AES
+	filtering.  This is required to compute the hash used in /R=6 (PDF
+	2.0) encryption.
+
+2012-12-28  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add random number generation functions to QUtil.
+
+	* Fix old bug that could cause an infinite loop if user password
+	recovery methods were called and a password contained the "("
+	character (which happens to be the first byte of padding used by
+	older PDF encryption formats).  This bug was noticed while reading
+	code and would not happen under ordinary usage patterns even if
+	the password contained that character.
+
 2012-12-27  Jay Berkenbilt  <ejb@ql.org>
 
-	* Removed public method QPDF::flattenScalarReferences.  Instead,
-	just flatten the scalar references we actually need to flatten.
-	Flattening scalar references was a wrong decision years ago and
-	has occasionally caused other problems, among which were that it
-	caused qpdf to visit otherwise unreferenced and possibly erroneous
-	objects in the file when it didn't have to.
+	* Add awareness of extension level to PDF Version methods for both
+	reading and writing.  This includes adding method
+	QPDF::getExtensionLevel and new versions of
+	QPDFWriter::setMinimumPDFVersion and QPDFWriter::forcePDFVersion
+	that support extension levels.  The qpdf command-line tool
+	interprets version numbers of the form x.y.z as version x.y at
+	extension level z.
 
-	* Removed public method QPDF::decodeStreams which was previously
-	used by qpdf --check but is no longer used.  The decodeStreams
-	method could generate false positives since it would attempt to
-	access all objects in the file including those that were not
-	referenced.
+	* Update AES classes to support use of 256-bit keys.
 
-	* Removed public method QPDF::trimTrailerForWrite, which was only
-	intended for use by QPDFWriter and which is no longer used.
+	* Non-compatible API change: Removed public method
+	QPDF::flattenScalarReferences.  Instead, just flatten the scalar
+	references we actually need to flatten.  Flattening scalar
+	references was a wrong decision years ago and has occasionally
+	caused other problems, among which were that it caused qpdf to
+	visit otherwise unreferenced and possibly erroneous objects in the
+	file when it didn't have to.  There's no reason that any
+	non-internal code would have had to call this.
+
+	* Non-compatible API change: Removed public method
+	QPDF::decodeStreams which was previously used by qpdf --check but
+	is no longer used.  The decodeStreams method could generate false
+	positives since it would attempt to access all objects in the file
+	including those that were not referenced.  There's no reason that
+	any non-internal code would have had to call this.
+
+	* Non-compatible API change: Removed public method
+	QPDF::trimTrailerForWrite, which was only intended for use by
+	QPDFWriter and which is no longer used.
+
+2012-12-26  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add new fields to QPDF::EncryptionData to support newer
+	encryption formats (V=5, R=5 and R=6)
+
+	* Non-compatible API change: Change public nested class
+	QPDF::EncryptionData to make all member fields private and to add
+	method calls.  This is a non-compatible API change, but changing
+	EncryptionData is necessary to support newer encryption formats,
+	and making this change will prevent the need from making a
+	non-compatible change in the future if new fields are added.  A
+	public nested class should never have had public members to begin
+	with.
 
 2012-12-25  Jay Berkenbilt  <ejb@ql.org>
 
