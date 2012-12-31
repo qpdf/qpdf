@@ -256,3 +256,6 @@ QPDF_encryption skip 0x28 0
 QPDF_encrypt crypt array 0
 QPDF_encryption CFM AESV3 0
 QPDFWriter remove Crypt 0
+qpdf-c called qpdf_get_pdf_extension_level 0
+qpdf-c called qpdf_set_r5_encryption_parameters 0
+qpdf-c called qpdf_set_r6_encryption_parameters 0

@@ -1,0 +1,20 @@
+checking a.pdf
+PDF Version: 1.7 extension level 8
+R = 6
+P = -2052
+User password = user4
+extract for accessibility: allowed
+extract for any purpose: allowed
+print low resolution: allowed
+print high resolution: not allowed
+modify document assembly: allowed
+modify forms: allowed
+modify annotations: allowed
+modify other: allowed
+modify anything: allowed
+stream encryption method: AESv3
+string encryption method: AESv3
+file encryption method: AESv3
+File is not linearized
+No syntax or stream encoding errors found; the file may still contain
+errors that qpdf cannot detect

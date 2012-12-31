@@ -106,6 +106,10 @@ static void test01(char const* infile,
 {
     qpdf_read(qpdf, infile, password);
     printf("version: %s\n", qpdf_get_pdf_version(qpdf));
+    if (qpdf_get_pdf_extension_level(qpdf) > 0)
+    {
+        printf("extension level: %d\n", qpdf_get_pdf_extension_level(qpdf));
+    }
     printf("linearized: %d\n", qpdf_is_linearized(qpdf));
     printf("encrypted: %d\n", qpdf_is_encrypted(qpdf));
     if (qpdf_is_encrypted(qpdf))
@@ -304,7 +308,7 @@ static void test14(char const* infile,
     qpdf_read(qpdf, infile, password);
     qpdf_init_write(qpdf, outfile);
     qpdf_set_static_ID(qpdf, QPDF_TRUE);
-    qpdf_set_minimum_pdf_version(qpdf, "1.6");
+    qpdf_set_minimum_pdf_version_and_extension(qpdf, "1.7", 8);
     qpdf_write(qpdf);
     qpdf_init_write(qpdf, outfile2);
     qpdf_set_static_ID(qpdf, QPDF_TRUE);
@@ -374,6 +378,38 @@ static void test16(char const* infile,
     report_errors();
 }
 
+static void test17(char const* infile,
+		   char const* password,
+		   char const* outfile,
+		   char const* outfile2)
+{
+    qpdf_read(qpdf, infile, password);
+    qpdf_init_write(qpdf, outfile);
+    qpdf_set_static_ID(qpdf, QPDF_TRUE);
+    qpdf_set_static_aes_IV(qpdf, QPDF_TRUE);
+    qpdf_set_r5_encryption_parameters(
+	qpdf, "user3", "owner3", QPDF_TRUE, QPDF_TRUE,
+	qpdf_r3p_low, qpdf_r3m_all, QPDF_TRUE);
+    qpdf_write(qpdf);
+    report_errors();
+}
+
+static void test18(char const* infile,
+		   char const* password,
+		   char const* outfile,
+		   char const* outfile2)
+{
+    qpdf_read(qpdf, infile, password);
+    qpdf_init_write(qpdf, outfile);
+    qpdf_set_static_ID(qpdf, QPDF_TRUE);
+    qpdf_set_static_aes_IV(qpdf, QPDF_TRUE);
+    qpdf_set_r6_encryption_parameters(
+	qpdf, "user4", "owner4", QPDF_TRUE, QPDF_TRUE,
+	qpdf_r3p_low, qpdf_r3m_all, QPDF_TRUE);
+    qpdf_write(qpdf);
+    report_errors();
+}
+
 int main(int argc, char* argv[])
 {
     char* p = 0;
@@ -430,6 +466,8 @@ int main(int argc, char* argv[])
 	  (n == 14) ? test14 :
 	  (n == 15) ? test15 :
 	  (n == 16) ? test16 :
+	  (n == 17) ? test17 :
+	  (n == 18) ? test18 :
 	  0);
 
     if (fn == 0)

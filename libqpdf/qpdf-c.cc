@@ -288,6 +288,12 @@ char const* qpdf_get_pdf_version(qpdf_data qpdf)
     return qpdf->tmp_string.c_str();
 }
 
+int qpdf_get_pdf_extension_level(qpdf_data qpdf)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_get_pdf_extension_level");
+    return qpdf->qpdf->getExtensionLevel();
+}
+
 char const* qpdf_get_user_password(qpdf_data qpdf)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_get_user_password");
@@ -566,6 +572,32 @@ void qpdf_set_r4_encryption_parameters(
 	encrypt_metadata, use_aes);
 }
 
+void qpdf_set_r5_encryption_parameters(
+    qpdf_data qpdf, char const* user_password, char const* owner_password,
+    QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
+    qpdf_r3_print_e print, qpdf_r3_modify_e modify,
+    QPDF_BOOL encrypt_metadata)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_set_r5_encryption_parameters");
+    qpdf->qpdf_writer->setR5EncryptionParameters(
+	user_password, owner_password,
+	allow_accessibility, allow_extract, print, modify,
+	encrypt_metadata);
+}
+
+void qpdf_set_r6_encryption_parameters(
+    qpdf_data qpdf, char const* user_password, char const* owner_password,
+    QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
+    qpdf_r3_print_e print, qpdf_r3_modify_e modify,
+    QPDF_BOOL encrypt_metadata)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_set_r6_encryption_parameters");
+    qpdf->qpdf_writer->setR6EncryptionParameters(
+	user_password, owner_password,
+	allow_accessibility, allow_extract, print, modify,
+	encrypt_metadata);
+}
+
 void qpdf_set_linearization(qpdf_data qpdf, QPDF_BOOL value)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_set_linearization");
@@ -574,14 +606,26 @@ void qpdf_set_linearization(qpdf_data qpdf, QPDF_BOOL value)
 
 void qpdf_set_minimum_pdf_version(qpdf_data qpdf, char const* version)
 {
+    qpdf_set_minimum_pdf_version_and_extension(qpdf, version, 0);
+}
+
+void qpdf_set_minimum_pdf_version_and_extension(
+    qpdf_data qpdf, char const* version, int extension_level)
+{
     QTC::TC("qpdf", "qpdf-c called qpdf_set_minimum_pdf_version");
-    qpdf->qpdf_writer->setMinimumPDFVersion(version);
+    qpdf->qpdf_writer->setMinimumPDFVersion(version, extension_level);
 }
 
 void qpdf_force_pdf_version(qpdf_data qpdf, char const* version)
 {
+    qpdf_force_pdf_version_and_extension(qpdf, version, 0);
+}
+
+void qpdf_force_pdf_version_and_extension(
+    qpdf_data qpdf, char const* version, int extension_level)
+{
     QTC::TC("qpdf", "qpdf-c called qpdf_force_pdf_version");
-    qpdf->qpdf_writer->forcePDFVersion(version);
+    qpdf->qpdf_writer->forcePDFVersion(version, extension_level);
 }
 
 QPDF_ERROR_CODE qpdf_write(qpdf_data qpdf)

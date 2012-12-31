@@ -1,3 +1,12 @@
+2012-12-31  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add new methods qpdf_get_pdf_extension_level,
+	qpdf_set_r5_encryption_parameters,
+	qpdf_set_r6_encryption_parameters,
+	qpdf_set_minimum_pdf_version_and_extension, and
+	qpdf_force_pdf_version_and_extension to support new functionality
+	from the C API.
+
 2012-12-30  Jay Berkenbilt  <ejb@ql.org>
 
 	* Fix long-standing bug that could theoretically have resulted in

@@ -315,8 +315,8 @@ $td->runtest("C API: min/force versions",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("C check version 1",
-	     {$td->COMMAND => "qpdf --check a.pdf"},
-	     {$td->FILE => "min-version.out",
+	     {$td->COMMAND => "qpdf-ctest 1 a.pdf '' ''"},
+	     {$td->FILE => "c-min-version.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("C check version 2",
@@ -1472,29 +1472,52 @@ $td->runtest("C API: invalid password",
 	     $td->NORMALIZE_NEWLINES);
 
 my @cenc = (
-    [11, 'hybrid-xref.pdf', "''", 'r2', ""],
-    [12, 'hybrid-xref.pdf', "''", 'r3', ""],
-    [15, 'hybrid-xref.pdf', "''", 'r4', ""],
+    [11, 'hybrid-xref.pdf', "''", 'r2', "", ""],
+    [12, 'hybrid-xref.pdf', "''", 'r3', "", ""],
+    [15, 'hybrid-xref.pdf', "''", 'r4', "", ""],
+    [17, 'hybrid-xref.pdf', "''", 'r5', "", "owner3"],
+    [18, 'hybrid-xref.pdf', "''", 'r6', "", "user4"],
     [13, 'c-r2.pdf', 'user1', 'decrypt with user',
-     "user password: user1\n"],
+     "user password: user1\n", ""],
     [13, 'c-r3.pdf', 'owner2', 'decrypt with owner',
-     "user password: user2\n"],
+     "user password: user2\n", ""],
+    [13, 'c-r5-in.pdf', 'user3', 'decrypt R5 with user',
+     "user password: user3\n", ""],
+    [13, 'c-r6-in.pdf', 'owner4', 'decrypt R6 with owner',
+     "user password: \n", ""],
     );
 $n_tests += 2 * @cenc;
 
 foreach my $d (@cenc)
 {
-    my ($n, $infile, $pass, $description, $output) = @$d;
+    my ($n, $infile, $pass, $description, $output, $checkpass) = @$d;
     my $outfile = $description;
     $outfile =~ s/ /-/g;
-    $outfile = "c-$outfile.pdf";
+    my $pdf_outfile = "c-$outfile.pdf";
+    my $check_outfile = "c-$outfile.out";
     $td->runtest("C API encryption: $description",
 		 {$td->COMMAND => "qpdf-ctest $n $infile $pass a.pdf"},
 		 {$td->STRING => $output, $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
-    $td->runtest("check $description",
-		 {$td->FILE => "a.pdf"},
-		 {$td->FILE => $outfile});
+    if (-f $pdf_outfile)
+    {
+        $td->runtest("check $description content",
+                     {$td->FILE => "a.pdf"},
+                     {$td->FILE => $pdf_outfile});
+    }
+    else
+    {
+        # QPDF doesn't provide any way to make the random bits in
+        # /Perms static, so we have no way to predictably create a
+        # /V=5 encrypted file.  It's not worth adding this...the test
+        # suite is adequate without having a statically predictable
+        # file.
+        $td->runtest("check $description",
+                     {$td->COMMAND =>
+                          "qpdf --check a.pdf --password=$checkpass"},
+                     {$td->FILE => $check_outfile, $td->EXIT_STATUS => 0},
+                     $td->NORMALIZE_NEWLINES);
+    }
 }
 
 # Test combinations of linearization and encryption.  Note that we do

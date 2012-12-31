@@ -213,6 +213,10 @@ extern "C" {
     QPDF_DLL
     char const* qpdf_get_pdf_version(qpdf_data qpdf);
 
+    /* Return the extension level of the PDF file. */
+    QPDF_DLL
+    int qpdf_get_pdf_extension_level(qpdf_data qpdf);
+
     /* Return the user password.  If the file is opened using the
      * owner password, the user password may be retrieved using this
      * function.  If the file is opened using the user password, this
@@ -359,13 +363,35 @@ extern "C" {
 	QPDF_BOOL encrypt_metadata, QPDF_BOOL use_aes);
 
     QPDF_DLL
+    void qpdf_set_r5_encryption_parameters(
+	qpdf_data qpdf, char const* user_password, char const* owner_password,
+	QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
+	enum qpdf_r3_print_e print, enum qpdf_r3_modify_e modify,
+	QPDF_BOOL encrypt_metadata);
+
+    QPDF_DLL
+    void qpdf_set_r6_encryption_parameters(
+	qpdf_data qpdf, char const* user_password, char const* owner_password,
+	QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
+	enum qpdf_r3_print_e print, enum qpdf_r3_modify_e modify,
+	QPDF_BOOL encrypt_metadata);
+
+    QPDF_DLL
     void qpdf_set_linearization(qpdf_data qpdf, QPDF_BOOL value);
 
     QPDF_DLL
     void qpdf_set_minimum_pdf_version(qpdf_data qpdf, char const* version);
 
     QPDF_DLL
+    void qpdf_set_minimum_pdf_version_and_extension(
+        qpdf_data qpdf, char const* version, int extension_level);
+
+    QPDF_DLL
     void qpdf_force_pdf_version(qpdf_data qpdf, char const* version);
+
+    QPDF_DLL
+    void qpdf_force_pdf_version_and_extension(
+        qpdf_data qpdf, char const* version, int extension_level);
 
     /* Do actual write operation. */
     QPDF_DLL
