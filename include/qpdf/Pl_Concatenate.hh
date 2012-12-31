@@ -1,3 +1,11 @@
+/* Copyright (c) 2005-2013 Jay Berkenbilt
+ *
+ * This file is part of qpdf.  This software may be distributed under
+ * the terms of version 2 of the Artistic License which may be found
+ * in the source distribution.  It is provided "as is" without express
+ * or implied warranty.
+ */
+
 #ifndef __PL_CONCATENATE_HH__
 #define __PL_CONCATENATE_HH__
 
