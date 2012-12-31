@@ -79,13 +79,14 @@ Index: QPDFWriter.cc
  * The description of Crypt filters is unclear with respect to how to
    use them to override /StmF for specific streams.  I'm not sure
    whether qpdf will do the right thing for any specific individual
-   streams that might have crypt filters.  The specification seems to
-   imply that only embedded file streams and metadata streams can have
-   crypt filters, and there are already special cases in the code to
-   handle those.  Most likely, it won't be a problem, but someday
-   someone may find a file that qpdf doesn't work on because of crypt
-   filters.  There is an example in the spec of using a crypt filter
-   on a metadata stream.
+   streams that might have crypt filters, but I believe it does based
+   on my testing of a limited subset.  The specification seems to imply
+   that only embedded file streams and metadata streams can have crypt
+   filters, and there are already special cases in the code to handle
+   those.  Most likely, it won't be a problem, but someday someone may
+   find a file that qpdf doesn't work on because of crypt filters.
+   There is an example in the spec of using a crypt filter on a
+   metadata stream.
 
    For now, we notice /Crypt filters and decode parameters consistent
    with the example in the PDF specification, and the right thing
