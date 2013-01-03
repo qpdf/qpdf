@@ -1188,7 +1188,7 @@ void runtest(int n, char const* filename1, char const* arg2)
             bool is_binary = false;
             for (size_t i = 0; i < data.size(); ++i)
             {
-                if (data[i] < 0)
+                if ((data[i] < 0) || (data[i] > 126))
                 {
                     is_binary = true;
                     break;
