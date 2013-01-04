@@ -345,12 +345,16 @@ class QPDF
         std::string& encryption_key,
 	std::string& O, std::string& U,
         std::string& OE, std::string& UE, std::string& Perms);
-    // Return the full user password as stored in the PDF file.  If
-    // you are attempting to recover the user password in a
+    // Return the full user password as stored in the PDF file.  For
+    // files encrypted with 40-bit or 128-bit keys, the user password
+    // can be recovered when the file is opened using the owner
+    // password.  This is not possible with newer encryption formats.
+    // If you are attempting to recover the user password in a
     // user-presentable form, call getTrimmedUserPassword() instead.
     QPDF_DLL
     std::string const& getPaddedUserPassword() const;
-    // Return human-readable form of user password.
+    // Return human-readable form of user password subject to same
+    // limitations as getPaddedUserPassword().
     QPDF_DLL
     std::string getTrimmedUserPassword() const;
     // Return the previously computed or retrieved encryption key for
