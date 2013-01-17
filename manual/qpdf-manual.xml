@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "4.0.0">
-<!ENTITY lastreleased "December 31, 2012">
+<!ENTITY swversion "4.0.1">
+<!ENTITY lastreleased "January 17, 2013">
 ]>
 <book>
  <bookinfo>
@@ -2460,6 +2460,32 @@ print "\n";
    <filename>ChangeLog</filename> in the source distribution.
   </para>
   <variablelist>
+   <varlistentry>
+    <term>4.0.1: January 17, 2013</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Fix detection of binary attachments in test suite to avoid
+        false test failures on some platforms.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Add clarifying comment in <filename>QPDF.hh</filename> to
+        methods that return the user password explaining that it is no
+        longer possible with newer encryption formats to recover the
+        user password knowing the owner password.  In earlier
+        encryption formats, the user password was encrypted in the
+        file using the owner password.  In newer encryption formats, a
+        separate encryption key is used on the file, and that key is
+        independently encrypted using both the user password and the
+        owner password.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
     <term>4.0.0: December 31, 2012</term>
     <listitem>
