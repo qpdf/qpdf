@@ -40,8 +40,10 @@ SRCS_libqpdf = \
 	libqpdf/QPDF_Array.cc \
 	libqpdf/QPDF_Bool.cc \
 	libqpdf/QPDF_Dictionary.cc \
+	libqpdf/QPDF_InlineImage.cc \
 	libqpdf/QPDF_Integer.cc \
 	libqpdf/QPDF_Name.cc \
+	libqpdf/QPDF_Keyword.cc \
 	libqpdf/QPDF_Null.cc \
 	libqpdf/QPDF_Real.cc \
 	libqpdf/QPDF_Reserved.cc \

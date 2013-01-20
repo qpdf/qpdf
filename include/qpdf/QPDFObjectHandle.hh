@@ -76,7 +76,8 @@ class QPDFObjectHandle
     QPDF_DLL
     bool isInitialized() const;
 
-    // Exactly one of these will return true for any object.
+    // Exactly one of these will return true for any object.  Keyword
+    // and InlineImage are only allowed in content streams.
     QPDF_DLL
     bool isBool();
     QPDF_DLL
@@ -89,6 +90,10 @@ class QPDFObjectHandle
     bool isName();
     QPDF_DLL
     bool isString();
+    QPDF_DLL
+    bool isKeyword();
+    QPDF_DLL
+    bool isInlineImage();
     QPDF_DLL
     bool isArray();
     QPDF_DLL
@@ -103,7 +108,8 @@ class QPDFObjectHandle
     QPDF_DLL
     bool isIndirect();
 
-    // True for everything except array, dictionary, and stream
+    // True for everything except array, dictionary, stream, word, and
+    // inline image.
     QPDF_DLL
     bool isScalar();
 
@@ -147,6 +153,10 @@ class QPDFObjectHandle
     static QPDFObjectHandle newName(std::string const& name);
     QPDF_DLL
     static QPDFObjectHandle newString(std::string const& str);
+    QPDF_DLL
+    static QPDFObjectHandle newKeyword(std::string const&);
+    QPDF_DLL
+    static QPDFObjectHandle newInlineImage(std::string const&);
     QPDF_DLL
     static QPDFObjectHandle newArray();
     QPDF_DLL
@@ -238,6 +248,12 @@ class QPDFObjectHandle
     std::string getStringValue();
     QPDF_DLL
     std::string getUTF8Value();
+
+    // Methods for content stream objects
+    QPDF_DLL
+    std::string getKeywordValue();
+    QPDF_DLL
+    std::string getInlineImageValue();
 
     // Methods for array objects; see also name and array objects
     QPDF_DLL
@@ -509,6 +525,10 @@ class QPDFObjectHandle
     void assertName();
     QPDF_DLL
     void assertString();
+    QPDF_DLL
+    void assertKeyword();
+    QPDF_DLL
+    void assertInlineImage();
     QPDF_DLL
     void assertArray();
     QPDF_DLL

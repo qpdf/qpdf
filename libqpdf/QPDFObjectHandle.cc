@@ -7,6 +7,8 @@
 #include <qpdf/QPDF_Real.hh>
 #include <qpdf/QPDF_Name.hh>
 #include <qpdf/QPDF_String.hh>
+#include <qpdf/QPDF_Keyword.hh>
+#include <qpdf/QPDF_InlineImage.hh>
 #include <qpdf/QPDF_Array.hh>
 #include <qpdf/QPDF_Dictionary.hh>
 #include <qpdf/QPDF_Stream.hh>
@@ -152,6 +154,20 @@ QPDFObjectHandle::isString()
 }
 
 bool
+QPDFObjectHandle::isKeyword()
+{
+    dereference();
+    return QPDFObjectTypeAccessor<QPDF_Keyword>::check(obj.getPointer());
+}
+
+bool
+QPDFObjectHandle::isInlineImage()
+{
+    dereference();
+    return QPDFObjectTypeAccessor<QPDF_InlineImage>::check(obj.getPointer());
+}
+
+bool
 QPDFObjectHandle::isArray()
 {
     dereference();
@@ -190,7 +206,8 @@ QPDFObjectHandle::isIndirect()
 bool
 QPDFObjectHandle::isScalar()
 {
-    return (! (isArray() || isDictionary() || isStream()));
+    return (! (isArray() || isDictionary() || isStream() ||
+               isKeyword() || isInlineImage()));
 }
 
 // Bool accessors
@@ -243,6 +260,22 @@ QPDFObjectHandle::getUTF8Value()
 {
     assertString();
     return dynamic_cast<QPDF_String*>(obj.getPointer())->getUTF8Val();
+}
+
+// Keyword and Inline Image accessors
+
+std::string
+QPDFObjectHandle::getKeywordValue()
+{
+    assertKeyword();
+    return dynamic_cast<QPDF_Keyword*>(obj.getPointer())->getVal();
+}
+
+std::string
+QPDFObjectHandle::getInlineImageValue()
+{
+    assertInlineImage();
+    return dynamic_cast<QPDF_InlineImage*>(obj.getPointer())->getVal();
 }
 
 // Array accessors
@@ -929,6 +962,18 @@ QPDFObjectHandle::newString(std::string const& str)
 }
 
 QPDFObjectHandle
+QPDFObjectHandle::newKeyword(std::string const& value)
+{
+    return QPDFObjectHandle(new QPDF_Keyword(value));
+}
+
+QPDFObjectHandle
+QPDFObjectHandle::newInlineImage(std::string const& value)
+{
+    return QPDFObjectHandle(new QPDF_InlineImage(value));
+}
+
+QPDFObjectHandle
 QPDFObjectHandle::newArray()
 {
     return newArray(std::vector<QPDFObjectHandle>());
@@ -1210,6 +1255,18 @@ void
 QPDFObjectHandle::assertString()
 {
     assertType("String", isString());
+}
+
+void
+QPDFObjectHandle::assertKeyword()
+{
+    assertType("Keyword", isKeyword());
+}
+
+void
+QPDFObjectHandle::assertInlineImage()
+{
+    assertType("InlineImage", isInlineImage());
 }
 
 void

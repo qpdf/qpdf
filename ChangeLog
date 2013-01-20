@@ -1,3 +1,9 @@
+2013-01-20  Jay Berkenbilt  <ejb@ql.org>
+
+	* Added QPDF_Keyword and QPDF_InlineImage types along with
+	appropriate wrapper methods in QPDFObjectHandle.  These new object
+	types are to facilitate content stream parsing.
+
 2013-01-17  Jay Berkenbilt  <ejb@ql.org>
 
 	* 4.0.1: release
