@@ -58,6 +58,45 @@ class Provider: public QPDFObjectHandle::StreamDataProvider
     bool bad_length;
 };
 
+class ParserCallbacks: public QPDFObjectHandle::ParserCallbacks
+{
+  public:
+    virtual ~ParserCallbacks()
+    {
+    }
+
+    virtual void handleObject(QPDFObjectHandle);
+    virtual void handleEOF();
+};
+
+void
+ParserCallbacks::handleObject(QPDFObjectHandle obj)
+{
+    if (obj.isInlineImage())
+    {
+        std::string val = obj.getInlineImageValue();
+        std::cout << "inline image: ";
+        char buf[3];
+        buf[2] = '\0';
+        for (size_t i = 0; i < val.length(); ++i)
+        {
+            sprintf(buf, "%02x", (unsigned char)(val[i]));
+            std::cout << buf;
+        }
+        std::cout << std::endl;
+    }
+    else
+    {
+        std::cout << obj.unparse() << std::endl;
+    }
+}
+
+void
+ParserCallbacks::handleEOF()
+{
+    std::cout << "-EOF-" << std::endl;
+}
+
 static std::string getPageContents(QPDFObjectHandle page)
 {
     PointerHolder<Buffer> b1 =
@@ -1243,6 +1282,19 @@ void runtest(int n, char const* filename1, char const* arg2)
                 std::cout << stream.getDict().unparse()
                           << filename << ":\n" << data << "--END--\n";
             }
+        }
+    }
+    else if (n == 37)
+    {
+        // Parse content streams of all pages
+        std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
+        for (std::vector<QPDFObjectHandle>::iterator iter = pages.begin();
+             iter != pages.end(); ++iter)
+        {
+            QPDFObjectHandle page = *iter;
+            QPDFObjectHandle contents = page.getKey("/Contents");
+            ParserCallbacks cb;
+            QPDFObjectHandle::parseContentStream(contents, &cb);
         }
     }
     else

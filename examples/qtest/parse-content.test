@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+chdir("parse-content");
+
+require TestDriver;
+
+my $td = new TestDriver('pdf-parse-content');
+
+$td->runtest("parse content",
+	     {$td->COMMAND => "pdf-parse-content input.pdf 1"},
+	     {$td->FILE => "content.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->report(1);

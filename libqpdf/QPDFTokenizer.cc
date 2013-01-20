@@ -22,7 +22,8 @@ static bool is_space(char ch)
 }
 
 QPDFTokenizer::QPDFTokenizer() :
-    pound_special_in_name(true)
+    pound_special_in_name(true),
+    allow_eof(false)
 {
     reset();
 }
@@ -32,6 +33,12 @@ QPDFTokenizer::allowPoundAnywhereInName()
 {
     QTC::TC("qpdf", "QPDFTokenizer allow pound anywhere in name");
     this->pound_special_in_name = false;
+}
+
+void
+QPDFTokenizer::allowEOF()
+{
+    this->allow_eof = true;
 }
 
 void
@@ -441,9 +448,17 @@ QPDFTokenizer::presentEOF()
     }
     else if (state != st_token_ready)
     {
-        QTC::TC("qpdf", "QPDF_Tokenizer EOF reading token");
-	type = tt_bad;
-	error_message = "EOF while reading token";
+        QTC::TC("qpdf", "QPDF_Tokenizer EOF reading token",
+                this->allow_eof ? 1 : 0);
+        if (this->allow_eof)
+        {
+            type = tt_eof;
+        }
+        else
+        {
+            type = tt_bad;
+            error_message = "EOF while reading token";
+        }
     }
 
     state = st_token_ready;

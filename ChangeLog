@@ -1,5 +1,9 @@
 2013-01-20  Jay Berkenbilt  <ejb@ql.org>
 
+	* Added QPDFObjectHandle::parseContentStream, which parses the
+	objects in a content stream and calls handlers in a callback
+	class.  The example pdf-parse-content illustrates it use.
+
 	* Added QPDF_Keyword and QPDF_InlineImage types along with
 	appropriate wrapper methods in QPDFObjectHandle.  These new object
 	types are to facilitate content stream parsing.

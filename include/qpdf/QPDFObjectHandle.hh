@@ -71,6 +71,21 @@ class QPDFObjectHandle
         virtual void decryptString(std::string& val) = 0;
     };
 
+    // This class is used by parseContentStream.  Callers must
+    // instantiate a subclass of this with handlers defined to accept
+    // QPDFObjectHandles that are parsed from the stream.
+    class ParserCallbacks
+    {
+      public:
+        QPDF_DLL
+        virtual ~ParserCallbacks()
+        {
+        }
+        virtual void handleObject(QPDFObjectHandle) = 0;
+        virtual void handleEOF() = 0;
+    };
+
+
     QPDF_DLL
     QPDFObjectHandle();
     QPDF_DLL
@@ -137,6 +152,11 @@ class QPDFObjectHandle
                                   QPDFTokenizer&, bool& empty,
                                   StringDecrypter* decrypter,
                                   QPDF* context);
+
+    // Helpers for parsing content streams
+    QPDF_DLL
+    static void parseContentStream(QPDFObjectHandle stream_or_array,
+                                   ParserCallbacks* callbacks);
 
     // Type-specific factories
     QPDF_DLL
@@ -571,7 +591,10 @@ class QPDFObjectHandle
         std::string const& object_description,
         QPDFTokenizer& tokenizer, bool& empty,
         StringDecrypter* decrypter, QPDF* context,
-        bool in_array, bool in_dictionary);
+        bool in_array, bool in_dictionary,
+        bool content_stream);
+    static void parseContentStream_internal(
+        QPDFObjectHandle stream, ParserCallbacks* callbacks);
 
     bool initialized;
 

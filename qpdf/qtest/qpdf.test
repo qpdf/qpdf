@@ -199,7 +199,7 @@ $td->runtest("remove page we don't have",
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 57;
+$n_tests += 59;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -467,6 +467,16 @@ $td->runtest("object with zero offset",
 $td->runtest("check file with leading junk",
              {$td->COMMAND => "qpdf --check leading-junk.pdf"},
              {$td->FILE => "leading-junk.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("EOF inside inline image",
+             {$td->COMMAND => "test_driver 37 eof-in-inline-image.pdf"},
+             {$td->FILE => "eof-in-inline-image.out",
+              $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("tokenize content streams",
+             {$td->COMMAND => "test_driver 37 tokenize-content-streams.pdf"},
+             {$td->FILE => "tokenize-content-streams.out",
+              $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 show_ntests();

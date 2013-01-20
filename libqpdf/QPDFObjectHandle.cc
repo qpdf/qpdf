@@ -680,6 +680,106 @@ QPDFObjectHandle::parse(std::string const& object_str,
     return result;
 }
 
+void
+QPDFObjectHandle::parseContentStream(QPDFObjectHandle stream_or_array,
+                                     ParserCallbacks* callbacks)
+{
+    std::vector<QPDFObjectHandle> streams;
+    if (stream_or_array.isArray())
+    {
+        streams = stream_or_array.getArrayAsVector();
+    }
+    else
+    {
+        streams.push_back(stream_or_array);
+    }
+    for (std::vector<QPDFObjectHandle>::iterator iter = streams.begin();
+         iter != streams.end(); ++iter)
+    {
+        QPDFObjectHandle stream = *iter;
+        if (! stream.isStream())
+        {
+            throw std::logic_error(
+                "QPDFObjectHandle: parseContentStream called on non-stream");
+        }
+        parseContentStream_internal(stream, callbacks);
+    }
+    callbacks->handleEOF();
+}
+
+void
+QPDFObjectHandle::parseContentStream_internal(QPDFObjectHandle stream,
+                                              ParserCallbacks* callbacks)
+{
+    stream.assertStream();
+    PointerHolder<Buffer> stream_data = stream.getStreamData();
+    size_t length = stream_data->getSize();
+    std::string description = "content stream object " +
+        QUtil::int_to_string(stream.getObjectID()) + " " +
+        QUtil::int_to_string(stream.getGeneration());
+    PointerHolder<InputSource> input =
+        new BufferInputSource(description, stream_data.getPointer());
+    QPDFTokenizer tokenizer;
+    tokenizer.allowEOF();
+    bool empty = false;
+    while ((size_t) input->tell() < length)
+    {
+        QPDFObjectHandle obj =
+            parseInternal(input, "content", tokenizer, empty,
+                          0, 0, false, false, true);
+        if (! obj.isInitialized())
+        {
+            // EOF
+            break;
+        }
+
+        callbacks->handleObject(obj);
+        if (obj.isKeyword() && (obj.getKeywordValue() == "ID"))
+        {
+            // Discard next character; it is the space after ID that
+            // terminated the token.  Read until end of inline image.
+            char ch;
+            input->read(&ch, 1);
+            char buf[4];
+            memset(buf, '\0', sizeof(buf));
+            bool done = false;
+            std::string inline_image;
+            while (! done)
+            {
+                if (input->read(&ch, 1) == 0)
+                {
+                    QTC::TC("qpdf", "QPDFObjectHandle EOF in inline image");
+                    throw QPDFExc(qpdf_e_damaged_pdf, input->getName(),
+                                  "stream data", input->tell(),
+                                  "EOF found while reading inline image");
+                }
+                inline_image += ch;
+                memmove(buf, buf + 1, sizeof(buf) - 1);
+                buf[sizeof(buf) - 1] = ch;
+                if (strchr(" \t\n\v\f\r", buf[0]) &&
+                    (buf[1] == 'E') &&
+                    (buf[2] == 'I') &&
+                    strchr(" \t\n\v\f\r", buf[3]))
+                {
+                    // We've found an EI operator.
+                    done = true;
+                    input->seek(-3, SEEK_CUR);
+                    for (int i = 0; i < 4; ++i)
+                    {
+                        if (inline_image.length() > 0)
+                        {
+                            inline_image.erase(inline_image.length() - 1);
+                        }
+                    }
+                }
+            }
+            QTC::TC("qpdf", "QPDFObjectHandle inline image token");
+            callbacks->handleObject(
+                QPDFObjectHandle::newInlineImage(inline_image));
+        }
+    }
+}
+
 QPDFObjectHandle
 QPDFObjectHandle::parse(PointerHolder<InputSource> input,
                         std::string const& object_description,
@@ -687,7 +787,7 @@ QPDFObjectHandle::parse(PointerHolder<InputSource> input,
                         StringDecrypter* decrypter, QPDF* context)
 {
     return parseInternal(input, object_description, tokenizer, empty,
-                         decrypter, context, false, false);
+                         decrypter, context, false, false, false);
 }
 
 QPDFObjectHandle
@@ -695,7 +795,8 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
                                 std::string const& object_description,
                                 QPDFTokenizer& tokenizer, bool& empty,
                                 StringDecrypter* decrypter, QPDF* context,
-                                bool in_array, bool in_dictionary)
+                                bool in_array, bool in_dictionary,
+                                bool content_stream)
 {
     empty = false;
     if (in_dictionary && in_array)
@@ -721,6 +822,21 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 
 	switch (token.getType())
 	{
+          case QPDFTokenizer::tt_eof:
+            if (content_stream)
+            {
+                // Return uninitialized object to indicate EOF
+                return object;
+            }
+            else
+            {
+                // When not in content stream mode, EOF is tt_bad and
+                // throws an exception before we get here.
+                throw std::logic_error(
+                    "EOF received while not in content stream mode");
+            }
+            break;
+
 	  case QPDFTokenizer::tt_brace_open:
 	  case QPDFTokenizer::tt_brace_close:
 	    // Don't know what to do with these for now
@@ -764,13 +880,13 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 	  case QPDFTokenizer::tt_array_open:
 	    object = parseInternal(
 		input, object_description, tokenizer, empty,
-                decrypter, context, true, false);
+                decrypter, context, true, false, content_stream);
 	    break;
 
 	  case QPDFTokenizer::tt_dict_open:
 	    object = parseInternal(
 		input, object_description, tokenizer, empty,
-                decrypter, context, false, true);
+                decrypter, context, false, true, content_stream);
 	    break;
 
 	  case QPDFTokenizer::tt_bool:
@@ -826,6 +942,10 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 		    input->seek(input->getLastOffset(), SEEK_SET);
                     empty = true;
 		}
+		else if (content_stream)
+                {
+                    object = QPDFObjectHandle::newKeyword(token.getValue());
+                }
 		else
 		{
 		    throw QPDFExc(qpdf_e_damaged_pdf, input->getName(),

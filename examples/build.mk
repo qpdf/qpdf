@@ -4,7 +4,8 @@ BINS_examples = \
 	pdf-npages \
 	pdf-double-page-size \
 	pdf-invert-images \
-	pdf-create
+	pdf-create \
+	pdf-parse-content
 CBINS_examples = pdf-linearize
 
 TARGETS_examples = $(foreach B,$(BINS_examples) $(CBINS_examples),examples/$(OUTPUT_DIR)/$(call binname,$(B)))

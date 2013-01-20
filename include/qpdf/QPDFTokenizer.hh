@@ -18,6 +18,8 @@
 class QPDFTokenizer
 {
   public:
+    // Token type tt_eof is only returned of allowEOF() is called on
+    // the tokenizer.  tt_eof was introduced in QPDF version 4.1.
     enum token_type_e
     {
 	tt_bad,
@@ -34,6 +36,7 @@ class QPDFTokenizer
 	tt_null,
 	tt_bool,
 	tt_word,
+        tt_eof,
     };
 
     class Token
@@ -97,6 +100,12 @@ class QPDFTokenizer
     QPDF_DLL
     void allowPoundAnywhereInName();
 
+    // If called, treat EOF as a separate token type instead of an
+    // error.  This was introduced in QPDF 4.1 to facilitate
+    // tokenizing content streams.
+    QPDF_DLL
+    void allowEOF();
+
     // Mode of operation:
 
     // Keep presenting characters and calling getToken() until
@@ -140,6 +149,7 @@ class QPDFTokenizer
 	   st_literal, st_in_hexstring, st_token_ready } state;
 
     bool pound_special_in_name;
+    bool allow_eof;
 
     // Current token accumulation
     token_type_e type;

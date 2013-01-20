@@ -236,7 +236,7 @@ QPDFWriter copy use_aes 1
 QPDFObjectHandle indirect without context 0
 QPDFObjectHandle trailing data in parse 0
 qpdf pages encryption password 0
-QPDF_Tokenizer EOF reading token 0
+QPDF_Tokenizer EOF reading token 1
 QPDF_Tokenizer EOF reading appendable token 0
 QPDFWriter extra header text no newline 0
 QPDFWriter extra header text add newline 0
@@ -259,3 +259,5 @@ QPDFWriter remove Crypt 0
 qpdf-c called qpdf_get_pdf_extension_level 0
 qpdf-c called qpdf_set_r5_encryption_parameters 0
 qpdf-c called qpdf_set_r6_encryption_parameters 0
+QPDFObjectHandle EOF in inline image 0
+QPDFObjectHandle inline image token 0
