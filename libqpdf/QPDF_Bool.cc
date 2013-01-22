@@ -15,6 +15,18 @@ QPDF_Bool::unparse()
     return (val ? "true" : "false");
 }
 
+QPDFObject::object_type_e
+QPDF_Bool::getTypeCode() const
+{
+    return QPDFObject::ot_boolean;
+}
+
+char const*
+QPDF_Bool::getTypeName() const
+{
+    return "boolean";
+}
+
 bool
 QPDF_Bool::getVal() const
 {

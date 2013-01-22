@@ -33,6 +33,18 @@ QPDF_String::unparse()
     return unparse(false);
 }
 
+QPDFObject::object_type_e
+QPDF_String::getTypeCode() const
+{
+    return QPDFObject::ot_string;
+}
+
+char const*
+QPDF_String::getTypeName() const
+{
+    return "string";
+}
+
 std::string
 QPDF_String::unparse(bool force_binary)
 {

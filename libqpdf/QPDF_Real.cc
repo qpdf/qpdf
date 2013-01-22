@@ -22,6 +22,18 @@ QPDF_Real::unparse()
     return this->val;
 }
 
+QPDFObject::object_type_e
+QPDF_Real::getTypeCode() const
+{
+    return QPDFObject::ot_real;
+}
+
+char const*
+QPDF_Real::getTypeName() const
+{
+    return "real";
+}
+
 std::string
 QPDF_Real::getVal()
 {

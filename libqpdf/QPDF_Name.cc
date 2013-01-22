@@ -41,6 +41,18 @@ QPDF_Name::unparse()
     return normalizeName(this->name);
 }
 
+QPDFObject::object_type_e
+QPDF_Name::getTypeCode() const
+{
+    return QPDFObject::ot_name;
+}
+
+char const*
+QPDF_Name::getTypeName() const
+{
+    return "name";
+}
+
 std::string
 QPDF_Name::getName() const
 {

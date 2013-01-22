@@ -34,6 +34,18 @@ QPDF_Array::unparse()
     return result;
 }
 
+QPDFObject::object_type_e
+QPDF_Array::getTypeCode() const
+{
+    return QPDFObject::ot_array;
+}
+
+char const*
+QPDF_Array::getTypeName() const
+{
+    return "array";
+}
+
 int
 QPDF_Array::getNItems() const
 {

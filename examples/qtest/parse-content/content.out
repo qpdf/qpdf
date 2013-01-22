@@ -1,11 +1,11 @@
-BT
-/F1
-24
-Tf
-72
-720
-Td
-(Potato)
-Tj
-ET
+keyword: BT
+name: /F1
+integer: 24
+keyword: Tf
+integer: 72
+integer: 720
+keyword: Td
+string: (Potato)
+keyword: Tj
+keyword: ET
 -EOF-

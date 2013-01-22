@@ -72,10 +72,11 @@ class ParserCallbacks: public QPDFObjectHandle::ParserCallbacks
 void
 ParserCallbacks::handleObject(QPDFObjectHandle obj)
 {
+    std::cout << obj.getTypeName() << ": ";
     if (obj.isInlineImage())
     {
+        assert(obj.getTypeCode() == QPDFObject::ot_inlineimage);
         std::string val = obj.getInlineImageValue();
-        std::cout << "inline image: ";
         char buf[3];
         buf[2] = '\0';
         for (size_t i = 0; i < val.length(); ++i)
@@ -142,6 +143,10 @@ void runtest(int n, char const* filename1, char const* arg2)
         assert(password.length() == 32);
         QPDF::trim_user_password(password);
         assert(password == "1234567890123456789012(45678");
+
+        QPDFObjectHandle uninitialized;
+        assert(uninitialized.getTypeCode() == QPDFObject::ot_uninitialized);
+        assert(strcmp(uninitialized.getTypeName(), "uninitialized") == 0);
     }
 
     QPDF pdf;

@@ -63,6 +63,18 @@ QPDF_Stream::unparse()
 	QUtil::int_to_string(this->generation) + " R";
 }
 
+QPDFObject::object_type_e
+QPDF_Stream::getTypeCode() const
+{
+    return QPDFObject::ot_stream;
+}
+
+char const*
+QPDF_Stream::getTypeName() const
+{
+    return "stream";
+}
+
 QPDFObjectHandle
 QPDF_Stream::getDict() const
 {

@@ -18,8 +18,41 @@ class QPDFObjectHandle;
 class QPDFObject
 {
   public:
+
+    // Objects derived from QPDFObject are accessible through
+    // QPDFObjectHandle.  Each object returns a unique type code that
+    // has one of the values in the list below.  As new object types
+    // are added to qpdf, additional items may be added to the list,
+    // so code that switches on these values should take that into
+    // consideration.
+    enum object_type_e {
+        // Object types internal to qpdf
+        ot_uninitialized,
+        ot_reserved,
+        // Object types that can occur in the main document
+        ot_boolean,
+        ot_null,
+        ot_integer,
+        ot_real,
+        ot_name,
+        ot_string,
+        ot_array,
+        ot_dictionary,
+        ot_stream,
+        // Additional object types that can occur in content streams
+        ot_keyword,
+        ot_inlineimage,
+    };
+
     virtual ~QPDFObject() {}
     virtual std::string unparse() = 0;
+
+    // Return a unique type code for the object
+    virtual object_type_e getTypeCode() const = 0;
+
+    // Return a string literal that describes the type, useful for
+    // debugging and testing
+    virtual char const* getTypeName() const = 0;
 
     // Accessor to give specific access to non-public methods
     class ObjAccessor

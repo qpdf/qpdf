@@ -9,6 +9,8 @@ class QPDF_Name: public QPDFObject
     QPDF_Name(std::string const& name);
     virtual ~QPDF_Name();
     virtual std::string unparse();
+    virtual QPDFObject::object_type_e getTypeCode() const;
+    virtual char const* getTypeName() const;
     std::string getName() const;
 
     // Put # into strings with characters unsuitable for name token

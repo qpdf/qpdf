@@ -1,10 +1,23 @@
+2013-01-22  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add QPDFObjectHandle::getTypeCode().  This method returns a
+	unique integer (enumerated type) value corresponding to the object
+	type of the QPDFObjectHandle.  It can be used as an alternative to
+	the QPDFObjectHandle::is* methods for type testing, particularly
+	where there is a desire to use a switch statement or optimize for
+	performance when testing object types.
+
+	* Add QPDFObjectHandle::getTypeName().  This method returns a
+	string literal describing the object type.  It is useful for
+	testing and debugging.
+
 2013-01-20  Jay Berkenbilt  <ejb@ql.org>
 
-	* Added QPDFObjectHandle::parseContentStream, which parses the
+	* Add QPDFObjectHandle::parseContentStream, which parses the
 	objects in a content stream and calls handlers in a callback
 	class.  The example pdf-parse-content illustrates it use.
 
-	* Added QPDF_Keyword and QPDF_InlineImage types along with
+	* Add QPDF_Keyword and QPDF_InlineImage types along with
 	appropriate wrapper methods in QPDFObjectHandle.  These new object
 	types are to facilitate content stream parsing.
 

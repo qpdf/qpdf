@@ -30,10 +30,10 @@ class ParserCallbacks: public QPDFObjectHandle::ParserCallbacks
 void
 ParserCallbacks::handleObject(QPDFObjectHandle obj)
 {
+    std::cout << obj.getTypeName() << ": ";
     if (obj.isInlineImage())
     {
         std::string val = obj.getInlineImageValue();
-        std::cout << "inline image: ";
         char buf[3];
         buf[2] = '\0';
         for (size_t i = 0; i < val.length(); ++i)

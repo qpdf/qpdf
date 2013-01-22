@@ -39,6 +39,18 @@ QPDF_Dictionary::unparse()
     return result;
 }
 
+QPDFObject::object_type_e
+QPDF_Dictionary::getTypeCode() const
+{
+    return QPDFObject::ot_dictionary;
+}
+
+char const*
+QPDF_Dictionary::getTypeName() const
+{
+    return "dictionary";
+}
+
 bool
 QPDF_Dictionary::hasKey(std::string const& key)
 {

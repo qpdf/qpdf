@@ -91,6 +91,14 @@ class QPDFObjectHandle
     QPDF_DLL
     bool isInitialized() const;
 
+    // Return type code and type name of underlying object.  These are
+    // useful for doing rapid type tests (like switch statements) or
+    // for testing and debugging.
+    QPDF_DLL
+    QPDFObject::object_type_e getTypeCode() const;
+    QPDF_DLL
+    char const* getTypeName() const;
+
     // Exactly one of these will return true for any object.  Keyword
     // and InlineImage are only allowed in content streams.
     QPDF_DLL

@@ -9,6 +9,8 @@ class QPDF_Keyword: public QPDFObject
     QPDF_Keyword(std::string const& val);
     virtual ~QPDF_Keyword();
     virtual std::string unparse();
+    virtual QPDFObject::object_type_e getTypeCode() const;
+    virtual char const* getTypeName() const;
     std::string getVal() const;
 
   private:

@@ -12,6 +12,8 @@ class QPDF_Array: public QPDFObject
     QPDF_Array(std::vector<QPDFObjectHandle> const& items);
     virtual ~QPDF_Array();
     virtual std::string unparse();
+    virtual QPDFObject::object_type_e getTypeCode() const;
+    virtual char const* getTypeName() const;
 
     int getNItems() const;
     QPDFObjectHandle getItem(int n) const;

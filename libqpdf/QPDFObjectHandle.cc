@@ -76,6 +76,32 @@ QPDFObjectHandle::isInitialized() const
     return this->initialized;
 }
 
+QPDFObject::object_type_e
+QPDFObjectHandle::getTypeCode() const
+{
+    if (obj.getPointer())
+    {
+        return obj->getTypeCode();
+    }
+    else
+    {
+        return QPDFObject::ot_uninitialized;
+    }
+}
+
+char const*
+QPDFObjectHandle::getTypeName() const
+{
+    if (obj.getPointer())
+    {
+        return obj->getTypeName();
+    }
+    else
+    {
+        return "uninitialized";
+    }
+}
+
 template <class T>
 class QPDFObjectTypeAccessor
 {

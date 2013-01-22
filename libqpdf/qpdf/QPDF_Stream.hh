@@ -17,6 +17,8 @@ class QPDF_Stream: public QPDFObject
 		qpdf_offset_t offset, size_t length);
     virtual ~QPDF_Stream();
     virtual std::string unparse();
+    virtual QPDFObject::object_type_e getTypeCode() const;
+    virtual char const* getTypeName() const;
     QPDFObjectHandle getDict() const;
 
     // See comments in QPDFObjectHandle.hh for these methods.

@@ -17,6 +17,18 @@ QPDF_Keyword::unparse()
     return this->val;
 }
 
+QPDFObject::object_type_e
+QPDF_Keyword::getTypeCode() const
+{
+    return QPDFObject::ot_keyword;
+}
+
+char const*
+QPDF_Keyword::getTypeName() const
+{
+    return "keyword";
+}
+
 std::string
 QPDF_Keyword::getVal() const
 {

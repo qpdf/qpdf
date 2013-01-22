@@ -17,6 +17,18 @@ QPDF_Integer::unparse()
     return QUtil::int_to_string(this->val);
 }
 
+QPDFObject::object_type_e
+QPDF_Integer::getTypeCode() const
+{
+    return QPDFObject::ot_integer;
+}
+
+char const*
+QPDF_Integer::getTypeName() const
+{
+    return "integer";
+}
+
 long long
 QPDF_Integer::getVal() const
 {

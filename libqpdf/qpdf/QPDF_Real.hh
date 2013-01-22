@@ -10,6 +10,8 @@ class QPDF_Real: public QPDFObject
     QPDF_Real(double value, int decimal_places = 0);
     virtual ~QPDF_Real();
     virtual std::string unparse();
+    virtual QPDFObject::object_type_e getTypeCode() const;
+    virtual char const* getTypeName() const;
     std::string getVal();
 
   private:
