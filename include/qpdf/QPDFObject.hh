@@ -30,17 +30,17 @@ class QPDFObject
         ot_uninitialized,
         ot_reserved,
         // Object types that can occur in the main document
-        ot_boolean,
         ot_null,
+        ot_boolean,
         ot_integer,
         ot_real,
-        ot_name,
         ot_string,
+        ot_name,
         ot_array,
         ot_dictionary,
         ot_stream,
         // Additional object types that can occur in content streams
-        ot_keyword,
+        ot_operator,
         ot_inlineimage,
     };
 

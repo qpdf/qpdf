@@ -43,8 +43,8 @@ SRCS_libqpdf = \
 	libqpdf/QPDF_InlineImage.cc \
 	libqpdf/QPDF_Integer.cc \
 	libqpdf/QPDF_Name.cc \
-	libqpdf/QPDF_Keyword.cc \
 	libqpdf/QPDF_Null.cc \
+	libqpdf/QPDF_Operator.cc \
 	libqpdf/QPDF_Real.cc \
 	libqpdf/QPDF_Reserved.cc \
 	libqpdf/QPDF_Stream.cc \

@@ -1,11 +1,11 @@
-keyword: BT
+operator: BT
 name: /F1
 integer: 24
-keyword: Tf
+operator: Tf
 integer: 72
 integer: 720
-keyword: Td
+operator: Td
 string: (Potato)
-keyword: Tj
-keyword: ET
+operator: Tj
+operator: ET
 -EOF-

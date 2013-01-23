@@ -99,7 +99,7 @@ class QPDFObjectHandle
     QPDF_DLL
     char const* getTypeName() const;
 
-    // Exactly one of these will return true for any object.  Keyword
+    // Exactly one of these will return true for any object.  Operator
     // and InlineImage are only allowed in content streams.
     QPDF_DLL
     bool isBool();
@@ -114,7 +114,7 @@ class QPDFObjectHandle
     QPDF_DLL
     bool isString();
     QPDF_DLL
-    bool isKeyword();
+    bool isOperator();
     QPDF_DLL
     bool isInlineImage();
     QPDF_DLL
@@ -182,7 +182,7 @@ class QPDFObjectHandle
     QPDF_DLL
     static QPDFObjectHandle newString(std::string const& str);
     QPDF_DLL
-    static QPDFObjectHandle newKeyword(std::string const&);
+    static QPDFObjectHandle newOperator(std::string const&);
     QPDF_DLL
     static QPDFObjectHandle newInlineImage(std::string const&);
     QPDF_DLL
@@ -279,7 +279,7 @@ class QPDFObjectHandle
 
     // Methods for content stream objects
     QPDF_DLL
-    std::string getKeywordValue();
+    std::string getOperatorValue();
     QPDF_DLL
     std::string getInlineImageValue();
 
@@ -554,7 +554,7 @@ class QPDFObjectHandle
     QPDF_DLL
     void assertString();
     QPDF_DLL
-    void assertKeyword();
+    void assertOperator();
     QPDF_DLL
     void assertInlineImage();
     QPDF_DLL

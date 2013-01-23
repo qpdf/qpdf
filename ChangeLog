@@ -17,7 +17,7 @@
 	objects in a content stream and calls handlers in a callback
 	class.  The example pdf-parse-content illustrates it use.
 
-	* Add QPDF_Keyword and QPDF_InlineImage types along with
+	* Add QPDF_Operator and QPDF_InlineImage types along with
 	appropriate wrapper methods in QPDFObjectHandle.  These new object
 	types are to facilitate content stream parsing.
 

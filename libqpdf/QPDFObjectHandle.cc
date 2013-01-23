@@ -7,7 +7,7 @@
 #include <qpdf/QPDF_Real.hh>
 #include <qpdf/QPDF_Name.hh>
 #include <qpdf/QPDF_String.hh>
-#include <qpdf/QPDF_Keyword.hh>
+#include <qpdf/QPDF_Operator.hh>
 #include <qpdf/QPDF_InlineImage.hh>
 #include <qpdf/QPDF_Array.hh>
 #include <qpdf/QPDF_Dictionary.hh>
@@ -180,10 +180,10 @@ QPDFObjectHandle::isString()
 }
 
 bool
-QPDFObjectHandle::isKeyword()
+QPDFObjectHandle::isOperator()
 {
     dereference();
-    return QPDFObjectTypeAccessor<QPDF_Keyword>::check(obj.getPointer());
+    return QPDFObjectTypeAccessor<QPDF_Operator>::check(obj.getPointer());
 }
 
 bool
@@ -233,7 +233,7 @@ bool
 QPDFObjectHandle::isScalar()
 {
     return (! (isArray() || isDictionary() || isStream() ||
-               isKeyword() || isInlineImage()));
+               isOperator() || isInlineImage()));
 }
 
 // Bool accessors
@@ -288,13 +288,13 @@ QPDFObjectHandle::getUTF8Value()
     return dynamic_cast<QPDF_String*>(obj.getPointer())->getUTF8Val();
 }
 
-// Keyword and Inline Image accessors
+// Operator and Inline Image accessors
 
 std::string
-QPDFObjectHandle::getKeywordValue()
+QPDFObjectHandle::getOperatorValue()
 {
-    assertKeyword();
-    return dynamic_cast<QPDF_Keyword*>(obj.getPointer())->getVal();
+    assertOperator();
+    return dynamic_cast<QPDF_Operator*>(obj.getPointer())->getVal();
 }
 
 std::string
@@ -760,7 +760,7 @@ QPDFObjectHandle::parseContentStream_internal(QPDFObjectHandle stream,
         }
 
         callbacks->handleObject(obj);
-        if (obj.isKeyword() && (obj.getKeywordValue() == "ID"))
+        if (obj.isOperator() && (obj.getOperatorValue() == "ID"))
         {
             // Discard next character; it is the space after ID that
             // terminated the token.  Read until end of inline image.
@@ -970,7 +970,7 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 		}
 		else if (content_stream)
                 {
-                    object = QPDFObjectHandle::newKeyword(token.getValue());
+                    object = QPDFObjectHandle::newOperator(token.getValue());
                 }
 		else
 		{
@@ -1108,9 +1108,9 @@ QPDFObjectHandle::newString(std::string const& str)
 }
 
 QPDFObjectHandle
-QPDFObjectHandle::newKeyword(std::string const& value)
+QPDFObjectHandle::newOperator(std::string const& value)
 {
-    return QPDFObjectHandle(new QPDF_Keyword(value));
+    return QPDFObjectHandle(new QPDF_Operator(value));
 }
 
 QPDFObjectHandle
@@ -1404,9 +1404,9 @@ QPDFObjectHandle::assertString()
 }
 
 void
-QPDFObjectHandle::assertKeyword()
+QPDFObjectHandle::assertOperator()
 {
-    assertType("Keyword", isKeyword());
+    assertType("Operator", isOperator());
 }
 
 void

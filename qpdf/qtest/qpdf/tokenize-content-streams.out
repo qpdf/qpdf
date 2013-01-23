@@ -1,13 +1,13 @@
-keyword: BT
+operator: BT
 name: /F1
 integer: 24
-keyword: Tf
+operator: Tf
 integer: 72
 integer: 720
-keyword: Td
+operator: Td
 string: (Potato)
-keyword: Tj
-keyword: ET
+operator: Tj
+operator: ET
 -EOF-
 real: 0.1
 integer: 0
@@ -15,16 +15,16 @@ integer: 0
 real: 0.1
 integer: 0
 integer: 0
-keyword: cm
-keyword: q
+operator: cm
+operator: q
 integer: 0
 real: 1.1999
 real: -1.1999
 integer: 0
 real: 121.19
 real: 150.009
-keyword: cm
-keyword: BI
+operator: cm
+operator: BI
 name: /CS
 name: /G
 name: /W
@@ -37,19 +37,19 @@ name: /F
 name: /Fl
 name: /DP
 dictionary: << /Columns 1 /Predictor 15 >>
-keyword: ID
+operator: ID
 inline-image: 789c63fc0f0001030101
-keyword: EI
-keyword: Q
-keyword: q
+operator: EI
+operator: Q
+operator: q
 integer: 0
 real: 35.997
 real: -128.389
 integer: 0
 real: 431.964
 real: 7269.02
-keyword: cm
-keyword: BI
+operator: cm
+operator: BI
 name: /CS
 name: /G
 name: /W
@@ -62,19 +62,19 @@ name: /F
 name: /Fl
 name: /DP
 dictionary: << /Columns 30 /Predictor 15 >>
-keyword: ID
+operator: ID
 inline-image: 789cedd1a11100300800b1b2ffd06503148283bc8dfcf8af2a306ee352eff2e06318638c31c63b3801627b620a
-keyword: EI
-keyword: Q
-keyword: q
+operator: EI
+operator: Q
+operator: q
 integer: 0
 real: 38.3968
 real: -93.5922
 integer: 0
 real: 431.964
 real: 7567.79
-keyword: cm
-keyword: BI
+operator: cm
+operator: BI
 name: /CS
 name: /G
 name: /W
@@ -87,9 +87,9 @@ name: /F
 name: /Fl
 name: /DP
 dictionary: << /Columns 32 /Predictor 15 >>
-keyword: ID
+operator: ID
 inline-image: 789c63fccf801f308e2a185530aa60882a20203faa605401890a0643aa1e5530aa6054010d140000bdd03c13
-keyword: EI
-keyword: Q
+operator: EI
+operator: Q
 -EOF-
 test 37 done

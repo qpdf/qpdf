@@ -1,13 +1,13 @@
-#ifndef __QPDF_KEYWORD_HH__
-#define __QPDF_KEYWORD_HH__
+#ifndef __QPDF_OPERATOR_HH__
+#define __QPDF_OPERATOR_HH__
 
 #include <qpdf/QPDFObject.hh>
 
-class QPDF_Keyword: public QPDFObject
+class QPDF_Operator: public QPDFObject
 {
   public:
-    QPDF_Keyword(std::string const& val);
-    virtual ~QPDF_Keyword();
+    QPDF_Operator(std::string const& val);
+    virtual ~QPDF_Operator();
     virtual std::string unparse();
     virtual QPDFObject::object_type_e getTypeCode() const;
     virtual char const* getTypeName() const;
@@ -17,4 +17,4 @@ class QPDF_Keyword: public QPDFObject
     std::string val;
 };
 
-#endif // __QPDF_KEYWORD_HH__
+#endif // __QPDF_OPERATOR_HH__

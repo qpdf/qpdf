@@ -1,14 +1,14 @@
-keyword: BT
+operator: BT
 name: /F1
 integer: 24
-keyword: Tf
+operator: Tf
 integer: 72
 integer: 720
-keyword: Td
+operator: Td
 string: (Potato)
-keyword: Tj
-keyword: ET
-keyword: BI
+operator: Tj
+operator: ET
+operator: BI
 name: /CS
 name: /G
 name: /W
@@ -21,5 +21,5 @@ name: /F
 name: /Fl
 name: /DP
 dictionary: << /Columns 1 /Predictor 15 >>
-keyword: ID
+operator: ID
 content stream object 4 0 (stream data, file position 139): EOF found while reading inline image
