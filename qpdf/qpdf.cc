@@ -46,6 +46,14 @@ struct QPDFPageData
     std::vector<int> selected_pages;
 };
 
+class DiscardContents: public QPDFObjectHandle::ParserCallbacks
+{
+  public:
+    virtual ~DiscardContents() {}
+    virtual void handleObject(QPDFObjectHandle) {}
+    virtual void handleEOF() {}
+};
+
 // Note: let's not be too noisy about documenting the fact that this
 // software purposely fails to enforce the distinction between user
 // and owner passwords.  A user password is sufficient to gain full
@@ -1442,16 +1450,29 @@ int main(int argc, char* argv[])
 		    else
 		    {
 			std::cout << "File is not linearized\n";
-                        // Write the file no nowhere, uncompressing
-                        // streams.  This causes full file traversal
-                        // and decoding of all streams we can decode.
-                        QPDFWriter w(pdf);
-                        Pl_Discard discard;
-                        w.setOutputPipeline(&discard);
-                        w.setStreamDataMode(qpdf_s_uncompress);
-                        w.write();
-			okay = true;
-		    }
+                    }
+
+                    // Write the file no nowhere, uncompressing
+                    // streams.  This causes full file traversal
+                    // and decoding of all streams we can decode.
+                    QPDFWriter w(pdf);
+                    Pl_Discard discard;
+                    w.setOutputPipeline(&discard);
+                    w.setStreamDataMode(qpdf_s_uncompress);
+                    w.write();
+
+                    // Parse all content streams
+                    std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
+                    DiscardContents discard_contents;
+                    for (std::vector<QPDFObjectHandle>::iterator iter =
+                             pages.begin();
+                         iter != pages.end(); ++iter)
+                    {
+                        QPDFObjectHandle::parseContentStream(
+                            (*iter).getKey("/Contents"), &discard_contents);
+                    }
+
+                    okay = true;
 		}
 		catch (std::exception& e)
 		{
