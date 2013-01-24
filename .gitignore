@@ -1,5 +1,6 @@
 aclocal.m4
 autoconf.mk
+autofiles.zip
 autom4te.cache/
 config.log
 config.status
