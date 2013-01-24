@@ -175,39 +175,48 @@ AC_ARG_WITH(buildrules,
    [BUILDRULES=libtool])
 AC_MSG_RESULT($BUILDRULES)
 
-if test "$BUILDRULES" != "msvc"; then
-   qpdf_USE_WALL=0
-   AC_MSG_CHECKING(for whether $CC supports -Wall)
-   oCFLAGS=$CFLAGS
-   CFLAGS="$CFLAGS -Wall"
-   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[int a = 1; int b = a; a = b;]])],
-                     [qpdf_USE_WALL=1],[qpdf_USE_WALL=0])
-   if test "$qpdf_USE_WALL" = "1"; then
-      AC_MSG_RESULT(yes)
-      CXXFLAGS="$CXXFLAGS -Wall"
-   else
-      AC_MSG_RESULT(no)
-      CFLAGS=$oCFLAGS
-   fi
+AC_SUBST(WFLAGS)
+qpdf_USE_EXTRA_WARNINGS=0
+if test "$BUILDRULES" = "msvc"; then
+   dnl /w14267 makes warning 4267 a level 1 warning.  This warning reports
+   dnl potential issues between size_t, off_t, and non-compatible integer
+   dnl types.
+   try_flags="/w14267"
+else
+   try_flags="-Wall"
+fi
+AC_MSG_CHECKING(for whether $CC supports $try_flags)
+oCFLAGS=$CFLAGS
+CFLAGS="$CFLAGS $try_flags"
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[int a = 1; int b = a; a = b;]])],
+                  [qpdf_USE_EXTRA_WARNINGS=1],[qpdf_USE_EXTRA_WARNINGS=0])
+CFLAGS=$oCFLAGS
+if test "$qpdf_USE_EXTRA_WARNINGS" = "1"; then
+   AC_MSG_RESULT(yes)
+   WFLAGS="$try_flags"
+else
+   AC_MSG_RESULT(no)
 fi
 
-if test "$BUILDRULES" != "msvc"; then
-   AC_MSG_CHECKING(for whether to use -Werror)
-   AC_ARG_ENABLE(werror,
-      AS_HELP_STRING([--enable-werror],
-		     [whether to use werror (default is no)]),
-      [if test "$enableval" = "yes"; then
-	 qpdf_USE_WERROR=1;
-       else
-	 qpdf_USE_WERROR=0;
-       fi], [qpdf_USE_WERROR=0])
-   if test "$qpdf_USE_WERROR" = "1"; then
-      AC_MSG_RESULT(yes)
-      CFLAGS="$CFLAGS -Werror"
-      CXXFLAGS="$CXXFLAGS -Werror"
-   else
-      AC_MSG_RESULT(no)
-   fi
+if test "$BUILDRULES" = "msvc"; then
+   try_flags="/WX"
+else
+   try_flags="-Werror"
+fi
+AC_MSG_CHECKING(for whether to use $try_flags)
+AC_ARG_ENABLE(werror,
+   AS_HELP_STRING([--enable-werror],
+                  [whether to treat warnings as errors (default is no)]),
+   [if test "$enableval" = "yes"; then
+      qpdf_USE_WERROR=1;
+    else
+      qpdf_USE_WERROR=0;
+    fi], [qpdf_USE_WERROR=0])
+if test "$qpdf_USE_WERROR" = "1"; then
+   AC_MSG_RESULT(yes)
+   WFLAGS="$WFLAGS $try_flags"
+else
+   AC_MSG_RESULT(no)
 fi
 
 AC_SUBST(QPDF_SKIP_TEST_COMPARE_IMAGES)

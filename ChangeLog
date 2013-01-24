@@ -25,6 +25,15 @@
 
 2013-01-24  Jay Berkenbilt  <ejb@ql.org>
 
+	* Make --enable-werror work for MSVC, and generally handle warning
+	options better for that compiler.  Warning flags for that compiler
+	were previous hard-coded into the build with /WX enabled
+	unconditionally.
+
+	* Split warning flags into WFLAGS in autoconf.mk to make them
+	easier to override.  Before they were repeated in CFLAGS and
+	CXXFLAGS and were commingled with other compiler flags.
+
 	* qpdf --check now does syntactic checks all pages' content
 	streams as well as checking overall document structure.  Semantic
 	errors are still not checked, and there are no plans to add

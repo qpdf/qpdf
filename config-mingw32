@@ -1,5 +1,5 @@
 #!/bin/sh
-./configure --disable-test-compare-images --enable-external-libs --with-windows-wordsize=32 --with-buildrules=mingw
+./configure --disable-test-compare-images --enable-external-libs --enable-werror --with-windows-wordsize=32 --with-buildrules=mingw
 # As of autoconf 2.69 and gcc 4.6, autoconf's configure fails to
 # recognize that defining _FILE_OFFSET_BITS works with mingw32.
 # Append to qpdf-config.h rather than passing CPPFLAGS on the

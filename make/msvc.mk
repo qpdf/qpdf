@@ -19,16 +19,6 @@ endef
 CFLAGS := $(filter-out -g,$(CFLAGS))
 CXXFLAGS := $(filter-out -g,$(CXXFLAGS))
 
-# /WX makes all warnings errors.
-CFLAGS += /WX
-CXXFLAGS += /WX
-
-# /w14267 makes warning 4267 a level 1 warning.  This warning reports
-# potential issues between size_t, off_t, and non-compatible integer
-# types.
-CFLAGS += /w14267
-CXXFLAGS += /w14267
-
 clean::
 	$(RM) *.pdb
 
