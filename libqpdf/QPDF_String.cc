@@ -90,14 +90,7 @@ QPDF_String::unparse(bool force_binary)
     std::string result;
     if (use_hexstring)
     {
-	result += "<";
-	char num[3];
-	for (unsigned int i = 0; i < this->val.length(); ++i)
-	{
-	    sprintf(num, "%02x", (unsigned char) this->val[i]);
-	    result += num;
-	}
-	result += ">";
+	result += "<" + QUtil::hex_encode(this->val) + ">";
     }
     else
     {

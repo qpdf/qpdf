@@ -56,6 +56,12 @@ namespace QUtil
     QPDF_DLL
     char* copy_string(std::string const&);
 
+    // Returns lower-case hex-encoded version of the string, treating
+    // each character in the input string as unsigned.  The output
+    // string will be twice as long as the input string.
+    QPDF_DLL
+    std::string hex_encode(std::string const&);
+
     // Set stdin, stdout to binary mode
     QPDF_DLL
     void binary_stdout();

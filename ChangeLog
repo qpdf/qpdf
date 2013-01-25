@@ -16,6 +16,9 @@
 
 2013-01-25  Jay Berkenbilt  <ejb@ql.org>
 
+	* New method QUtil::hex_encode to encode binary data as a
+	hexadecimal string
+
 	* qpdf --check was exiting with status 0 in some rare cases even
 	when errors were found.  It now always exits with one of the
 	document error codes (0 for success, 2 for errors, 3 or warnings).

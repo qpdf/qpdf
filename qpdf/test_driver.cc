@@ -75,16 +75,9 @@ ParserCallbacks::handleObject(QPDFObjectHandle obj)
     std::cout << obj.getTypeName() << ": ";
     if (obj.isInlineImage())
     {
+        // Exercise getTypeCode
         assert(obj.getTypeCode() == QPDFObject::ot_inlineimage);
-        std::string val = obj.getInlineImageValue();
-        char buf[3];
-        buf[2] = '\0';
-        for (size_t i = 0; i < val.length(); ++i)
-        {
-            sprintf(buf, "%02x", (unsigned char)(val[i]));
-            std::cout << buf;
-        }
-        std::cout << std::endl;
+        std::cout << QUtil::hex_encode(obj.getInlineImageValue()) << std::endl;
     }
     else
     {

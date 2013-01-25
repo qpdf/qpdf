@@ -386,16 +386,7 @@ void MD5::print()
 std::string MD5::unparse()
 {
     final();
-
-    char result[33];
-    char* p = result;
-    unsigned int i;
-    for (i = 0; i < 16; ++i)
-    {
-	sprintf(p, "%02x", digest_val[i]);
-	p += 2;
-    }
-    return result;
+    return QUtil::hex_encode(std::string((char*)digest_val, 16));
 }
 
 std::string

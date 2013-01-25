@@ -2,6 +2,7 @@
 #include <qpdf/qpdf-config.h>
 
 #include <qpdf/QUtil.hh>
+#include <qpdf/PointerHolder.hh>
 
 #include <stdio.h>
 #include <errno.h>
@@ -161,6 +162,21 @@ QUtil::copy_string(std::string const& str)
     result[str.length()] = '\0';
     memcpy(result, str.c_str(), str.length());
     return result;
+}
+
+std::string
+QUtil::hex_encode(std::string const& input)
+{
+    size_t input_size = input.length();
+    size_t hex_size = 1 + (2 * input_size);
+    PointerHolder<char> bufp(true, new char[hex_size]);
+    char* buf = bufp.getPointer();
+    buf[hex_size - 1] = '\0';
+    for (unsigned int i = 0; i < input_size; ++i)
+    {
+        sprintf(buf + i * 2, "%02x", (unsigned char)input[i]);
+    }
+    return buf;
 }
 
 void
