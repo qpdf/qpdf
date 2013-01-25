@@ -1,13 +1,15 @@
+2013-01-25  Jay Berkenbilt  <ejb@ql.org>
+
+	* qpdf --check was exiting with status 0 in some rare cases even
+	when errors were found.  It now always exits with one of the
+	document error codes (0 for success, 2 for errors, 3 or warnings).
+
 2013-01-24  Jay Berkenbilt  <ejb@ql.org>
 
 	* qpdf --check now does syntactic checks all pages' content
 	streams as well as checking overall document structure.  Semantic
 	errors are still not checked, and there are no plans to add
 	semantic checks.
-
-	* Bug fix: in versions 4.0.0 and 4.0.1, qpdf --check wasn't doing
-	as full of a check for linearized files as for non-linearized
-	files.
 
 2013-01-22  Jay Berkenbilt  <ejb@ql.org>
 

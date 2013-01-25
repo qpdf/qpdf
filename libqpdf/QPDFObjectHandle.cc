@@ -1012,10 +1012,10 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 	}
 	else if (! object.isInitialized())
 	{
-	    throw std::logic_error(
-		"INTERNAL ERROR: uninitialized object (token = " +
-		QUtil::int_to_string(token.getType()) +
-		", " + token.getValue() + ")");
+	    throw QPDFExc(qpdf_e_damaged_pdf, input->getName(),
+			  object_description,
+			  input->getLastOffset(),
+			  "parse error while reading object");
 	}
 	else
 	{

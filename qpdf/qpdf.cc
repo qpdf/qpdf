@@ -1428,7 +1428,11 @@ int main(int argc, char* argv[])
 	    }
 	    if (check)
 	    {
-		bool okay = false;
+                // Code below may set okay to false but not to true.
+                // We assume okay until we prove otherwise but may
+                // continue to perform additional checks after finding
+                // errors.
+		bool okay = true;
 		std::cout << "checking " << infilename << std::endl;
 		try
 		{
@@ -1444,8 +1448,11 @@ int main(int argc, char* argv[])
 		    if (pdf.isLinearized())
 		    {
 			std::cout << "File is linearized\n";
-			okay = pdf.checkLinearization();
-			// any errors are reported by checkLinearization().
+			if (! pdf.checkLinearization())
+                        {
+                            // any errors are reported by checkLinearization()
+                            okay = false;
+                        }
 		    }
 		    else
 		    {
@@ -1453,8 +1460,8 @@ int main(int argc, char* argv[])
                     }
 
                     // Write the file no nowhere, uncompressing
-                    // streams.  This causes full file traversal
-                    // and decoding of all streams we can decode.
+                    // streams.  This causes full file traversal and
+                    // decoding of all streams we can decode.
                     QPDFWriter w(pdf);
                     Pl_Discard discard;
                     w.setOutputPipeline(&discard);
@@ -1464,19 +1471,30 @@ int main(int argc, char* argv[])
                     // Parse all content streams
                     std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
                     DiscardContents discard_contents;
+                    int pageno = 0;
                     for (std::vector<QPDFObjectHandle>::iterator iter =
                              pages.begin();
                          iter != pages.end(); ++iter)
                     {
-                        QPDFObjectHandle::parseContentStream(
-                            (*iter).getKey("/Contents"), &discard_contents);
+                        ++pageno;
+                        try
+                        {
+                            QPDFObjectHandle::parseContentStream(
+                                (*iter).getKey("/Contents"),
+                                &discard_contents);
+                        }
+                        catch (QPDFExc& e)
+                        {
+                            okay = false;
+                            std::cout << "page " << pageno << ": "
+                                      << e.what() << std::endl;
+                        }
                     }
-
-                    okay = true;
 		}
 		catch (std::exception& e)
 		{
 		    std::cout << e.what() << std::endl;
+                    okay = false;
 		}
 		if (okay)
 		{
@@ -1493,6 +1511,10 @@ int main(int argc, char* argv[])
 				  << std::endl;
 		    }
 		}
+                else
+                {
+                    exit(EXIT_ERROR);
+                }
 	    }
 	}
 	else

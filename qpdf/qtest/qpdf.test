@@ -199,7 +199,7 @@ $td->runtest("remove page we don't have",
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 59;
+$n_tests += 60;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -435,7 +435,7 @@ $td->runtest("EOF terminating literal tokens",
              $td->NORMALIZE_NEWLINES);
 $td->runtest("EOF reading token",
              {$td->COMMAND => "qpdf --check eof-reading-token.pdf"},
-             {$td->FILE => "eof-reading-token.out", $td->EXIT_STATUS => 0},
+             {$td->FILE => "eof-reading-token.out", $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("extra header text",
              {$td->COMMAND => "test_driver 32 minimal.pdf"},
@@ -477,6 +477,11 @@ $td->runtest("tokenize content streams",
              {$td->COMMAND => "test_driver 37 tokenize-content-streams.pdf"},
              {$td->FILE => "tokenize-content-streams.out",
               $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("content stream errors",
+             {$td->COMMAND => "qpdf --check content-stream-errors.pdf"},
+             {$td->FILE => "content-stream-errors.out",
+              $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 
 show_ntests();
