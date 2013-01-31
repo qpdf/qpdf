@@ -116,7 +116,6 @@ install: all
 		libqpdf/$(OUTPUT_DIR)/libqpdf.la \
 		$(DESTDIR)$(libdir)/libqpdf.la
 	$(LIBTOOL) --finish $(DESTDIR)$(libdir)
-	$(RM) $(DESTDIR)$(libdir)/libqpdf.la
 	$(LIBTOOL) --mode=install install -c \
 		qpdf/$(OUTPUT_DIR)/qpdf \
 		$(DESTDIR)$(bindir)/qpdf

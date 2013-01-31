@@ -1,3 +1,9 @@
+2013-01-31  Jay Berkenbilt  <ejb@ql.org>
+
+	* Do not remove libtool's .la file during the make install step.
+	Note to packagers: if your distribution wants to you remove the
+	.la file, you will have to do that yourself now.
+
 2013-01-25  Jay Berkenbilt  <ejb@ql.org>
 
 	* qpdf --check was exiting with status 0 in some rare cases even
