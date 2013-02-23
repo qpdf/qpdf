@@ -1302,6 +1302,15 @@ void runtest(int n, char const* filename1, char const* arg2)
             QPDFObjectHandle::parseContentStream(contents, &cb);
         }
     }
+    else if (n == 38)
+    {
+        // Designed for override-compressed-object.pdf
+        QPDFObjectHandle qtest = pdf.getRoot().getKey("/QTest");
+        for (int i = 0; i < qtest.getArrayNItems(); ++i)
+        {
+            std::cout << qtest.getArrayItem(i).unparseResolved() << std::endl;
+        }
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +

@@ -1538,20 +1538,31 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
 	offsets[num] = offset + first;
     }
 
+    // To avoid having to read the object stream multiple times, store
+    // all objects that would be found here in the cache.  Remember
+    // that some objects stored here might have been overridden by new
+    // objects appended to the file, so it is necessary to recheck the
+    // xref table and only cache what would actually be resolved here.
     for (std::map<int, int>::iterator iter = offsets.begin();
 	 iter != offsets.end(); ++iter)
     {
 	int obj = (*iter).first;
-	int offset = (*iter).second;
-	input->seek(offset, SEEK_SET);
-	QPDFObjectHandle oh = readObject(input, "", obj, 0, true);
-
-	// Store in cache
 	ObjGen og(obj, 0);
-
-	this->obj_cache[og] =
-	    ObjCache(QPDFObjectHandle::ObjAccessor::getObject(oh),
-		     end_before_space, end_after_space);
+        QPDFXRefEntry const& entry = this->xref_table[og];
+        if ((entry.getType() == 2) &&
+            (entry.getObjStreamNumber() == obj_stream_number))
+        {
+            int offset = (*iter).second;
+            input->seek(offset, SEEK_SET);
+            QPDFObjectHandle oh = readObject(input, "", obj, 0, true);
+            this->obj_cache[og] =
+                ObjCache(QPDFObjectHandle::ObjAccessor::getObject(oh),
+                         end_before_space, end_after_space);
+        }
+        else
+        {
+            QTC::TC("qpdf", "QPDF not caching overridden objstm object");
+        }
     }
 }
 

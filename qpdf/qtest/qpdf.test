@@ -199,7 +199,7 @@ $td->runtest("remove page we don't have",
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 60;
+$n_tests += 61;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -482,6 +482,18 @@ $td->runtest("content stream errors",
              {$td->COMMAND => "qpdf --check content-stream-errors.pdf"},
              {$td->FILE => "content-stream-errors.out",
               $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+
+# The file override-compressed-object.pdf contains an object stream
+# with four strings in it.  The file is then appended.  The appended
+# section overrides one of the four strings with a string in another
+# object stream and another one in an uncompressed object.  The other
+# two strings are left alone.  The test case exercises that all four
+# objects have the correct value.
+$td->runtest("overridden compressed objects",
+             {$td->COMMAND => "test_driver 38 override-compressed-object.pdf"},
+             {$td->FILE => "override-compressed-object.out",
+              $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 show_ntests();
