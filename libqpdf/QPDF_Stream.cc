@@ -519,7 +519,7 @@ QPDF_Stream::replaceFilterData(QPDFObjectHandle const& filter,
     else
     {
         this->stream_dict.replaceKey(
-            "/Length", QPDFObjectHandle::newInteger((int)length));
+            "/Length", QPDFObjectHandle::newInteger(length));
     }
 }
 

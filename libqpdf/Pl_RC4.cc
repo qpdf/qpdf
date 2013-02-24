@@ -38,7 +38,7 @@ Pl_RC4::write(unsigned char* data, size_t len)
 	size_t bytes =
             (bytes_left < this->out_bufsize ? bytes_left : out_bufsize);
 	bytes_left -= bytes;
-	rc4.process(p, (int)bytes, outbuf);
+	rc4.process(p, bytes, outbuf);
 	p += bytes;
 	getNext()->write(outbuf, bytes);
     }

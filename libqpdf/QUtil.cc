@@ -26,7 +26,7 @@ QUtil::int_to_string(long long num, int fullpad)
     char t[50];
 
     // -2 or -1 to leave space for the possible negative sign and for NUL...
-    if (abs(fullpad) > (int)sizeof(t) - ((num < 0)?2:1))
+    if (abs(fullpad) > sizeof(t) - ((num < 0)?2:1))
     {
 	throw std::logic_error("Util::int_to_string has been called with "
 			       "a padding value greater than its internal "
@@ -58,7 +58,7 @@ QUtil::double_to_string(double num, int decimal_places)
     // 99 digits.
     char t[100];
 
-    std::string lhs = int_to_string((int)num);
+    std::string lhs = int_to_string(static_cast<int>(num));
 
     // lhs.length() gives us the length of the part on the right hand
     // side of the dot + 1 for the dot + decimal_places: total size of
@@ -68,7 +68,8 @@ QUtil::double_to_string(double num, int decimal_places)
     // If decimal_places <= 0, it is as if no precision was provided
     // so trust the buffer is big enough.  The following test will
     // always pass in those cases.
-    if (decimal_places + 1 + (int)lhs.length() > (int)sizeof(t) - 1)
+    if (decimal_places + 1 + static_cast<int>(lhs.length()) >
+        static_cast<int>(sizeof(t)) - 1)
     {
 	throw std::logic_error("Util::double_to_string has been called with "
 			       "a number and a decimal places specification "
@@ -94,6 +95,18 @@ QUtil::string_to_ll(char const* str)
 #else
     return strtoll(str, 0, 10);
 #endif
+}
+
+unsigned char*
+QUtil::unsigned_char_pointer(std::string const& str)
+{
+    return reinterpret_cast<unsigned char*>(const_cast<char*>(str.c_str()));
+}
+
+unsigned char*
+QUtil::unsigned_char_pointer(char const* str)
+{
+    return reinterpret_cast<unsigned char*>(const_cast<char*>(str));
 }
 
 void
@@ -126,14 +139,14 @@ int
 QUtil::seek(FILE* stream, qpdf_offset_t offset, int whence)
 {
 #if HAVE_FSEEKO
-    return fseeko(stream, (off_t)offset, whence);
+    return fseeko(stream, static_cast<off_t>(offset), whence);
 #elif HAVE_FSEEKO64
     return fseeko64(stream, offset, whence);
 #else
 # ifdef _MSC_VER
     return _fseeki64(stream, offset, whence);
 # else
-    return fseek(stream, (long)offset, whence);
+    return fseek(stream, static_cast<long>(offset), whence);
 # endif
 #endif
 }
@@ -142,14 +155,14 @@ qpdf_offset_t
 QUtil::tell(FILE* stream)
 {
 #if HAVE_FSEEKO
-    return (qpdf_offset_t)ftello(stream);
+    return static_cast<qpdf_offset_t>(ftello(stream));
 #elif HAVE_FSEEKO64
-    return (qpdf_offset_t)ftello64(stream);
+    return static_cast<qpdf_offset_t>(ftello64(stream));
 #else
 # ifdef _MSC_VER
     return _ftelli64(stream);
 # else
-    return (qpdf_offset_t)ftell(stream);
+    return static_cast<qpdf_offset_t>(ftell(stream));
 # endif
 #endif
 }
@@ -174,7 +187,7 @@ QUtil::hex_encode(std::string const& input)
     buf[hex_size - 1] = '\0';
     for (unsigned int i = 0; i < input_size; ++i)
     {
-        sprintf(buf + i * 2, "%02x", (unsigned char)input[i]);
+        sprintf(buf + i * 2, "%02x", static_cast<unsigned char>(input[i]));
     }
     return buf;
 }
@@ -199,7 +212,7 @@ void
 QUtil::setLineBuf(FILE* f)
 {
 #ifndef _WIN32
-    setvbuf(f, (char *) NULL, _IOLBF, 0);
+    setvbuf(f, reinterpret_cast<char *>(NULL), _IOLBF, 0);
 #endif
 }
 
@@ -314,7 +327,7 @@ QUtil::toUTF8(unsigned long uval)
     }
     else if (uval < 128)
     {
-	result += (char)(uval);
+	result += static_cast<char>(uval);
     }
     else
     {
@@ -329,7 +342,7 @@ QUtil::toUTF8(unsigned long uval)
 	{
 	    // Assign low six bits plus 10000000 to lowest unused
 	    // byte position, then shift
-	    *cur_byte = (unsigned char) (0x80 + (uval & 0x3f));
+	    *cur_byte = static_cast<unsigned char>(0x80 + (uval & 0x3f));
 	    uval >>= 6;
 	    // Maximum that will fit in high byte now shrinks by one bit
 	    maxval >>= 1;
@@ -342,9 +355,10 @@ QUtil::toUTF8(unsigned long uval)
 	}
 	// If maxval is k bits long, the high (7 - k) bits of the
 	// resulting byte must be high.
-	*cur_byte = (unsigned char)((0xff - (1 + (maxval << 1))) + uval);
+	*cur_byte = static_cast<unsigned char>(
+            (0xff - (1 + (maxval << 1))) + uval);
 
-	result += (char*)cur_byte;
+	result += reinterpret_cast<char*>(cur_byte);
     }
 
     return result;
@@ -358,8 +372,8 @@ QUtil::random()
     {
 	// Seed the random number generator with something simple, but
 	// just to be interesting, don't use the unmodified current
-	// time....
-        QUtil::srandom((int)QUtil::get_current_time() ^ 0xcccc);
+	// time.  It would be better if this were a more secure seed.
+        QUtil::srandom(QUtil::get_current_time() ^ 0xcccc);
 	seeded_random = true;
     }
 
@@ -385,6 +399,6 @@ QUtil::initializeWithRandomBytes(unsigned char* data, size_t len)
 {
     for (size_t i = 0; i < len; ++i)
     {
-        data[i] = (unsigned char)((QUtil::random() & 0xff0) >> 4);
+        data[i] = static_cast<unsigned char>((QUtil::random() & 0xff0) >> 4);
     }
 }

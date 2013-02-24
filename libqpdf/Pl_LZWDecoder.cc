@@ -98,7 +98,7 @@ Pl_LZWDecoder::getFirstChar(int code)
     unsigned char result = '\0';
     if (code < 256)
     {
-	result = (unsigned char) code;
+	result = static_cast<unsigned char>(code);
     }
     else
     {
@@ -131,7 +131,7 @@ Pl_LZWDecoder::addToTable(unsigned char next)
 	assert(idx < table.size());
 	Buffer& b = table[idx];
 	last_data = b.getBuffer();
-	last_size = (unsigned int) b.getSize();
+	last_size = b.getSize();
     }
 
     Buffer entry(1 + last_size);
@@ -170,7 +170,7 @@ Pl_LZWDecoder::handleCode(int code)
 	    // be what we read last plus the first character of what
 	    // we're reading now.
 	    unsigned char next = '\0';
-	    unsigned int table_size = (unsigned int) table.size();
+	    unsigned int table_size = table.size();
 	    if (code < 256)
 	    {
 		// just read < 256; last time's next was code
@@ -214,7 +214,7 @@ Pl_LZWDecoder::handleCode(int code)
 
 	if (code < 256)
 	{
-	    unsigned char ch = (unsigned char) code;
+	    unsigned char ch = static_cast<unsigned char>(code);
 	    getNext()->write(&ch, 1);
 	}
 	else

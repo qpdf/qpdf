@@ -135,7 +135,7 @@ ImageProvider::provideStreamData(int objid, int generation,
     for (int y = 0; y < nstripes; ++y)
     {
         unsigned char color = get_pixel_color(n, y);
-        memset(buf, (int) color, width * stripesize);
+        memset(buf, color, width * stripesize);
         pipeline->write(buf, width * stripesize);
     }
     pipeline->finish();
@@ -256,7 +256,8 @@ static void check_page_contents(int pageno, QPDFObjectHandle page)
     PointerHolder<Buffer> buf =
         page.getKey("/Contents").getStreamData();
     std::string actual_contents =
-        std::string((char *)(buf->getBuffer()), buf->getSize());
+        std::string(reinterpret_cast<char *>(buf->getBuffer()),
+                    buf->getSize());
     std::string expected_contents = generate_page_contents(pageno);
     if (expected_contents != actual_contents)
     {
@@ -280,7 +281,7 @@ static void check_pdf(char const* filename)
     QPDF pdf;
     pdf.processFile(filename);
     std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
-    assert(pages.size() == (size_t)npages);
+    assert(pages.size() == static_cast<size_t>(npages));
     for (int i = 0; i < npages; ++i)
     {
         int pageno = i + 1;

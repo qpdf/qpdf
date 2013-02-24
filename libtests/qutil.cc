@@ -152,7 +152,7 @@ static void print_utf8(unsigned long val)
 	     iter != result.end(); ++iter)
 	{
 	    char t[3];
-	    sprintf(t, "%02x", (unsigned char) (*iter));
+	    sprintf(t, "%02x", static_cast<unsigned char>(*iter));
 	    std::cout << " " << t;
 	}
     }

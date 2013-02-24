@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
 	QPDF pdf;
 	pdf.processFile(filename);
         std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
-        if ((pageno < 1) || (pageno > (int)pages.size()))
+        if ((pageno < 1) || (static_cast<size_t>(pageno) > pages.size()))
         {
             usage();
         }

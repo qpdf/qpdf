@@ -931,7 +931,7 @@ class QPDF
     void readHPageOffset(BitStream);
     void readHSharedObject(BitStream);
     void readHGeneric(BitStream, HGeneric&);
-    int maxEnd(ObjUser const& ou);
+    qpdf_offset_t maxEnd(ObjUser const& ou);
     qpdf_offset_t getLinearizationOffset(ObjGen const&);
     QPDFObjectHandle getUncompressedObject(
 	QPDFObjectHandle&, std::map<int, int> const& object_stream_data);

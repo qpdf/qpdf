@@ -110,7 +110,7 @@ QPDF::flattenPagesTree()
 
     QPDFObjectHandle pages = getRoot().getKey("/Pages");
 
-    int const len = (int)this->all_pages.size();
+    int const len = this->all_pages.size();
     for (int pos = 0; pos < len; ++pos)
     {
         // populate pageobj_to_pages_pos and fix parent pointer
@@ -175,25 +175,26 @@ QPDF::insertPage(QPDFObjectHandle newpage, int pos)
 
     QTC::TC("qpdf", "QPDF insert page",
             (pos == 0) ? 0 :                      // insert at beginning
-            (pos == ((int)this->all_pages.size())) ? 1 : // insert at end
+            (pos == static_cast<int>(this->all_pages.size())) ? 1 : // at end
             2);                                   // insert in middle
 
     QPDFObjectHandle pages = getRoot().getKey("/Pages");
     QPDFObjectHandle kids = pages.getKey("/Kids");
-    assert ((pos >= 0) && (pos <= (int)this->all_pages.size()));
+    assert ((pos >= 0) &&
+            (static_cast<size_t>(pos) <= this->all_pages.size()));
 
     newpage.replaceKey("/Parent", pages);
     kids.insertItem(pos, newpage);
     int npages = kids.getArrayNItems();
     pages.replaceKey("/Count", QPDFObjectHandle::newInteger(npages));
     this->all_pages.insert(this->all_pages.begin() + pos, newpage);
-    assert((int)this->all_pages.size() == npages);
+    assert(this->all_pages.size() == static_cast<size_t>(npages));
     for (int i = pos + 1; i < npages; ++i)
     {
         insertPageobjToPage(this->all_pages[i], i, false);
     }
     insertPageobjToPage(newpage, pos, true);
-    assert((int)this->pageobj_to_pages_pos.size() == npages);
+    assert(this->pageobj_to_pages_pos.size() == static_cast<size_t>(npages));
 }
 
 void
@@ -201,9 +202,9 @@ QPDF::removePage(QPDFObjectHandle page)
 {
     int pos = findPage(page); // also ensures flat /Pages
     QTC::TC("qpdf", "QPDF remove page",
-            (pos == 0) ? 0 :                          // remove at beginning
-            (pos == ((int)this->all_pages.size() - 1)) ? 1 : // remove at end
-            2);                                       // remove in middle
+            (pos == 0) ? 0 :                            // remove at beginning
+            (pos == static_cast<int>(this->all_pages.size() - 1)) ? 1 : // end
+            2);                                         // remove in middle
 
     QPDFObjectHandle pages = getRoot().getKey("/Pages");
     QPDFObjectHandle kids = pages.getKey("/Kids");
@@ -212,10 +213,10 @@ QPDF::removePage(QPDFObjectHandle page)
     int npages = kids.getArrayNItems();
     pages.replaceKey("/Count", QPDFObjectHandle::newInteger(npages));
     this->all_pages.erase(this->all_pages.begin() + pos);
-    assert((int)this->all_pages.size() == npages);
+    assert(this->all_pages.size() == static_cast<size_t>(npages));
     this->pageobj_to_pages_pos.erase(
         ObjGen(page.getObjectID(), page.getGeneration()));
-    assert((int)this->pageobj_to_pages_pos.size() == npages);
+    assert(this->pageobj_to_pages_pos.size() == static_cast<size_t>(npages));
     for (int i = pos; i < npages; ++i)
     {
         insertPageobjToPage(this->all_pages[i], i, false);

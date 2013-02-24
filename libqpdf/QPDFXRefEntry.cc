@@ -46,7 +46,7 @@ QPDFXRefEntry::getObjStreamNumber() const
 	throw std::logic_error(
 	    "getObjStreamNumber called for xref entry of type != 2");
     }
-    return (int) this->field1;
+    return this->field1;
 }
 
 int

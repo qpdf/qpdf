@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
     char* hexkey = argv[1];
     char* infilename = argv[2];
     char* outfilename = argv[3];
-    unsigned int hexkeylen = (unsigned int)strlen(hexkey);
+    unsigned int hexkeylen = strlen(hexkey);
     unsigned int keylen = hexkeylen / 2;
     unsigned char* key = new unsigned char[keylen + 1];
     key[keylen] = '\0';
@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
 	t[2] = '\0';
 
 	long val = strtol(t, 0, 16);
-	key[i/2] = (unsigned char) val;
+	key[i/2] = static_cast<unsigned char>(val);
     }
 
     FILE* outfile = fopen(outfilename, "wb");

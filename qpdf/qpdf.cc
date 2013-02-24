@@ -881,7 +881,7 @@ QPDFPageData::QPDFPageData(QPDF* qpdf, char const* range) :
     qpdf(qpdf),
     orig_pages(qpdf->getAllPages())
 {
-    this->selected_pages = parse_numrange(range, (int)this->orig_pages.size());
+    this->selected_pages = parse_numrange(range, this->orig_pages.size());
 }
 
 static void parse_version(std::string const& full_version_string,
@@ -1012,7 +1012,7 @@ int main(int argc, char* argv[])
 		// Be lax about -arg vs --arg
 		++arg;
 	    }
-	    char* parameter = (char*)strchr(arg, '=');
+	    char* parameter = const_cast<char*>(strchr(arg, '='));
 	    if (parameter)
 	    {
 		*parameter++ = 0;

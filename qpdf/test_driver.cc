@@ -95,7 +95,8 @@ static std::string getPageContents(QPDFObjectHandle page)
 {
     PointerHolder<Buffer> b1 =
         page.getKey("/Contents").getStreamData();
-    return std::string((char *)(b1->getBuffer()), b1->getSize()) + "\0";
+    return std::string(
+        reinterpret_cast<char *>(b1->getBuffer()), b1->getSize()) + "\0";
 }
 
 static void checkPageContents(QPDFObjectHandle page,
@@ -175,7 +176,7 @@ void runtest(int n, char const* filename1, char const* arg2)
 	FILE* f = QUtil::fopen_wrapper(std::string("open ") + filename1,
 				       fopen(filename1, "rb"));
 	fseek(f, 0, SEEK_END);
-	size_t size = (size_t) QUtil::tell(f);
+	size_t size = QUtil::tell(f);
 	fseek(f, 0, SEEK_SET);
 	file_buf = PointerHolder<char>(true, new char[size]);
 	char* buf_p = file_buf.getPointer();
@@ -495,7 +496,8 @@ void runtest(int n, char const* filename1, char const* arg2)
 	unsigned char const* data = buf->getBuffer();
 	bool cleartext = false;
 	if ((buf->getSize() > 9) &&
-	    (strncmp((char const*)data, "<?xpacket", 9) == 0))
+	    (strncmp(reinterpret_cast<char const*>(data),
+                     "<?xpacket", 9) == 0))
 	{
 	    cleartext = true;
 	}
@@ -532,7 +534,8 @@ void runtest(int n, char const* filename1, char const* arg2)
 	}
 	Pl_Buffer p1("buffer");
 	Pl_Flate p2("compress", &p1, Pl_Flate::a_deflate);
-	p2.write((unsigned char*)"new data for stream\n", 20); // no null!
+	p2.write(QUtil::unsigned_char_pointer("new data for stream\n"),
+                 20); // no null!
 	p2.finish();
 	PointerHolder<Buffer> b = p1.getBuffer();
 	// This is a bogus way to use StreamDataProvider, but it does
@@ -569,7 +572,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         // Explicitly exercise the Buffer version of newStream
 	PointerHolder<Buffer> buf = new Buffer(20);
 	unsigned char* bp = buf->getBuffer();
-	memcpy(bp, (char*)"data for new stream\n", 20); // no null!
+	memcpy(bp, "data for new stream\n", 20); // no null!
 	QPDFObjectHandle qstream = QPDFObjectHandle::newStream(
             &pdf, buf);
 	QPDFObjectHandle rstream = QPDFObjectHandle::newStream(&pdf);
@@ -824,7 +827,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         page.replaceKey("/Parent", pages);
         pages.replaceKey(
             "/Count",
-            QPDFObjectHandle::newInteger(1 + (int)all_pages.size()));
+            QPDFObjectHandle::newInteger(1 + all_pages.size()));
         kids.appendItem(page);
         assert(all_pages.size() == 10);
         pdf.updateAllPagesCache();
@@ -1220,7 +1223,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         {
             std::string const& filename = (*iter).first;
             std::string data = std::string(
-                (char const*)(*iter).second->getBuffer(),
+                reinterpret_cast<char const*>((*iter).second->getBuffer()),
                 (*iter).second->getSize());
             bool is_binary = false;
             for (size_t i = 0; i < data.size(); ++i)
@@ -1234,7 +1237,9 @@ void runtest(int n, char const* filename1, char const* arg2)
             if (is_binary)
             {
                 std::string t;
-                for (size_t i = 0; i < std::min(data.size(), (size_t)20); ++i)
+                for (size_t i = 0;
+                     i < std::min(data.size(), static_cast<size_t>(20));
+                     ++i)
                 {
                     if ((data[i] >= 32) && (data[i] <= 126))
                     {
@@ -1276,7 +1281,8 @@ void runtest(int n, char const* filename1, char const* arg2)
                 stream.pipeStreamData(&p2, false, false, false);
                 PointerHolder<Buffer> buf = p1.getBuffer();
                 std::string data = std::string(
-                    (char const*)buf->getBuffer(), buf->getSize());
+                    reinterpret_cast<char const*>(buf->getBuffer()),
+                    buf->getSize());
                 std::cout << stream.getDict().unparse()
                           << filename << ":\n" << data << "--END--\n";
             }

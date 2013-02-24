@@ -71,22 +71,22 @@ static unsigned char PADDING[64] = {
 // FF, GG, HH, and II transformations for rounds 1, 2, 3, and 4.
 // Rotation is separate from addition to prevent recomputation.
 #define FF(a, b, c, d, x, s, ac) { \
- (a) += F ((b), (c), (d)) + (x) + (UINT4)(ac); \
+ (a) += F ((b), (c), (d)) + (x) + static_cast<UINT4>(ac); \
  (a) = ROTATE_LEFT ((a), (s)); \
  (a) += (b); \
   }
 #define GG(a, b, c, d, x, s, ac) { \
- (a) += G ((b), (c), (d)) + (x) + (UINT4)(ac); \
+ (a) += G ((b), (c), (d)) + (x) + static_cast<UINT4>(ac); \
  (a) = ROTATE_LEFT ((a), (s)); \
  (a) += (b); \
   }
 #define HH(a, b, c, d, x, s, ac) { \
- (a) += H ((b), (c), (d)) + (x) + (UINT4)(ac); \
+ (a) += H ((b), (c), (d)) + (x) + static_cast<UINT4>(ac); \
  (a) = ROTATE_LEFT ((a), (s)); \
  (a) += (b); \
   }
 #define II(a, b, c, d, x, s, ac) { \
- (a) += I ((b), (c), (d)) + (x) + (UINT4)(ac); \
+ (a) += I ((b), (c), (d)) + (x) + static_cast<UINT4>(ac); \
  (a) = ROTATE_LEFT ((a), (s)); \
  (a) += (b); \
   }
@@ -115,21 +115,20 @@ void MD5::update(unsigned char *input,
     unsigned int i, index, partLen;
 
     // Compute number of bytes mod 64
-    index = (unsigned int)((count[0] >> 3) & 0x3F);
+    index = static_cast<unsigned int>((count[0] >> 3) & 0x3f);
 
     // Update number of bits
-    if ((count[0] += ((UINT4)inputLen << 3))
-	< ((UINT4)inputLen << 3))
+    if ((count[0] += (static_cast<UINT4>(inputLen) << 3)) <
+        (static_cast<UINT4>(inputLen) << 3))
 	count[1]++;
-    count[1] += ((UINT4)inputLen >> 29);
+    count[1] += (static_cast<UINT4>(inputLen) >> 29);
 
     partLen = 64 - index;
 
     // Transform as many times as possible.
 
     if (inputLen >= partLen) {
-	memcpy
-	    ((POINTER)&buffer[index], (POINTER)input, partLen);
+	memcpy(&buffer[index], input, partLen);
 	transform(state, buffer);
 
 	for (i = partLen; i + 63 < inputLen; i += 64)
@@ -141,9 +140,7 @@ void MD5::update(unsigned char *input,
 	i = 0;
 
     // Buffer remaining input
-    memcpy
-	((POINTER)&buffer[index], (POINTER)&input[i],
-	 inputLen-i);
+    memcpy(&buffer[index], &input[i], inputLen-i);
 }
 
 // MD5 finalization. Ends an MD5 message-digest operation, writing the
@@ -163,7 +160,7 @@ void MD5::final()
 
     // Pad out to 56 mod 64.
 
-    index = (unsigned int)((count[0] >> 3) & 0x3f);
+    index = static_cast<unsigned int>((count[0] >> 3) & 0x3f);
     padLen = (index < 56) ? (56 - index) : (120 - index);
     update(PADDING, padLen);
 
@@ -266,7 +263,7 @@ void MD5::transform(UINT4 state[4], unsigned char block[64])
 
     // Zeroize sensitive information.
 
-    memset ((POINTER)x, 0, sizeof (x));
+    memset (x, 0, sizeof (x));
 }
 
 // Encodes input (UINT4) into output (unsigned char). Assumes len is a
@@ -276,10 +273,10 @@ void MD5::encode(unsigned char *output, UINT4 *input, unsigned int len)
     unsigned int i, j;
 
     for (i = 0, j = 0; j < len; i++, j += 4) {
-	output[j] = (unsigned char)(input[i] & 0xff);
-	output[j+1] = (unsigned char)((input[i] >> 8) & 0xff);
-	output[j+2] = (unsigned char)((input[i] >> 16) & 0xff);
-	output[j+3] = (unsigned char)((input[i] >> 24) & 0xff);
+	output[j] = static_cast<unsigned char>(input[i] & 0xff);
+	output[j+1] = static_cast<unsigned char>((input[i] >> 8) & 0xff);
+	output[j+2] = static_cast<unsigned char>((input[i] >> 16) & 0xff);
+	output[j+3] = static_cast<unsigned char>((input[i] >> 24) & 0xff);
     }
 }
 
@@ -290,8 +287,11 @@ void MD5::decode(UINT4 *output, unsigned char *input, unsigned int len)
     unsigned int i, j;
 
     for (i = 0, j = 0; j < len; i++, j += 4)
-	output[i] = ((UINT4)input[j]) | (((UINT4)input[j+1]) << 8) |
-	    (((UINT4)input[j+2]) << 16) | (((UINT4)input[j+3]) << 24);
+	output[i] =
+            static_cast<UINT4>(input[j]) |
+            (static_cast<UINT4>(input[j+1]) << 8) |
+	    (static_cast<UINT4>(input[j+2]) << 16) |
+            (static_cast<UINT4>(input[j+3]) << 24);
 }
 
 // Public functions
@@ -308,20 +308,20 @@ void MD5::reset()
 
 void MD5::encodeString(char const* str)
 {
-    unsigned int len = (unsigned int)strlen(str);
+    unsigned int len = strlen(str);
 
-    update((unsigned char *)str, len);
+    update(QUtil::unsigned_char_pointer(str), len);
     final();
 }
 
 void MD5::appendString(char const* input_string)
 {
-    update((unsigned char *)input_string, (unsigned int) strlen(input_string));
+    update(QUtil::unsigned_char_pointer(input_string), strlen(input_string));
 }
 
 void MD5::encodeDataIncrementally(char const* data, int len)
 {
-    update((unsigned char *)data, len);
+    update(QUtil::unsigned_char_pointer(data), len);
 }
 
 void MD5::encodeFile(char const *filename, int up_to_size)
@@ -344,7 +344,7 @@ void MD5::encodeFile(char const *filename, int up_to_size)
 	len = fread(buffer, 1, to_try, file);
 	if (len > 0)
 	{
-	    update(buffer, (unsigned int) len);
+	    update(buffer, len);
 	    so_far += len;
 	    if ((up_to_size >= 0) && (so_far >= up_to_size))
 	    {
@@ -386,7 +386,8 @@ void MD5::print()
 std::string MD5::unparse()
 {
     final();
-    return QUtil::hex_encode(std::string((char*)digest_val, 16));
+    return QUtil::hex_encode(
+        std::string(reinterpret_cast<char*>(digest_val), 16));
 }
 
 std::string

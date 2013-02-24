@@ -39,7 +39,7 @@ ImageProvider::provideStreamData(int objid, int generation,
 {
     for (int i = 0; i < width * height; ++i)
     {
-        pipeline->write((unsigned char*)"\xff\x7f\x00", 3);
+        pipeline->write(QUtil::unsigned_char_pointer("\xff\x7f\x00"), 3);
     }
     pipeline->finish();
 }

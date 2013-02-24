@@ -20,7 +20,7 @@ BufferInputSource::BufferInputSource(std::string const& description,
 {
     this->buf = new Buffer(contents.length());
     unsigned char* bp = buf->getBuffer();
-    memcpy(bp, (char*)contents.c_str(), contents.length());
+    memcpy(bp, contents.c_str(), contents.length());
 }
 
 BufferInputSource::~BufferInputSource()
@@ -38,7 +38,7 @@ BufferInputSource::findAndSkipNextEOL()
     {
         throw std::logic_error("INTERNAL ERROR: BufferInputSource offset < 0");
     }
-    qpdf_offset_t end_pos = (qpdf_offset_t) this->buf->getSize();
+    qpdf_offset_t end_pos = this->buf->getSize();
     if (this->cur_offset >= end_pos)
     {
 	this->last_offset = end_pos;
@@ -47,12 +47,12 @@ BufferInputSource::findAndSkipNextEOL()
     }
 
     qpdf_offset_t result = 0;
-    size_t len = (size_t)(end_pos - this->cur_offset);
+    size_t len = end_pos - this->cur_offset;
     unsigned char const* buffer = this->buf->getBuffer();
 
-    void* start = (void*)(buffer + this->cur_offset);
-    unsigned char* p1 = (unsigned char*)memchr(start, '\r', len);
-    unsigned char* p2 = (unsigned char*)memchr(start, '\n', len);
+    void* start = const_cast<unsigned char*>(buffer) + this->cur_offset;
+    unsigned char* p1 = static_cast<unsigned char*>(memchr(start, '\r', len));
+    unsigned char* p2 = static_cast<unsigned char*>(memchr(start, '\n', len));
     unsigned char* p = (p1 && p2) ? std::min(p1, p2) : p1 ? p1 : p2;
     if (p)
     {
@@ -96,7 +96,7 @@ BufferInputSource::seek(qpdf_offset_t offset, int whence)
 	break;
 
       case SEEK_END:
-	this->cur_offset = (qpdf_offset_t)this->buf->getSize() + offset;
+	this->cur_offset = this->buf->getSize() + offset;
 	break;
 
       case SEEK_CUR:
@@ -129,7 +129,7 @@ BufferInputSource::read(char* buffer, size_t length)
     {
         throw std::logic_error("INTERNAL ERROR: BufferInputSource offset < 0");
     }
-    qpdf_offset_t end_pos = (qpdf_offset_t) this->buf->getSize();
+    qpdf_offset_t end_pos = this->buf->getSize();
     if (this->cur_offset >= end_pos)
     {
 	this->last_offset = end_pos;
@@ -137,7 +137,8 @@ BufferInputSource::read(char* buffer, size_t length)
     }
 
     this->last_offset = this->cur_offset;
-    size_t len = std::min((size_t)(end_pos - this->cur_offset), length);
+    size_t len = std::min(
+        static_cast<size_t>(end_pos - this->cur_offset), length);
     memcpy(buffer, buf->getBuffer() + this->cur_offset, len);
     this->cur_offset += len;
     return len;

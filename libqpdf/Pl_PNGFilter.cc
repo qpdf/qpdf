@@ -73,7 +73,7 @@ Pl_PNGFilter::processRow()
 void
 Pl_PNGFilter::decodeRow()
 {
-    int filter = (int) this->cur_row[0];
+    int filter = this->cur_row[0];
     if (this->prev_row)
     {
 	switch (filter)

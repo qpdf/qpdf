@@ -159,9 +159,10 @@ QPDF::processMemoryFile(char const* description,
 			char const* password)
 {
     processInputSource(
-	new BufferInputSource(description,
-			      new Buffer((unsigned char*)buf, length),
-			      true),
+	new BufferInputSource(
+            description,
+            new Buffer(QUtil::unsigned_char_pointer(buf), length),
+            true),
         password);
 }
 
@@ -280,7 +281,7 @@ QPDF::parse(char const* password)
     // where the regexp matches.
     char* p = buf;
     char const* candidate = "";
-    while ((p = (char*)memchr(p, 's', tbuf_size - (p - buf))) != 0)
+    while ((p = static_cast<char*>(memchr(p, 's', tbuf_size - (p - buf)))) != 0)
     {
 	if (eof_re.match(p))
 	{
@@ -796,7 +797,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
 	    for (int k = 0; k < W[j]; ++k)
 	    {
 		fields[j] <<= 8;
-		fields[j] += (int)(*p++);
+		fields[j] += static_cast<int>(*p++);
 	    }
 	}
 
@@ -828,7 +829,8 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
 	    // This is needed by checkLinearization()
 	    this->first_xref_item_offset = xref_offset;
 	}
-	insertXrefEntry(obj, (int)fields[0], fields[1], (int)fields[2]);
+	insertXrefEntry(obj, static_cast<int>(fields[0]),
+                        fields[1], static_cast<int>(fields[2]));
     }
 
     if (! this->trailer.isInitialized())
@@ -1096,8 +1098,7 @@ QPDF::readObject(PointerHolder<InputSource> input,
                 }
 
                 length = length_obj.getIntValue();
-                input->seek(
-                    stream_offset + (qpdf_offset_t)length, SEEK_SET);
+                input->seek(stream_offset + length, SEEK_SET);
                 if (! (readToken(input) ==
                        QPDFTokenizer::Token(
                            QPDFTokenizer::tt_word, "endstream")))
@@ -1395,7 +1396,7 @@ QPDF::readObjectAtOffset(bool try_recovery,
 	    char ch;
 	    if (this->file->read(&ch, 1))
 	    {
-		if (! isspace((unsigned char)ch))
+		if (! isspace(static_cast<unsigned char>(ch)))
 		{
 		    this->file->seek(-1, SEEK_CUR);
 		    break;
@@ -2064,7 +2065,7 @@ QPDF::pipeStreamData(int objid, int generation,
 			      "unexpected EOF reading stream data");
 	    }
 	    length -= len;
-	    pipeline->write((unsigned char*)buf, len);
+	    pipeline->write(QUtil::unsigned_char_pointer(buf), len);
 	}
     }
     catch (QPDFExc& e)

@@ -91,7 +91,7 @@ Pl_ASCIIHexDecoder::flush()
 	    b[i] = this->inbuf[i] - '0';
 	}
     }
-    unsigned char ch = (unsigned char)((b[0] << 4) + b[1]);
+    unsigned char ch = static_cast<unsigned char>((b[0] << 4) + b[1]);
 
     QTC::TC("libtests", "Pl_ASCIIHexDecoder partial flush",
 	    (this->pos == 2) ? 0 : 1);

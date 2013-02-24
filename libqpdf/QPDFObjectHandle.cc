@@ -508,7 +508,7 @@ QPDFObjectHandle::replaceStreamData(std::string const& data,
     assertStream();
     PointerHolder<Buffer> b = new Buffer(data.length());
     unsigned char* bp = b->getBuffer();
-    memcpy(bp, (char*)data.c_str(), data.length());
+    memcpy(bp, data.c_str(), data.length());
     dynamic_cast<QPDF_Stream*>(obj.getPointer())->replaceStreamData(
 	b, filter, decode_parms);
 }
@@ -690,7 +690,7 @@ QPDFObjectHandle::parse(std::string const& object_str,
     bool empty = false;
     QPDFObjectHandle result =
         parse(input, object_description, tokenizer, empty, 0, 0);
-    size_t offset = (size_t) input->tell();
+    size_t offset = input->tell();
     while (offset < object_str.length())
     {
         if (! isspace(object_str[offset]))
@@ -748,7 +748,7 @@ QPDFObjectHandle::parseContentStream_internal(QPDFObjectHandle stream,
     QPDFTokenizer tokenizer;
     tokenizer.allowEOF();
     bool empty = false;
-    while ((size_t) input->tell() < length)
+    while (static_cast<size_t>(input->tell()) < length)
     {
         QPDFObjectHandle obj =
             parseInternal(input, "content", tokenizer, empty,

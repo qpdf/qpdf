@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
         usage();
     }
 
-    unsigned int hexkeylen = (unsigned int)strlen(hexkey);
+    unsigned int hexkeylen = strlen(hexkey);
     unsigned int keylen = hexkeylen / 2;
 
     FILE* infile = fopen(infilename, "rb");
@@ -112,7 +112,7 @@ int main(int argc, char* argv[])
 	t[2] = '\0';
 
 	long val = strtol(t, 0, 16);
-	key[i/2] = (unsigned char) val;
+	key[i/2] = static_cast<unsigned char>(val);
     }
 
     Pl_StdioFile* out = new Pl_StdioFile("stdout", outfile);

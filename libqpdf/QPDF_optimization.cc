@@ -73,7 +73,7 @@ QPDF::optimize(std::map<int, int> const& object_stream_data,
     pushInheritedAttributesToPage(allow_changes, false);
 
     // Traverse pages
-    int n = (int)this->all_pages.size();
+    int n = this->all_pages.size();
     for (int pageno = 0; pageno < n; ++pageno)
     {
         updateObjectMaps(ObjUser(ObjUser::ou_page, pageno),

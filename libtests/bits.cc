@@ -37,7 +37,8 @@ test_write_bits(unsigned char& ch, unsigned int& bit_offset, unsigned long val,
 		int bits, Pl_Buffer* bp)
 {
     write_bits(ch, bit_offset, val, bits, bp);
-    printf("ch = %02x, bit_offset = %d\n", (unsigned int) ch, bit_offset);
+    printf("ch = %02x, bit_offset = %d\n",
+           static_cast<unsigned int>(ch), bit_offset);
 }
 
 static void
@@ -49,7 +50,7 @@ print_buffer(Pl_Buffer* bp)
     size_t l = b->getSize();
     for (unsigned long i = 0; i < l; ++i)
     {
-	printf("%02x%s", (unsigned int)(p[i]),
+	printf("%02x%s", static_cast<unsigned int>(p[i]),
 	       (i == l - 1) ? "\n" : " ");
     }
     printf("\n");

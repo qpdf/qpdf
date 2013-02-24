@@ -80,7 +80,7 @@ QPDFTokenizer::resolveLiteral()
                     num[0] = p[1];
                     num[1] = p[2];
                     num[2] = '\0';
-                    char ch = (char)(strtol(num, 0, 16));
+                    char ch = static_cast<char>(strtol(num, 0, 16));
                     if (ch == '\0')
                     {
                         type = tt_bad;
@@ -273,7 +273,7 @@ QPDFTokenizer::presentCharacter(char ch)
 	{
 	    // We've accumulated \ddd.  PDF Spec says to ignore
 	    // high-order overflow.
-	    val += (char) strtol(bs_num_register, 0, 8);
+	    val += static_cast<char>(strtol(bs_num_register, 0, 8));
 	    memset(bs_num_register, '\0', sizeof(bs_num_register));
 	    bs_num_count = 0;
 	}
@@ -399,7 +399,7 @@ QPDFTokenizer::presentCharacter(char ch)
 	    {
 		num[0] = val[i];
 		num[1] = val[i+1];
-		char nch = (char)(strtol(num, 0, 16));
+		char nch = static_cast<char>(strtol(num, 0, 16));
 		nval += nch;
 	    }
 	    val = nval;
@@ -511,7 +511,7 @@ QPDFTokenizer::readToken(PointerHolder<InputSource> input,
 	}
 	else
 	{
-	    if (is_space((unsigned char)ch) &&
+	    if (is_space(static_cast<unsigned char>(ch)) &&
 		(input->getLastOffset() == offset))
 	    {
 		++offset;

@@ -68,7 +68,9 @@ Pl_ASCII85Decoder::write(unsigned char* buf, size_t len)
 		else
 		{
 		    QTC::TC("libtests", "Pl_ASCII85Decoder read z");
-		    getNext()->write((unsigned char*)"\000\000\000\000", 4);
+                    unsigned char zeroes[4];
+                    memset(zeroes, '\0', 4);
+		    getNext()->write(zeroes, 4);
 		}
 		break;
 

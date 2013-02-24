@@ -122,7 +122,8 @@ Pl_AES_PDF::finish()
             // Pad as described in section 3.5.1 of version 1.7 of the PDF
             // specification, including providing an entire block of padding
             // if the input was a multiple of 16 bytes.
-            unsigned char pad = (unsigned char) (this->buf_size - this->offset);
+            unsigned char pad =
+                static_cast<unsigned char>(this->buf_size - this->offset);
             memset(this->inbuf + this->offset, pad, pad);
             this->offset = this->buf_size;
             flush(false);

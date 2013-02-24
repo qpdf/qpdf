@@ -28,7 +28,8 @@ Pl_MD5::write(unsigned char* buf, size_t len)
     while (bytes_left > 0)
     {
 	size_t bytes = (bytes_left >= max_bytes ? max_bytes : bytes_left);
-        this->md5.encodeDataIncrementally((char*) data, (int)bytes);
+        this->md5.encodeDataIncrementally(
+            reinterpret_cast<char*>(data), bytes);
 	bytes_left -= bytes;
         data += bytes;
     }

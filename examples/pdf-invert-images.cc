@@ -53,7 +53,7 @@ ImageInverter::provideStreamData(int objid, int generation,
     unsigned char ch;
     for (size_t i = 0; i < size; ++i)
     {
-	ch = (unsigned char)0xff - buf[i];
+	ch = static_cast<unsigned char>(0xff) - buf[i];
 	pipeline->write(&ch, 1);
     }
     pipeline->finish();

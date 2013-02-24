@@ -27,6 +27,17 @@ namespace QUtil
     QPDF_DLL
     long long string_to_ll(char const* str);
 
+    // Pipeline's write method wants unsigned char*, but we often have
+    // some other type of string.  These methods do combinations of
+    // const_cast and reinterpret_cast to give us an unsigned char*.
+    // They should only be used when it is known that it is safe.
+    // None of the pipelines in qpdf modify the data passed to them,
+    // so within qpdf, it should always be safe.
+    QPDF_DLL
+    unsigned char* unsigned_char_pointer(std::string const& str);
+    QPDF_DLL
+    unsigned char* unsigned_char_pointer(char const* str);
+
     // Throw std::runtime_error with a string formed by appending to
     // "description: " the standard string corresponding to the
     // current value of errno.

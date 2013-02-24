@@ -772,7 +772,7 @@ QPDFWriter::writeBinary(unsigned long long val, unsigned int bytes)
     unsigned char data[sizeof(unsigned long long)];
     for (unsigned int i = 0; i < bytes; ++i)
     {
-	data[bytes - i - 1] = (unsigned char)(val & 0xff);
+	data[bytes - i - 1] = static_cast<unsigned char>(val & 0xff);
 	val >>= 8;
     }
     this->pipeline->write(data, bytes);
@@ -781,7 +781,7 @@ QPDFWriter::writeBinary(unsigned long long val, unsigned int bytes)
 void
 QPDFWriter::writeString(std::string const& str)
 {
-    this->pipeline->write((unsigned char*)str.c_str(), str.length());
+    this->pipeline->write(QUtil::unsigned_char_pointer(str), str.length());
 }
 
 void
@@ -887,14 +887,14 @@ QPDFWriter::pushEncryptionFilter()
 	{
 	    p = new Pl_AES_PDF(
 		"aes stream encryption", this->pipeline, true,
-		(unsigned char*) this->cur_data_key.c_str(),
-                (unsigned int)this->cur_data_key.length());
+		QUtil::unsigned_char_pointer(this->cur_data_key),
+                this->cur_data_key.length());
 	}
 	else
 	{
 	    p = new Pl_RC4("rc4 stream encryption", this->pipeline,
-			   (unsigned char*) this->cur_data_key.c_str(),
-			   (unsigned int)this->cur_data_key.length());
+			   QUtil::unsigned_char_pointer(this->cur_data_key),
+			   this->cur_data_key.length());
 	}
 	pushPipeline(p);
     }
@@ -1087,7 +1087,7 @@ QPDFWriter::writeTrailer(trailer_e which, int size, bool xref_stream,
 		    writeString(" /Prev ");
 		    qpdf_offset_t pos = this->pipeline->getCount();
 		    writeString(QUtil::int_to_string(prev));
-		    int nspaces = (int)(pos - this->pipeline->getCount() + 21);
+		    int nspaces = pos - this->pipeline->getCount() + 21;
 		    assert(nspaces >= 0);
 		    writePad(nspaces);
 		}
@@ -1504,14 +1504,15 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	    if (this->encrypt_use_aes)
 	    {
 		Pl_Buffer bufpl("encrypted string");
-		Pl_AES_PDF pl("aes encrypt string", &bufpl, true,
-			      (unsigned char const*)this->cur_data_key.c_str(),
-                              (unsigned int)this->cur_data_key.length());
-		pl.write((unsigned char*) val.c_str(), val.length());
+		Pl_AES_PDF pl(
+                    "aes encrypt string", &bufpl, true,
+                    QUtil::unsigned_char_pointer(this->cur_data_key),
+                    this->cur_data_key.length());
+		pl.write(QUtil::unsigned_char_pointer(val), val.length());
 		pl.finish();
 		Buffer* buf = bufpl.getBuffer();
 		val = QPDF_String(
-		    std::string((char*)buf->getBuffer(),
+		    std::string(reinterpret_cast<char*>(buf->getBuffer()),
 				buf->getSize())).unparse(true);
 		delete buf;
 	    }
@@ -1519,9 +1520,9 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	    {
 		char* tmp = QUtil::copy_string(val);
 		size_t vlen = val.length();
-		RC4 rc4((unsigned char const*)this->cur_data_key.c_str(),
-			(int)this->cur_data_key.length());
-		rc4.process((unsigned char*)tmp, (int)vlen);
+		RC4 rc4(QUtil::unsigned_char_pointer(this->cur_data_key),
+			this->cur_data_key.length());
+		rc4.process(QUtil::unsigned_char_pointer(tmp), vlen);
 		val = QPDF_String(std::string(tmp, vlen)).unparse();
 		delete [] tmp;
 	    }
@@ -1788,7 +1789,7 @@ QPDFWriter::generateID()
                                       0x23, 0x84, 0x62, 0x64,
                                       0x33, 0x83, 0x27, 0x95,
                                       0x00};
-	result = (char*)tmp;
+	result = reinterpret_cast<char*>(tmp);
     }
     else
     {
@@ -1799,7 +1800,7 @@ QPDFWriter::generateID()
 	// the file yet.  This scheme should be fine though.
 
 	std::string seed;
-	seed += QUtil::int_to_string((int)QUtil::get_current_time());
+	seed += QUtil::int_to_string(QUtil::get_current_time());
 	seed += " QPDF ";
 	seed += this->filename;
 	seed += " ";
@@ -1823,7 +1824,8 @@ QPDFWriter::generateID()
 	m.encodeString(seed.c_str());
 	MD5::Digest digest;
 	m.digest(digest);
-	result = std::string((char*)digest, sizeof(MD5::Digest));
+	result = std::string(reinterpret_cast<char*>(digest),
+                             sizeof(MD5::Digest));
     }
 
     // If /ID already exists, follow the spec: use the original first
@@ -1899,9 +1901,8 @@ QPDFWriter::generateObjectStreams()
     // This code doesn't do anything with /Extends.
 
     std::vector<int> const& eligible = this->pdf.getCompressibleObjects();
-    unsigned int n_object_streams =
-        (unsigned int)((eligible.size() + 99) / 100);
-    unsigned int n_per = (unsigned int)(eligible.size() / n_object_streams);
+    unsigned int n_object_streams = (eligible.size() + 99) / 100;
+    unsigned int n_per = eligible.size() / n_object_streams;
     if (n_per * n_object_streams < eligible.size())
     {
 	++n_per;
@@ -2206,7 +2207,8 @@ QPDFWriter::write()
 	this->object_stream_to_objects[stream].insert(obj);
 	this->max_ostream_index =
 	    std::max(this->max_ostream_index,
-		     (int)this->object_stream_to_objects[stream].size() - 1);
+		     static_cast<int>(
+                         this->object_stream_to_objects[stream].size()) - 1);
     }
 
     if (! this->object_stream_to_objects.empty())
@@ -2553,8 +2555,7 @@ QPDFWriter::writeLinearized()
     //
 
     // Second half objects
-    int second_half_uncompressed =
-        (int)(part7.size() + part8.size() + part9.size());
+    int second_half_uncompressed = part7.size() + part8.size() + part9.size();
     int second_half_first_obj = 1;
     int after_second_half = 1 + second_half_uncompressed;
     this->next_objid = after_second_half;
@@ -2661,7 +2662,7 @@ QPDFWriter::writeLinearized()
 	{
 	    std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
 	    int first_page_object = obj_renumber[pages[0].getObjectID()];
-	    int npages = (int)pages.size();
+	    int npages = pages.size();
 
 	    writeString(" /Linearized 1 /L ");
 	    writeString(QUtil::int_to_string(file_size + hint_length));
@@ -2821,7 +2822,7 @@ QPDFWriter::writeLinearized()
 		// If this assertion fails, maybe we didn't have
 		// enough padding above.
 		assert(this->pipeline->getCount() ==
-		       (qpdf_offset_t)(second_xref_end + hint_length));
+                       second_xref_end + hint_length);
 	    }
 	}
 	else
@@ -2849,7 +2850,7 @@ QPDFWriter::writeLinearized()
 	    activatePipelineStack();
 	    writeHintStream(hint_id);
 	    popPipelineStack(&hint_buffer);
-	    hint_length = (qpdf_offset_t)hint_buffer->getSize();
+	    hint_length = hint_buffer->getSize();
 
 	    // Restore hint offset
 	    this->xref[hint_id] = QPDFXRefEntry(1, hint_offset, 0);

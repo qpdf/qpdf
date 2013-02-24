@@ -18,10 +18,10 @@ Pl_Flate::Pl_Flate(char const* identifier, Pipeline* next,
     // Windows environment.
     this->zdata = new z_stream;
 
-    z_stream& zstream = *((z_stream*) this->zdata);
-    zstream.zalloc = (alloc_func)0;
-    zstream.zfree = (free_func)0;
-    zstream.opaque = (voidpf)0;
+    z_stream& zstream = *(static_cast<z_stream*>(this->zdata));
+    zstream.zalloc = 0;
+    zstream.zfree = 0;
+    zstream.opaque = 0;
     zstream.next_in = 0;
     zstream.avail_in = 0;
     zstream.next_out = this->outbuf;
@@ -35,7 +35,7 @@ Pl_Flate::~Pl_Flate()
 	delete [] this->outbuf;
 	this->outbuf = 0;
     }
-    delete (z_stream*)this->zdata;
+    delete static_cast<z_stream*>(this->zdata);
     this->zdata = 0;
 }
 
@@ -57,7 +57,7 @@ Pl_Flate::write(unsigned char* data, size_t len)
     while (bytes_left > 0)
     {
 	size_t bytes = (bytes_left >= max_bytes ? max_bytes : bytes_left);
-        handleData(buf, (int)bytes, Z_NO_FLUSH);
+        handleData(buf, bytes, Z_NO_FLUSH);
 	bytes_left -= bytes;
         buf += bytes;
     }
@@ -66,13 +66,20 @@ Pl_Flate::write(unsigned char* data, size_t len)
 void
 Pl_Flate::handleData(unsigned char* data, int len, int flush)
 {
-    z_stream& zstream = *((z_stream*) this->zdata);
+    z_stream& zstream = *(static_cast<z_stream*>(this->zdata));
     zstream.next_in = data;
     zstream.avail_in = len;
 
     if (! this->initialized)
     {
 	int err = Z_OK;
+
+        // deflateInit and inflateInit are macros that use old-style
+        // casts.
+#ifdef __GNUC__
+#       pragma GCC diagnostic push
+#       pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
 	if (this->action == a_deflate)
 	{
 	    err = deflateInit(&zstream, Z_DEFAULT_COMPRESSION);
@@ -81,6 +88,10 @@ Pl_Flate::handleData(unsigned char* data, int len, int flush)
 	{
 	    err = inflateInit(&zstream);
 	}
+#ifdef __GNUC__
+#       pragma GCC diagnostic pop
+#endif
+
 	checkError("Init", err);
 	this->initialized = true;
     }
@@ -146,7 +157,7 @@ Pl_Flate::finish()
     {
 	if (this->initialized)
 	{
-	    z_stream& zstream = *((z_stream*) this->zdata);
+	    z_stream& zstream = *(static_cast<z_stream*>(this->zdata));
 	    unsigned char buf[1];
 	    buf[0] = '\0';
 	    handleData(buf, 0, Z_FINISH);
@@ -171,7 +182,7 @@ Pl_Flate::finish()
 void
 Pl_Flate::checkError(char const* prefix, int error_code)
 {
-    z_stream& zstream = *((z_stream*) this->zdata);
+    z_stream& zstream = *(static_cast<z_stream*>(this->zdata));
     if (error_code != Z_OK)
     {
 	char const* action_str = (action == a_deflate ? "deflate" : "inflate");
