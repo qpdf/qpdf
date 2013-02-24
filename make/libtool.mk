@@ -73,7 +73,7 @@ endef
 # Usage: $(call libcompile,src,includes)
 define c_libcompile
 	$(LIBTOOL) --quiet --mode=compile \
-		$(CC) $(CXXFLAGS) \
+		$(CC) $(CFLAGS) \
 		$(call libdepflags,$(basename $(call c_src_to_obj,$(1)))) \
 		$(foreach I,$(2),-I$(I)) \
 		$(CPPFLAGS) \

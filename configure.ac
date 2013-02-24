@@ -176,6 +176,7 @@ AC_ARG_WITH(buildrules,
 AC_MSG_RESULT($BUILDRULES)
 
 AC_SUBST(WFLAGS)
+AC_SUBST(CXXWFLAGS)
 qpdf_USE_EXTRA_WARNINGS=0
 if test "$BUILDRULES" = "msvc"; then
    dnl /w14267 makes warning 4267 a level 1 warning.  This warning reports
@@ -196,6 +197,22 @@ if test "$qpdf_USE_EXTRA_WARNINGS" = "1"; then
    WFLAGS="$try_flags"
 else
    AC_MSG_RESULT(no)
+fi
+if test "$BUILDRULES" != "msvc"; then
+   qpdf_USE_EXTRA_WARNINGS=0
+   try_flags="-Wold-style-cast"
+   AC_MSG_CHECKING(for whether $CXX supports $try_flags)
+   oCXXFLAGS=$CXXFLAGS
+   CXXFLAGS="$CXXFLAGS $try_flags"
+   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[int a = 1; int b = a; a = b;]])],
+                     [qpdf_USE_EXTRA_WARNINGS=1],[qpdf_USE_EXTRA_WARNINGS=0])
+   CXXFLAGS=$oCXXFLAGS
+   if test "$qpdf_USE_EXTRA_WARNINGS" = "1"; then
+      AC_MSG_RESULT(yes)
+      CXXWFLAGS="$try_flags"
+   else
+      AC_MSG_RESULT(no)
+   fi
 fi
 
 if test "$BUILDRULES" = "msvc"; then
