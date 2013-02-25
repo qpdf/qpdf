@@ -179,10 +179,12 @@ AC_SUBST(WFLAGS)
 AC_SUBST(CXXWFLAGS)
 qpdf_USE_EXTRA_WARNINGS=0
 if test "$BUILDRULES" = "msvc"; then
-   dnl /w14267 makes warning 4267 a level 1 warning.  This warning reports
-   dnl potential issues between size_t, off_t, and non-compatible integer
-   dnl types.
-   try_flags="/w14267"
+   dnl /w14996 makes warning 4996 a level 1 warning.  This warning
+   dnl reports on functions that Microsoft considers unsafe or
+   dnl deprecated.  Removing these warnings helps people who want to
+   dnl write applications based on qpdf that can be Windows 8
+   dnl certified.
+   try_flags="/w14996"
 else
    try_flags="-Wall"
 fi
