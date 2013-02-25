@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
 	    PCRE("^([\\p{L}]+)", PCRE_UTF8);
 	    std::cout << "1" << std::endl;
 	}
-	catch (std::exception& e)
+	catch (std::exception&)
 	{
 	    std::cout << "0" << std::endl;
 	}

@@ -657,7 +657,7 @@ QPDF::read_xrefStream(qpdf_offset_t xref_offset)
 	    xref_obj = readObjectAtOffset(
 		false, xref_offset, "xref stream", -1, 0, xobj, xgen);
 	}
-	catch (QPDFExc& e)
+	catch (QPDFExc&)
 	{
 	    // ignore -- report error below
 	}

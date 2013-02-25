@@ -1112,7 +1112,7 @@ QPDF::decryptString(std::string& str, int objid, int generation)
 	    str = std::string(tmp.getPointer(), vlen);
 	}
     }
-    catch (QPDFExc& e)
+    catch (QPDFExc&)
     {
 	throw;
     }
