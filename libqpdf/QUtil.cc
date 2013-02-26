@@ -4,6 +4,9 @@
 #include <qpdf/QUtil.hh>
 #include <qpdf/PointerHolder.hh>
 
+#include <cmath>
+#include <iomanip>
+#include <sstream>
 #include <stdio.h>
 #include <errno.h>
 #include <ctype.h>
@@ -19,72 +22,41 @@
 #endif
 
 std::string
-QUtil::int_to_string(long long num, int fullpad)
+QUtil::int_to_string(long long num, int length)
 {
-    // This routine will need to be recompiled if an int can be longer than
-    // 49 digits.
-    char t[50];
-
-    // -2 or -1 to leave space for the possible negative sign and for NUL...
-    if (abs(fullpad) > sizeof(t) - ((num < 0)?2:1))
+    // Backward compatibility -- this function used to use sprintf
+    // with %0*d, so we interpret length such that a negative value
+    // appends spaces and a positive value prepends zeroes.
+    std::ostringstream buf;
+    buf << num;
+    std::string result;
+    if ((length > 0) &&
+        (buf.str().length() < static_cast<size_t>(length)))
     {
-	throw std::logic_error("Util::int_to_string has been called with "
-			       "a padding value greater than its internal "
-			       "limit");
+	result.append(length - buf.str().length(), '0');
     }
-
-#ifdef HAVE_PRINTF_LL
-# define PRINTF_LL "ll"
-#else
-# define PRINTF_LL "l"
-#endif
-    if (fullpad)
+    result += buf.str();
+    if ((length < 0) && (buf.str().length() < static_cast<size_t>(-length)))
     {
-	sprintf(t, "%0*" PRINTF_LL "d", fullpad, num);
+	result.append(-length - buf.str().length(), ' ');
     }
-    else
-    {
-	sprintf(t, "%" PRINTF_LL "d", num);
-    }
-#undef PRINTF_LL
-
-    return std::string(t);
+    return result;
 }
 
 std::string
 QUtil::double_to_string(double num, int decimal_places)
 {
-    // This routine will need to be recompiled if a double can be longer than
-    // 99 digits.
-    char t[100];
-
-    std::string lhs = int_to_string(static_cast<int>(num));
-
-    // lhs.length() gives us the length of the part on the right hand
-    // side of the dot + 1 for the dot + decimal_places: total size of
-    // the required string.  -1 on the sizeof side to allow for NUL at
-    // the end.
-    //
-    // If decimal_places <= 0, it is as if no precision was provided
-    // so trust the buffer is big enough.  The following test will
-    // always pass in those cases.
-    if (decimal_places + 1 + static_cast<int>(lhs.length()) >
-        static_cast<int>(sizeof(t)) - 1)
+    // Backward compatibility -- this code used to use sprintf and
+    // treated decimal_places <= 0 to mean to use the default, which
+    // was six decimal places.  Also sprintf with %*.f interprents the
+    // length as fixed point rather than significant figures.
+    if (decimal_places <= 0)
     {
-	throw std::logic_error("Util::double_to_string has been called with "
-			       "a number and a decimal places specification "
-			       "that would break an internal limit");
+        decimal_places = 6;
     }
-
-    if (decimal_places)
-    {
-	sprintf(t, "%.*f", decimal_places, num);
-    }
-    else
-    {
-	sprintf(t, "%f", num);
-    }
-    return std::string(t);
+    std::ostringstream buf;
+    buf << std::setprecision(decimal_places) << std::fixed << num;
+    return buf.str();
 }
 
 long long
