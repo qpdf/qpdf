@@ -22,6 +22,8 @@ namespace QUtil
     QPDF_DLL
     std::string int_to_string(long long, int length = 0);
     QPDF_DLL
+    std::string int_to_string_base(long long, int base, int length = 0);
+    QPDF_DLL
     std::string double_to_string(double, int decimal_places = 0);
 
     QPDF_DLL

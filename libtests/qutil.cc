@@ -23,7 +23,10 @@ void string_conversion_test()
               << QUtil::double_to_string(.1234, 5) << std::endl
               << QUtil::double_to_string(.0001234, 5) << std::endl
               << QUtil::double_to_string(.123456, 5) << std::endl
-              << QUtil::double_to_string(.000123456, 5) << std::endl;
+              << QUtil::double_to_string(.000123456, 5) << std::endl
+              << QUtil::int_to_string_base(16059, 10) << std::endl
+              << QUtil::int_to_string_base(16059, 8) << std::endl
+              << QUtil::int_to_string_base(16059, 16) << std::endl;
 
     std::string embedded_null = "one";
     embedded_null += '\0';
@@ -86,10 +89,8 @@ void getenv_test()
 
 static void print_utf8(unsigned long val)
 {
-    char t[20];
-    sprintf(t, "%lx", val);   // XXXX
     std::string result = QUtil::toUTF8(val);
-    std::cout << "0x" << t << " ->";
+    std::cout << "0x" << QUtil::int_to_string_base(val, 16) << " ->";
     if (val < 0xfffe)
     {
 	std::cout << " " << result;
@@ -102,9 +103,8 @@ static void print_utf8(unsigned long val)
 	for (std::string::iterator iter = result.begin();
 	     iter != result.end(); ++iter)
 	{
-	    char t[3];
-	    sprintf(t, "%02x", static_cast<unsigned char>(*iter)); // XXXX
-	    std::cout << " " << t;
+	    std::cout << " " << QUtil::int_to_string_base(
+                static_cast<int>(static_cast<unsigned char>(*iter)), 16, 2);
 	}
     }
     std::cout << std::endl;

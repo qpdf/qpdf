@@ -95,7 +95,6 @@ QPDF_String::unparse(bool force_binary)
     else
     {
 	result += "(";
-	char num[5];
 	for (unsigned int i = 0; i < this->val.length(); ++i)
 	{
 	    char ch = this->val[i];
@@ -140,8 +139,9 @@ QPDF_String::unparse(bool force_binary)
 		}
 		else
 		{
-		    sprintf(num, "\\%03o", static_cast<unsigned char>(ch)); // XXXX
-		    result += num;
+		    result += "\\" + QUtil::int_to_string_base(
+                        static_cast<int>(static_cast<unsigned char>(ch)),
+                        8, 3);
 		}
 		break;
 	    }

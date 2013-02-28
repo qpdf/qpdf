@@ -1,3 +1,10 @@
+2013-02-28  Jay Berkenbilt  <ejb@ql.org>
+
+	* Remove all calls to sprintf
+
+	* New method QUtil::int_to_string_base to convert to octal or
+	hexademical (or decimal) strings without using sprintf
+
 2013-02-26  Jay Berkenbilt  <ejb@ql.org>
 
 	* Rewrite QUtil::int_to_string and QUtil::double_to_string to

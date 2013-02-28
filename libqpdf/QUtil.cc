@@ -24,11 +24,23 @@
 std::string
 QUtil::int_to_string(long long num, int length)
 {
-    // Backward compatibility -- this function used to use sprintf
-    // with %0*d, so we interpret length such that a negative value
-    // appends spaces and a positive value prepends zeroes.
+    return int_to_string_base(num, 10, length);
+}
+
+std::string
+QUtil::int_to_string_base(long long num, int base, int length)
+{
+    // Backward compatibility -- int_to_string, which calls this
+    // function, used to use sprintf with %0*d, so we interpret length
+    // such that a negative value appends spaces and a positive value
+    // prepends zeroes.
+    if (! ((base == 8) || (base == 10) || (base == 16)))
+    {
+        throw std::logic_error(
+            "int_to_string_base called with unsupported base");
+    }
     std::ostringstream buf;
-    buf << num;
+    buf << std::setbase(base) << std::nouppercase << num;
     std::string result;
     if ((length > 0) &&
         (buf.str().length() < static_cast<size_t>(length)))
@@ -152,16 +164,13 @@ QUtil::copy_string(std::string const& str)
 std::string
 QUtil::hex_encode(std::string const& input)
 {
-    size_t input_size = input.length();
-    size_t hex_size = 1 + (2 * input_size);
-    PointerHolder<char> bufp(true, new char[hex_size]);
-    char* buf = bufp.getPointer();
-    buf[hex_size - 1] = '\0';
-    for (unsigned int i = 0; i < input_size; ++i)
+    std::string result;
+    for (unsigned int i = 0; i < input.length(); ++i)
     {
-        sprintf(buf + i * 2, "%02x", static_cast<unsigned char>(input[i])); // XXXX
+        result += QUtil::int_to_string_base(
+            static_cast<int>(static_cast<unsigned char>(input[i])), 16, 2);
     }
-    return buf;
+    return result;
 }
 
 void
