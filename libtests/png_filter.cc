@@ -1,5 +1,6 @@
 #include <qpdf/Pl_PNGFilter.hh>
 #include <qpdf/Pl_StdioFile.hh>
+#include <qpdf/QUtil.hh>
 
 #include <iostream>
 #include <errno.h>
@@ -7,23 +8,11 @@
 #include <string.h>
 #include <stdlib.h>
 
-FILE* safe_fopen(char const* filename, char const* mode)
-{
-    FILE* result = fopen(filename, mode); // XXXX
-    if (result == 0)
-    {
-	std::cerr << "fopen " << filename << " failed: " << strerror(errno) // XXXX
-		  << std::endl;
-	exit(2);
-    }
-    return result;
-}
-
 void run(char const* filename, bool encode, unsigned int columns)
 {
     // Decode the file
-    FILE* in = safe_fopen(filename, "rb");
-    FILE* o1 = safe_fopen("out", "wb");
+    FILE* in = QUtil::safe_fopen(filename, "rb");
+    FILE* o1 = QUtil::safe_fopen("out", "wb");
     Pipeline* out = new Pl_StdioFile("out", o1);
     Pipeline* pl = new Pl_PNGFilter(
 	"png", out,

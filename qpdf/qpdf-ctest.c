@@ -8,6 +8,18 @@
 static char* whoami = 0;
 static qpdf_data qpdf = 0;
 
+static FILE* safe_fopen(char const* filename, char const* mode)
+{
+    FILE* f = fopen(filename, mode); /* XXXX */
+    if (f == NULL)
+    {
+	fprintf(stderr, "%s: unable to open %s: %s\n",
+		whoami, filename, strerror(errno)); /* XXXX */
+	exit(2);
+    }
+    return f;
+}
+
 static void report_errors()
 {
     qpdf_error e = 0;
@@ -56,13 +68,7 @@ static void read_file_into_memory(char const* filename,
     size_t bytes_read = 0;
     size_t len = 0;
 
-    f = fopen(filename, "rb"); /* XXXX */
-    if (f == NULL)
-    {
-	fprintf(stderr, "%s: unable to open %s: %s\n",
-		whoami, filename, strerror(errno)); /* XXXX */
-	exit(2);
-    }
+    f = safe_fopen(filename, "rb");
     fseek(f, 0, SEEK_END);
     *size = (unsigned long) ftell(f);
     fseek(f, 0, SEEK_SET);
@@ -364,13 +370,7 @@ static void test16(char const* infile,
     qpdf_set_static_aes_IV(qpdf, QPDF_TRUE);
     qpdf_set_stream_data_mode(qpdf, qpdf_s_uncompress);
     qpdf_write(qpdf);
-    f = fopen(outfile, "wb"); /* XXXX */
-    if (f == NULL)
-    {
-	fprintf(stderr, "%s: unable to open %s: %s\n",
-		whoami, outfile, strerror(errno)); /* XXXX */
-	exit(2);
-    }
+    f = safe_fopen(outfile, "wb");
     buflen = qpdf_get_buffer_length(qpdf);
     buf = qpdf_get_buffer(qpdf);
     fwrite(buf, 1, buflen, f);

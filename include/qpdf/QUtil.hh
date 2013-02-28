@@ -54,6 +54,11 @@ namespace QUtil
     QPDF_DLL
     int os_wrapper(std::string const& description, int status);
 
+    // If the open fails, throws std::runtime_error.  Otherwise, the
+    // FILE* is returned.
+    QPDF_DLL
+    FILE* safe_fopen(char const* filename, char const* mode);
+
     // The FILE* argument is assumed to be the return of fopen.  If
     // null, throw std::runtime_error.  Otherwise, return the FILE*
     // argument.

@@ -62,12 +62,10 @@ void os_wrapper_test()
 
 void fopen_wrapper_test()
 {
-    FILE* f = 0;
     try
     {
 	std::cout << "before fopen" << std::endl;
-	f = QUtil::fopen_wrapper("fopen file",
-				 fopen("/this/file/does/not/exist", "r")); // XXXX
+	FILE* f = QUtil::safe_fopen("/this/file/does/not/exist", "r");
 	std::cout << "after fopen" << std::endl;
 	(void) fclose(f);
     }

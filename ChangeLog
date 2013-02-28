@@ -1,5 +1,8 @@
 2013-02-28  Jay Berkenbilt  <ejb@ql.org>
 
+	* New method QUtil::safe_fopen to wrap calls to fopen.  This is
+	less cumbersome than calling QUtil::fopen_wrapper.
+
 	* Remove all calls to sprintf
 
 	* New method QUtil::int_to_string_base to convert to octal or

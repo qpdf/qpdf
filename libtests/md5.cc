@@ -1,6 +1,7 @@
 #include <qpdf/MD5.hh>
 #include <qpdf/Pl_MD5.hh>
 #include <qpdf/Pl_Discard.hh>
+#include <qpdf/QUtil.hh>
 #include <iostream>
 #include <stdio.h>
 
@@ -46,28 +47,25 @@ int main(int, char*[])
     Pl_MD5 p("MD5", &d);
     for (int i = 0; i < 2; ++i)
     {
-	FILE* f = fopen("md5.in", "rb"); // XXXX
-	if (f)
-	{
-	    // buffer size < size of md5.in
-	    unsigned char buf[50];
-	    bool done = false;
-	    while (! done)
-	    {
-		size_t len = fread(buf, 1, sizeof(buf), f);
-		if (len <= 0)
-		{
-		    done = true;
-		}
-		else
-		{
-		    p.write(buf, len);
-		}
-	    }
-	    fclose(f);
-	    p.finish();
-	    std::cout << p.getHexDigest() << std::endl;
-	}
+	FILE* f = QUtil::safe_fopen("md5.in", "rb");
+        // buffer size < size of md5.in
+        unsigned char buf[50];
+        bool done = false;
+        while (! done)
+        {
+            size_t len = fread(buf, 1, sizeof(buf), f);
+            if (len <= 0)
+            {
+                done = true;
+            }
+            else
+            {
+                p.write(buf, len);
+            }
+        }
+        fclose(f);
+        p.finish();
+        std::cout << p.getHexDigest() << std::endl;
     }
 
     return 0;

@@ -15,8 +15,7 @@ FileInputSource::setFilename(char const* filename)
     destroy();
     this->filename = filename;
     this->close_file = true;
-    this->file = QUtil::fopen_wrapper(std::string("open ") + this->filename,
-				      fopen(this->filename.c_str(), "rb")); // XXXX
+    this->file = QUtil::safe_fopen(this->filename.c_str(), "rb");
 }
 
 void

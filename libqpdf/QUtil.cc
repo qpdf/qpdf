@@ -110,6 +110,13 @@ QUtil::os_wrapper(std::string const& description, int status)
 }
 
 FILE*
+QUtil::safe_fopen(char const* filename, char const* mode)
+{
+    return fopen_wrapper(std::string("open ") + filename,
+                         fopen(filename, mode)); // XXXX
+}
+
+FILE*
 QUtil::fopen_wrapper(std::string const& description, FILE* f)
 {
     if (f == 0)

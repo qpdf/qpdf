@@ -2,23 +2,12 @@
 #include <qpdf/Pl_Flate.hh>
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/Pl_Count.hh>
+#include <qpdf/QUtil.hh>
 
 #include <iostream>
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
-
-FILE* safe_fopen(char const* filename, char const* mode)
-{
-    FILE* result = fopen(filename, mode); // XXXX
-    if (result == 0)
-    {
-	std::cerr << "fopen " << filename << " failed: " << strerror(errno) // XXXX
-		  << std::endl;
-	exit(2);
-    }
-    return result;
-}
 
 void run(char const* filename)
 {
@@ -26,9 +15,9 @@ void run(char const* filename)
     std::string n2 = std::string(filename) + ".2";
     std::string n3 = std::string(filename) + ".3";
 
-    FILE* o1 = safe_fopen(n1.c_str(), "wb");
-    FILE* o2 = safe_fopen(n2.c_str(), "wb");
-    FILE* o3 = safe_fopen(n3.c_str(), "wb");
+    FILE* o1 = QUtil::safe_fopen(n1.c_str(), "wb");
+    FILE* o2 = QUtil::safe_fopen(n2.c_str(), "wb");
+    FILE* o3 = QUtil::safe_fopen(n3.c_str(), "wb");
     Pipeline* out1 = new Pl_StdioFile("o1", o1);
     Pipeline* out2 = new Pl_StdioFile("o2", o2);
     Pipeline* out3 = new Pl_StdioFile("o3", o3);
@@ -46,7 +35,7 @@ void run(char const* filename)
     Pipeline* inf3 = new Pl_Flate("inf3", count3, Pl_Flate::a_inflate);
     Pipeline* def3 = new Pl_Flate("def3", inf3, Pl_Flate::a_deflate);
 
-    FILE* in1 = safe_fopen(filename, "rb");
+    FILE* in1 = QUtil::safe_fopen(filename, "rb");
     unsigned char buf[1024];
     size_t len;
     while ((len = fread(buf, 1, sizeof(buf), in1)) > 0)
@@ -75,7 +64,7 @@ void run(char const* filename)
     fclose(o3);
 
     // Now read the compressed data and write to the output uncompress pipeline
-    FILE* in2 = safe_fopen(n1.c_str(), "rb");
+    FILE* in2 = QUtil::safe_fopen(n1.c_str(), "rb");
     while ((len = fread(buf, 1, sizeof(buf), in2)) > 0)
     {
 	inf2->write(buf, len);

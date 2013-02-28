@@ -37,9 +37,7 @@ void QTC::TC(char const* const scope, char const* const ccase, int n)
     }
     cache.insert(std::make_pair(ccase, n));
 
-    FILE* tc =
-	QUtil::fopen_wrapper("open test coverage file (" + filename + ")",
-			     fopen(filename.c_str(), "ab")); // XXXX
+    FILE* tc = QUtil::safe_fopen(filename.c_str(), "ab");
     fprintf(tc, "%s %d\n", ccase, n);
     fclose(tc);
 }

@@ -1,5 +1,6 @@
 #include <qpdf/Pl_RC4.hh>
 #include <qpdf/Pl_StdioFile.hh>
+#include <qpdf/QUtil.hh>
 
 #include <stdio.h>
 #include <string.h>
@@ -22,13 +23,7 @@ int main(int argc, char* argv[])
     unsigned char* key = new unsigned char[keylen + 1];
     key[keylen] = '\0';
 
-    FILE* infile = fopen(infilename, "rb"); // XXXX
-    if (infile == 0)
-    {
-	std::cerr << "can't open " << infilename << std::endl;
-	exit(2);
-    }
-
+    FILE* infile = QUtil::safe_fopen(infilename, "rb");
     for (unsigned int i = 0; i < strlen(hexkey); i += 2)
     {
 	char t[3];
@@ -40,12 +35,7 @@ int main(int argc, char* argv[])
 	key[i/2] = static_cast<unsigned char>(val);
     }
 
-    FILE* outfile = fopen(outfilename, "wb"); // XXXX
-    if (outfile == 0)
-    {
-	std::cerr << "can't open " << outfilename << std::endl;
-	exit(2);
-    }
+    FILE* outfile = QUtil::safe_fopen(outfilename, "wb");
     Pl_StdioFile* out = new Pl_StdioFile("stdout", outfile);
     // Use a small buffer size (64) for testing
     Pl_RC4* rc4 = new Pl_RC4("rc4", out, key, keylen, 64);

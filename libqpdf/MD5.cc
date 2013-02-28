@@ -328,10 +328,7 @@ void MD5::encodeFile(char const *filename, int up_to_size)
 {
     unsigned char buffer[1024];
 
-    FILE *file = QUtil::fopen_wrapper(
-	std::string("MD5: open ") + filename,
-	fopen(filename, "rb")); // XXXX
-
+    FILE *file = QUtil::safe_fopen(filename, "rb");
     size_t len;
     int so_far = 0;
     int to_try = 1024;

@@ -165,16 +165,14 @@ void runtest(int n, char const* filename1, char const* arg2)
         else
         {
 	    QTC::TC("qpdf", "exercise processFile(FILE*)");
-            filep = QUtil::fopen_wrapper(std::string("open ") + filename1,
-                                         fopen(filename1, "rb")); // XXXX
+            filep = QUtil::safe_fopen(filename1, "rb");
             pdf.processFile(filename1, filep, false);
         }
     }
     else
     {
         QTC::TC("qpdf", "exercise processMemoryFile");
-	FILE* f = QUtil::fopen_wrapper(std::string("open ") + filename1,
-				       fopen(filename1, "rb")); // XXXX
+	FILE* f = QUtil::safe_fopen(filename1, "rb");
 	fseek(f, 0, SEEK_END);
 	size_t size = QUtil::tell(f);
 	fseek(f, 0, SEEK_SET);
@@ -718,8 +716,7 @@ void runtest(int n, char const* filename1, char const* arg2)
             w.write();
             Buffer* b = w.getBuffer();
             std::string const filename = (i == 0 ? "a.pdf" : "b.pdf");
-            FILE* f = QUtil::fopen_wrapper("open " + filename,
-                                           fopen(filename.c_str(), "wb")); // XXXX
+            FILE* f = QUtil::safe_fopen(filename.c_str(), "wb");
             fwrite(b->getBuffer(), b->getSize(), 1, f);
             fclose(f);
             delete b;
@@ -802,8 +799,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         checkPageContents(pages[12], "New page 12");
 
         // Exercise writing to FILE*
-        FILE* out =  QUtil::fopen_wrapper(std::string("open a.pdf"),
-                                          fopen("a.pdf", "wb")); // XXXX
+        FILE* out =  QUtil::safe_fopen("a.pdf", "wb");
 	QPDFWriter w(pdf, "FILE* a.pdf", out, true);
 	w.setStaticID(true);
 	w.setStreamDataMode(qpdf_s_preserve);
@@ -1183,8 +1179,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         w.setOutputPipeline(&p);
         w.write();
         PointerHolder<Buffer> b = p.getBuffer();
-        FILE* f = QUtil::fopen_wrapper("open a.pdf",
-                                       fopen("a.pdf", "wb")); // XXXX
+        FILE* f = QUtil::safe_fopen("a.pdf", "wb");
         fwrite(b->getBuffer(), b->getSize(), 1, f);
         fclose(f);
     }

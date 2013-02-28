@@ -19,7 +19,7 @@ before remove
 exception: remove file: No such file or directory
 ----
 before fopen
-exception: fopen file: No such file or directory
+exception: open /this/file/does/not/exist: No such file or directory
 ----
 IN_TESTSUITE: 1: 1
 HAGOOGAMAGOOGLE: 0
