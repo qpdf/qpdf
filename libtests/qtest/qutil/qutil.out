@@ -12,8 +12,8 @@ one
 7
 compare okay
 ----
-before open
-exception: open file: No such file or directory
+before remove
+exception: remove file: No such file or directory
 ----
 before fopen
 exception: fopen file: No such file or directory

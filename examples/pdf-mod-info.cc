@@ -8,6 +8,7 @@
 #include <iostream>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #ifdef _WIN32
 #include <Windows.h>
 #include <direct.h>
@@ -219,7 +220,7 @@ int main(int argc, char* argv[])
 
     try
     {
-	(void) unlink(fl_out);
+	(void) remove(fl_out);
 	QUtil::os_wrapper("rename " + fl_tmp + " " + std::string(fl_out),
 			  rename(fl_tmp.c_str(), fl_out));
     }

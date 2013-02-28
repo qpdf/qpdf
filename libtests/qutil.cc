@@ -44,14 +44,12 @@ void string_conversion_test()
 
 void os_wrapper_test()
 {
-    int fd = -1;
     try
     {
-	std::cout << "before open" << std::endl;
-	fd = QUtil::os_wrapper("open file",
-			       open("/this/file/does/not/exist", O_RDONLY));
-	std::cout << "after open" << std::endl;
-	(void) close(fd);
+	std::cout << "before remove" << std::endl;
+	QUtil::os_wrapper("remove file",
+                          remove("/this/file/does/not/exist"));
+	std::cout << "after remove" << std::endl;
     }
     catch (std::runtime_error& s)
     {
