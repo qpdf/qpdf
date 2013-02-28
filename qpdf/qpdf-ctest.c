@@ -113,7 +113,7 @@ static void read_file_into_memory(char const* filename,
 		    whoami, filename);
 	}
 	fprintf(stderr, " read %lu, wanted %lu\n",
-		(unsigned long) bytes_read, (unsigned long) size);
+		(unsigned long) bytes_read, (unsigned long) *size);
 	exit(2);
     }
     fclose(f);
