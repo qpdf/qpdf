@@ -36,6 +36,13 @@ static FILE* safe_fopen(char const* filename, char const* mode)
 
 static void report_errors()
 {
+#ifdef _WIN32
+# define POS_FMT "  pos : %I64d\n"
+#else
+/* If your compiler doesn't support lld, change to ld and lose
+   precision on offsets in error messages. */
+# define POS_FMT "  pos : %lld\n"
+#endif
     qpdf_error e = 0;
     while (qpdf_more_warnings(qpdf))
     {
@@ -43,10 +50,7 @@ static void report_errors()
 	printf("warning: %s\n", qpdf_get_error_full_text(qpdf, e));
 	printf("  code: %d\n", qpdf_get_error_code(qpdf, e));
 	printf("  file: %s\n", qpdf_get_error_filename(qpdf, e));
-        /* If your compiler doesn't support %lld, change to %ld and
-         * lose precision in the error message.
-         */
-	printf("  pos : %lld\n", qpdf_get_error_file_position(qpdf, e));
+	printf(POS_FMT, qpdf_get_error_file_position(qpdf, e));
 	printf("  text: %s\n", qpdf_get_error_message_detail(qpdf, e));
     }
     if (qpdf_has_error(qpdf))
@@ -56,8 +60,7 @@ static void report_errors()
 	printf("error: %s\n", qpdf_get_error_full_text(qpdf, e));
 	printf("  code: %d\n", qpdf_get_error_code(qpdf, e));
 	printf("  file: %s\n", qpdf_get_error_filename(qpdf, e));
-        /* see above comment about %lld */
-	printf("  pos : %lld\n", qpdf_get_error_file_position(qpdf, e));
+	printf(POS_FMT, qpdf_get_error_file_position(qpdf, e));
 	printf("  text: %s\n", qpdf_get_error_message_detail(qpdf, e));
     }
     else
