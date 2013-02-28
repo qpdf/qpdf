@@ -37,7 +37,7 @@ Pl_StdioFile::write(unsigned char* buf, size_t len)
 void
 Pl_StdioFile::finish()
 {
-    if (fileno(this->file) != -1)
+    if (fileno(this->file) != -1) // XXXX
     {
 	fflush(this->file);
     }

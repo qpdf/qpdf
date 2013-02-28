@@ -84,7 +84,7 @@ QUtil::unsigned_char_pointer(char const* str)
 void
 QUtil::throw_system_error(std::string const& description)
 {
-    throw std::runtime_error(description + ": " + strerror(errno));
+    throw std::runtime_error(description + ": " + strerror(errno)); // XXXX
 }
 
 int
@@ -159,7 +159,7 @@ QUtil::hex_encode(std::string const& input)
     buf[hex_size - 1] = '\0';
     for (unsigned int i = 0; i < input_size; ++i)
     {
-        sprintf(buf + i * 2, "%02x", static_cast<unsigned char>(input[i]));
+        sprintf(buf + i * 2, "%02x", static_cast<unsigned char>(input[i])); // XXXX
     }
     return buf;
 }

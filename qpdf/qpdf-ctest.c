@@ -56,11 +56,11 @@ static void read_file_into_memory(char const* filename,
     size_t bytes_read = 0;
     size_t len = 0;
 
-    f = fopen(filename, "rb");
+    f = fopen(filename, "rb"); /* XXXX */
     if (f == NULL)
     {
 	fprintf(stderr, "%s: unable to open %s: %s\n",
-		whoami, filename, strerror(errno));
+		whoami, filename, strerror(errno)); /* XXXX */
 	exit(2);
     }
     fseek(f, 0, SEEK_END);
@@ -364,11 +364,11 @@ static void test16(char const* infile,
     qpdf_set_static_aes_IV(qpdf, QPDF_TRUE);
     qpdf_set_stream_data_mode(qpdf, qpdf_s_uncompress);
     qpdf_write(qpdf);
-    f = fopen(outfile, "wb");
+    f = fopen(outfile, "wb"); /* XXXX */
     if (f == NULL)
     {
 	fprintf(stderr, "%s: unable to open %s: %s\n",
-		whoami, outfile, strerror(errno));
+		whoami, outfile, strerror(errno)); /* XXXX */
 	exit(2);
     }
     buflen = qpdf_get_buffer_length(qpdf);

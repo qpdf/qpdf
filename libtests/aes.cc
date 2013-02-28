@@ -89,14 +89,14 @@ int main(int argc, char* argv[])
     unsigned int hexkeylen = strlen(hexkey);
     unsigned int keylen = hexkeylen / 2;
 
-    FILE* infile = fopen(infilename, "rb");
+    FILE* infile = fopen(infilename, "rb"); // XXXX
     if (infile == 0)
     {
 	std::cerr << "can't open " << infilename << std::endl;
 	exit(2);
     }
 
-    FILE* outfile = fopen(outfilename, "wb");
+    FILE* outfile = fopen(outfilename, "wb"); // XXXX
     if (outfile == 0)
     {
 	std::cerr << "can't open " << outfilename << std::endl;

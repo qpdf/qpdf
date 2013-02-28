@@ -66,7 +66,7 @@ void fopen_wrapper_test()
     {
 	std::cout << "before fopen" << std::endl;
 	f = QUtil::fopen_wrapper("fopen file",
-				 fopen("/this/file/does/not/exist", "r"));
+				 fopen("/this/file/does/not/exist", "r")); // XXXX
 	std::cout << "after fopen" << std::endl;
 	(void) fclose(f);
     }
@@ -89,7 +89,7 @@ void getenv_test()
 static void print_utf8(unsigned long val)
 {
     char t[20];
-    sprintf(t, "%lx", val);
+    sprintf(t, "%lx", val);   // XXXX
     std::string result = QUtil::toUTF8(val);
     std::cout << "0x" << t << " ->";
     if (val < 0xfffe)
@@ -105,7 +105,7 @@ static void print_utf8(unsigned long val)
 	     iter != result.end(); ++iter)
 	{
 	    char t[3];
-	    sprintf(t, "%02x", static_cast<unsigned char>(*iter));
+	    sprintf(t, "%02x", static_cast<unsigned char>(*iter)); // XXXX
 	    std::cout << " " << t;
 	}
     }

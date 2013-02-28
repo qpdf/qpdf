@@ -105,7 +105,7 @@ QPDFWriter::setOutputFilename(char const* filename)
     {
 	QTC::TC("qpdf", "QPDFWriter write to file");
 	f = QUtil::fopen_wrapper(std::string("open ") + filename,
-                                 fopen(filename, "wb+"));
+                                 fopen(filename, "wb+")); // XXXX
 	close_file = true;
     }
     setOutputFile(description, f, close_file);

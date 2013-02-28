@@ -46,7 +46,7 @@ int main(int, char*[])
     Pl_MD5 p("MD5", &d);
     for (int i = 0; i < 2; ++i)
     {
-	FILE* f = fopen("md5.in", "rb");
+	FILE* f = fopen("md5.in", "rb"); // XXXX
 	if (f)
 	{
 	    // buffer size < size of md5.in

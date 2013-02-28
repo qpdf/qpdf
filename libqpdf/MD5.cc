@@ -330,7 +330,7 @@ void MD5::encodeFile(char const *filename, int up_to_size)
 
     FILE *file = QUtil::fopen_wrapper(
 	std::string("MD5: open ") + filename,
-	fopen(filename, "rb"));
+	fopen(filename, "rb")); // XXXX
 
     size_t len;
     int so_far = 0;

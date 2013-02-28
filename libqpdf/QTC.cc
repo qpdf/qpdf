@@ -39,7 +39,7 @@ void QTC::TC(char const* const scope, char const* const ccase, int n)
 
     FILE* tc =
 	QUtil::fopen_wrapper("open test coverage file (" + filename + ")",
-			     fopen(filename.c_str(), "ab"));
+			     fopen(filename.c_str(), "ab")); // XXXX
     fprintf(tc, "%s %d\n", ccase, n);
     fclose(tc);
 }

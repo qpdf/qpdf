@@ -9,7 +9,7 @@ Pl_ASCIIHexDecoder::Pl_ASCIIHexDecoder(char const* identifier, Pipeline* next) :
     pos(0),
     eod(false)
 {
-    strcpy(this->inbuf, "00");
+    strcpy(this->inbuf, "00");  // XXXX
 }
 
 Pl_ASCIIHexDecoder::~Pl_ASCIIHexDecoder()
@@ -98,7 +98,7 @@ Pl_ASCIIHexDecoder::flush()
     getNext()->write(&ch, 1);
 
     this->pos = 0;
-    strcpy(this->inbuf, "00");
+    strcpy(this->inbuf, "00");  // XXXX
 }
 
 void

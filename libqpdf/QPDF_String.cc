@@ -140,7 +140,7 @@ QPDF_String::unparse(bool force_binary)
 		}
 		else
 		{
-		    sprintf(num, "\\%03o", static_cast<unsigned char>(ch));
+		    sprintf(num, "\\%03o", static_cast<unsigned char>(ch)); // XXXX
 		    result += num;
 		}
 		break;

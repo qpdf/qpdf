@@ -27,9 +27,9 @@ int main(int argc, char* argv[])
 	char* outfilename = argv[2];
 
 	FILE* infile = QUtil::fopen_wrapper("open input file",
-					    fopen(infilename, "rb"));
+					    fopen(infilename, "rb")); // XXXX
 	FILE* outfile = QUtil::fopen_wrapper("open output file",
-					     fopen(outfilename, "wb"));
+					     fopen(outfilename, "wb")); // XXXX
 
 	Pl_StdioFile out("output", outfile);
 	Pl_LZWDecoder decode("decode", &out, early_code_change);

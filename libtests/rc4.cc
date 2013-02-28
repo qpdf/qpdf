@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
     unsigned char* key = new unsigned char[keylen + 1];
     key[keylen] = '\0';
 
-    FILE* infile = fopen(infilename, "rb");
+    FILE* infile = fopen(infilename, "rb"); // XXXX
     if (infile == 0)
     {
 	std::cerr << "can't open " << infilename << std::endl;
@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
 	key[i/2] = static_cast<unsigned char>(val);
     }
 
-    FILE* outfile = fopen(outfilename, "wb");
+    FILE* outfile = fopen(outfilename, "wb"); // XXXX
     if (outfile == 0)
     {
 	std::cerr << "can't open " << outfilename << std::endl;

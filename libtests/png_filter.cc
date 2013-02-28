@@ -9,10 +9,10 @@
 
 FILE* safe_fopen(char const* filename, char const* mode)
 {
-    FILE* result = fopen(filename, mode);
+    FILE* result = fopen(filename, mode); // XXXX
     if (result == 0)
     {
-	std::cerr << "fopen " << filename << " failed: " << strerror(errno)
+	std::cerr << "fopen " << filename << " failed: " << strerror(errno) // XXXX
 		  << std::endl;
 	exit(2);
     }
