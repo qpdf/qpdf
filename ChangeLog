@@ -1,5 +1,9 @@
 2013-02-28  Jay Berkenbilt  <ejb@ql.org>
 
+	* Favor fopen_s and strerror_s on MSVC to avoid CRT security
+	warnings.  This is useful for people who may want to use qpdf in
+	an application that is Windows 8 certified.
+
 	* New method QUtil::safe_fopen to wrap calls to fopen.  This is
 	less cumbersome than calling QUtil::fopen_wrapper.
 

@@ -96,7 +96,22 @@ QUtil::unsigned_char_pointer(char const* str)
 void
 QUtil::throw_system_error(std::string const& description)
 {
-    throw std::runtime_error(description + ": " + strerror(errno)); // XXXX
+#ifdef _MSC_VER
+    // "94" is mentioned in the MSVC docs, but it's still safe if the
+    // message is longer.  strerror_s is a templated function that
+    // knows the size of buf and truncates.
+    char buf[94];
+    if (strerror_s(buf, errno) != 0)
+    {
+        throw std::runtime_error(description + ": failed with an unknown error");
+    }
+    else
+    {
+        throw std::runtime_error(description + ": " + buf);
+    }
+#else
+    throw std::runtime_error(description + ": " + strerror(errno));
+#endif
 }
 
 int
@@ -112,8 +127,18 @@ QUtil::os_wrapper(std::string const& description, int status)
 FILE*
 QUtil::safe_fopen(char const* filename, char const* mode)
 {
-    return fopen_wrapper(std::string("open ") + filename,
-                         fopen(filename, mode)); // XXXX
+    FILE* f = 0;
+#ifdef _MSC_VER
+    errno_t err = fopen_s(&f, filename, mode);
+    if (err != 0)
+    {
+        errno = err;
+        throw_system_error(std::string("open ") + filename);
+    }
+#else
+    f = fopen_wrapper(std::string("open ") + filename, fopen(filename, mode));
+#endif
+    return f;
 }
 
 FILE*
