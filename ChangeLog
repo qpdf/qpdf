@@ -1,3 +1,9 @@
+2013-03-03  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add protected terminateParsing method to
+	QPDFObjectHandle::ParserCallbacks that implementor can call to
+	terminate parsing of a content stream.
+
 2013-02-28  Jay Berkenbilt  <ejb@ql.org>
 
 	* Favor fopen_s and strerror_s on MSVC to avoid CRT security

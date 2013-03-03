@@ -199,7 +199,7 @@ $td->runtest("remove page we don't have",
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 61;
+$n_tests += 62;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -476,6 +476,11 @@ $td->runtest("EOF inside inline image",
 $td->runtest("tokenize content streams",
              {$td->COMMAND => "test_driver 37 tokenize-content-streams.pdf"},
              {$td->FILE => "tokenize-content-streams.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("terminate parsing",
+             {$td->COMMAND => "test_driver 37 terminate-parsing.pdf"},
+             {$td->FILE => "terminate-parsing.out",
               $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("content stream errors",

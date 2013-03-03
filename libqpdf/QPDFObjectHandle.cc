@@ -23,6 +23,16 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+class TerminateParsing
+{
+};
+
+void
+QPDFObjectHandle::ParserCallbacks::terminateParsing()
+{
+    throw TerminateParsing();
+}
+
 QPDFObjectHandle::QPDFObjectHandle() :
     initialized(false),
     objid(0),
@@ -728,7 +738,14 @@ QPDFObjectHandle::parseContentStream(QPDFObjectHandle stream_or_array,
             throw std::logic_error(
                 "QPDFObjectHandle: parseContentStream called on non-stream");
         }
-        parseContentStream_internal(stream, callbacks);
+        try
+        {
+            parseContentStream_internal(stream, callbacks);
+        }
+        catch (TerminateParsing&)
+        {
+            return;
+        }
     }
     callbacks->handleEOF();
 }

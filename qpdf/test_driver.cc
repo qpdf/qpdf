@@ -72,6 +72,11 @@ class ParserCallbacks: public QPDFObjectHandle::ParserCallbacks
 void
 ParserCallbacks::handleObject(QPDFObjectHandle obj)
 {
+    if (obj.isName() && (obj.getName() == "/Abort"))
+    {
+        std::cout << "test suite: terminating parsing" << std::endl;
+        terminateParsing();
+    }
     std::cout << obj.getTypeName() << ": ";
     if (obj.isInlineImage())
     {

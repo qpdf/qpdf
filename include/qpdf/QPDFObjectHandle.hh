@@ -83,6 +83,13 @@ class QPDFObjectHandle
         }
         virtual void handleObject(QPDFObjectHandle) = 0;
         virtual void handleEOF() = 0;
+
+      protected:
+        // Implementors may call this method during parsing to
+        // terminate parsing early.  This method throws an exception
+        // that is caught by parseContentStream, so its effect is
+        // immediate.
+        void terminateParsing();
     };
 
 
