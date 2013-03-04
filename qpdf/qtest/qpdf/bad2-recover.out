@@ -2,7 +2,7 @@ WARNING: bad2.pdf: file is damaged
 WARNING: bad2.pdf: can't find startxref
 WARNING: bad2.pdf: Attempting to reconstruct cross-reference table
 /QTest is implicit
-/QTest is direct
+/QTest is direct and has type null (2)
 /QTest is null
 unparse: null
 unparseResolved: null

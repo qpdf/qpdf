@@ -1,4 +1,4 @@
-/QTest is indirect
+/QTest is indirect and has type dictionary (9)
 /QTest is a dictionary
   /hex strings is direct
   /indirect is indirect

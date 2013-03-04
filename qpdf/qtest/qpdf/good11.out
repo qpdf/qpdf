@@ -1,4 +1,4 @@
-/QTest is direct
+/QTest is direct and has type dictionary (9)
 /QTest is a dictionary
   /a is direct
 unparse: << /a (a) /b 8 0 R >>

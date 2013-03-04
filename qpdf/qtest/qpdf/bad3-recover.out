@@ -2,7 +2,7 @@ WARNING: bad3.pdf: file is damaged
 WARNING: bad3.pdf (file position 542): xref not found
 WARNING: bad3.pdf: Attempting to reconstruct cross-reference table
 /QTest is implicit
-/QTest is direct
+/QTest is direct and has type null (2)
 /QTest is null
 unparse: null
 unparseResolved: null

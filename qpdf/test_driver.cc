@@ -232,7 +232,9 @@ void runtest(int n, char const* filename1, char const* arg2)
 		qtest.isIndirect() ? 1 : 0);
 	std::cout << "/QTest is "
 		  << (qtest.isIndirect() ? "in" : "")
-		  << "direct" << std::endl;
+		  << "direct and has type "
+                  << qtest.getTypeName()
+                  << " (" << qtest.getTypeCode() << ")" << std::endl;
 
 	if (qtest.isNull())
 	{

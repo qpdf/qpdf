@@ -2,7 +2,7 @@ WARNING: bad11.pdf: file is damaged
 WARNING: bad11.pdf (trailer, file position 905): /Prev key in trailer dictionary is not an integer
 WARNING: bad11.pdf: Attempting to reconstruct cross-reference table
 /QTest is implicit
-/QTest is direct
+/QTest is direct and has type null (2)
 /QTest is null
 unparse: null
 unparseResolved: null

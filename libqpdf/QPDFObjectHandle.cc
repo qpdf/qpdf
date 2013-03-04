@@ -87,10 +87,11 @@ QPDFObjectHandle::isInitialized() const
 }
 
 QPDFObject::object_type_e
-QPDFObjectHandle::getTypeCode() const
+QPDFObjectHandle::getTypeCode()
 {
-    if (obj.getPointer())
+    if (this->initialized)
     {
+        dereference();
         return obj->getTypeCode();
     }
     else
@@ -100,10 +101,11 @@ QPDFObjectHandle::getTypeCode() const
 }
 
 char const*
-QPDFObjectHandle::getTypeName() const
+QPDFObjectHandle::getTypeName()
 {
-    if (obj.getPointer())
+    if (this->initialized)
     {
+        dereference();
         return obj->getTypeName();
     }
     else

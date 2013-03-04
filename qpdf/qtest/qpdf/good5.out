@@ -1,4 +1,4 @@
-/QTest is indirect
+/QTest is indirect and has type boolean (3)
 /QTest is Boolean with value true
 unparse: 7 0 R
 unparseResolved: true

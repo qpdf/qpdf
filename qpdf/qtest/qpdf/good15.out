@@ -1,4 +1,4 @@
-/QTest is direct
+/QTest is direct and has type name (7)
 /QTest is a name with value /oink
 unparse: /oink
 unparseResolved: /oink

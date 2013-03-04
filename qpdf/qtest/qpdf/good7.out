@@ -1,4 +1,4 @@
-/QTest is direct
+/QTest is direct and has type integer (4)
 /QTest is an integer with value 16059
 unparse: 16059
 unparseResolved: 16059

@@ -1,5 +1,5 @@
 /QTest is implicit
-/QTest is indirect
+/QTest is indirect and has type null (2)
 /QTest is null
 unparse: 7 0 R
 unparseResolved: null

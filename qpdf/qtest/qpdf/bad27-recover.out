@@ -3,7 +3,7 @@ WARNING: bad27.pdf (object 4 0, file position 307): expected n n obj
 WARNING: bad27.pdf: Attempting to reconstruct cross-reference table
 WARNING: bad27.pdf: object 4 0 not found in file after regenerating cross reference table
 /QTest is implicit
-/QTest is indirect
+/QTest is indirect and has type null (2)
 /QTest is null
 unparse: 4 0 R
 unparseResolved: null

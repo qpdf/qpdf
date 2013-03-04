@@ -102,9 +102,9 @@ class QPDFObjectHandle
     // useful for doing rapid type tests (like switch statements) or
     // for testing and debugging.
     QPDF_DLL
-    QPDFObject::object_type_e getTypeCode() const;
+    QPDFObject::object_type_e getTypeCode();
     QPDF_DLL
-    char const* getTypeName() const;
+    char const* getTypeName();
 
     // Exactly one of these will return true for any object.  Operator
     // and InlineImage are only allowed in content streams.

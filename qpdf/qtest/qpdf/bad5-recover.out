@@ -2,7 +2,7 @@ WARNING: bad5.pdf: file is damaged
 WARNING: bad5.pdf (xref table, file position 591): invalid xref entry (obj=2)
 WARNING: bad5.pdf: Attempting to reconstruct cross-reference table
 /QTest is implicit
-/QTest is direct
+/QTest is direct and has type null (2)
 /QTest is null
 unparse: null
 unparseResolved: null

@@ -1,4 +1,4 @@
-/QTest is indirect
+/QTest is indirect and has type real (5)
 /QTest is a real number with value 3.14159
 unparse: 7 0 R
 unparseResolved: 3.14159

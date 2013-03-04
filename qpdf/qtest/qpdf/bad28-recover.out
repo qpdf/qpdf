@@ -1,5 +1,5 @@
 WARNING: bad28.pdf (object 4 0, file position 395): expected endobj
-/QTest is indirect
+/QTest is indirect and has type stream (10)
 /QTest is a stream.  Dictionary: << /Length 44 >>
 Raw stream data:
 BT
