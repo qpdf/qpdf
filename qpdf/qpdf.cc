@@ -1617,7 +1617,7 @@ int main(int argc, char* argv[])
                 // This prevents those objects from being preserved by
                 // being referred to from other places, such as the
                 // outlines dictionary.
-                for (int pageno = 0; pageno < (int)orig_pages.size(); ++pageno)
+                for (size_t pageno = 0; pageno < orig_pages.size(); ++pageno)
                 {
                     if (selected_from_orig.count(pageno) == 0)
                     {
