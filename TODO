@@ -1,11 +1,114 @@
 4.1.0
 =====
 
+ * The mingw64 package is broken.  It contains a 32-bit version of
+   libstdc++-6.dll.  Fix this and make sure it can never happen
+   again.  Ideally we should test in a sandbox, but failing that, at
+   least run file on all the dlls to make sure they are of the right
+   type.
+
+ * Add to documentation, and mention this documentation in
+   README.maintainer:
+
+   Casting policy.
+
+   The C++ code in qpdf is free of old-style casts except where
+   unavoidable (e.g. where the old-style cast is in a macro provided
+   by a third-party header file).  When there is a need for a cast, it
+   is handled, in order of preference by rewriting the code to avoid
+   the need for a cast, calling const_cast, calling static_cast,
+   calling reinterpret_cast, or calling some combination of the above.
+   The casting policy explicitly prohibits casting between sizes for
+   no purpose other than to quiet a compiler warning when there is no
+   reasonable chance of a problem resulting.  The reason for this
+   exclusion is that it takes away enabling additional compiler
+   warnings as a tool for making future improvements to this aspect of
+   the code and also damages the readability of the code.  As a last
+   resort, a compiler-specific pragma may be used to suppress a
+   warning that we don't want to fix.  Examples may include
+   suppressing warnings about the use of old-style casts in code that
+   is shared between C and C++ code.
+
+   There are a few significant areas where casting is common in the qpdf
+   sources or where casting would be required to quiet higher levels
+   of compiler warnings but is omitted at present:
+
+    * signed vs. unsigned char.  For historical reasons, there are a
+      lot of places in qpdf's internals that deal with unsigned char,
+      which means that a lot of casting is required to interoperate
+      with standard library calls and std::string.  In retrospect,
+      qpdf should have probably used signed char everywhere and just
+      cast to unsigned char when needed.  There are reinterpret_cast
+      calls to go between char* and unsigned char*, and there are
+      static_cast calls to go between char and unsigned char.  These
+      should always be safe.
+
+    * non-const unsigned char* used in Pipeline interface.  The
+      pipeline interface has a write() call that uses unsigned char*
+      without a const qualifier.  The main reason for this is to
+      support pipelines that make calls to third-party libraries, such
+      as zlib, that don't include const in their interfaces.
+      Unfortunately, there are many places in the code where it is
+      desirable to have const char* with pipelines.  None of the
+      pipeline implementations in qpdf currently modify the data
+      passed to write, and doing so would be counter to the intent of
+      Pipeline.  There are places in the code where const_cast is used
+      to remove the const-ness of pointers going into Pipelines.  This
+      could be potentially unsafe, but there is adequate testing to
+      assert that it is safe in qpdf's code.
+
+    * size_t vs. qpdf_offset_t.  This is pretty much unavoidable since
+      offsets are signed types and sizes are unsigned types.  Whenever
+      it is necessary to seek by an amount given by a size_t, it
+      becomes necessary to mix and match between size_t and
+      qpdf_offset_t.  Additionally, qpdf sometimes treats memory
+      buffers like files, and those seek interfaces have to be
+      consistent with file-based input sources.  Neither gcc nor MSVC
+      give warnings for this case by default, but both have warning
+      flags that can enable this.  (MSVC: /W14267 or /W3 (which also
+      enables some additional warnings that we ignore); gcc:
+      -Wconversion -Wsign-conversion).  This could matter for files
+      whose sizes are larger than 2^63 bytes, but it is reasonable to
+      expect that a world where such files are common would also have
+      larger size_t and qpdf_offset_t types in it.  I am not aware of
+      any cases where 32-bit systems that have size_t smaller than
+      qpdf_offset_t could run into problems, though I can't
+      conclusively rule out the possibility.  In the event that
+      someone should produce a file that qpdf can't handle because of
+      what is suspected to be issues involving the handling of size_t
+      vs. qpdf_offset_t (such files may behave properly on 64-bit
+      systems but not on 32-bit systems and may have very large
+      embedded files or streams, for example), the above mentioned
+      warning flags could be enabled and all those implicit
+      conversions could be carefully scrutinized.  (I have already
+      gone through that exercise once in adding support for files >
+      4GB in size.)  I continue to be commited to supporting large
+      files on 32-bit systems, but I would not go to any lengths to
+      support corner cases involving large embedded files or large
+      streams that work on 64-bit systems but not on 32-bit systems
+      because of size_t being too small.  It is reasonable to assume
+      that anyone working with such files would be using a 64-bit
+      system anyway.
+
+    * size_t vs. int.  There are some cases where size_t and int or
+      size_t and unsigned int are used interchangeably.  These cases
+      occur when working with very small amounts of memory, such as
+      with the bit readers (where we're working with just a few bytes
+      at a time), some cases of strlen, and a few other cases.  I have
+      scrutinized all of these cases and determined them to be safe,
+      but there is no mechanism in the code to ensure that new unsafe
+      conversions between int and size_t aren't introduced short of
+      good testing and strong awareness of the issues.  Again, if any
+      such bugs are suspected in the future, enable the additional
+      warning flags and scrutinizing the warnings would be in order.
+
  * New public interfaces have been added.
 
 
 General
 =======
+
+ * Consider providing a Windows installer for qpdf using NSIS.
 
  * Improve the random number seed to make it more secure so that we
    have stronger random numbers, particularly when multiple files are
@@ -47,7 +150,7 @@ Index: QPDFWriter.cc
  	{
 -	    pushDiscardFilter();
 +//	    pushDiscardFilter();
-+	    XXX = fopen("/tmp/pass1.pdf", "w");
++	    XXX = QUtil::safe_fopen("/tmp/pass1.pdf", "w");
 +	    pushPipeline(new Pl_StdioFile("pass1", XXX));
 +	    activatePipelineStack();
  	}
