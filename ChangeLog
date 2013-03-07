@@ -1,3 +1,9 @@
+2013-03-07  Jay Berkenbilt  <ejb@ql.org>
+
+	* Use ./install-sh (already present) instead of "install -c" to
+	install executables to fix portability problems against different
+	UNIX variants.
+
 2013-03-03  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add protected terminateParsing method to
