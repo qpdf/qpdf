@@ -22,12 +22,6 @@
 
     - See ../misc/broken-files
 
- * The mingw64 package is broken.  It contains a 32-bit version of
-   libstdc++-6.dll.  Fix this and make sure it can never happen
-   again.  Ideally we should test in a sandbox, but failing that, at
-   least run file on all the dlls to make sure they are of the right
-   type.
-
  * Add to documentation, and mention this documentation in
    README.maintainer:
 

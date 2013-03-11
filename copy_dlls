@@ -12,6 +12,7 @@ my ($file, $destdir, $objdump) = @ARGV;
 my $filedir = dirname($file);
 
 my %dlls = ();
+my $format = undef;
 open(O, "$objdump -p $file|") or die "$whoami: can't run objdump\n";
 while (<O>)
 {
@@ -22,11 +23,21 @@ while (<O>)
 	next if $dll =~ m/^(kernel32|user32|msvcrt)\.dll$/;
 	$dlls{$dll} = 1;
     }
+    elsif (m/^Magic.*\((PE.+?)\)/)
+    {
+        $format = $1;
+    }
 }
 close(O);
+if (! defined $format)
+{
+    die "$whoami: can't determine format of $file\n";
+}
 
-# Search the file's directory, the current directory, and the path for
-# dlls since that's what Windows does.
+# Search the directories named in the file's manifest (if present),
+# the file's directory, the current directory, and the path for dlls
+# since that's what Windows does.  Be sure to only capture compatible
+# DLLs.
 my $sep = ($^O eq 'MSWin32' ? ';' : ':');
 my @path = ($filedir, '.', split($sep, $ENV{'PATH'}));
 if (-f "$file.manifest")
@@ -41,7 +52,7 @@ foreach my $dll (sort keys %dlls)
     my $found = 0;
     foreach my $dir (@path)
     {
-	if (-f "$dir/$dll")
+	if ((-f "$dir/$dll") && is_format("$dir/$dll", $format))
 	{
 	    push(@final, "$dir/$dll");
 	    $found = 1;
@@ -66,6 +77,31 @@ foreach my $f (@final)
     print "Copying $f to $destdir\n";
     system("cp -p $f $destdir") == 0 or
 	die "$whoami: copy $f to $destdir failed\n";
+}
+
+sub is_format
+{
+    my ($file, $format) = @_;
+    $file =~ s,\\,/,g;
+    # Special case: msvc*.dll seem to be able to behave both as 32-bit
+    # and 64-bit DLLs.  Either that, or this logic is wrong for those
+    # DLLs and it doesn't matter because they're already installed on
+    # my test system (which doesn't have msvc installed on it).
+    if ($file =~ m,/msvc,i)
+    {
+        return 1;
+    }
+    my $result = 0;
+    my $file_format = `file $file`;
+    print "$file $format $file_format\n";
+    if ($? == 0)
+    {
+        if ($file_format =~ m/\Q${format}\E executable/)
+        {
+            $result = 1;
+        }
+    }
+    $result;
 }
 
 sub get_manifest_dirs

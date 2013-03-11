@@ -1,3 +1,10 @@
+2013-03-11  Jay Berkenbilt  <ejb@ql.org>
+
+	* When creating Windows binary distributions, make sure to only
+	copy DLLs of the correct type.  The ensures that the 32-bit
+	distributions contain 32-bit DLLs and the 64-bit distributions
+	contain 64-bit DLLs.
+
 2013-03-07  Jay Berkenbilt  <ejb@ql.org>
 
 	* Use ./install-sh (already present) instead of "install -c" to
