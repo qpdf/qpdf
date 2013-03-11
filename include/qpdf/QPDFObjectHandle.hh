@@ -89,6 +89,7 @@ class QPDFObjectHandle
         // terminate parsing early.  This method throws an exception
         // that is caught by parseContentStream, so its effect is
         // immediate.
+        QPDF_DLL
         void terminateParsing();
     };
 
