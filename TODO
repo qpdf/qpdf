@@ -1,6 +1,27 @@
 4.1.0
 =====
 
+ * If possible, support user-pluggable stream filters.  This would
+   enable external code to provide interpretation for filters that are
+   missing from qpdf.
+
+ * If possible, consider adding RLE, CCITT3, CCITT4, or any other easy
+   filters.  (Low priority for 4.1.0.)
+
+ * If possible, support the following types of broken files:
+
+    - Files that lack %%EOF at the end but otherwise have a valid
+      startxref near the end
+
+    - Files that have no whitespace token after "endobj" such that
+      endobj collides with the start of the next object
+
+    - Files with individual corrupted streams.  Just replace the
+      streams with empty streams or possibly uncompress as much as
+      possible
+
+    - See ../misc/broken-files
+
  * The mingw64 package is broken.  It contains a 32-bit version of
    libstdc++-6.dll.  Fix this and make sure it can never happen
    again.  Ideally we should test in a sandbox, but failing that, at
@@ -117,8 +138,16 @@ General
    a strong random number and call this automatically the first time
    QUtil::random() is called.
 
+ * Study what's required to support savable forms that can be saved by
+   Adobe Reader.  Does this require actually signing the document with
+   an Adobe private key?  Search for "Digital signatures" in the PDF
+   spec, and look at ~/Q/pdf-collection/form-with-full-save.pdf, which
+   came from Adobe's example site.
+
  * Consider the possibility of doing something locale-aware to support
    non-ASCII passwords.  Update documentation if this is done.
+   Consider implementing full Unicode password algorithms from newer
+   encryption formats.
 
  * Consider impact of article threads on page splitting/merging.
    Subramanyam provided a test file; see ../misc/article-threads.pdf.
