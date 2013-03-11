@@ -219,13 +219,20 @@ class QPDFWriter
     QPDF_DLL
     void copyEncryptionParameters(QPDF&);
 
-    // Set up for encrypted output.  Disables stream prefiltering and
-    // content normalization.  Note that setting R2 encryption
-    // parameters sets the PDF version to at least 1.3, setting R3
-    // encryption parameters pushes the PDF version number to at least
-    // 1.4, setting R4 parameters pushes the version to at least 1.5,
-    // or if AES is used, 1.6, and setting R5 or R6 parameters pushes
-    // the version to at least 1.7 with extension level 3.
+    // Set up for encrypted output.  User and owner password both must
+    // be specified.  Either or both may be the empty string.  Note
+    // that qpdf does not apply any special treatment to the empty
+    // string, which makes it possible to create encrypted files with
+    // empty owner passwords and non-empty user passwords or with the
+    // same password for both user and owner.  Some PDF reading
+    // products don't handle such files very well.  Enabling
+    // encryption disables stream prefiltering and content
+    // normalization.  Note that setting R2 encryption parameters sets
+    // the PDF version to at least 1.3, setting R3 encryption
+    // parameters pushes the PDF version number to at least 1.4,
+    // setting R4 parameters pushes the version to at least 1.5, or if
+    // AES is used, 1.6, and setting R5 or R6 parameters pushes the
+    // version to at least 1.7 with extension level 3.
     QPDF_DLL
     void setR2EncryptionParameters(
 	char const* user_password, char const* owner_password,
