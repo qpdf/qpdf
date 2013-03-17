@@ -33,6 +33,19 @@ mingw-w64-bin_i686-mingw_yyyymmdd.zip.  The compiler binaries are
 C:\MinGW-w64, and add C:\MinGW-w64\bin and C:\MinGW-w64\lib\mingw to
 the path.
 
+Starting in version 4.1.0, qpdf uses std::setprecision and std::fixed
+to format floating point numbers, and using one or both of those
+causes a crash with the version of libstdc++-6 that is included with
+mingw-w64-bin_i686-mingw_20111220.zip, which appears to be the latest
+mingw-hosted version of mingw that targets w64 that includes the full
+toolchain including all the DLL creation tools.  To work around this,
+for my personal build, I have grabbed
+x86_64-w64-mingw32-gcc-4.7.2-release-win64_rubenvb.7z from the
+personal builds and just extracted libstdc++-6.dll from there and used
+that to replace the one in the 20111220 version, which is based on
+4.7.0.  That particular workaround results in a Windows-hosted 64-bit
+targetted mingw that can build a qpdf that passes its test suite.
+
 As of this writing, the image comparison tests confuse ghostscript in
 cygwin, but there's a chance they might work at some point.  If you
 want to run them, you need ghostscript and tiff utils as well, and you
