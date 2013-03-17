@@ -1,4 +1,4 @@
-4.1.0
+4.2.0
 =====
 
  * If possible, support user-pluggable stream filters.  This would
@@ -20,7 +20,24 @@
       streams with empty streams or possibly uncompress as much as
       possible
 
+    - Files whose PDF header is malformed, perhaps with no version
+      number (as literally %PDF-a.b).  Maybe keep track of features to
+      try to infer a version based on encryption formats and object
+      streams.
+
+    - For really hard errors like corrupted streams where there is
+      virtually guaranteed to be loss, maybe require an additional
+      option to tell qpdf that it's okay to continue and treat those
+      as warnings.  Probably need separate options for each type of
+      error plus a generic tryReallyHard kind of method that enables
+      them all.  Then the qpdf command-line tool can have a single
+      flag that enables all supported aggressive recovery techniques.
+
     - See ../misc/broken-files
+
+
+4.1.0
+=====
 
  * Add to documentation, and mention this documentation in
    README.maintainer:
