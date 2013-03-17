@@ -16,9 +16,11 @@
     - Files that have no whitespace token after "endobj" such that
       endobj collides with the start of the next object
 
-    - Files with individual corrupted streams.  Just replace the
-      streams with empty streams or possibly uncompress as much as
-      possible
+    - Files with individual corrupted streams.  Just leave the streams
+      unfiltered after giving a warning, or maybe do something else
+      like applying as many of the filters as possible, etc.
+      QPDFWriter can have some kind of retry mechanism on streams
+      where filtering fails after filterable returns true.
 
     - Files whose PDF header is malformed, perhaps with no version
       number (as literally %PDF-a.b).  Maybe keep track of features to
