@@ -1,3 +1,8 @@
+2013-03-25  Jay Berkenbilt  <ejb@ql.org>
+
+	* manual/qpdf-manual.xml: Document the casting policy that is
+	followed in qpdf's implementation.
+
 2013-03-11  Jay Berkenbilt  <ejb@ql.org>
 
 	* When creating Windows binary distributions, make sure to only

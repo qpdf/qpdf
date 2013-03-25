@@ -1623,6 +1623,166 @@ outfile.pdf</option>
     </itemizedlist>
    </para>
   </sect1>
+  <sect1 id="ref.casting">
+   <title>Casting Policy</title>
+   <para>
+    This section describes the casting policy followed by qpdf's
+    implementation.  This is no concern to qpdf's end users and
+    largely of no concern to people writing code that uses qpdf, but
+    it could be of interest to people who are porting qpdf to a new
+    platform or who are making modifications to the code.
+   </para>
+   <para>
+    The C++ code in qpdf is free of old-style casts except where
+    unavoidable (e.g. where the old-style cast is in a macro provided
+    by a third-party header file).  When there is a need for a cast,
+    it is handled, in order of preference, by rewriting the code to
+    avoid the need for a cast, calling
+    <function>const_cast</function>, calling
+    <function>static_cast</function>, calling
+    <function>reinterpret_cast</function>, or calling some combination
+    of the above.  As a last resort, a compiler-specific
+    <literal>#pragma</literal> may be used to suppress a warning that
+    we don't want to fix.  Examples may include suppressing warnings
+    about the use of old-style casts in code that is shared between C
+    and C++ code.
+   </para>
+   <para>
+    The casting policy explicitly prohibits casting between integer
+    sizes for no purpose other than to quiet a compiler warning when
+    there is no reasonable chance of a problem resulting.  The reason
+    for this exclusion is that the practice of adding these additional
+    casts precludes future use of additional compiler warnings as a
+    tool for making future improvements to this aspect of the code,
+    and it also damages the readability of the code.
+   </para>
+   <para>
+    There are a few significant areas where casting is common in the
+    qpdf sources or where casting would be required to quiet higher
+    levels of compiler warnings but is omitted at present:
+    <itemizedlist>
+     <listitem>
+      <para>
+       <type>char</type> vs. <type>unsigned char</type>.  For
+       historical reasons, there are a lot of places in qpdf's
+       internals that deal with <type>unsigned char</type>, which
+       means that a lot of casting is required to interoperate with
+       standard library calls and <type>std::string</type>.  In
+       retrospect, qpdf should have probably used regular (signed)
+       <type>char</type> and <type>char*</type> everywhere and just
+       cast to <type>unsigned char</type> when needed, but it's too
+       late to make that change now.  There are
+       <function>reinterpret_cast</function> calls to go between
+       <type>char*</type> and <type>unsigned char*</type>, and there
+       are <function>static_cast</function> calls to go between
+       <type>char</type> and <type>unsigned char</type>.  These should
+       always be safe.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       Non-const <type>unsigned char*</type> used in the
+       <type>Pipeline</type> interface.  The pipeline interface has a
+       <function>write</function> call that uses <type>unsigned
+       char*</type> without a <type>const</type> qualifier.  The main
+       reason for this is to support pipelines that make calls to
+       third-party libraries, such as zlib, that don't include
+       <type>const</type> in their interfaces.  Unfortunately, there
+       are many places in the code where it is desirable to have
+       <type>const char*</type> with pipelines.  None of the pipeline
+       implementations in qpdf currently modify the data passed to
+       write, and doing so would be counter to the intent of
+       <type>Pipeline</type>, but there is nothing in the code to
+       prevent this from being done.  There are places in the code
+       where <function>const_cast</function> is used to remove the
+       const-ness of pointers going into <type>Pipeline</type>s.  This
+       could theoretically be unsafe, but there is adequate testing to
+       assert that it is safe and will remain safe in qpdf's code.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       <type>size_t</type> vs. <type>qpdf_offset_t</type>.  This is
+       pretty much unavoidable since sizes are unsigned types and
+       offsets are signed types.  Whenever it is necessary to seek by
+       an amount given by a <type>size_t</type>, it becomes necessary
+       to mix and match between <type>size_t</type> and
+       <type>qpdf_offset_t</type>.  Additionally, qpdf sometimes
+       treats memory buffers like files (as with
+       <type>BufferInputSource</type>, and those seek interfaces have
+       to be consistent with file-based input sources.  Neither gcc
+       nor MSVC give warnings for this case by default, but both have
+       warning flags that can enable this.  (MSVC:
+       <option>/W14267</option> or <option>/W3</option>, which also
+       enables some additional warnings that we ignore; gcc:
+       <option>-Wconversion -Wsign-conversion</option>).  This could
+       matter for files whose sizes are larger than
+       2<superscript>63</superscript> bytes, but it is reasonable to
+       expect that a world where such files are common would also have
+       larger <type>size_t</type> and <type>qpdf_offset_t</type> types
+       in it.  On most 64-bit systems at the time of this writing (the
+       release of version 4.1.0 of qpdf), both <type>size_t</type> and
+       <type>qpdf_offset_t</type> are 64-bit integer types, while on
+       many current 32-bit systems, <type>size_t</type> is a 32-bit
+       type while <type>qpdf_offset_t</type> is a 64-bit type.  I am
+       not aware of any cases where 32-bit systems that have
+       <type>size_t</type> smaller than <type>qpdf_offset_t</type>
+       could run into problems.  Although I can't conclusively rule
+       out the possibility of such problems existing, I suspect any
+       cases would be pretty contrived.  In the event that someone
+       should produce a file that qpdf can't handle because of what is
+       suspected to be issues involving the handling of
+       <type>size_t</type> vs. <type>qpdf_offset_t</type> (such files
+       may behave properly on 64-bit systems but not on 32-bit systems
+       because they have very large embedded files or streams, for
+       example), the above mentioned warning flags could be enabled
+       and all those implicit conversions could be carefully
+       scrutinized.  (I have already gone through that exercise once
+       in adding support for files larger than 4&nbsp;GB in size.)  I
+       continue to be commited to supporting large files on 32-bit
+       systems, but I would not go to any lengths to support corner
+       cases involving large embedded files or large streams that work
+       on 64-bit systems but not on 32-bit systems because of
+       <type>size_t</type> being too small.  It is reasonable to
+       assume that anyone working with such files would be using a
+       64-bit system anyway since many 32-bit applications would have
+       similar difficulties.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       <type>size_t</type> vs. <type>int</type> or <type>long</type>.
+       There are some cases where <type>size_t</type> and
+       <type>int</type> or <type>long</type> or <type>size_t</type>
+       and <type>unsigned int</type> or <type>unsigned long</type> are
+       used interchangeably.  These cases occur when working with very
+       small amounts of memory, such as with the bit readers (where
+       we're working with just a few bytes at a time), some cases of
+       <function>strlen</function>, and a few other cases.  I have
+       scrutinized all of these cases and determined them to be safe,
+       but there is no mechanism in the code to ensure that new unsafe
+       conversions between <type>int</type> and <type>size_t</type>
+       aren't introduced short of good testing and strong awareness of
+       the issues.  Again, if any such bugs are suspected in the
+       future, enabling the additional warning flags and scrutinizing
+       the warnings would be in order.
+      </para>
+     </listitem>
+    </itemizedlist>
+   </para>
+   <para>
+    To be clear, I believe qpdf to be well-behaved with respect to
+    sizes and offsets, and qpdf's test suite includes actual
+    generation and full processing of files larger than 4&nbsp;GB in
+    size.  The issues raised here are largely academic and should not
+    in any way be interpreted to mean that qpdf has practical problems
+    involving sloppiness with integer types.  I also believe that
+    appropriate measures have been taken in the code to avoid problems
+    with signed vs. unsigned integers from resulting in memory
+    overwrites or other issues with potential security implications,
+    though there are never any absolute guarantees.
+   </para>
+  </sect1>
   <sect1 id="ref.encryption">
    <title>Encryption</title>
    <para>

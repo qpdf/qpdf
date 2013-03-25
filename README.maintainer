@@ -31,7 +31,9 @@ Release Reminders
  * Check all open issues in the sourceforge trackers and on github.
 
  * If any interfaces were added or changed, check C API to see whether
-   changes are appropriate there as well.
+   changes are appropriate there as well.  If necessary, review the
+   casting policy in the manual, and ensure that integer types are
+   properly handled.
 
  * Increment shared library version information as needed
    (libqpdf/build.mk)
