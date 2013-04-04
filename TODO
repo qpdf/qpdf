@@ -7,12 +7,17 @@
 4.2.0
 =====
 
+ * Provide an option for QPDFWriter to preserve unreferenced objects
+   when writing out a file.
+
  * If possible, support user-pluggable stream filters.  This would
    enable external code to provide interpretation for filters that are
    missing from qpdf.
 
  * If possible, consider adding RLE, CCITT3, CCITT4, or any other easy
-   filters.  (Low priority for 4.1.0.)
+   filters.  For some reference code that we probably can't use but
+   may be handy anyway, see
+   http://partners.adobe.com/public/developer/ps/sdk/index_archive.html
 
  * If possible, support the following types of broken files:
 
