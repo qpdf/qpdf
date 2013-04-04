@@ -164,7 +164,7 @@ QPDFObjectHandle::getNumericValue()
     double result = 0.0;
     if (isInteger())
     {
-	result = getIntValue();
+	result = static_cast<double>(getIntValue());
     }
     else if (isReal())
     {
