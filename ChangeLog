@@ -1,3 +1,7 @@
+2013-04-14  Jay Berkenbilt  <ejb@ql.org>
+
+	* 4.1.0: release
+
 2013-03-25  Jay Berkenbilt  <ejb@ql.org>
 
 	* manual/qpdf-manual.xml: Document the casting policy that is

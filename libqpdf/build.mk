@@ -93,4 +93,4 @@ $(COBJS_libqpdf): libqpdf/$(OUTPUT_DIR)/%.$(LOBJ): libqpdf/%.c
 # * Otherwise, increment REVISION
 
 $(TARGETS_libqpdf): $(OBJS_libqpdf)
-	$(call makelib,$(OBJS_libqpdf),$@,$(LDFLAGS),$(LIBS),10,1,0)
+	$(call makelib,$(OBJS_libqpdf),$@,$(LDFLAGS),$(LIBS),11,0,1)
