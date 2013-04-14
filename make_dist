@@ -72,17 +72,6 @@ while (<$fh>)
 }
 $fh->close();
 
-$fh = safe_open("qpdf.spec");
-my $spec_version = 'unknown';
-while (<$fh>)
-{
-    if (m/Version: (.*)$/)
-    {
-	$spec_version = $1;
-	last;
-    }
-}
-
 my $version_error = 0;
 if ($version ne $config_version)
 {
@@ -97,11 +86,6 @@ if ($version ne $code_version)
 if ($version ne $doc_version)
 {
     print "$whoami: qpdf-manual.xml version = $doc_version\n";
-    $version_error = 1;
-}
-if ($version ne $spec_version)
-{
-    print "$whoami: qpdf.spec version = $spec_version\n";
     $version_error = 1;
 }
 if ($version_error)

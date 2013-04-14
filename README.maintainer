@@ -46,7 +46,6 @@ Release Reminders
    locations:
 
      configure.ac
-     qpdf.spec
      libqpdf/QPDF.cc
      manual/qpdf-manual.xml
 
