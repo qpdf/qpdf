@@ -1739,7 +1739,7 @@ outfile.pdf</option>
        and all those implicit conversions could be carefully
        scrutinized.  (I have already gone through that exercise once
        in adding support for files larger than 4&nbsp;GB in size.)  I
-       continue to be commited to supporting large files on 32-bit
+       continue to be committed to supporting large files on 32-bit
        systems, but I would not go to any lengths to support corner
        cases involving large embedded files or large streams that work
        on 64-bit systems but not on 32-bit systems because of

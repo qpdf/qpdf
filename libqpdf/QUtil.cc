@@ -60,7 +60,7 @@ QUtil::double_to_string(double num, int decimal_places)
 {
     // Backward compatibility -- this code used to use sprintf and
     // treated decimal_places <= 0 to mean to use the default, which
-    // was six decimal places.  Also sprintf with %*.f interprents the
+    // was six decimal places.  Also sprintf with %*.f interprets the
     // length as fixed point rather than significant figures.
     if (decimal_places <= 0)
     {

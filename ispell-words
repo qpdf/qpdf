@@ -43,6 +43,7 @@ AIX
 alloc
 allocator
 allowAccessibility
+allowEOF
 allowExtractAll
 allowModifyAll
 allowModifyAnnotation
@@ -75,10 +76,12 @@ assertBool
 assertDictionary
 assertIndirect
 assertInitialized
+assertInlineImage
 assertInteger
 assertName
 assertNull
 assertNumber
+assertOperator
 assertPageObject
 assertReal
 assertReserved
@@ -143,6 +146,8 @@ calculateHPageOffset
 calculateHSharedObject
 calculateLinearizationData
 calculateXrefStreamPadding
+callback
+callbacks
 callHello
 CAPTURECOUNT
 cb
@@ -188,6 +193,7 @@ classname
 clearPipelineStack
 cleartext
 closeObject
+cmath
 cmd
 codepage
 codepoint
@@ -218,6 +224,7 @@ CreationDate
 CRNL
 CropBox
 CryptFilterDecodeParms
+cryptolog
 cso
 csoe
 css
@@ -272,6 +279,7 @@ dirname
 disableCBC
 disableIncompatibleEncryption
 disablePadding
+DiscardContents
 dist
 distclean
 dlfcn
@@ -286,6 +294,7 @@ docdir
 DocOpen
 DOCTYPE
 doubleBoxSize
+Doxygen
 DTD
 dtdvalid
 dumpHGeneric
@@ -301,6 +310,7 @@ eadb
 earlychange
 EarlyChange
 eb
+EBADF
 ebae
 ecc
 ecedd
@@ -391,6 +401,7 @@ flate
 FlateDecode
 flattenPagesTree
 flattenScalarReferences
+FMT
 fn
 fname
 fo
@@ -448,6 +459,7 @@ getFirstChar
 getGeneration
 getHexDigest
 getId
+getInlineImageValue
 getIntValue
 getItem
 getKey
@@ -475,6 +487,7 @@ getObjStreamNumber
 getOE
 getOffset
 getOffsetLength
+getOperatorValue
 getOwningQPDF
 getP
 getPaddedUserPassword
@@ -500,6 +513,8 @@ getTrimmedTrailer
 getTrimmedUserPassword
 getTrimmedUserPassword's
 getType
+getTypeCode
+getTypeName
 getU
 getUE
 getUncompressedObject
@@ -517,6 +532,7 @@ github
 glerbl
 glibc
 gm
+GNUC
 grayscale
 gt
 GUIs
@@ -525,6 +541,8 @@ gzip
 HAGOOGAMAGOOGLE
 handleCode
 handleData
+handleEOF
+handleObject
 hasKey
 hb
 hbp
@@ -586,6 +604,8 @@ initializeSpecialStreams
 initializeVector
 initializeWithRandomBytes
 inline
+InlineImage
+inlineimage
 inode
 inputLen
 InputSource
@@ -595,6 +615,7 @@ insertPageobjToPage
 insertXrefEntry
 inst
 int
+interoperate
 interpretCF
 interpretR
 ints
@@ -603,6 +624,7 @@ inv
 inverter
 io
 IOLBF
+iomanip
 iostream
 isArray
 isBool
@@ -611,12 +633,14 @@ isdigit
 isEncrypted
 isIndirect
 isInitialized
+isInlineImage
 isInteger
 isLinearized
 isName
 isNull
 isNumber
 iso
+isOperator
 isOrHasName
 isPageObject
 isPagesObject
@@ -742,14 +766,17 @@ nch
 ndash
 nendobj
 nendstream
+ness
 newArray
 newBool
 NewDict
 newDictionary
 newIndirect
+newInlineImage
 newInteger
 newName
 newNull
+newOperator
 newpage
 newpdf
 newReal
@@ -765,10 +792,12 @@ NoBackref
 nobjects
 NOMATCH
 NOMEMORY
+NONINFRINGEMENT
 nonprintable
 noout
 normalizeName
 normalizer
+nouppercase
 npages
 npos
 nrounds
@@ -795,6 +824,7 @@ objid
 objidok
 objok
 ObjStm
+objstm
 ObjUser
 objusers
 oc
@@ -818,6 +848,7 @@ orred
 os
 ostream
 ostringstream
+ot
 OtherPage
 ou
 OUE
@@ -841,7 +872,9 @@ para
 param
 params
 parms
+parseContentStream
 parseInternal
+ParserCallbacks
 parseVersion
 partLen
 pathsep
@@ -875,9 +908,11 @@ PNGFilter
 pngify
 PointerHolder
 popPipelineStack
+pornin
 pos
 POSIX
 PP
+pragma
 pre
 precompiled
 prefilering
@@ -899,6 +934,7 @@ procset
 ProcSet
 procsets
 programlisting
+Projet
 provideStreamData
 proxied
 PSâ
@@ -929,6 +965,7 @@ QPDFCONSTANTS
 QPDFExc
 QPDFObject
 QPDFObjectHandle
+QPDFObjectHandles
 QPDFObjectTypeAccessor
 QPDFPageData
 qpdfs
@@ -1011,6 +1048,7 @@ Rkey
 RKLENGTH
 RL
 rm
+RNRT
 roundoff
 RSA
 rstream
@@ -1018,6 +1056,7 @@ RStream
 RunLengthDecode
 runtest
 sAlT
+SAPHIR
 SASLprep
 se
 sed
@@ -1029,6 +1068,7 @@ serif
 setArrayFromVector
 setArrayItem
 setAttemptRecovery
+setbase
 setContentNormalization
 setDataKey
 setEncryptionParameters
@@ -1054,6 +1094,7 @@ setOutputFilename
 setOutputMemory
 setOutputPipeline
 setOutputStreams
+setprecision
 setPreserveEncryption
 setQDFMode
 setR
@@ -1087,6 +1128,7 @@ stat
 std
 STDC
 StdCF
+stddef
 stderr
 stdexcept
 stdin
@@ -1120,6 +1162,7 @@ stylesheets
 subclasses
 SubFilter
 SubFilters
+sublicense
 Subramanyam
 substr
 substring
@@ -1138,10 +1181,13 @@ tbuf
 tc
 Td
 Te
+TerminateParsing
+terminateParsing
 TESTSUITE
 Tf
 tgen
 th
+thomas
 Tj
 tmp
 tnum
@@ -1157,6 +1203,7 @@ toolchain
 Toolchains
 toupper
 toUTF
+tp
 TrimBox
 trimTrailerForWrite
 tt
@@ -1228,9 +1275,11 @@ voidpf
 vp
 vvv
 wb
+Wconversion
 werror
 whoami
 WinAnsiEncoding
+Wold
 writeBinary
 writeBits
 writeBuffer
@@ -1254,6 +1303,7 @@ writeToken
 writeTrailer
 writeXRefStream
 writeXRefTable
+Wsign
 www
 wxWindows
 xA
