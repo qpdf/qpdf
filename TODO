@@ -42,6 +42,12 @@
 
     - See ../misc/broken-files
 
+ * Suggestion from user: allow merging entire files without specifying
+   1-z as page number, e.g., qpdf --empty --pages a*.pdf -- b.pdf
+
+ * Suggestion from a user: add an command-line option to show the
+   number of pages.
+
 
 General
 =======
