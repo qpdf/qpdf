@@ -2899,7 +2899,6 @@ QPDFWriter::writeStandard()
     if (this->object_stream_to_objects.empty())
     {
 	// Write regular cross-reference table
-	// Write regular cross-reference table
 	writeXRefTable(t_normal, 0, this->next_objid - 1, this->next_objid);
     }
     else
