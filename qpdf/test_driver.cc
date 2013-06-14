@@ -659,8 +659,7 @@ void runtest(int n, char const* filename1, char const* arg2)
 				   " not called 4-page file");
 	}
 	// Swap pages 2 and 3
-	pdf.swapObjects(pages[1].getObjectID(), pages[1].getGeneration(),
-			pages[2].getObjectID(), pages[2].getGeneration());
+	pdf.swapObjects(pages[1].getObjGen(), pages[2].getObjGen());
 	// Replace object and swap objects
 	QPDFObjectHandle trailer = pdf.getTrailer();
 	QPDFObjectHandle qdict = trailer.getKey("/QDict");
@@ -672,21 +671,18 @@ void runtest(int n, char const* filename1, char const* arg2)
 	try
 	{
 	    // Do it wrong first...
-	    pdf.replaceObject(qdict.getObjectID(), qdict.getGeneration(),
-			      qdict);
+	    pdf.replaceObject(qdict.getObjGen(), qdict);
 	}
 	catch (std::logic_error)
 	{
 	    std::cout << "caught logic error as expected" << std::endl;
 	}
-	pdf.replaceObject(qdict.getObjectID(), qdict.getGeneration(),
-			  new_dict);
+	pdf.replaceObject(qdict.getObjGen(), new_dict);
 	// Now qdict still points to the old dictionary
 	std::cout << "old dict: " << qdict.getKey("/Dict").getIntValue()
 		  << std::endl;
 	// Swap dict and array
-	pdf.swapObjects(qdict.getObjectID(), qdict.getGeneration(),
-			qarray.getObjectID(), qarray.getGeneration());
+	pdf.swapObjects(qdict.getObjGen(), qarray.getObjGen());
 	// Now qarray will resolve to new object but qdict is still
 	// the old object
 	std::cout << "old dict: " << qdict.getKey("/Dict").getIntValue()
@@ -694,7 +690,7 @@ void runtest(int n, char const* filename1, char const* arg2)
 	std::cout << "new dict: " << qarray.getKey("/NewDict").getIntValue()
 		  << std::endl;
 	// Reread qdict, now pointing to an array
-	qdict = pdf.getObjectByID(qdict.getObjectID(), qdict.getGeneration());
+	qdict = pdf.getObjectByObjGen(qdict.getObjGen());
 	std::cout << "swapped array: " << qdict.getArrayItem(0).getName()
 		  << std::endl;
 
@@ -788,14 +784,14 @@ void runtest(int n, char const* filename1, char const* arg2)
         pdf.addPage(new_pages[0], true);
         checkPageContents(pages[0], "New page 1");
         pdf.addPageAt(new_pages[1], true, pages[0]);
-        assert(pages[0].getObjectID() == new_pages[1].getObjectID());
+        assert(pages[0].getObjGen() == new_pages[1].getObjGen());
         pdf.addPageAt(new_pages[2], true, pages[5]);
-        assert(pages[5].getObjectID() == new_pages[2].getObjectID());
+        assert(pages[5].getObjGen() == new_pages[2].getObjGen());
         pdf.addPageAt(new_pages[3], false, pages[5]);
-        assert(pages[6].getObjectID() == new_pages[3].getObjectID());
+        assert(pages[6].getObjGen() == new_pages[3].getObjGen());
         assert(pages.size() == 11);
         pdf.addPage(new_pages[4], false);
-        assert(pages[11].getObjectID() == new_pages[4].getObjectID());
+        assert(pages[11].getObjGen() == new_pages[4].getObjGen());
         pdf.addPageAt(new_pages[5], false, pages.back());
         assert(pages.size() == 13);
         checkPageContents(pages[0], "New page 0");
@@ -835,7 +831,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         assert(all_pages.size() == 10);
         pdf.updateAllPagesCache();
         assert(all_pages.size() == 11);
-        assert(all_pages.back().getObjectID() == page.getObjectID());
+        assert(all_pages.back().getObjGen() == page.getObjGen());
 
 	QPDFWriter w(pdf, "a.pdf");
 	w.setStaticID(true);
@@ -862,7 +858,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         pdf.removePage(page5);
         pdf.addPage(page5, false);
         assert(pages.size() == 10);
-        assert(pages.back().getObjectID() == page5.getObjectID());
+        assert(pages.back().getObjGen() == page5.getObjGen());
 
 	QPDFWriter w(pdf, "a.pdf");
 	w.setStaticID(true);

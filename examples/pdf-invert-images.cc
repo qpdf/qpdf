@@ -34,10 +34,10 @@ class ImageInverter: public QPDFObjectHandle::StreamDataProvider
     virtual void provideStreamData(int objid, int generation,
 				   Pipeline* pipeline);
 
-    // Map [obj][gen] = image object
-    std::map<int, std::map<int, QPDFObjectHandle> > image_objects;
-    // Map [obj][gen] = image data
-    std::map<int, std::map<int, PointerHolder<Buffer> > > image_data;
+    // Map [og] = image object
+    std::map<QPDFObjGen, QPDFObjectHandle> image_objects;
+    // Map [og] = image data
+    std::map<QPDFObjGen, PointerHolder<Buffer> > image_data;
 };
 
 void
@@ -47,7 +47,8 @@ ImageInverter::provideStreamData(int objid, int generation,
     // Use the object and generation number supplied to look up the
     // image data.  Then invert the image data and write the inverted
     // data to the pipeline.
-    PointerHolder<Buffer> data = this->image_data[objid][generation];
+    PointerHolder<Buffer> data =
+        this->image_data[QPDFObjGen(objid, generation)];
     size_t size = data->getSize();
     unsigned char* buf = data->getBuffer();
     unsigned char ch;
@@ -120,12 +121,11 @@ int main(int argc, char* argv[])
 		    // Store information about the images based on the
 		    // object and generation number.  Recall that a single
 		    // image object may be used more than once.
-		    int objid = image.getObjectID();
-		    int gen = image.getGeneration();
-		    if (inv->image_objects[objid].count(gen) == 0)
+		    QPDFObjGen og = image.getObjGen();
+		    if (inv->image_objects.count(og) == 0)
 		    {
-			inv->image_objects[objid][gen] = image;
-			inv->image_data[objid][gen] = image.getStreamData();
+			inv->image_objects[og] = image;
+			inv->image_data[og] = image.getStreamData();
 
 			// Register our stream data provider for this
 			// stream.  Future calls to getStreamData or

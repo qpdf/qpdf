@@ -159,6 +159,8 @@ class QPDF
     // Retrieve an object by object ID and generation.  Returns an
     // indirect reference to it.
     QPDF_DLL
+    QPDFObjectHandle getObjectByObjGen(QPDFObjGen const&);
+    QPDF_DLL
     QPDFObjectHandle getObjectByID(int objid, int generation);
 
     // Replace the object with the given object id with the given
@@ -175,6 +177,8 @@ class QPDF
     // object.  To replace a reserved object, call replaceReserved
     // instead.
     QPDF_DLL
+    void replaceObject(QPDFObjGen const& og, QPDFObjectHandle);
+    QPDF_DLL
     void replaceObject(int objid, int generation, QPDFObjectHandle);
 
     // Swap two objects given by ID.  Calling this method can have
@@ -188,6 +192,8 @@ class QPDF
     // you replace any existing QPDFObjectHandle instances that point
     // to the swapped objects with new ones, possibly by calling
     // getObjectByID.
+    QPDF_DLL
+    void swapObjects(QPDFObjGen const& og1, QPDFObjGen const& og2);
     QPDF_DLL
     void swapObjects(int objid1, int generation1,
 		     int objid2, int generation2);
@@ -623,7 +629,7 @@ class QPDF
     void getAllPagesInternal(QPDFObjectHandle cur_pages,
 			     std::vector<QPDFObjectHandle>& result);
     void insertPage(QPDFObjectHandle newpage, int pos);
-    int findPage(int objid, int generation);
+    int findPage(QPDFObjGen const& og);
     int findPage(QPDFObjectHandle& page);
     void flattenPagesTree();
     void insertPageobjToPage(QPDFObjectHandle const& obj, int pos,

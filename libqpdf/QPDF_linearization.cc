@@ -336,9 +336,7 @@ QPDF::readHintStream(Pipeline& pl, qpdf_offset_t offset, size_t length)
 	QTC::TC("qpdf", "QPDF hint table length indirect");
 	// Force resolution
 	(void) length_obj.getIntValue();
-	ObjCache& oc = this->obj_cache
-	    [QPDFObjGen(length_obj.getObjectID(),
-                        length_obj.getGeneration())];
+	ObjCache& oc = this->obj_cache[length_obj.getObjGen()];
 	min_end_offset = oc.end_before_space;
 	max_end_offset = oc.end_after_space;
     }
@@ -499,7 +497,7 @@ QPDF::checkLinearizationInternal()
     for (int i = 0; i < npages; ++i)
     {
 	QPDFObjectHandle const& page = pages[i];
-	QPDFObjGen og(page.getObjectID(), page.getGeneration());
+	QPDFObjGen og(page.getObjGen());
 	if (this->xref_table[og].getType() == 2)
 	{
 	    errors.push_back("page dictionary for page " +
@@ -582,7 +580,7 @@ QPDF::checkLinearizationInternal()
     for (std::vector<QPDFObjectHandle>::iterator iter = this->part6.begin();
 	 iter != this->part6.end(); ++iter)
     {
-	QPDFObjGen og((*iter).getObjectID(), (*iter).getGeneration());
+	QPDFObjGen og((*iter).getObjGen());
 	// All objects have to have been dereferenced to be classified.
 	assert(this->obj_cache.count(og) > 0);
 	ObjCache const& oc = this->obj_cache[og];
@@ -740,7 +738,7 @@ QPDF::checkHPageOffset(std::list<std::string>& errors,
     unsigned int npages = pages.size();
     int table_offset = adjusted_offset(
 	this->page_offset_hints.first_page_offset);
-    QPDFObjGen first_page_og(pages[0].getObjectID(), pages[0].getGeneration());
+    QPDFObjGen first_page_og(pages[0].getObjGen());
     assert(this->xref_table.count(first_page_og) > 0);
     int offset = getLinearizationOffset(first_page_og);
     if (table_offset != offset)
@@ -750,8 +748,7 @@ QPDF::checkHPageOffset(std::list<std::string>& errors,
 
     for (unsigned int pageno = 0; pageno < npages; ++pageno)
     {
-	QPDFObjGen page_og(pages[pageno].getObjectID(),
-                           pages[pageno].getGeneration());
+	QPDFObjGen page_og(pages[pageno].getObjGen());
 	int first_object = page_og.getObj();
 	assert(this->xref_table.count(page_og) > 0);
 	offset = getLinearizationOffset(page_og);
@@ -961,7 +958,7 @@ QPDF::checkHOutlines(std::list<std::string>& warnings)
 	{
 	    // Check length and offset.  Acrobat gets these wrong.
 	    QPDFObjectHandle outlines = getRoot().getKey("/Outlines");
-	    QPDFObjGen og(outlines.getObjectID(), outlines.getGeneration());
+	    QPDFObjGen og(outlines.getObjGen());
 	    assert(this->xref_table.count(og) > 0);
 	    int offset = getLinearizationOffset(og);
 	    ObjUser ou(ObjUser::ou_root_key, "/Outlines");
@@ -1466,7 +1463,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     // will do the same.
 
     // First, place the actual first page object itself.
-    QPDFObjGen first_page_og(pages[0].getObjectID(), pages[0].getGeneration());
+    QPDFObjGen first_page_og(pages[0].getObjGen());
     if (! lc_first_page_private.count(first_page_og))
     {
 	throw std::logic_error(
@@ -1515,7 +1512,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     {
 	// Place this page's page object
 
-	QPDFObjGen page_og(pages[i].getObjectID(), pages[i].getGeneration());
+	QPDFObjGen page_og(pages[i].getObjGen());
 	if (! lc_other_page_private.count(page_og))
 	{
 	    throw std::logic_error(
@@ -1598,7 +1595,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 	if (! thumb.isNull())
 	{
 	    // Output the thumbnail itself
-	    QPDFObjGen thumb_og(thumb.getObjectID(), thumb.getGeneration());
+	    QPDFObjGen thumb_og(thumb.getObjGen());
 	    if (lc_thumbnail_private.count(thumb_og))
 	    {
 		lc_thumbnail_private.erase(thumb_og);
@@ -1753,7 +1750,7 @@ QPDF::pushOutlinesToPart(
 	return;
     }
     outlines = getUncompressedObject(outlines, object_stream_data);
-    QPDFObjGen outlines_og(outlines.getObjectID(), outlines.getGeneration());
+    QPDFObjGen outlines_og(outlines.getObjGen());
     QTC::TC("qpdf", "QPDF lin outlines in part",
 	    ((&part == (&this->part6)) ? 0
 	     : (&part == (&this->part9)) ? 1

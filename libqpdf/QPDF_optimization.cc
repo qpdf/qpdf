@@ -115,7 +115,7 @@ QPDF::optimize(std::map<int, int> const& object_stream_data,
     }
 
     ObjUser root_ou = ObjUser(ObjUser::ou_root);
-    QPDFObjGen root_og = QPDFObjGen(root.getObjectID(), root.getGeneration());
+    QPDFObjGen root_og = QPDFObjGen(root.getObjGen());
     obj_user_to_objects[root_ou].insert(root_og);
     object_to_obj_users[root_og].insert(root_ou);
 
@@ -338,7 +338,7 @@ QPDF::updateObjectMapsInternal(ObjUser const& ou, QPDFObjectHandle oh,
 
     if (oh.isIndirect())
     {
-	QPDFObjGen og(oh.getObjectID(), oh.getGeneration());
+	QPDFObjGen og(oh.getObjGen());
 	if (visited.count(og))
 	{
 	    QTC::TC("qpdf", "QPDF opt loop detected");

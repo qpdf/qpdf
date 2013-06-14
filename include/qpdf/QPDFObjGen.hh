@@ -23,6 +23,8 @@ class QPDFObjGen
     QPDF_DLL
     bool operator<(QPDFObjGen const&) const;
     QPDF_DLL
+    bool operator==(QPDFObjGen const&) const;
+    QPDF_DLL
     int getObj() const;
     QPDF_DLL
     int getGen() const;

@@ -9,7 +9,7 @@ static char const* whoami = 0;
 static enum { st_none, st_numbers, st_lines } style = st_none;
 static bool show_open = false;
 static bool show_targets = false;
-static std::map<int, int> page_map;
+static std::map<QPDFObjGen, int> page_map;
 
 void usage()
 {
@@ -50,7 +50,7 @@ void generate_page_map(QPDF& qpdf)
 	 iter != pages.end(); ++iter)
     {
 	QPDFObjectHandle& oh = *iter;
-	page_map[oh.getObjectID()] = ++n;
+	page_map[oh.getObjGen()] = ++n;
     }
 }
 
@@ -121,10 +121,10 @@ void extract_bookmarks(QPDFObjectHandle outlines, std::vector<int>& numbers)
 		if ((dest.isArray()) && (dest.getArrayNItems() > 0))
 		{
 		    QPDFObjectHandle first = dest.getArrayItem(0);
-		    int object_id = first.getObjectID();
-		    if (page_map.count(object_id))
+		    QPDFObjGen og = first.getObjGen();
+		    if (page_map.count(og))
 		    {
-			target = QUtil::int_to_string(page_map[object_id]);
+			target = QUtil::int_to_string(page_map[og]);
 		    }
 		}
 

@@ -13,6 +13,12 @@ QPDFObjGen::operator<(QPDFObjGen const& rhs) const
 	    ((this->obj == rhs.obj) && (this->gen < rhs.gen)));
 }
 
+bool
+QPDFObjGen::operator==(QPDFObjGen const& rhs) const
+{
+    return ((this->obj == rhs.obj) && (this->gen == rhs.gen));
+}
+
 int
 QPDFObjGen::getObj() const
 {

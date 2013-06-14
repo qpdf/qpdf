@@ -1574,9 +1574,21 @@ QPDF::makeIndirectObject(QPDFObjectHandle oh)
 }
 
 QPDFObjectHandle
+QPDF::getObjectByObjGen(QPDFObjGen const& og)
+{
+    return getObjectByID(og.getObj(), og.getGen());
+}
+
+QPDFObjectHandle
 QPDF::getObjectByID(int objid, int generation)
 {
     return QPDFObjectHandle::Factory::newIndirect(this, objid, generation);
+}
+
+void
+QPDF::replaceObject(QPDFObjGen const& og, QPDFObjectHandle oh)
+{
+    replaceObject(og.getObj(), og.getGen(), oh);
 }
 
 void
@@ -1604,9 +1616,7 @@ QPDF::replaceReserved(QPDFObjectHandle reserved,
 {
     QTC::TC("qpdf", "QPDF replaceReserved");
     reserved.assertReserved();
-    replaceObject(reserved.getObjectID(),
-                  reserved.getGeneration(),
-                  replacement);
+    replaceObject(reserved.getObjGen(), replacement);
 }
 
 QPDFObjectHandle
@@ -1663,14 +1673,13 @@ QPDF::copyForeignObject(QPDFObjectHandle foreign, bool allow_page)
             replaceForeignIndirectObjects(to_copy, obj_copier, true);
         if (! to_copy.isStream())
         {
-            QPDFObjGen og(to_copy.getObjectID(), to_copy.getGeneration());
+            QPDFObjGen og(to_copy.getObjGen());
             replaceReserved(obj_copier.object_map[og], copy);
         }
     }
     obj_copier.to_copy.clear();
 
-    return obj_copier.object_map[QPDFObjGen(foreign.getObjectID(),
-                                            foreign.getGeneration())];
+    return obj_copier.object_map[foreign.getObjGen()];
 }
 
 void
@@ -1697,7 +1706,7 @@ QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier,
 
     if (foreign.isIndirect())
     {
-        QPDFObjGen foreign_og(foreign.getObjectID(), foreign.getGeneration());
+        QPDFObjGen foreign_og(foreign.getObjGen());
         if (obj_copier.visiting.find(foreign_og) != obj_copier.visiting.end())
         {
             QTC::TC("qpdf", "QPDF loop reserving objects");
@@ -1750,7 +1759,7 @@ QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier,
 
     if (foreign.isIndirect())
     {
-        QPDFObjGen foreign_og(foreign.getObjectID(), foreign.getGeneration());
+        QPDFObjGen foreign_og(foreign.getObjGen());
         obj_copier.visiting.erase(foreign_og);
     }
 }
@@ -1763,7 +1772,7 @@ QPDF::replaceForeignIndirectObjects(
     if ((! top) && foreign.isIndirect())
     {
         QTC::TC("qpdf", "QPDF replace indirect");
-        QPDFObjGen foreign_og(foreign.getObjectID(), foreign.getGeneration());
+        QPDFObjGen foreign_og(foreign.getObjGen());
         std::map<QPDFObjGen, QPDFObjectHandle>::iterator mapping =
             obj_copier.object_map.find(foreign_og);
         if (mapping == obj_copier.object_map.end())
@@ -1807,7 +1816,7 @@ QPDF::replaceForeignIndirectObjects(
     else if (foreign.isStream())
     {
         QTC::TC("qpdf", "QPDF replace stream");
-        QPDFObjGen foreign_og(foreign.getObjectID(), foreign.getGeneration());
+        QPDFObjGen foreign_og(foreign.getObjGen());
         result = obj_copier.object_map[foreign_og];
         result.assertStream();
         QPDFObjectHandle dict = result.getDict();
@@ -1826,7 +1835,7 @@ QPDF::replaceForeignIndirectObjects(
             this->copied_stream_data_provider = new CopiedStreamDataProvider();
             this->copied_streams = this->copied_stream_data_provider;
         }
-        QPDFObjGen local_og(result.getObjectID(), result.getGeneration());
+        QPDFObjGen local_og(result.getObjGen());
         this->copied_stream_data_provider->registerForeignStream(
             local_og, foreign);
         result.replaceStreamData(this->copied_streams,
@@ -1846,6 +1855,12 @@ QPDF::replaceForeignIndirectObjects(
     }
 
     return result;
+}
+
+void
+QPDF::swapObjects(QPDFObjGen const& og1, QPDFObjGen const& og2)
+{
+    swapObjects(og1.getObj(), og1.getGen(), og2.getObj(), og2.getGen());
 }
 
 void
@@ -2101,8 +2116,7 @@ QPDF::findAttachmentStreams()
             item.getKey("/EF").getKey("/F").isStream())
         {
             QPDFObjectHandle stream = item.getKey("/EF").getKey("/F");
-            this->attachment_streams.insert(
-                QPDFObjGen(stream.getObjectID(), stream.getGeneration()));
+            this->attachment_streams.insert(stream.getObjGen());
         }
     }
 }

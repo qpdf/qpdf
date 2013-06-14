@@ -1621,8 +1621,7 @@ int main(int argc, char* argv[])
                 {
                     if (selected_from_orig.count(pageno) == 0)
                     {
-                        pdf.replaceObject(orig_pages[pageno].getObjectID(),
-                                          orig_pages[pageno].getGeneration(),
+                        pdf.replaceObject(orig_pages[pageno].getObjGen(),
                                           QPDFObjectHandle::newNull());
                     }
                 }
