@@ -199,7 +199,7 @@ $td->runtest("remove page we don't have",
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 62;
+$n_tests += 64;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -500,6 +500,14 @@ $td->runtest("overridden compressed objects",
              {$td->FILE => "override-compressed-object.out",
               $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
+
+$td->runtest("generate object streams for gen > 0",
+             {$td->COMMAND => "qpdf --qdf --static-id" .
+		  " --object-streams=generate gen1.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check file",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "gen1.qdf"});
 
 show_ntests();
 # ----------
@@ -1183,6 +1191,7 @@ my @to_linearize =
      'lin-delete-and-reuse',	# linearized, then delete and reuse
      'object-stream',		# contains object streams
      'hybrid-xref',	        # contains both xref tables and streams
+     'gen1',                    # has objects with generation > 0
      @linearized_files,		# we should be able to relinearize
      );
 

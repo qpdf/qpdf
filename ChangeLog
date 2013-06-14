@@ -1,5 +1,11 @@
 2013-06-14  Jay Berkenbilt  <ejb@ql.org>
 
+	* Bug fix: properly handle object stream generation when the
+	original file has some compressible objects with generation != 0.
+
+	* Add QPDF::getCompressibleObjGens() and deprecate
+	QPDF::getCompressibleObjects(), which had a flaw in its logic.
+
 	* Add new QPDFObjectHandle::getObjGen() method and indiciate in
 	comments that its use is favored over getObjectID() and
 	getGeneration() for most cases.

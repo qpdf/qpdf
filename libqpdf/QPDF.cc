@@ -1944,55 +1944,68 @@ QPDF::getObjectStreamData(std::map<int, int>& omap)
 std::vector<int>
 QPDF::getCompressibleObjects()
 {
-    // Return a set of object numbers of objects that are allowed to
-    // be in object streams.  We disregard generation numbers here
-    // since this is a helper function for QPDFWriter which is going
-    // to renumber objects anyway.  This code will do weird things if
-    // we have two objects with the same object number and different
-    // generations, but so do virtually all PDF consumers,
-    // particularly since this is not a permitted condition.
+    std::vector<QPDFObjGen> objects = getCompressibleObjGens();
+    std::vector<int> result;
+    for (std::vector<QPDFObjGen>::iterator iter = objects.begin();
+         iter != objects.end(); ++iter)
+    {
+        if ((*iter).getGen() != 0)
+        {
+            throw std::logic_error(
+                "QPDF::getCompressibleObjects() would return an object ID"
+                " for an object with generation != 0.  Use"
+                " QPDF::getCompressibleObjGens() instead."
+                "  See comments in QPDF.hh.");
+        }
+        else
+        {
+            result.push_back((*iter).getObj());
+        }
+    }
+    return result;
+}
 
-    // We walk through the objects by traversing the document from the
-    // root, including a traversal of the pages tree.  This makes that
-    // objects that are on the same page are more likely to be in the
-    // same object stream, which is slightly more efficient,
+std::vector<QPDFObjGen>
+QPDF::getCompressibleObjGens()
+{
+    // Return a list of objects that are allowed to be in object
+    // streams.  Walk through the objects by traversing the document
+    // from the root, including a traversal of the pages tree.  This
+    // makes that objects that are on the same page are more likely to
+    // be in the same object stream, which is slightly more efficient,
     // particularly with linearized files.  This is better than
     // iterating through the xref table since it avoids preserving
     // orphaned items.
 
     // Exclude encryption dictionary, if any
-    int encryption_dict_id = 0;
     QPDFObjectHandle encryption_dict = trailer.getKey("/Encrypt");
-    if (encryption_dict.isIndirect())
-    {
-	encryption_dict_id = encryption_dict.getObjectID();
-    }
+    QPDFObjGen encryption_dict_og = encryption_dict.getObjGen();
 
-    std::set<int> visited;
+    std::set<QPDFObjGen> visited;
     std::list<QPDFObjectHandle> queue;
     queue.push_front(this->trailer);
-    std::vector<int> result;
+    std::vector<QPDFObjGen> result;
     while (! queue.empty())
     {
 	QPDFObjectHandle obj = queue.front();
 	queue.pop_front();
 	if (obj.isIndirect())
 	{
-	    int objid = obj.getObjectID();
-	    if (visited.count(objid))
+	    QPDFObjGen og = obj.getObjGen();
+	    if (visited.count(og))
 	    {
 		QTC::TC("qpdf", "QPDF loop detected traversing objects");
 		continue;
 	    }
-	    if (objid == encryption_dict_id)
+	    if (og == encryption_dict_og)
 	    {
 		QTC::TC("qpdf", "QPDF exclude encryption dictionary");
 	    }
 	    else if (! obj.isStream())
 	    {
-		result.push_back(objid);
+		result.push_back(og);
 	    }
-	    visited.insert(objid);
+	    visited.insert(og);
 	}
 	if (obj.isStream())
 	{

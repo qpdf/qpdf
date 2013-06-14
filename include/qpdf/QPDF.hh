@@ -434,8 +434,19 @@ class QPDF
     // Map object to object stream that contains it
     QPDF_DLL
     void getObjectStreamData(std::map<int, int>&);
+
     // Get a list of objects that would be permitted in an object
-    // stream
+    // stream.
+    QPDF_DLL
+    std::vector<QPDFObjGen> getCompressibleObjGens();
+
+    // Deprecated: get a list of objects that would be permitted in an
+    // object stream.  This method is deprecated and will be removed.
+    // It's incorrect because it disregards the generations of the
+    // compressible objects, which can lead (and has lead) to bugs.
+    // This method will throw an exception if any of the objects
+    // returned have a generation of other than zero.  Use
+    // getCompressibleObjGens() instead.
     QPDF_DLL
     std::vector<int> getCompressibleObjects();
 

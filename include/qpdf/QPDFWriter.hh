@@ -24,6 +24,7 @@
 
 #include <qpdf/Constants.h>
 
+#include <qpdf/QPDFObjGen.hh>
 #include <qpdf/QPDFXRefEntry.hh>
 
 #include <qpdf/Pl_Buffer.hh>
@@ -289,7 +290,7 @@ class QPDFWriter
     void writeStringQDF(std::string const& str);
     void writeStringNoQDF(std::string const& str);
     void writePad(int nspaces);
-    void assignCompressedObjectNumbers(int objid);
+    void assignCompressedObjectNumbers(QPDFObjGen const& og);
     void enqueueObject(QPDFObjectHandle object);
     void writeObjectStreamOffsets(
         std::vector<qpdf_offset_t>& offsets, int first_obj);
@@ -380,6 +381,9 @@ class QPDFWriter
     void pushEncryptionFilter();
     void pushDiscardFilter();
 
+    void discardGeneration(std::map<QPDFObjGen, int> const& in,
+                           std::map<int, int>& out);
+
     QPDF& pdf;
     char const* filename;
     FILE* file;
@@ -419,7 +423,7 @@ class QPDFWriter
     std::list<PointerHolder<Pipeline> > to_delete;
     Pl_Count* pipeline;
     std::list<QPDFObjectHandle> object_queue;
-    std::map<int, int> obj_renumber;
+    std::map<QPDFObjGen, int> obj_renumber;
     std::map<int, QPDFXRefEntry> xref;
     std::map<int, qpdf_offset_t> lengths;
     int next_objid;
@@ -427,12 +431,16 @@ class QPDFWriter
     size_t cur_stream_length;
     bool added_newline;
     int max_ostream_index;
-    std::set<int> normalized_streams;
-    std::map<int, int> page_object_to_seq;
-    std::map<int, int> contents_to_page_seq;
-    std::map<int, int> object_to_object_stream;
-    std::map<int, std::set<int> > object_stream_to_objects;
+    std::set<QPDFObjGen> normalized_streams;
+    std::map<QPDFObjGen, int> page_object_to_seq;
+    std::map<QPDFObjGen, int> contents_to_page_seq;
+    std::map<QPDFObjGen, int> object_to_object_stream;
+    std::map<int, std::set<QPDFObjGen> > object_stream_to_objects;
     std::list<Pipeline*> pipeline_stack;
+
+    // For linearization only
+    std::map<int, int> obj_renumber_no_gen;
+    std::map<int, int> object_to_object_stream_no_gen;
 };
 
 #endif // __QPDFWRITER_HH__
