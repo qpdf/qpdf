@@ -535,6 +535,12 @@ QPDFObjectHandle::replaceStreamData(PointerHolder<StreamDataProvider> provider,
 	provider, filter, decode_parms);
 }
 
+QPDFObjGen
+QPDFObjectHandle::getObjGen() const
+{
+    return QPDFObjGen(this->objid, this->generation);
+}
+
 int
 QPDFObjectHandle::getObjectID() const
 {

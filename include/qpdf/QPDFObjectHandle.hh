@@ -16,6 +16,7 @@
 #include <set>
 #include <map>
 
+#include <qpdf/QPDFObjGen.hh>
 #include <qpdf/PointerHolder.hh>
 #include <qpdf/Buffer.hh>
 #include <qpdf/InputSource.hh>
@@ -454,7 +455,17 @@ class QPDFObjectHandle
 			   QPDFObjectHandle const& filter,
 			   QPDFObjectHandle const& decode_parms);
 
-    // return 0 for direct objects
+    // Access object ID and generation.  For direct objects, return
+    // object ID 0.
+
+    // NOTE: Be careful about calling getObjectID() and
+    // getGeneration() directly as this can lead to the pattern of
+    // depending on object ID or generation without the other.  In
+    // general, when keeping track of object IDs, it's better to use
+    // QPDFObjGen instead.
+
+    QPDF_DLL
+    QPDFObjGen getObjGen() const;
     QPDF_DLL
     int getObjectID() const;
     QPDF_DLL

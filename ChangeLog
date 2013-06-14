@@ -1,5 +1,9 @@
 2013-06-14  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add new QPDFObjectHandle::getObjGen() method and indiciate in
+	comments that its use is favored over getObjectID() and
+	getGeneration() for most cases.
+
 	* Add new QPDFObjGen object to represent an object ID/generation
 	pair.
 
