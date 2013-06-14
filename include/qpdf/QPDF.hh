@@ -17,6 +17,7 @@
 #include <list>
 #include <iostream>
 
+#include <qpdf/QPDFObjGen.hh>
 #include <qpdf/QPDFXRefEntry.hh>
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFTokenizer.hh>
@@ -519,17 +520,6 @@ class QPDF
   private:
     static std::string qpdf_version;
 
-    class ObjGen
-    {
-      public:
-	ObjGen();
-	ObjGen(int obj, int gen);
-	bool operator<(ObjGen const&) const;
-
-	int obj;
-	int gen;
-    };
-
     class ObjCache
     {
       public:
@@ -555,9 +545,9 @@ class QPDF
     class ObjCopier
     {
       public:
-        std::map<ObjGen, QPDFObjectHandle> object_map;
+        std::map<QPDFObjGen, QPDFObjectHandle> object_map;
         std::vector<QPDFObjectHandle> to_copy;
-        std::set<ObjGen> visiting;
+        std::set<QPDFObjGen> visiting;
     };
 
     class CopiedStreamDataProvider: public QPDFObjectHandle::StreamDataProvider
@@ -568,11 +558,11 @@ class QPDF
         }
 	virtual void provideStreamData(int objid, int generation,
 				       Pipeline* pipeline);
-        void registerForeignStream(ObjGen const& local_og,
+        void registerForeignStream(QPDFObjGen const& local_og,
                                    QPDFObjectHandle foreign_stream);
 
       private:
-        std::map<ObjGen, QPDFObjectHandle> foreign_streams;
+        std::map<QPDFObjGen, QPDFObjectHandle> foreign_streams;
     };
 
     class StringDecrypter: public QPDFObjectHandle::StringDecrypter
@@ -932,7 +922,7 @@ class QPDF
     void readHSharedObject(BitStream);
     void readHGeneric(BitStream, HGeneric&);
     qpdf_offset_t maxEnd(ObjUser const& ou);
-    qpdf_offset_t getLinearizationOffset(ObjGen const&);
+    qpdf_offset_t getLinearizationOffset(QPDFObjGen const&);
     QPDFObjectHandle getUncompressedObject(
 	QPDFObjectHandle&, std::map<int, int> const& object_stream_data);
     int lengthNextN(int first_object, int n,
@@ -950,12 +940,12 @@ class QPDF
     void dumpHSharedObject();
     void dumpHGeneric(HGeneric&);
     int adjusted_offset(int offset);
-    QPDFObjectHandle objGenToIndirect(ObjGen const&);
+    QPDFObjectHandle objGenToIndirect(QPDFObjGen const&);
     void calculateLinearizationData(
 	std::map<int, int> const& object_stream_data);
     void pushOutlinesToPart(
 	std::vector<QPDFObjectHandle>& part,
-	std::set<ObjGen>& lc_outlines,
+	std::set<QPDFObjGen>& lc_outlines,
 	std::map<int, int> const& object_stream_data);
     int outputLengthNextN(
 	int in_object, int n,
@@ -989,7 +979,7 @@ class QPDF
 	bool allow_changes, bool warn_skipped_keys);
     void updateObjectMaps(ObjUser const& ou, QPDFObjectHandle oh);
     void updateObjectMapsInternal(ObjUser const& ou, QPDFObjectHandle oh,
-				  std::set<ObjGen>& visited, bool top);
+				  std::set<QPDFObjGen>& visited, bool top);
     void filterCompressedObjects(std::map<int, int> const& object_stream_data);
 
 
@@ -1017,19 +1007,19 @@ class QPDF
     int cached_key_objid;
     int cached_key_generation;
     std::string pdf_version;
-    std::map<ObjGen, QPDFXRefEntry> xref_table;
+    std::map<QPDFObjGen, QPDFXRefEntry> xref_table;
     std::set<int> deleted_objects;
-    std::map<ObjGen, ObjCache> obj_cache;
+    std::map<QPDFObjGen, ObjCache> obj_cache;
     QPDFObjectHandle trailer;
     std::vector<QPDFObjectHandle> all_pages;
-    std::map<ObjGen, int> pageobj_to_pages_pos;
+    std::map<QPDFObjGen, int> pageobj_to_pages_pos;
     bool pushed_inherited_attributes_to_pages;
     std::vector<QPDFExc> warnings;
     std::map<QPDF*, ObjCopier> object_copiers;
     PointerHolder<QPDFObjectHandle::StreamDataProvider> copied_streams;
     // copied_stream_data_provider is owned by copied_streams
     CopiedStreamDataProvider* copied_stream_data_provider;
-    std::set<ObjGen> attachment_streams;
+    std::set<QPDFObjGen> attachment_streams;
 
     // Linearization data
     qpdf_offset_t first_xref_item_offset; // actual value from file
@@ -1061,8 +1051,8 @@ class QPDF
     std::vector<QPDFObjectHandle> part9;
 
     // Optimization data
-    std::map<ObjUser, std::set<ObjGen> > obj_user_to_objects;
-    std::map<ObjGen, std::set<ObjUser> > object_to_obj_users;
+    std::map<ObjUser, std::set<QPDFObjGen> > obj_user_to_objects;
+    std::map<QPDFObjGen, std::set<ObjUser> > object_to_obj_users;
 };
 
 #endif // __QPDF_HH__

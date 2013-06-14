@@ -32,6 +32,7 @@ SRCS_libqpdf = \
 	libqpdf/Pl_StdioFile.cc \
 	libqpdf/QPDF.cc \
 	libqpdf/QPDFExc.cc \
+	libqpdf/QPDFObjGen.cc \
 	libqpdf/QPDFObject.cc \
 	libqpdf/QPDFObjectHandle.cc \
 	libqpdf/QPDFTokenizer.cc \

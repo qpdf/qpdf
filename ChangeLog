@@ -1,3 +1,8 @@
+2013-06-14  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add new QPDFObjGen object to represent an object ID/generation
+	pair.
+
 2013-04-14  Jay Berkenbilt  <ejb@ql.org>
 
 	* 4.1.0: release

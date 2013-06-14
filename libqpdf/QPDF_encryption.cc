@@ -1202,7 +1202,7 @@ QPDF::decryptStream(Pipeline*& pipeline, int objid, int generation,
 	    else
 	    {
                 if (this->attachment_streams.count(
-                        ObjGen(objid, generation)) > 0)
+                        QPDFObjGen(objid, generation)) > 0)
                 {
                     method = this->cf_file;
                 }

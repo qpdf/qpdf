@@ -115,7 +115,7 @@ QPDF::optimize(std::map<int, int> const& object_stream_data,
     }
 
     ObjUser root_ou = ObjUser(ObjUser::ou_root);
-    ObjGen root_og = ObjGen(root.getObjectID(), root.getGeneration());
+    QPDFObjGen root_og = QPDFObjGen(root.getObjectID(), root.getGeneration());
     obj_user_to_objects[root_ou].insert(root_og);
     object_to_obj_users[root_og].insert(root_ou);
 
@@ -310,13 +310,13 @@ QPDF::pushInheritedAttributesToPageInternal(
 void
 QPDF::updateObjectMaps(ObjUser const& ou, QPDFObjectHandle oh)
 {
-    std::set<ObjGen> visited;
+    std::set<QPDFObjGen> visited;
     updateObjectMapsInternal(ou, oh, visited, true);
 }
 
 void
 QPDF::updateObjectMapsInternal(ObjUser const& ou, QPDFObjectHandle oh,
-			       std::set<ObjGen>& visited, bool top)
+			       std::set<QPDFObjGen>& visited, bool top)
 {
     // Traverse the object tree from this point taking care to avoid
     // crossing page boundaries.
@@ -338,7 +338,7 @@ QPDF::updateObjectMapsInternal(ObjUser const& ou, QPDFObjectHandle oh,
 
     if (oh.isIndirect())
     {
-	ObjGen og(oh.getObjectID(), oh.getGeneration());
+	QPDFObjGen og(oh.getObjectID(), oh.getGeneration());
 	if (visited.count(og))
 	{
 	    QTC::TC("qpdf", "QPDF opt loop detected");
@@ -403,51 +403,51 @@ QPDF::filterCompressedObjects(std::map<int, int> const& object_stream_data)
     // user of a compressed object, then it is really a user of the
     // object stream that contains it.
 
-    std::map<ObjUser, std::set<ObjGen> > t_obj_user_to_objects;
-    std::map<ObjGen, std::set<ObjUser> > t_object_to_obj_users;
+    std::map<ObjUser, std::set<QPDFObjGen> > t_obj_user_to_objects;
+    std::map<QPDFObjGen, std::set<ObjUser> > t_object_to_obj_users;
 
-    for (std::map<ObjUser, std::set<ObjGen> >::iterator i1 =
+    for (std::map<ObjUser, std::set<QPDFObjGen> >::iterator i1 =
 	     this->obj_user_to_objects.begin();
 	 i1 != this->obj_user_to_objects.end(); ++i1)
     {
 	ObjUser const& ou = (*i1).first;
-	std::set<ObjGen> const& objects = (*i1).second;
-	for (std::set<ObjGen>::const_iterator i2 = objects.begin();
+	std::set<QPDFObjGen> const& objects = (*i1).second;
+	for (std::set<QPDFObjGen>::const_iterator i2 = objects.begin();
 	     i2 != objects.end(); ++i2)
 	{
-	    ObjGen const& og = (*i2);
+	    QPDFObjGen const& og = (*i2);
 	    std::map<int, int>::const_iterator i3 =
-		object_stream_data.find(og.obj);
+		object_stream_data.find(og.getObj());
 	    if (i3 == object_stream_data.end())
 	    {
 		t_obj_user_to_objects[ou].insert(og);
 	    }
 	    else
 	    {
-		t_obj_user_to_objects[ou].insert(ObjGen((*i3).second, 0));
+		t_obj_user_to_objects[ou].insert(QPDFObjGen((*i3).second, 0));
 	    }
 	}
     }
 
-    for (std::map<ObjGen, std::set<ObjUser> >::iterator i1 =
+    for (std::map<QPDFObjGen, std::set<ObjUser> >::iterator i1 =
 	     this->object_to_obj_users.begin();
 	 i1 != this->object_to_obj_users.end(); ++i1)
     {
-	ObjGen const& og = (*i1).first;
+	QPDFObjGen const& og = (*i1).first;
 	std::set<ObjUser> const& objusers = (*i1).second;
 	for (std::set<ObjUser>::const_iterator i2 = objusers.begin();
 	     i2 != objusers.end(); ++i2)
 	{
 	    ObjUser const& ou = (*i2);
 	    std::map<int, int>::const_iterator i3 =
-		object_stream_data.find(og.obj);
+		object_stream_data.find(og.getObj());
 	    if (i3 == object_stream_data.end())
 	    {
 		t_object_to_obj_users[og].insert(ou);
 	    }
 	    else
 	    {
-		t_object_to_obj_users[ObjGen((*i3).second, 0)].insert(ou);
+		t_object_to_obj_users[QPDFObjGen((*i3).second, 0)].insert(ou);
 	    }
 	}
     }

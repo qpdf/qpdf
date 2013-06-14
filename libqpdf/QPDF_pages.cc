@@ -127,7 +127,7 @@ void
 QPDF::insertPageobjToPage(QPDFObjectHandle const& obj, int pos,
                           bool check_duplicate)
 {
-    ObjGen og(obj.getObjectID(), obj.getGeneration());
+    QPDFObjGen og(obj.getObjectID(), obj.getGeneration());
     if (check_duplicate)
     {
         if (! this->pageobj_to_pages_pos.insert(std::make_pair(og, pos)).second)
@@ -135,7 +135,7 @@ QPDF::insertPageobjToPage(QPDFObjectHandle const& obj, int pos,
             QTC::TC("qpdf", "QPDF duplicate page reference");
             setLastObjectDescription("page " + QUtil::int_to_string(pos) +
                                      " (numbered from zero)",
-                                     og.obj, og.gen);
+                                     og.getObj(), og.getGen());
             throw QPDFExc(qpdf_e_pages, this->file->getName(),
                           this->last_object_description, 0,
                           "duplicate page reference found;"
@@ -215,7 +215,7 @@ QPDF::removePage(QPDFObjectHandle page)
     this->all_pages.erase(this->all_pages.begin() + pos);
     assert(this->all_pages.size() == static_cast<size_t>(npages));
     this->pageobj_to_pages_pos.erase(
-        ObjGen(page.getObjectID(), page.getGeneration()));
+        QPDFObjGen(page.getObjectID(), page.getGeneration()));
     assert(this->pageobj_to_pages_pos.size() == static_cast<size_t>(npages));
     for (int i = pos; i < npages; ++i)
     {
@@ -260,8 +260,8 @@ int
 QPDF::findPage(int objid, int generation)
 {
     flattenPagesTree();
-    std::map<ObjGen, int>::iterator it =
-        this->pageobj_to_pages_pos.find(ObjGen(objid, generation));
+    std::map<QPDFObjGen, int>::iterator it =
+        this->pageobj_to_pages_pos.find(QPDFObjGen(objid, generation));
     if (it == this->pageobj_to_pages_pos.end())
     {
         setLastObjectDescription("page object", objid, generation);
