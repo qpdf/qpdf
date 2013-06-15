@@ -1,6 +1,18 @@
 4.2.0
 =====
 
+ * New interfaces have been added.
+
+ * Suggestion from user: allow merging entire files without specifying
+   1-z as page number, e.g., qpdf --empty --pages a*.pdf -- b.pdf
+
+ * Suggestion from a user: add an command-line option to show the
+   number of pages.
+
+
+4.3.0
+=====
+
  * Provide an option for QPDFWriter to preserve unreferenced objects
    when writing out a file.
 
@@ -42,11 +54,19 @@
 
     - See ../misc/broken-files
 
- * Suggestion from user: allow merging entire files without specifying
-   1-z as page number, e.g., qpdf --empty --pages a*.pdf -- b.pdf
 
- * Suggestion from a user: add an command-line option to show the
-   number of pages.
+
+Next ABI change
+===============
+
+ * Remove QPDF::getCompressibleObjects()
+
+ * For public QPDF methods that are only public so QPDFWriter can
+   call them, make them private and provide a nested caller class with
+   QPDFWriter as a friend for access just like is being done now for
+   some other methods.  This will reduce the risk that future changes
+   in the interface between QPDFWriter and QPDF will result in
+   breaking ABI changes.
 
 
 General
