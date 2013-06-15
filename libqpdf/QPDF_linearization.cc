@@ -958,6 +958,15 @@ QPDF::checkHOutlines(std::list<std::string>& warnings)
 	{
 	    // Check length and offset.  Acrobat gets these wrong.
 	    QPDFObjectHandle outlines = getRoot().getKey("/Outlines");
+            if (! outlines.isIndirect())
+            {
+                // This case is not exercised in test suite since not
+                // permitted by the spec, but if this does occur, the
+                // code below would fail.
+		warnings.push_back(
+		    "/Outlines key of root dictionary is not indirect");
+                return;
+            }
 	    QPDFObjGen og(outlines.getObjGen());
 	    assert(this->xref_table.count(og) > 0);
 	    int offset = getLinearizationOffset(og);

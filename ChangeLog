@@ -1,5 +1,11 @@
 2013-06-14  Jay Berkenbilt  <ejb@ql.org>
 
+	* Detect and correct /Outlines dictionary being a direct object
+	when linearizing files.  This is not allowed by the spec but has
+	been seen in the wild.  Prior to this change, such a file would
+	cause an internal error in the linearization code, which assumed
+	/Outlines was indirect.
+
 	* Add /Length key to crypt filter dictionary for encrypted files.
 	This key is optional, but some version of MacOS reportedly fail to
 	open encrypted PDF files without this key.

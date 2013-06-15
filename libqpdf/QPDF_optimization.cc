@@ -68,6 +68,20 @@ QPDF::optimize(std::map<int, int> const& object_stream_data,
 	return;
     }
 
+    // The PDF specification indicates that /Outlines is supposed to
+    // be an indirect reference.  Force it to be so if it exists and
+    // is direct.  (This has been seen in the wild.)
+    QPDFObjectHandle root = getRoot();
+    if (root.getKey("/Outlines").isDictionary())
+    {
+        QPDFObjectHandle outlines = root.getKey("/Outlines");
+        if (! outlines.isIndirect())
+        {
+            QTC::TC("qpdf", "QPDF_optimization indirect outlines");
+            root.replaceKey("/Outlines", makeIndirectObject(outlines));
+        }
+    }
+
     // Traverse pages tree pushing all inherited resources down to the
     // page level.  This also initializes this->all_pages.
     pushInheritedAttributesToPage(allow_changes, false);
@@ -97,7 +111,6 @@ QPDF::optimize(std::map<int, int> const& object_stream_data,
 	}
     }
 
-    QPDFObjectHandle root = getRoot();
     keys = root.getKeys();
     for (std::set<std::string>::iterator iter = keys.begin();
 	 iter != keys.end(); ++iter)

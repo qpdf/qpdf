@@ -1192,6 +1192,7 @@ my @to_linearize =
      'object-stream',		# contains object streams
      'hybrid-xref',	        # contains both xref tables and streams
      'gen1',                    # has objects with generation > 0
+     'direct-outlines',         # /Outlines is a direct object
      @linearized_files,		# we should be able to relinearize
      );
 
