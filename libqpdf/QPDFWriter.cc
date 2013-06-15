@@ -726,8 +726,12 @@ QPDFWriter::setEncryptionParametersInternal(
 	std::string method = (this->encrypt_use_aes
                               ? ((V < 5) ? "/AESV2" : "/AESV3")
                               : "/V2");
+        // The PDF spec says the /Length key is optional, but the PDF
+        // previewer on some versions of MacOS won't open encrypted
+        // files without it.
 	encryption_dictionary["/CF"] =
-	    "<< /StdCF << /AuthEvent /DocOpen /CFM " + method + " >> >>";
+	    "<< /StdCF << /AuthEvent /DocOpen /CFM " + method +
+            " /Length " + std::string((V < 5) ? "16" : "32") + " >> >>";
     }
 
     this->encrypted = true;
