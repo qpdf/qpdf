@@ -791,17 +791,24 @@ QPDF::initializeEncryption()
     // encryption dictionary.
     this->encrypted = true;
 
+    std::string id1;
     QPDFObjectHandle id_obj = this->trailer.getKey("/ID");
-    if (! (id_obj.isArray() &&
-	   (id_obj.getArrayNItems() == 2) &&
-	   id_obj.getArrayItem(0).isString()))
+    if ((id_obj.isArray() &&
+         (id_obj.getArrayNItems() == 2) &&
+         id_obj.getArrayItem(0).isString()))
     {
-	throw QPDFExc(qpdf_e_damaged_pdf, this->file->getName(),
-		      "trailer", this->file->getLastOffset(),
-		      "invalid /ID in trailer dictionary");
+        id1 = id_obj.getArrayItem(0).getStringValue();
+    }
+    else
+    {
+        // Treating a missing ID as the empty string enables qpdf to
+        // decrypt some invalid encrypted files with no /ID that
+        // poppler can read but Adobe Reader can't.
+	warn(QPDFExc(qpdf_e_damaged_pdf, this->file->getName(),
+                     "trailer", this->file->getLastOffset(),
+                     "invalid /ID in trailer dictionary"));
     }
 
-    std::string id1 = id_obj.getArrayItem(0).getStringValue();
     QPDFObjectHandle encryption_dict = this->trailer.getKey("/Encrypt");
     if (! encryption_dict.isDictionary())
     {

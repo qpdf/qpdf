@@ -430,11 +430,22 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
     std::map<int, int> free_table;
     while (xref_offset)
     {
+        char buf[7];
+        memset(buf, 0, sizeof(buf));
 	this->file->seek(xref_offset, SEEK_SET);
-	std::string line = this->file->readLine(50);
-	if (line == "xref")
+	this->file->read(buf, sizeof(buf) - 1);
+        // The PDF spec says xref must be followed by a line
+        // terminator, but files exist in the wild where it is
+        // terminated by arbitrary whitespace.
+        PCRE xref_re("^xref\\s+");
+	PCRE::Match m = xref_re.match(buf);
+	if (m)
 	{
-	    xref_offset = read_xrefTable(this->file->tell());
+            QTC::TC("qpdf", "QPDF xref space",
+                    ((buf[4] == '\n') ? 0 :
+                     (buf[4] == '\r') ? 1 :
+                     (buf[4] == ' ') ? 2 : 9999));
+	    xref_offset = read_xrefTable(xref_offset + m.getMatch(0).length());
 	}
 	else
 	{

@@ -199,7 +199,7 @@ $td->runtest("remove page we don't have",
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 64;
+$n_tests += 65;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -508,6 +508,14 @@ $td->runtest("generate object streams for gen > 0",
 $td->runtest("check file",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "gen1.qdf"});
+
+# This file, from a user, is missing /ID in its trailer even though it
+# is encrypted and also has a space instead of a newline after its
+# xref keyword.  xpdf can open it, but Adobe reader can't.
+$td->runtest("check broken file",
+             {$td->COMMAND => "qpdf --check invalid-id-xref.pdf"},
+             {$td->FILE => "invalid-id-xref.out", $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
 
 show_ntests();
 # ----------

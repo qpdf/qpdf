@@ -1,3 +1,8 @@
+2013-06-15  Jay Berkenbilt  <ejb@ql.org>
+
+	* Handle some additional broken files with missing /ID in trailer
+	for encrypted files and with space rather than newline after xref.
+
 2013-06-14  Jay Berkenbilt  <ejb@ql.org>
 
 	* Detect and correct /Outlines dictionary being a direct object
