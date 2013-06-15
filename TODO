@@ -3,15 +3,16 @@
 
  * New interfaces have been added.
 
- * Suggestion from user: allow merging entire files without specifying
-   1-z as page number, e.g., qpdf --empty --pages a*.pdf -- b.pdf
-
- * Suggestion from a user: add an command-line option to show the
-   number of pages.
-
 
 4.3.0
 =====
+
+ * Add method to push inheritable resources to a single page by
+   walking up and copying without overwrite.  Above logic will also be
+   sufficient to fix the limitation in
+   QPDFObjectHandle::getPageImages().  Maybe add a method to get the
+   effective resources for a page without modifying the page and then
+   implement both changes in terms of that method.
 
  * Provide an option for QPDFWriter to preserve unreferenced objects
    when writing out a file.
@@ -73,6 +74,11 @@ General
 =======
 
  * Consider providing a Windows installer for qpdf using NSIS.
+
+ * Consider adding a method to balance the pages tree.  It would call
+   pushInheritedAttributesToPage, construct a pages tree from scratch,
+   and replace the /Pages key of the root dictionary with the new
+   tree.
 
  * Improve the random number seed to make it more secure so that we
    have stronger random numbers, particularly when multiple files are
