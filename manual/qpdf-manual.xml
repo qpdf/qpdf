@@ -779,7 +779,7 @@ outfile.pdf</option>
       <term><option>--object-streams=<replaceable>mode</replaceable></option></term>
       <listitem>
        <para>
-        Controls handing of object streams.  The value of
+        Controls handling of object streams.  The value of
         <option><replaceable>mode</replaceable></option> may be one of
         the following:
         <itemizedlist>
