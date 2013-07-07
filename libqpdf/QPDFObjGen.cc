@@ -1,6 +1,12 @@
 #include <qpdf/QPDFObjGen.hh>
 
-QPDFObjGen::QPDFObjGen(int o = 0, int g = 0) :
+QPDFObjGen::QPDFObjGen() :
+    obj(0),
+    gen(0)
+{
+}
+
+QPDFObjGen::QPDFObjGen(int o, int g) :
     obj(o),
     gen(g)
 {
