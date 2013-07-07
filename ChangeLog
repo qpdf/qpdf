@@ -1,5 +1,8 @@
 2013-07-07  Jay Berkenbilt  <ejb@ql.org>
 
+	* Ignore error case of a stream's decode parameters having invalid
+	length when there are no stream filters.
+
 	* qpdf: add --show-npages command-line option, which causes the
 	number of pages in the input file to be printed on a line by
 	itself.

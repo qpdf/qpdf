@@ -17,6 +17,10 @@
  * Provide an option for QPDFWriter to preserve unreferenced objects
    when writing out a file.
 
+ * Look at all the exceptions and error conditions in QPDF_stream and
+   figure out which ones should be converted to warnings and treating
+   the stream as not filterable.
+
  * If possible, support user-pluggable stream filters.  This would
    enable external code to provide interpretation for filters that are
    missing from qpdf.

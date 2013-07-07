@@ -199,7 +199,7 @@ $td->runtest("remove page we don't have",
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 66;
+$n_tests += 67;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -521,6 +521,11 @@ $td->runtest("show number of pages",
              {$td->COMMAND =>
                   "qpdf --show-npages 20-pages.pdf --password=user"},
              {$td->STRING => "20\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("ignore broken decode parms with no filters",
+             {$td->COMMAND => "qpdf --check broken-decode-parms-no-filter.pdf"},
+             {$td->FILE => "broken-decode-parms-no-filter.out",
+              $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 show_ntests();

@@ -295,8 +295,13 @@ QPDF_Stream::filterable(std::vector<std::string>& filters,
         }
     }
 
-    if (decode_parms.size() != filters.size())
+    // Ignore /DecodeParms entirely if /Filters is empty.  At least
+    // one case of a file whose /DecodeParms was [ << >> ] when
+    // /Filters was empty has been seen in the wild.
+    if ((filters.size() != 0) && (decode_parms.size() != filters.size()))
     {
+        // We should just issue a warning and treat this as not
+        // filterable.
 	throw QPDFExc(qpdf_e_damaged_pdf, qpdf->getFilename(),
 		      "", this->offset,
 		      "stream /DecodeParms length is"
