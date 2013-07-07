@@ -1090,6 +1090,17 @@ outfile.pdf</option>
       </listitem>
      </varlistentry>
      <varlistentry>
+      <term><option>-show-npages</option></term>
+      <listitem>
+       <para>
+        Prints the number of pages in the input file on a line by
+        itself.  Since the number of pages appears by itself on a
+        line, this option can be useful for scripting if you need to
+        know the number of pages in a file.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
       <term><option>-show-pages</option></term>
       <listitem>
        <para>

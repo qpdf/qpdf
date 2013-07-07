@@ -267,3 +267,4 @@ QPDF_optimization indirect outlines 0
 QPDF xref space 2
 qpdf pages range omitted at end 0
 qpdf pages range omitted in middle 0
+qpdf npages 0

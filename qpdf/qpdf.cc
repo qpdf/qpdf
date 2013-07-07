@@ -248,6 +248,7 @@ automated test suites for software that uses the qpdf library.\n\
 --show-object=obj[,gen]   show the contents of the given object\n\
   --raw-stream-data       show raw stream data instead of object contents\n\
   --filtered-stream-data  show filtered stream data instead of object contents\n\
+--show-npages             print the number of pages in the file\n\
 --show-pages              shows the object/generation number for each page\n\
   --with-images           also shows the object IDs for images on each page\n\
 --check                   check file structure + encryption, linearization\n\
@@ -1029,6 +1030,7 @@ int main(int argc, char* argv[])
     std::string min_version;
     std::string force_version;
 
+    bool show_npages = false;
     bool static_id = false;
     bool static_aes_iv = false;
     bool suppress_original_object_id = false;
@@ -1284,6 +1286,11 @@ int main(int argc, char* argv[])
 	    {
 		show_filtered_stream_data = true;
 	    }
+            else if (strcmp(arg, "show-npages") == 0)
+            {
+                show_npages = true;
+                require_outfile = false;
+            }
 	    else if (strcmp(arg, "show-pages") == 0)
 	    {
 		show_pages = true;
@@ -1352,6 +1359,12 @@ int main(int argc, char* argv[])
         }
 	if (outfilename == 0)
 	{
+            if (show_npages)
+            {
+                QTC::TC("qpdf", "qpdf npages");
+                std::cout << pdf.getRoot().getKey("/Pages").
+                    getKey("/Count").getIntValue() << std::endl;
+            }
 	    if (show_encryption)
 	    {
 		::show_encryption(pdf);

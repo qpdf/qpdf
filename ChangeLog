@@ -1,5 +1,9 @@
 2013-07-07  Jay Berkenbilt  <ejb@ql.org>
 
+	* qpdf: add --show-npages command-line option, which causes the
+	number of pages in the input file to be printed on a line by
+	itself.
+
 	* qpdf: allow omission of range in --pages.  If range is omitted
 	such that an argument that is supposed to be a range is an invalid
 	range and a valid file name, the range of 1-z is assumed.  This
