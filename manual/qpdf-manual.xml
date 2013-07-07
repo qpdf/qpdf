@@ -257,7 +257,7 @@ make
    <para>
     <option>outfilename</option> does not have to be seekable, even
     when generating linearized files.  Specifying
-    &ldquo;<option>-</option>&rdquo; as <option>outfilename</option>
+    &ldquo;<option>--</option>&rdquo; as <option>outfilename</option>
     means to write to standard output.  However, you can't specify the
     same file as both the input and the output because qpdf reads data
     from the input file as it writes to the output file.
@@ -1023,7 +1023,7 @@ outfile.pdf</option>
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term><option>-show-encryption</option></term>
+      <term><option>--show-encryption</option></term>
       <listitem>
        <para>
         Shows document encryption parameters.  Also shows the
@@ -1032,7 +1032,7 @@ outfile.pdf</option>
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term><option>-check-linearization</option></term>
+      <term><option>--check-linearization</option></term>
       <listitem>
        <para>
         Checks file integrity and linearization status.
@@ -1040,7 +1040,7 @@ outfile.pdf</option>
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term><option>-show-linearization</option></term>
+      <term><option>--show-linearization</option></term>
       <listitem>
        <para>
         Checks and displays all data in the linearization hint tables.
@@ -1048,7 +1048,7 @@ outfile.pdf</option>
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term><option>-show-xref</option></term>
+      <term><option>--show-xref</option></term>
       <listitem>
        <para>
         Shows the contents of the cross-reference table in a
@@ -1058,7 +1058,7 @@ outfile.pdf</option>
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term><option>-show-object=obj[,gen]</option></term>
+      <term><option>--show-object=obj[,gen]</option></term>
       <listitem>
        <para>
         Show the contents of the given object.  This is especially
@@ -1068,7 +1068,7 @@ outfile.pdf</option>
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term><option>-raw-stream-data</option></term>
+      <term><option>--raw-stream-data</option></term>
       <listitem>
        <para>
         When used along with the <option>--show-object</option>
@@ -1078,7 +1078,7 @@ outfile.pdf</option>
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term><option>-filtered-stream-data</option></term>
+      <term><option>--filtered-stream-data</option></term>
       <listitem>
        <para>
         When used along with the <option>--show-object</option>
@@ -1090,7 +1090,7 @@ outfile.pdf</option>
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term><option>-show-npages</option></term>
+      <term><option>--show-npages</option></term>
       <listitem>
        <para>
         Prints the number of pages in the input file on a line by
@@ -1101,7 +1101,7 @@ outfile.pdf</option>
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term><option>-show-pages</option></term>
+      <term><option>--show-pages</option></term>
       <listitem>
        <para>
         Shows the object and generation number for each page
@@ -1112,7 +1112,7 @@ outfile.pdf</option>
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term><option>-with-images</option></term>
+      <term><option>--with-images</option></term>
       <listitem>
        <para>
         When used along with <option>--show-pages</option>, also shows
@@ -1124,7 +1124,7 @@ outfile.pdf</option>
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term><option>-check</option></term>
+      <term><option>--check</option></term>
       <listitem>
        <para>
         Checks file structure and well as encryption, linearization,
