@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "4.1.0">
-<!ENTITY lastreleased "April 14, 2013">
+<!ENTITY swversion "4.2.0">
+<!ENTITY lastreleased "July 7, 2013">
 ]>
 <book>
  <bookinfo>
@@ -2640,6 +2640,62 @@ print "\n";
    <filename>ChangeLog</filename> in the source distribution.
   </para>
   <variablelist>
+   <varlistentry>
+    <term>4.2.0: July 7, 2013</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Bug fix: previous versions of qpdf would lose objects with
+        generation != 0 when generating object streams.  This also
+        required deprecation of
+        <function>QPDF::getCompressibleObjects()</function>, which has
+        now been replaced with
+        <function>QPDF::getCompressibleObjGens()</function>.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        New <type>QPDFObjGen</type> class added to represent an object
+        ID/generation pair.  The new method
+        <function>QPDF::getCompressibleObjGens()</function> uses this
+        type, and a handful of other API additions were made that use
+        this type.  In particular,
+        <function>QPDFObjectHandle::getObjGen()</function> is now
+        preferred over
+        <function>QPDFObjectHandle::getObjectID()</function> and
+        <function>QPDFObjectHandle::getGeneration()</function> as it
+        makes it less likely for people to accidentally write code
+        that ignores the generation number.  See
+        <filename>QPDF.hh</filename> and
+        <filename>QPDFObjectHandle.hh</filename> for additional notes.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Add <option>--show-npages</option> command-line option to the
+        <command>qpdf</command> command to show the number of pages in
+        a file.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Allow omission of the page range within
+        <option>--pages</option> for the <command>qpdf</command>
+        command.  When omitted, the page range is implicitly taken to
+        be all the pages in the file.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Various enhancements were made to support different types of
+        broken files or broken readers.  Details can be found in
+        <filename>ChangeLog</filename>.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
     <term>4.1.0: April 14, 2013</term>
     <listitem>
