@@ -567,7 +567,7 @@ foreach my $d (@nrange_tests)
 show_ntests();
 # ----------
 $td->notify("--- Merging and Splitting ---");
-$n_tests += 6;
+$n_tests += 8;
 
 # Select pages from the same file multiple times including selecting
 # twice from an encrypted file and specifying the password only the
@@ -612,6 +612,16 @@ $td->runtest("avoid respecification of password",
 $td->runtest("check output",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "pages-copy-encryption.pdf"});
+$td->runtest("merge with implicit ranges",
+             {$td->COMMAND =>
+                  "qpdf --empty a.pdf" .
+                  " --pages minimal.pdf 20-pages.pdf --password=user" .
+                  " page-labels-and-outlines.pdf --" .
+                  " --static-id"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "merge-implicit-ranges.pdf"});
 show_ntests();
 # ----------
 $td->notify("--- PDF From Scratch ---");

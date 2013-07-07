@@ -1,3 +1,11 @@
+2013-07-07  Jay Berkenbilt  <ejb@ql.org>
+
+	* qpdf: allow omission of range in --pages.  If range is omitted
+	such that an argument that is supposed to be a range is an invalid
+	range and a valid file name, the range of 1-z is assumed.  This
+	makes it possible to merge a bunch of files with something like
+	qpdf --empty out.pdf --pages *.pdf --
+
 2013-06-15  Jay Berkenbilt  <ejb@ql.org>
 
 	* Handle some additional broken files with missing /ID in trailer

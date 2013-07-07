@@ -614,7 +614,7 @@ make
     file is given as the primary input file is used as the starting
     point, but its pages are replaced with pages as specified.
 
-    <programlisting><option>--pages <replaceable>input-file</replaceable> [ <replaceable>--password=password</replaceable> ] <replaceable>page-range</replaceable> [ ... ] --</option>
+    <programlisting><option>--pages <replaceable>input-file</replaceable> [ <replaceable>--password=password</replaceable> ] [ <replaceable>page-range</replaceable> ] [ ... ] --</option>
 </programlisting>
     Multiple input files may be specified.  Each one is given as the
     name of the input file, an optional password (if required to open
@@ -634,6 +634,15 @@ make
     (info, outlines, page numbers, etc.) are taken from the primary
     input file.  To discard these, use <option>--empty</option> as the
     primary input.
+   </para>
+   <para>
+    Starting with qpdf 4.2.0, it is possible to omit the page range.
+    If qpdf sees a value in the place where it expects a page range
+    and that value is not a valid range but is a valid file name, qpdf
+    will implicitly use the range <literal>1-z</literal>, meaning that
+    it will include all pages in the file.  This makes it possible to
+    easily combine all pages in a set of files with a command like
+    <command>qpdf --empty out.pdf --pages *.pdf --</command>.
    </para>
    <para>
     It is not presently possible to specify the same page from the

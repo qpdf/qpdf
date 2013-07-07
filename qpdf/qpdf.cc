@@ -163,7 +163,7 @@ These options allow pages to be selected from one or more PDF files.\n\
 Whatever file is given as the primary input file is used as the\n\
 starting point, but its pages are replaced with pages as specified.\n\
 \n\
---pages file [ --password=password ] page-range ... --\n\
+--pages file [ --password=password ] [ page-range ] ... --\n\
 \n\
 For each file that pages should be taken from, specify the file, a\n\
 password needed to open the file (if any), and a page range.  The\n\
@@ -182,6 +182,10 @@ can appear with a high number followed by a low number, which causes the\n\
 pages to appear in reverse.  Repeating a number will cause an error, but\n\
 the manual discusses a workaround should you really want to include the\n\
 same page twice.\n\
+\n\
+If the page range is omitted, the range of 1-z is assumed.  qpdf decides\n\
+that the page range is omitted if the range argument is either -- or a\n\
+valid file name and not a valid range.\n\
 \n\
 See the manual for examples and a discussion of additional subtleties.\n\
 \n\
@@ -354,7 +358,8 @@ static void show_encryption(QPDF& pdf)
     }
 }
 
-static std::vector<int> parse_numrange(char const* range, int max)
+static std::vector<int> parse_numrange(char const* range, int max,
+                                       bool throw_error = false)
 {
     std::vector<int> result;
     char const* p = range;
@@ -436,7 +441,9 @@ static std::vector<int> parse_numrange(char const* range, int max)
         for (size_t i = 0; i < work.size(); i += 2)
         {
             int num = work[i];
-            if ((num < 1) || (num > max))
+            // max == 0 means we don't know the max and are just
+            // testing for valid syntax.
+            if ((max > 0) && ((num < 1) || (num > max)))
             {
                 throw std::runtime_error(
                     "number " + QUtil::int_to_string(num) + " out of range");
@@ -480,6 +487,10 @@ static std::vector<int> parse_numrange(char const* range, int max)
     }
     catch (std::runtime_error e)
     {
+        if (throw_error)
+        {
+            throw e;
+        }
         if (p)
         {
             usage("error at * in numeric range " +
@@ -839,9 +850,9 @@ parse_pages_options(
         {
             usage("insufficient arguments to --pages");
         }
-        char* file = argv[cur_arg++];
-        char* password = 0;
-        char* range = argv[cur_arg++];
+        char const* file = argv[cur_arg++];
+        char const* password = 0;
+        char const* range = argv[cur_arg++];
         if (strncmp(range, "--password=", 11) == 0)
         {
             // Oh, that's the password, not the range
@@ -851,6 +862,44 @@ parse_pages_options(
             }
             password = range + 11;
             range = argv[cur_arg++];
+        }
+
+        // See if the user omitted the range entirely, in which case
+        // we assume "1-z".
+        bool range_omitted = false;
+        if (strcmp(range, "--") == 0)
+        {
+            // The filename or password was the last argument
+            QTC::TC("qpdf", "qpdf pages range omitted at end");
+            range_omitted = true;
+        }
+        else
+        {
+            try
+            {
+                parse_numrange(range, 0, true);
+            }
+            catch (std::runtime_error& e1)
+            {
+                // The range is invalid.  Let's see if it's a file.
+                try
+                {
+                    fclose(QUtil::safe_fopen(range, "rb"));
+                    // Yup, it's a file.
+                    QTC::TC("qpdf", "qpdf pages range omitted in middle");
+                    range_omitted = true;
+                }
+                catch (std::runtime_error& e2)
+                {
+                    // Ignore.  The range is invalid and not a file.
+                    // We'll get an error message later.
+                }
+            }
+        }
+        if (range_omitted)
+        {
+            --cur_arg;
+            range = "1-z";
         }
 
         result.push_back(PageSpec(file, password, range));
