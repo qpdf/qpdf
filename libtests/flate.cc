@@ -46,6 +46,7 @@ void run(char const* filename)
 	// Write to the both pipeline
 	def3->write(buf, len);
     }
+    fclose(in1);
 
     def1->finish();
     delete def1;
@@ -69,6 +70,7 @@ void run(char const* filename)
     {
 	inf2->write(buf, len);
     }
+    fclose(in2);
 
     inf2->finish();
     delete inf2;

@@ -70,6 +70,7 @@ QPDFWriter::init()
     encryption_V = 0;
     encryption_R = 0;
     encryption_dict_objid = 0;
+    pipeline = 0;
     next_objid = 1;
     cur_stream_length_id = 0;
     cur_stream_length = 0;
@@ -2695,7 +2696,7 @@ QPDFWriter::writeLinearized()
 
     this->next_objid = part4_first_obj;
     enqueuePart(part4);
-    assert(this->next_objid = after_part4);
+    assert(this->next_objid == after_part4);
     this->next_objid = part6_first_obj;
     enqueuePart(part6);
     assert(this->next_objid == after_part6);
