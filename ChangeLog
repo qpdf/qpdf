@@ -1,5 +1,7 @@
 2013-07-07  Jay Berkenbilt  <ejb@ql.org>
 
+	* 4.2.0: release
+
 	* Ignore error case of a stream's decode parameters having invalid
 	length when there are no stream filters.
 
