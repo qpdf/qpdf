@@ -12,6 +12,7 @@ abcdefghbcdefghicdefghijdefghijkefghijklfghijklmg
 abcdefghbcdefghicdefghijdefghijkefghijklfghijklmg
 abcdefghijklmnopqrstuvwxyz
 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghi
+ABI
 abœ
 abs
 abuild
@@ -280,6 +281,7 @@ disableCBC
 disableIncompatibleEncryption
 disablePadding
 DiscardContents
+discardGeneration
 dist
 distclean
 dlfcn
@@ -441,6 +443,7 @@ getBits
 getBoolValue
 getBuffer
 getCompressibleObjects
+getCompressibleObjGens
 getCount
 getDataChecksum
 getDict
@@ -456,6 +459,7 @@ getFileChecksum
 getFilename
 getFilePosition
 getFirstChar
+getGen
 getGeneration
 getHexDigest
 getId
@@ -478,10 +482,13 @@ getNext
 getNItems
 getNumericValue
 getO
+getObj
 getObject
 getObjectByID
+getObjectByObjGen
 getObjectID
 getObjectStreamData
+getObjGen
 getObjStreamIndex
 getObjStreamNumber
 getOE
@@ -715,6 +722,7 @@ lzw
 LZWDecode
 LZWDecoder
 m'qpdf
+MacOS
 makeDirect
 makeDirectInternal
 Makefile
@@ -908,6 +916,7 @@ PNGFilter
 pngify
 PointerHolder
 popPipelineStack
+poppler
 pornin
 pos
 POSIX
@@ -967,6 +976,8 @@ QPDFObject
 QPDFObjectHandle
 QPDFObjectHandles
 QPDFObjectTypeAccessor
+QPDFObjGen
+QPDFObjGens
 QPDFPageData
 qpdfs
 QPDFStream
