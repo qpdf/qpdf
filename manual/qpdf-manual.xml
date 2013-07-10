@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "4.2.0">
-<!ENTITY lastreleased "July 7, 2013">
+<!ENTITY swversion "5.0.0">
+<!ENTITY lastreleased "July 10, 2013">
 ]>
 <book>
  <bookinfo>
@@ -636,7 +636,7 @@ make
     primary input.
    </para>
    <para>
-    Starting with qpdf 4.2.0, it is possible to omit the page range.
+    Starting with qpdf 5.0.0, it is possible to omit the page range.
     If qpdf sees a value in the place where it expects a page range
     and that value is not a valid range but is a valid file name, qpdf
     will implicitly use the range <literal>1-z</literal>, meaning that
@@ -2641,26 +2641,27 @@ print "\n";
   </para>
   <variablelist>
    <varlistentry>
-    <term>4.2.0: July 7, 2013</term>
+    <term>5.0.0: July 10, 2013</term>
     <listitem>
      <itemizedlist>
       <listitem>
        <para>
         Bug fix: previous versions of qpdf would lose objects with
-        generation != 0 when generating object streams.  This also
-        required deprecation of
-        <function>QPDF::getCompressibleObjects()</function>, which has
-        now been replaced with
-        <function>QPDF::getCompressibleObjGens()</function>.
+        generation != 0 when generating object streams.  Fixing this
+        required changes to the public API.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Removed methods from public API that were only supposed to be
+        called by QPDFWriter and couldn't realistically be called
+        anywhere else.  See ChangeLog for details.
        </para>
       </listitem>
       <listitem>
        <para>
         New <type>QPDFObjGen</type> class added to represent an object
-        ID/generation pair.  The new method
-        <function>QPDF::getCompressibleObjGens()</function> uses this
-        type, and a handful of other API additions were made that use
-        this type.  In particular,
+        ID/generation pair.
         <function>QPDFObjectHandle::getObjGen()</function> is now
         preferred over
         <function>QPDFObjectHandle::getObjectID()</function> and
