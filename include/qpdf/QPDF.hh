@@ -411,45 +411,6 @@ class QPDF
     void optimize(std::map<int, int> const& object_stream_data,
 		  bool allow_changes = true);
 
-    // For QPDFWriter:
-
-    // Get lists of all objects in order according to the part of a
-    // linearized file that they belong to.
-    QPDF_DLL
-    void getLinearizedParts(
-	std::map<int, int> const& object_stream_data,
-	std::vector<QPDFObjectHandle>& part4,
-	std::vector<QPDFObjectHandle>& part6,
-	std::vector<QPDFObjectHandle>& part7,
-	std::vector<QPDFObjectHandle>& part8,
-	std::vector<QPDFObjectHandle>& part9);
-
-    QPDF_DLL
-    void generateHintStream(std::map<int, QPDFXRefEntry> const& xref,
-			    std::map<int, qpdf_offset_t> const& lengths,
-			    std::map<int, int> const& obj_renumber,
-			    PointerHolder<Buffer>& hint_stream,
-			    int& S, int& O);
-
-    // Map object to object stream that contains it
-    QPDF_DLL
-    void getObjectStreamData(std::map<int, int>&);
-
-    // Get a list of objects that would be permitted in an object
-    // stream.
-    QPDF_DLL
-    std::vector<QPDFObjGen> getCompressibleObjGens();
-
-    // Deprecated: get a list of objects that would be permitted in an
-    // object stream.  This method is deprecated and will be removed.
-    // It's incorrect because it disregards the generations of the
-    // compressible objects, which can lead (and has lead) to bugs.
-    // This method will throw an exception if any of the objects
-    // returned have a generation of other than zero.  Use
-    // getCompressibleObjGens() instead.
-    QPDF_DLL
-    std::vector<int> getCompressibleObjects();
-
     // Convenience routines for common functions.  See also
     // QPDFObjectHandle.hh for additional convenience routines.
 
@@ -503,6 +464,49 @@ class QPDF
     // Remove page from the pdf.
     QPDF_DLL
     void removePage(QPDFObjectHandle page);
+
+    // Writer class is restricted to QPDFWriter so that only it can
+    // call certain methods.
+    class Writer
+    {
+        friend class QPDFWriter;
+      private:
+
+        static void getLinearizedParts(
+            QPDF& qpdf,
+            std::map<int, int> const& object_stream_data,
+            std::vector<QPDFObjectHandle>& part4,
+            std::vector<QPDFObjectHandle>& part6,
+            std::vector<QPDFObjectHandle>& part7,
+            std::vector<QPDFObjectHandle>& part8,
+            std::vector<QPDFObjectHandle>& part9)
+        {
+            qpdf.getLinearizedParts(object_stream_data,
+                                    part4, part6, part7, part8, part9);
+        }
+
+        static void generateHintStream(
+            QPDF& qpdf,
+            std::map<int, QPDFXRefEntry> const& xref,
+            std::map<int, qpdf_offset_t> const& lengths,
+            std::map<int, int> const& obj_renumber,
+            PointerHolder<Buffer>& hint_stream,
+            int& S, int& O)
+        {
+            return qpdf.generateHintStream(xref, lengths, obj_renumber,
+                                           hint_stream, S, O);
+        }
+
+        static void getObjectStreamData(QPDF& qpdf, std::map<int, int>& omap)
+        {
+            qpdf.getObjectStreamData(omap);
+        }
+
+        static std::vector<QPDFObjGen> getCompressibleObjGens(QPDF& qpdf)
+        {
+            return qpdf.getCompressibleObjGens();
+        }
+    };
 
     // Resolver class is restricted to QPDFObjectHandle so that only
     // it can resolve indirect references.
@@ -634,6 +638,31 @@ class QPDF
 			qpdf_offset_t offset, size_t length,
 			QPDFObjectHandle dict,
 			Pipeline* pipeline);
+
+    // For QPDFWriter:
+
+    // Get lists of all objects in order according to the part of a
+    // linearized file that they belong to.
+    void getLinearizedParts(
+	std::map<int, int> const& object_stream_data,
+	std::vector<QPDFObjectHandle>& part4,
+	std::vector<QPDFObjectHandle>& part6,
+	std::vector<QPDFObjectHandle>& part7,
+	std::vector<QPDFObjectHandle>& part8,
+	std::vector<QPDFObjectHandle>& part9);
+
+    void generateHintStream(std::map<int, QPDFXRefEntry> const& xref,
+			    std::map<int, qpdf_offset_t> const& lengths,
+			    std::map<int, int> const& obj_renumber,
+			    PointerHolder<Buffer>& hint_stream,
+			    int& S, int& O);
+
+    // Map object to object stream that contains it
+    void getObjectStreamData(std::map<int, int>&);
+
+    // Get a list of objects that would be permitted in an object
+    // stream.
+    std::vector<QPDFObjGen> getCompressibleObjGens();
 
     // methods to support page handling
 

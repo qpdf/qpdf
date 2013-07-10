@@ -1,5 +1,11 @@
-4.3.0
+5.1.0
 =====
+
+ * Figure out what about a3576a73593987b26cd3eff346f8f7c11f713cbd
+   broke binary compatibility.
+
+ * Implement automated testing for binary compatibility and add to
+   release checklist.
 
  * Add method to push inheritable resources to a single page by
    walking up and copying without overwrite.  Above logic will also be
@@ -53,19 +59,6 @@
 
     - See ../misc/broken-files
 
-
-
-Next ABI change
-===============
-
- * Remove QPDF::getCompressibleObjects()
-
- * For public QPDF methods that are only public so QPDFWriter can
-   call them, make them private and provide a nested caller class with
-   QPDFWriter as a friend for access just like is being done now for
-   some other methods.  This will reduce the risk that future changes
-   in the interface between QPDFWriter and QPDF will result in
-   breaking ABI changes.
 
 
 General

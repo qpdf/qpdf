@@ -1913,7 +1913,7 @@ QPDFWriter::preserveObjectStreams()
     // must have generation 0 because the PDF spec does not provide
     // any way to do otherwise.
     std::map<int, int> omap;
-    this->pdf.getObjectStreamData(omap);
+    QPDF::Writer::getObjectStreamData(this->pdf, omap);
     for (std::map<int, int>::iterator iter = omap.begin();
          iter != omap.end(); ++iter)
     {
@@ -1936,7 +1936,7 @@ QPDFWriter::generateObjectStreams()
     // This code doesn't do anything with /Extends.
 
     std::vector<QPDFObjGen> const& eligible =
-        this->pdf.getCompressibleObjGens();
+        QPDF::Writer::getCompressibleObjGens(this->pdf);
     unsigned int n_object_streams = (eligible.size() + 99) / 100;
     unsigned int n_per = eligible.size() / n_object_streams;
     if (n_per * n_object_streams < eligible.size())
@@ -2339,8 +2339,8 @@ QPDFWriter::writeHintStream(int hint_id)
     PointerHolder<Buffer> hint_buffer;
     int S = 0;
     int O = 0;
-    pdf.generateHintStream(
-	this->xref, this->lengths, this->obj_renumber_no_gen,
+    QPDF::Writer::generateHintStream(
+        this->pdf, this->xref, this->lengths, this->obj_renumber_no_gen,
         hint_buffer, S, O);
 
     openObject(hint_id);
@@ -2610,8 +2610,9 @@ QPDFWriter::writeLinearized()
     std::vector<QPDFObjectHandle> part7;
     std::vector<QPDFObjectHandle> part8;
     std::vector<QPDFObjectHandle> part9;
-    pdf.getLinearizedParts(this->object_to_object_stream_no_gen,
-			   part4, part6, part7, part8, part9);
+    QPDF::Writer::getLinearizedParts(
+        this->pdf, this->object_to_object_stream_no_gen,
+        part4, part6, part7, part8, part9);
 
     // Object number sequence:
     //

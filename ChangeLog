@@ -1,6 +1,24 @@
+2013-07-10  Jay Berkenbilt  <ejb@ql.org>
+
+	* 4.2.0 turned out to be binary incompatible on some platforms
+	even though there were no changes to the public API.  Therefore
+	the 4.2.0 release has been withdrawn, and is being replaced with a
+	5.0.0 release that acknowledges the ABI change and also removes
+	some problematic methods from the public API.
+
+	* Remove methods from public API that were only intended to be
+	used by QPDFWriter and really didn't make sense to call from
+	anywhere else as they required internal knowledge that only
+	QPDFWriter had:
+	   - QPDF::getLinearizedParts
+	   - QPDF::generateHintStream
+	   - QPDF::getObjectStreamData
+	   - QPDF::getCompressibleObjGens
+	   - QPDF::getCompressibleObjects
+
 2013-07-07  Jay Berkenbilt  <ejb@ql.org>
 
-	* 4.2.0: release
+	* 4.2.0: release [withdrawn]
 
 	* Ignore error case of a stream's decode parameters having invalid
 	length when there are no stream filters.
