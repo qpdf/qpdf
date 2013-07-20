@@ -64,6 +64,11 @@
 General
 =======
 
+ * When decrypting files with /R=6, hash_V5 is called more than once
+   with the same inputs.  Caching the results or refactoring to reduce
+   the number of identical calls could improve performance for
+   workloads that involve processing large numbers of small files.
+
  * Consider providing a Windows installer for qpdf using NSIS.
 
  * Consider adding a method to balance the pages tree.  It would call
