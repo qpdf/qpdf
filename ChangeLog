@@ -1,5 +1,11 @@
 2013-10-05  Jay Berkenbilt  <ejb@ql.org>
 
+	* Security fix: In places where std::vector<T>(size_t) was used,
+	either validate that the size parameter is sane or refactor code
+	to avoid the need to pre-allocate the vector.  This reduces the
+	likelihood of allocating a lot of memory in response to invalid
+	data in linearization hint streams.
+
 	* Security fix: sanitize /W array in cross reference stream to
 	avoid a potential integer overflow in a multiplication.  It is
 	unlikely that any exploits were possible from this bug as

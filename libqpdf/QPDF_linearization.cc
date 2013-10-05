@@ -23,12 +23,21 @@ static void
 load_vector_int(BitStream& bit_stream, int nitems, std::vector<T>& vec,
 		int bits_wanted, int_type T::*field)
 {
+    bool append = vec.empty();
     // nitems times, read bits_wanted from the given bit stream,
     // storing results in the ith vector entry.
 
     for (int i = 0; i < nitems; ++i)
     {
+        if (append)
+        {
+            vec.push_back(T());
+        }
 	vec[i].*field = bit_stream.getBits(bits_wanted);
+    }
+    if (static_cast<int>(vec.size()) != nitems)
+    {
+        throw std::logic_error("vector has wrong size in load_vector_int");
     }
     // The PDF spec says that each hint table starts at a byte
     // boundary.  Each "row" actually must start on a byte boundary.
@@ -255,6 +264,17 @@ QPDF::readLinearizationData()
 
     // Store linearization parameter data
 
+    // Various places in the code use linp.npages, which is
+    // initialized from N, to pre-allocate memory, so make sure it's
+    // accurate and bail right now if it's not.
+    if (N.getIntValue() != static_cast<long long>(getAllPages().size()))
+    {
+        throw QPDFExc(qpdf_e_damaged_pdf, this->file->getName(),
+                      "linearization hint table",
+                      this->file->getLastOffset(),
+                      "/N does not match number of pages");
+    }
+
     // file_size initialized by isLinearized()
     this->linp.first_page_object = O.getIntValue();
     this->linp.first_page_end = E.getIntValue();
@@ -396,10 +416,9 @@ QPDF::readHPageOffset(BitStream h)
     t.nbits_shared_numerator = h.getBits(16);		    // 12
     t.shared_denominator = h.getBits(16);		    // 13
 
-    unsigned int nitems = this->linp.npages;
     std::vector<HPageOffsetEntry>& entries = t.entries;
-    entries = std::vector<HPageOffsetEntry>(nitems);
-
+    entries.clear();
+    unsigned int nitems = this->linp.npages;
     load_vector_int(h, nitems, entries,
 		    t.nbits_delta_nobjects,
 		    &HPageOffsetEntry::delta_nobjects);
@@ -441,10 +460,9 @@ QPDF::readHSharedObject(BitStream h)
     QTC::TC("qpdf", "QPDF lin nshared_total > nshared_first_page",
 	    (t.nshared_total > t.nshared_first_page) ? 1 : 0);
 
-    int nitems = t.nshared_total;
     std::vector<HSharedObjectEntry>& entries = t.entries;
-    entries = std::vector<HSharedObjectEntry>(nitems);
-
+    entries.clear();
+    int nitems = t.nshared_total;
     load_vector_int(h, nitems, entries,
 		    t.nbits_delta_group_length,
 		    &HSharedObjectEntry::delta_group_length);
@@ -1466,8 +1484,11 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     // validation code can compute them relatively easily given the
     // rest of the information.
 
+    // npages is the size of the existing pages vector, which has been
+    // created by traversing the pages tree, and as such is a
+    // reasonable size.
     this->c_linp.npages = npages;
-    this->c_page_offset_data.entries = 	std::vector<CHPageOffsetEntry>(npages);
+    this->c_page_offset_data.entries = std::vector<CHPageOffsetEntry>(npages);
 
     // Part 4: open document objects.  We don't care about the order.
 
@@ -1861,6 +1882,7 @@ QPDF::calculateHPageOffset(
 
     HPageOffset& ph = this->page_offset_hints;
     std::vector<HPageOffsetEntry>& phe = ph.entries;
+    // npages is the size of the existing pages array.
     phe = std::vector<HPageOffsetEntry>(npages);
 
     for (unsigned int i = 0; i < npages; ++i)
@@ -1935,7 +1957,7 @@ QPDF::calculateHSharedObject(
     std::vector<CHSharedObjectEntry>& csoe = cso.entries;
     HSharedObject& so = this->shared_object_hints;
     std::vector<HSharedObjectEntry>& soe = so.entries;
-    soe = std::vector<HSharedObjectEntry>(cso.nshared_total);
+    soe.clear();
 
     int min_length = outputLengthNextN(
 	csoe[0].object, 1, lengths, obj_renumber);
@@ -1948,7 +1970,12 @@ QPDF::calculateHSharedObject(
 	    csoe[i].object, 1, lengths, obj_renumber);
 	min_length = std::min(min_length, length);
 	max_length = std::max(max_length, length);
+        soe.push_back(HSharedObjectEntry());
 	soe[i].delta_group_length = length;
+    }
+    if (soe.size() != static_cast<size_t>(cso.nshared_total))
+    {
+        throw std::logic_error("soe has wrong size after initialization");
     }
 
     so.nshared_total = cso.nshared_total;
