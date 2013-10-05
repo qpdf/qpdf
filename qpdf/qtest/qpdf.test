@@ -199,7 +199,7 @@ $td->runtest("remove page we don't have",
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 67;
+$n_tests += 69;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -526,6 +526,16 @@ $td->runtest("ignore broken decode parms with no filters",
              {$td->COMMAND => "qpdf --check broken-decode-parms-no-filter.pdf"},
              {$td->FILE => "broken-decode-parms-no-filter.out",
               $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("bounds check linearization data 1",
+             {$td->COMMAND => "qpdf --check linearization-bounds-1.pdf"},
+             {$td->FILE => "linearization-bounds-1.out",
+              $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("bounds check linearization data 2",
+             {$td->COMMAND => "qpdf --check linearization-bounds-2.pdf"},
+             {$td->FILE => "linearization-bounds-2.out",
+              $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 
 show_ntests();

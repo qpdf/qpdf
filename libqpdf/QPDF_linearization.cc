@@ -295,11 +295,25 @@ QPDF::readLinearizationData()
     readHPageOffset(BitStream(h_buf, h_size));
 
     int HSi = HS.getIntValue();
+    if ((HSi < 0) || (HSi >= h_size))
+    {
+        throw QPDFExc(qpdf_e_damaged_pdf, this->file->getName(),
+                      "linearization hint table",
+                      this->file->getLastOffset(),
+                      "/S (shared object) offset is out of bounds");
+    }
     readHSharedObject(BitStream(h_buf + HSi, h_size - HSi));
 
     if (HO.isInteger())
     {
 	int HOi = HO.getIntValue();
+        if ((HOi < 0) || (HOi >= h_size))
+        {
+            throw QPDFExc(qpdf_e_damaged_pdf, this->file->getName(),
+                          "linearization hint table",
+                          this->file->getLastOffset(),
+                          "/O (outline) offset is out of bounds");
+        }
 	readHGeneric(BitStream(h_buf + HOi, h_size - HOi),
 		     this->outline_hints);
     }

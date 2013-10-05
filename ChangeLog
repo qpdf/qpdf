@@ -1,5 +1,12 @@
 2013-10-05  Jay Berkenbilt  <ejb@ql.org>
 
+	* Security fix: avoid buffer overrun that could be caused by bogus
+	data in linearization hint streams.  The incorrect code could only
+	be triggered when checking linearization data, which must be
+	invoked explicitly.  qpdf does not check linearization data when
+	reading or writing linearized files, but the qpdf --check command
+	does check linearization data.
+
 	* Security fix: properly handle empty strings in
 	QPDF_Name::normalizeName.  The empty string is not a valid name
 	and would never be parsed as a name, so there were no known
