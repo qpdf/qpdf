@@ -360,11 +360,11 @@ QUtil::toUTF8(unsigned long uval)
 	    // Maximum that will fit in high byte now shrinks by one bit
 	    maxval >>= 1;
 	    // Slide to the left one byte
-	    --cur_byte;
-	    if (cur_byte < bytes)
+	    if (cur_byte <= bytes)
 	    {
 		throw std::logic_error("QUtil::toUTF8: overflow error");
 	    }
+	    --cur_byte;
 	}
 	// If maxval is k bits long, the high (7 - k) bits of the
 	// resulting byte must be high.
