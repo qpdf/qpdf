@@ -1,5 +1,10 @@
 2013-10-05  Jay Berkenbilt  <ejb@ql.org>
 
+	* Security fix: sanitize /W array in cross reference stream to
+	avoid a potential integer overflow in a multiplication.  It is
+	unlikely that any exploits were possible from this bug as
+	additional checks were also performed.
+
 	* Security fix: avoid buffer overrun that could be caused by bogus
 	data in linearization hint streams.  The incorrect code could only
 	be triggered when checking linearization data, which must be
