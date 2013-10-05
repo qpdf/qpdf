@@ -16,6 +16,10 @@ QPDF_Name::~QPDF_Name()
 std::string
 QPDF_Name::normalizeName(std::string const& name)
 {
+    if (name.empty())
+    {
+	return name;
+    }
     std::string result;
     result += name[0];
     for (unsigned int i = 1; i < name.length(); ++i)

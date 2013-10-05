@@ -1,5 +1,10 @@
 2013-10-05  Jay Berkenbilt  <ejb@ql.org>
 
+	* Security fix: properly handle empty strings in
+	QPDF_Name::normalizeName.  The empty string is not a valid name
+	and would never be parsed as a name, so there were no known
+	conditions where this method could be called with an empty string.
+
 	* Security fix: perform additional argument sanity checks when
 	reading bit streams.
 
