@@ -61,7 +61,7 @@ QPDFTokenizer::resolveLiteral()
 {
     PCRE num_re("^[\\+\\-]?(?:\\.\\d+|\\d+(?:\\.\\d+)?)$");
 
-    if ((val.length() > 0) && (val[0] == '/'))
+    if ((val.length() > 0) && (val.at(0) == '/'))
     {
         type = tt_name;
         // Deal with # in name token.  Note: '/' by itself is a
@@ -397,8 +397,8 @@ QPDFTokenizer::presentCharacter(char ch)
 	    std::string nval;
 	    for (unsigned int i = 0; i < val.length(); i += 2)
 	    {
-		num[0] = val[i];
-		num[1] = val[i+1];
+		num[0] = val.at(i);
+		num[1] = val.at(i+1);
 		char nch = static_cast<char>(strtol(num, 0, 16));
 		nval += nch;
 	    }

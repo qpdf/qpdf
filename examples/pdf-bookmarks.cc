@@ -31,7 +31,7 @@ void print_lines(std::vector<int>& numbers)
 {
     for (unsigned int i = 0; i < numbers.size() - 1; ++i)
     {
-	if (numbers[i])
+	if (numbers.at(i))
 	{
 	    std::cout << "| ";
 	}

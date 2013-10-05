@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
             usage();
         }
 
-        QPDFObjectHandle page = pages[pageno-1];
+        QPDFObjectHandle page = pages.at(pageno-1);
         QPDFObjectHandle contents = page.getKey("/Contents");
         ParserCallbacks cb;
         QPDFObjectHandle::parseContentStream(contents, &cb);

@@ -531,7 +531,7 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
             // For xref_table, these will always be small enough to be ints 
 	    qpdf_offset_t f1 = QUtil::string_to_ll(m2.getMatch(1).c_str());
 	    int f2 = atoi(m2.getMatch(2).c_str());
-	    char type = m2.getMatch(3)[0];
+	    char type = m2.getMatch(3).at(0);
 	    if (type == 'f')
 	    {
 		// Save deleted items until after we've checked the
@@ -758,17 +758,17 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
     long long num_entries = 0;
     for (unsigned int i = 1; i < indx.size(); i += 2)
     {
-        if (indx[i] > max_num_entries - num_entries)
+        if (indx.at(i) > max_num_entries - num_entries)
         {
             throw QPDFExc(qpdf_e_damaged_pdf, this->file->getName(),
                           "xref stream", xref_offset,
                           "Cross-reference stream claims to contain"
                           " too many entries: " +
-                          QUtil::int_to_string(indx[i]) + " " +
+                          QUtil::int_to_string(indx.at(i)) + " " +
                           QUtil::int_to_string(max_num_entries) + " " +
                           QUtil::int_to_string(num_entries));
         }
-	num_entries += indx[i];
+	num_entries += indx.at(i);
     }
 
     // entry_size and num_entries have both been validated to ensure
@@ -829,9 +829,9 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
 	// based on /Index.  The generation number is 0 unless this is
 	// an uncompressed object record, in which case the generation
 	// number appears as the third field.
-	int obj = indx[cur_chunk] + chunk_count;
+	int obj = indx.at(cur_chunk) + chunk_count;
 	++chunk_count;
-	if (chunk_count >= indx[cur_chunk + 1])
+	if (chunk_count >= indx.at(cur_chunk + 1))
 	{
 	    cur_chunk += 2;
 	    chunk_count = 0;

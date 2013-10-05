@@ -310,7 +310,7 @@ QPDF_Stream::filterable(std::vector<std::string>& filters,
 
     for (unsigned int i = 0; i < filters.size(); ++i)
     {
-        QPDFObjectHandle decode_item = decode_parms[i];
+        QPDFObjectHandle decode_item = decode_parms.at(i);
         if (decode_item.isNull())
         {
             // okay
@@ -318,7 +318,7 @@ QPDF_Stream::filterable(std::vector<std::string>& filters,
         else if (decode_item.isDictionary())
         {
             if (! understandDecodeParams(
-                    filters[i], decode_item,
+                    filters.at(i), decode_item,
                     predictor, columns, early_code_change))
             {
                 filterable = false;

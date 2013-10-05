@@ -55,7 +55,7 @@ QPDF_String::unparse(bool force_binary)
 	int consecutive_printable = 0;
 	for (unsigned int i = 0; i < this->val.length(); ++i)
 	{
-	    char ch = this->val[i];
+	    char ch = this->val.at(i);
 	    // Note: do not use locale to determine printability.  The
 	    // PDF specification accepts arbitrary binary data.  Some
 	    // locales imply multibyte characters.  We'll consider
@@ -97,7 +97,7 @@ QPDF_String::unparse(bool force_binary)
 	result += "(";
 	for (unsigned int i = 0; i < this->val.length(); ++i)
 	{
-	    char ch = this->val[i];
+	    char ch = this->val.at(i);
 	    switch (ch)
 	    {
 	      case '\n':
@@ -135,7 +135,7 @@ QPDF_String::unparse(bool force_binary)
 	      default:
 		if (is_iso_latin1_printable(ch))
 		{
-		    result += this->val[i];
+		    result += this->val.at(i);
 		}
 		else
 		{
@@ -164,7 +164,7 @@ QPDF_String::getUTF8Val() const
     std::string result;
     size_t len = this->val.length();
     if ((len >= 2) && (len % 2 == 0) &&
-	(this->val[0] == '\xfe') && (this->val[1] == '\xff'))
+	(this->val.at(0) == '\xfe') && (this->val.at(1) == '\xff'))
     {
 	// This is a Unicode string using big-endian UTF-16.  This
 	// code uses unsigned long and unsigned short to hold
@@ -181,8 +181,8 @@ QPDF_String::getUTF8Val() const
 	    // discarded, and a low codepoint not preceded by a high
 	    // codepoint will just get its low 10 bits output.
 	    unsigned short bits =
-		(static_cast<unsigned char>(this->val[i]) << 8) +
-		static_cast<unsigned char>(this->val[i+1]);
+		(static_cast<unsigned char>(this->val.at(i)) << 8) +
+		static_cast<unsigned char>(this->val.at(i+1));
 	    if ((bits & 0xFC00) == 0xD800)
 	    {
 		codepoint = 0x10000 + ((bits & 0x3FF) << 10);
@@ -209,7 +209,7 @@ QPDF_String::getUTF8Val() const
     {
 	for (unsigned int i = 0; i < len; ++i)
 	{
-	    result += QUtil::toUTF8(static_cast<unsigned char>(this->val[i]));
+	    result += QUtil::toUTF8(static_cast<unsigned char>(this->val.at(i)));
 	}
     }
     return result;

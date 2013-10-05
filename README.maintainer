@@ -43,6 +43,9 @@ Release Reminders
    casting policy in the manual, and ensure that integer types are
    properly handled.
 
+ * Remember to avoid using operator[] with std::string or
+   std::vector.  See README.hardening for details.
+
  * Increment shared library version information as needed
    (libqpdf/build.mk)
 

@@ -128,7 +128,7 @@ int main(int argc, char* argv[])
 	{
 	    QTC::TC("examples", "pdf-mod-info -key");
 	    cur_key = argv[i];
-	    if (! ((cur_key.length() > 0) && (cur_key[0] == '/')))
+	    if (! ((cur_key.length() > 0) && (cur_key.at(0) == '/')))
 	    {
 		cur_key = "/" + cur_key;
 	    }

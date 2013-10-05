@@ -1569,7 +1569,7 @@ QPDFWriter::writeObjectStreamOffsets(std::vector<qpdf_offset_t>& offsets,
 	}
 	writeString(QUtil::int_to_string(i + first_obj));
 	writeString(" ");
-	writeString(QUtil::int_to_string(offsets[i]));
+	writeString(QUtil::int_to_string(offsets.at(i)));
     }
     writeString("\n");
 }
@@ -1603,7 +1603,7 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
 	{
 	    // Adjust offsets to skip over comment before first object
 
-	    first = offsets[0];
+	    first = offsets.at(0);
 	    for (std::vector<qpdf_offset_t>::iterator iter = offsets.begin();
 		 iter != offsets.end(); ++iter)
 	    {
@@ -2745,7 +2745,7 @@ QPDFWriter::writeLinearized()
 	if (pass == 2)
 	{
 	    std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
-	    int first_page_object = obj_renumber[pages[0].getObjGen()];
+	    int first_page_object = obj_renumber[pages.at(0).getObjGen()];
 	    int npages = pages.size();
 
 	    writeString(" /Linearized 1 /L ");

@@ -1,5 +1,10 @@
 2013-10-05  Jay Berkenbilt  <ejb@ql.org>
 
+	* Replace operator[] in std::string and std::vector with "at" in
+	order to get bounds checking.  This reduces the chances that
+	incorrect code will result in data exposure or buffer overruns.
+	See README.hardening for additional notes.
+
 	* Use cryptographically secure random number generation when
 	available.  See additional notes in README.
 

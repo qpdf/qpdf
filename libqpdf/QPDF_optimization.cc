@@ -91,7 +91,7 @@ QPDF::optimize(std::map<int, int> const& object_stream_data,
     for (int pageno = 0; pageno < n; ++pageno)
     {
         updateObjectMaps(ObjUser(ObjUser::ou_page, pageno),
-                         this->all_pages[pageno]);
+                         this->all_pages.at(pageno));
     }
 
     // Traverse document-level items

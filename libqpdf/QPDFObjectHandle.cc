@@ -712,7 +712,7 @@ QPDFObjectHandle::parse(std::string const& object_str,
     size_t offset = input->tell();
     while (offset < object_str.length())
     {
-        if (! isspace(object_str[offset]))
+        if (! isspace(object_str.at(offset)))
         {
             QTC::TC("qpdf", "QPDFObjectHandle trailing data in parse");
             throw QPDFExc(qpdf_e_damaged_pdf, input->getName(),
@@ -966,8 +966,8 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 		std::string const& value = token.getValue();
 		if ((value == "R") && (in_array || in_dictionary) &&
 		    (olist.size() >= 2) &&
-		    (olist[olist.size() - 1].isInteger()) &&
-		    (olist[olist.size() - 2].isInteger()))
+		    (olist.at(olist.size() - 1).isInteger()) &&
+		    (olist.at(olist.size() - 2).isInteger()))
 		{
                     if (context == 0)
                     {
@@ -979,8 +979,8 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 		    // Try to resolve indirect objects
 		    object = newIndirect(
 			context,
-			olist[olist.size() - 2].getIntValue(),
-			olist[olist.size() - 1].getIntValue());
+			olist.at(olist.size() - 2).getIntValue(),
+			olist.at(olist.size() - 1).getIntValue());
 		    olist.pop_back();
 		    olist.pop_back();
 		}
@@ -1067,8 +1067,8 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 	}
 	for (unsigned int i = 0; i < olist.size(); i += 2)
 	{
-	    QPDFObjectHandle key_obj = olist[i];
-	    QPDFObjectHandle val = olist[i + 1];
+	    QPDFObjectHandle key_obj = olist.at(i);
+	    QPDFObjectHandle val = olist.at(i + 1);
 	    if (! key_obj.isName())
 	    {
 		throw QPDFExc(

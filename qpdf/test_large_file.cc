@@ -286,8 +286,8 @@ static void check_pdf(char const* filename)
     {
         int pageno = i + 1;
         std::cout << "page " << pageno << " of " << npages << std::endl;
-        check_page_contents(pageno, pages[i]);
-        check_image(pageno, pages[i]);
+        check_page_contents(pageno, pages.at(i));
+        check_image(pageno, pages.at(i));
     }
 }
 

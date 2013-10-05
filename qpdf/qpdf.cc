@@ -441,7 +441,7 @@ static std::vector<int> parse_numrange(char const* range, int max,
         p = 0;
         for (size_t i = 0; i < work.size(); i += 2)
         {
-            int num = work[i];
+            int num = work.at(i);
             // max == 0 means we don't know the max and are just
             // testing for valid syntax.
             if ((max > 0) && ((num < 1) || (num > max)))
@@ -451,11 +451,11 @@ static std::vector<int> parse_numrange(char const* range, int max,
             }
             if (i == 0)
             {
-                result.push_back(work[i]);
+                result.push_back(work.at(i));
             }
             else
             {
-                int separator = work[i-1];
+                int separator = work.at(i-1);
                 if (separator == comma)
                 {
                     result.push_back(num);
@@ -1664,7 +1664,7 @@ int main(int argc, char* argv[])
                         // Pages are specified from 1 but numbered
                         // from 0 in the vector
                         int pageno = *pageno_iter - 1;
-                        pdf.addPage(page_data.orig_pages[pageno], false);
+                        pdf.addPage(page_data.orig_pages.at(pageno), false);
                         if (page_data.qpdf == &pdf)
                         {
                             // This is a page from the original file.
@@ -1683,7 +1683,7 @@ int main(int argc, char* argv[])
                 {
                     if (selected_from_orig.count(pageno) == 0)
                     {
-                        pdf.replaceObject(orig_pages[pageno].getObjGen(),
+                        pdf.replaceObject(orig_pages.at(pageno).getObjGen(),
                                           QPDFObjectHandle::newNull());
                     }
                 }

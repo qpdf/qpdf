@@ -312,7 +312,7 @@ hash_V5(std::string const& password,
             int E_mod_3 = 0;
             for (unsigned int i = 0; i < 16; ++i)
             {
-                E_mod_3 += static_cast<unsigned char>(E[i]);
+                E_mod_3 += static_cast<unsigned char>(E.at(i));
             }
             E_mod_3 %= 3;
             int next_hash = ((E_mod_3 == 0) ? 256 :

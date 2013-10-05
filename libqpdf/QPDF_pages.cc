@@ -114,8 +114,8 @@ QPDF::flattenPagesTree()
     for (int pos = 0; pos < len; ++pos)
     {
         // populate pageobj_to_pages_pos and fix parent pointer
-        insertPageobjToPage(this->all_pages[pos], pos, true);
-        this->all_pages[pos].replaceKey("/Parent", pages);
+        insertPageobjToPage(this->all_pages.at(pos), pos, true);
+        this->all_pages.at(pos).replaceKey("/Parent", pages);
     }
 
     pages.replaceKey("/Kids", QPDFObjectHandle::newArray(this->all_pages));
@@ -194,7 +194,7 @@ QPDF::insertPage(QPDFObjectHandle newpage, int pos)
     assert(this->all_pages.size() == static_cast<size_t>(npages));
     for (int i = pos + 1; i < npages; ++i)
     {
-        insertPageobjToPage(this->all_pages[i], i, false);
+        insertPageobjToPage(this->all_pages.at(i), i, false);
     }
     insertPageobjToPage(newpage, pos, true);
     assert(this->pageobj_to_pages_pos.size() == static_cast<size_t>(npages));
@@ -221,7 +221,7 @@ QPDF::removePage(QPDFObjectHandle page)
     assert(this->pageobj_to_pages_pos.size() == static_cast<size_t>(npages));
     for (int i = pos; i < npages; ++i)
     {
-        insertPageobjToPage(this->all_pages[i], i, false);
+        insertPageobjToPage(this->all_pages.at(i), i, false);
     }
 }
 

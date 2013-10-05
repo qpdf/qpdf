@@ -109,7 +109,7 @@ Pl_LZWDecoder::getFirstChar(int code)
             throw std::logic_error(
                 "Pl_LZWDecoder::getFirstChar: table overflow");
         }
-	Buffer& b = table[idx];
+	Buffer& b = table.at(idx);
 	result = b.getBuffer()[0];
     }
     else
@@ -142,7 +142,7 @@ Pl_LZWDecoder::addToTable(unsigned char next)
             throw std::logic_error(
                 "Pl_LZWDecoder::addToTable: table overflow");
         }
-	Buffer& b = table[idx];
+	Buffer& b = table.at(idx);
 	last_data = b.getBuffer();
 	last_size = b.getSize();
     }
@@ -238,7 +238,7 @@ Pl_LZWDecoder::handleCode(int code)
 	}
 	else
 	{
-	    Buffer& b = table[code - 258];
+	    Buffer& b = table.at(code - 258);
 	    getNext()->write(b.getBuffer(), b.getSize());
 	}
     }

@@ -60,7 +60,7 @@ QPDF_Array::getItem(int n) const
 	throw std::logic_error(
 	    "INTERNAL ERROR: bounds error accessing QPDF_Array element");
     }
-    return this->items[n];
+    return this->items.at(n);
 }
 
 std::vector<QPDFObjectHandle> const&
@@ -74,7 +74,7 @@ QPDF_Array::setItem(int n, QPDFObjectHandle const& oh)
 {
     // Call getItem for bounds checking
     (void) getItem(n);
-    this->items[n] = oh;
+    this->items.at(n) = oh;
 }
 
 void

@@ -201,7 +201,7 @@ QUtil::hex_encode(std::string const& input)
     for (unsigned int i = 0; i < input.length(); ++i)
     {
         result += QUtil::int_to_string_base(
-            static_cast<int>(static_cast<unsigned char>(input[i])), 16, 2);
+            static_cast<int>(static_cast<unsigned char>(input.at(i))), 16, 2);
     }
     return result;
 }

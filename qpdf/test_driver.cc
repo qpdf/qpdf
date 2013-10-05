@@ -603,10 +603,10 @@ void runtest(int n, char const* filename1, char const* arg2)
     else if (n == 10)
     {
 	std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
-	pages[0].addPageContents(
+	pages.at(0).addPageContents(
             QPDFObjectHandle::newStream(
                 &pdf, "BT /F1 12 Tf 72 620 Td (Baked) Tj ET\n"), true);
-	pages[0].addPageContents(
+	pages.at(0).addPageContents(
             QPDFObjectHandle::newStream(
                 &pdf, "BT /F1 18 Tf 72 520 Td (Mashed) Tj ET\n"), false);
 
@@ -659,7 +659,7 @@ void runtest(int n, char const* filename1, char const* arg2)
 				   " not called 4-page file");
 	}
 	// Swap pages 2 and 3
-	pdf.swapObjects(pages[1].getObjGen(), pages[2].getObjGen());
+	pdf.swapObjects(pages.at(1).getObjGen(), pages.at(2).getObjGen());
 	// Replace object and swap objects
 	QPDFObjectHandle trailer = pdf.getTrailer();
 	QPDFObjectHandle qdict = trailer.getKey("/QDict");
@@ -700,7 +700,7 @@ void runtest(int n, char const* filename1, char const* arg2)
 	std::map<std::string, QPDFObjectHandle> dict_items =
 	    qarray.getDictAsMap();
 	if ((array_elements.size() == 1) &&
-	    (array_elements[0].getName() == "/Array") &&
+	    (array_elements.at(0).getName() == "/Array") &&
 	    (dict_items.size() == 1) &&
 	    (dict_items["/NewDict"].getIntValue() == 2))
 	{
@@ -738,12 +738,12 @@ void runtest(int n, char const* filename1, char const* arg2)
         assert(pages.size() == 9);
         pdf.removePage(*pages.begin()); // original page 0
         assert(pages.size() == 8);
-        checkPageContents(pages[4], "Original page 5");
-        pdf.removePage(pages[4]); // original page 5
+        checkPageContents(pages.at(4), "Original page 5");
+        pdf.removePage(pages.at(4)); // original page 5
         assert(pages.size() == 7);
-        checkPageContents(pages[4], "Original page 6");
-        checkPageContents(pages[0], "Original page 1");
-        checkPageContents(pages[6], "Original page 8");
+        checkPageContents(pages.at(4), "Original page 6");
+        checkPageContents(pages.at(0), "Original page 1");
+        checkPageContents(pages.at(6), "Original page 8");
 
         // Insert pages
 
@@ -760,7 +760,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         // dictionary and modify it.  Using the results of
         // getDictAsMap to create a new dictionary effectively creates
         // a shallow copy.
-        QPDFObjectHandle page_template = pages[0];
+        QPDFObjectHandle page_template = pages.at(0);
         std::vector<QPDFObjectHandle> new_pages;
         for (std::vector<QPDFObjectHandle>::iterator iter = contents.begin();
              iter != contents.end(); ++iter)
@@ -781,25 +781,25 @@ void runtest(int n, char const* filename1, char const* arg2)
         }
 
         // Now insert the pages
-        pdf.addPage(new_pages[0], true);
-        checkPageContents(pages[0], "New page 1");
-        pdf.addPageAt(new_pages[1], true, pages[0]);
-        assert(pages[0].getObjGen() == new_pages[1].getObjGen());
-        pdf.addPageAt(new_pages[2], true, pages[5]);
-        assert(pages[5].getObjGen() == new_pages[2].getObjGen());
-        pdf.addPageAt(new_pages[3], false, pages[5]);
-        assert(pages[6].getObjGen() == new_pages[3].getObjGen());
+        pdf.addPage(new_pages.at(0), true);
+        checkPageContents(pages.at(0), "New page 1");
+        pdf.addPageAt(new_pages.at(1), true, pages.at(0));
+        assert(pages.at(0).getObjGen() == new_pages.at(1).getObjGen());
+        pdf.addPageAt(new_pages.at(2), true, pages.at(5));
+        assert(pages.at(5).getObjGen() == new_pages.at(2).getObjGen());
+        pdf.addPageAt(new_pages.at(3), false, pages.at(5));
+        assert(pages.at(6).getObjGen() == new_pages.at(3).getObjGen());
         assert(pages.size() == 11);
-        pdf.addPage(new_pages[4], false);
-        assert(pages[11].getObjGen() == new_pages[4].getObjGen());
-        pdf.addPageAt(new_pages[5], false, pages.back());
+        pdf.addPage(new_pages.at(4), false);
+        assert(pages.at(11).getObjGen() == new_pages.at(4).getObjGen());
+        pdf.addPageAt(new_pages.at(5), false, pages.back());
         assert(pages.size() == 13);
-        checkPageContents(pages[0], "New page 0");
-        checkPageContents(pages[1], "New page 1");
-        checkPageContents(pages[5], "New page 5");
-        checkPageContents(pages[6], "New page 6");
-        checkPageContents(pages[11], "New page 11");
-        checkPageContents(pages[12], "New page 12");
+        checkPageContents(pages.at(0), "New page 0");
+        checkPageContents(pages.at(1), "New page 1");
+        checkPageContents(pages.at(5), "New page 5");
+        checkPageContents(pages.at(6), "New page 6");
+        checkPageContents(pages.at(11), "New page 11");
+        checkPageContents(pages.at(12), "New page 12");
 
         // Exercise writing to FILE*
         FILE* out =  QUtil::safe_fopen("a.pdf", "wb");
@@ -816,7 +816,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         QPDFObjectHandle contents = createPageContents(pdf, "New page 10");
         QPDFObjectHandle page =
             pdf.makeIndirectObject(
-                QPDFObjectHandle(all_pages[0]).shallowCopy());
+                QPDFObjectHandle(all_pages.at(0)).shallowCopy());
         page.replaceKey("/Contents", contents);
 
         // Insert the page manually.
@@ -843,7 +843,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         // The input file to this test case is broken to exercise an
         // error condition.
         std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
-        pdf.removePage(pages[0]);
+        pdf.removePage(pages.at(0));
         std::cout << "you can't see this" << std::endl;
     }
     else if (n == 18)
@@ -854,7 +854,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         // Remove pages from various places, checking to make sure
         // that our pages reference is getting updated.
         assert(pages.size() == 10);
-        QPDFObjectHandle page5 = pages[5];
+        QPDFObjectHandle page5 = pages.at(5);
         pdf.removePage(page5);
         pdf.addPage(page5, false);
         assert(pages.size() == 10);
@@ -871,7 +871,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
 
         // Try to insert a page that's already there.
-        pdf.addPage(pages[5], false);
+        pdf.addPage(pages.at(5), false);
         std::cout << "you can't see this" << std::endl;
     }
     else if (n == 20)
@@ -893,7 +893,7 @@ void runtest(int n, char const* filename1, char const* arg2)
     {
         // Try to shallow copy a stream
         std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
-        QPDFObjectHandle page = pages[0];
+        QPDFObjectHandle page = pages.at(0);
         QPDFObjectHandle contents = page.getKey("/Contents");
         contents.shallowCopy();
         std::cout << "you can't see this" << std::endl;
@@ -902,7 +902,7 @@ void runtest(int n, char const* filename1, char const* arg2)
     {
         // Try to remove a page we don't have
         std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
-        QPDFObjectHandle page = pages[0];
+        QPDFObjectHandle page = pages.at(0);
         pdf.removePage(page);
         pdf.removePage(page);
         std::cout << "you can't see this" << std::endl;
@@ -1109,9 +1109,9 @@ void runtest(int n, char const* filename1, char const* arg2)
         QPDF final;
         final.processFile("b.pdf", "user");
         std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
-        std::string orig_contents = getPageContents(pages[0]);
+        std::string orig_contents = getPageContents(pages.at(0));
         pages = final.getAllPages();
-        std::string new_contents = getPageContents(pages[0]);
+        std::string new_contents = getPageContents(pages.at(0));
         if (orig_contents != new_contents)
         {
             std::cout << "oops -- page contents don't match" << std::endl
@@ -1226,7 +1226,7 @@ void runtest(int n, char const* filename1, char const* arg2)
             bool is_binary = false;
             for (size_t i = 0; i < data.size(); ++i)
             {
-                if ((data[i] < 0) || (data[i] > 126))
+                if ((data.at(i) < 0) || (data.at(i) > 126))
                 {
                     is_binary = true;
                     break;
@@ -1239,9 +1239,9 @@ void runtest(int n, char const* filename1, char const* arg2)
                      i < std::min(data.size(), static_cast<size_t>(20));
                      ++i)
                 {
-                    if ((data[i] >= 32) && (data[i] <= 126))
+                    if ((data.at(i) >= 32) && (data.at(i) <= 126))
                     {
-                        t += data[i];
+                        t += data.at(i);
                     }
                     else
                     {
