@@ -1,6 +1,7 @@
 #include <qpdf/Pl_LZWDecoder.hh>
 
 #include <qpdf/QTC.hh>
+#include <qpdf/QUtil.hh>
 #include <stdexcept>
 #include <string.h>
 #include <assert.h>
@@ -100,13 +101,22 @@ Pl_LZWDecoder::getFirstChar(int code)
     {
 	result = static_cast<unsigned char>(code);
     }
-    else
+    else if (code > 257)
     {
-	assert(code > 257);
 	unsigned int idx = code - 258;
-	assert(idx < table.size());
+	if (idx >= table.size())
+        {
+            throw std::logic_error(
+                "Pl_LZWDecoder::getFirstChar: table overflow");
+        }
 	Buffer& b = table[idx];
 	result = b.getBuffer()[0];
+    }
+    else
+    {
+        throw std::logic_error(
+            "Pl_LZWDecoder::getFirstChar called with invalid code (" +
+            QUtil::int_to_string(code) + ")");
     }
     return result;
 }
@@ -124,14 +134,23 @@ Pl_LZWDecoder::addToTable(unsigned char next)
 	last_data = tmp;
 	last_size = 1;
     }
-    else
+    else if (this->last_code > 257)
     {
-	assert(this->last_code > 257);
 	unsigned int idx = this->last_code - 258;
-	assert(idx < table.size());
+	if (idx >= table.size())
+        {
+            throw std::logic_error(
+                "Pl_LZWDecoder::addToTable: table overflow");
+        }
 	Buffer& b = table[idx];
 	last_data = b.getBuffer();
 	last_size = b.getSize();
+    }
+    else
+    {
+        throw std::logic_error(
+            "Pl_LZWDecoder::addToTable called with invalid code (" +
+            QUtil::int_to_string(this->last_code) + ")");
     }
 
     Buffer entry(1 + last_size);

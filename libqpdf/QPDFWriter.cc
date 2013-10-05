@@ -772,7 +772,11 @@ QPDFWriter::bytesNeeded(unsigned long long n)
 void
 QPDFWriter::writeBinary(unsigned long long val, unsigned int bytes)
 {
-    assert(bytes <= sizeof(unsigned long long));
+    if (bytes > sizeof(unsigned long long))
+    {
+        throw std::logic_error(
+            "QPDFWriter::writeBinary called with too many bytes");
+    }
     unsigned char data[sizeof(unsigned long long)];
     for (unsigned int i = 0; i < bytes; ++i)
     {
@@ -1097,7 +1101,11 @@ QPDFWriter::writeTrailer(trailer_e which, int size, bool xref_stream,
 		    qpdf_offset_t pos = this->pipeline->getCount();
 		    writeString(QUtil::int_to_string(prev));
 		    int nspaces = pos - this->pipeline->getCount() + 21;
-		    assert(nspaces >= 0);
+		    if (nspaces < 0)
+                    {
+                        throw std::logic_error(
+                            "QPDFWriter: no padding required in trailer");
+                    }
 		    writePad(nspaces);
 		}
 	    }
@@ -2814,9 +2822,11 @@ QPDFWriter::writeLinearized()
 		// place as in pass 1.
 		writePad(first_xref_end - endpos);
 
-		// A failure of this insertion means we didn't allow
-		// enough padding for the first pass xref stream.
-		assert(this->pipeline->getCount() == first_xref_end);
+		if (this->pipeline->getCount() != first_xref_end)
+                {
+                    throw std::logic_error(
+                        "insufficient padding for first pass xref stream");
+                }
 	    }
 	    writeString("\n");
 	}
@@ -2897,8 +2907,13 @@ QPDFWriter::writeLinearized()
 
 		// If this assertion fails, maybe we didn't have
 		// enough padding above.
-		assert(this->pipeline->getCount() ==
-                       second_xref_end + hint_length);
+		if (this->pipeline->getCount() !=
+                    second_xref_end + hint_length)
+                {
+                    throw std::logic_error(
+                        "count mismatch after xref stream;"
+                        " possible insufficient padding?");
+                }
 	    }
 	}
 	else

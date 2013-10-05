@@ -1,5 +1,10 @@
 2013-10-05  Jay Berkenbilt  <ejb@ql.org>
 
+	* Replace some assert() calls with std::logic_error exceptions.
+	Ideally there shouldn't be assert() calls outside of testing.
+	This change may make a few more potential code errors in handling
+	invalid data recoverable.
+
 	* Security fix: In places where std::vector<T>(size_t) was used,
 	either validate that the size parameter is sane or refactor code
 	to avoid the need to pre-allocate the vector.  This reduces the

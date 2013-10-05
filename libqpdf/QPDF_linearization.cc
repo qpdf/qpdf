@@ -606,15 +606,21 @@ QPDF::checkLinearizationInternal()
     // agree with pdlin.  As of this writing, the test suite doesn't
     // contain any files with threads.
 
-    assert(! this->part6.empty());
+    if (this->part6.empty())
+    {
+        throw std::logic_error("linearization part 6 unexpectedly empty");
+    }
     qpdf_offset_t min_E = -1;
     qpdf_offset_t max_E = -1;
     for (std::vector<QPDFObjectHandle>::iterator iter = this->part6.begin();
 	 iter != this->part6.end(); ++iter)
     {
 	QPDFObjGen og((*iter).getObjGen());
-	// All objects have to have been dereferenced to be classified.
-	assert(this->obj_cache.count(og) > 0);
+	if (this->obj_cache.count(og) == 0)
+        {
+            // All objects have to have been dereferenced to be classified.
+            throw std::logic_error("linearization part6 object not in cache");
+        }
 	ObjCache const& oc = this->obj_cache[og];
 	min_E = std::max(min_E, oc.end_before_space);
 	max_E = std::max(max_E, oc.end_after_space);
@@ -832,14 +838,23 @@ QPDF::checkHPageOffset(std::list<std::string>& errors,
 	for (int i = 0; i < he.nshared_objects; ++i)
 	{
 	    int idx = he.shared_identifiers[i];
-	    assert(shared_idx_to_obj.count(idx) > 0);
+	    if (shared_idx_to_obj.count(idx) == 0)
+            {
+                throw std::logic_error(
+                    "unable to get object for item in"
+                    " shared objects hint table");
+            }
 	    hint_shared.insert(shared_idx_to_obj[idx]);
 	}
 
 	for (int i = 0; i < ce.nshared_objects; ++i)
 	{
 	    int idx = ce.shared_identifiers[i];
-	    assert(idx < this->c_shared_object_data.nshared_total);
+	    if (idx >= this->c_shared_object_data.nshared_total)
+            {
+                throw std::logic_error(
+                    "index out of bounds for shared object hint table");
+            }
 	    int obj = this->c_shared_object_data.entries[idx].object;
 	    computed_shared.insert(obj);
 	}
@@ -1754,8 +1769,12 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 	    shared.push_back(CHSharedObjectEntry(obj));
 	}
     }
-    assert(static_cast<size_t>(this->c_shared_object_data.nshared_total) ==
-	   this->c_shared_object_data.entries.size());
+    if (static_cast<size_t>(this->c_shared_object_data.nshared_total) !=
+        this->c_shared_object_data.entries.size())
+    {
+        throw std::logic_error(
+            "shared object hint table has wrong number of entries");
+    }
 
     // Now compute the list of shared objects for each page after the
     // first page.

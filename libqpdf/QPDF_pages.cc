@@ -120,7 +120,10 @@ QPDF::flattenPagesTree()
 
     pages.replaceKey("/Kids", QPDFObjectHandle::newArray(this->all_pages));
     // /Count has not changed
-    assert(pages.getKey("/Count").getIntValue() == len);
+    if (pages.getKey("/Count").getIntValue() != len)
+    {
+        throw std::logic_error("/Count is wrong after flattening pages tree");
+    }
 }
 
 void
