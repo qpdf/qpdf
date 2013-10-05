@@ -167,3 +167,22 @@ the test suite fails, test failure detail will be included in the
 build output.  Otherwise, you will have to have access to the
 qtest.log file from the build to view test failures.  The debian
 packages for qpdf enable this option, for example.
+
+
+Random Number Generation
+========================
+
+When the qpdf detects either the Windows cryptography API or the
+existence of /dev/urandom, /dev/arandom, or /dev/random, it uses them
+to generate cryptography secure random numbers.  If none of these
+conditions are true, the build will fail with an error.  It is
+possible to configure qpdf with the --enable-insecure-random option,
+in which case it will generate random numbers with stdlib's random()
+or rand() calls instead.  These random numbers are not cryptography
+secure, but the qpdf library is fully functional using them.  Using
+non-secure random numbers means that it's easier in some cases to
+guess encryption keys.  If you're not generating encrypted files,
+there's no advantage to using secure random numbers.
+
+If you are building qpdf on a platform that qpdf doesn't know how to
+generate secure random numbers on, a patch would be welcome.

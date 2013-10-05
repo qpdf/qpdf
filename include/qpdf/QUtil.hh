@@ -108,12 +108,18 @@ namespace QUtil
     QPDF_DLL
     std::string toUTF8(unsigned long uval);
 
-    // Wrapper around random from stdlib.  Calls srandom automatically
-    // the first time it is called.
+    // If secure random number generation is supported on your
+    // platform and qpdf was not compiled with insecure random number
+    // generation, this returns a crytographically secure random
+    // number.  Otherwise it falls back to random from stdlib and
+    // calls srandom automatically the first time it is called.
     QPDF_DLL
     long random();
 
-    // Wrapper around srandom from stdlib.
+    // Wrapper around srandom from stdlib.  Seeds the standard library
+    // weak random number generator, which is not used if secure
+    // random number generation is being used.  You never need to call
+    // this method as it is called automatically if needed.
     QPDF_DLL
     void srandom(unsigned int seed);
 

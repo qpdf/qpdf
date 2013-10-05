@@ -1,5 +1,8 @@
 2013-10-05  Jay Berkenbilt  <ejb@ql.org>
 
+	* Use cryptographically secure random number generation when
+	available.  See additional notes in README.
+
 	* Replace some assert() calls with std::logic_error exceptions.
 	Ideally there shouldn't be assert() calls outside of testing.
 	This change may make a few more potential code errors in handling

@@ -16,6 +16,23 @@ AC_PROG_CXX
 AC_HEADER_STDC
 LT_INIT([win32-dll])
 
+AC_ARG_ENABLE(insecure-random,
+   AS_HELP_STRING([--enable-insecure-random],
+                  [whether to use stdlib's random number generator (default is no)]),
+   [if test "$enableval" = "yes"; then
+      qpdf_INSECURE_RANDOM=1;
+    else
+      qpdf_INSECURE_RANDOM=0;
+    fi], [qpdf_INSECURE_RANDOM=0])
+if test "$qpdf_INSECURE_RANDOM" = "1"; then
+   AC_MSG_RESULT(yes)
+   AC_DEFINE([USE_INSECURE_RANDOM], [1], [Whether to use inscure random numbers])
+else
+   AC_MSG_RESULT(no)
+fi
+
+AX_RANDOM_DEVICE
+
 USE_EXTERNAL_LIBS=0
 AC_MSG_CHECKING(for whether to use external libraries distribution)
 AC_ARG_ENABLE(external-libs,
@@ -52,6 +69,23 @@ if test "$BUILD_INTERNAL_LIBS" = "0"; then
    AC_SEARCH_LIBS(deflate,z zlib,,[MISSING_ZLIB=1; MISSING_ANY=1])
    AC_CHECK_HEADER(pcre.h,,[MISSING_PCRE_H=1; MISSING_ANY=1])
    AC_SEARCH_LIBS(pcre_compile,pcre,,[MISSING_PCRE=1; MISSING_ANY=1])
+fi
+
+if test "x$qpdf_INSECURE_RANDOM" != "x1"; then
+  OLIBS=$LIBS
+  LIBS="$LIBS Advapi32.lib"
+  AC_MSG_CHECKING(for Advapi32 library)
+  AC_LINK_IFELSE([AC_LANG_PROGRAM(
+    [[#pragma comment(lib, "crypt32.lib")
+     #include <windows.h>
+     #include <Wincrypt.h>
+     HCRYPTPROV cp;]],
+     [CryptAcquireContext(&cp, NULL, NULL, PROV_RSA_FULL, 0);]
+     )],
+     [AC_MSG_RESULT(yes)
+      LIBS="$OLIBS -lAdvapi32"],
+     [AC_MSG_RESULT(no)
+      LIBS=$OLIBS])
 fi
 
 QPDF_LARGE_FILE_TEST_PATH=

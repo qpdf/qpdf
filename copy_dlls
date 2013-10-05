@@ -20,7 +20,7 @@ while (<O>)
     {
 	my $dll = $1;
 	$dll =~ tr/A-Z/a-z/;
-	next if $dll =~ m/^(kernel32|user32|msvcrt)\.dll$/;
+	next if $dll =~ m/^(kernel32|user32|msvcrt|advapi32)\.dll$/;
 	$dlls{$dll} = 1;
     }
     elsif (m/^Magic.*\((PE.+?)\)/)

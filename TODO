@@ -76,12 +76,11 @@ General
    and replace the /Pages key of the root dictionary with the new
    tree.
 
- * Improve the random number seed to make it more secure so that we
-   have stronger random numbers, particularly when multiple files are
-   generated in the same second.  This code may need to be
-   OS-specific.  Probably we should add a method in QUtil to seed with
-   a strong random number and call this automatically the first time
-   QUtil::random() is called.
+ * Secure random number generation could be made more efficient by
+   using a local static to ensure a single random device or crypt
+   provider as long as this can be done in a thread-safe fashion.  In
+   the initial implementation, this is being skipped to avoid having
+   to add any dependencies on threading libraries.
 
  * Study what's required to support savable forms that can be saved by
    Adobe Reader.  Does this require actually signing the document with
