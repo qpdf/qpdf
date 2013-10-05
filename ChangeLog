@@ -1,5 +1,8 @@
 2013-10-05  Jay Berkenbilt  <ejb@ql.org>
 
+	* Security fix: perform additional argument sanity checks when
+	reading bit streams.
+
 	* Security fix: in QUtil::toUTF8, change bounds checking to avoid
 	having a pointer point temporarily outside the bounds of an
 	array.  Some compiler optimizations could have made the original
