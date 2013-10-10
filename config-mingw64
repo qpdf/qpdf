@@ -7,4 +7,5 @@
     RANLIB=x86_64-w64-mingw32-ranlib \
     DLLTOOL=x86_64-w64-mingw32-dlltool \
     STRIP=x86_64-w64-mingw32-strip \
-    OBJDUMP=x86_64-w64-mingw32-objdump
+    OBJDUMP=x86_64-w64-mingw32-objdump \
+    ${1+"$@"}

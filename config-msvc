@@ -4,8 +4,9 @@ if ! test "$wordsize" = "32" -o "$wordsize" = "64"; then
     echo "Usage: $0 {32,64}"
     exit 2
 fi
+shift
 objdump=
 if test "$wordsize" = "64"; then
     objdump=OBJDUMP=x86_64-w64-mingw32-objdump
 fi
-CC=cl CXX="cl -TP -GR" ./configure --disable-test-compare-images --enable-external-libs --enable-werror --with-windows-wordsize=$wordsize --with-buildrules=msvc $objdump
+CC=cl CXX="cl -TP -GR" ./configure --disable-test-compare-images --enable-external-libs --enable-werror --with-windows-wordsize=$wordsize --with-buildrules=msvc $objdump ${1+"$@"}
