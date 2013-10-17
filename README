@@ -81,6 +81,7 @@ Building on UNIX/Linux
 
 For UNIX and UNIX-like systems, you can usually get by with just
 
+./autogen.sh
 ./configure
 make
 make install
