@@ -1,3 +1,11 @@
+2013-10-18  Jay Berkenbilt  <ejb@ql.org>
+
+	* Warn when -accessibility=n is specified with a modern encryption
+	format (R > 3).  Also, accept this flag (and ignore with warning)
+	with 256-bit encryption.  qpdf has always ignored the
+	accessibility setting with R > 3, but it previously did so
+	silently.
+
 2013-10-05  Jay Berkenbilt  <ejb@ql.org>
 
 	* Replace operator[] in std::string and std::vector with "at" in

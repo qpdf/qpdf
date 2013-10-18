@@ -740,13 +740,13 @@ parse_encrypt_options(
 	    {
 		usage("invalid -accessibility parameter");
 	    }
-	    if (keylen == 128)
+	    if (keylen == 40)
 	    {
-		r3_accessibility = result;
+		usage("-accessibility invalid for 40-bit keys");
 	    }
 	    else
 	    {
-		usage("-accessibility invalid for 40-bit keys");
+		r3_accessibility = result;
 	    }
 	}
 	else if (strcmp(arg, "cleartext-metadata") == 0)
@@ -1730,49 +1730,77 @@ int main(int argc, char* argv[])
             }
 	    if (encrypt)
 	    {
+                int R = 0;
 		if (keylen == 40)
 		{
-		    w.setR2EncryptionParameters(
-			user_password.c_str(), owner_password.c_str(),
-			r2_print, r2_modify, r2_extract, r2_annotate);
+                    R = 2;
 		}
 		else if (keylen == 128)
 		{
 		    if (force_V4 || cleartext_metadata || use_aes)
 		    {
-			w.setR4EncryptionParameters(
-			    user_password.c_str(), owner_password.c_str(),
-			    r3_accessibility, r3_extract, r3_print, r3_modify,
-			    !cleartext_metadata, use_aes);
+                        R = 4;
 		    }
 		    else
 		    {
-			w.setR3EncryptionParameters(
-			    user_password.c_str(), owner_password.c_str(),
-			    r3_accessibility, r3_extract, r3_print, r3_modify);
+                        R = 3;
 		    }
 		}
 		else if (keylen == 256)
 		{
 		    if (force_R5)
                     {
-			w.setR5EncryptionParameters(
-			    user_password.c_str(), owner_password.c_str(),
-			    r3_accessibility, r3_extract, r3_print, r3_modify,
-			    !cleartext_metadata);
+                        R = 5;
 		    }
 		    else
 		    {
-			w.setR6EncryptionParameters(
-			    user_password.c_str(), owner_password.c_str(),
-			    r3_accessibility, r3_extract, r3_print, r3_modify,
-			    !cleartext_metadata);
+                        R = 6;
 		    }
 		}
 		else
 		{
 		    throw std::logic_error("bad encryption keylen");
 		}
+                if ((R > 3) && (r3_accessibility == false))
+                {
+                    std::cerr << whoami
+                              << ": -accessibility=n is ignored for modern"
+                              << " encryption formats" << std::endl;
+                }
+                switch (R)
+                {
+                  case 2:
+		    w.setR2EncryptionParameters(
+			user_password.c_str(), owner_password.c_str(),
+			r2_print, r2_modify, r2_extract, r2_annotate);
+                    break;
+                  case 3:
+                    w.setR3EncryptionParameters(
+                        user_password.c_str(), owner_password.c_str(),
+                        r3_accessibility, r3_extract, r3_print, r3_modify);
+                    break;
+                  case 4:
+                    w.setR4EncryptionParameters(
+                        user_password.c_str(), owner_password.c_str(),
+                        r3_accessibility, r3_extract, r3_print, r3_modify,
+                        !cleartext_metadata, use_aes);
+                    break;
+                  case 5:
+                    w.setR5EncryptionParameters(
+                        user_password.c_str(), owner_password.c_str(),
+                        r3_accessibility, r3_extract, r3_print, r3_modify,
+                        !cleartext_metadata);
+                    break;
+                  case 6:
+                    w.setR6EncryptionParameters(
+                        user_password.c_str(), owner_password.c_str(),
+                        r3_accessibility, r3_extract, r3_print, r3_modify,
+                        !cleartext_metadata);
+                    break;
+                  default:
+		    throw std::logic_error("bad encryption R value");
+                    break;
+                }
 	    }
 	    if (linearize)
 	    {

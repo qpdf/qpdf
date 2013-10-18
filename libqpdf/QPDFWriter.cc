@@ -462,7 +462,9 @@ QPDFWriter::setEncryptionParameters(
 
     if (R > 3)
     {
-        // Bit 10 is deprecated and should always be set.
+        // Bit 10 is deprecated and should always be set.  This used
+        // to mean accessibility.  There is no way to disable
+        // accessibility with R > 3.
         bits_to_clear.erase(10);
     }
 
