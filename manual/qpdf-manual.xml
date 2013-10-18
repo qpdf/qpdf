@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "5.0.0">
-<!ENTITY lastreleased "July 10, 2013">
+<!ENTITY swversion "5.0.1">
+<!ENTITY lastreleased "October 18, 2013">
 ]>
 <book>
  <bookinfo>
@@ -2640,6 +2640,45 @@ print "\n";
    <filename>ChangeLog</filename> in the source distribution.
   </para>
   <variablelist>
+   <varlistentry>
+    <term>5.0.1: October 18, 2013</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Thanks to a detailed review by Florian Weimer and the Red Hat
+        Product Security Team, this release includes a number of
+        non-user-visible security hardening changes.  Please see the
+        ChangeLog file in the source distribution for the complete
+        list.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        When available, operating system-specific secure random number
+        generation is used for generating initialization vectors and
+        other random values used during encryption or file creation.
+        For the Windows build, this results in an added dependency on
+        Microsoft's cryptography API.  To disable the OS-specific
+        cryptography and use the old version, pass the
+        <option>--enable-insecure-random</option> option to
+        <command>./configure</command>.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        The <command>qpdf</command> command-line tool now issues a
+        warning when <option>-accessibility=n</option> is specified
+        for newer encryption versions stating that the option is
+        ignored.  qpdf, per the spec, has always ignored this flag,
+        but it previously did so silently.  This warning is issued
+        only by the command-line tool, not by the library.  The
+        library's handling of this flag is unchanged.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
     <term>5.0.0: July 10, 2013</term>
     <listitem>

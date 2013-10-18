@@ -1,5 +1,7 @@
 2013-10-18  Jay Berkenbilt  <ejb@ql.org>
 
+	* 5.0.1: release
+
 	* Warn when -accessibility=n is specified with a modern encryption
 	format (R > 3).  Also, accept this flag (and ignore with warning)
 	with 256-bit encryption.  qpdf has always ignored the
