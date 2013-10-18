@@ -76,8 +76,32 @@ That code has the following license:
   SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-Building on UNIX/Linux
-======================
+Building from a pristine checkout
+=================================
+
+When building qpdf from a pristine checkout from version control,
+documentation and automatically generated files are not present.
+Building on Windows from a pristine checkout is not guaranteed to work
+because of issues running autoconf; see README-windows.txt for how to
+handle this.  For UNIX and UNIX-like systems, you must have some
+addditional tools installed to build from the source repository.  To
+do this, you should run
+
+./autogen.sh
+./configure --enable-doc-maintenance
+make
+make install
+
+If you don't have Apache fop and the docbook stylesheets installed,
+you won't be able to build documentation.  You can omit
+--enable-doc-maintenance and produce working qpdf software that passes
+its test suite, but make install will fail because the documentation
+files won't exist.  Depending on your purposes, you can either work
+around this or grab the docs from a source distribution.
+
+
+Building from source distribution on UNIX/Linux
+===============================================
 
 For UNIX and UNIX-like systems, you can usually get by with just
 
