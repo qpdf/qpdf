@@ -8,6 +8,8 @@
 #ifndef __QPDFEXC_HH__
 #define __QPDFEXC_HH__
 
+#include <string>
+
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
 
