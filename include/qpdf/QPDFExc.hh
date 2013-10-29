@@ -12,6 +12,7 @@
 #include <qpdf/Types.h>
 
 #include <qpdf/Constants.h>
+#include <string>
 #include <stdexcept>
 
 class QPDFExc: public std::runtime_error
