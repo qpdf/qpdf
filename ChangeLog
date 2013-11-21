@@ -1,3 +1,10 @@
+2013-11-21  Jay Berkenbilt  <ejb@ql.org>
+
+	* Change image comparison tests, which are disabled by default, to
+	use tiff files with 8 bits per sample rather than 4.  This works
+	around a bug in tiffcmp but also increases time and disk space for
+	image comparison tests.
+
 2013-10-28  Jay Berkenbilt  <ejb@ql.org>
 
 	* Fix MacOS compilation errors by adding a missing #include in a

@@ -2176,7 +2176,7 @@ sub compare_pdfs
 	$td->runtest("convert original file to image",
 		     {$td->COMMAND =>
 			  "(cd tif1;" .
-			  " gs 2>/dev/null -q -dNOPAUSE -sDEVICE=tiff12nc" .
+			  " gs 2>/dev/null -q -dNOPAUSE -sDEVICE=tiff24nc" .
 			  " -sOutputFile=a.tif - < ../$f1)"},
 		     {$td->STRING => "",
 		      $td->EXIT_STATUS => 0});
@@ -2195,7 +2195,7 @@ sub compare_pdfs
 	$td->runtest("convert new file to image",
 		     {$td->COMMAND =>
 			  "(cd tif2;" .
-			  " gs 2>/dev/null -q -dNOPAUSE -sDEVICE=tiff12nc" .
+			  " gs 2>/dev/null -q -dNOPAUSE -sDEVICE=tiff24nc" .
 			  " -sOutputFile=a.tif - < ../$f2)"},
 		     {$td->STRING => "",
 		      $td->EXIT_STATUS => 0});
