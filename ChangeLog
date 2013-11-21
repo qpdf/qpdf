@@ -1,3 +1,8 @@
+2013-10-28  Jay Berkenbilt  <ejb@ql.org>
+
+	* Fix MacOS compilation errors by adding a missing #include in a
+	header file.
+
 2013-10-18  Jay Berkenbilt  <ejb@ql.org>
 
 	* 5.0.1: release
