@@ -12,8 +12,8 @@
 
 2013-10-28  Jay Berkenbilt  <ejb@ql.org>
 
-	* Fix MacOS compilation errors by adding a missing #include in a
-	header file.
+	* Fix MacOS compilation errors by adding a missing #include
+	<string> in a header file.
 
 2013-10-18  Jay Berkenbilt  <ejb@ql.org>
 
