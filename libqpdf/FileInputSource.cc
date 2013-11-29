@@ -2,6 +2,7 @@
 #include <string.h>
 #include <qpdf/QUtil.hh>
 #include <qpdf/QPDFExc.hh>
+#include <algorithm>
 
 FileInputSource::FileInputSource() :
     close_file(false),

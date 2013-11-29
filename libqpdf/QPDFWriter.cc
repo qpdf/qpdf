@@ -19,6 +19,7 @@
 #include <qpdf/QPDF_Name.hh>
 #include <qpdf/QPDF_String.hh>
 
+#include <algorithm>
 #include <stdlib.h>
 
 QPDFWriter::QPDFWriter(QPDF& pdf) :

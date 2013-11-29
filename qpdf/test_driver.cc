@@ -11,6 +11,7 @@
 #include <qpdf/QPDFWriter.hh>
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

@@ -1,6 +1,7 @@
 #include <qpdf/BufferInputSource.hh>
 #include <string.h>
 #include <stdexcept>
+#include <algorithm>
 
 BufferInputSource::BufferInputSource(std::string const& description,
                                      Buffer* buf, bool own_memory) :
