@@ -1,5 +1,8 @@
 2013-11-29  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add /FS to msvc builds to allow parallel builds to work with
+	Visual C++ 2013.
+
 	* Add missing #include <algorithm> in some files that use std::min
 	and std::max.
 

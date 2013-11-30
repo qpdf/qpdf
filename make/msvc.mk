@@ -27,7 +27,7 @@ clean::
 #                       1   2
 # Usage: $(call compile,src,includes)
 define compile
-	cl /nologo /Zi /Gy /EHsc /MD /TP /GR $(CPPFLAGS) $(CXXFLAGS) \
+	cl /nologo /O2 /Zi /Gy /EHsc /MD /TP /GR $(CPPFLAGS) $(CXXFLAGS) \
 		$(foreach I,$(2),-I$(I)) \
 		/c $(1) /Fo$(call src_to_obj,$(1))
 endef

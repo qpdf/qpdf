@@ -200,7 +200,7 @@ if test "$BUILDRULES" = "msvc"; then
    dnl deprecated.  Removing these warnings helps people who want to
    dnl write applications based on qpdf that can be Windows 8
    dnl certified.
-   try_flags="/w14996"
+   try_flags="-w14996"
 else
    try_flags="-Wall"
 fi
@@ -234,7 +234,23 @@ if test "$BUILDRULES" != "msvc"; then
 fi
 
 if test "$BUILDRULES" = "msvc"; then
-   try_flags="/WX"
+   try_flags=-FS
+   AC_MSG_CHECKING(for whether $CC supports $try_flags)
+   oCFLAGS=$CFLAGS
+   CFLAGS="$CFLAGS $try_flags"
+   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[int a = 1; int b = a; a = b;]])],
+                     [qpdf_USE_FS=1],[qpdf_USE_FS=0])
+   if test "$qpdf_USE_FS" = "1"; then
+      AC_MSG_RESULT(yes)
+      CXXFLAGS="$CXXFLAGS $try_flags"
+   else
+      AC_MSG_RESULT(no)
+      CFLAGS=$oCFLAGS
+   fi
+fi
+
+if test "$BUILDRULES" = "msvc"; then
+   try_flags="-WX"
 else
    try_flags="-Werror"
 fi
