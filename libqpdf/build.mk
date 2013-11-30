@@ -11,6 +11,7 @@ SRCS_libqpdf = \
 	libqpdf/BufferInputSource.cc \
 	libqpdf/FileInputSource.cc \
 	libqpdf/InputSource.cc \
+	libqpdf/InsecureRandomDataProvider.cc \
 	libqpdf/MD5.cc \
 	libqpdf/OffsetInputSource.cc \
 	libqpdf/PCRE.cc \
@@ -57,6 +58,7 @@ SRCS_libqpdf = \
 	libqpdf/QTC.cc \
 	libqpdf/QUtil.cc \
 	libqpdf/RC4.cc \
+	libqpdf/SecureRandomDataProvider.cc \
 	libqpdf/qpdf-c.cc \
 	libqpdf/rijndael.cc \
 	libqpdf/sha2.c \

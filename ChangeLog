@@ -3,6 +3,12 @@
 	* Allow anyspace rather than just newline to follow xref header.
 	This allows qpdf to read a wider range of damaged files.
 
+2013-11-30  Jay Berkenbilt  <ejb@ql.org>
+
+	* Allow user-supplied random data provider to be used in place of
+	OS-provided or insecure random number generation.  See
+	documentation for 5.1.0 for details.
+
 2013-11-29  Jay Berkenbilt  <ejb@ql.org>
 
 	* If NO_GET_ENVIRONMENT is #defined, for Windows only,

@@ -12,6 +12,7 @@ BINS_libtests = \
 	png_filter \
 	pointer_holder \
 	qutil \
+	random \
 	rc4 \
 	sha2
 

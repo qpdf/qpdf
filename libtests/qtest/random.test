@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+require TestDriver;
+
+my $td = new TestDriver('random');
+
+$td->runtest("Random Data Providers",
+	     {$td->COMMAND => "random"},
+	     {$td->STRING => "random: end of tests\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->report(1);
