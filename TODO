@@ -64,6 +64,40 @@
 General
 =======
 
+ * Provide support in QPDFWriter for writing incremental updates.
+   Provide support in qpdf for preserving incremental updates.  The
+   goal should be that QDF mode should be fully functional for files
+   with incremental updates including fix_qdf.
+
+   Note that there's nothing that says an indirect object in one
+   update can't refer to an object that doesn't appear until a later
+   update.  This means that QPDF has to treat indirect null objects
+   differently from how it does now.  QPDF drops indirect null objects
+   that appear as members of arrays or dictionaries.  For arrays, it's
+   handled in QPDFWriter where we make indirect nulls direct.  This is
+   in a single if block, and nothing else in the code cares about it.
+   We could just remove that if block and not break anything except a
+   few test cases that exercise the current behavior.  For
+   dictionaries, it's more complicated.  In this case,
+   QPDF_Dictionary::getKeys() ignores all keys with null values, and
+   hasKey() returns false for keys that have null values.  We would
+   probably want to make QPDF_Dictionary able to handle the special
+   case of keys that are indirect nulls and basically never have it
+   drop any keys that are indirect objects.
+
+   If we make a change to have qpdf preserve indirect references to
+   null objects, we have to note this in ChangeLog and in the release
+   notes since this will change output files.  We did this before when
+   we stopped flattening scalar references, so this is probably not a
+   big deal.  We also have to make sure that the testing for this
+   handles non-trivial cases of the targets of indirect nulls being
+   replaced by real objects in an update.  I'm not sure how this plays
+   with linearization, if at all.  For cases where incremental updates
+   are not being preserved as incremental updates and where the data
+   is being folded in (as is always the case with qpdf now), none of
+   this should make any difference in the actual semantics of the
+   files.
+
  * When decrypting files with /R=6, hash_V5 is called more than once
    with the same inputs.  Caching the results or refactoring to reduce
    the number of identical calls could improve performance for
