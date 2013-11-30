@@ -51,6 +51,15 @@ int main(int argc, char* argv[])
 	whoami += 3;
     }
 
+    // For test suite
+    bool static_id = false;
+    if ((argc > 1) && (strcmp(argv[1], " --static-id") == 0))
+    {
+        static_id = true;
+        --argc;
+        ++argv;
+    }
+
     if (! ((argc == 3) || (argc == 4)))
     {
 	usage();
@@ -88,7 +97,7 @@ int main(int argc, char* argv[])
 
 	// Write out a new file
 	QPDFWriter w(qpdf, outfilename);
-	if (QUtil::get_env("IN_TESTSUITE"))
+	if (static_id)
 	{
 	    // For the test suite, uncompress streams and use static
 	    // IDs.

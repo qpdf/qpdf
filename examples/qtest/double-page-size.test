@@ -12,7 +12,8 @@ my $td = new TestDriver('double-page-size');
 cleanup();
 
 $td->runtest("double page size",
-	     {$td->COMMAND => "pdf-double-page-size in.pdf a.pdf"},
+	     {$td->COMMAND => ['pdf-double-page-size', ' --static-id',
+                               'in.pdf', 'a.pdf']},
 	     {$td->STRING =>
 		  "pdf-double-page-size: new file written to a.pdf\n",
 	      $td->EXIT_STATUS => 0},

@@ -1,5 +1,12 @@
 2013-11-29  Jay Berkenbilt  <ejb@ql.org>
 
+	* If NO_GET_ENVIRONMENT is #defined, for Windows only,
+	QUtil::get_env will always return false.  This was added to
+	support a user who needs to avoid calling GetEnvironmentVariable
+	from the Windows API.  QUtil::get_env is not used for any
+	functionality in qpdf and exists only to support the test suite
+	including test coverage support with QTC (part of qtest).
+
 	* Add /FS to msvc builds to allow parallel builds to work with
 	Visual C++ 2013.
 

@@ -7,6 +7,7 @@
 #include <cmath>
 #include <iomanip>
 #include <sstream>
+#include <stdexcept>
 #include <stdio.h>
 #include <errno.h>
 #include <ctype.h>
@@ -262,6 +263,9 @@ QUtil::get_env(std::string const& var, std::string* value)
 {
     // This was basically ripped out of wxWindows.
 #ifdef _WIN32
+# ifdef NO_GET_ENVIRONMENT
+    return false;
+# else
     // first get the size of the buffer
     DWORD len = ::GetEnvironmentVariable(var.c_str(), NULL, 0);
     if (len == 0)
@@ -279,6 +283,7 @@ QUtil::get_env(std::string const& var, std::string* value)
     }
 
     return true;
+# endif
 #else
     char* p = getenv(var.c_str());
     if (p == 0)
