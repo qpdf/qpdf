@@ -9,6 +9,13 @@
 	OS-provided or insecure random number generation.  See
 	documentation for 5.1.0 for details.
 
+	* Add configure option --enable-os-secure-random (enabled by
+	default).  Pass --disable-os-secure-random or define
+	SKIP_OS_SECURE_RANDOM to avoid attempts to use the operating
+	system-provided secure random number generation.  This can be
+	especially useful on Windows if you wish to avoid any dependency
+	on Microsoft's cryptography system.
+
 2013-11-29  Jay Berkenbilt  <ejb@ql.org>
 
 	* If NO_GET_ENVIRONMENT is #defined, for Windows only,

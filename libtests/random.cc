@@ -1,4 +1,5 @@
 #include <qpdf/QUtil.hh>
+#include <qpdf/qpdf-config.h>
 #include <qpdf/InsecureRandomDataProvider.hh>
 #include <qpdf/SecureRandomDataProvider.hh>
 #include <iostream>
@@ -36,6 +37,7 @@ int main()
     {
         std::cout << "fail: two insecure randoms were the same\n";
     }
+#ifndef SKIP_OS_SECURE_RANDOM
     SecureRandomDataProvider srdp;
     srdp.provideRandomData(reinterpret_cast<unsigned char*>(&r1), 4);
     srdp.provideRandomData(reinterpret_cast<unsigned char*>(&r2), 4);
@@ -43,6 +45,7 @@ int main()
     {
         std::cout << "fail: two secure randoms were the same\n";
     }
+#endif
     BogusRandomDataProvider brdp;
     QUtil::setRandomDataProvider(&brdp);
     r1 = QUtil::random();

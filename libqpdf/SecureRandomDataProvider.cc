@@ -19,6 +19,22 @@ SecureRandomDataProvider::~SecureRandomDataProvider()
 {
 }
 
+#ifdef SKIP_OS_SECURE_RANDOM
+
+void
+SecureRandomDataProvider::provideRandomData(unsigned char* data, size_t len)
+{
+    throw std::logic_error("SecureRandomDataProvider::provideRandomData called when support was not compiled in");
+}
+
+RandomDataProvider*
+SecureRandomDataProvider::getInstance()
+{
+    return 0;
+}
+
+#else
+
 #ifdef _WIN32
 
 class WindowsCryptProvider
@@ -84,3 +100,5 @@ SecureRandomDataProvider::getInstance()
     static SecureRandomDataProvider instance;
     return &instance;
 }
+
+#endif

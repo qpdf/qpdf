@@ -1851,6 +1851,31 @@ outfile.pdf</option>
     preserved as clear-text if it is that way in the original file.
    </para>
   </sect1>
+  <sect1 id="ref.random-numbers">
+   <title>Random Number Generation</title>
+   <para>
+    QPDF generates random numbers to support generation of encrypted
+    data.  Versions prior to 5.0.1 used <function>random</function> or
+    <function>rand</function> from <filename>stdlib</filename> to
+    generate random numbers.  Version 5.0.1, if available, used
+    operating system-provided secure random number generation instead,
+    enabling use of <filename>stdlib</filename> random number
+    generation only if enabled by a compile-time option.  Starting in
+    version 5.1.0, use of insecure random numbers was disabled unless
+    enabled at compile time.  Starting in version 5.1.0, it is also
+    possible for you to disable use of OS-provided secure random
+    numbers.  This is especially useful on Windows if you want to
+    avoid a dependency on Microsoft's cryptography API.  In this case,
+    you must provide your own random data provider.  Regardless of how
+    you compile qpdf, starting in version 5.1.0, it is possible for
+    you to provide your own random data provider at runtime.  This
+    would enable you to use some software-based secure pseudorandom
+    number generator and to avoid use of whatever the operating system
+    provides.  For details on how to do this, please refer to the
+    top-level README file in the source distribution and to comments
+    in <filename>QUtil.hh</filename>.
+   </para>
+  </sect1>
   <sect1 id="ref.adding-and-remove-pages">
    <title>Adding and Removing Pages</title>
    <para>
