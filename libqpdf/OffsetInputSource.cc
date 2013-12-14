@@ -51,7 +51,9 @@ OffsetInputSource::rewind()
 size_t
 OffsetInputSource::read(char* buffer, size_t length)
 {
-    return this->proxied->read(buffer, length);
+    size_t result = this->proxied->read(buffer, length);
+    this->setLastOffset(this->proxied->getLastOffset() - global_offset);
+    return result;
 }
 
 void
