@@ -464,6 +464,7 @@ $td->runtest("object with zero offset",
              {$td->COMMAND => "qpdf --check zero-offset.pdf"},
              {$td->FILE => "zero-offset.out", $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
+# leading-junk also has a space instead of a newline after xref
 $td->runtest("check file with leading junk",
              {$td->COMMAND => "qpdf --check leading-junk.pdf"},
              {$td->FILE => "leading-junk.out", $td->EXIT_STATUS => 0},
