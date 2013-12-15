@@ -21,9 +21,12 @@
    figure out which ones should be converted to warnings and treating
    the stream as not filterable.
 
- * If possible, support user-pluggable stream filters.  This would
-   enable external code to provide interpretation for filters that are
-   missing from qpdf.
+ * Support user-pluggable stream filters.  This would enable external
+   code to provide interpretation for filters that are missing from
+   qpdf.  Make it possible for user-provided fitlers to override
+   built-in filters.  Make sure that the pluggable filters can be
+   prioritized so that we can poll all registered filters to see
+   whether they are capable of filtering a particular stream.
 
  * If possible, consider adding RLE, CCITT3, CCITT4, or any other easy
    filters.  For some reference code that we probably can't use but
