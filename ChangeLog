@@ -1,3 +1,10 @@
+2013-12-16  Jay Berkenbilt  <ejb@ql.org>
+
+	* Document and make explicit that passing null to
+	QUtil::setRandomDataProvider() resets the random data provider.
+
+	* Provide QUtil::getRandomDataProvider().
+
 2013-12-14  Jay Berkenbilt  <ejb@ql.org>
 
 	* Allow anyspace rather than just newline to follow xref header.

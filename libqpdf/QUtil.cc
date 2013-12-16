@@ -423,6 +423,8 @@ initialize_random_data_provider()
             random_data_provider = insecure_random_data_provider;
         }
     }
+    // QUtil.hh has comments indicating that getRandomDataProvider(),
+    // which calls this method, never returns null.
     if (random_data_provider == 0)
     {
         throw std::logic_error("QPDF has no random data provider");
@@ -433,6 +435,13 @@ void
 QUtil::setRandomDataProvider(RandomDataProvider* p)
 {
     random_data_provider = p;
+}
+
+RandomDataProvider*
+QUtil::getRandomDataProvider()
+{
+    initialize_random_data_provider();
+    return random_data_provider;
 }
 
 void

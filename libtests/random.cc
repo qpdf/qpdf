@@ -24,6 +24,7 @@ class BogusRandomDataProvider: public RandomDataProvider
 
 int main()
 {
+    RandomDataProvider* orig_rdp = QUtil::getRandomDataProvider();
     long r1 = QUtil::random();
     long r2 = QUtil::random();
     if (r1 == r2)
@@ -48,6 +49,11 @@ int main()
 #endif
     BogusRandomDataProvider brdp;
     QUtil::setRandomDataProvider(&brdp);
+    if (QUtil::getRandomDataProvider() != &brdp)
+    {
+        std::cout << "fail: getRandomDataProvider didn't"
+            " return our provider\n";
+    }
     r1 = QUtil::random();
     r2 = QUtil::random();
     if (r1 != r2)
@@ -62,6 +68,12 @@ int main()
            (buf[3] == 3)))
     {
         std::cout << "fail: bogus random didn't provide correct bytes\n";
+    }
+    QUtil::setRandomDataProvider(0);
+    if (QUtil::getRandomDataProvider() != orig_rdp)
+    {
+        std::cout << "fail: passing null to setRandomDataProvider "
+            "didn't reset the random data provider\n";
     }
     std::cout << "random: end of tests\n";
     return 0;
