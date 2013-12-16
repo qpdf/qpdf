@@ -237,13 +237,9 @@ QUtil::setLineBuf(FILE* f)
 char*
 QUtil::getWhoami(char* argv0)
 {
-#ifdef _WIN32
-    char pathsep = '\\';
-#else
-    char pathsep = '/';
-#endif
     char* whoami = 0;
-    if ((whoami = strrchr(argv0, pathsep)) == NULL)
+    if (((whoami = strrchr(argv0, '/')) == NULL) &&
+        ((whoami = strrchr(argv0, '\\')) == NULL))
     {
 	whoami = argv0;
     }
@@ -251,13 +247,13 @@ QUtil::getWhoami(char* argv0)
     {
 	++whoami;
     }
-#ifdef _WIN32
+
     if ((strlen(whoami) > 4) &&
 	(strcmp(whoami + strlen(whoami) - 4, ".exe") == 0))
     {
 	whoami[strlen(whoami) - 4] = '\0';
     }
-#endif
+
     return whoami;
 }
 

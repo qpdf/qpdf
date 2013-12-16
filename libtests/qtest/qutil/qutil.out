@@ -30,3 +30,8 @@ HAGOOGAMAGOOGLE: 0
 0x16059 -> f0 96 81 99
 0x7fffffff -> fd bf bf bf bf bf
 0x80000000: bounds error in QUtil::toUTF8
+----
+quack1
+quack2
+quack3
+quack4

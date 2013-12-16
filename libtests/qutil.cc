@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <qpdf/QUtil.hh>
+#include <qpdf/PointerHolder.hh>
 #include <string.h>
 
 #ifdef _WIN32
@@ -125,6 +126,20 @@ void to_utf8_test()
     }
 }
 
+void print_whoami(char const* str)
+{
+    PointerHolder<char> dup(true, QUtil::copy_string(str));
+    std::cout << QUtil::getWhoami(dup.getPointer()) << std::endl;
+}
+
+void get_whoami_test()
+{
+    print_whoami("a/b/c/quack1");
+    print_whoami("a/b/c/quack2.exe");
+    print_whoami("a\\b\\c\\quack3");
+    print_whoami("a\\b\\c\\quack4.exe");
+}
+
 int main(int argc, char* argv[])
 {
     try
@@ -138,6 +153,8 @@ int main(int argc, char* argv[])
 	getenv_test();
 	std::cout << "----" << std::endl;
 	to_utf8_test();
+	std::cout << "----" << std::endl;
+	get_whoami_test();
     }
     catch (std::exception& e)
     {
