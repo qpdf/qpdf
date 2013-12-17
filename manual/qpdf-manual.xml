@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "5.0.1">
-<!ENTITY lastreleased "October 18, 2013">
+<!ENTITY swversion "5.1.0">
+<!ENTITY lastreleased "December 17, 2013">
 ]>
 <book>
  <bookinfo>
@@ -2665,6 +2665,43 @@ print "\n";
    <filename>ChangeLog</filename> in the source distribution.
   </para>
   <variablelist>
+   <varlistentry>
+    <term>5.1.0: December 17, 2013</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Added runtime option
+        (<function>QUtil::setRandomDataProvider</function>) to supply
+        your own random data provider.  You can use this if you want
+        to avoid using the OS-provided secure random number generation
+        facility or stdlib's less secure version.  See comments in
+        include/qpdf/QUtil.hh for details.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Fixed image comparison tests to not create 12-bit-per-pixel
+        images since some versions of tiffcmp have bugs in comparing
+        them in some cases.  This increases the disk space required by
+        the image comparison tests, which are off by default anyway.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Introduce a number of small fixes for compilation on the
+        latest clang in MacOS and the latest Visual C++ in Windows.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Be able to handle broken files that end the xref table header
+        with a space instead of a newline.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
     <term>5.0.1: October 18, 2013</term>
     <listitem>

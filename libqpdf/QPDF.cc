@@ -20,7 +20,7 @@
 #include <qpdf/QPDF_Null.hh>
 #include <qpdf/QPDF_Dictionary.hh>
 
-std::string QPDF::qpdf_version = "5.0.1";
+std::string QPDF::qpdf_version = "5.1.0";
 
 static char const* EMPTY_PDF =
     "%PDF-1.3\n"

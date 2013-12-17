@@ -1,3 +1,7 @@
+2013-12-17  Jay Berkenbilt  <ejb@ql.org>
+
+	* 5.1.0: release
+
 2013-12-16  Jay Berkenbilt  <ejb@ql.org>
 
 	* Document and make explicit that passing null to
