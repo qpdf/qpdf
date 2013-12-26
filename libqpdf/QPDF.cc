@@ -1755,6 +1755,11 @@ QPDF::reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier,
             QTC::TC("qpdf", "QPDF loop reserving objects");
             return;
         }
+        if (obj_copier.object_map.find(foreign_og) != obj_copier.object_map.end())
+        {
+            QTC::TC("qpdf", "QPDF already reserved object");
+            return;
+        }
         QTC::TC("qpdf", "QPDF copy indirect");
         obj_copier.visiting.insert(foreign_og);
         std::map<QPDFObjGen, QPDFObjectHandle>::iterator mapping =

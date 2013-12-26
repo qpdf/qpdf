@@ -1,3 +1,11 @@
+2013-12-26  Jay Berkenbilt  <ejb@ql.org>
+
+	* Bug fix: when copying foreign objects (which occurs during page
+	splitting among other cases), avoid traversing the same object
+	more than once if it appears more than once in the same direct
+	object.  This bug is performance-only and does not affect the
+	actual output.
+
 2013-12-17  Jay Berkenbilt  <ejb@ql.org>
 
 	* 5.1.0: release
