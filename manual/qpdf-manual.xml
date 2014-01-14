@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "5.1.0">
-<!ENTITY lastreleased "December 17, 2013">
+<!ENTITY swversion "5.1.1">
+<!ENTITY lastreleased "December 17, 2014">
 ]>
 <book>
  <bookinfo>
@@ -2666,6 +2666,21 @@ print "\n";
   </para>
   <variablelist>
    <varlistentry>
+    <term>5.1.1: January 14, 2014</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Performance fix: copying foreign objects could be very slow
+        with certain types of files.  This was most likely to be
+        visible during page splitting and was due to traversing the
+        same objects multiple times in some cases.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
     <term>5.1.0: December 17, 2013</term>
     <listitem>
      <itemizedlist>
@@ -3144,8 +3159,6 @@ print "\n";
      </itemizedlist>
     </listitem>
    </varlistentry>
-  </variablelist>
-  <variablelist>
    <varlistentry>
     <term>3.0.2: September 6, 2012</term>
     <listitem>
@@ -3170,8 +3183,6 @@ print "\n";
      </itemizedlist>
     </listitem>
    </varlistentry>
-  </variablelist>
-  <variablelist>
    <varlistentry>
     <term>3.0.1: August 11, 2012</term>
     <listitem>
@@ -3195,8 +3206,6 @@ print "\n";
      </itemizedlist>
     </listitem>
    </varlistentry>
-  </variablelist>
-  <variablelist>
    <varlistentry>
     <term>3.0.0: August 2, 2012</term>
     <listitem>
@@ -3351,8 +3360,6 @@ print "\n";
      </itemizedlist>
     </listitem>
    </varlistentry>
-  </variablelist>
-  <variablelist>
    <varlistentry>
     <term>2.3.1: December 28, 2011</term>
     <listitem>
@@ -3450,8 +3457,6 @@ print "\n";
      </itemizedlist>
     </listitem>
    </varlistentry>
-  </variablelist>
-  <variablelist>
    <varlistentry>
     <term>2.2.4: June 25, 2011</term>
     <listitem>

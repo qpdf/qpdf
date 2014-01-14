@@ -1,3 +1,7 @@
+2014-01-14  Jay Berkenbilt  <ejb@ql.org>
+
+	* 5.1.1: release
+
 2013-12-26  Jay Berkenbilt  <ejb@ql.org>
 
 	* Bug fix: when copying foreign objects (which occurs during page
