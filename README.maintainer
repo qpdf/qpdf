@@ -69,8 +69,8 @@ Release Reminders
  * Check TODO file to make sure all planned items for the release are
    done or retargeted.
 
- * Each year, update copyright notices.  Just search for Copyright.
-   Last updated: 2013.
+ * Each year, update copyright notices.  Just do a case-insensitive
+   search for copyright.  Last updated: 2014.
 
  * To construct a source distribution from a pristine checkout,
    make_dist does the following:
