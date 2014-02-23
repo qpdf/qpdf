@@ -2447,7 +2447,7 @@ QPDFWriter::writeXRefStream(int xref_id, int max_id, qpdf_offset_t max_offset,
     qpdf_offset_t space_before_zero = xref_offset - 1;
 
     // field 1 contains offsets and object stream identifiers
-    int f1_size = std::max(bytesNeeded(max_offset),
+    int f1_size = std::max(bytesNeeded(max_offset + hint_length),
 			   bytesNeeded(max_id));
 
     // field 2 contains object stream indices

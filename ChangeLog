@@ -1,3 +1,10 @@
+2014-02-22  Jay Berkenbilt  <ejb@ql.org>
+
+	* Bug fix: if the last object in the first part of a linearized
+	file had an offset that was below 65536 by less than the size of
+	the hint stream, the xref stream was invalid and the resulting file
+	is not usable.  This is now fixed.
+
 2014-01-14  Jay Berkenbilt  <ejb@ql.org>
 
 	* 5.1.1: release
