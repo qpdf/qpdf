@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "5.1.1">
-<!ENTITY lastreleased "December 17, 2014">
+<!ENTITY swversion "5.1.2">
+<!ENTITY lastreleased "June 7, 2014">
 ]>
 <book>
  <bookinfo>
@@ -2665,6 +2665,42 @@ print "\n";
    <filename>ChangeLog</filename> in the source distribution.
   </para>
   <variablelist>
+   <varlistentry>
+    <term>5.1.2: June 7, 2014</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Bug fix: linearizing files could create a corrupted output
+        file under extremely unlikely file size circumstances. See
+        ChangeLog for details. The odds of getting hit by this are
+        very low, though one person did.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Bug fix: qpdf would fail to write files that had streams with
+        decode parameters referencing other streams.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        New example program: <command>pdf-split-pages</command>:
+        efficiently split PDF files into individual pages. The example
+        program does this more efficiently than using <command>qpdf
+        --pages</command> to do it.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Packaging fix: Visual C++ binaries did not support Windows XP.
+        This has been rectified by updating the compilers used to
+        generate the release binaries.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
     <term>5.1.1: January 14, 2014</term>
     <listitem>
