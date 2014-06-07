@@ -1,5 +1,7 @@
 2014-06-07  Jay Berkenbilt  <ejb@ql.org>
 
+	* MS Visual C++ build: explicitly target Windows 5.0.1 (XP)
+
 	* New example program: pdf-split-pages: efficiently split PDF
 	files into individual pages.
 

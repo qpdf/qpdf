@@ -66,7 +66,7 @@ endef
 # Usage: $(call makelib,objs,library,ldflags,libs,current,revision,age)
 define makelib
 	cl /nologo /O2 /Zi /Gy /EHsc /MD /LD /Fe$(basename $(2))$(shell expr $(5) - $(7)).dll $(1) \
-		/link /incremental:no \
+		/link /SUBSYSTEM:CONSOLE,5.01 /incremental:no \
 		$(foreach L,$(subst -L,,$(3)),/LIBPATH:$(L)) \
 		$(foreach L,$(subst -l,,$(4)),$(L).lib)
 	if [ -f $(basename $(2))$(shell expr $(5) - $(7)).dll.manifest ]; then \
@@ -80,7 +80,7 @@ endef
 # Usage: $(call makebin,objs,binary,ldflags,libs)
 define makebin
 	cl /nologo /O2 /Zi /Gy /EHsc /MD $(1) \
-		/link /incremental:no /OUT:$(2) \
+		/link /SUBSYSTEM:CONSOLE,5.01 /incremental:no /OUT:$(2) \
 		$(foreach L,$(subst -L,,$(3)),/LIBPATH:$(L)) \
 		$(foreach L,$(subst -l,,$(4)),$(L).lib)
 	if [ -f $(2).manifest ]; then \
