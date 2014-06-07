@@ -2051,11 +2051,14 @@ QPDFWriter::prepareFileForWrite()
 	{
             bool is_stream = false;
             bool is_root = false;
+            bool filterable = false;
 	    QPDFObjectHandle dict = node;
 	    if (node.isStream())
 	    {
                 is_stream = true;
 		dict = node.getDict();
+                // See whether we are able to filter this stream.
+                filterable = node.pipeStreamData(0, true, false, false);
 	    }
             else if (pdf.getRoot().getObjectID() == node.getObjectID())
             {
@@ -2073,8 +2076,9 @@ QPDFWriter::prepareFileForWrite()
                 {
                     if (oh.isIndirect() &&
                         ((key == "/Length") ||
-                         (key == "/Filter") ||
-                         (key == "/DecodeParms")))
+                         (filterable &&
+                          ((key == "/Filter") ||
+                           (key == "/DecodeParms")))))
                     {
                         QTC::TC("qpdf", "QPDFWriter make stream key direct");
                         add_to_queue = false;

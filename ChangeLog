@@ -1,3 +1,10 @@
+2014-06-07  Jay Berkenbilt  <ejb@ql.org>
+
+	* Bug fix: don't fail on files that contain streams where /Filter
+	or /DecodeParms references a stream. Before, qpdf would try to
+	convert these to direct objects, which would fail because of the
+	stream.
+
 2014-02-22  Jay Berkenbilt  <ejb@ql.org>
 
 	* Bug fix: if the last object in the first part of a linearized
