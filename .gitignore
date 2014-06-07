@@ -1,3 +1,5 @@
+*.pdb
+.lineno
 aclocal.m4
 autoconf.mk
 autofiles.zip
