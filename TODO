@@ -1,3 +1,51 @@
+Small, command-line tool only enhancements to do soon
+=====================================================
+
+ * Handle input file = output file as a special case. See issue 29.
+   Behavior: detect if output file is the same as one of the input
+   files. If so, refuse to operate unless --allow-overwrite is
+   specified. In that case, write to a temporary file and, if there
+   are no errors or warnings, rename the temporary output file over
+   the input file. If rename fails, delete the temporary file.
+
+ * Consider providing alternative methods for specifying passwords.
+   The methods should be general enough to use for both encryption and
+   decryption passwords. Example methods could be reading the password
+   from a file, a file descriptor, or prompting. Prompting should
+   never be done with being specifically requested though; we don't
+   want to create a situation where running qpdf might block waiting
+   for input where it previously did not. Test case: encrypt an
+   encrypted file with the output file having different user/owner
+   passwords. Make sure we have a predictable way to read all three
+   passwords (input, output user, output owner). Maybe we have
+   something like --password-source=<method>:<which>,... where method could
+   be file=/path, fd=n, or prompt and which could be one of input,
+   user, owner. If a password source is provided for input, it takes
+   precedence over --password if specified later on the command line.
+   If a password source is specified for output passwords, the
+   corresponding passwords must be '-'. If more than one password is
+   read from the same source, passwords are newline separated.
+   Trailing newlines are ignored. Example:
+
+   qpdf --password-source=fd=3:input,owner a.pdf b.pdf
+
+   would read two lines from file descriptor 3. The first would the
+   password for reading a.pdf, and the second would be the owner
+   password for b.pdf. The encryption arguments would specify the
+   actual user password for b.pdf and - as the owner password.
+
+   qpdf --password-source=file=/tmp/a:input --password=source=prompt:user,owner
+
+   would read the input file from /tmp/a and would prompt twice: one
+   for the user password and once for the owner password.
+
+ * Consider adding "uninstall" target to makefile. It should only
+   uninstall what it installed, which means that you must run
+   uninstall from the version you ran install with. It would only be
+   supported for the toolchains that support the install target
+   (libtool).
+
+
 5.2.0
 =====
 
@@ -69,6 +117,10 @@
 
 General
 =======
+
+ * Figure out how to find Visual Studio in Windows registry and see if
+   I can get it to work with make so I can simplify creation of
+   Windows releases.
 
  * Provide support in QPDFWriter for writing incremental updates.
    Provide support in qpdf for preserving incremental updates.  The
