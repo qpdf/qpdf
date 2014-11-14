@@ -1,3 +1,11 @@
+2014-11-14  Jay Berkenbilt  <ejb@ql.org>
+
+	* Bug fix: QPDFObjectHandle::getPageContents() no longer throws an
+	exception when called on a page that has no /Contents key in its
+	dictionary. This is allowed by the spec, and some software
+	packages generate files like this for pages that are blank in the
+	original.
+
 2014-06-07  Jay Berkenbilt  <ejb@ql.org>
 
 	* 5.1.2: release

@@ -633,7 +633,7 @@ QPDFObjectHandle::getPageContents()
     {
 	result.push_back(contents);
     }
-    else
+    else if (! contents.isNull())
     {
 	throw std::runtime_error("unknown object type inspecting /Contents "
 				 "key in page dictionary");
