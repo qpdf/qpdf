@@ -1,3 +1,11 @@
+2014-12-01  Jay Berkenbilt  <ejb@ql.org>
+
+	* Some broken PDF files lack the required /Type key for /Page and
+	/Pages nodes in the page dictionary. QPDF now uses other methods
+	to figure out what kind of node it is looking at so that it can
+	handle those files. Original reported at
+	https://bugs.launchpad.net/ubuntu/+source/qpdf/+bug/1397413
+
 2014-11-14  Jay Berkenbilt  <ejb@ql.org>
 
 	* Bug fix: QPDFObjectHandle::getPageContents() no longer throws an

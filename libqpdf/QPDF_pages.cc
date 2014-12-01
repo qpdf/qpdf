@@ -56,7 +56,20 @@ void
 QPDF::getAllPagesInternal(QPDFObjectHandle cur_pages,
 			  std::vector<QPDFObjectHandle>& result)
 {
-    std::string type = cur_pages.getKey("/Type").getName();
+    std::string type;
+    QPDFObjectHandle type_key = cur_pages.getKey("/Type");
+    if (type_key.isName())
+    {
+        type = type_key.getName();
+    }
+    else if (cur_pages.hasKey("/Kids"))
+    {
+        type = "/Pages";
+    }
+    else
+    {
+        type = "/Page";
+    }
     if (type == "/Pages")
     {
 	QPDFObjectHandle kids = cur_pages.getKey("/Kids");

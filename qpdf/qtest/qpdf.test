@@ -199,7 +199,7 @@ $td->runtest("remove page we don't have",
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 73;
+$n_tests += 74;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -557,6 +557,10 @@ $td->runtest("check file",
 $td->runtest("handle page no with contents",
              {$td->COMMAND => "qpdf --show-pages page-no-content.pdf"},
              {$td->FILE => "page-no-content.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("no type key for page nodes",
+             {$td->COMMAND => "qpdf --check no-pages-types.pdf"},
+             {$td->FILE => "no-pages-types.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 show_ntests();
