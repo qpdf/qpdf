@@ -428,7 +428,9 @@ QPDF::compute_encryption_key_from_password(
     }
     MD5::Digest digest;
     iterate_md5_digest(md5, digest, ((data.getR() >= 3) ? 50 : 0));
-    return std::string(reinterpret_cast<char*>(digest), data.getLengthBytes());
+    return std::string(reinterpret_cast<char*>(digest),
+                       std::min(static_cast<int>(sizeof(digest)),
+                                data.getLengthBytes()));
 }
 
 static void
