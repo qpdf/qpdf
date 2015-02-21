@@ -966,7 +966,9 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 		std::string const& value = token.getValue();
 		if ((value == "R") && (in_array || in_dictionary) &&
 		    (olist.size() >= 2) &&
+                    (! olist.at(olist.size() - 1).isIndirect()) &&
 		    (olist.at(olist.size() - 1).isInteger()) &&
+                    (! olist.at(olist.size() - 2).isIndirect()) &&
 		    (olist.at(olist.size() - 2).isInteger()))
 		{
                     if (context == 0)

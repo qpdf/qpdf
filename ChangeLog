@@ -1,3 +1,11 @@
+2015-02-21  Jay Berkenbilt  <ejb@ql.org>
+
+	* Ensure that arguments to "R" when parsing the file are direct
+	objects before trying to resolve them. This prevents specially
+	crafted files from causing qpdf to crash with a stack overflow.
+	Thanks to Gynvael Coldwind and Mateusz Jurczyk of the Google
+	Security Team for providing a sample file with this problem.
+
 2014-12-01  Jay Berkenbilt  <ejb@ql.org>
 
 	* Some broken PDF files lack the required /Type key for /Page and
