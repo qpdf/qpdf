@@ -174,6 +174,30 @@ QPDF::pushInheritedAttributesToPageInternal(
     std::vector<QPDFObjectHandle>& pages,
     bool allow_changes, bool warn_skipped_keys)
 {
+    std::set<QPDFObjGen> visited;
+    pushInheritedAttributesToPageInternal2(
+        cur_pages, key_ancestors, pages, allow_changes,
+        warn_skipped_keys, visited);
+}
+
+void
+QPDF::pushInheritedAttributesToPageInternal2(
+    QPDFObjectHandle cur_pages,
+    std::map<std::string, std::vector<QPDFObjectHandle> >& key_ancestors,
+    std::vector<QPDFObjectHandle>& pages,
+    bool allow_changes, bool warn_skipped_keys,
+    std::set<QPDFObjGen>& visited)
+{
+    QPDFObjGen this_og = cur_pages.getObjGen();
+    if (visited.count(this_og) > 0)
+    {
+        throw QPDFExc(
+            qpdf_e_pages, this->file->getName(),
+            this->last_object_description, 0,
+            "Loop detected in /Pages structure (inherited attributes)");
+    }
+    visited.insert(this_og);
+
     // Extract the underlying dictionary object
     std::string type = cur_pages.getKey("/Type").getName();
 
@@ -259,9 +283,9 @@ QPDF::pushInheritedAttributesToPageInternal(
 	int n = kids.getArrayNItems();
 	for (int i = 0; i < n; ++i)
 	{
-            pushInheritedAttributesToPageInternal(
+            pushInheritedAttributesToPageInternal2(
                 kids.getArrayItem(i), key_ancestors, pages,
-                allow_changes, warn_skipped_keys);
+                allow_changes, warn_skipped_keys, visited);
 	}
 
 	// For each inheritable key, pop the stack.  If the stack
@@ -318,6 +342,7 @@ QPDF::pushInheritedAttributesToPageInternal(
 		      this->file->getLastOffset(),
 		      "invalid Type " + type + " in page tree");
     }
+    visited.erase(this_og);
 }
 
 void

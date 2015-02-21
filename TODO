@@ -1,6 +1,9 @@
 5.2.0
 =====
 
+ * Before release: remember to bump minor shared library version since
+   new methods were added (even though private).
+
  * Figure out what about a3576a73593987b26cd3eff346f8f7c11f713cbd
    broke binary compatibility.
 

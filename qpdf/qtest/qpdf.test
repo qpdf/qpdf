@@ -199,7 +199,7 @@ $td->runtest("remove page we don't have",
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 75;
+$n_tests += 76;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -565,6 +565,10 @@ $td->runtest("no type key for page nodes",
 $td->runtest("ensure arguments to R are direct",
              {$td->COMMAND => "qpdf --check indirect-r-arg.pdf"},
              {$td->FILE => "indirect-r-arg.out", $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("detect loops in pages structure",
+             {$td->COMMAND => "qpdf --check pages-loop.pdf"},
+             {$td->FILE => "pages-loop.out", $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 
 show_ntests();

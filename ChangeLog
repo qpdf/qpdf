@@ -1,5 +1,9 @@
 2015-02-21  Jay Berkenbilt  <ejb@ql.org>
 
+	* Detect loops in Pages structure. Thanks to Gynvael Coldwind and
+	Mateusz Jurczyk of the Google Security Team for providing a sample
+	file with this problem.
+
 	* Prevent buffer overrun when converting a password to an
 	encryption key. Thanks to Gynvael Coldwind and Mateusz Jurczyk of
 	the Google Security Team for providing a sample file with this

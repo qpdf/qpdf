@@ -668,6 +668,9 @@ class QPDF
 
     void getAllPagesInternal(QPDFObjectHandle cur_pages,
 			     std::vector<QPDFObjectHandle>& result);
+    void getAllPagesInternal2(QPDFObjectHandle cur_pages,
+                              std::vector<QPDFObjectHandle>& result,
+                              std::set<QPDFObjGen>& visited);
     void insertPage(QPDFObjectHandle newpage, int pos);
     int findPage(QPDFObjGen const& og);
     int findPage(QPDFObjectHandle& page);
@@ -1023,6 +1026,12 @@ class QPDF
 	std::map<std::string, std::vector<QPDFObjectHandle> >&,
 	std::vector<QPDFObjectHandle>& all_pages,
 	bool allow_changes, bool warn_skipped_keys);
+    void pushInheritedAttributesToPageInternal2(
+	QPDFObjectHandle,
+	std::map<std::string, std::vector<QPDFObjectHandle> >&,
+	std::vector<QPDFObjectHandle>& all_pages,
+	bool allow_changes, bool warn_skipped_keys,
+        std::set<QPDFObjGen>& visited);
     void updateObjectMaps(ObjUser const& ou, QPDFObjectHandle oh);
     void updateObjectMapsInternal(ObjUser const& ou, QPDFObjectHandle oh,
 				  std::set<QPDFObjGen>& visited, bool top);
