@@ -1,5 +1,7 @@
 2015-05-24  Jay Berkenbilt  <ejb@ql.org>
 
+	* 5.1.3: release
+
 	* Bug fix: fix-qdf was not handling object streams with more than
 	255 objects in them.
 
