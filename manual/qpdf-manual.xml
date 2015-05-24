@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "5.1.2">
-<!ENTITY lastreleased "June 7, 2014">
+<!ENTITY swversion "5.1.3">
+<!ENTITY lastreleased "May 24, 2015">
 ]>
 <book>
  <bookinfo>
@@ -2665,6 +2665,47 @@ print "\n";
    <filename>ChangeLog</filename> in the source distribution.
   </para>
   <variablelist>
+   <varlistentry>
+    <term>5.1.3: May 24, 2015</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Bug fix: fix-qdf was not properly handling files that
+        contained object streams with more than 255 objects in them.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Bug fix: qpdf was not properly initializing Microsoft's secure
+        crypto provider on fresh Windows installations that had not
+        had any keys created yet.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Fix a few errors found by Gynvael Coldwind and
+	Mateusz Jurczyk of the Google Security Team. Please see the
+        ChangeLog for details.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Properly handle pages that have no contents at all. There were
+        many cases in which qpdf handled this fine, but a few methods
+        blindly obtained page contents with handling the possibility
+        that there were no contents.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Make qpdf more robust for a few more kinds of problems that
+        may occur in invalid PDF files.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
     <term>5.1.2: June 7, 2014</term>
     <listitem>
