@@ -70,7 +70,7 @@ Release Reminders
    done or retargeted.
 
  * Each year, update copyright notices.  Just do a case-insensitive
-   search for copyright.  Last updated: 2014.
+   search for copyright.  Last updated: 2015.
 
  * To construct a source distribution from a pristine checkout,
    make_dist does the following:
