@@ -1993,7 +1993,7 @@ compare_pdfs("inline-images-cr.pdf", "a.pdf");
 show_ntests();
 # ----------
 $td->notify("--- fix-qdf Tests ---");
-$n_tests += 4;
+$n_tests += 5;
 
 for (my $n = 1; $n <= 2; ++$n)
 {
@@ -2007,6 +2007,10 @@ for (my $n = 1; $n <= 2; ++$n)
 		 {$td->FILE => "fix$n.qdf.out",
 		  $td->EXIT_STATUS => 0});
 }
+$td->runtest("fix-qdf with big object stream", # > 255 objects in a stream
+             {$td->COMMAND => "fix-qdf big-ostream.pdf"},
+             {$td->FILE => "big-ostream.pdf",
+              $td->EXIT_STATUS => 0});
 
 show_ntests();
 # ----------

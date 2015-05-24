@@ -1,5 +1,8 @@
 2015-05-24  Jay Berkenbilt  <ejb@ql.org>
 
+	* Bug fix: fix-qdf was not handling object streams with more than
+	255 objects in them.
+
 	* Handle Microsoft crypt provider initialization properly for case
 	where no keys have been previously created, such as in a fresh
 	Windows installation.

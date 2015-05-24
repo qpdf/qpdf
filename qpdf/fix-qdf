@@ -53,6 +53,7 @@ my $stream_start = 0;
 my $stream_length = 0;
 my $xref_offset = 0;
 my $xref_f1_nbytes = 0;
+my $xref_f2_nbytes = 0;
 my $xref_size = 0;
 
 my $cur_state = 0;
@@ -122,11 +123,28 @@ while (defined($line = get_line()))
 		$t >>= 8;
 		++$xref_f1_nbytes;
 	    }
-	    my $esize = $xref_f1_nbytes + 2;
+            # Figure out how many bytes we need for ostream index.
+            # Make sure we get at least 1 byte even if there are no
+            # object streams.
+            my $max_objects = 1;
+            foreach my $e (@xref)
+            {
+                my ($type, $f1, $f2) = @$e;
+                if ((defined $f2) && ($f2 > $max_objects))
+                {
+                    $max_objects = $f2;
+                }
+            }
+            while ($max_objects)
+            {
+                $max_objects >>=8;
+                ++$xref_f2_nbytes;
+            }
+	    my $esize = 1 + $xref_f1_nbytes + $xref_f2_nbytes;
 	    $xref_size = 1 + @xref;
 	    my $length = $xref_size * $esize;
 	    print "  /Length $length\n";
-	    print "  /W [ 1 $xref_f1_nbytes 1 ]\n";
+	    print "  /W [ 1 $xref_f1_nbytes $xref_f2_nbytes ]\n";
 	    $state = $st_in_xref_stream_dict;
 	}
     }
@@ -200,19 +218,25 @@ while (defined($line = get_line()))
 	}
 	if ($line =~ m/^stream\n/)
 	{
-	    my $pack = "(C C$xref_f1_nbytes C)";
+	    my $pack = "(C C$xref_f1_nbytes C$xref_f2_nbytes)";
 	    print pack($pack, 0, 0, 0);
 	    foreach my $x (@xref)
 	    {
 		my ($type, $f1, $f2) = @$x;
 		$f2 = 0 unless defined $f2;
-		my @f1 = ();
-		for (my $i = 0; $i < $xref_f1_nbytes; ++$i)
-		{
-		    unshift(@f1, $f1 & 0xff);
-		    $f1 >>= 8;
-		}
-		print pack($pack, $type, @f1, $f2);
+                my @f1 = ();
+                my @f2 = ();
+                foreach my $d ([\@f1, $f1, $xref_f1_nbytes],
+                               [\@f2, $f2, $xref_f2_nbytes])
+                {
+                    my ($fa, $f, $nbytes) = @$d;
+                    for (my $i = 0; $i < $nbytes; ++$i)
+                    {
+                        unshift(@$fa, $f & 0xff);
+                        $f >>= 8;
+                    }
+                }
+		print pack($pack, $type, @f1, @f2);
 	    }
 	    print "\nendstream\nendobj\n\n";
 	    print "startxref\n$xref_offset\n\%\%EOF\n";
