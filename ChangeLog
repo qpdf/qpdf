@@ -1,5 +1,9 @@
 2015-05-24  Jay Berkenbilt  <ejb@ql.org>
 
+	* Handle Microsoft crypt provider initialization properly for case
+	where no keys have been previously created, such as in a fresh
+	Windows installation.
+
 	* Include time.h in QUtil.hh for time_t
 
 2015-02-21  Jay Berkenbilt  <ejb@ql.org>

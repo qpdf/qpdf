@@ -42,9 +42,40 @@ class WindowsCryptProvider
   public:
     WindowsCryptProvider()
     {
-        if (! CryptAcquireContext(&crypt_prov, NULL, NULL, PROV_RSA_FULL, 0))
+        if (!CryptAcquireContext(&crypt_prov,
+                                 "Container",
+                                 NULL,
+                                 PROV_RSA_FULL,
+                                 0))
         {
-            throw std::runtime_error("unable to acquire crypt context");
+#ifdef __GNUC__
+# if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406
+#           pragma GCC diagnostic push
+#           pragma GCC diagnostic ignored "-Wold-style-cast"
+#           pragma GCC diagnostic ignored "-Wsign-compare"
+# endif
+#endif
+            if (GetLastError() == NTE_BAD_KEYSET)
+#ifdef __GNUC__
+# if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406
+#           pragma GCC diagnostic pop
+# endif
+#endif
+            {
+                if (! CryptAcquireContext(&crypt_prov,
+                                         "Container",
+                                         NULL,
+                                         PROV_RSA_FULL,
+                                         CRYPT_NEWKEYSET))
+                {
+                    throw std::runtime_error(
+                        "unable to acquire crypt context with new keyset");
+                }
+            }
+            else
+            {
+                throw std::runtime_error("unable to acquire crypt context");
+            }
         }
     }
     ~WindowsCryptProvider()
