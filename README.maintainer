@@ -157,3 +157,18 @@ If you want to run make maintainer-clean or make distclean and you
 haven't run ./configure, you can pass CLEAN=1 to make on the command
 line to prevent it from complaining about configure not having been
 run.
+
+Local Windows Testing Procedure
+===============================
+
+This is what I do for routine testing on Windows.
+
+From Linux, run ./autogen.sh and make autofiles.zip
+
+From Windows in git bash, git clone from my Linux clone, unzip
+external-libs, and unzip autofiles.zip.
+
+Look at make_windows_releases. Set up path the same way and run
+whichever ./config-* is appropriate for whichever compiler I need to
+test with. Run from msys started from one of the visual studio command
+line shells. The build doesn't work from git bash on my local system.
