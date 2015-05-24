@@ -1,3 +1,7 @@
+2015-05-24  Jay Berkenbilt  <ejb@ql.org>
+
+	* Include time.h in QUtil.hh for time_t
+
 2015-02-21  Jay Berkenbilt  <ejb@ql.org>
 
 	* Detect loops in Pages structure. Thanks to Gynvael Coldwind and
