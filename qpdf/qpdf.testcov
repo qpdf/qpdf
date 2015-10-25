@@ -269,3 +269,7 @@ qpdf pages range omitted at end 0
 qpdf pages range omitted in middle 0
 qpdf npages 0
 QPDF already reserved object 0
+QPDFWriter standard deterministic ID 1
+QPDFWriter linearized deterministic ID 1
+QPDFWriter deterministic with no data 0
+qpdf-c called qpdf_set_deterministic_ID 0

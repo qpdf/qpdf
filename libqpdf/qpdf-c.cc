@@ -512,6 +512,12 @@ void qpdf_set_qdf_mode(qpdf_data qpdf, QPDF_BOOL value)
     qpdf->qpdf_writer->setQDFMode(value);
 }
 
+void qpdf_set_deterministic_ID(qpdf_data qpdf, QPDF_BOOL value)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_set_deterministic_ID");
+    qpdf->qpdf_writer->setDeterministicID(value);
+}
+
 void qpdf_set_static_ID(qpdf_data qpdf, QPDF_BOOL value)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_set_static_ID");

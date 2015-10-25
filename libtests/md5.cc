@@ -45,6 +45,13 @@ int main(int, char*[])
 
     Pl_Discard d;
     Pl_MD5 p("MD5", &d);
+    // Create a second pipeline, protect against finish, and call
+    // getHexDigest only once at the end of both passes. Make sure the
+    // checksum is that of the input file concatenated to itself. This
+    // will require changes to Pl_MD5.cc to prevent finish from
+    // calling finalize.
+    Pl_MD5 p2("MD5", &d);
+    p2.persistAcrossFinish(true);
     for (int i = 0; i < 2; ++i)
     {
 	FILE* f = QUtil::safe_fopen("md5.in", "rb");
@@ -61,12 +68,23 @@ int main(int, char*[])
             else
             {
                 p.write(buf, len);
+                p2.write(buf, len);
+                if (i == 1)
+                {
+                    // Partial digest -- resets after each call to write
+                    std::cout << p.getHexDigest() << std::endl;
+                }
             }
         }
         fclose(f);
         p.finish();
+        p2.finish();
+        // Make sure calling getHexDigest twice with no intervening
+        // writes results in the same result each time.
+        std::cout << p.getHexDigest() << std::endl;
         std::cout << p.getHexDigest() << std::endl;
     }
+    std::cout << p2.getHexDigest() << std::endl;
 
     return 0;
 }

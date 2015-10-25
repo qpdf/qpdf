@@ -1,3 +1,9 @@
+2015-10-29  Jay Berkenbilt  <ejb@ql.org>
+
+	* Implement QPDFWriter::setDeterministicID and --deterministic-id
+	commandline-flag to qpdf to request generation of a deterministic
+	/ID for non-encrypted files.
+
 2015-05-24  Jay Berkenbilt  <ejb@ql.org>
 
 	* 5.1.3: release

@@ -9,6 +9,7 @@
 #include <qpdf/Pl_AES_PDF.hh>
 #include <qpdf/Pl_Flate.hh>
 #include <qpdf/Pl_PNGFilter.hh>
+#include <qpdf/Pl_MD5.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/MD5.hh>
 #include <qpdf/RC4.hh>
@@ -77,6 +78,8 @@ QPDFWriter::init()
     cur_stream_length = 0;
     added_newline = false;
     max_ostream_index = 0;
+    deterministic_id = false;
+    md5_pipeline = 0;
 }
 
 QPDFWriter::~QPDFWriter()
@@ -261,6 +264,12 @@ void
 QPDFWriter::setStaticID(bool val)
 {
     this->static_id = val;
+}
+
+void
+QPDFWriter::setDeterministicID(bool val)
+{
+    this->deterministic_id = val;
 }
 
 void
@@ -507,10 +516,10 @@ void
 QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
 {
     this->preserve_encryption = false;
-    generateID();
     QPDFObjectHandle trailer = qpdf.getTrailer();
     if (trailer.hasKey("/Encrypt"))
     {
+        generateID();
         this->id1 =
             trailer.getKey("/ID").getArrayItem(0).getStringValue();
 	QPDFObjectHandle encrypt = trailer.getKey("/Encrypt");
@@ -864,6 +873,10 @@ QPDFWriter::popPipelineStack(PointerHolder<Buffer>* bp)
     while (dynamic_cast<Pl_Count*>(this->pipeline_stack.back()) == 0)
     {
 	Pipeline* p = this->pipeline_stack.back();
+        if (dynamic_cast<Pl_MD5*>(p) == this->md5_pipeline)
+        {
+            this->md5_pipeline = 0;
+        }
 	this->pipeline_stack.pop_back();
 	Pl_Buffer* buf = dynamic_cast<Pl_Buffer*>(p);
 	if (bp && buf)
@@ -919,6 +932,36 @@ QPDFWriter::pushDiscardFilter()
 {
     pushPipeline(new Pl_Discard());
     activatePipelineStack();
+}
+
+void
+QPDFWriter::pushMD5Pipeline()
+{
+    if (! this->id2.empty())
+    {
+        // Can't happen in the code
+        throw std::logic_error(
+            "Deterministic ID computation enabled after ID"
+            " generation has already occurred.");
+    }
+    assert(this->deterministic_id);
+    assert(this->md5_pipeline == 0);
+    assert(this->pipeline->getCount() == 0);
+    this->md5_pipeline = new Pl_MD5("qpdf md5", this->pipeline);
+    this->md5_pipeline->persistAcrossFinish(true);
+    // Special case code in popPipelineStack clears this->md5_pipeline
+    // upon deletion.
+    pushPipeline(this->md5_pipeline);
+    activatePipelineStack();
+}
+
+void
+QPDFWriter::computeDeterministicIDData()
+{
+    assert(this->md5_pipeline != 0);
+    assert(this->deterministic_id_data.empty());
+    this->deterministic_id_data = this->md5_pipeline->getHexDigest();
+    this->md5_pipeline->enable(false);
 }
 
 int
@@ -1069,6 +1112,13 @@ void
 QPDFWriter::writeTrailer(trailer_e which, int size, bool xref_stream,
                          qpdf_offset_t prev)
 {
+    writeTrailer(which, size, xref_stream, prev, 0);
+}
+
+void
+QPDFWriter::writeTrailer(trailer_e which, int size, bool xref_stream,
+                         qpdf_offset_t prev, int linearization_pass)
+{
     QPDFObjectHandle trailer = getTrimmedTrailer();
     if (! xref_stream)
     {
@@ -1119,8 +1169,21 @@ QPDFWriter::writeTrailer(trailer_e which, int size, bool xref_stream,
     // Write ID
     writeStringQDF(" ");
     writeString(" /ID [");
-    writeString(QPDF_String(this->id1).unparse(true));
-    writeString(QPDF_String(this->id2).unparse(true));
+    if (linearization_pass == 1)
+    {
+        writeString("<00000000000000000000000000000000>"
+                    "<00000000000000000000000000000000>");
+    }
+    else
+    {
+        if ((linearization_pass == 0) && (this->deterministic_id))
+        {
+            computeDeterministicIDData();
+        }
+        generateID();
+        writeString(QPDF_String(this->id1).unparse(true));
+        writeString(QPDF_String(this->id2).unparse(true));
+    }
     writeString("]");
 
     if (which != t_lin_second)
@@ -1794,12 +1857,8 @@ QPDFWriter::writeObject(QPDFObjectHandle object, int object_stream_index)
 void
 QPDFWriter::generateID()
 {
-    // Note: we can't call generateID() at the time of construction
-    // since the caller hasn't yet had a chance to call setStaticID(),
-    // but we need to generate it before computing encryption
-    // dictionary parameters.  This is why we call this function both
-    // from setEncryptionParameters() and from write() and return
-    // immediately if the ID has already been generated.
+    // Generate the ID lazily so that we can handle the user's
+    // preference to use static or deterministic ID generation.
 
     if (! this->id2.empty())
     {
@@ -1822,17 +1881,40 @@ QPDFWriter::generateID()
     }
     else
     {
-	// The PDF specification has guidelines for creating IDs, but it
-	// states clearly that the only thing that's really important is
-	// that it is very likely to be unique.  We can't really follow
-	// the guidelines in the spec exactly because we haven't written
-	// the file yet.  This scheme should be fine though.
+	// The PDF specification has guidelines for creating IDs, but
+	// it states clearly that the only thing that's really
+	// important is that it is very likely to be unique.  We can't
+	// really follow the guidelines in the spec exactly because we
+	// haven't written the file yet.  This scheme should be fine
+	// though.  The deterministic ID case uses a digest of a
+	// sufficient portion of the file's contents such no two
+	// non-matching files would match in the subsets used for this
+	// computation.  Note that we explicitly omit the filename from
+	// the digest calculation for deterministic ID so that the same
+	// file converted with qpdf, in that case, would have the same
+	// ID regardless of the output file's name.
 
 	std::string seed;
-	seed += QUtil::int_to_string(QUtil::get_current_time());
+        if (this->deterministic_id)
+        {
+            if (this->deterministic_id_data.empty())
+            {
+                QTC::TC("qpdf", "QPDFWriter deterministic with no data");
+                throw std::logic_error(
+                    "INTERNAL ERROR: QPDFWriter::generateID has no"
+                    " data for deterministic ID.  This may happen if"
+                    " deterministic ID and file encryption are requested"
+                    " together.");
+            }
+            seed += this->deterministic_id_data;
+        }
+        else
+        {
+            seed += QUtil::int_to_string(QUtil::get_current_time());
+            seed += this->filename;
+            seed += " ";
+        }
 	seed += " QPDF ";
-	seed += this->filename;
-	seed += " ";
 	if (trailer.hasKey("/Info"))
 	{
             QPDFObjectHandle info = trailer.getKey("/Info");
@@ -2260,8 +2342,6 @@ QPDFWriter::write()
 	setMinimumPDFVersion("1.5");
     }
 
-    generateID();
-
     prepareFileForWrite();
 
     if (this->linearized)
@@ -2397,6 +2477,17 @@ QPDFWriter::writeXRefTable(trailer_e which, int first, int last, int size,
 			   int hint_id, qpdf_offset_t hint_offset,
                            qpdf_offset_t hint_length)
 {
+    // ABI compatibility
+    return writeXRefTable(which, first, last, size, prev, suppress_offsets,
+                          hint_id, hint_offset, hint_length, 0);
+}
+
+qpdf_offset_t
+QPDFWriter::writeXRefTable(trailer_e which, int first, int last, int size,
+			   qpdf_offset_t prev, bool suppress_offsets,
+			   int hint_id, qpdf_offset_t hint_offset,
+                           qpdf_offset_t hint_length, int linearization_pass)
+{
     writeString("xref\n");
     writeString(QUtil::int_to_string(first));
     writeString(" ");
@@ -2426,7 +2517,7 @@ QPDFWriter::writeXRefTable(trailer_e which, int first, int last, int size,
 	    writeString(" 00000 n \n");
 	}
     }
-    writeTrailer(which, size, false, prev);
+    writeTrailer(which, size, false, prev, linearization_pass);
     writeString("\n");
     return space_before_zero;
 }
@@ -2435,8 +2526,9 @@ qpdf_offset_t
 QPDFWriter::writeXRefStream(int objid, int max_id, qpdf_offset_t max_offset,
 			    trailer_e which, int first, int last, int size)
 {
+    // ABI compatibility
     return writeXRefStream(objid, max_id, max_offset,
-			   which, first, last, size, 0, 0, 0, 0, false);
+			   which, first, last, size, 0, 0, 0, 0, false, 0);
 }
 
 qpdf_offset_t
@@ -2445,7 +2537,8 @@ QPDFWriter::writeXRefStream(int xref_id, int max_id, qpdf_offset_t max_offset,
 			    qpdf_offset_t prev, int hint_id,
 			    qpdf_offset_t hint_offset,
                             qpdf_offset_t hint_length,
-			    bool skip_compression)
+			    bool skip_compression,
+                            int linearization_pass)
 {
     qpdf_offset_t xref_offset = this->pipeline->getCount();
     qpdf_offset_t space_before_zero = xref_offset - 1;
@@ -2545,7 +2638,7 @@ QPDFWriter::writeXRefStream(int xref_id, int max_id, qpdf_offset_t max_offset,
 		    QUtil::int_to_string(first) + " " +
 		    QUtil::int_to_string(last - first + 1) + " ]");
     }
-    writeTrailer(which, size, true, prev);
+    writeTrailer(which, size, true, prev, linearization_pass);
     writeString("\nstream\n");
     writeBuffer(xref_data);
     writeString("\nendstream");
@@ -2725,6 +2818,10 @@ QPDFWriter::writeLinearized()
 	if (pass == 1)
 	{
 	    pushDiscardFilter();
+            if (this->deterministic_id)
+            {
+                pushMD5Pipeline();
+            }
 	}
 
 	// Part 1: header
@@ -2807,7 +2904,7 @@ QPDFWriter::writeLinearized()
 			    first_trailer_size,
 			    hint_length + second_xref_offset,
 			    hint_id, hint_offset, hint_length,
-			    (pass == 1));
+			    (pass == 1), pass);
 	    qpdf_offset_t endpos = this->pipeline->getCount();
 	    if (pass == 1)
 	    {
@@ -2834,7 +2931,8 @@ QPDFWriter::writeLinearized()
 	{
 	    writeXRefTable(t_lin_first, first_half_start, first_half_end,
 			   first_trailer_size, hint_length + second_xref_offset,
-			   (pass == 1), hint_id, hint_offset, hint_length);
+			   (pass == 1), hint_id, hint_offset, hint_length,
+                           pass);
 	    writeString("startxref\n0\n%%EOF\n");
 	}
 
@@ -2886,7 +2984,7 @@ QPDFWriter::writeLinearized()
 				second_half_end, second_xref_offset,
 				t_lin_second, 0, second_half_end,
 				second_trailer_size,
-				0, 0, 0, 0, (pass == 1));
+				0, 0, 0, 0, (pass == 1), pass);
 	    qpdf_offset_t endpos = this->pipeline->getCount();
 
 	    if (pass == 1)
@@ -2920,7 +3018,7 @@ QPDFWriter::writeLinearized()
 	{
 	    space_before_zero =
 		writeXRefTable(t_lin_second, 0, second_half_end,
-			       second_trailer_size);
+			       second_trailer_size, 0, false, 0, 0, 0, pass);
 	}
 	writeString("startxref\n");
 	writeString(QUtil::int_to_string(first_xref_offset));
@@ -2930,6 +3028,15 @@ QPDFWriter::writeLinearized()
 
 	if (pass == 1)
 	{
+            if (this->deterministic_id)
+            {
+                QTC::TC("qpdf", "QPDFWriter linearized deterministic ID",
+                        need_xref_stream ? 0 : 1);
+                computeDeterministicIDData();
+                popPipelineStack();
+                assert(this->md5_pipeline == 0);
+            }
+
 	    // Close first pass pipeline
 	    file_size = this->pipeline->getCount();
 	    popPipelineStack();
@@ -2954,6 +3061,11 @@ QPDFWriter::writeLinearized()
 void
 QPDFWriter::writeStandard()
 {
+    if (this->deterministic_id)
+    {
+        pushMD5Pipeline();
+    }
+
     // Start writing
 
     writeHeader();
@@ -3005,4 +3117,12 @@ QPDFWriter::writeStandard()
     writeString("startxref\n");
     writeString(QUtil::int_to_string(xref_offset));
     writeString("\n%%EOF\n");
+
+    if (this->deterministic_id)
+    {
+	QTC::TC("qpdf", "QPDFWriter standard deterministic ID",
+                this->object_stream_to_objects.empty() ? 0 : 1);
+        popPipelineStack();
+        assert(this->md5_pipeline == 0);
+    }
 }

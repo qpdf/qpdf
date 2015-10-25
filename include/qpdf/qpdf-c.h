@@ -324,8 +324,11 @@ extern "C" {
     QPDF_DLL
     void qpdf_set_qdf_mode(qpdf_data qpdf, QPDF_BOOL value);
 
+    QPDF_DLL
+    void qpdf_set_deterministic_ID(qpdf_data qpdf, QPDF_BOOL value);
+
     /* Never use qpdf_set_static_ID except in test suites to suppress
-     * generation of a random /ID.
+     * generation of a random /ID.  See also qpdf_set_deterministic_ID.
      */
     QPDF_DLL
     void qpdf_set_static_ID(qpdf_data qpdf, QPDF_BOOL value);

@@ -25,10 +25,24 @@ class Pl_MD5: public Pipeline
     virtual void finish();
     QPDF_DLL
     std::string getHexDigest();
+    // Enable/disable. Disabling the pipeline causes it to become a
+    // pass-through. This makes it possible to stick an MD5 pipeline
+    // in a pipeline when it may or may not be required. Disabling it
+    // avoids incurring the runtime overhead of doing needless
+    // digest computation.
+    QPDF_DLL
+    void enable(bool enabled);
+    // If persistAcrossFinish is called, calls to finish do not
+    // finalize the underlying md5 object. In this case, the object is
+    // not finalized until getHexDigest() is called.
+    QPDF_DLL
+    void persistAcrossFinish(bool);
 
   private:
     bool in_progress;
     MD5 md5;
+    bool enabled;
+    bool persist_across_finish;
 };
 
 #endif // __PL_MD5_HH__

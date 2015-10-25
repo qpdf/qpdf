@@ -35,6 +35,7 @@
 class QPDF;
 class QPDFObjectHandle;
 class Pl_Count;
+class Pl_MD5;
 
 class QPDFWriter
 {
@@ -189,8 +190,22 @@ class QPDFWriter
     QPDF_DLL
     void setExtraHeaderText(std::string const&);
 
+    // Causes a deterministic /ID value to be generated. When this is
+    // set, the current time and output file name are not used as part
+    // of /ID generation. Instead, a digest of all significant parts
+    // of the output file's contents is included in the /ID
+    // calculation. Use of a deterministic /ID can be handy when it is
+    // desirable for a repeat of the same qpdf operation on the same
+    // inputs being written to the same outputs with the same
+    // parameters to generate exactly the same results. This feature
+    // is incompatible with encrypted files because, for encrypted
+    // files, the /ID is generated before any part of the file is
+    // written since it is an input to the encryption process.
+    QPDF_DLL
+    void setDeterministicID(bool);
+
     // Cause a static /ID value to be generated.  Use only in test
-    // suites.
+    // suites.  See also setDeterministicID.
     QPDF_DLL
     void setStaticID(bool);
 
@@ -298,6 +313,9 @@ class QPDFWriter
     void writeObject(QPDFObjectHandle object, int object_stream_index = -1);
     void writeTrailer(trailer_e which, int size,
 		      bool xref_stream, qpdf_offset_t prev = 0);
+    void writeTrailer(trailer_e which, int size,
+		      bool xref_stream, qpdf_offset_t prev,
+                      int linearization_pass);
     void unparseObject(QPDFObjectHandle object, int level,
 		       unsigned int flags);
     void unparseObject(QPDFObjectHandle object, int level,
@@ -348,6 +366,15 @@ class QPDFWriter
         int hint_id,
         qpdf_offset_t hint_offset,
         qpdf_offset_t hint_length);
+    qpdf_offset_t writeXRefTable(
+        trailer_e which, int first, int last, int size,
+        // for linearization
+        qpdf_offset_t prev,
+        bool suppress_offsets,
+        int hint_id,
+        qpdf_offset_t hint_offset,
+        qpdf_offset_t hint_length,
+        int linearization_pass);
     qpdf_offset_t writeXRefStream(
         int objid, int max_id, qpdf_offset_t max_offset,
         trailer_e which, int first, int last, int size);
@@ -360,6 +387,16 @@ class QPDFWriter
         qpdf_offset_t hint_offset,
         qpdf_offset_t hint_length,
         bool skip_compression);
+    qpdf_offset_t writeXRefStream(
+        int objid, int max_id, qpdf_offset_t max_offset,
+        trailer_e which, int first, int last, int size,
+        // for linearization
+        qpdf_offset_t prev,
+        int hint_id,
+        qpdf_offset_t hint_offset,
+        qpdf_offset_t hint_length,
+        bool skip_compression,
+        int linearization_pass);
     int calculateXrefStreamPadding(int xref_bytes);
 
     // When filtering subsections, push additional pipelines to the
@@ -380,6 +417,8 @@ class QPDFWriter
     void adjustAESStreamLength(size_t& length);
     void pushEncryptionFilter();
     void pushDiscardFilter();
+    void pushMD5Pipeline();
+    void computeDeterministicIDData();
 
     void discardGeneration(std::map<QPDFObjGen, int> const& in,
                            std::map<int, int>& out);
@@ -437,6 +476,9 @@ class QPDFWriter
     std::map<QPDFObjGen, int> object_to_object_stream;
     std::map<int, std::set<QPDFObjGen> > object_stream_to_objects;
     std::list<Pipeline*> pipeline_stack;
+    bool deterministic_id;
+    Pl_MD5* md5_pipeline;
+    std::string deterministic_id_data;
 
     // For linearization only
     std::map<int, int> obj_renumber_no_gen;

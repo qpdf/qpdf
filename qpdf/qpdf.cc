@@ -237,6 +237,7 @@ Testing, Inspection, and Debugging Options\n\
 These options can be useful for digging into PDF files or for use in\n\
 automated test suites for software that uses the qpdf library.\n\
 \n\
+--deterministic-id        generate deterministic /ID\n\
 --static-id               generate static /ID: FOR TESTING ONLY!\n\
 --static-aes-iv           use a static initialization vector for AES-CBC\n\
                           This is option is not secure!  FOR TESTING ONLY!\n\
@@ -1031,6 +1032,7 @@ int main(int argc, char* argv[])
     std::string force_version;
 
     bool show_npages = false;
+    bool deterministic_id = false;
     bool static_id = false;
     bool static_aes_iv = false;
     bool suppress_original_object_id = false;
@@ -1228,6 +1230,10 @@ int main(int argc, char* argv[])
 			  "--force-version=version");
 		}
 		force_version = parameter;
+	    }
+	    else if (strcmp(arg, "deterministic-id") == 0)
+	    {
+		deterministic_id = true;
 	    }
 	    else if (strcmp(arg, "static-id") == 0)
 	    {
@@ -1710,6 +1716,10 @@ int main(int argc, char* argv[])
 	    {
 		w.setPreserveEncryption(false);
 	    }
+            if (deterministic_id)
+            {
+                w.setDeterministicID(true);
+            }
 	    if (static_id)
 	    {
 		w.setStaticID(true);

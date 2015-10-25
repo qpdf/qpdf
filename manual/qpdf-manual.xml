@@ -991,11 +991,30 @@ outfile.pdf</option>
     file should be given.  The following options are available:
     <variablelist>
      <varlistentry>
+      <term><option>--deterministic-id</option></term>
+      <listitem>
+       <para>
+        Causes generation of a deterministic value for /ID. This
+        prevents use of timestamp and output file name information in
+        the /ID generation. Instead, at some slight additional runtime
+        cost, the /ID field is generated to include a digest of the
+        significant parts of the content of the output PDF file. This
+        means that a given qpdf operation should generate the same /ID
+        each time it is run, which can be useful when caching results
+        or for generation of some test data. Use of this flag is not
+        compatible with creation of encrypted files.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
       <term><option>--static-id</option></term>
       <listitem>
        <para>
-        Causes generation of a fixed value for /ID.  This is intended
-        for testing only.  Never use it for production files.
+        Causes generation of a fixed value for /ID. This is intended
+        for testing only. Never use it for production files. If you
+        are trying to get the same /ID each time for a given file and
+        you are not generating encrypted files, consider using the
+        <option>--deterministic-id</option> option.
        </para>
       </listitem>
      </varlistentry>

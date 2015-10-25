@@ -427,6 +427,18 @@ static void test18(char const* infile,
     report_errors();
 }
 
+static void test19(char const* infile,
+		   char const* password,
+		   char const* outfile,
+		   char const* outfile2)
+{
+    qpdf_read(qpdf, infile, password);
+    qpdf_init_write(qpdf, outfile);
+    qpdf_set_deterministic_ID(qpdf, QPDF_TRUE);
+    qpdf_write(qpdf);
+    report_errors();
+}
+
 int main(int argc, char* argv[])
 {
     char* p = 0;
@@ -485,6 +497,7 @@ int main(int argc, char* argv[])
 	  (n == 16) ? test16 :
 	  (n == 17) ? test17 :
 	  (n == 18) ? test18 :
+	  (n == 19) ? test19 :
 	  0);
 
     if (fn == 0)

@@ -990,6 +990,43 @@ $td->runtest("write damaged",
 
 show_ntests();
 # ----------
+$td->notify("--- Deterministic ID Tests ---");
+$n_tests += 11;
+foreach my $d ('nn', 'ny', 'yn', 'yy')
+{
+    my $linearize = ($d =~ m/^y/);
+    my $ostream = ($d =~ m/y$/);
+    $td->runtest("deterministic ID: linearize/ostream=$d",
+                 {$td->COMMAND =>
+                      "qpdf -deterministic-id" .
+                      ($linearize ? " -linearize" : "") .
+                      " -object-streams=" . ($ostream ? "generate" : "disable") .
+                      " deterministic-id-in.pdf a.pdf"},
+                 {$td->STRING => "",
+                  $td->EXIT_STATUS => 0});
+    $td->runtest("compare files",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => "deterministic-id-$d.pdf"});
+}
+
+$td->runtest("deterministic ID with encryption",
+             {$td->COMMAND => "qpdf -deterministic-id encrypted-with-images.pdf a.pdf"},
+             {$td->STRING => "INTERNAL ERROR: QPDFWriter::generateID" .
+                  " has no data for deterministic ID." .
+                  "  This may happen if deterministic ID and" .
+                  " file encryption are requested together.\n",
+              $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("deterministic ID (C API)",
+             {$td->COMMAND =>
+                  "qpdf-ctest 19 deterministic-id-in.pdf '' a.pdf"},
+             {$td->STRING => "",
+              $td->EXIT_STATUS => 0});
+$td->runtest("compare files",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "deterministic-id-nn.pdf"});
+
+# ----------
 $td->notify("--- Object Stream Tests ---");
 $n_tests += (36 * 4) + (12 * 2);
 $n_compare_pdfs += 36;
