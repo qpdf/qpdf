@@ -534,7 +534,7 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
 		    QUtil::int_to_string(i) + ")");
 	    }
 
-            // For xref_table, these will always be small enough to be ints 
+            // For xref_table, these will always be small enough to be ints
 	    qpdf_offset_t f1 = QUtil::string_to_ll(m2.getMatch(1).c_str());
 	    int f2 = atoi(m2.getMatch(2).c_str());
 	    char type = m2.getMatch(3).at(0);
