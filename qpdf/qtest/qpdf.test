@@ -199,7 +199,7 @@ $td->runtest("remove page we don't have",
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 76;
+$n_tests += 77;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -569,6 +569,10 @@ $td->runtest("ensure arguments to R are direct",
 $td->runtest("detect loops in pages structure",
              {$td->COMMAND => "qpdf --check pages-loop.pdf"},
              {$td->FILE => "pages-loop.out", $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("no trailing space in xref table",
+             {$td->COMMAND => "qpdf --check no-space-in-xref.pdf"},
+             {$td->FILE => "no-space-in-xref.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 show_ntests();

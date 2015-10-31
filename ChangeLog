@@ -1,3 +1,9 @@
+2015-10-31  Jay Berkenbilt  <ejb@ql.org>
+
+	* libqpdf/QPDF.cc (read_xrefTable): Be tolerant of some malformed
+	xref tables that don't have the required trailing space after each
+	line.
+
 2015-10-29  Jay Berkenbilt  <ejb@ql.org>
 
 	* Implement QPDFWriter::setDeterministicID and --deterministic-id
