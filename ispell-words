@@ -125,10 +125,12 @@ bitstream
 BitStream
 BitWriter
 BleedBox
+BogusRandomDataProvider
 boldseq
 bookinfo
 bool
 bp
+brdp
 bs
 BT
 buf
@@ -202,6 +204,7 @@ ColorSpace
 com
 compareVersions
 compatbility
+computeDeterministicIDData
 concat
 Cond
 config
@@ -224,12 +227,16 @@ createWhat
 CreationDate
 CRNL
 CropBox
+CryptAcquireContext
 CryptFilterDecodeParms
+CryptGenRandom
 cryptolog
+CryptReleaseContext
 cso
 csoe
 css
 cstdio
+cstdlib
 cstr
 cstring
 ctest
@@ -304,6 +311,7 @@ dumpHPageOffset
 dumpHSharedObject
 dumpInfoDict
 dumpLinearizationDataInternal
+dup
 dwHighDateTime
 dwLowDateTime
 DWORD
@@ -411,6 +419,7 @@ fopen
 forcePDFVersion
 fprintf
 fR
+fr
 fread
 fseek
 fseeki
@@ -464,12 +473,14 @@ getGeneration
 getHexDigest
 getId
 getInlineImageValue
+getInstance
 getIntValue
 getItem
 getKey
 getKeyForObject
 getKeys
 getLastChar
+GetLastError
 getLastOffset
 getLength
 getLengthBytes
@@ -504,6 +515,7 @@ getPDFVersion
 getPerms
 getPointer
 getR
+getRandomDataProvider
 getRawDigest
 getRawStreamData
 getRawValue
@@ -553,6 +565,7 @@ handleObject
 hasKey
 hb
 hbp
+HCRYPTPROV
 Hdict
 Helvetica
 hexkey
@@ -614,8 +627,10 @@ inline
 InlineImage
 inlineimage
 inode
+inpdf
 inputLen
 InputSource
+InsecureRandomDataProvider
 insertItem
 insertPage
 insertPageobjToPage
@@ -633,6 +648,7 @@ io
 IOLBF
 iomanip
 iostream
+irdp
 isArray
 isBool
 isDictionary
@@ -668,6 +684,7 @@ jklmnopqrstuvwxyz
 keybits
 keylen
 KEYLENGTH
+keyset
 LARGEFILE
 lastnum
 lastreleased
@@ -697,6 +714,7 @@ linearization
 linearize
 linearized
 linearizing
+linebuf
 linefeeds
 linkend
 linkey
@@ -782,6 +800,7 @@ newDictionary
 newIndirect
 newInlineImage
 newInteger
+NEWKEYSET
 newName
 newNull
 newOperator
@@ -813,6 +832,7 @@ nshared
 nspaces
 nstream
 nstripes
+NTE
 ntotal
 NUL
 num
@@ -866,6 +886,9 @@ OUTDOC
 outfile
 outfilename
 outlength
+outpdf
+outpdfw
+outprefix
 outputLengthNextN
 ovecsize
 ovector
@@ -901,6 +924,7 @@ PDFs
 pdlin
 pe
 perl
+persistAcrossFinish
 ph
 phe
 php
@@ -944,6 +968,8 @@ ProcSet
 procsets
 programlisting
 Projet
+prov
+provideRandomData
 provideStreamData
 proxied
 PSâ
@@ -954,6 +980,7 @@ pushDiscardFilter
 pushEncryptionFilter
 pushInheritedAttributesToPage
 pushInheritedAttributesToPageInternal
+pushMD
 pushOutlinesToPart
 pushPipeline
 PUTU
@@ -999,11 +1026,14 @@ QuadPart
 QUtil
 qwert
 rand
+RandomDataProvider
+randoms
 rb
 rbegin
 rc
 rcon
 RDONLY
+rdp
 rdquo
 readHGeneric
 readHintStream
@@ -1070,6 +1100,7 @@ sAlT
 SAPHIR
 SASLprep
 se
+SecureRandomDataProvider
 sed
 seekable
 sendNextCode
@@ -1082,6 +1113,7 @@ setAttemptRecovery
 setbase
 setContentNormalization
 setDataKey
+setDeterministicID
 setEncryptionParameters
 setEncryptionParametersInternal
 setExtraHeaderText
@@ -1109,6 +1141,7 @@ setprecision
 setPreserveEncryption
 setQDFMode
 setR
+setRandomDataProvider
 setStaticAesIV
 setStaticID
 setStreamDataMode
@@ -1132,6 +1165,7 @@ sprintf
 srand
 srandom
 src
+srdp
 sstream
 startoffset
 startxref
@@ -1290,6 +1324,8 @@ Wconversion
 werror
 whoami
 WinAnsiEncoding
+Wincrypt
+WindowsCryptProvider
 Wold
 writeBinary
 writeBits

@@ -113,7 +113,7 @@ namespace QUtil
 
     // If secure random number generation is supported on your
     // platform and qpdf was not compiled with insecure random number
-    // generation, this returns a crytographically secure random
+    // generation, this returns a cryptographically secure random
     // number.  Otherwise it falls back to random from stdlib and
     // calls srandom automatically the first time it is called.
     QPDF_DLL
@@ -145,7 +145,7 @@ namespace QUtil
     // provider, you should call this at the beginning of your program
     // before creating any QPDF objects.  Passing a null to this
     // method will reset the library back to whichever of the built-in
-    // random data handlers is appropriate basedon how qpdf was
+    // random data handlers is appropriate based on how qpdf was
     // compiled.
     QPDF_DLL
     void setRandomDataProvider(RandomDataProvider*);
