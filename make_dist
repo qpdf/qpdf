@@ -95,7 +95,7 @@ if ($version_error)
 
 run("./autogen.sh");
 run("./configure --enable-doc-maintenance --enable-werror");
-run("make build_manual");
+run("make -j8 build_manual");
 run("make distclean");
 cd($pwd);
 run("tar czvf $srcdir.tar.gz-candidate $srcdir");

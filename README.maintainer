@@ -111,7 +111,6 @@ Release Reminders
 
  * Remember to update the web page including putting new documentation
    in the "files" subdirectory of the website on sourceforge.net.
-   Linearize the PDF version of the manual when copying it there.
 
  * Create a tag in the version control system, and make backups of the
    actual releases.  With git, use git tag -s to create a signed tag:

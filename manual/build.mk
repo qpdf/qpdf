@@ -24,8 +24,9 @@ $(VALIDATE):
 
 endif
 
-$(OUTDOC).pdf: $(OUTDOC).fo
-	$(FOP) $< -pdf $@
+$(OUTDOC).pdf: $(OUTDOC).fo qpdf/build/qpdf
+	$(FOP) $< -pdf $@.tmp
+	qpdf/build/qpdf --linearize $@.tmp $@
 
 $(OUTDOC).html: $(INDOC).xml manual/html.xsl $(VALIDATE)
 	$(XSLTPROC) --output $@ manual/html.xsl $<
