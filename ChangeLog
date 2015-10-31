@@ -1,5 +1,7 @@
 2015-10-31  Jay Berkenbilt  <ejb@ql.org>
 
+	* 5.2.0: release
+
 	* libqpdf/QPDF.cc (read_xrefTable): Be tolerant of some malformed
 	xref tables that don't have the required trailing space after each
 	line.

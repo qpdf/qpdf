@@ -53,18 +53,12 @@ Remove private methods that are there only for ABI compatibility
 including extra QPDFWriter writeTrailer, writeXRefTable,
 writeXRefStream.
 
+Remember that non-compatible changes to private methods still breaks
+ABI compatibility. See a3576a73593987b26cd3eff346f8f7c11f713cbd.
 
-5.2.0
+
+5.3.0
 =====
-
- * Before release: remember to bump minor shared library version since
-   new methods were added (even though private).
-
- * Figure out what about a3576a73593987b26cd3eff346f8f7c11f713cbd
-   broke binary compatibility.
-
- * Implement automated testing for binary compatibility and add to
-   release checklist.
 
  * Add method to push inheritable resources to a single page by
    walking up and copying without overwrite.  Above logic will also be
@@ -125,6 +119,9 @@ writeXRefStream.
 
 General
 =======
+
+ * Implement automated testing for binary compatibility and add to
+   release checklist.
 
  * Figure out how to find Visual Studio in Windows registry and see if
    I can get it to work with make so I can simplify creation of

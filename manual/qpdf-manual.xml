@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "5.1.3">
-<!ENTITY lastreleased "May 24, 2015">
+<!ENTITY swversion "5.2.0">
+<!ENTITY lastreleased "October 31, 2015">
 ]>
 <book>
  <bookinfo>
@@ -2684,6 +2684,31 @@ print "\n";
    <filename>ChangeLog</filename> in the source distribution.
   </para>
   <variablelist>
+   <varlistentry>
+    <term>5.2.0: October 31, 2015</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Implement <option>--deterministic-id</option> command-line
+        option and <function>QPDFWriter::setDeterministicID</function>
+        as well as C API function
+        <function>qpdf_set_deterministic_ID</function> for generating
+        a deterministic ID for non-encrypted files. When this option
+        is selected, the ID of the file depends on the contents of the
+        output file, and not on transient items such as the timestamp
+        or output file name.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Make qpdf more tolerant of files whose xref table entries are
+        not the correct length.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
     <term>5.1.3: May 24, 2015</term>
     <listitem>
