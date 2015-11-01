@@ -162,7 +162,7 @@ int main(int argc, char* argv[])
 	{
 	    // For the test suite, uncompress streams and use static
 	    // IDs.
-	    w.setStaticID(true);
+	    w.setStaticID(true); // for testing only
 	}
 	w.write();
 	std::cout << whoami << ": new file written to " << outfilename

@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
 	{
 	    // For the test suite, uncompress streams and use static
 	    // IDs.
-	    w.setStaticID(true);
+	    w.setStaticID(true); // for testing only
 	    w.setStreamDataMode(qpdf_s_uncompress);
 	}
 	w.write();

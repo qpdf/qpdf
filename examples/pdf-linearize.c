@@ -50,7 +50,10 @@ int main(int argc, char* argv[])
     if (((qpdf_read(qpdf, infile, password) & QPDF_ERRORS) == 0) &&
 	((qpdf_init_write(qpdf, outfile) & QPDF_ERRORS) == 0))
     {
-	qpdf_set_static_ID(qpdf, QPDF_TRUE);
+        /* Use static ID for testing only. For production, a
+         * non-static ID is used. See also
+         * qpdf_set_deterministic_ID. */
+	qpdf_set_static_ID(qpdf, QPDF_TRUE); /* for testing only */
 	qpdf_set_linearization(qpdf, QPDF_TRUE);
 	qpdf_write(qpdf);
     }

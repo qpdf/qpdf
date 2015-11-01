@@ -36,7 +36,7 @@ static void process(char const* whoami,
 	{
 	    // For the test suite, uncompress streams and use static
 	    // IDs.
-	    outpdfw.setStaticID(true);
+	    outpdfw.setStaticID(true); // for testing only
 	    outpdfw.setStreamDataMode(qpdf_s_uncompress);
 	}
         outpdfw.write();
