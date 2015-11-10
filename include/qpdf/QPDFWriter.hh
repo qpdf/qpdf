@@ -312,8 +312,6 @@ class QPDFWriter
     void writeObjectStream(QPDFObjectHandle object);
     void writeObject(QPDFObjectHandle object, int object_stream_index = -1);
     void writeTrailer(trailer_e which, int size,
-		      bool xref_stream, qpdf_offset_t prev = 0);
-    void writeTrailer(trailer_e which, int size,
 		      bool xref_stream, qpdf_offset_t prev,
                       int linearization_pass);
     void unparseObject(QPDFObjectHandle object, int level,
@@ -365,28 +363,11 @@ class QPDFWriter
         bool suppress_offsets,
         int hint_id,
         qpdf_offset_t hint_offset,
-        qpdf_offset_t hint_length);
-    qpdf_offset_t writeXRefTable(
-        trailer_e which, int first, int last, int size,
-        // for linearization
-        qpdf_offset_t prev,
-        bool suppress_offsets,
-        int hint_id,
-        qpdf_offset_t hint_offset,
         qpdf_offset_t hint_length,
         int linearization_pass);
     qpdf_offset_t writeXRefStream(
         int objid, int max_id, qpdf_offset_t max_offset,
         trailer_e which, int first, int last, int size);
-    qpdf_offset_t writeXRefStream(
-        int objid, int max_id, qpdf_offset_t max_offset,
-        trailer_e which, int first, int last, int size,
-        // for linearization
-        qpdf_offset_t prev,
-        int hint_id,
-        qpdf_offset_t hint_offset,
-        qpdf_offset_t hint_length,
-        bool skip_compression);
     qpdf_offset_t writeXRefStream(
         int objid, int max_id, qpdf_offset_t max_offset,
         trailer_e which, int first, int last, int size,

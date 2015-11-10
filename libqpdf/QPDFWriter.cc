@@ -1110,13 +1110,6 @@ QPDFWriter::unparseChild(QPDFObjectHandle child, int level, int flags)
 
 void
 QPDFWriter::writeTrailer(trailer_e which, int size, bool xref_stream,
-                         qpdf_offset_t prev)
-{
-    writeTrailer(which, size, xref_stream, prev, 0);
-}
-
-void
-QPDFWriter::writeTrailer(trailer_e which, int size, bool xref_stream,
                          qpdf_offset_t prev, int linearization_pass)
 {
     QPDFObjectHandle trailer = getTrimmedTrailer();
@@ -2468,18 +2461,7 @@ QPDFWriter::writeHintStream(int hint_id)
 qpdf_offset_t
 QPDFWriter::writeXRefTable(trailer_e which, int first, int last, int size)
 {
-    return writeXRefTable(which, first, last, size, 0, false, 0, 0, 0);
-}
-
-qpdf_offset_t
-QPDFWriter::writeXRefTable(trailer_e which, int first, int last, int size,
-			   qpdf_offset_t prev, bool suppress_offsets,
-			   int hint_id, qpdf_offset_t hint_offset,
-                           qpdf_offset_t hint_length)
-{
-    // ABI compatibility
-    return writeXRefTable(which, first, last, size, prev, suppress_offsets,
-                          hint_id, hint_offset, hint_length, 0);
+    return writeXRefTable(which, first, last, size, 0, false, 0, 0, 0, 0);
 }
 
 qpdf_offset_t
@@ -2526,7 +2508,6 @@ qpdf_offset_t
 QPDFWriter::writeXRefStream(int objid, int max_id, qpdf_offset_t max_offset,
 			    trailer_e which, int first, int last, int size)
 {
-    // ABI compatibility
     return writeXRefStream(objid, max_id, max_offset,
 			   which, first, last, size, 0, 0, 0, 0, false, 0);
 }
