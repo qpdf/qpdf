@@ -1,6 +1,16 @@
 Release Reminders
 =================
 
+ * These two commits broke binary compatibility:
+
+   a3576a73593987b26cd3eff346f8f7c11f713cbd
+   b8bdef0ad12883d72ced5eb443e6e34a93bbbb91
+
+   Need to figure out how. Every time any interface is added or any
+   object changes shape, always run compatibility tests by manually
+   running qtest-driver on most recent release using latest shared
+   library.
+
  * When making a release, always remember to run large file tests and
    image comparison tests (--enable-test-compare-images
    --with-large-file-test-path=/path).  For a major release, consider

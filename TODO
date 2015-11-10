@@ -46,18 +46,7 @@ Small, command-line tool only enhancements to do soon
    (libtool).
 
 
-Next ABI change
-===============
-
-Remove private methods that are there only for ABI compatibility
-including extra QPDFWriter writeTrailer, writeXRefTable,
-writeXRefStream.
-
-Remember that non-compatible changes to private methods still breaks
-ABI compatibility. See a3576a73593987b26cd3eff346f8f7c11f713cbd.
-
-
-5.3.0
+6.1.0
 =====
 
  * Add method to push inheritable resources to a single page by
