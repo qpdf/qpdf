@@ -1,3 +1,10 @@
+2015-11-10  Jay Berkenbilt  <ejb@ql.org>
+
+	* 6.0.0: release
+
+	* No changes from 5.2.0. The 5.2.0 release broke binary
+	compatibility and was withdrawn.
+
 2015-10-31  Jay Berkenbilt  <ejb@ql.org>
 
 	* 5.2.0: release
