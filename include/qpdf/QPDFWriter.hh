@@ -24,6 +24,7 @@
 
 #include <qpdf/Constants.h>
 
+#include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFObjGen.hh>
 #include <qpdf/QPDFXRefEntry.hh>
 
@@ -33,7 +34,6 @@
 #include <qpdf/Buffer.hh>
 
 class QPDF;
-class QPDFObjectHandle;
 class Pl_Count;
 class Pl_MD5;
 
