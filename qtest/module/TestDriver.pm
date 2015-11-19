@@ -65,9 +65,10 @@ use constant TD_THREADS => 'TD_THREADS';
 use constant TD_SEQGROUPS => 'TD_SEQGROUPS';
 
 # Flags
-use constant NORMALIZE_NEWLINES =>   1 << 0;
+use constant NORMALIZE_NEWLINES   => 1 << 0;
 use constant NORMALIZE_WHITESPACE => 1 << 1;
-use constant EXPECT_FAILURE =>       1 << 2;
+use constant EXPECT_FAILURE       => 1 << 2;
+use constant RM_WS_ONLY_LINES     => 1 << 3;
 
 # Field names
 use vars qw($f_socket $f_origdir $f_tempdir $f_testlog $f_testxml $f_suitename);
@@ -436,7 +437,7 @@ sub prompt
 	print "To avoid question, place answer in" .
 	    " environment variable \$$env\n";
 	# Note: ActiveState perl 5.10.1 gives the wrong answer for -t
-	# STDIN.
+	# STDIN when NUL (http://bugs.activestate.com/show_bug.cgi?id=85614).
 	if ((-t STDIN) && (-t STDOUT))
 	{
 	    print "$msg ";
@@ -550,6 +551,12 @@ sub get_start_dir
 #      will generate test suite failure.  This should be used for
 #      place-holder test cases that exercise a known bug that cannot
 #      yet be fixed.
+
+#      RM_WS_ONLY_LINES: If specified, all lines only containing any
+#      whitespace character like newlines, spaces or tabs are removed
+#      from the input. This is done before writing through any filter
+#      and is especially useful if some tests output more newlines on
+#      some platforms than on others.
 
 sub runtest
 {
@@ -818,6 +825,15 @@ sub runtest
 	{
 	    &QTC::TC("testdriver", "TestDriver no normalize newlines");
 	}
+        if ($flags & $rep->RM_WS_ONLY_LINES)
+        {
+            &QTC::TC("testdriver", "TestDriver remove empty lines");
+            $line =~ s/^\s+$//;
+        }
+        else
+        {
+            &QTC::TC("testdriver", "TestDriver no remove empty lines");
+        }
 	$actual->print($line);
 	$actual->flush();
 	last if defined $exit_status;
