@@ -386,7 +386,7 @@ sub report
     push(@vals, map { $rep->{+__PACKAGE__}{$_} } ($f_passes, $f_fails,
 						  $f_xpasses, $f_xfails));
     my $socket = $rep->_socket();
-    $socket->print(join(' ', @vals)), "\n";
+    $socket->print(join(' ', @vals), "\n");
 }
 
 # Usage: notify(string)
