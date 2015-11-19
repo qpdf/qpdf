@@ -824,15 +824,15 @@ sub runtest
 	{
 	    &QTC::TC("testdriver", "TestDriver no normalize newlines");
 	}
-  if ($flags & $rep->RM_WS_ONLY_LINES)
-  {
-      &QTC::TC("testdriver", "TestDriver remove empty lines");
-      $line =~ s/^\s+$//;
-  }
-  else
-  {
-      &QTC::TC("testdriver", "TestDriver no remove empty lines");
-  }
+    if ($flags & $rep->RM_WS_ONLY_LINES)
+    {
+        &QTC::TC("testdriver", "TestDriver remove whitespace only lines");
+        $line =~ s/^\s+$//;
+    }
+    else
+    {
+        &QTC::TC("testdriver", "TestDriver no remove whitespace only lines");
+    }
 	$actual->print($line);
 	$actual->flush();
 	last if defined $exit_status;
