@@ -17,17 +17,17 @@
 #include <list>
 #include <iostream>
 
-#include <qpdf/QPDFObjGen.hh>
-#include <qpdf/QPDFXRefEntry.hh>
+#include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFObjectHandle.hh>
+#include <qpdf/QPDFObjGen.hh>
 #include <qpdf/QPDFTokenizer.hh>
+#include <qpdf/QPDFXRefEntry.hh>
 #include <qpdf/Buffer.hh>
 #include <qpdf/InputSource.hh>
 
 class QPDF_Stream;
 class BitStream;
 class BitWriter;
-class QPDFExc;
 
 class QPDF
 {
