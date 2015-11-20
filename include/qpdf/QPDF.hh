@@ -17,6 +17,7 @@
 #include <list>
 #include <iostream>
 
+#include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFObjGen.hh>
 #include <qpdf/QPDFXRefEntry.hh>
 #include <qpdf/QPDFObjectHandle.hh>
@@ -27,7 +28,6 @@
 class QPDF_Stream;
 class BitStream;
 class BitWriter;
-class QPDFExc;
 
 class QPDF
 {
