@@ -374,7 +374,7 @@ $td->runtest("check output",
 	     {$td->FILE => "test14-out.pdf"});
 # Test 14 also exercises writing to memory without static ID.
 $td->runtest("check non-static ID version",
-             {$td->COMMAND => "./diff-ignore-ID-version a.pdf b.pdf"},
+             {$td->COMMAND => "sh ./diff-ignore-ID-version a.pdf b.pdf"},
              {$td->STRING => "okay\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
@@ -1551,7 +1551,7 @@ foreach my $d (@encrypted_files)
     {
 	$td->runtest("check against base",
 		     {$td->COMMAND =>
-                          "./diff-encrypted $enc_base.enc $file.enc"},
+                          "sh ./diff-encrypted $enc_base.enc $file.enc"},
 		     {$td->STRING => "okay\n",
 		      $td->EXIT_STATUS => 0},
 		     $td->NORMALIZE_NEWLINES);
@@ -1860,7 +1860,7 @@ $td->runtest("convert to qdf",
                   " --password=owner --no-original-object-ids"},
              {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("compare qdf",
-             {$td->COMMAND => "./diff-ignore-ID-version a.qdf b.qdf"},
+             {$td->COMMAND => "sh ./diff-ignore-ID-version a.qdf b.qdf"},
              {$td->STRING => "okay\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("copy encryption with qpdf",
@@ -1881,7 +1881,7 @@ $td->runtest("convert to qdf",
                   " --password=owner --no-original-object-ids"},
              {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("compare qdf",
-             {$td->COMMAND => "./diff-ignore-ID-version a.qdf c.qdf"},
+             {$td->COMMAND => "sh ./diff-ignore-ID-version a.qdf c.qdf"},
              {$td->STRING => "okay\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
