@@ -24,6 +24,11 @@ if ((exists $ENV{'QPDF_SKIP_TEST_COMPARE_IMAGES'}) &&
     $compare_images = 0;
 }
 my $large_file_test_path = $ENV{'QPDF_LARGE_FILE_TEST_PATH'} || undef;
+if (defined($large_file_test_path))
+{
+    $large_file_test_path = File::Spec->rel2abs($large_file_test_path);
+    $large_file_test_path =~ s!\\!/!g;
+}
 
 my $have_acroread = 0;
 
