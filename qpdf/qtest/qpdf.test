@@ -2,10 +2,11 @@
 require 5.008;
 BEGIN { $^W = 1; }
 use strict;
-use File::Copy;
-use File::Basename;
 use Cwd;
 use Digest::MD5;
+use File::Basename;
+use File::Copy;
+use File::Spec;
 
 chdir("qpdf") or die "chdir testdir failed: $!\n";
 
@@ -13,7 +14,8 @@ require TestDriver;
 
 cleanup();
 
-my $td = new TestDriver('qpdf');
+my $devNull = File::Spec->devnull();
+my $td      = new TestDriver('qpdf');
 
 my $compare_images = 1;
 if ((exists $ENV{'QPDF_SKIP_TEST_COMPARE_IMAGES'}) &&
@@ -29,7 +31,7 @@ if ($compare_images)
 {
     # check for working acroread
     if (system("acroread -toPostScript -pairs good1.pdf a.ps" .
-	       " >/dev/null 2>&1") == 0)
+               " >$devNull 2>&1") == 0)
     {
 	$have_acroread = 1;
     }
@@ -2247,7 +2249,7 @@ sub compare_pdfs
 	$td->runtest("convert original file to image",
 		     {$td->COMMAND =>
 			  "(cd tif1;" .
-			  " gs 2>/dev/null -q -dNOPAUSE -sDEVICE=tiff24nc" .
+			  " gs 2>$devNull -q -dNOPAUSE -sDEVICE=tiff24nc" .
 			  " -sOutputFile=a.tif - < ../$f1)"},
 		     {$td->STRING => "",
 		      $td->EXIT_STATUS => 0});
@@ -2266,7 +2268,7 @@ sub compare_pdfs
 	$td->runtest("convert new file to image",
 		     {$td->COMMAND =>
 			  "(cd tif2;" .
-			  " gs 2>/dev/null -q -dNOPAUSE -sDEVICE=tiff24nc" .
+			  " gs 2>$devNull -q -dNOPAUSE -sDEVICE=tiff24nc" .
 			  " -sOutputFile=a.tif - < ../$f2)"},
 		     {$td->STRING => "",
 		      $td->EXIT_STATUS => 0});
