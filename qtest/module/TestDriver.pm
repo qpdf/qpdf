@@ -65,9 +65,10 @@ use constant TD_THREADS => 'TD_THREADS';
 use constant TD_SEQGROUPS => 'TD_SEQGROUPS';
 
 # Flags
-use constant NORMALIZE_NEWLINES =>   1 << 0;
+use constant NORMALIZE_NEWLINES   => 1 << 0;
 use constant NORMALIZE_WHITESPACE => 1 << 1;
-use constant EXPECT_FAILURE =>       1 << 2;
+use constant EXPECT_FAILURE       => 1 << 2;
+use constant RM_WS_ONLY_LINES     => 1 << 3;
 
 # Field names
 use vars qw($f_socket $f_origdir $f_tempdir $f_testlog $f_testxml $f_suitename);
@@ -550,6 +551,12 @@ sub get_start_dir
 #      place-holder test cases that exercise a known bug that cannot
 #      yet be fixed.
 
+#      RM_WS_ONLY_LINES: If specified, all lines only containing any
+#      whitespace character like newlines, spaces or tabs are removed
+#      from the input.  This is done before writing through any
+#      filter and is especially useful if some tests output more e.g.
+#      newlines on some platforms than on others.
+
 sub runtest
 {
     my $rep = shift;
@@ -817,6 +824,15 @@ sub runtest
 	{
 	    &QTC::TC("testdriver", "TestDriver no normalize newlines");
 	}
+    if ($flags & $rep->RM_WS_ONLY_LINES)
+    {
+        &QTC::TC("testdriver", "TestDriver remove whitespace only lines");
+        $line =~ s/^\s+$//;
+    }
+    else
+    {
+        &QTC::TC("testdriver", "TestDriver no remove whitespace only lines");
+    }
 	$actual->print($line);
 	$actual->flush();
 	last if defined $exit_status;

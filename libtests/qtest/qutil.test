@@ -13,6 +13,6 @@ $td->runtest("QUtil",
 	     {$td->COMMAND => "qutil"},
 	     {$td->FILE => "qutil.out",
 	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
+	     $td->NORMALIZE_NEWLINES | $td->RM_WS_ONLY_LINES);
 
 $td->report(1);
