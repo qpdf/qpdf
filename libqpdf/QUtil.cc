@@ -164,7 +164,7 @@ QUtil::seek(FILE* stream, qpdf_offset_t offset, int whence)
 #elif HAVE_FSEEKO64
     return fseeko64(stream, offset, whence);
 #else
-# ifdef _MSC_VER
+# if defined _MSC_VER || defined __BORLANDC__
     return _fseeki64(stream, offset, whence);
 # else
     return fseek(stream, static_cast<long>(offset), whence);
@@ -180,7 +180,7 @@ QUtil::tell(FILE* stream)
 #elif HAVE_FSEEKO64
     return static_cast<qpdf_offset_t>(ftello64(stream));
 #else
-# ifdef _MSC_VER
+# if defined _MSC_VER || defined __BORLANDC__
     return _ftelli64(stream);
 # else
     return static_cast<qpdf_offset_t>(ftell(stream));
