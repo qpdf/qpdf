@@ -2086,15 +2086,15 @@ for (my $large = 0; $large < $nlarge; ++$large)
     my $size = ($large ? "large" : "small");
     my $file = $large ? "$large_file_test_path/a.pdf" : "a.pdf";
     $td->runtest("write test file",
-                 {$td->COMMAND => "test_large_file write $size $file"},
+                 {$td->COMMAND => "test_large_file write $size '$file'"},
                  {$td->FILE => "large_file.out", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
     $td->runtest("read test file",
-                 {$td->COMMAND => "test_large_file read $size $file"},
+                 {$td->COMMAND => "test_large_file read $size '$file'"},
                  {$td->FILE => "large_file.out", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
     $td->runtest("check",
-                 {$td->COMMAND => "qpdf --suppress-recovery --check $file",
+                 {$td->COMMAND => "qpdf --suppress-recovery --check '$file'",
                   $td->FILTER => "grep -v checking"},
                  {$td->FILE => "large_file-check-normal.out",
                   $td->EXIT_STATUS => 0},
@@ -2118,11 +2118,11 @@ for (my $large = 0; $large < $nlarge; ++$large)
                          {$td->COMMAND =>
                               "qpdf --stream-data=preserve" .
                               " --object-streams=$omode" .
-                              " $lin $file $newfile"},
+                              " $lin '$file' '$newfile'"},
                          {$td->STRING => "", $td->EXIT_STATUS => 0});
             $td->runtest("read test file",
                          {$td->COMMAND =>
-                              "test_large_file read $size $newfile"},
+                              "test_large_file read $size '$newfile'"},
                          {$td->FILE => "large_file.out", $td->EXIT_STATUS => 0},
                          $td->NORMALIZE_NEWLINES);
             my $check_out =
@@ -2135,7 +2135,7 @@ for (my $large = 0; $large < $nlarge; ++$large)
                     : "large_file-check-normal.out"));
             $td->runtest("check: ostream=$ostream, linearize=$linearize",
                          {$td->COMMAND =>
-                              "qpdf --suppress-recovery --check $newfile",
+                              "qpdf --suppress-recovery --check '$newfile'",
                           $td->FILTER => "grep -v checking"},
                          {$td->FILE => $check_out, $td->EXIT_STATUS => 0},
                          $td->NORMALIZE_NEWLINES);
@@ -2155,10 +2155,10 @@ for (my $large = 0; $large < $nlarge; ++$large)
     print F "oops" or die;
     close(F);
 
-    my $cmd = +{$td->COMMAND => "test_large_file read $size $file"};
+    my $cmd = +{$td->COMMAND => "test_large_file read $size '$file'"};
     if ($large)
     {
-        $cmd->{$td->FILTER} = "sed -e s,$large_file_test_path/,,";
+        $cmd->{$td->FILTER} = "sed -e 's,$large_file_test_path/,,'";
     }
     $td->runtest("reconstruct xref table",
                  $cmd,
