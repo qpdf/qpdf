@@ -50,3 +50,5 @@ download.
    addition to including unmodified distributions of pcre and zlib, it
    includes a README file and some scripts to help you build them for
    Windows.
+
+If you want to build on Windows, please see also README-windows.txt.

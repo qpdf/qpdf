@@ -52,6 +52,40 @@ want to run them, you need ghostscript and tiff utils as well, and you
 will need to add --enable-test-compare-images from the configure
 statements given below.
 
+
+
+Additionally for Windows, some tests require 3rd party software which
+most likely is not available if not provided by an environment like
+MSYS, Cygwin or such, but can be downloaded separately as well for an
+environment not using both of the former mentioned. Just extract or
+install the following software into separate folders each and add the
+"bin" folder to your "PATH" env variable to make executables and DLLs
+available. If installers are provided, they might do that already by
+default.
+
+ * LibJpeg (http://gnuwin32.sourceforge.net/packages/jpeg.htm)
+
+   This archive provides some needed DLLs for LibTiff if you want to
+   use the image comparison tests.
+
+ * LibTiff (http://gnuwin32.sourceforge.net/packages/tiff.htm)
+
+   This archive provides some needed binaries and DLLs if you want to
+   use the image comparison tests and is only working if DLLs from
+   LibJpeg are available as well.
+
+ * GhostScript (http://www.ghostscript.com/download/gsdnld.html)
+
+   GhstScript is needed for image comparison tests and it's important
+   that the binary is available as "gs", while its default name is
+   "gswin32[c].exe". So you need to provide an additional "gs.exe"
+   by copying one of the original files or use "mklink" to create a
+   hard-/softlink, or need to provide a custom "gs.cmd" wrapper which
+   simply forwards all args to one of the original binarys. Using
+   "mkink" with "gswin32c.exe" should be preferred.
+
+
+
 Jian Ma <stronghorse@tom.com> has generously provided a port of QPDF
 that works with Microsoft VC6.  Several changes are required, but they
 are well documented in his port.  You can find the VC6 port in the
