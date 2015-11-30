@@ -2,10 +2,11 @@
 require 5.008;
 BEGIN { $^W = 1; }
 use strict;
-use File::Copy;
-use File::Basename;
 use Cwd;
 use Digest::MD5;
+use File::Basename;
+use File::Copy;
+use File::Spec;
 
 chdir("qpdf") or die "chdir testdir failed: $!\n";
 
@@ -13,7 +14,8 @@ require TestDriver;
 
 cleanup();
 
-my $td = new TestDriver('qpdf');
+my $devNull = File::Spec->devnull();
+my $td      = new TestDriver('qpdf');
 
 my $compare_images = 1;
 if ((exists $ENV{'QPDF_SKIP_TEST_COMPARE_IMAGES'}) &&
@@ -22,6 +24,11 @@ if ((exists $ENV{'QPDF_SKIP_TEST_COMPARE_IMAGES'}) &&
     $compare_images = 0;
 }
 my $large_file_test_path = $ENV{'QPDF_LARGE_FILE_TEST_PATH'} || undef;
+if (defined($large_file_test_path))
+{
+	$large_file_test_path = File::Spec->rel2abs($large_file_test_path);
+	$large_file_test_path =~ s!\\!/!g;
+}
 
 my $have_acroread = 0;
 
@@ -29,7 +36,7 @@ if ($compare_images)
 {
     # check for working acroread
     if (system("acroread -toPostScript -pairs good1.pdf a.ps" .
-	       " >/dev/null 2>&1") == 0)
+               " >$devNull 2>&1") == 0)
     {
 	$have_acroread = 1;
     }
@@ -374,7 +381,7 @@ $td->runtest("check output",
 	     {$td->FILE => "test14-out.pdf"});
 # Test 14 also exercises writing to memory without static ID.
 $td->runtest("check non-static ID version",
-             {$td->COMMAND => "./diff-ignore-ID-version a.pdf b.pdf"},
+             {$td->COMMAND => "sh ./diff-ignore-ID-version a.pdf b.pdf"},
              {$td->STRING => "okay\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
@@ -1551,7 +1558,7 @@ foreach my $d (@encrypted_files)
     {
 	$td->runtest("check against base",
 		     {$td->COMMAND =>
-                          "./diff-encrypted $enc_base.enc $file.enc"},
+                          "sh ./diff-encrypted $enc_base.enc $file.enc"},
 		     {$td->STRING => "okay\n",
 		      $td->EXIT_STATUS => 0},
 		     $td->NORMALIZE_NEWLINES);
@@ -1860,7 +1867,7 @@ $td->runtest("convert to qdf",
                   " --password=owner --no-original-object-ids"},
              {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("compare qdf",
-             {$td->COMMAND => "./diff-ignore-ID-version a.qdf b.qdf"},
+             {$td->COMMAND => "sh ./diff-ignore-ID-version a.qdf b.qdf"},
              {$td->STRING => "okay\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("copy encryption with qpdf",
@@ -1881,7 +1888,7 @@ $td->runtest("convert to qdf",
                   " --password=owner --no-original-object-ids"},
              {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("compare qdf",
-             {$td->COMMAND => "./diff-ignore-ID-version a.qdf c.qdf"},
+             {$td->COMMAND => "sh ./diff-ignore-ID-version a.qdf c.qdf"},
              {$td->STRING => "okay\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
@@ -2079,15 +2086,15 @@ for (my $large = 0; $large < $nlarge; ++$large)
     my $size = ($large ? "large" : "small");
     my $file = $large ? "$large_file_test_path/a.pdf" : "a.pdf";
     $td->runtest("write test file",
-                 {$td->COMMAND => "test_large_file write $size $file"},
+                 {$td->COMMAND => "test_large_file write $size '$file'"},
                  {$td->FILE => "large_file.out", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
     $td->runtest("read test file",
-                 {$td->COMMAND => "test_large_file read $size $file"},
+                 {$td->COMMAND => "test_large_file read $size '$file'"},
                  {$td->FILE => "large_file.out", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
     $td->runtest("check",
-                 {$td->COMMAND => "qpdf --suppress-recovery --check $file",
+                 {$td->COMMAND => "qpdf --suppress-recovery --check '$file'",
                   $td->FILTER => "grep -v checking"},
                  {$td->FILE => "large_file-check-normal.out",
                   $td->EXIT_STATUS => 0},
@@ -2111,11 +2118,11 @@ for (my $large = 0; $large < $nlarge; ++$large)
                          {$td->COMMAND =>
                               "qpdf --stream-data=preserve" .
                               " --object-streams=$omode" .
-                              " $lin $file $newfile"},
+                              " $lin '$file' '$newfile'"},
                          {$td->STRING => "", $td->EXIT_STATUS => 0});
             $td->runtest("read test file",
                          {$td->COMMAND =>
-                              "test_large_file read $size $newfile"},
+                              "test_large_file read $size '$newfile'"},
                          {$td->FILE => "large_file.out", $td->EXIT_STATUS => 0},
                          $td->NORMALIZE_NEWLINES);
             my $check_out =
@@ -2128,7 +2135,7 @@ for (my $large = 0; $large < $nlarge; ++$large)
                     : "large_file-check-normal.out"));
             $td->runtest("check: ostream=$ostream, linearize=$linearize",
                          {$td->COMMAND =>
-                              "qpdf --suppress-recovery --check $newfile",
+                              "qpdf --suppress-recovery --check '$newfile'",
                           $td->FILTER => "grep -v checking"},
                          {$td->FILE => $check_out, $td->EXIT_STATUS => 0},
                          $td->NORMALIZE_NEWLINES);
@@ -2148,10 +2155,10 @@ for (my $large = 0; $large < $nlarge; ++$large)
     print F "oops" or die;
     close(F);
 
-    my $cmd = +{$td->COMMAND => "test_large_file read $size $file"};
+    my $cmd = +{$td->COMMAND => "test_large_file read $size '$file'"};
     if ($large)
     {
-        $cmd->{$td->FILTER} = "sed -e s,$large_file_test_path/,,";
+        $cmd->{$td->FILTER} = "sed -e 's,$large_file_test_path/,,'";
     }
     $td->runtest("reconstruct xref table",
                  $cmd,
@@ -2247,7 +2254,7 @@ sub compare_pdfs
 	$td->runtest("convert original file to image",
 		     {$td->COMMAND =>
 			  "(cd tif1;" .
-			  " gs 2>/dev/null -q -dNOPAUSE -sDEVICE=tiff24nc" .
+			  " gs 2>$devNull -q -dNOPAUSE -sDEVICE=tiff24nc" .
 			  " -sOutputFile=a.tif - < ../$f1)"},
 		     {$td->STRING => "",
 		      $td->EXIT_STATUS => 0});
@@ -2266,7 +2273,7 @@ sub compare_pdfs
 	$td->runtest("convert new file to image",
 		     {$td->COMMAND =>
 			  "(cd tif2;" .
-			  " gs 2>/dev/null -q -dNOPAUSE -sDEVICE=tiff24nc" .
+			  " gs 2>$devNull -q -dNOPAUSE -sDEVICE=tiff24nc" .
 			  " -sOutputFile=a.tif - < ../$f2)"},
 		     {$td->STRING => "",
 		      $td->EXIT_STATUS => 0});
