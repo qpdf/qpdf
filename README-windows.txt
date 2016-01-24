@@ -46,45 +46,35 @@ that to replace the one in the 20111220 version, which is based on
 4.7.0.  That particular workaround results in a Windows-hosted 64-bit
 targetted mingw that can build a qpdf that passes its test suite.
 
-As of this writing, the image comparison tests confuse ghostscript in
-cygwin, but there's a chance they might work at some point.  If you
-want to run them, you need ghostscript and tiff utils as well, and you
-will need to add --enable-test-compare-images from the configure
-statements given below.
-
-
-
-Additionally for Windows, some tests require 3rd party software which
-most likely is not available if not provided by an environment like
-MSYS, Cygwin or such, but can be downloaded separately as well for an
-environment not using both of the former mentioned. Just extract or
-install the following software into separate folders each and add the
-"bin" folder to your "PATH" env variable to make executables and DLLs
-available. If installers are provided, they might do that already by
-default.
+Image comparison tests are disabled by default, but it is possible to
+run them on Windows. To do so, add --enable-test-compare-images from
+the configure statements given below and install some additional
+third-party dependencies. These may be provided in an environment such
+as MSYS or Cygwin or can be downloaded separately for other
+environments. You may extract or install the following software into
+separate folders each and add the "bin" folder to your "PATH"
+environment variable to make executables and DLLs available. If
+installers are provided, they might do that already by default.
 
  * LibJpeg (http://gnuwin32.sourceforge.net/packages/jpeg.htm)
 
-   This archive provides some needed DLLs for LibTiff if you want to
-   use the image comparison tests.
+   This archive provides some needed DLLs needed by LibTiff.
 
  * LibTiff (http://gnuwin32.sourceforge.net/packages/tiff.htm)
 
    This archive provides some needed binaries and DLLs if you want to
-   use the image comparison tests and is only working if DLLs from
-   LibJpeg are available as well.
+   use the image comparison tests. It depends on some DLLs from
+   LibJpeg.
 
  * GhostScript (http://www.ghostscript.com/download/gsdnld.html)
 
-   GhstScript is needed for image comparison tests and it's important
+   GhostScript is needed for image comparison tests. It's important
    that the binary is available as "gs", while its default name is
-   "gswin32[c].exe". So you need to provide an additional "gs.exe"
-   by copying one of the original files or use "mklink" to create a
-   hard-/softlink, or need to provide a custom "gs.cmd" wrapper which
-   simply forwards all args to one of the original binarys. Using
-   "mkink" with "gswin32c.exe" should be preferred.
-
-
+   "gswin32[c].exe". You can either copy one of the original files,
+   use "mklink" to create a hard-/softlink, or provide a custom
+   "gs.cmd" wrapper that forwards all arguments to one of the original
+   binaries. Using "mklink" with "gswin32c.exe" is probably the best
+   choice.
 
 Jian Ma <stronghorse@tom.com> has generously provided a port of QPDF
 that works with Microsoft VC6.  Several changes are required, but they
