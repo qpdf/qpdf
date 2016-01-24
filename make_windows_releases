@@ -12,11 +12,11 @@ PATH=$cwd/libqpdf/build:$PATH
 rm -rf install-mingw* install-msvc*
 
 ./config-mingw64
-make -j8
+make
 make check install
 make distclean
 ./config-mingw32
-make -j8
+make
 make check install
 make distclean
 

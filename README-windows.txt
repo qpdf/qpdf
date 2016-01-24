@@ -4,47 +4,51 @@ Common Setup
 You may need to disable antivirus software to run qpdf's test suite.
 
 To be able to build qpdf and run its test suite, you must have MSYS
-from MinGW installed, and you must have ActiveState Perl.  Here's what
-I did on my system:
+from MinGW installed, and you must have ActiveState Perl. The Perl
+provided by MSYS won't work reliably. It partially works, but some
+tests will fail with it because it doesn't support all the
+capabilities required by the test driver. Here's what I did on my
+system:
 
-Install ActiveState perl.
+Install ActiveState perl. The versions of perl included with git bash
+and mingw are not able to run the test suite.
 
-Grab the latest mingw-get-inst.  From the installation wizard, choose
-to install developer kit, C, and C++ support.  Once installed, you
-will have an icon to start an msys shell.  From the msys shell, run
+Install MinGW-w64. From MinGW-w64 download page, grab the installer
+and run it. First install the i686 compiler to C:\mingw-w64, and then
+install x86_64 compiler to the same location. The installer will
+automatically created mingw32 and mingw64 directories under mingw-w64.
 
-mingw-get install msys-unzip msys-zip mingw32-make
+Grab the latest mingw-get-inst from the MinGW project. We are using
+this for shell and build utilties but not for the compiler. Run the
+installer.
 
-Then replace perl and make with the appropriate versions:
+Install under basic:
+  mingw-developer-toolkit
+  msys-base
 
-mv /bin/perl.exe /bin/msys-perl.exe
-mv /bin/make.exe /bin/msys-make.exe
-mv /mingw/bin/mingw32-make.exe /mingw/bin/make.exe
+Use C:\mingw32\msys\1.0\msys.bat to start a shell. In the shell, run
 
-Make sure perl --version shows ActiveState perl.
+mingw32-get install msys-zip
 
-To install MinGW-w64, first install msys and mingw32 as above.
+Add to path in this order:
+  C:\mingw32\msys\1.0\bin
+  C:\mingw-w64\mingw64\bin
+  C:\mingw-w64\mingw32\bin
 
-From MinGW-w64 download page, go to "Toolchains targeting
-Win64/Automated Builds" and find the latest mingw-w64 that runs under
-i686-mingw.  It will be called something like
-mingw-w64-bin_i686-mingw_yyyymmdd.zip.  The compiler binaries are
-32-bit, which (of course) runs on 64-bit Windows.  Extract this under
-C:\MinGW-w64, and add C:\MinGW-w64\bin and C:\MinGW-w64\lib\mingw to
-the path.
+ensuring that they are after ActiveState perl.
 
-Starting in version 4.1.0, qpdf uses std::setprecision and std::fixed
-to format floating point numbers, and using one or both of those
-causes a crash with the version of libstdc++-6 that is included with
-mingw-w64-bin_i686-mingw_20111220.zip, which appears to be the latest
-mingw-hosted version of mingw that targets w64 that includes the full
-toolchain including all the DLL creation tools.  To work around this,
-for my personal build, I have grabbed
-x86_64-w64-mingw32-gcc-4.7.2-release-win64_rubenvb.7z from the
-personal builds and just extracted libstdc++-6.dll from there and used
-that to replace the one in the 20111220 version, which is based on
-4.7.0.  That particular workaround results in a Windows-hosted 64-bit
-targetted mingw that can build a qpdf that passes its test suite.
+Check to make sure zip and unzip are in your path, make --version
+shows at least 3.81, perl --version shows the perl from ActiveState,
+and gcc --version is the 64-bit gcc. (zip is not actually needed
+unless you are running the tools to create the releases.)
+
+Install suitable Microsoft Visual Studio edition. In early 2016, 2015
+community edition with C++ support is fine. It may crash a few times
+during installation, but repeating the installation will allow it to
+finish, and the resulting software is stable.
+
+To build qpdf, start the msys shell from a command window started from
+one of the Visual Studio shell windows.
 
 Image comparison tests are disabled by default, but it is possible to
 run them on Windows. To do so, add --enable-test-compare-images from
@@ -75,12 +79,6 @@ installers are provided, they might do that already by default.
    "gs.cmd" wrapper that forwards all arguments to one of the original
    binaries. Using "mklink" with "gswin32c.exe" is probably the best
    choice.
-
-Jian Ma <stronghorse@tom.com> has generously provided a port of QPDF
-that works with Microsoft VC6.  Several changes are required, but they
-are well documented in his port.  You can find the VC6 port in the
-contrib area of the qpdf download area.  It may not always be
-up-to-date with the latest official qpdf release.
 
 
 External Libraries
@@ -129,13 +127,13 @@ autofiles.zip that you can extract on top of a fresh checkout.
 Building with MinGW
 ===================
 
-QPDF is known to build and pass its test suite with mingw (latest
-version tested: gcc 4.6.2), mingw64 (latest version tested: 4.7.0) and
-Microsoft Visual C++ 2010, both 32-bit and 64-bit versions.  MSYS plus
-ActiveState Perl is required to build as well in order to get make
-and other related tools.  While it is possible that Cygwin could be
-used to build native Windows versions of qpdf, this configuration has
-not been tested recently.
+QPDF is known to build and pass its test suite with mingw-w64 using
+the 32-bit and 64-bit compilers from that project (latest version
+tested: 5.3.0) and Microsoft Visual C++ 2015, both 32-bit and 64-bit
+versions. MSYS plus ActiveState Perl is required to build as well in
+order to get make and other related tools. While it is possible that
+Cygwin could be used to build native Windows versions of qpdf, this
+configuration has not been tested recently.
 
 From your MSYS prompt, run
 
@@ -151,13 +149,7 @@ and then
 
 Note that ./config-mingw32 and ./configure-mingw64 just run
 ./configure with specific arguments, so you can look at it, make
-adjustments, and manually run configure instead.  Note also that
-config-mingw32 appends definition of _FILE_OFFSET_BITS=64 to
-qpdf-config.h since, as of the qpdf 3.0 release, the current versions
-of the autoconf tools did not correctly detect that mingw requires
-this to get large file support.  This workaround is only required for
-mingw32.  The 64-bit version of mingw works "out of the box" with
-large file support, as do both the 32-bit and 64-bit versions of MSVC.
+adjustments, and manually run configure instead.
 
 Add the absolute path to the libqpdf/build directory to your PATH.
 Make sure you can run the qpdf command by typing qpdf/build/qpdf and
@@ -177,13 +169,11 @@ You can also take a look at make_windows_releases for reference.  This
 is how the distributed Windows executables are created.
 
 
-Building with MSVC 2010
+Building with MSVC 2015
 =======================
 
-These instructions would likely work with newer version of MSVC or
-with full version of MSVC.  They may also work with .NET 2005.  They
-have only been tested with Visual C++ 2010.  Earlier version of qpdf
-were built with MSVC 2008 Express.
+These instructions would likely work with newer versions of MSVC and
+are known to have worked with versions as old as 2008 Express.
 
 You should first set up your environment to be able to run MSVC from
 the command line.  There is usually a batch file included with MSVC
@@ -192,7 +182,8 @@ configured for whichever of 32-bit or 64-bit output that you intend to
 build for.
 
 From that cmd prompt, you can start your msys shell by just running
-manually whatever command is associated with your msys shell icon.
+manually whatever command is associated with your msys shell icon
+(such as C:\MinGW\msys\1.0\msys.bat).
 
 Configure as follows:
 
@@ -266,4 +257,6 @@ across the DLL to EXE boundary.  Since qpdf uses exception handling
 extensively for error handling, we have no choice but to redistribute
 the C++ runtime DLLs.  Maybe this will be addressed in a future
 version of the compilers.  This has not been retested with the
-toolchain versions used to create qpdf 3.0 distributions.
+toolchain versions used to create qpdf 3.0 distributions. (This has
+not been revisited since MSVC 2008, but redistrbuting runtime DLLs is
+extremely common and should not be a problem.)

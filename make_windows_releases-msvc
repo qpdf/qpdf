@@ -17,6 +17,6 @@ cwd=`pwd`
 PATH=$cwd/libqpdf/build:$PATH
 
 ./config-msvc $w
-make -j8
+make
 make check install
 make distclean

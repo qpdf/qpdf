@@ -5,7 +5,7 @@
     LD=x86_64-w64-mingw32-ld \
     AR=x86_64-w64-mingw32-ar \
     RANLIB=x86_64-w64-mingw32-ranlib \
-    DLLTOOL=x86_64-w64-mingw32-dlltool \
+    DLLTOOL=$(dirname $(type -p x86_64-w64-mingw32-gcc))/dlltool \
     STRIP=x86_64-w64-mingw32-strip \
-    OBJDUMP=x86_64-w64-mingw32-objdump \
+    OBJDUMP=$(dirname $(type -p x86_64-w64-mingw32-gcc))/objdump \
     ${1+"$@"}

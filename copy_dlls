@@ -7,8 +7,8 @@ use File::Basename;
 
 my $whoami = basename($0);
 
-usage() unless @ARGV == 3;
-my ($file, $destdir, $objdump) = @ARGV;
+usage() unless @ARGV == 4;
+my ($file, $destdir, $objdump, $windows_wordsize) = @ARGV;
 my $filedir = dirname($file);
 
 my %dlls = ();
@@ -40,9 +40,38 @@ if (! defined $format)
 # DLLs.
 my $sep = ($^O eq 'MSWin32' ? ';' : ':');
 my @path = ($filedir, '.', split($sep, $ENV{'PATH'}));
+foreach my $var (qw(LIB))
+{
+    if (exists $ENV{$var})
+    {
+        push(@path, split($sep, $ENV{$var}));
+    }
+}
 if (-f "$file.manifest")
 {
     unshift(@path, get_manifest_dirs("$file.manifest"));
+}
+my $redist_suffix = (($windows_wordsize eq '64') ? "x64" : "x86");
+if (exists $ENV{'VCINSTALLDIR'})
+{
+    my $redist = $ENV{'VCINSTALLDIR'} . "/Redist/$redist_suffix";
+    if (opendir(D, $redist))
+    {
+        my @entries = readdir(D);
+        closedir(D);
+        foreach my $e (@entries)
+        {
+            if ($e =~ m/\.CRT$/i)
+            {
+                unshift(@path, "$redist/$e");
+            }
+        }
+    }
+}
+if (exists $ENV{'UNIVERSALCRTSDKDIR'})
+{
+    my $redist = $ENV{'UNIVERSALCRTSDKDIR'} . "/Redist/ucrt/DLLs/$redist_suffix";
+    unshift(@path, $redist);
 }
 my @final = ();
 my @notfound = ();
@@ -75,7 +104,7 @@ foreach my $f (@final)
 {
     $f =~ s,\\,/,g;
     print "Copying $f to $destdir\n";
-    system("cp -p $f $destdir") == 0 or
+    system("cp -p '$f' '$destdir'") == 0 or
 	die "$whoami: copy $f to $destdir failed\n";
 }
 
@@ -92,7 +121,7 @@ sub is_format
         return 1;
     }
     my $result = 0;
-    my $file_format = `file $file`;
+    my $file_format = `file "$file"`;
     print "$file $format $file_format\n";
     if ($? == 0)
     {

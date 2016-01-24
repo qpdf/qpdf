@@ -1,13 +1,11 @@
 #!/bin/sh
-./configure --disable-test-compare-images --enable-external-libs --enable-werror --with-windows-wordsize=32 --with-buildrules=mingw ${1+"$@"}
-# As of autoconf 2.69 and gcc 4.6, autoconf's configure fails to
-# recognize that defining _FILE_OFFSET_BITS works with mingw32.
-# Append to qpdf-config.h rather than passing CPPFLAGS on the
-# commandline.  This way we don't defeat the fact that test_large_file
-# and other things that only use the public interface can be built
-# without any special flags.
-cat >> libqpdf/qpdf/qpdf-config.h <<EOF
-#ifndef _FILE_OFFSET_BITS
-# define _FILE_OFFSET_BITS 64
-#endif
-EOF
+./configure --disable-test-compare-images --enable-external-libs --enable-werror --with-windows-wordsize=32 --with-buildrules=mingw \
+    CC=i686-w64-mingw32-gcc \
+    CXX=i686-w64-mingw32-g++ \
+    LD=i686-w64-mingw32-ld \
+    AR=i686-w64-mingw32-ar \
+    RANLIB=i686-w64-mingw32-ranlib \
+    DLLTOOL=$(dirname $(type -p i686-w64-mingw32-gcc))/dlltool \
+    STRIP=i686-w64-mingw32-strip \
+    OBJDUMP=$(dirname $(type -p i686-w64-mingw32-gcc))/objdump \
+    ${1+"$@"}
