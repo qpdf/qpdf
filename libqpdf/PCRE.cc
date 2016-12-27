@@ -213,31 +213,13 @@ PCRE::test(int n)
 {
     try
     {
-	if (n == 1)
-	{
-	    static char const* utf8 = "abπdefq";
-	    PCRE u1("^([[:alpha:]]+)");
-	    PCRE u2("^([\\p{L}]+)", PCRE_UTF8);
-	    PCRE::Match m1 = u1.match(utf8);
-	    if (m1)
-	    {
-		std::cout << "no utf8: " << m1.getMatch(1) << std::endl;
-	    }
-	    PCRE::Match m2 = u2.match(utf8);
-	    if (m2)
-	    {
-		std::cout << "utf8: " << m2.getMatch(1) << std::endl;
-	    }
-	    return;
-	}
-
 	try
 	{
-	    PCRE pcre1("a**");
+	    PCRE pcre1("?**");
 	}
 	catch (std::exception& e)
 	{
-	    std::cout << e.what() << std::endl;
+	    std::cout << "invalid regex" << std::endl;
 	}
 
 	PCRE pcre2("^([^\\s:]*)\\s*:\\s*(.*?)\\s*$");

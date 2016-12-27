@@ -1,4 +1,4 @@
-PCRE error: compilation of a** failed at offset 2: nothing to repeat
+invalid regex
 3
 key: value one two three 
 0
