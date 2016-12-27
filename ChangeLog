@@ -1,3 +1,12 @@
+2016-12-27  Jay Berkenbilt  <ejb@ql.org>
+
+	* XXX: Abandoned: switch from pcre to std::regex. Abandoned for
+	two reasons: some of the regular expressions used PCRE-specific
+	features, specifically (?s) and \A. While it is possible to
+	rewrite the expressions, it's hard to make them exactly the same.
+	Even doing this, std::regex with g++ 5.4.1 is many times slower
+	than pcre. The approach is being abandoned for this reason.
+
 2015-11-10  Jay Berkenbilt  <ejb@ql.org>
 
 	* 6.0.0: release
