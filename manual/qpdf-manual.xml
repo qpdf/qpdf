@@ -103,7 +103,7 @@
      </listitem>
      <listitem>
       <para>
-       pcre: <ulink url="http://www.pcre.org/">http://www.pcre.org/</ulink>
+       If using a compiler that doesn't support c++11, pcre: <ulink url="http://www.pcre.org/">http://www.pcre.org/</ulink>
       </para>
      </listitem>
      <listitem>
@@ -1353,7 +1353,9 @@ outfile.pdf</option>
     When linking against the qpdf static library, you may also need to
     specify <literal>-lpcre -lz</literal> on your link command.  If
     your system understands how to read libtool
-    <filename>.la</filename> files, this may not be necessary.
+    <filename>.la</filename> files, this may not be necessary. Note
+    that <literal>-lpcre</literal> is not required if you are using a
+    compiler that supports <type>std::regex</type> (c++11).
    </para>
    <para>
     The qpdf library is safe to use in a multithreaded program, but no

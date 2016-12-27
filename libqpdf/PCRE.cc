@@ -42,29 +42,34 @@ PCRE::Match::init(int nmatches, int nbackrefs, char const* subject)
     this->nmatches = nmatches;
     this->nbackrefs = nbackrefs;
     this->subject = subject;
+#if ! HAVE_STD_REGEX
     this->ovecsize = 3 * (1 + nbackrefs);
     this->ovector = 0;
     if (this->ovecsize)
     {
 	this->ovector = new int[this->ovecsize];
     }
+#endif
 }
 
 void
 PCRE::Match::copy(Match const& rhs)
 {
     this->init(rhs.nmatches, rhs.nbackrefs, rhs.subject);
-    int i;
-    for (i = 0; i < this->ovecsize; ++i)
+#if ! HAVE_STD_REGEX
+    for (int i = 0; i < this->ovecsize; ++i)
     {
 	this->ovector[i] = rhs.ovector[i];
     }
+#endif
 }
 
 void
 PCRE::Match::destroy()
 {
+#if ! HAVE_STD_REGEX
     delete [] this->ovector;
+#endif
 }
 
 PCRE::Match::operator bool()
@@ -103,6 +108,19 @@ PCRE::Match::getMatch(int n, int flags)
 void
 PCRE::Match::getOffsetLength(int n, int& offset, int& length)
 {
+#if HAVE_STD_REGEX
+    if (this->m.empty() ||
+        (n > this->nmatches - 1) ||
+        (! this->m[n].matched))
+    {
+        throw NoBackref();
+    }
+    else
+    {
+        offset = this->m[n].first - this->subject;
+        length = this->m[n].second - this->m[n].first;
+    }
+#else
     if ((this->nmatches < 0) ||
 	(n > this->nmatches - 1) ||
 	(this->ovector[n * 2] == -1))
@@ -111,6 +129,7 @@ PCRE::Match::getOffsetLength(int n, int& offset, int& length)
     }
     offset = this->ovector[n * 2];
     length = this->ovector[n * 2 + 1] - offset;
+#endif
 }
 
 int
@@ -137,11 +156,16 @@ PCRE::Match::nMatches() const
     return this->nmatches;
 }
 
-PCRE::PCRE(char const* pattern, int options)
+PCRE::PCRE(char const* pattern) :
+    code(0)
 {
+#if HAVE_STD_REGEX
+    this->code = new std::regex(pattern);
+    this->nbackrefs = this->code->mark_count();
+#else
     char const *errptr;
     int erroffset;
-    this->code = pcre_compile(pattern, options, &errptr, &erroffset, 0);
+    this->code = pcre_compile(pattern, 0, &errptr, &erroffset, 0);
     if (this->code)
     {
 	pcre_fullinfo(this->code, 0, PCRE_INFO_CAPTURECOUNT, &(this->nbackrefs));
@@ -154,24 +178,41 @@ PCRE::PCRE(char const* pattern, int options)
 			  errptr);
 	throw std::runtime_error("PCRE error: " + message);
     }
+#endif
 }
 
 PCRE::~PCRE()
 {
+#if HAVE_STD_REGEX
+    delete this->code;
+#else
     pcre_free(this->code);
+#endif
 }
 
 PCRE::Match
-PCRE::match(char const* subject, int options, int startoffset, int size)
+PCRE::match(char const* subject)
 {
-    if (size == -1)
-    {
-	size = strlen(subject);
-    }
-
     Match result(this->nbackrefs, subject);
-    int status = pcre_exec(this->code, 0, subject, size,
-			   startoffset, options,
+#if HAVE_STD_REGEX
+    if (std::regex_search(subject, result.m, *this->code))
+    {
+	result.nmatches = result.m.size();
+        // For backward compatibility with pcre library, don't count
+        // trailing unmatched subexpressions.
+        while ((result.nmatches >= 0) &&
+               (! result.m[result.nmatches-1].matched))
+        {
+            --result.nmatches;
+        }
+    }
+    else
+    {
+        result.nmatches = -1;
+    }
+#else
+    int status = pcre_exec(this->code, 0, subject, strlen(subject),
+                           0 /*startoffset*/, 0 /*options*/,
 			   result.ovector, result.ovecsize);
     if (status >= 0)
     {
@@ -204,6 +245,7 @@ PCRE::match(char const* subject, int options, int startoffset, int size)
 	    throw std::logic_error(message);
 	}
     }
+#endif
 
     return result;
 }

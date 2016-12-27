@@ -79,13 +79,6 @@ if test "$USE_EXTERNAL_LIBS" = "1"; then
    fi
 fi
 
-if test "$BUILD_INTERNAL_LIBS" = "0"; then
-   AC_CHECK_HEADER(zlib.h,,[MISSING_ZLIB_H=1; MISSING_ANY=1])
-   AC_SEARCH_LIBS(deflate,z zlib,,[MISSING_ZLIB=1; MISSING_ANY=1])
-   AC_CHECK_HEADER(pcre.h,,[MISSING_PCRE_H=1; MISSING_ANY=1])
-   AC_SEARCH_LIBS(pcre_compile,pcre,,[MISSING_PCRE=1; MISSING_ANY=1])
-fi
-
 if test "x$qpdf_OS_SECURE_RANDOM" = "x1"; then
   OLIBS=$LIBS
   LIBS="$LIBS Advapi32.lib"
@@ -231,6 +224,64 @@ if test "$qpdf_USE_EXTRA_WARNINGS" = "1"; then
 else
    AC_MSG_RESULT(no)
 fi
+
+if test "$BUILDRULES" != "msvc"; then
+   qpdf_USE_CXX11=0
+   try_flags="--std=c++11"
+   AC_MSG_CHECKING(for whether $CXX supports $try_flags)
+   oCXXFLAGS=$CXXFLAGS
+   CXXFLAGS="$CXXFLAGS $try_flags"
+   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[auto a = 1; auto b = a; a = b;]])],
+                     [qpdf_USE_CXX11=1],[qpdf_USE_CXX11=0])
+   CXXFLAGS=$oCXXFLAGS
+   if test "$qpdf_USE_CXX11" = "1"; then
+      AC_MSG_RESULT(yes)
+      CXXFLAGS="$CXXFLAGS $try_flags"
+   else
+      AC_MSG_RESULT(no)
+   fi
+fi
+
+AC_ARG_ENABLE(std-regex,
+   AS_HELP_STRING([--enable-std-regex],
+                  [whether to use std::regex over PCRE if available (default is yes)]),
+   [if test "$enableval" = "yes"; then
+      qpdf_TRY_STD_REGEX=1;
+    else
+      qpdf_TRY_STD_REGEX=0;
+    fi], [qpdf_TRY_STD_REGEX=1])
+if test "$qpdf_TRY_STD_REGEX" = "1"; then
+   AC_MSG_RESULT(yes)
+else
+   AC_MSG_RESULT(no)
+fi
+
+QPDF_USE_STD_REGEX=0
+AC_SUBST(QPDF_USE_STD_REGEX)
+if test "$qpdf_TRY_STD_REGEX" = "1"; then
+   AC_MSG_CHECKING(for whether $CXX supports std::regex)
+   AC_LANG([C++])
+   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <regex>]], [[std::regex expr1("([0-9]+)(\\\\-| |$)(.*)");]])],
+                     [QPDF_USE_STD_REGEX=1],[QPDF_USE_STD_REGEX=0])
+   AC_LANG([C])
+   if test "$QPDF_USE_STD_REGEX" = "1"; then
+      AC_MSG_RESULT(yes)
+   else
+      AC_MSG_RESULT(no)
+   fi
+fi
+AC_DEFINE_UNQUOTED([HAVE_STD_REGEX], [$QPDF_USE_STD_REGEX],
+                   [Define to 1 if std::regex works])
+
+if test "$BUILD_INTERNAL_LIBS" = "0"; then
+   AC_CHECK_HEADER(zlib.h,,[MISSING_ZLIB_H=1; MISSING_ANY=1])
+   AC_SEARCH_LIBS(deflate,z zlib,,[MISSING_ZLIB=1; MISSING_ANY=1])
+   if test "$QPDF_USE_STD_REGEX" = "0"; then
+      AC_CHECK_HEADER(pcre.h,,[MISSING_PCRE_H=1; MISSING_ANY=1])
+      AC_SEARCH_LIBS(pcre_compile,pcre,,[MISSING_PCRE=1; MISSING_ANY=1])
+   fi
+fi
+
 if test "$BUILDRULES" != "msvc"; then
    qpdf_USE_EXTRA_WARNINGS=0
    try_flags="-Wold-style-cast"
@@ -446,12 +497,14 @@ if test "$MISSING_ZLIB" = "1"; then
   AC_MSG_WARN(unable to find required library z (or zlib))
 fi
 
-if test "$MISSING_PCRE_H" = "1"; then
-  AC_MSG_WARN(unable to find required header pcre.h)
-fi
+if test "$QPDF_USE_STD_REGEX" = "0"; then
+  if test "$MISSING_PCRE_H" = "1"; then
+    AC_MSG_WARN(unable to find required header pcre.h)
+  fi
 
-if test "$MISSING_PCRE" = "1"; then
-  AC_MSG_WARN(unable to find required library pcre)
+  if test "$MISSING_PCRE" = "1"; then
+    AC_MSG_WARN(unable to find required library pcre)
+  fi
 fi
 
 if test "$MISSING_DOCBOOK_FO" = "1"; then
@@ -490,7 +543,10 @@ if test "$USE_EXTERNAL_LIBS" = "1"; then
    # much trouble getting it to work with a different compiler.
    CPPFLAGS="$CPPFLAGS -Iexternal-libs/include"
    LDFLAGS="$LDFLAGS -Lexternal-libs/lib-$BUILDRULES$WINDOWS_WORDSIZE"
-   LIBS="$LIBS -lz -lpcre"
+   LIBS="$LIBS -lz"
+   if test "$QPDF_USE_STD_REGEX" = "0"; then
+      LIBS="$LIBS -lpcre"
+   fi
 fi
 
 AC_OUTPUT

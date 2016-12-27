@@ -1,16 +1,21 @@
 // This is a C++ wrapper class around Philip Hazel's perl-compatible
-// regular expressions library.
+// regular expressions library or, if available, std::regex.
 //
 
 #ifndef __PCRE_HH__
 #define __PCRE_HH__
 
 #include <qpdf/DLL.h>
+#include <qpdf/qpdf-config.h>
 
 #ifdef _WIN32
 # define PCRE_STATIC
 #endif
-#include <pcre.h>
+#if HAVE_STD_REGEX
+# include <regex>
+#else
+# include <pcre.h>
+#endif
 #include <string>
 #include <stdexcept>
 
@@ -46,12 +51,12 @@ class PCRE
 	operator bool();
 
 	// All the back reference accessing routines may throw the
-	// special exception NoBackref (derived from Exception) if the
-	// back reference does not exist.  Exception will be thrown
-	// for other error conditions.  This allows callers to trap
-	// this condition explicitly when they care about the
-	// difference between a backreference matching an empty string
-	// and not matching at all.
+	// special exception NoBackref (derived from std::logic_error)
+	// if the back reference does not exist. A standard exception
+	// will be thrown for other error conditions. This allows
+	// callers to trap this condition explicitly when they care
+	// about the difference between a backreference matching an
+	// empty string and not matching at all.
 
 	// see getMatch flags below
 	QPDF_DLL
@@ -86,21 +91,24 @@ class PCRE
 
 	int nbackrefs;
 	char const* subject;
+#if HAVE_STD_REGEX
+        std::cmatch m;
+#else
 	int* ovector;
 	int ovecsize;
+#endif
 	int nmatches;
     };
 
     // The value passed in as options is passed to pcre_exec.  See man
     // pcreapi for details.
     QPDF_DLL
-    PCRE(char const* pattern, int options = 0);
+    PCRE(char const* pattern);
     QPDF_DLL
     ~PCRE();
 
     QPDF_DLL
-    Match match(char const* subject, int options = 0, int startoffset = 0,
-		int size = -1);
+    Match match(char const* subject);
 
     QPDF_DLL
     static void test(int n = 0);
@@ -110,7 +118,11 @@ class PCRE
     PCRE(PCRE const&);
     PCRE& operator=(PCRE const&);
 
+#if HAVE_STD_REGEX
+    std::regex* code;
+#else
     pcre* code;
+#endif
     int nbackrefs;
 };
 

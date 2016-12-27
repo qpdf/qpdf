@@ -133,6 +133,16 @@ Release Reminders
    the 32-bit mingw build the default for Windows.
 
 
+PCRE
+====
+
+If the C++ compiler supports std::regex and qpdf can figure out how
+use it, it will prefer std::regex (from C++11) over the pcre library.
+To force use of pcre (e.g., if your std::regex doesn't work or you
+want to explicitly test use of pcre), you may pass --disable-std-regex
+to ./configure.
+
+
 General Build Stuff
 ===================
 
