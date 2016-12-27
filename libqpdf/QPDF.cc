@@ -204,8 +204,8 @@ QPDF::getWarnings()
 void
 QPDF::parse(char const* password)
 {
-    PCRE header_re("\\A((?s).*?)%PDF-(1.\\d+)\\b");
-    PCRE eof_re("(?s:startxref\\s+(\\d+)\\s+%%EOF\\b)");
+    PCRE header_re("^([.\r\n]*?)%PDF-(1.\\d+)\\b");
+    PCRE eof_re("(?:startxref\\s+(\\d+)\\s+%%EOF\\b)");
 
     if (password)
     {
@@ -488,7 +488,8 @@ qpdf_offset_t
 QPDF::read_xrefTable(qpdf_offset_t xref_offset)
 {
     PCRE xref_first_re("^\\s*(\\d+)\\s+(\\d+)\\s*");
-    PCRE xref_entry_re("(?s:(^\\d{10}) (\\d{5}) ([fn])\\s*$)");
+    PCRE xref_entry_re("(?:(^\\d{10}) (\\d{5}) ([fn])\\s*$)");
+    PCRE lindict_re("(?:(\\d+)\\s+0\\s+obj\\s*<<)");
 
     std::vector<QPDFObjGen> deleted_items;
 

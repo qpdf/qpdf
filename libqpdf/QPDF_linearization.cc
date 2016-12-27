@@ -101,7 +101,7 @@ QPDF::isLinearized()
     memset(buf, '\0', tbuf_size);
     this->file->read(buf, tbuf_size - 1);
 
-    PCRE lindict_re("(?s:(\\d+)\\s+0\\s+obj\\s*<<)");
+    PCRE lindict_re("(?:(\\d+)\\s+0\\s+obj\\s*<<)");
 
     int lindict_obj = -1;
     char* p = buf;
