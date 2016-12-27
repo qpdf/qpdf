@@ -306,3 +306,8 @@ Index: QPDFWriter.cc
 
  * From github issue 2, provide more in-depth output for examining
    hint stream contents.
+
+ * An attempt was made to replace pcre with std::regex, but it failed
+   because std::regex lacks some features of PCRE that we use and
+   because the result was many times slower. The work was saved in
+   refs/attic/std-regex on github.
