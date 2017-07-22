@@ -456,3 +456,63 @@ QUtil::srandom(unsigned int seed)
     srand(seed);
 #endif
 }
+
+bool
+QUtil::is_hex_digit(char ch)
+{
+    return (strchr("0123456789abcdefABCDEF", ch) != 0);
+}
+
+bool
+QUtil::is_space(char ch)
+{
+    return (strchr(" \f\n\r\t\v", ch) != 0);
+}
+
+bool
+QUtil::is_digit(char ch)
+{
+    return ((ch >= '0') && (ch <= '9'));
+}
+
+bool
+QUtil::is_number(char const* p)
+{
+    // ^[\+\-]?(\.\d+|\d+(\.\d+)?)$
+    if (! *p)
+    {
+        return false;
+    }
+    if ((*p == '-') || (*p == '+'))
+    {
+        ++p;
+    }
+    bool found_dot = false;
+    bool found_digit = false;
+    for (; *p; ++p)
+    {
+        if (*p == '.')
+        {
+            if (found_dot)
+            {
+                // only one dot
+                return false;
+            }
+            if (! *(p+1))
+            {
+                // dot can't be last
+                return false;
+            }
+            found_dot = true;
+        }
+        else if (QUtil::is_digit(*p))
+        {
+            found_digit = true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    return found_digit;
+}

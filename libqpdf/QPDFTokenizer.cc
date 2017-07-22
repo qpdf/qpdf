@@ -6,65 +6,10 @@
 
 #include <qpdf/QTC.hh>
 #include <qpdf/QPDFExc.hh>
+#include <qpdf/QUtil.hh>
 
 #include <stdexcept>
 #include <string.h>
-
-// See note above about ctype.
-static bool is_hex_digit(char ch)
-{
-    return (strchr("0123456789abcdefABCDEF", ch) != 0);
-}
-static bool is_space(char ch)
-{
-    return (strchr(" \f\n\r\t\v", ch) != 0);
-}
-static bool is_digit(char ch)
-{
-    return ((ch >= '0') && (ch <= '9'));
-}
-static bool
-is_number(std::string const& str)
-{
-    // ^[\+\-]?(\.\d+|\d+(\.\d+)?)$
-    char const* p = str.c_str();
-    if (! *p)
-    {
-        return false;
-    }
-    if ((*p == '-') || (*p == '+'))
-    {
-        ++p;
-    }
-    bool found_dot = false;
-    bool found_digit = false;
-    for (; *p; ++p)
-    {
-        if (*p == '.')
-        {
-            if (found_dot)
-            {
-                // only one dot
-                return false;
-            }
-            if (! *(p+1))
-            {
-                // dot can't be last
-                return false;
-            }
-            found_dot = true;
-        }
-        else if (is_digit(*p))
-        {
-            found_digit = true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-    return found_digit;
-}
 
 QPDFTokenizer::QPDFTokenizer() :
     pound_special_in_name(true),
@@ -117,7 +62,7 @@ QPDFTokenizer::resolveLiteral()
             if ((*p == '#') && this->pound_special_in_name)
             {
                 if (p[1] && p[2] &&
-                    is_hex_digit(p[1]) && is_hex_digit(p[2]))
+                    QUtil::is_hex_digit(p[1]) && QUtil::is_hex_digit(p[2]))
                 {
                     char num[3];
                     num[0] = p[1];
@@ -153,7 +98,7 @@ QPDFTokenizer::resolveLiteral()
         }
         val = nval;
     }
-    else if (is_number(val))
+    else if (QUtil::is_number(val.c_str()))
     {
         if (val.find('.') != std::string::npos)
         {
@@ -447,7 +392,7 @@ QPDFTokenizer::presentCharacter(char ch)
 	    }
 	    val = nval;
 	}
-	else if (is_hex_digit(ch))
+	else if (QUtil::is_hex_digit(ch))
 	{
 	    val += ch;
 	}
@@ -554,7 +499,7 @@ QPDFTokenizer::readToken(PointerHolder<InputSource> input,
 	}
 	else
 	{
-	    if (is_space(static_cast<unsigned char>(ch)) &&
+	    if (QUtil::is_space(static_cast<unsigned char>(ch)) &&
 		(input->getLastOffset() == offset))
 	    {
 		++offset;

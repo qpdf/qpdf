@@ -157,6 +157,21 @@ namespace QUtil
     // exception will be thrown.
     QPDF_DLL
     RandomDataProvider* getRandomDataProvider();
+
+    // These routines help the tokenizer recognize certain character
+    // classes without using ctype, which we avoid because of locale
+    // considerations.
+    QPDF_DLL
+    bool is_hex_digit(char);
+
+    QPDF_DLL
+    bool is_space(char);
+
+    QPDF_DLL
+    bool is_digit(char);
+
+    QPDF_DLL
+    bool is_number(char const*);
 };
 
 #endif // __QUTIL_HH__
