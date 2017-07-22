@@ -4,7 +4,6 @@
 // it's not worth the risk of including it in case it may accidentally
 // be used.
 
-#include <qpdf/PCRE.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QPDFExc.hh>
 
@@ -19,6 +18,52 @@ static bool is_hex_digit(char ch)
 static bool is_space(char ch)
 {
     return (strchr(" \f\n\r\t\v", ch) != 0);
+}
+static bool is_digit(char ch)
+{
+    return ((ch >= '0') && (ch <= '9'));
+}
+static bool
+is_number(std::string const& str)
+{
+    // ^[\+\-]?(\.\d+|\d+(\.\d+)?)$
+    char const* p = str.c_str();
+    if (! *p)
+    {
+        return false;
+    }
+    if ((*p == '-') || (*p == '+'))
+    {
+        ++p;
+    }
+    bool found_dot = false;
+    bool found_digit = false;
+    for (; *p; ++p)
+    {
+        if (*p == '.')
+        {
+            if (found_dot)
+            {
+                // only one dot
+                return false;
+            }
+            if (! *(p+1))
+            {
+                // dot can't be last
+                return false;
+            }
+            found_dot = true;
+        }
+        else if (is_digit(*p))
+        {
+            found_digit = true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    return found_digit;
 }
 
 QPDFTokenizer::QPDFTokenizer() :
@@ -59,8 +104,6 @@ QPDFTokenizer::reset()
 void
 QPDFTokenizer::resolveLiteral()
 {
-    PCRE num_re("^[\\+\\-]?(?:\\.\\d+|\\d+(?:\\.\\d+)?)$");
-
     if ((val.length() > 0) && (val.at(0) == '/'))
     {
         type = tt_name;
@@ -110,7 +153,7 @@ QPDFTokenizer::resolveLiteral()
         }
         val = nval;
     }
-    else if (num_re.match(val.c_str()))
+    else if (is_number(val))
     {
         if (val.find('.') != std::string::npos)
         {
