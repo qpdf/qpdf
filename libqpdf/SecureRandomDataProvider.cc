@@ -3,11 +3,11 @@
 #include <qpdf/qpdf-config.h>
 #include <qpdf/QUtil.hh>
 #ifdef _WIN32
-# include <Windows.h>
+# include <windows.h>
 # include <direct.h>
 # include <io.h>
 # ifndef SKIP_OS_SECURE_RANDOM
-#  include <Wincrypt.h>
+#  include <wincrypt.h>
 # endif
 #endif
 
