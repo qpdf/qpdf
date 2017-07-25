@@ -199,7 +199,7 @@ $td->runtest("remove page we don't have",
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 76;
+$n_tests += 77;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -210,6 +210,20 @@ $td->runtest("C API: qpdf version",
 	     {$td->REGEXP => "qpdf-ctest version \\S+\n",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
+
+# Files to reproduce various bugs
+foreach my $d (
+    ["101", "resolve for exception text"],
+    )
+{
+    my ($n, $description) = @$d;
+    $td->runtest($description,
+                 {$td->COMMAND => "qpdf issue-$n.pdf a.pdf"},
+                 {$td->FILE => "issue-$n.out",
+                  $td->EXIT_STATUS => 2},
+                 $td->NORMALIZE_NEWLINES);
+}
+
 
 foreach (my $i = 1; $i <= 3; ++$i)
 {
