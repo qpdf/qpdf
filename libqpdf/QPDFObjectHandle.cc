@@ -1076,8 +1076,7 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 		throw QPDFExc(
 		    qpdf_e_damaged_pdf,
 		    input->getName(), object_description, offset,
-		    std::string("dictionary key not name (") +
-		    key_obj.unparse() + ")");
+		    std::string("dictionary key is not not a name token"));
 	    }
 	    dict[key_obj.getName()] = val;
 	}
