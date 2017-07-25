@@ -1075,6 +1075,7 @@ class QPDF
     // copied_stream_data_provider is owned by copied_streams
     CopiedStreamDataProvider* copied_stream_data_provider;
     std::set<QPDFObjGen> attachment_streams;
+    bool reconstructed_xref;
 
     // Linearization data
     qpdf_offset_t first_xref_item_offset; // actual value from file
