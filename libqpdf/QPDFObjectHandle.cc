@@ -964,7 +964,11 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 	  case QPDFTokenizer::tt_word:
 	    {
 		std::string const& value = token.getValue();
-		if ((value == "R") && (in_array || in_dictionary) &&
+                if (content_stream)
+                {
+                    object = QPDFObjectHandle::newOperator(value);
+                }
+		else if ((value == "R") && (in_array || in_dictionary) &&
 		    (olist.size() >= 2) &&
                     (! olist.at(olist.size() - 1).isIndirect()) &&
 		    (olist.at(olist.size() - 1).isInteger()) &&
@@ -996,10 +1000,6 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 		    input->seek(input->getLastOffset(), SEEK_SET);
                     empty = true;
 		}
-		else if (content_stream)
-                {
-                    object = QPDFObjectHandle::newOperator(token.getValue());
-                }
 		else
 		{
 		    throw QPDFExc(qpdf_e_damaged_pdf, input->getName(),

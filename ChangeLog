@@ -1,5 +1,8 @@
 2017-07-26  Jay Berkenbilt  <ejb@ql.org>
 
+	* Don't attempt to interpret syntactic keywords (like R and
+	endobj) found while parsing content streams.
+
 	* Detect infinite loops while resolving objects. This could happen
 	if something inside an object that had to be resolved during
 	parsing, such as a stream length, recursively referenced the
