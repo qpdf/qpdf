@@ -1,3 +1,10 @@
+2017-07-27  Jay Berkenbilt  <ejb@ql.org>
+
+	* Significantly improve recoverability from invalid qpdf objects.
+	Most conditions in basic object parsing that used to cause qpdf to
+	exit are now warnings. There are still many more opportunities for
+	improvements of this sort beyond just object parsing.
+
 2017-07-26  Jay Berkenbilt  <ejb@ql.org>
 
 	* Fixes to infinite loops below also fix problems reported in

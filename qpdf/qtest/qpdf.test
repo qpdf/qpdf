@@ -220,22 +220,22 @@ $td->runtest("C API: qpdf version",
 
 # Files to reproduce various bugs
 foreach my $d (
-    ["51", "resolve loop"],
-    ["99", "object 0"],
-    ["99b", "object 0"],
-    ["100","xref reconstruction loop"],
-    ["101", "resolve for exception text"],
-    ["117", "other infinite loop"],
-    ["118", "other infinite loop"],
-    ["119", "other infinite loop"],
-    ["120", "other infinite loop"],
+    ["51", "resolve loop", 2],
+    ["99", "object 0", 2],
+    ["99b", "object 0", 2],
+    ["100", "xref reconstruction loop", 2],
+    ["101", "resolve for exception text", 2],
+    ["117", "other infinite loop", 2],
+    ["118", "other infinite loop", 2],
+    ["119", "other infinite loop", 3],
+    ["120", "other infinite loop", 2],
     )
 {
-    my ($n, $description) = @$d;
+    my ($n, $description, $exit_status) = @$d;
     $td->runtest($description,
                  {$td->COMMAND => "qpdf issue-$n.pdf a.pdf"},
                  {$td->FILE => "issue-$n.out",
-                  $td->EXIT_STATUS => 2},
+                  $td->EXIT_STATUS => $exit_status},
                  $td->NORMALIZE_NEWLINES);
 }
 
@@ -593,7 +593,7 @@ $td->runtest("no type key for page nodes",
              $td->NORMALIZE_NEWLINES);
 $td->runtest("ensure arguments to R are direct",
              {$td->COMMAND => "qpdf --check indirect-r-arg.pdf"},
-             {$td->FILE => "indirect-r-arg.out", $td->EXIT_STATUS => 2},
+             {$td->FILE => "indirect-r-arg.out", $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("detect loops in pages structure",
              {$td->COMMAND => "qpdf --check pages-loop.pdf"},
@@ -784,16 +784,19 @@ my @badfiles = ("not a PDF file", 			# 1
 		"invalid stream /Filter and xref",	# 33
 		"obj/gen in wrong place",		# 34
 		"object stream of wrong type",		# 35
+                "bad dictionary key",                   # 36
 		);
 
-$n_tests += @badfiles + 5;
+$n_tests += @badfiles + 4;
 
 # Test 6 contains errors in the free table consistency, but we no
 # longer have any consistency check for this since it is not important
 # neither Acrobat nor other PDF viewers really care.  Tests 12 and 28
 # have error conditions that used to be fatal but are now considered
 # non-fatal.
-my %badtest_overrides = (6 => 0, 12 => 0, 28 => 0, 31 => 0);
+my %badtest_overrides = (6 => 0, 12 => 0, 13 => 0,
+                         14 => 0, 15 => 0, 17 => 0,
+                         28 => 0, 31 => 0, 36 => 0);
 for (my $i = 1; $i <= scalar(@badfiles); ++$i)
 {
     my $status = $badtest_overrides{$i};
@@ -808,11 +811,6 @@ for (my $i = 1; $i <= scalar(@badfiles); ++$i)
 $td->runtest("C API: errors",
 	     {$td->COMMAND => "qpdf-ctest 2 bad1.pdf '' a.pdf"},
 	     {$td->FILE => "c-read-errors.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-$td->runtest("C API: warnings and errors",
-	     {$td->COMMAND => "qpdf-ctest 2 bad17.pdf '' a.pdf"},
-	     {$td->FILE => "c-read-warnings-and-errors.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("C API: errors writing",
@@ -842,7 +840,7 @@ $n_tests += @badfiles + 8;
 # though in some cases it may.  Acrobat Reader would not be able to
 # recover any of these files any better.
 my %recover_failures = ();
-for (1, 7, 13..21, 24, 29..30, 33, 35)
+for (1, 7, 16, 18..21, 24, 29..30, 33, 35)
 {
     $recover_failures{$_} = 1;
 }

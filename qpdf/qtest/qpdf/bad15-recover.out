@@ -1,4 +1,7 @@
-WARNING: bad15.pdf: file is damaged
-WARNING: bad15.pdf (trailer, file position 753): unexpected array close token
-WARNING: bad15.pdf: Attempting to reconstruct cross-reference table
-bad15.pdf (trailer, file position 753): unexpected array close token
+WARNING: bad15.pdf (trailer, file position 753): treating unexpected array close token as null
+/QTest is implicit
+/QTest is direct and has type null (2)
+/QTest is null
+unparse: null
+unparseResolved: null
+test 1 done

@@ -1,1 +1,4 @@
-bad16.pdf (trailer, file position 753): unexpected dictionary close token
+WARNING: bad16.pdf (trailer, file position 753): unexpected dictionary close token
+WARNING: bad16.pdf (trailer, file position 756): unexpected dictionary close token
+WARNING: bad16.pdf (trailer, file position 759): unknown token while reading object; treating as string
+bad16.pdf (trailer, file position 773): EOF while reading token

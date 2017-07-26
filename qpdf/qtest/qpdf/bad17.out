@@ -1,1 +1,7 @@
-bad17.pdf (trailer, file position 753): dictionary ending here has an odd number of elements
+WARNING: bad17.pdf (trailer, file position 715): dictionary ended prematurely; using null as value for last key
+/QTest is implicit
+/QTest is direct and has type null (2)
+/QTest is null
+unparse: null
+unparseResolved: null
+test 0 done

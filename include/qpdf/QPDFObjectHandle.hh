@@ -28,6 +28,7 @@ class QPDF;
 class QPDF_Dictionary;
 class QPDF_Array;
 class QPDFTokenizer;
+class QPDFExc;
 
 class QPDFObjectHandle
 {
@@ -622,6 +623,9 @@ class QPDFObjectHandle
         bool content_stream);
     static void parseContentStream_internal(
         QPDFObjectHandle stream, ParserCallbacks* callbacks);
+
+    // Other methods
+    static void warn(QPDF*, QPDFExc const&);
 
     bool initialized;
 

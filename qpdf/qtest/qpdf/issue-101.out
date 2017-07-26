@@ -1,6 +1,17 @@
 WARNING: issue-101.pdf: file is damaged
 WARNING: issue-101.pdf (file position 3526): xref not found
 WARNING: issue-101.pdf: Attempting to reconstruct cross-reference table
+WARNING: issue-101.pdf (file position 1242): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-101.pdf (file position 1242): dictionary ended prematurely; using null as value for last key
 WARNING: issue-101.pdf (object 5 0, file position 1509): attempting to recover stream length
-WARNING: issue-101.pdf (object 5 0, file position 2097): attempting to recover stream length
-issue-101.pdf (trailer, file position 2928): unknown token while reading object (ÿ)
+WARNING: issue-101.pdf (trailer, file position 2097): attempting to recover stream length
+WARNING: issue-101.pdf (trailer, file position 2928): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (trailer, file position 2930): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (trailer, file position 2928): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-101.pdf (trailer, file position 2928): expected dictionary key but found non-name object; inserting key /QPDFFake2
+WARNING: issue-101.pdf (trailer, file position 2928): expected dictionary key but found non-name object; inserting key /QPDFFake3
+WARNING: issue-101.pdf (trailer, file position 2996): attempting to recover stream length
+WARNING: issue-101.pdf (trailer, file position 3410): attempting to recover stream length
+WARNING: issue-101.pdf (trailer, file position 3631): attempting to recover stream length
+WARNING: issue-101.pdf (trailer, file position 4184): attempting to recover stream length
+issue-101.pdf (trailer, file position 4184): unable to recover stream data

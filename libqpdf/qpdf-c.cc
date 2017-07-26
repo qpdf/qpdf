@@ -261,7 +261,15 @@ QPDF_ERROR_CODE qpdf_read(qpdf_data qpdf, char const* filename,
     qpdf->filename = filename;
     qpdf->password = password;
     status = trap_errors(qpdf, &call_read);
-    QTC::TC("qpdf", "qpdf-c called qpdf_read", status);
+    // We no longer have a good way to exercise a file with both
+    // warnings and errors because qpdf is getting much better at
+    // recovering.
+    QTC::TC("qpdf", "qpdf-c called qpdf_read",
+            (status == 0) ? 0
+            : (status & QPDF_WARNINGS) ? 1
+            : (status & QPDF_ERRORS) ? 2 :
+            -1
+        );
     return status;
 }
 

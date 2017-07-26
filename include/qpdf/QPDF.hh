@@ -522,6 +522,18 @@ class QPDF
     };
     friend class Resolver;
 
+    // Warner class allows QPDFObjectHandle to create warnings
+    class Warner
+    {
+	friend class QPDFObjectHandle;
+      private:
+        static void warn(QPDF* qpdf, QPDFExc const& e)
+        {
+            qpdf->warn(e);
+        }
+    };
+    friend class Warner;
+
     // Pipe class is restricted to QPDF_Stream
     class Pipe
     {

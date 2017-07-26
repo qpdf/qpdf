@@ -850,6 +850,11 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
                                 bool in_array, bool in_dictionary,
                                 bool content_stream)
 {
+    // This method must take care not to resolve any objects. Don't
+    // check the tpye of any object without first ensuring that it is
+    // a direct object. Otherwise, doing so may have the side effect
+    // of reading the object and changing the file pointer.
+
     empty = false;
     if (in_dictionary && in_array)
     {
@@ -891,12 +896,13 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 
 	  case QPDFTokenizer::tt_brace_open:
 	  case QPDFTokenizer::tt_brace_close:
-	    // Don't know what to do with these for now
 	    QTC::TC("qpdf", "QPDFObjectHandle bad brace");
-	    throw QPDFExc(qpdf_e_damaged_pdf, input->getName(),
-			  object_description,
-			  input->getLastOffset(),
-			  "unexpected brace token");
+            warn(context,
+                 QPDFExc(qpdf_e_damaged_pdf, input->getName(),
+                         object_description,
+                         input->getLastOffset(),
+                         "treating unexpected brace token as null"));
+            object = newNull();
 	    break;
 
 	  case QPDFTokenizer::tt_array_close:
@@ -907,10 +913,12 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 	    else
 	    {
 		QTC::TC("qpdf", "QPDFObjectHandle bad array close");
-		throw QPDFExc(qpdf_e_damaged_pdf, input->getName(),
-			      object_description,
-			      input->getLastOffset(),
-			      "unexpected array close token");
+                warn(context,
+                     QPDFExc(qpdf_e_damaged_pdf, input->getName(),
+                             object_description,
+                             input->getLastOffset(),
+                             "treating unexpected array close token as null"));
+                object = newNull();
 	    }
 	    break;
 
@@ -922,10 +930,12 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 	    else
 	    {
 		QTC::TC("qpdf", "QPDFObjectHandle bad dictionary close");
-		throw QPDFExc(qpdf_e_damaged_pdf, input->getName(),
-			      object_description,
-			      input->getLastOffset(),
-			      "unexpected dictionary close token");
+                warn(context,
+                     QPDFExc(qpdf_e_damaged_pdf, input->getName(),
+                             object_description,
+                             input->getLastOffset(),
+                             "unexpected dictionary close token"));
+                object = newNull();
 	    }
 	    break;
 
@@ -1002,11 +1012,14 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 		}
 		else
 		{
-		    throw QPDFExc(qpdf_e_damaged_pdf, input->getName(),
-				  object_description,
-				  input->getLastOffset(),
-				  "unknown token while reading object (" +
-				  value + ")");
+                    QTC::TC("qpdf", "QPDFObjectHandle treat word as string");
+                    warn(context,
+                         QPDFExc(qpdf_e_damaged_pdf, input->getName(),
+                                 object_description,
+                                 input->getLastOffset(),
+                                 "unknown token while reading object;"
+                                 " treating as string"));
+                    object = newString(value);
 		}
 	    }
 	    break;
@@ -1024,10 +1037,13 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 	    break;
 
 	  default:
-	    throw QPDFExc(qpdf_e_damaged_pdf, input->getName(),
-			  object_description,
-			  input->getLastOffset(),
-			  "unknown token type while reading object");
+            warn(context,
+                 QPDFExc(qpdf_e_damaged_pdf, input->getName(),
+                         object_description,
+                         input->getLastOffset(),
+                         "treating unknown token type as null while "
+                         "reading object"));
+            object = newNull();
 	    break;
 	}
 
@@ -1040,10 +1056,12 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 	}
 	else if (! object.isInitialized())
 	{
-	    throw QPDFExc(qpdf_e_damaged_pdf, input->getName(),
-			  object_description,
-			  input->getLastOffset(),
-			  "parse error while reading object");
+            warn(context,
+                 QPDFExc(qpdf_e_damaged_pdf, input->getName(),
+                         object_description,
+                         input->getLastOffset(),
+                         "parse error while reading object"));
+            object = newNull();
 	}
 	else
 	{
@@ -1057,30 +1075,65 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
     }
     else if (in_dictionary)
     {
-	// Convert list to map.  Alternating elements are keys.
-	std::map<std::string, QPDFObjectHandle> dict;
-	if (olist.size() % 2)
-	{
-	    QTC::TC("qpdf", "QPDFObjectHandle dictionary odd number of elements");
-	    throw QPDFExc(
-		qpdf_e_damaged_pdf, input->getName(),
-		object_description, input->getLastOffset(),
-		"dictionary ending here has an odd number of elements");
-	}
-	for (unsigned int i = 0; i < olist.size(); i += 2)
-	{
-	    QPDFObjectHandle key_obj = olist.at(i);
-	    QPDFObjectHandle val = olist.at(i + 1);
-	    if (! key_obj.isName())
-	    {
-		throw QPDFExc(
-		    qpdf_e_damaged_pdf,
-		    input->getName(), object_description, offset,
-		    std::string("dictionary key is not not a name token"));
-	    }
-	    dict[key_obj.getName()] = val;
-	}
-	object = newDictionary(dict);
+        // Convert list to map. Alternating elements are keys. Attempt
+        // to recover more or less gracefully from invalid
+        // dictionaries.
+        std::set<std::string> names;
+        for (std::vector<QPDFObjectHandle>::iterator iter = olist.begin();
+             iter != olist.end(); ++iter)
+        {
+            if ((! (*iter).isIndirect()) && (*iter).isName())
+            {
+                names.insert((*iter).getName());
+            }
+        }
+
+        std::map<std::string, QPDFObjectHandle> dict;
+        int next_fake_key = 1;
+        for (unsigned int i = 0; i < olist.size(); ++i)
+        {
+            QPDFObjectHandle key_obj = olist.at(i);
+            QPDFObjectHandle val;
+            if (key_obj.isIndirect() || (! key_obj.isName()))
+            {
+                bool found_fake = false;
+                std::string candidate;
+                while (! found_fake)
+                {
+                    candidate =
+                        "/QPDFFake" + QUtil::int_to_string(next_fake_key++);
+                    found_fake = (names.count(candidate) == 0);
+                    QTC::TC("qpdf", "QPDFObjectHandle found fake",
+                            (found_fake ? 0 : 1));
+                }
+                warn(context,
+                     QPDFExc(
+                         qpdf_e_damaged_pdf,
+                         input->getName(), object_description, offset,
+                         "expected dictionary key but found"
+                         " non-name object; inserting key " +
+                         candidate));
+                val = key_obj;
+                key_obj = newName(candidate);
+            }
+            else if (i + 1 >= olist.size())
+            {
+                QTC::TC("qpdf", "QPDFObjectHandle no val for last key");
+                warn(context,
+                     QPDFExc(
+                         qpdf_e_damaged_pdf,
+                         input->getName(), object_description, offset,
+                         "dictionary ended prematurely; using null as value"
+                         " for last key"));
+                val = newNull();
+            }
+            else
+            {
+                val = olist.at(++i);
+            }
+            dict[key_obj.getName()] = val;
+        }
+        object = newDictionary(dict);
     }
 
     return object;
@@ -1542,5 +1595,22 @@ QPDFObjectHandle::dereference()
             this->reserved = false;
             this->obj = obj;
         }
+    }
+}
+
+void
+QPDFObjectHandle::warn(QPDF* qpdf, QPDFExc const& e)
+{
+    // If parsing on behalf of a QPDF object and want to give a
+    // warning, we can warn through the object. If parsing for some
+    // other reason, such as an explicit creation of an object from a
+    // string, then just throw the exception.
+    if (qpdf)
+    {
+        QPDF::Warner::warn(qpdf, e);
+    }
+    else
+    {
+        throw e;
     }
 }

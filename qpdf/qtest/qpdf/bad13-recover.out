@@ -1,4 +1,7 @@
-WARNING: bad13.pdf: file is damaged
-WARNING: bad13.pdf (trailer, file position 753): unexpected brace token
-WARNING: bad13.pdf: Attempting to reconstruct cross-reference table
-bad13.pdf (trailer, file position 753): unexpected brace token
+WARNING: bad13.pdf (trailer, file position 753): treating unexpected brace token as null
+/QTest is implicit
+/QTest is direct and has type null (2)
+/QTest is null
+unparse: null
+unparseResolved: null
+test 1 done

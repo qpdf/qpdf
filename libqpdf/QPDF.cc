@@ -334,8 +334,9 @@ QPDF::reconstruct_xref(QPDFExc& e)
 {
     if (this->reconstructed_xref)
     {
-        // Avoid xref reconstruction infinite loops
-        QTC::TC("qpdf", "QPDF caught recursive xref reconstruction");
+        // Avoid xref reconstruction infinite loops. This is getting
+        // very hard to reproduce because qpdf is throwing many fewer
+        // exceptions while parsing. Most situations are warnings now.
         throw e;
     }
 
