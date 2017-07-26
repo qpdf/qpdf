@@ -1,5 +1,10 @@
 2017-07-26  Jay Berkenbilt  <ejb@ql.org>
 
+	* Detect infinite loops while resolving objects. This could happen
+	if something inside an object that had to be resolved during
+	parsing, such as a stream length, recursively referenced the
+	object being resolved.
+
 	* CVE-2017-9208: Handle references to and appearance of object 0
 	as a special case. Object 0 is not allowed, and qpdf was using it
 	internally to represent direct objects.
