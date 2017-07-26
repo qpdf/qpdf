@@ -1,3 +1,9 @@
+Before next release
+===================
+
+ABI compatibility has most likely been broken. Retest and bump major
+version if needed.
+
 Small, command-line tool only enhancements to do soon
 =====================================================
 
