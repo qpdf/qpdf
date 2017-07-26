@@ -543,7 +543,7 @@ class QPDFObjectHandle
     friend class ObjAccessor;
 
     // Provide access to specific classes for recursive
-    // reverseResolved().
+    // releaseResolved().
     class ReleaseResolver
     {
 	friend class QPDF_Dictionary;
