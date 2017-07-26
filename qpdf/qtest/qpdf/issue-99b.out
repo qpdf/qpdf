@@ -1,0 +1,5 @@
+WARNING: issue-99b.pdf: file is damaged
+WARNING: issue-99b.pdf (object 1 0, file position 9): object with ID 0
+WARNING: issue-99b.pdf: Attempting to reconstruct cross-reference table
+WARNING: issue-99b.pdf: object 1 0 not found in file after regenerating cross reference table
+operation for Dictionary object attempted on object of wrong type

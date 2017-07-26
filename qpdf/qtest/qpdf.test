@@ -206,7 +206,7 @@ $td->runtest("remove page we don't have",
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 79;
+$n_tests += 81;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -220,6 +220,8 @@ $td->runtest("C API: qpdf version",
 
 # Files to reproduce various bugs
 foreach my $d (
+    ["99", "object 0"],
+    ["99b", "object 0"],
     ["100","xref reconstruction loop"],
     ["101", "resolve for exception text"],
     )
