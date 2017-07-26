@@ -1343,6 +1343,14 @@ QPDF::readObjectAtOffset(bool try_recovery,
 	objid = atoi(tobjid.getValue().c_str());
 	generation = atoi(tgen.getValue().c_str());
 
+        if (objid == 0)
+        {
+            QTC::TC("qpdf", "QPDF object id 0");
+            throw QPDFExc(qpdf_e_damaged_pdf, this->file->getName(),
+                          this->last_object_description, offset,
+                          "object with ID 0");
+        }
+
 	if ((exp_objid >= 0) &&
 	    (! ((objid == exp_objid) && (generation == exp_generation))))
 	{

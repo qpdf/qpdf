@@ -269,3 +269,6 @@ qpdf pages range omitted at end 0
 qpdf pages range omitted in middle 0
 qpdf npages 0
 QPDF already reserved object 0
+QPDFObjectHandle indirect with 0 objid 0
+QPDF object id 0 0
+QPDF caught recursive xref reconstruction 0

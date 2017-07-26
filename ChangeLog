@@ -1,5 +1,9 @@
 2017-07-26  Jay Berkenbilt  <ejb@ql.org>
 
+	* CVE-2017-9208: Handle references to and appearance of object 0
+	as a special case. Object 0 is not allowed, and qpdf was using it
+	internally to represent direct objects.
+
 	* CVE-2017-9210: Fix infinite loop caused by attempting to unparse
 	an object for inclusion in the text of an exception.
 

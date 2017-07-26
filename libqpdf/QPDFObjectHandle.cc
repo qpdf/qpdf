@@ -1089,6 +1089,16 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 QPDFObjectHandle
 QPDFObjectHandle::newIndirect(QPDF* qpdf, int objid, int generation)
 {
+    if (objid == 0)
+    {
+        // Special case: QPDF uses objid 0 as a sentinel for direct
+        // objects, and the PDF specification doesn't allow for object
+        // 0. Treat indirect references to object 0 as null so that we
+        // never create an indirect object with objid 0.
+        QTC::TC("qpdf", "QPDFObjectHandle indirect with 0 objid");
+        return newNull();
+    }
+
     return QPDFObjectHandle(qpdf, objid, generation);
 }
 
