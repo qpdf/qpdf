@@ -603,6 +603,25 @@ class QPDF
         int gen;
     };
 
+    class ResolveRecorder
+    {
+      public:
+        ResolveRecorder(QPDF* qpdf, QPDFObjGen const& og) :
+            qpdf(qpdf),
+            og(og)
+        {
+            qpdf->resolving.insert(og);
+        }
+        virtual ~ResolveRecorder()
+        {
+            this->qpdf->resolving.erase(og);
+        }
+      private:
+        QPDF* qpdf;
+        QPDFObjGen og;
+    };
+    friend class ResolveRecorder;
+
     void parse(char const* password);
     void warn(QPDFExc const& e);
     void setTrailer(QPDFObjectHandle obj);
@@ -1065,6 +1084,7 @@ class QPDF
     std::map<QPDFObjGen, QPDFXRefEntry> xref_table;
     std::set<int> deleted_objects;
     std::map<QPDFObjGen, ObjCache> obj_cache;
+    std::set<QPDFObjGen> resolving;
     QPDFObjectHandle trailer;
     std::vector<QPDFObjectHandle> all_pages;
     std::map<QPDFObjGen, int> pageobj_to_pages_pos;
