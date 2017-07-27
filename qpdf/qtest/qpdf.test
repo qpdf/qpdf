@@ -787,7 +787,7 @@ my @badfiles = ("not a PDF file", 			# 1
                 "bad dictionary key",                   # 36
 		);
 
-$n_tests += @badfiles + 4;
+$n_tests += @badfiles + 3;
 
 # Test 6 contains errors in the free table consistency, but we no
 # longer have any consistency check for this since it is not important
@@ -796,7 +796,7 @@ $n_tests += @badfiles + 4;
 # non-fatal.
 my %badtest_overrides = (6 => 0, 12 => 0, 13 => 0,
                          14 => 0, 15 => 0, 17 => 0,
-                         28 => 0, 31 => 0, 36 => 0);
+                         28 => 0, 30 => 0, 31 => 0, 36 => 0);
 for (my $i = 1; $i <= scalar(@badfiles); ++$i)
 {
     my $status = $badtest_overrides{$i};
@@ -813,14 +813,9 @@ $td->runtest("C API: errors",
 	     {$td->FILE => "c-read-errors.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
-$td->runtest("C API: errors writing",
-	     {$td->COMMAND => "qpdf-ctest 2 bad30.pdf '' a.pdf"},
-	     {$td->FILE => "c-write-errors.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-$td->runtest("C API: errors and warnings writing",
+$td->runtest("C API: warnings writing",
 	     {$td->COMMAND => "qpdf-ctest 2 bad33.pdf '' a.pdf"},
-	     {$td->FILE => "c-write-warnings-and-errors.out",
+	     {$td->FILE => "c-write-warnings.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("C API: no recovery",
@@ -840,7 +835,7 @@ $n_tests += @badfiles + 8;
 # though in some cases it may.  Acrobat Reader would not be able to
 # recover any of these files any better.
 my %recover_failures = ();
-for (1, 7, 16, 18..21, 24, 29..30, 33, 35)
+for (1, 7, 16, 18..21, 24, 29, 35)
 {
     $recover_failures{$_} = 1;
 }

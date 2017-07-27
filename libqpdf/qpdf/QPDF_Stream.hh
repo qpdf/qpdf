@@ -52,6 +52,7 @@ class QPDF_Stream: public QPDFObject
         int& predictor, int& columns, bool& early_code_change);
     bool filterable(std::vector<std::string>& filters,
 		    int& predictor, int& columns, bool& early_code_change);
+    void warn(QPDFExc const& e);
 
     QPDF* qpdf;
     int objid;

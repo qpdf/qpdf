@@ -1,5 +1,9 @@
 2017-07-27  Jay Berkenbilt  <ejb@ql.org>
 
+	* Recover gracefully from streams that aren't filterable because
+	the filter parameters are invalid in the stream dictionary or the
+	dictionary itself is invalid.
+
 	* Significantly improve recoverability from invalid qpdf objects.
 	Most conditions in basic object parsing that used to cause qpdf to
 	exit are now warnings. There are still many more opportunities for

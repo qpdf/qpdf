@@ -526,6 +526,7 @@ class QPDF
     class Warner
     {
 	friend class QPDFObjectHandle;
+        friend class QPDF_Stream;
       private:
         static void warn(QPDF* qpdf, QPDFExc const& e)
         {

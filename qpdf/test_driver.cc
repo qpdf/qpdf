@@ -567,7 +567,7 @@ void runtest(int n, char const* filename1, char const* arg2)
 	    qstream.getStreamData();
 	    std::cout << "oops -- getStreamData didn't throw" << std::endl;
 	}
-	catch (std::logic_error const& e)
+        catch (std::exception const& e)
 	{
 	    std::cout << "exception: " << e.what() << std::endl;
 	}

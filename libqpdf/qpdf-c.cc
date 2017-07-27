@@ -646,6 +646,6 @@ QPDF_ERROR_CODE qpdf_write(qpdf_data qpdf)
 {
     QPDF_ERROR_CODE status = QPDF_SUCCESS;
     status = trap_errors(qpdf, &call_write);
-    QTC::TC("qpdf", "qpdf-c called qpdf_write", status);
+    QTC::TC("qpdf", "qpdf-c called qpdf_write", (status == 0) ? 0 : 1);
     return status;
 }

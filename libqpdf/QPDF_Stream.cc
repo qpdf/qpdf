@@ -235,9 +235,10 @@ QPDF_Stream::filterable(std::vector<std::string>& filters,
     if (! filters_okay)
     {
 	QTC::TC("qpdf", "QPDF_Stream invalid filter");
-	throw QPDFExc(qpdf_e_damaged_pdf, qpdf->getFilename(),
-		      "", this->offset,
-		      "stream filter type is not name or array");
+	warn(QPDFExc(qpdf_e_damaged_pdf, qpdf->getFilename(),
+                     "", this->offset,
+                     "stream filter type is not name or array"));
+        return false;
     }
 
     bool filterable = true;
@@ -300,12 +301,16 @@ QPDF_Stream::filterable(std::vector<std::string>& filters,
     // /Filters was empty has been seen in the wild.
     if ((filters.size() != 0) && (decode_parms.size() != filters.size()))
     {
-        // We should just issue a warning and treat this as not
-        // filterable.
-	throw QPDFExc(qpdf_e_damaged_pdf, qpdf->getFilename(),
-		      "", this->offset,
-		      "stream /DecodeParms length is"
-                      " inconsistent with filters");
+        warn(QPDFExc(qpdf_e_damaged_pdf, qpdf->getFilename(),
+                     "", this->offset,
+                     "stream /DecodeParms length is"
+                     " inconsistent with filters"));
+        filterable = false;
+    }
+
+    if (! filterable)
+    {
+        return false;
     }
 
     for (unsigned int i = 0; i < filters.size(); ++i)
@@ -454,7 +459,9 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline, bool filter,
             else
             {
                 QTC::TC("qpdf", "QPDF_Stream provider length mismatch");
-                throw std::logic_error(
+                // This would be caused by programmer error on the
+                // part of a library user, not by invalid input data.
+                throw std::runtime_error(
                     "stream data provider for " +
                     QUtil::int_to_string(this->objid) + " " +
                     QUtil::int_to_string(this->generation) +
@@ -541,4 +548,10 @@ QPDF_Stream::replaceDict(QPDFObjectHandle new_dict)
     {
         this->length = 0;
     }
+}
+
+void
+QPDF_Stream::warn(QPDFExc const& e)
+{
+    QPDF::Warner::warn(this->qpdf, e);
 }

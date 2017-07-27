@@ -139,7 +139,7 @@ qpdf-c called qpdf_set_preserve_encryption 0
 qpdf-c called qpdf_set_r2_encryption_parameters 0
 qpdf-c called qpdf_set_r3_encryption_parameters 0
 qpdf-c called qpdf_set_linearization 0
-qpdf-c called qpdf_write 3
+qpdf-c called qpdf_write 1
 qpdf-c called qpdf_allow_accessibility 0
 qpdf-c called qpdf_allow_extract_all 0
 qpdf-c called qpdf_allow_print_low_res 0
