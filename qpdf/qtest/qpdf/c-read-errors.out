@@ -1,5 +1,25 @@
-error: bad1.pdf: not a PDF file
+warning: bad1.pdf: can't find PDF header
   code: 5
   file: bad1.pdf
   pos : 0
-  text: not a PDF file
+  text: can't find PDF header
+warning: bad1.pdf: file is damaged
+  code: 5
+  file: bad1.pdf
+  pos : 0
+  text: file is damaged
+warning: bad1.pdf: can't find startxref
+  code: 5
+  file: bad1.pdf
+  pos : 0
+  text: can't find startxref
+warning: bad1.pdf: Attempting to reconstruct cross-reference table
+  code: 5
+  file: bad1.pdf
+  pos : 0
+  text: Attempting to reconstruct cross-reference table
+error: bad1.pdf: unable to find trailer dictionary while recovering damaged file
+  code: 5
+  file: bad1.pdf
+  pos : 0
+  text: unable to find trailer dictionary while recovering damaged file

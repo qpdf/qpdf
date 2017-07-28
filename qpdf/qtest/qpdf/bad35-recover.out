@@ -1,1 +1,2 @@
-bad35.pdf (object 1 0, file position 521): supposed object stream 1 has wrong type
+WARNING: bad35.pdf (object 1 0, file position 521): supposed object stream 1 has wrong type
+operation for Dictionary object attempted on object of wrong type

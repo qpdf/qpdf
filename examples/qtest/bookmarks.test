@@ -29,8 +29,8 @@ $td->runtest("no bookmarks",
 
 $td->runtest("bad",
 	     {$td->COMMAND => "pdf-bookmarks 3.pdf"},
-	     {$td->STRING => "pdf-bookmarks processing file 3.pdf: " .
-		  "3.pdf: not a PDF file\n",
+	     {$td->REGEXP => "pdf-bookmarks processing file 3.pdf: " .
+		  ".*unable to find trailer.*",
 		  $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 

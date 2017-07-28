@@ -1,1 +1,7 @@
-bad27.pdf (object 4 0, file position 307): expected n n obj
+WARNING: bad27.pdf (object 4 0, file position 307): expected n n obj
+/QTest is implicit
+/QTest is indirect and has type null (2)
+/QTest is null
+unparse: 4 0 R
+unparseResolved: null
+test 0 done

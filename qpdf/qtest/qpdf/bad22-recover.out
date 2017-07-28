@@ -1,3 +1,4 @@
+WARNING: bad22.pdf (object 4 0, file position 314): stream dictionary lacks /Length key
 WARNING: bad22.pdf (object 4 0, file position 341): attempting to recover stream length
 /QTest is indirect and has type stream (10)
 /QTest is a stream.  Dictionary: << /Qength 44 >>

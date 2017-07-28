@@ -1,1 +1,2 @@
-bad1.pdf: not a PDF file
+WARNING: bad1.pdf: can't find PDF header
+bad1.pdf: can't find startxref

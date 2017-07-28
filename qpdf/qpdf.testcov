@@ -278,3 +278,4 @@ QPDF recursion loop in resolve 0
 QPDFObjectHandle treat word as string 0
 QPDFObjectHandle found fake 1
 QPDFObjectHandle no val for last key 0
+QPDF resolve failure to null 0

@@ -1,2 +1,3 @@
 WARNING: issue-118.pdf (file position 732): loop detected resolving object 2 0
-issue-118.pdf (xref stream: object 8 0, file position 732): supposed object stream 2 is not a stream
+WARNING: issue-118.pdf (xref stream: object 8 0, file position 732): supposed object stream 2 is not a stream
+operation for Dictionary object attempted on object of wrong type

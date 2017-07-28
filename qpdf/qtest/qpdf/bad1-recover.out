@@ -1,1 +1,5 @@
-bad1.pdf: not a PDF file
+WARNING: bad1.pdf: can't find PDF header
+WARNING: bad1.pdf: file is damaged
+WARNING: bad1.pdf: can't find startxref
+WARNING: bad1.pdf: Attempting to reconstruct cross-reference table
+bad1.pdf: unable to find trailer dictionary while recovering damaged file

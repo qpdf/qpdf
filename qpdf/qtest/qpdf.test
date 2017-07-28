@@ -220,7 +220,7 @@ $td->runtest("C API: qpdf version",
 
 # Files to reproduce various bugs
 foreach my $d (
-    ["51", "resolve loop", 2],
+    ["51", "resolve loop", 3],
     ["99", "object 0", 2],
     ["99b", "object 0", 2],
     ["100", "xref reconstruction loop", 2],
@@ -228,7 +228,7 @@ foreach my $d (
     ["117", "other infinite loop", 2],
     ["118", "other infinite loop", 2],
     ["119", "other infinite loop", 3],
-    ["120", "other infinite loop", 2],
+    ["120", "other infinite loop", 3],
     )
 {
     my ($n, $description, $exit_status) = @$d;
@@ -464,7 +464,7 @@ $td->runtest("EOF terminating literal tokens",
              $td->NORMALIZE_NEWLINES);
 $td->runtest("EOF reading token",
              {$td->COMMAND => "qpdf --check eof-reading-token.pdf"},
-             {$td->FILE => "eof-reading-token.out", $td->EXIT_STATUS => 2},
+             {$td->FILE => "eof-reading-token.out", $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("extra header text",
              {$td->COMMAND => "test_driver 32 minimal.pdf"},
@@ -794,9 +794,12 @@ $n_tests += @badfiles + 3;
 # neither Acrobat nor other PDF viewers really care.  Tests 12 and 28
 # have error conditions that used to be fatal but are now considered
 # non-fatal.
-my %badtest_overrides = (6 => 0, 12 => 0, 13 => 0,
-                         14 => 0, 15 => 0, 17 => 0,
-                         28 => 0, 30 => 0, 31 => 0, 36 => 0);
+my %badtest_overrides = ();
+for(6, 12..15, 17, 22..28, 30..32, 34, 36)
+{
+    $badtest_overrides{$_} = 0;
+}
+
 for (my $i = 1; $i <= scalar(@badfiles); ++$i)
 {
     my $status = $badtest_overrides{$i};
@@ -835,7 +838,7 @@ $n_tests += @badfiles + 8;
 # though in some cases it may.  Acrobat Reader would not be able to
 # recover any of these files any better.
 my %recover_failures = ();
-for (1, 7, 16, 18..21, 24, 29, 35)
+for (1, 7, 16, 18..21, 29, 35)
 {
     $recover_failures{$_} = 1;
 }

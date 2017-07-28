@@ -205,7 +205,7 @@ QPDF::getWarnings()
 void
 QPDF::parse(char const* password)
 {
-    PCRE header_re("\\A((?s).*?)%PDF-(1.\\d+)\\b");
+    PCRE header_re("\\A((?s).*?)%PDF-(\\d+.\\d+)\\b");
     PCRE eof_re("(?s:startxref\\s+(\\d+)\\s+%%EOF\\b)");
 
     if (password)
@@ -233,16 +233,17 @@ QPDF::parse(char const* password)
             this->file = new OffsetInputSource(this->file, global_offset);
         }
 	this->pdf_version = m1.getMatch(2);
-	if (atof(this->pdf_version.c_str()) < 1.2)
-	{
-	    this->tokenizer.allowPoundAnywhereInName();
-	}
     }
     else
     {
 	QTC::TC("qpdf", "QPDF not a pdf file");
-	throw QPDFExc(qpdf_e_damaged_pdf, this->file->getName(),
-		      "", 0, "not a PDF file");
+	warn(QPDFExc(qpdf_e_damaged_pdf, this->file->getName(),
+                     "", 0, "can't find PDF header"));
+        this->pdf_version = "1.0";
+    }
+    if (atof(this->pdf_version.c_str()) < 1.2)
+    {
+        this->tokenizer.allowPoundAnywhereInName();
     }
 
     // PDF spec says %%EOF must be found within the last 1024 bytes of
@@ -1152,7 +1153,7 @@ QPDF::readObject(PointerHolder<InputSource> input,
             {
                 if (this->attempt_recovery)
                 {
-                    // may throw an exception
+                    warn(e);
                     length = recoverStreamLength(
                         input, objid, generation, stream_offset);
                 }
@@ -1288,9 +1289,9 @@ QPDF::recoverStreamLength(PointerHolder<InputSource> input,
 
     if (length == 0)
     {
-	throw QPDFExc(qpdf_e_damaged_pdf, input->getName(),
-		      this->last_object_description, stream_offset,
-		      "unable to recover stream data");
+        warn(QPDFExc(qpdf_e_damaged_pdf, input->getName(),
+                     this->last_object_description, stream_offset,
+                     "unable to recover stream data; treating stream as empty"));
     }
 
     QTC::TC("qpdf", "QPDF recovered stream length");
@@ -1309,6 +1310,10 @@ QPDF::readObjectAtOffset(bool try_recovery,
 			 int exp_objid, int exp_generation,
 			 int& objid, int& generation)
 {
+    if (! this->attempt_recovery)
+    {
+        try_recovery = false;
+    }
     setLastObjectDescription(description, exp_objid, exp_generation);
 
     // Special case: if offset is 0, just return null.  Some PDF
@@ -1363,16 +1368,27 @@ QPDF::readObjectAtOffset(bool try_recovery,
 	    (! ((objid == exp_objid) && (generation == exp_generation))))
 	{
 	    QTC::TC("qpdf", "QPDF err wrong objid/generation");
-	    throw QPDFExc(qpdf_e_damaged_pdf, this->file->getName(),
-			  this->last_object_description, offset,
-			  std::string("expected ") +
-			  QUtil::int_to_string(exp_objid) + " " +
-			  QUtil::int_to_string(exp_generation) + " obj");
+	    QPDFExc e(qpdf_e_damaged_pdf, this->file->getName(),
+                      this->last_object_description, offset,
+                      std::string("expected ") +
+                      QUtil::int_to_string(exp_objid) + " " +
+                      QUtil::int_to_string(exp_generation) + " obj");
+            if (try_recovery)
+            {
+                // Will be retried below
+                throw e;
+            }
+            else
+            {
+                // We can try reading the object anyway even if the ID
+                // doesn't match.
+                warn(e);
+            }
 	}
     }
     catch (QPDFExc& e)
     {
-	if ((exp_objid >= 0) && try_recovery && this->attempt_recovery)
+	if ((exp_objid >= 0) && try_recovery)
 	{
 	    // Try again after reconstructing xref table
 	    reconstruct_xref(e);
@@ -1496,31 +1512,42 @@ QPDF::resolve(int objid, int generation)
 	}
 
 	QPDFXRefEntry const& entry = this->xref_table[og];
-	switch (entry.getType())
-	{
-	  case 1:
-	    {
-		qpdf_offset_t offset = entry.getOffset();
-		// Object stored in cache by readObjectAtOffset
-		int aobjid;
-		int ageneration;
-		QPDFObjectHandle oh =
-		    readObjectAtOffset(true, offset, "", objid, generation,
-				       aobjid, ageneration);
-	    }
-	    break;
+        try
+        {
+            switch (entry.getType())
+            {
+              case 1:
+                {
+                    qpdf_offset_t offset = entry.getOffset();
+                    // Object stored in cache by readObjectAtOffset
+                    int aobjid;
+                    int ageneration;
+                    QPDFObjectHandle oh =
+                        readObjectAtOffset(true, offset, "", objid, generation,
+                                           aobjid, ageneration);
+                }
+                break;
 
-	  case 2:
-	    resolveObjectsInStream(entry.getObjStreamNumber());
-	    break;
+              case 2:
+                resolveObjectsInStream(entry.getObjStreamNumber());
+                break;
 
-	  default:
-	    throw QPDFExc(qpdf_e_damaged_pdf, this->file->getName(), "", 0,
-			  "object " +
-			  QUtil::int_to_string(objid) + "/" +
-			  QUtil::int_to_string(generation) +
-			  " has unexpected xref entry type");
-	}
+              default:
+                throw QPDFExc(qpdf_e_damaged_pdf, this->file->getName(), "", 0,
+                              "object " +
+                              QUtil::int_to_string(objid) + "/" +
+                              QUtil::int_to_string(generation) +
+                              " has unexpected xref entry type");
+            }
+        }
+        catch (QPDFExc& e)
+        {
+            QTC::TC("qpdf", "QPDF resolve failure to null");
+            warn(e);
+            QPDFObjectHandle oh = QPDFObjectHandle::newNull();
+            this->obj_cache[og] =
+                ObjCache(QPDFObjectHandle::ObjAccessor::getObject(oh), -1, -1);
+        }
     }
 
     return this->obj_cache[og].object;
