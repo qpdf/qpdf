@@ -202,6 +202,7 @@ familiar with the PDF file format or who are PDF developers.\n\
 --suppress-recovery       prevents qpdf from attempting to recover damaged files\n\
 --object-streams=mode     controls handing of object streams\n\
 --ignore-xref-streams     tells qpdf to ignore any cross-reference streams\n\
+--precheck-streams        precheck ability to decode streams\n\
 --qdf                     turns on \"QDF mode\" (below)\n\
 --min-version=version     sets the minimum PDF version of the output file\n\
 --force-version=version   forces this to be the PDF version of the output file\n\
@@ -1028,6 +1029,7 @@ int main(int argc, char* argv[])
     qpdf_object_stream_e object_stream_mode = qpdf_o_preserve;
     bool ignore_xref_streams = false;
     bool qdf_mode = false;
+    bool precheck_streams = false;
     std::string min_version;
     std::string force_version;
 
@@ -1212,6 +1214,10 @@ int main(int argc, char* argv[])
 	    else if (strcmp(arg, "qdf") == 0)
 	    {
 		qdf_mode = true;
+	    }
+	    else if (strcmp(arg, "precheck-streams") == 0)
+	    {
+		precheck_streams = true;
 	    }
 	    else if (strcmp(arg, "min-version") == 0)
 	    {
@@ -1704,6 +1710,10 @@ int main(int argc, char* argv[])
 	    {
 		w.setQDFMode(true);
 	    }
+            if (precheck_streams)
+            {
+                w.setPrecheckStreams(true);
+            }
 	    if (normalize_set)
 	    {
 		w.setContentNormalization(normalize);

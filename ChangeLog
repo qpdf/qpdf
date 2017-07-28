@@ -1,5 +1,9 @@
 2017-07-27  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add --precheck-streams command-line option and setStreamPrecheck
+	option to QPDFWriter to tell QPDFWriter to attempt decoding a
+	stream fully before deciding whether to filter it or not.
+
 	* Recover gracefully from streams that aren't filterable because
 	the filter parameters are invalid in the stream dictionary or the
 	dictionary itself is invalid.

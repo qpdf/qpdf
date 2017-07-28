@@ -723,6 +723,26 @@ $td->runtest("check output",
 	     {$td->FILE => "from-scratch-0.pdf"});
 show_ntests();
 # ----------
+$td->notify("--- Precheck streams ---");
+$n_tests += 4;
+
+$td->runtest("bad stream without precheck",
+	     {$td->COMMAND => "qpdf --static-id bad-data.pdf a.pdf"},
+	     {$td->FILE => "bad-data.out", $td->EXIT_STATUS => 3},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "bad-data-out.pdf"});
+$td->runtest("bad stream with precheck",
+	     {$td->COMMAND =>
+                  "qpdf --static-id --precheck-streams bad-data.pdf a.pdf"},
+	     {$td->STRING => "", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "bad-data-precheck.pdf"});
+show_ntests();
+# ----------
 $td->notify("--- Copy Foreign Objects ---");
 $n_tests += 7;
 

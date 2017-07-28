@@ -1,0 +1,2 @@
+WARNING: bad-data.pdf (file position 319): error decoding stream data for object 4 0: LZWDecoder: bad code received
+qpdf: operation succeeded with warnings; resulting file may have some problems

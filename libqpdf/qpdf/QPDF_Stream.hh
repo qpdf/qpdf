@@ -23,7 +23,8 @@ class QPDF_Stream: public QPDFObject
 
     // See comments in QPDFObjectHandle.hh for these methods.
     bool pipeStreamData(Pipeline*, bool filter,
-			bool normalize, bool compress);
+			bool normalize, bool compress,
+                        bool suppress_warnings);
     PointerHolder<Buffer> getStreamData();
     PointerHolder<Buffer> getRawStreamData();
     void replaceStreamData(PointerHolder<Buffer> data,

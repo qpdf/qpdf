@@ -394,7 +394,8 @@ class QPDFObjectHandle
     // replaced if writing a new stream object.
     QPDF_DLL
     bool pipeStreamData(Pipeline*, bool filter,
-			bool normalize, bool compress);
+			bool normalize, bool compress,
+                        bool suppress_warnings = false);
 
     // Replace a stream's dictionary.  The new dictionary must be
     // consistent with the stream's data.  This is most appropriately

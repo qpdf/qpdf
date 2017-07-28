@@ -144,6 +144,17 @@ class QPDFWriter
     QPDF_DLL
     void setQDFMode(bool);
 
+    // Enable stream precheck mode. In this mode, all filterable
+    // streams are checked by actually attempting to decode them
+    // before filtering. This may add significant time to the process
+    // of writing the data because all streams from the input must be
+    // read twice, but it enables the raw stream data to be preserved
+    // even in cases where qpdf would run into errors decoding the
+    // stream after it determines that it should be able to do it.
+    // Examples would include compressed data with errors in it.
+    QPDF_DLL
+    void setPrecheckStreams(bool);
+
     // Set the minimum PDF version.  If the PDF version of the input
     // file (or previously set minimum version) is less than the
     // version passed to this method, the PDF version of the output
@@ -415,6 +426,7 @@ class QPDFWriter
     bool stream_data_mode_set;
     qpdf_stream_data_e stream_data_mode;
     bool qdf_mode;
+    bool precheck_streams;
     bool static_id;
     bool suppress_original_object_ids;
     bool direct_stream_lengths;

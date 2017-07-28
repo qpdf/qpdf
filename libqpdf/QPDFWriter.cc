@@ -57,6 +57,7 @@ QPDFWriter::init()
     stream_data_mode_set = false;
     stream_data_mode = qpdf_s_compress;
     qdf_mode = false;
+    precheck_streams = false;
     static_id = false;
     suppress_original_object_ids = false;
     direct_stream_lengths = true;
@@ -174,6 +175,12 @@ void
 QPDFWriter::setQDFMode(bool val)
 {
     this->qdf_mode = val;
+}
+
+void
+QPDFWriter::setPrecheckStreams(bool val)
+{
+    this->precheck_streams = val;
 }
 
 void
@@ -1521,6 +1528,21 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	}
 
 	flags |= f_stream;
+
+        if (filter && this->precheck_streams)
+        {
+            try
+            {
+                QTC::TC("qpdf", "QPDFWriter precheck stream");
+                Pl_Discard discard;
+                filter = object.pipeStreamData(
+                    &discard, true, false, false, true);
+            }
+            catch (std::exception)
+            {
+                filter = false;
+            }
+        }
 
 	pushPipeline(new Pl_Buffer("stream data"));
 	activatePipelineStack();

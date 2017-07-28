@@ -2134,12 +2134,14 @@ QPDF::getCompressibleObjGens()
     return result;
 }
 
-void
+bool
 QPDF::pipeStreamData(int objid, int generation,
 		     qpdf_offset_t offset, size_t length,
 		     QPDFObjectHandle stream_dict,
-		     Pipeline* pipeline)
+		     Pipeline* pipeline,
+                     bool suppress_warnings)
 {
+    bool success = false;
     std::vector<PointerHolder<Pipeline> > to_delete;
     if (this->encrypted)
     {
@@ -2165,21 +2167,29 @@ QPDF::pipeStreamData(int objid, int generation,
 	    length -= len;
 	    pipeline->write(QUtil::unsigned_char_pointer(buf), len);
 	}
+        success = true;
     }
     catch (QPDFExc& e)
     {
-	warn(e);
+        if (! suppress_warnings)
+        {
+            warn(e);
+        }
     }
     catch (std::runtime_error& e)
     {
-	QTC::TC("qpdf", "QPDF decoding error warning");
-	warn(QPDFExc(qpdf_e_damaged_pdf, this->file->getName(),
-		     "", this->file->getLastOffset(),
-		     "error decoding stream data for object " +
-		     QUtil::int_to_string(objid) + " " +
-		     QUtil::int_to_string(generation) + ": " + e.what()));
+        if (! suppress_warnings)
+        {
+            QTC::TC("qpdf", "QPDF decoding error warning");
+            warn(QPDFExc(qpdf_e_damaged_pdf, this->file->getName(),
+                         "", this->file->getLastOffset(),
+                         "error decoding stream data for object " +
+                         QUtil::int_to_string(objid) + " " +
+                         QUtil::int_to_string(generation) + ": " + e.what()));
+        }
     }
     pipeline->finish();
+    return success;
 }
 
 void

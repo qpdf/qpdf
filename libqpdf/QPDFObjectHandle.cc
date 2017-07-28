@@ -496,11 +496,12 @@ QPDFObjectHandle::getRawStreamData()
 
 bool
 QPDFObjectHandle::pipeStreamData(Pipeline* p, bool filter,
-				 bool normalize, bool compress)
+				 bool normalize, bool compress,
+                                 bool suppress_warnings)
 {
     assertStream();
     return dynamic_cast<QPDF_Stream*>(obj.getPointer())->pipeStreamData(
-	p, filter, normalize, compress);
+	p, filter, normalize, compress, suppress_warnings);
 }
 
 void

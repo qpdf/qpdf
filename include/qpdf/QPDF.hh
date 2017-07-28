@@ -540,13 +540,14 @@ class QPDF
     {
 	friend class QPDF_Stream;
       private:
-	static void pipeStreamData(QPDF* qpdf, int objid, int generation,
+	static bool pipeStreamData(QPDF* qpdf, int objid, int generation,
 				   qpdf_offset_t offset, size_t length,
 				   QPDFObjectHandle dict,
-				   Pipeline* pipeline)
+				   Pipeline* pipeline, bool suppress_warnings)
 	{
-	    qpdf->pipeStreamData(
-		objid, generation, offset, length, dict, pipeline);
+	    return qpdf->pipeStreamData(
+		objid, generation, offset, length, dict, pipeline,
+                suppress_warnings);
 	}
     };
     friend class Pipe;
@@ -666,10 +667,11 @@ class QPDF
     void findAttachmentStreams();
 
     // Calls finish() on the pipeline when done but does not delete it
-    void pipeStreamData(int objid, int generation,
+    bool pipeStreamData(int objid, int generation,
 			qpdf_offset_t offset, size_t length,
 			QPDFObjectHandle dict,
-			Pipeline* pipeline);
+			Pipeline* pipeline,
+                        bool suppress_warnings);
 
     // For QPDFWriter:
 
