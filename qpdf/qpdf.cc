@@ -203,6 +203,7 @@ familiar with the PDF file format or who are PDF developers.\n\
 --object-streams=mode     controls handing of object streams\n\
 --ignore-xref-streams     tells qpdf to ignore any cross-reference streams\n\
 --precheck-streams        precheck ability to decode streams\n\
+--preserve-unreferenced   preserve unreferenced objects\n\
 --qdf                     turns on \"QDF mode\" (below)\n\
 --min-version=version     sets the minimum PDF version of the output file\n\
 --force-version=version   forces this to be the PDF version of the output file\n\
@@ -1030,6 +1031,7 @@ int main(int argc, char* argv[])
     bool ignore_xref_streams = false;
     bool qdf_mode = false;
     bool precheck_streams = false;
+    bool preserve_unreferenced_objects = false;
     std::string min_version;
     std::string force_version;
 
@@ -1218,6 +1220,10 @@ int main(int argc, char* argv[])
 	    else if (strcmp(arg, "precheck-streams") == 0)
 	    {
 		precheck_streams = true;
+	    }
+	    else if (strcmp(arg, "preserve-unreferenced") == 0)
+	    {
+		preserve_unreferenced_objects = true;
 	    }
 	    else if (strcmp(arg, "min-version") == 0)
 	    {
@@ -1713,6 +1719,10 @@ int main(int argc, char* argv[])
             if (precheck_streams)
             {
                 w.setPrecheckStreams(true);
+            }
+            if (preserve_unreferenced_objects)
+            {
+                w.setPreserveUnreferencedObjects(true);
             }
 	    if (normalize_set)
 	    {

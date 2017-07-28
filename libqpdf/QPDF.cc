@@ -989,6 +989,22 @@ QPDF::showXRefTable()
     }
 }
 
+std::vector<QPDFObjectHandle>
+QPDF::getAllObjects()
+{
+    std::vector<QPDFObjectHandle> result;
+    for (std::map<QPDFObjGen, QPDFXRefEntry>::iterator iter =
+	     this->xref_table.begin();
+	 iter != this->xref_table.end(); ++iter)
+    {
+
+	QPDFObjGen const& og = (*iter).first;
+        result.push_back(QPDFObjectHandle::Factory::newIndirect(
+                             this, og.getObj(), og.getGen()));
+    }
+    return result;
+}
+
 void
 QPDF::setLastObjectDescription(std::string const& description,
 			       int objid, int generation)

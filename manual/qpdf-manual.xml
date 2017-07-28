@@ -839,6 +839,27 @@ outfile.pdf</option>
       </listitem>
      </varlistentry>
      <varlistentry>
+      <term><option>--preserve-unreferenced</option></term>
+      <listitem>
+       <para>
+        Tells qpdf to preserve objects that are not referenced when
+        writing the file. Ordinarily any object that is not referenced
+        in a traversal of the document from the trailer dictionary
+        will be discarded. This may be useful in working with some
+        damaged files or inspecting files with known unreferenced
+        objects.
+       </para>
+       <para>
+        This flag is ignored for linearized files and has the effect
+        of causing objects in the new file to be written in order by
+        object ID from the original file. This does not mean that
+        object numbers will be the same since qpdf may create stream
+        lengths as direct or indirect differently from the original
+        file, and the original file may have gaps in its numbering.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
       <term><option>--qdf</option></term>
       <listitem>
        <para>

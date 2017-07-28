@@ -280,3 +280,4 @@ QPDFObjectHandle found fake 1
 QPDFObjectHandle no val for last key 0
 QPDF resolve failure to null 0
 QPDFWriter precheck stream 0
+QPDFWriter preserve unreferenced standard 0

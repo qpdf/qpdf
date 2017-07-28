@@ -743,6 +743,24 @@ $td->runtest("check output",
 	     {$td->FILE => "bad-data-precheck.pdf"});
 show_ntests();
 # ----------
+$td->notify("--- Preserve unreferenced objects ---");
+$n_tests += 4;
+
+$td->runtest("drop unused objects",
+	     {$td->COMMAND => "qpdf --static-id unreferenced-objects.pdf a.pdf"},
+	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "unreferenced-dropped.pdf"});
+$td->runtest("keep unused objects",
+	     {$td->COMMAND => "qpdf --static-id --preserve-unreferenced" .
+                  " unreferenced-objects.pdf a.pdf"},
+	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "unreferenced-preserved.pdf"});
+show_ntests();
+# ----------
 $td->notify("--- Copy Foreign Objects ---");
 $n_tests += 7;
 

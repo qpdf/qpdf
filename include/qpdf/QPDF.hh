@@ -396,6 +396,12 @@ class QPDF
     QPDF_DLL
     void showXRefTable();
 
+    // Returns a list of indirect objects for every object in the xref
+    // table. Useful for discovering objects that are not otherwised
+    // referenced.
+    QPDF_DLL
+    std::vector<QPDFObjectHandle> getAllObjects();
+
     // Optimization support -- see doc/optimization.  Implemented in
     // QPDF_optimization.cc
 

@@ -1,7 +1,16 @@
+2017-07-28  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add --preserve-unreferenced command-line option and
+	setPreserveUnreferencedObjects method to QPDFWriter. This option
+	causes QPDFWriter to write all objects from the input file to the
+	output file regardless of whether the objects are referenced.
+	Objects are written to the output file in numerical order from the
+	input file. This option has no effect for linearized files.
+
 2017-07-27  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add --precheck-streams command-line option and setStreamPrecheck
-	option to QPDFWriter to tell QPDFWriter to attempt decoding a
+	method to QPDFWriter to tell QPDFWriter to attempt decoding a
 	stream fully before deciding whether to filter it or not.
 
 	* Recover gracefully from streams that aren't filterable because

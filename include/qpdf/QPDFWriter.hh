@@ -155,6 +155,12 @@ class QPDFWriter
     QPDF_DLL
     void setPrecheckStreams(bool);
 
+    // Preserve unreferenced objects. The default behavior is to
+    // discard any object that is not visited during a traversal of
+    // the object structure from the trailer.
+    QPDF_DLL
+    void setPreserveUnreferencedObjects(bool);
+
     // Set the minimum PDF version.  If the PDF version of the input
     // file (or previously set minimum version) is less than the
     // version passed to this method, the PDF version of the output
@@ -427,6 +433,7 @@ class QPDFWriter
     qpdf_stream_data_e stream_data_mode;
     bool qdf_mode;
     bool precheck_streams;
+    bool preserve_unreferenced_objects;
     bool static_id;
     bool suppress_original_object_ids;
     bool direct_stream_lengths;

@@ -58,6 +58,7 @@ QPDFWriter::init()
     stream_data_mode = qpdf_s_compress;
     qdf_mode = false;
     precheck_streams = false;
+    preserve_unreferenced_objects = false;
     static_id = false;
     suppress_original_object_ids = false;
     direct_stream_lengths = true;
@@ -181,6 +182,12 @@ void
 QPDFWriter::setPrecheckStreams(bool val)
 {
     this->precheck_streams = val;
+}
+
+void
+QPDFWriter::setPreserveUnreferencedObjects(bool val)
+{
+    this->preserve_unreferenced_objects = val;
 }
 
 void
@@ -3073,6 +3080,17 @@ QPDFWriter::writeStandard()
 
     writeHeader();
     writeString(this->extra_header_text);
+
+    if (this->preserve_unreferenced_objects)
+    {
+        QTC::TC("qpdf", "QPDFWriter preserve unreferenced standard");
+        std::vector<QPDFObjectHandle> all = this->pdf.getAllObjects();
+        for (std::vector<QPDFObjectHandle>::iterator iter = all.begin();
+             iter != all.end(); ++iter)
+        {
+            enqueueObject(*iter);
+        }
+    }
 
     // Put root first on queue.
     QPDFObjectHandle trailer = getTrimmedTrailer();
