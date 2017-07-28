@@ -65,9 +65,6 @@ Soon
    effective resources for a page without modifying the page and then
    implement both changes in terms of that method.
 
- * Provide an option for QPDFWriter to preserve unreferenced objects
-   when writing out a file.
-
  * Support user-pluggable stream filters.  This would enable external
    code to provide interpretation for filters that are missing from
    qpdf.  Make it possible for user-provided fitlers to override
