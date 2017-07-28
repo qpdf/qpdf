@@ -2028,7 +2028,14 @@ QPDF::getTrailer()
 QPDFObjectHandle
 QPDF::getRoot()
 {
-    return this->trailer.getKey("/Root");
+    QPDFObjectHandle root = this->trailer.getKey("/Root");
+    if (! root.isDictionary())
+    {
+        throw QPDFExc(qpdf_e_damaged_pdf, file->getName(),
+                      "", file->getLastOffset(),
+                      "unable to find /Root dictionary");
+    }
+    return root;
 }
 
 void

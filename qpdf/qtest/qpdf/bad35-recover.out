@@ -1,2 +1,2 @@
 WARNING: bad35.pdf (object 1 0, file position 521): supposed object stream 1 has wrong type
-operation for Dictionary object attempted on object of wrong type
+bad35.pdf (file position 521): unable to find /Root dictionary
