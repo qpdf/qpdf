@@ -52,8 +52,11 @@ Small, command-line tool only enhancements to do soon
    (libtool).
 
 
-6.1.0
-=====
+Soon
+====
+
+ * Eliminate dependency on PCRE. There aren't that many regular
+   expressions, and they are used only for internal purposes.
 
  * Add method to push inheritable resources to a single page by
    walking up and copying without overwrite.  Above logic will also be
@@ -64,10 +67,6 @@ Small, command-line tool only enhancements to do soon
 
  * Provide an option for QPDFWriter to preserve unreferenced objects
    when writing out a file.
-
- * Look at all the exceptions and error conditions in QPDF_stream and
-   figure out which ones should be converted to warnings and treating
-   the stream as not filterable.
 
  * Support user-pluggable stream filters.  This would enable external
    code to provide interpretation for filters that are missing from
@@ -89,27 +88,7 @@ Small, command-line tool only enhancements to do soon
     - Files that have no whitespace token after "endobj" such that
       endobj collides with the start of the next object
 
-    - Files with individual corrupted streams.  Just leave the streams
-      unfiltered after giving a warning, or maybe do something else
-      like applying as many of the filters as possible, etc.
-      QPDFWriter can have some kind of retry mechanism on streams
-      where filtering fails after filterable returns true.
-
-    - Files whose PDF header is malformed, perhaps with no version
-      number (as literally %PDF-a.b).  Maybe keep track of features to
-      try to infer a version based on encryption formats and object
-      streams.
-
-    - For really hard errors like corrupted streams where there is
-      virtually guaranteed to be loss, maybe require an additional
-      option to tell qpdf that it's okay to continue and treat those
-      as warnings.  Probably need separate options for each type of
-      error plus a generic tryReallyHard kind of method that enables
-      them all.  Then the qpdf command-line tool can have a single
-      flag that enables all supported aggressive recovery techniques.
-
     - See ../misc/broken-files
-
 
 
 General
