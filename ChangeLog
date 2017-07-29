@@ -1,5 +1,8 @@
 2017-07-29  Jay Berkenbilt  <ejb@ql.org>
 
+	* Improve handling of files where the "stream" keyword is not
+	followed by proper line terminators. Fixes #104.
+
 	* Fix content stream parsing to handle cases of structures within
 	the stream split across stream boundaries. Fixes #73.
 

@@ -1117,6 +1117,11 @@ QPDF::readObject(PointerHolder<InputSource> input,
                 else
                 {
                     QTC::TC("qpdf", "QPDF stream without newline");
+                    if (! QUtil::is_space(ch))
+                    {
+                        QTC::TC("qpdf", "QPDF stream with non-space");
+                        input->unreadCh(ch);
+                    }
                     warn(QPDFExc(qpdf_e_damaged_pdf, input->getName(),
                                  this->last_object_description,
                                  input->tell(),

@@ -283,3 +283,4 @@ QPDFWriter precheck stream 0
 QPDFWriter preserve unreferenced standard 0
 QPDFObjectHandle non-stream in parsecontent 0
 QPDFObjectHandle errors in parsecontent 0
+QPDF stream with non-space 0
