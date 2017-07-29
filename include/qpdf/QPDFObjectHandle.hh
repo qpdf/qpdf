@@ -623,7 +623,9 @@ class QPDFObjectHandle
         bool in_array, bool in_dictionary,
         bool content_stream);
     static void parseContentStream_internal(
-        QPDFObjectHandle stream, ParserCallbacks* callbacks);
+        PointerHolder<Buffer> stream_data,
+        std::string const& description,
+        ParserCallbacks* callbacks);
 
     // Other methods
     static void warn(QPDF*, QPDFExc const&);

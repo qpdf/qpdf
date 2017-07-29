@@ -1,3 +1,8 @@
+2017-07-29  Jay Berkenbilt  <ejb@ql.org>
+
+	* Fix content stream parsing to handle cases of structures within
+	the stream split across stream boundaries. Fixes #73.
+
 2017-07-28  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add --preserve-unreferenced command-line option and

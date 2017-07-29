@@ -1,0 +1,11 @@
+WARNING: split-content-stream-errors.pdf: file is damaged
+WARNING: split-content-stream-errors.pdf (file position 802): xref not found
+WARNING: split-content-stream-errors.pdf: Attempting to reconstruct cross-reference table
+checking split-content-stream-errors.pdf
+PDF Version: 1.3
+File is not encrypted
+File is not linearized
+WARNING: split-content-stream-errors.pdf (file position 557): error decoding stream data for object 6 0: LZWDecoder: bad code received
+WARNING: content stream: ignoring non-stream while parsing content streams
+WARNING: split-content-stream-errors.pdf (file position 557): error decoding stream data for object 6 0: LZWDecoder: bad code received
+WARNING: content stream (content stream object 6 0): errors while decoding content stream

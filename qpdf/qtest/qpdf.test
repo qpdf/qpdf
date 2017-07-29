@@ -206,7 +206,7 @@ $td->runtest("remove page we don't have",
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 86;
+$n_tests += 88;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -603,6 +603,20 @@ $td->runtest("no trailing space in xref table",
              {$td->COMMAND => "qpdf --check no-space-in-xref.pdf"},
              {$td->FILE => "no-space-in-xref.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
+
+# An array is split across multiple content streams starting object
+# 42. This was reported in github issue 73. The file is modified from
+# that example.
+$td->runtest("parse split content stream",
+             {$td->COMMAND => "qpdf --check split-content-stream.pdf"},
+             {$td->FILE => "split-content-stream.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("split content stream errors",
+             {$td->COMMAND => "qpdf --check split-content-stream-errors.pdf"},
+             {$td->FILE => "split-content-stream-errors.out",
+              $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+
 
 show_ntests();
 # ----------
