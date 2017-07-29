@@ -161,6 +161,11 @@ class QPDFWriter
     QPDF_DLL
     void setPreserveUnreferencedObjects(bool);
 
+    // Always write a newline before the endstream keyword. This helps
+    // with PDF/A compliance, though it is not sufficient for it.
+    QPDF_DLL
+    void setNewlineBeforeEndstream(bool);
+
     // Set the minimum PDF version.  If the PDF version of the input
     // file (or previously set minimum version) is less than the
     // version passed to this method, the PDF version of the output
@@ -434,6 +439,7 @@ class QPDFWriter
     bool qdf_mode;
     bool precheck_streams;
     bool preserve_unreferenced_objects;
+    bool newline_before_endstream;
     bool static_id;
     bool suppress_original_object_ids;
     bool direct_stream_lengths;

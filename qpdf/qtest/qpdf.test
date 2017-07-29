@@ -206,7 +206,7 @@ $td->runtest("remove page we don't have",
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 89;
+$n_tests += 91;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -617,6 +617,16 @@ $td->runtest("split content stream errors",
              {$td->FILE => "split-content-stream-errors.out",
               $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
+
+$td->runtest("newline before endstream",
+             {$td->COMMAND =>
+                  "qpdf --static-id --newline-before-endstream" .
+                  " minimal.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "newline-before-endstream.pdf"});
 
 
 show_ntests();

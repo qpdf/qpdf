@@ -59,6 +59,7 @@ QPDFWriter::init()
     qdf_mode = false;
     precheck_streams = false;
     preserve_unreferenced_objects = false;
+    newline_before_endstream = false;
     static_id = false;
     suppress_original_object_ids = false;
     direct_stream_lengths = true;
@@ -188,6 +189,12 @@ void
 QPDFWriter::setPreserveUnreferencedObjects(bool val)
 {
     this->preserve_unreferenced_objects = val;
+}
+
+void
+QPDFWriter::setNewlineBeforeEndstream(bool val)
+{
+    this->newline_before_endstream = val;
 }
 
 void
@@ -1580,7 +1587,7 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	char last_char = this->pipeline->getLastChar();
 	popPipelineStack();
 
-	if (this->qdf_mode)
+	if (this->qdf_mode || this->newline_before_endstream)
 	{
 	    if (last_char != '\n')
 	    {

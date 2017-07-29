@@ -204,6 +204,7 @@ familiar with the PDF file format or who are PDF developers.\n\
 --ignore-xref-streams     tells qpdf to ignore any cross-reference streams\n\
 --precheck-streams        precheck ability to decode streams\n\
 --preserve-unreferenced   preserve unreferenced objects\n\
+--newline-before-endstream  always put a newline before endstream\n\
 --qdf                     turns on \"QDF mode\" (below)\n\
 --min-version=version     sets the minimum PDF version of the output file\n\
 --force-version=version   forces this to be the PDF version of the output file\n\
@@ -1032,6 +1033,7 @@ int main(int argc, char* argv[])
     bool qdf_mode = false;
     bool precheck_streams = false;
     bool preserve_unreferenced_objects = false;
+    bool newline_before_endstream = false;
     std::string min_version;
     std::string force_version;
 
@@ -1224,6 +1226,10 @@ int main(int argc, char* argv[])
 	    else if (strcmp(arg, "preserve-unreferenced") == 0)
 	    {
 		preserve_unreferenced_objects = true;
+	    }
+	    else if (strcmp(arg, "newline-before-endstream") == 0)
+	    {
+		newline_before_endstream = true;
 	    }
 	    else if (strcmp(arg, "min-version") == 0)
 	    {
@@ -1723,6 +1729,10 @@ int main(int argc, char* argv[])
             if (preserve_unreferenced_objects)
             {
                 w.setPreserveUnreferencedObjects(true);
+            }
+            if (newline_before_endstream)
+            {
+                w.setNewlineBeforeEndstream(true);
             }
 	    if (normalize_set)
 	    {
