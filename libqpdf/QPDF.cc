@@ -1316,6 +1316,13 @@ QPDF::recoverStreamLength(PointerHolder<InputSource> input,
                      this->last_object_description, stream_offset,
                      "unable to recover stream data; treating stream as empty"));
     }
+    else
+    {
+        warn(QPDFExc(qpdf_e_damaged_pdf, input->getName(),
+                     this->last_object_description, stream_offset,
+                     "recovered stream length: " +
+                     QUtil::int_to_string(length)));
+    }
 
     QTC::TC("qpdf", "QPDF recovered stream length");
     return length;

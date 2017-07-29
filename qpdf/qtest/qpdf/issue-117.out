@@ -4,4 +4,5 @@ WARNING: issue-117.pdf: Attempting to reconstruct cross-reference table
 WARNING: issue-117.pdf (file position 66): loop detected resolving object 2 0
 WARNING: issue-117.pdf (object 2 0, file position 22): /Length key in stream dictionary is not an integer
 WARNING: issue-117.pdf (object 2 0, file position 67): attempting to recover stream length
+WARNING: issue-117.pdf (object 2 0, file position 67): recovered stream length: 91
 attempt to make a stream into a direct object
