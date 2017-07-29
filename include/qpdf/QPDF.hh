@@ -207,14 +207,19 @@ class QPDF
     replaceReserved(QPDFObjectHandle reserved,
                     QPDFObjectHandle replacement);
 
-    // Copy an object from another QPDF to this one.  The return value
-    // is an indirect reference to the copied object in this file.
-    // This method is intended to be used to copy non-page objects and
-    // will not copy page objects.  To copy page objects, pass the
-    // foreign page object directly to addPage (or addPageAt).  If you
-    // copy objects that contain references to pages, you should copy
-    // the pages first using addPage(At).  Otherwise references to the
-    // pages that have not been copied will be replaced with nulls.
+    // Copy an object from another QPDF to this one. Please note that
+    // the QPDF object containing the object being copied must stick
+    // around because it is still used to retrieve any stream data
+    // referenced by the copied objects.
+    //
+    // The return value is an indirect reference to the copied object
+    // in this file. This method is intended to be used to copy
+    // non-page objects and will not copy page objects. To copy page
+    // objects, pass the foreign page object directly to addPage (or
+    // addPageAt). If you copy objects that contain references to
+    // pages, you should copy the pages first using addPage(At).
+    // Otherwise references to the pages that have not been copied
+    // will be replaced with nulls.
 
     // When copying objects with this method, object structure will be
     // preserved, so all indirectly referenced indirect objects will
