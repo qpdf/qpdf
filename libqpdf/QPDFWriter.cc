@@ -1545,7 +1545,7 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
                 filter = object.pipeStreamData(
                     &discard, true, false, false, true);
             }
-            catch (std::exception)
+            catch (std::exception&)
             {
                 filter = false;
             }
