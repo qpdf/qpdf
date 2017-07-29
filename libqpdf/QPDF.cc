@@ -239,7 +239,9 @@ QPDF::parse(char const* password)
 	QTC::TC("qpdf", "QPDF not a pdf file");
 	warn(QPDFExc(qpdf_e_damaged_pdf, this->file->getName(),
                      "", 0, "can't find PDF header"));
-        this->pdf_version = "1.0";
+        // QPDFWriter writes files that usually require at least
+        // version 1.2 for /FlateDecode
+        this->pdf_version = "1.2";
     }
     if (atof(this->pdf_version.c_str()) < 1.2)
     {
