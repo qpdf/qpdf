@@ -153,23 +153,30 @@ else
 fi
 AC_SUBST(HAVE_LD_VERSION_SCRIPT)
 
-AC_MSG_CHECKING(for gnu make >= 3.81)
 make_okay=0
-if make --version >/dev/null 2>&1; then
-  v=`make --version | grep 'GNU Make' | sed -e 's/.*Make //'`
-  maj=`echo $v | cut -d. -f 1`
-  min=`echo $v | cut -d. -f 2`
-  if test $maj -gt 3 -o '(' $maj -eq 3 -a $min -ge 81 ')'; then
-     make_okay=1
+for make_prog in make gmake; do
+  this_make_okay=0
+  AC_MSG_CHECKING(for gnu make >= 3.81 ($make_prog))
+  if $make_prog --version >/dev/null 2>&1; then
+    v=`$make_prog --version | grep 'GNU Make' | sed -e 's/.*Make //'`
+    maj=`echo $v | cut -d. -f 1`
+    min=`echo $v | cut -d. -f 2`
+    if test $maj -gt 3 -o '(' $maj -eq 3 -a $min -ge 81 ')'; then
+       this_make_okay=1
+       make_okay=1
+    fi
   fi
-fi
-if test "$make_okay" = "1"; then
-  AC_MSG_RESULT(yes)
-else
+  if test "$this_make_okay" = "1"; then
+    AC_MSG_RESULT(yes)
+  else
+    AC_MSG_RESULT(no)
+  fi
+done
+
+if test "$make_okay" = "0"; then
   dnl Don't set MISSING_ANY=1 -- maybe user calls make something else
   MISSING_MAKE_381=1
   ISSUE_WARNINGS=1
-  AC_MSG_RESULT(no)
 fi
 
 AC_SUBST(GENDEPS)
