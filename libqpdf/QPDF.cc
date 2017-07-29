@@ -1542,6 +1542,7 @@ QPDF::resolve(int objid, int generation)
 	}
 
 	QPDFXRefEntry const& entry = this->xref_table[og];
+        bool success = false;
         try
         {
             switch (entry.getType())
@@ -1569,11 +1570,23 @@ QPDF::resolve(int objid, int generation)
                               QUtil::int_to_string(generation) +
                               " has unexpected xref entry type");
             }
+            success = true;
         }
         catch (QPDFExc& e)
         {
-            QTC::TC("qpdf", "QPDF resolve failure to null");
             warn(e);
+        }
+        catch (std::exception& e)
+        {
+            warn(QPDFExc(qpdf_e_damaged_pdf, this->file->getName(), "", 0,
+                         "object " +
+                         QUtil::int_to_string(objid) + "/" +
+                         QUtil::int_to_string(generation) +
+                         ": error reading object: " + e.what()));
+        }
+        if (! success)
+        {
+            QTC::TC("qpdf", "QPDF resolve failure to null");
             QPDFObjectHandle oh = QPDFObjectHandle::newNull();
             this->obj_cache[og] =
                 ObjCache(QPDFObjectHandle::ObjAccessor::getObject(oh), -1, -1);
