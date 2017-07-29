@@ -293,3 +293,8 @@ Index: QPDFWriter.cc
    because std::regex lacks some features of PCRE that we use and
    because the result was many times slower. The work was saved in
    refs/attic/std-regex on github.
+
+ * Consider adding on option to provide a human-readable dump of
+   linearization hint tables. This should include improving the
+   'overflow reading bit stream' message as reported in issue #2.
+
