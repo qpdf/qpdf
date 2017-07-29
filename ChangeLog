@@ -1,5 +1,7 @@
 2017-07-29  Jay Berkenbilt  <ejb@ql.org>
 
+	* Handle zlib data errors when decoding streams. Fixes #106.
+
 	* Improve handling of files where the "stream" keyword is not
 	followed by proper line terminators. Fixes #104.
 

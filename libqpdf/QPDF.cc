@@ -2206,7 +2206,7 @@ QPDF::pipeStreamData(int objid, int generation,
             warn(e);
         }
     }
-    catch (std::runtime_error& e)
+    catch (std::exception& e)
     {
         if (! suppress_warnings)
         {
@@ -2218,7 +2218,14 @@ QPDF::pipeStreamData(int objid, int generation,
                          QUtil::int_to_string(generation) + ": " + e.what()));
         }
     }
-    pipeline->finish();
+    try
+    {
+        pipeline->finish();
+    }
+    catch (std::exception&)
+    {
+        // ignore
+    }
     return success;
 }
 

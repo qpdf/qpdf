@@ -206,7 +206,7 @@ $td->runtest("remove page we don't have",
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 88;
+$n_tests += 89;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -229,6 +229,7 @@ foreach my $d (
     ["118", "other infinite loop", 2],
     ["119", "other infinite loop", 3],
     ["120", "other infinite loop", 3],
+    ["106", "zlib data error", 3],
     )
 {
     my ($n, $description, $exit_status) = @$d;

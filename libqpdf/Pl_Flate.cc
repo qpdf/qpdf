@@ -157,28 +157,36 @@ Pl_Flate::handleData(unsigned char* data, int len, int flush)
 void
 Pl_Flate::finish()
 {
-    if (this->outbuf)
+    try
     {
-	if (this->initialized)
-	{
-	    z_stream& zstream = *(static_cast<z_stream*>(this->zdata));
-	    unsigned char buf[1];
-	    buf[0] = '\0';
-	    handleData(buf, 0, Z_FINISH);
-	    int err = Z_OK;
-	    if (action == a_deflate)
-	    {
-		err = deflateEnd(&zstream);
-	    }
-	    else
-	    {
-		err = inflateEnd(&zstream);
-	    }
-	    checkError("End", err);
-	}
+        if (this->outbuf)
+        {
+            if (this->initialized)
+            {
+                z_stream& zstream = *(static_cast<z_stream*>(this->zdata));
+                unsigned char buf[1];
+                buf[0] = '\0';
+                handleData(buf, 0, Z_FINISH);
+                int err = Z_OK;
+                if (action == a_deflate)
+                {
+                    err = deflateEnd(&zstream);
+                }
+                else
+                {
+                    err = inflateEnd(&zstream);
+                }
+                checkError("End", err);
+            }
 
-	delete [] this->outbuf;
-	this->outbuf = 0;
+            delete [] this->outbuf;
+            this->outbuf = 0;
+        }
+    }
+    catch (std::exception& e)
+    {
+        this->getNext()->finish();
+        throw e;
     }
     this->getNext()->finish();
 }
