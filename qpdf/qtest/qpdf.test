@@ -206,7 +206,7 @@ $td->runtest("remove page we don't have",
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 91;
+$n_tests += 93;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -627,6 +627,19 @@ $td->runtest("newline before endstream",
 $td->runtest("check output",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "newline-before-endstream.pdf"});
+
+# Demonstrate show-xref after check and not after check to illustrate
+# that it can dump the real xref or the recovered xref.
+$td->runtest("dump bad xref",
+             {$td->COMMAND => "qpdf --show-xref bad-xref-entry.pdf"},
+             {$td->FILE => "bad-xref-entry.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("dump corrected bad xref",
+             {$td->COMMAND => "qpdf --check --show-xref bad-xref-entry.pdf"},
+             {$td->FILE => "bad-xref-entry-corrected.out",
+              $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
 
 
 show_ntests();

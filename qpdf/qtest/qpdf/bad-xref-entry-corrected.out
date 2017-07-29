@@ -1,0 +1,14 @@
+checking bad-xref-entry.pdf
+PDF Version: 1.3
+File is not encrypted
+File is not linearized
+WARNING: bad-xref-entry.pdf: file is damaged
+WARNING: bad-xref-entry.pdf (object 5 0, file position 580): expected n n obj
+WARNING: bad-xref-entry.pdf: Attempting to reconstruct cross-reference table
+1/0: uncompressed; offset = 52
+2/0: uncompressed; offset = 133
+3/0: uncompressed; offset = 242
+4/0: uncompressed; offset = 484
+5/0: uncompressed; offset = 583
+6/0: uncompressed; offset = 629
+7/0: uncompressed; offset = 774

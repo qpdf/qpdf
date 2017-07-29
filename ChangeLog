@@ -1,5 +1,15 @@
 2017-07-29  Jay Berkenbilt  <ejb@ql.org>
 
+	* When passing multiple inspection arguments, run --check first,
+	and defer exit until after all the checks have been run. This
+	makes it possible to force operations such as --show-xref to be
+	delayed until after recovery attempts have been made. For example,
+	if you have a file with a syntactically valid xref table that has
+	some offsets that are incorrect, running qpdf --check --show-xref
+	on that file will first recover the xref and the dump the
+	recovered xref, while just running qpdf --show-xref will show the
+	xref table as present in the file. Fixes #42.
+
 	* When recovering stream length, indicate the recovered length.
 	Fixes #44.
 

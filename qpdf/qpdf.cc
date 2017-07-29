@@ -1383,6 +1383,97 @@ int main(int argc, char* argv[])
         }
 	if (outfilename == 0)
 	{
+            int exit_code = 0;
+	    if (check)
+	    {
+                // Code below may set okay to false but not to true.
+                // We assume okay until we prove otherwise but may
+                // continue to perform additional checks after finding
+                // errors.
+		bool okay = true;
+		std::cout << "checking " << infilename << std::endl;
+		try
+		{
+                    int extension_level = pdf.getExtensionLevel();
+		    std::cout << "PDF Version: " << pdf.getPDFVersion();
+                    if (extension_level > 0)
+                    {
+                        std::cout << " extension level "
+                                  << pdf.getExtensionLevel();
+                    }
+                    std::cout << std::endl;
+		    ::show_encryption(pdf);
+		    if (pdf.isLinearized())
+		    {
+			std::cout << "File is linearized\n";
+			if (! pdf.checkLinearization())
+                        {
+                            // any errors are reported by checkLinearization()
+                            okay = false;
+                        }
+		    }
+		    else
+		    {
+			std::cout << "File is not linearized\n";
+                    }
+
+                    // Write the file no nowhere, uncompressing
+                    // streams.  This causes full file traversal and
+                    // decoding of all streams we can decode.
+                    QPDFWriter w(pdf);
+                    Pl_Discard discard;
+                    w.setOutputPipeline(&discard);
+                    w.setStreamDataMode(qpdf_s_uncompress);
+                    w.write();
+
+                    // Parse all content streams
+                    std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
+                    DiscardContents discard_contents;
+                    int pageno = 0;
+                    for (std::vector<QPDFObjectHandle>::iterator iter =
+                             pages.begin();
+                         iter != pages.end(); ++iter)
+                    {
+                        ++pageno;
+                        try
+                        {
+                            QPDFObjectHandle::parseContentStream(
+                                (*iter).getKey("/Contents"),
+                                &discard_contents);
+                        }
+                        catch (QPDFExc& e)
+                        {
+                            okay = false;
+                            std::cout << "page " << pageno << ": "
+                                      << e.what() << std::endl;
+                        }
+                    }
+		}
+		catch (std::exception& e)
+		{
+		    std::cout << e.what() << std::endl;
+                    okay = false;
+		}
+		if (okay)
+		{
+		    if (! pdf.getWarnings().empty())
+		    {
+			exit_code = EXIT_WARNING;
+		    }
+		    else
+		    {
+			std::cout << "No syntax or stream encoding errors"
+				  << " found; the file may still contain"
+				  << std::endl
+				  << "errors that qpdf cannot detect"
+				  << std::endl;
+		    }
+		}
+                else
+                {
+                    exit_code = EXIT_ERROR;
+                }
+	    }
             if (show_npages)
             {
                 QTC::TC("qpdf", "qpdf npages");
@@ -1402,7 +1493,7 @@ int main(int argc, char* argv[])
 		}
 		else
 		{
-		    exit(EXIT_ERROR);
+		    exit_code = EXIT_ERROR;
 		}
 	    }
 	    if (show_linearization)
@@ -1435,7 +1526,7 @@ int main(int argc, char* argv[])
 			    QTC::TC("qpdf", "qpdf unable to filter");
 			    std::cerr << "Unable to filter stream data."
 				      << std::endl;
-			    exit(EXIT_ERROR);
+			    exit_code = EXIT_ERROR;
 			}
 			else
 			{
@@ -1512,96 +1603,10 @@ int main(int argc, char* argv[])
 		    }
 		}
 	    }
-	    if (check)
-	    {
-                // Code below may set okay to false but not to true.
-                // We assume okay until we prove otherwise but may
-                // continue to perform additional checks after finding
-                // errors.
-		bool okay = true;
-		std::cout << "checking " << infilename << std::endl;
-		try
-		{
-                    int extension_level = pdf.getExtensionLevel();
-		    std::cout << "PDF Version: " << pdf.getPDFVersion();
-                    if (extension_level > 0)
-                    {
-                        std::cout << " extension level "
-                                  << pdf.getExtensionLevel();
-                    }
-                    std::cout << std::endl;
-		    ::show_encryption(pdf);
-		    if (pdf.isLinearized())
-		    {
-			std::cout << "File is linearized\n";
-			if (! pdf.checkLinearization())
-                        {
-                            // any errors are reported by checkLinearization()
-                            okay = false;
-                        }
-		    }
-		    else
-		    {
-			std::cout << "File is not linearized\n";
-                    }
-
-                    // Write the file no nowhere, uncompressing
-                    // streams.  This causes full file traversal and
-                    // decoding of all streams we can decode.
-                    QPDFWriter w(pdf);
-                    Pl_Discard discard;
-                    w.setOutputPipeline(&discard);
-                    w.setStreamDataMode(qpdf_s_uncompress);
-                    w.write();
-
-                    // Parse all content streams
-                    std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
-                    DiscardContents discard_contents;
-                    int pageno = 0;
-                    for (std::vector<QPDFObjectHandle>::iterator iter =
-                             pages.begin();
-                         iter != pages.end(); ++iter)
-                    {
-                        ++pageno;
-                        try
-                        {
-                            QPDFObjectHandle::parseContentStream(
-                                (*iter).getKey("/Contents"),
-                                &discard_contents);
-                        }
-                        catch (QPDFExc& e)
-                        {
-                            okay = false;
-                            std::cout << "page " << pageno << ": "
-                                      << e.what() << std::endl;
-                        }
-                    }
-		}
-		catch (std::exception& e)
-		{
-		    std::cout << e.what() << std::endl;
-                    okay = false;
-		}
-		if (okay)
-		{
-		    if (! pdf.getWarnings().empty())
-		    {
-			exit(EXIT_WARNING);
-		    }
-		    else
-		    {
-			std::cout << "No syntax or stream encoding errors"
-				  << " found; the file may still contain"
-				  << std::endl
-				  << "errors that qpdf cannot detect"
-				  << std::endl;
-		    }
-		}
-                else
-                {
-                    exit(EXIT_ERROR);
-                }
-	    }
+            if (exit_code)
+            {
+                exit(exit_code);
+            }
 	}
 	else
 	{
