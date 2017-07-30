@@ -64,14 +64,17 @@ int main(int argc, char* argv[])
     {
         std::cerr << "Usage: " << whoami << " infile outprefix" << std::endl;
     }
-    try
+    else
     {
-        process(whoami, argv[1], argv[2]);
-    }
-    catch (std::exception e)
-    {
-        std::cerr << whoami << ": exception: " << e.what() << std::endl;
-        return 2;
+        try
+        {
+            process(whoami, argv[1], argv[2]);
+        }
+        catch (std::exception e)
+        {
+            std::cerr << whoami << ": exception: " << e.what() << std::endl;
+            return 2;
+        }
     }
     return 0;
 }
