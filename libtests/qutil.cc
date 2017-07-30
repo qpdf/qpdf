@@ -170,6 +170,16 @@ void same_file_test()
     assert_same_file("", "qutil.out", false);
 }
 
+void read_lines_from_file_test()
+{
+    std::list<std::string> lines = QUtil::read_lines_from_file("other-file");
+    for (std::list<std::string>::iterator iter = lines.begin();
+         iter != lines.end(); ++iter)
+    {
+        std::cout << *iter << std::endl;
+    }
+}
+
 int main(int argc, char* argv[])
 {
     try
@@ -187,6 +197,8 @@ int main(int argc, char* argv[])
 	get_whoami_test();
 	std::cout << "----" << std::endl;
 	same_file_test();
+	std::cout << "----" << std::endl;
+	read_lines_from_file_test();
     }
     catch (std::exception& e)
     {

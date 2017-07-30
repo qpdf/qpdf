@@ -1,5 +1,9 @@
 2017-07-29  Jay Berkenbilt  <ejb@ql.org>
 
+	* Support @filename and @- in the qpdf command-line tool to read
+	command-line arguments, one per line, from the named file. @-
+	reads from standard input. Fixes #16.
+
 	* Detect when input file and output file are the same and exit to
 	avoid overwriting and losing input file. Fixes #29.
 

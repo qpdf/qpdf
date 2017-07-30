@@ -255,6 +255,14 @@ make
     linkend="ref.page-selection"/>.
    </para>
    <para>
+    If <option>@filename</option> appears anywhere in the
+    command-line, it will be read line by line, and each line will be
+    treated as a command-line argument. The <option>@-</option> option
+    allows arguments to be read from standard input. This allows qpdf
+    to be invoked with an arbitrary number of arbitrarily long
+    arguments.
+   </para>
+   <para>
     <option>outfilename</option> does not have to be seekable, even
     when generating linearized files.  Specifying
     &ldquo;<option>--</option>&rdquo; as <option>outfilename</option>

@@ -161,6 +161,11 @@ namespace QUtil
     QPDF_DLL
     RandomDataProvider* getRandomDataProvider();
 
+    QPDF_DLL
+    std::list<std::string> read_lines_from_file(char const* filename);
+    QPDF_DLL
+    std::list<std::string> read_lines_from_file(std::istream&);
+
     // These routines help the tokenizer recognize certain character
     // classes without using ctype, which we avoid because of locale
     // considerations.

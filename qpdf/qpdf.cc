@@ -69,6 +69,10 @@ Usage: qpdf [ options ] { infilename | --empty } [ outfilename ]\n\
 \n\
 An option summary appears below.  Please see the documentation for details.\n\
 \n\
+If @filename appears anywhere in the command-line, each line of filename\n\
+will be interpreted as an argument. No interpolation is done. Line\n\
+terminators are stripped. @- can be specified to read from standard input.\n\
+\n\
 Note that when contradictory options are provided, whichever options are\n\
 provided last take precedence.\n\
 \n\
@@ -953,6 +957,28 @@ static void parse_version(std::string const& full_version_string,
     version = v;
 }
 
+static void read_args_from_file(char const* filename,
+                                std::vector<PointerHolder<char> >& new_argv)
+{
+    std::list<std::string> lines;
+    if (strcmp(filename, "-") == 0)
+    {
+        QTC::TC("qpdf", "qpdf read args from stdin");
+        lines = QUtil::read_lines_from_file(std::cin);
+    }
+    else
+    {
+        QTC::TC("qpdf", "qpdf read args from file");
+        lines = QUtil::read_lines_from_file(filename);
+    }
+    for (std::list<std::string>::iterator iter = lines.begin();
+         iter != lines.end(); ++iter)
+    {
+        new_argv.push_back(
+            PointerHolder<char>(QUtil::copy_string((*iter).c_str()), true));
+    }
+}
+
 int main(int argc, char* argv[])
 {
     whoami = QUtil::getWhoami(argv[0]);
@@ -1059,6 +1085,33 @@ int main(int argc, char* argv[])
     bool require_outfile = true;
     char const* infilename = 0;
     char const* outfilename = 0;
+
+    // Support reading arguments from files. Create a new argv. Ensure
+    // that argv itself as well as all its contents are automatically
+    // deleted by using PointerHolder objects to back the pointers in
+    // argv.
+    std::vector<PointerHolder<char> > new_argv;
+    new_argv.push_back(PointerHolder<char>(QUtil::copy_string(argv[0]), true));
+    for (int i = 1; i < argc; ++i)
+    {
+        if ((strlen(argv[i]) > 1) && (argv[i][0] == '@'))
+        {
+            read_args_from_file(1+argv[i], new_argv);
+        }
+        else
+        {
+            new_argv.push_back(
+                PointerHolder<char>(QUtil::copy_string(argv[i]), true));
+        }
+    }
+    PointerHolder<char*> argv_ph(new char*[1+new_argv.size()], true);
+    argv = argv_ph.getPointer();
+    for (size_t i = 0; i < new_argv.size(); ++i)
+    {
+        argv[i] = new_argv.at(i).getPointer();
+    }
+    argc = static_cast<int>(new_argv.size());
+    argv[argc] = 0;
 
     for (int i = 1; i < argc; ++i)
     {

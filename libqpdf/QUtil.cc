@@ -11,6 +11,7 @@
 #include <cmath>
 #include <iomanip>
 #include <sstream>
+#include <fstream>
 #include <stdexcept>
 #include <stdio.h>
 #include <errno.h>
@@ -565,4 +566,56 @@ QUtil::is_number(char const* p)
         }
     }
     return found_digit;
+}
+
+std::list<std::string>
+QUtil::read_lines_from_file(char const* filename)
+{
+    std::ifstream in(filename, std::ios_base::binary);
+    if (! in.is_open())
+    {
+        throw_system_error(std::string("open ") + filename);
+    }
+    std::list<std::string> lines = read_lines_from_file(in);
+    in.close();
+    return lines;
+}
+
+std::list<std::string>
+QUtil::read_lines_from_file(std::istream& in)
+{
+    std::list<std::string> result;
+    std::string* buf = 0;
+
+    char c;
+    while (in.get(c))
+    {
+	if (buf == 0)
+	{
+	    result.push_back("");
+	    buf = &(result.back());
+	    buf->reserve(80);
+	}
+
+	if (buf->capacity() == buf->size())
+	{
+	    buf->reserve(buf->capacity() * 2);
+	}
+	if (c == '\n')
+	{
+            // Remove any carriage return that preceded the
+            // newline and discard the newline
+            if ((! buf->empty()) && ((*(buf->rbegin())) == '\r'))
+            {
+                buf->erase(buf->length() - 1);
+            }
+	    buf = 0;
+	}
+	else
+	{
+	    buf->append(1, c);
+	}
+    }
+
+    return result;
 }

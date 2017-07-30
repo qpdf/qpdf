@@ -635,14 +635,20 @@ $td->runtest("dump bad xref",
              {$td->FILE => "bad-xref-entry.out",
               $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
+# Test @file here too.
+open(F, ">args") or die;
+print F "--check\n";
+print F "--show-xref\n";
+close(F);
 $td->runtest("dump corrected bad xref",
-             {$td->COMMAND => "qpdf --check --show-xref bad-xref-entry.pdf"},
+             {$td->COMMAND => "qpdf \@args bad-xref-entry.pdf"},
              {$td->FILE => "bad-xref-entry-corrected.out",
               $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
+unlink "args";
 
 $td->runtest("don't overwrite self",
-             {$td->COMMAND => "qpdf a.pdf a.pdf"},
+             {$td->COMMAND => "(echo a.pdf; echo a.pdf) | qpdf \@-"},
              {$td->REGEXP => "input file and output file are the same.*",
               $td->EXIT_STATUS => 2});
 
