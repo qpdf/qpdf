@@ -206,7 +206,7 @@ $td->runtest("remove page we don't have",
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 93;
+$n_tests += 94;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -641,6 +641,10 @@ $td->runtest("dump corrected bad xref",
               $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 
+$td->runtest("don't overwrite self",
+             {$td->COMMAND => "qpdf a.pdf a.pdf"},
+             {$td->REGEXP => "input file and output file are the same.*",
+              $td->EXIT_STATUS => 2});
 
 show_ntests();
 # ----------

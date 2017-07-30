@@ -1361,6 +1361,12 @@ int main(int argc, char* argv[])
 	usage("no output file may be given for this option");
     }
 
+    if (QUtil::same_file(infilename, outfilename))
+    {
+        QTC::TC("qpdf", "qpdf same file error");
+        usage("input file and output file are the same; this would cause input file to be lost");
+    }
+
     try
     {
 	QPDF pdf;

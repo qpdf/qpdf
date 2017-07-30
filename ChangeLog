@@ -1,5 +1,8 @@
 2017-07-29  Jay Berkenbilt  <ejb@ql.org>
 
+	* Detect when input file and output file are the same and exit to
+	avoid overwriting and losing input file. Fixes #29.
+
 	* When passing multiple inspection arguments, run --check first,
 	and defer exit until after all the checks have been run. This
 	makes it possible to force operations such as --show-xref to be

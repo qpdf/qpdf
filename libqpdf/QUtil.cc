@@ -24,6 +24,7 @@
 #include <io.h>
 #else
 #include <unistd.h>
+#include <sys/stat.h>
 #endif
 
 std::string
@@ -186,6 +187,55 @@ QUtil::tell(FILE* stream)
     return static_cast<qpdf_offset_t>(ftell(stream));
 # endif
 #endif
+}
+
+bool
+QUtil::same_file(char const* name1, char const* name2)
+{
+    if ((name1 == 0) || (strlen(name1) == 0) ||
+        (name2 == 0) || (strlen(name2) == 0))
+    {
+        return false;
+    }
+#ifdef _WIN32
+    HANDLE fh1 = CreateFile(name1, GENERIC_READ, FILE_SHARE_READ,
+                            NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    HANDLE fh2 = CreateFile(name2, GENERIC_READ, FILE_SHARE_READ,
+                            NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    BY_HANDLE_FILE_INFORMATION fi1;
+    BY_HANDLE_FILE_INFORMATION fi2;
+    bool same = false;
+    if ((fh1 != INVALID_HANDLE_VALUE) &&
+        (fh2 != INVALID_HANDLE_VALUE) &&
+        GetFileInformationByHandle(fh1, &fi1) &&
+        GetFileInformationByHandle(fh2, &fi2) &&
+        (fi1.dwVolumeSerialNumber == fi2.dwVolumeSerialNumber) &&
+        (fi1.nFileIndexLow == fi2.nFileIndexLow) &&
+        (fi1.nFileIndexHigh == fi2.nFileIndexHigh))
+    {
+        same = true;
+    }
+    if (fh1 != INVALID_HANDLE_VALUE)
+    {
+        CloseHandle(fh1);
+    }
+    if (fh2 != INVALID_HANDLE_VALUE)
+    {
+        CloseHandle(fh2);
+    }
+    return same;
+#else
+    struct stat st1;
+    struct stat st2;
+    if ((stat(name1, &st1) == 0) &&
+        (stat(name2, &st2) == 0) &&
+        (st1.st_ino == st2.st_ino) &&
+        (st1.st_dev == st2.st_dev))
+    {
+        return true;
+    }
+#endif
+    return false;
 }
 
 char*

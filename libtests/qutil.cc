@@ -140,6 +140,36 @@ void get_whoami_test()
     print_whoami("a\\b\\c\\quack4.exe");
 }
 
+void assert_same_file(char const* file1, char const* file2, bool expected)
+{
+    bool actual = QUtil::same_file(file1, file2);
+    std::cout << "file1: -" << (file1 ? file1 : "(null)") << "-, file2: -"
+              << (file2 ? file2 : "(null)") << "-; same: "
+              << actual << ": " << ((actual == expected) ? "PASS" : "FAIL")
+              << std::endl;
+}
+
+void same_file_test()
+{
+    try
+    {
+        fclose(QUtil::safe_fopen("qutil.out", "r"));
+        fclose(QUtil::safe_fopen("other-file", "r"));
+    }
+    catch (std::exception)
+    {
+        std::cout << "same_file_test expects to have qutil.out and other-file"
+            " exist in the current directory\n";
+        return;
+    }
+    assert_same_file("qutil.out", "./qutil.out", true);
+    assert_same_file("qutil.out", "qutil.out", true);
+    assert_same_file("qutil.out", "other-file", false);
+    assert_same_file("qutil.out", "", false);
+    assert_same_file("qutil.out", 0, false);
+    assert_same_file("", "qutil.out", false);
+}
+
 int main(int argc, char* argv[])
 {
     try
@@ -155,6 +185,8 @@ int main(int argc, char* argv[])
 	to_utf8_test();
 	std::cout << "----" << std::endl;
 	get_whoami_test();
+	std::cout << "----" << std::endl;
+	same_file_test();
     }
     catch (std::exception& e)
     {

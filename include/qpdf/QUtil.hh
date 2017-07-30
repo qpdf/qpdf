@@ -75,6 +75,9 @@ namespace QUtil
     qpdf_offset_t tell(FILE* stream);
 
     QPDF_DLL
+    bool same_file(char const* name1, char const* name2);
+
+    QPDF_DLL
     char* copy_string(std::string const&);
 
     // Returns lower-case hex-encoded version of the string, treating
