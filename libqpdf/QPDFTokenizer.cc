@@ -10,6 +10,7 @@
 
 #include <stdexcept>
 #include <string.h>
+#include <cstdlib>
 
 QPDFTokenizer::QPDFTokenizer() :
     pound_special_in_name(true),
