@@ -11,6 +11,7 @@
 #include <iostream>
 #include <cstdlib>
 
+static char const* whoami = 0;
 static bool static_id = false;
 
 static void process(char const* whoami,
@@ -43,9 +44,15 @@ static void process(char const* whoami,
     }
 }
 
+void usage()
+{
+    std::cerr << "Usage: " << whoami << " infile outprefix" << std::endl;
+    exit(2);
+}
+
 int main(int argc, char* argv[])
 {
-    char* whoami = QUtil::getWhoami(argv[0]);
+    whoami = QUtil::getWhoami(argv[0]);
 
     // For libtool's sake....
     if (strncmp(whoami, "lt-", 3) == 0)
@@ -62,7 +69,7 @@ int main(int argc, char* argv[])
 
     if (argc != 3)
     {
-        std::cerr << "Usage: " << whoami << " infile outprefix" << std::endl;
+        usage();
     }
     try
     {
