@@ -1386,7 +1386,7 @@ outfile.pdf</option>
     of the qpdf library's public interface.  The best source of
     documentation on the library itself is reading comments in
     <filename>include/qpdf/QPDF.hh</filename>,
-    <filename>include/qpdf/QDFWriter.hh</filename>, and
+    <filename>include/qpdf/QPDFWriter.hh</filename>, and
     <filename>include/qpdf/QPDFObjectHandle.hh</filename>.
    </para>
    <para>
