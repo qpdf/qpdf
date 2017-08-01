@@ -67,6 +67,7 @@ QPDFWriter::init()
     encrypted = false;
     preserve_encryption = true;
     linearized = false;
+    pclm = false;
     object_stream_mode = qpdf_o_preserve;
     encrypt_metadata = true;
     encrypt_use_aes = false;
@@ -347,6 +348,20 @@ void
 QPDFWriter::setLinearization(bool val)
 {
     this->linearized = val;
+    if (val)
+    {
+        this->pclm = false;
+    }
+}
+
+void
+QPDFWriter::setPCLm(bool val)
+{
+    this->pclm = val;
+    if (val)
+    {
+        this->linearized = false;
+    }
 }
 
 void
@@ -2290,6 +2305,12 @@ QPDFWriter::write()
 	this->qdf_mode = false;
     }
 
+    if (this->pclm)
+    {
+        setStreamDataMode(qpdf_s_preserve);
+        this->encrypted = false;
+    }
+
     if (this->qdf_mode)
     {
 	if (! this->normalize_content_set)
@@ -2428,6 +2449,10 @@ QPDFWriter::write()
     {
 	writeLinearized();
     }
+    else if (this->pclm)
+    {
+        writePCLm();
+    }
     else
     {
 	writeStandard();
@@ -2499,6 +2524,26 @@ QPDFWriter::writeHeader()
     // within the first 1024 characters of the PDF file, so for
     // linearized files, we have to write extra header text after the
     // linearization parameter dictionary.
+}
+
+void
+QPDFWriter::writePCLmHeader()
+{
+    setMinimumPDFVersion(pdf.getPDFVersion(), pdf.getExtensionLevel());
+    this->final_pdf_version = this->min_pdf_version;
+    this->final_extension_level = this->min_extension_level;
+    if (! this->forced_pdf_version.empty())
+    {
+	QTC::TC("qpdf", "QPDFWriter using forced PDF version");
+	this->final_pdf_version = this->forced_pdf_version;
+        this->final_extension_level = this->forced_extension_level;
+    }
+
+    writeString("%PDF-");
+    writeString(this->final_pdf_version);
+    // PCLm version
+    writeString("\n%PCLm 1.0\n");
+    writeStringQDF("%QDF-1.0\n\n");
 }
 
 void
@@ -3201,6 +3246,87 @@ QPDFWriter::writeStandard()
     {
 	QTC::TC("qpdf", "QPDFWriter standard deterministic ID",
                 this->object_stream_to_objects.empty() ? 0 : 1);
+        popPipelineStack();
+        assert(this->md5_pipeline == 0);
+    }
+}
+
+void
+QPDFWriter::writePCLm()
+{
+    if (this->deterministic_id)
+    {
+        pushMD5Pipeline();
+    }
+
+    // Start writing
+
+    writePCLmHeader();
+    writeString(this->extra_header_text);
+
+    // Image transform stream content for page strip images.
+    // Each of this new stream has to come after every page image
+    // strip written in the pclm file.
+    std::string image_transform_content = "q /image Do Q\n";
+
+    // enqueue all pages first
+    std::vector<QPDFObjectHandle> all = this->pdf.getAllPages();
+    for (std::vector<QPDFObjectHandle>::iterator iter = all.begin();
+            iter != all.end(); ++iter)
+    {
+        // enqueue page
+        enqueueObject(*iter);
+
+        // enqueue page contents stream
+        enqueueObject((*iter).getKey("/Contents"));
+
+        // enqueue all the strips for each page
+        QPDFObjectHandle strips =
+            (*iter).getKey("/Resources").getKey("/XObject");
+        std::set<std::string> keys = strips.getKeys();
+        for (std::set<std::string>::iterator image = keys.begin();
+                image != keys.end(); ++image)
+        {
+            enqueueObject(strips.getKey(*image));
+            enqueueObject(QPDFObjectHandle::newStream(
+                              &pdf, image_transform_content));
+        }
+    }
+
+    // Put root in queue.
+    QPDFObjectHandle trailer = getTrimmedTrailer();
+    enqueueObject(trailer.getKey("/Root"));
+
+    // Now start walking queue, output each object
+    while (this->object_queue.size())
+    {
+        QPDFObjectHandle cur_object = this->object_queue.front();
+        this->object_queue.pop_front();
+        writeObject(cur_object);
+    }
+
+    // Now write out xref.  next_objid is now the number of objects.
+    qpdf_offset_t xref_offset = this->pipeline->getCount();
+    if (this->object_stream_to_objects.empty())
+    {
+        // Write regular cross-reference table
+        writeXRefTable(t_normal, 0, this->next_objid - 1, this->next_objid);
+    }
+    else
+    {
+        // Write cross-reference stream.
+        int xref_id = this->next_objid++;
+        writeXRefStream(xref_id, xref_id, xref_offset, t_normal,
+                0, this->next_objid - 1, this->next_objid);
+    }
+    writeString("startxref\n");
+    writeString(QUtil::int_to_string(xref_offset));
+    writeString("\n%%EOF\n");
+
+    if (this->deterministic_id)
+    {
+        QTC::TC("qpdf", "QPDFWriter standard deterministic ID",
+                    this->object_stream_to_objects.empty() ? 0 : 1);
         popPipelineStack();
         assert(this->md5_pipeline == 0);
     }
