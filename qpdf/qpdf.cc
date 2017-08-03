@@ -855,7 +855,7 @@ parse_pages_options(
         {
             break;
         }
-        if (cur_arg + 2 >= argc)
+        if (cur_arg + 1 >= argc)
         {
             usage("insufficient arguments to --pages");
         }
