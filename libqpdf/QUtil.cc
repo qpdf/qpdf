@@ -619,3 +619,13 @@ QUtil::read_lines_from_file(std::istream& in)
 
     return result;
 }
+
+int
+QUtil::strcasecmp(char const *s1, char const *s2)
+{
+#ifdef _WIN32
+    return _stricmp(s1, s2);
+#else
+    return ::strcasecmp(s1, s2);
+#endif
+}

@@ -166,6 +166,9 @@ namespace QUtil
     QPDF_DLL
     std::list<std::string> read_lines_from_file(std::istream&);
 
+    QPDF_DLL
+    int strcasecmp(char const *, char const *);
+
     // These routines help the tokenizer recognize certain character
     // classes without using ctype, which we avoid because of locale
     // considerations.
