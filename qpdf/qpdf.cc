@@ -1874,12 +1874,6 @@ static void set_encryption_options(QPDF& pdf, Options& o, QPDFWriter& w)
 static void write_outfile(QPDF& pdf, Options& o)
 {
     QPDF encryption_pdf;
-    std::vector<PointerHolder<QPDF> > page_heap;
-    if (! o.page_specs.empty())
-    {
-        handle_page_specs(pdf, o, page_heap);
-    }
-
     if (strcmp(o.outfilename, "-") == 0)
     {
         o.outfilename = 0;
@@ -2018,6 +2012,12 @@ int main(int argc, char* argv[])
         else
         {
             pdf.processFile(o.infilename, o.password);
+        }
+
+        std::vector<PointerHolder<QPDF> > page_heap;
+        if (! o.page_specs.empty())
+        {
+            handle_page_specs(pdf, o, page_heap);
         }
 
 	if (o.outfilename == 0)

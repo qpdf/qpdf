@@ -1,3 +1,9 @@
+2017-08-05  Jay Berkenbilt  <ejb@ql.org>
+
+	* Process --pages options earlier so that certain inspection
+	options, like --show-pages, can show the state after the merging
+	operations.
+
 2017-08-02  Jay Berkenbilt  <ejb@ql.org>
 
 	* Fix off-by-one error in parsing pages options. Fixes #129.

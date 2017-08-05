@@ -206,7 +206,7 @@ $td->runtest("remove page we don't have",
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 94;
+$n_tests += 95;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -651,6 +651,13 @@ $td->runtest("don't overwrite self",
              {$td->COMMAND => "(echo a.pdf; echo a.pdf) | qpdf \@-"},
              {$td->REGEXP => "input file and output file are the same.*",
               $td->EXIT_STATUS => 2});
+
+$td->runtest("combine show and --pages",
+             {$td->COMMAND =>
+                  "qpdf --empty --pages minimal.pdf -- --show-pages"},
+             {$td->FILE => "show-pages-pages.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 show_ntests();
 # ----------
