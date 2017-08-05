@@ -521,7 +521,7 @@ QPDFTokenizer::readToken(PointerHolder<InputSource> input,
     {
         if (allow_bad)
         {
-//            QTC::TC("qpdf", "QPDFTokenizer allowing bad token");
+            QTC::TC("qpdf", "QPDFTokenizer allowing bad token");
         }
         else
         {

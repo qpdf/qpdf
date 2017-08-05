@@ -254,11 +254,26 @@ QPDF::findHeader()
     return valid;
 }
 
+bool
+QPDF::findStartxref()
+{
+    QPDFTokenizer::Token t = readToken(this->file, true);
+    if (t == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "startxref"))
+    {
+        t = readToken(this->file, true);
+        if (t.getType() == QPDFTokenizer::tt_integer)
+        {
+            // Position in front of offset token
+            this->file->seek(this->file->getLastOffset(), SEEK_SET);
+            return true;
+        }
+    }
+    return false;
+}
+
 void
 QPDF::parse(char const* password)
 {
-    PCRE eof_re("(?s:startxref\\s+(\\d+)\\s+%%EOF\\b)");
-
     if (password)
     {
 	this->provided_password = password;
@@ -283,47 +298,25 @@ QPDF::parse(char const* password)
     // PDF spec says %%EOF must be found within the last 1024 bytes of
     // the file.  We add an extra 30 characters to leave room for the
     // startxref stuff.
-    static int const tbuf_size = 1054;
     this->file->seek(0, SEEK_END);
-    if (this->file->tell() > tbuf_size)
+    qpdf_offset_t end_offset = this->file->tell();
+    qpdf_offset_t start_offset = (end_offset > 1054 ? end_offset - 1054 : 0);
+    PatternFinder sf(*this, &QPDF::findStartxref);
+    qpdf_offset_t xref_offset = 0;
+    if (this->file->findLast("startxref", start_offset, 0, sf))
     {
-	this->file->seek(-tbuf_size, SEEK_END);
-    }
-    else
-    {
-	this->file->rewind();
-    }
-    char* buf = new char[tbuf_size + 1];
-    // Put buf in an array-style PointerHolder to guarantee deletion
-    // of buf.
-    PointerHolder<char> b(true, buf);
-    memset(buf, '\0', tbuf_size + 1);
-    this->file->read(buf, tbuf_size);
-
-    // Since buf may contain null characters, we can't do a regexp
-    // search on buf directly.  Find the last occurrence within buf
-    // where the regexp matches.
-    char* p = buf;
-    char const* candidate = "";
-    while ((p = static_cast<char*>(memchr(p, 's', tbuf_size - (p - buf)))) != 0)
-    {
-	if (eof_re.match(p))
-	{
-	    candidate = p;
-	}
-	++p;
+        xref_offset = QUtil::string_to_ll(
+            readToken(this->file).getValue().c_str());
     }
 
     try
     {
-	PCRE::Match m2 = eof_re.match(candidate);
-	if (! m2)
+	if (xref_offset == 0)
 	{
 	    QTC::TC("qpdf", "QPDF can't find startxref");
 	    throw QPDFExc(qpdf_e_damaged_pdf, this->file->getName(), "", 0,
 			  "can't find startxref");
 	}
-	qpdf_offset_t xref_offset = QUtil::string_to_ll(m2.getMatch(1).c_str());
 	read_xref(xref_offset);
     }
     catch (QPDFExc& e)

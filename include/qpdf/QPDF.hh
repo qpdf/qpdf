@@ -1029,6 +1029,7 @@ class QPDF
 
     // Methods to support pattern finding
     bool findHeader();
+    bool findStartxref();
 
     // methods to support linearization checking -- implemented in
     // QPDF_linearization.cc

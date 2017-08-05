@@ -290,3 +290,4 @@ qpdf read args from file 0
 qpdf single-pages %d 0
 qpdf single-pages .pdf 0
 qpdf single-pages other 0
+QPDFTokenizer allowing bad token 0
