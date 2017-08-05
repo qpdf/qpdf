@@ -354,6 +354,75 @@ make
        </para>
       </listitem>
      </varlistentry>
+     <varlistentry>
+      <term><option>--single-pages</option></term>
+      <listitem>
+       <para>
+        Write each page to a separate output file. Output file names
+        are generated as follows:
+        <itemizedlist>
+         <listitem>
+          <para>
+           If the string <literal>%d</literal> appears in the output
+           file name, it is replaced with a zero-padded page number
+           starting from 1.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Otherwise, if the output file name ends in
+           <filename>.pdf</filename> (case insensitive), a zero-padded
+           page number, preceded by a dash, is inserted before the
+           file extension.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Otherwise, the file name is appended with a zero-padded
+           page number preceded by a dash.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </para>
+       <para>
+        For example, if <filename>infile.pdf</filename> has 12 pages
+        <itemizedlist>
+         <listitem>
+          <para>
+           <command>qpdf infile.pdf %d-out</command> would generate
+           files <filename>01-out</filename> through
+           <filename>12-out</filename>
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           <command>qpdf infile.pdf outfile.pdf
+           --single-pages</command> would generate files
+           <filename>outfile-01.pdf</filename> through
+           <filename>outfile-12.pdf</filename>
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           <command>qpdf infile.pdf something.else</command> would generate
+           files <filename>something.else-01</filename> through
+           <filename>something.else-12</filename>
+          </para>
+         </listitem>
+        </itemizedlist>
+       </para>
+       <para>
+        Note that outlines, threads, and other global features of the
+        original PDF file are not preserved. For each page of output,
+        this option creates an empty PDF and copies a single page from
+        the output into it. If you require the global data, you will
+        have to run <command>qpdf</command> with the
+        <option>--pages</option> option once for each file. Using
+        <option>--single-pages</option> is much faster if you don't
+        require the global data.
+       </para>
+      </listitem>
+     </varlistentry>
     </variablelist>
    </para>
    <para>

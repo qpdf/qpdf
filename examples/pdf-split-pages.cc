@@ -1,7 +1,7 @@
 //
 // This is a stand-alone example of splitting a PDF into individual
-// pages. It is much faster than using the qpdf command-line tool to
-// split into separate files per page.
+// pages. It does essentially the same thing that qpdf --split-pages
+// does.
 //
 
 #include <qpdf/QPDF.hh>

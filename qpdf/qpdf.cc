@@ -43,6 +43,7 @@ struct Options
         password(0),
         linearize(false),
         decrypt(false),
+        single_pages(false),
         copy_encryption(false),
         encryption_file(0),
         encryption_file_password(0),
@@ -97,6 +98,7 @@ struct Options
     char const* password;
     bool linearize;
     bool decrypt;
+    bool single_pages;
     bool copy_encryption;
     char const* encryption_file;
     char const* encryption_file_password;
@@ -204,6 +206,7 @@ Basic Options\n\
 --encrypt options --    generate an encrypted file\n\
 --decrypt               remove any encryption on the file\n\
 --pages options --      select specific pages from one or more files\n\
+--single-pages          write each output page to a separate file\n\
 \n\
 If none of --copy-encryption, --encrypt or --decrypt are given, qpdf will\n\
 preserve any encryption data associated with a file.\n\
@@ -212,6 +215,16 @@ Note that when copying encryption parameters from another file, all\n\
 parameters will be copied, including both user and owner passwords, even\n\
 if the user password is used to open the other file.  This works even if\n\
 the owner password is not known.\n\
+\n\
+If --single-pages is specified, each page is written to a separate output\n\
+file. File names are generated as follows:\n\
+* If the string %d appears in the output file name, it is replaced with a\n\
+  zero-padded page number starting from 1\n\
+* Otherwise, if the output file name ends in .pdf (case insensitive), a\n\
+  zero-padded page number, preceded by a dash, is inserted before the file\n\
+  extension\n\
+* Otherwise, the file name is appended with a zero-padded page number\n\
+  preceded by a dash.\n\
 \n\
 \n\
 Encryption Options\n\
@@ -1321,6 +1334,10 @@ static void parse_options(int argc, char* argv[], Options& o)
                 }
                 o.force_version = parameter;
             }
+            else if (strcmp(arg, "single-pages") == 0)
+            {
+                o.single_pages = true;
+            }
             else if (strcmp(arg, "deterministic-id") == 0)
             {
                 o.deterministic_id = true;
@@ -1431,6 +1448,12 @@ static void parse_options(int argc, char* argv[], Options& o)
     else if ((! o.require_outfile) && (o.outfilename != 0))
     {
         usage("no output file may be given for this option");
+    }
+
+    if (o.require_outfile && (strcmp(o.outfilename, "-") == 0) &&
+        o.single_pages)
+    {
+        usage("--single-pages may not be used when writing to standard output");
     }
 
     if (QUtil::same_file(o.infilename, o.outfilename))
@@ -1954,13 +1977,59 @@ static void set_writer_options(QPDF& pdf, Options& o, QPDFWriter& w)
 
 static void write_outfile(QPDF& pdf, Options& o)
 {
-    if (strcmp(o.outfilename, "-") == 0)
+    if (o.single_pages)
     {
-        o.outfilename = 0;
+        // Generate output file pattern
+        std::string before;
+        std::string after;
+        size_t len = strlen(o.outfilename);
+        char* num_spot = strstr(const_cast<char*>(o.outfilename), "%d");
+        if (num_spot != 0)
+        {
+            QTC::TC("qpdf", "qpdf single-pages %d");
+            before = std::string(o.outfilename, (num_spot - o.outfilename));
+            after = num_spot + 2;
+        }
+        else if ((len >= 4) &&
+                 (QUtil::strcasecmp(o.outfilename + len - 4, ".pdf") == 0))
+        {
+            QTC::TC("qpdf", "qpdf single-pages .pdf");
+            before = std::string(o.outfilename, len - 4) + "-";
+            after = o.outfilename + len - 4;
+        }
+        else
+        {
+            QTC::TC("qpdf", "qpdf single-pages other");
+            before = std::string(o.outfilename) + "-";
+        }
+
+        std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
+        int pageno_len = QUtil::int_to_string(pages.size()).length();
+        int pageno = 0;
+        for (std::vector<QPDFObjectHandle>::const_iterator iter = pages.begin();
+             iter != pages.end(); ++iter)
+        {
+            QPDFObjectHandle page = *iter;
+            std::string outfile =
+                before + QUtil::int_to_string(++pageno, pageno_len) + after;
+            QPDF outpdf;
+            outpdf.emptyPDF();
+            outpdf.addPage(page, false);
+            QPDFWriter w(outpdf, outfile.c_str());
+            set_writer_options(outpdf, o, w);
+            w.write();
+        }
     }
-    QPDFWriter w(pdf, o.outfilename);
-    set_writer_options(pdf, o, w);
-    w.write();
+    else
+    {
+        if (strcmp(o.outfilename, "-") == 0)
+        {
+            o.outfilename = 0;
+        }
+        QPDFWriter w(pdf, o.outfilename);
+        set_writer_options(pdf, o, w);
+        w.write();
+    }
 }
 
 int main(int argc, char* argv[])

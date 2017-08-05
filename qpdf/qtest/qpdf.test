@@ -664,6 +664,61 @@ $td->runtest("combine show and --pages",
 
 show_ntests();
 # ----------
+$td->notify("--- Single Page ---");
+# sp = single-pages
+my @sp_cases = (
+    [11, '%d at beginning', '', '%d_single-out.zdf'],
+    [11, '%d at end', '--qdf', 'single-out.zdf_%d'],
+    [11, '%d in middle', '--encrypt u o 128 --', 'a-%d-single-out.zdf'],
+    [11, 'pdf extension', '', 'single-out.Pdf'],
+    [4, 'fallback', '--pages 11-pages.pdf 1-3 minimal.pdf --', 'single-out'],
+    );
+$n_tests += 1;
+for (@sp_cases)
+{
+    $n_tests += 1 + $_->[0];
+}
+
+$td->runtest("no single-pages to stdout",
+             {$td->COMMAND => "qpdf --single-pages 11-pages.pdf -"},
+             {$td->FILE => "single-pages-stdout.out", $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+
+foreach my $d (@sp_cases)
+{
+    my ($n, $description, $xargs, $out) = @$d;
+    $td->runtest("single pages " . $description,
+                 {$td->COMMAND =>
+                      "qpdf --static-id --single-pages 11-pages.pdf" .
+                      " $xargs $out"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0});
+    my $pattern = $out;
+    my $nlen = length($n);
+    if ($pattern =~ m/\%d/)
+    {
+        $pattern =~ s/\%d/\%0${nlen}d/;
+    }
+    elsif ($pattern =~ m/\.pdf$/i)
+    {
+        $pattern =~ s/(\.pdf$)/-%0${nlen}d$1/i;
+    }
+    else
+    {
+        $pattern .= "-%0${nlen}d";
+    }
+    for (my $i = 1; $i <= $n; ++$i)
+    {
+        my $actual = sprintf($pattern, $i);
+        my $expected = $actual;
+        $expected =~ s/single-out/single-exp/;
+        $td->runtest("checkout output page $i",
+                     {$td->FILE => $actual},
+                     {$td->FILE => $expected});
+    }
+}
+
+show_ntests();
+# ----------
 $td->notify("--- Numeric range parsing tests ---");
 my @nrange_tests = (
     [",5",
@@ -2426,4 +2481,5 @@ sub get_md5_checksum
 sub cleanup
 {
     system("rm -rf *.ps *.pnm ?.pdf ?.qdf *.enc* tif1 tif2 tiff-cache");
+    system("rm -rf *single-out*");
 }

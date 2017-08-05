@@ -1,5 +1,8 @@
 2017-08-05  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add --single-pages option to cause output to be written to a
+	separate file for each page rather than one big file.
+
 	* Process --pages options earlier so that certain inspection
 	options, like --show-pages, can show the state after the merging
 	operations.
