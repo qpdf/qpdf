@@ -1992,7 +1992,7 @@ outfile.pdf</option>
     <classname>QPDF</classname> object from a different
     <classname>QPDF</classname> object, which we refer to as
     <firstterm>foreign objects</firstterm>. This allows arbitrary
-    merging of PDF files. The &ldqo;from&rdqo;
+    merging of PDF files. The &ldquo;from&rdquo;
     <classname>QPDF</classname> object must remain valid after the
     copy as discussed in the note below. The <command>qpdf</command>
     command-line tool provides limited support for basic page
