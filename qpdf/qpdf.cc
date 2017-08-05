@@ -1871,14 +1871,8 @@ static void set_encryption_options(QPDF& pdf, Options& o, QPDFWriter& w)
     }
 }
 
-static void write_outfile(QPDF& pdf, Options& o)
+static void set_writer_options(QPDF& pdf, Options& o, QPDFWriter& w)
 {
-    QPDF encryption_pdf;
-    if (strcmp(o.outfilename, "-") == 0)
-    {
-        o.outfilename = 0;
-    }
-    QPDFWriter w(pdf, o.outfilename);
     if (o.qdf_mode)
     {
         w.setQDFMode(true);
@@ -1925,6 +1919,7 @@ static void write_outfile(QPDF& pdf, Options& o)
     }
     if (o.copy_encryption)
     {
+        QPDF encryption_pdf;
         encryption_pdf.processFile(
             o.encryption_file, o.encryption_file_password);
         w.copyEncryptionParameters(encryption_pdf);
@@ -1955,6 +1950,16 @@ static void write_outfile(QPDF& pdf, Options& o)
         parse_version(o.force_version, version, extension_level);
         w.forcePDFVersion(version, extension_level);
     }
+}
+
+static void write_outfile(QPDF& pdf, Options& o)
+{
+    if (strcmp(o.outfilename, "-") == 0)
+    {
+        o.outfilename = 0;
+    }
+    QPDFWriter w(pdf, o.outfilename);
+    set_writer_options(pdf, o, w);
     w.write();
 }
 
