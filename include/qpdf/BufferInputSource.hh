@@ -15,17 +15,27 @@
 class BufferInputSource: public InputSource
 {
   public:
+    QPDF_DLL
     BufferInputSource(std::string const& description, Buffer* buf,
                       bool own_memory = false);
+    QPDF_DLL
     BufferInputSource(std::string const& description,
                       std::string const& contents);
+    QPDF_DLL
     virtual ~BufferInputSource();
+    QPDF_DLL
     virtual qpdf_offset_t findAndSkipNextEOL();
+    QPDF_DLL
     virtual std::string const& getName() const;
+    QPDF_DLL
     virtual qpdf_offset_t tell();
+    QPDF_DLL
     virtual void seek(qpdf_offset_t offset, int whence);
+    QPDF_DLL
     virtual void rewind();
+    QPDF_DLL
     virtual size_t read(char* buffer, size_t length);
+    QPDF_DLL
     virtual void unreadCh(char ch);
 
   private:

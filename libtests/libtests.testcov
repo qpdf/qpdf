@@ -16,3 +16,11 @@ bits write zero bits 0
 Pl_ASCIIHexDecoder ignore space 0
 Pl_ASCIIHexDecoder no-op flush 0
 Pl_ASCIIHexDecoder partial flush 1
+InputSource read next block 1
+InputSource find EOF 1
+InputSource out of range 0
+InputSource first char matched but not string 0
+InputSource start_chars matched but not check 0
+InputSource not enough bytes 0
+InputSource findLast found more than one 0
+InputSource found match at buf[0] 0

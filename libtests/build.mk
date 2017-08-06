@@ -6,6 +6,7 @@ BINS_libtests = \
 	concatenate \
 	flate \
 	hex \
+	input_source \
 	lzw \
 	md5 \
 	pcre \

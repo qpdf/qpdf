@@ -1006,6 +1006,27 @@ class QPDF
 	std::string key;	// if ou_trailer_key or ou_root_key
     };
 
+    class PatternFinder: public InputSource::Finder
+    {
+      public:
+        PatternFinder(QPDF& qpdf, bool (QPDF::*checker)()) :
+            qpdf(qpdf),
+            checker(checker)
+        {
+        }
+        virtual ~PatternFinder()
+        {
+        }
+        virtual bool check()
+        {
+            return (this->qpdf.*checker)();
+        }
+
+      private:
+        QPDF& qpdf;
+        bool (QPDF::*checker)();
+    };
+
     // methods to support linearization checking -- implemented in
     // QPDF_linearization.cc
     void readLinearizationData();

@@ -1,0 +1,26 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+chdir("input_source") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('InputSource');
+
+cleanup();
+
+$td->runtest("input source tests",
+	     {$td->COMMAND => "input_source"},
+	     {$td->FILE => "input_source.out",
+	      $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+cleanup();
+
+$td->report(1);
+
+sub cleanup
+{
+}

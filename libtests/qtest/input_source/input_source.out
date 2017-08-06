@@ -1,0 +1,14 @@
+find potato salad: PASS
+barely find potato salad: PASS
+barely find potato salad: PASS
+potato salad is too late: PASS
+potato salad is too late: PASS
+potato salad not found: PASS
+potato salad not found: PASS
+potato salad at EOF: PASS
+findFirst found first: PASS
+findLast found potato salad: PASS
+findLast found at EOF: PASS
+potato but not salad salad at EOF: PASS
+findLast found potato salad: PASS
+findLast found first one: PASS

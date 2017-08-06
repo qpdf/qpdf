@@ -118,7 +118,7 @@ QPDF::isLinearized()
 	}
 	else
 	{
-	    p = reinterpret_cast<char*>(memchr(p, '\0', tbuf_size - (p - buf)));
+	    p = static_cast<char*>(memchr(p, '\0', tbuf_size - (p - buf)));
 	    assert(p != 0);
 	    while ((p - buf < tbuf_size) && (*p == 0))
 	    {
