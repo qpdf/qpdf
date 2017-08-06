@@ -202,27 +202,45 @@ QPDF::getWarnings()
     return result;
 }
 
-void
-QPDF::parse(char const* password)
+bool
+QPDF::findHeader()
 {
-    PCRE header_re("\\A((?s).*?)%PDF-(\\d+.\\d+)\\b");
-    PCRE eof_re("(?s:startxref\\s+(\\d+)\\s+%%EOF\\b)");
-
-    if (password)
+    qpdf_offset_t global_offset = this->file->tell();
+    std::string line = this->file->readLine(1024);
+    char const* p = line.c_str();
+    if (strncmp(p, "%PDF-", 5) != 0)
     {
-	this->provided_password = password;
+        throw std::logic_error("findHeader is not looking at %PDF-");
     }
-
-    // Find the header anywhere in the first 1024 bytes of the file,
-    // plus add a little extra space for the header itself.
-    char buffer[1045];
-    memset(buffer, '\0', sizeof(buffer));
-    this->file->read(buffer, sizeof(buffer) - 1);
-    std::string line(buffer);
-    PCRE::Match m1 = header_re.match(line.c_str());
-    if (m1)
+    p += 5;
+    std::string version;
+    // Note: The string returned by line.c_str() is always
+    // null-terminated. The code below never overruns the buffer
+    // because a null character always short-circuits further
+    // advancement.
+    bool valid = QUtil::is_digit(*p);
+    if (valid)
     {
-        size_t global_offset = m1.getMatch(1).length();
+        while (QUtil::is_digit(*p))
+        {
+            version.append(1, *p++);
+        }
+        if ((*p == '.') && QUtil::is_digit(*(p+1)))
+        {
+            version.append(1, *p++);
+            while (QUtil::is_digit(*p))
+            {
+                version.append(1, *p++);
+            }
+        }
+        else
+        {
+            valid = false;
+        }
+    }
+    if (valid)
+    {
+        this->pdf_version = version;
         if (global_offset != 0)
         {
             // Empirical evidence strongly suggests that when there is
@@ -232,9 +250,23 @@ QPDF::parse(char const* password)
             QTC::TC("qpdf", "QPDF global offset");
             this->file = new OffsetInputSource(this->file, global_offset);
         }
-	this->pdf_version = m1.getMatch(2);
     }
-    else
+    return valid;
+}
+
+void
+QPDF::parse(char const* password)
+{
+    PCRE eof_re("(?s:startxref\\s+(\\d+)\\s+%%EOF\\b)");
+
+    if (password)
+    {
+	this->provided_password = password;
+    }
+
+    // Find the header anywhere in the first 1024 bytes of the file.
+    PatternFinder hf(*this, &QPDF::findHeader);
+    if (! this->file->findFirst("%PDF-", 0, 1024, hf))
     {
 	QTC::TC("qpdf", "QPDF not a pdf file");
 	warn(QPDFExc(qpdf_e_damaged_pdf, this->file->getName(),

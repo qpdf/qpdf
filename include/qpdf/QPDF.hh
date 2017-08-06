@@ -1027,6 +1027,9 @@ class QPDF
         bool (QPDF::*checker)();
     };
 
+    // Methods to support pattern finding
+    bool findHeader();
+
     // methods to support linearization checking -- implemented in
     // QPDF_linearization.cc
     void readLinearizationData();
