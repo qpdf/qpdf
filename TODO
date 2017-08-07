@@ -4,59 +4,20 @@ Before next release
 ABI compatibility has most likely been broken. Retest and bump major
 version if needed.
 
-Small, command-line tool only enhancements to do soon
-=====================================================
-
- * Handle input file = output file as a special case. See issue 29.
-   Behavior: detect if output file is the same as one of the input
-   files. If so, refuse to operate unless --allow-overwrite is
-   specified. In that case, write to a temporary file and, if there
-   are no errors or warnings, rename the temporary output file over
-   the input file. If rename fails, delete the temporary file.
-
- * Consider providing alternative methods for specifying passwords.
-   The methods should be general enough to use for both encryption and
-   decryption passwords. Example methods could be reading the password
-   from a file, a file descriptor, or prompting. Prompting should
-   never be done with being specifically requested though; we don't
-   want to create a situation where running qpdf might block waiting
-   for input where it previously did not. Test case: encrypt an
-   encrypted file with the output file having different user/owner
-   passwords. Make sure we have a predictable way to read all three
-   passwords (input, output user, output owner). Maybe we have
-   something like --password-source=<method>:<which>,... where method could
-   be file=/path, fd=n, or prompt and which could be one of input,
-   user, owner. If a password source is provided for input, it takes
-   precedence over --password if specified later on the command line.
-   If a password source is specified for output passwords, the
-   corresponding passwords must be '-'. If more than one password is
-   read from the same source, passwords are newline separated.
-   Trailing newlines are ignored. Example:
-
-   qpdf --password-source=fd=3:input,owner a.pdf b.pdf
-
-   would read two lines from file descriptor 3. The first would the
-   password for reading a.pdf, and the second would be the owner
-   password for b.pdf. The encryption arguments would specify the
-   actual user password for b.pdf and - as the owner password.
-
-   qpdf --password-source=file=/tmp/a:input --password=source=prompt:user,owner
-
-   would read the input file from /tmp/a and would prompt twice: one
-   for the user password and once for the owner password.
-
- * Consider adding "uninstall" target to makefile. It should only
-   uninstall what it installed, which means that you must run
-   uninstall from the version you ran install with. It would only be
-   supported for the toolchains that support the install target
-   (libtool).
-
-
 Soon
 ====
 
  * Eliminate dependency on PCRE. There aren't that many regular
    expressions, and they are used only for internal purposes.
+
+ * Consider whether there should be a mode in which QPDFObjectHandle
+   returns nulls for operations on the wrong type instead of asserting
+   the type. The way things are wired up now, this would have to be a
+   global flag. Probably it makes sense to make that be the default
+   behavior and to add a static method in QPDFObjectHandle and
+   command-line flag that enables the stricter behavior globally for
+   easier debugging. For cases where we have enough information to do
+   so, we could still warn when not in strict mode.
 
  * Add method to push inheritable resources to a single page by
    walking up and copying without overwrite.  Above logic will also be
@@ -79,9 +40,6 @@ Soon
 
  * If possible, support the following types of broken files:
 
-    - Files that lack %%EOF at the end but otherwise have a valid
-      startxref near the end
-
     - Files that have no whitespace token after "endobj" such that
       endobj collides with the start of the next object
 
@@ -90,6 +48,12 @@ Soon
 
 General
 =======
+
+ * Consider adding "uninstall" target to makefile. It should only
+   uninstall what it installed, which means that you must run
+   uninstall from the version you ran install with. It would only be
+   supported for the toolchains that support the install target
+   (libtool).
 
  * Implement automated testing for binary compatibility and add to
    release checklist.
@@ -287,14 +251,7 @@ Index: QPDFWriter.cc
    re-encode inline images with an ASCII encoding.
 
  * From github issue 2, provide more in-depth output for examining
-   hint stream contents.
-
- * An attempt was made to replace pcre with std::regex, but it failed
-   because std::regex lacks some features of PCRE that we use and
-   because the result was many times slower. The work was saved in
-   refs/attic/std-regex on github.
-
- * Consider adding on option to provide a human-readable dump of
-   linearization hint tables. This should include improving the
-   'overflow reading bit stream' message as reported in issue #2.
-
+   hint stream contents. Consider adding on option to provide a
+   human-readable dump of linearization hint tables. This should
+   include improving the 'overflow reading bit stream' message as
+   reported in issue #2.
