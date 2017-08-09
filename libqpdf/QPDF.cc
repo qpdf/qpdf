@@ -1329,9 +1329,10 @@ QPDF::recoverStreamLength(PointerHolder<InputSource> input,
 }
 
 QPDFTokenizer::Token
-QPDF::readToken(PointerHolder<InputSource> input)
+QPDF::readToken(PointerHolder<InputSource> input, bool allow_bad)
 {
-    return this->tokenizer.readToken(input, this->last_object_description);
+    return this->tokenizer.readToken(
+        input, this->last_object_description, allow_bad);
 }
 
 QPDFObjectHandle

@@ -475,7 +475,8 @@ QPDFTokenizer::betweenTokens()
 
 QPDFTokenizer::Token
 QPDFTokenizer::readToken(PointerHolder<InputSource> input,
-                         std::string const& context)
+                         std::string const& context,
+                         bool allow_bad)
 {
     qpdf_offset_t offset = input->tell();
     Token token;
@@ -514,13 +515,20 @@ QPDFTokenizer::readToken(PointerHolder<InputSource> input,
 	input->unreadCh(char_to_unread);
     }
 
+    input->setLastOffset(offset);
+
     if (token.getType() == tt_bad)
     {
-	throw QPDFExc(qpdf_e_damaged_pdf, input->getName(),
-		      context, offset, token.getErrorMessage());
+        if (allow_bad)
+        {
+//            QTC::TC("qpdf", "QPDFTokenizer allowing bad token");
+        }
+        else
+        {
+            throw QPDFExc(qpdf_e_damaged_pdf, input->getName(),
+                          context, offset, token.getErrorMessage());
+        }
     }
-
-    input->setLastOffset(offset);
 
     return token;
 }

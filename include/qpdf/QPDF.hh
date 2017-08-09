@@ -666,7 +666,8 @@ class QPDF
     size_t recoverStreamLength(
 	PointerHolder<InputSource> input, int objid, int generation,
 	qpdf_offset_t stream_offset);
-    QPDFTokenizer::Token readToken(PointerHolder<InputSource>);
+    QPDFTokenizer::Token readToken(PointerHolder<InputSource>,
+                                   bool allow_bad = false);
 
     QPDFObjectHandle readObjectAtOffset(
 	bool attempt_recovery,

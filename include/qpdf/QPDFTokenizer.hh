@@ -138,7 +138,8 @@ class QPDFTokenizer
     // exception thrown if there is an error.
     QPDF_DLL
     Token readToken(PointerHolder<InputSource> input,
-                    std::string const& context);
+                    std::string const& context,
+                    bool allow_bad = false);
 
   private:
     void reset();
