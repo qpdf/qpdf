@@ -11,6 +11,12 @@
 	the (bool, T*) version of the constructor instead. If not, just
 	remove the second parameter.
 
+2017-08-09  Jay Berkenbilt  <ejb@ql.org>
+
+	* When recovering stream length, find endobj without endstream as
+	well as just looking for endstream. Be a little more lax about
+	where we allow it to be found.
+
 2017-08-05  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add --single-pages option to cause output to be written to a

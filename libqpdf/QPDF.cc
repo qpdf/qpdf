@@ -1231,76 +1231,43 @@ QPDF::readObject(PointerHolder<InputSource> input,
     return object;
 }
 
+bool
+QPDF::findEndstream()
+{
+    // Find endstream or endobj. Position the input at that token.
+    QPDFTokenizer::Token t = readToken(this->file, true);
+    if ((t.getType() == QPDFTokenizer::tt_word) &&
+        ((t.getValue() == "endobj") ||
+         (t.getValue() == "endstream")));
+    {
+        this->file->seek(this->file->getLastOffset(), SEEK_SET);
+        return true;
+    }
+    return false;
+}
+
 size_t
 QPDF::recoverStreamLength(PointerHolder<InputSource> input,
 			  int objid, int generation,
                           qpdf_offset_t stream_offset)
 {
-    PCRE endobj_re("^\\s*endobj\\b");
-
     // Try to reconstruct stream length by looking for
-    // endstream(\r\n?|\n)endobj
+    // endstream or endobj
     warn(QPDFExc(qpdf_e_damaged_pdf, input->getName(),
 		 this->last_object_description, stream_offset,
 		 "attempting to recover stream length"));
 
-    input->seek(0, SEEK_END);
-    qpdf_offset_t eof = input->tell();
-    input->seek(stream_offset, SEEK_SET);
-    qpdf_offset_t last_line_offset = 0;
+    PatternFinder ef(*this, &QPDF::findEndstream);
     size_t length = 0;
-    static int const line_end_length = 12; // room for endstream\r\n\0
-    char last_line_end[line_end_length];
-    while (input->tell() < eof)
+    if (this->file->findFirst("end", stream_offset, 0, ef))
     {
-	std::string line = input->readLine(50);
-        qpdf_offset_t line_offset = input->getLastOffset();
-	if (endobj_re.match(line.c_str()))
+        length = this->file->tell() - stream_offset;
+        // Reread endstream but, if it was endobj, don't skip that.
+        QPDFTokenizer::Token t = readToken(this->file);
+        if (t.getValue() == "endobj")
         {
-            qpdf_offset_t endstream_offset = 0;
-            if (last_line_offset >= line_end_length)
-            {
-                qpdf_offset_t cur_offset = input->tell();
-                // Read from the end of the last line, guaranteeing
-                // null termination
-                qpdf_offset_t search_offset =
-                    line_offset - (line_end_length - 1);
-                input->seek(search_offset, SEEK_SET);
-                memset(last_line_end, '\0', line_end_length);
-                input->read(last_line_end, line_end_length - 1);
-                input->seek(cur_offset, SEEK_SET);
-                // if endstream[\r\n] will fit in last_line_end, the
-                // 'e' has to be in one of the first three spots.
-                // Check explicitly rather than using strstr directly
-                // in case there are nulls right before endstream.
-                char* p = ((last_line_end[0] == 'e') ? last_line_end :
-                           (last_line_end[1] == 'e') ? last_line_end + 1 :
-                           (last_line_end[2] == 'e') ? last_line_end + 2 :
-                           0);
-                char* endstream_p = 0;
-                if (p)
-                {
-                    char* p1 = strstr(p, "endstream\n");
-                    char* p2 = strstr(p, "endstream\r");
-                    endstream_p = (p1 ? p1 : p2);
-                }
-                if (endstream_p)
-                {
-                    endstream_offset =
-                        search_offset + (endstream_p - last_line_end);
-                }
-            }
-            if (endstream_offset > 0)
-            {
-                // Stream probably ends right before "endstream"
-                length = endstream_offset - stream_offset;
-                // Go back to where we would have been if we had just
-                // read the endstream.
-                input->seek(line_offset, SEEK_SET);
-                break;
-            }
-	}
-	last_line_offset = line_offset;
+            this->file->seek(this->file->getLastOffset(), SEEK_SET);
+        }
     }
 
     if (length)
