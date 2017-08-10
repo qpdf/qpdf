@@ -2050,7 +2050,7 @@ int main(int argc, char* argv[])
     // deleted by using PointerHolder objects to back the pointers in
     // argv.
     std::vector<PointerHolder<char> > new_argv;
-    new_argv.push_back(PointerHolder<char>(QUtil::copy_string(argv[0]), true));
+    new_argv.push_back(PointerHolder<char>(true, QUtil::copy_string(argv[0])));
     for (int i = 1; i < argc; ++i)
     {
         if ((strlen(argv[i]) > 1) && (argv[i][0] == '@'))
@@ -2060,10 +2060,10 @@ int main(int argc, char* argv[])
         else
         {
             new_argv.push_back(
-                PointerHolder<char>(QUtil::copy_string(argv[i]), true));
+                PointerHolder<char>(true, QUtil::copy_string(argv[i])));
         }
     }
-    PointerHolder<char*> argv_ph(new char*[1+new_argv.size()], true);
+    PointerHolder<char*> argv_ph(true, new char*[1+new_argv.size()]);
     argv = argv_ph.getPointer();
     for (size_t i = 0; i < new_argv.size(); ++i)
     {

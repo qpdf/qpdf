@@ -17,6 +17,13 @@ Release Reminders
    running a spelling checker over the source code to catch errors in
    variable names, strings, and comments.  Use ispell -p ispell-words.
 
+ * Run tests with sanitize address enabled:
+
+   ./configure CFLAGS="-fsanitize=address -g" \
+      CXXFLAGS="-fsanitize=address -g" \
+      LDFLAGS="-fsanitize=address" \
+      --enable-werror --disable-shared
+
  * Consider running tests with latest gcc and/or valgrind.  To do
    this, replace, build with debugging and without shared libraries.
    In build, create z and move each executable into z.  Then create a
