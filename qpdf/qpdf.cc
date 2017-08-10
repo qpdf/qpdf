@@ -1103,7 +1103,7 @@ static void read_args_from_file(char const* filename,
          iter != lines.end(); ++iter)
     {
         new_argv.push_back(
-            PointerHolder<char>(QUtil::copy_string((*iter).c_str()), true));
+            PointerHolder<char>(true, QUtil::copy_string((*iter).c_str())));
     }
 }
 

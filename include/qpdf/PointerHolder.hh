@@ -69,8 +69,7 @@ class PointerHolder
     };
 
   public:
-    // "tracing" is not used but is kept for interface backward compatbility
-    PointerHolder(T* pointer = 0, bool tracing = false)
+    PointerHolder(T* pointer = 0)
 	{
 	    this->init(new Data(pointer, false));
 	}

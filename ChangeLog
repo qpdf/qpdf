@@ -1,3 +1,16 @@
+2017-08-10  Jay Berkenbilt  <ejb@ql.org>
+
+	* Remove unused "tracing" parameter from PointerHolder's
+	(T*, bool) constructor. This change breaks source code
+	compatibility, but since this argument to PointerHolder has not
+	used for a long time and the presence of a boolean parameter in
+	the primary constructor makes it too easy to use that by mistake
+	when trying to use PointerHolder for arrays, it seems like it's
+	finally time to take it out. If you have a compile error because
+	of this change, please check to see whether you intended to use
+	the (bool, T*) version of the constructor instead. If not, just
+	remove the second parameter.
+
 2017-08-05  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add --single-pages option to cause output to be written to a
