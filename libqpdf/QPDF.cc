@@ -9,7 +9,6 @@
 
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
-#include <qpdf/PCRE.hh>
 #include <qpdf/Pipeline.hh>
 #include <qpdf/Pl_Discard.hh>
 #include <qpdf/FileInputSource.hh>
@@ -537,12 +536,162 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
     this->deleted_objects.clear();
 }
 
+bool
+QPDF::parse_xrefFirst(std::string const& line,
+                      int& obj, int& num, int& bytes)
+{
+    // is_space and is_digit both return false on '\0', so this will
+    // not overrun the null-terminated buffer.
+    char const* p = line.c_str();
+    char const* start = line.c_str();
+
+    // Skip zero or more spaces
+    while (QUtil::is_space(*p))
+    {
+        ++p;
+    }
+    // Require digit
+    if (! QUtil::is_digit(*p))
+    {
+        return false;
+    }
+    // Gather digits
+    std::string obj_str;
+    while (QUtil::is_digit(*p))
+    {
+        obj_str.append(1, *p++);
+    }
+    // Require space
+    if (! QUtil::is_space(*p))
+    {
+        return false;
+    }
+    // Skip spaces
+    while (QUtil::is_space(*p))
+    {
+        ++p;
+    }
+    // Require digit
+    if (! QUtil::is_digit(*p))
+    {
+        return false;
+    }
+    // Gather digits
+    std::string num_str;
+    while (QUtil::is_digit(*p))
+    {
+        num_str.append(1, *p++);
+    }
+    // Skip any space including line terminators
+    while (QUtil::is_space(*p))
+    {
+        ++p;
+    }
+    bytes = p - start;
+    obj = atoi(obj_str.c_str());
+    num = atoi(num_str.c_str());
+    return true;
+}
+
+bool
+QPDF::parse_xrefEntry(std::string const& line,
+                      qpdf_offset_t& f1, int& f2, char& type)
+{
+    // is_space and is_digit both return false on '\0', so this will
+    // not overrun the null-terminated buffer.
+    char const* p = line.c_str();
+
+    // Skip zero or more spaces. There aren't supposed to be any.
+    bool invalid = false;
+    while (QUtil::is_space(*p))
+    {
+        ++p;
+        QTC::TC("qpdf", "QPDF ignore first space in xref entry");
+        invalid = true;
+    }
+    // Require digit
+    if (! QUtil::is_digit(*p))
+    {
+        return false;
+    }
+    // Gather digits
+    std::string f1_str;
+    while (QUtil::is_digit(*p))
+    {
+        f1_str.append(1, *p++);
+    }
+    // Require space
+    if (! QUtil::is_space(*p))
+    {
+        return false;
+    }
+    if (QUtil::is_space(*(p+1)))
+    {
+        QTC::TC("qpdf", "QPDF ignore first extra space in xref entry");
+        invalid = true;
+    }
+    // Skip spaces
+    while (QUtil::is_space(*p))
+    {
+        ++p;
+    }
+    // Require digit
+    if (! QUtil::is_digit(*p))
+    {
+        return false;
+    }
+    // Gather digits
+    std::string f2_str;
+    while (QUtil::is_digit(*p))
+    {
+        f2_str.append(1, *p++);
+    }
+    // Require space
+    if (! QUtil::is_space(*p))
+    {
+        return false;
+    }
+    if (QUtil::is_space(*(p+1)))
+    {
+        QTC::TC("qpdf", "QPDF ignore second extra space in xref entry");
+        invalid = true;
+    }
+    // Skip spaces
+    while (QUtil::is_space(*p))
+    {
+        ++p;
+    }
+    if ((*p == 'f') || (*p == 'n'))
+    {
+        type = *p;
+    }
+    else
+    {
+        return false;
+    }
+    if ((f1_str.length() != 10) || (f2_str.length() != 5))
+    {
+        QTC::TC("qpdf", "QPDF ignore length error xref entry");
+        invalid = true;
+    }
+
+    if (invalid)
+    {
+        warn(QPDFExc(qpdf_e_damaged_pdf, this->file->getName(),
+                     "xref table",
+                     this->file->getLastOffset(),
+                     "accepting invalid xref table entry"));
+    }
+
+    f1 = QUtil::string_to_ll(f1_str.c_str());
+    f2 = atoi(f2_str.c_str());
+
+    return true;
+}
+
 qpdf_offset_t
 QPDF::read_xrefTable(qpdf_offset_t xref_offset)
 {
-    PCRE xref_first_re("^\\s*(\\d+)\\s+(\\d+)\\s*");
-    PCRE xref_entry_re("(?s:(^\\d{10}) (\\d{5}) ([fn])\\s*$)");
-
     std::vector<QPDFObjGen> deleted_items;
 
     this->file->seek(xref_offset, SEEK_SET);
@@ -553,18 +702,17 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
         memset(linebuf, 0, sizeof(linebuf));
         this->file->read(linebuf, sizeof(linebuf) - 1);
 	std::string line = linebuf;
-	PCRE::Match m1 = xref_first_re.match(line.c_str());
-	if (! m1)
+        int obj = 0;
+        int num = 0;
+        int bytes = 0;
+        if (! parse_xrefFirst(line, obj, num, bytes))
 	{
 	    QTC::TC("qpdf", "QPDF invalid xref");
 	    throw QPDFExc(qpdf_e_damaged_pdf, this->file->getName(),
 			  "xref table", this->file->getLastOffset(),
 			  "xref syntax invalid");
 	}
-        file->seek(this->file->getLastOffset() + m1.getMatch(0).length(),
-                   SEEK_SET);
-	int obj = atoi(m1.getMatch(1).c_str());
-	int num = atoi(m1.getMatch(2).c_str());
+        this->file->seek(this->file->getLastOffset() + bytes, SEEK_SET);
 	for (int i = obj; i < obj + num; ++i)
 	{
 	    if (i == 0)
@@ -573,8 +721,11 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
 		this->first_xref_item_offset = this->file->tell();
 	    }
 	    std::string xref_entry = this->file->readLine(30);
-	    PCRE::Match m2 = xref_entry_re.match(xref_entry.c_str());
-	    if (! m2)
+            // For xref_table, these will always be small enough to be ints
+	    qpdf_offset_t f1 = 0;
+	    int f2 = 0;
+	    char type = '\0';
+            if (! parse_xrefEntry(xref_entry, f1, f2, type))
 	    {
 		QTC::TC("qpdf", "QPDF invalid xref entry");
 		throw QPDFExc(
@@ -583,11 +734,6 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
 		    "invalid xref entry (obj=" +
 		    QUtil::int_to_string(i) + ")");
 	    }
-
-            // For xref_table, these will always be small enough to be ints
-	    qpdf_offset_t f1 = QUtil::string_to_ll(m2.getMatch(1).c_str());
-	    int f2 = atoi(m2.getMatch(2).c_str());
-	    char type = m2.getMatch(3).at(0);
 	    if (type == 'f')
 	    {
 		// Save deleted items until after we've checked the

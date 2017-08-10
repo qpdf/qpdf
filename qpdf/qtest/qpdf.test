@@ -232,7 +232,7 @@ foreach my $d (@bug_tests)
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 86;
+$n_tests += 87;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -667,6 +667,13 @@ $td->runtest("ignore bad token",
                   "qpdf --show-xref bad-token-startxref.pdf"},
              {$td->FILE => "bad-token-startxref.out",
               $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("recoverable xref errors",
+             {$td->COMMAND =>
+                  "qpdf --check --show-xref xref-errors.pdf"},
+             {$td->FILE => "xref-errors.out",
+              $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 
 show_ntests();

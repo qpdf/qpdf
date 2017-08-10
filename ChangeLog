@@ -1,5 +1,8 @@
 2017-08-10  Jay Berkenbilt  <ejb@ql.org>
 
+	* Be more forgiving of certain types of errors in the xref table
+	that don't interfere with interpreting the table.
+
 	* Remove unused "tracing" parameter from PointerHolder's
 	(T*, bool) constructor. This change breaks source code
 	compatibility, but since this argument to PointerHolder has not

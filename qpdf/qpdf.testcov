@@ -289,3 +289,7 @@ qpdf single-pages %d 0
 qpdf single-pages .pdf 0
 qpdf single-pages other 0
 QPDFTokenizer allowing bad token 0
+QPDF ignore first space in xref entry 0
+QPDF ignore first extra space in xref entry 0
+QPDF ignore second extra space in xref entry 0
+QPDF ignore length error xref entry 0
