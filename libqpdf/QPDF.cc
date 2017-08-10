@@ -370,10 +370,6 @@ QPDF::reconstruct_xref(QPDFExc& e)
 
     this->reconstructed_xref = true;
 
-    PCRE obj_re("^\\s*(\\d+)\\s+(\\d+)\\s+obj\\b");
-    PCRE endobj_re("^\\s*endobj\\b");
-    PCRE trailer_re("^\\s*trailer\\b");
-
     warn(QPDFExc(qpdf_e_damaged_pdf, this->file->getName(), "", 0,
 		 "file is damaged"));
     warn(e);
@@ -401,45 +397,57 @@ QPDF::reconstruct_xref(QPDFExc& e)
     qpdf_offset_t eof = this->file->tell();
     this->file->seek(0, SEEK_SET);
     bool in_obj = false;
+    qpdf_offset_t line_start = 0;
     while (this->file->tell() < eof)
     {
-	std::string line = this->file->readLine(50);
-	if (in_obj)
+        this->file->findAndSkipNextEOL();
+        qpdf_offset_t next_line_start = this->file->tell();
+        this->file->seek(line_start, SEEK_SET);
+        QPDFTokenizer::Token t1 = readToken(this->file, true);
+        qpdf_offset_t token_start = this->file->tell() - t1.getValue().length();
+        if (token_start >= next_line_start)
+        {
+            // don't process yet
+        }
+	else if (in_obj)
 	{
-	    if (endobj_re.match(line.c_str()))
+            if (t1 == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "endobj"))
 	    {
 		in_obj = false;
 	    }
 	}
-	else
-	{
-	    PCRE::Match m = obj_re.match(line.c_str());
-	    if (m)
-	    {
-		in_obj = true;
-		int obj = atoi(m.getMatch(1).c_str());
-		int gen = atoi(m.getMatch(2).c_str());
-		qpdf_offset_t offset = this->file->getLastOffset();
-		insertXrefEntry(obj, 1, offset, gen, true);
-	    }
-	    else if ((! this->trailer.isInitialized()) &&
-		     trailer_re.match(line.c_str()))
-	    {
-		// read "trailer"
-		this->file->seek(this->file->getLastOffset(), SEEK_SET);
-		readToken(this->file);
-		QPDFObjectHandle t =
-		    readObject(this->file, "trailer", 0, 0, false);
-		if (! t.isDictionary())
-		{
-		    // Oh well.  It was worth a try.
-		}
-		else
-		{
-		    setTrailer(t);
-		}
-	    }
+        else
+        {
+            if (t1.getType() == QPDFTokenizer::tt_integer)
+            {
+                QPDFTokenizer::Token t2 = readToken(this->file, true);
+                QPDFTokenizer::Token t3 = readToken(this->file, true);
+                if ((t2.getType() == QPDFTokenizer::tt_integer) &&
+                    (t3 == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "obj")))
+                {
+                    in_obj = true;
+                    int obj = atoi(t1.getValue().c_str());
+                    int gen = atoi(t2.getValue().c_str());
+                    insertXrefEntry(obj, 1, token_start, gen, true);
+                }
+            }
+            else if ((! this->trailer.isInitialized()) &&
+                     (t1 == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "trailer")))
+            {
+                QPDFObjectHandle t =
+                    readObject(this->file, "trailer", 0, 0, false);
+                if (! t.isDictionary())
+                {
+                    // Oh well.  It was worth a try.
+                }
+                else
+                {
+                    setTrailer(t);
+                }
+            }
 	}
+        this->file->seek(next_line_start, SEEK_SET);
+        line_start = next_line_start;
     }
 
     if (! this->trailer.isInitialized())
