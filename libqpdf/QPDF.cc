@@ -477,15 +477,21 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
         // The PDF spec says xref must be followed by a line
         // terminator, but files exist in the wild where it is
         // terminated by arbitrary whitespace.
-        PCRE xref_re("^xref\\s+");
-	PCRE::Match m = xref_re.match(buf);
-	if (m)
+        if ((strncmp(buf, "xref", 4) == 0) &&
+            QUtil::is_space(buf[4]))
 	{
             QTC::TC("qpdf", "QPDF xref space",
                     ((buf[4] == '\n') ? 0 :
                      (buf[4] == '\r') ? 1 :
                      (buf[4] == ' ') ? 2 : 9999));
-	    xref_offset = read_xrefTable(xref_offset + m.getMatch(0).length());
+            int skip = 4;
+            // buf is null-terminated, and QUtil::is_space('\0') is
+            // false, so this won't overrun.
+            while (QUtil::is_space(buf[skip]))
+            {
+                ++skip;
+            }
+            xref_offset = read_xrefTable(xref_offset + skip);
 	}
 	else
 	{

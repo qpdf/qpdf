@@ -10,7 +10,7 @@ WARNING: issue-101.pdf (trailer, file position 2026): /Length key in stream dict
 WARNING: issue-101.pdf (trailer, file position 2097): attempting to recover stream length
 WARNING: issue-101.pdf (trailer, file position 2097): recovered stream length: 709
 WARNING: issue-101.pdf (trailer, file position 2928): unknown token while reading object; treating as string
-WARNING: issue-101.pdf (trailer, file position 2930): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (trailer, file position 2929): unknown token while reading object; treating as string
 WARNING: issue-101.pdf (trailer, file position 2928): expected dictionary key but found non-name object; inserting key /QPDFFake1
 WARNING: issue-101.pdf (trailer, file position 2928): expected dictionary key but found non-name object; inserting key /QPDFFake2
 WARNING: issue-101.pdf (trailer, file position 2928): expected dictionary key but found non-name object; inserting key /QPDFFake3

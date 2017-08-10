@@ -511,13 +511,13 @@ QUtil::srandom(unsigned int seed)
 bool
 QUtil::is_hex_digit(char ch)
 {
-    return (strchr("0123456789abcdefABCDEF", ch) != 0);
+    return (ch && (strchr("0123456789abcdefABCDEF", ch) != 0));
 }
 
 bool
 QUtil::is_space(char ch)
 {
-    return (strchr(" \f\n\r\t\v", ch) != 0);
+    return (ch && (strchr(" \f\n\r\t\v", ch) != 0));
 }
 
 bool
