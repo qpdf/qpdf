@@ -1,5 +1,4 @@
 ignored-scope: libtests
-QPDF lindict searching after null 0
 QPDF err expected endobj 0
 QPDF err wrong objid/generation 0
 QPDF check objid 1
@@ -10,7 +9,6 @@ QPDF hint table length direct 0
 QPDF P absent in lindict 0
 QPDF P present in lindict 0
 QPDF expected n n obj 0
-QPDF lindict found newline 0
 QPDF /L mismatch 0
 QPDF err /T mismatch 0
 QPDF err /O mismatch 0

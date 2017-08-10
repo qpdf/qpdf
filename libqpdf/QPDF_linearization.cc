@@ -5,7 +5,6 @@
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
-#include <qpdf/PCRE.hh>
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/Pl_Flate.hh>
 #include <qpdf/Pl_Count.hh>
@@ -101,38 +100,42 @@ QPDF::isLinearized()
     memset(buf, '\0', tbuf_size);
     this->file->read(buf, tbuf_size - 1);
 
-    PCRE lindict_re("(?s:(\\d+)\\s+0\\s+obj\\s*<<)");
-
     int lindict_obj = -1;
     char* p = buf;
     while (lindict_obj == -1)
     {
-	PCRE::Match m(lindict_re.match(p));
-	if (m)
-	{
-	    lindict_obj = atoi(m.getMatch(1).c_str());
-	    if (m.getMatch(0).find('\n') != std::string::npos)
-	    {
-		QTC::TC("qpdf", "QPDF lindict found newline");
-	    }
-	}
-	else
-	{
-	    p = static_cast<char*>(memchr(p, '\0', tbuf_size - (p - buf)));
-	    assert(p != 0);
-	    while ((p - buf < tbuf_size) && (*p == 0))
-	    {
-		++p;
-	    }
-	    if ((p - buf) == tbuf_size)
-	    {
-		break;
-	    }
-	    QTC::TC("qpdf", "QPDF lindict searching after null");
+        // Find a digit or end of buffer
+        while (((p - buf) < tbuf_size) && (! QUtil::is_digit(*p)))
+        {
+            ++p;
+        }
+        if (p - buf == tbuf_size)
+        {
+            break;
+        }
+        // Seek to the digit. Then skip over digits for a potential
+        // next iteration.
+        this->file->seek(p - buf, SEEK_SET);
+        while (((p - buf) < tbuf_size) && QUtil::is_digit(*p))
+        {
+            ++p;
+        }
+
+        QPDFTokenizer::Token t1 = readToken(this->file, true);
+        QPDFTokenizer::Token t2 = readToken(this->file, true);
+        QPDFTokenizer::Token t3 = readToken(this->file, true);
+        QPDFTokenizer::Token t4 = readToken(this->file, true);
+        if ((t1.getType() == QPDFTokenizer::tt_integer) &&
+            (t2.getType() == QPDFTokenizer::tt_integer) &&
+            (t3 == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "obj")) &&
+            (t4.getType() == QPDFTokenizer::tt_dict_open))
+        {
+	    lindict_obj =
+                static_cast<int>(QUtil::string_to_ll(t1.getValue().c_str()));
 	}
     }
 
-    if (lindict_obj == 0)
+    if (lindict_obj <= 0)
     {
 	return false;
     }
