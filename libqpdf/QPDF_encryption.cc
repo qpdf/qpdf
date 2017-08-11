@@ -340,6 +340,16 @@ hash_V5(std::string const& password,
     return result;
 }
 
+static
+void pad_short_parameter(std::string& param, unsigned int max_len)
+{
+    if (param.length() < max_len)
+    {
+        QTC::TC("qpdf", "QPDF_encryption pad short parameter");
+        param.append(max_len - param.length(), '\0');
+    }
+}
+
 std::string
 QPDF::compute_data_key(std::string const& encryption_key,
 		       int objid, int generation, bool use_aes,
@@ -876,6 +886,8 @@ QPDF::initializeEncryption()
 
     if (V < 5)
     {
+        pad_short_parameter(O, key_bytes);
+        pad_short_parameter(U, key_bytes);
         if (! ((O.length() == key_bytes) && (U.length() == key_bytes)))
         {
             throw QPDFExc(qpdf_e_damaged_pdf, this->file->getName(),
@@ -899,6 +911,11 @@ QPDF::initializeEncryption()
         UE = encryption_dict.getKey("/UE").getStringValue();
         Perms = encryption_dict.getKey("/Perms").getStringValue();
 
+        pad_short_parameter(O, OU_key_bytes_V5);
+        pad_short_parameter(U, OU_key_bytes_V5);
+        pad_short_parameter(OE, OUE_key_bytes_V5);
+        pad_short_parameter(UE, OUE_key_bytes_V5);
+        pad_short_parameter(Perms, Perms_key_bytes_V5);
         if ((O.length() < OU_key_bytes_V5) ||
             (U.length() < OU_key_bytes_V5) ||
             (OE.length() < OUE_key_bytes_V5) ||

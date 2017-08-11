@@ -232,7 +232,7 @@ foreach my $d (@bug_tests)
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 87;
+$n_tests += 88;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -674,6 +674,16 @@ $td->runtest("recoverable xref errors",
                   "qpdf --check --show-xref xref-errors.pdf"},
              {$td->FILE => "xref-errors.out",
               $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+
+# A file was emailed privately with issue 96. short-O-U.pdf was
+# created by copying encryption parameters from that file. It exhibits
+# the same behavior as the original file.
+$td->runtest("short /O or /U",
+             {$td->COMMAND =>
+                  "qpdf --password=19723102477 --check short-O-U.pdf"},
+             {$td->FILE => "short-O-U.out",
+              $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 show_ntests();

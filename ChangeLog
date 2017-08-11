@@ -1,3 +1,8 @@
+2017-08-11  Jay Berkenbilt  <ejb@ql.org>
+
+	* Handle encrypted files whose encryption parameters are too
+	short. Fixes #96.
+
 2017-08-10  Jay Berkenbilt  <ejb@ql.org>
 
 	* Remove dependency on libpcre.
