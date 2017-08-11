@@ -1,4 +1,4 @@
-LIBQPDF_10 {
+LIBQPDF_17 {
   global:
     *;
 };

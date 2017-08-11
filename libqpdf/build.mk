@@ -94,5 +94,23 @@ $(COBJS_libqpdf): libqpdf/$(OUTPUT_DIR)/%.$(LOBJ): libqpdf/%.c
 #
 # * Otherwise, increment REVISION
 
-$(TARGETS_libqpdf): $(OBJS_libqpdf)
-	$(call makelib,$(OBJS_libqpdf),$@,$(LDFLAGS),$(LIBS),17,0,0)
+CURRENT := 17
+REVISION := 0
+AGE := 0
+$(TARGETS_libqpdf): $(OBJS_libqpdf) libqpdf/$(OUTPUT_DIR)/checkmap_libqpdf-$(CURRENT).stamp
+	$(call makelib,$(OBJS_libqpdf),$@,$(LDFLAGS),$(LIBS),$(CURRENT),$(REVISION),$(AGE))
+
+libqpdf/$(OUTPUT_DIR)/checkmap_libqpdf-$(CURRENT).stamp: libqpdf.map
+	@if [ $$(head -1 libqpdf.map | awk '{print $$1}') = LIBQPDF_$(CURRENT) ]; then \
+		touch $@; \
+	else \
+		echo ''; \
+		echo '****'; \
+		echo libqpdf.map is out of date; \
+		echo first line should contain LIBQPDF_$(CURRENT); \
+		echo '****'; \
+		echo ''; \
+		rm -f $@; \
+		false; \
+	fi
+
