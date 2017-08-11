@@ -40,6 +40,30 @@ static char const* EMPTY_PDF =
     "110\n"
     "%%EOF\n";
 
+// Backport of infinite loop fix: this fix uses static variables to
+// avoid adding fields to QPDF.hh and breaking ABI. The real fix for
+// qpdf 7.0.0 does not use static variables.
+
+static std::map<QPDF*, std::set<QPDFObjGen> > resolving;
+
+class ResolveRecorder
+{
+  public:
+    ResolveRecorder(QPDF* qpdf, QPDFObjGen const& og) :
+        qpdf(qpdf),
+        og(og)
+    {
+        resolving[qpdf].insert(og);
+    }
+    virtual ~ResolveRecorder()
+    {
+        resolving[qpdf].erase(og);
+    }
+  private:
+    QPDF* qpdf;
+    QPDFObjGen og;
+};
+
 void
 QPDF::CopiedStreamDataProvider::provideStreamData(
     int objid, int generation, Pipeline* pipeline)
@@ -1464,7 +1488,7 @@ QPDF::resolve(int objid, int generation)
     // to insert things into the object cache that don't actually
     // exist in the file.
     QPDFObjGen og(objid, generation);
-    if (this->resolving.count(og))
+    if (resolving[this].count(og))
     {
         // This can happen if an object references itself directly or
         // indirectly in some key that has to be resolved during
