@@ -84,29 +84,32 @@ installers are provided, they might do that already by default.
 External Libraries
 ==================
 
-In order to build qpdf, you must have copies of zlib and pcre.  The
-easy way to get them is to download them from the qpdf download area.
-There are packages called external-libs-bin.zip and
-external-libs-src.zip.  If you are building with MSVC 2010 or MINGW,
-you can just extract the qpdf-external-libs-bin.zip zip file into the
-top-level qpdf source tree.  Note that you need the 2012-06-20 version
-(at least) to build qpdf 3.0 or greater since this includes 64-bit
-libraries.  It will create a directory called external-libs which
-contains header files and precompiled libraries.  Passing
---enable-external-libs to ./configure (which is done automatically if
-you follow the instructions below) is sufficient to find them.
+In order to build qpdf, you must have a copy of zlib. The easy way to
+get it is to download it from the qpdf download area. There are
+packages called external-libs-bin.zip and external-libs-src.zip. If
+you are building with MSVC 2010 or MINGW, you can just extract the
+qpdf-external-libs-bin.zip zip file into the top-level qpdf source
+tree. Note that you need the 2012-06-20 version (at least) to build
+qpdf 3.0 or greater since this includes 64-bit libraries. The
+2017-08-10 version includes libraries built with MSVC 2015 and
+contains only zlib. Older versions also contain pcre, which is no
+longer required as of qpdf 7.0.0. Extracting the zip will create a
+directory called external-libs which contains header files and
+precompiled libraries. Passing --enable-external-libs to ./configure
+(which is done automatically if you follow the instructions below) is
+sufficient to find them.
 
-You can also obtain pcre and zlib directly on your own and install
-them.  If you are using mingw, you can just set CPPFLAGS, LDFLAGS, and
-LIBS when you run ./configure so that it can find the header files and
-libraries.  If you are building with msvc and you want to do this, it
-probably won't work because ./configure doesn't know how to interpret
-LDFLAGS and LIBS properly for MSVC (though qpdf's own build system
-does).  In this case, you can probably get away with cheating by
-passing --enable-external-libs to ./configure and then just editing
-CPPFLAGS, LDFLAGS, LIBS in the generated autoconf.mk file.  Note that
-you should use UNIX-like syntax (-I, -L, -l) even though this is not
-what cl takes on the command line.  qpdf's build rules will fix it.
+You can also obtain zlib directly on your own and install it. If you
+are using mingw, you can just set CPPFLAGS, LDFLAGS, and LIBS when you
+run ./configure so that it can find the header files and libraries. If
+you are building with msvc and you want to do this, it probably won't
+work because ./configure doesn't know how to interpret LDFLAGS and
+LIBS properly for MSVC (though qpdf's own build system does). In this
+case, you can probably get away with cheating by passing
+--enable-external-libs to ./configure and then just editing CPPFLAGS,
+LDFLAGS, LIBS in the generated autoconf.mk file. Note that you should
+use UNIX-like syntax (-I, -L, -l) even though this is not what cl
+takes on the command line. qpdf's build rules will fix it.
 
 You can also download qpdf-external-libs-src.zip and follow the
 instructions in the README.txt there for how to build external libs.

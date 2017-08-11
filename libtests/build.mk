@@ -9,7 +9,6 @@ BINS_libtests = \
 	input_source \
 	lzw \
 	md5 \
-	pcre \
 	png_filter \
 	pointer_holder \
 	qutil \

@@ -1,5 +1,7 @@
 2017-08-10  Jay Berkenbilt  <ejb@ql.org>
 
+	* Remove dependency on libpcre.
+
 	* Be more forgiving of certain types of errors in the xref table
 	that don't interfere with interpreting the table.
 

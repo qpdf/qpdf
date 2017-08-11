@@ -7,9 +7,6 @@ version if needed.
 Soon
 ====
 
- * Eliminate dependency on PCRE. There aren't that many regular
-   expressions, and they are used only for internal purposes.
-
  * Consider whether there should be a mode in which QPDFObjectHandle
    returns nulls for operations on the wrong type instead of asserting
    the type. The way things are wired up now, this would have to be a

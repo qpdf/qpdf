@@ -13,11 +13,11 @@ warranty.
 Prerequisites
 =============
 
-QPDF depends on external libraries "zlib" and "pcre".  These are part
-of virtually all Linux distributions and are readily available;
-download information appears in the documentation.  For Windows, you
-can download pre-built binary versions of those libraries for some
-compilers; see README-windows.txt for additional details.
+QPDF depends on the external library "zlib". This are part of every
+Linux distribution and is readily available. Download information
+appears in the documentation. For Windows, you can download pre-built
+binary versions of this libraries for some compilers; see
+README-windows.txt for additional details.
 
 QPDF requires a C++ compiler that works with STL.  Your compiler must
 also support "long long".  Almost all modern compilers do.  If you are
@@ -34,10 +34,9 @@ you had an otherwise working qpdf.
 Licensing terms of embedded software
 ====================================
 
-QPDF makes use of zlib and pcre for its functionality.  These packages
-can be downloaded separately from their own download locations, or
-they can be downloaded in the external-libs area of the qpdf download
-site.
+QPDF makes use of zlib for its functionality. This package can be
+downloaded separately from its own download location, or it can be
+downloaded in the external-libs area of the qpdf download site.
 
 The Rijndael encryption implementation used as the basis for AES
 encryption and decryption support comes from Philip J. Erdelsky's
@@ -147,11 +146,11 @@ user's manual can be found in the "doc" directory.  The docbook
 sources to the user's manual can be found in the "manual" directory.
 
 The software library is just libqpdf, and all the header files are in
-the qpdf subdirectory.  If you link statically with -lqpdf, then you
-will also need to link with -lpcre and -lz.  The shared qpdf library
-is linked with -lpcre and -lz, and none of qpdf's public header files
-directly include files from pcre or libz, so in many cases, qpdf's
-development files are self contained.
+the qpdf subdirectory. If you link statically with -lqpdf, then you
+will also need to link with -lz. The shared qpdf library is linked
+with -lz, and none of qpdf's public header files directly include
+files from libz, so in many cases, qpdf's development files are self
+contained.
 
 To learn about using the library, please read comments in the header
 files in include/qpdf, especially QPDF.hh, QPDFObjectHandle.hh, and

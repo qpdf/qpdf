@@ -46,9 +46,8 @@ download.
  * qpdf-external-libs-src.zip
 
    If you want to build the external libraries on your own (for
-   Windows or anything else), you can download this archive.  In
-   addition to including unmodified distributions of pcre and zlib, it
-   includes a README file and some scripts to help you build them for
-   Windows.
+   Windows or anything else), you can download this archive. In
+   addition to including an unmodified distribution zlib, it includes
+   a README file and some scripts to help you build it for Windows.
 
 If you want to build on Windows, please see also README-windows.txt.

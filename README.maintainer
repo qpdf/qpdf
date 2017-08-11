@@ -113,7 +113,12 @@ Release Reminders
    version control system into a directory called qpdf-external-libs
    and just make a zip file of the result called
    qpdf-external-libs-src.zip.  See the README.txt file there for
-   information on creating binary external libs releases.
+   information on creating binary external libs releases. Run this
+   from the external-libs repository:
+
+   git archive --prefix=external-libs/ HEAD . | (cd /tmp; tar xf -)
+   cd /tmp
+   zip -r qpdf-external-libs-src.zip external-libs
 
  * To create Windows binary releases, extract the qpdf source
    distribution in Windows (MSYS + MINGW, MSVC).  From the extracted

@@ -727,7 +727,6 @@ lld
 lookup
 lossy
 LowPart
-lpcre
 lqpdf
 lsb
 lt
@@ -914,7 +913,6 @@ pb
 pbytes
 pc
 pcre
-pcreapi
 pdf
 PDFâ
 PDFContext
