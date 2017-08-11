@@ -1,0 +1,4 @@
+LIBQPDF_@LT_CURRENT@ {
+  global:
+    *;
+};

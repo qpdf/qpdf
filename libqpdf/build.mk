@@ -81,36 +81,5 @@ $(CCOBJS_libqpdf): libqpdf/$(OUTPUT_DIR)/%.$(LOBJ): libqpdf/%.cc
 $(COBJS_libqpdf): libqpdf/$(OUTPUT_DIR)/%.$(LOBJ): libqpdf/%.c
 	$(call c_libcompile,$<,$(INCLUDES_libqpdf))
 
-# Last three arguments to makelib are CURRENT,REVISION,AGE.
-#
-# * If any interfaces have been removed or changed, we are not binary
-#   compatible.  Increment CURRENT, and set AGE and REVISION to 0.
-#   Also update libqpdf.map, changing the numeric portion to match
-#   CURRENT.
-#
-# * Otherwise, if any interfaces have been added since the last
-#   public release, then increment CURRENT and AGE, and set REVISION
-#   to 0.
-#
-# * Otherwise, increment REVISION
-
-CURRENT := 17
-REVISION := 0
-AGE := 0
-$(TARGETS_libqpdf): $(OBJS_libqpdf) libqpdf/$(OUTPUT_DIR)/checkmap_libqpdf-$(CURRENT).stamp
-	$(call makelib,$(OBJS_libqpdf),$@,$(LDFLAGS),$(LIBS),$(CURRENT),$(REVISION),$(AGE))
-
-libqpdf/$(OUTPUT_DIR)/checkmap_libqpdf-$(CURRENT).stamp: libqpdf.map
-	@if [ $$(head -1 libqpdf.map | awk '{print $$1}') = LIBQPDF_$(CURRENT) ]; then \
-		touch $@; \
-	else \
-		echo ''; \
-		echo '****'; \
-		echo libqpdf.map is out of date; \
-		echo first line should contain LIBQPDF_$(CURRENT); \
-		echo '****'; \
-		echo ''; \
-		rm -f $@; \
-		false; \
-	fi
-
+$(TARGETS_libqpdf): $(OBJS_libqpdf)
+	$(call makelib,$(OBJS_libqpdf),$@,$(LDFLAGS),$(LIBS),$(LT_CURRENT),$(LT_REVISION),$(LT_AGE))

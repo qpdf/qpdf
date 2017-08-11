@@ -1,5 +1,8 @@
 PACKAGE_TARNAME=@PACKAGE_TARNAME@
 PACKAGE_VERSION=@PACKAGE_VERSION@
+LT_CURRENT=@LT_CURRENT@
+LT_REVISION=@LT_REVISION@
+LT_AGE=@LT_AGE@
 top_builddir=@top_builddir@
 prefix=@prefix@
 exec_prefix=@exec_prefix@

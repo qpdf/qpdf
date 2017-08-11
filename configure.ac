@@ -8,6 +8,7 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_FILES([autoconf.mk])
 AC_CONFIG_FILES([manual/html.xsl manual/print.xsl])
 AC_CONFIG_FILES([libqpdf.pc])
+AC_CONFIG_FILES([libqpdf.map])
 AC_CONFIG_HEADERS([libqpdf/qpdf/qpdf-config.h])
 
 AC_PROG_CC
@@ -15,6 +16,25 @@ AC_PROG_CC_C99
 AC_PROG_CXX
 AC_HEADER_STDC
 LT_INIT([win32-dll])
+
+# * If any interfaces have been removed or changed, or if any private
+#   member variables or virtual functions have been added to any
+#   class, we are not binary compatible. Increment LT_CURRENT, and set
+#   LT_AGE and LT_REVISION to 0.
+#
+# * Otherwise, if any interfaces have been added since the last public
+#   release, then increment LT_CURRENT and LT_AGE, and set LT_REVISION
+#   to 0.
+#
+# * Otherwise, increment LT_REVISION
+
+# LT = libtool
+LT_CURRENT=17
+LT_REVISION=0
+LT_AGE=0
+AC_SUBST(LT_CURRENT)
+AC_SUBST(LT_REVISION)
+AC_SUBST(LT_AGE)
 
 AC_ARG_ENABLE(insecure-random,
    AS_HELP_STRING([--enable-insecure-random],
