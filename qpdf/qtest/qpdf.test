@@ -543,9 +543,9 @@ $td->runtest("check file",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "gen1.qdf"});
 
-# This file, from a user, is missing /ID in its trailer even though it
-# is encrypted and also has a space instead of a newline after its
-# xref keyword.  xpdf can open it, but Adobe reader can't.
+# A user provided a file that was missing /ID in its trailer even
+# though it is encrypted and also has a space instead of a newline
+# after its xref keyword. This file has those same properties.
 $td->runtest("check broken file",
              {$td->COMMAND => "qpdf --check invalid-id-xref.pdf"},
              {$td->FILE => "invalid-id-xref.out", $td->EXIT_STATUS => 3},
@@ -995,7 +995,7 @@ $td->runtest("C API: no recovery",
 show_ntests();
 # ----------
 $td->notify("--- Recovery Tests ---");
-$n_tests += @badfiles + 8;
+$n_tests += @badfiles + 6;
 
 # Recovery tests.  These are mostly after-the-fact -- when recovery
 # was implemented, some degree of recovery was possible on many of the
@@ -1020,18 +1020,6 @@ for (my $i = 1; $i <= scalar(@badfiles); ++$i)
 		  $td->EXIT_STATUS => $status},
 		 $td->NORMALIZE_NEWLINES);
 }
-
-# This heifer file was a real file that contained errors that Acrobat
-# Reader can recover.  We can recover it too.
-$td->runtest("recover heifer file",
-	     {$td->COMMAND => "qpdf --static-id --no-original-object-ids" .
-		  " -qdf heifer.pdf a.pdf"},
-	     {$td->FILE => "heifer.out",
-	      $td->EXIT_STATUS => 3},
-	     $td->NORMALIZE_NEWLINES);
-$td->runtest("check output",
-	     {$td->FILE => "a.pdf"},
-	     {$td->FILE => "heifer.qdf"});
 
 # See if we can recover the cross reference table on a file that has
 # been appended to even when it deletes and reuses objects.  We can't
@@ -1094,6 +1082,7 @@ my @goodfiles = ("implicit null",			# 1
 		 "hybrid xref old mode",		# 18
 		 "xref with prev",			# 19
 		 "lots of compressible objects",	# 20
+		 "pound in name",                       # 21
 		 );
 
 $n_tests += (3 * @goodfiles) + 6;
@@ -1275,30 +1264,9 @@ for (my $n = 16; $n <= 19; ++$n)
 show_ntests();
 # ----------
 $td->notify("--- Specific File Tests ---");
-$n_tests += 5;
-$n_compare_pdfs += 1;
+$n_tests += 2;
 
 # Special PDF files that caused problems at some point
-
-# This file is a PDF 1.1 file with /# as a name and with
-# inconsistencies in its free table.  It also has LZW streams that
-# happen to test boundary conditions in the LZW decoder.
-$td->runtest("old and complex",
-	     {$td->COMMAND => "qpdf --check old-and-complex.pdf"},
-	     {$td->FILE => "old-and-complex-check.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-$td->runtest("old and complex (C API)",
-	     {$td->COMMAND => "qpdf-ctest 1 old-and-complex.pdf '' ''"},
-	     {$td->FILE => "old-and-complex-c-check.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("convert to qdf",
-	     {$td->COMMAND => "qpdf --qdf old-and-complex.pdf a.qdf"},
-	     {$td->STRING => "", $td->EXIT_STATUS => 0});
-
-compare_pdfs("old-and-complex.pdf", "a.qdf");
 
 $td->runtest("damaged stream",
 	     {$td->COMMAND => "qpdf --check damaged-stream.pdf"},
@@ -1529,8 +1497,8 @@ $td->runtest("check linearized and modified",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("check multiple modifications",
-	     {$td->COMMAND => "qpdf --check multiple-mods.pdf"},
-	     {$td->FILE => "multiple-mods-check.out",
+	     {$td->COMMAND => "qpdf --check delete-and-reuse.pdf"},
+	     {$td->FILE => "delete-and-reuse-check.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -1666,16 +1634,16 @@ my @encrypted_files =
 $n_tests += 5 + (2 * (@encrypted_files)) + (6 * (@encrypted_files - 6)) + 9;
 
 $td->runtest("encrypted file",
-	     {$td->COMMAND => "test_driver 2 U25A0.pdf"},
+	     {$td->COMMAND => "test_driver 2 encrypted-with-images.pdf"},
 	     {$td->FILE => "encrypted1.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("preserve encryption",
-	     {$td->COMMAND => "qpdf U25A0.pdf U25A0.enc"},
+	     {$td->COMMAND => "qpdf encrypted-with-images.pdf encrypted-with-images.enc"},
 	     {$td->STRING => "",
 	      $td->EXIT_STATUS => 0});
 $td->runtest("recheck encrypted file",
-	     {$td->COMMAND => "test_driver 2 U25A0.enc"},
+	     {$td->COMMAND => "test_driver 2 encrypted-with-images.enc"},
 	     {$td->FILE => "encrypted1.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
@@ -1882,13 +1850,13 @@ foreach my $d (@cenc)
 # linearized and/or encrypted as desired.
 
 $td->runtest("linearize encrypted file",
-	     {$td->COMMAND => "qpdf --linearize U25A0.pdf a.pdf"},
+	     {$td->COMMAND => "qpdf --linearize encrypted-with-images.pdf a.pdf"},
 	     {$td->STRING => "",
 	      $td->EXIT_STATUS => 0});
 $td->runtest("check encryption",
 	     {$td->COMMAND => "qpdf --show-encryption a.pdf",
 	      $td->FILTER => "grep -v allowed"},
-	     {$td->STRING => "R = 2\nP = -60\nUser password = \n",
+	     {$td->STRING => "R = 3\nP = -4\nUser password = \n",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("check linearization",
@@ -2128,7 +2096,7 @@ show_ntests();
 $td->notify("--- Content Preservation Tests ---");
 # $n_tests incremented below
 
-my @files = ("U25A0.pdf",	# encrypted
+my @files = ("encrypted-with-images.pdf", # encrypted
 	     "inline-images.pdf",
 	     "lin-special.pdf",
 	     "object-stream.pdf",
@@ -2213,13 +2181,12 @@ foreach my $file (@files)
     }
 }
 
-# inline-images-cr.pdf is xbkm938-dies.pdf from PDF collection
-$td->runtest("convert inline-images-cr to qdf",
+$td->runtest("convert inline-images to qdf",
 	     {$td->COMMAND => "qpdf --static-id --no-original-object-ids" .
-		  " --qdf inline-images-cr.pdf a.pdf"},
+		  " --qdf inline-images.pdf a.pdf"},
 	     {$td->STRING => "", $td->EXIT_STATUS => 0});
 
-compare_pdfs("inline-images-cr.pdf", "a.pdf");
+compare_pdfs("inline-images.pdf", "a.pdf");
 
 show_ntests();
 # ----------

@@ -1,4 +1,5 @@
-WARNING: issue-106.pdf (file position 56627): error decoding stream data for object 29 0: stream inflate: inflate: data: incorrect data check
-WARNING: issue-106.pdf (file position 64303): error decoding stream data for object 30 0: stream inflate: inflate: data: incorrect data check
-WARNING: issue-106.pdf (file position 67427): error decoding stream data for object 31 0: stream inflate: inflate: data: incorrect data check
+WARNING: issue-106.pdf: file is damaged
+WARNING: issue-106.pdf (file position 809): xref not found
+WARNING: issue-106.pdf: Attempting to reconstruct cross-reference table
+WARNING: issue-106.pdf (file position 965): error decoding stream data for object 8 0: stream inflate: inflate: data: incorrect data check
 qpdf: operation succeeded with warnings; resulting file may have some problems
