@@ -2056,6 +2056,10 @@ QPDFWriter::generateObjectStreams()
     std::vector<QPDFObjGen> const& eligible =
         QPDF::Writer::getCompressibleObjGens(this->pdf);
     unsigned int n_object_streams = (eligible.size() + 99) / 100;
+    if (n_object_streams == 0)
+    {
+        throw std::logic_error("n_object_streams == 0");
+    }
     unsigned int n_per = eligible.size() / n_object_streams;
     if (n_per * n_object_streams < eligible.size())
     {

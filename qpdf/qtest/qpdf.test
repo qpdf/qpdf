@@ -218,6 +218,8 @@ my @bug_tests = (
     ["119", "other infinite loop", 3],
     ["120", "other infinite loop", 3],
     ["106", "zlib data error", 3],
+    ["141a", "/W entry size 0", 2],
+    ["141b", "/W entry size 0", 2],
     );
 $n_tests += scalar(@bug_tests);
 foreach my $d (@bug_tests)

@@ -1,0 +1,8 @@
+WARNING: issue-141a.pdf: can't find PDF header
+WARNING: issue-141a.pdf (xref stream: object 9 0, file position 10): stream dictionary lacks /Length key
+WARNING: issue-141a.pdf (xref stream: object 9 0, file position 47): attempting to recover stream length
+WARNING: issue-141a.pdf (xref stream: object 9 0, file position 47): unable to recover stream data; treating stream as empty
+WARNING: issue-141a.pdf: file is damaged
+WARNING: issue-141a.pdf (xref stream, file position 3): Cross-reference stream's /W indicates entry size of 0
+WARNING: issue-141a.pdf: Attempting to reconstruct cross-reference table
+issue-141a.pdf: unable to find trailer dictionary while recovering damaged file

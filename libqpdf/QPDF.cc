@@ -917,6 +917,13 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
         }
 	entry_size += W[i];
     }
+    if (entry_size == 0)
+    {
+        throw QPDFExc(qpdf_e_damaged_pdf, this->file->getName(),
+                      "xref stream", xref_offset,
+                      "Cross-reference stream's /W indicates"
+                      " entry size of 0");
+    }
     long long max_num_entries =
         static_cast<unsigned long long>(-1) / entry_size;
 
