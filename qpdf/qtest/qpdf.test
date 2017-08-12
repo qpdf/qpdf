@@ -220,6 +220,7 @@ my @bug_tests = (
     ["106", "zlib data error", 3],
     ["141a", "/W entry size 0", 2],
     ["141b", "/W entry size 0", 2],
+    ["143", "self-referential ostream", 3],
     );
 $n_tests += scalar(@bug_tests);
 foreach my $d (@bug_tests)

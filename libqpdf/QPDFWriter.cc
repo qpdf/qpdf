@@ -1054,6 +1054,9 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
 		// here.  Instead, enqueue the object stream.  Object
 		// streams always have generation 0.
 		int stream_id = this->object_to_object_stream[og];
+                // Detect loops by storing invalid object ID 0, which
+                // will get overwritten later.
+                obj_renumber[og] = 0;
 		enqueueObject(this->pdf.getObjectByID(stream_id, 0));
 	    }
 	    else
@@ -1079,6 +1082,12 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
 		}
 	    }
 	}
+        else if (obj_renumber[og] == 0)
+        {
+            // This can happen if a specially constructed file
+            // indicates that an object stream is inside itself.
+            QTC::TC("qpdf", "QPDFWriter ignore self-referential object stream");
+        }
     }
     else if (object.isArray())
     {

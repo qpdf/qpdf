@@ -294,3 +294,4 @@ QPDF ignore first extra space in xref entry 0
 QPDF ignore second extra space in xref entry 0
 QPDF ignore length error xref entry 0
 QPDF_encryption pad short parameter 0
+QPDFWriter ignore self-referential object stream 0
