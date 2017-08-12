@@ -932,6 +932,21 @@ outfile.pdf</option>
       </listitem>
      </varlistentry>
      <varlistentry>
+      <term><option>--newline-before-endstream</option></term>
+      <listitem>
+       <para>
+        Tells qpdf to insert a newline before the
+        <literal>endstream</literal> keyword, not counted in the
+        length, after any stream content even if the last character of
+        the stream was a newline. This may result in two newlines in
+        some cases. This is a requirement of PDF/A. While qpdf doesn't
+        specifically know how to generate PDF/A-compliant PDFs, this
+        at least prevents it from removing compliance on already
+        compliant files.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
       <term><option>--qdf</option></term>
       <listitem>
        <para>

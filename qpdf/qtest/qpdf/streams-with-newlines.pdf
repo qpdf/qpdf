@@ -1,0 +1,90 @@
+%PDF-1.3
+%¿÷¢þ
+1 0 obj
+<< /Pages 2 0 R /Type /Catalog >>
+endobj
+2 0 obj
+<< /Count 3 /Kids [ 3 0 R 4 0 R 5 0 R ] /Type /Pages >>
+endobj
+3 0 obj
+<< /Contents 6 0 R /MediaBox [ 0 0 612 792 ] /Parent 2 0 R /Resources << /Font << /F1 7 0 R >> /ProcSet 8 0 R >> /Type /Page >>
+endobj
+4 0 obj
+<< /Contents 9 0 R /MediaBox [ 0 0 612 792 ] /Parent 2 0 R /Resources << /Font << /F1 10 0 R >> /ProcSet 11 0 R >> /Type /Page >>
+endobj
+5 0 obj
+<< /Contents 12 0 R /MediaBox [ 0 0 612 792 ] /Parent 2 0 R /Resources << /Font << /F1 13 0 R >> /ProcSet 14 0 R >> /Type /Page >>
+endobj
+6 0 obj
+<< /Length 94 >>
+stream
+% Stream contains a newline as part of its length
+BT
+  /F1 24 Tf
+  72 720 Td
+  (Potato) Tj
+ET
+endstream
+endobj
+7 0 obj
+<< /BaseFont /Helvetica /Encoding /WinAnsiEncoding /Name /F1 /Subtype /Type1 /Type /Font >>
+endobj
+8 0 obj
+[ /PDF /Text ]
+endobj
+9 0 obj
+<< /Length 127 >>
+stream
+% Stream data does not end with a newline but endstream is preceded by
+% a newline.
+BT
+  /F1 24 Tf
+  72 720 Td
+  (Potato) Tj
+ET
+endstream
+endobj
+10 0 obj
+<< /BaseFont /Helvetica /Encoding /WinAnsiEncoding /Name /F1 /Subtype /Type1 /Type /Font >>
+endobj
+11 0 obj
+[ /PDF /Text ]
+endobj
+12 0 obj
+<< /Length 131 >>
+stream
+% Stream data does not end with a newline and endstream is not
+% preceded by a newline.
+BT
+  /F1 24 Tf
+  72 720 Td
+  (Potato) Tj
+ETendstream
+endobj
+13 0 obj
+<< /BaseFont /Helvetica /Encoding /WinAnsiEncoding /Name /F1 /Subtype /Type1 /Type /Font >>
+endobj
+14 0 obj
+[ /PDF /Text ]
+endobj
+xref
+0 15
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000135 00000 n 
+0000000278 00000 n 
+0000000423 00000 n 
+0000000569 00000 n 
+0000000712 00000 n 
+0000000819 00000 n 
+0000000849 00000 n 
+0000001027 00000 n 
+0000001135 00000 n 
+0000001166 00000 n 
+0000001348 00000 n 
+0000001456 00000 n 
+trailer << /Root 1 0 R /Size 15 /ID [<ff82013f9cede898ae8db2f2f177aa1d><7eb8172a38e90a48184c5bf01c8020b0>] >>
+startxref
+1487
+%%EOF

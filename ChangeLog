@@ -1,5 +1,9 @@
 2017-08-11  Jay Berkenbilt  <ejb@ql.org>
 
+	* Fix --newline-before-endstream to always add a newline before
+	endstream even if the last character was already a newline. This
+	is actually what's required by PDF/A. Fixes #133.
+
 	* Handle encrypted files whose encryption parameters are too
 	short. Fixes #96.
 

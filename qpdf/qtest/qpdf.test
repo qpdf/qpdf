@@ -234,7 +234,7 @@ foreach my $d (@bug_tests)
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 88;
+$n_tests += 86;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -623,16 +623,6 @@ $td->runtest("split content stream errors",
               $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 
-$td->runtest("newline before endstream",
-             {$td->COMMAND =>
-                  "qpdf --static-id --newline-before-endstream" .
-                  " minimal.pdf a.pdf"},
-             {$td->STRING => "", $td->EXIT_STATUS => 0},
-             $td->NORMALIZE_NEWLINES);
-$td->runtest("check output",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "newline-before-endstream.pdf"});
-
 # Demonstrate show-xref after check and not after check to illustrate
 # that it can dump the real xref or the recovered xref.
 $td->runtest("dump bad xref",
@@ -688,6 +678,32 @@ $td->runtest("short /O or /U",
               $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
+show_ntests();
+# ----------
+$td->notify("--- Newline before endstream ---");
+$n_tests += 8;
+foreach my $d (
+    ['--qdf', 'qdf', 'qdf'],
+    ['--newline-before-endstream', 'newline', 'nl'],
+    ['--qdf --newline-before-endstream', 'newline and qdf', 'nl-qdf'],
+    )
+{
+    my ($flags, $description, $suffix) = @$d;
+    $td->runtest("newline before endstream: $description",
+                 {$td->COMMAND => "qpdf --static-id --stream-data=preserve" .
+                      " $flags streams-with-newlines.pdf a.pdf"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("check output",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => "newline-before-endstream-$suffix.pdf"});
+    if ($flags =~ /qdf/)
+    {
+        $td->runtest("fix-qdf",
+                     {$td->COMMAND => "fix-qdf a.pdf"},
+                     {$td->FILE => "a.pdf", $td->EXIT_STATUS => 0});
+    }
+}
 show_ntests();
 # ----------
 $td->notify("--- Single Page ---");
