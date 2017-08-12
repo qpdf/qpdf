@@ -349,6 +349,26 @@ make
       </listitem>
      </varlistentry>
      <varlistentry>
+      <term><option>--rotate=[+|-]angle:page-range</option></term>
+      <listitem>
+       <para>
+        Apply rotation to specified pages. The
+        <option>page-range</option> portion of the option value has
+        the same format as page ranges in <xref
+        linkend="ref.page-selection"/>. The <option>angle</option>
+        portion of the parameter may be either 90, 180, or 270. If
+        preceded by <option>+</option> or <option>-</option>, the
+        angle is added to or subtracted from the specified pages'
+        original rotations. Otherwise the pages' rotations are set to
+        the exact value. For example, the command <command>qpdf in.pdf
+        out.pdf --rotate=+90:2,4,6 --rotate=180:7-8</command> would
+        rotate pages 2, 4, and 6 90 degrees clockwise from their
+        original rotation and force the rotation of pages 7 through 9
+        to 180 degrees regardless of their original rotation.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
       <term><option>--pages options --</option></term>
       <listitem>
        <para>

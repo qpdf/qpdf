@@ -507,6 +507,13 @@ class QPDFObjectHandle
     QPDF_DLL
     void addPageContents(QPDFObjectHandle contents, bool first);
 
+    // Rotate a page. If relative is false, set the rotation of the
+    // page to angle. Otherwise, add angle to the rotation of the
+    // page. Angle must be a multiple of 90. Adding 90 to the rotation
+    // rotates clockwise by 90 degrees.
+    QPDF_DLL
+    void rotatePage(int angle, bool relative);
+
     // Initializers for objects.  This Factory class gives the QPDF
     // class specific permission to call factory methods without
     // making it a friend of the whole QPDFObjectHandle class.

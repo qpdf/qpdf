@@ -1,5 +1,9 @@
 2017-08-12  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add QPDFObjectHandle::rotatePage to apply rotation to a page
+	object. Add --rotate option to qpdf to specify page rotation from
+	the command line.
+
 	* Provide --verbose option that causes qpdf to print an indication
 	of what files it is writing.
 

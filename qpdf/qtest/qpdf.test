@@ -780,6 +780,26 @@ foreach my $d (@sp_cases)
 
 show_ntests();
 # ----------
+$td->notify("--- Rotate Pages ---");
+$n_tests += 2;
+# XXX do absolute, positive, and negative on ranges that include
+# inherited and non-inherited.
+# Pages 11-15 inherit /Rotate 90
+# Pages 1 and 2 have explicit /Rotate 270
+# Pages 16 and 17 have explicit /Rotate 180
+
+$td->runtest("page rotation",
+             {$td->COMMAND => "qpdf --static-id to-rotate.pdf a.pdf" .
+                  " --rotate=+90:1,4,11,16" .
+                  " --rotate=180:2,5,12-13" .
+                  " --rotate=-90:3,15,17,18"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "rotated.pdf"});
+
+show_ntests();
+# ----------
 $td->notify("--- Numeric range parsing tests ---");
 my @nrange_tests = (
     [",5",

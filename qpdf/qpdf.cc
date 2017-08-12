@@ -37,6 +37,18 @@ struct PageSpec
     char const* range;
 };
 
+struct RotationSpec
+{
+    RotationSpec(int angle = 0, bool relative = false) :
+        angle(angle),
+        relative(relative)
+    {
+    }
+
+    int angle;
+    bool relative;
+};
+
 struct Options
 {
     Options() :
@@ -151,6 +163,7 @@ struct Options
     bool show_page_images;
     bool check;
     std::vector<PageSpec> page_specs;
+    std::map<std::string, RotationSpec> rotations;
     bool require_outfile;
     char const* infilename;
     char const* outfilename;
@@ -209,6 +222,8 @@ Basic Options\n\
 --encrypt options --    generate an encrypted file\n\
 --decrypt               remove any encryption on the file\n\
 --pages options --      select specific pages from one or more files\n\
+--rotate=[+|-]angle:page-range\n\
+                        rotate each specified page 90, 180, or 270 degrees\n\
 --split-pages=[n]       write each output page to a separate file\n\
 \n\
 If none of --copy-encryption, --encrypt or --decrypt are given, qpdf will\n\
@@ -218,6 +233,13 @@ Note that when copying encryption parameters from another file, all\n\
 parameters will be copied, including both user and owner passwords, even\n\
 if the user password is used to open the other file.  This works even if\n\
 the owner password is not known.\n\
+\n\
+The --rotate flag can be used to specify pages to rotate pages either\n\
+90, 180, or 270 degrees. The page range is specified in the same\n\
+format as with the --pages option, described below. Repeat the option\n\
+to rotate multiple groups of pages. If the angle is preceded by + or -,\n\
+it is added to or subtracted from the original rotation. Otherwise, the\n\
+rotation angle is set explicitly to the given value.\n\
 \n\
 If --split-pages is specified, each page is written to a separate output\n\
 file. File names are generated as follows:\n\
@@ -1148,6 +1170,62 @@ static void handle_help_verison(int argc, char* argv[])
     }
 }
 
+static void parse_rotation_parameter(Options& o, std::string const& parameter)
+{
+    std::string angle_str;
+    std::string range;
+    size_t colon = parameter.find(':');
+    int relative = 0;
+    if (colon != std::string::npos)
+    {
+        if (colon > 0)
+        {
+            angle_str = parameter.substr(0, colon);
+            if (angle_str.length() > 0)
+            {
+                char first = angle_str.at(0);
+                if ((first == '+') || (first == '-'))
+                {
+                    relative = ((first == '+') ? 1 : -1);
+                    angle_str = angle_str.substr(1);
+                }
+                else if (! QUtil::is_digit(angle_str.at(0)))
+                {
+                    angle_str = "";
+                }
+            }
+        }
+        if (colon + 1 < parameter.length())
+        {
+            range = parameter.substr(colon + 1);
+        }
+    }
+    bool range_valid = false;
+    try
+    {
+        parse_numrange(range.c_str(), 0, true);
+        range_valid = true;
+    }
+    catch (std::runtime_error)
+    {
+        // ignore
+    }
+    if (range_valid &&
+        ((angle_str == "90") || (angle_str == "180") || (angle_str == "270")))
+    {
+        int angle = atoi(angle_str.c_str());
+        if (relative == -1)
+        {
+            angle = -angle;
+        }
+        o.rotations[range] = RotationSpec(angle, (relative != 0));
+    }
+    else
+    {
+        usage("invalid parameter to rotate: " + parameter);
+    }
+}
+
 static void parse_options(int argc, char* argv[], Options& o)
 {
     for (int i = 1; i < argc; ++i)
@@ -1236,6 +1314,10 @@ static void parse_options(int argc, char* argv[], Options& o)
                 {
                     usage("--pages: no page specifications given");
                 }
+            }
+            else if (strcmp(arg, "rotate") == 0)
+            {
+                parse_rotation_parameter(o, parameter);
             }
             else if (strcmp(arg, "stream-data") == 0)
             {
@@ -1829,6 +1911,29 @@ static void handle_page_specs(QPDF& pdf, Options& o,
     }
 }
 
+static void handle_rotations(QPDF& pdf, Options& o)
+{
+    std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
+    int npages = static_cast<int>(pages.size());
+    for (std::map<std::string, RotationSpec>::iterator iter =
+             o.rotations.begin();
+         iter != o.rotations.end(); ++iter)
+    {
+        std::string const& range = (*iter).first;
+        RotationSpec const& rspec = (*iter).second;
+        std::vector<int> to_rotate = parse_numrange(range.c_str(), npages);
+        for (std::vector<int>::iterator i2 = to_rotate.begin();
+             i2 != to_rotate.end(); ++i2)
+        {
+            int pageno = *i2 - 1;
+            if ((pageno >= 0) && (pageno < npages))
+            {
+                pages.at(pageno).rotatePage(rspec.angle, rspec.relative);
+            }
+        }
+    }
+}
+
 static void set_encryption_options(QPDF& pdf, Options& o, QPDFWriter& w)
 {
     int R = 0;
@@ -2123,6 +2228,10 @@ int main(int argc, char* argv[])
         if (! o.page_specs.empty())
         {
             handle_page_specs(pdf, o, page_heap);
+        }
+        if (! o.rotations.empty())
+        {
+            handle_rotations(pdf, o);
         }
 
 	if (o.outfilename == 0)
