@@ -1587,7 +1587,12 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	char last_char = this->pipeline->getLastChar();
 	popPipelineStack();
 
-	if (this->qdf_mode || this->newline_before_endstream)
+	if (this->newline_before_endstream)
+	{
+		writeString("\n");
+	}
+
+	if (this->qdf_mode)
 	{
 	    if (last_char != '\n')
 	    {
