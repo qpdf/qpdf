@@ -713,7 +713,7 @@ foreach my $d (
 }
 show_ntests();
 # ----------
-$td->notify("--- Split Pages ---"); # XXXX
+$td->notify("--- Split Pages ---");
 # sp = split-pages
 my @sp_cases = (
     [11, '%d at beginning', '', '%d_split-out.zdf'],
@@ -722,10 +722,22 @@ my @sp_cases = (
     [11, 'pdf extension', '', 'split-out.Pdf'],
     [4, 'fallback', '--pages 11-pages.pdf 1-3 minimal.pdf --', 'split-out'],
     );
-$n_tests += 1;
+$n_tests += 5;
 for (@sp_cases)
 {
     $n_tests += 1 + $_->[0];
+}
+
+$td->runtest("split page group > 1",
+             {$td->COMMAND => "qpdf --static-id --split-pages=5 11-pages.pdf" .
+                  " split-out-group.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+foreach my $f ('01-05', '06-10', '11-11')
+{
+    $td->runtest("checkout group $f",
+                 {$td->FILE => "split-out-group-$f.pdf"},
+                 {$td->FILE => "split-exp-group-$f.pdf"});
 }
 
 $td->runtest("no split-pages to stdout",

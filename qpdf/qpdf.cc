@@ -43,7 +43,7 @@ struct Options
         password(0),
         linearize(false),
         decrypt(false),
-        split_pages(false),
+        split_pages(0),
         copy_encryption(false),
         encryption_file(0),
         encryption_file_password(0),
@@ -98,7 +98,7 @@ struct Options
     char const* password;
     bool linearize;
     bool decrypt;
-    bool split_pages;
+    int split_pages;
     bool copy_encryption;
     char const* encryption_file;
     char const* encryption_file_password;
@@ -1338,7 +1338,8 @@ static void parse_options(int argc, char* argv[], Options& o)
             }
             else if (strcmp(arg, "split-pages") == 0)
             {
-                o.split_pages = true; // XXX
+                int n = ((parameter == 0) ? 1 : atoi(parameter));
+                o.split_pages = n;
             }
             else if (strcmp(arg, "deterministic-id") == 0)
             {
@@ -2007,16 +2008,28 @@ static void write_outfile(QPDF& pdf, Options& o)
 
         std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
         int pageno_len = QUtil::int_to_string(pages.size()).length();
-        int pageno = 0;
-        for (std::vector<QPDFObjectHandle>::const_iterator iter = pages.begin();
-             iter != pages.end(); ++iter)
+        unsigned int num_pages = pages.size();
+        for (unsigned int i = 0; i < num_pages; i += o.split_pages)
         {
-            QPDFObjectHandle page = *iter;
-            std::string outfile =
-                before + QUtil::int_to_string(++pageno, pageno_len) + after;
+            unsigned int first = i + 1;
+            unsigned int last = i + o.split_pages;
+            if (last > num_pages)
+            {
+                last = num_pages;
+            }
             QPDF outpdf;
             outpdf.emptyPDF();
-            outpdf.addPage(page, false);
+            for (unsigned int pageno = first; pageno <= last; ++pageno)
+            {
+                QPDFObjectHandle page = pages.at(pageno - 1);
+                outpdf.addPage(page, false);
+            }
+            std::string page_range = QUtil::int_to_string(first, pageno_len);
+            if (o.split_pages > 1)
+            {
+                page_range += "-" + QUtil::int_to_string(last, pageno_len);
+            }
+            std::string outfile = before + page_range + after;
             QPDFWriter w(outpdf, outfile.c_str());
             set_writer_options(outpdf, o, w);
             w.write();
