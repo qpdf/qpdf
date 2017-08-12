@@ -43,7 +43,7 @@ struct Options
         password(0),
         linearize(false),
         decrypt(false),
-        single_pages(false),
+        split_pages(false),
         copy_encryption(false),
         encryption_file(0),
         encryption_file_password(0),
@@ -98,7 +98,7 @@ struct Options
     char const* password;
     bool linearize;
     bool decrypt;
-    bool single_pages;
+    bool split_pages;
     bool copy_encryption;
     char const* encryption_file;
     char const* encryption_file_password;
@@ -206,7 +206,7 @@ Basic Options\n\
 --encrypt options --    generate an encrypted file\n\
 --decrypt               remove any encryption on the file\n\
 --pages options --      select specific pages from one or more files\n\
---single-pages          write each output page to a separate file\n\
+--split-pages=[n]       write each output page to a separate file\n\
 \n\
 If none of --copy-encryption, --encrypt or --decrypt are given, qpdf will\n\
 preserve any encryption data associated with a file.\n\
@@ -216,15 +216,17 @@ parameters will be copied, including both user and owner passwords, even\n\
 if the user password is used to open the other file.  This works even if\n\
 the owner password is not known.\n\
 \n\
-If --single-pages is specified, each page is written to a separate output\n\
+If --split-pages is specified, each page is written to a separate output\n\
 file. File names are generated as follows:\n\
 * If the string %d appears in the output file name, it is replaced with a\n\
-  zero-padded page number starting from 1\n\
+  zero-padded page range starting from 1\n\
 * Otherwise, if the output file name ends in .pdf (case insensitive), a\n\
-  zero-padded page number, preceded by a dash, is inserted before the file\n\
+  zero-padded page range, preceded by a dash, is inserted before the file\n\
   extension\n\
-* Otherwise, the file name is appended with a zero-padded page number\n\
+* Otherwise, the file name is appended with a zero-padded page range\n\
   preceded by a dash.\n\
+Page ranges are single page numbers for single-page groups or first-last\n\
+for multipage groups.\n\
 \n\
 \n\
 Encryption Options\n\
@@ -1334,9 +1336,9 @@ static void parse_options(int argc, char* argv[], Options& o)
                 }
                 o.force_version = parameter;
             }
-            else if (strcmp(arg, "single-pages") == 0)
+            else if (strcmp(arg, "split-pages") == 0)
             {
-                o.single_pages = true;
+                o.split_pages = true; // XXX
             }
             else if (strcmp(arg, "deterministic-id") == 0)
             {
@@ -1451,9 +1453,9 @@ static void parse_options(int argc, char* argv[], Options& o)
     }
 
     if (o.require_outfile && (strcmp(o.outfilename, "-") == 0) &&
-        o.single_pages)
+        o.split_pages)
     {
-        usage("--single-pages may not be used when writing to standard output");
+        usage("--split-pages may not be used when writing to standard output");
     }
 
     if (QUtil::same_file(o.infilename, o.outfilename))
@@ -1977,7 +1979,7 @@ static void set_writer_options(QPDF& pdf, Options& o, QPDFWriter& w)
 
 static void write_outfile(QPDF& pdf, Options& o)
 {
-    if (o.single_pages)
+    if (o.split_pages)
     {
         // Generate output file pattern
         std::string before;
@@ -1986,20 +1988,20 @@ static void write_outfile(QPDF& pdf, Options& o)
         char* num_spot = strstr(const_cast<char*>(o.outfilename), "%d");
         if (num_spot != 0)
         {
-            QTC::TC("qpdf", "qpdf single-pages %d");
+            QTC::TC("qpdf", "qpdf split-pages %d");
             before = std::string(o.outfilename, (num_spot - o.outfilename));
             after = num_spot + 2;
         }
         else if ((len >= 4) &&
                  (QUtil::strcasecmp(o.outfilename + len - 4, ".pdf") == 0))
         {
-            QTC::TC("qpdf", "qpdf single-pages .pdf");
+            QTC::TC("qpdf", "qpdf split-pages .pdf");
             before = std::string(o.outfilename, len - 4) + "-";
             after = o.outfilename + len - 4;
         }
         else
         {
-            QTC::TC("qpdf", "qpdf single-pages other");
+            QTC::TC("qpdf", "qpdf split-pages other");
             before = std::string(o.outfilename) + "-";
         }
 

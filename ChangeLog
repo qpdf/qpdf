@@ -1,3 +1,8 @@
+2017-08-12  Jay Berkenbilt  <ejb@ql.org>
+
+	* Change --single-pages to --split-pages and make it take an
+	optional argument specifying the number of pages per file.
+
 2017-08-11  Jay Berkenbilt  <ejb@ql.org>
 
 	* Fix --newline-before-endstream to always add a newline before

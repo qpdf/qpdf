@@ -285,9 +285,9 @@ QPDF stream with non-space 0
 qpdf same file error 0
 qpdf read args from stdin 0
 qpdf read args from file 0
-qpdf single-pages %d 0
-qpdf single-pages .pdf 0
-qpdf single-pages other 0
+qpdf split-pages %d 0
+qpdf split-pages .pdf 0
+qpdf split-pages other 0
 QPDFTokenizer allowing bad token 0
 QPDF ignore first space in xref entry 0
 QPDF ignore first extra space in xref entry 0
