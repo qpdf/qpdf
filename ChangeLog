@@ -1,5 +1,8 @@
 2017-08-12  Jay Berkenbilt  <ejb@ql.org>
 
+	* Provide --verbose option that causes qpdf to print an indication
+	of what files it is writing.
+
 	* Change --single-pages to --split-pages and make it take an
 	optional argument specifying the number of pages per file.
 

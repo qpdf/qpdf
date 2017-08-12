@@ -285,6 +285,15 @@ make
       </listitem>
      </varlistentry>
      <varlistentry>
+      <term><option>--verbose</option></term>
+      <listitem>
+       <para>
+        Increase verbosity of output. For now, this just prints some
+        indication of any file that it creates.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
       <term><option>--linearize</option></term>
       <listitem>
        <para>

@@ -325,8 +325,8 @@ $td->runtest("check obj0.pdf",
 
 # Min/Force version
 $td->runtest("set min version",
-	     {$td->COMMAND => "qpdf --min-version=1.6 good1.pdf a.pdf"},
-	     {$td->STRING => "",
+	     {$td->COMMAND => "qpdf --verbose --min-version=1.6 good1.pdf a.pdf"},
+	     {$td->STRING => "qpdf: wrote file a.pdf\n",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("check version",
@@ -730,8 +730,8 @@ for (@sp_cases)
 
 $td->runtest("split page group > 1",
              {$td->COMMAND => "qpdf --static-id --split-pages=5 11-pages.pdf" .
-                  " split-out-group.pdf"},
-             {$td->STRING => "", $td->EXIT_STATUS => 0},
+                  " --verbose split-out-group.pdf"},
+             {$td->FILE => "split-pages-group.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 foreach my $f ('01-05', '06-10', '11-11')
 {

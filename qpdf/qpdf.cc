@@ -44,6 +44,7 @@ struct Options
         linearize(false),
         decrypt(false),
         split_pages(0),
+        verbose(false),
         copy_encryption(false),
         encryption_file(0),
         encryption_file_password(0),
@@ -99,6 +100,7 @@ struct Options
     bool linearize;
     bool decrypt;
     int split_pages;
+    bool  verbose;
     bool copy_encryption;
     char const* encryption_file;
     char const* encryption_file_password;
@@ -198,6 +200,7 @@ Basic Options\n\
 -------------\n\
 \n\
 --password=password     specify a password for accessing encrypted files\n\
+--verbose               provide additional informational output\n\
 --linearize             generated a linearized (web optimized) file\n\
 --copy-encryption=file  copy encryption parameters from specified file\n\
 --encryption-file-password=password\n\
@@ -1341,6 +1344,10 @@ static void parse_options(int argc, char* argv[], Options& o)
                 int n = ((parameter == 0) ? 1 : atoi(parameter));
                 o.split_pages = n;
             }
+            else if (strcmp(arg, "verbose") == 0)
+            {
+                o.verbose = true;
+            }
             else if (strcmp(arg, "deterministic-id") == 0)
             {
                 o.deterministic_id = true;
@@ -2033,6 +2040,10 @@ static void write_outfile(QPDF& pdf, Options& o)
             QPDFWriter w(outpdf, outfile.c_str());
             set_writer_options(outpdf, o, w);
             w.write();
+            if (o.verbose)
+            {
+                std::cout << whoami << ": wrote file " << outfile << std::endl;
+            }
         }
     }
     else
@@ -2044,6 +2055,11 @@ static void write_outfile(QPDF& pdf, Options& o)
         QPDFWriter w(pdf, o.outfilename);
         set_writer_options(pdf, o, w);
         w.write();
+        if (o.verbose && o.outfilename)
+        {
+            std::cout << whoami << ": wrote file "
+                      << o.outfilename << std::endl;
+        }
     }
 }
 
