@@ -683,6 +683,12 @@ show_ntests();
 # ----------
 $td->notify("--- Newline before endstream ---");
 $n_tests += 8;
+
+# From issue 133, http://verapdf.org/software/ is an open source
+# package that can verify PDF/A compliance. This could potentially be
+# useful for manual or automated verification that qpdf doesn't break
+# PDF/A compliance should that ever be desired.
+
 foreach my $d (
     ['--qdf', 'qdf', 'qdf'],
     ['--newline-before-endstream', 'newline', 'nl'],
