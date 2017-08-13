@@ -141,12 +141,6 @@
 	* CVE-2017-9210: Fix infinite loop caused by attempting to unparse
 	an object for inclusion in the text of an exception.
 
-2016-09-10  Jay Berkenbilt  <ejb@ql.org>
-
-	* Include pdf-rotate.cc example in contrib. Thanks Iskander
-	Sharipov <Iskander.Sharipov@tatar.ru> for contributing this
-	program.
-
 2015-11-10  Jay Berkenbilt  <ejb@ql.org>
 
 	* 6.0.0: release

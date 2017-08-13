@@ -159,9 +159,7 @@ exercises most of the public interface.  There are additional example
 programs in the examples directory.  Reading all the source files in
 the qpdf directory (including the qpdf command-line tool and some test
 drivers) along with the code in the examples directory will give you a
-complete picture of every aspect of the public interface. You may also
-check programs in the contrib directory. These are not part of QPDF
-but have been contributed by other developers.
+complete picture of every aspect of the public interface.
 
 
 Additional Notes on Test Suite
