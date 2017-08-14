@@ -1,11 +1,11 @@
 Before next release
 ===================
 
-ABI compatibility has most likely been broken. Retest and bump major
-version if needed.
+ * The ABI has changed. Bump soname.
 
-Remember to upload new versions of external-libs and to remove pcre
-and insert jpeg in the debian packaging.
+ * Upload new versions of external-libs.
+
+ * Remove pcre and insert jpeg in debian packaging.
 
 Soon
 ====
