@@ -55,9 +55,6 @@ General
    supported for the toolchains that support the install target
    (libtool).
 
- * Implement automated testing for binary compatibility and add to
-   release checklist.
-
  * Figure out how to find Visual Studio in Windows registry and see if
    I can get it to work with make so I can simplify creation of
    Windows releases.
