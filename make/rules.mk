@@ -47,3 +47,18 @@ depflags=-MD -MF $(1).dep -MP
 else
 depflags=
 endif
+
+# Usage: $(call run_qtest,dir)
+define run_qtest
+	@echo running qtest-driver for $(1)
+	@(cd $(1)/$(OUTPUT_DIR); \
+         if TC_SRCS="$(foreach T,$(TC_SRCS_$(1)),../../$(T))" \
+	 $(QTEST) -bindirs .:.. -datadir ../qtest -covdir ..; then \
+	    true; \
+	 else \
+	    if test "$(SHOW_FAILED_TEST_OUTPUT)" = "1"; then \
+	       cat -v qtest.log; \
+	    fi; \
+	    false; \
+	 fi)
+endef

@@ -79,7 +79,7 @@ TEST_TARGETS = $(foreach B,$(TEST_ITEMS),check_$(B))
 
 CLEAN_TARGETS = $(foreach B,$(BUILD_ITEMS),clean_$(B))
 
-# For test suitse
+# For test suites
 export QPDF_BIN = $(abspath qpdf/$(OUTPUT_DIR)/qpdf)
 export QPDF_SKIP_TEST_COMPARE_IMAGES
 export QPDF_LARGE_FILE_TEST_PATH
@@ -128,14 +128,4 @@ check: $(TEST_TARGETS)
 
 QTEST=$(abspath qtest/bin/qtest-driver)
 $(TEST_TARGETS):
-	@echo running qtest-driver for $(subst check_,,$@)
-	@(cd $(subst check_,,$@)/$(OUTPUT_DIR); \
-         if TC_SRCS="$(foreach T,$(TC_SRCS_$(subst check_,,$@)),../../$(T))" \
-	 $(QTEST) -bindirs .:.. -datadir ../qtest -covdir ..; then \
-	    true; \
-	 else \
-	    if test "$(SHOW_FAILED_TEST_OUTPUT)" = "1"; then \
-	       cat -v qtest.log; \
-	    fi; \
-	    false; \
-	 fi)
+	$(call run_qtest,$(subst check_,,$@))
