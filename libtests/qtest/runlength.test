@@ -1,0 +1,75 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+chdir("runlength") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('runlength');
+
+cleanup();
+
+my @files = (
+    "01",                       # basic case, ends with copy
+    "02",                       # basic case, ends with run
+    "03",                       # long run run
+    "04",                       # ends with copy, length % 128 == 0
+    "05",                       # run starts at byte 128
+    "empty",                    # empty file
+    );
+
+# Create this rather than committing an empty file, which always looks
+# like an error.
+open(F, ">empty");
+close(F);
+
+foreach my $f (@files)
+{
+    $td->runtest("encode $f",
+                 {$td->COMMAND => "runlength -encode $f a"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0});
+    $td->runtest("check encoded output",
+                 {$td->FILE => "a"},
+                 {$td->FILE => "$f.encoded"});
+    $td->runtest("decode $f.encoded",
+                 {$td->COMMAND => "runlength -decode $f.encoded a"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0});
+    $td->runtest("check decoded output",
+                 {$td->FILE => "a"},
+                 {$td->FILE => "$f"});
+}
+
+concatenate("01.encoded", "02.encoded", "concat.encoded");
+concatenate("01", "02", "concat");
+
+$td->runtest("decode with embedded EOD",
+             {$td->COMMAND => "runlength -decode concat.encoded a"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check decoded output",
+             {$td->FILE => "a"},
+             {$td->FILE => "concat"});
+
+cleanup();
+
+$td->report(2 + (4 * scalar(@files)));
+
+sub cleanup
+{
+    system("rm -f a concat concat.encoded empty");
+}
+
+sub concatenate
+{
+    my ($a, $b, $out) = @_;
+    open(F, ">$out");
+    foreach my $f ($a, $b)
+    {
+        local $/ = undef;
+        open(G, "<$f");
+        print F <G>;
+        close(G);
+    }
+    close(F);
+}

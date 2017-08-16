@@ -14,6 +14,7 @@ BINS_libtests = \
 	qutil \
 	random \
 	rc4 \
+	runlength \
 	sha2
 
 TARGETS_libtests = $(foreach B,$(BINS_libtests),libtests/$(OUTPUT_DIR)/$(call binname,$(B)))

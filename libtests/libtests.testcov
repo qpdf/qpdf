@@ -24,3 +24,6 @@ InputSource start_chars matched but not check 0
 InputSource not enough bytes 0
 InputSource findLast found more than one 0
 InputSource found match at buf[0] 0
+Pl_RunLength: switch to run 1
+Pl_RunLength flush full buffer 1
+Pl_RunLength flush empty buffer 0

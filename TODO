@@ -33,9 +33,9 @@ Soon
    prioritized so that we can poll all registered filters to see
    whether they are capable of filtering a particular stream.
 
- * If possible, consider adding RLE, CCITT3, CCITT4, or any other easy
-   filters.  For some reference code that we probably can't use but
-   may be handy anyway, see
+ * If possible, consider adding CCITT3, CCITT4, or any other easy
+   filters. For some reference code that we probably can't use but may
+   be handy anyway, see
    http://partners.adobe.com/public/developer/ps/sdk/index_archive.html
 
  * If possible, support the following types of broken files:
