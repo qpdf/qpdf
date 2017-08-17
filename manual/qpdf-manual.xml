@@ -93,12 +93,20 @@
   <sect1 id="ref.prerequisites">
    <title>System Requirements</title>
    <para>
-    The qpdf package has only one external dependencies.  In
-    order to build qpdf, the following packages are required:
+    The qpdf package has few external dependencies. In order to build
+    qpdf, the following packages are required:
     <itemizedlist>
      <listitem>
       <para>
        zlib: <ulink url="http://www.zlib.net/">http://www.zlib.net/</ulink>
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       jpeg: <ulink
+       url="http://www.ijg.org/files/">http://www.ijg.org/files/</ulink>
+       or <ulink
+       url="https://libjpeg-turbo.org/">https://libjpeg-turbo.org/</ulink>
       </para>
      </listitem>
      <listitem>
@@ -1509,7 +1517,7 @@ outfile.pdf</option>
    </para>
    <para>
     When linking against the qpdf static library, you may also need to
-    specify <literal>-lz</literal> on your link command.  If
+    specify <literal>-lz -ljpeg</literal> on your link command. If
     your system understands how to read libtool
     <filename>.la</filename> files, this may not be necessary.
    </para>

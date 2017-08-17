@@ -102,6 +102,8 @@ fi
 if test "$BUILD_INTERNAL_LIBS" = "0"; then
    AC_CHECK_HEADER(zlib.h,,[MISSING_ZLIB_H=1; MISSING_ANY=1])
    AC_SEARCH_LIBS(deflate,z zlib,,[MISSING_ZLIB=1; MISSING_ANY=1])
+   AC_CHECK_HEADER(jpeglib.h,,[MISSING_JPEG_H=1; MISSING_ANY=1])
+   AC_SEARCH_LIBS(jpeg_destroy,jpeg,,[MISSING_JPEG=1; MISSING_ANY=1])
 fi
 
 if test "x$qpdf_OS_SECURE_RANDOM" = "x1"; then
@@ -471,6 +473,14 @@ if test "$MISSING_ZLIB" = "1"; then
   AC_MSG_WARN(unable to find required library z (or zlib))
 fi
 
+if test "$MISSING_JPEG_H" = "1"; then
+  AC_MSG_WARN(unable to find required header jpeglib.h)
+fi
+
+if test "$MISSING_JPEG" = "1"; then
+  AC_MSG_WARN(unable to find required library jpeg)
+fi
+
 if test "$MISSING_DOCBOOK_FO" = "1"; then
   AC_MSG_WARN(docbook fo stylesheets are required to build PDF documentation)
 fi
@@ -507,7 +517,7 @@ if test "$USE_EXTERNAL_LIBS" = "1"; then
    # much trouble getting it to work with a different compiler.
    CPPFLAGS="$CPPFLAGS -Iexternal-libs/include"
    LDFLAGS="$LDFLAGS -Lexternal-libs/lib-$BUILDRULES$WINDOWS_WORDSIZE"
-   LIBS="$LIBS -lz"
+   LIBS="$LIBS -lz -ljpeg"
 fi
 
 AC_OUTPUT

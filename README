@@ -13,11 +13,11 @@ warranty.
 Prerequisites
 =============
 
-QPDF depends on the external library "zlib". This are part of every
-Linux distribution and is readily available. Download information
-appears in the documentation. For Windows, you can download pre-built
-binary versions of this libraries for some compilers; see
-README-windows.txt for additional details.
+QPDF depends on the external libraries "zlib" and "jpeg". These are
+part of every Linux distribution and are readily available. Download
+information appears in the documentation. For Windows, you can
+download pre-built binary versions of these libraries for some
+compilers; see README-windows.txt for additional details.
 
 QPDF requires a C++ compiler that works with STL.  Your compiler must
 also support "long long".  Almost all modern compilers do.  If you are
@@ -34,9 +34,10 @@ you had an otherwise working qpdf.
 Licensing terms of embedded software
 ====================================
 
-QPDF makes use of zlib for its functionality. This package can be
-downloaded separately from its own download location, or it can be
-downloaded in the external-libs area of the qpdf download site.
+QPDF makes use of zlib and jpeg libraries for its functionality. These
+packages can be downloaded separately from their own download
+locations, or they can be downloaded in the external-libs area of the
+qpdf download site.
 
 The Rijndael encryption implementation used as the basis for AES
 encryption and decryption support comes from Philip J. Erdelsky's
@@ -147,10 +148,13 @@ sources to the user's manual can be found in the "manual" directory.
 
 The software library is just libqpdf, and all the header files are in
 the qpdf subdirectory. If you link statically with -lqpdf, then you
-will also need to link with -lz. The shared qpdf library is linked
-with -lz, and none of qpdf's public header files directly include
-files from libz, so in many cases, qpdf's development files are self
-contained.
+will also need to link with -lz and -ljpeg. The shared qpdf library is
+linked with -lz and -ljpeg, none of qpdf's public header files
+directly include files from libz, and only Pl_DCT.hh includes files
+from libjpeg, so for most cases, qpdf's development files are self
+contained. If you need to use Pl_DCT in your application code, you
+will need to have the header files for some libjpeg distribution in
+your include path.
 
 To learn about using the library, please read comments in the header
 files in include/qpdf, especially QPDF.hh, QPDFObjectHandle.hh, and

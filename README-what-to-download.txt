@@ -47,7 +47,10 @@ download.
 
    If you want to build the external libraries on your own (for
    Windows or anything else), you can download this archive. In
-   addition to including an unmodified distribution zlib, it includes
-   a README file and some scripts to help you build it for Windows.
+   addition to including an unmodified distribution zlib and the jpeg
+   libary, it includes a README file and some scripts to help you
+   build it for Windows. qpdf was built using a binary distribution of
+   libjpeg-turbo for Windows. You will also have to provide those. See
+   README-windows.txt for details.
 
 If you want to build on Windows, please see also README-windows.txt.
