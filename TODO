@@ -5,7 +5,7 @@ ABI compatibility has most likely been broken. Retest and bump major
 version if needed.
 
 Remember to upload new versions of external-libs and to remove pcre
-from the debian packaging.
+and insert jpeg in the debian packaging.
 
 Soon
 ====
