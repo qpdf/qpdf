@@ -1,0 +1,66 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+chdir("dct") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+# This test suite does light verification of DCT by running some data
+# through a round trip with one encoding system. The
+# examples/pdf-create program also exercises DCT but does so more
+# fully.
+
+my $td = new TestDriver('dct');
+
+cleanup();
+
+$td->runtest("compress",
+             {$td->COMMAND => "dct_compress rawdata a.jpg 400 256 gray"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("decompress",
+             {$td->COMMAND => "dct_uncompress a.jpg out"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+# Compare
+my @raw = get_data('rawdata');
+my @processed = get_data('out');
+my $checked_data = 0;
+if ($td->runtest("bytes in data",
+                 {$td->STRING => scalar(@processed)},
+                 {$td->STRING => scalar(@raw)}))
+{
+    my $mismatch = 0;
+    for (my $i = 0; $i < scalar(@raw); ++$i)
+    {
+        $checked_data = 1;
+        my $delta = abs(ord($raw[$i]) - ord($processed[$i]));
+        if ($delta > 10)
+        {
+            ++$mismatch;
+        }
+    }
+    $td->runtest("data is close enough",
+                 {$td->STRING => $mismatch},
+                 {$td->STRING => '0'});
+}
+
+cleanup();
+
+$td->report(3 + $checked_data);
+
+sub cleanup
+{
+    system("rm -f a.jpg out");
+}
+
+sub get_data
+{
+    my $file = shift;
+    local $/ = undef;
+    open(F, "<$file") || die;
+    binmode(F);
+    my $data = <F>;
+    close(F);
+    split('', $data);
+}

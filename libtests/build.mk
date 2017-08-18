@@ -4,6 +4,8 @@ BINS_libtests = \
 	bits \
 	buffer \
 	concatenate \
+	dct_compress \
+	dct_uncompress \
 	flate \
 	hex \
 	input_source \
