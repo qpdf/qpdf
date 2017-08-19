@@ -87,7 +87,6 @@ struct Options
         object_stream_mode(qpdf_o_preserve),
         ignore_xref_streams(false),
         qdf_mode(false),
-        precheck_streams(false),
         preserve_unreferenced_objects(false),
         newline_before_endstream(false),
         show_npages(false),
@@ -149,7 +148,6 @@ struct Options
     qpdf_object_stream_e object_stream_mode;
     bool ignore_xref_streams;
     bool qdf_mode;
-    bool precheck_streams;
     bool preserve_unreferenced_objects;
     bool newline_before_endstream;
     std::string min_version;
@@ -371,7 +369,6 @@ familiar with the PDF file format or who are PDF developers.\n\
 --suppress-recovery       prevents qpdf from attempting to recover damaged files\n\
 --object-streams=mode     controls handing of object streams\n\
 --ignore-xref-streams     tells qpdf to ignore any cross-reference streams\n\
---precheck-streams        precheck ability to decode streams\n\
 --preserve-unreferenced   preserve unreferenced objects\n\
 --newline-before-endstream  always put a newline before endstream\n\
 --qdf                     turns on \"QDF mode\" (below)\n\
@@ -1467,10 +1464,6 @@ static void parse_options(int argc, char* argv[], Options& o)
             {
                 o.qdf_mode = true;
             }
-            else if (strcmp(arg, "precheck-streams") == 0)
-            {
-                o.precheck_streams = true;
-            }
             else if (strcmp(arg, "preserve-unreferenced") == 0)
             {
                 o.preserve_unreferenced_objects = true;
@@ -2093,10 +2086,6 @@ static void set_writer_options(QPDF& pdf, Options& o, QPDFWriter& w)
     if (o.qdf_mode)
     {
         w.setQDFMode(true);
-    }
-    if (o.precheck_streams)
-    {
-        w.setPrecheckStreams(true);
     }
     if (o.preserve_unreferenced_objects)
     {

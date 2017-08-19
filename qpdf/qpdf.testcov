@@ -277,7 +277,6 @@ QPDFObjectHandle treat word as string 0
 QPDFObjectHandle found fake 1
 QPDFObjectHandle no val for last key 0
 QPDF resolve failure to null 0
-QPDFWriter precheck stream 0
 QPDFWriter preserve unreferenced standard 0
 QPDFObjectHandle non-stream in parsecontent 0
 QPDFObjectHandle errors in parsecontent 0

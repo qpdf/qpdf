@@ -997,23 +997,6 @@ outfile.pdf</option>
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term><option>--precheck-streams</option></term>
-      <listitem>
-       <para>
-        Tells qpdf to precheck each stream for the ability to decode
-        it. Ordinarily qpdf tries to decode streams that it thinks it
-        can decode based on the filters, and if there ends up being an
-        error when actually trying to do the decode, the stream data
-        is truncated. This flag causes qpdf to actually read the
-        stream fully before deciding whether to filter the stream.
-        This option will slow qpdf down since it will have to read the
-        stream twice, but it allows raw stream data to be preserved in
-        cases where the decoding of the stream would fail for some
-        reason. This may be useful in working with some damaged files.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
       <term><option>--preserve-unreferenced</option></term>
       <listitem>
        <para>

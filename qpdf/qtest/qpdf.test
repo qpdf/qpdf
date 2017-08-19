@@ -918,27 +918,20 @@ $td->runtest("check output",
 show_ntests();
 # ----------
 $td->notify("--- Precheck streams ---");
-$n_tests += 4;
+$n_tests += 2;
 
-$td->runtest("bad stream without precheck",
+$td->runtest("bad stream",
 	     {$td->COMMAND => "qpdf --static-id bad-data.pdf a.pdf"},
 	     {$td->FILE => "bad-data.out", $td->EXIT_STATUS => 3},
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
 	     {$td->FILE => "a.pdf"},
 	     {$td->FILE => "bad-data-out.pdf"});
-$td->runtest("bad stream with precheck",
-	     {$td->COMMAND =>
-                  "qpdf --static-id --precheck-streams bad-data.pdf a.pdf"},
-	     {$td->STRING => "", $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-$td->runtest("check output",
-	     {$td->FILE => "a.pdf"},
-	     {$td->FILE => "bad-data-precheck.pdf"});
+
 show_ntests();
 # ----------
 $td->notify("--- Decode levels ---");
-$n_tests += 10;
+$n_tests += 12;
 
 # image-streams.pdf is the output of examples/pdf-create.
 # examples/pdf-create validates the actual image data.
@@ -962,6 +955,14 @@ $td->runtest("check finds bad jpeg data",
              {$td->FILE => "bad-jpeg-check.out",
               $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
+$td->runtest("precheck detects bad jpeg data",
+             {$td->COMMAND => "qpdf --static-id --decode-level=all" .
+                  " bad-jpeg.pdf a.pdf"},
+             {$td->FILE => "bad-jpeg.out", $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check file",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "bad-jpeg-out.pdf"});
 $td->runtest("get data",
              {$td->COMMAND => "qpdf --show-object=6" .
                   " --filtered-stream-data bad-jpeg.pdf"},

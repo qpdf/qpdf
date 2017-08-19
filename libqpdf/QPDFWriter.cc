@@ -59,7 +59,6 @@ QPDFWriter::init()
     stream_decode_level = qpdf_dl_none;
     stream_decode_level_set = false;
     qdf_mode = false;
-    precheck_streams = false;
     preserve_unreferenced_objects = false;
     newline_before_endstream = false;
     static_id = false;
@@ -213,12 +212,6 @@ void
 QPDFWriter::setQDFMode(bool val)
 {
     this->qdf_mode = val;
-}
-
-void
-QPDFWriter::setPrecheckStreams(bool val)
-{
-    this->precheck_streams = val;
 }
 
 void
@@ -1590,34 +1583,32 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 
 	flags |= f_stream;
 
-        if (filter && this->precheck_streams)
+        PointerHolder<Buffer> stream_data;
+        bool filtered = false;
+        for (int attempt = 1; attempt <= 2; ++attempt)
         {
-            try
+            pushPipeline(new Pl_Buffer("stream data"));
+            activatePipelineStack();
+
+            filtered =
+                object.pipeStreamData(
+                    this->pipeline,
+                    (((filter && normalize) ? qpdf_ef_normalize : 0) |
+                     ((filter && compress) ? qpdf_ef_compress : 0)),
+                    (filter
+                     ? (uncompress ? qpdf_dl_all : this->stream_decode_level)
+                     : qpdf_dl_none));
+            popPipelineStack(&stream_data);
+            if (filter && (! filtered))
             {
-                QTC::TC("qpdf", "QPDFWriter precheck stream");
-                Pl_Discard discard;
-                filter = object.pipeStreamData(
-                    &discard, 0, qpdf_dl_all, true);
-            }
-            catch (std::exception&)
-            {
+                // Try again
                 filter = false;
             }
+            else
+            {
+                break;
+            }
         }
-
-	pushPipeline(new Pl_Buffer("stream data"));
-	activatePipelineStack();
-
-	bool filtered =
-	    object.pipeStreamData(
-                this->pipeline,
-                (((filter && normalize) ? qpdf_ef_normalize : 0) |
-                 ((filter && compress) ? qpdf_ef_compress : 0)),
-                (filter
-                 ? (uncompress ? qpdf_dl_all : this->stream_decode_level)
-                 : qpdf_dl_none));
-	PointerHolder<Buffer> stream_data;
-	popPipelineStack(&stream_data);
 	if (filtered)
 	{
 	    flags |= f_filtered;
