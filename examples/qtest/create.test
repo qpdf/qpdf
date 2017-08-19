@@ -13,15 +13,12 @@ my $td = new TestDriver('create');
 
 $td->runtest("create a simple PDF",
 	     {$td->COMMAND => "pdf-create a.pdf"},
-	     {$td->STRING => "", $td->EXIT_STATUS => 0});
-
-$td->runtest("check",
-	     {$td->FILE => "a.pdf"},
-	     {$td->FILE => "orange-square.pdf"});
+	     {$td->FILE => "create.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 cleanup();
 
-$td->report(2);
+$td->report(1);
 
 sub cleanup
 {
