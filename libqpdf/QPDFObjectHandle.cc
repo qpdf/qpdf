@@ -482,10 +482,10 @@ QPDFObjectHandle::replaceDict(QPDFObjectHandle new_dict)
 }
 
 PointerHolder<Buffer>
-QPDFObjectHandle::getStreamData()
+QPDFObjectHandle::getStreamData(qpdf_stream_decode_level_e level)
 {
     assertStream();
-    return dynamic_cast<QPDF_Stream*>(obj.getPointer())->getStreamData();
+    return dynamic_cast<QPDF_Stream*>(obj.getPointer())->getStreamData(level);
 }
 
 PointerHolder<Buffer>
@@ -496,13 +496,35 @@ QPDFObjectHandle::getRawStreamData()
 }
 
 bool
-QPDFObjectHandle::pipeStreamData(Pipeline* p, bool filter,
-				 bool normalize, bool compress,
+QPDFObjectHandle::pipeStreamData(Pipeline* p,
+                                 unsigned long encode_flags,
+                                 qpdf_stream_decode_level_e decode_level,
                                  bool suppress_warnings)
 {
     assertStream();
     return dynamic_cast<QPDF_Stream*>(obj.getPointer())->pipeStreamData(
-	p, filter, normalize, compress, suppress_warnings);
+	p, encode_flags, decode_level, suppress_warnings);
+}
+
+bool
+QPDFObjectHandle::pipeStreamData(Pipeline* p, bool filter,
+				 bool normalize, bool compress)
+{
+    unsigned long encode_flags = 0;
+    qpdf_stream_decode_level_e decode_level = qpdf_dl_none;
+    if (filter)
+    {
+        decode_level = qpdf_dl_generalized;
+        if (normalize)
+        {
+            encode_flags |= qpdf_ef_normalize;
+        }
+        if (compress)
+        {
+            encode_flags |= qpdf_ef_compress;
+        }
+    }
+    return pipeStreamData(p, encode_flags, decode_level, false);
 }
 
 void
@@ -825,7 +847,7 @@ QPDFObjectHandle::parseContentStream(QPDFObjectHandle stream_or_array,
                 all_description += ",";
             }
             all_description += " " + og;
-            if (! stream.pipeStreamData(&buf, true, false, false, false))
+            if (! stream.pipeStreamData(&buf, 0, qpdf_dl_specialized))
             {
                 QTC::TC("qpdf", "QPDFObjectHandle errors in parsecontent");
                 warn(stream.getOwningQPDF(),

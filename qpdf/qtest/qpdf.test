@@ -937,6 +937,39 @@ $td->runtest("check output",
 	     {$td->FILE => "bad-data-precheck.pdf"});
 show_ntests();
 # ----------
+$td->notify("--- Decode levels ---");
+$n_tests += 10;
+
+# image-streams.pdf is the output of examples/pdf-create.
+# examples/pdf-create validates the actual image data.
+foreach my $l (qw(none generalized specialized all))
+{
+    $td->runtest("image-streams: $l",
+                 {$td->COMMAND =>
+                      "qpdf image-streams.pdf --compress-streams=n" .
+                      " --decode-level=$l a.pdf"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("check image-streams: $l",
+                 {$td->COMMAND => "test_driver 39 a.pdf"},
+                 {$td->FILE => "image-streams-$l.out", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+# Bad JPEG data
+$td->runtest("check finds bad jpeg data",
+             {$td->COMMAND => "qpdf --check bad-jpeg.pdf"},
+             {$td->FILE => "bad-jpeg-check.out",
+              $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("get data",
+             {$td->COMMAND => "qpdf --show-object=6" .
+                  " --filtered-stream-data bad-jpeg.pdf"},
+             {$td->FILE => "bad-jpeg-show.out", $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+
+show_ntests();
+# ----------
 $td->notify("--- Preserve unreferenced objects ---");
 $n_tests += 4;
 
@@ -1429,8 +1462,8 @@ $td->runtest("show-page-1-image",
 	      $td->EXIT_STATUS => 0});
 
 $td->runtest("unfilterable stream data",
-	     {$td->COMMAND => "qpdf encrypted-with-images.pdf" .
-		  " --show-object=8 --filtered-stream-data"},
+	     {$td->COMMAND => "qpdf unfilterable.pdf" .
+		  " --show-object=4 --filtered-stream-data"},
 	     {$td->FILE => "show-unfilterable.out",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
@@ -1461,7 +1494,7 @@ foreach my $f (qw(compressed-metadata.pdf enc-base.pdf))
 {
     foreach my $w (qw(compress preserve))
     {
-	$td->runtest("$w streams",
+	$td->runtest("$w streams ($f)",
 		     {$td->COMMAND => "qpdf --stream-data=$w $f a.pdf"},
 		     {$td->STRING => "", $td->EXIT_STATUS => 0});
 	check_metadata("a.pdf", 0, 1);

@@ -10,6 +10,7 @@
 
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
+#include <qpdf/Constants.h>
 
 #include <string>
 #include <vector>
@@ -44,19 +45,19 @@ class QPDFObjectHandle
 	virtual ~StreamDataProvider()
 	{
 	}
-	// The implementation of this function must write the
-	// unencrypted, raw stream data to the given pipeline.  Every
-	// call to provideStreamData for a given stream must write the
-	// same data.  The number of bytes written must agree with the
-	// length provided at the time the StreamDataProvider object
-	// was associated with the stream.  The object ID and
-	// generation passed to this method are those that belong to
-	// the stream on behalf of which the provider is called.  They
-	// may be ignored or used by the implementation for indexing
-	// or other purposes.  This information is made available just
-	// to make it more convenient to use a single
-	// StreamDataProvider object to provide data for multiple
-	// streams.
+	// The implementation of this function must write stream data
+	// to the given pipeline. The stream data must conform to
+	// whatever filters are explicitly associated with the stream.
+	// QPDFWriter may, in some cases, add compression, but if it
+	// does, it will update the filters as needed. Every call to
+	// provideStreamData for a given stream must write the same
+	// data.The object ID and generation passed to this method are
+	// those that belong to the stream on behalf of which the
+	// provider is called. They may be ignored or used by the
+	// implementation for indexing or other purposes. This
+	// information is made available just to make it more
+	// convenient to use a single StreamDataProvider object to
+	// provide data for multiple streams.
 	virtual void provideStreamData(int objid, int generation,
 				       Pipeline* pipeline) = 0;
     };
@@ -370,32 +371,71 @@ class QPDFObjectHandle
     // Returns filtered (uncompressed) stream data.  Throws an
     // exception if the stream is filtered and we can't decode it.
     QPDF_DLL
-    PointerHolder<Buffer> getStreamData();
+    PointerHolder<Buffer> getStreamData(
+        qpdf_stream_decode_level_e level = qpdf_dl_generalized);
+
     // Returns unfiltered (raw) stream data.
     QPDF_DLL
     PointerHolder<Buffer> getRawStreamData();
 
-    // Write stream data through the given pipeline.  A null pipeline
+    // Write stream data through the given pipeline. A null pipeline
     // value may be used if all you want to do is determine whether a
-    // stream is filterable.  If filter is false, write raw stream
-    // data and return false.  If filter is true, then attempt to
-    // apply all the decoding filters to the stream data.  If we are
-    // successful, return true.  Otherwise, return false and write raw
-    // data.  If filtering is requested and successfully performed,
-    // then the normalize and compress flags are used to determine
-    // whether stream data should be normalized and compressed.  In
-    // all cases, if this function returns false, raw data has been
-    // written.  If it returns true, then any requested filtering has
-    // been performed.  Note that if the original stream data has no
-    // filters applied to it, the return value will be equal to the
-    // value of the filter parameter.  Callers may use the return
-    // value of this function to determine whether or not the /Filter
-    // and /DecodeParms keys in the stream dictionary should be
-    // replaced if writing a new stream object.
+    // stream is filterable and would be filtered based on the
+    // provided flags. If flags is 0, write raw stream data and return
+    // false. Otherwise, the flags alter the behavior in the following
+    // way:
+    //
+    // encode_flags:
+    //
+    // qpdf_sf_compress -- compress data with /FlateDecode if no other
+    // compression filters are applied.
+    //
+    // qpdf_sf_normalize -- tokenize as content stream and normalize tokens
+    //
+    // decode_level:
+    //
+    // qpdf_dl_none -- do not decode any streams.
+    //
+    // qpdf_dl_generalized -- decode supported general-purpose
+    // filters. This includes /ASCIIHexDecode, /ASCII85Decode,
+    // /LZWDecode, and /FlateDecode.
+    //
+    // qpdf_dl_specialized -- in addition to generalized filters, also
+    // decode supported non-lossy specialized filters. This includes
+    // /RunLengthDecode.
+    //
+    // qpdf_dl_all -- in addition to generalized and non-lossy
+    // specialized filters, decode supported lossy filters. This
+    // includes /DCTDecode.
+    //
+    // If, based on the flags and the filters and decode parameters,
+    // we determine that we know how to apply all requested filters,
+    // do so and return true if we are successful.
+    //
+    // In all cases, a return value of true means that filtered data
+    // has been written successfully. If filtering is requested but
+    // this method returns false, it means there was some error in the
+    // filtering, in which case the resulting data is likely partially
+    // filtered and/or incomplete and may not be consistent with the
+    // configured filters. QPDFWriter handles this by attempting to
+    // get the stream data without filtering, but callers should
+    // consider a false return value when decode_level is not
+    // qpdf_dl_none to be a potential loss of data.
+    QPDF_DLL
+    bool pipeStreamData(Pipeline*,
+                        unsigned long encode_flags,
+                        qpdf_stream_decode_level_e decode_level,
+                        bool suppress_warnings = false);
+
+    // Legacy pipeStreamData. This maps to the the flags-based
+    // pipeStreamData as follows:
+    //  filter = false                  -> encode_flags = 0
+    //  filter = true                   -> decode_level = qpdf_dl_generalized
+    //    normalize = true -> encode_flags |= qpdf_sf_normalize
+    //    compress = true  -> encode_flags |= qpdf_sf_compress
     QPDF_DLL
     bool pipeStreamData(Pipeline*, bool filter,
-			bool normalize, bool compress,
-                        bool suppress_warnings = false);
+			bool normalize, bool compress);
 
     // Replace a stream's dictionary.  The new dictionary must be
     // consistent with the stream's data.  This is most appropriately

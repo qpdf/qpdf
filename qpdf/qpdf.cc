@@ -76,6 +76,10 @@ struct Options
         use_aes(false),
         stream_data_set(false),
         stream_data_mode(qpdf_s_compress),
+        compress_streams(true),
+        compress_streams_set(false),
+        decode_level(qpdf_dl_generalized),
+        decode_level_set(false),
         normalize_set(false),
         normalize(false),
         suppress_recovery(false),
@@ -134,6 +138,10 @@ struct Options
     bool use_aes;
     bool stream_data_set;
     qpdf_stream_data_e stream_data_mode;
+    bool compress_streams;
+    bool compress_streams_set;
+    qpdf_stream_decode_level_e decode_level;
+    bool decode_level_set;
     bool normalize_set;
     bool normalize;
     bool suppress_recovery;
@@ -357,6 +365,8 @@ the output file.  Mostly these are of use only to people who are very\n\
 familiar with the PDF file format or who are PDF developers.\n\
 \n\
 --stream-data=option      controls transformation of stream data (below)\n\
+--compress-streams=[yn]   controls whether to compress streams on output\n\
+--decode-level=option     controls how to filter streams from the input\n\
 --normalize-content=[yn]  enables or disables normalization of content streams\n\
 --suppress-recovery       prevents qpdf from attempting to recover damaged files\n\
 --object-streams=mode     controls handing of object streams\n\
@@ -382,6 +392,19 @@ Values for object stream mode:\n\
   preserve                  preserve original object streams (default)\n\
   disable                   don't write any object streams\n\
   generate                  use object streams wherever possible\n\
+\n\
+When --compress-streams=n is specified, this overrides the default behavior\n\
+of qpdf, which is to attempt compress uncompressed streams. Setting\n\
+stream data mode to uncompress or preserve has the same effect.\n\
+\n\
+The --decode-level parameter may be set to one of the following values:\n\
+  none              do not decode streams\n\
+  generalized       decode streams compressed with generalized filters\n\
+                    including LZW, Flate, and the ASCII encoding filters.\n\
+  specialized       additionally decode streams with non-lossy specialized\n\
+                    filters including RunLength\n\
+  all               additionally decode streams with lossy filters\n\
+                    including DCT (JPEG)\n\
 \n\
 In qdf mode, by default, content normalization is turned on, and the\n\
 stream data mode is set to uncompress.\n\
@@ -1344,15 +1367,68 @@ static void parse_options(int argc, char* argv[], Options& o)
                     usage("invalid stream-data option");
                 }
             }
+            else if (strcmp(arg, "compress-streams") == 0)
+            {
+                o.compress_streams_set = true;
+                if (parameter && (strcmp(parameter, "y") == 0))
+                {
+                    o.compress_streams = true;
+                }
+                else if (parameter && (strcmp(parameter, "n") == 0))
+                {
+                    o.compress_streams = false;
+                }
+                else
+                {
+                    usage("--compress-streams must be given as"
+                          " --compress-streams=[yn]");
+                }
+            }
+            else if (strcmp(arg, "decode-level") == 0)
+            {
+                if (parameter == 0)
+                {
+                    usage("--decode-level must be given as"
+                          "--decode-level=option");
+                }
+                o.decode_level_set = true;
+                if (strcmp(parameter, "none") == 0)
+                {
+                    o.decode_level = qpdf_dl_none;
+                }
+                else if (strcmp(parameter, "generalized") == 0)
+                {
+                    o.decode_level = qpdf_dl_generalized;
+                }
+                else if (strcmp(parameter, "specialized") == 0)
+                {
+                    o.decode_level = qpdf_dl_specialized;
+                }
+                else if (strcmp(parameter, "all") == 0)
+                {
+                    o.decode_level = qpdf_dl_all;
+                }
+                else
+                {
+                    usage("invalid stream-data option");
+                }
+            }
             else if (strcmp(arg, "normalize-content") == 0)
             {
-                if ((parameter == 0) || (*parameter == '\0'))
+                o.normalize_set = true;
+                if (parameter && (strcmp(parameter, "y") == 0))
+                {
+                    o.normalize = true;
+                }
+                else if (parameter && (strcmp(parameter, "n") == 0))
+                {
+                    o.normalize = false;
+                }
+                else
                 {
                     usage("--normalize-content must be given as"
                           " --normalize-content=[yn]");
                 }
-                o.normalize_set = true;
-                o.normalize = (parameter[0] == 'y');
             }
             else if (strcmp(arg, "suppress-recovery") == 0)
             {
@@ -1606,7 +1682,7 @@ static void do_check(QPDF& pdf, Options& o, int& exit_code)
         QPDFWriter w(pdf);
         Pl_Discard discard;
         w.setOutputPipeline(&discard);
-        w.setStreamDataMode(qpdf_s_uncompress);
+        w.setDecodeLevel(qpdf_dl_all);
         w.write();
 
         // Parse all content streams
@@ -1667,7 +1743,7 @@ static void do_show_obj(QPDF& pdf, Options& o, int& exit_code)
         {
             bool filter = o.show_filtered_stream_data;
             if (filter &&
-                (! obj.pipeStreamData(0, true, false, false)))
+                (! obj.pipeStreamData(0, 0, qpdf_dl_all)))
             {
                 QTC::TC("qpdf", "qpdf unable to filter");
                 std::cerr << "Unable to filter stream data."
@@ -1678,7 +1754,10 @@ static void do_show_obj(QPDF& pdf, Options& o, int& exit_code)
             {
                 QUtil::binary_stdout();
                 Pl_StdioFile out("stdout", stdout);
-                obj.pipeStreamData(&out, filter, o.normalize, false);
+                obj.pipeStreamData(
+                    &out,
+                    (filter && o.normalize) ? qpdf_ef_normalize : 0,
+                    filter ? qpdf_dl_all : qpdf_dl_none);
             }
         }
         else
@@ -2034,6 +2113,14 @@ static void set_writer_options(QPDF& pdf, Options& o, QPDFWriter& w)
     if (o.stream_data_set)
     {
         w.setStreamDataMode(o.stream_data_mode);
+    }
+    if (o.compress_streams_set)
+    {
+        w.setCompressStreams(o.compress_streams);
+    }
+    if (o.decode_level_set)
+    {
+        w.setDecodeLevel(o.decode_level);
     }
     if (o.decrypt)
     {

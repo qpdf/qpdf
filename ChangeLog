@@ -1,3 +1,20 @@
+2017-08-19  Jay Berkenbilt  <ejb@ql.org>
+
+	* Remove --precheck-streams. This is enabled by default now
+	without any efficiency cost. This feature was never released.
+
+	* Update pdf-create example to illustrate use of additional image
+	compression filters.
+
+	* Add support for /RunLengthDecode and /DCTDecode:
+	  - New pipeline types Pl_RunLength and Pl_DCT
+	  - New command-line flags --compress-streams and --decode-level
+	    to replace/enhance --stream-data
+	  - New QPDFWriter::setCompressStreams and
+ 	    QPDFWriter::setDecodeLevel methods
+	  Please see documentation, header files, and help messages for
+	  details on these new features.
+
 2017-08-12  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add QPDFObjectHandle::rotatePage to apply rotation to a page

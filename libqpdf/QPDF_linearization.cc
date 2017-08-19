@@ -393,7 +393,7 @@ QPDF::readHintStream(Pipeline& pl, qpdf_offset_t offset, size_t length)
 		      this->file->getLastOffset(),
 		      "hint table length mismatch");
     }
-    H.pipeStreamData(&pl, true, false, false);
+    H.pipeStreamData(&pl, 0, qpdf_dl_specialized);
     return Hdict;
 }
 

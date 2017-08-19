@@ -45,7 +45,7 @@ QPDF::CopiedStreamDataProvider::provideStreamData(
 {
     QPDFObjectHandle foreign_stream =
         this->foreign_streams[QPDFObjGen(objid, generation)];
-    foreign_stream.pipeStreamData(pipeline, false, false, false);
+    foreign_stream.pipeStreamData(pipeline, 0, qpdf_dl_none);
 }
 
 void
@@ -2377,6 +2377,7 @@ QPDF::pipeStreamData(int objid, int generation,
 	    length -= len;
 	    pipeline->write(QUtil::unsigned_char_pointer(buf), len);
 	}
+        pipeline->finish();
         success = true;
     }
     catch (QPDFExc& e)
@@ -2398,13 +2399,16 @@ QPDF::pipeStreamData(int objid, int generation,
                          QUtil::int_to_string(generation) + ": " + e.what()));
         }
     }
-    try
+    if (! success)
     {
-        pipeline->finish();
-    }
-    catch (std::exception&)
-    {
-        // ignore
+        try
+        {
+            pipeline->finish();
+        }
+        catch (std::exception&)
+        {
+            // ignore
+        }
     }
     return success;
 }

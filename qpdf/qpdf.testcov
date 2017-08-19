@@ -296,3 +296,4 @@ QPDF ignore length error xref entry 0
 QPDF_encryption pad short parameter 0
 QPDFWriter ignore self-referential object stream 0
 QPDFObjectHandle found old angle 1
+QPDF_Stream special filters 3

@@ -54,8 +54,10 @@ QPDFWriter::init()
     output_buffer = 0;
     normalize_content_set = false;
     normalize_content = false;
-    stream_data_mode_set = false;
-    stream_data_mode = qpdf_s_compress;
+    compress_streams = true;
+    compress_streams_set = false;
+    stream_decode_level = qpdf_dl_none;
+    stream_decode_level_set = false;
     qdf_mode = false;
     precheck_streams = false;
     preserve_unreferenced_objects = false;
@@ -162,8 +164,42 @@ QPDFWriter::setObjectStreamMode(qpdf_object_stream_e mode)
 void
 QPDFWriter::setStreamDataMode(qpdf_stream_data_e mode)
 {
-    this->stream_data_mode_set = true;
-    this->stream_data_mode = mode;
+    switch (mode)
+    {
+      case qpdf_s_uncompress:
+        this->stream_decode_level =
+            std::max(qpdf_dl_generalized, this->stream_decode_level);
+        this->compress_streams = false;
+        break;
+
+      case qpdf_s_preserve:
+        this->stream_decode_level = qpdf_dl_none;
+        this->compress_streams = false;
+        break;
+
+      case qpdf_s_compress:
+        this->stream_decode_level =
+            std::max(qpdf_dl_generalized, this->stream_decode_level);
+        this->compress_streams = true;
+        break;
+    }
+    this->stream_decode_level_set = true;
+    this->compress_streams_set = true;
+}
+
+
+void
+QPDFWriter::setCompressStreams(bool val)
+{
+    this->compress_streams = val;
+    this->compress_streams_set = true;
+}
+
+void
+QPDFWriter::setDecodeLevel(qpdf_stream_decode_level_e val)
+{
+    this->stream_decode_level = val;
+    this->stream_decode_level_set = true;
 }
 
 void
@@ -1512,8 +1548,8 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	{
 	    is_metadata = true;
 	}
-	bool filter = (this->stream_data_mode != qpdf_s_preserve);
-	if (this->stream_data_mode == qpdf_s_compress)
+	bool filter = (this->compress_streams || this->stream_decode_level);
+	if (this->compress_streams)
 	{
 	    // Don't filter if the stream is already compressed with
 	    // FlateDecode.  We don't want to make it worse by getting
@@ -1532,19 +1568,21 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	}
 	bool normalize = false;
 	bool compress = false;
+        bool uncompress = false;
 	if (is_metadata &&
 	    ((! this->encrypted) || (this->encrypt_metadata == false)))
 	{
 	    QTC::TC("qpdf", "QPDFWriter not compressing metadata");
 	    filter = true;
 	    compress = false;
+           uncompress = true;
 	}
 	else if (this->normalize_content && normalized_streams.count(old_og))
 	{
 	    normalize = true;
 	    filter = true;
 	}
-	else if (filter && (this->stream_data_mode == qpdf_s_compress))
+	else if (filter && this->compress_streams)
 	{
 	    compress = true;
 	    QTC::TC("qpdf", "QPDFWriter compressing uncompressed stream");
@@ -1559,7 +1597,7 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
                 QTC::TC("qpdf", "QPDFWriter precheck stream");
                 Pl_Discard discard;
                 filter = object.pipeStreamData(
-                    &discard, true, false, false, true);
+                    &discard, 0, qpdf_dl_all, true);
             }
             catch (std::exception&)
             {
@@ -1569,8 +1607,15 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 
 	pushPipeline(new Pl_Buffer("stream data"));
 	activatePipelineStack();
+
 	bool filtered =
-	    object.pipeStreamData(this->pipeline, filter, normalize, compress);
+	    object.pipeStreamData(
+                this->pipeline,
+                (((filter && normalize) ? qpdf_ef_normalize : 0) |
+                 ((filter && compress) ? qpdf_ef_compress : 0)),
+                (filter
+                 ? (uncompress ? qpdf_dl_all : this->stream_decode_level)
+                 : qpdf_dl_none));
 	PointerHolder<Buffer> stream_data;
 	popPipelineStack(&stream_data);
 	if (filtered)
@@ -1717,8 +1762,7 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
 
 	    // Set up a stream to write the stream data into a buffer.
 	    Pipeline* next = pushPipeline(new Pl_Buffer("object stream"));
-	    if (! ((this->stream_data_mode == qpdf_s_uncompress) ||
-		   this->qdf_mode))
+            if (! (this->stream_decode_level || this->qdf_mode))
 	    {
 		compressed = true;
 		next = pushPipeline(
@@ -2180,7 +2224,8 @@ QPDFWriter::prepareFileForWrite()
                 is_stream = true;
 		dict = node.getDict();
                 // See whether we are able to filter this stream.
-                filterable = node.pipeStreamData(0, true, false, false);
+                filterable = node.pipeStreamData(
+                    0, 0, this->stream_decode_level, true);
 	    }
             else if (pdf.getRoot().getObjectID() == node.getObjectID())
             {
@@ -2260,10 +2305,14 @@ QPDFWriter::write()
 	{
 	    this->normalize_content = true;
 	}
-	if (! this->stream_data_mode_set)
+	if (! this->compress_streams_set)
 	{
-	    this->stream_data_mode = qpdf_s_uncompress;
+	    this->compress_streams = false;
 	}
+        if (! this->stream_decode_level_set)
+        {
+            this->stream_decode_level = qpdf_dl_generalized;
+        }
     }
 
     if (this->encrypted)
@@ -2272,7 +2321,7 @@ QPDFWriter::write()
 	this->preserve_encryption = false;
     }
     else if (this->normalize_content ||
-	     (this->stream_data_mode == qpdf_s_uncompress) ||
+	     this->stream_decode_level ||
 	     this->qdf_mode)
     {
 	// Encryption makes looking at contents pretty useless.  If
@@ -2300,7 +2349,7 @@ QPDFWriter::write()
     }
 
     if (this->qdf_mode || this->normalize_content ||
-	(this->stream_data_mode == qpdf_s_uncompress))
+        this->stream_decode_level)
     {
 	initializeSpecialStreams();
     }
@@ -2586,7 +2635,7 @@ QPDFWriter::writeXRefStream(int xref_id, int max_id, qpdf_offset_t max_offset,
 
     Pipeline* p = pushPipeline(new Pl_Buffer("xref stream"));
     bool compressed = false;
-    if (! ((this->stream_data_mode == qpdf_s_uncompress) || this->qdf_mode))
+    if (! (this->stream_decode_level || this->qdf_mode))
     {
 	compressed = true;
 	if (! skip_compression)

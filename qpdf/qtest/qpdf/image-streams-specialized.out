@@ -1,0 +1,19 @@
+page 1
+filter: null, color space: /DeviceCMYK
+page 2
+filter: /DCTDecode, color space: /DeviceCMYK
+page 3
+filter: null, color space: /DeviceCMYK
+page 4
+filter: null, color space: /DeviceRGB
+page 5
+filter: /DCTDecode, color space: /DeviceRGB
+page 6
+filter: null, color space: /DeviceRGB
+page 7
+filter: null, color space: /DeviceGray
+page 8
+filter: /DCTDecode, color space: /DeviceGray
+page 9
+filter: null, color space: /DeviceGray
+test 39 done

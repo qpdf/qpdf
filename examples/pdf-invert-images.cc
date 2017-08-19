@@ -121,7 +121,8 @@ int main(int argc, char* argv[])
 		// pipeStreamData with a null pipeline to determine
 		// whether the image is filterable.  Directly inspect
 		// keys to determine the image type.
-		if (image.pipeStreamData(0, true, false, false) &&
+		if (image.pipeStreamData(0, qpdf_ef_compress,
+                                         qpdf_dl_generalized) &&
 		    color_space.isName() &&
 		    bits_per_component.isInteger() &&
 		    (color_space.getName() == "/DeviceGray") &&

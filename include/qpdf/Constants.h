@@ -26,7 +26,7 @@ enum qpdf_error_code_e
     qpdf_e_pages,               /* erroneous or unsupported pages structure */
 };
 
-/* Write Parameters */
+/* Write Parameters. See QPDFWriter.hh for details. */
 
 enum qpdf_object_stream_e
 {
@@ -39,6 +39,23 @@ enum qpdf_stream_data_e
     qpdf_s_uncompress = 0,	/* uncompress stream data */
     qpdf_s_preserve,		/* preserve stream data compression */
     qpdf_s_compress		/* compress stream data */
+};
+
+/* Stream data flags */
+
+/* See pipeStreamData in QPDFObjectHandle.hh for details on these flags. */
+enum qpdf_stream_encode_flags_e
+{
+    qpdf_ef_compress  = 1 << 0, /* compress uncompressed streams */
+    qpdf_ef_normalize = 1 << 1, /* normalize content stream */
+};
+enum qpdf_stream_decode_level_e
+{
+    /* These must be in order from less to more decoding. */
+    qpdf_dl_none = 0,           /* preserve all stream filters */
+    qpdf_dl_generalized,        /* decode general-purpose filters */
+    qpdf_dl_specialized,        /* also decode other non-lossy filters */
+    qpdf_dl_all                 /* also decode loss filters */
 };
 
 /* R3 Encryption Parameters */

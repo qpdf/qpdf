@@ -853,28 +853,90 @@ outfile.pdf</option>
     developers.  The following options are available:
     <variablelist>
      <varlistentry>
-      <term><option>--stream-data=<replaceable>option</replaceable></option></term>
+      <term><option>--compress-streams=<replaceable>[yn]</replaceable></option></term>
       <listitem>
        <para>
-        Controls transformation of stream data.  The value of
-        <option><replaceable>option</replaceable></option> may be one
-        of the following:
+        By default, or with <option>--compress-streams=y</option>,
+        qpdf will compress any stream with no other filters applied to
+        it with the <literal>/FlateDecode</literal> filter when it
+        writes it. To suppress this behavior and preserve uncompressed
+        streams as uncompressed, use
+        <option>--compress-streams=n</option>.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--decode-level=<replaceable>option</replaceable></option></term>
+      <listitem>
+       <para>
+        Controls which streams qpdf tries to decode. The default is
+        <option>generalized</option>. The following options are
+        available:
         <itemizedlist>
          <listitem>
           <para>
-           <option>compress</option>: recompress stream data when
-           possible (default)
+           <option>none</option>: do not attempt to decode any streams
           </para>
          </listitem>
          <listitem>
           <para>
-           <option>preserve</option>: leave all stream data as is
+           <option>generalized</option>: decode streams filtered with
+           supported generalized filters: <option>/LZWDecode</option>,
+           <option>/FlateDecode</option>,
+           <option>/ASCII85Decode</option>, and
+           <option>/ASCIIHexDecode</option>
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           <option>specialized</option>: in addition to generalized,
+           decode streams with supported non-lossy specialized
+           filters; currently this is just <option>/RunLengthDecode</option>
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           <option>all</option>: in addition to generalized and
+           specialized, decode streams with supported lossy filters;
+           currently this is just <option>/DCTDecode</option> (JPEG)
+          </para>
+         </listitem>
+        </itemizedlist>
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--stream-data=<replaceable>option</replaceable></option></term>
+      <listitem>
+       <para>
+        Controls transformation of stream data. This option predates
+        the <option>--compress-streams</option> and
+        <option>--decode-level</option> options. Those options can be
+        used to achieve the same affect with more control. The value
+        of <option><replaceable>option</replaceable></option> may be
+        one of the following:
+        <itemizedlist>
+         <listitem>
+          <para>
+           <option>compress</option>: recompress stream data when
+           possible (default); equivalent to
+           <option>--compress-streams=y</option>
+           <option>--decode-level=generalized</option>
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           <option>preserve</option>: leave all stream data as is;
+           equivalent to <option>--compress-streams=n</option>
+           <option>--decode-level=none</option>
           </para>
          </listitem>
          <listitem>
           <para>
            <option>uncompress</option>: uncompress stream data when
-           possible
+           possible; equivalent to
+           <option>--compress-streams=n</option>
+           <option>--decode-level=generalized</option>
           </para>
          </listitem>
         </itemizedlist>

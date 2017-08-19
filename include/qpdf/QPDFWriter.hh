@@ -118,13 +118,69 @@ class QPDFWriter
     QPDF_DLL
     void setObjectStreamMode(qpdf_object_stream_e);
 
-    // Set value of stream data mode.  In uncompress mode, we attempt
-    // to uncompress any stream that we can.  In preserve mode, we
-    // preserve any filtering applied to streams.  In compress mode,
-    // if we can apply all filters and the stream is not already
-    // optimally compressed, recompress the stream.
+    // Set value of stream data mode. This is an older interface.
+    // Instead of using this, prefer setCompressStreams() and
+    // setDecodeLevel(). This method is retained for compatibility,
+    // but it does not cover the full range of available
+    // configurations. The mapping between this and the new methods is
+    // as follows:
+    //
+    // qpdf_s_uncompress:
+    //   setCompressStreams(false)
+    //   setDecodeLevel(qpdf_dl_generalized)
+    // qpdf_s_preserve:
+    //   setCompressStreams(false)
+    //   setDecodeLevel(qpdf_dl_none)
+    // qpdf_s_compress:
+    //   setCompressStreams(true)
+    //   setDecodeLevel(qpdf_dl_generalized)
+    //
+    // The default is qpdf_s_compress.
     QPDF_DLL
     void setStreamDataMode(qpdf_stream_data_e);
+
+    // If true, compress any uncompressed streams when writing them.
+    // Metadata streams are a special case and are not compressed even
+    // if this is true. This is true by default for QPDFWriter. If you
+    // want QPDFWriter to leave uncompressed streams uncompressed,
+    // pass false to this method.
+    QPDF_DLL
+    void setCompressStreams(bool);
+
+    // When QPDFWriter encounters streams, this parameter controls the
+    // behavior with respect to attempting to apply any filters to the
+    // streams when copying to the output. The decode levels are as
+    // follows:
+    //
+    // qpdf_dl_none: Do not attempt to apply any filters. Streams
+    // remain as they appear in the original file. Note that
+    // uncompressed streams may still be compressed on output. You can
+    // disable that by calling setCompressStreams(false).
+    //
+    // qpdf_dl_generalized: This is the default. QPDFWriter will apply
+    // LZWDecode, ASCII85Decode, ASCIIHexDecode, and FlateDecode
+    // filters on the input. When combined with
+    // setCompressStreams(true), which the default, the effect of this
+    // is that streams filtered with these older and less efficient
+    // filters will be recompressed with the Flate filter. As a
+    // special case, if a stream is already compressed with
+    // FlateDecode and setCompressStreams is enabled, the original
+    // compressed data will be preserved.
+    //
+    // qpdf_dl_specialized: In addition to uncompressing the
+    // generalized compression formats, supported non-lossy
+    // compression will also be be decoded. At present, this includes
+    // the RunLengthDecode filter.
+    //
+    // qpdf_dl_all: In addition to generalized and non-lossy
+    // specialized filters, supported lossy compression filters will
+    // be applied. At present, this includes DCTDecode (JPEG)
+    // compression. Note that compressing the resulting data with
+    // DCTDecode again will accumulate loss, so avoid multiple
+    // compression and decompression cycles. This is mostly useful for
+    // retreiving image data.
+    QPDF_DLL
+    void setDecodeLevel(qpdf_stream_decode_level_e);
 
     // Set value of content stream normalization.  The default is
     // "false".  If true, we attempt to normalize newlines inside of
@@ -434,8 +490,10 @@ class QPDFWriter
     Buffer* output_buffer;
     bool normalize_content_set;
     bool normalize_content;
-    bool stream_data_mode_set;
-    qpdf_stream_data_e stream_data_mode;
+    bool compress_streams;
+    bool compress_streams_set;
+    qpdf_stream_decode_level_e stream_decode_level;
+    bool stream_decode_level_set;
     bool qdf_mode;
     bool precheck_streams;
     bool preserve_unreferenced_objects;

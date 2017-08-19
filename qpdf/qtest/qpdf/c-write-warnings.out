@@ -18,8 +18,3 @@ warning: bad33.pdf (file position 629): stream filter type is not name or array
   file: bad33.pdf
   pos : 629
   text: stream filter type is not name or array
-warning: bad33.pdf (file position 629): stream filter type is not name or array
-  code: 5
-  file: bad33.pdf
-  pos : 629
-  text: stream filter type is not name or array
