@@ -1,14 +1,9 @@
 #!/bin/sh
-wordsize=$1
-if ! test "$wordsize" = "32" -o "$wordsize" = "64"; then
-    echo "Usage: $0 {32,64}"
-    exit 2
-fi
-shift
-objdump=
-if test "$wordsize" = "64"; then
-    objdump=$(dirname $(type -p x86_64-w64-mingw32-gcc))/objdump
+set -e
+set -x
+if echo $PATH | grep -q /mingw64; then
+    wordsize=64
 else
-    objdump=$(dirname $(type -p i686-w64-mingw32-gcc))/objdump
+    wordsize=32
 fi
-CC=cl CXX="cl -TP -GR" ./configure --disable-test-compare-images --enable-external-libs --enable-werror --with-windows-wordsize=$wordsize --with-buildrules=msvc OBJDUMP=$objdump ${1+"$@"}
+CC=cl CXX="cl -TP -GR" ./configure --disable-test-compare-images --enable-external-libs --enable-werror --with-windows-wordsize=$wordsize --with-buildrules=msvc ${1+"$@"}

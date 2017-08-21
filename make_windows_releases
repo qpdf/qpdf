@@ -1,7 +1,14 @@
 #!/bin/sh
+
 if [ ! -d external-libs ]; then
    echo "Please extract qpdf-external-libs-bin.zip and try again"
    exit 2
+fi
+
+if echo $PATH | grep -q /mingw64; then
+    wordsize=64
+else
+    wordsize=32
 fi
 
 set -e
@@ -9,21 +16,22 @@ set -x
 cwd=`pwd`
 PATH=$cwd/libqpdf/build:$PATH
 
-rm -rf install-mingw* install-msvc*
+rm -rf install-mingw$wordsize install-msvc$wordsize
 
-./config-mingw64
-make
+./config-mingw
+make -j8
 make check install
 make distclean
-./config-mingw32
-make
+
+./config-msvc
+make -j8
 make check install
 make distclean
 
 set +x
 
 echo ''
-echo 'Now run "./make_windows_releases-msvc 64" in a 64-bit MSVC environment'
-echo 'and "./make_windows_releases-msvc 32" in a 32-bit MSVC environment.'
+echo "Finished builds for $wordsize. If not done already, rerun this"
+echo "in a" `expr 64 - $wordsize` "environment."
 echo 'Then run "./make_windows_releases-finish".'
 echo ''

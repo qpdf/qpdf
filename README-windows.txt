@@ -3,52 +3,38 @@ Common Setup
 
 You may need to disable antivirus software to run qpdf's test suite.
 
-To be able to build qpdf and run its test suite, you must have MSYS
-from MinGW installed, and you must have ActiveState Perl. The Perl
-provided by MSYS won't work reliably. It partially works, but some
-tests will fail with it because it doesn't support all the
-capabilities required by the test driver. Here's what I did on my
-system:
+To be able to build qpdf and run its test suite, you must have MSYS2
+installed. This replaces the old process of having a mixture of msys,
+mingw-w64, and ActiveState perl. It is now possible to do everything
+with just MSYS2.
 
-Install ActiveState perl. The versions of perl included with git bash
-and mingw are not able to run the test suite.
+Here's what I did on my system:
 
-Install MinGW-w64. From MinGW-w64 download page, grab the installer
-and run it. First install the i686 compiler to C:\mingw-w64, and then
-install x86_64 compiler to the same location. The installer will
-automatically created mingw32 and mingw64 directories under mingw-w64.
+* Download msys2 (64-bit) from msys2.org
+* Run the installer.
+* Run msys2_shell.cmd by allowing the installer to start it.
+* From the prompt:
+  * Run `pacman -Syuu` and follow the instructions, which may tell you
+    to close the window and rerun the command multiple times.
+  * pacman -S make base-devel git zip unzip
+  * pacman -S mingw-w64-x86_64-toolchain mingw-w64-i686-toolchain
 
-Grab the latest mingw-get-inst from the MinGW project. We are using
-this for shell and build utilties but not for the compiler. Run the
-installer.
-
-Install under basic:
-  mingw-developer-toolkit
-  msys-base
-
-Use C:\mingw32\msys\1.0\msys.bat to start a shell. In the shell, run
-
-mingw32-get install msys-zip
-
-Add to path in this order:
-  C:\mingw32\msys\1.0\bin
-  C:\mingw-w64\mingw64\bin
-  C:\mingw-w64\mingw32\bin
-
-ensuring that they are after ActiveState perl.
-
-Check to make sure zip and unzip are in your path, make --version
-shows at least 3.81, perl --version shows the perl from ActiveState,
-and gcc --version is the 64-bit gcc. (zip is not actually needed
-unless you are running the tools to create the releases.)
-
-Install suitable Microsoft Visual Studio edition. In early 2016, 2015
+If you would like to build with Microsoft Visual C++, install a
+suitable Microsoft Visual Studio edition. In early 2016, 2015
 community edition with C++ support is fine. It may crash a few times
 during installation, but repeating the installation will allow it to
 finish, and the resulting software is stable.
 
-To build qpdf, start the msys shell from a command window started from
-one of the Visual Studio shell windows.
+To build qpdf with Visual Studio, start the msys2 mingw32 or mingw64
+shell from a command window started from one of the Visual Studio
+shell windows. You must use the mingw shell for the same word size (32
+or 64 bit) as the Windows compiler since the MSVC build uses objdump
+from the msys distribution. You must also have it inherit the path.
+For example:
+
+* Start x64 native tools command prompt from msvc
+* set MSYS2_PATH_TYPE=inherit
+* C:\msys64\mingw64
 
 Image comparison tests are disabled by default, but it is possible to
 run them on Windows. To do so, add --enable-test-compare-images from
@@ -84,32 +70,28 @@ installers are provided, they might do that already by default.
 External Libraries
 ==================
 
-In order to build qpdf, you must have a copy of zlib. The easy way to
-get it is to download it from the qpdf download area. There are
-packages called external-libs-bin.zip and external-libs-src.zip. If
-you are building with MSVC 2010 or MINGW, you can just extract the
+In order to build qpdf, you must have a copy of zlib and the jpeg
+library. The easy way to get it is to download the external libs from
+the qpdf download area. There are packages called
+external-libs-bin.zip and external-libs-src.zip. If you are building
+with MSVC 2015 or MINGW with MSYS2, you can just extract the
 qpdf-external-libs-bin.zip zip file into the top-level qpdf source
-tree. Note that you need the 2012-06-20 version (at least) to build
-qpdf 3.0 or greater since this includes 64-bit libraries. The
-2017-08-10 version includes libraries built with MSVC 2015 and
-contains only zlib. Older versions also contain pcre, which is no
-longer required as of qpdf 7.0.0. Extracting the zip will create a
-directory called external-libs which contains header files and
-precompiled libraries. Passing --enable-external-libs to ./configure
-(which is done automatically if you follow the instructions below) is
-sufficient to find them.
+tree. Note that you need the 2017-08-21 version (at least) to build
+qpdf 7.0 or greater since this includes jpeg. Passing
+--enable-external-libs to ./configure (which is done automatically if
+you follow the instructions below) is sufficient to find them.
 
-You can also obtain zlib directly on your own and install it. If you
-are using mingw, you can just set CPPFLAGS, LDFLAGS, and LIBS when you
-run ./configure so that it can find the header files and libraries. If
-you are building with msvc and you want to do this, it probably won't
-work because ./configure doesn't know how to interpret LDFLAGS and
-LIBS properly for MSVC (though qpdf's own build system does). In this
-case, you can probably get away with cheating by passing
---enable-external-libs to ./configure and then just editing CPPFLAGS,
-LDFLAGS, LIBS in the generated autoconf.mk file. Note that you should
-use UNIX-like syntax (-I, -L, -l) even though this is not what cl
-takes on the command line. qpdf's build rules will fix it.
+You can also obtain zlib and jpeg directly on your own and install
+them. If you are using mingw, you can just set CPPFLAGS, LDFLAGS, and
+LIBS when you run ./configure so that it can find the header files and
+libraries. If you are building with msvc and you want to do this, it
+probably won't work because ./configure doesn't know how to interpret
+LDFLAGS and LIBS properly for MSVC (though qpdf's own build system
+does). In this case, you can probably get away with cheating by
+passing --enable-external-libs to ./configure and then just editing
+CPPFLAGS, LDFLAGS, LIBS in the generated autoconf.mk file. Note that
+you should use UNIX-like syntax (-I, -L, -l) even though this is not
+what cl takes on the command line. qpdf's build rules will fix it.
 
 You can also download qpdf-external-libs-src.zip and follow the
 instructions in the README.txt there for how to build external libs.
@@ -130,29 +112,22 @@ autofiles.zip that you can extract on top of a fresh checkout.
 Building with MinGW
 ===================
 
-QPDF is known to build and pass its test suite with mingw-w64 using
-the 32-bit and 64-bit compilers from that project (latest version
-tested: 5.3.0) and Microsoft Visual C++ 2015, both 32-bit and 64-bit
-versions. MSYS plus ActiveState Perl is required to build as well in
-order to get make and other related tools. While it is possible that
-Cygwin could be used to build native Windows versions of qpdf, this
-configuration has not been tested recently.
+QPDF is known to build and pass its test suite with MSYS2 using the
+32-bit and 64-bit compilers from that project and Microsoft Visual C++
+2015, both 32-bit and 64-bit versions. MSYS2 is required to build as
+well in order to get make and other related tools. See common setup at
+the top of this file for installation and configuration of MSYS2.
+Then, from the suitable 32-bit or 64-bit environment, run
 
-From your MSYS prompt, run
-
-  ./config-mingw32
-
-or
-
-  ./config-mingw64
+  ./config-mingw
 
 and then
 
   make
 
-Note that ./config-mingw32 and ./configure-mingw64 just run
-./configure with specific arguments, so you can look at it, make
-adjustments, and manually run configure instead.
+Note that ./config-mingw just runs ./configure with specific
+arguments, so you can look at it, make adjustments, and manually run
+configure instead.
 
 Add the absolute path to the libqpdf/build directory to your PATH.
 Make sure you can run the qpdf command by typing qpdf/build/qpdf and
@@ -184,23 +159,12 @@ that does this.  Make sure that you start a command line environment
 configured for whichever of 32-bit or 64-bit output that you intend to
 build for.
 
-From that cmd prompt, you can start your msys shell by just running
-manually whatever command is associated with your msys shell icon
-(such as C:\MinGW\msys\1.0\msys.bat).
+From that cmd prompt, you can start your MSYS2 shell with path
+inheritance as described above.
 
 Configure as follows:
 
-  ./config-msvc 32
-
-or
-
-  ./config-msvc 64
-
-Note that you must pass the 32/64 option that matches your command
-line setup.  The scripts do not presently figure this out.  If you
-used the wrong argument, it would probably just build the size you
-have in your environment and then install the results in the wrong
-place.
+  ./config-msvc
 
 Once configured, run
 

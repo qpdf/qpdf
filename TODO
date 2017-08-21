@@ -1,6 +1,22 @@
 Before next release
 ===================
 
+
+msys2:
+
+* make_windows_releases: refactor to 32 and 64, add -j8 back to make
+* figure out how to get msvc to stay in path -- check msys2 docs
+  To void this, either launch start shell command using start_shell.cmd
+  -use-full-path or inside Windows directly, set an environment variable
+  for your user with name MSYS2_PATH_TYPE and value inherit.
+* figure out test coverage
+* get test coverage to work
+* get jpeg
+
+
+
+
+
 ABI compatibility has most likely been broken. Retest and bump major
 version if needed.
 
