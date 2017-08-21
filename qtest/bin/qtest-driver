@@ -604,7 +604,7 @@ sub tc_do_initial_checks
 	chop(my $f = `cygpath --windows $tc_log`);
 	$tc_winlog = $f;
     }
-    elsif ($^O eq 'MSWin32')
+    elsif ($^O =~ m/^MSWin32|msys$/)
     {
 	$tc_winlog = $tc_log;
     }
