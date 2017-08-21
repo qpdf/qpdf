@@ -353,6 +353,11 @@ class QPDFWriter
     QPDF_DLL
     void setLinearization(bool);
 
+    // Create PCLm output. Enables writing unreferenced objects,
+    // set PCLm header and writes pages before file catalog and page tree.
+    QPDF_DLL
+    void setPCLm(bool);
+
     QPDF_DLL
     void write();
 
@@ -417,9 +422,11 @@ class QPDFWriter
     void prepareFileForWrite();
     void writeStandard();
     void writeLinearized();
+    void writePCLm();
     void enqueuePart(std::vector<QPDFObjectHandle>& part);
     void writeEncryptionDictionary();
     void writeHeader();
+    void writePCLmHeader();
     void writeHintStream(int hint_id);
     qpdf_offset_t writeXRefTable(
         trailer_e which, int first, int last, int size);
@@ -492,6 +499,7 @@ class QPDFWriter
     bool encrypted;
     bool preserve_encryption;
     bool linearized;
+    bool pclm;
     qpdf_object_stream_e object_stream_mode;
     std::string encryption_key;
     bool encrypt_metadata;
