@@ -353,8 +353,13 @@ class QPDFWriter
     QPDF_DLL
     void setLinearization(bool);
 
-    // Create PCLm output. Enables writing unreferenced objects,
-    // set PCLm header and writes pages before file catalog and page tree.
+    // Create PCLm output. This is only useful for clients that know
+    // how to create PCLm files. If a file is structured exactly as
+    // PCLm requires, this call will tell QPDFWriter to write the PCLm
+    // header, create certain unreferenced streams required by the
+    // standard, and write the objects in the required order. Calling
+    // this on an ordinary PDF serves no purpose. There is no
+    // command-line argument that causes this method to be called.
     QPDF_DLL
     void setPCLm(bool);
 

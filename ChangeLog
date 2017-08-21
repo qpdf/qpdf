@@ -1,3 +1,13 @@
+2017-08-21  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add support for writing PCLm files. Most of the work was done by
+	Sahil Arora <sahilarora.535@gmail.com> as part of a Google Summer
+	of Code project in 2017. PCLm support is useful only for clients
+	that specifically know how to create PCLm files. Support in qpdf
+	is just for ensuring that objects are written in the correct order
+	and for including some additional material in the output that is
+	required by the PCLm standard.
+
 2017-08-19  Jay Berkenbilt  <ejb@ql.org>
 
 	* Remove --precheck-streams. This is enabled by default now
