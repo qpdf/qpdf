@@ -178,7 +178,7 @@ class QPDFWriter
     // compression. Note that compressing the resulting data with
     // DCTDecode again will accumulate loss, so avoid multiple
     // compression and decompression cycles. This is mostly useful for
-    // retreiving image data.
+    // retrieving image data.
     QPDF_DLL
     void setDecodeLevel(qpdf_stream_decode_level_e);
 

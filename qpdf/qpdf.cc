@@ -1154,7 +1154,7 @@ static void read_args_from_file(char const* filename,
     }
 }
 
-static void handle_help_verison(int argc, char* argv[])
+static void handle_help_version(int argc, char* argv[])
 {
     if ((argc == 2) &&
         ((strcmp(argv[1], "--version") == 0) ||
@@ -2255,7 +2255,7 @@ int main(int argc, char* argv[])
 	whoami += 3;
     }
 
-    handle_help_verison(argc, argv);
+    handle_help_version(argc, argv);
 
     // Support reading arguments from files. Create a new argv. Ensure
     // that argv itself as well as all its contents are automatically

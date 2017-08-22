@@ -47,7 +47,7 @@ That code has the following license:
 
 # Building from a pristine checkout
 
-When building qpdf from a pristine checkout from version control, documentation and automatically generated files are not present. Building on Windows from a pristine checkout is not guaranteed to work because of issues running autoconf; see [README-windows.md](README-windows.md) for how to handle this.  For UNIX and UNIX-like systems, you must have some addditional tools installed to build from the source repository.  To do this, you should run
+When building qpdf from a pristine checkout from version control, documentation and automatically generated files are not present. Building on Windows from a pristine checkout is not guaranteed to work because of issues running autoconf; see [README-windows.md](README-windows.md) for how to handle this.  For UNIX and UNIX-like systems, you must have some additional tools installed to build from the source repository.  To do this, you should run
 
 ```
 ./autogen.sh

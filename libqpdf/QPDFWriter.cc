@@ -3261,7 +3261,7 @@ QPDFWriter::writeStandard()
         enqueueObjectsStandard();
     }
 
-    // Now start walking queue, outputing each object. There shouldn't
+    // Now start walking queue, outputting each object. There shouldn't
     // really be any here, but this will catch anything that somehow
     // got missed.
     while (this->m->object_queue.size())

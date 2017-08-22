@@ -1,7 +1,7 @@
 //
 // This is an example of creating a PDF file from scratch. It
 // illustrates use of several QPDF operations for creating objects and
-// streams. It also serves as an ullstration of how to use
+// streams. It also serves as an illustration of how to use
 // StreamDataProvider with different types of filters.
 //
 

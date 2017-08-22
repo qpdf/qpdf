@@ -113,7 +113,7 @@ if test "x$qpdf_OS_SECURE_RANDOM" = "x1"; then
   AC_LINK_IFELSE([AC_LANG_PROGRAM(
     [[#pragma comment(lib, "crypt32.lib")
      #include <windows.h>
-     #include <Wincrypt.h>
+     #include <wincrypt.h>
      HCRYPTPROV cp;]],
      [CryptAcquireContext(&cp, NULL, NULL, PROV_RSA_FULL, 0);]
      )],

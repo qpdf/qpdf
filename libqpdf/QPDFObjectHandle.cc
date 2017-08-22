@@ -957,7 +957,7 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
                                 bool content_stream)
 {
     // This method must take care not to resolve any objects. Don't
-    // check the tpye of any object without first ensuring that it is
+    // check the type of any object without first ensuring that it is
     // a direct object. Otherwise, doing so may have the side effect
     // of reading the object and changing the file pointer.
 

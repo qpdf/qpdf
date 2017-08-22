@@ -24,7 +24,7 @@ For Windows, there are several additional files that you might want to download.
 
 * `qpdf-external-libs-src.zip`
 
-  If you want to build the external libraries on your own (for Windows or anything else), you can download this archive. In addition to including an unmodified distribution `zlib` and the `jpeg` libary, it includes a `README` file and some scripts to help you build it for Windows. You will also have to provide those.
+  If you want to build the external libraries on your own (for Windows or anything else), you can download this archive. In addition to including an unmodified distribution `zlib` and the `jpeg` library, it includes a `README` file and some scripts to help you build it for Windows. You will also have to provide those.
 
 If you want to build on Windows, please see also README-windows.md in the qpdf source distribution.
 

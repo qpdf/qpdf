@@ -1,6 +1,6 @@
 # Release Reminders
 
-* Test for binary compatility. The easiest way to do this is to check out the last release, run the test suite, check out the new release, run `make build_libqpdf`, check out the old release, and run `make check NO_REBUILD=1`.
+* Test for binary compatibility. The easiest way to do this is to check out the last release, run the test suite, check out the new release, run `make build_libqpdf`, check out the old release, and run `make check NO_REBUILD=1`.
 * When making a release, always remember to run large file tests and image comparison tests (`--enable-test-compare-images` `--with-large-file-test-path=/path`). For Windows, use a Windows style path, not an MSYS path for large files. For a major release, consider running a spelling checker over the source code to catch errors in variable names, strings, and comments. Use `ispell -p ispell-words`.
 * Run tests with sanitize address enabled:
   ```
