@@ -2307,7 +2307,8 @@ QPDFWriter::write()
 
     if (this->pclm)
     {
-        setStreamDataMode(qpdf_s_preserve);
+        this->stream_decode_level = qpdf_dl_none;
+        this->compress_streams = false;
         this->encrypted = false;
     }
 
@@ -2334,6 +2335,7 @@ QPDFWriter::write()
     }
     else if (this->normalize_content ||
 	     this->stream_decode_level ||
+             this->pclm ||
 	     this->qdf_mode)
     {
 	// Encryption makes looking at contents pretty useless.  If
