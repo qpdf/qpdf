@@ -128,10 +128,10 @@ install: all
 	cp include/qpdf/*.hh $(DESTDIR)$(includedir)/qpdf
 	cp doc/stylesheet.css $(DESTDIR)$(docdir)
 	cp libqpdf.pc $(DESTDIR)$(libdir)/pkgconfig
-	if [ $(BUILD_HTML) = 1 ]; then \
+	if [ -f doc/qpdf-manual.html ]; then \
 		cp doc/qpdf-manual.html $(DESTDIR)$(docdir); \
 	fi
-	if [ $(BUILD_PDF) = 1 ]; then \
+	if [ -f doc/qpdf-manual.pdf ]; then \
 		cp doc/qpdf-manual.pdf $(DESTDIR)$(docdir); \
 	fi
 	cp doc/*.1 $(DESTDIR)$(mandir)/man1
