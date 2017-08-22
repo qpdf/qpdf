@@ -184,8 +184,8 @@ This is what I do for routine testing on Windows.
 
 From Linux, run ./autogen.sh and make autofiles.zip
 
-From Windows in git bash, git clone from my Linux clone, unzip
-external-libs, and unzip autofiles.zip.
+From Windows, git clone from my Linux clone, unzip external-libs, and
+unzip autofiles.zip.
 
 Look at make_windows_releases. Set up path the same way and run
 whichever ./config-* is appropriate for whichever compiler I need to
