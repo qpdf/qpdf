@@ -107,6 +107,25 @@ Pl_DCT::finish()
     }
 }
 
+class Freer
+{
+  public:
+    Freer(unsigned char** p) :
+        p(p)
+    {
+    }
+    ~Freer()
+    {
+        if (*p)
+        {
+            free(*p);
+        }
+    }
+
+  private:
+    unsigned char** p;
+};
+
 void
 Pl_DCT::compress(void* cinfo_p, PointerHolder<Buffer> b)
 {
@@ -124,6 +143,7 @@ Pl_DCT::compress(void* cinfo_p, PointerHolder<Buffer> b)
 #       pragma GCC diagnostic pop
 #endif
     unsigned char* outbuffer = 0;
+    Freer freer(&outbuffer);
     unsigned long outsize = 0;
     jpeg_mem_dest(cinfo, &outbuffer, &outsize);
 
@@ -160,8 +180,6 @@ Pl_DCT::compress(void* cinfo_p, PointerHolder<Buffer> b)
     jpeg_finish_compress(cinfo);
     this->getNext()->write(outbuffer, outsize);
     this->getNext()->finish();
-
-    free(outbuffer);
 }
 
 void

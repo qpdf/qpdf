@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+pwd
+dir=$(dirname $1)
+if [ ! -x $dir/exec-z ]; then
+    ln -f make/exec-z $dir/exec-z
+fi
+mkdir -p $dir/z
+mv $1 $dir/z
+ln -f $dir/exec-z $1

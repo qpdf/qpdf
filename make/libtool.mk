@@ -102,6 +102,7 @@ endef
 # Usage: $(call makebin,objs,binary,ldflags,libs)
 define makebin
 	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(1) -o $(2) $(4) $(3)
+	if [ "$(VALGRIND)" = 1 ]; then make/valgrind-wrap $(2); fi
 endef
 
 # Install target

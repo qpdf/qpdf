@@ -21,34 +21,19 @@ Release Reminders
       LDFLAGS="-fsanitize=address" \
       --enable-werror --disable-shared
 
- * Consider running tests with latest gcc and/or valgrind.  To do
-   this, replace, build with debugging and without shared libraries.
-   In build, create z and move each executable into z.  Then create a
-   script called exec-z that contains:
+   As of gcc 6.3.0, this exposes some good things but appears to also
+   have some false positive leak reports. Valgrind is more reliable
+   but also may miss some things that this catches.
 
-   #!/bin/sh
-   exec valgrind --suppressions=/tmp/a.supp -q \
-      `dirname $0`/z/`basename $0` ${1+"$@"}
+ * Consider running tests with latest gcc and/or valgrind. To test
+   with valgrind:
 
-   Symlink exec-z to each executable.  /tmp/a.supp can be populated
-   with suppressions for libraries, for example:
+   ./configure --disable-shared
+   make -j8 -k VALGRIND=1
+   make -k check NO_REBUILD=1
 
-   {
-      zlib1
-      Memcheck:Cond
-      fun:inflateReset2
-      fun:inflateInit2_
-   }
-   {
-      index
-      Memcheck:Cond
-      fun:index
-      fun:expand_dynamic_string_token
-      fun:_dl_map_object
-      fun:map_doit
-   }
-
-   You can generate these by running valgrind with --gen-suppressions=yes.
+   This moves each binary into a subdirectory and replaces it with a
+   link to make/exec-z. See make/exec-z.
 
  * Check all open issues in the sourceforge trackers and on github.
 
