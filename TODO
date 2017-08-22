@@ -1,11 +1,9 @@
-Before next release
-===================
+Before final 7.0.0
+==================
 
- * The ABI has changed. Bump soname.
+ * Update C API
 
- * Upload new versions of external-libs.
-
- * Remove pcre and insert jpeg in debian packaging.
+ * Create release notes
 
 Soon
 ====
