@@ -1334,6 +1334,18 @@ void runtest(int n, char const* filename1, char const* arg2)
             }
         }
     }
+    else if (n == 40)
+    {
+        // Write PCLm. This requires specially crafted PDF files. This
+        // feature was implemented by Sahil Arora
+        // <sahilarora.535@gmail.com> as part of a Google Summer of
+        // Code project in 2017.
+        assert(arg2 != 0);
+        QPDFWriter w(pdf, arg2);
+        w.setPCLm(true);
+        w.setStaticID(true);
+        w.write();
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +

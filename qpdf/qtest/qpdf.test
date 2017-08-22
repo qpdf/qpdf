@@ -917,6 +917,19 @@ $td->runtest("check output",
 	     {$td->FILE => "from-scratch-0.pdf"});
 show_ntests();
 # ----------
+$td->notify("--- PCLm ---");
+$n_tests += 2;
+
+$td->runtest("write as PCLm",
+	     {$td->COMMAND => "test_driver 40 pclm-in.pdf a.pdf"},
+	     {$td->STRING => "test 40 done\n", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "pclm-out.pdf"});
+
+show_ntests();
+# ----------
 $td->notify("--- Precheck streams ---");
 $n_tests += 2;
 
