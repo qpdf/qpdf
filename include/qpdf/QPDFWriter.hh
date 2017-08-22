@@ -431,7 +431,6 @@ class QPDFWriter
     void enqueuePart(std::vector<QPDFObjectHandle>& part);
     void writeEncryptionDictionary();
     void writeHeader();
-    void writePCLmHeader();
     void writeHintStream(int hint_id);
     qpdf_offset_t writeXRefTable(
         trailer_e which, int first, int last, int size);
