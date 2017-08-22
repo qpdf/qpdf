@@ -1,3 +1,13 @@
+2017-08-22  Jay Berkenbilt  <ejb@ql.org>
+
+	* Convert all README files to markdown. Names changed as follows:
+	  - README --> README.md
+	  - README.hardening --> README-hardening.md
+	  - README.maintainer --> README-maintainer.md
+	  - README-what-to-download.txt --> README-what-to-download.md
+	  - README-windows.txt --> README-windows.md
+	  The file README-windows-install.txt remains a text file.
+
 2017-08-21  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add support for writing PCLm files. Most of the work was done by

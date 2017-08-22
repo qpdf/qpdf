@@ -43,7 +43,7 @@ Release Reminders
    properly handled.
 
  * Remember to avoid using operator[] with std::string or
-   std::vector.  See README.hardening for details.
+   std::vector.  See README-hardening.md for details.
 
  * Increment shared library version information as needed (LT_* in
    configure.ac)
@@ -110,7 +110,7 @@ Release Reminders
 
  * Before releasing, rebuild and test debian package.
 
- * Remember to copy README-what-to-download.txt separately onto the
+ * Remember to copy README-what-to-download.md separately onto the
    download area.
 
  * Remember to update the web page including putting new documentation

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 #
 # This program creates a source distribution of qpdf.  For details,
-# see README.maintainer.
+# see README-maintainer.md.
 #
 
 require 5.008;

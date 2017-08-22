@@ -37,7 +37,7 @@ download.
 
    If you want to build qpdf for Windows yourself with either MINGW or
    MSVC 2010, you can download this file and extract it inside the
-   qpdf source distribution.  Please refer to README-windows.txt in
+   qpdf source distribution.  Please refer to README-windows.md in
    the qpdf source distribution for additional details.  Note that you
    need the 2012-06-20 version or later to be able to build qpdf 3.0
    or newer.  The 2009-10-24 version is required for qpdf 2.3.1 or
@@ -51,6 +51,6 @@ download.
    libary, it includes a README file and some scripts to help you
    build it for Windows. qpdf was built using a binary distribution of
    libjpeg-turbo for Windows. You will also have to provide those. See
-   README-windows.txt for details.
+   README-windows.md for details.
 
-If you want to build on Windows, please see also README-windows.txt.
+If you want to build on Windows, please see also README-windows.md.

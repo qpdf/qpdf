@@ -87,7 +87,7 @@
   <title>Building and Installing QPDF</title>
   <para>
    This chapter describes how to build and install qpdf.  Please see
-   also the <filename>README</filename> and
+   also the <filename>README.md</filename> and
    <filename>INSTALL</filename> files in the source distribution.
   </para>
   <sect1 id="ref.prerequisites">
@@ -210,17 +210,17 @@ make
     configured.  You can also set the value of
     <varname>DESTDIR</varname> during installation to install to a
     temporary location, as is common with many open source packages.
-    Please see also the <filename>README</filename> and
+    Please see also the <filename>README.md</filename> and
     <filename>INSTALL</filename> files in the source distribution.
    </para>
    <para>
     Building on Windows is a little bit more complicated.  For
-    details, please see <filename>README-windows.txt</filename> in the
+    details, please see <filename>README-windows.md</filename> in the
     source distribution.  You can also download a binary distribution
     for Windows.  There is a port of qpdf to Visual C++ version 6 in
     the <filename>contrib</filename> area generously contributed by
     Jian Ma.  This is also discussed in more detail in
-    <filename>README-windows.txt</filename>.
+    <filename>README-windows.md</filename>.
    </para>
    <para>
     There are some other things you can do with the build.  Although
@@ -2102,7 +2102,7 @@ outfile.pdf</option>
     would enable you to use some software-based secure pseudorandom
     number generator and to avoid use of whatever the operating system
     provides.  For details on how to do this, please refer to the
-    top-level README file in the source distribution and to comments
+    top-level README.md file in the source distribution and to comments
     in <filename>QUtil.hh</filename>.
    </para>
   </sect1>
@@ -3256,7 +3256,7 @@ print "\n";
            converts numbers to strings.  This is largely invisible to
            users, but it does trigger a bug in some older versions of
            mingw-w64's C++ library.  See
-           <filename>README-windows.txt</filename> in the source
+           <filename>README-windows.md</filename> in the source
            distribution if you think this may affect you.  The copy of
            the DLL distributed with qpdf's binary distribution is not
            affected by this problem.
@@ -3677,7 +3677,7 @@ print "\n";
         not needed to verify a correct build or port of qpdf.  They
         are needed only when changing the actual PDF output generated
         by qpdf.  You should enable them if you are making deep
-        changes to qpdf itself.  See <filename>README</filename> for
+        changes to qpdf itself.  See <filename>README.md</filename> for
         details.
        </para>
       </listitem>
@@ -3686,7 +3686,7 @@ print "\n";
         Large file tests are off by default but can be turned on with
         <command>./configure</command> or by setting an environment
         variable before running the test suite.  See
-        <filename>README</filename> for details.
+        <filename>README.md</filename> for details.
        </para>
       </listitem>
       <listitem>

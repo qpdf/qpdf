@@ -228,7 +228,7 @@ AC_MSG_CHECKING(which build rules to use)
 AC_SUBST(BUILDRULES)
 AC_ARG_WITH(buildrules,
    AS_HELP_STRING([--with-buildrules=rules],
-		  [which build rules to use; see README]),
+		  [which build rules to use; see README.md]),
    [BUILDRULES=$withval],
    [BUILDRULES=libtool])
 AC_MSG_RESULT($BUILDRULES)

@@ -1,5 +1,5 @@
 #!/bin/sh
-# This script is used for valgrind testing. See README.maintainer.
+# This script is used for valgrind testing. See README-maintainer.md.
 
 # Create a suppressions file. This can be updated by running valgrind
 # with --gen-suppressions=yes.

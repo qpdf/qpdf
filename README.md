@@ -17,7 +17,7 @@ QPDF depends on the external libraries "zlib" and "jpeg". These are
 part of every Linux distribution and are readily available. Download
 information appears in the documentation. For Windows, you can
 download pre-built binary versions of these libraries for some
-compilers; see README-windows.txt for additional details.
+compilers; see README-windows.md for additional details.
 
 QPDF requires a C++ compiler that works with STL.  Your compiler must
 also support "long long".  Almost all modern compilers do.  If you are
@@ -82,7 +82,7 @@ Building from a pristine checkout
 When building qpdf from a pristine checkout from version control,
 documentation and automatically generated files are not present.
 Building on Windows from a pristine checkout is not guaranteed to work
-because of issues running autoconf; see README-windows.txt for how to
+because of issues running autoconf; see README-windows.md for how to
 handle this.  For UNIX and UNIX-like systems, you must have some
 addditional tools installed to build from the source repository.  To
 do this, you should run
@@ -124,8 +124,8 @@ QPDF is known to build and pass its test suite with mingw (latest
 version tested: gcc 4.6.2), mingw64 (latest version tested: 4.7.0) and
 Microsoft Visual C++ 2010, both 32-bit and 64-bit versions.  MSYS plus
 ActiveState Perl is required to build as well in order to get make
-and other related tools.  See README-windows.txt for details on how to
-build under Windows, see README-windows.txt.
+and other related tools.  See README-windows.md for details on how to
+build under Windows, see README-windows.md.
 
 
 Additional Notes on Build
@@ -137,7 +137,7 @@ obeying the compiler specified with configure.  This can be enabled by
 passing --with-buildrules=buildrules where buildrules corresponds to
 one of the .mk files (other than rules.mk) in the make directory.
 This should never be necessary on a UNIX system, but may be necessary
-on a Windows system.  See README-windows.txt for details.  There is a
+on a Windows system.  See README-windows.md for details.  There is a
 gcc-linux.mk file enable "gcc-linux" build rules, but it is intended
 to help test the build system; Linux users should build with the
 "libtools" rules, which are enabled by default.

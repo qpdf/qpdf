@@ -118,7 +118,7 @@ SecureRandomDataProvider::provideRandomData(unsigned char* data, size_t len)
 
 #else
 
-#  error "Don't know how to generate secure random numbers on this platform.  See random number generation in the top-level README"
+#  error "Don't know how to generate secure random numbers on this platform.  See random number generation in the top-level README.md"
 
 #endif
 }
