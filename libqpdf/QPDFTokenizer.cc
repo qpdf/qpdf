@@ -476,7 +476,8 @@ QPDFTokenizer::betweenTokens()
 QPDFTokenizer::Token
 QPDFTokenizer::readToken(PointerHolder<InputSource> input,
                          std::string const& context,
-                         bool allow_bad)
+                         bool allow_bad,
+                         size_t max_len)
 {
     qpdf_offset_t offset = input->tell();
     Token token;
@@ -507,6 +508,14 @@ QPDFTokenizer::readToken(PointerHolder<InputSource> input,
 		++offset;
 	    }
 	    presentCharacter(ch);
+            if (max_len && (raw_val.length() >= max_len) &&
+                (this->state != st_token_ready))
+            {
+                // terminate this token now
+                QTC::TC("qpdf", "QPDFTokenizer block long token");
+                this->type = tt_bad;
+                this->state = st_token_ready;
+            }
 	}
     }
 

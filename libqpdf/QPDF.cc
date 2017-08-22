@@ -407,12 +407,14 @@ QPDF::reconstruct_xref(QPDFExc& e)
     this->m->file->seek(0, SEEK_SET);
     bool in_obj = false;
     qpdf_offset_t line_start = 0;
+    // Don't allow very long tokens here during recovery.
+    static size_t const MAX_LEN = 100;
     while (this->m->file->tell() < eof)
     {
         this->m->file->findAndSkipNextEOL();
         qpdf_offset_t next_line_start = this->m->file->tell();
         this->m->file->seek(line_start, SEEK_SET);
-        QPDFTokenizer::Token t1 = readToken(this->m->file, true);
+        QPDFTokenizer::Token t1 = readToken(this->m->file, true, MAX_LEN);
         qpdf_offset_t token_start =
             this->m->file->tell() - t1.getValue().length();
         if (token_start >= next_line_start)
@@ -430,8 +432,10 @@ QPDF::reconstruct_xref(QPDFExc& e)
         {
             if (t1.getType() == QPDFTokenizer::tt_integer)
             {
-                QPDFTokenizer::Token t2 = readToken(this->m->file, true);
-                QPDFTokenizer::Token t3 = readToken(this->m->file, true);
+                QPDFTokenizer::Token t2 =
+                    readToken(this->m->file, true, MAX_LEN);
+                QPDFTokenizer::Token t3 =
+                    readToken(this->m->file, true, MAX_LEN);
                 if ((t2.getType() == QPDFTokenizer::tt_integer) &&
                     (t3 == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "obj")))
                 {
@@ -1411,7 +1415,7 @@ bool
 QPDF::findEndstream()
 {
     // Find endstream or endobj. Position the input at that token.
-    QPDFTokenizer::Token t = readToken(this->m->file, true);
+    QPDFTokenizer::Token t = readToken(this->m->file, true, 20);
     if ((t.getType() == QPDFTokenizer::tt_word) &&
         ((t.getValue() == "endobj") ||
          (t.getValue() == "endstream")))
@@ -1504,10 +1508,11 @@ QPDF::recoverStreamLength(PointerHolder<InputSource> input,
 }
 
 QPDFTokenizer::Token
-QPDF::readToken(PointerHolder<InputSource> input, bool allow_bad)
+QPDF::readToken(PointerHolder<InputSource> input,
+                bool allow_bad, size_t max_len)
 {
     return this->m->tokenizer.readToken(
-        input, this->m->last_object_description, allow_bad);
+        input, this->m->last_object_description, allow_bad, max_len);
 }
 
 QPDFObjectHandle
