@@ -83,7 +83,7 @@ Release Reminders
 
  * Each year, update copyright notices. Just do a case-insensitive
    search for copyright. Don't forget copyright in manual. Also update
-   debian copyright in debian package. Last updated: 2015.
+   debian copyright in debian package. Last updated: 2017.
 
  * To construct a source distribution from a pristine checkout,
    make_dist does the following:

@@ -1170,7 +1170,7 @@ static void handle_help_verison(int argc, char* argv[])
         //      12345678901234567890123456789012345678901234567890123456789012345678901234567890
         std::cout
             << whoami << " version " << QPDF::QPDFVersion() << std::endl
-            << "Copyright (c) 2005-2015 Jay Berkenbilt"
+            << "Copyright (c) 2005-2017 Jay Berkenbilt"
             << std::endl
             << "This software may be distributed under the terms of version 2 of the"
             << std::endl
