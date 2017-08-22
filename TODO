@@ -5,6 +5,10 @@ Before final 7.0.0
 
  * Create release notes
 
+ * See if the error message that gets generated when retrying a stream
+   without filtering after error detection can be less scary.
+   Communicate that the original stream data is being preserved.
+
 Soon
 ====
 
