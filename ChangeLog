@@ -1,5 +1,7 @@
 2017-08-22  Jay Berkenbilt  <ejb@ql.org>
 
+	* 7.0.b1: release
+
 	* Convert all README files to markdown. Names changed as follows:
 	  - README --> README.md
 	  - README.hardening --> README-hardening.md
