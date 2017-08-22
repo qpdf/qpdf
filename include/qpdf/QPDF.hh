@@ -635,11 +635,11 @@ class QPDF
             qpdf(qpdf),
             og(og)
         {
-            qpdf->resolving.insert(og);
+            qpdf->m->resolving.insert(og);
         }
         virtual ~ResolveRecorder()
         {
-            this->qpdf->resolving.erase(og);
+            this->qpdf->m->resolving.erase(og);
         }
       private:
         QPDF* qpdf;
@@ -1113,79 +1113,95 @@ class QPDF
 				  std::set<QPDFObjGen>& visited, bool top);
     void filterCompressedObjects(std::map<int, int> const& object_stream_data);
 
+    class Members
+    {
+        friend class QPDF;
 
-    QPDFTokenizer tokenizer;
-    PointerHolder<InputSource> file;
-    std::string last_object_description;
-    bool encrypted;
-    bool encryption_initialized;
-    bool ignore_xref_streams;
-    bool suppress_warnings;
-    std::ostream* out_stream;
-    std::ostream* err_stream;
-    bool attempt_recovery;
-    int encryption_V;
-    int encryption_R;
-    bool encrypt_metadata;
-    std::map<std::string, encryption_method_e> crypt_filters;
-    encryption_method_e cf_stream;
-    encryption_method_e cf_string;
-    encryption_method_e cf_file;
-    std::string provided_password;
-    std::string user_password;
-    std::string encryption_key;
-    std::string cached_object_encryption_key;
-    int cached_key_objid;
-    int cached_key_generation;
-    std::string pdf_version;
-    std::map<QPDFObjGen, QPDFXRefEntry> xref_table;
-    std::set<int> deleted_objects;
-    std::map<QPDFObjGen, ObjCache> obj_cache;
-    std::set<QPDFObjGen> resolving;
-    QPDFObjectHandle trailer;
-    std::vector<QPDFObjectHandle> all_pages;
-    std::map<QPDFObjGen, int> pageobj_to_pages_pos;
-    bool pushed_inherited_attributes_to_pages;
-    std::vector<QPDFExc> warnings;
-    std::map<QPDF*, ObjCopier> object_copiers;
-    PointerHolder<QPDFObjectHandle::StreamDataProvider> copied_streams;
-    // copied_stream_data_provider is owned by copied_streams
-    CopiedStreamDataProvider* copied_stream_data_provider;
-    std::set<QPDFObjGen> attachment_streams;
-    bool reconstructed_xref;
+      public:
+        ~Members();
 
-    // Linearization data
-    qpdf_offset_t first_xref_item_offset; // actual value from file
-    bool uncompressed_after_compressed;
+      private:
+        Members();
+        Members(Members const&);
 
-    // Linearization parameter dictionary and hint table data: may be
-    // read from file or computed prior to writing a linearized file
-    QPDFObjectHandle lindict;
-    LinParameters linp;
-    HPageOffset page_offset_hints;
-    HSharedObject shared_object_hints;
-    HGeneric outline_hints;
+        QPDFTokenizer tokenizer;
+        PointerHolder<InputSource> file;
+        std::string last_object_description;
+        bool encrypted;
+        bool encryption_initialized;
+        bool ignore_xref_streams;
+        bool suppress_warnings;
+        std::ostream* out_stream;
+        std::ostream* err_stream;
+        bool attempt_recovery;
+        int encryption_V;
+        int encryption_R;
+        bool encrypt_metadata;
+        std::map<std::string, encryption_method_e> crypt_filters;
+        encryption_method_e cf_stream;
+        encryption_method_e cf_string;
+        encryption_method_e cf_file;
+        std::string provided_password;
+        std::string user_password;
+        std::string encryption_key;
+        std::string cached_object_encryption_key;
+        int cached_key_objid;
+        int cached_key_generation;
+        std::string pdf_version;
+        std::map<QPDFObjGen, QPDFXRefEntry> xref_table;
+        std::set<int> deleted_objects;
+        std::map<QPDFObjGen, ObjCache> obj_cache;
+        std::set<QPDFObjGen> resolving;
+        QPDFObjectHandle trailer;
+        std::vector<QPDFObjectHandle> all_pages;
+        std::map<QPDFObjGen, int> pageobj_to_pages_pos;
+        bool pushed_inherited_attributes_to_pages;
+        std::vector<QPDFExc> warnings;
+        std::map<QPDF*, ObjCopier> object_copiers;
+        PointerHolder<QPDFObjectHandle::StreamDataProvider> copied_streams;
+        // copied_stream_data_provider is owned by copied_streams
+        CopiedStreamDataProvider* copied_stream_data_provider;
+        std::set<QPDFObjGen> attachment_streams;
+        bool reconstructed_xref;
 
-    // Computed linearization data: used to populate above tables
-    // during writing and to compare with them during validation.  c_
-    // means computed.
-    LinParameters c_linp;
-    CHPageOffset c_page_offset_data;
-    CHSharedObject c_shared_object_data;
-    HGeneric c_outline_data;
+        // Linearization data
+        qpdf_offset_t first_xref_item_offset; // actual value from file
+        bool uncompressed_after_compressed;
 
-    // Object ordering data for linearized files: initialized by
-    // calculateLinearizationData().  Part numbers refer to the PDF
-    // 1.4 specification.
-    std::vector<QPDFObjectHandle> part4;
-    std::vector<QPDFObjectHandle> part6;
-    std::vector<QPDFObjectHandle> part7;
-    std::vector<QPDFObjectHandle> part8;
-    std::vector<QPDFObjectHandle> part9;
+        // Linearization parameter dictionary and hint table data: may be
+        // read from file or computed prior to writing a linearized file
+        QPDFObjectHandle lindict;
+        LinParameters linp;
+        HPageOffset page_offset_hints;
+        HSharedObject shared_object_hints;
+        HGeneric outline_hints;
 
-    // Optimization data
-    std::map<ObjUser, std::set<QPDFObjGen> > obj_user_to_objects;
-    std::map<QPDFObjGen, std::set<ObjUser> > object_to_obj_users;
+        // Computed linearization data: used to populate above tables
+        // during writing and to compare with them during validation.
+        // c_ means computed.
+        LinParameters c_linp;
+        CHPageOffset c_page_offset_data;
+        CHSharedObject c_shared_object_data;
+        HGeneric c_outline_data;
+
+        // Object ordering data for linearized files: initialized by
+        // calculateLinearizationData().  Part numbers refer to the PDF
+        // 1.4 specification.
+        std::vector<QPDFObjectHandle> part4;
+        std::vector<QPDFObjectHandle> part6;
+        std::vector<QPDFObjectHandle> part7;
+        std::vector<QPDFObjectHandle> part8;
+        std::vector<QPDFObjectHandle> part9;
+
+        // Optimization data
+        std::map<ObjUser, std::set<QPDFObjGen> > obj_user_to_objects;
+        std::map<QPDFObjGen, std::set<ObjUser> > object_to_obj_users;
+    };
+
+    // Keep all member variables inside the Members object, which we
+    // dynamically allocate. This makes it possible to add new private
+    // members without breaking binary compatibility.
+    PointerHolder<Members> m;
 };
 
 #endif // __QPDF_HH__
