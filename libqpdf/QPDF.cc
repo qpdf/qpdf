@@ -1414,7 +1414,7 @@ QPDF::findEndstream()
     QPDFTokenizer::Token t = readToken(this->m->file, true);
     if ((t.getType() == QPDFTokenizer::tt_word) &&
         ((t.getValue() == "endobj") ||
-         (t.getValue() == "endstream")));
+         (t.getValue() == "endstream")))
     {
         this->m->file->seek(this->m->file->getLastOffset(), SEEK_SET);
         return true;

@@ -11,7 +11,7 @@ WARNING: issue-101.pdf (trailer, file position 1702): attempting to recover stre
 WARNING: issue-101.pdf (trailer, file position 1702): recovered stream length: 12
 WARNING: issue-101.pdf (trailer, file position 2026): /Length key in stream dictionary is not an integer
 WARNING: issue-101.pdf (trailer, file position 2097): attempting to recover stream length
-WARNING: issue-101.pdf (trailer, file position 2097): recovered stream length: 12
+WARNING: issue-101.pdf (trailer, file position 2097): recovered stream length: 257
 WARNING: issue-101.pdf (trailer, file position 2613): /Length key in stream dictionary is not an integer
 WARNING: issue-101.pdf (trailer, file position 2684): attempting to recover stream length
 WARNING: issue-101.pdf (trailer, file position 2684): recovered stream length: 74
