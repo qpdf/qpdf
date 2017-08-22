@@ -76,11 +76,10 @@ Pl_Flate::handleData(unsigned char* data, int len, int flush)
 
         // deflateInit and inflateInit are macros that use old-style
         // casts.
-#ifdef __GNUC__
-# if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406
+#if ((defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
+     defined(__clang__))
 #       pragma GCC diagnostic push
 #       pragma GCC diagnostic ignored "-Wold-style-cast"
-# endif
 #endif
 	if (this->action == a_deflate)
 	{
@@ -90,10 +89,9 @@ Pl_Flate::handleData(unsigned char* data, int len, int flush)
 	{
 	    err = inflateInit(&zstream);
 	}
-#ifdef __GNUC__
-# if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406
+#if ((defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
+     defined(__clang__))
 #       pragma GCC diagnostic pop
-# endif
 #endif
 
 	checkError("Init", err);

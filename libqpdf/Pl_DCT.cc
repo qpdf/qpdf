@@ -4,6 +4,7 @@
 #include <setjmp.h>
 #include <string>
 #include <stdexcept>
+#include <cstdlib>
 
 #if BITS_IN_JSAMPLE != 8
 # error "qpdf does not support libjpeg built with BITS_IN_JSAMPLE != 8"
@@ -112,17 +113,15 @@ Pl_DCT::compress(void* cinfo_p, PointerHolder<Buffer> b)
     struct jpeg_compress_struct* cinfo =
         reinterpret_cast<jpeg_compress_struct*>(cinfo_p);
 
-#ifdef __GNUC__
-# if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406
+#if ((defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
+     defined(__clang__))
 #       pragma GCC diagnostic push
 #       pragma GCC diagnostic ignored "-Wold-style-cast"
-# endif
 #endif
     jpeg_create_compress(cinfo);
-#ifdef __GNUC__
-# if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406
+#if ((defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
+     defined(__clang__))
 #       pragma GCC diagnostic pop
-# endif
 #endif
     unsigned char* outbuffer = 0;
     unsigned long outsize = 0;
@@ -171,17 +170,15 @@ Pl_DCT::decompress(void* cinfo_p, PointerHolder<Buffer> b)
     struct jpeg_decompress_struct* cinfo =
         reinterpret_cast<jpeg_decompress_struct*>(cinfo_p);
 
-#ifdef __GNUC__
-# if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406
+#if ((defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
+     defined(__clang__))
 #       pragma GCC diagnostic push
 #       pragma GCC diagnostic ignored "-Wold-style-cast"
-# endif
 #endif
     jpeg_create_decompress(cinfo);
-#ifdef __GNUC__
-# if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406
+#if ((defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
+     defined(__clang__))
 #       pragma GCC diagnostic pop
-# endif
 #endif
     jpeg_mem_src(cinfo, b->getBuffer(), b->getSize());
 

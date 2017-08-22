@@ -804,6 +804,11 @@ static inline void sph_enc64be_aligned(void *dst, sph_u64 val);
 
 /* ============== END documentation block for Doxygen ============= */
 
+#if defined(__clang__)
+#       pragma GCC diagnostic push
+#       pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
+
 #ifndef DOXYGEN_IGNORE
 
 /*
@@ -1969,6 +1974,10 @@ sph_dec64le_aligned(const void *src)
 #endif
 }
 
+#endif
+
+#if defined(__clang__)
+#       pragma GCC diagnostic pop
 #endif
 
 #endif /* Doxygen excluded block */

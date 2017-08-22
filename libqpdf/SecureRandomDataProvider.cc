@@ -48,18 +48,16 @@ class WindowsCryptProvider
                                  PROV_RSA_FULL,
                                  0))
         {
-#ifdef __GNUC__
-# if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406
+#if ((defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
+     defined(__clang__))
 #           pragma GCC diagnostic push
 #           pragma GCC diagnostic ignored "-Wold-style-cast"
 #           pragma GCC diagnostic ignored "-Wsign-compare"
-# endif
 #endif
             if (GetLastError() == NTE_BAD_KEYSET)
-#ifdef __GNUC__
-# if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406
+#if ((defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
+     defined(__clang__))
 #           pragma GCC diagnostic pop
-# endif
 #endif
             {
                 if (! CryptAcquireContext(&crypt_prov,

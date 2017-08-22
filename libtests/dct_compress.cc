@@ -17,11 +17,15 @@ static void usage()
 class Callback: public Pl_DCT::CompressConfig
 {
   public:
+    Callback() :
+        called(false)
+    {
+    }
     virtual ~Callback()
     {
     }
     virtual void apply(jpeg_compress_struct*);
-    bool called = false;
+    bool called;
 };
 
 void Callback::apply(jpeg_compress_struct*)
