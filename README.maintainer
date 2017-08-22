@@ -8,9 +8,11 @@ Release Reminders
 
  * When making a release, always remember to run large file tests and
    image comparison tests (--enable-test-compare-images
-   --with-large-file-test-path=/path).  For a major release, consider
-   running a spelling checker over the source code to catch errors in
-   variable names, strings, and comments.  Use ispell -p ispell-words.
+   --with-large-file-test-path=/path). For Windows, use a Windows
+   style path, not an MSYS path for large files. For a major release,
+   consider running a spelling checker over the source code to catch
+   errors in variable names, strings, and comments. Use ispell -p
+   ispell-words.
 
  * Run tests with sanitize address enabled:
 

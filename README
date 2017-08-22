@@ -175,17 +175,17 @@ enabled by passing --enable-test-compare-images to ./configure.  This
 was on by default in qpdf versions prior to 3.0, but is now off by
 default.  Large file tests can be enabled by passing
 --with-large-file-test-path=path to ./configure or by setting the
-QPDF_LARGE_FILE_TEST_PATH environment variable.  Run ./configure
---help for additional options.  The test suite provides nearly full
-coverage even without these tests.  Unless you are making deep changes
-to the library that would impact the contents of the generated PDF
-files or testing this on a new platform for the first time, there is
-no real reason to run these tests.  If you're just running the test
-suite to make sure that qpdf works for your build, the default tests
-are adequate.  The configure rules for these tests do nothing other
-than setting variables in autoconf.mk, so you can feel free to turn
-these on and off directly in autoconf.mk rather than rerunning
-configure.
+QPDF_LARGE_FILE_TEST_PATH environment variable.  On Windows, this
+should be a Windows path.  Run ./configure --help for additional
+options.  The test suite provides nearly full coverage even without
+these tests.  Unless you are making deep changes to the library that
+would impact the contents of the generated PDF files or testing this
+on a new platform for the first time, there is no real reason to run
+these tests.  If you're just running the test suite to make sure that
+qpdf works for your build, the default tests are adequate.  The
+configure rules for these tests do nothing other than setting
+variables in autoconf.mk, so you can feel free to turn these on and
+off directly in autoconf.mk rather than rerunning configure.
 
 If you are packaging qpdf for a distribution and preparing a build
 that is run by an autobuilder, you may want to add the
