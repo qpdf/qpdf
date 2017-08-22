@@ -2449,10 +2449,6 @@ QPDFWriter::write()
     {
 	writeLinearized();
     }
-    else if (this->pclm)
-    {
-        writePCLm();
-    }
     else
     {
 	writeStandard();
@@ -3160,18 +3156,8 @@ QPDFWriter::writeLinearized()
 }
 
 void
-QPDFWriter::writeStandard()
+QPDFWriter::enqueueObjectsStandard()
 {
-    if (this->deterministic_id)
-    {
-        pushMD5Pipeline();
-    }
-
-    // Start writing
-
-    writeHeader();
-    writeString(this->extra_header_text);
-
     if (this->preserve_unreferenced_objects)
     {
         QTC::TC("qpdf", "QPDFWriter preserve unreferenced standard");
@@ -3197,8 +3183,70 @@ QPDFWriter::writeStandard()
     {
 	enqueueObject(trailer.getKey(*iter));
     }
+}
 
-    // Now start walking queue, output each object
+void
+QPDFWriter::enqueueObjectsPCLm()
+{
+    // Image transform stream content for page strip images.
+    // Each of this new stream has to come after every page image
+    // strip written in the pclm file.
+    std::string image_transform_content = "q /image Do Q\n";
+
+    // enqueue all pages first
+    std::vector<QPDFObjectHandle> all = this->pdf.getAllPages();
+    for (std::vector<QPDFObjectHandle>::iterator iter = all.begin();
+         iter != all.end(); ++iter)
+    {
+        // enqueue page
+        enqueueObject(*iter);
+
+        // enqueue page contents stream
+        enqueueObject((*iter).getKey("/Contents"));
+
+        // enqueue all the strips for each page
+        QPDFObjectHandle strips =
+            (*iter).getKey("/Resources").getKey("/XObject");
+        std::set<std::string> keys = strips.getKeys();
+        for (std::set<std::string>::iterator image = keys.begin();
+             image != keys.end(); ++image)
+        {
+            enqueueObject(strips.getKey(*image));
+            enqueueObject(QPDFObjectHandle::newStream(
+                              &pdf, image_transform_content));
+        }
+    }
+
+    // Put root in queue.
+    QPDFObjectHandle trailer = getTrimmedTrailer();
+    enqueueObject(trailer.getKey("/Root"));
+}
+
+void
+QPDFWriter::writeStandard()
+{
+    if (this->deterministic_id)
+    {
+        pushMD5Pipeline();
+    }
+
+    // Start writing
+
+    writeHeader();
+    writeString(this->extra_header_text);
+
+    if (this->pclm)
+    {
+        enqueueObjectsPCLm();
+    }
+    else
+    {
+        enqueueObjectsStandard();
+    }
+
+    // Now start walking queue, outputing each object. There shouldn't
+    // really be any here, but this will catch anything that somehow
+    // got missed.
     while (this->object_queue.size())
     {
 	QPDFObjectHandle cur_object = this->object_queue.front();
@@ -3234,85 +3282,6 @@ QPDFWriter::writeStandard()
     {
 	QTC::TC("qpdf", "QPDFWriter standard deterministic ID",
                 this->object_stream_to_objects.empty() ? 0 : 1);
-        popPipelineStack();
-        assert(this->md5_pipeline == 0);
-    }
-}
-
-void
-QPDFWriter::writePCLm()
-{
-    if (this->deterministic_id)
-    {
-        pushMD5Pipeline();
-    }
-
-    // Start writing
-
-    writeHeader();
-    writeString(this->extra_header_text);
-
-    // Image transform stream content for page strip images.
-    // Each of this new stream has to come after every page image
-    // strip written in the pclm file.
-    std::string image_transform_content = "q /image Do Q\n";
-
-    // enqueue all pages first
-    std::vector<QPDFObjectHandle> all = this->pdf.getAllPages();
-    for (std::vector<QPDFObjectHandle>::iterator iter = all.begin();
-            iter != all.end(); ++iter)
-    {
-        // enqueue page
-        enqueueObject(*iter);
-
-        // enqueue page contents stream
-        enqueueObject((*iter).getKey("/Contents"));
-
-        // enqueue all the strips for each page
-        QPDFObjectHandle strips =
-            (*iter).getKey("/Resources").getKey("/XObject");
-        std::set<std::string> keys = strips.getKeys();
-        for (std::set<std::string>::iterator image = keys.begin();
-                image != keys.end(); ++image)
-        {
-            enqueueObject(strips.getKey(*image));
-            enqueueObject(QPDFObjectHandle::newStream(
-                              &pdf, image_transform_content));
-        }
-    }
-
-    // Put root in queue.
-    QPDFObjectHandle trailer = getTrimmedTrailer();
-    enqueueObject(trailer.getKey("/Root"));
-
-    // Now start walking queue, output each object
-    while (this->object_queue.size())
-    {
-        QPDFObjectHandle cur_object = this->object_queue.front();
-        this->object_queue.pop_front();
-        writeObject(cur_object);
-    }
-
-    // Now write out xref.  next_objid is now the number of objects.
-    qpdf_offset_t xref_offset = this->pipeline->getCount();
-    if (this->object_stream_to_objects.empty())
-    {
-        // Write regular cross-reference table
-        writeXRefTable(t_normal, 0, this->next_objid - 1, this->next_objid);
-    }
-    else
-    {
-        // Write cross-reference stream.
-        int xref_id = this->next_objid++;
-        writeXRefStream(xref_id, xref_id, xref_offset, t_normal,
-                0, this->next_objid - 1, this->next_objid);
-    }
-    writeString("startxref\n");
-    writeString(QUtil::int_to_string(xref_offset));
-    writeString("\n%%EOF\n");
-
-    if (this->deterministic_id)
-    {
         popPipelineStack();
         assert(this->md5_pipeline == 0);
     }

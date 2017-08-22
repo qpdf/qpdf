@@ -425,9 +425,10 @@ class QPDFWriter
     void closeObject(int objid);
     QPDFObjectHandle getTrimmedTrailer();
     void prepareFileForWrite();
+    void enqueueObjectsStandard();
+    void enqueueObjectsPCLm();
     void writeStandard();
     void writeLinearized();
-    void writePCLm();
     void enqueuePart(std::vector<QPDFObjectHandle>& part);
     void writeEncryptionDictionary();
     void writeHeader();
