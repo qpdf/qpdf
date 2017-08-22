@@ -11,33 +11,6 @@ usage() unless @ARGV == 4;
 my ($file, $destdir, $objdump, $windows_wordsize) = @ARGV;
 my $filedir = dirname($file);
 
-my %dlls = ();
-my $format = undef;
-open(O, "$objdump -p $file|") or die "$whoami: can't run objdump\n";
-while (<O>)
-{
-    if (m/^\s+DLL Name:\s+(.+\.dll)/i)
-    {
-	my $dll = $1;
-	$dll =~ tr/A-Z/a-z/;
-	next if $dll =~ m/^(kernel32|user32|msvcrt|advapi32)\.dll$/;
-	$dlls{$dll} = 1;
-    }
-    elsif (m/^Magic.*\((PE.+?)\)/)
-    {
-        $format = $1;
-    }
-}
-close(O);
-if (! defined $format)
-{
-    die "$whoami: can't determine format of $file\n";
-}
-
-# Search the directories named in the file's manifest (if present),
-# the file's directory, the current directory, and the path for dlls
-# since that's what Windows does.  Be sure to only capture compatible
-# DLLs.
 my $sep = ($^O eq 'MSWin32' ? ';' : ':');
 my @path = ($filedir, '.', split($sep, $ENV{'PATH'}));
 foreach my $var (qw(LIB))
@@ -46,10 +19,6 @@ foreach my $var (qw(LIB))
     {
         push(@path, split($sep, $ENV{$var}));
     }
-}
-if (-f "$file.manifest")
-{
-    unshift(@path, get_manifest_dirs("$file.manifest"));
 }
 my $redist_suffix = (($windows_wordsize eq '64') ? "x64" : "x86");
 if (exists $ENV{'VCINSTALLDIR'})
@@ -68,44 +37,80 @@ if (exists $ENV{'VCINSTALLDIR'})
         }
     }
 }
-if (exists $ENV{'UNIVERSALCRTSDKDIR'})
+if (exists $ENV{'UniversalCRTSdkDir'})
 {
-    my $redist = $ENV{'UNIVERSALCRTSDKDIR'} . "/Redist/ucrt/DLLs/$redist_suffix";
+    my $redist = $ENV{'UniversalCRTSdkDir'} . "/Redist/ucrt/DLLs/$redist_suffix";
     unshift(@path, $redist);
 }
-my @final = ();
+
+my $format = undef;
+my @to_find = get_dlls($file);
+
+my %final = ();
 my @notfound = ();
-dll_loop:
-foreach my $dll (sort keys %dlls)
+
+while (@to_find)
 {
+    my $dll = shift(@to_find);
     my $found = 0;
     foreach my $dir (@path)
     {
-	if ((-f "$dir/$dll") && is_format("$dir/$dll", $format))
-	{
-	    push(@final, "$dir/$dll");
-	    $found = 1;
-	    last;
-	}
+        if ((-f "$dir/$dll") && is_format("$dir/$dll", $format))
+        {
+            if (! exists $final{$dll})
+            {
+                $final{$dll} = "$dir/$dll";
+                push(@to_find, get_dlls("$dir/$dll"));
+            }
+            $found = 1;
+            last;
+        }
     }
     if (! $found)
     {
-	push(@notfound, $dll);
+        push(@notfound, $dll);
     }
 }
-
 if (@notfound)
 {
     die "$whoami: can't find the following dlls: " .
 	join(', ', @notfound), "\n";
 }
 
-foreach my $f (@final)
+foreach my $dll (sort keys (%final))
 {
+    my $f = $final{$dll};
     $f =~ s,\\,/,g;
     print "Copying $f to $destdir\n";
     system("cp -p '$f' '$destdir'") == 0 or
 	die "$whoami: copy $f to $destdir failed\n";
+}
+
+sub get_dlls
+{
+    my @result = ();
+    my $exe = shift;
+    open(O, "$objdump -p $exe|") or die "$whoami: can't run objdump\n";
+    while (<O>)
+    {
+        if (m/^\s+DLL Name:\s+(.+\.dll)/i)
+        {
+            my $dll = $1;
+            $dll =~ tr/A-Z/a-z/;
+            next if $dll =~ m/^(kernel32|user32|msvcrt|advapi32)\.dll$/;
+            push(@result, $dll);
+        }
+        elsif (m/^Magic.*\((PE.+?)\)/)
+        {
+            $format = $1;
+        }
+    }
+    close(O);
+    if (! defined $format)
+    {
+        die "$whoami: can't determine format of $exe\n";
+    }
+    @result;
 }
 
 sub is_format
@@ -131,58 +136,6 @@ sub is_format
         }
     }
     $result;
-}
-
-sub get_manifest_dirs
-{
-    # Find all system directories in which to search for DLLs based on
-    # the contents of a Visual Studio manifest file.
-
-    my $manifest_file = shift;
-
-    require XML::Parser;
-    my $sysroot = $ENV{'SYSTEMROOT'} or die "$whoami: can't get \$SYSTEMROOT\n";
-    $sysroot =~ s,\\,/,g;
-    if ($^O eq 'cygwin')
-    {
-	chop($sysroot = `cygpath $sysroot`);
-	die "$whoami: can't get system root" unless $? == 0;
-    }
-    my $winsxs = "$sysroot/WinSxS";
-    opendir(D, $winsxs) or die "$whoami: can't opendir $winsxs: $!\n";
-    my @entries = readdir(D);
-    closedir(D);
-
-    my @candidates = ();
-
-    my $readAssemblyIdentity = sub
-    {
-	my ($parser, $element, %attrs) = @_;
-	return unless $element eq 'assemblyIdentity';
-	my $type = $attrs{'type'};
-	my $name = $attrs{'name'};
-	my $version = $attrs{'version'};
-	my $processorArchitecture = $attrs{'processorArchitecture'};
-	my $publicKeyToken = $attrs{'publicKeyToken'};
-
-	my $dir_start = join('_',
-			     $processorArchitecture,
-			     $name,
-			     $publicKeyToken,
-			     $version);
-	push(@candidates, $dir_start);
-    };
-
-    my $p = new XML::Parser(Handlers => {'Start' => $readAssemblyIdentity});
-    $p->parsefile($manifest_file);
-
-    my @dirs = ();
-    foreach my $c (@candidates)
-    {
-	push(@dirs, map { "$winsxs/$_" } (grep { m/^\Q$c\E/i } @entries));
-    }
-
-    @dirs;
 }
 
 sub usage
