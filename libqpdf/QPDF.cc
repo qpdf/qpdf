@@ -491,8 +491,10 @@ void
 QPDF::read_xref(qpdf_offset_t xref_offset)
 {
     std::map<int, int> free_table;
+    std::set<qpdf_offset_t> visited;
     while (xref_offset)
     {
+        visited.insert(xref_offset);
         char buf[7];
         memset(buf, 0, sizeof(buf));
 	this->m->file->seek(xref_offset, SEEK_SET);
@@ -520,6 +522,10 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
 	{
 	    xref_offset = read_xrefStream(xref_offset);
 	}
+        if (visited.count(xref_offset) != 0)
+        {
+            xref_offset = 0;
+        }
     }
 
     if (! this->m->trailer.isInitialized())

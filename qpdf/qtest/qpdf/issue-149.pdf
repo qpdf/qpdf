@@ -1,0 +1,120 @@
+%PDF-1.7
+%Á∑·∂
+% vim: set tw=76 ts=2 et :
+% convert with:
+% ./fixlengths < hello.txt > hello.pdf ; ./genxref hello.pdf
+1 0 obj
+  <<  /Type /Catalog
+      /Outlines 6 0 R
+      /Pages 2 0 R
+  >>
+endobj
+
+2 0 obj
+  <<  /Type /Pages
+      /Kids [3 0 R]
+      /Count 1
+  >>
+endobj
+
+3 0 obj
+  <<  /Type /Page
+      /Parent 2 0 R
+      /MediaBox [0 0 595.276 841.89]
+      /Contents 4 0 R
+      /Resources <<
+        /ProcSet [/PDF /Text]
+        /Font << /F1 5 0 R >>
+        >>
+  >>
+endobj
+
+4 0 obj
+  <<  /Length 36  >>
+stream
+  BT 80 100 Td /F1 48 Tf (foo) Tj ET
+endstream
+endobj
+
+5 0 obj
+  <<  /Type /Font
+      /Subtype /Type1
+      /Name /F1
+      /BaseFont /Helvetica
+      /Encoding /MacRomanEncoding
+  >>
+endobj
+
+6 0 obj
+  <<  /Type /Outlines
+      /Count 0
+  >>
+endobj
+
+xref
+0 7
+0000000000 65535 f
+0000000125 00000 n
+0000000208 00000 n
+0000000283 00000 n
+0000000492 00000 n
+0000000583 00000 n
+0000000721 00000 n
+
+trailer
+  <<  /Size 7
+      /Prev 1516
+      /Root 1 0 R
+  >>
+startxref
+779%%EOF
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+1 1 obj
+  <<  /Type /Catalog
+      /Outlines 6 0 R
+      /Pages 2 1 R
+  >>
+endobj
+
+2 1 obj
+  <<  /Type /Pages
+      /Kids [3 1 R]
+      /Count 1
+  >>
+endobj
+
+3 1 obj
+  <<  /Type /Page
+      /Parent 2 1 R
+      /MediaBox [0 0 595.276 841.89]
+      /Contents 4 1 R
+      /Resources <<
+        /ProcSet [/PDF /Text]
+        /Font << /F1 5 0 R >>
+        >>
+  >>
+endobj
+
+4 1 obj
+  <<  /Length 36  >>
+stream
+  BT 80 100 Td /F1 48 Tf (bar) Tj ET
+endstream
+endobj
+
+xref
+1 4
+0000001058 00001 n
+0000001141 00001 n
+0000001216 00001 n
+0000001425 00001 n
+
+trailer
+  <<  /Size 11
+      /Prev 779
+      /Root 1 1 R
+  >>
+startxref
+1516
+%%EOF
