@@ -35,6 +35,20 @@ Pl_Flate::~Pl_Flate()
 	delete [] this->outbuf;
 	this->outbuf = 0;
     }
+
+    if (this->initialized)
+    {
+        z_stream& zstream = *(static_cast<z_stream*>(this->zdata));
+        if (action == a_deflate)
+        {
+            deflateEnd(&zstream);
+        }
+        else
+        {
+            inflateEnd(&zstream);
+        }
+    }
+
     delete static_cast<z_stream*>(this->zdata);
     this->zdata = 0;
 }
@@ -174,6 +188,7 @@ Pl_Flate::finish()
                 {
                     err = inflateEnd(&zstream);
                 }
+                this->initialized = false;
                 checkError("End", err);
             }
 
