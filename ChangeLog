@@ -1,5 +1,8 @@
 2017-08-25  Jay Berkenbilt  <ejb@ql.org>
 
+	* Re-implement parser iteratively to avoid stack overflow on very
+	deeply nested arrays and dictionaries. Fixes #146.
+
 	* Detect infinite loop while finding additional xref tables. Fixes
 	#149.
 

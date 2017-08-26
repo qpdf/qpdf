@@ -667,7 +667,6 @@ class QPDFObjectHandle
         std::string const& object_description,
         QPDFTokenizer& tokenizer, bool& empty,
         StringDecrypter* decrypter, QPDF* context,
-        bool in_array, bool in_dictionary,
         bool content_stream);
     static void parseContentStream_internal(
         PointerHolder<Buffer> stream_data,

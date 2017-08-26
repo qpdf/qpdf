@@ -1,0 +1,5 @@
+WARNING: issue-146.pdf: file is damaged
+WARNING: issue-146.pdf: can't find startxref
+WARNING: issue-146.pdf: Attempting to reconstruct cross-reference table
+WARNING: issue-146.pdf (trailer, file position 20728): unknown token while reading object; treating as string
+issue-146.pdf (trailer, file position 20732): EOF while reading token
