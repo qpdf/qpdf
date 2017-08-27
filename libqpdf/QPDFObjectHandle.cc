@@ -965,8 +965,7 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 
     std::vector<std::vector<QPDFObjectHandle> > olist_stack;
     olist_stack.push_back(std::vector<QPDFObjectHandle>());
-    enum state_e { st_top, st_start, st_stop, st_eof, st_dictionary, st_array };
-    std::vector<state_e> state_stack;
+    std::vector<parser_state_e> state_stack;
     state_stack.push_back(st_top);
     std::vector<qpdf_offset_t> offset_stack;
     offset_stack.push_back(input->tell());
@@ -974,7 +973,7 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
     while (! done)
     {
         std::vector<QPDFObjectHandle>& olist = olist_stack.back();
-        state_e state = state_stack.back();
+        parser_state_e state = state_stack.back();
         qpdf_offset_t offset = offset_stack.back();
 
 	object = QPDFObjectHandle();
@@ -1193,7 +1192,7 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
                     "QPDFObjectHandle::parseInternal: st_stop encountered"
                     " with insufficient elements in stack");
             }
-            state_e old_state = state_stack.back();
+            parser_state_e old_state = state_stack.back();
             state_stack.pop_back();
             if (old_state == st_array)
             {

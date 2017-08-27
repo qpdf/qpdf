@@ -652,6 +652,16 @@ class QPDFObjectHandle
     QPDFObjectHandle(QPDF*, int objid, int generation);
     QPDFObjectHandle(QPDFObject*);
 
+    enum parser_state_e
+    {
+        st_top,
+        st_start,
+        st_stop,
+        st_eof,
+        st_dictionary,
+        st_array
+    };
+
     // Private object factory methods
     static QPDFObjectHandle newIndirect(QPDF*, int objid, int generation);
     static QPDFObjectHandle newStream(
