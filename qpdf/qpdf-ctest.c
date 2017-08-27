@@ -228,6 +228,7 @@ static void test06(char const* infile,
     qpdf_set_object_stream_mode(qpdf, qpdf_o_generate);
     qpdf_write(qpdf);
     report_errors();
+    free(buf);
 }
 
 static void test07(char const* infile,
