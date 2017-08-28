@@ -43,6 +43,9 @@ class QPDF_Stream: public QPDFObject
     // when adding streams to files.
     void setObjGen(int objid, int generation);
 
+  protected:
+    virtual void releaseResolved();
+
   private:
     static std::map<std::string, std::string> filter_abbreviations;
 

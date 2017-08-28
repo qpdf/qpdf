@@ -597,6 +597,7 @@ class QPDFObjectHandle
     {
 	friend class QPDF_Dictionary;
 	friend class QPDF_Array;
+        friend class QPDF_Stream;
       private:
 	static void releaseResolved(QPDFObjectHandle& o)
 	{

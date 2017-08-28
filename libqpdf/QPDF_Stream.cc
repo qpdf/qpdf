@@ -45,6 +45,13 @@ QPDF_Stream::~QPDF_Stream()
 }
 
 void
+QPDF_Stream::releaseResolved()
+{
+    this->stream_provider = 0;
+    QPDFObjectHandle::ReleaseResolver::releaseResolved(this->stream_dict);
+}
+
+void
 QPDF_Stream::setObjGen(int objid, int generation)
 {
     if (! ((this->objid == 0) && (this->generation == 0)))
