@@ -21,6 +21,7 @@
   make -k check NO_REBUILD=1
   ```
   This moves each binary into a subdirectory and replaces it with a link to make/exec-z. See make/exec-z.
+* Test with clang.
 * Check all open issues in the sourceforge trackers and on github.
 * If any interfaces were added or changed, check C API to see whether changes are appropriate there as well.  If necessary, review the casting policy in the manual, and ensure that integer types are properly handled.
 * Remember to avoid using `operator[]` with `std::string` or `std::vector`. Instead, use `at()`. See README-hardening.md for details.
