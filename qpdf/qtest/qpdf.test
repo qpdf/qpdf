@@ -222,6 +222,8 @@ my @bug_tests = (
     ["141b", "/W entry size 0", 2],
     ["143", "self-referential ostream", 3],
     ["146", "very deeply nested array", 2],
+    ["147", "previously caused memory error", 2],
+    ["148", "free memory on bad flate", 2],
     ["149", "xref prev pointer loop", 3],
     );
 $n_tests += scalar(@bug_tests);

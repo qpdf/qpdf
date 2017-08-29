@@ -1,0 +1,8 @@
+WARNING: issue-147.pdf: can't find PDF header
+WARNING: issue-147.pdf: file is damaged
+WARNING: issue-147.pdf: can't find startxref
+WARNING: issue-147.pdf: Attempting to reconstruct cross-reference table
+WARNING: issue-147.pdf (trailer, file position 9): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-147.pdf (object 62 0, file position 88): expected endobj
+WARNING: issue-147.pdf (trailer, file position 90): invalid /ID in trailer dictionary
+issue-147.pdf: invalid password
