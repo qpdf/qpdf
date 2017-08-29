@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
 	usage();
     }
     char const* filename = argv[1];
-    int pageno = atoi(argv[2]);
+    int pageno = QUtil::string_to_int(argv[2]);
 
     try
     {

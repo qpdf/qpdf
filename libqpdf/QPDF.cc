@@ -440,8 +440,8 @@ QPDF::reconstruct_xref(QPDFExc& e)
                     (t3 == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "obj")))
                 {
                     in_obj = true;
-                    int obj = atoi(t1.getValue().c_str());
-                    int gen = atoi(t2.getValue().c_str());
+                    int obj = QUtil::string_to_int(t1.getValue().c_str());
+                    int gen = QUtil::string_to_int(t2.getValue().c_str());
                     insertXrefEntry(obj, 1, token_start, gen, true);
                 }
             }
@@ -610,8 +610,8 @@ QPDF::parse_xrefFirst(std::string const& line,
         ++p;
     }
     bytes = p - start;
-    obj = atoi(obj_str.c_str());
-    num = atoi(num_str.c_str());
+    obj = QUtil::string_to_int(obj_str.c_str());
+    num = QUtil::string_to_int(num_str.c_str());
     return true;
 }
 
@@ -706,7 +706,7 @@ QPDF::parse_xrefEntry(std::string const& line,
     }
 
     f1 = QUtil::string_to_ll(f1_str.c_str());
-    f2 = atoi(f2_str.c_str());
+    f2 = QUtil::string_to_int(f2_str.c_str());
 
     return true;
 }
@@ -1570,8 +1570,8 @@ QPDF::readObjectAtOffset(bool try_recovery,
 			  this->m->last_object_description, offset,
 			  "expected n n obj");
 	}
-	objid = atoi(tobjid.getValue().c_str());
-	generation = atoi(tgen.getValue().c_str());
+	objid = QUtil::string_to_int(tobjid.getValue().c_str());
+	generation = QUtil::string_to_int(tgen.getValue().c_str());
 
         if (objid == 0)
         {
@@ -1855,7 +1855,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
 			  "expected integer in object stream header");
 	}
 
-	int num = atoi(tnum.getValue().c_str());
+	int num = QUtil::string_to_int(tnum.getValue().c_str());
 	int offset = QUtil::string_to_ll(toffset.getValue().c_str());
 	offsets[num] = offset + first;
     }

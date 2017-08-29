@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
     }
     bool encode = (strcmp(argv[1], "encode") == 0);
     char* filename = argv[2];
-    int columns = atoi(argv[3]);
+    int columns = QUtil::string_to_int(argv[3]);
 
     try
     {

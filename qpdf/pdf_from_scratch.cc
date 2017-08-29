@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
 
     try
     {
-	int n = atoi(argv[1]);
+	int n = QUtil::string_to_int(argv[1]);
 	runtest(n);
     }
     catch (std::exception& e)

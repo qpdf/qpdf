@@ -17,6 +17,7 @@
 * Test with clang.
 * Check all open issues in the sourceforge trackers and on github.
 * If any interfaces were added or changed, check C API to see whether changes are appropriate there as well.  If necessary, review the casting policy in the manual, and ensure that integer types are properly handled.
+* Avoid atoi. Use QUtil::string_to_int instead. It does overflow/underflow checking.
 * Remember to avoid using `operator[]` with `std::string` or `std::vector`. Instead, use `at()`. See README-hardening.md for details.
 * Increment shared library version information as needed (`LT_*` in `configure.ac`)
 * Update release notes in manual. Look at diffs and ChangeLog.

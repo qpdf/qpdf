@@ -1127,7 +1127,7 @@ static void parse_version(std::string const& full_version_string,
     if (p2 && *(p2 + 1))
     {
         *p2++ = '\0';
-        extension_level = atoi(p2);
+        extension_level = QUtil::string_to_int(p2);
     }
     version = v;
 }
@@ -1233,7 +1233,7 @@ static void parse_rotation_parameter(Options& o, std::string const& parameter)
     if (range_valid &&
         ((angle_str == "90") || (angle_str == "180") || (angle_str == "270")))
     {
-        int angle = atoi(angle_str.c_str());
+        int angle = QUtil::string_to_int(angle_str.c_str());
         if (relative == -1)
         {
             angle = -angle;
@@ -1492,7 +1492,8 @@ static void parse_options(int argc, char* argv[], Options& o)
             }
             else if (strcmp(arg, "split-pages") == 0)
             {
-                int n = ((parameter == 0) ? 1 : atoi(parameter));
+                int n = ((parameter == 0) ? 1 :
+                         QUtil::string_to_int(parameter));
                 o.split_pages = n;
             }
             else if (strcmp(arg, "verbose") == 0)
@@ -1547,9 +1548,9 @@ static void parse_options(int argc, char* argv[], Options& o)
                 if ((gen = strchr(obj, ',')) != 0)
                 {
                     *gen++ = 0;
-                    o.show_gen = atoi(gen);
+                    o.show_gen = QUtil::string_to_int(gen);
                 }
-                o.show_obj = atoi(obj);
+                o.show_obj = QUtil::string_to_int(obj);
                 o.require_outfile = false;
             }
             else if (strcmp(arg, "raw-stream-data") == 0)
