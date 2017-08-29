@@ -49,8 +49,8 @@ class Pl_DCT: public Pipeline
     virtual void finish();
 
   private:
-    void compress(void* cinfo, PointerHolder<Buffer>);
-    void decompress(void* cinfo, PointerHolder<Buffer>);
+    void compress(void* cinfo, Buffer*);
+    void decompress(void* cinfo, Buffer*);
 
     enum action_e { a_compress, a_decompress };
 

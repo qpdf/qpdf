@@ -66,7 +66,6 @@ void
 Pl_DCT::finish()
 {
     this->buf.finish();
-    PointerHolder<Buffer> b = this->buf.getBuffer();
 
     struct jpeg_compress_struct cinfo_compress;
     struct jpeg_decompress_struct cinfo_decompress;
@@ -77,6 +76,10 @@ Pl_DCT::finish()
     jerr.pub.error_exit = error_handler;
 
     bool error = false;
+    // Using a PointerHolder<Buffer> here and passing it into compress
+    // and decompress causes a memory leak with setjmp/longjmp. Just
+    // use a pointer and delete it.
+    Buffer* b = this->buf.getBuffer();
     if (setjmp(jerr.jmpbuf) == 0)
     {
         if (this->action == a_compress)
@@ -92,6 +95,7 @@ Pl_DCT::finish()
     {
         error = true;
     }
+    delete b;
 
     if (this->action == a_compress)
     {
@@ -127,7 +131,7 @@ class Freer
 };
 
 void
-Pl_DCT::compress(void* cinfo_p, PointerHolder<Buffer> b)
+Pl_DCT::compress(void* cinfo_p, Buffer* b)
 {
     struct jpeg_compress_struct* cinfo =
         reinterpret_cast<jpeg_compress_struct*>(cinfo_p);
@@ -183,7 +187,7 @@ Pl_DCT::compress(void* cinfo_p, PointerHolder<Buffer> b)
 }
 
 void
-Pl_DCT::decompress(void* cinfo_p, PointerHolder<Buffer> b)
+Pl_DCT::decompress(void* cinfo_p, Buffer* b)
 {
     struct jpeg_decompress_struct* cinfo =
         reinterpret_cast<jpeg_decompress_struct*>(cinfo_p);
