@@ -81,11 +81,40 @@ QUtil::double_to_string(double num, int decimal_places)
 long long
 QUtil::string_to_ll(char const* str)
 {
+    errno = 0;
 #ifdef _MSC_VER
-    return _strtoi64(str, 0, 10);
+    long long result = _strtoi64(str, 0, 10);
 #else
-    return strtoll(str, 0, 10);
+    long long result = strtoll(str, 0, 10);
 #endif
+    if (errno == ERANGE)
+    {
+        throw std::runtime_error(
+            std::string("overflow/underflow converting ") + str
+            + " to 64-bit integer");
+    }
+    return result;
+}
+
+int
+QUtil::string_to_int(char const* str)
+{
+    errno = 0;
+    long long_val = strtol(str, 0, 10);
+    if (errno == ERANGE)
+    {
+        throw std::runtime_error(
+            std::string("overflow/underflow converting ") + str
+            + " to long integer");
+    }
+    int result = static_cast<int>(long_val);
+    if (static_cast<long>(result) != long_val)
+    {
+        throw std::runtime_error(
+            std::string("overflow/underflow converting ") + str
+            + " to integer");
+    }
+    return result;
 }
 
 unsigned char*

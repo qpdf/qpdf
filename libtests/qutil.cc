@@ -6,12 +6,64 @@
 #include <qpdf/QUtil.hh>
 #include <qpdf/PointerHolder.hh>
 #include <string.h>
+#include <limits.h>
 
 #ifdef _WIN32
 # include <io.h>
 #else
 # include <unistd.h>
 #endif
+
+template <class int_T>
+void test_to_number(char const* str, int_T wanted, bool error,
+                    int_T (*fn)(char const*))
+{
+    bool threw = false;
+    bool worked = false;
+    int_T result = 0;
+    try
+    {
+        result = fn(str);
+        worked = (wanted == result);
+    }
+    catch (std::runtime_error)
+    {
+        threw = true;
+    }
+    if (threw)
+    {
+        if (error)
+        {
+            std::cout << str << " to int threw: PASSED" << std::endl;
+        }
+        else
+        {
+            std::cout << str << " to int threw but wanted "
+                      << wanted << std::endl;
+        }
+    }
+    else
+    {
+        if (worked)
+        {
+            std::cout << str << " to int: PASSED" << std::endl;
+        }
+        else
+        {
+            std::cout << str << " to int failed; got " << result << std::endl;
+        }
+    }
+}
+
+void test_to_int(char const* str, int wanted, bool error)
+{
+    test_to_number(str, wanted, error, QUtil::string_to_int);
+}
+
+void test_to_ll(char const* str, long long wanted, bool error)
+{
+    test_to_number(str, wanted, error, QUtil::string_to_ll);
+}
 
 void string_conversion_test()
 {
@@ -44,6 +96,21 @@ void string_conversion_test()
 	std::cout << "compare failed" << std::endl;
     }
     delete [] tmp;
+
+    std::string int_max_str = QUtil::int_to_string(INT_MAX);
+    std::string int_min_str = QUtil::int_to_string(INT_MIN);
+    long long int_max_plus_1 = static_cast<long long>(INT_MAX) + 1;
+    long long int_min_minus_1 = static_cast<long long>(INT_MIN) - 1;
+    std::string int_max_plus_1_str = QUtil::int_to_string(int_max_plus_1);
+    std::string int_min_minus_1_str = QUtil::int_to_string(int_min_minus_1);
+    test_to_int(int_min_str.c_str(), INT_MIN, false);
+    test_to_int(int_max_str.c_str(), INT_MAX, false);
+    test_to_int(int_max_plus_1_str.c_str(), 0, true);
+    test_to_int(int_min_minus_1_str.c_str(), 0, true);
+    test_to_int("9999999999999999999999999", 0, true);
+    test_to_ll(int_max_plus_1_str.c_str(), int_max_plus_1, false);
+    test_to_ll(int_min_minus_1_str.c_str(), int_min_minus_1, false);
+    test_to_ll("99999999999999999999999999999999999999999999999999", 0, true);
 }
 
 void os_wrapper_test()

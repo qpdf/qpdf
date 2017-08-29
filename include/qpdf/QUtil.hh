@@ -29,8 +29,12 @@ namespace QUtil
     QPDF_DLL
     std::string double_to_string(double, int decimal_places = 0);
 
+    // These string to number methods throw std::runtime_error on
+    // underflow/overflow.
     QPDF_DLL
     long long string_to_ll(char const* str);
+    QPDF_DLL
+    int string_to_int(char const* str);
 
     // Pipeline's write method wants unsigned char*, but we often have
     // some other type of string.  These methods do combinations of
