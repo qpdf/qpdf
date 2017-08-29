@@ -13,14 +13,7 @@
      LDFLAGS="-fsanitize=address" \
      --enable-werror --disable-shared
   ```
-  As of gcc 6.3.0, this exposes some good things but appears to also have some false positive leak reports. Valgrind is more reliable but also may miss some things that this catches.
-* Consider running tests with latest gcc and/or valgrind. To test with valgrind:
-  ```
-  ./configure --disable-shared
-  make -j8 -k VALGRIND=1
-  make -k check NO_REBUILD=1
-  ```
-  This moves each binary into a subdirectory and replaces it with a link to make/exec-z. See make/exec-z.
+  The test suite should run clean with this. This seems to be more reliable than valgrind.
 * Test with clang.
 * Check all open issues in the sourceforge trackers and on github.
 * If any interfaces were added or changed, check C API to see whether changes are appropriate there as well.  If necessary, review the casting policy in the manual, and ensure that integer types are properly handled.
@@ -83,7 +76,7 @@ If building or editing documentation, configure with `--enable-doc-maintenance`.
 
 If you want to run `make maintainer-clean`, `make distclean`, or `make autofiles.zip` and you haven't run `./configure`, you can pass `CLEAN=1` to make on the command line to prevent it from complaining about configure not having been run.
 
-If you want to run checks without rerunning the build, pass `NO_REBUILD=1` to make. This can be useful for special testing scenarios such as valgrind or binary compatibility.
+If you want to run checks without rerunning the build, pass `NO_REBUILD=1` to make. This can be useful for special testing scenarios such as validation of memory fixes or binary compatibility.
 
 # Local Windows Testing Procedure
 
