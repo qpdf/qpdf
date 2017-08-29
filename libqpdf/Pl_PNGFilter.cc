@@ -14,6 +14,10 @@ Pl_PNGFilter::Pl_PNGFilter(char const* identifier, Pipeline* next,
     buf2(0),
     pos(0)
 {
+    if (columns == 0)
+    {
+        throw std::runtime_error("PNGFilter created with columns = 0");
+    }
     this->buf1 = new unsigned char[columns + 1];
     this->buf2 = new unsigned char[columns + 1];
     this->cur_row = buf1;
