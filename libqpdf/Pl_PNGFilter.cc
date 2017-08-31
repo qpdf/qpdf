@@ -1,6 +1,7 @@
 #include <qpdf/Pl_PNGFilter.hh>
 #include <stdexcept>
 #include <string.h>
+#include <limits.h>
 
 Pl_PNGFilter::Pl_PNGFilter(char const* identifier, Pipeline* next,
 			   action_e action, unsigned int columns,
@@ -14,9 +15,10 @@ Pl_PNGFilter::Pl_PNGFilter(char const* identifier, Pipeline* next,
     buf2(0),
     pos(0)
 {
-    if (columns == 0)
+    if ((columns == 0) || (columns > UINT_MAX - 1))
     {
-        throw std::runtime_error("PNGFilter created with columns = 0");
+        throw std::runtime_error(
+            "PNGFilter created with invalid columns value");
     }
     this->buf1 = new unsigned char[columns + 1];
     this->buf2 = new unsigned char[columns + 1];
