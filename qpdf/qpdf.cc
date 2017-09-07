@@ -1337,6 +1337,11 @@ static void parse_options(int argc, char* argv[], Options& o)
             }
             else if (strcmp(arg, "rotate") == 0)
             {
+                if (parameter == 0)
+                {
+                    usage("--rotate must be given as"
+                          " --rotate=[+|-]angle:page-range");
+                }
                 parse_rotation_parameter(o, parameter);
             }
             else if (strcmp(arg, "stream-data") == 0)
