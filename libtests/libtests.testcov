@@ -27,3 +27,5 @@ InputSource found match at buf[0] 0
 Pl_RunLength: switch to run 1
 Pl_RunLength flush full buffer 1
 Pl_RunLength flush empty buffer 0
+Pl_DCT empty_pipeline_output_buffer 0
+Pl_DCT term_pipeline_destination 0

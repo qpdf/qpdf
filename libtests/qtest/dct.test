@@ -16,38 +16,45 @@ my $td = new TestDriver('dct');
 
 cleanup();
 
-$td->runtest("compress",
-             {$td->COMMAND => "dct_compress rawdata a.jpg 400 256 gray"},
-             {$td->STRING => "", $td->EXIT_STATUS => 0});
-$td->runtest("decompress",
-             {$td->COMMAND => "dct_uncompress a.jpg out"},
-             {$td->STRING => "", $td->EXIT_STATUS => 0});
-# Compare
-my @raw = get_data('rawdata');
-my @processed = get_data('out');
 my $checked_data = 0;
-if ($td->runtest("bytes in data",
-                 {$td->STRING => scalar(@processed)},
-                 {$td->STRING => scalar(@raw)}))
+foreach my $d (['rawdata', '400 256 gray', 0],
+               ['big-rawdata', '1024 576 rgb', 0.2])
 {
-    my $mismatch = 0;
-    for (my $i = 0; $i < scalar(@raw); ++$i)
+    my ($in, $args, $mismatch_fraction) = @$d;
+    $td->runtest("compress",
+                 {$td->COMMAND => "dct_compress $in a.jpg $args"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0});
+    $td->runtest("decompress",
+                 {$td->COMMAND => "dct_uncompress a.jpg out"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0});
+    # Compare
+    my @raw = get_data($in);
+    my @processed = get_data('out');
+    my $bytes = scalar(@raw);
+    if ($td->runtest("bytes in data",
+                     {$td->STRING => scalar(@processed)},
+                     {$td->STRING => $bytes}))
     {
-        $checked_data = 1;
-        my $delta = abs(ord($raw[$i]) - ord($processed[$i]));
-        if ($delta > 10)
+        ++$checked_data;
+        my $mismatch = 0;
+        for (my $i = 0; $i < scalar(@raw); ++$i)
         {
-            ++$mismatch;
+            my $delta = abs(ord($raw[$i]) - ord($processed[$i]));
+            if ($delta > 10)
+            {
+                ++$mismatch;
+            }
         }
+        my $threshold = int($mismatch_fraction * $bytes);
+        $td->runtest("data is close enough",
+                     {$td->STRING => $mismatch <= $threshold ? 'pass' : 'fail'},
+                     {$td->STRING => 'pass'});
     }
-    $td->runtest("data is close enough",
-                 {$td->STRING => $mismatch},
-                 {$td->STRING => '0'});
 }
 
 cleanup();
 
-$td->report(3 + $checked_data);
+$td->report(6 + $checked_data);
 
 sub cleanup
 {
