@@ -420,12 +420,21 @@ class QPDFObjectHandle
     // configured filters. QPDFWriter handles this by attempting to
     // get the stream data without filtering, but callers should
     // consider a false return value when decode_level is not
-    // qpdf_dl_none to be a potential loss of data.
+    // qpdf_dl_none to be a potential loss of data. If you intend to
+    // retry in that case, pass true as the value of will_retry. This
+    // changes the warning issued by the library to indicate that the
+    // operation will be retried without filtering to avoid data loss.
     QPDF_DLL
     bool pipeStreamData(Pipeline*,
                         unsigned long encode_flags,
                         qpdf_stream_decode_level_e decode_level,
                         bool suppress_warnings = false);
+    QPDF_DLL
+    bool pipeStreamData(Pipeline*,
+                        unsigned long encode_flags,
+                        qpdf_stream_decode_level_e decode_level,
+                        bool suppress_warnings,
+                        bool will_retry);
 
     // Legacy pipeStreamData. This maps to the the flags-based
     // pipeStreamData as follows:

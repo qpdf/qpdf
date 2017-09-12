@@ -1,5 +1,10 @@
 2017-09-12  Jay Berkenbilt  <ejb@ql.org>
 
+	* Improve the error message that is issued when QPDFWriter
+	encounters a stream that can't be decoded. In particular, mention
+	that the stream will be copied without filtering to avoid data
+	loss.
+
 	* Add new methods to the C API to correspond to new additions to
 	QPDFWriter:
 	- qpdf_set_compress_streams

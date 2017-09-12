@@ -554,11 +554,13 @@ class QPDF
 	static bool pipeStreamData(QPDF* qpdf, int objid, int generation,
 				   qpdf_offset_t offset, size_t length,
 				   QPDFObjectHandle dict,
-				   Pipeline* pipeline, bool suppress_warnings)
+				   Pipeline* pipeline,
+                                   bool suppress_warnings,
+                                   bool will_retry)
 	{
 	    return qpdf->pipeStreamData(
 		objid, generation, offset, length, dict, pipeline,
-                suppress_warnings);
+                suppress_warnings, will_retry);
 	}
     };
     friend class Pipe;
@@ -688,7 +690,8 @@ class QPDF
 			qpdf_offset_t offset, size_t length,
 			QPDFObjectHandle dict,
 			Pipeline* pipeline,
-                        bool suppress_warnings);
+                        bool suppress_warnings,
+                        bool will_retry);
 
     // For QPDFWriter:
 

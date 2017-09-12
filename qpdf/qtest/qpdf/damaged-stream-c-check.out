@@ -3,3 +3,8 @@ warning: damaged-stream.pdf (file position 426): error decoding stream data for 
   file: damaged-stream.pdf
   pos : 426
   text: error decoding stream data for object 5 0: LZWDecoder: bad code received
+warning: damaged-stream.pdf (file position 426): stream will be re-processed without filtering to avoid data loss
+  code: 5
+  file: damaged-stream.pdf
+  pos : 426
+  text: stream will be re-processed without filtering to avoid data loss

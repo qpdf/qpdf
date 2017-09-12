@@ -2382,7 +2382,8 @@ QPDF::pipeStreamData(int objid, int generation,
 		     qpdf_offset_t offset, size_t length,
 		     QPDFObjectHandle stream_dict,
 		     Pipeline* pipeline,
-                     bool suppress_warnings)
+                     bool suppress_warnings,
+                     bool will_retry)
 {
     bool success = false;
     std::vector<PointerHolder<Pipeline> > to_delete;
@@ -2430,6 +2431,13 @@ QPDF::pipeStreamData(int objid, int generation,
                          "error decoding stream data for object " +
                          QUtil::int_to_string(objid) + " " +
                          QUtil::int_to_string(generation) + ": " + e.what()));
+            if (will_retry)
+            {
+                warn(QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
+                             "", this->m->file->getLastOffset(),
+                             "stream will be re-processed without"
+                             " filtering to avoid data loss"));
+            }
         }
     }
     if (! success)

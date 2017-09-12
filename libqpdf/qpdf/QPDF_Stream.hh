@@ -25,7 +25,7 @@ class QPDF_Stream: public QPDFObject
     bool pipeStreamData(Pipeline*,
                         unsigned long encode_flags,
                         qpdf_stream_decode_level_e decode_level,
-                        bool suppress_warnings);
+                        bool suppress_warnings, bool will_retry);
     PointerHolder<Buffer> getStreamData(qpdf_stream_decode_level_e);
     PointerHolder<Buffer> getRawStreamData();
     void replaceStreamData(PointerHolder<Buffer> data,

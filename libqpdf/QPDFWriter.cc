@@ -1623,7 +1623,7 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
                      ((filter && compress) ? qpdf_ef_compress : 0)),
                     (filter
                      ? (uncompress ? qpdf_dl_all : this->m->stream_decode_level)
-                     : qpdf_dl_none));
+                     : qpdf_dl_none), false, (attempt == 1));
             popPipelineStack(&stream_data);
             if (filter && (! filtered))
             {
