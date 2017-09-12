@@ -502,6 +502,30 @@ void qpdf_set_object_stream_mode(qpdf_data qpdf, qpdf_object_stream_e mode)
     qpdf->qpdf_writer->setObjectStreamMode(mode);
 }
 
+void qpdf_set_compress_streams(qpdf_data qpdf, QPDF_BOOL value)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_set_compress_streams");
+    qpdf->qpdf_writer->setCompressStreams(value);
+}
+
+void qpdf_set_decode_level(qpdf_data qpdf, qpdf_stream_decode_level_e level)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_set_decode_level");
+    qpdf->qpdf_writer->setDecodeLevel(level);
+}
+
+void qpdf_set_preserve_unreferenced_objects(qpdf_data qpdf, QPDF_BOOL value)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_set_preserve_unreferenced_objects");
+    qpdf->qpdf_writer->setPreserveUnreferencedObjects(value);
+}
+
+void qpdf_set_newline_before_endstream(qpdf_data qpdf, QPDF_BOOL value)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_set_newline_before_endstream");
+    qpdf->qpdf_writer->setNewlineBeforeEndstream(value);
+}
+
 void qpdf_set_stream_data_mode(qpdf_data qpdf, qpdf_stream_data_e mode)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_set_stream_data_mode");

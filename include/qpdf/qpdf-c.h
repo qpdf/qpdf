@@ -319,6 +319,21 @@ extern "C" {
 				   enum qpdf_stream_data_e mode);
 
     QPDF_DLL
+    void qpdf_set_compress_streams(qpdf_data qpdf, QPDF_BOOL value);
+
+
+    QPDF_DLL
+    void qpdf_set_decode_level(qpdf_data qpdf,
+                               enum qpdf_stream_decode_level_e level);
+
+    QPDF_DLL
+    void qpdf_set_preserve_unreferenced_objects(
+        qpdf_data qpdf, QPDF_BOOL value);
+
+    QPDF_DLL
+    void qpdf_set_newline_before_endstream(qpdf_data qpdf, QPDF_BOOL value);
+
+    QPDF_DLL
     void qpdf_set_content_normalization(qpdf_data qpdf, QPDF_BOOL value);
 
     QPDF_DLL

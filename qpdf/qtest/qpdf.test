@@ -687,7 +687,7 @@ $td->runtest("short /O or /U",
 show_ntests();
 # ----------
 $td->notify("--- Newline before endstream ---");
-$n_tests += 8;
+$n_tests += 10;
 
 # From issue 133, http://verapdf.org/software/ is an open source
 # package that can verify PDF/A compliance. This could potentially be
@@ -716,6 +716,16 @@ foreach my $d (
                      {$td->FILE => "a.pdf", $td->EXIT_STATUS => 0});
     }
 }
+
+$td->runtest("newline before endstream (C)",
+             {$td->COMMAND =>
+                  "qpdf-ctest 22 streams-with-newlines.pdf '' a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "newline-before-endstream-nl.pdf"});
+
 show_ntests();
 # ----------
 $td->notify("--- Split Pages ---");
@@ -949,7 +959,7 @@ $td->runtest("check output",
 show_ntests();
 # ----------
 $td->notify("--- Decode levels ---");
-$n_tests += 12;
+$n_tests += 14;
 
 # image-streams.pdf is the output of examples/pdf-create.
 # examples/pdf-create validates the actual image data.
@@ -966,6 +976,17 @@ foreach my $l (qw(none generalized specialized all))
                  {$td->FILE => "image-streams-$l.out", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
 }
+
+# C API
+$td->runtest("image-streams: C",
+             {$td->COMMAND => "qpdf-ctest 20 image-streams.pdf '' a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check image-streams: C",
+             {$td->COMMAND => "test_driver 39 a.pdf"},
+             {$td->FILE => "image-streams-specialized.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 # Bad JPEG data
 $td->runtest("check finds bad jpeg data",
@@ -990,7 +1011,7 @@ $td->runtest("get data",
 show_ntests();
 # ----------
 $td->notify("--- Preserve unreferenced objects ---");
-$n_tests += 4;
+$n_tests += 6;
 
 $td->runtest("drop unused objects",
 	     {$td->COMMAND => "qpdf --static-id unreferenced-objects.pdf a.pdf"},
@@ -1001,6 +1022,13 @@ $td->runtest("check output",
 $td->runtest("keep unused objects",
 	     {$td->COMMAND => "qpdf --static-id --preserve-unreferenced" .
                   " unreferenced-objects.pdf a.pdf"},
+	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "unreferenced-preserved.pdf"});
+$td->runtest("keep unused objects (C)",
+	     {$td->COMMAND =>
+                  "qpdf-ctest 21 unreferenced-objects.pdf '' a.pdf"},
 	     {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("check output",
 	     {$td->FILE => "a.pdf"},
