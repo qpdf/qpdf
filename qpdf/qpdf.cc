@@ -1170,13 +1170,37 @@ static void handle_help_version(int argc, char* argv[])
         //      12345678901234567890123456789012345678901234567890123456789012345678901234567890
         std::cout
             << whoami << " version " << QPDF::QPDFVersion() << std::endl
+            << std::endl
             << "Copyright (c) 2005-2017 Jay Berkenbilt"
             << std::endl
-            << "This software may be distributed under the terms of version 2 of the"
+            << "QPDF is licensed under the Apache License, Version 2.0 (the \"License\");"
             << std::endl
-            << "Artistic License which may be found in the source distribution.  It is"
+            << "not use this file except in compliance with the License."
             << std::endl
-            << "provided \"as is\" without express or implied warranty."
+            << "You may obtain a copy of the License at"
+            << std::endl
+            << std::endl
+            << "  http://www.apache.org/licenses/LICENSE-2.0"
+            << std::endl
+            << std::endl
+            << "Unless required by applicable law or agreed to in writing, software"
+            << std::endl
+            << "distributed under the License is distributed on an \"AS IS\" BASIS,"
+            << std::endl
+            << "WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied."
+            << std::endl
+            << "See the License for the specific language governing permissions and"
+            << std::endl
+            << "limitations under the License."
+            << std::endl
+            << std::endl
+            << "Versions of qpdf prior to version 7 were released under the terms"
+            << std::endl
+            << "of version 2.0 of the Artistic License. At your option, you may"
+            << std::endl
+            << "continue to consider qpdf to be licensed under those terms. Please"
+            << std::endl
+            << "see the manual for additional information."
             << std::endl;
         exit(0);
     }

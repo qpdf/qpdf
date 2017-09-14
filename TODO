@@ -1,6 +1,9 @@
 Before final 7.0.0
 ==================
 
+ * Include information about relicensing prominently in release
+   announcement for packagers.
+
  * Create release notes
 
 Soon

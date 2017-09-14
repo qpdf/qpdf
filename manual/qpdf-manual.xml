@@ -30,10 +30,30 @@
    url="https://github.com/qpdf/qpdf">https://github.com/qpdf/qpdf</ulink>.
   </para>
   <para>
-   QPDF has been released under the terms of <ulink
-   url="http://www.opensource.org/licenses/artistic-license-2.0.php">Version
-   2.0 of the Artistic License</ulink>, a copy of which appears in the
-   file <filename>Artistic-2.0</filename> in the source distribution.
+   QPDF is licensed under <ulink
+   url="http://www.apache.org/licenses/LICENSE-2.0">the Apache
+   License, Version 2.0</ulink> (the "License"). Unless required by
+   applicable law or agreed to in writing, software distributed under
+   the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+   OR CONDITIONS OF ANY KIND, either express or implied. See the
+   License for the specific language governing permissions and
+   limitations under the License.
+  </para>
+  <para>
+   Versions of qpdf prior to version 7 were released under the terms
+   of <ulink url="https://opensource.org/licenses/Artistic-2.0">the
+   Artistic License, version 2.0</ulink>. At your option, you may
+   continue to consider qpdf to be licensed under those terms. The
+   Apache License 2.0 permits everything that the Artistic License 2.0
+   permits but is slightly less restrictive. Allowing the Artistic
+   License to continue being used is primary to help people who may
+   have to get specific approval to use qpdf in their products.
+  </para>
+  <para>
+   QPDF is intentionally released with a permissive license. However,
+   if there is some reason that the licensing terms don't work for
+   your requirements, please feel free to contact the copyright holder
+   to make other arrangements.
   </para>
   <para>
    QPDF was originally created in 2001 and modified periodically

@@ -1,5 +1,15 @@
 2017-09-12  Jay Berkenbilt  <ejb@ql.org>
 
+	* Relicense qpdf under version 2.0 of the Apache License rather
+	than version 2.0 of the Artistic License. Both are fine, but the
+	Apache License is in more widespread use, and I like it a little
+	better than Artistic-2.0. It is my intention that there be no
+	change in what you can or can't do with qpdf. Versions of qpdf
+	prior to version 7 were released under the terms of version 2.0 of
+	the Artistic License. At your option, you may continue to consider
+	qpdf to be licensed under those terms. Please see the manual for
+	additional information.
+
 	* Improve the error message that is issued when QPDFWriter
 	encounters a stream that can't be decoded. In particular, mention
 	that the stream will be copied without filtering to avoid data
