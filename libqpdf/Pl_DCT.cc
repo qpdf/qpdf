@@ -138,7 +138,7 @@ init_pipeline_destination(j_compress_ptr)
 {
 }
 
-static int
+static boolean
 empty_pipeline_output_buffer(j_compress_ptr cinfo)
 {
     QTC::TC("libtests", "Pl_DCT empty_pipeline_output_buffer");
@@ -183,7 +183,7 @@ init_buffer_source(j_decompress_ptr)
 {
 }
 
-static int
+static boolean
 fill_buffer_input_buffer(j_decompress_ptr)
 {
     // The whole JPEG data is expected to reside in the supplied memory
