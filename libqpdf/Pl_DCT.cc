@@ -68,6 +68,20 @@ Pl_DCT::finish()
 {
     this->buf.finish();
 
+    // Using a PointerHolder<Buffer> here and passing it into compress
+    // and decompress causes a memory leak with setjmp/longjmp. Just
+    // use a pointer and delete it.
+    Buffer* b = this->buf.getBuffer();
+    if (b->getSize() == 0)
+    {
+        // Special case: empty data will never succeed and probably
+        // means we're calling finish a second time from an exception
+        // handler.
+        delete b;
+        this->getNext()->finish();
+        return;
+    }
+
     struct jpeg_compress_struct cinfo_compress;
     struct jpeg_decompress_struct cinfo_decompress;
     struct qpdf_jpeg_error_mgr jerr;
@@ -77,10 +91,6 @@ Pl_DCT::finish()
     jerr.pub.error_exit = error_handler;
 
     bool error = false;
-    // Using a PointerHolder<Buffer> here and passing it into compress
-    // and decompress causes a memory leak with setjmp/longjmp. Just
-    // use a pointer and delete it.
-    Buffer* b = this->buf.getBuffer();
     // The jpeg library is a "C" library, so we use setjmp and longjmp
     // for exception handling.
     if (setjmp(jerr.jmpbuf) == 0)
