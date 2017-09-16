@@ -82,7 +82,7 @@ Pl_DCT::finish()
     // use a pointer and delete it.
     Buffer* b = this->buf.getBuffer();
     // The jpeg library is a "C" library, so we use setjmp and longjmp
-    // for exceptoin handling.
+    // for exception handling.
     if (setjmp(jerr.jmpbuf) == 0)
     {
         try

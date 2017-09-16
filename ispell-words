@@ -389,6 +389,7 @@ eof
 eol
 epub
 eq
+ERANGE
 eraseItem
 Erdelsky's
 errno
@@ -1162,6 +1163,7 @@ resetBits
 resolveLiteral
 resolveObjectsInStream
 ResolveRecorder
+resync
 retargeted
 retested
 reverseResolved
