@@ -32,6 +32,6 @@ set +x
 
 echo ''
 echo "Finished builds for $wordsize. If not done already, rerun this"
-echo "in a" `expr 64 - $wordsize` "environment."
+echo "in a" `expr 96 - $wordsize` "environment."
 echo 'Then run "./make_windows_releases-finish".'
 echo ''
