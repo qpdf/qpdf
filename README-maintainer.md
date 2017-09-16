@@ -14,7 +14,7 @@
      --enable-werror --disable-shared
   ```
   The test suite should run clean with this. This seems to be more reliable than valgrind.
-* Test with clang.
+* Test with clang. Pass `CC=clang CXX=clang++` to `./configure`.
 * Check all open issues in the sourceforge trackers and on github.
 * If any interfaces were added or changed, check C API to see whether changes are appropriate there as well.  If necessary, review the casting policy in the manual, and ensure that integer types are properly handled.
 * Avoid atoi. Use QUtil::string_to_int instead. It does overflow/underflow checking.

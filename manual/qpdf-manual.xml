@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "7.0.b1">
-<!ENTITY lastreleased "August 22, 2017">
+<!ENTITY swversion "7.0.0">
+<!ENTITY lastreleased "September 15, 2017">
 ]>
 <book>
  <bookinfo>
@@ -154,8 +154,8 @@
      <listitem>
       <para>
        A C++ compiler that works well with STL and has the <type>long
-       long</type> type.  Most modern C++ compilers should fit the
-       bill fine.  QPDF is tested with gcc and Microsoft Visual C++.
+       long</type> type. Most modern C++ compilers should fit the bill
+       fine. QPDF is tested with gcc, clang, and Microsoft Visual C++.
       </para>
      </listitem>
     </itemizedlist>
@@ -283,15 +283,17 @@ make
     treated as a command-line argument. The <option>@-</option> option
     allows arguments to be read from standard input. This allows qpdf
     to be invoked with an arbitrary number of arbitrarily long
-    arguments.
+    arguments. It is also very useful for avoiding having to pass
+    passwords on the command line.
    </para>
    <para>
     <option>outfilename</option> does not have to be seekable, even
     when generating linearized files.  Specifying
-    &ldquo;<option>--</option>&rdquo; as <option>outfilename</option>
+    &ldquo;<option>-</option>&rdquo; as <option>outfilename</option>
     means to write to standard output.  However, you can't specify the
     same file as both the input and the output because qpdf reads data
-    from the input file as it writes to the output file.
+    from the input file as it writes to the output file. QPDF attempts
+    to detect this case and fail without overwriting the output file.
    </para>
    <para>
     Most options require an output file, but some testing or
@@ -507,12 +509,11 @@ make
     encoded in ISO-8859-1 and your terminal is configured to use
     UTF-8, the password you supply may not work properly.  There are
     various approaches to handling this.  For example, if you are
-    using Linux and have the iconv executable (part of the ICU
-    package) installed, you could pass <option>--password=`echo
-    <replaceable>password</replaceable> | iconv -t
-    iso-8859-1`</option> to qpdf where
+    using Linux and have the iconv executable installed, you could
+    pass <option>--password=`echo <replaceable>password</replaceable>
+    | iconv -t iso-8859-1`</option> to qpdf where
     <replaceable>password</replaceable> is a password specified in
-    your terminal's locale.  A detailed discussion of this is out of
+    your terminal's locale. A detailed discussion of this is out of
     scope for this manual, but just be aware of this issue if you have
     trouble with a password that contains 8-bit characters.
    </para>
@@ -904,7 +905,10 @@ outfile.pdf</option>
            supported generalized filters: <option>/LZWDecode</option>,
            <option>/FlateDecode</option>,
            <option>/ASCII85Decode</option>, and
-           <option>/ASCIIHexDecode</option>
+           <option>/ASCIIHexDecode</option>. We define generalized
+           filters as those to be used for general-purpose compression
+           or encoding, as opposed to filters specifically designed
+           for image data.
           </para>
          </listitem>
          <listitem>
@@ -953,9 +957,9 @@ outfile.pdf</option>
          </listitem>
          <listitem>
           <para>
-           <option>uncompress</option>: uncompress stream data when
-           possible; equivalent to
-           <option>--compress-streams=n</option>
+           <option>uncompress</option>: uncompress stream data
+           compressed with generalized filters when possible;
+           equivalent to <option>--compress-streams=n</option>
            <option>--decode-level=generalized</option>
           </para>
          </listitem>
@@ -1129,18 +1133,6 @@ outfile.pdf</option>
     Assuming proper filter implements, this is safe and generally
     results in smaller files.  This behavior may also be explicitly
     requested with <option>--stream-data=compress</option>.
-   </para>
-   <para>
-    When <option>--stream-data=preserve</option> is specified, qpdf
-    will never attempt to change the filtering of any stream data.
-   </para>
-   <para>
-    When <option>--stream-data=uncompress</option> is specified, qpdf
-    will attempt to remove any non-lossy filters that it supports.
-    This includes <literal>/FlateDecode</literal>,
-    <literal>/LZWDecode</literal>, <literal>/ASCII85Decode</literal>,
-    and <literal>/ASCIIHexDecode</literal>.  This can be very useful
-    for inspecting the contents of various streams.
    </para>
    <para>
     When <option>--normalize-content=y</option> is specified, qpdf
@@ -1386,7 +1378,14 @@ outfile.pdf</option>
         conditions that <option>--check</option> detects.  These are
         issued as warnings instead of errors.  If qpdf finds no errors
         but finds warnings, it will exit with a status of 3 (as of
-        version&nbsp;2.0.4).
+        version&nbsp;2.0.4). When <option>--check</option> is combined
+        with other options, checks are always performed before any
+        other options are processed. For erroneous files,
+        <option>--check</option> will cause qpdf to attempt to
+        recover, after which other options are effectively operating
+        on the recovered file. Combining <option>--check</option> with
+        other options in this way can be useful for manually
+        recovering severely damaged files.
        </para>
       </listitem>
      </varlistentry>
@@ -2924,6 +2923,237 @@ print "\n";
    For a detailed list of changes, please see the file
    <filename>ChangeLog</filename> in the source distribution.
   </para>
+  <variablelist>
+   <varlistentry>
+    <term>7.0.0: September 15, 2017</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Packaging and Distribution Changes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          QPDF's primary license is now <ulink
+          url="http://www.apache.org/licenses/LICENSE-2.0">version 2.0
+          of the Apache License</ulink> rather than version 2.0 of the
+          Artistic License. You may still, at your option, consider
+          qpdf to be licensed with version 2.0 of the Artistic
+          license.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          QPDF no longer has a dependency on the PCRE (Perl-Compatible
+          Regular Expression) library. QPDF now has an added
+          dependency on the JPEG library.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Bug Fixes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          This release contains many bug fixes for various infinite
+          loops, memory leaks, and other memory errors that could be
+          encountered with specially crafted or otherwise erroneous
+          PDF files.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+     <itemizedlist>
+      <listitem>
+       <para>
+        New Features
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          QPDF now supports reading and writing streams encoded with
+          JPEG or RunLength encoding. Library API enhancements and
+          command-line options have been added to control this
+          behavior. See command-line options
+          <option>--compress-streams</option> and
+          <option>--decode-level</option> and methods
+          <function>QPDFWriter::setCompressStreams</function> and
+          <function>QPDFWriter::setDecodeLevel</function>.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          QPDF is much better at recovering from broken files. In most
+          cases, qpdf will skip invalid objects and will preserve
+          broken stream data by not attempting to filter broken
+          streams. QPDF is now able to recover or at least not crash
+          on dozens of broken test files I have received over the past
+          few years.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Page rotation is now supported and accessible from both the
+          library and the command line.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          <classname>QPDFWriter</classname> supports writing files in
+          a way that preserves PCLm compliance in support of
+          driverless printing. This is very specialized and is only
+          useful to applications that already know how to create PCLm
+          files.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Enhancements to the <command>qpdf</command> Command-line Tool.
+        All new options listed here are documented in more detail in
+        <xref linkend="ref.using"/>.
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Command-line arguments can now be read from files or
+          standard input using <literal>@file</literal> or
+          <literal>@-</literal> syntax. Please see <xref
+          linkend="ref.invocation"/>.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          <option>--rotate</option>: request page rotation
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          <option>--newline-before-endstream</option>: ensure that a
+          newline appears before every <literal>endstream</literal>
+          keyword in the file; used to prevent qpdf from breaking
+          PDF/A compliance on already compliant files.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          <option>--preserve-unreferenced</option>: preserve
+          unreferenced objects in the input PDF
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+	  <option>--split-pages</option>: break output into chunks
+          with fixed numbers of pages
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+	  <option>--verbose</option>: print the name of each output
+          file that is created
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          <option>--compress-streams</option> and
+          <option>--decode-level</option> replace
+          <option>--stream-data</option> for improving granularity of
+          controlling compression and decompression of stream data.
+          The <option>--stream-data</option> option will remain
+          available.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          When running <command>qpdf --check</command> with other
+          options, checks are always run first. This enables qpdf to
+          perform its full recovery logic before outputting other
+          information. This can be especially useful when manually
+          recovering broken files, looking at qpdf's regenerated cross
+          reference table, or other similar operations.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Process <command>--pages</command> earlier so that other
+          options like <option>--show-pages</option> or
+          <option>--split-pages</option> can operate on the file after
+          page splitting/merging has occurred.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+     <itemizedlist>
+      <listitem>
+       <para>
+        API Changes. All new API calls are documented in their
+        respective classes' header files.
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          <function>QPDFObjectHandle::rotatePage</function>: apply
+          rotation to a page object
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          <function>QPDFWriter::setNewlineBeforeEndstream</function>:
+          force newline to appear before <literal>endstream</literal>
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          <function>QPDFWriter::setPreserveUnreferencedObjects</function>:
+          preserve unreferenced objects that appear in the input PDF.
+          The default behavior is to discard them.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          New <classname>Pipeline</classname> types
+          <classname>Pl_RunLength</classname> and
+          <classname>Pl_DCT</classname> are available for developers
+          who wish to produce or consume RunLength or DCT stream data
+          directly. The <filename>examples/pdf-create.cc</filename>
+          example illustrates their use.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+	  <function>QPDFWriter::setCompressStreams</function> and
+	  <function>QPDFWriter::setDecodeLevel</function> methods
+	  control handling of different types of stream compression.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+	  Add new C API functions
+	  <function>qpdf_set_compress_streams</function>,
+	  <function>qpdf_set_decode_level</function>,
+	  <function>qpdf_set_preserve_unreferenced_objects</function>,
+	  and <function>qpdf_set_newline_before_endstream</function>
+	  corresponding to the new <classname>QPDFWriter</classname>
+	  methods.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+  </variablelist>
   <variablelist>
    <varlistentry>
     <term>6.0.0: November 10, 2015</term>
