@@ -16,7 +16,8 @@ script:
   - ./configure --prefix=/usr
   - make -j$(nproc)
   - make install DESTDIR=$(readlink -f appdir) ; find appdir/
-  - rm -rf appdir/usr/include/ appdir/usr/lib/pkgconfig/ appdir/usr/lib/*.a # Don't bundle developer stuff
+  - rm -rf appdir/usr/include/ appdir/usr/lib/pkgconfig/ appdir/usr/lib/*.{a,la} # Don't bundle developer stuff
+  - sudo mv appdir/usr/lib/* /usr/local/lib/ # Workaround for https://github.com/probonopd/linuxdeployqt/issues/160
   - mkdir -p appdir/usr/share/icons/hicolor/128x128/apps ; cp dist/qpdf.png appdir/usr/share/icons/hicolor/128x128/apps/
   - mkdir -p appdir/usr/share/applications ; cp dist/qpdf.desktop appdir/usr/share/applications/
   - wget -c "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
