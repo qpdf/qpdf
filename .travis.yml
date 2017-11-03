@@ -12,7 +12,7 @@ install:
     - # source /opt/qt*/bin/qt*-env.sh
 
 script:
-  - autoconf ; automake --add-missing # Undocumented
+  - ./autogen.sh # Undocumented
   - ./configure --prefix=/usr
   - make -j$(nproc)
   - make install DESTDIR=$(readlink -f appdir) ; find appdir/
