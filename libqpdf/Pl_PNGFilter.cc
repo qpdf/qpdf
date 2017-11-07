@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <string.h>
 #include <limits.h>
+#include <math.h>
 
 Pl_PNGFilter::Pl_PNGFilter(char const* identifier, Pipeline* next,
 			   action_e action, unsigned int columns,
@@ -13,6 +14,7 @@ Pl_PNGFilter::Pl_PNGFilter(char const* identifier, Pipeline* next,
     prev_row(0),
     buf1(0),
     buf2(0),
+    bytes_per_pixel(bytes_per_pixel),
     pos(0)
 {
     if ((columns == 0) || (columns > UINT_MAX - 1))
@@ -82,37 +84,122 @@ Pl_PNGFilter::decodeRow()
     int filter = this->cur_row[0];
     if (this->prev_row)
     {
-	switch (filter)
-	{
-	  case 0:			// none
-	    break;
-
-	  case 1:			// sub
-	    throw std::logic_error("sub filter not implemented");
-	    break;
-
-	  case 2:			// up
-	    for (unsigned int i = 1; i <= this->columns; ++i)
-	    {
-		this->cur_row[i] += this->prev_row[i];
-	    }
-	    break;
-
-	  case 3:			// average
-	    throw std::logic_error("average filter not implemented");
-	    break;
-
-	  case 4:			// Paeth
-	    throw std::logic_error("Paeth filter not implemented");
-	    break;
-
-	  default:
-	    // ignore
-	    break;
-	}
+        switch (filter)
+        {
+          case 0:
+            break;
+          case 1:
+            this->decodeSub();
+            break;
+          case 2:
+            this->decodeUp();
+            break;
+          case 3:
+            this->decodeAverage();
+            break;
+          case 4:
+            this->decodePaeth();
+            break;
+          default:
+            // ignore
+            break;
+        }
     }
 
     getNext()->write(this->cur_row + 1, this->columns);
+}
+
+void
+Pl_PNGFilter::decodeSub()
+{
+    unsigned char* buffer = this->cur_row + 1;
+    unsigned int bpp = this->bytes_per_pixel != 0 ? this->bytes_per_pixel : 1;
+
+    for (unsigned int i = 0; i < this->columns; ++i)
+    {
+        unsigned char left = 0;
+
+        if (i >= bpp)
+        {
+            left = buffer[i - bpp];
+        }
+
+        buffer[i] += left;
+    }
+}
+
+void
+Pl_PNGFilter::decodeUp()
+{
+    unsigned char* buffer = this->cur_row + 1;
+    unsigned char* above_buffer = this->prev_row + 1;
+
+    for (unsigned int i = 0; i < this->columns; ++i)
+    {
+        unsigned char up = above_buffer[i];
+        buffer[i] += up;
+    }
+}
+
+void
+Pl_PNGFilter::decodeAverage()
+{
+    unsigned char* buffer = this->cur_row+1;
+    unsigned char* above_buffer = this->prev_row+1;
+    unsigned int bpp = this->bytes_per_pixel != 0 ? this->bytes_per_pixel : 1;
+
+    for (unsigned int i = 0; i < this->columns; ++i)
+    {
+        int left = 0, up = 0;
+
+        if (i >= bpp)
+        {
+            left = buffer[i - bpp];
+        }
+
+        up = above_buffer[i];
+        buffer[i] += floor((left+up) / 2);
+    }
+}
+
+void
+Pl_PNGFilter::decodePaeth()
+{
+    unsigned char* buffer = this->cur_row+1;
+    unsigned char* above_buffer = this->prev_row+1;
+    unsigned int bpp = this->bytes_per_pixel != 0 ? this->bytes_per_pixel : 1;
+
+    for (unsigned int i = 0; i < this->columns; ++i)
+    {
+        int left = 0,
+            up = above_buffer[i],
+            upper_left = 0;
+
+        if (i >= bpp)
+        {
+            left = buffer[i - bpp];
+            upper_left = above_buffer[i - bpp];
+        }
+
+        buffer[i] += this->PaethPredictor(left, up, upper_left);
+    }
+}
+
+int
+Pl_PNGFilter::PaethPredictor(int a, int b, int c)
+{
+    int p = a + b - c;
+    int pa = std::abs(p - a);
+    int pb = std::abs(p - b);
+    int pc = std::abs(p - c);
+
+    if (pa <= pb && pa <= pc) {
+        return a;
+    }
+    if (pb <= pc) {
+        return b;
+    }
+    return c;
 }
 
 void
