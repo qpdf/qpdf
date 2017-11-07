@@ -35,6 +35,10 @@ class Pl_PNGFilter: public Pipeline
     virtual void finish();
 
   private:
+    void decodeSub();
+    void decodeUp();
+    void decodeAverage();
+    void decodePaeth();
     void processRow();
     void encodeRow();
     void decodeRow();
@@ -45,6 +49,7 @@ class Pl_PNGFilter: public Pipeline
     unsigned char* prev_row;
     unsigned char* buf1;
     unsigned char* buf2;
+    unsigned int bytes_per_pixel;
     size_t pos;
     size_t incoming;
 };
