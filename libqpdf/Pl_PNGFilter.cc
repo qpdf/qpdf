@@ -82,6 +82,7 @@ void
 Pl_PNGFilter::decodeRow()
 {
     int filter = this->cur_row[0];
+
     if (this->prev_row)
     {
         switch (filter)
@@ -113,17 +114,18 @@ void
 Pl_PNGFilter::decodeSub()
 {
     unsigned char* buffer = this->cur_row + 1;
+    unsigned int bpp = this->bytes_per_pixel != 0 ? this->bytes_per_pixel : 1;
 
-    for (unsigned int i = 0; i << this->columns; ++i)
+    for (unsigned int i = 0; i < this->columns; ++i)
     {
-        if (i < this->bytes_per_pixel) 
+        unsigned char left = 0;
+
+        if (i >= bpp) 
         {
-            buffer[i] = 0;
+            left = buffer[i - bpp];
         }
-        else
-        {
-            buffer[i] += buffer[i - this->bytes_per_pixel] & 0xFF;
-        }
+
+        buffer[i] += left;
     }
 }
 
@@ -135,80 +137,70 @@ Pl_PNGFilter::decodeUp()
     
     for (unsigned int i = 0; i < this->columns; ++i)
     {
-        buffer[i] += above_buffer[i] & 0xFF;
+        unsigned char up = above_buffer[i];
+        buffer[i] += up;
     }
 }
 
 void
 Pl_PNGFilter::decodeAverage()
 {
-    int left = 0, above = 0, sum = 0, average = 0;
     unsigned char* buffer = this->cur_row+1;
     unsigned char* above_buffer = this->prev_row+1;
+    unsigned int bpp = this->bytes_per_pixel != 0 ? this->bytes_per_pixel : 1;
 
     for (unsigned int i = 0; i < this->columns; ++i)
     {
-        if (i < this->bytes_per_pixel) 
+        int left = 0, up = 0;
+    
+        if (i >= bpp)
         {
-            left = 0;
-        }
-        else
-        {
-            left = buffer[i - this->bytes_per_pixel] & 0xFF;
+            left = buffer[i - bpp];
         }
 
-        if (above_buffer != NULL)
-        {
-            above = static_cast<int>(above_buffer[i]) & 0xFF;
-        }
-
-        sum = left + above;
-        average = sum / 2;
-        buffer[i] = floor(average);           
+        up = above_buffer[i];
+        buffer[i] += floor((left+up) / 2);
     }
 }
 
 void
 Pl_PNGFilter::decodePaeth()
 {
-    int left = 0, above = 0, above_left = 0;
     unsigned char* buffer = this->cur_row+1;
     unsigned char* above_buffer = this->prev_row+1;
-    unsigned int bpp = this->bytes_per_pixel;
+    unsigned int bpp = this->bytes_per_pixel != 0 ? this->bytes_per_pixel : 1;
 
     for (unsigned int i = 0; i < this->columns; ++i)
     {
-        if (i < this->bytes_per_pixel) 
+        int left = 0, 
+             up = above_buffer[i], 
+             upper_left = 0;
+    
+        if (i >= bpp)
         {
-            left = 0;
-        }
-        else
-        {
-            left = buffer[i - this->bytes_per_pixel] & 0xFF;
-        }
-
-        if (above_buffer != NULL)
-        {
-            above = static_cast<int>(above_buffer[i]) & 0xFF;
+            left = buffer[i - bpp];
+            upper_left = above_buffer[i - bpp];
         }
 
-        if (i >= bpp && above_buffer != NULL)
-        {
-            above_left = static_cast<int>(above_buffer[i - bpp]) & 0xFF;
-        }
-
-        int p = left + above - above_left;
-        int p_left = std::abs(p - left);
-        int p_above = std::abs(p - above);
-        int p_above_left = std::abs(p - above_left);
-
-        if (p_left <= p_above && p_left <= p_above_left)
-            buffer[i] += left & 0xFF;
-        else if (p_above <= p_above_left)
-            buffer[i] += above & 0xFF;
-        else 
-            buffer[i] += above_left & 0xFF;
+        buffer[i] += this->PaethPredictor(left, up, upper_left);
     }
+}
+
+int 
+Pl_PNGFilter::PaethPredictor(int a, int b, int c)
+{
+    int p = a + b - c;
+    int pa = std::abs(p - a);
+    int pb = std::abs(p - b);
+    int pc = std::abs(p - c);
+
+    if (pa <= pb && pa <= pc) {
+        return a;
+    }
+    if (pb <= pc) {
+        return b;
+    }
+    return c;
 }
 
 void

@@ -42,6 +42,7 @@ class Pl_PNGFilter: public Pipeline
     void processRow();
     void encodeRow();
     void decodeRow();
+    int PaethPredictor(int a, int b, int c);
 
     action_e action;
     unsigned int columns;
