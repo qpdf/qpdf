@@ -53,8 +53,6 @@ I find it useful to make reference to them in this list
    filtering doesn't ever try to do this. QPDFWriter should be checked
    carefully too. See also bugs/private/from-email-663916/
 
- * Implement remaining PNG filters. See https://github.com/qpdf/qpdf/pull/166
-
  * Form flattening: ~/tmp/qtmp/form-flattening-email/. Distill this
    into notes along with stuff in qpdf email box.
 
@@ -235,12 +233,6 @@ Index: QPDFWriter.cc
    that case.  In fact, it appears that Adobe reader and other PDF
    viewing software silently ignores objects of this type, so this is
    probably not a big deal.
-
- * Pl_PNGFilter is only partially implemented.  If we ever decoded
-   images, we'd have to finish implementing it along with the other
-   filter decode parameters and types.  For just handling xref
-   streams, there's really no need as it wouldn't make sense to use
-   any kind of predictor other than 12 (PNG UP filter).
 
  * If we ever want to have check mode check the integrity of the free
    list, this can be done by looking at the code from prior to the

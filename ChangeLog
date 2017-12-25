@@ -1,3 +1,21 @@
+2017-12-25  Jay Berkenbilt  <ejb@ql.org>
+
+	* Implement remaining PNG filters for decode. Prior versions could
+	decode only the "up" filter. Now all PNG filters (sub, up,
+	average, Paeth, optimal) are supported for decoding. Thanks to
+	Tobias Hoffmann for providing a test PDF file that has images with
+	all PNG filters along with different numbers of bits per sample
+	and samples per pixel, and thanks to Casey Rojas for providing
+	implementations of the remaining PNG filters.
+
+	The implementation of the remaining PNG filters changed the
+	interface to the private Pl_PNGFilter class, but this class's
+	header file is not in the installation, and there is no public
+	interface to the class. Within the library, the class is never
+	allocated on the stack; it is only ever dynamically allocated. As
+	such, this does not actually break binary compatibility of the
+	library.
+
 2017-09-15  Jay Berkenbilt  <ejb@ql.org>
 
 	* 7.0.0: release
