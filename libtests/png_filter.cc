@@ -17,7 +17,7 @@ void run(char const* filename, bool encode, unsigned int columns)
     Pipeline* pl = new Pl_PNGFilter(
 	"png", out,
 	encode ? Pl_PNGFilter::a_encode : Pl_PNGFilter::a_decode,
-	columns, 0 /* not used */);
+	columns);
     assert((2 * (columns + 1)) < 1024);
     unsigned char buf[1024];
     size_t len;

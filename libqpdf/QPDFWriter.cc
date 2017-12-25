@@ -2684,7 +2684,7 @@ QPDFWriter::writeXRefStream(int xref_id, int max_id, qpdf_offset_t max_offset,
 	}
 	p = pushPipeline(
 	    new Pl_PNGFilter(
-		"pngify xref", p, Pl_PNGFilter::a_encode, esize, 0));
+		"pngify xref", p, Pl_PNGFilter::a_encode, esize));
     }
     activatePipelineStack();
     for (int i = first; i <= last; ++i)

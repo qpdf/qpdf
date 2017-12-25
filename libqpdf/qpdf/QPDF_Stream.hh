@@ -54,10 +54,14 @@ class QPDF_Stream: public QPDFObject
 			   size_t length);
     bool understandDecodeParams(
         std::string const& filter, QPDFObjectHandle decode_params,
-        int& predictor, int& columns, bool& early_code_change);
+        int& predictor, int& columns,
+        int& colors, int& bits_per_component,
+        bool& early_code_change);
     bool filterable(std::vector<std::string>& filters,
                     bool& specialized_compression, bool& lossy_compression,
-		    int& predictor, int& columns, bool& early_code_change);
+		    int& predictor, int& columns,
+                    int& colors, int& bits_per_component,
+                    bool& early_code_change);
     void warn(QPDFExc const& e);
 
     QPDF* qpdf;

@@ -18,7 +18,8 @@ class Pl_PNGFilter: public Pipeline
     QPDF_DLL
     Pl_PNGFilter(char const* identifier, Pipeline* next,
 		 action_e action, unsigned int columns,
-		 unsigned int bytes_per_pixel);
+                 unsigned int samples_per_pixel = 1,
+                 unsigned int bits_per_sample = 8);
     QPDF_DLL
     virtual ~Pl_PNGFilter();
 
@@ -38,12 +39,12 @@ class Pl_PNGFilter: public Pipeline
     int PaethPredictor(int a, int b, int c);
 
     action_e action;
-    unsigned int columns;
+    unsigned int bytes_per_row;
+    unsigned int bytes_per_pixel;
     unsigned char* cur_row;
     unsigned char* prev_row;
     unsigned char* buf1;
     unsigned char* buf2;
-    unsigned int bytes_per_pixel;
     size_t pos;
     size_t incoming;
 };
