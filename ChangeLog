@@ -1,5 +1,12 @@
 2017-12-25  Jay Berkenbilt  <ejb@ql.org>
 
+	* Clarify documentation around options that control parsing but
+	not output creation. Two options: --suppress-recovery and
+	--ignore-xref-streams, were documented in the "Advanced
+	Transformation Options" section of the manual and --help output
+	even though they are not related to output. These are now
+	described in a separate section called "Advanced Parsing Options."
+
 	* Implement remaining PNG filters for decode. Prior versions could
 	decode only the "up" filter. Now all PNG filters (sub, up,
 	average, Paeth, optimal) are supported for decoding. Thanks to

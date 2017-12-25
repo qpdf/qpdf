@@ -865,6 +865,56 @@ outfile.pdf</option>
     to be bothered with.
    </para>
   </sect1>
+  <sect1 id="ref.advanced-parsing">
+   <title>Advanced Parsing Options</title>
+   <para>
+    These options control aspects of how qpdf reads PDF files. Mostly
+    these are of use to people who are working with damaged files.
+    There is little reason to use these options unless you are trying
+    to solve specific problems. The following options are available:
+    <variablelist>
+     <varlistentry>
+      <term><option>--suppress-recovery</option></term>
+      <listitem>
+       <para>
+        Prevents qpdf from attempting to recover damaged files.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--ignore-xref-streams</option></term>
+      <listitem>
+       <para>
+        Tells qpdf to ignore any cross-reference streams.
+       </para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+   </para>
+   <para>
+    Ordinarily, qpdf will attempt to recover from certain types of
+    errors in PDF files.  These include errors in the cross-reference
+    table, certain types of object numbering errors, and certain types
+    of stream length errors.  Sometimes, qpdf may think it has
+    recovered but may not have actually recovered, so care should be
+    taken when using this option as some data loss is possible.  The
+    <option>--suppress-recovery</option> option will prevent qpdf from
+    attempting recovery.  In this case, it will fail on the first
+    error that it encounters.
+   </para>
+   <para>
+    Ordinarily, qpdf reads cross-reference streams when they are
+    present in a PDF file.  If <option>--ignore-xref-streams</option>
+    is specified, qpdf will ignore any cross-reference streams for
+    hybrid PDF files.  The purpose of hybrid files is to make some
+    content available to viewers that are not aware of cross-reference
+    streams.  It is almost never desirable to ignore them.  The only
+    time when you might want to use this feature is if you are testing
+    creation of hybrid PDF files and wish to see how a PDF consumer
+    that doesn't understand object and cross-reference streams would
+    interpret such a file.
+   </para>
+  </sect1>
   <sect1 id="ref.advanced-transformation">
    <title>Advanced Transformation Options</title>
    <para>
@@ -976,14 +1026,6 @@ outfile.pdf</option>
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term><option>--suppress-recovery</option></term>
-      <listitem>
-       <para>
-        Prevents qpdf from attempting to recover damaged files.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
       <term><option>--object-streams=<replaceable>mode</replaceable></option></term>
       <listitem>
        <para>
@@ -1009,14 +1051,6 @@ outfile.pdf</option>
           </para>
          </listitem>
         </itemizedlist>
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term><option>--ignore-xref-streams</option></term>
-      <listitem>
-       <para>
-        Tells qpdf to ignore any cross-reference streams.
        </para>
       </listitem>
      </varlistentry>
@@ -1143,17 +1177,6 @@ outfile.pdf</option>
     You should not use this for &ldquo;production&rdquo; PDF files.
    </para>
    <para>
-    Ordinarily, qpdf will attempt to recover from certain types of
-    errors in PDF files.  These include errors in the cross-reference
-    table, certain types of object numbering errors, and certain types
-    of stream length errors.  Sometimes, qpdf may think it has
-    recovered but may not have actually recovered, so care should be
-    taken when using this option as some data loss is possible.  The
-    <option>--suppress-recovery</option> option will prevent qpdf from
-    attempting recovery.  In this case, it will fail on the first
-    error that it encounters.
-   </para>
-   <para>
     Object streams, also known as compressed objects, were introduced
     into the PDF specification at version 1.5, corresponding to
     Acrobat 6.  Some older PDF viewers may not support files with
@@ -1176,18 +1199,6 @@ outfile.pdf</option>
     though they may not be readable by older viewers.  In this mode,
     qpdf will also make sure the PDF version number in the header is
     at least 1.5.
-   </para>
-   <para>
-    Ordinarily, qpdf reads cross-reference streams when they are
-    present in a PDF file.  If <option>--ignore-xref-streams</option>
-    is specified, qpdf will ignore any cross-reference streams for
-    hybrid PDF files.  The purpose of hybrid files is to make some
-    content available to viewers that are not aware of cross-reference
-    streams.  It is almost never desirable to ignore them.  The only
-    time when you might want to use this feature is if you are testing
-    creation of hybrid PDF files and wish to see how a PDF consumer
-    that doesn't understand object and cross-reference streams would
-    interpret such a file.
    </para>
    <para>
     The <option>--qdf</option> flag turns on QDF mode, which changes

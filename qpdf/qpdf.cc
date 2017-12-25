@@ -355,6 +355,17 @@ valid file name and not a valid range.\n\
 See the manual for examples and a discussion of additional subtleties.\n\
 \n\
 \n\
+Advanced Parsing Options\n\
+-------------------------------\n\
+\n\
+These options control aspects of how qpdf reads PDF files. Mostly these are\n\
+of use to people who are working with damaged files. There is little reason\n\
+to use these options unless you are trying to solve specific problems.\n\
+\n\
+--suppress-recovery       prevents qpdf from attempting to recover damaged files\n\
+--ignore-xref-streams     tells qpdf to ignore any cross-reference streams\n\
+\n\
+\n\
 Advanced Transformation Options\n\
 -------------------------------\n\
 \n\
@@ -366,9 +377,7 @@ familiar with the PDF file format or who are PDF developers.\n\
 --compress-streams=[yn]   controls whether to compress streams on output\n\
 --decode-level=option     controls how to filter streams from the input\n\
 --normalize-content=[yn]  enables or disables normalization of content streams\n\
---suppress-recovery       prevents qpdf from attempting to recover damaged files\n\
 --object-streams=mode     controls handing of object streams\n\
---ignore-xref-streams     tells qpdf to ignore any cross-reference streams\n\
 --preserve-unreferenced   preserve unreferenced objects\n\
 --newline-before-endstream  always put a newline before endstream\n\
 --qdf                     turns on \"QDF mode\" (below)\n\
