@@ -14,7 +14,7 @@ my $td = new TestDriver('png_filter');
 cleanup();
 
 $td->runtest("decode columns = 4",
-	     {$td->COMMAND => "png_filter decode in1 4"},
+	     {$td->COMMAND => "png_filter decode in1 4 1 8"},
 	     {$td->STRING => "done\n",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
@@ -24,7 +24,7 @@ $td->runtest("check output",
 	     {$td->FILE => "out1"});
 
 $td->runtest("decode columns = 5",
-	     {$td->COMMAND => "png_filter decode in2 5"},
+	     {$td->COMMAND => "png_filter decode in2 5 1 8"},
 	     {$td->STRING => "done\n",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
@@ -34,7 +34,7 @@ $td->runtest("check output",
 	     {$td->FILE => "out2"});
 
 $td->runtest("encode columns = 4",
-	     {$td->COMMAND => "png_filter encode out1 4"},
+	     {$td->COMMAND => "png_filter encode out1 4 1 8"},
 	     {$td->STRING => "done\n",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
@@ -44,7 +44,7 @@ $td->runtest("check output",
 	     {$td->FILE => "in1"});
 
 $td->runtest("encode columns = 5",
-	     {$td->COMMAND => "png_filter encode out2 5"},
+	     {$td->COMMAND => "png_filter encode out2 5 1 8"},
 	     {$td->STRING => "done\n",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
@@ -53,9 +53,41 @@ $td->runtest("check output",
 	     {$td->FILE => "out"},
 	     {$td->FILE => "in2"});
 
+my @other = (
+    '01--32-3-16',
+    '02--32-1-8',
+    '03--32-3-8',
+    '04--32-1-8',
+    '05--32-3-8',
+    '06--32-1-8',
+    '07--32-3-8',
+    '08--32-1-8',
+    '09--32-3-8',
+    '10--32-1-8',
+    '11--32-3-8',
+    '12--32-1-4',
+    );
+
+foreach my $i (@other)
+{
+    $i =~ m/^.*?--(\d+)-(\d+)-(\d+)$/ or die;
+    my $columns = $1;
+    my $samples_per_pixel = $2;
+    my $bits_per_sample = $3;
+    $td->runtest("decode $i",
+                 {$td->COMMAND => "png_filter decode $i.data" .
+                      " $columns $samples_per_pixel $bits_per_sample"},
+                 {$td->STRING => "done\n",
+                      $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("check output for $i",
+                 {$td->FILE => "out"},
+                 {$td->FILE => "$i.decoded"});
+}
+
 cleanup();
 
-$td->report(8);
+$td->report(8 + (2 * scalar(@other)));
 
 sub cleanup
 {

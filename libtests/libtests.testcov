@@ -29,3 +29,7 @@ Pl_RunLength flush full buffer 1
 Pl_RunLength flush empty buffer 0
 Pl_DCT empty_pipeline_output_buffer 0
 Pl_DCT term_pipeline_destination 0
+Pl_PNGFilter decodeSub 0
+Pl_PNGFilter decodeUp 0
+Pl_PNGFilter decodeAverage 0
+Pl_PNGFilter decodePaeth 0

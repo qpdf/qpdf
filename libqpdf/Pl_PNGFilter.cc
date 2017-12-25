@@ -1,4 +1,5 @@
 #include <qpdf/Pl_PNGFilter.hh>
+#include <qpdf/QTC.hh>
 #include <stdexcept>
 #include <string.h>
 #include <limits.h>
@@ -134,6 +135,7 @@ Pl_PNGFilter::decodeRow()
 void
 Pl_PNGFilter::decodeSub()
 {
+    QTC::TC("libtests", "Pl_PNGFilter decodeSub");
     unsigned char* buffer = this->cur_row + 1;
     unsigned int bpp = this->bytes_per_pixel;
 
@@ -153,6 +155,7 @@ Pl_PNGFilter::decodeSub()
 void
 Pl_PNGFilter::decodeUp()
 {
+    QTC::TC("libtests", "Pl_PNGFilter decodeUp");
     unsigned char* buffer = this->cur_row + 1;
     unsigned char* above_buffer = this->prev_row + 1;
 
@@ -166,6 +169,7 @@ Pl_PNGFilter::decodeUp()
 void
 Pl_PNGFilter::decodeAverage()
 {
+    QTC::TC("libtests", "Pl_PNGFilter decodeAverage");
     unsigned char* buffer = this->cur_row + 1;
     unsigned char* above_buffer = this->prev_row + 1;
     unsigned int bpp = this->bytes_per_pixel;
@@ -188,6 +192,7 @@ Pl_PNGFilter::decodeAverage()
 void
 Pl_PNGFilter::decodePaeth()
 {
+    QTC::TC("libtests", "Pl_PNGFilter decodePaeth");
     unsigned char* buffer = this->cur_row + 1;
     unsigned char* above_buffer = this->prev_row + 1;
     unsigned int bpp = this->bytes_per_pixel;
