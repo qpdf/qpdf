@@ -16,10 +16,10 @@ Pl_PNGFilter::Pl_PNGFilter(char const* identifier, Pipeline* next,
     buf2(0),
     pos(0)
 {
-    if ((samples_per_pixel < 1) || (samples_per_pixel > 4))
+    if (samples_per_pixel < 1)
     {
         throw std::runtime_error(
-            "PNGFilter created with invalid samples_per_pixel not from 1 to 4");
+            "PNGFilter created with invalid samples_per_pixel");
     }
     if (! ((bits_per_sample == 1) ||
            (bits_per_sample == 2) ||

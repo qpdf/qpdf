@@ -12,7 +12,7 @@
 class Pl_PNGFilter: public Pipeline
 {
   public:
-    // Encoding is not presently supported
+    // Encoding is only partially supported
     enum action_e { a_encode, a_decode };
 
     QPDF_DLL
