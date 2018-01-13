@@ -4,6 +4,7 @@
 #include <qpdf/Pipeline.hh>
 #include <qpdf/Pl_Flate.hh>
 #include <qpdf/Pl_PNGFilter.hh>
+#include <qpdf/Pl_TIFFPredictor.hh>
 #include <qpdf/Pl_RC4.hh>
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/Pl_ASCII85Decoder.hh>
@@ -133,7 +134,7 @@ QPDF_Stream::understandDecodeParams(
             if (predictor_obj.isInteger())
             {
                 predictor = predictor_obj.getIntValue();
-                if (! ((predictor == 1) ||
+                if (! ((predictor == 1) || (predictor == 2) ||
                        ((predictor >= 10) && (predictor <= 15))))
                 {
                     filterable = false;
@@ -459,14 +460,24 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline,
 	{
 	    std::string const& filter = *iter;
 
-            if (((filter == "/FlateDecode") || (filter == "/LZWDecode")) &&
-                ((predictor >= 10) && (predictor <= 15)))
+            if ((filter == "/FlateDecode") || (filter == "/LZWDecode"))
             {
-                QTC::TC("qpdf", "QPDF_Stream PNG filter");
-                pipeline = new Pl_PNGFilter(
-                    "png decode", pipeline, Pl_PNGFilter::a_decode,
-                    columns, colors, bits_per_component);
-                to_delete.push_back(pipeline);
+                if ((predictor >= 10) && (predictor <= 15))
+                {
+                    QTC::TC("qpdf", "QPDF_Stream PNG filter");
+                    pipeline = new Pl_PNGFilter(
+                        "png decode", pipeline, Pl_PNGFilter::a_decode,
+                        columns, colors, bits_per_component);
+                    to_delete.push_back(pipeline);
+                }
+                else if (predictor == 2)
+                {
+                    QTC::TC("qpdf", "QPDF_Stream TIFF predictor");
+                    pipeline = new Pl_TIFFPredictor(
+                        "tiff decode", pipeline, Pl_TIFFPredictor::a_decode,
+                        columns, colors, bits_per_component);
+                    to_delete.push_back(pipeline);
+                }
             }
 
 	    if (filter == "/Crypt")

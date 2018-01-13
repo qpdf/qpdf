@@ -301,3 +301,4 @@ qpdf-c called qpdf_set_decode_level 0
 qpdf-c called qpdf_set_compress_streams 0
 qpdf-c called qpdf_set_preserve_unreferenced_objects 0
 qpdf-c called qpdf_set_newline_before_endstream 0
+QPDF_Stream TIFF predictor 0

@@ -1,3 +1,8 @@
+2018-01-13  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add support for TIFF predictor for LZW and Flate streams. Now
+	all predictor functions are supported.
+
 2017-12-25  Jay Berkenbilt  <ejb@ql.org>
 
 	* Clarify documentation around options that control parsing but

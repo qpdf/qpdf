@@ -240,7 +240,7 @@ foreach my $d (@bug_tests)
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 86;
+$n_tests += 87;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -681,6 +681,12 @@ $td->runtest("short /O or /U",
              {$td->COMMAND =>
                   "qpdf --password=19723102477 --check short-O-U.pdf"},
              {$td->FILE => "short-O-U.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("stream with tiff predictor",
+             {$td->COMMAND => "qpdf --check tiff-predictor.pdf"},
+             {$td->FILE => "tiff-predictor.out",
               $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
