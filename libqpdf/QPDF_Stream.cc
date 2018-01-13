@@ -96,7 +96,9 @@ QPDF_Stream::getStreamData(qpdf_stream_decode_level_e decode_level)
     Pl_Buffer buf("stream data buffer");
     if (! pipeStreamData(&buf, 0, decode_level, false, false))
     {
-	throw std::logic_error("getStreamData called on unfilterable stream");
+	throw QPDFExc(qpdf_e_unsupported, qpdf->getFilename(),
+                      "", this->offset,
+                      "getStreamData called on unfilterable stream");
     }
     QTC::TC("qpdf", "QPDF_Stream getStreamData");
     return buf.getBuffer();
