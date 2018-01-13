@@ -53,7 +53,7 @@ $td->runtest("check output",
 	     {$td->FILE => "out"},
 	     {$td->FILE => "in2"});
 
-my @other = (
+my @other_png = (
     '01--32-3-16',
     '02--32-1-8',
     '03--32-3-8',
@@ -68,7 +68,7 @@ my @other = (
     '12--32-1-4',
     );
 
-foreach my $i (@other)
+foreach my $i (@other_png)
 {
     $i =~ m/^.*?--(\d+)-(\d+)-(\d+)$/ or die;
     my $columns = $1;
@@ -85,9 +85,41 @@ foreach my $i (@other)
                  {$td->FILE => "$i.decoded"});
 }
 
+my @tiff = (
+    '01--16-1-8',
+    '02--8-2-4',
+    '03--4-1-16',
+    );
+
+foreach my $i (@tiff)
+{
+    $i =~ m/^.*?--(\d+)-(\d+)-(\d+)$/ or die;
+    my $columns = $1;
+    my $samples_per_pixel = $2;
+    my $bits_per_sample = $3;
+    $td->runtest("decode tiff $i",
+                 {$td->COMMAND => "predictors tiff decode tiff-$i.data" .
+                      " $columns $samples_per_pixel $bits_per_sample"},
+                 {$td->STRING => "done\n",
+                      $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("check output for tiff-$i",
+                 {$td->FILE => "out"},
+                 {$td->FILE => "tiff-$i.decoded"});
+    $td->runtest("encode tiff $i",
+                 {$td->COMMAND => "predictors tiff encode tiff-$i.decoded" .
+                      " $columns $samples_per_pixel $bits_per_sample"},
+                 {$td->STRING => "done\n",
+                      $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("check output for tiff-$i",
+                 {$td->FILE => "out"},
+                 {$td->FILE => "tiff-$i.data"});
+}
+
 cleanup();
 
-$td->report(8 + (2 * scalar(@other)));
+$td->report(8 + (2 * scalar(@other_png)) + (4 * scalar(@tiff)));
 
 sub cleanup
 {

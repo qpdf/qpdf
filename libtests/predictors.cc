@@ -1,4 +1,5 @@
 #include <qpdf/Pl_PNGFilter.hh>
+#include <qpdf/Pl_TIFFPredictor.hh>
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/QUtil.hh>
 
@@ -21,6 +22,13 @@ void run(char const* filename, char const* filter,
         pl = new Pl_PNGFilter(
             "png", out,
             encode ? Pl_PNGFilter::a_encode : Pl_PNGFilter::a_decode,
+            columns, samples_per_pixel, bits_per_sample);
+    }
+    else if (strcmp(filter, "tiff") == 0)
+    {
+        pl = new Pl_TIFFPredictor(
+            "png", out,
+            encode ? Pl_TIFFPredictor::a_encode : Pl_TIFFPredictor::a_decode,
             columns, samples_per_pixel, bits_per_sample);
     }
     else

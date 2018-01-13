@@ -32,6 +32,7 @@ SRCS_libqpdf = \
 	libqpdf/Pl_RunLength.cc \
 	libqpdf/Pl_SHA2.cc \
 	libqpdf/Pl_StdioFile.cc \
+	libqpdf/Pl_TIFFPredictor.cc \
 	libqpdf/QPDF.cc \
 	libqpdf/QPDFExc.cc \
 	libqpdf/QPDFObjGen.cc \

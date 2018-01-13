@@ -33,3 +33,4 @@ Pl_PNGFilter decodeSub 0
 Pl_PNGFilter decodeUp 0
 Pl_PNGFilter decodeAverage 0
 Pl_PNGFilter decodePaeth 0
+Pl_TIFFPredictor processRow 1
