@@ -124,6 +124,13 @@ test()
     b.skipToNextByte();
     std::cout << b.getBits(8) << std::endl;
     std::cout << std::endl;
+    b.reset();
+    std::cout << b.getBitsSigned(3) << std::endl;
+    std::cout << b.getBitsSigned(6) << std::endl;
+    std::cout << b.getBitsSigned(5) << std::endl;
+    std::cout << b.getBitsSigned(1) << std::endl;
+    std::cout << b.getBitsSigned(17) << std::endl;
+    std::cout << std::endl;
 
     // Write tests
 
@@ -157,6 +164,13 @@ test()
     bw.flush();
     bw.flush();
     bw.writeBits(0xABUL, 8);
+    bw.flush();
+    print_buffer(bp);
+    bw.writeBitsSigned(-1, 3);  // 111
+    bw.writeBitsSigned(-12, 6); // 110100
+    bw.writeBitsSigned(4, 3);   // 100
+    bw.writeBitsSigned(-4, 3);  // 100
+    bw.writeBitsSigned(-1, 1);  // 1
     bw.flush();
     print_buffer(bp);
 

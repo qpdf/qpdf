@@ -36,6 +36,12 @@ byte offset = 8, bit offset = 7, bits available = 0
 21
 101
 
+-1
+-22
+5
+0
+-39559
+
 ch = f0, bit_offset = 2
 ch = 00, bit_offset = 6
 ch = 14, bit_offset = 0
@@ -55,5 +61,7 @@ ch = 00, bit_offset = 7
 f5 15 65 79 12 89 75 4b
 
 f0 ab
+
+fa 49
 
 done

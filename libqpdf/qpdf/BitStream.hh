@@ -15,6 +15,8 @@ class BitStream
     QPDF_DLL
     unsigned long long getBits(int nbits);
     QPDF_DLL
+    long long getBitsSigned(int nbits);
+    QPDF_DLL
     void skipToNextByte();
 
   private:

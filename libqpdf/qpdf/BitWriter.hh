@@ -16,6 +16,8 @@ class BitWriter
     BitWriter(Pipeline* pl);
     QPDF_DLL
     void writeBits(unsigned long long val, unsigned int bits);
+    QPDF_DLL
+    void writeBitsSigned(long long val, unsigned int bits);
     // Force any partial byte to be written to the pipeline.
     QPDF_DLL
     void flush();
