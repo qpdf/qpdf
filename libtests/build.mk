@@ -11,8 +11,8 @@ BINS_libtests = \
 	input_source \
 	lzw \
 	md5 \
-	png_filter \
 	pointer_holder \
+	predictors \
 	qutil \
 	random \
 	rc4 \
