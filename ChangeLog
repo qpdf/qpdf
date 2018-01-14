@@ -1,5 +1,7 @@
 2018-01-14  Jay Berkenbilt  <ejb@ql.org>
 
+	* 7.1.0: release
+
 	* Allow raw encryption key to be specified in libary and command
 	line with the QPDF::setPasswordIsHexKey method and
 	--password-is-hex-key option. Allow encryption key to be displayed
