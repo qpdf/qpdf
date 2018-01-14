@@ -379,6 +379,35 @@ make
       </listitem>
      </varlistentry>
      <varlistentry>
+      <term><option>--password-is-hex-key</option></term>
+      <listitem>
+       <para>
+        Overrides the usual computation/retrieval of the PDF file's
+        encryption key from user/owner password with an explicit
+        specification of the encryption key. When this option is
+        specified, the argument to the <option>--password</option>
+        option is interpreted as a hexadecimal-encoded key value. This
+        only applies to the password used to open the main input file.
+        It does not apply to other files opened by
+        <option>--pages</option> or other options or to files being
+        written.
+       </para>
+       <para>
+        Most users will never have a need for this option, and no
+        standard viewers support this mode of operation, but it can be
+        useful for forensic or investigatory purposes. For example, if
+        a PDF file is encrypted with an unknown password, a
+        brute-force attack using the key directly is sometimes more
+        efficient than one using the password. Also, if a file is
+        heavily damaged, it may be possible to derive the encryption
+        key and recover parts of the file using it directly. To expose
+        the encryption key used by an encrypted file that you can open
+        normally, use the <option>--show-encryption-key</option>
+        option.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
       <term><option>--rotate=[+|-]angle:page-range</option></term>
       <listitem>
        <para>
@@ -1281,6 +1310,24 @@ outfile.pdf</option>
        <para>
         Shows document encryption parameters.  Also shows the
         document's user password if the owner password is given.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--show-encryption-key</option></term>
+      <listitem>
+       <para>
+        When encryption information is being displayed, as when
+        <option>--check</option> or <option>--show-encryption</option>
+        is given, display the computed or retrieved encryption key as
+        a hexadecimal string. This value is not ordinarily useful to
+        users, but it can be used as the argument to
+        <option>--password</option> if the
+        <option>--password-is-hex-key</option> is specified. Note
+        that, when PDF files are encrypted, passwords and other
+        metadata are used only to compute an encryption key, and the
+        encryption key is what is actually used for encryption. This
+        enables retrieval of that key.
        </para>
       </listitem>
      </varlistentry>
@@ -2935,6 +2982,50 @@ print "\n";
    <filename>ChangeLog</filename> in the source distribution.
   </para>
   <variablelist>
+   <varlistentry>
+    <term>7.1.0: January 14, 2018</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        PDF files contain streams that may be compressed with various
+        compression algorithms which, in some cases, may be enhanced
+        by various predictor functions. Previously only the PNG up
+        predictor was supported. In this version, all the PNG
+        predictors as well as the TIFF predictor are supported. This
+        increases the range of files that qpdf is able to handle.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        QPDF now allows a raw encryption key to be specified in place
+        of a password when opening encrypted files, and will
+        optionally display the encryption key used by a file. This is
+        a non-standard operation, but it can be useful in certain
+        situations. Please see the discussion of
+        <option>--password-is-hex-key</option> in <xref
+        linkend="ref.basic-options"/> or the comments around
+        <function>QPDF::setPasswordIsHexKey</function> in
+        <filename>QPDF.hh</filename> for additional details.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Bug fix: numbers ending with a trailing decimal point are now
+        properly recognized as numbers.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Bug fix: when building qpdf from source on some platforms
+        (especially MacOS), the build could get confused by older
+        versions of qpdf installed on the system. This has been
+        corrected.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
     <term>7.0.0: September 15, 2017</term>
     <listitem>
