@@ -1,6 +1,10 @@
 Soon
 ====
 
+ * Take changes on encryption-keys branch and make them usable.
+   Replace the hex encoding and decoding piece, and come up with a
+   more robust way of specifying the key.
+
  * Consider whether there should be a mode in which QPDFObjectHandle
    returns nulls for operations on the wrong type instead of asserting
    the type. The way things are wired up now, this would have to be a
@@ -19,7 +23,7 @@ Soon
 
  * Support user-pluggable stream filters.  This would enable external
    code to provide interpretation for filters that are missing from
-   qpdf.  Make it possible for user-provided fitlers to override
+   qpdf.  Make it possible for user-provided filters to override
    built-in filters.  Make sure that the pluggable filters can be
    prioritized so that we can poll all registered filters to see
    whether they are capable of filtering a particular stream.
@@ -36,6 +40,41 @@ Soon
 
     - See ../misc/broken-files
 
+
+Lexical
+=======
+
+Consider rewriting the tokenizer. These are rough ideas at this point.
+I may or may not do this as described.
+
+ * Use flex. Generate them from ./autogen.sh and include them in the
+   source package, but do not commit them.
+
+ * Make it possible to run the lexer (tokenizer) over a while file
+   such that the following things would be possible:
+
+   * Rewrite fix-qdf in C++ so that there is no longer a runtime perl
+     dependency
+
+   * Create a way to filter content streams that could be used to
+     preserve the content stream exactly including spaces but also to
+     do things like replace everything between a detected set of
+     markers. This is to support form flattening. Ideally, it should
+     be possible to use this programmatically on broken files.
+
+   * Make it possible to replace all strings in a file lexically even
+     on badly broken files. Ideally this should work files that are
+     lacking xref, have broken links, etc., and ideally it should work
+     with encrypted files if possible. This should go through the
+     streams and strings and replace them with fixed or random
+     characters, preferably, but not necessarily, in a manner that
+     works with fonts. One possibility would be to detect whether a
+     string contains characters with normal encoding, and if so, use
+     0x41. If the string uses character maps, use 0x01. The output
+     should otherwise be unrelated to the input. This could be built
+     after the filtering and tokenizer rewrite and should be done in a
+     manner that takes advantage of the other lexical features. This
+     sanitizer should also clear metadata and replace images.
 
 General
 =======
