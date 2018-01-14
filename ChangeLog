@@ -1,3 +1,16 @@
+2018-01-14  Jay Berkenbilt  <ejb@ql.org>
+
+	* Allow raw encryption key to be specified in libary and command
+	line with the QPDF::setPasswordIsHexKey method and
+	--password-is-hex-key option. Allow encryption key to be displayed
+	with --show-encryption-key option. Thanks to Didier Stevens
+	<didier.stevens@gmail.com> for the idea and contribution of one
+	implementation of this idea. See his blog post at
+	https://blog.didierstevens.com/2017/12/28/cracking-encrypted-pdfs-part-3/
+	for a discussion of using this for cracking encrypted PDFs. I hope
+	that a future release of qpdf will include some additional
+	recovery options that may also make use of this capability.
+
 2018-01-13  Jay Berkenbilt  <ejb@ql.org>
 
 	* Fix lexical error: the PDF specification allows floating point

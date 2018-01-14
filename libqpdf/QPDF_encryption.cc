@@ -1007,8 +1007,12 @@ QPDF::initializeEncryption()
 
     EncryptionData data(V, R, Length / 8, P, O, U, OE, UE, Perms,
                         id1, this->m->encrypt_metadata);
-    if (check_owner_password(
-	    this->m->user_password, this->m->provided_password, data))
+    if (this->m->provided_password_is_hex_key)
+    {
+        // ignore passwords in file
+    }
+    else if (check_owner_password(
+                 this->m->user_password, this->m->provided_password, data))
     {
 	// password supplied was owner password; user_password has
 	// been initialized for V < 5
@@ -1023,7 +1027,11 @@ QPDF::initializeEncryption()
 		      "", 0, "invalid password");
     }
 
-    if (V < 5)
+    if (this->m->provided_password_is_hex_key)
+    {
+        this->m->encryption_key = QUtil::hex_decode(this->m->provided_password);
+    }
+    else if (V < 5)
     {
         // For V < 5, the user password is encrypted with the owner
         // password, and the user password is always used for

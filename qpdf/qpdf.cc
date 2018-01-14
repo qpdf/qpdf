@@ -61,6 +61,7 @@ struct Options
         encryption_file(0),
         encryption_file_password(0),
         encrypt(false),
+        password_is_hex_key(false),
         keylen(0),
         r2_print(true),
         r2_modify(true),
@@ -95,6 +96,7 @@ struct Options
         static_aes_iv(false),
         suppress_original_object_id(false),
         show_encryption(false),
+        show_encryption_key(false),
         check_linearization(false),
         show_linearization(false),
         show_xref(false),
@@ -120,6 +122,7 @@ struct Options
     char const* encryption_file;
     char const* encryption_file_password;
     bool encrypt;
+    bool password_is_hex_key;
     std::string user_password;
     std::string owner_password;
     int keylen;
@@ -158,6 +161,7 @@ struct Options
     bool static_aes_iv;
     bool suppress_original_object_id;
     bool show_encryption;
+    bool show_encryption_key;
     bool check_linearization;
     bool show_linearization;
     bool show_xref;
@@ -227,6 +231,7 @@ Basic Options\n\
                         parameters are being copied\n\
 --encrypt options --    generate an encrypted file\n\
 --decrypt               remove any encryption on the file\n\
+--password-is-hex-key   treat primary password option as a hex-encoded key\n\
 --pages options --      select specific pages from one or more files\n\
 --rotate=[+|-]angle:page-range\n\
                         rotate each specified page 90, 180, or 270 degrees\n\
@@ -239,6 +244,11 @@ Note that when copying encryption parameters from another file, all\n\
 parameters will be copied, including both user and owner passwords, even\n\
 if the user password is used to open the other file.  This works even if\n\
 the owner password is not known.\n\
+\n\
+The --password-is-hex-key option overrides the normal computation of\n\
+encryption keys. It only applies to the password used to open the main\n\
+file. This option is not ordinarily useful but can be helpful for forensic\n\
+or investigatory purposes. See manual for further discussion.\n\
 \n\
 The --rotate flag can be used to specify pages to rotate pages either\n\
 90, 180, or 270 degrees. The page range is specified in the same\n\
@@ -434,6 +444,7 @@ automated test suites for software that uses the qpdf library.\n\
                           This is option is not secure!  FOR TESTING ONLY!\n\
 --no-original-object-ids  suppress original object ID comments in qdf mode\n\
 --show-encryption         quickly show encryption parameters\n\
+--show-encryption-key     when showing encryption, reveal the actual key\n\
 --check-linearization     check file integrity and linearization status\n\
 --show-linearization      check and show all linearization data\n\
 --show-xref               show the contents of the cross-reference table\n\
@@ -501,7 +512,7 @@ static std::string show_encryption_method(QPDF::encryption_method_e method)
     return result;
 }
 
-static void show_encryption(QPDF& pdf)
+static void show_encryption(QPDF& pdf, Options& o)
 {
     // Extract /P from /Encrypt
     int R = 0;
@@ -520,8 +531,14 @@ static void show_encryption(QPDF& pdf)
 	std::cout << "R = " << R << std::endl;
 	std::cout << "P = " << P << std::endl;
 	std::string user_password = pdf.getTrimmedUserPassword();
-	std::cout << "User password = " << user_password << std::endl
-                  << "extract for accessibility: "
+        std::string encryption_key = pdf.getEncryptionKey();
+	std::cout << "User password = " << user_password << std::endl;
+        if (o.show_encryption_key)
+        {
+            std::cout << "Encryption key = "
+                      << QUtil::hex_encode(encryption_key) << std::endl;
+        }
+        std::cout << "extract for accessibility: "
 		  << show_bool(pdf.allowAccessibility()) << std::endl
                   << "extract for any purpose: "
 		  << show_bool(pdf.allowExtractAll()) << std::endl
@@ -1339,6 +1356,10 @@ static void parse_options(int argc, char* argv[], Options& o)
                 o.encrypt = false;
                 o.copy_encryption = false;
             }
+            else if (strcmp(arg, "password-is-hex-key") == 0)
+            {
+                o.password_is_hex_key = true;
+            }
             else if (strcmp(arg, "copy-encryption") == 0)
             {
                 if (parameter == 0)
@@ -1559,6 +1580,10 @@ static void parse_options(int argc, char* argv[], Options& o)
                 o.show_encryption = true;
                 o.require_outfile = false;
             }
+            else if (strcmp(arg, "show-encryption-key") == 0)
+            {
+                o.show_encryption_key = true;
+            }
             else if (strcmp(arg, "check-linearization") == 0)
             {
                 o.check_linearization = true;
@@ -1673,6 +1698,10 @@ static void set_qpdf_options(QPDF& pdf, Options& o)
     {
         pdf.setAttemptRecovery(false);
     }
+    if (o.password_is_hex_key)
+    {
+        pdf.setPasswordIsHexKey(true);
+    }
 }
 
 static void do_check(QPDF& pdf, Options& o, int& exit_code)
@@ -1693,7 +1722,7 @@ static void do_check(QPDF& pdf, Options& o, int& exit_code)
                       << pdf.getExtensionLevel();
         }
         std::cout << std::endl;
-        show_encryption(pdf);
+        show_encryption(pdf, o);
         if (pdf.isLinearized())
         {
             std::cout << "File is linearized\n";
@@ -1877,7 +1906,7 @@ static void do_inspection(QPDF& pdf, Options& o)
     }
     if (o.show_encryption)
     {
-        show_encryption(pdf);
+        show_encryption(pdf, o);
     }
     if (o.check_linearization)
     {

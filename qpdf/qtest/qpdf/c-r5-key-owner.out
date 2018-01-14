@@ -1,18 +1,21 @@
-checking a.pdf
-PDF Version: 1.3
-R = 2
-P = -4
+checking c-r5-in.pdf
+PDF Version: 1.7 extension level 3
+R = 5
+P = -2052
 User password = 
-Encryption key = 897d768fbd
+Encryption key = 35ea16a48b6a3045133b69ac0906c2e8fb0a2cc97903ae17b51a5786ebdba020
 extract for accessibility: allowed
 extract for any purpose: allowed
 print low resolution: allowed
-print high resolution: allowed
+print high resolution: not allowed
 modify document assembly: allowed
 modify forms: allowed
 modify annotations: allowed
 modify other: allowed
 modify anything: allowed
+stream encryption method: AESv3
+string encryption method: AESv3
+file encryption method: AESv3
 File is not linearized
 No syntax or stream encoding errors found; the file may still contain
 errors that qpdf cannot detect

@@ -64,7 +64,11 @@ class QPDF
     // those that set parameters.  If the input file is not
     // encrypted,either a null password or an empty password can be
     // used.  If the file is encrypted, either the user password or
-    // the owner password may be supplied.
+    // the owner password may be supplied. The method
+    // setPasswordIsHexKey may be called prior to calling this method
+    // or any of the other process methods to force the password to be
+    // interpreted as a raw encryption key. See comments on
+    // setPasswordIsHexKey for more information.
     QPDF_DLL
     void processFile(char const* filename, char const* password = 0);
 
@@ -93,6 +97,18 @@ class QPDF
     QPDF_DLL
     void processInputSource(PointerHolder<InputSource>,
                             char const* password = 0);
+
+    // For certain forensic or investigatory purposes, it may
+    // sometimes be useful to specify the encryption key directly,
+    // even though regular PDF applications do not provide a way to do
+    // this. calling setPasswordIsHexKey(true) before calling any of
+    // the process methods will bypass the normal encryption key
+    // computation or recovery mechanisms and interpret the bytes in
+    // the password as a hex-encoded encryption key. Note that we
+    // hex-encode the key because it may contain null bytes and
+    // therefore can't be represented in a char const*.
+    QPDF_DLL
+    void setPasswordIsHexKey(bool);
 
     // Create a QPDF object for an empty PDF.  This PDF has no pages
     // or objects other than a minimal trailer, a document catalog,
@@ -1145,6 +1161,7 @@ class QPDF
         QPDFTokenizer tokenizer;
         PointerHolder<InputSource> file;
         std::string last_object_description;
+        bool provided_password_is_hex_key;
         bool encrypted;
         bool encryption_initialized;
         bool ignore_xref_streams;

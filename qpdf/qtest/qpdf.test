@@ -314,7 +314,7 @@ foreach my $file (qw(short-id long-id))
 		 $td->NORMALIZE_NEWLINES);
 
     $td->runtest("check $file.pdf",
-		 {$td->COMMAND => "qpdf --check a.pdf"},
+		 {$td->COMMAND => "qpdf --check --show-encryption-key a.pdf"},
 		 {$td->FILE => "$file-check.out",
 		  $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
@@ -2243,6 +2243,21 @@ $td->runtest("copy of unfilterable with crypt",
              {$td->FILE => "unfilterable-with-crypt-after.out",
               $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
+
+# Raw encryption key
+my @enc_key = (['user', '--password=user3'],
+               ['owner', '--password=owner3'],
+               ['hex', '--password-is-hex-key --password=35ea16a48b6a3045133b69ac0906c2e8fb0a2cc97903ae17b51a5786ebdba020']);
+$n_tests += scalar(@enc_key);
+foreach my $d (@enc_key)
+{
+    my ($description, $pass) = @$d;
+    $td->runtest("use/show encryption key ($description)",
+                 {$td->COMMAND =>
+                      "qpdf --check --show-encryption-key c-r5-in.pdf $pass"},
+             {$td->FILE => "c-r5-key-$description.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+}
 
 show_ntests();
 # ----------

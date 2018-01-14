@@ -75,6 +75,7 @@ QPDF::QPDFVersion()
 }
 
 QPDF::Members::Members() :
+    provided_password_is_hex_key(false),
     encrypted(false),
     encryption_initialized(false),
     ignore_xref_streams(false),
@@ -169,6 +170,12 @@ QPDF::processInputSource(PointerHolder<InputSource> source,
 {
     this->m->file = source;
     parse(password);
+}
+
+void
+QPDF::setPasswordIsHexKey(bool val)
+{
+    this->m->provided_password_is_hex_key = val;
 }
 
 void

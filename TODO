@@ -1,10 +1,6 @@
 Soon
 ====
 
- * Take changes on encryption-keys branch and make them usable.
-   Replace the hex encoding and decoding piece, and come up with a
-   more robust way of specifying the key.
-
  * Consider whether there should be a mode in which QPDFObjectHandle
    returns nulls for operations on the wrong type instead of asserting
    the type. The way things are wired up now, this would have to be a
