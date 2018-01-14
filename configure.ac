@@ -35,6 +35,20 @@ LT_REVISION=0
 AC_SUBST(LT_CURRENT)
 AC_SUBST(LT_REVISION)
 AC_SUBST(LT_AGE)
+LT_SONAME=$(expr $LT_CURRENT - $LT_AGE)
+# BEGIN LT_SONAME WORKAROUND
+# For elf versioned symbols, get the soname version. Unfortunately,
+# there was a mistake at one point where we had 19 when we should have
+# had 18, so make this a special case until the next ABI change. At
+# that point, just remove the code deliminated by the LT_SONAME
+# WORKAROUND comments.
+if test $LT_SONAME = 18; then
+  LT_SONAME=19
+elif test $LT_SONAME -gt 18; then
+  AC_MSG_ERROR(Remove LT_SONAME workaround in configure.ac)
+fi
+# END LT_SONAME WORKAROUND
+AC_SUBST(LT_SONAME)
 
 AC_ARG_ENABLE(insecure-random,
    AS_HELP_STRING([--enable-insecure-random],

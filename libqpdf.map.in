@@ -1,4 +1,4 @@
-LIBQPDF_@LT_CURRENT@ {
+LIBQPDF_@LT_SONAME@ {
   global:
     *;
 };
