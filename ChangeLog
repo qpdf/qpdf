@@ -1,5 +1,8 @@
 2018-01-13  Jay Berkenbilt  <ejb@ql.org>
 
+	* Fix link order in the build to avoid conflicts when building
+	from source while an older version of qpdf is installed.
+
 	* Add support for TIFF predictor for LZW and Flate streams. Now
 	all predictor functions are supported.
 
