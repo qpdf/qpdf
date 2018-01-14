@@ -5,10 +5,8 @@ abacc
 abc
 ABCD
 abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnom
-abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnom
 abcde
 abcdefABCDEF
-abcdefghbcdefghicdefghijdefghijkefghijklfghijklmg
 abcdefghbcdefghicdefghijdefghijkefghijklfghijklmg
 abcdefghijklmnopqrstuvwxyz
 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghi
@@ -34,6 +32,7 @@ admon
 Adobeâ
 ae
 aeadb
+AEP
 aes
 AESv
 aesv
@@ -135,6 +134,8 @@ bookinfo
 bool
 BORLANDC
 bp
+bpp
+bpr
 brdp
 bs
 BT
@@ -212,6 +213,7 @@ cmyk
 codepage
 codepoint
 col
+Coldwind
 ColorSpace
 colorspace
 com
@@ -246,6 +248,7 @@ CropBox
 CryptAcquireContext
 CryptFilterDecodeParms
 CryptGenRandom
+crypto
 cryptolog
 CryptReleaseContext
 cso
@@ -275,9 +278,13 @@ de
 debian
 dec
 declspec
+decodeAverage
+decodePaeth
 DecodeParms
 decodeRow
 decodeStreams
+decodeSub
+decodeUp
 decrypt
 decrypted
 decrypter
@@ -326,6 +333,7 @@ DocOpen
 DOCTYPE
 doubleBoxSize
 Doxygen
+driverless
 DTD
 dtdvalid
 dumpHGeneric
@@ -489,6 +497,7 @@ getAsArray
 getAsMap
 getAsVector
 getBits
+getBitsSigned
 getBoolValue
 getBuffer
 getCompressibleObjects
@@ -603,6 +612,7 @@ gsdnld
 gswin
 gt
 GUIs
+Gynvael
 gz
 gzip
 HAGOOGAMAGOOGLE
@@ -624,7 +634,6 @@ hf
 HGeneric
 hh
 HighPart
-hijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstn
 hijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstn
 hlen
 Hoffmann
@@ -748,6 +757,7 @@ JPOOL
 JSAMPARRAY
 JSAMPLE
 JSAMPROW
+Jurczyk
 keybits
 keylen
 KEYLENGTH
@@ -820,6 +830,7 @@ Makefile
 makeIndirectObject
 malloc
 manualFinish
+Mateusz
 maxEnd
 maxval
 md
@@ -975,6 +986,7 @@ ovector
 pacman
 padLen
 Paeth
+PaethPredictor
 pagemode
 PageMode
 pageno
@@ -1058,6 +1070,7 @@ provideRandomData
 provideStreamData
 proxied
 PSâ
+pseudorandom
 pt
 pthread
 ptr
@@ -1244,6 +1257,7 @@ setOutputFilename
 setOutputMemory
 setOutputPipeline
 setOutputStreams
+setPasswordIsHexKey
 setPCLm
 setprecision
 setPreserveEncryption
@@ -1351,6 +1365,8 @@ Tf
 tgen
 th
 thomas
+tiffcmp
+TIFFPredictor
 Tj
 tmp
 tnum
@@ -1451,6 +1467,7 @@ WindowsCryptProvider
 Wold
 writeBinary
 writeBits
+writeBitsSigned
 writeBuffer
 writeEncryptionDictionary
 writeHeader
@@ -1506,6 +1523,7 @@ xobj
 xobject
 XObject
 xor
+XP
 xpacket
 xpdf
 XRef
