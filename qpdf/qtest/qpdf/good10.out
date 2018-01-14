@@ -1,8 +1,12 @@
 /QTest is direct and has type array (8)
-/QTest is an array with 3 items
+/QTest is an array with 7 items
   item 0 is direct
   item 1 is direct
   item 2 is indirect
-unparse: [ 1 (2) 8 0 R ]
-unparseResolved: [ 1 (2) 8 0 R ]
+  item 3 is direct
+  item 4 is direct
+  item 5 is direct
+  item 6 is direct
+unparse: [ 1 (2) 8 0 R 0.0 -0.0 0. -0. ]
+unparseResolved: [ 1 (2) 8 0 R 0.0 -0.0 0. -0. ]
 test 1 done

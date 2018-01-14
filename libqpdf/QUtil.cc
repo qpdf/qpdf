@@ -558,7 +558,7 @@ QUtil::is_digit(char ch)
 bool
 QUtil::is_number(char const* p)
 {
-    // ^[\+\-]?(\.\d+|\d+(\.\d+)?)$
+    // ^[\+\-]?(\.\d*|\d+(\.\d*)?)$
     if (! *p)
     {
         return false;
@@ -576,11 +576,6 @@ QUtil::is_number(char const* p)
             if (found_dot)
             {
                 // only one dot
-                return false;
-            }
-            if (! *(p+1))
-            {
-                // dot can't be last
                 return false;
             }
             found_dot = true;

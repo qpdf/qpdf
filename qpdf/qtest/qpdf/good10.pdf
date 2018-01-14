@@ -73,7 +73,7 @@ xref
 trailer <<
   /Size 7
   /Root 1 0 R
-  /QTest [1 (2) 8 0 R]
+  /QTest [1 (2) 8 0 R 0.0 -0.0 0. -0.]
 >>
 startxref
 556

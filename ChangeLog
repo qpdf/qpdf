@@ -1,10 +1,13 @@
 2018-01-13  Jay Berkenbilt  <ejb@ql.org>
 
+	* Fix lexical error: the PDF specification allows floating point
+	numbers to end with ".". Fixes #165.
+
 	* Fix link order in the build to avoid conflicts when building
-	from source while an older version of qpdf is installed.
+	from source while an older version of qpdf is installed. Fixes #158.
 
 	* Add support for TIFF predictor for LZW and Flate streams. Now
-	all predictor functions are supported.
+	all predictor functions are supported. Fixes #171.
 
 2017-12-25  Jay Berkenbilt  <ejb@ql.org>
 
