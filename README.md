@@ -26,7 +26,9 @@ Please see the [NOTICE](NOTICE.md) file for information on licenses of embedded 
 
 # Building from a pristine checkout
 
-When building qpdf from a pristine checkout from version control, documentation and automatically generated files are not present. Building on Windows from a pristine checkout is not guaranteed to work because of issues running autoconf; see [README-windows.md](README-windows.md) for how to handle this.  For UNIX and UNIX-like systems, you must have some additional tools installed to build from the source repository.  To do this, you should run
+When building qpdf from a pristine checkout from version control, documentation and automatically generated files are not present. You may either generate them or obtain them from a released source package, which includes them automatically generated files. If you want to grab just the automatic files, extract a source distribution in a temporary directory, and run `make CLEAN=1 autofiles.zip`. This will create a file called `autofiles.zip`, which can you can extract in a checkout of the source repository. This will enable you to run `./configure` and build normally. This approach is almost certainly required on Windows because of issues running autoconf. This workaround is also described in [README-windows.md](README-windows.md).
+
+For UNIX and UNIX-like systems, you can build the automatically generated files yourself, but you must have some additional tools installed to build from the source repository.  To do this, you should have `autoconf` installed (`automake` is not required). Then run
 
 ```
 ./autogen.sh
@@ -35,7 +37,7 @@ make
 make install
 ```
 
-If you don't have Apache fop and the docbook stylesheets installed, you won't be able to build documentation.  You can omit `--enable-doc-maintenance` and produce working qpdf software that passes its test suite, but make install will fail because the documentation files won't exist.  Depending on your purposes, you can either work around this or grab the docs from a source distribution.
+If you don't have Apache fop and the docbook stylesheets installed, you won't be able to build documentation.  You can omit `--enable-doc-maintenance` and produce working qpdf software that passes its test suite, but `make install` will not install documentation files.  Depending on your purposes, this may be fine, or you can grab the docs from a source distribution.
 
 # Building from source distribution on UNIX/Linux
 
