@@ -1,6 +1,6 @@
 This is the QPDF package.  Information about it can be found at https://qpdf.sourceforge.net.  The source code repository is hosted at github: https://github.com/qpdf/qpdf.
 
-QPDF is copyright (c) 2005-2017 Jay Berkenbilt
+QPDF is copyright (c) 2005-2018 Jay Berkenbilt
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 

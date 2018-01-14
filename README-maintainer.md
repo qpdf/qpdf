@@ -29,7 +29,7 @@
   `make_dist` verifies this consistency.
 * Update release date in `manual/qpdf-manual.xml`.  Remember to ensure that the entities at the top of the document are consistent with the release notes for both version and release date.
 * Check `TODO` file to make sure all planned items for the release are done or retargeted.
-* Each year, update copyright notices. Just do a case-insensitive search for copyright. Don't forget copyright in manual. Also update debian copyright in debian package. Last updated: 2017.
+* Each year, update copyright notices. Just do a case-insensitive search for copyright. Don't forget copyright in manual. Also update debian copyright in debian package. Last updated: 2018.
 * To construct a source distribution from a pristine checkout, `make_dist` does the following:
   ```
   ./autogen.sh

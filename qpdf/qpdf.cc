@@ -1180,7 +1180,7 @@ static void handle_help_version(int argc, char* argv[])
         std::cout
             << whoami << " version " << QPDF::QPDFVersion() << std::endl
             << std::endl
-            << "Copyright (c) 2005-2017 Jay Berkenbilt"
+            << "Copyright (c) 2005-2018 Jay Berkenbilt"
             << std::endl
             << "QPDF is licensed under the Apache License, Version 2.0 (the \"License\");"
             << std::endl
