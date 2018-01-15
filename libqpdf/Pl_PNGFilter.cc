@@ -1,5 +1,6 @@
 #include <qpdf/Pl_PNGFilter.hh>
 #include <qpdf/QTC.hh>
+#include <cstdlib>
 #include <stdexcept>
 #include <string.h>
 #include <limits.h>
