@@ -90,7 +90,7 @@ sub get_dlls
 {
     my @result = ();
     my $exe = shift;
-    open(O, "$objdump -p $exe|") or die "$whoami: can't run objdump\n";
+    open(O, "$objdump -p \"$exe\"|") or die "$whoami: can't run objdump\n";
     while (<O>)
     {
         if (m/^\s+DLL Name:\s+(.+\.dll)/i)
