@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <string.h>
 #include <limits.h>
+#include <algorithm>
 
 Pl_PNGFilter::Pl_PNGFilter(char const* identifier, Pipeline* next,
 			   action_e action, unsigned int columns,

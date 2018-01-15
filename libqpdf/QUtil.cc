@@ -326,7 +326,7 @@ QUtil::hex_decode(std::string const& input)
             }
             else
             {
-                result.back() += ch;
+                result[result.length()-1] += ch;
                 pos = 0;
             }
         }
