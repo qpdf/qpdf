@@ -2,6 +2,7 @@
 #include <qpdf/QPDF_String.hh>
 #include <qpdf/QPDF_Name.hh>
 #include <qpdf/QTC.hh>
+#include <qpdf/QUtil.hh>
 #include <stdexcept>
 #include <string.h>
 
@@ -26,10 +27,7 @@ Pl_QPDFTokenizer::writeNext(char const* buf, size_t len)
 {
     if (len)
     {
-	unsigned char* t = new unsigned char[len];
-	memcpy(t, buf, len);
-	getNext()->write(t, len);
-	delete [] t;
+	getNext()->write(QUtil::unsigned_char_pointer(buf), len);
 	this->just_wrote_nl = (buf[len-1] == '\n');
     }
 }
