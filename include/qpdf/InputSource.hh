@@ -64,9 +64,9 @@ class InputSource
     // starting within the range defined by offset and len such that,
     // when the input source is positioned at the beginning of that
     // sequence, finder.check() returns true. If len is 0, the search
-    // proceeds until EOF. If a qualifying pattern these methods
-    // return true and leave the input source positioned wherever
-    // check() left it at the end of the matching pattern.
+    // proceeds until EOF. If a qualifying pattern is found, these
+    // methods return true and leave the input source positioned
+    // wherever check() left it at the end of the matching pattern.
     QPDF_DLL
     bool findFirst(char const* start_chars,
                    qpdf_offset_t offset, size_t len,
