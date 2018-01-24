@@ -1,0 +1,261 @@
+#include <qpdf/QPDFTokenizer.hh>
+#include <qpdf/QUtil.hh>
+#include <qpdf/FileInputSource.hh>
+#include <qpdf/BufferInputSource.hh>
+#include <qpdf/QPDF.hh>
+#include <qpdf/Pl_Buffer.hh>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <iostream>
+
+static char const* whoami = 0;
+
+void usage()
+{
+    std::cerr << "Usage: " << whoami << " filename"
+              << std::endl;
+    exit(2);
+}
+
+class Finder: public InputSource::Finder
+{
+  public:
+    Finder(PointerHolder<InputSource> is, std::string const& str) :
+        is(is),
+        str(str)
+    {
+    }
+    virtual ~Finder()
+    {
+    }
+    virtual bool check();
+
+  private:
+    PointerHolder<InputSource> is;
+    std::string str;
+};
+
+bool
+Finder::check()
+{
+    QPDFTokenizer tokenizer;
+    QPDFTokenizer::Token t = tokenizer.readToken(is, "finder", true);
+    qpdf_offset_t offset = this->is->tell();
+    bool result = (t == QPDFTokenizer::Token(QPDFTokenizer::tt_word, str));
+    this->is->seek(offset - this->str.length(), SEEK_SET);
+    return result;
+}
+
+static char const* tokenTypeName(QPDFTokenizer::token_type_e ttype)
+{
+    // Do this is a case statement instead of a lookup so the compiler
+    // will warn if we miss any.
+    switch (ttype)
+    {
+      case QPDFTokenizer::tt_bad:
+        return "bad";
+      case QPDFTokenizer::tt_array_close:
+        return "array_close";
+      case QPDFTokenizer::tt_array_open:
+        return "array_open";
+      case QPDFTokenizer::tt_brace_close:
+        return "brace_close";
+      case QPDFTokenizer::tt_brace_open:
+        return "brace_open";
+      case QPDFTokenizer::tt_dict_close:
+        return "dict_close";
+      case QPDFTokenizer::tt_dict_open:
+        return "dict_open";
+      case QPDFTokenizer::tt_integer:
+        return "integer";
+      case QPDFTokenizer::tt_name:
+        return "name";
+      case QPDFTokenizer::tt_real:
+        return "real";
+      case QPDFTokenizer::tt_string:
+        return "string";
+      case QPDFTokenizer::tt_null:
+        return "null";
+      case QPDFTokenizer::tt_bool:
+        return "bool";
+      case QPDFTokenizer::tt_word:
+        return "word";
+      case QPDFTokenizer::tt_eof:
+        return "eof";
+    }
+    return 0;
+}
+
+static std::string
+sanitize(std::string const& value)
+{
+    std::string result;
+    for (std::string::const_iterator iter = value.begin(); iter != value.end();
+         ++iter)
+    {
+        if ((*iter >= 32) && (*iter <= 126))
+        {
+            result.append(1, *iter);
+        }
+        else
+        {
+            result += "\\x" + QUtil::int_to_string_base(
+                static_cast<unsigned char>(*iter), 16, 2);
+        }
+    }
+    return result;
+}
+
+static void
+try_skipping(PointerHolder<InputSource> is, char const* what, Finder& f)
+{
+    std::cout << "skipping to " << what << std::endl;
+    qpdf_offset_t offset = is->tell();
+    if (! is->findFirst(what, offset, 0, f))
+    {
+        std::cout << what << " not found" << std::endl;
+        is->seek(offset, SEEK_SET);
+    }
+}
+
+static void
+dump_tokens(PointerHolder<InputSource> is, std::string const& label,
+            bool skip_streams, bool skip_inline_images)
+{
+    Finder f1(is, "endstream");
+    Finder f2(is, "EI");
+    std::cout << "--- BEGIN " << label << " ---" << std::endl;
+    bool done = false;
+    QPDFTokenizer tokenizer;
+    tokenizer.allowEOF();
+    while (! done)
+    {
+        QPDFTokenizer::Token token = tokenizer.readToken(is, "test", true);
+
+        qpdf_offset_t offset = is->tell() - token.getRawValue().length();
+        std::cout << offset << ": "
+                  << tokenTypeName(token.getType());
+        if (token.getType() != QPDFTokenizer::tt_eof)
+        {
+            std::cout << ": "
+                      << sanitize(token.getValue());
+            if (token.getValue() != token.getRawValue())
+            {
+                std::cout << " (raw: " << sanitize(token.getRawValue()) << ")";
+            }
+        }
+        if (token.getType() == QPDFTokenizer::tt_bad)
+        {
+            std::cout << " (" << token.getErrorMessage() << ")";
+        }
+        std::cout << std::endl;
+        if (skip_streams &&
+            (token == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "stream")))
+        {
+            try_skipping(is, "endstream", f1);
+        }
+        else if (skip_inline_images &&
+                 (token == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "ID")))
+        {
+            try_skipping(is, "EI", f2);
+        }
+        else if (token.getType() == QPDFTokenizer::tt_eof)
+        {
+            done = true;
+        }
+    }
+    std::cout << "--- END " << label << " ---" << std::endl;
+}
+
+static void process(char const* filename)
+{
+    PointerHolder<InputSource> is;
+    QPDFTokenizer tokenizer;
+    tokenizer.allowEOF();
+
+    // Tokenize file, skipping streams
+    FileInputSource* fis = new FileInputSource();
+    fis->setFilename(filename);
+    is = fis;
+    dump_tokens(is, "FILE", true, false);
+
+    // Tokenize content streams, skipping inline images
+    QPDF qpdf;
+    qpdf.processFile(filename);
+    std::vector<QPDFObjectHandle> pages = qpdf.getAllPages();
+    int pageno = 0;
+    for (std::vector<QPDFObjectHandle>::iterator iter = pages.begin();
+         iter != pages.end(); ++iter)
+    {
+        ++pageno;
+        Pl_Buffer plb("buffer");
+        std::vector<QPDFObjectHandle> contents = (*iter).getPageContents();
+        for (std::vector<QPDFObjectHandle>::iterator citer = contents.begin();
+             citer != contents.end(); ++citer)
+        {
+            (*citer).pipeStreamData(&plb, 0, qpdf_dl_specialized);
+        }
+        plb.finish();
+        PointerHolder<Buffer> content_data = plb.getBuffer();
+        BufferInputSource* bis = new BufferInputSource(
+            "content data", content_data.getPointer());
+        is = bis;
+        dump_tokens(is, "PAGE " + QUtil::int_to_string(pageno), false, true);
+    }
+
+    // Tokenize object streams
+    std::vector<QPDFObjectHandle> all = qpdf.getAllObjects();
+    for (std::vector<QPDFObjectHandle>::iterator iter = all.begin();
+         iter != all.end(); ++iter)
+    {
+        if ((*iter).isStream() &&
+            (*iter).getDict().getKey("/Type").isName() &&
+            (*iter).getDict().getKey("/Type").getName() == "/ObjStm")
+        {
+            PointerHolder<Buffer> b =
+                (*iter).getStreamData(qpdf_dl_specialized);
+            BufferInputSource* bis = new BufferInputSource(
+                "object stream data", b.getPointer());
+            is = bis;
+            dump_tokens(is, "OBJECT STREAM " +
+                        QUtil::int_to_string((*iter).getObjectID()),
+                        false, false);
+        }
+    }
+}
+
+int main(int argc, char* argv[])
+{
+    QUtil::setLineBuf(stdout);
+    if ((whoami = strrchr(argv[0], '/')) == NULL)
+    {
+	whoami = argv[0];
+    }
+    else
+    {
+	++whoami;
+    }
+    // For libtool's sake....
+    if (strncmp(whoami, "lt-", 3) == 0)
+    {
+	whoami += 3;
+    }
+
+    if (argc != 2)
+    {
+        usage();
+    }
+
+    char const* filename = argv[1];
+    try
+    {
+        process(filename);
+    }
+    catch (std::exception& e)
+    {
+        std::cerr << whoami << ": exception: " << e.what();
+        exit(2);
+    }
+    return 0;
+}

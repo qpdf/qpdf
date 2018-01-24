@@ -1,4 +1,4 @@
-BINS_qpdf = qpdf test_driver pdf_from_scratch test_large_file
+BINS_qpdf = qpdf test_driver pdf_from_scratch test_large_file test_tokenizer
 CBINS_qpdf = qpdf-ctest
 
 TARGETS_qpdf = $(foreach B,$(BINS_qpdf) $(CBINS_qpdf),qpdf/$(OUTPUT_DIR)/$(call binname,$(B)))
