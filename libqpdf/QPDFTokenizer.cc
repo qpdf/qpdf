@@ -404,7 +404,7 @@ QPDFTokenizer::presentCharacter(char ch)
 	else
 	{
 	    type = tt_bad;
-	    QTC::TC("qpdf", "QPDF_Tokenizer bad (");
+	    QTC::TC("qpdf", "QPDF_Tokenizer bad hexstring character");
 	    error_message = std::string("invalid character (") +
 		ch + ") in hexstring";
 	    state = st_token_ready;
@@ -439,7 +439,7 @@ QPDFTokenizer::presentEOF()
     {
         QTC::TC("qpdf", "QPDF_Tokenizer EOF reading token",
                 this->allow_eof ? 1 : 0);
-        if (this->allow_eof)
+        if ((this->allow_eof) && (state == st_top))
         {
             type = tt_eof;
         }
