@@ -1692,7 +1692,8 @@ QPDF::readObjectAtOffset(bool try_recovery,
 	    else
 	    {
 		throw QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
-			      this->m->last_object_description, offset,
+			      this->m->last_object_description,
+                              this->m->file->tell(),
 			      "EOF after endobj");
 	    }
 	}
