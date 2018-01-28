@@ -13,7 +13,8 @@ static char const* whoami = 0;
 
 void usage()
 {
-    std::cerr << "Usage: " << whoami << " filename"
+    std::cerr << "Usage: " << whoami
+              << " [-maxlen len | -no-ignorable] filename"
               << std::endl;
     exit(2);
 }
@@ -83,6 +84,10 @@ static char const* tokenTypeName(QPDFTokenizer::token_type_e ttype)
         return "word";
       case QPDFTokenizer::tt_eof:
         return "eof";
+      case QPDFTokenizer::tt_space:
+        return "space";
+      case QPDFTokenizer::tt_comment:
+        return "comment";
     }
     return 0;
 }
@@ -108,7 +113,8 @@ sanitize(std::string const& value)
 }
 
 static void
-try_skipping(PointerHolder<InputSource> is, char const* what, Finder& f)
+try_skipping(QPDFTokenizer& tokenizer, PointerHolder<InputSource> is,
+             size_t max_len, char const* what, Finder& f)
 {
     std::cout << "skipping to " << what << std::endl;
     qpdf_offset_t offset = is->tell();
@@ -121,6 +127,7 @@ try_skipping(PointerHolder<InputSource> is, char const* what, Finder& f)
 
 static void
 dump_tokens(PointerHolder<InputSource> is, std::string const& label,
+            size_t max_len, bool include_ignorable,
             bool skip_streams, bool skip_inline_images)
 {
     Finder f1(is, "endstream");
@@ -129,11 +136,16 @@ dump_tokens(PointerHolder<InputSource> is, std::string const& label,
     bool done = false;
     QPDFTokenizer tokenizer;
     tokenizer.allowEOF();
+    if (include_ignorable)
+    {
+        tokenizer.includeIgnorable();
+    }
     while (! done)
     {
-        QPDFTokenizer::Token token = tokenizer.readToken(is, "test", true);
+        QPDFTokenizer::Token token =
+            tokenizer.readToken(is, "test", true, max_len);
 
-        qpdf_offset_t offset = is->tell() - token.getRawValue().length();
+        qpdf_offset_t offset = is->getLastOffset();
         std::cout << offset << ": "
                   << tokenTypeName(token.getType());
         if (token.getType() != QPDFTokenizer::tt_eof)
@@ -153,12 +165,12 @@ dump_tokens(PointerHolder<InputSource> is, std::string const& label,
         if (skip_streams &&
             (token == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "stream")))
         {
-            try_skipping(is, "endstream", f1);
+            try_skipping(tokenizer, is, max_len, "endstream", f1);
         }
         else if (skip_inline_images &&
                  (token == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "ID")))
         {
-            try_skipping(is, "EI", f2);
+            try_skipping(tokenizer, is, max_len, "EI", f2);
         }
         else if (token.getType() == QPDFTokenizer::tt_eof)
         {
@@ -168,17 +180,16 @@ dump_tokens(PointerHolder<InputSource> is, std::string const& label,
     std::cout << "--- END " << label << " ---" << std::endl;
 }
 
-static void process(char const* filename)
+static void process(char const* filename, bool include_ignorable,
+                    size_t max_len)
 {
     PointerHolder<InputSource> is;
-    QPDFTokenizer tokenizer;
-    tokenizer.allowEOF();
 
     // Tokenize file, skipping streams
     FileInputSource* fis = new FileInputSource();
     fis->setFilename(filename);
     is = fis;
-    dump_tokens(is, "FILE", true, false);
+    dump_tokens(is, "FILE", max_len, include_ignorable, true, false);
 
     // Tokenize content streams, skipping inline images
     QPDF qpdf;
@@ -201,7 +212,8 @@ static void process(char const* filename)
         BufferInputSource* bis = new BufferInputSource(
             "content data", content_data.getPointer());
         is = bis;
-        dump_tokens(is, "PAGE " + QUtil::int_to_string(pageno), false, true);
+        dump_tokens(is, "PAGE " + QUtil::int_to_string(pageno),
+                    max_len, include_ignorable, false, true);
     }
 
     // Tokenize object streams
@@ -220,7 +232,7 @@ static void process(char const* filename)
             is = bis;
             dump_tokens(is, "OBJECT STREAM " +
                         QUtil::int_to_string((*iter).getObjectID()),
-                        false, false);
+                        max_len, include_ignorable, false, false);
         }
     }
 }
@@ -242,15 +254,47 @@ int main(int argc, char* argv[])
 	whoami += 3;
     }
 
-    if (argc != 2)
+    char const* filename = 0;
+    size_t max_len = 0;
+    bool include_ignorable = true;
+    for (int i = 1; i < argc; ++i)
+    {
+        if (argv[i][0] == '-')
+        {
+            if (strcmp(argv[i], "-maxlen") == 0)
+            {
+                if (++i >= argc)
+                {
+                    usage();
+                }
+                max_len = QUtil::string_to_int(argv[i]);
+            }
+            else if (strcmp(argv[i], "-no-ignorable") == 0)
+            {
+                include_ignorable = false;
+            }
+            else
+            {
+                usage();
+            }
+        }
+        else if (filename)
+        {
+            usage();
+        }
+        else
+        {
+            filename = argv[i];
+        }
+    }
+    if (filename == 0)
     {
         usage();
     }
 
-    char const* filename = argv[1];
     try
     {
-        process(filename);
+        process(filename, include_ignorable, max_len);
     }
     catch (std::exception& e)
     {

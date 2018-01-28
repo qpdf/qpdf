@@ -1027,7 +1027,12 @@ EI not found
 258: space:  
 259: integer: 5678
 263: space: \x0a
-264: comment: %% Object stream: object 2, index 0; original object ID: 2
+264: bad: %% Object stream: object 2, index 0; original obje (exceeded allowable length while reading token)
+314: word: ct
+316: space:  
+317: word: ID:
+320: space:  
+321: integer: 2
 322: space: \x0a
 323: dict_open: <<
 325: space: \x0a  
@@ -1045,7 +1050,12 @@ EI not found
 357: space: \x0a
 358: dict_close: >>
 360: space: \x0a
-361: comment: %% Object stream: object 3, index 1; original object ID: 3
+361: bad: %% Object stream: object 3, index 1; original obje (exceeded allowable length while reading token)
+411: word: ct
+413: space:  
+414: word: ID:
+417: space:  
+418: integer: 3
 419: space: \x0a
 420: dict_open: <<
 422: space: \x0a  
@@ -1131,7 +1141,12 @@ EI not found
 578: space: \x0a
 579: dict_close: >>
 581: space: \x0a
-582: comment: %% Object stream: object 4, index 2; original object ID: 4
+582: bad: %% Object stream: object 4, index 2; original obje (exceeded allowable length while reading token)
+632: word: ct
+634: space:  
+635: word: ID:
+638: space:  
+639: integer: 4
 640: space: \x0a
 641: comment: %% Page 1
 650: space: \x0a
@@ -1201,7 +1216,12 @@ EI not found
 826: space: \x0a
 827: dict_close: >>
 829: space: \x0a
-830: comment: %% Object stream: object 5, index 3; original object ID: 5
+830: bad: %% Object stream: object 5, index 3; original obje (exceeded allowable length while reading token)
+880: word: ct
+882: space:  
+883: word: ID:
+886: space:  
+887: integer: 5
 888: space: \x0a
 889: comment: %% Page 2
 898: space: \x0a
@@ -1271,7 +1291,12 @@ EI not found
 1074: space: \x0a
 1075: dict_close: >>
 1077: space: \x0a
-1078: comment: %% Object stream: object 6, index 4; original object ID: 6
+1078: bad: %% Object stream: object 6, index 4; original obje (exceeded allowable length while reading token)
+1128: word: ct
+1130: space:  
+1131: word: ID:
+1134: space:  
+1135: integer: 6
 1136: space: \x0a
 1137: comment: %% Page 3
 1146: space: \x0a
@@ -1341,7 +1366,12 @@ EI not found
 1322: space: \x0a
 1323: dict_close: >>
 1325: space: \x0a
-1326: comment: %% Object stream: object 7, index 5; original object ID: 7
+1326: bad: %% Object stream: object 7, index 5; original obje (exceeded allowable length while reading token)
+1376: word: ct
+1378: space:  
+1379: word: ID:
+1382: space:  
+1383: integer: 7
 1384: space: \x0a
 1385: comment: %% Page 4
 1394: space: \x0a
@@ -1411,7 +1441,12 @@ EI not found
 1570: space: \x0a
 1571: dict_close: >>
 1573: space: \x0a
-1574: comment: %% Object stream: object 8, index 6; original object ID: 8
+1574: bad: %% Object stream: object 8, index 6; original obje (exceeded allowable length while reading token)
+1624: word: ct
+1626: space:  
+1627: word: ID:
+1630: space:  
+1631: integer: 8
 1632: space: \x0a
 1633: comment: %% Page 5
 1642: space: \x0a
@@ -1481,7 +1516,12 @@ EI not found
 1818: space: \x0a
 1819: dict_close: >>
 1821: space: \x0a
-1822: comment: %% Object stream: object 9, index 7; original object ID: 9
+1822: bad: %% Object stream: object 9, index 7; original obje (exceeded allowable length while reading token)
+1872: word: ct
+1874: space:  
+1875: word: ID:
+1878: space:  
+1879: integer: 9
 1880: space: \x0a
 1881: comment: %% Page 6
 1890: space: \x0a
@@ -1551,7 +1591,12 @@ EI not found
 2066: space: \x0a
 2067: dict_close: >>
 2069: space: \x0a
-2070: comment: %% Object stream: object 10, index 8; original object ID: 10
+2070: bad: %% Object stream: object 10, index 8; original obj (exceeded allowable length while reading token)
+2120: word: ect
+2123: space:  
+2124: word: ID:
+2127: space:  
+2128: integer: 10
 2130: space: \x0a
 2131: comment: %% Page 7
 2140: space: \x0a
@@ -1621,7 +1666,12 @@ EI not found
 2316: space: \x0a
 2317: dict_close: >>
 2319: space: \x0a
-2320: comment: %% Object stream: object 11, index 9; original object ID: 11
+2320: bad: %% Object stream: object 11, index 9; original obj (exceeded allowable length while reading token)
+2370: word: ect
+2373: space:  
+2374: word: ID:
+2377: space:  
+2378: integer: 11
 2380: space: \x0a
 2381: comment: %% Page 8
 2390: space: \x0a
@@ -1691,7 +1741,12 @@ EI not found
 2566: space: \x0a
 2567: dict_close: >>
 2569: space: \x0a
-2570: comment: %% Object stream: object 12, index 10; original object ID: 12
+2570: bad: %% Object stream: object 12, index 10; original ob (exceeded allowable length while reading token)
+2620: word: ject
+2624: space:  
+2625: word: ID:
+2628: space:  
+2629: integer: 12
 2631: space: \x0a
 2632: comment: %% Page 9
 2641: space: \x0a
@@ -1761,7 +1816,12 @@ EI not found
 2817: space: \x0a
 2818: dict_close: >>
 2820: space: \x0a
-2821: comment: %% Object stream: object 13, index 11; original object ID: 13
+2821: bad: %% Object stream: object 13, index 11; original ob (exceeded allowable length while reading token)
+2871: word: ject
+2875: space:  
+2876: word: ID:
+2879: space:  
+2880: integer: 13
 2882: space: \x0a
 2883: comment: %% Page 10
 2893: space: \x0a
@@ -1831,7 +1891,12 @@ EI not found
 3069: space: \x0a
 3070: dict_close: >>
 3072: space: \x0a
-3073: comment: %% Object stream: object 14, index 12; original object ID: 14
+3073: bad: %% Object stream: object 14, index 12; original ob (exceeded allowable length while reading token)
+3123: word: ject
+3127: space:  
+3128: word: ID:
+3131: space:  
+3132: integer: 14
 3134: space: \x0a
 3135: comment: %% Page 11
 3145: space: \x0a
@@ -1901,7 +1966,12 @@ EI not found
 3321: space: \x0a
 3322: dict_close: >>
 3324: space: \x0a
-3325: comment: %% Object stream: object 15, index 13; original object ID: 15
+3325: bad: %% Object stream: object 15, index 13; original ob (exceeded allowable length while reading token)
+3375: word: ject
+3379: space:  
+3380: word: ID:
+3383: space:  
+3384: integer: 15
 3386: space: \x0a
 3387: dict_open: <<
 3389: space: \x0a  
@@ -1927,7 +1997,12 @@ EI not found
 3485: space: \x0a
 3486: dict_close: >>
 3488: space: \x0a
-3489: comment: %% Object stream: object 16, index 14; original object ID: 16
+3489: bad: %% Object stream: object 16, index 14; original ob (exceeded allowable length while reading token)
+3539: word: ject
+3543: space:  
+3544: word: ID:
+3547: space:  
+3548: integer: 16
 3550: space: \x0a
 3551: array_open: [
 3552: space: \x0a  
@@ -1937,7 +2012,12 @@ EI not found
 3567: space: \x0a
 3568: array_close: ]
 3569: space: \x0a
-3570: comment: %% Object stream: object 17, index 15; original object ID: 17
+3570: bad: %% Object stream: object 17, index 15; original ob (exceeded allowable length while reading token)
+3620: word: ject
+3624: space:  
+3625: word: ID:
+3628: space:  
+3629: integer: 17
 3631: space: \x0a
 3632: dict_open: <<
 3634: space: \x0a  
@@ -1963,7 +2043,12 @@ EI not found
 3730: space: \x0a
 3731: dict_close: >>
 3733: space: \x0a
-3734: comment: %% Object stream: object 18, index 16; original object ID: 18
+3734: bad: %% Object stream: object 18, index 16; original ob (exceeded allowable length while reading token)
+3784: word: ject
+3788: space:  
+3789: word: ID:
+3792: space:  
+3793: integer: 18
 3795: space: \x0a
 3796: array_open: [
 3797: space: \x0a  
@@ -1973,7 +2058,12 @@ EI not found
 3812: space: \x0a
 3813: array_close: ]
 3814: space: \x0a
-3815: comment: %% Object stream: object 19, index 17; original object ID: 19
+3815: bad: %% Object stream: object 19, index 17; original ob (exceeded allowable length while reading token)
+3865: word: ject
+3869: space:  
+3870: word: ID:
+3873: space:  
+3874: integer: 19
 3876: space: \x0a
 3877: dict_open: <<
 3879: space: \x0a  
@@ -1999,7 +2089,12 @@ EI not found
 3975: space: \x0a
 3976: dict_close: >>
 3978: space: \x0a
-3979: comment: %% Object stream: object 20, index 18; original object ID: 20
+3979: bad: %% Object stream: object 20, index 18; original ob (exceeded allowable length while reading token)
+4029: word: ject
+4033: space:  
+4034: word: ID:
+4037: space:  
+4038: integer: 20
 4040: space: \x0a
 4041: array_open: [
 4042: space: \x0a  
@@ -2009,7 +2104,12 @@ EI not found
 4057: space: \x0a
 4058: array_close: ]
 4059: space: \x0a
-4060: comment: %% Object stream: object 21, index 19; original object ID: 21
+4060: bad: %% Object stream: object 21, index 19; original ob (exceeded allowable length while reading token)
+4110: word: ject
+4114: space:  
+4115: word: ID:
+4118: space:  
+4119: integer: 21
 4121: space: \x0a
 4122: dict_open: <<
 4124: space: \x0a  
@@ -2035,7 +2135,12 @@ EI not found
 4220: space: \x0a
 4221: dict_close: >>
 4223: space: \x0a
-4224: comment: %% Object stream: object 22, index 20; original object ID: 22
+4224: bad: %% Object stream: object 22, index 20; original ob (exceeded allowable length while reading token)
+4274: word: ject
+4278: space:  
+4279: word: ID:
+4282: space:  
+4283: integer: 22
 4285: space: \x0a
 4286: array_open: [
 4287: space: \x0a  
@@ -2045,7 +2150,12 @@ EI not found
 4302: space: \x0a
 4303: array_close: ]
 4304: space: \x0a
-4305: comment: %% Object stream: object 23, index 21; original object ID: 23
+4305: bad: %% Object stream: object 23, index 21; original ob (exceeded allowable length while reading token)
+4355: word: ject
+4359: space:  
+4360: word: ID:
+4363: space:  
+4364: integer: 23
 4366: space: \x0a
 4367: dict_open: <<
 4369: space: \x0a  
@@ -2071,7 +2181,12 @@ EI not found
 4465: space: \x0a
 4466: dict_close: >>
 4468: space: \x0a
-4469: comment: %% Object stream: object 24, index 22; original object ID: 24
+4469: bad: %% Object stream: object 24, index 22; original ob (exceeded allowable length while reading token)
+4519: word: ject
+4523: space:  
+4524: word: ID:
+4527: space:  
+4528: integer: 24
 4530: space: \x0a
 4531: array_open: [
 4532: space: \x0a  
@@ -2081,7 +2196,12 @@ EI not found
 4547: space: \x0a
 4548: array_close: ]
 4549: space: \x0a
-4550: comment: %% Object stream: object 25, index 23; original object ID: 25
+4550: bad: %% Object stream: object 25, index 23; original ob (exceeded allowable length while reading token)
+4600: word: ject
+4604: space:  
+4605: word: ID:
+4608: space:  
+4609: integer: 25
 4611: space: \x0a
 4612: dict_open: <<
 4614: space: \x0a  
@@ -2107,7 +2227,12 @@ EI not found
 4710: space: \x0a
 4711: dict_close: >>
 4713: space: \x0a
-4714: comment: %% Object stream: object 26, index 24; original object ID: 26
+4714: bad: %% Object stream: object 26, index 24; original ob (exceeded allowable length while reading token)
+4764: word: ject
+4768: space:  
+4769: word: ID:
+4772: space:  
+4773: integer: 26
 4775: space: \x0a
 4776: array_open: [
 4777: space: \x0a  
@@ -2117,7 +2242,12 @@ EI not found
 4792: space: \x0a
 4793: array_close: ]
 4794: space: \x0a
-4795: comment: %% Object stream: object 27, index 25; original object ID: 27
+4795: bad: %% Object stream: object 27, index 25; original ob (exceeded allowable length while reading token)
+4845: word: ject
+4849: space:  
+4850: word: ID:
+4853: space:  
+4854: integer: 27
 4856: space: \x0a
 4857: dict_open: <<
 4859: space: \x0a  
@@ -2143,7 +2273,12 @@ EI not found
 4955: space: \x0a
 4956: dict_close: >>
 4958: space: \x0a
-4959: comment: %% Object stream: object 28, index 26; original object ID: 28
+4959: bad: %% Object stream: object 28, index 26; original ob (exceeded allowable length while reading token)
+5009: word: ject
+5013: space:  
+5014: word: ID:
+5017: space:  
+5018: integer: 28
 5020: space: \x0a
 5021: array_open: [
 5022: space: \x0a  
@@ -2153,7 +2288,12 @@ EI not found
 5037: space: \x0a
 5038: array_close: ]
 5039: space: \x0a
-5040: comment: %% Object stream: object 29, index 27; original object ID: 29
+5040: bad: %% Object stream: object 29, index 27; original ob (exceeded allowable length while reading token)
+5090: word: ject
+5094: space:  
+5095: word: ID:
+5098: space:  
+5099: integer: 29
 5101: space: \x0a
 5102: dict_open: <<
 5104: space: \x0a  
@@ -2179,7 +2319,12 @@ EI not found
 5200: space: \x0a
 5201: dict_close: >>
 5203: space: \x0a
-5204: comment: %% Object stream: object 30, index 28; original object ID: 30
+5204: bad: %% Object stream: object 30, index 28; original ob (exceeded allowable length while reading token)
+5254: word: ject
+5258: space:  
+5259: word: ID:
+5262: space:  
+5263: integer: 30
 5265: space: \x0a
 5266: array_open: [
 5267: space: \x0a  
@@ -2189,7 +2334,12 @@ EI not found
 5282: space: \x0a
 5283: array_close: ]
 5284: space: \x0a
-5285: comment: %% Object stream: object 31, index 29; original object ID: 31
+5285: bad: %% Object stream: object 31, index 29; original ob (exceeded allowable length while reading token)
+5335: word: ject
+5339: space:  
+5340: word: ID:
+5343: space:  
+5344: integer: 31
 5346: space: \x0a
 5347: dict_open: <<
 5349: space: \x0a  
@@ -2215,7 +2365,12 @@ EI not found
 5445: space: \x0a
 5446: dict_close: >>
 5448: space: \x0a
-5449: comment: %% Object stream: object 32, index 30; original object ID: 32
+5449: bad: %% Object stream: object 32, index 30; original ob (exceeded allowable length while reading token)
+5499: word: ject
+5503: space:  
+5504: word: ID:
+5507: space:  
+5508: integer: 32
 5510: space: \x0a
 5511: array_open: [
 5512: space: \x0a  
@@ -2225,7 +2380,12 @@ EI not found
 5527: space: \x0a
 5528: array_close: ]
 5529: space: \x0a
-5530: comment: %% Object stream: object 33, index 31; original object ID: 33
+5530: bad: %% Object stream: object 33, index 31; original ob (exceeded allowable length while reading token)
+5580: word: ject
+5584: space:  
+5585: word: ID:
+5588: space:  
+5589: integer: 33
 5591: space: \x0a
 5592: dict_open: <<
 5594: space: \x0a  
@@ -2251,7 +2411,12 @@ EI not found
 5690: space: \x0a
 5691: dict_close: >>
 5693: space: \x0a
-5694: comment: %% Object stream: object 34, index 32; original object ID: 34
+5694: bad: %% Object stream: object 34, index 32; original ob (exceeded allowable length while reading token)
+5744: word: ject
+5748: space:  
+5749: word: ID:
+5752: space:  
+5753: integer: 34
 5755: space: \x0a
 5756: array_open: [
 5757: space: \x0a  
@@ -2261,7 +2426,12 @@ EI not found
 5772: space: \x0a
 5773: array_close: ]
 5774: space: \x0a
-5775: comment: %% Object stream: object 35, index 33; original object ID: 35
+5775: bad: %% Object stream: object 35, index 33; original ob (exceeded allowable length while reading token)
+5825: word: ject
+5829: space:  
+5830: word: ID:
+5833: space:  
+5834: integer: 35
 5836: space: \x0a
 5837: dict_open: <<
 5839: space: \x0a  
@@ -2287,7 +2457,12 @@ EI not found
 5935: space: \x0a
 5936: dict_close: >>
 5938: space: \x0a
-5939: comment: %% Object stream: object 36, index 34; original object ID: 36
+5939: bad: %% Object stream: object 36, index 34; original ob (exceeded allowable length while reading token)
+5989: word: ject
+5993: space:  
+5994: word: ID:
+5997: space:  
+5998: integer: 36
 6000: space: \x0a
 6001: array_open: [
 6002: space: \x0a  

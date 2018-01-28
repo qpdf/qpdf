@@ -39,4 +39,12 @@ This stream does end with a newline.
 -- stream 4 --
 (ends with a name)
 /ThisMustBeLast
+-- stream 5 --
+% This stream has an inline image marker that is not terminated
+(Potato)
+
+BI
+ID
+<506f7
+461746f>
 test 3 done

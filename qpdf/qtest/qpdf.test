@@ -240,7 +240,7 @@ foreach my $d (@bug_tests)
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 97;
+$n_tests += 99;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -263,9 +263,19 @@ $td->runtest("check pass1 file",
 	     {$td->FILE => "b.pdf"},
 	     {$td->FILE => "minimal-linearize-pass1.pdf"});
 
+$td->runtest("tokenizer with no ignorable",
+             {$td->COMMAND => "test_tokenizer -no-ignorable tokens.pdf"},
+             {$td->FILE => "tokens-no-ignorable.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
 $td->runtest("tokenizer",
              {$td->COMMAND => "test_tokenizer tokens.pdf"},
              {$td->FILE => "tokens.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("tokenizer with max_len",
+             {$td->COMMAND => "test_tokenizer -maxlen 50 tokens.pdf"},
+             {$td->FILE => "tokens-maxlen.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 foreach (my $i = 1; $i <= 3; ++$i)

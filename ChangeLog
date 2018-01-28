@@ -1,5 +1,37 @@
 2018-02-04  Jay Berkenbilt  <ejb@ql.org>
 
+	* Significant lexer (tokenizer) enhancements. These are changes to
+	  the QPDFTokenizer class. These changes are of concern only to
+	  people who are operating with PDF files at the lexical layer
+	  using qpdf. They have little or no impact on most high-level
+	  interfaces or the command-line tool.
+	  * New token types tt_space and tt_comment to recognize
+	    whitespace and comments. this makes it possible to tokenize a
+	    PDF file or stream and preserve everything about it.
+	  * For backward compatibility, space and comment tokens are not
+	    returned by the tokenizer unless
+	    QPDFTokenizer.includeIgnorable() is called.
+	  * Better handling of null bytes. These are now included in space
+	    tokens rather than being their own "tt_word" tokens. This
+	    should have no impact on any correct PDF file and has no
+	    impact on output, but it may change offsets in some error
+	    messages when trying to parse contents of bad files. Under
+	    default operation, qpdf does not attempt to parse content
+	    streams, so this change is mostly invisible.
+	  * Bug fix to handling of bad tokens at ends of streams. Now,
+	    when allowEOF() has been called, these are treated as bad tokens
+	    (tt_bad or an exception, depending on invocation), and a
+	    separate tt_eof token is returned. Before the bad token
+	    contents were returned as the value of a tt_eof token. tt_eof
+	    tokens are always empty now.
+	  * Fix a bug that would, on rare occasions, report the offset in an
+	    error message in the wrong space because of spaces or comments
+	    adjacent to a bad token.
+	  * Clarify in comments exactly where the input source is
+	    positioned surrounding calls to readToken and getToken.
+
+2018-02-04  Jay Berkenbilt  <ejb@ql.org>
+
 	* Add QPDFWriter::setLinearizationPass1Filename method and
 	--linearize-pass1 command line option to allow specification of a
 	file into which QPDFWriter will write its intermediate

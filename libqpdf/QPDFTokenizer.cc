@@ -14,7 +14,8 @@
 
 QPDFTokenizer::QPDFTokenizer() :
     pound_special_in_name(true),
-    allow_eof(false)
+    allow_eof(false),
+    include_ignorable(false)
 {
     reset();
 }
@@ -30,6 +31,18 @@ void
 QPDFTokenizer::allowEOF()
 {
     this->allow_eof = true;
+}
+
+void
+QPDFTokenizer::includeIgnorable()
+{
+    this->include_ignorable = true;
+}
+
+bool
+QPDFTokenizer::isSpace(char ch)
+{
+    return ((ch == '\0') || QUtil::is_space(ch));
 }
 
 void
@@ -148,14 +161,21 @@ QPDFTokenizer::presentCharacter(char ch)
     {
 	// Note: we specifically do not use ctype here.  It is
 	// locale-dependent.
-	if (strchr(" \t\n\v\f\r", ch))
+	if (isSpace(ch))
 	{
-	    // ignore
+            if (this->include_ignorable)
+            {
+                state = st_in_space;
+                val += ch;
+            }
 	}
 	else if (ch == '%')
 	{
-	    // Discard comments
 	    state = st_in_comment;
+            if (this->include_ignorable)
+            {
+                val += ch;
+            }
 	}
 	else if (ch == '(')
 	{
@@ -209,12 +229,41 @@ QPDFTokenizer::presentCharacter(char ch)
 	    }
 	}
     }
+    else if (state == st_in_space)
+    {
+        // We only enter this state if include_ignorable is true.
+        if (! isSpace(ch))
+        {
+	    type = tt_space;
+	    unread_char = true;
+	    char_to_unread = ch;
+	    state = st_token_ready;
+        }
+        else
+        {
+            val += ch;
+        }
+    }
     else if (state == st_in_comment)
     {
 	if ((ch == '\r') || (ch == '\n'))
-	{
-	    state = st_top;
-	}
+        {
+            if (this->include_ignorable)
+            {
+                type = tt_comment;
+                unread_char = true;
+                char_to_unread = ch;
+                state = st_token_ready;
+            }
+            else
+            {
+                state = st_top;
+            }
+        }
+        else if (this->include_ignorable)
+        {
+            val += ch;
+        }
     }
     else if (state == st_lt)
     {
@@ -397,7 +446,7 @@ QPDFTokenizer::presentCharacter(char ch)
 	{
 	    val += ch;
 	}
-	else if (strchr(" \t\n\v\f\r", ch))
+	else if (isSpace(ch))
 	{
 	    // ignore
 	}
@@ -435,19 +484,23 @@ QPDFTokenizer::presentEOF()
         QTC::TC("qpdf", "QPDF_Tokenizer EOF reading appendable token");
         resolveLiteral();
     }
+    else if ((this->include_ignorable) && (state == st_in_space))
+    {
+        type = tt_space;
+    }
+    else if ((this->include_ignorable) && (state == st_in_comment))
+    {
+        type = tt_comment;
+    }
+    else if (betweenTokens())
+    {
+        type = tt_eof;
+    }
     else if (state != st_token_ready)
     {
-        QTC::TC("qpdf", "QPDF_Tokenizer EOF reading token",
-                this->allow_eof ? 1 : 0);
-        if ((this->allow_eof) && (state == st_top))
-        {
-            type = tt_eof;
-        }
-        else
-        {
-            type = tt_bad;
-            error_message = "EOF while reading token";
-        }
+        QTC::TC("qpdf", "QPDF_Tokenizer EOF reading token");
+        type = tt_bad;
+        error_message = "EOF while reading token";
     }
 
     state = st_token_ready;
@@ -461,6 +514,10 @@ QPDFTokenizer::getToken(Token& token, bool& unread_char, char& ch)
     ch = this->char_to_unread;
     if (ready)
     {
+        if (type == tt_bad)
+        {
+            val = raw_val;
+        }
 	token = Token(type, val, raw_val, error_message);
 	reset();
     }
@@ -470,7 +527,10 @@ QPDFTokenizer::getToken(Token& token, bool& unread_char, char& ch)
 bool
 QPDFTokenizer::betweenTokens()
 {
-    return ((state == st_top) || (state == st_in_comment));
+    return ((state == st_top) ||
+            ((! this->include_ignorable) &&
+             ((state == st_in_comment) ||
+              (state == st_in_space))));
 }
 
 QPDFTokenizer::Token
@@ -493,6 +553,13 @@ QPDFTokenizer::readToken(PointerHolder<InputSource> input,
             {
                 presentEOF();
                 presented_eof = true;
+                if ((type == tt_eof) && (! this->allow_eof))
+                {
+                    QTC::TC("qpdf", "QPDF_Tokenizer EOF when not allowed");
+                    type = tt_bad;
+                    error_message = "unexpected EOF";
+                    offset = input->getLastOffset();
+                }
             }
             else
             {
@@ -502,12 +569,11 @@ QPDFTokenizer::readToken(PointerHolder<InputSource> input,
 	}
 	else
 	{
-	    if (QUtil::is_space(static_cast<unsigned char>(ch)) &&
-		(input->getLastOffset() == offset))
+	    presentCharacter(ch);
+	    if (betweenTokens() && (input->getLastOffset() == offset))
 	    {
 		++offset;
 	    }
-	    presentCharacter(ch);
             if (max_len && (raw_val.length() >= max_len) &&
                 (this->state != st_token_ready))
             {
@@ -515,6 +581,8 @@ QPDFTokenizer::readToken(PointerHolder<InputSource> input,
                 QTC::TC("qpdf", "QPDFTokenizer block long token");
                 this->type = tt_bad;
                 this->state = st_token_ready;
+                error_message =
+                    "exceeded allowable length while reading token";
             }
 	}
     }

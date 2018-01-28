@@ -16,7 +16,7 @@ WARNING: issue-101.pdf (trailer, file position 2613): /Length key in stream dict
 WARNING: issue-101.pdf (trailer, file position 2684): attempting to recover stream length
 WARNING: issue-101.pdf (trailer, file position 2684): recovered stream length: 74
 WARNING: issue-101.pdf (trailer, file position 2928): unknown token while reading object; treating as string
-WARNING: issue-101.pdf (trailer, file position 2929): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (trailer, file position 2930): unknown token while reading object; treating as string
 WARNING: issue-101.pdf (trailer, file position 2928): expected dictionary key but found non-name object; inserting key /QPDFFake1
 WARNING: issue-101.pdf (trailer, file position 2928): expected dictionary key but found non-name object; inserting key /QPDFFake2
 WARNING: issue-101.pdf (trailer, file position 2928): expected dictionary key but found non-name object; inserting key /QPDFFake3
@@ -45,7 +45,7 @@ WARNING: issue-101.pdf (file position 696): unknown token while reading object; 
 WARNING: issue-101.pdf (file position 698): unknown token while reading object; treating as string
 WARNING: issue-101.pdf (file position 701): unknown token while reading object; treating as string
 WARNING: issue-101.pdf (file position 711): unknown token while reading object; treating as string
-WARNING: issue-101.pdf (file position 742): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (file position 743): unknown token while reading object; treating as string
 WARNING: issue-101.pdf (file position 745): unknown token while reading object; treating as string
 WARNING: issue-101.pdf (file position 747): unknown token while reading object; treating as string
 WARNING: issue-101.pdf (file position 777): unknown token while reading object; treating as string

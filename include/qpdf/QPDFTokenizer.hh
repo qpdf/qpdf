@@ -33,7 +33,8 @@ class QPDFTokenizer
 {
   public:
     // Token type tt_eof is only returned of allowEOF() is called on
-    // the tokenizer.  tt_eof was introduced in QPDF version 4.1.
+    // the tokenizer. tt_eof was introduced in QPDF version 4.1.
+    // tt_space and tt_comment were added in QPDF version 8.
     enum token_type_e
     {
 	tt_bad,
@@ -51,6 +52,8 @@ class QPDFTokenizer
 	tt_bool,
 	tt_word,
         tt_eof,
+        tt_space,
+        tt_comment,
     };
 
     class Token
@@ -120,6 +123,11 @@ class QPDFTokenizer
     QPDF_DLL
     void allowEOF();
 
+    // If called, readToken will return "ignorable" tokens for space
+    // and comments. This was added in QPDF 8.
+    QPDF_DLL
+    void includeIgnorable();
+
     // Mode of operation:
 
     // Keep presenting characters and calling getToken() until
@@ -159,13 +167,15 @@ class QPDFTokenizer
   private:
     void reset();
     void resolveLiteral();
+    bool isSpace(char);
 
     // Lexer state
-    enum { st_top, st_in_comment, st_in_string, st_lt, st_gt,
+    enum { st_top, st_in_space, st_in_comment, st_in_string, st_lt, st_gt,
 	   st_literal, st_in_hexstring, st_token_ready } state;
 
     bool pound_special_in_name;
     bool allow_eof;
+    bool include_ignorable;
 
     // Current token accumulation
     token_type_e type;

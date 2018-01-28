@@ -13,4 +13,4 @@ WARNING: issue-100.pdf (object 5 0, file position 489): attempting to recover st
 WARNING: issue-100.pdf (object 5 0, file position 489): recovered stream length: 12
 WARNING: issue-100.pdf (trailer, file position 953): expected dictionary key but found non-name object; inserting key /QPDFFake1
 WARNING: issue-100.pdf (trailer, file position 953): dictionary ended prematurely; using null as value for last key
-issue-100.pdf (file position 1138): unable to find /Root dictionary
+issue-100.pdf (file position 1144): unable to find /Root dictionary
