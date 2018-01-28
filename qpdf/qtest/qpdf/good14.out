@@ -36,4 +36,7 @@ This stream does end with a newline.
 (This stream ends with a \001 bad token
 -- stream 3 --
 <AB X
+-- stream 4 --
+(ends with a name)
+/ThisMustBeLast
 test 3 done
