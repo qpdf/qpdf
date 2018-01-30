@@ -165,31 +165,53 @@ class QPDFTokenizer
                     size_t max_len = 0);
 
   private:
-    void reset();
+    // Do not implement copy or assignment
+    QPDFTokenizer(QPDFTokenizer const&);
+    QPDFTokenizer& operator=(QPDFTokenizer const&);
+
     void resolveLiteral();
     bool isSpace(char);
 
-    // Lexer state
-    enum { st_top, st_in_space, st_in_comment, st_in_string, st_lt, st_gt,
-	   st_literal, st_in_hexstring, st_token_ready } state;
+    enum state_e {
+        st_top, st_in_space, st_in_comment, st_in_string, st_lt, st_gt,
+        st_literal, st_in_hexstring, st_token_ready
+    };
 
-    bool pound_special_in_name;
-    bool allow_eof;
-    bool include_ignorable;
+    class Members
+    {
+        friend class QPDFTokenizer;
 
-    // Current token accumulation
-    token_type_e type;
-    std::string val;
-    std::string raw_val;
-    std::string error_message;
-    bool unread_char;
-    char char_to_unread;
+      public:
+        QPDF_DLL
+        ~Members();
 
-    // State for strings
-    int string_depth;
-    bool string_ignoring_newline;
-    char bs_num_register[4];
-    bool last_char_was_bs;
+      private:
+        Members();
+        Members(Members const&);
+        void reset();
+
+        // Lexer state
+        state_e state;
+
+        bool pound_special_in_name;
+        bool allow_eof;
+        bool include_ignorable;
+
+        // Current token accumulation
+        token_type_e type;
+        std::string val;
+        std::string raw_val;
+        std::string error_message;
+        bool unread_char;
+        char char_to_unread;
+
+        // State for strings
+        int string_depth;
+        bool string_ignoring_newline;
+        char bs_num_register[4];
+        bool last_char_was_bs;
+    };
+    PointerHolder<Members> m;
 };
 
 #endif // __QPDFTOKENIZER_HH__
