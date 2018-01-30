@@ -28,7 +28,6 @@ class Pl_QPDFTokenizer: public Pipeline
     void writeToken(QPDFTokenizer::Token&);
 
     QPDFTokenizer tokenizer;
-    bool newline_after_next_token;
     bool just_wrote_nl;
     bool last_char_was_cr;
     bool unread_char;

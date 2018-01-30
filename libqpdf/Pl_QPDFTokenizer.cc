@@ -8,12 +8,13 @@
 
 Pl_QPDFTokenizer::Pl_QPDFTokenizer(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next),
-    newline_after_next_token(false),
     just_wrote_nl(false),
     last_char_was_cr(false),
     unread_char(false),
     char_to_unread('\0')
 {
+    tokenizer.allowEOF();
+    tokenizer.includeIgnorable();
 }
 
 Pl_QPDFTokenizer::~Pl_QPDFTokenizer()
@@ -37,8 +38,35 @@ Pl_QPDFTokenizer::writeToken(QPDFTokenizer::Token& token)
 
     switch (token.getType())
     {
+      case QPDFTokenizer::tt_space:
+        {
+            size_t len = value.length();
+            for (size_t i = 0; i < len; ++i)
+            {
+                char ch = value.at(i);
+                if (ch == '\r')
+                {
+                    if ((i + 1 < len) && (value.at(i + 1) == '\n'))
+                    {
+                        // ignore
+                    }
+                    else
+                    {
+                        writeNext("\n", 1);
+                    }
+                }
+                else
+                {
+                    writeNext(&ch, 1);
+                }
+            }
+        }
+        value.clear();
+        break;
+
       case QPDFTokenizer::tt_string:
 	value = QPDF_String(token.getValue()).unparse();
+
 	break;
 
       case QPDFTokenizer::tt_name:
@@ -59,45 +87,20 @@ Pl_QPDFTokenizer::processChar(char ch)
     if (tokenizer.getToken(token, this->unread_char, this->char_to_unread))
     {
 	writeToken(token);
-	if (this->newline_after_next_token)
-	{
+        std::string value = token.getRawValue();
+        QPDFTokenizer::token_type_e token_type = token.getType();
+        if (((token_type == QPDFTokenizer::tt_string) ||
+             (token_type == QPDFTokenizer::tt_name)) &&
+            ((value.find('\r') != std::string::npos) ||
+             (value.find('\n') != std::string::npos)))
+        {
 	    writeNext("\n", 1);
-	    this->newline_after_next_token = false;
 	}
 	if ((token.getType() == QPDFTokenizer::tt_word) &&
 	    (token.getValue() == "ID"))
 	{
             QTC::TC("qpdf", "Pl_QPDFTokenizer found ID");
             tokenizer.expectInlineImage();
-	}
-    }
-    else
-    {
-	bool suppress = false;
-	if ((ch == '\n') && (this->last_char_was_cr))
-	{
-	    // Always ignore \n following \r
-	    suppress = true;
-	}
-
-	if ((this->last_char_was_cr = (ch == '\r')))
-	{
-	    ch = '\n';
-	}
-
-	if (this->tokenizer.betweenTokens())
-	{
-	    if (! suppress)
-	    {
-		writeNext(&ch, 1);
-	    }
-	}
-	else
-	{
-	    if (ch == '\n')
-	    {
-		this->newline_after_next_token = true;
-	    }
 	}
     }
 }
