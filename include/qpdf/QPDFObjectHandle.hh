@@ -65,8 +65,8 @@ class QPDFObjectHandle
 	// QPDFWriter may, in some cases, add compression, but if it
 	// does, it will update the filters as needed. Every call to
 	// provideStreamData for a given stream must write the same
-	// data.The object ID and generation passed to this method are
-	// those that belong to the stream on behalf of which the
+	// data. The object ID and generation passed to this method
+	// are those that belong to the stream on behalf of which the
 	// provider is called. They may be ignored or used by the
 	// implementation for indexing or other purposes. This
 	// information is made available just to make it more
@@ -442,13 +442,8 @@ class QPDFObjectHandle
     bool pipeStreamData(Pipeline*,
                         unsigned long encode_flags,
                         qpdf_stream_decode_level_e decode_level,
-                        bool suppress_warnings = false);
-    QPDF_DLL
-    bool pipeStreamData(Pipeline*,
-                        unsigned long encode_flags,
-                        qpdf_stream_decode_level_e decode_level,
-                        bool suppress_warnings,
-                        bool will_retry);
+                        bool suppress_warnings = false,
+                        bool will_retry = false);
 
     // Legacy pipeStreamData. This maps to the the flags-based
     // pipeStreamData as follows:
