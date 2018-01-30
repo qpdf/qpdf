@@ -907,42 +907,31 @@ QPDFObjectHandle::parseContentStream_internal(PointerHolder<Buffer> stream_data,
             // terminated the token.  Read until end of inline image.
             char ch;
             input->read(&ch, 1);
-            char buf[4];
-            memset(buf, '\0', sizeof(buf));
-            bool done = false;
-            std::string inline_image;
-            while (! done)
+            tokenizer.expectInlineImage();
+            QPDFTokenizer::Token t = tokenizer.readToken(input, description, true);
+            if (t.getType() == QPDFTokenizer::tt_bad)
             {
-                if (input->read(&ch, 1) == 0)
+                QTC::TC("qpdf", "QPDFObjectHandle EOF in inline image");
+                throw QPDFExc(qpdf_e_damaged_pdf, input->getName(),
+                              "stream data", input->tell(),
+                              "EOF found while reading inline image");
+            }
+            else
+            {
+                // Skip back over EI
+                input->seek(-3, SEEK_CUR);
+                std::string inline_image = t.getRawValue();
+                for (int i = 0; i < 4; ++i)
                 {
-                    QTC::TC("qpdf", "QPDFObjectHandle EOF in inline image");
-                    throw QPDFExc(qpdf_e_damaged_pdf, input->getName(),
-                                  "stream data", input->tell(),
-                                  "EOF found while reading inline image");
-                }
-                inline_image += ch;
-                memmove(buf, buf + 1, sizeof(buf) - 1);
-                buf[sizeof(buf) - 1] = ch;
-                if (strchr(" \t\n\v\f\r", buf[0]) &&
-                    (buf[1] == 'E') &&
-                    (buf[2] == 'I') &&
-                    strchr(" \t\n\v\f\r", buf[3]))
-                {
-                    // We've found an EI operator.
-                    done = true;
-                    input->seek(-3, SEEK_CUR);
-                    for (int i = 0; i < 4; ++i)
+                    if (inline_image.length() > 0)
                     {
-                        if (inline_image.length() > 0)
-                        {
-                            inline_image.erase(inline_image.length() - 1);
-                        }
+                        inline_image.erase(inline_image.length() - 1);
                     }
                 }
+                QTC::TC("qpdf", "QPDFObjectHandle inline image token");
+                callbacks->handleObject(
+                    QPDFObjectHandle::newInlineImage(inline_image));
             }
-            QTC::TC("qpdf", "QPDFObjectHandle inline image token");
-            callbacks->handleObject(
-                QPDFObjectHandle::newInlineImage(inline_image));
         }
     }
 }
