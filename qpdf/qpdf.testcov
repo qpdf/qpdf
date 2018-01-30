@@ -64,11 +64,11 @@ QPDF stream length not integer 0
 QPDF missing endstream 0
 QPDFObjectHandle bad dictionary close 0
 QPDF can't find xref 0
-QPDF_Tokenizer bad ) 0
-QPDF_Tokenizer bad > 0
-QPDF_Tokenizer bad hexstring character 0
-QPDF_Tokenizer null in name 0
-QPDF_Tokenizer bad name 0
+QPDFTokenizer bad ) 0
+QPDFTokenizer bad > 0
+QPDFTokenizer bad hexstring character 0
+QPDFTokenizer null in name 0
+QPDFTokenizer bad name 0
 QPDF_Stream invalid filter 0
 QPDF UseOutlines but no Outlines 0
 QPDFObjectHandle clone bool 0
@@ -233,8 +233,8 @@ QPDFWriter copy use_aes 1
 QPDFObjectHandle indirect without context 0
 QPDFObjectHandle trailing data in parse 0
 qpdf pages encryption password 0
-QPDF_Tokenizer EOF reading token 0
-QPDF_Tokenizer EOF reading appendable token 0
+QPDFTokenizer EOF reading token 0
+QPDFTokenizer EOF reading appendable token 0
 QPDFWriter extra header text no newline 0
 QPDFWriter extra header text add newline 0
 QPDF bogus 0 offset 0
@@ -302,4 +302,5 @@ qpdf-c called qpdf_set_compress_streams 0
 qpdf-c called qpdf_set_preserve_unreferenced_objects 0
 qpdf-c called qpdf_set_newline_before_endstream 0
 QPDF_Stream TIFF predictor 0
-QPDF_Tokenizer EOF when not allowed 0
+QPDFTokenizer EOF when not allowed 0
+QPDFTokenizer inline image at EOF 0

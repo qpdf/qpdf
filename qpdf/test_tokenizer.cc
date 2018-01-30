@@ -88,6 +88,8 @@ static char const* tokenTypeName(QPDFTokenizer::token_type_e ttype)
         return "space";
       case QPDFTokenizer::tt_comment:
         return "comment";
+      case QPDFTokenizer::tt_inline_image:
+        return "inline-image";
     }
     return 0;
 }
@@ -131,7 +133,6 @@ dump_tokens(PointerHolder<InputSource> is, std::string const& label,
             bool skip_streams, bool skip_inline_images)
 {
     Finder f1(is, "endstream");
-    Finder f2(is, "EI");
     std::cout << "--- BEGIN " << label << " ---" << std::endl;
     bool done = false;
     QPDFTokenizer tokenizer;
@@ -140,10 +141,20 @@ dump_tokens(PointerHolder<InputSource> is, std::string const& label,
     {
         tokenizer.includeIgnorable();
     }
+    qpdf_offset_t inline_image_offset = 0;
     while (! done)
     {
         QPDFTokenizer::Token token =
-            tokenizer.readToken(is, "test", true, max_len);
+            tokenizer.readToken(is, "test", true,
+                                inline_image_offset ? 0 : max_len);
+        if (inline_image_offset && (token.getType() == QPDFTokenizer::tt_bad))
+        {
+            std::cout << "EI not found; resuming normal scanning" << std::endl;
+            is->seek(inline_image_offset, SEEK_SET);
+            inline_image_offset = 0;
+            continue;
+        }
+        inline_image_offset = 0;
 
         qpdf_offset_t offset = is->getLastOffset();
         std::cout << offset << ": "
@@ -170,7 +181,8 @@ dump_tokens(PointerHolder<InputSource> is, std::string const& label,
         else if (skip_inline_images &&
                  (token == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "ID")))
         {
-            try_skipping(tokenizer, is, max_len, "EI", f2);
+            tokenizer.expectInlineImage();
+            inline_image_offset = is->tell();
         }
         else if (token.getType() == QPDFTokenizer::tt_eof)
         {

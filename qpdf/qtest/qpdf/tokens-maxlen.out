@@ -222,307 +222,311 @@ skipping to endstream
 7601: word: endstream
 7610: space: \x0a
 7611: word: endobj
-7617: space: \x0a\x0a
-7619: integer: 46
-7621: space:  
-7622: integer: 0
-7623: space:  
-7624: word: obj
-7627: space: \x0a
-7628: integer: 68
-7630: space: \x0a
-7631: word: endobj
-7637: space: \x0a\x0a
-7639: comment: %% Contents for page 6
-7661: space: \x0a
-7662: comment: %% Original object ID: 42 0
-7689: space: \x0a
-7690: integer: 47
-7692: space:  
-7693: integer: 0
-7694: space:  
-7695: word: obj
-7698: space: \x0a
-7699: dict_open: <<
-7701: space: \x0a  
-7704: name: /Length
-7711: space:  
-7712: integer: 48
-7714: space:  
-7715: integer: 0
-7716: space:  
-7717: word: R
-7718: space: \x0a
-7719: dict_close: >>
-7721: space: \x0a
-7722: word: stream
+7617: space: \x0a
+7618: comment: %QDF: ignore_newline
+7638: space: \x0a\x0a
+7640: integer: 46
+7642: space:  
+7643: integer: 0
+7644: space:  
+7645: word: obj
+7648: space: \x0a
+7649: integer: 67
+7651: space: \x0a
+7652: word: endobj
+7658: space: \x0a\x0a
+7660: comment: %% Contents for page 6
+7682: space: \x0a
+7683: comment: %% Original object ID: 42 0
+7710: space: \x0a
+7711: integer: 47
+7713: space:  
+7714: integer: 0
+7715: space:  
+7716: word: obj
+7719: space: \x0a
+7720: dict_open: <<
+7722: space: \x0a  
+7725: name: /Length
+7732: space:  
+7733: integer: 48
+7735: space:  
+7736: integer: 0
+7737: space:  
+7738: word: R
+7739: space: \x0a
+7740: dict_close: >>
+7742: space: \x0a
+7743: word: stream
 skipping to endstream
-7773: word: endstream
-7782: space: \x0a
-7783: word: endobj
-7789: space: \x0a\x0a
-7791: integer: 48
-7793: space:  
-7794: integer: 0
-7795: space:  
-7796: word: obj
-7799: space: \x0a
-7800: integer: 44
-7802: space: \x0a
-7803: word: endobj
-7809: space: \x0a\x0a
-7811: comment: %% Contents for page 7
-7833: space: \x0a
-7834: comment: %% Original object ID: 43 0
-7861: space: \x0a
-7862: integer: 49
-7864: space:  
-7865: integer: 0
-7866: space:  
-7867: word: obj
-7870: space: \x0a
-7871: dict_open: <<
-7873: space: \x0a  
-7876: name: /Length
-7883: space:  
-7884: integer: 50
-7886: space:  
-7887: integer: 0
-7888: space:  
-7889: word: R
-7890: space: \x0a
-7891: dict_close: >>
-7893: space: \x0a
-7894: word: stream
+7794: word: endstream
+7803: space: \x0a
+7804: word: endobj
+7810: space: \x0a\x0a
+7812: integer: 48
+7814: space:  
+7815: integer: 0
+7816: space:  
+7817: word: obj
+7820: space: \x0a
+7821: integer: 44
+7823: space: \x0a
+7824: word: endobj
+7830: space: \x0a\x0a
+7832: comment: %% Contents for page 7
+7854: space: \x0a
+7855: comment: %% Original object ID: 43 0
+7882: space: \x0a
+7883: integer: 49
+7885: space:  
+7886: integer: 0
+7887: space:  
+7888: word: obj
+7891: space: \x0a
+7892: dict_open: <<
+7894: space: \x0a  
+7897: name: /Length
+7904: space:  
+7905: integer: 50
+7907: space:  
+7908: integer: 0
+7909: space:  
+7910: word: R
+7911: space: \x0a
+7912: dict_close: >>
+7914: space: \x0a
+7915: word: stream
 skipping to endstream
-7945: word: endstream
-7954: space: \x0a
-7955: word: endobj
-7961: space: \x0a\x0a
-7963: integer: 50
-7965: space:  
-7966: integer: 0
-7967: space:  
-7968: word: obj
-7971: space: \x0a
-7972: integer: 44
-7974: space: \x0a
-7975: word: endobj
-7981: space: \x0a\x0a
-7983: comment: %% Contents for page 8
-8005: space: \x0a
-8006: comment: %% Original object ID: 44 0
-8033: space: \x0a
-8034: integer: 51
-8036: space:  
-8037: integer: 0
-8038: space:  
-8039: word: obj
-8042: space: \x0a
-8043: dict_open: <<
-8045: space: \x0a  
-8048: name: /Length
-8055: space:  
-8056: integer: 52
-8058: space:  
-8059: integer: 0
-8060: space:  
-8061: word: R
-8062: space: \x0a
-8063: dict_close: >>
-8065: space: \x0a
-8066: word: stream
+8241: word: endstream
+8250: space: \x0a
+8251: word: endobj
+8257: space: \x0a
+8258: comment: %QDF: ignore_newline
+8278: space: \x0a\x0a
+8280: integer: 50
+8282: space:  
+8283: integer: 0
+8284: space:  
+8285: word: obj
+8288: space: \x0a
+8289: integer: 318
+8292: space: \x0a
+8293: word: endobj
+8299: space: \x0a\x0a
+8301: comment: %% Contents for page 8
+8323: space: \x0a
+8324: comment: %% Original object ID: 44 0
+8351: space: \x0a
+8352: integer: 51
+8354: space:  
+8355: integer: 0
+8356: space:  
+8357: word: obj
+8360: space: \x0a
+8361: dict_open: <<
+8363: space: \x0a  
+8366: name: /Length
+8373: space:  
+8374: integer: 52
+8376: space:  
+8377: integer: 0
+8378: space:  
+8379: word: R
+8380: space: \x0a
+8381: dict_close: >>
+8383: space: \x0a
+8384: word: stream
 skipping to endstream
-8117: word: endstream
-8126: space: \x0a
-8127: word: endobj
-8133: space: \x0a\x0a
-8135: integer: 52
-8137: space:  
-8138: integer: 0
-8139: space:  
-8140: word: obj
-8143: space: \x0a
-8144: integer: 44
-8146: space: \x0a
-8147: word: endobj
-8153: space: \x0a\x0a
-8155: comment: %% Contents for page 9
-8177: space: \x0a
-8178: comment: %% Original object ID: 45 0
-8205: space: \x0a
-8206: integer: 53
-8208: space:  
-8209: integer: 0
-8210: space:  
-8211: word: obj
-8214: space: \x0a
-8215: dict_open: <<
-8217: space: \x0a  
-8220: name: /Length
-8227: space:  
-8228: integer: 54
-8230: space:  
-8231: integer: 0
-8232: space:  
-8233: word: R
-8234: space: \x0a
-8235: dict_close: >>
-8237: space: \x0a
-8238: word: stream
-skipping to endstream
-8289: word: endstream
-8298: space: \x0a
-8299: word: endobj
-8305: space: \x0a\x0a
-8307: integer: 54
-8309: space:  
-8310: integer: 0
-8311: space:  
-8312: word: obj
-8315: space: \x0a
-8316: integer: 44
-8318: space: \x0a
-8319: word: endobj
-8325: space: \x0a\x0a
-8327: comment: %% Contents for page 10
-8350: space: \x0a
-8351: comment: %% Original object ID: 46 0
-8378: space: \x0a
-8379: integer: 55
-8381: space:  
-8382: integer: 0
-8383: space:  
-8384: word: obj
-8387: space: \x0a
-8388: dict_open: <<
-8390: space: \x0a  
-8393: name: /Length
-8400: space:  
-8401: integer: 56
-8403: space:  
-8404: integer: 0
-8405: space:  
-8406: word: R
-8407: space: \x0a
-8408: dict_close: >>
-8410: space: \x0a
-8411: word: stream
-skipping to endstream
-8462: word: endstream
-8471: space: \x0a
-8472: word: endobj
-8478: space: \x0a\x0a
-8480: integer: 56
-8482: space:  
-8483: integer: 0
-8484: space:  
-8485: word: obj
-8488: space: \x0a
-8489: integer: 44
-8491: space: \x0a
-8492: word: endobj
-8498: space: \x0a\x0a
-8500: comment: %% Contents for page 11
+8435: word: endstream
+8444: space: \x0a
+8445: word: endobj
+8451: space: \x0a\x0a
+8453: integer: 52
+8455: space:  
+8456: integer: 0
+8457: space:  
+8458: word: obj
+8461: space: \x0a
+8462: integer: 44
+8464: space: \x0a
+8465: word: endobj
+8471: space: \x0a\x0a
+8473: comment: %% Contents for page 9
+8495: space: \x0a
+8496: comment: %% Original object ID: 45 0
 8523: space: \x0a
-8524: comment: %% Original object ID: 47 0
-8551: space: \x0a
-8552: integer: 57
-8554: space:  
-8555: integer: 0
-8556: space:  
-8557: word: obj
-8560: space: \x0a
-8561: dict_open: <<
-8563: space: \x0a  
-8566: name: /Length
-8573: space:  
-8574: integer: 58
-8576: space:  
-8577: integer: 0
-8578: space:  
-8579: word: R
-8580: space: \x0a
-8581: dict_close: >>
-8583: space: \x0a
-8584: word: stream
+8524: integer: 53
+8526: space:  
+8527: integer: 0
+8528: space:  
+8529: word: obj
+8532: space: \x0a
+8533: dict_open: <<
+8535: space: \x0a  
+8538: name: /Length
+8545: space:  
+8546: integer: 54
+8548: space:  
+8549: integer: 0
+8550: space:  
+8551: word: R
+8552: space: \x0a
+8553: dict_close: >>
+8555: space: \x0a
+8556: word: stream
 skipping to endstream
-8635: word: endstream
-8644: space: \x0a
-8645: word: endobj
-8651: space: \x0a\x0a
-8653: integer: 58
-8655: space:  
-8656: integer: 0
-8657: space:  
-8658: word: obj
-8661: space: \x0a
-8662: integer: 44
-8664: space: \x0a
-8665: word: endobj
-8671: space: \x0a\x0a
-8673: integer: 59
-8675: space:  
-8676: integer: 0
-8677: space:  
-8678: word: obj
-8681: space: \x0a
-8682: dict_open: <<
-8684: space: \x0a  
-8687: name: /Type
-8692: space:  
-8693: name: /XRef
-8698: space: \x0a  
-8701: name: /Length
-8708: space:  
-8709: integer: 240
-8712: space: \x0a  
-8715: name: /W
-8717: space:  
-8718: array_open: [
-8719: space:  
-8720: integer: 1
+8607: word: endstream
+8616: space: \x0a
+8617: word: endobj
+8623: space: \x0a\x0a
+8625: integer: 54
+8627: space:  
+8628: integer: 0
+8629: space:  
+8630: word: obj
+8633: space: \x0a
+8634: integer: 44
+8636: space: \x0a
+8637: word: endobj
+8643: space: \x0a\x0a
+8645: comment: %% Contents for page 10
+8668: space: \x0a
+8669: comment: %% Original object ID: 46 0
+8696: space: \x0a
+8697: integer: 55
+8699: space:  
+8700: integer: 0
+8701: space:  
+8702: word: obj
+8705: space: \x0a
+8706: dict_open: <<
+8708: space: \x0a  
+8711: name: /Length
+8718: space:  
+8719: integer: 56
 8721: space:  
-8722: integer: 2
+8722: integer: 0
 8723: space:  
-8724: integer: 1
-8725: space:  
-8726: array_close: ]
-8727: space: \x0a  
-8730: name: /Root
-8735: space:  
-8736: integer: 2
-8737: space:  
-8738: integer: 0
-8739: space:  
-8740: word: R
-8741: space: \x0a  
-8744: name: /Size
-8749: space:  
-8750: integer: 60
-8752: space: \x0a  
-8755: name: /ID
-8758: space:  
-8759: array_open: [
-8760: string: \x88\x04\x8e\x17\xc9a\xe0\x94\xff\xec\xe9\x8c\xb8\x8cF\xd0 (raw: <88048e17c961e094ffece98cb88c46d0>)
-8794: string: \xed\xd6\x0f\xe8\xee\x87\xf8\x871\xa8o\x81\x9f\xe6Q\x99 (raw: <edd60fe8ee87f88731a86f819fe65199>)
-8828: array_close: ]
-8829: space: \x0a
-8830: dict_close: >>
-8832: space: \x0a
-8833: word: stream
+8724: word: R
+8725: space: \x0a
+8726: dict_close: >>
+8728: space: \x0a
+8729: word: stream
 skipping to endstream
-9081: word: endstream
-9090: space: \x0a
-9091: word: endobj
-9097: space: \x0a\x0a
-9099: word: startxref
-9108: space: \x0a
-9109: integer: 8673
-9113: space: \x0a
-9114: comment: %%EOF
-9119: space: \x0a
-9120: eof
+8780: word: endstream
+8789: space: \x0a
+8790: word: endobj
+8796: space: \x0a\x0a
+8798: integer: 56
+8800: space:  
+8801: integer: 0
+8802: space:  
+8803: word: obj
+8806: space: \x0a
+8807: integer: 44
+8809: space: \x0a
+8810: word: endobj
+8816: space: \x0a\x0a
+8818: comment: %% Contents for page 11
+8841: space: \x0a
+8842: comment: %% Original object ID: 47 0
+8869: space: \x0a
+8870: integer: 57
+8872: space:  
+8873: integer: 0
+8874: space:  
+8875: word: obj
+8878: space: \x0a
+8879: dict_open: <<
+8881: space: \x0a  
+8884: name: /Length
+8891: space:  
+8892: integer: 58
+8894: space:  
+8895: integer: 0
+8896: space:  
+8897: word: R
+8898: space: \x0a
+8899: dict_close: >>
+8901: space: \x0a
+8902: word: stream
+skipping to endstream
+8953: word: endstream
+8962: space: \x0a
+8963: word: endobj
+8969: space: \x0a\x0a
+8971: integer: 58
+8973: space:  
+8974: integer: 0
+8975: space:  
+8976: word: obj
+8979: space: \x0a
+8980: integer: 44
+8982: space: \x0a
+8983: word: endobj
+8989: space: \x0a\x0a
+8991: integer: 59
+8993: space:  
+8994: integer: 0
+8995: space:  
+8996: word: obj
+8999: space: \x0a
+9000: dict_open: <<
+9002: space: \x0a  
+9005: name: /Type
+9010: space:  
+9011: name: /XRef
+9016: space: \x0a  
+9019: name: /Length
+9026: space:  
+9027: integer: 240
+9030: space: \x0a  
+9033: name: /W
+9035: space:  
+9036: array_open: [
+9037: space:  
+9038: integer: 1
+9039: space:  
+9040: integer: 2
+9041: space:  
+9042: integer: 1
+9043: space:  
+9044: array_close: ]
+9045: space: \x0a  
+9048: name: /Root
+9053: space:  
+9054: integer: 2
+9055: space:  
+9056: integer: 0
+9057: space:  
+9058: word: R
+9059: space: \x0a  
+9062: name: /Size
+9067: space:  
+9068: integer: 60
+9070: space: \x0a  
+9073: name: /ID
+9076: space:  
+9077: array_open: [
+9078: string: \x88\x04\x8e\x17\xc9a\xe0\x94\xff\xec\xe9\x8c\xb8\x8cF\xd0 (raw: <88048e17c961e094ffece98cb88c46d0>)
+9112: string: \xed\xd6\x0f\xe8\xee\x87\xf8\x871\xa8o\x81\x9f\xe6Q\x99 (raw: <edd60fe8ee87f88731a86f819fe65199>)
+9146: array_close: ]
+9147: space: \x0a
+9148: dict_close: >>
+9150: space: \x0a
+9151: word: stream
+skipping to endstream
+9399: word: endstream
+9408: space: \x0a
+9409: word: endobj
+9415: space: \x0a\x0a
+9417: word: startxref
+9426: space: \x0a
+9427: integer: 8991
+9431: space: \x0a
+9432: comment: %%EOF
+9437: space: \x0a
+9438: eof
 --- END FILE ---
 --- BEGIN PAGE 1 ---
 0: word: BT
@@ -595,9 +599,7 @@ skipping to endstream
 103: dict_close: >>
 105: space: \x0a
 106: word: ID
-skipping to EI
-352: word: EI
-354: space: \x0a
+108: inline-image:  x\x9c\xc5\xd6I\x0e\xc3 \x0c\x05P|\xffC;U\xc8`\xc0\xd37\x91Z\xa9\x0b\xa6\x17\x02\xc4\x98\xda\xe6\x8f\x1b}D\xf0\xef_\xb4\xf8\x1c\xc9W\xa9\x84\x9c\xc4-\x94\x88>\xff\x87\xc0\x8d>\x94^\x01&\xae\xa1u\xe2]\x80"!\x87\x95\x08\x96\x05*\xac&\x8fE|Sy\xae \xf0d-\x80<\x9d\x19B\x010B\x05\xfa@N\x11\xea+<\x1fhl\xe8K\xd0\xee/56L\xa0\x89\x90\xe3\x19\x1e \xa3\x96\xb9\xa6>0\x06>\x15Y\x81\xf9!c\xec\\x0eY\x0c\xd8\x0f%Y\xf0\x01\xa5\xd68?&\xa0\xd6\xeb\x88}j\x92\xfb\xe8\x1d;\xab\x8d3\x9d\xc2\xd6l\x14p\xdbsH\xf6\xfbt\xfa\x01Q\x02\xd8Tt*h\xccU\xfa\xe3w\x07\xcd\xd5\xd0%\xa8)p\x96\xb3"\x95DiRj\xb9\x96D\x18YNU\x11\xd3\xd9Av\x92F\xe0&\x0d\x90\xcd\xd4u#c\x95\xc6W\x09\xf4\xdf\x89\x03W\x93O\x0d\x0aEI\x0a
 355: word: BT
 357: space: \x0a  
 360: name: /F1
@@ -743,13 +745,11 @@ skipping to EI
 47: word: ET
 49: space: \x0a\x00\x0a
 52: name: /ThisMustBeLast
-67: space: \x0a
-68: eof
+67: eof
 --- END PAGE 5 ---
 --- BEGIN PAGE 6 ---
 0: word: ID
-skipping to EI
-EI not found
+EI not found; resuming normal scanning
 2: space: \x0a  
 5: name: /F1
 8: space:  
@@ -772,27 +772,37 @@ EI not found
 44: eof
 --- END PAGE 6 ---
 --- BEGIN PAGE 7 ---
-0: word: BT
-2: space: \x0a  
-5: name: /F1
-8: space:  
-9: integer: 24
-11: space:  
-12: word: Tf
-14: space: \x0a  
-17: integer: 72
+0: name: /potato
+7: space: \x0a
+8: word: BI
+10: space: \x0a
+11: name: /CS
+14: space:  
+15: name: /G
+17: name: /W
 19: space:  
-20: integer: 720
-23: space:  
-24: word: Td
-26: space: \x0a  
-29: string: Potato (raw: (Potato))
-37: space:  
-38: word: Tj
-40: space: \x0a
-41: word: ET
-43: space: \x0a
-44: eof
+20: integer: 66
+22: name: /H
+24: space:  
+25: integer: 47
+27: name: /BPC
+31: space:  
+32: integer: 8
+33: name: /F
+35: name: /Fl
+38: name: /DP
+41: dict_open: <<
+43: name: /Predictor
+53: space:  
+54: integer: 15
+56: name: /Columns
+64: space:  
+65: integer: 66
+67: dict_close: >>
+69: space: \x0a
+70: word: ID
+72: inline-image:  x\x9c\xc5\xd6I\x0e\xc3 \x0c\x05P|\xffC;U\xc8`\xc0\xd37\x91Z\xa9\x0b\xa6\x17\x02\xc4\x98\xda\xe6\x8f\x1b}D\xf0\xef_\xb4\xf8\x1c\xc9W\xa9\x84\x9c\xc4-\x94\x88>\xff\x87\xc0\x8d>\x94^\x01&\xae\xa1u\xe2]\x80"!\x87\x95\x08\x96\x05*\xac&\x8fE|Sy\xae \xf0d-\x80<\x9d\x19B\x010B\x05\xfa@N\x11\xea+<\x1fhl\xe8K\xd0\xee/56L\xa0\x89\x90\xe3\x19\x1e \xa3\x96\xb9\xa6>0\x06>\x15Y\x81\xf9!c\xec\\x0eY\x0c\xd8\x0f%Y\xf0\x01\xa5\xd68?&\xa0\xd6\xeb\x88}j\x92\xfb\xe8\x1d;\xab\x8d3\x9d\xc2\xd6l\x14p\xdbsH\xf6\xfbt\xfa\x01Q\x02\xd8Tt*h\xccU\xfa\xe3w\x07\xcd\xd5\xd0%\xa8)p\x96\xb3"\x95DiRj\xb9\x96D\x18YNU\x11\xd3\xd9Av\x92F\xe0&\x0d\x90\xcd\xd4u#c\x95\xc6W\x09\xf4\xdf\x89\x03W\x93O\x0d\x0aEI
+318: eof
 --- END PAGE 7 ---
 --- BEGIN PAGE 8 ---
 0: word: BT
