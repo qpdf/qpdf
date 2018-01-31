@@ -1,5 +1,15 @@
 2018-02-04  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add QPDFWriter::setLinearizationPass1Filename method and
+	--linearize-pass1 command line option to allow specification of a
+	file into which QPDFWriter will write its intermediate
+	linearization pass 1 file. This is useful only for debugging qpdf.
+	qpdf creates linearized files by computing the output in two
+	passes. Ordinarily the first pass is discarded and not written
+	anywhere. This option allows it to be inspected.
+
+2018-02-04  Jay Berkenbilt  <ejb@ql.org>
+
 	* 7.1.1: release
 
 	* Bug fix: properly linearize files whose /ID has a length of

@@ -153,6 +153,7 @@ struct Options
     bool qdf_mode;
     bool preserve_unreferenced_objects;
     bool newline_before_endstream;
+    std::string linearize_pass1;
     std::string min_version;
     std::string force_version;
     bool show_npages;
@@ -391,6 +392,8 @@ familiar with the PDF file format or who are PDF developers.\n\
 --preserve-unreferenced   preserve unreferenced objects\n\
 --newline-before-endstream  always put a newline before endstream\n\
 --qdf                     turns on \"QDF mode\" (below)\n\
+--linearize-pass1=file    write intermediate pass of linearized file\n\
+                          for debugging\n\
 --min-version=version     sets the minimum PDF version of the output file\n\
 --force-version=version   forces this to be the PDF version of the output file\n\
 \n\
@@ -1531,6 +1534,15 @@ static void parse_options(int argc, char* argv[], Options& o)
             {
                 o.newline_before_endstream = true;
             }
+            else if (strcmp(arg, "linearize-pass1") == 0)
+            {
+                if (parameter == 0)
+                {
+                    usage("--linearize-pass1 be given as"
+                          "--linearize-pass1=filename");
+                }
+                o.linearize_pass1 = parameter;
+            }
             else if (strcmp(arg, "min-version") == 0)
             {
                 if (parameter == 0)
@@ -2213,6 +2225,10 @@ static void set_writer_options(QPDF& pdf, Options& o, QPDFWriter& w)
     if (o.linearize)
     {
         w.setLinearization(true);
+    }
+    if (! o.linearize_pass1.empty())
+    {
+        w.setLinearizationPass1Filename(o.linearize_pass1);
     }
     if (o.object_stream_set)
     {

@@ -357,6 +357,12 @@ QPDFWriter::setLinearization(bool val)
 }
 
 void
+QPDFWriter::setLinearizationPass1Filename(std::string const& filename)
+{
+    this->m->lin_pass1_filename = filename;
+}
+
+void
 QPDFWriter::setPCLm(bool val)
 {
     this->m->pclm = val;
@@ -2957,11 +2963,24 @@ QPDFWriter::writeLinearized()
 
     // Write file in two passes.  Part numbers refer to PDF spec 1.4.
 
+    FILE* lin_pass1_file = 0;
     for (int pass = 1; pass <= 2; ++pass)
     {
 	if (pass == 1)
 	{
-	    pushDiscardFilter();
+            if (! this->m->lin_pass1_filename.empty())
+            {
+                lin_pass1_file =
+                    QUtil::safe_fopen(
+                        this->m->lin_pass1_filename.c_str(), "wb");
+                pushPipeline(
+                    new Pl_StdioFile("linearization pass1", lin_pass1_file));
+                activatePipelineStack();
+            }
+            else
+            {
+                pushDiscardFilter();
+            }
             if (this->m->deterministic_id)
             {
                 pushMD5Pipeline();
@@ -3201,6 +3220,20 @@ QPDFWriter::writeLinearized()
 
 	    // Restore hint offset
 	    this->m->xref[hint_id] = QPDFXRefEntry(1, hint_offset, 0);
+            if (lin_pass1_file)
+            {
+                // Write some debugging information
+                fprintf(lin_pass1_file, "%% hint_offset=%s\n",
+                        QUtil::int_to_string(hint_offset).c_str());
+                fprintf(lin_pass1_file, "%% hint_length=%s\n",
+                        QUtil::int_to_string(hint_length).c_str());
+                fprintf(lin_pass1_file, "%% second_xref_offset=%s\n",
+                        QUtil::int_to_string(second_xref_offset).c_str());
+                fprintf(lin_pass1_file, "%% second_xref_end=%s\n",
+                        QUtil::int_to_string(second_xref_end).c_str());
+                fclose(lin_pass1_file);
+                lin_pass1_file = 0;
+            }
 	}
     }
 }

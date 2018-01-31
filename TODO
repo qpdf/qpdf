@@ -177,44 +177,6 @@ I find it useful to make reference to them in this list
  * See if we can avoid preserving unreferenced objects in object
    streams even when preserving the object streams.
 
- * For debugging linearization bugs, consider adding an option to save
-   pass 1 of linearization.  This code is sufficient.  Change the
-   interface to allow specification of a pass1 file, which would
-   change the behavior as in this patch.
-
-------------------------------
-Index: QPDFWriter.cc
-===================================================================
---- QPDFWriter.cc	(revision 932)
-+++ QPDFWriter.cc	(working copy)
-@@ -1965,11 +1965,15 @@
- 
-     // Write file in two passes.  Part numbers refer to PDF spec 1.4.
- 
-+    FILE* XXX = 0;
-     for (int pass = 1; pass <= 2; ++pass)
-     {
- 	if (pass == 1)
- 	{
--	    pushDiscardFilter();
-+//	    pushDiscardFilter();
-+	    XXX = QUtil::safe_fopen("/tmp/pass1.pdf", "w");
-+	    pushPipeline(new Pl_StdioFile("pass1", XXX));
-+	    activatePipelineStack();
- 	}
- 
- 	// Part 1: header
-@@ -2204,6 +2208,8 @@
- 
- 	    // Restore hint offset
- 	    this->xref[hint_id] = QPDFXRefEntry(1, hint_offset, 0);
-+	    fclose(XXX);
-+	    XXX = 0;
- 	}
-     }
- }
-------------------------------
-
  * Provide APIs for embedded files.  See *attachments*.pdf in test
    suite.  The private method findAttachmentStreams finds at least
    cases for modern versions of Adobe Reader (>= 1.7, maybe earlier).
