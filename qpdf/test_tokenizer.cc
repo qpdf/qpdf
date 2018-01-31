@@ -213,13 +213,7 @@ static void process(char const* filename, bool include_ignorable,
     {
         ++pageno;
         Pl_Buffer plb("buffer");
-        std::vector<QPDFObjectHandle> contents = (*iter).getPageContents();
-        for (std::vector<QPDFObjectHandle>::iterator citer = contents.begin();
-             citer != contents.end(); ++citer)
-        {
-            (*citer).pipeStreamData(&plb, 0, qpdf_dl_specialized);
-        }
-        plb.finish();
+        (*iter).pipePageContents(&plb);
         PointerHolder<Buffer> content_data = plb.getBuffer();
         BufferInputSource* bis = new BufferInputSource(
             "content data", content_data.getPointer());
