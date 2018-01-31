@@ -277,7 +277,6 @@ QPDFObjectHandle found fake 1
 QPDFObjectHandle no val for last key 0
 QPDF resolve failure to null 0
 QPDFWriter preserve unreferenced standard 0
-QPDFObjectHandle non-stream in parsecontent 0
 QPDFObjectHandle errors in parsecontent 0
 QPDF stream with non-space 0
 qpdf same file error 0
@@ -304,3 +303,4 @@ QPDF_Stream TIFF predictor 0
 QPDFTokenizer EOF when not allowed 0
 QPDFTokenizer inline image at EOF 0
 Pl_QPDFTokenizer found ID 0
+QPDFObjectHandle non-stream in stream array 0

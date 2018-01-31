@@ -45,6 +45,18 @@
 	characters may surround the EI operator that marks the end of an
 	inline image.
 
+	* New method QPDFObjectHandle::parsePageContents() to improve upon
+	QPDFObjectHandle::parseContentStream(). The parseContentStream
+	method used to operate on a single content stream, but was fixed
+	to properly handle pages with contents split across multiple
+	streams in an earlier release. The new method parsePageContents()
+	can be called on the page object rather than the value of the
+	page dictionary's /Contents key. This removes a few lines of
+	boiler-plate code from any code that uses parseContentStream, and
+	it also enables creation of more helpful error messages if
+	problems are encountered as the error messages can include
+	information about which page the streams come from.
+
 2018-02-04  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add QPDFWriter::setLinearizationPass1Filename method and

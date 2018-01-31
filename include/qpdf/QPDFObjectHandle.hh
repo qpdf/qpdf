@@ -88,7 +88,7 @@ class QPDFObjectHandle
         virtual void decryptString(std::string& val) = 0;
     };
 
-    // This class is used by parseContentStream.  Callers must
+    // This class is used by parsePageContents. Callers must
     // instantiate a subclass of this with handlers defined to accept
     // QPDFObjectHandles that are parsed from the stream.
     class ParserCallbacks
@@ -103,8 +103,8 @@ class QPDFObjectHandle
 
       protected:
         // Implementors may call this method during parsing to
-        // terminate parsing early.  This method throws an exception
-        // that is caught by parseContentStream, so its effect is
+        // terminate parsing early. This method throws an exception
+        // that is caught by parsePageContents, so its effect is
         // immediate.
         QPDF_DLL
         void terminateParsing();
@@ -187,6 +187,24 @@ class QPDFObjectHandle
                                   QPDF* context);
 
     // Helpers for parsing content streams
+
+    // Parse a page's contents through ParserCallbacks, described
+    // above. This method works whether the contents are a single
+    // stream or an array of streams. Call on a page object.
+    QPDF_DLL
+    void parsePageContents(ParserCallbacks* callbacks);
+
+    // Pipe a page's contents through the given pipeline. This method
+    // works whether the contents are a single stream or an array of
+    // streams. Call on a page object.
+    QPDF_DLL
+    void pipePageContents(Pipeline* p);
+
+    // Older method: stream_or_array should be the value of /Contents
+    // from a page object. It's more convenient to just call
+    // parsePageContents on the page object, and error messages will
+    // also be more useful because the page object information will be
+    // known.
     QPDF_DLL
     static void parseContentStream(QPDFObjectHandle stream_or_array,
                                    ParserCallbacks* callbacks);
@@ -697,12 +715,17 @@ class QPDFObjectHandle
         QPDFTokenizer& tokenizer, bool& empty,
         StringDecrypter* decrypter, QPDF* context,
         bool content_stream);
-    static void parseContentStream_internal(
-        PointerHolder<Buffer> stream_data,
+    void parseContentStream_internal(
         std::string const& description,
         ParserCallbacks* callbacks);
-
-    // Other methods
+    static void parseContentStream_data(
+        PointerHolder<Buffer>,
+        std::string const& description,
+        ParserCallbacks* callbacks);
+    std::vector<QPDFObjectHandle> arrayOrStreamToStreamArray(
+        std::string const& description, std::string& all_description);
+    void pipeContentStreams(Pipeline* p, std::string const& description,
+                            std::string& all_description);
     static void warn(QPDF*, QPDFExc const&);
 
     bool initialized;

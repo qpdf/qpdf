@@ -628,42 +628,76 @@ QPDFObjectHandle::getPageImages()
 }
 
 std::vector<QPDFObjectHandle>
-QPDFObjectHandle::getPageContents()
+QPDFObjectHandle::arrayOrStreamToStreamArray(
+    std::string const& description, std::string& all_description)
 {
-    assertPageObject();
-
+    all_description = description;
     std::vector<QPDFObjectHandle> result;
-    QPDFObjectHandle contents = this->getKey("/Contents");
-    if (contents.isArray())
+    if (isArray())
     {
-	int n_items = contents.getArrayNItems();
+	int n_items = getArrayNItems();
 	for (int i = 0; i < n_items; ++i)
 	{
-	    QPDFObjectHandle item = contents.getArrayItem(i);
+	    QPDFObjectHandle item = getArrayItem(i);
 	    if (item.isStream())
+            {
+                result.push_back(item);
+            }
+            else
 	    {
-		result.push_back(item);
-	    }
-	    else
-	    {
-		throw std::runtime_error(
-		    "unknown item type while inspecting "
-		    "element of /Contents array in page "
-		    "dictionary");
+                QTC::TC("qpdf", "QPDFObjectHandle non-stream in stream array");
+                warn(item.getOwningQPDF(),
+                     QPDFExc(qpdf_e_damaged_pdf, description,
+                             "item index " + QUtil::int_to_string(i) +
+                             " (from 0)", 0,
+                             "ignoring non-stream in an array of streams"));
 	    }
 	}
     }
-    else if (contents.isStream())
+    else if (isStream())
     {
-	result.push_back(contents);
+	result.push_back(*this);
     }
-    else if (! contents.isNull())
+    else if (! isNull())
     {
-	throw std::runtime_error("unknown object type inspecting /Contents "
-				 "key in page dictionary");
+        warn(getOwningQPDF(),
+             QPDFExc(qpdf_e_damaged_pdf, "", description, 0,
+                     " object is supposed to be a stream or an"
+                     " array of streams but is neither"));
+    }
+
+    bool first = true;
+    for (std::vector<QPDFObjectHandle>::iterator iter = result.begin();
+         iter != result.end(); ++iter)
+    {
+        QPDFObjectHandle item = *iter;
+        std::string og =
+            QUtil::int_to_string(item.getObjectID()) + " " +
+            QUtil::int_to_string(item.getGeneration());
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            all_description += ",";
+        }
+        all_description += " stream " + og;
     }
 
     return result;
+}
+
+std::vector<QPDFObjectHandle>
+QPDFObjectHandle::getPageContents()
+{
+    assertPageObject();
+    std::string description = "page object " +
+        QUtil::int_to_string(this->objid) + " " +
+        QUtil::int_to_string(this->generation);
+    std::string all_description;
+    return this->getKey("/Contents").arrayOrStreamToStreamArray(
+        description, all_description);
 }
 
 void
@@ -806,61 +840,72 @@ QPDFObjectHandle::parse(std::string const& object_str,
 }
 
 void
-QPDFObjectHandle::parseContentStream(QPDFObjectHandle stream_or_array,
-                                     ParserCallbacks* callbacks)
+QPDFObjectHandle::pipePageContents(Pipeline* p)
 {
-    std::vector<QPDFObjectHandle> streams;
-    if (stream_or_array.isArray())
-    {
-        streams = stream_or_array.getArrayAsVector();
-    }
-    else
-    {
-        streams.push_back(stream_or_array);
-    }
-    Pl_Buffer buf("concatenated stream data buffer");
-    std::string all_description = "content stream objects";
-    bool first = true;
+    std::string description = "page object " +
+        QUtil::int_to_string(this->objid) + " " +
+        QUtil::int_to_string(this->generation);
+    std::string all_description;
+    this->getKey("/Contents").pipeContentStreams(
+        p, description, all_description);
+}
+
+void
+QPDFObjectHandle::pipeContentStreams(
+    Pipeline* p, std::string const& description, std::string& all_description)
+{
+    std::vector<QPDFObjectHandle> streams =
+        arrayOrStreamToStreamArray(
+            description, all_description);
     for (std::vector<QPDFObjectHandle>::iterator iter = streams.begin();
          iter != streams.end(); ++iter)
     {
         QPDFObjectHandle stream = *iter;
-        if (! stream.isStream())
+        std::string og =
+            QUtil::int_to_string(stream.getObjectID()) + " " +
+            QUtil::int_to_string(stream.getGeneration());
+        std::string description = "content stream object " + og;
+        if (! stream.pipeStreamData(p, 0, qpdf_dl_specialized))
         {
-            QTC::TC("qpdf", "QPDFObjectHandle non-stream in parsecontent");
+            QTC::TC("qpdf", "QPDFObjectHandle errors in parsecontent");
             warn(stream.getOwningQPDF(),
                  QPDFExc(qpdf_e_damaged_pdf, "content stream",
-                         "", 0,
-                         "ignoring non-stream while parsing content streams"));
-        }
-        else
-        {
-            std::string og = QUtil::int_to_string(stream.getObjectID()) + " " +
-                QUtil::int_to_string(stream.getGeneration());
-            std::string description = "content stream object " + og;
-            if (first)
-            {
-                first = false;
-            }
-            else
-            {
-                all_description += ",";
-            }
-            all_description += " " + og;
-            if (! stream.pipeStreamData(&buf, 0, qpdf_dl_specialized))
-            {
-                QTC::TC("qpdf", "QPDFObjectHandle errors in parsecontent");
-                warn(stream.getOwningQPDF(),
-                     QPDFExc(qpdf_e_damaged_pdf, "content stream",
-                             description, 0,
-                             "errors while decoding content stream"));
-            }
+                         description, 0,
+                         "errors while decoding content stream"));
         }
     }
+}
+
+void
+QPDFObjectHandle::parsePageContents(ParserCallbacks* callbacks)
+{
+    std::string description = "page object " +
+        QUtil::int_to_string(this->objid) + " " +
+        QUtil::int_to_string(this->generation);
+    this->getKey("/Contents").parseContentStream_internal(
+        description, callbacks);
+}
+
+void
+QPDFObjectHandle::parseContentStream(QPDFObjectHandle stream_or_array,
+                                     ParserCallbacks* callbacks)
+{
+    stream_or_array.parseContentStream_internal(
+        "content stream objects", callbacks);
+}
+
+void
+QPDFObjectHandle::parseContentStream_internal(
+    std::string const& description,
+    ParserCallbacks* callbacks)
+{
+    Pl_Buffer buf("concatenated stream data buffer");
+    std::string all_description;
+    pipeContentStreams(&buf, description, all_description);
     PointerHolder<Buffer> stream_data = buf.getBuffer();
     try
     {
-        parseContentStream_internal(stream_data, all_description, callbacks);
+        parseContentStream_data(stream_data, all_description, callbacks);
     }
     catch (TerminateParsing&)
     {
@@ -870,9 +915,10 @@ QPDFObjectHandle::parseContentStream(QPDFObjectHandle stream_or_array,
 }
 
 void
-QPDFObjectHandle::parseContentStream_internal(PointerHolder<Buffer> stream_data,
-                                              std::string const& description,
-                                              ParserCallbacks* callbacks)
+QPDFObjectHandle::parseContentStream_data(
+    PointerHolder<Buffer> stream_data,
+    std::string const& description,
+    ParserCallbacks* callbacks)
 {
     size_t length = stream_data->getSize();
     PointerHolder<InputSource> input =
