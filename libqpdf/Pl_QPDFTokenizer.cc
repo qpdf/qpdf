@@ -149,10 +149,6 @@ Pl_QPDFTokenizer::finish()
             writeNext(&this->char_to_unread, 1);
         }
     }
-    if (! this->just_wrote_nl)
-    {
-	writeNext("\n", 1);
-    }
 
     getNext()->finish();
 }

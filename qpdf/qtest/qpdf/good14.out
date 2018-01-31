@@ -13,8 +13,7 @@ three lines
 <8a8b>
 (ab)
 <8c><dd> ) >
-<610062> (MOO)
--- stream 1 --
+<610062> (MOO)-- stream 1 --
 This stream does end with a newline.
 // tests:
 //   bad tokens preserved
@@ -35,11 +34,9 @@ This stream does end with a newline.
 -- stream 2 --
 (This stream ends with a \001 bad token
 -- stream 3 --
-<AB X
--- stream 4 --
+<AB X-- stream 4 --
 (ends with a name)
-/ThisMustBeLast
--- stream 5 --
+/ThisMustBeLast-- stream 5 --
 % This stream has an inline image marker that is not terminated
 (Potato)
 
