@@ -304,3 +304,5 @@ QPDFTokenizer EOF when not allowed 0
 QPDFTokenizer inline image at EOF 0
 Pl_QPDFTokenizer found ID 0
 QPDFObjectHandle non-stream in stream array 0
+QPDFObjectHandle coalesce called on stream 0
+QPDFObjectHandle coalesce provide stream data 0

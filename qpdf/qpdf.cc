@@ -90,6 +90,7 @@ struct Options
         qdf_mode(false),
         preserve_unreferenced_objects(false),
         newline_before_endstream(false),
+        coalesce_contents(false),
         show_npages(false),
         deterministic_id(false),
         static_id(false),
@@ -154,6 +155,7 @@ struct Options
     bool preserve_unreferenced_objects;
     bool newline_before_endstream;
     std::string linearize_pass1;
+    bool coalesce_contents;
     std::string min_version;
     std::string force_version;
     bool show_npages;
@@ -391,6 +393,7 @@ familiar with the PDF file format or who are PDF developers.\n\
 --object-streams=mode     controls handing of object streams\n\
 --preserve-unreferenced   preserve unreferenced objects\n\
 --newline-before-endstream  always put a newline before endstream\n\
+--coalesce-contents       force all pages' content to be a single stream\n\
 --qdf                     turns on \"QDF mode\" (below)\n\
 --linearize-pass1=file    write intermediate pass of linearized file\n\
                           for debugging\n\
@@ -1543,6 +1546,10 @@ static void parse_options(int argc, char* argv[], Options& o)
                 }
                 o.linearize_pass1 = parameter;
             }
+            else if (strcmp(arg, "coalesce-contents") == 0)
+            {
+                o.coalesce_contents = true;
+            }
             else if (strcmp(arg, "min-version") == 0)
             {
                 if (parameter == 0)
@@ -1957,6 +1964,19 @@ static void do_inspection(QPDF& pdf, Options& o)
     if (exit_code)
     {
         exit(exit_code);
+    }
+}
+
+static void handle_transformations(QPDF& pdf, Options& o)
+{
+    if (o.coalesce_contents)
+    {
+        std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
+        for (std::vector<QPDFObjectHandle>::iterator iter = pages.begin();
+             iter != pages.end(); ++iter)
+        {
+            (*iter).coalesceContentStreams();
+        }
     }
 }
 
@@ -2382,6 +2402,7 @@ int main(int argc, char* argv[])
             pdf.processFile(o.infilename, o.password);
         }
 
+        handle_transformations(pdf, o);
         std::vector<PointerHolder<QPDF> > page_heap;
         if (! o.page_specs.empty())
         {

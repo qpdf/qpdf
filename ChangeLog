@@ -78,6 +78,35 @@
 	production use. Even if it did, it would be very unusual for a PDF
 	file to actually be adversely affected by this issue.
 
+	* Add support for coalescing a page's contents into a single
+	stream if they are represented as an array of streams. This can be
+	performed from the command line using the --coalesce-contents
+	option. Coalescing content streams can simplify things for
+	software that wants to operate on a page's content streams without
+	having to handle weird edge cases like content streams split in
+	the middle of tokens. Note that
+	QPDFObjectHandle::parsePageContents and
+	QPDFObjectHandle::parseContentStream already handled split content
+	streams. This is mainly to set the stage for new methods of
+	operating on page contents. The new method
+	QPDFObjectHandle::pipeContentStreams will pipe all of a page's
+	content streams though a single pipeline. The new method
+	QPDFObjectHandle.coalesceContentStreams, when called on a page
+	object, will do nothing if the page's contents are a single
+	stream, but if they are an array of streams, it will replace the
+	page's contents with a single stream whose contents are the
+	concatenation of the original streams.
+
+	* A few library routines throw exceptions if called on non-page
+	objects. These constraints have been relaxed somewhat to make qpdf
+	more tolerant of files whose page dictionaries are not properly
+	marked as such. Mostly exceptions about page operations being
+	called on non page objects will only be thrown in cases where the
+	operation had no chance of succeeding anyway. This change has no
+	impact on any default mode operations, but it could allow
+	applications that use page-level APIs in QPDFObjectHandle to be
+	more tolerant of certain types of damaged files.
+
 2018-02-04  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add QPDFWriter::setLinearizationPass1Filename method and

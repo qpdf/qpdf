@@ -200,6 +200,20 @@ class QPDFObjectHandle
     QPDF_DLL
     void pipePageContents(Pipeline* p);
 
+    // When called on a stream or stream array that is some page's
+    // content streams, do the same as pipePageContents. This method
+    // is a lower level way to do what pipePageContents does, but it
+    // allows you to perform this operation on a contents object that
+    // is disconnected from a page object. The description argument
+    // should describe the containing page and is used in error
+    // messages. The all_description argument is initialized to
+    // something that could be used to describe the result of the
+    // pipeline. It is the description amended with the identifiers of
+    // the underlying objects.
+    QPDF_DLL
+    void pipeContentStreams(Pipeline* p, std::string const& description,
+                            std::string& all_description);
+
     // Older method: stream_or_array should be the value of /Contents
     // from a page object. It's more convenient to just call
     // parsePageContents on the page object, and error messages will
@@ -556,30 +570,30 @@ class QPDFObjectHandle
 
     // Convenience routines for commonly performed functions
 
-    // Throws an exception if this is not a Page object.  Returns an
-    // empty map if there are no images or no resources.  This
-    // function does not presently support inherited resources.  If
-    // this is a significant concern, call
+    // Returns an empty map if there are no images or no resources.
+    // This function does not presently support inherited resources.
+    // If this is a significant concern, call
     // pushInheritedAttributesToPage() on the QPDF object that owns
-    // this page.  See comment in the source for details.  Return
-    // value is a map from XObject name to the image object, which is
-    // always a stream.
+    // this page. See comment in the source for details. Return value
+    // is a map from XObject name to the image object, which is always
+    // a stream.
     QPDF_DLL
     std::map<std::string, QPDFObjectHandle> getPageImages();
 
     // Returns a vector of stream objects representing the content
     // streams for the given page.  This routine allows the caller to
     // not care whether there are one or more than one content streams
-    // for a page.  Throws an exception if this is not a Page object.
+    // for a page.
     QPDF_DLL
     std::vector<QPDFObjectHandle> getPageContents();
 
-    // Add the given object as a new content stream for this page.  If
-    // parameter 'first' is true, add to the beginning.  Otherwise,
-    // add to the end.  This routine automatically converts the page
+    // Add the given object as a new content stream for this page. If
+    // parameter 'first' is true, add to the beginning. Otherwise, add
+    // to the end. This routine automatically converts the page
     // contents to an array if it is a scalar, allowing the caller not
-    // to care what the initial structure is.  Throws an exception if
-    // this is not a Page object.
+    // to care what the initial structure is. You can call
+    // coalesceContentStreams() afterwards if you want to force it to
+    // be a single stream.
     QPDF_DLL
     void addPageContents(QPDFObjectHandle contents, bool first);
 
@@ -589,6 +603,16 @@ class QPDFObjectHandle
     // rotates clockwise by 90 degrees.
     QPDF_DLL
     void rotatePage(int angle, bool relative);
+
+    // Coalesce a page's content streams. A page's content may be a
+    // stream or an array of streams. If this page's content is an
+    // array, concatenate the streams into a single stream. This can
+    // be useful when working with files that split content streams in
+    // arbitary spots, such as in the middle of a token, as that can
+    // confuse some software. You could also call this after calling
+    // addPageContents.
+    QPDF_DLL
+    void coalesceContentStreams();
 
     // Initializers for objects.  This Factory class gives the QPDF
     // class specific permission to call factory methods without
@@ -724,8 +748,6 @@ class QPDFObjectHandle
         ParserCallbacks* callbacks);
     std::vector<QPDFObjectHandle> arrayOrStreamToStreamArray(
         std::string const& description, std::string& all_description);
-    void pipeContentStreams(Pipeline* p, std::string const& description,
-                            std::string& all_description);
     static void warn(QPDF*, QPDFExc const&);
 
     bool initialized;

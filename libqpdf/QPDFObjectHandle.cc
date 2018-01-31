@@ -14,6 +14,7 @@
 #include <qpdf/QPDF_Stream.hh>
 #include <qpdf/QPDF_Reserved.hh>
 #include <qpdf/Pl_Buffer.hh>
+#include <qpdf/Pl_Concatenate.hh>
 #include <qpdf/BufferInputSource.hh>
 #include <qpdf/QPDFExc.hh>
 
@@ -27,6 +28,39 @@
 class TerminateParsing
 {
 };
+
+class CoalesceProvider: public QPDFObjectHandle::StreamDataProvider
+{
+  public:
+    CoalesceProvider(QPDFObjectHandle containing_page,
+                     QPDFObjectHandle old_contents) :
+        containing_page(containing_page),
+        old_contents(old_contents)
+    {
+    }
+    virtual ~CoalesceProvider()
+    {
+    }
+    virtual void provideStreamData(int objid, int generation,
+                                   Pipeline* pipeline);
+
+  private:
+    QPDFObjectHandle containing_page;
+    QPDFObjectHandle old_contents;
+};
+
+void
+CoalesceProvider::provideStreamData(int, int, Pipeline* p)
+{
+    QTC::TC("qpdf", "QPDFObjectHandle coalesce provide stream data");
+    Pl_Concatenate concat("concatenate", p);
+    std::string description = "page object " +
+        QUtil::int_to_string(containing_page.getObjectID()) + " " +
+        QUtil::int_to_string(containing_page.getGeneration());
+    std::string all_description;
+    old_contents.pipeContentStreams(&concat, description, all_description);
+    concat.manualFinish();
+}
 
 void
 QPDFObjectHandle::ParserCallbacks::terminateParsing()
@@ -691,7 +725,6 @@ QPDFObjectHandle::arrayOrStreamToStreamArray(
 std::vector<QPDFObjectHandle>
 QPDFObjectHandle::getPageContents()
 {
-    assertPageObject();
     std::string description = "page object " +
         QUtil::int_to_string(this->objid) + " " +
         QUtil::int_to_string(this->generation);
@@ -703,7 +736,6 @@ QPDFObjectHandle::getPageContents()
 void
 QPDFObjectHandle::addPageContents(QPDFObjectHandle new_contents, bool first)
 {
-    assertPageObject();
     new_contents.assertStream();
 
     std::vector<QPDFObjectHandle> orig_contents = getPageContents();
@@ -785,6 +817,33 @@ QPDFObjectHandle::rotatePage(int angle, bool relative)
     replaceKey("/Rotate", QPDFObjectHandle::newInteger(new_angle));
 }
 
+void
+QPDFObjectHandle::coalesceContentStreams()
+{
+    assertPageObject();
+    QPDFObjectHandle contents = this->getKey("/Contents");
+    if (contents.isStream())
+    {
+        QTC::TC("qpdf", "QPDFObjectHandle coalesce called on stream");
+        return;
+    }
+    QPDF* qpdf = getOwningQPDF();
+    if (qpdf == 0)
+    {
+        // Should not be possible for a page object to not have an
+        // owning PDF unless it was manually constructed in some
+        // incorrect way.
+        throw std::logic_error("coalesceContentStreams called on object"
+                               " with no associated PDF file");
+    }
+    QPDFObjectHandle new_contents = newStream(qpdf);
+    this->replaceKey("/Contents", new_contents);
+
+    PointerHolder<StreamDataProvider> provider =
+        new CoalesceProvider(*this, contents);
+    new_contents.replaceStreamData(provider, newNull(), newNull());
+}
+
 std::string
 QPDFObjectHandle::unparse()
 {
@@ -842,6 +901,7 @@ QPDFObjectHandle::parse(std::string const& object_str,
 void
 QPDFObjectHandle::pipePageContents(Pipeline* p)
 {
+    assertPageObject();
     std::string description = "page object " +
         QUtil::int_to_string(this->objid) + " " +
         QUtil::int_to_string(this->generation);
@@ -879,6 +939,7 @@ QPDFObjectHandle::pipeContentStreams(
 void
 QPDFObjectHandle::parsePageContents(ParserCallbacks* callbacks)
 {
+    assertPageObject();
     std::string description = "page object " +
         QUtil::int_to_string(this->objid) + " " +
         QUtil::int_to_string(this->generation);
@@ -1728,15 +1789,15 @@ QPDFObjectHandle::assertNumber()
 bool
 QPDFObjectHandle::isPageObject()
 {
-    return (this->isDictionary() && this->hasKey("/Type") &&
-            (this->getKey("/Type").getName() == "/Page"));
+    // Some PDF files have /Type broken on pages.
+    return (this->isDictionary() && this->hasKey("/Contents"));
 }
 
 bool
 QPDFObjectHandle::isPagesObject()
 {
-    return (this->isDictionary() && this->hasKey("/Type") &&
-            (this->getKey("/Type").getName() == "/Pages"));
+    // Some PDF files have /Type broken on pages.
+    return (this->isDictionary() && this->hasKey("/Kids"));
 }
 
 void
