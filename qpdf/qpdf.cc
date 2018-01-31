@@ -1769,9 +1769,7 @@ static void do_check(QPDF& pdf, Options& o, int& exit_code)
             ++pageno;
             try
             {
-                QPDFObjectHandle::parseContentStream(
-                    (*iter).getKey("/Contents"),
-                    &discard_contents);
+                (*iter).parsePageContents(&discard_contents);
             }
             catch (QPDFExc& e)
             {

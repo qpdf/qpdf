@@ -1296,9 +1296,8 @@ void runtest(int n, char const* filename1, char const* arg2)
              iter != pages.end(); ++iter)
         {
             QPDFObjectHandle page = *iter;
-            QPDFObjectHandle contents = page.getKey("/Contents");
             ParserCallbacks cb;
-            QPDFObjectHandle::parseContentStream(contents, &cb);
+            page.parsePageContents(&cb);
         }
     }
     else if (n == 38)

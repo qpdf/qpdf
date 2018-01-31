@@ -57,6 +57,11 @@
 	problems are encountered as the error messages can include
 	information about which page the streams come from.
 
+	* Update content stream parsing example
+	(examples/pdf-parse-content.cc) to use new
+	QPDFObjectHandle::parsePageContents() method in favor of the older
+	QPDFObjectHandle::parseContentStream() method.
+
 2018-02-04  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add QPDFWriter::setLinearizationPass1Filename method and

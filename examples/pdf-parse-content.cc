@@ -75,9 +75,8 @@ int main(int argc, char* argv[])
         }
 
         QPDFObjectHandle page = pages.at(pageno-1);
-        QPDFObjectHandle contents = page.getKey("/Contents");
         ParserCallbacks cb;
-        QPDFObjectHandle::parseContentStream(contents, &cb);
+        page.parsePageContents(&cb);
     }
     catch (std::exception& e)
     {
