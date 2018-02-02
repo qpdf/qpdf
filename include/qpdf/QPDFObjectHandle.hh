@@ -35,6 +35,7 @@
 #include <qpdf/PointerHolder.hh>
 #include <qpdf/Buffer.hh>
 #include <qpdf/InputSource.hh>
+#include <qpdf/QPDFTokenizer.hh>
 
 #include <qpdf/QPDFObject.hh>
 
@@ -74,6 +75,66 @@ class QPDFObjectHandle
 	// provide data for multiple streams.
 	virtual void provideStreamData(int objid, int generation,
 				       Pipeline* pipeline) = 0;
+    };
+
+    // The TokenFilter class provides a way to filter content streams
+    // in a lexically aware fashion. TokenFilters can be attached to
+    // streams using the addTokenFilter or addContentTokenFilter
+    // methods. The handleToken method is called for each token,
+    // including the eof token, and then handleEOF is called at the
+    // very end. Handlers may call write (or writeToken) to pass data
+    // downstream. The finish() method must be called exactly one time
+    // to ensure that any written data is flushed out. The default
+    // handleEOF calls finish. If you override handleEOF, you must
+    // ensure that finish() is called either there or in response to
+    // whatever event causes you to terminate creation of output.
+    // Failure to call finish() may result in some of the data you
+    // have written being lost. You should not rely on a destructor
+    // for calling finish() since the destructor call may occur later
+    // than you expect. Please see examples/token-filters.cc for
+    // examples of using TokenFilters.
+    //
+    // Please note that when you call token.getValue() on a token of
+    // type tt_string, you get the string value without any
+    // delimiters. token.getRawValue() will return something suitable
+    // for being written to output, or calling writeToken with a
+    // string token will also work. The correct way to construct a
+    // string token that would write the literal value (str) is
+    // QPDFTokenizer::Token(QPDFTokenizer::tt_string, "str").
+    class TokenFilter
+    {
+      public:
+        QPDF_DLL
+        TokenFilter()
+        {
+        }
+        QPDF_DLL
+        virtual ~TokenFilter()
+        {
+        }
+        virtual void handleToken(QPDFTokenizer::Token const&) = 0;
+        virtual void handleEOF()
+        {
+            // If you override handleEOF, you must be sure to call
+            // finish().
+            finish();
+        }
+
+        // This is called internally by the qpdf library.
+        void setPipeline(Pipeline*);
+
+      protected:
+        QPDF_DLL
+        void write(char const* data, size_t len);
+        QPDF_DLL
+        void write(std::string const& str);
+        QPDF_DLL
+        void writeToken(QPDFTokenizer::Token const&);
+        QPDF_DLL
+        void finish();
+
+      private:
+        Pipeline* pipeline;
     };
 
     // This class is used by parse to decrypt strings when reading an
@@ -222,6 +283,23 @@ class QPDFObjectHandle
     QPDF_DLL
     static void parseContentStream(QPDFObjectHandle stream_or_array,
                                    ParserCallbacks* callbacks);
+
+    // Attach a token filter to a page's contents. If the page's
+    // contents is an array of streams, it is automatically coalesced.
+    // The token filter is applied to the page's contents as a single
+    // stream.
+    QPDF_DLL
+    void addContentTokenFilter(PointerHolder<TokenFilter> token_filter);
+
+    // As of qpdf 8, it is possible to add custom token filters to a
+    // stream. The tokenized stream data is passed through the token
+    // filter after all original filters but before content stream
+    // normalization if requested. This is a low-level interface to
+    // add it to a stream. You will usually want to call
+    // addContentTokenFilter instead, which can be applied to a page
+    // object, and which will automatically handle the case of pages
+    // whose contents are split across multiple streams.
+    void addTokenFilter(PointerHolder<TokenFilter> token_filter);
 
     // Type-specific factories
     QPDF_DLL
@@ -413,6 +491,13 @@ class QPDFObjectHandle
     // Methods for stream objects
     QPDF_DLL
     QPDFObjectHandle getDict();
+
+    // If addTokenFilter has been called for this stream, then the
+    // original data should be considered to be modified. This means we
+    // should avoid optimizations such as not filtering a stream that
+    // is already compressed.
+    QPDF_DLL
+    bool isDataModified();
 
     // Returns filtered (uncompressed) stream data.  Throws an
     // exception if the stream is filtered and we can't decode it.
@@ -608,7 +693,7 @@ class QPDFObjectHandle
     // stream or an array of streams. If this page's content is an
     // array, concatenate the streams into a single stream. This can
     // be useful when working with files that split content streams in
-    // arbitary spots, such as in the middle of a token, as that can
+    // arbitrary spots, such as in the middle of a token, as that can
     // confuse some software. You could also call this after calling
     // addPageContents.
     QPDF_DLL

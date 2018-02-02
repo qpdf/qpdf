@@ -7,6 +7,7 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/QPDFObjectHandle.hh>
 
 #include <stdexcept>
 #include <string.h>
@@ -38,6 +39,23 @@ QPDFTokenizer::Members::reset()
 QPDFTokenizer::Members::~Members()
 {
 }
+
+QPDFTokenizer::Token::Token(token_type_e type, std::string const& value) :
+    type(type),
+    value(value),
+    raw_value(value)
+{
+    if (type == tt_string)
+    {
+        raw_value = QPDFObjectHandle::newString(value).unparse();
+    }
+    else if (type == tt_string)
+    {
+        raw_value = QPDFObjectHandle::newName(value).unparse();
+    }
+}
+
+
 
 QPDFTokenizer::QPDFTokenizer() :
     m(new Members())

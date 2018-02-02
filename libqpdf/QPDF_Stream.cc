@@ -13,7 +13,7 @@
 #include <qpdf/Pl_RunLength.hh>
 #include <qpdf/Pl_DCT.hh>
 #include <qpdf/Pl_Count.hh>
-
+#include <qpdf/ContentNormalizer.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFExc.hh>
@@ -89,6 +89,12 @@ QPDFObjectHandle
 QPDF_Stream::getDict() const
 {
     return this->stream_dict;
+}
+
+bool
+QPDF_Stream::isDataModified() const
+{
+    return (! this->token_filters.empty());
 }
 
 PointerHolder<Buffer>
@@ -440,20 +446,35 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline,
     // create to be deleted when this function finishes.
     std::vector<PointerHolder<Pipeline> > to_delete;
 
+    PointerHolder<ContentNormalizer> normalizer;
     if (filter)
     {
 	if (encode_flags & qpdf_ef_compress)
 	{
-	    pipeline = new Pl_Flate("compress object stream", pipeline,
+	    pipeline = new Pl_Flate("compress stream", pipeline,
 				    Pl_Flate::a_deflate);
 	    to_delete.push_back(pipeline);
 	}
 
 	if (encode_flags & qpdf_ef_normalize)
 	{
-	    pipeline = new Pl_QPDFTokenizer("normalizer", pipeline);
+            normalizer = new ContentNormalizer();
+            normalizer->setPipeline(pipeline);
+	    pipeline = new Pl_QPDFTokenizer(
+                "normalizer", normalizer.getPointer());
 	    to_delete.push_back(pipeline);
 	}
+
+        for (std::vector<PointerHolder<
+                 QPDFObjectHandle::TokenFilter> >::reverse_iterator iter =
+                 this->token_filters.rbegin();
+             iter != this->token_filters.rend(); ++iter)
+        {
+            (*iter)->setPipeline(pipeline);
+            pipeline = new Pl_QPDFTokenizer(
+                "token filter", (*iter).getPointer());
+            to_delete.push_back(pipeline);
+        }
 
 	for (std::vector<std::string>::reverse_iterator iter = filters.rbegin();
 	     iter != filters.rend(); ++iter)
@@ -610,6 +631,13 @@ QPDF_Stream::replaceStreamData(
     this->stream_provider = provider;
     this->stream_data = 0;
     replaceFilterData(filter, decode_parms, 0);
+}
+
+void
+QPDF_Stream::addTokenFilter(
+    PointerHolder<QPDFObjectHandle::TokenFilter> token_filter)
+{
+    this->token_filters.push_back(token_filter);
 }
 
 void

@@ -4,6 +4,8 @@
 #include <qpdf/Pipeline.hh>
 
 #include <qpdf/QPDFTokenizer.hh>
+#include <qpdf/PointerHolder.hh>
+#include <qpdf/QPDFObjectHandle.hh>
 
 //
 // Treat incoming text as a stream consisting of valid PDF tokens, but
@@ -16,7 +18,8 @@
 class Pl_QPDFTokenizer: public Pipeline
 {
   public:
-    Pl_QPDFTokenizer(char const* identifier, Pipeline* next);
+    Pl_QPDFTokenizer(char const* identifier,
+                     QPDFObjectHandle::TokenFilter* filter);
     virtual ~Pl_QPDFTokenizer();
     virtual void write(unsigned char* buf, size_t len);
     virtual void finish();
@@ -24,14 +27,25 @@ class Pl_QPDFTokenizer: public Pipeline
   private:
     void processChar(char ch);
     void checkUnread();
-    void writeNext(char const*, size_t len);
-    void writeToken(QPDFTokenizer::Token&);
 
-    QPDFTokenizer tokenizer;
-    bool just_wrote_nl;
-    bool last_char_was_cr;
-    bool unread_char;
-    char char_to_unread;
+    class Members
+    {
+        friend class Pl_QPDFTokenizer;
+
+      public:
+        ~Members();
+
+      private:
+        Members();
+        Members(Members const&);
+
+        QPDFObjectHandle::TokenFilter* filter;
+        QPDFTokenizer tokenizer;
+        bool last_char_was_cr;
+        bool unread_char;
+        char char_to_unread;
+    };
+    PointerHolder<Members> m;
 };
 
 #endif // __PL_QPDFTOKENIZER_HH__

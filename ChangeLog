@@ -107,6 +107,49 @@
 	applications that use page-level APIs in QPDFObjectHandle to be
 	more tolerant of certain types of damaged files.
 
+	* Add QPDFObjectHandle::TokenFilter class and methods to use it to
+	perform lexical filtering on content streams. You can call
+	QPDFObjectHandle::addTokenFilter on stream object, or you can call
+	the higher level QPDFObjectHandle::addContentTokenFilter on a page
+	object to cause the stream's contents to passed through a token
+	filter while being retrieved by QPDFWriter or any other consumer.
+	For details on using TokenFilter, please see comments in
+	QPDFObjectHandle.hh.
+
+	* Enhance the string, type QPDFTokenizer::Token constructor to
+	initialize a raw value in addition to a value. Tokens have a
+	value, which is a canonical representation, and a raw value. For
+	all tokens except strings and names, the raw value and the value
+	are the same. For strings, the value excludes the outer delimiters
+	and has non-printing characters normalized. For names, the value
+	resolves non-printing characters. In order to better facilitate
+	token filters that mostly preserve contents and to enable
+	developers to be mostly unconcerned about the nuances of token
+	values and raw values, creating string and name tokens now
+	properly handles this subtlety of values and raw values. When
+	constructing string tokens, take care to avoid passing in the
+	outer delimiters. This has always been the case, but it is now
+	clarified in comments in QPDFObjectHandle.hh::TokenFilter. This
+	has no impact on any existing code unless there's some code
+	somewhere that was relying on Token::getRawValue() returning an
+	empty string for a manually constructed token. The token class's
+	operator== method still only looks at type and value, not raw
+	value. For example, string tokens for <41> and (A) would still be
+	equal because both are representations of the string "A".
+
+	* Add QPDFObjectHandle::isDataModified method. This method just
+	returns true if addTokenFilter has been called on the stream. It
+	enables a caller to determine whether it is safe to optimize away
+	piping of stream data in cases where the input and output are
+	expected to be the same. QPDFWriter uses this internally to skip
+	the optimization of not re-compressing already compressed streams
+	if addTokenFilter has been called. Most developers will not have
+	to worry about this as it is used internally in the library in the
+	places that need it. If you are manually retrieving stream data
+	with QPDFObjectHandle::getStreamData or
+	QPDFObjectHandle::pipeStreamData, you don't need to worry about
+	this at all.
+
 2018-02-04  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add QPDFWriter::setLinearizationPass1Filename method and

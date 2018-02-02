@@ -97,6 +97,36 @@ ParserCallbacks::handleEOF()
     std::cout << "-EOF-" << std::endl;
 }
 
+class TokenFilter: public QPDFObjectHandle::TokenFilter
+{
+  public:
+    TokenFilter()
+    {
+    }
+    virtual ~TokenFilter()
+    {
+    }
+    virtual void handleToken(QPDFTokenizer::Token const& t)
+    {
+        if (t == QPDFTokenizer::Token(QPDFTokenizer::tt_string, "Potato"))
+        {
+            // Exercise unparsing of strings by token constructor
+            writeToken(
+                QPDFTokenizer::Token(QPDFTokenizer::tt_string, "Salad"));
+        }
+        else
+        {
+            writeToken(t);
+        }
+    }
+    virtual void handleEOF()
+    {
+        writeToken(QPDFTokenizer::Token(QPDFTokenizer::tt_name, "/bye"));
+        write("\n");
+        finish();
+    }
+};
+
 static std::string getPageContents(QPDFObjectHandle page)
 {
     PointerHolder<Buffer> b1 =
@@ -1342,6 +1372,22 @@ void runtest(int n, char const* filename1, char const* arg2)
         assert(arg2 != 0);
         QPDFWriter w(pdf, arg2);
         w.setPCLm(true);
+        w.setStaticID(true);
+        w.write();
+    }
+    else if (n == 41)
+    {
+        // Apply a token filter. This test case is crafted to work
+        // with coalesce.pdf.
+        std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
+        for (std::vector<QPDFObjectHandle>::iterator iter =
+                 pages.begin();
+             iter != pages.end(); ++iter)
+        {
+            (*iter).addContentTokenFilter(new TokenFilter);
+        }
+        QPDFWriter w(pdf, "a.pdf");
+	w.setQDFMode(true);
         w.setStaticID(true);
         w.write();
     }

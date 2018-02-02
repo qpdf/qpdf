@@ -63,6 +63,50 @@ CoalesceProvider::provideStreamData(int, int, Pipeline* p)
 }
 
 void
+QPDFObjectHandle::TokenFilter::setPipeline(Pipeline* p)
+{
+    this->pipeline = p;
+}
+
+void
+QPDFObjectHandle::TokenFilter::write(char const* data, size_t len)
+{
+    if (! this->pipeline)
+    {
+        throw std::logic_error(
+            "TokenFilter::write called before setPipeline");
+    }
+    if (len)
+    {
+	this->pipeline->write(QUtil::unsigned_char_pointer(data), len);
+    }
+}
+
+void
+QPDFObjectHandle::TokenFilter::write(std::string const& str)
+{
+    write(str.c_str(), str.length());
+}
+
+void
+QPDFObjectHandle::TokenFilter::writeToken(QPDFTokenizer::Token const& token)
+{
+    std::string value = token.getRawValue();
+    write(value.c_str(), value.length());
+}
+
+void
+QPDFObjectHandle::TokenFilter::finish()
+{
+    if (! this->pipeline)
+    {
+        throw std::logic_error(
+            "TokenFilter::finish called before setPipeline");
+    }
+    this->pipeline->finish();
+}
+
+void
 QPDFObjectHandle::ParserCallbacks::terminateParsing()
 {
     throw TerminateParsing();
@@ -506,6 +550,13 @@ QPDFObjectHandle::getDict()
 {
     assertStream();
     return dynamic_cast<QPDF_Stream*>(obj.getPointer())->getDict();
+}
+
+bool
+QPDFObjectHandle::isDataModified()
+{
+    assertStream();
+    return dynamic_cast<QPDF_Stream*>(obj.getPointer())->isDataModified();
 }
 
 void
@@ -1031,6 +1082,21 @@ QPDFObjectHandle::parseContentStream_data(
             }
         }
     }
+}
+
+void
+QPDFObjectHandle::addContentTokenFilter(PointerHolder<TokenFilter> filter)
+{
+    coalesceContentStreams();
+    this->getKey("/Contents").addTokenFilter(filter);
+}
+
+void
+QPDFObjectHandle::addTokenFilter(PointerHolder<TokenFilter> filter)
+{
+    assertStream();
+    return dynamic_cast<QPDF_Stream*>(
+        obj.getPointer())->addTokenFilter(filter);
 }
 
 QPDFObjectHandle

@@ -1591,7 +1591,8 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	{
 	    is_metadata = true;
 	}
-	bool filter = (this->m->compress_streams ||
+	bool filter = (object.isDataModified() ||
+                       this->m->compress_streams ||
                        this->m->stream_decode_level);
 	if (this->m->compress_streams)
 	{
@@ -1602,7 +1603,8 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	    // compressed with a lossy compression scheme, but we
 	    // don't support any of those right now.
 	    QPDFObjectHandle filter_obj = stream_dict.getKey("/Filter");
-	    if (filter_obj.isName() &&
+            if ((! object.isDataModified()) &&
+                filter_obj.isName() &&
 		((filter_obj.getName() == "/FlateDecode") ||
 		 (filter_obj.getName() == "/Fl")))
 	    {

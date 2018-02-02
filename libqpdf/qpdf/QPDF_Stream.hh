@@ -20,6 +20,7 @@ class QPDF_Stream: public QPDFObject
     virtual QPDFObject::object_type_e getTypeCode() const;
     virtual char const* getTypeName() const;
     QPDFObjectHandle getDict() const;
+    bool isDataModified() const;
 
     // See comments in QPDFObjectHandle.hh for these methods.
     bool pipeStreamData(Pipeline*,
@@ -35,6 +36,8 @@ class QPDF_Stream: public QPDFObject
 	PointerHolder<QPDFObjectHandle::StreamDataProvider> provider,
 	QPDFObjectHandle const& filter,
 	QPDFObjectHandle const& decode_parms);
+    void addTokenFilter(
+        PointerHolder<QPDFObjectHandle::TokenFilter> token_filter);
 
     void replaceDict(QPDFObjectHandle new_dict);
 
@@ -72,6 +75,8 @@ class QPDF_Stream: public QPDFObject
     size_t length;
     PointerHolder<Buffer> stream_data;
     PointerHolder<QPDFObjectHandle::StreamDataProvider> stream_provider;
+    std::vector<
+        PointerHolder<QPDFObjectHandle::TokenFilter> > token_filters;
 };
 
 #endif // __QPDF_STREAM_HH__

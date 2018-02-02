@@ -62,13 +62,8 @@ class QPDFTokenizer
     {
       public:
 	Token() : type(tt_bad) {}
-
-	Token(token_type_e type, std::string const& value) :
-	    type(type),
-	    value(value)
-	{
-	}
-
+        QPDF_DLL
+	Token(token_type_e type, std::string const& value);
 	Token(token_type_e type, std::string const& value,
 	      std::string raw_value, std::string error_message) :
 	    type(type),
@@ -93,7 +88,7 @@ class QPDFTokenizer
 	{
 	    return this->error_message;
 	}
-	bool operator==(Token const& rhs)
+	bool operator==(Token const& rhs) const
 	{
 	    // Ignore fields other than type and value
 	    return ((this->type != tt_bad) &&
