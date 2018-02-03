@@ -209,7 +209,7 @@ int main(int argc, char* argv[])
 	QPDFWriter w(file, fl_tmp.c_str());
 	w.setStreamDataMode(qpdf_s_preserve);
 	w.setLinearization(true);
-	w.setStaticID(static_id);
+	w.setStaticID(static_id); // for testing only
 	w.write();
     }
     catch (std::exception& e)
