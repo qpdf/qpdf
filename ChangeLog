@@ -150,6 +150,9 @@
 	QPDFObjectHandle::pipeStreamData, you don't need to worry about
 	this at all.
 
+	* Provide heavily annoated examples/pdf-filter-tokens.cc example
+	that illustrates use of some simple token filters.
+
 2018-02-04  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add QPDFWriter::setLinearizationPass1Filename method and
