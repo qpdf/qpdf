@@ -1,7 +1,9 @@
 #include <qpdf/ContentNormalizer.hh>
 #include <qpdf/QUtil.hh>
 
-ContentNormalizer::ContentNormalizer()
+ContentNormalizer::ContentNormalizer() :
+    any_bad_tokens(false),
+    last_token_was_bad(false)
 {
 }
 
@@ -14,6 +16,16 @@ ContentNormalizer::handleToken(QPDFTokenizer::Token const& token)
 {
     std::string value = token.getRawValue();
     QPDFTokenizer::token_type_e token_type = token.getType();
+
+    if (token_type == QPDFTokenizer::tt_bad)
+    {
+        this->any_bad_tokens = true;
+        this->last_token_was_bad = true;
+    }
+    else if (token_type != QPDFTokenizer::tt_eof)
+    {
+        this->last_token_was_bad = false;
+    }
 
     switch (token_type)
     {
@@ -74,4 +86,16 @@ void
 ContentNormalizer::handleEOF()
 {
     finish();
+}
+
+bool
+ContentNormalizer::anyBadTokens() const
+{
+    return this->any_bad_tokens;
+}
+
+bool
+ContentNormalizer::lastTokenWasBad()const
+{
+    return this->last_token_was_bad;
 }

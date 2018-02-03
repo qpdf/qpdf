@@ -306,3 +306,4 @@ Pl_QPDFTokenizer found ID 0
 QPDFObjectHandle non-stream in stream array 0
 QPDFObjectHandle coalesce called on stream 0
 QPDFObjectHandle coalesce provide stream data 0
+QPDF_Stream bad token at end during normalize 0

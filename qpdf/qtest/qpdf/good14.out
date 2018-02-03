@@ -13,7 +13,9 @@ three lines
 <8a8b>
 (ab)
 <8c><dd> ) >
-<610062> (MOO)-- stream 1 --
+<610062> (MOO)WARNING: good14.pdf (file position 628): content normalization encountered bad tokens
+WARNING: good14.pdf (file position 628): Resulting stream data may be corrupted but is may still useful for manual inspection. For more information on this warning, search for content normalization in the manual.
+-- stream 1 --
 This stream does end with a newline.
 // tests:
 //   bad tokens preserved
@@ -31,10 +33,18 @@ This stream does end with a newline.
   
 /good name
 /bad#00name
+WARNING: good14.pdf (file position 860): content normalization encountered bad tokens
+WARNING: good14.pdf (file position 860): Resulting stream data may be corrupted but is may still useful for manual inspection. For more information on this warning, search for content normalization in the manual.
 -- stream 2 --
 (This stream ends with a \001 bad token
+WARNING: good14.pdf (file position 1316): content normalization encountered bad tokens
+WARNING: good14.pdf (file position 1316): normalized content ended with a bad token; you may be able to resolve this by coalescing content streams in combination with normalizing content. From the command line, specify --coalesce-contents
+WARNING: good14.pdf (file position 1316): Resulting stream data may be corrupted but is may still useful for manual inspection. For more information on this warning, search for content normalization in the manual.
 -- stream 3 --
-<AB X-- stream 4 --
+<AB XWARNING: good14.pdf (file position 1406): content normalization encountered bad tokens
+WARNING: good14.pdf (file position 1406): normalized content ended with a bad token; you may be able to resolve this by coalescing content streams in combination with normalizing content. From the command line, specify --coalesce-contents
+WARNING: good14.pdf (file position 1406): Resulting stream data may be corrupted but is may still useful for manual inspection. For more information on this warning, search for content normalization in the manual.
+-- stream 4 --
 (ends with a name)
 /ThisMustBeLast-- stream 5 --
 % This stream has an inline image marker that is not terminated
@@ -44,4 +54,7 @@ BI
 ID
 <506f7
 461746f>
+WARNING: good14.pdf (file position 1549): content normalization encountered bad tokens
+WARNING: good14.pdf (file position 1549): normalized content ended with a bad token; you may be able to resolve this by coalescing content streams in combination with normalizing content. From the command line, specify --coalesce-contents
+WARNING: good14.pdf (file position 1549): Resulting stream data may be corrupted but is may still useful for manual inspection. For more information on this warning, search for content normalization in the manual.
 test 3 done

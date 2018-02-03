@@ -153,6 +153,25 @@
 	* Provide heavily annoated examples/pdf-filter-tokens.cc example
 	that illustrates use of some simple token filters.
 
+	* When normalizing content streams, as in qdf mode, issue warning
+	about bad tokens. Content streams are only normalized when this is
+	explicitly requested, so this has no impact on normal operation.
+	However, in qdf mode, if qpdf detects a bad token, it means that
+	either there's a bug in qpdf's lexer, that the file is damaged, or
+	that the page's contents are split in a weird way. In any of those
+	cases, qpdf could potentially damage the stream's contents by
+	replacing carrige returns with newlines or otherwise messing with
+	spaces. The mostly likely case of this would be an inline image's
+	compressed data being divided across two streams and having the
+	compressed data in the second stream contain a carriage return as
+	part of its binary data. If you are using qdf mode just to look at
+	PDF files in text editors, this usually doesn't matter. In cases
+	of contents split across multiple streams, coalescing streams
+	would eliminate the problem, so the warning mentions this. Prior
+	to this enhancement, the chances of qdf mode writing incorrect
+	data were already very low. This change should make it nearly
+	impossible for qdf mode to unknowingly write invalid data.
+
 2018-02-04  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add QPDFWriter::setLinearizationPass1Filename method and

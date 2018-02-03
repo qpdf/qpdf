@@ -609,6 +609,33 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline,
         }
     }
 
+    if (filter &&
+        (! suppress_warnings) &&
+        normalizer.getPointer() &&
+        normalizer->anyBadTokens())
+    {
+        warn(QPDFExc(qpdf_e_damaged_pdf, qpdf->getFilename(),
+                     "", this->offset,
+                     "content normalization encountered bad tokens"));
+        if (normalizer->lastTokenWasBad())
+        {
+            QTC::TC("qpdf", "QPDF_Stream bad token at end during normalize");
+            warn(QPDFExc(qpdf_e_damaged_pdf, qpdf->getFilename(),
+                         "", this->offset,
+                         "normalized content ended with a bad token;"
+                         " you may be able to resolve this by"
+                         " coalescing content streams in combination"
+                         " with normalizing content. From the command"
+                         " line, specify --coalesce-contents"));
+        }
+        warn(QPDFExc(qpdf_e_damaged_pdf, qpdf->getFilename(),
+                     "", this->offset,
+                     "Resulting stream data may be corrupted but is"
+                     " may still useful for manual inspection."
+                     " For more information on this warning, search"
+                     " for content normalization in the manual."));
+    }
+
     return filter;
 }
 

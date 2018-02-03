@@ -737,8 +737,16 @@ $td->runtest("stream with tiff predictor",
 show_ntests();
 # ----------
 $td->notify("--- Coalesce contents ---");
-$n_tests += 4;
+$n_tests += 6;
 
+$td->runtest("qdf with normalize warnings",
+             {$td->COMMAND =>
+                  "qpdf --qdf --static-id coalesce.pdf a.pdf"},
+             {$td->FILE => "normalize-warnings.out", $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "coalesce.qdf"});
 $td->runtest("coalesce contents with qdf",
              {$td->COMMAND =>
                   "qpdf --qdf --static-id" .
