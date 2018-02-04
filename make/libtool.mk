@@ -94,14 +94,14 @@ endef
 define makelib
 	$(LIBTOOL) --mode=link \
 		$(CXX) $(CXXFLAGS) $(LD_VERSION_FLAGS) \
-		 -o $(2) $(1) $(4) $(3) \
+		 -o $(2) $(1) $(3) $(4) \
 		 -rpath $(libdir) -version-info $(5):$(6):$(7) -no-undefined
 endef
 
 #                       1    2      3       4
 # Usage: $(call makebin,objs,binary,ldflags,libs)
 define makebin
-	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(1) -o $(2) $(4) $(3)
+	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(1) -o $(2) $(3) $(4)
 endef
 
 # Install target
