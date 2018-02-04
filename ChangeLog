@@ -1,5 +1,21 @@
 2018-02-04  Jay Berkenbilt  <ejb@ql.org>
 
+        * Changes listed on today's date are numerous and reflect
+	significant enhancements to qpdf's lexical layer. While many
+	nuances are discussed and a handful of small bugs were fixed, it
+	should be emphasized that none of these issues have any impact on
+	any output or behavior of qpdf under "normal" operation. There are
+	some changes that have an effect on content stream normalization
+	as with qdf mode or on code that interacts with PDF files
+	lexically using QPDFTokenizer. There are no incompatible changes
+	for normal operation. There are a few changes that will affect the
+	exact error messages issued on certain bad files, and there is a
+	small non-compatible enhancement regarding the behavior of
+	manually constructed QPDFTokenizer::Token objects. Users of the
+	qpdf command line tool will see no changes other than the addition
+	of a new command-line flag and possibly some improved error
+	messages.
+
 	* Significant lexer (tokenizer) enhancements. These are changes to
 	the QPDFTokenizer class. These changes are of concern only to
 	people who are operating with PDF files at the lexical layer using
