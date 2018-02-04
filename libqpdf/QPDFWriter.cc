@@ -1593,7 +1593,7 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	    QTC::TC("qpdf", "QPDFWriter not compressing metadata");
 	    filter = true;
 	    compress = false;
-           uncompress = true;
+            uncompress = true;
 	}
 	else if (this->m->normalize_content &&
                  this->m->normalized_streams.count(old_og))
