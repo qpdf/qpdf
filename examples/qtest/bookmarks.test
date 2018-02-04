@@ -13,7 +13,9 @@ foreach my $show ("", " -show-open")
 {
     foreach my $style ("", " -lines", " -numbers")
     {
-	my $out = "test.$show.$style.out";
+        my $xshow = $show ? $show : "x";
+        my $xstyle = $style ? $style : "x";
+	my $out = "test.$xshow.$xstyle.out";
 	$out =~ s/ //g;
 	$td->runtest("show:$show, style:$style",
 		     {$td->COMMAND => "pdf-bookmarks $show $style 1.pdf"},
