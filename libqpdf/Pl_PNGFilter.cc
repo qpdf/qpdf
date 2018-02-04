@@ -3,7 +3,11 @@
 #include <stdexcept>
 #include <string.h>
 #include <limits.h>
-#include <algorithm>
+
+static int abs_diff(int a, int b)
+{
+    return a > b ? a - b : b - a;
+}
 
 Pl_PNGFilter::Pl_PNGFilter(char const* identifier, Pipeline* next,
 			   action_e action, unsigned int columns,
@@ -218,9 +222,9 @@ int
 Pl_PNGFilter::PaethPredictor(int a, int b, int c)
 {
     int p = a + b - c;
-    int pa = std::abs(p - a);
-    int pb = std::abs(p - b);
-    int pc = std::abs(p - c);
+    int pa = abs_diff(p, a);
+    int pb = abs_diff(p, b);
+    int pc = abs_diff(p, c);
 
     if (pa <= pb && pa <= pc)
     {
