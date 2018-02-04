@@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl This config.in requires autoconf 2.5 or greater.
 
 AC_PREREQ([2.68])
-AC_INIT([qpdf],[7.1.0])
+AC_INIT([qpdf],[7.1.1])
 
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_FILES([autoconf.mk])
@@ -31,7 +31,7 @@ LT_INIT([win32-dll])
 # LT = libtool
 LT_CURRENT=20
 LT_AGE=2
-LT_REVISION=0
+LT_REVISION=1
 AC_SUBST(LT_CURRENT)
 AC_SUBST(LT_REVISION)
 AC_SUBST(LT_AGE)

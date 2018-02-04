@@ -1,3 +1,18 @@
+2018-02-04  Jay Berkenbilt  <ejb@ql.org>
+
+	* 7.1.1: release
+
+	* Bug fix: properly linearize files whose /ID has a length of
+	other than 16 bytes.
+
+	* Rename some test files to avoid files with three dots in their
+	names. Fixes #173.
+
+	* Fix various build and compilation issues on some platforms and
+	compilers. Fixes #176, #172, #177
+
+	* Fix a few typos and clarify a few comments in header files.
+
 2018-01-14  Jay Berkenbilt  <ejb@ql.org>
 
 	* 7.1.0: release

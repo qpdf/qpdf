@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "7.1.0">
-<!ENTITY lastreleased "January 14, 2018">
+<!ENTITY swversion "7.1.1">
+<!ENTITY lastreleased "February 4, 2018">
 ]>
 <book>
  <bookinfo>
@@ -2982,6 +2982,25 @@ print "\n";
    <filename>ChangeLog</filename> in the source distribution.
   </para>
   <variablelist>
+   <varlistentry>
+    <term>7.1.1: February 4, 2018</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Bug fix: files whose /ID fields were other than 16 bytes long
+        can now be properly linearlized
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        A few compile and link issues have been corrected for some
+        platforms.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
     <term>7.1.0: January 14, 2018</term>
     <listitem>
