@@ -414,6 +414,7 @@ class QPDFWriter
     void initializeSpecialStreams();
     void preserveObjectStreams();
     void generateObjectStreams();
+    std::string getOriginalID1();
     void generateID();
     void interpretR3EncryptionParameters(
 	std::set<int>& bits_to_clear,

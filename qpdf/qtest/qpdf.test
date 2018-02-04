@@ -240,7 +240,7 @@ foreach my $d (@bug_tests)
 show_ntests();
 # ----------
 $td->notify("--- Miscellaneous Tests ---");
-$n_tests += 87;
+$n_tests += 93;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
@@ -303,7 +303,8 @@ $td->runtest("check output",
 	     {$td->FILE => "unreferenced-indirect-scalar.out"});
 
 # Encrypt files whose /ID strings are other than 32 bytes long (bug
-# 2991412).
+# 2991412). Also linearize these files, which was reported in a
+# separate bug by email.
 foreach my $file (qw(short-id long-id))
 {
     $td->runtest("encrypt $file.pdf",
@@ -316,6 +317,23 @@ foreach my $file (qw(short-id long-id))
     $td->runtest("check $file.pdf",
 		 {$td->COMMAND => "qpdf --check --show-encryption-key a.pdf"},
 		 {$td->FILE => "$file-check.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("linearize $file.pdf",
+		 {$td->COMMAND =>
+		      "qpdf --deterministic-id --linearize $file.pdf a.pdf"},
+		 {$td->STRING => "",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("check output",
+                 {$td->FILE => "a.pdf"},
+		 {$td->FILE => "$file-linearized.pdf"});
+
+    $td->runtest("check $file.pdf",
+		 {$td->COMMAND => "qpdf --check a.pdf"},
+		 {$td->FILE => "$file-linearized-check.out",
 		  $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
 }

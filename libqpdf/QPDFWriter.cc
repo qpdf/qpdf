@@ -1246,8 +1246,28 @@ QPDFWriter::writeTrailer(trailer_e which, int size, bool xref_stream,
     writeString(" /ID [");
     if (linearization_pass == 1)
     {
-        writeString("<00000000000000000000000000000000>"
-                    "<00000000000000000000000000000000>");
+	std::string original_id1 = getOriginalID1();
+        if (original_id1.empty())
+        {
+            writeString("<00000000000000000000000000000000>");
+        }
+        else
+        {
+            // Write a string of zeroes equal in length to the
+            // representation of the original ID. While writing the
+            // original ID would have the same number of bytes, it
+            // would cause a change to the deterministic ID generated
+            // by older versions of the software that hard-coded the
+            // length of the ID to 16 bytes.
+            writeString("<");
+            size_t len = QPDF_String(original_id1).unparse(true).length() - 2;
+            for (size_t i = 0; i < len; ++i)
+            {
+                writeString("0");
+            }
+            writeString(">");
+        }
+        writeString("<00000000000000000000000000000000>");
     }
     else
     {
@@ -1952,6 +1972,20 @@ QPDFWriter::writeObject(QPDFObjectHandle object, int object_stream_index)
     }
 }
 
+std::string
+QPDFWriter::getOriginalID1()
+{
+    QPDFObjectHandle trailer = this->m->pdf.getTrailer();
+    if (trailer.hasKey("/ID"))
+    {
+        return trailer.getKey("/ID").getArrayItem(0).getStringValue();
+    }
+    else
+    {
+        return "";
+    }
+}
+
 void
 QPDFWriter::generateID()
 {
@@ -2042,12 +2076,9 @@ QPDFWriter::generateID()
     // generated ID for both.
 
     this->m->id2 = result;
-    if (trailer.hasKey("/ID"))
-    {
-	// Note: keep /ID from old file even if --static-id was given.
-	this->m->id1 = trailer.getKey("/ID").getArrayItem(0).getStringValue();
-    }
-    else
+    // Note: keep /ID from old file even if --static-id was given.
+    this->m->id1 = getOriginalID1();
+    if (this->m->id1.empty())
     {
 	this->m->id1 = this->m->id2;
     }
