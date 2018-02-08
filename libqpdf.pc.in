@@ -6,6 +6,6 @@ includedir=@includedir@
 Name: libqpdf
 Description: PDF transformation library
 Version: @PACKAGE_VERSION@
-Requires.private: zlib, libjpeg
+Requires.private: zlib
 Libs: -L${libdir} -lqpdf
 Cflags: -I${includedir}
