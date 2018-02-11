@@ -7,13 +7,10 @@
 #include <qpdf/PointerHolder.hh>
 #include <qpdf/QPDFObjectHandle.hh>
 
-//
-// Treat incoming text as a stream consisting of valid PDF tokens, but
-// output bad tokens just the same.  The idea here is to be able to
-// use pipeline for content streams to normalize newlines without
-// interfering with meaningful newlines such as those that occur
-// inside of strings.
-//
+// Tokenize the incoming text using QPDFTokenizer and pass the tokens
+// in turn to a QPDFObjectHandle::TokenFilter object. All bytes of
+// incoming content will be included in exactly one token and passed
+// downstream.
 
 class Pl_QPDFTokenizer: public Pipeline
 {
