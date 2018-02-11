@@ -1,3 +1,9 @@
+2018-02-11  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add QPDFObjectHandle::filterPageContents method to provide a
+	different interface for applying token filters to page contents
+	without modifying the ultimate output.
+
 2018-02-04  Jay Berkenbilt  <ejb@ql.org>
 
         * Changes listed on today's date are numerous and reflect

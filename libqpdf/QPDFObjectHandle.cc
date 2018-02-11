@@ -15,6 +15,8 @@
 #include <qpdf/QPDF_Reserved.hh>
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/Pl_Concatenate.hh>
+#include <qpdf/Pl_QPDFTokenizer.hh>
+#include <qpdf/Pl_Discard.hh>
 #include <qpdf/BufferInputSource.hh>
 #include <qpdf/QPDFExc.hh>
 
@@ -996,6 +998,24 @@ QPDFObjectHandle::parsePageContents(ParserCallbacks* callbacks)
         QUtil::int_to_string(this->generation);
     this->getKey("/Contents").parseContentStream_internal(
         description, callbacks);
+}
+
+void
+QPDFObjectHandle::filterPageContents(TokenFilter* filter, Pipeline* next)
+{
+    assertPageObject();
+    std::string description = "token filter for page object " +
+        QUtil::int_to_string(this->objid) + " " +
+        QUtil::int_to_string(this->generation);
+    Pl_QPDFTokenizer token_pipeline(description.c_str(), filter);
+    PointerHolder<Pipeline> next_p;
+    if (next == 0)
+    {
+        next_p = new Pl_Discard();
+        next = next_p.getPointer();
+    }
+    filter->setPipeline(next);
+    this->pipePageContents(&token_pipeline);
 }
 
 void
