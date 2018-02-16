@@ -111,6 +111,7 @@ class QPDFObjectHandle
         {
         }
         virtual void handleToken(QPDFTokenizer::Token const&) = 0;
+        QPDF_DLL
         virtual void handleEOF();
 
         class PipelineAccessor
@@ -174,6 +175,11 @@ class QPDFObjectHandle
 
     QPDF_DLL
     QPDFObjectHandle();
+    QPDF_DLL
+    QPDFObjectHandle(QPDFObjectHandle const&);
+    QPDF_DLL
+    QPDFObjectHandle&
+    operator=(QPDFObjectHandle const&);
     QPDF_DLL
     bool isInitialized() const;
 
@@ -743,7 +749,7 @@ class QPDFObjectHandle
 	static PointerHolder<QPDFObject> getObject(QPDFObjectHandle& o)
 	{
 	    o.dereference();
-	    return o.obj;
+	    return o.m->obj;
 	}
     };
     friend class ObjAccessor;
@@ -847,13 +853,28 @@ class QPDFObjectHandle
         std::string const& description, std::string& all_description);
     static void warn(QPDF*, QPDFExc const&);
 
-    bool initialized;
+    class Members
+    {
+        friend class QPDFObjectHandle;
 
-    QPDF* qpdf;			// 0 for direct object
-    int objid;			// 0 for direct object
-    int generation;
-    PointerHolder<QPDFObject> obj;
-    bool reserved;
+      public:
+        QPDF_DLL
+        ~Members();
+
+      private:
+        Members();
+        Members(QPDF* qpdf, int objid, int generation);
+        Members(QPDFObject* data);
+
+        bool initialized;
+
+        QPDF* qpdf;			// 0 for direct object
+        int objid;			// 0 for direct object
+        int generation;
+        PointerHolder<QPDFObject> obj;
+        bool reserved;
+    };
+    PointerHolder<Members> m;
 };
 
 #endif // __QPDFOBJECTHANDLE_HH__
