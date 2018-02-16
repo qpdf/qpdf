@@ -15,14 +15,15 @@ Pl_QPDFTokenizer::Members::~Members()
 {
 }
 
-Pl_QPDFTokenizer::Pl_QPDFTokenizer(
-    char const* identifier,
-    QPDFObjectHandle::TokenFilter* filter)
-    :
-    Pipeline(identifier, 0),
+Pl_QPDFTokenizer::Pl_QPDFTokenizer(char const* identifier,
+                                   QPDFObjectHandle::TokenFilter* filter,
+                                   Pipeline* next) :
+    Pipeline(identifier, next),
     m(new Members)
 {
     m->filter = filter;
+    QPDFObjectHandle::TokenFilter::PipelineAccessor::setPipeline(
+        m->filter, next);
     m->tokenizer.allowEOF();
     m->tokenizer.includeIgnorable();
 }
@@ -88,4 +89,11 @@ Pl_QPDFTokenizer::finish()
     }
 
     this->m->filter->handleEOF();
+    QPDFObjectHandle::TokenFilter::PipelineAccessor::setPipeline(
+        m->filter, 0);
+    Pipeline* next = this->getNext(true);
+    if (next)
+    {
+        next->finish();
+    }
 }

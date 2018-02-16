@@ -184,12 +184,6 @@ ColorToGray::handleEOF()
         writeToken(this->all_stack.at(0));
         this->all_stack.pop_front();
     }
-    // Remember to call finish(). If you override handleEOF, it is
-    // essential that you call finish() or else you are likely to lose
-    // some data in buffers of downstream pipelines that are not
-    // flushed out. This is also mentioned in comments in
-    // QPDFObjectHandle.hh.
-    finish();
 }
 
 int main(int argc, char* argv[])

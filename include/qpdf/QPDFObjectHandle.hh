@@ -45,6 +45,7 @@ class QPDF_Dictionary;
 class QPDF_Array;
 class QPDFTokenizer;
 class QPDFExc;
+class Pl_QPDFTokenizer;
 
 class QPDFObjectHandle
 {
@@ -81,18 +82,13 @@ class QPDFObjectHandle
     // in a lexically aware fashion. TokenFilters can be attached to
     // streams using the addTokenFilter or addContentTokenFilter
     // methods or can be applied on the spot by filterPageContents.
+    // You may also use Pl_QPDFTokenizer directly if you need full
+    // control.
+    //
     // The handleToken method is called for each token, including the
     // eof token, and then handleEOF is called at the very end.
     // Handlers may call write (or writeToken) to pass data
-    // downstream. The finish() method must be called exactly one time
-    // to ensure that any written data is flushed out. The default
-    // handleEOF calls finish. If you override handleEOF, you must
-    // ensure that finish() is called either there or in response to
-    // whatever event causes you to terminate creation of output.
-    // Failure to call finish() may result in some of the data you
-    // have written being lost. You should not rely on a destructor
-    // for calling finish() since the destructor call may occur later
-    // than you expect. Please see examples/pdf-filter-tokens.cc and
+    // downstream. Please see examples/pdf-filter-tokens.cc and
     // examples/pdf-count-strings.cc for examples of using
     // TokenFilters.
     //
@@ -115,15 +111,17 @@ class QPDFObjectHandle
         {
         }
         virtual void handleToken(QPDFTokenizer::Token const&) = 0;
-        virtual void handleEOF()
-        {
-            // If you override handleEOF, you must be sure to call
-            // finish().
-            finish();
-        }
+        virtual void handleEOF();
 
-        // This is called internally by the qpdf library.
-        void setPipeline(Pipeline*);
+        class PipelineAccessor
+        {
+            friend class Pl_QPDFTokenizer;
+          private:
+            static void setPipeline(TokenFilter* f, Pipeline* p)
+            {
+                f->setPipeline(p);
+            }
+        };
 
       protected:
         QPDF_DLL
@@ -132,10 +130,10 @@ class QPDFObjectHandle
         void write(std::string const& str);
         QPDF_DLL
         void writeToken(QPDFTokenizer::Token const&);
-        QPDF_DLL
-        void finish();
 
       private:
+        void setPipeline(Pipeline*);
+
         Pipeline* pipeline;
     };
 

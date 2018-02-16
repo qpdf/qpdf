@@ -123,7 +123,6 @@ class TokenFilter: public QPDFObjectHandle::TokenFilter
     {
         writeToken(QPDFTokenizer::Token(QPDFTokenizer::tt_name, "/bye"));
         write("\n");
-        finish();
     }
 };
 

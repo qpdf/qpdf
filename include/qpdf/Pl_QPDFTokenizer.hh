@@ -41,8 +41,12 @@
 class Pl_QPDFTokenizer: public Pipeline
 {
   public:
+    // Whatever pipeline is provided as "next" will be set as the
+    // pipeline that the token filter writes to. If next is not
+    // provided, any output written by the filter will be discarded.
     Pl_QPDFTokenizer(char const* identifier,
-                     QPDFObjectHandle::TokenFilter* filter);
+                     QPDFObjectHandle::TokenFilter* filter,
+                     Pipeline* next = 0);
     virtual ~Pl_QPDFTokenizer();
     virtual void write(unsigned char* buf, size_t len);
     virtual void finish();

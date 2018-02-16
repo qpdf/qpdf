@@ -9,7 +9,6 @@ class ContentNormalizer: public QPDFObjectHandle::TokenFilter
     ContentNormalizer();
     virtual ~ContentNormalizer();
     virtual void handleToken(QPDFTokenizer::Token const&);
-    virtual void handleEOF();
 
     bool anyBadTokens() const;
     bool lastTokenWasBad() const;

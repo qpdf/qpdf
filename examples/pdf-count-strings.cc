@@ -62,8 +62,6 @@ StringCounter::handleEOF()
     // can enhance the output if we want.
     write("\n% strings found: ");
     write(QUtil::int_to_string(this->count));
-    // If you override handleEOF, you must always remember to call finish().
-    finish();
 }
 
 int

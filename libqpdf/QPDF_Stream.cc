@@ -459,9 +459,8 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline,
 	if (encode_flags & qpdf_ef_normalize)
 	{
             normalizer = new ContentNormalizer();
-            normalizer->setPipeline(pipeline);
 	    pipeline = new Pl_QPDFTokenizer(
-                "normalizer", normalizer.getPointer());
+                "normalizer", normalizer.getPointer(), pipeline);
 	    to_delete.push_back(pipeline);
 	}
 
@@ -470,9 +469,8 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline,
                  this->token_filters.rbegin();
              iter != this->token_filters.rend(); ++iter)
         {
-            (*iter)->setPipeline(pipeline);
             pipeline = new Pl_QPDFTokenizer(
-                "token filter", (*iter).getPointer());
+                "token filter", (*iter).getPointer(), pipeline);
             to_delete.push_back(pipeline);
         }
 

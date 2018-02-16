@@ -82,12 +82,6 @@ ContentNormalizer::handleToken(QPDFTokenizer::Token const& token)
     }
 }
 
-void
-ContentNormalizer::handleEOF()
-{
-    finish();
-}
-
 bool
 ContentNormalizer::anyBadTokens() const
 {

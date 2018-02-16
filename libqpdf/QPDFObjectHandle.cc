@@ -16,7 +16,6 @@
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/Pl_Concatenate.hh>
 #include <qpdf/Pl_QPDFTokenizer.hh>
-#include <qpdf/Pl_Discard.hh>
 #include <qpdf/BufferInputSource.hh>
 #include <qpdf/QPDFExc.hh>
 
@@ -65,6 +64,11 @@ CoalesceProvider::provideStreamData(int, int, Pipeline* p)
 }
 
 void
+QPDFObjectHandle::TokenFilter::handleEOF()
+{
+}
+
+void
 QPDFObjectHandle::TokenFilter::setPipeline(Pipeline* p)
 {
     this->pipeline = p;
@@ -75,8 +79,7 @@ QPDFObjectHandle::TokenFilter::write(char const* data, size_t len)
 {
     if (! this->pipeline)
     {
-        throw std::logic_error(
-            "TokenFilter::write called before setPipeline");
+        return;
     }
     if (len)
     {
@@ -95,17 +98,6 @@ QPDFObjectHandle::TokenFilter::writeToken(QPDFTokenizer::Token const& token)
 {
     std::string value = token.getRawValue();
     write(value.c_str(), value.length());
-}
-
-void
-QPDFObjectHandle::TokenFilter::finish()
-{
-    if (! this->pipeline)
-    {
-        throw std::logic_error(
-            "TokenFilter::finish called before setPipeline");
-    }
-    this->pipeline->finish();
 }
 
 void
@@ -1007,14 +999,7 @@ QPDFObjectHandle::filterPageContents(TokenFilter* filter, Pipeline* next)
     std::string description = "token filter for page object " +
         QUtil::int_to_string(this->objid) + " " +
         QUtil::int_to_string(this->generation);
-    Pl_QPDFTokenizer token_pipeline(description.c_str(), filter);
-    PointerHolder<Pipeline> next_p;
-    if (next == 0)
-    {
-        next_p = new Pl_Discard();
-        next = next_p.getPointer();
-    }
-    filter->setPipeline(next);
+    Pl_QPDFTokenizer token_pipeline(description.c_str(), filter, next);
     this->pipePageContents(&token_pipeline);
 }
 
