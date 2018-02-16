@@ -1,4 +1,4 @@
 WARNING: bad21.pdf: file is damaged
-WARNING: bad21.pdf (trailer, file position 742): invalid name token
+WARNING: bad21.pdf (trailer, offset 742): invalid name token
 WARNING: bad21.pdf: Attempting to reconstruct cross-reference table
-bad21.pdf (trailer, file position 742): invalid name token
+bad21.pdf (trailer, offset 742): invalid name token

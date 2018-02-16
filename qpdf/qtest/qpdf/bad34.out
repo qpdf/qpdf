@@ -1,4 +1,4 @@
-WARNING: bad34.pdf (object 4 0, file position 322): expected n n obj
+WARNING: bad34.pdf (object 4 0, offset 322): expected n n obj
 /QTest is implicit
 /QTest is indirect and has type null (2)
 /QTest is null

@@ -1,5 +1,13 @@
 2018-02-17  Jay Berkenbilt  <ejb@ql.org>
 
+	* Error message fix: replace "file position" with "offset" in
+	error messages that report lexical or parsing errors. Sometimes
+	it's an offset in an object stream or a content stream rather than
+	a file position, so this makes the error message less confusing in
+	those cases. It still requires some knowledge to find the exact
+	position of the error, since when it's not a file offset, it's
+	probably an offset into a stream after uncompressing it.
+
 	* Error message fix: correct some cases in which the object that
 	contained a lexical error was omitted from the error message.
 

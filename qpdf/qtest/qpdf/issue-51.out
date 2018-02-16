@@ -1,10 +1,10 @@
 WARNING: issue-51.pdf: can't find PDF header
 WARNING: issue-51.pdf: reported number of objects (0) inconsistent with actual number of objects (9)
-WARNING: issue-51.pdf (object 7 0, file position 553): expected endobj
-WARNING: issue-51.pdf (object 1 0, file position 359): expected endobj
-WARNING: issue-51.pdf (file position 70): loop detected resolving object 2 0
-WARNING: issue-51.pdf (object 2 0, file position 26): /Length key in stream dictionary is not an integer
-WARNING: issue-51.pdf (object 2 0, file position 71): attempting to recover stream length
-WARNING: issue-51.pdf (object 2 0, file position 71): unable to recover stream data; treating stream as empty
-WARNING: issue-51.pdf (object 2 0, file position 977): unexpected EOF
+WARNING: issue-51.pdf (object 7 0, offset 553): expected endobj
+WARNING: issue-51.pdf (object 1 0, offset 359): expected endobj
+WARNING: issue-51.pdf (offset 70): loop detected resolving object 2 0
+WARNING: issue-51.pdf (object 2 0, offset 26): /Length key in stream dictionary is not an integer
+WARNING: issue-51.pdf (object 2 0, offset 71): attempting to recover stream length
+WARNING: issue-51.pdf (object 2 0, offset 71): unable to recover stream data; treating stream as empty
+WARNING: issue-51.pdf (object 2 0, offset 977): unexpected EOF
 qpdf: operation succeeded with warnings; resulting file may have some problems

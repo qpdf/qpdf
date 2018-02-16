@@ -2,7 +2,7 @@ checking linearization-bounds-1.pdf
 PDF Version: 1.3
 File is not encrypted
 File is linearized
-WARNING: linearization-bounds-1.pdf (linearization hint stream: object 62 0, file position 12302): unexpected EOF
-WARNING: linearization-bounds-1.pdf (linearization hint stream: object 62 0, file position 1183): attempting to recover stream length
-WARNING: linearization-bounds-1.pdf (linearization hint stream: object 62 0, file position 1183): recovered stream length: 106
-linearization-bounds-1.pdf (linearization hint table, file position 1183): /S (shared object) offset is out of bounds
+WARNING: linearization-bounds-1.pdf (linearization hint stream: object 62 0, offset 12302): unexpected EOF
+WARNING: linearization-bounds-1.pdf (linearization hint stream: object 62 0, offset 1183): attempting to recover stream length
+WARNING: linearization-bounds-1.pdf (linearization hint stream: object 62 0, offset 1183): recovered stream length: 106
+linearization-bounds-1.pdf (linearization hint table, offset 1183): /S (shared object) offset is out of bounds

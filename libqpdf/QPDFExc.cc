@@ -43,7 +43,7 @@ QPDFExc::createWhat(std::string const& filename,
 	}
 	if (offset > 0)
 	{
-	    result += "file position " + QUtil::int_to_string(offset);
+	    result += "offset " + QUtil::int_to_string(offset);
 	}
 	result += ")";
     }

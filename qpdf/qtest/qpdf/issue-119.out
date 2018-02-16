@@ -1,3 +1,3 @@
-WARNING: issue-119.pdf (object 4 0, file position 298): expected dictionary key but found non-name object; inserting key /QPDFFake1
-WARNING: issue-119.pdf (object 4 0, file position 298): expected dictionary key but found non-name object; inserting key /QPDFFake2
+WARNING: issue-119.pdf (object 4 0, offset 298): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-119.pdf (object 4 0, offset 298): expected dictionary key but found non-name object; inserting key /QPDFFake2
 qpdf: operation succeeded with warnings; resulting file may have some problems

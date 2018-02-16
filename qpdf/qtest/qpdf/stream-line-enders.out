@@ -1,4 +1,4 @@
-WARNING: stream-line-enders.pdf (object 5 0, file position 384): stream keyword followed by carriage return only
-WARNING: stream-line-enders.pdf (object 6 0, file position 443): stream keyword not followed by proper line terminator
-WARNING: stream-line-enders.pdf (object 7 0, file position 503): stream keyword not followed by proper line terminator
+WARNING: stream-line-enders.pdf (object 5 0, offset 384): stream keyword followed by carriage return only
+WARNING: stream-line-enders.pdf (object 6 0, offset 443): stream keyword not followed by proper line terminator
+WARNING: stream-line-enders.pdf (object 7 0, offset 503): stream keyword not followed by proper line terminator
 qpdf: operation succeeded with warnings; resulting file may have some problems

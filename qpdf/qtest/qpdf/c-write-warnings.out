@@ -3,7 +3,7 @@ warning: bad33.pdf: file is damaged
   file: bad33.pdf
   pos : 0
   text: file is damaged
-warning: bad33.pdf (file position 1771): xref not found
+warning: bad33.pdf (offset 1771): xref not found
   code: 5
   file: bad33.pdf
   pos : 1771
@@ -13,7 +13,7 @@ warning: bad33.pdf: Attempting to reconstruct cross-reference table
   file: bad33.pdf
   pos : 0
   text: Attempting to reconstruct cross-reference table
-warning: bad33.pdf (file position 629): stream filter type is not name or array
+warning: bad33.pdf (offset 629): stream filter type is not name or array
   code: 5
   file: bad33.pdf
   pos : 629

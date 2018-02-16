@@ -1,4 +1,4 @@
 WARNING: bad18.pdf: file is damaged
-WARNING: bad18.pdf (trailer, file position 753): unexpected )
+WARNING: bad18.pdf (trailer, offset 753): unexpected )
 WARNING: bad18.pdf: Attempting to reconstruct cross-reference table
-bad18.pdf (trailer, file position 753): unexpected )
+bad18.pdf (trailer, offset 753): unexpected )

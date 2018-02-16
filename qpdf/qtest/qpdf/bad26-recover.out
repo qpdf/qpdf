@@ -1,5 +1,5 @@
 WARNING: bad26.pdf: file is damaged
-WARNING: bad26.pdf (object 4 0, file position 307): expected n n obj
+WARNING: bad26.pdf (object 4 0, offset 307): expected n n obj
 WARNING: bad26.pdf: Attempting to reconstruct cross-reference table
 WARNING: bad26.pdf: object 4 0 not found in file after regenerating cross reference table
 /QTest is implicit

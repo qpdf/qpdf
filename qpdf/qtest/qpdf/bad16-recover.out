@@ -1,10 +1,10 @@
-WARNING: bad16.pdf (trailer, file position 753): unexpected dictionary close token
-WARNING: bad16.pdf (trailer, file position 756): unexpected dictionary close token
-WARNING: bad16.pdf (trailer, file position 759): unknown token while reading object; treating as string
+WARNING: bad16.pdf (trailer, offset 753): unexpected dictionary close token
+WARNING: bad16.pdf (trailer, offset 756): unexpected dictionary close token
+WARNING: bad16.pdf (trailer, offset 759): unknown token while reading object; treating as string
 WARNING: bad16.pdf: file is damaged
-WARNING: bad16.pdf (trailer, file position 779): unexpected EOF
+WARNING: bad16.pdf (trailer, offset 779): unexpected EOF
 WARNING: bad16.pdf: Attempting to reconstruct cross-reference table
-WARNING: bad16.pdf (trailer, file position 753): unexpected dictionary close token
-WARNING: bad16.pdf (trailer, file position 756): unexpected dictionary close token
-WARNING: bad16.pdf (trailer, file position 759): unknown token while reading object; treating as string
-bad16.pdf (trailer, file position 779): unexpected EOF
+WARNING: bad16.pdf (trailer, offset 753): unexpected dictionary close token
+WARNING: bad16.pdf (trailer, offset 756): unexpected dictionary close token
+WARNING: bad16.pdf (trailer, offset 759): unknown token while reading object; treating as string
+bad16.pdf (trailer, offset 779): unexpected EOF

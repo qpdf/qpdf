@@ -1,4 +1,4 @@
 WARNING: bad29.pdf: file is damaged
-WARNING: bad29.pdf (trailer, file position 742): null character not allowed in name token
+WARNING: bad29.pdf (trailer, offset 742): null character not allowed in name token
 WARNING: bad29.pdf: Attempting to reconstruct cross-reference table
-bad29.pdf (trailer, file position 742): null character not allowed in name token
+bad29.pdf (trailer, offset 742): null character not allowed in name token
