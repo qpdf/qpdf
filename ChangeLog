@@ -1,3 +1,8 @@
+2018-02-17  Jay Berkenbilt  <ejb@ql.org>
+
+	* Error message fix: improve file name in the error message when
+	there is a parser error inside an object stream.
+
 2018-02-11  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add QPDFObjectHandle::filterPageContents method to provide a

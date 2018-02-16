@@ -13,5 +13,5 @@ WARNING: issue-143.pdf (file position 24): expected dictionary key but found non
 WARNING: issue-143.pdf (object 1 0, file position 21): stream dictionary lacks /Length key
 WARNING: issue-143.pdf (object 1 0, file position 84): attempting to recover stream length
 WARNING: issue-143.pdf (object 1 0, file position 84): recovered stream length: 606
-WARNING: object stream 1 (file position 33): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-143.pdf object stream 1 (file position 33): expected dictionary key but found non-name object; inserting key /QPDFFake1
 qpdf: operation succeeded with warnings; resulting file may have some problems

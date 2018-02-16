@@ -1847,7 +1847,8 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
 
     PointerHolder<Buffer> bp = obj_stream.getStreamData(qpdf_dl_specialized);
     PointerHolder<InputSource> input = new BufferInputSource(
-	"object stream " + QUtil::int_to_string(obj_stream_number),
+        this->m->file->getName() +
+        " object stream " + QUtil::int_to_string(obj_stream_number),
 	bp.getPointer());
 
     for (int i = 0; i < n; ++i)
