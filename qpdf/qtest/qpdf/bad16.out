@@ -1,4 +1,6 @@
 WARNING: bad16.pdf (trailer, offset 753): unexpected dictionary close token
 WARNING: bad16.pdf (trailer, offset 756): unexpected dictionary close token
 WARNING: bad16.pdf (trailer, offset 759): unknown token while reading object; treating as string
-bad16.pdf (trailer, offset 779): unexpected EOF
+WARNING: bad16.pdf (trailer, offset 779): unexpected EOF
+WARNING: bad16.pdf (trailer, offset 779): parse error while reading object
+bad16.pdf (offset 712): expected trailer dictionary

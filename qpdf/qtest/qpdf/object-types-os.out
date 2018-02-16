@@ -1,0 +1,41 @@
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 347: operation for string attempted on object of type dictionary: returning empty string
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 384: returning null for out of bounds array access
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 384: returning null for out of bounds array access
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for array attempted on object of type integer: returning null
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for array attempted on object of type integer: ignoring attempt to append item
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 384: ignoring attempt to erase out of bounds array item
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 384: ignoring attempt to erase out of bounds array item
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for array attempted on object of type integer: ignoring attempt to erase item
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for array attempted on object of type integer: ignoring attempt to insert item
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for array attempted on object of type integer: ignoring attempt to replace items
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for array attempted on object of type integer: ignoring attempt to set item
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for array attempted on object of type integer: treating as empty
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for array attempted on object of type integer: treating as empty
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for boolean attempted on object of type integer: returning false
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for dictionary attempted on object of type integer: treating as empty
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for dictionary attempted on object of type integer: treating as empty
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for dictionary attempted on object of type integer: returning false for a key containment request
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for dictionary attempted on object of type integer: ignoring key removal request
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for dictionary attempted on object of type integer: ignoring key removal/replacement request
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for dictionary attempted on object of type integer: ignoring key removal/replacement request
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for dictionary attempted on object of type integer: ignoring key replacement request
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for dictionary attempted on object of type integer: returning null for attempted key retrieval
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for inlineimage attempted on object of type integer: returning empty data
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 362: operation for integer attempted on object of type dictionary: returning 0
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for name attempted on object of type integer: returning dummy name
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for operator attempted on object of type integer: returning fake value
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 362: operation for real attempted on object of type dictionary: returning 0.0
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for string attempted on object of type integer: returning empty string
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for string attempted on object of type integer: returning empty string
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 362: operation for number attempted on object of type dictionary: returning 0
+One error
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 385: operation for string attempted on object of type name: returning empty string
+One error
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 362 -> dictionary key /Quack: operation for string attempted on object of type null: returning empty string
+Two errors
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 384: returning null for out of bounds array access
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 384 -> null returned from invalid array access: operation for string attempted on object of type null: returning empty string
+One error
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 400: operation for string attempted on object of type name: returning empty string
+WARNING: object-types-os.pdf, object 8 0 at offset 538 -> dictionary key /Potato: operation for name attempted on object of type null: returning dummy name
+test 42 done

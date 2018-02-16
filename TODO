@@ -1,15 +1,6 @@
 Soon
 ====
 
- * Consider whether there should be a mode in which QPDFObjectHandle
-   returns nulls for operations on the wrong type instead of asserting
-   the type. The way things are wired up now, this would have to be a
-   global flag. Probably it makes sense to make that be the default
-   behavior and to add a static method in QPDFObjectHandle and
-   command-line flag that enables the stricter behavior globally for
-   easier debugging. For cases where we have enough information to do
-   so, we could still warn when not in strict mode.
-
  * Add method to push inheritable resources to a single page by
    walking up and copying without overwrite.  Above logic will also be
    sufficient to fix the limitation in

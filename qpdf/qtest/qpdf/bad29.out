@@ -1,1 +1,9 @@
-bad29.pdf (trailer, offset 742): null character not allowed in name token
+WARNING: bad29.pdf (trailer, offset 742): null character not allowed in name token
+WARNING: bad29.pdf (trailer, offset 715): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: bad29.pdf (trailer, offset 715): expected dictionary key but found non-name object; inserting key /QPDFFake2
+/QTest is implicit
+/QTest is direct and has type null (2)
+/QTest is null
+unparse: null
+unparseResolved: null
+test 0 done

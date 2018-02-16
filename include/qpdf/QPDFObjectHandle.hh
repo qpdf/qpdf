@@ -398,6 +398,21 @@ class QPDFObjectHandle
     QPDF_DLL
     static QPDFObjectHandle newReserved(QPDF* qpdf);
 
+    // Provide an owning qpdf and object description. The library does
+    // this automatically with objects that are read from from the
+    // input PDF and with objects that are created programmatically
+    // and inserted into the QPDF by adding them to an array or a
+    // dictionary or creating a new indirect object. Most end user
+    // code will not need to call this. If an object has an owning
+    // qpdf and object description, it enables qpdf to give warnings
+    // with proper context in some cases where it would otherwise
+    // raise exceptions.
+    QPDF_DLL
+    void setObjectDescription(QPDF* owning_qpdf,
+                              std::string const& object_description);
+    QPDF_DLL
+    bool hasObjectDescription();
+
     // Accessor methods.  If an accessor method that is valid for only
     // a particular object type is called on an object of the wrong
     // type, an exception is thrown.
@@ -498,7 +513,7 @@ class QPDFObjectHandle
 
     // Replace value of key, adding it if it does not exist
     QPDF_DLL
-    void replaceKey(std::string const& key, QPDFObjectHandle const&);
+    void replaceKey(std::string const& key, QPDFObjectHandle);
     // Remove key, doing nothing if key does not exist
     QPDF_DLL
     void removeKey(std::string const& key);
@@ -769,7 +784,10 @@ class QPDFObjectHandle
     };
     friend class ReleaseResolver;
 
-    // Convenience routine: Throws if the assumption is violated.
+    // Convenience routine: Throws if the assumption is violated. Your
+    // code will be better if you call one of the isType methods and
+    // handle the case of the type being wrong, but these can be
+    // convenient if you have already verified the type.
     QPDF_DLL
     void assertInitialized() const;
 
@@ -832,10 +850,16 @@ class QPDFObjectHandle
 	QPDF* qpdf, int objid, int generation,
 	QPDFObjectHandle stream_dict, qpdf_offset_t offset, size_t length);
 
-    void assertType(char const* type_name, bool istype) const;
+    void typeWarning(char const* expected_type,
+                     std::string const& warning);
+    void objectWarning(std::string const& warning);
+    void assertType(char const* type_name, bool istype);
     void dereference();
     void makeDirectInternal(std::set<int>& visited);
     void releaseResolved();
+    static void setObjectDescriptionFromInput(
+        QPDFObjectHandle, QPDF*, std::string const&,
+        PointerHolder<InputSource>, qpdf_offset_t);
     static QPDFObjectHandle parseInternal(
         PointerHolder<InputSource> input,
         std::string const& object_description,
@@ -868,7 +892,7 @@ class QPDFObjectHandle
 
         bool initialized;
 
-        QPDF* qpdf;			// 0 for direct object
+        QPDF* qpdf;
         int objid;			// 0 for direct object
         int generation;
         PointerHolder<QPDFObject> obj;

@@ -19,6 +19,7 @@ class QPDF_Stream: public QPDFObject
     virtual std::string unparse();
     virtual QPDFObject::object_type_e getTypeCode() const;
     virtual char const* getTypeName() const;
+    virtual void setDescription(QPDF*, std::string const&);
     QPDFObjectHandle getDict() const;
     bool isDataModified() const;
 
@@ -66,6 +67,8 @@ class QPDF_Stream: public QPDFObject
                     int& colors, int& bits_per_component,
                     bool& early_code_change);
     void warn(QPDFExc const& e);
+    void setDictDescription();
+    void setStreamDescription();
 
     QPDF* qpdf;
     int objid;

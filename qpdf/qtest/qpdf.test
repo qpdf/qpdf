@@ -212,7 +212,7 @@ my @bug_tests = (
     ["99", "object 0", 2],
     ["99b", "object 0", 2],
     ["100", "xref reconstruction loop", 2],
-    ["101", "resolve for exception text", 2],
+    ["101", "resolve for exception text", 3],
     ["117", "other infinite loop", 2],
     ["118", "other infinite loop", 2],
     ["119", "other infinite loop", 3],
@@ -736,6 +736,33 @@ $td->runtest("stream with tiff predictor",
 
 show_ntests();
 # ----------
+$td->notify("--- Type checks ---");
+$n_tests += 4;
+# Whenever object-types.pdf is edited, object-types-os.pdf should be
+# regenerated.
+$td->runtest("ensure object-types-os is up-to-date",
+             {$td->COMMAND =>
+                  "qpdf" .
+                  " --object-streams=generate" .
+                  " --deterministic-id" .
+                  " --stream-data=uncompress" .
+                  " object-types.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check file",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "object-types-os.pdf"});
+$td->runtest("type checks",
+             {$td->COMMAND => "test_driver 42 object-types.pdf"},
+             {$td->FILE => "object-types.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("type checks with object streams",
+             {$td->COMMAND => "test_driver 42 object-types-os.pdf"},
+             {$td->FILE => "object-types-os.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+# ----------
 $td->notify("--- Coalesce contents ---");
 $n_tests += 6;
 
@@ -1200,7 +1227,7 @@ $n_tests += @badfiles + 3;
 # have error conditions that used to be fatal but are now considered
 # non-fatal.
 my %badtest_overrides = ();
-for(6, 12..15, 17, 22..28, 30..32, 34, 36)
+for(6, 12..15, 17, 18..32, 34, 36)
 {
     $badtest_overrides{$_} = 0;
 }
@@ -1243,7 +1270,7 @@ $n_tests += @badfiles + 6;
 # though in some cases it may.  Acrobat Reader would not be able to
 # recover any of these files any better.
 my %recover_failures = ();
-for (1, 7, 16, 18..21, 29, 35)
+for (1, 7, 16, 35)
 {
     $recover_failures{$_} = 1;
 }

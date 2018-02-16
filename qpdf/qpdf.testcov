@@ -105,7 +105,6 @@ QPDF reconstructed xref table 0
 QPDF recovered in readObjectAtOffset 0
 QPDF recovered stream length 0
 QPDF found wrong endstream in recovery 0
-QPDFObjectHandle indirect to unknown 0
 QPDF_Stream pipeStreamData with null pipeline 0
 QPDFWriter not recompressing /FlateDecode 0
 QPDF_encryption xref stream from encrypted file 0
@@ -300,10 +299,37 @@ qpdf-c called qpdf_set_compress_streams 0
 qpdf-c called qpdf_set_preserve_unreferenced_objects 0
 qpdf-c called qpdf_set_newline_before_endstream 0
 QPDF_Stream TIFF predictor 0
-QPDFTokenizer EOF when not allowed 0
 QPDFTokenizer inline image at EOF 0
 Pl_QPDFTokenizer found ID 0
 QPDFObjectHandle non-stream in stream array 0
 QPDFObjectHandle coalesce called on stream 0
 QPDFObjectHandle coalesce provide stream data 0
 QPDF_Stream bad token at end during normalize 0
+QPDFObjectHandle bad token in parse 0
+QPDFObjectHandle eof in parseInternal 0
+QPDFObjectHandle array bounds 0
+QPDFObjectHandle boolean returning false 0
+QPDFObjectHandle integer returning 0 0
+QPDFObjectHandle real returning 0.0 0
+QPDFObjectHandle name returning dummy name 0
+QPDFObjectHandle string returning empty string 0
+QPDFObjectHandle string returning empty utf8 0
+QPDFObjectHandle operator returning fake value 0
+QPDFObjectHandle inlineimage returning empty data 0
+QPDFObjectHandle array treating as empty 0
+QPDFObjectHandle array null for non-array 0
+QPDFObjectHandle array treating as empty vector 0
+QPDFObjectHandle array ignoring set item 0
+QPDFObjectHandle array ignoring replace items 0
+QPDFObjectHandle array ignoring insert item 0
+QPDFObjectHandle array ignoring append item 0
+QPDFObjectHandle array ignoring erase item 0
+QPDFObjectHandle dictionary false for hasKey 0
+QPDFObjectHandle dictionary null for getKey 0
+QPDFObjectHandle dictionary empty set for getKeys 0
+QPDFObjectHandle dictionary empty map for asMap 0
+QPDFObjectHandle dictionary ignoring replaceKey 0
+QPDFObjectHandle dictionary ignoring removeKey 0
+QPDFObjectHandle dictionary ignoring removereplace 0
+QPDFObjectHandle numeric non-numeric 0
+QPDFObjectHandle erase array bounds 0

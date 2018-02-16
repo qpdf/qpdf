@@ -640,7 +640,9 @@ QPDFTokenizer::readToken(PointerHolder<InputSource> input,
                 presented_eof = true;
                 if ((this->m->type == tt_eof) && (! this->m->allow_eof))
                 {
-                    QTC::TC("qpdf", "QPDFTokenizer EOF when not allowed");
+                    // Nothing in the qpdf library calls readToken
+                    // without allowEOF anymore, so this case is not
+                    // exercised.
                     this->m->type = tt_bad;
                     this->m->error_message = "unexpected EOF";
                     offset = input->getLastOffset();
@@ -677,7 +679,10 @@ QPDFTokenizer::readToken(PointerHolder<InputSource> input,
 	input->unreadCh(char_to_unread);
     }
 
-    input->setLastOffset(offset);
+    if (token.getType() != tt_eof)
+    {
+        input->setLastOffset(offset);
+    }
 
     if (token.getType() == tt_bad)
     {

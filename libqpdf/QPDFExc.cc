@@ -32,7 +32,10 @@ QPDFExc::createWhat(std::string const& filename,
     }
     if (! (object.empty() && offset == 0))
     {
-	result += " (";
+        if (! filename.empty())
+        {
+            result += " (";
+        }
 	if (! object.empty())
 	{
 	    result += object;
@@ -45,7 +48,10 @@ QPDFExc::createWhat(std::string const& filename,
 	{
 	    result += "offset " + QUtil::int_to_string(offset);
 	}
-	result += ")";
+        if (! filename.empty())
+        {
+            result += ")";
+        }
     }
     if (! result.empty())
     {

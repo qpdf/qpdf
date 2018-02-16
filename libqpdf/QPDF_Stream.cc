@@ -39,6 +39,7 @@ QPDF_Stream::QPDF_Stream(QPDF* qpdf, int objid, int generation,
 	    "stream object instantiated with non-dictionary "
 	    "object for dictionary");
     }
+    setStreamDescription();
 }
 
 QPDF_Stream::~QPDF_Stream()
@@ -83,6 +84,35 @@ char const*
 QPDF_Stream::getTypeName() const
 {
     return "stream";
+}
+
+void
+QPDF_Stream::setDescription(QPDF* qpdf, std::string const& description)
+{
+    this->QPDFObject::setDescription(qpdf, description);
+    setDictDescription();
+}
+
+void
+QPDF_Stream::setStreamDescription()
+{
+    setDescription(
+        this->qpdf,
+        "stream object " + QUtil::int_to_string(this->objid) + " " +
+        QUtil::int_to_string(this->generation));
+}
+
+void
+QPDF_Stream::setDictDescription()
+{
+    QPDF* qpdf = 0;
+    std::string description;
+    if ((! this->stream_dict.hasObjectDescription()) &&
+        getDescription(qpdf, description))
+    {
+        this->stream_dict.setObjectDescription(
+            qpdf, description + " -> stream dictionary");
+    }
 }
 
 QPDFObjectHandle
@@ -688,6 +718,7 @@ void
 QPDF_Stream::replaceDict(QPDFObjectHandle new_dict)
 {
     this->stream_dict = new_dict;
+    setDictDescription();
     QPDFObjectHandle length_obj = new_dict.getKey("/Length");
     if (length_obj.isInteger())
     {

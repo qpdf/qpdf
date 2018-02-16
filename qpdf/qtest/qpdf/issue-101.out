@@ -56,4 +56,72 @@ WARNING: issue-101.pdf (object 11 0, offset 811): unknown token while reading ob
 WARNING: issue-101.pdf (object 11 0, offset 819): unknown token while reading object; treating as string
 WARNING: issue-101.pdf (object 11 0, offset 832): unknown token while reading object; treating as string
 WARNING: issue-101.pdf (object 11 0, offset 856): unexpected >
-issue-101.pdf (offset 856): unable to find /Root dictionary
+WARNING: issue-101.pdf (object 11 0, offset 857): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 868): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 887): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 897): unexpected )
+WARNING: issue-101.pdf (object 11 0, offset 898): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 909): invalid character (¤) in hexstring
+WARNING: issue-101.pdf (object 11 0, offset 911): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 929): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 930): invalid character (²) in hexstring
+WARNING: issue-101.pdf (object 11 0, offset 932): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 944): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 947): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 970): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1046): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1067): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1075): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1080): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1084): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1102): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1112): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1124): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1133): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1145): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1148): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1150): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1151): unexpected )
+WARNING: issue-101.pdf (object 11 0, offset 1153): unexpected dictionary close token
+WARNING: issue-101.pdf (object 11 0, offset 1156): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1163): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1168): unexpected >
+WARNING: issue-101.pdf (object 11 0, offset 1170): invalid character (I) in hexstring
+WARNING: issue-101.pdf (object 11 0, offset 1167): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-101.pdf (object 11 0, offset 1167): expected dictionary key but found non-name object; inserting key /QPDFFake2
+WARNING: issue-101.pdf (object 11 0, offset 1167): expected dictionary key but found non-name object; inserting key /QPDFFake3
+WARNING: issue-101.pdf (object 11 0, offset 1176): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1180): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1184): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1190): unexpected >
+WARNING: issue-101.pdf (object 11 0, offset 1192): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1195): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1205): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1217): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1224): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1236): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1242): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-101.pdf (object 11 0, offset 1242): dictionary ended prematurely; using null as value for last key
+WARNING: issue-101.pdf (object 11 0, offset 1275): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1287): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1291): unexpected dictionary close token
+WARNING: issue-101.pdf (object 11 0, offset 1294): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1306): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1322): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1325): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1329): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1341): treating unexpected array close token as null
+WARNING: issue-101.pdf (object 11 0, offset 1312): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-101.pdf (object 11 0, offset 1312): expected dictionary key but found non-name object; inserting key /QPDFFake2
+WARNING: issue-101.pdf (object 11 0, offset 1312): expected dictionary key but found non-name object; inserting key /QPDFFake3
+WARNING: issue-101.pdf (object 11 0, offset 1312): expected dictionary key but found non-name object; inserting key /QPDFFake4
+WARNING: issue-101.pdf (object 11 0, offset 1312): dictionary ended prematurely; using null as value for last key
+WARNING: issue-101.pdf (object 11 0, offset 1349): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1353): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1357): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1359): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1368): unexpected )
+WARNING: issue-101.pdf (object 11 0, offset 1373): expected endobj
+WARNING: issue-101.pdf (object 8 0, offset 4067): invalid character ()) in hexstring
+WARNING: issue-101.pdf (object 8 0, offset 4069): expected endobj
+qpdf: operation succeeded with warnings; resulting file may have some problems

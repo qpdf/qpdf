@@ -1,0 +1,41 @@
+WARNING: object-types.pdf, object 8 0 at offset 657: operation for string attempted on object of type dictionary: returning empty string
+WARNING: object-types.pdf, object 8 0 at offset 717: returning null for out of bounds array access
+WARNING: object-types.pdf, object 8 0 at offset 717: returning null for out of bounds array access
+WARNING: object-types.pdf, object 8 0 at offset 669: operation for array attempted on object of type integer: returning null
+WARNING: object-types.pdf, object 8 0 at offset 669: operation for array attempted on object of type integer: ignoring attempt to append item
+WARNING: object-types.pdf, object 8 0 at offset 717: ignoring attempt to erase out of bounds array item
+WARNING: object-types.pdf, object 8 0 at offset 717: ignoring attempt to erase out of bounds array item
+WARNING: object-types.pdf, object 8 0 at offset 669: operation for array attempted on object of type integer: ignoring attempt to erase item
+WARNING: object-types.pdf, object 8 0 at offset 669: operation for array attempted on object of type integer: ignoring attempt to insert item
+WARNING: object-types.pdf, object 8 0 at offset 669: operation for array attempted on object of type integer: ignoring attempt to replace items
+WARNING: object-types.pdf, object 8 0 at offset 669: operation for array attempted on object of type integer: ignoring attempt to set item
+WARNING: object-types.pdf, object 8 0 at offset 669: operation for array attempted on object of type integer: treating as empty
+WARNING: object-types.pdf, object 8 0 at offset 669: operation for array attempted on object of type integer: treating as empty
+WARNING: object-types.pdf, object 8 0 at offset 669: operation for boolean attempted on object of type integer: returning false
+WARNING: object-types.pdf, object 8 0 at offset 669: operation for dictionary attempted on object of type integer: treating as empty
+WARNING: object-types.pdf, object 8 0 at offset 669: operation for dictionary attempted on object of type integer: treating as empty
+WARNING: object-types.pdf, object 8 0 at offset 669: operation for dictionary attempted on object of type integer: returning false for a key containment request
+WARNING: object-types.pdf, object 8 0 at offset 669: operation for dictionary attempted on object of type integer: ignoring key removal request
+WARNING: object-types.pdf, object 8 0 at offset 669: operation for dictionary attempted on object of type integer: ignoring key removal/replacement request
+WARNING: object-types.pdf, object 8 0 at offset 669: operation for dictionary attempted on object of type integer: ignoring key removal/replacement request
+WARNING: object-types.pdf, object 8 0 at offset 669: operation for dictionary attempted on object of type integer: ignoring key replacement request
+WARNING: object-types.pdf, object 8 0 at offset 669: operation for dictionary attempted on object of type integer: returning null for attempted key retrieval
+WARNING: object-types.pdf, object 8 0 at offset 669: operation for inlineimage attempted on object of type integer: returning empty data
+WARNING: object-types.pdf, object 8 0 at offset 687: operation for integer attempted on object of type dictionary: returning 0
+WARNING: object-types.pdf, object 8 0 at offset 669: operation for name attempted on object of type integer: returning dummy name
+WARNING: object-types.pdf, object 8 0 at offset 669: operation for operator attempted on object of type integer: returning fake value
+WARNING: object-types.pdf, object 8 0 at offset 687: operation for real attempted on object of type dictionary: returning 0.0
+WARNING: object-types.pdf, object 8 0 at offset 669: operation for string attempted on object of type integer: returning empty string
+WARNING: object-types.pdf, object 8 0 at offset 669: operation for string attempted on object of type integer: returning empty string
+WARNING: object-types.pdf, object 8 0 at offset 687: operation for number attempted on object of type dictionary: returning 0
+One error
+WARNING: object-types.pdf, object 8 0 at offset 724: operation for string attempted on object of type name: returning empty string
+One error
+WARNING: object-types.pdf, object 8 0 at offset 687 -> dictionary key /Quack: operation for string attempted on object of type null: returning empty string
+Two errors
+WARNING: object-types.pdf, object 8 0 at offset 717: returning null for out of bounds array access
+WARNING: object-types.pdf, object 8 0 at offset 717 -> null returned from invalid array access: operation for string attempted on object of type null: returning empty string
+One error
+WARNING: object-types.pdf, object 8 0 at offset 745: operation for string attempted on object of type name: returning empty string
+WARNING: object-types.pdf, object 4 0 at offset 386 -> dictionary key /Potato: operation for name attempted on object of type null: returning dummy name
+test 42 done

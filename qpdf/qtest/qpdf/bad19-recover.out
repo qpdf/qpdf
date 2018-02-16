@@ -1,4 +1,7 @@
-WARNING: bad19.pdf: file is damaged
 WARNING: bad19.pdf (trailer, offset 753): unexpected >
-WARNING: bad19.pdf: Attempting to reconstruct cross-reference table
-bad19.pdf (trailer, offset 753): unexpected >
+/QTest is implicit
+/QTest is direct and has type null (2)
+/QTest is null
+unparse: null
+unparseResolved: null
+test 1 done
