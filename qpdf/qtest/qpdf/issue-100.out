@@ -1,13 +1,13 @@
 WARNING: issue-100.pdf: file is damaged
 WARNING: issue-100.pdf (file position 736): xref not found
 WARNING: issue-100.pdf: Attempting to reconstruct cross-reference table
-WARNING: issue-100.pdf (file position 268): unknown token while reading object; treating as string
-WARNING: issue-100.pdf (file position 286): unknown token while reading object; treating as string
-WARNING: issue-100.pdf (file position 289): unknown token while reading object; treating as string
-WARNING: issue-100.pdf (file position 294): unknown token while reading object; treating as string
-WARNING: issue-100.pdf (file position 297): unknown token while reading object; treating as string
-WARNING: issue-100.pdf (file position 304): unknown token while reading object; treating as string
-WARNING: issue-100.pdf (file position 308): unexpected )
+WARNING: issue-100.pdf (object 5 0, file position 268): unknown token while reading object; treating as string
+WARNING: issue-100.pdf (object 5 0, file position 286): unknown token while reading object; treating as string
+WARNING: issue-100.pdf (object 5 0, file position 289): unknown token while reading object; treating as string
+WARNING: issue-100.pdf (object 5 0, file position 294): unknown token while reading object; treating as string
+WARNING: issue-100.pdf (object 5 0, file position 297): unknown token while reading object; treating as string
+WARNING: issue-100.pdf (object 5 0, file position 304): unknown token while reading object; treating as string
+WARNING: issue-100.pdf (object 5 0, file position 308): unexpected )
 WARNING: issue-100.pdf (object 5 0, file position 418): /Length key in stream dictionary is not an integer
 WARNING: issue-100.pdf (object 5 0, file position 489): attempting to recover stream length
 WARNING: issue-100.pdf (object 5 0, file position 489): recovered stream length: 12

@@ -1269,7 +1269,8 @@ QPDF::readObject(PointerHolder<InputSource> input,
         decrypter = decrypter_ph.getPointer();
     }
     QPDFObjectHandle object = QPDFObjectHandle::parse(
-        input, description, this->m->tokenizer, empty, decrypter, this);
+        input, this->m->last_object_description,
+        this->m->tokenizer, empty, decrypter, this);
     if (empty)
     {
         // Nothing in the PDF spec appears to allow empty objects, but
