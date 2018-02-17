@@ -442,6 +442,13 @@ class QPDFObjectHandle
     // Methods for string objects
     QPDF_DLL
     std::string getStringValue();
+    // If a string starts with the UTF-16 marker, it is converted from
+    // UTF-16 to UTF-8. Otherwise, it is treated as a string encoded
+    // with PDF Doc Encoding. PDF Doc Encoding is identical to
+    // ISO-8859-1 except in the range from 0200 through 0240, where
+    // there is a mapping of characters to Unicode. QPDF versions
+    // prior to version erroneously left characters in that range
+    // unmapped.
     QPDF_DLL
     std::string getUTF8Value();
 

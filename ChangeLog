@@ -1,5 +1,8 @@
 2018-02-17  Jay Berkenbilt  <ejb@ql.org>
 
+	* Fix QPDFObjectHandle::getUTF8Val() to properly handle strings
+	that are encoded with PDF Doc Encoding. Fixes #179.
+
 	* Add qpdf_check_pdf to the "C" API. This method just attempts to
 	read the entire file and produce no output, making possible to
 	assess whether the file has any errors that qpdf can detect.

@@ -84,6 +84,16 @@ flush_tiff_cache();
 
 show_ntests();
 # ----------
+$td->notify("--- PDF Doc Encoding ---");
+$n_tests += 1;
+
+$td->runtest("PDF doc encoding to Unicode",
+	     {$td->COMMAND => "test_pdf_doc_encoding pdf-doc-to-utf8.in"},
+	     {$td->FILE => "pdf-doc-to-utf8.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+show_ntests();
+# ----------
 $td->notify("--- Stream Replacement Tests ---");
 $n_tests += 8;
 
