@@ -1,5 +1,9 @@
 2018-02-17  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add qpdf_check_pdf to the "C" API. This method just attempts to
+	read the entire file and produce no output, making possible to
+	assess whether the file has any errors that qpdf can detect.
+
 	* Major enhancements to handling of type errors within the qpdf
 	library. This fix is intended to eliminate those annoying cases
 	where qpdf would exit with a message like "operation for

@@ -2495,6 +2495,21 @@ foreach my $d (@enc_key)
 
 show_ntests();
 # ----------
+$td->notify("--- Check from C API ---");
+my @c_check_types = qw(warn clear);
+$n_tests += scalar(@c_check_types);
+
+foreach my $i (@c_check_types)
+{
+    $td->runtest("C check $i",
+                 {$td->COMMAND => "qpdf-ctest 23 c-check-$i-in.pdf '' -"},
+                 {$td->FILE => "c-check-$i.out",
+                      $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+show_ntests();
+# ----------
 $td->notify("--- Content Preservation Tests ---");
 # $n_tests incremented below
 

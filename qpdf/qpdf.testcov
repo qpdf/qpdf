@@ -333,3 +333,4 @@ QPDFObjectHandle dictionary ignoring removeKey 0
 QPDFObjectHandle dictionary ignoring removereplace 0
 QPDFObjectHandle numeric non-numeric 0
 QPDFObjectHandle erase array bounds 0
+qpdf-c called qpdf_check_pdf 0
