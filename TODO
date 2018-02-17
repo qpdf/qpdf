@@ -40,23 +40,11 @@ Soon
 Lexical
 =======
 
-Consider rewriting the tokenizer. These are rough ideas at this point.
-I may or may not do this as described.
-
- * Use flex. Generate them from ./autogen.sh and include them in the
-   source package, but do not commit them.
-
- * Make it possible to run the lexer (tokenizer) over a while file
+ * Make it possible to run the lexer (tokenizer) over a whole file
    such that the following things would be possible:
 
    * Rewrite fix-qdf in C++ so that there is no longer a runtime perl
      dependency
-
-   * Create a way to filter content streams that could be used to
-     preserve the content stream exactly including spaces but also to
-     do things like replace everything between a detected set of
-     markers. This is to support form flattening. Ideally, it should
-     be possible to use this programmatically on broken files.
 
    * Make it possible to replace all strings in a file lexically even
      on badly broken files. Ideally this should work files that are
