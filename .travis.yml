@@ -4,28 +4,10 @@ sudo: require
 dist: trusty
 
 script:
-  - ./autogen.sh
-  - ./configure --prefix=/usr
-  - make -j$(nproc)
-  - make check
-  - make install DESTDIR=$(readlink -f appdir) ; find appdir/
-  - rm -rf appdir/usr/include/ appdir/usr/lib/pkgconfig/ appdir/usr/lib/*.{a,la} # Don't bundle developer stuff
-  - sudo mv appdir/usr/lib/* /usr/local/lib/ # Workaround for https://github.com/probonopd/linuxdeployqt/issues/160
-  - mkdir -p appdir/usr/share/icons/hicolor/128x128/apps ; cp dist/qpdf.png appdir/usr/share/icons/hicolor/128x128/apps/
-  - mkdir -p appdir/usr/share/applications ; cp dist/qpdf.desktop appdir/usr/share/applications/
-  - wget -c "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
-  - chmod a+x linuxdeployqt*.AppImage
-  - unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
-  - export LD_LIBRARY_PATH=/usr/local/lib/ # Workaround for https://github.com/probonopd/linuxdeployqt/issues/160
-  - ./linuxdeployqt*.AppImage ./appdir/usr/share/applications/*.desktop -bundle-non-qt-libs
-  - # In addition to the main executable, we have additional ones to process
-  - # ./linuxdeployqt*.AppImage ./appdir/usr/bin/fix-qdf -bundle-non-qt-libs # Not an ELF?
-  - ./linuxdeployqt*.AppImage ./appdir/usr/bin/zlib-flate -bundle-non-qt-libs
-  - # Generate AppImage
-  - ./linuxdeployqt*.AppImage --appimage-extract
-  - rm ./appdir/AppRun ; cp dist/AppRun appdir/ ; chmod a+x ./appdir/AppRun # Replace symlink with custom script
-  - PATH=./squashfs-root/usr/bin:$PATH ./squashfs-root/usr/bin/appimagetool ./appdir/
+  - appimage/build-appimage
 
 after_success:
+  - cd appimage/build
   - find ./appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
   - curl --upload-file ./QPDF*.AppImage https://transfer.sh/QPDF-git.$(git rev-parse --short HEAD)-x86_64.AppImage
+  - sha512sum ./QPDF*.AppImage

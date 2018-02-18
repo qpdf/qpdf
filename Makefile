@@ -90,6 +90,7 @@ export QPDF_SKIP_TEST_COMPARE_IMAGES
 export QPDF_LARGE_FILE_TEST_PATH
 
 clean:: $(CLEAN_TARGETS)
+	$(RM) -r appimage/build
 
 .PHONY: $(CLEAN_TARGETS)
 $(foreach B,$(BUILD_ITEMS),$(eval \

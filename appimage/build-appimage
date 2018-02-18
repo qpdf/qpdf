@@ -1,0 +1,36 @@
+#!/bin/sh
+set -ex
+here="$(dirname $(readlink -f "$0"))"
+top=$(dirname $here)
+cd $top
+appdir=$here/build/appdir
+rm -rf $here/build
+./autogen.sh
+./configure --prefix=/usr --enable-werror --enable-show-failed-test-output
+make -j$(nproc)
+make check
+mkdir -p $appdir
+make install DESTDIR=$appdir; find $appdir
+cd $here/build
+# Don't bundle developer stuff
+rm -rf appdir/usr/include appdir/usr/lib/pkgconfig appdir/usr/lib/*.{a,la,so}
+rm -rf appdir/usr/share/doc appdir/usr/share/man
+for i in appdir/usr/share/icons/hicolor/128x128/apps; do
+    mkdir -p $i
+    cp $top/logo/qpdf.svg $i
+    convert -resize '128x128>' $top/logo/qpdf.svg $i/qpdf.png
+done
+for i in appdir/usr/share/applications; do mkdir -p $i; cp $top/appimage/qpdf.desktop $i; done
+wget -c "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+chmod a+x linuxdeployqt*.AppImage
+unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
+./linuxdeployqt*.AppImage appdir/usr/share/applications/*.desktop -bundle-non-qt-libs
+# In addition to the main executable, we have additional ones to process
+./linuxdeployqt*.AppImage appdir/usr/bin/zlib-flate -bundle-non-qt-libs
+# Generate AppImage
+./linuxdeployqt*.AppImage --appimage-extract
+rm appdir/AppRun ; cp $top/appimage/AppRun appdir; chmod a+x appdir/AppRun # Replace symlink with custom script
+PATH=./squashfs-root/usr/bin:$PATH ./squashfs-root/usr/bin/appimagetool appdir
+echo ""
+echo "*** AppImage is ready in appimage/build ***"
+echo ""

@@ -1,6 +1,7 @@
 *.pdb
 .lineno
 aclocal.m4
+appimage/build
 autoconf.mk
 autofiles.zip
 autom4te.cache/
