@@ -3,7 +3,7 @@
 %%Title: qpdf logo
 %%CreationDate: $Date: 2000/02/11 03:25:50 $
 %%Orientation: Portrait
-%%BoundingBox: 0 0 512 420
+%%BoundingBox: 0 0 128 105
 %%Pages: 0
 %%EndComments
 %
@@ -21,7 +21,9 @@
 
 %%BeginProlog
 
-% Bounding box and page bounding box must match fullwidth and fullheight.
+% Bounding box and page bounding box must match fullwidth and
+% fullheight when adjusted by the scale factor.
+
 /fullheight 420 def % must be { outerheight linewidth add }
 /fullwidth 512 def
 
@@ -61,8 +63,9 @@
 %%EndProlog
 
 %%Page: 1 1
-%%PageBoundingBox: 0 0 512 420
+%%PageBoundingBox: 0 0 128 105
 
+.25 dup scale
 linewidth 2 div fullheight outerheight sub 2 div translate
 drawOuter
 gsave
