@@ -1,8 +1,8 @@
 # QPDF [![Build Status](https://travis-ci.org/qpdf/qpdf.svg?branch=master)](https://travis-ci.org/qpdf/qpdf)
 
-[![QPDF](logo/qpdf.svg)](https://qpdf.sourceforge.net)
+[![QPDF](logo/qpdf.svg)](http://qpdf.sourceforge.net)
 
-This is the QPDF package.  Information about it can be found at https://qpdf.sourceforge.net.  The source code repository is hosted at github: https://github.com/qpdf/qpdf.
+This is the QPDF package.  Information about it can be found at http://qpdf.sourceforge.net.  The source code repository is hosted at github: https://github.com/qpdf/qpdf.
 
 QPDF is copyright (c) 2005-2018 Jay Berkenbilt
 
