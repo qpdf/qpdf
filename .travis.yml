@@ -13,14 +13,14 @@ script:
 after_success:
   - cd appimage/build
   - find ./appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
-  - curl --upload-file ./QPDF*.AppImage https://transfer.sh/QPDF-git.$(git rev-parse --short HEAD)-x86_64.AppImage
-  - sha512sum ./QPDF*.AppImage
-  - export _appimage=$(basename $(ls -1 ./QPDF*.AppImage))
+  - curl --upload-file ./qpdf*.AppImage https://transfer.sh/qpdf-git.$(git rev-parse --short HEAD)-x86_64.AppImage
+  - sha512sum ./qpdf*.AppImage
+  - export _appimage=$(basename $(ls -1 ./qpdf*.AppImage))
   - ls -l $_appimage
   - export major_version=$( ./$_appimage --version | grep "qpdf version" | awk '{print $3}' )
-  - mv  $_appimage QPDF-$major_version-git.$(git rev-parse --short HEAD)-x86_64.AppImage
-  - echo QPDF-$major_version-git.$(git rev-parse --short HEAD)-x86_64.AppImage
-  - ls -l QPDF-*.AppImage*
+  - mv  $_appimage qpdf-$major_version-git.$(git rev-parse --short HEAD)-x86_64.AppImage
+  - echo qpdf-$major_version-git.$(git rev-parse --short HEAD)-x86_64.AppImage
+  - ls -l qpdf-*.AppImage*
   - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
-  - bash upload.sh QPDF-$major_version-git.$(git rev-parse --short HEAD)-x86_64.AppImage
-  - bash upload.sh QPDF-x86_64.AppImage.zsync
+  - bash upload.sh qpdf-$major_version-git.$(git rev-parse --short HEAD)-x86_64.AppImage
+  - bash upload.sh qpdf-x86_64.AppImage.zsync
