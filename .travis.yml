@@ -13,5 +13,5 @@ script:
 after_success:
   - cd appimage/build
   - find ./appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
-  - curl --upload-file ./QPDF*.AppImage https://transfer.sh/QPDF-git.$(git rev-parse --short HEAD)-x86_64.AppImage
-  - sha512sum ./QPDF*.AppImage
+  - curl --upload-file ./qpdf*.AppImage https://transfer.sh/qpdf-git.$(git rev-parse --short HEAD)-x86_64.AppImage
+  - sha512sum ./qpdf*.AppImage

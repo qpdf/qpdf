@@ -4,7 +4,7 @@
 .SH NAME
 fix-qdf \- repair PDF files in QDF form after editing
 .SH SYNOPSIS
-.B qpdf
+.B fix-qdf
 < \fIinfilename\fR > \fIoutfilename\fR
 .SH DESCRIPTION
 The fix-qdf program is part of the qpdf package.

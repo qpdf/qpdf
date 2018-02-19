@@ -2,6 +2,6 @@
 Type=Application
 Terminal=true
 Exec=qpdf
-Name=QPDF
+Name=qpdf
 Comment=Structural, content-preserving transformations on PDF files
 Icon=qpdf

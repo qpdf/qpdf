@@ -27,6 +27,7 @@
   * libqpdf/QPDF.cc
   * manual/qpdf-manual.xml
   `make_dist` verifies this consistency.
+* Generate a signed AppImage. To do this, have the gpg key available and run `./appimage/build-appimage --sign`. Rename the AppImage in appimage/build to qpdf-<version>-x86_64.AppImage and include it in the set of files to be released.
 * Update release date in `manual/qpdf-manual.xml`.  Remember to ensure that the entities at the top of the document are consistent with the release notes for both version and release date.
 * Check `TODO` file to make sure all planned items for the release are done or retargeted.
 * Each year, update copyright notices. Just do a case-insensitive search for copyright. Don't forget copyright in manual. Also update debian copyright in debian package. Last updated: 2018.
@@ -58,6 +59,12 @@
   git tag -s release-qpdf-$version HEAD -m"qpdf $version"
   ```
 * When releasing on sourceforge, `external-libs` distributions go in `external-libs/yyyymmdd`, and qpdf distributions go in `qpdf/vvv`. Make the source package the default for all but Windows, and make the 32-bit mingw build the default for Windows.
+* Prepare and archive all release files. Files should be the source package, Windows binaries, AppImage, checksum files, and signature files.
+* Create a github release after pushing the tag. `gcurl` is an alias that includes the auth token.
+  ```
+  url=$(gcurl -s -XPOST https://api.github.com/repos/qpdf/qpdf/releases -d'{"tag_name": "release-qpdf-$version", "name": "qpdf $version", "draft": true, "body": "test *body* text"}' | jq -r '.url')
+  ```
+* Upload files to sourceforge and github. Publish the github release. Release notes can be added to the github release manually. Publish a news item manually on sourceforge. Email the qpdf-announce list.
 
 # General Build Stuff
 

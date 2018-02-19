@@ -56,11 +56,13 @@ allowPrintLowRes
 antivirus
 aobjid
 apexcovantage
-API
+api
 APIs
 appendable
 appendItem
 appendString
+AppImage
+appimage
 arandom
 arg
 argc
@@ -95,6 +97,7 @@ assertType
 assignCompressedObjectNumbers
 atof
 atoi
+auth
 AuthEvent
 autobuilder
 autoconf
@@ -198,6 +201,7 @@ CHPageOffsetEntry
 CHSharedObject
 CHSharedObjectEntry
 CHSomething
+ci
 cin
 cinfo
 ciphertext
@@ -482,6 +486,7 @@ Gagic
 GajiÄ
 Gajic
 gcc
+gcurl
 gen
 generateHintStream
 generateID
@@ -606,6 +611,7 @@ gm
 gmail
 GNUC
 gnuwin
+gpg
 grayscale
 grep
 gsdnld
@@ -754,6 +760,7 @@ JMSG
 jpeg
 jpeglib
 JPOOL
+jq
 JSAMPARRAY
 JSAMPLE
 JSAMPROW
@@ -864,6 +871,7 @@ msg
 msvc
 MSVC's
 msys
+MT
 multibyte
 multiline
 multipage
@@ -1171,6 +1179,7 @@ replaceObject
 replaceOrRemoveKey
 replaceReserved
 replaceStreamData
+repos
 reserveObjects
 resetBits
 resolveLiteral
@@ -1345,6 +1354,7 @@ Subtype
 sudo
 supp
 suppressions
+svg
 swapObjects
 swversion
 Symlink
@@ -1384,6 +1394,7 @@ Toolchains
 toupper
 toUTF
 tp
+travis
 TrimBox
 trimTrailerForWrite
 tt
@@ -1526,6 +1537,7 @@ xor
 XP
 xpacket
 xpdf
+XPOST
 XRef
 xref
 xrefEntry
