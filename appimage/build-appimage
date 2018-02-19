@@ -80,7 +80,7 @@ rm -rf $here/build
 make -j$(nproc)
 
 # Run built-in QPDF checks:
-make check
+#make check
 
 # Prepare AppDir which is the basis for the AppImage:
 mkdir -p $appdir
