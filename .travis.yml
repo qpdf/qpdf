@@ -5,7 +5,7 @@ dist: trusty
 
 install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq docbook* fop xsltproc
+  - sudo apt-get install -qq docbook* fop xsltproc less busybox
 
 script:
   - appimage/build-appimage
@@ -15,3 +15,10 @@ after_success:
   - find ./appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
   - curl --upload-file ./qpdf*.AppImage https://transfer.sh/qpdf-git.$(git rev-parse --short HEAD)-x86_64.AppImage
   - sha512sum ./qpdf*.AppImage
+  - export _appimage=$(basename $(ls -1 ./qpdf*.AppImage))
+  - ls -l $_appimage
+  - export major_version=$( ./$_appimage --version | grep "qpdf version" | awk '{print $3}' )
+  - mv  $_appimage qpdf-$major_version-git.$(git rev-parse --short HEAD)-x86_64.AppImage
+  - echo qpdf-$major_version-git.$(git rev-parse --short HEAD)-x86_64.AppImage
+  - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
+  - bash upload.sh qpdf-$major_version-git.$(git rev-parse --short HEAD)-x86_64.AppImage
