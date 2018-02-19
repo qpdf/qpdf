@@ -23,9 +23,9 @@
 HERE="$(dirname "$(readlink -f "${0}")")"
 
 # Set APPDIR and ARGV0 when running directly from the AppDir.
-# Running from the AppDir can be beneficial when debugging the AppImage (or performance improvements):
+# Running from the AppDir can be beneficial when debugging the AppImage (or give performance improvements):
 if [ -z $APPDIR ]; then
-    APPDIR=$(readlink -f $(dirname "$0"))
+    APPDIR="$HERE"
     ARGV0="$0"
 fi
 
@@ -403,13 +403,7 @@ if [ ! -z $APPIMAGE ] ; then
         echo CALLED_SUBCMD=$CALLED_SUBCMD   1>&2  # Don't leak strings into output of qpdf|fix-pdf|zlib-flate going to stdout!
     fi
 
-    if [ x"$1" == "x" -o x"$1" = "xqpdf" ] ; then
-            # We are invoked as the 'naked' AppImage, or with 'qpdf' as the sub-command
-            shift
-            exec "$HERE/usr/bin/qpdf" "$@"
-    fi
-
-    if [ -e "$HERE/usr/bin/$BINARY_NAME" ] ; then
+    if [ -x "$HERE/usr/bin/$BINARY_NAME" ] && [ x"$BINARY_NAME" != "x" ] ; then
         # We are invoked from a symlink (like 'fix-qdf' or 'zlib-flate')
         if [ "x$SET_SHOW_ENV_FOR_APPRUN" == "xYeSS" ] ; then
             # We have the (hidden) env var for debugging stuff set
@@ -417,10 +411,11 @@ if [ ! -z $APPIMAGE ] ; then
             echo APPIMAGE=$APPIMAGE             1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
             echo CALLED_SUBCMD=$CALLED_SUBCMD   1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
         fi
+        shift
         exec "$HERE/usr/bin/$BINARY_NAME" "$@"
 
     else
-        if [ -e "$HERE/usr/bin/$1" ] ; then
+        if [ -x "$HERE/usr/bin/$CALLED_SUBCMD" ] && [ x"$CALLED_SUBCMD" != "x" ] ; then
             # We are invoked by a (currently not yet known future) binary name which may be located in ./usr/bin/ ...
             BINARY_NAME=$1
             if [ "x$SET_SHOW_ENV_FOR_APPRUN" == "xYeSS" ] ; then
@@ -431,9 +426,9 @@ if [ ! -z $APPIMAGE ] ; then
             fi
             shift
             exec "$HERE/usr/bin/$BINARY_NAME" "$@"
-        elif [ -e "$HERE/$1" ] ; then
+        elif [ -x "$HERE/$CALLED_SUBCMD" ] && [ x"$CALLED_SUBCMD" != "x" ] ; then
             # We are invoked by a (currently not yet known future) binary name which may be located in our root AppDir ...
-            BINARY_NAME=$1
+            BINARY_NAME=$CALLED_SUBCMD
             if [ "x$SET_SHOW_ENV_FOR_APPRUN" == "xYeSS" ] ; then
                 # We have the (hidden) env var for debugging stuff set
                 echo BINARY_NAME=$BINARY_NAME       1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
@@ -460,7 +455,7 @@ else
         echo CALLED_SUBCMD=$CALLED_SUBCMD   1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
     fi
 
-    if [ -e "$HERE/usr/bin/$CALLED_SUBCMD" ] && [ "x$CALLED_SUBCMD" != "x" ]; then
+    if [ -x "$HERE/usr/bin/$CALLED_SUBCMD" ] && [ "x$CALLED_SUBCMD" != "x" ]; then
         #echo befor shift dollar_at=$@
         if [ "x$SET_SHOW_ENV_FOR_APPRUN" == "xYeSS" ] ; then
             # We have the (hidden) env var for debugging stuff set
@@ -473,7 +468,7 @@ else
         #echo CALLED_SUBCMD=$CALLED_SUBCMD
         exec "$HERE/usr/bin/$CALLED_SUBCMD" "$@"
 
-    elif [ -e "$HERE/usr/bin/$BINARY_NAME" ] ; then
+    elif [ -x "$HERE/usr/bin/$BINARY_NAME" ] && [ "x$BINARY_NAME" != "x" ] ; then
         if [ "x$SET_SHOW_ENV_FOR_APPRUN" == "xYeSS" ] ; then
             # We have the (hidden) env var for debugging stuff set
             echo BINARY_NAME=$BINARY_NAME       1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
