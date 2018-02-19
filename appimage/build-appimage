@@ -1,38 +1,147 @@
 #!/bin/sh
+
+# Copyright (c) 2018 Jay Berkenbilt and Kurt Pfeifle
+#
+# This script is mainly meant to build an 'AppImage' from GitHub sources of QPDF via Travis CI on an
+# Ubuntu Trusty (14.04) LTS system (see https://appimage.org/).
+#
+# But it also allows Linux users to build such an AppImage on their own systems. Please read
+# 'README.md' from the top level Git sources to see what preconditions you must meet to build QPDF
+# in general. The same apply to build an AppImage. Then follow these three steps:
+#
+#   1. Clone Git sources:  `git clone https://github.com/qpdf/qpdf.git git.qpdf`
+#   2. Change into git dir:  `cd git.qpdf`
+#   3. Run this script:  `bash appimage/build-appimage`
+#
+# The resulting AppImage will be placed in './appimage/build/QPDF-x86_64.AppImage'.
+# Read the output of the script for hints in case something goes wrong.
+#
+# You may pass custom options for the configure step by setting them into the 'CUSTOM_CONFIGURE'
+# environment variable and exporting it before running this script. For example:
+#
+#      export CUSTOM_CONFIGURE=" --enable-test-compare-images [--more-other-options]"
+#
+# ATTENTION:
+#
+#   1. To build the AppImage you should have a working internet connection.
+#      Reason: the script downloads the most recent 'linuxdeployqt' utility for building the AppImage.
+#   2. If you build the AppImage on a too recent Linux distribution, it may only work on the exact
+#      distribution you build it on. For an AppImage to work on a wide range of different
+#      distributions from the last 3-4 years if should be built on Ubuntu Trusty (14.04).
+
+
 set -ex
+
+# Check if we are on Ubuntu Trusty
+_osversion=$(cat /etc/os-release | grep PRETTY_NAME | awk -F'=' '{print $2}' | sed 's#"##g')
+
+# Warn users building the AppImage locally:
+if [ x"$_osversion" != x"Ubuntu 14.04.5 LTS" ] ; then
+set +x
+    echo ""
+    echo "+==============================================================================================================+"
+    echo "|| WARNING: You are about to build a QPDF AppImage on a system which is NOT Ubuntu 14.04.5 LTS ('Trusty').    ||"
+    echo "||                                                                                                            ||"
+    echo "||    Very likely you use a newer Linux distribution.                                                         ||"
+    echo "||    The resulting AppImage will not be 'universally' usable.                                                ||"
+    echo "||    Hence, it likely will not be capable of running on a large range of Linux distributions.                ||"
+    echo "||    It will only reliably run on the very same systems it has been created on, and maybe some similar ones. ||"
+    echo "+==============================================================================================================+"
+    echo ""
+set -x
+fi
+
+
+# From where do we run this script?
 here="$(dirname $(readlink -f "$0"))"
 top=$(dirname $here)
+
+# Move to root of GitHub sources:
 cd $top
+
+# Set 'appdir' environment variable name:
 appdir=$here/build/appdir
+
+# Clean up stuff from previous build attempts:
 rm -rf $here/build
+
+# Prepare build of QPDF from sources:
 ./autogen.sh
-./configure --prefix=/usr --enable-werror --enable-show-failed-test-output
+./configure --prefix=/usr --enable-werror --enable-show-failed-test-output --enable-html-doc --enable-pdf-doc "$CUSTOM_CONFIGURE"
+
+# Build!
 make -j$(nproc)
+
+# Run built-in QPDF checks:
 make check
+
+# Prepare AppDir which is the basis for the AppImage:
 mkdir -p $appdir
+
+# Install build result into AppDir:
 make install DESTDIR=$appdir ; find $appdir
+
+# Change into build directory:
 cd $here/build
+
 # Don't bundle developer stuff
-rm -rf appdir/usr/include appdir/usr/lib/pkgconfig appdir/usr/lib/*.{a,la,so}
-#rm -rf appdir/usr/share/doc appdir/usr/share/man
+rm -rf appdir/usr/include appdir/usr/lib/pkgconfig appdir/usr/lib/*.{a,la}
+
+# Copy icon which is needed for desktop integration into place:
 for i in appdir/usr/share/icons/hicolor/512x512/apps ; do
     mkdir -p $i
     cp $top/logo/qpdf.png $i
-    #convert -resize '128x128>' $top/logo/qpdf.svg $i/qpdf.png
 done
+
+# Copy .desktop and .appdata.xml metadata for desktop integration into place:
 for i in appdir/usr/share/applications ; do mkdir -p $i ; cp $top/appimage/qpdf.desktop     $i ; done
 for i in appdir/usr/share/metainfo ;     do mkdir -p $i ; cp $top/appimage/qpdf.appdata.xml $i ; done
+for i in appdir/usr/share/doc/qpdf ;     do mkdir -p $i ; cp $top/README* $i ; cp $top/NOTICE.md $i/README-notice.md ; cp $top/LICENSE.txt $i ; cp $top/Artistic-2.0 $i/Artistic-LICENSE.txt ; cp $top/ChangeLog $i/README-ChangeLog ; cp $top/TODO $i/README-todo ; done
+
+# The following lines are experimental (for debugging; and to test support for unexpected future binaries added to QPDF):
+for i in /usr/bin/env /bin/{less,busybox} ; do cp $i appdir/usr/bin/ ; done
+
+# Fetch 'linuxdeployqt' which will transform the AppDir into an AppImage:
 wget -c "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
 chmod a+x linuxdeployqt*.AppImage
-unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
+
+# Set up a clean environment:
+unset QTDIR ; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
+
+# Let 'linuxdeployqt' do its first stage of work:
 ./linuxdeployqt*.AppImage appdir/usr/share/applications/*.desktop -bundle-non-qt-libs
+
 # In addition to the main executable, we have additional ones to process
 ./linuxdeployqt*.AppImage appdir/usr/bin/zlib-flate -bundle-non-qt-libs
-#./linuxdeployqt*.AppImage appdir/usr/bin/fix-qdf -bundle-non-qt-libs
-# Generate AppImage
+
+# To eventually generate the AppImage we extract the linuxdeployqt AppImage to get access to the embedded 'appimagetool':
 ./linuxdeployqt*.AppImage --appimage-extract
-rm appdir/AppRun ; cp $top/appimage/AppRun appdir; chmod a+x appdir/AppRun # Replace symlink with custom script
-PATH=./squashfs-root/usr/bin:$PATH ./squashfs-root/usr/bin/appimagetool -g appdir
+
+# We want to run our custom AppRun script:
+rm appdir/AppRun ; cp $top/appimage/AppRun appdir ; chmod a+x appdir/AppRun # Replace symlink with custom script
+
+# If we are not on Ubuntu Trusty, we need to disable 'appstreamcli' validation:
+if [ x"$_osversion" == x"Ubuntu 14.04.5 LTS" ] ; then
+    appimagetool_param=""
+else
+    appimagetool_param="-n"
+    set +x
+    echo ""
+    echo " Running linuxdeployqt with '-n' parameter..."
+    echo " Reason: this does not seem to be a Travis CI build running on Ubuntu Trusty 14.04."
+    echo " '-n' disables checking of AppStream data by the 'appstreamcli' utility since post-Trusty versions have incompatible changes."
+    echo ""
+    set -x
+fi
+
+# Finally, generate the AppIamge:
+PATH=./squashfs-root/usr/bin:$PATH ./squashfs-root/usr/bin/appimagetool -g $appimagetool_param appdir
+
+# Tell everyone where our result is stored:
+set +x
 echo ""
-echo "*** AppImage is ready in appimage/build ***"
+echo "===================================================================================="
+echo "  === AppImage is ready in $top/appimage/build ==="
+echo "===================================================================================="
 echo ""
+
