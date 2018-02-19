@@ -23,4 +23,4 @@ after_success:
   - ls -l qpdf-*.AppImage*
   - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
   - bash upload.sh qpdf-$major_version-git.$(git rev-parse --short HEAD)-x86_64.AppImage
-  - bash upload.sh qpdf-*-x86_64.AppImage.zsync
+  - bash upload.sh qpdf-x86_64.AppImage.zsync
