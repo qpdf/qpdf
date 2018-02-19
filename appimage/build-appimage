@@ -1,5 +1,9 @@
 #!/bin/sh
 set -ex
+sign=
+if [ "$1" = "--sign" ]; then
+    sign=--sign
+fi
 here="$(dirname $(readlink -f "$0"))"
 top=$(dirname $here)
 cd $top
@@ -30,7 +34,7 @@ unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
 # Generate AppImage
 ./linuxdeployqt*.AppImage --appimage-extract
 rm appdir/AppRun ; cp $top/appimage/AppRun appdir; chmod a+x appdir/AppRun # Replace symlink with custom script
-PATH=./squashfs-root/usr/bin:$PATH ./squashfs-root/usr/bin/appimagetool appdir
+PATH=./squashfs-root/usr/bin:$PATH ./squashfs-root/usr/bin/appimagetool $sign appdir
 echo ""
 echo "*** AppImage is ready in appimage/build ***"
 echo ""

@@ -1,5 +1,7 @@
 To build from source for Linux or other UNIX/UNIX-like systems, it is generally sufficient to download just the source `qpdf-<version>.tar.gz` file.
 
+Virtually all Linux distributions include packages for qpdf. If you'd like to run the latest version of qpdf on an AppImage, you can download `qpdf-<version>-x86_64.AppImage`.
+
 For Windows, there are several additional files that you might want to download.
 
 * `qpdf-<version>-bin-mingw32.zip`
