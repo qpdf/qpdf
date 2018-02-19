@@ -11,6 +11,21 @@ else
     wordsize=32
 fi
 
+if [ "$wordsize" = 32 ]; then
+    if [ ! -f win.64 ]; then
+        echo "Waiting for win.64 to appear"
+        while [ ! -f win.64 ]; do
+            sleep 5
+        done
+    fi
+else
+    rm -f win.32 win.64
+    echo ''
+    echo "You may now start $0 in a 32-bit window."
+    echo ''
+    sleep 5
+fi
+
 set -e
 set -x
 cwd=`pwd`
@@ -28,10 +43,16 @@ make -j8
 make check install
 make distclean
 
+touch win.$wordsize
+
 set +x
 
-echo ''
-echo "Finished builds for $wordsize. If not done already, rerun this"
-echo "in a" `expr 96 - $wordsize` "environment."
-echo 'Then run "./make_windows_releases-finish".'
-echo ''
+echo "Finished builds for $wordsize."
+
+if [ "$wordsize" = 64 ]; then
+  echo "If not done already, rerun this in a "`expr 96 - $wordsize`"-bit environment."
+  echo ''
+  echo 'Running "./make_windows_releases-finish".'
+  echo ''
+  ./make_windows_releases-finish
+fi
