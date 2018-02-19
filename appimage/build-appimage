@@ -34,7 +34,7 @@ set -ex
 
 # Support for signing the AppImage (only by original maintainer):
 sign=
-if [ x"$1" == x"--sign" ]; then
+if [ "x$1" == "x--sign" ] ; then
     sign=--sign
 fi
 
@@ -106,7 +106,8 @@ for i in appdir/usr/share/metainfo ;     do mkdir -p $i ; cp $top/appimage/qpdf.
 for i in appdir/usr/share/doc/qpdf ;     do mkdir -p $i ; cp $top/README* $i ; cp $top/NOTICE.md $i/README-notice.md ; cp $top/LICENSE.txt $i ; cp $top/Artistic-2.0 $i/Artistic-LICENSE.txt ; cp $top/ChangeLog $i/README-ChangeLog ; cp $top/TODO $i/README-todo ; done
 
 # The following lines are experimental (for debugging; and to test support for unexpected future binaries added to QPDF):
-for i in /usr/bin/env /bin/{less,busybox} ; do cp $i appdir/usr/bin/ ; done
+for i in /usr/bin/env /bin/less /bin/busybox ; do cp $i appdir/usr/bin/ ; done
+ls -l /usr/bin/env /bin/less /bin/busybox
 
 # Fetch 'linuxdeployqt' which will transform the AppDir into an AppImage:
 wget -c "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
