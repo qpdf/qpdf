@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Copyright (c) 2018 Jay Berkenbilt and Kurt Pfeifle
 #
@@ -92,7 +92,7 @@ make install DESTDIR=$appdir ; find $appdir
 cd $here/build
 
 # Don't bundle developer stuff
-rm -rf appdir/usr/include appdir/usr/lib/pkgconfig appdir/usr/lib/*.{a,la}
+rm -rf appdir/usr/include appdir/usr/lib/pkgconfig appdir/usr/lib/*.{a,la,so}
 
 # Copy icon which is needed for desktop integration into place:
 for i in appdir/usr/share/icons/hicolor/512x512/apps ; do
