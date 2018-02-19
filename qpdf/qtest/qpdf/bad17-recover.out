@@ -1,4 +1,4 @@
-WARNING: bad17.pdf (trailer, file position 715): dictionary ended prematurely; using null as value for last key
+WARNING: bad17.pdf (trailer, offset 715): dictionary ended prematurely; using null as value for last key
 /QTest is implicit
 /QTest is direct and has type null (2)
 /QTest is null

@@ -1,59 +1,127 @@
 WARNING: issue-101.pdf: file is damaged
-WARNING: issue-101.pdf (file position 3526): xref not found
+WARNING: issue-101.pdf (offset 3526): xref not found
 WARNING: issue-101.pdf: Attempting to reconstruct cross-reference table
-WARNING: issue-101.pdf (file position 1242): expected dictionary key but found non-name object; inserting key /QPDFFake1
-WARNING: issue-101.pdf (file position 1242): dictionary ended prematurely; using null as value for last key
-WARNING: issue-101.pdf (object 5 0, file position 1438): /Length key in stream dictionary is not an integer
-WARNING: issue-101.pdf (object 5 0, file position 1509): attempting to recover stream length
-WARNING: issue-101.pdf (object 5 0, file position 1509): recovered stream length: 8
-WARNING: issue-101.pdf (trailer, file position 1631): /Length key in stream dictionary is not an integer
-WARNING: issue-101.pdf (trailer, file position 1702): attempting to recover stream length
-WARNING: issue-101.pdf (trailer, file position 1702): recovered stream length: 12
-WARNING: issue-101.pdf (trailer, file position 2026): /Length key in stream dictionary is not an integer
-WARNING: issue-101.pdf (trailer, file position 2097): attempting to recover stream length
-WARNING: issue-101.pdf (trailer, file position 2097): recovered stream length: 257
-WARNING: issue-101.pdf (trailer, file position 2613): /Length key in stream dictionary is not an integer
-WARNING: issue-101.pdf (trailer, file position 2684): attempting to recover stream length
-WARNING: issue-101.pdf (trailer, file position 2684): recovered stream length: 74
-WARNING: issue-101.pdf (trailer, file position 2928): unknown token while reading object; treating as string
-WARNING: issue-101.pdf (trailer, file position 2929): unknown token while reading object; treating as string
-WARNING: issue-101.pdf (trailer, file position 2928): expected dictionary key but found non-name object; inserting key /QPDFFake1
-WARNING: issue-101.pdf (trailer, file position 2928): expected dictionary key but found non-name object; inserting key /QPDFFake2
-WARNING: issue-101.pdf (trailer, file position 2928): expected dictionary key but found non-name object; inserting key /QPDFFake3
-WARNING: issue-101.pdf (trailer, file position 2925): /Length key in stream dictionary is not an integer
-WARNING: issue-101.pdf (trailer, file position 2996): attempting to recover stream length
-WARNING: issue-101.pdf (trailer, file position 2996): recovered stream length: 12
-WARNING: issue-101.pdf (trailer, file position 3339): /Length key in stream dictionary is not an integer
-WARNING: issue-101.pdf (trailer, file position 3410): attempting to recover stream length
-WARNING: issue-101.pdf (trailer, file position 3410): recovered stream length: 12
-WARNING: issue-101.pdf (trailer, file position 3560): /Length key in stream dictionary is not an integer
-WARNING: issue-101.pdf (trailer, file position 3631): attempting to recover stream length
-WARNING: issue-101.pdf (trailer, file position 3631): recovered stream length: 8
-WARNING: issue-101.pdf (trailer, file position 4113): /Length key in stream dictionary is not an integer
-WARNING: issue-101.pdf (trailer, file position 4184): attempting to recover stream length
-WARNING: issue-101.pdf (trailer, file position 4184): recovered stream length: 8
-WARNING: issue-101.pdf (file position 591): unknown token while reading object; treating as string
-WARNING: issue-101.pdf (file position 625): treating unexpected brace token as null
-WARNING: issue-101.pdf (file position 626): unknown token while reading object; treating as string
-WARNING: issue-101.pdf (file position 637): unknown token while reading object; treating as string
-WARNING: issue-101.pdf (file position 639): unknown token while reading object; treating as string
-WARNING: issue-101.pdf (file position 644): unknown token while reading object; treating as string
-WARNING: issue-101.pdf (file position 647): unknown token while reading object; treating as string
-WARNING: issue-101.pdf (file position 687): unknown token while reading object; treating as string
-WARNING: issue-101.pdf (file position 691): unknown token while reading object; treating as string
-WARNING: issue-101.pdf (file position 696): unknown token while reading object; treating as string
-WARNING: issue-101.pdf (file position 698): unknown token while reading object; treating as string
-WARNING: issue-101.pdf (file position 701): unknown token while reading object; treating as string
-WARNING: issue-101.pdf (file position 711): unknown token while reading object; treating as string
-WARNING: issue-101.pdf (file position 742): unknown token while reading object; treating as string
-WARNING: issue-101.pdf (file position 745): unknown token while reading object; treating as string
-WARNING: issue-101.pdf (file position 747): unknown token while reading object; treating as string
-WARNING: issue-101.pdf (file position 777): unknown token while reading object; treating as string
-WARNING: issue-101.pdf (file position 790): unknown token while reading object; treating as string
-WARNING: issue-101.pdf (file position 800): treating unexpected brace token as null
-WARNING: issue-101.pdf (file position 801): unknown token while reading object; treating as string
-WARNING: issue-101.pdf (file position 811): unknown token while reading object; treating as string
-WARNING: issue-101.pdf (file position 819): unknown token while reading object; treating as string
-WARNING: issue-101.pdf (file position 832): unknown token while reading object; treating as string
-WARNING: issue-101.pdf (file position 856): unexpected >
-issue-101.pdf (file position 856): unable to find /Root dictionary
+WARNING: issue-101.pdf (object 5 0, offset 1242): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-101.pdf (object 5 0, offset 1242): dictionary ended prematurely; using null as value for last key
+WARNING: issue-101.pdf (object 5 0, offset 1438): /Length key in stream dictionary is not an integer
+WARNING: issue-101.pdf (object 5 0, offset 1509): attempting to recover stream length
+WARNING: issue-101.pdf (object 5 0, offset 1509): recovered stream length: 8
+WARNING: issue-101.pdf (trailer, offset 1631): /Length key in stream dictionary is not an integer
+WARNING: issue-101.pdf (trailer, offset 1702): attempting to recover stream length
+WARNING: issue-101.pdf (trailer, offset 1702): recovered stream length: 12
+WARNING: issue-101.pdf (trailer, offset 2026): /Length key in stream dictionary is not an integer
+WARNING: issue-101.pdf (trailer, offset 2097): attempting to recover stream length
+WARNING: issue-101.pdf (trailer, offset 2097): recovered stream length: 257
+WARNING: issue-101.pdf (trailer, offset 2613): /Length key in stream dictionary is not an integer
+WARNING: issue-101.pdf (trailer, offset 2684): attempting to recover stream length
+WARNING: issue-101.pdf (trailer, offset 2684): recovered stream length: 74
+WARNING: issue-101.pdf (trailer, offset 2928): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (trailer, offset 2930): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (trailer, offset 2928): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-101.pdf (trailer, offset 2928): expected dictionary key but found non-name object; inserting key /QPDFFake2
+WARNING: issue-101.pdf (trailer, offset 2928): expected dictionary key but found non-name object; inserting key /QPDFFake3
+WARNING: issue-101.pdf (trailer, offset 2925): /Length key in stream dictionary is not an integer
+WARNING: issue-101.pdf (trailer, offset 2996): attempting to recover stream length
+WARNING: issue-101.pdf (trailer, offset 2996): recovered stream length: 12
+WARNING: issue-101.pdf (trailer, offset 3339): /Length key in stream dictionary is not an integer
+WARNING: issue-101.pdf (trailer, offset 3410): attempting to recover stream length
+WARNING: issue-101.pdf (trailer, offset 3410): recovered stream length: 12
+WARNING: issue-101.pdf (trailer, offset 3560): /Length key in stream dictionary is not an integer
+WARNING: issue-101.pdf (trailer, offset 3631): attempting to recover stream length
+WARNING: issue-101.pdf (trailer, offset 3631): recovered stream length: 8
+WARNING: issue-101.pdf (trailer, offset 4113): /Length key in stream dictionary is not an integer
+WARNING: issue-101.pdf (trailer, offset 4184): attempting to recover stream length
+WARNING: issue-101.pdf (trailer, offset 4184): recovered stream length: 8
+WARNING: issue-101.pdf (object 11 0, offset 591): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 625): treating unexpected brace token as null
+WARNING: issue-101.pdf (object 11 0, offset 626): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 637): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 639): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 644): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 647): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 687): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 691): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 696): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 698): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 701): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 711): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 743): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 745): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 747): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 777): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 790): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 800): treating unexpected brace token as null
+WARNING: issue-101.pdf (object 11 0, offset 801): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 811): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 819): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 832): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 856): unexpected >
+WARNING: issue-101.pdf (object 11 0, offset 857): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 868): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 887): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 897): unexpected )
+WARNING: issue-101.pdf (object 11 0, offset 898): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 909): invalid character (¤) in hexstring
+WARNING: issue-101.pdf (object 11 0, offset 911): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 929): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 930): invalid character (²) in hexstring
+WARNING: issue-101.pdf (object 11 0, offset 932): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 944): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 947): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 970): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1046): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1067): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1075): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1080): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1084): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1102): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1112): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1124): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1133): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1145): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1148): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1150): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1151): unexpected )
+WARNING: issue-101.pdf (object 11 0, offset 1153): unexpected dictionary close token
+WARNING: issue-101.pdf (object 11 0, offset 1156): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1163): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1168): unexpected >
+WARNING: issue-101.pdf (object 11 0, offset 1170): invalid character (I) in hexstring
+WARNING: issue-101.pdf (object 11 0, offset 1167): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-101.pdf (object 11 0, offset 1167): expected dictionary key but found non-name object; inserting key /QPDFFake2
+WARNING: issue-101.pdf (object 11 0, offset 1167): expected dictionary key but found non-name object; inserting key /QPDFFake3
+WARNING: issue-101.pdf (object 11 0, offset 1176): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1180): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1184): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1190): unexpected >
+WARNING: issue-101.pdf (object 11 0, offset 1192): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1195): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1205): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1217): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1224): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1236): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1242): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-101.pdf (object 11 0, offset 1242): dictionary ended prematurely; using null as value for last key
+WARNING: issue-101.pdf (object 11 0, offset 1275): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1287): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1291): unexpected dictionary close token
+WARNING: issue-101.pdf (object 11 0, offset 1294): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1306): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1322): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1325): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1329): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1341): treating unexpected array close token as null
+WARNING: issue-101.pdf (object 11 0, offset 1312): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-101.pdf (object 11 0, offset 1312): expected dictionary key but found non-name object; inserting key /QPDFFake2
+WARNING: issue-101.pdf (object 11 0, offset 1312): expected dictionary key but found non-name object; inserting key /QPDFFake3
+WARNING: issue-101.pdf (object 11 0, offset 1312): expected dictionary key but found non-name object; inserting key /QPDFFake4
+WARNING: issue-101.pdf (object 11 0, offset 1312): dictionary ended prematurely; using null as value for last key
+WARNING: issue-101.pdf (object 11 0, offset 1349): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1353): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1357): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1359): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 11 0, offset 1368): unexpected )
+WARNING: issue-101.pdf (object 11 0, offset 1373): expected endobj
+WARNING: issue-101.pdf (object 8 0, offset 4067): invalid character ()) in hexstring
+WARNING: issue-101.pdf (object 8 0, offset 4069): expected endobj
+qpdf: operation succeeded with warnings; resulting file may have some problems

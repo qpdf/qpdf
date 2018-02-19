@@ -1,4 +1,4 @@
-WARNING: bad24.pdf (object 4 0, file position 385): expected endstream
+WARNING: bad24.pdf (object 4 0, offset 385): expected endstream
 /QTest is implicit
 /QTest is indirect and has type null (2)
 /QTest is null

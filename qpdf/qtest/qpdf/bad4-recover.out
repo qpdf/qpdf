@@ -1,5 +1,5 @@
 WARNING: bad4.pdf: file is damaged
-WARNING: bad4.pdf (xref table, file position 547): xref syntax invalid
+WARNING: bad4.pdf (xref table, offset 547): xref syntax invalid
 WARNING: bad4.pdf: Attempting to reconstruct cross-reference table
 /QTest is implicit
 /QTest is direct and has type null (2)

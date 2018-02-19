@@ -1,15 +1,6 @@
 Soon
 ====
 
- * Consider whether there should be a mode in which QPDFObjectHandle
-   returns nulls for operations on the wrong type instead of asserting
-   the type. The way things are wired up now, this would have to be a
-   global flag. Probably it makes sense to make that be the default
-   behavior and to add a static method in QPDFObjectHandle and
-   command-line flag that enables the stricter behavior globally for
-   easier debugging. For cases where we have enough information to do
-   so, we could still warn when not in strict mode.
-
  * Add method to push inheritable resources to a single page by
    walking up and copying without overwrite.  Above logic will also be
    sufficient to fix the limitation in
@@ -40,23 +31,11 @@ Soon
 Lexical
 =======
 
-Consider rewriting the tokenizer. These are rough ideas at this point.
-I may or may not do this as described.
-
- * Use flex. Generate them from ./autogen.sh and include them in the
-   source package, but do not commit them.
-
- * Make it possible to run the lexer (tokenizer) over a while file
+ * Make it possible to run the lexer (tokenizer) over a whole file
    such that the following things would be possible:
 
    * Rewrite fix-qdf in C++ so that there is no longer a runtime perl
      dependency
-
-   * Create a way to filter content streams that could be used to
-     preserve the content stream exactly including spaces but also to
-     do things like replace everything between a detected set of
-     markers. This is to support form flattening. Ideally, it should
-     be possible to use this programmatically on broken files.
 
    * Make it possible to replace all strings in a file lexically even
      on badly broken files. Ideally this should work files that are
@@ -176,44 +155,6 @@ I find it useful to make reference to them in this list
 
  * See if we can avoid preserving unreferenced objects in object
    streams even when preserving the object streams.
-
- * For debugging linearization bugs, consider adding an option to save
-   pass 1 of linearization.  This code is sufficient.  Change the
-   interface to allow specification of a pass1 file, which would
-   change the behavior as in this patch.
-
-------------------------------
-Index: QPDFWriter.cc
-===================================================================
---- QPDFWriter.cc	(revision 932)
-+++ QPDFWriter.cc	(working copy)
-@@ -1965,11 +1965,15 @@
- 
-     // Write file in two passes.  Part numbers refer to PDF spec 1.4.
- 
-+    FILE* XXX = 0;
-     for (int pass = 1; pass <= 2; ++pass)
-     {
- 	if (pass == 1)
- 	{
--	    pushDiscardFilter();
-+//	    pushDiscardFilter();
-+	    XXX = QUtil::safe_fopen("/tmp/pass1.pdf", "w");
-+	    pushPipeline(new Pl_StdioFile("pass1", XXX));
-+	    activatePipelineStack();
- 	}
- 
- 	// Part 1: header
-@@ -2204,6 +2208,8 @@
- 
- 	    // Restore hint offset
- 	    this->xref[hint_id] = QPDFXRefEntry(1, hint_offset, 0);
-+	    fclose(XXX);
-+	    XXX = 0;
- 	}
-     }
- }
-------------------------------
 
  * Provide APIs for embedded files.  See *attachments*.pdf in test
    suite.  The private method findAttachmentStreams finds at least

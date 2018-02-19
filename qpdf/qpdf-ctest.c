@@ -484,6 +484,18 @@ static void test22(char const* infile,
     report_errors();
 }
 
+static void test23(char const* infile,
+		   char const* password,
+		   char const* outfile,
+		   char const* outfile2)
+{
+    QPDF_ERROR_CODE status = 0;
+    qpdf_read(qpdf, infile, password);
+    status = qpdf_check_pdf(qpdf);
+    printf("status: %d\n", status);
+    report_errors();
+}
+
 int main(int argc, char* argv[])
 {
     char* p = 0;
@@ -546,6 +558,7 @@ int main(int argc, char* argv[])
 	  (n == 20) ? test20 :
 	  (n == 21) ? test21 :
 	  (n == 22) ? test22 :
+	  (n == 23) ? test23 :
 	  0);
 
     if (fn == 0)

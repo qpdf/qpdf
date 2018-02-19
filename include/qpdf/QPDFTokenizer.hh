@@ -33,7 +33,9 @@ class QPDFTokenizer
 {
   public:
     // Token type tt_eof is only returned of allowEOF() is called on
-    // the tokenizer.  tt_eof was introduced in QPDF version 4.1.
+    // the tokenizer. tt_eof was introduced in QPDF version 4.1.
+    // tt_space, tt_comment, and tt_inline_image were added in QPDF
+    // version 8.
     enum token_type_e
     {
 	tt_bad,
@@ -51,19 +53,17 @@ class QPDFTokenizer
 	tt_bool,
 	tt_word,
         tt_eof,
+        tt_space,
+        tt_comment,
+        tt_inline_image,
     };
 
     class Token
     {
       public:
 	Token() : type(tt_bad) {}
-
-	Token(token_type_e type, std::string const& value) :
-	    type(type),
-	    value(value)
-	{
-	}
-
+        QPDF_DLL
+	Token(token_type_e type, std::string const& value);
 	Token(token_type_e type, std::string const& value,
 	      std::string raw_value, std::string error_message) :
 	    type(type),
@@ -88,7 +88,7 @@ class QPDFTokenizer
 	{
 	    return this->error_message;
 	}
-	bool operator==(Token const& rhs)
+	bool operator==(Token const& rhs) const
 	{
 	    // Ignore fields other than type and value
 	    return ((this->type != tt_bad) &&
@@ -120,11 +120,22 @@ class QPDFTokenizer
     QPDF_DLL
     void allowEOF();
 
-    // Mode of operation:
+    // If called, readToken will return "ignorable" tokens for space
+    // and comments. This was added in QPDF 8.
+    QPDF_DLL
+    void includeIgnorable();
 
-    // Keep presenting characters and calling getToken() until
-    // getToken() returns true.  When it does, be sure to check
-    // unread_ch and to unread ch if it is true.
+    // There are two modes of operation: push and pull. The pull
+    // method is easier but requires an input source. The push method
+    // is more complicated but can be used to tokenize a stream of
+    // incoming characters in a pipeline.
+
+    // Push mode:
+
+    // Keep presenting characters with presentCharacter() and
+    // presentEOF() and calling getToken() until getToken() returns
+    // true. When it does, be sure to check unread_ch and to unread ch
+    // if it is true.
 
     // It these are called when a token is available, an exception
     // will be thrown.
@@ -147,39 +158,79 @@ class QPDFTokenizer
     QPDF_DLL
     bool betweenTokens();
 
-    // Read a token from an input source.  Context describes the
+    // Pull mode:
+
+    // Read a token from an input source. Context describes the
     // context in which the token is being read and is used in the
-    // exception thrown if there is an error.
+    // exception thrown if there is an error. After a token is read,
+    // the position of the input source returned by input->tell()
+    // points to just after the token, and the input source's "last
+    // offset" as returned by input->getLastOffset() points to the
+    // beginning of the token.
     QPDF_DLL
     Token readToken(PointerHolder<InputSource> input,
                     std::string const& context,
                     bool allow_bad = false,
                     size_t max_len = 0);
 
+    // Calling this method puts the tokenizer in a state for reading
+    // inline images. In that state, it will return all data up to and
+    // including the next EI token. After you call this method, the
+    // next call to readToken (or the token created next time getToken
+    // returns true) will either be tt_inline_image or tt_bad. This is
+    // the only way readToken returns a tt_inline_image token.
+    QPDF_DLL
+    void expectInlineImage();
+
   private:
-    void reset();
+    // Do not implement copy or assignment
+    QPDFTokenizer(QPDFTokenizer const&);
+    QPDFTokenizer& operator=(QPDFTokenizer const&);
+
     void resolveLiteral();
+    bool isSpace(char);
+    bool isDelimiter(char);
 
-    // Lexer state
-    enum { st_top, st_in_comment, st_in_string, st_lt, st_gt,
-	   st_literal, st_in_hexstring, st_token_ready } state;
+    enum state_e {
+        st_top, st_in_space, st_in_comment, st_in_string, st_lt, st_gt,
+        st_literal, st_in_hexstring, st_inline_image, st_token_ready
+    };
 
-    bool pound_special_in_name;
-    bool allow_eof;
+    class Members
+    {
+        friend class QPDFTokenizer;
 
-    // Current token accumulation
-    token_type_e type;
-    std::string val;
-    std::string raw_val;
-    std::string error_message;
-    bool unread_char;
-    char char_to_unread;
+      public:
+        QPDF_DLL
+        ~Members();
 
-    // State for strings
-    int string_depth;
-    bool string_ignoring_newline;
-    char bs_num_register[4];
-    bool last_char_was_bs;
+      private:
+        Members();
+        Members(Members const&);
+        void reset();
+
+        // Lexer state
+        state_e state;
+
+        bool pound_special_in_name;
+        bool allow_eof;
+        bool include_ignorable;
+
+        // Current token accumulation
+        token_type_e type;
+        std::string val;
+        std::string raw_val;
+        std::string error_message;
+        bool unread_char;
+        char char_to_unread;
+
+        // State for strings
+        int string_depth;
+        bool string_ignoring_newline;
+        char bs_num_register[4];
+        bool last_char_was_bs;
+    };
+    PointerHolder<Members> m;
 };
 
 #endif // __QPDFTOKENIZER_HH__

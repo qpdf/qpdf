@@ -97,6 +97,35 @@ ParserCallbacks::handleEOF()
     std::cout << "-EOF-" << std::endl;
 }
 
+class TokenFilter: public QPDFObjectHandle::TokenFilter
+{
+  public:
+    TokenFilter()
+    {
+    }
+    virtual ~TokenFilter()
+    {
+    }
+    virtual void handleToken(QPDFTokenizer::Token const& t)
+    {
+        if (t == QPDFTokenizer::Token(QPDFTokenizer::tt_string, "Potato"))
+        {
+            // Exercise unparsing of strings by token constructor
+            writeToken(
+                QPDFTokenizer::Token(QPDFTokenizer::tt_string, "Salad"));
+        }
+        else
+        {
+            writeToken(t);
+        }
+    }
+    virtual void handleEOF()
+    {
+        writeToken(QPDFTokenizer::Token(QPDFTokenizer::tt_name, "/bye"));
+        write("\n");
+    }
+};
+
 static std::string getPageContents(QPDFObjectHandle page)
 {
     PointerHolder<Buffer> b1 =
@@ -1296,9 +1325,8 @@ void runtest(int n, char const* filename1, char const* arg2)
              iter != pages.end(); ++iter)
         {
             QPDFObjectHandle page = *iter;
-            QPDFObjectHandle contents = page.getKey("/Contents");
             ParserCallbacks cb;
-            QPDFObjectHandle::parseContentStream(contents, &cb);
+            page.parsePageContents(&cb);
         }
     }
     else if (n == 38)
@@ -1345,6 +1373,82 @@ void runtest(int n, char const* filename1, char const* arg2)
         w.setPCLm(true);
         w.setStaticID(true);
         w.write();
+    }
+    else if (n == 41)
+    {
+        // Apply a token filter. This test case is crafted to work
+        // with coalesce.pdf.
+        std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
+        for (std::vector<QPDFObjectHandle>::iterator iter =
+                 pages.begin();
+             iter != pages.end(); ++iter)
+        {
+            (*iter).addContentTokenFilter(new TokenFilter);
+        }
+        QPDFWriter w(pdf, "a.pdf");
+	w.setQDFMode(true);
+        w.setStaticID(true);
+        w.write();
+    }
+    else if (n == 42)
+    {
+        // Access objects as wrong type. This test case is crafted to
+        // work with object-types.pdf.
+        QPDFObjectHandle qtest = pdf.getTrailer().getKey("/QTest");
+        QPDFObjectHandle array = qtest.getKey("/Dictionary").getKey("/Key2");
+        QPDFObjectHandle dictionary = qtest.getKey("/Dictionary");
+        QPDFObjectHandle integer = qtest.getKey("/Integer");
+        QPDFObjectHandle null = QPDFObjectHandle::newNull();
+        assert(array.isArray());
+        assert(dictionary.isDictionary());
+        assert("" == qtest.getStringValue());
+        array.getArrayItem(-1).assertNull();
+        array.getArrayItem(16059).assertNull();
+        integer.getArrayItem(0).assertNull();
+        integer.appendItem(null);
+        array.eraseItem(-1);
+        array.eraseItem(16059);
+        integer.eraseItem(0);
+        integer.insertItem(0, null);
+        integer.setArrayFromVector(std::vector<QPDFObjectHandle>());
+        integer.setArrayItem(0, null);
+        assert(0 == integer.getArrayNItems());
+        assert(integer.getArrayAsVector().empty());
+        assert(false == integer.getBoolValue());
+        assert(integer.getDictAsMap().empty());
+        assert(integer.getKeys().empty());
+        assert(false == integer.hasKey("/Potato"));
+        integer.removeKey("/Potato");
+        integer.replaceOrRemoveKey("/Potato", null);
+        integer.replaceOrRemoveKey("/Potato", QPDFObjectHandle::newInteger(1));
+        integer.replaceKey("/Potato", QPDFObjectHandle::newInteger(1));
+        qtest.getKey("/Integer").getKey("/Potato");
+        assert(integer.getInlineImageValue().empty());
+        assert(0 == dictionary.getIntValue());
+        assert("/QPDFFakeName" == integer.getName());
+        assert("QPDFFAKE" == integer.getOperatorValue());
+        assert("0.0" == dictionary.getRealValue());
+        assert(integer.getStringValue().empty());
+        assert(integer.getUTF8Value().empty());
+        assert(0.0 == dictionary.getNumericValue());
+        // Make sure error messages are okay for nested values
+        std::cerr << "One error\n";
+        assert(array.getArrayItem(0).getStringValue().empty());
+        std::cerr << "One error\n";
+        assert(dictionary.getKey("/Quack").getStringValue().empty());
+        assert(array.getArrayItem(1).isDictionary());
+        assert(array.getArrayItem(1).getKey("/K").isArray());
+        assert(array.getArrayItem(1).getKey("/K").getArrayItem(0).isName());
+        assert("/V" ==
+               array.getArrayItem(1).getKey("/K").getArrayItem(0).getName());
+        std::cerr << "Two errors\n";
+        assert(array.getArrayItem(16059).getStringValue().empty());
+        std::cerr << "One error\n";
+        array.getArrayItem(1).getKey("/K").getArrayItem(0).getStringValue();
+        // Stream dictionary
+        QPDFObjectHandle page = pdf.getAllPages()[0];
+        assert("/QPDFFakeName" ==
+               page.getKey("/Contents").getDict().getKey("/Potato").getName());
     }
     else
     {

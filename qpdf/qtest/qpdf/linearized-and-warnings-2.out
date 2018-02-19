@@ -50,5 +50,5 @@ Shared Object 2:
 Shared Object 3:
   group length: 107
 ---error---
-WARNING: linearized-and-warnings.pdf (object 2 0, file position 1117): empty object treated as null
+WARNING: linearized-and-warnings.pdf (object 2 0, offset 1117): empty object treated as null
 test 13 done

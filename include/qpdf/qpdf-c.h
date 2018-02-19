@@ -180,6 +180,14 @@ extern "C" {
     QPDF_DLL
     void qpdf_set_suppress_warnings(qpdf_data qpdf, QPDF_BOOL value);
 
+    /* CHECK FUNCTIONS */
+
+    /* Attempt to read the entire PDF file to see if there are any
+     * errors qpdf can detect.
+     */
+    QPDF_DLL
+    QPDF_ERROR_CODE qpdf_check_pdf(qpdf_data qpdf);
+
     /* READ FUNCTIONS */
 
     /* READ PARAMETER FUNCTIONS -- must be called before qpdf_read */

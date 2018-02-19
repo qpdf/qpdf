@@ -13,7 +13,7 @@
 #include <qpdf/Pl_RunLength.hh>
 #include <qpdf/Pl_DCT.hh>
 #include <qpdf/Pl_Count.hh>
-
+#include <qpdf/ContentNormalizer.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFExc.hh>
@@ -39,6 +39,7 @@ QPDF_Stream::QPDF_Stream(QPDF* qpdf, int objid, int generation,
 	    "stream object instantiated with non-dictionary "
 	    "object for dictionary");
     }
+    setStreamDescription();
 }
 
 QPDF_Stream::~QPDF_Stream()
@@ -85,10 +86,45 @@ QPDF_Stream::getTypeName() const
     return "stream";
 }
 
+void
+QPDF_Stream::setDescription(QPDF* qpdf, std::string const& description)
+{
+    this->QPDFObject::setDescription(qpdf, description);
+    setDictDescription();
+}
+
+void
+QPDF_Stream::setStreamDescription()
+{
+    setDescription(
+        this->qpdf,
+        "stream object " + QUtil::int_to_string(this->objid) + " " +
+        QUtil::int_to_string(this->generation));
+}
+
+void
+QPDF_Stream::setDictDescription()
+{
+    QPDF* qpdf = 0;
+    std::string description;
+    if ((! this->stream_dict.hasObjectDescription()) &&
+        getDescription(qpdf, description))
+    {
+        this->stream_dict.setObjectDescription(
+            qpdf, description + " -> stream dictionary");
+    }
+}
+
 QPDFObjectHandle
 QPDF_Stream::getDict() const
 {
     return this->stream_dict;
+}
+
+bool
+QPDF_Stream::isDataModified() const
+{
+    return (! this->token_filters.empty());
 }
 
 PointerHolder<Buffer>
@@ -440,20 +476,33 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline,
     // create to be deleted when this function finishes.
     std::vector<PointerHolder<Pipeline> > to_delete;
 
+    PointerHolder<ContentNormalizer> normalizer;
     if (filter)
     {
 	if (encode_flags & qpdf_ef_compress)
 	{
-	    pipeline = new Pl_Flate("compress object stream", pipeline,
+	    pipeline = new Pl_Flate("compress stream", pipeline,
 				    Pl_Flate::a_deflate);
 	    to_delete.push_back(pipeline);
 	}
 
 	if (encode_flags & qpdf_ef_normalize)
 	{
-	    pipeline = new Pl_QPDFTokenizer("normalizer", pipeline);
+            normalizer = new ContentNormalizer();
+	    pipeline = new Pl_QPDFTokenizer(
+                "normalizer", normalizer.getPointer(), pipeline);
 	    to_delete.push_back(pipeline);
 	}
+
+        for (std::vector<PointerHolder<
+                 QPDFObjectHandle::TokenFilter> >::reverse_iterator iter =
+                 this->token_filters.rbegin();
+             iter != this->token_filters.rend(); ++iter)
+        {
+            pipeline = new Pl_QPDFTokenizer(
+                "token filter", (*iter).getPointer(), pipeline);
+            to_delete.push_back(pipeline);
+        }
 
 	for (std::vector<std::string>::reverse_iterator iter = filters.rbegin();
 	     iter != filters.rend(); ++iter)
@@ -588,6 +637,33 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline,
         }
     }
 
+    if (filter &&
+        (! suppress_warnings) &&
+        normalizer.getPointer() &&
+        normalizer->anyBadTokens())
+    {
+        warn(QPDFExc(qpdf_e_damaged_pdf, qpdf->getFilename(),
+                     "", this->offset,
+                     "content normalization encountered bad tokens"));
+        if (normalizer->lastTokenWasBad())
+        {
+            QTC::TC("qpdf", "QPDF_Stream bad token at end during normalize");
+            warn(QPDFExc(qpdf_e_damaged_pdf, qpdf->getFilename(),
+                         "", this->offset,
+                         "normalized content ended with a bad token;"
+                         " you may be able to resolve this by"
+                         " coalescing content streams in combination"
+                         " with normalizing content. From the command"
+                         " line, specify --coalesce-contents"));
+        }
+        warn(QPDFExc(qpdf_e_damaged_pdf, qpdf->getFilename(),
+                     "", this->offset,
+                     "Resulting stream data may be corrupted but is"
+                     " may still useful for manual inspection."
+                     " For more information on this warning, search"
+                     " for content normalization in the manual."));
+    }
+
     return filter;
 }
 
@@ -613,6 +689,13 @@ QPDF_Stream::replaceStreamData(
 }
 
 void
+QPDF_Stream::addTokenFilter(
+    PointerHolder<QPDFObjectHandle::TokenFilter> token_filter)
+{
+    this->token_filters.push_back(token_filter);
+}
+
+void
 QPDF_Stream::replaceFilterData(QPDFObjectHandle const& filter,
 			       QPDFObjectHandle const& decode_parms,
 			       size_t length)
@@ -635,6 +718,7 @@ void
 QPDF_Stream::replaceDict(QPDFObjectHandle new_dict)
 {
     this->stream_dict = new_dict;
+    setDictDescription();
     QPDFObjectHandle length_obj = new_dict.getKey("/Length");
     if (length_obj.isInteger())
     {

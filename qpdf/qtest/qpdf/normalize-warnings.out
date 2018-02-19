@@ -1,0 +1,9 @@
+WARNING: coalesce.pdf (offset 671): content normalization encountered bad tokens
+WARNING: coalesce.pdf (offset 671): normalized content ended with a bad token; you may be able to resolve this by coalescing content streams in combination with normalizing content. From the command line, specify --coalesce-contents
+WARNING: coalesce.pdf (offset 671): Resulting stream data may be corrupted but is may still useful for manual inspection. For more information on this warning, search for content normalization in the manual.
+WARNING: coalesce.pdf (offset 823): content normalization encountered bad tokens
+WARNING: coalesce.pdf (offset 823): Resulting stream data may be corrupted but is may still useful for manual inspection. For more information on this warning, search for content normalization in the manual.
+WARNING: coalesce.pdf (offset 962): content normalization encountered bad tokens
+WARNING: coalesce.pdf (offset 962): normalized content ended with a bad token; you may be able to resolve this by coalescing content streams in combination with normalizing content. From the command line, specify --coalesce-contents
+WARNING: coalesce.pdf (offset 962): Resulting stream data may be corrupted but is may still useful for manual inspection. For more information on this warning, search for content normalization in the manual.
+qpdf: operation succeeded with warnings; resulting file may have some problems

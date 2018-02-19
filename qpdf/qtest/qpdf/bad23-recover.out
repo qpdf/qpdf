@@ -1,6 +1,6 @@
-WARNING: bad23.pdf (object 4 0, file position 314): /Length key in stream dictionary is not an integer
-WARNING: bad23.pdf (object 4 0, file position 341): attempting to recover stream length
-WARNING: bad23.pdf (object 4 0, file position 341): recovered stream length: 44
+WARNING: bad23.pdf (object 4 0, offset 314): /Length key in stream dictionary is not an integer
+WARNING: bad23.pdf (object 4 0, offset 341): attempting to recover stream length
+WARNING: bad23.pdf (object 4 0, offset 341): recovered stream length: 44
 /QTest is indirect and has type stream (10)
 /QTest is a stream.  Dictionary: << /Length () >>
 Raw stream data:

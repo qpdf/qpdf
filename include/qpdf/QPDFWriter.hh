@@ -367,6 +367,15 @@ class QPDFWriter
     QPDF_DLL
     void setLinearization(bool);
 
+    // For debugging QPDF: provide the name of a file to write pass1
+    // of linearization to. The only reason to use this is to debug
+    // QPDF. To linearize, QPDF writes out the file in two passes.
+    // Usually the first pass is discarded, but lots of computations
+    // are made in pass 1. If a linearized file comes out wrong, it
+    // can be helpful to look at the first pass.
+    QPDF_DLL
+    void setLinearizationPass1Filename(std::string const&);
+
     // Create PCLm output. This is only useful for clients that know
     // how to create PCLm files. If a file is structured exactly as
     // PCLm requires, this call will tell QPDFWriter to write the PCLm
@@ -571,6 +580,7 @@ class QPDFWriter
         std::string deterministic_id_data;
 
         // For linearization only
+        std::string lin_pass1_filename;
         std::map<int, int> obj_renumber_no_gen;
         std::map<int, int> object_to_object_stream_no_gen;
     };

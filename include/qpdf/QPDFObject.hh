@@ -23,6 +23,7 @@
 #define __QPDFOBJECT_HH__
 
 #include <qpdf/DLL.h>
+#include <qpdf/PointerHolder.hh>
 
 #include <string>
 
@@ -32,6 +33,7 @@ class QPDFObjectHandle;
 class QPDFObject
 {
   public:
+    QPDFObject();
 
     // Objects derived from QPDFObject are accessible through
     // QPDFObjectHandle.  Each object returns a unique type code that
@@ -84,8 +86,27 @@ class QPDFObject
     };
     friend class ObjAccessor;
 
+    virtual void setDescription(QPDF*, std::string const&);
+    bool getDescription(QPDF*&, std::string&);
+    bool hasDescription();
+
   protected:
     virtual void releaseResolved() {}
+
+  private:
+    QPDFObject(QPDFObject const&);
+    QPDFObject& operator=(QPDFObject const&);
+    class Members
+    {
+        friend class QPDFObject;
+      public:
+        ~Members();
+      private:
+        Members();
+        QPDF* owning_qpdf;
+        std::string object_description;
+    };
+    PointerHolder<Members> m;
 };
 
 #endif // __QPDFOBJECT_HH__
