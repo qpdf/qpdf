@@ -135,20 +135,19 @@ else
     appimagetool_param="-n"
     set +x
     echo ""
-    echo " Running linuxdeployqt with '-n' parameter..."
+    echo " Running 'appimagetool' with '-n' parameter..."
     echo " Reason: this does not seem to be a Travis CI build running on Ubuntu Trusty 14.04."
     echo " '-n' disables checking of AppStream data by the 'appstreamcli' utility since post-Trusty versions have incompatible changes."
     echo ""
     set -x
 fi
 
-# Finally, generate the AppIamge:
-PATH=./squashfs-root/usr/bin:$PATH ./squashfs-root/usr/bin/appimagetool -g $appimagetool_param appdir
 
-# Tell everyone where our result is stored:
 set +x
+# Finally, generate the AppIamge:
 rm appdir/AppRun ; cp $top/appimage/AppRun appdir; chmod a+x appdir/AppRun # Replace symlink with custom script
-PATH=./squashfs-root/usr/bin:$PATH ./squashfs-root/usr/bin/appimagetool $sign appdir
+PATH=./squashfs-root/usr/bin:$PATH ./squashfs-root/usr/bin/appimagetool $sign -g $appimagetool_param appdir
+# Tell everyone where our result is stored:
 echo ""
 echo "===================================================================================="
 echo "  === AppImage is ready in $top/appimage/build ==="
