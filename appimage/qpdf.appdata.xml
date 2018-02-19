@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2005-2018 Jay Berkenbilt -->
 <component>
-	<id>org.QPDF.qdf.desktop</id>
-	<metadata_license>APL-2.0</metadata_license>
-	<project_license>APL-2.0</project_license>
+	<id>org.QPDF.qpdf.desktop</id>
+	<metadata_license>MIT</metadata_license>
+	<project_license>Apache-2.0</project_license>
 	<name>QPDF</name>
 	<summary>Structural, content-preserving transformations on PDF files</summary>
 	<description>
@@ -21,7 +21,7 @@
 		</screenshot>
 	</screenshots>
 	<provides>
-		<id>qpdf.desktop</id>
+		<id>org.QPDF.qpdf.desktop</id>
 	</provides>
 	<!-- <update_contact></update_contact> -->
 </component>
