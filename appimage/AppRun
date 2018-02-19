@@ -59,8 +59,12 @@ echo "
 
  Usage:
  ------
+
+   $ARGV0  --help
+                # Show help screen of QPDF itself
+
    $ARGV0  --usage
-                # This message
+                # This message (it's only present in the AppImage incarnation of QPDF)
 
    $ARGV0  fix-qdf|zlib-flate
                 # Run the named sub-command
@@ -105,7 +109,10 @@ echo "
                  # Show 'AppRun' invoked by 'less -N'; type '-N' to toogle line number display
 
    $ARGV0  --appimage-help
-                # Show available AppImage options
+                # Show AppImage options available for all 'type 2' AppImages
+
+   $ARGV0  --help
+                # Show help screen of QPDF itself
 
  ------------------------------------------------------------------------------------------------
  NOTE: The execution of this AppImage is controlled by a custom AppRun script. The state of this
