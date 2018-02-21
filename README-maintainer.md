@@ -27,7 +27,17 @@
   * libqpdf/QPDF.cc
   * manual/qpdf-manual.xml
   `make_dist` verifies this consistency.
-* Generate a signed AppImage. To do this, have the gpg key available and run `./appimage/build-appimage --sign`. Rename the AppImage in appimage/build to qpdf-<version>-x86_64.AppImage and include it in the set of files to be released.
+* Generate a signed AppImage using the docker image in appimage. Arguments to the docker container are arguments to git clone. The build should be made off the exact commit that will be officially tagged as the release but built prior to tagging the release.
+Example:
+  ```
+  cd appimage
+  docker build -t qpdfbuild .
+  rm -rf /tmp/build
+  mkdir -p /tmp/build
+  cp -rLp ~/.gnupg/. /tmp/build/.gnupg
+  docker run --privileged -ti --rm -v /tmp/build:/tmp/build qpdfbuild https://github.com/jberkenbilt/qpdf -b work
+  ```
+  Rename the AppImage in appimage/build to qpdf-<version>-x86_64.AppImage and include it in the set of files to be released.
 * Update release date in `manual/qpdf-manual.xml`.  Remember to ensure that the entities at the top of the document are consistent with the release notes for both version and release date.
 * Check `TODO` file to make sure all planned items for the release are done or retargeted.
 * Each year, update copyright notices. Just do a case-insensitive search for copyright. Don't forget copyright in manual. Also update debian copyright in debian package. Last updated: 2018.

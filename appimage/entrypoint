@@ -1,0 +1,22 @@
+#!/bin/bash
+set -e
+if [ $(id -u) = 0 ]; then
+    if [ ! -d /tmp/build/.gnupg ]; then
+        echo "/tmp/build must exist and must contain .gnupg"
+        exit 2
+    fi
+    id=$(stat -c %u /tmp/build)
+    adduser --home /tmp/build --no-create-home --uid $id --disabled-password --gecos build build
+    exec sudo -iu build $0 "$@"
+fi
+
+cd /tmp/build
+if [ ! -d qpdf ]; then
+    if [ "$1" == "" ]; then
+        echo "A repository and optional git clone arguments must be given"
+        exit 2
+    fi
+    git clone "$@" qpdf
+fi
+cd qpdf
+./appimage/build-appimage --sign
