@@ -60,7 +60,7 @@ Example:
   cd /tmp
   zip -r qpdf-external-libs-src.zip external-libs
   ```
-* To create Windows binary releases, extract the qpdf source distribution in Windows (MSYS2 + MSVC).  From the extracted directory, extract the binary distribution of the external libraries.  Run ./make_windows_releases simultaneously in 32-bit and 64-windows from there.
+* To create Windows binary releases, extract the qpdf source distribution in Windows (MSYS2 + MSVC).  From the extracted directory, extract the binary distribution of the external libraries.  Run ./make_windows_releases simultaneously in 32-bit and 64-windows from there. It may be necessary to disable antivirus software first.
 * Before releasing, rebuild and test debian package.
 * Remember to copy `README-what-to-download.md` separately onto the download area.
 * Remember to update the web page including putting new documentation in the `files` subdirectory of the website on sourceforge.net.
