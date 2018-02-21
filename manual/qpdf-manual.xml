@@ -1123,6 +1123,40 @@ outfile.pdf</option>
       </listitem>
      </varlistentry>
      <varlistentry>
+      <term><option>--linearize-pass1=<replaceable>file</replaceable></option></term>
+      <listitem>
+       <para>
+        Write the first pass of linearization to the named file. The
+        resulting file is not a valid PDF file. This option is useful
+        only for debugging <classname>QPDFWriter</classname>'s
+        linearization code. When qpdf linearizes files, it writes the
+        file in two passes, using the first pass to calculate sizes
+        and offsets that are required for hint tables and the
+        linearization dictionary. Ordinarily, the first pass is
+        discarded. This option enables it to be captured.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--coalesce-contents</option></term>
+      <listitem>
+       <para>
+        When a page's contents are split across multiple streams, this
+        option causes qpdf to combine them into a single stream. Use
+        of this option is never necessary for ordinary usage, but it
+        can help when working with some files in some cases. For
+        example, some PDF writers split page contents into small
+        streams at arbitrary points that may fall in the middle of
+        lexical tokens within the content, and some PDF readers may
+        get confused on such files. If you use qpdf to coalesce the
+        content streams, such readers may be able to work with the
+        file more easily. This can also be combined with QDF mode or
+        content normalization to make it easier to look at all of a
+        page's contents at once.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
       <term><option>--qdf</option></term>
       <listitem>
        <para>
@@ -3022,7 +3056,7 @@ print "\n";
       <listitem>
        <para>
         Bug fix: files whose /ID fields were other than 16 bytes long
-        can now be properly linearlized
+        can now be properly linearized
        </para>
       </listitem>
       <listitem>
