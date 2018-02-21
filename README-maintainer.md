@@ -53,7 +53,7 @@ Example:
   rm -rf /tmp/qpdf-x.y.z
   git archive --prefix=qpdf-x.y.z/ HEAD . | (cd /tmp; tar xf -)
   ```
-  From the parent of that directory, run `make_dist` with the directory as an argument.  Remember to have fop in your path.  For internally testing releases, you can run make_dist with the `--no-tests` option.
+  From the parent of that directory, run `qpdf-x.y.z/make_dist`.  Remember to have fop in your path.  For internally testing releases, you can run make_dist with the `--no-tests` option.
 * To create a source release of external libs, do an export from the version control system into a directory called `qpdf-external-libs` and just make a zip file of the result called `qpdf-external-libs-src.zip`.  See the README.txt file there for information on creating binary external libs releases. Run this from the external-libs repository:
   ```
   git archive --prefix=external-libs/ HEAD . | (cd /tmp; tar xf -)

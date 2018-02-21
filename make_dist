@@ -9,16 +9,18 @@ use warnings;
 use strict;
 use File::Basename;
 use Cwd;
+use Cwd 'abs_path';
 use IO::File;
 
 my $whoami = basename($0);
+my $srcdir = basename(dirname($0));
+my $pwd = getcwd();
+usage() unless $pwd eq abs_path(dirname(dirname($0)));
 
-usage() unless @ARGV >= 1;
-my $srcdir = shift(@ARGV);
 my $run_tests = 1;
-if (@ARGV)
+foreach my $arg (@ARGV)
 {
-    if ($ARGV[0] eq '--no-tests')
+    if ($arg eq '--no-tests')
     {
 	$run_tests = 0;
     }
@@ -27,12 +29,9 @@ if (@ARGV)
 	usage();
     }
 }
-$srcdir =~ s,/$,,;
+
 usage() unless $srcdir =~ m/^qpdf-(\d+\.\d+(?:\.(a|b|rc)?\d+)?)$/;
 my $version = $1;
-usage() unless -d $srcdir;
-
-my $pwd = getcwd();
 cd($srcdir);
 
 # Check versions
@@ -139,12 +138,12 @@ sub cd
 sub usage
 {
     die "
-Usage: $whoami qpdf-version [ --no-tests ]
+Usage: $whoami [ --no-tests ]
 
-qpdf-version must be a directory containing a pristine export of that
-version of qpdf from the version control system.  Use of --no-tests
-can be used for internally testing releases, but do not use it for a
-real release.
+$whoami must be run from the parent of a directory called
+qpdf-<version> which must contain a pristine export of that version of
+qpdf from the version control system. Use of --no-tests can be used
+for internally testing releases, but do not use it for a real release.
 
 ";
 }
