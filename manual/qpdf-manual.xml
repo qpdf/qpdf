@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "7.1.1">
-<!ENTITY lastreleased "February 4, 2018">
+<!ENTITY swversion "8.0.a1">
+<!ENTITY lastreleased "February 20, 2018">
 ]>
 <book>
  <bookinfo>
