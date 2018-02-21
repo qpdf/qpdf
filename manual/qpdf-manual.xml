@@ -1050,7 +1050,10 @@ outfile.pdf</option>
       <term><option>--normalize-content=[yn]</option></term>
       <listitem>
        <para>
-        Enables or disables normalization of content streams.
+        Enables or disables normalization of content streams. Content
+        normalization is enabled by default in QDF mode. Please see
+        <xref linkend="ref.qdf"/> for additional discussion of QDF
+        mode.
        </para>
       </listitem>
      </varlistentry>
@@ -1204,6 +1207,36 @@ outfile.pdf</option>
     damage to the content streams.  This option is intended for people
     who wish to study PDF content streams or to debug PDF content.
     You should not use this for &ldquo;production&rdquo; PDF files.
+   </para>
+   <para>
+    This paragraph discusses edge cases of content normalization that
+    are not of concern to most users and are not relevant when content
+    normalization is not enabled. When normalizing content, if qpdf
+    runs into any lexical errors, it will print a warning indicating
+    that content may be damaged. The only situation in which qpdf is
+    known to cause damage during content normalization is when a
+    page's contents are split across multiple streams and streams are
+    split in the middle of a lexical token such as a string, name, or
+    inline image. There may be some pathological cases in which qpdf
+    could damage content without noticing this, such as if the partial
+    tokens at the end of one stream and the beginning of the next
+    stream are both valid, but usually qpdf will be able to detect
+    this case. For slightly increased safety, you can specify
+    <option>--coalesce-contents</option> in addition to
+    <option>--normalize-content</option> or <option>--qdf</option>.
+    This will cause qpdf to combine all the content streams into one,
+    thus recombining any split tokens. However doing this will prevent
+    you from being able to see the original layout of the content
+    streams. If you must inspect the original content streams in an
+    uncompressed format, you can always run with <option>--qdf
+    --normalize-content=n</option> for a QDF file without content
+    normalization, or alternatively
+    <option>--stream-data=uncompress</option> for a regular non-QDF
+    mode file with uncompressed streams. These will both uncompress
+    all the streams but will not attempt to normalize content. Please
+    note that if you are using content normalization or QDF mode for
+    the purpose of manually inspecting files, you don't have to care
+    about this.
    </para>
    <para>
     Object streams, also known as compressed objects, were introduced
