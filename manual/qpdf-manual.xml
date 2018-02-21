@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "7.1.1">
-<!ENTITY lastreleased "February 4, 2018">
+<!ENTITY swversion "8.0.a1">
+<!ENTITY lastreleased "February 20, 2018">
 ]>
 <book>
  <bookinfo>
@@ -1050,7 +1050,10 @@ outfile.pdf</option>
       <term><option>--normalize-content=[yn]</option></term>
       <listitem>
        <para>
-        Enables or disables normalization of content streams.
+        Enables or disables normalization of content streams. Content
+        normalization is enabled by default in QDF mode. Please see
+        <xref linkend="ref.qdf"/> for additional discussion of QDF
+        mode.
        </para>
       </listitem>
      </varlistentry>
@@ -1116,6 +1119,40 @@ outfile.pdf</option>
         specifically know how to generate PDF/A-compliant PDFs, this
         at least prevents it from removing compliance on already
         compliant files.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--linearize-pass1=<replaceable>file</replaceable></option></term>
+      <listitem>
+       <para>
+        Write the first pass of linearization to the named file. The
+        resulting file is not a valid PDF file. This option is useful
+        only for debugging <classname>QPDFWriter</classname>'s
+        linearization code. When qpdf linearizes files, it writes the
+        file in two passes, using the first pass to calculate sizes
+        and offsets that are required for hint tables and the
+        linearization dictionary. Ordinarily, the first pass is
+        discarded. This option enables it to be captured.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--coalesce-contents</option></term>
+      <listitem>
+       <para>
+        When a page's contents are split across multiple streams, this
+        option causes qpdf to combine them into a single stream. Use
+        of this option is never necessary for ordinary usage, but it
+        can help when working with some files in some cases. For
+        example, some PDF writers split page contents into small
+        streams at arbitrary points that may fall in the middle of
+        lexical tokens within the content, and some PDF readers may
+        get confused on such files. If you use qpdf to coalesce the
+        content streams, such readers may be able to work with the
+        file more easily. This can also be combined with QDF mode or
+        content normalization to make it easier to look at all of a
+        page's contents at once.
        </para>
       </listitem>
      </varlistentry>
@@ -1204,6 +1241,36 @@ outfile.pdf</option>
     damage to the content streams.  This option is intended for people
     who wish to study PDF content streams or to debug PDF content.
     You should not use this for &ldquo;production&rdquo; PDF files.
+   </para>
+   <para>
+    This paragraph discusses edge cases of content normalization that
+    are not of concern to most users and are not relevant when content
+    normalization is not enabled. When normalizing content, if qpdf
+    runs into any lexical errors, it will print a warning indicating
+    that content may be damaged. The only situation in which qpdf is
+    known to cause damage during content normalization is when a
+    page's contents are split across multiple streams and streams are
+    split in the middle of a lexical token such as a string, name, or
+    inline image. There may be some pathological cases in which qpdf
+    could damage content without noticing this, such as if the partial
+    tokens at the end of one stream and the beginning of the next
+    stream are both valid, but usually qpdf will be able to detect
+    this case. For slightly increased safety, you can specify
+    <option>--coalesce-contents</option> in addition to
+    <option>--normalize-content</option> or <option>--qdf</option>.
+    This will cause qpdf to combine all the content streams into one,
+    thus recombining any split tokens. However doing this will prevent
+    you from being able to see the original layout of the content
+    streams. If you must inspect the original content streams in an
+    uncompressed format, you can always run with <option>--qdf
+    --normalize-content=n</option> for a QDF file without content
+    normalization, or alternatively
+    <option>--stream-data=uncompress</option> for a regular non-QDF
+    mode file with uncompressed streams. These will both uncompress
+    all the streams but will not attempt to normalize content. Please
+    note that if you are using content normalization or QDF mode for
+    the purpose of manually inspecting files, you don't have to care
+    about this.
    </para>
    <para>
     Object streams, also known as compressed objects, were introduced
@@ -2989,7 +3056,7 @@ print "\n";
       <listitem>
        <para>
         Bug fix: files whose /ID fields were other than 16 bytes long
-        can now be properly linearlized
+        can now be properly linearized
        </para>
       </listitem>
       <listitem>

@@ -1,0 +1,265 @@
+ROUTINE DEVELOPMENT
+
+Default:
+
+./configure --enable-werror --disable-shared
+
+Debugging:
+
+./configure CFLAGS="-g" CXXFLAGS="-g" --enable-werror --disable-shared
+
+Memory checks:
+
+./configure CFLAGS="-fsanitize=address -g" \
+   CXXFLAGS="-fsanitize=address -g" \
+   LDFLAGS="-fsanitize=address" \
+   --enable-werror --disable-shared
+
+
+CODING RULES
+
+* Avoid atoi. Use QUtil::string_to_int instead. It does
+  overflow/underflow checking.
+
+* Remember to avoid using `operator[]` with `std::string` or
+  `std::vector`. Instead, use `at()`. See README-hardening.md for
+  details.
+
+
+RELEASE PREPARATION
+
+* Each year, update copyright notices. Just do a case-insensitive
+  search for copyright. Don't forget copyright in manual. Also update
+  debian copyright in debian package. Last updated: 2018.
+
+* Check all open issues in the sourceforge trackers and on github.
+
+* Check `TODO` file to make sure all planned items for the release are
+  done or retargeted.
+
+* Run a spelling checker over the source code to catch errors in
+  variable names, strings, and comments.
+
+  ispell -p words **/*.hh **/*.cc manual/*
+
+* If needed, run large file and image comparison tests. Configure
+  options:
+
+--enable-test-compare-images --with-large-file-test-path=/path
+
+  For Windows, use a Windows style path, not an MSYS path for large files.
+
+* Test with clang. Pass `CC=clang CXX=clang++` to `./configure`.
+
+* Test build on a mac.
+
+* Test with address sanitizer as described above.
+
+* A small handful of additional files have been taken from autotools
+  programs. These should probably be updated from time to time.
+
+  * `config.guess`, `config.sub`, `ltmain.sh`, and the `m4` directory:
+    these were created by running `libtoolize -c`. To update, run
+    `libtoolize -f -c` or remove the files and rerun `libtoolize`.
+
+  * Other files copied as indicated:
+    ```
+    cp /usr/share/automake-1.11/install-sh .
+    cp /usr/share/automake-1.11/mkinstalldirs .
+    ```
+
+  The entire contents of the `m4` directory came from `libtool.m4`. If
+  we had some additional local parts, we could also add those to the
+  `m4` directory. In order for this to work, it is necessary to run
+  `aclocal -I m4` before running `autoheader` and `autoconf`. The
+  `autogen.sh` script handles this.
+
+* If any interfaces were added or changed, check C API to see whether
+  changes are appropriate there as well. If necessary, review the
+  casting policy in the manual, and ensure that integer types are
+  properly handled.
+
+* Increment shared library version information as needed (`LT_*` in
+  `configure.ac`)
+
+* Test for binary compatibility:
+  * Check out the last release
+  * ./autogen.sh && ./configure --enable-werror && make -j$(nproc)
+  * Check out the current version
+  * ./autogen.sh && ./configure --enable-werror && make -j$(nproc) build_libqpdf
+  * Checkout the last release
+  * make check NO_REBUILD=1
+
+* Make sure version numbers are consistent in the following locations:
+  * configure.ac
+  * libqpdf/QPDF.cc
+  * manual/qpdf-manual.xml
+  `make_dist` verifies this consistency.
+
+* Update release notes in manual. Look at diffs and ChangeLog. Update
+  release date in `manual/qpdf-manual.xml`. Remember to ensure that
+  the entities at the top of the document are consistent with the
+  release notes for both version and release date.
+
+* Add a release entry to ChangeLog.
+
+
+CREATING A RELEASE
+
+* Create source release:
+
+version=x.y.z
+rm -rf /tmp/qpdf-$version
+git archive --prefix=qpdf-$version/ HEAD . | (cd /tmp; tar xf -)
+cd /tmp
+./qpdf-$version/make_dist
+gpg --detach-sign --armor qpdf-$version.tar.gz
+
+  Move qpdf-$version.tar.gz and qpdf-$version.tar.gz.asc to the
+  release archive area.
+
+  For iterating on the release during testing, pass `--no-tests` to
+  make_dist to skip the test suite.
+
+* Generate a signed AppImage using the docker image in appimage.
+  Arguments to the docker container are arguments to git clone. The
+  build should be made off the exact commit that will be officially
+  tagged as the release but built prior to tagging the release.
+  Example:
+
+cd appimage
+docker build -t qpdfbuild .
+rm -rf /tmp/build
+mkdir -p /tmp/build
+cp -rLp ~/.gnupg/. /tmp/build/.gnupg
+docker run --privileged -ti --rm -v /tmp/build:/tmp/build qpdfbuild https://github.com/jberkenbilt/qpdf -b work
+
+  Rename the AppImage in /tmp/build/qpdf/appimage/build
+  qpdf-$version-x86_64.AppImage and move it to the release archive
+  area.
+
+* Create Windows binary releases. In Windows:
+  * Extract the source distribution
+  * From there, unzip the binary distribution of the external libraries
+  * Open windows for 32-bit and 64-bit compilation environments that
+    support msvc and mingw
+  * Disable antivirus software. For bitdefender, open, select the "B"
+    shield, and go to "View Features". Disable advanced threat defense
+    and vulnerability scanning.
+  * In each window simultaneously, run ./make_windows_releases
+  * Copy the four resulting zip files into the release archive area
+  * Re-enable anti-virus software
+
+* Build and test the debian package
+
+* Sign the releases. The release archive area should contain the
+  Windows binaries, the AppImage, the source tarball, and the source
+  tarball signature.
+
+\rm -f *.{md5,sha1,sha512}
+files=(*)
+for i in md5 sha1 sha512; do
+  ${i}sum $files >| qpdf-$version.$i
+  gpg --clearsign --armor qpdf-$version.$i
+  mv qpdf-$version.$i.asc qpdf-$version.$i
+done
+
+* When creating releases on github and sourceforge, remember to copy
+  `README-what-to-download.md` separately onto the download area if
+  needed.
+
+* Create a github release after pushing the tag. `gcurl` is an alias
+  that includes the auth token.
+
+# Create release
+url=$(gcurl -s -XPOST https://api.github.com/repos/qpdf/qpdf/releases -d'{"tag_name": "release-qpdf-'$version'", "name": "qpdf '$version'", "draft": true}' | jq -r '.url')
+
+# Get upload url
+upload_url=$(gcurl -s $url | jq -r '.upload_url' | sed -E -e 's/\{.*\}//')
+echo $upload_url
+
+# Upload all the files. You can add a label attribute too, which
+# overrides the name.
+for i in *; do
+  mime=$(file -b --mime-type $i)
+  gcurl -H "Content-Type: $mime" --data-binary @$i "$upload_url?name=$i"
+done
+
+If needed, go onto github and make any manual updates such as
+indicating a pre-release, adding release notes, etc.
+
+# Publish release
+gcurl -XPOST $url -d'{"draft": false}'
+
+* Upload files to sourceforge. Make the source package the default for
+  all but Windows, and make the 32-bit mingw build the default for
+  Windows. Publish a news item manually on sourceforge.
+
+* Update the web page to indicate the new version and to put the new
+  documentation in the `files` subdirectory of the website on
+  sourceforge.net.
+
+* Email the qpdf-announce list.
+
+
+OTHER NOTES
+
+To construct a source distribution from a pristine checkout,
+`make_dist` does the following:
+
+./autogen.sh
+./configure --enable-doc-maintenance --enable-werror
+make build_manual
+make distclean
+
+To create a source release of external libs, do an export from the
+version control system into a directory called `qpdf-external-libs`
+and just make a zip file of the result called
+`qpdf-external-libs-src.zip`. See the README.txt file there for
+information on creating binary external libs releases. Run this from
+the external-libs repository:
+
+git archive --prefix=external-libs/ HEAD . | (cd /tmp; tar xf -)
+cd /tmp
+zip -r qpdf-external-libs-src.zip external-libs
+
+When releasing on sourceforge, `external-libs` distributions go in
+`external-libs/yyyymmdd`, and qpdf distributions go in `qpdf/vvv`.
+
+
+GENERAL BUILD STUFF
+
+QPDF uses autoconf and libtool but does not use automake. The only
+files distributed with the qpdf source distribution that are not
+controlled are `configure`, `libqpdf/qpdf/qpdf-config.h.in`,
+`aclocal.m4`, and some documentation. See above for the steps required
+to prepare a source distribution.
+
+If building or editing documentation, configure with
+`--enable-doc-maintenance`. This will ensure that all tools or files
+required to validate and build documentation are available.
+
+If you want to run `make maintainer-clean`, `make distclean`, or `make
+autofiles.zip` and you haven't run `./configure`, you can pass
+`CLEAN=1` to make on the command line to prevent it from complaining
+about configure not having been run.
+
+If you want to run checks without rerunning the build, pass
+`NO_REBUILD=1` to make. This can be useful for special testing
+scenarios such as validation of memory fixes or binary compatibility.
+
+
+LOCAL WINDOWS TESTING PROCEDURE
+
+This is what I do for routine testing on Windows.
+
+From Linux, run `./autogen.sh` and `make autofiles.zip CLEAN=1`.
+
+From Windows, git clone from my Linux clone, unzip `external-libs`,
+and unzip `autofiles.zip`.
+
+Look at `make_windows_releases`. Set up path the same way and run
+whichever `./config-*` is appropriate for whichever compiler I need to
+test with. Start one of the Visual Studio native compiler shells, and
+from there, run one of the msys shells. The Visual Studio step is not
+necessary if just building with mingw.
