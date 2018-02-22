@@ -3050,6 +3050,118 @@ print "\n";
   </para>
   <variablelist>
    <varlistentry>
+    <term>8.0.0: February XXX, 2018</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Packaging and Distribution Changes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          QPDF is now distributed as an <ulink
+          url="https://appimage.org/">AppImage</ulink> in addition to
+          all the other ways it is distributed. The AppImage can be
+          found in the download area with the other packages. Thanks
+          to Kurt Pfeifle and Simon Peter for their contributions.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Bug Fixes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          <function>QPDFObjectHandle::getUTF8Val</function> now
+          properly treats non-Unicode strings as encoded with PDF Doc
+          Encoding.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Improvements to handling of objects in PDF files that are
+          not of the expected type. In most cases, qpdf will be able
+          to warn for such cases rather than fail with an exception.
+          Previous versions of qpdf would sometimes fail with errors
+          such as &ldquo;operation for dictionary object attempted on
+          object of wrong type&rdquo;. This situation should be mostly
+          or entirely eliminated now.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Enhancements to the <command>qpdf</command> Command-line Tool.
+        All new options listed here are documented in more detail in
+        <xref linkend="ref.using"/>.
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          The option
+          <option>--linearize-pass1=<replaceable>file</replaceable></option>
+          has been added for debugging qpdf's linearization code.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          The option <option>--coalesce-contents</option> can be used
+          to combine content streams of a page whose contents are an
+          array of streams into a single stream.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        API Enhancements. All new API calls are documented in their
+        respective classes' header files. There are no non-compatible
+        changes to the API.
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Add function <function>qpdf_check_pdf</function> to the C API.
+          This function does basic checking that is a subset of what
+          <command>qpdf --check</command> performs.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Major enhancements to the lexical layer of qpdf. For a
+          complete list of enhancements, please refer to the
+          <filename>ChangeLog</filename> file. Most of the changes
+          result in improvements to qpdf's ability handle erroneous
+          files. It is also possible for programs to handle
+          whitespace, comments, and inline images as tokens.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          New API for working with PDF content streams at a lexical
+          level. The new class
+          <classname>QPDFObjectHandle::TokenFilter</classname> allows
+          the developer to provide token handlers. Token filters can be
+          used with several different methods in
+          <classname>QPDFObjectHandle</classname> as well as with a
+          lower-level interface. See comments in
+          <filename>QPDFObjectHandle.hh</filename> as well as the new
+          examples <filename>examples/pdf-filter-tokens.cc</filename>
+          and <filename>examples/pdf-count-strings.cc</filename> for
+          details.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
     <term>7.1.1: February 4, 2018</term>
     <listitem>
      <itemizedlist>
