@@ -322,7 +322,7 @@ fi
 if [ x"$1" == "xman"  -o  x"$1" == "x--man" ] ; then
     export MANPATH="$HERE/usr/share/man:$MANPATH"
     shift
-    exec man "$@"
+    exec man "$@" || man $(basename $1)
 fi
 
 
