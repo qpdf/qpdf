@@ -4,6 +4,9 @@ if [ ! -d external-libs ]; then
    exit 2
 fi
 
+echo "Waiting for win.32 and win.64"
+while [ ! -f win.32 ] || [ ! -f win.64 ]; do sleep 1; done
+
 set -e
 set -x
 cwd=`pwd`

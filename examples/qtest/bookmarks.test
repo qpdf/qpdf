@@ -48,4 +48,10 @@ $td->runtest("bookmarks deleted",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-$td->report(10);
+$td->runtest("non-trivial pdf doc to unicode",
+             {$td->COMMAND => "pdf-bookmarks issue-179.pdf"},
+             {$td->FILE => "issue-179.out",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->report(11);

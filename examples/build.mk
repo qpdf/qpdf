@@ -6,7 +6,9 @@ BINS_examples = \
 	pdf-invert-images \
 	pdf-create \
 	pdf-parse-content \
-	pdf-split-pages
+	pdf-split-pages \
+	pdf-filter-tokens \
+	pdf-count-strings
 CBINS_examples = pdf-linearize
 
 TARGETS_examples = $(foreach B,$(BINS_examples) $(CBINS_examples),examples/$(OUTPUT_DIR)/$(call binname,$(B)))

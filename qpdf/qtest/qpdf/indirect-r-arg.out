@@ -1,6 +1,6 @@
-WARNING: indirect-r-arg.pdf (file position 76): unknown token while reading object; treating as string
-WARNING: indirect-r-arg.pdf (file position 62): expected dictionary key but found non-name object; inserting key /QPDFFake1
-WARNING: indirect-r-arg.pdf (file position 62): expected dictionary key but found non-name object; inserting key /QPDFFake2
+WARNING: indirect-r-arg.pdf (object 1 0, offset 76): unknown token while reading object; treating as string
+WARNING: indirect-r-arg.pdf (object 1 0, offset 62): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: indirect-r-arg.pdf (object 1 0, offset 62): expected dictionary key but found non-name object; inserting key /QPDFFake2
 checking indirect-r-arg.pdf
 PDF Version: 1.3
 File is not encrypted

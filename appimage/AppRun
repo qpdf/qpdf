@@ -1,19 +1,492 @@
 #!/bin/bash
 
-# The purpose of this custom AppRun script is
-# to allow symlinking the AppImage and invoking
-# the corresponding binary depending on which
-# symlink was used to invoke the AppImage
+# Copyright (c) 2017 Simon Peter (@probonopd)
+# Copyright (c) 2018 Kurt Pfeifle (@pdfkungfoo)
+#
+# License: MIT
+#
+# The purpose of this custom AppRun script is to enable symlinking the AppImage and invoking the corresponding
+# binary depending on which symlink name was used to invoke the AppImage.
+#
+# At the same time it also allows to invoke the embedded binaries as 'sub-commands'. This is in the interest of
+# saving users from creating extra symlinks (without preventing others from STILL using such, should they want
+# or need these).
+#
+# It also provides some additional help parameters in order to allow faster familiarization with functionality
+# embedded in this AppImage. For example it support the listing and viewing of embedded manpages, HTML files,
+# PDF files, licenses and READMEs.
+#
+# Note, the AppImage can be renamed to anything what's 'legal' for an executable name under Linux or used via
+# a symlink under any name and it should behave like 'qpdf' is expected to behave. If the symlink name is
+# 'fix-qdf' or 'zlib-flate' it should behave like these...
 
 HERE="$(dirname "$(readlink -f "${0}")")"
 
-if [ ! -z $APPIMAGE ] ; then
-  BINARY_NAME=$(basename "$ARGV0")
-  if [ -e "$HERE/usr/bin/$BINARY_NAME" ] ; then
-    exec "$HERE/usr/bin/$BINARY_NAME" "$@"
-  else
-    exec "$HERE/usr/bin/qpdf" "$@"
-  fi
-else
-  exec "$HERE/usr/bin/qpdf" "$@"
+# Set APPDIR and ARGV0 when running directly from the AppDir.
+# Running from the AppDir can be beneficial when debugging the AppImage (or give performance improvements):
+if [ -z $APPDIR ]; then
+    APPDIR="$HERE"
+    ARGV0="$0"
 fi
+
+# This is a semi-secret environment variable which can be set for debugging the AppImage.
+# For now it is only meant for temporary use and may be removed again in the near future once things have
+# settled:
+if [ "x$SET_BASH_X_FOR_APPRUN" == "xYeSS" ] ; then
+   set -x
+else
+   set +x
+fi
+
+# Another semi-secret environment var:
+if [ "x$SET_SHOW_ENV_FOR_APPRUN" == "xYeSS" ] ; then
+    env | less
+fi
+
+if [ "x$SET_SHOW_ENV_FOR_APPIMAGE" == "xYeSS" ] ; then
+    env | grep --color -E '(APPIMAGE|APPDIR|APP|ARGV0|HERE)'
+fi
+
+
+function usage() {
+echo "
+ --------------------------------------------------------------------------
+    All QPDF command line functionality inside an AppImage package.
+ --------------------------------------------------------------------------
+
+ (This package uses the AppImage software packaging technology for Linux ['One App == One File']
+  for easy availability of the newest QPDF releases across all major Linux distributions.)
+
+ Usage:
+ ------
+
+   $ARGV0  --help
+                # Show help screen of QPDF itself
+
+   $ARGV0  --usage
+                # This message (it's only present in the AppImage incarnation of QPDF)
+
+   $ARGV0  fix-qdf|zlib-flate
+                # Run the named sub-command
+
+   $ARGV0  --list-exe
+                # List all executables embedded in AppImage
+
+   $ARGV0  --list-man
+                # List available, embedded manual pages
+
+   $ARGV0  --man qpdf|zlib-flate|fix-qdf
+                # Display embedded manual page(s)
+
+   $ARGV0  --list-html
+                # List all HTML documents embedded in AppImage
+
+   $ARGV0  --html <path/to/file>
+                # Use browser to show HTML file embedded in AppImage
+                # (for list of available HTML files see \"$ARGV0 --list-html\")
+
+   $ARGV0  --list-pdf
+                # List all PDF documents embedded in AppImage
+
+   $ARGV0  --pdf <path/to/file>
+                # Use system default PDF viewer to display embedded PDF document(s)
+                # (for list of available PDF files see \"$ARGV0 --list-pdf\")
+
+   $ARGV0  --list-readme
+                # List all READMEs embedded in AppImage
+
+   $ARGV0  --readme <path/to/readme>
+                # Show content of README embedded in AppImage
+                # (for list of available READMEs see \"$ARGV0 --list-readme\")
+
+   $ARGV0  --list-license
+                # List all LICENSE files embedded in AppImage
+
+   $ARGV0  --license <name-of-license>
+                # Show content of LICENSE file embedded in AppImage (piped thru 'less -N')
+
+   $ARGV0  --show-apprun|--self-show|--selfshow
+                 # Show 'AppRun' invoked by 'less -N'; type '-N' to toogle line number display
+
+   $ARGV0  --appimage-help
+                # Show AppImage options available for all 'type 2' AppImages
+
+   $ARGV0  --help
+                # Show help screen of QPDF itself
+
+ ------------------------------------------------------------------------------------------------
+ NOTE: The execution of this AppImage is controlled by a custom AppRun script. The state of this
+ script is experimental and preliminary. Hence it may not work as expected, or miss some
+ functionality. You can hack on this script by unpacking this AppImage into a local sub directory
+ [currently named 'squashfs-root'] with this command:
+
+       $ARGV0 --appimage-extract
+
+ After you're done with your hacks, repackage the AppImage again with this command:
+
+       appimagetool [/path/to/]squashfs-root [/path/to/]QPDF-*.AppImage
+
+ Latest versions of tools provided by AppImageKit are always available from
+   * https://github.com/AppImage/AppImageKit/releases/     and
+   * https://github.com/AppImage/AppImageUpdate/releases/  and
+   * https://github.com/AppImage/zsync2/releases           and
+   * https://github.com/probonopd/linuxdeployqt/releases/
+ ------------------------------------------------------------------------------------------------
+"
+}
+
+
+function mimetype() {
+case "$#" in
+    1)
+        # 'file --mime-type some-foo-file.ext' usually returns: 'some-foo-file.ext: major/minor', on stderr...
+        # However, we want to get back only 'major/minor', on stdout!
+        file --mime-type "$1" 2>&1 | sed 's#'"$1"':##;s# ##'
+        ;;
+    0)
+        echo ""                                                                     1>&2
+        echo " #  This is a Bash function, named \"$FUNCNAME\"."                    1>&2
+        echo " #  You cannot run it without an argument. If you run it with a"      1>&2
+        echo " #  [path to a] file as a single argument, it simply returns the"     1>&2
+        echo " #  'major/minor' MIME type. If you add multiple [paths to] files"    1>&2
+        echo " #  as arguments, it returns a list of 'major/minor' MIME types with" 1>&2
+        echo " #  the respective file names prepended. Example usage:"              1>&2
+        echo " #"                                                                   1>&2
+        echo " #         $> $FUNCNAME /path/to/a.pdf"                               1>&2
+        echo " #"                                                                   1>&2
+        echo " #         $> $FUNCNAME /path/to/a.txt ./myscript.sh ../some.txt"     1>&2
+        echo " #"                                                                   1>&2
+        echo " #  This Bash function's source code is this:"                        1>&2
+        echo ""                                                                     1>&2
+        typeset -f "${FUNCNAME}"                                                    1>&2
+        echo ""                                                                     1>&2
+        ;;
+    *)
+        file --mime-type "$@"
+        ;;
+esac
+}
+
+
+if [ x"$1" == "xshow-apprun" -o x"$1" == "x--show-apprun" -o x"$1" == "x--apprunshow" -o x"$1" == "x--apprun-show" -o x"$1" == "xselfshow" -o x"$1" == "x--selfshow"  -o x"$1" == "xself-show" -o x"$1" == "x--self-show" -o x"$1" == "x--show-self" -o x"$1" == "x--showself" -o x"$1" == "xshow-self" -o x"$1" == "xshowself" ] ; then
+    cd "$HERE"
+    less -N AppRun
+    exit $?
+fi
+
+
+if [ x"$1" == "xlistlicense" -o x"$1" == "x--listlicense" -o  x"$1" == "xlist-license" -o x"$1" == "x--list-license" -o x"$1" == "x--licenselist" -o x"$1" == "x--license-list" ] ; then
+    cd "$HERE"
+    echo ""
+    echo "You may invoke \"$ARGV0\" with one of the following additional arguments."
+    echo "This will then display the respective license file:"
+    echo ""
+    find . -type f -name "*LICENSE*" -o -name "*license*" | sed 's#^./#  --license #'
+    echo ""
+    exit $?
+fi
+
+
+if [ "x$1" == "xusage" -o "x$1" == "x--usage" -o "x$1" == "x-u" ] ; then
+    usage | less
+    #usage
+    exit $?
+fi
+
+
+if [ x"$1" == "xlistman" -o x"$1" == "x--listman" -o x"$1" == "xlist-man" -o x"$1" == "x--list-man" -o x"$1" == "x--manlist" -o x"$1" == "x--man-list" ] ; then
+    cd "$HERE"
+    echo ""
+    echo "You may invoke \"$ARGV0\" with one of the following additional arguments."
+    echo "This will then open the respective manual page:"
+    echo ""
+    find usr/share/man* -type f | sed 's#^#  --man #'
+    echo ""
+    exit $?
+fi
+
+
+if [ x"$1" == "xlistexe" -o x"$1" == "x--listexe" -o x"$1" == "xlist-exe" -o x"$1" == "x--list-exe" -o x"$1" == "x--exelist" -o x"$1" == "x--exe-list" ] ; then
+    cd "$HERE"
+    echo ""
+    echo "You may invoke \"$ARGV0\" with one of the following additional arguments."
+    echo "This would run the respective exe as a 'sub-command':"
+    echo ""
+    find . \( \( -type f -o -type l -o -type s -o -type p \) -a -executable \) | grep '/bin/' | grep -v qpdf | sed 's#./usr/bin/#  #' | sort -V | grep -v ".sh$"
+    echo ""
+    find . \( \( -type f -o -type l -o -type s -o -type p \) -a -executable \) | grep '/bin/' | grep -v qpdf | sed 's#./usr/bin/#  #' | sort -V | grep    ".sh$"
+    echo ""
+    exit $?
+fi
+
+
+if [ x"$1" == "xlistreadme" -o x"$1" == "x--listreadme" -o x"$1" == "xlist-readme" -o x"$1" == "x--list-readme" -o x"$1" == "x--readmelist" -o x"$1" == "x--readme-list" ] ; then
+    cd "$HERE"
+    echo ""
+    echo "You may invoke \"$ARGV0\" with one of the following additional arguments."
+    echo "This will then display the respective README file:"
+    echo ""
+    find . -type f -iname "*README*" -o -iname "*.txt" -o -iname "*.md" -o -iname "*copyright*" -o -iname "*changelog*" -o -iname "*todo*" | sed 's#^./#  --readme #'
+    echo ""
+    exit $?
+fi
+
+
+if [ x"$1" == "xlisthtml" -o x"$1" == "x--listhtml" -o  x"$1" == "xlist-html" -o x"$1" == "x--list-html" -o x"$1" == "x--htmllist" -o x"$1" == "x--html-list" ] ; then
+    cd "$HERE"
+    echo ""
+    echo "You may invoke \"$ARGV0\" with one of the following additional arguments."
+    echo "This will then open the respective HTML file in your preferred browser:"
+    echo ""
+    find . -type f -name "*.html" | sed 's#^./#  --html #'
+    echo ""
+    exit $?
+fi
+
+
+if [ x"$1" == "xlistpdf" -o x"$1" == "x--listpdf" -o x"$1" == "xlist-pdf" -o x"$1" == "x--list-pdf" -o x"$1" == "x--pdflist" -o x"$1" == "x--pdf-list" ] ; then
+    cd "$HERE"
+    echo ""
+    echo "You may invoke \"$ARGV0\" with one of the following additional arguments."
+    echo "This will then open the respective PDF file in your preferred viewer program:"
+    echo ""
+    find . -type f -name "*.pdf" | sed 's#^./#  --pdf #'
+    echo ""
+    exit $?
+fi
+
+
+if [ x"$1" == "xreadme" -o x"$1" == "x--readme" ] ; then
+    cd "$HERE"
+    shift
+    echo ""
+    if [ x"$1" == "x" ] ; then
+        echo " You must give a path to the README you want to open."
+        echo "   For available READMEs run \"$ARGV0 --listreadme\"."
+    else
+        readmefile=$( find . -type f -iname "*README*" -o -iname "*.txt" -o -iname "*.md" -o -iname "*copyright*" -o -iname "*changelog*" | grep "${1}" | sort -rV | head -n 1 )
+        MIME=$(mimetype $readmefile)
+        case $MIME in
+            text/html|application/pdf|application/epub*)
+                xdg-open "$readmefile"
+                sleep 3  # sleep to allow slow xdg-open do its job
+             ;;
+            inode/x-empty)
+                echo ""
+                echo " Sorry, this file, \"$readmefile\", is empty and has no content."
+                echo ""
+             ;;
+            text/*)
+                less -N "$readmefile"
+             ;;
+        esac
+        sleep 0
+    fi
+    echo ""
+   exit $?
+fi
+
+
+if [ x"$1" == "xlicense" -o x"$1" == "x--license" ] ; then
+    cd "$HERE"
+    shift
+    echo ""
+    if [ x"$1" == "x" ] ; then
+        echo " You must give a path to the LICENSE you want to open."
+        echo "   For available LICENSE run \"$ARGV0 --list-license\"."
+    else
+        licensefile=$( find . -type f -iname "*LICENSE*" | grep "${1}" | sort -rV | head -n 1 )
+        #if PDF or EPUB or HTML ; then xdg-open $licensefile ; else
+        MIME=$(mimetype $licensefile)
+        case $MIME in
+            text/html|application/pdf|application/epub*)
+                xdg-open "$licensefile"
+                sleep 3  # sleep to allow slow xdg-open do its job
+             ;;
+            inode/x-empty)
+                echo ""
+                echo " Sorry, this file, \"$licensefile\", is empty and has no content."
+                echo ""
+             ;;
+            text/*)
+                less -N "$licensefile"
+             ;;
+        esac
+        sleep 0
+    fi
+    echo ""
+   exit $?
+fi
+
+
+if [ x"$1" == "xman"  -o  x"$1" == "x--man" ] ; then
+    export MANPATH="$HERE/usr/share/man:$MANPATH"
+    shift
+    exec man "$@"
+fi
+
+
+if [ x"$1" == "xpdf" -o x"$1" == "x--pdf" ] ; then
+    cd "$HERE"
+    shift
+    echo ""
+    if [ x"$1" == "x" ] ; then
+        echo ""
+        echo " You must give a path to the PDF file you want to open."
+        echo "   For available PDFs run \"$ARGV0 --list-pdf\""
+        echo ""
+    else
+        pdffile=$( find . -type f -name "*.pdf" | grep "${1/.pdf/}.pdf" | sort -rV | head -n 1 )
+        xdg-open "$pdffile"
+        sleep 5
+    fi
+    echo ""
+    exit $?
+fi
+
+
+if [ x"$1" == "xhtml" -o x"$1" == "x--html" ] ; then
+    cd "$HERE"
+    shift
+    if [ x"$1" == "x" ] ; then
+        echo ""
+        echo " You must give a path to the HTML file you want to open."
+        echo "   For available HTMLs run \"$ARGV0 --list-html\""
+        echo ""
+    else
+        htmlfile=$( find . -type f -name "*.html" | grep "${1}" | sort -rV | head -n 1 )
+        xdg-open "$htmlfile"
+        sleep 5
+    fi
+    exit $?
+fi
+
+
+if [ x"$1" == "x--appimage-help" ] ; then
+    cd "$HERE"
+    shift
+    if [ x"$APPIMAGE" == "x" ] ; then
+        echo ""
+        echo " The parameter '--appimage-help' does not work if you run this application from an AppDir (as you do)."
+        echo " To create an AppImage from your AppDir run this command:"
+        echo ""
+        echo "    appimagetool -n $APPDIR qpdf.AppImage"
+        echo ""
+        echo " You can download the latest version of 'appimagetool' (as an AppImage) from here:"
+        echo ""
+        echo "    https://github.com/AppImage/AppImageKit/releases"
+        echo ""
+    fi
+    exit $?
+fi
+
+
+if [ "x$SET_SHOW_ENV_FOR_APPRUN" == "xYeSS" ] ; then
+    echo APPIMAGE=$APPIMAGE     1>&2  # Don't leak strings into output of qpdf|fix-qdf|zlib-flate which goes to stdout!
+    echo ARGV0=$ARGV0           1>&2  # Don't leak strings into output of qpdf|fix-qdf|zlib-flate which goes to stdout!
+    echo dollar0=$0             1>&2  # Don't leak strings into output of qpdf|fix-qdf|zlib-flate which goes to stdout!
+    echo dollar1=$1             1>&2  # Don't leak strings into output of qpdf|fix-qdf|zlib-flate which goes to stdout!
+    echo dollar_at="$@"         1>&2  # Don't leak strings into output of qpdf|fix-qdf|zlib-flate which goes to stdout!
+fi
+
+
+### Main stuff happens from here:
+if [ ! -z $APPIMAGE ] ; then
+    # We run as an AppImage
+    BINARY_NAME=$(basename "$ARGV0")
+    APPIMAGE=$APPIMAGE
+    CALLED_SUBCMD=$( basename $1 2>/dev/null )
+    if [ "x$SET_SHOW_ENV_FOR_APPRUN" == "xYeSS" ] ; then
+        # We have the (hidden) env var for debugging stuff set
+        echo BINARY_NAME=$BINARY_NAME       1>&2  # Don't leak strings into output of qpdf|fix-pdf|zlib-flate going to stdout!
+        echo APPIMAGE=$APPIMAGE             1>&2  # Don't leak strings into output of qpdf|fix-pdf|zlib-flate going to stdout!
+        echo CALLED_SUBCMD=$CALLED_SUBCMD   1>&2  # Don't leak strings into output of qpdf|fix-pdf|zlib-flate going to stdout!
+    fi
+
+    if [ -x "$HERE/usr/bin/$BINARY_NAME" ] && [ x"$BINARY_NAME" != "x" ] ; then
+        # We are invoked from a symlink (like 'fix-qdf' or 'zlib-flate')
+        if [ "x$SET_SHOW_ENV_FOR_APPRUN" == "xYeSS" ] ; then
+            # We have the (hidden) env var for debugging stuff set
+            echo BINARY_NAME=$BINARY_NAME       1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
+            echo APPIMAGE=$APPIMAGE             1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
+            echo CALLED_SUBCMD=$CALLED_SUBCMD   1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
+        fi
+        shift
+        exec "$HERE/usr/bin/$BINARY_NAME" "$@"
+
+    else
+        if [ -x "$HERE/usr/bin/$CALLED_SUBCMD" ] && [ x"$CALLED_SUBCMD" != "x" ] ; then
+            # We are invoked by a (currently not yet known future) binary name which may be located in ./usr/bin/ ...
+            BINARY_NAME=$1
+            if [ "x$SET_SHOW_ENV_FOR_APPRUN" == "xYeSS" ] ; then
+                # We have the (hidden) env var for debugging stuff set
+                echo BINARY_NAME=$BINARY_NAME       1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
+                echo APPIMAGE=$APPIMAGE             1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
+                echo CALLED_SUBCMD=$CALLED_SUBCMD   1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
+            fi
+            shift
+            exec "$HERE/usr/bin/$BINARY_NAME" "$@"
+        elif [ -x "$HERE/$CALLED_SUBCMD" ] && [ x"$CALLED_SUBCMD" != "x" ] ; then
+            # We are invoked by a (currently not yet known future) binary name which may be located in our root AppDir ...
+            BINARY_NAME=$CALLED_SUBCMD
+            if [ "x$SET_SHOW_ENV_FOR_APPRUN" == "xYeSS" ] ; then
+                # We have the (hidden) env var for debugging stuff set
+                echo BINARY_NAME=$BINARY_NAME       1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
+                echo APPIMAGE=$APPIMAGE             1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
+                echo CALLED_SUBCMD=$CALLED_SUBCMD   1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
+            fi
+            shift
+            exec "$HERE/$BINARY_NAME" "$@"
+        else
+            # this clause may not be necessary...
+            exec "$HERE/usr/bin/qpdf" "$@"
+        fi
+    fi
+
+else
+    # Most likely we run from an AppDir, not as an AppImage:
+    BINARY_NAME=$(basename "$ARGV0")
+    APPIMAGE=$APPIMAGE
+    CALLED_SUBCMD=$( basename $1 2>/dev/null )
+    if [ "x$SET_SHOW_ENV_FOR_APPRUN" == "xYeSS" ] ; then
+        # We have the (hidden) env var for debugging stuff set
+        echo BINARY_NAME=$BINARY_NAME       1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
+        echo APPIMAGE=$APPIMAGE             1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
+        echo CALLED_SUBCMD=$CALLED_SUBCMD   1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
+    fi
+
+    if [ -x "$HERE/usr/bin/$CALLED_SUBCMD" ] && [ "x$CALLED_SUBCMD" != "x" ]; then
+        #echo befor shift dollar_at=$@
+        if [ "x$SET_SHOW_ENV_FOR_APPRUN" == "xYeSS" ] ; then
+            # We have the (hidden) env var for debugging stuff set
+            echo BINARY_NAME=$BINARY_NAME       1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
+            echo APPIMAGE=$APPIMAGE             1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
+            echo CALLED_SUBCMD=$CALLED_SUBCMD   1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
+        fi
+        shift
+        #echo after shift dollar_at=$@
+        #echo CALLED_SUBCMD=$CALLED_SUBCMD
+        exec "$HERE/usr/bin/$CALLED_SUBCMD" "$@"
+
+    elif [ -x "$HERE/usr/bin/$BINARY_NAME" ] && [ "x$BINARY_NAME" != "x" ] ; then
+        if [ "x$SET_SHOW_ENV_FOR_APPRUN" == "xYeSS" ] ; then
+            # We have the (hidden) env var for debugging stuff set
+            echo BINARY_NAME=$BINARY_NAME       1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
+            echo APPIMAGE=$APPIMAGE             1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
+            echo CALLED_SUBCMD=$CALLED_SUBCMD   1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
+        fi
+        shift
+        exec "$HERE/usr/bin/$BINARY_NAME" "$@"
+
+    else
+        if [ "x$SET_SHOW_ENV_FOR_APPRUN" == "xYeSS" ] ; then
+            # We have the (hidden) env var for debugging stuff set
+            echo BINARY_NAME=$BINARY_NAME       1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
+            echo APPIMAGE=$APPIMAGE             1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
+            echo CALLED_SUBCMD=$CALLED_SUBCMD   1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
+        fi
+        exec "$HERE/usr/bin/qpdf" "$@"
+    fi
+
+fi
+

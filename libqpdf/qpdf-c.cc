@@ -4,6 +4,7 @@
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QPDFExc.hh>
+#include <qpdf/Pl_Discard.hh>
 
 #include <list>
 #include <string>
@@ -80,6 +81,15 @@ static void call_init_write_memory(qpdf_data qpdf)
 static void call_write(qpdf_data qpdf)
 {
     qpdf->qpdf_writer->write();
+}
+
+static void call_check(qpdf_data qpdf)
+{
+    QPDFWriter w(*qpdf->qpdf);
+    Pl_Discard discard;
+    w.setOutputPipeline(&discard);
+    w.setDecodeLevel(qpdf_dl_all);
+    w.write();
 }
 
 static QPDF_ERROR_CODE trap_errors(qpdf_data qpdf, void (*fn)(qpdf_data))
@@ -234,6 +244,13 @@ char const* qpdf_get_error_message_detail(qpdf_data qpdf, qpdf_error e)
 	return "";
     }
     return e->exc->getMessageDetail().c_str();
+}
+
+QPDF_ERROR_CODE qpdf_check_pdf(qpdf_data qpdf)
+{
+    QPDF_ERROR_CODE status = trap_errors(qpdf, &call_check);
+    QTC::TC("qpdf", "qpdf-c called qpdf_check_pdf");
+    return status;
 }
 
 void qpdf_set_suppress_warnings(qpdf_data qpdf, QPDF_BOOL value)

@@ -1,4 +1,5 @@
 #include <qpdf/QPDF_Array.hh>
+#include <qpdf/QUtil.hh>
 #include <stdexcept>
 
 QPDF_Array::QPDF_Array(std::vector<QPDFObjectHandle> const& items) :
@@ -44,6 +45,12 @@ char const*
 QPDF_Array::getTypeName() const
 {
     return "array";
+}
+
+void
+QPDF_Array::setDescription(QPDF* qpdf, std::string const& description)
+{
+    this->QPDFObject::setDescription(qpdf, description);
 }
 
 int

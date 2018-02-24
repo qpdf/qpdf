@@ -1,6 +1,6 @@
-WARNING: bad24.pdf (object 4 0, file position 385): expected endstream
-WARNING: bad24.pdf (object 4 0, file position 341): attempting to recover stream length
-WARNING: bad24.pdf (object 4 0, file position 341): recovered stream length: 54
+WARNING: bad24.pdf (object 4 0, offset 385): expected endstream
+WARNING: bad24.pdf (object 4 0, offset 341): attempting to recover stream length
+WARNING: bad24.pdf (object 4 0, offset 341): recovered stream length: 54
 /QTest is indirect and has type stream (10)
 /QTest is a stream.  Dictionary: << /Length 44 >>
 Raw stream data:

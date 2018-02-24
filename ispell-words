@@ -23,9 +23,11 @@ activatePipelineStack
 ActiveState
 acyclic
 adbe
+addContentTokenFilter
 addPage
 addPageAt
 addPageContents
+addTokenFilter
 addToTable
 adjustAESStreamLength
 admon
@@ -54,13 +56,16 @@ allowPoundAnywhereInName
 allowPrintHighRes
 allowPrintLowRes
 antivirus
+anyBadTokens
 aobjid
 apexcovantage
-API
+api
 APIs
 appendable
 appendItem
 appendString
+AppImage
+appimage
 arandom
 arg
 argc
@@ -69,11 +74,13 @@ argv
 arko
 arko's
 Arora
+arrayOrStreamToStreamArray
 ArtBox
 ascii
 asciiHex
 ASCIIHexDecode
 ASCIIHexDecoder
+asMap
 assertArray
 assertBool
 assertDictionary
@@ -95,6 +102,7 @@ assertType
 assignCompressedObjectNumbers
 atof
 atoi
+auth
 AuthEvent
 autobuilder
 autoconf
@@ -198,6 +206,7 @@ CHPageOffsetEntry
 CHSharedObject
 CHSharedObjectEntry
 CHSomething
+ci
 cin
 cinfo
 ciphertext
@@ -210,12 +219,15 @@ closeObject
 cmath
 cmd
 cmyk
+coalesceContentStreams
+CoalesceProvider
 codepage
 codepoint
 col
 Coldwind
 ColorSpace
 colorspace
+ColorToGray
 com
 compareVersions
 compatbility
@@ -226,6 +238,7 @@ Cond
 config
 conftest
 const
+ContentNormalizer
 contrib
 CopiedStreamDataProvider
 copyEncryptionParameters
@@ -296,6 +309,7 @@ deflateEnd
 deflateInit
 defq
 delphi
+deque
 dereference
 dereferenced
 dest
@@ -407,6 +421,7 @@ esize
 exc
 exe
 exp
+expectInlineImage
 ExtensionLevel
 extern
 fb
@@ -435,6 +450,7 @@ Filespec
 FILETIME
 filetrailer
 filterCompressedObjects
+filterPageContents
 findAndSkipNextEOL
 findAttachmentStreams
 findEndstream
@@ -482,6 +498,7 @@ Gagic
 GajiÄ
 Gajic
 gcc
+gcurl
 gen
 generateHintStream
 generateID
@@ -504,6 +521,7 @@ getCompressibleObjects
 getCompressibleObjGens
 getCount
 getDataChecksum
+getDescription
 getDict
 getDictAsMap
 getEncryptionKey
@@ -557,6 +575,7 @@ getOE
 getOffset
 getOffsetLength
 getOperatorValue
+getOriginalID
 getOwningQPDF
 getP
 getPaddedUserPassword
@@ -606,6 +625,7 @@ gm
 gmail
 GNUC
 gnuwin
+gpg
 grayscale
 grep
 gsdnld
@@ -620,7 +640,10 @@ handleCode
 handleData
 handleEOF
 handleObject
+handleToken
+hasDescription
 hasKey
+hasObjectDescription
 hb
 hbp
 HCRYPTPROV
@@ -662,6 +685,7 @@ ifeq
 iff
 ifndef
 ifstream
+ignorable
 ijg
 Im
 ImageC
@@ -670,6 +694,7 @@ ImageInverter
 ImageMask
 ImageProvider
 inbuf
+includeIgnorable
 INDOC
 indx
 inf
@@ -714,9 +739,12 @@ iostream
 irdp
 isArray
 isBool
+isDataModified
+isDelimiter
 isDictionary
 isdigit
 isEncrypted
+isIgnorable
 isIndirect
 isInitialized
 isInlineImage
@@ -725,6 +753,7 @@ isLinearized
 isName
 isNull
 isNumber
+isNumeric
 iso
 isOperator
 isOrHasName
@@ -735,10 +764,12 @@ isReal
 isReserved
 isScalar
 isspace
+isSpace
 isStream
 isString
 istream
 istype
+isType
 italicseq
 itemizedlist
 iter
@@ -754,6 +785,7 @@ JMSG
 jpeg
 jpeglib
 JPOOL
+jq
 JSAMPARRAY
 JSAMPLE
 JSAMPROW
@@ -765,6 +797,7 @@ keyset
 LARGEFILE
 lastnum
 lastreleased
+lastTokenWasBad
 latin
 lbuf
 lc
@@ -832,6 +865,7 @@ malloc
 manualFinish
 Mateusz
 maxEnd
+maxlen
 maxval
 md
 mdash
@@ -864,6 +898,7 @@ msg
 msvc
 MSVC's
 msys
+MT
 multibyte
 multiline
 multipage
@@ -925,6 +960,7 @@ NTE
 ntotal
 NUL
 num
+numericValue
 numrange
 nval
 nwalsh
@@ -999,6 +1035,7 @@ parms
 parsecontent
 parseContentStream
 parseInternal
+parsePageContents
 ParserCallbacks
 parseVersion
 partLen
@@ -1025,6 +1062,9 @@ persistAcrossFinish
 ph
 phe
 php
+pipeContentStreams
+PipelineAccessor
+pipePageContents
 pipeStreamData
 pipeStringAndFinish
 Pkey
@@ -1064,6 +1104,7 @@ procset
 ProcSet
 procsets
 programlisting
+programmatically
 Projet
 prov
 provideRandomData
@@ -1098,6 +1139,7 @@ QPDF's
 QPDFCONSTANTS
 QPDFExc
 QPDFFake
+QPDFFakeName
 QPDFObject
 QPDFObjectHandle
 QPDFObjectHandle's
@@ -1162,6 +1204,7 @@ ReleaseResolver
 remotesensing
 removeKey
 removePage
+removereplace
 repl
 replaceDict
 replaceFilterData
@@ -1171,6 +1214,7 @@ replaceObject
 replaceOrRemoveKey
 replaceReserved
 replaceStreamData
+repos
 reserveObjects
 resetBits
 resolveLiteral
@@ -1182,6 +1226,7 @@ retested
 reverseResolved
 rf
 rfont
+rg
 rgb
 rhs
 rijndael
@@ -1231,7 +1276,9 @@ setCompressStreams
 setContentNormalization
 setDataKey
 setDecodeLevel
+setDescription
 setDeterministicID
+setDictDescription
 setEncryptionParameters
 setEncryptionParametersInternal
 setExtraHeaderText
@@ -1245,11 +1292,14 @@ setjmp
 setLastObjectDescription
 setLastOffset
 setLinearization
+setLinearizationPass
 setLineBuf
 setMinimumPDFVersion
 setmode
 setNewlineBeforeEndstream
 setO
+setObjectDescription
+setObjectDescriptionFromInput
 setObjectStreamMode
 setObjGen
 setOutputFile
@@ -1259,6 +1309,7 @@ setOutputPipeline
 setOutputStreams
 setPasswordIsHexKey
 setPCLm
+setPipeline
 setprecision
 setPreserveEncryption
 setPreserveUnreferencedObjects
@@ -1268,6 +1319,7 @@ setRandomDataProvider
 setStaticAesIV
 setStaticID
 setStreamDataMode
+setStreamDescription
 setSuppressOriginalObjectIDs
 setSuppressWarnings
 setTrailer
@@ -1320,8 +1372,10 @@ StreamDataProvider
 strerror
 StrF
 stricmp
+StringCounter
 StringDecrypter
 stringprep
+StringReverser
 stripesize
 strlen
 strncmp
@@ -1345,6 +1399,7 @@ Subtype
 sudo
 supp
 suppressions
+svg
 swapObjects
 swversion
 Symlink
@@ -1375,20 +1430,25 @@ tobj
 tobjid
 TODO
 toffset
+TokenFilter
+TokenFilters
 tokenize
 tokenized
 tokenizer
 tokenizing
+tokenTypeName
 toolchain
 Toolchains
 toupper
 toUTF
 tp
+travis
 TrimBox
 trimTrailerForWrite
 tt
 turbo
 txt
+typeWarning
 uc
 udata
 UE
@@ -1417,6 +1477,7 @@ unparse
 unparseChild
 unparseObject
 unparseResolved
+unparsing
 unreadCh
 unreferenced
 unresolvable
@@ -1526,6 +1587,7 @@ xor
 XP
 xpacket
 xpdf
+XPOST
 XRef
 xref
 xrefEntry

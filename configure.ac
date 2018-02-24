@@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl This config.in requires autoconf 2.5 or greater.
 
 AC_PREREQ([2.68])
-AC_INIT([qpdf],[7.1.1])
+AC_INIT([qpdf],[8.0.a1])
 
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_FILES([autoconf.mk])
@@ -29,25 +29,13 @@ LT_INIT([win32-dll])
 # * Otherwise, increment LT_REVISION
 
 # LT = libtool
-LT_CURRENT=20
-LT_AGE=2
-LT_REVISION=1
+LT_CURRENT=21
+LT_AGE=0
+LT_REVISION=0
 AC_SUBST(LT_CURRENT)
 AC_SUBST(LT_REVISION)
 AC_SUBST(LT_AGE)
 LT_SONAME=$(expr $LT_CURRENT - $LT_AGE)
-# BEGIN LT_SONAME WORKAROUND
-# For elf versioned symbols, get the soname version. Unfortunately,
-# there was a mistake at one point where we had 19 when we should have
-# had 18, so make this a special case until the next ABI change. At
-# that point, just remove the code deliminated by the LT_SONAME
-# WORKAROUND comments.
-if test $LT_SONAME = 18; then
-  LT_SONAME=19
-elif test $LT_SONAME -gt 18; then
-  AC_MSG_ERROR(Remove LT_SONAME workaround in configure.ac)
-fi
-# END LT_SONAME WORKAROUND
 AC_SUBST(LT_SONAME)
 
 AC_ARG_ENABLE(insecure-random,

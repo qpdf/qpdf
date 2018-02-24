@@ -3,7 +3,7 @@
 Raw stream data:
 x%11ϋΌb;tΰ4| wXIDμ Ψεχ8G·«Ν>rQ¨uOÒκE:©IWμΓPlνµII)Γr΄p4~;§ΞAs/ςÒ…jcϊϊΎχs§εφzϋ»T.?®uζ§<Ό…Π*6δ
 Uncompressed stream data:
-WARNING: bad30.pdf (file position 629): stream filter type is not name or array
+WARNING: bad30.pdf (offset 629): stream filter type is not name or array
 Stream data is not filterable.
 unparse: 7 0 R
 unparseResolved: 7 0 R

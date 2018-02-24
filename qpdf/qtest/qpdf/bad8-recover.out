@@ -1,5 +1,5 @@
 WARNING: bad8.pdf: file is damaged
-WARNING: bad8.pdf (file position 543): xref not found
+WARNING: bad8.pdf (offset 543): xref not found
 WARNING: bad8.pdf: Attempting to reconstruct cross-reference table
 /QTest is implicit
 /QTest is direct and has type null (2)

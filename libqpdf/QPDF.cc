@@ -19,7 +19,7 @@
 #include <qpdf/QPDF_Null.hh>
 #include <qpdf/QPDF_Dictionary.hh>
 
-std::string QPDF::qpdf_version = "7.1.1";
+std::string QPDF::qpdf_version = "8.0.a1";
 
 static char const* EMPTY_PDF =
     "%PDF-1.3\n"
@@ -106,6 +106,7 @@ QPDF::Members::~Members()
 QPDF::QPDF() :
     m(new Members())
 {
+    m->tokenizer.allowEOF();
 }
 
 QPDF::~QPDF()
@@ -272,10 +273,10 @@ QPDF::findHeader()
 bool
 QPDF::findStartxref()
 {
-    QPDFTokenizer::Token t = readToken(this->m->file, true);
+    QPDFTokenizer::Token t = readToken(this->m->file);
     if (t == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "startxref"))
     {
-        t = readToken(this->m->file, true);
+        t = readToken(this->m->file);
         if (t.getType() == QPDFTokenizer::tt_integer)
         {
             // Position in front of offset token
@@ -421,7 +422,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
         this->m->file->findAndSkipNextEOL();
         qpdf_offset_t next_line_start = this->m->file->tell();
         this->m->file->seek(line_start, SEEK_SET);
-        QPDFTokenizer::Token t1 = readToken(this->m->file, true, MAX_LEN);
+        QPDFTokenizer::Token t1 = readToken(this->m->file, MAX_LEN);
         qpdf_offset_t token_start =
             this->m->file->tell() - t1.getValue().length();
         if (token_start >= next_line_start)
@@ -440,9 +441,9 @@ QPDF::reconstruct_xref(QPDFExc& e)
             if (t1.getType() == QPDFTokenizer::tt_integer)
             {
                 QPDFTokenizer::Token t2 =
-                    readToken(this->m->file, true, MAX_LEN);
+                    readToken(this->m->file, MAX_LEN);
                 QPDFTokenizer::Token t3 =
-                    readToken(this->m->file, true, MAX_LEN);
+                    readToken(this->m->file, MAX_LEN);
                 if ((t2.getType() == QPDFTokenizer::tt_integer) &&
                     (t3 == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "obj")))
                 {
@@ -1269,7 +1270,8 @@ QPDF::readObject(PointerHolder<InputSource> input,
         decrypter = decrypter_ph.getPointer();
     }
     QPDFObjectHandle object = QPDFObjectHandle::parse(
-        input, description, this->m->tokenizer, empty, decrypter, this);
+        input, this->m->last_object_description,
+        this->m->tokenizer, empty, decrypter, this);
     if (empty)
     {
         // Nothing in the PDF spec appears to allow empty objects, but
@@ -1428,7 +1430,7 @@ bool
 QPDF::findEndstream()
 {
     // Find endstream or endobj. Position the input at that token.
-    QPDFTokenizer::Token t = readToken(this->m->file, true, 20);
+    QPDFTokenizer::Token t = readToken(this->m->file, 20);
     if ((t.getType() == QPDFTokenizer::tt_word) &&
         ((t.getValue() == "endobj") ||
          (t.getValue() == "endstream")))
@@ -1521,11 +1523,10 @@ QPDF::recoverStreamLength(PointerHolder<InputSource> input,
 }
 
 QPDFTokenizer::Token
-QPDF::readToken(PointerHolder<InputSource> input,
-                bool allow_bad, size_t max_len)
+QPDF::readToken(PointerHolder<InputSource> input, size_t max_len)
 {
     return this->m->tokenizer.readToken(
-        input, this->m->last_object_description, allow_bad, max_len);
+        input, this->m->last_object_description, true, max_len);
 }
 
 QPDFObjectHandle
@@ -1729,16 +1730,10 @@ QPDF::resolve(int objid, int generation)
     }
     ResolveRecorder rr(this, og);
 
-    if (! this->m->obj_cache.count(og))
+    // PDF spec says unknown objects resolve to the null object.
+    if ((! this->m->obj_cache.count(og)) && this->m->xref_table.count(og))
     {
-	if (! this->m->xref_table.count(og))
-	{
-	    // PDF spec says unknown objects resolve to the null object.
-	    return new QPDF_Null;
-	}
-
 	QPDFXRefEntry const& entry = this->m->xref_table[og];
-        bool success = false;
         try
         {
             switch (entry.getType())
@@ -1767,7 +1762,6 @@ QPDF::resolve(int objid, int generation)
                               QUtil::int_to_string(generation) +
                               " has unexpected xref entry type");
             }
-            success = true;
         }
         catch (QPDFExc& e)
         {
@@ -1781,16 +1775,24 @@ QPDF::resolve(int objid, int generation)
                          QUtil::int_to_string(generation) +
                          ": error reading object: " + e.what()));
         }
-        if (! success)
-        {
-            QTC::TC("qpdf", "QPDF resolve failure to null");
-            QPDFObjectHandle oh = QPDFObjectHandle::newNull();
-            this->m->obj_cache[og] =
-                ObjCache(QPDFObjectHandle::ObjAccessor::getObject(oh), -1, -1);
-        }
+    }
+    if (this->m->obj_cache.count(og) == 0)
+    {
+        QTC::TC("qpdf", "QPDF resolve failure to null");
+        QPDFObjectHandle oh = QPDFObjectHandle::newNull();
+        this->m->obj_cache[og] =
+            ObjCache(QPDFObjectHandle::ObjAccessor::getObject(oh), -1, -1);
     }
 
-    return this->m->obj_cache[og].object;
+    PointerHolder<QPDFObject> result(this->m->obj_cache[og].object);
+    if (! result->hasDescription())
+    {
+        result->setDescription(
+            this,
+            "object " + QUtil::int_to_string(objid) + " " +
+            QUtil::int_to_string(generation));
+    }
+    return result;
 }
 
 void
@@ -1847,7 +1849,8 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
 
     PointerHolder<Buffer> bp = obj_stream.getStreamData(qpdf_dl_specialized);
     PointerHolder<InputSource> input = new BufferInputSource(
-	"object stream " + QUtil::int_to_string(obj_stream_number),
+        this->m->file->getName() +
+        " object stream " + QUtil::int_to_string(obj_stream_number),
 	bp.getPointer());
 
     for (int i = 0; i < n; ++i)

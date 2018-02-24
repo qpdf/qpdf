@@ -11,6 +11,21 @@ else
     wordsize=32
 fi
 
+if [ "$wordsize" = 64 ]; then
+    if [ ! -f win.32 ]; then
+        echo "Waiting for win.32 to appear"
+        while [ ! -f win.32 ]; do
+            sleep 5
+        done
+    fi
+else
+    rm -f win.32 win.64
+    echo ''
+    echo "You may now start $0 in a 64-bit window."
+    echo ''
+    sleep 5
+fi
+
 set -e
 set -x
 cwd=`pwd`
@@ -18,20 +33,27 @@ PATH=$cwd/libqpdf/build:$PATH
 
 rm -rf install-mingw$wordsize install-msvc$wordsize
 
-./config-mingw
-make -j8
-make check install
-make distclean
-
 ./config-msvc
 make -j8
 make check install
 make distclean
 
+./config-mingw
+make -j8
+make check install
+make distclean
+
+touch win.$wordsize
+
 set +x
 
-echo ''
-echo "Finished builds for $wordsize. If not done already, rerun this"
-echo "in a" `expr 96 - $wordsize` "environment."
-echo 'Then run "./make_windows_releases-finish".'
-echo ''
+echo "Finished builds for $wordsize."
+
+if [ "$wordsize" = 32 ]; then
+  echo "If not done already, rerun this in a "`expr 96 - $wordsize`"-bit environment."
+  echo ''
+else
+  echo 'Running "./make_windows_releases-finish".'
+  echo ''
+  ./make_windows_releases-finish
+fi

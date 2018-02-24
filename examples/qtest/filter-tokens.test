@@ -1,0 +1,20 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+chdir("filter-tokens");
+
+require TestDriver;
+
+my $td = new TestDriver('pdf-filter-tokens');
+
+$td->runtest("filter tokens",
+	     {$td->COMMAND => "pdf-filter-tokens in.pdf a.pdf"},
+	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "out.pdf"});
+
+$td->report(2);

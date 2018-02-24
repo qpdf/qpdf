@@ -1,4 +1,4 @@
-WARNING: bad23.pdf (object 4 0, file position 314): /Length key in stream dictionary is not an integer
+WARNING: bad23.pdf (object 4 0, offset 314): /Length key in stream dictionary is not an integer
 /QTest is implicit
 /QTest is indirect and has type null (2)
 /QTest is null

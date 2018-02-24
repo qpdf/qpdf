@@ -703,7 +703,6 @@ class QPDF
 	PointerHolder<InputSource> input, int objid, int generation,
 	qpdf_offset_t stream_offset);
     QPDFTokenizer::Token readToken(PointerHolder<InputSource>,
-                                   bool allow_bad = false,
                                    size_t max_len = 0);
 
     QPDFObjectHandle readObjectAtOffset(

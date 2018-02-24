@@ -1,0 +1,16 @@
+Page 1: strings = 3
+% Contents of page 2
+BT
+  /F1 24 Tf
+  72 720 Td
+  (Four ) Tj
+  (Five ) Tj
+  (Six )
+  (beautiful ) Tj
+  (strings) Tj
+  (!) Tj
+ET
+
+% strings found: 6
+% end 2
+Page 2: strings = 6

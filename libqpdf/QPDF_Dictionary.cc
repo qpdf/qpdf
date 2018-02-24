@@ -51,6 +51,12 @@ QPDF_Dictionary::getTypeName() const
     return "dictionary";
 }
 
+void
+QPDF_Dictionary::setDescription(QPDF* qpdf, std::string const& description)
+{
+    this->QPDFObject::setDescription(qpdf, description);
+}
+
 bool
 QPDF_Dictionary::hasKey(std::string const& key)
 {
@@ -70,7 +76,15 @@ QPDF_Dictionary::getKey(std::string const& key)
     }
     else
     {
-	return QPDFObjectHandle::newNull();
+        QPDFObjectHandle null = QPDFObjectHandle::newNull();
+        QPDF* qpdf = 0;
+        std::string description;
+        if (getDescription(qpdf, description))
+        {
+            null.setObjectDescription(
+                qpdf, description + " -> dictionary key " + key);
+        }
+	return null;
     }
 }
 
@@ -93,13 +107,12 @@ QPDF_Dictionary::getKeys()
 std::map<std::string, QPDFObjectHandle> const&
 QPDF_Dictionary::getAsMap() const
 {
-
     return this->items;
 }
 
 void
 QPDF_Dictionary::replaceKey(std::string const& key,
-			    QPDFObjectHandle const& value)
+			    QPDFObjectHandle value)
 {
     // add or replace value
     this->items[key] = value;
