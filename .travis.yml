@@ -3,11 +3,18 @@ compiler: gcc
 sudo: require
 dist: trusty
 
+install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq docbook* fop xsltproc less
+
 script:
   - appimage/build-appimage
 
 after_success:
   - cd appimage/build
   - find ./appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
+  - ls -l                                       # for more debugging in Travis' log
   - curl --upload-file ./qpdf*.AppImage https://transfer.sh/qpdf-git.$(git rev-parse --short HEAD)-x86_64.AppImage
-  - sha512sum ./qpdf*.AppImage
+  - sha512sum ./qpdf*.AppImage*
+  - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
+  - bash upload.sh qpdf-*x86_64.AppImage*       # This should upload the .zsync file as well
