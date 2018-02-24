@@ -187,7 +187,7 @@ if [ x"$1" == "xlistlicense" -o x"$1" == "x--listlicense" -o  x"$1" == "xlist-li
 fi
 
 
-if [ "x$1" == "xai-usage" -o "x$1" == "x--aiusage" -o "x$1" == "x-u" ] ; then
+if [ "x$1" == "xai-usage" -o "x$1" == "x--aiusage" -o "x$1" == "x--ai-usage" -o "x$1" == "x-u" ] ; then
     usage | less
     #usage
     exit $?
