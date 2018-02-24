@@ -142,11 +142,17 @@ else
     set -x
 fi
 
+# Set up a version string to include in the AppImage name
+MAJOR_QPDF_VERSION=$( ./appdir/usr/bin/qpdf --version | grep "qpdf version" | awk '{print $3}' )
+VERSION=${MAJOR_QPDF_VERSION}-continuous-${TRAVIS_JOB_NUMBER}-$(date "+%Y-%m-%d")-git.$(git rev-parse --short HEAD)-x86_64
+
+# Remove the default AppRun/symlink and use our own custom AppRun script
+rm appdir/AppRun ; cp $top/appimage/AppRun appdir; chmod a+x appdir/AppRun
 
 set +x
-# Finally, generate the AppIamge:
-rm appdir/AppRun ; cp $top/appimage/AppRun appdir; chmod a+x appdir/AppRun # Replace symlink with custom script
-PATH=./squashfs-root/usr/bin:$PATH ./squashfs-root/usr/bin/appimagetool $sign -g $appimagetool_param appdir
+# Finally, generate the AppImage:
+PATH=./squashfs-root/usr/bin:$PATH ./squashfs-root/usr/bin/appimagetool $sign -g $appimagetool_param appdir qpdf-$VERSION.AppImage
+
 # Tell everyone where our result is stored:
 echo ""
 echo "===================================================================================="
