@@ -7,10 +7,28 @@
 	<name>QPDF</name>
 	<summary>Structural, content-preserving transformations on PDF files</summary>
 	<description>
-		<p> QPDF is a command-line program that does structural, content-preserving transformations on PDF files. It could have been called something like pdf-to-pdf. It also provides many useful capabilities to developers of PDF-producing software or for people who just want to look at the innards of a PDF file to learn more about how they work.</p>
-		<p> QPDF is capable of creating linearized (also known as web-optimized) files and encrypted files. It is also capable of converting PDF files with object streams (also known as compressed objects) to files with no compressed objects or to generate object streams from files that don't have them (or even those that already do). QPDF also supports a special mode designed to allow you to edit the content of PDF files in a text editor. For more details, please see the documentation links below.</p>
-		<p> QPDF includes support for merging and splitting PDFs through the ability to copy objects from one PDF file into another and to manipulate the list of pages in a PDF file. The QPDF library also makes it possible for you to create PDF files from scratch. In this mode, you are responsible for supplying all the contents of the file, while the QPDF library takes care off all the syntactical representation of the objects, creation of cross references tables and, if you use them, object streams, encryption, linearization, and other syntactic details.</p>
-		<p>QPDF is not a PDF content creation library, a PDF viewer, or a program capable of converting PDF into other formats. In particular, QPDF knows nothing about the semantics of PDF content streams. If you are looking for something that can do that, you should look elsewhere. However, once you have a valid PDF file, QPDF can be used to transform that file in ways perhaps your original PDF creation can't handle. For example, programs generate simple PDF files but can't password-protect them, web-optimize them, or perform other transformations of that type.</p>
+		<p> QPDF is a command-line program that does structural, content-preserving transformations on PDF files.
+			It could have been called something like pdf-to-pdf.
+			It also provides many useful capabilities to developers of PDF-producing software or for people
+			who just want to look at the innards of a PDF file to learn more about how they work.</p>
+		<p> QPDF is capable of creating linearized (also known as web-optimized) files and encrypted files.
+			It is also capable of converting PDF files with object streams (also known as compressed objects)
+			to files with no compressed objects or to generate object streams from files that don't have them
+			(or even those that already do). QPDF also supports a special mode designed to allow you to edit
+			the content of PDF files in a text editor. For more details, please see the documentation links
+			below.</p>
+		<p> QPDF includes support for merging and splitting PDFs through the ability to copy objects from one PDF
+			file into another and to manipulate the list of pages in a PDF file. The QPDF library also makes
+			it possible for you to create PDF files from scratch. In this mode, you are responsible for
+			supplying all the contents of the file, while the QPDF library takes care off all the syntactical
+			representation of the objects, creation of cross references tables and, if you use them, object
+			streams, encryption, linearization, and other syntactic details.</p>
+		<p>QPDF is not a PDF content creation library, a PDF viewer, or a program capable of converting PDF into
+			other formats. In particular, QPDF knows nothing about the semantics of PDF content streams.
+			If you are looking for something that can do that, you should look elsewhere.
+			However, once you have a valid PDF file, QPDF can be used to transform that file in ways perhaps
+			your original PDF creation can't handle. For example, programs generate simple PDF files but
+			can't password-protect them, web-optimize them, or perform other transformations of that type.</p>
 	</description>
 	<x-launchable type="desktop-id">qpdf.desktop</x-launchable>
 	<url type="homepage">http://qpdf.sourceforge.net/</url>
