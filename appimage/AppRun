@@ -63,7 +63,7 @@ echo "
    $ARGV0  --help
                 # Show help screen of QPDF itself
 
-   $ARGV0  --usage
+   $ARGV0  --ai-usage
                 # This message (it's only present in the AppImage incarnation of QPDF)
 
    $ARGV0  fix-qdf|zlib-flate
@@ -187,7 +187,7 @@ if [ x"$1" == "xlistlicense" -o x"$1" == "x--listlicense" -o  x"$1" == "xlist-li
 fi
 
 
-if [ "x$1" == "xusage" -o "x$1" == "x--usage" -o "x$1" == "x-u" ] ; then
+if [ "x$1" == "xai-usage" -o "x$1" == "x--aiusage" -o "x$1" == "x-u" ] ; then
     usage | less
     #usage
     exit $?
@@ -322,7 +322,7 @@ fi
 if [ x"$1" == "xman"  -o  x"$1" == "x--man" ] ; then
     export MANPATH="$HERE/usr/share/man:$MANPATH"
     shift
-    exec man "$@"
+    exec man "$@" || man $(basename $1)
 fi
 
 
