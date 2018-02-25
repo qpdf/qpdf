@@ -182,24 +182,22 @@ fi
 
 # Set up a version string to include in the AppImage name
 MAJOR_QPDF_VERSION=$( ./appdir/usr/bin/qpdf --version | grep "qpdf version" | awk '{print $3}' )
+declare -a UPDATE_INFO
 if [ "$TRAVIS_JOB_NUMBER" != "" ]; then
     VERSION=${MAJOR_QPDF_VERSION}-continuous-${TRAVIS_JOB_NUMBER}-$(date "+%Y-%m-%d")-git.$(git rev-parse --short HEAD)
-    UPDATE_FLAG=-g
-    UPDATE_INFO=
+    # No update info supported for travis builds for now.
 else
     VERSION=${MAJOR_QPDF_VERSION}
-    UPDATE_FLAG=-u
-    UPDATE_INFO="gh-releases-zsync|qpdf|qpdf|latest|qpdf-*x86_64.AppImage.zsync"
+    UPDATE_INFO=(-u "gh-releases-zsync|qpdf|qpdf|latest|qpdf-*x86_64.AppImage.zsync")
 fi
 
 # Remove the default AppRun/symlink and use our own custom AppRun script
 rm appdir/AppRun; cp $top/appimage/AppRun appdir; chmod a+x appdir/AppRun
 
-set +x
 # Finally, generate the AppImage:
-PATH=./squashfs-root/usr/bin:$PATH ./squashfs-root/usr/bin/appimagetool $sign $UPDATE_FLAG "$UPDATE_INFO" $appimagetool_param appdir qpdf-$VERSION-x86_64.AppImage
+PATH=./squashfs-root/usr/bin:$PATH ./squashfs-root/usr/bin/appimagetool $sign $UPDATE_FLAG ${UPDATE_INFO[*]} $appimagetool_param appdir qpdf-$VERSION-x86_64.AppImage
 
-
+set +x
 # Tell everyone where our result is stored:
 echo ""
 echo "============================================================================="
