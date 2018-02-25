@@ -1,13 +1,5 @@
 # QPDF [![Build Status](https://travis-ci.org/qpdf/qpdf.svg?branch=master)](https://travis-ci.org/qpdf/qpdf)
 
-----
-
-<sup>
-(This repository is a temporary clone of the original upstream one in order to test (and possibly improve) the AppImage created via the Travis CI integration which was recently added by Jay.)
-</sup>
-
-----
-
 [![QPDF](logo/qpdf.svg)](http://qpdf.sourceforge.net)
 
 This is the QPDF package.  Information about it can be found at http://qpdf.sourceforge.net.  The source code repository is hosted at github: https://github.com/qpdf/qpdf.
