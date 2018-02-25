@@ -116,7 +116,7 @@ CREATING A RELEASE
 version=x.y.z
 \rm -rf /tmp/qpdf-$version
 git archive --prefix=qpdf-$version/ HEAD . | (cd /tmp; tar xf -)
-cd /tmp
+pushd /tmp
 ./qpdf-$version/make_dist
 gpg --detach-sign --armor qpdf-$version.tar.gz
 
@@ -149,9 +149,12 @@ docker run --privileged -ti --rm -v /tmp/build:/tmp/build qpdfbuild https://gith
   * Open windows for 32-bit and 64-bit compilation environments that
     support msvc and mingw
   * Disable antivirus software. For bitdefender, open, select the "B"
-    shield, and go to "View Features". Disable advanced threat defense
-    and vulnerability scanning.
+    shield, and go to "View Features". Disable all features. Disable
+    antivirus until next restart.
   * In each window simultaneously, run ./make_windows_releases
+    * NOTE: For now, test failure is not fatal for 32-bit Windows
+      builds because of unknown fragility in the test environment.
+      Check test logs carefully. Tests must pass on 64-bit.
   * Copy the four resulting zip files into the release archive area
   * Re-enable anti-virus software
 
