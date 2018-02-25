@@ -1,3 +1,7 @@
+2018-02-25  Jay Berkenbilt  <ejb@ql.org>
+
+	* 8.0.0: release
+
 2018-02-17  Jay Berkenbilt  <ejb@ql.org>
 
 	* Fix QPDFObjectHandle::getUTF8Val() to properly handle strings
