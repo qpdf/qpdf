@@ -49,7 +49,7 @@ fi
 _osversion=$(cat /etc/os-release | grep PRETTY_NAME | awk -F'=' '{print $2}' | sed 's#"##g')
 
 # Warn users building the AppImage locally:
-if [ x"$_osversion" != x"Ubuntu 14.04.5 LTS" ] ; then
+if [[ ! $_osversion =~ Ubuntu\ 14.04.*\ LTS ]]; then
 set +x
     echo ""
     #    0         1         2         3         4         5         6         7
@@ -160,7 +160,7 @@ unset QTDIR; unset QT_PLUGIN_PATH; unset LD_LIBRARY_PATH
 rm appdir/AppRun; cp $top/appimage/AppRun appdir; chmod a+x appdir/AppRun
 
 # If we are not on Ubuntu Trusty, we need to disable 'appstreamcli' validation:
-if [ x"$_osversion" == x"Ubuntu 14.04.5 LTS" ] ; then
+if [[ $_osversion =~ Ubuntu\ 14.04.*\ LTS ]]; then
     appimagetool_param=""
 else
     appimagetool_param="-n"
@@ -177,7 +177,11 @@ fi
 
 # Set up a version string to include in the AppImage name
 MAJOR_QPDF_VERSION=$( ./appdir/usr/bin/qpdf --version | grep "qpdf version" | awk '{print $3}' )
-VERSION=${MAJOR_QPDF_VERSION}-continuous-${TRAVIS_JOB_NUMBER}-$(date "+%Y-%m-%d")-git.$(git rev-parse --short HEAD)-x86_64
+if [ "$TRAVIS_JOB_NUMBER" != "" ]; then
+    VERSION=${MAJOR_QPDF_VERSION}-continuous-${TRAVIS_JOB_NUMBER}-$(date "+%Y-%m-%d")-git.$(git rev-parse --short HEAD)
+else
+    VERSION=${MAJOR_QPDF_VERSION}
+fi
 
 # Remove the default AppRun/symlink and use our own custom AppRun script
 rm appdir/AppRun; cp $top/appimage/AppRun appdir; chmod a+x appdir/AppRun
