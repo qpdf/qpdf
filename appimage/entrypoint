@@ -1,5 +1,8 @@
 #!/bin/bash
 set -e
+if [ "$SKIP_TESTS" = "1" ]; then
+    touch /tmp/skip-tests
+fi
 if [ $(id -u) = 0 ]; then
     if [ ! -d /tmp/build/.gnupg ]; then
         echo "/tmp/build must exist and must contain .gnupg"
@@ -19,4 +22,7 @@ if [ ! -d qpdf ]; then
     git clone "$@" qpdf
 fi
 cd qpdf
+if [ -f /tmp/skip-tests ]; then
+    export SKIP_TESTS=1
+fi
 ./appimage/build-appimage --sign

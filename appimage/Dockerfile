@@ -3,7 +3,7 @@ RUN apt-get update && \
     apt-get -y install screen autoconf git \
        build-essential zlib1g-dev libjpeg-dev \
        docbook-xsl fop xsltproc \
-       imagemagick wget fuse && \
+       inkscape busybox wget fuse && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 COPY entrypoint /entrypoint

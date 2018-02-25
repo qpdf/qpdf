@@ -134,6 +134,12 @@ mkdir -p /tmp/build
 cp -rLp ~/.gnupg/. /tmp/build/.gnupg
 docker run --privileged -ti --rm -v /tmp/build:/tmp/build qpdfbuild https://github.com/jberkenbilt/qpdf -b work
 
+  To build locally, omit the git arguments after qpdfbuild above and
+  copy the source tree into /tmp/build/qpdf.
+
+  Pass -e SKIP_TESTS=1 to docker to skip the test suite, useful for
+  rapid iteration.
+
   Rename the AppImage in /tmp/build/qpdf/appimage/build
   qpdf-$version-x86_64.AppImage and move it to the release archive
   area.
