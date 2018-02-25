@@ -515,7 +515,7 @@ else
     fi
 
     if [ -x "$HERE/usr/bin/$CALLED_SUBCMD" ] && [ "x$CALLED_SUBCMD" != "x" ]; then
-        #echo befor shift dollar_at=$@
+        #echo before shift dollar_at=$@
         if [ "x$SET_SHOW_ENV_FOR_APPRUN" == "xYeSS" ] ; then
             # We have the (hidden) env var for debugging stuff set
             echo BINARY_NAME=$BINARY_NAME       1>&2  # Don't leak strings into qpdf|fix-pdf|zlib-flate output going to stdout!
