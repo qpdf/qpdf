@@ -74,8 +74,9 @@ echo "
                 # This message (it's only present in the AppImage
                 # incarnation of QPDF)
 
-   $ARGV0  fix-qdf|zlib-flate
-                # Run the named sub-command
+   $ARGV0  qpdf|fix-qdf|zlib-flate
+                # Run the named sub-command; not available if the AppImage
+                # is invoked as one of the embedded executables
 
    $ARGV0  --list-exe
                 # List all executables embedded in AppImage
@@ -218,8 +219,7 @@ fi
 
 if [ x"$1" == "xai-usage" -o \
      x"$1" == "x--aiusage" -o \
-     x"$1" == "x--ai-usage" -o \
-     x"$1" == "x-u" ] ; then
+     x"$1" == "x--ai-usage" ]; then
     usage | less
     #usage
     exit $?
