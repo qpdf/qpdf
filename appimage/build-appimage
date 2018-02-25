@@ -91,8 +91,10 @@ rm -rf $here/build
 # Build!
 make -j$(nproc)
 
-# Run built-in QPDF checks:
-make check
+if [ "$SKIP_TESTS" = "" ]; then
+    # Run built-in QPDF checks:
+    make check
+fi
 
 # Prepare AppDir which is the basis for the AppImage:
 mkdir -p $appdir
@@ -107,9 +109,10 @@ cd $here/build
 rm -rf appdir/usr/include appdir/usr/lib/pkgconfig appdir/usr/lib/*.{a,la,so}
 
 # Copy icon which is needed for desktop integration into place:
-for i in appdir/usr/share/icons/hicolor/512x512/apps; do
-    mkdir -p $i
-    cp $top/logo/qpdf.png $i
+for width in 64 128 256 512; do
+    dir=appdir/usr/share/icons/hicolor/${width}x${width}/apps
+    mkdir -p $dir
+    inkscape -z -e $dir/qpdf.png -w $width -b white $top/logo/qpdf.svg
 done
 
 # Copy .desktop and .appdata.xml metadata for desktop integration into place:

@@ -5,7 +5,7 @@ dist: trusty
 
 install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq docbook* fop xsltproc less
+  - sudo apt-get install -qq docbook* fop xsltproc less inkscape
 
 script:
   - appimage/build-appimage
