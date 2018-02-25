@@ -250,11 +250,16 @@ foreach my $d (@bug_tests)
 show_ntests();
 # ----------
 $td->notify("--- Library version ---");
-$n_tests += 2;
+$n_tests += 3;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
 	     {$td->REGEXP => "qpdf version \\S+\n.*", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("qpdf copyright contains version too",
+	     {$td->COMMAND => "qpdf --copyright"},
+	     {$td->REGEXP => "(?s)qpdf version \\S+\n.*Apache.*",
+                  $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("C API: qpdf version",
 	     {$td->COMMAND => "qpdf-ctest --version"},

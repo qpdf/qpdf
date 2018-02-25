@@ -225,6 +225,9 @@ provided last take precedence.\n\
 Basic Options\n\
 -------------\n\
 \n\
+--version               show version of qpdf\n\
+--copyright             show qpdf's copyright and license information\n\
+--help                  show command-line argument help\n\
 --password=password     specify a password for accessing encrypted files\n\
 --verbose               provide additional informational output\n\
 --linearize             generated a linearized (web optimized) file\n\
@@ -1188,16 +1191,23 @@ static void read_args_from_file(char const* filename,
 
 static void handle_help_version(int argc, char* argv[])
 {
+    // Make sure the outpu looks right on an 80-column display.
+
     if ((argc == 2) &&
         ((strcmp(argv[1], "--version") == 0) ||
          (strcmp(argv[1], "-version") == 0)))
     {
-        // make_dist looks for the line of code here that actually
-        // prints the version number, so read make_dist if you change
-        // anything other than the version number.  Don't worry about
-        // the numbers.  That's just a guide to 80 columns so that the
-        // help message looks right on an 80-column display.
+        std::cout
+            << whoami << " version " << QPDF::QPDFVersion() << std::endl
+            << "Run " << whoami << " --copyright to see copyright and license information."
+            << std::endl;
+        exit(0);
+    }
 
+    if ((argc == 2) &&
+             ((strcmp(argv[1], "--copyright") == 0) ||
+              (strcmp(argv[1], "-copyright") == 0)))
+    {
         //               1         2         3         4         5         6         7         8
         //      12345678901234567890123456789012345678901234567890123456789012345678901234567890
         std::cout
