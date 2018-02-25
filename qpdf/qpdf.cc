@@ -1191,7 +1191,7 @@ static void read_args_from_file(char const* filename,
 
 static void handle_help_version(int argc, char* argv[])
 {
-    // Make sure the outpu looks right on an 80-column display.
+    // Make sure the output looks right on an 80-column display.
 
     if ((argc == 2) &&
         ((strcmp(argv[1], "--version") == 0) ||

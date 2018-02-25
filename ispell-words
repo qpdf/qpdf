@@ -5,8 +5,10 @@ abacc
 abc
 ABCD
 abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnom
+abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnom
 abcde
 abcdefABCDEF
+abcdefghbcdefghicdefghijdefghijkefghijklfghijklmg
 abcdefghbcdefghicdefghijdefghijkefghijklfghijklmg
 abcdefghijklmnopqrstuvwxyz
 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghi
@@ -131,6 +133,7 @@ Berkenbilt
 betweenTokens
 bf
 binmode
+bis
 BitsPerComponent
 bitstream
 BitStream
@@ -168,6 +171,7 @@ callback
 callbacks
 callHello
 CAPTURECOUNT
+CARON
 cb
 cbc
 cc
@@ -320,6 +324,7 @@ devel
 DeviceCMYK
 DeviceGray
 DeviceRGB
+DIAERESIS
 dict
 diff
 diffs
@@ -345,6 +350,7 @@ DOCBOOKX
 docdir
 DocOpen
 DOCTYPE
+DOTLESS
 doubleBoxSize
 Doxygen
 driverless
@@ -464,6 +470,7 @@ fIoptions
 fIoutfilename
 firstname
 firstterm
+fis
 fl
 flate
 FlateDecode
@@ -657,6 +664,7 @@ hf
 HGeneric
 hh
 HighPart
+hijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstn
 hijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstn
 hlen
 Hoffmann
@@ -882,6 +890,7 @@ memset
 merchantability
 metadata
 mgr
+MILLE
 min
 mingw
 MinGW
@@ -971,6 +980,7 @@ ObjCopier
 OBJDIR
 objdump
 ObjectHolder
+objectWarning
 ObjGen
 ObjGens
 objGenToIndirect
@@ -1073,6 +1083,7 @@ pkg
 PKI
 pl
 plaintext
+plb
 png
 PNGFilter
 pngify
@@ -1166,6 +1177,11 @@ QTC
 qtest
 QTest
 QuadPart
+quotedblbase
+quotedblright
+quoteleft
+quoteright
+quotesinglbase
 QUtil
 qutil
 qwert
@@ -1336,6 +1352,7 @@ sizeof
 skipToNextByte
 soe
 softlink
+solidus
 sourceforge
 SourceForge
 sph
@@ -1447,6 +1464,7 @@ travis
 TrimBox
 trimTrailerForWrite
 tt
+ttype
 turbo
 txt
 typeWarning
