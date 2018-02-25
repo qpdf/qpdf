@@ -5,32 +5,38 @@
 #
 # License: MIT
 #
-# The purpose of this custom AppRun script is to enable symlinking the AppImage and invoking the corresponding
-# binary depending on which symlink name was used to invoke the AppImage.
+# The purpose of this custom AppRun script is to enable symlinking the
+# AppImage and invoking the corresponding binary depending on which
+# symlink name was used to invoke the AppImage.
 #
-# At the same time it also allows to invoke the embedded binaries as 'sub-commands'. This is in the interest of
-# saving users from creating extra symlinks (without preventing others from STILL using such, should they want
-# or need these).
+# At the same time it also allows to invoke the embedded binaries as
+# 'sub-commands'. This is in the interest of saving users from
+# creating extra symlinks (without preventing others from STILL using
+# such, should they want or need these).
 #
-# It also provides some additional help parameters in order to allow faster familiarization with functionality
-# embedded in this AppImage. For example it support the listing and viewing of embedded manpages, HTML files,
-# PDF files, licenses and READMEs.
+# It also provides some additional help parameters in order to allow
+# faster familiarization with functionality embedded in this AppImage.
+# For example it support the listing and viewing of embedded manpages,
+# HTML files, PDF files, licenses and READMEs.
 #
-# Note, the AppImage can be renamed to anything what's 'legal' for an executable name under Linux or used via
-# a symlink under any name and it should behave like 'qpdf' is expected to behave. If the symlink name is
-# 'fix-qdf' or 'zlib-flate' it should behave like these...
+# Note, the AppImage can be renamed to anything what's 'legal' for an
+# executable name under Linux or used via a symlink under any name and
+# it should behave like 'qpdf' is expected to behave. If the symlink
+# name is 'fix-qdf' or 'zlib-flate' it should behave like these...
 
 HERE="$(dirname "$(readlink -f "${0}")")"
 
 # Set APPDIR and ARGV0 when running directly from the AppDir.
-# Running from the AppDir can be beneficial when debugging the AppImage (or give performance improvements):
+# Running from the AppDir can be beneficial when debugging the
+# AppImage (or give performance improvements):
 if [ -z $APPDIR ]; then
     APPDIR="$HERE"
     ARGV0="$0"
 fi
 
-# This is a semi-secret environment variable which can be set for debugging the AppImage.
-# For now it is only meant for temporary use and may be removed again in the near future once things have
+# This is a semi-secret environment variable which can be set for
+# debugging the AppImage. For now it is only meant for temporary use
+# and may be removed again in the near future once things have
 # settled:
 if [ "x$SET_BASH_X_FOR_APPRUN" == "xYeSS" ] ; then
    set -x
@@ -54,8 +60,9 @@ echo "
     All QPDF command line functionality inside an AppImage package.
  --------------------------------------------------------------------------
 
- (This package uses the AppImage software packaging technology for Linux ['One App == One File']
-  for easy availability of the newest QPDF releases across all major Linux distributions.)
+ (This package uses the AppImage software packaging technology for
+ Linux ['One App == One File'] for easy availability of the newest
+ QPDF releases across all major Linux distributions.)
 
  Usage:
  ------
@@ -64,7 +71,8 @@ echo "
                 # Show help screen of QPDF itself
 
    $ARGV0  --ai-usage
-                # This message (it's only present in the AppImage incarnation of QPDF)
+                # This message (it's only present in the AppImage
+                # incarnation of QPDF)
 
    $ARGV0  fix-qdf|zlib-flate
                 # Run the named sub-command
@@ -89,7 +97,8 @@ echo "
                 # List all PDF documents embedded in AppImage
 
    $ARGV0  --pdf <path/to/file>
-                # Use system default PDF viewer to display embedded PDF document(s)
+                # Use system default PDF viewer to display embedded PDF
+                # document(s)
                 # (for list of available PDF files see \"$ARGV0 --list-pdf\")
 
    $ARGV0  --list-readme
@@ -103,10 +112,12 @@ echo "
                 # List all LICENSE files embedded in AppImage
 
    $ARGV0  --license <name-of-license>
-                # Show content of LICENSE file embedded in AppImage (piped thru 'less -N')
+                # Show content of LICENSE file embedded in AppImage
+                # (piped thru 'less -N')
 
    $ARGV0  --show-apprun|--self-show|--selfshow
-                 # Show 'AppRun' invoked by 'less -N'; type '-N' to toogle line number display
+                # Show 'AppRun' invoked by 'less -N'; type '-N' to toggle
+                # line number display
 
    $ARGV0  --appimage-help
                 # Show AppImage options available for all 'type 2' AppImages
@@ -114,15 +125,17 @@ echo "
    $ARGV0  --help
                 # Show help screen of QPDF itself
 
- ------------------------------------------------------------------------------------------------
- NOTE: The execution of this AppImage is controlled by a custom AppRun script. The state of this
- script is experimental and preliminary. Hence it may not work as expected, or miss some
- functionality. You can hack on this script by unpacking this AppImage into a local sub directory
- [currently named 'squashfs-root'] with this command:
+ ------------------------------------------------------------------------------
+ NOTE: The execution of this AppImage is controlled by a custom AppRun
+ script. The state of this script is experimental and preliminary.
+ Hence it may not work as expected, or miss some functionality. You
+ can hack on this script by unpacking this AppImage into a local
+ subdirectory [currently named 'squashfs-root'] with this command:
 
        $ARGV0 --appimage-extract
 
- After you're done with your hacks, repackage the AppImage again with this command:
+ After you're done with your hacks, repackage the AppImage again with
+ this command:
 
        appimagetool [/path/to/]squashfs-root [/path/to/]QPDF-*.AppImage
 
@@ -131,7 +144,7 @@ echo "
    * https://github.com/AppImage/AppImageUpdate/releases/  and
    * https://github.com/AppImage/zsync2/releases           and
    * https://github.com/probonopd/linuxdeployqt/releases/
- ------------------------------------------------------------------------------------------------
+ ------------------------------------------------------------------------------
 "
 }
 
@@ -168,14 +181,30 @@ esac
 }
 
 
-if [ x"$1" == "xshow-apprun" -o x"$1" == "x--show-apprun" -o x"$1" == "x--apprunshow" -o x"$1" == "x--apprun-show" -o x"$1" == "xselfshow" -o x"$1" == "x--selfshow"  -o x"$1" == "xself-show" -o x"$1" == "x--self-show" -o x"$1" == "x--show-self" -o x"$1" == "x--showself" -o x"$1" == "xshow-self" -o x"$1" == "xshowself" ] ; then
+if [ x"$1" == "xshow-apprun" -o \
+     x"$1" == "x--show-apprun" -o \
+     x"$1" == "x--apprunshow" -o \
+     x"$1" == "x--apprun-show" -o \
+     x"$1" == "xselfshow" -o \
+     x"$1" == "x--selfshow" -o \
+     x"$1" == "xself-show" -o \
+     x"$1" == "x--self-show" -o \
+     x"$1" == "x--show-self" -o \
+     x"$1" == "x--showself" -o \
+     x"$1" == "xshow-self" -o \
+     x"$1" == "xshowself" ] ; then
     cd "$HERE"
     less -N AppRun
     exit $?
 fi
 
 
-if [ x"$1" == "xlistlicense" -o x"$1" == "x--listlicense" -o  x"$1" == "xlist-license" -o x"$1" == "x--list-license" -o x"$1" == "x--licenselist" -o x"$1" == "x--license-list" ] ; then
+if [ x"$1" == "xlistlicense" -o \
+      x"$1" == "x--listlicense" -o  \
+      x"$1" == "xlist-license" -o \
+      x"$1" == "x--list-license" -o \
+      x"$1" == "x--licenselist" -o \
+      x"$1" == "x--license-list" ] ; then
     cd "$HERE"
     echo ""
     echo "You may invoke \"$ARGV0\" with one of the following additional arguments."
@@ -187,14 +216,22 @@ if [ x"$1" == "xlistlicense" -o x"$1" == "x--listlicense" -o  x"$1" == "xlist-li
 fi
 
 
-if [ "x$1" == "xai-usage" -o "x$1" == "x--aiusage" -o "x$1" == "x--ai-usage" -o "x$1" == "x-u" ] ; then
+if [ x"$1" == "xai-usage" -o \
+     x"$1" == "x--aiusage" -o \
+     x"$1" == "x--ai-usage" -o \
+     x"$1" == "x-u" ] ; then
     usage | less
     #usage
     exit $?
 fi
 
 
-if [ x"$1" == "xlistman" -o x"$1" == "x--listman" -o x"$1" == "xlist-man" -o x"$1" == "x--list-man" -o x"$1" == "x--manlist" -o x"$1" == "x--man-list" ] ; then
+if [ x"$1" == "xlistman" -o \
+     x"$1" == "x--listman" -o \
+     x"$1" == "xlist-man" -o \
+     x"$1" == "x--list-man" -o \
+     x"$1" == "x--manlist" -o \
+     x"$1" == "x--man-list" ] ; then
     cd "$HERE"
     echo ""
     echo "You may invoke \"$ARGV0\" with one of the following additional arguments."
@@ -206,7 +243,12 @@ if [ x"$1" == "xlistman" -o x"$1" == "x--listman" -o x"$1" == "xlist-man" -o x"$
 fi
 
 
-if [ x"$1" == "xlistexe" -o x"$1" == "x--listexe" -o x"$1" == "xlist-exe" -o x"$1" == "x--list-exe" -o x"$1" == "x--exelist" -o x"$1" == "x--exe-list" ] ; then
+if [ x"$1" == "xlistexe" -o \
+     x"$1" == "x--listexe" -o \
+     x"$1" == "xlist-exe" -o \
+     x"$1" == "x--list-exe" -o \
+     x"$1" == "x--exelist" -o \
+     x"$1" == "x--exe-list" ] ; then
     cd "$HERE"
     echo ""
     echo "You may invoke \"$ARGV0\" with one of the following additional arguments."
@@ -220,7 +262,12 @@ if [ x"$1" == "xlistexe" -o x"$1" == "x--listexe" -o x"$1" == "xlist-exe" -o x"$
 fi
 
 
-if [ x"$1" == "xlistreadme" -o x"$1" == "x--listreadme" -o x"$1" == "xlist-readme" -o x"$1" == "x--list-readme" -o x"$1" == "x--readmelist" -o x"$1" == "x--readme-list" ] ; then
+if [ x"$1" == "xlistreadme" -o \
+     x"$1" == "x--listreadme" -o \
+     x"$1" == "xlist-readme" -o \
+     x"$1" == "x--list-readme" -o \
+     x"$1" == "x--readmelist" -o \
+     x"$1" == "x--readme-list" ] ; then
     cd "$HERE"
     echo ""
     echo "You may invoke \"$ARGV0\" with one of the following additional arguments."
@@ -232,7 +279,12 @@ if [ x"$1" == "xlistreadme" -o x"$1" == "x--listreadme" -o x"$1" == "xlist-readm
 fi
 
 
-if [ x"$1" == "xlisthtml" -o x"$1" == "x--listhtml" -o  x"$1" == "xlist-html" -o x"$1" == "x--list-html" -o x"$1" == "x--htmllist" -o x"$1" == "x--html-list" ] ; then
+if [ x"$1" == "xlisthtml" -o \
+     x"$1" == "x--listhtml" -o  \
+     x"$1" == "xlist-html" -o \
+     x"$1" == "x--list-html" -o \
+     x"$1" == "x--htmllist" -o \
+     x"$1" == "x--html-list" ] ; then
     cd "$HERE"
     echo ""
     echo "You may invoke \"$ARGV0\" with one of the following additional arguments."
@@ -244,7 +296,12 @@ if [ x"$1" == "xlisthtml" -o x"$1" == "x--listhtml" -o  x"$1" == "xlist-html" -o
 fi
 
 
-if [ x"$1" == "xlistpdf" -o x"$1" == "x--listpdf" -o x"$1" == "xlist-pdf" -o x"$1" == "x--list-pdf" -o x"$1" == "x--pdflist" -o x"$1" == "x--pdf-list" ] ; then
+if [ x"$1" == "xlistpdf" -o \
+     x"$1" == "x--listpdf" -o \
+     x"$1" == "xlist-pdf" -o \
+     x"$1" == "x--list-pdf" -o \
+     x"$1" == "x--pdflist" -o \
+     x"$1" == "x--pdf-list" ] ; then
     cd "$HERE"
     echo ""
     echo "You may invoke \"$ARGV0\" with one of the following additional arguments."
@@ -256,7 +313,8 @@ if [ x"$1" == "xlistpdf" -o x"$1" == "x--listpdf" -o x"$1" == "xlist-pdf" -o x"$
 fi
 
 
-if [ x"$1" == "xreadme" -o x"$1" == "x--readme" ] ; then
+if [ x"$1" == "xreadme" -o \
+     x"$1" == "x--readme" ] ; then
     cd "$HERE"
     shift
     echo ""
@@ -287,7 +345,8 @@ if [ x"$1" == "xreadme" -o x"$1" == "x--readme" ] ; then
 fi
 
 
-if [ x"$1" == "xlicense" -o x"$1" == "x--license" ] ; then
+if [ x"$1" == "xlicense" -o \
+     x"$1" == "x--license" ] ; then
     cd "$HERE"
     shift
     echo ""
@@ -489,4 +548,3 @@ else
     fi
 
 fi
-
