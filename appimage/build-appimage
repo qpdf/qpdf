@@ -112,7 +112,9 @@ rm -rf appdir/usr/include appdir/usr/lib/pkgconfig appdir/usr/lib/*.{a,la,so}
 for width in 64 128 256 512; do
     dir=appdir/usr/share/icons/hicolor/${width}x${width}/apps
     mkdir -p $dir
-    inkscape -z -e $dir/qpdf.png -w $width -b white $top/logo/qpdf.svg
+    inkscape -z -e qpdf-tmp.png -w $width -b white $top/logo/qpdf.svg
+    convert qpdf-tmp.png -gravity center -background white -extent ${width}x${width} $dir/qpdf.png
+    rm qpdf-tmp.png
 done
 
 # Copy .desktop and .appdata.xml metadata for desktop integration into place:
