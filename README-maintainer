@@ -106,10 +106,15 @@ RELEASE PREPARATION
 
 CREATING A RELEASE
 
+* Be sure that the local git clone's HEAD is a commit that has
+  upstream/master as an ancestor and that can be pushed to my fork. We
+  will be generating releases and tagging this commit, which will be
+  pushed to master as part of the release process.
+
 * Create source release:
 
 version=x.y.z
-rm -rf /tmp/qpdf-$version
+\rm -rf /tmp/qpdf-$version
 git archive --prefix=qpdf-$version/ HEAD . | (cd /tmp; tar xf -)
 cd /tmp
 ./qpdf-$version/make_dist
@@ -129,20 +134,13 @@ gpg --detach-sign --armor qpdf-$version.tar.gz
 
 cd appimage
 docker build -t qpdfbuild .
-rm -rf /tmp/build
+\rm -rf /tmp/build
 mkdir -p /tmp/build
 cp -rLp ~/.gnupg/. /tmp/build/.gnupg
 docker run --privileged -ti --rm -v /tmp/build:/tmp/build qpdfbuild https://github.com/jberkenbilt/qpdf -b work
 
-  To build locally, omit the git arguments after qpdfbuild above and
-  copy the source tree into /tmp/build/qpdf.
-
-  Pass -e SKIP_TESTS=1 to docker to skip the test suite, useful for
-  rapid iteration.
-
-  Rename the AppImage in /tmp/build/qpdf/appimage/build
-  qpdf-$version-x86_64.AppImage and move it to the release archive
-  area.
+  The AppImage in /tmp/build/qpdf/appimage/build should be called
+  qpdf-$version-x86_64.AppImage. Move it to the release archive area.
 
 * Create Windows binary releases. In Windows:
   * Extract the source distribution
@@ -169,10 +167,20 @@ for i in md5 sha1 sha512; do
   gpg --clearsign --armor qpdf-$version.$i
   mv qpdf-$version.$i.asc qpdf-$version.$i
 done
+chmod 444 *
+chmod 555 *.AppImage
 
 * When creating releases on github and sourceforge, remember to copy
   `README-what-to-download.md` separately onto the download area if
   needed.
+
+* Push the master branch to github. Create and push a signed tag. This
+  should be run with HEAD pointing to the tip of master.
+
+git rev-parse master @
+git push upstream master
+git tag -s release-qpdf-$version HEAD -m"qpdf $version"
+git push upstream release-qpdf-$version
 
 * Create a github release after pushing the tag. `gcurl` is an alias
   that includes the auth token.
@@ -231,6 +239,15 @@ zip -r qpdf-external-libs-src.zip external-libs
 
 When releasing on sourceforge, `external-libs` distributions go in
 `external-libs/yyyymmdd`, and qpdf distributions go in `qpdf/vvv`.
+
+For local iteration on the AppImage generation, follow the release
+procedures for building the AppImage, but instead of passing git clone
+options to the docker command, copy qpdf to /tmp/build. You can also
+pass -e SKIP_TESTS=1 to docker to skip the test suite, useful for
+rapid iteration. Set up /tmp/build as in the release process.
+
+cp -a $PWD /tmp/build
+docker run --privileged -ti --rm -e SKIP_TESTS=1 -v /tmp/build:/tmp/build qpdfbuild
 
 
 GENERAL BUILD STUFF
