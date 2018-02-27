@@ -35,7 +35,7 @@
 	<url type="bugtracker">https://github.com/qpdf/qpdf/issues</url>
 	<screenshots>
 		<screenshot type="default">
-                    <image width="798" height="1550">https://i.stack.imgur.com/coCKR.jpg</image>
+                    <image width="798" height="1550">https://raw.githubusercontent.com/qpdf/qpdf/master/appimage/qpdf-screenshot.jpeg</image>
 		</screenshot>
 	</screenshots>
 	<provides>
