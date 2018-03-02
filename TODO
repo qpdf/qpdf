@@ -1,6 +1,9 @@
 Soon
 ====
 
+ * Figure out how to render Gajić correctly in the PDF version of the
+   qpdf manual.
+
  * Add method to push inheritable resources to a single page by
    walking up and copying without overwrite.  Above logic will also be
    sufficient to fix the limitation in

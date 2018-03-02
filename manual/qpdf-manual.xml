@@ -4613,11 +4613,11 @@ print "\n";
       <listitem>
        <para>
         This is the first version of qpdf to include Windows support.
-        On Windows, it is possible to build a DLL.  Additionally, a
+        On Windows, it is possible to build a DLL. Additionally, a
         partial C-language API has been introduced, which makes it
-        possible to call qpdf functions from non-C++ environments.  I
-        am very grateful to <!-- Žarko Gajić --> Zarko Gagic (<ulink
-        url="http://delphi.about.com/">http://delphi.about.com/</ulink>)
+        possible to call qpdf functions from non-C++ environments. I
+        am very grateful to Žarko <!-- Gajić --> Gajic (<ulink
+        url="http://zarko-gajic.iz.hr/">http://zarko-gajic.iz.hr/</ulink>)
         for tirelessly testing numerous pre-release versions of this
         DLL and providing many excellent suggestions on improving the
         interface.
@@ -4630,13 +4630,13 @@ print "\n";
       </listitem>
       <listitem>
        <para>
-        Zarko Gajic has written a Delphi wrapper for qpdf, which can
-        be downloaded from qpdf's download side.  Zarko's Delphi
+        Žarko Gajic has written a Delphi wrapper for qpdf, which can
+        be downloaded from qpdf's download side.  Žarko's Delphi
         wrapper is released with the same licensing terms as qpdf
         itself and comes with this disclaimer: &ldquo;Delphi wrapper
-        unit <filename>qpdf.pas</filename> created by Zarko Gajic
+        unit <filename>qpdf.pas</filename> created by Žarko Gajic
         (<ulink
-        url="http://delphi.about.com/">http://delphi.about.com/</ulink>).
+        url="http://zarko-gajic.iz.hr/">http://zarko-gajic.iz.hr/</ulink>).
         Use at your own risk and for whatever purpose you want.  No
         support is provided.  Sample code is provided.&rdquo;
        </para>
