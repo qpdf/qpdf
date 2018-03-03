@@ -1,3 +1,9 @@
+2018-03-03  Jay Berkenbilt  <ejb@ql.org>
+
+	* Ignore zlib data check errors while uncompressing streams. This
+	is consistent with behaviors of other readers and enables handling
+	of some incorrectly written zlib strems. Fixes #191.
+
 2018-02-25  Jay Berkenbilt  <ejb@ql.org>
 
 	* 8.0.0: release

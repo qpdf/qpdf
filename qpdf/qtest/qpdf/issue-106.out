@@ -1,6 +1,4 @@
 WARNING: issue-106.pdf: file is damaged
 WARNING: issue-106.pdf (offset 809): xref not found
 WARNING: issue-106.pdf: Attempting to reconstruct cross-reference table
-WARNING: issue-106.pdf (offset 965): error decoding stream data for object 8 0: stream inflate: inflate: data: incorrect data check
-WARNING: issue-106.pdf (offset 965): stream will be re-processed without filtering to avoid data loss
 qpdf: operation succeeded with warnings; resulting file may have some problems

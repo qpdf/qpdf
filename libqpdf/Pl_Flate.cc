@@ -1,5 +1,6 @@
 #include <qpdf/Pl_Flate.hh>
 #include <zlib.h>
+#include <string.h>
 
 #include <qpdf/QUtil.hh>
 
@@ -71,7 +72,8 @@ Pl_Flate::write(unsigned char* data, size_t len)
     while (bytes_left > 0)
     {
 	size_t bytes = (bytes_left >= max_bytes ? max_bytes : bytes_left);
-        handleData(buf, bytes, Z_NO_FLUSH);
+        handleData(buf, bytes,
+                   (action == a_inflate ? Z_SYNC_FLUSH : Z_NO_FLUSH));
 	bytes_left -= bytes;
         buf += bytes;
     }
@@ -125,6 +127,14 @@ Pl_Flate::handleData(unsigned char* data, int len, int flush)
 	{
 	    err = inflate(&zstream, flush);
 	}
+        if ((action == a_inflate) && (err != Z_OK) && zstream.msg &&
+            (strcmp(zstream.msg, "incorrect data check") == 0))
+        {
+            // Other PDF readers ignore this specific error. Combining
+            // this with Z_SYNC_FLUSH enables qpdf to handle some
+            // broken zlib streams without losing data.
+            err = Z_STREAM_END;
+        }
 	switch (err)
 	{
 	  case Z_BUF_ERROR:
