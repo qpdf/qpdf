@@ -140,8 +140,8 @@ cp -rLp ~/.gnupg/. /tmp/build/.gnupg
 docker run --privileged -ti --rm -v /tmp/build:/tmp/build qpdfbuild https://github.com/jberkenbilt/qpdf -b work
 
   The AppImage in /tmp/build/qpdf/appimage/build should be called
-  qpdf-$version-x86_64.AppImage. Move the AppImage and AppImage.zsync
-  files to the release archive area.
+  qpdf-$version-x86_64.AppImage. Copy qpdf*AppImage* (AppImage and
+  zsync) files to the release archive area.
 
 * Create Windows binary releases. In Windows:
   * Extract the source distribution
