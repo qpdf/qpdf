@@ -358,11 +358,12 @@ input.\n\
 \n\
 The page range is a set of numbers separated by commas, ranges of\n\
 numbers separated dashes, or combinations of those.  The character\n\
-\"z\" represents the last page.  Pages can appear in any order.  Ranges\n\
-can appear with a high number followed by a low number, which causes the\n\
-pages to appear in reverse.  Repeating a number will cause an error, but\n\
-the manual discusses a workaround should you really want to include the\n\
-same page twice.\n\
+\"z\" represents the last page.  A number preceded by an \"r\" indicates\n\
+to count from the end, so \"r3-r1\" would be the last three pages of the\n\
+document.  Pages can appear in any order.  Ranges can appear with a\n\
+high number followed by a low number, which causes the pages to appear in\n\
+reverse.  Repeating a number will cause an error, but the manual discusses\n\
+a workaround should you really want to include the same page twice.\n\
 \n\
 If the page range is omitted, the range of 1-z is assumed.  qpdf decides\n\
 that the page range is omitted if the range argument is either -- or a\n\
@@ -577,6 +578,22 @@ static void show_encryption(QPDF& pdf, Options& o)
     }
 }
 
+static int maybe_from_end(int num, bool from_end, int max)
+{
+    if (from_end)
+    {
+        if (num > max)
+        {
+            num = 0;
+        }
+        else
+        {
+            num = max + 1 - num;
+        }
+    }
+    return num;
+}
+
 static std::vector<int> parse_numrange(char const* range, int max,
                                        bool throw_error = false)
 {
@@ -593,6 +610,7 @@ static std::vector<int> parse_numrange(char const* range, int max,
                st_after_number } state = st_top;
         bool last_separator_was_dash = false;
         int cur_number = 0;
+        bool from_end = false;
         while (*p)
         {
             char ch = *p;
@@ -616,14 +634,25 @@ static std::vector<int> parse_numrange(char const* range, int max,
                 state = st_after_number;
                 cur_number = max;
             }
+            else if (ch == 'r')
+            {
+                if (! (state == st_top))
+                {
+                    throw std::runtime_error("r not expected");
+                }
+                state = st_in_number;
+                from_end = true;
+            }
             else if ((ch == ',') || (ch == '-'))
             {
                 if (! ((state == st_in_number) || (state == st_after_number)))
                 {
                     throw std::runtime_error("unexpected separator");
                 }
+                cur_number = maybe_from_end(cur_number, from_end, max);
                 work.push_back(cur_number);
                 cur_number = 0;
+                from_end = false;
                 if (ch == ',')
                 {
                     state = st_top;
@@ -649,6 +678,7 @@ static std::vector<int> parse_numrange(char const* range, int max,
         }
         if ((state == st_in_number) || (state == st_after_number))
         {
+            cur_number = maybe_from_end(cur_number, from_end, max);
             work.push_back(cur_number);
         }
         else

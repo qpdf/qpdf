@@ -818,13 +818,15 @@ make
    </para>
    <para>
     The page range is a set of numbers separated by commas, ranges of
-    numbers separated dashes, or combinations of those.  The character
-    &ldquo;z&rdquo; represents the last page.  Pages can appear in any
-    order.  Ranges can appear with a high number followed by a low
-    number, which causes the pages to appear in reverse.  Repeating a
-    number will cause an error, but you can use the workaround
-    discussed above should you really want to include the same page
-    twice.
+    numbers separated dashes, or combinations of those. The character
+    &ldquo;z&rdquo; represents the last page. A number preceded by an
+    &ldquo;r&rdquo; indicates to count from the end, so
+    &ldquo;r3-r1&rdquo; would be the last three pages of the document.
+    Pages can appear in any order. Ranges can appear with a high
+    number followed by a low number, which causes the pages to appear
+    in reverse. Repeating a number will cause an error, but you can
+    use the workaround discussed above should you really want to
+    include the same page twice.
    </para>
    <para>
     Example page ranges:
@@ -838,6 +840,17 @@ make
      <listitem>
       <para>
        <literal>z-1</literal>: all pages in the document in reverse
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       <literal>r3-r1</literal>: the last three pages of the document
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       <literal>r1-r3</literal>: the last three pages of the document
+       in reverse order
       </para>
      </listitem>
     </itemizedlist>
