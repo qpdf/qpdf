@@ -821,11 +821,11 @@ make
     numbers separated dashes, or combinations of those. The character
     &ldquo;z&rdquo; represents the last page. A number preceded by an
     &ldquo;r&rdquo; indicates to count from the end, so
-    &ldquo;r3-r1&rdquo; would be the last three pages of the document.
-    Pages can appear in any order. Ranges can appear with a high
-    number followed by a low number, which causes the pages to appear
-    in reverse. Repeating a number will cause an error, but you can
-    use the workaround discussed above should you really want to
+    <literal>r3-r1</literal> would be the last three pages of the
+    document. Pages can appear in any order. Ranges can appear with a
+    high number followed by a low number, which causes the pages to
+    appear in reverse. Repeating a number will cause an error, but you
+    can use the workaround discussed above should you really want to
     include the same page twice.
    </para>
    <para>
