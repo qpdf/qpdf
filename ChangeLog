@@ -1,5 +1,7 @@
 2018-03-04  Jay Berkenbilt  <ejb@ql.org>
 
+	* 8.0.1: release
+
 	* On the command line when specifying page ranges, support
 	preceding a page number by "r" to indicate that it should be
 	counted from the end. For example, the range r3-r1 would indicate
