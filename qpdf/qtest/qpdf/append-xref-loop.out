@@ -1,0 +1,4 @@
+WARNING: append-xref-loop.pdf: file is damaged
+WARNING: append-xref-loop.pdf: loop detected following xref tables
+WARNING: append-xref-loop.pdf: Attempting to reconstruct cross-reference table
+qpdf: operation succeeded with warnings; resulting file may have some problems

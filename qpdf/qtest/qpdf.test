@@ -1400,7 +1400,7 @@ $td->runtest("C API: no recovery",
 show_ntests();
 # ----------
 $td->notify("--- Recovery Tests ---");
-$n_tests += @badfiles + 7;
+$n_tests += @badfiles + 9;
 
 # Recovery tests.  These are mostly after-the-fact -- when recovery
 # was implemented, some degree of recovery was possible on many of the
@@ -1468,6 +1468,17 @@ $td->runtest("recoverable xref errors",
              {$td->FILE => "xref-errors.out",
               $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
+
+$td->runtest("xref loop with append",
+             {$td->COMMAND =>
+                  "qpdf --deterministic-id append-xref-loop.pdf a.pdf"},
+             {$td->FILE => "append-xref-loop.out",
+              $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "append-xref-loop-fixed.pdf"});
 
 show_ntests();
 # ----------

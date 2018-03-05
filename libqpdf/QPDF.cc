@@ -532,7 +532,9 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
 	}
         if (visited.count(xref_offset) != 0)
         {
-            xref_offset = 0;
+            QTC::TC("qpdf", "QPDF xref loop");
+            throw QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(), "", 0,
+                          "loop detected following xref tables");
         }
     }
 

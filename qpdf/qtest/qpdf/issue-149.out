@@ -1,2 +1,4 @@
-WARNING: issue-149.pdf: reported number of objects (11) inconsistent with actual number of objects (7)
+WARNING: issue-149.pdf: file is damaged
+WARNING: issue-149.pdf: loop detected following xref tables
+WARNING: issue-149.pdf: Attempting to reconstruct cross-reference table
 qpdf: operation succeeded with warnings; resulting file may have some problems

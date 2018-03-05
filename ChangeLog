@@ -1,3 +1,8 @@
+2018-03-05  Jay Berkenbilt  <ejb@ql.org>
+
+	* Improve handling of loops while following cross reference
+	tables. Fixes #192.
+
 2018-03-04  Jay Berkenbilt  <ejb@ql.org>
 
 	* 8.0.1: release
