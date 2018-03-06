@@ -1,5 +1,7 @@
 2018-03-06  Jay Berkenbilt  <ejb@ql.org>
 
+	* 8.0.2: release
+
 	* Properly handle pages with no contents. Fixes #194.
 
 2018-03-05  Jay Berkenbilt  <ejb@ql.org>

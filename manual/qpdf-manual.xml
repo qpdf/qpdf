@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "8.0.1">
-<!ENTITY lastreleased "March 4, 2018">
+<!ENTITY swversion "8.0.2">
+<!ENTITY lastreleased "March 6, 2018">
 ]>
 <book>
  <bookinfo>
@@ -3062,6 +3062,28 @@ print "\n";
    <filename>ChangeLog</filename> in the source distribution.
   </para>
   <variablelist>
+   <varlistentry>
+    <term>8.0.2: March 6, 2018</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        When a loop is detected while following cross reference
+        streams or tables, treat this as damage instead of silently
+        ignoring the previous table. This prevents loss of otherwise
+        recoverable data in some damaged files.
+       </para>
+      </listitem>
+     </itemizedlist>
+     <itemizedlist>
+      <listitem>
+       <para>
+         Properly handle pages with no contents.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
     <term>8.0.1: March 4, 2018</term>
     <listitem>
