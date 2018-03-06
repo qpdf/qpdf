@@ -5,7 +5,7 @@
 
 Pl_Buffer::Pl_Buffer(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next),
-    ready(false),
+    ready(true),
     total_size(0)
 {
 }
