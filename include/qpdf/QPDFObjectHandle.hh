@@ -830,6 +830,11 @@ class QPDFObjectHandle
     QPDF_DLL
     void assertNumber();
 
+    // The isPageObject method checks the /Type key of the object.
+    // This is not completely reliable as there are some otherwise
+    // valid files whose /Type is wrong for page objects. qpdf is
+    // slightly more accepting but may still return false here when
+    // treating the object as a page would work. Use this sparingly.
     QPDF_DLL
     bool isPageObject();
     QPDF_DLL

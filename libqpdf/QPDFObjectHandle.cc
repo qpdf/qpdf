@@ -932,8 +932,6 @@ QPDFObjectHandle::getGeneration() const
 std::map<std::string, QPDFObjectHandle>
 QPDFObjectHandle::getPageImages()
 {
-    assertPageObject();
-
     // Note: this code doesn't handle inherited resources.  If this
     // page dictionary doesn't have a /Resources key or has one whose
     // value is null or an empty dictionary, you are supposed to walk
@@ -1081,7 +1079,6 @@ QPDFObjectHandle::addPageContents(QPDFObjectHandle new_contents, bool first)
 void
 QPDFObjectHandle::rotatePage(int angle, bool relative)
 {
-    assertPageObject();
     if ((angle % 90) != 0)
     {
         throw std::runtime_error(
@@ -1137,7 +1134,6 @@ QPDFObjectHandle::rotatePage(int angle, bool relative)
 void
 QPDFObjectHandle::coalesceContentStreams()
 {
-    assertPageObject();
     QPDFObjectHandle contents = this->getKey("/Contents");
     if (contents.isStream())
     {
@@ -1218,7 +1214,6 @@ QPDFObjectHandle::parse(std::string const& object_str,
 void
 QPDFObjectHandle::pipePageContents(Pipeline* p)
 {
-    assertPageObject();
     std::string description = "page object " +
         QUtil::int_to_string(this->m->objid) + " " +
         QUtil::int_to_string(this->m->generation);
@@ -1256,7 +1251,6 @@ QPDFObjectHandle::pipeContentStreams(
 void
 QPDFObjectHandle::parsePageContents(ParserCallbacks* callbacks)
 {
-    assertPageObject();
     std::string description = "page object " +
         QUtil::int_to_string(this->m->objid) + " " +
         QUtil::int_to_string(this->m->generation);
@@ -1267,7 +1261,6 @@ QPDFObjectHandle::parsePageContents(ParserCallbacks* callbacks)
 void
 QPDFObjectHandle::filterPageContents(TokenFilter* filter, Pipeline* next)
 {
-    assertPageObject();
     std::string description = "token filter for page object " +
         QUtil::int_to_string(this->m->objid) + " " +
         QUtil::int_to_string(this->m->generation);
@@ -2222,8 +2215,29 @@ QPDFObjectHandle::assertNumber()
 bool
 QPDFObjectHandle::isPageObject()
 {
-    // Some PDF files have /Type broken on pages.
-    return (this->isDictionary() && this->hasKey("/Contents"));
+    // See comments in QPDFObjectHandle.hh.
+    if (! this->isDictionary())
+    {
+        return false;
+    }
+    if (this->hasKey("/Type"))
+    {
+        QPDFObjectHandle type = this->getKey("/Type");
+        if (type.isName() && (type.getName() == "/Page"))
+        {
+            return true;
+        }
+        // Files have been seen in the wild that have /Type (Page)
+        if (type.isString() && (type.getStringValue() == "Page"))
+        {
+            return true;
+        }
+    }
+    if (this->hasKey("/Contents"))
+    {
+        return true;
+    }
+    return false;
 }
 
 bool

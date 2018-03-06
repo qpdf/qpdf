@@ -191,7 +191,6 @@ QPDF::insertPage(QPDFObjectHandle newpage, int pos)
     // pos = npages adds to the end.
 
     flattenPagesTree();
-    newpage.assertPageObject();
 
     if (! newpage.isIndirect())
     {
@@ -288,7 +287,6 @@ QPDF::addPage(QPDFObjectHandle newpage, bool first)
 int
 QPDF::findPage(QPDFObjectHandle& page)
 {
-    page.assertPageObject();
     return findPage(page.getObjGen());
 }
 

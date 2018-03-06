@@ -1,3 +1,7 @@
+2018-03-06  Jay Berkenbilt  <ejb@ql.org>
+
+	* Properly handle pages with no contents. Fixes #194.
+
 2018-03-05  Jay Berkenbilt  <ejb@ql.org>
 
 	* Improve handling of loops while following cross reference
