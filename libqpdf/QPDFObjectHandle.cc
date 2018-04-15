@@ -1487,12 +1487,26 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 
 	  case QPDFTokenizer::tt_array_open:
 	  case QPDFTokenizer::tt_dict_open:
-            olist_stack.push_back(std::vector<QPDFObjectHandle>());
-            state = st_start;
-            offset_stack.push_back(input->tell());
-            state_stack.push_back(
-                (token.getType() == QPDFTokenizer::tt_array_open) ?
-                st_array : st_dictionary);
+            if (olist_stack.size() > 500)
+            {
+		QTC::TC("qpdf", "QPDFObjectHandle too deep");
+                warn(context,
+                     QPDFExc(qpdf_e_damaged_pdf, input->getName(),
+                             object_description,
+                             input->getLastOffset(),
+                             "ignoring excessively deeply nested data structure"));
+                object = newNull();
+                state = st_top;
+            }
+            else
+            {
+                olist_stack.push_back(std::vector<QPDFObjectHandle>());
+                state = st_start;
+                offset_stack.push_back(input->tell());
+                state_stack.push_back(
+                    (token.getType() == QPDFTokenizer::tt_array_open) ?
+                    st_array : st_dictionary);
+            }
 	    break;
 
 	  case QPDFTokenizer::tt_bool:

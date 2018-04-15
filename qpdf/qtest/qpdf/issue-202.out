@@ -1,0 +1,5 @@
+WARNING: issue-202.pdf (trailer, offset 55770): ignoring excessively deeply nested data structure
+WARNING: issue-202.pdf: file is damaged
+WARNING: issue-202.pdf (offset 54769): expected trailer dictionary
+WARNING: issue-202.pdf: Attempting to reconstruct cross-reference table
+issue-202.pdf: unable to find trailer dictionary while recovering damaged file

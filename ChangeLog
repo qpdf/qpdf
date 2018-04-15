@@ -1,3 +1,8 @@
+2018-04-15  Jay Berkenbilt  <ejb@ql.org>
+
+	* Arbitrarily limit the depth of data structures represented by
+	direct object. This is CVE-2018-9918. Fixes #202.
+
 2018-03-06  Jay Berkenbilt  <ejb@ql.org>
 
 	* 8.0.2: release

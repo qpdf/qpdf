@@ -335,3 +335,4 @@ QPDFObjectHandle numeric non-numeric 0
 QPDFObjectHandle erase array bounds 0
 qpdf-c called qpdf_check_pdf 0
 QPDF xref loop 0
+QPDFObjectHandle too deep 0

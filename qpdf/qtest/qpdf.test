@@ -236,6 +236,7 @@ my @bug_tests = (
     ["148", "free memory on bad flate", 2],
     ["149", "xref prev pointer loop", 3],
     ["150", "integer overflow", 2],
+    ["202", "even more deeply nested dictionary", 2],
     );
 $n_tests += scalar(@bug_tests);
 foreach my $d (@bug_tests)
