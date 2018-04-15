@@ -1,6 +1,8 @@
 Soon
 ====
 
+ * libtests buffer test fails with address sanitizer.
+
  * Figure out how to render Gajić correctly in the PDF version of the
    qpdf manual.
 
@@ -61,6 +63,13 @@ NOTE: Some items in this list refer to files in my personal home
 directory or that are otherwise not publicly accessible. This includes
 things sent to me by email that are specifically not public. Even so,
 I find it useful to make reference to them in this list
+
+ * Some test cases on bad fails fail because qpdf is unable to find
+   the root dictionary when it fails to read the trailer. Recovery
+   could find the root dictionary and even the info dictionary in
+   other ways. In particular, issue-202.pdf can be opened by evince,
+   and there's no real reason that qpdf couldn't be made to be able to
+   recover that file as well.
 
  * Audit every place where qpdf allocates memory to see whether there
    are cases where malicious inputs could cause qpdf to attempt to
