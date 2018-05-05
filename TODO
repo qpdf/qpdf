@@ -86,6 +86,9 @@ I find it useful to make reference to them in this list
 
  * Look at Travis-CI for qpdf. See email from Travis-CI in pending.
 
+ * https://github.com/qpdf/qpdf/pull/172 contains information about
+   running through MacPorts's CI.
+
  * Consider adding "uninstall" target to makefile. It should only
    uninstall what it installed, which means that you must run
    uninstall from the version you ran install with. It would only be
