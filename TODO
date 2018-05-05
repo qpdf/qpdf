@@ -1,8 +1,6 @@
 Soon
 ====
 
- * libtests buffer test fails with address sanitizer.
-
  * Figure out how to render Gajić correctly in the PDF version of the
    qpdf manual.
 
