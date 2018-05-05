@@ -49,7 +49,7 @@ QPDFTokenizer::Token::Token(token_type_e type, std::string const& value) :
     {
         raw_value = QPDFObjectHandle::newString(value).unparse();
     }
-    else if (type == tt_string)
+    else if (type == tt_name)
     {
         raw_value = QPDFObjectHandle::newName(value).unparse();
     }
