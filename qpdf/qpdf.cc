@@ -243,6 +243,10 @@ Basic Options\n\
                         rotate each specified page 90, 180, or 270 degrees\n\
 --split-pages=[n]       write each output page to a separate file\n\
 \n\
+Note that you can use the @filename or @- syntax for any argument at any\n\
+point in the command. This provides a good way to specify a password without\n\
+having to explicitly put it on the command line.\n\
+\n\
 If none of --copy-encryption, --encrypt or --decrypt are given, qpdf will\n\
 preserve any encryption data associated with a file.\n\
 \n\

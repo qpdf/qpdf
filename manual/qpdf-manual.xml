@@ -310,7 +310,11 @@ make
       <term><option>--password=password</option></term>
       <listitem>
        <para>
-        Specifies a password for accessing encrypted files.
+        Specifies a password for accessing encrypted files. Note that
+        you can use <option>@filename</option> or <option>@-</option>
+        as described above to put the password in a file or pass it
+        via standard input so you can avoid specifying it on the
+        command line.
        </para>
       </listitem>
      </varlistentry>
