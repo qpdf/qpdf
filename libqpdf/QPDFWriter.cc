@@ -1907,6 +1907,10 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
     pushEncryptionFilter();
     writeBuffer(stream_buffer);
     popPipelineStack();
+    if (this->m->newline_before_endstream)
+    {
+        writeString("\n");
+    }
     writeString("endstream");
     this->m->cur_data_key.clear();
     closeObject(new_id);

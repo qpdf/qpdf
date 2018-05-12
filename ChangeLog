@@ -1,3 +1,9 @@
+2018-05-12  Jay Berkenbilt  <ejb@ql.org>
+
+	* In newline before endstream mode, an extra newline was not
+	inserted prior to the endstream that ends object streams.
+	Fixes #205.
+
 2018-04-15  Jay Berkenbilt  <ejb@ql.org>
 
 	* Arbitrarily limit the depth of data structures represented by

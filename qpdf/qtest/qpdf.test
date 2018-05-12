@@ -964,7 +964,7 @@ $td->runtest("check output",
 show_ntests();
 # ----------
 $td->notify("--- Newline before endstream ---");
-$n_tests += 10;
+$n_tests += 12;
 
 # From issue 133, http://verapdf.org/software/ is an open source
 # package that can verify PDF/A compliance. This could potentially be
@@ -975,6 +975,8 @@ foreach my $d (
     ['--qdf', 'qdf', 'qdf'],
     ['--newline-before-endstream', 'newline', 'nl'],
     ['--qdf --newline-before-endstream', 'newline and qdf', 'nl-qdf'],
+    ['--object-streams=generate --newline-before-endstream',
+     'newline and object streams', 'nl-objstm'],
     )
 {
     my ($flags, $description, $suffix) = @$d;
