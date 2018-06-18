@@ -1,4 +1,6 @@
 #include <qpdf/QPDFTokenizer.hh>
+#include <qpdf/QPDFPageDocumentHelper.hh>
+#include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/FileInputSource.hh>
 #include <qpdf/BufferInputSource.hh>
@@ -206,9 +208,10 @@ static void process(char const* filename, bool include_ignorable,
     // Tokenize content streams, skipping inline images
     QPDF qpdf;
     qpdf.processFile(filename);
-    std::vector<QPDFObjectHandle> pages = qpdf.getAllPages();
+    std::vector<QPDFPageObjectHelper> pages =
+        QPDFPageDocumentHelper(qpdf).getAllPages();
     int pageno = 0;
-    for (std::vector<QPDFObjectHandle>::iterator iter = pages.begin();
+    for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
          iter != pages.end(); ++iter)
     {
         ++pageno;

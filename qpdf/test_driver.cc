@@ -3,6 +3,8 @@
 
 #include <qpdf/QPDF.hh>
 
+#include <qpdf/QPDFPageDocumentHelper.hh>
+#include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/Pl_StdioFile.hh>
@@ -455,12 +457,13 @@ void runtest(int n, char const* filename1, char const* arg2)
     }
     else if (n == 5)
     {
-	std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
+        QPDFPageDocumentHelper dh(pdf);
+	std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
 	int pageno = 0;
-	for (std::vector<QPDFObjectHandle>::iterator iter = pages.begin();
+	for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
 	     iter != pages.end(); ++iter)
 	{
-	    QPDFObjectHandle& page = *iter;
+	    QPDFPageObjectHelper& page(*iter);
 	    ++pageno;
 
 	    std::cout << "page " << pageno << ":" << std::endl;
@@ -633,11 +636,13 @@ void runtest(int n, char const* filename1, char const* arg2)
     }
     else if (n == 10)
     {
-	std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
-	pages.at(0).addPageContents(
+	std::vector<QPDFPageObjectHelper> pages =
+            QPDFPageDocumentHelper(pdf).getAllPages();
+        QPDFPageObjectHelper& ph(pages.at(0));
+	ph.addPageContents(
             QPDFObjectHandle::newStream(
                 &pdf, "BT /F1 12 Tf 72 620 Td (Baked) Tj ET\n"), true);
-	pages.at(0).addPageContents(
+	ph.addPageContents(
             QPDFObjectHandle::newStream(
                 &pdf, "BT /F1 18 Tf 72 520 Td (Mashed) Tj ET\n"), false);
 
@@ -887,6 +892,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         assert(pages.size() == 10);
         QPDFObjectHandle page5 = pages.at(5);
         pdf.removePage(page5);
+        assert(pages.size() == 9);
         pdf.addPage(page5, false);
         assert(pages.size() == 10);
         assert(pages.back().getObjGen() == page5.getObjGen());
@@ -899,10 +905,11 @@ void runtest(int n, char const* filename1, char const* arg2)
     else if (n == 19)
     {
         // Remove a page and re-insert it in the same file.
-        std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
+        QPDFPageDocumentHelper dh(pdf);
+        std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
 
         // Try to insert a page that's already there.
-        pdf.addPage(pages.at(5), false);
+        dh.addPage(pages.at(5), false);
         std::cout << "you can't see this" << std::endl;
     }
     else if (n == 20)
@@ -932,16 +939,18 @@ void runtest(int n, char const* filename1, char const* arg2)
     else if (n == 22)
     {
         // Try to remove a page we don't have
-        std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
-        QPDFObjectHandle page = pages.at(0);
-        pdf.removePage(page);
-        pdf.removePage(page);
+        QPDFPageDocumentHelper dh(pdf);
+        std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
+        QPDFPageObjectHelper& page = pages.at(0);
+        dh.removePage(page);
+        dh.removePage(page);
         std::cout << "you can't see this" << std::endl;
     }
     else if (n == 23)
     {
-        std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
-        pdf.removePage(pages.back());
+        QPDFPageDocumentHelper dh(pdf);
+        std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
+        dh.removePage(pages.back());
     }
     else if (n == 24)
     {
@@ -1053,7 +1062,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         newpdf.processFile(arg2);
         QPDFObjectHandle qtest = pdf.getTrailer().getKey("/QTest");
         QPDFObjectHandle O3 = qtest.getKey("/O3");
-        newpdf.addPage(O3, false);
+        QPDFPageDocumentHelper(newpdf).addPage(O3, false);
         newpdf.getTrailer().replaceKey(
             "/QTest", newpdf.copyForeignObject(qtest));
 
@@ -1073,8 +1082,9 @@ void runtest(int n, char const* filename1, char const* arg2)
         newpdf.processFile(arg2);
         QPDFObjectHandle qtest = pdf.getTrailer().getKey("/QTest");
         QPDFObjectHandle O3 = qtest.getKey("/O3");
-        newpdf.addPage(O3.getKey("/OtherPage"), false);
-        newpdf.addPage(O3, false);
+        QPDFPageDocumentHelper dh(newpdf);
+        dh.addPage(O3.getKey("/OtherPage"), false);
+        dh.addPage(O3, false);
         newpdf.getTrailer().replaceKey(
             "/QTest", newpdf.copyForeignObject(qtest));
 
@@ -1320,11 +1330,12 @@ void runtest(int n, char const* filename1, char const* arg2)
     else if (n == 37)
     {
         // Parse content streams of all pages
-        std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
-        for (std::vector<QPDFObjectHandle>::iterator iter = pages.begin();
+        std::vector<QPDFPageObjectHelper> pages =
+            QPDFPageDocumentHelper(pdf).getAllPages();
+        for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
              iter != pages.end(); ++iter)
         {
-            QPDFObjectHandle page = *iter;
+            QPDFPageObjectHelper& page(*iter);
             ParserCallbacks cb;
             page.parsePageContents(&cb);
         }
@@ -1341,9 +1352,10 @@ void runtest(int n, char const* filename1, char const* arg2)
     else if (n == 39)
     {
         // Display image filter and color set for each image on each page
-        std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
+        std::vector<QPDFPageObjectHelper> pages =
+            QPDFPageDocumentHelper(pdf).getAllPages();
         int pageno = 0;
-        for (std::vector<QPDFObjectHandle>::iterator p_iter =
+        for (std::vector<QPDFPageObjectHelper>::iterator p_iter =
                  pages.begin();
              p_iter != pages.end(); ++p_iter)
         {
@@ -1378,8 +1390,9 @@ void runtest(int n, char const* filename1, char const* arg2)
     {
         // Apply a token filter. This test case is crafted to work
         // with coalesce.pdf.
-        std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
-        for (std::vector<QPDFObjectHandle>::iterator iter =
+        std::vector<QPDFPageObjectHelper> pages =
+            QPDFPageDocumentHelper(pdf).getAllPages();
+        for (std::vector<QPDFPageObjectHelper>::iterator iter =
                  pages.begin();
              iter != pages.end(); ++iter)
         {
@@ -1446,7 +1459,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         std::cerr << "One error\n";
         array.getArrayItem(1).getKey("/K").getArrayItem(0).getStringValue();
         // Stream dictionary
-        QPDFObjectHandle page = pdf.getAllPages()[0];
+        QPDFObjectHandle page = pdf.getAllPages().at(0);
         assert("/QPDFFakeName" ==
                page.getKey("/Contents").getDict().getKey("/Potato").getName());
         // Rectangles

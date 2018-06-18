@@ -12,6 +12,8 @@
 #include <qpdf/PointerHolder.hh>
 
 #include <qpdf/QPDF.hh>
+#include <qpdf/QPDFPageDocumentHelper.hh>
+#include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QPDFExc.hh>
 
 #include <qpdf/QPDFWriter.hh>
@@ -1810,17 +1812,19 @@ static void do_check(QPDF& pdf, Options& o, int& exit_code)
         w.write();
 
         // Parse all content streams
-        std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
+        QPDFPageDocumentHelper dh(pdf);
+        std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
         DiscardContents discard_contents;
         int pageno = 0;
-        for (std::vector<QPDFObjectHandle>::iterator iter =
+        for (std::vector<QPDFPageObjectHelper>::iterator iter =
                  pages.begin();
              iter != pages.end(); ++iter)
         {
+            QPDFPageObjectHelper& page(*iter);
             ++pageno;
             try
             {
-                (*iter).parsePageContents(&discard_contents);
+                page.parsePageContents(&discard_contents);
             }
             catch (QPDFExc& e)
             {
@@ -1897,17 +1901,18 @@ static void do_show_obj(QPDF& pdf, Options& o, int& exit_code)
 
 static void do_show_pages(QPDF& pdf, Options& o)
 {
+    QPDFPageDocumentHelper dh(pdf);
     if (o.show_page_images)
     {
-        pdf.pushInheritedAttributesToPage();
+        dh.pushInheritedAttributesToPage();
     }
-    std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
+    std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
     int pageno = 0;
-    for (std::vector<QPDFObjectHandle>::iterator iter =
-             pages.begin();
+    for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
          iter != pages.end(); ++iter)
     {
-        QPDFObjectHandle& page = *iter;
+        QPDFPageObjectHelper& ph(*iter);
+        QPDFObjectHandle page = ph.getObjectHandle();
         ++pageno;
 
         std::cout << "page " << pageno << ": "
@@ -1916,7 +1921,7 @@ static void do_show_pages(QPDF& pdf, Options& o)
         if (o.show_page_images)
         {
             std::map<std::string, QPDFObjectHandle> images =
-                page.getPageImages();
+                ph.getPageImages();
             if (! images.empty())
             {
                 std::cout << "  images:" << std::endl;
@@ -1942,7 +1947,7 @@ static void do_show_pages(QPDF& pdf, Options& o)
 
         std::cout << "  content:" << std::endl;
         std::vector<QPDFObjectHandle> content =
-            page.getPageContents();
+            ph.getPageContents();
         for (std::vector<QPDFObjectHandle>::iterator iter =
                  content.begin();
              iter != content.end(); ++iter)
@@ -2013,10 +2018,11 @@ static void do_inspection(QPDF& pdf, Options& o)
 
 static void handle_transformations(QPDF& pdf, Options& o)
 {
+    QPDFPageDocumentHelper dh(pdf);
     if (o.coalesce_contents)
     {
-        std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
-        for (std::vector<QPDFObjectHandle>::iterator iter = pages.begin();
+        std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
+        for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
              iter != pages.end(); ++iter)
         {
             (*iter).coalesceContentStreams();
@@ -2077,12 +2083,13 @@ static void handle_page_specs(QPDF& pdf, Options& o,
     // without changing their object numbers. This enables other
     // things in the original file, such as outlines, to continue to
     // work.
-    std::vector<QPDFObjectHandle> orig_pages = pdf.getAllPages();
-    for (std::vector<QPDFObjectHandle>::iterator iter =
+    QPDFPageDocumentHelper dh(pdf);
+    std::vector<QPDFPageObjectHelper> orig_pages = dh.getAllPages();
+    for (std::vector<QPDFPageObjectHelper>::iterator iter =
              orig_pages.begin();
          iter != orig_pages.end(); ++iter)
     {
-        pdf.removePage(*iter);
+        dh.removePage(*iter);
     }
 
     // Add all the pages from all the files in the order specified.
@@ -2102,7 +2109,7 @@ static void handle_page_specs(QPDF& pdf, Options& o,
             // Pages are specified from 1 but numbered from 0 in the
             // vector
             int pageno = *pageno_iter - 1;
-            pdf.addPage(page_data.orig_pages.at(pageno), false);
+            dh.addPage(page_data.orig_pages.at(pageno), false);
             if (page_data.qpdf == &pdf)
             {
                 // This is a page from the original file. Keep track
@@ -2119,15 +2126,17 @@ static void handle_page_specs(QPDF& pdf, Options& o,
     {
         if (selected_from_orig.count(pageno) == 0)
         {
-            pdf.replaceObject(orig_pages.at(pageno).getObjGen(),
-                              QPDFObjectHandle::newNull());
+            pdf.replaceObject(
+                orig_pages.at(pageno).getObjectHandle().getObjGen(),
+                QPDFObjectHandle::newNull());
         }
     }
 }
 
 static void handle_rotations(QPDF& pdf, Options& o)
 {
-    std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
+    QPDFPageDocumentHelper dh(pdf);
+    std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
     int npages = static_cast<int>(pages.size());
     for (std::map<std::string, RotationSpec>::iterator iter =
              o.rotations.begin();
