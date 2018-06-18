@@ -3,6 +3,8 @@
 #include <stdlib.h>
 
 #include <qpdf/QPDF.hh>
+#include <qpdf/QPDFPageDocumentHelper.hh>
+#include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QUtil.hh>
 
 static char const* whoami = 0;
@@ -68,13 +70,14 @@ int main(int argc, char* argv[])
     {
 	QPDF pdf;
 	pdf.processFile(filename);
-        std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
+        std::vector<QPDFPageObjectHelper> pages =
+            QPDFPageDocumentHelper(pdf).getAllPages();
         if ((pageno < 1) || (static_cast<size_t>(pageno) > pages.size()))
         {
             usage();
         }
 
-        QPDFObjectHandle page = pages.at(pageno-1);
+        QPDFPageObjectHelper& page = pages.at(pageno-1);
         ParserCallbacks cb;
         page.parsePageContents(&cb);
     }

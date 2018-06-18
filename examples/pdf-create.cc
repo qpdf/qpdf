@@ -6,6 +6,8 @@
 //
 
 #include <qpdf/QPDF.hh>
+#include <qpdf/QPDFPageDocumentHelper.hh>
+#include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QUtil.hh>
@@ -158,10 +160,12 @@ QPDFObjectHandle newInteger(int val)
     return QPDFObjectHandle::newInteger(val);
 }
 
-void add_page(QPDF& pdf, QPDFObjectHandle font,
+void add_page(QPDFPageDocumentHelper& dh, QPDFObjectHandle font,
               std::string const& color_space,
               std::string const& filter)
 {
+    QPDF& pdf(dh.getQPDF());
+
     // Create a stream to encode our image. QPDFWriter will fill in
     // the length and will respect our filters based on stream data
     // mode. Since we are not specifying, QPDFWriter will compress
@@ -222,7 +226,7 @@ void add_page(QPDF& pdf, QPDFObjectHandle font,
     page.replaceKey("/Resources", resources);
 
     // Add the page to the PDF file
-    pdf.addPage(page, false);
+    dh.addPage(page, false);
 }
 
 static void check(char const* filename,
@@ -249,18 +253,19 @@ static void check(char const* filename,
 
     QPDF pdf;
     pdf.processFile(filename);
-    std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
+    QPDFPageDocumentHelper dh(pdf);
+    std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
     if (n_color_spaces * n_filters != pages.size())
     {
         throw std::logic_error("incorrect number of pages");
     }
     size_t pageno = 1;
     bool errors = false;
-    for (std::vector<QPDFObjectHandle>::const_iterator page_iter =
+    for (std::vector<QPDFPageObjectHelper>::iterator page_iter =
              pages.begin();
          page_iter != pages.end(); ++page_iter)
     {
-        QPDFObjectHandle page = *page_iter;
+        QPDFPageObjectHelper& page(*page_iter);
         std::map<std::string, QPDFObjectHandle> images = page.getPageImages();
         if (images.size() != 1)
         {
@@ -391,13 +396,14 @@ static void create_pdf(char const* filename)
     filters.push_back("null");
     filters.push_back("/DCTDecode");
     filters.push_back("/RunLengthDecode");
+    QPDFPageDocumentHelper dh(pdf);
     for (std::vector<std::string>::iterator c_iter = color_spaces.begin();
          c_iter != color_spaces.end(); ++c_iter)
     {
         for (std::vector<std::string>::iterator f_iter = filters.begin();
              f_iter != filters.end(); ++f_iter)
         {
-            add_page(pdf, font, *c_iter, *f_iter);
+            add_page(dh, font, *c_iter, *f_iter);
         }
     }
 

@@ -2,6 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <qpdf/QPDF.hh>
+#include <qpdf/QPDFPageDocumentHelper.hh>
+#include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/Buffer.hh>
 #include <qpdf/QPDFWriter.hh>
@@ -97,11 +99,12 @@ int main(int argc, char* argv[])
 	PointerHolder<QPDFObjectHandle::StreamDataProvider> p = inv;
 
 	// For each page...
-	std::vector<QPDFObjectHandle> pages = qpdf.getAllPages();
-	for (std::vector<QPDFObjectHandle>::iterator iter = pages.begin();
+	std::vector<QPDFPageObjectHelper> pages =
+            QPDFPageDocumentHelper(qpdf).getAllPages();
+	for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
 	     iter != pages.end(); ++iter)
 	{
-	    QPDFObjectHandle& page = *iter;
+	    QPDFPageObjectHelper& page(*iter);
 	    // Get all images on the page.
 	    std::map<std::string, QPDFObjectHandle> images =
 		page.getPageImages();

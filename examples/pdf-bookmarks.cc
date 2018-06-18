@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <qpdf/QPDF.hh>
+#include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/QTC.hh>
 
@@ -44,12 +45,13 @@ void print_lines(std::vector<int>& numbers)
 
 void generate_page_map(QPDF& qpdf)
 {
-    std::vector<QPDFObjectHandle> pages = qpdf.getAllPages();
+    QPDFPageDocumentHelper dh(qpdf);
+    std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
     int n = 0;
-    for (std::vector<QPDFObjectHandle>::iterator iter = pages.begin();
+    for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
 	 iter != pages.end(); ++iter)
     {
-	QPDFObjectHandle& oh = *iter;
+	QPDFObjectHandle oh = (*iter).getObjectHandle();
 	page_map[oh.getObjGen()] = ++n;
     }
 }

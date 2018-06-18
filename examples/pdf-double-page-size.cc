@@ -2,6 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <qpdf/QPDF.hh>
+#include <qpdf/QPDFPageDocumentHelper.hh>
+#include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/Buffer.hh>
 #include <qpdf/QPDFWriter.hh>
@@ -77,14 +79,17 @@ int main(int argc, char* argv[])
 	QPDF qpdf;
 	qpdf.processFile(infilename, password);
 
-	std::vector<QPDFObjectHandle> pages = qpdf.getAllPages();
-	for (std::vector<QPDFObjectHandle>::iterator iter = pages.begin();
+	std::vector<QPDFPageObjectHelper> pages =
+            QPDFPageDocumentHelper(qpdf).getAllPages();
+	for (std::vector<QPDFPageObjectHelper>::iterator iter =
+                 pages.begin();
 	     iter != pages.end(); ++iter)
 	{
-	    QPDFObjectHandle& page = *iter;
+            QPDFPageObjectHelper& ph(*iter);
+	    QPDFObjectHandle page = ph.getObjectHandle();
 
 	    // Prepend the buffer to the page's contents
-	    page.addPageContents(
+	    ph.addPageContents(
                 QPDFObjectHandle::newStream(&qpdf, content), true);
 
 	    // Double the size of each of the content boxes

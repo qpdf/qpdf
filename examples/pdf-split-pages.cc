@@ -5,6 +5,7 @@
 //
 
 #include <qpdf/QPDF.hh>
+#include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QUtil.hh>
 #include <string>
@@ -20,18 +21,19 @@ static void process(char const* whoami,
 {
     QPDF inpdf;
     inpdf.processFile(infile);
-    std::vector<QPDFObjectHandle> const& pages = inpdf.getAllPages();
+    std::vector<QPDFPageObjectHelper> pages =
+        QPDFPageDocumentHelper(inpdf).getAllPages();
     int pageno_len = QUtil::int_to_string(pages.size()).length();
     int pageno = 0;
-    for (std::vector<QPDFObjectHandle>::const_iterator iter = pages.begin();
+    for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
          iter != pages.end(); ++iter)
     {
-        QPDFObjectHandle page = *iter;
+        QPDFPageObjectHelper& page(*iter);
         std::string outfile =
             outprefix + QUtil::int_to_string(++pageno, pageno_len) + ".pdf";
         QPDF outpdf;
         outpdf.emptyPDF();
-        outpdf.addPage(page, false);
+        QPDFPageDocumentHelper(outpdf).addPage(page, false);
         QPDFWriter outpdfw(outpdf, outfile.c_str());
 	if (static_id)
 	{

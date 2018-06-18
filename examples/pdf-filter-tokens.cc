@@ -12,6 +12,8 @@
 #include <deque>
 
 #include <qpdf/QPDF.hh>
+#include <qpdf/QPDFPageDocumentHelper.hh>
+#include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QPDFObjectHandle.hh>
@@ -207,8 +209,9 @@ int main(int argc, char* argv[])
     {
 	QPDF pdf;
 	pdf.processFile(infilename);
-        std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
-        for (std::vector<QPDFObjectHandle>::iterator iter = pages.begin();
+        std::vector<QPDFPageObjectHelper> pages =
+            QPDFPageDocumentHelper(pdf).getAllPages();
+        for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
              iter != pages.end(); ++iter)
         {
             // Attach two token filters to each page of this file.
@@ -216,7 +219,7 @@ int main(int argc, char* argv[])
             // are retrieved in any other way, the filters will be
             // applied. See comments on the filters for additional
             // details.
-            QPDFObjectHandle page = *iter;
+            QPDFPageObjectHelper& page(*iter);
             page.addContentTokenFilter(new StringReverser);
             page.addContentTokenFilter(new ColorToGray);
         }

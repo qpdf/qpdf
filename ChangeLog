@@ -7,7 +7,9 @@
 	of structural features of PDF while still staying true to qpdf's
 	philosophy of not isolating the user from the underlying
 	structure. Please see the chapter in the documentation entitled
-	"Design and Library Notes" for additional discussion.
+	"Design and Library Notes" for additional discussion. The examples
+	have also been updated to use QPDFPageDocumentHelper and
+	QPDFPageObjctHelper when performing page-level operations.
 
 2018-06-19  Jay Berkenbilt  <ejb@ql.org>
 

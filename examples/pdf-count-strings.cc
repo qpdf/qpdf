@@ -10,6 +10,8 @@
 #include <stdlib.h>
 
 #include <qpdf/QPDF.hh>
+#include <qpdf/QPDFPageDocumentHelper.hh>
+#include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/Pl_StdioFile.hh>
@@ -90,12 +92,13 @@ int main(int argc, char* argv[])
     {
 	QPDF pdf;
 	pdf.processFile(infilename);
-        std::vector<QPDFObjectHandle> pages = pdf.getAllPages();
+        std::vector<QPDFPageObjectHelper> pages =
+            QPDFPageDocumentHelper(pdf).getAllPages();
         int pageno = 0;
-        for (std::vector<QPDFObjectHandle>::iterator iter = pages.begin();
+        for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
              iter != pages.end(); ++iter)
         {
-            QPDFObjectHandle page = *iter;
+            QPDFPageObjectHelper& ph(*iter);
             ++pageno;
             // Pass the contents of a page through our string counter.
             // If it's an even page, capture the output. This
@@ -105,14 +108,14 @@ int main(int argc, char* argv[])
             if (pageno % 2)
             {
                 // Ignore output for odd pages.
-                page.filterPageContents(&counter);
+                ph.filterPageContents(&counter);
             }
             else
             {
                 // Write output to stdout for even pages.
                 Pl_StdioFile out("stdout", stdout);
                 std::cout << "% Contents of page " << pageno << std::endl;
-                page.filterPageContents(&counter, &out);
+                ph.filterPageContents(&counter, &out);
                 std::cout << "\n% end " << pageno << std::endl;
             }
             std::cout << "Page " << pageno
