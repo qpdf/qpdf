@@ -1,3 +1,14 @@
+2018-06-20  Jay Berkenbilt  <ejb@ql.org>
+
+	* Added new classes QPDFPageDocumentHelper and QPDFPageObjctHelper
+	for page-level API functions. These classes introduce a new API
+	pattern of document helpers and object helpers in qpdf. The helper
+	classes provide a higher level API for working with certain types
+	of structural features of PDF while still staying true to qpdf's
+	philosophy of not isolating the user from the underlying
+	structure. Please see the chapter in the documentation entitled
+	"Design and Library Notes" for additional discussion.
+
 2018-06-19  Jay Berkenbilt  <ejb@ql.org>
 
 	* New QPDFObject::Rectangle class will convert to and from arrays

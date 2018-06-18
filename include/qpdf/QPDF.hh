@@ -452,15 +452,17 @@ class QPDF
     void optimize(std::map<int, int> const& object_stream_data,
 		  bool allow_changes = true);
 
-    // Convenience routines for common functions.  See also
-    // QPDFObjectHandle.hh for additional convenience routines.
-
-    // Page handling API
-
-    // Traverse page tree return all /Page objects.  Note that calls
-    // to page manipulation APIs will change the internal vector that
-    // this routine returns a pointer to.  If you don't want that,
-    // assign this to a regular vector rather than a const reference.
+    // Traverse page tree return all /Page objects. For efficiency,
+    // this method returns a const reference to an internal vector of
+    // pages. Calls to addPage, addPageAt, and removePage safely
+    // update this, but directly manipulation of the pages three or
+    // pushing inheritable objects to the page level may invalidate
+    // it. See comments for updateAllPagesCache() for additional
+    // notes. Newer code should use
+    // QPDFPageDocumentHelper::getAllPages instead. The decision to
+    // expose this internal cache was arguably incorrect, but it is
+    // being left here for compatibility. It is, however, completely
+    // safe to use this for files that you are not modifying.
     QPDF_DLL
     std::vector<QPDFObjectHandle> const& getAllPages();
 
@@ -479,32 +481,25 @@ class QPDF
     QPDF_DLL
     void updateAllPagesCache();
 
-    // The PDF /Pages tree allows inherited values.  Working with
-    // the pages of a pdf is much easier when the inheritance is
-    // resolved by explicitly setting the values in each /Page.
+    // Legacy handling API. These methods are not going anywhere, and
+    // you should feel free to continue using them if it simplifies
+    // your code. Newer code should make use of QPDFPageDocumentHelper
+    // instead as future page handling methods will be added there.
+    // The functionality and specification of these legacy methods is
+    // identical to the identically named methods there, except that
+    // these versions use QPDFObjectHandle instead of
+    // QPDFPageObjectHelper, so please see comments in that file for
+    // descriptions.
     QPDF_DLL
     void pushInheritedAttributesToPage();
-
-    // Add new page at the beginning or the end of the current pdf.
-    // The newpage parameter may be either a direct object, an
-    // indirect object from this QPDF, or an indirect object from
-    // another QPDF.  If it is a direct object, it will be made
-    // indirect.  If it is an indirect object from another QPDF, this
-    // method will call pushInheritedAttributesToPage on the other
-    // file and then copy the page to this QPDF using the same
-    // underlying code as copyForeignObject.
     QPDF_DLL
     void addPage(QPDFObjectHandle newpage, bool first);
-
-    // Add new page before or after refpage.  See comments for addPage
-    // for details about what newpage should be.
     QPDF_DLL
     void addPageAt(QPDFObjectHandle newpage, bool before,
                    QPDFObjectHandle refpage);
-
-    // Remove page from the pdf.
     QPDF_DLL
     void removePage(QPDFObjectHandle page);
+    // End legacy page helpers
 
     // Writer class is restricted to QPDFWriter so that only it can
     // call certain methods.

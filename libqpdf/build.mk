@@ -39,6 +39,8 @@ SRCS_libqpdf = \
 	libqpdf/QPDFObjGen.cc \
 	libqpdf/QPDFObject.cc \
 	libqpdf/QPDFObjectHandle.cc \
+	libqpdf/QPDFPageDocumentHelper.cc \
+	libqpdf/QPDFPageObjectHelper.cc \
 	libqpdf/QPDFTokenizer.cc \
 	libqpdf/QPDFWriter.cc \
 	libqpdf/QPDFXRefEntry.cc \
