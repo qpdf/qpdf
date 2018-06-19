@@ -1,0 +1,241 @@
+iterating over form fields
+Field: 4 0 R
+  Parent: none
+  Fully qualified name: Text Box 1
+  Partial name: Text Box 1
+  Alternative name: Text Box 1
+  Mapping name: Text Box 1
+  Field type: /Tx
+  Value: <feff>
+  Value as string: 
+  Default value: <feff>
+  Default value as string: 
+  Default appearance: 0.18039 0.20392 0.21176 rg /F2 12 Tf
+  Quadding: 0
+  Annotation: 4 0 R
+Field: 6 0 R
+  Parent: none
+  Fully qualified name: Check Box 1
+  Partial name: Check Box 1
+  Alternative name: Check Box 1
+  Mapping name: Check Box 1
+  Field type: /Btn
+  Value: /Off
+  Value as string: 
+  Default value: /Off
+  Default value as string: 
+  Default appearance: 0.18039 0.20392 0.21176 rg /ZaDi 0 Tf
+  Quadding: 0
+  Annotation: 6 0 R
+Field: 7 0 R
+  Parent: none
+  Fully qualified name: Check Box 2
+  Partial name: Check Box 2
+  Alternative name: Check Box 2
+  Mapping name: Check Box 2
+  Field type: /Btn
+  Value: /Yes
+  Value as string: 
+  Default value: /Yes
+  Default value as string: 
+  Default appearance: 0.18039 0.20392 0.21176 rg /ZaDi 0 Tf
+  Quadding: 0
+  Annotation: 7 0 R
+Field: 8 0 R
+  Parent: none
+  Fully qualified name: Check Box 3
+  Partial name: Check Box 3
+  Alternative name: Check Box 3
+  Mapping name: Check Box 3
+  Field type: /Btn
+  Value: /Off
+  Value as string: 
+  Default value: /Off
+  Default value as string: 
+  Default appearance: 0.18039 0.20392 0.21176 rg /ZaDi 0 Tf
+  Quadding: 0
+  Annotation: 8 0 R
+Field: 10 0 R
+  Parent: none
+  Fully qualified name: Text Box 2
+  Partial name: Text Box 2
+  Alternative name: Text Box 2
+  Mapping name: Text Box 2
+  Field type: /Tx
+  Value: <feff00730061006c00610064002003c002ac>
+  Value as string: salad πʬ
+  Default value: <feff00730061006c00610064002003c002ac>
+  Default value as string: salad πʬ
+  Default appearance: 0.18039 0.20392 0.21176 rg /F2 12 Tf
+  Quadding: 0
+  Annotation: 10 0 R
+Field: 16 0 R
+  Parent: 5 0 R
+  Parent: none
+  Fully qualified name: r1
+  Partial name: 
+  Alternative name: r1
+  Mapping name: r1
+  Field type: /Btn
+  Value: /1
+  Value as string: 
+  Default value: /1
+  Default value as string: 
+  Default appearance: 0.18039 0.20392 0.21176 rg /ZaDi 0 Tf
+  Quadding: 0
+  Annotation: 16 0 R
+Field: 17 0 R
+  Parent: 5 0 R
+  Parent: none
+  Fully qualified name: r1
+  Partial name: 
+  Alternative name: r1
+  Mapping name: r1
+  Field type: /Btn
+  Value: /1
+  Value as string: 
+  Default value: /1
+  Default value as string: 
+  Default appearance: 0.18039 0.20392 0.21176 rg /ZaDi 0 Tf
+  Quadding: 0
+  Annotation: 17 0 R
+Field: 18 0 R
+  Parent: 5 0 R
+  Parent: none
+  Fully qualified name: r1
+  Partial name: 
+  Alternative name: r1
+  Mapping name: r1
+  Field type: /Btn
+  Value: /1
+  Value as string: 
+  Default value: /1
+  Default value as string: 
+  Default appearance: 0.18039 0.20392 0.21176 rg /ZaDi 0 Tf
+  Quadding: 0
+  Annotation: 18 0 R
+Field: 32 0 R
+  Parent: 9 0 R
+  Parent: none
+  Fully qualified name: r2
+  Partial name: 
+  Alternative name: r2
+  Mapping name: r2
+  Field type: /Btn
+  Value: /2
+  Value as string: 
+  Default value: /2
+  Default value as string: 
+  Default appearance: 0.18039 0.20392 0.21176 rg /ZaDi 0 Tf
+  Quadding: 0
+  Annotation: 32 0 R
+Field: 33 0 R
+  Parent: 9 0 R
+  Parent: none
+  Fully qualified name: r2
+  Partial name: 
+  Alternative name: r2
+  Mapping name: r2
+  Field type: /Btn
+  Value: /2
+  Value as string: 
+  Default value: /2
+  Default value as string: 
+  Default appearance: 0.18039 0.20392 0.21176 rg /ZaDi 0 Tf
+  Quadding: 0
+  Annotation: 33 0 R
+Field: 34 0 R
+  Parent: 9 0 R
+  Parent: none
+  Fully qualified name: r2
+  Partial name: 
+  Alternative name: r2
+  Mapping name: r2
+  Field type: /Btn
+  Value: /2
+  Value as string: 
+  Default value: /2
+  Default value as string: 
+  Default appearance: 0.18039 0.20392 0.21176 rg /ZaDi 0 Tf
+  Quadding: 0
+  Annotation: 34 0 R
+iterating over annotations per page
+Page: 11 0 R
+  Annotation: 4 0 R
+    Field: 4 0 R
+    Subtype: /Widget
+    Rect: [123.4, 692.1, 260.9, 706.7]
+    Appearance stream (/N): 14 0 R
+    Appearance stream (/N, /3): null
+  Annotation: 16 0 R
+    Field: 16 0 R
+    Subtype: /Widget
+    Rect: [149.3, 648.5, 161.6, 660.4]
+    Appearance state: /1
+    Appearance stream (/N): 44 0 R
+    Appearance stream (/N, /3): null
+  Annotation: 17 0 R
+    Field: 17 0 R
+    Subtype: /Widget
+    Rect: [152.7, 627.3, 165, 639.2]
+    Appearance state: /Off
+    Appearance stream (/N): 50 0 R
+    Appearance stream (/N, /3): null
+  Annotation: 18 0 R
+    Field: 18 0 R
+    Subtype: /Widget
+    Rect: [151.3, 601.7, 163.6, 613.6]
+    Appearance state: /Off
+    Appearance stream (/N): 54 0 R
+    Appearance stream (/N, /3): 52 0 R
+  Annotation: 6 0 R
+    Field: 6 0 R
+    Subtype: /Widget
+    Rect: [121.9, 559.1, 134.2, 571]
+    Appearance state: /Off
+    Appearance stream (/N): 19 0 R
+    Appearance stream (/N, /3): null
+  Annotation: 7 0 R
+    Field: 7 0 R
+    Subtype: /Widget
+    Rect: [118.6, 527.7, 130.9, 539.6]
+    Appearance state: /Yes
+    Appearance stream (/N): 26 0 R
+    Appearance stream (/N, /3): null
+  Annotation: 8 0 R
+    Field: 8 0 R
+    Subtype: /Widget
+    Rect: [118.6, 500.5, 130.9, 512.4]
+    Appearance state: /Off
+    Appearance stream (/N): 28 0 R
+    Appearance stream (/N, /3): null
+Page: 40 0 R
+Page: 35 0 R
+  Annotation: 32 0 R
+    Field: 32 0 R
+    Subtype: /Widget
+    Rect: [118.6, 555.7, 130.9, 567.6]
+    Appearance state: /Off
+    Appearance stream (/N): 58 0 R
+    Appearance stream (/N, /3): null
+  Annotation: 33 0 R
+    Field: 33 0 R
+    Subtype: /Widget
+    Rect: [119.3, 514.8, 131.6, 526.7]
+    Appearance state: /2
+    Appearance stream (/N): 60 0 R
+    Appearance stream (/N, /3): null
+  Annotation: 34 0 R
+    Field: 34 0 R
+    Subtype: /Widget
+    Rect: [121.3, 472.5, 133.6, 484.4]
+    Appearance state: /Off
+    Appearance stream (/N): 66 0 R
+    Appearance stream (/N, /3): 64 0 R
+  Annotation: 10 0 R
+    Field: 10 0 R
+    Subtype: /Widget
+    Rect: [113.6, 378.5, 351.3, 396.3]
+    Appearance stream (/N): 36 0 R
+    Appearance stream (/N, /3): null
+test 43 done

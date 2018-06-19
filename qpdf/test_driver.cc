@@ -5,6 +5,7 @@
 
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
+#include <qpdf/QPDFAcroFormDocumentHelper.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/Pl_StdioFile.hh>
@@ -151,6 +152,13 @@ static QPDFObjectHandle createPageContents(QPDF& pdf, std::string const& text)
 {
     std::string contents = "BT /F1 15 Tf 72 720 Td (" + text + ") Tj ET\n";
     return QPDFObjectHandle::newStream(&pdf, contents);
+}
+
+static void print_rect(std::ostream& out,
+                       QPDFObjectHandle::Rectangle const& r)
+{
+    out << "[" << r.llx << ", " << r.lly << ", "
+        << r.urx << ", " << r.ury << "]";
 }
 
 void runtest(int n, char const* filename1, char const* arg2)
@@ -1473,6 +1481,108 @@ void runtest(int n, char const* filename1, char const* arg2)
                (r1.lly > 3.39) && (r1.lly < 3.41) &&
                (r1.urx > 5.59) && (r1.urx < 5.61) &&
                (r1.ury > 7.79) && (r1.ury < 7.81));
+    }
+    else if (n == 43)
+    {
+        // Forms
+        QPDFAcroFormDocumentHelper afdh(pdf);
+        if (! afdh.hasAcroForm())
+        {
+            std::cout << "no forms\n";
+            return;
+        }
+        std::cout << "iterating over form fields\n";
+        std::vector<QPDFFormFieldObjectHelper> form_fields =
+            afdh.getFormFields();
+        for (std::vector<QPDFFormFieldObjectHelper>::iterator iter =
+                 form_fields.begin();
+             iter != form_fields.end(); ++iter)
+        {
+            QPDFFormFieldObjectHelper ffh(*iter);
+            std::cout << "Field: " << ffh.getObjectHandle().unparse()
+                      << std::endl;
+            QPDFFormFieldObjectHelper node = ffh;
+            while (! node.isNull())
+            {
+                QPDFFormFieldObjectHelper parent(node.getParent());
+                std::cout << "  Parent: "
+                          << (parent.isNull()
+                              ? "none"
+                              : parent.getObjectHandle().unparse())
+                          << std::endl;
+                node = parent;
+            }
+            std::cout << "  Fully qualified name: "
+                      << ffh.getFullyQualifiedName() << std::endl;
+            std::cout << "  Partial name: "
+                      << ffh.getPartialName() << std::endl;
+            std::cout << "  Alternative name: "
+                      << ffh.getAlternativeName() << std::endl;
+            std::cout << "  Mapping name: "
+                      << ffh.getMappingName() << std::endl;
+            std::cout << "  Field type: "
+                      << ffh.getFieldType() << std::endl;
+            std::cout << "  Value: "
+                      << ffh.getValue().unparse() << std::endl;
+            std::cout << "  Value as string: "
+                      << ffh.getValueAsString() << std::endl;
+            std::cout << "  Default value: "
+                      << ffh.getDefaultValue().unparse() << std::endl;
+            std::cout << "  Default value as string: "
+                      << ffh.getDefaultValueAsString() << std::endl;
+            std::cout << "  Default appearance: "
+                      << ffh.getDefaultAppearance() << std::endl;
+            std::cout << "  Quadding: "
+                      << ffh.getQuadding() << std::endl;
+            std::vector<QPDFAnnotationObjectHelper> annotations =
+                afdh.getAnnotationsForField(ffh);
+            for (std::vector<QPDFAnnotationObjectHelper>::iterator i2 =
+                     annotations.begin();
+                 i2 != annotations.end(); ++i2)
+            {
+                std::cout << "  Annotation: "
+                          << (*i2).getObjectHandle().unparse() << std::endl;
+            }
+        }
+        std::cout << "iterating over annotations per page\n";
+        std::vector<QPDFPageObjectHelper> pages =
+            QPDFPageDocumentHelper(pdf).getAllPages();
+        for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
+             iter != pages.end(); ++iter)
+        {
+            std::cout << "Page: " << (*iter).getObjectHandle().unparse()
+                      << std::endl;
+            std::vector<QPDFAnnotationObjectHelper> annotations =
+                afdh.getWidgetAnnotationsForPage(*iter);
+            for (std::vector<QPDFAnnotationObjectHelper>::iterator i2 =
+                     annotations.begin();
+                 i2 != annotations.end(); ++i2)
+            {
+                QPDFAnnotationObjectHelper ah(*i2);
+                std::cout << "  Annotation: " << ah.getObjectHandle().unparse()
+                          << std::endl;
+                std::cout << "    Field: "
+                          << (afdh.getFieldForAnnotation(ah).
+                              getObjectHandle().unparse())
+                          << std::endl;
+                std::cout << "    Subtype: " << ah.getSubtype() << std::endl;
+                std::cout << "    Rect: ";
+                print_rect(std::cout, ah.getRect());
+                std::cout << std::endl;
+                std::string state = ah.getAppearanceState();
+                if (! state.empty())
+                {
+                    std::cout << "    Appearance state: " << state
+                              << std::endl;
+                }
+                std::cout << "    Appearance stream (/N): "
+                          << ah.getAppearanceStream("/N").unparse()
+                          << std::endl;
+                std::cout << "    Appearance stream (/N, /3): "
+                          << ah.getAppearanceStream("/N", "/3").unparse()
+                          << std::endl;
+            }
+        }
     }
     else
     {

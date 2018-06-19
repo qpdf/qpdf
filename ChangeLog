@@ -1,5 +1,22 @@
 2018-06-20  Jay Berkenbilt  <ejb@ql.org>
 
+	* Added new classes QPDFAcroFormDocumentHelper,
+	QPDFFormFieldObjectHelper, and QPDFAnnotationObjectHelper to
+	assist with working with interactive forms in PDF files. At
+	present, API methods for reading forms, form fields, and widget
+	annotations have been added. It is likely that some additional
+	methods for modifying forms will be added in the future. Note that
+	qpdf remains a library whose function is primarily focused around
+	document structure and metadata rather than content. As such, it
+	is not expected that qpdf will have higher level APIs for
+	generating form contents, but qpdf will hopefully gain the
+	capability to deal with the bookkeeping aspects of wiring up all
+	the objects, which could make it a useful library for other
+	software that works with PDF interactive forms. PDF forms are
+	complex, and the terminology around them is confusing. Please see
+	comments at the top of QPDFAcroFormDocumentHelper.hh for
+	additional discussion.
+
 	* Added new classes QPDFPageDocumentHelper and QPDFPageObjctHelper
 	for page-level API functions. These classes introduce a new API
 	pattern of document helpers and object helpers in qpdf. The helper

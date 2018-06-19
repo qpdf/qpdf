@@ -94,6 +94,38 @@ $td->runtest("PDF doc encoding to Unicode",
 
 show_ntests();
 # ----------
+$td->notify("--- Form Tests ---");
+
+my @form_tests = (
+    'minimal',
+    'form-empty-from-odt',
+    'form-mod1',
+    # Atril (MATE Document Viewer) 1.20.1 dumps appearance streams
+    # when modifying form fields, leaving /NeedAppearances true.
+    'form-filled-with-atril',
+    'form-bad-fields-array',
+    'form-errors',
+    );
+
+$n_tests += scalar(@form_tests);
+
+# Many of the form*.pdf files were created by converting the
+# LibreOffice document storage/form.odt to PDF and then manually
+# modifying the resulting PDF in various ways. That file would be good
+# starting point for generation of more complex forms should that be
+# required in the future. The file storage/form.pdf is a direct export
+# from LibreOffice with no modifications.
+
+foreach my $f (@form_tests)
+{
+    $td->runtest("form test: $f",
+                 {$td->COMMAND => "test_driver 43 $f.pdf"},
+                 {$td->FILE => "form-$f.out", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+show_ntests();
+# ----------
 $td->notify("--- Stream Replacement Tests ---");
 $n_tests += 8;
 

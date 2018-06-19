@@ -35,7 +35,10 @@ SRCS_libqpdf = \
 	libqpdf/Pl_StdioFile.cc \
 	libqpdf/Pl_TIFFPredictor.cc \
 	libqpdf/QPDF.cc \
+	libqpdf/QPDFAcroFormDocumentHelper.cc \
+	libqpdf/QPDFAnnotationObjectHelper.cc \
 	libqpdf/QPDFExc.cc \
+	libqpdf/QPDFFormFieldObjectHelper.cc \
 	libqpdf/QPDFObjGen.cc \
 	libqpdf/QPDFObject.cc \
 	libqpdf/QPDFObjectHandle.cc \

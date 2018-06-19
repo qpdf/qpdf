@@ -1,0 +1,4 @@
+This directory contains files that I want to keep around because I
+hand-created them or otherwise went to some trouble and used them in
+some fashion in the test suite. Any file in this directory should be
+referenced in a comment in the test code.

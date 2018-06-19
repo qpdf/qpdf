@@ -336,3 +336,23 @@ QPDFObjectHandle erase array bounds 0
 qpdf-c called qpdf_check_pdf 0
 QPDF xref loop 0
 QPDFObjectHandle too deep 0
+QPDFFormFieldObjectHelper non-trivial inheritance 0
+QPDFFormFieldObjectHelper non-trivial qualified name 0
+QPDFFormFieldObjectHelper TU present 0
+QPDFFormFieldObjectHelper TM present 0
+QPDFFormFieldObjectHelper TU absent 0
+QPDFFormFieldObjectHelper TM absent 0
+QPDFFormFieldObjectHelper Q present 0
+QPDFAnnotationObjectHelper AS present 0
+QPDFAnnotationObjectHelper AS absent 0
+QPDFAnnotationObjectHelper AP stream 0
+QPDFAnnotationObjectHelper AP dictionary 0
+QPDFAnnotationObjectHelper AN sub stream 0
+QPDFAnnotationObjectHelper AN null 0
+QPDFAcroFormDocumentHelper fields not array 0
+QPDFAcroFormDocumentHelper orphaned widget 0
+QPDFAcroFormDocumentHelper direct field 0
+QPDFAcroFormDocumentHelper non-dictionary field 0
+QPDFAcroFormDocumentHelper loop 0
+QPDFAcroFormDocumentHelper field found 1
+QPDFAcroFormDocumentHelper annotation found 1

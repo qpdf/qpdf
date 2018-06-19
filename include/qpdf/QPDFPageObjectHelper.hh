@@ -23,6 +23,7 @@
 #define __QPDFPAGEOBJECTHELPER_HH__
 
 #include <qpdf/QPDFObjectHelper.hh>
+#include <qpdf/QPDFAnnotationObjectHelper.hh>
 
 #include <qpdf/DLL.h>
 
@@ -42,6 +43,13 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     // a stream.
     QPDF_DLL
     std::map<std::string, QPDFObjectHandle> getPageImages();
+
+    // Return the annotations in the page's "/Annots" list, if any. If
+    // only_subtype is non-empty, only include annotations of the
+    // given subtype.
+    QPDF_DLL
+    std::vector<QPDFAnnotationObjectHelper> getAnnotations(
+        std::string const& only_subtype = "");
 
     // Returns a vector of stream objects representing the content
     // streams for the given page.  This routine allows the caller to
