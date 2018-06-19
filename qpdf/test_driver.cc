@@ -1449,6 +1449,17 @@ void runtest(int n, char const* filename1, char const* arg2)
         QPDFObjectHandle page = pdf.getAllPages()[0];
         assert("/QPDFFakeName" ==
                page.getKey("/Contents").getDict().getKey("/Potato").getName());
+        // Rectangles
+        QPDFObjectHandle::Rectangle r0 = integer.getArrayAsRectangle();
+        assert((r0.llx == 0) && (r0.lly == 0) &&
+               (r0.urx == 0) && (r0.ury == 0));
+        QPDFObjectHandle rect = QPDFObjectHandle::newFromRectangle(
+            QPDFObjectHandle::Rectangle(1.2, 3.4, 5.6, 7.8));
+        QPDFObjectHandle::Rectangle r1 = rect.getArrayAsRectangle();
+        assert((r1.llx > 1.19) && (r1.llx < 1.21) &&
+               (r1.lly > 3.39) && (r1.lly < 3.41) &&
+               (r1.urx > 5.59) && (r1.urx < 5.61) &&
+               (r1.ury > 7.79) && (r1.ury < 7.81));
     }
     else
     {

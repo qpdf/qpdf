@@ -172,6 +172,31 @@ class QPDFObjectHandle
         void terminateParsing();
     };
 
+    // Convenience object for rectangles
+    class Rectangle
+    {
+      public:
+        Rectangle() :
+            llx(0.0),
+            lly(0.0),
+            urx(0.0),
+            ury(0.0)
+        {
+        }
+        Rectangle(double llx, double lly,
+                  double urx, double ury) :
+            llx(llx),
+            lly(lly),
+            urx(urx),
+            ury(ury)
+        {
+        }
+
+        double llx;
+        double lly;
+        double urx;
+        double ury;
+    };
 
     QPDF_DLL
     QPDFObjectHandle();
@@ -344,10 +369,17 @@ class QPDFObjectHandle
     static QPDFObjectHandle newArray(
 	std::vector<QPDFObjectHandle> const& items);
     QPDF_DLL
+    static QPDFObjectHandle newArray(Rectangle const&);
+    QPDF_DLL
     static QPDFObjectHandle newDictionary();
     QPDF_DLL
     static QPDFObjectHandle newDictionary(
 	std::map<std::string, QPDFObjectHandle> const& items);
+
+    // Create an array from a rectangle. Equivalent to the rectangle
+    // form of newArray.
+    QPDF_DLL
+    static QPDFObjectHandle newFromRectangle(Rectangle const&);
 
     // Create a new stream and associate it with the given qpdf
     // object.  A subsequent call must be made to replaceStreamData()
@@ -465,6 +497,12 @@ class QPDFObjectHandle
     QPDFObjectHandle getArrayItem(int n);
     QPDF_DLL
     std::vector<QPDFObjectHandle> getArrayAsVector();
+    QPDF_DLL
+    bool isRectangle();
+    // If the array an array of four numeric values, return as a
+    // rectangle. Otherwise, return the rectangle [0, 0, 0, 0]
+    QPDF_DLL
+    Rectangle getArrayAsRectangle();
 
     // Methods for dictionary objects
     QPDF_DLL
@@ -738,6 +776,15 @@ class QPDFObjectHandle
     // addPageContents.
     QPDF_DLL
     void coalesceContentStreams();
+
+    // Issue a warning about this object if possible. If the object
+    // has a description, a warning will be issued. Otherwise, if
+    // throw_if_no_description is true, throw an exception. Otherwise
+    // do nothing. Objects read normally from the file have
+    // descriptions. See comments on setObjectDescription for
+    // additional details.
+    void warnIfPossible(std::string const& warning,
+                        bool throw_if_no_description = false);
 
     // Initializers for objects.  This Factory class gives the QPDF
     // class specific permission to call factory methods without

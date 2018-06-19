@@ -554,6 +554,42 @@ QPDFObjectHandle::getArrayItem(int n)
     return result;
 }
 
+bool
+QPDFObjectHandle::isRectangle()
+{
+    if (! isArray())
+    {
+        return false;
+    }
+    if (getArrayNItems() != 4)
+    {
+        return false;
+    }
+    for (size_t i = 0; i < 4; ++i)
+    {
+        if (! getArrayItem(i).isNumber())
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+
+QPDFObjectHandle::Rectangle
+QPDFObjectHandle::getArrayAsRectangle()
+{
+    Rectangle result;
+    if (isRectangle())
+    {
+        result = Rectangle(getArrayItem(0).getNumericValue(),
+                           getArrayItem(1).getNumericValue(),
+                           getArrayItem(2).getNumericValue(),
+                           getArrayItem(3).getNumericValue());
+    }
+    return result;
+}
+
 std::vector<QPDFObjectHandle>
 QPDFObjectHandle::getArrayAsVector()
 {
@@ -1834,6 +1870,23 @@ QPDFObjectHandle::newArray(std::vector<QPDFObjectHandle> const& items)
 }
 
 QPDFObjectHandle
+QPDFObjectHandle::newArray(Rectangle const& rect)
+{
+    std::vector<QPDFObjectHandle> items;
+    items.push_back(newReal(rect.llx));
+    items.push_back(newReal(rect.lly));
+    items.push_back(newReal(rect.urx));
+    items.push_back(newReal(rect.ury));
+    return newArray(items);
+}
+
+QPDFObjectHandle
+QPDFObjectHandle::newFromRectangle(Rectangle const& rect)
+{
+    return newArray(rect);
+}
+
+QPDFObjectHandle
 QPDFObjectHandle::newDictionary()
 {
     return newDictionary(std::map<std::string, QPDFObjectHandle>());
@@ -2103,7 +2156,8 @@ QPDFObjectHandle::typeWarning(char const* expected_type,
 }
 
 void
-QPDFObjectHandle::objectWarning(std::string const& warning)
+QPDFObjectHandle::warnIfPossible(std::string const& warning,
+                                 bool throw_if_no_description)
 {
     QPDF* context = 0;
     std::string description;
@@ -2115,10 +2169,16 @@ QPDFObjectHandle::objectWarning(std::string const& warning)
                  "", description, 0,
                  warning));
     }
-    else
+    else if (throw_if_no_description)
     {
         throw std::logic_error(warning);
     }
+}
+
+void
+QPDFObjectHandle::objectWarning(std::string const& warning)
+{
+    warnIfPossible(warning, true);
 }
 
 void

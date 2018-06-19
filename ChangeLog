@@ -1,3 +1,10 @@
+2018-06-19  Jay Berkenbilt  <ejb@ql.org>
+
+	* New QPDFObject::Rectangle class will convert to and from arrays
+	of four numerical values. Rectangles are used in various places
+	within the PDF file format and are called out as a specific data
+	type in the PDF specification.
+
 2018-05-12  Jay Berkenbilt  <ejb@ql.org>
 
 	* In newline before endstream mode, an extra newline was not
