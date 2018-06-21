@@ -1584,6 +1584,34 @@ void runtest(int n, char const* filename1, char const* arg2)
             }
         }
     }
+    else if (n == 44)
+    {
+        // Set form fields.
+        QPDFAcroFormDocumentHelper afdh(pdf);
+        std::vector<QPDFFormFieldObjectHelper> fields = afdh.getFormFields();
+        for (std::vector<QPDFFormFieldObjectHelper>::iterator iter =
+                 fields.begin();
+             iter != fields.end(); ++iter)
+        {
+            QPDFFormFieldObjectHelper& field(*iter);
+            QPDFObjectHandle ft = field.getInheritableFieldValue("/FT");
+            if (ft.isName() && (ft.getName() == "/Tx"))
+            {
+                // \xc3\xb7 is utf-8 for U+00F7 (divided by)
+                field.setV("3.14 \xc3\xb7 0");
+                std::cout << "Set field value: "
+                          << field.getFullyQualifiedName()
+                          << " -> "
+                          << field.getValueAsString()
+                          << std::endl;
+            }
+        }
+        QPDFWriter w(pdf, "a.pdf");
+	w.setQDFMode(true);
+        w.setStaticID(true);
+        w.setSuppressOriginalObjectIDs(true);
+        w.write();
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +

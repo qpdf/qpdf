@@ -1,5 +1,6 @@
 #include <qpdf/QPDFFormFieldObjectHelper.hh>
 #include <qpdf/QTC.hh>
+#include <qpdf/QPDFAcroFormDocumentHelper.hh>
 
 QPDFFormFieldObjectHelper::Members::~Members()
 {
@@ -187,4 +188,45 @@ QPDFFormFieldObjectHelper::getQuadding()
         result = static_cast<int>(fv.getIntValue());
     }
     return result;
+}
+
+void
+QPDFFormFieldObjectHelper::setFieldAttribute(
+    std::string const& key, QPDFObjectHandle value)
+{
+    this->oh.replaceKey(key, value);
+}
+
+void
+QPDFFormFieldObjectHelper::setFieldAttribute(
+    std::string const& key, std::string const& utf8_value)
+{
+    this->oh.replaceKey(key, QPDFObjectHandle::newUnicodeString(utf8_value));
+}
+
+void
+QPDFFormFieldObjectHelper::setV(
+    QPDFObjectHandle value, bool need_appearances)
+{
+    setFieldAttribute("/V", value);
+    if (need_appearances)
+    {
+        QPDF* qpdf = this->oh.getOwningQPDF();
+        if (! qpdf)
+        {
+            throw std::logic_error(
+                "QPDFFormFieldObjectHelper::setV called with"
+                " need_appearances = true on an object that is"
+                " not associated with an owning QPDF");
+        }
+        QPDFAcroFormDocumentHelper(*qpdf).setNeedAppearances(true);
+    }
+}
+
+void
+QPDFFormFieldObjectHelper::setV(
+    std::string const& utf8_value, bool need_appearances)
+{
+    setV(QPDFObjectHandle::newUnicodeString(utf8_value),
+         need_appearances);
 }

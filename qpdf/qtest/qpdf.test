@@ -115,7 +115,7 @@ my @form_tests = (
     'form-errors',
     );
 
-$n_tests += scalar(@form_tests);
+$n_tests += scalar(@form_tests) + 2;
 
 # Many of the form*.pdf files were created by converting the
 # LibreOffice document storage/form.odt to PDF and then manually
@@ -131,6 +131,15 @@ foreach my $f (@form_tests)
                  {$td->FILE => "form-$f.out", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
 }
+
+$td->runtest("fill fields",
+             {$td->COMMAND => "test_driver 44 form-no-need-appearances.pdf"},
+             {$td->FILE => "form-no-need-appearances.out",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("compare files",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "form-no-need-appearances-filled.pdf"});
 
 show_ntests();
 # ----------

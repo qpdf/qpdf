@@ -250,3 +250,38 @@ QPDFAcroFormDocumentHelper::traverseField(
             QPDFFormFieldObjectHelper(our_field);
     }
 }
+
+bool
+QPDFAcroFormDocumentHelper::getNeedAppearances()
+{
+    bool result = false;
+    QPDFObjectHandle acroform = this->qpdf.getRoot().getKey("/AcroForm");
+    if (acroform.isDictionary() &&
+        acroform.getKey("/NeedAppearances").isBool())
+    {
+        result = acroform.getKey("/NeedAppearances").getBoolValue();
+    }
+    return result;
+}
+
+void
+QPDFAcroFormDocumentHelper::setNeedAppearances(bool val)
+{
+    QPDFObjectHandle acroform = this->qpdf.getRoot().getKey("/AcroForm");
+    if (! acroform.isDictionary())
+    {
+        this->qpdf.getRoot().warnIfPossible(
+            "ignoring call to QPDFAcroFormDocumentHelper::setNeedAppearances"
+            " on a file that lacks an /AcroForm dictionary");
+        return;
+    }
+    if (val)
+    {
+        acroform.replaceKey("/NeedAppearances",
+                            QPDFObjectHandle::newBool(true));
+    }
+    else
+    {
+        acroform.removeKey("/NeedAppearances");
+    }
+}

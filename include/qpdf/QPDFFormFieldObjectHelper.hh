@@ -114,6 +114,29 @@ class QPDFFormFieldObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     int getQuadding();
 
+    // Set an attribute to the given value
+    QPDF_DLL
+    void setFieldAttribute(std::string const& key, QPDFObjectHandle value);
+
+    // Set an attribute to the given value as a Unicode string (UTF-16
+    // BE encoded). The input string should be UTF-8 encoded.
+    QPDF_DLL
+    void setFieldAttribute(std::string const& key,
+                           std::string const& utf8_value);
+
+    // Set /V (field value) to the given value. Optionally set
+    // /NeedAppearances to true. You can explicitly tell this method
+    // not to set /NeedAppearances if you are going to explicitly
+    // generate an appearance stream yourself.
+    QPDF_DLL
+    void setV(QPDFObjectHandle value, bool need_appearances = true);
+
+    // Set /V (field value) to the given string value encoded as a
+    // Unicode string. The input value should be UTF-8 encoded. See
+    // comments above about /NeedAppearances.
+    QPDF_DLL
+    void setV(std::string const& utf8_value, bool need_appearances = true);
+
   private:
     class Members
     {

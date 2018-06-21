@@ -1,5 +1,10 @@
 2018-06-21  Jay Berkenbilt  <ejb@ql.org>
 
+	* Added methods QPDFAcroFormDocumentHelper::setNeedAppearances and
+	added methods to QPDFFormFieldObjectHelper to set a field's value,
+	optionally updating the document to indicate that appearance
+	streams need to be regenerated.
+
 	* Added QPDFObject::newUnicodeString and QPDFObject::unparseBinary
 	to allow for more convenient creation of strings that are
 	explicitly encoded in UTF-16 BE. This is useful for creating

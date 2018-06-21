@@ -135,6 +135,23 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
     QPDFFormFieldObjectHelper
     getFieldForAnnotation(QPDFAnnotationObjectHelper);
 
+    // Return the current value of /NeedAppearances. If
+    // /NeedAppearances is missing, return false as that is how PDF
+    // viewers are supposed to interpret it.
+    QPDF_DLL
+    bool getNeedAppearances();
+
+    // Indicate whether appearance streams must be regenerated. If you
+    // modify a field value, you should call setNeedAppearances(true)
+    // unless you also generate an appearance stream for the
+    // corresponding annotation at the same time. If you generate
+    // appearance streams for all fields, you can call
+    // setNeedAppearances(false). If you use
+    // QPDFFormFieldObjectHelper::setV, it will automatically call
+    // this method unless you tell it not to.
+    QPDF_DLL
+    void setNeedAppearances(bool);
+
   private:
     void analyze();
     void traverseField(QPDFObjectHandle field,
