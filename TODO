@@ -54,6 +54,16 @@ Lexical
      manner that takes advantage of the other lexical features. This
      sanitizer should also clear metadata and replace images.
 
+Page splitting/merging
+======================
+
+ * Update page splitting and merging to handle document-level
+   constructs with page impact such as interactive forms and article
+   threading. Check keys in the document catalog for others, such as
+   outlines, page labels, thumbnails, and zones. For threads,
+   Subramanyam provided a test file; see ../misc/article-threads.pdf.
+   Email Q-Count: 431864 from 2009-11-03.
+
 General
 =======
 
@@ -77,8 +87,32 @@ I find it useful to make reference to them in this list
    filtering doesn't ever try to do this. QPDFWriter should be checked
    carefully too. See also bugs/private/from-email-663916/
 
- * Form flattening: ~/tmp/qtmp/form-flattening-email/. Distill this
-   into notes along with stuff in qpdf email box.
+ * Interactive form modification:
+   https://github.com/qpdf/qpdf/issues/213 contains a good discussion
+   of some ideas for adding methods to modify annotations and form
+   fields if we want to make it easier to support modifications to
+   interactive forms. Some of the ideas have been implemented, and
+   some of the probably never will be implemented, but it's worth a
+   read if there is an intention to work on this. In the issue, search
+   for "Regarding write functionality", and read that comment and the
+   responses to it.
+
+ * Form flattening: there is on-going work on this topic. The primary
+   tracking issue is https://github.com/qpdf/qpdf/issues/72, and there
+   has also been discussion in private email threads. My notes are
+   summarized in ../misc/form-flattening/README (not publicly
+   accessible), but all important information is in issues in github.
+   The non-public items in my notes are transcripts of discussions
+   with a google summer of code student who was working on the issue.
+   These notes likely have low value at this point, but I have saved
+   them to review in case form flattening ever moves into the qpdf
+   library from external tools where it is currently being
+   implemented. Note that flattening forms with appearance streams is
+   relatively straightforward, but many PDF files don't have
+   appearance streams and leave rendering of the form fields to the
+   viewer. Handling this in the general case is probably out of scope
+   for what will be in qpdf in the foreseeable future, particularly in
+   the area of embedding and subsetting fonts.
 
  * Look at ~/Q/pdf-collection/forms-from-appian/
 
@@ -159,12 +193,6 @@ I find it useful to make reference to them in this list
    non-ASCII passwords.  Update documentation if this is done.
    Consider implementing full Unicode password algorithms from newer
    encryption formats.
-
- * Consider impact of article threads on page splitting/merging.
-   Subramanyam provided a test file; see ../misc/article-threads.pdf.
-   Email Q-Count: 431864 from 2009-11-03.  Other things to consider:
-   outlines, page labels, thumbnails, zones.  There are probably
-   others.
 
  * See if we can avoid preserving unreferenced objects in object
    streams even when preserving the object streams.
