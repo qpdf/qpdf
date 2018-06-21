@@ -1751,53 +1751,54 @@ outfile.pdf</option>
    </para>
    <para>
     In general, one should adhere strictly to a specification when
-    writing but be liberal in reading.  This way, the product of our
+    writing but be liberal in reading. This way, the product of our
     software will be accepted by the widest range of other programs,
-    and we will accept the widest range of input files.  This library
+    and we will accept the widest range of input files. This library
     attempts to conform to that philosophy whenever possible but also
     aims to provide strict checking for people who want to validate
-    PDF files.  If you don't want to see warnings and are trying to
+    PDF files. If you don't want to see warnings and are trying to
     write something that is tolerant, you can call
-    <literal>setSuppressWarnings(true)</literal>.  If you want to fail
+    <literal>setSuppressWarnings(true)</literal>. If you want to fail
     on the first error, you can call
-    <literal>setAttemptRecovery(false)</literal>.  The default
-    behavior is to generating warnings for recoverable problems.  Note
-    that recovery will not always produce the desired results even if
-    it is able to get through the file.  Unlike most other PDF files
-    that produce generic warnings such as &ldquo;This file is
+    <literal>setAttemptRecovery(false)</literal>. The default behavior
+    is to generating warnings for recoverable problems. Note that
+    recovery will not always produce the desired results even if it is
+    able to get through the file. Unlike most other PDF files that
+    produce generic warnings such as &ldquo;This file is
     damaged,&rdquo;, qpdf generally issues a detailed error message
-    that would be most useful to a PDF developer.  This is by design
-    as there seems to be a shortage of PDF validation tools out
-    there.  (This was, in fact, one of the major motivations behind
-    the initial creation of qpdf.)
+    that would be most useful to a PDF developer. This is by design as
+    there seems to be a shortage of PDF validation tools out there.
+    This was, in fact, one of the major motivations behind the initial
+    creation of qpdf.
    </para>
   </sect1>
   <sect1 id="ref.design-goals">
    <title>Design Goals</title>
    <para>
     The QPDF package includes support for reading and rewriting PDF
-    files.  It aims to hide from the user details involving object
+    files. It aims to hide from the user details involving object
     locations, modified (appended) PDF files, the
     directness/indirectness of objects, and stream filters including
-    encryption.  It does not aim to hide knowledge of the object
-    hierarchy or content stream contents.  Put another way, a user of
+    encryption. It does not aim to hide knowledge of the object
+    hierarchy or content stream contents. Put another way, a user of
     the qpdf library is expected to have knowledge about how PDF files
     work, but is not expected to have to keep track of bookkeeping
     details such as file positions.
    </para>
    <para>
     A user of the library never has to care whether an object is
-    direct or indirect.  All access to objects deals with this
-    transparently.  All memory management details are also handled by
-    the library.
+    direct or indirect, though it is possible to determine whether an
+    object is direct or not if this information is needed. All access
+    to objects deals with this transparently. All memory management
+    details are also handled by the library.
    </para>
    <para>
     The <classname>PointerHolder</classname> object is used internally
-    by the library to deal with memory management.  This is basically
-    a smart pointer object very similar in spirit to the Boost
-    library's <classname>shared_ptr</classname> object, but predating
-    it by several years.  This library also makes use of a technique
-    for giving fine-grained access to methods in one class to other
+    by the library to deal with memory management. This is basically a
+    smart pointer object very similar in spirit to C++-11's
+    <classname>std::shared_ptr</classname> object, but predating it by
+    several years. This library also makes use of a technique for
+    giving fine-grained access to methods in one class to other
     classes by using public subclasses with friends and only private
     members that in turn call private methods of the containing class.
     See <classname>QPDFObjectHandle::Factory</classname> as an
@@ -1810,29 +1811,20 @@ outfile.pdf</option>
     files.
    </para>
    <para>
-    <classname>QPDFObject</classname> is the basic PDF Object class.
-    It is an abstract base class from which are derived classes for
-    each type of PDF object.  Clients do not interact with Objects
-    directly but instead interact with
-    <classname>QPDFObjectHandle</classname>.
-   </para>
-   <para>
-    <classname>QPDFObjectHandle</classname> contains
-    <classname>PointerHolder&lt;QPDFObject&gt;</classname> and
-    includes accessor methods that are type-safe proxies to the
-    methods of the derived object classes as well as methods for
-    querying object types.  They can be passed around by value,
-    copied, stored in containers, etc. with very low overhead.
-    Instances of <classname>QPDFObjectHandle</classname> always
-    contain a reference back to the <classname>QPDF</classname> object
-    from which they were created.  A
+    The primary class for interacting with PDF objects is
+    <classname>QPDFObjectHandle</classname>. Instances of this class
+    can be passed around by value, copied, stored in containers, etc.
+    with very low overhead. Instances of
+    <classname>QPDFObjectHandle</classname> created by reading from a
+    file will always contain a reference back to the
+    <classname>QPDF</classname> object from which they were created. A
     <classname>QPDFObjectHandle</classname> may be direct or indirect.
     If indirect, the <classname>QPDFObject</classname> the
     <classname>PointerHolder</classname> initially points to is a null
-    pointer.  In this case, the first attempt to access the underlying
+    pointer. In this case, the first attempt to access the underlying
     <classname>QPDFObject</classname> will result in the
     <classname>QPDFObject</classname> being resolved via a call to the
-    referenced <classname>QPDF</classname> instance.  This makes it
+    referenced <classname>QPDF</classname> instance. This makes it
     essentially impossible to make coding errors in which certain
     things will work for some PDF files and not for others based on
     which objects are direct and which objects are indirect.
@@ -1847,48 +1839,6 @@ outfile.pdf</option>
     instances of <classname>QPDFObjectHandle</classname> can also be
     modified in several ways.  See comments in
     <filename>QPDFObjectHandle.hh</filename> for details.
-   </para>
-   <para>
-    When the <classname>QPDF</classname> class creates a new object,
-    it dynamically allocates the appropriate type of
-    <classname>QPDFObject</classname> and immediately hands the
-    pointer to an instance of <classname>QPDFObjectHandle</classname>.
-    The parser reads a token from the current file position.  If the
-    token is a not either a dictionary or array opener, an object is
-    immediately constructed from the single token and the parser
-    returns.  Otherwise, the parser is invoked recursively in a
-    special mode in which it accumulates objects until it finds a
-    balancing closer.  During this process, the
-    &ldquo;<literal>R</literal>&rdquo; keyword is recognized and an
-    indirect <classname>QPDFObjectHandle</classname> may be
-    constructed.
-   </para>
-   <para>
-    The <function>QPDF::resolve()</function> method, which is used to
-    resolve an indirect object, may be invoked from the
-    <classname>QPDFObjectHandle</classname> class.  It first checks a
-    cache to see whether this object has already been read.  If not,
-    it reads the object from the PDF file and caches it.  It the
-    returns the resulting <classname>QPDFObjectHandle</classname>.
-    The calling object handle then replaces its
-    <classname>PointerHolder&lt;QDFObject&gt;</classname> with the one
-    from the newly returned <classname>QPDFObjectHandle</classname>.
-    In this way, only a single copy of any direct object need exist
-    and clients can access objects transparently without knowing
-    caring whether they are direct or indirect objects.  Additionally,
-    no object is ever read from the file more than once.  That means
-    that only the portions of the PDF file that are actually needed
-    are ever read from the input file, thus allowing the qpdf package
-    to take advantage of this important design goal of PDF files.
-   </para>
-   <para>
-    If the requested object is inside of an object stream, the object
-    stream itself is first read into memory.  Then the tokenizer reads
-    objects from the memory stream based on the offset information
-    stored in the stream.  Those individual objects are cached, after
-    which the temporary buffer holding the object stream contents are
-    discarded.  In this way, the first time an object in an object
-    stream is requested, all objects in the stream are cached.
    </para>
    <para>
     An instance of <classname>QPDF</classname> is constructed by using
@@ -1934,8 +1884,206 @@ outfile.pdf</option>
    <para>
     There are some convenience routines for very common operations
     such as walking the page tree and returning a vector of all page
-    objects.  For full details, please see the header file
-    <filename>QPDF.hh</filename>.
+    objects. For full details, please see the header files
+    <filename>QPDF.hh</filename> and
+    <filename>QPDFObjectHandle.hh</filename>. There are also some
+    additional helper classes that provide higher level API functions
+    for certain document constructions. These are discussed in <xref
+    linkend="ref.helper-classes"/>.
+   </para>
+  </sect1>
+  <sect1 id="ref.helper-classes">
+   <title>Helper Classes</title>
+   <para>
+    QPDF version 8.1 introduced the concept of helper classes. Helper
+    classes are intended to contain higher level APIs that allow
+    developers to work with certain document constructs at an
+    abstraction level above that of
+    <classname>QPDFObjectHandle</classname> while staying true to
+    qpdf's philosophy of not hiding document structure from the
+    developer. As with qpdf in general, the goal is take away some of
+    the more tedious bookkeeping aspects of working with PDF files,
+    not to remove the need for the developer to understand how the PDF
+    construction in question works. The driving factor behind the
+    creation of helper classes was to allow the evolution of higher
+    level interfaces in qpdf without polluting the interfaces of the
+    main top-level classes <classname>QPDF</classname> and
+    <classname>QPDFObjectHandle</classname>.
+   </para>
+   <para>
+    There are two kinds of helper classes:
+    <emphasis>document</emphasis> helpers and
+    <emphasis>object</emphasis> helpers. Document helpers are
+    constructed with a reference to a <classname>QPDF</classname>
+    object and provide methods for working with structures that are at
+    the document level. Object helpers are constructed with an
+    instance of a <classname>QPDFObjectHandle</classname> and provide
+    methods for working with specific types of objects.
+   </para>
+   <para>
+    Examples of document helpers include
+    <classname>QPDFPageDocumentHelper</classname>, which contains
+    methods for operating on the document's page trees, such as
+    enumerating all pages of a document and adding and removing pages;
+    and <classname>QPDFAcroFormDocumentHelper</classname>, which
+    contains document-level methods related to interactive forms, such
+    as enumerating form fields and creating mappings between form
+    fields and annotations.
+   </para>
+   <para>
+    Examples of object helpers include
+    <classname>QPDFPageObjectHelper</classname> for performing
+    operations on pages such as page rotation and some operations on
+    content streams, <classname>QPDFFormFieldObjectHelper</classname>
+    for performing operations related to interactive form fields, and
+    <classname>QPDFAnnotationObjectHelper</classname> for working with
+    annotations.
+   </para>
+   <para>
+    It is always possible to retrieve the underlying
+    <classname>QPDF</classname> reference from a document helper and
+    the underlying <classname>QPDFObjectHandle</classname> reference
+    from an object helper. Helpers are designed to be helpers, not
+    wrappers. The intention is that, in general, it is safe to freely
+    intermix operations that use helpers with operations that use the
+    underlying objects. Document and object helpers do not attempt to
+    provide a complete interface for working with the things they are
+    helping with, nor do they attempt to encapsulate underlying
+    structures. They just provide a few methods to help with
+    error-prone, repetitive, or complex tasks. In some cases, a helper
+    object may cache some information that is expensive to gather. In
+    such cases, the helper classes are implemented so that their own
+    methods keep the cache consistent, and the header file will
+    provide a method to invalidate the cache and a description of what
+    kinds of operations would make the cache invalid. If in doubt, you
+    can always discard a helper class and create a new one with the
+    same underlying objects, which will ensure that you have discarded
+    any stale information.
+   </para>
+   <para>
+    By Convention, document helpers are called
+    <classname>QPDFSomethingDocumentHelper</classname> and are derived
+    from <classname>QPDFDocumentHelper</classname>, and object helpers
+    are called <classname>QPDFSomethingObjectHelper</classname> and
+    are derived from <classname>QPDFObjectHelper</classname>. For
+    details on specific helpers, please see their header files. You
+    can find them by looking at
+    <filename>include/qpdf/QPDF*DocumentHelper.hh</filename> and
+    <filename>include/qpdf/QPDF*ObjectHelper.hh</filename>.
+   </para>
+   <para>
+    In order to avoid creation of circular dependencies, the following
+    general guidelines are followed with helper classes:
+    <itemizedlist>
+     <listitem>
+      <para>
+       Core class interfaces do not know about helper classes. For
+       example, no methods of <classname>QPDF</classname> or
+       <classname>QPDFObjectHandle</classname> will include helper
+       classes in their interfaces.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       Interfaces of object helpers will usually not use document
+       helpers in their interfaces. This is because it is much more
+       useful for document helpers to have methods that return object
+       helpers. Most operations in PDF files start at the document
+       level and go from there to the object level rather than the
+       other way around. It can sometimes be useful to map back from
+       object-level structures to document-level structures. If there
+       is a desire to do this, it will generally be provided by a
+       method in the document helper class.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       Most of the time, object helpers don't know about other object
+       helpers. However, in some cases, one type of object may be a
+       container for another type of object, in which case it may make
+       sense for the outer object to know about the inner object. For
+       example, there are methods in the
+       <classname>QPDFPageObjectHelper</classname> that know
+       <classname>QPDFAnnotationObjectHelper</classname> because
+       references to annotations are contained in page dictionaries.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       Any helper or core library class may use helpers in their
+       implementations.
+      </para>
+     </listitem>
+    </itemizedlist>
+   </para>
+   <para>
+    Prior to qpdf version 8.1, higher level interfaces were added as
+    &ldquo;convenience functions&rdquo; in either
+    <classname>QPDF</classname> or
+    <classname>QPDFObjectHandle</classname>. For compatibility, older
+    convenience functions for operating with pages will remain in
+    those classes even as alternatives are provided in helper classes.
+    Going forward, new higher level interfaces will be provided using
+    helper classes.
+   </para>
+  </sect1>
+  <sect1 id="ref.implementation-notes">
+   <title>Implementation Notes</title>
+   <para>
+    This section contains a few notes about QPDF's internal
+    implementation, particularly around what it does when it first
+    processes a file. This section is a bit of a simplification of
+    what it actually does, but it could serve as a starting point to
+    someone trying to understand the implementation. There is nothing
+    in this section that you need to know to use the qpdf library.
+   </para>
+   <para>
+    <classname>QPDFObject</classname> is the basic PDF Object class.
+    It is an abstract base class from which are derived classes for
+    each type of PDF object.  Clients do not interact with Objects
+    directly but instead interact with
+    <classname>QPDFObjectHandle</classname>.
+   </para>
+   <para>
+    When the <classname>QPDF</classname> class creates a new object,
+    it dynamically allocates the appropriate type of
+    <classname>QPDFObject</classname> and immediately hands the
+    pointer to an instance of <classname>QPDFObjectHandle</classname>.
+    The parser reads a token from the current file position. If the
+    token is a not either a dictionary or array opener, an object is
+    immediately constructed from the single token and the parser
+    returns. Otherwise, the parser iterates in a special mode in which
+    it accumulates objects until it finds a balancing closer. During
+    this process, the &ldquo;<literal>R</literal>&rdquo; keyword is
+    recognized and an indirect <classname>QPDFObjectHandle</classname>
+    may be constructed.
+   </para>
+   <para>
+    The <function>QPDF::resolve()</function> method, which is used to
+    resolve an indirect object, may be invoked from the
+    <classname>QPDFObjectHandle</classname> class.  It first checks a
+    cache to see whether this object has already been read.  If not,
+    it reads the object from the PDF file and caches it.  It the
+    returns the resulting <classname>QPDFObjectHandle</classname>.
+    The calling object handle then replaces its
+    <classname>PointerHolder&lt;QDFObject&gt;</classname> with the one
+    from the newly returned <classname>QPDFObjectHandle</classname>.
+    In this way, only a single copy of any direct object need exist
+    and clients can access objects transparently without knowing
+    caring whether they are direct or indirect objects.  Additionally,
+    no object is ever read from the file more than once.  That means
+    that only the portions of the PDF file that are actually needed
+    are ever read from the input file, thus allowing the qpdf package
+    to take advantage of this important design goal of PDF files.
+   </para>
+   <para>
+    If the requested object is inside of an object stream, the object
+    stream itself is first read into memory.  Then the tokenizer reads
+    objects from the memory stream based on the offset information
+    stored in the stream.  Those individual objects are cached, after
+    which the temporary buffer holding the object stream contents are
+    discarded.  In this way, the first time an object in an object
+    stream is requested, all objects in the stream are cached.
    </para>
    <para>
     The following example should clarify how
@@ -1951,12 +2099,11 @@ outfile.pdf</option>
      <listitem>
       <para>
        The <classname>QPDF</classname> class checks the beginning of
-       <filename>a.pdf</filename> for
-       <literal>%!PDF-1.[0-9]+</literal>.  It then reads the cross
-       reference table mentioned at the end of the file, ensuring that
-       it is looking before the last <literal>%%EOF</literal>.  After
-       getting to <literal>trailer</literal> keyword, it invokes the
-       parser.
+       <filename>a.pdf</filename> for a PDF header. It then reads the
+       cross reference table mentioned at the end of the file,
+       ensuring that it is looking before the last
+       <literal>%%EOF</literal>. After getting to
+       <literal>trailer</literal> keyword, it invokes the parser.
       </para>
      </listitem>
      <listitem>
