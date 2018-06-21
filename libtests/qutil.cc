@@ -193,6 +193,30 @@ void to_utf8_test()
     }
 }
 
+static void print_utf16(unsigned long val)
+{
+    std::string result = QUtil::toUTF16(val);
+    std::cout << "0x" << QUtil::int_to_string_base(val, 16) << " ->";
+    for (std::string::iterator iter = result.begin();
+         iter != result.end(); ++iter)
+    {
+        std::cout << " " << QUtil::int_to_string_base(
+            static_cast<int>(static_cast<unsigned char>(*iter)), 16, 2);
+    }
+    std::cout << std::endl;
+}
+
+void to_utf16_test()
+{
+    print_utf16(0x41UL);
+    print_utf16(0xF7UL);
+    print_utf16(0x3c0UL);
+    print_utf16(0x16059UL);
+    print_utf16(0xdeadUL);
+    print_utf16(0x7fffffffUL);
+    print_utf16(0x80000000UL);
+}
+
 void print_whoami(char const* str)
 {
     PointerHolder<char> dup(true, QUtil::copy_string(str));
@@ -299,6 +323,8 @@ int main(int argc, char* argv[])
 	getenv_test();
 	std::cout << "---- utf8" << std::endl;
 	to_utf8_test();
+	std::cout << "---- utf16" << std::endl;
+	to_utf16_test();
 	std::cout << "---- whoami" << std::endl;
 	get_whoami_test();
 	std::cout << "---- file" << std::endl;

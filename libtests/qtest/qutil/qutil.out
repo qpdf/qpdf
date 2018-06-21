@@ -39,6 +39,14 @@ HAGOOGAMAGOOGLE: 0
 0x16059 -> f0 96 81 99
 0x7fffffff -> fd bf bf bf bf bf
 0x80000000: bounds error in QUtil::toUTF8
+---- utf16
+0x41 -> 00 41
+0xf7 -> 00 f7
+0x3c0 -> 03 c0
+0x16059 -> d8 18 dc 59
+0xdead -> ff fd
+0x7fffffff -> ff fd
+0x80000000 -> ff fd
 ---- whoami
 quack1
 quack2

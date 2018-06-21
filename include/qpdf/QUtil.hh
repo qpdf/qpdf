@@ -140,6 +140,12 @@ namespace QUtil
     QPDF_DLL
     std::string toUTF8(unsigned long uval);
 
+    // Return a string containing the byte representation of the
+    // UTF-16 BE encoding for the unicode value passed in.
+    // Unrepresentable code points are converted to U+FFFD.
+    QPDF_DLL
+    std::string toUTF16(unsigned long uval);
+
     // If secure random number generation is supported on your
     // platform and qpdf was not compiled with insecure random number
     // generation, this returns a cryptographically secure random
