@@ -241,8 +241,9 @@ Basic Options\n\
 --decrypt               remove any encryption on the file\n\
 --password-is-hex-key   treat primary password option as a hex-encoded key\n\
 --pages options --      select specific pages from one or more files\n\
---rotate=[+|-]angle:page-range\n\
-                        rotate each specified page 90, 180, or 270 degrees\n\
+--rotate=[+|-]angle[:page-range]\n\
+                        rotate each specified page 90, 180, or 270 degrees;\n\
+                        rotate all pages if no page range is given\n\
 --split-pages=[n]       write each output page to a separate file\n\
 \n\
 Note that you can use the @filename or @- syntax for any argument at any\n\
@@ -1303,24 +1304,32 @@ static void parse_rotation_parameter(Options& o, std::string const& parameter)
         if (colon > 0)
         {
             angle_str = parameter.substr(0, colon);
-            if (angle_str.length() > 0)
-            {
-                char first = angle_str.at(0);
-                if ((first == '+') || (first == '-'))
-                {
-                    relative = ((first == '+') ? 1 : -1);
-                    angle_str = angle_str.substr(1);
-                }
-                else if (! QUtil::is_digit(angle_str.at(0)))
-                {
-                    angle_str = "";
-                }
-            }
         }
         if (colon + 1 < parameter.length())
         {
             range = parameter.substr(colon + 1);
         }
+    }
+    else
+    {
+        angle_str = parameter;
+    }
+    if (angle_str.length() > 0)
+    {
+        char first = angle_str.at(0);
+        if ((first == '+') || (first == '-'))
+        {
+            relative = ((first == '+') ? 1 : -1);
+            angle_str = angle_str.substr(1);
+        }
+        else if (! QUtil::is_digit(angle_str.at(0)))
+        {
+            angle_str = "";
+        }
+    }
+    if (range.empty())
+    {
+        range = "1-z";
     }
     bool range_valid = false;
     try

@@ -1124,7 +1124,7 @@ foreach my $d (@sp_cases)
 show_ntests();
 # ----------
 $td->notify("--- Rotate Pages ---");
-$n_tests += 2;
+$n_tests += 4;
 # Do absolute, positive, and negative on ranges that include
 # inherited and non-inherited.
 # Pages 11-15 inherit /Rotate 90
@@ -1140,6 +1140,14 @@ $td->runtest("page rotation",
 $td->runtest("check output",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "rotated.pdf"});
+
+$td->runtest("rotate all pages",
+             {$td->COMMAND =>
+                  "qpdf --static-id --rotate=180 minimal.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "minimal-rotated.pdf"});
 
 show_ntests();
 # ----------

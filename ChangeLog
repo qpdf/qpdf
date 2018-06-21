@@ -1,5 +1,9 @@
 2018-06-21  Jay Berkenbilt  <ejb@ql.org>
 
+	* The --rotate option to qpdf no longer requires an explicit page
+	range. You can now rotate all pages of a document with
+	qpdf --rotate=angle in.pdf out.pdf. Fixes #211.
+
 	* Create examples/pdf-set-form-values.cc to illustrate use of
 	interactive form helpers.
 
