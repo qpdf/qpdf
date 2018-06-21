@@ -289,22 +289,23 @@ int main(int argc, char* argv[])
 {
     try
     {
+        std::cout << "---- string conversion" << std::endl;
 	string_conversion_test();
-	std::cout << "----" << std::endl;
+	std::cout << "---- os wrapper" << std::endl;
 	os_wrapper_test();
-	std::cout << "----" << std::endl;
+	std::cout << "---- fopen" << std::endl;
 	fopen_wrapper_test();
-	std::cout << "----" << std::endl;
+	std::cout << "---- getenv" << std::endl;
 	getenv_test();
-	std::cout << "----" << std::endl;
+	std::cout << "---- utf8" << std::endl;
 	to_utf8_test();
-	std::cout << "----" << std::endl;
+	std::cout << "---- whoami" << std::endl;
 	get_whoami_test();
-	std::cout << "----" << std::endl;
+	std::cout << "---- file" << std::endl;
 	same_file_test();
-	std::cout << "----" << std::endl;
+	std::cout << "---- lines from file" << std::endl;
 	read_lines_from_file_test();
-	std::cout << "----" << std::endl;
+	std::cout << "---- hex encode/decode" << std::endl;
 	hex_encode_decode_test();
     }
     catch (std::exception& e)
