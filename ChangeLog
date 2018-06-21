@@ -1,5 +1,8 @@
 2018-06-21  Jay Berkenbilt  <ejb@ql.org>
 
+	* Create examples/pdf-set-form-values.cc to illustrate use of
+	interactive form helpers.
+
 	* Added methods QPDFAcroFormDocumentHelper::setNeedAppearances and
 	added methods to QPDFFormFieldObjectHelper to set a field's value,
 	optionally updating the document to indicate that appearance

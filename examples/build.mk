@@ -8,7 +8,8 @@ BINS_examples = \
 	pdf-parse-content \
 	pdf-split-pages \
 	pdf-filter-tokens \
-	pdf-count-strings
+	pdf-count-strings \
+	pdf-set-form-values
 CBINS_examples = pdf-linearize
 
 TARGETS_examples = $(foreach B,$(BINS_examples) $(CBINS_examples),examples/$(OUTPUT_DIR)/$(call binname,$(B)))

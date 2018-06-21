@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+chdir("set-form-values");
+
+require TestDriver;
+
+my $td = new TestDriver('pdf-set-form-values');
+
+cleanup();
+
+$td->runtest("set form values",
+	     {$td->COMMAND => "pdf-set-form-values form-in.pdf a.pdf soup"},
+	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("compare files",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "form-out.pdf"});
+
+cleanup();
+
+$td->report(2);
+
+sub cleanup
+{
+    unlink("a.pdf");
+}
