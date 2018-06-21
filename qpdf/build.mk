@@ -4,6 +4,7 @@ BINS_qpdf = \
     test_driver \
     test_large_file \
     test_pdf_doc_encoding \
+    test_pdf_unicode \
     test_tokenizer
 CBINS_qpdf = qpdf-ctest
 

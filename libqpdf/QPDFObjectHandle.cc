@@ -1221,6 +1221,20 @@ QPDFObjectHandle::unparseResolved()
     return this->m->obj->unparse();
 }
 
+std::string
+QPDFObjectHandle::unparseBinary()
+{
+    if (this->isString())
+    {
+        return dynamic_cast<QPDF_String*>(
+            this->m->obj.getPointer())->unparse(true);
+    }
+    else
+    {
+        return unparse();
+    }
+}
+
 QPDFObjectHandle
 QPDFObjectHandle::parse(std::string const& object_str,
                         std::string const& object_description)
@@ -1843,6 +1857,12 @@ QPDFObjectHandle
 QPDFObjectHandle::newString(std::string const& str)
 {
     return QPDFObjectHandle(new QPDF_String(str));
+}
+
+QPDFObjectHandle
+QPDFObjectHandle::newUnicodeString(std::string const& utf8_str)
+{
+    return QPDFObjectHandle(QPDF_String::new_utf16(utf8_str));
 }
 
 QPDFObjectHandle

@@ -344,6 +344,12 @@ class QPDFObjectHandle
     static QPDFObjectHandle newName(std::string const& name);
     QPDF_DLL
     static QPDFObjectHandle newString(std::string const& str);
+    // Create a string encoded in UTF-16 from the given utf8-encoded
+    // string. Such strings are appropriately encoded to appear in PDF
+    // files outside of content streams, such as in document metadata
+    // form field values, page labels, outlines, and similar locations.
+    QPDF_DLL
+    static QPDFObjectHandle newUnicodeString(std::string const& utf8_str);
     QPDF_DLL
     static QPDFObjectHandle newOperator(std::string const&);
     QPDF_DLL
@@ -715,6 +721,10 @@ class QPDFObjectHandle
     std::string unparse();
     QPDF_DLL
     std::string unparseResolved();
+    // For strings only, force binary representation. Otherwise, same
+    // as unparse.
+    QPDF_DLL
+    std::string unparseBinary();
 
     // Legacy helper methods for commonly performed operations on
     // pages. Newer code should use QPDFPageObjectHelper instead. The

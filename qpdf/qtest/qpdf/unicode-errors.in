@@ -1,0 +1,7 @@
+This file has utf-8 encoding errors and should be edited as a binary file.
+
+0: too many bytes: şafter
+1: too few bytes: €after
+2: invalid codepoint (U+DEAD): íº­after
+3: not enough bytes for character: ğ„!after (! included)
+4: not enough bytes left in file ğ

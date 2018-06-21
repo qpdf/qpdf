@@ -1,3 +1,11 @@
+2018-06-21  Jay Berkenbilt  <ejb@ql.org>
+
+	* Added QPDFObject::newUnicodeString and QPDFObject::unparseBinary
+	to allow for more convenient creation of strings that are
+	explicitly encoded in UTF-16 BE. This is useful for creating
+	Unicode strings that appear outside of content streams, such as in
+	page labels, outlines, form field values, etc.
+
 2018-06-20  Jay Berkenbilt  <ejb@ql.org>
 
 	* Added new classes QPDFAcroFormDocumentHelper,
