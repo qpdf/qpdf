@@ -7,6 +7,7 @@
 
 #include <qpdf/QUtil.hh>
 #include <qpdf/QTC.hh>
+#include <qpdf/ClosedFileInputSource.hh>
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/Pl_Discard.hh>
 #include <qpdf/PointerHolder.hh>
@@ -2083,8 +2084,9 @@ static void handle_page_specs(QPDF& pdf, Options& o,
                 QTC::TC("qpdf", "qpdf pages encryption password");
                 password = o.encryption_file_password;
             }
-            qpdf->processFile(
-                page_spec.filename.c_str(), password);
+            qpdf->processInputSource(
+                new ClosedFileInputSource(
+                    page_spec.filename.c_str()), password);
             page_spec_qpdfs[page_spec.filename] = qpdf;
         }
 

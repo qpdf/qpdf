@@ -1,5 +1,9 @@
 2018-06-22  Jay Berkenbilt  <ejb@ql.org>
 
+	* Don't leave files open when merging. This makes it possible
+	merge more files at once than the operating system's open file
+	limit. Fixes #154.
+
 	* Add ClosedFileInputSource class, and input source that keeps its
 	input file closed when not reading it. At the expense of some
 	performance, this allows you to operate on many files without
