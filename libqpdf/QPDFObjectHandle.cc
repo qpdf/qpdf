@@ -2025,11 +2025,14 @@ QPDFObjectHandle::shallowCopy()
         new_obj = *this;
     }
 
+    std::set<QPDFObjGen> visited;
+    new_obj.copyObject(visited, false);
     return new_obj;
 }
 
 void
-QPDFObjectHandle::makeDirectInternal(std::set<int>& visited)
+QPDFObjectHandle::copyObject(std::set<QPDFObjGen>& visited,
+                             bool cross_indirect)
 {
     assertInitialized();
 
@@ -2040,17 +2043,17 @@ QPDFObjectHandle::makeDirectInternal(std::set<int>& visited)
 	    "attempt to make a stream into a direct object");
     }
 
-    int cur_objid = this->m->objid;
-    if (cur_objid != 0)
+    QPDFObjGen cur_og(this->m->objid, this->m->generation);
+    if (cur_og.getObj() != 0)
     {
-	if (visited.count(cur_objid))
+	if (visited.count(cur_og))
 	{
 	    QTC::TC("qpdf", "QPDFObjectHandle makeDirect loop");
 	    throw std::runtime_error(
 		"loop detected while converting object from "
 		"indirect to direct");
 	}
-	visited.insert(cur_objid);
+	visited.insert(cur_og);
     }
 
     if (isReserved())
@@ -2105,7 +2108,10 @@ QPDFObjectHandle::makeDirectInternal(std::set<int>& visited)
 	for (int i = 0; i < n; ++i)
 	{
 	    items.push_back(getArrayItem(i));
-	    items.back().makeDirectInternal(visited);
+            if (cross_indirect || (! items.back().isIndirect()))
+            {
+                items.back().copyObject(visited, cross_indirect);
+            }
 	}
 	new_obj = new QPDF_Array(items);
     }
@@ -2118,7 +2124,10 @@ QPDFObjectHandle::makeDirectInternal(std::set<int>& visited)
 	     iter != keys.end(); ++iter)
 	{
 	    items[*iter] = getKey(*iter);
-	    items[*iter].makeDirectInternal(visited);
+            if (cross_indirect || (! items[*iter].isIndirect()))
+            {
+                items[*iter].copyObject(visited, cross_indirect);
+            }
 	}
 	new_obj = new QPDF_Dictionary(items);
     }
@@ -2130,17 +2139,17 @@ QPDFObjectHandle::makeDirectInternal(std::set<int>& visited)
 
     this->m->obj = new_obj;
 
-    if (cur_objid)
+    if (cur_og.getObj())
     {
-	visited.erase(cur_objid);
+	visited.erase(cur_og);
     }
 }
 
 void
 QPDFObjectHandle::makeDirect()
 {
-    std::set<int> visited;
-    makeDirectInternal(visited);
+    std::set<QPDFObjGen> visited;
+    copyObject(visited, true);
 }
 
 void

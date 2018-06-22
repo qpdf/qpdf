@@ -514,10 +514,11 @@ class QPDFObjectHandle
     QPDF_DLL
     QPDF* getOwningQPDF();
 
-    // Create a shallow copy of an object as a direct object.  Since
-    // this is a shallow copy, for dictionaries and arrays, any keys
-    // or items that were indirect objects will still be indirect
-    // objects that point to the same place.
+    // Create a shallow of an object as a direct object, but do not
+    // traverse across indirect object boundaries. That means that,
+    // for dictionaries and arrays, any keys or items that were
+    // indirect objects will still be indirect objects that point to
+    // the same place.
     QPDF_DLL
     QPDFObjectHandle shallowCopy();
 
@@ -880,7 +881,7 @@ class QPDFObjectHandle
     void objectWarning(std::string const& warning);
     void assertType(char const* type_name, bool istype);
     void dereference();
-    void makeDirectInternal(std::set<int>& visited);
+    void copyObject(std::set<QPDFObjGen>& visited, bool cross_indirect);
     void releaseResolved();
     static void setObjectDescriptionFromInput(
         QPDFObjectHandle, QPDF*, std::string const&,
