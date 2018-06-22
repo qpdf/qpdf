@@ -60,6 +60,7 @@ struct Options
         decrypt(false),
         split_pages(0),
         verbose(false),
+        progress(false),
         copy_encryption(false),
         encryption_file(0),
         encryption_file_password(0),
@@ -122,7 +123,8 @@ struct Options
     bool linearize;
     bool decrypt;
     int split_pages;
-    bool  verbose;
+    bool verbose;
+    bool progress;
     bool copy_encryption;
     char const* encryption_file;
     char const* encryption_file_password;
@@ -204,6 +206,29 @@ class DiscardContents: public QPDFObjectHandle::ParserCallbacks
     virtual void handleEOF() {}
 };
 
+class ProgressReporter: public QPDFWriter::ProgressReporter
+{
+  public:
+    ProgressReporter(char const* filename) :
+        filename(filename)
+    {
+    }
+    virtual ~ProgressReporter()
+    {
+    }
+
+    virtual void reportProgress(int);
+  private:
+    std::string filename;
+};
+
+void
+ProgressReporter::reportProgress(int percentage)
+{
+    std::cout << whoami << ": " << filename << ": write progress: "
+              << percentage << "%" << std::endl;
+}
+
 // Note: let's not be too noisy about documenting the fact that this
 // software purposely fails to enforce the distinction between user
 // and owner passwords.  A user password is sufficient to gain full
@@ -235,6 +260,7 @@ Basic Options\n\
 --help                  show command-line argument help\n\
 --password=password     specify a password for accessing encrypted files\n\
 --verbose               provide additional informational output\n\
+--progress              give progress indicators while writing output\n\
 --linearize             generated a linearized (web optimized) file\n\
 --copy-encryption=file  copy encryption parameters from specified file\n\
 --encryption-file-password=password\n\
@@ -1642,6 +1668,10 @@ static void parse_options(int argc, char* argv[], Options& o)
             {
                 o.verbose = true;
             }
+            else if (strcmp(arg, "progress") == 0)
+            {
+                o.progress = true;
+            }
             else if (strcmp(arg, "deterministic-id") == 0)
             {
                 o.deterministic_id = true;
@@ -2349,6 +2379,10 @@ static void set_writer_options(QPDF& pdf, Options& o, QPDFWriter& w)
         int extension_level = 0;
         parse_version(o.force_version, version, extension_level);
         w.forcePDFVersion(version, extension_level);
+    }
+    if (o.progress && o.outfilename)
+    {
+        w.registerProgressReporter(new ProgressReporter(o.outfilename));
     }
 }
 

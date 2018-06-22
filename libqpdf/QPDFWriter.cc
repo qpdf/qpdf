@@ -62,7 +62,10 @@ QPDFWriter::Members::Members(QPDF& pdf) :
     added_newline(false),
     max_ostream_index(0),
     deterministic_id(false),
-    md5_pipeline(0)
+    md5_pipeline(0),
+    events_expected(0),
+    events_seen(0),
+    next_progress_report(0)
 {
 }
 
@@ -1856,6 +1859,10 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
 	    if (pass == 1)
 	    {
 		offsets.push_back(this->m->pipeline->getCount());
+                // To avoid double-counting objects being written in
+                // object streams for progress reporting, decrement in
+                // pass 1.
+                indicateProgress(true, false);
 	    }
 	    writeObject(this->m->pdf.getObjectByObjGen(obj), count);
 
@@ -1929,6 +1936,7 @@ QPDFWriter::writeObject(QPDFObjectHandle object, int object_stream_index)
 	return;
     }
 
+    indicateProgress(false, false);
     int new_id = this->m->obj_renumber[old_og];
     if (this->m->qdf_mode)
     {
@@ -2253,6 +2261,7 @@ QPDFWriter::prepareFileForWrite()
 	    {
 		continue;
 	    }
+            indicateProgress(false, false);
 	    visited.insert(node.getObjectID());
 	}
 
@@ -2500,6 +2509,15 @@ QPDFWriter::write()
 	setMinimumPDFVersion("1.5");
     }
 
+    // Set up progress reporting. We spent about equal amounts of time
+    // preparing and writing one pass. To get a rough estimate of
+    // progress, we track handling of indirect objects. For linearized
+    // files, we write two passes. events_expected is an
+    // approximation, but it's good enough for progress reporting,
+    // which is mostly a guess anyway.
+    this->m->events_expected = (
+        this->m->pdf.getObjectCount() * (this->m->linearized ? 3 : 2));
+
     prepareFileForWrite();
 
     if (this->m->linearized)
@@ -2522,6 +2540,7 @@ QPDFWriter::write()
 	this->m->output_buffer = this->m->buffer_pipeline->getBuffer();
 	this->m->buffer_pipeline = 0;
     }
+    indicateProgress(false, true);
 }
 
 void
@@ -3309,6 +3328,45 @@ QPDFWriter::enqueueObjectsPCLm()
     // Put root in queue.
     QPDFObjectHandle trailer = getTrimmedTrailer();
     enqueueObject(trailer.getKey("/Root"));
+}
+
+void
+QPDFWriter::indicateProgress(bool decrement, bool finished)
+{
+    if (decrement)
+    {
+        --this->m->events_seen;
+        return;
+    }
+
+    ++this->m->events_seen;
+
+    if (! this->m->progress_reporter.getPointer())
+    {
+        return;
+    }
+
+    if (finished || (this->m->events_seen >= this->m->next_progress_report))
+    {
+        int percentage = (
+            finished
+            ? 100
+            : this->m->next_progress_report == 0
+            ? 0
+            : std::min(99, 1 + ((100 * this->m->events_seen) /
+                                this->m->events_expected)));
+        this->m->progress_reporter->reportProgress(percentage);
+    }
+    while (this->m->events_seen >= this->m->next_progress_report)
+    {
+        this->m->next_progress_report += (this->m->events_expected / 100);
+    }
+}
+
+void
+QPDFWriter::registerProgressReporter(PointerHolder<ProgressReporter> pr)
+{
+    this->m->progress_reporter = pr;
 }
 
 void

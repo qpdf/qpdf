@@ -76,6 +76,19 @@ class QPDFWriter
     QPDF_DLL
     ~QPDFWriter();
 
+    class ProgressReporter
+    {
+      public:
+        virtual ~ProgressReporter()
+        {
+        }
+
+        // This method is called with a value from 0 to 100 to
+        // indicate approximate progress through the write process.
+        // See registerProgressReporter.
+        virtual void reportProgress(int) = 0;
+    };
+
     // Setting Output.  Output may be set only one time.  If you don't
     // use the filename version of the QPDFWriter constructor, you
     // must call exactly one of these methods.
@@ -386,6 +399,11 @@ class QPDFWriter
     QPDF_DLL
     void setPCLm(bool);
 
+    // If you want to be notified of progress, derive a class from
+    // ProgressReporter and override the reportProgress method.
+    QPDF_DLL
+    void registerProgressReporter(PointerHolder<ProgressReporter>);
+
     QPDF_DLL
     void write();
 
@@ -450,6 +468,7 @@ class QPDFWriter
     void prepareFileForWrite();
     void enqueueObjectsStandard();
     void enqueueObjectsPCLm();
+    void indicateProgress(bool decrement, bool finished);
     void writeStandard();
     void writeLinearized();
     void enqueuePart(std::vector<QPDFObjectHandle>& part);
@@ -583,6 +602,12 @@ class QPDFWriter
         std::string lin_pass1_filename;
         std::map<int, int> obj_renumber_no_gen;
         std::map<int, int> object_to_object_stream_no_gen;
+
+        // For progress reporting
+        PointerHolder<ProgressReporter> progress_reporter;
+        int events_expected;
+        int events_seen;
+        int next_progress_report;
     };
 
     // Keep all member variables inside the Members object, which we

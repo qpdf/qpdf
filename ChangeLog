@@ -1,5 +1,11 @@
 2018-06-22  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add progress reporting to QPDFWriter. Programmatically, you can
+	register a progress reporter with registerProgressReporter(). From
+	the command line, passing --progress will give progress indicators
+	in increments of no less than 1% as output files are written.
+	Fixes #200.
+
 	* Add new method QPDF::getObjectCount(). This gives an approximate
 	(upper bound) account of objects in the QPDF object.
 
