@@ -191,8 +191,9 @@ struct Options
 
 struct QPDFPageData
 {
-    QPDFPageData(QPDF* qpdf, char const* range);
+    QPDFPageData(std::string const& filename, QPDF* qpdf, char const* range);
 
+    std::string filename;
     QPDF* qpdf;
     std::vector<QPDFObjectHandle> orig_pages;
     std::vector<int> selected_pages;
@@ -1213,7 +1214,10 @@ static void test_numrange(char const* range)
     }
 }
 
-QPDFPageData::QPDFPageData(QPDF* qpdf, char const* range) :
+QPDFPageData::QPDFPageData(std::string const& filename,
+                           QPDF* qpdf,
+                           char const* range) :
+    filename(filename),
     qpdf(qpdf),
     orig_pages(qpdf->getAllPages())
 {
@@ -1788,10 +1792,23 @@ static void parse_options(int argc, char* argv[], Options& o)
         usage("no output file may be given for this option");
     }
 
-    if (o.require_outfile && (strcmp(o.outfilename, "-") == 0) &&
-        o.split_pages)
+    if (o.require_outfile && (strcmp(o.outfilename, "-") == 0))
     {
-        usage("--split-pages may not be used when writing to standard output");
+        if (o.split_pages)
+        {
+            usage("--split-pages may not be used when"
+                  " writing to standard output");
+        }
+        if (o.verbose)
+        {
+            usage("--verbose may not be used when"
+                  " writing to standard output");
+        }
+        if (o.progress)
+        {
+            usage("--progress may not be used when"
+                  " writing to standard output");
+        }
     }
 
     if (QUtil::same_file(o.infilename, o.outfilename))
@@ -2114,6 +2131,11 @@ static void handle_page_specs(QPDF& pdf, Options& o,
                 QTC::TC("qpdf", "qpdf pages encryption password");
                 password = o.encryption_file_password;
             }
+            if (o.verbose)
+            {
+                std::cout << whoami << ": processing "
+                          << page_spec.filename << std::endl;
+            }
             qpdf->processInputSource(
                 new ClosedFileInputSource(
                     page_spec.filename.c_str()), password);
@@ -2123,7 +2145,8 @@ static void handle_page_specs(QPDF& pdf, Options& o,
         // Read original pages from the PDF, and parse the page range
         // associated with this occurrence of the file.
         parsed_specs.push_back(
-            QPDFPageData(page_spec_qpdfs[page_spec.filename],
+            QPDFPageData(page_spec.filename,
+                         page_spec_qpdfs[page_spec.filename],
                          page_spec.range));
     }
 
@@ -2144,6 +2167,12 @@ static void handle_page_specs(QPDF& pdf, Options& o,
     // without changing their object numbers. This enables other
     // things in the original file, such as outlines, to continue to
     // work.
+    if (o.verbose)
+    {
+        std::cout << whoami
+                  << ": removing unreferenced pages from primary input"
+                  << std::endl;
+    }
     QPDFPageDocumentHelper dh(pdf);
     std::vector<QPDFPageObjectHelper> orig_pages = dh.getAllPages();
     for (std::vector<QPDFPageObjectHelper>::iterator iter =
@@ -2162,6 +2191,11 @@ static void handle_page_specs(QPDF& pdf, Options& o,
          iter != parsed_specs.end(); ++iter)
     {
         QPDFPageData& page_data = *iter;
+        if (o.verbose)
+        {
+            std::cout << whoami << ": adding pages from "
+                      << page_data.filename << std::endl;
+        }
         for (std::vector<int>::iterator pageno_iter =
                  page_data.selected_pages.begin();
              pageno_iter != page_data.selected_pages.end();
@@ -2462,7 +2496,7 @@ static void write_outfile(QPDF& pdf, Options& o)
         QPDFWriter w(pdf, o.outfilename);
         set_writer_options(pdf, o, w);
         w.write();
-        if (o.verbose && o.outfilename)
+        if (o.verbose)
         {
             std::cout << whoami << ": wrote file "
                       << o.outfilename << std::endl;

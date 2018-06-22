@@ -1,5 +1,8 @@
 2018-06-22  Jay Berkenbilt  <ejb@ql.org>
 
+	* With --verbose, print information about each input file when
+	merging files.
+
 	* Add progress reporting to QPDFWriter. Programmatically, you can
 	register a progress reporter with registerProgressReporter(). From
 	the command line, passing --progress will give progress indicators
