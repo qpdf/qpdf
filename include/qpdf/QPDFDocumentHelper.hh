@@ -45,6 +45,10 @@ class QPDFDocumentHelper
     {
     }
     QPDF_DLL
+    virtual ~QPDFDocumentHelper()
+    {
+    }
+    QPDF_DLL
     QPDF& getQPDF()
     {
         return this->qpdf;

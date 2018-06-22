@@ -34,6 +34,7 @@
 class QPDFPageDocumentHelper: public QPDFDocumentHelper
 {
   public:
+    QPDF_DLL
     QPDFPageDocumentHelper(QPDF&);
 
     // Traverse page tree, and return all /Page objects wrapped in
@@ -85,6 +86,7 @@ class QPDFPageDocumentHelper: public QPDFDocumentHelper
         friend class QPDFPageDocumentHelper;
 
       public:
+        QPDF_DLL
         ~Members();
 
       private:

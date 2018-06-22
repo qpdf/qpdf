@@ -83,6 +83,7 @@
 class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
 {
   public:
+    QPDF_DLL
     QPDFAcroFormDocumentHelper(QPDF&);
 
     // This class lazily creates an internal cache of the mapping
@@ -163,6 +164,7 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
         friend class QPDFAcroFormDocumentHelper;
 
       public:
+        QPDF_DLL
         ~Members();
 
       private:

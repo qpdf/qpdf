@@ -32,6 +32,7 @@
 class QPDFPageObjectHelper: public QPDFObjectHelper
 {
   public:
+    QPDF_DLL
     QPDFPageObjectHelper(QPDFObjectHandle);
 
     // Returns an empty map if there are no images or no resources.
@@ -141,6 +142,7 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
         friend class QPDFPageObjectHelper;
 
       public:
+        QPDF_DLL
         ~Members();
 
       private:

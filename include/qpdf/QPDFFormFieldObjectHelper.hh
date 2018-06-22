@@ -33,7 +33,9 @@
 class QPDFFormFieldObjectHelper: public QPDFObjectHelper
 {
   public:
+    QPDF_DLL
     QPDFFormFieldObjectHelper();
+    QPDF_DLL
     QPDFFormFieldObjectHelper(QPDFObjectHandle);
 
     QPDF_DLL
@@ -143,6 +145,7 @@ class QPDFFormFieldObjectHelper: public QPDFObjectHelper
         friend class QPDFFormFieldObjectHelper;
 
       public:
+        QPDF_DLL
         ~Members();
 
       private:

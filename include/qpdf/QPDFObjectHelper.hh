@@ -46,6 +46,10 @@ class QPDFObjectHelper
     {
     }
     QPDF_DLL
+    virtual ~QPDFObjectHelper()
+    {
+    }
+    QPDF_DLL
     QPDFObjectHandle getObjectHandle()
     {
         return this->oh;

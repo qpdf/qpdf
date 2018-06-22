@@ -29,6 +29,7 @@
 class QPDFAnnotationObjectHelper: public QPDFObjectHelper
 {
   public:
+    QPDF_DLL
     QPDFAnnotationObjectHelper(QPDFObjectHandle);
 
     // This class provides helper methods for certain types of
@@ -73,6 +74,7 @@ class QPDFAnnotationObjectHelper: public QPDFObjectHelper
         friend class QPDFPageObjectHelper;
 
       public:
+        QPDF_DLL
         ~Members();
 
       private:
