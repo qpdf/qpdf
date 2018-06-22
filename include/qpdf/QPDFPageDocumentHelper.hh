@@ -52,6 +52,12 @@ class QPDFPageDocumentHelper: public QPDFDocumentHelper
     QPDF_DLL
     void pushInheritedAttributesToPage();
 
+    // This calls QPDFPageObjectHelper::removeUnreferencedResources
+    // for every page in the document. See comments in
+    // QPDFPageObjectHelper.hh for details.
+    QPDF_DLL
+    void removeUnreferencedResources();
+
     // Add new page at the beginning or the end of the current pdf.
     // The newpage parameter may be either a direct object, an
     // indirect object from this QPDF, or an indirect object from

@@ -122,6 +122,19 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     void addContentTokenFilter(
         PointerHolder<QPDFObjectHandle::TokenFilter> token_filter);
 
+    // A page's resources dictionary maps names to objects elsewhere
+    // in the file. This method walks through a page's contents and
+    // keeps tracks of which resources are referenced somewhere in the
+    // contents. Then it removes from the resources dictionary any
+    // object that is not referenced in the contents. This operation
+    // is most useful after calling
+    // QPDFPageDocumentHelper::pushInheritedAttributesToPage(). This
+    // method is used by page splitting code to avoid copying unused
+    // objects in files that used shared resource dictionaries across
+    // multiple pages.
+    QPDF_DLL
+    void removeUnreferencedResources();
+
   private:
     class Members
     {

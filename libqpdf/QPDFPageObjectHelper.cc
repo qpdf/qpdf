@@ -1,4 +1,5 @@
 #include <qpdf/QPDFPageObjectHelper.hh>
+#include <qpdf/QTC.hh>
 
 QPDFPageObjectHelper::Members::~Members()
 {
@@ -92,4 +93,67 @@ QPDFPageObjectHelper::addContentTokenFilter(
     PointerHolder<QPDFObjectHandle::TokenFilter> token_filter)
 {
     this->oh.addContentTokenFilter(token_filter);
+}
+
+class NameWatcher: public QPDFObjectHandle::TokenFilter
+{
+  public:
+    virtual ~NameWatcher()
+    {
+    }
+    virtual void handleToken(QPDFTokenizer::Token const&);
+    std::set<std::string> names;
+};
+
+void
+NameWatcher::handleToken(QPDFTokenizer::Token const& token)
+{
+    if (token.getType() == QPDFTokenizer::tt_name)
+    {
+        // Create a name object and get its name. This canonicalizes
+        // the representation of the name
+        this->names.insert(
+            QPDFObjectHandle::newName(token.getValue()).getName());
+    }
+    writeToken(token);
+}
+
+void
+QPDFPageObjectHelper::removeUnreferencedResources()
+{
+    NameWatcher nw;
+    filterPageContents(&nw);
+    // Walk through /Font and /XObject dictionaries, removing any
+    // resources that are not referenced. We must make copies of
+    // resource dictionaries down into the dictionaries are mutating
+    // to prevent mutating one dictionary from having the side effect
+    // of mutating the one it was copied from.
+    std::vector<std::string> to_filter;
+    to_filter.push_back("/Font");
+    to_filter.push_back("/XObject");
+    QPDFObjectHandle resources = this->oh.getKey("/Resources");
+    if (resources.isDictionary())
+    {
+        resources = resources.shallowCopy();
+        this->oh.replaceKey("/Resources", resources);
+    }
+    for (std::vector<std::string>::iterator d_iter = to_filter.begin();
+         d_iter != to_filter.end(); ++d_iter)
+    {
+        QPDFObjectHandle dict = resources.getKey(*d_iter);
+        if (! dict.isDictionary())
+        {
+            continue;
+        }
+        resources.replaceKey(*d_iter, dict);
+        std::set<std::string> keys = dict.getKeys();
+        for (std::set<std::string>::iterator k_iter = keys.begin();
+             k_iter != keys.end(); ++k_iter)
+        {
+            if (! nw.names.count(*k_iter))
+            {
+                dict.removeKey(*k_iter);
+            }
+        }
+    }
 }

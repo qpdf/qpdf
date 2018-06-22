@@ -33,6 +33,17 @@ QPDFPageDocumentHelper::pushInheritedAttributesToPage()
 }
 
 void
+QPDFPageDocumentHelper::removeUnreferencedResources()
+{
+    std::vector<QPDFPageObjectHelper> pages = getAllPages();
+    for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
+         iter != pages.end(); ++iter)
+    {
+        (*iter).removeUnreferencedResources();
+    }
+}
+
+void
 QPDFPageDocumentHelper::addPage(QPDFPageObjectHelper newpage, bool first)
 {
     this->qpdf.addPage(newpage.getObjectHandle(), first);

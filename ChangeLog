@@ -1,5 +1,13 @@
 2018-06-21  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add method QPDFPageObjectHelper::removeUnreferencedResources and
+	also QPDFPageDocumentHelper::removeUnreferencedResources that
+	calls the former on every page. This method removes any XObject or
+	Font references from the page's resource dictionary if they are
+	not referenced anywhere in any of the content streams. This
+	significantly reduces the size of split files whose pages
+	internally share resource dictionaries. Fixes #203.
+
 	* The --rotate option to qpdf no longer requires an explicit page
 	range. You can now rotate all pages of a document with
 	qpdf --rotate=angle in.pdf out.pdf. Fixes #211.
@@ -37,7 +45,7 @@
 	comments at the top of QPDFAcroFormDocumentHelper.hh for
 	additional discussion.
 
-	* Added new classes QPDFPageDocumentHelper and QPDFPageObjctHelper
+	* Added new classes QPDFPageDocumentHelper and QPDFPageObjectHelper
 	for page-level API functions. These classes introduce a new API
 	pattern of document helpers and object helpers in qpdf. The helper
 	classes provide a higher level API for working with certain types
@@ -46,7 +54,7 @@
 	structure. Please see the chapter in the documentation entitled
 	"Design and Library Notes" for additional discussion. The examples
 	have also been updated to use QPDFPageDocumentHelper and
-	QPDFPageObjctHelper when performing page-level operations.
+	QPDFPageObjectHelper when performing page-level operations.
 
 2018-06-19  Jay Berkenbilt  <ejb@ql.org>
 

@@ -2087,6 +2087,14 @@ static void handle_page_specs(QPDF& pdf, Options& o,
                          page_spec.range));
     }
 
+    for (std::map<std::string, QPDF*>::iterator iter = page_spec_qpdfs.begin();
+         iter != page_spec_qpdfs.end(); ++iter)
+    {
+        QPDFPageDocumentHelper dh(*((*iter).second));
+        dh.pushInheritedAttributesToPage();
+        dh.removeUnreferencedResources();
+    }
+
     // Clear all pages out of the primary QPDF's pages tree but leave
     // the objects in place in the file so they can be re-added
     // without changing their object numbers. This enables other
@@ -2358,6 +2366,9 @@ static void write_outfile(QPDF& pdf, Options& o)
             before = std::string(o.outfilename) + "-";
         }
 
+        QPDFPageDocumentHelper dh(pdf);
+        dh.pushInheritedAttributesToPage();
+        dh.removeUnreferencedResources();
         std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
         int pageno_len = QUtil::int_to_string(pages.size()).length();
         unsigned int num_pages = pages.size();
