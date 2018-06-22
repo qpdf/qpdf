@@ -1126,6 +1126,28 @@ outfile.pdf</option>
         lengths as direct or indirect differently from the original
         file, and the original file may have gaps in its numbering.
        </para>
+       <para>
+        See also <option>--preserve-unreferenced-resources</option>,
+        which does something completely different.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--preserve-unreferenced-resources</option></term>
+      <listitem>
+       <para>
+        Starting with qpdf 8.1, when splitting pages, qpdf ordinarily
+        attempts to remove images and fonts that are not used by a
+        page even if they are referenced in the page's resources
+        dictionary. This option suppresses that behavior. The only
+        reason to use this is if you suspect that qpdf is removing
+        resources it shouldn't be removing. If you encounter that
+        case, please report it as a bug.
+       </para>
+       <para>
+        See also <option>--preserve-unreferenced-resources</option>,
+        which does something completely different.
+       </para>
       </listitem>
      </varlistentry>
      <varlistentry>

@@ -122,7 +122,17 @@ void
 QPDFPageObjectHelper::removeUnreferencedResources()
 {
     NameWatcher nw;
-    filterPageContents(&nw);
+    try
+    {
+        filterPageContents(&nw);
+    }
+    catch (std::exception& e)
+    {
+        this->oh.warnIfPossible(
+            std::string("Unable to parse content stream: ") + e.what() +
+            "; not attempting to remove unreferenced objects from this page");
+        return;
+    }
     // Walk through /Font and /XObject dictionaries, removing any
     // resources that are not referenced. We must make copies of
     // resource dictionaries down into the dictionaries are mutating

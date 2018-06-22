@@ -1,3 +1,9 @@
+2018-06-22  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add new option --preserved-unreferenced-resources, which
+	suppresses removal of unreferenced objects from page resource
+	dictionaries during page splitting operations.
+
 2018-06-21  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add method QPDFPageObjectHelper::removeUnreferencedResources and

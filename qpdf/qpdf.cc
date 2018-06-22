@@ -91,6 +91,7 @@ struct Options
         ignore_xref_streams(false),
         qdf_mode(false),
         preserve_unreferenced_objects(false),
+        preserve_unreferenced_page_resources(false),
         newline_before_endstream(false),
         coalesce_contents(false),
         show_npages(false),
@@ -155,6 +156,7 @@ struct Options
     bool ignore_xref_streams;
     bool qdf_mode;
     bool preserve_unreferenced_objects;
+    bool preserve_unreferenced_page_resources;
     bool newline_before_endstream;
     std::string linearize_pass1;
     bool coalesce_contents;
@@ -403,6 +405,8 @@ familiar with the PDF file format or who are PDF developers.\n\
 --normalize-content=[yn]  enables or disables normalization of content streams\n\
 --object-streams=mode     controls handing of object streams\n\
 --preserve-unreferenced   preserve unreferenced objects\n\
+--preserve-unreferenced-resources\n\
+                          preserve unreferenced page resources\n\
 --newline-before-endstream  always put a newline before endstream\n\
 --coalesce-contents       force all pages' content to be a single stream\n\
 --qdf                     turns on \"QDF mode\" (below)\n\
@@ -1588,6 +1592,10 @@ static void parse_options(int argc, char* argv[], Options& o)
             {
                 o.preserve_unreferenced_objects = true;
             }
+            else if (strcmp(arg, "preserve-unreferenced-resources") == 0)
+            {
+                o.preserve_unreferenced_page_resources = true;
+            }
             else if (strcmp(arg, "newline-before-endstream") == 0)
             {
                 o.newline_before_endstream = true;
@@ -2087,12 +2095,16 @@ static void handle_page_specs(QPDF& pdf, Options& o,
                          page_spec.range));
     }
 
-    for (std::map<std::string, QPDF*>::iterator iter = page_spec_qpdfs.begin();
-         iter != page_spec_qpdfs.end(); ++iter)
+    if (! o.preserve_unreferenced_page_resources)
     {
-        QPDFPageDocumentHelper dh(*((*iter).second));
-        dh.pushInheritedAttributesToPage();
-        dh.removeUnreferencedResources();
+        for (std::map<std::string, QPDF*>::iterator iter =
+                 page_spec_qpdfs.begin();
+             iter != page_spec_qpdfs.end(); ++iter)
+        {
+            QPDFPageDocumentHelper dh(*((*iter).second));
+            dh.pushInheritedAttributesToPage();
+            dh.removeUnreferencedResources();
+        }
     }
 
     // Clear all pages out of the primary QPDF's pages tree but leave
@@ -2366,9 +2378,12 @@ static void write_outfile(QPDF& pdf, Options& o)
             before = std::string(o.outfilename) + "-";
         }
 
-        QPDFPageDocumentHelper dh(pdf);
-        dh.pushInheritedAttributesToPage();
-        dh.removeUnreferencedResources();
+        if (! o.preserve_unreferenced_page_resources)
+        {
+            QPDFPageDocumentHelper dh(pdf);
+            dh.pushInheritedAttributesToPage();
+            dh.removeUnreferencedResources();
+        }
         std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
         int pageno_len = QUtil::int_to_string(pages.size()).length();
         unsigned int num_pages = pages.size();
