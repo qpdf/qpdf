@@ -453,7 +453,7 @@ $td->runtest("check output",
 show_ntests();
 # ----------
 $td->notify("--- ID and Encryption Parameter Issues ---");
-$n_tests += 12;
+$n_tests += 13;
 
 # Encrypt files whose /ID strings are other than 32 bytes long (bug
 # 2991412). Also linearize these files, which was reported in a
@@ -506,6 +506,19 @@ $td->runtest("short /O or /U",
              {$td->COMMAND =>
                   "qpdf --password=19723102477 --check short-O-U.pdf"},
              {$td->FILE => "short-O-U.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+# A file was sent to me privately as part of issue 212. This file was
+# encrypted and had /R=3 and /V=1 and was using a 40-bit key. qpdf was
+# failing to work properly on files with /R=3 and 40-bit keys. The
+# test file is not this private file, but the encryption parameters
+# were copied from it. Like the bug file, qpdf < 8.1 can't decrypt it.
+$td->runtest("/R 3 with 40-bit key",
+             {$td->COMMAND =>
+                  "qpdf --password=623 --check --show-encryption-key" .
+                  " encrypted-40-bit-R3.pdf"},
+             {$td->FILE => "encrypted-40-bit-R3.out",
               $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 

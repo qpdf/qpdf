@@ -183,7 +183,7 @@ truncate_password_V5(std::string const& password)
 }
 
 static void
-iterate_md5_digest(MD5& md5, MD5::Digest& digest, int iterations)
+iterate_md5_digest(MD5& md5, MD5::Digest& digest, int iterations, int key_len)
 {
     md5.digest(digest);
 
@@ -191,7 +191,7 @@ iterate_md5_digest(MD5& md5, MD5::Digest& digest, int iterations)
     {
 	MD5 m;
 	m.encodeDataIncrementally(reinterpret_cast<char*>(digest),
-                                  sizeof(digest));
+                                  key_len);
 	m.digest(digest);
     }
 }
@@ -437,7 +437,8 @@ QPDF::compute_encryption_key_from_password(
 	md5.encodeDataIncrementally(bytes, 4);
     }
     MD5::Digest digest;
-    iterate_md5_digest(md5, digest, ((data.getR() >= 3) ? 50 : 0));
+    iterate_md5_digest(md5, digest, ((data.getR() >= 3) ? 50 : 0),
+                       data.getLengthBytes());
     return std::string(reinterpret_cast<char*>(digest),
                        std::min(static_cast<int>(sizeof(digest)),
                                 data.getLengthBytes()));
@@ -463,7 +464,8 @@ compute_O_rc4_key(std::string const& user_password,
     md5.encodeDataIncrementally(
 	pad_or_truncate_password_V4(password).c_str(), key_bytes);
     MD5::Digest digest;
-    iterate_md5_digest(md5, digest, ((data.getR() >= 3) ? 50 : 0));
+    iterate_md5_digest(md5, digest, ((data.getR() >= 3) ? 50 : 0),
+                       data.getLengthBytes());
     memcpy(key, digest, OU_key_bytes_V4);
 }
 
@@ -933,6 +935,11 @@ QPDF::initializeEncryption()
     if (encryption_dict.getKey("/Length").isInteger())
     {
 	Length = encryption_dict.getKey("/Length").getIntValue();
+        if (R < 3)
+        {
+            // Force Length to 40 regardless of what the file says.
+            Length = 40;
+        }
 	if ((Length % 8) || (Length < 40) || (Length > 256))
 	{
 	    throw QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
