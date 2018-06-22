@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <string.h>
 #include <iostream>
 #include <stdlib.h>
 #include <qpdf/QPDF.hh>
