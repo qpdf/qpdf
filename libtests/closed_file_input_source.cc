@@ -28,7 +28,7 @@ void do_tests(InputSource* is)
     char b[1];
     b[0] = '\0';
 #ifdef _WIN32
-    // Emperical evidence, and the passage of the rest of the qpdf
+    // Empirical evidence, and the passage of the rest of the qpdf
     // test suite, suggest that this is working on Windows in the way
     // that it needs to work. If this ifdef is made to be true on
     // Windows, it passes with ClosedFileInputSource but not with
