@@ -224,6 +224,7 @@ cl
 classname
 clearPipelineStack
 cleartext
+ClosedFileInputSource
 CloseHandle
 closeObject
 cmath
@@ -254,6 +255,7 @@ CopiedStreamDataProvider
 copyEncryptionParameters
 copyForeign
 copyForeignObject
+copyObject
 cout
 CoVantage
 cp
@@ -561,6 +563,7 @@ getErrorCode
 getErrorMessage
 getExtensionLevel
 getFieldForAnnotation
+getFieldType
 getFileChecksum
 GetFileInformationByHandle
 getFilename
@@ -574,6 +577,7 @@ getHeight
 getHexDigest
 getId
 getInheritableFieldValue
+getInheritableFieldValueAsName
 getInheritableFieldValueAsString
 getInlineImageValue
 getInstance
@@ -602,6 +606,7 @@ getObj
 getObject
 getObjectByID
 getObjectByObjGen
+getObjectCount
 getObjectHandle
 getObjectID
 getObjectStreamData
@@ -742,6 +747,7 @@ ImageMask
 ImageProvider
 inbuf
 includeIgnorable
+indicateProgress
 INDOC
 indx
 inf
@@ -958,6 +964,7 @@ multithreaded
 Mutator
 mutators
 mv
+NameWatcher
 nannots
 nbackrefs
 nbits
@@ -1021,6 +1028,7 @@ num
 numericValue
 numrange
 nval
+nw
 nwalsh
 obj
 ObjAccessor
@@ -1115,6 +1123,7 @@ PDFContext
 PDFDocEncoding
 pdfDumpInfoDict
 PDFs
+pdh
 pdlin
 pe
 perl
@@ -1144,6 +1153,7 @@ pornin
 pos
 POSIX
 PP
+pr
 pragma
 pre
 precompiled
@@ -1167,6 +1177,7 @@ ProcSet
 procsets
 programlisting
 programmatically
+ProgressReporter
 Projet
 prov
 provideRandomData
@@ -1278,12 +1289,14 @@ refpage
 refpos
 regexp
 registerForeignStream
+registerProgressReporter
 releaseResolved
 ReleaseResolver
 remotesensing
 removeKey
 removePage
 removereplace
+removeUnreferencedResources
 repl
 replaceDict
 replaceFilterData
@@ -1293,6 +1306,7 @@ replaceObject
 replaceOrRemoveKey
 replaceReserved
 replaceStreamData
+reportProgress
 repos
 reserveObjects
 resetBits

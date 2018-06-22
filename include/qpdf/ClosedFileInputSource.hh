@@ -24,7 +24,7 @@
 
 // This is an input source that reads from files, like
 // FileInputSource, except that it opens and close the file
-// surrounding every operation. This decreases effiency, but it allows
+// surrounding every operation. This decreases efficiency, but it allows
 // many more of these to exist at once than the maximum number of open
 // file descriptors. This is used for merging large numbers of files.
 
