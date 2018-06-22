@@ -1290,10 +1290,9 @@ QPDFObjectHandle::pipeContentStreams(
         if (! stream.pipeStreamData(p, 0, qpdf_dl_specialized))
         {
             QTC::TC("qpdf", "QPDFObjectHandle errors in parsecontent");
-            warn(stream.getOwningQPDF(),
-                 QPDFExc(qpdf_e_damaged_pdf, "content stream",
-                         description, 0,
-                         "errors while decoding content stream"));
+            throw QPDFExc(qpdf_e_damaged_pdf, "content stream",
+                          description, 0,
+                          "errors while decoding content stream");
         }
     }
 }
