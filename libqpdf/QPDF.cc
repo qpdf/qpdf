@@ -1218,6 +1218,22 @@ QPDF::showXRefTable()
     }
 }
 
+size_t
+QPDF::getObjectCount()
+{
+    // This method returns the next available indirect object number.
+    // makeIndirectObject uses it for this purpose.
+    QPDFObjGen o1(0, 0);
+    if (! this->m->obj_cache.empty())
+    {
+	o1 = (*(this->m->obj_cache.rbegin())).first;
+    }
+    QPDFObjGen o2 = (*(this->m->xref_table.rbegin())).first;
+    QTC::TC("qpdf", "QPDF indirect last obj from xref",
+	    (o2.getObj() > o1.getObj()) ? 1 : 0);
+    return std::max(o1.getObj(), o2.getObj());
+}
+
 std::vector<QPDFObjectHandle>
 QPDF::getAllObjects()
 {
@@ -1904,15 +1920,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
 QPDFObjectHandle
 QPDF::makeIndirectObject(QPDFObjectHandle oh)
 {
-    QPDFObjGen o1(0, 0);
-    if (! this->m->obj_cache.empty())
-    {
-	o1 = (*(this->m->obj_cache.rbegin())).first;
-    }
-    QPDFObjGen o2 = (*(this->m->xref_table.rbegin())).first;
-    QTC::TC("qpdf", "QPDF indirect last obj from xref",
-	    (o2.getObj() > o1.getObj()) ? 1 : 0);
-    int max_objid = std::max(o1.getObj(), o2.getObj());
+    int max_objid = getObjectCount();
     QPDFObjGen next(max_objid + 1, 0);
     this->m->obj_cache[next] =
 	ObjCache(QPDFObjectHandle::ObjAccessor::getObject(oh), -1, -1);

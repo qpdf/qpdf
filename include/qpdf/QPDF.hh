@@ -431,6 +431,12 @@ class QPDF
     QPDF_DLL
     void showXRefTable();
 
+    // Return the approximate number of indirect objects. It is
+    // approximate because not all objects in the file are preserved
+    // in all cases.
+    QPDF_DLL
+    size_t getObjectCount();
+
     // Returns a list of indirect objects for every object in the xref
     // table. Useful for discovering objects that are not otherwise
     // referenced.

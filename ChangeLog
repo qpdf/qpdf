@@ -1,5 +1,8 @@
 2018-06-22  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add new method QPDF::getObjectCount(). This gives an approximate
+	(upper bound) account of objects in the QPDF object.
+
 	* Don't leave files open when merging. This makes it possible
 	merge more files at once than the operating system's open file
 	limit. Fixes #154.
