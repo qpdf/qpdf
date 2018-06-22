@@ -1,5 +1,10 @@
 2018-06-22  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add ClosedFileInputSource class, and input source that keeps its
+	input file closed when not reading it. At the expense of some
+	performance, this allows you to operate on many files without
+	opening too many files at the operating system level.
+
 	* Add new option --preserved-unreferenced-resources, which
 	suppresses removal of unreferenced objects from page resource
 	dictionaries during page splitting operations.

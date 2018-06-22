@@ -9,6 +9,7 @@ SRCS_libqpdf = \
 	libqpdf/BitWriter.cc \
 	libqpdf/Buffer.cc \
 	libqpdf/BufferInputSource.cc \
+	libqpdf/ClosedFileInputSource.cc \
 	libqpdf/ContentNormalizer.cc \
 	libqpdf/FileInputSource.cc \
 	libqpdf/InputSource.cc \

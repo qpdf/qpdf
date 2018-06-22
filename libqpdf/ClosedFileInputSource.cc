@@ -1,0 +1,103 @@
+#include <qpdf/ClosedFileInputSource.hh>
+#include <qpdf/FileInputSource.hh>
+
+ClosedFileInputSource::Members::Members(char const* filename) :
+    filename(filename),
+    offset(0),
+    fis(0)
+{
+}
+
+ClosedFileInputSource::Members::~Members()
+{
+    if (fis)
+    {
+        delete fis;
+    }
+}
+
+ClosedFileInputSource::ClosedFileInputSource(char const* filename) :
+    m(new Members(filename))
+{
+}
+
+ClosedFileInputSource::~ClosedFileInputSource()
+{
+}
+
+void
+ClosedFileInputSource::before()
+{
+    if (0 == this->m->fis)
+    {
+        this->m->fis = new FileInputSource();
+        this->m->fis->setFilename(this->m->filename.c_str());
+        this->m->fis->seek(this->m->offset, SEEK_SET);
+        this->m->fis->setLastOffset(this->last_offset);
+    }
+}
+
+void
+ClosedFileInputSource::after()
+{
+    this->last_offset = this->m->fis->getLastOffset();
+    this->m->offset = this->m->fis->tell();
+    delete this->m->fis;
+    this->m->fis = 0;
+}
+
+qpdf_offset_t
+ClosedFileInputSource::findAndSkipNextEOL()
+{
+    before();
+    qpdf_offset_t r = this->m->fis->findAndSkipNextEOL();
+    after();
+    return r;
+}
+
+std::string const&
+ClosedFileInputSource::getName() const
+{
+    return this->m->filename;
+}
+
+qpdf_offset_t
+ClosedFileInputSource::tell()
+{
+    before();
+    qpdf_offset_t r = this->m->fis->tell();
+    after();
+    return r;
+}
+
+void
+ClosedFileInputSource::seek(qpdf_offset_t offset, int whence)
+{
+    before();
+    this->m->fis->seek(offset, whence);
+    after();
+}
+
+void
+ClosedFileInputSource::rewind()
+{
+    this->m->offset = 0;
+}
+
+size_t
+ClosedFileInputSource::read(char* buffer, size_t length)
+{
+    before();
+    size_t r = this->m->fis->read(buffer, length);
+    after();
+    return r;
+}
+
+void
+ClosedFileInputSource::unreadCh(char ch)
+{
+    before();
+    this->m->fis->unreadCh(ch);
+    // Don't call after -- the file has to stay open after this
+    // operation.
+}

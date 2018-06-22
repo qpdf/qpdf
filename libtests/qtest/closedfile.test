@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+chdir("closedfile") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('closed_file_input_source');
+
+$td->runtest("closed file input source",
+             {$td->COMMAND => "closed_file_input_source"},
+             {$td->FILE => "output", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->report(1);

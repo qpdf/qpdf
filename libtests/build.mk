@@ -3,6 +3,7 @@ BINS_libtests = \
 	ascii85 \
 	bits \
 	buffer \
+	closed_file_input_source \
 	concatenate \
 	dct_compress \
 	dct_uncompress \
