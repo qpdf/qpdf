@@ -1235,8 +1235,10 @@ my $pages_options = "--pages page-labels-and-outlines.pdf 1,3,5-7,z" .
 
 $td->runtest("merge three files",
              {$td->COMMAND => "qpdf page-labels-and-outlines.pdf a.pdf" .
-                  " $pages_options --static-id"},
-             {$td->STRING => "", $td->EXIT_STATUS => 0});
+                  " $pages_options --static-id --verbose --progress",
+                  $td->FILTER => "perl filter-progress.pl"},
+             {$td->FILE => "verbose-merge.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 # Manually verified about this file: make sure that outline entries
 # that pointed to pages that were preserved still work in the copy,
 # and verify that all pages are as expected.  page-labels-and-outlines
