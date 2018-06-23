@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "8.0.2">
-<!ENTITY lastreleased "March 6, 2018">
+<!ENTITY swversion "8.1.0">
+<!ENTITY lastreleased "June 22, 2018">
 ]>
 <book>
  <bookinfo>
@@ -3239,6 +3239,189 @@ print "\n";
    <filename>ChangeLog</filename> in the source distribution.
   </para>
   <variablelist>
+   <varlistentry>
+    <term>8.1.0: June 23, 2018</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Usability Improvements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          When splitting files, qpdf detects fonts and images that the
+          document metadata claims are referenced from a page but are
+          not actually referenced and omits them from the output file.
+          This change can cause a significant reduction in the size of
+          split PDF files for files created by some software packages.
+          Prior versions of qpdf would believe the document metadata
+          and sometimes include all the images from all the other
+          pages even though the pages were no longer present. In the
+          unlikely event that the old behavior should be desired, it
+          can be enabled by specifying
+          <option>--preserve-unreferenced-resources</option>. For
+          additional details, please see <xref
+          linkend="ref.advanced-transformation"/>.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          When merging multiple PDF files, qpdf no longer leaves all
+          the files open. This makes it possible to merge numbers of
+          files that may exceed the operating system's limit for the
+          maximum number of open files.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          The <option>--rotate</option> option's syntax has been
+          extended to make the page range optional. If you specify
+          <option>--rotate=<replaceable>angle</replaceable></option>
+          without specifying a page range, the rotation will be
+          applied to all pages. This can be especially useful for
+          adjusting a PDF created from a multi-page document that
+          was scanned upside down.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          When merging multiple files, the <option>--verbose</option>
+          option now prints information about each file as it operates
+          on that file.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          When the <option>--progress</option> option is specified,
+          qpdf will print a running indicator of its best guess at how
+          far through the writing process it is. Note that, as with
+          all progress meters, it's an approximation. This option is
+          implemented in a way that makes it useful for software that
+          uses the qpdf library; see API Enhancements below.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Bug Fixes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Properly decrypt files that use revision 3 of the standard
+          security handler but use 40 bit keys (even though revision 3
+          supports 128-bit keys).
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Limit depth of nested data structures to prevent crashes
+          from certain types of malformed (malicious) PDFs.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          In &ldquo;newline before endstream&rdquo; mode, insert the
+          required extra newline before the
+          <literal>endstream</literal> at the end of object streams.
+          This one case was previously omitted.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        API Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          The first round of higher level &ldquo;helper&rdquo;
+          interfaces has been introduced. These are designed to
+          provide a more convenient way of interacting with certain
+          document features than using
+          <classname>QPDFObjectHandle</classname> directly. For
+          details on helpers, see <xref
+          linkend="ref.helper-classes"/>. Specific additional
+          interfaces are described below.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add two new document helper classes:
+          <classname>QPDFPageDocumentHelper</classname> for working
+          with pages, and
+          <classname>QPDFAcroFormDocumentHelper</classname> for
+          working with interactive forms. No old methods have been
+          removed, but <classname>QPDFPageDocumentHelper</classname>
+          is now the preferred way to perform operations on pages
+          rather than calling the old methods in
+          <classname>QPDFObjectHandle</classname> and
+          <classname>QPDF</classname> directly. Comments in the header
+          files direct you to the new interfaces. Please see the
+          header files and <filename>ChangeLog</filename> for
+          additional details.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add three new object helper class:
+          <classname>QPDFPageObjectHelper</classname> for pages,
+          <classname>QPDFFormFieldObjectHelper</classname> for
+          interactive form fields, and
+          <classname>QPDFAnnotationObjectHelper</classname> for
+          annotations. All three classes are fairly sparse at the
+          moment, but they have some useful, basic functionality.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          A new example program
+          <filename>examples/pdf-set-form-values.cc</filename> has
+          been added that illustrates use of the new document and
+          object helpers.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          The method
+          <function>QPDFWriter::registerProgressReporter</function>
+          has been added. This method allows you to register a
+          function that is called by <classname>QPDFWriter</classname>
+          to update your idea of the percentage it thinks it is
+          through writing its output. Client programs can use this to
+          implement reasonably accurate progress meters. The
+          <command>qpdf</command> command line tool uses this to
+          implement its <option>--progress</option> option.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          New methods
+          <function>QPDFObjectHandle::newUnicodeString</function> and
+          <function>QPDFObject::unparseBinary</function> have been
+          added to allow for more convenient creation of strings that
+          are explicitly encoded using big-endian UTF-16. This is
+          useful for creating strings that appear outside of content
+          streams, such as labels, form fields, outlines, document
+          metadata, etc.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          A new class
+          <classname>QPDFObjectHandle::Rectangle</classname> has been
+          added to ease working with PDF rectangles, which are just
+          arrays of four numeric values.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
     <term>8.0.2: March 6, 2018</term>
     <listitem>

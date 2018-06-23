@@ -1,4 +1,12 @@
+2018-06-23  Jay Berkenbilt  <ejb@ql.org>
+
+	* 8.1.0: release
+
 2018-06-22  Jay Berkenbilt  <ejb@ql.org>
+
+	* Bug fix: properly decrypt files with 40-bit keys that use
+	revision 3 of the security handler. Prior to this, qpdf was
+	reporting "invalid password" in this case. Fixes #212.
 
 	* With --verbose, print information about each input file when
 	merging files.
@@ -21,7 +29,7 @@
 	performance, this allows you to operate on many files without
 	opening too many files at the operating system level.
 
-	* Add new option --preserved-unreferenced-resources, which
+	* Add new option --preserve-unreferenced-resources, which
 	suppresses removal of unreferenced objects from page resource
 	dictionaries during page splitting operations.
 

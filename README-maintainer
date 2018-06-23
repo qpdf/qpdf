@@ -88,18 +88,18 @@ RELEASE PREPARATION
   * Check out the current version
   * ./autogen.sh && ./configure --enable-werror && make -j$(nproc) build_libqpdf
   * Checkout the last release
-  * make check NO_REBUILD=1
+  * make -k check NO_REBUILD=1
+
+* Update release notes in manual. Look at diffs and ChangeLog. Update
+  release date in `manual/qpdf-manual.xml`. Remember to ensure that
+  the entities at the top of the document are consistent with the
+  release notes for both version and release date.
 
 * Make sure version numbers are consistent in the following locations:
   * configure.ac
   * libqpdf/QPDF.cc
   * manual/qpdf-manual.xml
   `make_dist` verifies this consistency.
-
-* Update release notes in manual. Look at diffs and ChangeLog. Update
-  release date in `manual/qpdf-manual.xml`. Remember to ensure that
-  the entities at the top of the document are consistent with the
-  release notes for both version and release date.
 
 * Add a release entry to ChangeLog.
 
