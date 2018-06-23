@@ -126,17 +126,21 @@ gpg --detach-sign --armor qpdf-$version.tar.gz
   For iterating on the release during testing, pass `--no-tests` to
   make_dist to skip the test suite.
 
-* Generate a signed AppImage using the docker image in appimage.
-  Arguments to the docker container are arguments to git clone. The
-  build should be made off the exact commit that will be officially
-  tagged as the release but built prior to tagging the release.
+* Generate an AppImage using the docker image in appimage. Arguments
+  to the docker container are arguments to git clone. The build should
+  be made off the exact commit that will be officially tagged as the
+  release but built prior to tagging the release. We used to create
+  signed AppImages, but this is problematic for various reasons (older
+  gpg on the build image, problems embedding the key in the AppImage
+  because of ELF issues), and we are signing the AppImages externally,
+  so it doesn't really matter.
+
   Example:
 
 cd appimage
 docker build -t qpdfbuild .
 \rm -rf /tmp/build
 mkdir -p /tmp/build
-cp -rLp ~/.gnupg/. /tmp/build/.gnupg
 docker run --privileged -ti --rm -v /tmp/build:/tmp/build qpdfbuild https://github.com/jberkenbilt/qpdf -b work
 
   The AppImage in /tmp/build/qpdf/appimage/build should be called
@@ -152,9 +156,10 @@ docker run --privileged -ti --rm -v /tmp/build:/tmp/build qpdfbuild https://gith
     shield, and go to "View Features". Disable all features. Disable
     antivirus until next restart.
   * In each window simultaneously, run ./make_windows_releases
-    * NOTE: For now, test failure is not fatal for 32-bit Windows
-      builds because of unknown fragility in the test environment.
-      Check test logs carefully. Tests must pass on 64-bit.
+    * NOTE: For now, test failures are not fatal because of unknown
+      fragility in the Windows test environment. If any tests fail,
+      test logs are copied to qtest-*. Check test logs carefully
+      before accepting the releases.
   * Copy the four resulting zip files into the release archive area
   * Re-enable anti-virus software
 

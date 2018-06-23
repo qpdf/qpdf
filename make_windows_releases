@@ -31,19 +31,16 @@ set -x
 cwd=`pwd`
 PATH=$cwd/libqpdf/build:$PATH
 
-rm -rf install-mingw$wordsize install-msvc$wordsize
-
-./config-msvc
-make -j8
-make -k check || test $wordsize = 32
-make install
-make distclean
-
-./config-mingw
-make -j8
-make -k check || test $wordsize = 32
-make install
-make distclean
+for i in msvc mingw; do
+    rm -rf {install,qtest}-$i$wordsize
+    ./config-$i
+    make -j8
+    make -k check || \
+        { mkdir qtest-$i$wordsize; \
+          tar cf - */build/qtest.log | (cd qtest-$i$wordsize; tar xf -) }
+    make install
+    make distclean
+done
 
 touch win.$wordsize
 
