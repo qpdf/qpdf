@@ -190,9 +190,19 @@ I find it useful to make reference to them in this list
    came from Adobe's example site.
 
  * Consider the possibility of doing something locale-aware to support
-   non-ASCII passwords.  Update documentation if this is done.
-   Consider implementing full Unicode password algorithms from newer
-   encryption formats.
+   non-ASCII passwords. Update documentation if this is done. Consider
+   implementing full Unicode password algorithms from newer encryption
+   formats. See ../misc/unicode-password*. If code is added to
+   properly encode Unicode passwords, figure out how to deal with
+   backward compatibility. Either require some additional flag to
+   decode the password or provide a `--raw-password` flag to suppress
+   decoding. While automatically encoding breaks backward
+   compatibility, it's probably the right behavior because the current
+   behavior is arguably a bug. Alternatively, if the password doesn't
+   work as a raw password and contains characters outside US-ASCII,
+   try various encoding methods to see if any work. See section
+   7.6.3.3, algorithms 2 and 2A, in the ISO spec for details. (This is
+   tracked in https://github.com/qpdf/qpdf/issues/215.)
 
  * See if we can avoid preserving unreferenced objects in object
    streams even when preserving the object streams.
