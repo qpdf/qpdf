@@ -65,6 +65,11 @@ int main()
     std::cout << "testing with ClosedFileInputSource\n";
     ClosedFileInputSource cf("input");
     do_tests(&cf);
+    std::cout << "testing with ClosedFileInputSource in stay open mode\n";
+    ClosedFileInputSource cf2("input");
+    cf2.stayOpen(true);
+    do_tests(&cf2);
+    cf2.stayOpen(false);
     std::cout << "testing with FileInputSource\n";
     FileInputSource f;
     f.setFilename("input");

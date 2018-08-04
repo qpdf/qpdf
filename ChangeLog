@@ -1,3 +1,10 @@
+2018-08-04  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add ClosedFileInputSource::stayOpen method, enabling a
+	ClosedFileInputSource to stay open during manually indicated
+	periods of high activity, thus reducing the overhead of frequent
+	open/close operations.
+
 2018-06-23  Jay Berkenbilt  <ejb@ql.org>
 
 	* 8.1.0: release

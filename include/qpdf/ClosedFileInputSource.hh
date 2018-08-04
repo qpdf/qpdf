@@ -55,6 +55,13 @@ class ClosedFileInputSource: public InputSource
     QPDF_DLL
     virtual void unreadCh(char ch);
 
+    // The file stays open between calls to stayOpen(true) and
+    // stayOpen(false). You can use this to surround multiple
+    // operations on a single ClosedFileInputSource to reduce the
+    // overhead of a separate open/close on each call.
+    QPDF_DLL
+    void stayOpen(bool);
+
   private:
     ClosedFileInputSource(ClosedFileInputSource const&);
     ClosedFileInputSource& operator=(ClosedFileInputSource const&);
@@ -76,6 +83,7 @@ class ClosedFileInputSource: public InputSource
         std::string filename;
         qpdf_offset_t offset;
         FileInputSource* fis;
+        bool stay_open;
     };
     PointerHolder<Members> m;
 };

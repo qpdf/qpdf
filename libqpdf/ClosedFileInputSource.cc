@@ -4,7 +4,8 @@
 ClosedFileInputSource::Members::Members(char const* filename) :
     filename(filename),
     offset(0),
-    fis(0)
+    fis(0),
+    stay_open(false)
 {
 }
 
@@ -42,6 +43,10 @@ ClosedFileInputSource::after()
 {
     this->last_offset = this->m->fis->getLastOffset();
     this->m->offset = this->m->fis->tell();
+    if (this->m->stay_open)
+    {
+        return;
+    }
     delete this->m->fis;
     this->m->fis = 0;
 }
@@ -82,6 +87,10 @@ void
 ClosedFileInputSource::rewind()
 {
     this->m->offset = 0;
+    if (this->m->fis)
+    {
+        this->m->fis->rewind();
+    }
 }
 
 size_t
@@ -100,4 +109,14 @@ ClosedFileInputSource::unreadCh(char ch)
     this->m->fis->unreadCh(ch);
     // Don't call after -- the file has to stay open after this
     // operation.
+}
+
+void
+ClosedFileInputSource::stayOpen(bool val)
+{
+    this->m->stay_open = val;
+    if ((! val) && this->m->fis)
+    {
+        after();
+    }
 }

@@ -1,3 +1,4 @@
 testing with ClosedFileInputSource
+testing with ClosedFileInputSource in stay open mode
 testing with FileInputSource
 all assertions passed
