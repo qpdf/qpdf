@@ -2103,6 +2103,7 @@ static void handle_page_specs(QPDF& pdf, Options& o,
 
     // Create a QPDF object for each file that we may take pages from.
     std::map<std::string, QPDF*> page_spec_qpdfs;
+    std::map<std::string, ClosedFileInputSource*> page_spec_cfis;
     page_spec_qpdfs[o.infilename] = &pdf;
     std::vector<QPDFPageData> parsed_specs;
     for (std::vector<PageSpec>::iterator iter = o.page_specs.begin();
@@ -2136,10 +2137,14 @@ static void handle_page_specs(QPDF& pdf, Options& o,
                 std::cout << whoami << ": processing "
                           << page_spec.filename << std::endl;
             }
-            qpdf->processInputSource(
-                new ClosedFileInputSource(
-                    page_spec.filename.c_str()), password);
+            ClosedFileInputSource* cis =
+                new ClosedFileInputSource(page_spec.filename.c_str());
+            PointerHolder<InputSource> is(cis);
+            cis->stayOpen(true);
+            qpdf->processInputSource(is, password);
+            cis->stayOpen(false);
             page_spec_qpdfs[page_spec.filename] = qpdf;
+            page_spec_cfis[page_spec.filename] = cis;
         }
 
         // Read original pages from the PDF, and parse the page range
@@ -2156,9 +2161,20 @@ static void handle_page_specs(QPDF& pdf, Options& o,
                  page_spec_qpdfs.begin();
              iter != page_spec_qpdfs.end(); ++iter)
         {
+            std::string const& filename = (*iter).first;
+            ClosedFileInputSource* cis = 0;
+            if (page_spec_cfis.count(filename))
+            {
+                cis = page_spec_cfis[filename];
+                cis->stayOpen(true);
+            }
             QPDFPageDocumentHelper dh(*((*iter).second));
             dh.pushInheritedAttributesToPage();
             dh.removeUnreferencedResources();
+            if (cis)
+            {
+                cis->stayOpen(false);
+            }
         }
     }
 
@@ -2204,7 +2220,17 @@ static void handle_page_specs(QPDF& pdf, Options& o,
             // Pages are specified from 1 but numbered from 0 in the
             // vector
             int pageno = *pageno_iter - 1;
+            ClosedFileInputSource* cis = 0;
+            if (page_spec_cfis.count(page_data.filename))
+            {
+                cis = page_spec_cfis[page_data.filename];
+                cis->stayOpen(true);
+            }
             dh.addPage(page_data.orig_pages.at(pageno), false);
+            if (cis)
+            {
+                cis->stayOpen(false);
+            }
             if (page_data.qpdf == &pdf)
             {
                 // This is a page from the original file. Keep track

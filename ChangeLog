@@ -1,5 +1,8 @@
 2018-08-04  Jay Berkenbilt  <ejb@ql.org>
 
+	* Performance fix: optimize page merging operation to avoid
+	unnecessary open/close calls on files being merged. Fixes #217.
+
 	* Add ClosedFileInputSource::stayOpen method, enabling a
 	ClosedFileInputSource to stay open during manually indicated
 	periods of high activity, thus reducing the overhead of frequent
