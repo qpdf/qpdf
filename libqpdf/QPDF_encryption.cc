@@ -1396,7 +1396,7 @@ QPDF::isEncrypted(int& R, int& P, int& V,
 	R = Rkey.getIntValue();
         V = Vkey.getIntValue();
         stream_method = this->m->cf_stream;
-        string_method = this->m->cf_stream;
+        string_method = this->m->cf_string;
         file_method = this->m->cf_file;
 	return true;
     }
