@@ -1152,6 +1152,7 @@ class QPDF
         friend class QPDF;
 
       public:
+        QPDF_DLL
         ~Members();
 
       private:

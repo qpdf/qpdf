@@ -100,6 +100,7 @@ class QPDFObject
     {
         friend class QPDFObject;
       public:
+        QPDF_DLL
         ~Members();
       private:
         Members();

@@ -530,6 +530,7 @@ class QPDFWriter
         friend class QPDFWriter;
 
       public:
+        QPDF_DLL
         ~Members();
 
       private:
