@@ -927,6 +927,17 @@ $td->runtest("don't overwrite self",
 
 show_ntests();
 # ----------
+$td->notify("--- Progress reporting ---");
+$n_tests += 1;
+
+$td->runtest("progress report on small file",
+             {$td->COMMAND => "qpdf --progress minimal.pdf a.pdf",
+                  $td->FILTER => "perl filter-progress.pl"},
+             {$td->FILE => "small-progress.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+show_ntests();
+# ----------
 $td->notify("--- Type checks ---");
 $n_tests += 4;
 # Whenever object-types.pdf is edited, object-types-os.pdf should be

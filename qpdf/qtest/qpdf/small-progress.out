@@ -1,0 +1,3 @@
+qpdf: a.pdf: write progress: 0%
+....other write progress....
+qpdf: a.pdf: write progress: 100%
