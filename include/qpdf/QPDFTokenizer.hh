@@ -229,6 +229,7 @@ class QPDFTokenizer
         bool string_ignoring_newline;
         char bs_num_register[4];
         bool last_char_was_bs;
+        bool last_char_was_cr;
     };
     PointerHolder<Members> m;
 };

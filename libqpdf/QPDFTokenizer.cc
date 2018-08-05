@@ -34,6 +34,7 @@ QPDFTokenizer::Members::reset()
     string_depth = 0;
     string_ignoring_newline = false;
     last_char_was_bs = false;
+    last_char_was_cr = false;
 }
 
 QPDFTokenizer::Members::~Members()
@@ -217,6 +218,7 @@ QPDFTokenizer::presentCharacter(char ch)
 	    memset(this->m->bs_num_register, '\0',
                    sizeof(this->m->bs_num_register));
 	    this->m->last_char_was_bs = false;
+	    this->m->last_char_was_cr = false;
 	    this->m->state = st_in_string;
 	}
 	else if (ch == '<')
@@ -334,8 +336,7 @@ QPDFTokenizer::presentCharacter(char ch)
     }
     else if (this->m->state == st_in_string)
     {
-	if (this->m->string_ignoring_newline &&
-            (! ((ch == '\r') || (ch == '\n'))))
+	if (this->m->string_ignoring_newline && (ch != '\n'))
 	{
 	    this->m->string_ignoring_newline = false;
 	}
@@ -353,9 +354,10 @@ QPDFTokenizer::presentCharacter(char ch)
 	    bs_num_count = 0;
 	}
 
-	if (this->m->string_ignoring_newline && ((ch == '\r') || (ch == '\n')))
+	if (this->m->string_ignoring_newline && (ch == '\n'))
 	{
 	    // ignore
+            this->m->string_ignoring_newline = false;
 	}
 	else if (ch_is_octal &&
                  (this->m->last_char_was_bs || (bs_num_count > 0)))
@@ -386,8 +388,10 @@ QPDFTokenizer::presentCharacter(char ch)
 		this->m->val += '\f';
 		break;
 
-	      case '\r':
 	      case '\n':
+                break;
+
+	      case '\r':
 		this->m->string_ignoring_newline = true;
 		break;
 
@@ -417,11 +421,26 @@ QPDFTokenizer::presentCharacter(char ch)
 	    this->m->type = tt_string;
 	    this->m->state = st_token_ready;
 	}
+        else if (ch == '\r')
+        {
+            // CR by itself is converted to LF
+            this->m->val += '\n';
+        }
+        else if (ch == '\n')
+        {
+            // CR LF is converted to LF
+            if (! this->m->last_char_was_cr)
+            {
+                this->m->val += ch;
+            }
+        }
 	else
 	{
 	    this->m->val += ch;
 	}
 
+        this->m->last_char_was_cr =
+            ((! this->m->string_ignoring_newline) && (ch == '\r'));
 	this->m->last_char_was_bs =
             ((! this->m->last_char_was_bs) && (ch == '\\'));
     }

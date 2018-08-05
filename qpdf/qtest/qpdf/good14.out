@@ -6,7 +6,7 @@ A B
 one
 two
 three lines
-(string with \r\nCRNL)
+(string with \nCRLF and\nCR and\nLF)
  and another
    indentation
 (\001B%DEF)<01>
@@ -21,7 +21,7 @@ This stream does end with a newline.
 //   bad tokens preserved
 //   comments
 //   indentation
-//   CR/NL inside string literal -- changed to \r or \n, newline follows
+//   CR, CR/LF, LF inside string literal -- changed to \n
 //   whitespace in hexstring (removed)
 //   strings normalized
 //   newlines normalized
@@ -33,17 +33,17 @@ This stream does end with a newline.
   
 /good name
 /bad#00name
-WARNING: good14.pdf (offset 860): content normalization encountered bad tokens
-WARNING: good14.pdf (offset 860): Resulting stream data may be corrupted but is may still useful for manual inspection. For more information on this warning, search for content normalization in the manual.
+WARNING: good14.pdf (offset 874): content normalization encountered bad tokens
+WARNING: good14.pdf (offset 874): Resulting stream data may be corrupted but is may still useful for manual inspection. For more information on this warning, search for content normalization in the manual.
 -- stream 2 --
 (This stream ends with a \001 bad token
-WARNING: good14.pdf (offset 1316): content normalization encountered bad tokens
-WARNING: good14.pdf (offset 1316): normalized content ended with a bad token; you may be able to resolve this by coalescing content streams in combination with normalizing content. From the command line, specify --coalesce-contents
-WARNING: good14.pdf (offset 1316): Resulting stream data may be corrupted but is may still useful for manual inspection. For more information on this warning, search for content normalization in the manual.
+WARNING: good14.pdf (offset 1315): content normalization encountered bad tokens
+WARNING: good14.pdf (offset 1315): normalized content ended with a bad token; you may be able to resolve this by coalescing content streams in combination with normalizing content. From the command line, specify --coalesce-contents
+WARNING: good14.pdf (offset 1315): Resulting stream data may be corrupted but is may still useful for manual inspection. For more information on this warning, search for content normalization in the manual.
 -- stream 3 --
-<AB XWARNING: good14.pdf (offset 1406): content normalization encountered bad tokens
-WARNING: good14.pdf (offset 1406): normalized content ended with a bad token; you may be able to resolve this by coalescing content streams in combination with normalizing content. From the command line, specify --coalesce-contents
-WARNING: good14.pdf (offset 1406): Resulting stream data may be corrupted but is may still useful for manual inspection. For more information on this warning, search for content normalization in the manual.
+<AB XWARNING: good14.pdf (offset 1405): content normalization encountered bad tokens
+WARNING: good14.pdf (offset 1405): normalized content ended with a bad token; you may be able to resolve this by coalescing content streams in combination with normalizing content. From the command line, specify --coalesce-contents
+WARNING: good14.pdf (offset 1405): Resulting stream data may be corrupted but is may still useful for manual inspection. For more information on this warning, search for content normalization in the manual.
 -- stream 4 --
 (ends with a name)
 /ThisMustBeLast-- stream 5 --
@@ -54,7 +54,7 @@ BI
 ID
 <506f7
 461746f>
-WARNING: good14.pdf (offset 1549): content normalization encountered bad tokens
-WARNING: good14.pdf (offset 1549): normalized content ended with a bad token; you may be able to resolve this by coalescing content streams in combination with normalizing content. From the command line, specify --coalesce-contents
-WARNING: good14.pdf (offset 1549): Resulting stream data may be corrupted but is may still useful for manual inspection. For more information on this warning, search for content normalization in the manual.
+WARNING: good14.pdf (offset 1548): content normalization encountered bad tokens
+WARNING: good14.pdf (offset 1548): normalized content ended with a bad token; you may be able to resolve this by coalescing content streams in combination with normalizing content. From the command line, specify --coalesce-contents
+WARNING: good14.pdf (offset 1548): Resulting stream data may be corrupted but is may still useful for manual inspection. For more information on this warning, search for content normalization in the manual.
 test 3 done

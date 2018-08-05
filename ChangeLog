@@ -1,5 +1,8 @@
 2018-08-05  Jay Berkenbilt  <ejb@ql.org>
 
+	* Bug fix: end of line characters were not properly handled inside
+	strings in some cases. Fixes #226.
+
 	* Bug fix: infinite loop on progress reporting for very small
 	files. Fixes #230.
 
