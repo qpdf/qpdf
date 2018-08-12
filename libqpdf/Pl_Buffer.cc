@@ -17,11 +17,32 @@ Pl_Buffer::~Pl_Buffer()
 void
 Pl_Buffer::write(unsigned char* buf, size_t len)
 {
-    Buffer* b = new Buffer(len);
-    memcpy(b->getBuffer(), buf, len);
-    this->data.push_back(b);
+    PointerHolder<Buffer> cur_buf;
+    size_t cur_size = 0;
+    if (! this->data.empty())
+    {
+        cur_buf = this->data.back();
+        cur_size = cur_buf->getSize();
+    }
+    size_t left = cur_size - this->total_size;
+    if (left < len)
+    {
+        size_t new_size = std::max(this->total_size + len, 2 * cur_size);
+        Buffer* b = new Buffer(new_size);
+        if (cur_buf.getPointer())
+        {
+            memcpy(b->getBuffer(), cur_buf->getBuffer(), this->total_size);
+        }
+        this->data.clear();
+        cur_buf = b;
+        this->data.push_back(cur_buf);
+    }
+    if (len)
+    {
+        memcpy(cur_buf->getBuffer() + this->total_size, buf, len);
+        this->total_size += len;
+    }
     this->ready = false;
-    this->total_size += len;
 
     if (getNext(true))
     {
@@ -49,17 +70,13 @@ Pl_Buffer::getBuffer()
 
     Buffer* b = new Buffer(this->total_size);
     unsigned char* p = b->getBuffer();
-    while (! this->data.empty())
+    if (! this->data.empty())
     {
-	PointerHolder<Buffer> bp = this->data.front();
-	this->data.pop_front();
-	size_t bytes = bp->getSize();
-	memcpy(p, bp->getBuffer(), bytes);
-	p += bytes;
-	this->total_size -= bytes;
+        PointerHolder<Buffer> bp = this->data.back();
+        this->data.clear();
+        memcpy(p, bp->getBuffer(), this->total_size);
     }
-
-    assert(this->total_size == 0);
+    this->total_size = 0;
     this->ready = false;
 
     return b;

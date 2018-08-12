@@ -1,3 +1,11 @@
+2018-08-12  Jay Berkenbilt  <ejb@ql.org>
+
+	* Rewrite the internals of Pl_Buffer to be much more efficient in
+	use of memory at a very slight performance cost. The old
+	implementation could cause memory usage to go out of control for
+	files with large images compressed using the TIFF predictor.
+	Fixes #228.
+
 2018-08-05  Jay Berkenbilt  <ejb@ql.org>
 
 	* Bug fix: end of line characters were not properly handled inside
