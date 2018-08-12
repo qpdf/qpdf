@@ -1,11 +1,11 @@
-\" This file is not processed by autoconf, but rather by build.mk in
-\" the manual directory.
+.\" This file is not processed by autoconf, but rather by build.mk in
+.\" the manual directory.
 .TH QPDF "1" "April 2008" "qpdf version @PACKAGE_VERSION@" "User Commands"
 .SH NAME
 qpdf \- PDF transformation software
 .SH SYNOPSIS
 .B qpdf
-[ \fIoptions \fR] \fIinfilename [ outfilename ]\fR
+.RI "[ " options " ] " infilename " [ " outfilename " ]"
 .SH DESCRIPTION
 The qpdf program is used to convert one PDF file to another equivalent
 PDF file.  It is capable of performing a variety of transformations
@@ -15,5 +15,5 @@ options for inspecting or checking PDF files, some of which are
 useful primarily to PDF developers.
 .PP
 For a summary of qpdf's options, please run
-\fBqpdf --help\fR.  A complete manual can be found in
+\fBqpdf \-\-help\fR.  A complete manual can be found in
 @docdir@/qpdf-manual.html or @docdir@/qpdf-manual.pdf.
