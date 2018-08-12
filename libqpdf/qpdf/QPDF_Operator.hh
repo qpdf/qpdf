@@ -1,5 +1,5 @@
-#ifndef __QPDF_OPERATOR_HH__
-#define __QPDF_OPERATOR_HH__
+#ifndef QPDF_OPERATOR_HH
+#define QPDF_OPERATOR_HH
 
 #include <qpdf/QPDFObject.hh>
 
@@ -17,4 +17,4 @@ class QPDF_Operator: public QPDFObject
     std::string val;
 };
 
-#endif // __QPDF_OPERATOR_HH__
+#endif // QPDF_OPERATOR_HH

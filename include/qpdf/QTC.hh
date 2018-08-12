@@ -19,8 +19,8 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef __QTC_HH__
-#define __QTC_HH__
+#ifndef QTC_HH
+#define QTC_HH
 
 #include <qpdf/DLL.h>
 
@@ -30,4 +30,4 @@ namespace QTC
     void TC(char const* const scope, char const* const ccase, int n = 0);
 };
 
-#endif // __QTC_HH__
+#endif // QTC_HH

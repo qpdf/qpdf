@@ -1,5 +1,5 @@
-#ifndef __PL_PNGFILTER_HH__
-#define __PL_PNGFILTER_HH__
+#ifndef PL_PNGFILTER_HH
+#define PL_PNGFILTER_HH
 
 // This pipeline applies or reverses the application of a PNG filter
 // as described in the PNG specification.
@@ -49,4 +49,4 @@ class Pl_PNGFilter: public Pipeline
     size_t incoming;
 };
 
-#endif // __PL_PNGFILTER_HH__
+#endif // PL_PNGFILTER_HH

@@ -20,8 +20,8 @@
  * see the manual for additional information.
  */
 
-#ifndef __QPDF_C_H__
-#define __QPDF_C_H__
+#ifndef QPDF_C_H
+#define QPDF_C_H
 
 /*
  * This file defines a basic "C" API for qpdf.  It provides access to
@@ -442,4 +442,4 @@ extern "C" {
 #endif
 
 
-#endif /* __QPDF_C_H__ */
+#endif /* QPDF_C_H */

@@ -1,5 +1,5 @@
-#ifndef __QPDF_OFFSETINPUTSOURCE_HH__
-#define __QPDF_OFFSETINPUTSOURCE_HH__
+#ifndef QPDF_OFFSETINPUTSOURCE_HH
+#define QPDF_OFFSETINPUTSOURCE_HH
 
 // This class implements an InputSource that proxies for an underlying
 // input source but offset a specific number of bytes.
@@ -26,4 +26,4 @@ class OffsetInputSource: public InputSource
     qpdf_offset_t global_offset;
 };
 
-#endif // __QPDF_OFFSETINPUTSOURCE_HH__
+#endif // QPDF_OFFSETINPUTSOURCE_HH

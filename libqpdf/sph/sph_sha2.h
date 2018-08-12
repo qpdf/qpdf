@@ -37,8 +37,8 @@
  * @author   Thomas Pornin <thomas.pornin@cryptolog.com>
  */
 
-#ifndef SPH_SHA2_H__
-#define SPH_SHA2_H__
+#ifndef SPH_SHA2_H
+#define SPH_SHA2_H
 
 #ifdef __cplusplus
 extern "C" {

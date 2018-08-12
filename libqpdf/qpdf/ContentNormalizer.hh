@@ -1,5 +1,5 @@
-#ifndef __CONTENTNORMALIZER_HH__
-#define __CONTENTNORMALIZER_HH__
+#ifndef CONTENTNORMALIZER_HH
+#define CONTENTNORMALIZER_HH
 
 #include <qpdf/QPDFObjectHandle.hh>
 
@@ -18,4 +18,4 @@ class ContentNormalizer: public QPDFObjectHandle::TokenFilter
     bool last_token_was_bad;
 };
 
-#endif // __CONTENTNORMALIZER_HH__
+#endif // CONTENTNORMALIZER_HH

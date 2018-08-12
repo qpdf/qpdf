@@ -19,8 +19,8 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef __QPDFACROFORMDOCUMENTHELPER_HH__
-#define __QPDFACROFORMDOCUMENTHELPER_HH__
+#ifndef QPDFACROFORMDOCUMENTHELPER_HH
+#define QPDFACROFORMDOCUMENTHELPER_HH
 
 // This document helper is intended to help with operations on
 // interactive forms. Here are the key things to know:
@@ -181,4 +181,4 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
     PointerHolder<Members> m;
 };
 
-#endif // __QPDFACROFORMDOCUMENTHELPER_HH__
+#endif // QPDFACROFORMDOCUMENTHELPER_HH

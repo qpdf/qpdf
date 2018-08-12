@@ -19,8 +19,8 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef __QPDFFORMFIELDOBJECTHELPER_HH__
-#define __QPDFFORMFIELDOBJECTHELPER_HH__
+#ifndef QPDFFORMFIELDOBJECTHELPER_HH
+#define QPDFFORMFIELDOBJECTHELPER_HH
 
 // This object helper helps with form fields for interactive forms.
 // Please see comments in QPDFAcroFormDocumentHelper.hh for additional
@@ -156,4 +156,4 @@ class QPDFFormFieldObjectHelper: public QPDFObjectHelper
     PointerHolder<Members> m;
 };
 
-#endif // __QPDFFORMFIELDOBJECTHELPER_HH__
+#endif // QPDFFORMFIELDOBJECTHELPER_HH

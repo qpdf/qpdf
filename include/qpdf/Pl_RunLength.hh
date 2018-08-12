@@ -19,8 +19,8 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef __PL_RUNLENGTH_HH__
-#define __PL_RUNLENGTH_HH__
+#ifndef PL_RUNLENGTH_HH
+#define PL_RUNLENGTH_HH
 
 #include <qpdf/Pipeline.hh>
 
@@ -53,4 +53,4 @@ class Pl_RunLength: public Pipeline
     unsigned int length;
 };
 
-#endif // __PL_RUNLENGTH_HH__
+#endif // PL_RUNLENGTH_HH

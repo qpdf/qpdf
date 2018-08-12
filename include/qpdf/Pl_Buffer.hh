@@ -19,8 +19,8 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef __PL_BUFFER_HH__
-#define __PL_BUFFER_HH__
+#ifndef PL_BUFFER_HH
+#define PL_BUFFER_HH
 
 // This pipeline accumulates the data passed to it into a memory
 // buffer.  Each subsequent use of this buffer appends to the data
@@ -62,4 +62,4 @@ class Pl_Buffer: public Pipeline
     size_t total_size;
 };
 
-#endif // __PL_BUFFER_HH__
+#endif // PL_BUFFER_HH

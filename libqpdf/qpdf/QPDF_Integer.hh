@@ -1,5 +1,5 @@
-#ifndef __QPDF_INTEGER_HH__
-#define __QPDF_INTEGER_HH__
+#ifndef QPDF_INTEGER_HH
+#define QPDF_INTEGER_HH
 
 #include <qpdf/QPDFObject.hh>
 
@@ -17,4 +17,4 @@ class QPDF_Integer: public QPDFObject
     long long val;
 };
 
-#endif // __QPDF_INTEGER_HH__
+#endif // QPDF_INTEGER_HH

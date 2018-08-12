@@ -1,5 +1,5 @@
-#ifndef __PL_TIFFPREDICTOR_HH__
-#define __PL_TIFFPREDICTOR_HH__
+#ifndef PL_TIFFPREDICTOR_HH
+#define PL_TIFFPREDICTOR_HH
 
 // This pipeline reverses the application of a TIFF predictor as
 // described in the TIFF specification.
@@ -36,4 +36,4 @@ class Pl_TIFFPredictor: public Pipeline
     size_t pos;
 };
 
-#endif // __PL_TIFFPREDICTOR_HH__
+#endif // PL_TIFFPREDICTOR_HH

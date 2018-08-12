@@ -20,8 +20,8 @@
  * see the manual for additional information.
  */
 
-#ifndef __QPDFCONSTANTS_H__
-#define __QPDFCONSTANTS_H__
+#ifndef QPDFCONSTANTS_H
+#define QPDFCONSTANTS_H
 
 /* Keep this file 'C' compatible so it can be used from the C and C++
  * interfaces.
@@ -89,4 +89,4 @@ enum qpdf_r3_modify_e		/* Allowed changes: */
     qpdf_r3m_none		/* no modifications */
 };
 
-#endif /* __QPDFCONSTANTS_H__ */
+#endif /* QPDFCONSTANTS_H */

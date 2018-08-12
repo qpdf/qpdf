@@ -1,5 +1,5 @@
-#ifndef __QPDF_DICTIONARY_HH__
-#define __QPDF_DICTIONARY_HH__
+#ifndef QPDF_DICTIONARY_HH
+#define QPDF_DICTIONARY_HH
 
 #include <qpdf/QPDFObject.hh>
 
@@ -40,4 +40,4 @@ class QPDF_Dictionary: public QPDFObject
     std::map<std::string, QPDFObjectHandle> items;
 };
 
-#endif // __QPDF_DICTIONARY_HH__
+#endif // QPDF_DICTIONARY_HH

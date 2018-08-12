@@ -19,8 +19,8 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef __PL_CONCATENATE_HH__
-#define __PL_CONCATENATE_HH__
+#ifndef PL_CONCATENATE_HH
+#define PL_CONCATENATE_HH
 
 // This pipeline will drop all regular finished calls rather than
 // passing them onto next.  To finish downstream streams, call
@@ -50,4 +50,4 @@ class Pl_Concatenate: public Pipeline
     void manualFinish();
 };
 
-#endif // __PL_CONCATENATE_HH__
+#endif // PL_CONCATENATE_HH

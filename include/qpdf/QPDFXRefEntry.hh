@@ -19,8 +19,8 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef __QPDFXREFENTRY_HH__
-#define __QPDFXREFENTRY_HH__
+#ifndef QPDFXREFENTRY_HH
+#define QPDFXREFENTRY_HH
 
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
@@ -54,4 +54,4 @@ class QPDFXRefEntry
     int field2;
 };
 
-#endif // __QPDFXREFENTRY_HH__
+#endif // QPDFXREFENTRY_HH

@@ -1,5 +1,5 @@
-#ifndef __INSECURERANDOMDATAPROVIDER_HH__
-#define __INSECURERANDOMDATAPROVIDER_HH__
+#ifndef INSECURERANDOMDATAPROVIDER_HH
+#define INSECURERANDOMDATAPROVIDER_HH
 
 #include <qpdf/RandomDataProvider.hh>
 #include <qpdf/DLL.h>
@@ -24,4 +24,4 @@ class InsecureRandomDataProvider: public RandomDataProvider
     bool seeded_random;
 };
 
-#endif // __INSECURERANDOMDATAPROVIDER_HH__
+#endif // INSECURERANDOMDATAPROVIDER_HH

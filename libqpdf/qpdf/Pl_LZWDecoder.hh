@@ -1,5 +1,5 @@
-#ifndef __PL_LZWDECODER_HH__
-#define __PL_LZWDECODER_HH__
+#ifndef PL_LZWDECODER_HH
+#define PL_LZWDECODER_HH
 
 #include <qpdf/Pipeline.hh>
 
@@ -40,4 +40,4 @@ class Pl_LZWDecoder: public Pipeline
     int last_code;
 };
 
-#endif // __PL_LZWDECODER_HH__
+#endif // PL_LZWDECODER_HH

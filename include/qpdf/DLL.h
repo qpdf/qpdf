@@ -20,8 +20,8 @@
  * see the manual for additional information.
  */
 
-#ifndef __QPDF_DLL_HH__
-#define __QPDF_DLL_HH__
+#ifndef QPDF_DLL_HH
+#define QPDF_DLL_HH
 
 #if defined(_WIN32) && defined(DLL_EXPORT)
 # define QPDF_DLL __declspec(dllexport)
@@ -29,4 +29,4 @@
 # define QPDF_DLL
 #endif
 
-#endif /* __QPDF_DLL_HH__ */
+#endif /* QPDF_DLL_HH */

@@ -19,8 +19,8 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef __PL_DCT_HH__
-#define __PL_DCT_HH__
+#ifndef PL_DCT_HH
+#define PL_DCT_HH
 
 #include <qpdf/Pipeline.hh>
 #include <qpdf/Pl_Buffer.hh>
@@ -81,4 +81,4 @@ class Pl_DCT: public Pipeline
 
 };
 
-#endif // __PL_DCT_HH__
+#endif // PL_DCT_HH

@@ -1,5 +1,5 @@
-#ifndef __MD5_HH__
-#define __MD5_HH__
+#ifndef MD5_HH
+#define MD5_HH
 
 #include <qpdf/DLL.h>
 #include <qpdf/qpdf-config.h>
@@ -89,4 +89,4 @@ class MD5
     Digest digest_val;
 };
 
-#endif // __MD5_HH__
+#endif // MD5_HH

@@ -1,5 +1,5 @@
-#ifndef __PL_MD5_HH__
-#define __PL_MD5_HH__
+#ifndef PL_MD5_HH
+#define PL_MD5_HH
 
 // This pipeline sends its output to its successor unmodified.  After
 // calling finish, the MD5 checksum of the data that passed through
@@ -45,4 +45,4 @@ class Pl_MD5: public Pipeline
     bool persist_across_finish;
 };
 
-#endif // __PL_MD5_HH__
+#endif // PL_MD5_HH

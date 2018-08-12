@@ -1,5 +1,5 @@
-#ifndef __QPDF_STREAM_HH__
-#define __QPDF_STREAM_HH__
+#ifndef QPDF_STREAM_HH
+#define QPDF_STREAM_HH
 
 #include <qpdf/Types.h>
 
@@ -82,4 +82,4 @@ class QPDF_Stream: public QPDFObject
         PointerHolder<QPDFObjectHandle::TokenFilter> > token_filters;
 };
 
-#endif // __QPDF_STREAM_HH__
+#endif // QPDF_STREAM_HH

@@ -19,8 +19,8 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef __BUFFER_HH__
-#define __BUFFER_HH__
+#ifndef BUFFER_HH
+#define BUFFER_HH
 
 #include <qpdf/DLL.h>
 #include <cstring>              // for size_t
@@ -64,4 +64,4 @@ class Buffer
     unsigned char* buf;
 };
 
-#endif // __BUFFER_HH__
+#endif // BUFFER_HH

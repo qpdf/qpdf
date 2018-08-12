@@ -1,5 +1,5 @@
-#ifndef __PL_ASCII85DECODER_HH__
-#define __PL_ASCII85DECODER_HH__
+#ifndef PL_ASCII85DECODER_HH
+#define PL_ASCII85DECODER_HH
 
 #include <qpdf/Pipeline.hh>
 
@@ -23,4 +23,4 @@ class Pl_ASCII85Decoder: public Pipeline
     size_t eod;
 };
 
-#endif // __PL_ASCII85DECODER_HH__
+#endif // PL_ASCII85DECODER_HH

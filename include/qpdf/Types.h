@@ -20,8 +20,8 @@
  * see the manual for additional information.
  */
 
-#ifndef __QPDFTYPES_H__
-#define __QPDFTYPES_H__
+#ifndef QPDFTYPES_H
+#define QPDFTYPES_H
 
 /* Provide an offset type that should be as big as off_t on just about
  * any system.  If your compiler doesn't support C99 (or at least the
@@ -30,4 +30,4 @@
 
 typedef long long int qpdf_offset_t;
 
-#endif /* __QPDFTYPES_H__ */
+#endif /* QPDFTYPES_H */

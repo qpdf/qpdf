@@ -1,5 +1,5 @@
-#ifndef __QPDF_STRING_HH__
-#define __QPDF_STRING_HH__
+#ifndef QPDF_STRING_HH
+#define QPDF_STRING_HH
 
 #include <qpdf/QPDFObject.hh>
 
@@ -22,4 +22,4 @@ class QPDF_String: public QPDFObject
     std::string val;
 };
 
-#endif // __QPDF_STRING_HH__
+#endif // QPDF_STRING_HH

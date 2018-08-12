@@ -1,5 +1,5 @@
-#ifndef __QPDF_ARRAY_HH__
-#define __QPDF_ARRAY_HH__
+#ifndef QPDF_ARRAY_HH
+#define QPDF_ARRAY_HH
 
 #include <qpdf/QPDFObject.hh>
 
@@ -33,4 +33,4 @@ class QPDF_Array: public QPDFObject
     std::vector<QPDFObjectHandle> items;
 };
 
-#endif // __QPDF_ARRAY_HH__
+#endif // QPDF_ARRAY_HH

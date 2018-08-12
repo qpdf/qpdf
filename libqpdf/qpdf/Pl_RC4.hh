@@ -1,5 +1,5 @@
-#ifndef __PL_RC4_HH__
-#define __PL_RC4_HH__
+#ifndef PL_RC4_HH
+#define PL_RC4_HH
 
 #include <qpdf/Pipeline.hh>
 
@@ -29,4 +29,4 @@ class Pl_RC4: public Pipeline
     RC4 rc4;
 };
 
-#endif // __PL_RC4_HH__
+#endif // PL_RC4_HH

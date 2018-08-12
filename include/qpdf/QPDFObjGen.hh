@@ -19,8 +19,8 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef __QPDFOBJGEN_HH__
-#define __QPDFOBJGEN_HH__
+#ifndef QPDFOBJGEN_HH
+#define QPDFOBJGEN_HH
 
 #include <qpdf/DLL.h>
 
@@ -48,4 +48,4 @@ class QPDFObjGen
     int gen;
 };
 
-#endif // __QPDFOBJGEN_HH__
+#endif // QPDFOBJGEN_HH

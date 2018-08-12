@@ -1,5 +1,5 @@
-#ifndef __PL_SHA2_HH__
-#define __PL_SHA2_HH__
+#ifndef PL_SHA2_HH
+#define PL_SHA2_HH
 
 // Bits must be a supported number of bits, currently only 256, 384,
 // or 512.  Passing 0 as bits leaves the pipeline uncommitted, in
@@ -47,4 +47,4 @@ class Pl_SHA2: public Pipeline
     unsigned char sha512sum[64];
 };
 
-#endif // __PL_SHA2_HH__
+#endif // PL_SHA2_HH

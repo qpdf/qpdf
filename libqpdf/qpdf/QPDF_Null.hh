@@ -1,5 +1,5 @@
-#ifndef __QPDF_NULL_HH__
-#define __QPDF_NULL_HH__
+#ifndef QPDF_NULL_HH
+#define QPDF_NULL_HH
 
 #include <qpdf/QPDFObject.hh>
 
@@ -12,4 +12,4 @@ class QPDF_Null: public QPDFObject
     virtual char const* getTypeName() const;
 };
 
-#endif // __QPDF_NULL_HH__
+#endif // QPDF_NULL_HH

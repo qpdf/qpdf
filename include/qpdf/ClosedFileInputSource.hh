@@ -19,8 +19,8 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef __QPDF_CLOSEDFILEINPUTSOURCE_HH__
-#define __QPDF_CLOSEDFILEINPUTSOURCE_HH__
+#ifndef QPDF_CLOSEDFILEINPUTSOURCE_HH
+#define QPDF_CLOSEDFILEINPUTSOURCE_HH
 
 // This is an input source that reads from files, like
 // FileInputSource, except that it opens and close the file
@@ -88,4 +88,4 @@ class ClosedFileInputSource: public InputSource
     PointerHolder<Members> m;
 };
 
-#endif // __QPDF_CLOSEDFILEINPUTSOURCE_HH__
+#endif // QPDF_CLOSEDFILEINPUTSOURCE_HH

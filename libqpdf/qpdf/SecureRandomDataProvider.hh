@@ -1,5 +1,5 @@
-#ifndef __SECURERANDOMDATAPROVIDER_HH__
-#define __SECURERANDOMDATAPROVIDER_HH__
+#ifndef SECURERANDOMDATAPROVIDER_HH
+#define SECURERANDOMDATAPROVIDER_HH
 
 #include <qpdf/RandomDataProvider.hh>
 #include <qpdf/DLL.h>
@@ -19,4 +19,4 @@ class SecureRandomDataProvider: public RandomDataProvider
     static RandomDataProvider* getInstance();
 };
 
-#endif // __SECURERANDOMDATAPROVIDER_HH__
+#endif // SECURERANDOMDATAPROVIDER_HH

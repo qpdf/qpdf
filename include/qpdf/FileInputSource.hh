@@ -19,8 +19,8 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef __QPDF_FILEINPUTSOURCE_HH__
-#define __QPDF_FILEINPUTSOURCE_HH__
+#ifndef QPDF_FILEINPUTSOURCE_HH
+#define QPDF_FILEINPUTSOURCE_HH
 
 #include <qpdf/InputSource.hh>
 
@@ -61,4 +61,4 @@ class FileInputSource: public InputSource
     FILE* file;
 };
 
-#endif // __QPDF_FILEINPUTSOURCE_HH__
+#endif // QPDF_FILEINPUTSOURCE_HH

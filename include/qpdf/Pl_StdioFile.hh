@@ -21,8 +21,8 @@
 
 // End-of-line pipeline that simply writes its data to a stdio FILE* object.
 
-#ifndef __PL_STDIOFILE_HH__
-#define __PL_STDIOFILE_HH__
+#ifndef PL_STDIOFILE_HH
+#define PL_STDIOFILE_HH
 
 #include <qpdf/Pipeline.hh>
 
@@ -51,4 +51,4 @@ class Pl_StdioFile: public Pipeline
     FILE* file;
 };
 
-#endif // __PL_STDIOFILE_HH__
+#endif // PL_STDIOFILE_HH

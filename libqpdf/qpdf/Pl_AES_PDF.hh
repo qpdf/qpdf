@@ -1,5 +1,5 @@
-#ifndef __PL_AES_PDF_HH__
-#define __PL_AES_PDF_HH__
+#ifndef PL_AES_PDF_HH
+#define PL_AES_PDF_HH
 
 #include <qpdf/Pipeline.hh>
 #include <qpdf/qpdf-config.h>
@@ -66,4 +66,4 @@ class Pl_AES_PDF: public Pipeline
     bool disable_padding;
 };
 
-#endif // __PL_AES_PDF_HH__
+#endif // PL_AES_PDF_HH

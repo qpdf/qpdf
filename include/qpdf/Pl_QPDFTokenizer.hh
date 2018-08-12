@@ -19,8 +19,8 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef __PL_QPDFTOKENIZER_HH__
-#define __PL_QPDFTOKENIZER_HH__
+#ifndef PL_QPDFTOKENIZER_HH
+#define PL_QPDFTOKENIZER_HH
 
 #include <qpdf/Pipeline.hh>
 
@@ -80,4 +80,4 @@ class Pl_QPDFTokenizer: public Pipeline
     PointerHolder<Members> m;
 };
 
-#endif // __PL_QPDFTOKENIZER_HH__
+#endif // PL_QPDFTOKENIZER_HH

@@ -19,8 +19,8 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef __QPDF_HH__
-#define __QPDF_HH__
+#ifndef QPDF_HH
+#define QPDF_HH
 
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
@@ -1240,4 +1240,4 @@ class QPDF
     PointerHolder<Members> m;
 };
 
-#endif // __QPDF_HH__
+#endif // QPDF_HH

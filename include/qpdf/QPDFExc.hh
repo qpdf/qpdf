@@ -19,8 +19,8 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef __QPDFEXC_HH__
-#define __QPDFEXC_HH__
+#ifndef QPDFEXC_HH
+#define QPDFEXC_HH
 
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
@@ -75,4 +75,4 @@ class QPDFExc: public std::runtime_error
     std::string message;
 };
 
-#endif // __QPDFEXC_HH__
+#endif // QPDFEXC_HH

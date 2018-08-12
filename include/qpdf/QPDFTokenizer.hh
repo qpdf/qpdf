@@ -19,8 +19,8 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef __QPDFTOKENIZER_HH__
-#define __QPDFTOKENIZER_HH__
+#ifndef QPDFTOKENIZER_HH
+#define QPDFTOKENIZER_HH
 
 #include <qpdf/DLL.h>
 
@@ -234,4 +234,4 @@ class QPDFTokenizer
     PointerHolder<Members> m;
 };
 
-#endif // __QPDFTOKENIZER_HH__
+#endif // QPDFTOKENIZER_HH

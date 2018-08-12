@@ -19,8 +19,8 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef __PL_FLATE_HH__
-#define __PL_FLATE_HH__
+#ifndef PL_FLATE_HH
+#define PL_FLATE_HH
 
 #include <qpdf/Pipeline.hh>
 
@@ -53,4 +53,4 @@ class Pl_Flate: public Pipeline
     void* zdata;
 };
 
-#endif // __PL_FLATE_HH__
+#endif // PL_FLATE_HH

@@ -19,8 +19,8 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef __RANDOMDATAPROVIDER_HH__
-#define __RANDOMDATAPROVIDER_HH__
+#ifndef RANDOMDATAPROVIDER_HH
+#define RANDOMDATAPROVIDER_HH
 
 #include <string.h> // for size_t
 
@@ -42,4 +42,4 @@ class RandomDataProvider
     RandomDataProvider& operator=(RandomDataProvider const&);
 };
 
-#endif // __RANDOMDATAPROVIDER_HH__
+#endif // RANDOMDATAPROVIDER_HH

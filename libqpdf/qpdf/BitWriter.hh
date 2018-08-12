@@ -1,7 +1,7 @@
 // Write bits into a bit stream.  See BitStream for reading.
 
-#ifndef __BITWRITER_HH__
-#define __BITWRITER_HH__
+#ifndef BITWRITER_HH
+#define BITWRITER_HH
 
 #include <qpdf/DLL.h>
 
@@ -28,4 +28,4 @@ class BitWriter
     unsigned int bit_offset;
 };
 
-#endif // __BITWRITER_HH__
+#endif // BITWRITER_HH

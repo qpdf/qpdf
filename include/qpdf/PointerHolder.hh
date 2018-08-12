@@ -19,8 +19,8 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef __POINTERHOLDER_HH__
-#define __POINTERHOLDER_HH__
+#ifndef POINTERHOLDER_HH
+#define POINTERHOLDER_HH
 
 // This class is basically boost::shared_pointer but predates that by
 // several years.
@@ -182,4 +182,4 @@ class PointerHolder
     Data* data;
 };
 
-#endif // __POINTERHOLDER_HH__
+#endif // POINTERHOLDER_HH

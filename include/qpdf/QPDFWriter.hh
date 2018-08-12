@@ -23,8 +23,8 @@
 // new PDF files.  See comments through the header file for additional
 // details.
 
-#ifndef __QPDFWRITER_HH__
-#define __QPDFWRITER_HH__
+#ifndef QPDFWRITER_HH
+#define QPDFWRITER_HH
 
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
@@ -617,4 +617,4 @@ class QPDFWriter
     PointerHolder<Members> m;
 };
 
-#endif // __QPDFWRITER_HH__
+#endif // QPDFWRITER_HH

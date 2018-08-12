@@ -19,8 +19,8 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef __PL_COUNT_HH__
-#define __PL_COUNT_HH__
+#ifndef PL_COUNT_HH
+#define PL_COUNT_HH
 
 // This pipeline is reusable; i.e., it is safe to call write() after
 // calling finish().
@@ -52,4 +52,4 @@ class Pl_Count: public Pipeline
     unsigned char last_char;
 };
 
-#endif // __PL_COUNT_HH__
+#endif // PL_COUNT_HH

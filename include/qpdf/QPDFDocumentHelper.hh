@@ -19,8 +19,8 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef __QPDFDOCUMENTHELPER_HH__
-#define __QPDFDOCUMENTHELPER_HH__
+#ifndef QPDFDOCUMENTHELPER_HH
+#define QPDFDOCUMENTHELPER_HH
 
 #include <qpdf/DLL.h>
 #include <qpdf/QPDF.hh>
@@ -63,4 +63,4 @@ class QPDFDocumentHelper
     QPDF& qpdf;
 };
 
-#endif // __QPDFDOCUMENTHELPER_HH__
+#endif // QPDFDOCUMENTHELPER_HH

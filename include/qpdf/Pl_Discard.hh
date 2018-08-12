@@ -19,8 +19,8 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef __PL_DISCARD_HH__
-#define __PL_DISCARD_HH__
+#ifndef PL_DISCARD_HH
+#define PL_DISCARD_HH
 
 // This pipeline discards its output.  It is an end-of-line pipeline
 // (with no next).
@@ -43,4 +43,4 @@ class Pl_Discard: public Pipeline
     virtual void finish();
 };
 
-#endif // __PL_DISCARD_HH__
+#endif // PL_DISCARD_HH

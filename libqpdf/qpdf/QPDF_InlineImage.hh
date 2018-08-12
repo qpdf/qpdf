@@ -1,5 +1,5 @@
-#ifndef __QPDF_INLINEIMAGE_HH__
-#define __QPDF_INLINEIMAGE_HH__
+#ifndef QPDF_INLINEIMAGE_HH
+#define QPDF_INLINEIMAGE_HH
 
 #include <qpdf/QPDFObject.hh>
 
@@ -17,4 +17,4 @@ class QPDF_InlineImage: public QPDFObject
     std::string val;
 };
 
-#endif // __QPDF_INLINEIMAGE_HH__
+#endif // QPDF_INLINEIMAGE_HH

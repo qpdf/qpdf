@@ -19,8 +19,8 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef __QPDF_BUFFERINPUTSOURCE_HH__
-#define __QPDF_BUFFERINPUTSOURCE_HH__
+#ifndef QPDF_BUFFERINPUTSOURCE_HH
+#define QPDF_BUFFERINPUTSOURCE_HH
 
 #include <qpdf/InputSource.hh>
 #include <qpdf/Buffer.hh>
@@ -60,4 +60,4 @@ class BufferInputSource: public InputSource
     qpdf_offset_t cur_offset;
 };
 
-#endif // __QPDF_BUFFERINPUTSOURCE_HH__
+#endif // QPDF_BUFFERINPUTSOURCE_HH

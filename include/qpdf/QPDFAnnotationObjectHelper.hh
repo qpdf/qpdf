@@ -19,8 +19,8 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef __QPDFANNOTATIONOBJECTHELPER_HH__
-#define __QPDFANNOTATIONOBJECTHELPER_HH__
+#ifndef QPDFANNOTATIONOBJECTHELPER_HH
+#define QPDFANNOTATIONOBJECTHELPER_HH
 
 #include <qpdf/QPDFObjectHelper.hh>
 
@@ -85,4 +85,4 @@ class QPDFAnnotationObjectHelper: public QPDFObjectHelper
     PointerHolder<Members> m;
 };
 
-#endif // __QPDFANNOTATIONOBJECTHELPER_HH__
+#endif // QPDFANNOTATIONOBJECTHELPER_HH

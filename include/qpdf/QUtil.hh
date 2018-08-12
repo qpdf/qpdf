@@ -19,8 +19,8 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef __QUTIL_HH__
-#define __QUTIL_HH__
+#ifndef QUTIL_HH
+#define QUTIL_HH
 
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
@@ -217,4 +217,4 @@ namespace QUtil
     bool is_number(char const*);
 };
 
-#endif // __QUTIL_HH__
+#endif // QUTIL_HH

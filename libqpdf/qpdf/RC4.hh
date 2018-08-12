@@ -1,5 +1,5 @@
-#ifndef __RC4_HH__
-#define __RC4_HH__
+#ifndef RC4_HH
+#define RC4_HH
 
 class RC4
 {
@@ -22,4 +22,4 @@ class RC4
     RC4Key key;
 };
 
-#endif // __RC4_HH__
+#endif // RC4_HH

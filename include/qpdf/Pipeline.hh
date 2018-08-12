@@ -41,8 +41,8 @@
 // are not.  It is up to the caller to use a pipeline according to its
 // own restrictions.
 
-#ifndef __PIPELINE_HH__
-#define __PIPELINE_HH__
+#ifndef PIPELINE_HH
+#define PIPELINE_HH
 
 #include <qpdf/DLL.h>
 #include <string>
@@ -82,4 +82,4 @@ class Pipeline
     Pipeline* next;
 };
 
-#endif // __PIPELINE_HH__
+#endif // PIPELINE_HH

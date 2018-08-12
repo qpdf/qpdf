@@ -19,8 +19,8 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef __QPDF_INPUTSOURCE_HH__
-#define __QPDF_INPUTSOURCE_HH__
+#ifndef QPDF_INPUTSOURCE_HH
+#define QPDF_INPUTSOURCE_HH
 
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
@@ -88,4 +88,4 @@ class InputSource
     qpdf_offset_t last_offset;
 };
 
-#endif // __QPDF_INPUTSOURCE_HH__
+#endif // QPDF_INPUTSOURCE_HH
