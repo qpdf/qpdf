@@ -31,11 +31,8 @@ Pl_Flate::Pl_Flate(char const* identifier, Pipeline* next,
 
 Pl_Flate::~Pl_Flate()
 {
-    if (this->outbuf)
-    {
-	delete [] this->outbuf;
-	this->outbuf = 0;
-    }
+    delete [] this->outbuf;
+    this->outbuf = 0;
 
     if (this->initialized)
     {

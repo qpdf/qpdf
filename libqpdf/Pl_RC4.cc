@@ -13,11 +13,8 @@ Pl_RC4::Pl_RC4(char const* identifier, Pipeline* next,
 
 Pl_RC4::~Pl_RC4()
 {
-    if (this->outbuf)
-    {
-	delete [] this->outbuf;
-	this->outbuf = 0;
-    }
+    delete [] this->outbuf;
+    this->outbuf = 0;
 }
 
 void
@@ -47,10 +44,7 @@ Pl_RC4::write(unsigned char* data, size_t len)
 void
 Pl_RC4::finish()
 {
-    if (this->outbuf)
-    {
-	delete [] this->outbuf;
-	this->outbuf = 0;
-    }
+    delete [] this->outbuf;
+    this->outbuf = 0;
     this->getNext()->finish();
 }

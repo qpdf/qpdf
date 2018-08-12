@@ -75,10 +75,7 @@ QPDFWriter::Members::~Members()
     {
 	fclose(file);
     }
-    if (output_buffer)
-    {
-	delete output_buffer;
-    }
+    delete output_buffer;
 }
 
 QPDFWriter::QPDFWriter(QPDF& pdf) :

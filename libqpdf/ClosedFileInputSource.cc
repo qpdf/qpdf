@@ -11,10 +11,7 @@ ClosedFileInputSource::Members::Members(char const* filename) :
 
 ClosedFileInputSource::Members::~Members()
 {
-    if (fis)
-    {
-        delete fis;
-    }
+    delete fis;
 }
 
 ClosedFileInputSource::ClosedFileInputSource(char const* filename) :
