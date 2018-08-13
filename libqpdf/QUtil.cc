@@ -7,6 +7,7 @@
 # include <qpdf/InsecureRandomDataProvider.hh>
 #endif
 #include <qpdf/SecureRandomDataProvider.hh>
+#include <qpdf/QPDFSystemError.hh>
 
 #include <cmath>
 #include <iomanip>
@@ -132,22 +133,7 @@ QUtil::unsigned_char_pointer(char const* str)
 void
 QUtil::throw_system_error(std::string const& description)
 {
-#ifdef _MSC_VER
-    // "94" is mentioned in the MSVC docs, but it's still safe if the
-    // message is longer.  strerror_s is a templated function that
-    // knows the size of buf and truncates.
-    char buf[94];
-    if (strerror_s(buf, errno) != 0)
-    {
-        throw std::runtime_error(description + ": failed with an unknown error");
-    }
-    else
-    {
-        throw std::runtime_error(description + ": " + buf);
-    }
-#else
-    throw std::runtime_error(description + ": " + strerror(errno));
-#endif
+    throw QPDFSystemError(description, errno);
 }
 
 int

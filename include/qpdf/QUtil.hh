@@ -61,9 +61,14 @@ namespace QUtil
     QPDF_DLL
     unsigned char* unsigned_char_pointer(char const* str);
 
-    // Throw std::runtime_error with a string formed by appending to
+    // Throw QPDFSystemError, which is derived from
+    // std::runtime_error, with a string formed by appending to
     // "description: " the standard string corresponding to the
-    // current value of errno.
+    // current value of errno. You can retrieve the value of errno by
+    // calling getErrno() on the QPDFSystemError. Prior to qpdf 8.2.0,
+    // this method threw system::runtime_error directly, but since
+    // QPDFSystemError is derived from system::runtime_error, old code
+    // that specifically catches std::runtime_error will still work.
     QPDF_DLL
     void throw_system_error(std::string const& description);
 

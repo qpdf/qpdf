@@ -1,3 +1,9 @@
+2018-08-13  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add new class QPDFSystemError, derived from std::runtime_error,
+	which is now thrown by QUtil::throw_system_error. This enables the
+	triggering errno value to be retrieved. Fixes #221.
+
 2018-08-12  Jay Berkenbilt  <ejb@ql.org>
 
 	* qpdf command line: add --no-warn option to suppress issuing

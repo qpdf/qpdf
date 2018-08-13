@@ -5,8 +5,10 @@
 #include <fcntl.h>
 #include <qpdf/QUtil.hh>
 #include <qpdf/PointerHolder.hh>
+#include <qpdf/QPDFSystemError.hh>
 #include <string.h>
 #include <limits.h>
+#include <assert.h>
 
 #ifdef _WIN32
 # include <io.h>
@@ -137,9 +139,10 @@ void fopen_wrapper_test()
 	std::cout << "after fopen" << std::endl;
 	(void) fclose(f);
     }
-    catch (std::runtime_error& s)
+    catch (QPDFSystemError& s)
     {
 	std::cout << "exception: " << s.what() << std::endl;
+        assert(s.getErrno() != 0);
     }
 }
 
