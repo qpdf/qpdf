@@ -1,5 +1,5 @@
-#ifndef H__RIJNDAEL
-#define H__RIJNDAEL
+#ifndef RIJNDAEL_H
+#define RIJNDAEL_H
 
 #include <qpdf/qpdf-config.h>
 #ifdef HAVE_INTTYPES_H
