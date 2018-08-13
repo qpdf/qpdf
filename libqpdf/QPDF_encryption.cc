@@ -1124,6 +1124,7 @@ QPDF::decryptString(std::string& str, int objid, int generation)
 	    // To avoid repeated warnings, reset cf_string.  Assume
 	    // we'd want to use AES if V == 4.
 	    this->m->cf_string = e_aes;
+            use_aes = true;
 	    break;
 	}
     }
