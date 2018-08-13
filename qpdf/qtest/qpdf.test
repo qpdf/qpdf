@@ -291,11 +291,31 @@ $n_tests += scalar(@bug_tests);
 foreach my $d (@bug_tests)
 {
     my ($n, $description, $exit_status) = @$d;
-    $td->runtest($description,
-                 {$td->COMMAND => "qpdf issue-$n.pdf a.pdf"},
-                 {$td->FILE => "issue-$n.out",
-                  $td->EXIT_STATUS => $exit_status},
-                 $td->NORMALIZE_NEWLINES);
+    if (-f "issue-$n.obfuscated")
+    {
+        # Some of the PDF files in the test suite trigger anti-virus
+        # warnings (MAL/PDFEx-H) and are quarantined or deleted by
+        # some antivirus software. These files are not actually
+        # infected files with malicious intent. They are present in
+        # the test suite to ensure that qpdf does not crash when
+        # process those files. Base64-encode them and pass them to
+        # stdin to prevent anti-virus programs from messing up the
+        # extracted sources. Search for "obfuscated" in test_driver.cc
+        # for instructions on how to obfuscate input files.
+        $td->runtest($description,
+                     {$td->COMMAND => "test_driver 45 issue-$n"},
+                     {$td->FILE => "issue-$n.out",
+                          $td->EXIT_STATUS => $exit_status},
+                     $td->NORMALIZE_NEWLINES);
+    }
+    else
+    {
+        $td->runtest($description,
+                     {$td->COMMAND => "qpdf issue-$n.pdf a.pdf"},
+                     {$td->FILE => "issue-$n.out",
+                          $td->EXIT_STATUS => $exit_status},
+                     $td->NORMALIZE_NEWLINES);
+    }
 }
 show_ntests();
 # ----------

@@ -161,6 +161,44 @@ static void print_rect(std::ostream& out,
         << r.urx << ", " << r.ury << "]";
 }
 
+static void read_file_into_memory(
+    char const* filename,
+    PointerHolder<char>& file_buf, size_t& size)
+{
+    FILE* f = QUtil::safe_fopen(filename, "rb");
+    fseek(f, 0, SEEK_END);
+    size = QUtil::tell(f);
+    fseek(f, 0, SEEK_SET);
+    file_buf = PointerHolder<char>(true, new char[size]);
+    char* buf_p = file_buf.getPointer();
+    size_t bytes_read = 0;
+    size_t len = 0;
+    while ((len = fread(buf_p + bytes_read, 1, size - bytes_read, f)) > 0)
+    {
+        bytes_read += len;
+    }
+    if (bytes_read != size)
+    {
+        if (ferror(f))
+        {
+            throw std::runtime_error(
+                std::string("failure reading file ") + filename +
+                " into memory: read " +
+                QUtil::int_to_string(bytes_read) + "; wanted " +
+                QUtil::int_to_string(size));
+        }
+        else
+        {
+            throw std::logic_error(
+                std::string("premature eof reading file ") + filename +
+                " into memory: read " +
+                QUtil::int_to_string(bytes_read) + "; wanted " +
+                QUtil::int_to_string(size));
+        }
+    }
+    fclose(f);
+}
+
 void runtest(int n, char const* filename1, char const* arg2)
 {
     // Most tests here are crafted to work on specific files.  Look at
@@ -200,6 +238,34 @@ void runtest(int n, char const* filename1, char const* arg2)
         // arg2 is password
 	pdf.processFile(filename1, arg2);
     }
+    else if (n == 45)
+    {
+        // Decode obfuscated files. To obfuscated, run the input file
+        // through this perl script, and save the result to
+        // filename.obfuscated. This pretends that the input was
+        // called filename.pdf and that that file contained the
+        // deobfuscated version.
+
+        // undef $/;
+        // my @str = split('', <STDIN>);
+        // for (my $i = 0; $i < scalar(@str); ++$i)
+        // {
+        //     $str[$i] = chr(ord($str[$i]) ^ 0xcc);
+        // }
+        // print(join('', @str));
+
+        std::string filename(std::string(filename1) + ".obfuscated");
+        PointerHolder<char> file_buf;
+        size_t size = 0;
+        read_file_into_memory(filename.c_str(), file_buf, size);
+        char* p = file_buf.getPointer();
+        for (size_t i = 0; i < size; ++i)
+        {
+            p[i] ^= 0xcc;
+        }
+	pdf.processMemoryFile((std::string(filename1) + ".pdf").c_str(),
+                              p, size);
+    }
     else if (n % 2 == 0)
     {
         if (n % 4 == 0)
@@ -217,39 +283,9 @@ void runtest(int n, char const* filename1, char const* arg2)
     else
     {
         QTC::TC("qpdf", "exercise processMemoryFile");
-	FILE* f = QUtil::safe_fopen(filename1, "rb");
-	fseek(f, 0, SEEK_END);
-	size_t size = QUtil::tell(f);
-	fseek(f, 0, SEEK_SET);
-	file_buf = PointerHolder<char>(true, new char[size]);
-	char* buf_p = file_buf.getPointer();
-	size_t bytes_read = 0;
-	size_t len = 0;
-	while ((len = fread(buf_p + bytes_read, 1, size - bytes_read, f)) > 0)
-	{
-	    bytes_read += len;
-	}
-	if (bytes_read != size)
-	{
-	    if (ferror(f))
-	    {
-		throw std::runtime_error(
-		    std::string("failure reading file ") + filename1 +
-		    " into memory: read " +
-		    QUtil::int_to_string(bytes_read) + "; wanted " +
-		    QUtil::int_to_string(size));
-	    }
-	    else
-	    {
-		throw std::logic_error(
-		    std::string("premature eof reading file ") + filename1 +
-		    " into memory: read " +
-		    QUtil::int_to_string(bytes_read) + "; wanted " +
-		    QUtil::int_to_string(size));
-	    }
-	}
-	fclose(f);
-	pdf.processMemoryFile(filename1, buf_p, size);
+        size_t size = 0;
+        read_file_into_memory(filename1, file_buf, size);
+	pdf.processMemoryFile(filename1, file_buf.getPointer(), size);
     }
 
     if ((n == 0) || (n == 1))
@@ -1611,6 +1647,19 @@ void runtest(int n, char const* filename1, char const* arg2)
         w.setStaticID(true);
         w.setSuppressOriginalObjectIDs(true);
         w.write();
+    }
+    else if (n == 45)
+    {
+        // Decode obfuscated files. This is here to help test with
+        // files that trigger anti-virus warnings. See comments in
+        // qpdf.test for details.
+        QPDFWriter w(pdf, "a.pdf");
+        w.setStaticID(true);
+        w.write();
+        if (! pdf.getWarnings().empty())
+        {
+            exit(3);
+        }
     }
     else
     {

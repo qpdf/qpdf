@@ -8,4 +8,3 @@ WARNING: issue-51.pdf (object 2 0, offset 71): attempting to recover stream leng
 WARNING: issue-51.pdf (object 2 0, offset 71): unable to recover stream data; treating stream as empty
 WARNING: issue-51.pdf (object 2 0, offset 977): expected endobj
 WARNING: issue-51.pdf (object 2 0, offset 977): EOF after endobj
-qpdf: operation succeeded with warnings; resulting file may have some problems
