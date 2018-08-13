@@ -773,7 +773,7 @@ static std::vector<int> parse_numrange(char const* range, int max,
             }
         }
     }
-    catch (std::runtime_error e)
+    catch (std::runtime_error const& e)
     {
         if (throw_error)
         {
@@ -1372,7 +1372,7 @@ static void parse_rotation_parameter(Options& o, std::string const& parameter)
         parse_numrange(range.c_str(), 0, true);
         range_valid = true;
     }
-    catch (std::runtime_error)
+    catch (std::runtime_error const&)
     {
         // ignore
     }

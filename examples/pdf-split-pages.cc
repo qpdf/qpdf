@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
     {
         process(whoami, argv[1], argv[2]);
     }
-    catch (std::exception e)
+    catch (std::exception const& e)
     {
         std::cerr << whoami << ": exception: " << e.what() << std::endl;
         return 2;

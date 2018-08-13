@@ -717,7 +717,7 @@ void runtest(int n, char const* filename1, char const* arg2)
 	    // Do it wrong first...
 	    pdf.replaceObject(qdict.getObjGen(), qdict);
 	}
-	catch (std::logic_error)
+	catch (std::logic_error const&)
 	{
 	    std::cout << "caught logic error as expected" << std::endl;
 	}
@@ -1003,7 +1003,7 @@ void runtest(int n, char const* filename1, char const* arg2)
             res2.unparseResolved();
             std::cout << "oops -- didn't throw" << std::endl;
         }
-        catch (std::logic_error e)
+        catch (std::logic_error const& e)
         {
             std::cout << "logic error: " << e.what() << std::endl;
         }
@@ -1012,7 +1012,7 @@ void runtest(int n, char const* filename1, char const* arg2)
             res2.makeDirect();
             std::cout << "oops -- didn't throw" << std::endl;
         }
-        catch (std::logic_error e)
+        catch (std::logic_error const& e)
         {
             std::cout << "logic error: " << e.what() << std::endl;
         }
@@ -1109,7 +1109,7 @@ void runtest(int n, char const* filename1, char const* arg2)
             pdf.copyForeignObject(pdf.getTrailer().getKey("/QTest"));
             std::cout << "oops -- didn't throw" << std::endl;
         }
-        catch (std::logic_error e)
+        catch (std::logic_error const& e)
         {
             std::cout << "logic error: " << e.what() << std::endl;
         }
@@ -1118,7 +1118,7 @@ void runtest(int n, char const* filename1, char const* arg2)
             pdf.copyForeignObject(QPDFObjectHandle::newInteger(1));
             std::cout << "oops -- didn't throw" << std::endl;
         }
-        catch (std::logic_error e)
+        catch (std::logic_error const& e)
         {
             std::cout << "logic error: " << e.what() << std::endl;
         }
@@ -1139,7 +1139,7 @@ void runtest(int n, char const* filename1, char const* arg2)
             w.write();
             std::cout << "oops -- didn't throw" << std::endl;
         }
-        catch (std::logic_error e)
+        catch (std::logic_error const& e)
         {
             std::cout << "logic error: " << e.what() << std::endl;
         }
@@ -1185,7 +1185,7 @@ void runtest(int n, char const* filename1, char const* arg2)
             QPDFObjectHandle::parse("[1 0 R]", "indirect test");
             std::cout << "oops -- didn't throw" << std::endl;
         }
-        catch (std::logic_error e)
+        catch (std::logic_error const& e)
         {
             std::cout << "logic error parsing indirect: " << e.what()
                       << std::endl;
@@ -1195,7 +1195,7 @@ void runtest(int n, char const* filename1, char const* arg2)
             QPDFObjectHandle::parse("0 trailing", "trailing test");
             std::cout << "oops -- didn't throw" << std::endl;
         }
-        catch (std::runtime_error e)
+        catch (std::runtime_error const& e)
         {
             std::cout << "trailing data: " << e.what()
                       << std::endl;

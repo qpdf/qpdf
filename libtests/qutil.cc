@@ -26,7 +26,7 @@ void test_to_number(char const* str, int_T wanted, bool error,
         result = fn(str);
         worked = (wanted == result);
     }
-    catch (std::runtime_error)
+    catch (std::runtime_error const&)
     {
         threw = true;
     }
@@ -247,7 +247,7 @@ void same_file_test()
         fclose(QUtil::safe_fopen("qutil.out", "r"));
         fclose(QUtil::safe_fopen("other-file", "r"));
     }
-    catch (std::exception)
+    catch (std::exception const&)
     {
         std::cout << "same_file_test expects to have qutil.out and other-file"
             " exist in the current directory\n";
