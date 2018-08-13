@@ -1,5 +1,9 @@
 2018-08-12  Jay Berkenbilt  <ejb@ql.org>
 
+	* qpdf command line: add --no-warn option to suppress issuing
+	warning messages. If there are any conditions that would have
+	caused warnings to be issued, the exit status is still 3.
+
 	* Rewrite the internals of Pl_Buffer to be much more efficient in
 	use of memory at a very slight performance cost. The old
 	implementation could cause memory usage to go out of control for

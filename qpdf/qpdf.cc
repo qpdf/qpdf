@@ -61,6 +61,7 @@ struct Options
         split_pages(0),
         verbose(false),
         progress(false),
+        suppress_warnings(false),
         copy_encryption(false),
         encryption_file(0),
         encryption_file_password(0),
@@ -125,6 +126,7 @@ struct Options
     int split_pages;
     bool verbose;
     bool progress;
+    bool suppress_warnings;
     bool copy_encryption;
     char const* encryption_file;
     char const* encryption_file_password;
@@ -262,6 +264,7 @@ Basic Options\n\
 --password=password     specify a password for accessing encrypted files\n\
 --verbose               provide additional informational output\n\
 --progress              give progress indicators while writing output\n\
+--no-warn               suppress warnings\n\
 --linearize             generated a linearized (web optimized) file\n\
 --copy-encryption=file  copy encryption parameters from specified file\n\
 --encryption-file-password=password\n\
@@ -515,8 +518,9 @@ page content stream.  This attempt will be made even if it is not a\n\
 page content stream, in which case it will produce unusable results.\n\
 \n\
 Ordinarily, qpdf exits with a status of 0 on success or a status of 2\n\
-if any errors occurred.  In --check mode, if there were warnings but not\n\
-errors, qpdf exits with a status of 3.\n\
+if any errors occurred.  If there were warnings but not errors, qpdf\n\
+exits with a status of 3. If warnings would have been issued but --no-warn\n\
+was given, an exit status of 3 is still used.\n\
 \n";
 
 void usage(std::string const& msg)
@@ -1676,6 +1680,10 @@ static void parse_options(int argc, char* argv[], Options& o)
             {
                 o.progress = true;
             }
+            else if (strcmp(arg, "no-warn") == 0)
+            {
+                o.suppress_warnings = true;
+            }
             else if (strcmp(arg, "deterministic-id") == 0)
             {
                 o.deterministic_id = true;
@@ -1831,6 +1839,10 @@ static void set_qpdf_options(QPDF& pdf, Options& o)
     if (o.password_is_hex_key)
     {
         pdf.setPasswordIsHexKey(true);
+    }
+    if (o.suppress_warnings)
+    {
+        pdf.setSuppressWarnings(true);
     }
 }
 
@@ -2607,9 +2619,14 @@ int main(int argc, char* argv[])
 	}
 	if (! pdf.getWarnings().empty())
 	{
-	    std::cerr << whoami << ": operation succeeded with warnings;"
-		      << " resulting file may have some problems" << std::endl;
-	    exit(EXIT_WARNING);
+            if (! o.suppress_warnings)
+            {
+                std::cerr << whoami << ": operation succeeded with warnings;"
+                          << " resulting file may have some problems"
+                          << std::endl;
+            }
+            // Still exit with warning code even if warnings were suppressed.
+            exit(EXIT_WARNING);
 	}
     }
     catch (std::exception& e)

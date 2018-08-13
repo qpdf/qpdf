@@ -1528,7 +1528,7 @@ my @badfiles = ("not a PDF file", 			# 1
                 "bad dictionary key",                   # 36
 		);
 
-$n_tests += @badfiles + 3;
+$n_tests += @badfiles + 5;
 
 # Test 6 contains errors in the free table consistency, but we no
 # longer have any consistency check for this since it is not important
@@ -1552,6 +1552,14 @@ for (my $i = 1; $i <= scalar(@badfiles); ++$i)
 		 $td->NORMALIZE_NEWLINES);
 }
 
+$td->runtest("Suppress warnings",
+             {$td->COMMAND => "qpdf --no-warn bad14.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 3});
+$td->runtest("Suppress warnings with --check",
+             {$td->COMMAND => "qpdf --check --no-warn bad14.pdf"},
+             {$td->FILE => "bad14-check-no-warn.out",
+                  $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
 $td->runtest("C API: errors",
 	     {$td->COMMAND => "qpdf-ctest 2 bad1.pdf '' a.pdf"},
 	     {$td->FILE => "c-read-errors.out",
