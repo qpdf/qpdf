@@ -255,7 +255,6 @@ void runtest(int n, char const* filename1, char const* arg2)
         // print(join('', @str));
 
         std::string filename(std::string(filename1) + ".obfuscated");
-        PointerHolder<char> file_buf;
         size_t size = 0;
         read_file_into_memory(filename.c_str(), file_buf, size);
         char* p = file_buf.getPointer();
