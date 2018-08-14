@@ -24,7 +24,7 @@ QPDFSystemError::createWhat(std::string const& description,
     // message is longer.  strerror_s is a templated function that
     // knows the size of buf and truncates.
     char buf[94];
-    if (strerror_s(buf, errno) != 0)
+    if (strerror_s(buf, system_errno) != 0)
     {
         message = description + ": failed with an unknown error";
     }
@@ -33,7 +33,7 @@ QPDFSystemError::createWhat(std::string const& description,
         message = description + ": " + buf;
     }
 #else
-    message = description + ": " + strerror(errno);
+    message = description + ": " + strerror(system_errno);
 #endif
     return message;
 }
