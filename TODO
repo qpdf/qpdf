@@ -30,6 +30,10 @@ Soon
 
     - See ../misc/broken-files
 
+ * Some qpdf --check tests are fragile on Windows. The output gets
+   truncated. This happens in the loop for content preservation tests.
+   Figure out the source of the fragility.
+
 
 Next ABI
 ========
