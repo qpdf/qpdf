@@ -1,3 +1,11 @@
+2018-08-14  Jay Berkenbilt  <ejb@ql.org>
+
+	* For the mingw builds, change the name of the DLL import library
+	from libqpdf.a to libqpdf.dll.a to avoid confusing it with a
+	static library. This potentially clears the way for supporting a
+	static library in the future, though presently, the qpdf Windows
+	build only builds the DLL and executables. Fixes #225.
+
 2018-08-13  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add new class QPDFSystemError, derived from std::runtime_error,

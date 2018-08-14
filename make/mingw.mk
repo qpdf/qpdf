@@ -5,7 +5,7 @@ LOBJ=o
 
 # Usage: $(call libname,base)
 define libname
-lib$(1).a
+lib$(1).dll.a
 endef
 
 # Usage: $(call binname,base)
@@ -62,8 +62,8 @@ endef
 #                       1    2       3       4    5       6        7
 # Usage: $(call makelib,objs,library,ldflags,libs,current,revision,age)
 define makelib
-	$(DLLTOOL) -l $(2) -D $$(basename `echo $(2) | sed -e 's,/lib\(.*\).a,/\1,'`$(shell expr $(5) - $(7)).dll) $(1); \
-	$(CXX) -shared -o `echo $(2) | sed -e 's,/lib\(.*\).a,/\1,'`$(shell expr $(5) - $(7)).dll \
+	$(DLLTOOL) -l $(2) -D $$(basename `echo $(2) | sed -e 's,/lib\(.*\).dll.a,/\1,'`$(shell expr $(5) - $(7)).dll) $(1); \
+	$(CXX) -shared -o `echo $(2) | sed -e 's,/lib\(.*\).dll.a,/\1,'`$(shell expr $(5) - $(7)).dll \
 		$(1) $(3) $(4)
 endef
 
@@ -76,7 +76,6 @@ endef
 # Install target
 
 INSTALL_DIR = install-mingw$(WINDOWS_WORDSIZE)
-STATIC_LIB_NAME = libqpdf.a
 include make/installwin.mk
 install: installwin
 	$(STRIP) $(DEST)/bin/*.exe

@@ -1,4 +1,5 @@
 DEST=$(INSTALL_DIR)/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+IMPORT_LIB_NAME := $(call libname,qpdf)
 installwin: all
 	$(RM) -r $(INSTALL_DIR)
 	mkdir $(INSTALL_DIR)
@@ -8,7 +9,7 @@ installwin: all
 	mkdir $(DEST)/include
 	mkdir $(DEST)/include/qpdf
 	mkdir $(DEST)/doc
-	cp libqpdf/$(OUTPUT_DIR)/$(STATIC_LIB_NAME) $(DEST)/lib
+	cp libqpdf/$(OUTPUT_DIR)/$(IMPORT_LIB_NAME) $(DEST)/lib
 	cp libqpdf/$(OUTPUT_DIR)/qpdf*.dll $(DEST)/bin
 	perl copy_dlls libqpdf/$(OUTPUT_DIR)/qpdf*.dll $(DEST)/bin $(OBJDUMP) $(WINDOWS_WORDSIZE)
 	cp qpdf/$(OUTPUT_DIR)/qpdf.exe $(DEST)/bin

@@ -92,6 +92,5 @@ endef
 # Install target
 
 INSTALL_DIR = install-msvc$(WINDOWS_WORDSIZE)
-STATIC_LIB_NAME = qpdf.lib
 include make/installwin.mk
 install: installwin
