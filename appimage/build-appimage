@@ -93,7 +93,7 @@ make -j$(nproc)
 
 if [ "$SKIP_TESTS" = "" ]; then
     # Run built-in QPDF checks:
-    make check
+    make -k check
 fi
 
 # Prepare AppDir which is the basis for the AppImage:
