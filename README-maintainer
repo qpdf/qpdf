@@ -40,7 +40,7 @@ RELEASE PREPARATION
 * Run a spelling checker over the source code to catch errors in
   variable names, strings, and comments.
 
-  ispell -p ispell-words **/*.hh **/*.cc manual/*
+  ispell -p ispell-words **/*.hh **/*.cc manual/* ChangeLog
 
 * If needed, run large file and image comparison tests. Configure
   options:
@@ -49,7 +49,8 @@ RELEASE PREPARATION
 
   For Windows, use a Windows style path, not an MSYS path for large files.
 
-* Test with clang. Pass `CC=clang CXX=clang++` to `./configure`.
+* Test with clang. Pass `CC=clang CXX=clang++` to `./configure`. Test
+  with newer version of gcc if available.
 
 * Test build on a mac.
 
@@ -114,14 +115,11 @@ CREATING A RELEASE
 * Create source release:
 
 version=x.y.z
-\rm -rf /tmp/qpdf-$version
-git archive --prefix=qpdf-$version/ HEAD . | (cd /tmp; tar xf -)
-pushd /tmp
-./qpdf-$version/make_dist
-gpg --detach-sign --armor qpdf-$version.tar.gz
+./make_dist $version
+gpg --detach-sign --armor /tmp/qpdf-$version.tar.gz
 
-  Move qpdf-$version.tar.gz and qpdf-$version.tar.gz.asc to the
-  release archive area.
+  Move /tmp/qpdf-$version.tar.gz and /tmp/qpdf-$version.tar.gz.asc to
+  the release archive area.
 
   For iterating on the release during testing, pass `--no-tests` to
   make_dist to skip the test suite.
