@@ -177,7 +177,7 @@
 
 	* Ignore zlib data check errors while uncompressing streams. This
 	is consistent with behaviors of other readers and enables handling
-	of some incorrectly written zlib strems. Fixes #191.
+	of some incorrectly written zlib streams. Fixes #191.
 
 2018-02-25  Jay Berkenbilt  <ejb@ql.org>
 
@@ -195,7 +195,7 @@
 	* Major enhancements to handling of type errors within the qpdf
 	library. This fix is intended to eliminate those annoying cases
 	where qpdf would exit with a message like "operation for
-	dictionary object attemped on object of wrong type" without
+	dictionary object attempted on object of wrong type" without
 	providing any context. Now qpdf keeps enough context to be able to
 	issue a proper warning and to handle such conditions in a sensible
 	way. This should greatly increase the number of bad files that
@@ -311,7 +311,7 @@
 	counting in length for better readability. Ordinarily this makes
 	no difference, but in the rare case of a page's contents being
 	split in the middle of a token, the old behavior could cause the
-	extra newline to be interprted as part of the token. This bug
+	extra newline to be interpreted as part of the token. This bug
 	could only be triggered in qdf mode, which is a mode intended for
 	manual inspection of PDF files' contents, so it is very unlikely
 	to have caused any actual problems for people using qpdf for
@@ -390,7 +390,7 @@
 	QPDFObjectHandle::pipeStreamData, you don't need to worry about
 	this at all.
 
-	* Provide heavily annoated examples/pdf-filter-tokens.cc example
+	* Provide heavily annotated examples/pdf-filter-tokens.cc example
 	that illustrates use of some simple token filters.
 
 	* When normalizing content streams, as in qdf mode, issue warning
@@ -400,7 +400,7 @@
 	either there's a bug in qpdf's lexer, that the file is damaged, or
 	that the page's contents are split in a weird way. In any of those
 	cases, qpdf could potentially damage the stream's contents by
-	replacing carrige returns with newlines or otherwise messing with
+	replacing carriage returns with newlines or otherwise messing with
 	spaces. The mostly likely case of this would be an inline image's
 	compressed data being divided across two streams and having the
 	compressed data in the second stream contain a carriage return as
@@ -441,7 +441,7 @@
 
 	* 7.1.0: release
 
-	* Allow raw encryption key to be specified in libary and command
+	* Allow raw encryption key to be specified in library and command
 	line with the QPDF::setPasswordIsHexKey method and
 	--password-is-hex-key option. Allow encryption key to be displayed
 	with --show-encryption-key option. Thanks to Didier Stevens
@@ -819,7 +819,7 @@
 
 2013-12-14  Jay Berkenbilt  <ejb@ql.org>
 
-	* Allow anyspace rather than just newline to follow xref header.
+	* Allow any space rather than just newline to follow xref header.
 	This allows qpdf to read a wider range of damaged files.
 
 2013-11-30  Jay Berkenbilt  <ejb@ql.org>
@@ -978,7 +978,7 @@
 	* Add QPDF::getCompressibleObjGens() and deprecate
 	QPDF::getCompressibleObjects(), which had a flaw in its logic.
 
-	* Add new QPDFObjectHandle::getObjGen() method and indiciate in
+	* Add new QPDFObjectHandle::getObjGen() method and indicate in
 	comments that its use is favored over getObjectID() and
 	getGeneration() for most cases.
 
@@ -1025,7 +1025,7 @@
 	* Remove all calls to sprintf
 
 	* New method QUtil::int_to_string_base to convert to octal or
-	hexademical (or decimal) strings without using sprintf
+	hexadecimal (or decimal) strings without using sprintf
 
 2013-02-26  Jay Berkenbilt  <ejb@ql.org>
 
@@ -1154,7 +1154,7 @@
 	QPDF::compute_data_key to take the R and V values from the
 	encryption dictionary.  There is no reason for any application
 	code to call this method since handling of encryption is done
-	automatically by the qpdf libary.  It is used internally by
+	automatically by the qpdf library.  It is used internally by
 	QPDFWriter.
 
 	* Support reading and decryption of files whose main text is not
@@ -1469,7 +1469,7 @@
 	* Add new array mutation routines to QPDFObjectHandle.
 	Implemented by Tobias Hoffmann.
 
-	* Rework APIs that use size_t, off_t, and primative integer types
+	* Rework APIs that use size_t, off_t, and primitive integer types
 	so that size_t is used for sizes of memory and off_t is used for
 	file offsets.  Also set _FILE_OFFSET_BITS so that large files can
 	be supported on 32-bit UNIX/Linux platforms.  The code assumes in
@@ -1572,7 +1572,7 @@
 	uses the invalid object number 0 as a regular object.
 
 	* libqpdf/QPDF_linearization.cc (isLinearized): use -1 rather than
-	0 as a sentintel for not having found the first object in the
+	0 as a sentinel for not having found the first object in the
 	file.  Since -1 can never match the regular expression, this
 	prevents an infinite loop when checking a file that starts with
 	(erroneous) 0 0 obj.  (Fixes qpdf-Bugs-3159950.)
@@ -1795,7 +1795,7 @@
 	with the required padding as specified by the PDF specification.
 	This is seldom useful to users.  This function has been replaced
 	by QPDF::getPaddedUserPassword.  Call the new
-	QPDF::getTrimmedUserPassword to retreive the user password in a
+	QPDF::getTrimmedUserPassword to retrieve the user password in a
 	human-readable format.
 
 	* qpdf/qpdf.cc (main): qpdf --check now prints the PDF version
