@@ -328,6 +328,24 @@ make
       </listitem>
      </varlistentry>
      <varlistentry>
+      <term><option>--progress</option></term>
+      <listitem>
+       <para>
+        Indicate progress while writing files.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--no-warn</option></term>
+      <listitem>
+       <para>
+        Suppress writing of warnings to stderr. If warnings were
+        detected and suppressed, <command>qpdf</command> will still
+        exit with exit code 3.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
       <term><option>--linearize</option></term>
       <listitem>
        <para>
@@ -3239,6 +3257,106 @@ print "\n";
    <filename>ChangeLog</filename> in the source distribution.
   </para>
   <variablelist>
+   <varlistentry>
+    <term>8.2.0: August XXX, 2018</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Command-line Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+	  Add <option>--no-warn</option> option to suppress issuing
+	  warning messages. If there are any conditions that would
+	  have caused warnings to be issued, the exit status is still
+	  3.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Bug Fixes and Optimizations
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+	  Performance fix: optimize page merging operation to avoid
+	  unnecessary open/close calls on files being merged. This
+          solves a dramatic slow-down that was observed when merging
+          certain types of files.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Optimize how memory was used for the TIFF predictor,
+          drastically improving performance and memory usage for files
+          containing high-resolution images compressed with Flate
+          using the TIFF predictor.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+	  Bug fix: end of line characters were not properly handled
+	  inside strings in some cases.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+	  Bug fix: using <option>--progress</option> on very small
+          files could cause an infinite loop.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        API enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+	  Add new class <classname>QPDFSystemError</classname>, derived
+	  from <classname>std::runtime_error</classname>, which is now
+	  thrown by <function>QUtil::throw_system_error</function>.
+	  This enables the triggering <classname>errno</classname>
+	  value to be retrieved.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+	  Add <function>ClosedFileInputSource::stayOpen</function>
+	  method, enabling a
+	  <classname>ClosedFileInputSource</classname> to stay open
+	  during manually indicated periods of high activity, thus
+	  reducing the overhead of frequent open/close operations.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Build Changes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+	  For the mingw builds, change the name of the DLL import
+	  library from <filename>libqpdf.a</filename> to
+	  <filename>libqpdf.dll.a</filename> to more accurately
+	  reflect that it is an import library rather than a static
+	  library. This potentially clears the way for supporting a
+	  static library in the future, though presently, the qpdf
+	  Windows build only builds the DLL and executables.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
     <term>8.1.0: June 23, 2018</term>
     <listitem>
