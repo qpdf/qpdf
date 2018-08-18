@@ -1,5 +1,7 @@
 2018-08-18  Jay Berkenbilt  <ejb@ql.org>
 
+	* 8.2.1: release
+
 	* Add new option --keep-files-open=[yn] to control whether qpdf
 	keeps files open when merging. Prior to version 8.1.0, qpdf always
 	kept all files open, but this meant that the number of files that

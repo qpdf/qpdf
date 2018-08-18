@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "8.2.0">
-<!ENTITY lastreleased "August 16, 2018">
+<!ENTITY swversion "8.2.1">
+<!ENTITY lastreleased "August 18, 2018">
 ]>
 <book>
  <bookinfo>
@@ -450,6 +450,35 @@ make
         their original rotation, and the command <command>qpdf in.pdf
         out.pdf --rotate=180</command> would rotate all pages by 180
         degrees.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--keep-files-open=<replaceable>[yn]</replaceable></option></term>
+      <listitem>
+       <para>
+        This option controls whether qpdf keeps individual files open
+        while merging. Prior to version 8.1.0, qpdf always kept all
+        files open, but this meant that the number of files that could
+        be merged was limited by the operating system's open file
+        limit. Version 8.1.0 opened files as they were referenced and
+        closed them after each read, but this caused a major
+        performance impact. Version 8.2.0 optimized the performance
+        but did so in a way that, for local file systems, there was a
+        small but unavoidable performance hit, but for networked file
+        systems, the performance impact could be very high. Starting
+        with version 8.2.1, the default behavior is that files are
+        kept open if no more than 200 files are specified, but that
+        the behavior can be explicitly overridden with the
+        <option>--keep-files-open</option> flag. If you are merging
+        more than 200 files but less than the operating system's max
+        open files limit, you may want to use
+        <option>--keep-files-open=y</option>, especially if working
+        over a networked file system. If you are using a local file
+        system where the overhead is low and you might sometimes merge
+        more than the OS limit's number of files from a script and are
+        not worried about a few seconds additional processing time,
+        you may want to specify <option>--keep-files-open=n</option>.
        </para>
       </listitem>
      </varlistentry>
@@ -3257,6 +3286,30 @@ print "\n";
    <filename>ChangeLog</filename> in the source distribution.
   </para>
   <variablelist>
+   <varlistentry>
+    <term>8.2.1: August 18, 2018</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Command-line Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+	  Add
+	  <option>--keep-files-open=<replaceable>[yn]</replaceable></option>
+	  to override default determination of whether to keep files
+	  open when merging. Please see the discussion of
+	  <option>--keep-files-open</option> in <xref
+	  linkend="ref.basic-options"/> for additional details.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
     <term>8.2.0: August 16, 2018</term>
     <listitem>
