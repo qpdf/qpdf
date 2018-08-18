@@ -1,3 +1,4 @@
+qpdf: selecting --keep-open-files=y
 qpdf: processing 20-pages.pdf
 qpdf: processing ./20-pages.pdf
 qpdf: processing minimal.pdf

@@ -8,6 +8,7 @@
 #include <qpdf/QUtil.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/ClosedFileInputSource.hh>
+#include <qpdf/FileInputSource.hh>
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/Pl_Discard.hh>
 #include <qpdf/PointerHolder.hh>
@@ -95,6 +96,8 @@ struct Options
         qdf_mode(false),
         preserve_unreferenced_objects(false),
         preserve_unreferenced_page_resources(false),
+        keep_files_open(true),
+        keep_files_open_set(false),
         newline_before_endstream(false),
         coalesce_contents(false),
         show_npages(false),
@@ -162,6 +165,8 @@ struct Options
     bool qdf_mode;
     bool preserve_unreferenced_objects;
     bool preserve_unreferenced_page_resources;
+    bool keep_files_open;
+    bool keep_files_open_set;
     bool newline_before_endstream;
     std::string linearize_pass1;
     bool coalesce_contents;
@@ -384,6 +389,7 @@ These options allow pages to be selected from one or more PDF files.\n\
 Whatever file is given as the primary input file is used as the\n\
 starting point, but its pages are replaced with pages as specified.\n\
 \n\
+--keep-files-open=[yn]\n\
 --pages file [ --password=password ] [ page-range ] ... --\n\
 \n\
 For each file that pages should be taken from, specify the file, a\n\
@@ -395,6 +401,13 @@ password here.  The same file can be repeated multiple times.  All\n\
 non-page data (info, outlines, page numbers, etc. are taken from the\n\
 primary input file.  To discard this, use --empty as the primary\n\
 input.\n\
+\n\
+By default, when more than 200 distinct files are specified, qpdf will\n\
+close each file when not being referenced. With 200 files or fewer, all\n\
+files will be kept open at the same time. This behavior can be overridden\n\
+by specifying --keep-files-open=[yn]. Closing and opening files can have\n\
+very high overhead on certain file systems, especially networked file\n\
+systems.\n\
 \n\
 The page range is a set of numbers separated by commas, ranges of\n\
 numbers separated dashes, or combinations of those.  The character\n\
@@ -1631,6 +1644,23 @@ static void parse_options(int argc, char* argv[], Options& o)
             {
                 o.preserve_unreferenced_page_resources = true;
             }
+            else if (strcmp(arg, "keep-files-open") == 0)
+            {
+                o.keep_files_open_set = true;
+                if (parameter && (strcmp(parameter, "y") == 0))
+                {
+                    o.keep_files_open = true;
+                }
+                else if (parameter && (strcmp(parameter, "n") == 0))
+                {
+                    o.keep_files_open = false;
+                }
+                else
+                {
+                    usage("--keep-files-open must be given as"
+                          " --keep-files-open=[yn]");
+                }
+            }
             else if (strcmp(arg, "newline-before-endstream") == 0)
             {
                 o.newline_before_endstream = true;
@@ -2113,6 +2143,43 @@ static void handle_page_specs(QPDF& pdf, Options& o,
     // Parse all page specifications and translate them into lists of
     // actual pages.
 
+    if (! o.keep_files_open_set)
+    {
+        // Count the number of distinct files to determine whether we
+        // should keep files open or not. Rather than trying to code
+        // some portable heuristic based on OS limits, just hard-code
+        // this at a given number and allow users to override.
+        std::set<std::string> filenames;
+        for (std::vector<PageSpec>::iterator iter = o.page_specs.begin();
+             iter != o.page_specs.end(); ++iter)
+        {
+            PageSpec& page_spec = *iter;
+            filenames.insert(page_spec.filename);
+        }
+        // NOTE: The number 200 for this threshold is in the help
+        // message and manual and is baked into the test suite.
+        if (filenames.size() > 200)
+        {
+            QTC::TC("qpdf", "qpdf disable keep files open");
+            if (o.verbose)
+            {
+                std::cout << whoami << ": selecting --keep-open-files=n"
+                          << std::endl;
+            }
+            o.keep_files_open = false;
+        }
+        else
+        {
+            if (o.verbose)
+            {
+                std::cout << whoami << ": selecting --keep-open-files=y"
+                          << std::endl;
+            }
+            o.keep_files_open = true;
+            QTC::TC("qpdf", "qpdf don't disable keep files open");
+        }
+    }
+
     // Create a QPDF object for each file that we may take pages from.
     std::map<std::string, QPDF*> page_spec_qpdfs;
     std::map<std::string, ClosedFileInputSource*> page_spec_cfis;
@@ -2149,14 +2216,29 @@ static void handle_page_specs(QPDF& pdf, Options& o,
                 std::cout << whoami << ": processing "
                           << page_spec.filename << std::endl;
             }
-            ClosedFileInputSource* cis =
-                new ClosedFileInputSource(page_spec.filename.c_str());
-            PointerHolder<InputSource> is(cis);
-            cis->stayOpen(true);
+            PointerHolder<InputSource> is;
+            ClosedFileInputSource* cis = 0;
+            if (! o.keep_files_open)
+            {
+                QTC::TC("qpdf", "qpdf keep files open n");
+                cis = new ClosedFileInputSource(page_spec.filename.c_str());
+                is = cis;
+                cis->stayOpen(true);
+            }
+            else
+            {
+                QTC::TC("qpdf", "qpdf keep files open y");
+                FileInputSource* fis = new FileInputSource();
+                is = fis;
+                fis->setFilename(page_spec.filename.c_str());
+            }
             qpdf->processInputSource(is, password);
-            cis->stayOpen(false);
             page_spec_qpdfs[page_spec.filename] = qpdf;
-            page_spec_cfis[page_spec.filename] = cis;
+            if (cis)
+            {
+                cis->stayOpen(false);
+                page_spec_cfis[page_spec.filename] = cis;
+            }
         }
 
         // Read original pages from the PDF, and parse the page range

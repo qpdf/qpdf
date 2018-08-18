@@ -1,0 +1,203 @@
+qpdf: selecting --keep-open-files=y
+qpdf: processing 100-kfo.pdf
+qpdf: processing 101-kfo.pdf
+qpdf: processing 102-kfo.pdf
+qpdf: processing 103-kfo.pdf
+qpdf: processing 104-kfo.pdf
+qpdf: processing 105-kfo.pdf
+qpdf: processing 106-kfo.pdf
+qpdf: processing 107-kfo.pdf
+qpdf: processing 108-kfo.pdf
+qpdf: processing 109-kfo.pdf
+qpdf: processing 110-kfo.pdf
+qpdf: processing 111-kfo.pdf
+qpdf: processing 112-kfo.pdf
+qpdf: processing 113-kfo.pdf
+qpdf: processing 114-kfo.pdf
+qpdf: processing 115-kfo.pdf
+qpdf: processing 116-kfo.pdf
+qpdf: processing 117-kfo.pdf
+qpdf: processing 118-kfo.pdf
+qpdf: processing 119-kfo.pdf
+qpdf: processing 120-kfo.pdf
+qpdf: processing 121-kfo.pdf
+qpdf: processing 122-kfo.pdf
+qpdf: processing 123-kfo.pdf
+qpdf: processing 124-kfo.pdf
+qpdf: processing 125-kfo.pdf
+qpdf: processing 126-kfo.pdf
+qpdf: processing 127-kfo.pdf
+qpdf: processing 128-kfo.pdf
+qpdf: processing 129-kfo.pdf
+qpdf: processing 130-kfo.pdf
+qpdf: processing 131-kfo.pdf
+qpdf: processing 132-kfo.pdf
+qpdf: processing 133-kfo.pdf
+qpdf: processing 134-kfo.pdf
+qpdf: processing 135-kfo.pdf
+qpdf: processing 136-kfo.pdf
+qpdf: processing 137-kfo.pdf
+qpdf: processing 138-kfo.pdf
+qpdf: processing 139-kfo.pdf
+qpdf: processing 140-kfo.pdf
+qpdf: processing 141-kfo.pdf
+qpdf: processing 142-kfo.pdf
+qpdf: processing 143-kfo.pdf
+qpdf: processing 144-kfo.pdf
+qpdf: processing 145-kfo.pdf
+qpdf: processing 146-kfo.pdf
+qpdf: processing 147-kfo.pdf
+qpdf: processing 148-kfo.pdf
+qpdf: processing 149-kfo.pdf
+qpdf: processing 150-kfo.pdf
+qpdf: processing 151-kfo.pdf
+qpdf: processing 152-kfo.pdf
+qpdf: processing 153-kfo.pdf
+qpdf: processing 154-kfo.pdf
+qpdf: processing 155-kfo.pdf
+qpdf: processing 156-kfo.pdf
+qpdf: processing 157-kfo.pdf
+qpdf: processing 158-kfo.pdf
+qpdf: processing 159-kfo.pdf
+qpdf: processing 160-kfo.pdf
+qpdf: processing 161-kfo.pdf
+qpdf: processing 162-kfo.pdf
+qpdf: processing 163-kfo.pdf
+qpdf: processing 164-kfo.pdf
+qpdf: processing 165-kfo.pdf
+qpdf: processing 166-kfo.pdf
+qpdf: processing 167-kfo.pdf
+qpdf: processing 168-kfo.pdf
+qpdf: processing 169-kfo.pdf
+qpdf: processing 170-kfo.pdf
+qpdf: processing 171-kfo.pdf
+qpdf: processing 172-kfo.pdf
+qpdf: processing 173-kfo.pdf
+qpdf: processing 174-kfo.pdf
+qpdf: processing 175-kfo.pdf
+qpdf: processing 176-kfo.pdf
+qpdf: processing 177-kfo.pdf
+qpdf: processing 178-kfo.pdf
+qpdf: processing 179-kfo.pdf
+qpdf: processing 180-kfo.pdf
+qpdf: processing 181-kfo.pdf
+qpdf: processing 182-kfo.pdf
+qpdf: processing 183-kfo.pdf
+qpdf: processing 184-kfo.pdf
+qpdf: processing 185-kfo.pdf
+qpdf: processing 186-kfo.pdf
+qpdf: processing 187-kfo.pdf
+qpdf: processing 188-kfo.pdf
+qpdf: processing 189-kfo.pdf
+qpdf: processing 190-kfo.pdf
+qpdf: processing 191-kfo.pdf
+qpdf: processing 192-kfo.pdf
+qpdf: processing 193-kfo.pdf
+qpdf: processing 194-kfo.pdf
+qpdf: processing 195-kfo.pdf
+qpdf: processing 196-kfo.pdf
+qpdf: processing 197-kfo.pdf
+qpdf: processing 198-kfo.pdf
+qpdf: processing 199-kfo.pdf
+qpdf: removing unreferenced pages from primary input
+qpdf: adding pages from 100-kfo.pdf
+qpdf: adding pages from 101-kfo.pdf
+qpdf: adding pages from 102-kfo.pdf
+qpdf: adding pages from 103-kfo.pdf
+qpdf: adding pages from 104-kfo.pdf
+qpdf: adding pages from 105-kfo.pdf
+qpdf: adding pages from 106-kfo.pdf
+qpdf: adding pages from 107-kfo.pdf
+qpdf: adding pages from 108-kfo.pdf
+qpdf: adding pages from 109-kfo.pdf
+qpdf: adding pages from 110-kfo.pdf
+qpdf: adding pages from 111-kfo.pdf
+qpdf: adding pages from 112-kfo.pdf
+qpdf: adding pages from 113-kfo.pdf
+qpdf: adding pages from 114-kfo.pdf
+qpdf: adding pages from 115-kfo.pdf
+qpdf: adding pages from 116-kfo.pdf
+qpdf: adding pages from 117-kfo.pdf
+qpdf: adding pages from 118-kfo.pdf
+qpdf: adding pages from 119-kfo.pdf
+qpdf: adding pages from 120-kfo.pdf
+qpdf: adding pages from 121-kfo.pdf
+qpdf: adding pages from 122-kfo.pdf
+qpdf: adding pages from 123-kfo.pdf
+qpdf: adding pages from 124-kfo.pdf
+qpdf: adding pages from 125-kfo.pdf
+qpdf: adding pages from 126-kfo.pdf
+qpdf: adding pages from 127-kfo.pdf
+qpdf: adding pages from 128-kfo.pdf
+qpdf: adding pages from 129-kfo.pdf
+qpdf: adding pages from 130-kfo.pdf
+qpdf: adding pages from 131-kfo.pdf
+qpdf: adding pages from 132-kfo.pdf
+qpdf: adding pages from 133-kfo.pdf
+qpdf: adding pages from 134-kfo.pdf
+qpdf: adding pages from 135-kfo.pdf
+qpdf: adding pages from 136-kfo.pdf
+qpdf: adding pages from 137-kfo.pdf
+qpdf: adding pages from 138-kfo.pdf
+qpdf: adding pages from 139-kfo.pdf
+qpdf: adding pages from 140-kfo.pdf
+qpdf: adding pages from 141-kfo.pdf
+qpdf: adding pages from 142-kfo.pdf
+qpdf: adding pages from 143-kfo.pdf
+qpdf: adding pages from 144-kfo.pdf
+qpdf: adding pages from 145-kfo.pdf
+qpdf: adding pages from 146-kfo.pdf
+qpdf: adding pages from 147-kfo.pdf
+qpdf: adding pages from 148-kfo.pdf
+qpdf: adding pages from 149-kfo.pdf
+qpdf: adding pages from 150-kfo.pdf
+qpdf: adding pages from 151-kfo.pdf
+qpdf: adding pages from 152-kfo.pdf
+qpdf: adding pages from 153-kfo.pdf
+qpdf: adding pages from 154-kfo.pdf
+qpdf: adding pages from 155-kfo.pdf
+qpdf: adding pages from 156-kfo.pdf
+qpdf: adding pages from 157-kfo.pdf
+qpdf: adding pages from 158-kfo.pdf
+qpdf: adding pages from 159-kfo.pdf
+qpdf: adding pages from 160-kfo.pdf
+qpdf: adding pages from 161-kfo.pdf
+qpdf: adding pages from 162-kfo.pdf
+qpdf: adding pages from 163-kfo.pdf
+qpdf: adding pages from 164-kfo.pdf
+qpdf: adding pages from 165-kfo.pdf
+qpdf: adding pages from 166-kfo.pdf
+qpdf: adding pages from 167-kfo.pdf
+qpdf: adding pages from 168-kfo.pdf
+qpdf: adding pages from 169-kfo.pdf
+qpdf: adding pages from 170-kfo.pdf
+qpdf: adding pages from 171-kfo.pdf
+qpdf: adding pages from 172-kfo.pdf
+qpdf: adding pages from 173-kfo.pdf
+qpdf: adding pages from 174-kfo.pdf
+qpdf: adding pages from 175-kfo.pdf
+qpdf: adding pages from 176-kfo.pdf
+qpdf: adding pages from 177-kfo.pdf
+qpdf: adding pages from 178-kfo.pdf
+qpdf: adding pages from 179-kfo.pdf
+qpdf: adding pages from 180-kfo.pdf
+qpdf: adding pages from 181-kfo.pdf
+qpdf: adding pages from 182-kfo.pdf
+qpdf: adding pages from 183-kfo.pdf
+qpdf: adding pages from 184-kfo.pdf
+qpdf: adding pages from 185-kfo.pdf
+qpdf: adding pages from 186-kfo.pdf
+qpdf: adding pages from 187-kfo.pdf
+qpdf: adding pages from 188-kfo.pdf
+qpdf: adding pages from 189-kfo.pdf
+qpdf: adding pages from 190-kfo.pdf
+qpdf: adding pages from 191-kfo.pdf
+qpdf: adding pages from 192-kfo.pdf
+qpdf: adding pages from 193-kfo.pdf
+qpdf: adding pages from 194-kfo.pdf
+qpdf: adding pages from 195-kfo.pdf
+qpdf: adding pages from 196-kfo.pdf
+qpdf: adding pages from 197-kfo.pdf
+qpdf: adding pages from 198-kfo.pdf
+qpdf: adding pages from 199-kfo.pdf
+qpdf: wrote file a.pdf

@@ -356,3 +356,7 @@ QPDFAcroFormDocumentHelper non-dictionary field 0
 QPDFAcroFormDocumentHelper loop 0
 QPDFAcroFormDocumentHelper field found 1
 QPDFAcroFormDocumentHelper annotation found 1
+qpdf disable keep files open 0
+qpdf keep files open n 0
+qpdf keep files open y 0
+qpdf don't disable keep files open 0

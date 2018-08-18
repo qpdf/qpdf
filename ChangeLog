@@ -1,3 +1,24 @@
+2018-08-18  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add new option --keep-files-open=[yn] to control whether qpdf
+	keeps files open when merging. Prior to version 8.1.0, qpdf always
+	kept all files open, but this meant that the number of files that
+	could be merged was limited by the operating system's open file
+	limit. Version 8.1.0 opened files as they were referenced, but
+	this caused a major performance impact. Version 8.2.0 optimized
+	the performance but did so in a way that, for local file systems,
+	there was a small but unavoidable performance hit, but for
+	networked file systems, the performance impact could be very high.
+	Starting with version 8.2.1, the default behavior is that files
+	are kept open if no more than 200 files are specified, but that
+	the behavior can be explicitly overridden with the
+	--keep-files-open flag. If you are merging more than 200 files but
+	less than the operating system's max open files limit, you may
+	want to use --keep-files-open=y. If you are using a local file
+	system where the overhead is low and you might sometimes merge
+	more than the OS limit's number of files, you may want to specify
+	--keep-files-open=n. Fixes #237.
+
 2018-08-16  Jay Berkenbilt  <ejb@ql.org>
 
 	* 8.2.0: release
