@@ -269,10 +269,10 @@ If building or editing documentation, configure with
 `--enable-doc-maintenance`. This will ensure that all tools or files
 required to validate and build documentation are available.
 
-If you want to run `make maintainer-clean`, `make distclean`, or `make
-autofiles.zip` and you haven't run `./configure`, you can pass
-`CLEAN=1` to make on the command line to prevent it from complaining
-about configure not having been run.
+If you want to run `make maintainer-clean` or `make distclean` and you
+haven't run `./configure`, you can pass `CLEAN=1` to make on the
+command line to prevent it from complaining about configure not having
+been run.
 
 If you want to run checks without rerunning the build, pass
 `NO_REBUILD=1` to make. This can be useful for special testing
@@ -283,10 +283,8 @@ LOCAL WINDOWS TESTING PROCEDURE
 
 This is what I do for routine testing on Windows.
 
-From Linux, run `./autogen.sh` and `make autofiles.zip CLEAN=1`.
-
-From Windows, git clone from my Linux clone, unzip `external-libs`,
-and unzip `autofiles.zip`.
+From Windows, git clone from my Linux clone, and unzip
+`external-libs`.
 
 Look at `make_windows_releases`. Set up path the same way and run
 whichever `./config-*` is appropriate for whichever compiler I need to

@@ -97,12 +97,7 @@ $(foreach B,$(BUILD_ITEMS),$(eval \
   clean_$(B): ; \
 	$(RM) -r $(B)/$(OUTPUT_DIR)))
 
-AUTOFILES = configure aclocal.m4 libqpdf/qpdf/qpdf-config.h.in
-autofiles.zip: $(AUTOFILES)
-	$(RM) autofiles.zip
-	zip autofiles.zip $(AUTOFILES)
-
-DISTFILES = $(AUTOFILES) doc/qpdf-manual.html doc/qpdf-manual.pdf
+DISTFILES = doc/qpdf-manual.html doc/qpdf-manual.pdf
 distfiles.zip: $(DISTFILES)
 	$(RM) distfiles.zip
 	zip distfiles.zip $(DISTFILES)
@@ -116,10 +111,9 @@ distclean: clean
 	$(RM) libqpdf.pc libqpdf.map
 
 maintainer-clean: distclean
-	$(RM) configure doc/qpdf-manual.* libqpdf/qpdf/qpdf-config.h.in
-	$(RM) aclocal.m4
-	$(RM) -r install-mingw install-msvc external-libs
-	$(RM) autofiles.zip distfiles.zip
+	$(RM) doc/qpdf-manual.*
+	$(RM) -r install-mingw* install-msvc* external-libs
+	$(RM) distfiles.zip
 
 .PHONY: $(TEST_TARGETS)
 
