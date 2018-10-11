@@ -102,6 +102,11 @@ autofiles.zip: $(AUTOFILES)
 	$(RM) autofiles.zip
 	zip autofiles.zip $(AUTOFILES)
 
+DISTFILES = $(AUTOFILES) doc/qpdf-manual.html doc/qpdf-manual.pdf
+distfiles.zip: $(DISTFILES)
+	$(RM) distfiles.zip
+	zip distfiles.zip $(DISTFILES)
+
 distclean: clean
 	$(RM) -r autoconf.mk autom4te.cache config.log config.status libtool
 	$(RM) libqpdf/qpdf/qpdf-config.h
@@ -114,7 +119,7 @@ maintainer-clean: distclean
 	$(RM) configure doc/qpdf-manual.* libqpdf/qpdf/qpdf-config.h.in
 	$(RM) aclocal.m4
 	$(RM) -r install-mingw install-msvc external-libs
-	$(RM) autofiles.zip
+	$(RM) autofiles.zip distfiles.zip
 
 .PHONY: $(TEST_TARGETS)
 

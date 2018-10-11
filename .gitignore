@@ -8,6 +8,7 @@ autom4te.cache/
 config.log
 config.status
 configure
+distfiles.zip
 doc/fix-qdf.1
 doc/qpdf-manual.html
 doc/qpdf-manual.pdf
