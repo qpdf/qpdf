@@ -22,5 +22,5 @@ installwin: all
 	    cp doc/qpdf-manual.html $(DEST)/doc; \
 	fi
 	if [ -f doc/qpdf-manual.pdf ]; then \
-	    doc/qpdf-manual.pdf $(DEST)/doc; \
+	    cp doc/qpdf-manual.pdf $(DEST)/doc; \
 	fi
