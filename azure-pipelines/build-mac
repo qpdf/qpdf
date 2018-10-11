@@ -7,7 +7,9 @@ cd jpeg-9c
 make
 sudo make install
 cd ..
-unzip distfiles/distfiles.zip
+if [ -f distfiles/distfiles.zip ]; then
+    unzip distfiles/distfiles.zip
+fi
 ./configure --enable-werror --enable-show-failed-test-output
 make -j$(nproc)
 make -k check

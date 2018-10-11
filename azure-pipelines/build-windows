@@ -17,7 +17,9 @@ if [[ $tool == mingw ]]; then
 elif [[ $tool == msvc ]]; then
     cl
 fi
-unzip distfiles/distfiles.zip
+if [ -f distfiles/distfiles.zip ]; then
+    unzip distfiles/distfiles.zip
+fi
 curl -L https://downloads.sourceforge.net/project/qpdf/external-libs/2017-08-21/qpdf-external-libs-bin.zip -o qpdf-external-libs-bin.zip
 unzip qpdf-external-libs-bin.zip
 cwd=`pwd`

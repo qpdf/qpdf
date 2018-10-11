@@ -10,6 +10,7 @@ jobs:
       pathtoPublish: '$(System.DefaultWorkingDirectory)/distfiles.zip'
       artifactName: distfiles
     displayName: 'Upload extra distribution files'
+    condition: eq(variables['System.PullRequest.IsFork'], 'False')
 - job: Windows
   pool:
     vmImage: vs2017-win2016
@@ -38,6 +39,7 @@ jobs:
     inputs:
       artifactName: distfiles
       downloadPath: $(System.DefaultWorkingDirectory)
+    condition: eq(variables['System.PullRequest.IsFork'], 'False')
   - script: azure-pipelines/build-windows.bat $(wordsize) $(tool)
     displayName: 'Build, test, generate binary distributions'
   - task: PublishBuildArtifacts@1
@@ -45,6 +47,7 @@ jobs:
       pathtoPublish: '$(System.DefaultWorkingDirectory)/installers'
       artifactName: installers
     displayName: 'Upload binary distributions'
+    condition: eq(variables['System.PullRequest.IsFork'], 'False')
   dependsOn: Linux
   condition: succeeded()
 - job: macOS
@@ -56,6 +59,7 @@ jobs:
     inputs:
       artifactName: distfiles
       downloadPath: $(System.DefaultWorkingDirectory)
+    condition: eq(variables['System.PullRequest.IsFork'], 'False')
   - script: azure-pipelines/build-mac
     displayName: 'Mac build and test'
   dependsOn: Linux
