@@ -18,5 +18,9 @@ installwin: all
 	cp include/qpdf/*.h $(DEST)/include/qpdf
 	cp include/qpdf/*.hh $(DEST)/include/qpdf
 	cp doc/stylesheet.css $(DEST)/doc
-	cp doc/qpdf-manual.html $(DEST)/doc
-	cp doc/qpdf-manual.pdf $(DEST)/doc
+	if [ -f doc/qpdf-manual.html ]; then \
+	    cp doc/qpdf-manual.html $(DEST)/doc; \
+	fi
+	if [ -f doc/qpdf-manual.pdf ]; then \
+	    doc/qpdf-manual.pdf $(DEST)/doc; \
+	fi
