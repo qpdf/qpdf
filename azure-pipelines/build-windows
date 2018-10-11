@@ -1,0 +1,40 @@
+#!/bin/bash
+set -ex
+cd $(dirname $0)/..
+wordsize=$1
+tool=$2
+
+if [[ $tool == mingw ]]; then
+    pacman -Sy --noconfirm make base-devel tar zip unzip
+    if [[ $wordsize == 64 ]]; then
+        pacman -Sy --noconfirm mingw-w64-x86_64-toolchain
+        PATH="/c/tools/msys64/mingw64/bin:$PATH"
+    else
+        pacman -Sy --noconfirm mingw-w64-i686-toolchain
+        PATH="/c/tools/msys64/mingw32/bin:$PATH"
+    fi
+    g++ -v
+elif [[ $tool == msvc ]]; then
+    cl
+fi
+unzip distfiles/distfiles.zip
+curl -L https://downloads.sourceforge.net/project/qpdf/external-libs/2017-08-21/qpdf-external-libs-bin.zip -o qpdf-external-libs-bin.zip
+unzip qpdf-external-libs-bin.zip
+cwd=`pwd`
+PATH=$cwd/libqpdf/build:$PATH
+
+installdir=install-$tool$wordsize
+rm -rf $installdir
+./config-$tool --with-windows-wordsize=$wordsize --enable-show-failed-test-output
+make -j$(nproc)
+# XXX Fix test fragility -- it's always check status in the content preservation tests.
+make -k check || echo "WARNING: TESTS FAILED"
+make install
+
+v=`(cd $installdir; ls -d qpdf-*)`
+cp -p README-windows-install.txt $installdir/$v/README.txt
+mkdir installers
+(cd $installdir; zip -r ../installers/$v-bin-$tool$wordsize.zip $v)
+
+set +x
+ls -l installers

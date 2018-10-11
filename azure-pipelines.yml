@@ -1,0 +1,62 @@
+jobs:
+- job: Linux
+  pool:
+    vmImage: ubuntu-16.04
+  steps:
+  - script: azure-pipelines/build-linux
+    displayName: 'Generate, build, and test'
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: '$(System.DefaultWorkingDirectory)/distfiles.zip'
+      artifactName: distfiles
+    displayName: 'Upload extra distribution files'
+- job: Windows
+  pool:
+    vmImage: vs2017-win2016
+  strategy:
+    matrix:
+      msvc32:
+        wordsize: 32
+        tool: msvc
+      msvc64:
+        wordsize: 64
+        tool: msvc
+      mingw32:
+        wordsize: 32
+        tool: mingw
+      mingw64:
+        wordsize: 64
+        tool: mingw
+    maxParallel: 4
+  steps:
+  - bash: git config --global core.autocrlf input
+    displayName: 'Disable git autocrlf'
+  - checkout: self
+    displayName: 'Get sources'
+  - task: DownloadBuildArtifacts@0
+    displayName: 'Download distribution files'
+    inputs:
+      artifactName: distfiles
+      downloadPath: $(System.DefaultWorkingDirectory)
+  - script: azure-pipelines/build-windows.bat $(wordsize) $(tool)
+    displayName: 'Build, test, generate binary distributions'
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: '$(System.DefaultWorkingDirectory)/installers'
+      artifactName: installers
+    displayName: 'Upload binary distributions'
+  dependsOn: Linux
+  condition: succeeded()
+- job: macOS
+  pool:
+    vmImage: macOS-10.13
+  steps:
+  - task: DownloadBuildArtifacts@0
+    displayName: 'Download distribution files'
+    inputs:
+      artifactName: distfiles
+      downloadPath: $(System.DefaultWorkingDirectory)
+  - script: azure-pipelines/build-mac
+    displayName: 'Mac build and test'
+  dependsOn: Linux
+  condition: succeeded()

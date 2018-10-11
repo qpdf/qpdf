@@ -1,3 +1,8 @@
+2018-10-11  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add build in Azure Pipelines, now that it is free for open
+	source projects.
+
 2018-08-18  Jay Berkenbilt  <ejb@ql.org>
 
 	* 8.2.1: release
