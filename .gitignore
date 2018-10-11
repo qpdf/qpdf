@@ -1,13 +1,10 @@
 *.pdb
 .lineno
-aclocal.m4
 appimage/build
 autoconf.mk
-autofiles.zip
 autom4te.cache/
 config.log
 config.status
-configure
 distfiles.zip
 doc/fix-qdf.1
 doc/qpdf-manual.html
@@ -20,7 +17,6 @@ libqpdf.map
 libqpdf.pc
 libqpdf/build/
 libqpdf/qpdf/qpdf-config.h
-libqpdf/qpdf/qpdf-config.h.in
 libtests/build/
 libtool
 manual/build/
