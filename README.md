@@ -3,9 +3,7 @@
 
 [![QPDF](logo/qpdf.svg)](http://qpdf.sourceforge.net)
 
-[![Build status]()]
-
-[![Build status](https://dev.azure.com/qpdf/qpdf/_apis/build/status/qpdf?branchName=master)](https://dev.azure.com/qpdf/qpdf/_build?definitionId=3&branchName=master) [![Travis Build Status](https://travis-ci.org/qpdf/qpdf.svg?branch=master)](https://travis-ci.org/qpdf/qpdf)
+[![Azure Pipeline Build Status](https://dev.azure.com/qpdf/qpdf/_apis/build/status/qpdf.qpdf)](https://dev.azure.com/qpdf/qpdf/_build/latest?definitionId=1) [![Travis Build Status](https://travis-ci.org/qpdf/qpdf.svg?branch=master)](https://travis-ci.org/qpdf/qpdf)
 
 This is the QPDF package.  Information about it can be found at http://qpdf.sourceforge.net.  The source code repository is hosted at github: https://github.com/qpdf/qpdf.
 
