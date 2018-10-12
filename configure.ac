@@ -18,7 +18,7 @@ AC_CHECK_PROG(AUTOHEADER,autoheader,1,0)
 AC_CHECK_PROG(ACLOCAL,aclocal,1,0)
 AC_CHECK_PROG(MD5SUM,md5sum,1,0)
 if test "$AUTOCONF$AUTOHEADER$ACLOCAL$MD5SUM" = "1111"; then
-   if ! md5sum configure.ac m4/* | diff - autofiles.sums; then
+   if ! md5sum configure.ac m4/* | diff -w - autofiles.sums; then
        AC_MSG_ERROR(autofiles are autodated; rerun autogen.sh)
    fi
 fi
