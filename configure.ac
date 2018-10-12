@@ -16,9 +16,9 @@ AC_CONFIG_HEADERS([libqpdf/qpdf/qpdf-config.h])
 AC_CHECK_PROG(AUTOCONF,autoconf,1,0)
 AC_CHECK_PROG(AUTOHEADER,autoheader,1,0)
 AC_CHECK_PROG(ACLOCAL,aclocal,1,0)
-AC_CHECK_PROG(MD5SUM,md5sum,1,0)
-if test "$AUTOCONF$AUTOHEADER$ACLOCAL$MD5SUM" = "1111"; then
-   if ! md5sum configure.ac m4/* | diff -w - autofiles.sums; then
+AC_CHECK_PROG(SHA256SUM,sha256sum,1,0)
+if test "$AUTOCONF$AUTOHEADER$ACLOCAL$SHA256SUM" = "1111"; then
+   if ! sha256sum -c autofiles.sums; then
        AC_MSG_ERROR(autofiles are autodated; rerun autogen.sh)
    fi
 fi
