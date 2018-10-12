@@ -3,6 +3,9 @@ Azure Pipelines
 
  * Work make_dist and building of the app image into the pipeline so I
    can use the pipeline to create all the official release files.
+   Append -ci to the names and include the sha256sum in the output.
+   The official release process will be to take the artifacts from the
+   release commit on master, verify the checksums, and rename.
 
 Soon
 ====
