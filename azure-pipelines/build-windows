@@ -35,8 +35,6 @@ make install
 
 v=`(cd $installdir; ls -d qpdf-*)`
 cp -p README-windows-install.txt $installdir/$v/README.txt
-mkdir installers
-(cd $installdir; zip -r ../installers/$v-bin-$tool$wordsize.zip $v)
-
-set +x
-ls -l installers
+mkdir distribution
+(cd $installdir; zip -r ../distribution/$v-bin-$tool$wordsize-ci.zip $v)
+sha256sum distribution/*

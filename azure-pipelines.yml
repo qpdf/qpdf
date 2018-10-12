@@ -44,8 +44,8 @@ jobs:
     displayName: 'Build, test, generate binary distributions'
   - task: PublishBuildArtifacts@1
     inputs:
-      pathtoPublish: '$(System.DefaultWorkingDirectory)/installers'
-      artifactName: installers
+      pathtoPublish: '$(System.DefaultWorkingDirectory)/distribution'
+      artifactName: distribution
     displayName: 'Upload binary distributions'
     condition: eq(variables['System.PullRequest.IsFork'], 'False')
   dependsOn: Linux
