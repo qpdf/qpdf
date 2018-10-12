@@ -23,10 +23,6 @@ if test "$AUTOCONF$AUTOHEADER$ACLOCAL$MD5SUM" = "1111"; then
    fi
 fi
 
-if md5sum configure.ac m4/* | diff -q - autofiles.sums; then
-    echo "Automatically generated files are stale; rerun autogen.sh"
-fi
-
 AC_PROG_CC
 AC_PROG_CC_C99
 AC_PROG_CXX
