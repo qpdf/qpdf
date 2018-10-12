@@ -83,7 +83,6 @@ appdir=$here/build/appdir
 rm -rf $here/build
 
 # Prepare build of QPDF from sources:
-./autogen.sh
 ./configure --prefix=/usr --enable-werror \
             --enable-show-failed-test-output \
             --enable-html-doc --enable-pdf-doc "$CUSTOM_CONFIGURE"

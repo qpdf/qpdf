@@ -228,7 +228,6 @@ OTHER NOTES
 To construct a source distribution from a pristine checkout,
 `make_dist` does the following:
 
-./autogen.sh
 ./configure --enable-doc-maintenance --enable-werror
 make build_manual
 make distclean
