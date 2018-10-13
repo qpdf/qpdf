@@ -70,3 +70,17 @@ jobs:
     displayName: 'Mac build and test'
   dependsOn: Linux
   condition: succeeded()
+- job: AppImage
+  pool:
+    vmImage: ubuntu-16.04
+  steps:
+  - script: azure-pipelines/build-appimage
+    displayName: 'Build AppImage'
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: '$(System.DefaultWorkingDirectory)/distribution'
+      artifactName: distribution
+    displayName: 'Upload AppImage'
+    condition: eq(variables['System.PullRequest.IsFork'], 'False')
+  dependsOn: Linux
+  condition: succeeded()
