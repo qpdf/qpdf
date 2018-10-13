@@ -1,0 +1,13 @@
+#!/bin/bash
+set -ex
+(cd appimage; docker build -t qpdfbuild .)
+rm -rf /tmp/build
+mkdir -p /tmp/build
+git clone .git /tmp/build/qpdf
+docker run --privileged --rm -v /tmp/build:/tmp/build qpdfbuild
+mkdir distribution
+cp -p /tmp/build/qpdf/appimage/build/qpdf*AppImage* distribution
+for i in distribution/*; do
+    mv $i $(echo $i | sed -e 's/\.AppImage/-ci.AppImage/')
+done
+sha256sum distribution/*
