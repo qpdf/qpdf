@@ -1284,7 +1284,8 @@ sub xmlify
     $str =~ s/</&lt;/g;
     $str =~ s/>/&gt;/g;
     $str =~ s/\"/&quot;/g if $attr;
-    $str =~ s/([\000-\010\013-\037\177-\377])/sprintf("&#x%02x;", ord($1))/ge;
+    $str =~ s/([\000-\010\013-\037])/sprintf("<0x%02x>", ord($1))/ge;
+    $str =~ s/([\177-\377])/sprintf("&#x%02x;", ord($1))/ge;
     $str;
 }
 
