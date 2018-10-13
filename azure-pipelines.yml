@@ -17,6 +17,10 @@ jobs:
       artifactName: distribution
     displayName: 'Upload source distribution'
     condition: eq(variables['System.PullRequest.IsFork'], 'False')
+  - task: PublishTestResults@2
+    inputs:
+      testRunTitle: Linux
+      buildPlatform: Linux
 - job: Windows
   pool:
     vmImage: vs2017-win2016
@@ -54,6 +58,10 @@ jobs:
       artifactName: distribution
     displayName: 'Upload binary distributions'
     condition: eq(variables['System.PullRequest.IsFork'], 'False')
+  - task: PublishTestResults@2
+    inputs:
+      testRunTitle: Windows-$(wordsize)$(tool)
+      buildPlatform: Windows-$(wordsize)$(tool)
   dependsOn: Linux
   condition: succeeded()
 - job: macOS
@@ -68,6 +76,10 @@ jobs:
     condition: eq(variables['System.PullRequest.IsFork'], 'False')
   - script: azure-pipelines/build-mac
     displayName: 'Mac build and test'
+  - task: PublishTestResults@2
+    inputs:
+      testRunTitle: MacOS
+      buildPlatform: MacOS
   dependsOn: Linux
   condition: succeeded()
 - job: AppImage
