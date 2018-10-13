@@ -2,7 +2,7 @@
 #
 # This file is part of qtest.
 #
-# Copyright 1993-2007, Jay Berkenbilt
+# Copyright 1993-2018, Jay Berkenbilt
 #
 # QTest is distributed under the terms of version 2.0 of the Artistic
 # license which may be found in the source distribution.
@@ -71,12 +71,14 @@ use constant EXPECT_FAILURE       => 1 << 2;
 use constant RM_WS_ONLY_LINES     => 1 << 3;
 
 # Field names
-use vars qw($f_socket $f_origdir $f_tempdir $f_testlog $f_testxml $f_suitename);
+use vars (qw($f_socket $f_origdir $f_tempdir $f_testlog),
+          qw($f_testxml $f_testjunit $f_suitename));
 $f_socket = 'socket';
 $f_origdir = 'origdir';
 $f_tempdir = 'tempdir';
 $f_testlog = 'testlog';
 $f_testxml = 'testxml';
+$f_testjunit = 'testjunit';
 $f_suitename = 'suitename';
 
 use vars qw($f_passes $f_fails $f_xpasses $f_xfails $f_testnum);
@@ -233,13 +235,14 @@ sub new
     }
     my $suitename = shift;
 
-    if (! ((@ARGV == 11) &&
+    if (! ((@ARGV == 13) &&
 	   (($ARGV[0] eq '-fd') || ($ARGV[0] eq '-port')) &&
 	   ($ARGV[2] eq '-origdir') &&
 	   ($ARGV[4] eq '-tempdir') &&
 	   ($ARGV[6] eq '-testlog') &&
 	   ($ARGV[8] eq '-testxml') &&
-	   ($ARGV[10] =~ m/^-stdout-tty=([01])$/) &&
+	   ($ARGV[10] eq '-testjunit') &&
+	   ($ARGV[12] =~ m/^-stdout-tty=([01])$/) &&
 	   (-d $ARGV[5])))
     {
 	die +__PACKAGE__, ": improper invocation of test driver $0 (" .
@@ -251,11 +254,14 @@ sub new
     my $tempdir = $ARGV[5];
     my $testlogfile = $ARGV[7];
     my $testxmlfile = $ARGV[9];
+    my $testjunitfile = $ARGV[11];
     my $testlog = new IO::File(">>$testlogfile");
     binmode $testlog;
     my $testxml = new IO::File(">>$testxmlfile");
     binmode $testxml;
-    $ARGV[10] =~ m/=([01])/ or die +__PACKAGE__, ": INTERNAL ERROR in ARGV[10]";
+    my $testjunit = new IO::File(">>$testjunitfile");
+    binmode $testjunit;
+    $ARGV[12] =~ m/=([01])/ or die +__PACKAGE__, ": INTERNAL ERROR in ARGV[10]";
     my $stdout_is_tty = $1;
     if ($stdout_is_tty)
     {
@@ -300,6 +306,7 @@ sub new
     $rep->{+__PACKAGE__}{$f_tempdir} = $tempdir;
     $rep->{+__PACKAGE__}{$f_testlog} = $testlog;
     $rep->{+__PACKAGE__}{$f_testxml} = $testxml;
+    $rep->{+__PACKAGE__}{$f_testjunit} = $testjunit;
     $rep->{+__PACKAGE__}{$f_suitename} = $suitename;
     $rep->{+__PACKAGE__}{$f_passes} = 0;
     $rep->{+__PACKAGE__}{$f_fails} = 0;
@@ -340,6 +347,12 @@ sub _testxml
 {
     my $rep = shift;
     $rep->{+__PACKAGE__}{$f_testxml};
+}
+
+sub _testjunit
+{
+    my $rep = shift;
+    $rep->{+__PACKAGE__}{$f_testjunit};
 }
 
 sub _suitename
@@ -1003,6 +1016,7 @@ sub runtest
     my $passed = $rep->update_counters($outcome, $exp_outcome);
 
     my $testxml = $rep->_testxml();
+    my $testjunit = $rep->_testjunit();
     my $testlog = $rep->_testlog();
     # $outcome_text is for the human-readable.  We need something
     # different for the xml file.
@@ -1014,16 +1028,22 @@ sub runtest
 		     ? ($passed ? "pass" : "unexpected-pass")
 		     : ($passed ? "expected-fail" : "fail")) .
 		    "\"\n");
+    $testjunit->print("  <testcase\n" .
+		    "   id=\"" . xmlify($category, 1) . " $testnum\"\n" .
+		    "   name=\"" . xmlify($description, 1) . "\"\n");
 
     if (($outcome eq FAIL) && ($outcome ne $exp_outcome))
     {
 	# Test failed and failure was not expected
 
 	$testxml->print("  >\n");
+        $testjunit->print("  >\n" .
+                          "   <failure>\n");
 	$testlog->printf("$category test %d (%s) FAILED\n",
 			 $testnum, $description);
 	my $cwd = getcwd();
 	$testlog->print("cwd: $cwd\n");
+        $testjunit->print("cwd: " . xmlify($cwd) . "\n");
 	$testxml->print("   <cwd>" . xmlify($cwd) . "</cwd>\n");
 	my $cmd = $in_command;
 	if ((defined $cmd) && (ref($cmd) eq 'ARRAY'))
@@ -1034,6 +1054,7 @@ sub runtest
 	{
 	    $testlog->print("command: $cmd\n");
 	    $testxml->print("   <command>" . xmlify($cmd) . "</command>\n");
+	    $testjunit->print("command: " . xmlify($cmd) . "\n");
 	}
 	if (defined $out_file)
 	{
@@ -1044,6 +1065,8 @@ sub runtest
 	    $testxml->print(
 		"   <expected-output-file>" . xmlify($out_file) .
 		"</expected-output-file>\n");
+            $testjunit->print("expected output in " .
+                              xmlify($out_file) . "\n");
 	}
 
 	# It would be nice if we could filter out internal calls for
@@ -1054,6 +1077,7 @@ sub runtest
 	$testxml->print("   <stacktrace>test failure" .
 			xmlify(Carp::longmess()) .
 			"</stacktrace>\n");
+	$testjunit->print("stracktrace:\n" . xmlify(Carp::longmess()));
 
 	if (! $status_match)
 	{
@@ -1064,16 +1088,20 @@ sub runtest
 		"   <expected-status>$out_exit_status</expected-status>\n");
 	    $testxml->print(
 		"   <actual-status>$exit_status</actual-status>\n");
+	    $testjunit->printf("  Expected status: %s\n", $out_exit_status);
+	    $testjunit->printf("  Actual   status: %s\n", $exit_status);
 	}
 	if (! $output_match)
 	{
 	    &QTC::TC("testdriver", "TestDriver output mismatch");
 	    $testlog->print("--> BEGIN EXPECTED OUTPUT <--\n");
 	    $testxml->print("   <expected-output>");
+            $testjunit->print("-- BEGIN EXPECTED OUTPUT --\n");
 	    if (defined $expected_file)
 	    {
 		write_file_to_fh($expected_file, $testlog);
 		xml_write_file_to_fh($expected_file, $testxml);
+		xml_write_file_to_fh($expected_file, $testjunit);
 	    }
 	    elsif (defined $out_regexp)
 	    {
@@ -1083,6 +1111,7 @@ sub runtest
 		    $testlog->print("\n");
 		}
 		$testxml->print("regexp: " . xmlify($out_regexp));
+		$testjunit->print("regexp: " . xmlify($out_regexp));
 	    }
 	    else
 	    {
@@ -1093,19 +1122,26 @@ sub runtest
 			    "--> BEGIN ACTUAL OUTPUT <--\n");
 	    $testxml->print("</expected-output>\n" .
 			    "   <actual-output>");
+	    $testjunit->print("-- END EXPECTED OUTPUT --\n" .
+                              "-- ACTUAL OUTPUT --\n");
 	    write_file_to_fh($actual_file, $testlog);
 	    xml_write_file_to_fh($actual_file, $testxml);
+	    xml_write_file_to_fh($actual_file, $testjunit);
 	    $testlog->print("--> END ACTUAL OUTPUT <--\n");
 	    $testxml->print("</actual-output>\n");
+	    $testjunit->print("-- ACTUAL OUTPUT --\n");
 	    if (defined $output_diff)
 	    {
 		&QTC::TC("testdriver", "TestDriver display diff");
 		$testlog->print("--> DIFF EXPECTED ACTUAL <--\n");
 		$testxml->print("   <diff-output>");
+		$testjunit->print("-- DIFF EXPECTED ACTUAL --\n");
 		write_file_to_fh($output_diff, $testlog);
 		xml_write_file_to_fh($output_diff, $testxml);
+		xml_write_file_to_fh($output_diff, $testjunit);
 		$testlog->print("--> END DIFFERENCES <--\n");
 		$testxml->print("</diff-output>\n");
+		$testjunit->print("-- END DIFFERENCES --\n");
 	    }
 	    else
 	    {
@@ -1113,10 +1149,13 @@ sub runtest
 	    }
 	}
 	$testxml->print("  </testcase>\n");
+	$testjunit->print("   </failure>\n" .
+                          "  </testcase>\n");
     }
     else
     {
 	$testxml->print("  />\n");
+	$testjunit->print("  />\n");
     }
 
     if (defined $threads)
@@ -1245,7 +1284,8 @@ sub xmlify
     $str =~ s/</&lt;/g;
     $str =~ s/>/&gt;/g;
     $str =~ s/\"/&quot;/g if $attr;
-    $str =~ s/([\000-\010\013-\037\177-\377])/sprintf("&#x%02x;", ord($1))/ge;
+    $str =~ s/([\000-\010\013-\037])/sprintf("[0x%02x]", ord($1))/ge;
+    $str =~ s/([\177-\377])/sprintf("&#x%02x;", ord($1))/ge;
     $str;
 }
 
