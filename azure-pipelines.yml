@@ -11,6 +11,12 @@ jobs:
       artifactName: distfiles
     displayName: 'Upload extra distribution files'
     condition: eq(variables['System.PullRequest.IsFork'], 'False')
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: '$(System.DefaultWorkingDirectory)/distribution'
+      artifactName: distribution
+    displayName: 'Upload source distribution'
+    condition: eq(variables['System.PullRequest.IsFork'], 'False')
 - job: Windows
   pool:
     vmImage: vs2017-win2016

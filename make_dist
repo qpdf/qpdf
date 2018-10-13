@@ -85,7 +85,7 @@ if ($version_error)
     die "$whoami: version numbers are not consistent\n";
 }
 
-run("./configure --enable-doc-maintenance --enable-werror");
+run("./configure --disable-shared --enable-doc-maintenance --enable-werror");
 run("make -j8 build_manual");
 run("make distclean");
 cd("/tmp");
