@@ -17,6 +17,7 @@ my $whoami = basename($0);
 
 my $run_tests = 1;
 my $keep_tmp = 0;
+my $ci_mode = 0;
 my $version = undef;
 foreach my $arg (@ARGV)
 {
@@ -28,6 +29,10 @@ foreach my $arg (@ARGV)
     {
         $keep_tmp = 1;
     }
+    elsif ($arg eq '--ci')
+    {
+        $ci_mode = 1;
+    }
     elsif (! defined $version)
     {
         $version = $arg;
@@ -36,6 +41,11 @@ foreach my $arg (@ARGV)
     {
 	usage();
     }
+}
+
+if ($ci_mode && (! defined $version))
+{
+    $version = get_version_from_configure();
 }
 
 usage() unless defined $version;
@@ -50,41 +60,9 @@ run("git archive --prefix=qpdf-$version/ HEAD . | (cd /tmp; tar xf -)");
 cd($tmpdir);
 
 # Check versions
-my $fh = safe_open("configure.ac");
-my $config_version = 'unknown';
-while (<$fh>)
-{
-    if (m/^AC_INIT\(\[qpdf\],\[([^\)]+)\]\)/)
-    {
-	$config_version = $1;
-	last;
-    }
-}
-$fh->close();
-
-$fh = safe_open("libqpdf/QPDF.cc");
-my $code_version = 'unknown';
-while (<$fh>)
-{
-    if (m/QPDF::qpdf_version = \"([^\"]+)\"/)
-    {
-	$code_version = $1;
-	last;
-    }
-}
-$fh->close();
-
-$fh = safe_open("manual/qpdf-manual.xml");
-my $doc_version = 'unknown';
-while (<$fh>)
-{
-    if (m/swversion "([^\"]+)\"/)
-    {
-	$doc_version = $1;
-	last;
-    }
-}
-$fh->close();
+my $config_version = get_version_from_configure();
+my $code_version = get_version_from_source();
+my $doc_version = get_version_from_manual();
 
 my $version_error = 0;
 if ($version ne $config_version)
@@ -120,7 +98,8 @@ if ($run_tests)
     run("make check");
     cd("/tmp");
 }
-rename "$distname.tar.gz-candidate", "$distname.tar.gz" or die;
+my $distfile = ($ci_mode ? "$distname-ci.tar.gz" : "$distname.tar.gz");
+rename "$distname.tar.gz-candidate", $distfile or die;
 
 if (! $keep_tmp)
 {
@@ -128,11 +107,59 @@ if (! $keep_tmp)
 }
 
 print "
-Source distribution created as $tmpdir.tar.gz
+Source distribution created as /tmp/$distfile
 If this is a release, don't forget to tag the version control system and
 make a backup of the release tar file.
 
 ";
+
+sub get_version_from_configure
+{
+    my $fh = safe_open("configure.ac");
+    my $config_version = 'unknown';
+    while (<$fh>)
+    {
+        if (m/^AC_INIT\(\[qpdf\],\[([^\)]+)\]\)/)
+        {
+            $config_version = $1;
+            last;
+        }
+    }
+    $fh->close();
+    $config_version;
+}
+
+sub get_version_from_source
+{
+    my $fh = safe_open("libqpdf/QPDF.cc");
+    my $code_version = 'unknown';
+    while (<$fh>)
+    {
+        if (m/QPDF::qpdf_version = \"([^\"]+)\"/)
+        {
+            $code_version = $1;
+            last;
+        }
+    }
+    $fh->close();
+    $code_version;
+}
+
+sub get_version_from_manual
+{
+    my $fh = safe_open("manual/qpdf-manual.xml");
+    my $doc_version = 'unknown';
+    while (<$fh>)
+    {
+        if (m/swversion "([^\"]+)\"/)
+        {
+            $doc_version = $1;
+            last;
+        }
+    }
+    $fh->close();
+    $doc_version;
+}
 
 sub safe_open
 {
