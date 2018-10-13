@@ -16,7 +16,6 @@ make
 In qpdf:
 
 ```
-./autogen.sh
 /tmp/htcondor-analyzer/create-db
 CC=/tmp/htcondor-analyzer/cc CXX=/tmp/htcondor-analyzer/cxx ./configure --disable-shared --disable-werror
 # to remove conftest.c

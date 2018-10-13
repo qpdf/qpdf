@@ -3,7 +3,7 @@
 
 [![QPDF](logo/qpdf.svg)](http://qpdf.sourceforge.net)
 
-[![Azure Pipeline Build Status](https://dev.azure.com/qpdf/qpdf/_apis/build/status/qpdf.qpdf)](https://dev.azure.com/qpdf/qpdf/_build/latest?definitionId=1) [![Travis Build Status](https://travis-ci.org/qpdf/qpdf.svg?branch=master)](https://travis-ci.org/qpdf/qpdf)
+[![Azure Pipeline Build Status](https://dev.azure.com/qpdf/qpdf/_apis/build/status/qpdf.qpdf)](https://dev.azure.com/qpdf/qpdf/_build/latest?definitionId=3) [![Travis Build Status](https://travis-ci.org/qpdf/qpdf.svg?branch=master)](https://travis-ci.org/qpdf/qpdf)
 
 This is the QPDF package.  Information about it can be found at http://qpdf.sourceforge.net.  The source code repository is hosted at github: https://github.com/qpdf/qpdf.
 
@@ -33,18 +33,7 @@ Please see the [NOTICE](NOTICE.md) file for information on licenses of embedded 
 
 # Building from a pristine checkout
 
-When building qpdf from a pristine checkout from version control, documentation and automatically generated files are not present. You may either generate them or obtain them from a released source package, which includes them automatically generated files. If you want to grab just the automatic files, extract a source distribution in a temporary directory, and run `make CLEAN=1 autofiles.zip`. This will create a file called `autofiles.zip`, which can you can extract in a checkout of the source repository. This will enable you to run `./configure` and build normally. This approach is almost certainly required on Windows because of issues running autoconf. This workaround is also described in [README-windows.md](README-windows.md).
-
-For UNIX and UNIX-like systems, you can build the automatically generated files yourself, but you must have some additional tools installed to build from the source repository.  To do this, you should have `autoconf` installed (`automake` is not required). Then run
-
-```
-./autogen.sh
-./configure --enable-doc-maintenance
-make
-make install
-```
-
-If you don't have Apache fop and the docbook stylesheets installed, you won't be able to build documentation.  You can omit `--enable-doc-maintenance` and produce working qpdf software that passes its test suite, but `make install` will not install documentation files.  Depending on your purposes, this may be fine, or you can grab the docs from a source distribution.
+When building qpdf from a pristine checkout from version control, generated documentation files are not present. You may either generate them (by passing `--enable-doc-maintenance` to `./configure` and satisfying the extra build-time dependencies) or obtain them from a released source package, which includes them. If you want to grab just the files that are in the source distribution but not in the repository, extract a source distribution in a temporary directory, and run `make CLEAN=1 distfiles.zip`. This will create a file called `distfiles.zip`, which can you can extract in a checkout of the source repository. This step is optional unless you are running make install and want the html and PDF versions of the documentation to be installed.
 
 # Building from source distribution on UNIX/Linux
 
