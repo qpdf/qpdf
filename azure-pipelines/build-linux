@@ -9,7 +9,7 @@ sudo apt-get -y install \
 make -j$(nproc)
 make -k check
 make distfiles.zip
-./make_dist --ci-mode --no-tests
+./make_dist --ci --no-tests
 mkdir distribution
 cp /tmp/qpdf*-ci.tar.gz distribution
 sha256sum distribution/*
