@@ -2,7 +2,7 @@
 #
 # This file is part of qtest.
 #
-# Copyright 1993-2007, Jay Berkenbilt
+# Copyright 1993-2018, Jay Berkenbilt
 #
 # QTest is distributed under the terms of version 2.0 of the Artistic
 # license which may be found in the source distribution.
@@ -33,7 +33,7 @@ require TestDriver;
 
 if ((@ARGV == 1) && ($ARGV[0] eq '--version'))
 {
-    print "$whoami version 1.4\n";
+    print "$whoami version 1.5\n";
     exit 0;
 }
 if ((@ARGV == 1) && ($ARGV[0] eq '--print-path'))
@@ -46,6 +46,7 @@ my @bindirs = ();
 my $datadir = undef;
 my $covdir = '.';
 my $stdout_tty = (-t STDOUT) ? "1" : "0";
+my $junit_suffix = "";
 
 while (@ARGV)
 {
@@ -68,6 +69,11 @@ while (@ARGV)
     elsif ($arg =~ m/^-stdout-tty=([01])$/)
     {
 	$stdout_tty = $1;
+    }
+    elsif ($arg eq '-junit-suffix')
+    {
+	usage() unless @ARGV;
+	$junit_suffix = "-" . shift(@ARGV);
     }
     else
     {
@@ -159,8 +165,10 @@ elsif (@testcov)
 
 my $testlogfile = 'qtest.log';
 my $testxmlfile = 'qtest-results.xml';
+my $testjunitfile = "TEST-qtest$junit_suffix.xml";
 unlink $testlogfile;
 unlink $testxmlfile;
+unlink $testjunitfile;
 
 my $totmissing = 0;
 my $totextra = 0;
@@ -208,10 +216,13 @@ if (defined $tc_log)
     print_xml(" coverage-scope=\"$tc_scope\"");
 }
 print_xml(">\n");
+print_junit("<?xml version=\"1.0\"?>\n" .
+            "<testsuites>\n");
 foreach my $test (@tests)
 {
     print_and_log("\nRunning $test\n");
     print_xml(" <testsuite file=\"$test\">\n");
+    print_junit(" <testsuite name=\"$test\">\n");
     my @results = run_test($test);
     if (scalar(@results) != 5)
     {
@@ -263,6 +274,7 @@ foreach my $test (@tests)
 	print_xml("  />\n");
     }
     print_xml(" </testsuite>\n");
+    print_junit(" </testsuite>\n");
 }
 
 my $coverage_okay = 1;
@@ -317,6 +329,7 @@ if (defined $tc_log)
 }
 print_xml(" />\n" .
 	  "</qtest-results>\n");
+print_junit("</testsuites>\n");
 
 exit ($okay ? 0 : 2);
 
@@ -408,6 +421,7 @@ sub run_test
 	       '-tempdir', $tempdir,
 	       '-testlog', "$cwd/$testlogfile",
 	       '-testxml', "$cwd/$testxmlfile",
+	       '-testjunit', "$cwd/$testjunitfile",
 	       "-stdout-tty=$stdout_tty") or
 		   fatal("exec $prog failed: $!");
     }
@@ -668,15 +682,22 @@ sub tc_do_final_checks
     if (@problems)
     {
 	my $testxml = open_xml();
+        my $testjunit = open_junit();
 	$testxml->print(" <coverage-errors count=\"" .
 			scalar(@problems) . "\">\n");
+        $testjunit->print(" <testsuite name=\"coverage\">\n");
 	foreach my $p (@problems)
 	{
 	    $testlog->print("$p\n");
 	    $testxml->print("  <coverage-error case=\"$p\"/>\n");
+            $testjunit->print("  <testcase name=\"$p\">\n" .
+                              "   <failure message=\"$p\"/>\n" .
+                              "  </testcase>\n");
 	}
 	$testxml->print(" </coverage-errors>\n");
 	$testxml->close();
+        $testjunit->print(" </testsuite>\n");
+        $testjunit->close();
 	$testlog->print("coverage errors: " . scalar(@problems) . "\n");
     }
     my $passed = (@problems == 0);
@@ -718,6 +739,11 @@ sub open_xml
     open_binary($testxmlfile);
 }
 
+sub open_junit
+{
+    open_binary($testjunitfile);
+}
+
 sub print_and_log
 {
     my $fh = open_log();
@@ -729,6 +755,13 @@ sub print_and_log
 sub print_xml
 {
     my $fh = open_xml();
+    print $fh @_;
+    $fh->close();
+}
+
+sub print_junit
+{
+    my $fh = open_junit();
     print $fh @_;
     $fh->close();
 }
@@ -784,6 +817,7 @@ Options include:
   -bindirs bindir[:bindir...]
   [ -covdir [coverage-dir] ]
   [ -stdout-tty=[01] ]
+  [ -junit-suffix suffix ]
 
 Subsidiary test programs are run with the -bindirs argument (a
 colon-separated list of directories, which may be relative but will be
@@ -808,6 +842,15 @@ If the -stdout-tty option is passed, its value overrides ${whoami}'s
 determination of whether standard output is a terminal.  This can be
 useful for cases in which another program is invoking ${whoami} and
 passing its output through a pipe to a terminal.
+
+Qtest writes its results to qtest.log, qtest-results.xml, and
+TEST-qtest.xml. The TEST-qtest.xml file is compatible with JUnit's
+test ouput, which makes it useful for many continuous integration
+systems. The test output information in that file is not quite as rich
+as in qtest-results.xml, but it is good enough for most purposes. If
+you want your JUnit-compatible results file to have a different name,
+pass -junit-suffix yoursuffix. This will change the name to
+TEST-qtest-yoursuffix.xml.
 
 ";
     exit 2;
