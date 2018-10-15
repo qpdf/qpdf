@@ -1,14 +1,10 @@
-Azure Pipelines
-===============
-
- * Work make_dist and building of the app image into the pipeline so I
-   can use the pipeline to create all the official release files.
-   Append -ci to the names and include the sha256sum in the output.
-   The official release process will be to take the artifacts from the
-   release commit on master, verify the checksums, and rename.
-
 Soon
 ====
+
+ * The check status test in the content preservation tests is fragile
+   on Windows. The output gets truncated occasionally. Figure out the
+   source of the fragility and fix. Then fix make_windows_releases and
+   azure-pipelines/build-windows to not ignore test failures.
 
  * Figure out how to render Gajić correctly in the PDF version of the
    qpdf manual.
@@ -38,11 +34,6 @@ Soon
       endobj collides with the start of the next object
 
     - See ../misc/broken-files
-
- * Some qpdf --check tests are fragile on Windows. The output gets
-   truncated. This happens in the loop for content preservation tests.
-   Figure out the source of the fragility.
-
 
 Next ABI
 ========
