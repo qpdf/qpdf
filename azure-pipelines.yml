@@ -94,5 +94,9 @@ jobs:
       artifactName: distribution
     displayName: 'Upload AppImage'
     condition: eq(variables['System.PullRequest.IsFork'], 'False')
+  - task: PublishTestResults@2
+    inputs:
+      testRunTitle: AppImage
+      buildPlatform: AppImage
   dependsOn: Linux
   condition: succeeded()
