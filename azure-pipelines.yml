@@ -32,9 +32,11 @@ jobs:
       msvc64:
         wordsize: 64
         tool: msvc
-      mingw32:
-        wordsize: 32
-        tool: mingw
+# mingw 32-bit build is temporarily disabled pending resolution of
+# https://github.com/Alexpux/MINGW-packages/issues/4543
+#      mingw32:
+#        wordsize: 32
+#        tool: mingw
       mingw64:
         wordsize: 64
         tool: mingw
