@@ -29,8 +29,7 @@ installdir=install-$tool$wordsize
 rm -rf $installdir
 ./config-$tool --with-windows-wordsize=$wordsize --enable-show-failed-test-output
 make -j$(nproc)
-# XXX Fix test fragility -- it's always check status in the content preservation tests.
-make -k check || echo "WARNING: TESTS FAILED"
+make -k check
 make install
 
 v=`(cd $installdir; ls -d qpdf-*)`
