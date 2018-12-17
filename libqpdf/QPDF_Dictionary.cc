@@ -39,6 +39,20 @@ QPDF_Dictionary::unparse()
     return result;
 }
 
+JSON
+QPDF_Dictionary::getJSON()
+{
+    JSON j = JSON::makeDictionary();
+    for (std::map<std::string, QPDFObjectHandle>::iterator iter =
+	     this->items.begin();
+	 iter != this->items.end(); ++iter)
+    {
+        j.addDictionaryMember(QPDF_Name::normalizeName((*iter).first),
+                              (*iter).second.getJSON());
+    }
+    return j;
+}
+
 QPDFObject::object_type_e
 QPDF_Dictionary::getTypeCode() const
 {

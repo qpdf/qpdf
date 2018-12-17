@@ -10,6 +10,12 @@ QPDF_Null::unparse()
     return "null";
 }
 
+JSON
+QPDF_Null::getJSON()
+{
+    return JSON::makeNull();
+}
+
 QPDFObject::object_type_e
 QPDF_Null::getTypeCode() const
 {

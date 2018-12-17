@@ -15,6 +15,12 @@ QPDF_Bool::unparse()
     return (val ? "true" : "false");
 }
 
+JSON
+QPDF_Bool::getJSON()
+{
+    return JSON::makeBool(this->val);
+}
+
 QPDFObject::object_type_e
 QPDF_Bool::getTypeCode() const
 {

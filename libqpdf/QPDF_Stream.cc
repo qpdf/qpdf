@@ -74,6 +74,12 @@ QPDF_Stream::unparse()
 	QUtil::int_to_string(this->generation) + " R";
 }
 
+JSON
+QPDF_Stream::getJSON()
+{
+    return this->stream_dict.getJSON();
+}
+
 QPDFObject::object_type_e
 QPDF_Stream::getTypeCode() const
 {

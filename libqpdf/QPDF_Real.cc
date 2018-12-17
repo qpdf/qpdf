@@ -22,6 +22,12 @@ QPDF_Real::unparse()
     return this->val;
 }
 
+JSON
+QPDF_Real::getJSON()
+{
+    return JSON::makeNumber(this->val);
+}
+
 QPDFObject::object_type_e
 QPDF_Real::getTypeCode() const
 {

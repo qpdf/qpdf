@@ -44,6 +44,12 @@ QPDF_Name::unparse()
     return normalizeName(this->name);
 }
 
+JSON
+QPDF_Name::getJSON()
+{
+    return JSON::makeString(normalizeName(this->name));
+}
+
 QPDFObject::object_type_e
 QPDF_Name::getTypeCode() const
 {

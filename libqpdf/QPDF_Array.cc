@@ -35,6 +35,18 @@ QPDF_Array::unparse()
     return result;
 }
 
+JSON
+QPDF_Array::getJSON()
+{
+    JSON j = JSON::makeArray();
+    for (std::vector<QPDFObjectHandle>::iterator iter = this->items.begin();
+	 iter != this->items.end(); ++iter)
+    {
+        j.addArrayElement((*iter).getJSON());
+    }
+    return j;
+}
+
 QPDFObject::object_type_e
 QPDF_Array::getTypeCode() const
 {

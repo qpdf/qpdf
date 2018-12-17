@@ -1235,6 +1235,25 @@ QPDFObjectHandle::unparseBinary()
     }
 }
 
+JSON
+QPDFObjectHandle::getJSON(bool dereference_indirect)
+{
+    if ((! dereference_indirect) && this->isIndirect())
+    {
+        return JSON::makeString(unparse());
+    }
+    else
+    {
+        if (this->m->reserved)
+        {
+            throw std::logic_error(
+                "QPDFObjectHandle: attempting to unparse a reserved object");
+        }
+        dereference();
+        return this->m->obj->getJSON();
+    }
+}
+
 QPDFObjectHandle
 QPDFObjectHandle::wrapInArray()
 {

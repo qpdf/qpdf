@@ -733,6 +733,25 @@ class QPDFObjectHandle
     QPDF_DLL
     std::string unparseBinary();
 
+    // Return encoded as JSON. For most object types, there is an
+    // obvious mapping. The JSON is generated as follows:
+    // * Names are encoded as strings representing the normalized value of
+    //   getName()
+    // * Indirect references are encoded as strings containing "obj gen R"
+    // * Strings are encoded as UTF-8 strings with unrepresentable binary
+    //   characters encoded as \uHHHH
+    // * Encoding streams just encodes the stream's dictionary; the stream
+    //   data is not represented
+    // * Object types that are only valid in content streams (inline
+    //   image, operator) as well as "reserved" objects are not
+    //   representable and will be serialized as "null".
+    // If dereference_indirect is true and this is an indirect object,
+    // show the actual contents of the object. The effect of
+    // dereference_indirect applies only to this object. It is not
+    // recursive.
+    QPDF_DLL
+    JSON getJSON(bool dereference_indirect = false);
+
     // Legacy helper methods for commonly performed operations on
     // pages. Newer code should use QPDFPageObjectHelper instead. The
     // specification and behavior of these methods are the same as the

@@ -17,6 +17,12 @@ QPDF_Integer::unparse()
     return QUtil::int_to_string(this->val);
 }
 
+JSON
+QPDF_Integer::getJSON()
+{
+    return JSON::makeInt(this->val);
+}
+
 QPDFObject::object_type_e
 QPDF_Integer::getTypeCode() const
 {

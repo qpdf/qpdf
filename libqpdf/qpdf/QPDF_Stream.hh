@@ -17,6 +17,7 @@ class QPDF_Stream: public QPDFObject
 		qpdf_offset_t offset, size_t length);
     virtual ~QPDF_Stream();
     virtual std::string unparse();
+    virtual JSON getJSON();
     virtual QPDFObject::object_type_e getTypeCode() const;
     virtual char const* getTypeName() const;
     virtual void setDescription(QPDF*, std::string const&);

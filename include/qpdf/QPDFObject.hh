@@ -24,6 +24,7 @@
 
 #include <qpdf/DLL.h>
 #include <qpdf/PointerHolder.hh>
+#include <qpdf/JSON.hh>
 
 #include <string>
 
@@ -62,6 +63,7 @@ class QPDFObject
 
     virtual ~QPDFObject() {}
     virtual std::string unparse() = 0;
+    virtual JSON getJSON() = 0;
 
     // Return a unique type code for the object
     virtual object_type_e getTypeCode() const = 0;

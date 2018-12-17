@@ -17,6 +17,12 @@ QPDF_Operator::unparse()
     return this->val;
 }
 
+JSON
+QPDF_Operator::getJSON()
+{
+    return JSON::makeNull();
+}
+
 QPDFObject::object_type_e
 QPDF_Operator::getTypeCode() const
 {

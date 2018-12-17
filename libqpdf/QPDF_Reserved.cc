@@ -12,6 +12,13 @@ QPDF_Reserved::unparse()
     return "";
 }
 
+JSON
+QPDF_Reserved::getJSON()
+{
+    throw std::logic_error("attempt to generate JSON from QPDF_Reserved");
+    return JSON::makeNull();
+}
+
 QPDFObject::object_type_e
 QPDF_Reserved::getTypeCode() const
 {

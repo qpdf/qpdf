@@ -9,6 +9,7 @@ class QPDF_Operator: public QPDFObject
     QPDF_Operator(std::string const& val);
     virtual ~QPDF_Operator();
     virtual std::string unparse();
+    virtual JSON getJSON();
     virtual QPDFObject::object_type_e getTypeCode() const;
     virtual char const* getTypeName() const;
     std::string getVal() const;

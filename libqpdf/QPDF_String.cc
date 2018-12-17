@@ -122,6 +122,12 @@ QPDF_String::unparse()
     return unparse(false);
 }
 
+JSON
+QPDF_String::getJSON()
+{
+    return JSON::makeString(getUTF8Val());
+}
+
 QPDFObject::object_type_e
 QPDF_String::getTypeCode() const
 {

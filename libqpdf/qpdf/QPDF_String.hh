@@ -15,6 +15,7 @@ class QPDF_String: public QPDFObject
     virtual QPDFObject::object_type_e getTypeCode() const;
     virtual char const* getTypeName() const;
     std::string unparse(bool force_binary);
+    virtual JSON getJSON();
     std::string getVal() const;
     std::string getUTF8Val() const;
 

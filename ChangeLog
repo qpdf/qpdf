@@ -1,5 +1,9 @@
 2018-12-18  Jay Berkenbilt  <ejb@ql.org>
 
+	* New method QPDFObjectHandle::getJSON() returns a JSON object
+	with a partial representation of the object. See
+	QPDFObjectHandle.hh for a detailed description.
+
 	* Add a simple JSON serializer. This is not a complete or
 	general-purpose JSON library. It allows assembly and serialization
 	of JSON structures with some restrictions, which are described in

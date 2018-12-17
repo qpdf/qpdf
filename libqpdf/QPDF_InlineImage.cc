@@ -17,6 +17,12 @@ QPDF_InlineImage::unparse()
     return this->val;
 }
 
+JSON
+QPDF_InlineImage::getJSON()
+{
+    return JSON::makeNull();
+}
+
 QPDFObject::object_type_e
 QPDF_InlineImage::getTypeCode() const
 {
