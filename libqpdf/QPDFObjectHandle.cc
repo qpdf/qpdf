@@ -1236,6 +1236,18 @@ QPDFObjectHandle::unparseBinary()
 }
 
 QPDFObjectHandle
+QPDFObjectHandle::wrapInArray()
+{
+    if (isArray())
+    {
+        return *this;
+    }
+    QPDFObjectHandle result = QPDFObjectHandle::newArray();
+    result.appendItem(*this);
+    return result;
+}
+
+QPDFObjectHandle
 QPDFObjectHandle::parse(std::string const& object_str,
                         std::string const& object_description)
 {

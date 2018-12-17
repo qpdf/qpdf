@@ -255,6 +255,12 @@ class QPDFObjectHandle
 
     // Public factory methods
 
+    // Wrap an object in an array if it is not already an array. This
+    // is a helper for cases in which something in a PDF may either be
+    // a single item or an array of items, which is a common idiom.
+    QPDF_DLL
+    QPDFObjectHandle wrapInArray();
+
     // Construct an object of any type from a string representation of
     // the object.  Throws QPDFExc with an empty filename and an
     // offset into the string if there is an error.  Any indirect
