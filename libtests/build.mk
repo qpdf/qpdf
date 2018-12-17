@@ -10,6 +10,7 @@ BINS_libtests = \
 	flate \
 	hex \
 	input_source \
+	json \
 	lzw \
 	md5 \
 	pointer_holder \

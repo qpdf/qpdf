@@ -1,5 +1,10 @@
 2018-12-18  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add a simple JSON serializer. This is not a complete or
+	general-purpose JSON library. It allows assembly and serialization
+	of JSON structures with some restrictions, which are described in
+	the header file.
+
 	* Add QPDFNameTreeObjectHelper class. This class provides useful
 	methods for dealing with name trees, which are discussed in
 	section 7.9.6 of the PDF spec (ISO-32000).

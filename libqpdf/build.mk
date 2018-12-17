@@ -14,6 +14,7 @@ SRCS_libqpdf = \
 	libqpdf/FileInputSource.cc \
 	libqpdf/InputSource.cc \
 	libqpdf/InsecureRandomDataProvider.cc \
+	libqpdf/JSON.cc \
 	libqpdf/MD5.cc \
 	libqpdf/OffsetInputSource.cc \
 	libqpdf/Pipeline.cc \

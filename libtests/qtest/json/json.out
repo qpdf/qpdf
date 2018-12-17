@@ -1,0 +1,23 @@
+--- top-level type mismatch
+top-level object is supposed to be a dictionary
+---
+--- top-level type mismatch
+json key "./one./a": key "/q" is present in schema but missing in object
+json key "./one./a./r" is supposed to be a dictionary
+json key "./one./a./s" is supposed to be an array
+json key "./one./a": key "/t" is not present in schema but appears in object
+json key "./two.1": key "/glarp" is present in schema but missing in object
+json key "./two.1": key "/flarp" is not present in schema but appears in object
+json key "./two.2" is supposed to be a dictionary
+json key "./two.3" is supposed to be a dictionary
+---
+--- top-level schema array error
+top-level object schema array contains other than one item
+---
+--- lower-level schema array error
+json key "./one./a./r" schema array contains other than one item
+json key "./two" schema array contains other than one item
+---
+--- pass
+---
+end of json tests

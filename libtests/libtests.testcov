@@ -34,3 +34,8 @@ Pl_PNGFilter decodeUp 0
 Pl_PNGFilter decodeAverage 0
 Pl_PNGFilter decodePaeth 0
 Pl_TIFFPredictor processRow 1
+JSON wanted dictionary 0
+JSON key missing in object 0
+JSON wanted array 0
+JSON schema array error 0
+JSON key extra in object 0
