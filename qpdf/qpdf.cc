@@ -17,6 +17,7 @@
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QPDFPageLabelDocumentHelper.hh>
+#include <qpdf/QPDFOutlineDocumentHelper.hh>
 #include <qpdf/QPDFExc.hh>
 
 #include <qpdf/QPDFWriter.hh>
@@ -117,6 +118,7 @@ struct Options
         show_filtered_stream_data(false),
         show_pages(false),
         show_page_images(false),
+        show_json(false),
         check(false),
         require_outfile(true),
         infilename(0),
@@ -189,6 +191,7 @@ struct Options
     bool show_filtered_stream_data;
     bool show_pages;
     bool show_page_images;
+    bool show_json;
     bool check;
     std::vector<PageSpec> page_specs;
     std::map<std::string, RotationSpec> rotations;
@@ -547,6 +550,75 @@ void usage(std::string const& msg)
 	<< "For detailed help, run " << whoami << " --help" << std::endl
 	<< std::endl;
     exit(EXIT_ERROR);
+}
+
+static JSON json_schema()
+{
+    // This JSON object doubles as a schema and as documentation for
+    // our JSON output. Any schema mismatch is a bug in qpdf. This
+    // helps to enforce our policy of consistently providing a known
+    // structure where every documented key will always be present,
+    // which makes it easier to consume our JSON. This is discussed in
+    // more depth in the manual.
+    JSON schema = JSON::makeDictionary();
+    schema.addDictionaryMember(
+        "version", JSON::makeString(
+            "JSON format serial number; increased for non-compatible changes"));
+    schema.addDictionaryMember(
+        "objects", JSON::makeString(
+            "Original objects; keys are 'trailer' or 'n n R'"));
+    JSON page = schema.addDictionaryMember("pages", JSON::makeArray()).
+        addArrayElement(JSON::makeDictionary());
+    page.addDictionaryMember(
+        "object",
+        JSON::makeString("reference to original page object"));
+    JSON image = page.addDictionaryMember("images", JSON::makeArray()).
+        addArrayElement(JSON::makeDictionary());
+    image.addDictionaryMember(
+        "object",
+        JSON::makeString("reference to image stream"));
+    image.addDictionaryMember(
+        "width",
+        JSON::makeString("image width"));
+    image.addDictionaryMember(
+        "height",
+        JSON::makeString("image height"));
+    image.addDictionaryMember("filter", JSON::makeArray()).
+        addArrayElement(
+            JSON::makeString("filters applied to image data"));
+    image.addDictionaryMember("decodeparms", JSON::makeArray()).
+        addArrayElement(
+            JSON::makeString("decode parameters for image data"));
+    image.addDictionaryMember(
+        "filterable",
+        JSON::makeString("whether image data can be decoded"
+                         " using the decode level qpdf was invoked with"));
+    page.addDictionaryMember("contents", JSON::makeArray()).
+        addArrayElement(
+            JSON::makeString("reference to each content stream"));
+    page.addDictionaryMember(
+        "label",
+        JSON::makeString("page label dictionary, or null if none"));
+    JSON labels = schema.addDictionaryMember("pagelabels", JSON::makeArray()).
+        addArrayElement(JSON::makeDictionary());
+    labels.addDictionaryMember(
+        "index",
+        JSON::makeString("starting page position starting from zero"));
+    labels.addDictionaryMember(
+        "label",
+        JSON::makeString("page label dictionary"));
+    JSON outline = page.addDictionaryMember("outlines", JSON::makeArray()).
+        addArrayElement(JSON::makeDictionary());
+    outline.addDictionaryMember(
+        "object",
+        JSON::makeString("reference to outline that targets this page"));
+    outline.addDictionaryMember(
+        "title",
+        JSON::makeString("outline title"));
+    outline.addDictionaryMember(
+        "destination",
+        JSON::makeString("outline destination dictionary"));
+    return schema;
 }
 
 static std::string show_bool(bool v)
@@ -1613,6 +1685,11 @@ static void parse_options(int argc, char* argv[], Options& o)
             {
                 o.show_page_images = true;
             }
+            else if (strcmp(arg, "show-json") == 0)
+            {
+                o.show_json = true;
+                o.require_outfile = false;
+            }
             else if (strcmp(arg, "check") == 0)
             {
                 o.check = true;
@@ -1884,12 +1961,174 @@ static void do_show_pages(QPDF& pdf, Options& o)
     }
 }
 
+static void do_show_json(QPDF& pdf, Options& o)
+{
+    JSON j = JSON::makeDictionary();
+    // This version is updated every time a non-backward-compatible
+    // change is made to the JSON format. Clients of the JSON are to
+    // ignore unrecognized keys, so we only update the version of a
+    // key disappears or if its value changes meaning.
+    j.addDictionaryMember("version", JSON::makeInt(1));
+
+    // Objects
+
+    // Add all objects. Do this first before other code below modifies
+    // things by doing stuff like calling
+    // pushInheritedAttributesToPage.
+    JSON j_objects = j.addDictionaryMember("objects", JSON::makeDictionary());
+    j_objects.addDictionaryMember("trailer", pdf.getTrailer().getJSON(true));
+    std::vector<QPDFObjectHandle> objects = pdf.getAllObjects();
+    for (std::vector<QPDFObjectHandle>::iterator iter = objects.begin();
+         iter != objects.end(); ++iter)
+    {
+        j_objects.addDictionaryMember(
+            (*iter).unparse(), (*iter).getJSON(true));
+    }
+
+    // Pages
+
+    JSON j_pages = j.addDictionaryMember("pages", JSON::makeArray());
+    QPDFPageDocumentHelper dh(pdf);
+    QPDFPageLabelDocumentHelper pldh(pdf);
+    QPDFOutlineDocumentHelper odh(pdf);
+    dh.pushInheritedAttributesToPage();
+    std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
+    size_t pageno = 0;
+    for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
+         iter != pages.end(); ++iter, ++pageno)
+    {
+        JSON j_page = j_pages.addArrayElement(JSON::makeDictionary());
+        QPDFPageObjectHelper& ph(*iter);
+        QPDFObjectHandle page = ph.getObjectHandle();
+        j_page.addDictionaryMember("object", page.getJSON());
+        JSON j_images = j_page.addDictionaryMember(
+            "images", JSON::makeArray());
+        std::map<std::string, QPDFObjectHandle> images =
+            ph.getPageImages();
+        for (std::map<std::string, QPDFObjectHandle>::iterator iter =
+                 images.begin();
+             iter != images.end(); ++iter)
+        {
+            JSON j_image = j_images.addArrayElement(JSON::makeDictionary());
+            j_image.addDictionaryMember(
+                "name", JSON::makeString((*iter).first));
+            QPDFObjectHandle image = (*iter).second;
+            QPDFObjectHandle dict = image.getDict();
+            j_image.addDictionaryMember("object", image.getJSON());
+            j_image.addDictionaryMember(
+                "width", dict.getKey("/Width").getJSON());
+            j_image.addDictionaryMember(
+                "height", dict.getKey("/Height").getJSON());
+            QPDFObjectHandle filters = dict.getKey("/Filter").wrapInArray();
+            j_image.addDictionaryMember(
+                "filter", filters.getJSON());
+            QPDFObjectHandle decode_parms = dict.getKey("/DecodeParms");
+            QPDFObjectHandle dp_array;
+            if (decode_parms.isArray())
+            {
+                dp_array = decode_parms;
+            }
+            else
+            {
+                dp_array = QPDFObjectHandle::newArray();
+                for (int i = 0; i < filters.getArrayNItems(); ++i)
+                {
+                    dp_array.appendItem(decode_parms);
+                }
+            }
+            j_image.addDictionaryMember("decodeparms", dp_array.getJSON());
+            j_image.addDictionaryMember(
+                "filterable",
+                JSON::makeBool(
+                    image.pipeStreamData(0, 0, o.decode_level, true)));
+        }
+        j_page.addDictionaryMember("images", j_images);
+        JSON j_contents = j_page.addDictionaryMember(
+            "contents", JSON::makeArray());
+        std::vector<QPDFObjectHandle> content = ph.getPageContents();
+        for (std::vector<QPDFObjectHandle>::iterator iter = content.begin();
+             iter != content.end(); ++iter)
+        {
+            j_contents.addArrayElement((*iter).getJSON());
+        }
+        j_page.addDictionaryMember(
+            "label", pldh.getLabelForPage(pageno).getJSON());
+        JSON j_outlines = j_page.addDictionaryMember(
+            "outlines", JSON::makeArray());
+        std::list<QPDFOutlineObjectHelper> outlines =
+            odh.getOutlinesForPage(page.getObjGen());
+        for (std::list<QPDFOutlineObjectHelper>::iterator oiter =
+                 outlines.begin();
+             oiter != outlines.end(); ++oiter)
+        {
+            JSON j_outline = j_outlines.addArrayElement(JSON::makeDictionary());
+            j_outline.addDictionaryMember(
+                "object", (*oiter).getObjectHandle().getJSON());
+            j_outline.addDictionaryMember(
+                "title", JSON::makeString((*oiter).getTitle()));
+            j_outline.addDictionaryMember(
+                "destination", (*oiter).getDest().getJSON(true));
+        }
+    }
+
+    // Page labels
+
+    JSON j_labels = j.addDictionaryMember("pagelabels", JSON::makeArray());
+    if (pldh.hasPageLabels())
+    {
+        std::vector<QPDFObjectHandle> labels;
+        pldh.getLabelsForPageRange(0, pages.size() - 1, 0, labels);
+        for (std::vector<QPDFObjectHandle>::iterator iter = labels.begin();
+             iter != labels.end(); ++iter)
+        {
+            std::vector<QPDFObjectHandle>::iterator next = iter;
+            ++next;
+            if (next == labels.end())
+            {
+                // This can't happen, so ignore it. This could only
+                // happen if getLabelsForPageRange somehow returned an
+                // odd number of items.
+                break;
+            }
+            JSON j_label = j_labels.addArrayElement(JSON::makeDictionary());
+            j_label.addDictionaryMember("index", (*iter).getJSON());
+            ++iter;
+            j_label.addDictionaryMember("label", (*iter).getJSON());
+        }
+    }
+
+    // Check against schema
+
+    JSON schema = json_schema();
+    std::list<std::string> errors;
+    if (! j.checkSchema(schema, errors))
+    {
+        std::cerr
+            << whoami << " didn't create JSON that complies with its own\n\
+rules. Please report this as a bug at\n\
+   https://github.com/qpdf/qpdf/issues/new\n\
+ideally with the file that caused the error and the output below. Thanks!\n\
+\n";
+        for (std::list<std::string>::iterator iter = errors.begin();
+             iter != errors.end(); ++iter)
+        {
+            std::cerr << (*iter) << std::endl;
+        }
+    }
+
+    std::cout << j.serialize() << std::endl;
+}
+
 static void do_inspection(QPDF& pdf, Options& o)
 {
     int exit_code = 0;
     if (o.check)
     {
         do_check(pdf, o, exit_code);
+    }
+    if (o.show_json)
+    {
+        do_show_json(pdf, o);
     }
     if (o.show_npages)
     {
