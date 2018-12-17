@@ -10,9 +10,9 @@ Debugging:
 
 Memory checks:
 
-./configure CFLAGS="-fsanitize=address -g" \
-   CXXFLAGS="-fsanitize=address -g" \
-   LDFLAGS="-fsanitize=address" \
+./configure CFLAGS="-fsanitize=address -fsanitize=undefined -g" \
+   CXXFLAGS="-fsanitize=address -fsanitize=undefined -g" \
+   LDFLAGS="-fsanitize=address -fsanitize=undefined" \
    --enable-werror --disable-shared
 
 
