@@ -360,3 +360,4 @@ qpdf disable keep files open 0
 qpdf keep files open n 0
 qpdf keep files open y 0
 qpdf don't disable keep files open 0
+QPDFPageLabelDocumentHelper skip first 0

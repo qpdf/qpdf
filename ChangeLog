@@ -1,5 +1,11 @@
 2018-12-18  Jay Berkenbilt  <ejb@ql.org>
 
+	* Preserve page labels when merging and splitting files. Prior
+	versions of qpdf simply preserved the page label information from
+	the first file, which usually wouldn't make any sense in the
+	merged file. Now any page that had a page number in any original
+	file will have the same page number after merging or splitting.
+
 	* Add QPDFPageLabelDocumentHelper class. This is a document helper
 	class that provides useful methods for dealing with page labels.
 	It abstracts the fact that they are stored as number trees and

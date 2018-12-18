@@ -911,23 +911,23 @@ make
     </itemizedlist>
    </para>
    <para>
-    Note that qpdf doesn't presently do anything special about other
-    constructs in a PDF file that may know about pages, so semantics
-    of splitting and merging vary across features.  For example, the
-    document's outlines (bookmarks) point to actual page objects, so
-    if you select some pages and not others, bookmarks that point to
-    pages that are in the output file will work, and remaining
-    bookmarks will not work.  On the other hand, page labels (page
-    numbers specified in the file) are just sequential, so page labels
-    will be messed up in the output file.  A future version of
-    <command>qpdf</command> may do a better job at handling these
-    issues.  (Note that the qpdf library already contains all of the
-    APIs required in order to implement this in your own application
-    if you need it.)  In the mean time, you can always use
-    <option>--empty</option> as the primary input file to avoid
-    copying all of that from the first file.  For example, to take
-    pages 1 through 5 from a <filename>infile.pdf</filename> while
-    preserving all metadata associated with that file, you could use
+    Starting in qpdf version 8.3, when you split and merge files, any
+    page labels (page numbers) are preserved in the final file. It is
+    expected that more document features will be preserved by
+    splitting and merging. In the mean time, semantics of splitting
+    and merging vary across features. For example, the document's
+    outlines (bookmarks) point to actual page objects, so if you
+    select some pages and not others, bookmarks that point to pages
+    that are in the output file will work, and remaining bookmarks
+    will not work. A future version of <command>qpdf</command> may do
+    a better job at handling these issues. (Note that the qpdf library
+    already contains all of the APIs required in order to implement
+    this in your own application if you need it.) In the mean time,
+    you can always use <option>--empty</option> as the primary input
+    file to avoid copying all of that from the first file. For
+    example, to take pages 1 through 5 from a
+    <filename>infile.pdf</filename> while preserving all metadata
+    associated with that file, you could use
 
     <programlisting><command>qpdf</command> <option>infile.pdf --pages infile.pdf 1-5 -- outfile.pdf</option>
 </programlisting>
@@ -946,8 +946,8 @@ make
     If, for some reason, you wanted to take the first page of an
     encrypted file called <filename>encrypted.pdf</filename> with
     password <literal>pass</literal> and repeat it twice in an output
-    file, and if you wanted to drop metadata (like page numbers and
-    outlines) but preserve encryption, you would use
+    file, and if you wanted to drop document-level metadata but
+    preserve encryption, you would use
 
     <programlisting><command>qpdf</command> <option>--empty --copy-encryption=encrypted.pdf --encryption-file-password=pass
 --pages encrypted.pdf --password=pass 1 ./encrypted.pdf --password=pass 1 --

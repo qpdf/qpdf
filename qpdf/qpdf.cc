@@ -16,6 +16,7 @@
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
+#include <qpdf/QPDFPageLabelDocumentHelper.hh>
 #include <qpdf/QPDFExc.hh>
 
 #include <qpdf/QPDFWriter.hh>
@@ -2296,11 +2297,25 @@ static void handle_page_specs(QPDF& pdf, Options& o,
     // Keep track of any pages from the original file that we are
     // selecting.
     std::set<int> selected_from_orig;
+    std::vector<QPDFObjectHandle> new_labels;
+    bool any_page_labels = false;
+    int out_pageno = 0;
     for (std::vector<QPDFPageData>::iterator iter =
              parsed_specs.begin();
          iter != parsed_specs.end(); ++iter)
     {
         QPDFPageData& page_data = *iter;
+        ClosedFileInputSource* cis = 0;
+        if (page_spec_cfis.count(page_data.filename))
+        {
+            cis = page_spec_cfis[page_data.filename];
+            cis->stayOpen(true);
+        }
+        QPDFPageLabelDocumentHelper pldh(*page_data.qpdf);
+        if (pldh.hasPageLabels())
+        {
+            any_page_labels = true;
+        }
         if (o.verbose)
         {
             std::cout << whoami << ": adding pages from "
@@ -2309,22 +2324,14 @@ static void handle_page_specs(QPDF& pdf, Options& o,
         for (std::vector<int>::iterator pageno_iter =
                  page_data.selected_pages.begin();
              pageno_iter != page_data.selected_pages.end();
-             ++pageno_iter)
+             ++pageno_iter, ++out_pageno)
         {
             // Pages are specified from 1 but numbered from 0 in the
             // vector
             int pageno = *pageno_iter - 1;
-            ClosedFileInputSource* cis = 0;
-            if (page_spec_cfis.count(page_data.filename))
-            {
-                cis = page_spec_cfis[page_data.filename];
-                cis->stayOpen(true);
-            }
+            pldh.getLabelsForPageRange(pageno, pageno, out_pageno,
+                                       new_labels);
             dh.addPage(page_data.orig_pages.at(pageno), false);
-            if (cis)
-            {
-                cis->stayOpen(false);
-            }
             if (page_data.qpdf == &pdf)
             {
                 // This is a page from the original file. Keep track
@@ -2332,6 +2339,18 @@ static void handle_page_specs(QPDF& pdf, Options& o,
                 selected_from_orig.insert(pageno);
             }
         }
+        if (cis)
+        {
+            cis->stayOpen(false);
+        }
+    }
+    if (any_page_labels)
+    {
+        QPDFObjectHandle page_labels =
+            QPDFObjectHandle::newDictionary();
+        page_labels.replaceKey(
+            "/Nums", QPDFObjectHandle::newArray(new_labels));
+        pdf.getRoot().replaceKey("/PageLabels", page_labels);
     }
 
     // Delete page objects for unused page in primary. This prevents
@@ -2574,6 +2593,7 @@ static void write_outfile(QPDF& pdf, Options& o)
             dh.pushInheritedAttributesToPage();
             dh.removeUnreferencedResources();
         }
+        QPDFPageLabelDocumentHelper pldh(pdf);
         std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
         int pageno_len = QUtil::int_to_string(pages.size()).length();
         unsigned int num_pages = pages.size();
@@ -2591,6 +2611,16 @@ static void write_outfile(QPDF& pdf, Options& o)
             {
                 QPDFObjectHandle page = pages.at(pageno - 1);
                 outpdf.addPage(page, false);
+            }
+            if (pldh.hasPageLabels())
+            {
+                std::vector<QPDFObjectHandle> labels;
+                pldh.getLabelsForPageRange(first - 1, last - 1, 0, labels);
+                QPDFObjectHandle page_labels =
+                    QPDFObjectHandle::newDictionary();
+                page_labels.replaceKey(
+                    "/Nums", QPDFObjectHandle::newArray(labels));
+                outpdf.getRoot().replaceKey("/PageLabels", page_labels);
             }
             std::string page_range = QUtil::int_to_string(first, pageno_len);
             if (o.split_pages > 1)
