@@ -6,6 +6,7 @@
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
+#include <qpdf/QPDFNumberTreeObjectHelper.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/Pl_StdioFile.hh>
@@ -1659,6 +1660,35 @@ void runtest(int n, char const* filename1, char const* arg2)
         {
             exit(3);
         }
+    }
+    else if (n == 46)
+    {
+        // Test number tree. This test is crafted to work with
+        // number-tree.pdf
+        QPDFObjectHandle qtest = pdf.getTrailer().getKey("/QTest");
+        QPDFNumberTreeObjectHelper ntoh(qtest);
+        QPDFNumberTreeObjectHelper::idx_map ntoh_map = ntoh.getAsMap();
+        for (QPDFNumberTreeObjectHelper::idx_map::iterator iter =
+                 ntoh_map.begin();
+             iter != ntoh_map.end(); ++iter)
+        {
+            std::cout << (*iter).first << " "
+                      << (*iter).second.getStringValue()
+                      << std::endl;
+        }
+        assert(1 == ntoh.getMin());
+        assert(29 == ntoh.getMax());
+        assert(ntoh.hasIndex(6));
+        assert(! ntoh.hasIndex(500));
+        QPDFObjectHandle oh;
+        assert(! ntoh.findObject(4, oh));
+        assert(ntoh.findObject(3, oh));
+        assert("three" == oh.getStringValue());
+        QPDFNumberTreeObjectHelper::numtree_number offset = 0;
+        assert(! ntoh.findObjectAtOrBelow(0, oh, offset));
+        assert(ntoh.findObjectAtOrBelow(8, oh, offset));
+        assert("six" == oh.getStringValue());
+        assert(2 == offset);
     }
     else
     {

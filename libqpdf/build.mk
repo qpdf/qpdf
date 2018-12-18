@@ -40,6 +40,7 @@ SRCS_libqpdf = \
 	libqpdf/QPDFAnnotationObjectHelper.cc \
 	libqpdf/QPDFExc.cc \
 	libqpdf/QPDFFormFieldObjectHelper.cc \
+	libqpdf/QPDFNumberTreeObjectHelper.cc \
 	libqpdf/QPDFObjGen.cc \
 	libqpdf/QPDFObject.cc \
 	libqpdf/QPDFObjectHandle.cc \

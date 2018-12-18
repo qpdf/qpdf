@@ -1,5 +1,10 @@
 2018-12-18  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add QPDFNumberTreeObjectHelper class. This class provides useful
+	methods for dealing with number trees, which are discussed in
+	section 7.9.7 of the PDF spec (ISO-32000). Page label dictionaries
+	are represented as number trees.
+
 	* New method QPDFObjectHandle::wrapInArray returns the object
 	itself if it is an array. Otherwise, it returns an array
 	containing the object. This is useful for dealing with PDF data
