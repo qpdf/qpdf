@@ -7,6 +7,7 @@
 #include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
 #include <qpdf/QPDFNumberTreeObjectHelper.hh>
+#include <qpdf/QPDFPageLabelDocumentHelper.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/Pl_StdioFile.hh>
@@ -1689,6 +1690,21 @@ void runtest(int n, char const* filename1, char const* arg2)
         assert(ntoh.findObjectAtOrBelow(8, oh, offset));
         assert("six" == oh.getStringValue());
         assert(2 == offset);
+    }
+    else if (n == 47)
+    {
+        // Test page labels.
+        QPDFPageLabelDocumentHelper pldh(pdf);
+        size_t npages = pdf.getRoot().getKey("/Pages").
+            getKey("/Count").getIntValue();
+        std::vector<QPDFObjectHandle> labels;
+        pldh.getLabelsForPageRange(0, npages - 1, 1, labels);
+        assert(labels.size() % 2 == 0);
+        for (size_t i = 0; i < labels.size(); i+= 2)
+        {
+            std::cout << labels.at(i).getIntValue() << " "
+                      << labels.at(i+1).unparse() << std::endl;
+        }
     }
     else
     {

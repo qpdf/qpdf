@@ -236,6 +236,24 @@ $td->runtest("number trees",
 
 show_ntests();
 # ----------
+$td->notify("--- Page Labels ---");
+$n_tests += 3;
+
+$td->runtest("complex page labels",
+	     {$td->COMMAND => "test_driver 47 page-labels-num-tree.pdf"},
+	     {$td->FILE => "page-labels-num-tree.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("no zero entry for page labels",
+	     {$td->COMMAND => "test_driver 47 page-labels-no-zero.pdf"},
+	     {$td->FILE => "page-labels-no-zero.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("no page labels",
+	     {$td->COMMAND => "test_driver 47 minimal.pdf"},
+	     {$td->FILE => "no-page-labels.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+show_ntests();
+# ----------
 $td->notify("--- Page API Tests ---");
 $n_tests += 9;
 

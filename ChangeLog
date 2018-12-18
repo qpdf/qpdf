@@ -1,5 +1,12 @@
 2018-12-18  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add QPDFPageLabelDocumentHelper class. This is a document helper
+	class that provides useful methods for dealing with page labels.
+	It abstracts the fact that they are stored as number trees and
+	deals with interpolating intermediate values that are not in the
+	tree. It also has helper functions used by the qpdf command line
+	tool to preserve page labels when merging and splitting files.
+
 	* Add QPDFNumberTreeObjectHelper class. This class provides useful
 	methods for dealing with number trees, which are discussed in
 	section 7.9.7 of the PDF spec (ISO-32000). Page label dictionaries
