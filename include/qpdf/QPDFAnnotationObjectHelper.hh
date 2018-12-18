@@ -71,7 +71,7 @@ class QPDFAnnotationObjectHelper: public QPDFObjectHelper
   private:
     class Members
     {
-        friend class QPDFPageObjectHelper;
+        friend class QPDFAnnotationObjectHelper;
 
       public:
         QPDF_DLL
