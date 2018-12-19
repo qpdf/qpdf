@@ -1,0 +1,12 @@
+page 0: Trepsicle 1.2.2 -> 0: /XYZ null null null -> [ 3 0 R /XYZ null null null ]
+page 1: Trepsichord 1.2.1 -> 1: /FitR 66 714 180 770 -> [ 4 0 R /FitR 66 714 180 770 ]
+page 5: Isís 1 -> 5: /XYZ null null null -> [ 8 0 R /XYZ null null null ]
+page 11: Amanda 1.1 -> 11: /Fit -> [ 14 0 R /Fit ]
+page 12: Isosicle 1.1.1 -> 12: /FitV 100 -> [ 15 0 R /FitV 100 ]
+page 12: Isosicle 1.1.2 -> 12: /XYZ null null null -> [ 15 0 R /XYZ null null null ]
+page 13: Sandy ÷Σανδι÷ 1.2 -> 13: /FitH 792 -> [ 16 0 R /FitH 792 ]
+page 15: Trepak 2 -> 15: /XYZ 66 756 3 -> [ 18 0 R /XYZ 66 756 3 ]
+page 18: Isosicle 1.1.1.1 -> 18: /XYZ null null null -> [ 21 0 R /XYZ null null null ]
+page 19: Isosicle 1.1.1.2 -> 19: /XYZ null null null -> [ 22 0 R /XYZ null null null ]
+page 22: Isosicle 1.1.2.1 -> 22: /XYZ null null null -> [ 25 0 R /XYZ null null null ]
+test 49 done

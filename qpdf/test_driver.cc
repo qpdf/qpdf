@@ -9,6 +9,7 @@
 #include <qpdf/QPDFNumberTreeObjectHelper.hh>
 #include <qpdf/QPDFNameTreeObjectHelper.hh>
 #include <qpdf/QPDFPageLabelDocumentHelper.hh>
+#include <qpdf/QPDFOutlineDocumentHelper.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/Pl_StdioFile.hh>
@@ -1729,6 +1730,29 @@ void runtest(int n, char const* filename1, char const* arg2)
         assert(! ntoh.findObject("potato", oh));
         assert(ntoh.findObject("07 sev\xe2\x80\xa2n", oh));
         assert("seven!" == oh.getStringValue());
+    }
+    else if (n == 49)
+    {
+        // Outlines
+        std::vector<QPDFPageObjectHelper> pages =
+            QPDFPageDocumentHelper(pdf).getAllPages();
+        QPDFOutlineDocumentHelper odh(pdf);
+        int pageno = 0;
+        for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
+             iter != pages.end(); ++iter, ++pageno)
+        {
+            std::list<QPDFOutlineObjectHelper> outlines =
+                odh.getOutlinesForPage((*iter).getObjectHandle().getObjGen());
+            for (std::list<QPDFOutlineObjectHelper>::iterator oiter =
+                     outlines.begin();
+                 oiter != outlines.end(); ++oiter)
+            {
+                std::cout
+                    << "page " << pageno << ": "
+                    << (*oiter).getTitle() << " -> "
+                    << (*oiter).getDest().unparseResolved() << std::endl;
+            }
+        }
     }
     else
     {

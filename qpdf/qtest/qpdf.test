@@ -258,6 +258,24 @@ $td->runtest("no page labels",
 
 show_ntests();
 # ----------
+$td->notify("--- Outlines ---");
+my @outline_files = (
+    'page-labels-and-outlines',
+    'outlines-with-actions',
+    'outlines-with-old-root-dests',
+    'outlines-with-loop',
+    );
+$n_tests += scalar(@outline_files);
+foreach my $f (@outline_files)
+{
+    $td->runtest("outlines: $f",
+                 {$td->COMMAND => "test_driver 49 $f.pdf"},
+                 {$td->FILE => "$f.out", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+show_ntests();
+# ----------
 $td->notify("--- Page API Tests ---");
 $n_tests += 9;
 

@@ -361,3 +361,9 @@ qpdf keep files open n 0
 qpdf keep files open y 0
 qpdf don't disable keep files open 0
 QPDFPageLabelDocumentHelper skip first 0
+QPDFOutlineObjectHelper direct dest 0
+QPDFOutlineObjectHelper action dest 0
+QPDFOutlineObjectHelper named dest 0
+QPDFOutlineDocumentHelper name named dest 0
+QPDFOutlineDocumentHelper string named dest 0
+QPDFOutlineObjectHelper loop 0
