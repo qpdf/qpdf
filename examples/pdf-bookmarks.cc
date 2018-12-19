@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFPageDocumentHelper.hh>
+#include <qpdf/QPDFOutlineDocumentHelper.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/QTC.hh>
 
@@ -56,111 +57,99 @@ void generate_page_map(QPDF& qpdf)
     }
 }
 
-void extract_bookmarks(QPDFObjectHandle outlines, std::vector<int>& numbers)
+void show_bookmark_details(QPDFOutlineObjectHelper outline,
+                           std::vector<int> numbers)
 {
-    if (outlines.hasKey("/Title"))
+    // No default so gcc will warn on missing tag
+    switch (style)
     {
-	// No default so gcc will warn on missing tag
-	switch (style)
-	{
-	  case st_none:
-	    QTC::TC("examples", "pdf-bookmarks none");
-	    break;
+      case st_none:
+        QTC::TC("examples", "pdf-bookmarks none");
+        break;
 
-	  case st_numbers:
-	    QTC::TC("examples", "pdf-bookmarks numbers");
-	    for (std::vector<int>::iterator iter = numbers.begin();
-		 iter != numbers.end(); ++iter)
-	    {
-		std::cout << *iter << ".";
-	    }
-	    std::cout << " ";
-	    break;
+      case st_numbers:
+        QTC::TC("examples", "pdf-bookmarks numbers");
+        for (std::vector<int>::iterator iter = numbers.begin();
+             iter != numbers.end(); ++iter)
+        {
+            std::cout << *iter << ".";
+        }
+        std::cout << " ";
+        break;
 
-	  case st_lines:
-	    QTC::TC("examples", "pdf-bookmarks lines");
-	    print_lines(numbers);
-	    std::cout << "|" << std::endl;
-	    print_lines(numbers);
-	    std::cout << "+-+ ";
-	    break;
-	}
-
-	if (show_open)
-	{
-	    if (outlines.hasKey("/Count"))
-	    {
-		QTC::TC("examples", "pdf-bookmarks has count");
-		int count = outlines.getKey("/Count").getIntValue();
-		if (count > 0)
-		{
-		    // hierarchy is open at this point
-		    QTC::TC("examples", "pdf-bookmarks open");
-		    std::cout << "(v) ";
-		}
-		else
-		{
-		    QTC::TC("examples", "pdf-bookmarks closed");
-		    std::cout << "(>) ";
-		}
-	    }
-	    else
-	    {
-		QTC::TC("examples", "pdf-bookmarks no count");
-		std::cout << "( ) ";
-	    }
-	}
-
-	if (show_targets)
-	{
-	    QTC::TC("examples", "pdf-bookmarks targets");
-	    std::string target = "unknown";
-	    // Only explicit destinations supported for now
-	    if (outlines.hasKey("/Dest"))
-	    {
-		QTC::TC("examples", "pdf-bookmarks dest");
-		QPDFObjectHandle dest = outlines.getKey("/Dest");
-		if ((dest.isArray()) && (dest.getArrayNItems() > 0))
-		{
-		    QPDFObjectHandle first = dest.getArrayItem(0);
-		    QPDFObjGen og = first.getObjGen();
-		    if (page_map.count(og))
-		    {
-			target = QUtil::int_to_string(page_map[og]);
-		    }
-		}
-
-		std::cout << "[ -> " << target << " ] ";
-	    }
-	}
-
-	std::cout << outlines.getKey("/Title").getUTF8Value() << std::endl;
+      case st_lines:
+        QTC::TC("examples", "pdf-bookmarks lines");
+        print_lines(numbers);
+        std::cout << "|" << std::endl;
+        print_lines(numbers);
+        std::cout << "+-+ ";
+        break;
     }
 
-    if (outlines.hasKey("/First"))
+    if (show_open)
     {
-	numbers.push_back(0);
-	QPDFObjectHandle child = outlines.getKey("/First");
-	while (1)
-	{
-	    ++(numbers.back());
-	    bool has_next = child.hasKey("/Next");
-	    if ((style == st_lines) && (! has_next))
-	    {
-		numbers.back() = 0;
-	    }
-	    extract_bookmarks(child, numbers);
-	    if (has_next)
-	    {
-		child = child.getKey("/Next");
-	    }
-	    else
-	    {
-		break;
-	    }
-	}
-	numbers.pop_back();
+        int count = outline.getCount();
+        if (count)
+        {
+            QTC::TC("examples", "pdf-bookmarks has count");
+            if (count > 0)
+            {
+                // hierarchy is open at this point
+                QTC::TC("examples", "pdf-bookmarks open");
+                std::cout << "(v) ";
+            }
+            else
+            {
+                QTC::TC("examples", "pdf-bookmarks closed");
+                std::cout << "(>) ";
+            }
+        }
+        else
+        {
+            QTC::TC("examples", "pdf-bookmarks no count");
+            std::cout << "( ) ";
+        }
     }
+
+    if (show_targets)
+    {
+        QTC::TC("examples", "pdf-bookmarks targets");
+        std::string target = "unknown";
+        QPDFObjectHandle dest_page = outline.getDestPage();
+        if (! dest_page.isNull())
+        {
+            QTC::TC("examples", "pdf-bookmarks dest");
+            QPDFObjGen og = dest_page.getObjGen();
+            if (page_map.count(og))
+            {
+                target = QUtil::int_to_string(page_map[og]);
+            }
+        }
+        std::cout << "[ -> " << target << " ] ";
+    }
+
+    std::cout << outline.getTitle() << std::endl;
+}
+
+void extract_bookmarks(std::list<QPDFOutlineObjectHelper> outlines,
+                       std::vector<int>& numbers)
+{
+    numbers.push_back(0);
+    for (std::list<QPDFOutlineObjectHelper>::iterator iter = outlines.begin();
+         iter != outlines.end(); ++iter)
+    {
+        ++(numbers.back());
+        show_bookmark_details(*iter, numbers);
+        std::list<QPDFOutlineObjectHelper>::iterator next = iter;
+        ++next;
+        bool has_next = (next != outlines.end());
+        if ((style == st_lines) && (! has_next))
+        {
+            numbers.back() = 0;
+        }
+        extract_bookmarks((*iter).getKids(), numbers);
+    }
+    numbers.pop_back();
 }
 
 int main(int argc, char* argv[])
@@ -233,15 +222,15 @@ int main(int argc, char* argv[])
 	QPDF qpdf;
 	qpdf.processFile(filename, password);
 
-	QPDFObjectHandle root = qpdf.getRoot();
-	if (root.hasKey("/Outlines"))
+        QPDFOutlineDocumentHelper odh(qpdf);
+	if (odh.hasOutlines())
 	{
 	    std::vector<int> numbers;
 	    if (show_targets)
 	    {
 		generate_page_map(qpdf);
 	    }
-	    extract_bookmarks(root.getKey("/Outlines"), numbers);
+	    extract_bookmarks(odh.getTopLevelOutlines(), numbers);
 	}
 	else
 	{
