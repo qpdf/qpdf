@@ -1,5 +1,9 @@
 2018-12-18  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add QPDFNameTreeObjectHelper class. This class provides useful
+	methods for dealing with name trees, which are discussed in
+	section 7.9.6 of the PDF spec (ISO-32000).
+
 	* Preserve page labels when merging and splitting files. Prior
 	versions of qpdf simply preserved the page label information from
 	the first file, which usually wouldn't make any sense in the

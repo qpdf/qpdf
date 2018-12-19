@@ -226,12 +226,16 @@ foreach my $input (@ext_inputs)
 }
 show_ntests();
 # ----------
-$td->notify("--- Number Trees ---");
-$n_tests += 1;
+$td->notify("--- Number and Name Trees ---");
+$n_tests += 2;
 
 $td->runtest("number trees",
 	     {$td->COMMAND => "test_driver 46 number-tree.pdf"},
 	     {$td->FILE => "number-tree.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("name trees",
+	     {$td->COMMAND => "test_driver 48 name-tree.pdf"},
+	     {$td->FILE => "name-tree.out", $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 show_ntests();

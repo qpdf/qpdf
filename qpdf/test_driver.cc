@@ -7,6 +7,7 @@
 #include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
 #include <qpdf/QPDFNumberTreeObjectHelper.hh>
+#include <qpdf/QPDFNameTreeObjectHelper.hh>
 #include <qpdf/QPDFPageLabelDocumentHelper.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/QTC.hh>
@@ -1705,6 +1706,29 @@ void runtest(int n, char const* filename1, char const* arg2)
             std::cout << labels.at(i).getIntValue() << " "
                       << labels.at(i+1).unparse() << std::endl;
         }
+    }
+    else if (n == 48)
+    {
+        // Test name tree. This test is crafted to work with
+        // name-tree.pdf
+        QPDFObjectHandle qtest = pdf.getTrailer().getKey("/QTest");
+        QPDFNameTreeObjectHelper ntoh(qtest);
+        std::map<std::string, QPDFObjectHandle> ntoh_map = ntoh.getAsMap();
+        for (std::map<std::string, QPDFObjectHandle>::iterator iter =
+                 ntoh_map.begin();
+             iter != ntoh_map.end(); ++iter)
+        {
+            std::cout << (*iter).first << " -> "
+                      << (*iter).second.getStringValue()
+                      << std::endl;
+        }
+        assert(ntoh.hasName("11 elephant"));
+        assert(ntoh.hasName("07 sev\xe2\x80\xa2n"));
+        assert(! ntoh.hasName("potato"));
+        QPDFObjectHandle oh;
+        assert(! ntoh.findObject("potato", oh));
+        assert(ntoh.findObject("07 sev\xe2\x80\xa2n", oh));
+        assert("seven!" == oh.getStringValue());
     }
     else
     {
