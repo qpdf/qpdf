@@ -1159,7 +1159,7 @@ my @sp_cases = (
     [11, 'pdf extension', '', 'split-out.Pdf'],
     [4, 'fallback', '--pages 11-pages.pdf 1-3 minimal.pdf --', 'split-out'],
     );
-$n_tests += 12;
+$n_tests += 16;
 for (@sp_cases)
 {
     $n_tests += 1 + $_->[0];
@@ -1202,6 +1202,17 @@ foreach my $i (qw(01-06 07-11))
     $td->runtest("check output ($i)",
                  {$td->FILE => "split-out-labels-$i.pdf"},
                  {$td->FILE => "labels-split-$i.pdf"});
+}
+
+$td->runtest("split page with outlines",
+             {$td->COMMAND => "qpdf --qdf --static-id --split-pages=10".
+                  " outlines-with-actions.pdf split-out-outlines.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+foreach my $i (qw(01-10 11-20 21-30))
+{
+    $td->runtest("check output ($i)",
+                 {$td->FILE => "split-out-outlines-$i.pdf"},
+                 {$td->FILE => "outlines-split-$i.pdf"});
 }
 
 foreach my $d (@sp_cases)

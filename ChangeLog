@@ -1,5 +1,13 @@
 2018-12-19  Jay Berkenbilt  <ejb@ql.org>
 
+	* When splitting pages using --split-pages, the outlines
+	dictionary and some supporting metadata are copied into the split
+	files. The result is that all bookmarks from the original file
+	appear, and those that point to pages that are preserved work
+	while those that point to pages that are not preserved don't do
+	anything. This is an interim step toward proper support for
+	bookmark preservation in split files.
+
 	* Add QPDFOutlineDocumentHelper and QPDFOutlineObjectHelper for
 	handling outlines (bookmarks) including bidirectionally mapping
 	between bookmarks and pages. Initially there is no support for

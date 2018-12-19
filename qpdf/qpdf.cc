@@ -2622,6 +2622,30 @@ static void write_outfile(QPDF& pdf, Options& o)
                     "/Nums", QPDFObjectHandle::newArray(labels));
                 outpdf.getRoot().replaceKey("/PageLabels", page_labels);
             }
+            // Copying the outlines tree, names table, and any
+            // outdated Dests key from the original file will make
+            // some things work in the split files. It is not a
+            // complete solution, but at least outlines whose
+            // destinations are on pages that have been preserved will
+            // work normally. There are other top-level structures
+            // that should be copied as well. This will be improved in
+            // the future.
+            std::list<std::string> to_copy;
+            to_copy.push_back("/Names");
+            to_copy.push_back("/Dests");
+            to_copy.push_back("/Outlines");
+            for (std::list<std::string>::iterator iter = to_copy.begin();
+                 iter != to_copy.end(); ++iter)
+            {
+                QPDFObjectHandle orig = pdf.getRoot().getKey(*iter);
+                if (! orig.isIndirect())
+                {
+                    orig = pdf.makeIndirectObject(orig);
+                }
+                outpdf.getRoot().replaceKey(
+                    *iter,
+                    outpdf.copyForeignObject(orig));
+            }
             std::string page_range = QUtil::int_to_string(first, pageno_len);
             if (o.split_pages > 1)
             {
