@@ -1,5 +1,4 @@
 #include <qpdf/QPDFNumberTreeObjectHelper.hh>
-#include <qpdf/QTC.hh>
 
 QPDFNumberTreeObjectHelper::Members::~Members()
 {

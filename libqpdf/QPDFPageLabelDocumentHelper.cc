@@ -85,8 +85,8 @@ QPDFPageLabelDocumentHelper::getLabelsForPageRange(
     bool skip_first = false;
     if (size >= 2)
     {
-        QPDFObjectHandle last = new_labels[size - 1];
-        QPDFObjectHandle last_idx = new_labels[size - 2];
+        QPDFObjectHandle last = new_labels.at(size - 1);
+        QPDFObjectHandle last_idx = new_labels.at(size - 2);
         if (last_idx.isInteger() && last.isDictionary() &&
             (label.getKey("/S").unparse() == last.getKey("/S").unparse()) &&
             (label.getKey("/P").unparse() == last.getKey("/P").unparse()) &&
