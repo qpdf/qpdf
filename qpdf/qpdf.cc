@@ -241,6 +241,78 @@ ProgressReporter::reportProgress(int percentage)
               << percentage << "%" << std::endl;
 }
 
+// This is not a general-purpose argument parser. It is tightly
+// crafted to work with qpdf. qpdf's command-line syntax is very
+// complex because of its long history, and it doesn't really follow
+// any kind of normal standard for arguments, but I don't want to
+// break compatibility by changing what constitutes a valid command.
+// This class is intended to simplify the argument parsing code and
+// also to make it possible to add bash completion support while
+// guaranteeing consistency with the actual argument syntax.
+class ArgParser
+{
+  public:
+    ArgParser(int argc, char* argv[], Options& o);
+    void parseOptions();
+
+  private:
+    void usage(std::string const& message);
+    void handleHelpVersion();
+    void handleArgFileArguments();
+    void readArgsFromFile(char const* filename);
+    void parseEncryptOptions(int& cur_arg);
+    std::vector<PageSpec> parsePagesOptions(int& cur_arg);
+    void parseRotationParameter(std::string const&);
+    std::vector<int> parseNumrange(char const* range, int max,
+                                   bool throw_error = false);
+
+    static char const* help;
+
+    int argc;
+    char** argv;
+    Options& o;
+
+    std::vector<PointerHolder<char> > new_argv;
+    PointerHolder<char*> argv_ph;
+};
+
+ArgParser::ArgParser(int argc, char* argv[], Options& o) :
+    argc(argc),
+    argv(argv),
+    o(o)
+{
+}
+
+void
+ArgParser::handleArgFileArguments()
+{
+    // Support reading arguments from files. Create a new argv. Ensure
+    // that argv itself as well as all its contents are automatically
+    // deleted by using PointerHolder objects to back the pointers in
+    // argv.
+    new_argv.push_back(PointerHolder<char>(true, QUtil::copy_string(argv[0])));
+    for (int i = 1; i < argc; ++i)
+    {
+        if ((strlen(argv[i]) > 1) && (argv[i][0] == '@'))
+        {
+            readArgsFromFile(1+argv[i]);
+        }
+        else
+        {
+            new_argv.push_back(
+                PointerHolder<char>(true, QUtil::copy_string(argv[i])));
+        }
+    }
+    argv_ph = PointerHolder<char*>(true, new char*[1+new_argv.size()]);
+    argv = argv_ph.getPointer();
+    for (size_t i = 0; i < new_argv.size(); ++i)
+    {
+        argv[i] = new_argv.at(i).getPointer();
+    }
+    argc = static_cast<int>(new_argv.size());
+    argv[argc] = 0;
+}
+
 // Note: let's not be too noisy about documenting the fact that this
 // software purposely fails to enforce the distinction between user
 // and owner passwords.  A user password is sufficient to gain full
@@ -250,7 +322,7 @@ ProgressReporter::reportProgress(int percentage)
 // (Setting this value requires the owner password.)  The
 // documentation discusses this as well.
 
-static char const* help = "\
+char const* ArgParser::help  = "\
 \n\
 Usage: qpdf [ options ] { infilename | --empty } [ outfilename ]\n\
 \n\
@@ -540,7 +612,7 @@ exits with a status of 3. If warnings would have been issued but --no-warn\n\
 was given, an exit status of 3 is still used.\n\
 \n";
 
-void usage(std::string const& msg)
+void usageExit(std::string const& msg)
 {
     std::cerr
 	<< std::endl
@@ -550,6 +622,12 @@ void usage(std::string const& msg)
 	<< "For detailed help, run " << whoami << " --help" << std::endl
 	<< std::endl;
     exit(EXIT_ERROR);
+}
+
+void
+ArgParser::usage(std::string const& message)
+{
+    usageExit(message);
 }
 
 static JSON json_schema()
@@ -707,8 +785,8 @@ static void show_encryption(QPDF& pdf, Options& o)
     }
 }
 
-static std::vector<int> parse_numrange(char const* range, int max,
-                                       bool throw_error = false)
+std::vector<int>
+ArgParser::parseNumrange(char const* range, int max, bool throw_error)
 {
     try
     {
@@ -728,35 +806,28 @@ static std::vector<int> parse_numrange(char const* range, int max,
     return std::vector<int>();
 }
 
-static void
-parse_encrypt_options(
-    int argc, char* argv[], int& cur_arg,
-    std::string& user_password, std::string& owner_password, int& keylen,
-    bool& r2_print, bool& r2_modify, bool& r2_extract, bool& r2_annotate,
-    bool& r3_accessibility, bool& r3_extract,
-    qpdf_r3_print_e& r3_print, qpdf_r3_modify_e& r3_modify,
-    bool& force_V4, bool& cleartext_metadata, bool& use_aes,
-    bool& force_R5)
+void
+ArgParser::parseEncryptOptions(int& cur_arg)
 {
     if (cur_arg + 3 >= argc)
     {
 	usage("insufficient arguments to --encrypt");
     }
-    user_password = argv[cur_arg++];
-    owner_password = argv[cur_arg++];
+    o.user_password = argv[cur_arg++];
+    o.owner_password = argv[cur_arg++];
     std::string len_str = argv[cur_arg++];
     if (len_str == "40")
     {
-	keylen = 40;
+	o.keylen = 40;
     }
     else if (len_str == "128")
     {
-	keylen = 128;
+	o.keylen = 128;
     }
     else if (len_str == "256")
     {
-	keylen = 256;
-        use_aes = true;
+	o.keylen = 256;
+        o.use_aes = true;
     }
     else
     {
@@ -798,15 +869,15 @@ parse_encrypt_options(
 		usage("--print must be given as --print=option");
 	    }
 	    std::string val = parameter;
-	    if (keylen == 40)
+	    if (o.keylen == 40)
 	    {
 		if (val == "y")
 		{
-		    r2_print = true;
+		    o.r2_print = true;
 		}
 		else if (val == "n")
 		{
-		    r2_print = false;
+		    o.r2_print = false;
 		}
 		else
 		{
@@ -817,15 +888,15 @@ parse_encrypt_options(
 	    {
 		if (val == "full")
 		{
-		    r3_print = qpdf_r3p_full;
+		    o.r3_print = qpdf_r3p_full;
 		}
 		else if (val == "low")
 		{
-		    r3_print = qpdf_r3p_low;
+		    o.r3_print = qpdf_r3p_low;
 		}
 		else if (val == "none")
 		{
-		    r3_print = qpdf_r3p_none;
+		    o.r3_print = qpdf_r3p_none;
 		}
 		else
 		{
@@ -840,15 +911,15 @@ parse_encrypt_options(
 		usage("--modify must be given as --modify=option");
 	    }
 	    std::string val = parameter;
-	    if (keylen == 40)
+	    if (o.keylen == 40)
 	    {
 		if (val == "y")
 		{
-		    r2_modify = true;
+		    o.r2_modify = true;
 		}
 		else if (val == "n")
 		{
-		    r2_modify = false;
+		    o.r2_modify = false;
 		}
 		else
 		{
@@ -859,23 +930,23 @@ parse_encrypt_options(
 	    {
 		if (val == "all")
 		{
-		    r3_modify = qpdf_r3m_all;
+		    o.r3_modify = qpdf_r3m_all;
 		}
 		else if (val == "annotate")
 		{
-		    r3_modify = qpdf_r3m_annotate;
+		    o.r3_modify = qpdf_r3m_annotate;
 		}
 		else if (val == "form")
 		{
-		    r3_modify = qpdf_r3m_form;
+		    o.r3_modify = qpdf_r3m_form;
 		}
 		else if (val == "assembly")
 		{
-		    r3_modify = qpdf_r3m_assembly;
+		    o.r3_modify = qpdf_r3m_assembly;
 		}
 		else if (val == "none")
 		{
-		    r3_modify = qpdf_r3m_none;
+		    o.r3_modify = qpdf_r3m_none;
 		}
 		else
 		{
@@ -903,13 +974,13 @@ parse_encrypt_options(
 	    {
 		usage("invalid -extract parameter");
 	    }
-	    if (keylen == 40)
+	    if (o.keylen == 40)
 	    {
-		r2_extract = result;
+		o.r2_extract = result;
 	    }
 	    else
 	    {
-		r3_extract = result;
+		o.r3_extract = result;
 	    }
 	}
 	else if (strcmp(arg, "annotate") == 0)
@@ -932,9 +1003,9 @@ parse_encrypt_options(
 	    {
 		usage("invalid -annotate parameter");
 	    }
-	    if (keylen == 40)
+	    if (o.keylen == 40)
 	    {
-		r2_annotate = result;
+		o.r2_annotate = result;
 	    }
 	    else
 	    {
@@ -962,13 +1033,13 @@ parse_encrypt_options(
 	    {
 		usage("invalid -accessibility parameter");
 	    }
-	    if (keylen == 40)
+	    if (o.keylen == 40)
 	    {
 		usage("-accessibility invalid for 40-bit keys");
 	    }
 	    else
 	    {
-		r3_accessibility = result;
+		o.r3_accessibility = result;
 	    }
 	}
 	else if (strcmp(arg, "cleartext-metadata") == 0)
@@ -977,13 +1048,13 @@ parse_encrypt_options(
 	    {
 		usage("--cleartext-metadata does not take a parameter");
 	    }
-	    if (keylen == 40)
+	    if (o.keylen == 40)
 	    {
 		usage("--cleartext-metadata is invalid for 40-bit keys");
 	    }
 	    else
 	    {
-		cleartext_metadata = true;
+		o.cleartext_metadata = true;
 	    }
 	}
 	else if (strcmp(arg, "force-V4") == 0)
@@ -992,13 +1063,13 @@ parse_encrypt_options(
 	    {
 		usage("--force-V4 does not take a parameter");
 	    }
-	    if (keylen != 128)
+	    if (o.keylen != 128)
 	    {
 		usage("--force-V4 is invalid only for 128-bit keys");
 	    }
 	    else
 	    {
-		force_V4 = true;
+		o.force_V4 = true;
 	    }
 	}
 	else if (strcmp(arg, "force-R5") == 0)
@@ -1007,13 +1078,13 @@ parse_encrypt_options(
 	    {
 		usage("--force-R5 does not take a parameter");
 	    }
-	    if (keylen != 256)
+	    if (o.keylen != 256)
 	    {
 		usage("--force-R5 is invalid only for 256-bit keys");
 	    }
 	    else
 	    {
-		force_R5 = true;
+		o.force_R5 = true;
 	    }
 	}
 	else if (strcmp(arg, "use-aes") == 0)
@@ -1036,11 +1107,11 @@ parse_encrypt_options(
 	    {
 		usage("invalid -use-aes parameter");
 	    }
-	    if ((keylen == 40) && result)
+	    if ((o.keylen == 40) && result)
 	    {
 		usage("use-aes is invalid for 40-bit keys");
 	    }
-            else if ((keylen == 256) && (! result))
+            else if ((o.keylen == 256) && (! result))
             {
                 // qpdf would happily create files encrypted with RC4
                 // using /V=5, but Adobe reader can't read them.
@@ -1048,7 +1119,7 @@ parse_encrypt_options(
             }
 	    else
 	    {
-		use_aes = result;
+		o.use_aes = result;
 	    }
 	}
 	else
@@ -1058,9 +1129,8 @@ parse_encrypt_options(
     }
 }
 
-static std::vector<PageSpec>
-parse_pages_options(
-    int argc, char* argv[], int& cur_arg)
+std::vector<PageSpec>
+ArgParser::parsePagesOptions(int& cur_arg)
 {
     std::vector<PageSpec> result;
     while (1)
@@ -1100,7 +1170,7 @@ parse_pages_options(
         {
             try
             {
-                parse_numrange(range, 0, true);
+                parseNumrange(range, 0, true);
             }
             catch (std::runtime_error& e1)
             {
@@ -1112,10 +1182,10 @@ parse_pages_options(
                     QTC::TC("qpdf", "qpdf pages range omitted in middle");
                     range_omitted = true;
                 }
-                catch (std::runtime_error& e2)
+                catch (std::runtime_error&)
                 {
-                    // Ignore.  The range is invalid and not a file.
-                    // We'll get an error message later.
+                    // Give the range error
+                    usage(e1.what());
                 }
             }
         }
@@ -1137,7 +1207,15 @@ QPDFPageData::QPDFPageData(std::string const& filename,
     qpdf(qpdf),
     orig_pages(qpdf->getAllPages())
 {
-    this->selected_pages = parse_numrange(range, this->orig_pages.size());
+    try
+    {
+        this->selected_pages =
+            QUtil::parse_numrange(range, this->orig_pages.size());
+    }
+    catch (std::runtime_error& e)
+    {
+        usageExit("parsing numeric range for " + filename + ": " + e.what());
+    }
 }
 
 static void parse_version(std::string const& full_version_string,
@@ -1155,8 +1233,8 @@ static void parse_version(std::string const& full_version_string,
     version = v;
 }
 
-static void read_args_from_file(char const* filename,
-                                std::vector<PointerHolder<char> >& new_argv)
+void
+ArgParser::readArgsFromFile(char const* filename)
 {
     std::list<std::string> lines;
     if (strcmp(filename, "-") == 0)
@@ -1177,7 +1255,8 @@ static void read_args_from_file(char const* filename,
     }
 }
 
-static void handle_help_version(int argc, char* argv[])
+void
+ArgParser::handleHelpVersion()
 {
     // Make sure the output looks right on an 80-column display.
 
@@ -1244,7 +1323,8 @@ static void handle_help_version(int argc, char* argv[])
     }
 }
 
-static void parse_rotation_parameter(Options& o, std::string const& parameter)
+void
+ArgParser::parseRotationParameter(std::string const& parameter)
 {
     std::string angle_str;
     std::string range;
@@ -1285,7 +1365,7 @@ static void parse_rotation_parameter(Options& o, std::string const& parameter)
     bool range_valid = false;
     try
     {
-        parse_numrange(range.c_str(), 0, true);
+        parseNumrange(range.c_str(), 0, true);
         range_valid = true;
     }
     catch (std::runtime_error const&)
@@ -1308,8 +1388,11 @@ static void parse_rotation_parameter(Options& o, std::string const& parameter)
     }
 }
 
-static void parse_options(int argc, char* argv[], Options& o)
+void
+ArgParser::parseOptions()
 {
+    handleHelpVersion();
+    handleArgFileArguments();
     for (int i = 1; i < argc; ++i)
     {
         char const* arg = argv[i];
@@ -1345,12 +1428,7 @@ static void parse_options(int argc, char* argv[], Options& o)
             }
             else if (strcmp(arg, "encrypt") == 0)
             {
-                parse_encrypt_options(
-                    argc, argv, ++i,
-                    o.user_password, o.owner_password, o.keylen,
-                    o.r2_print, o.r2_modify, o.r2_extract, o.r2_annotate,
-                    o.r3_accessibility, o.r3_extract, o.r3_print, o.r3_modify,
-                    o.force_V4, o.cleartext_metadata, o.use_aes, o.force_R5);
+                parseEncryptOptions(++i);
                 o.encrypt = true;
                 o.decrypt = false;
                 o.copy_encryption = false;
@@ -1388,7 +1466,7 @@ static void parse_options(int argc, char* argv[], Options& o)
             }
             else if (strcmp(arg, "pages") == 0)
             {
-                o.page_specs = parse_pages_options(argc, argv, ++i);
+                o.page_specs = parsePagesOptions(++i);
                 if (o.page_specs.empty())
                 {
                     usage("--pages: no page specifications given");
@@ -1401,7 +1479,7 @@ static void parse_options(int argc, char* argv[], Options& o)
                     usage("--rotate must be given as"
                           " --rotate=[+|-]angle:page-range");
                 }
-                parse_rotation_parameter(o, parameter);
+                parseRotationParameter(parameter);
             }
             else if (strcmp(arg, "stream-data") == 0)
             {
@@ -2436,7 +2514,9 @@ static void handle_rotations(QPDF& pdf, Options& o)
     {
         std::string const& range = (*iter).first;
         RotationSpec const& rspec = (*iter).second;
-        std::vector<int> to_rotate = parse_numrange(range.c_str(), npages);
+        // range has been previously validated
+        std::vector<int> to_rotate =
+            QUtil::parse_numrange(range.c_str(), npages);
         for (std::vector<int>::iterator i2 = to_rotate.begin();
              i2 != to_rotate.end(); ++i2)
         {
@@ -2741,43 +2821,17 @@ int main(int argc, char* argv[])
     whoami = QUtil::getWhoami(argv[0]);
     QUtil::setLineBuf(stdout);
 
-    // For libtool's sake....
+    // Remove prefix added by libtool for consistency during testing.
     if (strncmp(whoami, "lt-", 3) == 0)
     {
 	whoami += 3;
     }
 
-    handle_help_version(argc, argv);
-
-    // Support reading arguments from files. Create a new argv. Ensure
-    // that argv itself as well as all its contents are automatically
-    // deleted by using PointerHolder objects to back the pointers in
-    // argv.
-    std::vector<PointerHolder<char> > new_argv;
-    new_argv.push_back(PointerHolder<char>(true, QUtil::copy_string(argv[0])));
-    for (int i = 1; i < argc; ++i)
-    {
-        if ((strlen(argv[i]) > 1) && (argv[i][0] == '@'))
-        {
-            read_args_from_file(1+argv[i], new_argv);
-        }
-        else
-        {
-            new_argv.push_back(
-                PointerHolder<char>(true, QUtil::copy_string(argv[i])));
-        }
-    }
-    PointerHolder<char*> argv_ph(true, new char*[1+new_argv.size()]);
-    argv = argv_ph.getPointer();
-    for (size_t i = 0; i < new_argv.size(); ++i)
-    {
-        argv[i] = new_argv.at(i).getPointer();
-    }
-    argc = static_cast<int>(new_argv.size());
-    argv[argc] = 0;
-
+    // ArgParser must stay in scope for the duration of qpdf's run as
+    // it holds dynamic memory used for argv.
     Options o;
-    parse_options(argc, argv, o);
+    ArgParser ap(argc, argv, o);
+    ap.parseOptions();
 
     try
     {
