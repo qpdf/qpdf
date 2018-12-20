@@ -13,6 +13,7 @@ BINS_libtests = \
 	json \
 	lzw \
 	md5 \
+	numrange \
 	pointer_holder \
 	predictors \
 	qutil \

@@ -26,6 +26,7 @@
 #include <qpdf/Types.h>
 #include <string>
 #include <list>
+#include <vector>
 #include <stdexcept>
 #include <stdio.h>
 #include <time.h>
@@ -220,6 +221,11 @@ namespace QUtil
 
     QPDF_DLL
     bool is_number(char const*);
+
+    // This method parses the numeric range syntax used by the qpdf
+    // command-line tool. May throw std::runtime_error.
+    QPDF_DLL
+    std::vector<int> parse_numrange(char const* range, int max);
 };
 
 #endif // QUTIL_HH
