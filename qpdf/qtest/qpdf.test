@@ -102,6 +102,27 @@ $td->runtest("UTF-16 encoding errors",
 
 show_ntests();
 # ----------
+$td->notify("--- Argument Parsing ---");
+$n_tests += 3;
+
+$td->runtest("required argument",
+             {$td->COMMAND => "qpdf --password minimal.pdf"},
+	     {$td->REGEXP => "must be given as --password=pass",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("required argument with choices",
+             {$td->COMMAND => "qpdf --decode-level minimal.pdf"},
+	     {$td->REGEXP => "must be given as --decode-level=\\{.*all.*\\}",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("required argument with choices",
+             {$td->COMMAND => "qpdf --decode-level minimal.pdf"},
+	     {$td->REGEXP => "must be given as --decode-level=\\{.*all.*\\}",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+
+show_ntests();
+# ----------
 $td->notify("--- Form Tests ---");
 
 my @form_tests = (

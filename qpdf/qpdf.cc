@@ -256,12 +256,87 @@ class ArgParser
     void parseOptions();
 
   private:
+    typedef void (ArgParser::*bare_arg_handler_t)();
+    typedef void (ArgParser::*param_arg_handler_t)(char* parameter);
+
+    struct OptionEntry
+    {
+        OptionEntry() :
+            parameter_needed(false),
+            bare_arg_handler(0),
+            param_arg_handler(0)
+        {
+        }
+        bool parameter_needed;
+        std::string parameter_name;
+        std::set<std::string> choices;
+        bare_arg_handler_t bare_arg_handler;
+        param_arg_handler_t param_arg_handler;
+    };
+    friend struct OptionEntry;
+
+    OptionEntry oe_positional(param_arg_handler_t);
+    OptionEntry oe_bare(bare_arg_handler_t);
+    OptionEntry oe_requiredParameter(param_arg_handler_t, char const* name);
+    OptionEntry oe_optionalParameter(param_arg_handler_t);
+    OptionEntry oe_requiredChoices(param_arg_handler_t, char const** choices);
+
+    void argPositional(char* arg);
+    void argPassword(char* parameter);
+    void argEmpty();
+    void argLinearize();
+    void argEncrypt();
+    void argDecrypt();
+    void argPasswordIsHexKey();
+    void argCopyEncryption(char* parameter);
+    void argEncryptionFilePassword(char* parameter);
+    void argPages();
+    void argRotate(char* parameter);
+    void argStreamData(char* parameter);
+    void argCompressStreams(char* parameter);
+    void argDecodeLevel(char* parameter);
+    void argNormalizeContent(char* parameter);
+    void argSuppressRecovery();
+    void argObjectStreams(char* parameter);
+    void argIgnoreXrefStreams();
+    void argQdf();
+    void argPreserveUnreferenced();
+    void argPreserveUnreferencedResources();
+    void argKeepFilesOpen(char* parameter);
+    void argNewlineBeforeEndstream();
+    void argLinearizePass1(char* parameter);
+    void argCoalesceContents();
+    void argMinVersion(char* parameter);
+    void argForceVersion(char* parameter);
+    void argSplitPages(char* parameter);
+    void argVerbose();
+    void argProgress();
+    void argNoWarn();
+    void argDeterministicId();
+    void argStaticId();
+    void argStaticAesIv();
+    void argNoOriginalObjectIds();
+    void argShowEncryption();
+    void argShowEncryptionKey();
+    void argCheckLinearization();
+    void argShowLinearization();
+    void argShowXref();
+    void argShowObject(char* parameter);
+    void argShowObject();
+    void argFilteredStreamData();
+    void argShowNpages();
+    void argShowPages();
+    void argWithImages();
+    void argShowJson();
+    void argCheck();
+
     void usage(std::string const& message);
+    void initOptionTable();
     void handleHelpVersion();
     void handleArgFileArguments();
     void readArgsFromFile(char const* filename);
-    void parseEncryptOptions(int& cur_arg);
-    std::vector<PageSpec> parsePagesOptions(int& cur_arg);
+    void parseEncryptOptions();
+    std::vector<PageSpec> parsePagesOptions();
     void parseRotationParameter(std::string const&);
     std::vector<int> parseNumrange(char const* range, int max,
                                    bool throw_error = false);
@@ -271,7 +346,9 @@ class ArgParser
     int argc;
     char** argv;
     Options& o;
+    int cur_arg;
 
+    std::map<std::string, OptionEntry> option_table;
     std::vector<PointerHolder<char> > new_argv;
     PointerHolder<char*> argv_ph;
 };
@@ -279,8 +356,525 @@ class ArgParser
 ArgParser::ArgParser(int argc, char* argv[], Options& o) :
     argc(argc),
     argv(argv),
-    o(o)
+    o(o),
+    cur_arg(0)
 {
+    initOptionTable();
+}
+
+ArgParser::OptionEntry
+ArgParser::oe_positional(param_arg_handler_t h)
+{
+    OptionEntry oe;
+    oe.param_arg_handler = h;
+    return oe;
+}
+
+ArgParser::OptionEntry
+ArgParser::oe_bare(bare_arg_handler_t h)
+{
+    OptionEntry oe;
+    oe.parameter_needed = false;
+    oe.bare_arg_handler = h;
+    return oe;
+}
+
+ArgParser::OptionEntry
+ArgParser::oe_requiredParameter(param_arg_handler_t h, char const* name)
+{
+    OptionEntry oe;
+    oe.parameter_needed = true;
+    oe.parameter_name = name;
+    oe.param_arg_handler = h;
+    return oe;
+}
+
+ArgParser::OptionEntry
+ArgParser::oe_optionalParameter(param_arg_handler_t h)
+{
+    OptionEntry oe;
+    oe.parameter_needed = false;
+    oe.param_arg_handler = h;
+    return oe;
+}
+
+ArgParser::OptionEntry
+ArgParser::oe_requiredChoices(param_arg_handler_t h, char const** choices)
+{
+    OptionEntry oe;
+    oe.parameter_needed = true;
+    oe.param_arg_handler = h;
+    for (char const** i = choices; *i; ++i)
+    {
+        oe.choices.insert(*i);
+    }
+    return oe;
+}
+
+void
+ArgParser::initOptionTable()
+{
+    std::map<std::string, OptionEntry>& t = this->option_table;
+    char const* yn[] = {"y", "n", 0};
+    t[""] = oe_positional(&ArgParser::argPositional);
+    t["password"] = oe_requiredParameter(&ArgParser::argPassword, "pass");
+    t["empty"] = oe_bare(&ArgParser::argEmpty);
+    t["linearize"] = oe_bare(&ArgParser::argLinearize);
+    t["encrypt"] = oe_bare(&ArgParser::argEncrypt);
+    t["decrypt"] = oe_bare(&ArgParser::argDecrypt);
+    t["password-is-hex-key"] = oe_bare(&ArgParser::argPasswordIsHexKey);
+    t["copy-encryption"] = oe_requiredParameter(
+        &ArgParser::argCopyEncryption, "file");
+    t["encryption-file-password"] = oe_requiredParameter(
+        &ArgParser::argEncryptionFilePassword, "password");
+    t["pages"] = oe_bare(&ArgParser::argPages);
+    t["rotate"] = oe_requiredParameter(
+        &ArgParser::argRotate, "[+|-]angle:page-range");
+    char const* streamDataChoices[] =
+        {"compress", "preserve", "uncompress", 0};
+    t["stream-data"] = oe_requiredChoices(
+        &ArgParser::argStreamData, streamDataChoices);
+    t["compress-streams"] = oe_requiredChoices(
+        &ArgParser::argCompressStreams, yn);
+    char const* decodeLevelChoices[] =
+        {"none", "generalized", "specialized", "all", 0};
+    t["decode-level"] = oe_requiredChoices(
+        &ArgParser::argDecodeLevel, decodeLevelChoices);
+    t["normalize-content"] = oe_requiredChoices(
+        &ArgParser::argNormalizeContent, yn);
+    t["suppress-recovery"] = oe_bare(&ArgParser::argSuppressRecovery);
+    char const* objectStreamsChoices[] = {"disable", "preserve", "generate", 0};
+    t["object-streams"] = oe_requiredChoices(
+        &ArgParser::argObjectStreams, objectStreamsChoices);
+    t["ignore-xref-streams"] = oe_bare(&ArgParser::argIgnoreXrefStreams);
+    t["qdf"] = oe_bare(&ArgParser::argQdf);
+    t["preserve-unreferenced"] = oe_bare(&ArgParser::argPreserveUnreferenced);
+    t["preserve-unreferenced-resources"] = oe_bare(
+        &ArgParser::argPreserveUnreferencedResources);
+    t["keep-files-open"] = oe_requiredChoices(&ArgParser::argKeepFilesOpen, yn);
+    t["newline-before-endstream"] = oe_bare(
+        &ArgParser::argNewlineBeforeEndstream);
+    t["linearize-pass1"] = oe_requiredParameter(
+        &ArgParser::argLinearizePass1, "filename");
+    t["coalesce-contents"] = oe_bare(&ArgParser::argCoalesceContents);
+    t["min-version"] = oe_requiredParameter(
+        &ArgParser::argMinVersion, "version");
+    t["force-version"] = oe_requiredParameter(
+        &ArgParser::argForceVersion, "version");
+    t["split-pages"] = oe_optionalParameter(&ArgParser::argSplitPages);
+    t["verbose"] = oe_bare(&ArgParser::argVerbose);
+    t["progress"] = oe_bare(&ArgParser::argProgress);
+    t["no-warn"] = oe_bare(&ArgParser::argNoWarn);
+    t["deterministic-id"] = oe_bare(&ArgParser::argDeterministicId);
+    t["static-id"] = oe_bare(&ArgParser::argStaticId);
+    t["static-aes-iv"] = oe_bare(&ArgParser::argStaticAesIv);
+    t["no-original-object-ids"] = oe_bare(&ArgParser::argNoOriginalObjectIds);
+    t["show-encryption"] = oe_bare(&ArgParser::argShowEncryption);
+    t["show-encryption-key"] = oe_bare(&ArgParser::argShowEncryptionKey);
+    t["check-linearization"] = oe_bare(&ArgParser::argCheckLinearization);
+    t["show-linearization"] = oe_bare(&ArgParser::argShowLinearization);
+    t["show-xref"] = oe_bare(&ArgParser::argShowXref);
+    t["show-object"] = oe_requiredParameter(
+        &ArgParser::argShowObject, "obj[,gen]");
+    t["raw-stream-data"] = oe_bare(&ArgParser::argShowObject);
+    t["filtered-stream-data"] = oe_bare(&ArgParser::argFilteredStreamData);
+    t["show-npages"] = oe_bare(&ArgParser::argShowNpages);
+    t["show-pages"] = oe_bare(&ArgParser::argShowPages);
+    t["with-images"] = oe_bare(&ArgParser::argWithImages);
+    t["show-json"] = oe_bare(&ArgParser::argShowJson);
+    t["check"] = oe_bare(&ArgParser::argCheck);
+}
+
+void
+ArgParser::argPositional(char* arg)
+{
+    if (o.infilename == 0)
+    {
+        o.infilename = arg;
+    }
+    else if (o.outfilename == 0)
+    {
+        o.outfilename = arg;
+    }
+    else
+    {
+        usage(std::string("unknown argument ") + arg);
+    }
+}
+
+void
+ArgParser::argPassword(char* parameter)
+{
+    o.password = parameter;
+}
+
+void
+ArgParser::argEmpty()
+{
+    o.infilename = "";
+}
+
+void
+ArgParser::argLinearize()
+{
+    o.linearize = true;
+}
+
+void
+ArgParser::argEncrypt()
+{
+    ++cur_arg;
+    parseEncryptOptions();
+    o.encrypt = true;
+    o.decrypt = false;
+    o.copy_encryption = false;
+}
+
+void
+ArgParser::argDecrypt()
+{
+    o.decrypt = true;
+    o.encrypt = false;
+    o.copy_encryption = false;
+}
+
+void
+ArgParser::argPasswordIsHexKey()
+{
+    o.password_is_hex_key = true;
+}
+
+void
+ArgParser::argCopyEncryption(char* parameter)
+{
+    o.encryption_file = parameter;
+    o.copy_encryption = true;
+    o.encrypt = false;
+    o.decrypt = false;
+}
+
+void
+ArgParser::argEncryptionFilePassword(char* parameter)
+{
+    o.encryption_file_password = parameter;
+}
+
+void
+ArgParser::argPages()
+{
+    ++cur_arg;
+    o.page_specs = parsePagesOptions();
+    if (o.page_specs.empty())
+    {
+        usage("--pages: no page specifications given");
+    }
+}
+
+void
+ArgParser::argRotate(char* parameter)
+{
+    parseRotationParameter(parameter);
+}
+
+void
+ArgParser::argStreamData(char* parameter)
+{
+    o.stream_data_set = true;
+    if (strcmp(parameter, "compress") == 0)
+    {
+        o.stream_data_mode = qpdf_s_compress;
+    }
+    else if (strcmp(parameter, "preserve") == 0)
+    {
+        o.stream_data_mode = qpdf_s_preserve;
+    }
+    else if (strcmp(parameter, "uncompress") == 0)
+    {
+        o.stream_data_mode = qpdf_s_uncompress;
+    }
+    else
+    {
+        // If this happens, it means streamDataChoices in
+        // ArgParser::initOptionTable is wrong.
+        usage("invalid stream-data option");
+    }
+}
+
+void
+ArgParser::argCompressStreams(char* parameter)
+{
+    o.compress_streams_set = true;
+    o.compress_streams = (strcmp(parameter, "y") == 0);
+}
+
+void
+ArgParser::argDecodeLevel(char* parameter)
+{
+    o.decode_level_set = true;
+    if (strcmp(parameter, "none") == 0)
+    {
+        o.decode_level = qpdf_dl_none;
+    }
+    else if (strcmp(parameter, "generalized") == 0)
+    {
+        o.decode_level = qpdf_dl_generalized;
+    }
+    else if (strcmp(parameter, "specialized") == 0)
+    {
+        o.decode_level = qpdf_dl_specialized;
+    }
+    else if (strcmp(parameter, "all") == 0)
+    {
+        o.decode_level = qpdf_dl_all;
+    }
+    else
+    {
+        // If this happens, it means decodeLevelChoices in
+        // ArgParser::initOptionTable is wrong.
+        usage("invalid option");
+    }
+}
+
+void
+ArgParser::argNormalizeContent(char* parameter)
+{
+    o.normalize_set = true;
+    o.normalize = (strcmp(parameter, "y") == 0);
+}
+
+void
+ArgParser::argSuppressRecovery()
+{
+    o.suppress_recovery = true;
+}
+
+void
+ArgParser::argObjectStreams(char* parameter)
+{
+    o.object_stream_set = true;
+    if (strcmp(parameter, "disable") == 0)
+    {
+        o.object_stream_mode = qpdf_o_disable;
+    }
+    else if (strcmp(parameter, "preserve") == 0)
+    {
+        o.object_stream_mode = qpdf_o_preserve;
+    }
+    else if (strcmp(parameter, "generate") == 0)
+    {
+        o.object_stream_mode = qpdf_o_generate;
+    }
+    else
+    {
+        // If this happens, it means objectStreamsChoices in
+        // ArgParser::initOptionTable is wrong.
+        usage("invalid object stream mode");
+    }
+}
+
+void
+ArgParser::argIgnoreXrefStreams()
+{
+    o.ignore_xref_streams = true;
+}
+
+void
+ArgParser::argQdf()
+{
+    o.qdf_mode = true;
+}
+
+void
+ArgParser::argPreserveUnreferenced()
+{
+    o.preserve_unreferenced_objects = true;
+}
+
+void
+ArgParser::argPreserveUnreferencedResources()
+{
+    o.preserve_unreferenced_page_resources = true;
+}
+
+void
+ArgParser::argKeepFilesOpen(char* parameter)
+{
+    o.keep_files_open_set = true;
+    o.keep_files_open = (strcmp(parameter, "y") == 0);
+}
+
+void
+ArgParser::argNewlineBeforeEndstream()
+{
+    o.newline_before_endstream = true;
+}
+
+void
+ArgParser::argLinearizePass1(char* parameter)
+{
+    o.linearize_pass1 = parameter;
+}
+
+void
+ArgParser::argCoalesceContents()
+{
+    o.coalesce_contents = true;
+}
+
+void
+ArgParser::argMinVersion(char* parameter)
+{
+    o.min_version = parameter;
+}
+
+void
+ArgParser::argForceVersion(char* parameter)
+{
+    o.force_version = parameter;
+}
+
+void
+ArgParser::argSplitPages(char* parameter)
+{
+    int n = ((parameter == 0) ? 1 :
+             QUtil::string_to_int(parameter));
+    o.split_pages = n;
+}
+
+void
+ArgParser::argVerbose()
+{
+    o.verbose = true;
+}
+
+void
+ArgParser::argProgress()
+{
+    o.progress = true;
+}
+
+void
+ArgParser::argNoWarn()
+{
+    o.suppress_warnings = true;
+}
+
+void
+ArgParser::argDeterministicId()
+{
+    o.deterministic_id = true;
+}
+
+void
+ArgParser::argStaticId()
+{
+    o.static_id = true;
+}
+
+void
+ArgParser::argStaticAesIv()
+{
+    o.static_aes_iv = true;
+}
+
+void
+ArgParser::argNoOriginalObjectIds()
+{
+    o.suppress_original_object_id = true;
+}
+
+void
+ArgParser::argShowEncryption()
+{
+    o.show_encryption = true;
+    o.require_outfile = false;
+}
+
+void
+ArgParser::argShowEncryptionKey()
+{
+    o.show_encryption_key = true;
+}
+
+void
+ArgParser::argCheckLinearization()
+{
+    o.check_linearization = true;
+    o.require_outfile = false;
+}
+
+void
+ArgParser::argShowLinearization()
+{
+    o.show_linearization = true;
+    o.require_outfile = false;
+}
+
+void
+ArgParser::argShowXref()
+{
+    o.show_xref = true;
+    o.require_outfile = false;
+}
+
+void
+ArgParser::argShowObject(char* parameter)
+{
+    char* obj = parameter;
+    char* gen = obj;
+    if ((gen = strchr(obj, ',')) != 0)
+    {
+        *gen++ = 0;
+        o.show_gen = QUtil::string_to_int(gen);
+    }
+    o.show_obj = QUtil::string_to_int(obj);
+    o.require_outfile = false;
+}
+
+void
+ArgParser::argShowObject()
+{
+    o.show_raw_stream_data = true;
+}
+
+void
+ArgParser::argFilteredStreamData()
+{
+    o.show_filtered_stream_data = true;
+}
+
+void
+ArgParser::argShowNpages()
+{
+    o.show_npages = true;
+    o.require_outfile = false;
+}
+
+void
+ArgParser::argShowPages()
+{
+    o.show_pages = true;
+    o.require_outfile = false;
+}
+
+void
+ArgParser::argWithImages()
+{
+    o.show_page_images = true;
+}
+
+void
+ArgParser::argShowJson()
+{
+    o.show_json = true;
+    o.require_outfile = false;
+}
+
+void
+ArgParser::argCheck()
+{
+    o.check = true;
+    o.require_outfile = false;
 }
 
 void
@@ -807,7 +1401,7 @@ ArgParser::parseNumrange(char const* range, int max, bool throw_error)
 }
 
 void
-ArgParser::parseEncryptOptions(int& cur_arg)
+ArgParser::parseEncryptOptions()
 {
     if (cur_arg + 3 >= argc)
     {
@@ -1130,7 +1724,7 @@ ArgParser::parseEncryptOptions(int& cur_arg)
 }
 
 std::vector<PageSpec>
-ArgParser::parsePagesOptions(int& cur_arg)
+ArgParser::parsePagesOptions()
 {
     std::vector<PageSpec> result;
     while (1)
@@ -1391,11 +1985,11 @@ ArgParser::parseRotationParameter(std::string const& parameter)
 void
 ArgParser::parseOptions()
 {
-    handleHelpVersion();
+    handleHelpVersion();        // QXXXQ calls std::cout
     handleArgFileArguments();
-    for (int i = 1; i < argc; ++i)
+    for (cur_arg = 1; cur_arg < argc; ++cur_arg)
     {
-        char const* arg = argv[i];
+        char* arg = argv[cur_arg];
         if ((arg[0] == '-') && (strcmp(arg, "-") != 0))
         {
             ++arg;
@@ -1410,381 +2004,64 @@ ArgParser::parseOptions()
                 *parameter++ = 0;
             }
 
-            if (strcmp(arg, "password") == 0)
-            {
-                if (parameter == 0)
-                {
-                    usage("--password must be given as --password=pass");
-                }
-                o.password = parameter;
-            }
-            else if (strcmp(arg, "empty") == 0)
-            {
-                o.infilename = "";
-            }
-            else if (strcmp(arg, "linearize") == 0)
-            {
-                o.linearize = true;
-            }
-            else if (strcmp(arg, "encrypt") == 0)
-            {
-                parseEncryptOptions(++i);
-                o.encrypt = true;
-                o.decrypt = false;
-                o.copy_encryption = false;
-            }
-            else if (strcmp(arg, "decrypt") == 0)
-            {
-                o.decrypt = true;
-                o.encrypt = false;
-                o.copy_encryption = false;
-            }
-            else if (strcmp(arg, "password-is-hex-key") == 0)
-            {
-                o.password_is_hex_key = true;
-            }
-            else if (strcmp(arg, "copy-encryption") == 0)
-            {
-                if (parameter == 0)
-                {
-                    usage("--copy-encryption must be given as"
-                          "--copy_encryption=file");
-                }
-                o.encryption_file = parameter;
-                o.copy_encryption = true;
-                o.encrypt = false;
-                o.decrypt = false;
-            }
-            else if (strcmp(arg, "encryption-file-password") == 0)
-            {
-                if (parameter == 0)
-                {
-                    usage("--encryption-file-password must be given as"
-                          "--encryption-file-password=password");
-                }
-                o.encryption_file_password = parameter;
-            }
-            else if (strcmp(arg, "pages") == 0)
-            {
-                o.page_specs = parsePagesOptions(++i);
-                if (o.page_specs.empty())
-                {
-                    usage("--pages: no page specifications given");
-                }
-            }
-            else if (strcmp(arg, "rotate") == 0)
-            {
-                if (parameter == 0)
-                {
-                    usage("--rotate must be given as"
-                          " --rotate=[+|-]angle:page-range");
-                }
-                parseRotationParameter(parameter);
-            }
-            else if (strcmp(arg, "stream-data") == 0)
-            {
-                if (parameter == 0)
-                {
-                    usage("--stream-data must be given as"
-                          "--stream-data=option");
-                }
-                o.stream_data_set = true;
-                if (strcmp(parameter, "compress") == 0)
-                {
-                    o.stream_data_mode = qpdf_s_compress;
-                }
-                else if (strcmp(parameter, "preserve") == 0)
-                {
-                    o.stream_data_mode = qpdf_s_preserve;
-                }
-                else if (strcmp(parameter, "uncompress") == 0)
-                {
-                    o.stream_data_mode = qpdf_s_uncompress;
-                }
-                else
-                {
-                    usage("invalid stream-data option");
-                }
-            }
-            else if (strcmp(arg, "compress-streams") == 0)
-            {
-                o.compress_streams_set = true;
-                if (parameter && (strcmp(parameter, "y") == 0))
-                {
-                    o.compress_streams = true;
-                }
-                else if (parameter && (strcmp(parameter, "n") == 0))
-                {
-                    o.compress_streams = false;
-                }
-                else
-                {
-                    usage("--compress-streams must be given as"
-                          " --compress-streams=[yn]");
-                }
-            }
-            else if (strcmp(arg, "decode-level") == 0)
-            {
-                if (parameter == 0)
-                {
-                    usage("--decode-level must be given as"
-                          "--decode-level=option");
-                }
-                o.decode_level_set = true;
-                if (strcmp(parameter, "none") == 0)
-                {
-                    o.decode_level = qpdf_dl_none;
-                }
-                else if (strcmp(parameter, "generalized") == 0)
-                {
-                    o.decode_level = qpdf_dl_generalized;
-                }
-                else if (strcmp(parameter, "specialized") == 0)
-                {
-                    o.decode_level = qpdf_dl_specialized;
-                }
-                else if (strcmp(parameter, "all") == 0)
-                {
-                    o.decode_level = qpdf_dl_all;
-                }
-                else
-                {
-                    usage("invalid stream-data option");
-                }
-            }
-            else if (strcmp(arg, "normalize-content") == 0)
-            {
-                o.normalize_set = true;
-                if (parameter && (strcmp(parameter, "y") == 0))
-                {
-                    o.normalize = true;
-                }
-                else if (parameter && (strcmp(parameter, "n") == 0))
-                {
-                    o.normalize = false;
-                }
-                else
-                {
-                    usage("--normalize-content must be given as"
-                          " --normalize-content=[yn]");
-                }
-            }
-            else if (strcmp(arg, "suppress-recovery") == 0)
-            {
-                o.suppress_recovery = true;
-            }
-            else if (strcmp(arg, "object-streams") == 0)
-            {
-                if (parameter == 0)
-                {
-                    usage("--object-streams must be given as"
-                          " --object-streams=option");
-                }
-                o.object_stream_set = true;
-                if (strcmp(parameter, "disable") == 0)
-                {
-                    o.object_stream_mode = qpdf_o_disable;
-                }
-                else if (strcmp(parameter, "preserve") == 0)
-                {
-                    o.object_stream_mode = qpdf_o_preserve;
-                }
-                else if (strcmp(parameter, "generate") == 0)
-                {
-                    o.object_stream_mode = qpdf_o_generate;
-                }
-                else
-                {
-                    usage("invalid object stream mode");
-                }
-            }
-            else if (strcmp(arg, "ignore-xref-streams") == 0)
-            {
-                o.ignore_xref_streams = true;
-            }
-            else if (strcmp(arg, "qdf") == 0)
-            {
-                o.qdf_mode = true;
-            }
-            else if (strcmp(arg, "preserve-unreferenced") == 0)
-            {
-                o.preserve_unreferenced_objects = true;
-            }
-            else if (strcmp(arg, "preserve-unreferenced-resources") == 0)
-            {
-                o.preserve_unreferenced_page_resources = true;
-            }
-            else if (strcmp(arg, "keep-files-open") == 0)
-            {
-                o.keep_files_open_set = true;
-                if (parameter && (strcmp(parameter, "y") == 0))
-                {
-                    o.keep_files_open = true;
-                }
-                else if (parameter && (strcmp(parameter, "n") == 0))
-                {
-                    o.keep_files_open = false;
-                }
-                else
-                {
-                    usage("--keep-files-open must be given as"
-                          " --keep-files-open=[yn]");
-                }
-            }
-            else if (strcmp(arg, "newline-before-endstream") == 0)
-            {
-                o.newline_before_endstream = true;
-            }
-            else if (strcmp(arg, "linearize-pass1") == 0)
-            {
-                if (parameter == 0)
-                {
-                    usage("--linearize-pass1 be given as"
-                          "--linearize-pass1=filename");
-                }
-                o.linearize_pass1 = parameter;
-            }
-            else if (strcmp(arg, "coalesce-contents") == 0)
-            {
-                o.coalesce_contents = true;
-            }
-            else if (strcmp(arg, "min-version") == 0)
-            {
-                if (parameter == 0)
-                {
-                    usage("--min-version be given as"
-                          "--min-version=version");
-                }
-                o.min_version = parameter;
-            }
-            else if (strcmp(arg, "force-version") == 0)
-            {
-                if (parameter == 0)
-                {
-                    usage("--force-version be given as"
-                          "--force-version=version");
-                }
-                o.force_version = parameter;
-            }
-            else if (strcmp(arg, "split-pages") == 0)
-            {
-                int n = ((parameter == 0) ? 1 :
-                         QUtil::string_to_int(parameter));
-                o.split_pages = n;
-            }
-            else if (strcmp(arg, "verbose") == 0)
-            {
-                o.verbose = true;
-            }
-            else if (strcmp(arg, "progress") == 0)
-            {
-                o.progress = true;
-            }
-            else if (strcmp(arg, "no-warn") == 0)
-            {
-                o.suppress_warnings = true;
-            }
-            else if (strcmp(arg, "deterministic-id") == 0)
-            {
-                o.deterministic_id = true;
-            }
-            else if (strcmp(arg, "static-id") == 0)
-            {
-                o.static_id = true;
-            }
-            else if (strcmp(arg, "static-aes-iv") == 0)
-            {
-                o.static_aes_iv = true;
-            }
-            else if (strcmp(arg, "no-original-object-ids") == 0)
-            {
-                o.suppress_original_object_id = true;
-            }
-            else if (strcmp(arg, "show-encryption") == 0)
-            {
-                o.show_encryption = true;
-                o.require_outfile = false;
-            }
-            else if (strcmp(arg, "show-encryption-key") == 0)
-            {
-                o.show_encryption_key = true;
-            }
-            else if (strcmp(arg, "check-linearization") == 0)
-            {
-                o.check_linearization = true;
-                o.require_outfile = false;
-            }
-            else if (strcmp(arg, "show-linearization") == 0)
-            {
-                o.show_linearization = true;
-                o.require_outfile = false;
-            }
-            else if (strcmp(arg, "show-xref") == 0)
-            {
-                o.show_xref = true;
-                o.require_outfile = false;
-            }
-            else if (strcmp(arg, "show-object") == 0)
-            {
-                if (parameter == 0)
-                {
-                    usage("--show-object must be given as"
-                          " --show-object=obj[,gen]");
-                }
-                char* obj = parameter;
-                char* gen = obj;
-                if ((gen = strchr(obj, ',')) != 0)
-                {
-                    *gen++ = 0;
-                    o.show_gen = QUtil::string_to_int(gen);
-                }
-                o.show_obj = QUtil::string_to_int(obj);
-                o.require_outfile = false;
-            }
-            else if (strcmp(arg, "raw-stream-data") == 0)
-            {
-                o.show_raw_stream_data = true;
-            }
-            else if (strcmp(arg, "filtered-stream-data") == 0)
-            {
-                o.show_filtered_stream_data = true;
-            }
-            else if (strcmp(arg, "show-npages") == 0)
-            {
-                o.show_npages = true;
-                o.require_outfile = false;
-            }
-            else if (strcmp(arg, "show-pages") == 0)
-            {
-                o.show_pages = true;
-                o.require_outfile = false;
-            }
-            else if (strcmp(arg, "with-images") == 0)
-            {
-                o.show_page_images = true;
-            }
-            else if (strcmp(arg, "show-json") == 0)
-            {
-                o.show_json = true;
-                o.require_outfile = false;
-            }
-            else if (strcmp(arg, "check") == 0)
-            {
-                o.check = true;
-                o.require_outfile = false;
-            }
-            else
+            std::string arg_s(arg);
+            if (0 == this->option_table.count(arg_s))
             {
                 usage(std::string("unknown option --") + arg);
             }
+
+            OptionEntry& oe = this->option_table[arg_s];
+            if ((oe.parameter_needed && (0 == parameter)) ||
+                ((! oe.choices.empty() &&
+                  ((0 == parameter) ||
+                   (0 == oe.choices.count(parameter))))))
+            {
+                std::string message =
+                    "--" + arg_s + " must be given as --" + arg_s + "=";
+                if (! oe.choices.empty())
+                {
+                    QTC::TC("qpdf", "qpdf required choices");
+                    message += "{";
+                    for (std::set<std::string>::iterator iter =
+                             oe.choices.begin();
+                         iter != oe.choices.end(); ++iter)
+                    {
+                        if (iter != oe.choices.begin())
+                        {
+                            message += ",";
+                        }
+                        message += *iter;
+                    }
+                    message += "}";
+                }
+                else if (! oe.parameter_name.empty())
+                {
+                    QTC::TC("qpdf", "qpdf required parameter");
+                    message += oe.parameter_name;
+                }
+                else
+                {
+                    // should not be possible
+                    message += "option";
+                }
+                usage(message);
+            }
+            if (oe.bare_arg_handler)
+            {
+                (this->*(oe.bare_arg_handler))();
+            }
+            else if (oe.param_arg_handler)
+            {
+                (this->*(oe.param_arg_handler))(parameter);
+            }
         }
-        else if (o.infilename == 0)
+        else if (0 != this->option_table.count(""))
         {
-            o.infilename = arg;
-        }
-        else if (o.outfilename == 0)
-        {
-            o.outfilename = arg;
+            OptionEntry& oe = this->option_table[""];
+            if (oe.param_arg_handler)
+            {
+                (this->*(oe.param_arg_handler))(arg);
+            }
         }
         else
         {
@@ -1827,7 +2104,8 @@ ArgParser::parseOptions()
     if (QUtil::same_file(o.infilename, o.outfilename))
     {
         QTC::TC("qpdf", "qpdf same file error");
-        usage("input file and output file are the same; this would cause input file to be lost");
+        usage("input file and output file are the same;"
+              " this would cause input file to be lost");
     }
 }
 

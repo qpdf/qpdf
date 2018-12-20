@@ -367,3 +367,5 @@ QPDFOutlineObjectHelper named dest 0
 QPDFOutlineDocumentHelper name named dest 0
 QPDFOutlineDocumentHelper string named dest 0
 QPDFOutlineObjectHelper loop 0
+qpdf required parameter 0
+qpdf required choices 0
