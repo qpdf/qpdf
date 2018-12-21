@@ -1,5 +1,7 @@
 2018-12-21  Jay Berkenbilt  <ejb@ql.org>
 
+	* Allow --show-object=trailer for showing the document trailer.
+
 	* You can now use eval $(qpdf --completion-bash) to enable bash
 	completion for qpdf. It's not perfect, but it works pretty well.
 

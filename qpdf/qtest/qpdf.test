@@ -2048,7 +2048,7 @@ $td->runtest("stream detected",
 show_ntests();
 # ----------
 $td->notify("--- Extraction Tests ---");
-$n_tests += 11;
+$n_tests += 12;
 
 $td->runtest("show xref",
 	     {$td->COMMAND => "qpdf encrypted-with-images.pdf" .
@@ -2121,6 +2121,12 @@ $td->runtest("show-xref-by-id-filtered",
 		  " --show-object=12 --filtered-stream-data"},
 	     {$td->FILE => "show-xref-by-id-filtered.out",
 	      $td->EXIT_STATUS => 0});
+
+$td->runtest("show trailer",
+	     {$td->COMMAND => "qpdf minimal.pdf --show-object=trailer"},
+	     {$td->FILE => "show-trailer.out",
+	      $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 show_ntests();
 # ----------

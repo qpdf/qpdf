@@ -112,6 +112,7 @@ struct Options
         check_linearization(false),
         show_linearization(false),
         show_xref(false),
+        show_trailer(false),
         show_obj(0),
         show_gen(0),
         show_raw_stream_data(false),
@@ -185,6 +186,7 @@ struct Options
     bool check_linearization;
     bool show_linearization;
     bool show_xref;
+    bool show_trailer;
     int show_obj;
     int show_gen;
     bool show_raw_stream_data;
@@ -511,7 +513,7 @@ ArgParser::initOptionTable()
     (*t)["show-linearization"] = oe_bare(&ArgParser::argShowLinearization);
     (*t)["show-xref"] = oe_bare(&ArgParser::argShowXref);
     (*t)["show-object"] = oe_requiredParameter(
-        &ArgParser::argShowObject, "obj[,gen]");
+        &ArgParser::argShowObject, "trailer|obj[,gen]");
     (*t)["raw-stream-data"] = oe_bare(&ArgParser::argRawStreamData);
     (*t)["filtered-stream-data"] = oe_bare(&ArgParser::argFilteredStreamData);
     (*t)["show-npages"] = oe_bare(&ArgParser::argShowNpages);
@@ -929,14 +931,21 @@ ArgParser::argShowXref()
 void
 ArgParser::argShowObject(char* parameter)
 {
-    char* obj = parameter;
-    char* gen = obj;
-    if ((gen = strchr(obj, ',')) != 0)
+    if (strcmp(parameter, "trailer") == 0)
     {
-        *gen++ = 0;
-        o.show_gen = QUtil::string_to_int(gen);
+        o.show_trailer = true;
     }
-    o.show_obj = QUtil::string_to_int(obj);
+    else
+    {
+        char* obj = parameter;
+        char* gen = obj;
+        if ((gen = strchr(obj, ',')) != 0)
+        {
+            *gen++ = 0;
+            o.show_gen = QUtil::string_to_int(gen);
+        }
+        o.show_obj = QUtil::string_to_int(obj);
+    }
     o.require_outfile = false;
 }
 
@@ -1453,7 +1462,8 @@ automated test suites for software that uses the qpdf library.\n\
 --check-linearization     check file integrity and linearization status\n\
 --show-linearization      check and show all linearization data\n\
 --show-xref               show the contents of the cross-reference table\n\
---show-object=obj[,gen]   show the contents of the given object\n\
+--show-object=trailer|obj[,gen]\n\
+                          show the contents of the given object\n\
   --raw-stream-data       show raw stream data instead of object contents\n\
   --filtered-stream-data  show filtered stream data instead of object contents\n\
 --show-npages             print the number of pages in the file\n\
@@ -2374,7 +2384,15 @@ static void do_check(QPDF& pdf, Options& o, int& exit_code)
 
 static void do_show_obj(QPDF& pdf, Options& o, int& exit_code)
 {
-    QPDFObjectHandle obj = pdf.getObjectByID(o.show_obj, o.show_gen);
+    QPDFObjectHandle obj;
+    if (o.show_trailer)
+    {
+        obj = pdf.getTrailer();
+    }
+    else
+    {
+        obj = pdf.getObjectByID(o.show_obj, o.show_gen);
+    }
     if (obj.isStream())
     {
         if (o.show_raw_stream_data || o.show_filtered_stream_data)
@@ -2676,7 +2694,7 @@ static void do_inspection(QPDF& pdf, Options& o)
     {
         pdf.showXRefTable();
     }
-    if (o.show_obj > 0)
+    if ((o.show_obj > 0) || o.show_trailer)
     {
         do_show_obj(pdf, o, exit_code);
     }
