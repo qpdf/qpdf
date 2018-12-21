@@ -31,6 +31,10 @@ class QPDFAnnotationObjectHelper: public QPDFObjectHelper
   public:
     QPDF_DLL
     QPDFAnnotationObjectHelper(QPDFObjectHandle);
+    QPDF_DLL
+    virtual ~QPDFAnnotationObjectHelper()
+    {
+    }
 
     // This class provides helper methods for certain types of
     // annotations. At its introduction, it only supports Widget

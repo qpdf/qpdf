@@ -41,6 +41,10 @@ class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
   public:
     QPDF_DLL
     QPDFNumberTreeObjectHelper(QPDFObjectHandle);
+    QPDF_DLL
+    virtual ~QPDFNumberTreeObjectHelper()
+    {
+    }
 
     typedef long long int numtree_number;
 

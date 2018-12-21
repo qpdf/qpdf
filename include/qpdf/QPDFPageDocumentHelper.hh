@@ -36,6 +36,10 @@ class QPDFPageDocumentHelper: public QPDFDocumentHelper
   public:
     QPDF_DLL
     QPDFPageDocumentHelper(QPDF&);
+    QPDF_DLL
+    virtual ~QPDFPageDocumentHelper()
+    {
+    }
 
     // Traverse page tree, and return all /Page objects wrapped in
     // QPDFPageObjectHelper objects. Unlike with

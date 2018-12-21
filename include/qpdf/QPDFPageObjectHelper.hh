@@ -34,6 +34,10 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
   public:
     QPDF_DLL
     QPDFPageObjectHelper(QPDFObjectHandle);
+    QPDF_DLL
+    virtual ~QPDFPageObjectHelper()
+    {
+    }
 
     // Returns an empty map if there are no images or no resources.
     // This function does not presently support inherited resources.

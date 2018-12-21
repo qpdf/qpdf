@@ -37,6 +37,10 @@ class QPDFFormFieldObjectHelper: public QPDFObjectHelper
     QPDFFormFieldObjectHelper();
     QPDF_DLL
     QPDFFormFieldObjectHelper(QPDFObjectHandle);
+    QPDF_DLL
+    virtual ~QPDFFormFieldObjectHelper()
+    {
+    }
 
     QPDF_DLL
     bool isNull();
