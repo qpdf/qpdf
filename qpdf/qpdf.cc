@@ -329,13 +329,25 @@ class ArgParser
     void argWithImages();
     void argShowJson();
     void argCheck();
+    void arg40Print(char* parameter);
+    void arg40Modify(char* parameter);
+    void arg40Extract(char* parameter);
+    void arg40Annotate(char* parameter);
+    void arg128Accessibility(char* parameter);
+    void arg128Extract(char* parameter);
+    void arg128Print(char* parameter);
+    void arg128Modify(char* parameter);
+    void arg128ClearTextMetadata();
+    void arg128UseAes(char* parameter);
+    void arg128ForceV4();
+    void arg256ForceR5();
+    void argEndEncrypt();
 
     void usage(std::string const& message);
     void initOptionTable();
     void handleHelpVersion();
     void handleArgFileArguments();
     void readArgsFromFile(char const* filename);
-    void parseEncryptOptions();
     std::vector<PageSpec> parsePagesOptions();
     void parseRotationParameter(std::string const&);
     std::vector<int> parseNumrange(char const* range, int max,
@@ -348,7 +360,11 @@ class ArgParser
     Options& o;
     int cur_arg;
 
-    std::map<std::string, OptionEntry> option_table;
+    std::map<std::string, OptionEntry>* option_table;
+    std::map<std::string, OptionEntry> main_option_table;
+    std::map<std::string, OptionEntry> encrypt40_option_table;
+    std::map<std::string, OptionEntry> encrypt128_option_table;
+    std::map<std::string, OptionEntry> encrypt256_option_table;
     std::vector<PointerHolder<char> > new_argv;
     PointerHolder<char*> argv_ph;
 };
@@ -359,6 +375,7 @@ ArgParser::ArgParser(int argc, char* argv[], Options& o) :
     o(o),
     cur_arg(0)
 {
+    option_table = &main_option_table;
     initOptionTable();
 }
 
@@ -414,75 +431,107 @@ ArgParser::oe_requiredChoices(param_arg_handler_t h, char const** choices)
 void
 ArgParser::initOptionTable()
 {
-    std::map<std::string, OptionEntry>& t = this->option_table;
+    std::map<std::string, OptionEntry>* t = &this->main_option_table;
     char const* yn[] = {"y", "n", 0};
-    t[""] = oe_positional(&ArgParser::argPositional);
-    t["password"] = oe_requiredParameter(&ArgParser::argPassword, "pass");
-    t["empty"] = oe_bare(&ArgParser::argEmpty);
-    t["linearize"] = oe_bare(&ArgParser::argLinearize);
-    t["encrypt"] = oe_bare(&ArgParser::argEncrypt);
-    t["decrypt"] = oe_bare(&ArgParser::argDecrypt);
-    t["password-is-hex-key"] = oe_bare(&ArgParser::argPasswordIsHexKey);
-    t["copy-encryption"] = oe_requiredParameter(
+    (*t)[""] = oe_positional(&ArgParser::argPositional);
+    (*t)["password"] = oe_requiredParameter(&ArgParser::argPassword, "pass");
+    (*t)["empty"] = oe_bare(&ArgParser::argEmpty);
+    (*t)["linearize"] = oe_bare(&ArgParser::argLinearize);
+    (*t)["encrypt"] = oe_bare(&ArgParser::argEncrypt);
+    (*t)["decrypt"] = oe_bare(&ArgParser::argDecrypt);
+    (*t)["password-is-hex-key"] = oe_bare(&ArgParser::argPasswordIsHexKey);
+    (*t)["copy-encryption"] = oe_requiredParameter(
         &ArgParser::argCopyEncryption, "file");
-    t["encryption-file-password"] = oe_requiredParameter(
+    (*t)["encryption-file-password"] = oe_requiredParameter(
         &ArgParser::argEncryptionFilePassword, "password");
-    t["pages"] = oe_bare(&ArgParser::argPages);
-    t["rotate"] = oe_requiredParameter(
+    (*t)["pages"] = oe_bare(&ArgParser::argPages);
+    (*t)["rotate"] = oe_requiredParameter(
         &ArgParser::argRotate, "[+|-]angle:page-range");
     char const* streamDataChoices[] =
         {"compress", "preserve", "uncompress", 0};
-    t["stream-data"] = oe_requiredChoices(
+    (*t)["stream-data"] = oe_requiredChoices(
         &ArgParser::argStreamData, streamDataChoices);
-    t["compress-streams"] = oe_requiredChoices(
+    (*t)["compress-streams"] = oe_requiredChoices(
         &ArgParser::argCompressStreams, yn);
     char const* decodeLevelChoices[] =
         {"none", "generalized", "specialized", "all", 0};
-    t["decode-level"] = oe_requiredChoices(
+    (*t)["decode-level"] = oe_requiredChoices(
         &ArgParser::argDecodeLevel, decodeLevelChoices);
-    t["normalize-content"] = oe_requiredChoices(
+    (*t)["normalize-content"] = oe_requiredChoices(
         &ArgParser::argNormalizeContent, yn);
-    t["suppress-recovery"] = oe_bare(&ArgParser::argSuppressRecovery);
+    (*t)["suppress-recovery"] = oe_bare(&ArgParser::argSuppressRecovery);
     char const* objectStreamsChoices[] = {"disable", "preserve", "generate", 0};
-    t["object-streams"] = oe_requiredChoices(
+    (*t)["object-streams"] = oe_requiredChoices(
         &ArgParser::argObjectStreams, objectStreamsChoices);
-    t["ignore-xref-streams"] = oe_bare(&ArgParser::argIgnoreXrefStreams);
-    t["qdf"] = oe_bare(&ArgParser::argQdf);
-    t["preserve-unreferenced"] = oe_bare(&ArgParser::argPreserveUnreferenced);
-    t["preserve-unreferenced-resources"] = oe_bare(
+    (*t)["ignore-xref-streams"] = oe_bare(&ArgParser::argIgnoreXrefStreams);
+    (*t)["qdf"] = oe_bare(&ArgParser::argQdf);
+    (*t)["preserve-unreferenced"] = oe_bare(
+        &ArgParser::argPreserveUnreferenced);
+    (*t)["preserve-unreferenced-resources"] = oe_bare(
         &ArgParser::argPreserveUnreferencedResources);
-    t["keep-files-open"] = oe_requiredChoices(&ArgParser::argKeepFilesOpen, yn);
-    t["newline-before-endstream"] = oe_bare(
+    (*t)["keep-files-open"] = oe_requiredChoices(
+        &ArgParser::argKeepFilesOpen, yn);
+    (*t)["newline-before-endstream"] = oe_bare(
         &ArgParser::argNewlineBeforeEndstream);
-    t["linearize-pass1"] = oe_requiredParameter(
+    (*t)["linearize-pass1"] = oe_requiredParameter(
         &ArgParser::argLinearizePass1, "filename");
-    t["coalesce-contents"] = oe_bare(&ArgParser::argCoalesceContents);
-    t["min-version"] = oe_requiredParameter(
+    (*t)["coalesce-contents"] = oe_bare(&ArgParser::argCoalesceContents);
+    (*t)["min-version"] = oe_requiredParameter(
         &ArgParser::argMinVersion, "version");
-    t["force-version"] = oe_requiredParameter(
+    (*t)["force-version"] = oe_requiredParameter(
         &ArgParser::argForceVersion, "version");
-    t["split-pages"] = oe_optionalParameter(&ArgParser::argSplitPages);
-    t["verbose"] = oe_bare(&ArgParser::argVerbose);
-    t["progress"] = oe_bare(&ArgParser::argProgress);
-    t["no-warn"] = oe_bare(&ArgParser::argNoWarn);
-    t["deterministic-id"] = oe_bare(&ArgParser::argDeterministicId);
-    t["static-id"] = oe_bare(&ArgParser::argStaticId);
-    t["static-aes-iv"] = oe_bare(&ArgParser::argStaticAesIv);
-    t["no-original-object-ids"] = oe_bare(&ArgParser::argNoOriginalObjectIds);
-    t["show-encryption"] = oe_bare(&ArgParser::argShowEncryption);
-    t["show-encryption-key"] = oe_bare(&ArgParser::argShowEncryptionKey);
-    t["check-linearization"] = oe_bare(&ArgParser::argCheckLinearization);
-    t["show-linearization"] = oe_bare(&ArgParser::argShowLinearization);
-    t["show-xref"] = oe_bare(&ArgParser::argShowXref);
-    t["show-object"] = oe_requiredParameter(
+    (*t)["split-pages"] = oe_optionalParameter(&ArgParser::argSplitPages);
+    (*t)["verbose"] = oe_bare(&ArgParser::argVerbose);
+    (*t)["progress"] = oe_bare(&ArgParser::argProgress);
+    (*t)["no-warn"] = oe_bare(&ArgParser::argNoWarn);
+    (*t)["deterministic-id"] = oe_bare(&ArgParser::argDeterministicId);
+    (*t)["static-id"] = oe_bare(&ArgParser::argStaticId);
+    (*t)["static-aes-iv"] = oe_bare(&ArgParser::argStaticAesIv);
+    (*t)["no-original-object-ids"] = oe_bare(
+        &ArgParser::argNoOriginalObjectIds);
+    (*t)["show-encryption"] = oe_bare(&ArgParser::argShowEncryption);
+    (*t)["show-encryption-key"] = oe_bare(&ArgParser::argShowEncryptionKey);
+    (*t)["check-linearization"] = oe_bare(&ArgParser::argCheckLinearization);
+    (*t)["show-linearization"] = oe_bare(&ArgParser::argShowLinearization);
+    (*t)["show-xref"] = oe_bare(&ArgParser::argShowXref);
+    (*t)["show-object"] = oe_requiredParameter(
         &ArgParser::argShowObject, "obj[,gen]");
-    t["raw-stream-data"] = oe_bare(&ArgParser::argShowObject);
-    t["filtered-stream-data"] = oe_bare(&ArgParser::argFilteredStreamData);
-    t["show-npages"] = oe_bare(&ArgParser::argShowNpages);
-    t["show-pages"] = oe_bare(&ArgParser::argShowPages);
-    t["with-images"] = oe_bare(&ArgParser::argWithImages);
-    t["show-json"] = oe_bare(&ArgParser::argShowJson);
-    t["check"] = oe_bare(&ArgParser::argCheck);
+    (*t)["raw-stream-data"] = oe_bare(&ArgParser::argShowObject);
+    (*t)["filtered-stream-data"] = oe_bare(&ArgParser::argFilteredStreamData);
+    (*t)["show-npages"] = oe_bare(&ArgParser::argShowNpages);
+    (*t)["show-pages"] = oe_bare(&ArgParser::argShowPages);
+    (*t)["with-images"] = oe_bare(&ArgParser::argWithImages);
+    (*t)["show-json"] = oe_bare(&ArgParser::argShowJson);
+    (*t)["check"] = oe_bare(&ArgParser::argCheck);
+
+    t = &this->encrypt40_option_table;
+    (*t)["--"] = oe_bare(&ArgParser::argEndEncrypt);
+    (*t)["print"] = oe_requiredChoices(&ArgParser::arg40Print, yn);
+    (*t)["modify"] = oe_requiredChoices(&ArgParser::arg40Modify, yn);
+    (*t)["extract"] = oe_requiredChoices(&ArgParser::arg40Extract, yn);
+    (*t)["annotate"] = oe_requiredChoices(&ArgParser::arg40Annotate, yn);
+
+    t = &this->encrypt128_option_table;
+    (*t)["--"] = oe_bare(&ArgParser::argEndEncrypt);
+    (*t)["accessibility"] = oe_requiredChoices(
+        &ArgParser::arg128Accessibility, yn);
+    (*t)["extract"] = oe_requiredChoices(&ArgParser::arg128Extract, yn);
+    char const* print128Choices[] = {"full", "low", "none", 0};
+    (*t)["print"] = oe_requiredChoices(
+        &ArgParser::arg128Print, print128Choices);
+    char const* modify128Choices[] =
+        {"all", "annotate", "form", "assembly", "none", 0};
+    (*t)["modify"] = oe_requiredChoices(
+        &ArgParser::arg128Modify, modify128Choices);
+    (*t)["cleartext-metadata"] = oe_bare(&ArgParser::arg128ClearTextMetadata);
+    // The above 128-bit options are also 256-bit options, so copy
+    // what we have so far. Then continue separately with 128 and 256.
+    this->encrypt256_option_table = this->encrypt128_option_table;
+    (*t)["use-aes"] = oe_requiredChoices(&ArgParser::arg128UseAes, yn);
+    (*t)["force-V4"] = oe_bare(&ArgParser::arg128ForceV4);
+
+    t = &this->encrypt256_option_table;
+    (*t)["force-R5"] = oe_bare(&ArgParser::arg256ForceR5);
 }
 
 void
@@ -524,10 +573,33 @@ void
 ArgParser::argEncrypt()
 {
     ++cur_arg;
-    parseEncryptOptions();
-    o.encrypt = true;
-    o.decrypt = false;
-    o.copy_encryption = false;
+    if (cur_arg + 3 >= argc)
+    {
+	usage("insufficient arguments to --encrypt");
+    }
+    o.user_password = argv[cur_arg++];
+    o.owner_password = argv[cur_arg++];
+    std::string len_str = argv[cur_arg];
+    if (len_str == "40")
+    {
+	o.keylen = 40;
+        this->option_table = &(this->encrypt40_option_table);
+    }
+    else if (len_str == "128")
+    {
+	o.keylen = 128;
+        this->option_table = &(this->encrypt128_option_table);
+    }
+    else if (len_str == "256")
+    {
+	o.keylen = 256;
+        o.use_aes = true;
+        this->option_table = &(this->encrypt256_option_table);
+    }
+    else
+    {
+	usage("encryption key length must be 40, 128, or 256");
+    }
 }
 
 void
@@ -875,6 +947,125 @@ ArgParser::argCheck()
 {
     o.check = true;
     o.require_outfile = false;
+}
+
+void
+ArgParser::arg40Print(char* parameter)
+{
+    o.r2_print = (strcmp(parameter, "y") == 0);
+}
+
+void
+ArgParser::arg40Modify(char* parameter)
+{
+    o.r2_modify = (strcmp(parameter, "y") == 0);
+}
+
+void
+ArgParser::arg40Extract(char* parameter)
+{
+    o.r2_extract = (strcmp(parameter, "y") == 0);
+}
+
+void
+ArgParser::arg40Annotate(char* parameter)
+{
+    o.r2_annotate = (strcmp(parameter, "y") == 0);
+}
+
+void
+ArgParser::arg128Accessibility(char* parameter)
+{
+    o.r3_accessibility = (strcmp(parameter, "y") == 0);
+}
+
+void
+ArgParser::arg128Extract(char* parameter)
+{
+    o.r3_extract = (strcmp(parameter, "y") == 0);
+}
+
+void
+ArgParser::arg128Print(char* parameter)
+{
+    if (strcmp(parameter, "full") == 0)
+    {
+        o.r3_print = qpdf_r3p_full;
+    }
+    else if (strcmp(parameter, "low") == 0)
+    {
+        o.r3_print = qpdf_r3p_low;
+    }
+    else if (strcmp(parameter, "none") == 0)
+    {
+        o.r3_print = qpdf_r3p_none;
+    }
+    else
+    {
+        usage("invalid print option");
+    }
+}
+
+void
+ArgParser::arg128Modify(char* parameter)
+{
+    if (strcmp(parameter, "all") == 0)
+    {
+        o.r3_modify = qpdf_r3m_all;
+    }
+    else if (strcmp(parameter, "annotate") == 0)
+    {
+        o.r3_modify = qpdf_r3m_annotate;
+    }
+    else if (strcmp(parameter, "form") == 0)
+    {
+        o.r3_modify = qpdf_r3m_form;
+    }
+    else if (strcmp(parameter, "assembly") == 0)
+    {
+        o.r3_modify = qpdf_r3m_assembly;
+    }
+    else if (strcmp(parameter, "none") == 0)
+    {
+        o.r3_modify = qpdf_r3m_none;
+    }
+    else
+    {
+        usage("invalid modify option");
+    }
+}
+
+void
+ArgParser::arg128ClearTextMetadata()
+{
+    o.cleartext_metadata = true;
+}
+
+void
+ArgParser::arg128UseAes(char* parameter)
+{
+    o.use_aes = (strcmp(parameter, "y") == 0);
+}
+
+void
+ArgParser::arg128ForceV4()
+{
+    o.force_V4 = true;
+}
+
+void
+ArgParser::arg256ForceR5()
+{
+    o.force_R5 = true;
+}
+
+void
+ArgParser::argEndEncrypt()
+{
+    o.encrypt = true;
+    o.decrypt = false;
+    o.copy_encryption = false;
+    this->option_table = &(this->main_option_table);
 }
 
 void
@@ -1400,329 +1591,6 @@ ArgParser::parseNumrange(char const* range, int max, bool throw_error)
     return std::vector<int>();
 }
 
-void
-ArgParser::parseEncryptOptions()
-{
-    if (cur_arg + 3 >= argc)
-    {
-	usage("insufficient arguments to --encrypt");
-    }
-    o.user_password = argv[cur_arg++];
-    o.owner_password = argv[cur_arg++];
-    std::string len_str = argv[cur_arg++];
-    if (len_str == "40")
-    {
-	o.keylen = 40;
-    }
-    else if (len_str == "128")
-    {
-	o.keylen = 128;
-    }
-    else if (len_str == "256")
-    {
-	o.keylen = 256;
-        o.use_aes = true;
-    }
-    else
-    {
-	usage("encryption key length must be 40, 128, or 256");
-    }
-    while (1)
-    {
-	char* arg = argv[cur_arg];
-	if (arg == 0)
-	{
-	    usage("insufficient arguments to --encrypt");
-	}
-	else if (strcmp(arg, "--") == 0)
-	{
-	    return;
-	}
-	if (arg[0] == '-')
-	{
-	    ++arg;
-	    if (arg[0] == '-')
-	    {
-		++arg;
-	    }
-	}
-	else
-	{
-	    usage(std::string("invalid encryption parameter ") + arg);
-	}
-	++cur_arg;
-	char* parameter = strchr(arg, '=');
-	if (parameter)
-	{
-	    *parameter++ = 0;
-	}
-	if (strcmp(arg, "print") == 0)
-	{
-	    if (parameter == 0)
-	    {
-		usage("--print must be given as --print=option");
-	    }
-	    std::string val = parameter;
-	    if (o.keylen == 40)
-	    {
-		if (val == "y")
-		{
-		    o.r2_print = true;
-		}
-		else if (val == "n")
-		{
-		    o.r2_print = false;
-		}
-		else
-		{
-		    usage("invalid 40-bit -print parameter");
-		}
-	    }
-	    else
-	    {
-		if (val == "full")
-		{
-		    o.r3_print = qpdf_r3p_full;
-		}
-		else if (val == "low")
-		{
-		    o.r3_print = qpdf_r3p_low;
-		}
-		else if (val == "none")
-		{
-		    o.r3_print = qpdf_r3p_none;
-		}
-		else
-		{
-		    usage("invalid 128-bit -print parameter");
-		}
-	    }
-	}
-	else if (strcmp(arg, "modify") == 0)
-	{
-	    if (parameter == 0)
-	    {
-		usage("--modify must be given as --modify=option");
-	    }
-	    std::string val = parameter;
-	    if (o.keylen == 40)
-	    {
-		if (val == "y")
-		{
-		    o.r2_modify = true;
-		}
-		else if (val == "n")
-		{
-		    o.r2_modify = false;
-		}
-		else
-		{
-		    usage("invalid 40-bit -modify parameter");
-		}
-	    }
-	    else
-	    {
-		if (val == "all")
-		{
-		    o.r3_modify = qpdf_r3m_all;
-		}
-		else if (val == "annotate")
-		{
-		    o.r3_modify = qpdf_r3m_annotate;
-		}
-		else if (val == "form")
-		{
-		    o.r3_modify = qpdf_r3m_form;
-		}
-		else if (val == "assembly")
-		{
-		    o.r3_modify = qpdf_r3m_assembly;
-		}
-		else if (val == "none")
-		{
-		    o.r3_modify = qpdf_r3m_none;
-		}
-		else
-		{
-		    usage("invalid 128-bit -modify parameter");
-		}
-	    }
-	}
-	else if (strcmp(arg, "extract") == 0)
-	{
-	    if (parameter == 0)
-	    {
-		usage("--extract must be given as --extract=option");
-	    }
-	    std::string val = parameter;
-	    bool result = false;
-	    if (val == "y")
-	    {
-		result = true;
-	    }
-	    else if (val == "n")
-	    {
-		result = false;
-	    }
-	    else
-	    {
-		usage("invalid -extract parameter");
-	    }
-	    if (o.keylen == 40)
-	    {
-		o.r2_extract = result;
-	    }
-	    else
-	    {
-		o.r3_extract = result;
-	    }
-	}
-	else if (strcmp(arg, "annotate") == 0)
-	{
-	    if (parameter == 0)
-	    {
-		usage("--annotate must be given as --annotate=option");
-	    }
-	    std::string val = parameter;
-	    bool result = false;
-	    if (val == "y")
-	    {
-		result = true;
-	    }
-	    else if (val == "n")
-	    {
-		result = false;
-	    }
-	    else
-	    {
-		usage("invalid -annotate parameter");
-	    }
-	    if (o.keylen == 40)
-	    {
-		o.r2_annotate = result;
-	    }
-	    else
-	    {
-		usage("-annotate invalid for 128-bit keys");
-	    }
-	}
-	else if (strcmp(arg, "accessibility") == 0)
-	{
-	    if (parameter == 0)
-	    {
-		usage("--accessibility must be given as"
-		      " --accessibility=option");
-	    }
-	    std::string val = parameter;
-	    bool result = false;
-	    if (val == "y")
-	    {
-		result = true;
-	    }
-	    else if (val == "n")
-	    {
-		result = false;
-	    }
-	    else
-	    {
-		usage("invalid -accessibility parameter");
-	    }
-	    if (o.keylen == 40)
-	    {
-		usage("-accessibility invalid for 40-bit keys");
-	    }
-	    else
-	    {
-		o.r3_accessibility = result;
-	    }
-	}
-	else if (strcmp(arg, "cleartext-metadata") == 0)
-	{
-	    if (parameter)
-	    {
-		usage("--cleartext-metadata does not take a parameter");
-	    }
-	    if (o.keylen == 40)
-	    {
-		usage("--cleartext-metadata is invalid for 40-bit keys");
-	    }
-	    else
-	    {
-		o.cleartext_metadata = true;
-	    }
-	}
-	else if (strcmp(arg, "force-V4") == 0)
-	{
-	    if (parameter)
-	    {
-		usage("--force-V4 does not take a parameter");
-	    }
-	    if (o.keylen != 128)
-	    {
-		usage("--force-V4 is invalid only for 128-bit keys");
-	    }
-	    else
-	    {
-		o.force_V4 = true;
-	    }
-	}
-	else if (strcmp(arg, "force-R5") == 0)
-	{
-	    if (parameter)
-	    {
-		usage("--force-R5 does not take a parameter");
-	    }
-	    if (o.keylen != 256)
-	    {
-		usage("--force-R5 is invalid only for 256-bit keys");
-	    }
-	    else
-	    {
-		o.force_R5 = true;
-	    }
-	}
-	else if (strcmp(arg, "use-aes") == 0)
-	{
-	    if (parameter == 0)
-	    {
-		usage("--use-aes must be given as --extract=option");
-	    }
-	    std::string val = parameter;
-	    bool result = false;
-	    if (val == "y")
-	    {
-		result = true;
-	    }
-	    else if (val == "n")
-	    {
-		result = false;
-	    }
-	    else
-	    {
-		usage("invalid -use-aes parameter");
-	    }
-	    if ((o.keylen == 40) && result)
-	    {
-		usage("use-aes is invalid for 40-bit keys");
-	    }
-            else if ((o.keylen == 256) && (! result))
-            {
-                // qpdf would happily create files encrypted with RC4
-                // using /V=5, but Adobe reader can't read them.
-                usage("use-aes can't be disabled with 256-bit keys");
-            }
-	    else
-	    {
-		o.use_aes = result;
-	    }
-	}
-	else
-	{
-	    usage(std::string("invalid encryption parameter --") + arg);
-	}
-    }
-}
-
 std::vector<PageSpec>
 ArgParser::parsePagesOptions()
 {
@@ -1990,7 +1858,17 @@ ArgParser::parseOptions()
     for (cur_arg = 1; cur_arg < argc; ++cur_arg)
     {
         char* arg = argv[cur_arg];
-        if ((arg[0] == '-') && (strcmp(arg, "-") != 0))
+        if (strcmp(arg, "--") == 0)
+        {
+            // Special case for -- option, which is used to break out
+            // of subparsers.
+            OptionEntry& oe = (*this->option_table)["--"];
+            if (oe.bare_arg_handler)
+            {
+                (this->*(oe.bare_arg_handler))();
+            }
+        }
+        else if ((arg[0] == '-') && (strcmp(arg, "-") != 0))
         {
             ++arg;
             if (arg[0] == '-')
@@ -1998,19 +1876,28 @@ ArgParser::parseOptions()
                 // Be lax about -arg vs --arg
                 ++arg;
             }
-            char* parameter = const_cast<char*>(strchr(arg, '='));
+            char* parameter = 0;
+            if (strlen(arg) > 0)
+            {
+                // Prevent --=something from being treated as an empty
+                // arg since the empty string in the option table is
+                // for positional arguments.
+                parameter = const_cast<char*>(strchr(1 + arg, '='));
+            }
             if (parameter)
             {
                 *parameter++ = 0;
             }
 
             std::string arg_s(arg);
-            if (0 == this->option_table.count(arg_s))
+            if (arg_s.empty() ||
+                (arg_s.at(0) == '-') ||
+                (0 == this->option_table->count(arg_s)))
             {
                 usage(std::string("unknown option --") + arg);
             }
 
-            OptionEntry& oe = this->option_table[arg_s];
+            OptionEntry& oe = (*this->option_table)[arg_s];
             if ((oe.parameter_needed && (0 == parameter)) ||
                 ((! oe.choices.empty() &&
                   ((0 == parameter) ||
@@ -2055,9 +1942,11 @@ ArgParser::parseOptions()
                 (this->*(oe.param_arg_handler))(parameter);
             }
         }
-        else if (0 != this->option_table.count(""))
+        else if (0 != this->option_table->count(""))
         {
-            OptionEntry& oe = this->option_table[""];
+            // The empty string maps to the positional argument
+            // handler.
+            OptionEntry& oe = (*this->option_table)[""];
             if (oe.param_arg_handler)
             {
                 (this->*(oe.param_arg_handler))(arg);
@@ -2069,6 +1958,10 @@ ArgParser::parseOptions()
         }
     }
 
+    if (this->option_table != &(this->main_option_table))
+    {
+        usage("missing -- at end of options");
+    }
     if (o.infilename == 0)
     {
         usage("an input file name is required");
