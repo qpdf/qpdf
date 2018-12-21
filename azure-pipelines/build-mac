@@ -4,12 +4,12 @@ curl -L https://www.ijg.org/files/jpegsrc.v9c.tar.gz -o jpegsrc.v9c.tar.gz
 tar xzf jpegsrc.v9c.tar.gz
 cd jpeg-9c
 ./configure
-make
+make -k
 sudo make install
 cd ..
 if [ -f distfiles/distfiles.zip ]; then
     unzip distfiles/distfiles.zip
 fi
 ./configure --enable-werror --enable-show-failed-test-output
-make -j$(nproc)
+make -j$(nproc) -k
 make -k check

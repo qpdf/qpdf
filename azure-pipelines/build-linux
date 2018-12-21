@@ -6,7 +6,7 @@ sudo apt-get -y install \
    docbook-xsl fop xsltproc libxml2-utils inkscape imagemagick
 ./configure --enable-werror --enable-doc-maintenance \
     --enable-show-failed-test-output
-make -j$(nproc)
+make -j$(nproc) -k
 make -k check
 make distfiles.zip
 ./make_dist --ci --no-tests
