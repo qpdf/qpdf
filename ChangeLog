@@ -1,3 +1,8 @@
+2018-12-21  Jay Berkenbilt  <ejb@ql.org>
+
+	* You can now use eval $(qpdf --completion-bash) to enable bash
+	completion for qpdf. It's not perfect, but it works pretty well.
+
 2018-12-19  Jay Berkenbilt  <ejb@ql.org>
 
 	* When splitting pages using --split-pages, the outlines

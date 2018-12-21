@@ -322,7 +322,7 @@ class ArgParser
     void argShowLinearization();
     void argShowXref();
     void argShowObject(char* parameter);
-    void argShowObject();
+    void argRawStreamData();
     void argFilteredStreamData();
     void argShowNpages();
     void argShowPages();
@@ -344,10 +344,16 @@ class ArgParser
     void argEndEncrypt();
 
     void usage(std::string const& message);
+    void checkCompletion();
     void initOptionTable();
-    void handleHelpVersion();
+    void handleHelpArgs();
     void handleArgFileArguments();
+    void handleBashArguments();
     void readArgsFromFile(char const* filename);
+    void doFinalChecks();
+    void addOptionsToCompletions();
+    void addChoicesToCompletions(std::string const&);
+    void handleCompletion();
     std::vector<PageSpec> parsePagesOptions();
     void parseRotationParameter(std::string const&);
     std::vector<int> parseNumrange(char const* range, int max,
@@ -359,6 +365,12 @@ class ArgParser
     char** argv;
     Options& o;
     int cur_arg;
+    bool bash_completion;
+    std::string bash_prev;
+    std::string bash_cur;
+    std::string bash_line;
+    size_t bash_point;
+    std::set<std::string> completions;
 
     std::map<std::string, OptionEntry>* option_table;
     std::map<std::string, OptionEntry> main_option_table;
@@ -366,14 +378,18 @@ class ArgParser
     std::map<std::string, OptionEntry> encrypt128_option_table;
     std::map<std::string, OptionEntry> encrypt256_option_table;
     std::vector<PointerHolder<char> > new_argv;
+    std::vector<PointerHolder<char> > bash_argv;
     PointerHolder<char*> argv_ph;
+    PointerHolder<char*> bash_argv_ph;
 };
 
 ArgParser::ArgParser(int argc, char* argv[], Options& o) :
     argc(argc),
     argv(argv),
     o(o),
-    cur_arg(0)
+    cur_arg(0),
+    bash_completion(false),
+    bash_point(0)
 {
     option_table = &main_option_table;
     initOptionTable();
@@ -496,7 +512,7 @@ ArgParser::initOptionTable()
     (*t)["show-xref"] = oe_bare(&ArgParser::argShowXref);
     (*t)["show-object"] = oe_requiredParameter(
         &ArgParser::argShowObject, "obj[,gen]");
-    (*t)["raw-stream-data"] = oe_bare(&ArgParser::argShowObject);
+    (*t)["raw-stream-data"] = oe_bare(&ArgParser::argRawStreamData);
     (*t)["filtered-stream-data"] = oe_bare(&ArgParser::argFilteredStreamData);
     (*t)["show-npages"] = oe_bare(&ArgParser::argShowNpages);
     (*t)["show-pages"] = oe_bare(&ArgParser::argShowPages);
@@ -573,9 +589,30 @@ void
 ArgParser::argEncrypt()
 {
     ++cur_arg;
-    if (cur_arg + 3 >= argc)
+    if (cur_arg + 3 > argc)
     {
-	usage("insufficient arguments to --encrypt");
+        if (this->bash_completion)
+        {
+            if (cur_arg == argc)
+            {
+                this->completions.insert("user-password");
+            }
+            else if (cur_arg + 1 == argc)
+            {
+                this->completions.insert("owner-password");
+            }
+            else if (cur_arg + 2 == argc)
+            {
+                this->completions.insert("40");
+                this->completions.insert("128");
+                this->completions.insert("256");
+            }
+            return;
+        }
+        else
+        {
+            usage("insufficient arguments to --encrypt");
+        }
     }
     o.user_password = argv[cur_arg++];
     o.owner_password = argv[cur_arg++];
@@ -904,7 +941,7 @@ ArgParser::argShowObject(char* parameter)
 }
 
 void
-ArgParser::argShowObject()
+ArgParser::argRawStreamData()
 {
     o.show_raw_stream_data = true;
 }
@@ -1098,14 +1135,55 @@ ArgParser::handleArgFileArguments()
     argv[argc] = 0;
 }
 
-// Note: let's not be too noisy about documenting the fact that this
-// software purposely fails to enforce the distinction between user
-// and owner passwords.  A user password is sufficient to gain full
-// access to the PDF file, so there is nothing this software can do
-// with an owner password that it couldn't do with a user password
-// other than changing the /P value in the encryption dictionary.
-// (Setting this value requires the owner password.)  The
-// documentation discusses this as well.
+void
+ArgParser::handleBashArguments()
+{
+    // Do a minimal job of parsing bash_line into arguments. This
+    // doesn't do everything the shell does, but it should be good
+    // enough for purposes of handling completion. We can't use
+    // new_argv because this has to interoperate with @file arguments.
+
+    enum { st_top, st_quote } state = st_top;
+    std::string arg;
+    for (std::string::iterator iter = bash_line.begin();
+         iter != bash_line.end(); ++iter)
+    {
+        char ch = (*iter);
+        if ((state == st_top) && QUtil::is_space(ch) && (! arg.empty()))
+        {
+            bash_argv.push_back(
+                PointerHolder<char>(
+                    true, QUtil::copy_string(arg.c_str())));
+            arg.clear();
+        }
+        else
+        {
+            if (ch == '"')
+            {
+                state = (state == st_top ? st_quote : st_top);
+            }
+            arg.append(1, ch);
+        }
+    }
+    if (bash_argv.empty())
+    {
+        // This can't happen if properly invoked by bash, but ensure
+        // we have a valid argv[0] regardless.
+        bash_argv.push_back(
+            PointerHolder<char>(
+                true, QUtil::copy_string(argv[0])));
+    }
+    // Explicitly discard any non-space-terminated word. The "current
+    // word" is handled specially.
+    bash_argv_ph = PointerHolder<char*>(true, new char*[1+bash_argv.size()]);
+    argv = bash_argv_ph.getPointer();
+    for (size_t i = 0; i < bash_argv.size(); ++i)
+    {
+        argv[i] = bash_argv.at(i).getPointer();
+    }
+    argc = static_cast<int>(bash_argv.size());
+    argv[argc] = 0;
+}
 
 char const* ArgParser::help  = "\
 \n\
@@ -1127,6 +1205,7 @@ Basic Options\n\
 --version               show version of qpdf\n\
 --copyright             show qpdf's copyright and license information\n\
 --help                  show command-line argument help\n\
+--completion-bash       output a bash complete command you can eval\n\
 --password=password     specify a password for accessing encrypted files\n\
 --verbose               provide additional informational output\n\
 --progress              give progress indicators while writing output\n\
@@ -1412,7 +1491,15 @@ void usageExit(std::string const& msg)
 void
 ArgParser::usage(std::string const& message)
 {
-    usageExit(message);
+    if (this->bash_completion)
+    {
+        // This will cause bash to fall back to regular file completion.
+        exit(0);
+    }
+    else
+    {
+        usageExit(message);
+    }
 }
 
 static JSON json_schema()
@@ -1718,13 +1805,33 @@ ArgParser::readArgsFromFile(char const* filename)
 }
 
 void
-ArgParser::handleHelpVersion()
+ArgParser::handleHelpArgs()
 {
-    // Make sure the output looks right on an 80-column display.
+    // Handle special-case informational options that are only
+    // available as the sole option.
 
-    if ((argc == 2) &&
-        ((strcmp(argv[1], "--version") == 0) ||
-         (strcmp(argv[1], "-version") == 0)))
+    // The options processed here are also handled as a special case
+    // in handleCompletion.
+
+    if (argc != 2)
+    {
+        return;
+    }
+    char* arg = argv[1];
+    if (*arg != '-')
+    {
+        return;
+    }
+    ++arg;
+    if (*arg == '-')
+    {
+        ++arg;
+    }
+    if (! *arg)
+    {
+        return;
+    }
+    if (strcmp(arg, "version") == 0)
     {
         std::cout
             << whoami << " version " << QPDF::QPDFVersion() << std::endl
@@ -1733,10 +1840,9 @@ ArgParser::handleHelpVersion()
         exit(0);
     }
 
-    if ((argc == 2) &&
-             ((strcmp(argv[1], "--copyright") == 0) ||
-              (strcmp(argv[1], "-copyright") == 0)))
+    if (strcmp(arg, "copyright") == 0)
     {
+        // Make sure the output looks right on an 80-column display.
         //               1         2         3         4         5         6         7         8
         //      12345678901234567890123456789012345678901234567890123456789012345678901234567890
         std::cout
@@ -1776,11 +1882,23 @@ ArgParser::handleHelpVersion()
         exit(0);
     }
 
-    if ((argc == 2) &&
-        ((strcmp(argv[1], "--help") == 0) ||
-         (strcmp(argv[1], "-help") == 0)))
+    if (strcmp(arg, "help") == 0)
     {
         std::cout << help;
+        exit(0);
+    }
+
+    if (strcmp(arg, "completion-bash") == 0)
+    {
+        std::string path = argv[0];
+        size_t slash = path.find('/');
+        if ((slash != 0) && (slash != std::string::npos))
+        {
+            std::cerr << "WARNING: qpdf completion enabled"
+                      << " using relative path to qpdf" << std::endl;
+        }
+        std::cout << "complete -o bashdefault -o default -o nospace"
+                  << " -C " << argv[0] << " " << whoami << std::endl;
         exit(0);
     }
 }
@@ -1851,9 +1969,37 @@ ArgParser::parseRotationParameter(std::string const& parameter)
 }
 
 void
+ArgParser::checkCompletion()
+{
+    // See if we're being invoked from bash completion.
+    std::string bash_point_env;
+    if (QUtil::get_env("COMP_LINE", &bash_line) &&
+        QUtil::get_env("COMP_POINT", &bash_point_env))
+    {
+        int p = QUtil::string_to_int(bash_point_env.c_str());
+        if ((p > 0) && (p <= static_cast<int>(bash_line.length())))
+        {
+            // Point to the last character
+            bash_point = static_cast<size_t>(p) - 1;
+        }
+        if (argc >= 4)
+        {
+            bash_cur = argv[2];
+            bash_prev = argv[3];
+            handleBashArguments();
+            bash_completion = true;
+        }
+    }
+}
+
+void
 ArgParser::parseOptions()
 {
-    handleHelpVersion();        // QXXXQ calls std::cout
+    checkCompletion();
+    if (! this->bash_completion)
+    {
+        handleHelpArgs();
+    }
     handleArgFileArguments();
     for (cur_arg = 1; cur_arg < argc; ++cur_arg)
     {
@@ -1957,7 +2103,19 @@ ArgParser::parseOptions()
             usage(std::string("unknown argument ") + arg);
         }
     }
+    if (this->bash_completion)
+    {
+        handleCompletion();
+    }
+    else
+    {
+        doFinalChecks();
+    }
+}
 
+void
+ArgParser::doFinalChecks()
+{
     if (this->option_table != &(this->main_option_table))
     {
         usage("missing -- at end of options");
@@ -2000,6 +2158,107 @@ ArgParser::parseOptions()
         usage("input file and output file are the same;"
               " this would cause input file to be lost");
     }
+}
+
+void
+ArgParser::addChoicesToCompletions(std::string const& option)
+{
+    if (this->option_table->count(option) != 0)
+    {
+        OptionEntry& oe = (*this->option_table)[option];
+        for (std::set<std::string>::iterator iter = oe.choices.begin();
+             iter != oe.choices.end(); ++iter)
+        {
+            completions.insert(*iter);
+        }
+    }
+}
+
+void
+ArgParser::addOptionsToCompletions()
+{
+    for (std::map<std::string, OptionEntry>::iterator iter =
+             this->option_table->begin();
+         iter != this->option_table->end(); ++iter)
+    {
+        std::string const& arg = (*iter).first;
+        OptionEntry& oe = (*iter).second;
+        std::string base = "--" + arg;
+        if (oe.param_arg_handler)
+        {
+            completions.insert(base + "=");
+        }
+        if (! oe.parameter_needed)
+        {
+            completions.insert(base);
+        }
+    }
+}
+
+void
+ArgParser::handleCompletion()
+{
+    if (this->completions.empty())
+    {
+        // Detect --option=... Bash treats the = as a word separator.
+        std::string choice_option;
+        if (bash_cur.empty() && (bash_prev.length() > 2) &&
+            (bash_prev.at(0) == '-') &&
+            (bash_prev.at(1) == '-') &&
+            (bash_line.at(bash_point) == '='))
+        {
+            choice_option = bash_prev.substr(2, std::string::npos);
+        }
+        else if ((bash_prev == "=") &&
+                 (bash_line.length() > (bash_cur.length() + 1)))
+        {
+            // We're sitting at --option=x. Find previous option.
+            size_t end_mark = bash_line.length() - bash_cur.length() - 1;
+            char before_cur = bash_line.at(end_mark);
+            if (before_cur == '=')
+            {
+                size_t space = bash_line.find_last_of(' ', end_mark);
+                if (space != std::string::npos)
+                {
+                    std::string candidate =
+                        bash_line.substr(space + 1, end_mark - space - 1);
+                    if ((candidate.length() > 2) &&
+                        (candidate.at(0) == '-') &&
+                        (candidate.at(1) == '-'))
+                    {
+                        choice_option =
+                            candidate.substr(2, std::string::npos);
+                    }
+                }
+            }
+        }
+        if (! choice_option.empty())
+        {
+            addChoicesToCompletions(choice_option);
+        }
+        else if ((! bash_cur.empty()) && (bash_cur.at(0) == '-'))
+        {
+            addOptionsToCompletions();
+            if (this->argc == 1)
+            {
+                // Handle options usually handled by handleHelpArgs.
+                this->completions.insert("--help");
+                this->completions.insert("--version");
+                this->completions.insert("--copyright");
+                this->completions.insert("--completion-bash");
+            }
+        }
+    }
+    for (std::set<std::string>::iterator iter = completions.begin();
+         iter != completions.end(); ++iter)
+    {
+        if (this->bash_cur.empty() ||
+            ((*iter).substr(0, bash_cur.length()) == bash_cur))
+        {
+            std::cout << *iter << std::endl;
+        }
+    }
+    exit(0);
 }
 
 static void set_qpdf_options(QPDF& pdf, Options& o)

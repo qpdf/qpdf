@@ -100,6 +100,36 @@ $td->runtest("UTF-16 encoding errors",
 	     {$td->FILE => "unicode-errors.out", $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+my @completion_tests = (
+    ['qpdf ', undef, 'top'],
+    ['qpdf -', undef, 'top-arg'],
+    ['qpdf --enc', undef, 'enc'],
+    ['qpdf --encrypt ', undef, 'encrypt'],
+    ['qpdf --encrypt u ', undef, 'encrypt-u'],
+    ['qpdf --encrypt u o ', undef, 'encrypt-u-o'],
+    ['qpdf @encrypt-u o ', undef, 'encrypt-u-o'],
+    ['qpdf --encrypt u o 40 --', undef, 'encrypt-40'],
+    ['qpdf --encrypt u o 128 --', undef, 'encrypt-128'],
+    ['qpdf --encrypt u o 256 --', undef, 'encrypt-256'],
+    ['qpdf --encrypt u o bad --', undef, 'encrypt-bad'],
+    ['qpdf --split-pag', undef, 'split'],
+    ['qpdf --decode-l', undef, 'decode-l'],
+    ['qpdf --decode-lzzz', 15, 'decode-l'],
+    ['qpdf --decode-level=', undef, 'decode-level'],
+    ['qpdf --check -', undef, 'later-arg'],
+    );
+$n_tests += scalar(@completion_tests);
+foreach my $c (@completion_tests)
+{
+    my ($cmd, $point, $description) = @$c;
+    my $out = "completion-$description.out";
+    $td->runtest("bash completion: $description",
+                 {$td->COMMAND => [@{bash_completion($cmd, $point)}],
+                      $td->FILTER => "perl filter-completion.pl $out"},
+                 {$td->FILE => "$out", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+}
+
 show_ntests();
 # ----------
 $td->notify("--- Argument Parsing ---");
@@ -3142,6 +3172,24 @@ sub show_ntests
     {
 	$td->emphasize("tests so far: ". calc_ntests());
     }
+}
+
+sub bash_completion
+{
+    my ($line, $point) = @_;
+    if (! defined $point)
+    {
+        $point = length($line);
+    }
+    my $before_point = substr($line, 0, $point);
+    $before_point =~ m/^(.*)([ =])([^= ]*)$/ or die;
+    my ($first, $sep, $cur) = ($1, $2, $3);
+    my $prev = ($sep eq '=' ? $sep : $first);
+    $prev =~ s/.* (\S+)$/$1/;
+    my $this = $first;
+    $this =~ s/(\S+)\s.*/$1/;
+    ['env', "COMP_LINE=$line", "COMP_POINT=$point",
+     "qpdf", $this, $cur, $prev];
 }
 
 sub check_pdf
