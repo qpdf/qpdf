@@ -1515,7 +1515,7 @@ outfile.pdf</option>
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term><option>--show-object=obj[,gen]</option></term>
+      <term><option>--show-object=trailer|obj[,gen]</option></term>
       <listitem>
        <para>
         Show the contents of the given object.  This is especially
@@ -1577,6 +1577,44 @@ outfile.pdf</option>
         each page.  (At present, information about images in shared
         resource dictionaries are not output by this command.  This is
         discussed in a comment in the source code.)
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--json</option></term>
+      <listitem>
+       <para>
+        Generate a json representation of the file. This is described
+        in depth in <xref linkend="ref.json"/>
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--json-help</option></term>
+      <listitem>
+       <para>
+        Describe the format of the json output.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--json-key=key</option></term>
+      <listitem>
+       <para>
+        This option is repeatable. If specified, only top-level keys
+        specified will be included in the json output. If not
+        specified, all keys wil be shown.
+       </para>
+      </listitem>
+      </varlistentry>
+     <varlistentry>
+      <term><option>--json-object=trailer|obj[,gen]</option></term>
+      <listitem>
+       <para>
+        This option is repeatable. If specified, only specified
+        objects will be shown in the
+        &ldquo;<literal>objects</literal>&rdquo; key of the json
+        output. If absent, all objects will be shown.
        </para>
       </listitem>
      </varlistentry>
@@ -1777,6 +1815,8 @@ outfile.pdf</option>
  </chapter>
  <chapter id="ref.using-library">
   <title>Using the QPDF Library</title>
+  <sect1 id="ref.using.from-cxx">
+   <title>Using QPDF from C++</title>
    <para>
     The source tree for the qpdf package has an
     <filename>examples</filename> directory that contains a few
@@ -1808,6 +1848,234 @@ outfile.pdf</option>
     time.  Multiple threads may simultaneously work with different
     instances of these and all other QPDF objects.
    </para>
+  </sect1>
+  <sect1 id="ref.using.other-languages">
+   <title>Using QPDF from other languages</title>
+   <para>
+    The qpdf library is implemented in C++, which makes it hard to use
+    directly in other languages. There are a few things that can help.
+   </para>
+   <variablelist>
+    <varlistentry>
+     <term>&ldquo;C&rdquo;</term>
+     <listitem>
+      <para>
+       The qpdf library includes a &ldquo;C&rdquo; language interface
+       that provides a subset of the overall capabilities. The header
+       file <filename>qpdf/qpdf-c.h</filename> includes information
+       about its use. As long as you use a C++ linker, you can link C
+       programs with qpdf and use the C API. For languages that can
+       directly load methods from a shared library, the C API can also
+       be useful. People have reported success using the C API from
+       other languages on Windows by directly calling functions in the
+       DLL.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Python</term>
+     <listitem>
+      <para>
+       A Python module called <ulink
+       url="https://pypi.org/project/pikepdf/">pikepdf</ulink>
+       provides a clean and highly functional set of Python bindings
+       to the qpdf library. Using pikepdf, you can work with PDF files
+       in a natural way and combine qpdf's capabilities with other
+       functionality provided by Python's rich standard library and
+       available modules.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Other Languages</term>
+     <listitem>
+      <para>
+       Starting with version 8.3.0, the <command>qpdf</command>
+       command-line tool can produce a json representation of the PDF
+       file's non-content data. This can facilitate interacting
+       programmatically with PDF files through qpdf's command line
+       interface. For more information, please see <xref
+       linkend="ref.json"/>.
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </sect1>
+ </chapter>
+ <chapter id="ref.json">
+  <title>QPDF JSON</title>
+  <para>
+   Beginning with qpdf version 8.3.0, the <command>qpdf</command>
+   command-line program can produce a json representation of the
+   non-content data in a PDF file. It includes a dump in json format
+   of all objects in the PDF file excluding the content of streams.
+   This json representation makes it very easy to look in detail at
+   the structure of a given PDF file, and it also provides a great way
+   to work with PDF files programmatically from the command-line in
+   languages that can't call or link with the qpdf library directly.
+   Note that stream data can be extracted from PDF files using other
+   qpdf command-line options.
+  </para>
+  <para>
+   The qpdf json representation includes a json serialization of the
+   raw objects in the PDF file as well as some computed information in
+   a more easily extracted format. QPDF provides some guarantees about
+   its json format. These guarantees are designed to simplify the
+   experience of a developer working with the JSON format.
+   <variablelist>
+    <varlistentry>
+     <term>Compatibility</term>
+     <listitem>
+      <para>
+       The top-level json object output is a dictionary. The json
+       output contains various nested dictionaries and arrays. With
+       the exception of dictionaries that are populated by the fields
+       of objects from the file, all instances of a dictionary are
+       guaranteed to have exactly the same keys. Future versions of
+       qpdf are free to add additional keys but not to remove keys or
+       change the type of object that a key points to. The qpdf
+       program validates this guarantee, and in the unlikely event
+       that a bug in qpdf should cause it to generate data that
+       doesn't conform to this rule, it will ask you to file a bug
+       report.
+      </para>
+      <para>
+       The top-level json structure contains a
+       &ldquo;<literal>version</literal>&rdquo; key whose value is
+       simple integer. The value of the <literal>version</literal> key
+       will be incremented if a non-compatible change is made. A
+       non-compatible change would be any change that involves removal
+       of a key, a change to the format of data pointed to by a key,
+       or a semantic change that requires a different interpretation
+       of a previously existing key. A strong effort will be made to
+       avoid breaking compatibility.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Documentation</term>
+     <listitem>
+      <para>
+       The <command>qpdf</command> command can be invoked with the
+       <option>--json-help</option> option. This will output a json
+       structure that has the same structure as the json output that
+       qpdf generates, except that each field in the help output is a
+       description of the corresponding field in the json output. The
+       specific guarantees are as follows:
+       <itemizedlist>
+        <listitem>
+         <para>
+          A dictionary in the help output means that the corresponding
+          location in the actual json output is also a dictionary with
+          exactly the same keys; that is, no keys present in help are
+          absent in the real output, and no keys will be present in
+          the real output that are not in help.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          A string in the help output is a description of the item
+          that appears in the corresponding location of the actual
+          output. The corresponding output can have any format.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          An array in the help output always contains a single
+          element. It indicates that the corresponding location in the
+          actual output is also an array, and that each element of the
+          array has whatever format is implied by the single element
+          of the help output's array.
+         </para>
+        </listitem>
+       </itemizedlist>
+       For example, the help output indicates includes a
+       &ldquo;<literal>pagelabels</literal>&rdquo; key whose value is
+       an array of one element. That element is a dictionary with keys
+       &ldquo;<literal>index</literal>&rdquo; and
+       &ldquo;<literal>label</literal>&rdquo;. In addition to
+       describing the meaning of those keys, this tells you that the
+       actual json output will contain a <literal>pagelabels</literal>
+       array, each of whose elements is a dictionary that contains an
+       <literal>index</literal> key, a <literal>label</literal> key,
+       and no other keys.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Directness and Simplicity</term>
+     <listitem>
+      <para>
+       The json output contains the value of every object in the file,
+       but it also contains some processed data. This is analogous to
+       how qpdf's library interface works. The processed data is
+       similar to the helper functions in that it allows you to look
+       at certain aspects of the PDF file without having to understand
+       all the nuances of the PDF specification, while the raw objects
+       allow you to mine the PDF for anything that the higher-level
+       interfaces are lacking.
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </para>
+  <para>
+   There are a few limitations to be aware of with the json structure:
+   <itemizedlist>
+    <listitem>
+     <para>
+      Strings, names, and indirect object references in the original
+      PDF file are all converted to strings in the json
+      representation. In the case of a &ldquo;normal&rdquo; PDF file,
+      you can tell the difference because a name starts with a slash
+      (<literal>/</literal>), and an indirect object reference looks
+      like <literal>n n R</literal>, but if there were to be a string
+      that looked like a name or indirect object reference, there
+      would be no way to tell this from the json output. Note that
+      there are certain cases where you know for sure what something
+      is, such as knowing that dictionary keys in objects are always
+      names and that certain things in the higher-level computed data
+      are known to contain indirect object references.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      The json format doesn't support binary data very well. Mostly
+      the details are not important, but they are presented here for
+      information. When qpdf outputs a string in the json
+      representation, it converts the string to UTF-8, assuming usual
+      PDF string semantics. Specifically, if the original string is
+      UTF-16, it is converted to UTF-8. Otherwise, it is assumed to
+      have PDF doc encoding, and is converted to UTF-8 with that
+      assumption. This causes strange things to happen to binary
+      strings. For example, if you had the binary string
+      <literal>&lt;038051&gt;</literal>, this would be output to the
+      json as <literal>\u0003•Q</literal> because
+      <literal>03</literal> is not a printable character and
+      <literal>80</literal> is the bullet character in PDF doc
+      encoding and is mapped to the Unicode value
+      <literal>2022</literal>. Since <literal>51</literal> is
+      <literal>Q</literal>, it is output as is. If you wanted to
+      convert back from here to a binary string, would have to
+      recognize Unicode values whose code points are higher than
+      <literal>0xFF</literal> and map those back to their
+      corresponding PDF doc encoding characters. There is no way to
+      tell the difference between a Unicode string that was originally
+      encoded as UTF-16 or one that was converted from PDF doc
+      encoding. In other words, it's best if you don't try to use the
+      json format to extract binary strings from the PDF file, but if
+      you really had to, it could be done. Note that qpdf's
+      <option>--show-object</option> option does not have this
+      limitation and will reveal the string as encoded in the original
+      file.
+     </para>
+    </listitem>
+   </itemizedlist>
+  </para>
+  <para>
+   For specific details on the information provided in the json
+   output, please run <command>qpdf --json-help</command>.
+  </para>
  </chapter>
  <chapter id="ref.design">
   <title>Design and Library Notes</title>
