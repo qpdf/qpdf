@@ -243,6 +243,90 @@ ProgressReporter::reportProgress(int percentage)
               << percentage << "%" << std::endl;
 }
 
+static JSON json_schema()
+{
+    // Style: use all lower-case keys with no dashes or underscores.
+    // Choose array or dictionary based on indexing. For example, we
+    // use a dictionary for objects because we want to index by object
+    // ID and an array for pages because we want to index by position.
+    // The pages in the pages array contain references back to the
+    // original object, which can be resolved in the objects
+    // dictionary. When a PDF constract that maps back to an original
+    // object is represented separately, use "object" as the key that
+    // references the original object.
+
+    // This JSON object doubles as a schema and as documentation for
+    // our JSON output. Any schema mismatch is a bug in qpdf. This
+    // helps to enforce our policy of consistently providing a known
+    // structure where every documented key will always be present,
+    // which makes it easier to consume our JSON. This is discussed in
+    // more depth in the manual.
+    JSON schema = JSON::makeDictionary();
+    schema.addDictionaryMember(
+        "version", JSON::makeString(
+            "JSON format serial number; increased for non-compatible changes"));
+    JSON j_params = schema.addDictionaryMember(
+        "parameters", JSON::makeDictionary());
+    j_params.addDictionaryMember(
+        "decodelevel", JSON::makeString(
+            "decode level used to determine stream filterability"));
+    schema.addDictionaryMember(
+        "objects", JSON::makeString(
+            "dictionary of original objects; keys are 'trailer' or 'n n R'"));
+    JSON page = schema.addDictionaryMember("pages", JSON::makeArray()).
+        addArrayElement(JSON::makeDictionary());
+    page.addDictionaryMember(
+        "object",
+        JSON::makeString("reference to original page object"));
+    JSON image = page.addDictionaryMember("images", JSON::makeArray()).
+        addArrayElement(JSON::makeDictionary());
+    image.addDictionaryMember(
+        "object",
+        JSON::makeString("reference to image stream"));
+    image.addDictionaryMember(
+        "width",
+        JSON::makeString("image width"));
+    image.addDictionaryMember(
+        "height",
+        JSON::makeString("image height"));
+    image.addDictionaryMember("filter", JSON::makeArray()).
+        addArrayElement(
+            JSON::makeString("filters applied to image data"));
+    image.addDictionaryMember("decodeparms", JSON::makeArray()).
+        addArrayElement(
+            JSON::makeString("decode parameters for image data"));
+    image.addDictionaryMember(
+        "filterable",
+        JSON::makeString("whether image data can be decoded"
+                         " using the decode level qpdf was invoked with"));
+    page.addDictionaryMember("contents", JSON::makeArray()).
+        addArrayElement(
+            JSON::makeString("reference to each content stream"));
+    page.addDictionaryMember(
+        "label",
+        JSON::makeString("page label dictionary, or null if none"));
+    JSON labels = schema.addDictionaryMember("pagelabels", JSON::makeArray()).
+        addArrayElement(JSON::makeDictionary());
+    labels.addDictionaryMember(
+        "index",
+        JSON::makeString("starting page position starting from zero"));
+    labels.addDictionaryMember(
+        "label",
+        JSON::makeString("page label dictionary"));
+    JSON outline = page.addDictionaryMember("outlines", JSON::makeArray()).
+        addArrayElement(JSON::makeDictionary());
+    outline.addDictionaryMember(
+        "object",
+        JSON::makeString("reference to outline that targets this page"));
+    outline.addDictionaryMember(
+        "title",
+        JSON::makeString("outline title"));
+    outline.addDictionaryMember(
+        "dest",
+        JSON::makeString("outline destination dictionary"));
+    return schema;
+}
+
 // This is not a general-purpose argument parser. It is tightly
 // crafted to work with qpdf. qpdf's command-line syntax is very
 // complex because of its long history, and it doesn't really follow
@@ -283,6 +367,11 @@ class ArgParser
     OptionEntry oe_optionalParameter(param_arg_handler_t);
     OptionEntry oe_requiredChoices(param_arg_handler_t, char const** choices);
 
+    void argHelp();
+    void argVersion();
+    void argCopyright();
+    void argCompletionBash();
+    void argJsonHelp();
     void argPositional(char* arg);
     void argPassword(char* parameter);
     void argEmpty();
@@ -374,6 +463,7 @@ class ArgParser
     std::set<std::string> completions;
 
     std::map<std::string, OptionEntry>* option_table;
+    std::map<std::string, OptionEntry> help_option_table;
     std::map<std::string, OptionEntry> main_option_table;
     std::map<std::string, OptionEntry> encrypt40_option_table;
     std::map<std::string, OptionEntry> encrypt128_option_table;
@@ -447,7 +537,14 @@ ArgParser::oe_requiredChoices(param_arg_handler_t h, char const** choices)
 void
 ArgParser::initOptionTable()
 {
-    std::map<std::string, OptionEntry>* t = &this->main_option_table;
+    std::map<std::string, OptionEntry>* t = &this->help_option_table;
+    (*t)["help"] = oe_bare(&ArgParser::argHelp);
+    (*t)["version"] = oe_bare(&ArgParser::argVersion);
+    (*t)["copyright"] = oe_bare(&ArgParser::argCopyright);
+    (*t)["completion-bash"] = oe_bare(&ArgParser::argCompletionBash);
+    (*t)["json-help"] = oe_bare(&ArgParser::argJsonHelp);
+
+    t = &this->main_option_table;
     char const* yn[] = {"y", "n", 0};
     (*t)[""] = oe_positional(&ArgParser::argPositional);
     (*t)["password"] = oe_requiredParameter(&ArgParser::argPassword, "pass");
@@ -565,6 +662,100 @@ ArgParser::argPositional(char* arg)
     {
         usage(std::string("unknown argument ") + arg);
     }
+}
+
+void
+ArgParser::argVersion()
+{
+    std::cout
+        << whoami << " version " << QPDF::QPDFVersion() << std::endl
+        << "Run " << whoami << " --copyright to see copyright and license information."
+        << std::endl;
+}
+
+void
+ArgParser::argCopyright()
+{
+    // Make sure the output looks right on an 80-column display.
+    //               1         2         3         4         5         6         7         8
+    //      12345678901234567890123456789012345678901234567890123456789012345678901234567890
+    std::cout
+        << whoami << " version " << QPDF::QPDFVersion() << std::endl
+        << std::endl
+        << "Copyright (c) 2005-2018 Jay Berkenbilt"
+        << std::endl
+        << "QPDF is licensed under the Apache License, Version 2.0 (the \"License\");"
+        << std::endl
+        << "not use this file except in compliance with the License."
+        << std::endl
+        << "You may obtain a copy of the License at"
+        << std::endl
+        << std::endl
+        << "  http://www.apache.org/licenses/LICENSE-2.0"
+        << std::endl
+        << std::endl
+        << "Unless required by applicable law or agreed to in writing, software"
+        << std::endl
+        << "distributed under the License is distributed on an \"AS IS\" BASIS,"
+        << std::endl
+        << "WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied."
+        << std::endl
+        << "See the License for the specific language governing permissions and"
+        << std::endl
+        << "limitations under the License."
+        << std::endl
+        << std::endl
+        << "Versions of qpdf prior to version 7 were released under the terms"
+        << std::endl
+        << "of version 2.0 of the Artistic License. At your option, you may"
+        << std::endl
+        << "continue to consider qpdf to be licensed under those terms. Please"
+        << std::endl
+        << "see the manual for additional information."
+        << std::endl;
+}
+
+void
+ArgParser::argHelp()
+{
+    std::cout << help;
+}
+
+void
+ArgParser::argCompletionBash()
+{
+    std::string path = argv[0];
+    size_t slash = path.find('/');
+    if ((slash != 0) && (slash != std::string::npos))
+    {
+        std::cerr << "WARNING: qpdf completion enabled"
+                  << " using relative path to qpdf" << std::endl;
+    }
+    std::cout << "complete -o bashdefault -o default -o nospace"
+              << " -C " << argv[0] << " " << whoami << std::endl;
+}
+
+void
+ArgParser::argJsonHelp()
+{
+    // Make sure the output looks right on an 80-column display.
+    //               1         2         3         4         5         6         7         8
+    //      12345678901234567890123456789012345678901234567890123456789012345678901234567890
+    std::cout
+        << "The json block below contains the same structure with the same keys as the"
+        << std::endl
+        << "json generated by qpdf. In the block below, the values are descriptions of"
+        << std::endl
+        << "the meanings of those entries. The specific contract guaranteed by qpdf in"
+        << std::endl
+        << "its json representation is explained in more detail in the manual. You can"
+        << std::endl
+        << "specify a subset of top-level keys when you invoke qpdf, but the \"version\""
+        << std::endl
+        << "and \"parameters\" keys will always be present."
+        << std::endl
+        << std::endl
+        << json_schema().serialize();
 }
 
 void
@@ -1510,80 +1701,6 @@ ArgParser::usage(std::string const& message)
     }
 }
 
-static JSON json_schema(Options& o)
-{
-    // This JSON object doubles as a schema and as documentation for
-    // our JSON output. Any schema mismatch is a bug in qpdf. This
-    // helps to enforce our policy of consistently providing a known
-    // structure where every documented key will always be present,
-    // which makes it easier to consume our JSON. This is discussed in
-    // more depth in the manual.
-    JSON schema = JSON::makeDictionary();
-    schema.addDictionaryMember(
-        "version", JSON::makeString(
-            "JSON format serial number; increased for non-compatible changes"));
-    JSON j_params = schema.addDictionaryMember(
-        "parameters", JSON::makeDictionary());
-    j_params.addDictionaryMember(
-        "decodeLevel", JSON::makeString(
-            "decode level used to determine stream filterability"));
-    schema.addDictionaryMember(
-        "objects", JSON::makeString(
-            "Original objects; keys are 'trailer' or 'n n R'"));
-    JSON page = schema.addDictionaryMember("pages", JSON::makeArray()).
-        addArrayElement(JSON::makeDictionary());
-    page.addDictionaryMember(
-        "object",
-        JSON::makeString("reference to original page object"));
-    JSON image = page.addDictionaryMember("images", JSON::makeArray()).
-        addArrayElement(JSON::makeDictionary());
-    image.addDictionaryMember(
-        "object",
-        JSON::makeString("reference to image stream"));
-    image.addDictionaryMember(
-        "width",
-        JSON::makeString("image width"));
-    image.addDictionaryMember(
-        "height",
-        JSON::makeString("image height"));
-    image.addDictionaryMember("filter", JSON::makeArray()).
-        addArrayElement(
-            JSON::makeString("filters applied to image data"));
-    image.addDictionaryMember("decodeparms", JSON::makeArray()).
-        addArrayElement(
-            JSON::makeString("decode parameters for image data"));
-    image.addDictionaryMember(
-        "filterable",
-        JSON::makeString("whether image data can be decoded"
-                         " using the decode level qpdf was invoked with"));
-    page.addDictionaryMember("contents", JSON::makeArray()).
-        addArrayElement(
-            JSON::makeString("reference to each content stream"));
-    page.addDictionaryMember(
-        "label",
-        JSON::makeString("page label dictionary, or null if none"));
-    JSON labels = schema.addDictionaryMember("pagelabels", JSON::makeArray()).
-        addArrayElement(JSON::makeDictionary());
-    labels.addDictionaryMember(
-        "index",
-        JSON::makeString("starting page position starting from zero"));
-    labels.addDictionaryMember(
-        "label",
-        JSON::makeString("page label dictionary"));
-    JSON outline = page.addDictionaryMember("outlines", JSON::makeArray()).
-        addArrayElement(JSON::makeDictionary());
-    outline.addDictionaryMember(
-        "object",
-        JSON::makeString("reference to outline that targets this page"));
-    outline.addDictionaryMember(
-        "title",
-        JSON::makeString("outline title"));
-    outline.addDictionaryMember(
-        "dest",
-        JSON::makeString("outline destination dictionary"));
-    return schema;
-}
-
 static std::string show_bool(bool v)
 {
     return v ? "allowed" : "not allowed";
@@ -1823,9 +1940,6 @@ ArgParser::handleHelpArgs()
     // Handle special-case informational options that are only
     // available as the sole option.
 
-    // The options processed here are also handled as a special case
-    // in handleCompletion.
-
     if (argc != 2)
     {
         return;
@@ -1844,74 +1958,9 @@ ArgParser::handleHelpArgs()
     {
         return;
     }
-    if (strcmp(arg, "version") == 0)
+    if (this->help_option_table.count(arg))
     {
-        std::cout
-            << whoami << " version " << QPDF::QPDFVersion() << std::endl
-            << "Run " << whoami << " --copyright to see copyright and license information."
-            << std::endl;
-        exit(0);
-    }
-
-    if (strcmp(arg, "copyright") == 0)
-    {
-        // Make sure the output looks right on an 80-column display.
-        //               1         2         3         4         5         6         7         8
-        //      12345678901234567890123456789012345678901234567890123456789012345678901234567890
-        std::cout
-            << whoami << " version " << QPDF::QPDFVersion() << std::endl
-            << std::endl
-            << "Copyright (c) 2005-2018 Jay Berkenbilt"
-            << std::endl
-            << "QPDF is licensed under the Apache License, Version 2.0 (the \"License\");"
-            << std::endl
-            << "not use this file except in compliance with the License."
-            << std::endl
-            << "You may obtain a copy of the License at"
-            << std::endl
-            << std::endl
-            << "  http://www.apache.org/licenses/LICENSE-2.0"
-            << std::endl
-            << std::endl
-            << "Unless required by applicable law or agreed to in writing, software"
-            << std::endl
-            << "distributed under the License is distributed on an \"AS IS\" BASIS,"
-            << std::endl
-            << "WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied."
-            << std::endl
-            << "See the License for the specific language governing permissions and"
-            << std::endl
-            << "limitations under the License."
-            << std::endl
-            << std::endl
-            << "Versions of qpdf prior to version 7 were released under the terms"
-            << std::endl
-            << "of version 2.0 of the Artistic License. At your option, you may"
-            << std::endl
-            << "continue to consider qpdf to be licensed under those terms. Please"
-            << std::endl
-            << "see the manual for additional information."
-            << std::endl;
-        exit(0);
-    }
-
-    if (strcmp(arg, "help") == 0)
-    {
-        std::cout << help;
-        exit(0);
-    }
-
-    if (strcmp(arg, "completion-bash") == 0)
-    {
-        std::string path = argv[0];
-        size_t slash = path.find('/');
-        if ((slash != 0) && (slash != std::string::npos))
-        {
-            std::cerr << "WARNING: qpdf completion enabled"
-                      << " using relative path to qpdf" << std::endl;
-        }
-        std::cout << "complete -o bashdefault -o default -o nospace"
-                  << " -C " << argv[0] << " " << whoami << std::endl;
+        (this->*(this->help_option_table[arg].bare_arg_handler))();
         exit(0);
     }
 }
@@ -2255,11 +2304,13 @@ ArgParser::handleCompletion()
             addOptionsToCompletions();
             if (this->argc == 1)
             {
-                // Handle options usually handled by handleHelpArgs.
-                this->completions.insert("--help");
-                this->completions.insert("--version");
-                this->completions.insert("--copyright");
-                this->completions.insert("--completion-bash");
+                // Help options are valid only by themselves.
+                for (std::map<std::string, OptionEntry>::iterator iter =
+                         this->help_option_table.begin();
+                     iter != this->help_option_table.end(); ++iter)
+                {
+                    this->completions.insert("--" + (*iter).first);
+                }
             }
         }
     }
@@ -2651,7 +2702,7 @@ static void do_json(QPDF& pdf, Options& o)
           break;
     }
     j_params.addDictionaryMember(
-        "decodeLevel", JSON::makeString(decode_level_str));
+        "decodelevel", JSON::makeString(decode_level_str));
 
     do_json_objects(pdf, o, j);
     do_json_pages(pdf, o, j);
@@ -2659,7 +2710,7 @@ static void do_json(QPDF& pdf, Options& o)
 
     // Check against schema
 
-    JSON schema = json_schema(o);
+    JSON schema = json_schema();
     std::list<std::string> errors;
     if (! j.checkSchema(schema, errors))
     {
