@@ -300,12 +300,48 @@ make
     inspection commands do not.  These are specifically noted.
    </para>
   </sect1>
+  <sect1 id="ref.shell-completion">
+   <title>Shell Completion</title>
+   <para>
+    Starting in qpdf version 8.3.0, qpdf provides its own bash
+    completion support. You can enable bash completion with
+    <command>eval $(qpdf --completion-bash)</command>. If
+    <command>qpdf</command> is not in your path, you should invoke it
+    above with an absolute path. If you invoke it with a relative
+    path, it will warn you, and the completion won't work if you're in
+    a different directory.
+   </para>
+  </sect1>
   <sect1 id="ref.basic-options">
    <title>Basic Options</title>
    <para>
     The following options are the most common ones and perform
     commonly needed transformations.
     <variablelist>
+     <varlistentry>
+      <term><option>--help</option></term>
+      <listitem>
+       <para>
+        Display command-line invocation help.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--version</option></term>
+      <listitem>
+       <para>
+        Display the current version of qpdf.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--copyright</option></term>
+      <listitem>
+       <para>
+        Show detailed copyright information.
+       </para>
+      </listitem>
+     </varlistentry>
      <varlistentry>
       <term><option>--password=password</option></term>
       <listitem>
