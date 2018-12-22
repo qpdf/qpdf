@@ -371,7 +371,6 @@ class ArgParser
     std::string bash_prev;
     std::string bash_cur;
     std::string bash_line;
-    size_t bash_point;
     std::set<std::string> completions;
 
     std::map<std::string, OptionEntry>* option_table;
@@ -390,8 +389,7 @@ ArgParser::ArgParser(int argc, char* argv[], Options& o) :
     argv(argv),
     o(o),
     cur_arg(0),
-    bash_completion(false),
-    bash_point(0)
+    bash_completion(false)
 {
     option_table = &main_option_table;
     initOptionTable();
@@ -1989,8 +1987,9 @@ ArgParser::checkCompletion()
         int p = QUtil::string_to_int(bash_point_env.c_str());
         if ((p > 0) && (p <= static_cast<int>(bash_line.length())))
         {
-            // Point to the last character
-            bash_point = static_cast<size_t>(p) - 1;
+            // Truncate the line. We ignore everything at or after the
+            // cursor for completion purposes.
+            bash_line = bash_line.substr(0, p);
         }
         if (argc >= 4)
         {
@@ -2215,7 +2214,7 @@ ArgParser::handleCompletion()
         if (bash_cur.empty() && (bash_prev.length() > 2) &&
             (bash_prev.at(0) == '-') &&
             (bash_prev.at(1) == '-') &&
-            (bash_line.at(bash_point) == '='))
+            (bash_line.at(bash_line.length() - 1) == '='))
         {
             choice_option = bash_prev.substr(2, std::string::npos);
         }
