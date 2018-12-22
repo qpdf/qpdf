@@ -194,6 +194,7 @@ struct Options
     bool show_pages;
     bool show_page_images;
     bool json;
+    std::set<std::string> json_keys;
     bool check;
     std::vector<PageSpec> page_specs;
     std::map<std::string, RotationSpec> rotations;
@@ -243,7 +244,7 @@ ProgressReporter::reportProgress(int percentage)
               << percentage << "%" << std::endl;
 }
 
-static JSON json_schema()
+static JSON json_schema(std::set<std::string>* keys = 0)
 {
     // Style: use all lower-case keys with no dashes or underscores.
     // Choose array or dictionary based on indexing. For example, we
@@ -270,60 +271,76 @@ static JSON json_schema()
     j_params.addDictionaryMember(
         "decodelevel", JSON::makeString(
             "decode level used to determine stream filterability"));
-    schema.addDictionaryMember(
-        "objects", JSON::makeString(
-            "dictionary of original objects; keys are 'trailer' or 'n n R'"));
-    JSON page = schema.addDictionaryMember("pages", JSON::makeArray()).
-        addArrayElement(JSON::makeDictionary());
-    page.addDictionaryMember(
-        "object",
-        JSON::makeString("reference to original page object"));
-    JSON image = page.addDictionaryMember("images", JSON::makeArray()).
-        addArrayElement(JSON::makeDictionary());
-    image.addDictionaryMember(
-        "object",
-        JSON::makeString("reference to image stream"));
-    image.addDictionaryMember(
-        "width",
-        JSON::makeString("image width"));
-    image.addDictionaryMember(
-        "height",
-        JSON::makeString("image height"));
-    image.addDictionaryMember("filter", JSON::makeArray()).
-        addArrayElement(
-            JSON::makeString("filters applied to image data"));
-    image.addDictionaryMember("decodeparms", JSON::makeArray()).
-        addArrayElement(
-            JSON::makeString("decode parameters for image data"));
-    image.addDictionaryMember(
-        "filterable",
-        JSON::makeString("whether image data can be decoded"
-                         " using the decode level qpdf was invoked with"));
-    page.addDictionaryMember("contents", JSON::makeArray()).
-        addArrayElement(
-            JSON::makeString("reference to each content stream"));
-    page.addDictionaryMember(
-        "label",
-        JSON::makeString("page label dictionary, or null if none"));
-    JSON labels = schema.addDictionaryMember("pagelabels", JSON::makeArray()).
-        addArrayElement(JSON::makeDictionary());
-    labels.addDictionaryMember(
-        "index",
-        JSON::makeString("starting page position starting from zero"));
-    labels.addDictionaryMember(
-        "label",
-        JSON::makeString("page label dictionary"));
-    JSON outline = page.addDictionaryMember("outlines", JSON::makeArray()).
-        addArrayElement(JSON::makeDictionary());
-    outline.addDictionaryMember(
-        "object",
-        JSON::makeString("reference to outline that targets this page"));
-    outline.addDictionaryMember(
-        "title",
-        JSON::makeString("outline title"));
-    outline.addDictionaryMember(
-        "dest",
-        JSON::makeString("outline destination dictionary"));
+
+    bool all_keys = ((keys == 0) || keys->empty());
+
+    // The list of selectable top-level keys id duplicated in three
+    // places: json_schema, do_json, and initOptionTable.
+    if (all_keys || keys->count("objects"))
+    {
+        schema.addDictionaryMember(
+            "objects", JSON::makeString(
+                "dictionary of original objects;"
+                " keys are 'trailer' or 'n n R'"));
+    }
+    if (all_keys || keys->count("pages"))
+    {
+        JSON page = schema.addDictionaryMember("pages", JSON::makeArray()).
+            addArrayElement(JSON::makeDictionary());
+        page.addDictionaryMember(
+            "object",
+            JSON::makeString("reference to original page object"));
+        JSON image = page.addDictionaryMember("images", JSON::makeArray()).
+            addArrayElement(JSON::makeDictionary());
+        image.addDictionaryMember(
+            "object",
+            JSON::makeString("reference to image stream"));
+        image.addDictionaryMember(
+            "width",
+            JSON::makeString("image width"));
+        image.addDictionaryMember(
+            "height",
+            JSON::makeString("image height"));
+        image.addDictionaryMember("filter", JSON::makeArray()).
+            addArrayElement(
+                JSON::makeString("filters applied to image data"));
+        image.addDictionaryMember("decodeparms", JSON::makeArray()).
+            addArrayElement(
+                JSON::makeString("decode parameters for image data"));
+        image.addDictionaryMember(
+            "filterable",
+            JSON::makeString("whether image data can be decoded"
+                             " using the decode level qpdf was invoked with"));
+        page.addDictionaryMember("contents", JSON::makeArray()).
+            addArrayElement(
+                JSON::makeString("reference to each content stream"));
+        page.addDictionaryMember(
+            "label",
+            JSON::makeString("page label dictionary, or null if none"));
+        JSON outline = page.addDictionaryMember("outlines", JSON::makeArray()).
+            addArrayElement(JSON::makeDictionary());
+        outline.addDictionaryMember(
+            "object",
+            JSON::makeString("reference to outline that targets this page"));
+        outline.addDictionaryMember(
+            "title",
+            JSON::makeString("outline title"));
+        outline.addDictionaryMember(
+            "dest",
+            JSON::makeString("outline destination dictionary"));
+    }
+    if (all_keys || keys->count("pagelabels"))
+    {
+        JSON labels = schema.addDictionaryMember(
+            "pagelabels", JSON::makeArray()).
+            addArrayElement(JSON::makeDictionary());
+        labels.addDictionaryMember(
+            "index",
+            JSON::makeString("starting page position starting from zero"));
+        labels.addDictionaryMember(
+            "label",
+            JSON::makeString("page label dictionary"));
+    }
     return schema;
 }
 
@@ -419,6 +436,7 @@ class ArgParser
     void argShowPages();
     void argWithImages();
     void argJson();
+    void argJsonKey(char* parameter);
     void argCheck();
     void arg40Print(char* parameter);
     void arg40Modify(char* parameter);
@@ -615,6 +633,11 @@ ArgParser::initOptionTable()
     (*t)["show-pages"] = oe_bare(&ArgParser::argShowPages);
     (*t)["with-images"] = oe_bare(&ArgParser::argWithImages);
     (*t)["json"] = oe_bare(&ArgParser::argJson);
+    // The list of selectable top-level keys id duplicated in three
+    // places: json_schema, do_json, and initOptionTable.
+    char const* jsonKeyChoices[] = {"objects", "pages", "pagelabels", 0};
+    (*t)["json-key"] = oe_requiredChoices(
+        &ArgParser::argJsonKey, jsonKeyChoices);
     (*t)["check"] = oe_bare(&ArgParser::argCheck);
 
     t = &this->encrypt40_option_table;
@@ -1178,6 +1201,12 @@ ArgParser::argJson()
 }
 
 void
+ArgParser::argJsonKey(char* parameter)
+{
+    o.json_keys.insert(parameter);
+}
+
+void
 ArgParser::argCheck()
 {
     o.check = true;
@@ -1659,6 +1688,16 @@ automated test suites for software that uses the qpdf library.\n\
 --show-pages              shows the object/generation number for each page\n\
   --with-images           also shows the object IDs for images on each page\n\
 --check                   check file structure + encryption, linearization\n\
+--json                    generate a json representation of the file\n\
+--json-help               describe the format of the json representation\n\
+--json-key=key            repeatable; prune json structure to include only\n\
+                          specified keys\n\
+\n\
+The json representation generated by qpdf is designed to facilitate\n\
+processing of qpdf from other programming languages that have a hard\n\
+time calling C++ APIs. Run qpdf --json-help for details on the format.\n\
+The manual has more in-depth information about the json representation\n\
+and certain compatibility guarantees that qpdf provides.\n\
 \n\
 The --raw-stream-data and --filtered-stream-data options are ignored\n\
 unless --show-object is given.  Either of these options will cause the\n\
@@ -2704,13 +2743,25 @@ static void do_json(QPDF& pdf, Options& o)
     j_params.addDictionaryMember(
         "decodelevel", JSON::makeString(decode_level_str));
 
-    do_json_objects(pdf, o, j);
-    do_json_pages(pdf, o, j);
-    do_json_page_labels(pdf, o, j);
+    bool all_keys = o.json_keys.empty();
+    // The list of selectable top-level keys id duplicated in three
+    // places: json_schema, do_json, and initOptionTable.
+    if (all_keys || o.json_keys.count("objects"))
+    {
+        do_json_objects(pdf, o, j);
+    }
+    if (all_keys || o.json_keys.count("pages"))
+    {
+        do_json_pages(pdf, o, j);
+    }
+    if (all_keys || o.json_keys.count("pagelabels"))
+    {
+        do_json_page_labels(pdf, o, j);
+    }
 
     // Check against schema
 
-    JSON schema = json_schema();
+    JSON schema = json_schema(&o.json_keys);
     std::list<std::string> errors;
     if (! j.checkSchema(schema, errors))
     {
