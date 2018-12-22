@@ -342,6 +342,27 @@ static JSON json_schema(std::set<std::string>* keys = 0)
             "label",
             JSON::makeString("page label dictionary"));
     }
+    if (all_keys || keys->count("outlines"))
+    {
+        JSON outlines = schema.addDictionaryMember(
+            "outlines", JSON::makeArray()).
+            addArrayElement(JSON::makeDictionary());
+        outlines.addDictionaryMember(
+            "object",
+            JSON::makeString("reference to this outline"));
+        outlines.addDictionaryMember(
+            "title",
+            JSON::makeString("outline title"));
+        outlines.addDictionaryMember(
+            "dest",
+            JSON::makeString("outline destination dictionary"));
+        outlines.addDictionaryMember(
+            "kids",
+            JSON::makeString("array of descendent outlines"));
+        outlines.addDictionaryMember(
+            "open",
+            JSON::makeString("whether the outline is displayed expanded"));
+    }
     return schema;
 }
 
@@ -657,7 +678,8 @@ ArgParser::initOptionTable()
     (*t)["json"] = oe_bare(&ArgParser::argJson);
     // The list of selectable top-level keys id duplicated in three
     // places: json_schema, do_json, and initOptionTable.
-    char const* jsonKeyChoices[] = {"objects", "pages", "pagelabels", 0};
+    char const* jsonKeyChoices[] = {
+        "objects", "pages", "pagelabels", "outlines", 0};
     (*t)["json-key"] = oe_requiredChoices(
         &ArgParser::argJsonKey, jsonKeyChoices);
     (*t)["json-object"] = oe_requiredParameter(
@@ -802,7 +824,8 @@ ArgParser::argJsonHelp()
         << "and \"parameters\" keys will always be present."
         << std::endl
         << std::endl
-        << json_schema().serialize();
+        << json_schema().serialize()
+        << std::endl;
 }
 
 void
@@ -2755,6 +2778,31 @@ static void do_json_page_labels(QPDF& pdf, Options& o, JSON& j)
     }
 }
 
+static void add_outlines_to_json(
+    std::list<QPDFOutlineObjectHelper> outlines, JSON& j)
+{
+    for (std::list<QPDFOutlineObjectHelper>::iterator iter = outlines.begin();
+         iter != outlines.end(); ++iter)
+    {
+        QPDFOutlineObjectHelper& ol = *iter;
+        JSON jo = j.addArrayElement(JSON::makeDictionary());
+        jo.addDictionaryMember("object", ol.getObjectHandle().getJSON());
+        jo.addDictionaryMember("title", JSON::makeString(ol.getTitle()));
+        jo.addDictionaryMember("dest", ol.getDest().getJSON(true));
+        jo.addDictionaryMember("open", JSON::makeBool(ol.getCount() >= 0));
+        JSON j_kids = jo.addDictionaryMember("kids", JSON::makeArray());
+        add_outlines_to_json(ol.getKids(), j_kids);
+    }
+}
+
+static void do_json_outlines(QPDF& pdf, Options& o, JSON& j)
+{
+    JSON j_outlines = j.addDictionaryMember(
+        "outlines", JSON::makeArray());
+    QPDFOutlineDocumentHelper odh(pdf);
+    add_outlines_to_json(odh.getTopLevelOutlines(), j_outlines);
+}
+
 static void do_json(QPDF& pdf, Options& o)
 {
     JSON j = JSON::makeDictionary();
@@ -2798,6 +2846,10 @@ static void do_json(QPDF& pdf, Options& o)
     if (all_keys || o.json_keys.count("pagelabels"))
     {
         do_json_page_labels(pdf, o, j);
+    }
+    if (all_keys || o.json_keys.count("outlines"))
+    {
+        do_json_outlines(pdf, o, j);
     }
 
     // Check against schema
