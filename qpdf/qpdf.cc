@@ -119,7 +119,7 @@ struct Options
         show_filtered_stream_data(false),
         show_pages(false),
         show_page_images(false),
-        show_json(false),
+        json(false),
         check(false),
         require_outfile(true),
         infilename(0),
@@ -193,7 +193,7 @@ struct Options
     bool show_filtered_stream_data;
     bool show_pages;
     bool show_page_images;
-    bool show_json;
+    bool json;
     bool check;
     std::vector<PageSpec> page_specs;
     std::map<std::string, RotationSpec> rotations;
@@ -329,7 +329,7 @@ class ArgParser
     void argShowNpages();
     void argShowPages();
     void argWithImages();
-    void argShowJson();
+    void argJson();
     void argCheck();
     void arg40Print(char* parameter);
     void arg40Modify(char* parameter);
@@ -517,7 +517,7 @@ ArgParser::initOptionTable()
     (*t)["show-npages"] = oe_bare(&ArgParser::argShowNpages);
     (*t)["show-pages"] = oe_bare(&ArgParser::argShowPages);
     (*t)["with-images"] = oe_bare(&ArgParser::argWithImages);
-    (*t)["show-json"] = oe_bare(&ArgParser::argShowJson);
+    (*t)["json"] = oe_bare(&ArgParser::argJson);
     (*t)["check"] = oe_bare(&ArgParser::argCheck);
 
     t = &this->encrypt40_option_table;
@@ -980,9 +980,9 @@ ArgParser::argWithImages()
 }
 
 void
-ArgParser::argShowJson()
+ArgParser::argJson()
 {
-    o.show_json = true;
+    o.json = true;
     o.require_outfile = false;
 }
 
@@ -1510,7 +1510,7 @@ ArgParser::usage(std::string const& message)
     }
 }
 
-static JSON json_schema()
+static JSON json_schema(Options& o)
 {
     // This JSON object doubles as a schema and as documentation for
     // our JSON output. Any schema mismatch is a bug in qpdf. This
@@ -1522,6 +1522,11 @@ static JSON json_schema()
     schema.addDictionaryMember(
         "version", JSON::makeString(
             "JSON format serial number; increased for non-compatible changes"));
+    JSON j_params = schema.addDictionaryMember(
+        "parameters", JSON::makeDictionary());
+    j_params.addDictionaryMember(
+        "decodeLevel", JSON::makeString(
+            "decode level used to determine stream filterability"));
     schema.addDictionaryMember(
         "objects", JSON::makeString(
             "Original objects; keys are 'trailer' or 'n n R'"));
@@ -1574,7 +1579,7 @@ static JSON json_schema()
         "title",
         JSON::makeString("outline title"));
     outline.addDictionaryMember(
-        "destination",
+        "dest",
         JSON::makeString("outline destination dictionary"));
     return schema;
 }
@@ -2486,17 +2491,8 @@ static void do_show_pages(QPDF& pdf, Options& o)
     }
 }
 
-static void do_show_json(QPDF& pdf, Options& o)
+static void do_json_objects(QPDF& pdf, Options& o, JSON& j)
 {
-    JSON j = JSON::makeDictionary();
-    // This version is updated every time a non-backward-compatible
-    // change is made to the JSON format. Clients of the JSON are to
-    // ignore unrecognized keys, so we only update the version of a
-    // key disappears or if its value changes meaning.
-    j.addDictionaryMember("version", JSON::makeInt(1));
-
-    // Objects
-
     // Add all objects. Do this first before other code below modifies
     // things by doing stuff like calling
     // pushInheritedAttributesToPage.
@@ -2509,15 +2505,16 @@ static void do_show_json(QPDF& pdf, Options& o)
         j_objects.addDictionaryMember(
             (*iter).unparse(), (*iter).getJSON(true));
     }
+}
 
-    // Pages
-
+static void do_json_pages(QPDF& pdf, Options& o, JSON& j)
+{
     JSON j_pages = j.addDictionaryMember("pages", JSON::makeArray());
-    QPDFPageDocumentHelper dh(pdf);
+    QPDFPageDocumentHelper pdh(pdf);
     QPDFPageLabelDocumentHelper pldh(pdf);
     QPDFOutlineDocumentHelper odh(pdf);
-    dh.pushInheritedAttributesToPage();
-    std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
+    pdh.pushInheritedAttributesToPage();
+    std::vector<QPDFPageObjectHelper> pages = pdh.getAllPages();
     size_t pageno = 0;
     for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
          iter != pages.end(); ++iter, ++pageno)
@@ -2592,13 +2589,17 @@ static void do_show_json(QPDF& pdf, Options& o)
             j_outline.addDictionaryMember(
                 "title", JSON::makeString((*oiter).getTitle()));
             j_outline.addDictionaryMember(
-                "destination", (*oiter).getDest().getJSON(true));
+                "dest", (*oiter).getDest().getJSON(true));
         }
     }
+}
 
-    // Page labels
-
+static void do_json_page_labels(QPDF& pdf, Options& o, JSON& j)
+{
     JSON j_labels = j.addDictionaryMember("pagelabels", JSON::makeArray());
+    QPDFPageLabelDocumentHelper pldh(pdf);
+    QPDFPageDocumentHelper pdh(pdf);
+    std::vector<QPDFPageObjectHelper> pages = pdh.getAllPages();
     if (pldh.hasPageLabels())
     {
         std::vector<QPDFObjectHandle> labels;
@@ -2621,10 +2622,44 @@ static void do_show_json(QPDF& pdf, Options& o)
             j_label.addDictionaryMember("label", (*iter).getJSON());
         }
     }
+}
+
+static void do_json(QPDF& pdf, Options& o)
+{
+    JSON j = JSON::makeDictionary();
+    // This version is updated every time a non-backward-compatible
+    // change is made to the JSON format. Clients of the JSON are to
+    // ignore unrecognized keys, so we only update the version of a
+    // key disappears or if its value changes meaning.
+    j.addDictionaryMember("version", JSON::makeInt(1));
+    JSON j_params = j.addDictionaryMember(
+        "parameters", JSON::makeDictionary());
+    std::string decode_level_str;
+    switch (o.decode_level)
+    {
+        case qpdf_dl_none:
+          decode_level_str = "none";
+          break;
+        case qpdf_dl_generalized:
+          decode_level_str = "generalized";
+          break;
+        case qpdf_dl_specialized:
+          decode_level_str = "specialized";
+          break;
+        case qpdf_dl_all:
+          decode_level_str = "all";
+          break;
+    }
+    j_params.addDictionaryMember(
+        "decodeLevel", JSON::makeString(decode_level_str));
+
+    do_json_objects(pdf, o, j);
+    do_json_pages(pdf, o, j);
+    do_json_page_labels(pdf, o, j);
 
     // Check against schema
 
-    JSON schema = json_schema();
+    JSON schema = json_schema(o);
     std::list<std::string> errors;
     if (! j.checkSchema(schema, errors))
     {
@@ -2651,9 +2686,9 @@ static void do_inspection(QPDF& pdf, Options& o)
     {
         do_check(pdf, o, exit_code);
     }
-    if (o.show_json)
+    if (o.json)
     {
-        do_show_json(pdf, o);
+        do_json(pdf, o);
     }
     if (o.show_npages)
     {
