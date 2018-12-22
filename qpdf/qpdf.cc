@@ -294,6 +294,9 @@ static JSON json_schema(std::set<std::string>* keys = 0)
         JSON image = page.addDictionaryMember("images", JSON::makeArray()).
             addArrayElement(JSON::makeDictionary());
         image.addDictionaryMember(
+            "name",
+            JSON::makeString("name of image in XObject table"));
+        image.addDictionaryMember(
             "object",
             JSON::makeString("reference to image stream"));
         image.addDictionaryMember(
@@ -302,6 +305,12 @@ static JSON json_schema(std::set<std::string>* keys = 0)
         image.addDictionaryMember(
             "height",
             JSON::makeString("image height"));
+        image.addDictionaryMember(
+            "colorspace",
+            JSON::makeString("color space"));
+        image.addDictionaryMember(
+            "bitspercomponent",
+            JSON::makeString("bits per component"));
         image.addDictionaryMember("filter", JSON::makeArray()).
             addArrayElement(
                 JSON::makeString("filters applied to image data"));
@@ -2695,6 +2704,10 @@ static void do_json_pages(QPDF& pdf, Options& o, JSON& j)
                 "width", dict.getKey("/Width").getJSON());
             j_image.addDictionaryMember(
                 "height", dict.getKey("/Height").getJSON());
+            j_image.addDictionaryMember(
+                "colorspace", dict.getKey("/ColorSpace").getJSON());
+            j_image.addDictionaryMember(
+                "bitspercomponent", dict.getKey("/BitsPerComponent").getJSON());
             QPDFObjectHandle filters = dict.getKey("/Filter").wrapInArray();
             j_image.addDictionaryMember(
                 "filter", filters.getJSON());
