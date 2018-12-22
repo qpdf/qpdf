@@ -1041,6 +1041,7 @@ show_ntests();
 $td->notify("--- Overwrite self ---");
 $n_tests += 1;
 
+copy("minimal.pdf", "a.pdf");
 $td->runtest("don't overwrite self",
              {$td->COMMAND => "(echo a.pdf; echo a.pdf) | qpdf \@-"},
              {$td->REGEXP => "input file and output file are the same.*",
@@ -3178,6 +3179,9 @@ sub show_ntests
     {
 	$td->emphasize("tests so far: ". calc_ntests());
     }
+    # Calling cleanup here helps to ensure that sections of the test
+    # suite are isolated.
+    cleanup();
 }
 
 sub bash_completion
