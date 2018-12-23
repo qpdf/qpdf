@@ -117,6 +117,12 @@ my @completion_tests = (
     ['qpdf --decode-lzzz', 15, 'decode-l'],
     ['qpdf --decode-level=', undef, 'decode-level'],
     ['qpdf --check -', undef, 'later-arg'],
+    ['qpdf infile outfile oops --ch', undef, 'usage-empty'],
+    ['qpdf --encrypt \'user " password\' ', undef, 'quoting'],
+    ['qpdf --encrypt \'user password\' ', undef, 'quoting'],
+    ['qpdf --encrypt "user password" ', undef, 'quoting'],
+    ['qpdf --encrypt "user pass\'word" ', undef, 'quoting'],
+    ['qpdf --encrypt user\ password ', undef, 'quoting'],
     );
 $n_tests += scalar(@completion_tests);
 foreach my $c (@completion_tests)

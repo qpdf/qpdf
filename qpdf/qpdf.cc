@@ -1414,30 +1414,85 @@ void
 ArgParser::handleBashArguments()
 {
     // Do a minimal job of parsing bash_line into arguments. This
-    // doesn't do everything the shell does, but it should be good
-    // enough for purposes of handling completion. We can't use
-    // new_argv because this has to interoperate with @file arguments.
+    // doesn't do everything the shell does (e.g. $(...), variable
+    // expansion, arithmetic, globs, etc.), but it should be good
+    // enough for purposes of handling completion. As we build up the
+    // new argv, we can't use this->new_argv because this code has to
+    // interoperate with @file arguments, so memory for both ways of
+    // fabricating argv has to be protected.
 
-    enum { st_top, st_quote } state = st_top;
+    bool last_was_backslash = false;
+    enum { st_top, st_squote, st_dquote } state = st_top;
     std::string arg;
     for (std::string::iterator iter = bash_line.begin();
          iter != bash_line.end(); ++iter)
     {
         char ch = (*iter);
-        if ((state == st_top) && QUtil::is_space(ch) && (! arg.empty()))
+        if (last_was_backslash)
         {
-            bash_argv.push_back(
-                PointerHolder<char>(
-                    true, QUtil::copy_string(arg.c_str())));
-            arg.clear();
+            arg.append(1, ch);
+            last_was_backslash = false;
+        }
+        else if (ch == '\\')
+        {
+            last_was_backslash = true;
         }
         else
         {
-            if (ch == '"')
+            bool append = false;
+            switch (state)
             {
-                state = (state == st_top ? st_quote : st_top);
+              case st_top:
+                if (QUtil::is_space(ch))
+                {
+                    if (! arg.empty())
+                    {
+                        bash_argv.push_back(
+                            PointerHolder<char>(
+                                true, QUtil::copy_string(arg.c_str())));
+                        arg.clear();
+                    }
+                }
+                else if (ch == '"')
+                {
+                    state = st_dquote;
+                }
+                else if (ch == '\'')
+                {
+                    state = st_squote;
+                }
+                else
+                {
+                    append = true;
+                }
+                break;
+
+              case st_squote:
+                if (ch == '\'')
+                {
+                    state = st_top;
+                }
+                else
+                {
+                    append = true;
+                }
+                break;
+
+              case st_dquote:
+                if (ch == '"')
+                {
+                    state = st_top;
+                }
+                else
+                {
+                    append = true;
+                }
+                break;
             }
-            arg.append(1, ch);
+            if (append)
+            {
+                arg.append(1, ch);
+            }
         }
     }
     if (bash_argv.empty())
