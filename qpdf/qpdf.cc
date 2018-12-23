@@ -338,6 +338,9 @@ static JSON json_schema(std::set<std::string>* keys = 0)
         outline.addDictionaryMember(
             "dest",
             JSON::makeString("outline destination dictionary"));
+        page.addDictionaryMember(
+            "pageposfrom1",
+            JSON::makeString("position of page in document numbering from 1"));
     }
     if (all_keys || keys->count("pagelabels"))
     {
@@ -371,6 +374,10 @@ static JSON json_schema(std::set<std::string>* keys = 0)
         outlines.addDictionaryMember(
             "open",
             JSON::makeString("whether the outline is displayed expanded"));
+        outlines.addDictionaryMember(
+            "destpageposfrom1",
+            JSON::makeString("position of destination page in document"
+                             " numbered from 1; null if not known"));
     }
     return schema;
 }
@@ -2813,6 +2820,7 @@ static void do_json_pages(QPDF& pdf, Options& o, JSON& j)
             j_outline.addDictionaryMember(
                 "dest", (*oiter).getDest().getJSON(true));
         }
+        j_page.addDictionaryMember("pageposfrom1", JSON::makeInt(1 + pageno));
     }
 }
 
@@ -2847,7 +2855,8 @@ static void do_json_page_labels(QPDF& pdf, Options& o, JSON& j)
 }
 
 static void add_outlines_to_json(
-    std::list<QPDFOutlineObjectHelper> outlines, JSON& j)
+    std::list<QPDFOutlineObjectHelper> outlines, JSON& j,
+    std::map<QPDFObjGen, int>& page_numbers)
 {
     for (std::list<QPDFOutlineObjectHelper>::iterator iter = outlines.begin();
          iter != outlines.end(); ++iter)
@@ -2858,17 +2867,39 @@ static void add_outlines_to_json(
         jo.addDictionaryMember("title", JSON::makeString(ol.getTitle()));
         jo.addDictionaryMember("dest", ol.getDest().getJSON(true));
         jo.addDictionaryMember("open", JSON::makeBool(ol.getCount() >= 0));
+        QPDFObjectHandle page = ol.getDestPage();
+        JSON j_destpage = JSON::makeNull();
+        if (page.isIndirect())
+        {
+            QPDFObjGen og = page.getObjGen();
+            if (page_numbers.count(og))
+            {
+                j_destpage = JSON::makeInt(page_numbers[og]);
+            }
+        }
+        jo.addDictionaryMember("destpageposfrom1", j_destpage);
         JSON j_kids = jo.addDictionaryMember("kids", JSON::makeArray());
-        add_outlines_to_json(ol.getKids(), j_kids);
+        add_outlines_to_json(ol.getKids(), j_kids, page_numbers);
     }
 }
 
 static void do_json_outlines(QPDF& pdf, Options& o, JSON& j)
 {
+    std::map<QPDFObjGen, int> page_numbers;
+    QPDFPageDocumentHelper dh(pdf);
+    std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
+    int n = 0;
+    for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
+	 iter != pages.end(); ++iter)
+    {
+	QPDFObjectHandle oh = (*iter).getObjectHandle();
+	page_numbers[oh.getObjGen()] = ++n;
+    }
+
     JSON j_outlines = j.addDictionaryMember(
         "outlines", JSON::makeArray());
     QPDFOutlineDocumentHelper odh(pdf);
-    add_outlines_to_json(odh.getTopLevelOutlines(), j_outlines);
+    add_outlines_to_json(odh.getTopLevelOutlines(), j_outlines, page_numbers);
 }
 
 static void do_json(QPDF& pdf, Options& o)
