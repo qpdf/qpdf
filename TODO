@@ -1,3 +1,68 @@
+
+Current
+=======
+
+ * open bugs
+
+ * form features
+   * flatten
+   * include in json at document and page level
+     * values
+     * names
+     * other stuff?
+   * preserve when merging and splitting; functionality should be
+     similar to outlines.
+   * set value?
+   * maybe basic appearance generation for values within pdf doc
+     encoding that don't use subsetted fonts
+
+ * replace mode: --replace-object, --replace-stream-raw,
+   --replace-stream-filtered
+   * update first paragraph of QPDF JSON in the manual to mention this
+   * object numbers are not stable
+   * you don't have to specify length for streams
+   * you only have to specify filtering for streams if providing raw data
+
+ * special mode for compressing images with DCT
+   * allow specifying a single image, all images, images based on
+     size, specific images
+   * never replace an image if the replacement is not smaller than the
+     original
+
+ * bookmarks (outlines) 12.3.3
+   * support bookmarks when merging
+   * prune bookmarks that don't point to a surviving page when merging
+     or splitting
+   * make sure conflicting named destinations work possibly test by
+     including the same file by two paths in a merge
+
+   When pruning outlines, keep all outlines in the hierarchy that are
+   above an outline for a page we care about. If one of the ancestor
+   outlines points to a non-existent page, clear its dest. If an
+   outline does not have any children that point to pages in the
+   document, just omit it.
+
+   Possible strategy:
+   * resolve all named destinations to explicit destinations
+   * concatenate top-level outlines
+   * prune outlines whose dests don't point to a valid page
+   * recompute all /Count fields
+
+   Test files
+   * page-labels-and-outlines.pdf: old file with both page labels and
+     outlines. All destinations are explicit destinations. Each page
+     has Potato and a number. All titles are feline names.
+   * outlines-with-actions.pdf: mixture of explicit destinations,
+     named destinations, goto actions with explicit destinations, and
+     goto actions with named destinations; uses /Dests key in names
+     dictionary. Each page has Salad and a number. All titles are
+     silly words. One destination is an indirect object.
+   * outlines-with-old-root-dests.pdf: like outlines-with-actions
+     except it uses the PDF-1.1 /Dests dictionary for named
+     destinations, and each page has Soup and a number. Also pages are
+     numbered with upper-case Roman numerals starting with 0. All
+     titles are silly words preceded by a bullet.
+
 Soon
 ====
 
