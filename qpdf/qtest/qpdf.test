@@ -344,6 +344,47 @@ foreach my $f (@outline_files)
 
 show_ntests();
 # ----------
+$td->notify("--- JSON Tests ---");
+my @json_files = (
+    ['outlines-with-actions', []],
+    ['outlines-with-old-root-dests', []],
+    ['page-labels-and-outlines', []],
+    ['page-labels-num-tree', []],
+    ['image-streams', []],
+    ['image-streams', ['--decode-level=all']],
+    ['image-streams', ['--decode-level=specialized']],
+    ['page-labels-and-outlines', ['--json-key=objects']],
+    ['page-labels-and-outlines', ['--json-key=pages']],
+    ['page-labels-and-outlines', ['--json-key=pagelabels']],
+    ['page-labels-and-outlines', ['--json-key=outlines']],
+    ['page-labels-and-outlines',
+     ['--json-key=outlines', '--json-key=pages']],
+    ['page-labels-and-outlines',
+     ['--json-key=objects', '--json-object=trailer']],
+    ['page-labels-and-outlines',
+     ['--json-key=objects', '--json-object=trailer', '--json-object=2 0 R']],
+);
+$n_tests += scalar(@json_files);
+foreach my $d (@json_files)
+{
+    my ($file, $xargs) = @$d;
+    my $out = "json-$file";
+    foreach my $x (@$xargs)
+    {
+        my $y = $x;
+        $y =~ s/^.*=//;
+        $y =~ s/\s.*//;
+        $out .= "-$y";
+    }
+    my $in = "$file.pdf";
+    $td->runtest("json $out",
+                 {$td->COMMAND => ['qpdf', '--json', @$xargs, $in]},
+                 {$td->FILE => "$out.out", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+show_ntests();
+# ----------
 $td->notify("--- Page API Tests ---");
 $n_tests += 9;
 

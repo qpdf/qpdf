@@ -1,0 +1,92 @@
+{
+  "pagelabels": [
+    {
+      "index": 0,
+      "label": {
+        "/P": "",
+        "/St": 1
+      }
+    },
+    {
+      "index": 2,
+      "label": {
+        "/S": "/r",
+        "/St": 1
+      }
+    },
+    {
+      "index": 7,
+      "label": {
+        "/P": "",
+        "/St": 1
+      }
+    },
+    {
+      "index": 9,
+      "label": {
+        "/S": "/r",
+        "/St": 6
+      }
+    },
+    {
+      "index": 11,
+      "label": {
+        "/P": "",
+        "/St": 1
+      }
+    },
+    {
+      "index": 12,
+      "label": {
+        "/S": "/D",
+        "/St": 2
+      }
+    },
+    {
+      "index": 15,
+      "label": {
+        "/S": "/D",
+        "/St": 6
+      }
+    },
+    {
+      "index": 19,
+      "label": {
+        "/P": "",
+        "/St": 1
+      }
+    },
+    {
+      "index": 20,
+      "label": {
+        "/S": "/D",
+        "/St": 12
+      }
+    },
+    {
+      "index": 22,
+      "label": {
+        "/S": "/D",
+        "/St": 16059
+      }
+    },
+    {
+      "index": 23,
+      "label": {
+        "/S": "/r",
+        "/St": 50
+      }
+    },
+    {
+      "index": 29,
+      "label": {
+        "/S": "/r",
+        "/St": 54
+      }
+    }
+  ],
+  "parameters": {
+    "decodelevel": "generalized"
+  },
+  "version": 1
+}

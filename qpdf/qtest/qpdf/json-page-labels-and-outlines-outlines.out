@@ -1,0 +1,161 @@
+{
+  "outlines": [
+    {
+      "dest": [
+        "8 0 R",
+        "/XYZ",
+        null,
+        null,
+        null
+      ],
+      "destpageposfrom1": 6,
+      "kids": [
+        {
+          "dest": [
+            "14 0 R",
+            "/Fit"
+          ],
+          "destpageposfrom1": 12,
+          "kids": [
+            {
+              "dest": [
+                "15 0 R",
+                "/FitV",
+                100
+              ],
+              "destpageposfrom1": 13,
+              "kids": [
+                {
+                  "dest": [
+                    "21 0 R",
+                    "/XYZ",
+                    null,
+                    null,
+                    null
+                  ],
+                  "destpageposfrom1": 19,
+                  "kids": [],
+                  "object": "102 0 R",
+                  "open": true,
+                  "title": "Isosicle 1.1.1.1 -> 18: /XYZ null null null"
+                },
+                {
+                  "dest": [
+                    "22 0 R",
+                    "/XYZ",
+                    null,
+                    null,
+                    null
+                  ],
+                  "destpageposfrom1": 20,
+                  "kids": [],
+                  "object": "103 0 R",
+                  "open": true,
+                  "title": "Isosicle 1.1.1.2 -> 19: /XYZ null null null"
+                }
+              ],
+              "object": "100 0 R",
+              "open": false,
+              "title": "Isosicle 1.1.1 -> 12: /FitV 100"
+            },
+            {
+              "dest": [
+                "15 0 R",
+                "/XYZ",
+                null,
+                null,
+                null
+              ],
+              "destpageposfrom1": 13,
+              "kids": [
+                {
+                  "dest": [
+                    "25 0 R",
+                    "/XYZ",
+                    null,
+                    null,
+                    null
+                  ],
+                  "destpageposfrom1": 23,
+                  "kids": [],
+                  "object": "104 0 R",
+                  "open": true,
+                  "title": "Isosicle 1.1.2.1 -> 22: /XYZ null null null"
+                }
+              ],
+              "object": "101 0 R",
+              "open": true,
+              "title": "Isosicle 1.1.2 -> 12: /XYZ null null null"
+            }
+          ],
+          "object": "98 0 R",
+          "open": false,
+          "title": "Amanda 1.1 -> 11: /Fit"
+        },
+        {
+          "dest": [
+            "16 0 R",
+            "/FitH",
+            792
+          ],
+          "destpageposfrom1": 14,
+          "kids": [
+            {
+              "dest": [
+                "4 0 R",
+                "/FitR",
+                66,
+                714,
+                180,
+                770
+              ],
+              "destpageposfrom1": 2,
+              "kids": [],
+              "object": "105 0 R",
+              "open": true,
+              "title": "Trepsichord 1.2.1 -> 1: /FitR 66 714 180 770"
+            },
+            {
+              "dest": [
+                "3 0 R",
+                "/XYZ",
+                null,
+                null,
+                null
+              ],
+              "destpageposfrom1": 1,
+              "kids": [],
+              "object": "106 0 R",
+              "open": true,
+              "title": "Trepsicle 1.2.2 -> 0: /XYZ null null null"
+            }
+          ],
+          "object": "99 0 R",
+          "open": true,
+          "title": "Sandy ÷Σανδι÷ 1.2 -> 13: /FitH 792"
+        }
+      ],
+      "object": "96 0 R",
+      "open": true,
+      "title": "Isís 1 -> 5: /XYZ null null null"
+    },
+    {
+      "dest": [
+        "18 0 R",
+        "/XYZ",
+        66,
+        756,
+        3
+      ],
+      "destpageposfrom1": 16,
+      "kids": [],
+      "object": "97 0 R",
+      "open": true,
+      "title": "Trepak 2 -> 15: /XYZ 66 756 3"
+    }
+  ],
+  "parameters": {
+    "decodelevel": "generalized"
+  },
+  "version": 1
+}

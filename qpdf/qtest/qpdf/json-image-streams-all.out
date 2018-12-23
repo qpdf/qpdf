@@ -1,0 +1,622 @@
+{
+  "objects": {
+    "1 0 R": {
+      "/Pages": "2 0 R",
+      "/Type": "/Catalog"
+    },
+    "10 0 R": {
+      "/Contents": "27 0 R",
+      "/MediaBox": [
+        0,
+        0,
+        612,
+        392
+      ],
+      "/Parent": "2 0 R",
+      "/Resources": {
+        "/Font": {
+          "/F1": "13 0 R"
+        },
+        "/ProcSet": [
+          "/PDF",
+          "/Text",
+          "/ImageC"
+        ],
+        "/XObject": {
+          "/Im1": "28 0 R"
+        }
+      },
+      "/Type": "/Page"
+    },
+    "11 0 R": {
+      "/Contents": "29 0 R",
+      "/MediaBox": [
+        0,
+        0,
+        612,
+        392
+      ],
+      "/Parent": "2 0 R",
+      "/Resources": {
+        "/Font": {
+          "/F1": "13 0 R"
+        },
+        "/ProcSet": [
+          "/PDF",
+          "/Text",
+          "/ImageC"
+        ],
+        "/XObject": {
+          "/Im1": "30 0 R"
+        }
+      },
+      "/Type": "/Page"
+    },
+    "12 0 R": {
+      "/Filter": "/FlateDecode",
+      "/Length": 97
+    },
+    "13 0 R": {
+      "/BaseFont": "/Helvetica",
+      "/Encoding": "/WinAnsiEncoding",
+      "/Name": "/F1",
+      "/Subtype": "/Type1",
+      "/Type": "/Font"
+    },
+    "14 0 R": {
+      "/BitsPerComponent": 8,
+      "/ColorSpace": "/DeviceCMYK",
+      "/Filter": "/FlateDecode",
+      "/Height": 480,
+      "/Length": 847,
+      "/Subtype": "/Image",
+      "/Type": "/XObject",
+      "/Width": 400
+    },
+    "15 0 R": {
+      "/Filter": "/FlateDecode",
+      "/Length": 102
+    },
+    "16 0 R": {
+      "/BitsPerComponent": 8,
+      "/ColorSpace": "/DeviceCMYK",
+      "/Filter": "/DCTDecode",
+      "/Height": 480,
+      "/Length": 9364,
+      "/Subtype": "/Image",
+      "/Type": "/XObject",
+      "/Width": 400
+    },
+    "17 0 R": {
+      "/Filter": "/FlateDecode",
+      "/Length": 108
+    },
+    "18 0 R": {
+      "/BitsPerComponent": 8,
+      "/ColorSpace": "/DeviceCMYK",
+      "/Filter": "/RunLengthDecode",
+      "/Height": 480,
+      "/Length": 768998,
+      "/Subtype": "/Image",
+      "/Type": "/XObject",
+      "/Width": 400
+    },
+    "19 0 R": {
+      "/Filter": "/FlateDecode",
+      "/Length": 96
+    },
+    "2 0 R": {
+      "/Count": 9,
+      "/Kids": [
+        "3 0 R",
+        "4 0 R",
+        "5 0 R",
+        "6 0 R",
+        "7 0 R",
+        "8 0 R",
+        "9 0 R",
+        "10 0 R",
+        "11 0 R"
+      ],
+      "/Type": "/Pages"
+    },
+    "20 0 R": {
+      "/BitsPerComponent": 8,
+      "/ColorSpace": "/DeviceRGB",
+      "/Filter": "/FlateDecode",
+      "/Height": 480,
+      "/Length": 645,
+      "/Subtype": "/Image",
+      "/Type": "/XObject",
+      "/Width": 400
+    },
+    "21 0 R": {
+      "/Filter": "/FlateDecode",
+      "/Length": 99
+    },
+    "22 0 R": {
+      "/BitsPerComponent": 8,
+      "/ColorSpace": "/DeviceRGB",
+      "/Filter": "/DCTDecode",
+      "/Height": 480,
+      "/Length": 3650,
+      "/Subtype": "/Image",
+      "/Type": "/XObject",
+      "/Width": 400
+    },
+    "23 0 R": {
+      "/Filter": "/FlateDecode",
+      "/Length": 106
+    },
+    "24 0 R": {
+      "/BitsPerComponent": 8,
+      "/ColorSpace": "/DeviceRGB",
+      "/Filter": "/RunLengthDecode",
+      "/Height": 480,
+      "/Length": 641497,
+      "/Subtype": "/Image",
+      "/Type": "/XObject",
+      "/Width": 400
+    },
+    "25 0 R": {
+      "/Filter": "/FlateDecode",
+      "/Length": 97
+    },
+    "26 0 R": {
+      "/BitsPerComponent": 8,
+      "/ColorSpace": "/DeviceGray",
+      "/Filter": "/FlateDecode",
+      "/Height": 480,
+      "/Length": 221,
+      "/Subtype": "/Image",
+      "/Type": "/XObject",
+      "/Width": 400
+    },
+    "27 0 R": {
+      "/Filter": "/FlateDecode",
+      "/Length": 101
+    },
+    "28 0 R": {
+      "/BitsPerComponent": 8,
+      "/ColorSpace": "/DeviceGray",
+      "/Filter": "/DCTDecode",
+      "/Height": 480,
+      "/Length": 2587,
+      "/Subtype": "/Image",
+      "/Type": "/XObject",
+      "/Width": 400
+    },
+    "29 0 R": {
+      "/Filter": "/FlateDecode",
+      "/Length": 108
+    },
+    "3 0 R": {
+      "/Contents": "12 0 R",
+      "/MediaBox": [
+        0,
+        0,
+        612,
+        392
+      ],
+      "/Parent": "2 0 R",
+      "/Resources": {
+        "/Font": {
+          "/F1": "13 0 R"
+        },
+        "/ProcSet": [
+          "/PDF",
+          "/Text",
+          "/ImageC"
+        ],
+        "/XObject": {
+          "/Im1": "14 0 R"
+        }
+      },
+      "/Type": "/Page"
+    },
+    "30 0 R": {
+      "/BitsPerComponent": 8,
+      "/ColorSpace": "/DeviceGray",
+      "/Filter": "/RunLengthDecode",
+      "/Height": 480,
+      "/Length": 3001,
+      "/Subtype": "/Image",
+      "/Type": "/XObject",
+      "/Width": 400
+    },
+    "4 0 R": {
+      "/Contents": "15 0 R",
+      "/MediaBox": [
+        0,
+        0,
+        612,
+        392
+      ],
+      "/Parent": "2 0 R",
+      "/Resources": {
+        "/Font": {
+          "/F1": "13 0 R"
+        },
+        "/ProcSet": [
+          "/PDF",
+          "/Text",
+          "/ImageC"
+        ],
+        "/XObject": {
+          "/Im1": "16 0 R"
+        }
+      },
+      "/Type": "/Page"
+    },
+    "5 0 R": {
+      "/Contents": "17 0 R",
+      "/MediaBox": [
+        0,
+        0,
+        612,
+        392
+      ],
+      "/Parent": "2 0 R",
+      "/Resources": {
+        "/Font": {
+          "/F1": "13 0 R"
+        },
+        "/ProcSet": [
+          "/PDF",
+          "/Text",
+          "/ImageC"
+        ],
+        "/XObject": {
+          "/Im1": "18 0 R"
+        }
+      },
+      "/Type": "/Page"
+    },
+    "6 0 R": {
+      "/Contents": "19 0 R",
+      "/MediaBox": [
+        0,
+        0,
+        612,
+        392
+      ],
+      "/Parent": "2 0 R",
+      "/Resources": {
+        "/Font": {
+          "/F1": "13 0 R"
+        },
+        "/ProcSet": [
+          "/PDF",
+          "/Text",
+          "/ImageC"
+        ],
+        "/XObject": {
+          "/Im1": "20 0 R"
+        }
+      },
+      "/Type": "/Page"
+    },
+    "7 0 R": {
+      "/Contents": "21 0 R",
+      "/MediaBox": [
+        0,
+        0,
+        612,
+        392
+      ],
+      "/Parent": "2 0 R",
+      "/Resources": {
+        "/Font": {
+          "/F1": "13 0 R"
+        },
+        "/ProcSet": [
+          "/PDF",
+          "/Text",
+          "/ImageC"
+        ],
+        "/XObject": {
+          "/Im1": "22 0 R"
+        }
+      },
+      "/Type": "/Page"
+    },
+    "8 0 R": {
+      "/Contents": "23 0 R",
+      "/MediaBox": [
+        0,
+        0,
+        612,
+        392
+      ],
+      "/Parent": "2 0 R",
+      "/Resources": {
+        "/Font": {
+          "/F1": "13 0 R"
+        },
+        "/ProcSet": [
+          "/PDF",
+          "/Text",
+          "/ImageC"
+        ],
+        "/XObject": {
+          "/Im1": "24 0 R"
+        }
+      },
+      "/Type": "/Page"
+    },
+    "9 0 R": {
+      "/Contents": "25 0 R",
+      "/MediaBox": [
+        0,
+        0,
+        612,
+        392
+      ],
+      "/Parent": "2 0 R",
+      "/Resources": {
+        "/Font": {
+          "/F1": "13 0 R"
+        },
+        "/ProcSet": [
+          "/PDF",
+          "/Text",
+          "/ImageC"
+        ],
+        "/XObject": {
+          "/Im1": "26 0 R"
+        }
+      },
+      "/Type": "/Page"
+    },
+    "trailer": {
+      "/ID": [
+        "S¶Ł”łîð\u000e¢¬\u0007}_)\u0012¶",
+        "S¶Ł”łîð\u000e¢¬\u0007}_)\u0012¶"
+      ],
+      "/Root": "1 0 R",
+      "/Size": 31
+    }
+  },
+  "outlines": [],
+  "pagelabels": [],
+  "pages": [
+    {
+      "contents": [
+        "12 0 R"
+      ],
+      "images": [
+        {
+          "bitspercomponent": 8,
+          "colorspace": "/DeviceCMYK",
+          "decodeparms": [
+            null
+          ],
+          "filter": [
+            "/FlateDecode"
+          ],
+          "filterable": true,
+          "height": 480,
+          "name": "/Im1",
+          "object": "14 0 R",
+          "width": 400
+        }
+      ],
+      "label": null,
+      "object": "3 0 R",
+      "outlines": [],
+      "pageposfrom1": 1
+    },
+    {
+      "contents": [
+        "15 0 R"
+      ],
+      "images": [
+        {
+          "bitspercomponent": 8,
+          "colorspace": "/DeviceCMYK",
+          "decodeparms": [
+            null
+          ],
+          "filter": [
+            "/DCTDecode"
+          ],
+          "filterable": true,
+          "height": 480,
+          "name": "/Im1",
+          "object": "16 0 R",
+          "width": 400
+        }
+      ],
+      "label": null,
+      "object": "4 0 R",
+      "outlines": [],
+      "pageposfrom1": 2
+    },
+    {
+      "contents": [
+        "17 0 R"
+      ],
+      "images": [
+        {
+          "bitspercomponent": 8,
+          "colorspace": "/DeviceCMYK",
+          "decodeparms": [
+            null
+          ],
+          "filter": [
+            "/RunLengthDecode"
+          ],
+          "filterable": true,
+          "height": 480,
+          "name": "/Im1",
+          "object": "18 0 R",
+          "width": 400
+        }
+      ],
+      "label": null,
+      "object": "5 0 R",
+      "outlines": [],
+      "pageposfrom1": 3
+    },
+    {
+      "contents": [
+        "19 0 R"
+      ],
+      "images": [
+        {
+          "bitspercomponent": 8,
+          "colorspace": "/DeviceRGB",
+          "decodeparms": [
+            null
+          ],
+          "filter": [
+            "/FlateDecode"
+          ],
+          "filterable": true,
+          "height": 480,
+          "name": "/Im1",
+          "object": "20 0 R",
+          "width": 400
+        }
+      ],
+      "label": null,
+      "object": "6 0 R",
+      "outlines": [],
+      "pageposfrom1": 4
+    },
+    {
+      "contents": [
+        "21 0 R"
+      ],
+      "images": [
+        {
+          "bitspercomponent": 8,
+          "colorspace": "/DeviceRGB",
+          "decodeparms": [
+            null
+          ],
+          "filter": [
+            "/DCTDecode"
+          ],
+          "filterable": true,
+          "height": 480,
+          "name": "/Im1",
+          "object": "22 0 R",
+          "width": 400
+        }
+      ],
+      "label": null,
+      "object": "7 0 R",
+      "outlines": [],
+      "pageposfrom1": 5
+    },
+    {
+      "contents": [
+        "23 0 R"
+      ],
+      "images": [
+        {
+          "bitspercomponent": 8,
+          "colorspace": "/DeviceRGB",
+          "decodeparms": [
+            null
+          ],
+          "filter": [
+            "/RunLengthDecode"
+          ],
+          "filterable": true,
+          "height": 480,
+          "name": "/Im1",
+          "object": "24 0 R",
+          "width": 400
+        }
+      ],
+      "label": null,
+      "object": "8 0 R",
+      "outlines": [],
+      "pageposfrom1": 6
+    },
+    {
+      "contents": [
+        "25 0 R"
+      ],
+      "images": [
+        {
+          "bitspercomponent": 8,
+          "colorspace": "/DeviceGray",
+          "decodeparms": [
+            null
+          ],
+          "filter": [
+            "/FlateDecode"
+          ],
+          "filterable": true,
+          "height": 480,
+          "name": "/Im1",
+          "object": "26 0 R",
+          "width": 400
+        }
+      ],
+      "label": null,
+      "object": "9 0 R",
+      "outlines": [],
+      "pageposfrom1": 7
+    },
+    {
+      "contents": [
+        "27 0 R"
+      ],
+      "images": [
+        {
+          "bitspercomponent": 8,
+          "colorspace": "/DeviceGray",
+          "decodeparms": [
+            null
+          ],
+          "filter": [
+            "/DCTDecode"
+          ],
+          "filterable": true,
+          "height": 480,
+          "name": "/Im1",
+          "object": "28 0 R",
+          "width": 400
+        }
+      ],
+      "label": null,
+      "object": "10 0 R",
+      "outlines": [],
+      "pageposfrom1": 8
+    },
+    {
+      "contents": [
+        "29 0 R"
+      ],
+      "images": [
+        {
+          "bitspercomponent": 8,
+          "colorspace": "/DeviceGray",
+          "decodeparms": [
+            null
+          ],
+          "filter": [
+            "/RunLengthDecode"
+          ],
+          "filterable": true,
+          "height": 480,
+          "name": "/Im1",
+          "object": "30 0 R",
+          "width": 400
+        }
+      ],
+      "label": null,
+      "object": "11 0 R",
+      "outlines": [],
+      "pageposfrom1": 9
+    }
+  ],
+  "parameters": {
+    "decodelevel": "all"
+  },
+  "version": 1
+}
