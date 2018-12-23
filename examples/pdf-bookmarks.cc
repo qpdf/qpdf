@@ -7,6 +7,10 @@
 #include <qpdf/QUtil.hh>
 #include <qpdf/QTC.hh>
 
+// This program demonstrates extraction of bookmarks using the qpdf
+// outlines API. Note that all the information shown by this program
+// can also be obtained from a PDF file using qpdf's --json option.
+
 static char const* whoami = 0;
 static enum { st_none, st_numbers, st_lines } style = st_none;
 static bool show_open = false;
