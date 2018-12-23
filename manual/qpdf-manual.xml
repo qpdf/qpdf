@@ -303,11 +303,12 @@ make
   <sect1 id="ref.shell-completion">
    <title>Shell Completion</title>
    <para>
-    Starting in qpdf version 8.3.0, qpdf provides its own bash
-    completion support. You can enable bash completion with
-    <command>eval $(qpdf --completion-bash)</command>. If
-    <command>qpdf</command> is not in your path, you should invoke it
-    above with an absolute path. If you invoke it with a relative
+    Starting in qpdf version 8.3.0, qpdf provides its own completion
+    support for zsh and bash. You can enable bash completion with
+    <command>eval $(qpdf --completion-bash)</command> and zsh
+    completion with <command>eval $(qpdf --completion-zsh)</command>.
+    If <command>qpdf</command> is not in your path, you should invoke
+    it above with an absolute path. If you invoke it with a relative
     path, it will warn you, and the completion won't work if you're in
     a different directory.
    </para>
@@ -339,6 +340,24 @@ make
       <listitem>
        <para>
         Show detailed copyright information.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--completion-bash</option></term>
+      <listitem>
+       <para>
+        Output a completion command you can eval to enable shell
+        completion from bash.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--completion-zsh</option></term>
+      <listitem>
+       <para>
+        Output a completion command you can eval to enable shell
+        completion from zsh.
        </para>
       </listitem>
      </varlistentry>

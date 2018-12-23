@@ -116,6 +116,7 @@ my @completion_tests = (
     ['qpdf --decode-l', undef, 'decode-l'],
     ['qpdf --decode-lzzz', 15, 'decode-l'],
     ['qpdf --decode-level=', undef, 'decode-level'],
+    ['qpdf --decode-level=g', undef, 'decode-level-g'],
     ['qpdf --check -', undef, 'later-arg'],
     ['qpdf infile outfile oops --ch', undef, 'usage-empty'],
     ['qpdf --encrypt \'user " password\' ', undef, 'quoting'],
@@ -124,15 +125,25 @@ my @completion_tests = (
     ['qpdf --encrypt "user pass\'word" ', undef, 'quoting'],
     ['qpdf --encrypt user\ password ', undef, 'quoting'],
     );
-$n_tests += scalar(@completion_tests);
+$n_tests += 2 * scalar(@completion_tests);
 foreach my $c (@completion_tests)
 {
     my ($cmd, $point, $description) = @$c;
     my $out = "completion-$description.out";
+    my $zout = "completion-$description-zsh.out";
+    if (! -f $zout)
+    {
+        $zout = $out;
+    }
     $td->runtest("bash completion: $description",
                  {$td->COMMAND => [@{bash_completion($cmd, $point)}],
                       $td->FILTER => "perl filter-completion.pl $out"},
                  {$td->FILE => "$out", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("zsh completion: $description",
+                 {$td->COMMAND => [@{zsh_completion($cmd, $point)}],
+                      $td->FILTER => "perl filter-completion.pl $zout"},
+                 {$td->FILE => "$zout", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
 }
 
@@ -3206,6 +3217,16 @@ sub bash_completion
     $this =~ s/(\S+)\s.*/$1/;
     ['env', "COMP_LINE=$line", "COMP_POINT=$point",
      "qpdf", $this, $cur, $prev];
+}
+
+sub zsh_completion
+{
+    my ($line, $point) = @_;
+    if (! defined $point)
+    {
+        $point = length($line);
+    }
+    ['env', "COMP_LINE=$line", "COMP_POINT=$point", "qpdf"];
 }
 
 sub check_pdf

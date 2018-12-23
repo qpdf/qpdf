@@ -1,3 +1,8 @@
+2018-12-23  Jay Berkenbilt  <ejb@ql.org>
+
+	* Tweak completion so it works with zsh as well using
+	bashcompinit.
+
 2018-12-22  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add new options --json, --json-key, and --json-object to

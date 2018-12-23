@@ -1,0 +1,6 @@
+--decode-level=generalized
+!--decode-level=all
+!--decode-level=none
+!all
+!generalized
+!none
