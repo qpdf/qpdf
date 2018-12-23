@@ -1408,7 +1408,24 @@ ArgParser::handleArgFileArguments()
     new_argv.push_back(PointerHolder<char>(true, QUtil::copy_string(argv[0])));
     for (int i = 1; i < argc; ++i)
     {
+        char* argfile = 0;
         if ((strlen(argv[i]) > 1) && (argv[i][0] == '@'))
+        {
+            try
+            {
+                argfile = 1 + argv[i];
+                if (strcmp(argfile, "-") != 0)
+                {
+                    fclose(QUtil::safe_fopen(argfile, "rb"));
+                }
+            }
+            catch (std::runtime_error&)
+            {
+                // The file's not there; treating as regular option
+                argfile = 0;
+            }
+        }
+        if (argfile)
         {
             readArgsFromFile(1+argv[i]);
         }

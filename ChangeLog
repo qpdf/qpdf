@@ -1,5 +1,10 @@
 2018-12-23  Jay Berkenbilt  <ejb@ql.org>
 
+	* When specifying @arg on the command line, if the file "arg" does
+	not exist, just treat this is a normal argument. This makes it
+	easier to deal with files whose names start with the @ character.
+	Fixes #265.
+
 	* Tweak completion so it works with zsh as well using
 	bashcompinit.
 

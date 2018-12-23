@@ -150,7 +150,7 @@ foreach my $c (@completion_tests)
 show_ntests();
 # ----------
 $td->notify("--- Argument Parsing ---");
-$n_tests += 3;
+$n_tests += 4;
 
 $td->runtest("required argument",
              {$td->COMMAND => "qpdf --password minimal.pdf"},
@@ -166,6 +166,11 @@ $td->runtest("required argument with choices",
              {$td->COMMAND => "qpdf --decode-level minimal.pdf"},
 	     {$td->REGEXP => "must be given as --decode-level=\\{.*all.*\\}",
                   $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+copy("minimal.pdf", '@file.pdf');
+$td->runtest("\@file exists and file doesn't",
+             {$td->COMMAND => "qpdf --check \@file.pdf"},
+             {$td->FILE => "check-at-file.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 show_ntests();
@@ -1100,6 +1105,7 @@ $td->notify("--- Overwrite self ---");
 $n_tests += 1;
 
 copy("minimal.pdf", "a.pdf");
+# Also tests @- for reading args from stdin
 $td->runtest("don't overwrite self",
              {$td->COMMAND => "(echo a.pdf; echo a.pdf) | qpdf \@-"},
              {$td->REGEXP => "input file and output file are the same.*",
@@ -3384,5 +3390,5 @@ sub get_md5_checksum
 sub cleanup
 {
     system("rm -rf *.ps *.pnm ?.pdf ?.qdf *.enc* tif1 tif2 tiff-cache");
-    system("rm -rf *split-out* ???-kfo.pdf *.tmpout");
+    system("rm -rf *split-out* ???-kfo.pdf *.tmpout \@file.pdf");
 }
