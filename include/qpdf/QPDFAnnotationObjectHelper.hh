@@ -72,6 +72,24 @@ class QPDFAnnotationObjectHelper: public QPDFObjectHelper
     QPDFObjectHandle getAppearanceStream(std::string const& which,
                                          std::string const& state = "");
 
+    // Return a matrix that transforms from the annotation's
+    // appearance stream's coordinates to the page's coordinates. This
+    // method also honors the annotation's NoRotate flag if set. The
+    // matrix is returned as a string representing the six floating
+    // point numbers to be passed to a cm operator. Returns the empty
+    // string if it is unable to compute the matrix for any reason.
+    // The value "rotate" should be set to the page's /Rotate value or
+    // 0 if none.
+    QPDF_DLL
+    std::string getAnnotationAppearanceMatrix(int rotate);
+
+    // Generate text suitable for addition to the containing page's
+    // content stream that replaces this annotation's appearance
+    // stream. The value "rotate" should be set to the page's /Rotate
+    // value or 0 if none.
+    QPDF_DLL
+    std::string getPageContentForAppearance(int rotate);
+
   private:
     class Members
     {
