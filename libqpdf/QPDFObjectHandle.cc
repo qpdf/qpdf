@@ -575,6 +575,26 @@ QPDFObjectHandle::isRectangle()
     return true;
 }
 
+bool
+QPDFObjectHandle::isMatrix()
+{
+    if (! isArray())
+    {
+        return false;
+    }
+    if (getArrayNItems() != 6)
+    {
+        return false;
+    }
+    for (size_t i = 0; i < 6; ++i)
+    {
+        if (! getArrayItem(i).isNumber())
+        {
+            return false;
+        }
+    }
+    return true;
+}
 
 QPDFObjectHandle::Rectangle
 QPDFObjectHandle::getArrayAsRectangle()
@@ -586,6 +606,22 @@ QPDFObjectHandle::getArrayAsRectangle()
                            getArrayItem(1).getNumericValue(),
                            getArrayItem(2).getNumericValue(),
                            getArrayItem(3).getNumericValue());
+    }
+    return result;
+}
+
+QPDFObjectHandle::Matrix
+QPDFObjectHandle::getArrayAsMatrix()
+{
+    Matrix result;
+    if (isMatrix())
+    {
+        result = Matrix(getArrayItem(0).getNumericValue(),
+                        getArrayItem(1).getNumericValue(),
+                        getArrayItem(2).getNumericValue(),
+                        getArrayItem(3).getNumericValue(),
+                        getArrayItem(4).getNumericValue(),
+                        getArrayItem(5).getNumericValue());
     }
     return result;
 }
@@ -1931,7 +1967,26 @@ QPDFObjectHandle::newArray(Rectangle const& rect)
 }
 
 QPDFObjectHandle
+QPDFObjectHandle::newArray(Matrix const& matrix)
+{
+    std::vector<QPDFObjectHandle> items;
+    items.push_back(newReal(matrix.a));
+    items.push_back(newReal(matrix.b));
+    items.push_back(newReal(matrix.c));
+    items.push_back(newReal(matrix.d));
+    items.push_back(newReal(matrix.e));
+    items.push_back(newReal(matrix.f));
+    return newArray(items);
+}
+
+QPDFObjectHandle
 QPDFObjectHandle::newFromRectangle(Rectangle const& rect)
+{
+    return newArray(rect);
+}
+
+QPDFObjectHandle
+QPDFObjectHandle::newFromMatrix(Matrix const& rect)
 {
     return newArray(rect);
 }

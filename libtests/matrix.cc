@@ -50,6 +50,11 @@ int main()
     m.transform(240, 480, xp, yp);
     check_xy(xp, yp, "2582.50 4912.00");
 
+    check(QPDFMatrix(
+              QPDFObjectHandle::parse(
+                  "[3 1 4 1 5 9.26535]").getArrayAsMatrix()),
+          "3.00000 1.00000 4.00000 1.00000 5.00000 9.26535");
+
     std::cout << "matrix tests done" << std::endl;
     return 0;
 }

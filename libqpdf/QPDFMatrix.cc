@@ -22,6 +22,17 @@ QPDFMatrix::QPDFMatrix(double a, double b, double c,
 {
 }
 
+QPDFMatrix::QPDFMatrix(QPDFObjectHandle::Matrix const& m) :
+    a(m.a),
+    b(m.b),
+    c(m.c),
+    d(m.d),
+    e(m.e),
+    f(m.f)
+{
+}
+
+
 std::string
 QPDFMatrix::unparse() const
 {

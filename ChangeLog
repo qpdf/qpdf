@@ -1,3 +1,9 @@
+2018-12-31  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add QPDFObjectHandle::Matrix, similar to
+	QPDFObjectHandle::Rectangle, as a convenience class for
+	six-element arrays that are used as matrices.
+
 2018-12-23  Jay Berkenbilt  <ejb@ql.org>
 
 	* When specifying @arg on the command line, if the file "arg" does

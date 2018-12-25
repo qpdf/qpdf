@@ -198,6 +198,38 @@ class QPDFObjectHandle
         double ury;
     };
 
+    // Convenience object for transformation matrices
+    class Matrix
+    {
+      public:
+        Matrix() :
+            a(0.0),
+            b(0.0),
+            c(0.0),
+            d(0.0),
+            e(0.0),
+            f(0.0)
+        {
+        }
+        Matrix(double a, double b, double c,
+               double d, double e, double f) :
+            a(a),
+            b(b),
+            c(c),
+            d(d),
+            e(e),
+            f(f)
+        {
+        }
+
+        double a;
+        double b;
+        double c;
+        double d;
+        double e;
+        double f;
+    };
+
     QPDF_DLL
     QPDFObjectHandle();
     QPDF_DLL
@@ -368,6 +400,8 @@ class QPDFObjectHandle
     QPDF_DLL
     static QPDFObjectHandle newArray(Rectangle const&);
     QPDF_DLL
+    static QPDFObjectHandle newArray(Matrix const&);
+    QPDF_DLL
     static QPDFObjectHandle newDictionary();
     QPDF_DLL
     static QPDFObjectHandle newDictionary(
@@ -377,6 +411,10 @@ class QPDFObjectHandle
     // form of newArray.
     QPDF_DLL
     static QPDFObjectHandle newFromRectangle(Rectangle const&);
+    // Create an array from a matrix. Equivalent to the matrix
+    // form of newArray.
+    QPDF_DLL
+    static QPDFObjectHandle newFromMatrix(Matrix const&);
 
     // Create a new stream and associate it with the given qpdf
     // object.  A subsequent call must be made to replaceStreamData()
@@ -500,6 +538,12 @@ class QPDFObjectHandle
     // rectangle. Otherwise, return the rectangle [0, 0, 0, 0]
     QPDF_DLL
     Rectangle getArrayAsRectangle();
+    QPDF_DLL
+    bool isMatrix();
+    // If the array an array of six numeric values, return as a
+    // matrix. Otherwise, return the matrix [1, 0, 0, 1, 0, 0]
+    QPDF_DLL
+    Matrix getArrayAsMatrix();
 
     // Methods for dictionary objects
     QPDF_DLL

@@ -1,6 +1,7 @@
 #ifndef QPDFMATRIX_HH
 #define QPDFMATRIX_HH
 
+#include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/DLL.h>
 #include <string>
 
@@ -12,6 +13,8 @@ class QPDFMatrix
     QPDF_DLL
     QPDFMatrix(double a, double b, double c,
                double d, double e, double f);
+    QPDF_DLL
+    QPDFMatrix(QPDFObjectHandle::Matrix const&);
 
     QPDF_DLL
     std::string unparse() const;
