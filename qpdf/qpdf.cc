@@ -851,7 +851,7 @@ ArgParser::argJsonHelp()
         << "and \"parameters\" keys will always be present."
         << std::endl
         << std::endl
-        << json_schema().serialize()
+        << json_schema().unparse()
         << std::endl;
 }
 
@@ -3055,7 +3055,7 @@ ideally with the file that caused the error and the output below. Thanks!\n\
         }
     }
 
-    std::cout << j.serialize() << std::endl;
+    std::cout << j.unparse() << std::endl;
 }
 
 static void do_inspection(QPDF& pdf, Options& o)

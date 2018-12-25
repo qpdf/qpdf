@@ -5,9 +5,9 @@
 
 static void check(JSON& j, std::string const& exp)
 {
-    if (exp != j.serialize())
+    if (exp != j.unparse())
     {
-        std::cout << "Got " << j.serialize() << "; wanted " << exp << "\n";
+        std::cout << "Got " << j.unparse() << "; wanted " << exp << "\n";
     }
 }
 

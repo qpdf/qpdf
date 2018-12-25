@@ -150,7 +150,7 @@ std::string JSON::JSON_null::unparse(size_t) const
 }
 
 std::string
-JSON::serialize() const
+JSON::unparse() const
 {
     if (0 == this->m->value.getPointer())
     {

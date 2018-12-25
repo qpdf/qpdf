@@ -41,7 +41,7 @@ class JSON
 {
   public:
     QPDF_DLL
-    std::string serialize() const;
+    std::string unparse() const;
 
     // The JSON spec calls dictionaries "objects", but that creates
     // too much confusion when referring to instances of the JSON
