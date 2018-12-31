@@ -895,6 +895,16 @@ $td->runtest("detect foreign object in write",
 
 show_ntests();
 # ----------
+$td->notify("--- Merge Dictionary ---");
+$n_tests += 1;
+
+$td->runtest("merge dictionary",
+             {$td->COMMAND => "test_driver 50 merge-dict.pdf"},
+             {$td->FILE => "merge-dict.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+show_ntests();
+# ----------
 $td->notify("--- Parsing ---");
 $n_tests += 17;
 

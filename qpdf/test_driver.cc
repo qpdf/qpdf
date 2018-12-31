@@ -1754,6 +1754,17 @@ void runtest(int n, char const* filename1, char const* arg2)
             }
         }
     }
+    else if (n == 50)
+    {
+        // Test dictionary merge. This test is crafted to work with
+        // merge-dict.pdf
+        QPDFObjectHandle d1 = pdf.getTrailer().getKey("/Dict1");
+        QPDFObjectHandle d2 = pdf.getTrailer().getKey("/Dict2");
+        d1.mergeDictionary(d2);
+        std::cout << d1.getJSON().unparse() << std::endl;
+        // Top-level type mismatch
+        d1.mergeDictionary(d2.getKey("/k1"));
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +

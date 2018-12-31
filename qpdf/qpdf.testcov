@@ -369,3 +369,11 @@ QPDFOutlineDocumentHelper string named dest 0
 QPDFOutlineObjectHelper loop 0
 qpdf required parameter 0
 qpdf required choices 0
+QPDFObjectHandle merge top type mismatch 0
+QPDFObjectHandle merge shallow copy 0
+QPDFObjectHandle nested merge 0
+QPDFObjectHandle merge array 0
+QPDFObjectHandle merge array dup 0
+QPDFObjectHandle merge copy from other 0
+QPDFObjectHandle merge loop 0
+QPDFObjectHandle merge equal indirect 0

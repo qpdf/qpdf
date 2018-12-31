@@ -559,6 +559,28 @@ class QPDFObjectHandle
     QPDF_DLL
     bool isOrHasName(std::string const&);
 
+    // Merge dictionaries with the following behavior, where "object"
+    // refers to the object whose method is invoked, and "other"
+    // refers to the argument:
+    // * If either object or other is not a dictionary, do nothing
+    // * Otherwise
+    //   * For each key in other
+    //     * If key is absent in object, insert it
+    //     * If key is present in object
+    //       * If both values are dictionaries, merge the dictionary from
+    //         other into the one from object
+    //       * If both values are arrays, append scalar elements from
+    //         other's that are not present in object's onto object's,
+    //         and ignore non-scalar elements in other's
+    //       * Otherwise ignore
+    // The primary purpose of this method is to facilitate merging of
+    // resource dictionaries. Conflicts are ignored. If needed, a
+    // future version of qpdf may provide some mechanism for conflict
+    // resolution, such as providing a handler that is invoked with
+    // the path to the conflict.
+    QPDF_DLL
+    void mergeDictionary(QPDFObjectHandle other);
+
     // Return the QPDF object that owns an indirect object.  Returns
     // null for a direct object.
     QPDF_DLL
@@ -970,6 +992,10 @@ class QPDFObjectHandle
         ParserCallbacks* callbacks);
     std::vector<QPDFObjectHandle> arrayOrStreamToStreamArray(
         std::string const& description, std::string& all_description);
+    void mergeDictionaryInternal(
+        QPDFObjectHandle other,
+        std::set<QPDFObjGen>& visiting,
+        int depth);
     static void warn(QPDF*, QPDFExc const&);
 
     class Members

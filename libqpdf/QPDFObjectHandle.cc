@@ -825,6 +825,109 @@ QPDFObjectHandle::isOrHasName(std::string const& value)
     return false;
 }
 
+void
+QPDFObjectHandle::mergeDictionary(QPDFObjectHandle other)
+{
+    std::set<QPDFObjGen> visiting;
+    mergeDictionaryInternal(other, visiting, 0);
+}
+
+void
+QPDFObjectHandle::mergeDictionaryInternal(
+    QPDFObjectHandle other,
+    std::set<QPDFObjGen>& visiting,
+    int depth)
+{
+    if (depth > 100)
+    {
+        // Arbitrarily limit depth to avoid stack overflow
+        return;
+    }
+    if (! (isDictionary() && other.isDictionary()))
+    {
+        QTC::TC("qpdf", "QPDFObjectHandle merge top type mismatch");
+        return;
+    }
+    std::set<std::string> other_keys = other.getKeys();
+    for (std::set<std::string>::iterator iter = other_keys.begin();
+         iter != other_keys.end(); ++iter)
+    {
+        std::string const& key = *iter;
+        QPDFObjectHandle other_val = other.getKey(key);
+        if (hasKey(key))
+        {
+            QPDFObjectHandle this_val = getKey(key);
+            if (this_val.isDictionary() && other_val.isDictionary())
+            {
+                if (this_val.isIndirect() && other_val.isIndirect() &&
+                    (this_val.getObjGen() == other_val.getObjGen()))
+                {
+                    QTC::TC("qpdf", "QPDFObjectHandle merge equal indirect");
+                }
+                else if (this_val.isIndirect() &&
+                    (visiting.count(this_val.getObjGen())))
+                {
+                    QTC::TC("qpdf", "QPDFObjectHandle merge loop");
+                }
+                else
+                {
+                    QPDFObjGen loop;
+                    if (this_val.isIndirect())
+                    {
+                        loop = this_val.getObjGen();
+                        visiting.insert(loop);
+                        QTC::TC("qpdf", "QPDFObjectHandle merge shallow copy");
+                        this_val = this_val.shallowCopy();
+                        replaceKey(key, this_val);
+                    }
+                    QTC::TC("qpdf", "QPDFObjectHandle nested merge");
+                    this_val.mergeDictionaryInternal(
+                        other_val, visiting, 1 + depth);
+                    if (loop.getObj())
+                    {
+                        visiting.erase(loop);
+                    }
+                }
+            }
+            else if (this_val.isArray() && other_val.isArray())
+            {
+                std::set<std::string> scalars;
+                int n = this_val.getArrayNItems();
+                for (int i = 0; i < n; ++i)
+                {
+                    QPDFObjectHandle this_item = this_val.getArrayItem(i);
+                    if (this_item.isScalar())
+                    {
+                        scalars.insert(this_item.unparse());
+                    }
+                }
+                n = other_val.getArrayNItems();
+                for (int i = 0; i < n; ++i)
+                {
+                    QPDFObjectHandle other_item = other_val.getArrayItem(i);
+                    if (other_item.isScalar())
+                    {
+                        if (scalars.count(other_item.unparse()) == 0)
+                        {
+                            QTC::TC("qpdf", "QPDFObjectHandle merge array");
+                            this_val.appendItem(other_item);
+                        }
+                        else
+                        {
+                            QTC::TC("qpdf", "QPDFObjectHandle merge array dup");
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            QTC::TC("qpdf", "QPDFObjectHandle merge copy from other");
+            replaceKey(key, other_val);
+        }
+    }
+}
+
 // Indirect object accessors
 QPDF*
 QPDFObjectHandle::getOwningQPDF()

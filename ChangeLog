@@ -1,5 +1,10 @@
 2018-12-31  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add method QPDFObjectHandle::mergeDictionary(), which
+	recursively merges dictionaries with semantics designed for
+	merging resource dictionaries. See detailed description in
+	QPDFObjectHandle.hh.
+
 	* Add QPDFObjectHandle::Matrix, similar to
 	QPDFObjectHandle::Rectangle, as a convenience class for
 	six-element arrays that are used as matrices.
