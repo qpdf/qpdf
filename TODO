@@ -3,65 +3,47 @@ Current
 =======
 
  * open bugs
+   * Important but non-trivial
+     #240 -- invalid indirect references
+     #209, #231 -- assert in linearization checks
+   * Security
+     #263 -- segv
+   * Performance
+     #243 -- very slow processing of something
+   * Easy
+     #266 -- get final PDF version from QPDFWriter
+     #259 -- page collation
 
- * form features
-   * flatten
-   * include in json at document and page level
-     * values
-     * names
-     * other stuff?
-   * preserve when merging and splitting; functionality should be
-     similar to outlines.
-   * set value?
-   * maybe basic appearance generation for values within pdf doc
-     encoding that don't use subsetted fonts
+ * Generate appearance streams. QPDFAcroFormDocumentHelper.hh:
 
- * replace mode: --replace-object, --replace-stream-raw,
-   --replace-stream-filtered
-   * update first paragraph of QPDF JSON in the manual to mention this
-   * object numbers are not stable
-   * you don't have to specify length for streams
-   * you only have to specify filtering for streams if providing raw data
+    // If /NeedAppearances is true, generate appearance streams for
+    // all widget annotations. Note that qpdf's abilitiy to generate
+    // appearance streams is quite limited. We can only generate
+    // appearance streams for streams of type variable text, and even
+    // then, the appearance stream just uses the default parameters
+    // specified to substitute the form field's value into the
+    // provided appearance stream. This means that appearance streams
+    // will likely not look right for any form field values that
+    // contain characters outside the range of PDF Doc Encoding. Also,
+    // quadding is ignored.
+    QPDF_DLL
+    void generateAppearancesIfNeeded();
+
+   See need-appearances.pdf, which is based on form-field-types.pdf
+   and can be modified as needed. Search for it in qpdf.test
+
+   Close #72 when done.
+
+ * form field inclusion in json at document and page level
+   * values
+   * names
+   * other stuff?
 
  * special mode for compressing images with DCT
-   * allow specifying a single image, all images, images based on
-     size, specific images
+   * allow specifying a minimum width, height, or pixel area with
+     sensible defaults
    * never replace an image if the replacement is not smaller than the
      original
-
- * bookmarks (outlines) 12.3.3
-   * support bookmarks when merging
-   * prune bookmarks that don't point to a surviving page when merging
-     or splitting
-   * make sure conflicting named destinations work possibly test by
-     including the same file by two paths in a merge
-
-   When pruning outlines, keep all outlines in the hierarchy that are
-   above an outline for a page we care about. If one of the ancestor
-   outlines points to a non-existent page, clear its dest. If an
-   outline does not have any children that point to pages in the
-   document, just omit it.
-
-   Possible strategy:
-   * resolve all named destinations to explicit destinations
-   * concatenate top-level outlines
-   * prune outlines whose dests don't point to a valid page
-   * recompute all /Count fields
-
-   Test files
-   * page-labels-and-outlines.pdf: old file with both page labels and
-     outlines. All destinations are explicit destinations. Each page
-     has Potato and a number. All titles are feline names.
-   * outlines-with-actions.pdf: mixture of explicit destinations,
-     named destinations, goto actions with explicit destinations, and
-     goto actions with named destinations; uses /Dests key in names
-     dictionary. Each page has Salad and a number. All titles are
-     silly words. One destination is an indirect object.
-   * outlines-with-old-root-dests.pdf: like outlines-with-actions
-     except it uses the PDF-1.1 /Dests dictionary for named
-     destinations, and each page has Soup and a number. Also pages are
-     numbered with upper-case Roman numerals starting with 0. All
-     titles are silly words preceded by a bullet.
 
 Soon
 ====
@@ -138,6 +120,42 @@ Page splitting/merging
    Subramanyam provided a test file; see ../misc/article-threads.pdf.
    Email Q-Count: 431864 from 2009-11-03.
 
+ * bookmarks (outlines) 12.3.3
+   * support bookmarks when merging
+   * prune bookmarks that don't point to a surviving page when merging
+     or splitting
+   * make sure conflicting named destinations work possibly test by
+     including the same file by two paths in a merge
+
+   When pruning outlines, keep all outlines in the hierarchy that are
+   above an outline for a page we care about. If one of the ancestor
+   outlines points to a non-existent page, clear its dest. If an
+   outline does not have any children that point to pages in the
+   document, just omit it.
+
+   Possible strategy:
+   * resolve all named destinations to explicit destinations
+   * concatenate top-level outlines
+   * prune outlines whose dests don't point to a valid page
+   * recompute all /Count fields
+
+   Test files
+   * page-labels-and-outlines.pdf: old file with both page labels and
+     outlines. All destinations are explicit destinations. Each page
+     has Potato and a number. All titles are feline names.
+   * outlines-with-actions.pdf: mixture of explicit destinations,
+     named destinations, goto actions with explicit destinations, and
+     goto actions with named destinations; uses /Dests key in names
+     dictionary. Each page has Salad and a number. All titles are
+     silly words. One destination is an indirect object.
+   * outlines-with-old-root-dests.pdf: like outlines-with-actions
+     except it uses the PDF-1.1 /Dests dictionary for named
+     destinations, and each page has Soup and a number. Also pages are
+     numbered with upper-case Roman numerals starting with 0. All
+     titles are silly words preceded by a bullet.
+
+ * Form fields: should be similar to outlines.
+
 General
 =======
 
@@ -146,7 +164,21 @@ directory or that are otherwise not publicly accessible. This includes
 things sent to me by email that are specifically not public. Even so,
 I find it useful to make reference to them in this list
 
+ * Additional form features
+   * set value from CLI? Specify title, and provide way to
+     disambiguate, probably by giving objgen of field
+
+ * replace mode: --replace-object, --replace-stream-raw,
+   --replace-stream-filtered
+   * update first paragraph of QPDF JSON in the manual to mention this
+   * object numbers are not preserved by write, so object ID lookup
+     has to be done separately for each invocation
+   * you don't have to specify length for streams
+   * you only have to specify filtering for streams if providing raw data
+
  * Pl_TIFFPredictor is pretty slow.
+
+ * Maybe disambiguate resources when flattening annotations
 
  * Some test cases on bad fails fail because qpdf is unable to find
    the root dictionary when it fails to read the trailer. Recovery
