@@ -149,12 +149,12 @@ QPDFAnnotationObjectHelper::getAnnotationAppearanceMatrix(int rotate)
     QPDFMatrix matrix;
     if (matrix_obj.isMatrix())
     {
-///        QTC::TC("qpdf", "QPDFAnnotationObjectHelper explicit matrix");
+        QTC::TC("qpdf", "QPDFAnnotationObjectHelper explicit matrix");
         matrix = QPDFMatrix(matrix_obj.getArrayAsMatrix());
     }
     else
     {
-///        QTC::TC("qpdf", "QPDFAnnotationObjectHelper default matrix");
+        QTC::TC("qpdf", "QPDFAnnotationObjectHelper default matrix");
     }
     QPDFObjectHandle::Rectangle rect = rect_obj.getArrayAsRectangle();
     if (rotate && flags.isInteger() && (flags.getIntValue() & 16))
@@ -176,7 +176,7 @@ QPDFAnnotationObjectHelper::getAnnotationAppearanceMatrix(int rotate)
         switch (rotate)
         {
           case 90:
-///            QTC::TC("qpdf", "QPDFAnnotationObjectHelper rotate 90");
+            QTC::TC("qpdf", "QPDFAnnotationObjectHelper rotate 90");
             rect = QPDFObjectHandle::Rectangle(
                 rect.llx,
                 rect.ury,
@@ -184,7 +184,7 @@ QPDFAnnotationObjectHelper::getAnnotationAppearanceMatrix(int rotate)
                 rect.ury + rect_w);
             break;
           case 180:
-///            QTC::TC("qpdf", "QPDFAnnotationObjectHelper rotate 180");
+            QTC::TC("qpdf", "QPDFAnnotationObjectHelper rotate 180");
             rect = QPDFObjectHandle::Rectangle(
                 rect.llx - rect_w,
                 rect.ury,
@@ -192,7 +192,7 @@ QPDFAnnotationObjectHelper::getAnnotationAppearanceMatrix(int rotate)
                 rect.ury + rect_h);
             break;
           case 270:
-///            QTC::TC("qpdf", "QPDFAnnotationObjectHelper rotate 270");
+            QTC::TC("qpdf", "QPDFAnnotationObjectHelper rotate 270");
             rect = QPDFObjectHandle::Rectangle(
                 rect.llx - rect_h,
                 rect.ury - rect_w,

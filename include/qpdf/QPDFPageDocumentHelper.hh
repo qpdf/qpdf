@@ -31,6 +31,8 @@
 
 #include <qpdf/QPDF.hh>
 
+class QPDFAcroFormDocumentHelper;
+
 class QPDFPageDocumentHelper: public QPDFDocumentHelper
 {
   public:
@@ -84,7 +86,21 @@ class QPDFPageDocumentHelper: public QPDFDocumentHelper
     QPDF_DLL
     void removePage(QPDFPageObjectHelper page);
 
+    // For every annotation, integrate the annotation's appearance
+    // stream into the containing page's content streams, merge the
+    // annotation's resources with the page's resources, and remove
+    // the annotation from the page. Handles widget annotations
+    // associated with interactive form fields as a special case,
+    // including removing the /AcroForm key from the document catalog.
+    QPDF_DLL
+    void flattenAnnotations();
+
   private:
+    void flattenAnnotationsForPage(
+        QPDFPageObjectHelper& page,
+        QPDFObjectHandle& resources,
+        QPDFAcroFormDocumentHelper& afdh);
+
     class Members
     {
         friend class QPDFPageDocumentHelper;

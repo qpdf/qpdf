@@ -1,5 +1,22 @@
 2018-12-31  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add several methods for flattening form fields and annotations:
+	  - QPDFPageDocumentHelper::flattenAnnotations - integrate
+	    annotation appearance streams into page contents with special
+	    handling for form fields: if appearance streams are up to date
+	    (/NeedAppearances is false in /AcroForm), the /AcroForm key of
+	    the document catalog is removed. Otherwise, a warning is
+	    issued, and form fields are ignored. Non-form-field
+	    annotations are always flattened if an appearance stream can
+	    be found.
+	  - QPDFAnnotationObjectHelper::getPageContentForAppearance -
+	    generate the content stream fragment to render an appearance
+	    stream in a page's content stream. Called by flattenAnnotations.
+	  - QPDFAnnotationObjectHelper::getAnnotationAppearanceMatrix -
+	    calculate the matrix that will transform from the appearance
+	    stream coordinates to the page coordinates. Called by
+	    getPageContentForAppearance.
+
 	* Add method QPDFObjectHandle::mergeDictionary(), which
 	recursively merges dictionaries with semantics designed for
 	merging resource dictionaries. See detailed description in

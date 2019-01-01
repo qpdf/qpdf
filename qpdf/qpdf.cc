@@ -102,6 +102,7 @@ struct Options
         keep_files_open_set(false),
         newline_before_endstream(false),
         coalesce_contents(false),
+        flatten_annotations(false),
         show_npages(false),
         deterministic_id(false),
         static_id(false),
@@ -174,6 +175,7 @@ struct Options
     bool newline_before_endstream;
     std::string linearize_pass1;
     bool coalesce_contents;
+    bool flatten_annotations;
     std::string min_version;
     std::string force_version;
     bool show_npages;
@@ -473,6 +475,7 @@ class ArgParser
     void argNewlineBeforeEndstream();
     void argLinearizePass1(char* parameter);
     void argCoalesceContents();
+    void argFlattenAnnotations();
     void argMinVersion(char* parameter);
     void argForceVersion(char* parameter);
     void argSplitPages(char* parameter);
@@ -670,6 +673,7 @@ ArgParser::initOptionTable()
     (*t)["linearize-pass1"] = oe_requiredParameter(
         &ArgParser::argLinearizePass1, "filename");
     (*t)["coalesce-contents"] = oe_bare(&ArgParser::argCoalesceContents);
+    (*t)["flatten-annotations"] = oe_bare(&ArgParser::argFlattenAnnotations);
     (*t)["min-version"] = oe_requiredParameter(
         &ArgParser::argMinVersion, "version");
     (*t)["force-version"] = oe_requiredParameter(
@@ -1116,6 +1120,12 @@ void
 ArgParser::argCoalesceContents()
 {
     o.coalesce_contents = true;
+}
+
+void
+ArgParser::argFlattenAnnotations()
+{
+    o.flatten_annotations = true;
 }
 
 void
@@ -1759,6 +1769,9 @@ familiar with the PDF file format or who are PDF developers.\n\
                           preserve unreferenced page resources\n\
 --newline-before-endstream  always put a newline before endstream\n\
 --coalesce-contents       force all pages' content to be a single stream\n\
+--flatten-annotations     incorporate rendering of annotations into page\n\
+                          contents including those for interactive form\n\
+                          fields\n\
 --qdf                     turns on \"QDF mode\" (below)\n\
 --linearize-pass1=file    write intermediate pass of linearized file\n\
                           for debugging\n\
@@ -3124,6 +3137,10 @@ static void do_inspection(QPDF& pdf, Options& o)
 static void handle_transformations(QPDF& pdf, Options& o)
 {
     QPDFPageDocumentHelper dh(pdf);
+    if (o.flatten_annotations)
+    {
+        dh.flattenAnnotations();
+    }
     if (o.coalesce_contents)
     {
         std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();

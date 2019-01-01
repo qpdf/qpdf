@@ -1447,6 +1447,62 @@ $td->runtest("check output",
 
 show_ntests();
 # ----------
+$td->notify("--- Flatten Form/Annotations ---");
+
+# manual-appearances was created by hand-coding appearance streams
+# with graphics that make it easy to test matrix calculations. The
+# result of flattening the annotations was compared visually with
+# okular. Some PDF viewers don't actually display the original version
+# correctly. The pages are as follows:
+# - page 1: normal
+# - page 2: rotate 90 with /F 20 (NoRotate)
+# - page 3: non-trivial matrix
+# - page 4: non-trivial matrix, rotate
+# - page 5: rotate 180 with /F 20
+# - page 6: rotate 90, /F 20, non-trivial matrix
+# - page 7: normal -- available for additional testing
+# - page 8: rotate 270 with /F 20
+# - page 9: normal -- available for additional testing
+#
+# form-filled-by-acrobat was filled in using the Acrobat Reader
+# android app. One of its appearance streams is actually an image.
+#
+# need-appearances is based on form-field-types with manual edits to
+# turn on NeedAppearances, change /V for a field, and add the comment
+# annotation from comment-annotation.pdf. The test output includes a
+# flattened version of the comment annotation but not of the form
+# fields.
+my @annotation_files = (
+    'manual-appearances',
+    'form-filled-by-acrobat',
+    'comment-annotation',
+    'comment-annotation-direct',
+    'form-field-types',
+    'need-appearances',
+    );
+$n_tests += 2 * scalar(@annotation_files);
+
+foreach my $f (@annotation_files)
+{
+    my $exp_out = {$td->STRING => "", $td->EXIT_STATUS => 0};
+    if (-f "$f-warn.out")
+    {
+        $exp_out = {$td->FILE => "$f-warn.out", $td->EXIT_STATUS => 3};
+    }
+    $td->runtest("flatten $f",
+                 {$td->COMMAND =>
+                      "qpdf --qdf --static-id --no-original-object-ids" .
+                      " --flatten-annotations $f.pdf a.pdf"},
+                 $exp_out,
+                 $td->NORMALIZE_NEWLINES);
+    copy("a.pdf", "$f-out.pdf");
+    $td->runtest("check output",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => "$f-out.pdf"});
+}
+
+show_ntests();
+# ----------
 $td->notify("--- Merging and Splitting ---");
 $n_tests += 18;
 

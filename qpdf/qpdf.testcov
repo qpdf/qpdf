@@ -377,3 +377,15 @@ QPDFObjectHandle merge array dup 0
 QPDFObjectHandle merge copy from other 0
 QPDFObjectHandle merge loop 0
 QPDFObjectHandle merge equal indirect 0
+QPDFAnnotationObjectHelper explicit matrix 0
+QPDFAnnotationObjectHelper default matrix 0
+QPDFAnnotationObjectHelper rotate 90 0
+QPDFAnnotationObjectHelper rotate 180 0
+QPDFAnnotationObjectHelper rotate 270 0
+QPDFPageDocumentHelper indirect resources 0
+QPDFPageDocumentHelper skip widget need appearances 0
+QPDFPageDocumentHelper merge DR 0
+QPDFPageDocumentHelper non-widget annotation 0
+QPDFPageDocumentHelper remove annots 0
+QPDFPageDocumentHelper replace indirect annots 0
+QPDFPageDocumentHelper replace direct annots 0
