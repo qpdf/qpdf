@@ -190,6 +190,70 @@ QPDFFormFieldObjectHelper::getQuadding()
     return result;
 }
 
+int
+QPDFFormFieldObjectHelper::getFlags()
+{
+    QPDFObjectHandle f = getInheritableFieldValue("/Ff");
+    return f.isInteger() ? f.getIntValue() : 0;
+}
+
+bool
+QPDFFormFieldObjectHelper::isText()
+{
+    return (getFieldType() == "/Tx");
+}
+
+bool
+QPDFFormFieldObjectHelper::isCheckbox()
+{
+    return ((getFieldType() == "/Btn") &&
+            ((getFlags() & (ff_btn_radio | ff_btn_pushbutton)) == 0));
+}
+
+bool
+QPDFFormFieldObjectHelper::isRadioButton()
+{
+    return ((getFieldType() == "/Btn") &&
+            ((getFlags() & ff_btn_radio) == ff_btn_radio));
+}
+
+bool
+QPDFFormFieldObjectHelper::isPushbutton()
+{
+    return ((getFieldType() == "/Btn") &&
+            ((getFlags() & ff_btn_pushbutton) == ff_btn_pushbutton));
+}
+
+bool
+QPDFFormFieldObjectHelper::isChoice()
+{
+    return (getFieldType() == "/Ch");
+}
+
+std::vector<std::string>
+QPDFFormFieldObjectHelper::getChoices()
+{
+    std::vector<std::string> result;
+    if (! isChoice())
+    {
+        return result;
+    }
+    QPDFObjectHandle opt = getInheritableFieldValue("/Opt");
+    if (opt.isArray())
+    {
+        size_t n = opt.getArrayNItems();
+        for (size_t i = 0; i < n; ++i)
+        {
+            QPDFObjectHandle item = opt.getArrayItem(i);
+            if (item.isString())
+            {
+                result.push_back(item.getUTF8Value());
+            }
+        }
+    }
+    return result;
+}
+
 void
 QPDFFormFieldObjectHelper::setFieldAttribute(
     std::string const& key, QPDFObjectHandle value)

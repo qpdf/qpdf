@@ -1,4 +1,9 @@
 {
+  "acroform": {
+    "fields": [],
+    "hasacroform": false,
+    "needappearances": false
+  },
   "objects": {
     "1 0 R": {
       "/Dests": "107 0 R",

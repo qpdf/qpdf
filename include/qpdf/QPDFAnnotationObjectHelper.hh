@@ -61,6 +61,11 @@ class QPDFAnnotationObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     std::string getAppearanceState();
 
+    // Return flags from "/F". The value is a logical or of
+    // pdf_annotation_flag_e as defined in qpdf/Constants.h.
+    QPDF_DLL
+    int getFlags();
+
     // Return a specific stream. "which" may be one of "/N", "/R", or
     // "/D" to indicate the normal, rollover, or down appearance
     // stream. (Any value may be passed to "which"; if an appearance

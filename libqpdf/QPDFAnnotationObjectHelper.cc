@@ -49,6 +49,13 @@ QPDFAnnotationObjectHelper::getAppearanceState()
     return "";
 }
 
+int
+QPDFAnnotationObjectHelper::getFlags()
+{
+    QPDFObjectHandle flags_obj = this->oh.getKey("/F");
+    return flags_obj.isInteger() ? flags_obj.getIntValue() : 0;
+}
+
 QPDFObjectHandle
 QPDFAnnotationObjectHelper::getAppearanceStream(
     std::string const& which,
@@ -169,13 +176,11 @@ QPDFAnnotationObjectHelper::getPageContentForAppearance(
     //    appearance matrix.
 
     QPDFObjectHandle rect_obj = this->oh.getKey("/Rect");
-    QPDFObjectHandle flags_obj = this->oh.getKey("/F");
     QPDFObjectHandle as = getAppearanceStream("/N").getDict();
     QPDFObjectHandle bbox_obj = as.getKey("/BBox");
     QPDFObjectHandle matrix_obj = as.getKey("/Matrix");
 
-    int flags = flags_obj.isInteger() ? flags_obj.getIntValue() : 0;
-
+    int flags = getFlags();
     if (flags & forbidden_flags)
     {
         QTC::TC("qpdf", "QPDFAnnotationObjectHelper forbidden flags");

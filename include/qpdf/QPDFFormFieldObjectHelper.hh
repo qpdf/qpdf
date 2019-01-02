@@ -29,6 +29,7 @@
 #include <qpdf/QPDFObjectHelper.hh>
 
 #include <qpdf/DLL.h>
+#include <vector>
 
 class QPDFFormFieldObjectHelper: public QPDFObjectHelper
 {
@@ -119,6 +120,38 @@ class QPDFFormFieldObjectHelper: public QPDFObjectHelper
     // tree into account. Returns 0 if quadding is not specified.
     QPDF_DLL
     int getQuadding();
+
+    // Return field flags from /Ff. The value is a logical or of
+    // pdf_form_field_flag_e as defined in qpdf/Constants.h
+    QPDF_DLL
+    int getFlags();
+
+    // Methods for testing for particular types of form fields
+
+    // Returns true if field is of type /Tx
+    QPDF_DLL
+    bool isText();
+    // Returns true if field is of type /Btn and flags do not indicate
+    // some other type of button.
+    QPDF_DLL
+    bool isCheckbox();
+    // Returns true if field is a checkbox and is checked.
+    QPDF_DLL
+    bool isChecked();
+    // Returns true if field is of type /Btn and flags indicate that
+    // it is a radio button
+    QPDF_DLL
+    bool isRadioButton();
+    // Returns true if field is of type /Btn and flags indicate that
+    // it is a pushbutton
+    QPDF_DLL
+    bool isPushbutton();
+    // Returns true if fields if of type /Ch
+    QPDF_DLL
+    bool isChoice();
+    // Returns choices as UTF-8 strings
+    QPDF_DLL
+    std::vector<std::string> getChoices();
 
     // Set an attribute to the given value
     QPDF_DLL

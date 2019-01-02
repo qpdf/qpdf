@@ -18,6 +18,7 @@
 #include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QPDFPageLabelDocumentHelper.hh>
 #include <qpdf/QPDFOutlineDocumentHelper.hh>
+#include <qpdf/QPDFAcroFormDocumentHelper.hh>
 #include <qpdf/QPDFExc.hh>
 
 #include <qpdf/QPDFWriter.hh>
@@ -385,6 +386,95 @@ static JSON json_schema(std::set<std::string>* keys = 0)
             JSON::makeString("position of destination page in document"
                              " numbered from 1; null if not known"));
     }
+    if (all_keys || keys->count("acroform"))
+    {
+        JSON acroform = schema.addDictionaryMember(
+            "acroform", JSON::makeDictionary());
+        acroform.addDictionaryMember(
+            "hasacroform",
+            JSON::makeString("whether the document has interactive forms"));
+        acroform.addDictionaryMember(
+            "needappearances",
+            JSON::makeString("whether the form fields' appearance"
+                             " streams need to be regenerated"));
+        JSON fields = acroform.addDictionaryMember(
+            "fields", JSON::makeArray()).
+            addArrayElement(JSON::makeDictionary());
+        fields.addDictionaryMember(
+            "object",
+            JSON::makeString("reference to this form field"));
+        fields.addDictionaryMember(
+            "parent",
+            JSON::makeString("reference to this field's parent"));
+        fields.addDictionaryMember(
+            "pageposfrom1",
+            JSON::makeString("position of containing page numbered from 1"));
+        fields.addDictionaryMember(
+            "fieldtype",
+            JSON::makeString("field type"));
+        fields.addDictionaryMember(
+            "fieldflags",
+            JSON::makeString(
+                "form field flags from /Ff --"
+                " see pdf_form_field_flag_e in qpdf/Constants.h"));
+        fields.addDictionaryMember(
+            "fullname",
+            JSON::makeString("full name of field"));
+        fields.addDictionaryMember(
+            "partialname",
+            JSON::makeString("partial name of field"));
+        fields.addDictionaryMember(
+            "alternativename",
+            JSON::makeString(
+                "alternative name of field --"
+                " this is the one usually shown to users"));
+        fields.addDictionaryMember(
+            "mappingname",
+            JSON::makeString("mapping name of field"));
+        fields.addDictionaryMember(
+            "value",
+            JSON::makeString("value of field"));
+        fields.addDictionaryMember(
+            "defaultvalue",
+            JSON::makeString("default value of field"));
+        fields.addDictionaryMember(
+            "quadding",
+            JSON::makeString(
+                "field quadding --"
+                " number indicating left, center, or right"));
+        fields.addDictionaryMember(
+            "ischeckbox",
+            JSON::makeString("whether field is a checkbox"));
+        fields.addDictionaryMember(
+            "isradiobutton",
+            JSON::makeString("whether field is a radiobutton --"
+                             " buttons in a single group share a parent"));
+        fields.addDictionaryMember(
+            "ischoice",
+            JSON::makeString("whether field is a list, combo, or dropdown"));
+        fields.addDictionaryMember(
+            "istext",
+            JSON::makeString("whether field is a text field"));
+        JSON j_choices = fields.addDictionaryMember(
+            "choices",
+            JSON::makeString("for choices fields, the list of"
+                             " choices presented to the user"));
+        JSON annotation = fields.addDictionaryMember(
+            "annotation", JSON::makeDictionary());
+        annotation.addDictionaryMember(
+            "object",
+            JSON::makeString("reference to the annotation object"));
+        annotation.addDictionaryMember(
+            "appearancestate",
+            JSON::makeString("appearance state --"
+                             " can be used to determine value for"
+                             " checkboxes and radio buttons"));
+        annotation.addDictionaryMember(
+            "annotationflags",
+            JSON::makeString(
+                "annotation flags from /F --"
+                " see pdf_annotation_flag_e in qpdf/Constants.h"));
+    }
     return schema;
 }
 
@@ -710,7 +800,7 @@ ArgParser::initOptionTable()
     // The list of selectable top-level keys id duplicated in three
     // places: json_schema, do_json, and initOptionTable.
     char const* json_key_choices[] = {
-        "objects", "pages", "pagelabels", "outlines", 0};
+        "objects", "pages", "pagelabels", "outlines", "acroform", 0};
     (*t)["json-key"] = oe_requiredChoices(
         &ArgParser::argJsonKey, json_key_choices);
     (*t)["json-object"] = oe_requiredParameter(
@@ -3022,6 +3112,109 @@ static void do_json_outlines(QPDF& pdf, Options& o, JSON& j)
     add_outlines_to_json(odh.getTopLevelOutlines(), j_outlines, page_numbers);
 }
 
+static void do_json_acroform(QPDF& pdf, Options& o, JSON& j)
+{
+    JSON j_acroform = j.addDictionaryMember(
+        "acroform", JSON::makeDictionary());
+    QPDFAcroFormDocumentHelper afdh(pdf);
+    j_acroform.addDictionaryMember(
+        "hasacroform",
+        JSON::makeBool(afdh.hasAcroForm()));
+    j_acroform.addDictionaryMember(
+        "needappearances",
+        JSON::makeBool(afdh.getNeedAppearances()));
+    JSON j_fields = j_acroform.addDictionaryMember(
+        "fields", JSON::makeArray());
+    QPDFPageDocumentHelper pdh(pdf);
+    std::vector<QPDFPageObjectHelper> pages = pdh.getAllPages();
+    int pagepos1 = 0;
+    for (std::vector<QPDFPageObjectHelper>::iterator page_iter =
+             pages.begin();
+         page_iter != pages.end(); ++page_iter)
+    {
+        ++pagepos1;
+        std::vector<QPDFAnnotationObjectHelper> annotations =
+            afdh.getWidgetAnnotationsForPage(*page_iter);
+        for (std::vector<QPDFAnnotationObjectHelper>::iterator annot_iter =
+                 annotations.begin();
+             annot_iter != annotations.end(); ++annot_iter)
+        {
+            QPDFAnnotationObjectHelper& aoh = *annot_iter;
+            QPDFFormFieldObjectHelper ffh =
+                afdh.getFieldForAnnotation(aoh);
+            JSON j_field = j_fields.addArrayElement(
+                JSON::makeDictionary());
+            j_field.addDictionaryMember(
+                "object",
+                ffh.getObjectHandle().getJSON());
+            j_field.addDictionaryMember(
+                "parent",
+                ffh.getObjectHandle().getKey("/Parent").getJSON());
+            j_field.addDictionaryMember(
+                "pageposfrom1",
+                JSON::makeInt(pagepos1));
+            j_field.addDictionaryMember(
+                "fieldtype",
+                JSON::makeString(ffh.getFieldType()));
+            j_field.addDictionaryMember(
+                "fieldflags",
+                JSON::makeInt(ffh.getFlags()));
+            j_field.addDictionaryMember(
+                "fullname",
+                JSON::makeString(ffh.getFullyQualifiedName()));
+            j_field.addDictionaryMember(
+                "partialname",
+                JSON::makeString(ffh.getPartialName()));
+            j_field.addDictionaryMember(
+                "alternativename",
+                JSON::makeString(ffh.getAlternativeName()));
+            j_field.addDictionaryMember(
+                "mappingname",
+                JSON::makeString(ffh.getMappingName()));
+            j_field.addDictionaryMember(
+                "value",
+                ffh.getValue().getJSON());
+            j_field.addDictionaryMember(
+                "defaultvalue",
+                ffh.getDefaultValue().getJSON());
+            j_field.addDictionaryMember(
+                "quadding",
+                JSON::makeInt(ffh.getQuadding()));
+            j_field.addDictionaryMember(
+                "ischeckbox",
+                JSON::makeBool(ffh.isCheckbox()));
+            j_field.addDictionaryMember(
+                "isradiobutton",
+                JSON::makeBool(ffh.isRadioButton()));
+            j_field.addDictionaryMember(
+                "ischoice",
+                JSON::makeBool(ffh.isChoice()));
+            j_field.addDictionaryMember(
+                "istext",
+                JSON::makeBool(ffh.isText()));
+            JSON j_choices = j_field.addDictionaryMember(
+                "choices", JSON::makeArray());
+            std::vector<std::string> choices = ffh.getChoices();
+            for (std::vector<std::string>::iterator iter = choices.begin();
+                 iter != choices.end(); ++iter)
+            {
+                j_choices.addArrayElement(JSON::makeString(*iter));
+            }
+            JSON j_annot = j_field.addDictionaryMember(
+                "annotation", JSON::makeDictionary());
+            j_annot.addDictionaryMember(
+                "object",
+                aoh.getObjectHandle().getJSON());
+            j_annot.addDictionaryMember(
+                "appearancestate",
+                JSON::makeString(aoh.getAppearanceState()));
+            j_annot.addDictionaryMember(
+                "annotationflags",
+                JSON::makeInt(aoh.getFlags()));
+        }
+    }
+}
+
 static void do_json(QPDF& pdf, Options& o)
 {
     JSON j = JSON::makeDictionary();
@@ -3069,6 +3262,10 @@ static void do_json(QPDF& pdf, Options& o)
     if (all_keys || o.json_keys.count("outlines"))
     {
         do_json_outlines(pdf, o, j);
+    }
+    if (all_keys || o.json_keys.count("acroform"))
+    {
+        do_json_acroform(pdf, o, j);
     }
 
     // Check against schema

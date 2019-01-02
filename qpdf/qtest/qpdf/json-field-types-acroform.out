@@ -1,0 +1,392 @@
+{
+  "acroform": {
+    "fields": [
+      {
+        "alternativename": "text",
+        "annotation": {
+          "annotationflags": 4,
+          "appearancestate": "",
+          "object": "4 0 R"
+        },
+        "choices": [],
+        "defaultvalue": "",
+        "fieldflags": 0,
+        "fieldtype": "/Tx",
+        "fullname": "text",
+        "ischeckbox": false,
+        "ischoice": false,
+        "isradiobutton": false,
+        "istext": true,
+        "mappingname": "text",
+        "object": "4 0 R",
+        "pageposfrom1": 1,
+        "parent": null,
+        "partialname": "text",
+        "quadding": 0,
+        "value": ""
+      },
+      {
+        "alternativename": "r1",
+        "annotation": {
+          "annotationflags": 4,
+          "appearancestate": "/1",
+          "object": "21 0 R"
+        },
+        "choices": [],
+        "defaultvalue": "/1",
+        "fieldflags": 49152,
+        "fieldtype": "/Btn",
+        "fullname": "r1",
+        "ischeckbox": false,
+        "ischoice": false,
+        "isradiobutton": true,
+        "istext": false,
+        "mappingname": "r1",
+        "object": "21 0 R",
+        "pageposfrom1": 1,
+        "parent": "5 0 R",
+        "partialname": "",
+        "quadding": 0,
+        "value": "/1"
+      },
+      {
+        "alternativename": "r1",
+        "annotation": {
+          "annotationflags": 4,
+          "appearancestate": "/Off",
+          "object": "22 0 R"
+        },
+        "choices": [],
+        "defaultvalue": "/1",
+        "fieldflags": 49152,
+        "fieldtype": "/Btn",
+        "fullname": "r1",
+        "ischeckbox": false,
+        "ischoice": false,
+        "isradiobutton": true,
+        "istext": false,
+        "mappingname": "r1",
+        "object": "22 0 R",
+        "pageposfrom1": 1,
+        "parent": "5 0 R",
+        "partialname": "",
+        "quadding": 0,
+        "value": "/1"
+      },
+      {
+        "alternativename": "r1",
+        "annotation": {
+          "annotationflags": 4,
+          "appearancestate": "/Off",
+          "object": "23 0 R"
+        },
+        "choices": [],
+        "defaultvalue": "/1",
+        "fieldflags": 49152,
+        "fieldtype": "/Btn",
+        "fullname": "r1",
+        "ischeckbox": false,
+        "ischoice": false,
+        "isradiobutton": true,
+        "istext": false,
+        "mappingname": "r1",
+        "object": "23 0 R",
+        "pageposfrom1": 1,
+        "parent": "5 0 R",
+        "partialname": "",
+        "quadding": 0,
+        "value": "/1"
+      },
+      {
+        "alternativename": "checkbox1",
+        "annotation": {
+          "annotationflags": 4,
+          "appearancestate": "/Off",
+          "object": "6 0 R"
+        },
+        "choices": [],
+        "defaultvalue": "/Off",
+        "fieldflags": 0,
+        "fieldtype": "/Btn",
+        "fullname": "checkbox1",
+        "ischeckbox": true,
+        "ischoice": false,
+        "isradiobutton": false,
+        "istext": false,
+        "mappingname": "checkbox1",
+        "object": "6 0 R",
+        "pageposfrom1": 1,
+        "parent": null,
+        "partialname": "checkbox1",
+        "quadding": 0,
+        "value": "/Off"
+      },
+      {
+        "alternativename": "checkbox2",
+        "annotation": {
+          "annotationflags": 4,
+          "appearancestate": "/Yes",
+          "object": "7 0 R"
+        },
+        "choices": [],
+        "defaultvalue": "/Yes",
+        "fieldflags": 0,
+        "fieldtype": "/Btn",
+        "fullname": "checkbox2",
+        "ischeckbox": true,
+        "ischoice": false,
+        "isradiobutton": false,
+        "istext": false,
+        "mappingname": "checkbox2",
+        "object": "7 0 R",
+        "pageposfrom1": 1,
+        "parent": null,
+        "partialname": "checkbox2",
+        "quadding": 0,
+        "value": "/Yes"
+      },
+      {
+        "alternativename": "checkbox3",
+        "annotation": {
+          "annotationflags": 4,
+          "appearancestate": "/Off",
+          "object": "8 0 R"
+        },
+        "choices": [],
+        "defaultvalue": "/Off",
+        "fieldflags": 0,
+        "fieldtype": "/Btn",
+        "fullname": "checkbox3",
+        "ischeckbox": true,
+        "ischoice": false,
+        "isradiobutton": false,
+        "istext": false,
+        "mappingname": "checkbox3",
+        "object": "8 0 R",
+        "pageposfrom1": 1,
+        "parent": null,
+        "partialname": "checkbox3",
+        "quadding": 0,
+        "value": "/Off"
+      },
+      {
+        "alternativename": "r2",
+        "annotation": {
+          "annotationflags": 4,
+          "appearancestate": "/Off",
+          "object": "37 0 R"
+        },
+        "choices": [],
+        "defaultvalue": "/2",
+        "fieldflags": 49152,
+        "fieldtype": "/Btn",
+        "fullname": "r2",
+        "ischeckbox": false,
+        "ischoice": false,
+        "isradiobutton": true,
+        "istext": false,
+        "mappingname": "r2",
+        "object": "37 0 R",
+        "pageposfrom1": 1,
+        "parent": "9 0 R",
+        "partialname": "",
+        "quadding": 0,
+        "value": "/2"
+      },
+      {
+        "alternativename": "r2",
+        "annotation": {
+          "annotationflags": 4,
+          "appearancestate": "/2",
+          "object": "38 0 R"
+        },
+        "choices": [],
+        "defaultvalue": "/2",
+        "fieldflags": 49152,
+        "fieldtype": "/Btn",
+        "fullname": "r2",
+        "ischeckbox": false,
+        "ischoice": false,
+        "isradiobutton": true,
+        "istext": false,
+        "mappingname": "r2",
+        "object": "38 0 R",
+        "pageposfrom1": 1,
+        "parent": "9 0 R",
+        "partialname": "",
+        "quadding": 0,
+        "value": "/2"
+      },
+      {
+        "alternativename": "r2",
+        "annotation": {
+          "annotationflags": 4,
+          "appearancestate": "/Off",
+          "object": "39 0 R"
+        },
+        "choices": [],
+        "defaultvalue": "/2",
+        "fieldflags": 49152,
+        "fieldtype": "/Btn",
+        "fullname": "r2",
+        "ischeckbox": false,
+        "ischoice": false,
+        "isradiobutton": true,
+        "istext": false,
+        "mappingname": "r2",
+        "object": "39 0 R",
+        "pageposfrom1": 1,
+        "parent": "9 0 R",
+        "partialname": "",
+        "quadding": 0,
+        "value": "/2"
+      },
+      {
+        "alternativename": "text2",
+        "annotation": {
+          "annotationflags": 4,
+          "appearancestate": "",
+          "object": "10 0 R"
+        },
+        "choices": [],
+        "defaultvalue": "salad πʬ",
+        "fieldflags": 0,
+        "fieldtype": "/Tx",
+        "fullname": "text2",
+        "ischeckbox": false,
+        "ischoice": false,
+        "isradiobutton": false,
+        "istext": true,
+        "mappingname": "text2",
+        "object": "10 0 R",
+        "pageposfrom1": 1,
+        "parent": null,
+        "partialname": "text2",
+        "quadding": 0,
+        "value": "salad πʬ"
+      },
+      {
+        "alternativename": "combolist1",
+        "annotation": {
+          "annotationflags": 4,
+          "appearancestate": "",
+          "object": "13 0 R"
+        },
+        "choices": [
+          "one",
+          "two",
+          "pi",
+          "four"
+        ],
+        "defaultvalue": "",
+        "fieldflags": 393216,
+        "fieldtype": "/Ch",
+        "fullname": "combolist1",
+        "ischeckbox": false,
+        "ischoice": true,
+        "isradiobutton": false,
+        "istext": false,
+        "mappingname": "combolist1",
+        "object": "13 0 R",
+        "pageposfrom1": 1,
+        "parent": null,
+        "partialname": "combolist1",
+        "quadding": 0,
+        "value": ""
+      },
+      {
+        "alternativename": "list1",
+        "annotation": {
+          "annotationflags": 4,
+          "appearancestate": "",
+          "object": "11 0 R"
+        },
+        "choices": [
+          "five",
+          "six",
+          "seven",
+          "eight"
+        ],
+        "defaultvalue": "",
+        "fieldflags": 0,
+        "fieldtype": "/Ch",
+        "fullname": "list1",
+        "ischeckbox": false,
+        "ischoice": true,
+        "isradiobutton": false,
+        "istext": false,
+        "mappingname": "list1",
+        "object": "11 0 R",
+        "pageposfrom1": 1,
+        "parent": null,
+        "partialname": "list1",
+        "quadding": 0,
+        "value": ""
+      },
+      {
+        "alternativename": "drop1",
+        "annotation": {
+          "annotationflags": 4,
+          "appearancestate": "",
+          "object": "12 0 R"
+        },
+        "choices": [
+          "nine",
+          "ten",
+          "elephant",
+          "twelve"
+        ],
+        "defaultvalue": "",
+        "fieldflags": 131072,
+        "fieldtype": "/Ch",
+        "fullname": "drop1",
+        "ischeckbox": false,
+        "ischoice": true,
+        "isradiobutton": false,
+        "istext": false,
+        "mappingname": "drop1",
+        "object": "12 0 R",
+        "pageposfrom1": 1,
+        "parent": null,
+        "partialname": "drop1",
+        "quadding": 0,
+        "value": ""
+      },
+      {
+        "alternativename": "combodrop1",
+        "annotation": {
+          "annotationflags": 4,
+          "appearancestate": "",
+          "object": "14 0 R"
+        },
+        "choices": [
+          "alpha",
+          "beta",
+          "gamma",
+          "delta"
+        ],
+        "defaultvalue": "",
+        "fieldflags": 393216,
+        "fieldtype": "/Ch",
+        "fullname": "combodrop1",
+        "ischeckbox": false,
+        "ischoice": true,
+        "isradiobutton": false,
+        "istext": false,
+        "mappingname": "combodrop1",
+        "object": "14 0 R",
+        "pageposfrom1": 1,
+        "parent": null,
+        "partialname": "combodrop1",
+        "quadding": 0,
+        "value": ""
+      }
+    ],
+    "hasacroform": true,
+    "needappearances": true
+  },
+  "parameters": {
+    "decodelevel": "generalized"
+  },
+  "version": 1
+}

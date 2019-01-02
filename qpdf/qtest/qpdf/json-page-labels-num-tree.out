@@ -1,4 +1,9 @@
 {
+  "acroform": {
+    "fields": [],
+    "hasacroform": false,
+    "needappearances": false
+  },
   "objects": {
     "1 0 R": {
       "/PageLabels": "2 0 R",

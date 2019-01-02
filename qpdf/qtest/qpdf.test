@@ -195,7 +195,9 @@ $n_tests += scalar(@form_tests) + 2;
 # modifying the resulting PDF in various ways. That file would be good
 # starting point for generation of more complex forms should that be
 # required in the future. The file storage/form.pdf is a direct export
-# from LibreOffice with no modifications.
+# from LibreOffice with no modifications. The files
+# storage/field-types.odt and storage/field-types.pdf are the basis of
+# field-types.pdf used elsewhere in the test suite.
 
 foreach my $f (@form_tests)
 {
@@ -356,6 +358,7 @@ my @json_files = (
     ['page-labels-and-outlines', []],
     ['page-labels-num-tree', []],
     ['image-streams', []],
+    ['field-types', []],
     ['image-streams', ['--decode-level=all']],
     ['image-streams', ['--decode-level=specialized']],
     ['page-labels-and-outlines', ['--json-key=objects']],
@@ -368,6 +371,8 @@ my @json_files = (
      ['--json-key=objects', '--json-object=trailer']],
     ['page-labels-and-outlines',
      ['--json-key=objects', '--json-object=trailer', '--json-object=2 0 R']],
+    ['field-types', ['--json-key=acroform']],
+    ['need-appearances', ['--json-key=acroform']],
 );
 $n_tests += scalar(@json_files);
 foreach my $d (@json_files)
