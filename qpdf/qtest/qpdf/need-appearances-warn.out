@@ -1,2 +1,2 @@
-WARNING: need-appearances.pdf object stream 1, object 2 0 at offset 438: document does not have updated appearance streams, so form fields will not be flattened
+WARNING: need-appearances.pdf, object 1 0 at offset 50: document does not have updated appearance streams, so form fields will not be flattened
 qpdf: operation succeeded with warnings; resulting file may have some problems

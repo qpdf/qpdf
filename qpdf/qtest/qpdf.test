@@ -1473,11 +1473,19 @@ $td->notify("--- Flatten Form/Annotations ---");
 # form-filled-by-acrobat was filled in using the Acrobat Reader
 # android app. One of its appearance streams is actually an image.
 #
-# need-appearances is based on sample-form with manual edits to
-# turn on NeedAppearances, change /V for a field, and add the comment
-# annotation from comment-annotation.pdf. The test output includes a
-# flattened version of the comment annotation but not of the form
-# fields.
+# need-appearances.pdf is based on field-types.pdf with manual edits
+# to turn on NeedAppearances, change /V for several fields, and add
+# the comment annotation from comment-annotation.pdf. The test output
+# includes a flattened version of the comment annotation but not of
+# the form fields. Changes:
+# - field-types.pdf has /NeedAppearances true
+# - text1: blank -> abc
+# - r1: 1 -> 2
+# - list1: blank -> five
+# - combolist1: blank -> pi
+# - drop1: blank -> elephant
+# - combodrop1: blank -> delta
+
 my @annotation_files = (
     'manual-appearances',
     'form-filled-by-acrobat',
