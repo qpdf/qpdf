@@ -1228,7 +1228,11 @@ QPDF::getObjectCount()
     {
 	o1 = (*(this->m->obj_cache.rbegin())).first;
     }
-    QPDFObjGen o2 = (*(this->m->xref_table.rbegin())).first;
+    QPDFObjGen o2(0, 0);
+    if (! this->m->xref_table.empty())
+    {
+	o2 = (*(this->m->xref_table.rbegin())).first;
+    }
     QTC::TC("qpdf", "QPDF indirect last obj from xref",
 	    (o2.getObj() > o1.getObj()) ? 1 : 0);
     return std::max(o1.getObj(), o2.getObj());
