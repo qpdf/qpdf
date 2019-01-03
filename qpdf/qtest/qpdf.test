@@ -188,7 +188,7 @@ my @form_tests = (
     'form-errors',
     );
 
-$n_tests += scalar(@form_tests) + 2;
+$n_tests += scalar(@form_tests) + 6;
 
 # Many of the form*.pdf files were created by converting the
 # LibreOffice document storage/form.odt to PDF and then manually
@@ -215,6 +215,22 @@ $td->runtest("fill fields",
 $td->runtest("compare files",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "form-no-need-appearances-filled.pdf"});
+
+$td->runtest("button fields",
+             {$td->COMMAND => "test_driver 51 button-set.pdf"},
+             {$td->FILE => "button-set.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("compare files",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "button-set-out.pdf"});
+
+$td->runtest("broken button fields",
+             {$td->COMMAND => "test_driver 51 button-set-broken.pdf"},
+             {$td->FILE => "button-set-broken.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("compare files",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "button-set-broken-out.pdf"});
 
 show_ntests();
 # ----------

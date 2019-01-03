@@ -1,0 +1,7 @@
+setting r1 via parent
+WARNING: button-set-broken.pdf, object 5 0 at offset 995: unable to set the value of this radio button
+turning checkbox1 on
+turning checkbox2 off
+WARNING: button-set-broken.pdf, object 7 0 at offset 1354: unable to set the value of this checkbox
+setting r2 via child
+test 51 done

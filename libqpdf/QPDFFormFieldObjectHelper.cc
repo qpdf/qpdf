@@ -272,6 +272,47 @@ void
 QPDFFormFieldObjectHelper::setV(
     QPDFObjectHandle value, bool need_appearances)
 {
+    if (getFieldType() == "/Btn")
+    {
+        if (isCheckbox())
+        {
+            bool okay = false;
+            if (value.isName())
+            {
+                std::string name = value.getName();
+                if ((name == "/Yes") || (name == "/Off"))
+                {
+                    okay = true;
+                    setCheckBoxValue((name == "/Yes"));
+                }
+            }
+            if (! okay)
+            {
+                this->oh.warnIfPossible(
+                    "ignoring attempt to set a checkbox field to a"
+                    " value of other than /Yes or /Off");
+            }
+        }
+        else if (isRadioButton())
+        {
+            if (value.isName())
+            {
+                setRadioButtonValue(value);
+            }
+            else
+            {
+                this->oh.warnIfPossible(
+                    "ignoring attempt to set a radio button field to"
+                    " an object that is not a name");
+            }
+        }
+        else if (isPushbutton())
+        {
+            this->oh.warnIfPossible(
+                "ignoring attempt set the value of a pushbutton field");
+        }
+        return;
+    }
     setFieldAttribute("/V", value);
     if (need_appearances)
     {
@@ -293,4 +334,139 @@ QPDFFormFieldObjectHelper::setV(
 {
     setV(QPDFObjectHandle::newUnicodeString(utf8_value),
          need_appearances);
+}
+
+void
+QPDFFormFieldObjectHelper::setRadioButtonValue(QPDFObjectHandle name)
+{
+    // Set the value of a radio button field. This has the following
+    // specific behavior:
+    // * If this is a radio button field that has a parent that is
+    //   also a radio button field and has no explicit /V, call itself
+    //   on the parent
+    // * If this is a radio button field with childen, set /V to the
+    //   given value. Then, for each child, if the child has the
+    //   specified value as one of its keys in the /N subdictionary of
+    //   its /AP (i.e. its normal appearance stream dictionary), set
+    //   /AS to name; otherwise, if /Off is a member, set /AS to /Off.
+    // Note that we never turn on /NeedAppearances when setting a
+    // radio button field.
+    QPDFObjectHandle parent = this->oh.getKey("/Parent");
+    if (parent.isDictionary() && parent.getKey("/Parent").isNull())
+    {
+        QPDFFormFieldObjectHelper ph(parent);
+        if (ph.isRadioButton())
+        {
+            // This is most likely one of the individual buttons. Try
+            // calling on the parent.
+            QTC::TC("qpdf", "QPDFFormFieldObjectHelper set parent radio button");
+            ph.setRadioButtonValue(name);
+            return;
+        }
+    }
+
+    QPDFObjectHandle kids = this->oh.getKey("/Kids");
+    if (! (isRadioButton() && parent.isNull() && kids.isArray()))
+    {
+        this->oh.warnIfPossible("don't know how to set the value"
+                                " of this field as a radio button");
+        return;
+    }
+    setFieldAttribute("/V", name);
+    int nkids = kids.getArrayNItems();
+    for (int i = 0; i < nkids; ++i)
+    {
+        QPDFObjectHandle kid = kids.getArrayItem(i);
+        QPDFObjectHandle AP = kid.getKey("/AP");
+        QPDFObjectHandle annot;
+        if (AP.isNull())
+        {
+            // The widget may be below. If there is more than one,
+            // just find the first one.
+            QPDFObjectHandle grandkids = kid.getKey("/Kids");
+            if (grandkids.isArray())
+            {
+                int ngrandkids = grandkids.getArrayNItems();
+                for (int j = 0; j < ngrandkids; ++j)
+                {
+                    QPDFObjectHandle grandkid = grandkids.getArrayItem(j);
+                    AP = grandkid.getKey("/AP");
+                    if (! AP.isNull())
+                    {
+                        QTC::TC("qpdf", "QPDFFormFieldObjectHelper radio button grandkid widget");
+                        annot = grandkid;
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            annot = kid;
+        }
+        if (! annot.isInitialized())
+        {
+            QTC::TC("qpdf", "QPDFObjectHandle broken radio button");
+            this->oh.warnIfPossible(
+                "unable to set the value of this radio button");
+            continue;
+        }
+        if (AP.isDictionary() &&
+            AP.getKey("/N").isDictionary() &&
+            AP.getKey("/N").hasKey(name.getName()))
+        {
+            QTC::TC("qpdf", "QPDFFormFieldObjectHelper turn on radio button");
+            annot.replaceKey("/AS", name);
+        }
+        else
+        {
+            QTC::TC("qpdf", "QPDFFormFieldObjectHelper turn off radio button");
+            annot.replaceKey("/AS", QPDFObjectHandle::newName("/Off"));
+        }
+    }
+}
+
+void
+QPDFFormFieldObjectHelper::setCheckBoxValue(bool value)
+{
+    // Set /AS to /Yes or /Off in addition to setting /V.
+    QPDFObjectHandle name =
+        QPDFObjectHandle::newName(value ? "/Yes" : "/Off");
+    setFieldAttribute("/V", name);
+    QPDFObjectHandle AP = this->oh.getKey("/AP");
+    QPDFObjectHandle annot;
+    if (AP.isNull())
+    {
+        // The widget may be below. If there is more than one, just
+        // find the first one.
+        QPDFObjectHandle kids = this->oh.getKey("/Kids");
+        if (kids.isArray())
+        {
+            int nkids = kids.getArrayNItems();
+            for (int i = 0; i < nkids; ++i)
+            {
+                QPDFObjectHandle kid = kids.getArrayItem(i);
+                AP = kid.getKey("/AP");
+                if (! AP.isNull())
+                {
+                    QTC::TC("qpdf", "QPDFFormFieldObjectHelper checkbox kid widget");
+                    annot = kid;
+                    break;
+                }
+            }
+        }
+    }
+    else
+    {
+        annot = this->oh;
+    }
+    if (! annot.isInitialized())
+    {
+        QTC::TC("qpdf", "QPDFObjectHandle broken checkbox");
+        this->oh.warnIfPossible(
+            "unable to set the value of this checkbox");
+        return;
+    }
+    QTC::TC("qpdf", "QPDFFormFieldObjectHelper set checkbox AS");
+    annot.replaceKey("/AS", name);
 }

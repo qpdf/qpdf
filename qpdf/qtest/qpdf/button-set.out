@@ -1,0 +1,5 @@
+setting r1 via parent
+turning checkbox1 on
+turning checkbox2 off
+setting r2 via child
+test 51 done

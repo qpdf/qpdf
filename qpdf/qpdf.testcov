@@ -390,3 +390,11 @@ QPDFObjectHandle replace with copy 0
 QPDFPageDocumentHelper indirect as resources 0
 QPDFAnnotationObjectHelper forbidden flags 0
 QPDFAnnotationObjectHelper missing required flags 0
+QPDFFormFieldObjectHelper set parent radio button 0
+QPDFFormFieldObjectHelper radio button grandkid widget 0
+QPDFFormFieldObjectHelper turn on radio button 0
+QPDFFormFieldObjectHelper turn off radio button 0
+QPDFFormFieldObjectHelper checkbox kid widget 0
+QPDFObjectHandle broken radio button 0
+QPDFFormFieldObjectHelper set checkbox AS 0
+QPDFObjectHandle broken checkbox 0

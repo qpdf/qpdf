@@ -1771,6 +1771,55 @@ void runtest(int n, char const* filename1, char const* arg2)
             std::cout << *iter << std::endl;
         }
     }
+    else if (n == 51)
+    {
+        // Test radio button and checkbox field setting. The input
+        // files must have radios button called r1 and r2 and
+        // checkboxes called checkbox1 and checkbox2. The files
+        // button-set*.pdf are designed for this test case.
+        QPDFObjectHandle acroform = pdf.getRoot().getKey("/AcroForm");
+        QPDFObjectHandle fields = acroform.getKey("/Fields");
+        int n = fields.getArrayNItems();
+        for (int i = 0; i < n; ++i)
+        {
+            QPDFObjectHandle field = fields.getArrayItem(i);
+            QPDFObjectHandle T = field.getKey("/T");
+            if (! T.isString())
+            {
+                continue;
+            }
+            std::string Tval = T.getUTF8Value();
+            if (Tval == "r1")
+            {
+                std::cout << "setting r1 via parent\n";
+                QPDFFormFieldObjectHelper foh(field);
+                foh.setV(QPDFObjectHandle::newName("/2"));
+            }
+            else if (Tval == "r2")
+            {
+                std::cout << "setting r2 via child\n";
+                field = field.getKey("/Kids").getArrayItem(1);
+                QPDFFormFieldObjectHelper foh(field);
+                foh.setV(QPDFObjectHandle::newName("/3"));
+            }
+            else if (Tval == "checkbox1")
+            {
+                std::cout << "turning checkbox1 on\n";
+                QPDFFormFieldObjectHelper foh(field);
+                foh.setV(QPDFObjectHandle::newName("/Yes"));
+            }
+            else if (Tval == "checkbox2")
+            {
+                std::cout << "turning checkbox2 off\n";
+                QPDFFormFieldObjectHelper foh(field);
+                foh.setV(QPDFObjectHandle::newName("/Off"));
+            }
+        }
+        QPDFWriter w(pdf, "a.pdf");
+	w.setQDFMode(true);
+        w.setStaticID(true);
+        w.write();
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +

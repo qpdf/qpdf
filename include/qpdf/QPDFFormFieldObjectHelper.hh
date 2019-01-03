@@ -163,10 +163,13 @@ class QPDFFormFieldObjectHelper: public QPDFObjectHelper
     void setFieldAttribute(std::string const& key,
                            std::string const& utf8_value);
 
-    // Set /V (field value) to the given value. Optionally set
-    // /NeedAppearances to true. You can explicitly tell this method
-    // not to set /NeedAppearances if you are going to explicitly
-    // generate an appearance stream yourself.
+    // Set /V (field value) to the given value. If need_appearances is
+    // true and the field type is either /Tx (text) or /Ch (choice),
+    // set /NeedAppearances to true. You can explicitly tell this
+    // method not to set /NeedAppearances if you are going to generate
+    // an appearance stream yourself. Starting with qpdf 8.3.0, this
+    // method handles fields of type /Btn (checkboxes, radio buttons,
+    // pushbuttons) specially.
     QPDF_DLL
     void setV(QPDFObjectHandle value, bool need_appearances = true);
 
@@ -177,6 +180,9 @@ class QPDFFormFieldObjectHelper: public QPDFObjectHelper
     void setV(std::string const& utf8_value, bool need_appearances = true);
 
   private:
+    void setRadioButtonValue(QPDFObjectHandle name);
+    void setCheckBoxValue(bool value);
+
     class Members
     {
         friend class QPDFFormFieldObjectHelper;
