@@ -559,27 +559,46 @@ class QPDFObjectHandle
     QPDF_DLL
     bool isOrHasName(std::string const&);
 
-    // Merge dictionaries with the following behavior, where "object"
-    // refers to the object whose method is invoked, and "other"
-    // refers to the argument:
-    // * If either object or other is not a dictionary, do nothing
-    // * Otherwise
-    //   * For each key in other
-    //     * If key is absent in object, insert it
-    //     * If key is present in object
-    //       * If both values are dictionaries, merge the dictionary from
-    //         other into the one from object
-    //       * If both values are arrays, append scalar elements from
-    //         other's that are not present in object's onto object's,
-    //         and ignore non-scalar elements in other's
-    //       * Otherwise ignore
+    // Merge resource dictionaries. Assumes resource dictionaries have
+    // the property that the collection of keys of all first-level
+    // dictionary members contains no duplicates. This method does
+    // nothing if both this object and the other object are not
+    // dictionaries. Otherwise, it has following behavior, where
+    // "object" refers to the object whose method is invoked, and
+    // "other" refers to the argument:
+    //
+    // * For each key in "other" whose value is an array:
+    //   * If "object" does not have that entry, shallow copy it.
+    //   * Otherwise, if "object" has an array in the same place,
+    //     append to that array any objects in "other"'s array that
+    //     are not already present.
+    // * For each key in "other" whose value is a dictionary:
+    //   * If "object" does not have that entry, shallow copy it.
+    //   * Otherwise, for each key in the subdictionary:
+    //     * If key is not present in "object"'s entry, shallow copy it.
+    //     * Otherwise, ignore. Conflicts are not detected.
+    //
     // The primary purpose of this method is to facilitate merging of
-    // resource dictionaries. Conflicts are ignored. If needed, a
-    // future version of qpdf may provide some mechanism for conflict
-    // resolution, such as providing a handler that is invoked with
-    // the path to the conflict.
+    // resource dictionaries that are supposed to have the same scope
+    // as each other. For example, this can be used to merge a form
+    // XObject's /Resources dictionary with a form field's /DR.
+    // Conflicts are not detected. If, in the future, there should be
+    // a need to detect conflicts, this method could detect them and
+    // return a mapping from old to new names. This mapping could be
+    // used for filtering the stream. This would be necessary, for
+    // example, to merge a form XObject's resources with a page's
+    // resources with the intention of concatenating the content
+    // streams.
     QPDF_DLL
-    void mergeDictionary(QPDFObjectHandle other);
+    void mergeResources(QPDFObjectHandle other);
+
+    // Get all resource names from a resourcey dictionary. If this
+    // object is a dctionary, this method returns a set of all the
+    // keys in all top-level subdictionaries. For resources
+    // dictionaries, this is the collection of names that may be
+    // referenced in the content stream.
+    QPDF_DLL
+    std::set<std::string> getResourceNames();
 
     // Return the QPDF object that owns an indirect object.  Returns
     // null for a direct object.
@@ -992,10 +1011,6 @@ class QPDFObjectHandle
         ParserCallbacks* callbacks);
     std::vector<QPDFObjectHandle> arrayOrStreamToStreamArray(
         std::string const& description, std::string& all_description);
-    void mergeDictionaryInternal(
-        QPDFObjectHandle other,
-        std::set<QPDFObjGen>& visiting,
-        int depth);
     static void warn(QPDF*, QPDFExc const&);
 
     class Members

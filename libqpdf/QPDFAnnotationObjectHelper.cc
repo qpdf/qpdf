@@ -80,19 +80,66 @@ QPDFAnnotationObjectHelper::getAppearanceStream(
 }
 
 std::string
-QPDFAnnotationObjectHelper::getAnnotationAppearanceMatrix(int rotate)
+QPDFAnnotationObjectHelper::getPageContentForAppearance(
+    std::string const& name, int rotate)
 {
-    // The appearance matrix is the transformation in effect when
-    // rendering an appearance stream's content. The appearance stream
-    // itself is a form XObject, which has a /BBox and an optional
-    // /Matrix. The /BBox describes the bounding box of the annotation
-    // in unrotated page coordinates. /Matrix may be applied to the
-    // bounding box to transform the bounding box. The effect of this
-    // is that the transformed box is still fit within the area the
-    // annotation designates in its /Rect field.
+    if (! getAppearanceStream("/N").isStream())
+    {
+        return "";
+    }
 
-    // The algorithm for computing the appearance matrix described in
-    // section 12.5.5 of the ISO-32000 PDF spec. It is as follows:
+    // The appearance matrix computed by this method is the
+    // transformation matrix that needs to be in effect when drawing
+    // this annotation's appearance stream on the page. The algorithm
+    // for computing the appearance matrix described in section 12.5.5
+    // of the ISO-32000 PDF spec is similar but not identical to what
+    // we are doing here.
+
+    // When rendering an appearance stream associated with an
+    // annotation, there are four relevant components:
+    //
+    // * The appearance stream's bounding box (/BBox)
+    // * The appearance stream's matrix (/Matrix)
+    // * The annotation's rectangle (/Rect)
+    // * In the case of form fields with the NoRotate flag, the
+    //   page's rotation
+
+    // When rendering a form xobject in isolation, just drawn with a
+    // /Do operator, the is no form field, so page rotation is not
+    // relevant, and there is no annotation, so /Rect is not relevant,
+    // so only /BBox and /Matrix are relevant. The effect of these are
+    // as follows:
+
+    // * /BBox is treated as a clipping region
+    // * /Matrix is applied as a transformation prior to rendering the
+    //   appearance stream.
+
+    // There is no relationship between /BBox and /Matrix in this
+    // case.
+
+    // When rendering a form xobject in the context of an annotation,
+    // things are a little different. In particular, a matrix is
+    // established such that /BBox, when transformed by /Matrix, would
+    // fit completely inside of /Rect. /BBox is no longer a clipping
+    // region. To illustrate the difference, consider a /Matrix of
+    // [2 0 0 2 0 0], which is scaling by a factor of two along both
+    // axes. If the appearance stream drew a rectangle equal to /BBox,
+    // in the case of the form xobject in isolation, this matrix would
+    // cause only the lower-left quadrant of the rectangle to be
+    // visible since the scaling would cause the rest of it to fall
+    // outside of the clipping region. In the case of the form xobject
+    // displayed in the context of an annotation, such a matrix would
+    // have no effect at all because it would be applied to the
+    // bounding box first, and then when the resulting enclosing
+    // quadrilateral was transformed to fit into /Rect, the effect of
+    // the scaling would be undone.
+
+    // Our job is to create a transformation matrix that compensates
+    // for these differences so that the appearance stream of an
+    // annotation can be drawn as a regular form xobject.
+
+    // To do this, we perform the following steps, which overlap
+    // significantly with the algorithm in 12.5.5:
 
     // 1. Transform the four corners of /BBox by applying /Matrix to
     //    them, creating an arbitrarily transformed quadrilateral.
@@ -103,38 +150,22 @@ QPDFAnnotationObjectHelper::getAnnotationAppearanceMatrix(int rotate)
 
     // 3. Compute matrix A that maps the lower left and upper right
     //    corners of T to the annotation's /Rect. This can be done by
-    //    translating the lower left corner and then scaling so that
-    //    the upper right corner also matches.
+    //    scaling so that the sizes match and translating so that the
+    //    scaled T exactly overlaps /Rect.
 
-    // 4. Concatenate /Matrix to A to get matrix AA. This matrix
-    //    translates from appearance stream coordinates to page
-    //    coordinates.
+    // If the annotation's /F flag has bit 4 set, this means that
+    // annotation is to be rotated about its upper left corner to
+    // counteract any rotation of the page so it remains upright. To
+    // achieve this effect, we do the following extra steps:
 
-    // If the annotation's /F flag has bit 4 set, we modify the matrix
-    // to also rotate the annotation in the opposite direction, and we
-    // adjust the destination rectangle by rotating it about the upper
-    // left hand corner so that the annotation will appear upright on
-    // the rotated page.
+    // 1. Perform the rotation on /BBox box prior to transforming it
+    //    with /Matrix (by replacing matrix with concatenation of
+    //    matrix onto the rotation)
 
-    // You can see that the above algorithm works by imagining the
-    // following:
+    // 2. Rotate the destination rectangle by the specified amount
 
-    // * In the simple case of where /BBox = /Rect and /Matrix is the
-    //   identity matrix, the transformed quadrilateral in step 1 will
-    //   be the bounding box. Since the bounding box is upright, T
-    //   will be the bounding box. Since /BBox = /Rect, matrix A is
-    //   the identity matrix, and matrix AA in step 4 is also the
-    //   identity matrix.
-    //
-    // * Imagine that the rectangle is different from the bounding
-    //   box. In this case, matrix A just transforms the bounding box
-    //   to the rectangle by scaling and translating, effectively
-    //   squeezing or stretching it into /Rect.
-    //
-    // * Imagine that /Matrix rotates the annotation by 30 degrees.
-    //   The transformed bounding box would stick out, and T would be
-    //   too big. In this case, matrix A shrinks T down until it fits
-    //   in /Rect.
+    // 3. Apply the rotation to A as computed above to get the final
+    //    appearance matrix.
 
     QPDFObjectHandle rect_obj = this->oh.getKey("/Rect");
     QPDFObjectHandle flags = this->oh.getKey("/F");
@@ -157,7 +188,9 @@ QPDFAnnotationObjectHelper::getAnnotationAppearanceMatrix(int rotate)
         QTC::TC("qpdf", "QPDFAnnotationObjectHelper default matrix");
     }
     QPDFObjectHandle::Rectangle rect = rect_obj.getArrayAsRectangle();
-    if (rotate && flags.isInteger() && (flags.getIntValue() & 16))
+    bool do_rotate = (rotate && flags.isInteger() &&
+                      (flags.getIntValue() & 16));
+    if (do_rotate)
     {
         // If the the annotation flags include the NoRotate bit and
         // the page is rotated, we have to rotate the annotation about
@@ -229,39 +262,15 @@ QPDFAnnotationObjectHelper::getAnnotationAppearanceMatrix(int rotate)
     AA.scale((rect.urx - rect.llx) / (t_urx - t_llx),
              (rect.ury - rect.lly) / (t_ury - t_lly));
     AA.translate(-t_llx, -t_lly);
-    // Concatenate the user-specified matrix
-    AA.concat(matrix);
-    return AA.unparse();
-}
-
-std::string
-QPDFAnnotationObjectHelper::getPageContentForAppearance(int rotate)
-{
-    QPDFObjectHandle as = getAppearanceStream("/N");
-    if (! (as.isStream() && as.getDict().getKey("/BBox").isRectangle()))
+    if (do_rotate)
     {
-        return "";
+        AA.rotatex90(rotate);
     }
 
-    QPDFObjectHandle::Rectangle rect =
-        as.getDict().getKey("/BBox").getArrayAsRectangle();
-    std::string cm = getAnnotationAppearanceMatrix(rotate);
-    if (cm.empty())
-    {
-        return "";
-    }
-    std::string as_content = (
+    as.replaceKey("/Subtype", QPDFObjectHandle::newName("/Form"));
+    return (
         "q\n" +
-        cm + " cm\n" +
-        QUtil::double_to_string(rect.llx, 5) + " " +
-        QUtil::double_to_string(rect.lly, 5) + " " +
-        QUtil::double_to_string(rect.urx - rect.llx, 5) + " " +
-        QUtil::double_to_string(rect.ury - rect.lly, 5) + " " +
-        "re W n\n");
-    PointerHolder<Buffer> buf = as.getStreamData(qpdf_dl_all);
-    as_content += std::string(
-        reinterpret_cast<char *>(buf->getBuffer()),
-        buf->getSize());
-    as_content += "\nQ\n";
-    return as_content;
+        AA.unparse() + " cm\n" +
+        name + " Do\n" +
+        "Q\n");
 }

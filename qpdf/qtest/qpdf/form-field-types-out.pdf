@@ -1440,14 +1440,7 @@ endobj
     /ExtGState <<
       /FXE1 42 0 R
     >>
-    /Font <<
-      /ArialMT 26 0 R
-      /F2 24 0 R
-      /F3 26 0 R
-      /FXF1 26 0 R
-      /Helv 29 0 R
-      /ZaDi 13 0 R
-    >>
+    /Font 4 0 R
     /ProcSet [
       /PDF
       /Text
@@ -1456,6 +1449,19 @@ endobj
       /ImageB
     ]
     /XObject <<
+      /Fxo1 46 0 R
+      /Fxo10 58 0 R
+      /Fxo11 66 0 R
+      /Fxo12 66 0 R
+      /Fxo13 68 0 R
+      /Fxo2 48 0 R
+      /Fxo3 72 0 R
+      /Fxo4 50 0 R
+      /Fxo5 52 0 R
+      /Fxo6 54 0 R
+      /Fxo7 60 0 R
+      /Fxo8 56 0 R
+      /Fxo9 70 0 R
     >>
   >>
   /Type /Page
@@ -1478,7 +1484,29 @@ endobj
     0
     0
   ]
-  /Resources 33 0 R
+  /Resources <<
+    /Encoding <<
+      /PDFDocEncoding 41 0 R
+    >>
+    /Font <<
+      /ArialMT 26 0 R
+      /F2 24 0 R
+      /F3 26 0 R
+      /FXF1 26 0 R
+      /Helv 29 0 R
+      /ZaDi 13 0 R
+    >>
+    /ProcSet [
+      /PDF
+      /Text
+      /ImageC
+      /ImageI
+      /ImageB
+    ]
+    /XObject <<
+    >>
+  >>
+  /Subtype /Form
   /Length 47 0 R
 >>
 stream
@@ -1520,7 +1548,29 @@ endobj
     0
     0
   ]
-  /Resources 34 0 R
+  /Resources <<
+    /Encoding <<
+      /PDFDocEncoding 41 0 R
+    >>
+    /Font <<
+      /ArialMT 26 0 R
+      /F2 24 0 R
+      /F3 26 0 R
+      /FXF1 26 0 R
+      /Helv 29 0 R
+      /ZaDi 13 0 R
+    >>
+    /ProcSet [
+      /PDF
+      /Text
+      /ImageC
+      /ImageI
+      /ImageB
+    ]
+    /XObject <<
+    >>
+  >>
+  /Subtype /Form
   /Length 49 0 R
 >>
 stream
@@ -1562,7 +1612,29 @@ endobj
     0
     0
   ]
-  /Resources 36 0 R
+  /Resources <<
+    /Encoding <<
+      /PDFDocEncoding 41 0 R
+    >>
+    /Font <<
+      /ArialMT 26 0 R
+      /F2 24 0 R
+      /F3 26 0 R
+      /FXF1 26 0 R
+      /Helv 29 0 R
+      /ZaDi 13 0 R
+    >>
+    /ProcSet [
+      /PDF
+      /Text
+      /ImageC
+      /ImageI
+      /ImageB
+    ]
+    /XObject <<
+    >>
+  >>
+  /Subtype /Form
   /Length 51 0 R
 >>
 stream
@@ -1583,7 +1655,29 @@ endobj
     150
     14.2
   ]
-  /Resources 30 0 R
+  /Resources <<
+    /Encoding <<
+      /PDFDocEncoding 41 0 R
+    >>
+    /Font <<
+      /ArialMT 26 0 R
+      /F2 24 0 R
+      /F3 26 0 R
+      /FXF1 26 0 R
+      /Helv 29 0 R
+      /ZaDi 13 0 R
+    >>
+    /ProcSet [
+      /PDF
+      /Text
+      /ImageC
+      /ImageI
+      /ImageB
+    ]
+    /XObject <<
+    >>
+  >>
+  /Subtype /Form
   /Length 53 0 R
 >>
 stream
@@ -1613,7 +1707,29 @@ endobj
     0
     0
   ]
-  /Resources 37 0 R
+  /Resources <<
+    /Encoding <<
+      /PDFDocEncoding 41 0 R
+    >>
+    /Font <<
+      /ArialMT 26 0 R
+      /F2 24 0 R
+      /F3 26 0 R
+      /FXF1 26 0 R
+      /Helv 29 0 R
+      /ZaDi 13 0 R
+    >>
+    /ProcSet [
+      /PDF
+      /Text
+      /ImageC
+      /ImageI
+      /ImageB
+    ]
+    /XObject <<
+    >>
+  >>
+  /Subtype /Form
   /Length 55 0 R
 >>
 stream
@@ -1642,7 +1758,29 @@ endobj
     0
     0
   ]
-  /Resources 39 0 R
+  /Resources <<
+    /Encoding <<
+      /PDFDocEncoding 41 0 R
+    >>
+    /Font <<
+      /ArialMT 26 0 R
+      /F2 24 0 R
+      /F3 26 0 R
+      /FXF1 26 0 R
+      /Helv 29 0 R
+      /ZaDi 13 0 R
+    >>
+    /ProcSet [
+      /PDF
+      /Text
+      /ImageC
+      /ImageI
+      /ImageB
+    ]
+    /XObject <<
+    >>
+  >>
+  /Subtype /Form
   /Length 57 0 R
 >>
 stream
@@ -1671,7 +1809,29 @@ endobj
     0
     0
   ]
-  /Resources 32 0 R
+  /Resources <<
+    /Encoding <<
+      /PDFDocEncoding 41 0 R
+    >>
+    /Font <<
+      /ArialMT 26 0 R
+      /F2 24 0 R
+      /F3 26 0 R
+      /FXF1 26 0 R
+      /Helv 29 0 R
+      /ZaDi 13 0 R
+    >>
+    /ProcSet [
+      /PDF
+      /Text
+      /ImageC
+      /ImageI
+      /ImageB
+    ]
+    /XObject <<
+    >>
+  >>
+  /Subtype /Form
   /Length 59 0 R
 >>
 stream
@@ -1700,7 +1860,29 @@ endobj
     0
     0
   ]
-  /Resources 38 0 R
+  /Resources <<
+    /Encoding <<
+      /PDFDocEncoding 41 0 R
+    >>
+    /Font <<
+      /ArialMT 26 0 R
+      /F2 24 0 R
+      /F3 26 0 R
+      /FXF1 26 0 R
+      /Helv 29 0 R
+      /ZaDi 13 0 R
+    >>
+    /ProcSet [
+      /PDF
+      /Text
+      /ImageC
+      /ImageI
+      /ImageB
+    ]
+    /XObject <<
+    >>
+  >>
+  /Subtype /Form
   /Length 61 0 R
 >>
 stream
@@ -1816,6 +1998,9 @@ endobj
     0
   ]
   /Resources <<
+    /Font <<
+      /ZaDi 13 0 R
+    >>
     /ProcSet [
       /PDF
     ]
@@ -1851,7 +2036,29 @@ endobj
     157.1
     14.2
   ]
-  /Resources 40 0 R
+  /Resources <<
+    /Encoding <<
+      /PDFDocEncoding 41 0 R
+    >>
+    /Font <<
+      /ArialMT 26 0 R
+      /F2 24 0 R
+      /F3 26 0 R
+      /FXF1 26 0 R
+      /Helv 29 0 R
+      /ZaDi 13 0 R
+    >>
+    /ProcSet [
+      /PDF
+      /Text
+      /ImageC
+      /ImageI
+      /ImageB
+    ]
+    /XObject <<
+    >>
+  >>
+  /Subtype /Form
   /Length 69 0 R
 >>
 stream
@@ -1888,7 +2095,29 @@ endobj
     0
     0
   ]
-  /Resources 31 0 R
+  /Resources <<
+    /Encoding <<
+      /PDFDocEncoding 41 0 R
+    >>
+    /Font <<
+      /ArialMT 26 0 R
+      /F2 24 0 R
+      /F3 26 0 R
+      /FXF1 26 0 R
+      /Helv 29 0 R
+      /ZaDi 13 0 R
+    >>
+    /ProcSet [
+      /PDF
+      /Text
+      /ImageC
+      /ImageI
+      /ImageB
+    ]
+    /XObject <<
+    >>
+  >>
+  /Subtype /Form
   /Length 71 0 R
 >>
 stream
@@ -1930,7 +2159,29 @@ endobj
     0
     0
   ]
-  /Resources 35 0 R
+  /Resources <<
+    /Encoding <<
+      /PDFDocEncoding 41 0 R
+    >>
+    /Font <<
+      /ArialMT 26 0 R
+      /F2 24 0 R
+      /F3 26 0 R
+      /FXF1 26 0 R
+      /Helv 29 0 R
+      /ZaDi 13 0 R
+    >>
+    /ProcSet [
+      /PDF
+      /Text
+      /ImageC
+      /ImageI
+      /ImageB
+    ]
+    /XObject <<
+    >>
+  >>
+  /Subtype /Form
   /Length 73 0 R
 >>
 stream
@@ -2400,164 +2651,61 @@ stream
 Q
 q
 1.00000 0.00000 0.00000 1.00000 165.70000 453.70000 cm
-0.00000 0.00000 150.00000 14.20000 re W n
-q
-Q
-/Tx BMC
-q
-1 1 148 12.2 re
-W
-n
-BT
-0 0 0 rg
-1 3.28299 Td
-/FXF1 11 Tf
-(ABC) Tj
-ET
-Q
-EMC
-
+/Fxo1 Do
 Q
 q
 1.00000 0.00000 0.00000 1.00000 165.70000 421.20000 cm
-0.00000 0.00000 150.00000 14.20000 re W n
-q
-Q
-/Tx BMC
-q
-1 1 148 12.2 re
-W
-n
-BT
-0 0 0 rg
-1 3.28299 Td
-/FXF1 11 Tf
-(DEF) Tj
-ET
-Q
-EMC
-
+/Fxo2 Do
 Q
 q
 1.00000 0.00000 0.00000 1.00000 165.70000 388.30000 cm
-0.00000 0.00000 150.00000 14.20000 re W n
-q
-Q
-
+/Fxo3 Do
 Q
 q
 1.00000 0.00000 0.00000 1.00000 378.40000 388.40000 cm
-0.00000 0.00000 68.50000 14.20000 re W n
-q
-Q
-
+/Fxo4 Do
 Q
 q
 1.00000 0.00000 0.00000 1.00000 165.70000 368.40000 cm
-0.00000 0.00000 150.00000 14.20000 re W n
-/Tx BMC 
-EMC
+/Fxo5 Do
 Q
 q
 1.00000 0.00000 0.00000 1.00000 165.70000 348.50000 cm
-0.00000 0.00000 72.80000 14.20000 re W n
-q
-Q
-
+/Fxo6 Do
 Q
 q
 1.00000 0.00000 0.00000 1.00000 297.10000 348.50000 cm
-0.00000 0.00000 150.10000 14.20000 re W n
-q
-Q
-
+/Fxo7 Do
 Q
 q
 1.00000 0.00000 0.00000 1.00000 165.70000 315.90000 cm
-0.00000 0.00000 150.00000 14.20000 re W n
-q
-Q
-
+/Fxo8 Do
 Q
 q
 1.00000 0.00000 0.00000 1.00000 165.70000 283.40000 cm
-0.00000 0.00000 75.50000 14.20000 re W n
-q
-Q
-/Tx BMC
-q
-1 1 60.5 12.2 re
-W
-n
-BT
-0 0 0 rg
-1 3.24501 Td
-/FXF1 11 Tf
-(Man) Tj
-ET
-Q
-EMC
-
+/Fxo9 Do
 Q
 q
 1.00000 0.00000 0.00000 1.00000 165.70000 250.80000 cm
-0.00000 0.00000 72.30000 14.20000 re W n
-q
-Q
-
+/Fxo10 Do
 Q
 q
 1.00000 0.00000 0.00000 1.00000 164.10000 221.40000 cm
-0.00000 0.00000 11.30000 10.90000 re W n
-q
-1 1 9.3 8.9 re
-W
-n
-0 G
-2.2 8.9 m
-9.1 2 l
-9.1 8.9 m
-2.2 2 l
-s
-Q
-
+/Fxo11 Do
 Q
 q
 1.00000 0.00000 0.00000 1.00000 154.80000 177.60000 cm
-0.00000 0.00000 11.30000 10.90000 re W n
-q
-1 1 9.3 8.9 re
-W
-n
-0 G
-2.2 8.9 m
-9.1 2 l
-9.1 8.9 m
-2.2 2 l
-s
-Q
-
+/Fxo12 Do
 Q
 q
 1.00000 0.00000 0.00000 1.00000 165.70000 143.40000 cm
-0.00000 0.00000 157.10000 14.20000 re W n
-1 1 0.6 rg
-0 0 156.9 14.4 re f*
-/Tx BMC 
-BT
-0 0 0 rg /F3 11 Tf
-0 g
-2 2.106 Td
-(Blue) Tj
-ET
-EMC
-
+/Fxo13 Do
 Q
 endstream
 endobj
 
 83 0 obj
-1852
+891
 endobj
 
 84 0 obj
@@ -2603,10 +2751,10 @@ endobj
 >>
 stream
           Í                      	  
-                                               !  "  #  $  %  &  ' Bó  P   P@  RË  SÌ  T  U  U  UÀ  Uﬁ  Vx  Vå  W=  WP  X   X  Xƒ  X◊  Yâ  Yú  Z∏  ZÃ  \)  \=  ]|  ]ê  ^i  ^}  _Ñ  _ò  `H  `[  Ò  Òñ  ıe  ıë  ıÃ  ıˆ  ˘  ˘F  ª  — f z ( < 
+                                               !  "  #  $  %  &  ' Bó  P   P@  Sn  U¨  U¿  W˛  X  Y¸  Z  [‚  [ˆ  ]‡  ]Û  _‹  _Ô  aŸ  aÏ  c◊  cÍ  e  e  fw  fã  gÒ  h  j  j+  lk  l  nh  n{  ˇü  ˇ∂ Ö ± Ï  : f  / ƒ ÿ Ü ö 
 endstream
 endobj
 
 startxref
-66108
+68762
 %%EOF

@@ -1,5 +1,6 @@
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
+#include <qpdf/QUtil.hh>
 #include <qpdf/QTC.hh>
 
 QPDFPageDocumentHelper::Members::~Members()
@@ -121,6 +122,7 @@ QPDFPageDocumentHelper::flattenAnnotationsForPage(
     {
         rotate = rotate_obj.getIntValue();
     }
+    int next_fx = 1;
     for (std::vector<QPDFAnnotationObjectHelper>::iterator iter =
              annots.begin();
          iter != annots.end(); ++iter)
@@ -140,18 +142,50 @@ QPDFPageDocumentHelper::flattenAnnotationsForPage(
         }
         if (process)
         {
-            resources.mergeDictionary(as.getDict().getKey("/Resources"));
             if (is_widget)
             {
                 QTC::TC("qpdf", "QPDFPageDocumentHelper merge DR");
                 QPDFFormFieldObjectHelper ff = afdh.getFieldForAnnotation(aoh);
-                resources.mergeDictionary(ff.getInheritableFieldValue("/DR"));
+                QPDFObjectHandle as_resources =
+                    as.getDict().getKey("/Resources");
+                if (as_resources.isIndirect())
+                {
+                    QTC::TC("qpdf", "QPDFPageDocumentHelper indirect as resources");
+                    as.getDict().replaceKey(
+                        "/Resources", as_resources.shallowCopy());
+                    as_resources = as.getDict().getKey("/Resources");
+                }
+                as_resources.mergeResources(
+                    ff.getInheritableFieldValue("/DR"));
             }
             else
             {
                 QTC::TC("qpdf", "QPDFPageDocumentHelper non-widget annotation");
             }
-            new_content += aoh.getPageContentForAppearance(rotate);
+            std::set<std::string> names = resources.getResourceNames();
+            std::string name;
+            while (next_fx < 1000000)
+            {
+                std::string candidate = "/Fxo" + QUtil::int_to_string(next_fx);
+                ++next_fx;
+                if (names.count(candidate) == 0)
+                {
+                    name = candidate;
+                    break;
+                }
+            }
+            if (name.empty())
+            {
+                // There are already more than a million /Fxo names.
+                // Somehow I doubt this is going to actually happen.
+                // Just pick a name and forget conflicts.
+                name = "/FxConflict";
+            }
+            resources.mergeResources(
+                QPDFObjectHandle::parse(
+                    "<< /XObject << " + name + " null >> >>"));
+            resources.getKey("/XObject").replaceKey(name, as);
+            new_content += aoh.getPageContentForAppearance(name, rotate);
         }
         else
         {

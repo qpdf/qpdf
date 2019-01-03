@@ -6,11 +6,9 @@
     "/b": "conflict: seen",
     "/c": [
       2,
-      3,
-      1
+      3
     ],
     "/d": {
-      "/x": 24,
       "/y": 25,
       "/z": 26
     },
@@ -33,4 +31,14 @@
     "two"
   ]
 }
+/A
+/B
+/C
+/a
+/b
+/c
+/d
+/e
+/indirect2
+/recursive
 test 50 done

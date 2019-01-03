@@ -1760,10 +1760,16 @@ void runtest(int n, char const* filename1, char const* arg2)
         // merge-dict.pdf
         QPDFObjectHandle d1 = pdf.getTrailer().getKey("/Dict1");
         QPDFObjectHandle d2 = pdf.getTrailer().getKey("/Dict2");
-        d1.mergeDictionary(d2);
+        d1.mergeResources(d2);
         std::cout << d1.getJSON().unparse() << std::endl;
         // Top-level type mismatch
-        d1.mergeDictionary(d2.getKey("/k1"));
+        d1.mergeResources(d2.getKey("/k1"));
+        std::set<std::string> names = d1.getResourceNames();
+        for (std::set<std::string>::iterator iter = names.begin();
+             iter != names.end(); ++iter)
+        {
+            std::cout << *iter << std::endl;
+        }
     }
     else
     {
