@@ -68,7 +68,9 @@ QPDFPageDocumentHelper::removePage(QPDFPageObjectHelper page)
 
 
 void
-QPDFPageDocumentHelper::flattenAnnotations()
+QPDFPageDocumentHelper::flattenAnnotations(
+    int required_flags,
+    int forbidden_flags)
 {
     QPDFAcroFormDocumentHelper afdh(this->qpdf);
     if (afdh.getNeedAppearances())
@@ -97,7 +99,8 @@ QPDFPageDocumentHelper::flattenAnnotations()
             // test suite
             resources = QPDFObjectHandle::newDictionary();
         }
-        flattenAnnotationsForPage(ph, resources, afdh);
+        flattenAnnotationsForPage(ph, resources, afdh,
+                                  required_flags, forbidden_flags);
     }
     if (! afdh.getNeedAppearances())
     {
@@ -109,7 +112,9 @@ void
 QPDFPageDocumentHelper::flattenAnnotationsForPage(
     QPDFPageObjectHelper& page,
     QPDFObjectHandle& resources,
-    QPDFAcroFormDocumentHelper& afdh)
+    QPDFAcroFormDocumentHelper& afdh,
+    int required_flags,
+    int forbidden_flags)
 {
     bool need_appearances = afdh.getNeedAppearances();
     std::vector<QPDFAnnotationObjectHelper> annots = page.getAnnotations();
@@ -168,12 +173,12 @@ QPDFPageDocumentHelper::flattenAnnotationsForPage(
             while (next_fx <= max_fx)
             {
                 std::string candidate = "/Fxo" + QUtil::int_to_string(next_fx);
-                ++next_fx;
                 if (names.count(candidate) == 0)
                 {
                     name = candidate;
                     break;
                 }
+                ++next_fx;
             }
             if (name.empty())
             {
@@ -182,11 +187,18 @@ QPDFPageDocumentHelper::flattenAnnotationsForPage(
                 // number of keys we're checking against.
                 name = "/FxConflict";
             }
-            resources.mergeResources(
-                QPDFObjectHandle::parse(
-                    "<< /XObject << " + name + " null >> >>"));
-            resources.getKey("/XObject").replaceKey(name, as);
-            new_content += aoh.getPageContentForAppearance(name, rotate);
+            std::string content = aoh.getPageContentForAppearance(
+                name, rotate, required_flags, forbidden_flags);
+            if (! content.empty())
+            {
+                resources.mergeResources(
+                    QPDFObjectHandle::parse(
+                        "<< /XObject << " + name + " null >> >>"));
+                resources.getKey("/XObject").replaceKey(name, as);
+                names.insert(name);
+                ++next_fx;
+            }
+            new_content += content;
         }
         else
         {

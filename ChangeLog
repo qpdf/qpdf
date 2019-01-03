@@ -6,6 +6,9 @@
 
 2018-12-31  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add --flatten-annotations flag to the qpdf command-line tool for
+	annotation flattening.
+
 	* Add methods for flattening form fields and annotations:
 	  - QPDFPageDocumentHelper::flattenAnnotations - integrate
 	    annotation appearance streams into page contents with special

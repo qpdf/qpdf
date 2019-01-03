@@ -103,6 +103,8 @@ struct Options
         newline_before_endstream(false),
         coalesce_contents(false),
         flatten_annotations(false),
+        flatten_annotations_required(0),
+        flatten_annotations_forbidden(an_invisible | an_hidden),
         show_npages(false),
         deterministic_id(false),
         static_id(false),
@@ -176,6 +178,8 @@ struct Options
     std::string linearize_pass1;
     bool coalesce_contents;
     bool flatten_annotations;
+    int flatten_annotations_required;
+    int flatten_annotations_forbidden;
     std::string min_version;
     std::string force_version;
     bool show_npages;
@@ -475,7 +479,7 @@ class ArgParser
     void argNewlineBeforeEndstream();
     void argLinearizePass1(char* parameter);
     void argCoalesceContents();
-    void argFlattenAnnotations();
+    void argFlattenAnnotations(char* parameter);
     void argMinVersion(char* parameter);
     void argForceVersion(char* parameter);
     void argSplitPages(char* parameter);
@@ -644,22 +648,23 @@ ArgParser::initOptionTable()
     (*t)["pages"] = oe_bare(&ArgParser::argPages);
     (*t)["rotate"] = oe_requiredParameter(
         &ArgParser::argRotate, "[+|-]angle:page-range");
-    char const* streamDataChoices[] =
+    char const* stream_data_choices[] =
         {"compress", "preserve", "uncompress", 0};
     (*t)["stream-data"] = oe_requiredChoices(
-        &ArgParser::argStreamData, streamDataChoices);
+        &ArgParser::argStreamData, stream_data_choices);
     (*t)["compress-streams"] = oe_requiredChoices(
         &ArgParser::argCompressStreams, yn);
-    char const* decodeLevelChoices[] =
+    char const* decode_level_choices[] =
         {"none", "generalized", "specialized", "all", 0};
     (*t)["decode-level"] = oe_requiredChoices(
-        &ArgParser::argDecodeLevel, decodeLevelChoices);
+        &ArgParser::argDecodeLevel, decode_level_choices);
     (*t)["normalize-content"] = oe_requiredChoices(
         &ArgParser::argNormalizeContent, yn);
     (*t)["suppress-recovery"] = oe_bare(&ArgParser::argSuppressRecovery);
-    char const* objectStreamsChoices[] = {"disable", "preserve", "generate", 0};
+    char const* object_streams_choices[] = {
+        "disable", "preserve", "generate", 0};
     (*t)["object-streams"] = oe_requiredChoices(
-        &ArgParser::argObjectStreams, objectStreamsChoices);
+        &ArgParser::argObjectStreams, object_streams_choices);
     (*t)["ignore-xref-streams"] = oe_bare(&ArgParser::argIgnoreXrefStreams);
     (*t)["qdf"] = oe_bare(&ArgParser::argQdf);
     (*t)["preserve-unreferenced"] = oe_bare(
@@ -673,7 +678,9 @@ ArgParser::initOptionTable()
     (*t)["linearize-pass1"] = oe_requiredParameter(
         &ArgParser::argLinearizePass1, "filename");
     (*t)["coalesce-contents"] = oe_bare(&ArgParser::argCoalesceContents);
-    (*t)["flatten-annotations"] = oe_bare(&ArgParser::argFlattenAnnotations);
+    char const* flatten_choices[] = {"all", "print", "screen", 0};
+    (*t)["flatten-annotations"] = oe_requiredChoices(
+        &ArgParser::argFlattenAnnotations, flatten_choices);
     (*t)["min-version"] = oe_requiredParameter(
         &ArgParser::argMinVersion, "version");
     (*t)["force-version"] = oe_requiredParameter(
@@ -702,10 +709,10 @@ ArgParser::initOptionTable()
     (*t)["json"] = oe_bare(&ArgParser::argJson);
     // The list of selectable top-level keys id duplicated in three
     // places: json_schema, do_json, and initOptionTable.
-    char const* jsonKeyChoices[] = {
+    char const* json_key_choices[] = {
         "objects", "pages", "pagelabels", "outlines", 0};
     (*t)["json-key"] = oe_requiredChoices(
-        &ArgParser::argJsonKey, jsonKeyChoices);
+        &ArgParser::argJsonKey, json_key_choices);
     (*t)["json-object"] = oe_requiredParameter(
         &ArgParser::argJsonObject, "trailer|obj[,gen]");
     (*t)["check"] = oe_bare(&ArgParser::argCheck);
@@ -722,13 +729,13 @@ ArgParser::initOptionTable()
     (*t)["accessibility"] = oe_requiredChoices(
         &ArgParser::arg128Accessibility, yn);
     (*t)["extract"] = oe_requiredChoices(&ArgParser::arg128Extract, yn);
-    char const* print128Choices[] = {"full", "low", "none", 0};
+    char const* print128_choices[] = {"full", "low", "none", 0};
     (*t)["print"] = oe_requiredChoices(
-        &ArgParser::arg128Print, print128Choices);
-    char const* modify128Choices[] =
+        &ArgParser::arg128Print, print128_choices);
+    char const* modify128_choices[] =
         {"all", "annotate", "form", "assembly", "none", 0};
     (*t)["modify"] = oe_requiredChoices(
-        &ArgParser::arg128Modify, modify128Choices);
+        &ArgParser::arg128Modify, modify128_choices);
     (*t)["cleartext-metadata"] = oe_bare(&ArgParser::arg128ClearTextMetadata);
     // The above 128-bit options are also 256-bit options, so copy
     // what we have so far. Then continue separately with 128 and 256.
@@ -1123,9 +1130,17 @@ ArgParser::argCoalesceContents()
 }
 
 void
-ArgParser::argFlattenAnnotations()
+ArgParser::argFlattenAnnotations(char* parameter)
 {
     o.flatten_annotations = true;
+    if (strcmp(parameter, "screen") == 0)
+    {
+        o.flatten_annotations_forbidden |= an_no_view;
+    }
+    else if (strcmp(parameter, "print") == 0)
+    {
+        o.flatten_annotations_required |= an_print;
+    }
 }
 
 void
@@ -1769,7 +1784,8 @@ familiar with the PDF file format or who are PDF developers.\n\
                           preserve unreferenced page resources\n\
 --newline-before-endstream  always put a newline before endstream\n\
 --coalesce-contents       force all pages' content to be a single stream\n\
---flatten-annotations     incorporate rendering of annotations into page\n\
+--flatten-annotations=option\n\
+                          incorporate rendering of annotations into page\n\
                           contents including those for interactive form\n\
                           fields\n\
 --qdf                     turns on \"QDF mode\" (below)\n\
@@ -1777,6 +1793,12 @@ familiar with the PDF file format or who are PDF developers.\n\
                           for debugging\n\
 --min-version=version     sets the minimum PDF version of the output file\n\
 --force-version=version   forces this to be the PDF version of the output file\n\
+\n\
+Options for --flatten-annotations are all, print, or screen. If the\n\
+option is print, only annotations marked as print are included. If the\n\
+option is screen, options marked as \"no view\" are excluded.\n\
+Otherwise, annotations are flattened regardless of the presence of\n\
+print or NoView flags.\n\
 \n\
 Version numbers may be expressed as major.minor.extension-level, so 1.7.3\n\
 means PDF version 1.7 at extension level 3.\n\
@@ -3139,7 +3161,8 @@ static void handle_transformations(QPDF& pdf, Options& o)
     QPDFPageDocumentHelper dh(pdf);
     if (o.flatten_annotations)
     {
-        dh.flattenAnnotations();
+        dh.flattenAnnotations(o.flatten_annotations_required,
+                              o.flatten_annotations_forbidden);
     }
     if (o.coalesce_contents)
     {

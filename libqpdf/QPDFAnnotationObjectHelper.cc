@@ -81,7 +81,8 @@ QPDFAnnotationObjectHelper::getAppearanceStream(
 
 std::string
 QPDFAnnotationObjectHelper::getPageContentForAppearance(
-    std::string const& name, int rotate)
+    std::string const& name, int rotate,
+    int required_flags, int forbidden_flags)
 {
     if (! getAppearanceStream("/N").isStream())
     {
@@ -168,10 +169,23 @@ QPDFAnnotationObjectHelper::getPageContentForAppearance(
     //    appearance matrix.
 
     QPDFObjectHandle rect_obj = this->oh.getKey("/Rect");
-    QPDFObjectHandle flags = this->oh.getKey("/F");
+    QPDFObjectHandle flags_obj = this->oh.getKey("/F");
     QPDFObjectHandle as = getAppearanceStream("/N").getDict();
     QPDFObjectHandle bbox_obj = as.getKey("/BBox");
     QPDFObjectHandle matrix_obj = as.getKey("/Matrix");
+
+    int flags = flags_obj.isInteger() ? flags_obj.getIntValue() : 0;
+
+    if (flags & forbidden_flags)
+    {
+        QTC::TC("qpdf", "QPDFAnnotationObjectHelper forbidden flags");
+        return "";
+    }
+    if ((flags & required_flags) != required_flags)
+    {
+        QTC::TC("qpdf", "QPDFAnnotationObjectHelper missing required flags");
+        return "";
+    }
 
     if (! (bbox_obj.isRectangle() && rect_obj.isRectangle()))
     {
@@ -188,8 +202,7 @@ QPDFAnnotationObjectHelper::getPageContentForAppearance(
         QTC::TC("qpdf", "QPDFAnnotationObjectHelper default matrix");
     }
     QPDFObjectHandle::Rectangle rect = rect_obj.getArrayAsRectangle();
-    bool do_rotate = (rotate && flags.isInteger() &&
-                      (flags.getIntValue() & 16));
+    bool do_rotate = (rotate && (flags & an_no_rotate));
     if (do_rotate)
     {
         // If the the annotation flags include the NoRotate bit and

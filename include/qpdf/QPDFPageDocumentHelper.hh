@@ -24,6 +24,7 @@
 
 #include <qpdf/QPDFDocumentHelper.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
+#include <qpdf/Constants.h>
 
 #include <qpdf/DLL.h>
 
@@ -92,14 +93,23 @@ class QPDFPageDocumentHelper: public QPDFDocumentHelper
     // the annotation from the page. Handles widget annotations
     // associated with interactive form fields as a special case,
     // including removing the /AcroForm key from the document catalog.
+    // The values passed to required_flags and forbidden_flags are
+    // passed along to
+    // QPDFAnnotationObjectHelper::getPageContentForAppearance. See
+    // comments there in QPDFAnnotationObjectHelper.hh for meanings of
+    // those flags.
     QPDF_DLL
-    void flattenAnnotations();
+    void flattenAnnotations(
+        int required_flags = 0,
+        int forbidden_flags = an_invisible | an_hidden);
 
   private:
     void flattenAnnotationsForPage(
         QPDFPageObjectHelper& page,
         QPDFObjectHandle& resources,
-        QPDFAcroFormDocumentHelper& afdh);
+        QPDFAcroFormDocumentHelper& afdh,
+        int required_flags,
+        int forbidden_flags);
 
     class Members
     {

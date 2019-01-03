@@ -1461,7 +1461,7 @@ $td->notify("--- Flatten Form/Annotations ---");
 # - page 4: non-trivial matrix, rotate
 # - page 5: rotate 180 with /F 20
 # - page 6: rotate 90, /F 20, non-trivial matrix
-# - page 7: normal -- available for additional testing
+# - page 7: flags: top is print, middle is screen, bottom is hidden
 # - page 8: rotate 270 with /F 20
 # - page 9: normal -- available for additional testing
 #
@@ -1493,12 +1493,26 @@ foreach my $f (@annotation_files)
     $td->runtest("flatten $f",
                  {$td->COMMAND =>
                       "qpdf --qdf --static-id --no-original-object-ids" .
-                      " --flatten-annotations $f.pdf a.pdf"},
+                      " --flatten-annotations=all $f.pdf a.pdf"},
                  $exp_out,
                  $td->NORMALIZE_NEWLINES);
     $td->runtest("check output",
                  {$td->FILE => "a.pdf"},
                  {$td->FILE => "$f-out.pdf"});
+}
+
+$n_tests += 4;
+foreach my $f (qw(screen print))
+{
+    $td->runtest("flatten for $f",
+                 {$td->COMMAND =>
+                      "qpdf --qdf --static-id --no-original-object-ids" .
+                      " --flatten-annotations=$f manual-appearances.pdf a.pdf"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("check output",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => "manual-appearances-$f-out.pdf"});
 }
 
 show_ntests();

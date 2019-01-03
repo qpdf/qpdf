@@ -388,3 +388,5 @@ QPDFPageDocumentHelper replace indirect annots 0
 QPDFPageDocumentHelper replace direct annots 0
 QPDFObjectHandle replace with copy 0
 QPDFPageDocumentHelper indirect as resources 0
+QPDFAnnotationObjectHelper forbidden flags 0
+QPDFAnnotationObjectHelper missing required flags 0

@@ -89,4 +89,53 @@ enum qpdf_r3_modify_e		/* Allowed changes: */
     qpdf_r3m_none		/* no modifications */
 };
 
+/* Form field flags from the PDF spec */
+
+enum pdf_form_field_flag_e
+{
+    /* flags that apply to all form fields */
+    ff_all_read_only = 1 << 0,
+    ff_all_required = 1 << 1,
+    ff_all_no_export = 1 << 2,
+
+    /* flags that apply to fields of type /Btn (button) */
+    ff_btn_no_toggle_off = 1 << 14,
+    ff_btn_radio = 1 << 15,
+    ff_btn_pushbutton = 1 << 16,
+    ff_btn_radios_in_unison = 1 << 17,
+
+    /* flags that apply to fields of type /Tx (text) */
+    ff_tx_multiline = 1 << 12,
+    ff_tx_password = 1 << 13,
+    ff_tx_file_select = 1 << 20,
+    ff_tx_do_not_spell_check = 1 << 22,
+    ff_tx_do_not_scroll = 1 << 23,
+    ff_tx_comb = 1 << 24,
+    ff_tx_rich_text = 1 << 25,
+
+    /* flags that apply to fields of type /Ch (choice) */
+    ff_ch_combo = 1 << 17,
+    ff_ch_edit = 1 << 18,
+    ff_ch_sort = 1 << 19,
+    ff_ch_multi_select = 1 << 21,
+    ff_ch_do_not_spell_check = 1 << 22,
+    ff_ch_commit_on_sel_change = 1 << 26
+};
+
+/* Annotation flags from the PDF spec */
+
+enum pdf_annotation_flag_e
+{
+    an_invisible = 1 << 0,
+    an_hidden = 1 << 1,
+    an_print = 1 << 2,
+    an_no_zoom = 1 << 3,
+    an_no_rotate = 1 << 4,
+    an_no_view = 1 << 5,
+    an_read_only = 1 << 6,
+    an_locked = 1 << 7,
+    an_toggle_no_view = 1 << 8,
+    an_locked_contents = 1 << 9
+};
+
 #endif /* QPDFCONSTANTS_H */

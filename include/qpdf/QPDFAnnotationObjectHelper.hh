@@ -23,6 +23,7 @@
 #define QPDFANNOTATIONOBJECTHELPER_HH
 
 #include <qpdf/QPDFObjectHelper.hh>
+#include <qpdf/Constants.h>
 
 #include <qpdf/DLL.h>
 
@@ -76,10 +77,20 @@ class QPDFAnnotationObjectHelper: public QPDFObjectHelper
     // content stream that draws this annotation's appearance stream
     // as a form XObject. The value "name" is the resource name that
     // will be used to refer to the form xobject. The value "rotate"
-    // should be set to the page's /Rotate value or 0 if none.
+    // should be set to the page's /Rotate value or 0 if none. The
+    // values of required_flags and forbidden_flags are constructed by
+    // logically "or"ing annotation flags of type
+    // pdf_annotation_flag_e defined in qpdf/Constants.h. Content will
+    // be returned only if all required_flags are set and no
+    // forbidden_flags are set. For example, including an_no_view in
+    // forbidden_flags could be useful for creating an on-screen view,
+    // and including an_print to required_flags could be useful if
+    // preparing to print.
     QPDF_DLL
     std::string getPageContentForAppearance(
-        std::string const& name, int rotate);
+        std::string const& name, int rotate,
+        int required_flags = 0,
+        int forbidden_flags = an_invisible | an_hidden);
 
   private:
     class Members
