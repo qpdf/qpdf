@@ -1,3 +1,9 @@
+2019-01-02  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add method QPDFObjectHandle::getResourceNames that returns a set
+	of strings representing all second-level keys in a dictionary
+	(i.e. all keys of all direct dictionary members).
+
 2018-12-31  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add methods for flattening form fields and annotations:

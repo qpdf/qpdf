@@ -164,7 +164,8 @@ QPDFPageDocumentHelper::flattenAnnotationsForPage(
             }
             std::set<std::string> names = resources.getResourceNames();
             std::string name;
-            while (next_fx < 1000000)
+            int max_fx = next_fx + names.size() + 1;
+            while (next_fx <= max_fx)
             {
                 std::string candidate = "/Fxo" + QUtil::int_to_string(next_fx);
                 ++next_fx;
@@ -176,9 +177,9 @@ QPDFPageDocumentHelper::flattenAnnotationsForPage(
             }
             if (name.empty())
             {
-                // There are already more than a million /Fxo names.
-                // Somehow I doubt this is going to actually happen.
-                // Just pick a name and forget conflicts.
+                // This could only happen if there is a coding error.
+                // The number of candidates we test is more than the
+                // number of keys we're checking against.
                 name = "/FxConflict";
             }
             resources.mergeResources(
