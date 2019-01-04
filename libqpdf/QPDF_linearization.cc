@@ -675,14 +675,20 @@ QPDF::checkLinearizationInternal()
 qpdf_offset_t
 QPDF::maxEnd(ObjUser const& ou)
 {
-    assert(this->m->obj_user_to_objects.count(ou) > 0);
+    if (this->m->obj_user_to_objects.count(ou) == 0)
+    {
+        stopOnError("no entry in object user table for requested object user");
+    }
     std::set<QPDFObjGen> const& ogs = this->m->obj_user_to_objects[ou];
     qpdf_offset_t end = 0;
     for (std::set<QPDFObjGen>::const_iterator iter = ogs.begin();
 	 iter != ogs.end(); ++iter)
     {
 	QPDFObjGen const& og = *iter;
-	assert(this->m->obj_cache.count(og) > 0);
+	if (this->m->obj_cache.count(og) == 0)
+        {
+            stopOnError("unknown object referenced in object user table");
+        }
 	end = std::max(end, this->m->obj_cache[og].end_after_space);
     }
     return end;
@@ -745,7 +751,11 @@ QPDF::lengthNextN(int first_object, int n,
 	}
 	else
 	{
-	    assert(this->m->obj_cache.count(og) > 0);
+	    if (this->m->obj_cache.count(og) == 0)
+            {
+                stopOnError("found unknown object while"
+                            " calculating length for linearization data");
+            }
 	    length += this->m->obj_cache[og].end_after_space -
 		getLinearizationOffset(og);
 	}
@@ -780,7 +790,10 @@ QPDF::checkHPageOffset(std::list<std::string>& errors,
     int table_offset = adjusted_offset(
 	this->m->page_offset_hints.first_page_offset);
     QPDFObjGen first_page_og(pages.at(0).getObjGen());
-    assert(this->m->xref_table.count(first_page_og) > 0);
+    if (this->m->xref_table.count(first_page_og) == 0)
+    {
+        stopOnError("supposed first page object is not known");
+    }
     int offset = getLinearizationOffset(first_page_og);
     if (table_offset != offset)
     {
@@ -791,7 +804,10 @@ QPDF::checkHPageOffset(std::list<std::string>& errors,
     {
 	QPDFObjGen page_og(pages.at(pageno).getObjGen());
 	int first_object = page_og.getObj();
-	assert(this->m->xref_table.count(page_og) > 0);
+	if (this->m->xref_table.count(page_og) == 0)
+        {
+            stopOnError("unknown object in page offset hint table");
+        }
 	offset = getLinearizationOffset(page_og);
 
 	HPageOffsetEntry& he = this->m->page_offset_hints.entries.at(pageno);
@@ -955,7 +971,10 @@ QPDF::checkHSharedObject(std::list<std::string>& errors,
 		cur_object = so.first_shared_obj;
 
 		QPDFObjGen og(cur_object, 0);
-		assert(this->m->xref_table.count(og) > 0);
+		if (this->m->xref_table.count(og) == 0)
+                {
+                    stopOnError("unknown object in shared object hint table");
+                }
 		int offset = getLinearizationOffset(og);
 		int h_offset = adjusted_offset(so.first_shared_offset);
 		if (offset != h_offset)
@@ -1018,7 +1037,10 @@ QPDF::checkHOutlines(std::list<std::string>& warnings)
                 return;
             }
 	    QPDFObjGen og(outlines.getObjGen());
-	    assert(this->m->xref_table.count(og) > 0);
+	    if (this->m->xref_table.count(og) == 0)
+            {
+                stopOnError("unknown object in outlines hint table");
+            }
 	    int offset = getLinearizationOffset(og);
 	    ObjUser ou(ObjUser::ou_root_key, "/Outlines");
 	    int length = maxEnd(ou) - offset;
@@ -1513,7 +1535,11 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 
     // Part 4: open document objects.  We don't care about the order.
 
-    assert(lc_root.size() == 1);
+    if (lc_root.size() != 1)
+    {
+        stopOnError("found other than one root while"
+                    " calculating linearization data");
+    }
     this->m->part4.push_back(objGenToIndirect(*(lc_root.begin())));
     for (std::set<QPDFObjGen>::iterator iter = lc_open_document.begin();
 	 iter != lc_open_document.end(); ++iter)
@@ -1594,7 +1620,11 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 	this->m->c_page_offset_data.entries.at(i).nobjects = 1;
 
 	ObjUser ou(ObjUser::ou_page, i);
-	assert(this->m->obj_user_to_objects.count(ou) > 0);
+	if (this->m->obj_user_to_objects.count(ou) == 0)
+        {
+            stopOnError("found unreferenced page while"
+                        " calculating linearization data");
+        }
 	std::set<QPDFObjGen> ogs = this->m->obj_user_to_objects[ou];
 	for (std::set<QPDFObjGen>::iterator iter = ogs.begin();
 	     iter != ogs.end(); ++iter)
@@ -1638,7 +1668,11 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     // Place the pages tree.
     std::set<QPDFObjGen> pages_ogs =
 	this->m->obj_user_to_objects[ObjUser(ObjUser::ou_root_key, "/Pages")];
-    assert(! pages_ogs.empty());
+    if (pages_ogs.empty())
+    {
+        stopOnError("found empty pages tree while"
+                    " calculating linearization data");
+    }
     for (std::set<QPDFObjGen>::iterator iter = pages_ogs.begin();
 	 iter != pages_ogs.end(); ++iter)
     {
@@ -1790,7 +1824,11 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     {
 	CHPageOffsetEntry& pe = this->m->c_page_offset_data.entries.at(i);
 	ObjUser ou(ObjUser::ou_page, i);
-	assert(this->m->obj_user_to_objects.count(ou) > 0);
+	if (this->m->obj_user_to_objects.count(ou) == 0)
+        {
+            stopOnError("found unreferenced page while"
+                        " calculating linearization data");
+        }
 	std::set<QPDFObjGen> const& ogs = this->m->obj_user_to_objects[ou];
 	for (std::set<QPDFObjGen>::const_iterator iter = ogs.begin();
 	     iter != ogs.end(); ++iter)
@@ -1869,12 +1907,20 @@ QPDF::outputLengthNextN(
     // the output file starting with whatever object in_object from
     // the input file mapped to.
 
-    assert(obj_renumber.count(in_object) > 0);
+    if (obj_renumber.count(in_object) == 0)
+    {
+        stopOnError("found object that is not renumbered while"
+                    " writing linearization data");
+    }
     int first = (*(obj_renumber.find(in_object))).second;
     int length = 0;
     for (int i = 0; i < n; ++i)
     {
-	assert(lengths.count(first + i) > 0);
+	if (lengths.count(first + i) == 0)
+        {
+            stopOnError("found item with unknown length"
+                        " while writing linearization data");
+        }
 	length += (*(lengths.find(first + i))).second;
     }
     return length;
@@ -1958,8 +2004,12 @@ QPDF::calculateHPageOffset(
     for (unsigned int i = 0; i < npages; ++i)
     {
 	// Adjust delta entries
-	assert(phe.at(i).delta_nobjects >= min_nobjects);
-	assert(phe.at(i).delta_page_length >= min_length);
+	if ((phe.at(i).delta_nobjects < min_nobjects) ||
+            (phe.at(i).delta_page_length < min_length))
+        {
+            stopOnError("found too small delta nobjects or delta page length"
+                        " while writing linearization data");
+        }
 	phe.at(i).delta_nobjects -= min_nobjects;
 	phe.at(i).delta_page_length -= min_length;
 	phe.at(i).delta_content_length = phe.at(i).delta_page_length;
@@ -2019,7 +2069,11 @@ QPDF::calculateHSharedObject(
     for (int i = 0; i < cso.nshared_total; ++i)
     {
 	// Adjust deltas
-	assert(soe.at(i).delta_group_length >= min_length);
+	if (soe.at(i).delta_group_length < min_length)
+        {
+            stopOnError("found too small group length while"
+                        " writing linearization data");
+        }
 	soe.at(i).delta_group_length -= min_length;
     }
 }
@@ -2158,7 +2212,11 @@ QPDF::writeHSharedObject(BitWriter& w)
     for (int i = 0; i < nitems; ++i)
     {
 	// If signature were present, we'd have to write a 128-bit hash.
-	assert(entries.at(i).signature_present == 0);
+	if (entries.at(i).signature_present != 0)
+        {
+            stopOnError("found unexpected signature present"
+                        " while writing linearization data");
+        }
     }
     write_vector_int(w, nitems, entries,
 		     t.nbits_nobjects,

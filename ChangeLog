@@ -1,5 +1,9 @@
 2019-01-04  Jay Berkenbilt  <ejb@ql.org>
 
+	* When unexpected errors are found while checking linearization
+	data, print an error message instead of calling assert, which
+	cause the program to crash. Fixes #209, #231.
+
 	* Detect and recover from dangling references. If a PDF file
 	contained an indirect reference to a non-existent object (which is
 	valid), when adding a new object to the file, it was possible for

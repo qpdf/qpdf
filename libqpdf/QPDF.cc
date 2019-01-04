@@ -2609,3 +2609,13 @@ QPDF::findAttachmentStreams()
         }
     }
 }
+
+void
+QPDF::stopOnError(std::string const& message)
+{
+    // Throw a generic exception when we lack context for something
+    // more specific. New code should not use this. This method exists
+    // to improve somewhat from calling assert in very old code.
+    throw QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
+                  "", this->m->file->getLastOffset(), message);
+}

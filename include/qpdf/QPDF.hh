@@ -726,6 +726,7 @@ class QPDF
     PointerHolder<QPDFObject> resolve(int objid, int generation);
     void resolveObjectsInStream(int obj_stream_number);
     void findAttachmentStreams();
+    void stopOnError(std::string const& message);
 
     // Calls finish() on the pipeline when done but does not delete it
     bool pipeStreamData(int objid, int generation,
