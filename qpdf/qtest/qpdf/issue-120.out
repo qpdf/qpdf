@@ -1,3 +1,7 @@
 WARNING: issue-120.pdf (offset 85): loop detected resolving object 3 0
 WARNING: issue-120.pdf (object 6 0, offset 85): supposed object stream 3 is not a stream
+WARNING: issue-120.pdf: file is damaged
+WARNING: issue-120.pdf (object 8 10, offset 26880): expected n n obj
+WARNING: issue-120.pdf: Attempting to reconstruct cross-reference table
+WARNING: issue-120.pdf: object 8 10 not found in file after regenerating cross reference table
 qpdf: operation succeeded with warnings; resulting file may have some problems

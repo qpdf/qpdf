@@ -82,7 +82,6 @@ QPDFObjectHandle clone dictionary 0
 QPDFObjectHandle makeDirect loop 0
 QPDFObjectHandle ERR clone stream 0
 QPDFTokenizer allow pound anywhere in name 0
-QPDF indirect last obj from xref 1
 QPDF default for xref stream field 0 0
 QPDF prev key in xref stream dictionary 0
 QPDF prev key in trailer dictionary 0
@@ -402,3 +401,4 @@ QPDFFormFieldObjectHelper list not found 0
 QPDFFormFieldObjectHelper list found 0
 QPDFFormFieldObjectHelper list first too low 0
 QPDFFormFieldObjectHelper list last too high 0
+QPDF detected dangling ref 0

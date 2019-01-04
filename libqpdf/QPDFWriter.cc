@@ -2244,6 +2244,7 @@ QPDFWriter::prepareFileForWrite()
     // includes stream lengths, stream filtering parameters, and
     // document extension level information.
 
+    this->m->pdf.fixDanglingReferences(true);
     std::list<QPDFObjectHandle> queue;
     queue.push_back(getTrimmedTrailer());
     std::set<int> visited;

@@ -1846,6 +1846,25 @@ void runtest(int n, char const* filename1, char const* arg2)
         QPDFWriter w(pdf, "a.pdf");
         w.write();
     }
+    else if (n == 53)
+    {
+        // Test get all objects and dangling ref handling
+        QPDFObjectHandle root = pdf.getRoot();
+        root.replaceKey(
+            "/Q1",
+            pdf.makeIndirectObject(QPDFObjectHandle::newString("potato")));
+        std::cout << "all objects" << std::endl;
+        std::vector<QPDFObjectHandle> all = pdf.getAllObjects();
+        for (std::vector<QPDFObjectHandle>::iterator iter = all.begin();
+             iter != all.end(); ++iter)
+        {
+            std::cout << (*iter).unparse() << std::endl;
+        }
+
+        QPDFWriter w(pdf, "a.pdf");
+        w.setStaticID(true);
+        w.write();
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +

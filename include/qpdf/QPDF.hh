@@ -431,9 +431,21 @@ class QPDF
     QPDF_DLL
     void showXRefTable();
 
+    // Detect all indirect references to objects that don't exist and
+    // resolve them by replacing them with null, which is how the PDF
+    // spec says to interpret such dangling references. This method is
+    // called automatically if you try to add any new objects, if you
+    // call getAllObjects, and before a file is written. The qpdf
+    // object caches whether it has run this to avoid running it
+    // multiple times. You can pass true to force it to run again if
+    // you have explicitly added new objects that may have additional
+    // dangling references.
+    QPDF_DLL
+    void fixDanglingReferences(bool force = false);
+
     // Return the approximate number of indirect objects. It is
     // approximate because not all objects in the file are preserved
-    // in all cases.
+    // in all cases, and gaps in object numbering are not preserved.
     QPDF_DLL
     size_t getObjectCount();
 
@@ -1199,6 +1211,7 @@ class QPDF
         CopiedStreamDataProvider* copied_stream_data_provider;
         std::set<QPDFObjGen> attachment_streams;
         bool reconstructed_xref;
+        bool fixed_dangling_refs;
 
         // Linearization data
         qpdf_offset_t first_xref_item_offset; // actual value from file

@@ -94,6 +94,7 @@ QPDF::Members::Members() :
     pushed_inherited_attributes_to_pages(false),
     copied_stream_data_provider(0),
     reconstructed_xref(false),
+    fixed_dangling_refs(false),
     first_xref_item_offset(0),
     uncompressed_after_compressed(false)
 {
@@ -1218,33 +1219,129 @@ QPDF::showXRefTable()
     }
 }
 
+void
+QPDF::fixDanglingReferences(bool force)
+{
+    if (this->m->fixed_dangling_refs && (! force))
+    {
+        return;
+    }
+    this->m->fixed_dangling_refs = true;
+
+    // Create a set of all known indirect objects including those
+    // we've previously resolved and those that we have created.
+    std::set<QPDFObjGen> to_process;
+    for (std::map<QPDFObjGen, ObjCache>::iterator iter =
+	     this->m->obj_cache.begin();
+	 iter != this->m->obj_cache.end(); ++iter)
+    {
+	to_process.insert((*iter).first);
+    }
+    for (std::map<QPDFObjGen, QPDFXRefEntry>::iterator iter =
+	     this->m->xref_table.begin();
+	 iter != this->m->xref_table.end(); ++iter)
+    {
+	to_process.insert((*iter).first);
+    }
+
+    // For each non-scalar item to process, put it in the queue.
+    std::list<QPDFObjectHandle> queue;
+    queue.push_back(this->m->trailer);
+    for (std::set<QPDFObjGen>::iterator iter = to_process.begin();
+         iter != to_process.end(); ++iter)
+    {
+        QPDFObjectHandle obj = QPDFObjectHandle::Factory::newIndirect(
+            this, (*iter).getObj(), (*iter).getGen());
+        if (obj.isDictionary() || obj.isArray())
+        {
+            queue.push_back(obj);
+        }
+        else if (obj.isStream())
+        {
+            queue.push_back(obj.getDict());
+        }
+    }
+
+    // Process the queue by recursively resolving all object
+    // references. We don't need to do loop detection because we don't
+    // traverse known indirect objects when processing the queue.
+    while (! queue.empty())
+    {
+        QPDFObjectHandle obj = queue.front();
+        queue.pop_front();
+        std::list<QPDFObjectHandle> to_check;
+        if (obj.isDictionary())
+        {
+            std::map<std::string, QPDFObjectHandle> members =
+                obj.getDictAsMap();
+            for (std::map<std::string, QPDFObjectHandle>::iterator iter =
+                     members.begin();
+                 iter != members.end(); ++iter)
+            {
+                to_check.push_back((*iter).second);
+            }
+        }
+        else if (obj.isArray())
+        {
+            std::vector<QPDFObjectHandle> elements = obj.getArrayAsVector();
+            for (std::vector<QPDFObjectHandle>::iterator iter =
+                     elements.begin();
+                 iter != elements.end(); ++iter)
+            {
+                to_check.push_back(*iter);
+            }
+        }
+        for (std::list<QPDFObjectHandle>::iterator iter = to_check.begin();
+             iter != to_check.end(); ++iter)
+        {
+            QPDFObjectHandle sub = *iter;
+            if (sub.isIndirect())
+            {
+                if (sub.getOwningQPDF() == this)
+                {
+                    QPDFObjGen og(sub.getObjGen());
+                    if (this->m->obj_cache.count(og) == 0)
+                    {
+                        QTC::TC("qpdf", "QPDF detected dangling ref");
+                        queue.push_back(sub);
+                    }
+                }
+            }
+            else
+            {
+                queue.push_back(sub);
+            }
+        }
+
+    }
+}
+
 size_t
 QPDF::getObjectCount()
 {
     // This method returns the next available indirect object number.
-    // makeIndirectObject uses it for this purpose.
-    QPDFObjGen o1(0, 0);
+    // makeIndirectObject uses it for this purpose. After
+    // fixDanglingReferences is called, all objects in the xref table
+    // will also be in obj_cache.
+    fixDanglingReferences();
+    QPDFObjGen og(0, 0);
     if (! this->m->obj_cache.empty())
     {
-	o1 = (*(this->m->obj_cache.rbegin())).first;
+	og = (*(this->m->obj_cache.rbegin())).first;
     }
-    QPDFObjGen o2(0, 0);
-    if (! this->m->xref_table.empty())
-    {
-	o2 = (*(this->m->xref_table.rbegin())).first;
-    }
-    QTC::TC("qpdf", "QPDF indirect last obj from xref",
-	    (o2.getObj() > o1.getObj()) ? 1 : 0);
-    return std::max(o1.getObj(), o2.getObj());
+    return og.getObj();
 }
 
 std::vector<QPDFObjectHandle>
 QPDF::getAllObjects()
 {
+    // After fixDanglingReferences is called, all objects are in the
+    // object cache.
+    fixDanglingReferences(true);
     std::vector<QPDFObjectHandle> result;
-    for (std::map<QPDFObjGen, QPDFXRefEntry>::iterator iter =
-	     this->m->xref_table.begin();
-	 iter != this->m->xref_table.end(); ++iter)
+    for (std::map<QPDFObjGen, ObjCache>::iterator iter =
+	     this->m->obj_cache.begin();
+	 iter != this->m->obj_cache.end(); ++iter)
     {
 
 	QPDFObjGen const& og = (*iter).first;
@@ -1752,7 +1849,6 @@ QPDF::resolve(int objid, int generation)
     }
     ResolveRecorder rr(this, og);
 
-    // PDF spec says unknown objects resolve to the null object.
     if ((! this->m->obj_cache.count(og)) && this->m->xref_table.count(og))
     {
 	QPDFXRefEntry const& entry = this->m->xref_table[og];
@@ -1800,6 +1896,7 @@ QPDF::resolve(int objid, int generation)
     }
     if (this->m->obj_cache.count(og) == 0)
     {
+        // PDF spec says unknown objects resolve to the null object.
         QTC::TC("qpdf", "QPDF resolve failure to null");
         QPDFObjectHandle oh = QPDFObjectHandle::newNull();
         this->m->obj_cache[og] =

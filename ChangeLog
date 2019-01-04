@@ -1,3 +1,12 @@
+2019-01-04  Jay Berkenbilt  <ejb@ql.org>
+
+	* Detect and recover from dangling references. If a PDF file
+	contained an indirect reference to a non-existent object (which is
+	valid), when adding a new object to the file, it was possible for
+	the new object to take the object ID of the dangling reference,
+	thereby causing the dangling reference to point to the new object.
+	This case is now prevented. Fixes #240.
+
 2019-01-03  Jay Berkenbilt  <ejb@ql.org>
 
 	* Fix behavior of form field value setting to handle the following

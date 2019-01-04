@@ -122,6 +122,32 @@ WARNING: issue-101.pdf (object 11 0, offset 1357): unknown token while reading o
 WARNING: issue-101.pdf (object 11 0, offset 1359): unknown token while reading object; treating as string
 WARNING: issue-101.pdf (object 11 0, offset 1368): unexpected )
 WARNING: issue-101.pdf (object 11 0, offset 1373): expected endobj
+WARNING: issue-101.pdf (object 2 0, offset 244): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 7 0, offset 3855): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 7 0, offset 3863): treating unexpected brace token as null
+WARNING: issue-101.pdf (object 7 0, offset 3864): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 7 0, offset 3866): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 7 0, offset 3873): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 7 0, offset 3879): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 7 0, offset 3888): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 7 0, offset 3901): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 7 0, offset 3905): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 7 0, offset 3913): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 7 0, offset 3847): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-101.pdf (object 7 0, offset 3847): expected dictionary key but found non-name object; inserting key /QPDFFake2
+WARNING: issue-101.pdf (object 7 0, offset 3847): expected dictionary key but found non-name object; inserting key /QPDFFake3
+WARNING: issue-101.pdf (object 7 0, offset 3847): expected dictionary key but found non-name object; inserting key /QPDFFake4
+WARNING: issue-101.pdf (object 7 0, offset 3847): expected dictionary key but found non-name object; inserting key /QPDFFake5
+WARNING: issue-101.pdf (object 7 0, offset 3847): expected dictionary key but found non-name object; inserting key /QPDFFake6
+WARNING: issue-101.pdf (object 7 0, offset 3847): expected dictionary key but found non-name object; inserting key /QPDFFake7
+WARNING: issue-101.pdf (object 7 0, offset 3847): expected dictionary key but found non-name object; inserting key /QPDFFake8
+WARNING: issue-101.pdf (object 7 0, offset 3847): expected dictionary key but found non-name object; inserting key /QPDFFake9
+WARNING: issue-101.pdf (object 7 0, offset 3847): expected dictionary key but found non-name object; inserting key /QPDFFake10
+WARNING: issue-101.pdf (object 7 0, offset 3844): stream dictionary lacks /Length key
+WARNING: issue-101.pdf (object 7 0, offset 3962): attempting to recover stream length
+WARNING: issue-101.pdf (object 7 0, offset 3962): recovered stream length: 12
 WARNING: issue-101.pdf (object 8 0, offset 4067): invalid character ()) in hexstring
 WARNING: issue-101.pdf (object 8 0, offset 4069): expected endobj
+WARNING: issue-101.pdf (object 9 0, offset 2832): unknown token while reading object; treating as string
+WARNING: issue-101.pdf (object 9 0, offset 2834): expected endobj
 qpdf: operation succeeded with warnings; resulting file may have some problems
