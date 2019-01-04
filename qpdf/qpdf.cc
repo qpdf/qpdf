@@ -106,6 +106,7 @@ struct Options
         flatten_annotations(false),
         flatten_annotations_required(0),
         flatten_annotations_forbidden(an_invisible | an_hidden),
+        generate_appearances(false),
         show_npages(false),
         deterministic_id(false),
         static_id(false),
@@ -181,6 +182,7 @@ struct Options
     bool flatten_annotations;
     int flatten_annotations_required;
     int flatten_annotations_forbidden;
+    bool generate_appearances;
     std::string min_version;
     std::string force_version;
     bool show_npages;
@@ -570,6 +572,7 @@ class ArgParser
     void argLinearizePass1(char* parameter);
     void argCoalesceContents();
     void argFlattenAnnotations(char* parameter);
+    void argGenerateAppearances();
     void argMinVersion(char* parameter);
     void argForceVersion(char* parameter);
     void argSplitPages(char* parameter);
@@ -771,6 +774,8 @@ ArgParser::initOptionTable()
     char const* flatten_choices[] = {"all", "print", "screen", 0};
     (*t)["flatten-annotations"] = oe_requiredChoices(
         &ArgParser::argFlattenAnnotations, flatten_choices);
+    (*t)["generate-appearances"] =
+        oe_bare(&ArgParser::argGenerateAppearances);
     (*t)["min-version"] = oe_requiredParameter(
         &ArgParser::argMinVersion, "version");
     (*t)["force-version"] = oe_requiredParameter(
@@ -1231,6 +1236,12 @@ ArgParser::argFlattenAnnotations(char* parameter)
     {
         o.flatten_annotations_required |= an_print;
     }
+}
+
+void
+ArgParser::argGenerateAppearances()
+{
+    o.generate_appearances = true;
 }
 
 void
@@ -1877,18 +1888,28 @@ familiar with the PDF file format or who are PDF developers.\n\
 --flatten-annotations=option\n\
                           incorporate rendering of annotations into page\n\
                           contents including those for interactive form\n\
-                          fields\n\
+                          fields; may also want --generate-appearances\n\
+--generate-appearances    generate appearance streams for form fields\n\
 --qdf                     turns on \"QDF mode\" (below)\n\
 --linearize-pass1=file    write intermediate pass of linearized file\n\
                           for debugging\n\
 --min-version=version     sets the minimum PDF version of the output file\n\
 --force-version=version   forces this to be the PDF version of the output file\n\
 \n\
-Options for --flatten-annotations are all, print, or screen. If the\n\
-option is print, only annotations marked as print are included. If the\n\
-option is screen, options marked as \"no view\" are excluded.\n\
-Otherwise, annotations are flattened regardless of the presence of\n\
-print or NoView flags.\n\
+Options for --flatten-annotations are all, print, or screen. If the option\n\
+is print, only annotations marked as print are included. If the option is\n\
+screen, options marked as \"no view\" are excluded. Otherwise, annotations\n\
+are flattened regardless of the presence of print or NoView flags. It is\n\
+common for PDF files to have a flag set that appearance streams need to be\n\
+regenerated. This happens when someone changes a form value with software\n\
+that does not know how to render the new value. qpdf will not flatten form\n\
+fields in files like this. If you get this warning, you have two choices:\n\
+either use qpdf's --generate-appearances flag to tell qpdf to go ahead and\n\
+regenerate appearances, or use some other tool to generate the appearances.\n\
+qpdf does a pretty good job with most forms when only ASCII characters are\n\
+used in form field values, but if your form fields contain other\n\
+characters, rich text, or are other than left justified, you will get\n\
+better results first saving with other software.\n\
 \n\
 Version numbers may be expressed as major.minor.extension-level, so 1.7.3\n\
 means PDF version 1.7 at extension level 3.\n\
@@ -3356,6 +3377,11 @@ static void do_inspection(QPDF& pdf, Options& o)
 static void handle_transformations(QPDF& pdf, Options& o)
 {
     QPDFPageDocumentHelper dh(pdf);
+    if (o.generate_appearances)
+    {
+        QPDFAcroFormDocumentHelper afdh(pdf);
+        afdh.generateAppearancesIfNeeded();
+    }
     if (o.flatten_annotations)
     {
         dh.flattenAnnotations(o.flatten_annotations_required,

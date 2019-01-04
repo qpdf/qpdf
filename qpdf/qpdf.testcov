@@ -398,3 +398,7 @@ QPDFFormFieldObjectHelper checkbox kid widget 0
 QPDFObjectHandle broken radio button 0
 QPDFFormFieldObjectHelper set checkbox AS 0
 QPDFObjectHandle broken checkbox 0
+QPDFFormFieldObjectHelper list not found 0
+QPDFFormFieldObjectHelper list found 0
+QPDFFormFieldObjectHelper list first too low 0
+QPDFFormFieldObjectHelper list last too high 0

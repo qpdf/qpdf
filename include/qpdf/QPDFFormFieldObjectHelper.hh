@@ -31,6 +31,8 @@
 #include <qpdf/DLL.h>
 #include <vector>
 
+class QPDFAnnotationObjectHelper;
+
 class QPDFFormFieldObjectHelper: public QPDFObjectHelper
 {
   public:
@@ -179,9 +181,21 @@ class QPDFFormFieldObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     void setV(std::string const& utf8_value, bool need_appearances = true);
 
+    // Update the appearance stream for this field. Note that qpdf's
+    // abilitiy to generate appearance streams is limited. We only
+    // generate appearance streams for streams of type text or choice.
+    // The appearance uses the default parameters provided in the
+    // file, and it only supports ASCII characters. Quadding is
+    // currently ignored. While this functionality is limited, it
+    // should do a decent job on properly constructed PDF files when
+    // field values are restricted to ASCII characters.
+    QPDF_DLL
+    void generateAppearance(QPDFAnnotationObjectHelper&);
+
   private:
     void setRadioButtonValue(QPDFObjectHandle name);
     void setCheckBoxValue(bool value);
+    void generateTextAppearance(QPDFAnnotationObjectHelper&);
 
     class Members
     {

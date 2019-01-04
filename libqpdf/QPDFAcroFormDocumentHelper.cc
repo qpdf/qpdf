@@ -285,3 +285,48 @@ QPDFAcroFormDocumentHelper::setNeedAppearances(bool val)
         acroform.removeKey("/NeedAppearances");
     }
 }
+
+void
+QPDFAcroFormDocumentHelper::generateAppearancesIfNeeded()
+{
+    if (! getNeedAppearances())
+    {
+        return;
+    }
+
+    QPDFPageDocumentHelper pdh(this->qpdf);
+    std::vector<QPDFPageObjectHelper> pages = pdh.getAllPages();
+    for (std::vector<QPDFPageObjectHelper>::iterator page_iter =
+             pages.begin();
+         page_iter != pages.end(); ++page_iter)
+    {
+        std::vector<QPDFAnnotationObjectHelper> annotations =
+            getWidgetAnnotationsForPage(*page_iter);
+        for (std::vector<QPDFAnnotationObjectHelper>::iterator annot_iter =
+                 annotations.begin();
+             annot_iter != annotations.end(); ++annot_iter)
+        {
+            QPDFAnnotationObjectHelper& aoh = *annot_iter;
+            QPDFFormFieldObjectHelper ffh =
+                getFieldForAnnotation(aoh);
+            if (ffh.getFieldType() == "/Btn")
+            {
+                // Rather than generating appearances for button
+                // fields, rely on what's already there. Just make
+                // sure /AS is consistent with /V, which we can do by
+                // resetting the value of the field back to itself.
+                // This code is referenced in a comment in
+                // QPDFFormFieldObjectHelper::generateAppearance.
+                if (ffh.isRadioButton() || ffh.isCheckbox())
+                {
+                    ffh.setV(ffh.getValue());
+                }
+            }
+            else
+            {
+                ffh.generateAppearance(aoh);
+            }
+        }
+    }
+    setNeedAppearances(false);
+}

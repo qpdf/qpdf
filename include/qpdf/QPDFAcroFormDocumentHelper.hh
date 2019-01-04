@@ -157,6 +157,16 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
     QPDF_DLL
     void setNeedAppearances(bool);
 
+    // If /NeedAppearances is false, do nothing. Otherwise generate
+    // appearance streams for all widget annotations that need them.
+    // See comments in QPDFFormFieldObjectHelper.hh for
+    // generateAppearance for limitations. For checkbox and radio
+    // button fields, this code ensures that appearance state is
+    // consistent with the field's value and uses any pre-existing
+    // appearance streams.
+    QPDF_DLL
+    void generateAppearancesIfNeeded();
+
   private:
     void analyze();
     void traverseField(QPDFObjectHandle field,

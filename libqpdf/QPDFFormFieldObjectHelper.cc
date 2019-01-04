@@ -1,6 +1,10 @@
 #include <qpdf/QPDFFormFieldObjectHelper.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
+#include <qpdf/QPDFAnnotationObjectHelper.hh>
+#include <qpdf/QUtil.hh>
+#include <qpdf/Pl_QPDFTokenizer.hh>
+#include <stdlib.h>
 
 QPDFFormFieldObjectHelper::Members::~Members()
 {
@@ -313,7 +317,15 @@ QPDFFormFieldObjectHelper::setV(
         }
         return;
     }
-    setFieldAttribute("/V", value);
+    if (value.isString())
+    {
+        setFieldAttribute(
+            "/V", QPDFObjectHandle::newUnicodeString(value.getUTF8Value()));
+    }
+    else
+    {
+        setFieldAttribute("/V", value);
+    }
     if (need_appearances)
     {
         QPDF* qpdf = this->oh.getOwningQPDF();
@@ -469,4 +481,291 @@ QPDFFormFieldObjectHelper::setCheckBoxValue(bool value)
     }
     QTC::TC("qpdf", "QPDFFormFieldObjectHelper set checkbox AS");
     annot.replaceKey("/AS", name);
+}
+
+void
+QPDFFormFieldObjectHelper::generateAppearance(QPDFAnnotationObjectHelper& aoh)
+{
+    std::string ft = getFieldType();
+    // Ignore field types we don't know how to generate appearances
+    // for. Button fields don't really need them -- see code in
+    // QPDFAcroFormDocumentHelper::generateAppearancesIfNeeded.
+    if ((ft == "/Tx") || (ft == "/Ch"))
+    {
+        generateTextAppearance(aoh);
+    }
+}
+
+class ValueSetter: public QPDFObjectHandle::TokenFilter
+{
+  public:
+    ValueSetter(std::string const& DA, std::string const& V,
+                std::vector<std::string> const& opt, double tf,
+                QPDFObjectHandle::Rectangle const& bbox);
+    virtual ~ValueSetter()
+    {
+    }
+    virtual void handleToken(QPDFTokenizer::Token const&);
+    void writeAppearance();
+
+  private:
+    std::string DA;
+    std::string V;
+    std::vector<std::string> opt;
+    double tf;
+    QPDFObjectHandle::Rectangle bbox;
+    enum { st_top, st_bmc, st_emc, st_end } state;
+};
+
+ValueSetter::ValueSetter(std::string const& DA, std::string const& V,
+                         std::vector<std::string> const& opt, double tf,
+                         QPDFObjectHandle::Rectangle const& bbox) :
+    DA(DA),
+    V(V),
+    opt(opt),
+    tf(tf),
+    bbox(bbox),
+    state(st_top)
+{
+}
+
+void
+ValueSetter::handleToken(QPDFTokenizer::Token const& token)
+{
+    QPDFTokenizer::token_type_e ttype = token.getType();
+    std::string value = token.getValue();
+    bool do_replace = false;
+    switch (state)
+    {
+        case st_top:
+          writeToken(token);
+          if ((ttype == QPDFTokenizer::tt_word) && (value == "BMC"))
+          {
+              state = st_bmc;
+          }
+          break;
+
+      case st_bmc:
+        if ((ttype == QPDFTokenizer::tt_space) ||
+            (ttype == QPDFTokenizer::tt_comment))
+        {
+            writeToken(token);
+        }
+        else
+        {
+            state = st_emc;
+        }
+        // fall through to emc
+
+      case st_emc:
+        if ((ttype == QPDFTokenizer::tt_word) && (value == "EMC"))
+        {
+            do_replace = true;
+            state = st_end;
+        }
+        break;
+
+      case st_end:
+        writeToken(token);
+        break;
+    }
+    if (do_replace)
+    {
+        writeAppearance();
+    }
+}
+
+void ValueSetter::writeAppearance()
+{
+    // This code does not take quadding into consideration because
+    // doing so requires font metric information, which we don't
+    // have in many cases.
+
+    double tfh = 1.2 * tf;
+    int dx = 1;
+
+    // Write one or more lines, centered vertically, possibly with
+    // one row highlighted.
+
+    size_t max_rows = static_cast<size_t>((bbox.ury - bbox.lly) / tfh);
+    bool highlight = false;
+    size_t highlight_idx = 0;
+
+    std::vector<std::string> lines;
+    if (opt.empty() || (max_rows < 2))
+    {
+        lines.push_back(V);
+    }
+    else
+    {
+        // Figure out what rows to write
+        size_t nopt = opt.size();
+        size_t found_idx = 0;
+        bool found = false;
+        for (found_idx = 0; found_idx < nopt; ++found_idx)
+        {
+            if (opt.at(found_idx) == V)
+            {
+                found = true;
+                break;
+            }
+        }
+        if (found)
+        {
+            // Try to make the found item the second one, but
+            // adjust for under/overflow.
+            int wanted_first = found_idx - 1;
+            int wanted_last = found_idx + max_rows - 2;
+            QTC::TC("qpdf", "QPDFFormFieldObjectHelper list found");
+            while (wanted_first < 0)
+            {
+                QTC::TC("qpdf", "QPDFFormFieldObjectHelper list first too low");
+                ++wanted_first;
+                ++wanted_last;
+            }
+            while (wanted_last >= static_cast<int>(nopt))
+            {
+                QTC::TC("qpdf", "QPDFFormFieldObjectHelper list last too high");
+                if (wanted_first > 0)
+                {
+                    --wanted_first;
+                }
+                --wanted_last;
+            }
+            highlight = true;
+            highlight_idx = found_idx - wanted_first;
+            for (int i = wanted_first; i <= wanted_last; ++i)
+            {
+                lines.push_back(opt.at(i));
+            }
+        }
+        else
+        {
+            QTC::TC("qpdf", "QPDFFormFieldObjectHelper list not found");
+            // include our value and the first n-1 rows
+            highlight_idx = 0;
+            highlight = true;
+            lines.push_back(V);
+            for (size_t i = 0; ((i < nopt) && (i < (max_rows - 1))); ++i)
+            {
+                lines.push_back(opt.at(i));
+            }
+        }
+    }
+
+    // Write the lines centered vertically, highlighting if needed
+    size_t nlines = lines.size();
+    double dy = bbox.ury - ((bbox.ury - bbox.lly - (nlines * tfh)) / 2.0);
+    write(DA + "\nq\n");
+    if (highlight)
+    {
+        write("q\n0.85 0.85 0.85 rg\n" +
+              QUtil::int_to_string(bbox.llx) + " " +
+              QUtil::double_to_string(bbox.lly + dy -
+                                      (tfh * (highlight_idx + 1))) + " " +
+              QUtil::int_to_string(bbox.urx - bbox.llx) + " " +
+              QUtil::double_to_string(tfh) +
+              " re f\nQ\n");
+    }
+    dy += 0.2 * tf;
+    for (size_t i = 0; i < nlines; ++i)
+    {
+        dy -= tfh;
+        write("BT\n" +
+              QUtil::int_to_string(bbox.llx + dx) + " " +
+              QUtil::double_to_string(bbox.lly + dy) + " Td\n" +
+              QPDFObjectHandle::newString(lines.at(i)).unparse() +
+              " Tj\nET\n");
+    }
+    write("Q\nEMC");
+}
+
+class TfFinder: public QPDFObjectHandle::TokenFilter
+{
+  public:
+    TfFinder();
+    virtual ~TfFinder()
+    {
+    }
+    virtual void handleToken(QPDFTokenizer::Token const&);
+    double getTf();
+
+  private:
+    double tf;
+    double last_num;
+};
+
+TfFinder::TfFinder() :
+    tf(11.0),
+    last_num(0.0)
+{
+}
+
+void
+TfFinder::handleToken(QPDFTokenizer::Token const& token)
+{
+    QPDFTokenizer::token_type_e ttype = token.getType();
+    std::string value = token.getValue();
+    switch (ttype)
+    {
+      case QPDFTokenizer::tt_integer:
+      case QPDFTokenizer::tt_real:
+        last_num = strtod(value.c_str(), 0);
+        break;
+
+      case QPDFTokenizer::tt_word:
+        if ((value == "Tf") &&
+            (last_num > 1.0) &&
+            (last_num < 1000.0))
+        {
+            // These ranges are arbitrary but keep us from doing
+            // insane things or suffering from over/underflow
+            tf = last_num;
+        }
+        break;
+
+      default:
+        break;
+    }
+}
+
+double
+TfFinder::getTf()
+{
+    return this->tf;
+}
+
+void
+QPDFFormFieldObjectHelper::generateTextAppearance(
+    QPDFAnnotationObjectHelper& aoh)
+{
+    QPDFObjectHandle AS = aoh.getAppearanceStream("/N");
+    if (! AS.isStream())
+    {
+        aoh.getObjectHandle().warnIfPossible(
+            "unable to get normal appearance stream for update");
+        return;
+    }
+    QPDFObjectHandle bbox_obj = AS.getDict().getKey("/BBox");
+    if (! bbox_obj.isRectangle())
+    {
+        aoh.getObjectHandle().warnIfPossible(
+            "unable to get appearance stream bounding box");
+        return;
+    }
+    QPDFObjectHandle::Rectangle bbox = bbox_obj.getArrayAsRectangle();
+    std::string DA = getDefaultAppearance();
+    std::string V = QUtil::utf8_to_ascii(getValueAsString());
+
+    TfFinder tff;
+    Pl_QPDFTokenizer tok("tf", &tff);
+    tok.write(QUtil::unsigned_char_pointer(DA.c_str()), DA.length());
+    tok.finish();
+    double tf = tff.getTf();
+    std::vector<std::string> opt;
+    if (isChoice() && ((getFlags() & ff_ch_combo) == 0))
+    {
+        opt = getChoices();
+    }
+    AS.addTokenFilter(new ValueSetter(DA, V, opt, tf, bbox));
 }

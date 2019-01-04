@@ -1820,6 +1820,32 @@ void runtest(int n, char const* filename1, char const* arg2)
         w.setStaticID(true);
         w.write();
     }
+    else if (n == 52)
+    {
+        // This test just sets a field value for appearance stream
+        // generating testing.
+        QPDFObjectHandle acroform = pdf.getRoot().getKey("/AcroForm");
+        QPDFObjectHandle fields = acroform.getKey("/Fields");
+        int n = fields.getArrayNItems();
+        for (int i = 0; i < n; ++i)
+        {
+            QPDFObjectHandle field = fields.getArrayItem(i);
+            QPDFObjectHandle T = field.getKey("/T");
+            if (! T.isString())
+            {
+                continue;
+            }
+            std::string Tval = T.getUTF8Value();
+            if (Tval == "list1")
+            {
+                std::cout << "setting list1 value\n";
+                QPDFFormFieldObjectHelper foh(field);
+                foh.setV(QPDFObjectHandle::newString(arg2));
+            }
+        }
+        QPDFWriter w(pdf, "a.pdf");
+        w.write();
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +

@@ -1,5 +1,28 @@
 2019-01-03  Jay Berkenbilt  <ejb@ql.org>
 
+	* Fix behavior of form field value setting to handle the following
+	cases:
+	  - Strings are always written as UTF-16
+	  - Check boxes and radio buttons are handled properly with
+	    synchronization of values and appearance states
+
+	* Define constants in qpdf/Constants.h for interpretation of
+	annotation and form field flags
+
+	* Add QPDFAnnotationObjectHelper::getFlags
+
+	* Add many new methods to QPDFFormFieldObjectHelper for querying
+	flags and field types
+
+	* Add new methods for appearance stream generation. See comments
+	in QPDFFormFieldObjectHelper.hh for generateAppearance() for a
+	description of limitations.
+	  - QPDFAcroFormDocumentHelper::generateAppearancesIfNeeded
+	  - QPDFFormFieldObjectHelper::generateAppearance
+
+	* Bug fix: when writing form field values, always write string
+	values encoded as UTF-16.
+
 	* Add method QUtil::utf8_to_ascii, which returns an ASCII string
 	for a UTF-8 string, replacing out-of-range characters with a
 	specified substitute.
