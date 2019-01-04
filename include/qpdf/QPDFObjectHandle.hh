@@ -860,6 +860,7 @@ class QPDFObjectHandle
     // do nothing. Objects read normally from the file have
     // descriptions. See comments on setObjectDescription for
     // additional details.
+    QPDF_DLL
     void warnIfPossible(std::string const& warning,
                         bool throw_if_no_description = false);
 

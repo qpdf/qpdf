@@ -1,0 +1,64 @@
+{
+  "pages": [
+    {
+      "contents": [
+        "4 0 R"
+      ],
+      "images": [
+        {
+          "bitspercomponent": 8,
+          "colorspace": "/DeviceGray",
+          "decodeparms": [
+            null
+          ],
+          "filter": [
+            "/DCTDecode"
+          ],
+          "filterable": false,
+          "height": 200,
+          "name": "/Im1",
+          "object": "6 0 R",
+          "width": 100
+        },
+        {
+          "bitspercomponent": 8,
+          "colorspace": "/DeviceGray",
+          "decodeparms": [
+            null
+          ],
+          "filter": [
+            "/FlateDecode"
+          ],
+          "filterable": true,
+          "height": 100,
+          "name": "/Im2",
+          "object": "7 0 R",
+          "width": 200
+        },
+        {
+          "bitspercomponent": 8,
+          "colorspace": "/DeviceGray",
+          "decodeparms": [
+            null
+          ],
+          "filter": [
+            "/FlateDecode"
+          ],
+          "filterable": true,
+          "height": 200,
+          "name": "/Im3",
+          "object": "8 0 R",
+          "width": 200
+        }
+      ],
+      "label": null,
+      "object": "3 0 R",
+      "outlines": [],
+      "pageposfrom1": 1
+    }
+  ],
+  "parameters": {
+    "decodelevel": "generalized"
+  },
+  "version": 1
+}

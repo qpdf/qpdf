@@ -1,0 +1,4 @@
+qpdf: image /Im1 on page 1: not optimizing because of image is smaller than requested minimum dimensions
+qpdf: image /Im2 on page 1: optimizing image reduces size from 20000 to ...
+qpdf: image /Im3 on page 1: not optimizing because DCT compression does not reduce image size
+qpdf: wrote file a.pdf

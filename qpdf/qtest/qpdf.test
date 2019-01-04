@@ -1851,6 +1851,43 @@ $td->runtest("get data",
 
 show_ntests();
 # ----------
+$td->notify("--- Image Optimization ---");
+my @image_opt = (
+    ['image-streams', 'image-streams', ''],
+    ['small-images', 'defaults', ''],
+    ['small-images', 'min-width',
+     '--oi-min-width=150 --oi-min-height=0 --oi-min-area=0'],
+    ['small-images', 'min-height',
+     '--oi-min-width=0 --oi-min-height=150 --oi-min-area=0'],
+    ['small-images', 'min-area',
+     '--oi-min-width=0 --oi-min-height=0 --oi-min-area=30000'],
+    ['small-images', 'min-area-all',
+     '--oi-min-width=0 --oi-min-height=0 --oi-min-area=30000'],
+    );
+
+$n_tests += 2 * scalar(@image_opt);
+
+foreach my $d (@image_opt)
+{
+    my ($f, $description, $args) = @$d;
+
+    $td->runtest("optimize images: $description",
+                 {$td->COMMAND =>
+                      "qpdf --static-id --optimize-images --verbose" .
+                      " $args $f.pdf a.pdf",
+                      $td->FILTER => "perl filter-optimize-images.pl"},
+                 {$td->FILE => "optimize-images-$description.out",
+                      $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("check json: $description",
+                 {$td->COMMAND => "qpdf --json --json-key=pages a.pdf"},
+                 {$td->FILE => "optimize-images-$description-json.out",
+                      $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+show_ntests();
+# ----------
 $td->notify("--- Preserve unreferenced objects ---");
 $n_tests += 6;
 

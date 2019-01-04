@@ -11,6 +11,8 @@
 #include <qpdf/FileInputSource.hh>
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/Pl_Discard.hh>
+#include <qpdf/Pl_DCT.hh>
+#include <qpdf/Pl_Count.hh>
 #include <qpdf/PointerHolder.hh>
 
 #include <qpdf/QPDF.hh>
@@ -127,6 +129,10 @@ struct Options
         collate(false),
         json(false),
         check(false),
+        optimize_images(false),
+        oi_min_width(128),
+        oi_min_height(128),
+        oi_min_area(16384),
         require_outfile(true),
         infilename(0),
         outfilename(0)
@@ -208,6 +214,10 @@ struct Options
     std::set<std::string> json_keys;
     std::set<std::string> json_objects;
     bool check;
+    bool optimize_images;
+    size_t oi_min_width;
+    size_t oi_min_height;
+    size_t oi_min_area;
     std::vector<PageSpec> page_specs;
     std::map<std::string, RotationSpec> rotations;
     bool require_outfile;
@@ -602,6 +612,10 @@ class ArgParser
     void argJsonKey(char* parameter);
     void argJsonObject(char* parameter);
     void argCheck();
+    void argOptimizeImages();
+    void argOiMinWidth(char* paramter);
+    void argOiMinHeight(char* paramter);
+    void argOiMinArea(char* paramter);
     void arg40Print(char* parameter);
     void arg40Modify(char* parameter);
     void arg40Extract(char* parameter);
@@ -816,6 +830,13 @@ ArgParser::initOptionTable()
     (*t)["json-object"] = oe_requiredParameter(
         &ArgParser::argJsonObject, "trailer|obj[,gen]");
     (*t)["check"] = oe_bare(&ArgParser::argCheck);
+    (*t)["optimize-images"] = oe_bare(&ArgParser::argOptimizeImages);
+    (*t)["oi-min-width"] = oe_requiredParameter(
+        &ArgParser::argOiMinWidth, "minimum-width");
+    (*t)["oi-min-height"] = oe_requiredParameter(
+        &ArgParser::argOiMinHeight, "minimum-height");
+    (*t)["oi-min-area"] = oe_requiredParameter(
+        &ArgParser::argOiMinArea, "minimum-area");
 
     t = &this->encrypt40_option_table;
     (*t)["--"] = oe_bare(&ArgParser::argEndEncrypt);
@@ -1417,6 +1438,30 @@ ArgParser::argCheck()
 }
 
 void
+ArgParser::argOptimizeImages()
+{
+    o.optimize_images = true;
+}
+
+void
+ArgParser::argOiMinWidth(char* parameter)
+{
+    o.oi_min_width = QUtil::string_to_int(parameter);
+}
+
+void
+ArgParser::argOiMinHeight(char* parameter)
+{
+    o.oi_min_height = QUtil::string_to_int(parameter);
+}
+
+void
+ArgParser::argOiMinArea(char* parameter)
+{
+    o.oi_min_area = QUtil::string_to_int(parameter);
+}
+
+void
 ArgParser::arg40Print(char* parameter)
 {
     o.r2_print = (strcmp(parameter, "y") == 0);
@@ -1911,6 +1956,10 @@ familiar with the PDF file format or who are PDF developers.\n\
                           contents including those for interactive form\n\
                           fields; may also want --generate-appearances\n\
 --generate-appearances    generate appearance streams for form fields\n\
+--optimize-images         compress images with DCT (JPEG) when advantageous\n\
+--oi-min-width=w          do not optimize images whose width is below w\n\
+--oi-min-height=h         do not optimize images whose height is below h\n\
+--oi-min-area=a           do not optimize images whose pixel count is below a\n\
 --qdf                     turns on \"QDF mode\" (below)\n\
 --linearize-pass1=file    write intermediate pass of linearized file\n\
                           for debugging\n\
@@ -3403,9 +3452,202 @@ static void do_inspection(QPDF& pdf, Options& o)
     }
 }
 
+class ImageOptimizer: public QPDFObjectHandle::StreamDataProvider
+{
+  public:
+    ImageOptimizer(Options& o, QPDFObjectHandle& image);
+    virtual ~ImageOptimizer()
+    {
+    }
+    virtual void provideStreamData(int objid, int generation,
+				   Pipeline* pipeline);
+    PointerHolder<Pipeline> makePipeline(
+        std::string const& description, Pipeline* next);
+    bool evaluate(std::string const& description);
+
+  private:
+    Options& o;
+    QPDFObjectHandle image;
+};
+
+ImageOptimizer::ImageOptimizer(Options& o, QPDFObjectHandle& image) :
+    o(o),
+    image(image)
+{
+}
+
+PointerHolder<Pipeline>
+ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
+{
+    PointerHolder<Pipeline> result;
+    QPDFObjectHandle dict = image.getDict();
+    QPDFObjectHandle w_obj = dict.getKey("/Width");
+    QPDFObjectHandle h_obj = dict.getKey("/Height");
+    QPDFObjectHandle colorspace_obj = dict.getKey("/ColorSpace");
+    QPDFObjectHandle components_obj = dict.getKey("/BitsPerComponent");
+    if (! (w_obj.isInteger() &&
+           h_obj.isInteger() &&
+           colorspace_obj.isName() &&
+           components_obj.isInteger()))
+    {
+        if (o.verbose && (! description.empty()))
+        {
+            std::cout << whoami << ": " << description
+                      << ": not optimizing because image dictionary"
+                      << " is missing required keys" << std::endl;
+        }
+        return result;
+    }
+    JDIMENSION w = w_obj.getIntValue();
+    JDIMENSION h = h_obj.getIntValue();
+    std::string colorspace = colorspace_obj.getName();
+    int components = 0;
+    J_COLOR_SPACE cs = JCS_UNKNOWN;
+    if (colorspace == "/DeviceRGB")
+    {
+        components = 3;
+        cs = JCS_RGB;
+    }
+    else if (colorspace == "/DeviceGray")
+    {
+        components = 1;
+        cs = JCS_GRAYSCALE;
+    }
+    else if (colorspace == "/DeviceCMYK")
+    {
+        components = 4;
+        cs = JCS_CMYK;
+    }
+    else
+    {
+        if (o.verbose && (! description.empty()))
+        {
+            std::cout << whoami << ": " << description
+                      << ": not optimizing because of unsupported"
+                      << " image parameters" << std::endl;
+        }
+        return result;
+    }
+    if (((o.oi_min_width > 0) && (w <= o.oi_min_width)) ||
+        ((o.oi_min_height > 0) && (h <= o.oi_min_height)) ||
+        ((o.oi_min_area > 0) && ((w * h) <= o.oi_min_area)))
+    {
+        QTC::TC("qpdf", "qpdf image optimize too small");
+        if (o.verbose && (! description.empty()))
+        {
+            std::cout << whoami << ": " << description
+                      << ": not optimizing because of image"
+                      << " is smaller than requested minimum dimensions"
+                      << std::endl;
+        }
+        return result;
+    }
+
+    result = new Pl_DCT("jpg", next, w, h, components, cs);
+    return result;
+}
+
+bool
+ImageOptimizer::evaluate(std::string const& description)
+{
+    Pl_Discard d;
+    Pl_Count c("count", &d);
+    PointerHolder<Pipeline> p = makePipeline(description, &c);
+    if (p.getPointer() == 0)
+    {
+        // message issued by makePipeline
+        return false;
+    }
+    if (! image.pipeStreamData(p.getPointer(), 0, qpdf_dl_specialized,
+                               true, false))
+    {
+        QTC::TC("qpdf", "qpdf image optimize no pipeline");
+        if (o.verbose)
+        {
+            std::cout << whoami << ": " << description
+                      << ": not optimizing because unable to decode data"
+                      << " or data already uses DCT"
+                      << std::endl;
+        }
+        return false;
+    }
+    long long orig_length = image.getDict().getKey("/Length").getIntValue();
+    if (c.getCount() >= orig_length)
+    {
+        QTC::TC("qpdf", "qpdf image optimize no shink");
+        if (o.verbose)
+        {
+            std::cout << whoami << ": " << description
+                      << ": not optimizing because DCT compression does not"
+                      << " reduce image size" << std::endl;
+        }
+        return false;
+    }
+    if (o.verbose)
+    {
+        std::cout << whoami << ": " << description
+                  << ": optimizing image reduces size from "
+                  << orig_length << " to " << c.getCount()
+                  << std::endl;
+    }
+    return true;
+}
+
+void
+ImageOptimizer::provideStreamData(int, int, Pipeline* pipeline)
+{
+    PointerHolder<Pipeline> p = makePipeline("", pipeline);
+    if (p.getPointer() == 0)
+    {
+        // Should not be possible
+        image.warnIfPossible("unable to create pipeline after previous"
+                             " success; image data will be lost");
+        pipeline->finish();
+        return;
+    }
+    image.pipeStreamData(p.getPointer(), 0, qpdf_dl_specialized,
+                         false, false);
+}
+
 static void handle_transformations(QPDF& pdf, Options& o)
 {
     QPDFPageDocumentHelper dh(pdf);
+    if (o.optimize_images)
+    {
+        int pageno = 0;
+        std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
+        for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
+             iter != pages.end(); ++iter)
+        {
+            ++pageno;
+            QPDFPageObjectHelper& ph(*iter);
+            QPDFObjectHandle page = ph.getObjectHandle();
+            std::map<std::string, QPDFObjectHandle> images =
+                ph.getPageImages();
+            for (std::map<std::string, QPDFObjectHandle>::iterator iter =
+                     images.begin();
+                 iter != images.end(); ++iter)
+            {
+                std::string name = (*iter).first;
+                QPDFObjectHandle& image = (*iter).second;
+                ImageOptimizer* io = new ImageOptimizer(o, image);
+                PointerHolder<QPDFObjectHandle::StreamDataProvider> sdp(io);
+                if (io->evaluate("image " + name + " on page " +
+                                 QUtil::int_to_string(pageno)))
+                {
+                    QPDFObjectHandle new_image =
+                        QPDFObjectHandle::newStream(&pdf);
+                    new_image.replaceDict(image.getDict().shallowCopy());
+                    new_image.replaceStreamData(
+                        sdp,
+                        QPDFObjectHandle::newName("/DCTDecode"),
+                        QPDFObjectHandle::newNull());
+                    page.getKey("/Resources").getKey("/XObject").replaceKey(
+                        name, new_image);
+                }
+            }
+        }
+    }
     if (o.generate_appearances)
     {
         QPDFAcroFormDocumentHelper afdh(pdf);

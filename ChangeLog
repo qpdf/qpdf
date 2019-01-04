@@ -1,5 +1,13 @@
 2019-01-04  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add new option --optimize-images, which recompresses every image
+	using DCT (JPEG) compression as long as the image is not already
+	compressed with lossy compression and recompressing the image
+	reduces its size. The additional options --oi-min-width,
+	--oi-min-height, and --oi-min-area prevent recompression of images
+	whose width, height, or pixel area (width * height) are below a
+	specified threshold.
+
 	* Add new option --collate. When specified, the semantics of
 	--pages change from concatenation to collation. See the manual for
 	a more detailed discussion. Fixes #259.
