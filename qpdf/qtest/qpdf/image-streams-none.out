@@ -1,17 +1,17 @@
 page 1
-filter: /FlateDecode, color space: /DeviceCMYK
+filter: null, color space: /DeviceCMYK
 page 2
 filter: /DCTDecode, color space: /DeviceCMYK
 page 3
 filter: /RunLengthDecode, color space: /DeviceCMYK
 page 4
-filter: /FlateDecode, color space: /DeviceRGB
+filter: null, color space: /DeviceRGB
 page 5
 filter: /DCTDecode, color space: /DeviceRGB
 page 6
 filter: /RunLengthDecode, color space: /DeviceRGB
 page 7
-filter: /FlateDecode, color space: /DeviceGray
+filter: null, color space: /DeviceGray
 page 8
 filter: /DCTDecode, color space: /DeviceGray
 page 9

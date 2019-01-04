@@ -58,8 +58,7 @@
       "/Type": "/Page"
     },
     "12 0 R": {
-      "/Filter": "/FlateDecode",
-      "/Length": 97
+      "/Length": 95
     },
     "13 0 R": {
       "/BaseFont": "/Helvetica",
@@ -71,16 +70,14 @@
     "14 0 R": {
       "/BitsPerComponent": 8,
       "/ColorSpace": "/DeviceCMYK",
-      "/Filter": "/FlateDecode",
       "/Height": 480,
-      "/Length": 847,
+      "/Length": 768000,
       "/Subtype": "/Image",
       "/Type": "/XObject",
       "/Width": 400
     },
     "15 0 R": {
-      "/Filter": "/FlateDecode",
-      "/Length": 102
+      "/Length": 101
     },
     "16 0 R": {
       "/BitsPerComponent": 8,
@@ -93,8 +90,7 @@
       "/Width": 400
     },
     "17 0 R": {
-      "/Filter": "/FlateDecode",
-      "/Length": 108
+      "/Length": 107
     },
     "18 0 R": {
       "/BitsPerComponent": 8,
@@ -107,8 +103,7 @@
       "/Width": 400
     },
     "19 0 R": {
-      "/Filter": "/FlateDecode",
-      "/Length": 96
+      "/Length": 94
     },
     "2 0 R": {
       "/Count": 9,
@@ -128,16 +123,14 @@
     "20 0 R": {
       "/BitsPerComponent": 8,
       "/ColorSpace": "/DeviceRGB",
-      "/Filter": "/FlateDecode",
       "/Height": 480,
-      "/Length": 645,
+      "/Length": 576000,
       "/Subtype": "/Image",
       "/Type": "/XObject",
       "/Width": 400
     },
     "21 0 R": {
-      "/Filter": "/FlateDecode",
-      "/Length": 99
+      "/Length": 100
     },
     "22 0 R": {
       "/BitsPerComponent": 8,
@@ -150,7 +143,6 @@
       "/Width": 400
     },
     "23 0 R": {
-      "/Filter": "/FlateDecode",
       "/Length": 106
     },
     "24 0 R": {
@@ -164,21 +156,18 @@
       "/Width": 400
     },
     "25 0 R": {
-      "/Filter": "/FlateDecode",
-      "/Length": 97
+      "/Length": 95
     },
     "26 0 R": {
       "/BitsPerComponent": 8,
       "/ColorSpace": "/DeviceGray",
-      "/Filter": "/FlateDecode",
       "/Height": 480,
-      "/Length": 221,
+      "/Length": 192000,
       "/Subtype": "/Image",
       "/Type": "/XObject",
       "/Width": 400
     },
     "27 0 R": {
-      "/Filter": "/FlateDecode",
       "/Length": 101
     },
     "28 0 R": {
@@ -192,8 +181,7 @@
       "/Width": 400
     },
     "29 0 R": {
-      "/Filter": "/FlateDecode",
-      "/Length": 108
+      "/Length": 107
     },
     "3 0 R": {
       "/Contents": "12 0 R",
@@ -376,7 +364,7 @@
     "trailer": {
       "/ID": [
         "S¶Ł”łîð\u000e¢¬\u0007}_)\u0012¶",
-        "S¶Ł”łîð\u000e¢¬\u0007}_)\u0012¶"
+        "'+“‰¤V2«PP ç`m\"\u001d"
       ],
       "/Root": "1 0 R",
       "/Size": 31
@@ -397,7 +385,7 @@
             null
           ],
           "filter": [
-            "/FlateDecode"
+            null
           ],
           "filterable": true,
           "height": 480,
@@ -475,7 +463,7 @@
             null
           ],
           "filter": [
-            "/FlateDecode"
+            null
           ],
           "filterable": true,
           "height": 480,
@@ -553,7 +541,7 @@
             null
           ],
           "filter": [
-            "/FlateDecode"
+            null
           ],
           "filterable": true,
           "height": 480,
