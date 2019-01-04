@@ -63,6 +63,7 @@ QPDFWriter::Members::Members(QPDF& pdf) :
     max_ostream_index(0),
     deterministic_id(false),
     md5_pipeline(0),
+    did_write_setup(false),
     events_expected(0),
     events_seen(0),
     next_progress_report(0)
@@ -2358,8 +2359,14 @@ QPDFWriter::prepareFileForWrite()
 }
 
 void
-QPDFWriter::write()
+QPDFWriter::doWriteSetup()
 {
+    if (this->m->did_write_setup)
+    {
+        return;
+    }
+    this->m->did_write_setup = true;
+
     // Do preliminary setup
 
     if (this->m->linearized)
@@ -2507,6 +2514,23 @@ QPDFWriter::write()
 	setMinimumPDFVersion("1.5");
     }
 
+    setMinimumPDFVersion(this->m->pdf.getPDFVersion(),
+                         this->m->pdf.getExtensionLevel());
+    this->m->final_pdf_version = this->m->min_pdf_version;
+    this->m->final_extension_level = this->m->min_extension_level;
+    if (! this->m->forced_pdf_version.empty())
+    {
+	QTC::TC("qpdf", "QPDFWriter using forced PDF version");
+	this->m->final_pdf_version = this->m->forced_pdf_version;
+        this->m->final_extension_level = this->m->forced_extension_level;
+    }
+}
+
+void
+QPDFWriter::write()
+{
+    doWriteSetup();
+
     // Set up progress reporting. We spent about equal amounts of time
     // preparing and writing one pass. To get a rough estimate of
     // progress, we track handling of indirect objects. For linearized
@@ -2569,20 +2593,16 @@ QPDFWriter::writeEncryptionDictionary()
     closeObject(this->m->encryption_dict_objid);
 }
 
+std::string
+QPDFWriter::getFinalVersion()
+{
+    doWriteSetup();
+    return this->m->final_pdf_version;
+}
+
 void
 QPDFWriter::writeHeader()
 {
-    setMinimumPDFVersion(this->m->pdf.getPDFVersion(),
-                         this->m->pdf.getExtensionLevel());
-    this->m->final_pdf_version = this->m->min_pdf_version;
-    this->m->final_extension_level = this->m->min_extension_level;
-    if (! this->m->forced_pdf_version.empty())
-    {
-	QTC::TC("qpdf", "QPDFWriter using forced PDF version");
-	this->m->final_pdf_version = this->m->forced_pdf_version;
-        this->m->final_extension_level = this->m->forced_extension_level;
-    }
-
     writeString("%PDF-");
     writeString(this->m->final_pdf_version);
     if (this->m->pclm)

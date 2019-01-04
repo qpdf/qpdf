@@ -175,6 +175,16 @@ $td->runtest("\@file exists and file doesn't",
 
 show_ntests();
 # ----------
+$td->notify("--- Final Version ---");
+$n_tests += 1;
+
+$td->runtest("check final version",
+             {$td->COMMAND => "test_driver 54 minimal.pdf"},
+             {$td->STRING => "test 54 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+show_ntests();
+# ----------
 $td->notify("--- Dangling Refs ---");
 my @dangling = (qw(minimal dangling-refs));
 $n_tests += 2 * scalar(@dangling);

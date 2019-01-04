@@ -404,6 +404,18 @@ class QPDFWriter
     QPDF_DLL
     void registerProgressReporter(PointerHolder<ProgressReporter>);
 
+    // Return the PDF version that will be written into the header.
+    // Calling this method does all the preparation for writing, so it
+    // is an error to call any methods that may cause a change to the
+    // version. Adding new objects to the original file after calling
+    // this may also cause problems. It is safe to update existing
+    // objects or stream contents after calling this method, e.g., to
+    // include the final version number in metadata.
+    QPDF_DLL
+    std::string getFinalVersion();
+
+    // Write the final file. There is no expectation of being able to
+    // call write() more than once.
     QPDF_DLL
     void write();
 
@@ -473,6 +485,7 @@ class QPDFWriter
     void writeLinearized();
     void enqueuePart(std::vector<QPDFObjectHandle>& part);
     void writeEncryptionDictionary();
+    void doWriteSetup();
     void writeHeader();
     void writeHintStream(int hint_id);
     qpdf_offset_t writeXRefTable(
@@ -598,6 +611,7 @@ class QPDFWriter
         bool deterministic_id;
         Pl_MD5* md5_pipeline;
         std::string deterministic_id_data;
+        bool did_write_setup;
 
         // For linearization only
         std::string lin_pass1_filename;

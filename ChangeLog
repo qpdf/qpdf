@@ -1,5 +1,10 @@
 2019-01-04  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add new method QPDFWriter::getFinalVersion, which returns the
+	PDF version that will ultimately be written to the final file. See
+	comments in QPDFWriter.hh for some restrictions on its use. Fixes
+	#266.
+
 	* When unexpected errors are found while checking linearization
 	data, print an error message instead of calling assert, which
 	cause the program to crash. Fixes #209, #231.

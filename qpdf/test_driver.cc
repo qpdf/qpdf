@@ -1865,6 +1865,18 @@ void runtest(int n, char const* filename1, char const* arg2)
         w.setStaticID(true);
         w.write();
     }
+    else if (n == 54)
+    {
+        // Test getFinalVersion. This must be invoked with a file
+        // whose final version is not 1.5.
+        QPDFWriter w(pdf, "a.pdf");
+        assert(pdf.getPDFVersion() != "1.5");
+        w.setObjectStreamMode(qpdf_o_generate);
+        if (w.getFinalVersion() != "1.5")
+        {
+            std::cout << "oops: " << w.getFinalVersion() << std::endl;
+        }
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +
