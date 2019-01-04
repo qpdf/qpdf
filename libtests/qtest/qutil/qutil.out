@@ -47,6 +47,10 @@ HAGOOGAMAGOOGLE: 0
 0xdead -> ff fd
 0x7fffffff -> ff fd
 0x80000000 -> ff fd
+---- utf8_to_ascii
+Does π have fingers?
+Does ? have fingers?
+Does * have fingers?
 ---- whoami
 quack1
 quack2

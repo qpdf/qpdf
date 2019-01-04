@@ -892,3 +892,26 @@ QUtil::parse_numrange(char const* range, int max)
     }
     return result;
 }
+
+std::string
+QUtil::utf8_to_ascii(std::string const& utf8, char unknown_char)
+{
+    std::string ascii_value;
+    for (size_t i = 0; i < utf8.length(); ++i)
+    {
+        unsigned char ch = static_cast<unsigned char>(utf8.at(i));
+        if (ch < 128)
+        {
+            ascii_value.append(1, ch);
+        }
+        else if ((ch & 0xc0) == 0x80)
+        {
+            // Ignore subsequent byte of UTF-8 encoded character
+        }
+        else
+        {
+            ascii_value.append(1, unknown_char);
+        }
+    }
+    return ascii_value;
+}

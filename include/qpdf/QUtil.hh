@@ -152,6 +152,12 @@ namespace QUtil
     QPDF_DLL
     std::string toUTF16(unsigned long uval);
 
+    // Convert a UTF-8 encoded string to ASCII by replacing all
+    // characters outside of ascii with the given unknown_char.
+    QPDF_DLL
+    std::string utf8_to_ascii(
+        std::string const& utf8, char unknown_char = '?');
+
     // If secure random number generation is supported on your
     // platform and qpdf was not compiled with insecure random number
     // generation, this returns a cryptographically secure random
