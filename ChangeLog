@@ -1,5 +1,9 @@
 2019-01-04  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add new option --collate. When specified, the semantics of
+	--pages change from concatenation to collation. See the manual for
+	a more detailed discussion. Fixes #259.
+
 	* Add new method QPDFWriter::getFinalVersion, which returns the
 	PDF version that will ultimately be written to the final file. See
 	comments in QPDFWriter.hh for some restrictions on its use. Fixes

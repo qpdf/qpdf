@@ -124,6 +124,7 @@ struct Options
         show_filtered_stream_data(false),
         show_pages(false),
         show_page_images(false),
+        collate(false),
         json(false),
         check(false),
         require_outfile(true),
@@ -202,6 +203,7 @@ struct Options
     bool show_filtered_stream_data;
     bool show_pages;
     bool show_page_images;
+    bool collate;
     bool json;
     std::set<std::string> json_keys;
     std::set<std::string> json_objects;
@@ -216,6 +218,7 @@ struct Options
 struct QPDFPageData
 {
     QPDFPageData(std::string const& filename, QPDF* qpdf, char const* range);
+    QPDFPageData(QPDFPageData const& other, int page);
 
     std::string filename;
     QPDF* qpdf;
@@ -557,6 +560,7 @@ class ArgParser
     void argEncryptionFilePassword(char* parameter);
     void argPages();
     void argRotate(char* parameter);
+    void argCollate();
     void argStreamData(char* parameter);
     void argCompressStreams(char* parameter);
     void argDecodeLevel(char* parameter);
@@ -743,6 +747,7 @@ ArgParser::initOptionTable()
         &ArgParser::argRotate, "[+|-]angle:page-range");
     char const* stream_data_choices[] =
         {"compress", "preserve", "uncompress", 0};
+    (*t)["collate"] = oe_bare(&ArgParser::argCollate);
     (*t)["stream-data"] = oe_requiredChoices(
         &ArgParser::argStreamData, stream_data_choices);
     (*t)["compress-streams"] = oe_requiredChoices(
@@ -1060,6 +1065,12 @@ void
 ArgParser::argEncryptionFilePassword(char* parameter)
 {
     o.encryption_file_password = parameter;
+}
+
+void
+ArgParser::argCollate()
+{
+    o.collate = true;
 }
 
 void
@@ -1711,6 +1722,8 @@ Basic Options\n\
 --decrypt               remove any encryption on the file\n\
 --password-is-hex-key   treat primary password option as a hex-encoded key\n\
 --pages options --      select specific pages from one or more files\n\
+--collate               causes files specified in --pages to be collated\n\
+                        rather than concatenated\n\
 --rotate=[+|-]angle[:page-range]\n\
                         rotate each specified page 90, 180, or 270 degrees;\n\
                         rotate all pages if no page range is given\n\
@@ -1853,6 +1866,14 @@ a workaround should you really want to include the same page twice.\n\
 If the page range is omitted, the range of 1-z is assumed.  qpdf decides\n\
 that the page range is omitted if the range argument is either -- or a\n\
 valid file name and not a valid range.\n\
+\n\
+The usual behavior of --pages is to add all pages from the first file,\n\
+then all pages from the second file, and so on. If the --collate option\n\
+is specified, then pages are collated instead. In other words, qpdf takes\n\
+the first page from the first file, the first page from the second file,\n\
+and so on until it runs out of files; then it takes the second page from\n\
+each file, etc. When a file runs out of pages, it is skipped until all\n\
+specified pages are taken from all files.\n\
 \n\
 See the manual for examples and a discussion of additional subtleties.\n\
 \n\
@@ -2223,6 +2244,14 @@ QPDFPageData::QPDFPageData(std::string const& filename,
     {
         usageExit("parsing numeric range for " + filename + ": " + e.what());
     }
+}
+
+QPDFPageData::QPDFPageData(QPDFPageData const& other, int page) :
+    filename(other.filename),
+    qpdf(other.qpdf),
+    orig_pages(other.orig_pages)
+{
+    this->selected_pages.push_back(page);
 }
 
 static void parse_version(std::string const& full_version_string,
@@ -3551,6 +3580,35 @@ static void handle_page_specs(QPDF& pdf, Options& o,
          iter != orig_pages.end(); ++iter)
     {
         dh.removePage(*iter);
+    }
+
+    if (o.collate && (parsed_specs.size() > 1))
+    {
+        // Collate the pages by selecting one page from each spec in
+        // order. When a spec runs out of pages, stop selecting from
+        // it.
+        std::vector<QPDFPageData> new_parsed_specs;
+        size_t nspecs = parsed_specs.size();
+        size_t cur_page = 0;
+        bool got_pages = true;
+        while (got_pages)
+        {
+            got_pages = false;
+            for (size_t i = 0; i < nspecs; ++i)
+            {
+                QPDFPageData& page_data = parsed_specs.at(i);
+                if (cur_page < page_data.selected_pages.size())
+                {
+                    got_pages = true;
+                    new_parsed_specs.push_back(
+                        QPDFPageData(
+                            page_data,
+                            page_data.selected_pages.at(cur_page)));
+                }
+            }
+            ++cur_page;
+        }
+        parsed_specs = new_parsed_specs;
     }
 
     // Add all the pages from all the files in the order specified.
