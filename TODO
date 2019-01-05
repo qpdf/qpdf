@@ -4,7 +4,17 @@ Soon
  * Set up OSS-Fuzz (Google). See starred email in qpdf label.
 
  * Issue #219, not requiring QPDF reference of copied object to be
-   kept around. Comments are in the issue.
+   kept around. Comments are in the issue. Most likely we should take
+   all the encryption parameters and push them into a separate class
+   within QPDF. We can convert the encryption computation methods to
+   methods of that class and then hang onto that along with the input
+   stream for foreign streams. That should handle the encrypted file
+   case. For the stream data provider case, we don't have to do
+   anything special. In that case, it's definitely up to the user
+   to make sure the stream data provider and everything it uses stay
+   in scope. The user can use a PointerHolder<QPDF> if they want as
+   long as the original QPDF object is allocated this way. That would
+   be a good case for the test suite.
 
  * Figure out how to render Gajić correctly in the PDF version of the
    qpdf manual.
@@ -136,7 +146,13 @@ I find it useful to make reference to them in this list
 
  * Pl_TIFFPredictor is pretty slow.
 
- * Some test cases on bad fails fail because qpdf is unable to find
+ * If we ever wanted to do anything more with character encoding, see
+   ../misc/character-encoding/, which includes machine-readable dump
+   of table D.2 in the ISO-32000 PDF spec. This shows the mapping
+   between Unicode, StandardEncoding, WinAnsiEncoding,
+   MacRomanEncoding, and PDFDocEncoding.
+
+ * Some test cases on bad files fail because qpdf is unable to find
    the root dictionary when it fails to read the trailer. Recovery
    could find the root dictionary and even the info dictionary in
    other ways. In particular, issue-202.pdf can be opened by evince,
