@@ -646,8 +646,6 @@ class ArgParser
     std::vector<int> parseNumrange(char const* range, int max,
                                    bool throw_error = false);
 
-    static char const* help;
-
     int argc;
     char** argv;
     Options& o;
@@ -939,7 +937,345 @@ ArgParser::argCopyright()
 void
 ArgParser::argHelp()
 {
-    std::cout << help;
+    std::cout
+        // 12345678901234567890123456789012345678901234567890123456789012345678901234567890
+        << "Usage: qpdf [ options ] { infilename | --empty } [ outfilename ]\n"
+        << "\n"
+        << "An option summary appears below.  Please see the documentation for details.\n"
+        << "\n"
+        << "If @filename appears anywhere in the command-line, each line of filename\n"
+        << "will be interpreted as an argument. No interpolation is done. Line\n"
+        << "terminators are stripped. @- can be specified to read from standard input.\n"
+        << "\n"
+        << "Note that when contradictory options are provided, whichever options are\n"
+        << "provided last take precedence.\n"
+        << "\n"
+        << "\n"
+        << "Basic Options\n"
+        << "-------------\n"
+        << "\n"
+        << "--version               show version of qpdf\n"
+        << "--copyright             show qpdf's copyright and license information\n"
+        << "--help                  show command-line argument help\n"
+        << "--completion-bash       output a bash complete command you can eval\n"
+        << "--completion-zsh        output a zsh complete command you can eval\n"
+        << "--password=password     specify a password for accessing encrypted files\n"
+        << "--verbose               provide additional informational output\n"
+        << "--progress              give progress indicators while writing output\n"
+        << "--no-warn               suppress warnings\n"
+        << "--linearize             generated a linearized (web optimized) file\n"
+        << "--copy-encryption=file  copy encryption parameters from specified file\n"
+        << "--encryption-file-password=password\n"
+        << "                        password used to open the file from which encryption\n"
+        << "                        parameters are being copied\n"
+        << "--encrypt options --    generate an encrypted file\n"
+        << "--decrypt               remove any encryption on the file\n"
+        << "--password-is-hex-key   treat primary password option as a hex-encoded key\n"
+        << "--pages options --      select specific pages from one or more files\n"
+        << "--collate               causes files specified in --pages to be collated\n"
+        << "                        rather than concatenated\n"
+        << "--rotate=[+|-]angle[:page-range]\n"
+        << "                        rotate each specified page 90, 180, or 270 degrees;\n"
+        << "                        rotate all pages if no page range is given\n"
+        << "--split-pages=[n]       write each output page to a separate file\n"
+        << "\n"
+        << "Note that you can use the @filename or @- syntax for any argument at any\n"
+        << "point in the command. This provides a good way to specify a password without\n"
+        << "having to explicitly put it on the command line.\n"
+        << "\n"
+        << "If none of --copy-encryption, --encrypt or --decrypt are given, qpdf will\n"
+        << "preserve any encryption data associated with a file.\n"
+        << "\n"
+        << "Note that when copying encryption parameters from another file, all\n"
+        << "parameters will be copied, including both user and owner passwords, even\n"
+        << "if the user password is used to open the other file.  This works even if\n"
+        << "the owner password is not known.\n"
+        << "\n"
+        << "The --password-is-hex-key option overrides the normal computation of\n"
+        << "encryption keys. It only applies to the password used to open the main\n"
+        << "file. This option is not ordinarily useful but can be helpful for forensic\n"
+        << "or investigatory purposes. See manual for further discussion.\n"
+        << "\n"
+        << "The --rotate flag can be used to specify pages to rotate pages either\n"
+        << "90, 180, or 270 degrees. The page range is specified in the same\n"
+        << "format as with the --pages option, described below. Repeat the option\n"
+        << "to rotate multiple groups of pages. If the angle is preceded by + or -,\n"
+        << "it is added to or subtracted from the original rotation. Otherwise, the\n"
+        << "rotation angle is set explicitly to the given value.\n"
+        << "\n"
+        << "If --split-pages is specified, each page is written to a separate output\n"
+        << "file. File names are generated as follows:\n"
+        << "* If the string %d appears in the output file name, it is replaced with a\n"
+        << "  zero-padded page range starting from 1\n"
+        << "* Otherwise, if the output file name ends in .pdf (case insensitive), a\n"
+        << "  zero-padded page range, preceded by a dash, is inserted before the file\n"
+        << "  extension\n"
+        << "* Otherwise, the file name is appended with a zero-padded page range\n"
+        << "  preceded by a dash.\n"
+        << "Page ranges are single page numbers for single-page groups or first-last\n"
+        << "for multipage groups.\n"
+        << "\n"
+        << "\n"
+        << "Encryption Options\n"
+        << "------------------\n"
+        << "\n"
+        << "  --encrypt user-password owner-password key-length flags --\n"
+        << "\n"
+        << "Note that -- terminates parsing of encryption flags.\n"
+        << "\n"
+        << "Either or both of the user password and the owner password may be\n"
+        << "empty strings.\n"
+        << "\n"
+        << "key-length may be 40, 128, or 256\n"
+        << "\n"
+        << "Additional flags are dependent upon key length.\n"
+        << "\n"
+        << "  If 40:\n"
+        << "\n"
+        << "    --print=[yn]             allow printing\n"
+        << "    --modify=[yn]            allow document modification\n"
+        << "    --extract=[yn]           allow text/graphic extraction\n"
+        << "    --annotate=[yn]          allow comments and form fill-in and signing\n"
+        << "\n"
+        << "  If 128:\n"
+        << "\n"
+        << "    --accessibility=[yn]     allow accessibility to visually impaired\n"
+        << "    --extract=[yn]           allow other text/graphic extraction\n"
+        << "    --print=print-opt        control printing access\n"
+        << "    --modify=modify-opt      control modify access\n"
+        << "    --cleartext-metadata     prevents encryption of metadata\n"
+        << "    --use-aes=[yn]           indicates whether to use AES encryption\n"
+        << "    --force-V4               forces use of V=4 encryption handler\n"
+        << "\n"
+        << "  If 256, options are the same as 128 with these exceptions:\n"
+        << "    --force-V4               this option is not available with 256-bit keys\n"
+        << "    --use-aes                this option is always on with 256-bit keys\n"
+        << "    --force-R5               forces use of deprecated R=5 encryption\n"
+        << "\n"
+        << "    print-opt may be:\n"
+        << "\n"
+        << "      full                  allow full printing\n"
+        << "      low                   allow only low-resolution printing\n"
+        << "      none                  disallow printing\n"
+        << "\n"
+        << "    modify-opt may be:\n"
+        << "\n"
+        << "      all                   allow full document modification\n"
+        << "      annotate              allow comment authoring and form operations\n"
+        << "      form                  allow form field fill-in and signing\n"
+        << "      assembly              allow document assembly only\n"
+        << "      none                  allow no modifications\n"
+        << "\n"
+        << "The default for each permission option is to be fully permissive.\n"
+        << "\n"
+        << "Specifying cleartext-metadata forces the PDF version to at least 1.5.\n"
+        << "Specifying use of AES forces the PDF version to at least 1.6.  These\n"
+        << "options are both off by default.\n"
+        << "\n"
+        << "The --force-V4 flag forces the V=4 encryption handler introduced in PDF 1.5\n"
+        << "to be used even if not otherwise needed.  This option is primarily useful\n"
+        << "for testing qpdf and has no other practical use.\n"
+        << "\n"
+        << "\n"
+        << "Page Selection Options\n"
+        << "----------------------\n"
+        << "\n"
+        << "These options allow pages to be selected from one or more PDF files.\n"
+        << "Whatever file is given as the primary input file is used as the\n"
+        << "starting point, but its pages are replaced with pages as specified.\n"
+        << "\n"
+        << "--keep-files-open=[yn]\n"
+        << "--pages file [ --password=password ] [ page-range ] ... --\n"
+        << "\n"
+        << "For each file that pages should be taken from, specify the file, a\n"
+        << "password needed to open the file (if any), and a page range.  The\n"
+        << "password needs to be given only once per file.  If any of the input\n"
+        << "files are the same as the primary input file or the file used to copy\n"
+        << "encryption parameters (if specified), you do not need to repeat the\n"
+        << "password here.  The same file can be repeated multiple times.  All\n"
+        << "non-page data (info, outlines, page numbers, etc. are taken from the\n"
+        << "primary input file.  To discard this, use --empty as the primary\n"
+        << "input.\n"
+        << "\n"
+        << "By default, when more than 200 distinct files are specified, qpdf will\n"
+        << "close each file when not being referenced. With 200 files or fewer, all\n"
+        << "files will be kept open at the same time. This behavior can be overridden\n"
+        << "by specifying --keep-files-open=[yn]. Closing and opening files can have\n"
+        << "very high overhead on certain file systems, especially networked file\n"
+        << "systems.\n"
+        << "\n"
+        << "The page range is a set of numbers separated by commas, ranges of\n"
+        << "numbers separated dashes, or combinations of those.  The character\n"
+        << "\"z\" represents the last page.  A number preceded by an \"r\" indicates\n"
+        << "to count from the end, so \"r3-r1\" would be the last three pages of the\n"
+        << "document.  Pages can appear in any order.  Ranges can appear with a\n"
+        << "high number followed by a low number, which causes the pages to appear in\n"
+        << "reverse.  Repeating a number will cause an error, but the manual discusses\n"
+        << "a workaround should you really want to include the same page twice.\n"
+        << "\n"
+        << "If the page range is omitted, the range of 1-z is assumed.  qpdf decides\n"
+        << "that the page range is omitted if the range argument is either -- or a\n"
+        << "valid file name and not a valid range.\n"
+        << "\n"
+        << "The usual behavior of --pages is to add all pages from the first file,\n"
+        << "then all pages from the second file, and so on. If the --collate option\n"
+        << "is specified, then pages are collated instead. In other words, qpdf takes\n"
+        << "the first page from the first file, the first page from the second file,\n"
+        << "and so on until it runs out of files; then it takes the second page from\n"
+        << "each file, etc. When a file runs out of pages, it is skipped until all\n"
+        << "specified pages are taken from all files.\n"
+        << "\n"
+        << "See the manual for examples and a discussion of additional subtleties.\n"
+        << "\n"
+        << "\n"
+        << "Advanced Parsing Options\n"
+        << "-------------------------------\n"
+        << "\n"
+        << "These options control aspects of how qpdf reads PDF files. Mostly these are\n"
+        << "of use to people who are working with damaged files. There is little reason\n"
+        << "to use these options unless you are trying to solve specific problems.\n"
+        << "\n"
+        << "--suppress-recovery       prevents qpdf from attempting to recover damaged files\n"
+        << "--ignore-xref-streams     tells qpdf to ignore any cross-reference streams\n"
+        << "\n"
+        << "\n"
+        << "Advanced Transformation Options\n"
+        << "-------------------------------\n"
+        << "\n"
+        << "These transformation options control fine points of how qpdf creates\n"
+        << "the output file.  Mostly these are of use only to people who are very\n"
+        << "familiar with the PDF file format or who are PDF developers.\n"
+        << "\n"
+        << "--stream-data=option      controls transformation of stream data (below)\n"
+        << "--compress-streams=[yn]   controls whether to compress streams on output\n"
+        << "--decode-level=option     controls how to filter streams from the input\n"
+        << "--normalize-content=[yn]  enables or disables normalization of content streams\n"
+        << "--object-streams=mode     controls handing of object streams\n"
+        << "--preserve-unreferenced   preserve unreferenced objects\n"
+        << "--preserve-unreferenced-resources\n"
+        << "                          preserve unreferenced page resources\n"
+        << "--newline-before-endstream  always put a newline before endstream\n"
+        << "--coalesce-contents       force all pages' content to be a single stream\n"
+        << "--flatten-annotations=option\n"
+        << "                          incorporate rendering of annotations into page\n"
+        << "                          contents including those for interactive form\n"
+        << "                          fields; may also want --generate-appearances\n"
+        << "--generate-appearances    generate appearance streams for form fields\n"
+        << "--optimize-images         compress images with DCT (JPEG) when advantageous\n"
+        << "--oi-min-width=w          do not optimize images whose width is below w\n"
+        << "--oi-min-height=h         do not optimize images whose height is below h\n"
+        << "--oi-min-area=a           do not optimize images whose pixel count is below a\n"
+        << "--qdf                     turns on \"QDF mode\" (below)\n"
+        << "--linearize-pass1=file    write intermediate pass of linearized file\n"
+        << "                          for debugging\n"
+        << "--min-version=version     sets the minimum PDF version of the output file\n"
+        << "--force-version=version   forces this to be the PDF version of the output file\n"
+        << "\n"
+        << "Options for --flatten-annotations are all, print, or screen. If the option\n"
+        << "is print, only annotations marked as print are included. If the option is\n"
+        << "screen, options marked as \"no view\" are excluded. Otherwise, annotations\n"
+        << "are flattened regardless of the presence of print or NoView flags. It is\n"
+        << "common for PDF files to have a flag set that appearance streams need to be\n"
+        << "regenerated. This happens when someone changes a form value with software\n"
+        << "that does not know how to render the new value. qpdf will not flatten form\n"
+        << "fields in files like this. If you get this warning, you have two choices:\n"
+        << "either use qpdf's --generate-appearances flag to tell qpdf to go ahead and\n"
+        << "regenerate appearances, or use some other tool to generate the appearances.\n"
+        << "qpdf does a pretty good job with most forms when only ASCII characters are\n"
+        << "used in form field values, but if your form fields contain other\n"
+        << "characters, rich text, or are other than left justified, you will get\n"
+        << "better results first saving with other software.\n"
+        << "\n"
+        << "Version numbers may be expressed as major.minor.extension-level, so 1.7.3\n"
+        << "means PDF version 1.7 at extension level 3.\n"
+        << "\n"
+        << "Values for stream data options:\n"
+        << "\n"
+        << "  compress              recompress stream data when possible (default)\n"
+        << "  preserve              leave all stream data as is\n"
+        << "  uncompress            uncompress stream data when possible\n"
+        << "\n"
+        << "Values for object stream mode:\n"
+        << "\n"
+        << "  preserve                  preserve original object streams (default)\n"
+        << "  disable                   don't write any object streams\n"
+        << "  generate                  use object streams wherever possible\n"
+        << "\n"
+        << "When --compress-streams=n is specified, this overrides the default behavior\n"
+        << "of qpdf, which is to attempt compress uncompressed streams. Setting\n"
+        << "stream data mode to uncompress or preserve has the same effect.\n"
+        << "\n"
+        << "The --decode-level parameter may be set to one of the following values:\n"
+        << "  none              do not decode streams\n"
+        << "  generalized       decode streams compressed with generalized filters\n"
+        << "                    including LZW, Flate, and the ASCII encoding filters.\n"
+        << "  specialized       additionally decode streams with non-lossy specialized\n"
+        << "                    filters including RunLength\n"
+        << "  all               additionally decode streams with lossy filters\n"
+        << "                    including DCT (JPEG)\n"
+        << "\n"
+        << "In qdf mode, by default, content normalization is turned on, and the\n"
+        << "stream data mode is set to uncompress.\n"
+        << "\n"
+        << "Setting the minimum PDF version of the output file may raise the version\n"
+        << "but will never lower it.  Forcing the PDF version of the output file may\n"
+        << "set the PDF version to a lower value than actually allowed by the file's\n"
+        << "contents.  You should only do this if you have no other possible way to\n"
+        << "open the file or if you know that the file definitely doesn't include\n"
+        << "features not supported later versions.\n"
+        << "\n"
+        << "Testing, Inspection, and Debugging Options\n"
+        << "------------------------------------------\n"
+        << "\n"
+        << "These options can be useful for digging into PDF files or for use in\n"
+        << "automated test suites for software that uses the qpdf library.\n"
+        << "\n"
+        << "--deterministic-id        generate deterministic /ID\n"
+        << "--static-id               generate static /ID: FOR TESTING ONLY!\n"
+        << "--static-aes-iv           use a static initialization vector for AES-CBC\n"
+        << "                          This is option is not secure!  FOR TESTING ONLY!\n"
+        << "--no-original-object-ids  suppress original object ID comments in qdf mode\n"
+        << "--show-encryption         quickly show encryption parameters\n"
+        << "--show-encryption-key     when showing encryption, reveal the actual key\n"
+        << "--check-linearization     check file integrity and linearization status\n"
+        << "--show-linearization      check and show all linearization data\n"
+        << "--show-xref               show the contents of the cross-reference table\n"
+        << "--show-object=trailer|obj[,gen]\n"
+        << "                          show the contents of the given object\n"
+        << "  --raw-stream-data       show raw stream data instead of object contents\n"
+        << "  --filtered-stream-data  show filtered stream data instead of object contents\n"
+        << "--show-npages             print the number of pages in the file\n"
+        << "--show-pages              shows the object/generation number for each page\n"
+        << "  --with-images           also shows the object IDs for images on each page\n"
+        << "--check                   check file structure + encryption, linearization\n"
+        << "--json                    generate a json representation of the file\n"
+        << "--json-help               describe the format of the json representation\n"
+        << "--json-key=key            repeatable; prune json structure to include only\n"
+        << "                          specified keys. If absent, all keys are shown\n"
+        << "--json-object=trailer|[obj,gen]\n"
+        << "                          repeatable; include only specified objects in the\n"
+        << "                          \"objects\" section of the json. If absent, all\n"
+        << "                          objects are shown\n"
+        << "\n"
+        << "The json representation generated by qpdf is designed to facilitate\n"
+        << "processing of qpdf from other programming languages that have a hard\n"
+        << "time calling C++ APIs. Run qpdf --json-help for details on the format.\n"
+        << "The manual has more in-depth information about the json representation\n"
+        << "and certain compatibility guarantees that qpdf provides.\n"
+        << "\n"
+        << "The --raw-stream-data and --filtered-stream-data options are ignored\n"
+        << "unless --show-object is given.  Either of these options will cause the\n"
+        << "stream data to be written to standard output.\n"
+        << "\n"
+        << "If --filtered-stream-data is given and --normalize-content=y is also\n"
+        << "given, qpdf will attempt to normalize the stream data as if it is a\n"
+        << "page content stream.  This attempt will be made even if it is not a\n"
+        << "page content stream, in which case it will produce unusable results.\n"
+        << "\n"
+        << "Ordinarily, qpdf exits with a status of 0 on success or a status of 2\n"
+        << "if any errors occurred.  If there were warnings but not errors, qpdf\n"
+        << "exits with a status of 3. If warnings would have been issued but --no-warn\n"
+        << "was given, an exit status of 3 is still used.\n";
 }
 
 void
@@ -1731,347 +2067,6 @@ ArgParser::handleBashArguments()
     argc = static_cast<int>(bash_argv.size());
     argv[argc] = 0;
 }
-
-char const* ArgParser::help  = "\
-\n\
-Usage: qpdf [ options ] { infilename | --empty } [ outfilename ]\n\
-\n\
-An option summary appears below.  Please see the documentation for details.\n\
-\n\
-If @filename appears anywhere in the command-line, each line of filename\n\
-will be interpreted as an argument. No interpolation is done. Line\n\
-terminators are stripped. @- can be specified to read from standard input.\n\
-\n\
-Note that when contradictory options are provided, whichever options are\n\
-provided last take precedence.\n\
-\n\
-\n\
-Basic Options\n\
--------------\n\
-\n\
---version               show version of qpdf\n\
---copyright             show qpdf's copyright and license information\n\
---help                  show command-line argument help\n\
---completion-bash       output a bash complete command you can eval\n\
---completion-zsh        output a zsh complete command you can eval\n\
---password=password     specify a password for accessing encrypted files\n\
---verbose               provide additional informational output\n\
---progress              give progress indicators while writing output\n\
---no-warn               suppress warnings\n\
---linearize             generated a linearized (web optimized) file\n\
---copy-encryption=file  copy encryption parameters from specified file\n\
---encryption-file-password=password\n\
-                        password used to open the file from which encryption\n\
-                        parameters are being copied\n\
---encrypt options --    generate an encrypted file\n\
---decrypt               remove any encryption on the file\n\
---password-is-hex-key   treat primary password option as a hex-encoded key\n\
---pages options --      select specific pages from one or more files\n\
---collate               causes files specified in --pages to be collated\n\
-                        rather than concatenated\n\
---rotate=[+|-]angle[:page-range]\n\
-                        rotate each specified page 90, 180, or 270 degrees;\n\
-                        rotate all pages if no page range is given\n\
---split-pages=[n]       write each output page to a separate file\n\
-\n\
-Note that you can use the @filename or @- syntax for any argument at any\n\
-point in the command. This provides a good way to specify a password without\n\
-having to explicitly put it on the command line.\n\
-\n\
-If none of --copy-encryption, --encrypt or --decrypt are given, qpdf will\n\
-preserve any encryption data associated with a file.\n\
-\n\
-Note that when copying encryption parameters from another file, all\n\
-parameters will be copied, including both user and owner passwords, even\n\
-if the user password is used to open the other file.  This works even if\n\
-the owner password is not known.\n\
-\n\
-The --password-is-hex-key option overrides the normal computation of\n\
-encryption keys. It only applies to the password used to open the main\n\
-file. This option is not ordinarily useful but can be helpful for forensic\n\
-or investigatory purposes. See manual for further discussion.\n\
-\n\
-The --rotate flag can be used to specify pages to rotate pages either\n\
-90, 180, or 270 degrees. The page range is specified in the same\n\
-format as with the --pages option, described below. Repeat the option\n\
-to rotate multiple groups of pages. If the angle is preceded by + or -,\n\
-it is added to or subtracted from the original rotation. Otherwise, the\n\
-rotation angle is set explicitly to the given value.\n\
-\n\
-If --split-pages is specified, each page is written to a separate output\n\
-file. File names are generated as follows:\n\
-* If the string %d appears in the output file name, it is replaced with a\n\
-  zero-padded page range starting from 1\n\
-* Otherwise, if the output file name ends in .pdf (case insensitive), a\n\
-  zero-padded page range, preceded by a dash, is inserted before the file\n\
-  extension\n\
-* Otherwise, the file name is appended with a zero-padded page range\n\
-  preceded by a dash.\n\
-Page ranges are single page numbers for single-page groups or first-last\n\
-for multipage groups.\n\
-\n\
-\n\
-Encryption Options\n\
-------------------\n\
-\n\
-  --encrypt user-password owner-password key-length flags --\n\
-\n\
-Note that -- terminates parsing of encryption flags.\n\
-\n\
-Either or both of the user password and the owner password may be\n\
-empty strings.\n\
-\n\
-key-length may be 40, 128, or 256\n\
-\n\
-Additional flags are dependent upon key length.\n\
-\n\
-  If 40:\n\
-\n\
-    --print=[yn]             allow printing\n\
-    --modify=[yn]            allow document modification\n\
-    --extract=[yn]           allow text/graphic extraction\n\
-    --annotate=[yn]          allow comments and form fill-in and signing\n\
-\n\
-  If 128:\n\
-\n\
-    --accessibility=[yn]     allow accessibility to visually impaired\n\
-    --extract=[yn]           allow other text/graphic extraction\n\
-    --print=print-opt        control printing access\n\
-    --modify=modify-opt      control modify access\n\
-    --cleartext-metadata     prevents encryption of metadata\n\
-    --use-aes=[yn]           indicates whether to use AES encryption\n\
-    --force-V4               forces use of V=4 encryption handler\n\
-\n\
-  If 256, options are the same as 128 with these exceptions:\n\
-    --force-V4               this option is not available with 256-bit keys\n\
-    --use-aes                this option is always on with 256-bit keys\n\
-    --force-R5               forces use of deprecated R=5 encryption\n\
-\n\
-    print-opt may be:\n\
-\n\
-      full                  allow full printing\n\
-      low                   allow only low-resolution printing\n\
-      none                  disallow printing\n\
-\n\
-    modify-opt may be:\n\
-\n\
-      all                   allow full document modification\n\
-      annotate              allow comment authoring and form operations\n\
-      form                  allow form field fill-in and signing\n\
-      assembly              allow document assembly only\n\
-      none                  allow no modifications\n\
-\n\
-The default for each permission option is to be fully permissive.\n\
-\n\
-Specifying cleartext-metadata forces the PDF version to at least 1.5.\n\
-Specifying use of AES forces the PDF version to at least 1.6.  These\n\
-options are both off by default.\n\
-\n\
-The --force-V4 flag forces the V=4 encryption handler introduced in PDF 1.5\n\
-to be used even if not otherwise needed.  This option is primarily useful\n\
-for testing qpdf and has no other practical use.\n\
-\n\
-\n\
-Page Selection Options\n\
-----------------------\n\
-\n\
-These options allow pages to be selected from one or more PDF files.\n\
-Whatever file is given as the primary input file is used as the\n\
-starting point, but its pages are replaced with pages as specified.\n\
-\n\
---keep-files-open=[yn]\n\
---pages file [ --password=password ] [ page-range ] ... --\n\
-\n\
-For each file that pages should be taken from, specify the file, a\n\
-password needed to open the file (if any), and a page range.  The\n\
-password needs to be given only once per file.  If any of the input\n\
-files are the same as the primary input file or the file used to copy\n\
-encryption parameters (if specified), you do not need to repeat the\n\
-password here.  The same file can be repeated multiple times.  All\n\
-non-page data (info, outlines, page numbers, etc. are taken from the\n\
-primary input file.  To discard this, use --empty as the primary\n\
-input.\n\
-\n\
-By default, when more than 200 distinct files are specified, qpdf will\n\
-close each file when not being referenced. With 200 files or fewer, all\n\
-files will be kept open at the same time. This behavior can be overridden\n\
-by specifying --keep-files-open=[yn]. Closing and opening files can have\n\
-very high overhead on certain file systems, especially networked file\n\
-systems.\n\
-\n\
-The page range is a set of numbers separated by commas, ranges of\n\
-numbers separated dashes, or combinations of those.  The character\n\
-\"z\" represents the last page.  A number preceded by an \"r\" indicates\n\
-to count from the end, so \"r3-r1\" would be the last three pages of the\n\
-document.  Pages can appear in any order.  Ranges can appear with a\n\
-high number followed by a low number, which causes the pages to appear in\n\
-reverse.  Repeating a number will cause an error, but the manual discusses\n\
-a workaround should you really want to include the same page twice.\n\
-\n\
-If the page range is omitted, the range of 1-z is assumed.  qpdf decides\n\
-that the page range is omitted if the range argument is either -- or a\n\
-valid file name and not a valid range.\n\
-\n\
-The usual behavior of --pages is to add all pages from the first file,\n\
-then all pages from the second file, and so on. If the --collate option\n\
-is specified, then pages are collated instead. In other words, qpdf takes\n\
-the first page from the first file, the first page from the second file,\n\
-and so on until it runs out of files; then it takes the second page from\n\
-each file, etc. When a file runs out of pages, it is skipped until all\n\
-specified pages are taken from all files.\n\
-\n\
-See the manual for examples and a discussion of additional subtleties.\n\
-\n\
-\n\
-Advanced Parsing Options\n\
--------------------------------\n\
-\n\
-These options control aspects of how qpdf reads PDF files. Mostly these are\n\
-of use to people who are working with damaged files. There is little reason\n\
-to use these options unless you are trying to solve specific problems.\n\
-\n\
---suppress-recovery       prevents qpdf from attempting to recover damaged files\n\
---ignore-xref-streams     tells qpdf to ignore any cross-reference streams\n\
-\n\
-\n\
-Advanced Transformation Options\n\
--------------------------------\n\
-\n\
-These transformation options control fine points of how qpdf creates\n\
-the output file.  Mostly these are of use only to people who are very\n\
-familiar with the PDF file format or who are PDF developers.\n\
-\n\
---stream-data=option      controls transformation of stream data (below)\n\
---compress-streams=[yn]   controls whether to compress streams on output\n\
---decode-level=option     controls how to filter streams from the input\n\
---normalize-content=[yn]  enables or disables normalization of content streams\n\
---object-streams=mode     controls handing of object streams\n\
---preserve-unreferenced   preserve unreferenced objects\n\
---preserve-unreferenced-resources\n\
-                          preserve unreferenced page resources\n\
---newline-before-endstream  always put a newline before endstream\n\
---coalesce-contents       force all pages' content to be a single stream\n\
---flatten-annotations=option\n\
-                          incorporate rendering of annotations into page\n\
-                          contents including those for interactive form\n\
-                          fields; may also want --generate-appearances\n\
---generate-appearances    generate appearance streams for form fields\n\
---optimize-images         compress images with DCT (JPEG) when advantageous\n\
---oi-min-width=w          do not optimize images whose width is below w\n\
---oi-min-height=h         do not optimize images whose height is below h\n\
---oi-min-area=a           do not optimize images whose pixel count is below a\n\
---qdf                     turns on \"QDF mode\" (below)\n\
---linearize-pass1=file    write intermediate pass of linearized file\n\
-                          for debugging\n\
---min-version=version     sets the minimum PDF version of the output file\n\
---force-version=version   forces this to be the PDF version of the output file\n\
-\n\
-Options for --flatten-annotations are all, print, or screen. If the option\n\
-is print, only annotations marked as print are included. If the option is\n\
-screen, options marked as \"no view\" are excluded. Otherwise, annotations\n\
-are flattened regardless of the presence of print or NoView flags. It is\n\
-common for PDF files to have a flag set that appearance streams need to be\n\
-regenerated. This happens when someone changes a form value with software\n\
-that does not know how to render the new value. qpdf will not flatten form\n\
-fields in files like this. If you get this warning, you have two choices:\n\
-either use qpdf's --generate-appearances flag to tell qpdf to go ahead and\n\
-regenerate appearances, or use some other tool to generate the appearances.\n\
-qpdf does a pretty good job with most forms when only ASCII characters are\n\
-used in form field values, but if your form fields contain other\n\
-characters, rich text, or are other than left justified, you will get\n\
-better results first saving with other software.\n\
-\n\
-Version numbers may be expressed as major.minor.extension-level, so 1.7.3\n\
-means PDF version 1.7 at extension level 3.\n\
-\n\
-Values for stream data options:\n\
-\n\
-  compress              recompress stream data when possible (default)\n\
-  preserve              leave all stream data as is\n\
-  uncompress            uncompress stream data when possible\n\
-\n\
-Values for object stream mode:\n\
-\n\
-  preserve                  preserve original object streams (default)\n\
-  disable                   don't write any object streams\n\
-  generate                  use object streams wherever possible\n\
-\n\
-When --compress-streams=n is specified, this overrides the default behavior\n\
-of qpdf, which is to attempt compress uncompressed streams. Setting\n\
-stream data mode to uncompress or preserve has the same effect.\n\
-\n\
-The --decode-level parameter may be set to one of the following values:\n\
-  none              do not decode streams\n\
-  generalized       decode streams compressed with generalized filters\n\
-                    including LZW, Flate, and the ASCII encoding filters.\n\
-  specialized       additionally decode streams with non-lossy specialized\n\
-                    filters including RunLength\n\
-  all               additionally decode streams with lossy filters\n\
-                    including DCT (JPEG)\n\
-\n\
-In qdf mode, by default, content normalization is turned on, and the\n\
-stream data mode is set to uncompress.\n\
-\n\
-Setting the minimum PDF version of the output file may raise the version\n\
-but will never lower it.  Forcing the PDF version of the output file may\n\
-set the PDF version to a lower value than actually allowed by the file's\n\
-contents.  You should only do this if you have no other possible way to\n\
-open the file or if you know that the file definitely doesn't include\n\
-features not supported later versions.\n\
-\n\
-Testing, Inspection, and Debugging Options\n\
-------------------------------------------\n\
-\n\
-These options can be useful for digging into PDF files or for use in\n\
-automated test suites for software that uses the qpdf library.\n\
-\n\
---deterministic-id        generate deterministic /ID\n\
---static-id               generate static /ID: FOR TESTING ONLY!\n\
---static-aes-iv           use a static initialization vector for AES-CBC\n\
-                          This is option is not secure!  FOR TESTING ONLY!\n\
---no-original-object-ids  suppress original object ID comments in qdf mode\n\
---show-encryption         quickly show encryption parameters\n\
---show-encryption-key     when showing encryption, reveal the actual key\n\
---check-linearization     check file integrity and linearization status\n\
---show-linearization      check and show all linearization data\n\
---show-xref               show the contents of the cross-reference table\n\
---show-object=trailer|obj[,gen]\n\
-                          show the contents of the given object\n\
-  --raw-stream-data       show raw stream data instead of object contents\n\
-  --filtered-stream-data  show filtered stream data instead of object contents\n\
---show-npages             print the number of pages in the file\n\
---show-pages              shows the object/generation number for each page\n\
-  --with-images           also shows the object IDs for images on each page\n\
---check                   check file structure + encryption, linearization\n\
---json                    generate a json representation of the file\n\
---json-help               describe the format of the json representation\n\
---json-key=key            repeatable; prune json structure to include only\n\
-                          specified keys. If absent, all keys are shown\n\
---json-object=trailer|[obj,gen]\n\
-                          repeatable; include only specified objects in the\n\
-                          \"objects\" section of the json. If absent, all\n\
-                          objects are shown\n\
-\n\
-The json representation generated by qpdf is designed to facilitate\n\
-processing of qpdf from other programming languages that have a hard\n\
-time calling C++ APIs. Run qpdf --json-help for details on the format.\n\
-The manual has more in-depth information about the json representation\n\
-and certain compatibility guarantees that qpdf provides.\n\
-\n\
-The --raw-stream-data and --filtered-stream-data options are ignored\n\
-unless --show-object is given.  Either of these options will cause the\n\
-stream data to be written to standard output.\n\
-\n\
-If --filtered-stream-data is given and --normalize-content=y is also\n\
-given, qpdf will attempt to normalize the stream data as if it is a\n\
-page content stream.  This attempt will be made even if it is not a\n\
-page content stream, in which case it will produce unusable results.\n\
-\n\
-Ordinarily, qpdf exits with a status of 0 on success or a status of 2\n\
-if any errors occurred.  If there were warnings but not errors, qpdf\n\
-exits with a status of 3. If warnings would have been issued but --no-warn\n\
-was given, an exit status of 3 is still used.\n\
-\n";
 
 void usageExit(std::string const& msg)
 {
