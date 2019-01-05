@@ -1465,8 +1465,10 @@ outfile.pdf</option>
         This flag causes qpdf to recompress all images that are not
         compressed with DCT (JPEG) using DCT compression as long as
         doing so decreases the size in bytes of the image data and the
-        image does not fall below minimum specified dimensions. See
-        also the <option>--oi-min-width</option>,
+        image does not fall below minimum specified dimensions. Useful
+        information is provided when used in combination with
+        <option>--verbose</option>. See also the
+        <option>--oi-min-width</option>,
         <option>--oi-min-height</option>, and
         <option>--oi-min-area</option> options.
        </para>
