@@ -893,20 +893,32 @@ QUtil::parse_numrange(char const* range, int max)
     return result;
 }
 
-enum encoding_e { e_utf16 };
+enum encoding_e { e_utf16, e_ascii };
 
 static
 std::string
-transcode_utf8(std::string const& utf8_val, encoding_e encoding)
+transcode_utf8(std::string const& utf8_val, encoding_e encoding,
+               char unknown)
 {
-    std::string result = "\xfe\xff";
+    std::string result;
+    if (encoding == e_utf16)
+    {
+        result += "\xfe\xff";
+    }
     size_t len = utf8_val.length();
     for (size_t i = 0; i < len; ++i)
     {
         unsigned char ch = static_cast<unsigned char>(utf8_val.at(i));
         if (ch < 128)
         {
-            result += QUtil::toUTF16(ch);
+            if (encoding == e_utf16)
+            {
+                result += QUtil::toUTF16(ch);
+            }
+            else
+            {
+                result.append(1, ch);
+            }
         }
         else
         {
@@ -923,7 +935,14 @@ transcode_utf8(std::string const& utf8_val, encoding_e encoding)
             if (((bytes_needed > 5) || (bytes_needed < 1)) ||
                 ((i + bytes_needed) >= len))
             {
-                result += "\xff\xfd";
+                if (encoding == e_utf16)
+                {
+                    result += "\xff\xfd";
+                }
+                else
+                {
+                    result.append(1, unknown);
+                }
             }
             else
             {
@@ -941,7 +960,14 @@ transcode_utf8(std::string const& utf8_val, encoding_e encoding)
                     codepoint <<= 6;
                     codepoint += (ch & 0x3f);
                 }
-                result += QUtil::toUTF16(codepoint);
+                if (encoding == e_utf16)
+                {
+                    result += QUtil::toUTF16(codepoint);
+                }
+                else
+                {
+                    result.append(1, unknown);
+                }
             }
         }
     }
@@ -951,28 +977,11 @@ transcode_utf8(std::string const& utf8_val, encoding_e encoding)
 std::string
 QUtil::utf8_to_utf16(std::string const& utf8)
 {
-    return transcode_utf8(utf8, e_utf16);
+    return transcode_utf8(utf8, e_utf16, 0);
 }
 
 std::string
 QUtil::utf8_to_ascii(std::string const& utf8, char unknown_char)
 {
-    std::string ascii_value;
-    for (size_t i = 0; i < utf8.length(); ++i)
-    {
-        unsigned char ch = static_cast<unsigned char>(utf8.at(i));
-        if (ch < 128)
-        {
-            ascii_value.append(1, ch);
-        }
-        else if ((ch & 0xc0) == 0x80)
-        {
-            // Ignore subsequent byte of UTF-8 encoded character
-        }
-        else
-        {
-            ascii_value.append(1, unknown_char);
-        }
-    }
-    return ascii_value;
+    return transcode_utf8(utf8, e_ascii, unknown_char);
 }

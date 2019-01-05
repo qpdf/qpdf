@@ -222,7 +222,7 @@ void to_utf16_test()
 
 void utf8_to_ascii_test()
 {
-    char const* input = "Does \317\200 have fingers?";
+    char const* input = "\302\277Does \317\200 have fingers?";
     std::cout << input
               << std::endl
               << QUtil::utf8_to_ascii(input)
