@@ -130,9 +130,9 @@ struct Options
         json(false),
         check(false),
         optimize_images(false),
-        oi_min_width(128),
-        oi_min_height(128),
-        oi_min_area(16384),
+        oi_min_width(128),      // Default values for these
+        oi_min_height(128),     // oi flags are in --help
+        oi_min_area(16384),     // and in the manual.
         require_outfile(true),
         infilename(0),
         outfilename(0)
@@ -1162,9 +1162,12 @@ ArgParser::argHelp()
         << "                          fields; may also want --generate-appearances\n"
         << "--generate-appearances    generate appearance streams for form fields\n"
         << "--optimize-images         compress images with DCT (JPEG) when advantageous\n"
-        << "--oi-min-width=w          do not optimize images whose width is below w\n"
+        << "--oi-min-width=w          do not optimize images whose width is below w;\n"
+        << "                          default is 128. Use 0 to mean no minimum\n"
         << "--oi-min-height=h         do not optimize images whose height is below h\n"
+        << "                          default is 128. Use 0 to mean no minimum\n"
         << "--oi-min-area=a           do not optimize images whose pixel count is below a\n"
+        << "                          default is 16,384. Use 0 to mean no minimum\n"
         << "--qdf                     turns on \"QDF mode\" (below)\n"
         << "--linearize-pass1=file    write intermediate pass of linearized file\n"
         << "                          for debugging\n"
@@ -3609,6 +3612,7 @@ static void handle_transformations(QPDF& pdf, Options& o)
     QPDFPageDocumentHelper dh(pdf);
     if (o.optimize_images)
     {
+        dh.pushInheritedAttributesToPage();
         int pageno = 0;
         std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
         for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();

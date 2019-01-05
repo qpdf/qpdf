@@ -548,6 +548,16 @@ make
       </listitem>
      </varlistentry>
      <varlistentry>
+      <term><option>--collate</option></term>
+      <listitem>
+       <para>
+        When specified, collate rather than concatenate pages from
+        files specified with <option>--pages</option>.  See <xref
+        linkend="ref.page-selection"/> for additional details.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
       <term><option>--split-pages=[n]</option></term>
       <listitem>
        <para>
@@ -966,6 +976,37 @@ make
     </itemizedlist>
    </para>
    <para>
+    Starting in qpdf version 8.3, you can specify the
+    <option>--collate</option> option. Note that this option is
+    specified outside of <option>--pages&nbsp;...&nbsp;--</option>.
+    When <option>--collate</option> is specified, it changes the
+    meaning of <option>--pages</option> so that the specified files,
+    as modified by page ranges, are collated rather than concatenated.
+    For example, if you add the files <filename>odd.pdf</filename> and
+    <filename>even.pdf</filename> containing odd and even pages of a
+    document respectively, you could run <command>qpdf --collate
+    odd.pdf --pages odd.pdf even.pdf -- all.pdf</command> to collate
+    the pages. This would pick page 1 from odd, page 1 from even, page
+    2 from odd, page 2 from even, etc. until all pages have been
+    included. Any number of files and page ranges can be specified. If
+    any file has fewer pages, that file is just skipped when its pages
+    have all been included. For example, if you ran <command>qpdf
+    --collate --empty --pages a.pdf 1-5 b.pdf 6-4 c.pdf r1 --
+    out.pdf</command>, you would get the following pages in this
+    order:
+    <itemizedlist>
+     <listitem><para>a.pdf page 1</para></listitem>
+     <listitem><para>b.pdf page 6</para></listitem>
+     <listitem><para>c.pdf last page</para></listitem>
+     <listitem><para>a.pdf page 2</para></listitem>
+     <listitem><para>b.pdf page 5</para></listitem>
+     <listitem><para>a.pdf page 3</para></listitem>
+     <listitem><para>b.pdf page 4</para></listitem>
+     <listitem><para>a.pdf page 4</para></listitem>
+     <listitem><para>a.pdf page 5</para></listitem>
+    </itemizedlist>
+   </para>
+   <para>
     Starting in qpdf version 8.3, when you split and merge files, any
     page labels (page numbers) are preserved in the final file. It is
     expected that more document features will be preserved by
@@ -1298,6 +1339,166 @@ outfile.pdf</option>
         file more easily. This can also be combined with QDF mode or
         content normalization to make it easier to look at all of a
         page's contents at once.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--flatten-annotations=<replaceable>option</replaceable></option></term>
+      <listitem>
+       <para>
+        This option collapses annotations into the pages' contents
+        with special handling for form fields. Ordinarily, an
+        annotation is rendered separately and on top of the page.
+        Combining annotations into the page's contents effectively
+        freezes the placement of the annotations, making them look
+        right after various page transformations. The library
+        functionality backing this option was added for the benefit of
+        programs that want to create <emphasis>n-up</emphasis> page
+        layouts and other similar things that don't work well with
+        annotations. The <replaceable>option</replaceable> parameter
+        may be any of the following:
+        <itemizedlist>
+         <listitem>
+          <para>
+           <option>all</option>: include all annotations that are not
+           marked invisible or hidden
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           <option>print</option>: only include annotations that
+           indicate that they should appear when the page is printed
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           <option>screen</option>: omit annotations that indicate
+           they should not appear on the screen
+          </para>
+         </listitem>
+        </itemizedlist>
+       </para>
+       <para>
+        Note that form fields are special because the annotations that
+        are used to render filled-in form fields may become out of
+        date from the fields' values if the form is filled in by a
+        program that doesn't know how to update the appearances. If
+        qpdf detects this case, its default behavior is not to flatten
+        those annotations because doing so would cause the value of
+        the form field to be lost. This gives you a chance to go back
+        and resave the form with a program that knows how to generate
+        appearances. QPDF itself can generate appearances with some
+        limitations. See the <option>--generate-appearances</option>
+        option below.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--generate-appearances</option></term>
+      <listitem>
+       <para>
+        If a file contains interactive form fields and indicates that
+        the appearances are out of date with the values of the form,
+        this flag will regenerate appearances, subject to a few
+        limitations. Note that there is not usually a reason to do
+        this, but it can be necessary before using the
+        <option>--flatten-annotations</option> option. Most of these
+        are not a problem with well-behaved PDF files. The limitations
+        are as follows:
+        <itemizedlist>
+         <listitem>
+          <para>
+           Radio button and checkbox appearances use the pre-set
+           values in the PDF file. QPDF just makes sure that the
+           correct appearance is displayed based on the value of the
+           field. This is fine for PDF files that create their forms
+           properly. Some PDF writers save appearances for fields when
+           they change, which could cause some controls to have
+           inconsistent appearances.
+          </para>
+         </listitem>
+        </itemizedlist>
+        <itemizedlist>
+         <listitem>
+          <para>
+           For text fields and list boxes, any characters that fall
+           outside of US-ASCII will be replaced by the
+           <literal>?</literal> character.
+          </para>
+         </listitem>
+        </itemizedlist>
+        <itemizedlist>
+         <listitem>
+          <para>
+           Quadding is ignored. Quadding is used to specify whether
+           the contents of a field should be left, center, or right
+           aligned with the field.
+          </para>
+         </listitem>
+        </itemizedlist>
+        <itemizedlist>
+         <listitem>
+          <para>
+           Rich text, multi-line, and other more elaborate formatting
+           directives are ignored.
+          </para>
+         </listitem>
+        </itemizedlist>
+        <itemizedlist>
+         <listitem>
+          <para>
+           There is no support for multi-select fields or signature
+           fields.
+          </para>
+         </listitem>
+        </itemizedlist>
+        If qpdf doesn't do a good enough job with your form, use an
+        external application to save your filled-in form before
+        processing it with qpdf.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--optimize-images</option></term>
+      <listitem>
+       <para>
+        This flag causes qpdf to recompress all images that are not
+        compressed with DCT (JPEG) using DCT compression as long as
+        doing so decreases the size in bytes of the image data and the
+        image does not fall below minimum specified dimensions. See
+        also the <option>--oi-min-width</option>,
+        <option>--oi-min-height</option>, and
+        <option>--oi-min-area</option> options.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--oi-min-width=<replaceable>width</replaceable></option></term>
+      <listitem>
+       <para>
+        Avoid optimizing images whose width is below the specified
+        amount. If omitted, the default is 128 pixels. Use 0 for no
+        minimum.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--oi-min-height=<replaceable>height</replaceable></option></term>
+      <listitem>
+       <para>
+        Avoid optimizing images whose height is below the specified
+        amount. If omitted, the default is 128 pixels. Use 0 for no
+        minimum.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--oi-min-area=<replaceable>area-in-pixels</replaceable></option></term>
+      <listitem>
+       <para>
+        Avoid optimizing images whose pixel count
+        (width&nbsp;×&nbsp;height) is below the specified amount. If
+        omitted, the default is 16,384 pixels. Use 0 for no minimum.
        </para>
       </listitem>
      </varlistentry>
