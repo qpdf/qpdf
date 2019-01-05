@@ -64,8 +64,11 @@ QPDF_String::~QPDF_String()
 {
 }
 
-QPDF_String*
-QPDF_String::new_utf16(std::string const& utf8_val)
+enum encoding_e { e_utf16 };
+
+static
+std::string
+transcode_utf8(std::string const& utf8_val, encoding_e encoding)
 {
     std::string result = "\xfe\xff";
     size_t len = utf8_val.length();
@@ -113,7 +116,13 @@ QPDF_String::new_utf16(std::string const& utf8_val)
             }
         }
     }
-    return new QPDF_String(result);
+    return result;
+}
+
+QPDF_String*
+QPDF_String::new_utf16(std::string const& utf8_val)
+{
+    return new QPDF_String(transcode_utf8(utf8_val, e_utf16));
 }
 
 std::string
