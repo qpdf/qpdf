@@ -1,52 +1,10 @@
-
-Current
-=======
-
- * open bugs
-   * Important but non-trivial
-     #240 -- invalid indirect references
-     #209, #231 -- assert in linearization checks
-   * Security
-     #263 -- segv
-   * Performance
-     #243 -- very slow processing of something
-   * Easy
-     #266 -- get final PDF version from QPDFWriter
-     #259 -- page collation
-
- * Generate appearance streams. QPDFAcroFormDocumentHelper.hh:
-
-    // If /NeedAppearances is true, generate appearance streams for
-    // all widget annotations. Note that qpdf's abilitiy to generate
-    // appearance streams is quite limited. We can only generate
-    // appearance streams for streams of type variable text, and even
-    // then, the appearance stream just uses the default parameters
-    // specified to substitute the form field's value into the
-    // provided appearance stream. This means that appearance streams
-    // will likely not look right for any form field values that
-    // contain characters outside the range of PDF Doc Encoding. Also,
-    // quadding is ignored.
-    QPDF_DLL
-    void generateAppearancesIfNeeded();
-
-   See need-appearances.pdf, which is based on form-field-types.pdf
-   and can be modified as needed. Search for it in qpdf.test
-
-   Close #72 when done.
-
- * form field inclusion in json at document and page level
-   * values
-   * names
-   * other stuff?
-
- * special mode for compressing images with DCT
-   * allow specifying a minimum width, height, or pixel area with
-     sensible defaults
-   * never replace an image if the replacement is not smaller than the
-     original
-
 Soon
 ====
+
+ * Set up OSS-Fuzz (Google). See starred email in qpdf label.
+
+ * Issue #219, not requiring QPDF reference of copied object to be
+   kept around. Comments are in the issue.
 
  * Figure out how to render Gajić correctly in the PDF version of the
    qpdf manual.
@@ -178,8 +136,6 @@ I find it useful to make reference to them in this list
 
  * Pl_TIFFPredictor is pretty slow.
 
- * Maybe disambiguate resources when flattening annotations
-
  * Some test cases on bad fails fail because qpdf is unable to find
    the root dictionary when it fails to read the trailer. Recovery
    could find the root dictionary and even the info dictionary in
@@ -205,39 +161,13 @@ I find it useful to make reference to them in this list
    for "Regarding write functionality", and read that comment and the
    responses to it.
 
- * Form flattening: there is on-going work on this topic. The primary
-   tracking issue is https://github.com/qpdf/qpdf/issues/72, and there
-   has also been discussion in private email threads. My notes are
-   summarized in ../misc/form-flattening/README (not publicly
-   accessible), but all important information is in issues in github.
-   The non-public items in my notes are transcripts of discussions
-   with a google summer of code student who was working on the issue.
-   These notes likely have low value at this point, but I have saved
-   them to review in case form flattening ever moves into the qpdf
-   library from external tools where it is currently being
-   implemented. Note that flattening forms with appearance streams is
-   relatively straightforward, but many PDF files don't have
-   appearance streams and leave rendering of the form fields to the
-   viewer. Handling this in the general case is probably out of scope
-   for what will be in qpdf in the foreseeable future, particularly in
-   the area of embedding and subsetting fonts.
-
  * Look at ~/Q/pdf-collection/forms-from-appian/
-
- * Look at Travis-CI for qpdf. See email from Travis-CI in pending.
-
- * https://github.com/qpdf/qpdf/pull/172 contains information about
-   running through MacPorts's CI.
 
  * Consider adding "uninstall" target to makefile. It should only
    uninstall what it installed, which means that you must run
    uninstall from the version you ran install with. It would only be
    supported for the toolchains that support the install target
    (libtool).
-
- * Figure out how to find Visual Studio in Windows registry and see if
-   I can get it to work with make so I can simplify creation of
-   Windows releases.
 
  * Provide support in QPDFWriter for writing incremental updates.
    Provide support in qpdf for preserving incremental updates.  The
@@ -277,8 +207,6 @@ I find it useful to make reference to them in this list
    with the same inputs.  Caching the results or refactoring to reduce
    the number of identical calls could improve performance for
    workloads that involve processing large numbers of small files.
-
- * Consider providing a Windows installer for qpdf using NSIS.
 
  * Consider adding a method to balance the pages tree.  It would call
    pushInheritedAttributesToPage, construct a pages tree from scratch,
@@ -368,14 +296,6 @@ I find it useful to make reference to them in this list
    that case.  In fact, it appears that Adobe reader and other PDF
    viewing software silently ignores objects of this type, so this is
    probably not a big deal.
-
- * If we ever want to have check mode check the integrity of the free
-   list, this can be done by looking at the code from prior to the
-   object stream support of 4/5/2008.  It's in an if (0) block and
-   there's a comment about it.  There's also something about it in
-   qpdf.test -- search for "free table".  On the other hand, the value
-   of doing this seems very low since no viewer seems to care, so it's
-   probably not worth it.
 
  * QPDFObjectHandle::getPageImages() doesn't notice images in
    inherited resource dictionaries.  See comments in that function.
