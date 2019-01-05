@@ -592,8 +592,8 @@ class QPDFObjectHandle
     QPDF_DLL
     void mergeResources(QPDFObjectHandle other);
 
-    // Get all resource names from a resourcey dictionary. If this
-    // object is a dctionary, this method returns a set of all the
+    // Get all resource names from a resource dictionary. If this
+    // object is a dictionary, this method returns a set of all the
     // keys in all top-level subdictionaries. For resources
     // dictionaries, this is the collection of names that may be
     // referenced in the content stream.

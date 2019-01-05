@@ -1658,7 +1658,7 @@ outfile.pdf</option>
        <para>
         This option is repeatable. If specified, only top-level keys
         specified will be included in the json output. If not
-        specified, all keys wil be shown.
+        specified, all keys will be shown.
        </para>
       </listitem>
       </varlistentry>

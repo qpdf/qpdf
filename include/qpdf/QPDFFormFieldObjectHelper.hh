@@ -182,7 +182,7 @@ class QPDFFormFieldObjectHelper: public QPDFObjectHelper
     void setV(std::string const& utf8_value, bool need_appearances = true);
 
     // Update the appearance stream for this field. Note that qpdf's
-    // abilitiy to generate appearance streams is limited. We only
+    // ability to generate appearance streams is limited. We only
     // generate appearance streams for streams of type text or choice.
     // The appearance uses the default parameters provided in the
     // file, and it only supports ASCII characters. Quadding is

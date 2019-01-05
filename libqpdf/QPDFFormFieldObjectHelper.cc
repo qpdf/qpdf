@@ -356,7 +356,7 @@ QPDFFormFieldObjectHelper::setRadioButtonValue(QPDFObjectHandle name)
     // * If this is a radio button field that has a parent that is
     //   also a radio button field and has no explicit /V, call itself
     //   on the parent
-    // * If this is a radio button field with childen, set /V to the
+    // * If this is a radio button field with children, set /V to the
     //   given value. Then, for each child, if the child has the
     //   specified value as one of its keys in the /N subdictionary of
     //   its /AP (i.e. its normal appearance stream dictionary), set

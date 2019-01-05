@@ -275,7 +275,7 @@ static JSON json_schema(std::set<std::string>* keys = 0)
     // ID and an array for pages because we want to index by position.
     // The pages in the pages array contain references back to the
     // original object, which can be resolved in the objects
-    // dictionary. When a PDF constract that maps back to an original
+    // dictionary. When a PDF construct that maps back to an original
     // object is represented separately, use "object" as the key that
     // references the original object.
 
@@ -462,7 +462,7 @@ static JSON json_schema(std::set<std::string>* keys = 0)
             JSON::makeString("whether field is a checkbox"));
         fields.addDictionaryMember(
             "isradiobutton",
-            JSON::makeString("whether field is a radiobutton --"
+            JSON::makeString("whether field is a radio button --"
                              " buttons in a single group share a parent"));
         fields.addDictionaryMember(
             "ischoice",
@@ -613,9 +613,9 @@ class ArgParser
     void argJsonObject(char* parameter);
     void argCheck();
     void argOptimizeImages();
-    void argOiMinWidth(char* paramter);
-    void argOiMinHeight(char* paramter);
-    void argOiMinArea(char* paramter);
+    void argOiMinWidth(char* parameter);
+    void argOiMinHeight(char* parameter);
+    void argOiMinArea(char* parameter);
     void arg40Print(char* parameter);
     void arg40Modify(char* parameter);
     void arg40Extract(char* parameter);
@@ -3574,7 +3574,7 @@ ImageOptimizer::evaluate(std::string const& description)
     long long orig_length = image.getDict().getKey("/Length").getIntValue();
     if (c.getCount() >= orig_length)
     {
-        QTC::TC("qpdf", "qpdf image optimize no shink");
+        QTC::TC("qpdf", "qpdf image optimize no shrink");
         if (o.verbose)
         {
             std::cout << whoami << ": " << description

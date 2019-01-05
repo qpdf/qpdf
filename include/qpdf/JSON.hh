@@ -84,7 +84,7 @@ class JSON
     //     element of this object's corresponding array.
     //   * Otherwise, the value is ignored.
     //
-    // QPDF's JSON output conforms to certain strict compatability
+    // QPDF's JSON output conforms to certain strict compatibility
     // rules as discussed in the manual. The idea is that a JSON
     // structure created manually in qpdf.cc doubles as both JSON help
     // information and a schema for validating the JSON that qpdf
