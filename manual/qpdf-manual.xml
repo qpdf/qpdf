@@ -1422,8 +1422,9 @@ outfile.pdf</option>
          <listitem>
           <para>
            For text fields and list boxes, any characters that fall
-           outside of US-ASCII will be replaced by the
-           <literal>?</literal> character.
+           outside of US-ASCII or, if detected, &ldquo;Windows
+           ANSI&rdquo; or &ldquo;Mac Roman&rdquo; encoding, will be
+           replaced by the <literal>?</literal> character.
           </para>
          </listitem>
         </itemizedlist>

@@ -196,6 +196,8 @@ class QPDFFormFieldObjectHelper: public QPDFObjectHelper
     void setRadioButtonValue(QPDFObjectHandle name);
     void setCheckBoxValue(bool value);
     void generateTextAppearance(QPDFAnnotationObjectHelper&);
+    QPDFObjectHandle getFontFromResource(
+        QPDFObjectHandle resources, std::string const& font_name);
 
     class Members
     {

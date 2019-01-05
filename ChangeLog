@@ -1,5 +1,11 @@
 2019-01-05  Jay Berkenbilt  <ejb@ql.org>
 
+	* When generating appearances, if the font uses one of the
+	standard, built-in encodings, restrict the character set to that
+	rather than just to ASCII. This will allow most appearances to
+	contain characters from the ISO-Latin-1 range plus a few
+	additional characters.
+
 	* Add methods QUtil::utf8_to_win_ansi and
 	QUtil::utf8_to_mac_roman.
 

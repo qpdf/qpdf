@@ -405,3 +405,4 @@ QPDF detected dangling ref 0
 qpdf image optimize no pipeline 0
 qpdf image optimize no shrink 0
 qpdf image optimize too small 0
+QPDFFormFieldObjectHelper WinAnsi 0

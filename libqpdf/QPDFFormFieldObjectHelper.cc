@@ -689,10 +689,13 @@ class TfFinder: public QPDFObjectHandle::TokenFilter
     }
     virtual void handleToken(QPDFTokenizer::Token const&);
     double getTf();
+    std::string getFontName();
 
   private:
     double tf;
+    std::string font_name;
     double last_num;
+    std::string last_name;
 };
 
 TfFinder::TfFinder() :
@@ -713,6 +716,10 @@ TfFinder::handleToken(QPDFTokenizer::Token const& token)
         last_num = strtod(value.c_str(), 0);
         break;
 
+      case QPDFTokenizer::tt_name:
+        last_name = value;
+        break;
+
       case QPDFTokenizer::tt_word:
         if ((value == "Tf") &&
             (last_num > 1.0) &&
@@ -722,6 +729,7 @@ TfFinder::handleToken(QPDFTokenizer::Token const& token)
             // insane things or suffering from over/underflow
             tf = last_num;
         }
+        font_name = last_name;
         break;
 
       default:
@@ -733,6 +741,26 @@ double
 TfFinder::getTf()
 {
     return this->tf;
+}
+
+std::string
+TfFinder::getFontName()
+{
+    return this->font_name;
+}
+
+QPDFObjectHandle
+QPDFFormFieldObjectHelper::getFontFromResource(
+    QPDFObjectHandle resources, std::string const& name)
+{
+    QPDFObjectHandle result;
+    if (resources.isDictionary() &&
+        resources.getKey("/Font").isDictionary() &&
+        resources.getKey("/Font").hasKey(name))
+    {
+        result = resources.getKey("/Font").getKey(name);
+    }
+    return result;
 }
 
 void
@@ -755,17 +783,52 @@ QPDFFormFieldObjectHelper::generateTextAppearance(
     }
     QPDFObjectHandle::Rectangle bbox = bbox_obj.getArrayAsRectangle();
     std::string DA = getDefaultAppearance();
-    std::string V = QUtil::utf8_to_ascii(getValueAsString());
+    std::string V = getValueAsString();
+    std::vector<std::string> opt;
+    if (isChoice() && ((getFlags() & ff_ch_combo) == 0))
+    {
+        opt = getChoices();
+    }
 
     TfFinder tff;
     Pl_QPDFTokenizer tok("tf", &tff);
     tok.write(QUtil::unsigned_char_pointer(DA.c_str()), DA.length());
     tok.finish();
     double tf = tff.getTf();
-    std::vector<std::string> opt;
-    if (isChoice() && ((getFlags() & ff_ch_combo) == 0))
+
+    std::string (*encoder)(std::string const&, char) = &QUtil::utf8_to_ascii;
+    std::string font_name = tff.getFontName();
+    if (! font_name.empty())
     {
-        opt = getChoices();
+        // See if the font is encoded with something we know about.
+        QPDFObjectHandle resources = AS.getDict().getKey("/Resources");
+        QPDFObjectHandle font = getFontFromResource(resources, font_name);
+        if (! font.isInitialized())
+        {
+            QPDFObjectHandle dr = getInheritableFieldValue("/DR");
+            font = getFontFromResource(dr, font_name);
+        }
+        if (font.isDictionary() &&
+            font.getKey("/Encoding").isName())
+        {
+            std::string encoding = font.getKey("/Encoding").getName();
+            if (encoding == "/WinAnsiEncoding")
+            {
+                QTC::TC("qpdf", "QPDFFormFieldObjectHelper WinAnsi");
+                encoder = &QUtil::utf8_to_win_ansi;
+            }
+            else if (encoding == "/MacRomanEncoding")
+            {
+                encoder = &QUtil::utf8_to_mac_roman;
+            }
+        }
     }
+
+    V = (*encoder)(V, '?');
+    for (size_t i = 0; i < opt.size(); ++i)
+    {
+        opt.at(i) = (*encoder)(opt.at(i), '?');
+    }
+
     AS.addTokenFilter(new ValueSetter(DA, V, opt, tf, bbox));
 }
