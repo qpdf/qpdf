@@ -152,8 +152,14 @@ namespace QUtil
     QPDF_DLL
     std::string toUTF16(unsigned long uval);
 
-    // Convert a UTF-8 encoded string to ASCII by replacing all
-    // characters outside of ascii with the given unknown_char.
+    // Convert a UTF-8 encoded string to UTF-16. Unrepresentable code
+    // points are converted to U+FFFD.
+    QPDF_DLL
+    std::string utf8_to_utf16(std::string const& utf8);
+
+    // Convert a UTF-8 encoded string to the specified single-byte
+    // encoding system by replacing all unsupported characters with
+    // the given unknown_char.
     QPDF_DLL
     std::string utf8_to_ascii(
         std::string const& utf8, char unknown_char = '?');

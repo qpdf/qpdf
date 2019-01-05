@@ -1,3 +1,7 @@
+2019-01-05  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add method QUtil::utf8_to_utf16.
+
 2019-01-04  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add new option --optimize-images, which recompresses every image
