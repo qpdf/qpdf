@@ -229,6 +229,15 @@ void utf8_to_ascii_test()
               << std::endl
               << QUtil::utf8_to_ascii(input, '*')
               << std::endl;
+    std::string a = QUtil::utf8_to_win_ansi(input, '*');
+    std::string b = QUtil::utf8_to_mac_roman(input, '*');
+    std::cout
+        << "<" << QUtil::int_to_string_base(
+            static_cast<unsigned char>(a.at(0)), 16, 2)
+        << ">" << a.substr(1) << std::endl
+        << "<" << QUtil::int_to_string_base(
+            static_cast<unsigned char>(b.at(0)), 16, 2)
+        << ">" << b.substr(1) << std::endl;
 }
 
 void print_whoami(char const* str)

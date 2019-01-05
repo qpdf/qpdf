@@ -163,6 +163,12 @@ namespace QUtil
     QPDF_DLL
     std::string utf8_to_ascii(
         std::string const& utf8, char unknown_char = '?');
+    QPDF_DLL
+    std::string utf8_to_win_ansi(
+        std::string const& utf8, char unknown_char = '?');
+    QPDF_DLL
+    std::string utf8_to_mac_roman(
+        std::string const& utf8, char unknown_char = '?');
 
     // If secure random number generation is supported on your
     // platform and qpdf was not compiled with insecure random number
