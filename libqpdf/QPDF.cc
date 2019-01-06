@@ -2512,34 +2512,40 @@ QPDF::getCompressibleObjGens()
 }
 
 bool
-QPDF::pipeStreamData(int objid, int generation,
+QPDF::pipeStreamData(PointerHolder<EncryptionParameters> encp,
+                     PointerHolder<InputSource> file,
+                     QPDF& qpdf_for_warning,
+                     int objid, int generation,
 		     qpdf_offset_t offset, size_t length,
 		     QPDFObjectHandle stream_dict,
+                     bool is_attachment_stream,
 		     Pipeline* pipeline,
                      bool suppress_warnings,
                      bool will_retry)
 {
-    bool success = false;
     std::vector<PointerHolder<Pipeline> > to_delete;
-    if (this->m->encp->encrypted)
+    if (encp->encrypted)
     {
-	decryptStream(pipeline, objid, generation, stream_dict, to_delete);
+	decryptStream(encp, file, qpdf_for_warning,
+                      pipeline, objid, generation,
+                      stream_dict, is_attachment_stream, to_delete);
     }
 
+    bool success = false;
     try
     {
-	this->m->file->seek(offset, SEEK_SET);
+	file->seek(offset, SEEK_SET);
 	char buf[10240];
 	while (length > 0)
 	{
 	    size_t to_read = (sizeof(buf) < length ? sizeof(buf) : length);
-	    size_t len = this->m->file->read(buf, to_read);
+	    size_t len = file->read(buf, to_read);
 	    if (len == 0)
 	    {
 		throw QPDFExc(qpdf_e_damaged_pdf,
-			      this->m->file->getName(),
-			      this->m->last_object_description,
-			      this->m->file->getLastOffset(),
+			      file->getName(),
+			      "",
+			      file->getLastOffset(),
 			      "unexpected EOF reading stream data");
 	    }
 	    length -= len;
@@ -2552,7 +2558,7 @@ QPDF::pipeStreamData(int objid, int generation,
     {
         if (! suppress_warnings)
         {
-            warn(e);
+            qpdf_for_warning.warn(e);
         }
     }
     catch (std::exception& e)
@@ -2560,17 +2566,19 @@ QPDF::pipeStreamData(int objid, int generation,
         if (! suppress_warnings)
         {
             QTC::TC("qpdf", "QPDF decoding error warning");
-            warn(QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
-                         "", this->m->file->getLastOffset(),
-                         "error decoding stream data for object " +
-                         QUtil::int_to_string(objid) + " " +
-                         QUtil::int_to_string(generation) + ": " + e.what()));
+            qpdf_for_warning.warn(
+                QPDFExc(qpdf_e_damaged_pdf, file->getName(),
+                        "", file->getLastOffset(),
+                        "error decoding stream data for object " +
+                        QUtil::int_to_string(objid) + " " +
+                        QUtil::int_to_string(generation) + ": " + e.what()));
             if (will_retry)
             {
-                warn(QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
-                             "", this->m->file->getLastOffset(),
-                             "stream will be re-processed without"
-                             " filtering to avoid data loss"));
+                qpdf_for_warning.warn(
+                    QPDFExc(qpdf_e_damaged_pdf, file->getName(),
+                            "", file->getLastOffset(),
+                            "stream will be re-processed without"
+                            " filtering to avoid data loss"));
             }
         }
     }
@@ -2586,6 +2594,23 @@ QPDF::pipeStreamData(int objid, int generation,
         }
     }
     return success;
+}
+
+bool
+QPDF::pipeStreamData(int objid, int generation,
+		     qpdf_offset_t offset, size_t length,
+		     QPDFObjectHandle stream_dict,
+		     Pipeline* pipeline,
+                     bool suppress_warnings,
+                     bool will_retry)
+{
+    bool is_attachment_stream = this->m->attachment_streams.count(
+        QPDFObjGen(objid, generation));
+    return pipeStreamData(
+        this->m->encp, this->m->file, *this,
+        objid, generation, offset, length,
+        stream_dict, is_attachment_stream,
+        pipeline, suppress_warnings, will_retry);
 }
 
 void

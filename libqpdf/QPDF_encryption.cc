@@ -764,14 +764,15 @@ QPDF::recover_encryption_key_with_password(
 }
 
 QPDF::encryption_method_e
-QPDF::interpretCF(QPDFObjectHandle cf)
+QPDF::interpretCF(
+    PointerHolder<EncryptionParameters> encp, QPDFObjectHandle cf)
 {
     if (cf.isName())
     {
 	std::string filter = cf.getName();
-	if (this->m->encp->crypt_filters.count(filter) != 0)
+	if (encp->crypt_filters.count(filter) != 0)
 	{
-	    return this->m->encp->crypt_filters[filter];
+	    return encp->crypt_filters[filter];
 	}
 	else if (filter == "/Identity")
 	{
@@ -1000,11 +1001,11 @@ QPDF::initializeEncryption()
 	QPDFObjectHandle StmF = encryption_dict.getKey("/StmF");
 	QPDFObjectHandle StrF = encryption_dict.getKey("/StrF");
 	QPDFObjectHandle EFF = encryption_dict.getKey("/EFF");
-	this->m->encp->cf_stream = interpretCF(StmF);
-	this->m->encp->cf_string = interpretCF(StrF);
+	this->m->encp->cf_stream = interpretCF(this->m->encp, StmF);
+	this->m->encp->cf_string = interpretCF(this->m->encp, StrF);
 	if (EFF.isName())
 	{
-	    this->m->encp->cf_file = interpretCF(EFF);
+	    this->m->encp->cf_file = interpretCF(this->m->encp, EFF);
 	}
 	else
 	{
@@ -1068,26 +1069,28 @@ QPDF::initializeEncryption()
 }
 
 std::string
-QPDF::getKeyForObject(int objid, int generation, bool use_aes)
+QPDF::getKeyForObject(
+    PointerHolder<EncryptionParameters> encp,
+    int objid, int generation, bool use_aes)
 {
-    if (! this->m->encp->encrypted)
+    if (! encp->encrypted)
     {
 	throw std::logic_error(
 	    "request for encryption key in non-encrypted PDF");
     }
 
-    if (! ((objid == this->m->encp->cached_key_objid) &&
-	   (generation == this->m->encp->cached_key_generation)))
+    if (! ((objid == encp->cached_key_objid) &&
+	   (generation == encp->cached_key_generation)))
     {
-	this->m->encp->cached_object_encryption_key =
-	    compute_data_key(this->m->encp->encryption_key, objid, generation,
-                             use_aes, this->m->encp->encryption_V,
-                             this->m->encp->encryption_R);
-	this->m->encp->cached_key_objid = objid;
-	this->m->encp->cached_key_generation = generation;
+	encp->cached_object_encryption_key =
+	    compute_data_key(encp->encryption_key, objid, generation,
+                             use_aes, encp->encryption_V,
+                             encp->encryption_R);
+	encp->cached_key_objid = objid;
+	encp->cached_key_generation = generation;
     }
 
-    return this->m->encp->cached_object_encryption_key;
+    return encp->cached_object_encryption_key;
 }
 
 void
@@ -1131,7 +1134,8 @@ QPDF::decryptString(std::string& str, int objid, int generation)
 	}
     }
 
-    std::string key = getKeyForObject(objid, generation, use_aes);
+    std::string key = getKeyForObject(
+        this->m->encp, objid, generation, use_aes);
     try
     {
 	if (use_aes)
@@ -1175,8 +1179,12 @@ QPDF::decryptString(std::string& str, int objid, int generation)
 }
 
 void
-QPDF::decryptStream(Pipeline*& pipeline, int objid, int generation,
+QPDF::decryptStream(PointerHolder<EncryptionParameters> encp,
+                    PointerHolder<InputSource> file,
+                    QPDF& qpdf_for_warning, Pipeline*& pipeline,
+                    int objid, int generation,
 		    QPDFObjectHandle& stream_dict,
+                    bool is_attachment_stream,
 		    std::vector<PointerHolder<Pipeline> >& heap)
 {
     std::string type;
@@ -1190,7 +1198,7 @@ QPDF::decryptStream(Pipeline*& pipeline, int objid, int generation,
 	return;
     }
     bool use_aes = false;
-    if (this->m->encp->encryption_V >= 4)
+    if (encp->encryption_V >= 4)
     {
 	encryption_method_e method = e_unknown;
 	std::string method_source = "/StmF from /Encrypt dictionary";
@@ -1206,7 +1214,7 @@ QPDF::decryptStream(Pipeline*& pipeline, int objid, int generation,
                      "/CryptFilterDecodeParms"))
                 {
                     QTC::TC("qpdf", "QPDF_encryption stream crypt filter");
-                    method = interpretCF(decode_parms.getKey("/Name"));
+                    method = interpretCF(encp, decode_parms.getKey("/Name"));
                     method_source = "stream's Crypt decode parameters";
                 }
             }
@@ -1229,7 +1237,7 @@ QPDF::decryptStream(Pipeline*& pipeline, int objid, int generation,
                             {
                                 QTC::TC("qpdf", "QPDF_encrypt crypt array");
                                 method = interpretCF(
-                                    crypt_params.getKey("/Name"));
+                                    encp, crypt_params.getKey("/Name"));
                                 method_source = "stream's Crypt "
                                     "decode parameters (array)";
                             }
@@ -1241,21 +1249,21 @@ QPDF::decryptStream(Pipeline*& pipeline, int objid, int generation,
 
 	if (method == e_unknown)
 	{
-	    if ((! this->m->encp->encrypt_metadata) && (type == "/Metadata"))
+	    if ((! encp->encrypt_metadata) && (type == "/Metadata"))
 	    {
 		QTC::TC("qpdf", "QPDF_encryption cleartext metadata");
 		method = e_none;
 	    }
 	    else
 	    {
-                if (this->m->attachment_streams.count(
-                        QPDFObjGen(objid, generation)) > 0)
+                if (is_attachment_stream)
                 {
-                    method = this->m->encp->cf_file;
+                    QTC::TC("qpdf", "QPDF_encryption attachment stream");
+                    method = encp->cf_file;
                 }
                 else
                 {
-                    method = this->m->encp->cf_stream;
+                    method = encp->cf_stream;
                 }
 	    }
 	}
@@ -1279,19 +1287,20 @@ QPDF::decryptStream(Pipeline*& pipeline, int objid, int generation,
 
 	  default:
 	    // filter local to this stream.
-	    warn(QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
-			 this->m->last_object_description,
-			 this->m->file->getLastOffset(),
-			 "unknown encryption filter for streams"
-			 " (check " + method_source + ");"
-			 " streams may be decrypted improperly"));
+	    qpdf_for_warning.warn(
+                QPDFExc(qpdf_e_damaged_pdf, file->getName(),
+                        "", file->getLastOffset(),
+                        "unknown encryption filter for streams"
+                        " (check " + method_source + ");"
+                        " streams may be decrypted improperly"));
 	    // To avoid repeated warnings, reset cf_stream.  Assume
 	    // we'd want to use AES if V == 4.
-	    this->m->encp->cf_stream = e_aes;
+	    encp->cf_stream = e_aes;
+            use_aes = true;
 	    break;
 	}
     }
-    std::string key = getKeyForObject(objid, generation, use_aes);
+    std::string key = getKeyForObject(encp, objid, generation, use_aes);
     if (use_aes)
     {
 	QTC::TC("qpdf", "QPDF_encryption aes decode stream");

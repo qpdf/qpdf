@@ -692,6 +692,30 @@ class QPDF
     };
     friend class ResolveRecorder;
 
+    class EncryptionParameters
+    {
+        friend class QPDF;
+      public:
+        EncryptionParameters();
+
+      private:
+        bool encrypted;
+        bool encryption_initialized;
+        int encryption_V;
+        int encryption_R;
+        bool encrypt_metadata;
+        std::map<std::string, encryption_method_e> crypt_filters;
+        encryption_method_e cf_stream;
+        encryption_method_e cf_string;
+        encryption_method_e cf_file;
+        std::string provided_password;
+        std::string user_password;
+        std::string encryption_key;
+        std::string cached_object_encryption_key;
+        int cached_key_objid;
+        int cached_key_generation;
+    };
+
     void parse(char const* password);
     void warn(QPDFExc const& e);
     void setTrailer(QPDFObjectHandle obj);
@@ -735,6 +759,16 @@ class QPDF
 			Pipeline* pipeline,
                         bool suppress_warnings,
                         bool will_retry);
+    static bool pipeStreamData(PointerHolder<QPDF::EncryptionParameters> encp,
+                               PointerHolder<InputSource> file,
+                               QPDF& qpdf_for_warning,
+                               int objid, int generation,
+                               qpdf_offset_t offset, size_t length,
+                               QPDFObjectHandle dict,
+                               bool is_attachment_stream,
+                               Pipeline* pipeline,
+                               bool suppress_warnings,
+                               bool will_retry);
 
     // For QPDFWriter:
 
@@ -776,9 +810,12 @@ class QPDF
                              bool check_duplicate);
 
     // methods to support encryption -- implemented in QPDF_encryption.cc
-    encryption_method_e interpretCF(QPDFObjectHandle);
+    static encryption_method_e interpretCF(
+        PointerHolder<EncryptionParameters> encp, QPDFObjectHandle);
     void initializeEncryption();
-    std::string getKeyForObject(int objid, int generation, bool use_aes);
+    static std::string getKeyForObject(
+        PointerHolder<EncryptionParameters> encp,
+        int objid, int generation, bool use_aes);
     void decryptString(std::string&, int objid, int generation);
     static std::string compute_encryption_key_from_password(
         std::string const& password, EncryptionData const& data);
@@ -787,9 +824,12 @@ class QPDF
     static std::string recover_encryption_key_with_password(
         std::string const& password, EncryptionData const& data,
         bool& perms_valid);
-    void decryptStream(
-	Pipeline*& pipeline, int objid, int generation,
-	QPDFObjectHandle& stream_dict,
+    static void decryptStream(
+	PointerHolder<EncryptionParameters> encp,
+        PointerHolder<InputSource> file,
+        QPDF& qpdf_for_warning, Pipeline*& pipeline,
+        int objid, int generation,
+	QPDFObjectHandle& stream_dict, bool is_attachment_stream,
 	std::vector<PointerHolder<Pipeline> >& heap);
 
     // Methods to support object copying
@@ -1159,30 +1199,6 @@ class QPDF
     void updateObjectMapsInternal(ObjUser const& ou, QPDFObjectHandle oh,
 				  std::set<QPDFObjGen>& visited, bool top);
     void filterCompressedObjects(std::map<int, int> const& object_stream_data);
-
-    class EncryptionParameters
-    {
-        friend class QPDF;
-      public:
-        EncryptionParameters();
-
-      private:
-        bool encrypted;
-        bool encryption_initialized;
-        int encryption_V;
-        int encryption_R;
-        bool encrypt_metadata;
-        std::map<std::string, encryption_method_e> crypt_filters;
-        encryption_method_e cf_stream;
-        encryption_method_e cf_string;
-        encryption_method_e cf_file;
-        std::string provided_password;
-        std::string user_password;
-        std::string encryption_key;
-        std::string cached_object_encryption_key;
-        int cached_key_objid;
-        int cached_key_generation;
-    };
 
     class Members
     {
