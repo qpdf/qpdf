@@ -67,6 +67,7 @@ alternativename
 annot
 annotationflags
 annots
+ansi
 antivirus
 anyBadTokens
 aobjid
@@ -473,6 +474,7 @@ doWriteSetup
 Doxygen
 dp
 dquote
+dr
 driverless
 dropdown
 DTD
@@ -717,6 +719,8 @@ getFilePosition
 getFinalVersion
 getFirstChar
 getFlags
+getFontFromResource
+getFontName
 getFormFields
 getFullyQualifiedName
 getGen
@@ -1116,8 +1120,11 @@ lzw
 LZWDecode
 LZWDecoder
 m'qpdf
+mac
 MacOS
 Macports
+macroman
+MacRomanEncoding
 makeArray
 makeBool
 makeDictionary
@@ -1578,6 +1585,7 @@ reportProgress
 repos
 requiredChoices
 requiredParameter
+resave
 reserveObjects
 resetBits
 resolveLiteral
@@ -1834,6 +1842,7 @@ Toolchains
 toupper
 toUTF
 tp
+transcode
 traverseField
 travis
 TrimBox
@@ -1932,6 +1941,8 @@ Weimer
 werror
 WFLAGS
 whoami
+WinAnsi
+winansi
 WinAnsiEncoding
 wincrypt
 WindowsCryptProvider
@@ -1974,6 +1985,7 @@ xbebfbc
 xbf
 xc
 xcc
+xcf
 xD
 xDC
 xe
