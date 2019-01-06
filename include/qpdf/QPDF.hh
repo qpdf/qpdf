@@ -1196,6 +1196,7 @@ class QPDF
         Members();
         Members(Members const&);
 
+        unsigned long long unique_id;
         QPDFTokenizer tokenizer;
         PointerHolder<InputSource> file;
         std::string last_object_description;
@@ -1216,7 +1217,7 @@ class QPDF
         std::map<QPDFObjGen, int> pageobj_to_pages_pos;
         bool pushed_inherited_attributes_to_pages;
         std::vector<QPDFExc> warnings;
-        std::map<QPDF*, ObjCopier> object_copiers;
+        std::map<unsigned long long, ObjCopier> object_copiers;
         PointerHolder<QPDFObjectHandle::StreamDataProvider> copied_streams;
         // copied_stream_data_provider is owned by copied_streams
         CopiedStreamDataProvider* copied_stream_data_provider;

@@ -89,6 +89,7 @@ QPDF::EncryptionParameters::EncryptionParameters() :
 }
 
 QPDF::Members::Members() :
+    unique_id(0),
     provided_password_is_hex_key(false),
     ignore_xref_streams(false),
     suppress_warnings(false),
@@ -113,6 +114,12 @@ QPDF::QPDF() :
     m(new Members())
 {
     m->tokenizer.allowEOF();
+    // Generate a unique ID. It just has to be unique among all QPDF
+    // objects allocated throughout the lifetime of this running
+    // application.
+    m->unique_id = static_cast<unsigned long>(QUtil::get_current_time());
+    m->unique_id <<= 32;
+    m->unique_id |= static_cast<unsigned long>(QUtil::random());
 }
 
 QPDF::~QPDF()
@@ -2103,7 +2110,7 @@ QPDF::copyForeignObject(QPDFObjectHandle foreign, bool allow_page)
             "QPDF::copyForeign called with object from this QPDF");
     }
 
-    ObjCopier& obj_copier = this->m->object_copiers[other];
+    ObjCopier& obj_copier = this->m->object_copiers[other->m->unique_id];
     if (! obj_copier.visiting.empty())
     {
         throw std::logic_error("obj_copier.visiting is not empty"
