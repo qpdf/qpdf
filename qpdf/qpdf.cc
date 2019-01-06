@@ -3548,16 +3548,7 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
 bool
 ImageOptimizer::evaluate(std::string const& description)
 {
-    Pl_Discard d;
-    Pl_Count c("count", &d);
-    PointerHolder<Pipeline> p = makePipeline(description, &c);
-    if (p.getPointer() == 0)
-    {
-        // message issued by makePipeline
-        return false;
-    }
-    if (! image.pipeStreamData(p.getPointer(), 0, qpdf_dl_specialized,
-                               true, false))
+    if (! image.pipeStreamData(0, 0, qpdf_dl_specialized, true))
     {
         QTC::TC("qpdf", "qpdf image optimize no pipeline");
         if (o.verbose)
@@ -3567,6 +3558,18 @@ ImageOptimizer::evaluate(std::string const& description)
                       << " or data already uses DCT"
                       << std::endl;
         }
+        return false;
+    }
+    Pl_Discard d;
+    Pl_Count c("count", &d);
+    PointerHolder<Pipeline> p = makePipeline(description, &c);
+    if (p.getPointer() == 0)
+    {
+        // message issued by makePipeline
+        return false;
+    }
+    if (! image.pipeStreamData(p.getPointer(), 0, qpdf_dl_specialized))
+    {
         return false;
     }
     long long orig_length = image.getDict().getKey("/Length").getIntValue();
