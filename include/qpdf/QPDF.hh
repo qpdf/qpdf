@@ -1160,6 +1160,30 @@ class QPDF
 				  std::set<QPDFObjGen>& visited, bool top);
     void filterCompressedObjects(std::map<int, int> const& object_stream_data);
 
+    class EncryptionParameters
+    {
+        friend class QPDF;
+      public:
+        EncryptionParameters();
+
+      private:
+        bool encrypted;
+        bool encryption_initialized;
+        int encryption_V;
+        int encryption_R;
+        bool encrypt_metadata;
+        std::map<std::string, encryption_method_e> crypt_filters;
+        encryption_method_e cf_stream;
+        encryption_method_e cf_string;
+        encryption_method_e cf_file;
+        std::string provided_password;
+        std::string user_password;
+        std::string encryption_key;
+        std::string cached_object_encryption_key;
+        int cached_key_objid;
+        int cached_key_generation;
+    };
+
     class Members
     {
         friend class QPDF;
@@ -1176,26 +1200,12 @@ class QPDF
         PointerHolder<InputSource> file;
         std::string last_object_description;
         bool provided_password_is_hex_key;
-        bool encrypted;
-        bool encryption_initialized;
         bool ignore_xref_streams;
         bool suppress_warnings;
         std::ostream* out_stream;
         std::ostream* err_stream;
         bool attempt_recovery;
-        int encryption_V;
-        int encryption_R;
-        bool encrypt_metadata;
-        std::map<std::string, encryption_method_e> crypt_filters;
-        encryption_method_e cf_stream;
-        encryption_method_e cf_string;
-        encryption_method_e cf_file;
-        std::string provided_password;
-        std::string user_password;
-        std::string encryption_key;
-        std::string cached_object_encryption_key;
-        int cached_key_objid;
-        int cached_key_generation;
+        PointerHolder<EncryptionParameters> encp;
         std::string pdf_version;
         std::map<QPDFObjGen, QPDFXRefEntry> xref_table;
         std::set<int> deleted_objects;

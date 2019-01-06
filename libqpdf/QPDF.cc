@@ -74,15 +74,9 @@ QPDF::QPDFVersion()
     return QPDF::qpdf_version;
 }
 
-QPDF::Members::Members() :
-    provided_password_is_hex_key(false),
+QPDF::EncryptionParameters::EncryptionParameters() :
     encrypted(false),
     encryption_initialized(false),
-    ignore_xref_streams(false),
-    suppress_warnings(false),
-    out_stream(&std::cout),
-    err_stream(&std::cerr),
-    attempt_recovery(true),
     encryption_V(0),
     encryption_R(0),
     encrypt_metadata(true),
@@ -90,7 +84,18 @@ QPDF::Members::Members() :
     cf_string(e_none),
     cf_file(e_none),
     cached_key_objid(0),
-    cached_key_generation(0),
+    cached_key_generation(0)
+{
+}
+
+QPDF::Members::Members() :
+    provided_password_is_hex_key(false),
+    ignore_xref_streams(false),
+    suppress_warnings(false),
+    out_stream(&std::cout),
+    err_stream(&std::cerr),
+    attempt_recovery(true),
+    encp(new EncryptionParameters),
     pushed_inherited_attributes_to_pages(false),
     copied_stream_data_provider(0),
     reconstructed_xref(false),
@@ -293,7 +298,7 @@ QPDF::parse(char const* password)
 {
     if (password)
     {
-	this->m->provided_password = password;
+	this->m->encp->provided_password = password;
     }
 
     // Find the header anywhere in the first 1024 bytes of the file.
@@ -1383,7 +1388,7 @@ QPDF::readObject(PointerHolder<InputSource> input,
     bool empty = false;
     PointerHolder<StringDecrypter> decrypter_ph;
     StringDecrypter* decrypter = 0;
-    if (this->m->encrypted && (! in_object_stream))
+    if (this->m->encp->encrypted && (! in_object_stream))
     {
         decrypter_ph = new StringDecrypter(this, objid, generation);
         decrypter = decrypter_ph.getPointer();
@@ -2509,7 +2514,7 @@ QPDF::pipeStreamData(int objid, int generation,
 {
     bool success = false;
     std::vector<PointerHolder<Pipeline> > to_delete;
-    if (this->m->encrypted)
+    if (this->m->encp->encrypted)
     {
 	decryptStream(pipeline, objid, generation, stream_dict, to_delete);
     }
