@@ -40,7 +40,7 @@ RELEASE PREPARATION
 * Run a spelling checker over the source code to catch errors in
   variable names, strings, and comments.
 
-  ispell -p ispell-words **/*.hh **/*.cc manual/* ChangeLog
+  ispell -p ispell-words **/*.hh **/*.cc manual/* ChangeLog README*
 
 * If needed, run large file and image comparison tests. Configure
   options:

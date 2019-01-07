@@ -49,6 +49,7 @@ afa
 afdh
 ageneration
 AHx
+ai
 AIX
 alloc
 allocator
@@ -76,6 +77,7 @@ ap
 apexcovantage
 api
 APIs
+apis
 appearancestate
 appendable
 appendItem
@@ -159,6 +161,7 @@ Arora
 arr
 arrayOrStreamToStreamArray
 ArtBox
+asc
 ascii
 asciiHex
 ASCIIHexDecode
@@ -300,6 +303,7 @@ checkSchemaInternal
 checkSeen
 checkUnread
 CHGeneric
+chmod
 cho
 CHPageOffset
 CHPageOffsetEntry
@@ -315,6 +319,7 @@ cis
 cl
 classname
 clearPipelineStack
+clearsign
 cleartext
 ClearTextMetadata
 ClosedFileInputSource
@@ -417,6 +422,7 @@ decryptStream
 decryptString
 def
 defaultvalue
+definitionId
 deflateEnd
 deflateInit
 defq
@@ -454,6 +460,7 @@ DiscardContents
 discardGeneration
 dist
 distclean
+distfiles
 dl
 dlfcn
 dll
@@ -521,6 +528,7 @@ encodeDataIncrementally
 encodeFile
 encodeRow
 encodeString
+encp
 EncryptionData
 EncryptionParameters
 EncryptMetadata
@@ -631,6 +639,7 @@ forcePDFVersion
 ForceR
 ForceV
 foreach
+ForeignStreamData
 fp
 fprintf
 fR
@@ -802,6 +811,8 @@ getResourceNames
 getRoot
 getSize
 getStreamData
+getStreamDataBuffer
+getStreamDataProvider
 getStringValue
 getSubtype
 GetSystemTime
@@ -1249,6 +1260,7 @@ nouppercase
 NoView
 npages
 npos
+nproc
 nq
 nQ
 nrounds
@@ -1300,6 +1312,7 @@ oi
 oiter
 okey
 ol
+oldpdf
 olist
 omap
 ooh
@@ -1391,6 +1404,7 @@ phe
 php
 pikepdf
 pipeContentStreams
+pipeForeignStreamData
 PipelineAccessor
 pipePageContents
 pipeStreamData
@@ -1457,6 +1471,7 @@ pushMD
 pushOutlinesToPart
 pushPipeline
 PUTU
+PWD
 pypi
 qarray
 QArray
@@ -1475,6 +1490,7 @@ QPDF's
 QPDFAcroFormDocumentHelper
 QPDFAcroFormDocumentHelper's
 QPDFAnnotationObjectHelper
+qpdfbuild
 QPDFCONSTANTS
 QPDFDocumentHelper
 QPDFExc
@@ -1803,6 +1819,7 @@ sysnow
 SYSTEMTIME
 SystemTimeToFileTime
 Syuu
+tarball
 TARNAME
 tbuf
 tc
