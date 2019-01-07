@@ -3671,8 +3671,7 @@ static void handle_transformations(QPDF& pdf, Options& o)
     }
 }
 
-static void handle_page_specs(QPDF& pdf, Options& o,
-                              std::vector<PointerHolder<QPDF> >& page_heap)
+static void handle_page_specs(QPDF& pdf, Options& o)
 {
     // Parse all page specifications and translate them into lists of
     // actual pages.
@@ -3715,6 +3714,7 @@ static void handle_page_specs(QPDF& pdf, Options& o,
     }
 
     // Create a QPDF object for each file that we may take pages from.
+    std::vector<PointerHolder<QPDF> > page_heap;
     std::map<std::string, QPDF*> page_spec_qpdfs;
     std::map<std::string, ClosedFileInputSource*> page_spec_cfis;
     page_spec_qpdfs[o.infilename] = &pdf;
@@ -3727,7 +3727,7 @@ static void handle_page_specs(QPDF& pdf, Options& o,
         {
             // Open the PDF file and store the QPDF object. Throw a
             // PointerHolder to the qpdf into a heap so that it
-            // survives through writing the output but gets cleaned up
+            // survives through copying to the output but gets cleaned up
             // automatically at the end. Do not canonicalize the file
             // name. Using two different paths to refer to the same
             // file is a document workaround for duplicating a page.
@@ -4273,10 +4273,9 @@ int main(int argc, char* argv[])
         }
 
         handle_transformations(pdf, o);
-        std::vector<PointerHolder<QPDF> > page_heap;
         if (! o.page_specs.empty())
         {
-            handle_page_specs(pdf, o, page_heap);
+            handle_page_specs(pdf, o);
         }
         if (! o.rotations.empty())
         {
