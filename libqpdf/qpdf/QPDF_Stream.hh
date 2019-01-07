@@ -24,6 +24,12 @@ class QPDF_Stream: public QPDFObject
     QPDFObjectHandle getDict() const;
     bool isDataModified() const;
 
+    // Methods to help QPDF copy foreign streams
+    qpdf_offset_t getOffset() const;
+    size_t getLength() const;
+    PointerHolder<Buffer> getStreamDataBuffer() const;
+    PointerHolder<QPDFObjectHandle::StreamDataProvider> getStreamDataProvider() const;
+
     // See comments in QPDFObjectHandle.hh for these methods.
     bool pipeStreamData(Pipeline*,
                         unsigned long encode_flags,

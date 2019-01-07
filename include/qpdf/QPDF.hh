@@ -237,19 +237,26 @@ class QPDF
     replaceReserved(QPDFObjectHandle reserved,
                     QPDFObjectHandle replacement);
 
-    // Copy an object from another QPDF to this one. Please note that
-    // the QPDF object containing the object being copied must stick
-    // around because it is still used to retrieve any stream data
-    // referenced by the copied objects.
+    // Copy an object from another QPDF to this one. Starting with
+    // qpdf version 8.3.0, it is no longer necessary to keep the
+    // original QPDF around after the call to copyForeignObject as
+    // long as the source of any copied stream data is still
+    // available. Usually this means you just have to keep the input
+    // file around, not the QPDF object. The exception to this is if
+    // you copy a stream that gets its data from a
+    // QPDFObjectHandle::StreamDataProvider. In this case only, the
+    // original stream's QPDF object must stick around because the
+    // QPDF object is itself the source of the original stream data.
+    // For a more in-depth discussion, please see the TODO file.
     //
-    // The return value is an indirect reference to the copied object
-    // in this file. This method is intended to be used to copy
-    // non-page objects and will not copy page objects. To copy page
-    // objects, pass the foreign page object directly to addPage (or
-    // addPageAt). If you copy objects that contain references to
-    // pages, you should copy the pages first using addPage(At).
-    // Otherwise references to the pages that have not been copied
-    // will be replaced with nulls.
+    // The return value of this method is an indirect reference to the
+    // copied object in this file. This method is intended to be used
+    // to copy non-page objects and will not copy page objects. To
+    // copy page objects, pass the foreign page object directly to
+    // addPage (or addPageAt). If you copy objects that contain
+    // references to pages, you should copy the pages first using
+    // addPage(At). Otherwise references to the pages that have not
+    // been copied will be replaced with nulls.
 
     // When copying objects with this method, object structure will be
     // preserved, so all indirectly referenced indirect objects will
@@ -641,9 +648,59 @@ class QPDF
         std::set<QPDFObjGen> visiting;
     };
 
+    class EncryptionParameters
+    {
+        friend class QPDF;
+      public:
+        EncryptionParameters();
+
+      private:
+        bool encrypted;
+        bool encryption_initialized;
+        int encryption_V;
+        int encryption_R;
+        bool encrypt_metadata;
+        std::map<std::string, encryption_method_e> crypt_filters;
+        encryption_method_e cf_stream;
+        encryption_method_e cf_string;
+        encryption_method_e cf_file;
+        std::string provided_password;
+        std::string user_password;
+        std::string encryption_key;
+        std::string cached_object_encryption_key;
+        int cached_key_objid;
+        int cached_key_generation;
+    };
+
+    class ForeignStreamData
+    {
+        friend class QPDF;
+      public:
+        ForeignStreamData(
+            PointerHolder<EncryptionParameters> encp,
+            PointerHolder<InputSource> file,
+            int foreign_objid,
+            int foreign_generation,
+            qpdf_offset_t offset,
+            size_t length,
+            bool is_attachment_stream,
+            QPDFObjectHandle local_dict);
+
+      private:
+        PointerHolder<EncryptionParameters> encp;
+        PointerHolder<InputSource> file;
+        int foreign_objid;
+        int foreign_generation;
+        qpdf_offset_t offset;
+        size_t length;
+        bool is_attachment_stream;
+        QPDFObjectHandle local_dict;
+    };
+
     class CopiedStreamDataProvider: public QPDFObjectHandle::StreamDataProvider
     {
       public:
+        CopiedStreamDataProvider(QPDF& destination_qpdf);
         virtual ~CopiedStreamDataProvider()
         {
         }
@@ -651,9 +708,14 @@ class QPDF
 				       Pipeline* pipeline);
         void registerForeignStream(QPDFObjGen const& local_og,
                                    QPDFObjectHandle foreign_stream);
+        void registerForeignStream(QPDFObjGen const& local_og,
+                                   PointerHolder<ForeignStreamData>);
 
       private:
+        QPDF& destination_qpdf;
         std::map<QPDFObjGen, QPDFObjectHandle> foreign_streams;
+        std::map<QPDFObjGen,
+                 PointerHolder<ForeignStreamData> > foreign_stream_data;
     };
 
     class StringDecrypter: public QPDFObjectHandle::StringDecrypter
@@ -691,30 +753,6 @@ class QPDF
         QPDFObjGen og;
     };
     friend class ResolveRecorder;
-
-    class EncryptionParameters
-    {
-        friend class QPDF;
-      public:
-        EncryptionParameters();
-
-      private:
-        bool encrypted;
-        bool encryption_initialized;
-        int encryption_V;
-        int encryption_R;
-        bool encrypt_metadata;
-        std::map<std::string, encryption_method_e> crypt_filters;
-        encryption_method_e cf_stream;
-        encryption_method_e cf_string;
-        encryption_method_e cf_file;
-        std::string provided_password;
-        std::string user_password;
-        std::string encryption_key;
-        std::string cached_object_encryption_key;
-        int cached_key_objid;
-        int cached_key_generation;
-    };
 
     void parse(char const* password);
     void warn(QPDFExc const& e);
@@ -759,6 +797,11 @@ class QPDF
 			Pipeline* pipeline,
                         bool suppress_warnings,
                         bool will_retry);
+    bool pipeForeignStreamData(
+        PointerHolder<ForeignStreamData>,
+        Pipeline*,
+        unsigned long encode_flags,
+        qpdf_stream_decode_level_e decode_level);
     static bool pipeStreamData(PointerHolder<QPDF::EncryptionParameters> encp,
                                PointerHolder<InputSource> file,
                                QPDF& qpdf_for_warning,

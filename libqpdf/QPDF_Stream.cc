@@ -133,6 +133,30 @@ QPDF_Stream::isDataModified() const
     return (! this->token_filters.empty());
 }
 
+qpdf_offset_t
+QPDF_Stream::getOffset() const
+{
+    return this->offset;
+}
+
+size_t
+QPDF_Stream::getLength() const
+{
+    return this->length;
+}
+
+PointerHolder<Buffer>
+QPDF_Stream::getStreamDataBuffer() const
+{
+    return this->stream_data;
+}
+
+PointerHolder<QPDFObjectHandle::StreamDataProvider>
+QPDF_Stream::getStreamDataProvider() const
+{
+    return this->stream_provider;
+}
+
 PointerHolder<Buffer>
 QPDF_Stream::getStreamData(qpdf_stream_decode_level_e decode_level)
 {

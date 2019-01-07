@@ -3,19 +3,6 @@ Soon
 
  * Set up OSS-Fuzz (Google). See starred email in qpdf label.
 
- * Issue #219, not requiring QPDF reference of copied object to be
-   kept around. Comments are in the issue. Most likely we should take
-   all the encryption parameters and push them into a separate class
-   within QPDF. We can convert the encryption computation methods to
-   methods of that class and then hang onto that along with the input
-   stream for foreign streams. That should handle the encrypted file
-   case. For the stream data provider case, we don't have to do
-   anything special. In that case, it's definitely up to the user
-   to make sure the stream data provider and everything it uses stay
-   in scope. The user can use a PointerHolder<QPDF> if they want as
-   long as the original QPDF object is allocated this way. That would
-   be a good case for the test suite.
-
  * Figure out how to render Gajić correctly in the PDF version of the
    qpdf manual.
 
@@ -333,3 +320,42 @@ I find it useful to make reference to them in this list
    of all that code to make the checks more robust. In particular,
    it's hard to look at the code and quickly determine what is a true
    logic error and what could happen because of malformed user input.
+
+ * There are a few known limitations of copying foreign streams. These
+   are somewhat discussed in github issue 219. They are most likely
+   not worth fixing.
+
+   * The original pipeStreamData in QPDF_Stream has various logic for
+     reporting warnings and letting the caller retry. This logic is
+     not implemented for stream data providers. When copying foreign
+     streams, qpdf uses a stream data provider
+     (QPDF::CopiedStreamDataProvider) to read the stream data from the
+     original file. While a warning is issued for that case, there is
+     no way to actually propagate failure information back through
+     because StreamDataProvider::provideStreamData doesn't take the
+     suppress_warnings or will_retry options, and adding them would
+     break source compatibility.
+
+   * When copying streams that use StreamDataProvider provider, the
+     original QPDF object must still be kept around. This is the case
+     of where QPDF q1 has a stream for which replaceStreamData was
+     called to provide a StreamDataProvider, and then that stream from
+     q1 was subsequently copied to q2. In that case, q1 must be kept
+     around until q2 is written. That is a pretty unusual case as,
+     most of the time, people could just attach the stream data
+     provider directly to the q2. That said, it actually appears in
+     qpdf itself. qpdf allows you to combine the --pages and --split
+     options. In that case, a merged file, which uses
+     StreamDataProvider to access the original stream, is subsequently
+     copied to the final split output files. Solving this restriction
+     is difficult and would probably require breaking source
+     compatibility because QPDF_Stream doesn't have enough information
+     to know whether the original QPDF object is needed by the
+     stream's data provider. Also, the interface is designed to pass
+     the object ID and generation of the object whose data is being
+     provided so the provider can use it for lookup or any other
+     purpose. As such, copying a stream data provider to a new stream
+     potentially changes the meaning of the parameters passed to the
+     provider. This happens with CopiedStreamDataProvider, which uses
+     the object ID and generation of the new stream to locate the
+     parameters of the old stream.

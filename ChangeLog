@@ -1,3 +1,13 @@
+2019-01-06  Jay Berkenbilt  <ejb@ql.org>
+
+	* Remove the restriction in most cases that the source QPDF used
+	in a copyForeignObject call has to stick around until the
+	destination QPDF is written. The exceptional case is when the
+	source stream gets is data using a
+	QPDFObjectHandle::StreamDataProvider. For a more in-depth
+	discussion, see comments around copyForeignObject in QPDF.hh.
+	Fixes #219.
+
 2019-01-05  Jay Berkenbilt  <ejb@ql.org>
 
 	* When generating appearances, if the font uses one of the
