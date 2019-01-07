@@ -90,6 +90,8 @@ directory or that are otherwise not publicly accessible. This includes
 things sent to me by email that are specifically not public. Even so,
 I find it useful to make reference to them in this list
 
+ * Add support for writing name and number trees
+
  * Figure out how to render Gajić correctly in the PDF version of the
    qpdf manual.
 
