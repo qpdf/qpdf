@@ -137,18 +137,24 @@ chmod 555 *.AppImage
   `README-what-to-download.md` separately onto the download area if
   needed.
 
-* Push the master branch to github. Create and push a signed tag. This
-  should be run with HEAD pointing to the tip of master.
+* Ensure that the master branch has been to github. The rev-parse
+  command below should show the same commit hash for all its
+  arguments. Create and push a signed tag. This should be run with
+  HEAD pointing to the tip of master.
 
-git rev-parse master @
-git push upstream master
-git tag -s release-qpdf-$version HEAD -m"qpdf $version"
+git rev-parse master upstream/master @
+git tag -s release-qpdf-$version @ -m"qpdf $version"
 git push upstream release-qpdf-$version
+
+* In Azure Pipelines, retain the build that was used to generate the
+  release.
 
 * Create a github release after pushing the tag. `gcurl` is an alias
   that includes the auth token.
 
 # Create release
+TOKEN=$(cat ~/.github-token)
+function gcurl() { curl -H "Authorization: token $TOKEN" ${1+"$@"} }
 url=$(gcurl -s -XPOST https://api.github.com/repos/qpdf/qpdf/releases -d'{"tag_name": "release-qpdf-'$version'", "name": "qpdf '$version'", "draft": true}' | jq -r '.url')
 
 # Get upload url
