@@ -1,3 +1,7 @@
+2019-01-07  Jay Berkenbilt  <ejb@ql.org>
+
+	* 8.3.0: release
+
 2019-01-06  Jay Berkenbilt  <ejb@ql.org>
 
 	* Remove the restriction in most cases that the source QPDF used
