@@ -30,7 +30,7 @@ RELEASE PREPARATION
 
 * Each year, update copyright notices. Just do a case-insensitive
   search for copyright. Don't forget copyright in manual. Also update
-  debian copyright in debian package. Last updated: 2018.
+  debian copyright in debian package. Last updated: 2019.
 
 * Check all open issues in the sourceforge trackers and on github.
 
