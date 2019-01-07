@@ -408,3 +408,5 @@ qpdf image optimize too small 0
 QPDFFormFieldObjectHelper WinAnsi 0
 QPDF_encryption attachment stream 0
 QPDF pipe foreign encrypted stream 0
+QPDF copy foreign stream with provider 0
+QPDF copy foreign stream with buffer 0

@@ -1085,13 +1085,16 @@ void runtest(int n, char const* filename1, char const* arg2)
         // and O2 and their streams but not O3 or any other pages.
 
         assert(arg2 != 0);
-        QPDF newpdf;
-        newpdf.processFile(arg2);
-        QPDFObjectHandle qtest = pdf.getTrailer().getKey("/QTest");
-        newpdf.getTrailer().replaceKey(
-            "/QTest", newpdf.copyForeignObject(qtest));
+        {
+            // Make sure original PDF is out of scope when we write.
+            QPDF oldpdf;
+            oldpdf.processFile(arg2);
+            QPDFObjectHandle qtest = oldpdf.getTrailer().getKey("/QTest");
+            pdf.getTrailer().replaceKey(
+                "/QTest", pdf.copyForeignObject(qtest));
+        }
 
-	QPDFWriter w(newpdf, "a.pdf");
+	QPDFWriter w(pdf, "a.pdf");
 	w.setStaticID(true);
 	w.setStreamDataMode(qpdf_s_preserve);
 	w.write();
@@ -1104,16 +1107,19 @@ void runtest(int n, char const* filename1, char const* arg2)
         // that O3 points to.  Also, inherited object will have been
         // pushed down and will be preserved.
 
-        assert(arg2 != 0);
-        QPDF newpdf;
-        newpdf.processFile(arg2);
-        QPDFObjectHandle qtest = pdf.getTrailer().getKey("/QTest");
-        QPDFObjectHandle O3 = qtest.getKey("/O3");
-        QPDFPageDocumentHelper(newpdf).addPage(O3, false);
-        newpdf.getTrailer().replaceKey(
-            "/QTest", newpdf.copyForeignObject(qtest));
+        {
+            // Make sure original PDF is out of scope when we write.
+            assert(arg2 != 0);
+            QPDF oldpdf;
+            oldpdf.processFile(arg2);
+            QPDFObjectHandle qtest = oldpdf.getTrailer().getKey("/QTest");
+            QPDFObjectHandle O3 = qtest.getKey("/O3");
+            QPDFPageDocumentHelper(pdf).addPage(O3, false);
+            pdf.getTrailer().replaceKey(
+                "/QTest", pdf.copyForeignObject(qtest));
+        }
 
-	QPDFWriter w(newpdf, "a.pdf");
+	QPDFWriter w(pdf, "a.pdf");
 	w.setStaticID(true);
 	w.setStreamDataMode(qpdf_s_preserve);
 	w.write();
@@ -1122,20 +1128,48 @@ void runtest(int n, char const* filename1, char const* arg2)
     {
         // Copy O3 and the page O3 refers to before copying qtest.
         // Should get qtest plus only the O3 page and the page that O3
-        // points to.  Inherited objects should be preserved.
+        // points to. Inherited objects should be preserved. This test
+        // also exercises copying from a stream that has a buffer and
+        // a provider, including copying a provider multiple times.
 
-        assert(arg2 != 0);
-        QPDF newpdf;
-        newpdf.processFile(arg2);
-        QPDFObjectHandle qtest = pdf.getTrailer().getKey("/QTest");
-        QPDFObjectHandle O3 = qtest.getKey("/O3");
-        QPDFPageDocumentHelper dh(newpdf);
-        dh.addPage(O3.getKey("/OtherPage"), false);
-        dh.addPage(O3, false);
-        newpdf.getTrailer().replaceKey(
-            "/QTest", newpdf.copyForeignObject(qtest));
+	Pl_Buffer p1("buffer");
+	p1.write(QUtil::unsigned_char_pointer("new data for stream\n"),
+                 20); // no null!
+	p1.finish();
+	PointerHolder<Buffer> b = p1.getBuffer();
+	Provider* provider = new Provider(b);
+	PointerHolder<QPDFObjectHandle::StreamDataProvider> p = provider;
+        QPDF empty1;
+        empty1.emptyPDF();
+        QPDFObjectHandle s1 = QPDFObjectHandle::newStream(&empty1);
+	s1.replaceStreamData(
+	    p, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
+        QPDF empty2;
+        empty2.emptyPDF();
+	s1 = empty2.copyForeignObject(s1);
+        {
+            // Make sure original PDF is out of scope when we write.
+            assert(arg2 != 0);
+            QPDF oldpdf;
+            oldpdf.processFile(arg2);
+            QPDFObjectHandle qtest = oldpdf.getTrailer().getKey("/QTest");
+            QPDFObjectHandle O3 = qtest.getKey("/O3");
+            QPDFPageDocumentHelper dh(pdf);
+            dh.addPage(O3.getKey("/OtherPage"), false);
+            dh.addPage(O3, false);
+            QPDFObjectHandle s2 = QPDFObjectHandle::newStream(
+                &oldpdf, "potato\n");
+            pdf.getTrailer().replaceKey(
+                "/QTest", pdf.copyForeignObject(qtest));
+            pdf.getTrailer().replaceKey(
+                "/QTest2", QPDFObjectHandle::newArray());
+            pdf.getTrailer().getKey("/QTest2").appendItem(
+                pdf.copyForeignObject(s1));
+            pdf.getTrailer().getKey("/QTest2").appendItem(
+                pdf.copyForeignObject(s2));
+        }
 
-	QPDFWriter w(newpdf, "a.pdf");
+	QPDFWriter w(pdf, "a.pdf");
 	w.setStaticID(true);
 	w.setStreamDataMode(qpdf_s_preserve);
 	w.write();

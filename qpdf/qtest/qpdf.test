@@ -1921,7 +1921,7 @@ foreach my $d ([25, 1], [26, 2], [27, 3])
     my ($testn, $outn) = @$d;
     $td->runtest("copy objects $outn",
                  {$td->COMMAND => "test_driver $testn" .
-                      " copy-foreign-objects-in.pdf minimal.pdf"},
+                      " minimal.pdf copy-foreign-objects-in.pdf"},
                  {$td->STRING => "test $testn done\n", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
     $td->runtest("check output",

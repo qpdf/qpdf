@@ -2380,7 +2380,7 @@ QPDF::replaceForeignIndirectObjects(
             stream->getStreamDataProvider();
         if (stream_buffer.getPointer())
         {
-//            QTC::TC("qpdf", "QPDF copy foreign stream with buffer");
+            QTC::TC("qpdf", "QPDF copy foreign stream with buffer");
             result.replaceStreamData(stream_buffer,
                                      dict.getKey("/Filter"),
                                      dict.getKey("/DecodeParms"));
@@ -2388,7 +2388,7 @@ QPDF::replaceForeignIndirectObjects(
         else if (stream_provider.getPointer())
         {
             // In this case, the remote stream's QPDF must stay in scope.
-//            QTC::TC("qpdf", "QPDF copy foreign stream with provider");
+            QTC::TC("qpdf", "QPDF copy foreign stream with provider");
             this->m->copied_stream_data_provider->registerForeignStream(
                 local_og, foreign);
             result.replaceStreamData(this->m->copied_streams,
