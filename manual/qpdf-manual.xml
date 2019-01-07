@@ -1843,7 +1843,7 @@ outfile.pdf</option>
       <term><option>--json</option></term>
       <listitem>
        <para>
-        Generate a json representation of the file. This is described
+        Generate a JSON representation of the file. This is described
         in depth in <xref linkend="ref.json"/>
        </para>
       </listitem>
@@ -1852,7 +1852,7 @@ outfile.pdf</option>
       <term><option>--json-help</option></term>
       <listitem>
        <para>
-        Describe the format of the json output.
+        Describe the format of the JSON output.
        </para>
       </listitem>
      </varlistentry>
@@ -1861,7 +1861,7 @@ outfile.pdf</option>
       <listitem>
        <para>
         This option is repeatable. If specified, only top-level keys
-        specified will be included in the json output. If not
+        specified will be included in the JSON output. If not
         specified, all keys will be shown.
        </para>
       </listitem>
@@ -1872,7 +1872,7 @@ outfile.pdf</option>
        <para>
         This option is repeatable. If specified, only specified
         objects will be shown in the
-        &ldquo;<literal>objects</literal>&rdquo; key of the json
+        &ldquo;<literal>objects</literal>&rdquo; key of the JSON
         output. If absent, all objects will be shown.
        </para>
       </listitem>
@@ -2150,7 +2150,7 @@ outfile.pdf</option>
      <listitem>
       <para>
        Starting with version 8.3.0, the <command>qpdf</command>
-       command-line tool can produce a json representation of the PDF
+       command-line tool can produce a JSON representation of the PDF
        file's non-content data. This can facilitate interacting
        programmatically with PDF files through qpdf's command line
        interface. For more information, please see <xref
@@ -2167,10 +2167,10 @@ outfile.pdf</option>
    <title>Overview</title>
    <para>
     Beginning with qpdf version 8.3.0, the <command>qpdf</command>
-    command-line program can produce a json representation of the
-    non-content data in a PDF file. It includes a dump in json format
+    command-line program can produce a JSON representation of the
+    non-content data in a PDF file. It includes a dump in JSON format
     of all objects in the PDF file excluding the content of streams.
-    This json representation makes it very easy to look in detail at
+    This JSON representation makes it very easy to look in detail at
     the structure of a given PDF file, and it also provides a great way
     to work with PDF files programmatically from the command-line in
     languages that can't call or link with the qpdf library directly.
@@ -2181,17 +2181,17 @@ outfile.pdf</option>
   <sect1 id="ref.json-guarantees">
    <title>JSON Guarantees</title>
    <para>
-    The qpdf json representation includes a json serialization of the
+    The qpdf JSON representation includes a JSON serialization of the
     raw objects in the PDF file as well as some computed information in
     a more easily extracted format. QPDF provides some guarantees about
-    its json format. These guarantees are designed to simplify the
+    its JSON format. These guarantees are designed to simplify the
     experience of a developer working with the JSON format.
     <variablelist>
      <varlistentry>
       <term>Compatibility</term>
       <listitem>
        <para>
-        The top-level json object output is a dictionary. The json
+        The top-level JSON object output is a dictionary. The JSON
         output contains various nested dictionaries and arrays. With
         the exception of dictionaries that are populated by the fields
         of objects from the file, all instances of a dictionary are
@@ -2204,7 +2204,7 @@ outfile.pdf</option>
         report.
        </para>
        <para>
-        The top-level json structure contains a
+        The top-level JSON structure contains a
         &ldquo;<literal>version</literal>&rdquo; key whose value is
         simple integer. The value of the <literal>version</literal> key
         will be incremented if a non-compatible change is made. A
@@ -2221,16 +2221,16 @@ outfile.pdf</option>
       <listitem>
        <para>
         The <command>qpdf</command> command can be invoked with the
-        <option>--json-help</option> option. This will output a json
-        structure that has the same structure as the json output that
+        <option>--json-help</option> option. This will output a JSON
+        structure that has the same structure as the JSON output that
         qpdf generates, except that each field in the help output is a
-        description of the corresponding field in the json output. The
+        description of the corresponding field in the JSON output. The
         specific guarantees are as follows:
         <itemizedlist>
          <listitem>
           <para>
            A dictionary in the help output means that the corresponding
-           location in the actual json output is also a dictionary with
+           location in the actual JSON output is also a dictionary with
            exactly the same keys; that is, no keys present in help are
            absent in the real output, and no keys will be present in
            the real output that are not in help.
@@ -2259,7 +2259,7 @@ outfile.pdf</option>
         &ldquo;<literal>index</literal>&rdquo; and
         &ldquo;<literal>label</literal>&rdquo;. In addition to
         describing the meaning of those keys, this tells you that the
-        actual json output will contain a <literal>pagelabels</literal>
+        actual JSON output will contain a <literal>pagelabels</literal>
         array, each of whose elements is a dictionary that contains an
         <literal>index</literal> key, a <literal>label</literal> key,
         and no other keys.
@@ -2270,7 +2270,7 @@ outfile.pdf</option>
       <term>Directness and Simplicity</term>
       <listitem>
        <para>
-        The json output contains the value of every object in the file,
+        The JSON output contains the value of every object in the file,
         but it also contains some processed data. This is analogous to
         how qpdf's library interface works. The processed data is
         similar to the helper functions in that it allows you to look
@@ -2287,18 +2287,18 @@ outfile.pdf</option>
   <sect1 id="json.limitations">
    <title>Limitations of JSON Representation</title>
    <para>
-    There are a few limitations to be aware of with the json structure:
+    There are a few limitations to be aware of with the JSON structure:
     <itemizedlist>
      <listitem>
       <para>
        Strings, names, and indirect object references in the original
-       PDF file are all converted to strings in the json
+       PDF file are all converted to strings in the JSON
        representation. In the case of a &ldquo;normal&rdquo; PDF file,
        you can tell the difference because a name starts with a slash
        (<literal>/</literal>), and an indirect object reference looks
        like <literal>n n R</literal>, but if there were to be a string
        that looked like a name or indirect object reference, there
-       would be no way to tell this from the json output. Note that
+       would be no way to tell this from the JSON output. Note that
        there are certain cases where you know for sure what something
        is, such as knowing that dictionary keys in objects are always
        names and that certain things in the higher-level computed data
@@ -2307,9 +2307,9 @@ outfile.pdf</option>
      </listitem>
      <listitem>
       <para>
-       The json format doesn't support binary data very well. Mostly
+       The JSON format doesn't support binary data very well. Mostly
        the details are not important, but they are presented here for
-       information. When qpdf outputs a string in the json
+       information. When qpdf outputs a string in the JSON
        representation, it converts the string to UTF-8, assuming usual
        PDF string semantics. Specifically, if the original string is
        UTF-16, it is converted to UTF-8. Otherwise, it is assumed to
@@ -2317,7 +2317,7 @@ outfile.pdf</option>
        assumption. This causes strange things to happen to binary
        strings. For example, if you had the binary string
        <literal>&lt;038051&gt;</literal>, this would be output to the
-       json as <literal>\u0003•Q</literal> because
+       JSON as <literal>\u0003•Q</literal> because
        <literal>03</literal> is not a printable character and
        <literal>80</literal> is the bullet character in PDF doc
        encoding and is mapped to the Unicode value
@@ -2330,7 +2330,7 @@ outfile.pdf</option>
        tell the difference between a Unicode string that was originally
        encoded as UTF-16 or one that was converted from PDF doc
        encoding. In other words, it's best if you don't try to use the
-       json format to extract binary strings from the PDF file, but if
+       JSON format to extract binary strings from the PDF file, but if
        you really had to, it could be done. Note that qpdf's
        <option>--show-object</option> option does not have this
        limitation and will reveal the string as encoded in the original
@@ -2362,11 +2362,11 @@ outfile.pdf</option>
        In a few places, there are keys with names containing
        <literal>pageposfrom1</literal>. The values of these keys are
        null or an integer. If an integer, they point to a page index
-       within the file numbering from 1. Note that json indexes from
+       within the file numbering from 1. Note that JSON indexes from
        0, and you would also use 0-based indexing using the API.
        However, 1-based indexing is easier in this case because the
        command-line syntax for specifying page ranges is 1-based. If
-       you were going to write a program that looked through the json
+       you were going to write a program that looked through the JSON
        for information about specific pages and then use the
        command-line to extract those pages, 1-based indexing is
        easier. Besides, it's more convenient to subtract 1 from a
@@ -2377,11 +2377,11 @@ outfile.pdf</option>
      <listitem>
       <para>
        The image information included in the <literal>page</literal>
-       section of the json output includes the key
+       section of the JSON output includes the key
        &ldquo;<literal>filterable</literal>&rdquo;. Note that the
        value of this field may depend on the
        <option>--decode-level</option> that you invoke qpdf with. The
-       json output includes a top-level key
+       JSON output includes a top-level key
        &ldquo;<literal>parameters</literal>&rdquo; that indicates the
        decode level used for computing whether a stream was
        filterable. For example, jpeg images will be shown as not
@@ -3870,6 +3870,322 @@ print "\n";
    <filename>ChangeLog</filename> in the source distribution.
   </para>
   <variablelist>
+   <varlistentry>
+    <term>8.3.0: January 7, 2019</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Command-line Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Shell completion: you can now use eval <command>$(qpdf
+          --completion-bash)</command> and eval <command>$(qpdf
+          --completion-zsh)</command> to enable shell completion for
+          bash and zsh.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Page numbers (also known as page labels) are now preserved
+          when merging and splitting files with the
+          <option>--pages</option> and <option>--split-pages</option>
+          options.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Bookmarks are partially preserved when splitting pages with
+          the <option>--split-pages</option> option. Specifically, the
+          outlines dictionary and some supporting metadata are copied
+          into the split files. The result is that all bookmarks from
+          the original file appear, those that point to pages that are
+          preserved work, and those that point to pages that are not
+          preserved don't do anything. This is an interim step toward
+          proper support for bookmarks in splitting and merging
+          operations.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Page collation: add new option <option>--collate</option>.
+          When specified, the semantics of <option>--pages</option>
+          change from concatenation to collation. See <xref
+          linkend="ref.page-selection"/> for examples and discussion.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Generation of information in JSON format, primarily to
+          facilitate use of qpdf from languages other than C++. Add
+          new options <option>--json</option>,
+          <option>--json-key</option>, and
+          <option>--json-object</option> to generate a JSON
+          representation of the PDF file. Run <command>qpdf
+          --json-help</command> to get a description of the JSON
+          format. For more information, see <xref linkend="ref.json"/>.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          The <option>--generate-appearances</option> flag will cause
+          qpdf to generate appearances for form fields if the PDF file
+          indicates that form field appearances are out of date. This
+          can happen when PDF forms are filled in by a program that
+          doesn't know how to regenerate the appearances of the
+          filled-in fields.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          The <option>--flatten-annotations</option> flag can be used
+          to <emphasis>flatten</emphasis> annotations, including form
+          fields. Ordinarily, annotations are drawn separately from
+          the page. Flattening annotations is the process of combining
+          their appearances into the page's contents. You might want
+          to do this if you are going to rotate or combine pages using
+          a tool that doesn't understand about annotations. You may
+          also want to use <option>--generate-appearances</option>
+          when using this flag since annotations for outdated form
+          fields are not flattened as that would cause loss of
+          information.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          The <option>--optimize-images</option> flag tells qpdf to
+          recompresses every image using DCT (JPEG) compression as
+          long as the image is not already compressed with lossy
+          compression and recompressing the image reduces its size.
+          The additional options <option>--oi-min-width</option>,
+          <option>--oi-min-height</option>, and
+          <option>--oi-min-area</option> prevent recompression of
+          images whose width, height, or pixel area
+          (width&nbsp;&#xd7;&nbsp;height) are below a specified
+          threshold.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          The <option>--show-object</option> option can now be given
+          as <option>--show-object=trailer</option> to show the
+          trailer dictionary.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Bug Fixes and Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          QPDF now automatically detects and recovers from dangling
+          references. If a PDF file contained an indirect reference to
+          a non-existent object, which is valid, when adding a new
+          object to the file, it was possible for the new object to
+          take the object ID of the dangling reference, thereby
+          causing the dangling reference to point to the new object.
+          This case is now prevented.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Fixes to form field setting code: strings are always written
+          in UTF-16 format, and checkboxes and radio buttons are
+          handled properly with respect to synchronization of values
+          and appearance states.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          The <function>QPDF::checkLinearization()</function> no
+          longer causes the program to crash when it detects problems
+          with linearization data. Instead, it issues a normal warning
+          or error.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Ordinarily qpdf treats an argument of the form
+          <option>@file</option> to mean that command-line options
+          should be read from <filename>file</filename>. Now, if
+          <filename>file</filename> does not exist but
+          <filename>@file</filename> does, qpdf will treat
+          <filename>@file</filename> as a regular option. This makes
+          it possible to work more easily with PDF files whose names
+          happen to start with the <literal>@</literal> character.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Library Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Remove the restriction in most cases that the source QPDF
+          object used in a
+          <function>QPDF::copyForeignObject</function> call has to
+          stick around until the destination QPDF is written. The
+          exceptional case is when the source stream gets is data
+          using a QPDFObjectHandle::StreamDataProvider. For a more
+          in-depth discussion, see comments around
+          <function>copyForeignObject</function> in
+          <filename>QPDF.hh</filename>.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add new method
+          <function>QPDFWriter::getFinalVersion()</function>, which
+          returns the PDF version that will ultimately be written to
+          the final file. See comments in
+          <filename>QPDFWriter.hh</filename> for some restrictions on
+          its use.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add several methods for transcoding strings to some of the
+          character sets used in PDF files:
+          <function>QUtil::utf8_to_ascii</function>,
+          <function>QUtil::utf8_to_win_ansi</function>,
+          <function>QUtil::utf8_to_mac_roman</function>, and
+          <function>QUtil::utf8_to_utf16</function>. For the
+          single-byte encodings that support only a limited character
+          sets, these methods replace unsupported characters with a
+          specified substitute.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add new methods to
+          <classname>QPDFAnnotationObjectHelper</classname> and
+          <classname>QPDFFormFieldObjectHelper</classname> for
+          querying flags and interpretation of different field types.
+          Define constants in <filename>qpdf/Constants.h</filename> to
+          help with interpretation of flag values.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add new methods
+          <function>QPDFAcroFormDocumentHelper::generateAppearancesIfNeeded</function>
+          and
+          <function>QPDFFormFieldObjectHelper::generateAppearance</function>
+          for generating appearance streams. See discussion in
+          <filename>QPDFFormFieldObjectHelper.hh</filename> for
+          limitations.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add two new helper functions for dealing with resource
+          dictionaries:
+          <function>QPDFObjectHandle::getResourceNames()</function>
+          returns a list of all second-level keys, which correspond to
+          the names of resources, and
+          <function>QPDFObjectHandle::mergeResources()</function>
+          merges two resources dictionaries as long as they have
+          non-conflicting keys. These methods are useful for certain
+          types of objects that resolve resources from multiple places,
+          such as form fields.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add methods
+          <function>QPDFPageDocumentHelper::flattenAnnotations()</function>
+          and
+          <function>QPDFAnnotationObjectHelper::getPageContentForAppearance()</function>
+          for handling low-level details of annotation flattening.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add new helper classes:
+          <classname>QPDFOutlineDocumentHelper</classname>,
+          <classname>QPDFOutlineObjectHelper</classname>,
+          <classname>QPDFPageLabelDocumentHelper</classname>,
+          <classname>QPDFNameTreeObjectHelper</classname>, and
+          <classname>QPDFNumberTreeObjectHelper</classname>.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add method <function>QPDFObjectHandle::getJSON()</function>
+          that returns a JSON representation of the object. Call
+          <function>serialize()</function> on the result to convert it
+          to a string.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add a simple JSON serializer. This is not a complete or
+          general-purpose JSON library. It allows assembly and
+          serialization of JSON structures with some restrictions,
+          which are described in the header file. This is the
+          serializer used by qpdf's new JSON representation.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add new <classname>QPDFObjectHandle::Matrix</classname>
+          class along with a few convenience methods for dealing with
+          six-element numerical arrays as matrices.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add new method
+          <function>QPDFObjectHandle::wrapInArray</function>, which returns
+          the object itself if it is an array, or an array containing
+          the object otherwise. This is a common construct in PDF.
+          This method prevents you from having to explicitly test
+          whether something is a single element or an array.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Build Improvements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          It is no longer necessary to run
+          <command>autogen.sh</command> to build from a pristine
+          checkout. Automatically generated files are now committed so
+          that it is possible to build on platforms without autoconf
+          directly from a clean checkout of the repository. The
+          <command>configure</command> script detects if the files are
+          out of date when it also determines that the tools are
+          present to regenerate them.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Pull requests and the master branch are now built
+          automatically in <ulink
+          url="https://dev.azure.com/qpdf/qpdf/_build">Azure
+          Pipelines</ulink>, which is free for open source projects.
+          The build includes Linux, mac, Windows 32-bit and 64-bit
+          with mingw and MSVC, and an AppImage build. Official qpdf
+          releases are now built with Azure Pipelines.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
     <term>8.2.1: August 18, 2018</term>
     <listitem>

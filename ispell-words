@@ -5,10 +5,8 @@ abacc
 abc
 ABCD
 abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnom
-abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnom
 abcde
 abcdefABCDEF
-abcdefghbcdefghicdefghijdefghijkefghijklfghijklmg
 abcdefghbcdefghicdefghijdefghijkefghijklfghijklmg
 abcdefghijklmnopqrstuvwxyz
 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghi
@@ -895,7 +893,6 @@ hf
 HGeneric
 hh
 HighPart
-hijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstn
 hijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstn
 hlen
 Hoffmann
@@ -1860,6 +1857,7 @@ toupper
 toUTF
 tp
 transcode
+transcoding
 traverseField
 travis
 TrimBox
@@ -2004,6 +2002,7 @@ xc
 xcc
 xcf
 xD
+xd
 xDC
 xe
 xeaa

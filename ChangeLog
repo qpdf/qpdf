@@ -53,6 +53,9 @@
 
 2019-01-03  Jay Berkenbilt  <ejb@ql.org>
 
+        * Add --generate-appearances flag to the qpdf command-line tool to
+	trigger generation of appearance streams.
+
 	* Fix behavior of form field value setting to handle the following
 	cases:
 	  - Strings are always written as UTF-16
