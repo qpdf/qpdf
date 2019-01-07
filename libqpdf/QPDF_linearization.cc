@@ -794,7 +794,7 @@ QPDF::checkHPageOffset(std::list<std::string>& errors,
     {
         stopOnError("supposed first page object is not known");
     }
-    int offset = getLinearizationOffset(first_page_og);
+    qpdf_offset_t offset = getLinearizationOffset(first_page_og);
     if (table_offset != offset)
     {
 	warnings.push_back("first page object offset mismatch");
