@@ -3,35 +3,6 @@ Soon
 
  * Set up OSS-Fuzz (Google). See starred email in qpdf label.
 
- * Figure out how to render Gajić correctly in the PDF version of the
-   qpdf manual.
-
- * Add method to push inheritable resources to a single page by
-   walking up and copying without overwrite.  Above logic will also be
-   sufficient to fix the limitation in
-   QPDFObjectHandle::getPageImages().  Maybe add a method to get the
-   effective resources for a page without modifying the page and then
-   implement both changes in terms of that method.
-
- * Support user-pluggable stream filters.  This would enable external
-   code to provide interpretation for filters that are missing from
-   qpdf.  Make it possible for user-provided filters to override
-   built-in filters.  Make sure that the pluggable filters can be
-   prioritized so that we can poll all registered filters to see
-   whether they are capable of filtering a particular stream.
-
- * If possible, consider adding CCITT3, CCITT4, or any other easy
-   filters. For some reference code that we probably can't use but may
-   be handy anyway, see
-   http://partners.adobe.com/public/developer/ps/sdk/index_archive.html
-
- * If possible, support the following types of broken files:
-
-    - Files that have no whitespace token after "endobj" such that
-      endobj collides with the start of the next object
-
-    - See ../misc/broken-files
-
 Next ABI
 ========
 
@@ -118,6 +89,35 @@ NOTE: Some items in this list refer to files in my personal home
 directory or that are otherwise not publicly accessible. This includes
 things sent to me by email that are specifically not public. Even so,
 I find it useful to make reference to them in this list
+
+ * Figure out how to render Gajić correctly in the PDF version of the
+   qpdf manual.
+
+ * Add method to push inheritable resources to a single page by
+   walking up and copying without overwrite.  Above logic will also be
+   sufficient to fix the limitation in
+   QPDFObjectHandle::getPageImages().  Maybe add a method to get the
+   effective resources for a page without modifying the page and then
+   implement both changes in terms of that method.
+
+ * Support user-pluggable stream filters.  This would enable external
+   code to provide interpretation for filters that are missing from
+   qpdf.  Make it possible for user-provided filters to override
+   built-in filters.  Make sure that the pluggable filters can be
+   prioritized so that we can poll all registered filters to see
+   whether they are capable of filtering a particular stream.
+
+ * If possible, consider adding CCITT3, CCITT4, or any other easy
+   filters. For some reference code that we probably can't use but may
+   be handy anyway, see
+   http://partners.adobe.com/public/developer/ps/sdk/index_archive.html
+
+ * If possible, support the following types of broken files:
+
+    - Files that have no whitespace token after "endobj" such that
+      endobj collides with the start of the next object
+
+    - See ../misc/broken-files
 
  * Additional form features
    * set value from CLI? Specify title, and provide way to
