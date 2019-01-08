@@ -1,0 +1,1 @@
+eval $(/usr/bin/qpdf --completion-bash)

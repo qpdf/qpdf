@@ -2,6 +2,10 @@
 
 	* 8.3.0: release
 
+	* Add sample completion files in completions. These can be used by
+	packagers to install on the system wherever bash and zsh keep
+	their vendor-supplied completions.
+
 	* Add configure flag --enable-check-autofiles, which is on by
 	default. Packagers whose packaging systems automatically refresh
 	autoconf or libtool files should pass --disable-check-autofiles to
