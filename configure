@@ -744,6 +744,7 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
+enable_check_autofiles
 enable_shared
 enable_static
 with_pic
@@ -1409,6 +1410,10 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --enable-check-autofiles
+                          if specified, verify checksums on automatically
+                          generated files (default=yes); package maintainers
+                          may want to disable this
   --enable-shared[=PKGS]  build shared libraries [default=yes]
   --enable-static[=PKGS]  build static libraries [default=yes]
   --enable-fast-install[=PKGS]
@@ -2448,6 +2453,18 @@ ac_config_files="$ac_config_files libqpdf.map"
 ac_config_headers="$ac_config_headers libqpdf/qpdf/qpdf-config.h"
 
 
+# Check whether --enable-check-autofiles was given.
+if test "${enable_check_autofiles+set}" = set; then :
+  enableval=$enable_check_autofiles; if test "$enableval" = "no"; then
+      CHECK_AUTOFILES=0
+    else
+      CHECK_AUTOFILES=1
+    fi
+else
+  CHECK_AUTOFILES=1
+fi
+
+
 # Check to see if automatically generated files are outdated and if we
 # can update them.
 # Extract the first word of "autoconf", so it can be a program name with args.
@@ -2602,7 +2619,7 @@ $as_echo "no" >&6; }
 fi
 
 
-if test "$AUTOCONF$AUTOHEADER$ACLOCAL$SHA256SUM" = "1111"; then
+if test "$CHECK_AUTOFILES$AUTOCONF$AUTOHEADER$ACLOCAL$SHA256SUM" = "11111"; then
    if ! sha256sum -c autofiles.sums; then
        as_fn_error $? "autofiles are autodated; rerun autogen.sh" "$LINENO" 5
    fi

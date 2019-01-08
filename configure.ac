@@ -11,13 +11,23 @@ AC_CONFIG_FILES([libqpdf.pc])
 AC_CONFIG_FILES([libqpdf.map])
 AC_CONFIG_HEADERS([libqpdf/qpdf/qpdf-config.h])
 
+AC_ARG_ENABLE(check-autofiles,
+   AS_HELP_STRING([--enable-check-autofiles],
+		  [if specified, verify checksums on automatically generated files (default=yes); package maintainers may want to disable this]),
+   [if test "$enableval" = "no"; then
+      CHECK_AUTOFILES=0
+    else
+      CHECK_AUTOFILES=1
+    fi],
+   [CHECK_AUTOFILES=1])
+
 # Check to see if automatically generated files are outdated and if we
 # can update them.
 AC_CHECK_PROG(AUTOCONF,autoconf,1,0)
 AC_CHECK_PROG(AUTOHEADER,autoheader,1,0)
 AC_CHECK_PROG(ACLOCAL,aclocal,1,0)
 AC_CHECK_PROG(SHA256SUM,sha256sum,1,0)
-if test "$AUTOCONF$AUTOHEADER$ACLOCAL$SHA256SUM" = "1111"; then
+if test "$CHECK_AUTOFILES$AUTOCONF$AUTOHEADER$ACLOCAL$SHA256SUM" = "11111"; then
    if ! sha256sum -c autofiles.sums; then
        AC_MSG_ERROR(autofiles are autodated; rerun autogen.sh)
    fi

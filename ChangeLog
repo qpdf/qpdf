@@ -2,6 +2,12 @@
 
 	* 8.3.0: release
 
+	* Add configure flag --enable-check-autofiles, which is on by
+	default. Packagers whose packaging systems automatically refresh
+	autoconf or libtool files should pass --disable-check-autofiles to
+	./configure to suppress warnings about automatically generated
+	files being outdated.
+
 2019-01-06  Jay Berkenbilt  <ejb@ql.org>
 
 	* Remove the restriction in most cases that the source QPDF used
