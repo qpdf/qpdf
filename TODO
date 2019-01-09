@@ -3,6 +3,13 @@ Soon
 
  * Set up OSS-Fuzz (Google). See starred email in qpdf label.
 
+ * Add an explicit test case that uses copyForeignObject to convert a
+   page object to a form XObject. Comment in the test case and/or code
+   to explain this use case. Update the docs to explain the difference
+   between copying a page in the two ways: using addPage updates the
+   pages tree, while using copyForeignObject does not. The latter is
+   appropriate when a page is being converted to a form XObject.
+
 Next ABI
 ========
 
@@ -12,6 +19,9 @@ Do these things next time we have to break binary compatibility
    was modified for greater efficiency, but it was done in a way that
    preserved binary compatibility, so the implementation is a bit
    convoluted.
+
+ * Rename QUtil::strcasecmp since strcasecmp is a macro on some
+   platforms. See #242.
 
 Lexical
 =======
