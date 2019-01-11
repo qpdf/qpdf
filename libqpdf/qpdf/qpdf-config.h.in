@@ -1,5 +1,8 @@
 /* libqpdf/qpdf/qpdf-config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Whether to avoid use of HANDLE in Windows */
+#undef AVOID_WINDOWS_HANDLE
+
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 

@@ -756,6 +756,7 @@ enable_libtool_lock
 enable_insecure_random
 enable_os_secure_random
 with_random
+enable_avoid_windows_handle
 enable_external_libs
 with_windows_wordsize
 with_large_file_test_path
@@ -1425,6 +1426,9 @@ Optional Features:
   --enable-os-secure-random
                           whether to try to use OS-provided secure random
                           numbers (default is yes)
+  --enable-avoid-windows-handle
+                          whether to avoid use of HANDLE, useful for some
+                          embedded Windows builds (default is no)
   --enable-external-libs  whether to use external libraries distribution
   --disable-largefile     omit support for large files
   --enable-ld-version-script
@@ -15779,6 +15783,28 @@ _ACEOF
 
   fi
 
+
+# Check whether --enable-avoid-windows-handle was given.
+if test "${enable_avoid_windows_handle+set}" = set; then :
+  enableval=$enable_avoid_windows_handle; if test "$enableval" = "yes"; then
+      qpdf_AVOID_HANDLE=1;
+    else
+      qpdf_AVOID_HANDLE=0;
+    fi
+else
+  qpdf_AVOID_HANDLE=0
+fi
+
+if test "$qpdf_AVOID_HANDLE" = "1"; then
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define AVOID_WINDOWS_HANDLE 1" >>confdefs.h
+
+else
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
 
 USE_EXTERNAL_LIBS=0
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for whether to use external libraries distribution" >&5

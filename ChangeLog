@@ -1,5 +1,12 @@
 2019-01-10  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add new configure option --enable-avoid-windows-handle, which
+	causes the symbol AVOID_WINDOWS_HANDLE to be defined. If set, we
+	avoid using Windows I/O HANDLE, which is disallowed in some
+	versions of the Windows SDK, such as for Windows phones.
+	QUtil::same_file will always return false in this case. Only
+	applies to Windows builds.
+
 	* Add new method QPDF::setImmediateCopyFrom. When called on a
 	source QPDF object, streams can be copied FROM that object to
 	other ones without having to keep the source QPDF or its input

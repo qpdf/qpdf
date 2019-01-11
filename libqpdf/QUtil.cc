@@ -214,13 +214,14 @@ QUtil::same_file(char const* name1, char const* name2)
         return false;
     }
 #ifdef _WIN32
+    bool same = false;
+# ifndef AVOID_WINDOWS_HANDLE
     HANDLE fh1 = CreateFile(name1, GENERIC_READ, FILE_SHARE_READ,
                             NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
     HANDLE fh2 = CreateFile(name2, GENERIC_READ, FILE_SHARE_READ,
                             NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
     BY_HANDLE_FILE_INFORMATION fi1;
     BY_HANDLE_FILE_INFORMATION fi2;
-    bool same = false;
     if ((fh1 != INVALID_HANDLE_VALUE) &&
         (fh2 != INVALID_HANDLE_VALUE) &&
         GetFileInformationByHandle(fh1, &fi1) &&
@@ -239,6 +240,7 @@ QUtil::same_file(char const* name1, char const* name2)
     {
         CloseHandle(fh2);
     }
+# endif
     return same;
 #else
     struct stat st1;

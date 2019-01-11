@@ -92,6 +92,21 @@ fi
 
 AX_RANDOM_DEVICE
 
+AC_ARG_ENABLE(avoid-windows-handle,
+   AS_HELP_STRING([--enable-avoid-windows-handle],
+                  [whether to avoid use of HANDLE, useful for some embedded Windows builds (default is no)]),
+   [if test "$enableval" = "yes"; then
+      qpdf_AVOID_HANDLE=1;
+    else
+      qpdf_AVOID_HANDLE=0;
+    fi], [qpdf_AVOID_HANDLE=0])
+if test "$qpdf_AVOID_HANDLE" = "1"; then
+   AC_MSG_RESULT(yes)
+   AC_DEFINE([AVOID_WINDOWS_HANDLE], [1], [Whether to avoid use of HANDLE in Windows])
+else
+   AC_MSG_RESULT(no)
+fi
+
 USE_EXTERNAL_LIBS=0
 AC_MSG_CHECKING(for whether to use external libraries distribution)
 AC_ARG_ENABLE(external-libs,
