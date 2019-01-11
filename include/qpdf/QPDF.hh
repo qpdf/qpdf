@@ -160,6 +160,39 @@ class QPDF
     QPDF_DLL
     void setAttemptRecovery(bool);
 
+    // Tell other QPDF objects that streams copied from this QPDF need
+    // to be fully copied when copyForeignObject is called on them.
+    // Calling setIgnoreXRefStreams(true) on a QPDF object makes it
+    // possible for the object and its input source to disappear
+    // before streams copied from it are written with the destination
+    // QPDF object. Confused? Ordinarily, if you are going to copy
+    // objects from a source QPDF object to a destination QPDF object
+    // using copyForeignObject or addPage, the source object's input
+    // source must stick around until after the destination PDF is
+    // written. If you call this method on the source QPDF object, it
+    // sends a signal to the destination object that it must fully
+    // copy the stream data when copyForeignObject. It will do this by
+    // making a copy in RAM. Ordinarily the stream data is copied
+    // lazily to avoid unnecessary duplication of the stream data.
+    // Note that the stream data is copied into RAM only once
+    // regardless of how many objects the stream is copied into. The
+    // result is that, if you called setImmediateCopyFrom(true) on a
+    // given QPDF object prior to copying any of its streams, you do
+    // not need to keep it or its input source around after copying
+    // its objects to another QPDF. This is true even if the source
+    // streams use StreamDataProvider. Note that this method is called
+    // on the QPDF object you are copying FROM, not the one you are
+    // copying to. The reasoning for this is that there's no reason a
+    // given QPDF may not get objects copied to it from a variety of
+    // other objects, some transient and some not. Since what's
+    // relevant is whether the source QPDF is transient, the method
+    // must be called on the source QPDF, not the destination one.
+    // Since this method will make a copy of the stream in RAM, so be
+    // sure you have enough memory to simultaneously hold all the
+    // streams you're copying.
+    QPDF_DLL
+    void setImmediateCopyFrom(bool);
+
     // Other public methods
 
     // Return the list of warnings that have been issued so far and
@@ -248,6 +281,13 @@ class QPDF
     // original stream's QPDF object must stick around because the
     // QPDF object is itself the source of the original stream data.
     // For a more in-depth discussion, please see the TODO file.
+    // Starting in 8.3.1, you can call setImmediateCopyFrom(true) on
+    // the SOURCE QPDF object (the one you're copying FROM). If you do
+    // this prior to copying any of its objects, then neither the
+    // source QPDF object nor its input source needs to stick around
+    // at all regardless of the source. The cost is that the stream
+    // data is copied into RAM at the time copyForeignObject is
+    // called. See setImmediateCopyFrom for more information.
     //
     // The return value of this method is an indirect reference to the
     // copied object in this file. This method is intended to be used
@@ -1283,6 +1323,7 @@ class QPDF
         std::set<QPDFObjGen> attachment_streams;
         bool reconstructed_xref;
         bool fixed_dangling_refs;
+        bool immediate_copy_from;
 
         // Linearization data
         qpdf_offset_t first_xref_item_offset; // actual value from file

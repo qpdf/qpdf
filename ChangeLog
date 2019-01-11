@@ -1,3 +1,12 @@
+2019-01-10  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add new method QPDF::setImmediateCopyFrom. When called on a
+	source QPDF object, streams can be copied FROM that object to
+	other ones without having to keep the source QPDF or its input
+	source around. The cost is copying the streams into RAM. See
+	comments in QPDF.hh for setImmediateCopyFrom for a detailed
+	explanation.
+
 2019-01-07  Jay Berkenbilt  <ejb@ql.org>
 
 	* 8.3.0: release

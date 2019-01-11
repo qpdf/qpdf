@@ -1130,25 +1130,56 @@ void runtest(int n, char const* filename1, char const* arg2)
         // Should get qtest plus only the O3 page and the page that O3
         // points to. Inherited objects should be preserved. This test
         // also exercises copying from a stream that has a buffer and
-        // a provider, including copying a provider multiple times.
+        // a provider, including copying a provider multiple times. We
+        // also exercise setImmediateCopyFrom.
 
-	Pl_Buffer p1("buffer");
-	p1.write(QUtil::unsigned_char_pointer("new data for stream\n"),
-                 20); // no null!
-	p1.finish();
-	PointerHolder<Buffer> b = p1.getBuffer();
-	Provider* provider = new Provider(b);
-	PointerHolder<QPDFObjectHandle::StreamDataProvider> p = provider;
+        // Create a provider. The provider stays in scope.
+	PointerHolder<QPDFObjectHandle::StreamDataProvider> p1;
+        {
+            // Local scope
+            Pl_Buffer pl("buffer");
+            pl.write(QUtil::unsigned_char_pointer("new data for stream\n"),
+                      20); // no null!
+            pl.finish();
+            PointerHolder<Buffer> b = pl.getBuffer();
+            Provider* provider = new Provider(b);
+            p1 = provider;
+        }
+        // Create a stream that uses a provider in empty1 and copy it
+        // to empty2. It is copied from empty2 to the final pdf.
         QPDF empty1;
         empty1.emptyPDF();
         QPDFObjectHandle s1 = QPDFObjectHandle::newStream(&empty1);
 	s1.replaceStreamData(
-	    p, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
+	    p1, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
         QPDF empty2;
         empty2.emptyPDF();
 	s1 = empty2.copyForeignObject(s1);
         {
-            // Make sure original PDF is out of scope when we write.
+            // Make sure some source PDFs are out of scope when we
+            // write.
+
+            PointerHolder<QPDFObjectHandle::StreamDataProvider> p2;
+            // Create another provider. This one will go out of scope
+            // along with its containing qpdf, which has
+            // setImmediateCopyFrom(true).
+            {
+                // Local scope
+                Pl_Buffer pl("buffer");
+                pl.write(QUtil::unsigned_char_pointer(
+                              "more data for stream\n"),
+                          21); // no null!
+                pl.finish();
+                PointerHolder<Buffer> b = pl.getBuffer();
+                Provider* provider = new Provider(b);
+                p2 = provider;
+            }
+            QPDF empty3;
+            empty3.emptyPDF();
+            empty3.setImmediateCopyFrom(true);
+            QPDFObjectHandle s3 = QPDFObjectHandle::newStream(&empty3);
+            s3.replaceStreamData(
+                p2, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
             assert(arg2 != 0);
             QPDF oldpdf;
             oldpdf.processFile(arg2);
@@ -1167,6 +1198,8 @@ void runtest(int n, char const* filename1, char const* arg2)
                 pdf.copyForeignObject(s1));
             pdf.getTrailer().getKey("/QTest2").appendItem(
                 pdf.copyForeignObject(s2));
+            pdf.getTrailer().getKey("/QTest2").appendItem(
+                pdf.copyForeignObject(s3));
         }
 
 	QPDFWriter w(pdf, "a.pdf");

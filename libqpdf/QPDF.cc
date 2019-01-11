@@ -147,6 +147,7 @@ QPDF::Members::Members() :
     copied_stream_data_provider(0),
     reconstructed_xref(false),
     fixed_dangling_refs(false),
+    immediate_copy_from(false),
     first_xref_item_offset(0),
     uncompressed_after_compressed(false)
 {
@@ -267,6 +268,12 @@ void
 QPDF::setAttemptRecovery(bool val)
 {
     this->m->attempt_recovery = val;
+}
+
+void
+QPDF::setImmediateCopyFrom(bool val)
+{
+    this->m->immediate_copy_from = val;
 }
 
 std::vector<QPDFExc>
@@ -2376,6 +2383,19 @@ QPDF::replaceForeignIndirectObjects(
         }
         PointerHolder<Buffer> stream_buffer =
             stream->getStreamDataBuffer();
+        if ((foreign_stream_qpdf->m->immediate_copy_from) &&
+            (stream_buffer.getPointer() == 0))
+        {
+            // Pull the stream data into a buffer before attempting
+            // the copy operation. Do it on the source stream so that
+            // if the source stream is copied multiple times, we don't
+            // have to keep duplicating the memory.
+            QTC::TC("qpdf", "QPDF immediate copy stream data");
+            foreign.replaceStreamData(foreign.getRawStreamData(),
+                                      dict.getKey("/Filter"),
+                                      dict.getKey("/DecodeParms"));
+            stream_buffer = stream->getStreamDataBuffer();
+        }
         PointerHolder<QPDFObjectHandle::StreamDataProvider> stream_provider =
             stream->getStreamDataProvider();
         if (stream_buffer.getPointer())
