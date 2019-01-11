@@ -281,7 +281,7 @@ class QPDF
     // original stream's QPDF object must stick around because the
     // QPDF object is itself the source of the original stream data.
     // For a more in-depth discussion, please see the TODO file.
-    // Starting in 8.3.1, you can call setImmediateCopyFrom(true) on
+    // Starting in 8.4.0, you can call setImmediateCopyFrom(true) on
     // the SOURCE QPDF object (the one you're copying FROM). If you do
     // this prior to copying any of its objects, then neither the
     // source QPDF object nor its input source needs to stick around
