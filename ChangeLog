@@ -1,3 +1,9 @@
+2019-01-12  Jay Berkenbilt  <ejb@ql.org>
+
+	* In --pages, allow "." as a replacement for the current input
+	file, making it possible to say "qpdf A.pdf --pages . 1-3 --"
+	instead of having to repeat the input filename.
+
 2019-01-10  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add new configure option --enable-avoid-windows-handle, which

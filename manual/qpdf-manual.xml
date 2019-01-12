@@ -956,6 +956,11 @@ make
     selection flags.
    </para>
    <para>
+    Starting with qpf 8.4, the special input file name
+    &ldquo;<filename>.</filename>&rdquo; can be used shortcut for the
+    primary input filename.
+   </para>
+   <para>
     For each file that pages should be taken from, specify the file, a
     password needed to open the file (if any), and a page range.  The
     password needs to be given only once per file.  If any of the
@@ -1075,7 +1080,7 @@ make
     <filename>infile.pdf</filename> while preserving all metadata
     associated with that file, you could use
 
-    <programlisting><command>qpdf</command> <option>infile.pdf --pages infile.pdf 1-5 -- outfile.pdf</option>
+    <programlisting><command>qpdf</command> <option>infile.pdf --pages . 1-5 -- outfile.pdf</option>
 </programlisting>
     If you wanted pages 1 through 5 from
     <filename>infile.pdf</filename> but you wanted the rest of the
@@ -1087,7 +1092,7 @@ make
     <filename>file1.pdf</filename> and pages 11&ndash;15 from
     <filename>file2.pdf</filename> in reverse, you would run
 
-    <programlisting><command>qpdf</command> <option>file1.pdf --pages file1.pdf 1-5 file2.pdf 15-11 -- outfile.pdf</option>
+    <programlisting><command>qpdf</command> <option>file1.pdf --pages file1.pdf 1-5 . 15-11 -- outfile.pdf</option>
 </programlisting>
     If, for some reason, you wanted to take the first page of an
     encrypted file called <filename>encrypted.pdf</filename> with

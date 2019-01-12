@@ -1692,11 +1692,10 @@ $td->runtest("check output",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "merge-multiple-labels.pdf"});
 
-$td->runtest("split with shared resources",
+$td->runtest("split with shared resources", # QXXXQ
              {$td->COMMAND =>
                   "qpdf --qdf --static-id" .
-                  " shared-images.pdf --pages" .
-                  " shared-images.pdf 1,3" .
+                  " shared-images.pdf --pages . 1,3" .
                   " ./shared-images.pdf 1,2 -- a.pdf"},
              {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("check output",
@@ -1706,8 +1705,7 @@ $td->runtest("check output",
 $td->runtest("shared resources relevant errors",
              {$td->COMMAND =>
                   "qpdf --qdf --static-id" .
-                  " shared-images-errors.pdf --pages" .
-                  " shared-images-errors.pdf 2 -- a.pdf"},
+                  " shared-images-errors.pdf --pages . 2 -- a.pdf"},
              {$td->FILE => "shared-images-errors-2.out",
                   $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
@@ -1718,8 +1716,7 @@ $td->runtest("check output",
 $td->runtest("shared resources irrelevant errors",
              {$td->COMMAND =>
                   "qpdf --qdf --static-id" .
-                  " shared-images-errors.pdf --pages" .
-                  " shared-images-errors.pdf 1 -- a.pdf"},
+                  " shared-images-errors.pdf --pages . 1 -- a.pdf"},
              {$td->FILE => "shared-images-errors-1.out",
                   $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
@@ -1730,8 +1727,7 @@ $td->runtest("check output",
 $td->runtest("don't remove shared resources",
              {$td->COMMAND =>
                   "qpdf --qdf --static-id --preserve-unreferenced-resources" .
-                  " shared-images.pdf --pages" .
-                  " shared-images.pdf 1,3 -- a.pdf"},
+                  " shared-images.pdf --pages . 1,3 -- a.pdf"},
              {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("check output",
              {$td->FILE => "a.pdf"},

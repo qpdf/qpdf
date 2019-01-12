@@ -1092,7 +1092,8 @@ ArgParser::argHelp()
         << "password needs to be given only once per file.  If any of the input\n"
         << "files are the same as the primary input file or the file used to copy\n"
         << "encryption parameters (if specified), you do not need to repeat the\n"
-        << "password here.  The same file can be repeated multiple times.  All\n"
+        << "password here.  The same file can be repeated multiple times.  The\n"
+        << "filename \".\" may be used to refer to the current input file.  All\n"
         << "non-page data (info, outlines, page numbers, etc. are taken from the\n"
         << "primary input file.  To discard this, use --empty as the primary\n"
         << "input.\n"
@@ -3675,6 +3676,17 @@ static void handle_page_specs(QPDF& pdf, Options& o)
 {
     // Parse all page specifications and translate them into lists of
     // actual pages.
+
+    // Handle "." as a shortcut for the input file
+    for (std::vector<PageSpec>::iterator iter = o.page_specs.begin();
+         iter != o.page_specs.end(); ++iter)
+    {
+        PageSpec& page_spec = *iter;
+        if (page_spec.filename == ".")
+        {
+            page_spec.filename = o.infilename;
+        }
+    }
 
     if (! o.keep_files_open_set)
     {
