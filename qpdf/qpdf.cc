@@ -3731,6 +3731,7 @@ static void handle_page_specs(QPDF& pdf, Options& o)
     std::map<std::string, ClosedFileInputSource*> page_spec_cfis;
     page_spec_qpdfs[o.infilename] = &pdf;
     std::vector<QPDFPageData> parsed_specs;
+    std::map<unsigned long long, std::set<QPDFObjGen> > copied_pages;
     for (std::vector<PageSpec>::iterator iter = o.page_specs.begin();
          iter != o.page_specs.end(); ++iter)
     {
@@ -3905,7 +3906,20 @@ static void handle_page_specs(QPDF& pdf, Options& o)
             int pageno = *pageno_iter - 1;
             pldh.getLabelsForPageRange(pageno, pageno, out_pageno,
                                        new_labels);
-            dh.addPage(page_data.orig_pages.at(pageno), false);
+            QPDFPageObjectHelper to_copy = page_data.orig_pages.at(pageno);
+            QPDFObjGen to_copy_og = to_copy.getObjectHandle().getObjGen();
+            unsigned long long from_uuid = page_data.qpdf->getUniqueId();
+            if (copied_pages[from_uuid].count(to_copy_og))
+            {
+                QTC::TC("qpdf", "qpdf copy same page more than once",
+                        (page_data.qpdf == &pdf) ? 0 : 1);
+                to_copy = to_copy.shallowCopyPage();
+            }
+            else
+            {
+                copied_pages[from_uuid].insert(to_copy_og);
+            }
+            dh.addPage(to_copy, false);
             if (page_data.qpdf == &pdf)
             {
                 // This is a page from the original file. Keep track

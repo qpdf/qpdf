@@ -1,5 +1,6 @@
 #include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QTC.hh>
+#include <qpdf/QPDF.hh>
 
 QPDFPageObjectHelper::Members::~Members()
 {
@@ -166,4 +167,18 @@ QPDFPageObjectHelper::removeUnreferencedResources()
             }
         }
     }
+}
+
+QPDFPageObjectHelper
+QPDFPageObjectHelper::shallowCopyPage()
+{
+    QPDF* qpdf = this->oh.getOwningQPDF();
+    if (! qpdf)
+    {
+        throw std::runtime_error(
+            "QPDFPageObjectHelper::shallowCopyPage"
+            " called with a direct objet");
+    }
+    QPDFObjectHandle new_page = this->oh.shallowCopy();
+    return QPDFPageObjectHelper(qpdf->makeIndirectObject(new_page));
 }

@@ -2470,6 +2470,12 @@ QPDF::swapObjects(int objid1, int generation1, int objid2, int generation2)
     this->m->obj_cache[og2] = t;
 }
 
+unsigned long long
+QPDF::getUniqueId() const
+{
+    return this->m->unique_id;
+}
+
 std::string
 QPDF::getFilename() const
 {

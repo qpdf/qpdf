@@ -203,6 +203,16 @@ class QPDF
     QPDF_DLL
     std::vector<QPDFExc> getWarnings();
 
+    // Return an application-scoped unique ID for this QPDF object.
+    // This is not a globally unique ID. It is constructing using a
+    // timestamp and a random number and is intended to be unique
+    // among QPDF objects that are created by a single run of an
+    // application. While it's very likely that these are actually
+    // globally unique, it is not recommended to use them for
+    // long-term purposes.
+    QPDF_DLL
+    unsigned long long getUniqueId() const;
+
     QPDF_DLL
     std::string getFilename() const;
     QPDF_DLL

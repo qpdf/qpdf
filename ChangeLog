@@ -1,5 +1,21 @@
 2019-01-12  Jay Berkenbilt  <ejb@ql.org>
 
+	* In the --pages option, allow the same page to be specified more
+	than once. You can now do "--pages A.pdf 1,1 --" or
+	"--pages A.pdf 1 A.pdf 1" instead of having to use two different
+	paths to specify A.pdf. Fixes #272.
+
+	* Add QPDFPageObjectHelper::shallowCopyPage(). This method creates
+	a new page object that is a "shallow copy" of the given page as
+	described in the comments in QPDFPageObjectHelper. The resulting
+	object has not been added anywhere but is ready to be passed to
+	QPDFPageDocumentHelper::addPage of its own QPDF or another QPDF
+	object.
+
+	* Add QPDF::getUniqueId() method to return an identifier that is
+	intended to be unique within the scope of all QPDF objects created
+	by the calling application in a single run.
+
 	* In --pages, allow "." as a replacement for the current input
 	file, making it possible to say "qpdf A.pdf --pages . 1-3 --"
 	instead of having to repeat the input filename.

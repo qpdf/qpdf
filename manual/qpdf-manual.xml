@@ -983,15 +983,6 @@ make
     <command>qpdf --empty out.pdf --pages *.pdf --</command>.
    </para>
    <para>
-    It is not presently possible to specify the same page from the
-    same file directly more than once, but you can make this work by
-    specifying two different paths to the same file (such as by
-    putting <filename>./</filename> somewhere in the path).  This can
-    also be used if you want to repeat a page from one of the input
-    files in the output file.  This may be made more convenient in a
-    future version of qpdf if there is enough demand for this feature.
-   </para>
-   <para>
     The page range is a set of numbers separated by commas, ranges of
     numbers separated dashes, or combinations of those. The character
     &ldquo;z&rdquo; represents the last page. A number preceded by an
@@ -1111,6 +1102,12 @@ outfile.pdf</option>
     <filename>./encrypted.pdf</filename> are separated files.  These
     are all corner cases that most users should hopefully never have
     to be bothered with.
+   </para>
+   <para>
+    Prior to version 8.4, it was not possible to specify the same page
+    from the same file directly more than once, and the workaround of
+    specifying the same file in more than one way was required.
+    Version 8.4 removes this limitation.
    </para>
   </sect1>
   <sect1 id="ref.advanced-parsing">

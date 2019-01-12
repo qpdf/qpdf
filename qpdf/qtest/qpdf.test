@@ -1624,7 +1624,7 @@ foreach my $f (qw(screen print))
 show_ntests();
 # ----------
 $td->notify("--- Merging and Splitting ---");
-$n_tests += 18;
+$n_tests += 22;
 
 # Select pages from the same file multiple times including selecting
 # twice from an encrypted file and specifying the password only the
@@ -1692,7 +1692,7 @@ $td->runtest("check output",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "merge-multiple-labels.pdf"});
 
-$td->runtest("split with shared resources", # QXXXQ
+$td->runtest("split with shared resources",
              {$td->COMMAND =>
                   "qpdf --qdf --static-id" .
                   " shared-images.pdf --pages . 1,3" .
@@ -1701,6 +1701,16 @@ $td->runtest("split with shared resources", # QXXXQ
 $td->runtest("check output",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "shared-images-pages-out.pdf"});
+
+$td->runtest("split with really shared resources",
+             {$td->COMMAND =>
+                  "qpdf --qdf --static-id" .
+                  " shared-images.pdf --pages . 1,3" .
+                  " . 1,2 -- a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "really-shared-images-pages-out.pdf"});
 
 $td->runtest("shared resources relevant errors",
              {$td->COMMAND =>
@@ -1732,6 +1742,16 @@ $td->runtest("don't remove shared resources",
 $td->runtest("check output",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "shared-images-errors-1-3-out.pdf"});
+
+$td->runtest("duplicate pages",
+             {$td->COMMAND =>
+                  "qpdf --qdf --static-id 11-pages-with-labels.pdf" .
+                  " --pages . 6,5,6 . 5 minimal.pdf 1,1 minimal.pdf 1 --" .
+                  " a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "duplicate-pages.pdf"});
 
 show_ntests();
 # ----------
