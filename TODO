@@ -3,12 +3,18 @@ Soon
 
  * Set up OSS-Fuzz (Google). See starred email in qpdf label.
 
- * Add an explicit test case that uses copyForeignObject to convert a
-   page object to a form XObject. Comment in the test case and/or code
-   to explain this use case. Update the docs to explain the difference
-   between copying a page in the two ways: using addPage updates the
-   pages tree, while using copyForeignObject does not. The latter is
-   appropriate when a page is being converted to a form XObject.
+ * Add a method to QPDFPageObjectHelper that converts a page into a
+   form XObject.
+
+ * Update the docs for copyForeignObject and addPage to explain the
+   difference between copying a page in the two ways: using addPage
+   updates the pages tree, while using copyForeignObject does not. The
+   latter is appropriate when a page is being converted to a form
+   XObject.
+
+ * Look at the file for issue 271 (../misc/bugs/271/6059954.pdf) to
+   figure out why the compression is bad and see if I can do anything
+   about it.
 
 Next ABI
 ========
@@ -332,6 +338,7 @@ I find it useful to make reference to them in this list
    of all that code to make the checks more robust. In particular,
    it's hard to look at the code and quickly determine what is a true
    logic error and what could happen because of malformed user input.
+   See also ../misc/linearization-errors.
 
  * There are a few known limitations of copying foreign streams. These
    are somewhat discussed in github issue 219. They are most likely
