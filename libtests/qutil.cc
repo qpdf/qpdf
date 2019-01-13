@@ -240,6 +240,41 @@ void utf8_to_ascii_test()
         << ">" << b.substr(1) << std::endl;
 }
 
+void transcoding_test(std::string (*to_utf8)(std::string const&),
+                      std::string (*from_utf8)(std::string const&, char),
+                      int last, std::string unknown)
+{
+    std::string in(" ");
+    std::string out;
+    std::string back;
+    for (int i = 128; i <= last; ++i)
+    {
+        in.at(0) = static_cast<unsigned char>(i);
+        out = (*to_utf8)(in);
+        std::string wanted = (out == "\xef\xbf\xbd") ? unknown : in;
+        back = (*from_utf8)(out, '?');
+        if (back != wanted)
+        {
+            std::cout << i << ": " << in << " -> " << out
+                      << " -> " << back << " (wanted " << wanted << ")"
+                      << std::endl;
+        }
+    }
+}
+
+void transcoding_test()
+{
+    transcoding_test(&QUtil::pdf_doc_to_utf8,
+                     &QUtil::utf8_to_pdf_doc, 160, "\x9f");
+    std::cout << "bidirectional pdf doc done" << std::endl;
+    transcoding_test(&QUtil::win_ansi_to_utf8,
+                     &QUtil::utf8_to_win_ansi, 160, "?");
+    std::cout << "bidirectional win ansi done" << std::endl;
+    transcoding_test(&QUtil::mac_roman_to_utf8,
+                     &QUtil::utf8_to_mac_roman, 255, "?");
+    std::cout << "bidirectional mac roman done" << std::endl;
+}
+
 void print_whoami(char const* str)
 {
     PointerHolder<char> dup(true, QUtil::copy_string(str));
@@ -350,6 +385,8 @@ int main(int argc, char* argv[])
 	to_utf16_test();
 	std::cout << "---- utf8_to_ascii" << std::endl;
         utf8_to_ascii_test();
+	std::cout << "---- transcoding" << std::endl;
+        transcoding_test();
 	std::cout << "---- whoami" << std::endl;
 	get_whoami_test();
 	std::cout << "---- file" << std::endl;
