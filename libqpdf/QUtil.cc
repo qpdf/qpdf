@@ -1661,6 +1661,50 @@ encode_pdfdoc(unsigned long codepoint)
     return ch;
 }
 
+unsigned long get_next_utf8_codepoint(
+    std::string const& utf8_val, size_t& pos, bool& error)
+{
+    size_t len = utf8_val.length();
+    unsigned char ch = static_cast<unsigned char>(utf8_val.at(pos));
+    error = false;
+    if (ch < 128)
+    {
+        return static_cast<unsigned long>(ch);
+    }
+
+    size_t bytes_needed = 0;
+    unsigned bit_check = 0x40;
+    unsigned char to_clear = 0x80;
+    while (ch & bit_check)
+    {
+        ++bytes_needed;
+        to_clear |= bit_check;
+        bit_check >>= 1;
+    }
+    if (((bytes_needed > 5) || (bytes_needed < 1)) ||
+        ((pos + bytes_needed) >= len))
+    {
+        error = true;
+        return 0xfffd;
+    }
+
+    unsigned long codepoint = (ch & ~to_clear);
+    while (bytes_needed > 0)
+    {
+        --bytes_needed;
+        ch = utf8_val.at(++pos);
+        if ((ch & 0xc0) != 0x80)
+        {
+            --pos;
+            codepoint = 0xfffd;
+            break;
+        }
+        codepoint <<= 6;
+        codepoint += (ch & 0x3f);
+    }
+    return codepoint;
+}
+
 static std::string
 transcode_utf8(std::string const& utf8_val, encoding_e encoding,
                char unknown)
@@ -1673,9 +1717,22 @@ transcode_utf8(std::string const& utf8_val, encoding_e encoding,
     size_t len = utf8_val.length();
     for (size_t i = 0; i < len; ++i)
     {
-        unsigned char ch = static_cast<unsigned char>(utf8_val.at(i));
-        if (ch < 128)
+        bool error = false;
+        unsigned long codepoint = get_next_utf8_codepoint(utf8_val, i, error);
+        if (error)
         {
+            if (encoding == e_utf16)
+            {
+                result += "\xff\xfd";
+            }
+            else
+            {
+                result.append(1, unknown);
+            }
+        }
+        else if (codepoint < 128)
+        {
+            char ch = static_cast<char>(codepoint);
             if (encoding == e_utf16)
             {
                 result += QUtil::toUTF16(ch);
@@ -1685,78 +1742,35 @@ transcode_utf8(std::string const& utf8_val, encoding_e encoding,
                 result.append(1, ch);
             }
         }
+        else if (encoding == e_utf16)
+        {
+            result += QUtil::toUTF16(codepoint);
+        }
+        else if ((codepoint > 160) && (codepoint < 256) &&
+                 ((encoding == e_winansi) || (encoding == e_pdfdoc)))
+        {
+            result.append(1, static_cast<unsigned char>(codepoint & 0xff));
+        }
         else
         {
-            size_t bytes_needed = 0;
-            unsigned bit_check = 0x40;
-            unsigned char to_clear = 0x80;
-            while (ch & bit_check)
+            unsigned char ch = '\0';
+            if (encoding == e_winansi)
             {
-                ++bytes_needed;
-                to_clear |= bit_check;
-                bit_check >>= 1;
+                ch = encode_winansi(codepoint);
             }
-
-            if (((bytes_needed > 5) || (bytes_needed < 1)) ||
-                ((i + bytes_needed) >= len))
+            else if (encoding == e_macroman)
             {
-                if (encoding == e_utf16)
-                {
-                    result += "\xff\xfd";
-                }
-                else
-                {
-                    result.append(1, unknown);
-                }
+                ch = encode_macroman(codepoint);
             }
-            else
+            else if (encoding == e_pdfdoc)
             {
-                unsigned long codepoint = (ch & ~to_clear);
-                while (bytes_needed > 0)
-                {
-                    --bytes_needed;
-                    ch = utf8_val.at(++i);
-                    if ((ch & 0xc0) != 0x80)
-                    {
-                        --i;
-                        codepoint = 0xfffd;
-                        break;
-                    }
-                    codepoint <<= 6;
-                    codepoint += (ch & 0x3f);
-                }
-                if (encoding == e_utf16)
-                {
-                    result += QUtil::toUTF16(codepoint);
-                }
-                else if ((codepoint > 160) && (codepoint < 256) &&
-                         ((encoding == e_winansi) || (encoding == e_pdfdoc)))
-                {
-                    ch = static_cast<unsigned char>(codepoint & 0xff);
-                    result.append(1, ch);
-                }
-                else
-                {
-                    ch = '\0';
-                    if (encoding == e_winansi)
-                    {
-                        ch = encode_winansi(codepoint);
-                    }
-                    else if (encoding == e_macroman)
-                    {
-                        ch = encode_macroman(codepoint);
-                    }
-                    else if (encoding == e_pdfdoc)
-                    {
-                        ch = encode_pdfdoc(codepoint);
-                    }
-                    if (ch == '\0')
-                    {
-                        ch = static_cast<unsigned char>(unknown);
-                    }
-                    result.append(1, ch);
-                }
+                ch = encode_pdfdoc(codepoint);
             }
+            if (ch == '\0')
+            {
+                ch = static_cast<unsigned char>(unknown);
+            }
+            result.append(1, ch);
         }
     }
     return result;
@@ -1903,4 +1917,38 @@ QUtil::pdf_doc_to_utf8(std::string const& val)
         result += QUtil::toUTF8(val);
     }
     return result;
+}
+
+void
+QUtil::analyze_encoding(std::string const& val,
+                        bool& has_8bit_chars,
+                        bool& is_valid_utf8,
+                        bool& is_utf16)
+{
+    has_8bit_chars = is_utf16 = is_valid_utf8 = false;
+    if (QUtil::is_utf16(val))
+    {
+        has_8bit_chars = true;
+        is_utf16 = true;
+        return;
+    }
+    size_t len = val.length();
+    bool any_errors = false;
+    for (size_t i = 0; i < len; ++i)
+    {
+        bool error = false;
+        unsigned long codepoint = get_next_utf8_codepoint(val, i, error);
+        if (error)
+        {
+            any_errors = true;
+        }
+        if (codepoint >= 128)
+        {
+            has_8bit_chars = true;
+        }
+    }
+    if (has_8bit_chars && (! any_errors))
+    {
+        is_valid_utf8 = true;
+    }
 }

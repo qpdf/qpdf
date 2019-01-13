@@ -14,6 +14,13 @@
 	the first bug in qpdf's history that could result in silent loss
 	of data when processing a correct input file. Fixes #276.
 
+2019-01-13  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add several more string transcoding and analysis methods to
+	QUtil for bidirectional conversion between PDF Doc, Win Ansi, Mac
+	Roman, UTF-6, and UTF-16 along with detection of valid UTF-8 and
+	UTF-16.
+
 2019-01-12  Jay Berkenbilt  <ejb@ql.org>
 
 	* In the --pages option, allow the same page to be specified more

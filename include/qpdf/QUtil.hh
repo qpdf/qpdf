@@ -193,6 +193,20 @@ namespace QUtil
     QPDF_DLL
     std::string pdf_doc_to_utf8(std::string const& pdfdoc);
 
+    // Analyze a string for encoding. We can't tell the difference
+    // between any single-byte encodings, and we can't tell for sure
+    // whether a string that happens to be valid UTF-8 isn't a
+    // different encoding, but we can at least tell a few things to
+    // help us guess. If there are no characters with the high bit
+    // set, has_8bit_chars is false, and the other values are also
+    // false, even though ASCII strings are valid UTF-8. is_valid_utf8
+    // means that the string is non-trivially valid UTF-8.
+    QPDF_DLL
+    void analyze_encoding(std::string const& str,
+                          bool& has_8bit_chars,
+                          bool& is_valid_utf8,
+                          bool& is_utf16);
+
     // If secure random number generation is supported on your
     // platform and qpdf was not compiled with insecure random number
     // generation, this returns a cryptographically secure random

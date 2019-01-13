@@ -262,6 +262,20 @@ void transcoding_test(std::string (*to_utf8)(std::string const&),
     }
 }
 
+void check_analyze(std::string const& str, bool has8bit, bool utf8, bool utf16)
+{
+    bool has_8bit_chars = false;
+    bool is_valid_utf8 = false;
+    bool is_utf16 = false;
+    QUtil::analyze_encoding(str, has_8bit_chars, is_valid_utf8, is_utf16);
+    if (! ((has_8bit_chars == has8bit) &&
+           (is_valid_utf8 == utf8) &&
+           (is_utf16 == utf16)))
+    {
+        std::cout << "analysis failed: " << str << std::endl;
+    }
+}
+
 void transcoding_test()
 {
     transcoding_test(&QUtil::pdf_doc_to_utf8,
@@ -273,6 +287,11 @@ void transcoding_test()
     transcoding_test(&QUtil::mac_roman_to_utf8,
                      &QUtil::utf8_to_mac_roman, 255, "?");
     std::cout << "bidirectional mac roman done" << std::endl;
+    check_analyze("pi = \317\200", true, true, false);
+    check_analyze("pi != \317", true, false, false);
+    check_analyze("pi != 22/7", false, false, false);
+    check_analyze(std::string("\xfe\xff\00\x51", 4), true, false, true);
+    std::cout << "analysis done" << std::endl;
 }
 
 void print_whoami(char const* str)
