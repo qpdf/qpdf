@@ -147,13 +147,18 @@ namespace QUtil
     std::string toUTF8(unsigned long uval);
 
     // Return a string containing the byte representation of the
-    // UTF-16 BE encoding for the unicode value passed in.
+    // UTF-16 big-endian encoding for the unicode value passed in.
     // Unrepresentable code points are converted to U+FFFD.
     QPDF_DLL
     std::string toUTF16(unsigned long uval);
 
-    // Convert a UTF-8 encoded string to UTF-16. Unrepresentable code
-    // points are converted to U+FFFD.
+    // Test whether this is a UTF-16 big-endian string. This is
+    // indicated by first two bytes being 0xFE 0xFF.
+    QPDF_DLL
+    bool is_utf16(std::string const&);
+
+    // Convert a UTF-8 encoded string to UTF-16 big-endian.
+    // Unrepresentable code points are converted to U+FFFD.
     QPDF_DLL
     std::string utf8_to_utf16(std::string const& utf8);
 
@@ -169,6 +174,24 @@ namespace QUtil
     QPDF_DLL
     std::string utf8_to_mac_roman(
         std::string const& utf8, char unknown_char = '?');
+    QPDF_DLL
+    std::string utf8_to_pdf_doc(
+        std::string const& utf8, char unknown_char = '?');
+
+    // Convert a UTF-16 big-endian encoded string to UTF-8.
+    // Unrepresentable code points are converted to U+FFFD.
+    QPDF_DLL
+    std::string utf16_to_utf8(std::string const& utf16);
+
+    // Convert from the specified single-byte encoding system to
+    // UTF-8. There is no ascii_to_utf8 because all ASCII strings are
+    // already valid UTF-8.
+    QPDF_DLL
+    std::string win_ansi_to_utf8(std::string const& win);
+    QPDF_DLL
+    std::string mac_roman_to_utf8(std::string const& mac);
+    QPDF_DLL
+    std::string pdf_doc_to_utf8(std::string const& pdfdoc);
 
     // If secure random number generation is supported on your
     // platform and qpdf was not compiled with insecure random number
