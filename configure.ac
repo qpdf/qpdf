@@ -145,6 +145,47 @@ if test "$BUILD_INTERNAL_LIBS" = "0"; then
    AC_SEARCH_LIBS(jpeg_destroy,jpeg,,[MISSING_JPEG=1; MISSING_ANY=1])
 fi
 
+qpdf_USE_WMAIN=0
+AC_LANG_PUSH([C++])
+AC_SUBST(WINDOWS_WMAIN_COMPILE)
+AC_SUBST(WINDOWS_WMAIN_LINK)
+for i in 0 1; do
+  if test "$qpdf_USE_WMAIN" = "0"; then
+    oLDFLAGS="$LDFLAGS"
+    if test "$i" = "1"; then
+      nLDFLAGS="-municode"
+      LDFLAGS="$LDFLAGS $nLDFLAGS"
+      msg="checking for wmain with $nLDFLAGS"
+    else
+      nLDFLAGS=
+      msg="checking for wmain"
+    fi
+    AC_MSG_CHECKING($msg)
+    AC_LINK_IFELSE([AC_LANG_SOURCE(
+      [[#include <windows.h>
+       #include <string.h>
+       #include <stdio.h>
+       extern "C"
+       int wmain(int argc, wchar_t* argv[])
+       {
+           size_t x = wcslen(argv[0]);
+           return 0;
+       }
+       ]])],
+       [qpdf_USE_WMAIN=1],
+       [qpdf_USE_WMAIN=0])
+    LDFLAGS="$oLDFLAGS"
+    if test "$qpdf_USE_WMAIN" = "1"; then
+      AC_MSG_RESULT(yes)
+      WINDOWS_WMAIN_COMPILE="-DWINDOWS_WMAIN $nLDFLAGS"
+      WINDOWS_WMAIN_LINK="$nLDFLAGS"
+    else
+      AC_MSG_RESULT(no)
+    fi
+  fi
+done
+AC_LANG_POP
+
 if test "x$qpdf_OS_SECURE_RANDOM" = "x1"; then
   OLIBS=$LIBS
   LIBS="$LIBS Advapi32.lib"
