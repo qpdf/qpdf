@@ -37,10 +37,10 @@ endif
 
 # --- Required rule definitions ---
 
-#                       1   2
-# Usage: $(call compile,src,includes)
+#                       1   2        3
+# Usage: $(call compile,src,includes,xflags)
 define compile
-	$(CXX) $(CXXFLAGS) \
+	$(CXX) $(CXXFLAGS) $(3) \
 		$(call depflags,$(basename $(call src_to_obj,$(1)))) \
 		$(foreach I,$(2),-I$(I)) \
 		$(CPPFLAGS) \

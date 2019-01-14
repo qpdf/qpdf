@@ -18,6 +18,9 @@ TC_SRCS_qpdf = $(wildcard libqpdf/*.cc) $(wildcard qpdf/*.cc)
 
 # -----
 
+XCXXFLAGS_qpdf_qpdf := $(WINDOWS_WMAIN_COMPILE)
+XLDFLAGS_qpdf_qpdf := $(WINDOWS_WMAIN_LINK)
+
 $(foreach B,$(BINS_qpdf),$(eval \
   OBJS_$(B) = $(call src_to_obj,qpdf/$(B).cc)))
 $(foreach B,$(CBINS_qpdf),$(eval \
@@ -29,7 +32,7 @@ endif
 
 $(foreach B,$(BINS_qpdf),$(eval \
   $(OBJS_$(B)): qpdf/$(OUTPUT_DIR)/%.$(OBJ): qpdf/$(B).cc ; \
-	$(call compile,qpdf/$(B).cc,$(INCLUDES_qpdf))))
+	$(call compile,qpdf/$(B).cc,$(INCLUDES_qpdf),$(XCXXFLAGS_qpdf_$(B)))))
 
 $(foreach B,$(CBINS_qpdf),$(eval \
   $(OBJS_$(B)): qpdf/$(OUTPUT_DIR)/%.$(OBJ): qpdf/$(B).c ; \
@@ -37,4 +40,4 @@ $(foreach B,$(CBINS_qpdf),$(eval \
 
 $(foreach B,$(BINS_qpdf) $(CBINS_qpdf),$(eval \
   qpdf/$(OUTPUT_DIR)/$(call binname,$(B)): $(OBJS_$(B)) ; \
-	$(call makebin,$(OBJS_$(B)),$$@,$(LDFLAGS_libqpdf) $(LDFLAGS),$(LIBS_libqpdf) $(LIBS))))
+	$(call makebin,$(OBJS_$(B)),$$@,$(LDFLAGS_libqpdf) $(LDFLAGS) $(XLDFLAGS_qpdf_$(B)),$(LIBS_libqpdf) $(LIBS))))

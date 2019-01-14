@@ -15,10 +15,10 @@ endef
 
 # --- Required rule definitions ---
 
-#                       1   2
-# Usage: $(call compile,src,includes)
+#                       1   2        3
+# Usage: $(call compile,src,includes,xflags)
 define compile
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) \
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(3) \
 		$(call depflags,$(basename $(call src_to_obj,$(1)))) \
 		$(foreach I,$(2),-I$(I)) \
 		-c $(1) -o $(call src_to_obj,$(1))
