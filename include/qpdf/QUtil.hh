@@ -178,6 +178,22 @@ namespace QUtil
     std::string utf8_to_pdf_doc(
         std::string const& utf8, char unknown_char = '?');
 
+    // These versions return true if the conversion was successful and
+    // false if any unrepresentable characters were found and had to
+    // be substituted with the unknown character.
+    QPDF_DLL
+    bool utf8_to_ascii(
+        std::string const& utf8, std::string& ascii, char unknown_char = '?');
+    QPDF_DLL
+    bool utf8_to_win_ansi(
+        std::string const& utf8, std::string& win, char unknown_char = '?');
+    QPDF_DLL
+    bool utf8_to_mac_roman(
+        std::string const& utf8, std::string& mac, char unknown_char = '?');
+    QPDF_DLL
+    bool utf8_to_pdf_doc(
+        std::string const& utf8, std::string& pdfdoc, char unknown_char = '?');
+
     // Convert a UTF-16 big-endian encoded string to UTF-8.
     // Unrepresentable code points are converted to U+FFFD.
     QPDF_DLL

@@ -1705,11 +1705,12 @@ unsigned long get_next_utf8_codepoint(
     return codepoint;
 }
 
-static std::string
-transcode_utf8(std::string const& utf8_val, encoding_e encoding,
-               char unknown)
+static bool
+transcode_utf8(std::string const& utf8_val, std::string& result,
+               encoding_e encoding, char unknown)
 {
-    std::string result;
+    bool okay = true;
+    result.clear();
     if (encoding == e_utf16)
     {
         result += "\xfe\xff";
@@ -1721,6 +1722,7 @@ transcode_utf8(std::string const& utf8_val, encoding_e encoding,
         unsigned long codepoint = get_next_utf8_codepoint(utf8_val, i, error);
         if (error)
         {
+            okay = false;
             if (encoding == e_utf16)
             {
                 result += "\xff\xfd";
@@ -1768,11 +1770,21 @@ transcode_utf8(std::string const& utf8_val, encoding_e encoding,
             }
             if (ch == '\0')
             {
+                okay = false;
                 ch = static_cast<unsigned char>(unknown);
             }
             result.append(1, ch);
         }
     }
+    return okay;
+}
+
+static std::string
+transcode_utf8(std::string const& utf8_val, encoding_e encoding,
+               char unknown)
+{
+    std::string result;
+    transcode_utf8(utf8_val, result, encoding, unknown);
     return result;
 }
 
@@ -1804,6 +1816,34 @@ std::string
 QUtil::utf8_to_pdf_doc(std::string const& utf8, char unknown_char)
 {
     return transcode_utf8(utf8, e_pdfdoc, unknown_char);
+}
+
+bool
+QUtil::utf8_to_ascii(std::string const& utf8, std::string& ascii,
+                     char unknown_char)
+{
+    return transcode_utf8(utf8, ascii, e_ascii, unknown_char);
+}
+
+bool
+QUtil::utf8_to_win_ansi(std::string const& utf8, std::string& win,
+                        char unknown_char)
+{
+    return transcode_utf8(utf8, win, e_winansi, unknown_char);
+}
+
+bool
+QUtil::utf8_to_mac_roman(std::string const& utf8, std::string& mac,
+                         char unknown_char)
+{
+    return transcode_utf8(utf8, mac, e_macroman, unknown_char);
+}
+
+bool
+QUtil::utf8_to_pdf_doc(std::string const& utf8, std::string& pdfdoc,
+                       char unknown_char)
+{
+    return transcode_utf8(utf8, pdfdoc, e_pdfdoc, unknown_char);
 }
 
 bool

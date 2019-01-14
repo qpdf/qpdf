@@ -292,6 +292,22 @@ void transcoding_test()
     check_analyze("pi != 22/7", false, false, false);
     check_analyze(std::string("\xfe\xff\00\x51", 4), true, false, true);
     std::cout << "analysis done" << std::endl;
+    std::string input1("a\302\277b");
+    std::string input2("a\317\200b");
+    std::string input3("ab");
+    std::string output;
+    assert(! QUtil::utf8_to_ascii(input1, output));
+    assert(! QUtil::utf8_to_ascii(input2, output));
+    assert(QUtil::utf8_to_ascii(input3, output));
+    assert(QUtil::utf8_to_win_ansi(input1, output));
+    assert(! QUtil::utf8_to_win_ansi(input2, output));
+    assert(QUtil::utf8_to_win_ansi(input3, output));
+    assert(QUtil::utf8_to_mac_roman(input1, output));
+    assert(! QUtil::utf8_to_mac_roman(input2, output));
+    assert(QUtil::utf8_to_mac_roman(input3, output));
+    assert(QUtil::utf8_to_pdf_doc(input1, output));
+    assert(! QUtil::utf8_to_pdf_doc(input2, output));
+    assert(QUtil::utf8_to_pdf_doc(input3, output));
 }
 
 void print_whoami(char const* str)
