@@ -647,6 +647,8 @@ BUILDRULES
 GENDEPS
 HAVE_LD_VERSION_SCRIPT
 QPDF_LARGE_FILE_TEST_PATH
+WINDOWS_WMAIN_LINK
+WINDOWS_WMAIN_COMPILE
 WINDOWS_WORDSIZE
 RANDOM_DEVICE
 LT_SONAME
@@ -15982,6 +15984,67 @@ else
 fi
 
 fi
+
+qpdf_USE_WMAIN=0
+ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+
+for i in 0 1; do
+  if test "$qpdf_USE_WMAIN" = "0"; then
+    oLDFLAGS="$LDFLAGS"
+    if test "$i" = "1"; then
+      nLDFLAGS="-municode"
+      LDFLAGS="$LDFLAGS $nLDFLAGS"
+      msg="checking for wmain with $nLDFLAGS"
+    else
+      nLDFLAGS=
+      msg="checking for wmain"
+    fi
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking $msg" >&5
+$as_echo_n "checking $msg... " >&6; }
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <windows.h>
+       #include <string.h>
+       #include <stdio.h>
+       extern "C"
+       int wmain(int argc, wchar_t* argv[])
+       {
+           size_t x = wcslen(argv[0]);
+           return 0;
+       }
+
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  qpdf_USE_WMAIN=1
+else
+  qpdf_USE_WMAIN=0
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+    LDFLAGS="$oLDFLAGS"
+    if test "$qpdf_USE_WMAIN" = "1"; then
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+      WINDOWS_WMAIN_COMPILE="-DWINDOWS_WMAIN $nLDFLAGS"
+      WINDOWS_WMAIN_LINK="$nLDFLAGS"
+    else
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+    fi
+  fi
+done
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
 
 if test "x$qpdf_OS_SECURE_RANDOM" = "x1"; then
   OLIBS=$LIBS
