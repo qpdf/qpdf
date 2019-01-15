@@ -16,6 +16,11 @@
 
 2019-01-14  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add new CLI flags to 128-bit and 256-bit encryption: --assemble,
+	--annotate, --form, and --modify-other to control encryption
+	permissions with more granularity than was allowed with the
+	--modify flag. Fixes #214.
+
 	* Add new versions of
 	QPDFWriter::setR{3,4,5,6}EncryptionParameters that allow
 	individual setting of the various permission bits. The old

@@ -631,6 +631,10 @@ class ArgParser
     void arg128Print(char* parameter);
     void arg128Modify(char* parameter);
     void arg128ClearTextMetadata();
+    void arg128Assemble(char* parameter);
+    void arg128Annotate(char* parameter);
+    void arg128Form(char* parameter);
+    void arg128ModOther(char* parameter);
     void arg128UseAes(char* parameter);
     void arg128ForceV4();
     void arg256ForceR5();
@@ -857,11 +861,16 @@ ArgParser::initOptionTable()
     char const* print128_choices[] = {"full", "low", "none", 0};
     (*t)["print"] = oe_requiredChoices(
         &ArgParser::arg128Print, print128_choices);
+    (*t)["assemble"] = oe_requiredChoices(&ArgParser::arg128Assemble, yn);
+    (*t)["annotate"] = oe_requiredChoices(&ArgParser::arg128Annotate, yn);
+    (*t)["form"] = oe_requiredChoices(&ArgParser::arg128Form, yn);
+    (*t)["modify-other"] = oe_requiredChoices(&ArgParser::arg128ModOther, yn);
     char const* modify128_choices[] =
         {"all", "annotate", "form", "assembly", "none", 0};
     (*t)["modify"] = oe_requiredChoices(
         &ArgParser::arg128Modify, modify128_choices);
     (*t)["cleartext-metadata"] = oe_bare(&ArgParser::arg128ClearTextMetadata);
+
     // The above 128-bit options are also 256-bit options, so copy
     // what we have so far. Then continue separately with 128 and 256.
     this->encrypt256_option_table = this->encrypt128_option_table;
@@ -1048,7 +1057,11 @@ ArgParser::argHelp()
         << "    --accessibility=[yn]     allow accessibility to visually impaired\n"
         << "    --extract=[yn]           allow other text/graphic extraction\n"
         << "    --print=print-opt        control printing access\n"
-        << "    --modify=modify-opt      control modify access\n"
+        << "    --assemble=[yn]          allow document assembly\n"
+        << "    --annotate=[yn]          allow commenting/filling form fields\n"
+        << "    --form=[yn]              allow filling form fields\n"
+        << "    --modify-other=[yn]      allow other modifications\n"
+        << "    --modify=modify-opt      control modify access (old way)\n"
         << "    --cleartext-metadata     prevents encryption of metadata\n"
         << "    --use-aes=[yn]           indicates whether to use AES encryption\n"
         << "    --force-V4               forces use of V=4 encryption handler\n"
@@ -1072,7 +1085,8 @@ ArgParser::argHelp()
         << "      assembly              allow document assembly only\n"
         << "      none                  allow no modifications\n"
         << "\n"
-        << "The default for each permission option is to be fully permissive.\n"
+        << "The default for each permission option is to be fully permissive. Please\n"
+        << "refer to the manual for more details on the modify options.\n"
         << "\n"
         << "Specifying cleartext-metadata forces the PDF version to at least 1.5.\n"
         << "Specifying use of AES forces the PDF version to at least 1.6.  These\n"
@@ -1912,6 +1926,30 @@ void
 ArgParser::arg128ClearTextMetadata()
 {
     o.cleartext_metadata = true;
+}
+
+void
+ArgParser::arg128Assemble(char* parameter)
+{
+    o.r3_assemble = (strcmp(parameter, "y") == 0);
+}
+
+void
+ArgParser::arg128Annotate(char* parameter)
+{
+    o.r3_annotate_and_form = (strcmp(parameter, "y") == 0);
+}
+
+void
+ArgParser::arg128Form(char* parameter)
+{
+    o.r3_form_filling = (strcmp(parameter, "y") == 0);
+}
+
+void
+ArgParser::arg128ModOther(char* parameter)
+{
+    o.r3_modify_other = (strcmp(parameter, "y") == 0);
 }
 
 void

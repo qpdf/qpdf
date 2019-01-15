@@ -786,7 +786,12 @@ make
       <listitem>
        <para>
         Determines whether or not to allow accessibility to visually
-        impaired.
+        impaired. The qpdf library disregards this field when AES is
+        used or when 256-bit encryption is used. You should really
+        never disable accessibility, but qpdf lets you do it in case
+        you need to configure a file this way for testing purposes.
+        The PDF spec says that conforming readers should disregard
+        this permission and always allow accessibility.
        </para>
       </listitem>
      </varlistentry>
@@ -795,6 +800,45 @@ make
       <listitem>
        <para>
         Determines whether or not to allow text/graphic extraction.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--assemble=[yn]</option></term>
+      <listitem>
+       <para>
+        Determines whether document assembly (rotation and reordering
+        of pages) is allowed.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--annotate=[yn]</option></term>
+      <listitem>
+       <para>
+        Determines whether modifying annotations is allowed. This
+        includes adding comments and filling in form fields. Also
+        allows editing of form fields if
+        <option>--modify-other=y</option> is given.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--form=[yn]</option></term>
+      <listitem>
+       <para>
+        Determines whether filling form fields is allowed.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--modify-other=[yn]</option></term>
+      <listitem>
+       <para>
+        Allow all document editing except those controlled separately
+        by the <option>--assemble</option>,
+        <option>--annotate</option>, and <option>--form</option>
+        options.
        </para>
       </listitem>
      </varlistentry>
@@ -829,10 +873,10 @@ make
       <term><option>--modify=<replaceable>modify-opt</replaceable></option></term>
       <listitem>
        <para>
-        Controls modify access.
+        Controls modify access. This way of controlling modify access
+        has less granularity than new options added in qpdf 8.4.
         <option><replaceable>modify-opt</replaceable></option> may be
-        one of the following, each of which implies all the options
-        that follow it:
+        one of the following:
         <itemizedlist>
          <listitem>
           <para>
@@ -841,12 +885,14 @@ make
          </listitem>
          <listitem>
           <para>
-           <option>annotate</option>: allow comment authoring and form operations
+           <option>annotate</option>: allow comment authoring, form
+           operations, and document assembly
           </para>
          </listitem>
          <listitem>
           <para>
            <option>form</option>: allow form field fill-in and signing
+           and document assembly
           </para>
          </listitem>
          <listitem>
@@ -860,6 +906,12 @@ make
           </para>
          </listitem>
         </itemizedlist>
+        Using the <option>--modify</option> option does not allow you
+        to create certain combinations of permissions such as allowing
+        form filling but not allowing document assembly. Starting with
+        qpdf 8.4, you can either just use the other options to control
+        fields individually, or you can use something like
+        <option>--modify=form --assembly=n</option> to fine tune.
        </para>
       </listitem>
      </varlistentry>
