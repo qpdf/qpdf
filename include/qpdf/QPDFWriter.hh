@@ -344,6 +344,39 @@ class QPDFWriter
     // AES is used, 1.6, and setting R5 or R6 parameters pushes the
     // version to at least 1.7 with extension level 3.
     QPDF_DLL
+    void setR3EncryptionParameters(
+	char const* user_password, char const* owner_password,
+	bool allow_accessibility, bool allow_extract,
+        bool allow_assemble, bool allow_annotate_and_form,
+        bool allow_form_filling, bool allow_modify_other,
+	qpdf_r3_print_e print);
+    QPDF_DLL
+    void setR4EncryptionParameters(
+	char const* user_password, char const* owner_password,
+	bool allow_accessibility, bool allow_extract,
+        bool allow_assemble, bool allow_annotate_and_form,
+        bool allow_form_filling, bool allow_modify_other,
+	qpdf_r3_print_e print, bool encrypt_metadata, bool use_aes);
+    // R5 is deprecated.  Do not use it for production use.  Writing
+    // R5 is supported by qpdf primarily to generate test files for
+    // applications that may need to test R5 support.
+    QPDF_DLL
+    void setR5EncryptionParameters(
+	char const* user_password, char const* owner_password,
+	bool allow_accessibility, bool allow_extract,
+        bool allow_assemble, bool allow_annotate_and_form,
+        bool allow_form_filling, bool allow_modify_other,
+	qpdf_r3_print_e print, bool encrypt_metadata);
+    QPDF_DLL
+    void setR6EncryptionParameters(
+	char const* user_password, char const* owner_password,
+	bool allow_accessibility, bool allow_extract,
+        bool allow_assemble, bool allow_annotate_and_form,
+        bool allow_form_filling, bool allow_modify_other,
+	qpdf_r3_print_e print, bool encrypt_metadata_aes);
+
+    // Pre qpdf 8.4.0 API
+    QPDF_DLL
     void setR2EncryptionParameters(
 	char const* user_password, char const* owner_password,
 	bool allow_print, bool allow_modify,
@@ -359,9 +392,6 @@ class QPDFWriter
 	bool allow_accessibility, bool allow_extract,
 	qpdf_r3_print_e print, qpdf_r3_modify_e modify,
 	bool encrypt_metadata, bool use_aes);
-    // R5 is deprecated.  Do not use it for production use.  Writing
-    // R5 is supported by qpdf primarily to generate test files for
-    // applications that may need to test R5 support.
     QPDF_DLL
     void setR5EncryptionParameters(
 	char const* user_password, char const* owner_password,
@@ -459,6 +489,8 @@ class QPDFWriter
 	std::set<int>& bits_to_clear,
 	char const* user_password, char const* owner_password,
 	bool allow_accessibility, bool allow_extract,
+        bool allow_assemble, bool allow_annotate_and_form,
+        bool allow_form_filling, bool allow_modify_other,
 	qpdf_r3_print_e print, qpdf_r3_modify_e modify);
     void disableIncompatibleEncryption(int major, int minor,
                                        int extension_level);

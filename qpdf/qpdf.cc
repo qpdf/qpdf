@@ -80,8 +80,11 @@ struct Options
         r2_annotate(true),
         r3_accessibility(true),
         r3_extract(true),
+        r3_assemble(true),
+        r3_annotate_and_form(true),
+        r3_form_filling(true),
+        r3_modify_other(true),
         r3_print(qpdf_r3p_full),
-        r3_modify(qpdf_r3m_all),
         force_V4(false),
         force_R5(false),
         cleartext_metadata(false),
@@ -160,8 +163,11 @@ struct Options
     bool r2_annotate;
     bool r3_accessibility;
     bool r3_extract;
+    bool r3_assemble;
+    bool r3_annotate_and_form;
+    bool r3_form_filling;
+    bool r3_modify_other;
     qpdf_r3_print_e r3_print;
-    qpdf_r3_modify_e r3_modify;
     bool force_V4;
     bool force_R5;
     bool cleartext_metadata;
@@ -1863,23 +1869,38 @@ ArgParser::arg128Modify(char* parameter)
 {
     if (strcmp(parameter, "all") == 0)
     {
-        o.r3_modify = qpdf_r3m_all;
+        o.r3_assemble = true;
+        o.r3_annotate_and_form = true;
+        o.r3_form_filling = true;
+        o.r3_modify_other = true;
     }
     else if (strcmp(parameter, "annotate") == 0)
     {
-        o.r3_modify = qpdf_r3m_annotate;
+        o.r3_assemble = true;
+        o.r3_annotate_and_form = true;
+        o.r3_form_filling = true;
+        o.r3_modify_other = false;
     }
     else if (strcmp(parameter, "form") == 0)
     {
-        o.r3_modify = qpdf_r3m_form;
+        o.r3_assemble = true;
+        o.r3_annotate_and_form = false;
+        o.r3_form_filling = true;
+        o.r3_modify_other = false;
     }
     else if (strcmp(parameter, "assembly") == 0)
     {
-        o.r3_modify = qpdf_r3m_assembly;
+        o.r3_assemble = true;
+        o.r3_annotate_and_form = false;
+        o.r3_form_filling = false;
+        o.r3_modify_other = false;
     }
     else if (strcmp(parameter, "none") == 0)
     {
-        o.r3_modify = qpdf_r3m_none;
+        o.r3_assemble = false;
+        o.r3_annotate_and_form = false;
+        o.r3_form_filling = false;
+        o.r3_modify_other = false;
     }
     else
     {
@@ -4030,25 +4051,34 @@ static void set_encryption_options(QPDF& pdf, Options& o, QPDFWriter& w)
       case 3:
         w.setR3EncryptionParameters(
             o.user_password.c_str(), o.owner_password.c_str(),
-            o.r3_accessibility, o.r3_extract, o.r3_print, o.r3_modify);
+            o.r3_accessibility, o.r3_extract,
+            o.r3_assemble, o.r3_annotate_and_form,
+            o.r3_form_filling, o.r3_modify_other,
+            o.r3_print);
         break;
       case 4:
         w.setR4EncryptionParameters(
             o.user_password.c_str(), o.owner_password.c_str(),
-            o.r3_accessibility, o.r3_extract, o.r3_print, o.r3_modify,
-            !o.cleartext_metadata, o.use_aes);
+            o.r3_accessibility, o.r3_extract,
+            o.r3_assemble, o.r3_annotate_and_form,
+            o.r3_form_filling, o.r3_modify_other,
+            o.r3_print, !o.cleartext_metadata, o.use_aes);
         break;
       case 5:
         w.setR5EncryptionParameters(
             o.user_password.c_str(), o.owner_password.c_str(),
-            o.r3_accessibility, o.r3_extract, o.r3_print, o.r3_modify,
-            !o.cleartext_metadata);
+            o.r3_accessibility, o.r3_extract,
+            o.r3_assemble, o.r3_annotate_and_form,
+            o.r3_form_filling, o.r3_modify_other,
+            o.r3_print, !o.cleartext_metadata);
         break;
       case 6:
         w.setR6EncryptionParameters(
             o.user_password.c_str(), o.owner_password.c_str(),
-            o.r3_accessibility, o.r3_extract, o.r3_print, o.r3_modify,
-            !o.cleartext_metadata);
+            o.r3_accessibility, o.r3_extract,
+            o.r3_assemble, o.r3_annotate_and_form,
+            o.r3_form_filling, o.r3_modify_other,
+            o.r3_print, !o.cleartext_metadata);
         break;
       default:
         throw std::logic_error("bad encryption R value");

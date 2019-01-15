@@ -303,9 +303,10 @@ static void test12(char const* infile,
     qpdf_read(qpdf, infile, password);
     qpdf_init_write(qpdf, outfile);
     qpdf_set_static_ID(qpdf, QPDF_TRUE);
-    qpdf_set_r3_encryption_parameters(
+    qpdf_set_r3_encryption_parameters2(
 	qpdf, "user2", "owner2", QPDF_TRUE, QPDF_TRUE,
-	qpdf_r3p_low, qpdf_r3m_all);
+        QPDF_TRUE, QPDF_TRUE, QPDF_TRUE, QPDF_TRUE,
+	qpdf_r3p_low);
     qpdf_write(qpdf);
     report_errors();
 }
@@ -350,9 +351,10 @@ static void test15(char const* infile,
     qpdf_init_write(qpdf, outfile);
     qpdf_set_static_ID(qpdf, QPDF_TRUE);
     qpdf_set_static_aes_IV(qpdf, QPDF_TRUE);
-    qpdf_set_r4_encryption_parameters(
+    qpdf_set_r4_encryption_parameters2(
 	qpdf, "user2", "owner2", QPDF_TRUE, QPDF_TRUE,
-	qpdf_r3p_low, qpdf_r3m_all, QPDF_TRUE, QPDF_TRUE);
+        QPDF_TRUE, QPDF_TRUE, QPDF_TRUE, QPDF_TRUE,
+	qpdf_r3p_low, QPDF_TRUE, QPDF_TRUE);
     qpdf_write(qpdf);
     report_errors();
 }
@@ -405,9 +407,10 @@ static void test17(char const* infile,
     qpdf_init_write(qpdf, outfile);
     qpdf_set_static_ID(qpdf, QPDF_TRUE);
     qpdf_set_static_aes_IV(qpdf, QPDF_TRUE);
-    qpdf_set_r5_encryption_parameters(
+    qpdf_set_r5_encryption_parameters2(
 	qpdf, "user3", "owner3", QPDF_TRUE, QPDF_TRUE,
-	qpdf_r3p_low, qpdf_r3m_all, QPDF_TRUE);
+        QPDF_TRUE, QPDF_TRUE, QPDF_TRUE, QPDF_TRUE,
+	qpdf_r3p_low, QPDF_TRUE);
     qpdf_write(qpdf);
     report_errors();
 }
@@ -421,9 +424,10 @@ static void test18(char const* infile,
     qpdf_init_write(qpdf, outfile);
     qpdf_set_static_ID(qpdf, QPDF_TRUE);
     qpdf_set_static_aes_IV(qpdf, QPDF_TRUE);
-    qpdf_set_r6_encryption_parameters(
+    qpdf_set_r6_encryption_parameters2(
 	qpdf, "user4", "owner4", QPDF_TRUE, QPDF_TRUE,
-	qpdf_r3p_low, qpdf_r3m_all, QPDF_TRUE);
+        QPDF_TRUE, QPDF_TRUE, QPDF_TRUE, QPDF_TRUE,
+	qpdf_r3p_low, QPDF_TRUE);
     qpdf_write(qpdf);
     report_errors();
 }

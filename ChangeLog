@@ -16,6 +16,15 @@
 
 2019-01-14  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add new versions of
+	QPDFWriter::setR{3,4,5,6}EncryptionParameters that allow
+	individual setting of the various permission bits. The old
+	interfaces are retained for backward compatibility. In the "C"
+	API, add qpdf_set_r{3,4,5,6}_encryption_parameters2. The new
+	interfaces use separate booleans for various permissions instead
+	of the qpdf_r3_modify_e enumerated type, which set permission bits
+	in predefined groups.
+
 	* Add versions of utf8 to single-byte character transcoders that
 	return a success code.
 

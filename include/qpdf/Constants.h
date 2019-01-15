@@ -80,13 +80,18 @@ enum qpdf_r3_print_e
     qpdf_r3p_low,		/* allow only low-resolution printing */
     qpdf_r3p_none		/* allow no printing */
 };
+
+/* qpdf_r3_modify_e doesn't allow the full flexibility of the spec. It
+ * corresponds to options in Acrobat 5's menus. The new interface in
+ * QPDFWriter offers more granularity and no longer uses this type.
+ */
 enum qpdf_r3_modify_e		/* Allowed changes: */
 {
-    qpdf_r3m_all = 0,		/* General editing, comments, forms */
-    qpdf_r3m_annotate,	        /* Comments, form field fill-in, and signing */
-    qpdf_r3m_form,		/* form field fill-in and signing */
-    qpdf_r3m_assembly,		/* only document assembly */
-    qpdf_r3m_none		/* no modifications */
+    qpdf_r3m_all = 0,		/* All editing */
+    qpdf_r3m_annotate,          /* Comments, fill forms, signing, assembly */
+    qpdf_r3m_form,		/* Fill forms, signing, assembly */
+    qpdf_r3m_assembly,		/* Only document assembly */
+    qpdf_r3m_none		/* No modifications */
 };
 
 /* Form field flags from the PDF spec */

@@ -409,7 +409,26 @@ QPDFWriter::setR3EncryptionParameters(
     std::set<int> clear;
     interpretR3EncryptionParameters(
 	clear, user_password, owner_password,
-	allow_accessibility, allow_extract, print, modify);
+	allow_accessibility, allow_extract,
+        true, true, true, true, print, modify);
+    setEncryptionParameters(user_password, owner_password, 2, 3, 16, clear);
+}
+
+void
+QPDFWriter::setR3EncryptionParameters(
+    char const* user_password, char const* owner_password,
+    bool allow_accessibility, bool allow_extract,
+    bool allow_assemble, bool allow_annotate_and_form,
+    bool allow_form_filling, bool allow_modify_other,
+    qpdf_r3_print_e print)
+{
+    std::set<int> clear;
+    interpretR3EncryptionParameters(
+	clear, user_password, owner_password,
+	allow_accessibility, allow_extract,
+        allow_assemble, allow_annotate_and_form,
+        allow_form_filling, allow_modify_other,
+        print, qpdf_r3m_all);
     setEncryptionParameters(user_password, owner_password, 2, 3, 16, clear);
 }
 
@@ -423,7 +442,29 @@ QPDFWriter::setR4EncryptionParameters(
     std::set<int> clear;
     interpretR3EncryptionParameters(
 	clear, user_password, owner_password,
-	allow_accessibility, allow_extract, print, modify);
+	allow_accessibility, allow_extract,
+        true, true, true, true, print, modify);
+    this->m->encrypt_use_aes = use_aes;
+    this->m->encrypt_metadata = encrypt_metadata;
+    setEncryptionParameters(user_password, owner_password, 4, 4, 16, clear);
+}
+
+void
+QPDFWriter::setR4EncryptionParameters(
+    char const* user_password, char const* owner_password,
+    bool allow_accessibility, bool allow_extract,
+    bool allow_assemble, bool allow_annotate_and_form,
+    bool allow_form_filling, bool allow_modify_other,
+    qpdf_r3_print_e print,
+    bool encrypt_metadata, bool use_aes)
+{
+    std::set<int> clear;
+    interpretR3EncryptionParameters(
+	clear, user_password, owner_password,
+	allow_accessibility, allow_extract,
+        allow_assemble, allow_annotate_and_form,
+        allow_form_filling, allow_modify_other,
+        print, qpdf_r3m_all);
     this->m->encrypt_use_aes = use_aes;
     this->m->encrypt_metadata = encrypt_metadata;
     setEncryptionParameters(user_password, owner_password, 4, 4, 16, clear);
@@ -439,7 +480,29 @@ QPDFWriter::setR5EncryptionParameters(
     std::set<int> clear;
     interpretR3EncryptionParameters(
 	clear, user_password, owner_password,
-	allow_accessibility, allow_extract, print, modify);
+	allow_accessibility, allow_extract,
+        true, true, true, true, print, modify);
+    this->m->encrypt_use_aes = true;
+    this->m->encrypt_metadata = encrypt_metadata;
+    setEncryptionParameters(user_password, owner_password, 5, 5, 32, clear);
+}
+
+void
+QPDFWriter::setR5EncryptionParameters(
+    char const* user_password, char const* owner_password,
+    bool allow_accessibility, bool allow_extract,
+    bool allow_assemble, bool allow_annotate_and_form,
+    bool allow_form_filling, bool allow_modify_other,
+    qpdf_r3_print_e print,
+    bool encrypt_metadata)
+{
+    std::set<int> clear;
+    interpretR3EncryptionParameters(
+	clear, user_password, owner_password,
+	allow_accessibility, allow_extract,
+        allow_assemble, allow_annotate_and_form,
+        allow_form_filling, allow_modify_other,
+        print, qpdf_r3m_all);
     this->m->encrypt_use_aes = true;
     this->m->encrypt_metadata = encrypt_metadata;
     setEncryptionParameters(user_password, owner_password, 5, 5, 32, clear);
@@ -455,7 +518,29 @@ QPDFWriter::setR6EncryptionParameters(
     std::set<int> clear;
     interpretR3EncryptionParameters(
 	clear, user_password, owner_password,
-	allow_accessibility, allow_extract, print, modify);
+	allow_accessibility, allow_extract,
+        true, true, true, true, print, modify);
+    this->m->encrypt_use_aes = true;
+    this->m->encrypt_metadata = encrypt_metadata;
+    setEncryptionParameters(user_password, owner_password, 5, 6, 32, clear);
+}
+
+void
+QPDFWriter::setR6EncryptionParameters(
+    char const* user_password, char const* owner_password,
+    bool allow_accessibility, bool allow_extract,
+    bool allow_assemble, bool allow_annotate_and_form,
+    bool allow_form_filling, bool allow_modify_other,
+    qpdf_r3_print_e print,
+    bool encrypt_metadata)
+{
+    std::set<int> clear;
+    interpretR3EncryptionParameters(
+	clear, user_password, owner_password,
+	allow_accessibility, allow_extract,
+        allow_assemble, allow_annotate_and_form,
+        allow_form_filling, allow_modify_other,
+        print, qpdf_r3m_all);
     this->m->encrypt_use_aes = true;
     this->m->encrypt_metadata = encrypt_metadata;
     setEncryptionParameters(user_password, owner_password, 5, 6, 32, clear);
@@ -466,6 +551,8 @@ QPDFWriter::interpretR3EncryptionParameters(
     std::set<int>& clear,
     char const* user_password, char const* owner_password,
     bool allow_accessibility, bool allow_extract,
+    bool allow_assemble, bool allow_annotate_and_form,
+    bool allow_form_filling, bool allow_modify_other,
     qpdf_r3_print_e print, qpdf_r3_modify_e modify)
 {
     // Acrobat 5 security options:
@@ -486,8 +573,21 @@ QPDFWriter::interpretR3EncryptionParameters(
     //   Low Resolution
     //   Full printing
 
+    // Meanings of bits in P when R >= 3
+    //
+    //  3: low-resolution printing
+    //  4: document modification except as controlled by 6, 9, and 11
+    //  5: extraction
+    //  6: add/modify annotations (comment), fill in forms
+    //     if 4+6 are set, also allows modification of form fields
+    //  9: fill in forms even if 6 is clear
+    // 10: accessibility; ignored by readers, should always be set
+    // 11: document assembly even if 4 is clear
+    // 12: high-resolution printing
+
     if (! allow_accessibility)
     {
+        // setEncryptionParameters sets this if R > 3
 	clear.insert(10);
     }
     if (! allow_extract)
@@ -511,6 +611,13 @@ QPDFWriter::interpretR3EncryptionParameters(
 	// no default so gcc warns for missing cases
     }
 
+    // Modify options. The qpdf_r3_modify_e options control groups of
+    // bits and lack the full flexibility of the spec. This is
+    // unfortunate, but it's been in the API for ages, and we're stuck
+    // with it. See also allow checks below to control the bits
+    // individually.
+
+    // NOT EXERCISED IN TEST SUITE
     switch (modify)
     {
       case qpdf_r3m_none:
@@ -529,6 +636,24 @@ QPDFWriter::interpretR3EncryptionParameters(
 	break;
 
 	// no default so gcc warns for missing cases
+    }
+    // END NOT EXERCISED IN TEST SUITE
+
+    if (! allow_assemble)
+    {
+        clear.insert(11);
+    }
+    if (! allow_annotate_and_form)
+    {
+        clear.insert(6);
+    }
+    if (! allow_form_filling)
+    {
+        clear.insert(9);
+    }
+    if (! allow_modify_other)
+    {
+        clear.insert(4);
     }
 }
 
