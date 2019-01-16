@@ -15,6 +15,7 @@
 #include <sstream>
 #include <fstream>
 #include <stdexcept>
+#include <set>
 #include <stdio.h>
 #include <errno.h>
 #include <ctype.h>
@@ -1991,4 +1992,96 @@ QUtil::analyze_encoding(std::string const& val,
     {
         is_valid_utf8 = true;
     }
+}
+
+std::vector<std::string>
+QUtil::possible_repaired_encodings(std::string supplied)
+{
+    std::vector<std::string> result;
+    // Always include the original string
+    result.push_back(supplied);
+    bool has_8bit_chars = false;
+    bool is_valid_utf8 = false;
+    bool is_utf16 = false;
+    analyze_encoding(supplied, has_8bit_chars, is_valid_utf8, is_utf16);
+    if (! has_8bit_chars)
+    {
+        return result;
+    }
+    if (is_utf16)
+    {
+        // Convert to UTF-8 and pretend we got a UTF-8 string.
+        is_utf16 = false;
+        is_valid_utf8 = true;
+        supplied = utf16_to_utf8(supplied);
+    }
+    std::string output;
+    if (is_valid_utf8)
+    {
+        // Maybe we were given UTF-8 but wanted one of the single-byte
+        // encodings.
+        if (utf8_to_pdf_doc(supplied, output))
+        {
+            result.push_back(output);
+        }
+        if (utf8_to_win_ansi(supplied, output))
+        {
+            result.push_back(output);
+        }
+        if (utf8_to_mac_roman(supplied, output))
+        {
+            result.push_back(output);
+        }
+    }
+    else
+    {
+        // Maybe we were given one of the single-byte encodings but
+        // wanted UTF-8.
+        std::string from_pdf_doc(pdf_doc_to_utf8(supplied));
+        result.push_back(from_pdf_doc);
+        std::string from_win_ansi(win_ansi_to_utf8(supplied));
+        result.push_back(from_win_ansi);
+        std::string from_mac_roman(mac_roman_to_utf8(supplied));
+        result.push_back(from_mac_roman);
+
+        // Maybe we were given one of the other single-byte encodings
+        // but wanted one of the other ones.
+        if (utf8_to_win_ansi(from_pdf_doc, output))
+        {
+            result.push_back(output);
+        }
+        if (utf8_to_mac_roman(from_pdf_doc, output))
+        {
+            result.push_back(output);
+        }
+        if (utf8_to_pdf_doc(from_win_ansi, output))
+        {
+            result.push_back(output);
+        }
+        if (utf8_to_mac_roman(from_win_ansi, output))
+        {
+            result.push_back(output);
+        }
+        if (utf8_to_pdf_doc(from_mac_roman, output))
+        {
+            result.push_back(output);
+        }
+        if (utf8_to_win_ansi(from_mac_roman, output))
+        {
+            result.push_back(output);
+        }
+    }
+    // De-duplicate
+    std::vector<std::string> t;
+    std::set<std::string> seen;
+    for (std::vector<std::string>::iterator iter = result.begin();
+         iter != result.end(); ++iter)
+    {
+        if (! seen.count(*iter))
+        {
+            seen.insert(*iter);
+            t.push_back(*iter);
+        }
+    }
+    return t;
 }

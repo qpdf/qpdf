@@ -14,6 +14,14 @@
 	the first bug in qpdf's history that could result in silent loss
 	of data when processing a correct input file. Fixes #276.
 
+2019-01-15  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add QUtil::possible_repaired_encodings which, given a string,
+	generates other strings that represent re-interpretation of the
+	bytes in a different coding system. This is used to help recover
+	passwords if the password string was improperly encoded on a
+	different system due to user error or a software bug.
+
 2019-01-14  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add new CLI flags to 128-bit and 256-bit encryption: --assemble,

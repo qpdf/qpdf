@@ -276,6 +276,16 @@ void check_analyze(std::string const& str, bool has8bit, bool utf8, bool utf16)
     }
 }
 
+void print_alternatives(std::string const& str)
+{
+    std::vector<std::string> result = QUtil::possible_repaired_encodings(str);
+    size_t n = result.size();
+    for (size_t i = 0; i < n; ++i)
+    {
+        std::cout << i << ": " << QUtil::hex_encode(result.at(i)) << std::endl;
+    }
+}
+
 void transcoding_test()
 {
     transcoding_test(&QUtil::pdf_doc_to_utf8,
@@ -308,6 +318,18 @@ void transcoding_test()
     assert(QUtil::utf8_to_pdf_doc(input1, output));
     assert(! QUtil::utf8_to_pdf_doc(input2, output));
     assert(QUtil::utf8_to_pdf_doc(input3, output));
+    std::cout << "alternatives" << std::endl;
+    // char	name		mac	win	pdf-doc
+    // U+0192	florin		304	203	206
+    // U+00A9	copyright	251	251	251
+    // U+00E9	eacute		216	351	351
+    // U+017E	zcaron		-	236	236
+    std::string pdfdoc = "\206\251\351\236";
+    std::string utf8 = QUtil::pdf_doc_to_utf8(pdfdoc);
+    print_alternatives(pdfdoc);
+    print_alternatives(utf8);
+    print_alternatives("quack");
+    std::cout << "done alternatives" << std::endl;
 }
 
 void print_whoami(char const* str)

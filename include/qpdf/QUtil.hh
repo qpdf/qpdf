@@ -223,6 +223,28 @@ namespace QUtil
                           bool& is_valid_utf8,
                           bool& is_utf16);
 
+    // Try to compensate for previously incorrectly encoded strings.
+    // We want to compensate for the following errors:
+    //
+    // * The string was supposed to be UTF-8 but was one of the
+    //   single-byte encodings
+    // * The string was supposed to be PDF Doc but was either UTF-8 or
+    //   one of the other single-byte encodings
+    //
+    // The returned vector always contains the original string first,
+    // and then it contains what the correct string would be in the
+    // event that the original string was the result of any of the
+    // above errors.
+    //
+    // This method is useful for attempting to recover a password that
+    // may have been previously incorrectly encoded. For example, the
+    // password was supposed to be UTF-8 but the previous application
+    // used a password encoded in WinAnsi, or if the previous password
+    // was supposed to be PDFDoc but was actually given as UTF-8 or
+    // WinAnsi, this method would find the correct password.
+    QPDF_DLL
+    std::vector<std::string> possible_repaired_encodings(std::string);
+
     // If secure random number generation is supported on your
     // platform and qpdf was not compiled with insecure random number
     // generation, this returns a cryptographically secure random

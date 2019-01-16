@@ -58,6 +58,19 @@ bidirectional pdf doc done
 bidirectional win ansi done
 bidirectional mac roman done
 analysis done
+alternatives
+0: 86a9e99e
+1: c692c2a9c3a9c5be
+2: e280a0c2a9c3a9c5be
+3: c39cc2a9c388c3bb
+4: 83a9e99e
+5: 81a9e99e
+6: dca9c8fb
+0: c692c2a9c3a9c5be
+1: 86a9e99e
+2: 83a9e99e
+0: 717561636b
+done alternatives
 ---- whoami
 quack1
 quack2
