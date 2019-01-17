@@ -3670,6 +3670,39 @@ ImageOptimizer::provideStreamData(int, int, Pipeline* pipeline)
                          false, false);
 }
 
+template <typename T>
+static PointerHolder<QPDF> do_process(
+    void (QPDF::*fn)(T, char const*),
+    T item, char const* password,
+    Options& o, bool empty)
+{
+    PointerHolder<QPDF> pdf = new QPDF;
+    set_qpdf_options(*pdf, o);
+    if (empty)
+    {
+        pdf->emptyPDF();
+    }
+    else
+    {
+        ((*pdf).*fn)(item, password);
+    }
+    return pdf;
+}
+
+static PointerHolder<QPDF> process_file(char const* filename,
+                                        char const* password,
+                                        Options& o)
+{
+    return do_process(&QPDF::processFile, filename, password, o,
+                      strcmp(filename, "") == 0);
+}
+
+static PointerHolder<QPDF> process_input_source(
+    PointerHolder<InputSource> is, char const* password, Options& o)
+{
+    return do_process(&QPDF::processInputSource, is, password, o, false);
+}
+
 static void handle_transformations(QPDF& pdf, Options& o)
 {
     QPDFPageDocumentHelper dh(pdf);
@@ -3807,9 +3840,6 @@ static void handle_page_specs(QPDF& pdf, Options& o)
             // the API, you can just create two different QPDF objects
             // to the same underlying file with the same path to
             // achieve the same affect.
-            PointerHolder<QPDF> qpdf_ph = new QPDF();
-            page_heap.push_back(qpdf_ph);
-            QPDF* qpdf = qpdf_ph.getPointer();
             char const* password = page_spec.password;
             if (o.encryption_file && (password == 0) &&
                 (page_spec.filename == o.encryption_file))
@@ -3838,8 +3868,9 @@ static void handle_page_specs(QPDF& pdf, Options& o)
                 is = fis;
                 fis->setFilename(page_spec.filename.c_str());
             }
-            qpdf->processInputSource(is, password);
-            page_spec_qpdfs[page_spec.filename] = qpdf;
+            PointerHolder<QPDF> qpdf_ph = process_input_source(is, password, o);
+            page_heap.push_back(qpdf_ph);
+            page_spec_qpdfs[page_spec.filename] = qpdf_ph.getPointer();
             if (cis)
             {
                 cis->stayOpen(false);
@@ -4176,10 +4207,10 @@ static void set_writer_options(QPDF& pdf, Options& o, QPDFWriter& w)
     }
     if (o.copy_encryption)
     {
-        QPDF encryption_pdf;
-        encryption_pdf.processFile(
-            o.encryption_file, o.encryption_file_password);
-        w.copyEncryptionParameters(encryption_pdf);
+        PointerHolder<QPDF> encryption_pdf =
+            process_file(
+                o.encryption_file, o.encryption_file_password, o);
+        w.copyEncryptionParameters(*encryption_pdf);
     }
     if (o.encrypt)
     {
@@ -4355,17 +4386,9 @@ int realmain(int argc, char* argv[])
 
     try
     {
-	QPDF pdf;
-        set_qpdf_options(pdf, o);
-        if (strcmp(o.infilename, "") == 0)
-        {
-            pdf.emptyPDF();
-        }
-        else
-        {
-            pdf.processFile(o.infilename, o.password);
-        }
-
+	PointerHolder<QPDF> pdf_ph =
+            process_file(o.infilename, o.password, o);
+        QPDF& pdf = *pdf_ph;
         handle_transformations(pdf, o);
         if (! o.page_specs.empty())
         {
