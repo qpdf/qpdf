@@ -1384,7 +1384,7 @@ my @sp_cases = (
     [11, 'pdf extension', '', 'split-out.Pdf'],
     [4, 'fallback', '--pages 11-pages.pdf 1-3 minimal.pdf --', 'split-out'],
     );
-$n_tests += 16;
+$n_tests += 21;
 for (@sp_cases)
 {
     $n_tests += 1 + $_->[0];
@@ -1471,6 +1471,19 @@ foreach my $d (@sp_cases)
                      {$td->FILE => $actual},
                      {$td->FILE => $expected});
     }
+}
+
+$td->runtest("split shared font, xobject",
+             {$td->COMMAND =>
+                  "qpdf --static-id --qdf --no-original-object-ids" .
+                  " --split-pages shared-font-xobject.pdf" .
+                  " split-out-shared-font-xobject.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+foreach my $i (qw(1 2 3 4))
+{
+    $td->runtest("check output ($i)",
+                 {$td->FILE => "shared-font-xobject-split-$i.pdf"},
+                 {$td->FILE => "split-out-shared-font-xobject-$i.pdf"});
 }
 
 show_ntests();

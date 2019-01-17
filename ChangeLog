@@ -1,3 +1,19 @@
+2019-01-17  Jay Berkenbilt  <ejb@ql.org>
+
+	* Fix data loss bug: qpdf was discarding referenced resources in
+	the case in which a page's resource dictionary contained an
+	indirect reference for either /Font or /XObject that contained
+	fonts or XObjects not referenced on all pages that shared the
+	resource. This was a "typo" in the code. The comment explained the
+	correct behavior, and the code was clearly intended to handle this
+	issue, but the implementation had an error in it. This is fixed by
+	a single-line change, which can be found in git commit
+	4bc434000c42a7191e705c8a38216ca6743ad9ff. That commit can be used
+	as a patch that applies cleanly against qpdf 8.1.0 and forward.
+	The bug was introduced in version 8.1.0. For the record, this is
+	the first bug in qpdf's history that could result in silent loss
+	of data when processing a correct input file. Fixes #276.
+
 2019-01-12  Jay Berkenbilt  <ejb@ql.org>
 
 	* In the --pages option, allow the same page to be specified more
