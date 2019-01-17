@@ -1384,7 +1384,7 @@ my @sp_cases = (
     [11, 'pdf extension', '', 'split-out.Pdf'],
     [4, 'fallback', '--pages 11-pages.pdf 1-3 minimal.pdf --', 'split-out'],
     );
-$n_tests += 21;
+$n_tests += 23;
 for (@sp_cases)
 {
     $n_tests += 1 + $_->[0];
@@ -1482,9 +1482,19 @@ $td->runtest("split shared font, xobject",
 foreach my $i (qw(1 2 3 4))
 {
     $td->runtest("check output ($i)",
-                 {$td->FILE => "shared-font-xobject-split-$i.pdf"},
-                 {$td->FILE => "split-out-shared-font-xobject-$i.pdf"});
+                 {$td->FILE => "split-out-shared-font-xobject-$i.pdf"},
+                 {$td->FILE => "shared-font-xobject-split-$i.pdf"});
 }
+
+$td->runtest("unreferenced resources with bad token",
+             {$td->COMMAND =>
+                  "qpdf --qdf --static-id --split-pages=2" .
+                  " coalesce.pdf split-out-bad-token.pdf"},
+             {$td->FILE => "coalesce-split.out", $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "split-out-bad-token-1-2.pdf"},
+             {$td->FILE => "coalesce-split-1-2.pdf"});
 
 show_ntests();
 # ----------

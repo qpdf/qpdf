@@ -412,3 +412,4 @@ QPDF copy foreign stream with provider 0
 QPDF copy foreign stream with buffer 0
 QPDF immediate copy stream data 0
 qpdf copy same page more than once 1
+QPDFPageObjectHelper bad token finding names 0

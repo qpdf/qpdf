@@ -99,11 +99,16 @@ QPDFPageObjectHelper::addContentTokenFilter(
 class NameWatcher: public QPDFObjectHandle::TokenFilter
 {
   public:
+    NameWatcher() :
+        saw_bad(false)
+    {
+    }
     virtual ~NameWatcher()
     {
     }
     virtual void handleToken(QPDFTokenizer::Token const&);
     std::set<std::string> names;
+    bool saw_bad;
 };
 
 void
@@ -115,6 +120,10 @@ NameWatcher::handleToken(QPDFTokenizer::Token const& token)
         // the representation of the name
         this->names.insert(
             QPDFObjectHandle::newName(token.getValue()).getName());
+    }
+    else if (token.getType() == QPDFTokenizer::tt_bad)
+    {
+        saw_bad = true;
     }
     writeToken(token);
 }
@@ -132,6 +141,14 @@ QPDFPageObjectHelper::removeUnreferencedResources()
         this->oh.warnIfPossible(
             std::string("Unable to parse content stream: ") + e.what() +
             "; not attempting to remove unreferenced objects from this page");
+        return;
+    }
+    if (nw.saw_bad)
+    {
+        QTC::TC("qpdf", "QPDFPageObjectHelper bad token finding names");
+        this->oh.warnIfPossible(
+            "Bad token found while scanning content stream; "
+            "not attempting to remove unreferenced objects from this page");
         return;
     }
     // Walk through /Font and /XObject dictionaries, removing any
