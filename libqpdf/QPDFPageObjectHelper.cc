@@ -156,6 +156,7 @@ QPDFPageObjectHelper::removeUnreferencedResources()
         {
             continue;
         }
+        dict = dict.shallowCopy();
         resources.replaceKey(*d_iter, dict);
         std::set<std::string> keys = dict.getKeys();
         for (std::set<std::string>::iterator k_iter = keys.begin();
