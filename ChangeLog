@@ -1,5 +1,12 @@
 2019-01-17  Jay Berkenbilt  <ejb@ql.org>
 
+	* When attempting to open an encrypted file with a password, if
+	the password doesn't work, try alternative passwords created by
+	re-interpreting the supplied password with different string
+	encodings. This makes qpdf able to recover passwords with
+	non-ASCII characters when either the decryption or encryption
+	operation was performed with an incorrectly encoded password.
+
 	* Fix data loss bug: qpdf was discarding referenced resources in
 	the case in which a page's resource dictionary contained an
 	indirect reference for either /Font or /XObject that contained

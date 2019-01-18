@@ -3671,7 +3671,7 @@ ImageOptimizer::provideStreamData(int, int, Pipeline* pipeline)
 }
 
 template <typename T>
-static PointerHolder<QPDF> do_process(
+static PointerHolder<QPDF> do_process_once(
     void (QPDF::*fn)(T, char const*),
     T item, char const* password,
     Options& o, bool empty)
@@ -3687,6 +3687,83 @@ static PointerHolder<QPDF> do_process(
         ((*pdf).*fn)(item, password);
     }
     return pdf;
+}
+
+template <typename T>
+static PointerHolder<QPDF> do_process(
+    void (QPDF::*fn)(T, char const*),
+    T item, char const* password,
+    Options& o, bool empty)
+{
+    // If a password has been specified but doesn't work, try other
+    // passwords that are equivalent in different character encodings.
+    // This makes it possible to open PDF files that were encrypted
+    // using incorrect string encodings. For example, if someone used
+    // a password encoded in PDF Doc encoding or Windows code page
+    // 1252 for an AES-encrypted file or a UTF-8-encoded password on
+    // an RC4-encrypted file, or if the password was properly encoded
+    // by the password given here was incorrectly encoded, there's a
+    // good chance we'd succeed here.
+
+    if ((password == 0) || empty || o.password_is_hex_key)
+    {
+        // There is no password, so just do the normal processing.
+        return do_process_once(fn, item, password, o, empty);
+    }
+
+    // Get a list of otherwise encoded strings. Keep in scope for this
+    // method.
+    std::vector<std::string> passwords_str =
+        QUtil::possible_repaired_encodings(password);
+    // Represent to char const*, as required by the QPDF class.
+    std::vector<char const*> passwords;
+    for (std::vector<std::string>::iterator iter = passwords_str.begin();
+         iter != passwords_str.end(); ++iter)
+    {
+        passwords.push_back((*iter).c_str());
+    }
+    // We always try the supplied password first because it is the
+    // first string returned by possible_repaired_encodings. If there
+    // is more than one option, go ahead and put the supplied password
+    // at the end so that it's that decoding attempt whose exception
+    // is thrown.
+    if (passwords.size() > 1)
+    {
+        passwords.push_back(password);
+    }
+
+    // Try each password. If one works, return the resulting object.
+    // If they all fail, throw the exception thrown by the final
+    // attempt, which, like the first attempt, will be with the
+    // supplied password.
+    bool warned = false;
+    for (std::vector<char const*>::iterator iter = passwords.begin();
+         iter != passwords.end(); ++iter)
+    {
+        try
+        {
+            return do_process_once(fn, item, *iter, o, empty);
+        }
+        catch (QPDFExc& e)
+        {
+            std::vector<char const*>::iterator next = iter;
+            ++next;
+            if (next == passwords.end())
+            {
+                throw e;
+            }
+        }
+        if ((! warned) && o.verbose)
+        {
+            warned = true;
+            std::cout << whoami << ": supplied password didn't work;"
+                      << " trying other passwords based on interpreting"
+                      << " password with different string encodings"
+                      << std::endl;
+        }
+    }
+    // Should not be reachable
+    throw std::logic_error("do_process returned");
 }
 
 static PointerHolder<QPDF> process_file(char const* filename,
