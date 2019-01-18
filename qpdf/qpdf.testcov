@@ -413,3 +413,11 @@ QPDF copy foreign stream with buffer 0
 QPDF immediate copy stream data 0
 qpdf copy same page more than once 1
 QPDFPageObjectHelper bad token finding names 0
+qpdf password mode bytes 0
+qpdf password mode hex-bytes 0
+qpdf password not unicode 0
+qpdf password not encodable 0
+qpdf auto-encode password 0
+qpdf bytes fallback warning 0
+qpdf invalid utf-8 in auto 0
+qpdf input password hex-bytes 0

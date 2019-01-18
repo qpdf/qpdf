@@ -58,6 +58,8 @@ struct RotationSpec
     bool relative;
 };
 
+enum password_mode_e { pm_bytes, pm_hex_bytes, pm_unicode, pm_auto };
+
 struct Options
 {
     Options() :
@@ -73,6 +75,8 @@ struct Options
         encryption_file_password(0),
         encrypt(false),
         password_is_hex_key(false),
+        suppress_password_recovery(false),
+        password_mode(pm_auto),
         keylen(0),
         r2_print(true),
         r2_modify(true),
@@ -154,6 +158,8 @@ struct Options
     char const* encryption_file_password;
     bool encrypt;
     bool password_is_hex_key;
+    bool suppress_password_recovery;
+    password_mode_e password_mode;
     std::string user_password;
     std::string owner_password;
     int keylen;
@@ -572,6 +578,8 @@ class ArgParser
     void argEncrypt();
     void argDecrypt();
     void argPasswordIsHexKey();
+    void argPasswordMode(char* parameter);
+    void argSuppressPasswordRecovery();
     void argCopyEncryption(char* parameter);
     void argEncryptionFilePassword(char* parameter);
     void argPages();
@@ -760,6 +768,12 @@ ArgParser::initOptionTable()
     (*t)["encrypt"] = oe_bare(&ArgParser::argEncrypt);
     (*t)["decrypt"] = oe_bare(&ArgParser::argDecrypt);
     (*t)["password-is-hex-key"] = oe_bare(&ArgParser::argPasswordIsHexKey);
+    (*t)["suppress-password-recovery"] =
+        oe_bare(&ArgParser::argSuppressPasswordRecovery);
+    char const* password_mode_choices[] =
+        {"bytes", "hex-bytes", "unicode", "auto", 0};
+    (*t)["password-mode"] = oe_requiredChoices(
+        &ArgParser::argPasswordMode, password_mode_choices);
     (*t)["copy-encryption"] = oe_requiredParameter(
         &ArgParser::argCopyEncryption, "file");
     (*t)["encryption-file-password"] = oe_requiredParameter(
@@ -986,6 +1000,10 @@ ArgParser::argHelp()
         << "--encrypt options --    generate an encrypted file\n"
         << "--decrypt               remove any encryption on the file\n"
         << "--password-is-hex-key   treat primary password option as a hex-encoded key\n"
+        << "--suppress-password-recovery\n"
+        << "                        do not attempt recovering from password string\n"
+        << "                        encoding errors\n"
+        << "--password-mode=mode    control qpdf's encoding of passwords\n"
         << "--pages options --      select specific pages from one or more files\n"
         << "--collate               causes files specified in --pages to be collated\n"
         << "                        rather than concatenated\n"
@@ -1096,6 +1114,20 @@ ArgParser::argHelp()
         << "to be used even if not otherwise needed.  This option is primarily useful\n"
         << "for testing qpdf and has no other practical use.\n"
         << "\n"
+        << "\n"
+        << "Password Modes\n"
+        << "----------------------\n"
+        << "\n"
+        << "The --password-mode controls how qpdf interprets passwords supplied\n"
+        << "on the command-line. qpdf's default behavior is correct in almost all\n"
+        << "cases, but you can fine-tune with this option.\n"
+        << "\n"
+        << "  bytes: use the password literally as supplied\n"
+        << "  hex-bytes: interpret the password as ahex-encoded byte string\n"
+        << "  unicode: interpret the password as a UTF-8 encoded string\n"
+        << "  auto: attempt to infer the encoding and adjust as needed\n"
+        << "\n"
+        << "This is a complex topic. See the manual for a complete discussion.\n"
         << "\n"
         << "Page Selection Options\n"
         << "----------------------\n"
@@ -1431,6 +1463,37 @@ void
 ArgParser::argPasswordIsHexKey()
 {
     o.password_is_hex_key = true;
+}
+
+void
+ArgParser::argSuppressPasswordRecovery()
+{
+    o.suppress_password_recovery = true;
+}
+
+void
+ArgParser::argPasswordMode(char* parameter)
+{
+    if (strcmp(parameter, "bytes") == 0)
+    {
+        o.password_mode = pm_bytes;
+    }
+    else if (strcmp(parameter, "hex-bytes") == 0)
+    {
+        o.password_mode = pm_hex_bytes;
+    }
+    else if (strcmp(parameter, "unicode") == 0)
+    {
+        o.password_mode = pm_unicode;
+    }
+    else if (strcmp(parameter, "auto") == 0)
+    {
+        o.password_mode = pm_auto;
+    }
+    else
+    {
+        usage("invalid password-mode option");
+    }
 }
 
 void
@@ -3705,9 +3768,23 @@ static PointerHolder<QPDF> do_process(
     // by the password given here was incorrectly encoded, there's a
     // good chance we'd succeed here.
 
-    if ((password == 0) || empty || o.password_is_hex_key)
+    std::string ptemp;
+    if (password && (! o.password_is_hex_key))
     {
-        // There is no password, so just do the normal processing.
+        if (o.password_mode == pm_hex_bytes)
+        {
+            // Special case: handle --password-mode=hex-bytes for input
+            // password as well as output password
+            QTC::TC("qpdf", "qpdf input password hex-bytes");
+            ptemp = QUtil::hex_decode(password);
+            password = ptemp.c_str();
+        }
+    }
+    if ((password == 0) || empty || o.password_is_hex_key ||
+        o.suppress_password_recovery)
+    {
+        // There is no password, or we're not doing recovery, so just
+        // do the normal processing with the supplied password.
         return do_process_once(fn, item, password, o, empty);
     }
 
@@ -4148,6 +4225,103 @@ static void handle_rotations(QPDF& pdf, Options& o)
     }
 }
 
+static void maybe_fix_write_password(int R, Options& o, std::string& password)
+{
+    switch (o.password_mode)
+    {
+      case pm_bytes:
+        QTC::TC("qpdf", "qpdf password mode bytes");
+        break;
+
+      case pm_hex_bytes:
+        QTC::TC("qpdf", "qpdf password mode hex-bytes");
+        password = QUtil::hex_decode(password);
+        break;
+
+      case pm_unicode:
+      case pm_auto:
+        {
+            bool has_8bit_chars;
+            bool is_valid_utf8;
+            bool is_utf16;
+            QUtil::analyze_encoding(password,
+                                    has_8bit_chars,
+                                    is_valid_utf8,
+                                    is_utf16);
+            if (! has_8bit_chars)
+            {
+                return;
+            }
+            if (o.password_mode == pm_unicode)
+            {
+                if (! is_valid_utf8)
+                {
+                    QTC::TC("qpdf", "qpdf password not unicode");
+                    throw std::runtime_error(
+                        "supplied password is not valid UTF-8");
+                }
+                if (R < 5)
+                {
+                    std::string encoded;
+                    if (! QUtil::utf8_to_pdf_doc(password, encoded))
+                    {
+                        QTC::TC("qpdf", "qpdf password not encodable");
+                        throw std::runtime_error(
+                            "supplied password cannot be encoded for"
+                            " 40-bit or 128-bit encryption formats");
+                    }
+                    password = encoded;
+                }
+            }
+            else
+            {
+                if ((R < 5) && is_valid_utf8)
+                {
+                    std::string encoded;
+                    if (QUtil::utf8_to_pdf_doc(password, encoded))
+                    {
+                        QTC::TC("qpdf", "qpdf auto-encode password");
+                        if (o.verbose)
+                        {
+                            std::cout
+                                << whoami
+                                << ": automatically converting Unicode"
+                                << " password to single-byte encoding as"
+                                << " required for 40-bit or 128-bit"
+                                << " encryption" << std::endl;
+                        }
+                        password = encoded;
+                    }
+                    else
+                    {
+                        QTC::TC("qpdf", "qpdf bytes fallback warning");
+                        std::cerr
+                            << whoami << ": WARNING: "
+                            << "supplied password looks like a Unicode"
+                            << " password with characters not allowed in"
+                            << " passwords for 40-bit and 128-bit encryption;"
+                            << " most readers will not be able to open this"
+                            << " file with the supplied password."
+                            << " (Use --password-mode=bytes to suppress this"
+                            << " warning and use the password anyway.)"
+                            << std::endl;
+                    }
+                }
+                else if ((R >= 5) && (! is_valid_utf8))
+                {
+                    QTC::TC("qpdf", "qpdf invalid utf-8 in auto");
+                    throw std::runtime_error(
+                        "supplied password is not a valid Unicode password,"
+                        " which is required for 256-bit encryption; to"
+                        " really use this password, rerun with the"
+                        " --password-mode=bytes option");
+                }
+            }
+        }
+        break;
+    }
+}
+
 static void set_encryption_options(QPDF& pdf, Options& o, QPDFWriter& w)
 {
     int R = 0;
@@ -4187,6 +4361,8 @@ static void set_encryption_options(QPDF& pdf, Options& o, QPDFWriter& w)
                   << ": -accessibility=n is ignored for modern"
                   << " encryption formats" << std::endl;
     }
+    maybe_fix_write_password(R, o, o.user_password);
+    maybe_fix_write_password(R, o, o.owner_password);
     switch (R)
     {
       case 2:

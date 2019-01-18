@@ -1,3 +1,25 @@
+2019-01-19  Jay Berkenbilt  <ejb@ql.org>
+
+	* NOTE: qpdf CLI: some non-compatible changes were made to how
+	qpdf interprets password arguments that contain Unicode characters
+	that fall outside of ASCII. On Windows, the non-compatibility was
+	unavoidable, as explained in the release notes. On all platforms,
+	it is possible to get the old behavior if desired, though the old
+	behavior would almost always result in files that other
+	applications were unable to open. As it stands, qpdf should now be
+	able to open passwords encrypted with a wide range of passwords
+	that some other viewers might not handle, though even now, qpdf's
+	Unicode password handling is not 100% complete.
+
+	* Add --password-mode option, which allows fine-grained control of
+	how password arguments are treated. This is discussed fully in the
+	manual. Fixes #215.
+
+	* Add option --suppress-password-recovery to disable the behavior
+	of searching for a correct password by re-encoding the provided
+	password. This option can be useful if you want to ensure you know
+	exactly what password is being used.
+
 2019-01-17  Jay Berkenbilt  <ejb@ql.org>
 
 	* When attempting to open an encrypted file with a password, if
