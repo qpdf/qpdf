@@ -39,7 +39,9 @@ class QPDFExc: public std::runtime_error
 	    qpdf_offset_t offset,
 	    std::string const& message);
     QPDF_DLL
-    virtual ~QPDFExc() throw ();
+    virtual ~QPDFExc() throw ()
+    {
+    }
 
     // To get a complete error string, call what(), provided by
     // std::exception.  The accessors below return the original values

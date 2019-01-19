@@ -15,10 +15,6 @@ QPDFExc::QPDFExc(qpdf_error_code_e error_code,
 {
 }
 
-QPDFExc::~QPDFExc() throw ()
-{
-}
-
 std::string
 QPDFExc::createWhat(std::string const& filename,
 		    std::string const& object,
