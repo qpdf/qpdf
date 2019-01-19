@@ -1,3 +1,60 @@
+Pending Doc Updates
+===================
+
+Unicode Passwords
+
+Release notes
+
+* Windows now interprets CLI arguments as Unicode. Explain the
+  non-compatibility and how it is unavoidable.
+* Refer to the manual for the rest
+
+Regular manual
+
+* Explain the password modes, how they work, and when you would need
+  to use other than auto (e.g. overriding automatic detection of
+  UTF-8, forcibly creating a file with incorrect encoding for tests,
+  etc.)
+* Explain limitations around BiDi and normalize
+* Explain that the features are CLI and that the library, for
+  compatibility, still expects bytes. Refer to the transcoding methods.
+   - Document that users should pass an appropriately encoded string:
+     PDF Doc for R3 and R4, and UTF-8 for R5 and R6, and that they can
+     use QUtil::utf8_to_pdf_doc to achieve this.
+* Talk about automatic password recovery and what it does.
+
+Possible text
+
+   - password modes:
+     - hex-bytes: hex-encoded bytes for password
+     - bytes: take the bytes as they are
+     - unicode: utf8-encoded, with notes about Windows doing this by default
+     - auto: determine automatically
+   - Note that --password-is-hex-key applies only to the main password
+     and is only related to reading. It bypasses the password checks
+     entirely and is not a password mode. The --password-mode option
+     tells qpdf how to interpret the password used in writing.
+   - Behavior of unicode: Fail if the password is not valid UTF-8.
+     For R <= 4 fail if the password cannot be transcoded to PDFDoc
+     without loss.
+   - Behavior of auto: For R >= 5 fail if the password is not valid
+     UTF-8 and tell the user about bytes. For R <= 4, if string is
+     valid UTF-8 and is able to be successfully transcoded to PDFDoc,
+     transcode it; otherwise fall back to bytes.
+   - For bytes and hexbytes, just treat the passwords as given,
+     documenting the change for Windows that incoming arguments are
+     UTF-8 starting in 8.4.
+   - Note that, for Windows, there is no guaranteed compatibility
+     because of the switch to wmain. For Non-Windows, "bytes" gives
+     backward compatibility, but "auto" will fix the bug of qpdf
+     generating invalid passwords when accented characters were used.
+     Take special note of @file password arguments, which are not
+     converted automatically to Unicode on Windows like CLI args are.
+
+   Don't bother with normalize and BiDi for Unicode as that requires
+   something like ICU. If we ever do that, we can add additional flags
+   and method calls.
+
 Soon
 ====
 
@@ -110,6 +167,13 @@ I find it useful to make reference to them in this list
 
  * Figure out how to render Gajić correctly in the PDF version of the
    qpdf manual.
+
+ * Decide whether errors thrown by checkLinearization should be
+   converted to warnings. Take a pass through the linearization code
+   to see whether it's correct. Be able to view linearization data
+   even when there are errors. See linearization label in github.
+
+ * Consider creating a PPA for Ubuntu
 
  * Add method to push inheritable resources to a single page by
    walking up and copying without overwrite.  Above logic will also be
