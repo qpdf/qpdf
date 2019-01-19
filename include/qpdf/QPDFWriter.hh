@@ -343,6 +343,16 @@ class QPDFWriter
     // setting R4 parameters pushes the version to at least 1.5, or if
     // AES is used, 1.6, and setting R5 or R6 parameters pushes the
     // version to at least 1.7 with extension level 3.
+    //
+    // Note about Unicode passwords: the PDF specification requires
+    // passwords to be encoded with PDF Doc encoding for R <= 4 and
+    // UTF-8 for R >= 5. In all cases, these methods take strings of
+    // bytes as passwords. It is up to the caller to ensure that
+    // passwords are properly encoded. The qpdf command-line tool
+    // tries to do this, as discussed in the manual. If you are doing
+    // this from your own application, QUtil contains many transcoding
+    // functions that could be useful to you, most notably
+    // utf8_to_pdf_doc.
     QPDF_DLL
     void setR3EncryptionParameters(
 	char const* user_password, char const* owner_password,

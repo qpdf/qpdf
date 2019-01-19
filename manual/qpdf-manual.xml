@@ -535,6 +535,83 @@ make
       </listitem>
      </varlistentry>
      <varlistentry>
+      <term><option>--suppress-password-recovery</option></term>
+      <listitem>
+       <para>
+        Ordinarily, qpdf attempts to automatically compensate for
+        passwords specified in the wrong character encoding. This
+        option suppresses that behavior. Under normal conditions,
+        there are no reasons to use this option. See <xref
+        linkend="ref.unicode-passwords"/> for a discussion
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--password-mode=<replaceable>mode</replaceable></option></term>
+      <listitem>
+       <para>
+        This option can be used to fine-tune how qpdf interprets
+        Unicode (non-ASCII) password strings passed on the command
+        line. With the exception of the <option>hex-bytes</option>
+        mode, these only apply to passwords provided when encrypting
+        files. The <option>hex-bytes</option> mode also applies to
+        passwords specified for reading files. For additional
+        discussion of the supported password modes and when you might
+        want to use them, see <xref linkend="ref.unicode-passwords"/>.
+        The following modes are supported:
+        <itemizedlist>
+         <listitem>
+          <para>
+           <option>auto</option>: Automatically determine whether the
+           specified password is a properly encoded Unicode (UTF-8)
+           string, and transcode it as required by the PDF spec based
+           on the type encryption being applied. On Windows starting
+           with version 8.4.0, and on almost all other modern
+           platforms, incoming passwords will be properly encoded in
+           UTF-8, so this is almost always what you want.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           <option>unicode</option>: Tells qpdf that the incoming
+           password is UTF-8, overriding whatever its automatic
+           detection determines. The only difference between this mode
+           and <option>auto</option> is that qpdf will fail with an
+           error message if the password is not valid UTF-8 instead of
+           falling back to <option>bytes</option> mode with a warning.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           <option>bytes</option>: Interpret the password as a literal
+           byte string. For non-Windows platforms, this is what
+           versions of qpdf prior to 8.4.0 did. For Windows platforms,
+           there is no way to specify strings of binary data on the
+           command line directly, but you can use the
+           <option>@filename</option> option to do it, in which case
+           this option forces qpdf to respect the string of bytes as
+           provided. This option will allow you to encrypt PDF files
+           with passwords that will not be usable by other readers.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           <option>hex-bytes</option>: Interpret the password as a
+           hex-encoded string. This provides a way to pass binary data
+           as a password on all platforms including Windows. As with
+           <option>bytes</option>, this option may allow creation of
+           files that can't be opened by other readers. This mode
+           affects qpdf's interpretation of passwords specified for
+           decrypting files as well as for encrypting them. It makes
+           it possible to specify strings that are encoded in some
+           manner other than the system's default encoding.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
       <term><option>--rotate=[+|-]angle[:page-range]</option></term>
       <listitem>
        <para>
@@ -699,22 +776,17 @@ make
     producers.
    </para>
    <para>
-    In all cases where qpdf allows specification of a password, care
-    must be taken if the password contains characters that fall
-    outside of the 7-bit US-ASCII character range to ensure that the
-    exact correct byte sequence is provided.  It is possible that a
-    future version of qpdf may handle this more gracefully.  For
-    example, if a password was encrypted using a password that was
-    encoded in ISO-8859-1 and your terminal is configured to use
-    UTF-8, the password you supply may not work properly.  There are
-    various approaches to handling this.  For example, if you are
-    using Linux and have the iconv executable installed, you could
-    pass <option>--password=`echo <replaceable>password</replaceable>
-    | iconv -t iso-8859-1`</option> to qpdf where
-    <replaceable>password</replaceable> is a password specified in
-    your terminal's locale. A detailed discussion of this is out of
-    scope for this manual, but just be aware of this issue if you have
-    trouble with a password that contains 8-bit characters.
+    Prior to 8.4.0, in the case of passwords that contain characters
+    that fall outside of 7-bit US-ASCII, qpdf left the burden of
+    supplying properly encoded encryption and decryption passwords to
+    the user. Starting in qpdf 8.4.0, qpdf does this automatically in
+    most cases. For an in-depth discussion, please see <xref
+    linkend="ref.unicode-passwords"/>. Previous versions of this
+    manual described workarounds using the <command>iconv</command>
+    command. Such workarounds are no longer required or recommended
+    with qpdf 8.4.0. However, for backward compatibility, qpdf
+    attempts to detect those workarounds and do the right thing in
+    most cases.
    </para>
   </sect1>
   <sect1 id="ref.encryption-options">
@@ -2022,6 +2094,121 @@ outfile.pdf</option>
     attempt to normalize the stream data as if it is a page content
     stream.  This attempt will be made even if it is not a page
     content stream, in which case it will produce unusable results.
+   </para>
+  </sect1>
+  <sect1 id="ref.unicode-passwords">
+   <title>Unicode Passwords</title>
+   <para>
+    At the library API level, all methods that perform encryption and
+    decryption interpret passwords as strings of bytes. It is up to
+    the caller to ensure that they are appropriately encoded. Starting
+    with qpdf version 8.4.0, qpdf will attempt to make this easier for
+    you when interact with qpdf via its command line interface. The
+    PDF specification requires passwords used to encrypt files with
+    40-bit or 128-bit encryption to be encoded with PDF Doc encoding.
+    This encoding is a single-byte encoding that supports ISO-Latin-1
+    and a handful of other commonly used characters. It has a large
+    overlap with Windows ANSI but is not exactly the same. There is
+    generally not a way to provide PDF Doc encoded strings on the
+    command line. As such, qpdf versions prior to 8.4.0 would often
+    create PDF files that couldn't be opened with other software when
+    given a password with non-ASCII characters to encrypt a file with
+    40-bit or 128-bit encryption. Starting with qpdf 8.4.0, qpdf
+    recognizes the encoding of the parameter and transcodes it as
+    needed. The rest of this section provides the details about
+    exactly how qpdf behaves. Most users will not need to know this
+    information, but it might be useful if you have been working
+    around qpdf's old behavior or if you are using qpdf to generate
+    encrypted files for testing other PDF software.
+   </para>
+   <para>
+    A note about Windows: when qpdf builds, it attempts to determine
+    what it has to do to use <function>wmain</function> instead of
+    <function>main</function> on Windows. The
+    <function>wmain</function> function is an alternative entry point
+    that receives all arguments as UTF-16-encoded strings. When qpdf
+    starts up this way, it converts all the strings to UTF-8 encoding
+    and then invokes the regular main. This means that, as far as qpdf
+    is concerned, it receives its command-line arguments with UTF-8
+    encoding, just as it would in any modern Linux or UNIX
+    environment.
+   </para>
+   <para>
+    If a file is being encrypted with 40-bit or 128-bit encryption and
+    the supplied password is not a valid UTF-8 string, qpdf will fall
+    back to the behavior of interpreting the password as a string of
+    bytes. If you have old scripts that encrypt files by passing the
+    output of <command>iconv</command> to qpdf, you no longer need to
+    do that, but if you do, qpdf should still work. The only exception
+    would be for the extremely unlikely case of a password that is
+    encoded with a single-byte encoding but also happens to be valid
+    UTF-8. Such a password would contain strings of even numbers of
+    characters that alternate between accented letters and symbols. In
+    the extremely unlikely event that you are intentionally using such
+    passwords and qpdf is thwarting you by interpreting them as UTF-8,
+    you can use <option>--password-mode=bytes</option> to suppress
+    qpdf's automatic behavior.
+   </para>
+   <para>
+    The <option>--password-mode</option> option, as described earlier
+    in this chapter, can be used to change qpdf's interpretation of
+    supplied passwords. There are very few reasons to use this option.
+    One would be the unlikely case described in the previous paragraph
+    in which the supplied password happens to be valid UTF-8 but isn't
+    supposed to be UTF-8. Your best bet would be just to provide the
+    password as a valid UTF-8 string, but you could also use
+    <option>--password-mode=bytes</option>. Another reason to use
+    <option>--password-mode=bytes</option> would be to intentionally
+    generate PDF files encrypted with passwords that are not properly
+    encoded. The qpdf test suite does this to generate invalid files
+    for the purpose of testing its password recovery capability. If
+    you were trying to create intentionally incorrect files for a
+    similar purposes, the <option>bytes</option> password mode can
+    enable you to do this.
+   </para>
+   <para>
+    When qpdf attempts to decrypt a file with a password that contains
+    non-ASCII characters, it will generate a list of alternative
+    passwords by attempting to interpret the password as each of a
+    handful of different coding systems and then transcode them to the
+    required format. This helps to compensate for the supplied
+    password being given in the wrong coding system, such as would
+    happen if you used the <command>iconv</command> workaround that
+    was previously needed. It also generates passwords by doing the
+    reverse operation: translating from correct in incorrect encoding
+    of the password. This would enable qpdf to decrypt files using
+    passwords that were improperly encoded by whatever software
+    encrypted the files, including older versions of qpdf invoked
+    without properly encoded passwords. The combination of these two
+    recovery methods should make qpdf transparently open most
+    encrypted files with the password supplied correctly but in the
+    wrong coding system. There are no real downsides to this behavior,
+    but if you don't want qpdf to do this, you can use the
+    <option>--suppress-password-recovery</option> option. One reason
+    to do that is to ensure that you know the exact password that was
+    used to encrypt the file.
+   </para>
+   <para>
+    With these changes, qpdf now generates compliant passwords in most
+    cases. There are still some exceptions. In particular, the PDF
+    specification directs compliant writers to normalize Unicode
+    passwords and to perform certain transformations on passwords with
+    bidirectional text. Implementing this functionality requires using
+    a real Unicode library like ICU. If a client application that uses
+    qpdf wants to do this, the qpdf library will accept the resulting
+    passwords, but qpdf will not perform these transformations itself.
+    It is possible that this will be addressed in a future version of
+    qpdf. The <classname>QPDFWriter</classname> methods that enable
+    encryption on the output file accept passwords as strings of
+    bytes.
+   </para>
+   <para>
+    Please note that the <option>--password-is-hex-key</option> option
+    is unrelated to all this. This flag bypasses the normal process of
+    going from password to encryption string entirely, allowing the
+    raw encryption key to be specified directly. This is useful for
+    forensic purposes or for brute-force recovery of files with
+    unknown passwords.
    </para>
   </sect1>
  </chapter>
@@ -3975,6 +4162,253 @@ print "\n";
   </para>
   <variablelist>
    <varlistentry>
+    <term>8.4.0: XXX, 2019</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Command-line Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          <emphasis>Non-compatible CLI change:</emphasis> The qpdf
+          command-line tool interprets passwords given at the
+          command-line differently from previous releases when the
+          passwords contain non-ASCII characters. In some cases, the
+          behavior differs from previous releases. For a discussion of
+          the current behavior, please see <xref
+          linkend="ref.unicode-passwords"/>. The incompatibilities are
+          as follows:
+          <itemizedlist>
+           <listitem>
+            <para>
+             On Windows, qpdf now receives all command-line options as
+             Unicode strings if it can figure out the appropriate
+             compile/link options. This is enabled at least for MSVC
+             and mingw builds. That means that if non-ASCII strings
+             are passed to the qpdf CLI in Windows, qpdf will now
+             correctly receive them. In the past, they would have
+             either been encoded as Windows code page 1252 (also known
+             as &ldquo;Windows ANSI&rdquo; or as something
+             unintelligble. In almost all cases, qpdf is able to
+             properly interpret Unicode arguments now, whereas in the
+             past, it would almost never interpret them properly. The
+             result is that non-ASCII passwords given to the qpdf CLI
+             on Windows now have a much greater chance of creating PDF
+             files that can be opened by a variety of readers. In the
+             past, usually files encrypted from the Windows CLI using
+             non-ASCII passwords would not be readable by most
+             viewers. Note that the current version of qpdf is able to
+             decrypt files that it previously created using the
+             previously supplied password.
+            </para>
+           </listitem>
+           <listitem>
+            <para>
+             The PDF specification requires passwords to be encoded as
+             UTF-8 for 256-bit encryption and with PDF Doc encoding
+             for 40-bit or 128-bit encryption. Older versions of qpdf
+             left it up to the user to provide passwords with the
+             correct encoding. The qpdf CLI now detects when a
+             password is given with UTF-8 encoding and automatically
+             transcodes it to what the PDF spec requires. While this
+             is almost always the correct behavior, it is possible to
+             override the behavior if there is some reason to do so.
+             This is discussed in more depth in <xref
+             linkend="ref.unicode-passwords"/>.
+            </para>
+           </listitem>
+          </itemizedlist>
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          When opening an encrypted file with a password, if the
+          specified password doesn't work and the password contains
+          any non-ASCII characters, qpdf will try a number of
+          alternative passwords to try to compensate for possible
+          character encoding errors. This behavior can be suppressed
+          with the <option>--suppress-password-recovery</option>
+          option. See <xref linkend="ref.unicode-passwords"/> for a
+          full discussion.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add the <option>--password-mode</option> option to fine-tune
+          how qpdf interprets password arguments, especially when they
+          contain non-ASCII characters. See <xref
+          linkend="ref.unicode-passwords"/> for more information.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          In the <option>--pages</option> option, it is now possible
+          to copy the same page more than once from the same file
+          without using the previous workaround of specifying two
+          different paths to the same file.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          In the <option>--pages</option> option, allow use of
+          &ldquo;.&rdquo; as a shortcut for the primary input file.
+          That way, you can do <command>qpdf in.pdf --pages . 1-2 --
+          out.pdf</command> instead of having to repeat
+          <filename>in.pdf</filename> in the command.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          When encrypting with 128-bit and 256-bit encryption, new
+          encryption options <option>--assemble</option>,
+          <option>--annotate</option>, <option>--form</option>, and
+          <option>--modify-other</option> allow more fine-grained
+          granluarity in configuring options. Before, the
+          <option>--modify</option> option only configured certain
+          predefined groups of permissions.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Bug Fixes and Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          <emphasis>Potential data-loss bug:</emphasis> Versions of
+          qpdf between 8.1.0 and 8.3.0 had a bug that could cause page
+          splitting and merging operations to drop some font or image
+          resources if the PDF file's internal structure shared these
+          resource lists across pages and if some but not all of the
+          pages in the output did not reference all the fonts and
+          images. Using the
+          <option>--preserve-unreferenced-resources</option> option
+          would work around the incorrect behavior. This bug was the
+          result of a typo in the code and a deficiency in the test
+          suite. The case that triggered the error was known, just not
+          handled properly. This case is now exercised in qpdf's test
+          suite and properly handled.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Library Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Add method
+          <function>QUtil::possible_repaired_encodings()</function> to
+          generate a list of strings that represent other ways the
+          given string could have been encoded. This is the method the
+          QPDF CLI uses to generate the strings it tries when
+          recovering incorrectly encoded Unicode passwords.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add new versions of
+          <function>QPDFWriter::setR{3,4,5,6}EncryptionParameters</function>
+          that allow more granular setting of permissions bits. See
+          <filename>QPDFWriter.hh</filename> for details.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add new versions of the transcoders from UTF-8 to
+          single-byte coding systems in <classname>QUtil</classname>
+          that report success or failure rather than just substituting
+          a specified unknown character.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add method <function>QUtil::analyze_encoding()</function> to
+          determine whether a string has high-bit characters and is
+          appears to be UTF-16 or valid UTF-8 encoding.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add new method
+          <function>QPDFPageObjectHelper::shallowCopyPage()</function>
+          to copy a new page that is a &ldquo;shallow copy&rdquo; of a
+          page. The resulting object is an indirect object ready to be
+          passed to
+          <function>QPDFPageDocumentHelper::addPage()</function> for
+          either the original <classname>QPDF</classname> object or a
+          different one. This is what the <command>qpdf</command>
+          command-line tool uses to copy the same page multiple times
+          from the same file during splitting and merging operations.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add method <function>QPDF::getUniqueId()</function>, which
+          returns a unique identifier for the given QPDF object. The
+          identifier will be unique across the life of the
+          application. The returned value can be safely used as a map
+          key.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add method <function>QPDF::setImmediateCopyFrom</function>.
+          This further enhances qpdf's ability to allow a
+          <classname>QPDF</classname> object from which objects are
+          being copied to go out of scope before the destination
+          object is written. If you call this method on a
+          <classname>QPDF</classname> instances, objects copied
+          <emphasis>from</emphasis> this instance will be copied
+          immediately instead of lazily. This option uses more memory
+          but allows the source object to go out of scope before the
+          destination object is written in all cases. See comments in
+          <filename>QPDF.hh</filename> for details.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Build Improvements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Add new configure option
+          <option>--enable-avoid-windows-handle</option>, which causes
+          the preprocessor symbol
+          <literal>AVOID_WINDOWS_HANDLE</literal> to be defined. When
+          defined, qpdf will avoid referencing the Windows
+          <classname>HANDLE</classname> type, which is disallowed with
+          certain versions of the Windows SDK.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          For Windows builds, attempt to determine what options, if
+          any, have to be passed to the compiler and linker to enable
+          use of <function>wmain</function>. This causes the
+          preprocessor symbol <literal>WINDOWS_WMAIN</literal> to be
+          defined. If you do your own builds with other compilers, you
+          can define this symbol to cause <function>wmain</function>
+          to be used. This is needed to allow the Windows
+          <command>qpdf</command> command to receive Unicode
+          command-line options.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
     <term>8.3.0: January 7, 2019</term>
     <listitem>
      <itemizedlist>
@@ -5079,8 +5513,6 @@ print "\n";
      </itemizedlist>
     </listitem>
    </varlistentry>
-  </variablelist>
-  <variablelist>
    <varlistentry>
     <term>6.0.0: November 10, 2015</term>
     <listitem>
