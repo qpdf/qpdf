@@ -3378,7 +3378,8 @@ foreach my $d (@unicode_pw_cases)
     }
 }
 
-$n_tests += 2;
+$n_tests += 5;
+
 $td->runtest("bytes fallback warning",
              {$td->COMMAND =>
                   "qpdf --encrypt \@password-bare-complex-utf8 o 128 --" .
@@ -3401,6 +3402,23 @@ $td->runtest("bytes fallback warning",
                  {$td->STRING => "$r_output", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
 }
+
+# Exercise passing Unicode passwords via the command line. This tests
+# wmain for Windows and assumes a UTF-8 locale for other platforms.
+$td->runtest("Unicode at CLI",
+             {$td->COMMAND =>
+                  "qpdf --encrypt π ʬ 256 --" .
+                  " minimal.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("Decrypt using user password",
+             {$td->COMMAND => "qpdf --show-encryption a.pdf --password=π"},
+             {$td->FILE => "unicode-up.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("Decrypt using owner password",
+             {$td->COMMAND => "qpdf --show-encryption a.pdf --password=ʬ"},
+             {$td->FILE => "unicode-op.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 show_ntests();
 # ----------

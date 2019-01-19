@@ -1,0 +1,15 @@
+R = 6
+P = -4
+User password = π
+extract for accessibility: allowed
+extract for any purpose: allowed
+print low resolution: allowed
+print high resolution: allowed
+modify document assembly: allowed
+modify forms: allowed
+modify annotations: allowed
+modify other: allowed
+modify anything: allowed
+stream encryption method: AESv3
+string encryption method: AESv3
+file encryption method: AESv3
