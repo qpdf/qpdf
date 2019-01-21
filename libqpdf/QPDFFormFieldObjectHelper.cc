@@ -673,7 +673,6 @@ ValueSetter::writeAppearance()
     // Write the lines centered vertically, highlighting if needed
     size_t nlines = lines.size();
     double dy = bbox.ury - ((bbox.ury - bbox.lly - (nlines * tfh)) / 2.0);
-    write(DA + "\nq\n");
     if (highlight)
     {
         write("q\n0.85 0.85 0.85 rg\n" +
@@ -684,17 +683,26 @@ ValueSetter::writeAppearance()
               QUtil::double_to_string(tfh) +
               " re f\nQ\n");
     }
-    dy += 0.2 * tf;
+    dy -= tf;
+    write("q\nBT\n" + DA + "\n");
     for (size_t i = 0; i < nlines; ++i)
     {
-        dy -= tfh;
-        write("BT\n" +
-              QUtil::int_to_string(bbox.llx + dx) + " " +
-              QUtil::double_to_string(bbox.lly + dy) + " Td\n" +
-              QPDFObjectHandle::newString(lines.at(i)).unparse() +
-              " Tj\nET\n");
+        // We could adjust Tm to translate to the beginning the first
+        // line, set TL to tfh, and use T* for each subsequent line,
+        // but doing this would require extracting any Tm from DA,
+        // which doesn't seem really worth the effort.
+        if (i == 0)
+        {
+            write(QUtil::int_to_string(bbox.llx + dx) + " " +
+                  QUtil::double_to_string(bbox.lly + dy) + " Td\n");
+        }
+        else
+        {
+            write("0 " + QUtil::double_to_string(-tfh) + " Td\n");
+        }
+        write(QPDFObjectHandle::newString(lines.at(i)).unparse() + " Tj\n");
     }
-    write("Q\nEMC");
+    write("ET\nQ\nEMC");
 }
 
 class TfFinder: public QPDFObjectHandle::TokenFilter
