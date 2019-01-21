@@ -506,6 +506,7 @@ class ValueSetter: public QPDFObjectHandle::TokenFilter
     {
     }
     virtual void handleToken(QPDFTokenizer::Token const&);
+    virtual void handleEOF();
     void writeAppearance();
 
   private:
@@ -515,6 +516,7 @@ class ValueSetter: public QPDFObjectHandle::TokenFilter
     double tf;
     QPDFObjectHandle::Rectangle bbox;
     enum { st_top, st_bmc, st_emc, st_end } state;
+    bool replaced;
 };
 
 ValueSetter::ValueSetter(std::string const& DA, std::string const& V,
@@ -525,7 +527,8 @@ ValueSetter::ValueSetter(std::string const& DA, std::string const& V,
     opt(opt),
     tf(tf),
     bbox(bbox),
-    state(st_top)
+    state(st_top),
+    replaced(false)
 {
 }
 
@@ -575,8 +578,22 @@ ValueSetter::handleToken(QPDFTokenizer::Token const& token)
     }
 }
 
-void ValueSetter::writeAppearance()
+void
+ValueSetter::handleEOF()
 {
+    if (! this->replaced)
+    {
+        QTC::TC("qpdf", "QPDFFormFieldObjectHelper replaced BMC at EOF");
+        write("/Tx BMC\n");
+        writeAppearance();
+    }
+}
+
+void
+ValueSetter::writeAppearance()
+{
+    this->replaced = true;
+
     // This code does not take quadding into consideration because
     // doing so requires font metric information, which we don't
     // have in many cases.
@@ -768,6 +785,29 @@ QPDFFormFieldObjectHelper::generateTextAppearance(
     QPDFAnnotationObjectHelper& aoh)
 {
     QPDFObjectHandle AS = aoh.getAppearanceStream("/N");
+    if (AS.isNull())
+    {
+        QTC::TC("qpdf", "QPDFFormFieldObjectHelper create AS from scratch");
+        QPDFObjectHandle::Rectangle rect = aoh.getRect();
+        QPDFObjectHandle::Rectangle bbox(
+            0, 0, rect.urx - rect.llx, rect.ury - rect.lly);
+        QPDFObjectHandle dict = QPDFObjectHandle::parse(
+            "<< /Resources << /ProcSet [ /PDF /Text ] >>"
+            " /Type /XObject /Subtype /Form >>");
+        dict.replaceKey("/BBox", QPDFObjectHandle::newFromRectangle(bbox));
+        AS = QPDFObjectHandle::newStream(
+            this->oh.getOwningQPDF(), "/Tx BMC\nEMC\n");
+        AS.replaceDict(dict);
+        QPDFObjectHandle AP = aoh.getAppearanceDictionary();
+        if (AP.isNull())
+        {
+            QTC::TC("qpdf", "QPDFFormFieldObjectHelper create AP from scratch");
+            aoh.getObjectHandle().replaceKey(
+                "/AP", QPDFObjectHandle::newDictionary());
+            AP = aoh.getAppearanceDictionary();
+        }
+        AP.replaceKey("/N", AS);
+    }
     if (! AS.isStream())
     {
         aoh.getObjectHandle().warnIfPossible(

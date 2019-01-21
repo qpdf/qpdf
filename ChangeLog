@@ -1,5 +1,10 @@
 2019-01-20  Jay Berkenbilt  <ejb@ql.org>
 
+	* When generating appearance streams for variable text
+	annotations, properly handle the cases of there being no
+	appearance dictionary, no appearance stream, or an appearance
+	stream with no BMC..EMC marker.
+
 	* When flattening annotations, remove annotations from the file
 	that don't have appearance streams. These were previously being
 	preserved, but since they are invisible, there is no reason to

@@ -261,18 +261,29 @@ $td->runtest("compare files",
 show_ntests();
 # ----------
 $td->notify("--- Appearance Streams ---");
-$n_tests += 4;
+$n_tests += 8;
 
-$td->runtest("generate appearances and flatten",
-             {$td->COMMAND =>
-                  "qpdf --qdf --no-original-object-ids --static-id" .
-                  " --generate-appearances --flatten-annotations=all" .
-                  " need-appearances.pdf a.pdf"},
-             {$td->STRING => "", $td->EXIT_STATUS => 0},
-             $td->NORMALIZE_NEWLINES);
-$td->runtest("compare files",
-             {$td->FILE => "a.pdf"},
-             {$td->FILE => "appearances-a.pdf"});
+foreach my $f ('need-appearances',
+               'need-appearances-more',
+               'need-appearances-more2')
+{
+    $td->runtest("generate appearances and flatten ($f)",
+                 {$td->COMMAND =>
+                      "qpdf --qdf --no-original-object-ids --static-id" .
+                      " --generate-appearances --flatten-annotations=all" .
+                      " $f.pdf a.pdf"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    my $exp = 'appearances-a';
+    if ($f =~ m/appearances(-.*)$/)
+    {
+        $exp .= $1;
+    }
+    $exp .= '.pdf';
+    $td->runtest("compare files",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => $exp});
+}
 
 $td->runtest("more choices",
              {$td->COMMAND =>
