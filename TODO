@@ -385,3 +385,7 @@ I find it useful to make reference to them in this list
      provider. This happens with CopiedStreamDataProvider, which uses
      the object ID and generation of the new stream to locate the
      parameters of the old stream.
+
+ * If I ever decide to make appearance stream-generation aware of
+   fonts or font metrics, see email from Tobias with Message-ID
+   <5C3C9C6C.8000102@thax.hardliners.org> dated 2019-01-14.
