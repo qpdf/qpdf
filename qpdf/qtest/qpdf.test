@@ -1609,6 +1609,7 @@ my @annotation_files = (
     'comment-annotation-direct',
     'sample-form',
     'need-appearances',
+    'need-appearances-more',
     );
 $n_tests += 2 * scalar(@annotation_files);
 

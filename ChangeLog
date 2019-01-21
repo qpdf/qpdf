@@ -1,3 +1,10 @@
+2019-01-20  Jay Berkenbilt  <ejb@ql.org>
+
+	* When flattening annotations, remove annotations from the file
+	that don't have appearance streams. These were previously being
+	preserved, but since they are invisible, there is no reason to
+	preserve them when flattening annotations.
+
 2019-01-19  Jay Berkenbilt  <ejb@ql.org>
 
 	* NOTE: qpdf CLI: some non-compatible changes were made to how

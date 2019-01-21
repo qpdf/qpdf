@@ -421,3 +421,4 @@ qpdf auto-encode password 0
 qpdf bytes fallback warning 0
 qpdf invalid utf-8 in auto 0
 qpdf input password hex-bytes 0
+QPDFPageDocumentHelper ignore annotation with no appearance 0

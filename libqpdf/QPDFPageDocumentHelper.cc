@@ -141,11 +141,7 @@ QPDFPageDocumentHelper::flattenAnnotationsForPage(
             QTC::TC("qpdf", "QPDFPageDocumentHelper skip widget need appearances");
             process = false;
         }
-        if (process && (! as.isStream()))
-        {
-            process = false;
-        }
-        if (process)
+        if (process && as.isStream())
         {
             if (is_widget)
             {
@@ -199,6 +195,15 @@ QPDFPageDocumentHelper::flattenAnnotationsForPage(
                 ++next_fx;
             }
             new_content += content;
+        }
+        else if (process)
+        {
+            // If an annotation has no appearance stream, just drop
+            // the annotation when flattening. This can happen for
+            // unchecked checkboxes and radio buttons, popup windows
+            // associated with comments that aren't visible, and other
+            // types of annotations that aren't visible.
+            QTC::TC("qpdf", "QPDFPageDocumentHelper ignore annotation with no appearance");
         }
         else
         {
