@@ -425,3 +425,4 @@ QPDFPageDocumentHelper ignore annotation with no appearance 0
 QPDFFormFieldObjectHelper create AS from scratch 0
 QPDFFormFieldObjectHelper create AP from scratch 0
 QPDFFormFieldObjectHelper replaced BMC at EOF 0
+QPDFFormFieldObjectHelper fallback Tf 0

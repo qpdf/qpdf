@@ -715,17 +715,23 @@ class TfFinder: public QPDFObjectHandle::TokenFilter
     virtual void handleToken(QPDFTokenizer::Token const&);
     double getTf();
     std::string getFontName();
+    std::string getDA();
 
   private:
     double tf;
+    size_t tf_idx;
     std::string font_name;
     double last_num;
+    size_t last_num_idx;
     std::string last_name;
+    std::vector<std::string> DA;
 };
 
 TfFinder::TfFinder() :
     tf(11.0),
-    last_num(0.0)
+    tf_idx(0),
+    last_num(0.0),
+    last_num_idx(0)
 {
 }
 
@@ -734,11 +740,13 @@ TfFinder::handleToken(QPDFTokenizer::Token const& token)
 {
     QPDFTokenizer::token_type_e ttype = token.getType();
     std::string value = token.getValue();
+    DA.push_back(token.getRawValue());
     switch (ttype)
     {
       case QPDFTokenizer::tt_integer:
       case QPDFTokenizer::tt_real:
         last_num = strtod(value.c_str(), 0);
+        last_num_idx = DA.size() - 1;
         break;
 
       case QPDFTokenizer::tt_name:
@@ -754,6 +762,7 @@ TfFinder::handleToken(QPDFTokenizer::Token const& token)
             // insane things or suffering from over/underflow
             tf = last_num;
         }
+        tf_idx = last_num_idx;
         font_name = last_name;
         break;
 
@@ -766,6 +775,30 @@ double
 TfFinder::getTf()
 {
     return this->tf;
+}
+
+std::string
+TfFinder::getDA()
+{
+    std::string result;
+    size_t n = this->DA.size();
+    for (size_t i = 0; i < n; ++i)
+    {
+        std::string cur = this->DA.at(i);
+        if (i == tf_idx)
+        {
+            double delta = strtod(cur.c_str(), 0) - this->tf;
+            if ((delta > 0.001) || (delta < -0.001))
+            {
+                // tf doesn't match the font size passed to Tf, so
+                // substitute.
+                QTC::TC("qpdf", "QPDFFormFieldObjectHelper fallback Tf");
+                cur = QUtil::double_to_string(tf);
+            }
+        }
+        result += cur;
+    }
+    return result;
 }
 
 std::string
@@ -843,6 +876,7 @@ QPDFFormFieldObjectHelper::generateTextAppearance(
     tok.write(QUtil::unsigned_char_pointer(DA.c_str()), DA.length());
     tok.finish();
     double tf = tff.getTf();
+    DA = tff.getDA();
 
     std::string (*encoder)(std::string const&, char) = &QUtil::utf8_to_ascii;
     std::string font_name = tff.getFontName();

@@ -1,5 +1,8 @@
 2019-01-20  Jay Berkenbilt  <ejb@ql.org>
 
+	* Tweak the content code generated for variable text fields to
+	better handle font sizes and multi-line text.
+
 	* When generating appearance streams for variable text
 	annotations, properly handle the cases of there being no
 	appearance dictionary, no appearance stream, or an appearance
