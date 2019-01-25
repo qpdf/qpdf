@@ -600,6 +600,18 @@ class QPDFObjectHandle
     QPDF_DLL
     std::set<std::string> getResourceNames();
 
+    // Find a unique name within a resource dictionary starting with a
+    // given prefix. This method works by appending a number to the
+    // given prefix. It searches starting with min_suffix and sets
+    // min_suffix to selected value upon return. This can be used to
+    // increase efficiency if adding multiple items with the same
+    // prefix. (Why doesn't it set min_suffix to the next number?
+    // Well, maybe you aren't going to actually use the name it
+    // returns.)
+    QPDF_DLL
+    std::string getUniqueResourceName(std::string const& prefix,
+                                      int& min_suffix);
+
     // Return the QPDF object that owns an indirect object.  Returns
     // null for a direct object.
     QPDF_DLL

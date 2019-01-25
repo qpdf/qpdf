@@ -1,5 +1,9 @@
 2019-01-25  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add new method QPDFObjectHandle::getUniqueResourceName() to
+	return an unused key available to be used in a resource
+	dictionary.
+
 	* Add new method QPDFPageObjectHelper::getAttribute() that
 	properly handles inherited attributes and allows for creation of a
 	copy of shared attributes. This is very useful if you are getting
