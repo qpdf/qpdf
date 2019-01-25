@@ -378,7 +378,6 @@ QPDFAnnotationObjectHelper default matrix 0
 QPDFAnnotationObjectHelper rotate 90 0
 QPDFAnnotationObjectHelper rotate 180 0
 QPDFAnnotationObjectHelper rotate 270 0
-QPDFPageDocumentHelper indirect resources 0
 QPDFPageDocumentHelper skip widget need appearances 0
 QPDFPageDocumentHelper merge DR 0
 QPDFPageDocumentHelper non-widget annotation 0
@@ -426,3 +425,5 @@ QPDFFormFieldObjectHelper create AS from scratch 0
 QPDFFormFieldObjectHelper create AP from scratch 0
 QPDFFormFieldObjectHelper replaced BMC at EOF 0
 QPDFFormFieldObjectHelper fallback Tf 0
+QPDFPageObjectHelper non-trivial inheritance 0
+QPDFPageObjectHelper copy shared attribute 0

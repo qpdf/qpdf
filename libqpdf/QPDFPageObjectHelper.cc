@@ -15,6 +15,42 @@ QPDFPageObjectHelper::QPDFPageObjectHelper(QPDFObjectHandle oh) :
 {
 }
 
+QPDFObjectHandle
+QPDFPageObjectHelper::getAttribute(std::string const& name,
+                                   bool copy_if_shared)
+{
+    bool inheritable = ((name == "/MediaBox") || (name == "/CropBox") ||
+                        (name == "/Resources") || (name == "/Rotate"));
+
+    QPDFObjectHandle node = this->oh;
+    QPDFObjectHandle result(node.getKey(name));
+    std::set<QPDFObjGen> seen;
+    bool inherited = false;
+    while (inheritable && result.isNull() && node.hasKey("/Parent"))
+    {
+        seen.insert(node.getObjGen());
+        node = node.getKey("/Parent");
+        if (seen.count(node.getObjGen()))
+        {
+            break;
+        }
+        result = node.getKey(name);
+        if (! result.isNull())
+        {
+            QTC::TC("qpdf", "QPDFPageObjectHelper non-trivial inheritance");
+            inherited = true;
+        }
+    }
+    if (copy_if_shared && (inherited || result.isIndirect()))
+    {
+        QTC::TC("qpdf", "QPDFPageObjectHelper copy shared attribute");
+        result = result.shallowCopy();
+        this->oh.replaceKey(name, result);
+    }
+    return result;
+}
+
+
 std::map<std::string, QPDFObjectHandle>
 QPDFPageObjectHelper::getPageImages()
 {
@@ -159,12 +195,7 @@ QPDFPageObjectHelper::removeUnreferencedResources()
     std::vector<std::string> to_filter;
     to_filter.push_back("/Font");
     to_filter.push_back("/XObject");
-    QPDFObjectHandle resources = this->oh.getKey("/Resources");
-    if (resources.isDictionary())
-    {
-        resources = resources.shallowCopy();
-        this->oh.replaceKey("/Resources", resources);
-    }
+    QPDFObjectHandle resources = getAttribute("/Resources", true);
     for (std::vector<std::string>::iterator d_iter = to_filter.begin();
          d_iter != to_filter.end(); ++d_iter)
     {

@@ -39,13 +39,22 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     {
     }
 
+    // Return the effective value of this attribute for the page. If
+    // the requested attribute is not present on the page but is
+    // inheritable, look up through the page's ancestors in the page
+    // tree. If copy_if_shared is true, then this method will replace
+    // the attribute with a shallow copy if it is in indirect or
+    // inherited and return the copy. You should do this if you are
+    // going to modify the returned object and want the modifications
+    // to apply to the current page only.
+    QPDF_DLL
+    QPDFObjectHandle
+    getAttribute(std::string const& name, bool copy_if_shared);
+
     // Returns an empty map if there are no images or no resources.
-    // This function does not presently support inherited resources.
-    // If this is a significant concern, call
-    // pushInheritedAttributesToPage() on the QPDF object that owns
-    // this page. See comment in the source for details. Return value
-    // is a map from XObject name to the image object, which is always
-    // a stream.
+    // Prior to qpdf 8.4.0, this function did not support inherited
+    // resources, but it does now. Return value is a map from XObject
+    // name to the image object, which is always a stream.
     QPDF_DLL
     std::map<std::string, QPDFObjectHandle> getPageImages();
 

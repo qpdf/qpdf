@@ -3070,10 +3070,6 @@ static void do_show_obj(QPDF& pdf, Options& o, int& exit_code)
 static void do_show_pages(QPDF& pdf, Options& o)
 {
     QPDFPageDocumentHelper dh(pdf);
-    if (o.show_page_images)
-    {
-        dh.pushInheritedAttributesToPage();
-    }
     std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
     int pageno = 0;
     for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
@@ -3862,7 +3858,6 @@ static void handle_transformations(QPDF& pdf, Options& o)
     QPDFPageDocumentHelper dh(pdf);
     if (o.optimize_images)
     {
-        dh.pushInheritedAttributesToPage();
         int pageno = 0;
         std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
         for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
@@ -3891,8 +3886,9 @@ static void handle_transformations(QPDF& pdf, Options& o)
                         sdp,
                         QPDFObjectHandle::newName("/DCTDecode"),
                         QPDFObjectHandle::newNull());
-                    page.getKey("/Resources").getKey("/XObject").replaceKey(
-                        name, new_image);
+                    ph.getAttribute("/Resources", true).
+                        getKey("/XObject").replaceKey(
+                            name, new_image);
                 }
             }
         }
@@ -4054,7 +4050,6 @@ static void handle_page_specs(QPDF& pdf, Options& o)
                 cis->stayOpen(true);
             }
             QPDFPageDocumentHelper dh(*((*iter).second));
-            dh.pushInheritedAttributesToPage();
             dh.removeUnreferencedResources();
             if (cis)
             {
@@ -4532,7 +4527,6 @@ static void write_outfile(QPDF& pdf, Options& o)
         if (! o.preserve_unreferenced_page_resources)
         {
             QPDFPageDocumentHelper dh(pdf);
-            dh.pushInheritedAttributesToPage();
             dh.removeUnreferencedResources();
         }
         QPDFPageLabelDocumentHelper pldh(pdf);

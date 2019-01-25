@@ -2409,7 +2409,7 @@ $td->runtest("stream detected",
 show_ntests();
 # ----------
 $td->notify("--- Extraction Tests ---");
-$n_tests += 12;
+$n_tests += 13;
 
 $td->runtest("show xref",
 	     {$td->COMMAND => "qpdf encrypted-with-images.pdf" .
@@ -2429,6 +2429,13 @@ $td->runtest("show-pages-images",
 	     {$td->COMMAND => "qpdf encrypted-with-images.pdf" .
 		  " --show-pages --with-images"},
 	     {$td->FILE => "show-pages-images.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("show-pages-images",
+	     {$td->COMMAND => "qpdf shared-images.pdf" .
+		  " --show-pages --with-images"},
+	     {$td->FILE => "shared-images-show.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 

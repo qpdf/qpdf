@@ -1,3 +1,15 @@
+2019-01-25  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add new method QPDFPageObjectHelper::getAttribute() that
+	properly handles inherited attributes and allows for creation of a
+	copy of shared attributes. This is very useful if you are getting
+	an attribute of a page dictionary with the intent to modify it
+	privately for that page.
+
+	* Fix QPDFPageObjectHelper::getPageImages (and the legacy
+	QPDFObjectHandle::getPageImages()) to properly handle images in
+	inherited resources dictionaries.
+
 2019-01-20  Jay Berkenbilt  <ejb@ql.org>
 
 	* Tweak the content code generated for variable text fields to

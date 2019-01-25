@@ -208,10 +208,10 @@ QPDF::pushInheritedAttributesToPageInternal2(
 
     if (type == "/Pages")
     {
-	// Make a list of inheritable keys.  Any key other than /Type,
-	// /Parent, Kids, or /Count is an inheritable attribute.  Push
-	// this object onto the stack of pages nodes that have values
-	// for this attribute.
+	// Make a list of inheritable keys. Only the keys /MediaBox,
+	// /CropBox, /Resources, and /Rotate are inheritable
+	// attributes. Push this object onto the stack of pages nodes
+	// that have values for this attribute.
 
 	std::set<std::string> inheritable_keys;
 	std::set<std::string> keys = cur_pages.getKeys();

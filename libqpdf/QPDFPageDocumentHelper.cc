@@ -79,20 +79,12 @@ QPDFPageDocumentHelper::flattenAnnotations(
             "document does not have updated appearance streams,"
             " so form fields will not be flattened");
     }
-    pushInheritedAttributesToPage();
     std::vector<QPDFPageObjectHelper> pages = getAllPages();
     for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
          iter != pages.end(); ++iter)
     {
         QPDFPageObjectHelper ph(*iter);
-        QPDFObjectHandle page_oh = ph.getObjectHandle();
-        if (page_oh.getKey("/Resources").isIndirect())
-        {
-            QTC::TC("qpdf", "QPDFPageDocumentHelper indirect resources");
-            page_oh.replaceKey("/Resources",
-                               page_oh.getKey("/Resources").shallowCopy());
-        }
-        QPDFObjectHandle resources = ph.getObjectHandle().getKey("/Resources");
+        QPDFObjectHandle resources = ph.getAttribute("/Resources", true);
         if (! resources.isDictionary())
         {
             // This should never happen and is not exercised in the
