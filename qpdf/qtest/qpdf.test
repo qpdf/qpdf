@@ -150,7 +150,7 @@ foreach my $c (@completion_tests)
 show_ntests();
 # ----------
 $td->notify("--- Argument Parsing ---");
-$n_tests += 4;
+$n_tests += 6;
 
 $td->runtest("required argument",
              {$td->COMMAND => "qpdf --password minimal.pdf"},
@@ -171,6 +171,16 @@ copy("minimal.pdf", '@file.pdf');
 $td->runtest("\@file exists and file doesn't",
              {$td->COMMAND => "qpdf --check \@file.pdf"},
              {$td->FILE => "check-at-file.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("missing underlay filename",
+             {$td->COMMAND => "qpdf --underlay --"},
+             {$td->REGEXP => ".*underlay file not specified.*",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("extra overlay filename",
+             {$td->COMMAND => "qpdf --overlay x x --"},
+             {$td->REGEXP => ".*overlay file already specified.*",
+                  $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 
 show_ntests();
@@ -345,6 +355,34 @@ foreach (my $i = 56; $i <= 59; ++$i)
                  {$td->FILE => "fx-overlay-$i.pdf"});
 }
 
+my @uo_cases = (
+    '--underlay fxo-green.pdf --repeat=z --to=1-14 --' .
+    ' --overlay fxo-blue.pdf --', # 1
+    '--overlay fxo-green.pdf --from= --repeat=r2,r1 --' .
+    ' --underlay fxo-blue.pdf --from=z-1 --', # 2
+    '--overlay fxo-green.pdf --from= --repeat=r2,r1 --' .
+    ' --underlay fxo-blue.pdf --from=z-1 -- --coalesce-contents', # 3
+    '--overlay fxo-green.pdf --', # 4
+    '--underlay fxo-green.pdf --to=3-7 --', # 5
+    '--overlay fxo-blue.pdf --to=1,1,1,1 --from=1-4 --' .
+    ' --pages . 1 --', #6
+    '--overlay 20-pages.pdf --password=user --', #7
+    );
+$n_tests += 2 * scalar(@uo_cases);
+for (my $i = 1; $i <= scalar(@uo_cases); ++$i)
+{
+    my $args = $uo_cases[$i-1];
+    my $outbase = "uo-$i";
+    $td->runtest("overlay/underlay $i",
+                 {$td->COMMAND =>
+                      "qpdf --static-id --qdf --no-original-object-ids" .
+                      " --verbose fxo-red.pdf a.pdf $args"},
+                 {$td->FILE => "$outbase.out", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("compare files",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => "$outbase.pdf"});
+}
 
 show_ntests();
 # ----------

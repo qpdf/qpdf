@@ -2,7 +2,6 @@
 %¿÷¢þ
 %QDF-1.0
 
-%% Original object ID: 1 0
 1 0 obj
 <<
   /Pages 2 0 R
@@ -10,7 +9,6 @@
 >>
 endobj
 
-%% Original object ID: 2 0
 2 0 obj
 <<
   /Count 16
@@ -37,7 +35,6 @@ endobj
 endobj
 
 %% Page 1
-%% Original object ID: 3 0
 3 0 obj
 <<
   /Contents [
@@ -66,7 +63,6 @@ endobj
 endobj
 
 %% Page 2
-%% Original object ID: 4 0
 4 0 obj
 <<
   /Contents [
@@ -96,7 +92,6 @@ endobj
 endobj
 
 %% Page 3
-%% Original object ID: 5 0
 5 0 obj
 <<
   /Contents [
@@ -126,7 +121,6 @@ endobj
 endobj
 
 %% Page 4
-%% Original object ID: 6 0
 6 0 obj
 <<
   /Contents [
@@ -155,7 +149,6 @@ endobj
 endobj
 
 %% Page 5
-%% Original object ID: 7 0
 7 0 obj
 <<
   /Contents [
@@ -185,7 +178,6 @@ endobj
 endobj
 
 %% Page 6
-%% Original object ID: 8 0
 8 0 obj
 <<
   /Contents [
@@ -216,7 +208,6 @@ endobj
 endobj
 
 %% Page 7
-%% Original object ID: 9 0
 9 0 obj
 <<
   /Contents [
@@ -246,7 +237,6 @@ endobj
 endobj
 
 %% Page 8
-%% Original object ID: 10 0
 10 0 obj
 <<
   /Contents [
@@ -276,7 +266,6 @@ endobj
 endobj
 
 %% Page 9
-%% Original object ID: 11 0
 11 0 obj
 <<
   /Contents [
@@ -306,7 +295,6 @@ endobj
 endobj
 
 %% Page 10
-%% Original object ID: 12 0
 12 0 obj
 <<
   /Contents [
@@ -337,7 +325,6 @@ endobj
 endobj
 
 %% Page 11
-%% Original object ID: 13 0
 13 0 obj
 <<
   /Contents [
@@ -367,7 +354,6 @@ endobj
 endobj
 
 %% Page 12
-%% Original object ID: 14 0
 14 0 obj
 <<
   /Contents [
@@ -397,7 +383,6 @@ endobj
 endobj
 
 %% Page 13
-%% Original object ID: 15 0
 15 0 obj
 <<
   /Contents [
@@ -427,7 +412,6 @@ endobj
 endobj
 
 %% Page 14
-%% Original object ID: 16 0
 16 0 obj
 <<
   /Contents [
@@ -458,7 +442,6 @@ endobj
 endobj
 
 %% Page 15
-%% Original object ID: 17 0
 17 0 obj
 <<
   /Contents [
@@ -488,7 +471,6 @@ endobj
 endobj
 
 %% Page 16
-%% Original object ID: 18 0
 18 0 obj
 <<
   /Contents [
@@ -518,7 +500,6 @@ endobj
 endobj
 
 %% Contents for page 1
-%% Original object ID: 58 0
 19 0 obj
 <<
   /Length 20 0 R
@@ -533,7 +514,6 @@ endobj
 endobj
 
 %% Contents for page 1
-%% Original object ID: 19 0
 21 0 obj
 <<
   /Length 22 0 R
@@ -557,7 +537,6 @@ endobj
 endobj
 
 %% Contents for page 1
-%% Original object ID: 59 0
 23 0 obj
 <<
   /Length 24 0 R
@@ -576,7 +555,6 @@ endobj
 66
 endobj
 
-%% Original object ID: 21 0
 25 0 obj
 <<
   /BaseFont /Helvetica
@@ -587,7 +565,6 @@ endobj
 >>
 endobj
 
-%% Original object ID: 22 0
 26 0 obj
 [
   /PDF
@@ -595,7 +572,6 @@ endobj
 ]
 endobj
 
-%% Original object ID: 55 0
 27 0 obj
 <<
   /BBox [
@@ -608,32 +584,25 @@ endobj
     /Font <<
       /F1 151 0 R
     >>
-    /ProcSet 152 0 R
+    /ProcSet [
+      /PDF
+      /Text
+    ]
   >>
   /Subtype /Form
   /Type /XObject
   /Length 28 0 R
 >>
 stream
-0 0 1 RG
-0 0 1 rg
-BT
-  /F1 24 Tf
-  72 690 Td
-  (Page 1 - blue) Tj
-ET
-5 w
-0 0 612 792 re s
-291 391 60 60 re f
+BT /F1 15 Tf 72 720 Td (Original page 0) Tj ET
 endstream
 endobj
 
 28 0 obj
-109
+47
 endobj
 
 %% Contents for page 2
-%% Original object ID: 61 0
 29 0 obj
 <<
   /Length 30 0 R
@@ -648,7 +617,6 @@ endobj
 endobj
 
 %% Contents for page 2
-%% Original object ID: 23 0
 31 0 obj
 <<
   /Length 32 0 R
@@ -672,7 +640,6 @@ endobj
 endobj
 
 %% Contents for page 2
-%% Original object ID: 62 0
 33 0 obj
 <<
   /Length 34 0 R
@@ -691,7 +658,6 @@ endobj
 70
 endobj
 
-%% Original object ID: 60 0
 35 0 obj
 <<
   /BBox [
@@ -704,32 +670,25 @@ endobj
     /Font <<
       /F1 151 0 R
     >>
-    /ProcSet 152 0 R
+    /ProcSet [
+      /PDF
+      /Text
+    ]
   >>
   /Subtype /Form
   /Type /XObject
   /Length 36 0 R
 >>
 stream
-0 0 1 RG
-0 0 1 rg
-BT
-  /F1 24 Tf
-  72 690 Td
-  (Page 2 - blue, 90) Tj
-ET
-5 w
-0 0 612 792 re s
-291 391 60 60 re f
+BT /F1 15 Tf 72 720 Td (Original page 1) Tj ET
 endstream
 endobj
 
 36 0 obj
-113
+47
 endobj
 
 %% Contents for page 3
-%% Original object ID: 64 0
 37 0 obj
 <<
   /Length 38 0 R
@@ -744,7 +703,6 @@ endobj
 endobj
 
 %% Contents for page 3
-%% Original object ID: 25 0
 39 0 obj
 <<
   /Length 40 0 R
@@ -763,7 +721,6 @@ endobj
 endobj
 
 %% Contents for page 3
-%% Original object ID: 27 0
 41 0 obj
 <<
   /Length 42 0 R
@@ -782,7 +739,6 @@ endobj
 endobj
 
 %% Contents for page 3
-%% Original object ID: 65 0
 43 0 obj
 <<
   /Length 44 0 R
@@ -801,46 +757,37 @@ endobj
 66
 endobj
 
-%% Original object ID: 63 0
 45 0 obj
 <<
   /BBox [
-    10
-    10
-    602
-    782
+    0
+    0
+    612
+    792
   ]
   /Resources <<
     /Font <<
       /F1 151 0 R
     >>
-    /ProcSet 152 0 R
+    /ProcSet [
+      /PDF
+      /Text
+    ]
   >>
   /Subtype /Form
   /Type /XObject
   /Length 46 0 R
 >>
 stream
-0 0 1 RG
-0 0 1 rg
-BT
-  /F1 24 Tf
-  72 690 Td
-  (Page 3 - blue, 180, trim-to-crop=10) Tj
-ET
-5 w
-0 0 612 792 re s
-10 10 592 772 re s
-291 391 60 60 re f
+BT /F1 15 Tf 72 720 Td (Original page 2) Tj ET
 endstream
 endobj
 
 46 0 obj
-150
+47
 endobj
 
 %% Contents for page 4
-%% Original object ID: 67 0
 47 0 obj
 <<
   /Length 48 0 R
@@ -855,7 +802,6 @@ endobj
 endobj
 
 %% Contents for page 4
-%% Original object ID: 29 0
 49 0 obj
 <<
   /Length 50 0 R
@@ -879,7 +825,6 @@ endobj
 endobj
 
 %% Contents for page 4
-%% Original object ID: 68 0
 51 0 obj
 <<
   /Length 52 0 R
@@ -898,47 +843,37 @@ endobj
 66
 endobj
 
-%% Original object ID: 66 0
 53 0 obj
 <<
   /BBox [
-    20
-    20
-    592
-    772
+    0
+    0
+    612
+    792
   ]
   /Resources <<
     /Font <<
       /F1 151 0 R
     >>
-    /ProcSet 152 0 R
+    /ProcSet [
+      /PDF
+      /Text
+    ]
   >>
   /Subtype /Form
   /Type /XObject
   /Length 54 0 R
 >>
 stream
-0 0 1 RG
-0 0 1 rg
-BT
-  /F1 24 Tf
-  72 690 Td
-  (Page 4 - blue, 270, crop=10, trim=20) Tj
-ET
-5 w
-0 0 612 792 re s
-10 10 592 772 re s
-20 20 572 752 re s
-291 391 60 60 re f
+BT /F1 15 Tf 72 720 Td (Original page 3) Tj ET
 endstream
 endobj
 
 54 0 obj
-170
+47
 endobj
 
 %% Contents for page 5
-%% Original object ID: 70 0
 55 0 obj
 <<
   /Length 56 0 R
@@ -953,7 +888,6 @@ endobj
 endobj
 
 %% Contents for page 5
-%% Original object ID: 31 0
 57 0 obj
 <<
   /Length 58 0 R
@@ -977,7 +911,6 @@ endobj
 endobj
 
 %% Contents for page 5
-%% Original object ID: 71 0
 59 0 obj
 <<
   /Length 60 0 R
@@ -996,7 +929,6 @@ endobj
 71
 endobj
 
-%% Original object ID: 69 0
 61 0 obj
 <<
   /BBox [
@@ -1009,32 +941,25 @@ endobj
     /Font <<
       /F1 151 0 R
     >>
-    /ProcSet 152 0 R
+    /ProcSet [
+      /PDF
+      /Text
+    ]
   >>
   /Subtype /Form
   /Type /XObject
   /Length 62 0 R
 >>
 stream
-0 0 1 RG
-0 0 1 rg
-BT
-  /F1 24 Tf
-  72 690 Td
-  (Page 5 - blue) Tj
-ET
-5 w
-0 0 612 792 re s
-291 391 60 60 re f
+BT /F1 15 Tf 72 720 Td (Original page 4) Tj ET
 endstream
 endobj
 
 62 0 obj
-109
+47
 endobj
 
 %% Contents for page 6
-%% Original object ID: 73 0
 63 0 obj
 <<
   /Length 64 0 R
@@ -1049,7 +974,6 @@ endobj
 endobj
 
 %% Contents for page 6
-%% Original object ID: 33 0
 65 0 obj
 <<
   /Length 66 0 R
@@ -1073,7 +997,6 @@ endobj
 endobj
 
 %% Contents for page 6
-%% Original object ID: 74 0
 67 0 obj
 <<
   /Length 68 0 R
@@ -1092,7 +1015,6 @@ endobj
 71
 endobj
 
-%% Original object ID: 72 0
 69 0 obj
 <<
   /BBox [
@@ -1105,32 +1027,25 @@ endobj
     /Font <<
       /F1 151 0 R
     >>
-    /ProcSet 152 0 R
+    /ProcSet [
+      /PDF
+      /Text
+    ]
   >>
   /Subtype /Form
   /Type /XObject
   /Length 70 0 R
 >>
 stream
-0 0 1 RG
-0 0 1 rg
-BT
-  /F1 24 Tf
-  72 690 Td
-  (Page 6 - blue, 90) Tj
-ET
-5 w
-0 0 612 792 re s
-291 391 60 60 re f
+BT /F1 15 Tf 72 720 Td (Original page 5) Tj ET
 endstream
 endobj
 
 70 0 obj
-113
+47
 endobj
 
 %% Contents for page 7
-%% Original object ID: 76 0
 71 0 obj
 <<
   /Length 72 0 R
@@ -1145,7 +1060,6 @@ endobj
 endobj
 
 %% Contents for page 7
-%% Original object ID: 35 0
 73 0 obj
 <<
   /Length 74 0 R
@@ -1169,7 +1083,6 @@ endobj
 endobj
 
 %% Contents for page 7
-%% Original object ID: 77 0
 75 0 obj
 <<
   /Length 76 0 R
@@ -1188,7 +1101,6 @@ endobj
 71
 endobj
 
-%% Original object ID: 75 0
 77 0 obj
 <<
   /BBox [
@@ -1201,32 +1113,25 @@ endobj
     /Font <<
       /F1 151 0 R
     >>
-    /ProcSet 152 0 R
+    /ProcSet [
+      /PDF
+      /Text
+    ]
   >>
   /Subtype /Form
   /Type /XObject
   /Length 78 0 R
 >>
 stream
-0 0 1 RG
-0 0 1 rg
-BT
-  /F1 24 Tf
-  72 690 Td
-  (Page 7 - blue, 180) Tj
-ET
-5 w
-0 0 612 792 re s
-291 391 60 60 re f
+BT /F1 15 Tf 72 720 Td (Original page 6) Tj ET
 endstream
 endobj
 
 78 0 obj
-114
+47
 endobj
 
 %% Contents for page 8
-%% Original object ID: 79 0
 79 0 obj
 <<
   /Length 80 0 R
@@ -1241,7 +1146,6 @@ endobj
 endobj
 
 %% Contents for page 8
-%% Original object ID: 37 0
 81 0 obj
 <<
   /Length 82 0 R
@@ -1265,7 +1169,6 @@ endobj
 endobj
 
 %% Contents for page 8
-%% Original object ID: 80 0
 83 0 obj
 <<
   /Length 84 0 R
@@ -1284,7 +1187,6 @@ endobj
 71
 endobj
 
-%% Original object ID: 78 0
 85 0 obj
 <<
   /BBox [
@@ -1297,32 +1199,25 @@ endobj
     /Font <<
       /F1 151 0 R
     >>
-    /ProcSet 152 0 R
+    /ProcSet [
+      /PDF
+      /Text
+    ]
   >>
   /Subtype /Form
   /Type /XObject
   /Length 86 0 R
 >>
 stream
-0 0 1 RG
-0 0 1 rg
-BT
-  /F1 24 Tf
-  72 690 Td
-  (Page 8 - blue, 270) Tj
-ET
-5 w
-0 0 612 792 re s
-291 391 60 60 re f
+BT /F1 15 Tf 72 720 Td (Original page 7) Tj ET
 endstream
 endobj
 
 86 0 obj
-114
+47
 endobj
 
 %% Contents for page 9
-%% Original object ID: 82 0
 87 0 obj
 <<
   /Length 88 0 R
@@ -1337,7 +1232,6 @@ endobj
 endobj
 
 %% Contents for page 9
-%% Original object ID: 39 0
 89 0 obj
 <<
   /Length 90 0 R
@@ -1361,7 +1255,6 @@ endobj
 endobj
 
 %% Contents for page 9
-%% Original object ID: 83 0
 91 0 obj
 <<
   /Length 92 0 R
@@ -1380,7 +1273,6 @@ endobj
 72
 endobj
 
-%% Original object ID: 81 0
 93 0 obj
 <<
   /BBox [
@@ -1393,32 +1285,25 @@ endobj
     /Font <<
       /F1 151 0 R
     >>
-    /ProcSet 152 0 R
+    /ProcSet [
+      /PDF
+      /Text
+    ]
   >>
   /Subtype /Form
   /Type /XObject
   /Length 94 0 R
 >>
 stream
-0 0 1 RG
-0 0 1 rg
-BT
-  /F1 24 Tf
-  72 690 Td
-  (Page 9 - blue) Tj
-ET
-5 w
-0 0 612 792 re s
-291 391 60 60 re f
+BT /F1 15 Tf 72 720 Td (Original page 8) Tj ET
 endstream
 endobj
 
 94 0 obj
-109
+47
 endobj
 
 %% Contents for page 10
-%% Original object ID: 85 0
 95 0 obj
 <<
   /Length 96 0 R
@@ -1433,7 +1318,6 @@ endobj
 endobj
 
 %% Contents for page 10
-%% Original object ID: 41 0
 97 0 obj
 <<
   /Length 98 0 R
@@ -1457,7 +1341,6 @@ endobj
 endobj
 
 %% Contents for page 10
-%% Original object ID: 86 0
 99 0 obj
 <<
   /Length 100 0 R
@@ -1476,7 +1359,6 @@ endobj
 72
 endobj
 
-%% Original object ID: 84 0
 101 0 obj
 <<
   /BBox [
@@ -1489,32 +1371,25 @@ endobj
     /Font <<
       /F1 151 0 R
     >>
-    /ProcSet 152 0 R
+    /ProcSet [
+      /PDF
+      /Text
+    ]
   >>
   /Subtype /Form
   /Type /XObject
   /Length 102 0 R
 >>
 stream
-0 0 1 RG
-0 0 1 rg
-BT
-  /F1 24 Tf
-  72 690 Td
-  (Page 10 - blue, 90) Tj
-ET
-5 w
-0 0 612 792 re s
-291 391 60 60 re f
+BT /F1 15 Tf 72 720 Td (Original page 9) Tj ET
 endstream
 endobj
 
 102 0 obj
-114
+47
 endobj
 
 %% Contents for page 11
-%% Original object ID: 88 0
 103 0 obj
 <<
   /Length 104 0 R
@@ -1529,7 +1404,6 @@ endobj
 endobj
 
 %% Contents for page 11
-%% Original object ID: 43 0
 105 0 obj
 <<
   /Length 106 0 R
@@ -1553,7 +1427,6 @@ endobj
 endobj
 
 %% Contents for page 11
-%% Original object ID: 89 0
 107 0 obj
 <<
   /Length 108 0 R
@@ -1572,7 +1445,6 @@ endobj
 72
 endobj
 
-%% Original object ID: 87 0
 109 0 obj
 <<
   /BBox [
@@ -1585,32 +1457,25 @@ endobj
     /Font <<
       /F1 151 0 R
     >>
-    /ProcSet 152 0 R
+    /ProcSet [
+      /PDF
+      /Text
+    ]
   >>
   /Subtype /Form
   /Type /XObject
   /Length 110 0 R
 >>
 stream
-0 0 1 RG
-0 0 1 rg
-BT
-  /F1 24 Tf
-  72 690 Td
-  (Page 11 - blue, 180) Tj
-ET
-5 w
-0 0 612 792 re s
-291 391 60 60 re f
+BT /F1 15 Tf 72 720 Td (Original page 10) Tj ET
 endstream
 endobj
 
 110 0 obj
-115
+48
 endobj
 
 %% Contents for page 12
-%% Original object ID: 91 0
 111 0 obj
 <<
   /Length 112 0 R
@@ -1625,7 +1490,6 @@ endobj
 endobj
 
 %% Contents for page 12
-%% Original object ID: 45 0
 113 0 obj
 <<
   /Length 114 0 R
@@ -1649,7 +1513,6 @@ endobj
 endobj
 
 %% Contents for page 12
-%% Original object ID: 92 0
 115 0 obj
 <<
   /Length 116 0 R
@@ -1668,7 +1531,6 @@ endobj
 72
 endobj
 
-%% Original object ID: 90 0
 117 0 obj
 <<
   /BBox [
@@ -1681,32 +1543,25 @@ endobj
     /Font <<
       /F1 151 0 R
     >>
-    /ProcSet 152 0 R
+    /ProcSet [
+      /PDF
+      /Text
+    ]
   >>
   /Subtype /Form
   /Type /XObject
   /Length 118 0 R
 >>
 stream
-0 0 1 RG
-0 0 1 rg
-BT
-  /F1 24 Tf
-  72 690 Td
-  (Page 12 - blue, 270) Tj
-ET
-5 w
-0 0 612 792 re s
-291 391 60 60 re f
+BT /F1 15 Tf 72 720 Td (Original page 11) Tj ET
 endstream
 endobj
 
 118 0 obj
-115
+48
 endobj
 
 %% Contents for page 13
-%% Original object ID: 94 0
 119 0 obj
 <<
   /Length 120 0 R
@@ -1721,7 +1576,6 @@ endobj
 endobj
 
 %% Contents for page 13
-%% Original object ID: 47 0
 121 0 obj
 <<
   /Length 122 0 R
@@ -1745,7 +1599,6 @@ endobj
 endobj
 
 %% Contents for page 13
-%% Original object ID: 95 0
 123 0 obj
 <<
   /Length 124 0 R
@@ -1764,7 +1617,6 @@ endobj
 69
 endobj
 
-%% Original object ID: 93 0
 125 0 obj
 <<
   /BBox [
@@ -1777,32 +1629,25 @@ endobj
     /Font <<
       /F1 151 0 R
     >>
-    /ProcSet 152 0 R
+    /ProcSet [
+      /PDF
+      /Text
+    ]
   >>
   /Subtype /Form
   /Type /XObject
   /Length 126 0 R
 >>
 stream
-0 0 1 RG
-0 0 1 rg
-BT
-  /F1 24 Tf
-  72 690 Td
-  (Page 13 - blue) Tj
-ET
-5 w
-0 0 612 792 re s
-291 391 60 60 re f
+BT /F1 15 Tf 72 720 Td (Original page 12) Tj ET
 endstream
 endobj
 
 126 0 obj
-110
+48
 endobj
 
 %% Contents for page 14
-%% Original object ID: 97 0
 127 0 obj
 <<
   /Length 128 0 R
@@ -1817,7 +1662,6 @@ endobj
 endobj
 
 %% Contents for page 14
-%% Original object ID: 49 0
 129 0 obj
 <<
   /Length 130 0 R
@@ -1841,7 +1685,6 @@ endobj
 endobj
 
 %% Contents for page 14
-%% Original object ID: 98 0
 131 0 obj
 <<
   /Length 132 0 R
@@ -1860,7 +1703,6 @@ endobj
 69
 endobj
 
-%% Original object ID: 96 0
 133 0 obj
 <<
   /BBox [
@@ -1873,32 +1715,25 @@ endobj
     /Font <<
       /F1 151 0 R
     >>
-    /ProcSet 152 0 R
+    /ProcSet [
+      /PDF
+      /Text
+    ]
   >>
   /Subtype /Form
   /Type /XObject
   /Length 134 0 R
 >>
 stream
-0 0 1 RG
-0 0 1 rg
-BT
-  /F1 24 Tf
-  72 690 Td
-  (Page 14 - blue, 90, scale 1.5) Tj
-ET
-5 w
-0 0 612 792 re s
-291 391 60 60 re f
+BT /F1 15 Tf 72 720 Td (Original page 13) Tj ET
 endstream
 endobj
 
 134 0 obj
-125
+48
 endobj
 
 %% Contents for page 15
-%% Original object ID: 100 0
 135 0 obj
 <<
   /Length 136 0 R
@@ -1913,7 +1748,6 @@ endobj
 endobj
 
 %% Contents for page 15
-%% Original object ID: 51 0
 137 0 obj
 <<
   /Length 138 0 R
@@ -1937,7 +1771,6 @@ endobj
 endobj
 
 %% Contents for page 15
-%% Original object ID: 101 0
 139 0 obj
 <<
   /Length 140 0 R
@@ -1956,7 +1789,6 @@ endobj
 69
 endobj
 
-%% Original object ID: 99 0
 141 0 obj
 <<
   /BBox [
@@ -1969,32 +1801,25 @@ endobj
     /Font <<
       /F1 151 0 R
     >>
-    /ProcSet 152 0 R
+    /ProcSet [
+      /PDF
+      /Text
+    ]
   >>
   /Subtype /Form
   /Type /XObject
   /Length 142 0 R
 >>
 stream
-0 0 1 RG
-0 0 1 rg
-BT
-  /F1 24 Tf
-  72 690 Td
-  (Page 15 - blue, 180) Tj
-ET
-5 w
-0 0 612 792 re s
-291 391 60 60 re f
+BT /F1 15 Tf 72 720 Td (Original page 14) Tj ET
 endstream
 endobj
 
 142 0 obj
-115
+48
 endobj
 
 %% Contents for page 16
-%% Original object ID: 103 0
 143 0 obj
 <<
   /Length 144 0 R
@@ -2009,7 +1834,6 @@ endobj
 endobj
 
 %% Contents for page 16
-%% Original object ID: 53 0
 145 0 obj
 <<
   /Length 146 0 R
@@ -2033,7 +1857,6 @@ endobj
 endobj
 
 %% Contents for page 16
-%% Original object ID: 104 0
 147 0 obj
 <<
   /Length 148 0 R
@@ -2052,7 +1875,6 @@ endobj
 69
 endobj
 
-%% Original object ID: 102 0
 149 0 obj
 <<
   /BBox [
@@ -2065,209 +1887,192 @@ endobj
     /Font <<
       /F1 151 0 R
     >>
-    /ProcSet 152 0 R
+    /ProcSet [
+      /PDF
+      /Text
+    ]
   >>
   /Subtype /Form
   /Type /XObject
   /Length 150 0 R
 >>
 stream
-0 0 1 RG
-0 0 1 rg
-BT
-  /F1 24 Tf
-  72 690 Td
-  (Page 16 - blue, 270) Tj
-ET
-5 w
-0 0 612 792 re s
-291 391 60 60 re f
+BT /F1 15 Tf 72 720 Td (Original page 15) Tj ET
 endstream
 endobj
 
 150 0 obj
-115
+48
 endobj
 
-%% Original object ID: 56 0
 151 0 obj
 <<
-  /BaseFont /Helvetica
+  /BaseFont /Times-Roman
   /Encoding /WinAnsiEncoding
-  /Name /F1
   /Subtype /Type1
   /Type /Font
 >>
 endobj
 
-%% Original object ID: 57 0
-152 0 obj
-[
-  /PDF
-  /Text
-]
-endobj
-
 xref
-0 153
+0 152
 0000000000 65535 f 
-0000000052 00000 n 
-0000000133 00000 n 
-0000000402 00000 n 
-0000000707 00000 n 
-0000001026 00000 n 
-0000001342 00000 n 
-0000001647 00000 n 
-0000001965 00000 n 
-0000002299 00000 n 
-0000002618 00000 n 
-0000002938 00000 n 
-0000003260 00000 n 
-0000003600 00000 n 
-0000003926 00000 n 
-0000004252 00000 n 
-0000004578 00000 n 
-0000004921 00000 n 
-0000005247 00000 n 
-0000005585 00000 n 
-0000005644 00000 n 
-0000005714 00000 n 
-0000005879 00000 n 
-0000005951 00000 n 
-0000006074 00000 n 
-0000006122 00000 n 
-0000006269 00000 n 
-0000006333 00000 n 
-0000006655 00000 n 
-0000006727 00000 n 
-0000006786 00000 n 
-0000006856 00000 n 
-0000007030 00000 n 
-0000007102 00000 n 
-0000007229 00000 n 
-0000007277 00000 n 
-0000007603 00000 n 
-0000007675 00000 n 
-0000007734 00000 n 
-0000007804 00000 n 
-0000007906 00000 n 
-0000007977 00000 n 
-0000008097 00000 n 
-0000008168 00000 n 
-0000008291 00000 n 
-0000008339 00000 n 
-0000008704 00000 n 
-0000008776 00000 n 
-0000008835 00000 n 
-0000008905 00000 n 
-0000009070 00000 n 
-0000009142 00000 n 
-0000009265 00000 n 
-0000009313 00000 n 
-0000009698 00000 n 
-0000009770 00000 n 
-0000009829 00000 n 
-0000009899 00000 n 
-0000010068 00000 n 
-0000010140 00000 n 
-0000010268 00000 n 
-0000010316 00000 n 
-0000010638 00000 n 
-0000010710 00000 n 
-0000010769 00000 n 
-0000010839 00000 n 
-0000011019 00000 n 
-0000011091 00000 n 
-0000011219 00000 n 
-0000011267 00000 n 
-0000011593 00000 n 
-0000011665 00000 n 
-0000011724 00000 n 
-0000011794 00000 n 
-0000011963 00000 n 
-0000012035 00000 n 
-0000012163 00000 n 
-0000012211 00000 n 
-0000012538 00000 n 
-0000012610 00000 n 
-0000012669 00000 n 
-0000012739 00000 n 
-0000012908 00000 n 
-0000012980 00000 n 
-0000013108 00000 n 
-0000013156 00000 n 
-0000013483 00000 n 
-0000013555 00000 n 
-0000013614 00000 n 
-0000013684 00000 n 
-0000013854 00000 n 
-0000013926 00000 n 
-0000014055 00000 n 
-0000014103 00000 n 
-0000014425 00000 n 
-0000014498 00000 n 
-0000014557 00000 n 
-0000014628 00000 n 
-0000014811 00000 n 
-0000014884 00000 n 
-0000015014 00000 n 
-0000015063 00000 n 
-0000015392 00000 n 
-0000015466 00000 n 
-0000015527 00000 n 
-0000015599 00000 n 
-0000015772 00000 n 
-0000015846 00000 n 
-0000015977 00000 n 
-0000016026 00000 n 
-0000016356 00000 n 
-0000016430 00000 n 
-0000016491 00000 n 
-0000016563 00000 n 
-0000016736 00000 n 
-0000016810 00000 n 
-0000016941 00000 n 
-0000016990 00000 n 
-0000017320 00000 n 
-0000017394 00000 n 
-0000017455 00000 n 
-0000017527 00000 n 
+0000000025 00000 n 
+0000000079 00000 n 
+0000000321 00000 n 
+0000000599 00000 n 
+0000000891 00000 n 
+0000001180 00000 n 
+0000001458 00000 n 
+0000001749 00000 n 
+0000002056 00000 n 
+0000002347 00000 n 
+0000002639 00000 n 
+0000002933 00000 n 
+0000003245 00000 n 
+0000003543 00000 n 
+0000003841 00000 n 
+0000004139 00000 n 
+0000004454 00000 n 
+0000004752 00000 n 
+0000005062 00000 n 
+0000005121 00000 n 
+0000005163 00000 n 
+0000005328 00000 n 
+0000005372 00000 n 
+0000005495 00000 n 
+0000005515 00000 n 
+0000005634 00000 n 
+0000005670 00000 n 
+0000005953 00000 n 
+0000005996 00000 n 
+0000006055 00000 n 
+0000006097 00000 n 
+0000006271 00000 n 
+0000006315 00000 n 
+0000006442 00000 n 
+0000006462 00000 n 
+0000006745 00000 n 
+0000006788 00000 n 
+0000006847 00000 n 
+0000006889 00000 n 
+0000006991 00000 n 
+0000007034 00000 n 
+0000007154 00000 n 
+0000007197 00000 n 
+0000007320 00000 n 
+0000007340 00000 n 
+0000007623 00000 n 
+0000007666 00000 n 
+0000007725 00000 n 
+0000007767 00000 n 
+0000007932 00000 n 
+0000007976 00000 n 
+0000008099 00000 n 
+0000008119 00000 n 
+0000008402 00000 n 
+0000008445 00000 n 
+0000008504 00000 n 
+0000008546 00000 n 
+0000008715 00000 n 
+0000008759 00000 n 
+0000008887 00000 n 
+0000008907 00000 n 
+0000009190 00000 n 
+0000009233 00000 n 
+0000009292 00000 n 
+0000009334 00000 n 
+0000009514 00000 n 
+0000009558 00000 n 
+0000009686 00000 n 
+0000009706 00000 n 
+0000009989 00000 n 
+0000010032 00000 n 
+0000010091 00000 n 
+0000010133 00000 n 
+0000010302 00000 n 
+0000010346 00000 n 
+0000010474 00000 n 
+0000010494 00000 n 
+0000010777 00000 n 
+0000010820 00000 n 
+0000010879 00000 n 
+0000010921 00000 n 
+0000011090 00000 n 
+0000011134 00000 n 
+0000011262 00000 n 
+0000011282 00000 n 
+0000011565 00000 n 
+0000011608 00000 n 
+0000011667 00000 n 
+0000011709 00000 n 
+0000011879 00000 n 
+0000011923 00000 n 
+0000012052 00000 n 
+0000012072 00000 n 
+0000012355 00000 n 
+0000012399 00000 n 
+0000012458 00000 n 
+0000012501 00000 n 
+0000012684 00000 n 
+0000012729 00000 n 
+0000012859 00000 n 
+0000012880 00000 n 
+0000013165 00000 n 
+0000013210 00000 n 
+0000013271 00000 n 
+0000013315 00000 n 
+0000013488 00000 n 
+0000013534 00000 n 
+0000013665 00000 n 
+0000013686 00000 n 
+0000013972 00000 n 
+0000014017 00000 n 
+0000014078 00000 n 
+0000014122 00000 n 
+0000014295 00000 n 
+0000014341 00000 n 
+0000014472 00000 n 
+0000014493 00000 n 
+0000014779 00000 n 
+0000014824 00000 n 
+0000014885 00000 n 
+0000014929 00000 n 
+0000015102 00000 n 
+0000015148 00000 n 
+0000015276 00000 n 
+0000015297 00000 n 
+0000015583 00000 n 
+0000015628 00000 n 
+0000015689 00000 n 
+0000015733 00000 n 
+0000015918 00000 n 
+0000015964 00000 n 
+0000016092 00000 n 
+0000016113 00000 n 
+0000016399 00000 n 
+0000016444 00000 n 
+0000016505 00000 n 
+0000016549 00000 n 
+0000016722 00000 n 
+0000016768 00000 n 
+0000016896 00000 n 
+0000016917 00000 n 
+0000017203 00000 n 
+0000017248 00000 n 
+0000017309 00000 n 
+0000017353 00000 n 
+0000017526 00000 n 
+0000017572 00000 n 
 0000017700 00000 n 
-0000017774 00000 n 
-0000017902 00000 n 
-0000017951 00000 n 
-0000018276 00000 n 
-0000018350 00000 n 
-0000018411 00000 n 
-0000018483 00000 n 
-0000018668 00000 n 
-0000018742 00000 n 
-0000018870 00000 n 
-0000018919 00000 n 
-0000019259 00000 n 
-0000019334 00000 n 
-0000019395 00000 n 
-0000019467 00000 n 
-0000019640 00000 n 
-0000019715 00000 n 
-0000019843 00000 n 
-0000019892 00000 n 
-0000020222 00000 n 
-0000020297 00000 n 
-0000020358 00000 n 
-0000020430 00000 n 
-0000020603 00000 n 
-0000020678 00000 n 
-0000020806 00000 n 
-0000020856 00000 n 
-0000021186 00000 n 
-0000021236 00000 n 
-0000021384 00000 n 
+0000017721 00000 n 
+0000018007 00000 n 
+0000018028 00000 n 
 trailer <<
   /Root 1 0 R
-  /Size 153
+  /Size 152
   /ID [<4866f3ccc81fb28dc4a27f0f976ce937><31415926535897932384626433832795>]
 >>
 startxref
-21421
+18138
 %%EOF

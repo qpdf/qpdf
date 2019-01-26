@@ -1,5 +1,7 @@
 2019-01-26  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add --overlay and --underlay options. Fixes #207.
+
 	* Create examples/pdf-overlay-page.cc to demonstrate use of
 	page/form XObject interaction
 

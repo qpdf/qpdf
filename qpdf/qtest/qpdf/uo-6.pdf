@@ -1,0 +1,357 @@
+%PDF-1.3
+%¿÷¢þ
+%QDF-1.0
+
+1 0 obj
+<<
+  /Pages 2 0 R
+  /Type /Catalog
+>>
+endobj
+
+2 0 obj
+<<
+  /Count 1
+  /Kids [
+    3 0 R
+  ]
+  /Type /Pages
+>>
+endobj
+
+%% Page 1
+3 0 obj
+<<
+  /Contents [
+    4 0 R
+    6 0 R
+    8 0 R
+  ]
+  /MediaBox [
+    0
+    0
+    612
+    792
+  ]
+  /Parent 2 0 R
+  /Resources <<
+    /Font <<
+      /F1 10 0 R
+    >>
+    /ProcSet 11 0 R
+    /XObject <<
+      /Fx1 12 0 R
+      /Fx2 14 0 R
+      /Fx3 16 0 R
+      /Fx4 18 0 R
+    >>
+  >>
+  /Type /Page
+>>
+endobj
+
+%% Contents for page 1
+4 0 obj
+<<
+  /Length 5 0 R
+>>
+stream
+q
+endstream
+endobj
+
+5 0 obj
+2
+endobj
+
+%% Contents for page 1
+6 0 obj
+<<
+  /Length 7 0 R
+>>
+stream
+1 0 0 RG
+1 0 0 rg
+BT
+  /F1 24 Tf
+  72 720 Td
+  (Page 1 - red) Tj
+ET
+5 w
+0 0 612 792 re s
+271 371 60 60 re f
+endstream
+endobj
+
+7 0 obj
+108
+endobj
+
+%% Contents for page 1
+8 0 obj
+<<
+  /Length 9 0 R
+>>
+stream
+
+Q
+q
+1.00000 0.00000 0.00000 1.00000 0.00000 0.00000 cm
+/Fx1 Do
+Q
+q
+0.77273 0.00000 0.00000 0.77273 0.00000 159.54545 cm
+/Fx2 Do
+Q
+q
+1.00000 0.00000 0.00000 1.00000 20.00000 20.00000 cm
+/Fx3 Do
+Q
+q
+0.81383 0.00000 0.00000 0.81383 16.27660 146.96809 cm
+/Fx4 Do
+Q
+endstream
+endobj
+
+9 0 obj
+262
+endobj
+
+10 0 obj
+<<
+  /BaseFont /Helvetica
+  /Encoding /WinAnsiEncoding
+  /Name /F1
+  /Subtype /Type1
+  /Type /Font
+>>
+endobj
+
+11 0 obj
+[
+  /PDF
+  /Text
+]
+endobj
+
+12 0 obj
+<<
+  /BBox [
+    0
+    0
+    612
+    792
+  ]
+  /Resources <<
+    /Font <<
+      /F1 20 0 R
+    >>
+    /ProcSet 21 0 R
+  >>
+  /Subtype /Form
+  /Type /XObject
+  /Length 13 0 R
+>>
+stream
+0 0 1 RG
+0 0 1 rg
+BT
+  /F1 24 Tf
+  72 690 Td
+  (Page 1 - blue) Tj
+ET
+5 w
+0 0 612 792 re s
+291 391 60 60 re f
+endstream
+endobj
+
+13 0 obj
+109
+endobj
+
+14 0 obj
+<<
+  /BBox [
+    0
+    0
+    612
+    792
+  ]
+  /Matrix [
+    0.000000
+    -1.000000
+    1.000000
+    0.000000
+    0.000000
+    612.000000
+  ]
+  /Resources <<
+    /Font <<
+      /F1 20 0 R
+    >>
+    /ProcSet 21 0 R
+  >>
+  /Subtype /Form
+  /Type /XObject
+  /Length 15 0 R
+>>
+stream
+0 0 1 RG
+0 0 1 rg
+BT
+  /F1 24 Tf
+  72 690 Td
+  (Page 2 - blue, 90) Tj
+ET
+5 w
+0 0 612 792 re s
+291 391 60 60 re f
+endstream
+endobj
+
+15 0 obj
+113
+endobj
+
+16 0 obj
+<<
+  /BBox [
+    10
+    10
+    602
+    782
+  ]
+  /Matrix [
+    -1.000000
+    0.000000
+    0.000000
+    -1.000000
+    592.000000
+    772.000000
+  ]
+  /Resources <<
+    /Font <<
+      /F1 20 0 R
+    >>
+    /ProcSet 21 0 R
+  >>
+  /Subtype /Form
+  /Type /XObject
+  /Length 17 0 R
+>>
+stream
+0 0 1 RG
+0 0 1 rg
+BT
+  /F1 24 Tf
+  72 690 Td
+  (Page 3 - blue, 180, trim-to-crop=10) Tj
+ET
+5 w
+0 0 612 792 re s
+10 10 592 772 re s
+291 391 60 60 re f
+endstream
+endobj
+
+17 0 obj
+150
+endobj
+
+18 0 obj
+<<
+  /BBox [
+    20
+    20
+    592
+    772
+  ]
+  /Matrix [
+    0.000000
+    1.000000
+    -1.000000
+    0.000000
+    752.000000
+    0.000000
+  ]
+  /Resources <<
+    /Font <<
+      /F1 20 0 R
+    >>
+    /ProcSet 21 0 R
+  >>
+  /Subtype /Form
+  /Type /XObject
+  /Length 19 0 R
+>>
+stream
+0 0 1 RG
+0 0 1 rg
+BT
+  /F1 24 Tf
+  72 690 Td
+  (Page 4 - blue, 270, crop=10, trim=20) Tj
+ET
+5 w
+0 0 612 792 re s
+10 10 592 772 re s
+20 20 572 752 re s
+291 391 60 60 re f
+endstream
+endobj
+
+19 0 obj
+170
+endobj
+
+20 0 obj
+<<
+  /BaseFont /Helvetica
+  /Encoding /WinAnsiEncoding
+  /Name /F1
+  /Subtype /Type1
+  /Type /Font
+>>
+endobj
+
+21 0 obj
+[
+  /PDF
+  /Text
+]
+endobj
+
+xref
+0 22
+0000000000 65535 f 
+0000000025 00000 n 
+0000000079 00000 n 
+0000000161 00000 n 
+0000000503 00000 n 
+0000000560 00000 n 
+0000000601 00000 n 
+0000000764 00000 n 
+0000000807 00000 n 
+0000001124 00000 n 
+0000001144 00000 n 
+0000001263 00000 n 
+0000001299 00000 n 
+0000001619 00000 n 
+0000001640 00000 n 
+0000002061 00000 n 
+0000002082 00000 n 
+0000002545 00000 n 
+0000002566 00000 n 
+0000003046 00000 n 
+0000003067 00000 n 
+0000003186 00000 n 
+trailer <<
+  /Root 1 0 R
+  /Size 22
+  /ID [<4866f3ccc81fb28dc4a27f0f976ce937><31415926535897932384626433832795>]
+>>
+startxref
+3222
+%%EOF

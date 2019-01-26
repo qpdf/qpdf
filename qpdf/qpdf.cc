@@ -60,6 +60,30 @@ struct RotationSpec
 
 enum password_mode_e { pm_bytes, pm_hex_bytes, pm_unicode, pm_auto };
 
+struct UnderOverlay
+{
+    UnderOverlay(char const* which) :
+        which(which),
+        filename(0),
+        password(0),
+        to_nr("1-z"),
+        from_nr("1-z"),
+        repeat_nr("")
+    {
+    }
+
+    std::string which;
+    char const* filename;
+    char const* password;
+    char const* to_nr;
+    char const* from_nr;
+    char const* repeat_nr;
+    PointerHolder<QPDF> pdf;
+    std::vector<int> to_pagenos;
+    std::vector<int> from_pagenos;
+    std::vector<int> repeat_pagenos;
+};
+
 struct Options
 {
     Options() :
@@ -140,6 +164,9 @@ struct Options
         oi_min_width(128),      // Default values for these
         oi_min_height(128),     // oi flags are in --help
         oi_min_area(16384),     // and in the manual.
+        underlay("underlay"),
+        overlay("overlay"),
+        under_overlay(0),
         require_outfile(true),
         infilename(0),
         outfilename(0)
@@ -230,6 +257,9 @@ struct Options
     size_t oi_min_width;
     size_t oi_min_height;
     size_t oi_min_area;
+    UnderOverlay underlay;
+    UnderOverlay overlay;
+    UnderOverlay* under_overlay;
     std::vector<PageSpec> page_specs;
     std::map<std::string, RotationSpec> rotations;
     bool require_outfile;
@@ -583,6 +613,8 @@ class ArgParser
     void argCopyEncryption(char* parameter);
     void argEncryptionFilePassword(char* parameter);
     void argPages();
+    void argUnderlay();
+    void argOverlay();
     void argRotate(char* parameter);
     void argCollate();
     void argStreamData(char* parameter);
@@ -647,6 +679,12 @@ class ArgParser
     void arg128ForceV4();
     void arg256ForceR5();
     void argEndEncrypt();
+    void argUOpositional(char* arg);
+    void argUOto(char* parameter);
+    void argUOfrom(char* parameter);
+    void argUOrepeat(char* parameter);
+    void argUOpassword(char* parameter);
+    void argEndUnderOverlay();
 
     void usage(std::string const& message);
     void checkCompletion();
@@ -660,6 +698,7 @@ class ArgParser
     void addChoicesToCompletions(std::string const&, std::string const&);
     void handleCompletion();
     std::vector<PageSpec> parsePagesOptions();
+    void parseUnderOverlayOptions(UnderOverlay*);
     void parseRotationParameter(std::string const&);
     std::vector<int> parseNumrange(char const* range, int max,
                                    bool throw_error = false);
@@ -681,6 +720,7 @@ class ArgParser
     std::map<std::string, OptionEntry> encrypt40_option_table;
     std::map<std::string, OptionEntry> encrypt128_option_table;
     std::map<std::string, OptionEntry> encrypt256_option_table;
+    std::map<std::string, OptionEntry> under_overlay_option_table;
     std::vector<PointerHolder<char> > new_argv;
     std::vector<PointerHolder<char> > bash_argv;
     PointerHolder<char*> argv_ph;
@@ -762,7 +802,8 @@ ArgParser::initOptionTable()
     t = &this->main_option_table;
     char const* yn[] = {"y", "n", 0};
     (*t)[""] = oe_positional(&ArgParser::argPositional);
-    (*t)["password"] = oe_requiredParameter(&ArgParser::argPassword, "pass");
+    (*t)["password"] = oe_requiredParameter(
+        &ArgParser::argPassword, "password");
     (*t)["empty"] = oe_bare(&ArgParser::argEmpty);
     (*t)["linearize"] = oe_bare(&ArgParser::argLinearize);
     (*t)["encrypt"] = oe_bare(&ArgParser::argEncrypt);
@@ -859,6 +900,8 @@ ArgParser::initOptionTable()
         &ArgParser::argOiMinHeight, "minimum-height");
     (*t)["oi-min-area"] = oe_requiredParameter(
         &ArgParser::argOiMinArea, "minimum-area");
+    (*t)["overlay"] = oe_bare(&ArgParser::argOverlay);
+    (*t)["underlay"] = oe_bare(&ArgParser::argUnderlay);
 
     t = &this->encrypt40_option_table;
     (*t)["--"] = oe_bare(&ArgParser::argEndEncrypt);
@@ -893,6 +936,18 @@ ArgParser::initOptionTable()
 
     t = &this->encrypt256_option_table;
     (*t)["force-R5"] = oe_bare(&ArgParser::arg256ForceR5);
+
+    t = &this->under_overlay_option_table;
+    (*t)[""] = oe_positional(&ArgParser::argUOpositional);
+    (*t)["to"] = oe_requiredParameter(
+        &ArgParser::argUOto, "page-range");
+    (*t)["from"] = oe_requiredParameter(
+        &ArgParser::argUOfrom, "page-range");
+    (*t)["repeat"] = oe_requiredParameter(
+        &ArgParser::argUOrepeat, "page-range");
+    (*t)["password"] = oe_requiredParameter(
+        &ArgParser::argUOpassword, "password");
+    (*t)["--"] = oe_bare(&ArgParser::argEndUnderOverlay);
 }
 
 void
@@ -1011,6 +1066,8 @@ ArgParser::argHelp()
         << "                        rotate each specified page 90, 180, or 270 degrees;\n"
         << "                        rotate all pages if no page range is given\n"
         << "--split-pages=[n]       write each output page to a separate file\n"
+        << "--overlay options --    overlay pages from another file\n"
+        << "--underlay options --   underlay pages from another file\n"
         << "\n"
         << "Note that you can use the @filename or @- syntax for any argument at any\n"
         << "point in the command. This provides a good way to specify a password without\n"
@@ -1129,6 +1186,7 @@ ArgParser::argHelp()
         << "\n"
         << "This is a complex topic. See the manual for a complete discussion.\n"
         << "\n"
+        << "\n"
         << "Page Selection Options\n"
         << "----------------------\n"
         << "\n"
@@ -1179,6 +1237,35 @@ ArgParser::argHelp()
         << "specified pages are taken from all files.\n"
         << "\n"
         << "See the manual for examples and a discussion of additional subtleties.\n"
+        << "\n"
+        << "\n"
+        << "Overlay and Underlay Options\n"
+        << "-------------------------------\n"
+        << "\n"
+        << "These options allow pages from another file to be overlaid or underlaid\n"
+        << "on the primary output. Overlaid pages are drawn on top of the destination\n"
+        << "page and may obsecure the page. Underlaid pages are drawn below the\n"
+        << "destination page.\n"
+        << "\n"
+        << "{--overlay | --underlay } file\n"
+        "      [ --password=password ]\n"
+        "      [ --to=page-range ]\n"
+        "      [ --from=[page-range] ]\n"
+        "      [ --repeat=page-range ]\n"
+        "      --\n"
+        << "\n"
+        << "For overlay and underlay, a file and optional password are specified, along\n"
+        << "with a series of optional page ranges. The default behavior is that each\n"
+        << "page of the overlay or underlay file is imposed on the corresponding page\n"
+        << "of the primary output until it runs out of pages, and any extra pages are\n"
+        << "ignored. The page range options all take page ranges in the same form as\n"
+        << "the --pages option. They have the following meanings:\n"
+        << "\n"
+        << "  --to:     the pages in the primary output to which overlay/underlay is\n"
+        << "            applied\n"
+        << "  --from:   the pages from the overlay/underlay file that are used\n"
+        << "  --repeat: pages from the overlay/underlay that are repeated after\n"
+        << "            any \"from\" pages have been exhausted\n"
         << "\n"
         << "\n"
         << "Advanced Parsing Options\n"
@@ -1526,6 +1613,18 @@ ArgParser::argPages()
     {
         usage("--pages: no page specifications given");
     }
+}
+
+void
+ArgParser::argUnderlay()
+{
+    parseUnderOverlayOptions(&o.underlay);
+}
+
+void
+ArgParser::argOverlay()
+{
+    parseUnderOverlayOptions(&o.overlay);
 }
 
 void
@@ -2043,6 +2142,63 @@ ArgParser::argEndEncrypt()
 }
 
 void
+ArgParser::argUOpositional(char* arg)
+{
+    if (o.under_overlay->filename)
+    {
+        usage(o.under_overlay->which + " file already specified");
+    }
+    else
+    {
+        o.under_overlay->filename = arg;
+    }
+}
+
+void
+ArgParser::argUOto(char* parameter)
+{
+    parseNumrange(parameter, 0);
+    o.under_overlay->to_nr = parameter;
+}
+
+void
+ArgParser::argUOfrom(char* parameter)
+{
+    if (strlen(parameter))
+    {
+        parseNumrange(parameter, 0);
+    }
+    o.under_overlay->from_nr = parameter;
+}
+
+void
+ArgParser::argUOrepeat(char* parameter)
+{
+    if (strlen(parameter))
+    {
+        parseNumrange(parameter, 0);
+    }
+    o.under_overlay->repeat_nr = parameter;
+}
+
+void
+ArgParser::argUOpassword(char* parameter)
+{
+    o.under_overlay->password = parameter;
+}
+
+void
+ArgParser::argEndUnderOverlay()
+{
+    this->option_table = &(this->main_option_table);
+    if (0 == o.under_overlay->filename)
+    {
+        usage(o.under_overlay->which + " file not specified");
+    }
+    o.under_overlay = 0;
+}
+
+void
 ArgParser::handleArgFileArguments()
 {
     // Support reading arguments from files. Create a new argv. Ensure
@@ -2396,6 +2552,13 @@ ArgParser::parsePagesOptions()
         result.push_back(PageSpec(file, password, range));
     }
     return result;
+}
+
+void
+ArgParser::parseUnderOverlayOptions(UnderOverlay* uo)
+{
+    o.under_overlay = uo;
+    this->option_table = &(this->under_overlay_option_table);
 }
 
 QPDFPageData::QPDFPageData(std::string const& filename,
@@ -3853,6 +4016,184 @@ static PointerHolder<QPDF> process_input_source(
     return do_process(&QPDF::processInputSource, is, password, o, false);
 }
 
+static void validate_under_overlay(QPDF& pdf, UnderOverlay* uo, Options& o)
+{
+    if (0 == uo->filename)
+    {
+        return;
+    }
+    QPDFPageDocumentHelper main_pdh(pdf);
+    int main_npages = static_cast<int>(main_pdh.getAllPages().size());
+    uo->pdf = process_file(uo->filename, uo->password, o);
+    QPDFPageDocumentHelper uo_pdh(*(uo->pdf));
+    int uo_npages = static_cast<int>(uo_pdh.getAllPages().size());
+    try
+    {
+        uo->to_pagenos = QUtil::parse_numrange(uo->to_nr, main_npages);
+    }
+    catch (std::runtime_error& e)
+    {
+        usageExit("parsing numeric range for " + uo->which +
+                  " \"to\" pages: " + e.what());
+    }
+    try
+    {
+        if (0 == strlen(uo->from_nr))
+        {
+            QTC::TC("qpdf", "qpdf from_nr from repeat_nr");
+            uo->from_nr = uo->repeat_nr;
+        }
+        uo->from_pagenos = QUtil::parse_numrange(uo->from_nr, uo_npages);
+        if (strlen(uo->repeat_nr))
+        {
+            uo->repeat_pagenos =
+                QUtil::parse_numrange(uo->repeat_nr, uo_npages);
+        }
+    }
+    catch (std::runtime_error& e)
+    {
+        usageExit("parsing numeric range for " + uo->which + " file " +
+                  uo->filename + ": " + e.what());
+    }
+}
+
+static void get_uo_pagenos(UnderOverlay& uo,
+                           std::map<int, std::vector<int> >& pagenos)
+{
+    size_t idx = 0;
+    size_t from_size = uo.from_pagenos.size();
+    size_t repeat_size = uo.repeat_pagenos.size();
+    for (std::vector<int>::iterator iter = uo.to_pagenos.begin();
+         iter != uo.to_pagenos.end(); ++iter, ++idx)
+    {
+        if (idx < from_size)
+        {
+            pagenos[*iter].push_back(uo.from_pagenos.at(idx));
+        }
+        else if (repeat_size)
+        {
+            pagenos[*iter].push_back(
+                uo.repeat_pagenos.at((idx - from_size) % repeat_size));
+        }
+    }
+}
+
+static void do_under_overlay_for_page(
+    QPDF& pdf,
+    Options& o,
+    UnderOverlay& uo,
+    std::map<int, std::vector<int> >& pagenos,
+    size_t page_idx,
+    std::map<int, QPDFObjectHandle>& fo,
+    std::vector<QPDFPageObjectHelper>& pages,
+    QPDFPageObjectHelper& dest_page,
+    bool before)
+{
+    int pageno = 1 + page_idx;
+    if (! pagenos.count(pageno))
+    {
+        return;
+    }
+
+    std::string content;
+    int min_suffix = 1;
+    QPDFObjectHandle resources = dest_page.getAttribute("/Resources", true);
+    for (std::vector<int>::iterator iter = pagenos[pageno].begin();
+         iter != pagenos[pageno].end(); ++iter)
+    {
+        int from_pageno = *iter;
+        if (o.verbose)
+        {
+            std::cout << "    " << uo.which << " " << from_pageno << std::endl;
+        }
+        if (0 == fo.count(from_pageno))
+        {
+            fo[from_pageno] =
+                pdf.copyForeignObject(
+                    pages.at(from_pageno - 1).getFormXObjectForPage());
+        }
+        // If the same page is overlaid or underlaid multiple times,
+        // we'll generate multiple names for it, but that's harmless
+        // and also a pretty goofy case that's not worth coding
+        // around.
+        std::string name = resources.getUniqueResourceName("/Fx", min_suffix);
+        std::string new_content = dest_page.placeFormXObject(
+            fo[from_pageno], name,
+            dest_page.getTrimBox().getArrayAsRectangle());
+        if (! new_content.empty())
+        {
+            resources.mergeResources(
+                QPDFObjectHandle::parse("<< /XObject << >> >>"));
+            resources.getKey("/XObject").replaceKey(name, fo[from_pageno]);
+            ++min_suffix;
+            content += new_content;
+        }
+    }
+    if (! content.empty())
+    {
+        if (before)
+        {
+            dest_page.addPageContents(
+                QPDFObjectHandle::newStream(&pdf, content), true);
+        }
+        else
+        {
+            dest_page.addPageContents(
+                QPDFObjectHandle::newStream(&pdf, "q\n"), true);
+            dest_page.addPageContents(
+                QPDFObjectHandle::newStream(&pdf, "\nQ\n" + content), false);
+        }
+    }
+}
+
+static void handle_under_overlay(QPDF& pdf, Options& o)
+{
+    validate_under_overlay(pdf, &o.underlay, o);
+    validate_under_overlay(pdf, &o.overlay, o);
+    if ((0 == o.underlay.pdf.getPointer()) &&
+        (0 == o.overlay.pdf.getPointer()))
+    {
+        return;
+    }
+    std::map<int, std::vector<int> > underlay_pagenos;
+    get_uo_pagenos(o.underlay, underlay_pagenos);
+    std::map<int, std::vector<int> > overlay_pagenos;
+    get_uo_pagenos(o.overlay, overlay_pagenos);
+    std::map<int, QPDFObjectHandle> underlay_fo;
+    std::map<int, QPDFObjectHandle> overlay_fo;
+    std::vector<QPDFPageObjectHelper> upages;
+    if (o.underlay.pdf.getPointer())
+    {
+        upages = QPDFPageDocumentHelper(*(o.underlay.pdf)).getAllPages();
+    }
+    std::vector<QPDFPageObjectHelper> opages;
+    if (o.overlay.pdf.getPointer())
+    {
+        opages = QPDFPageDocumentHelper(*(o.overlay.pdf)).getAllPages();
+    }
+
+    QPDFPageDocumentHelper main_pdh(pdf);
+    std::vector<QPDFPageObjectHelper> main_pages = main_pdh.getAllPages();
+    size_t main_npages = main_pages.size();
+    if (o.verbose)
+    {
+        std::cout << whoami << ": processing underlay/overlay" << std::endl;
+    }
+    for (size_t i = 0; i < main_npages; ++i)
+    {
+        if (o.verbose)
+        {
+            std::cout << "  page " << 1+i << std::endl;
+        }
+        do_under_overlay_for_page(pdf, o, o.underlay, underlay_pagenos, i,
+                                  underlay_fo, upages, main_pages.at(i),
+                                  true);
+        do_under_overlay_for_page(pdf, o, o.overlay, overlay_pagenos, i,
+                                  overlay_fo, opages, main_pages.at(i),
+                                  false);
+    }
+}
+
 static void handle_transformations(QPDF& pdf, Options& o)
 {
     QPDFPageDocumentHelper dh(pdf);
@@ -4636,7 +4977,6 @@ int realmain(int argc, char* argv[])
 	PointerHolder<QPDF> pdf_ph =
             process_file(o.infilename, o.password, o);
         QPDF& pdf = *pdf_ph;
-        handle_transformations(pdf, o);
         if (! o.page_specs.empty())
         {
             handle_page_specs(pdf, o);
@@ -4645,6 +4985,8 @@ int realmain(int argc, char* argv[])
         {
             handle_rotations(pdf, o);
         }
+        handle_under_overlay(pdf, o);
+        handle_transformations(pdf, o);
 
 	if (o.outfilename == 0)
 	{
