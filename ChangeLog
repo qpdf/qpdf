@@ -1,3 +1,10 @@
+2019-01-26  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add new methods QPDFPageObjectHelper::getFormXObjectForPage,
+	which creates a form XObject equivalent to a page, and
+	QPDFObjectHandle::placeFormXObject, which generates content stream
+	code to placing a form XObject on a page.
+
 2019-01-25  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add new method QPDFObjectHandle::getUniqueResourceName() to

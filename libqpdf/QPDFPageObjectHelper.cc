@@ -1,6 +1,40 @@
 #include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QPDF.hh>
+#include <qpdf/Pl_Concatenate.hh>
+#include <qpdf/QUtil.hh>
+#include <qpdf/QPDFExc.hh>
+#include <qpdf/QPDFMatrix.hh>
+
+class ContentProvider: public QPDFObjectHandle::StreamDataProvider
+{
+  public:
+    ContentProvider(QPDFObjectHandle from_page) :
+        from_page(from_page)
+    {
+    }
+    virtual ~ContentProvider()
+    {
+    }
+    virtual void provideStreamData(int objid, int generation,
+                                   Pipeline* pipeline);
+
+  private:
+    QPDFObjectHandle from_page;
+};
+
+void
+ContentProvider::provideStreamData(int, int, Pipeline* p)
+{
+    Pl_Concatenate concat("concatenate", p);
+    std::string description = "contents from page object " +
+        QUtil::int_to_string(from_page.getObjectID()) + " " +
+        QUtil::int_to_string(from_page.getGeneration());
+    std::string all_description;
+    from_page.getKey("/Contents").pipeContentStreams(
+        &concat, description, all_description);
+    concat.manualFinish();
+}
 
 QPDFPageObjectHelper::Members::~Members()
 {
@@ -48,6 +82,34 @@ QPDFPageObjectHelper::getAttribute(std::string const& name,
         this->oh.replaceKey(name, result);
     }
     return result;
+}
+
+QPDFObjectHandle
+QPDFPageObjectHelper::getTrimBox(bool copy_if_shared)
+{
+    QPDFObjectHandle result = getAttribute("/TrimBox", copy_if_shared);
+    if (result.isNull())
+    {
+        result = getCropBox(copy_if_shared);
+    }
+    return result;
+}
+
+QPDFObjectHandle
+QPDFPageObjectHelper::getCropBox(bool copy_if_shared)
+{
+    QPDFObjectHandle result = getAttribute("/CropBox", copy_if_shared);
+    if (result.isNull())
+    {
+        result = getMediaBox();
+    }
+    return result;
+}
+
+QPDFObjectHandle
+QPDFPageObjectHelper::getMediaBox(bool copy_if_shared)
+{
+    return getAttribute("/MediaBox", copy_if_shared);
 }
 
 
@@ -230,4 +292,212 @@ QPDFPageObjectHelper::shallowCopyPage()
     }
     QPDFObjectHandle new_page = this->oh.shallowCopy();
     return QPDFPageObjectHelper(qpdf->makeIndirectObject(new_page));
+}
+
+QPDFObjectHandle::Matrix
+QPDFPageObjectHelper::getMatrixForTransformations(bool invert)
+{
+    QPDFObjectHandle::Matrix matrix(1, 0, 0, 1, 0, 0);
+    QPDFObjectHandle bbox = getTrimBox(false);
+    if (! bbox.isRectangle())
+    {
+        return matrix;
+    }
+    QPDFObjectHandle rotate_obj = getAttribute("/Rotate", false);
+    QPDFObjectHandle scale_obj = getAttribute("/UserUnit", false);
+    if (! (rotate_obj.isNull() && scale_obj.isNull()))
+    {
+        QPDFObjectHandle::Rectangle rect = bbox.getArrayAsRectangle();
+        double width = rect.urx - rect.llx;
+        double height = rect.ury - rect.lly;
+        double scale = (scale_obj.isNumber()
+                        ? scale_obj.getNumericValue()
+                        : 1.0);
+        int rotate = (rotate_obj.isInteger()
+                      ? rotate_obj.getIntValue()
+                      : 0);
+        if (invert)
+        {
+            if (scale == 0.0)
+            {
+                return matrix;
+            }
+            scale = 1.0 / scale;
+            rotate = 360 - rotate;
+        }
+
+        // Ignore invalid rotation angle
+        switch (rotate)
+        {
+          case 90:
+            matrix = QPDFObjectHandle::Matrix(
+                0, -scale, scale, 0, 0, width * scale);
+            break;
+          case 180:
+            matrix = QPDFObjectHandle::Matrix(
+                -scale, 0, 0, -scale, width * scale, height * scale);
+            break;
+          case 270:
+            matrix = QPDFObjectHandle::Matrix(
+                0, scale, -scale, 0, height * scale, 0);
+            break;
+          default:
+            matrix = QPDFObjectHandle::Matrix(
+                scale, 0, 0, scale, 0, 0);
+            break;
+        }
+    }
+    return matrix;
+}
+
+QPDFObjectHandle
+QPDFPageObjectHelper::getFormXObjectForPage(bool handle_transformations)
+{
+    QPDF* qpdf = this->oh.getOwningQPDF();
+    if (! qpdf)
+    {
+        throw std::runtime_error(
+            "QPDFPageObjectHelper::getFormXObjectForPage"
+            " called with a direct objet");
+    }
+    QPDFObjectHandle result = QPDFObjectHandle::newStream(qpdf);
+    QPDFObjectHandle newdict = result.getDict();
+    newdict.replaceKey("/Type", QPDFObjectHandle::newName("/XObject"));
+    newdict.replaceKey("/Subtype", QPDFObjectHandle::newName("/Form"));
+    newdict.replaceKey("/Resources",
+                       getAttribute("/Resources", false).shallowCopy());
+    newdict.replaceKey("/Group",
+                       getAttribute("/Group", false).shallowCopy());
+    QPDFObjectHandle bbox = getTrimBox(false).shallowCopy();
+    if (! bbox.isRectangle())
+    {
+        this->oh.warnIfPossible(
+            "bounding box is invalid; form"
+            " XObject created from page will not work");
+    }
+    newdict.replaceKey("/BBox", bbox);
+    PointerHolder<QPDFObjectHandle::StreamDataProvider> provider =
+        new ContentProvider(this->oh);
+    result.replaceStreamData(
+        provider, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
+    QPDFObjectHandle rotate_obj = getAttribute("/Rotate", false);
+    QPDFObjectHandle scale_obj = getAttribute("/UserUnit", false);
+    if (handle_transformations &&
+        (! (rotate_obj.isNull() && scale_obj.isNull())))
+    {
+        newdict.replaceKey("/Matrix",
+                           QPDFObjectHandle::newArray(
+                               getMatrixForTransformations()));
+    }
+
+    return result;
+}
+
+std::string
+QPDFPageObjectHelper::placeFormXObject(
+    QPDFObjectHandle fo, std::string name,
+    QPDFObjectHandle::Rectangle rect,
+    bool invert_transformations)
+{
+    // Calculate the transformation matrix that will place the given
+    // form XObject fully inside the given rectangle, shrinking and
+    // centering if needed.
+
+    // When rendering a form XObject, the transformation in the
+    // graphics state (cm) is applied first (of course -- when it is
+    // applied, the PDF interpreter doesn't even know we're going to
+    // be drawing a form XObject yet), and then the object's matrix
+    // (M) is applied. The resulting matrix, when applied to the form
+    // XObject's bounding box, will generate a new rectangle. We want
+    // to create a transformation matrix that make the form XObject's
+    // bounding box land in exactly the right spot.
+
+    QPDFObjectHandle fdict = fo.getDict();
+    QPDFObjectHandle bbox_obj = fdict.getKey("/BBox");
+    if (! bbox_obj.isRectangle())
+    {
+        return "";
+    }
+
+    QPDFMatrix wmatrix;         // work matrix
+    QPDFMatrix tmatrix;         // "to" matrix
+    QPDFMatrix fmatrix;         // "from" matrix
+    if (invert_transformations)
+    {
+        // tmatrix inverts scaling and rotation of the destination
+        // page. Applying this matrix allows the overlayed form
+        // XObject's to be absolute rather than relative to properties
+        // of the destination page. tmatrix is part of the computed
+        // transformation matrix.
+        tmatrix = QPDFMatrix(getMatrixForTransformations(true));
+        wmatrix.concat(tmatrix);
+    }
+    if (fdict.getKey("/Matrix").isMatrix())
+    {
+        // fmatrix is the transformation matrix that is applied to the
+        // form XObject itself. We need this for calculations, but we
+        // don't explicitly use it in the final result because the PDF
+        // rendering system automatically applies this last before
+        // drawing the form XObject.
+        fmatrix = QPDFMatrix(fdict.getKey("/Matrix").getArrayAsMatrix());
+        wmatrix.concat(fmatrix);
+    }
+
+    // The current wmatrix handles transformation from the form
+    // xobject and, if requested, the destination page. Next, we have
+    // to adjust this for scale and position.
+
+    // Step 1: figure out what scale factor we need to make the form
+    // XObject's bnounding box fit within the destination rectangle.
+
+    // Transform bounding box
+    QPDFObjectHandle::Rectangle bbox = bbox_obj.getArrayAsRectangle();
+    QPDFObjectHandle::Rectangle T = wmatrix.transformRectangle(bbox);
+
+    // Calculate a scale factor, if needed. If the transformed
+    // rectangle is too big, shrink it. Never expand it.
+    if ((T.urx == T.llx) || (T.ury == T.lly))
+    {
+        // avoid division by zero
+        return "";
+    }
+    double rect_w = rect.urx - rect.llx;
+    double rect_h = rect.ury - rect.lly;
+    double t_w = T.urx - T.llx;
+    double t_h = T.ury - T.lly;
+    double xscale = rect_w / t_w;
+    double yscale = rect_h / t_h;
+    double scale = (xscale < yscale ? xscale : yscale);
+    if (scale > 1.0)
+    {
+        scale = 1.0;
+    }
+
+    // Step 2: figure out what translation is required to get the
+    // rectangle to the right spot: centered within the destination.
+    wmatrix = QPDFMatrix();
+    wmatrix.scale(scale, scale);
+    wmatrix.concat(tmatrix);
+    wmatrix.concat(fmatrix);
+
+    T = wmatrix.transformRectangle(bbox);
+    double t_cx = (T.llx + T.urx) / 2.0;
+    double t_cy = (T.lly + T.ury) / 2.0;
+    double r_cx = (rect.llx + rect.urx) / 2.0;
+    double r_cy = (rect.lly + rect.ury) / 2.0;
+    double tx = r_cx - t_cx;
+    double ty = r_cy - t_cy;
+
+    // Now we can calculate the final matrix. The final matrix does
+    // not include fmatrix because that is applied automatically by
+    // the PDF interpreter.
+    QPDFMatrix cm;
+    cm.translate(tx, ty);
+    cm.scale(scale, scale);
+    cm.concat(tmatrix);
+    return (
+        "q\n" +
+        cm.unparse() + " cm\n" +
+        name + " Do\n" +
+        "Q\n");
 }

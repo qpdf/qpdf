@@ -1944,6 +1944,78 @@ void runtest(int n, char const* filename1, char const* arg2)
             std::cout << "oops: " << w.getFinalVersion() << std::endl;
         }
     }
+    else if (n == 55)
+    {
+        // Form XObjects
+        std::vector<QPDFPageObjectHelper> pages =
+            QPDFPageDocumentHelper(pdf).getAllPages();
+        QPDFObjectHandle qtest = QPDFObjectHandle::newArray();
+        for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
+             iter != pages.end(); ++iter)
+        {
+            QPDFPageObjectHelper& ph(*iter);
+            qtest.appendItem(ph.getFormXObjectForPage());
+            qtest.appendItem(ph.getFormXObjectForPage(false));
+        }
+        pdf.getTrailer().replaceKey("/QTest", qtest);
+        QPDFWriter w(pdf, "a.pdf");
+	w.setQDFMode(true);
+        w.setStaticID(true);
+        w.write();
+    }
+    else if ((n >= 56) && (n <= 59))
+    {
+        // Placing form XObjects
+        assert(arg2);
+        QPDF pdf2;
+        pdf2.processFile(arg2);
+
+        // red pages are from pdf, blue pages are from pdf2
+        // red pages always have stated rotation absolutely
+        // 56: blue pages are overlayed exactly on top of red pages
+        // 57: blue pages have stated rotation relative to red pages
+        // 58: blue pages have no rotation (absolutely upgright)
+        // 59: blue pages have stated rotation absolutely
+        bool handle_from_transformation = ((n == 57) || (n == 59));
+        bool invert_to_transformation = ((n == 58) || (n == 59));
+
+        std::vector<QPDFPageObjectHelper> pages1 =
+            QPDFPageDocumentHelper(pdf).getAllPages();
+        std::vector<QPDFPageObjectHelper> pages2 =
+            QPDFPageDocumentHelper(pdf2).getAllPages();
+        size_t npages = (pages1.size() < pages2.size()
+                         ? pages1.size() : pages2.size());
+        for (size_t i = 0; i < npages; ++i)
+        {
+            QPDFPageObjectHelper& ph1 = pages1.at(i);
+            QPDFPageObjectHelper& ph2 = pages2.at(i);
+            QPDFObjectHandle fo = pdf.copyForeignObject(
+                ph2.getFormXObjectForPage(handle_from_transformation));
+            int min_suffix = 1;
+            QPDFObjectHandle resources = ph1.getAttribute("/Resources", true);
+            std::string name = resources.getUniqueResourceName(
+                "/Fx", min_suffix);
+            std::string content =
+                ph1.placeFormXObject(
+                    fo, name, ph1.getTrimBox().getArrayAsRectangle(),
+                    invert_to_transformation);
+            if (! content.empty())
+            {
+                resources.mergeResources(
+                    QPDFObjectHandle::parse("<< /XObject << >> >>"));
+                resources.getKey("/XObject").replaceKey(name, fo);
+                ph1.addPageContents(
+                    QPDFObjectHandle::newStream(&pdf, "q\n"), true);
+                ph1.addPageContents(
+                    QPDFObjectHandle::newStream(&pdf, "\nQ\n" + content),
+                    false);
+            }
+        }
+        QPDFWriter w(pdf, "a.pdf");
+	w.setQDFMode(true);
+        w.setStaticID(true);
+        w.write();
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +
