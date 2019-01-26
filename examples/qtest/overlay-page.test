@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+chdir("overlay-page");
+
+require TestDriver;
+
+my $td = new TestDriver('overlay-page');
+
+cleanup();
+
+$td->runtest("overlay-page",
+	     {$td->COMMAND => "pdf-overlay-page in.pdf stamp.pdf a.pdf"},
+	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("compare files",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "out.pdf"});
+
+cleanup();
+
+$td->report(2);
+
+sub cleanup
+{
+    unlink("a.pdf");
+}

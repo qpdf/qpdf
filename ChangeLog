@@ -1,5 +1,8 @@
 2019-01-26  Jay Berkenbilt  <ejb@ql.org>
 
+	* Create examples/pdf-overlay-page.cc to demonstrate use of
+	page/form XObject interaction
+
 	* Add new methods QPDFPageObjectHelper::getFormXObjectForPage,
 	which creates a form XObject equivalent to a page, and
 	QPDFObjectHandle::placeFormXObject, which generates content stream
