@@ -19,6 +19,9 @@ class QPDFMatrix
     QPDF_DLL
     std::string unparse() const;
 
+    QPDF_DLL
+    QPDFObjectHandle::Matrix getAsMatrix() const;
+
     // This is not part of the public API. Just provide the methods we
     // need as we need them.
     QPDF_DLL
@@ -33,6 +36,10 @@ class QPDFMatrix
 
     QPDF_DLL
     void transform(double x, double y, double& xp, double& yp);
+
+    QPDF_DLL
+    QPDFObjectHandle::Rectangle transformRectangle(
+        QPDFObjectHandle::Rectangle r);
 
   private:
     double a;

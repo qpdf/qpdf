@@ -1,5 +1,6 @@
 #include <qpdf/QPDFMatrix.hh>
 #include <qpdf/QUtil.hh>
+#include <algorithm>
 
 QPDFMatrix::QPDFMatrix() :
     a(1.0),
@@ -32,16 +33,30 @@ QPDFMatrix::QPDFMatrix(QPDFObjectHandle::Matrix const& m) :
 {
 }
 
+static double fix_rounding(double d)
+{
+    if ((d > -0.00001) && (d < 0.00001))
+    {
+        d = 0.0;
+    }
+    return d;
+}
 
 std::string
 QPDFMatrix::unparse() const
 {
-    return (QUtil::double_to_string(a, 5) + " " +
-            QUtil::double_to_string(b, 5) + " " +
-            QUtil::double_to_string(c, 5) + " " +
-            QUtil::double_to_string(d, 5) + " " +
-            QUtil::double_to_string(e, 5) + " " +
-            QUtil::double_to_string(f, 5));
+    return (QUtil::double_to_string(fix_rounding(a), 5) + " " +
+            QUtil::double_to_string(fix_rounding(b), 5) + " " +
+            QUtil::double_to_string(fix_rounding(c), 5) + " " +
+            QUtil::double_to_string(fix_rounding(d), 5) + " " +
+            QUtil::double_to_string(fix_rounding(e), 5) + " " +
+            QUtil::double_to_string(fix_rounding(f), 5));
+}
+
+QPDFObjectHandle::Matrix
+QPDFMatrix::getAsMatrix() const
+{
+    return QPDFObjectHandle::Matrix(a, b, c, d, e, f);
 }
 
 void
@@ -98,4 +113,23 @@ QPDFMatrix::transform(double x, double y, double& xp, double& yp)
 {
     xp = (this->a * x) + (this->c * y) + this->e;
     yp = (this->b * x) + (this->d * y) + this->f;
+}
+
+QPDFObjectHandle::Rectangle
+QPDFMatrix::transformRectangle(QPDFObjectHandle::Rectangle r)
+{
+    // Transform a rectangle by creating a new rectangle the tightly
+    // bounds the polygon resulting from transforming the four
+    // corners.
+    std::vector<double> tx(4);
+    std::vector<double> ty(4);
+    transform(r.llx, r.lly, tx.at(0), ty.at(0));
+    transform(r.llx, r.ury, tx.at(1), ty.at(1));
+    transform(r.urx, r.lly, tx.at(2), ty.at(2));
+    transform(r.urx, r.ury, tx.at(3), ty.at(3));
+    return QPDFObjectHandle::Rectangle(
+        *std::min_element(tx.begin(), tx.end()),
+        *std::min_element(ty.begin(), ty.end()),
+        *std::max_element(tx.begin(), tx.end()),
+        *std::max_element(ty.begin(), ty.end()));
 }

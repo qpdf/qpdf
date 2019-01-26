@@ -4,7 +4,6 @@
 #include <qpdf/QUtil.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFNameTreeObjectHelper.hh>
-#include <algorithm>
 
 QPDFAnnotationObjectHelper::Members::~Members()
 {
@@ -258,18 +257,8 @@ QPDFAnnotationObjectHelper::getPageContentForAppearance(
 
     // Transform bounding box by matrix to get T
     QPDFObjectHandle::Rectangle bbox = bbox_obj.getArrayAsRectangle();
-    std::vector<double> bx(4);
-    std::vector<double> by(4);
-    matrix.transform(bbox.llx, bbox.lly, bx.at(0), by.at(0));
-    matrix.transform(bbox.llx, bbox.ury, bx.at(1), by.at(1));
-    matrix.transform(bbox.urx, bbox.lly, bx.at(2), by.at(2));
-    matrix.transform(bbox.urx, bbox.ury, bx.at(3), by.at(3));
-    // Find the transformed appearance box
-    double t_llx = *std::min_element(bx.begin(), bx.end());
-    double t_urx = *std::max_element(bx.begin(), bx.end());
-    double t_lly = *std::min_element(by.begin(), by.end());
-    double t_ury = *std::max_element(by.begin(), by.end());
-    if ((t_urx == t_llx) || (t_ury == t_lly))
+    QPDFObjectHandle::Rectangle T = matrix.transformRectangle(bbox);
+    if ((T.urx == T.llx) || (T.ury == T.lly))
     {
         // avoid division by zero
         return "";
@@ -277,9 +266,9 @@ QPDFAnnotationObjectHelper::getPageContentForAppearance(
     // Compute a matrix to transform the appearance box to the rectangle
     QPDFMatrix AA;
     AA.translate(rect.llx, rect.lly);
-    AA.scale((rect.urx - rect.llx) / (t_urx - t_llx),
-             (rect.ury - rect.lly) / (t_ury - t_lly));
-    AA.translate(-t_llx, -t_lly);
+    AA.scale((rect.urx - rect.llx) / (T.urx - T.llx),
+             (rect.ury - rect.lly) / (T.ury - T.lly));
+    AA.translate(-T.llx, -T.lly);
     if (do_rotate)
     {
         AA.rotatex90(rotate);
