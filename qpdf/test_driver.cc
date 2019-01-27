@@ -2016,6 +2016,23 @@ void runtest(int n, char const* filename1, char const* arg2)
         w.setStaticID(true);
         w.write();
     }
+    else if (n == 60)
+    {
+        // Boundary condition testing for getUniqueResourceName
+        QPDFObjectHandle r1 = QPDFObjectHandle::newDictionary();
+        int min_suffix = 1;
+        for (int i = 1; i < 3; ++i)
+        {
+            std::string name = r1.getUniqueResourceName("/Quack", min_suffix);
+            r1.mergeResources(QPDFObjectHandle::parse("<< /Z << >> >>"));
+            r1.getKey("/Z").replaceKey(
+                name, QPDFObjectHandle::newString("moo"));
+        }
+        pdf.getTrailer().replaceKey("/QTest", r1);
+        QPDFWriter w(pdf, "a.pdf");
+        w.setStaticID(true);
+        w.write();
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +
