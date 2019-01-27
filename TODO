@@ -3,8 +3,8 @@ Soon
 
  * Set up OSS-Fuzz (Google). See starred email in qpdf label.
 
- * Add a method to QPDFPageObjectHelper that converts a page into a
-   form XObject.
+ * Look at files from bug 268 (../misc/bugs/268), which cause an
+   internal error when linearized.
 
  * Update the docs for copyForeignObject and addPage to explain the
    difference between copying a page in the two ways: using addPage
@@ -106,6 +106,17 @@ directory or that are otherwise not publicly accessible. This includes
 things sent to me by email that are specifically not public. Even so,
 I find it useful to make reference to them in this list
 
+ * Do something better for inline images (see #278)
+   * Improve location of EI to handle EI embedded in the image data;
+     consider trying to parse after EI and, if errors, keep looking.
+     Will have to look at what happens with random binary characters
+     regarding token type.
+   * Add a method to replace inline images with real images. Look at
+     existing code for adding new resources used with form XObjects
+     and reuse if possible
+   * Have image optimization replace inline images that are of more
+     than a certain size prior to optimizing
+
  * Add support for writing name and number trees
 
  * Figure out how to render Gajić correctly in the PDF version of the
@@ -117,13 +128,6 @@ I find it useful to make reference to them in this list
    even when there are errors. See linearization label in github.
 
  * Consider creating a PPA for Ubuntu
-
- * Add method to push inheritable resources to a single page by
-   walking up and copying without overwrite.  Above logic will also be
-   sufficient to fix the limitation in
-   QPDFObjectHandle::getPageImages().  Maybe add a method to get the
-   effective resources for a page without modifying the page and then
-   implement both changes in terms of that method.
 
  * Support user-pluggable stream filters.  This would enable external
    code to provide interpretation for filters that are missing from
@@ -325,15 +329,14 @@ I find it useful to make reference to them in this list
    viewing software silently ignores objects of this type, so this is
    probably not a big deal.
 
- * QPDFObjectHandle::getPageImages() doesn't notice images in
-   inherited resource dictionaries.  See comments in that function.
-
  * Based on an idea suggested by user "Atom Smasher", consider
    providing some mechanism to recover earlier versions of a file
    embedded prior to appended sections.
 
  * From a suggestion in bug 3152169, consider having an option to
-   re-encode inline images with an ASCII encoding.
+   re-encode inline images with an ASCII encoding. This is also
+   https://github.com/qpdf/qpdf/issues/278. It would be interesting to
+   make optimize-images work with inline images.
 
  * From github issue 2, provide more in-depth output for examining
    hint stream contents. Consider adding on option to provide a
