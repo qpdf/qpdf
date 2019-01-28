@@ -1572,8 +1572,8 @@ outfile.pdf</option>
         case, please report it as a bug.
        </para>
        <para>
-        See also <option>--preserve-unreferenced-resources</option>,
-        which does something completely different.
+        See also <option>--preserve-unreferenced</option>, which does
+        something completely different.
        </para>
       </listitem>
      </varlistentry>
