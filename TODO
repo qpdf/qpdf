@@ -3,9 +3,6 @@ Soon
 
  * Set up OSS-Fuzz (Google). See starred email in qpdf label.
 
- * Look at files from bug 268 (../misc/bugs/268), which cause an
-   internal error when linearized.
-
  * Update the docs for copyForeignObject and addPage to explain the
    difference between copying a page in the two ways: using addPage
    updates the pages tree, while using copyForeignObject does not. The
@@ -28,6 +25,9 @@ Do these things next time we have to break binary compatibility
 
  * Rename QUtil::strcasecmp since strcasecmp is a macro on some
    platforms. See #242.
+
+ * Collapse QPDF::pushInheritedAttributesToPageInternal* and
+   QPDF::getAllPagesInternal* into QPDF::*Internal.
 
 Lexical
 =======
@@ -107,6 +107,12 @@ things sent to me by email that are specifically not public. Even so,
 I find it useful to make reference to them in this list
 
  * Do something better for inline images (see #278)
+   * Figure out a way to add an expectInlineImage method that takes
+     the offset of the EI image so an external system can locate the
+     end tag. Hopefully Both QPDFObjectHandle and Pl_QPDFTokenizer can
+     do this. Somewhere we might want something that uses an input
+     source to do it, but for the pipeline, it will also have to be
+     possible to do it as we go.
    * Improve location of EI to handle EI embedded in the image data;
      consider trying to parse after EI and, if errors, keep looking.
      Will have to look at what happens with random binary characters
