@@ -1,6 +1,6 @@
 #!/bin/bash
 set -ex
-curl -L https://www.ijg.org/files/jpegsrc.v9c.tar.gz -o jpegsrc.v9c.tar.gz
+curl -L https://github.com/qpdf/qpdf/raw/external-libs/jpegsrc.v9c.tar.gz -o jpegsrc.v9c.tar.gz
 tar xzf jpegsrc.v9c.tar.gz
 cd jpeg-9c
 ./configure

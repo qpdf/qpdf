@@ -20,7 +20,7 @@ fi
 if [ -f distfiles/distfiles.zip ]; then
     unzip distfiles/distfiles.zip
 fi
-curl -L https://downloads.sourceforge.net/project/qpdf/external-libs/2017-08-21/qpdf-external-libs-bin.zip -o qpdf-external-libs-bin.zip
+curl -L https://github.com/qpdf/qpdf/raw/external-libs/qpdf-external-libs-bin.zip -o qpdf-external-libs-bin.zip
 unzip qpdf-external-libs-bin.zip
 cwd=`pwd`
 PATH=$cwd/libqpdf/build:$PATH
