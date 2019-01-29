@@ -923,11 +923,24 @@ void runtest(int n, char const* filename1, char const* arg2)
     }
     else if (n == 17)
     {
-        // The input file to this test case is broken to exercise an
-        // error condition.
+        // The input file to this test case has a duplicated page.
+        QPDFObjectHandle page_kids =
+            pdf.getRoot().getKey("/Pages").getKey("/Kids");
+        assert(page_kids.getArrayItem(0).getObjGen() ==
+               page_kids.getArrayItem(1).getObjGen());
         std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
+        assert(pages.size() == 3);
+        assert(! (pages.at(0).getObjGen() == pages.at(1).getObjGen()));
+        assert(QPDFObjectHandle(pages.at(0)).getKey("/Contents").getObjGen() ==
+               QPDFObjectHandle(pages.at(1)).getKey("/Contents").getObjGen());
         pdf.removePage(pages.at(0));
-        std::cout << "you can't see this" << std::endl;
+        assert(pages.size() == 2);
+        PointerHolder<Buffer> b = QPDFObjectHandle(pages.at(0)).
+            getKey("/Contents").getStreamData();
+        std::string contents = std::string(
+            reinterpret_cast<char const*>(b->getBuffer()),
+            b->getSize());
+        assert(contents.find("page 0") != std::string::npos);
     }
     else if (n == 18)
     {

@@ -62,8 +62,18 @@ QPDF::getAllPagesInternal(QPDFObjectHandle cur_pages,
 
 void
 QPDF::getAllPagesInternal2(QPDFObjectHandle cur_pages,
-			  std::vector<QPDFObjectHandle>& result,
-                          std::set<QPDFObjGen>& visited)
+                           std::vector<QPDFObjectHandle>& result,
+                           std::set<QPDFObjGen>& visited)
+{
+    std::set<QPDFObjGen> seen;
+    getAllPagesInternal3(cur_pages, result, visited, seen);
+}
+
+void
+QPDF::getAllPagesInternal3(QPDFObjectHandle cur_pages,
+                           std::vector<QPDFObjectHandle>& result,
+                           std::set<QPDFObjGen>& visited,
+                           std::set<QPDFObjGen>& seen)
 {
     QPDFObjGen this_og = cur_pages.getObjGen();
     if (visited.count(this_og) > 0)
@@ -94,11 +104,21 @@ QPDF::getAllPagesInternal2(QPDFObjectHandle cur_pages,
 	int n = kids.getArrayNItems();
 	for (int i = 0; i < n; ++i)
 	{
-	    getAllPagesInternal2(kids.getArrayItem(i), result, visited);
+            QPDFObjectHandle kid = kids.getArrayItem(i);
+            if (seen.count(kid.getObjGen()))
+            {
+                // Make a copy of the page. This does the same as
+                // shallowCopyPage in QPDFPageObjectHelper.
+                QTC::TC("qpdf", "QPDF resolve duplicated page object");
+                kid = makeIndirectObject(QPDFObjectHandle(kid).shallowCopy());
+                kids.setArrayItem(i, kid);
+            }
+	    getAllPagesInternal3(kid, result, visited, seen);
 	}
     }
     else if (type == "/Page")
     {
+        seen.insert(this_og);
 	result.push_back(cur_pages);
     }
     else

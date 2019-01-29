@@ -4410,6 +4410,13 @@ print "\n";
           suite and properly handled.
          </para>
         </listitem>
+        <listitem>
+         <para>
+          Linearization and page manipulation APIs now detect and
+          recover from files that have duplicate Page objects in the
+          pages tree.
+         </para>
+        </listitem>
        </itemizedlist>
       </listitem>
       <listitem>

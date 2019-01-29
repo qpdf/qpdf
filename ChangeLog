@@ -1,3 +1,11 @@
+2019-01-28  Jay Berkenbilt  <ejb@ql.org>
+
+	* When linearizing or getting the list of all pages in a file,
+	replace duplicated page objects with a shallow copy of the page
+	object. Linearization and all page manipulation APIs require page
+	objects to be unique. Pages that were originally duplicated will
+	still share contents and any other indirect resources. Fixes #268.
+
 2019-01-26  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add --overlay and --underlay options. Fixes #207.

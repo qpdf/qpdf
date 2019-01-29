@@ -582,7 +582,7 @@ $td->runtest("check output",
 	     {$td->FILE => "page_api_1-out2.pdf"});
 $td->runtest("duplicate page",
 	     {$td->COMMAND => "test_driver 17 page_api_2.pdf"},
-	     {$td->FILE => "page_api_2.out", $td->EXIT_STATUS => 2},
+	     {$td->FILE => "page_api_2.out", $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("delete and re-add a page",
 	     {$td->COMMAND => "test_driver 18 page_api_1.pdf"},
@@ -1726,6 +1726,30 @@ foreach my $f (qw(screen print))
                  {$td->FILE => "a.pdf"},
                  {$td->FILE => "manual-appearances-$f-out.pdf"});
 }
+
+show_ntests();
+# ----------
+$td->notify("--- Duplicated Page Object ---");
+$n_tests += 4;
+
+$td->runtest("linearize duplicated pages",
+             {$td->COMMAND =>
+                  "qpdf --static-id --linearize" .
+                  " page_api_2.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("compare files",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "linearize-duplicate-page.pdf"});
+$td->runtest("extract duplicated pages",
+             {$td->COMMAND =>
+                  "qpdf --static-id page_api_2.pdf" .
+                  " --pages . -- a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("compare files",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "extract-duplicate-page.pdf"});
 
 show_ntests();
 # ----------

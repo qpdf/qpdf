@@ -156,6 +156,9 @@ QPDF::pushInheritedAttributesToPage(bool allow_changes, bool warn_skipped_keys)
         return;
     }
 
+    // Calling getAllPages() resolves any duplicated page objects.
+    getAllPages();
+
     // key_ancestors is a mapping of page attribute keys to a stack of
     // Pages nodes that contain values for them.
     std::map<std::string, std::vector<QPDFObjectHandle> > key_ancestors;

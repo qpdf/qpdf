@@ -527,15 +527,16 @@ class QPDF
     void optimize(std::map<int, int> const& object_stream_data,
 		  bool allow_changes = true);
 
-    // Traverse page tree return all /Page objects. For efficiency,
-    // this method returns a const reference to an internal vector of
-    // pages. Calls to addPage, addPageAt, and removePage safely
-    // update this, but directly manipulation of the pages three or
-    // pushing inheritable objects to the page level may invalidate
-    // it. See comments for updateAllPagesCache() for additional
-    // notes. Newer code should use
-    // QPDFPageDocumentHelper::getAllPages instead. The decision to
-    // expose this internal cache was arguably incorrect, but it is
+    // Traverse page tree return all /Page objects. It also detects
+    // and resolves cases in which the same /Page object is
+    // duplicated. For efficiency, this method returns a const
+    // reference to an internal vector of pages. Calls to addPage,
+    // addPageAt, and removePage safely update this, but directly
+    // manipulation of the pages three or pushing inheritable objects
+    // to the page level may invalidate it. See comments for
+    // updateAllPagesCache() for additional notes. Newer code should
+    // use QPDFPageDocumentHelper::getAllPages instead. The decision
+    // to expose this internal cache was arguably incorrect, but it is
     // being left here for compatibility. It is, however, completely
     // safe to use this for files that you are not modifying.
     QPDF_DLL
@@ -895,6 +896,10 @@ class QPDF
     void getAllPagesInternal2(QPDFObjectHandle cur_pages,
                               std::vector<QPDFObjectHandle>& result,
                               std::set<QPDFObjGen>& visited);
+    void getAllPagesInternal3(QPDFObjectHandle cur_pages,
+                              std::vector<QPDFObjectHandle>& result,
+                              std::set<QPDFObjGen>& visited,
+                              std::set<QPDFObjGen>& seen);
     void insertPage(QPDFObjectHandle newpage, int pos);
     int findPage(QPDFObjGen const& og);
     int findPage(QPDFObjectHandle& page);
