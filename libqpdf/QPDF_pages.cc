@@ -105,7 +105,13 @@ QPDF::getAllPagesInternal3(QPDFObjectHandle cur_pages,
 	for (int i = 0; i < n; ++i)
 	{
             QPDFObjectHandle kid = kids.getArrayItem(i);
-            if (seen.count(kid.getObjGen()))
+            if (! kid.isIndirect())
+            {
+                QTC::TC("qpdf", "QPDF handle direct page object");
+                kid = makeIndirectObject(kid);
+                kids.setArrayItem(i, kid);
+            }
+            else if (seen.count(kid.getObjGen()))
             {
                 // Make a copy of the page. This does the same as
                 // shallowCopyPage in QPDFPageObjectHelper.

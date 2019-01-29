@@ -429,3 +429,4 @@ QPDFPageObjectHelper non-trivial inheritance 0
 QPDFPageObjectHelper copy shared attribute 0
 qpdf from_nr from repeat_nr 0
 QPDF resolve duplicated page object 0
+QPDF handle direct page object 0
