@@ -4417,6 +4417,13 @@ print "\n";
           pages tree.
          </para>
         </listitem>
+        <listitem>
+         <para>
+          Using older option <option>--stream-data=compress</option>
+          with object streams, object streams and xref streams were
+          not compressed.
+         </para>
+        </listitem>
        </itemizedlist>
       </listitem>
       <listitem>

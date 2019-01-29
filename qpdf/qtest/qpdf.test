@@ -1435,7 +1435,7 @@ foreach my $d (
                       " $flags streams-with-newlines.pdf a.pdf"},
                  {$td->STRING => "", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
-    $td->runtest("check output",
+    $td->runtest("check output ($description)",
                  {$td->FILE => "a.pdf"},
                  {$td->FILE => "newline-before-endstream-$suffix.pdf"});
     if ($flags =~ /qdf/)
@@ -2461,7 +2461,7 @@ for (my $n = 16; $n <= 19; ++$n)
 show_ntests();
 # ----------
 $td->notify("--- Specific File Tests ---");
-$n_tests += 2;
+$n_tests += 4;
 
 # Special PDF files that caused problems at some point
 
@@ -2473,6 +2473,15 @@ $td->runtest("damaged stream (C)",
 	     {$td->COMMAND => "qpdf-ctest 2 damaged-stream.pdf '' a.pdf"},
 	     {$td->FILE => "damaged-stream-c-check.out", $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
+$td->runtest("compress objstm and xref",
+             {$td->COMMAND =>
+                  "qpdf --static-id --stream-data=compress".
+                  " --object-streams=generate minimal.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "compress-objstm-xref.pdf"});
 
 show_ntests();
 # ----------

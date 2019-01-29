@@ -9,10 +9,6 @@ Soon
    latter is appropriate when a page is being converted to a form
    XObject.
 
- * Look at the file for issue 271 (../misc/bugs/271/6059954.pdf) to
-   figure out why the compression is bad and see if I can do anything
-   about it.
-
 Next ABI
 ========
 

@@ -1,5 +1,9 @@
 2019-01-28  Jay Berkenbilt  <ejb@ql.org>
 
+	* Bug fix: when using --stream-data=compress, object streams and
+	xref streams were not compressed. They were compressed if no
+	--stream-data option was specified. Fixes #271.
+
 	* When linearizing or getting the list of all pages in a file,
 	replace duplicated page objects with a shallow copy of the page
 	object. Linearization and all page manipulation APIs require page
