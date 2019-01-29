@@ -73,7 +73,12 @@ class QPDFPageDocumentHelper: public QPDFDocumentHelper
     // indirect. If it is an indirect object from another QPDF, this
     // method will call pushInheritedAttributesToPage on the other
     // file and then copy the page to this QPDF using the same
-    // underlying code as copyForeignObject.
+    // underlying code as copyForeignObject. Note that you can call
+    // copyForeignObject directly to copy a page from a different
+    // file, but the resulting object will not be a page in the new
+    // file. You could do this, for example, to convert a page into a
+    // form XObject, though for that, you're better off using
+    // QPDFPageObjectHelper::getFormXObjectForPage.
     QPDF_DLL
     void addPage(QPDFPageObjectHelper newpage, bool first);
 

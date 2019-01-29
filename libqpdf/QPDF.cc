@@ -2141,14 +2141,18 @@ QPDF::replaceReserved(QPDFObjectHandle reserved,
 }
 
 QPDFObjectHandle
-QPDF::copyForeignObject(QPDFObjectHandle foreign)
+QPDF::copyForeignObject(QPDFObjectHandle foreign, bool)
 {
-    return copyForeignObject(foreign, false);
+    // This method will be removed next time the ABI is changed.
+    return copyForeignObject(foreign);
 }
 
 QPDFObjectHandle
-QPDF::copyForeignObject(QPDFObjectHandle foreign, bool allow_page)
+QPDF::copyForeignObject(QPDFObjectHandle foreign)
 {
+    // Do not preclude use of copyForeignObject on page objects. It is
+    // a documented use case to copy pages this way if the intention
+    // is to not update the pages tree.
     if (! foreign.isIndirect())
     {
         QTC::TC("qpdf", "QPDF copyForeign direct");

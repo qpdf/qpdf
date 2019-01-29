@@ -221,7 +221,7 @@ QPDF::insertPage(QPDFObjectHandle newpage, int pos)
     {
         QTC::TC("qpdf", "QPDF insert foreign page");
         newpage.getOwningQPDF()->pushInheritedAttributesToPage();
-        newpage = copyForeignObject(newpage, true);
+        newpage = copyForeignObject(newpage);
     }
     else
     {

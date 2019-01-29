@@ -301,12 +301,18 @@ class QPDF
     //
     // The return value of this method is an indirect reference to the
     // copied object in this file. This method is intended to be used
-    // to copy non-page objects and will not copy page objects. To
-    // copy page objects, pass the foreign page object directly to
-    // addPage (or addPageAt). If you copy objects that contain
-    // references to pages, you should copy the pages first using
-    // addPage(At). Otherwise references to the pages that have not
-    // been copied will be replaced with nulls.
+    // to copy non-page objects. To copy page objects, pass the
+    // foreign page object directly to addPage (or addPageAt). If you
+    // copy objects that contain references to pages, you should copy
+    // the pages first using addPage(At). Otherwise references to the
+    // pages that have not been copied will be replaced with nulls. It
+    // is possible to use copyForeignObject on page objects if you are
+    // not going to use them as pages. Doing so copies the object
+    // normally but does not update the page structure. For example,
+    // it is a valid use case to use copyForeignObject for a page that
+    // you are going to turn into a form XObject, though you can also
+    // use QPDFPageObjectHelper::getFormXObjectForPage for that
+    // purpose.
 
     // When copying objects with this method, object structure will be
     // preserved, so all indirectly referenced indirect objects will
@@ -930,9 +936,10 @@ class QPDF
 	QPDFObjectHandle& stream_dict, bool is_attachment_stream,
 	std::vector<PointerHolder<Pipeline> >& heap);
 
-    // Methods to support object copying
+    // Unused copyForeignObject -- remove at next ABI change
     QPDFObjectHandle copyForeignObject(
-        QPDFObjectHandle foreign, bool allow_page);
+        QPDFObjectHandle foreign, bool unused);
+    // Methods to support object copying
     void reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier,
                         bool top);
     QPDFObjectHandle replaceForeignIndirectObjects(
