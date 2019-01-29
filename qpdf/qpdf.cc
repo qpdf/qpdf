@@ -3767,7 +3767,6 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
     QPDFObjectHandle components_obj = dict.getKey("/BitsPerComponent");
     if (! (w_obj.isInteger() &&
            h_obj.isInteger() &&
-           colorspace_obj.isName() &&
            components_obj.isInteger()))
     {
         if (o.verbose && (! description.empty()))
@@ -3780,7 +3779,9 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
     }
     JDIMENSION w = w_obj.getIntValue();
     JDIMENSION h = h_obj.getIntValue();
-    std::string colorspace = colorspace_obj.getName();
+    std::string colorspace = (colorspace_obj.isName() ?
+                              colorspace_obj.getName() :
+                              "");
     int components = 0;
     J_COLOR_SPACE cs = JCS_UNKNOWN;
     if (colorspace == "/DeviceRGB")
@@ -3803,8 +3804,8 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
         if (o.verbose && (! description.empty()))
         {
             std::cout << whoami << ": " << description
-                      << ": not optimizing because of unsupported"
-                      << " image parameters" << std::endl;
+                      << ": not optimizing because qpdf can't optimize"
+                      << " images with this colorspace" << std::endl;
         }
         return result;
     }
