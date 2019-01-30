@@ -1746,7 +1746,11 @@ outfile.pdf</option>
         <option>--verbose</option>. See also the
         <option>--oi-min-width</option>,
         <option>--oi-min-height</option>, and
-        <option>--oi-min-area</option> options.
+        <option>--oi-min-area</option> options. By default, starting
+        in qpdf 8.4, inline images are converted to regular images
+        and optimized as well. Use
+        <option>--keep-inline-images</option> to prevent inline images
+        from being included.
        </para>
       </listitem>
      </varlistentry>
@@ -1777,6 +1781,43 @@ outfile.pdf</option>
         Avoid optimizing images whose pixel count
         (width&nbsp;×&nbsp;height) is below the specified amount. If
         omitted, the default is 16,384 pixels. Use 0 for no minimum.
+       </para>
+      </listitem>
+     </varlistentry>
+
+
+
+     <varlistentry>
+      <term><option>--externalize-inline-images</option></term>
+      <listitem>
+       <para>
+        Convert inline images to regular images. By default, images
+        whose data is at least 1,024 bytes are converted when this
+        option is selected. Use <option>--ii-min-bytes</option> to
+        change the size threshold. This option is implicitly selected
+        when <option>--optimize-images</option> is selected. Use
+        <option>--keep-inline-images</option> to exclude inline images
+        from image optimization.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--ii-min-bytes=<replaceable>bytes</replaceable></option></term>
+      <listitem>
+       <para>
+        Avoid converting inline images whose size is below the
+        specified minimum size to regular images. If omitted, the
+        default is 1,024 bytes. Use 0 for no minimum.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--keep-inline-images</option></term>
+      <listitem>
+       <para>
+        Prevent inline images from being included in image
+        optimization. This option has no affect when
+        <option>--optimize-images</option> is not specified.
        </para>
       </listitem>
      </varlistentry>
@@ -4323,6 +4364,18 @@ print "\n";
         </listitem>
         <listitem>
          <para>
+          New options <option>--externalize-inline-images</option>,
+          <option>--ii-min-bytes</option>, and
+          <option>--keep-inline-images</option> control qpdf's
+          handling of inline images and possible conversion of them to
+          regular images. By default,
+          <option>--optimize-images</option> now also applies to
+          inline images. These options are discussed in <xref
+          linkend="ref.advanced-transformation"/>.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
           Add options <option>--overlay</option> and
           <option>--underlay</option> for overlaying or underlaying
           pages of other files onto output pages. See <xref
@@ -4415,6 +4468,14 @@ print "\n";
           not compressed.
          </para>
         </listitem>
+        <listitem>
+         <para>
+          When the tokenizer returns inline image tokens, delimiters
+          following <literal>ID</literal> and <literal>EI</literal>
+          operators are no longer excluded. This makes it possible to
+          reliably extract the actual image data.
+         </para>
+        </listitem>
        </itemizedlist>
       </listitem>
       <listitem>
@@ -4422,6 +4483,13 @@ print "\n";
         Library Enhancements
        </para>
        <itemizedlist>
+        <listitem>
+         <para>
+          Add method
+          <function>QPDFPageObjectHelper::externalizeInlineImages</function>
+          to convert inline images to regular images.
+         </para>
+        </listitem>
         <listitem>
          <para>
           Add method

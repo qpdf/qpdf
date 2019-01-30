@@ -161,9 +161,12 @@ struct Options
         json(false),
         check(false),
         optimize_images(false),
+        externalize_inline_images(false),
+        keep_inline_images(false),
         oi_min_width(128),      // Default values for these
         oi_min_height(128),     // oi flags are in --help
         oi_min_area(16384),     // and in the manual.
+        ii_min_bytes(1024),     //
         underlay("underlay"),
         overlay("overlay"),
         under_overlay(0),
@@ -254,9 +257,12 @@ struct Options
     std::set<std::string> json_objects;
     bool check;
     bool optimize_images;
+    bool externalize_inline_images;
+    bool keep_inline_images;
     size_t oi_min_width;
     size_t oi_min_height;
     size_t oi_min_area;
+    size_t ii_min_bytes;
     UnderOverlay underlay;
     UnderOverlay overlay;
     UnderOverlay* under_overlay;
@@ -659,9 +665,12 @@ class ArgParser
     void argJsonObject(char* parameter);
     void argCheck();
     void argOptimizeImages();
+    void argExternalizeInlineImages();
+    void argKeepInlineImages();
     void argOiMinWidth(char* parameter);
     void argOiMinHeight(char* parameter);
     void argOiMinArea(char* parameter);
+    void argIiMinBytes(char* parameter);
     void arg40Print(char* parameter);
     void arg40Modify(char* parameter);
     void arg40Extract(char* parameter);
@@ -894,12 +903,17 @@ ArgParser::initOptionTable()
         &ArgParser::argJsonObject, "trailer|obj[,gen]");
     (*t)["check"] = oe_bare(&ArgParser::argCheck);
     (*t)["optimize-images"] = oe_bare(&ArgParser::argOptimizeImages);
+    (*t)["externalize-inline-images"] =
+        oe_bare(&ArgParser::argExternalizeInlineImages);
+    (*t)["keep-inline-images"] = oe_bare(&ArgParser::argKeepInlineImages);
     (*t)["oi-min-width"] = oe_requiredParameter(
         &ArgParser::argOiMinWidth, "minimum-width");
     (*t)["oi-min-height"] = oe_requiredParameter(
         &ArgParser::argOiMinHeight, "minimum-height");
     (*t)["oi-min-area"] = oe_requiredParameter(
         &ArgParser::argOiMinArea, "minimum-area");
+    (*t)["ii-min-bytes"] = oe_requiredParameter(
+        &ArgParser::argIiMinBytes, "minimum-bytes");
     (*t)["overlay"] = oe_bare(&ArgParser::argOverlay);
     (*t)["underlay"] = oe_bare(&ArgParser::argUnderlay);
 
@@ -1308,6 +1322,12 @@ ArgParser::argHelp()
         << "                          default is 128. Use 0 to mean no minimum\n"
         << "--oi-min-area=a           do not optimize images whose pixel count is below a\n"
         << "                          default is 16,384. Use 0 to mean no minimum\n"
+        << "--externalize-inline-images  convert inline images to regular images; by\n"
+        << "                          default, images of at least 1,024 bytes are\n"
+        << "                          externalized\n"
+        << "--ii-min-bytes=bytes      specify minimum size of inline images to be\n"
+        << "                          converted to regular images\n"
+        << "--keep-inline-images      exclude inline images from image optimization\n"
         << "--qdf                     turns on \"QDF mode\" (below)\n"
         << "--linearize-pass1=file    write intermediate pass of linearized file\n"
         << "                          for debugging\n"
@@ -1966,6 +1986,18 @@ ArgParser::argOptimizeImages()
 }
 
 void
+ArgParser::argExternalizeInlineImages()
+{
+    o.externalize_inline_images = true;
+}
+
+void
+ArgParser::argKeepInlineImages()
+{
+    o.keep_inline_images = true;
+}
+
+void
 ArgParser::argOiMinWidth(char* parameter)
 {
     o.oi_min_width = QUtil::string_to_int(parameter);
@@ -1981,6 +2013,12 @@ void
 ArgParser::argOiMinArea(char* parameter)
 {
     o.oi_min_area = QUtil::string_to_int(parameter);
+}
+
+void
+ArgParser::argIiMinBytes(char* parameter)
+{
+    o.ii_min_bytes = QUtil::string_to_int(parameter);
 }
 
 void
@@ -2933,6 +2971,10 @@ ArgParser::doFinalChecks()
     {
         usage("no output file may be given for this option");
     }
+    if (o.optimize_images && (! o.keep_inline_images))
+    {
+        o.externalize_inline_images = true;
+    }
 
     if (o.require_outfile && (strcmp(o.outfilename, "-") == 0))
     {
@@ -3764,10 +3806,7 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
     QPDFObjectHandle w_obj = dict.getKey("/Width");
     QPDFObjectHandle h_obj = dict.getKey("/Height");
     QPDFObjectHandle colorspace_obj = dict.getKey("/ColorSpace");
-    QPDFObjectHandle components_obj = dict.getKey("/BitsPerComponent");
-    if (! (w_obj.isInteger() &&
-           h_obj.isInteger() &&
-           components_obj.isInteger()))
+    if (! (w_obj.isNumber() && h_obj.isNumber()))
     {
         if (o.verbose && (! description.empty()))
         {
@@ -3777,8 +3816,12 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
         }
         return result;
     }
-    JDIMENSION w = w_obj.getIntValue();
-    JDIMENSION h = h_obj.getIntValue();
+    // Files have been seen in the wild whose width and height are
+    // floating point, which is goofy, but we can deal with it.
+    JDIMENSION w = static_cast<JDIMENSION>(
+        w_obj.isInteger() ? w_obj.getIntValue() : w_obj.getNumericValue());
+    JDIMENSION h = static_cast<JDIMENSION>(
+        h_obj.isInteger() ? h_obj.getIntValue() : h_obj.getNumericValue());
     std::string colorspace = (colorspace_obj.isName() ?
                               colorspace_obj.getName() :
                               "");
@@ -4198,6 +4241,16 @@ static void handle_under_overlay(QPDF& pdf, Options& o)
 static void handle_transformations(QPDF& pdf, Options& o)
 {
     QPDFPageDocumentHelper dh(pdf);
+    if (o.externalize_inline_images)
+    {
+        std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
+        for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
+             iter != pages.end(); ++iter)
+        {
+            QPDFPageObjectHelper& ph(*iter);
+            ph.externalizeInlineImages(o.ii_min_bytes);
+        }
+    }
     if (o.optimize_images)
     {
         int pageno = 0;

@@ -1,5 +1,17 @@
 2019-01-31  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add new options --externalize-inline-images, which converts
+	inline images larger than a specified size to regular images, and
+	--ii-min-bytes, which tweaks that size.
+
+	* When optimizing images, inline images are now included in the
+	optimization, first being converted to regular images. Use
+	--keep-inline-images to exclude them from optimization. Fixes #278.
+
+	* Add method QPDFPageObjectHelper::externalizeInlineImages, which
+	converts inline images whose size is at least a specified amount
+	to regular images.
+
 	* Remove traces of acroread, which hasn't been available in Linux
 	for a long time.
 

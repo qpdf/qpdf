@@ -1,0 +1,79 @@
+{
+  "pages": [
+    {
+      "contents": [
+        "7 0 R"
+      ],
+      "images": [
+        {
+          "bitspercomponent": 8,
+          "colorspace": "/DeviceRGB",
+          "decodeparms": [
+            null
+          ],
+          "filter": [
+            "/DCTDecode"
+          ],
+          "filterable": false,
+          "height": 56,
+          "name": "/IIm1",
+          "object": "8 0 R",
+          "width": 49
+        },
+        {
+          "bitspercomponent": 8,
+          "colorspace": "/DeviceRGB",
+          "decodeparms": [
+            null
+          ],
+          "filter": [
+            "/DCTDecode"
+          ],
+          "filterable": false,
+          "height": 675,
+          "name": "/IIm2",
+          "object": "9 0 R",
+          "width": 1200
+        },
+        {
+          "bitspercomponent": 8,
+          "colorspace": "/DeviceRGB",
+          "decodeparms": [
+            null
+          ],
+          "filter": [
+            "/DCTDecode"
+          ],
+          "filterable": false,
+          "height": 56,
+          "name": "/IIm3",
+          "object": "10 0 R",
+          "width": 49
+        },
+        {
+          "bitspercomponent": 8,
+          "colorspace": "/DeviceGray",
+          "decodeparms": [
+            null
+          ],
+          "filter": [
+            "/FlateDecode"
+          ],
+          "filterable": true,
+          "height": 8,
+          "name": "/IIm4",
+          "object": "11 0 R",
+          "width": 8
+        }
+      ],
+      "label": null,
+      "object": "4 0 R",
+      "outlines": [],
+      "pageposfrom1": 1
+    }
+  ],
+  "parameters": {
+    "decodelevel": "generalized"
+  },
+  "version": 1
+}

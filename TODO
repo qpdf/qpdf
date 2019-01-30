@@ -1,3 +1,8 @@
+Now
+===
+
+* Deal with compiler warnings
+
 Soon
 ====
 
@@ -95,23 +100,6 @@ NOTE: Some items in this list refer to files in my personal home
 directory or that are otherwise not publicly accessible. This includes
 things sent to me by email that are specifically not public. Even so,
 I find it useful to make reference to them in this list
-
- * Do something better for inline images (see #278)
-   * Figure out a way to add an expectInlineImage method that takes
-     the offset of the EI image so an external system can locate the
-     end tag. Hopefully Both QPDFObjectHandle and Pl_QPDFTokenizer can
-     do this. Somewhere we might want something that uses an input
-     source to do it, but for the pipeline, it will also have to be
-     possible to do it as we go.
-   * Improve location of EI to handle EI embedded in the image data;
-     consider trying to parse after EI and, if errors, keep looking.
-     Will have to look at what happens with random binary characters
-     regarding token type.
-   * Add a method to replace inline images with real images. Look at
-     existing code for adding new resources used with form XObjects
-     and reuse if possible
-   * Have image optimization replace inline images that are of more
-     than a certain size prior to optimizing
 
  * Add support for writing name and number trees
 

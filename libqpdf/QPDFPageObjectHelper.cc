@@ -2,6 +2,7 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/Pl_Concatenate.hh>
+#include <qpdf/Pl_Buffer.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFMatrix.hh>
@@ -34,6 +35,251 @@ ContentProvider::provideStreamData(int, int, Pipeline* p)
     from_page.getKey("/Contents").pipeContentStreams(
         &concat, description, all_description);
     concat.manualFinish();
+}
+
+class InlineImageTracker: public QPDFObjectHandle::TokenFilter
+{
+  public:
+    InlineImageTracker(QPDF*, size_t min_size, QPDFObjectHandle resources);
+    virtual ~InlineImageTracker()
+    {
+    }
+    virtual void handleToken(QPDFTokenizer::Token const&);
+    QPDFObjectHandle convertIIDict(QPDFObjectHandle odict);
+
+    QPDF* qpdf;
+    size_t min_size;
+    QPDFObjectHandle resources;
+    std::string dict_str;
+    std::string bi_str;
+    int min_suffix;
+    bool any_images;
+    enum { st_top, st_bi } state;
+};
+
+InlineImageTracker::InlineImageTracker(QPDF* qpdf, size_t min_size,
+                                       QPDFObjectHandle resources) :
+    qpdf(qpdf),
+    min_size(min_size),
+    resources(resources),
+    min_suffix(1),
+    any_images(false),
+    state(st_top)
+{
+}
+
+QPDFObjectHandle
+InlineImageTracker::convertIIDict(QPDFObjectHandle odict)
+{
+    QPDFObjectHandle dict = QPDFObjectHandle::newDictionary();
+    dict.replaceKey("/Type", QPDFObjectHandle::newName("/XObject"));
+    dict.replaceKey("/Subtype", QPDFObjectHandle::newName("/Image"));
+    std::set<std::string> keys = odict.getKeys();
+    for (std::set<std::string>::iterator iter = keys.begin();
+         iter != keys.end(); ++iter)
+    {
+        std::string key = *iter;
+        QPDFObjectHandle value = odict.getKey(key);
+        if (key == "/BPC")
+        {
+            key = "/BitsPerComponent";
+        }
+        else if (key == "/CS")
+        {
+            key = "/ColorSpace";
+        }
+        else if (key == "/D")
+        {
+            key = "/Decode";
+        }
+        else if (key == "/DP")
+        {
+            key = "/DecodeParms";
+        }
+        else if (key == "/F")
+        {
+            key = "/Filter";
+        }
+        else if (key == "/H")
+        {
+            key = "/Height";
+        }
+        else if (key == "/IM")
+        {
+            key = "/ImageMask";
+        }
+        else if (key == "/I")
+        {
+            key = "/Interpolate";
+        }
+        else if (key == "/W")
+        {
+            key = "/Width";
+        }
+
+        if (key == "/ColorSpace")
+        {
+            if (value.isName())
+            {
+                std::string name = value.getName();
+                if (name == "/G")
+                {
+                    name = "/DeviceGray";
+                }
+                else if (name == "/RGB")
+                {
+                    name = "/DeviceRGB";
+                }
+                else if (name == "/CMYK")
+                {
+                    name = "/DeviceCMYK";
+                }
+                else if (name == "/I")
+                {
+                    name = "/Indexed";
+                }
+                else
+                {
+                    name.clear();
+                }
+                if (! name.empty())
+                {
+                    value = QPDFObjectHandle::newName(name);
+                }
+            }
+        }
+        else if (key == "/Filter")
+        {
+            std::vector<QPDFObjectHandle> filters;
+            if (value.isName())
+            {
+                filters.push_back(value);
+            }
+            else if (value.isArray())
+            {
+                filters = value.getArrayAsVector();
+            }
+            for (std::vector<QPDFObjectHandle>::iterator iter =
+                     filters.begin();
+                 iter != filters.end(); ++iter)
+            {
+                std::string name;
+                if ((*iter).isName())
+                {
+                    name = (*iter).getName();
+                }
+                if (name == "/AHx")
+                {
+                    name = "/ASCIIHexDecode";
+                }
+                else if (name == "/A85")
+                {
+                    name = "/ASCII85Decode";
+                }
+                else if (name == "/LZW")
+                {
+                    name = "/LZWDecode";
+                }
+                else if (name == "/Fl")
+                {
+                    name = "/FlateDecode";
+                }
+                else if (name == "/RL")
+                {
+                    name = "/RunLengthDecode";
+                }
+                else if (name == "/CCF")
+                {
+                    name = "/CCITTFaxDecode";
+                }
+                else if (name == "/DCT")
+                {
+                    name = "/DCTDecode";
+                }
+                else
+                {
+                    name.clear();
+                }
+                if (! name.empty())
+                {
+                    *iter = QPDFObjectHandle::newName(name);
+                }
+            }
+            if (value.isName() && (filters.size() == 1))
+            {
+                value = filters.at(0);
+            }
+            else if (value.isArray())
+            {
+                value = QPDFObjectHandle::newArray(filters);
+            }
+        }
+        dict.replaceKey(key, value);
+    }
+    return dict;
+}
+
+void
+InlineImageTracker::handleToken(QPDFTokenizer::Token const& token)
+{
+    if (state == st_bi)
+    {
+        if (token.getType() == QPDFTokenizer::tt_inline_image)
+        {
+            std::string image_data(token.getValue());
+            size_t len = image_data.length();
+            // The token ends with delimiter followed by EI, so it
+            // will always be at least 3 bytes long. We want to
+            // exclude the EI and preceding delimiter.
+            len = (len >= 3 ? len - 3 : 0);
+            if (len >= this->min_size)
+            {
+                QTC::TC("qpdf", "QPDFPageObjectHelper externalize inline image");
+                Pl_Buffer b("image_data");
+                b.write(QUtil::unsigned_char_pointer(image_data), len);
+                b.finish();
+                QPDFObjectHandle dict =
+                    convertIIDict(QPDFObjectHandle::parse(dict_str));
+                dict.replaceKey("/Length", QPDFObjectHandle::newInteger(len));
+                std::string name = resources.getUniqueResourceName(
+                    "/IIm", this->min_suffix);
+                QPDFObjectHandle image = QPDFObjectHandle::newStream(
+                    this->qpdf, b.getBuffer());
+                image.replaceDict(dict);
+                resources.getKey("/XObject").replaceKey(name, image);
+                write(name);
+                write(" Do\n");
+                any_images = true;
+            }
+            else
+            {
+                QTC::TC("qpdf", "QPDFPageObjectHelper keep inline image");
+                write(bi_str);
+                writeToken(token);
+            }
+            state = st_top;
+        }
+        else if (token == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "ID"))
+        {
+            bi_str += token.getValue();
+            dict_str += " >>";
+        }
+        else
+        {
+            bi_str += token.getValue();
+            dict_str += token.getValue();
+        }
+    }
+    else if (token == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "BI"))
+    {
+        bi_str = token.getValue();
+        dict_str = "<< ";
+        state = st_bi;
+    }
+    else
+    {
+        writeToken(token);
+    }
 }
 
 QPDFPageObjectHelper::Members::~Members()
@@ -112,11 +358,30 @@ QPDFPageObjectHelper::getMediaBox(bool copy_if_shared)
     return getAttribute("/MediaBox", copy_if_shared);
 }
 
-
 std::map<std::string, QPDFObjectHandle>
 QPDFPageObjectHelper::getPageImages()
 {
     return this->oh.getPageImages();
+}
+
+void
+QPDFPageObjectHelper::externalizeInlineImages(size_t min_size)
+{
+    QPDFObjectHandle resources = getAttribute("/Resources", true);
+    // Calling mergeResources also ensures that /XObject becomes
+    // direct and is not shared with other pages.
+    resources.mergeResources(
+        QPDFObjectHandle::parse("<< /XObject << >> >>"));
+    InlineImageTracker iit(this->oh.getOwningQPDF(), min_size, resources);
+    Pl_Buffer b("new page content");
+    filterPageContents(&iit, &b);
+    if (iit.any_images)
+    {
+        getObjectHandle().replaceKey(
+            "/Contents",
+            QPDFObjectHandle::newStream(
+                this->oh.getOwningQPDF(), b.getBuffer()));
+    }
 }
 
 std::vector<QPDFAnnotationObjectHelper>

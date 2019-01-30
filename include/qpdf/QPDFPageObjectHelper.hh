@@ -73,6 +73,11 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     std::map<std::string, QPDFObjectHandle> getPageImages();
 
+    // Convert each inline image to an external (normal) image if the
+    // size is at least the specified number of bytes.
+    QPDF_DLL
+    void externalizeInlineImages(size_t min_size = 0);
+
     // Return the annotations in the page's "/Annots" list, if any. If
     // only_subtype is non-empty, only include annotations of the
     // given subtype.
