@@ -1,5 +1,9 @@
 2019-01-29  Jay Berkenbilt  <ejb@ql.org>
 
+	* Bug fix: when returning an inline image token, the tokenizer no
+	longer includes the delimiter that follows EI. The
+	QPDFObjectHandle created from the token was correct.
+
 	* Handle files with direct page objects, which is not allowed by
 	the PDF spec but has been seen in the wild. Fixes #164.
 

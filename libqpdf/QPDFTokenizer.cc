@@ -468,6 +468,7 @@ QPDFTokenizer::presentCharacter(char ch)
     }
     else if (this->m->state == st_inline_image)
     {
+        this->m->val += ch;
         size_t len = this->m->val.length();
         if ((len >= 4) &&
             isDelimiter(this->m->val.at(len-4)) &&
@@ -475,21 +476,17 @@ QPDFTokenizer::presentCharacter(char ch)
             (this->m->val.at(len-2) == 'I') &&
             isDelimiter(this->m->val.at(len-1)))
         {
+            this->m->val.erase(len - 1);
             this->m->type = tt_inline_image;
             this->m->unread_char = true;
             this->m->char_to_unread = ch;
             this->m->state = st_token_ready;
-        }
-        else
-        {
-            this->m->val += ch;
         }
     }
     else
     {
 	handled = false;
     }
-
 
     if (handled)
     {

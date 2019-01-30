@@ -1571,9 +1571,9 @@ QPDFObjectHandle::parseContentStream_data(
             else
             {
                 // Skip back over EI
-                input->seek(-3, SEEK_CUR);
+                input->seek(-2, SEEK_CUR);
                 std::string inline_image = t.getRawValue();
-                for (int i = 0; i < 4; ++i)
+                for (int i = 0; i < 3; ++i)
                 {
                     if (inline_image.length() > 0)
                     {
