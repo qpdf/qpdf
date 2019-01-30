@@ -198,6 +198,7 @@ class QPDFTokenizer
     void resolveLiteral();
     bool isSpace(char);
     bool isDelimiter(char);
+    void findEI(PointerHolder<InputSource> input);
 
     enum state_e {
         st_top, st_in_space, st_in_comment, st_in_string, st_lt, st_gt,

@@ -693,6 +693,26 @@ $td->runtest("check pass1 file",
 
 show_ntests();
 # ----------
+$td->notify("--- Inline Images ---");
+$n_tests += 2;
+
+# The file large-inline-image.pdf is a hand-crafted file with several
+# inline images of various sizes including one that is two megabytes,
+# encoded in base85, and has a base85-encoding that contains EI
+# surrounded by delimiters several times. This exercises the EI
+# detection code added in qpdf 8.4.
+
+$td->runtest("complex inline image parsing",
+             {$td->COMMAND =>
+                  "qpdf --qdf --static-id large-inline-image.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "large-inline-image.qdf"});
+
+show_ntests();
+# ----------
 $td->notify("--- Tokenizer ---");
 $n_tests += 5;
 

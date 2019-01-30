@@ -1,3 +1,15 @@
+2019-01-30  Jay Berkenbilt  <ejb@ql.org>
+
+	* Improve locating of an inline image's EI operator to correctly
+	handle the case of EI appearing inside the image data.
+
+	* Very low-level QPDFTokenizer API now includes an
+	expectInlineImage method that takes an input stream, enabling it
+	to locate an inline image's EI operator better. This is called
+	automatically everywhere within the qpdf library. Most user code
+	will never have to use the low-level tokenizer API. If you use
+	Pl_QPDFTokenizer, this will be done automatically for you.
+
 2019-01-29  Jay Berkenbilt  <ejb@ql.org>
 
 	* Bug fix: when returning an inline image token, the tokenizer no

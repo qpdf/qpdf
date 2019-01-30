@@ -430,6 +430,9 @@ QPDFPageObjectHelper copy shared attribute 0
 qpdf from_nr from repeat_nr 0
 QPDF resolve duplicated page object 0
 QPDF handle direct page object 0
+QPDFTokenizer finder found wrong word 0
+QPDFTokenizer finder word not preceded by delimiter 0
 QPDFTokenizer found EI the old way 0
 QPDFTokenizer found EI by byte count 0
 QPDFTokenizer inline image at EOF the old way 0
+QPDFTokenizer found EI after more than one try 0
