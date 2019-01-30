@@ -163,9 +163,11 @@ QPDF::pushInheritedAttributesToPage(bool allow_changes, bool warn_skipped_keys)
     // Pages nodes that contain values for them.
     std::map<std::string, std::vector<QPDFObjectHandle> > key_ancestors;
     this->m->all_pages.clear();
+    std::set<QPDFObjGen> visited;
     pushInheritedAttributesToPageInternal(
         this->m->trailer.getKey("/Root").getKey("/Pages"),
-        key_ancestors, this->m->all_pages, allow_changes, warn_skipped_keys);
+        key_ancestors, this->m->all_pages, allow_changes, warn_skipped_keys,
+        visited);
     if (! key_ancestors.empty())
     {
         throw std::logic_error(
@@ -177,19 +179,6 @@ QPDF::pushInheritedAttributesToPage(bool allow_changes, bool warn_skipped_keys)
 
 void
 QPDF::pushInheritedAttributesToPageInternal(
-    QPDFObjectHandle cur_pages,
-    std::map<std::string, std::vector<QPDFObjectHandle> >& key_ancestors,
-    std::vector<QPDFObjectHandle>& pages,
-    bool allow_changes, bool warn_skipped_keys)
-{
-    std::set<QPDFObjGen> visited;
-    pushInheritedAttributesToPageInternal2(
-        cur_pages, key_ancestors, pages, allow_changes,
-        warn_skipped_keys, visited);
-}
-
-void
-QPDF::pushInheritedAttributesToPageInternal2(
     QPDFObjectHandle cur_pages,
     std::map<std::string, std::vector<QPDFObjectHandle> >& key_ancestors,
     std::vector<QPDFObjectHandle>& pages,
@@ -291,7 +280,7 @@ QPDF::pushInheritedAttributesToPageInternal2(
 	int n = kids.getArrayNItems();
 	for (int i = 0; i < n; ++i)
 	{
-            pushInheritedAttributesToPageInternal2(
+            pushInheritedAttributesToPageInternal(
                 kids.getArrayItem(i), key_ancestors, pages,
                 allow_changes, warn_skipped_keys, visited);
 	}

@@ -898,14 +898,9 @@ class QPDF
     // methods to support page handling
 
     void getAllPagesInternal(QPDFObjectHandle cur_pages,
-			     std::vector<QPDFObjectHandle>& result);
-    void getAllPagesInternal2(QPDFObjectHandle cur_pages,
-                              std::vector<QPDFObjectHandle>& result,
-                              std::set<QPDFObjGen>& visited);
-    void getAllPagesInternal3(QPDFObjectHandle cur_pages,
-                              std::vector<QPDFObjectHandle>& result,
-                              std::set<QPDFObjGen>& visited,
-                              std::set<QPDFObjGen>& seen);
+                             std::vector<QPDFObjectHandle>& result,
+                             std::set<QPDFObjGen>& visited,
+                             std::set<QPDFObjGen>& seen);
     void insertPage(QPDFObjectHandle newpage, int pos);
     int findPage(QPDFObjGen const& og);
     int findPage(QPDFObjectHandle& page);
@@ -1290,11 +1285,6 @@ class QPDF
     void pushInheritedAttributesToPage(bool allow_changes,
                                        bool warn_skipped_keys);
     void pushInheritedAttributesToPageInternal(
-	QPDFObjectHandle,
-	std::map<std::string, std::vector<QPDFObjectHandle> >&,
-	std::vector<QPDFObjectHandle>& all_pages,
-	bool allow_changes, bool warn_skipped_keys);
-    void pushInheritedAttributesToPageInternal2(
 	QPDFObjectHandle,
 	std::map<std::string, std::vector<QPDFObjectHandle> >&,
 	std::vector<QPDFObjectHandle>& all_pages,

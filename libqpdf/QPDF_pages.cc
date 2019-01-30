@@ -47,33 +47,19 @@ QPDF::getAllPages()
     // initialize this->m->all_pages.
     if (this->m->all_pages.empty())
     {
-	getAllPagesInternal(getRoot().getKey("/Pages"), this->m->all_pages);
+        std::set<QPDFObjGen> visited;
+        std::set<QPDFObjGen> seen;
+	getAllPagesInternal(getRoot().getKey("/Pages"), this->m->all_pages,
+                            visited, seen);
     }
     return this->m->all_pages;
 }
 
 void
 QPDF::getAllPagesInternal(QPDFObjectHandle cur_pages,
-			  std::vector<QPDFObjectHandle>& result)
-{
-    std::set<QPDFObjGen> visited;
-    getAllPagesInternal2(cur_pages, result, visited);
-}
-
-void
-QPDF::getAllPagesInternal2(QPDFObjectHandle cur_pages,
-                           std::vector<QPDFObjectHandle>& result,
-                           std::set<QPDFObjGen>& visited)
-{
-    std::set<QPDFObjGen> seen;
-    getAllPagesInternal3(cur_pages, result, visited, seen);
-}
-
-void
-QPDF::getAllPagesInternal3(QPDFObjectHandle cur_pages,
-                           std::vector<QPDFObjectHandle>& result,
-                           std::set<QPDFObjGen>& visited,
-                           std::set<QPDFObjGen>& seen)
+                          std::vector<QPDFObjectHandle>& result,
+                          std::set<QPDFObjGen>& visited,
+                          std::set<QPDFObjGen>& seen)
 {
     QPDFObjGen this_og = cur_pages.getObjGen();
     if (visited.count(this_og) > 0)
@@ -119,7 +105,7 @@ QPDF::getAllPagesInternal3(QPDFObjectHandle cur_pages,
                 kid = makeIndirectObject(QPDFObjectHandle(kid).shallowCopy());
                 kids.setArrayItem(i, kid);
             }
-	    getAllPagesInternal3(kid, result, visited, seen);
+	    getAllPagesInternal(kid, result, visited, seen);
 	}
     }
     else if (type == "/Page")
