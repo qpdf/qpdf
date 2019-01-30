@@ -694,7 +694,7 @@ $td->runtest("check pass1 file",
 show_ntests();
 # ----------
 $td->notify("--- Tokenizer ---");
-$n_tests += 4;
+$n_tests += 5;
 
 $td->runtest("tokenizer with no ignorable",
              {$td->COMMAND => "test_tokenizer -no-ignorable tokens.pdf"},
@@ -703,6 +703,11 @@ $td->runtest("tokenizer with no ignorable",
 
 $td->runtest("tokenizer",
              {$td->COMMAND => "test_tokenizer tokens.pdf"},
+             {$td->FILE => "tokens.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("tokenizer with old inline image code",
+             {$td->COMMAND => "test_tokenizer -old-ei tokens.pdf"},
              {$td->FILE => "tokens.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 

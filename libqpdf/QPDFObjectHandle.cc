@@ -1558,7 +1558,7 @@ QPDFObjectHandle::parseContentStream_data(
             // terminated the token.  Read until end of inline image.
             char ch;
             input->read(&ch, 1);
-            tokenizer.expectInlineImage();
+            tokenizer.expectInlineImage(input);
             QPDFTokenizer::Token t =
                 tokenizer.readToken(input, description, true);
             if (t.getType() == QPDFTokenizer::tt_bad)

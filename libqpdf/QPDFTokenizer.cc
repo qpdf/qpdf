@@ -13,6 +13,79 @@
 #include <string.h>
 #include <cstdlib>
 
+static bool is_delimiter(char ch)
+{
+    return (strchr(" \t\n\v\f\r()<>[]{}/%", ch) != 0);
+}
+
+class QPDFWordTokenFinder: public InputSource::Finder
+{
+  public:
+    QPDFWordTokenFinder(PointerHolder<InputSource> is,
+                        std::string const& str) :
+        is(is),
+        str(str)
+    {
+    }
+    virtual ~QPDFWordTokenFinder()
+    {
+    }
+    virtual bool check();
+
+  private:
+    PointerHolder<InputSource> is;
+    std::string str;
+};
+
+bool
+QPDFWordTokenFinder::check()
+{
+    // Find a word token matching the given string, preceded by a
+    // delimiter, and followed by a delimiter or EOF.
+    QPDFTokenizer tokenizer;
+    QPDFTokenizer::Token t = tokenizer.readToken(is, "finder", true);
+    qpdf_offset_t pos = is->tell();
+    if (! (t == QPDFTokenizer::Token(QPDFTokenizer::tt_word, str)))
+    {
+///        QTC::TC("qpdf", "QPDFTokenizer finder found wrong word");
+        return false;
+    }
+    qpdf_offset_t token_start = is->getLastOffset();
+    char next;
+    bool next_okay = false;
+    if (is->read(&next, 1) == 0)
+    {
+        QTC::TC("qpdf", "QPDFTokenizer inline image at EOF");
+        next_okay = true;
+    }
+    else
+    {
+        next_okay = is_delimiter(next);
+    }
+    is->seek(pos, SEEK_SET);
+    if (! next_okay)
+    {
+///        QTC::TC("qpdf", "QPDFTokenizer finder word not followed by delimiter");
+        return false;
+    }
+    if (token_start == 0)
+    {
+        // Can't actually happen...we never start the search at the
+        // beginning of the input.
+        return false;
+    }
+    is->seek(token_start - 1, SEEK_SET);
+    char prev;
+    bool prev_okay = ((is->read(&prev, 1) == 1) && is_delimiter(prev));
+    is->seek(pos, SEEK_SET);
+    if (! prev_okay)
+    {
+///        QTC::TC("qpdf", "QPDFTokenizer finder word not preceded by delimiter");
+        return false;
+    }
+    return true;
+}
+
 QPDFTokenizer::Members::Members() :
     pound_special_in_name(true),
     allow_eof(false),
@@ -31,6 +104,7 @@ QPDFTokenizer::Members::reset()
     error_message = "";
     unread_char = false;
     char_to_unread = '\0';
+    inline_image_bytes = 0;
     string_depth = 0;
     string_ignoring_newline = false;
     last_char_was_bs = false;
@@ -91,7 +165,7 @@ QPDFTokenizer::isSpace(char ch)
 bool
 QPDFTokenizer::isDelimiter(char ch)
 {
-    return (strchr(" \t\n\v\f\r()<>[]{}/%", ch) != 0);
+    return is_delimiter(ch);
 }
 
 void
@@ -470,12 +544,21 @@ QPDFTokenizer::presentCharacter(char ch)
     {
         this->m->val += ch;
         size_t len = this->m->val.length();
-        if ((len >= 4) &&
-            isDelimiter(this->m->val.at(len-4)) &&
-            (this->m->val.at(len-3) == 'E') &&
-            (this->m->val.at(len-2) == 'I') &&
-            isDelimiter(this->m->val.at(len-1)))
+        if (len == this->m->inline_image_bytes)
         {
+            QTC::TC("qpdf", "QPDFTokenizer found EI by byte count");
+            this->m->type = tt_inline_image;
+            this->m->inline_image_bytes = 0;
+            this->m->state = st_token_ready;
+        }
+        else if ((this->m->inline_image_bytes == 0) &&
+                 (len >= 4) &&
+                 isDelimiter(this->m->val.at(len-4)) &&
+                 (this->m->val.at(len-3) == 'E') &&
+                 (this->m->val.at(len-2) == 'I') &&
+                 isDelimiter(this->m->val.at(len-1)))
+        {
+            QTC::TC("qpdf", "QPDFTokenizer found EI the old way");
             this->m->val.erase(len - 1);
             this->m->type = tt_inline_image;
             this->m->unread_char = true;
@@ -562,7 +645,7 @@ QPDFTokenizer::presentEOF()
             (this->m->val.at(len-2) == 'E') &&
             (this->m->val.at(len-1) == 'I'))
         {
-            QTC::TC("qpdf", "QPDFTokenizer inline image at EOF");
+            QTC::TC("qpdf", "QPDFTokenizer inline image at EOF the old way");
             this->m->type = tt_inline_image;
             this->m->state = st_token_ready;
         }
@@ -598,6 +681,26 @@ QPDFTokenizer::presentEOF()
 void
 QPDFTokenizer::expectInlineImage()
 {
+    expectInlineImage(PointerHolder<InputSource>());
+}
+
+void
+QPDFTokenizer::expectInlineImage(PointerHolder<InputSource> input)
+{
+    if (input.getPointer())
+    {
+        qpdf_offset_t last_offset = input->getLastOffset();
+        qpdf_offset_t pos = input->tell();
+
+        QPDFWordTokenFinder f(input, "EI");
+        if (input->findFirst("EI", pos, 0, f))
+        {
+            this->m->inline_image_bytes = input->tell() - pos;
+        }
+
+        input->seek(pos, SEEK_SET);
+        input->setLastOffset(last_offset);
+    }
     if (this->m->state != st_top)
     {
         throw std::logic_error("QPDFTokenizer::expectInlineImage called"

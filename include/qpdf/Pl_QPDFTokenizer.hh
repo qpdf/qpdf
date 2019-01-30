@@ -27,6 +27,7 @@
 #include <qpdf/QPDFTokenizer.hh>
 #include <qpdf/PointerHolder.hh>
 #include <qpdf/QPDFObjectHandle.hh>
+#include <qpdf/Pl_Buffer.hh>
 
 // Tokenize the incoming text using QPDFTokenizer and pass the tokens
 // in turn to a QPDFObjectHandle::TokenFilter object. All bytes of
@@ -56,9 +57,6 @@ class Pl_QPDFTokenizer: public Pipeline
     virtual void finish();
 
   private:
-    void processChar(char ch);
-    void checkUnread();
-
     class Members
     {
         friend class Pl_QPDFTokenizer;
@@ -73,9 +71,7 @@ class Pl_QPDFTokenizer: public Pipeline
 
         QPDFObjectHandle::TokenFilter* filter;
         QPDFTokenizer tokenizer;
-        bool last_char_was_cr;
-        bool unread_char;
-        char char_to_unread;
+        Pl_Buffer buf;
     };
     PointerHolder<Members> m;
 };

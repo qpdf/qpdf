@@ -178,7 +178,15 @@ class QPDFTokenizer
     // including the next EI token. After you call this method, the
     // next call to readToken (or the token created next time getToken
     // returns true) will either be tt_inline_image or tt_bad. This is
-    // the only way readToken returns a tt_inline_image token.
+    // the only way readToken returns a tt_inline_image token. The
+    // version of this method that takes a PointerHolder<InputSource>
+    // does a better job of locating the end of the inline image and
+    // should be used whenever the input source is available. It
+    // preserves both tell() and getLastOffset(). The version without
+    // the input source will always end the inline image the first
+    // time it sees something that looks like an EI operator.
+    QPDF_DLL
+    void expectInlineImage(PointerHolder<InputSource> input);
     QPDF_DLL
     void expectInlineImage();
 
@@ -223,6 +231,7 @@ class QPDFTokenizer
         std::string error_message;
         bool unread_char;
         char char_to_unread;
+        size_t inline_image_bytes;
 
         // State for strings
         int string_depth;
