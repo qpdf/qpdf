@@ -196,15 +196,6 @@
     ghostscript.
    </para>
    <para>
-    If Adobe Reader is installed as <command>acroread</command>, some
-    additional test cases will be enabled.  These test cases simply
-    verify that Adobe Reader can open the files that qpdf creates.
-    They require version 8.0 or newer to pass.  However, in order to
-    avoid having qpdf depend on non-free (as in liberty) software, the
-    test suite will still pass without Adobe reader, and the test
-    suite still exercises the full functionality of the software.
-   </para>
-   <para>
     Pre-built documentation is distributed with qpdf, so you should
     generally not need to rebuild the documentation.  In order to
     build the documentation from its docbook sources, you need the

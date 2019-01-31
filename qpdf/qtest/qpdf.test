@@ -30,18 +30,6 @@ if (defined($large_file_test_path))
     $large_file_test_path =~ s!\\!/!g;
 }
 
-my $have_acroread = 0;
-
-if ($compare_images)
-{
-    # check for working acroread
-    if (system("acroread -toPostScript -pairs good1.pdf a.ps" .
-               " >$devNull 2>&1") == 0)
-    {
-	$have_acroread = 1;
-    }
-}
-
 # These variables are used to store the total number of tests in the
 # test suite.  NOTE: qtest's requirement to indicate the number of
 # tests serves as a check that the test suite is operating properly.
@@ -56,12 +44,9 @@ if ($compare_images)
 # compare_pdfs generates depends on the value of $compare_images.
 my $n_compare_pdfs = 0;
 
-# This should be set to the number of times we call acroread.
-my $n_acroread = 0;
-
 # Each section of tests should increment this number by the number of
-# tests they generate excluding calls to acroread or compare_pdfs,
-# which are tracked separately by $n_compare_pdfs and $n_acroread.
+# tests they generate excluding calls to compare_pdfs, which are
+# tracked separately by $n_compare_pdfs.
 my $n_tests = 0;
 
 # Call show_ntests after each block of test cases.  In show_ntests,
@@ -3634,7 +3619,6 @@ my @flags = (["-qdf",						# 1
 
 $n_tests += 1 + (@files * @flags  * 2 * 3);
 $n_compare_pdfs += 1 + (@files * @flags * 2);
-$n_acroread += (@files * @flags * 2);
 
 foreach my $file (@files)
 {
@@ -3696,17 +3680,6 @@ foreach my $file (@files)
 			 $td->NORMALIZE_NEWLINES);
 
 	    compare_pdfs($file, "a.pdf");
-
-	    if ($have_acroread)
-	    {
-		# These tests require Adobe Reader > 7.x to work with
-		# encrypted files.
-		$td->runtest("check with Adobe Reader",
-			     {$td->COMMAND =>
-				  "acroread -toPostScript -pairs a.pdf 1.ps"},
-			     {$td->STRING => "",
-			      $td->EXIT_STATUS => 0});
-	    }
 	}
 	flush_tiff_cache();
     }
@@ -3889,10 +3862,6 @@ $td->report(calc_ntests());
 sub calc_ntests
 {
     my $result = $n_tests;
-    if ($have_acroread)
-    {
-	$result += $n_acroread;
-    }
     if ($compare_images)
     {
 	$result += 3 * ($n_compare_pdfs);

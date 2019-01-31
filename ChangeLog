@@ -1,3 +1,8 @@
+2019-01-31  Jay Berkenbilt  <ejb@ql.org>
+
+	* Remove traces of acroread, which hasn't been available in Linux
+	for a long time.
+
 2019-01-30  Jay Berkenbilt  <ejb@ql.org>
 
 	* Do not include space after ID operator in inline image data. The
