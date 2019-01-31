@@ -228,10 +228,6 @@ InlineImageTracker::handleToken(QPDFTokenizer::Token const& token)
         {
             std::string image_data(token.getValue());
             size_t len = image_data.length();
-            // The token ends with delimiter followed by EI, so it
-            // will always be at least 3 bytes long. We want to
-            // exclude the EI and preceding delimiter.
-            len = (len >= 3 ? len - 3 : 0);
             if (len >= this->min_size)
             {
                 QTC::TC("qpdf", "QPDFPageObjectHelper externalize inline image");
@@ -256,13 +252,17 @@ InlineImageTracker::handleToken(QPDFTokenizer::Token const& token)
                 QTC::TC("qpdf", "QPDFPageObjectHelper keep inline image");
                 write(bi_str);
                 writeToken(token);
+                state = st_top;
             }
-            state = st_top;
         }
         else if (token == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "ID"))
         {
             bi_str += token.getValue();
             dict_str += " >>";
+        }
+        else if (token == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "EI"))
+        {
+            state = st_top;
         }
         else
         {

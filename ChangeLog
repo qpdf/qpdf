@@ -26,10 +26,14 @@
 
 	* Very low-level QPDFTokenizer API now includes an
 	expectInlineImage method that takes an input stream, enabling it
-	to locate an inline image's EI operator better. This is called
+	to locate an inline image's EI operator better. When this method
+	is called, the inline image token returned will not contain the EI
+	operator and will contain correct image data. This is called
 	automatically everywhere within the qpdf library. Most user code
 	will never have to use the low-level tokenizer API. If you use
-	Pl_QPDFTokenizer, this will be done automatically for you.
+	Pl_QPDFTokenizer, this will be done automatically for you. If you
+	use the low-level API and call expectInlineImage, you should call
+	the new version.
 
 2019-01-29  Jay Berkenbilt  <ejb@ql.org>
 

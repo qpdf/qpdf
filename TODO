@@ -24,6 +24,9 @@ Do these things next time we have to break binary compatibility
  * Get rid of the version of QPDF::copyForeignObject with the bool
    unused parameter.
 
+ * Remove version of QPDFTokenizer::expectInlineImage with no
+   arguments.
+
 Lexical
 =======
 

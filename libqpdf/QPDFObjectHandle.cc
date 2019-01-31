@@ -1570,16 +1570,7 @@ QPDFObjectHandle::parseContentStream_data(
             }
             else
             {
-                // Skip back over EI
-                input->seek(-2, SEEK_CUR);
-                std::string inline_image = t.getRawValue();
-                for (int i = 0; i < 3; ++i)
-                {
-                    if (inline_image.length() > 0)
-                    {
-                        inline_image.erase(inline_image.length() - 1);
-                    }
-                }
+                std::string inline_image = t.getValue();
                 QTC::TC("qpdf", "QPDFObjectHandle inline image token");
                 callbacks->handleObject(
                     QPDFObjectHandle::newInlineImage(inline_image));

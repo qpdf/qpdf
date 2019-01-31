@@ -73,15 +73,6 @@ QPDFWordTokenFinder::check()
         // beginning of the input.
         return false;
     }
-    is->seek(token_start - 1, SEEK_SET);
-    char prev;
-    bool prev_okay = ((is->read(&prev, 1) == 1) && is_delimiter(prev));
-    is->seek(pos, SEEK_SET);
-    if (! prev_okay)
-    {
-        QTC::TC("qpdf", "QPDFTokenizer finder word not preceded by delimiter");
-        return false;
-    }
     return true;
 }
 
@@ -724,7 +715,7 @@ QPDFTokenizer::findEI(PointerHolder<InputSource> input)
         {
             break;
         }
-        this->m->inline_image_bytes = input->tell() - pos;
+        this->m->inline_image_bytes = input->tell() - pos - 2;
 
         QPDFTokenizer check;
         bool found_bad = false;

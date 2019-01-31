@@ -776,7 +776,7 @@ $td->runtest("tokenizer",
 
 $td->runtest("tokenizer with old inline image code",
              {$td->COMMAND => "test_tokenizer -old-ei tokens.pdf"},
-             {$td->FILE => "tokens.out", $td->EXIT_STATUS => 0},
+             {$td->FILE => "tokens-old-ei.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 $td->runtest("tokenizer with max_len",
