@@ -1,0 +1,3 @@
+qpdf: image /Im1 on page 1: not optimizing because image has other than 8 bits per component
+qpdf: image /Im2 on page 1: not optimizing because qpdf can't optimize images with this colorspace
+qpdf: wrote file a.pdf

@@ -437,3 +437,5 @@ QPDFTokenizer inline image at EOF the old way 0
 QPDFTokenizer found EI after more than one try 0
 QPDFPageObjectHelper externalize inline image 0
 QPDFPageObjectHelper keep inline image 0
+qpdf image optimize colorspace 0
+qpdf image optimize bits per component 0

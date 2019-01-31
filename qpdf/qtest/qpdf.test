@@ -2088,6 +2088,8 @@ my @image_opt = (
      '--oi-min-width=0 --oi-min-height=0 --oi-min-area=0 --ii-min-bytes=0'],
     ['large-inline-image', 'inline-images-keep-some', ''],
     ['large-inline-image', 'inline-images-keep-all', '--keep-inline-images'],
+    ['unsupported-optimization', 'unsupported',
+     '--oi-min-width=0 --oi-min-height=0 --oi-min-area=0'],
     );
 
 $n_tests += 2 * scalar(@image_opt);

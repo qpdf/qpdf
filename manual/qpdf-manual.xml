@@ -4456,6 +4456,13 @@ print "\n";
         </listitem>
         <listitem>
          <para>
+           When optimizing images, detect and refuse to optimize
+           images that can't be converted to JPEG because of bit depth
+           or color space.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
           Linearization and page manipulation APIs now detect and
           recover from files that have duplicate Page objects in the
           pages tree.

@@ -1,5 +1,9 @@
 2019-01-31  Jay Berkenbilt  <ejb@ql.org>
 
+	* Bug fix: do better pre-checks on images before optimizing;
+	refuse to optimize images that can't be converted to JPEG because
+	of colorspace or depth.
+
 	* Add new options --externalize-inline-images, which converts
 	inline images larger than a specified size to regular images, and
 	--ii-min-bytes, which tweaks that size.

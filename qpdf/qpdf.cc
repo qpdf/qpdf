@@ -3816,6 +3816,18 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
         }
         return result;
     }
+    QPDFObjectHandle components_obj = dict.getKey("/BitsPerComponent");
+    if (! (components_obj.isInteger() && (components_obj.getIntValue() == 8)))
+    {
+        QTC::TC("qpdf", "qpdf image optimize bits per component");
+        if (o.verbose && (! description.empty()))
+        {
+            std::cout << whoami << ": " << description
+                      << ": not optimizing because image has other than"
+                      << " 8 bits per component" << std::endl;
+        }
+        return result;
+    }
     // Files have been seen in the wild whose width and height are
     // floating point, which is goofy, but we can deal with it.
     JDIMENSION w = static_cast<JDIMENSION>(
@@ -3844,6 +3856,7 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
     }
     else
     {
+        QTC::TC("qpdf", "qpdf image optimize colorspace");
         if (o.verbose && (! description.empty()))
         {
             std::cout << whoami << ": " << description
