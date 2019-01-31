@@ -59,6 +59,12 @@ Pl_QPDFTokenizer::finish()
         else if ((token.getType() == QPDFTokenizer::tt_word) &&
                  (token.getValue() == "ID"))
         {
+            // Read the space after the ID.
+            char ch = ' ';
+            input->read(&ch, 1);
+            this->m->filter->handleToken(
+                QPDFTokenizer::Token(
+                    QPDFTokenizer::tt_space, std::string(1, ch)));
             QTC::TC("qpdf", "Pl_QPDFTokenizer found ID");
             this->m->tokenizer.expectInlineImage(input);
         }

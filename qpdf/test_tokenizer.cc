@@ -183,6 +183,8 @@ dump_tokens(PointerHolder<InputSource> is, std::string const& label,
         else if (skip_inline_images &&
                  (token == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "ID")))
         {
+            char ch;
+            is->read(&ch, 1);
             if (old_ei)
             {
                 tokenizer.expectInlineImage();
