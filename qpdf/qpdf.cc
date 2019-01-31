@@ -3817,7 +3817,7 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
         if (o.verbose && (! description.empty()))
         {
             std::cout << whoami << ": " << description
-                      << ": not optimizing because of image"
+                      << ": not optimizing because image"
                       << " is smaller than requested minimum dimensions"
                       << std::endl;
         }
