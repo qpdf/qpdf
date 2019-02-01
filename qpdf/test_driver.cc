@@ -1985,9 +1985,9 @@ void runtest(int n, char const* filename1, char const* arg2)
 
         // red pages are from pdf, blue pages are from pdf2
         // red pages always have stated rotation absolutely
-        // 56: blue pages are overlayed exactly on top of red pages
+        // 56: blue pages are overlaid exactly on top of red pages
         // 57: blue pages have stated rotation relative to red pages
-        // 58: blue pages have no rotation (absolutely upgright)
+        // 58: blue pages have no rotation (absolutely upright)
         // 59: blue pages have stated rotation absolutely
         bool handle_from_transformation = ((n == 57) || (n == 59));
         bool invert_to_transformation = ((n == 58) || (n == 59));

@@ -553,7 +553,7 @@ QPDFPageObjectHelper::shallowCopyPage()
     {
         throw std::runtime_error(
             "QPDFPageObjectHelper::shallowCopyPage"
-            " called with a direct objet");
+            " called with a direct object");
     }
     QPDFObjectHandle new_page = this->oh.shallowCopy();
     return QPDFPageObjectHelper(qpdf->makeIndirectObject(new_page));
@@ -623,7 +623,7 @@ QPDFPageObjectHelper::getFormXObjectForPage(bool handle_transformations)
     {
         throw std::runtime_error(
             "QPDFPageObjectHelper::getFormXObjectForPage"
-            " called with a direct objet");
+            " called with a direct object");
     }
     QPDFObjectHandle result = QPDFObjectHandle::newStream(qpdf);
     QPDFObjectHandle newdict = result.getDict();
@@ -690,7 +690,7 @@ QPDFPageObjectHelper::placeFormXObject(
     if (invert_transformations)
     {
         // tmatrix inverts scaling and rotation of the destination
-        // page. Applying this matrix allows the overlayed form
+        // page. Applying this matrix allows the overlaid form
         // XObject's to be absolute rather than relative to properties
         // of the destination page. tmatrix is part of the computed
         // transformation matrix.
@@ -713,7 +713,7 @@ QPDFPageObjectHelper::placeFormXObject(
     // to adjust this for scale and position.
 
     // Step 1: figure out what scale factor we need to make the form
-    // XObject's bnounding box fit within the destination rectangle.
+    // XObject's bounding box fit within the destination rectangle.
 
     // Transform bounding box
     QPDFObjectHandle::Rectangle bbox = bbox_obj.getArrayAsRectangle();

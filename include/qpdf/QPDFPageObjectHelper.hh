@@ -174,8 +174,8 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     // to be inserted into the same or a different QPDF object using
     // any of the addPage methods in QPDFPageDocumentHelper or QPDF.
     // Without calling one of those methods, the page will not be
-    // added anywhere. Thew new page object shares all content streams
-    // and indirect objet resources with the original page, so if you
+    // added anywhere. The new page object shares all content streams
+    // and indirect object resources with the original page, so if you
     // are going to modify the contents or other aspects of the page,
     // you will need to handling copying of the component parts
     // separately.

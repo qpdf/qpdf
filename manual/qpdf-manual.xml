@@ -266,7 +266,7 @@ make
        prevent you from accidentally forgetting to regenerate
        automatic files after modifying their sources. If your
        packaging environment automatically refreshes automatic files,
-       it can cause this check to fail. Supress qpdf's checks by
+       it can cause this check to fail. Suppress qpdf's checks by
        passing <option>--disable-check-autofiles</option> to
        <command>/.configure</command>. This is safe since qpdf's
        <command>autogen.sh</command> just runs autotools in the normal
@@ -1259,7 +1259,7 @@ outfile.pdf</option>
     output. The <option>--overlay</option> and
     <option>--underlay</option> options work the same way, except
     underlay pages are drawn underneath the page to which they are
-    applied, possibly obscured by the origial page, and overlay files
+    applied, possibly obscured by the original page, and overlay files
     are drawn on top of the page to which they are applied, possibly
     obscuring the page. You can combine overlay and underlay.
    </para>
@@ -4331,7 +4331,7 @@ print "\n";
              correctly receive them. In the past, they would have
              either been encoded as Windows code page 1252 (also known
              as &ldquo;Windows ANSI&rdquo; or as something
-             unintelligble. In almost all cases, qpdf is able to
+             unintelligible. In almost all cases, qpdf is able to
              properly interpret Unicode arguments now, whereas in the
              past, it would almost never interpret them properly. The
              result is that non-ASCII passwords given to the qpdf CLI
@@ -4425,7 +4425,7 @@ print "\n";
           encryption options <option>--assemble</option>,
           <option>--annotate</option>, <option>--form</option>, and
           <option>--modify-other</option> allow more fine-grained
-          granluarity in configuring options. Before, the
+          granularity in configuring options. Before, the
           <option>--modify</option> option only configured certain
           predefined groups of permissions.
          </para>
@@ -4573,7 +4573,7 @@ print "\n";
           Add method
           <function>QPDFPageObjectHelper::getAttribute</function> for
           retrieving an attribute from the page dictionary taking
-          inheritence into consideration, and optionally making a copy
+          inheritance into consideration, and optionally making a copy
           if your intention is to modify the attribute.
          </para>
         </listitem>
