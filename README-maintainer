@@ -85,9 +85,9 @@ RELEASE PREPARATION
 
 * Test for binary compatibility:
   * Check out the last release
-  * ./autogen.sh && ./configure --enable-werror && make -j$(nproc)
+  * ./configure --enable-werror && make -j$(nproc)
   * Check out the current version
-  * ./autogen.sh && ./configure --enable-werror && make -j$(nproc) build_libqpdf
+  * ./configure --enable-werror && make -j$(nproc) build_libqpdf
   * Checkout the last release
   * make -k check NO_REBUILD=1
 
@@ -137,8 +137,8 @@ chmod 555 *.AppImage
   `README-what-to-download.md` separately onto the download area if
   needed.
 
-* Ensure that the master branch has been to github. The rev-parse
-  command below should show the same commit hash for all its
+* Ensure that the master branch has been pushed to github. The
+  rev-parse command below should show the same commit hash for all its
   arguments. Create and push a signed tag. This should be run with
   HEAD pointing to the tip of master.
 
