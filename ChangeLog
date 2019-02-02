@@ -1,3 +1,7 @@
+2019-02-01  Jay Berkenbilt  <ejb@ql.org>
+
+	* 8.4.0: release
+
 2019-01-31  Jay Berkenbilt  <ejb@ql.org>
 
 	* Bug fix: do better pre-checks on images before optimizing;
