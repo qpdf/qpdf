@@ -107,7 +107,7 @@ my $color_emph = "";
 # MSWin32 support
 my $in_windows = 0;
 my $winbin = undef;
-if ($^O eq 'MSWin32')
+if (($^O eq 'MSWin32') || ($^O eq 'msys'))
 {
     $in_windows = 1;
 }
@@ -784,6 +784,10 @@ sub runtest
 	    binmode F;
 	    while (<$in>)
 	    {
+                if ($flags & $rep->NORMALIZE_NEWLINES)
+                {
+                    s/\r$//;
+                }
 		print F;
 	    }
 	    $in->close();

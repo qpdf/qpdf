@@ -11,30 +11,9 @@ cleanup();
 
 my $td = new TestDriver('create');
 
-# This test is fragile on Windows for unknown reasons. Sometimes the
-# output of the command is truncated even though it works and exits
-# normally.
-
-for (my $i = 0; $i < 5; ++$i)
-{
-    unlink "tmp.out";
-    if ((system("pdf-create a.pdf > tmp.out") == 0) &&
-        open(F, "<check.tmpout"))
-    {
-        local $/ = undef;
-        my $text = <F>;
-        close(F);
-        if ($text =~ m/passed/)
-        {
-            last;
-        }
-    }
-    sleep 1;
-}
-
 $td->runtest("create a simple PDF",
-	     {$td->FILE => "tmp.out"},
-	     {$td->FILE => "create.out"},
+	     {$td->COMMAND => "pdf-create a.pdf"},
+	     {$td->FILE => "create.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 cleanup();

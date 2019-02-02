@@ -3724,36 +3724,10 @@ foreach my $file (@files)
 			 {$td->STRING => "",
 			  $td->EXIT_STATUS => 0});
 
-            # This test is fragile on Windows for unknown reasons.
-            # Sometimes the output of qpdf --check is truncated yet
-            # qpdf --check still exits normally. As a workaround, try
-            # writing the output of qpdf --check to a file and test
-            # for truncation. If we get a non-truncated output, use
-            # that output as the test input. If this loop fails to
-            # produce a non-truncated output, the truncated or
-            # otherwise incorrect output will still be used as the
-            # test input, so the test will fail as it should. We lose
-            # a check of qpdf --check's output, but it's not important
-            # for this test to verify that.
-            unlink "check.tmpout";
-            for (my $i = 0; $i < 5; ++$i)
-            {
-                if ((system("qpdf --check a.pdf > check.tmpout") == 0) &&
-                    open(F, "<check.tmpout"))
-                {
-                    local $/ = undef;
-                    my $text = <F>;
-                    close(F);
-                    if ($text =~ m/No syntax or stream/)
-                    {
-                        last;
-                    }
-                }
-                sleep 1;
-            }
 	    $td->runtest("check status",
-			 {$td->FILE => "check.tmpout"},
-			 {$td->FILE => "$base.$n$osuf.check"},
+			 {$td->COMMAND => "qpdf --check a.pdf"},
+			 {$td->FILE => "$base.$n$osuf.check",
+                              $td->EXIT_STATUS => 0},
 			 $td->NORMALIZE_NEWLINES);
 
 	    $td->runtest("check with C API",

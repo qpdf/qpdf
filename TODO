@@ -3,13 +3,6 @@ Soon
 
  * Set up OSS-Fuzz (Google). See starred email in qpdf label.
 
- * Get to the bottom of Windows test fragility. The symptom is that
-   sometimes the output of a command is truncated even though the
-   command ran successfully. I strongly suspect it has to do with
-   TestDriver->winrun and/or use of temporary files in qtest for
-   Windows. If found, remove workarounds. Search for sleep to find
-   them.
-
 Next ABI
 ========
 
