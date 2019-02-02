@@ -1,5 +1,7 @@
 ROUTINE DEVELOPMENT
 
+**Remember to check pull requests as well as issues in github.**
+
 Default:
 
 ./configure --enable-werror --disable-shared
@@ -32,7 +34,8 @@ RELEASE PREPARATION
   search for copyright. Don't forget copyright in manual. Also update
   debian copyright in debian package. Last updated: 2019.
 
-* Check all open issues in the sourceforge trackers and on github.
+* Check all open issues and pull requests in github and the
+  sourceforge trackers.
 
 * Check `TODO` file to make sure all planned items for the release are
   done or retargeted.
