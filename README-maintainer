@@ -157,7 +157,7 @@ git push upstream release-qpdf-$version
 
 # Create release
 TOKEN=$(cat ~/.github-token)
-function gcurl() { curl -H "Authorization: token $TOKEN" ${1+"$@"} }
+function gcurl() { curl -H "Authorization: token $TOKEN" ${1+"$@"}; }
 url=$(gcurl -s -XPOST https://api.github.com/repos/qpdf/qpdf/releases -d'{"tag_name": "release-qpdf-'$version'", "name": "qpdf '$version'", "draft": true}' | jq -r '.url')
 
 # Get upload url
