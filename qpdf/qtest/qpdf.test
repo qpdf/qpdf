@@ -180,6 +180,16 @@ $td->runtest("check final version",
 
 show_ntests();
 # ----------
+$td->notify("--- Exceptions ---");
+$n_tests += 1;
+
+$td->runtest("check exception handling",
+             {$td->COMMAND => "test_driver 61 -"},
+             {$td->FILE => "exceptions.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+show_ntests();
+# ----------
 $td->notify("--- Dangling Refs ---");
 my @dangling = (qw(minimal dangling-refs));
 $n_tests += 2 * scalar(@dangling);

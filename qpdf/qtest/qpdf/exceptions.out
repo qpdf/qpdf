@@ -1,0 +1,5 @@
+Caught QPDFExc as expected
+Caught QPDFSystemError as expected
+Caught logic_error as expected
+Caught runtime_error as expected
+test 61 done

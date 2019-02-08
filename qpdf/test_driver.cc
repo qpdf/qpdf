@@ -16,6 +16,7 @@
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/Pl_Flate.hh>
 #include <qpdf/QPDFWriter.hh>
+#include <qpdf/QPDFSystemError.hh>
 #include <iostream>
 #include <sstream>
 #include <algorithm>
@@ -268,6 +269,10 @@ void runtest(int n, char const* filename1, char const* arg2)
         }
 	pdf.processMemoryFile((std::string(filename1) + ".pdf").c_str(),
                               p, size);
+    }
+    else if (n == 61)
+    {
+        // Ignore filename argument entirely
     }
     else if (n % 2 == 0)
     {
@@ -2045,6 +2050,45 @@ void runtest(int n, char const* filename1, char const* arg2)
         QPDFWriter w(pdf, "a.pdf");
         w.setStaticID(true);
         w.write();
+    }
+    else if (n == 61)
+    {
+        // Test to make sure exceptions can be caught properly across
+        // shared library boundaries.
+	pdf.setAttemptRecovery(false);
+        pdf.setSuppressWarnings(true);
+        try
+        {
+            pdf.processMemoryFile("empty", "", 0);
+        }
+        catch (QPDFExc& e)
+        {
+            std::cout << "Caught QPDFExc as expected" << std::endl;
+        }
+        try
+        {
+            QUtil::safe_fopen("/does/not/exist", "r");
+        }
+        catch (QPDFSystemError& e)
+        {
+            std::cout << "Caught QPDFSystemError as expected" << std::endl;
+        }
+        try
+        {
+            QUtil::int_to_string_base(0, 12);
+        }
+        catch (std::logic_error& e)
+        {
+            std::cout << "Caught logic_error as expected" << std::endl;
+        }
+        try
+        {
+            QUtil::toUTF8(0xffffffff);
+        }
+        catch (std::runtime_error& e)
+        {
+            std::cout << "Caught runtime_error as expected" << std::endl;
+        }
     }
     else
     {
