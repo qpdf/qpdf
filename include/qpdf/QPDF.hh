@@ -33,6 +33,7 @@
 #include <vector>
 
 #include <qpdf/QPDFExc.hh>
+#include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFObjGen.hh>
 #include <qpdf/QPDFXRefEntry.hh>
 #include <qpdf/QPDFObjectHandle.hh>
