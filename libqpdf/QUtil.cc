@@ -529,7 +529,9 @@ QUtil::hex_decode(std::string const& input)
 void
 QUtil::binary_stdout()
 {
-#ifdef _WIN32
+#if defined(_WIN32) && defined(__BORLANDC__)
+     setmode(_fileno(stdout), _O_BINARY);
+#elif defined(_WIN32)
     _setmode(_fileno(stdout), _O_BINARY);
 #endif
 }
@@ -537,7 +539,9 @@ QUtil::binary_stdout()
 void
 QUtil::binary_stdin()
 {
-#ifdef _WIN32
+#if defined(_WIN32) && defined(__BORLANDC__)
+     setmode(_fileno(stdin), _O_BINARY);
+#elif defined(_WIN32)
     _setmode(_fileno(stdin), _O_BINARY);
 #endif
 }
@@ -918,7 +922,9 @@ QUtil::read_lines_from_file(std::istream& in)
 int
 QUtil::strcasecmp(char const *s1, char const *s2)
 {
-#ifdef _WIN32
+#if defined(_WIN32) && defined(__BORLANDC__)
+    return stricmp(s1, s2);
+#elif defined(_WIN32)
     return _stricmp(s1, s2);
 #else
     return ::strcasecmp(s1, s2);
