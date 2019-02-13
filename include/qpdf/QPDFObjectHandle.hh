@@ -1028,6 +1028,7 @@ class QPDFObjectHandle
 
     class Members
     {
+        friend class ObjAccessor;
         friend class QPDFObjectHandle;
 
       public:
