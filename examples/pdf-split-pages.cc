@@ -49,7 +49,7 @@ static void process(char const* whoami,
 void usage()
 {
     std::cerr << "Usage: " << whoami << " infile outprefix" << std::endl;
-    exit(2);
+    std::exit(2);
 }
 
 int main(int argc, char* argv[])
