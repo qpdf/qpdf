@@ -30,6 +30,7 @@
 #include <map>
 #include <list>
 #include <iostream>
+#include <vector>
 
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFObjGen.hh>
