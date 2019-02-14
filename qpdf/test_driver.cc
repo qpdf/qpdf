@@ -1631,7 +1631,7 @@ void runtest(int n, char const* filename1, char const* arg2)
                 QPDFFormFieldObjectHelper parent(node.getParent());
                 std::cout << "  Parent: "
                           << (parent.isNull()
-                              ? "none"
+                              ? std::string("none")
                               : parent.getObjectHandle().unparse())
                           << std::endl;
                 node = parent;
