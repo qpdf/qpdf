@@ -1689,7 +1689,7 @@ $td->runtest("disable keep files open",
 $td->runtest("don't disable keep files open",
              {$td->COMMAND =>
                   "qpdf --verbose --static-id --empty" .
-                  " --pages 1*kfo.pdf -- a.pdf"},
+                  " --pages 11*kfo.pdf -- a.pdf"},
              {$td->FILE => "enable-kfo.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("explict keep files open",
