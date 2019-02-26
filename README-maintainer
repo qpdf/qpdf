@@ -129,7 +129,7 @@ gpg --detach-sign --armor qpdf-$version.tar.gz
 \rm -f *.{md5,sha1,sha512}
 files=(*)
 for i in md5 sha1 sha512; do
-  ${i}sum $files >| qpdf-$version.$i
+  ${i}sum ${files[*]} >| qpdf-$version.$i
   gpg --clearsign --armor qpdf-$version.$i
   mv qpdf-$version.$i.asc qpdf-$version.$i
 done
