@@ -26,7 +26,11 @@
 #if defined(_WIN32) && defined(DLL_EXPORT)
 # define QPDF_DLL __declspec(dllexport)
 #else
-# define QPDF_DLL
+  #if __GNUC__ >= 4
+    #define QPDF_DLL __attribute__ ((visibility ("default")))
+  #else
+    #define QPDF_DLL
+  #endif
 #endif
 
 #endif /* QPDF_DLL_HH */

@@ -29,7 +29,7 @@
 #include <string>
 #include <stdexcept>
 
-class QPDFExc: public std::runtime_error
+class QPDF_DLL QPDFExc: public std::runtime_error
 {
   public:
     QPDF_DLL
