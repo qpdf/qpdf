@@ -3836,7 +3836,7 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
         h_obj.isInteger() ? h_obj.getIntValue() : h_obj.getNumericValue());
     std::string colorspace = (colorspace_obj.isName() ?
                               colorspace_obj.getName() :
-                              "");
+                              std::string());
     int components = 0;
     J_COLOR_SPACE cs = JCS_UNKNOWN;
     if (colorspace == "/DeviceRGB")
