@@ -28,6 +28,9 @@ Do these things next time we have to break binary compatibility
  * Remove version of QPDFTokenizer::expectInlineImage with no
    arguments.
 
+ * Consider whether to build with -fvisibility=hidden by default. See
+   #302 for discussion.
+
 Lexical
 =======
 
