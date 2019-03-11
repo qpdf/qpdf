@@ -1,3 +1,8 @@
+2019-03-11  Jay Berkenbilt  <ejb@ql.org>
+
+	* JSON serialization: add missing leading 0 to decimal values
+	between -1 and 1. Fixes #308.
+
 2019-02-01  Jay Berkenbilt  <ejb@ql.org>
 
 	* 8.4.0: release

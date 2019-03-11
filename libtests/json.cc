@@ -3,7 +3,7 @@
 #include <iostream>
 #include <assert.h>
 
-static void check(JSON& j, std::string const& exp)
+static void check(JSON const& j, std::string const& exp)
 {
     if (exp != j.unparse())
     {
@@ -69,6 +69,10 @@ static void test_main()
           "  ],\n"
           "  \"yes\": false\n"
           "}");
+    check(QPDFObjectHandle::newReal("0.12").getJSON(), "0.12");
+    check(QPDFObjectHandle::newReal(".34").getJSON(), "0.34");
+    check(QPDFObjectHandle::newReal("-0.56").getJSON(), "-0.56");
+    check(QPDFObjectHandle::newReal("-.78").getJSON(), "-0.78");
 }
 
 static void check_schema(JSON& obj, JSON& schema, bool exp,
