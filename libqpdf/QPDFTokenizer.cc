@@ -10,8 +10,8 @@
 #include <qpdf/QPDFObjectHandle.hh>
 
 #include <stdexcept>
+#include <stdlib.h>
 #include <string.h>
-#include <cstdlib>
 
 static bool is_delimiter(char ch)
 {
@@ -180,7 +180,7 @@ QPDFTokenizer::resolveLiteral()
                     num[0] = p[1];
                     num[1] = p[2];
                     num[2] = '\0';
-                    char ch = static_cast<char>(std::strtol(num, 0, 16));
+                    char ch = static_cast<char>(strtol(num, 0, 16));
                     if (ch == '\0')
                     {
                         this->m->type = tt_bad;
@@ -412,7 +412,7 @@ QPDFTokenizer::presentCharacter(char ch)
 	    // We've accumulated \ddd.  PDF Spec says to ignore
 	    // high-order overflow.
 	    this->m->val += static_cast<char>(
-                std::strtol(this->m->bs_num_register, 0, 8));
+                strtol(this->m->bs_num_register, 0, 8));
 	    memset(this->m->bs_num_register, '\0',
                    sizeof(this->m->bs_num_register));
 	    bs_num_count = 0;
@@ -584,7 +584,7 @@ QPDFTokenizer::presentCharacter(char ch)
 	    {
 		num[0] = this->m->val.at(i);
 		num[1] = this->m->val.at(i+1);
-		char nch = static_cast<char>(std::strtol(num, 0, 16));
+		char nch = static_cast<char>(strtol(num, 0, 16));
 		nval += nch;
 	    }
 	    this->m->val = nval;

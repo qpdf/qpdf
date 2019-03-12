@@ -8,9 +8,10 @@
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QUtil.hh>
-#include <string>
+
 #include <iostream>
-#include <cstdlib>
+#include <stdlib.h>
+#include <string>
 
 static char const* whoami = 0;
 static bool static_id = false;
@@ -49,7 +50,7 @@ static void process(char const* whoami,
 void usage()
 {
     std::cerr << "Usage: " << whoami << " infile outprefix" << std::endl;
-    std::exit(2);
+    exit(2);
 }
 
 int main(int argc, char* argv[])
