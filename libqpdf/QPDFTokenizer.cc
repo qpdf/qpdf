@@ -10,8 +10,8 @@
 #include <qpdf/QPDFObjectHandle.hh>
 
 #include <stdexcept>
+#include <stdlib.h>
 #include <string.h>
-#include <cstdlib>
 
 static bool is_delimiter(char ch)
 {

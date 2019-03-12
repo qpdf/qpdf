@@ -2,10 +2,11 @@
 
 #include <qpdf/QUtil.hh>
 #include <qpdf/QTC.hh>
+
 #include <setjmp.h>
-#include <string>
 #include <stdexcept>
-#include <cstdlib>
+#include <stdlib.h>
+#include <string>
 
 #if BITS_IN_JSAMPLE != 8
 # error "qpdf does not support libjpeg built with BITS_IN_JSAMPLE != 8"
