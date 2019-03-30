@@ -31,6 +31,12 @@ Do these things next time we have to break binary compatibility
  * Consider whether to build with -fvisibility=hidden by default. See
    #302 for discussion.
 
+ * Consider dealing with integer sizes in the API. Build with
+   -Wconversion -Wsign-conversion to see warnings. We won't be able to
+   resolve all, but we can possibly convert some things from int to
+   either size_t or qpdf_offset_t. Only do this if it doesn't break
+   source compatibility.
+
 Lexical
 =======
 
