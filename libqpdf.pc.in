@@ -8,4 +8,4 @@ Description: PDF transformation library
 Version: @PACKAGE_VERSION@
 Requires.private: zlib, libjpeg
 Libs: -L${libdir} -lqpdf
-Cflags: -I${includedir}
+Cflags: -I${includedir}/libqpdf
