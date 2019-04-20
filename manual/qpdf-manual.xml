@@ -1826,7 +1826,8 @@ outfile.pdf</option>
       <listitem>
        <para>
         Turns on QDF mode.  For additional information on QDF, please
-        see <xref linkend="ref.qdf"/>.
+        see <xref linkend="ref.qdf"/>. Note that
+        <option>--linearize</option> disables QDF mode.
        </para>
       </listitem>
      </varlistentry>
@@ -2364,7 +2365,9 @@ outfile.pdf</option>
    some restrictions, in an ordinary text editor.  This can be very
    useful for experimenting with different PDF constructs or for
    making one-off edits to PDF files (though there are other reasons
-   why this may not always work).
+   why this may not always work). Note that QDF mode does not support
+   linearized files. If you enable linearization, QDF mode is
+   automatically disabled.
   </para>
   <para>
    It is ordinarily very difficult to edit PDF files in a text editor
