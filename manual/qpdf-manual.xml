@@ -1797,9 +1797,6 @@ outfile.pdf</option>
        </para>
       </listitem>
      </varlistentry>
-
-
-
      <varlistentry>
       <term><option>--externalize-inline-images</option></term>
       <listitem>
@@ -1831,6 +1828,14 @@ outfile.pdf</option>
         Prevent inline images from being included in image
         optimization. This option has no affect when
         <option>--optimize-images</option> is not specified.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--remove-page-labels</option></term>
+      <listitem>
+       <para>
+        Remove page labels from the output file.
        </para>
       </listitem>
      </varlistentry>

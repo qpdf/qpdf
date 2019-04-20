@@ -1,5 +1,12 @@
 2019-04-20  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add parameter --remove-page-labels to remove page labels from
+	output. In qpdf 8.3.0, the behavior changed so that page labels
+	were preserved when merging and splitting files. Some users were
+	relying on the fact that if you ran qpdf --empty --pages ... all
+	page labels were dropped. This option makes it possible to get
+	that behavior if it is explicitly desired. Fixes #317.
+
 	* Add parameter --keep-files-open-threshold to override the
 	maximum number of files that qpdf will allow to be kept open at
 	once. Fixes #288.

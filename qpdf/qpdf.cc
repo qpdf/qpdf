@@ -164,6 +164,7 @@ struct Options
         optimize_images(false),
         externalize_inline_images(false),
         keep_inline_images(false),
+        remove_page_labels(false),
         oi_min_width(128),      // Default values for these
         oi_min_height(128),     // oi flags are in --help
         oi_min_area(16384),     // and in the manual.
@@ -261,6 +262,7 @@ struct Options
     bool optimize_images;
     bool externalize_inline_images;
     bool keep_inline_images;
+    bool remove_page_labels;
     size_t oi_min_width;
     size_t oi_min_height;
     size_t oi_min_area;
@@ -670,6 +672,7 @@ class ArgParser
     void argOptimizeImages();
     void argExternalizeInlineImages();
     void argKeepInlineImages();
+    void argRemovePageLabels();
     void argOiMinWidth(char* parameter);
     void argOiMinHeight(char* parameter);
     void argOiMinArea(char* parameter);
@@ -911,6 +914,7 @@ ArgParser::initOptionTable()
     (*t)["externalize-inline-images"] =
         oe_bare(&ArgParser::argExternalizeInlineImages);
     (*t)["keep-inline-images"] = oe_bare(&ArgParser::argKeepInlineImages);
+    (*t)["remove-page-labels"] = oe_bare(&ArgParser::argRemovePageLabels);
     (*t)["oi-min-width"] = oe_requiredParameter(
         &ArgParser::argOiMinWidth, "minimum-width");
     (*t)["oi-min-height"] = oe_requiredParameter(
@@ -1335,6 +1339,7 @@ ArgParser::argHelp()
         << "--ii-min-bytes=bytes      specify minimum size of inline images to be\n"
         << "                          converted to regular images\n"
         << "--keep-inline-images      exclude inline images from image optimization\n"
+        << "--remove-page-labels      remove any page labels present in the output file\n"
         << "--qdf                     turns on \"QDF mode\" (below)\n"
         << "--linearize-pass1=file    write intermediate pass of linearized file\n"
         << "                          for debugging\n"
@@ -2010,6 +2015,12 @@ void
 ArgParser::argKeepInlineImages()
 {
     o.keep_inline_images = true;
+}
+
+void
+ArgParser::argRemovePageLabels()
+{
+    o.remove_page_labels = true;
 }
 
 void
@@ -4334,6 +4345,10 @@ static void handle_transformations(QPDF& pdf, Options& o)
         {
             (*iter).coalesceContentStreams();
         }
+    }
+    if (o.remove_page_labels)
+    {
+        pdf.getRoot().removeKey("/PageLabels");
     }
 }
 
