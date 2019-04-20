@@ -2524,14 +2524,14 @@ QPDFObjectHandle::isPageObject()
             return true;
         }
         // Files have been seen in the wild that have /Type (Page)
-        if (type.isString() && (type.getStringValue() == "Page"))
+        else if (type.isString() && (type.getStringValue() == "Page"))
         {
             return true;
         }
-    }
-    if (this->hasKey("/Contents"))
-    {
-        return true;
+        else
+        {
+            return false;
+        }
     }
     return false;
 }

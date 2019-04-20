@@ -1,5 +1,14 @@
 2019-04-20  Jay Berkenbilt  <ejb@ql.org>
 
+	* Slightly tighten logic that determines whether an object is a
+	page. The previous logic was sometimes failing to preserve
+	annotations because they were passing the overly loose test for
+	whether something was a page. This fix has a slight risk of
+	causing some extraneous objects to be copied during page splitting
+	and merging for erroneous PDF files whose page objects contain
+	invalid types or are missing the /Type key entirely, both of which
+	would be invalid according to the PDF specification.
+
 	* Revert change that included preservation of outlines (bookmarks)
 	in --split-pages. The way it was implemented caused a very
 	significant performance penalty when splitting pages with
