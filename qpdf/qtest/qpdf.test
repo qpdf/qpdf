@@ -1594,6 +1594,8 @@ foreach my $i (qw(01-06 07-11))
                  {$td->FILE => "labels-split-$i.pdf"});
 }
 
+# See comments in TODO about these expected failures. Search for
+# "split page with outlines".
 $td->runtest("split page with outlines",
              {$td->COMMAND => "qpdf --qdf --static-id --split-pages=10".
                   " outlines-with-actions.pdf split-out-outlines.pdf"},
@@ -1602,7 +1604,8 @@ foreach my $i (qw(01-10 11-20 21-30))
 {
     $td->runtest("check output ($i)",
                  {$td->FILE => "split-out-outlines-$i.pdf"},
-                 {$td->FILE => "outlines-split-$i.pdf"});
+                 {$td->FILE => "outlines-split-$i.pdf"},
+                 $td->EXPECT_FAILURE)
 }
 
 foreach my $d (@sp_cases)

@@ -77,6 +77,17 @@ Page splitting/merging
    * make sure conflicting named destinations work possibly test by
      including the same file by two paths in a merge
 
+   Note: original implementation of bookmark preservation for split
+   pages caused a very high performance hit. The problem was
+   introduced in 313ba081265f69ac9a0324f9fe87087c72918191 and reverted
+   in the commit that adds this paragraph. The revert includes marking
+   a few tests cases as $td->EXPECT_FAILURE. When properly coded, the
+   test cases will need to be adjusted to only include the parts of
+   the outlines that are actually copied. The tests in question are
+   "split page with outlines". When implementing properly, ensure that
+   the performance is not adversely affected by timing split-pages on
+   a large file with complex outlines such as the PDF specification.
+
    When pruning outlines, keep all outlines in the hierarchy that are
    above an outline for a page we care about. If one of the ancestor
    outlines points to a non-existent page, clear its dest. If an

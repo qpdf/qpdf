@@ -1,3 +1,11 @@
+2019-04-20  Jay Berkenbilt  <ejb@ql.org>
+
+	* Revert change that included preservation of outlines (bookmarks)
+	in --split-pages. The way it was implemented caused a very
+	significant performance penalty when splitting pages with
+	outlines. We need a better solution that only copies the relevant
+	items, not the whole tree.
+
 2019-03-11  Jay Berkenbilt  <ejb@ql.org>
 
 	* JSON serialization: add missing leading 0 to decimal values
