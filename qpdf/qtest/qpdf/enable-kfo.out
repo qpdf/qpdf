@@ -1,23 +1,23 @@
 qpdf: selecting --keep-open-files=y
-qpdf: processing 110-kfo.pdf
-qpdf: processing 111-kfo.pdf
-qpdf: processing 112-kfo.pdf
-qpdf: processing 113-kfo.pdf
-qpdf: processing 114-kfo.pdf
-qpdf: processing 115-kfo.pdf
-qpdf: processing 116-kfo.pdf
-qpdf: processing 117-kfo.pdf
-qpdf: processing 118-kfo.pdf
-qpdf: processing 119-kfo.pdf
+qpdf: processing 010-kfo.pdf
+qpdf: processing 011-kfo.pdf
+qpdf: processing 012-kfo.pdf
+qpdf: processing 013-kfo.pdf
+qpdf: processing 014-kfo.pdf
+qpdf: processing 015-kfo.pdf
+qpdf: processing 016-kfo.pdf
+qpdf: processing 017-kfo.pdf
+qpdf: processing 018-kfo.pdf
+qpdf: processing 019-kfo.pdf
 qpdf: removing unreferenced pages from primary input
-qpdf: adding pages from 110-kfo.pdf
-qpdf: adding pages from 111-kfo.pdf
-qpdf: adding pages from 112-kfo.pdf
-qpdf: adding pages from 113-kfo.pdf
-qpdf: adding pages from 114-kfo.pdf
-qpdf: adding pages from 115-kfo.pdf
-qpdf: adding pages from 116-kfo.pdf
-qpdf: adding pages from 117-kfo.pdf
-qpdf: adding pages from 118-kfo.pdf
-qpdf: adding pages from 119-kfo.pdf
+qpdf: adding pages from 010-kfo.pdf
+qpdf: adding pages from 011-kfo.pdf
+qpdf: adding pages from 012-kfo.pdf
+qpdf: adding pages from 013-kfo.pdf
+qpdf: adding pages from 014-kfo.pdf
+qpdf: adding pages from 015-kfo.pdf
+qpdf: adding pages from 016-kfo.pdf
+qpdf: adding pages from 017-kfo.pdf
+qpdf: adding pages from 018-kfo.pdf
+qpdf: adding pages from 019-kfo.pdf
 qpdf: wrote file a.pdf

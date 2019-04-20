@@ -652,6 +652,19 @@ make
         more than the OS limit's number of files from a script and are
         not worried about a few seconds additional processing time,
         you may want to specify <option>--keep-files-open=n</option>.
+        The threshold for switching may be changed from the default
+        200 with the <option>--keep-files-open-threshold</option>
+        option.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--keep-files-open-threshold=<replaceable>count</replaceable></option></term>
+      <listitem>
+       <para>
+        If specified, overrides the default value of 200 used as the
+        threshold for qpdf deciding whether or not to keep files open.
+        See <option>--keep-files-open</option> for details.
        </para>
       </listitem>
      </varlistentry>

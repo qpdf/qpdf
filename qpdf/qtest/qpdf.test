@@ -1685,7 +1685,7 @@ $n_tests += 4;
     binmode F;
     my $content = <F>;
     close(F);
-    for (my $i = 1; $i <= 201; ++$i)
+    for (my $i = 1; $i <= 51; ++$i)
     {
         open(F, sprintf(">%03d-kfo.pdf", $i)) or die;
         binmode F;
@@ -1693,16 +1693,17 @@ $n_tests += 4;
         close(F);
     }
 }
-$td->runtest("disable keep files open",
+$td->runtest("automatic disable keep files open",
              {$td->COMMAND =>
                   "qpdf --verbose --static-id --empty" .
+                  " --keep-files-open-threshold=50" .
                   " --pages *kfo.pdf -- a.pdf"},
              {$td->FILE => "disable-kfo.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("don't disable keep files open",
              {$td->COMMAND =>
                   "qpdf --verbose --static-id --empty" .
-                  " --pages 11*kfo.pdf -- a.pdf"},
+                  " --pages 01*kfo.pdf -- a.pdf"},
              {$td->FILE => "enable-kfo.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("explict keep files open",

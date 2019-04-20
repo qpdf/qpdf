@@ -1,5 +1,9 @@
 2019-04-20  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add parameter --keep-files-open-threshold to override the
+	maximum number of files that qpdf will allow to be kept open at
+	once. Fixes #288.
+
 	* Handle Unicode characters in filenames. The changes to support
 	Unicode on the CLI in Windows broke Unicode filenames. Fixes #298.
 

@@ -134,6 +134,7 @@ struct Options
         preserve_unreferenced_page_resources(false),
         keep_files_open(true),
         keep_files_open_set(false),
+        keep_files_open_threshold(200), // default known in help and docs
         newline_before_endstream(false),
         coalesce_contents(false),
         flatten_annotations(false),
@@ -225,6 +226,7 @@ struct Options
     bool preserve_unreferenced_page_resources;
     bool keep_files_open;
     bool keep_files_open_set;
+    size_t keep_files_open_threshold;
     bool newline_before_endstream;
     std::string linearize_pass1;
     bool coalesce_contents;
@@ -634,6 +636,7 @@ class ArgParser
     void argPreserveUnreferenced();
     void argPreserveUnreferencedResources();
     void argKeepFilesOpen(char* parameter);
+    void argKeepFilesOpenThreshold(char* parameter);
     void argNewlineBeforeEndstream();
     void argLinearizePass1(char* parameter);
     void argCoalesceContents();
@@ -857,6 +860,8 @@ ArgParser::initOptionTable()
         &ArgParser::argPreserveUnreferencedResources);
     (*t)["keep-files-open"] = oe_requiredChoices(
         &ArgParser::argKeepFilesOpen, yn);
+    (*t)["keep-files-open-threshold"] = oe_requiredParameter(
+        &ArgParser::argKeepFilesOpenThreshold, "count");
     (*t)["newline-before-endstream"] = oe_bare(
         &ArgParser::argNewlineBeforeEndstream);
     (*t)["linearize-pass1"] = oe_requiredParameter(
@@ -1209,6 +1214,7 @@ ArgParser::argHelp()
         << "starting point, but its pages are replaced with pages as specified.\n"
         << "\n"
         << "--keep-files-open=[yn]\n"
+        << "--keep-files-threshold=count\n"
         << "--pages file [ --password=password ] [ page-range ] ... --\n"
         << "\n"
         << "For each file that pages should be taken from, specify the file, a\n"
@@ -1227,7 +1233,8 @@ ArgParser::argHelp()
         << "files will be kept open at the same time. This behavior can be overridden\n"
         << "by specifying --keep-files-open=[yn]. Closing and opening files can have\n"
         << "very high overhead on certain file systems, especially networked file\n"
-        << "systems.\n"
+        << "systems. The threshold of 200 can be modified with\n"
+        << "--keep-files-open-threshold\n"
         << "\n"
         << "The page range is a set of numbers separated by commas, ranges of\n"
         << "numbers separated dashes, or combinations of those.  The character\n"
@@ -1779,6 +1786,13 @@ ArgParser::argKeepFilesOpen(char* parameter)
 {
     o.keep_files_open_set = true;
     o.keep_files_open = (strcmp(parameter, "y") == 0);
+}
+
+void
+ArgParser::argKeepFilesOpenThreshold(char* parameter)
+{
+    o.keep_files_open_threshold =
+        static_cast<size_t>(QUtil::string_to_int(parameter));
 }
 
 void
@@ -4352,9 +4366,7 @@ static void handle_page_specs(QPDF& pdf, Options& o)
             PageSpec& page_spec = *iter;
             filenames.insert(page_spec.filename);
         }
-        // NOTE: The number 200 for this threshold is in the help
-        // message and manual and is baked into the test suite.
-        if (filenames.size() > 200)
+        if (filenames.size() > o.keep_files_open_threshold)
         {
             QTC::TC("qpdf", "qpdf disable keep files open");
             if (o.verbose)
