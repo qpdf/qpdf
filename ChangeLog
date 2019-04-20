@@ -1,5 +1,8 @@
 2019-04-20  Jay Berkenbilt  <ejb@ql.org>
 
+	* Handle Unicode characters in filenames. The changes to support
+	Unicode on the CLI in Windows broke Unicode filenames. Fixes #298.
+
 	* Slightly tighten logic that determines whether an object is a
 	page. The previous logic was sometimes failing to preserve
 	annotations because they were passing the overly loose test for
