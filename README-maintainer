@@ -103,6 +103,7 @@ RELEASE PREPARATION
   * configure.ac
   * libqpdf/QPDF.cc
   * manual/qpdf-manual.xml
+  * qpdf/qpdf.cc
   `make_dist` verifies this consistency.
 
 * Add a release entry to ChangeLog.

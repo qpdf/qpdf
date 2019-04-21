@@ -667,7 +667,7 @@ $n_tests += 3;
 
 $td->runtest("qpdf version",
 	     {$td->COMMAND => "qpdf --version"},
-	     {$td->REGEXP => "qpdf version \\S+\n.*", $td->EXIT_STATUS => 0},
+	     {$td->REGEXP => ".*qpdf version \\S+\n.*", $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("qpdf copyright contains version too",
 	     {$td->COMMAND => "qpdf --copyright"},

@@ -1,5 +1,12 @@
 2019-04-20  Jay Berkenbilt  <ejb@ql.org>
 
+	* When qpdf --version is run, it will detect if the qpdf CLI was
+	built with a different version of qpdf than the library. This
+	usually indicates that multiple versions of qpdf are installed and
+	that the library path is not set up properly. This situation
+	sometimes causes confusing behavior for users who are not actually
+	running the version of qpdf they think they are running.
+
 	* Add parameter --remove-page-labels to remove page labels from
 	output. In qpdf 8.3.0, the behavior changed so that page labels
 	were preserved when merging and splitting files. Some users were
