@@ -117,6 +117,7 @@ argJsonHelp
 argJsonKey
 argJsonObject
 argKeepFilesOpen
+argKeepFilesOpenThreshold
 argKeepInlineImages
 argLinearize
 argLinearizePass
@@ -142,6 +143,7 @@ argPreserveUnreferencedResources
 argProgress
 argQdf
 argRawStreamData
+argRemovePageLabels
 argRotate
 args
 argShowEncryption
@@ -688,6 +690,7 @@ fullname
 fullpad
 func
 fv
+fvisibility
 fweimer
 fwrite
 fx
@@ -1450,6 +1453,7 @@ pdfs
 pdh
 pdlin
 pe
+performant
 perl
 persistAcrossFinish
 Pfeifle
@@ -2044,15 +2048,21 @@ Wconversion
 wcslen
 Weimer
 werror
+wfilename
+wfilenamep
 WFLAGS
+wfopen
 whoami
 WinAnsi
 winansi
 WinAnsiEncoding
 wincrypt
 WindowsCryptProvider
+wlen
 wmain
 wmatrix
+wmode
+wmodep
 Wold
 wrapInArray
 writeAppearance

@@ -26,7 +26,7 @@ JSON
 QPDF_Real::getJSON()
 {
     // While PDF allows .x or -.x, JSON does not. Rather than
-    // convering from string to double and back, just handle this as a
+    // converting from string to double and back, just handle this as a
     // special case for JSON.
     std::string result;
     if (this->val.length() == 0)
