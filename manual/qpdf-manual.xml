@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "8.4.0">
-<!ENTITY lastreleased "February 1, 2019">
+<!ENTITY swversion "8.4.1">
+<!ENTITY lastreleased "April 27, 2019">
 ]>
 <book>
  <bookinfo>
@@ -4347,6 +4347,89 @@ print "\n";
    <filename>ChangeLog</filename> in the source distribution.
   </para>
   <variablelist>
+   <varlistentry>
+    <term>8.4.1: April 21, 2019</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          When <command>qpdf --version</command> is run, it will
+          detect if the qpdf CLI was built with a different version of
+          qpdf than the library, which may indicate a problem with the
+          installation.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+	  New option <option>--remove-page-labels</option> will remove page
+          labels before generating output. This used to happen if you
+          ran <command>qpdf --empty --pages .. --</command>, but the
+          behavior changed in qpdf 8.3.0. This option enables people
+          who were relying on the old behavior to get it again.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          New option
+          <option>--keep-files-open-threshold=<replaceable>count</replaceable></option>
+          can be used to override number of files that qpdf will use
+          to trigger the behavior of not keeping all files open when
+          merging files. This may be necessary if your system allows
+          fewer than the default value of 200 files to be open at the
+          same time.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Bug Fixes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Handle Unicode characters in filenames on Windows. The
+          changes to support Unicode on the CLI in Windows broke
+          Unicode filenames for Windows.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Slightly tighten logic that determines whether an object is
+          a page. This should resolve problems in some rare files
+          where some non-page objects were passing qpdf's test for
+          whether something was a page, thus causing them to be
+          erroneously lost during page splitting operations.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+	  Revert change that included preservation of outlines
+	  (bookmarks) in <option>--split-pages</option>. The way it
+	  was implemented in 8.3.0 and 8.4.0 caused a very significant
+	  degradation of performance for splitting certain files. A
+	  future release of qpdf may re-introduce the behavior in a
+	  more performant and also more correct fashion.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          In JSON mode, add missing leading 0 to decimal values
+          between -1 and 1 even if not present in the input. The JSON
+          specification requires the leading 0. The PDF specification
+          does not.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
     <term>8.4.0: February 1, 2019</term>
     <listitem>

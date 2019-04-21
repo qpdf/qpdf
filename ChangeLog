@@ -1,3 +1,7 @@
+2019-04-27  Jay Berkenbilt  <ejb@ql.org>
+
+	* 8.4.1: release
+
 2019-04-20  Jay Berkenbilt  <ejb@ql.org>
 
 	* When qpdf --version is run, it will detect if the qpdf CLI was
@@ -18,8 +22,9 @@
 	maximum number of files that qpdf will allow to be kept open at
 	once. Fixes #288.
 
-	* Handle Unicode characters in filenames. The changes to support
-	Unicode on the CLI in Windows broke Unicode filenames. Fixes #298.
+	* Handle Unicode characters in filenames properly on Windows. The
+	changes to support Unicode on the CLI in Windows broke Unicode
+	filenames on that platform. Fixes #298.
 
 	* Slightly tighten logic that determines whether an object is a
 	page. The previous logic was sometimes failing to preserve
