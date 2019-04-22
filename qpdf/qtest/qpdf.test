@@ -170,7 +170,7 @@ $td->runtest("extra overlay filename",
 foreach my $d (['auto-ü', 1], ['auto-öπ', 2])
 {
     my ($u, $n) = @$d;
-    copy('minimal.pdf', "$u.pdf");
+
     $td->runtest("unicode filename $u",
                  {$td->COMMAND => "qpdf --check $u.pdf"},
                  {$td->FILE => "check-unicode-filename-$n.out",
@@ -4116,5 +4116,5 @@ sub get_md5_checksum
 sub cleanup
 {
     system("rm -rf *.ps *.pnm ?.pdf ?.qdf *.enc* tif1 tif2 tiff-cache");
-    system("rm -rf *split-out* ???-kfo.pdf *.tmpout \@file.pdf auto-*.pdf");
+    system("rm -rf *split-out* ???-kfo.pdf *.tmpout \@file.pdf");
 }
