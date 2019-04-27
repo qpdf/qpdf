@@ -170,6 +170,14 @@ I find it useful to make reference to them in this list
 
  * Pl_TIFFPredictor is pretty slow.
 
+ * Support for handling file names with Unicode characters in Windows
+   is incomplete. qpdf seems to support them okay from a functionality
+   standpoint, and the right thing happens if you pass in UTF-8
+   encoded filenames to QPDF library routines in Windows (they are
+   converted internally to wchar_t*), but file names are encoded in
+   UTF-8 on output, which doesn't produce nice error messages or
+   output on Windows in some cases.
+
  * If we ever wanted to do anything more with character encoding, see
    ../misc/character-encoding/, which includes machine-readable dump
    of table D.2 in the ISO-32000 PDF spec. This shows the mapping

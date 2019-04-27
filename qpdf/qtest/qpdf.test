@@ -135,7 +135,7 @@ foreach my $c (@completion_tests)
 show_ntests();
 # ----------
 $td->notify("--- Argument Parsing ---");
-$n_tests += 8;
+$n_tests += 6;
 
 $td->runtest("required argument",
              {$td->COMMAND => "qpdf --password minimal.pdf"},
@@ -167,10 +167,21 @@ $td->runtest("extra overlay filename",
              {$td->REGEXP => ".*overlay file already specified.*",
                   $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
+
+show_ntests();
+# ----------
+$td->notify("--- Unicode Filenames ---");
+$n_tests += 3;
+
+$td->runtest("create unicode filenames",
+             {$td->COMMAND => "test_unicode_filenames"},
+             {$td->STRING => "created Unicode filenames\n",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
 foreach my $d (['auto-ü', 1], ['auto-öπ', 2])
 {
     my ($u, $n) = @$d;
-    copy('minimal.pdf', "$u.pdf");
     $td->runtest("unicode filename $u",
                  {$td->COMMAND => "qpdf --check $u.pdf"},
                  {$td->FILE => "check-unicode-filename-$n.out",

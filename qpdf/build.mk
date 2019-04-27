@@ -5,7 +5,8 @@ BINS_qpdf = \
     test_large_file \
     test_pdf_doc_encoding \
     test_pdf_unicode \
-    test_tokenizer
+    test_tokenizer \
+    test_unicode_filenames
 CBINS_qpdf = qpdf-ctest
 
 TARGETS_qpdf = $(foreach B,$(BINS_qpdf) $(CBINS_qpdf),qpdf/$(OUTPUT_DIR)/$(call binname,$(B)))
@@ -20,6 +21,8 @@ TC_SRCS_qpdf = $(wildcard libqpdf/*.cc) $(wildcard qpdf/*.cc)
 
 XCXXFLAGS_qpdf_qpdf := $(WINDOWS_WMAIN_COMPILE)
 XLDFLAGS_qpdf_qpdf := $(WINDOWS_WMAIN_LINK)
+XCXXFLAGS_qpdf_test_unicode_filenames := $(WINDOWS_WMAIN_COMPILE)
+XLDFLAGS_qpdf_test_unicode_filenames := $(WINDOWS_WMAIN_LINK)
 
 $(foreach B,$(BINS_qpdf),$(eval \
   OBJS_$(B) = $(call src_to_obj,qpdf/$(B).cc)))
