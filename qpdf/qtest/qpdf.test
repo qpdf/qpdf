@@ -777,8 +777,6 @@ foreach my $d (@eii_tests)
     compare_pdfs("$file.pdf", "a.pdf");
 }
 
-# QXXXQ externalize tests with min size
-
 show_ntests();
 # ----------
 $td->notify("--- Tokenizer ---");
