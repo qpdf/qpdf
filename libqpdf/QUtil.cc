@@ -371,7 +371,7 @@ QUtil::safe_fopen(char const* filename, char const* mode)
                 (static_cast<unsigned char>(u16.at(i)) << 8) +
                 static_cast<unsigned char>(u16.at(i+1)));
     }
-    PointerHolder<wchar_t> wmodep(true, new wchar_t(strlen(mode) + 1));
+    PointerHolder<wchar_t> wmodep(true, new wchar_t[strlen(mode) + 1]);
     wchar_t* wmode = wmodep.getPointer();
     wmode[strlen(mode)] = 0;
     for (size_t i = 0; i < strlen(mode); ++i)
