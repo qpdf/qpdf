@@ -9,6 +9,10 @@ Soon
 
  * Set up OSS-Fuzz (Google). See starred email in qpdf label.
 
+ * Investigate whether there is a way to automate the memory checker
+   tests for Windows, and consider running the memory checks in the
+   automated test pipeline.
+
 Next ABI
 ========
 
