@@ -1,3 +1,7 @@
+2019-05-18  Jay Berkenbilt  <ejb@ql.org>
+
+	* 8.4.2: release
+
 2019-05-16  Jay Berkenbilt  <ejb@ql.org>
 
 	* Fix memory error in Windows-only code from typo. Fixes #330.

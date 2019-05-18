@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "8.4.1">
-<!ENTITY lastreleased "April 27, 2019">
+<!ENTITY swversion "8.4.2">
+<!ENTITY lastreleased "May 18, 2019">
 ]>
 <book>
  <bookinfo>
@@ -4348,7 +4348,18 @@ print "\n";
   </para>
   <variablelist>
    <varlistentry>
-    <term>8.4.1: April 21, 2019</term>
+    <term>8.4.2: May 18, 2019</term>
+    <listitem>
+     <para>
+      This release has just one change: correction of a buffer overrun
+      in the Windows code used to open files. Windows users should
+      take this update. There are no code changes that affect
+      non-Windows releases.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>8.4.1: April 27, 2019</term>
     <listitem>
      <itemizedlist>
       <listitem>
