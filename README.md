@@ -7,6 +7,12 @@
 
 This is the QPDF package.  Information about it can be found at http://qpdf.sourceforge.net.  The source code repository is hosted at github: https://github.com/qpdf/qpdf.
 
+# Verifying Distributions
+
+The public key used to sign qpdf source distributions has fingerprint `C2C9 6B10 011F E009 E6D1  DF82 8A75 D109 9801 2C7E` and can be found at https://q.ql.org/pubkey.asc or downloaded from a public key server.
+
+# Copyright, License
+
 QPDF is copyright (c) 2005-2019 Jay Berkenbilt
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
