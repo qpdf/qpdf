@@ -12,6 +12,10 @@ Next ABI
 
 Do these things next time we have to break binary compatibility
 
+ * Check all classes that don't use the Members pattern and see if
+   they should be converted. Most of the pipeline classes should be
+   converted.
+
  * Pl_Buffer's internal structure is not right for what it does. It
    was modified for greater efficiency, but it was done in a way that
    preserved binary compatibility, so the implementation is a bit
@@ -19,6 +23,10 @@ Do these things next time we have to break binary compatibility
 
  * Rename QUtil::strcasecmp since strcasecmp is a macro on some
    platforms. See #242.
+
+ * Check all overloaded methods to see if any can be eliminated by
+   using defaulted arguments. See ../misc/find-overloaded-functions.pl
+   (not in source repo)
 
  * Get rid of the version of QPDF::copyForeignObject with the bool
    unused parameter.
@@ -34,6 +42,10 @@ Do these things next time we have to break binary compatibility
    resolve all, but we can possibly convert some things from int to
    either size_t or qpdf_offset_t. Only do this if it doesn't break
    source compatibility.
+
+ * See if there is a way to provide an option to use higher
+   compression with zlib. See #113. This can be done by adding options
+   to Pl_Flate and having QPDFWriter optionally use those options.
 
 Lexical
 =======
