@@ -439,3 +439,4 @@ QPDFPageObjectHelper externalize inline image 0
 QPDFPageObjectHelper keep inline image 0
 qpdf image optimize colorspace 0
 qpdf image optimize bits per component 0
+QPDFWriter remove empty DecodeParms 0

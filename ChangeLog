@@ -1,3 +1,8 @@
+2019-06-09  Jay Berkenbilt  <ejb@ql.org>
+
+	* When /DecodeParms is an empty list, ignore it on read and delete
+	it on write. Fixes #331.
+
 2019-05-18  Jay Berkenbilt  <ejb@ql.org>
 
 	* 8.4.2: release

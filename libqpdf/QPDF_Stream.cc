@@ -391,6 +391,10 @@ QPDF_Stream::filterable(std::vector<std::string>& filters,
 
     QPDFObjectHandle decode_obj = this->stream_dict.getKey("/DecodeParms");
     std::vector<QPDFObjectHandle> decode_parms;
+    if (decode_obj.isArray() && (decode_obj.getArrayNItems() == 0))
+    {
+        decode_obj = QPDFObjectHandle::newNull();
+    }
     if (decode_obj.isArray())
     {
         for (int i = 0; i < decode_obj.getArrayNItems(); ++i)

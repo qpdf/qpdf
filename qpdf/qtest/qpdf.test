@@ -847,7 +847,7 @@ $td->runtest("get stream data",
 show_ntests();
 # ----------
 $td->notify("--- Decode parameter problems ---");
-$n_tests += 4;
+$n_tests += 6;
 
 # Make sure we ignore decode parameters that we don't understand
 $td->runtest("unknown decode parameters",
@@ -869,6 +869,13 @@ $td->runtest("stream with indirect decode parms",
 $td->runtest("check file",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "indirect-decode-parms-out.pdf"});
+
+$td->runtest("decode parameters empty list",
+             {$td->COMMAND => "qpdf --static-id empty-decode-parms.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check file",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "empty-decode-parms-out.pdf"});
 
 show_ntests();
 # ----------

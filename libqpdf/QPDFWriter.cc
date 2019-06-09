@@ -1604,6 +1604,14 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
             // Suppress /Length since we will write it manually
             object.removeKey("/Length");
 
+            // If /DecodeParms is an empty list, remove it.
+            if (object.getKey("/DecodeParms").isArray() &&
+                (0 == object.getKey("/DecodeParms").getArrayNItems()))
+            {
+                QTC::TC("qpdf", "QPDFWriter remove empty DecodeParms");
+                object.removeKey("/DecodeParms");
+            }
+
 	    if (flags & f_filtered)
             {
                 // We will supply our own filter and decode
