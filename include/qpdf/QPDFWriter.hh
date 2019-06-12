@@ -196,7 +196,7 @@ class QPDFWriter
     //
     // qpdf_dl_specialized: In addition to uncompressing the
     // generalized compression formats, supported non-lossy
-    // compression will also be be decoded. At present, this includes
+    // compression will also be decoded. At present, this includes
     // the RunLengthDecode filter.
     //
     // qpdf_dl_all: In addition to generalized and non-lossy
