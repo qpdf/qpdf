@@ -1,11 +1,8 @@
-Soon
-====
+OSS-Fuzz
+========
 
- * Set up OSS-Fuzz (Google). See starred email in qpdf label.
-
- * Investigate whether there is a way to automate the memory checker
-   tests for Windows, and consider running the memory checks in the
-   automated test pipeline.
+* Fix open issues from https://oss-fuzz.com
+* Get fuzzer tests to pass in Windows
 
 Next ABI
 ========
@@ -146,6 +143,9 @@ I find it useful to make reference to them in this list
    even when there are errors. See linearization label in github.
 
  * Consider creating a PPA for Ubuntu
+
+ * Investigate whether there is a way to automate the memory checker
+   tests for Windows.
 
  * Support user-pluggable stream filters.  This would enable external
    code to provide interpretation for filters that are missing from
