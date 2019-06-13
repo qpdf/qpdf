@@ -17,6 +17,19 @@ Memory checks:
    LDFLAGS="-fsanitize=address -fsanitize=undefined" \
    --enable-werror --disable-shared
 
+GOOGLE OSS-FUZZ
+
+* https://github.com/google/oss-fuzz/tree/master/projects/qpdf
+* To test locally, see https://github.com/google/oss-fuzz/tree/master/docs/,
+  especially new_project_guide.md
+
+Clone the oss-fuzz project. From the root directory of the repository:
+
+  python infra/helper.py build_image --pull qpdf
+  python infra/helper.py build_fuzzers qpdf
+  python infra/helper.py check_build qpdf
+  python infra/helper.py build_fuzzers --sanitizer coverage qpdf
+  python infra/helper.py coverage qpdf
 
 CODING RULES
 

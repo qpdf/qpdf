@@ -1,3 +1,10 @@
+2019-06-13  Jay Berkenbilt  <ejb@ql.org>
+
+	* Perform initial integration of Google's oss-fuzz project by
+	copying the fuzzer someone from Google already did into the qpdf
+	repository and adding build support. This shift in control is in
+	preparation for an ideal integration with oss-fuzz.
+
 2019-06-09  Jay Berkenbilt  <ejb@ql.org>
 
 	* When /DecodeParms is an empty list, ignore it on read and delete

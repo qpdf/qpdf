@@ -100,3 +100,11 @@ jobs:
       buildPlatform: AppImage
   dependsOn: Linux
   condition: succeeded()
+- job: Fuzzers
+  pool:
+    vmImage: ubuntu-16.04
+  steps:
+  - script: azure-pipelines/build-fuzzer
+    displayName: 'Build Fuzzer'
+  dependsOn: Linux
+  condition: succeeded()

@@ -13,6 +13,7 @@ doc/qpdf.1
 doc/zlib-flate.1
 examples/build/
 external-libs
+fuzz/build/
 libqpdf.map
 libqpdf.pc
 libqpdf/build/

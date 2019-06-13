@@ -1,0 +1,18 @@
+#!/bin/bash -e
+
+# This is used invoked from
+# https://github.com/google/oss-fuzz/blob/master/projects/qpdf/build.sh
+
+# It should be run from the top level directory of a clean checkout of
+# qpdf. It is also exercised in ../azure-pipelines/build-fuzzer
+
+./configure \
+  --enable-oss-fuzz \
+  --enable-static \
+  --disable-shared \
+  --prefix="$WORK" \
+  LDFLAGS="-L$WORK/lib" \
+  CPPFLAGS="-I$WORK/include" \
+  LIBS="-pthread"
+make -j$(nproc) install
+make install_fuzz

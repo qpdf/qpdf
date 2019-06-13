@@ -501,6 +501,17 @@ AC_ARG_ENABLE(validate-doc,
     fi],
    [VALIDATE_DOC=$doc_default])
 
+AC_SUBST(OSS_FUZZ)
+AC_ARG_ENABLE(oss-fuzz,
+   AS_HELP_STRING([--enable-doc-maintenance],
+		  [if set, build static fuzzers for oss-fuzz]),
+   [if test "$enableval" = "yes"; then
+      OSS_FUZZ=1;
+    else
+      OSS_FUZZ=0;
+    fi],
+   [OSS_FUZZ=0])
+
 if test "$VALIDATE_DOC" = "1"; then
    if test "$XMLLINT" = ""; then
       MISSING_XMLLINT=1

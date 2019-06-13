@@ -10,6 +10,8 @@ Versions of qpdf prior to version 7 were released under the terms of version 2.0
 
 The qpdf distribution includes a copy of [qtest](http://qtest.qbilt.org), which is released under the terms of the [version 2.0 of the Artistic license](https://opensource.org/licenses/Artistic-2.0), which can be found at https://opensource.org/licenses/Artistic-2.0.
 
+The standalone fuzz target runner (fuzz/standalone_fuzz_target_runner.cc) is copyright 2017 by Google and is also released under the Apache license, Version 2.0.
+
 The Rijndael encryption implementation used as the basis for AES encryption and decryption support comes from Philip J. Erdelsky's public domain implementation.  The files `libqpdf/rijndael.cc` and `libqpdf/qpdf/rijndael.h` remain in the public domain.  They were obtained from
 * http://www.efgh.com/software/rijndael.htm
 * http://www.efgh.com/software/rijndael.txt
