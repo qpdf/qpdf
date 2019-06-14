@@ -1,10 +1,25 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 
 # This is used invoked from
 # https://github.com/google/oss-fuzz/blob/master/projects/qpdf/build.sh
 
 # It should be run from the top level directory of a clean checkout of
 # qpdf. It is also exercised in ../azure-pipelines/build-fuzzer
+
+if [[ $GITHUB_FORK != "" ]]; then
+    git remote add fork https://github.com/$GITHUB_FORK/qpdf
+    git fetch fork --depth=1
+    CUR_BRANCH=$(git rev-parse --abbrev-ref @)
+    if [[ $GITHUB_BRANCH == "" ]]; then
+        GITHUB_BRANCH=$CUR_BRANCH
+    fi
+    if [[ $GITHUB_BRANCH == $CUR_BRANCH ]]; then
+        git reset --hard fork/$CUR_BRANCH
+    else
+        git branch -f $GITHUB_BRANCH fork/$GITHUB_BRANCH
+        git checkout $GITHUB_BRANCH
+    fi
+fi
 
 ./configure \
   --enable-oss-fuzz \

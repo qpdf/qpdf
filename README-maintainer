@@ -25,6 +25,9 @@ GOOGLE OSS-FUZZ
 
 Clone the oss-fuzz project. From the root directory of the repository:
 
+  Add `-e GITHUB_FORK=fork -e GITHUB_BRANCH=branch` to build_fuzzers
+  to work off a fork/branch rather than qpdf/master.
+
   python infra/helper.py build_image --pull qpdf
   python infra/helper.py build_fuzzers qpdf
   python infra/helper.py check_build qpdf
