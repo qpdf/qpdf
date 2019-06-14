@@ -20,8 +20,7 @@ int main(int argc, char **argv)
         in.seekg(0, in.end);
         size_t length = in.tellg();
         in.seekg (0, in.beg);
-        std::cout << "Reading " << length << " bytes from " << argv[i]
-                  << std::endl;
+        std::cout << "checking " << argv[i] << std::endl;
         // Allocate exactly length bytes so that we reliably catch
         // buffer overflows.
         std::vector<char> bytes(length);
@@ -30,7 +29,7 @@ int main(int argc, char **argv)
         LLVMFuzzerTestOneInput(
             reinterpret_cast<unsigned char const*>(bytes.data()),
             bytes.size());
-        std::cout << "Execution successful" << std::endl;
+        std::cout << argv[i] << " successful" << std::endl;
     }
     return 0;
 }

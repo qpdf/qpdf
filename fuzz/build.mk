@@ -2,6 +2,7 @@
 # https://github.com/google/oss-fuzz/tree/master/projects/qpdf
 
 FUZZERS = \
+    qpdf_fuzzer \
     qpdf_read_memory_fuzzer
 
 DEFAULT_FUZZ_RUNNER := standalone_fuzz_target_runner

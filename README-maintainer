@@ -19,20 +19,39 @@ Memory checks:
 
 GOOGLE OSS-FUZZ
 
-* https://github.com/google/oss-fuzz/tree/master/projects/qpdf
-* To test locally, see https://github.com/google/oss-fuzz/tree/master/docs/,
-  especially new_project_guide.md
+* qpdf project: https://github.com/google/oss-fuzz/tree/master/projects/qpdf
 
-Clone the oss-fuzz project. From the root directory of the repository:
+* To test locally, see https://github.com/google/oss-fuzz/tree/master/docs/,
+  especially new_project_guide.md. Summary:
+
+  Clone the oss-fuzz project. From the root directory of the repository:
 
   Add `-e GITHUB_FORK=fork -e GITHUB_BRANCH=branch` to build_fuzzers
-  to work off a fork/branch rather than qpdf/master.
+  from a qpdf fork/branch rather than qpdf/master.
 
   python infra/helper.py build_image --pull qpdf
   python infra/helper.py build_fuzzers qpdf
   python infra/helper.py check_build qpdf
   python infra/helper.py build_fuzzers --sanitizer coverage qpdf
   python infra/helper.py coverage qpdf
+
+  The fuzzer is in build/out/qpdf. It can be run with a directory as
+  an argument to run against files in a directory. You can use
+
+  qpdf_fuzzer -merge=1 cur new >& /dev/null&
+
+  to add any files from new into cur if they increase coverage. You
+  need to do this with the coverage build (the one with
+  --sanitizer coverage)
+
+* General documentation: http://libfuzzer.info
+
+* Build status: https://oss-fuzz-build-logs.storage.googleapis.com/index.html
+
+* Project status: https://oss-fuzz.com/ (private -- log in with Google account)
+
+* Latest corpus:
+  gs://qpdf-backup.clusterfuzz-external.appspot.com/corpus/libFuzzer/qpdf_fuzzer/latest.zip
 
 CODING RULES
 
