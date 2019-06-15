@@ -9,7 +9,7 @@ DEFAULT_FUZZ_RUNNER := standalone_fuzz_target_runner
 OBJ_DEFAULT_FUZZ := fuzz/$(OUTPUT_DIR)/$(DEFAULT_FUZZ_RUNNER).$(OBJ)
 
 BINS_fuzz = $(foreach B,$(FUZZERS),fuzz/$(OUTPUT_DIR)/$(call binname,$(B)))
-TARGETS_fuzz = $(OBJ_DEFAULT_FUZZ) $(BINS_fuzz)
+TARGETS_fuzz = $(OBJ_DEFAULT_FUZZ) $(BINS_fuzz) fuzz_corpus
 
 INCLUDES_fuzz = include
 
@@ -21,7 +21,57 @@ LIB_FUZZING_ENGINE ?= $(OBJ_DEFAULT_FUZZ)
 # by oss-fuzz, it will be there.
 $(BINS_fuzz): $(TARGETS_libqpdf) $(OBJ_DEFAULT_FUZZ)
 
+# Files from the test suite that are good for seeding the fuzzer.
+# Update $n_test_files in qtest/fuzz.test if you change this list.
+SEED_CORPUS_FILES = \
+	field-types.pdf \
+	image-streams.pdf \
+	need-appearances.pdf \
+	outlines-with-actions.pdf \
+	outlines-with-old-root-dests.pdf \
+	page-labels-and-outlines.pdf \
+	page-labels-num-tree.pdf \
+	issue-99b.pdf \
+	issue-99.pdf \
+	issue-100.pdf \
+	issue-101.pdf \
+	issue-106.pdf \
+	issue-117.pdf \
+	issue-119.pdf \
+	issue-120.pdf \
+	issue-141a.pdf \
+	issue-141b.pdf \
+	issue-143.pdf \
+	issue-146.pdf \
+	issue-147.pdf \
+	issue-148.pdf \
+	issue-149.pdf \
+	issue-150.pdf \
+	issue-202.pdf \
+	issue-263.pdf \
+	issue-335a.pdf \
+	issue-335b.pdf
+
 # -----
+
+CORPUS_FROM_TEST := $(foreach F,$(SEED_CORPUS_FILES),qpdf/qtest/qpdf/$F)
+CORPUS_DIR := fuzz/qpdf_fuzzer_seed_corpus
+
+.PHONY: fuzz_corpus
+fuzz_corpus:: fuzz/$(OUTPUT_DIR)/fuzz_corpus.stamp
+$(foreach F,$(CORPUS_FROM_TEST),$(eval \
+  SHA1_$(notdir $(F)) := $(shell perl fuzz/get_sha1 < $F)))
+$(foreach F,$(CORPUS_FROM_TEST),$(eval \
+  fuzz_corpus:: $(CORPUS_DIR)/$(SHA1_$(notdir $(F)))))
+$(foreach F,$(CORPUS_FROM_TEST),$(eval \
+  $(CORPUS_DIR)/$(SHA1_$(notdir $(F))): $(F) ; \
+	mkdir -p $(CORPUS_DIR); \
+	cp $(F) $(CORPUS_DIR)/$(SHA1_$(notdir $(F)))))
+
+fuzz/$(OUTPUT_DIR)/fuzz_corpus.stamp: fuzz/original-corpus.tar.gz $(CORPUS_FROM_TEST)
+	mkdir -p $(CORPUS_DIR)
+	(cd $(CORPUS_DIR); tar xzf ../original-corpus.tar.gz)
+	touch $@
 
 $(foreach B,$(FUZZERS),$(eval \
   OBJS_$(B) = $(call src_to_obj,fuzz/$(B).cc)))
