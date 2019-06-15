@@ -1,3 +1,11 @@
+2019-06-15  Jay Berkenbilt  <ejb@ql.org>
+
+	* When parsing files, while reading an object, if there are too
+	many consecutive errors without enough intervening successes, give
+	up on the specific object. This reduces cases in which very badly
+	damaged files send qpdf into a tail spin reading one character at
+	a time and reporting warnings.
+
 2019-06-13  Jay Berkenbilt  <ejb@ql.org>
 
 	* Perform initial integration of Google's oss-fuzz project by

@@ -624,7 +624,7 @@ my @bug_tests = (
     ["99", "object 0", 2],
     ["99b", "object 0", 2],
     ["100", "xref reconstruction loop", 2],
-    ["101", "resolve for exception text", 3],
+    ["101", "resolve for exception text", 2],
     ["117", "other infinite loop", 2],
     ["118", "other infinite loop", 2],
     ["119", "other infinite loop", 3],
@@ -639,7 +639,7 @@ my @bug_tests = (
     ["149", "xref prev pointer loop", 3],
     ["150", "integer overflow", 2],
     ["202", "even more deeply nested dictionary", 2],
-    ["263", "empty xref stream", 3],
+    ["263", "empty xref stream", 2],
     );
 $n_tests += scalar(@bug_tests);
 foreach my $d (@bug_tests)

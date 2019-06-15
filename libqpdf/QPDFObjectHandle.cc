@@ -1628,8 +1628,11 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
     qpdf_offset_t offset = input->tell();
     offset_stack.push_back(offset);
     bool done = false;
+    int bad_count = 0;
+    int good_count = 0;
     while (! done)
     {
+        bool bad = false;
         std::vector<QPDFObjectHandle>& olist = olist_stack.back();
         parser_state_e state = state_stack.back();
         offset = offset_stack.back();
@@ -1651,6 +1654,7 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
                              input->getLastOffset(),
                              "unexpected EOF"));
             }
+            bad = true;
             state = st_eof;
             break;
 
@@ -1661,6 +1665,7 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
                          object_description,
                          input->getLastOffset(),
                          token.getErrorMessage()));
+            bad = true;
             object = newNull();
 	    break;
 
@@ -1672,6 +1677,7 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
                          object_description,
                          input->getLastOffset(),
                          "treating unexpected brace token as null"));
+            bad = true;
             object = newNull();
 	    break;
 
@@ -1688,6 +1694,7 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
                              object_description,
                              input->getLastOffset(),
                              "treating unexpected array close token as null"));
+                bad = true;
                 object = newNull();
 	    }
 	    break;
@@ -1705,6 +1712,7 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
                              object_description,
                              input->getLastOffset(),
                              "unexpected dictionary close token"));
+                bad = true;
                 object = newNull();
 	    }
 	    break;
@@ -1719,6 +1727,7 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
                              object_description,
                              input->getLastOffset(),
                              "ignoring excessively deeply nested data structure"));
+                bad = true;
                 object = newNull();
                 state = st_top;
             }
@@ -1800,6 +1809,7 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
                                  input->getLastOffset(),
                                  "unknown token while reading object;"
                                  " treating as string"));
+                    bad = true;
                     object = newString(value);
 		}
 	    }
@@ -1824,6 +1834,7 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
                          input->getLastOffset(),
                          "treating unknown token type as null while "
                          "reading object"));
+            bad = true;
             object = newNull();
 	    break;
 	}
@@ -1836,6 +1847,32 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
             throw std::logic_error(
                 "QPDFObjectHandle::parseInternal: "
                 "unexpected uninitialized object");
+            object = newNull();
+        }
+
+        if (bad)
+        {
+            ++bad_count;
+            good_count = 0;
+        }
+        else
+        {
+            ++good_count;
+            if (good_count > 3)
+            {
+                bad_count = 0;
+            }
+        }
+        if (bad_count > 5)
+        {
+            // We had too many consecutive errors without enough
+            // intervening successful objects. Give up.
+            warn(context,
+                 QPDFExc(qpdf_e_damaged_pdf, input->getName(),
+                         object_description,
+                         input->getLastOffset(),
+                         "too many errors; giving up on reading object"));
+            state = st_top;
             object = newNull();
         }
 

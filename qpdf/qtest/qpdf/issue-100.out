@@ -7,10 +7,8 @@ WARNING: issue-100.pdf (object 5 0, offset 289): unknown token while reading obj
 WARNING: issue-100.pdf (object 5 0, offset 294): unknown token while reading object; treating as string
 WARNING: issue-100.pdf (object 5 0, offset 297): unknown token while reading object; treating as string
 WARNING: issue-100.pdf (object 5 0, offset 304): unknown token while reading object; treating as string
-WARNING: issue-100.pdf (object 5 0, offset 308): unexpected )
-WARNING: issue-100.pdf (object 5 0, offset 316): treating unexpected array close token as null
-WARNING: issue-100.pdf (object 5 0, offset 227): expected dictionary key but found non-name object; inserting key /QPDFFake1
-WARNING: issue-100.pdf (object 5 0, offset 321): expected endobj
+WARNING: issue-100.pdf (object 5 0, offset 304): too many errors; giving up on reading object
+WARNING: issue-100.pdf (object 5 0, offset 308): expected endobj
 WARNING: issue-100.pdf (object 5 0, offset 418): /Length key in stream dictionary is not an integer
 WARNING: issue-100.pdf (object 5 0, offset 489): attempting to recover stream length
 WARNING: issue-100.pdf (object 5 0, offset 489): recovered stream length: 12

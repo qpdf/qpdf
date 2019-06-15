@@ -8,31 +8,5 @@ WARNING: issue-263.pdf (trailer, offset 79): unknown token while reading object;
 WARNING: issue-263.pdf (trailer, offset 82): unexpected )
 WARNING: issue-263.pdf (trailer, offset 83): unknown token while reading object; treating as string
 WARNING: issue-263.pdf (trailer, offset 87): unexpected >
-WARNING: issue-263.pdf (trailer, offset 89): unexpected dictionary close token
-WARNING: issue-263.pdf (trailer, offset 92): unexpected >
-WARNING: issue-263.pdf (trailer, offset 40): expected dictionary key but found non-name object; inserting key /QPDFFake1
-WARNING: issue-263.pdf (trailer, offset 40): expected dictionary key but found non-name object; inserting key /QPDFFake2
-WARNING: issue-263.pdf (trailer, offset 40): expected dictionary key but found non-name object; inserting key /QPDFFake3
-WARNING: issue-263.pdf (trailer, offset 40): expected dictionary key but found non-name object; inserting key /QPDFFake4
-WARNING: issue-263.pdf (trailer, offset 40): expected dictionary key but found non-name object; inserting key /QPDFFake5
-WARNING: issue-263.pdf (trailer, offset 40): expected dictionary key but found non-name object; inserting key /QPDFFake6
-WARNING: issue-263.pdf (trailer, offset 40): expected dictionary key but found non-name object; inserting key /QPDFFake7
-WARNING: issue-263.pdf (trailer, offset 98): unknown token while reading object; treating as string
-WARNING: issue-263.pdf (trailer, offset 103): unexpected )
-WARNING: issue-263.pdf (trailer, offset 107): unknown token while reading object; treating as string
-WARNING: issue-263.pdf (trailer, offset 119): expected dictionary key but found non-name object; inserting key /QPDFFake1
-WARNING: issue-263.pdf (trailer, offset 163): unknown token while reading object; treating as string
-WARNING: issue-263.pdf (trailer, offset 173): unknown token while reading object; treating as string
-WARNING: issue-263.pdf (trailer, offset 113): expected dictionary key but found non-name object; inserting key /QPDFFake1
-WARNING: issue-263.pdf (trailer, offset 113): expected dictionary key but found non-name object; inserting key /QPDFFake2
-WARNING: issue-263.pdf (trailer, offset 113): dictionary ended prematurely; using null as value for last key
-WARNING: issue-263.pdf (trailer, offset 18): expected dictionary key but found non-name object; inserting key /QPDFFake1
-WARNING: issue-263.pdf (trailer, offset 18): expected dictionary key but found non-name object; inserting key /QPDFFake2
-WARNING: issue-263.pdf (trailer, offset 18): expected dictionary key but found non-name object; inserting key /QPDFFake3
-WARNING: issue-263.pdf (trailer, offset 18): expected dictionary key but found non-name object; inserting key /QPDFFake4
-WARNING: issue-263.pdf (trailer, offset 18): expected dictionary key but found non-name object; inserting key /QPDFFake5
-WARNING: issue-263.pdf (trailer, offset 18): expected dictionary key but found non-name object; inserting key /QPDFFake6
-WARNING: issue-263.pdf (trailer, offset 18): expected dictionary key but found non-name object; inserting key /QPDFFake7
-WARNING: issue-263.pdf (trailer, offset 18): expected dictionary key but found non-name object; inserting key /QPDFFake8
-WARNING: issue-263.pdf (trailer, offset 18): expected dictionary key but found non-name object; inserting key /QPDFFake9
-qpdf: operation succeeded with warnings; resulting file may have some problems
+WARNING: issue-263.pdf (trailer, offset 87): too many errors; giving up on reading object
+issue-263.pdf: unable to find trailer dictionary while recovering damaged file
