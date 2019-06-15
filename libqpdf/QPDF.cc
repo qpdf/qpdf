@@ -812,7 +812,7 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
 			  "xref syntax invalid");
 	}
         this->m->file->seek(this->m->file->getLastOffset() + bytes, SEEK_SET);
-	for (int i = obj; i < obj + num; ++i)
+	for (qpdf_offset_t i = obj; i - num < obj; ++i)
 	{
 	    if (i == 0)
 	    {
