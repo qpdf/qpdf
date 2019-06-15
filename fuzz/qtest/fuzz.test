@@ -1,0 +1,52 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+use Digest::SHA;
+use File::Basename;
+
+require TestDriver;
+
+my $td = new TestDriver('fuzz');
+
+if (($^O eq 'MSWin32') || ($^O eq 'msys'))
+{
+    $td->emphasize("temporarily skipping fuzz tests in Windows");
+    $td->report(0);
+    exit(0);
+}
+
+my @files = glob("../qpdf_fuzzer_seed_corpus/*");
+my $n_test_files = 27;
+my $n_orig_files = 2559;
+my $n_files = $n_test_files + $n_orig_files;
+
+if (scalar(@files) != $n_files)
+{
+    die "wrong number of files seen in fuzz.test";
+}
+
+foreach my $f (@files)
+{
+    my $sum = basename($f);
+    $td->runtest("checksum $sum",
+                 {$td->STRING => get_sha1_checksum($f)},
+                 {$td->STRING => $sum});
+    $td->runtest("fuzz check $sum",
+                 {$td->COMMAND => "qpdf_fuzzer $f"},
+                 {$td->REGEXP => ".*$f successful\n",
+                      $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+$td->report(2 * $n_files);
+
+sub get_sha1_checksum
+{
+    my $file = shift;
+    open(F, "<$file") or fatal("can't open $file: $!");
+    binmode F;
+    my $digest = Digest::SHA->new('sha1')->addfile(*F)->hexdigest;
+    close(F);
+    $digest;
+}

@@ -1,5 +1,9 @@
 2019-06-15  Jay Berkenbilt  <ejb@ql.org>
 
+	* Do "ideal integration" with oss-fuzz. This includes adding a
+	better fuzzer with a seed corpus and adding automated tests of the
+	fuzzer with the test data.
+
 	* When parsing files, while reading an object, if there are too
 	many consecutive errors without enough intervening successes, give
 	up on the specific object. This reduces cases in which very badly

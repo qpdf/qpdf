@@ -642,6 +642,8 @@ my @bug_tests = (
     ["263", "empty xref stream", 2],
     ["335a", "ozz-fuzz-12152", 2],
     ["335b", "ozz-fuzz-14845", 2],
+    # When adding to this list, consider adding to SEED_CORPUS_FILES
+    # in fuzz/build.mk and updating the count in fuzz/qtest/fuzz.test.
     );
 $n_tests += scalar(@bug_tests);
 foreach my $d (@bug_tests)
