@@ -108,3 +108,15 @@ jobs:
     displayName: 'Build Fuzzer'
   dependsOn: Linux
   condition: succeeded()
+- job: Sanitizers
+  pool:
+    vmImage: ubuntu-16.04
+  steps:
+  - script: azure-pipelines/test-sanitizers
+    displayName: 'Sanitizer Tests'
+  - task: PublishTestResults@2
+    inputs:
+      testRunTitle: Sanitizers
+      buildPlatform: Sanitizers
+  dependsOn: Linux
+  condition: succeeded()

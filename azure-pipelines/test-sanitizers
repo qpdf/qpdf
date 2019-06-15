@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+sudo apt-get update
+sudo apt-get -y install \
+   autoconf build-essential zlib1g-dev libjpeg-dev
+./configure \
+   CFLAGS="-fsanitize=address -fsanitize=undefined -g" \
+   CXXFLAGS="-fsanitize=address -fsanitize=undefined -g" \
+   LDFLAGS="-fsanitize=address -fsanitize=undefined" \
+   --enable-werror --disable-shared --enable-show-failed-test-output
+make -j$(nproc) -k
+make -k check
