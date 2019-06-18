@@ -1451,8 +1451,7 @@ Optional Features:
   --enable-html-doc       whether to build HTML documents
   --enable-pdf-doc        whether to build PDF documents
   --enable-validate-doc   whether to validate xml document source
-  --enable-doc-maintenance
-                          if set, build static fuzzers for oss-fuzz
+  --enable-oss-fuzz       if set, build static fuzzers for oss-fuzz
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]

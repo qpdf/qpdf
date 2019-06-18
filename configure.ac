@@ -503,7 +503,7 @@ AC_ARG_ENABLE(validate-doc,
 
 AC_SUBST(OSS_FUZZ)
 AC_ARG_ENABLE(oss-fuzz,
-   AS_HELP_STRING([--enable-doc-maintenance],
+   AS_HELP_STRING([--enable-oss-fuzz],
 		  [if set, build static fuzzers for oss-fuzz]),
    [if test "$enableval" = "yes"; then
       OSS_FUZZ=1;
