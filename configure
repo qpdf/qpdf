@@ -767,6 +767,7 @@ enable_largefile
 enable_ld_version_script
 with_buildrules
 enable_werror
+enable_int_warnings
 enable_test_compare_images
 enable_show_failed_test_output
 with_docbook_xsl
@@ -1438,6 +1439,8 @@ Optional Features:
   --enable-ld-version-script
                           enable linker version script (default is enabled)
   --enable-werror         whether to treat warnings as errors (default is no)
+  --enable-int-warnings   whether to turn on integer type warnings (default is
+                          no)
   --enable-test-compare-images
                           whether to compare images in test suite; disabled by
                           default, enabling requires ghostscript and tiffcmp
@@ -16675,6 +16678,33 @@ else
 fi
 
 if test "$qpdf_USE_WERROR" = "1"; then
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+   WFLAGS="$WFLAGS $try_flags"
+else
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+if test "$BUILDRULES" = "msvc"; then
+   try_flags="-W3"
+else
+   try_flags="-Wconversion -Wsign-conversion"
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for whether to use $try_flags" >&5
+$as_echo_n "checking for whether to use $try_flags... " >&6; }
+# Check whether --enable-int-warnings was given.
+if test "${enable_int_warnings+set}" = set; then :
+  enableval=$enable_int_warnings; if test "$enableval" = "yes"; then
+      qpdf_INT_WARNINGS=1;
+    else
+      qpdf_INT_WARNINGS=0;
+    fi
+else
+  qpdf_INT_WARNINGS=0
+fi
+
+if test "$qpdf_INT_WARNINGS" = "1"; then
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
    WFLAGS="$WFLAGS $try_flags"

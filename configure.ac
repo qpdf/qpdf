@@ -392,6 +392,27 @@ else
    AC_MSG_RESULT(no)
 fi
 
+if test "$BUILDRULES" = "msvc"; then
+   try_flags="-W3"
+else
+   try_flags="-Wconversion -Wsign-conversion"
+fi
+AC_MSG_CHECKING(for whether to use $try_flags)
+AC_ARG_ENABLE(int-warnings,
+   AS_HELP_STRING([--enable-int-warnings],
+                  [whether to turn on integer type warnings (default is no)]),
+   [if test "$enableval" = "yes"; then
+      qpdf_INT_WARNINGS=1;
+    else
+      qpdf_INT_WARNINGS=0;
+    fi], [qpdf_INT_WARNINGS=0])
+if test "$qpdf_INT_WARNINGS" = "1"; then
+   AC_MSG_RESULT(yes)
+   WFLAGS="$WFLAGS $try_flags"
+else
+   AC_MSG_RESULT(no)
+fi
+
 AC_SUBST(QPDF_SKIP_TEST_COMPARE_IMAGES)
 AC_ARG_ENABLE(test-compare-images,
    AS_HELP_STRING([--enable-test-compare-images],
