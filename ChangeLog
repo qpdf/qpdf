@@ -1,3 +1,8 @@
+2019-06-18  Jay Berkenbilt  <ejb@ql.org>
+
+	* Remove previously submitted qpdf_read_memory_fuzzer as it is a
+	small subset of qpdf_fuzzer.
+
 2019-06-15  Jay Berkenbilt  <ejb@ql.org>
 
 	* Update CI (Azure Pipelines) to run tests with some sanitizers.

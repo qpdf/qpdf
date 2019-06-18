@@ -1,9 +1,7 @@
 # This directory contains support for Google's oss-fuzz project. See
 # https://github.com/google/oss-fuzz/tree/master/projects/qpdf
 
-FUZZERS = \
-    qpdf_fuzzer \
-    qpdf_read_memory_fuzzer
+FUZZERS = qpdf_fuzzer
 
 DEFAULT_FUZZ_RUNNER := standalone_fuzz_target_runner
 OBJ_DEFAULT_FUZZ := fuzz/$(OUTPUT_DIR)/$(DEFAULT_FUZZ_RUNNER).$(OBJ)
