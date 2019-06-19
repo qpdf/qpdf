@@ -1,0 +1,18 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+chdir("qintc") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('qintc');
+
+$td->runtest("QINTC",
+	     {$td->COMMAND => "qintc"},
+	     {$td->FILE => "qintc.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES | $td->RM_WS_ONLY_LINES);
+
+$td->report(1);

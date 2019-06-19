@@ -1,3 +1,8 @@
+2019-06-20  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add QIC.hh, containing integer type converters that do range
+	checking.
+
 2019-06-18  Jay Berkenbilt  <ejb@ql.org>
 
 	* Remove previously submitted qpdf_read_memory_fuzzer as it is a

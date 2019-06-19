@@ -17,6 +17,7 @@ BINS_libtests = \
 	numrange \
 	pointer_holder \
 	predictors \
+	qintc \
 	qutil \
 	random \
 	rc4 \
