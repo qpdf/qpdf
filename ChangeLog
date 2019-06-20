@@ -1,5 +1,9 @@
 2019-06-20  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add functions to QUtil to convert unsigned integers to strings,
+	avoiding implicit conversion between unsigned and signed integer
+	types.
+
 	* Add QIC.hh, containing integer type converters that do range
 	checking.
 

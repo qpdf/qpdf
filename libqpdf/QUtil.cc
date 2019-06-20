@@ -9,6 +9,7 @@
 #include <qpdf/SecureRandomDataProvider.hh>
 #include <qpdf/QPDFSystemError.hh>
 #include <qpdf/QTC.hh>
+#include <qpdf/QIntC.hh>
 
 #include <cmath>
 #include <iomanip>
@@ -233,14 +234,10 @@ static unsigned short mac_roman_to_unicode[] = {
     0x02c7,    // 0xff
 };
 
+template <typename T>
+static
 std::string
-QUtil::int_to_string(long long num, int length)
-{
-    return int_to_string_base(num, 10, length);
-}
-
-std::string
-QUtil::int_to_string_base(long long num, int base, int length)
+int_to_string_base_internal(T num, int base, int length)
 {
     // Backward compatibility -- int_to_string, which calls this
     // function, used to use sprintf with %0*d, so we interpret length
@@ -255,16 +252,40 @@ QUtil::int_to_string_base(long long num, int base, int length)
     buf << std::setbase(base) << std::nouppercase << num;
     std::string result;
     if ((length > 0) &&
-        (buf.str().length() < static_cast<size_t>(length)))
+        (buf.str().length() < QIntC::to_size(length)))
     {
 	result.append(length - buf.str().length(), '0');
     }
     result += buf.str();
-    if ((length < 0) && (buf.str().length() < static_cast<size_t>(-length)))
+    if ((length < 0) && (buf.str().length() < QIntC::to_size(-length)))
     {
 	result.append(-length - buf.str().length(), ' ');
     }
     return result;
+}
+
+std::string
+QUtil::int_to_string(long long num, int length)
+{
+    return int_to_string_base(num, 10, length);
+}
+
+std::string
+QUtil::uint_to_string(unsigned long long num, int length)
+{
+    return int_to_string_base(num, 10, length);
+}
+
+std::string
+QUtil::int_to_string_base(long long num, int base, int length)
+{
+    return int_to_string_base_internal(num, base, length);
+}
+
+std::string
+QUtil::uint_to_string_base(unsigned long long num, int base, int length)
+{
+    return int_to_string_base_internal(num, base, length);
 }
 
 std::string
@@ -294,7 +315,7 @@ QUtil::string_to_ll(char const* str)
 #endif
     if (errno == ERANGE)
     {
-        throw std::runtime_error(
+        throw std::range_error(
             std::string("overflow/underflow converting ") + str
             + " to 64-bit integer");
     }
@@ -304,22 +325,45 @@ QUtil::string_to_ll(char const* str)
 int
 QUtil::string_to_int(char const* str)
 {
+    // QIntC::to_int does range checking
+    return QIntC::to_int(string_to_ll(str));
+}
+
+unsigned long long
+QUtil::string_to_ull(char const* str)
+{
+    char const* p = str;
+    while (*p && is_space(*p))
+    {
+        ++p;
+    }
+    if (*p == '-')
+    {
+        throw std::runtime_error(
+            std::string("underflow converting ") + str
+            + " to 64-bit unsigned integer");
+    }
+
     errno = 0;
-    long long_val = strtol(str, 0, 10);
+#ifdef _MSC_VER
+    unsigned long long result = _strtoui64(str, 0, 10);
+#else
+    unsigned long long result = strtoull(str, 0, 10);
+#endif
     if (errno == ERANGE)
     {
         throw std::runtime_error(
-            std::string("overflow/underflow converting ") + str
-            + " to long integer");
-    }
-    int result = static_cast<int>(long_val);
-    if (static_cast<long>(result) != long_val)
-    {
-        throw std::runtime_error(
-            std::string("overflow/underflow converting ") + str
-            + " to integer");
+            std::string("overflow converting ") + str
+            + " to 64-bit unsigned integer");
     }
     return result;
+}
+
+unsigned int
+QUtil::string_to_uint(char const* str)
+{
+    // QIntC::to_uint does range checking
+    return QIntC::to_uint(string_to_ull(str));
 }
 
 unsigned char*
@@ -412,14 +456,18 @@ int
 QUtil::seek(FILE* stream, qpdf_offset_t offset, int whence)
 {
 #if HAVE_FSEEKO
-    return fseeko(stream, static_cast<off_t>(offset), whence);
+    return fseeko(stream,
+                  QIntC::IntConverter<qpdf_offset_t, off_t>::convert(offset),
+                  whence);
 #elif HAVE_FSEEKO64
     return fseeko64(stream, offset, whence);
 #else
 # if defined _MSC_VER || defined __BORLANDC__
     return _fseeki64(stream, offset, whence);
 # else
-    return fseek(stream, static_cast<long>(offset), whence);
+    return fseek(stream,
+                 QIntC::IntConverter<qpdf_offset_t, long>(offset),
+                 whence);
 # endif
 #endif
 }
@@ -428,14 +476,14 @@ qpdf_offset_t
 QUtil::tell(FILE* stream)
 {
 #if HAVE_FSEEKO
-    return static_cast<qpdf_offset_t>(ftello(stream));
+    return QIntC::to_offset(ftello(stream));
 #elif HAVE_FSEEKO64
-    return static_cast<qpdf_offset_t>(ftello64(stream));
+    return QIntC::to_offset(ftello64(stream));
 #else
 # if defined _MSC_VER || defined __BORLANDC__
     return _ftelli64(stream);
 # else
-    return static_cast<qpdf_offset_t>(ftell(stream));
+    return QIntC::to_offset(ftell(stream));
 # endif
 #endif
 }
@@ -508,7 +556,7 @@ QUtil::hex_encode(std::string const& input)
     for (unsigned int i = 0; i < input.length(); ++i)
     {
         result += QUtil::int_to_string_base(
-            static_cast<int>(static_cast<unsigned char>(input.at(i))), 16, 2);
+            QIntC::to_int(static_cast<unsigned char>(input.at(i))), 16, 2);
     }
     return result;
 }

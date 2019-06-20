@@ -23,20 +23,22 @@ void test_to_number(char const* str, int_T wanted, bool error,
     bool threw = false;
     bool worked = false;
     int_T result = 0;
+    std::string msg;
     try
     {
         result = fn(str);
         worked = (wanted == result);
     }
-    catch (std::runtime_error const&)
+    catch (std::runtime_error const& e)
     {
         threw = true;
+        msg = e.what();
     }
     if (threw)
     {
         if (error)
         {
-            std::cout << str << " to int threw: PASSED" << std::endl;
+            std::cout << str << " to int threw (" << msg << "): PASSED" << std::endl;
         }
         else
         {
@@ -65,6 +67,16 @@ void test_to_int(char const* str, int wanted, bool error)
 void test_to_ll(char const* str, long long wanted, bool error)
 {
     test_to_number(str, wanted, error, QUtil::string_to_ll);
+}
+
+void test_to_uint(char const* str, unsigned int wanted, bool error)
+{
+    test_to_number(str, wanted, error, QUtil::string_to_uint);
+}
+
+void test_to_ull(char const* str, unsigned long long wanted, bool error)
+{
+    test_to_number(str, wanted, error, QUtil::string_to_ull);
 }
 
 void string_conversion_test()
@@ -105,6 +117,8 @@ void string_conversion_test()
     long long int_min_minus_1 = static_cast<long long>(INT_MIN) - 1;
     std::string int_max_plus_1_str = QUtil::int_to_string(int_max_plus_1);
     std::string int_min_minus_1_str = QUtil::int_to_string(int_min_minus_1);
+    std::string small_positive = QUtil::uint_to_string(16059U);
+    std::string small_negative = QUtil::int_to_string(-16059);
     test_to_int(int_min_str.c_str(), INT_MIN, false);
     test_to_int(int_max_str.c_str(), INT_MAX, false);
     test_to_int(int_max_plus_1_str.c_str(), 0, true);
@@ -113,6 +127,11 @@ void string_conversion_test()
     test_to_ll(int_max_plus_1_str.c_str(), int_max_plus_1, false);
     test_to_ll(int_min_minus_1_str.c_str(), int_min_minus_1, false);
     test_to_ll("99999999999999999999999999999999999999999999999999", 0, true);
+    test_to_uint(small_positive.c_str(), 16059U, false);
+    test_to_uint(small_negative.c_str(), 0, true);
+    test_to_uint("9999999999", 0, true);
+    test_to_ull(small_positive.c_str(), 16059U, false);
+    test_to_ull(small_negative.c_str(), 0, true);
 }
 
 void os_wrapper_test()
@@ -159,7 +178,7 @@ void getenv_test()
 static void print_utf8(unsigned long val)
 {
     std::string result = QUtil::toUTF8(val);
-    std::cout << "0x" << QUtil::int_to_string_base(val, 16) << " ->";
+    std::cout << "0x" << QUtil::uint_to_string_base(val, 16) << " ->";
     if (val < 0xfffe)
     {
 	std::cout << " " << result;
@@ -199,7 +218,7 @@ void to_utf8_test()
 static void print_utf16(unsigned long val)
 {
     std::string result = QUtil::toUTF16(val);
-    std::cout << "0x" << QUtil::int_to_string_base(val, 16) << " ->";
+    std::cout << "0x" << QUtil::uint_to_string_base(val, 16) << " ->";
     for (std::string::iterator iter = result.begin();
          iter != result.end(); ++iter)
     {
@@ -249,7 +268,7 @@ void transcoding_test(std::string (*to_utf8)(std::string const&),
     std::string back;
     for (int i = 128; i <= last; ++i)
     {
-        in.at(0) = static_cast<unsigned char>(i);
+        in.at(0) = static_cast<char>(static_cast<unsigned char>(i));
         out = (*to_utf8)(in);
         std::string wanted = (out == "\xef\xbf\xbd") ? unknown : in;
         back = (*from_utf8)(out, '?');

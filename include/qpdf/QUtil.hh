@@ -40,7 +40,11 @@ namespace QUtil
     QPDF_DLL
     std::string int_to_string(long long, int length = 0);
     QPDF_DLL
+    std::string uint_to_string(unsigned long long, int length = 0);
+    QPDF_DLL
     std::string int_to_string_base(long long, int base, int length = 0);
+    QPDF_DLL
+    std::string uint_to_string_base(unsigned long long, int base, int length = 0);
     QPDF_DLL
     std::string double_to_string(double, int decimal_places = 0);
 
@@ -50,6 +54,10 @@ namespace QUtil
     long long string_to_ll(char const* str);
     QPDF_DLL
     int string_to_int(char const* str);
+    QPDF_DLL
+    unsigned long long string_to_ull(char const* str);
+    QPDF_DLL
+    unsigned int string_to_uint(char const* str);
 
     // Pipeline's write method wants unsigned char*, but we often have
     // some other type of string.  These methods do combinations of

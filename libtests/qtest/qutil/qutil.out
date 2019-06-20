@@ -17,12 +17,17 @@ one
 compare okay
 -2147483648 to int: PASSED
 2147483647 to int: PASSED
-2147483648 to int threw: PASSED
--2147483649 to int threw: PASSED
-9999999999999999999999999 to int threw: PASSED
+2147483648 to int threw (integer out of range converting 2147483648 from a 8-byte signed type to a 4-byte signed type): PASSED
+-2147483649 to int threw (integer out of range converting -2147483649 from a 8-byte signed type to a 4-byte signed type): PASSED
+9999999999999999999999999 to int threw (overflow/underflow converting 9999999999999999999999999 to 64-bit integer): PASSED
 2147483648 to int: PASSED
 -2147483649 to int: PASSED
-99999999999999999999999999999999999999999999999999 to int threw: PASSED
+99999999999999999999999999999999999999999999999999 to int threw (overflow/underflow converting 99999999999999999999999999999999999999999999999999 to 64-bit integer): PASSED
+16059 to int: PASSED
+-16059 to int threw (underflow converting -16059 to 64-bit unsigned integer): PASSED
+9999999999 to int threw (integer out of range converting 9999999999 from a 8-byte unsigned type to a 4-byte unsigned type): PASSED
+16059 to int: PASSED
+-16059 to int threw (underflow converting -16059 to 64-bit unsigned integer): PASSED
 ---- os wrapper
 before remove
 exception: remove file: No such file or directory
