@@ -26,6 +26,7 @@
 #include <stdexcept>
 #include <stdlib.h>
 #include <ctype.h>
+#include <limits.h>
 
 class TerminateParsing
 {
@@ -404,6 +405,82 @@ QPDFObjectHandle::getIntValue()
         QTC::TC("qpdf", "QPDFObjectHandle integer returning 0");
         return 0;
     }
+}
+
+int
+QPDFObjectHandle::getIntValueAsInt()
+{
+    int result = 0;
+    long long v = getIntValue();
+    if (v < INT_MIN)
+    {
+        QTC::TC("qpdf", "QPDFObjectHandle int returning INT_MIN");
+        warnIfPossible(
+            "requested value of integer is too small; returning INT_MIN",
+            false);
+        result = INT_MIN;
+    }
+    else if (v > INT_MAX)
+    {
+        QTC::TC("qpdf", "QPDFObjectHandle int returning INT_MAX");
+        warnIfPossible(
+            "requested value of integer is too big; returning INT_MAX",
+            false);
+        result = INT_MAX;
+    }
+    else
+    {
+        result = static_cast<int>(v);
+    }
+    return result;
+}
+
+unsigned long long
+QPDFObjectHandle::getUIntValue()
+{
+    unsigned long long result = 0;
+    long long v = getIntValue();
+    if (v < 0)
+    {
+        QTC::TC("qpdf", "QPDFObjectHandle uint returning 0");
+        warnIfPossible(
+            "unsigned value request for negative number; returning 0",
+            false);
+    }
+    else
+    {
+        result = static_cast<unsigned long long>(v);
+    }
+    return result;
+}
+
+unsigned int
+QPDFObjectHandle::getUIntValueAsUInt()
+{
+    unsigned int result = 0;
+    long long v = getIntValue();
+    if (v < 0)
+    {
+        QTC::TC("qpdf", "QPDFObjectHandle uint uint returning 0");
+        warnIfPossible(
+            "unsigned integer value request for negative number; returning 0",
+            false);
+        result = 0;
+    }
+    else if (v > UINT_MAX)
+    {
+        QTC::TC("qpdf", "QPDFObjectHandle uint returning UINT_MAX");
+        warnIfPossible(
+            "requested value of unsigned integer is too big;"
+            " returning UINT_MAX",
+            false);
+        result = UINT_MAX;
+    }
+    else
+    {
+        result = static_cast<unsigned int>(v);
+    }
+    return result;
 }
 
 // Real accessors

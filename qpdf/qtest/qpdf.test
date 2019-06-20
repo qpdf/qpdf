@@ -2286,7 +2286,7 @@ my @badfiles = ("not a PDF file", 			# 1
                 "bad dictionary key",                   # 36
 		);
 
-$n_tests += @badfiles + 5;
+$n_tests += @badfiles + 6;
 
 # Test 6 contains errors in the free table consistency, but we no
 # longer have any consistency check for this since it is not important
@@ -2333,6 +2333,11 @@ $td->runtest("C API: no recovery",
 	     {$td->FILE => "c-no-recovery.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("integer type checks",
+             {$td->COMMAND => "test_driver 62 minimal.pdf"},
+             {$td->STRING => "test 62 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 show_ntests();
 # ----------

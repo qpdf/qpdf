@@ -440,3 +440,8 @@ QPDFPageObjectHelper keep inline image 0
 qpdf image optimize colorspace 0
 qpdf image optimize bits per component 0
 QPDFWriter remove empty DecodeParms 0
+QPDFObjectHandle uint returning 0 0
+QPDFObjectHandle int returning INT_MIN 0
+QPDFObjectHandle int returning INT_MAX 0
+QPDFObjectHandle uint returning UINT_MAX 0
+QPDFObjectHandle uint uint returning 0 0

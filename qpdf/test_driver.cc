@@ -24,6 +24,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <limits.h>
 #include <map>
 
 static char const* whoami = 0;
@@ -189,19 +190,33 @@ static void read_file_into_memory(
             throw std::runtime_error(
                 std::string("failure reading file ") + filename +
                 " into memory: read " +
-                QUtil::int_to_string(bytes_read) + "; wanted " +
-                QUtil::int_to_string(size));
+                QUtil::uint_to_string(bytes_read) + "; wanted " +
+                QUtil::uint_to_string(size));
         }
         else
         {
             throw std::logic_error(
                 std::string("premature eof reading file ") + filename +
                 " into memory: read " +
-                QUtil::int_to_string(bytes_read) + "; wanted " +
-                QUtil::int_to_string(size));
+                QUtil::uint_to_string(bytes_read) + "; wanted " +
+                QUtil::uint_to_string(size));
         }
     }
     fclose(f);
+}
+
+#define assert_compare_numbers(expected, expr) \
+    compare_numbers(#expr, expected, expr)
+
+template <typename T1, typename T2>
+static void compare_numbers(
+    char const* description, T1 const& expected, T2 const& actual)
+{
+    if (expected != actual)
+    {
+        std::cerr << description << ": expected = " << expected
+                  << "; actual = " << actual << std::endl;
+    }
 }
 
 void runtest(int n, char const* filename1, char const* arg2)
@@ -2089,6 +2104,31 @@ void runtest(int n, char const* filename1, char const* arg2)
         {
             std::cout << "Caught runtime_error as expected" << std::endl;
         }
+    }
+    else if (n == 62)
+    {
+        // Test int size checks. This test will fail if int and long
+        // long are the same size.
+        QPDFObjectHandle t = pdf.getTrailer();
+        unsigned long long q1_l = 3L * INT_MAX;
+        long long q1 = static_cast<long long>(q1_l);
+        long long q2_l = 3L * INT_MIN;
+        long long q2 = static_cast<long long>(q2_l);
+        unsigned int q3_i = UINT_MAX;
+        long long q3 = static_cast<long long>(q3_i);
+        t.replaceKey("/Q1", QPDFObjectHandle::newInteger(q1));
+        t.replaceKey("/Q2", QPDFObjectHandle::newInteger(q2));
+        t.replaceKey("/Q3", QPDFObjectHandle::newInteger(q3));
+        assert_compare_numbers(q1, t.getKey("/Q1").getIntValue());
+        assert_compare_numbers(q1_l, t.getKey("/Q1").getUIntValue());
+        assert_compare_numbers(INT_MAX, t.getKey("/Q1").getIntValueAsInt());
+        assert_compare_numbers(UINT_MAX, t.getKey("/Q1").getUIntValueAsUInt());
+        assert_compare_numbers(q2_l, t.getKey("/Q2").getIntValue());
+        assert_compare_numbers(0U, t.getKey("/Q2").getUIntValue());
+        assert_compare_numbers(INT_MIN, t.getKey("/Q2").getIntValueAsInt());
+        assert_compare_numbers(0U, t.getKey("/Q2").getUIntValueAsUInt());
+        assert_compare_numbers(INT_MAX, t.getKey("/Q3").getIntValueAsInt());
+        assert_compare_numbers(UINT_MAX, t.getKey("/Q3").getUIntValueAsUInt());
     }
     else
     {

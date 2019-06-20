@@ -491,6 +491,12 @@ class QPDFObjectHandle
     // Methods for integer objects
     QPDF_DLL
     long long getIntValue();
+    QPDF_DLL
+    int getIntValueAsInt();
+    QPDF_DLL
+    unsigned long long getUIntValue();
+    QPDF_DLL
+    unsigned int getUIntValueAsUInt();
 
     // Methods for real objects
     QPDF_DLL
