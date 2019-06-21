@@ -542,6 +542,7 @@ my @json_files = (
     ['page-labels-and-outlines', []],
     ['page-labels-num-tree', []],
     ['image-streams', []],
+    ['image-streams-small', []],
     ['field-types', []],
     ['image-streams', ['--decode-level=all']],
     ['image-streams', ['--decode-level=specialized']],
@@ -2105,6 +2106,10 @@ $n_tests += 14;
 
 # image-streams.pdf is the output of examples/pdf-create.
 # examples/pdf-create validates the actual image data.
+# image-streams-small.pdf was manually created by editing
+# pdf-create.cc to reduce width and height to 40x8 and ignoring
+# errors. Its purpose was to get a small file with images with
+# different filters for fuzz testing.
 foreach my $l (qw(none generalized specialized all))
 {
     $td->runtest("image-streams: $l",
