@@ -59,7 +59,7 @@ QPDF is known to build and pass its test suite with mingw (latest version tested
 
 # Additional Notes on Build
 
-QPDF's build system, inspired by [abuild](http://www.abuild.org), can optionally use its own built-in rules rather than using libtool and obeying the compiler specified with configure.  This can be enabled by passing `--with-buildrules=buildrules` where buildrules corresponds to one of the `.mk` files (other than `rules.mk`) in the make directory. This should never be necessary on a UNIX system, but may be necessary on a Windows system.  See [README-windows.md](README-windows.md) for details.  There is a `gcc-linux.mk` file enable `gcc-linux` build rules, but it is intended to help test the build system; Linux users should build with the `libtools` rules, which are enabled by default.
+QPDF's build system, inspired by [abuild](http://www.abuild.org), can optionally use its own built-in rules rather than using libtool and obeying the compiler specified with configure.  This can be enabled by passing `--with-buildrules=buildrules` where buildrules corresponds to one of the `.mk` files (other than `rules.mk`) in the make directory. This should never be necessary on a UNIX system, but may be necessary on a Windows system.  See [README-windows.md](README-windows.md) for details.
 
 The QPDF package provides some executables and a software library.  A user manual can be found in the "doc" directory.  The docbook sources to the user manual can be found in the `manual` directory.
 
