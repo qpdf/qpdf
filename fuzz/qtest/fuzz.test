@@ -9,13 +9,6 @@ require TestDriver;
 
 my $td = new TestDriver('fuzz');
 
-if (($^O eq 'MSWin32') || ($^O eq 'msys'))
-{
-    $td->emphasize("temporarily skipping fuzz tests in Windows");
-    $td->report(0);
-    exit(0);
-}
-
 my @files = glob("../qpdf_fuzzer_seed_corpus/*");
 my $n_test_files = 27;
 my $n_orig_files = 2559;

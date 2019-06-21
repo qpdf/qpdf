@@ -2,7 +2,6 @@ OSS-Fuzz
 ========
 
 * Fix open issues from https://oss-fuzz.com
-* Get fuzzer tests to pass in Windows
 
 Next ABI
 ========
