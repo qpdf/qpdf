@@ -58,9 +58,7 @@ FuzzHelper::getWriter(PointerHolder<QPDF> qpdf)
 {
     PointerHolder<QPDFWriter> w = new QPDFWriter(*qpdf);
     w->setOutputPipeline(&this->discard);
-    w->setDeterministicID(true);
     w->setDecodeLevel(qpdf_dl_all);
-    w->setCompressStreams(false);
     return w;
 }
 
@@ -72,6 +70,10 @@ FuzzHelper::doWrite(PointerHolder<QPDFWriter> w)
         w->write();
     }
     catch (QPDFExc const& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
+    catch (std::runtime_error const& e)
     {
         std::cerr << e.what() << std::endl;
     }
@@ -87,21 +89,31 @@ FuzzHelper::testWrite()
 
     q = getQpdf();
     w = getWriter(q);
+    w->setDeterministicID(true);
+    w->setQDFMode(true);
     doWrite(w);
 
     q = getQpdf();
     w = getWriter(q);
+    w->setStaticID(true);
     w->setLinearization(true);
+    w->setR6EncryptionParameters(
+        "u", "o", true, true, true, true, true, true, qpdf_r3p_full, true);
     doWrite(w);
 
     q = getQpdf();
     w = getWriter(q);
+    w->setStaticID(true);
     w->setObjectStreamMode(qpdf_o_disable);
+    w->setR3EncryptionParameters(
+	"u", "o", true, true, qpdf_r3p_full, qpdf_r3m_all);
     doWrite(w);
 
     q = getQpdf();
     w = getWriter(q);
+    w->setDeterministicID(true);
     w->setObjectStreamMode(qpdf_o_generate);
+    w->setLinearization(true);
     doWrite(w);
 }
 
@@ -115,6 +127,8 @@ FuzzHelper::testPages()
     QPDFPageLabelDocumentHelper pldh(*q);
     QPDFOutlineDocumentHelper odh(*q);
     QPDFAcroFormDocumentHelper afdh(*q);
+    afdh.generateAppearancesIfNeeded();
+    pdh.flattenAnnotations();
     std::vector<QPDFPageObjectHelper> pages = pdh.getAllPages();
     DiscardContents discard_contents;
     int pageno = 0;
@@ -126,10 +140,13 @@ FuzzHelper::testPages()
         ++pageno;
         try
         {
+            page.coalesceContentStreams();
             page.parsePageContents(&discard_contents);
             page.getPageImages();
             pldh.getLabelForPage(pageno);
-            odh.getOutlinesForPage(page.getObjectHandle().getObjGen());
+            QPDFObjectHandle page_obj(page.getObjectHandle());
+            page_obj.getJSON(true).unparse();
+            odh.getOutlinesForPage(page_obj.getObjGen());
 
             std::vector<QPDFAnnotationObjectHelper> annotations =
                 afdh.getWidgetAnnotationsForPage(page);
