@@ -676,10 +676,10 @@ ValueSetter::writeAppearance()
     if (highlight)
     {
         write("q\n0.85 0.85 0.85 rg\n" +
-              QUtil::int_to_string(bbox.llx) + " " +
+              QUtil::double_to_string(bbox.llx) + " " +
               QUtil::double_to_string(bbox.lly + dy -
                                       (tfh * (highlight_idx + 1))) + " " +
-              QUtil::int_to_string(bbox.urx - bbox.llx) + " " +
+              QUtil::double_to_string(bbox.urx - bbox.llx) + " " +
               QUtil::double_to_string(tfh) +
               " re f\nQ\n");
     }
@@ -693,7 +693,7 @@ ValueSetter::writeAppearance()
         // which doesn't seem really worth the effort.
         if (i == 0)
         {
-            write(QUtil::int_to_string(bbox.llx + dx) + " " +
+            write(QUtil::double_to_string(bbox.llx + dx) + " " +
                   QUtil::double_to_string(bbox.lly + dy) + " Td\n");
         }
         else
