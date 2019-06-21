@@ -1127,7 +1127,7 @@ QPDFObjectHandle::getRawStreamData()
 
 bool
 QPDFObjectHandle::pipeStreamData(Pipeline* p,
-                                 unsigned long encode_flags,
+                                 int encode_flags,
                                  qpdf_stream_decode_level_e decode_level,
                                  bool suppress_warnings, bool will_retry)
 {
@@ -1140,7 +1140,7 @@ bool
 QPDFObjectHandle::pipeStreamData(Pipeline* p, bool filter,
 				 bool normalize, bool compress)
 {
-    unsigned long encode_flags = 0;
+    int encode_flags = 0;
     qpdf_stream_decode_level_e decode_level = qpdf_dl_none;
     if (filter)
     {

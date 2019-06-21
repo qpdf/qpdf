@@ -32,7 +32,7 @@ class QPDF_Stream: public QPDFObject
 
     // See comments in QPDFObjectHandle.hh for these methods.
     bool pipeStreamData(Pipeline*,
-                        unsigned long encode_flags,
+                        int encode_flags,
                         qpdf_stream_decode_level_e decode_level,
                         bool suppress_warnings, bool will_retry);
     PointerHolder<Buffer> getStreamData(qpdf_stream_decode_level_e);

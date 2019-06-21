@@ -736,7 +736,7 @@ class QPDFObjectHandle
     // operation will be retried without filtering to avoid data loss.
     QPDF_DLL
     bool pipeStreamData(Pipeline*,
-                        unsigned long encode_flags,
+                        int encode_flags,
                         qpdf_stream_decode_level_e decode_level,
                         bool suppress_warnings = false,
                         bool will_retry = false);
