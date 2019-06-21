@@ -2142,13 +2142,6 @@ QPDF::replaceReserved(QPDFObjectHandle reserved,
 }
 
 QPDFObjectHandle
-QPDF::copyForeignObject(QPDFObjectHandle foreign, bool)
-{
-    // This method will be removed next time the ABI is changed.
-    return copyForeignObject(foreign);
-}
-
-QPDFObjectHandle
 QPDF::copyForeignObject(QPDFObjectHandle foreign)
 {
     // Do not preclude use of copyForeignObject on page objects. It is

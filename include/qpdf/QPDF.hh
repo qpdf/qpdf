@@ -934,9 +934,6 @@ class QPDF
 	QPDFObjectHandle& stream_dict, bool is_attachment_stream,
 	std::vector<PointerHolder<Pipeline> >& heap);
 
-    // Unused copyForeignObject -- remove at next ABI change
-    QPDFObjectHandle copyForeignObject(
-        QPDFObjectHandle foreign, bool unused);
     // Methods to support object copying
     void reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier,
                         bool top);
