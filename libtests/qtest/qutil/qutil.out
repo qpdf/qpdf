@@ -53,6 +53,8 @@ HAGOOGAMAGOOGLE: 0
 0xdead -> ff fd
 0x7fffffff -> ff fd
 0x80000000 -> ff fd
+π
+π
 ---- utf8_to_ascii
 ¿Does π have fingers?
 ?Does ? have fingers?

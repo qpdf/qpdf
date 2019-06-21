@@ -1955,7 +1955,7 @@ QUtil::utf16_to_utf8(std::string const& val)
     }
     // If the string has an odd number of bytes, the last byte is
     // ignored.
-    for (size_t i = start; i < len; i += 2)
+    for (size_t i = start; i + 1 < len; i += 2)
     {
         // Convert from UTF16-BE.  If we get a malformed
         // codepoint, this code will generate incorrect output

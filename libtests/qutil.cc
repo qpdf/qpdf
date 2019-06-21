@@ -238,6 +238,10 @@ void to_utf16_test()
     print_utf16(0xdeadUL);
     print_utf16(0x7fffffffUL);
     print_utf16(0x80000000UL);
+
+    std::string s(QUtil::utf8_to_utf16("\xcf\x80"));
+    std::cout << QUtil::utf16_to_utf8(s) << std::endl;
+    std::cout << QUtil::utf16_to_utf8(s + ".") << std::endl;
 }
 
 void utf8_to_ascii_test()
