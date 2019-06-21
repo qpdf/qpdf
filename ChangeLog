@@ -1,5 +1,9 @@
 2019-06-20  Jay Berkenbilt  <ejb@ql.org>
 
+	* Change out_bufsize argument to Pl_Flate's constructor for int to
+	unsigned int for compatibility with underlying zlib
+	implementation.
+
 	* Add methods to QPDFObjectHandle to return the value of Integer
 	objects as int and unsigned int with range checking and fallback
 	behavior to avoid silent underflow/overflow conditions.

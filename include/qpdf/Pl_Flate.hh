@@ -27,13 +27,13 @@
 class Pl_Flate: public Pipeline
 {
   public:
-    static int const def_bufsize = 65536;
+    static unsigned int const def_bufsize = 65536;
 
     enum action_e { a_inflate, a_deflate };
 
     QPDF_DLL
     Pl_Flate(char const* identifier, Pipeline* next,
-	     action_e action, int out_bufsize = def_bufsize);
+	     action_e action, unsigned int out_bufsize = def_bufsize);
     QPDF_DLL
     virtual ~Pl_Flate();
 
@@ -43,11 +43,11 @@ class Pl_Flate: public Pipeline
     virtual void finish();
 
   private:
-    void handleData(unsigned char* data, int len, int flush);
+    void handleData(unsigned char* data, size_t len, int flush);
     void checkError(char const* prefix, int error_code);
 
     unsigned char* outbuf;
-    int out_bufsize;
+    size_t out_bufsize;
     action_e action;
     bool initialized;
     void* zdata;

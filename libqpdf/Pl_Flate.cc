@@ -1,13 +1,15 @@
 #include <qpdf/Pl_Flate.hh>
 #include <zlib.h>
 #include <string.h>
+#include <limits.h>
 
 #include <qpdf/QUtil.hh>
+#include <qpdf/QIntC.hh>
 
 Pl_Flate::Pl_Flate(char const* identifier, Pipeline* next,
-		   action_e action, int out_bufsize) :
+		   action_e action, unsigned int out_bufsize_int) :
     Pipeline(identifier, next),
-    out_bufsize(out_bufsize),
+    out_bufsize(QIntC::to_size(out_bufsize_int)),
     action(action),
     initialized(false)
 {
@@ -19,6 +21,13 @@ Pl_Flate::Pl_Flate(char const* identifier, Pipeline* next,
     // Windows environment.
     this->zdata = new z_stream;
 
+    if (out_bufsize > UINT_MAX)
+    {
+        throw std::runtime_error(
+            "Pl_Flate: zlib doesn't support buffer"
+            " sizes larger than unsigned int");
+    }
+
     z_stream& zstream = *(static_cast<z_stream*>(this->zdata));
     zstream.zalloc = 0;
     zstream.zfree = 0;
@@ -26,7 +35,7 @@ Pl_Flate::Pl_Flate(char const* identifier, Pipeline* next,
     zstream.next_in = 0;
     zstream.avail_in = 0;
     zstream.next_out = this->outbuf;
-    zstream.avail_out = out_bufsize;
+    zstream.avail_out = QIntC::to_uint(out_bufsize);
 }
 
 Pl_Flate::~Pl_Flate()
@@ -77,11 +86,17 @@ Pl_Flate::write(unsigned char* data, size_t len)
 }
 
 void
-Pl_Flate::handleData(unsigned char* data, int len, int flush)
+Pl_Flate::handleData(unsigned char* data, size_t len, int flush)
 {
+    if (len > UINT_MAX)
+    {
+        throw std::runtime_error(
+            "Pl_Flate: zlib doesn't support data"
+            " blocks larger than int");
+    }
     z_stream& zstream = *(static_cast<z_stream*>(this->zdata));
     zstream.next_in = data;
-    zstream.avail_in = len;
+    zstream.avail_in = QIntC::to_uint(len);
 
     if (! this->initialized)
     {
@@ -156,12 +171,13 @@ Pl_Flate::handleData(unsigned char* data, int len, int flush)
 		    // needed, so we're done for now.
 		    done = true;
 		}
-		uLong ready = (this->out_bufsize - zstream.avail_out);
+		uLong ready =
+                    QIntC::to_ulong(this->out_bufsize - zstream.avail_out);
 		if (ready > 0)
 		{
 		    this->getNext()->write(this->outbuf, ready);
 		    zstream.next_out = this->outbuf;
-		    zstream.avail_out = this->out_bufsize;
+		    zstream.avail_out = QIntC::to_uint(this->out_bufsize);
 		}
 	    }
 	    break;
