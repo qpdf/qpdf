@@ -1,9 +1,6 @@
 Next ABI
 ========
 
- * Rename QUtil::strcasecmp since strcasecmp is a macro on some
-   platforms. See #242.
-
  * Get rid of the version of QPDF::copyForeignObject with the bool
    unused parameter.
 

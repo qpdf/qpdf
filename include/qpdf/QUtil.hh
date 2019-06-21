@@ -305,8 +305,11 @@ namespace QUtil
     QPDF_DLL
     std::list<std::string> read_lines_from_file(std::istream&);
 
+    // This used to be called strcasecmp, but that is a macro on some
+    // platforms, so we have to give it a name that is not likely to
+    // be a macro anywhere.
     QPDF_DLL
-    int strcasecmp(char const *, char const *);
+    int str_compare_nocase(char const *, char const *);
 
     // These routines help the tokenizer recognize certain character
     // classes without using ctype, which we avoid because of locale

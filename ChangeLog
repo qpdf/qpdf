@@ -1,3 +1,12 @@
+2019-06-21  Jay Berkenbilt  <ejb@ql.org>
+
+	* Source-level incompatibility: rename QUtil::strcasecmp to
+	QUtil::str_compare_nocase. This is a non-compatible change, but
+	QUtil::strcasecmp is hardly the most important part of qpdf's API.
+	The reason for this change is that strcasecmp is a macro on some
+	systems, and that was causing problems when QUtil.hh was included
+	in certain circumstances. Fixes #242.
+
 2019-06-20  Jay Berkenbilt  <ejb@ql.org>
 
 	* Enable compilation with additional warnings for integer

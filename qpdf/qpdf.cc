@@ -4981,7 +4981,8 @@ static void write_outfile(QPDF& pdf, Options& o)
             after = num_spot + 2;
         }
         else if ((len >= 4) &&
-                 (QUtil::strcasecmp(o.outfilename + len - 4, ".pdf") == 0))
+                 (QUtil::str_compare_nocase(
+                     o.outfilename + len - 4, ".pdf") == 0))
         {
             QTC::TC("qpdf", "qpdf split-pages .pdf");
             before = std::string(o.outfilename, len - 4) + "-";

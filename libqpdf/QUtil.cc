@@ -997,14 +997,14 @@ QUtil::read_lines_from_file(std::istream& in)
 }
 
 int
-QUtil::strcasecmp(char const *s1, char const *s2)
+QUtil::str_compare_nocase(char const *s1, char const *s2)
 {
 #if defined(_WIN32) && defined(__BORLANDC__)
     return stricmp(s1, s2);
 #elif defined(_WIN32)
     return _stricmp(s1, s2);
 #else
-    return ::strcasecmp(s1, s2);
+    return strcasecmp(s1, s2);
 #endif
 }
 
