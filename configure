@@ -1440,7 +1440,7 @@ Optional Features:
                           enable linker version script (default is enabled)
   --enable-werror         whether to treat warnings as errors (default is no)
   --enable-int-warnings   whether to turn on integer type warnings (default is
-                          no)
+                          yes)
   --enable-test-compare-images
                           whether to compare images in test suite; disabled by
                           default, enabling requires ghostscript and tiffcmp
@@ -16904,7 +16904,7 @@ if test "${enable_int_warnings+set}" = set; then :
       qpdf_INT_WARNINGS=0;
     fi
 else
-  qpdf_INT_WARNINGS=0
+  qpdf_INT_WARNINGS=1
 fi
 
 if test "$qpdf_INT_WARNINGS" = "1"; then

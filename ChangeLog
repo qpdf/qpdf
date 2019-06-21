@@ -1,5 +1,10 @@
 2019-06-20  Jay Berkenbilt  <ejb@ql.org>
 
+	* Enable compilation with additional warnings for integer
+	conversion and sign (-Wsign-conversion, -Wconversion for gcc and
+	similar; -W3 for msvc) if supported. These warnings are on by
+	default can be turned off by passing --disable-int-warnings
+
 	* Fix all integer sign and conversion warnings. This makes all
 	integer type conversions that have potential data loss explicit
 	with calls that do range checks and raise an exception.

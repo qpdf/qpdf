@@ -396,12 +396,12 @@ fi
 AC_MSG_CHECKING(for whether to use $try_flags)
 AC_ARG_ENABLE(int-warnings,
    AS_HELP_STRING([--enable-int-warnings],
-                  [whether to turn on integer type warnings (default is no)]),
+                  [whether to turn on integer type warnings (default is yes)]),
    [if test "$enableval" = "yes"; then
       qpdf_INT_WARNINGS=1;
     else
       qpdf_INT_WARNINGS=0;
-    fi], [qpdf_INT_WARNINGS=0])
+    fi], [qpdf_INT_WARNINGS=1])
 if test "$qpdf_INT_WARNINGS" = "1"; then
    AC_MSG_RESULT(yes)
    WFLAGS="$WFLAGS $try_flags"
