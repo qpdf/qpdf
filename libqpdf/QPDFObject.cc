@@ -26,11 +26,11 @@ QPDFObject::getDescription(QPDF*& qpdf, std::string& description)
 {
     qpdf = this->m->owning_qpdf;
     description = this->m->object_description;
-    return this->m->owning_qpdf;
+    return this->m->owning_qpdf != 0;
 }
 
 bool
 QPDFObject::hasDescription()
 {
-    return this->m->owning_qpdf;
+    return this->m->owning_qpdf != 0;
 }

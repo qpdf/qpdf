@@ -1425,7 +1425,7 @@ static bool
 is_bit_set(int P, int bit)
 {
     // Bits in P are numbered from 1 in the spec
-    return (P & (1 << (bit - 1)));
+    return ((P & (1 << (bit - 1))) != 0);
 }
 
 bool
