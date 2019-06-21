@@ -119,7 +119,7 @@ RELEASE PREPARATION
 * If any interfaces were added or changed, check C API to see whether
   changes are appropriate there as well. If necessary, review the
   casting policy in the manual, and ensure that integer types are
-  properly handled.
+  properly handled with QIntC or the appropriate cast.
 
 * Increment shared library version information as needed (`LT_*` in
   `configure.ac`)

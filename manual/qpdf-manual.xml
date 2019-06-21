@@ -3340,139 +3340,68 @@ outfile.pdf</option>
     and C++ code.
    </para>
    <para>
-    The casting policy explicitly prohibits casting between integer
-    sizes for no purpose other than to quiet a compiler warning when
-    there is no reasonable chance of a problem resulting.  The reason
-    for this exclusion is that the practice of adding these additional
-    casts precludes future use of additional compiler warnings as a
-    tool for making future improvements to this aspect of the code,
-    and it also damages the readability of the code.
+    The <classname>QIntC</classname> namespace, provided by
+    <filename>include/qpdf/QIntC.hh</filename>, implements safe
+    functions for converting between integer types. These functions do
+    range checking and throw a <type>std::range_error</type>, which is
+    subclass of <type>std::runtime_error</type>, if conversion from one
+    integer type to another results in loss of information. There are
+    many cases in which we have to move between different integer
+    types because of incompatible integer types used in interoperable
+    interfaces. Some are unavoidable, such as moving between sizes and
+    offsets, and others are there because of old code that is too in
+    entrenched to be fixable without breaking source compatibility and
+    causing pain for users. QPDF is compiled with extra warnings to
+    detect conversions with potential data loss, and all such cases
+    should be fixed by either using a function from
+    <classname>QIntC</classname> or a
+    <function>static_cast</function>.
    </para>
    <para>
-    There are a few significant areas where casting is common in the
-    qpdf sources or where casting would be required to quiet higher
-    levels of compiler warnings but is omitted at present:
-    <itemizedlist>
-     <listitem>
-      <para>
-       <type>char</type> vs. <type>unsigned char</type>.  For
-       historical reasons, there are a lot of places in qpdf's
-       internals that deal with <type>unsigned char</type>, which
-       means that a lot of casting is required to interoperate with
-       standard library calls and <type>std::string</type>.  In
-       retrospect, qpdf should have probably used regular (signed)
-       <type>char</type> and <type>char*</type> everywhere and just
-       cast to <type>unsigned char</type> when needed, but it's too
-       late to make that change now.  There are
-       <function>reinterpret_cast</function> calls to go between
-       <type>char*</type> and <type>unsigned char*</type>, and there
-       are <function>static_cast</function> calls to go between
-       <type>char</type> and <type>unsigned char</type>.  These should
-       always be safe.
-      </para>
-     </listitem>
-     <listitem>
-      <para>
-       Non-const <type>unsigned char*</type> used in the
-       <type>Pipeline</type> interface.  The pipeline interface has a
-       <function>write</function> call that uses <type>unsigned
-       char*</type> without a <type>const</type> qualifier.  The main
-       reason for this is to support pipelines that make calls to
-       third-party libraries, such as zlib, that don't include
-       <type>const</type> in their interfaces.  Unfortunately, there
-       are many places in the code where it is desirable to have
-       <type>const char*</type> with pipelines.  None of the pipeline
-       implementations in qpdf currently modify the data passed to
-       write, and doing so would be counter to the intent of
-       <type>Pipeline</type>, but there is nothing in the code to
-       prevent this from being done.  There are places in the code
-       where <function>const_cast</function> is used to remove the
-       const-ness of pointers going into <type>Pipeline</type>s.  This
-       could theoretically be unsafe, but there is adequate testing to
-       assert that it is safe and will remain safe in qpdf's code.
-      </para>
-     </listitem>
-     <listitem>
-      <para>
-       <type>size_t</type> vs. <type>qpdf_offset_t</type>.  This is
-       pretty much unavoidable since sizes are unsigned types and
-       offsets are signed types.  Whenever it is necessary to seek by
-       an amount given by a <type>size_t</type>, it becomes necessary
-       to mix and match between <type>size_t</type> and
-       <type>qpdf_offset_t</type>.  Additionally, qpdf sometimes
-       treats memory buffers like files (as with
-       <type>BufferInputSource</type>, and those seek interfaces have
-       to be consistent with file-based input sources.  Neither gcc
-       nor MSVC give warnings for this case by default, but both have
-       warning flags that can enable this.  (MSVC:
-       <option>/W14267</option> or <option>/W3</option>, which also
-       enables some additional warnings that we ignore; gcc:
-       <option>-Wconversion -Wsign-conversion</option>).  This could
-       matter for files whose sizes are larger than
-       2<superscript>63</superscript> bytes, but it is reasonable to
-       expect that a world where such files are common would also have
-       larger <type>size_t</type> and <type>qpdf_offset_t</type> types
-       in it.  On most 64-bit systems at the time of this writing (the
-       release of version 4.1.0 of qpdf), both <type>size_t</type> and
-       <type>qpdf_offset_t</type> are 64-bit integer types, while on
-       many current 32-bit systems, <type>size_t</type> is a 32-bit
-       type while <type>qpdf_offset_t</type> is a 64-bit type.  I am
-       not aware of any cases where 32-bit systems that have
-       <type>size_t</type> smaller than <type>qpdf_offset_t</type>
-       could run into problems.  Although I can't conclusively rule
-       out the possibility of such problems existing, I suspect any
-       cases would be pretty contrived.  In the event that someone
-       should produce a file that qpdf can't handle because of what is
-       suspected to be issues involving the handling of
-       <type>size_t</type> vs. <type>qpdf_offset_t</type> (such files
-       may behave properly on 64-bit systems but not on 32-bit systems
-       because they have very large embedded files or streams, for
-       example), the above mentioned warning flags could be enabled
-       and all those implicit conversions could be carefully
-       scrutinized.  (I have already gone through that exercise once
-       in adding support for files larger than 4&nbsp;GB in size.)  I
-       continue to be committed to supporting large files on 32-bit
-       systems, but I would not go to any lengths to support corner
-       cases involving large embedded files or large streams that work
-       on 64-bit systems but not on 32-bit systems because of
-       <type>size_t</type> being too small.  It is reasonable to
-       assume that anyone working with such files would be using a
-       64-bit system anyway since many 32-bit applications would have
-       similar difficulties.
-      </para>
-     </listitem>
-     <listitem>
-      <para>
-       <type>size_t</type> vs. <type>int</type> or <type>long</type>.
-       There are some cases where <type>size_t</type> and
-       <type>int</type> or <type>long</type> or <type>size_t</type>
-       and <type>unsigned int</type> or <type>unsigned long</type> are
-       used interchangeably.  These cases occur when working with very
-       small amounts of memory, such as with the bit readers (where
-       we're working with just a few bytes at a time), some cases of
-       <function>strlen</function>, and a few other cases.  I have
-       scrutinized all of these cases and determined them to be safe,
-       but there is no mechanism in the code to ensure that new unsafe
-       conversions between <type>int</type> and <type>size_t</type>
-       aren't introduced short of good testing and strong awareness of
-       the issues.  Again, if any such bugs are suspected in the
-       future, enabling the additional warning flags and scrutinizing
-       the warnings would be in order.
-      </para>
-     </listitem>
-    </itemizedlist>
+    When the intention is just to switch the type because of
+    exchanging data between incompatible interfaces, use
+    <classname>QIntC</classname>. This is the usual case. However,
+    there are some cases in which we are explicitly intending to use
+    the exact same bit pattern with a different type. This is most
+    common when switching between signed and unsigned characters. A
+    lot of qpdf's code uses unsigned characters internally, but
+    <type>std::string</type> and <type>char</type> are signed. Using
+    <function>QIntC::to_char</function> would be wrong for converting
+    from unsigned to signed characters because a negative
+    <type>char</type> value and the corresponding <type>unsigned
+    char</type> value greater than 127 <emphasis>mean the same
+    thing</emphasis>. There are also cases in which we use
+    <function>static_cast</function> when working with bit fields
+    where we are not representing a numerical value but rather a bunch
+    of bits packed together in some integer type. Also note that
+    <type>size_t</type> and <type>long</type> both typically differ
+    between 32-bit and 64-bit environments, so sometimes an explicit
+    cast may not be needed to avoid warnings on one platform but may
+    be needed on another. A conversion with
+    <classname>QIntC</classname> should always be used when the types
+    are different even if the underlying size is the same. QPDF's CI
+    build builds on 32-bit and 64-bit platforms, and the test suite is
+    very thorough, so it is hard to make any of the potential errors
+    here without being caught in build or test.
    </para>
    <para>
-    To be clear, I believe qpdf to be well-behaved with respect to
-    sizes and offsets, and qpdf's test suite includes actual
-    generation and full processing of files larger than 4&nbsp;GB in
-    size.  The issues raised here are largely academic and should not
-    in any way be interpreted to mean that qpdf has practical problems
-    involving sloppiness with integer types.  I also believe that
-    appropriate measures have been taken in the code to avoid problems
-    with signed vs. unsigned integers from resulting in memory
-    overwrites or other issues with potential security implications,
-    though there are never any absolute guarantees.
+    Non-const <type>unsigned char*</type> is used in the
+    <type>Pipeline</type> interface. The pipeline interface has a
+    <function>write</function> call that uses <type>unsigned
+    char*</type> without a <type>const</type> qualifier. The main
+    reason for this is to support pipelines that make calls to
+    third-party libraries, such as zlib, that don't include
+    <type>const</type> in their interfaces. Unfortunately, there are
+    many places in the code where it is desirable to have <type>const
+    char*</type> with pipelines. None of the pipeline implementations
+    in qpdf currently modify the data passed to write, and doing so
+    would be counter to the intent of <type>Pipeline</type>, but there
+    is nothing in the code to prevent this from being done. There are
+    places in the code where <function>const_cast</function> is used
+    to remove the const-ness of pointers going into
+    <type>Pipeline</type>s. This could theoretically be unsafe, but
+    there is adequate testing to assert that it is safe and will
+    remain safe in qpdf's code.
    </para>
   </sect1>
   <sect1 id="ref.encryption">
