@@ -43,6 +43,10 @@ QPDFObjectHandle
 QPDFFormFieldObjectHelper::getInheritableFieldValue(std::string const& name)
 {
     QPDFObjectHandle node = this->oh;
+    if (! node.isDictionary())
+    {
+        return QPDFObjectHandle::newNull();
+    }
     QPDFObjectHandle result(node.getKey(name));
     std::set<QPDFObjGen> seen;
     while (result.isNull() && node.hasKey("/Parent"))
@@ -896,7 +900,8 @@ QPDFFormFieldObjectHelper::generateTextAppearance(
             QPDFObjectHandle dr = getInheritableFieldValue("/DR");
             font = getFontFromResource(dr, font_name);
         }
-        if (font.isDictionary() &&
+        if (font.isInitialized() &&
+            font.isDictionary() &&
             font.getKey("/Encoding").isName())
         {
             std::string encoding = font.getKey("/Encoding").getName();

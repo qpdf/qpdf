@@ -851,9 +851,11 @@ QPDFWriter::parseVersion(std::string const& version,
 	QUtil::int_to_string(minor);
     if (tmp != version)
     {
-	throw std::logic_error(
-	    "INTERNAL ERROR: QPDFWriter::parseVersion"
-	    " called with invalid version number " + version);
+        // The version number in the input is probably invalid. This
+        // happens with some files that are designed to exercise bugs,
+        // such as files in the fuzzer corpus. Unfortunately
+        // QPDFWriter doesn't have a way to give a warning, so we just
+        // ignore this case.
     }
 }
 
@@ -3013,7 +3015,7 @@ QPDFWriter::discardGeneration(std::map<QPDFObjGen, int> const& in,
     {
         if (out.count((*iter).first.getObj()))
         {
-            throw std::logic_error(
+            throw std::runtime_error(
                 "QPDF cannot currently linearize files that contain"
                 " multiple objects with the same object ID and different"
                 " generations.  If you see this error message, please file"
@@ -3130,15 +3132,33 @@ QPDFWriter::writeLinearized()
 
     this->m->next_objid = part4_first_obj;
     enqueuePart(part4);
-    assert(this->m->next_objid == after_part4);
+    if (this->m->next_objid != after_part4)
+    {
+        // This can happen with very botched files as in the fuzzer
+        // test. There are likely some faulty assumptions in
+        // calculateLinearizationData
+        throw std::runtime_error(
+            "error encountered after"
+            " writing part 4 of linearized data");
+    }
     this->m->next_objid = part6_first_obj;
     enqueuePart(part6);
-    assert(this->m->next_objid == after_part6);
+    if (this->m->next_objid != after_part6)
+    {
+        throw std::runtime_error(
+            "error encountered after"
+            " writing part 6 of linearized data");
+    }
     this->m->next_objid = second_half_first_obj;
     enqueuePart(part7);
     enqueuePart(part8);
     enqueuePart(part9);
-    assert(this->m->next_objid == after_second_half);
+    if (this->m->next_objid != after_second_half)
+    {
+        throw std::runtime_error(
+            "error encountered after"
+            " writing part 9 of linearized data");
+    }
 
     qpdf_offset_t hint_length = 0;
     PointerHolder<Buffer> hint_buffer;

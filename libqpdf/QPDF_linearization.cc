@@ -612,7 +612,7 @@ QPDF::checkLinearizationInternal()
 
     if (this->m->part6.empty())
     {
-        throw std::logic_error("linearization part 6 unexpectedly empty");
+        stopOnError("linearization part 6 unexpectedly empty");
     }
     qpdf_offset_t min_E = -1;
     qpdf_offset_t max_E = -1;
@@ -714,7 +714,7 @@ QPDF::getLinearizationOffset(QPDFObjGen const& og)
 	break;
 
       default:
-	throw std::logic_error(
+	stopOnError(
 	    "getLinearizationOffset called for xref entry not of type 1 or 2");
 	break;
     }
@@ -862,7 +862,7 @@ QPDF::checkHPageOffset(std::list<std::string>& errors,
 	    int idx = he.shared_identifiers.at(i);
 	    if (shared_idx_to_obj.count(idx) == 0)
             {
-                throw std::logic_error(
+                stopOnError(
                     "unable to get object for item in"
                     " shared objects hint table");
             }
@@ -874,7 +874,7 @@ QPDF::checkHPageOffset(std::list<std::string>& errors,
 	    int idx = ce.shared_identifiers.at(i);
 	    if (idx >= this->m->c_shared_object_data.nshared_total)
             {
-                throw std::logic_error(
+                stopOnError(
                     "index out of bounds for shared object hint table");
             }
 	    int obj = this->m->c_shared_object_data.entries.at(toS(idx)).object;
@@ -1444,7 +1444,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 		break;
 
 	      case ObjUser::ou_bad:
-		throw std::logic_error(
+		stopOnError(
 		    "INTERNAL ERROR: QPDF::calculateLinearizationData: "
 		    "invalid user type");
 		break;
@@ -1558,10 +1558,14 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     // will do the same.
 
     // First, place the actual first page object itself.
+    if (pages.empty())
+    {
+        stopOnError("no pages found while calculating linearization data");
+    }
     QPDFObjGen first_page_og(pages.at(0).getObjGen());
     if (! lc_first_page_private.count(first_page_og))
     {
-	throw std::logic_error(
+	stopOnError(
 	    "INTERNAL ERROR: QPDF::calculateLinearizationData: first page "
 	    "object not in lc_first_page_private");
     }
@@ -1611,7 +1615,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 	QPDFObjGen page_og(pages.at(i).getObjGen());
 	if (! lc_other_page_private.count(page_og))
 	{
-	    throw std::logic_error(
+	    stopOnError(
 		"INTERNAL ERROR: "
 		"QPDF::calculateLinearizationData: page object for page " +
 		QUtil::uint_to_string(i) + " not in lc_other_page_private");
@@ -1646,7 +1650,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     // That should have covered all part7 objects.
     if (! lc_other_page_private.empty())
     {
-	throw std::logic_error(
+	stopOnError(
 	    "INTERNAL ERROR:"
 	    " QPDF::calculateLinearizationData: lc_other_page_private is "
 	    "not empty after generation of part7");
@@ -1731,7 +1735,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     }
     if (! lc_thumbnail_private.empty())
     {
-	throw std::logic_error(
+	stopOnError(
 	    "INTERNAL ERROR: "
 	    "QPDF::calculateLinearizationData: lc_thumbnail_private "
 	    "not empty after placing thumbnails");
@@ -1765,7 +1769,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     size_t num_wanted = this->m->object_to_obj_users.size();
     if (num_placed != num_wanted)
     {
-	throw std::logic_error(
+	stopOnError(
 	    "INTERNAL ERROR: QPDF::calculateLinearizationData: wrong "
 	    "number of objects placed (num_placed = " +
 	    QUtil::uint_to_string(num_placed) +
@@ -1820,7 +1824,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     if (static_cast<size_t>(this->m->c_shared_object_data.nshared_total) !=
         this->m->c_shared_object_data.entries.size())
     {
-        throw std::logic_error(
+        stopOnError(
             "shared object hint table has wrong number of entries");
     }
 
@@ -2058,7 +2062,7 @@ QPDF::calculateHSharedObject(
     }
     if (soe.size() != static_cast<size_t>(cso.nshared_total))
     {
-        throw std::logic_error("soe has wrong size after initialization");
+        stopOnError("soe has wrong size after initialization");
     }
 
     so.nshared_total = cso.nshared_total;

@@ -1407,6 +1407,12 @@ QPDFObjectHandle::coalesceContentStreams()
         QTC::TC("qpdf", "QPDFObjectHandle coalesce called on stream");
         return;
     }
+    else if (! contents.isArray())
+    {
+        // /Contents is optional for pages, and some very damaged
+        // files may have pages that are invalid in other ways.
+        return;
+    }
     QPDF* qpdf = getOwningQPDF();
     if (qpdf == 0)
     {

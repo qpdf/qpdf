@@ -195,6 +195,14 @@ QPDF::pushInheritedAttributesToPageInternal(
     }
     visited.insert(this_og);
 
+    if (! cur_pages.isDictionary())
+    {
+	throw QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
+		      this->m->last_object_description,
+		      this->m->file->getLastOffset(),
+		      "invalid object in page tree");
+    }
+
     // Extract the underlying dictionary object
     std::string type = cur_pages.getKey("/Type").getName();
 
