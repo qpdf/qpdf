@@ -69,6 +69,9 @@
 /* Define to the filename of the random device (and set HAVE_RANDOM_DEVICE) */
 #undef RANDOM_DEVICE
 
+/* The size of `size_t', as computed by sizeof. */
+#undef SIZEOF_SIZE_T
+
 /* Whether to suppres use of OS-provided secure random numbers */
 #undef SKIP_OS_SECURE_RANDOM
 

@@ -90,6 +90,9 @@ RELEASE PREPARATION
 * Test with clang. Pass `CC=clang CXX=clang++` to `./configure`. Test
   with newer version of gcc if available.
 
+* Test 32-bit. Pass `CC=i686-linux-gnu-gcc CXX=i686-linux-gnu-g++` to
+  `./configure`.
+
 * Test build on a mac.
 
 * Test with address sanitizer as described above.

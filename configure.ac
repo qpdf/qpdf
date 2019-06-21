@@ -123,20 +123,16 @@ else
    AC_MSG_RESULT(yes)
 fi
 
-WINDOWS_WORDSIZE=
-AC_SUBST(WINDOWS_WORDSIZE)
-AC_ARG_WITH(windows-wordsize,
-   AS_HELP_STRING([--with-windows-wordsize={32,64}],
-		  [Windows only: whether this is a 32-bit or 64-bit build; required if external-libs are enabled]),
-   [WINDOWS_WORDSIZE=$withval],
-   [WINDOWS_WORDSIZE=none])
-if test "$USE_EXTERNAL_LIBS" = "1"; then
-   AC_MSG_CHECKING(for windows wordsize)
-   AC_MSG_RESULT($WINDOWS_WORDSIZE)
-   if ! test "$WINDOWS_WORDSIZE" = "32" -o "$WINDOWS_WORDSIZE" = "64"; then
-      AC_MSG_ERROR(Windows wordsize of 32 or 64 must be specified if external libs are being used.)
-   fi
+AC_CHECK_SIZEOF([size_t])
+if test "$ac_cv_sizeof_size_t" = "4"; then
+   IS_32BIT=1
+   WINDOWS_WORDSIZE=32
+else
+   IS_32BIT=0
+   WINDOWS_WORDSIZE=64
 fi
+AC_SUBST(IS_32BIT)
+AC_SUBST(WINDOWS_WORDSIZE)
 
 if test "$BUILD_INTERNAL_LIBS" = "0"; then
    AC_CHECK_HEADER(zlib.h,,[MISSING_ZLIB_H=1; MISSING_ANY=1])

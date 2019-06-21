@@ -6,4 +6,4 @@ if echo $PATH | grep -q /mingw64; then
 else
     wordsize=32
 fi
-./configure --disable-test-compare-images --enable-external-libs --enable-werror --with-windows-wordsize=$wordsize --with-buildrules=mingw ${1+"$@"}
+./configure --disable-test-compare-images --enable-external-libs --enable-werror --with-buildrules=mingw ${1+"$@"}

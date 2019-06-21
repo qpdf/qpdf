@@ -27,7 +27,7 @@ PATH=$cwd/libqpdf/build:$PATH
 
 installdir=install-$tool$wordsize
 rm -rf $installdir
-./config-$tool --with-windows-wordsize=$wordsize --enable-show-failed-test-output
+./config-$tool --enable-show-failed-test-output
 make -j$(nproc) -k
 make -k check
 make install
