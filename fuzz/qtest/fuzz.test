@@ -9,8 +9,8 @@ require TestDriver;
 
 my $td = new TestDriver('fuzz');
 
-my @files = glob("../qpdf_fuzzer_seed_corpus/*");
-my $n_test_files = 27;
+my @files = glob("../build/qpdf_fuzzer_seed_corpus/*");
+my $n_test_files = 29;
 my $n_orig_files = 2559;
 my $n_files = $n_test_files + $n_orig_files;
 

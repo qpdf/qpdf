@@ -22,8 +22,10 @@ $(BINS_fuzz): $(TARGETS_libqpdf) $(OBJ_DEFAULT_FUZZ)
 # Files from the test suite that are good for seeding the fuzzer.
 # Update $n_test_files in qtest/fuzz.test if you change this list.
 SEED_CORPUS_FILES = \
+	stream-data.pdf \
+	lin5.pdf \
 	field-types.pdf \
-	image-streams.pdf \
+	image-streams-small.pdf \
 	need-appearances.pdf \
 	outlines-with-actions.pdf \
 	outlines-with-old-root-dests.pdf \
@@ -53,7 +55,7 @@ SEED_CORPUS_FILES = \
 # -----
 
 CORPUS_FROM_TEST := $(foreach F,$(SEED_CORPUS_FILES),qpdf/qtest/qpdf/$F)
-CORPUS_DIR := fuzz/qpdf_fuzzer_seed_corpus
+CORPUS_DIR := fuzz/$(OUTPUT_DIR)/qpdf_fuzzer_seed_corpus
 
 .PHONY: fuzz_corpus
 fuzz_corpus:: fuzz/$(OUTPUT_DIR)/fuzz_corpus.stamp
@@ -68,7 +70,7 @@ $(foreach F,$(CORPUS_FROM_TEST),$(eval \
 
 fuzz/$(OUTPUT_DIR)/fuzz_corpus.stamp: fuzz/original-corpus.tar.gz $(CORPUS_FROM_TEST)
 	mkdir -p $(CORPUS_DIR)
-	(cd $(CORPUS_DIR); tar xzf ../original-corpus.tar.gz)
+	(cd $(CORPUS_DIR); tar xzf ../../original-corpus.tar.gz)
 	touch $@
 
 $(foreach B,$(FUZZERS),$(eval \
@@ -122,9 +124,11 @@ install_fuzz: $(STATIC_BINS_fuzz)
 	mkdir -p $(OUT)
 	cp fuzz/pdf.dict $(STATIC_BINS_fuzz) $(OUT)/
 	for B in $(FUZZERS); do \
-	  cp fuzz/options $(OUT)/$${B}.options; \
-	  if test -d fuzz/$${B}_seed_corpus; then \
-	    (cd fuzz/$${B}_seed_corpus; zip -q -r $(OUT)/$${B}_seed_corpus.zip .); \
+	  if test -f fuzz/$${B}.options; then \
+	    cp fuzz/$${B}.options $(OUT)/$${B}.options; \
+	  fi; \
+	  if test -d fuzz/$(OUTPUT_DIR)/$${B}_seed_corpus; then \
+	    (cd fuzz/$(OUTPUT_DIR)/$${B}_seed_corpus; zip -q -r $(OUT)/$${B}_seed_corpus.zip .); \
 	  fi; \
 	done
 
