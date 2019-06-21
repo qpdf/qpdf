@@ -4,6 +4,10 @@
 	QPDF::copyForeignObject with an unused boolean parameter. If you
 	were, for some reason, calling this, just take the parameter away.
 
+	* Source-level incompatibility: remove the version
+	QPDF::copyForeignObject with an unused boolean parameter. If you
+	were, for some reason, calling this, just take the parameter away.
+
 	* Source-level incompatibility: rename QUtil::strcasecmp to
 	QUtil::str_compare_nocase. This is a non-compatible change, but
 	QUtil::strcasecmp is hardly the most important part of qpdf's API.

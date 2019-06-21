@@ -1,9 +1,6 @@
 Next ABI
 ========
 
- * Remove version of QPDFTokenizer::expectInlineImage with no
-   arguments.
-
  * Build with -fvisibility=hidden by default. Fix QPDF_DLL. See #302
    for discussion. See also https://gcc.gnu.org/wiki/Visibility
 

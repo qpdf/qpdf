@@ -190,12 +190,6 @@ class QPDFTokenizer
     QPDF_DLL
     void expectInlineImage(PointerHolder<InputSource> input);
 
-    // Legacy version. New code should not call this. The token
-    // returned will include the EI keyword. The recipient of the
-    // token will have to remove it.
-    QPDF_DLL
-    void expectInlineImage();
-
   private:
     // Do not implement copy or assignment
     QPDFTokenizer(QPDFTokenizer const&);

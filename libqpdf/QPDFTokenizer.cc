@@ -542,20 +542,6 @@ QPDFTokenizer::presentCharacter(char ch)
             this->m->inline_image_bytes = 0;
             this->m->state = st_token_ready;
         }
-        else if ((this->m->inline_image_bytes == 0) &&
-                 (len >= 4) &&
-                 isDelimiter(this->m->val.at(len-4)) &&
-                 (this->m->val.at(len-3) == 'E') &&
-                 (this->m->val.at(len-2) == 'I') &&
-                 isDelimiter(this->m->val.at(len-1)))
-        {
-            QTC::TC("qpdf", "QPDFTokenizer found EI the old way");
-            this->m->val.erase(len - 1);
-            this->m->type = tt_inline_image;
-            this->m->unread_char = true;
-            this->m->char_to_unread = ch;
-            this->m->state = st_token_ready;
-        }
     }
     else
     {
@@ -628,20 +614,6 @@ QPDFTokenizer::presentCharacter(char ch)
 void
 QPDFTokenizer::presentEOF()
 {
-    if (this->m->state == st_inline_image)
-    {
-        size_t len = this->m->val.length();
-        if ((len >= 3) &&
-            isDelimiter(this->m->val.at(len-3)) &&
-            (this->m->val.at(len-2) == 'E') &&
-            (this->m->val.at(len-1) == 'I'))
-        {
-            QTC::TC("qpdf", "QPDFTokenizer inline image at EOF the old way");
-            this->m->type = tt_inline_image;
-            this->m->state = st_token_ready;
-        }
-    }
-
     if (this->m->state == st_literal)
     {
         QTC::TC("qpdf", "QPDFTokenizer EOF reading appendable token");
@@ -667,12 +639,6 @@ QPDFTokenizer::presentEOF()
     }
 
     this->m->state = st_token_ready;
-}
-
-void
-QPDFTokenizer::expectInlineImage()
-{
-    expectInlineImage(PointerHolder<InputSource>());
 }
 
 void
