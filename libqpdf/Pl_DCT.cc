@@ -2,6 +2,7 @@
 
 #include <qpdf/QUtil.hh>
 #include <qpdf/QTC.hh>
+#include <qpdf/QIntC.hh>
 
 #include <setjmp.h>
 #include <stdexcept>
@@ -213,7 +214,7 @@ skip_buffer_input_data(j_decompress_ptr cinfo, long num_bytes)
             "reading jpeg: jpeg library requested"
             " skipping a negative number of bytes");
     }
-    size_t to_skip = static_cast<size_t>(num_bytes);
+    size_t to_skip = QIntC::to_size(num_bytes);
     if ((to_skip > 0) && (to_skip <= cinfo->src->bytes_in_buffer))
     {
         cinfo->src->next_input_byte += to_skip;
@@ -283,15 +284,17 @@ Pl_DCT::compress(void* cinfo_p, Buffer* b)
 
     jpeg_start_compress(cinfo, TRUE);
 
-    int width = cinfo->image_width * cinfo->input_components;
+    unsigned int width = cinfo->image_width *
+        QIntC::to_uint(cinfo->input_components);
     size_t expected_size =
-        cinfo->image_height * cinfo->image_width * cinfo->input_components;
+        cinfo->image_height * cinfo->image_width *
+        QIntC::to_uint(cinfo->input_components);
     if (b->getSize() != expected_size)
     {
         throw std::runtime_error(
             "Pl_DCT: image buffer size = " +
-            QUtil::int_to_string(b->getSize()) + "; expected size = " +
-            QUtil::int_to_string(expected_size));
+            QUtil::uint_to_string(b->getSize()) + "; expected size = " +
+            QUtil::uint_to_string(expected_size));
     }
     JSAMPROW row_pointer[1];
     unsigned char* buffer = b->getBuffer();
@@ -326,7 +329,8 @@ Pl_DCT::decompress(void* cinfo_p, Buffer* b)
     (void) jpeg_read_header(cinfo, TRUE);
     (void) jpeg_calc_output_dimensions(cinfo);
 
-    int width = cinfo->output_width * cinfo->output_components;
+    unsigned int width = cinfo->output_width *
+        QIntC::to_uint(cinfo->output_components);
     JSAMPARRAY buffer = (*cinfo->mem->alloc_sarray)
         (reinterpret_cast<j_common_ptr>(cinfo), JPOOL_IMAGE, width, 1);
 

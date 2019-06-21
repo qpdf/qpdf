@@ -8,6 +8,7 @@
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/QPDFObjectHandle.hh>
+#include <qpdf/QIntC.hh>
 
 #include <stdexcept>
 #include <stdlib.h>
@@ -715,7 +716,7 @@ QPDFTokenizer::findEI(PointerHolder<InputSource> input)
         {
             break;
         }
-        this->m->inline_image_bytes = input->tell() - pos - 2;
+        this->m->inline_image_bytes = QIntC::to_size(input->tell() - pos - 2);
 
         QPDFTokenizer check;
         bool found_bad = false;

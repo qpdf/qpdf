@@ -8,7 +8,7 @@
 class Pl_RC4: public Pipeline
 {
   public:
-    static int const def_bufsize = 65536;
+    static size_t const def_bufsize = 65536;
 
     // key_len of -1 means treat key_data as a null-terminated string
     QPDF_DLL

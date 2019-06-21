@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <qpdf/QTC.hh>
 #include <qpdf/PointerHolder.hh>
+#include <qpdf/QIntC.hh>
 
 
 void
@@ -35,7 +36,7 @@ InputSource::readLine(size_t max_line_length)
     this->seek(offset, SEEK_SET);
     qpdf_offset_t eol = this->findAndSkipNextEOL();
     this->last_offset = offset;
-    size_t line_length = eol - offset;
+    size_t line_length = QIntC::to_size(eol - offset);
     if (line_length < max_line_length)
     {
         buf[line_length] = '\0';
@@ -116,7 +117,8 @@ InputSource::findFirst(char const* start_chars,
 
         // Search for the first character.
         if ((p = static_cast<char*>(
-                 memchr(p, start_chars[0], bytes_read - (p - buf)))) != 0)
+                 memchr(p, start_chars[0],
+                        bytes_read - QIntC::to_size(p - buf)))) != 0)
         {
             if (p == buf)
             {
@@ -126,7 +128,8 @@ InputSource::findFirst(char const* start_chars,
             if (len != 0)
             {
                 // Make sure it's in range.
-                size_t p_relative_offset = (p - buf) + (buf_offset - offset);
+                size_t p_relative_offset =
+                    QIntC::to_size((p - buf) + (buf_offset - offset));
                 if (p_relative_offset >= len)
                 {
                     // out of range
@@ -198,7 +201,7 @@ InputSource::findLast(char const* start_chars,
         }
         after_found_offset = this->tell();
         cur_offset = after_found_offset;
-        cur_len = len - (cur_offset - offset);
+        cur_len = len - QIntC::to_size((cur_offset - offset));
     }
     if (found)
     {

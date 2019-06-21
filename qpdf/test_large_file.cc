@@ -9,6 +9,7 @@
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/QIntC.hh>
 #include <iostream>
 #include <string.h>
 #include <stdlib.h>
@@ -36,37 +37,39 @@
 static char const* whoami = 0;
 
 // Height should be a multiple of 10
-static int const nstripes = 10;
-static int const stripesize_large = 500;
-static int const stripesize_small = 5;
-static int const npages = 200;
+static size_t const nstripes = 10;
+static size_t const stripesize_large = 500;
+static size_t const stripesize_small = 5;
+static size_t const npages = 200;
 
 // initialized in main
-int stripesize = 0;
-int width = 0;
-int height = 0;
+size_t stripesize = 0;
+size_t width = 0;
+size_t height = 0;
 static unsigned char* buf = 0;
 
-static inline unsigned char get_pixel_color(int n, size_t row)
+static inline unsigned char get_pixel_color(size_t n, size_t row)
 {
-    return (n & (1 << (nstripes - 1 - row))) ? '\xc0' : '\x40';
+    return ((n & (1LLU << (nstripes - 1LLU - row)))
+            ? static_cast<unsigned char>('\xc0')
+            : static_cast<unsigned char>('\x40'));
 }
 
 class ImageChecker: public Pipeline
 {
   public:
-    ImageChecker(int n);
+    ImageChecker(size_t n);
     virtual ~ImageChecker();
     virtual void write(unsigned char* data, size_t len);
     virtual void finish();
 
   private:
-    int n;
+    size_t n;
     size_t offset;
     bool okay;
 };
 
-ImageChecker::ImageChecker(int n) :
+ImageChecker::ImageChecker(size_t n) :
     Pipeline("image checker", 0),
     n(n),
     offset(0),
@@ -106,16 +109,16 @@ ImageChecker::finish()
 class ImageProvider: public QPDFObjectHandle::StreamDataProvider
 {
   public:
-    ImageProvider(int n);
+    ImageProvider(size_t n);
     virtual ~ImageProvider();
     virtual void provideStreamData(int objid, int generation,
 				   Pipeline* pipeline);
 
   private:
-    int n;
+    size_t n;
 };
 
-ImageProvider::ImageProvider(int n) :
+ImageProvider::ImageProvider(size_t n) :
     n(n)
 {
 }
@@ -133,7 +136,7 @@ ImageProvider::provideStreamData(int objid, int generation,
         buf = new unsigned char[width * stripesize];
     }
     std::cout << "page " << n << " of " << npages << std::endl;
-    for (int y = 0; y < nstripes; ++y)
+    for (size_t y = 0; y < nstripes; ++y)
     {
         unsigned char color = get_pixel_color(n, y);
         memset(buf, color, width * stripesize);
@@ -156,16 +159,16 @@ static void set_parameters(bool large)
     width = height;
 }
 
-std::string generate_page_contents(int pageno)
+std::string generate_page_contents(size_t pageno)
 {
     std::string contents =
-        "BT /F1 24 Tf 72 720 Td (page " +  QUtil::int_to_string(pageno) +
+        "BT /F1 24 Tf 72 720 Td (page " +  QUtil::uint_to_string(pageno) +
         ") Tj ET\n"
         "q 468 0 0 468 72 72 cm /Im1 Do Q\n";
     return contents;
 }
 
-static QPDFObjectHandle create_page_contents(QPDF& pdf, int pageno)
+static QPDFObjectHandle create_page_contents(QPDF& pdf, size_t pageno)
 {
     return QPDFObjectHandle::newStream(&pdf, generate_page_contents(pageno));
 }
@@ -175,9 +178,9 @@ QPDFObjectHandle newName(std::string const& name)
     return QPDFObjectHandle::newName(name);
 }
 
-QPDFObjectHandle newInteger(int val)
+QPDFObjectHandle newInteger(size_t val)
 {
-    return QPDFObjectHandle::newInteger(val);
+    return QPDFObjectHandle::newInteger(QIntC::to_longlong(val));
 }
 
 static void create_pdf(char const* filename)
@@ -210,7 +213,7 @@ static void create_pdf(char const* filename)
     mediabox.appendItem(newInteger(792));
 
     QPDFPageDocumentHelper dh(pdf);
-    for (int pageno = 1; pageno <= npages; ++pageno)
+    for (size_t pageno = 1; pageno <= npages; ++pageno)
     {
         QPDFObjectHandle image = QPDFObjectHandle::newStream(&pdf);
         QPDFObjectHandle image_dict = image.getDict();
@@ -253,7 +256,7 @@ static void create_pdf(char const* filename)
     w.write();
 }
 
-static void check_page_contents(int pageno, QPDFObjectHandle page)
+static void check_page_contents(size_t pageno, QPDFObjectHandle page)
 {
     PointerHolder<Buffer> buf =
         page.getKey("/Contents").getStreamData();
@@ -270,7 +273,7 @@ static void check_page_contents(int pageno, QPDFObjectHandle page)
     }
 }
 
-static void check_image(int pageno, QPDFObjectHandle page)
+static void check_image(size_t pageno, QPDFObjectHandle page)
 {
     QPDFObjectHandle image =
         page.getKey("/Resources").getKey("/XObject").getKey("/Im1");
@@ -283,10 +286,10 @@ static void check_pdf(char const* filename)
     QPDF pdf;
     pdf.processFile(filename);
     std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
-    assert(pages.size() == static_cast<size_t>(npages));
-    for (int i = 0; i < npages; ++i)
+    assert(pages.size() == QIntC::to_size(npages));
+    for (size_t i = 0; i < npages; ++i)
     {
-        int pageno = i + 1;
+        size_t pageno = i + 1;
         std::cout << "page " << pageno << " of " << npages << std::endl;
         check_page_contents(pageno, pages.at(i));
         check_image(pageno, pages.at(i));

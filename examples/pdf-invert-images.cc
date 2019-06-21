@@ -7,6 +7,7 @@
 #include <qpdf/QUtil.hh>
 #include <qpdf/Buffer.hh>
 #include <qpdf/QPDFWriter.hh>
+#include <qpdf/QIntC.hh>
 
 static char const* whoami = 0;
 
@@ -56,7 +57,7 @@ ImageInverter::provideStreamData(int objid, int generation,
     unsigned char ch;
     for (size_t i = 0; i < size; ++i)
     {
-	ch = static_cast<unsigned char>(0xff) - buf[i];
+	ch = QIntC::to_uchar(0xff - buf[i]);
 	pipeline->write(&ch, 1);
     }
     pipeline->finish();

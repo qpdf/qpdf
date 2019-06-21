@@ -42,8 +42,8 @@ int main(int argc, char* argv[])
 
     char* infilename = argv[1];
     char* outfilename = argv[2];
-    int width = QUtil::string_to_int(argv[3]);
-    int height = QUtil::string_to_int(argv[4]);
+    JDIMENSION width = QUtil::string_to_uint(argv[3]);
+    JDIMENSION height = QUtil::string_to_uint(argv[4]);
     char* colorspace = argv[5];
     J_COLOR_SPACE cs =
         ((strcmp(colorspace, "rgb") == 0) ? JCS_RGB :

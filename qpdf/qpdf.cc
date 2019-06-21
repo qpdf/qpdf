@@ -24,6 +24,7 @@
 #include <qpdf/QPDFExc.hh>
 
 #include <qpdf/QPDFWriter.hh>
+#include <qpdf/QIntC.hh>
 
 static int const EXIT_ERROR = 2;
 static int const EXIT_WARNING = 3;
@@ -1809,8 +1810,7 @@ ArgParser::argKeepFilesOpen(char* parameter)
 void
 ArgParser::argKeepFilesOpenThreshold(char* parameter)
 {
-    o.keep_files_open_threshold =
-        static_cast<size_t>(QUtil::string_to_int(parameter));
+    o.keep_files_open_threshold = QUtil::string_to_uint(parameter);
 }
 
 void
@@ -2039,25 +2039,25 @@ ArgParser::argRemovePageLabels()
 void
 ArgParser::argOiMinWidth(char* parameter)
 {
-    o.oi_min_width = QUtil::string_to_int(parameter);
+    o.oi_min_width = QUtil::string_to_uint(parameter);
 }
 
 void
 ArgParser::argOiMinHeight(char* parameter)
 {
-    o.oi_min_height = QUtil::string_to_int(parameter);
+    o.oi_min_height = QUtil::string_to_uint(parameter);
 }
 
 void
 ArgParser::argOiMinArea(char* parameter)
 {
-    o.oi_min_area = QUtil::string_to_int(parameter);
+    o.oi_min_area = QUtil::string_to_uint(parameter);
 }
 
 void
 ArgParser::argIiMinBytes(char* parameter)
 {
-    o.ii_min_bytes = QUtil::string_to_int(parameter);
+    o.ii_min_bytes = QUtil::string_to_uint(parameter);
 }
 
 void
@@ -2318,7 +2318,7 @@ ArgParser::handleArgFileArguments()
     {
         argv[i] = new_argv.at(i).getPointer();
     }
-    argc = static_cast<int>(new_argv.size());
+    argc = QIntC::to_int(new_argv.size());
     argv[argc] = 0;
 }
 
@@ -2423,7 +2423,7 @@ ArgParser::handleBashArguments()
     {
         argv[i] = bash_argv.at(i).getPointer();
     }
-    argc = static_cast<int>(bash_argv.size());
+    argc = QIntC::to_int(bash_argv.size());
     argv[argc] = 0;
 }
 
@@ -2648,7 +2648,8 @@ QPDFPageData::QPDFPageData(std::string const& filename,
     try
     {
         this->selected_pages =
-            QUtil::parse_numrange(range, this->orig_pages.size());
+            QUtil::parse_numrange(range,
+                                  QIntC::to_int(this->orig_pages.size()));
     }
     catch (std::runtime_error& e)
     {
@@ -2805,8 +2806,8 @@ ArgParser::checkCompletion()
     if (QUtil::get_env("COMP_LINE", &bash_line) &&
         QUtil::get_env("COMP_POINT", &bash_point_env))
     {
-        int p = QUtil::string_to_int(bash_point_env.c_str());
-        if ((p > 0) && (p <= static_cast<int>(bash_line.length())))
+        size_t p = QUtil::string_to_uint(bash_point_env.c_str());
+        if ((p > 0) && (p <= bash_line.length()))
         {
             // Truncate the line. We ignore everything at or after the
             // cursor for completion purposes.
@@ -2844,7 +2845,7 @@ ArgParser::checkCompletion()
         {
             // Go back to the last separator and set prev based on
             // that.
-            int p1 = p;
+            size_t p1 = p;
             while (--p1 > 0)
             {
                 char ch = bash_line.at(p1);
@@ -3342,9 +3343,9 @@ static void do_show_pages(QPDF& pdf, Options& o)
                     QPDFObjectHandle image = (*iter).second;
                     QPDFObjectHandle dict = image.getDict();
                     int width =
-                        dict.getKey("/Width").getIntValue();
+                        dict.getKey("/Width").getIntValueAsInt();
                     int height =
-                        dict.getKey("/Height").getIntValue();
+                        dict.getKey("/Height").getIntValueAsInt();
                     std::cout << "    " << name << ": "
                               << image.unparse()
                               << ", " << width << " x " << height
@@ -3410,7 +3411,7 @@ static void do_json_pages(QPDF& pdf, Options& o, JSON& j)
     QPDFOutlineDocumentHelper odh(pdf);
     pdh.pushInheritedAttributesToPage();
     std::vector<QPDFPageObjectHelper> pages = pdh.getAllPages();
-    size_t pageno = 0;
+    int pageno = 0;
     for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
          iter != pages.end(); ++iter, ++pageno)
     {
@@ -3503,7 +3504,8 @@ static void do_json_page_labels(QPDF& pdf, Options& o, JSON& j)
     if (pldh.hasPageLabels())
     {
         std::vector<QPDFObjectHandle> labels;
-        pldh.getLabelsForPageRange(0, pages.size() - 1, 0, labels);
+        pldh.getLabelsForPageRange(
+            0, QIntC::to_int(pages.size()) - 1, 0, labels);
         for (std::vector<QPDFObjectHandle>::iterator iter = labels.begin();
              iter != labels.end(); ++iter)
         {
@@ -3869,10 +3871,24 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
     }
     // Files have been seen in the wild whose width and height are
     // floating point, which is goofy, but we can deal with it.
-    JDIMENSION w = static_cast<JDIMENSION>(
-        w_obj.isInteger() ? w_obj.getIntValue() : w_obj.getNumericValue());
-    JDIMENSION h = static_cast<JDIMENSION>(
-        h_obj.isInteger() ? h_obj.getIntValue() : h_obj.getNumericValue());
+    JDIMENSION w = 0;
+    if (w_obj.isInteger())
+    {
+        w = w_obj.getUIntValueAsUInt();
+    }
+    else
+    {
+        w = static_cast<JDIMENSION>(w_obj.getNumericValue());
+    }
+    JDIMENSION h = 0;
+    if (h_obj.isInteger())
+    {
+        h = h_obj.getUIntValueAsUInt();
+    }
+    else
+    {
+        h = static_cast<JDIMENSION>(h_obj.getNumericValue());
+    }
     std::string colorspace = (colorspace_obj.isName() ?
                               colorspace_obj.getName() :
                               std::string());
@@ -4119,10 +4135,10 @@ static void validate_under_overlay(QPDF& pdf, UnderOverlay* uo, Options& o)
         return;
     }
     QPDFPageDocumentHelper main_pdh(pdf);
-    int main_npages = static_cast<int>(main_pdh.getAllPages().size());
+    int main_npages = QIntC::to_int(main_pdh.getAllPages().size());
     uo->pdf = process_file(uo->filename, uo->password, o);
     QPDFPageDocumentHelper uo_pdh(*(uo->pdf));
-    int uo_npages = static_cast<int>(uo_pdh.getAllPages().size());
+    int uo_npages = QIntC::to_int(uo_pdh.getAllPages().size());
     try
     {
         uo->to_pagenos = QUtil::parse_numrange(uo->to_nr, main_npages);
@@ -4185,7 +4201,7 @@ static void do_under_overlay_for_page(
     QPDFPageObjectHelper& dest_page,
     bool before)
 {
-    int pageno = 1 + page_idx;
+    int pageno = 1 + QIntC::to_int(page_idx);
     if (! pagenos.count(pageno))
     {
         return;
@@ -4206,7 +4222,8 @@ static void do_under_overlay_for_page(
         {
             fo[from_pageno] =
                 pdf.copyForeignObject(
-                    pages.at(from_pageno - 1).getFormXObjectForPage());
+                    pages.at(QIntC::to_size(from_pageno - 1)).
+                    getFormXObjectForPage());
         }
         // If the same page is overlaid or underlaid multiple times,
         // we'll generate multiple names for it, but that's harmless
@@ -4594,7 +4611,8 @@ static void handle_page_specs(QPDF& pdf, Options& o)
             int pageno = *pageno_iter - 1;
             pldh.getLabelsForPageRange(pageno, pageno, out_pageno,
                                        new_labels);
-            QPDFPageObjectHelper to_copy = page_data.orig_pages.at(pageno);
+            QPDFPageObjectHelper to_copy =
+                page_data.orig_pages.at(QIntC::to_size(pageno));
             QPDFObjGen to_copy_og = to_copy.getObjectHandle().getObjGen();
             unsigned long long from_uuid = page_data.qpdf->getUniqueId();
             if (copied_pages[from_uuid].count(to_copy_og))
@@ -4634,7 +4652,7 @@ static void handle_page_specs(QPDF& pdf, Options& o)
     // other places, such as the outlines dictionary.
     for (size_t pageno = 0; pageno < orig_pages.size(); ++pageno)
     {
-        if (selected_from_orig.count(pageno) == 0)
+        if (selected_from_orig.count(QIntC::to_int(pageno)) == 0)
         {
             pdf.replaceObject(
                 orig_pages.at(pageno).getObjectHandle().getObjGen(),
@@ -4647,7 +4665,7 @@ static void handle_rotations(QPDF& pdf, Options& o)
 {
     QPDFPageDocumentHelper dh(pdf);
     std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
-    int npages = static_cast<int>(pages.size());
+    int npages = QIntC::to_int(pages.size());
     for (std::map<std::string, RotationSpec>::iterator iter =
              o.rotations.begin();
          iter != o.rotations.end(); ++iter)
@@ -4663,7 +4681,8 @@ static void handle_rotations(QPDF& pdf, Options& o)
             int pageno = *i2 - 1;
             if ((pageno >= 0) && (pageno < npages))
             {
-                pages.at(pageno).rotatePage(rspec.angle, rspec.relative);
+                pages.at(QIntC::to_size(pageno)).rotatePage(
+                    rspec.angle, rspec.relative);
             }
         }
     }
@@ -4957,7 +4976,8 @@ static void write_outfile(QPDF& pdf, Options& o)
         if (num_spot != 0)
         {
             QTC::TC("qpdf", "qpdf split-pages %d");
-            before = std::string(o.outfilename, (num_spot - o.outfilename));
+            before = std::string(o.outfilename,
+                                 QIntC::to_size(num_spot - o.outfilename));
             after = num_spot + 2;
         }
         else if ((len >= 4) &&
@@ -4980,19 +5000,19 @@ static void write_outfile(QPDF& pdf, Options& o)
         }
         QPDFPageLabelDocumentHelper pldh(pdf);
         std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
-        int pageno_len = QUtil::int_to_string(pages.size()).length();
-        unsigned int num_pages = pages.size();
-        for (unsigned int i = 0; i < num_pages; i += o.split_pages)
+        size_t pageno_len = QUtil::uint_to_string(pages.size()).length();
+        size_t num_pages = pages.size();
+        for (size_t i = 0; i < num_pages; i += QIntC::to_size(o.split_pages))
         {
-            unsigned int first = i + 1;
-            unsigned int last = i + o.split_pages;
+            size_t first = i + 1;
+            size_t last = i + QIntC::to_size(o.split_pages);
             if (last > num_pages)
             {
                 last = num_pages;
             }
             QPDF outpdf;
             outpdf.emptyPDF();
-            for (unsigned int pageno = first; pageno <= last; ++pageno)
+            for (size_t pageno = first; pageno <= last; ++pageno)
             {
                 QPDFObjectHandle page = pages.at(pageno - 1);
                 outpdf.addPage(page, false);
@@ -5000,17 +5020,22 @@ static void write_outfile(QPDF& pdf, Options& o)
             if (pldh.hasPageLabels())
             {
                 std::vector<QPDFObjectHandle> labels;
-                pldh.getLabelsForPageRange(first - 1, last - 1, 0, labels);
+                pldh.getLabelsForPageRange(
+                    QIntC::to_longlong(first - 1),
+                    QIntC::to_longlong(last - 1),
+                    0, labels);
                 QPDFObjectHandle page_labels =
                     QPDFObjectHandle::newDictionary();
                 page_labels.replaceKey(
                     "/Nums", QPDFObjectHandle::newArray(labels));
                 outpdf.getRoot().replaceKey("/PageLabels", page_labels);
             }
-            std::string page_range = QUtil::int_to_string(first, pageno_len);
+            std::string page_range =
+                QUtil::uint_to_string(first, QIntC::to_int(pageno_len));
             if (o.split_pages > 1)
             {
-                page_range += "-" + QUtil::int_to_string(last, pageno_len);
+                page_range += "-" +
+                    QUtil::uint_to_string(last, QIntC::to_int(pageno_len));
             }
             std::string outfile = before + page_range + after;
             QPDFWriter w(outpdf, outfile.c_str());
@@ -5117,8 +5142,10 @@ int wmain(int argc, wchar_t* argv[])
         for (size_t j = 0; j < wcslen(argv[i]); ++j)
         {
             unsigned short codepoint = static_cast<unsigned short>(argv[i][j]);
-            utf16.append(1, static_cast<unsigned char>(codepoint >> 8));
-            utf16.append(1, static_cast<unsigned char>(codepoint & 0xff));
+            utf16.append(1, static_cast<char>(
+                             QIntC::to_uchar(codepoint >> 8)));
+            utf16.append(1, static_cast<char>(
+                             QIntC::to_uchar(codepoint & 0xff)));
         }
         std::string utf8 = QUtil::utf16_to_utf8(utf16);
         utf8_argv.push_back(
@@ -5131,7 +5158,7 @@ int wmain(int argc, wchar_t* argv[])
     {
         new_argv[i] = utf8_argv.at(i).getPointer();
     }
-    argc = static_cast<int>(utf8_argv.size());
+    argc = QIntC::to_int(utf8_argv.size());
     new_argv[argc] = 0;
     return realmain(argc, new_argv);
 }

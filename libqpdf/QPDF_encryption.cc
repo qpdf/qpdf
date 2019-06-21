@@ -130,9 +130,9 @@ QPDF::EncryptionData::setV5EncryptionParameters(
 static void
 pad_or_truncate_password_V4(std::string const& password, char k1[key_bytes])
 {
-    int password_bytes = std::min(static_cast<size_t>(key_bytes),
-                                  password.length());
-    int pad_bytes = key_bytes - password_bytes;
+    size_t password_bytes = std::min(QIntC::to_size(key_bytes),
+                                     password.length());
+    size_t pad_bytes = key_bytes - password_bytes;
     memcpy(k1, password.c_str(), password_bytes);
     memcpy(k1 + password_bytes, padding_string, pad_bytes);
 }
@@ -154,9 +154,10 @@ QPDF::trim_user_password(std::string& user_password)
     char const* p2 = 0;
     while ((p2 = strchr(p1, '\x28')) != 0)
     {
-	if (memcmp(p2, padding_string, len - (p2 - cstr)) == 0)
+        size_t idx = toS(p2 - cstr);
+	if (memcmp(p2, padding_string, len - idx) == 0)
 	{
-	    user_password = user_password.substr(0, p2 - cstr);
+	    user_password = user_password.substr(0, idx);
 	    return;
 	}
         else
@@ -183,7 +184,8 @@ truncate_password_V5(std::string const& password)
 }
 
 static void
-iterate_md5_digest(MD5& md5, MD5::Digest& digest, int iterations, int key_len)
+iterate_md5_digest(MD5& md5, MD5::Digest& digest,
+                   int iterations, int key_len)
 {
     md5.digest(digest);
 
@@ -191,26 +193,26 @@ iterate_md5_digest(MD5& md5, MD5::Digest& digest, int iterations, int key_len)
     {
 	MD5 m;
 	m.encodeDataIncrementally(reinterpret_cast<char*>(digest),
-                                  key_len);
+                                  QIntC::to_size(key_len));
 	m.digest(digest);
     }
 }
 
 
 static void
-iterate_rc4(unsigned char* data, int data_len,
+iterate_rc4(unsigned char* data, size_t data_len,
 	    unsigned char* okey, int key_len,
 	    int iterations, bool reverse)
 {
-    unsigned char* key = new unsigned char[key_len];
+    unsigned char* key = new unsigned char[QIntC::to_size(key_len)];
     for (int i = 0; i < iterations; ++i)
     {
 	int const xor_value = (reverse ? iterations - 1 - i : i);
 	for (int j = 0; j < key_len; ++j)
 	{
-	    key[j] = okey[j] ^ xor_value;
+	    key[j] = static_cast<unsigned char>(okey[j] ^ xor_value);
 	}
-	RC4 rc4(key, key_len);
+	RC4 rc4(key, QIntC::to_int(key_len));
 	rc4.process(data, data_len);
     }
     delete [] key;
@@ -228,7 +230,7 @@ process_with_aes(std::string const& key,
     Pl_Buffer buffer("buffer");
     Pl_AES_PDF aes("aes", &buffer, encrypt,
                    QUtil::unsigned_char_pointer(key),
-                   key.length());
+                   QIntC::to_uint(key.length()));
     if (iv)
     {
         aes.setIV(iv, iv_length);
@@ -328,7 +330,7 @@ hash_V5(std::string const& password,
             {
                 unsigned int ch = static_cast<unsigned char>(*(E.rbegin()));
 
-                if (ch <= static_cast<unsigned int>(round_number - 32))
+                if (ch <= QIntC::to_uint(round_number - 32))
                 {
                     done = true;
                 }
@@ -341,7 +343,7 @@ hash_V5(std::string const& password,
 }
 
 static
-void pad_short_parameter(std::string& param, unsigned int max_len)
+void pad_short_parameter(std::string& param, size_t max_len)
 {
     if (param.length() < max_len)
     {
@@ -367,11 +369,11 @@ QPDF::compute_data_key(std::string const& encryption_key,
     }
 
     // Append low three bytes of object ID and low two bytes of generation
-    result += static_cast<char>(objid & 0xff);
-    result += static_cast<char>((objid >> 8) & 0xff);
-    result += static_cast<char>((objid >> 16) & 0xff);
-    result += static_cast<char>(generation & 0xff);
-    result += static_cast<char>((generation >> 8) & 0xff);
+    result.append(1, static_cast<char>(objid & 0xff));
+    result.append(1, static_cast<char>((objid >> 8) & 0xff));
+    result.append(1, static_cast<char>((objid >> 16) & 0xff));
+    result.append(1, static_cast<char>(generation & 0xff));
+    result.append(1, static_cast<char>((generation >> 8) & 0xff));
     if (use_aes)
     {
 	result += "sAlT";
@@ -382,7 +384,7 @@ QPDF::compute_data_key(std::string const& encryption_key,
     MD5::Digest digest;
     md5.digest(digest);
     return std::string(reinterpret_cast<char*>(digest),
-		       std::min(result.length(), static_cast<size_t>(16)));
+		       std::min(result.length(), toS(16)));
 }
 
 std::string
@@ -437,10 +439,9 @@ QPDF::compute_encryption_key_from_password(
 	md5.encodeDataIncrementally(bytes, 4);
     }
     MD5::Digest digest;
-    int key_len = std::min(static_cast<int>(sizeof(digest)),
-                           data.getLengthBytes());
+    int key_len = std::min(QIntC::to_int(sizeof(digest)), data.getLengthBytes());
     iterate_md5_digest(md5, digest, ((data.getR() >= 3) ? 50 : 0), key_len);
-    return std::string(reinterpret_cast<char*>(digest), key_len);
+    return std::string(reinterpret_cast<char*>(digest), QIntC::to_size(key_len));
 }
 
 static void
@@ -463,7 +464,7 @@ compute_O_rc4_key(std::string const& user_password,
     md5.encodeDataIncrementally(
 	pad_or_truncate_password_V4(password).c_str(), key_bytes);
     MD5::Digest digest;
-    int key_len = std::min(static_cast<int>(sizeof(digest)),
+    int key_len = std::min(QIntC::to_int(sizeof(digest)),
                            data.getLengthBytes());
     iterate_md5_digest(md5, digest, ((data.getR() >= 3) ? 50 : 0), key_len);
     memcpy(key, digest, OU_key_bytes_V4);
@@ -482,7 +483,7 @@ compute_O_value(std::string const& user_password,
     char upass[key_bytes];
     pad_or_truncate_password_V4(user_password, upass);
     std::string k1(reinterpret_cast<char*>(O_key), OU_key_bytes_V4);
-    pad_short_parameter(k1, data.getLengthBytes());
+    pad_short_parameter(k1, QIntC::to_size(data.getLengthBytes()));
     iterate_rc4(QUtil::unsigned_char_pointer(upass), key_bytes,
 		O_key, data.getLengthBytes(),
                 (data.getR() >= 3) ? 20 : 1, false);
@@ -499,7 +500,7 @@ compute_U_value_R2(std::string const& user_password,
     std::string k1 = QPDF::compute_encryption_key(user_password, data);
     char udata[key_bytes];
     pad_or_truncate_password_V4("", udata);
-    pad_short_parameter(k1, data.getLengthBytes());
+    pad_short_parameter(k1, QIntC::to_size(data.getLengthBytes()));
     iterate_rc4(QUtil::unsigned_char_pointer(udata), key_bytes,
 		QUtil::unsigned_char_pointer(k1),
                 data.getLengthBytes(), 1, false);
@@ -521,7 +522,7 @@ compute_U_value_R3(std::string const& user_password,
                                 data.getId1().length());
     MD5::Digest digest;
     md5.digest(digest);
-    pad_short_parameter(k1, data.getLengthBytes());
+    pad_short_parameter(k1, QIntC::to_size(data.getLengthBytes()));
     iterate_rc4(digest, sizeof(MD5::Digest),
 		QUtil::unsigned_char_pointer(k1),
                 data.getLengthBytes(), 20, false);
@@ -555,8 +556,8 @@ check_user_password_V4(std::string const& user_password,
     // Algorithm 3.6 from the PDF 1.7 Reference Manual
 
     std::string u_value = compute_U_value(user_password, data);
-    int to_compare = ((data.getR() >= 3) ? sizeof(MD5::Digest)
-                      : key_bytes);
+    size_t to_compare = ((data.getR() >= 3) ? sizeof(MD5::Digest)
+                         : key_bytes);
     return (memcmp(data.getU().c_str(), u_value.c_str(), to_compare) == 0);
 }
 
@@ -598,7 +599,7 @@ check_owner_password_V4(std::string& user_password,
     unsigned char O_data[key_bytes];
     memcpy(O_data, QUtil::unsigned_char_pointer(data.getO()), key_bytes);
     std::string k1(reinterpret_cast<char*>(key), OU_key_bytes_V4);
-    pad_short_parameter(k1, data.getLengthBytes());
+    pad_short_parameter(k1, QIntC::to_size(data.getLengthBytes()));
     iterate_rc4(O_data, key_bytes, QUtil::unsigned_char_pointer(k1),
                 data.getLengthBytes(),
                 (data.getR() >= 3) ? 20 : 1, true);
@@ -694,7 +695,8 @@ compute_Perms_value_V5_clear(std::string const& encryption_key,
                              unsigned char k[16])
 {
     // From algorithm 3.10 from the PDF 1.7 extension level 3
-    unsigned long long extended_perms = 0xffffffff00000000LL | data.getP();
+    unsigned long long extended_perms =
+        0xffffffff00000000LL | static_cast<unsigned long long>(data.getP());
     for (int i = 0; i < 8; ++i)
     {
         k[i] = static_cast<unsigned char>(extended_perms & 0xff);
@@ -868,11 +870,11 @@ QPDF::initializeEncryption()
 		      "or the wrong type");
     }
 
-    int V = encryption_dict.getKey("/V").getIntValue();
-    int R = encryption_dict.getKey("/R").getIntValue();
+    int V = encryption_dict.getKey("/V").getIntValueAsInt();
+    int R = encryption_dict.getKey("/R").getIntValueAsInt();
     std::string O = encryption_dict.getKey("/O").getStringValue();
     std::string U = encryption_dict.getKey("/U").getStringValue();
-    unsigned int P = encryption_dict.getKey("/P").getIntValue();
+    int P = encryption_dict.getKey("/P").getIntValueAsInt();
 
     // If supporting new encryption R/V values, remember to update
     // error message inside this if statement.
@@ -935,7 +937,7 @@ QPDF::initializeEncryption()
     int Length = 40;
     if (encryption_dict.getKey("/Length").isInteger())
     {
-	Length = encryption_dict.getKey("/Length").getIntValue();
+	Length = encryption_dict.getKey("/Length").getIntValueAsInt();
         if (R < 3)
         {
             // Force Length to 40 regardless of what the file says.
@@ -1013,7 +1015,8 @@ QPDF::initializeEncryption()
 	}
     }
 
-    EncryptionData data(V, R, Length / 8, P, O, U, OE, UE, Perms,
+    EncryptionData data(V, R, Length / 8,
+                        P, O, U, OE, UE, Perms,
                         id1, this->m->encp->encrypt_metadata);
     if (this->m->provided_password_is_hex_key)
     {
@@ -1154,11 +1157,11 @@ QPDF::decryptString(std::string& str, int objid, int generation)
 	else
 	{
 	    QTC::TC("qpdf", "QPDF_encryption rc4 decode string");
-	    unsigned int vlen = str.length();
+	    size_t vlen = str.length();
 	    // Using PointerHolder guarantees that tmp will
 	    // be freed even if rc4.process throws an exception.
 	    PointerHolder<char> tmp(true, QUtil::copy_string(str));
-	    RC4 rc4(QUtil::unsigned_char_pointer(key), key.length());
+	    RC4 rc4(QUtil::unsigned_char_pointer(key), toI(key.length()));
 	    rc4.process(QUtil::unsigned_char_pointer(tmp.getPointer()), vlen);
 	    str = std::string(tmp.getPointer(), vlen);
 	}
@@ -1313,7 +1316,7 @@ QPDF::decryptStream(PointerHolder<EncryptionParameters> encp,
 	QTC::TC("qpdf", "QPDF_encryption rc4 decode stream");
 	pipeline = new Pl_RC4("RC4 stream decryption", pipeline,
 			      QUtil::unsigned_char_pointer(key),
-                              key.length());
+                              toI(key.length()));
     }
     heap.push_back(pipeline);
 }
@@ -1404,9 +1407,9 @@ QPDF::isEncrypted(int& R, int& P, int& V,
 	QPDFObjectHandle Pkey = encrypt.getKey("/P");
 	QPDFObjectHandle Rkey = encrypt.getKey("/R");
         QPDFObjectHandle Vkey = encrypt.getKey("/V");
-	P = Pkey.getIntValue();
-	R = Rkey.getIntValue();
-        V = Vkey.getIntValue();
+	P = Pkey.getIntValueAsInt();
+	R = Rkey.getIntValueAsInt();
+        V = Vkey.getIntValueAsInt();
         stream_method = this->m->encp->cf_stream;
         string_method = this->m->encp->cf_string;
         file_method = this->m->encp->cf_file;

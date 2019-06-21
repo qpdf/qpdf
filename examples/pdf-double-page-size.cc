@@ -34,7 +34,7 @@ static void doubleBoxSize(QPDFObjectHandle& page, char const* box_name)
 				 " is not an array of four elements");
     }
     std::vector<QPDFObjectHandle> doubled;
-    for (unsigned int i = 0; i < 4; ++i)
+    for (int i = 0; i < 4; ++i)
     {
 	doubled.push_back(
 	    QPDFObjectHandle::newReal(

@@ -391,7 +391,7 @@ static void test16(char const* infile,
     qpdf_set_stream_data_mode(qpdf, qpdf_s_uncompress);
     qpdf_write(qpdf);
     f = safe_fopen(outfile, "wb");
-    buflen = qpdf_get_buffer_length(qpdf);
+    buflen = (unsigned long)(qpdf_get_buffer_length(qpdf));
     buf = qpdf_get_buffer(qpdf);
     fwrite(buf, 1, buflen, f);
     fclose(f);

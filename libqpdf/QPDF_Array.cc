@@ -1,5 +1,6 @@
 #include <qpdf/QPDF_Array.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/QIntC.hh>
 #include <stdexcept>
 
 QPDF_Array::QPDF_Array(std::vector<QPDFObjectHandle> const& items) :
@@ -68,18 +69,20 @@ QPDF_Array::setDescription(QPDF* qpdf, std::string const& description)
 int
 QPDF_Array::getNItems() const
 {
-    return this->items.size();
+    // This should really return a size_t, but changing it would break
+    // a lot of code.
+    return QIntC::to_int(this->items.size());
 }
 
 QPDFObjectHandle
 QPDF_Array::getItem(int n) const
 {
-    if ((n < 0) || (n >= static_cast<int>(this->items.size())))
+    if ((n < 0) || (n >= QIntC::to_int(this->items.size())))
     {
 	throw std::logic_error(
 	    "INTERNAL ERROR: bounds error accessing QPDF_Array element");
     }
-    return this->items.at(n);
+    return this->items.at(QIntC::to_size(n));
 }
 
 std::vector<QPDFObjectHandle> const&
@@ -93,7 +96,7 @@ QPDF_Array::setItem(int n, QPDFObjectHandle const& oh)
 {
     // Call getItem for bounds checking
     (void) getItem(n);
-    this->items.at(n) = oh;
+    this->items.at(QIntC::to_size(n)) = oh;
 }
 
 void
@@ -106,7 +109,7 @@ void
 QPDF_Array::insertItem(int at, QPDFObjectHandle const& item)
 {
     // As special case, also allow insert beyond the end
-    if ((at < 0) || (at > static_cast<int>(this->items.size())))
+    if ((at < 0) || (at > QIntC::to_int(this->items.size())))
     {
 	throw std::logic_error(
 	    "INTERNAL ERROR: bounds error accessing QPDF_Array element");

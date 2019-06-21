@@ -1337,8 +1337,8 @@ sph_bswap64(sph_u64 x)
 static SPH_INLINE void
 sph_enc16be(void *dst, unsigned val)
 {
-	((unsigned char *)dst)[0] = (val >> 8);
-	((unsigned char *)dst)[1] = val;
+	((unsigned char *)dst)[0] = (unsigned char)(val >> 8);
+	((unsigned char *)dst)[1] = (unsigned char)val;
 }
 
 static SPH_INLINE unsigned
@@ -1351,8 +1351,8 @@ sph_dec16be(const void *src)
 static SPH_INLINE void
 sph_enc16le(void *dst, unsigned val)
 {
-	((unsigned char *)dst)[0] = val;
-	((unsigned char *)dst)[1] = val >> 8;
+	((unsigned char *)dst)[0] = (unsigned char)val;
+	((unsigned char *)dst)[1] = (unsigned char)(val >> 8);
 }
 
 static SPH_INLINE unsigned

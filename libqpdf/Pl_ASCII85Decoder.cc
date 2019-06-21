@@ -106,7 +106,7 @@ Pl_ASCII85Decoder::flush()
     for (int i = 0; i < 5; ++i)
     {
 	lval *= 85;
-	lval += (this->inbuf[i] - 33);
+	lval += (this->inbuf[i] - 33U);
     }
 
     unsigned char outbuf[4];

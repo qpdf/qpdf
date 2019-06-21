@@ -1,6 +1,7 @@
 #include <qpdf/Pl_AES_PDF.hh>
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/QIntC.hh>
 
 #include <stdio.h>
 #include <string.h>
@@ -87,7 +88,7 @@ int main(int argc, char* argv[])
         usage();
     }
 
-    unsigned int hexkeylen = strlen(hexkey);
+    unsigned int hexkeylen = QIntC::to_uint(strlen(hexkey));
     unsigned int keylen = hexkeylen / 2;
 
     FILE* infile = QUtil::safe_fopen(infilename, "rb");

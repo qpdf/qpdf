@@ -26,8 +26,8 @@ QPDFNumberTreeObjectHelper::updateMap(QPDFObjectHandle oh)
     QPDFObjectHandle nums = oh.getKey("/Nums");
     if (nums.isArray())
     {
-        size_t nitems = nums.getArrayNItems();
-        size_t i = 0;
+        int nitems = nums.getArrayNItems();
+        int i = 0;
         while (i < nitems - 1)
         {
             QPDFObjectHandle num = nums.getArrayItem(i);
@@ -43,8 +43,8 @@ QPDFNumberTreeObjectHelper::updateMap(QPDFObjectHandle oh)
     QPDFObjectHandle kids = oh.getKey("/Kids");
     if (kids.isArray())
     {
-        size_t nitems = kids.getArrayNItems();
-        for (size_t i = 0; i < nitems; ++i)
+        int nitems = kids.getArrayNItems();
+        for (int i = 0; i < nitems; ++i)
         {
             updateMap(kids.getArrayItem(i));
         }

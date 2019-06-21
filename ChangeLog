@@ -1,8 +1,18 @@
 2019-06-20  Jay Berkenbilt  <ejb@ql.org>
 
+	* Fix all integer sign and conversion warnings. This makes all
+	integer type conversions that have potential data loss explicit
+	with calls that do range checks and raise an exception.
+
 	* Change out_bufsize argument to Pl_Flate's constructor for int to
 	unsigned int for compatibility with underlying zlib
 	implementation.
+
+	* Change QPDFObjectHandle::pipeStreamData's encode_flags argument
+	from unsigned long to int since int is the underlying type of the
+	enumerated type values that are passed to it. This change should
+	be invisible to virtually all code unless you are compiling with
+	strict warning flags and explicitly casting to unsigned long.
 
 	* Add methods to QPDFObjectHandle to return the value of Integer
 	objects as int and unsigned int with range checking and fallback

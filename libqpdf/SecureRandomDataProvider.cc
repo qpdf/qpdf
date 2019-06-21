@@ -53,6 +53,7 @@ class WindowsCryptProvider
 #           pragma GCC diagnostic push
 #           pragma GCC diagnostic ignored "-Wold-style-cast"
 #           pragma GCC diagnostic ignored "-Wsign-compare"
+#           pragma GCC diagnostic ignored "-Wsign-conversion"
 #endif
             if (GetLastError() == NTE_BAD_KEYSET)
 #if ((defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
@@ -94,7 +95,8 @@ SecureRandomDataProvider::provideRandomData(unsigned char* data, size_t len)
     // Optimization: make the WindowsCryptProvider static as long as
     // it can be done in a thread-safe fashion.
     WindowsCryptProvider c;
-    if (! CryptGenRandom(c.crypt_prov, len, reinterpret_cast<BYTE*>(data)))
+    if (! CryptGenRandom(c.crypt_prov, static_cast<DWORD>(len),
+                         reinterpret_cast<BYTE*>(data)))
     {
         throw std::runtime_error("unable to generate secure random data");
     }
@@ -112,7 +114,7 @@ SecureRandomDataProvider::provideRandomData(unsigned char* data, size_t len)
     {
         throw std::runtime_error(
             "unable to read " +
-            QUtil::int_to_string(len) +
+            QUtil::uint_to_string(len) +
             " bytes from " + std::string(RANDOM_DEVICE));
     }
 

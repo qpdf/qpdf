@@ -17,6 +17,7 @@
 #include <qpdf/Pl_Flate.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QPDFSystemError.hh>
+#include <qpdf/QIntC.hh>
 #include <iostream>
 #include <sstream>
 #include <algorithm>
@@ -173,7 +174,7 @@ static void read_file_into_memory(
 {
     FILE* f = QUtil::safe_fopen(filename, "rb");
     fseek(f, 0, SEEK_END);
-    size = QUtil::tell(f);
+    size = QIntC::to_size(QUtil::tell(f));
     fseek(f, 0, SEEK_SET);
     file_buf = PointerHolder<char>(true, new char[size]);
     char* buf_p = file_buf.getPointer();
@@ -280,7 +281,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         char* p = file_buf.getPointer();
         for (size_t i = 0; i < size; ++i)
         {
-            p[i] ^= 0xcc;
+            p[i] = static_cast<char>(p[i] ^ 0xcc);
         }
 	pdf.processMemoryFile((std::string(filename1) + ".pdf").c_str(),
                               p, size);
@@ -544,8 +545,8 @@ void runtest(int n, char const* filename1, char const* arg2)
 		std::string const& name = (*iter).first;
 		QPDFObjectHandle image = (*iter).second;
 		QPDFObjectHandle dict = image.getDict();
-		int width = dict.getKey("/Width").getIntValue();
-		int height = dict.getKey("/Height").getIntValue();
+		long long width = dict.getKey("/Width").getIntValue();
+		long long height = dict.getKey("/Height").getIntValue();
 		std::cout << "    " << name
 			  << ": " << width << " x " << height
 			  << std::endl;
@@ -929,7 +930,8 @@ void runtest(int n, char const* filename1, char const* arg2)
         page.replaceKey("/Parent", pages);
         pages.replaceKey(
             "/Count",
-            QPDFObjectHandle::newInteger(1 + all_pages.size()));
+            QPDFObjectHandle::newInteger(
+                1 + QIntC::to_longlong(all_pages.size())));
         kids.appendItem(page);
         assert(all_pages.size() == 10);
         pdf.updateAllPagesCache();
@@ -1096,8 +1098,8 @@ void runtest(int n, char const* filename1, char const* arg2)
 
         // Verify that the previously added reserved keys can be
         // dereferenced properly now
-        int i1 = res1.getArrayItem(0).getArrayItem(1).getIntValue();
-        int i2 = res2.getArrayItem(0).getArrayItem(1).getIntValue();
+        int i1 = res1.getArrayItem(0).getArrayItem(1).getIntValueAsInt();
+        int i2 = res2.getArrayItem(0).getArrayItem(1).getIntValueAsInt();
         if ((i1 == 2) && (i2 == 1))
         {
             std::cout << "circular access and lazy resolution worked" << std::endl;
@@ -1424,7 +1426,7 @@ void runtest(int n, char const* filename1, char const* arg2)
             {
                 std::string t;
                 for (size_t i = 0;
-                     i < std::min(data.size(), static_cast<size_t>(20));
+                     i < std::min(data.size(), QIntC::to_size(20));
                      ++i)
                 {
                     if ((data.at(i) >= 32) && (data.at(i) <= 126))
@@ -1436,7 +1438,7 @@ void runtest(int n, char const* filename1, char const* arg2)
                         t += ".";
                     }
                 }
-                t += " (" + QUtil::int_to_string(data.size()) + " bytes)";
+                t += " (" + QUtil::uint_to_string(data.size()) + " bytes)";
                 data = t;
             }
             std::cout << filename << ":\n" << data << "--END--\n";
@@ -1797,7 +1799,7 @@ void runtest(int n, char const* filename1, char const* arg2)
     {
         // Test page labels.
         QPDFPageLabelDocumentHelper pldh(pdf);
-        size_t npages = pdf.getRoot().getKey("/Pages").
+        long long npages = pdf.getRoot().getKey("/Pages").
             getKey("/Count").getIntValue();
         std::vector<QPDFObjectHandle> labels;
         pldh.getLabelsForPageRange(0, npages - 1, 1, labels);
@@ -2076,7 +2078,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         {
             pdf.processMemoryFile("empty", "", 0);
         }
-        catch (QPDFExc& e)
+        catch (QPDFExc const&)
         {
             std::cout << "Caught QPDFExc as expected" << std::endl;
         }
@@ -2084,7 +2086,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         {
             QUtil::safe_fopen("/does/not/exist", "r");
         }
-        catch (QPDFSystemError& e)
+        catch (QPDFSystemError const&)
         {
             std::cout << "Caught QPDFSystemError as expected" << std::endl;
         }
@@ -2092,7 +2094,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         {
             QUtil::int_to_string_base(0, 12);
         }
-        catch (std::logic_error& e)
+        catch (std::logic_error const&)
         {
             std::cout << "Caught logic_error as expected" << std::endl;
         }
@@ -2100,7 +2102,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         {
             QUtil::toUTF8(0xffffffff);
         }
-        catch (std::runtime_error& e)
+        catch (std::runtime_error const&)
         {
             std::cout << "Caught runtime_error as expected" << std::endl;
         }
@@ -2110,12 +2112,12 @@ void runtest(int n, char const* filename1, char const* arg2)
         // Test int size checks. This test will fail if int and long
         // long are the same size.
         QPDFObjectHandle t = pdf.getTrailer();
-        unsigned long long q1_l = 3L * INT_MAX;
-        long long q1 = static_cast<long long>(q1_l);
-        long long q2_l = 3L * INT_MIN;
-        long long q2 = static_cast<long long>(q2_l);
+        unsigned long long q1_l = 3ULL * QIntC::to_ulonglong(INT_MAX);
+        long long q1 = QIntC::to_longlong(q1_l);
+        long long q2_l = 3LL * QIntC::to_longlong(INT_MIN);
+        long long q2 = QIntC::to_longlong(q2_l);
         unsigned int q3_i = UINT_MAX;
-        long long q3 = static_cast<long long>(q3_i);
+        long long q3 = QIntC::to_longlong(q3_i);
         t.replaceKey("/Q1", QPDFObjectHandle::newInteger(q1));
         t.replaceKey("/Q2", QPDFObjectHandle::newInteger(q2));
         t.replaceKey("/Q3", QPDFObjectHandle::newInteger(q3));

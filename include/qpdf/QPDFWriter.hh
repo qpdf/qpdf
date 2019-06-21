@@ -467,7 +467,7 @@ class QPDFWriter
 
     enum trailer_e { t_normal, t_lin_first, t_lin_second };
 
-    int bytesNeeded(unsigned long long n);
+    unsigned int bytesNeeded(long long n);
     void writeBinary(unsigned long long val, unsigned int bytes);
     void writeString(std::string const& str);
     void writeBuffer(PointerHolder<Buffer>&);
@@ -483,10 +483,8 @@ class QPDFWriter
     void writeTrailer(trailer_e which, int size,
 		      bool xref_stream, qpdf_offset_t prev,
                       int linearization_pass);
-    void unparseObject(QPDFObjectHandle object, int level,
-		       unsigned int flags);
-    void unparseObject(QPDFObjectHandle object, int level,
-		       unsigned int flags,
+    void unparseObject(QPDFObjectHandle object, int level, int flags);
+    void unparseObject(QPDFObjectHandle object, int level, int flags,
 		       // for stream dictionaries
 		       size_t stream_length, bool compress);
     void unparseChild(QPDFObjectHandle child, int level, int flags);
@@ -510,7 +508,7 @@ class QPDFWriter
 	char const* user_password, char const* owner_password,
 	int V, int R, int key_len, std::set<int>& bits_to_clear);
     void setEncryptionParametersInternal(
-	int V, int R, int key_len, long P,
+	int V, int R, int key_len, int P,
 	std::string const& O, std::string const& U,
 	std::string const& OE, std::string const& UE, std::string const& Perms,
 	std::string const& id1, std::string const& user_password,
@@ -554,7 +552,7 @@ class QPDFWriter
         qpdf_offset_t hint_length,
         bool skip_compression,
         int linearization_pass);
-    int calculateXrefStreamPadding(int xref_bytes);
+    int calculateXrefStreamPadding(qpdf_offset_t xref_bytes);
 
     // When filtering subsections, push additional pipelines to the
     // stack.  When ready to switch, activate the pipeline stack.

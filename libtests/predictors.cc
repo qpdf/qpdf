@@ -2,6 +2,7 @@
 #include <qpdf/Pl_TIFFPredictor.hh>
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/QIntC.hh>
 
 #include <iostream>
 #include <errno.h>
@@ -11,7 +12,7 @@
 
 void run(char const* filename, char const* filter,
          bool encode, unsigned int columns,
-         int bits_per_sample, int samples_per_pixel)
+         unsigned int bits_per_sample, unsigned int samples_per_pixel)
 {
     FILE* in = QUtil::safe_fopen(filename, "rb");
     FILE* o1 = QUtil::safe_fopen("out", "wb");
@@ -89,7 +90,9 @@ int main(int argc, char* argv[])
     try
     {
 	run(filename, filter, encode,
-            columns, bits_per_sample, samples_per_pixel);
+            QIntC::to_uint(columns),
+            QIntC::to_uint(bits_per_sample),
+            QIntC::to_uint(samples_per_pixel));
     }
     catch (std::exception& e)
     {

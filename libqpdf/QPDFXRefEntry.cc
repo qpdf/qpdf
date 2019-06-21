@@ -1,6 +1,7 @@
 #include <qpdf/QPDFXRefEntry.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/QIntC.hh>
 
 QPDFXRefEntry::QPDFXRefEntry() :
     type(0),
@@ -46,7 +47,7 @@ QPDFXRefEntry::getObjStreamNumber() const
 	throw std::logic_error(
 	    "getObjStreamNumber called for xref entry of type != 2");
     }
-    return this->field1;
+    return QIntC::to_int(this->field1);
 }
 
 int

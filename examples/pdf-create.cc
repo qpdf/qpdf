@@ -14,6 +14,7 @@
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/Pl_RunLength.hh>
 #include <qpdf/Pl_DCT.hh>
+#include <qpdf/QIntC.hh>
 #include <iostream>
 #include <string.h>
 #include <stdlib.h>
@@ -30,15 +31,15 @@ class ImageProvider: public QPDFObjectHandle::StreamDataProvider
     virtual ~ImageProvider();
     virtual void provideStreamData(int objid, int generation,
 				   Pipeline* pipeline);
-    int getWidth() const;
-    int getHeight() const;
+    size_t getWidth() const;
+    size_t getHeight() const;
 
   private:
-    int width;
-    int stripe_height;
+    size_t width;
+    size_t stripe_height;
     std::string color_space;
     std::string filter;
-    int n_stripes;
+    size_t n_stripes;
     std::vector<std::string> stripes;
     J_COLOR_SPACE j_color_space;
 };
@@ -88,13 +89,13 @@ ImageProvider::~ImageProvider()
 {
 }
 
-int
+size_t
 ImageProvider::getWidth() const
 {
     return width;
 }
 
-int
+size_t
 ImageProvider::getHeight() const
 {
     return stripe_height * n_stripes;
@@ -111,7 +112,8 @@ ImageProvider::provideStreamData(int objid, int generation,
     {
         p = new Pl_DCT(
             "image encoder", pipeline,
-            width, getHeight(), stripes[0].length(), j_color_space);
+            QIntC::to_uint(width), QIntC::to_uint(getHeight()),
+            QIntC::to_int(stripes[0].length()), j_color_space);
         to_delete.push_back(p);
     }
     else if (filter == "/RunLengthDecode")
@@ -121,9 +123,9 @@ ImageProvider::provideStreamData(int objid, int generation,
         to_delete.push_back(p);
     }
 
-    for (int i = 0; i < n_stripes; ++i)
+    for (size_t i = 0; i < n_stripes; ++i)
     {
-        for (int j = 0; j < width * stripe_height; ++j)
+        for (size_t j = 0; j < width * stripe_height; ++j)
         {
             p->write(
                 QUtil::unsigned_char_pointer(stripes[i].c_str()),
@@ -155,9 +157,9 @@ QPDFObjectHandle newName(std::string const& name)
     return QPDFObjectHandle::newName(name);
 }
 
-QPDFObjectHandle newInteger(int val)
+QPDFObjectHandle newInteger(size_t val)
 {
-    return QPDFObjectHandle::newInteger(val);
+    return QPDFObjectHandle::newInteger(QIntC::to_int(val));
 }
 
 void add_page(QPDFPageDocumentHelper& dh, QPDFObjectHandle font,
@@ -173,8 +175,8 @@ void add_page(QPDFPageDocumentHelper& dh, QPDFObjectHandle font,
     // compression.
     ImageProvider* p = new ImageProvider(color_space, filter);
     PointerHolder<QPDFObjectHandle::StreamDataProvider> provider(p);
-    int width = p->getWidth();
-    int height = p->getHeight();
+    size_t width = p->getWidth();
+    size_t height = p->getHeight();
     QPDFObjectHandle image = QPDFObjectHandle::newStream(&pdf);
     image.replaceDict(QPDFObjectHandle::parse(
                           "<<"
@@ -335,8 +337,8 @@ static void check(char const* filename,
                 unsigned int mismatches = 0;
                 int tolerance = (
                     desired_filter == "/DCTDecode" ? 10 : 0);
-                unsigned int threshold = (
-                    desired_filter == "/DCTDecode" ? len / 40 : 0);
+                size_t threshold = (
+                    desired_filter == "/DCTDecode" ? len / 40U : 0);
                 for (size_t i = 0; i < len; ++i)
                 {
                     int delta = actual_bytes[i] - desired_bytes[i];

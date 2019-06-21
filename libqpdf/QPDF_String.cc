@@ -9,13 +9,14 @@
 #include <string.h>
 
 // See above about ctype.
-static bool is_ascii_printable(unsigned char ch)
+static bool is_ascii_printable(char ch)
 {
     return ((ch >= 32) && (ch <= 126));
 }
-static bool is_iso_latin1_printable(unsigned char ch)
+static bool is_iso_latin1_printable(char ch)
 {
-    return (((ch >= 32) && (ch <= 126)) || (ch >= 160));
+    return (((ch >= 32) && (ch <= 126)) ||
+            (static_cast<unsigned char>(ch) >= 160));
 }
 
 QPDF_String::QPDF_String(std::string const& val) :

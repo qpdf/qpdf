@@ -22,6 +22,7 @@
 
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/QIntC.hh>
 
 #include <stdexcept>
 #include <stdlib.h>
@@ -643,7 +644,7 @@ QPDFObjectHandle::isRectangle()
     {
         return false;
     }
-    for (size_t i = 0; i < 4; ++i)
+    for (int i = 0; i < 4; ++i)
     {
         if (! getArrayItem(i).isNumber())
         {
@@ -664,7 +665,7 @@ QPDFObjectHandle::isMatrix()
     {
         return false;
     }
-    for (size_t i = 0; i < 6; ++i)
+    for (int i = 0; i < 6; ++i)
     {
         if (! getArrayItem(i).isNumber())
         {
@@ -1013,7 +1014,7 @@ QPDFObjectHandle::getUniqueResourceName(std::string const& prefix,
                                         int& min_suffix)
 {
     std::set<std::string> names = getResourceNames();
-    int max_suffix = min_suffix + names.size();
+    int max_suffix = min_suffix + QIntC::to_int(names.size());
     while (min_suffix <= max_suffix)
     {
         std::string candidate = prefix + QUtil::int_to_string(min_suffix);
@@ -1374,7 +1375,7 @@ QPDFObjectHandle::rotatePage(int angle, bool relative)
             if (cur_obj.getKey("/Rotate").isInteger())
             {
                 found_rotate = true;
-                old_angle = cur_obj.getKey("/Rotate").getIntValue();
+                old_angle = cur_obj.getKey("/Rotate").getIntValueAsInt();
             }
             else if (cur_obj.getKey("/Parent").isDictionary())
             {
@@ -1506,7 +1507,7 @@ QPDFObjectHandle::parse(std::string const& object_str,
     bool empty = false;
     QPDFObjectHandle result =
         parse(input, object_description, tokenizer, empty, 0, 0);
-    size_t offset = input->tell();
+    size_t offset = QIntC::to_size(input->tell());
     while (offset < object_str.length())
     {
         if (! isspace(object_str.at(offset)))
@@ -1618,7 +1619,7 @@ QPDFObjectHandle::parseContentStream_data(
     QPDFTokenizer tokenizer;
     tokenizer.allowEOF();
     bool empty = false;
-    while (static_cast<size_t>(input->tell()) < length)
+    while (QIntC::to_size(input->tell()) < length)
     {
         QPDFObjectHandle obj =
             parseInternal(input, "content", tokenizer, empty, 0, 0, true);
@@ -1863,8 +1864,8 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 		    // Try to resolve indirect objects
 		    object = newIndirect(
 			context,
-			olist.at(olist.size() - 2).getIntValue(),
-			olist.at(olist.size() - 1).getIntValue());
+			olist.at(olist.size() - 2).getIntValueAsInt(),
+			olist.at(olist.size() - 1).getIntValueAsInt());
 		    olist.pop_back();
 		    olist.pop_back();
 		}

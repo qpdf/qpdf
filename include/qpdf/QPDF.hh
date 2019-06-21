@@ -32,6 +32,7 @@
 #include <iostream>
 #include <vector>
 
+#include <qpdf/QIntC.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFObjGen.hh>
@@ -859,7 +860,7 @@ class QPDF
     bool pipeForeignStreamData(
         PointerHolder<ForeignStreamData>,
         Pipeline*,
-        unsigned long encode_flags,
+        int encode_flags,
         qpdf_stream_decode_level_e decode_level);
     static bool pipeStreamData(PointerHolder<QPDF::EncryptionParameters> encp,
                                PointerHolder<InputSource> file,
@@ -1253,7 +1254,7 @@ class QPDF
     void dumpHPageOffset();
     void dumpHSharedObject();
     void dumpHGeneric(HGeneric&);
-    int adjusted_offset(int offset);
+    qpdf_offset_t adjusted_offset(qpdf_offset_t offset);
     QPDFObjectHandle objGenToIndirect(QPDFObjGen const&);
     void calculateLinearizationData(
 	std::map<int, int> const& object_stream_data);
@@ -1296,6 +1297,20 @@ class QPDF
     void updateObjectMapsInternal(ObjUser const& ou, QPDFObjectHandle oh,
 				  std::set<QPDFObjGen>& visited, bool top);
     void filterCompressedObjects(std::map<int, int> const& object_stream_data);
+
+    // Type conversion helper methods
+    template<typename T> static qpdf_offset_t toO(T const& i)
+    {
+        return QIntC::to_offset(i);
+    }
+    template<typename T> static size_t toS(T const& i)
+    {
+        return QIntC::to_size(i);
+    }
+    template<typename T> static int toI(T const& i)
+    {
+        return QIntC::to_int(i);
+    }
 
     class Members
     {

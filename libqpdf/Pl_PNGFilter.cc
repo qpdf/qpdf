@@ -153,7 +153,7 @@ Pl_PNGFilter::decodeSub()
             left = buffer[i - bpp];
         }
 
-        buffer[i] += left;
+        buffer[i] = static_cast<unsigned char>(buffer[i] + left);
     }
 }
 
@@ -167,7 +167,7 @@ Pl_PNGFilter::decodeUp()
     for (unsigned int i = 0; i < this->bytes_per_row; ++i)
     {
         unsigned char up = above_buffer[i];
-        buffer[i] += up;
+        buffer[i] = static_cast<unsigned char>(buffer[i] + up);
     }
 }
 
@@ -190,7 +190,7 @@ Pl_PNGFilter::decodeAverage()
         }
 
         up = above_buffer[i];
-        buffer[i] += (left+up) / 2;
+        buffer[i] = static_cast<unsigned char>(buffer[i] + (left+up) / 2);
     }
 }
 
@@ -214,7 +214,9 @@ Pl_PNGFilter::decodePaeth()
             upper_left = above_buffer[i - bpp];
         }
 
-        buffer[i] += this->PaethPredictor(left, up, upper_left);
+        buffer[i] = static_cast<unsigned char>(
+            buffer[i] +
+            this->PaethPredictor(left, up, upper_left));
     }
 }
 
@@ -247,7 +249,8 @@ Pl_PNGFilter::encodeRow()
     {
 	for (unsigned int i = 0; i < this->bytes_per_row; ++i)
 	{
-	    ch = this->cur_row[i] - this->prev_row[i];
+	    ch = static_cast<unsigned char>(
+                this->cur_row[i] - this->prev_row[i]);
 	    getNext()->write(&ch, 1);
 	}
     }

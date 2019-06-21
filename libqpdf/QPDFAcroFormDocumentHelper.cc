@@ -114,9 +114,9 @@ QPDFAcroFormDocumentHelper::analyze()
     // bidirectionally to fields.
 
     std::set<QPDFObjGen> visited;
-    size_t nfields = fields.getArrayNItems();
+    int nfields = fields.getArrayNItems();
     QPDFObjectHandle null(QPDFObjectHandle::newNull());
-    for (size_t i = 0; i < nfields; ++i)
+    for (int i = 0; i < nfields; ++i)
     {
         traverseField(fields.getArrayItem(i), null, 0, visited);
     }
@@ -216,8 +216,8 @@ QPDFAcroFormDocumentHelper::traverseField(
     if (kids.isArray())
     {
         is_field = true;
-        size_t nkids = kids.getArrayNItems();
-        for (size_t k = 0; k < nkids; ++k)
+        int nkids = kids.getArrayNItems();
+        for (int k = 0; k < nkids; ++k)
         {
             traverseField(kids.getArrayItem(k), field, 1 + depth, visited);
         }

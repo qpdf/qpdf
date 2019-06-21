@@ -18,6 +18,7 @@
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/Pl_QPDFTokenizer.hh>
+#include <qpdf/QIntC.hh>
 
 #include <stdexcept>
 
@@ -199,7 +200,7 @@ QPDF_Stream::understandDecodeParams(
             QPDFObjectHandle predictor_obj = decode_obj.getKey(key);
             if (predictor_obj.isInteger())
             {
-                predictor = predictor_obj.getIntValue();
+                predictor = predictor_obj.getIntValueAsInt();
                 if (! ((predictor == 1) || (predictor == 2) ||
                        ((predictor >= 10) && (predictor <= 15))))
                 {
@@ -216,7 +217,7 @@ QPDF_Stream::understandDecodeParams(
             QPDFObjectHandle earlychange_obj = decode_obj.getKey(key);
             if (earlychange_obj.isInteger())
             {
-                int earlychange = earlychange_obj.getIntValue();
+                int earlychange = earlychange_obj.getIntValueAsInt();
                 early_code_change = (earlychange == 1);
                 if (! ((earlychange == 0) || (earlychange == 1)))
                 {
@@ -235,7 +236,7 @@ QPDF_Stream::understandDecodeParams(
             QPDFObjectHandle param_obj = decode_obj.getKey(key);
             if (param_obj.isInteger())
             {
-                int val = param_obj.getIntValue();
+                int val = param_obj.getIntValueAsInt();
                 if (key == "/Columns")
                 {
                     columns = val;
@@ -550,7 +551,9 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline,
                     QTC::TC("qpdf", "QPDF_Stream PNG filter");
                     pipeline = new Pl_PNGFilter(
                         "png decode", pipeline, Pl_PNGFilter::a_decode,
-                        columns, colors, bits_per_component);
+                        QIntC::to_uint(columns),
+                        QIntC::to_uint(colors),
+                        QIntC::to_uint(bits_per_component));
                     to_delete.push_back(pipeline);
                 }
                 else if (predictor == 2)
@@ -558,7 +561,9 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline,
                     QTC::TC("qpdf", "QPDF_Stream TIFF predictor");
                     pipeline = new Pl_TIFFPredictor(
                         "tiff decode", pipeline, Pl_TIFFPredictor::a_decode,
-                        columns, colors, bits_per_component);
+                        QIntC::to_uint(columns),
+                        QIntC::to_uint(colors),
+                        QIntC::to_uint(bits_per_component));
                     to_delete.push_back(pipeline);
                 }
             }
@@ -744,7 +749,8 @@ QPDF_Stream::replaceFilterData(QPDFObjectHandle const& filter,
     else
     {
         this->stream_dict.replaceKey(
-            "/Length", QPDFObjectHandle::newInteger(length));
+            "/Length", QPDFObjectHandle::newInteger(
+                QIntC::to_longlong(length)));
     }
 }
 
@@ -756,7 +762,7 @@ QPDF_Stream::replaceDict(QPDFObjectHandle new_dict)
     QPDFObjectHandle length_obj = new_dict.getKey("/Length");
     if (length_obj.isInteger())
     {
-        this->length = length_obj.getIntValue();
+        this->length = QIntC::to_size(length_obj.getUIntValue());
     }
     else
     {

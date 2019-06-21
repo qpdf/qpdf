@@ -3,6 +3,7 @@
 
 #include <qpdf/DLL.h>
 #include <qpdf/qpdf-config.h>
+#include <qpdf/Types.h>
 #ifdef HAVE_INTTYPES_H
 # include <inttypes.h>
 #endif
@@ -25,9 +26,9 @@ class MD5
     QPDF_DLL
     void encodeString(char const* input_string);
 
-    // encodes file and finalizes
+    // encodes file and finalizes; offset < 0 reads whole file
     QPDF_DLL
-    void encodeFile(char const* filename, int up_to_size = -1);
+    void encodeFile(char const* filename, qpdf_offset_t up_to_offset = -1);
 
     // appends string to current md5 object
     QPDF_DLL
@@ -35,7 +36,7 @@ class MD5
 
     // appends arbitrary data to current md5 object
     QPDF_DLL
-    void encodeDataIncrementally(char const* input_data, int len);
+    void encodeDataIncrementally(char const* input_data, size_t len);
 
     // computes a raw digest
     QPDF_DLL
@@ -52,16 +53,17 @@ class MD5
 
     // Convenience functions
     QPDF_DLL
-    static std::string getDataChecksum(char const* buf, int len);
+    static std::string getDataChecksum(char const* buf, size_t len);
     QPDF_DLL
     static std::string getFileChecksum(char const* filename,
-				       int up_to_size = -1);
+				       qpdf_offset_t up_to_offset = -1);
     QPDF_DLL
     static bool checkDataChecksum(char const* const checksum,
-				  char const* buf, int len);
+				  char const* buf, size_t len);
     QPDF_DLL
     static bool checkFileChecksum(char const* const checksum,
-				  char const* filename, int up_to_size = -1);
+				  char const* filename,
+                                  qpdf_offset_t up_to_offset = -1);
 
   private:
     // POINTER defines a generic pointer type
@@ -74,12 +76,12 @@ class MD5
     typedef uint32_t UINT4;
 
     void init();
-    void update(unsigned char *, unsigned int);
+    void update(unsigned char *, size_t);
     void final();
 
     static void transform(UINT4 [4], unsigned char [64]);
-    static void encode(unsigned char *, UINT4 *, unsigned int);
-    static void decode(UINT4 *, unsigned char *, unsigned int);
+    static void encode(unsigned char *, UINT4 *, size_t);
+    static void decode(UINT4 *, unsigned char *, size_t);
 
     UINT4 state[4];		// state (ABCD)
     UINT4 count[2];		// number of bits, modulo 2^64 (lsb first)

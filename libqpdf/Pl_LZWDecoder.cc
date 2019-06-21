@@ -2,6 +2,7 @@
 
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/QIntC.hh>
 #include <stdexcept>
 #include <string.h>
 #include <assert.h>
@@ -52,22 +53,22 @@ Pl_LZWDecoder::finish()
 void
 Pl_LZWDecoder::sendNextCode()
 {
-    int high = this->byte_pos;
-    int med = (this->byte_pos + 1) % 3;
-    int low = (this->byte_pos + 2) % 3;
+    unsigned int high = this->byte_pos;
+    unsigned int med = (this->byte_pos + 1) % 3;
+    unsigned int low = (this->byte_pos + 2) % 3;
 
-    int bits_from_high = 8 - this->bit_pos;
-    int bits_from_med = this->code_size - bits_from_high;
-    int bits_from_low = 0;
+    unsigned int bits_from_high = 8 - this->bit_pos;
+    unsigned int bits_from_med = this->code_size - bits_from_high;
+    unsigned int bits_from_low = 0;
     if (bits_from_med > 8)
     {
 	bits_from_low = bits_from_med - 8;
 	bits_from_med = 8;
     }
-    int high_mask = (1 << bits_from_high) - 1;
-    int med_mask = 0xff - ((1 << (8 - bits_from_med)) - 1);
-    int low_mask = 0xff - ((1 << (8 - bits_from_low)) - 1);
-    int code = 0;
+    unsigned int high_mask = (1U << bits_from_high) - 1U;
+    unsigned int med_mask = 0xff - ((1U << (8 - bits_from_med)) - 1U);
+    unsigned int low_mask = 0xff - ((1U << (8 - bits_from_low)) - 1U);
+    unsigned int code = 0;
     code += (this->buf[high] & high_mask) << bits_from_med;
     code += ((this->buf[med] & med_mask) >> (8 - bits_from_med));
     if (bits_from_low)
@@ -94,7 +95,7 @@ Pl_LZWDecoder::sendNextCode()
 }
 
 unsigned char
-Pl_LZWDecoder::getFirstChar(int code)
+Pl_LZWDecoder::getFirstChar(unsigned int code)
 {
     unsigned char result = '\0';
     if (code < 256)
@@ -130,7 +131,7 @@ Pl_LZWDecoder::addToTable(unsigned char next)
 
     if (this->last_code < 256)
     {
-	tmp[0] = this->last_code;
+	tmp[0] = static_cast<unsigned char>(this->last_code);
 	last_data = tmp;
 	last_size = 1;
     }
@@ -144,7 +145,7 @@ Pl_LZWDecoder::addToTable(unsigned char next)
         }
 	Buffer& b = table.at(idx);
 	last_data = b.getBuffer();
-	last_size = b.getSize();
+	last_size = QIntC::to_uint(b.getSize());
     }
     else
     {
@@ -161,7 +162,7 @@ Pl_LZWDecoder::addToTable(unsigned char next)
 }
 
 void
-Pl_LZWDecoder::handleCode(int code)
+Pl_LZWDecoder::handleCode(unsigned int code)
 {
     if (this->eod)
     {
@@ -189,11 +190,11 @@ Pl_LZWDecoder::handleCode(int code)
 	    // be what we read last plus the first character of what
 	    // we're reading now.
 	    unsigned char next = '\0';
-	    unsigned int table_size = table.size();
+	    unsigned int table_size = QIntC::to_uint(table.size());
 	    if (code < 256)
 	    {
 		// just read < 256; last time's next was code
-		next = code;
+		next = static_cast<unsigned char>(code);
 	    }
 	    else if (code > 257)
 	    {

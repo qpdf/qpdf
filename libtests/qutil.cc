@@ -93,7 +93,8 @@ void string_conversion_test()
               << QUtil::double_to_string(.000123456, 5) << std::endl
               << QUtil::int_to_string_base(16059, 10) << std::endl
               << QUtil::int_to_string_base(16059, 8) << std::endl
-              << QUtil::int_to_string_base(16059, 16) << std::endl;
+              << QUtil::int_to_string_base(16059, 16) << std::endl
+              << QUtil::int_to_string_base(5000093552LL, 10) << std::endl;
 
     std::string embedded_null = "one";
     embedded_null += '\0';

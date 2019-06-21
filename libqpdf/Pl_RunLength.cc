@@ -85,13 +85,13 @@ Pl_RunLength::decode(unsigned char* data, size_t len)
             if (ch < 128)
             {
                 // length represents remaining number of bytes to copy
-                this->length = 1 + ch;
+                this->length = 1U + ch;
                 this->state = st_copying;
             }
             else if (ch > 128)
             {
                 // length represents number of copies of next byte
-                this->length = 257 - ch;
+                this->length = 257U - ch;
                 this->state = st_run;
             }
             else // ch == 128

@@ -130,7 +130,7 @@ FileInputSource::read(char* buffer, size_t length)
                           this->filename, "",
                           this->last_offset,
                           std::string("read ") +
-                          QUtil::int_to_string(length) + " bytes");
+                          QUtil::uint_to_string(length) + " bytes");
         }
         else if (length > 0)
         {

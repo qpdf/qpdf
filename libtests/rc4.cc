@@ -1,6 +1,7 @@
 #include <qpdf/Pl_RC4.hh>
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/QIntC.hh>
 
 #include <stdio.h>
 #include <string.h>
@@ -18,7 +19,7 @@ int main(int argc, char* argv[])
     char* hexkey = argv[1];
     char* infilename = argv[2];
     char* outfilename = argv[3];
-    unsigned int hexkeylen = strlen(hexkey);
+    unsigned int hexkeylen = QIntC::to_uint(strlen(hexkey));
     unsigned int keylen = hexkeylen / 2;
     unsigned char* key = new unsigned char[keylen + 1];
     key[keylen] = '\0';
@@ -38,7 +39,7 @@ int main(int argc, char* argv[])
     FILE* outfile = QUtil::safe_fopen(outfilename, "wb");
     Pl_StdioFile* out = new Pl_StdioFile("stdout", outfile);
     // Use a small buffer size (64) for testing
-    Pl_RC4* rc4 = new Pl_RC4("rc4", out, key, keylen, 64);
+    Pl_RC4* rc4 = new Pl_RC4("rc4", out, key, QIntC::to_int(keylen), 64U);
     delete [] key;
 
     // 64 < buffer size < 512, buffer_size is not a power of 2 for testing

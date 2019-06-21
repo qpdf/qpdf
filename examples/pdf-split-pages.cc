@@ -8,6 +8,7 @@
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/QIntC.hh>
 
 #include <iostream>
 #include <stdlib.h>
@@ -24,7 +25,8 @@ static void process(char const* whoami,
     inpdf.processFile(infile);
     std::vector<QPDFPageObjectHelper> pages =
         QPDFPageDocumentHelper(inpdf).getAllPages();
-    int pageno_len = QUtil::int_to_string(pages.size()).length();
+    int pageno_len =
+        QIntC::to_int(QUtil::uint_to_string(pages.size()).length());
     int pageno = 0;
     for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
          iter != pages.end(); ++iter)

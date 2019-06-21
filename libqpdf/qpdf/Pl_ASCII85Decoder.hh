@@ -18,7 +18,7 @@ class Pl_ASCII85Decoder: public Pipeline
   private:
     void flush();
 
-    char inbuf[5];
+    unsigned char inbuf[5];
     size_t pos;
     size_t eod;
 };

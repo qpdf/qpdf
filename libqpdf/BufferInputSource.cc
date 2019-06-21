@@ -1,4 +1,5 @@
 #include <qpdf/BufferInputSource.hh>
+#include <qpdf/QIntC.hh>
 #include <string.h>
 #include <stdexcept>
 #include <algorithm>
@@ -32,6 +33,12 @@ BufferInputSource::~BufferInputSource()
     }
 }
 
+qpdf_offset_t const
+BufferInputSource::bufSizeAsOffset() const
+{
+    return QIntC::to_offset(this->buf->getSize());
+}
+
 qpdf_offset_t
 BufferInputSource::findAndSkipNextEOL()
 {
@@ -39,7 +46,7 @@ BufferInputSource::findAndSkipNextEOL()
     {
         throw std::logic_error("INTERNAL ERROR: BufferInputSource offset < 0");
     }
-    qpdf_offset_t end_pos = this->buf->getSize();
+    qpdf_offset_t end_pos = bufSizeAsOffset();
     if (this->cur_offset >= end_pos)
     {
 	this->last_offset = end_pos;
@@ -48,7 +55,7 @@ BufferInputSource::findAndSkipNextEOL()
     }
 
     qpdf_offset_t result = 0;
-    size_t len = end_pos - this->cur_offset;
+    size_t len = QIntC::to_size(end_pos - this->cur_offset);
     unsigned char const* buffer = this->buf->getBuffer();
 
     void* start = const_cast<unsigned char*>(buffer) + this->cur_offset;
@@ -97,7 +104,7 @@ BufferInputSource::seek(qpdf_offset_t offset, int whence)
 	break;
 
       case SEEK_END:
-	this->cur_offset = this->buf->getSize() + offset;
+	this->cur_offset = bufSizeAsOffset() + offset;
 	break;
 
       case SEEK_CUR:
@@ -130,7 +137,7 @@ BufferInputSource::read(char* buffer, size_t length)
     {
         throw std::logic_error("INTERNAL ERROR: BufferInputSource offset < 0");
     }
-    qpdf_offset_t end_pos = this->buf->getSize();
+    qpdf_offset_t end_pos = bufSizeAsOffset();
     if (this->cur_offset >= end_pos)
     {
 	this->last_offset = end_pos;
@@ -139,9 +146,9 @@ BufferInputSource::read(char* buffer, size_t length)
 
     this->last_offset = this->cur_offset;
     size_t len = std::min(
-        static_cast<size_t>(end_pos - this->cur_offset), length);
+        QIntC::to_size(end_pos - this->cur_offset), length);
     memcpy(buffer, buf->getBuffer() + this->cur_offset, len);
-    this->cur_offset += len;
+    this->cur_offset += QIntC::to_offset(len);
     return len;
 }
 

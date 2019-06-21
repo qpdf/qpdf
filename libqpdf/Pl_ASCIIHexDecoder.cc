@@ -27,7 +27,7 @@ Pl_ASCIIHexDecoder::write(unsigned char* buf, size_t len)
     }
     for (size_t i = 0; i < len; ++i)
     {
-	char ch = toupper(buf[i]);
+	char ch = static_cast<char>(toupper(buf[i]));
 	switch (ch)
 	{
 	  case ' ':

@@ -16,8 +16,8 @@
 
 #ifdef BITS_READ
 static unsigned long long
-read_bits(unsigned char const*& p, unsigned int& bit_offset,
-	  unsigned int& bits_available, unsigned int bits_wanted)
+read_bits(unsigned char const*& p, size_t& bit_offset,
+	  size_t& bits_available, size_t bits_wanted)
 {
     // View p as a stream of bits:
 
@@ -46,11 +46,12 @@ read_bits(unsigned char const*& p, unsigned int& bit_offset,
     {
 	// Grab bits from the first byte clearing anything before
 	// bit_offset.
-	unsigned char byte = *p & ((1 << (bit_offset + 1)) - 1);
+	unsigned char byte = static_cast<unsigned char>(
+            *p & ((1U << (bit_offset + 1U)) - 1U));
 
 	// There are bit_offset + 1 bits available in the first byte.
-	unsigned int to_copy = std::min(bits_wanted, bit_offset + 1);
-	unsigned int leftover = (bit_offset + 1) - to_copy;
+	size_t to_copy = std::min(bits_wanted, bit_offset + 1);
+	size_t leftover = (bit_offset + 1) - to_copy;
 
 #ifdef BITS_TESTING
 	QTC::TC("libtests", "bits bit_offset",
@@ -61,7 +62,7 @@ read_bits(unsigned char const*& p, unsigned int& bit_offset,
 #endif
 
 	// Right shift so that all the bits we want are right justified.
-	byte >>= leftover;
+	byte = static_cast<unsigned char>(byte >> leftover);
 
 	// Copy the bits into result
 	result <<= to_copy;
@@ -94,8 +95,8 @@ read_bits(unsigned char const*& p, unsigned int& bit_offset,
 
 #ifdef BITS_WRITE
 static void
-write_bits(unsigned char& ch, unsigned int& bit_offset,
-	   unsigned long long val, unsigned int bits, Pipeline* pipeline)
+write_bits(unsigned char& ch, size_t& bit_offset,
+	   unsigned long long val, size_t bits, Pipeline* pipeline)
 {
     if (bits > 32)
     {
@@ -111,11 +112,11 @@ write_bits(unsigned char& ch, unsigned int& bit_offset,
 #endif
     while (bits > 0)
     {
-	int bits_to_write = std::min(bits, bit_offset + 1);
-	unsigned char newval =
-	    (val >> (bits - bits_to_write)) & ((1 << bits_to_write) - 1);
-	int bits_left_in_ch = bit_offset + 1 - bits_to_write;
-	newval <<= bits_left_in_ch;
+	size_t bits_to_write = std::min(bits, bit_offset + 1);
+	unsigned char newval = static_cast<unsigned char>(
+	    (val >> (bits - bits_to_write)) & ((1U << bits_to_write) - 1));
+	size_t bits_left_in_ch = bit_offset + 1 - bits_to_write;
+	newval = static_cast<unsigned char>(newval << bits_left_in_ch);
 	ch |= newval;
 	if (bits_left_in_ch == 0)
 	{

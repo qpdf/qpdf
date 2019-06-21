@@ -8,14 +8,15 @@
 #ifdef HAVE_STDINT_H
 # include <stdint.h>
 #endif
+#include <stddef.h>
 
-int rijndaelSetupEncrypt(uint32_t *rk, const unsigned char *key,
-  int keybits);
-int rijndaelSetupDecrypt(uint32_t *rk, const unsigned char *key,
-  int keybits);
-void rijndaelEncrypt(const uint32_t *rk, int nrounds,
+unsigned int rijndaelSetupEncrypt(uint32_t *rk, const unsigned char *key,
+  size_t keybits);
+unsigned int rijndaelSetupDecrypt(uint32_t *rk, const unsigned char *key,
+  size_t keybits);
+void rijndaelEncrypt(const uint32_t *rk, unsigned int nrounds,
   const unsigned char plaintext[16], unsigned char ciphertext[16]);
-void rijndaelDecrypt(const uint32_t *rk, int nrounds,
+void rijndaelDecrypt(const uint32_t *rk, unsigned int nrounds,
   const unsigned char ciphertext[16], unsigned char plaintext[16]);
 
 #define KEYLENGTH(keybits) ((keybits)/8)

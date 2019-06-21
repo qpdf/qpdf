@@ -6,6 +6,7 @@
 #include <qpdf/BufferInputSource.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/Pl_Buffer.hh>
+#include <qpdf/QIntC.hh>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -46,7 +47,7 @@ Finder::check()
     QPDFTokenizer::Token t = tokenizer.readToken(is, "finder", true);
     qpdf_offset_t offset = this->is->tell();
     bool result = (t == QPDFTokenizer::Token(QPDFTokenizer::tt_word, str));
-    this->is->seek(offset - this->str.length(), SEEK_SET);
+    this->is->seek(offset - QIntC::to_offset(this->str.length()), SEEK_SET);
     return result;
 }
 
@@ -286,7 +287,7 @@ int main(int argc, char* argv[])
                 {
                     usage();
                 }
-                max_len = QUtil::string_to_int(argv[i]);
+                max_len = QUtil::string_to_uint(argv[i]);
             }
             else if (strcmp(argv[i], "-no-ignorable") == 0)
             {

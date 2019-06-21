@@ -54,6 +54,8 @@ class BufferInputSource: public InputSource
     virtual void unreadCh(char ch);
 
   private:
+    qpdf_offset_t const bufSizeAsOffset() const;
+
     bool own_memory;
     std::string description;
     Buffer* buf;

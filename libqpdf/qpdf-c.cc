@@ -5,6 +5,7 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/Pl_Discard.hh>
+#include <qpdf/QIntC.hh>
 
 #include <list>
 #include <string>
@@ -63,7 +64,7 @@ static void call_read(qpdf_data qpdf)
 static void call_read_memory(qpdf_data qpdf)
 {
     qpdf->qpdf->processMemoryFile(qpdf->filename, qpdf->buffer,
-				  qpdf->size, qpdf->password);
+				  QIntC::to_size(qpdf->size), qpdf->password);
 }
 
 // must set qpdf->filename
@@ -234,7 +235,7 @@ unsigned long long qpdf_get_error_file_position(qpdf_data qpdf, qpdf_error e)
     {
 	return 0;
     }
-    return e->exc->getFilePosition();
+    return QIntC::to_ulonglong(e->exc->getFilePosition());
 }
 
 char const* qpdf_get_error_message_detail(qpdf_data qpdf, qpdf_error e)

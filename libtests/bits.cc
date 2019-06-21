@@ -1,6 +1,8 @@
 #include <qpdf/BitStream.hh>
 #include <qpdf/BitWriter.hh>
 #include <qpdf/Pl_Buffer.hh>
+#include <qpdf/QUtil.hh>
+#include <qpdf/QIntC.hh>
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,8 +14,8 @@
 #include "../libqpdf/bits.icc"
 
 static void
-print_values(int byte_offset, unsigned int bit_offset,
-	     unsigned int bits_available)
+print_values(long long byte_offset, size_t bit_offset,
+	     size_t bits_available)
 {
     std::cout << "byte offset = " << byte_offset << ", "
 	      << "bit offset = " << bit_offset << ", "
@@ -22,11 +24,11 @@ print_values(int byte_offset, unsigned int bit_offset,
 
 static void
 test_read_bits(unsigned char const* buf,
-	       unsigned char const*& p, unsigned int& bit_offset,
-	       unsigned int& bits_available, int bits_wanted)
+	       unsigned char const*& p, size_t& bit_offset,
+	       size_t& bits_available, size_t bits_wanted)
 {
     unsigned long result =
-	read_bits(p, bit_offset, bits_available, bits_wanted);
+	QIntC::to_ulong(read_bits(p, bit_offset, bits_available, bits_wanted));
 
     std::cout << "bits read: " << bits_wanted << ", result = " << result
 	      << std::endl;
@@ -34,12 +36,12 @@ test_read_bits(unsigned char const* buf,
 }
 
 static void
-test_write_bits(unsigned char& ch, unsigned int& bit_offset, unsigned long val,
-		int bits, Pl_Buffer* bp)
+test_write_bits(unsigned char& ch, size_t& bit_offset, unsigned long val,
+		size_t bits, Pl_Buffer* bp)
 {
     write_bits(ch, bit_offset, val, bits, bp);
-    printf("ch = %02x, bit_offset = %d\n",
-           static_cast<unsigned int>(ch), bit_offset);
+    std::cout << "ch = " << QUtil::uint_to_string_base(ch, 16, 2)
+              << ", bit_offset = " << bit_offset << std::endl;
 }
 
 static void
@@ -51,10 +53,10 @@ print_buffer(Pl_Buffer* bp)
     size_t l = b->getSize();
     for (unsigned long i = 0; i < l; ++i)
     {
-	printf("%02x%s", static_cast<unsigned int>(p[i]),
-	       (i == l - 1) ? "\n" : " ");
+        std::cout << QUtil::uint_to_string_base(p[i], 16, 2)
+                  << ((i == l - 1) ? "\n" : " ");
     }
-    printf("\n");
+    std::cout << std::endl;
     delete b;
 }
 
@@ -71,8 +73,8 @@ test()
     };
 
     unsigned char const* p = buf;
-    unsigned int bit_offset = 7;
-    unsigned int bits_available = 64;
+    size_t bit_offset = 7;
+    size_t bits_available = 64;
 
     // 11110:101 0:001010:1 01100101: 01111001
     // 0:00:1:0010 10001001 01110101 01001:011
@@ -163,7 +165,7 @@ test()
     bw.writeBits(30UL, 5);
     bw.flush();
     bw.flush();
-    bw.writeBits(0xABUL, 8);
+    bw.writeBitsInt(0xAB, 8);
     bw.flush();
     print_buffer(bp);
     bw.writeBitsSigned(-1, 3);  // 111

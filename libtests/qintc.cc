@@ -48,10 +48,10 @@ int main()
     try_convert(true,  QIntC::to_uint<uint64_t>, ul2);
     try_convert(true,  QIntC::to_offset<uint32_t>, u1);
     try_convert(true,  QIntC::to_offset<int32_t>, i1);
-    try_convert(false, QIntC::to_size<int32_t>, i1);
+    try_convert(false, QIntC::to_ulonglong<int32_t>, i1);
     try_convert(true,  QIntC::to_char<int32_t>, i2);
     try_convert(true,  QIntC::to_uchar<int32_t>, i2);
-    try_convert(false,  QIntC::to_uchar<char>, c1);
+    try_convert(false, QIntC::to_uchar<char>, c1);
 
     return 0;
 }

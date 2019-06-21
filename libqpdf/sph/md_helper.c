@@ -145,7 +145,7 @@ SPH_XCAT(sph_, HASH)(void *cc, const void *data, size_t len)
 
 		clen = SPH_BLEN - current;
 		if (clen > len)
-			clen = len;
+			clen = (unsigned)len;
 		memcpy(sc->buf + current, data, clen);
 		data = (const unsigned char *)data + clen;
 		current += clen;
@@ -257,7 +257,7 @@ SPH_XCAT(HASH, _addbits_and_close)(void *cc,
 	{
 		unsigned z;
 
-		z = 0x80 >> n;
+		z = 0x80U >> n;
 		sc->buf[current ++] = ((ub & -z) | z) & 0xFF;
 	}
 #endif

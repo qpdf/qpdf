@@ -491,7 +491,7 @@ QPDF::reconstruct_xref(QPDFExc& e)
         this->m->file->seek(line_start, SEEK_SET);
         QPDFTokenizer::Token t1 = readToken(this->m->file, MAX_LEN);
         qpdf_offset_t token_start =
-            this->m->file->tell() - t1.getValue().length();
+            this->m->file->tell() - toO(t1.getValue().length());
         if (token_start >= next_line_start)
         {
             // don't process yet
@@ -610,7 +610,7 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
         throw QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(), "", 0,
                       "unable to find trailer while reading xref");
     }
-    int size = this->m->trailer.getKey("/Size").getIntValue();
+    int size = this->m->trailer.getKey("/Size").getIntValueAsInt();
     int max_obj = 0;
     if (! this->m->xref_table.empty())
     {
@@ -686,7 +686,7 @@ QPDF::parse_xrefFirst(std::string const& line,
     {
         ++p;
     }
-    bytes = p - start;
+    bytes = toI(p - start);
     obj = QUtil::string_to_int(obj_str.c_str());
     num = QUtil::string_to_int(num_str.c_str());
     return true;
@@ -837,11 +837,11 @@ QPDF::read_xrefTable(qpdf_offset_t xref_offset)
 	    {
 		// Save deleted items until after we've checked the
 		// XRefStm, if any.
-		deleted_items.push_back(QPDFObjGen(i, f2));
+		deleted_items.push_back(QPDFObjGen(toI(i), f2));
 	    }
 	    else
 	    {
-		insertXrefEntry(i, 1, f1, f2);
+		insertXrefEntry(toI(i), 1, f1, f2);
 	    }
 	}
 	qpdf_offset_t pos = this->m->file->tell();
@@ -1006,7 +1006,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
     int max_bytes = sizeof(qpdf_offset_t);
     for (int i = 0; i < 3; ++i)
     {
-	W[i] = W_obj.getArrayItem(i).getIntValue();
+	W[i] = W_obj.getArrayItem(i).getIntValueAsInt();
         if (W[i] > max_bytes)
         {
             throw QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
@@ -1014,7 +1014,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
                           "Cross-reference stream's /W contains"
                           " impossibly large values");
         }
-	entry_size += W[i];
+	entry_size += toS(W[i]);
     }
     if (entry_size == 0)
     {
@@ -1023,7 +1023,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
                       "Cross-reference stream's /W indicates"
                       " entry size of 0");
     }
-    long long max_num_entries =
+    unsigned long long max_num_entries =
         static_cast<unsigned long long>(-1) / entry_size;
 
     std::vector<long long> indx;
@@ -1063,20 +1063,20 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
 	indx.push_back(size);
     }
 
-    long long num_entries = 0;
-    for (unsigned int i = 1; i < indx.size(); i += 2)
+    size_t num_entries = 0;
+    for (size_t i = 1; i < indx.size(); i += 2)
     {
-        if (indx.at(i) > max_num_entries - num_entries)
+        if (indx.at(i) > QIntC::to_longlong(max_num_entries - num_entries))
         {
             throw QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
                           "xref stream", xref_offset,
                           "Cross-reference stream claims to contain"
                           " too many entries: " +
                           QUtil::int_to_string(indx.at(i)) + " " +
-                          QUtil::int_to_string(max_num_entries) + " " +
-                          QUtil::int_to_string(num_entries));
+                          QUtil::uint_to_string(max_num_entries) + " " +
+                          QUtil::uint_to_string(num_entries));
         }
-	num_entries += indx.at(i);
+	num_entries += toS(indx.at(i));
     }
 
     // entry_size and num_entries have both been validated to ensure
@@ -1091,8 +1091,8 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
 	QPDFExc x(qpdf_e_damaged_pdf, this->m->file->getName(),
 		  "xref stream", xref_offset,
 		  "Cross-reference stream data has the wrong size;"
-		  " expected = " + QUtil::int_to_string(expected_size) +
-		  "; actual = " + QUtil::int_to_string(actual_size));
+		  " expected = " + QUtil::uint_to_string(expected_size) +
+		  "; actual = " + QUtil::uint_to_string(actual_size));
 	if (expected_size > actual_size)
 	{
 	    throw x;
@@ -1103,7 +1103,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
 	}
     }
 
-    int cur_chunk = 0;
+    size_t cur_chunk = 0;
     int chunk_count = 0;
 
     bool saw_first_compressed_object = false;
@@ -1112,7 +1112,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
     // not overflow any buffers here.  We know that entry_size *
     // num_entries is equal to the size of the buffer.
     unsigned char const* data = bp->getBuffer();
-    for (int i = 0; i < num_entries; ++i)
+    for (size_t i = 0; i < num_entries; ++i)
     {
 	// Read this entry
 	unsigned char const* entry = data + (entry_size * i);
@@ -1129,7 +1129,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
 	    for (int k = 0; k < W[j]; ++k)
 	    {
 		fields[j] <<= 8;
-		fields[j] += static_cast<int>(*p++);
+		fields[j] += toI(*p++);
 	    }
 	}
 
@@ -1137,7 +1137,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
 	// based on /Index.  The generation number is 0 unless this is
 	// an uncompressed object record, in which case the generation
 	// number appears as the third field.
-	int obj = indx.at(cur_chunk) + chunk_count;
+	int obj = toI(indx.at(cur_chunk)) + chunk_count;
 	++chunk_count;
 	if (chunk_count >= indx.at(cur_chunk + 1))
 	{
@@ -1161,8 +1161,8 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
 	    // This is needed by checkLinearization()
 	    this->m->first_xref_item_offset = xref_offset;
 	}
-	insertXrefEntry(obj, static_cast<int>(fields[0]),
-                        fields[1], static_cast<int>(fields[2]));
+	insertXrefEntry(obj, toI(fields[0]),
+                        fields[1], toI(fields[2]));
     }
 
     if (! this->m->trailer.isInitialized())
@@ -1395,7 +1395,7 @@ QPDF::getObjectCount()
     {
 	og = (*(this->m->obj_cache.rbegin())).first;
     }
-    return og.getObj();
+    return toS(og.getObj());
 }
 
 std::vector<QPDFObjectHandle>
@@ -1570,8 +1570,8 @@ QPDF::readObject(PointerHolder<InputSource> input,
                                   "an integer");
                 }
 
-                length = length_obj.getIntValue();
-                input->seek(stream_offset + length, SEEK_SET);
+                length = toS(length_obj.getUIntValue());
+                input->seek(stream_offset + toO(length), SEEK_SET);
                 if (! (readToken(input) ==
                        QPDFTokenizer::Token(
                            QPDFTokenizer::tt_word, "endstream")))
@@ -1641,7 +1641,7 @@ QPDF::recoverStreamLength(PointerHolder<InputSource> input,
     size_t length = 0;
     if (this->m->file->findFirst("end", stream_offset, 0, ef))
     {
-        length = this->m->file->tell() - stream_offset;
+        length = toS(this->m->file->tell() - stream_offset);
         // Reread endstream but, if it was endobj, don't skip that.
         QPDFTokenizer::Token t = readToken(this->m->file);
         if (t.getValue() == "endobj")
@@ -1652,7 +1652,7 @@ QPDF::recoverStreamLength(PointerHolder<InputSource> input,
 
     if (length)
     {
-	int this_obj_offset = 0;
+	qpdf_offset_t this_obj_offset = 0;
 	QPDFObjGen this_obj(0, 0);
 
 	// Make sure this is inside this object
@@ -1700,7 +1700,7 @@ QPDF::recoverStreamLength(PointerHolder<InputSource> input,
         warn(QPDFExc(qpdf_e_damaged_pdf, input->getName(),
                      this->m->last_object_description, stream_offset,
                      "recovered stream length: " +
-                     QUtil::int_to_string(length)));
+                     QUtil::uint_to_string(length)));
     }
 
     QTC::TC("qpdf", "QPDF recovered stream length");
@@ -2027,8 +2027,8 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
 		      " has incorrect keys");
     }
 
-    int n = dict.getKey("/N").getIntValue();
-    int first = dict.getKey("/First").getIntValue();
+    int n = dict.getKey("/N").getIntValueAsInt();
+    int first = dict.getKey("/First").getIntValueAsInt();
 
     std::map<int, int> offsets;
 
@@ -2052,7 +2052,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
 	}
 
 	int num = QUtil::string_to_int(tnum.getValue().c_str());
-	int offset = QUtil::string_to_ll(toffset.getValue().c_str());
+	int offset = QUtil::string_to_int(toffset.getValue().c_str());
 	offsets[num] = offset + first;
     }
 
@@ -2087,7 +2087,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
 QPDFObjectHandle
 QPDF::makeIndirectObject(QPDFObjectHandle oh)
 {
-    int max_objid = getObjectCount();
+    int max_objid = toI(getObjectCount());
     QPDFObjGen next(max_objid + 1, 0);
     this->m->obj_cache[next] =
 	ObjCache(QPDFObjectHandle::ObjAccessor::getObject(oh), -1, -1);
@@ -2509,7 +2509,7 @@ QPDF::getExtensionLevel()
                 obj = obj.getKey("/ExtensionLevel");
                 if (obj.isInteger())
                 {
-                    result = obj.getIntValue();
+                    result = obj.getIntValueAsInt();
                 }
             }
         }
@@ -2733,8 +2733,9 @@ QPDF::pipeStreamData(int objid, int generation,
                      bool suppress_warnings,
                      bool will_retry)
 {
-    bool is_attachment_stream = this->m->attachment_streams.count(
-        QPDFObjGen(objid, generation));
+    bool is_attachment_stream = (
+        this->m->attachment_streams.count(
+            QPDFObjGen(objid, generation)) > 0);
     return pipeStreamData(
         this->m->encp, this->m->file, *this,
         objid, generation, offset, length,
@@ -2746,7 +2747,7 @@ bool
 QPDF::pipeForeignStreamData(
     PointerHolder<ForeignStreamData> foreign,
     Pipeline* pipeline,
-    unsigned long encode_flags,
+    int encode_flags,
     qpdf_stream_decode_level_e decode_level)
 {
     if (foreign->encp->encrypted)

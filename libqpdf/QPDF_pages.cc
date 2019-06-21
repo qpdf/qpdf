@@ -154,17 +154,17 @@ QPDF::flattenPagesTree()
 
     QPDFObjectHandle pages = getRoot().getKey("/Pages");
 
-    int const len = this->m->all_pages.size();
-    for (int pos = 0; pos < len; ++pos)
+    size_t const len = this->m->all_pages.size();
+    for (size_t pos = 0; pos < len; ++pos)
     {
         // populate pageobj_to_pages_pos and fix parent pointer
-        insertPageobjToPage(this->m->all_pages.at(pos), pos, true);
+        insertPageobjToPage(this->m->all_pages.at(pos), toI(pos), true);
         this->m->all_pages.at(pos).replaceKey("/Parent", pages);
     }
 
     pages.replaceKey("/Kids", QPDFObjectHandle::newArray(this->m->all_pages));
     // /Count has not changed
-    if (pages.getKey("/Count").getIntValue() != len)
+    if (pages.getKey("/Count").getUIntValue() != len)
     {
         throw std::logic_error("/Count is wrong after flattening pages tree");
     }
@@ -222,26 +222,25 @@ QPDF::insertPage(QPDFObjectHandle newpage, int pos)
 
     QTC::TC("qpdf", "QPDF insert page",
             (pos == 0) ? 0 :                      // insert at beginning
-            (pos == static_cast<int>(this->m->all_pages.size())) ? 1 : // at end
+            (pos == QIntC::to_int(this->m->all_pages.size())) ? 1 : // at end
             2);                                   // insert in middle
 
     QPDFObjectHandle pages = getRoot().getKey("/Pages");
     QPDFObjectHandle kids = pages.getKey("/Kids");
-    assert ((pos >= 0) &&
-            (static_cast<size_t>(pos) <= this->m->all_pages.size()));
+    assert ((pos >= 0) && (QIntC::to_size(pos) <= this->m->all_pages.size()));
 
     newpage.replaceKey("/Parent", pages);
     kids.insertItem(pos, newpage);
     int npages = kids.getArrayNItems();
     pages.replaceKey("/Count", QPDFObjectHandle::newInteger(npages));
     this->m->all_pages.insert(this->m->all_pages.begin() + pos, newpage);
-    assert(this->m->all_pages.size() == static_cast<size_t>(npages));
+    assert(this->m->all_pages.size() == QIntC::to_size(npages));
     for (int i = pos + 1; i < npages; ++i)
     {
-        insertPageobjToPage(this->m->all_pages.at(i), i, false);
+        insertPageobjToPage(this->m->all_pages.at(toS(i)), i, false);
     }
     insertPageobjToPage(newpage, pos, true);
-    assert(this->m->pageobj_to_pages_pos.size() == static_cast<size_t>(npages));
+    assert(this->m->pageobj_to_pages_pos.size() == QIntC::to_size(npages));
 }
 
 void
@@ -250,8 +249,7 @@ QPDF::removePage(QPDFObjectHandle page)
     int pos = findPage(page); // also ensures flat /Pages
     QTC::TC("qpdf", "QPDF remove page",
             (pos == 0) ? 0 :                            // remove at beginning
-            (pos == static_cast<int>(
-                this->m->all_pages.size() - 1)) ? 1 :   // end
+            (pos == QIntC::to_int(this->m->all_pages.size() - 1)) ? 1 : // end
             2);                                         // remove in middle
 
     QPDFObjectHandle pages = getRoot().getKey("/Pages");
@@ -261,12 +259,12 @@ QPDF::removePage(QPDFObjectHandle page)
     int npages = kids.getArrayNItems();
     pages.replaceKey("/Count", QPDFObjectHandle::newInteger(npages));
     this->m->all_pages.erase(this->m->all_pages.begin() + pos);
-    assert(this->m->all_pages.size() == static_cast<size_t>(npages));
+    assert(this->m->all_pages.size() == QIntC::to_size(npages));
     this->m->pageobj_to_pages_pos.erase(page.getObjGen());
-    assert(this->m->pageobj_to_pages_pos.size() == static_cast<size_t>(npages));
+    assert(this->m->pageobj_to_pages_pos.size() == QIntC::to_size(npages));
     for (int i = pos; i < npages; ++i)
     {
-        insertPageobjToPage(this->m->all_pages.at(i), i, false);
+        insertPageobjToPage(this->m->all_pages.at(toS(i)), i, false);
     }
 }
 
@@ -291,8 +289,9 @@ QPDF::addPage(QPDFObjectHandle newpage, bool first)
     }
     else
     {
-        insertPage(newpage,
-                   getRoot().getKey("/Pages").getKey("/Count").getIntValue());
+        insertPage(
+            newpage,
+            getRoot().getKey("/Pages").getKey("/Count").getIntValueAsInt());
     }
 }
 

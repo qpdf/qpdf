@@ -29,6 +29,7 @@
 
 #include <qpdf/MD5.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/QIntC.hh>
 
 #include <stdio.h>
 #include <memory.h>
@@ -110,7 +111,7 @@ void MD5::init()
 // context.
 
 void MD5::update(unsigned char *input,
-		 unsigned int inputLen)
+		 size_t inputLen)
 {
     unsigned int i, index, partLen;
 
@@ -268,7 +269,7 @@ void MD5::transform(UINT4 state[4], unsigned char block[64])
 
 // Encodes input (UINT4) into output (unsigned char). Assumes len is a
 // multiple of 4.
-void MD5::encode(unsigned char *output, UINT4 *input, unsigned int len)
+void MD5::encode(unsigned char *output, UINT4 *input, size_t len)
 {
     unsigned int i, j;
 
@@ -282,7 +283,7 @@ void MD5::encode(unsigned char *output, UINT4 *input, unsigned int len)
 
 // Decodes input (unsigned char) into output (UINT4). Assumes len is a
 // multiple of 4.
-void MD5::decode(UINT4 *output, unsigned char *input, unsigned int len)
+void MD5::decode(UINT4 *output, unsigned char *input, size_t len)
 {
     unsigned int i, j;
 
@@ -308,7 +309,7 @@ void MD5::reset()
 
 void MD5::encodeString(char const* str)
 {
-    unsigned int len = strlen(str);
+    size_t len = strlen(str);
 
     update(QUtil::unsigned_char_pointer(str), len);
     final();
@@ -319,22 +320,27 @@ void MD5::appendString(char const* input_string)
     update(QUtil::unsigned_char_pointer(input_string), strlen(input_string));
 }
 
-void MD5::encodeDataIncrementally(char const* data, int len)
+void MD5::encodeDataIncrementally(char const* data, size_t len)
 {
     update(QUtil::unsigned_char_pointer(data), len);
 }
 
-void MD5::encodeFile(char const *filename, int up_to_size)
+void MD5::encodeFile(char const *filename, qpdf_offset_t up_to_offset)
 {
     unsigned char buffer[1024];
 
     FILE *file = QUtil::safe_fopen(filename, "rb");
     size_t len;
-    int so_far = 0;
-    int to_try = 1024;
+    size_t so_far = 0;
+    size_t to_try = 1024;
+    size_t up_to_size = 0;
+    if (up_to_offset >= 0)
+    {
+        up_to_size = QIntC::to_size(up_to_offset);
+    }
     do
     {
-	if ((up_to_size >= 0) && ((so_far + to_try) > up_to_size))
+	if ((up_to_offset >= 0) && ((so_far + to_try) > up_to_size))
 	{
 	    to_try = up_to_size - so_far;
 	}
@@ -343,7 +349,7 @@ void MD5::encodeFile(char const *filename, int up_to_size)
 	{
 	    update(buffer, len);
 	    so_far += len;
-	    if ((up_to_size >= 0) && (so_far >= up_to_size))
+	    if ((up_to_offset >= 0) && (so_far >= up_to_size))
 	    {
 		break;
 	    }
@@ -388,7 +394,7 @@ std::string MD5::unparse()
 }
 
 std::string
-MD5::getDataChecksum(char const* buf, int len)
+MD5::getDataChecksum(char const* buf, size_t len)
 {
     MD5 m;
     m.encodeDataIncrementally(buf, len);
@@ -396,16 +402,16 @@ MD5::getDataChecksum(char const* buf, int len)
 }
 
 std::string
-MD5::getFileChecksum(char const* filename, int up_to_size)
+MD5::getFileChecksum(char const* filename, qpdf_offset_t up_to_offset)
 {
     MD5 m;
-    m.encodeFile(filename, up_to_size);
+    m.encodeFile(filename, up_to_offset);
     return m.unparse();
 }
 
 bool
 MD5::checkDataChecksum(char const* const checksum,
-		       char const* buf, int len)
+		       char const* buf, size_t len)
 {
     std::string actual_checksum = getDataChecksum(buf, len);
     return (checksum == actual_checksum);
@@ -413,12 +419,12 @@ MD5::checkDataChecksum(char const* const checksum,
 
 bool
 MD5::checkFileChecksum(char const* const checksum,
-		       char const* filename, int up_to_size)
+		       char const* filename, qpdf_offset_t up_to_offset)
 {
     bool result = false;
     try
     {
-	std::string actual_checksum = getFileChecksum(filename, up_to_size);
+	std::string actual_checksum = getFileChecksum(filename, up_to_offset);
 	result = (checksum == actual_checksum);
     }
     catch (std::runtime_error const&)

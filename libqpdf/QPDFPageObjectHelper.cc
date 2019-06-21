@@ -6,6 +6,7 @@
 #include <qpdf/QUtil.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFMatrix.hh>
+#include <qpdf/QIntC.hh>
 
 class ContentProvider: public QPDFObjectHandle::StreamDataProvider
 {
@@ -236,7 +237,9 @@ InlineImageTracker::handleToken(QPDFTokenizer::Token const& token)
                 b.finish();
                 QPDFObjectHandle dict =
                     convertIIDict(QPDFObjectHandle::parse(dict_str));
-                dict.replaceKey("/Length", QPDFObjectHandle::newInteger(len));
+                dict.replaceKey(
+                    "/Length",
+                    QPDFObjectHandle::newInteger(QIntC::to_longlong(len)));
                 std::string name = resources.getUniqueResourceName(
                     "/IIm", this->min_suffix);
                 QPDFObjectHandle image = QPDFObjectHandle::newStream(
@@ -391,8 +394,8 @@ QPDFPageObjectHelper::getAnnotations(std::string const& only_subtype)
     QPDFObjectHandle annots = this->oh.getKey("/Annots");
     if (annots.isArray())
     {
-        size_t nannots = annots.getArrayNItems();
-        for (size_t i = 0; i < nannots; ++i)
+        int nannots = annots.getArrayNItems();
+        for (int i = 0; i < nannots; ++i)
         {
             QPDFObjectHandle annot = annots.getArrayItem(i);
             if (only_subtype.empty() ||
@@ -579,7 +582,7 @@ QPDFPageObjectHelper::getMatrixForTransformations(bool invert)
                         ? scale_obj.getNumericValue()
                         : 1.0);
         int rotate = (rotate_obj.isInteger()
-                      ? rotate_obj.getIntValue()
+                      ? rotate_obj.getIntValueAsInt()
                       : 0);
         if (invert)
         {

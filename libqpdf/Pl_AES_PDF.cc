@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <stdexcept>
 #include <qpdf/rijndael.h>
+#include <qpdf/QIntC.hh>
 #include <string>
 #include <stdlib.h>
 
@@ -11,7 +12,7 @@ bool Pl_AES_PDF::use_static_iv = false;
 
 Pl_AES_PDF::Pl_AES_PDF(char const* identifier, Pipeline* next,
 		       bool encrypt, unsigned char const* key,
-                       unsigned int key_bytes) :
+                       size_t key_bytes) :
     Pipeline(identifier, next),
     encrypt(encrypt),
     cbc_mode(true),
@@ -22,11 +23,11 @@ Pl_AES_PDF::Pl_AES_PDF(char const* identifier, Pipeline* next,
     use_specified_iv(false),
     disable_padding(false)
 {
-    unsigned int keybits = 8 * key_bytes;
+    size_t keybits = 8 * key_bytes;
     assert(key_bytes == KEYLENGTH(keybits));
     this->key = new unsigned char[key_bytes];
     this->rk = new uint32_t[RKLENGTH(keybits)];
-    unsigned int rk_bytes = RKLENGTH(keybits) * sizeof(uint32_t);
+    size_t rk_bytes = RKLENGTH(keybits) * sizeof(uint32_t);
     std::memcpy(this->key, key, key_bytes);
     std::memset(this->rk, 0, rk_bytes);
     std::memset(this->inbuf, 0, this->buf_size);
@@ -68,7 +69,7 @@ Pl_AES_PDF::setIV(unsigned char const* iv, size_t bytes)
     {
         throw std::logic_error(
             "Pl_AES_PDF: specified initialization vector"
-            " size in bytes must be " + QUtil::int_to_string(bytes));
+            " size in bytes must be " + QUtil::uint_to_string(bytes));
     }
     this->use_specified_iv = true;
     memcpy(this->specified_iv, iv, bytes);
@@ -123,7 +124,7 @@ Pl_AES_PDF::finish()
             // specification, including providing an entire block of padding
             // if the input was a multiple of 16 bytes.
             unsigned char pad =
-                static_cast<unsigned char>(this->buf_size - this->offset);
+                QIntC::to_uchar(this->buf_size - this->offset);
             memset(this->inbuf + this->offset, pad, pad);
             this->offset = this->buf_size;
             flush(false);
@@ -166,7 +167,7 @@ Pl_AES_PDF::initializeVector()
     {
 	for (unsigned int i = 0; i < this->buf_size; ++i)
 	{
-	    this->cbc_block[i] = 14 * (1 + i);
+	    this->cbc_block[i] = static_cast<unsigned char>(14U * (1U + i));
 	}
     }
     else

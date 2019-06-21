@@ -1,4 +1,5 @@
 #include <qpdf/Pl_Count.hh>
+#include <qpdf/QIntC.hh>
 
 Pl_Count::Pl_Count(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next),
@@ -16,7 +17,7 @@ Pl_Count::write(unsigned char* buf, size_t len)
 {
     if (len)
     {
-	this->count += len;
+	this->count += QIntC::to_offset(len);
 	getNext()->write(buf, len);
 	this->last_char = buf[len - 1];
     }

@@ -197,7 +197,7 @@ JSON::encode_string(std::string const& str)
             }
             else
             {
-                result.append(1, ch);
+                result.append(1, static_cast<char>(ch));
             }
         }
     }
