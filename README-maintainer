@@ -64,6 +64,12 @@ CODING RULES
 
 * Use QIntC for type conversions -- see casting policy in docs.
 
+* Use QPDF_DLL on all methods that are to be exported in the shared
+  library/DLL. Use QPDF_DLL_CLASS for all classes whose type
+  information is needed. This is important for exception classes and
+  it seems also for classes that are intended to be subclassed across
+  the shared library boundary.
+
 RELEASE PREPARATION
 
 * Each year, update copyright notices. Just do a case-insensitive

@@ -33,7 +33,7 @@ class Pl_DCT: public Pipeline
     QPDF_DLL
     Pl_DCT(char const* identifier, Pipeline* next);
 
-    class CompressConfig
+    class QPDF_DLL_CLASS CompressConfig
     {
       public:
         CompressConfig()

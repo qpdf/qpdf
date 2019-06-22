@@ -1,9 +1,6 @@
 Next ABI
 ========
 
- * Build with -fvisibility=hidden by default. Fix QPDF_DLL. See #302
-   for discussion. See also https://gcc.gnu.org/wiki/Visibility
-
  * Check all classes that don't use the Members pattern and see if
    they should be converted. Most of the pipeline classes should be
    converted.

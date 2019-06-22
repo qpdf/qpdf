@@ -60,6 +60,33 @@ AC_SUBST(LT_AGE)
 LT_SONAME=$(expr $LT_CURRENT - $LT_AGE)
 AC_SUBST(LT_SONAME)
 
+AC_MSG_CHECKING(for -fvisibility=hidden)
+try_flags=-fvisibility=hidden
+oCXXFLAGS=$CXXFLAGS
+CXXFLAGS="$CXXFLAGS $try_flags"
+AC_LANG_PUSH([C++])
+AC_LINK_IFELSE([AC_LANG_PROGRAM(
+    [[class X
+{
+  public:
+    __attribute__ ((visibility ("default")))
+    X() {}
+    __attribute__ ((visibility ("default")))
+    void f() {}
+};
+   ]],[[X x; x.f();]])],
+   [qpdf_VISIBILITY_HIDDEN=1],
+   [qpdf_VISIBILITY_HIDDEN=0])
+AC_LANG_POP
+if test "$qpdf_VISIBILITY_HIDDEN" = "0"; then
+   AC_MSG_RESULT(no)
+   CXXFLAGS=$oCXXFLAGS
+else
+   AC_MSG_RESULT(yes)
+   CFLAGS="$CFLAGS $try_flags"
+fi
+
+AC_MSG_CHECKING(whether to use insecure random numbers)
 AC_ARG_ENABLE(insecure-random,
    AS_HELP_STRING([--enable-insecure-random],
                   [whether to use stdlib's random number generator (default is no)]),

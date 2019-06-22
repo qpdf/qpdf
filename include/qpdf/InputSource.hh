@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <string>
 
-class InputSource
+class QPDF_DLL_CLASS InputSource
 {
   public:
     QPDF_DLL
@@ -40,7 +40,7 @@ class InputSource
     {
     }
 
-    class Finder
+    class QPDF_DLL_CLASS Finder
     {
       public:
         Finder()

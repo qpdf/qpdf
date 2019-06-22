@@ -76,7 +76,7 @@ class QPDFWriter
     QPDF_DLL
     ~QPDFWriter();
 
-    class ProgressReporter
+    class QPDF_DLL_CLASS ProgressReporter
     {
       public:
         virtual ~ProgressReporter()

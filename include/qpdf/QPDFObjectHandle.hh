@@ -54,7 +54,7 @@ class QPDFObjectHandle
     // alternative way of associating stream data with a stream.  See
     // comments on replaceStreamData and newStream for additional
     // details.
-    class StreamDataProvider
+    class QPDF_DLL_CLASS StreamDataProvider
     {
       public:
 	QPDF_DLL
@@ -99,7 +99,7 @@ class QPDFObjectHandle
     // string token will also work. The correct way to construct a
     // string token that would write the literal value (str) is
     // QPDFTokenizer::Token(QPDFTokenizer::tt_string, "str").
-    class TokenFilter
+    class QPDF_DLL_CLASS TokenFilter
     {
       public:
         QPDF_DLL

@@ -47,7 +47,7 @@
 #include <qpdf/DLL.h>
 #include <string>
 
-class Pipeline
+class QPDF_DLL_CLASS Pipeline
 {
   public:
     QPDF_DLL

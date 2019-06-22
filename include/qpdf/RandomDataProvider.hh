@@ -22,9 +22,10 @@
 #ifndef RANDOMDATAPROVIDER_HH
 #define RANDOMDATAPROVIDER_HH
 
+#include <qpdf/DLL.h>
 #include <string.h> // for size_t
 
-class RandomDataProvider
+class QPDF_DLL_CLASS RandomDataProvider
 {
   public:
     virtual ~RandomDataProvider()

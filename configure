@@ -15840,6 +15840,61 @@ LT_REVISION=2
 LT_SONAME=$(expr $LT_CURRENT - $LT_AGE)
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for -fvisibility=hidden" >&5
+$as_echo_n "checking for -fvisibility=hidden... " >&6; }
+try_flags=-fvisibility=hidden
+oCXXFLAGS=$CXXFLAGS
+CXXFLAGS="$CXXFLAGS $try_flags"
+ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+class X
+{
+  public:
+    __attribute__ ((visibility ("default")))
+    X() {}
+    __attribute__ ((visibility ("default")))
+    void f() {}
+};
+
+int
+main ()
+{
+X x; x.f();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  qpdf_VISIBILITY_HIDDEN=1
+else
+  qpdf_VISIBILITY_HIDDEN=0
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+if test "$qpdf_VISIBILITY_HIDDEN" = "0"; then
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+   CXXFLAGS=$oCXXFLAGS
+else
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+   CFLAGS="$CFLAGS $try_flags"
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to use insecure random numbers" >&5
+$as_echo_n "checking whether to use insecure random numbers... " >&6; }
 # Check whether --enable-insecure-random was given.
 if test "${enable_insecure_random+set}" = set; then :
   enableval=$enable_insecure_random; if test "$enableval" = "yes"; then
