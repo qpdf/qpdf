@@ -1471,10 +1471,23 @@ ArgParser::argHelp()
 void
 ArgParser::argCompletionBash()
 {
+    std::string progname = argv[0];
+    // Detect if we're in an AppImage and adjust
+    std::string appdir;
+    std::string appimage;
+    if (QUtil::get_env("APPDIR", &appdir) &&
+        QUtil::get_env("APPIMAGE", &appimage))
+    {
+        if ((appdir.length() < strlen(argv[0])) &&
+            (strncmp(appdir.c_str(), argv[0], appdir.length()) == 0))
+        {
+            progname = appimage;
+        }
+    }
     std::cout << "complete -o bashdefault -o default -o nospace"
-              << " -C " << argv[0] << " " << whoami << std::endl;
+              << " -C " << progname << " " << whoami << std::endl;
     // Put output before error so calling from zsh works properly
-    std::string path = argv[0];
+    std::string path = progname;
     size_t slash = path.find('/');
     if ((slash != 0) && (slash != std::string::npos))
     {

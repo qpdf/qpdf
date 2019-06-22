@@ -264,15 +264,11 @@ zip -r qpdf-external-libs-src.zip external-libs
 When releasing on sourceforge, `external-libs` distributions go in
 `external-libs/yyyymmdd`, and qpdf distributions go in `qpdf/vvv`.
 
-For local iteration on the AppImage generation, follow the release
-procedures for building the AppImage, but instead of passing git clone
-options to the docker command, copy qpdf to /tmp/build. You can also
-pass -e SKIP_TESTS=1 to docker to skip the test suite, useful for
-rapid iteration. Set up /tmp/build as in the release process.
-
-cp -a $PWD /tmp/build
-docker run --privileged -ti --rm -e SKIP_TESTS=1 -v /tmp/build:/tmp/build qpdfbuild
-
+For local iteration on the AppImage generation, it works to just
+./azure-pipelines/build-appimage and get the resulting AppImage from
+the distribution directory. You can also pass -e SKIP_TESTS=1
+build-appimage, which passes it along to to docker, to skip the test
+suite, which useful for rapid iteration.
 
 GENERAL BUILD STUFF
 

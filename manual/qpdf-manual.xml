@@ -4337,6 +4337,13 @@ print "\n";
           with exit code 3 instead of 2.
          </para>
         </listitem>
+        <listitem>
+         <para>
+          The <option>--completion-bash</option> and
+          <option>--completion-zsh</option> options now work properly
+          when qpdf is invoked as an AppImage.
+         </para>
+        </listitem>
        </itemizedlist>
       </listitem>
       <listitem>

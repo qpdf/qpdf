@@ -1,5 +1,8 @@
 2019-06-22  Jay Berkenbilt  <ejb@ql.org>
 
+	* It now works to run --completion-bash and --completion-zsh when
+	qpdf is started from an AppImage.
+
 	* Provided a more useful error message when Windows can't get
 	security context. Thanks to user zdenop for supplying some code.
 	Fixes #286.

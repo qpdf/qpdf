@@ -1,4 +1,9 @@
 #!/bin/bash
+#
+# Any extra args are passed to the docker run command before the
+# invocation of qpdfbuild. This is useful for iterating locally as
+# described in README-maintainer.
+#
 set -ex
 cd appimage
 docker build -t qpdfbuild .
@@ -6,7 +11,9 @@ rm -rf build
 mkdir build
 cd ..
 git clone .git appimage/build/qpdf
-docker run --privileged --rm -v $PWD/appimage/build:/tmp/build qpdfbuild
+docker run --privileged --rm \
+       -v $PWD/appimage/build:/tmp/build ${1+"$@"} qpdfbuild
+rm -rf distribution
 mkdir distribution
 cp -p appimage/build/qpdf/appimage/build/qpdf*AppImage* distribution
 for i in distribution/*; do

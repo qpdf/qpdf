@@ -26,3 +26,4 @@ manual/print.xsl
 qpdf/build/
 zlib-flate/build/
 fuzz/qpdf_fuzzer_seed_corpus/
+distribution/
