@@ -1,5 +1,8 @@
 2019-06-22  Jay Berkenbilt  <ejb@ql.org>
 
+	* The "make install" target explicitly sets a mode rather than
+	relying the user's umask. Fixes #326.
+
 	* When a file has linearization warnings but no errors, qpdf
 	--check and --check-linearization now exit with code 3 instead
 	of 2. Fixes #50.

@@ -4370,6 +4370,14 @@ print "\n";
           the library to make this safe.
          </para>
         </listitem>
+        <listitem>
+         <para>
+          QPDF's <command>make install</command> target explicitly
+          specifies the mode to use when installing files instead of
+          relying the user's umask. It was previously doing this for
+          some files but not others.
+         </para>
+        </listitem>
        </itemizedlist>
       </listitem>
       <listitem>
