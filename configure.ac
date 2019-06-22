@@ -75,6 +75,7 @@ else
    AC_MSG_RESULT(no)
 fi
 
+AC_MSG_CHECKING(whether to use OS-provided secure random numbers)
 AC_ARG_ENABLE(os-secure-random,
    AS_HELP_STRING([--enable-os-secure-random],
                   [whether to try to use OS-provided secure random numbers (default is yes)]),
@@ -92,6 +93,7 @@ fi
 
 AX_RANDOM_DEVICE
 
+AC_MSG_CHECKING(whether to avoid Windows HANDLE type)
 AC_ARG_ENABLE(avoid-windows-handle,
    AS_HELP_STRING([--enable-avoid-windows-handle],
                   [whether to avoid use of HANDLE, useful for some embedded Windows builds (default is no)]),

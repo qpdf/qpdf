@@ -15862,6 +15862,8 @@ else
 $as_echo "no" >&6; }
 fi
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to use OS-provided secure random numbers" >&5
+$as_echo_n "checking whether to use OS-provided secure random numbers... " >&6; }
 # Check whether --enable-os-secure-random was given.
 if test "${enable_os_secure_random+set}" = set; then :
   enableval=$enable_os_secure_random; if test "$enableval" = "yes"; then
@@ -15972,6 +15974,8 @@ _ACEOF
   fi
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to avoid Windows HANDLE type" >&5
+$as_echo_n "checking whether to avoid Windows HANDLE type... " >&6; }
 # Check whether --enable-avoid-windows-handle was given.
 if test "${enable_avoid_windows_handle+set}" = set; then :
   enableval=$enable_avoid_windows_handle; if test "$enableval" = "yes"; then
