@@ -15,6 +15,7 @@ Memory checks:
 ./configure CFLAGS="-fsanitize=address -fsanitize=undefined -g" \
    CXXFLAGS="-fsanitize=address -fsanitize=undefined -g" \
    LDFLAGS="-fsanitize=address -fsanitize=undefined" \
+   CC=clang CXX=clang++ \
    --enable-werror --disable-shared
 
 GOOGLE OSS-FUZZ
