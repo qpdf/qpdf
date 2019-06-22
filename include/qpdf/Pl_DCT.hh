@@ -68,17 +68,37 @@ class Pl_DCT: public Pipeline
 
     enum action_e { a_compress, a_decompress };
 
-    action_e action;
-    Pl_Buffer buf;
+    class Members
+    {
+        friend class Pl_DCT;
 
-    // Used for compression
-    JDIMENSION image_width;
-    JDIMENSION image_height;
-    int components;
-    J_COLOR_SPACE color_space;
+      public:
+        QPDF_DLL
+        ~Members();
 
-    CompressConfig* config_callback;
+      private:
+        Members(action_e action,
+                char const* buf_description,
+                JDIMENSION image_width = 0,
+                JDIMENSION image_height = 0,
+                int components = 1,
+                J_COLOR_SPACE color_space = JCS_GRAYSCALE,
+                CompressConfig* config_callback = 0);
+        Members(Members const&);
 
+        action_e action;
+        Pl_Buffer buf;
+
+        // Used for compression
+        JDIMENSION image_width;
+        JDIMENSION image_height;
+        int components;
+        J_COLOR_SPACE color_space;
+
+        CompressConfig* config_callback;
+    };
+
+    PointerHolder<Members> m;
 };
 
 #endif // PL_DCT_HH

@@ -24,8 +24,8 @@
 
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
-
 #include <qpdf/Constants.h>
+
 #include <string>
 #include <stdexcept>
 
@@ -69,6 +69,9 @@ class QPDF_DLL_CLASS QPDFExc: public std::runtime_error
 				  std::string const& object,
 				  qpdf_offset_t offset,
 				  std::string const& message);
+
+    // This class does not use the Members pattern to avoid needless
+    // memory allocations during exception handling.
 
     qpdf_error_code_e error_code;
     std::string filename;

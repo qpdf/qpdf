@@ -48,7 +48,22 @@ class Pl_StdioFile: public Pipeline
     virtual void finish();
 
   private:
-    FILE* file;
+    class Members
+    {
+        friend class Pl_StdioFile;
+
+      public:
+        QPDF_DLL
+        ~Members();
+
+      private:
+        Members(FILE*);
+        Members(Members const&);
+
+        FILE* file;
+    };
+
+    PointerHolder<Members> m;
 };
 
 #endif // PL_STDIOFILE_HH

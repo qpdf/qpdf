@@ -9,4 +9,6 @@ Pl_Buffer::getBuffer() called when not ready
 size: 9
 data: mooquack
 size: 0
+size: 0
+size: 0
 done

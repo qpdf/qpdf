@@ -56,10 +56,25 @@ class BufferInputSource: public InputSource
   private:
     qpdf_offset_t const bufSizeAsOffset() const;
 
-    bool own_memory;
-    std::string description;
-    Buffer* buf;
-    qpdf_offset_t cur_offset;
+    class Members
+    {
+        friend class BufferInputSource;
+
+      public:
+        QPDF_DLL
+        ~Members();
+
+      private:
+        Members(bool own_memory, std::string const& description, Buffer* buf);
+        Members(Members const&);
+
+        bool own_memory;
+        std::string description;
+        Buffer* buf;
+        qpdf_offset_t cur_offset;
+    };
+
+    PointerHolder<Members> m;
 };
 
 #endif // QPDF_BUFFERINPUTSOURCE_HH

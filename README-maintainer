@@ -70,6 +70,9 @@ CODING RULES
   it seems also for classes that are intended to be subclassed across
   the shared library boundary.
 
+* Put private member variables in PointerHolder<Members> for all
+  public classes. Remember to use QPDF_DLL on ~Members().
+
 RELEASE PREPARATION
 
 * Each year, update copyright notices. Just do a case-insensitive

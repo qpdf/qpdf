@@ -46,11 +46,26 @@ class Pl_Flate: public Pipeline
     void handleData(unsigned char* data, size_t len, int flush);
     void checkError(char const* prefix, int error_code);
 
-    unsigned char* outbuf;
-    size_t out_bufsize;
-    action_e action;
-    bool initialized;
-    void* zdata;
+    class Members
+    {
+        friend class Pl_Flate;
+
+      public:
+        QPDF_DLL
+        ~Members();
+
+      private:
+        Members(size_t out_bufsize, action_e action);
+        Members(Members const&);
+
+        unsigned char* outbuf;
+        size_t out_bufsize;
+        action_e action;
+        bool initialized;
+        void* zdata;
+    };
+
+    PointerHolder<Members> m;
 };
 
 #endif // PL_FLATE_HH

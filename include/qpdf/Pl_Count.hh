@@ -48,10 +48,25 @@ class Pl_Count: public Pipeline
     unsigned char getLastChar() const;
 
   private:
-    // Must be qpdf_offset_t, not size_t, to handle writing more than
-    // size_t can handle.
-    qpdf_offset_t count;
-    unsigned char last_char;
+    class Members
+    {
+        friend class Pl_Count;
+
+      public:
+        QPDF_DLL
+        ~Members();
+
+      private:
+        Members();
+        Members(Members const&);
+
+        // Must be qpdf_offset_t, not size_t, to handle writing more than
+        // size_t can handle.
+        qpdf_offset_t count;
+        unsigned char last_char;
+    };
+
+    PointerHolder<Members> m;
 };
 
 #endif // PL_COUNT_HH

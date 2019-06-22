@@ -4,8 +4,9 @@
 #include <stdexcept>
 #include <algorithm>
 
-BufferInputSource::BufferInputSource(std::string const& description,
-                                     Buffer* buf, bool own_memory) :
+BufferInputSource::Members::Members(bool own_memory,
+                                    std::string const& description,
+                                    Buffer* buf) :
     own_memory(own_memory),
     description(description),
     buf(buf),
@@ -13,70 +14,77 @@ BufferInputSource::BufferInputSource(std::string const& description,
 {
 }
 
+BufferInputSource::Members::~Members()
+{
+}
+
+BufferInputSource::BufferInputSource(std::string const& description,
+                                     Buffer* buf, bool own_memory) :
+    m(new Members(own_memory, description, buf))
+{
+}
+
 BufferInputSource::BufferInputSource(std::string const& description,
                                      std::string const& contents) :
-    own_memory(true),
-    description(description),
-    buf(0),
-    cur_offset(0)
+    m(new Members(true, description, 0))
 {
-    this->buf = new Buffer(contents.length());
-    unsigned char* bp = buf->getBuffer();
+    this->m->buf = new Buffer(contents.length());
+    unsigned char* bp = this->m->buf->getBuffer();
     memcpy(bp, contents.c_str(), contents.length());
 }
 
 BufferInputSource::~BufferInputSource()
 {
-    if (own_memory)
+    if (this->m->own_memory)
     {
-	delete this->buf;
+	delete this->m->buf;
     }
 }
 
 qpdf_offset_t const
 BufferInputSource::bufSizeAsOffset() const
 {
-    return QIntC::to_offset(this->buf->getSize());
+    return QIntC::to_offset(this->m->buf->getSize());
 }
 
 qpdf_offset_t
 BufferInputSource::findAndSkipNextEOL()
 {
-    if (this->cur_offset < 0)
+    if (this->m->cur_offset < 0)
     {
         throw std::logic_error("INTERNAL ERROR: BufferInputSource offset < 0");
     }
     qpdf_offset_t end_pos = bufSizeAsOffset();
-    if (this->cur_offset >= end_pos)
+    if (this->m->cur_offset >= end_pos)
     {
 	this->last_offset = end_pos;
-        this->cur_offset = end_pos;
+        this->m->cur_offset = end_pos;
 	return end_pos;
     }
 
     qpdf_offset_t result = 0;
-    size_t len = QIntC::to_size(end_pos - this->cur_offset);
-    unsigned char const* buffer = this->buf->getBuffer();
+    size_t len = QIntC::to_size(end_pos - this->m->cur_offset);
+    unsigned char const* buffer = this->m->buf->getBuffer();
 
-    void* start = const_cast<unsigned char*>(buffer) + this->cur_offset;
+    void* start = const_cast<unsigned char*>(buffer) + this->m->cur_offset;
     unsigned char* p1 = static_cast<unsigned char*>(memchr(start, '\r', len));
     unsigned char* p2 = static_cast<unsigned char*>(memchr(start, '\n', len));
     unsigned char* p = (p1 && p2) ? std::min(p1, p2) : p1 ? p1 : p2;
     if (p)
     {
         result = p - buffer;
-        this->cur_offset = result + 1;
+        this->m->cur_offset = result + 1;
         ++p;
-        while ((this->cur_offset < end_pos) &&
+        while ((this->m->cur_offset < end_pos) &&
                ((*p == '\r') || (*p == '\n')))
         {
             ++p;
-            ++this->cur_offset;
+            ++this->m->cur_offset;
         }
     }
     else
     {
-        this->cur_offset = end_pos;
+        this->m->cur_offset = end_pos;
         result = end_pos;
     }
     return result;
@@ -85,13 +93,13 @@ BufferInputSource::findAndSkipNextEOL()
 std::string const&
 BufferInputSource::getName() const
 {
-    return this->description;
+    return this->m->description;
 }
 
 qpdf_offset_t
 BufferInputSource::tell()
 {
-    return this->cur_offset;
+    return this->m->cur_offset;
 }
 
 void
@@ -100,15 +108,15 @@ BufferInputSource::seek(qpdf_offset_t offset, int whence)
     switch (whence)
     {
       case SEEK_SET:
-	this->cur_offset = offset;
+	this->m->cur_offset = offset;
 	break;
 
       case SEEK_END:
-	this->cur_offset = bufSizeAsOffset() + offset;
+	this->m->cur_offset = bufSizeAsOffset() + offset;
 	break;
 
       case SEEK_CUR:
-	this->cur_offset += offset;
+	this->m->cur_offset += offset;
 	break;
 
       default:
@@ -117,46 +125,46 @@ BufferInputSource::seek(qpdf_offset_t offset, int whence)
 	break;
     }
 
-    if (this->cur_offset < 0)
+    if (this->m->cur_offset < 0)
     {
         throw std::runtime_error(
-            this->description + ": seek before beginning of buffer");
+            this->m->description + ": seek before beginning of buffer");
     }
 }
 
 void
 BufferInputSource::rewind()
 {
-    this->cur_offset = 0;
+    this->m->cur_offset = 0;
 }
 
 size_t
 BufferInputSource::read(char* buffer, size_t length)
 {
-    if (this->cur_offset < 0)
+    if (this->m->cur_offset < 0)
     {
         throw std::logic_error("INTERNAL ERROR: BufferInputSource offset < 0");
     }
     qpdf_offset_t end_pos = bufSizeAsOffset();
-    if (this->cur_offset >= end_pos)
+    if (this->m->cur_offset >= end_pos)
     {
 	this->last_offset = end_pos;
 	return 0;
     }
 
-    this->last_offset = this->cur_offset;
+    this->last_offset = this->m->cur_offset;
     size_t len = std::min(
-        QIntC::to_size(end_pos - this->cur_offset), length);
-    memcpy(buffer, buf->getBuffer() + this->cur_offset, len);
-    this->cur_offset += QIntC::to_offset(len);
+        QIntC::to_size(end_pos - this->m->cur_offset), length);
+    memcpy(buffer, this->m->buf->getBuffer() + this->m->cur_offset, len);
+    this->m->cur_offset += QIntC::to_offset(len);
     return len;
 }
 
 void
 BufferInputSource::unreadCh(char ch)
 {
-    if (this->cur_offset > 0)
+    if (this->m->cur_offset > 0)
     {
-	--this->cur_offset;
+	--this->m->cur_offset;
     }
 }

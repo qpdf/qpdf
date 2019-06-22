@@ -24,8 +24,8 @@
 
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
-
 #include <qpdf/Constants.h>
+
 #include <string>
 #include <stdexcept>
 
@@ -50,6 +50,9 @@ class QPDF_DLL_CLASS QPDFSystemError: public std::runtime_error
   private:
     static std::string createWhat(std::string const& description,
 				  int system_errno);
+
+    // This class does not use the Members pattern to avoid needless
+    // memory allocations during exception handling.
 
     std::string description;
     int system_errno;

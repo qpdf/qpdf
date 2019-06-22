@@ -41,6 +41,22 @@ class Pl_Discard: public Pipeline
     virtual void write(unsigned char*, size_t);
     QPDF_DLL
     virtual void finish();
+
+  private:
+    class Members
+    {
+        friend class Pl_Discard;
+
+      public:
+        QPDF_DLL
+        ~Members();
+
+      private:
+        Members();
+        Members(Members const&);
+    };
+
+    PointerHolder<Members> m;
 };
 
 #endif // PL_DISCARD_HH

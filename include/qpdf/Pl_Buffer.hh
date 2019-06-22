@@ -36,7 +36,6 @@
 #include <qpdf/Pipeline.hh>
 #include <qpdf/PointerHolder.hh>
 #include <qpdf/Buffer.hh>
-#include <list>
 
 class Pl_Buffer: public Pipeline
 {
@@ -57,9 +56,24 @@ class Pl_Buffer: public Pipeline
     Buffer* getBuffer();
 
   private:
-    bool ready;
-    std::list<PointerHolder<Buffer> > data;
-    size_t total_size;
+    class Members
+    {
+        friend class Pl_Buffer;
+
+      public:
+        QPDF_DLL
+        ~Members();
+
+      private:
+        Members();
+        Members(Members const&);
+
+        bool ready;
+        PointerHolder<Buffer> data;
+        size_t total_size;
+    };
+
+    PointerHolder<Members> m;
 };
 
 #endif // PL_BUFFER_HH

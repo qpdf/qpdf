@@ -1,10 +1,19 @@
 #include <qpdf/Pl_Count.hh>
 #include <qpdf/QIntC.hh>
 
-Pl_Count::Pl_Count(char const* identifier, Pipeline* next) :
-    Pipeline(identifier, next),
+Pl_Count::Members::Members() :
     count(0),
     last_char('\0')
+{
+}
+
+Pl_Count::Members::~Members()
+{
+}
+
+Pl_Count::Pl_Count(char const* identifier, Pipeline* next) :
+    Pipeline(identifier, next),
+    m(new Members())
 {
 }
 
@@ -17,9 +26,9 @@ Pl_Count::write(unsigned char* buf, size_t len)
 {
     if (len)
     {
-	this->count += QIntC::to_offset(len);
+	this->m->count += QIntC::to_offset(len);
 	getNext()->write(buf, len);
-	this->last_char = buf[len - 1];
+	this->m->last_char = buf[len - 1];
     }
 }
 
@@ -32,11 +41,11 @@ Pl_Count::finish()
 qpdf_offset_t
 Pl_Count::getCount() const
 {
-    return this->count;
+    return this->m->count;
 }
 
 unsigned char
 Pl_Count::getLastChar() const
 {
-    return this->last_char;
+    return this->m->last_char;
 }

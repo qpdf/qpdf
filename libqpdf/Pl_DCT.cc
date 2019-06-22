@@ -31,10 +31,30 @@ error_handler(j_common_ptr cinfo)
     longjmp(jerr->jmpbuf, 1);
 }
 
+Pl_DCT::Members::Members(action_e action,
+                         char const* buf_description,
+                         JDIMENSION image_width,
+                         JDIMENSION image_height,
+                         int components,
+                         J_COLOR_SPACE color_space,
+                         CompressConfig* config_callback) :
+    action(action),
+    buf(buf_description),
+    image_width(image_width),
+    image_height(image_height),
+    components(components),
+    color_space(color_space),
+    config_callback(config_callback)
+{
+}
+
+Pl_DCT::Members::~Members()
+{
+}
+
 Pl_DCT::Pl_DCT(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next),
-    action(a_decompress),
-    buf("DCT compressed image")
+    m(new Members(a_decompress, "DCT compressed image"))
 {
 }
 
@@ -45,13 +65,8 @@ Pl_DCT::Pl_DCT(char const* identifier, Pipeline* next,
                J_COLOR_SPACE color_space,
                CompressConfig* config_callback) :
     Pipeline(identifier, next),
-    action(a_compress),
-    buf("DCT uncompressed image"),
-    image_width(image_width),
-    image_height(image_height),
-    components(components),
-    color_space(color_space),
-    config_callback(config_callback)
+    m(new Members(a_compress, "DCT uncompressed image",
+      image_width, image_height, components, color_space, config_callback))
 {
 }
 
@@ -62,18 +77,18 @@ Pl_DCT::~Pl_DCT()
 void
 Pl_DCT::write(unsigned char* data, size_t len)
 {
-    this->buf.write(data, len);
+    this->m->buf.write(data, len);
 }
 
 void
 Pl_DCT::finish()
 {
-    this->buf.finish();
+    this->m->buf.finish();
 
     // Using a PointerHolder<Buffer> here and passing it into compress
     // and decompress causes a memory leak with setjmp/longjmp. Just
     // use a pointer and delete it.
-    Buffer* b = this->buf.getBuffer();
+    Buffer* b = this->m->buf.getBuffer();
     if (b->getSize() == 0)
     {
         // Special case: empty data will never succeed and probably
@@ -99,7 +114,7 @@ Pl_DCT::finish()
     {
         try
         {
-            if (this->action == a_compress)
+            if (this->m->action == a_compress)
             {
                 compress(reinterpret_cast<void*>(&cinfo_compress), b);
             }
@@ -123,11 +138,11 @@ Pl_DCT::finish()
     }
     delete b;
 
-    if (this->action == a_compress)
+    if (this->m->action == a_compress)
     {
         jpeg_destroy_compress(&cinfo_compress);
     }
-    if (this->action == a_decompress)
+    if (this->m->action == a_decompress)
     {
         jpeg_destroy_decompress(&cinfo_decompress);
     }
@@ -272,14 +287,14 @@ Pl_DCT::compress(void* cinfo_p, Buffer* b)
     unsigned char* outbuffer = outbuffer_ph.getPointer();
     jpeg_pipeline_dest(cinfo, outbuffer, BUF_SIZE, this->getNext());
 
-    cinfo->image_width = this->image_width;
-    cinfo->image_height = this->image_height;
-    cinfo->input_components = this->components;
-    cinfo->in_color_space = this->color_space;
+    cinfo->image_width = this->m->image_width;
+    cinfo->image_height = this->m->image_height;
+    cinfo->input_components = this->m->components;
+    cinfo->in_color_space = this->m->color_space;
     jpeg_set_defaults(cinfo);
-    if (this->config_callback)
+    if (this->m->config_callback)
     {
-        this->config_callback->apply(cinfo);
+        this->m->config_callback->apply(cinfo);
     }
 
     jpeg_start_compress(cinfo, TRUE);

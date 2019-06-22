@@ -44,6 +44,9 @@ class QPDFObjGen
     int getGen() const;
 
   private:
+    // This class does not use the Members pattern to avoid a memory
+    // allocation for every one of these. A lot of these get created
+    // and destroyed.
     int obj;
     int gen;
 };

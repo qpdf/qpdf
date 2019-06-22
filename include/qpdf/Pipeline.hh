@@ -45,6 +45,7 @@
 #define PIPELINE_HH
 
 #include <qpdf/DLL.h>
+#include <qpdf/PointerHolder.hh>
 #include <string>
 
 class QPDF_DLL_CLASS Pipeline
@@ -79,7 +80,22 @@ class QPDF_DLL_CLASS Pipeline
     Pipeline(Pipeline const&);
     Pipeline& operator=(Pipeline const&);
 
-    Pipeline* next;
+    class Members
+    {
+        friend class Pipeline;
+
+      public:
+        QPDF_DLL
+        ~Members();
+
+      private:
+        Members(Pipeline* next);
+        Members(Members const&);
+
+        Pipeline* next;
+    };
+
+    PointerHolder<Members> m;
 };
 
 #endif // PIPELINE_HH

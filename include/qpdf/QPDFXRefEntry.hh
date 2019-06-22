@@ -49,6 +49,8 @@ class QPDFXRefEntry
     int getObjStreamIndex() const;	// only for type 2
 
   private:
+    // This class does not use the Members pattern to avoid a memory
+    // allocation for every one of these. A lot of these get created.
     int type;
     qpdf_offset_t field1;
     int field2;

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdexcept>
 #include <iostream>
+#include <cassert>
 
 static unsigned char* uc(char const* s)
 {
@@ -13,6 +14,25 @@ static unsigned char* uc(char const* s)
 
 int main()
 {
+    {
+        // Test that buffers can be copied by value.
+        Buffer bc1(2);
+        unsigned char* bc1p = bc1.getBuffer();
+        bc1p[0] = 'Q';
+        bc1p[1] = 'W';
+        Buffer bc2(bc1);
+        bc1p[0] = 'R';
+        unsigned char* bc2p = bc2.getBuffer();
+        assert(bc2p != bc1p);
+        assert(bc2p[0] == 'Q');
+        assert(bc2p[1] == 'W');
+        bc2 = bc1;
+        bc2p = bc2.getBuffer();
+        assert(bc2p != bc1p);
+        assert(bc2p[0] == 'R');
+        assert(bc2p[1] == 'W');
+    }
+
     try
     {
 	Pl_Discard discard;
@@ -65,6 +85,16 @@ int main()
 	}
 
         Pl_Buffer bp3("bp3");
+        b = bp3.getBuffer();
+        std::cout << "size: " << b->getSize() << std::endl;
+        delete b;
+        // Should be able to call getBuffer again and get an empty buffer
+        b = bp3.getBuffer();
+        std::cout << "size: " << b->getSize() << std::endl;
+        delete b;
+        // Also can write 0 and do it.
+        bp3.write(uc(""), 0);
+        bp3.finish();
         b = bp3.getBuffer();
         std::cout << "size: " << b->getSize() << std::endl;
         delete b;

@@ -24,6 +24,7 @@
 
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
+#include <qpdf/PointerHolder.hh>
 #include <stdio.h>
 #include <string>
 
@@ -86,6 +87,22 @@ class QPDF_DLL_CLASS InputSource
 
   protected:
     qpdf_offset_t last_offset;
+
+  private:
+    class Members
+    {
+        friend class InputSource;
+
+      public:
+        QPDF_DLL
+        ~Members();
+
+      private:
+        Members();
+        Members(Members const&);
+    };
+
+    PointerHolder<Members> m;
 };
 
 #endif // QPDF_INPUTSOURCE_HH

@@ -47,10 +47,25 @@ class Pl_RunLength: public Pipeline
 
     enum state_e { st_top, st_copying, st_run };
 
-    action_e action;
-    state_e state;
-    unsigned char buf[128];
-    unsigned int length;
+    class Members
+    {
+        friend class Pl_RunLength;
+
+      public:
+        QPDF_DLL
+        ~Members();
+
+      private:
+        Members(action_e);
+        Members(Members const&);
+
+        action_e action;
+        state_e state;
+        unsigned char buf[128];
+        unsigned int length;
+    };
+
+    PointerHolder<Members> m;
 };
 
 #endif // PL_RUNLENGTH_HH

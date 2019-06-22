@@ -5,6 +5,13 @@
 #include <qpdf/PointerHolder.hh>
 #include <qpdf/QIntC.hh>
 
+InputSource::Members::Members()
+{
+}
+
+InputSource::Members::~Members()
+{
+}
 
 void
 InputSource::setLastOffset(qpdf_offset_t offset)

@@ -48,6 +48,22 @@ class Pl_Concatenate: public Pipeline
     // the pipeline.
     QPDF_DLL
     void manualFinish();
+
+  private:
+    class Members
+    {
+        friend class Pl_Concatenate;
+
+      public:
+        QPDF_DLL
+        ~Members();
+
+      private:
+        Members();
+        Members(Members const&);
+    };
+
+    PointerHolder<Members> m;
 };
 
 #endif // PL_CONCATENATE_HH

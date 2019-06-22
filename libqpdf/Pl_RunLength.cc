@@ -3,12 +3,21 @@
 #include <qpdf/QUtil.hh>
 #include <qpdf/QTC.hh>
 
-Pl_RunLength::Pl_RunLength(char const* identifier, Pipeline* next,
-                           action_e action) :
-    Pipeline(identifier, next),
+Pl_RunLength::Members::Members(action_e action) :
     action(action),
     state(st_top),
     length(0)
+{
+}
+
+Pl_RunLength::Members::~Members()
+{
+}
+
+Pl_RunLength::Pl_RunLength(char const* identifier, Pipeline* next,
+                           action_e action) :
+    Pipeline(identifier, next),
+    m(new Members(action))
 {
 }
 
@@ -19,7 +28,7 @@ Pl_RunLength::~Pl_RunLength()
 void
 Pl_RunLength::write(unsigned char* data, size_t len)
 {
-    if (this->action == a_encode)
+    if (this->m->action == a_encode)
     {
         encode(data, len);
     }
@@ -34,41 +43,41 @@ Pl_RunLength::encode(unsigned char* data, size_t len)
 {
     for (size_t i = 0; i < len; ++i)
     {
-        if ((this->state == st_top) != (this->length <= 1))
+        if ((this->m->state == st_top) != (this->m->length <= 1))
         {
             throw std::logic_error(
                 "Pl_RunLength::encode: state/length inconsistency");
         }
         unsigned char ch = data[i];
-        if ((this->length > 0) &&
-            ((this->state == st_copying) || (this->length < 128)) &&
-            (ch == this->buf[this->length-1]))
+        if ((this->m->length > 0) &&
+            ((this->m->state == st_copying) || (this->m->length < 128)) &&
+            (ch == this->m->buf[this->m->length-1]))
         {
             QTC::TC("libtests", "Pl_RunLength: switch to run",
-                    (this->length == 128) ? 0 : 1);
-            if (this->state == st_copying)
+                    (this->m->length == 128) ? 0 : 1);
+            if (this->m->state == st_copying)
             {
-                --this->length;
+                --this->m->length;
                 flush_encode();
-                this->buf[0] = ch;
-                this->length = 1;
+                this->m->buf[0] = ch;
+                this->m->length = 1;
             }
-            this->state = st_run;
-            this->buf[this->length] = ch;
-            ++this->length;
+            this->m->state = st_run;
+            this->m->buf[this->m->length] = ch;
+            ++this->m->length;
         }
         else
         {
-            if ((this->length == 128) || (this->state == st_run))
+            if ((this->m->length == 128) || (this->m->state == st_run))
             {
                 flush_encode();
             }
-            else if (this->length > 0)
+            else if (this->m->length > 0)
             {
-                this->state = st_copying;
+                this->m->state = st_copying;
             }
-            this->buf[this->length] = ch;
-            ++this->length;
+            this->m->buf[this->m->length] = ch;
+            ++this->m->length;
         }
     }
 }
@@ -79,20 +88,20 @@ Pl_RunLength::decode(unsigned char* data, size_t len)
     for (size_t i = 0; i < len; ++i)
     {
         unsigned char ch = data[i];
-        switch (this->state)
+        switch (this->m->state)
         {
           case st_top:
             if (ch < 128)
             {
                 // length represents remaining number of bytes to copy
-                this->length = 1U + ch;
-                this->state = st_copying;
+                this->m->length = 1U + ch;
+                this->m->state = st_copying;
             }
             else if (ch > 128)
             {
                 // length represents number of copies of next byte
-                this->length = 257U - ch;
-                this->state = st_run;
+                this->m->length = 257U - ch;
+                this->m->state = st_run;
             }
             else // ch == 128
             {
@@ -102,18 +111,18 @@ Pl_RunLength::decode(unsigned char* data, size_t len)
 
           case st_copying:
             this->getNext()->write(&ch, 1);
-            if (--this->length == 0)
+            if (--this->m->length == 0)
             {
-                this->state = st_top;
+                this->m->state = st_top;
             }
             break;
 
           case st_run:
-            for (unsigned int j = 0; j < this->length; ++j)
+            for (unsigned int j = 0; j < this->m->length; ++j)
             {
                 this->getNext()->write(&ch, 1);
             }
-            this->state = st_top;
+            this->m->state = st_top;
             break;
         }
     }
@@ -122,36 +131,36 @@ Pl_RunLength::decode(unsigned char* data, size_t len)
 void
 Pl_RunLength::flush_encode()
 {
-    if (this->length == 128)
+    if (this->m->length == 128)
     {
         QTC::TC("libtests", "Pl_RunLength flush full buffer",
-                (this->state == st_copying ? 0 :
-                 this->state == st_run ? 1 :
+                (this->m->state == st_copying ? 0 :
+                 this->m->state == st_run ? 1 :
                  -1));
     }
-    if (this->length == 0)
+    if (this->m->length == 0)
     {
         QTC::TC("libtests", "Pl_RunLength flush empty buffer");
     }
-    if (this->state == st_run)
+    if (this->m->state == st_run)
     {
-        if ((this->length < 2) || (this->length > 128))
+        if ((this->m->length < 2) || (this->m->length > 128))
         {
             throw std::logic_error(
                 "Pl_RunLength: invalid length in flush_encode for run");
         }
-        unsigned char ch = static_cast<unsigned char>(257 - this->length);
+        unsigned char ch = static_cast<unsigned char>(257 - this->m->length);
         this->getNext()->write(&ch, 1);
-        this->getNext()->write(&this->buf[0], 1);
+        this->getNext()->write(&this->m->buf[0], 1);
     }
-    else if (this->length > 0)
+    else if (this->m->length > 0)
     {
-        unsigned char ch = static_cast<unsigned char>(this->length - 1);
+        unsigned char ch = static_cast<unsigned char>(this->m->length - 1);
         this->getNext()->write(&ch, 1);
-        this->getNext()->write(this->buf, this->length);
+        this->getNext()->write(this->m->buf, this->m->length);
     }
-    this->state = st_top;
-    this->length = 0;
+    this->m->state = st_top;
+    this->m->length = 0;
 }
 
 void
@@ -161,7 +170,7 @@ Pl_RunLength::finish()
     // data, which means the stream was terminated early, but we will
     // just ignore this case since this is the only sensible thing to
     // do.
-    if (this->action == a_encode)
+    if (this->m->action == a_encode)
     {
         flush_encode();
         unsigned char ch = 128;
