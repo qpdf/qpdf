@@ -62,6 +62,7 @@ CODING RULES
   `std::vector`. Instead, use `at()`. See README-hardening.md for
   details.
 
+* Use QIntC for type conversions -- see casting policy in docs.
 
 RELEASE PREPARATION
 
