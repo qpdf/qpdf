@@ -32,7 +32,7 @@ class Pl_TIFFPredictor: public Pipeline
     unsigned int bytes_per_row;
     unsigned int samples_per_pixel;
     unsigned int bits_per_sample;
-    unsigned char* cur_row;
+    PointerHolder<unsigned char> cur_row;
     size_t pos;
 };
 

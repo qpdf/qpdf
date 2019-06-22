@@ -22,8 +22,8 @@ struct _qpdf_data
     _qpdf_data();
     ~_qpdf_data();
 
-    QPDF* qpdf;
-    QPDFWriter* qpdf_writer;
+    PointerHolder<QPDF> qpdf;
+    PointerHolder<QPDFWriter> qpdf_writer;
 
     PointerHolder<QPDFExc> error;
     _qpdf_error tmp_error;
@@ -36,22 +36,16 @@ struct _qpdf_data
     unsigned long long size;
     char const* password;
     bool write_memory;
-    Buffer* output_buffer;
+    PointerHolder<Buffer> output_buffer;
 };
 
 _qpdf_data::_qpdf_data() :
-    qpdf(0),
-    qpdf_writer(0),
-    write_memory(false),
-    output_buffer(0)
+    write_memory(false)
 {
 }
 
 _qpdf_data::~_qpdf_data()
 {
-    delete qpdf_writer;
-    delete qpdf;
-    delete output_buffer;
 }
 
 // must set qpdf->filename and qpdf->password
@@ -451,14 +445,12 @@ QPDF_BOOL qpdf_allow_modify_all(qpdf_data qpdf)
 
 static void qpdf_init_write_internal(qpdf_data qpdf)
 {
-    if (qpdf->qpdf_writer)
+    if (qpdf->qpdf_writer.getPointer())
     {
 	QTC::TC("qpdf", "qpdf-c called qpdf_init_write multiple times");
-	delete qpdf->qpdf_writer;
 	qpdf->qpdf_writer = 0;
-	if (qpdf->output_buffer)
+	if (qpdf->output_buffer.getPointer())
 	{
-	    delete qpdf->output_buffer;
 	    qpdf->output_buffer = 0;
 	    qpdf->write_memory = false;
 	    qpdf->filename = 0;
@@ -496,7 +488,7 @@ size_t qpdf_get_buffer_length(qpdf_data qpdf)
 {
     qpdf_get_buffer_internal(qpdf);
     size_t result = 0;
-    if (qpdf->output_buffer)
+    if (qpdf->output_buffer.getPointer())
     {
 	result = qpdf->output_buffer->getSize();
     }
@@ -507,7 +499,7 @@ unsigned char const* qpdf_get_buffer(qpdf_data qpdf)
 {
     unsigned char const* result = 0;
     qpdf_get_buffer_internal(qpdf);
-    if (qpdf->output_buffer)
+    if (qpdf->output_buffer.getPointer())
     {
 	result = qpdf->output_buffer->getBuffer();
     }

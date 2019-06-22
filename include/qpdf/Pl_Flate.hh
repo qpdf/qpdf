@@ -58,7 +58,7 @@ class Pl_Flate: public Pipeline
         Members(size_t out_bufsize, action_e action);
         Members(Members const&);
 
-        unsigned char* outbuf;
+        PointerHolder<unsigned char> outbuf;
         size_t out_bufsize;
         action_e action;
         bool initialized;

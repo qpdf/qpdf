@@ -16,7 +16,6 @@ Pl_TIFFPredictor::Pl_TIFFPredictor(char const* identifier, Pipeline* next,
     columns(columns),
     samples_per_pixel(samples_per_pixel),
     bits_per_sample(bits_per_sample),
-    cur_row(0),
     pos(0)
 {
     if (samples_per_pixel < 1)
@@ -38,13 +37,13 @@ Pl_TIFFPredictor::Pl_TIFFPredictor(char const* identifier, Pipeline* next,
             "TIFFPredictor created with invalid columns value");
     }
     this->bytes_per_row = bpr & UINT_MAX;
-    this->cur_row = new unsigned char[this->bytes_per_row];
-    memset(this->cur_row, 0, this->bytes_per_row);
+    this->cur_row = PointerHolder<unsigned char>(
+        true, new unsigned char[this->bytes_per_row]);
+    memset(this->cur_row.getPointer(), 0, this->bytes_per_row);
 }
 
 Pl_TIFFPredictor::~Pl_TIFFPredictor()
 {
-    delete [] cur_row;
 }
 
 void
@@ -55,20 +54,20 @@ Pl_TIFFPredictor::write(unsigned char* data, size_t len)
     while (len >= left)
     {
 	// finish off current row
-	memcpy(this->cur_row + this->pos, data + offset, left);
+	memcpy(this->cur_row.getPointer() + this->pos, data + offset, left);
 	offset += left;
 	len -= left;
 
 	processRow();
 
 	// Prepare for next row
-	memset(this->cur_row, 0, this->bytes_per_row);
+	memset(this->cur_row.getPointer(), 0, this->bytes_per_row);
 	left = this->bytes_per_row;
 	this->pos = 0;
     }
     if (len)
     {
-	memcpy(this->cur_row + this->pos, data + offset, len);
+	memcpy(this->cur_row.getPointer() + this->pos, data + offset, len);
     }
     this->pos += len;
 }
@@ -79,7 +78,7 @@ Pl_TIFFPredictor::processRow()
     QTC::TC("libtests", "Pl_TIFFPredictor processRow",
             (action == a_decode ? 0 : 1));
     BitWriter bw(this->getNext());
-    BitStream in(this->cur_row, this->bytes_per_row);
+    BitStream in(this->cur_row.getPointer(), this->bytes_per_row);
     std::vector<long long> prev;
     for (unsigned int i = 0; i < this->samples_per_pixel; ++i)
     {
@@ -118,6 +117,6 @@ Pl_TIFFPredictor::finish()
 	processRow();
     }
     this->pos = 0;
-    memset(this->cur_row, 0, this->bytes_per_row);
+    memset(this->cur_row.getPointer(), 0, this->bytes_per_row);
     getNext()->finish();
 }

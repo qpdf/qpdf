@@ -41,10 +41,10 @@ class Pl_PNGFilter: public Pipeline
     action_e action;
     unsigned int bytes_per_row;
     unsigned int bytes_per_pixel;
-    unsigned char* cur_row;
-    unsigned char* prev_row;
-    unsigned char* buf1;
-    unsigned char* buf2;
+    unsigned char* cur_row;     // points to buf1 or buf2
+    unsigned char* prev_row;    // points to buf1 or buf2
+    PointerHolder<unsigned char> buf1;
+    PointerHolder<unsigned char> buf2;
     size_t pos;
     size_t incoming;
 };

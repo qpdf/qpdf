@@ -8,19 +8,18 @@ Pl_RC4::Pl_RC4(char const* identifier, Pipeline* next,
     out_bufsize(out_bufsize),
     rc4(key_data, key_len)
 {
-    this->outbuf = new unsigned char[out_bufsize];
+    this->outbuf = PointerHolder<unsigned char>(
+        true, new unsigned char[out_bufsize]);
 }
 
 Pl_RC4::~Pl_RC4()
 {
-    delete [] this->outbuf;
-    this->outbuf = 0;
 }
 
 void
 Pl_RC4::write(unsigned char* data, size_t len)
 {
-    if (this->outbuf == 0)
+    if (this->outbuf.getPointer() == 0)
     {
 	throw std::logic_error(
 	    this->identifier +
@@ -35,16 +34,15 @@ Pl_RC4::write(unsigned char* data, size_t len)
 	size_t bytes =
             (bytes_left < this->out_bufsize ? bytes_left : out_bufsize);
 	bytes_left -= bytes;
-	rc4.process(p, bytes, outbuf);
+	rc4.process(p, bytes, outbuf.getPointer());
 	p += bytes;
-	getNext()->write(outbuf, bytes);
+	getNext()->write(outbuf.getPointer(), bytes);
     }
 }
 
 void
 Pl_RC4::finish()
 {
-    delete [] this->outbuf;
     this->outbuf = 0;
     this->getNext()->finish();
 }

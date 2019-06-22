@@ -55,8 +55,8 @@ class Pl_AES_PDF: public Pipeline
     bool cbc_mode;
     bool first;
     size_t offset;              // offset into memory buffer
-    unsigned char* key;
-    uint32_t* rk;
+    PointerHolder<unsigned char> key;
+    PointerHolder<uint32_t> rk;
     unsigned char inbuf[buf_size];
     unsigned char outbuf[buf_size];
     unsigned char cbc_block[buf_size];

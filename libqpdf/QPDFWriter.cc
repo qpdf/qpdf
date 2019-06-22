@@ -1835,21 +1835,21 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
                     this->m->cur_data_key.length());
 		pl.write(QUtil::unsigned_char_pointer(val), val.length());
 		pl.finish();
-		Buffer* buf = bufpl.getBuffer();
+		PointerHolder<Buffer> buf = bufpl.getBuffer();
 		val = QPDF_String(
 		    std::string(reinterpret_cast<char*>(buf->getBuffer()),
 				buf->getSize())).unparse(true);
-		delete buf;
 	    }
 	    else
 	    {
-		char* tmp = QUtil::copy_string(val);
+		PointerHolder<char> tmp_ph =
+                    PointerHolder<char>(true, QUtil::copy_string(val));
+                char* tmp = tmp_ph.getPointer();
 		size_t vlen = val.length();
 		RC4 rc4(QUtil::unsigned_char_pointer(this->m->cur_data_key),
 			QIntC::to_int(this->m->cur_data_key.length()));
 		rc4.process(QUtil::unsigned_char_pointer(tmp), vlen);
 		val = QPDF_String(std::string(tmp, vlen)).unparse();
-		delete [] tmp;
 	    }
 	}
 	else

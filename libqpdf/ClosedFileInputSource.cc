@@ -4,14 +4,12 @@
 ClosedFileInputSource::Members::Members(char const* filename) :
     filename(filename),
     offset(0),
-    fis(0),
     stay_open(false)
 {
 }
 
 ClosedFileInputSource::Members::~Members()
 {
-    delete fis;
 }
 
 ClosedFileInputSource::ClosedFileInputSource(char const* filename) :
@@ -26,7 +24,7 @@ ClosedFileInputSource::~ClosedFileInputSource()
 void
 ClosedFileInputSource::before()
 {
-    if (0 == this->m->fis)
+    if (0 == this->m->fis.getPointer())
     {
         this->m->fis = new FileInputSource();
         this->m->fis->setFilename(this->m->filename.c_str());
@@ -44,7 +42,6 @@ ClosedFileInputSource::after()
     {
         return;
     }
-    delete this->m->fis;
     this->m->fis = 0;
 }
 
@@ -84,7 +81,7 @@ void
 ClosedFileInputSource::rewind()
 {
     this->m->offset = 0;
-    if (this->m->fis)
+    if (this->m->fis.getPointer())
     {
         this->m->fis->rewind();
     }
@@ -112,7 +109,7 @@ void
 ClosedFileInputSource::stayOpen(bool val)
 {
     this->m->stay_open = val;
-    if ((! val) && this->m->fis)
+    if ((! val) && this->m->fis.getPointer())
     {
         after();
     }

@@ -670,10 +670,9 @@ QUtil::get_env(std::string const& var, std::string* value)
 
     if (value)
     {
-	char* t = new char[len + 1];
-        ::GetEnvironmentVariable(var.c_str(), t, len);
-	*value = t;
-	delete [] t;
+	PointerHolder<char> t = PointerHolder<char>(true, new char[len + 1]);
+        ::GetEnvironmentVariable(var.c_str(), t.getPointer(), len);
+	*value = t.getPointer();
     }
 
     return true;

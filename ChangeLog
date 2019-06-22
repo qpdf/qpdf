@@ -1,5 +1,8 @@
 2019-06-22  Jay Berkenbilt  <ejb@ql.org>
 
+	* Favor PointerHolder over manual memory allocation in shippable
+	code where possible. Fixes #235.
+
 	* If pkg-config is available, use it to local libjpeg and zlib. If
 	not, fall back to old behavior. Fixes #324.
 

@@ -204,7 +204,9 @@ iterate_rc4(unsigned char* data, size_t data_len,
 	    unsigned char* okey, int key_len,
 	    int iterations, bool reverse)
 {
-    unsigned char* key = new unsigned char[QIntC::to_size(key_len)];
+    PointerHolder<unsigned char> key_ph = PointerHolder<unsigned char>(
+        true, new unsigned char[QIntC::to_size(key_len)]);
+    unsigned char* key = key_ph.getPointer();
     for (int i = 0; i < iterations; ++i)
     {
 	int const xor_value = (reverse ? iterations - 1 - i : i);
@@ -215,7 +217,6 @@ iterate_rc4(unsigned char* data, size_t data_len,
 	RC4 rc4(key, QIntC::to_int(key_len));
 	rc4.process(data, data_len);
     }
-    delete [] key;
 }
 
 static std::string

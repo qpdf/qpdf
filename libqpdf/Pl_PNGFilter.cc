@@ -45,12 +45,14 @@ Pl_PNGFilter::Pl_PNGFilter(char const* identifier, Pipeline* next,
             "PNGFilter created with invalid columns value");
     }
     this->bytes_per_row = bpr & UINT_MAX;
-    this->buf1 = new unsigned char[this->bytes_per_row + 1];
-    this->buf2 = new unsigned char[this->bytes_per_row + 1];
-    memset(this->buf1, 0, this->bytes_per_row + 1);
-    memset(this->buf2, 0, this->bytes_per_row + 1);
-    this->cur_row = this->buf1;
-    this->prev_row = this->buf2;
+    this->buf1 = PointerHolder<unsigned char>(
+        true, new unsigned char[this->bytes_per_row + 1]);
+    this->buf2 = PointerHolder<unsigned char>(
+        true, new unsigned char[this->bytes_per_row + 1]);
+    memset(this->buf1.getPointer(), 0, this->bytes_per_row + 1);
+    memset(this->buf2.getPointer(), 0, this->bytes_per_row + 1);
+    this->cur_row = this->buf1.getPointer();
+    this->prev_row = this->buf2.getPointer();
 
     // number of bytes per incoming row
     this->incoming = (action == a_encode ?
@@ -60,8 +62,6 @@ Pl_PNGFilter::Pl_PNGFilter(char const* identifier, Pipeline* next,
 
 Pl_PNGFilter::~Pl_PNGFilter()
 {
-    delete [] buf1;
-    delete [] buf2;
 }
 
 void
@@ -81,7 +81,7 @@ Pl_PNGFilter::write(unsigned char* data, size_t len)
 	// Swap rows
 	unsigned char* t = this->prev_row;
 	this->prev_row = this->cur_row;
-	this->cur_row = t ? t : this->buf2;
+	this->cur_row = t ? t : this->buf2.getPointer();
 	memset(this->cur_row, 0, this->bytes_per_row + 1);
 	left = this->incoming;
 	this->pos = 0;
@@ -269,7 +269,7 @@ Pl_PNGFilter::finish()
 	processRow();
     }
     this->prev_row = 0;
-    this->cur_row = buf1;
+    this->cur_row = buf1.getPointer();
     this->pos = 0;
     memset(this->cur_row, 0, this->bytes_per_row + 1);
 

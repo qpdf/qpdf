@@ -24,7 +24,7 @@ class Pl_RC4: public Pipeline
     virtual void finish();
 
   private:
-    unsigned char* outbuf;
+    PointerHolder<unsigned char> outbuf;
     size_t out_bufsize;
     RC4 rc4;
 };

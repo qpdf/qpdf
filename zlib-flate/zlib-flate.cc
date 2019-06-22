@@ -61,8 +61,9 @@ int main(int argc, char* argv[])
 
     QUtil::binary_stdout();
     QUtil::binary_stdin();
-    Pl_StdioFile* out = new Pl_StdioFile("stdout", stdout);
-    Pl_Flate* flate = new Pl_Flate("flate", out, action);
+    PointerHolder<Pl_StdioFile> out = new Pl_StdioFile("stdout", stdout);
+    PointerHolder<Pl_Flate> flate =
+        new Pl_Flate("flate", out.getPointer(), action);
 
     try
     {
@@ -81,8 +82,6 @@ int main(int argc, char* argv[])
 	    }
 	}
 	flate->finish();
-	delete flate;
-	delete out;
     }
     catch (std::exception& e)
     {

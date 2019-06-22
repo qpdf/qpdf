@@ -25,29 +25,31 @@ Pl_AES_PDF::Pl_AES_PDF(char const* identifier, Pipeline* next,
 {
     size_t keybits = 8 * key_bytes;
     assert(key_bytes == KEYLENGTH(keybits));
-    this->key = new unsigned char[key_bytes];
-    this->rk = new uint32_t[RKLENGTH(keybits)];
+    this->key = PointerHolder<unsigned char>(
+        true, new unsigned char[key_bytes]);
+    this->rk = PointerHolder<uint32_t>(
+        true, new uint32_t[RKLENGTH(keybits)]);
     size_t rk_bytes = RKLENGTH(keybits) * sizeof(uint32_t);
-    std::memcpy(this->key, key, key_bytes);
-    std::memset(this->rk, 0, rk_bytes);
+    std::memcpy(this->key.getPointer(), key, key_bytes);
+    std::memset(this->rk.getPointer(), 0, rk_bytes);
     std::memset(this->inbuf, 0, this->buf_size);
     std::memset(this->outbuf, 0, this->buf_size);
     std::memset(this->cbc_block, 0, this->buf_size);
     if (encrypt)
     {
-	this->nrounds = rijndaelSetupEncrypt(this->rk, this->key, keybits);
+	this->nrounds = rijndaelSetupEncrypt(
+            this->rk.getPointer(), this->key.getPointer(), keybits);
     }
     else
     {
-	this->nrounds = rijndaelSetupDecrypt(this->rk, this->key, keybits);
+	this->nrounds = rijndaelSetupDecrypt(
+            this->rk.getPointer(), this->key.getPointer(), keybits);
     }
     assert(this->nrounds == NROUNDS(keybits));
 }
 
 Pl_AES_PDF::~Pl_AES_PDF()
 {
-    delete [] this->key;
-    delete [] this->rk;
 }
 
 void
@@ -222,7 +224,8 @@ Pl_AES_PDF::flush(bool strip_padding)
 		this->inbuf[i] ^= this->cbc_block[i];
 	    }
 	}
-	rijndaelEncrypt(this->rk, this->nrounds, this->inbuf, this->outbuf);
+	rijndaelEncrypt(this->rk.getPointer(),
+                        this->nrounds, this->inbuf, this->outbuf);
 	if (this->cbc_mode)
 	{
 	    memcpy(this->cbc_block, this->outbuf, this->buf_size);
@@ -230,7 +233,8 @@ Pl_AES_PDF::flush(bool strip_padding)
     }
     else
     {
-	rijndaelDecrypt(this->rk, this->nrounds, this->inbuf, this->outbuf);
+	rijndaelDecrypt(this->rk.getPointer(),
+                        this->nrounds, this->inbuf, this->outbuf);
 	if (this->cbc_mode)
 	{
 	    for (unsigned int i = 0; i < this->buf_size; ++i)

@@ -13,7 +13,8 @@ Pl_Flate::Members::Members(size_t out_bufsize,
     initialized(false),
     zdata(0)
 {
-    this->outbuf = new unsigned char[out_bufsize];
+    this->outbuf = PointerHolder<unsigned char>(
+        true, new unsigned char[out_bufsize]);
     // Indirect through zdata to reach the z_stream so we don't have
     // to include zlib.h in Pl_Flate.hh.  This means people using
     // shared library versions of qpdf don't have to have zlib
@@ -34,15 +35,12 @@ Pl_Flate::Members::Members(size_t out_bufsize,
     zstream.opaque = 0;
     zstream.next_in = 0;
     zstream.avail_in = 0;
-    zstream.next_out = this->outbuf;
+    zstream.next_out = this->outbuf.getPointer();
     zstream.avail_out = QIntC::to_uint(out_bufsize);
 }
 
 Pl_Flate::Members::~Members()
 {
-    delete [] this->outbuf;
-    this->outbuf = 0;
-
     if (this->initialized)
     {
         z_stream& zstream = *(static_cast<z_stream*>(this->zdata));
@@ -74,7 +72,7 @@ Pl_Flate::~Pl_Flate()
 void
 Pl_Flate::write(unsigned char* data, size_t len)
 {
-    if (this->m->outbuf == 0)
+    if (this->m->outbuf.getPointer() == 0)
     {
 	throw std::logic_error(
 	    this->identifier +
@@ -186,8 +184,8 @@ Pl_Flate::handleData(unsigned char* data, size_t len, int flush)
                     QIntC::to_ulong(this->m->out_bufsize - zstream.avail_out);
 		if (ready > 0)
 		{
-		    this->getNext()->write(this->m->outbuf, ready);
-		    zstream.next_out = this->m->outbuf;
+		    this->getNext()->write(this->m->outbuf.getPointer(), ready);
+		    zstream.next_out = this->m->outbuf.getPointer();
 		    zstream.avail_out = QIntC::to_uint(this->m->out_bufsize);
 		}
 	    }
@@ -205,7 +203,7 @@ Pl_Flate::finish()
 {
     try
     {
-        if (this->m->outbuf)
+        if (this->m->outbuf.getPointer())
         {
             if (this->m->initialized)
             {
@@ -226,7 +224,6 @@ Pl_Flate::finish()
                 checkError("End", err);
             }
 
-            delete [] this->m->outbuf;
             this->m->outbuf = 0;
         }
     }

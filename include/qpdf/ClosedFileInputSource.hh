@@ -82,7 +82,7 @@ class ClosedFileInputSource: public InputSource
 
         std::string filename;
         qpdf_offset_t offset;
-        FileInputSource* fis;
+        PointerHolder<FileInputSource> fis;
         bool stay_open;
     };
     PointerHolder<Members> m;
