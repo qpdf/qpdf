@@ -13,6 +13,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <string>
+#include <cstring>
 
 static char const* whoami = 0;
 static bool static_id = false;

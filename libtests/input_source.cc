@@ -1,8 +1,9 @@
-#include <iostream>
 #include <qpdf/BufferInputSource.hh>
 #include <qpdf/PointerHolder.hh>
 #include <qpdf/Buffer.hh>
 #include <qpdf/QPDFTokenizer.hh>
+#include <iostream>
+#include <cstring>
 
 static PointerHolder<Buffer>
 get_buffer()
