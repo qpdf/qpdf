@@ -1,5 +1,8 @@
 2019-06-22  Jay Berkenbilt  <ejb@ql.org>
 
+	* If pkg-config is available, use it to local libjpeg and zlib. If
+	not, fall back to old behavior. Fixes #324.
+
 	* The "make install" target explicitly sets a mode rather than
 	relying the user's umask. Fixes #326.
 

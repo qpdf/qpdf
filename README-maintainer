@@ -121,6 +121,7 @@ RELEASE PREPARATION
     ```
     cp /usr/share/automake-1.11/install-sh .
     cp /usr/share/automake-1.11/mkinstalldirs .
+    cp /usr/share/aclocal/pkg.m4 m4
     ```
 
   The entire contents of the `m4` directory came from `libtool.m4`. If

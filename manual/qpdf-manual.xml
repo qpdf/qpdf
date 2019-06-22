@@ -4378,6 +4378,14 @@ print "\n";
           some files but not others.
          </para>
         </listitem>
+        <listitem>
+         <para>
+          If <command>pkg-config</command> is available, use it to
+          locate <filename>libjpeg</filename> and
+          <filename>zlib</filename> dependencies, falling back on old
+          behavior if unsuccessful.
+         </para>
+        </listitem>
        </itemizedlist>
       </listitem>
       <listitem>

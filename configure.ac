@@ -163,11 +163,39 @@ fi
 AC_SUBST(IS_32BIT)
 AC_SUBST(WINDOWS_WORDSIZE)
 
+PKG_PROG_PKG_CONFIG
 if test "$BUILD_INTERNAL_LIBS" = "0"; then
-   AC_CHECK_HEADER(zlib.h,,[MISSING_ZLIB_H=1; MISSING_ANY=1])
-   AC_SEARCH_LIBS(deflate,z zlib,,[MISSING_ZLIB=1; MISSING_ANY=1])
-   AC_CHECK_HEADER(jpeglib.h,,[MISSING_JPEG_H=1; MISSING_ANY=1])
-   AC_SEARCH_LIBS(jpeg_destroy,jpeg,,[MISSING_JPEG=1; MISSING_ANY=1])
+    if test "$PKG_CONFIG" != ""; then
+       PKG_CHECK_MODULES([pc_zlib], [zlib],
+         [CFLAGS="$CFLAGS $pc_zlib_CFLAGS"
+          CXXFLAGS="$CXXFLAGS $pc_zlib_CXXFLAGS"
+          LIBS="$LIBS $pc_zlib_LIBS"
+         ], [:])
+       PKG_CHECK_MODULES([pc_libjpeg], [libjpeg],
+         [CFLAGS="$CFLAGS $pc_libjpeg_CFLAGS"
+          CXXFLAGS="$CXXFLAGS $pc_libjpeg_CXXFLAGS"
+          LIBS="$LIBS $pc_libjpeg_LIBS"
+         ],[:])
+    fi
+    if test "$pc_zlib_LIBS" = ""; then
+        AC_CHECK_HEADER(zlib.h,,[MISSING_ZLIB_H=1; MISSING_ANY=1])
+        AC_SEARCH_LIBS(deflate,z zlib,,[MISSING_ZLIB=1; MISSING_ANY=1])
+    fi
+    if test "$pc_libjpeg_LIBS" = ""; then
+        AC_CHECK_HEADER(jpeglib.h,,[MISSING_JPEG_H=1; MISSING_ANY=1])
+        AC_SEARCH_LIBS(jpeg_destroy,jpeg,,[MISSING_JPEG=1; MISSING_ANY=1])
+    fi
+    if test "$LIBS" != ""; then
+        nLIBS=""
+        for x in $LIBS; do
+            if echo $x | grep -q '^-L'; then
+                LDFLAGS="$LDFLAGS $x"
+            else
+                nLIBS="$nLIBS $x"
+            fi
+            LIBS=$nLIBS
+        done
+    fi
 fi
 
 qpdf_USE_WMAIN=0
