@@ -168,44 +168,6 @@ static void print_rect(std::ostream& out,
         << r.urx << ", " << r.ury << "]";
 }
 
-static void read_file_into_memory(
-    char const* filename,
-    PointerHolder<char>& file_buf, size_t& size)
-{
-    FILE* f = QUtil::safe_fopen(filename, "rb");
-    fseek(f, 0, SEEK_END);
-    size = QIntC::to_size(QUtil::tell(f));
-    fseek(f, 0, SEEK_SET);
-    file_buf = PointerHolder<char>(true, new char[size]);
-    char* buf_p = file_buf.getPointer();
-    size_t bytes_read = 0;
-    size_t len = 0;
-    while ((len = fread(buf_p + bytes_read, 1, size - bytes_read, f)) > 0)
-    {
-        bytes_read += len;
-    }
-    if (bytes_read != size)
-    {
-        if (ferror(f))
-        {
-            throw std::runtime_error(
-                std::string("failure reading file ") + filename +
-                " into memory: read " +
-                QUtil::uint_to_string(bytes_read) + "; wanted " +
-                QUtil::uint_to_string(size));
-        }
-        else
-        {
-            throw std::logic_error(
-                std::string("premature eof reading file ") + filename +
-                " into memory: read " +
-                QUtil::uint_to_string(bytes_read) + "; wanted " +
-                QUtil::uint_to_string(size));
-        }
-    }
-    fclose(f);
-}
-
 #define assert_compare_numbers(expected, expr) \
     compare_numbers(#expr, expected, expr)
 
@@ -277,7 +239,7 @@ void runtest(int n, char const* filename1, char const* arg2)
 
         std::string filename(std::string(filename1) + ".obfuscated");
         size_t size = 0;
-        read_file_into_memory(filename.c_str(), file_buf, size);
+        QUtil::read_file_into_memory(filename.c_str(), file_buf, size);
         char* p = file_buf.getPointer();
         for (size_t i = 0; i < size; ++i)
         {
@@ -308,7 +270,7 @@ void runtest(int n, char const* filename1, char const* arg2)
     {
         QTC::TC("qpdf", "exercise processMemoryFile");
         size_t size = 0;
-        read_file_into_memory(filename1, file_buf, size);
+        QUtil::read_file_into_memory(filename1, file_buf, size);
 	pdf.processMemoryFile(filename1, file_buf.getPointer(), size);
     }
 

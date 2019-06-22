@@ -400,7 +400,7 @@ void same_file_test()
     assert_same_file("", "qutil.out", false);
 }
 
-void read_lines_from_file_test()
+void read_from_file_test()
 {
     std::list<std::string> lines = QUtil::read_lines_from_file("other-file");
     for (std::list<std::string>::iterator iter = lines.begin();
@@ -408,6 +408,15 @@ void read_lines_from_file_test()
     {
         std::cout << *iter << std::endl;
     }
+    PointerHolder<char> buf;
+    size_t size = 0;
+    QUtil::read_file_into_memory("other-file", buf, size);
+    std::cout << "read " << size << " bytes" << std::endl;
+    char const* p = buf.getPointer();
+    assert(size == 24652);
+    assert(memcmp(p, "This file is used for qutil testing.", 36) == 0);
+    assert(p[59] == static_cast<char>(13));
+    assert(memcmp(p + 24641, "very long.", 10) == 0);
 }
 
 void assert_hex_encode(std::string const& input, std::string const& expected)
@@ -472,8 +481,8 @@ int main(int argc, char* argv[])
 	get_whoami_test();
 	std::cout << "---- file" << std::endl;
 	same_file_test();
-	std::cout << "---- lines from file" << std::endl;
-	read_lines_from_file_test();
+	std::cout << "---- read from file" << std::endl;
+	read_from_file_test();
 	std::cout << "---- hex encode/decode" << std::endl;
 	hex_encode_decode_test();
     }

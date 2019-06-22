@@ -1,3 +1,7 @@
+2019-06-22  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add new function QUtil::read_file_into_memory.
+
 2019-06-21  Jay Berkenbilt  <ejb@ql.org>
 
 	* When supported, qpdf builds with -fvisibility=hidden, which

@@ -24,6 +24,7 @@
 
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
+#include <qpdf/PointerHolder.hh>
 #include <string>
 #include <list>
 #include <vector>
@@ -304,6 +305,9 @@ namespace QUtil
     std::list<std::string> read_lines_from_file(char const* filename);
     QPDF_DLL
     std::list<std::string> read_lines_from_file(std::istream&);
+    QPDF_DLL
+    void read_file_into_memory(
+        char const* filename, PointerHolder<char>& file_buf, size_t& size);
 
     // This used to be called strcasecmp, but that is a macro on some
     // platforms, so we have to give it a name that is not likely to
