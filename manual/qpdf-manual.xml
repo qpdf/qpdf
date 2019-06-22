@@ -4277,6 +4277,164 @@ print "\n";
   </para>
   <variablelist>
    <varlistentry>
+    <term>9.0.0: XXX</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Incompatible API (source-level) Changes (minor)
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          The method <function>QUtil::strcasecmp</function> has been
+          renamed to <function>QUtil::str_compare_nocase</function>.
+          This incompatible change is necessary to enable qpdf to
+          build on platforms that define
+          <function>strcasecmp</function> as a macro.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          The <function>QPDF::copyForeignObject</function> method has
+          an overloaded version that took a boolean parameter that was
+          not used. If you were using this version, just omit the
+          extra parameter.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          There was a version
+          <function>QPDFTokenizer::expectInlineImage</function> that
+          took no arguments. This version has been removed since it
+          caused the tokenizer to return incorrect inline images. A
+          new version was added some time ago that produces correct
+          output. This is a very low level method that doesn't make
+          sense to call outside of qpdf's lexical engine. There are
+          higher level methods for tokenizing content streams.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Bug Fixes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          A small handful of memory issues, assertion failures, and
+          unhandled exceptions that could occur on badly mangled input
+          files have been fixed. Most of these problems were found by
+          Google's OSS-Fuzz project.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Build Changes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          On platforms that support it, qpdf now builds with
+          <option>-fvisibility=hidden</option>. If you build qpdf with
+          your own build system, this is now safe to use. This
+          prevents methods that are not part of the public API from
+          being exported by the shared library, and makes qpdf's ELF
+          shared libraries (used on Linux, MacOS, and most other UNIX
+          flavors) behave more like the Windows DLL. Since the DLL
+          already behaves in much this way, it is unlikely that there
+          are any methods that were accidentally not exported.
+          However, with ELF shared libraries, typeinfo for some
+          classes has to be explicitly exported. If there are problems
+          in dynamically linked code catching exceptions or
+          subclassing, this could be the reason. If you see this,
+          please report a bug at <ulink
+          url="https://github.com/qpdf/qpdf/issues/">pikepdf</ulink>.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          QPDF is now compiled with integer conversion and sign
+          conversion warnings enabled. Numerous changes were made to
+          the library to make this safe.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Library Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          A new namespace <classname>QIntC</classname>, provided by
+          <filename>qpdf/QIntC.hh</filename>, provides safe conversion
+          methods between different integer types. These conversion
+          methods do range checking to ensure that the cast can be
+          performed with no loss of information. Every use of
+          <function>static_cast</function> in the library was
+          inspected to see if it could use one of these safe
+          converters instead. See <xref linkend="ref.casting"/> for
+          additional details.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          New methods have been added to <classname>QUtil</classname>
+          for converting back and forth between strings and unsigned
+          integers: <function>uint_to_string</function>,
+          <function>uint_to_string_base</function>,
+          <function>string_to_uint</function>, and
+          <function>string_to_ull</function>.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          New methods have been added to
+          <classname>QPDFObjectHandle</classname> that return the
+          value of <classname>Integer</classname> objects as
+          <type>int</type> or <type>unsigned int</type> with range
+          checking and sensible fallback values, and a new method was
+          added to return an unsigned value. This makes it easier to
+          write code that is safe from unintentional data loss.
+          Functions: <function>getUIntValue</function>,
+          <function>getIntVauleAsInt</function>,
+          <function>getUIntValueAsUInt</function>.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          A new helper method
+          <function>QUtil::read_file_into_memory</function> was added.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Other Notes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          QPDF has been fully integrated into <ulink
+          url="https://github.com/google/oss-fuzz">Google's OSS-Fuzz
+          project</ulink>. This project exercises code with randomly
+          mutated inputs and is great for discovering hidden security
+          crashes and security issues. Several bugs found by oss-fuzz
+          have already been fixed in qpdf.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
     <term>8.4.2: May 18, 2019</term>
     <listitem>
      <para>
