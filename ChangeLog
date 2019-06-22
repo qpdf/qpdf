@@ -1,5 +1,9 @@
 2019-06-22  Jay Berkenbilt  <ejb@ql.org>
 
+	* Provided a more useful error message when Windows can't get
+	security context. Thanks to user zdenop for supplying some code.
+	Fixes #286.
+
 	* Favor PointerHolder over manual memory allocation in shippable
 	code where possible. Fixes #235.
 
