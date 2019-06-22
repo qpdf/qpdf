@@ -83,7 +83,7 @@ RELEASE PREPARATION
 * Check for open fuzz crashes at https://oss-fuzz.com
 
 * Check all open issues and pull requests in github and the
-  sourceforge trackers.
+  sourceforge trackers. See ~/scripts/github-issues.
 
 * Check `TODO` file to make sure all planned items for the release are
   done or retargeted.

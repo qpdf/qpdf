@@ -86,20 +86,10 @@ directory or that are otherwise not publicly accessible. This includes
 things sent to me by email that are specifically not public. Even so,
 I find it useful to make reference to them in this list
 
- * See if there is a way to provide an option to use higher
-   compression with zlib. See #113. This can be done by adding options
-   to Pl_Flate and having QPDFWriter optionally use those options.
-   Also increasing the buffer size may help.
-
  * Add support for writing name and number trees
 
  * Figure out how to render Gajić correctly in the PDF version of the
    qpdf manual.
-
- * Decide whether errors thrown by checkLinearization should be
-   converted to warnings. Take a pass through the linearization code
-   to see whether it's correct. Be able to view linearization data
-   even when there are errors. See linearization label in github.
 
  * Consider creating a PPA for Ubuntu
 
@@ -242,21 +232,6 @@ I find it useful to make reference to them in this list
    spec, and look at ~/Q/pdf-collection/form-with-full-save.pdf, which
    came from Adobe's example site.
 
- * Consider the possibility of doing something locale-aware to support
-   non-ASCII passwords. Update documentation if this is done. Consider
-   implementing full Unicode password algorithms from newer encryption
-   formats. See ../misc/unicode-password*. If code is added to
-   properly encode Unicode passwords, figure out how to deal with
-   backward compatibility. Either require some additional flag to
-   decode the password or provide a `--raw-password` flag to suppress
-   decoding. While automatically encoding breaks backward
-   compatibility, it's probably the right behavior because the current
-   behavior is arguably a bug. Alternatively, if the password doesn't
-   work as a raw password and contains characters outside US-ASCII,
-   try various encoding methods to see if any work. See section
-   7.6.3.3, algorithms 2 and 2A, in the ISO spec for details. (This is
-   tracked in https://github.com/qpdf/qpdf/issues/215.)
-
  * See if we can avoid preserving unreferenced objects in object
    streams even when preserving the object streams.
 
@@ -319,9 +294,7 @@ I find it useful to make reference to them in this list
    embedded prior to appended sections.
 
  * From a suggestion in bug 3152169, consider having an option to
-   re-encode inline images with an ASCII encoding. This is also
-   https://github.com/qpdf/qpdf/issues/278. It would be interesting to
-   make optimize-images work with inline images.
+   re-encode inline images with an ASCII encoding.
 
  * From github issue 2, provide more in-depth output for examining
    hint stream contents. Consider adding on option to provide a
