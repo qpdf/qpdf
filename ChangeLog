@@ -19,8 +19,10 @@
 	were, for some reason, calling this, just take the parameter away.
 
 	* Source-level incompatibility: remove the version
-	QPDF::copyForeignObject with an unused boolean parameter. If you
-	were, for some reason, calling this, just take the parameter away.
+	QPDFTokenizer::expectInlineImage with no arguments. It didn't
+	produce correct inline images. This is a very low-level routine.
+	There is little reason to call it outside of qpdf's lexical
+	engine.
 
 	* Source-level incompatibility: rename QUtil::strcasecmp to
 	QUtil::str_compare_nocase. This is a non-compatible change, but
@@ -58,7 +60,7 @@
 	avoiding implicit conversion between unsigned and signed integer
 	types.
 
-	* Add QIC.hh, containing integer type converters that do range
+	* Add QIntC.hh, containing integer type converters that do range
 	checking.
 
 2019-06-18  Jay Berkenbilt  <ejb@ql.org>
