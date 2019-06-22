@@ -80,6 +80,8 @@ RELEASE PREPARATION
   search for copyright. Don't forget copyright in manual. Also update
   debian copyright in debian package. Last updated: 2019.
 
+* Check for open fuzz crashes at https://oss-fuzz.com
+
 * Check all open issues and pull requests in github and the
   sourceforge trackers.
 
