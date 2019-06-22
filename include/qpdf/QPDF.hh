@@ -483,6 +483,9 @@ class QPDF
     // specified in a call to setOutputStreams.
     QPDF_DLL
     bool checkLinearization();
+    // Separately indicate whether there were errors or warnings.
+    QPDF_DLL
+    void checkLinearization(bool& errors, bool& warnings);
 
     // Calls checkLinearization() and, if possible, prints normalized
     // contents of some of the hints tables to std::cout or the output
@@ -1226,7 +1229,7 @@ class QPDF
     // methods to support linearization checking -- implemented in
     // QPDF_linearization.cc
     void readLinearizationData();
-    bool checkLinearizationInternal();
+    void checkLinearizationInternal(bool& errors, bool& warnings);
     void dumpLinearizationDataInternal();
     QPDFObjectHandle readHintStream(
         Pipeline&, qpdf_offset_t offset, size_t length);

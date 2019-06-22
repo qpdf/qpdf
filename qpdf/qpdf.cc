@@ -3181,6 +3181,7 @@ static void do_check(QPDF& pdf, Options& o, int& exit_code)
     // continue to perform additional checks after finding
     // errors.
     bool okay = true;
+    bool warnings = false;
     std::cout << "checking " << o.infilename << std::endl;
     try
     {
@@ -3196,10 +3197,17 @@ static void do_check(QPDF& pdf, Options& o, int& exit_code)
         if (pdf.isLinearized())
         {
             std::cout << "File is linearized\n";
-            if (! pdf.checkLinearization())
+            bool lin_errors = false;
+            bool lin_warnings = false;
+            // any errors or warnings are reported by checkLinearization()
+            pdf.checkLinearization(lin_errors, lin_warnings);
+            if (lin_errors)
             {
-                // any errors are reported by checkLinearization()
                 okay = false;
+            }
+            else if (lin_warnings)
+            {
+                warnings = true;
             }
         }
         else
@@ -3246,7 +3254,7 @@ static void do_check(QPDF& pdf, Options& o, int& exit_code)
     }
     if (okay)
     {
-        if (! pdf.getWarnings().empty())
+        if ((! pdf.getWarnings().empty()) || warnings)
         {
             exit_code = EXIT_WARNING;
         }
@@ -3775,14 +3783,21 @@ static void do_inspection(QPDF& pdf, Options& o)
     }
     if (o.check_linearization)
     {
-        if (pdf.checkLinearization())
+        bool lin_errors = false;
+        bool lin_warnings = false;
+        pdf.checkLinearization(lin_errors, lin_warnings);
+        if (lin_errors)
         {
-            std::cout << o.infilename << ": no linearization errors"
-                      << std::endl;
+            exit_code = EXIT_ERROR;
+        }
+        else if (lin_warnings && (exit_code != EXIT_ERROR))
+        {
+            exit_code = EXIT_WARNING;
         }
         else
         {
-            exit_code = EXIT_ERROR;
+            std::cout << o.infilename << ": no linearization errors"
+                      << std::endl;
         }
     }
     if (o.show_linearization)

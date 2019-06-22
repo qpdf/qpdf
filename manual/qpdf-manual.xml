@@ -4329,6 +4329,14 @@ print "\n";
           Google's OSS-Fuzz project.
          </para>
         </listitem>
+        <listitem>
+         <para>
+          When <command>qpdf --check</command> or <command>qpdf
+          --check-linearization</command> encounters a file with
+          linearization warnings but not errors, it now properly exits
+          with exit code 3 instead of 2.
+         </para>
+        </listitem>
        </itemizedlist>
       </listitem>
       <listitem>
@@ -4410,6 +4418,14 @@ print "\n";
          <para>
           A new helper method
           <function>QUtil::read_file_into_memory</function> was added.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          A new version of
+          <function>QPDF::checkLinearization()</function> has been
+          added that indicates separately whether there were errors or
+          warnings.
          </para>
         </listitem>
        </itemizedlist>
