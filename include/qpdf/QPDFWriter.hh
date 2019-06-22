@@ -248,9 +248,7 @@ class QPDFWriter
     // R3 encryption parameters are used, and to 1.5 when object
     // streams are used.
     QPDF_DLL
-    void setMinimumPDFVersion(std::string const&);
-    QPDF_DLL
-    void setMinimumPDFVersion(std::string const&, int extension_level);
+    void setMinimumPDFVersion(std::string const&, int extension_level = 0);
 
     // Force the PDF version of the output file to be a given version.
     // Use of this function may create PDF files that will not work
@@ -268,9 +266,7 @@ class QPDFWriter
     // Additionally, forcing to a version below 1.5 will disable
     // object streams.
     QPDF_DLL
-    void forcePDFVersion(std::string const&);
-    QPDF_DLL
-    void forcePDFVersion(std::string const&, int extension_level);
+    void forcePDFVersion(std::string const&, int extension_level = 0);
 
     // Provide additional text to insert in the PDF file somewhere
     // near the beginning of the file.  This can be used to add
@@ -483,10 +479,9 @@ class QPDFWriter
     void writeTrailer(trailer_e which, int size,
 		      bool xref_stream, qpdf_offset_t prev,
                       int linearization_pass);
-    void unparseObject(QPDFObjectHandle object, int level, int flags);
     void unparseObject(QPDFObjectHandle object, int level, int flags,
 		       // for stream dictionaries
-		       size_t stream_length, bool compress);
+		       size_t stream_length = 0, bool compress = false);
     void unparseChild(QPDFObjectHandle child, int level, int flags);
     void initializeSpecialStreams();
     void preserveObjectStreams();

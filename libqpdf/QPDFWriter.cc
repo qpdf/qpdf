@@ -232,12 +232,6 @@ QPDFWriter::setNewlineBeforeEndstream(bool val)
 }
 
 void
-QPDFWriter::setMinimumPDFVersion(std::string const& version)
-{
-    setMinimumPDFVersion(version, 0);
-}
-
-void
 QPDFWriter::setMinimumPDFVersion(std::string const& version,
                                  int extension_level)
 {
@@ -283,12 +277,6 @@ QPDFWriter::setMinimumPDFVersion(std::string const& version,
     {
         this->m->min_extension_level = extension_level;
     }
-}
-
-void
-QPDFWriter::forcePDFVersion(std::string const& version)
-{
-    forcePDFVersion(version, 0);
 }
 
 void
@@ -1431,12 +1419,6 @@ QPDFWriter::writeTrailer(trailer_e which, int size, bool xref_stream,
     writeStringQDF("\n");
     writeStringNoQDF(" ");
     writeString(">>");
-}
-
-void
-QPDFWriter::unparseObject(QPDFObjectHandle object, int level, int flags)
-{
-    unparseObject(object, level, flags, 0, false);
 }
 
 void
@@ -2811,6 +2793,9 @@ QPDFWriter::writeHintStream(int hint_id)
 qpdf_offset_t
 QPDFWriter::writeXRefTable(trailer_e which, int first, int last, int size)
 {
+    // There are too many extra arguments to replace overloaded
+    // function with defaults in the header file...too much risk of
+    // leaving something off.
     return writeXRefTable(which, first, last, size, 0, false, 0, 0, 0, 0);
 }
 
@@ -2858,6 +2843,9 @@ qpdf_offset_t
 QPDFWriter::writeXRefStream(int objid, int max_id, qpdf_offset_t max_offset,
 			    trailer_e which, int first, int last, int size)
 {
+    // There are too many extra arguments to replace overloaded
+    // function with defaults in the header file...too much risk of
+    // leaving something off.
     return writeXRefStream(objid, max_id, max_offset,
 			   which, first, last, size, 0, 0, 0, 0, false, 0);
 }
