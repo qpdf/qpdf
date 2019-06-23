@@ -4296,7 +4296,7 @@ print "\n";
         </listitem>
         <listitem>
          <para>
-          The <function>QPDF::copyForeignObject</function> method has
+          The <function>QPDF::copyForeignObject</function> method had
           an overloaded version that took a boolean parameter that was
           not used. If you were using this version, just omit the
           extra parameter.
