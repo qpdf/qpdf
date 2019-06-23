@@ -1,3 +1,9 @@
+Performance
+===========
+
+There is some performance problem that happens with some large files.
+Issues 305 and 311 both seem to be examples of this.
+
 Lexical
 =======
 
@@ -75,6 +81,10 @@ Page splitting/merging
      destinations, and each page has Soup and a number. Also pages are
      numbered with upper-case Roman numerals starting with 0. All
      titles are silly words preceded by a bullet.
+
+   If outline handling is significantly improved, see
+   ../misc/bad-outlines/bad-outlines.pdf and email:
+   https://mail.google.com/mail/u/0/#search/rfc822msgid%3A02aa01d3d013%249f766990%24de633cb0%24%40mono.hr)
 
  * Form fields: should be similar to outlines.
 
