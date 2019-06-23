@@ -2,7 +2,19 @@ Performance
 ===========
 
 There is some performance problem that happens with some large files.
-Issues 305 and 311 both seem to be examples of this.
+Issues 305 and 311 both seem to be examples of this. Files saved in
+../misc/bugs.
+
+Fuzz Errors
+===========
+
+* https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=<N>
+
+* 15454: uninitialized memory error from jpeg library. Consider
+  marking the memory sanitizer is experimental in qpdf oss-fuzz
+  project because jpeg is not known to work -- see libfuzz.info or
+  google's docs for details.
+
 
 Lexical
 =======
