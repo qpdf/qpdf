@@ -1,5 +1,8 @@
 2019-06-22  Jay Berkenbilt  <ejb@ql.org>
 
+	* Handle encrypted files with missing or invalid /Length entries
+	in the encryption dictionary.
+
 	* QPDFWriter: allow calling set*EncryptionParameters before
 	calling setFilename. Fixes #336.
 

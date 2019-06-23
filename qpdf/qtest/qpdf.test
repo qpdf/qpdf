@@ -3523,7 +3523,7 @@ foreach my $d (@enc_key)
 }
 
 # Miscellaneous encryption tests
-$n_tests += 2;
+$n_tests += 3;
 
 $td->runtest("set encryption before set filename",
              {$td->COMMAND => "test_driver 63 minimal.pdf"},
@@ -3532,6 +3532,11 @@ $td->runtest("set encryption before set filename",
 $td->runtest("check file's validity",
              {$td->COMMAND => "qpdf --check --password=u a.pdf"},
              {$td->FILE => "encrypt-before-filename.out",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("handle missing/invalid Length",
+             {$td->COMMAND => "qpdf --check bad-encryption-length.pdf"},
+             {$td->FILE => "bad-encryption-length.out",
                   $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 

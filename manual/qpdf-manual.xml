@@ -4353,6 +4353,14 @@ print "\n";
           segmentation fault.
          </para>
         </listitem>
+        <listitem>
+         <para>
+          When reading encrypted files, follow the spec more closely
+          regarding encryption key length. This allows qpdf to open
+          encrypted files in most cases when they have invalid or
+          missing /Length keys in the encryption dictionary.
+         </para>
+        </listitem>
        </itemizedlist>
       </listitem>
       <listitem>

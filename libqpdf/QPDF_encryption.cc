@@ -935,22 +935,38 @@ QPDF::initializeEncryption()
         pad_short_parameter(Perms, Perms_key_bytes_V5);
     }
 
-    int Length = 40;
-    if (encryption_dict.getKey("/Length").isInteger())
+    int Length = 0;
+    if (V <= 1)
     {
-	Length = encryption_dict.getKey("/Length").getIntValueAsInt();
-        if (R < 3)
+        Length = 40;
+    }
+    else if (V == 4)
+    {
+        Length = 128;
+    }
+    else if (V == 5)
+    {
+        Length = 256;
+    }
+    else
+    {
+        if (encryption_dict.getKey("/Length").isInteger())
         {
-            // Force Length to 40 regardless of what the file says.
-            Length = 40;
+            Length = encryption_dict.getKey("/Length").getIntValueAsInt();
+            if ((Length % 8) || (Length < 40) || (Length > 128))
+            {
+                Length = 0;
+            }
         }
-	if ((Length % 8) || (Length < 40) || (Length > 256))
-	{
-	    throw QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
-			  "encryption dictionary",
-                          this->m->file->getLastOffset(),
-			  "invalid /Length value in encryption dictionary");
-	}
+        if (Length == 0)
+        {
+            Length = 128;
+        }
+    }
+    if (Length == 0)
+    {
+        // Still no Length? Just take a guess.
+        Length = 128;
     }
 
     this->m->encp->encrypt_metadata = true;
