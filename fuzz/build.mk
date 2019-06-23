@@ -1,7 +1,16 @@
 # This directory contains support for Google's oss-fuzz project. See
 # https://github.com/google/oss-fuzz/tree/master/projects/qpdf
 
-FUZZERS = qpdf_fuzzer
+FUZZERS = \
+    qpdf_fuzzer \
+    ascii85_fuzzer \
+    dct_fuzzer \
+    flate_fuzzer \
+    hex_fuzzer \
+    lzw_fuzzer \
+    pngpredictor_fuzzer \
+    runlength_fuzzer \
+    tiffpredictor_fuzzer
 
 DEFAULT_FUZZ_RUNNER := standalone_fuzz_target_runner
 OBJ_DEFAULT_FUZZ := fuzz/$(OUTPUT_DIR)/$(DEFAULT_FUZZ_RUNNER).$(OBJ)
@@ -9,7 +18,8 @@ OBJ_DEFAULT_FUZZ := fuzz/$(OUTPUT_DIR)/$(DEFAULT_FUZZ_RUNNER).$(OBJ)
 BINS_fuzz = $(foreach B,$(FUZZERS),fuzz/$(OUTPUT_DIR)/$(call binname,$(B)))
 TARGETS_fuzz = $(OBJ_DEFAULT_FUZZ) $(BINS_fuzz) fuzz_corpus
 
-INCLUDES_fuzz = include
+# Fuzzers test private classes too, so we need libqpdf in the include path
+INCLUDES_fuzz = include libqpdf
 
 # LIB_FUZZING_ENGINE is overridden by oss-fuzz
 LIB_FUZZING_ENGINE ?= $(OBJ_DEFAULT_FUZZ)
@@ -129,6 +139,8 @@ install_fuzz: $(STATIC_BINS_fuzz)
 	  fi; \
 	  if test -d fuzz/$(OUTPUT_DIR)/$${B}_seed_corpus; then \
 	    (cd fuzz/$(OUTPUT_DIR)/$${B}_seed_corpus; zip -q -r $(OUT)/$${B}_seed_corpus.zip .); \
+	  elif test -d fuzz/$${B}_seed_corpus; then \
+	    (cd fuzz/$${B}_seed_corpus; zip -q -r $(OUT)/$${B}_seed_corpus.zip .); \
 	  fi; \
 	done
 

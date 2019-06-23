@@ -9,30 +9,59 @@ require TestDriver;
 
 my $td = new TestDriver('fuzz');
 
-my @files = glob("../build/qpdf_fuzzer_seed_corpus/*");
-my $n_test_files = 29;
-my $n_orig_files = 2559;
-my $n_files = $n_test_files + $n_orig_files;
+my $qpdf_n_test_files = 29;
+my $qpdf_n_orig_files = 2559;
+my $qpdf_n_files = $qpdf_n_test_files + $qpdf_n_orig_files;
 
-if (scalar(@files) != $n_files)
+my @fuzzers = (
+    ['qpdf' => $qpdf_n_files],
+    ['ascii85' => 1],
+    ['dct' => 1],
+    ['flate' => 1],
+    ['hex' => 1],
+    ['lzw' => 1],
+    ['pngpredictor' => 1],
+    ['runlength' => 6],
+    ['tiffpredictor' => 1],
+    );
+
+my $n_tests = 0;
+# One test for each directory for file count, two tests for each file
+# in each directory
+foreach my $d (@fuzzers)
 {
-    die "wrong number of files seen in fuzz.test";
+    $n_tests += 1 + (2 * $d->[1]);
 }
 
-foreach my $f (@files)
+foreach my $d (@fuzzers)
 {
-    my $sum = basename($f);
-    $td->runtest("checksum $sum",
-                 {$td->STRING => get_sha1_checksum($f)},
-                 {$td->STRING => $sum});
-    $td->runtest("fuzz check $sum",
-                 {$td->COMMAND => "qpdf_fuzzer $f"},
-                 {$td->REGEXP => ".*$f successful\n",
-                      $td->EXIT_STATUS => 0},
+    my $k = $d->[0];
+    my $dir = "../${k}_fuzzer_seed_corpus";
+    if (! -d $dir)
+    {
+        $dir = "../build/${k}_fuzzer_seed_corpus";
+    }
+    my @files = glob("$dir/*");
+    $td->runtest("file count for $dir",
+                 {$td->STRING => scalar(@files) . "\n"},
+                 {$td->STRING => $d->[1] . "\n"},
                  $td->NORMALIZE_NEWLINES);
+
+    foreach my $f (@files)
+    {
+        my $sum = basename($f);
+        $td->runtest("$k checksum   $sum",
+                     {$td->STRING => get_sha1_checksum($f)},
+                     {$td->STRING => $sum});
+        $td->runtest("$k fuzz check $sum",
+                     {$td->COMMAND => "${k}_fuzzer $f"},
+                     {$td->REGEXP => ".*$f successful\n",
+                          $td->EXIT_STATUS => 0},
+                     $td->NORMALIZE_NEWLINES);
+    }
 }
 
-$td->report(2 * $n_files);
+$td->report($n_tests);
 
 sub get_sha1_checksum
 {
