@@ -4344,6 +4344,15 @@ print "\n";
           when qpdf is invoked as an AppImage.
          </para>
         </listitem>
+        <listitem>
+         <para>
+          Calling
+          <function>QPDFWriter::set*EncryptionParameters</function> on
+          a <classname>QPDFWriter</classname> object whose output
+          filename has not yet been set no longer produces a
+          segmentation fault.
+         </para>
+        </listitem>
        </itemizedlist>
       </listitem>
       <listitem>

@@ -2094,6 +2094,19 @@ void runtest(int n, char const* filename1, char const* arg2)
         assert_compare_numbers(INT_MAX, t.getKey("/Q3").getIntValueAsInt());
         assert_compare_numbers(UINT_MAX, t.getKey("/Q3").getUIntValueAsUInt());
     }
+    else if (n == 63)
+    {
+        QPDFWriter w(pdf);
+        // Exercise setting encryption parameters before setting the
+        // output filename. The previous bug does not happen if static
+        // or deterministic ID is used because the filename is not
+        // used as part of the input data for ID generation in those
+        // cases.
+        w.setR6EncryptionParameters(
+            "u", "o", true, true, true, true, true, true, qpdf_r3p_full, true);
+        w.setOutputFilename("a.pdf");
+        w.write();
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +

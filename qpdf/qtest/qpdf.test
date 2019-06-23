@@ -3522,6 +3522,19 @@ foreach my $d (@enc_key)
              $td->NORMALIZE_NEWLINES);
 }
 
+# Miscellaneous encryption tests
+$n_tests += 2;
+
+$td->runtest("set encryption before set filename",
+             {$td->COMMAND => "test_driver 63 minimal.pdf"},
+             {$td->STRING => "test 63 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check file's validity",
+             {$td->COMMAND => "qpdf --check --password=u a.pdf"},
+             {$td->FILE => "encrypt-before-filename.out",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
 show_ntests();
 # ----------
 $td->notify("--- Unicode Passwords ---");

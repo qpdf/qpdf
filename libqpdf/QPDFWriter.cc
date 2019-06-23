@@ -26,7 +26,7 @@
 
 QPDFWriter::Members::Members(QPDF& pdf) :
     pdf(pdf),
-    filename(0),
+    filename("unspecified"),
     file(0),
     close_file(false),
     buffer_pipeline(0),
