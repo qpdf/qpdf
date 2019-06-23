@@ -1,5 +1,5 @@
-ERROR: first page object (/O) mismatch
-ERROR: space before first xref item (/T) mismatch (computed = 11777; file = 11771
+WARNING: first page object (/O) mismatch
+WARNING: space before first xref item (/T) mismatch (computed = 11777; file = 11771
 WARNING: end of first page section (/E) mismatch: /E = 1827; computed = 3889..3891
 WARNING: page 0 has shared identifier entries
 WARNING: page 0: shared object 62: in hint table but not computed list

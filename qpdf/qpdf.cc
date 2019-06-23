@@ -3210,15 +3210,10 @@ static void do_check(QPDF& pdf, Options& o, int& exit_code)
         if (pdf.isLinearized())
         {
             std::cout << "File is linearized\n";
-            bool lin_errors = false;
-            bool lin_warnings = false;
-            // any errors or warnings are reported by checkLinearization()
-            pdf.checkLinearization(lin_errors, lin_warnings);
-            if (lin_errors)
-            {
-                okay = false;
-            }
-            else if (lin_warnings)
+            // any errors or warnings are reported by
+            // checkLinearization(). We treat all issues reported here
+            // as warnings.
+            if (! pdf.checkLinearization())
             {
                 warnings = true;
             }
@@ -3796,21 +3791,14 @@ static void do_inspection(QPDF& pdf, Options& o)
     }
     if (o.check_linearization)
     {
-        bool lin_errors = false;
-        bool lin_warnings = false;
-        pdf.checkLinearization(lin_errors, lin_warnings);
-        if (lin_errors)
-        {
-            exit_code = EXIT_ERROR;
-        }
-        else if (lin_warnings && (exit_code != EXIT_ERROR))
-        {
-            exit_code = EXIT_WARNING;
-        }
-        else
+        if (pdf.checkLinearization())
         {
             std::cout << o.infilename << ": no linearization errors"
                       << std::endl;
+        }
+        else if (exit_code != EXIT_ERROR)
+        {
+            exit_code = EXIT_WARNING;
         }
     }
     if (o.show_linearization)

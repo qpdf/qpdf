@@ -65,25 +65,17 @@ load_vector_vector(BitStream& bit_stream,
 bool
 QPDF::checkLinearization()
 {
-    bool errors = false;
-    bool warnings = false;
-    checkLinearization(errors, warnings);
-    return (! (errors || warnings));
-}
-
-void
-QPDF::checkLinearization(bool& errors, bool& warnings)
-{
+    bool result = false;
     try
     {
 	readLinearizationData();
-	checkLinearizationInternal(errors, warnings);
+	result = checkLinearizationInternal();
     }
     catch (QPDFExc& e)
     {
 	*this->m->out_stream << e.what() << std::endl;
-        errors = true;
     }
+    return result;
 }
 
 bool
@@ -507,8 +499,8 @@ QPDF::readHGeneric(BitStream h, HGeneric& t)
     t.group_length = h.getBitsInt(32);                      // 4
 }
 
-void
-QPDF::checkLinearizationInternal(bool& any_errors, bool& any_warnings)
+bool
+QPDF::checkLinearizationInternal()
 {
     // All comments referring to the PDF spec refer to the spec for
     // version 1.4.
@@ -656,26 +648,34 @@ QPDF::checkLinearizationInternal(bool& any_errors, bool& any_warnings)
 
     // Report errors
 
-    any_errors = (! errors.empty());
-    any_warnings = (! warnings.empty());
+    bool result = true;
 
-    if (any_errors)
+    // Treat all linearization errors as warnings. Many of them occur
+    // in otherwise working files, so it's really misleading to treat
+    // them as errors. We'll hang onto the distinction in the code for
+    // now in case we ever have a chance to clean up the linearization
+    // code.
+    if (! errors.empty())
     {
+	result = false;
 	for (std::list<std::string>::iterator iter = errors.begin();
 	     iter != errors.end(); ++iter)
 	{
-	    *this->m->out_stream << "ERROR: " << (*iter) << std::endl;
+	    *this->m->out_stream << "WARNING: " << (*iter) << std::endl;
 	}
     }
 
-    if (any_warnings)
+    if (! warnings.empty())
     {
+	result = false;
 	for (std::list<std::string>::iterator iter = warnings.begin();
 	     iter != warnings.end(); ++iter)
 	{
 	    *this->m->out_stream << "WARNING: " << (*iter) << std::endl;
 	}
     }
+
+    return result;
 }
 
 qpdf_offset_t
@@ -1089,9 +1089,7 @@ QPDF::showLinearizationData()
     try
     {
 	readLinearizationData();
-        bool errors = false;
-        bool warnings = false;
-	checkLinearizationInternal(errors, warnings);
+	checkLinearizationInternal();
 	dumpLinearizationDataInternal();
     }
     catch (QPDFExc& e)

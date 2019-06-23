@@ -1321,12 +1321,12 @@ $n_tests += 3;
 $td->runtest("bounds check linearization data 1",
              {$td->COMMAND => "qpdf --check linearization-bounds-1.pdf"},
              {$td->FILE => "linearization-bounds-1.out",
-              $td->EXIT_STATUS => 2},
+              $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("bounds check linearization data 2",
              {$td->COMMAND => "qpdf --check linearization-bounds-2.pdf"},
              {$td->FILE => "linearization-bounds-2.out",
-              $td->EXIT_STATUS => 2},
+              $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 # Throws logic error, not bad_alloc
 $td->runtest("sanity check array size",
@@ -2855,7 +2855,7 @@ my @to_linearize =
      );
 
 $n_tests += @linearized_files + 6;
-$n_tests += (3 * @to_linearize * 5) + 8;
+$n_tests += (3 * @to_linearize * 5) + 6;
 
 foreach my $base (@linearized_files)
 {
@@ -2938,17 +2938,6 @@ foreach my $base (@to_linearize)
 	}
     }
 }
-
-# Verify that we get proper exit codes for files with only warnings
-$td->runtest("linearization warnings check",
-             {$td->COMMAND => "qpdf --check lin3.pdf"},
-             {$td->FILE => "lin3-check.out", $td->EXIT_STATUS => 3},
-             $td->NORMALIZE_NEWLINES);
-$td->runtest("linearization warnings check-linearization",
-             {$td->COMMAND => "qpdf --check-linearization lin3.pdf"},
-             {$td->FILE => "lin3-check-linearization.out",
-                  $td->EXIT_STATUS => 3},
-             $td->NORMALIZE_NEWLINES);
 
 show_ntests();
 # ----------
