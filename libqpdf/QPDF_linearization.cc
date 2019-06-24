@@ -2065,7 +2065,7 @@ QPDF::calculateHSharedObject(
         soe.push_back(HSharedObjectEntry());
 	soe.at(i).delta_group_length = length;
     }
-    if (soe.size() != static_cast<size_t>(cso.nshared_total))
+    if (soe.size() != QIntC::to_size(cso.nshared_total))
     {
         stopOnError("soe has wrong size after initialization");
     }
