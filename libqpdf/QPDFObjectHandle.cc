@@ -2515,7 +2515,7 @@ QPDFObjectHandle::warnIfPossible(std::string const& warning,
     }
     else if (throw_if_no_description)
     {
-        throw std::logic_error(warning);
+        throw std::runtime_error(warning);
     }
 }
 
@@ -2530,9 +2530,9 @@ QPDFObjectHandle::assertType(char const* type_name, bool istype)
 {
     if (! istype)
     {
-	throw std::logic_error(std::string("operation for ") + type_name +
-			       " attempted on object of type " +
-                               getTypeName());
+	throw std::runtime_error(std::string("operation for ") + type_name +
+                                 " attempted on object of type " +
+                                 getTypeName());
     }
 }
 
@@ -2670,7 +2670,7 @@ QPDFObjectHandle::assertPageObject()
 {
     if (! isPageObject())
     {
-	throw std::logic_error("page operation called on non-Page object");
+	throw std::runtime_error("page operation called on non-Page object");
     }
 }
 

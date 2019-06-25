@@ -166,7 +166,7 @@ QPDF::flattenPagesTree()
     // /Count has not changed
     if (pages.getKey("/Count").getUIntValue() != len)
     {
-        throw std::logic_error("/Count is wrong after flattening pages tree");
+        throw std::runtime_error("/Count is wrong after flattening pages tree");
     }
 }
 
