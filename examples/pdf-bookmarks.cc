@@ -135,16 +135,16 @@ void show_bookmark_details(QPDFOutlineObjectHelper outline,
     std::cout << outline.getTitle() << std::endl;
 }
 
-void extract_bookmarks(std::list<QPDFOutlineObjectHelper> outlines,
+void extract_bookmarks(std::vector<QPDFOutlineObjectHelper> outlines,
                        std::vector<int>& numbers)
 {
     numbers.push_back(0);
-    for (std::list<QPDFOutlineObjectHelper>::iterator iter = outlines.begin();
+    for (std::vector<QPDFOutlineObjectHelper>::iterator iter = outlines.begin();
          iter != outlines.end(); ++iter)
     {
         ++(numbers.back());
         show_bookmark_details(*iter, numbers);
-        std::list<QPDFOutlineObjectHelper>::iterator next = iter;
+        std::vector<QPDFOutlineObjectHelper>::iterator next = iter;
         ++next;
         bool has_next = (next != outlines.end());
         if ((style == st_lines) && (! has_next))

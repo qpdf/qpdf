@@ -4316,6 +4316,16 @@ print "\n";
         </listitem>
         <listitem>
          <para>
+          Change
+          <function>QPDFOutlineDocumentHelper::getTopLevelOutlines</function>
+          and <function>QPDFOutlineObjectHelper::getKids</function> to
+          return a <type>std::vector</type> instead of a
+          <type>std::list</type> of
+          <classname>QPDFOutlineObjectHelper</classname> objects.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
           When <command>qpdf --check</command> or <command>qpdf
           --check-linearization</command> encounters a file with
           linearization warnings but not errors, it now properly exits

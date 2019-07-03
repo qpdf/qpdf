@@ -1,3 +1,13 @@
+2019-07-03  Jay Berkenbilt  <ejb@ql.org>
+
+	* Non-compatible API change: change
+	QPDFOutlineDocumentHelper::getTopLevelOutlines and
+	QPDFOutlineObjectHelper::getKids to return a std::vector instead
+	of a std::list of QPDFOutlineObjectHelper objects. This is to work
+	around bugs with some compilers' STL implementations that are
+	choking with list here. There's no deep reason for these to be
+	lists instead of vectors. Fixes #297.
+
 2019-06-22  Jay Berkenbilt  <ejb@ql.org>
 
 	* Handle encrypted files with missing or invalid /Length entries

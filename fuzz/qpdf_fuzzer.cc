@@ -170,13 +170,13 @@ void
 FuzzHelper::testOutlines()
 {
     PointerHolder<QPDF> q = getQpdf();
-    std::list<std::list<QPDFOutlineObjectHelper> > queue;
+    std::list<std::vector<QPDFOutlineObjectHelper> > queue;
     QPDFOutlineDocumentHelper odh(*q);
     queue.push_back(odh.getTopLevelOutlines());
     while (! queue.empty())
     {
-        std::list<QPDFOutlineObjectHelper>& outlines = *(queue.begin());
-        for (std::list<QPDFOutlineObjectHelper>::iterator iter =
+        std::vector<QPDFOutlineObjectHelper>& outlines = *(queue.begin());
+        for (std::vector<QPDFOutlineObjectHelper>::iterator iter =
                  outlines.begin();
              iter != outlines.end(); ++iter)
         {

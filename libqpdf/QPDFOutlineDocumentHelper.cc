@@ -42,7 +42,7 @@ QPDFOutlineDocumentHelper::hasOutlines()
     return ! this->m->outlines.empty();
 }
 
-std::list<QPDFOutlineObjectHelper>
+std::vector<QPDFOutlineObjectHelper>
 QPDFOutlineDocumentHelper::getTopLevelOutlines()
 {
     return this->m->outlines;
@@ -59,19 +59,19 @@ QPDFOutlineDocumentHelper::initializeByPage()
         QPDFOutlineObjectHelper oh = queue.front();
         queue.pop_front();
         this->m->by_page[oh.getDestPage().getObjGen()].push_back(oh);
-        std::list<QPDFOutlineObjectHelper> kids = oh.getKids();
+        std::vector<QPDFOutlineObjectHelper> kids = oh.getKids();
         queue.insert(queue.end(), kids.begin(), kids.end());
     }
 }
 
-std::list<QPDFOutlineObjectHelper>
+std::vector<QPDFOutlineObjectHelper>
 QPDFOutlineDocumentHelper::getOutlinesForPage(QPDFObjGen const& og)
 {
     if (this->m->by_page.empty())
     {
         initializeByPage();
     }
-    std::list<QPDFOutlineObjectHelper> result;
+    std::vector<QPDFOutlineObjectHelper> result;
     if (this->m->by_page.count(og))
     {
         result = this->m->by_page[og];

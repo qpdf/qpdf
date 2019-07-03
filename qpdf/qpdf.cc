@@ -3493,9 +3493,9 @@ static void do_json_pages(QPDF& pdf, Options& o, JSON& j)
             "label", pldh.getLabelForPage(pageno).getJSON());
         JSON j_outlines = j_page.addDictionaryMember(
             "outlines", JSON::makeArray());
-        std::list<QPDFOutlineObjectHelper> outlines =
+        std::vector<QPDFOutlineObjectHelper> outlines =
             odh.getOutlinesForPage(page.getObjGen());
-        for (std::list<QPDFOutlineObjectHelper>::iterator oiter =
+        for (std::vector<QPDFOutlineObjectHelper>::iterator oiter =
                  outlines.begin();
              oiter != outlines.end(); ++oiter)
         {
@@ -3543,10 +3543,10 @@ static void do_json_page_labels(QPDF& pdf, Options& o, JSON& j)
 }
 
 static void add_outlines_to_json(
-    std::list<QPDFOutlineObjectHelper> outlines, JSON& j,
+    std::vector<QPDFOutlineObjectHelper> outlines, JSON& j,
     std::map<QPDFObjGen, int>& page_numbers)
 {
-    for (std::list<QPDFOutlineObjectHelper>::iterator iter = outlines.begin();
+    for (std::vector<QPDFOutlineObjectHelper>::iterator iter = outlines.begin();
          iter != outlines.end(); ++iter)
     {
         QPDFOutlineObjectHelper& ol = *iter;
