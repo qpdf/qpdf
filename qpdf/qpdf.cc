@@ -3437,9 +3437,9 @@ static void do_json_pages(QPDF& pdf, Options& o, JSON& j)
             "label", pldh.getLabelForPage(pageno).getJSON());
         JSON j_outlines = j_page.addDictionaryMember(
             "outlines", JSON::makeArray());
-        std::list<QPDFOutlineObjectHelper> outlines =
+        std::vector<QPDFOutlineObjectHelper> outlines =
             odh.getOutlinesForPage(page.getObjGen());
-        for (std::list<QPDFOutlineObjectHelper>::iterator oiter =
+        for (std::vector<QPDFOutlineObjectHelper>::iterator oiter =
                  outlines.begin();
              oiter != outlines.end(); ++oiter)
         {
@@ -3486,19 +3486,19 @@ static void do_json_page_labels(QPDF& pdf, Options& o, JSON& j)
 }
 
 static void add_outlines_to_json(
-    std::list<PointerHolder<QPDFOutlineObjectHelper> > outlines, JSON& j,
+    std::vector<QPDFOutlineObjectHelper> outlines, JSON& j,
     std::map<QPDFObjGen, int>& page_numbers)
 {
-    for (std::list<PointerHolder<QPDFOutlineObjectHelper> >::iterator iter = outlines.begin();
+    for (std::vector<QPDFOutlineObjectHelper>::iterator iter = outlines.begin();
          iter != outlines.end(); ++iter)
     {
-        PointerHolder<QPDFOutlineObjectHelper>& ol = *iter;
+        QPDFOutlineObjectHelper& ol = *iter;
         JSON jo = j.addArrayElement(JSON::makeDictionary());
-        jo.addDictionaryMember("object", ol->getObjectHandle().getJSON());
-        jo.addDictionaryMember("title", JSON::makeString(ol->getTitle()));
-        jo.addDictionaryMember("dest", ol->getDest().getJSON(true));
-        jo.addDictionaryMember("open", JSON::makeBool(ol->getCount() >= 0));
-        QPDFObjectHandle page = ol->getDestPage();
+        jo.addDictionaryMember("object", ol.getObjectHandle().getJSON());
+        jo.addDictionaryMember("title", JSON::makeString(ol.getTitle()));
+        jo.addDictionaryMember("dest", ol.getDest().getJSON(true));
+        jo.addDictionaryMember("open", JSON::makeBool(ol.getCount() >= 0));
+        QPDFObjectHandle page = ol.getDestPage();
         JSON j_destpage = JSON::makeNull();
         if (page.isIndirect())
         {
@@ -3510,7 +3510,7 @@ static void add_outlines_to_json(
         }
         jo.addDictionaryMember("destpageposfrom1", j_destpage);
         JSON j_kids = jo.addDictionaryMember("kids", JSON::makeArray());
-        add_outlines_to_json(ol->getKids(), j_kids, page_numbers);
+        add_outlines_to_json(ol.getKids(), j_kids, page_numbers);
     }
 }
 

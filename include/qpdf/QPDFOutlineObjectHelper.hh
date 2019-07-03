@@ -24,7 +24,7 @@
 
 #include <qpdf/QPDFObjectHelper.hh>
 #include <qpdf/QPDFObjGen.hh>
-#include <list>
+#include <vector>
 
 class QPDFOutlineDocumentHelper;
 
@@ -55,7 +55,7 @@ class QPDFOutlineObjectHelper: public QPDFObjectHelper
 
     // Return children as a list.
     QPDF_DLL
-    std::list<PointerHolder<QPDFOutlineObjectHelper> > getKids();
+    std::vector<QPDFOutlineObjectHelper> getKids();
 
     // Return the destination, regardless of whether it is named or
     // explicit and whether it is directly provided or in a GoTo
@@ -87,10 +87,10 @@ class QPDFOutlineObjectHelper: public QPDFObjectHelper
     {
         friend class QPDFOutlineDocumentHelper;
 
-        static PointerHolder<QPDFOutlineObjectHelper>
+        static QPDFOutlineObjectHelper
         create(QPDFObjectHandle oh, QPDFOutlineDocumentHelper& dh, int depth)
         {
-            return new QPDFOutlineObjectHelper(oh, dh, depth);
+            return QPDFOutlineObjectHelper(oh, dh, depth);
         }
     };
     friend class Accessor;
@@ -113,7 +113,7 @@ class QPDFOutlineObjectHelper: public QPDFObjectHelper
 
         QPDFOutlineDocumentHelper& dh;
         PointerHolder<QPDFOutlineObjectHelper> parent;
-        std::list<PointerHolder<QPDFOutlineObjectHelper> > kids;
+        std::vector<QPDFOutlineObjectHelper> kids;
     };
 
     PointerHolder<Members> m;
