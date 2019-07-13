@@ -10,6 +10,13 @@ Debugging:
 
 ./configure CFLAGS="-g" CXXFLAGS="-g" --enable-werror --disable-shared
 
+Profiling:
+
+./configure CFLAGS="-g -pg" CXXFLAGS="-g -pg" LDFLAGS="-pg" \
+   --enable-werror --disable-shared
+
+Then run `gprof gmon.out`. Note that gmon.out is not cumulative.
+
 Memory checks:
 
 ./configure CFLAGS="-fsanitize=address -fsanitize=undefined -g" \
