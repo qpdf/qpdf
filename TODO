@@ -55,6 +55,7 @@ Page splitting/merging
      or splitting
    * make sure conflicting named destinations work possibly test by
      including the same file by two paths in a merge
+   * see also comments in issue 343
 
    Note: original implementation of bookmark preservation for split
    pages caused a very high performance hit. The problem was
