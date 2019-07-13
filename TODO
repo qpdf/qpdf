@@ -7,18 +7,15 @@ Fuzz Errors
   * Problems inside the jpeg library: 15470, 15751, 18633
   * Timeout: 17630
 
-C++-11 (for qpdf 10)
-====================
+C++-11
+======
 
-* Consider requiring C++-11 for qpdf 10.
-
-* My c++11 branch adds autoconf tests to require C++-11 and
-  re-implements PointerHolder so that it is interchangeable with
-  std::shared_ptr. It is not actually possible to just replace
-  PointerHolder with std::shared_ptr for two reasons: there is no
-  automatic creation of std::shared_ptr<T> from T* like there is for
-  PointerHolder, which breaks some code, and also there is no
-  automatic conversion from something like
+* My c++11 branch adds re-implements PointerHolder so that it is
+  interchangeable with std::shared_ptr. It is not actually possible to
+  just replace PointerHolder with std::shared_ptr for two reasons:
+  there is no automatic creation of std::shared_ptr<T> from T* like
+  there is for PointerHolder, which breaks some code, and also there
+  is no automatic conversion from something like
   std::vector<PointerHolder<T>> to std::vector<std::shared_ptr<T>>. It
   may be a good idea to replace PointerHolder with std::shared_ptr in
   the API even if it requires some work for the developer, but even if

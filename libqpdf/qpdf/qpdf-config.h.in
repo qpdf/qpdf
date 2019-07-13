@@ -3,6 +3,9 @@
 /* Whether to avoid use of HANDLE in Windows */
 #undef AVOID_WINDOWS_HANDLE
 
+/* define if the compiler supports basic C++11 syntax */
+#undef HAVE_CXX11
+
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 

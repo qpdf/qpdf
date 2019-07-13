@@ -36,6 +36,7 @@ fi
 AC_PROG_CC
 AC_PROG_CC_C99
 AC_PROG_CXX
+AX_CXX_COMPILE_STDCXX([11], [noext], [mandatory])
 AC_HEADER_STDC
 LT_INIT([win32-dll])
 

@@ -27,9 +27,9 @@ Versions of qpdf prior to version 7 were released under the terms of version 2.0
 
 # Prerequisites
 
-QPDF depends on the external libraries [zlib](http://www.zlib.net/) and [jpeg](http://www.ijg.org/files/). The [libjpeg-turbo](https://libjpeg-turbo.org/) library is also known to work since it is compatible with the regular jpeg library, and QPDF doesn't use any interfaces that aren't present in the straight jpeg8 API. These are part of every Linux distribution and are readily available. Download information appears in the documentation. For Windows, you can download pre-built binary versions of these libraries for some compilers; see [README-windows.md](README-windows.md) for additional details.
+QPDF requires a C++ compiler that supports C++-11.
 
-QPDF requires a C++ compiler that works with STL.  Your compiler must also support `long long`.  Almost all modern compilers do.  If you are trying to port qpdf to a compiler that doesn't support `long long`, you could change all occurrences of `long long` to `long` in the source code, noting that this would break binary compatibility with other builds of qpdf.  Doing so would certainly prevent qpdf from working with files larger than 2 GB, but remaining functionality would most likely work fine.  If you built qpdf this way and it passed its test suite with large file support disabled, you could be confident that you had an otherwise working qpdf.
+QPDF depends on the external libraries [zlib](http://www.zlib.net/) and [jpeg](http://www.ijg.org/files/). The [libjpeg-turbo](https://libjpeg-turbo.org/) library is also known to work since it is compatible with the regular jpeg library, and QPDF doesn't use any interfaces that aren't present in the straight jpeg8 API. These are part of every Linux distribution and are readily available. Download information appears in the documentation. For Windows, you can download pre-built binary versions of these libraries for some compilers; see [README-windows.md](README-windows.md) for additional details.
 
 # Licensing terms of embedded software
 
