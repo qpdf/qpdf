@@ -22,7 +22,7 @@
 #ifndef POINTERHOLDER_HH
 #define POINTERHOLDER_HH
 
-// This class is basically boost::shared_pointer but predates that by
+// This class is basically std::shared_ptr but predates that by
 // several years.
 
 // This class expects to be initialized with a dynamically allocated
