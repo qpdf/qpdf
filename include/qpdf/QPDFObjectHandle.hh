@@ -275,6 +275,14 @@ class QPDFObjectHandle
     QPDF_DLL
     bool isReserved();
 
+    // True for objects that are direct nulls or have previously been
+    // resolved to be nulls. Does not attempt to resolve objects. This
+    // is intended for internal use, but it can be used as an
+    // efficient way to check for nulls if you don't mind unresolved
+    // indirect nulls being false negatives.
+    QPDF_DLL
+    bool isResolvedNull() const;
+
     // This returns true in addition to the query for the specific
     // type for indirect objects.
     QPDF_DLL
@@ -926,6 +934,7 @@ class QPDFObjectHandle
 	friend class QPDF_Dictionary;
 	friend class QPDF_Array;
         friend class QPDF_Stream;
+        friend class SparseOHArray;
       private:
 	static void releaseResolved(QPDFObjectHandle& o)
 	{

@@ -76,6 +76,7 @@ SRCS_libqpdf = \
 	libqpdf/QUtil.cc \
 	libqpdf/RC4.cc \
 	libqpdf/SecureRandomDataProvider.cc \
+	libqpdf/SparseOHArray.cc \
 	libqpdf/qpdf-c.cc \
 	libqpdf/rijndael.cc \
 	libqpdf/sha2.c \

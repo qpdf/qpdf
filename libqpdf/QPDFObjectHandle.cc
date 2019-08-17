@@ -248,6 +248,10 @@ class QPDFObjectTypeAccessor
     {
 	return (o && dynamic_cast<T*>(o));
     }
+    static bool check(QPDFObject const* o)
+    {
+	return (o && dynamic_cast<T const*>(o));
+    }
 };
 
 bool
@@ -255,6 +259,12 @@ QPDFObjectHandle::isBool()
 {
     dereference();
     return QPDFObjectTypeAccessor<QPDF_Bool>::check(m->obj.getPointer());
+}
+
+bool
+QPDFObjectHandle::isResolvedNull() const
+{
+    return QPDFObjectTypeAccessor<QPDF_Null>::check(m->obj.getPointer());
 }
 
 bool
