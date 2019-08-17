@@ -3,11 +3,10 @@ Fuzz Errors
 
 * https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=<N>
 
-* 15454: uninitialized memory error from jpeg library. Consider
-  marking the memory sanitizer is experimental in qpdf oss-fuzz
-  project because jpeg is not known to work -- see libfuzz.info or
-  google's docs for details.
-
+* Ignoring these:
+  * Problems inside the jpeg library: 15454, 15471, 15751, 15987
+  * Timeout in xref reconstruction (won't fix): 15659
+  * Out of memory: 15730
 
 Lexical
 =======
