@@ -3,9 +3,9 @@
 #include <qpdf/QIntC.hh>
 #include <stdexcept>
 
-QPDF_Array::QPDF_Array(std::vector<QPDFObjectHandle> const& items) :
-    items(items)
+QPDF_Array::QPDF_Array(std::vector<QPDFObjectHandle> const& v)
 {
+    setFromVector(v);
 }
 
 QPDF_Array::~QPDF_Array()
@@ -26,10 +26,10 @@ std::string
 QPDF_Array::unparse()
 {
     std::string result = "[ ";
-    for (std::vector<QPDFObjectHandle>::iterator iter = this->items.begin();
-	 iter != this->items.end(); ++iter)
+    size_t size = this->items.size();
+    for (size_t i = 0; i < size; ++i)
     {
-	result += (*iter).unparse();
+	result += this->items.at(i).unparse();
 	result += " ";
     }
     result += "]";
@@ -40,10 +40,10 @@ JSON
 QPDF_Array::getJSON()
 {
     JSON j = JSON::makeArray();
-    for (std::vector<QPDFObjectHandle>::iterator iter = this->items.begin();
-	 iter != this->items.end(); ++iter)
+    size_t size = this->items.size();
+    for (size_t i = 0; i < size; ++i)
     {
-        j.addArrayElement((*iter).getJSON());
+        j.addArrayElement(this->items.at(i).getJSON());
     }
     return j;
 }
@@ -85,10 +85,14 @@ QPDF_Array::getItem(int n) const
     return this->items.at(QIntC::to_size(n));
 }
 
-std::vector<QPDFObjectHandle> const&
-QPDF_Array::getAsVector() const
+void
+QPDF_Array::getAsVector(std::vector<QPDFObjectHandle>& v) const
 {
-    return this->items;
+    size_t size = this->items.size();
+    for (size_t i = 0; i < size; ++i)
+    {
+        v.push_back(this->items.at(i));
+    }
 }
 
 void
@@ -100,9 +104,14 @@ QPDF_Array::setItem(int n, QPDFObjectHandle const& oh)
 }
 
 void
-QPDF_Array::setFromVector(std::vector<QPDFObjectHandle> const& items)
+QPDF_Array::setFromVector(std::vector<QPDFObjectHandle> const& v)
 {
-    this->items = items;
+    this->items.clear();
+    for (std::vector<QPDFObjectHandle>::const_iterator iter = v.begin();
+         iter != v.end(); ++iter)
+    {
+        this->items.push_back(*iter);
+    }
 }
 
 void

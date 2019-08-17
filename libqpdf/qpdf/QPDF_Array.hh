@@ -19,7 +19,7 @@ class QPDF_Array: public QPDFObject
 
     int getNItems() const;
     QPDFObjectHandle getItem(int n) const;
-    std::vector<QPDFObjectHandle> const& getAsVector() const;
+    void getAsVector(std::vector<QPDFObjectHandle>&) const;
 
     void setItem(int, QPDFObjectHandle const&);
     void setFromVector(std::vector<QPDFObjectHandle> const& items);

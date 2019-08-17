@@ -722,7 +722,7 @@ QPDFObjectHandle::getArrayAsVector()
     std::vector<QPDFObjectHandle> result;
     if (isArray())
     {
-        result = dynamic_cast<QPDF_Array*>(m->obj.getPointer())->getAsVector();
+        dynamic_cast<QPDF_Array*>(m->obj.getPointer())->getAsVector(result);
     }
     else
     {
