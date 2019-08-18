@@ -4,6 +4,7 @@
 #include <qpdf/QPDFObject.hh>
 
 #include <vector>
+#include <list>
 #include <qpdf/SparseOHArray.hh>
 
 class QPDF_Array: public QPDFObject
@@ -28,7 +29,11 @@ class QPDF_Array: public QPDFObject
     void appendItem(QPDFObjectHandle const& item);
     void eraseItem(int at);
 
+    // Helper methods for QPDF and QPDFObjectHandle -- these are
+    // public methods since the whole class is not part of the public
+    // API. Otherwise, these would be wrapped in accessor classes.
     SparseOHArray const& getElementsForShallowCopy() const;
+    void addExplicitElementsToList(std::list<QPDFObjectHandle>&) const;
 
   protected:
     virtual void releaseResolved();

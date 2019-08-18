@@ -20,6 +20,7 @@
 #include <qpdf/QPDF_Null.hh>
 #include <qpdf/QPDF_Dictionary.hh>
 #include <qpdf/QPDF_Stream.hh>
+#include <qpdf/QPDF_Array.hh>
 
 std::string QPDF::qpdf_version = "8.4.2";
 
@@ -1349,13 +1350,10 @@ QPDF::fixDanglingReferences(bool force)
         }
         else if (obj.isArray())
         {
-            std::vector<QPDFObjectHandle> elements = obj.getArrayAsVector();
-            for (std::vector<QPDFObjectHandle>::iterator iter =
-                     elements.begin();
-                 iter != elements.end(); ++iter)
-            {
-                to_check.push_back(*iter);
-            }
+            QPDF_Array* arr =
+                dynamic_cast<QPDF_Array*>(
+                    QPDFObjectHandle::ObjAccessor::getObject(obj).getPointer());
+            arr->addExplicitElementsToList(to_check);
         }
         for (std::list<QPDFObjectHandle>::iterator iter = to_check.begin();
              iter != to_check.end(); ++iter)

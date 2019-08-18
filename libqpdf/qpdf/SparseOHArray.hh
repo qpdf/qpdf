@@ -26,6 +26,12 @@ class SparseOHArray
     QPDF_DLL
     void insert(size_t idx, QPDFObjectHandle oh);
 
+    typedef std::map<size_t, QPDFObjectHandle>::const_iterator const_iterator;
+    QPDF_DLL
+    const_iterator begin() const;
+    QPDF_DLL
+    const_iterator end() const;
+
   private:
     std::map<size_t, QPDFObjectHandle> elements;
     size_t n_elements;

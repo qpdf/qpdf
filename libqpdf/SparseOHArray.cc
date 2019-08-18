@@ -141,3 +141,15 @@ SparseOHArray::insert(size_t idx, QPDFObjectHandle oh)
         ++this->n_elements;
     }
 }
+
+SparseOHArray::const_iterator
+SparseOHArray::begin() const
+{
+    return this->elements.begin();
+}
+
+SparseOHArray::const_iterator
+SparseOHArray::end() const
+{
+    return this->elements.end();
+}
