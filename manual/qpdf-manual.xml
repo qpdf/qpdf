@@ -4482,6 +4482,14 @@ print "\n";
         </listitem>
         <listitem>
          <para>
+          The underlying implementation of QPDF arrays has been
+          enhanced to be much more memory efficient when dealing with
+          arrays with lots of nulls. This enables qpdf to use
+          drastically less memory for certain types of files.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
           A new helper method
           <function>QUtil::read_file_into_memory</function> was added.
          </para>

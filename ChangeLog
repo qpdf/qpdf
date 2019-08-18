@@ -1,3 +1,11 @@
+2019-08-17  Jay Berkenbilt  <ejb@ql.org>
+
+	* Change internal implementation of QPDF arrays to use sparse
+	arrays, which results in using much less memory for arrays with
+	large numbers of nulls. Various files have been encountered in the
+	wild that contains thousands of arrays with millions of nulls.
+	Fixes #305, #311.
+
 2019-07-03  Jay Berkenbilt  <ejb@ql.org>
 
 	* Non-compatible API change: change
