@@ -544,6 +544,10 @@ class QPDFObjectHandle
     int getArrayNItems();
     QPDF_DLL
     QPDFObjectHandle getArrayItem(int n);
+    // Note: QPDF arrays internally optimize memory for arrays
+    // containing lots of nulls. Calling getArrayAsVector may cause a
+    // lot of memory to be allocated for very large arrays with lots
+    // of nulls.
     QPDF_DLL
     std::vector<QPDFObjectHandle> getArrayAsVector();
     QPDF_DLL
@@ -932,7 +936,6 @@ class QPDFObjectHandle
     class ReleaseResolver
     {
 	friend class QPDF_Dictionary;
-	friend class QPDF_Array;
         friend class QPDF_Stream;
         friend class SparseOHArray;
       private:

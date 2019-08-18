@@ -4,12 +4,13 @@
 #include <qpdf/QPDFObject.hh>
 
 #include <vector>
-#include <qpdf/QPDFObjectHandle.hh>
+#include <qpdf/SparseOHArray.hh>
 
 class QPDF_Array: public QPDFObject
 {
   public:
     QPDF_Array(std::vector<QPDFObjectHandle> const& items);
+    QPDF_Array(SparseOHArray const& items);
     virtual ~QPDF_Array();
     virtual std::string unparse();
     virtual JSON getJSON();
@@ -31,7 +32,7 @@ class QPDF_Array: public QPDFObject
     virtual void releaseResolved();
 
   private:
-    std::vector<QPDFObjectHandle> items;
+    SparseOHArray elements;
 };
 
 #endif // QPDF_ARRAY_HH
