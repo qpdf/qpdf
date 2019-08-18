@@ -1,3 +1,10 @@
+2019-08-18  Jay Berkenbilt  <ejb@ql.org>
+
+	* When traversing the pages tree, if an invalid /Type key is
+	encountered, fix it. This is not done for all operations, but it
+	will be done for any case in which getAllPages is called. This
+	includes all page-based CLI operations. (Hopefully) Fixes #349.
+
 2019-08-17  Jay Berkenbilt  <ejb@ql.org>
 
 	* Change internal implementation of QPDF arrays to use sparse

@@ -56,12 +56,12 @@ QPDF::getAllPages()
 }
 
 void
-QPDF::getAllPagesInternal(QPDFObjectHandle cur_pages,
+QPDF::getAllPagesInternal(QPDFObjectHandle cur_node,
                           std::vector<QPDFObjectHandle>& result,
                           std::set<QPDFObjGen>& visited,
                           std::set<QPDFObjGen>& seen)
 {
-    QPDFObjGen this_og = cur_pages.getObjGen();
+    QPDFObjGen this_og = cur_node.getObjGen();
     if (visited.count(this_og) > 0)
     {
         throw QPDFExc(
@@ -70,23 +70,11 @@ QPDF::getAllPagesInternal(QPDFObjectHandle cur_pages,
             "Loop detected in /Pages structure (getAllPages)");
     }
     visited.insert(this_og);
-    std::string type;
-    QPDFObjectHandle type_key = cur_pages.getKey("/Type");
-    if (type_key.isName())
+    std::string wanted_type;
+    if (cur_node.hasKey("/Kids"))
     {
-        type = type_key.getName();
-    }
-    else if (cur_pages.hasKey("/Kids"))
-    {
-        type = "/Pages";
-    }
-    else
-    {
-        type = "/Page";
-    }
-    if (type == "/Pages")
-    {
-	QPDFObjectHandle kids = cur_pages.getKey("/Kids");
+        wanted_type = "/Pages";
+	QPDFObjectHandle kids = cur_node.getKey("/Kids");
 	int n = kids.getArrayNItems();
 	for (int i = 0; i < n; ++i)
 	{
@@ -108,17 +96,22 @@ QPDF::getAllPagesInternal(QPDFObjectHandle cur_pages,
 	    getAllPagesInternal(kid, result, visited, seen);
 	}
     }
-    else if (type == "/Page")
-    {
-        seen.insert(this_og);
-	result.push_back(cur_pages);
-    }
     else
     {
-	throw QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
-		      this->m->last_object_description,
-		      this->m->file->getLastOffset(),
-		      "invalid Type " + type + " in page tree");
+        wanted_type = "/Page";
+        seen.insert(this_og);
+	result.push_back(cur_node);
+    }
+
+    QPDFObjectHandle type_key = cur_node.getKey("/Type");
+    if (! (type_key.isName() && (type_key.getName() == wanted_type)))
+    {
+        warn(QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
+                     "page tree node",
+                     this->m->file->getLastOffset(),
+                     "/Type key should be " + wanted_type +
+                     " but is not; overriding"));
+        cur_node.replaceKey("/Type", QPDFObjectHandle::newName(wanted_type));
     }
     visited.erase(this_og);
 }

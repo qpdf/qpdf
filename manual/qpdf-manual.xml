@@ -4490,6 +4490,13 @@ print "\n";
         </listitem>
         <listitem>
          <para>
+          When traversing the pages tree, if nodes are encountered
+          with invalid types, the types are fixed, and a warning is
+          issued.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
           A new helper method
           <function>QUtil::read_file_into_memory</function> was added.
          </para>
