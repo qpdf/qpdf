@@ -2340,7 +2340,10 @@ QPDFObjectHandle::shallowCopy()
     if (isArray())
     {
 	QTC::TC("qpdf", "QPDFObjectHandle shallow copy array");
-	new_obj = newArray(getArrayAsVector());
+        // No newArray for shallow copying the sparse array
+        QPDF_Array* arr = dynamic_cast<QPDF_Array*>(m->obj.getPointer());
+        new_obj = QPDFObjectHandle(
+            new QPDF_Array(arr->getElementsForShallowCopy()));
     }
     else if (isDictionary())
     {

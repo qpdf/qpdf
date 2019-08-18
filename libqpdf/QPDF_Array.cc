@@ -136,3 +136,9 @@ QPDF_Array::eraseItem(int at)
 {
     this->elements.erase(QIntC::to_size(at));
 }
+
+SparseOHArray const&
+QPDF_Array::getElementsForShallowCopy() const
+{
+    return this->elements;
+}

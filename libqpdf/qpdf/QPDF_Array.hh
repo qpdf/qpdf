@@ -28,6 +28,8 @@ class QPDF_Array: public QPDFObject
     void appendItem(QPDFObjectHandle const& item);
     void eraseItem(int at);
 
+    SparseOHArray const& getElementsForShallowCopy() const;
+
   protected:
     virtual void releaseResolved();
 
