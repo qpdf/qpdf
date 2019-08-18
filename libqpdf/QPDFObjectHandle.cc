@@ -19,6 +19,7 @@
 #include <qpdf/BufferInputSource.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
+#include <qpdf/SparseOHArray.hh>
 
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
@@ -1715,8 +1716,8 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 
     QPDFObjectHandle object;
 
-    std::vector<std::vector<QPDFObjectHandle> > olist_stack;
-    olist_stack.push_back(std::vector<QPDFObjectHandle>());
+    std::vector<SparseOHArray> olist_stack;
+    olist_stack.push_back(SparseOHArray());
     std::vector<parser_state_e> state_stack;
     state_stack.push_back(st_top);
     std::vector<qpdf_offset_t> offset_stack;
@@ -1728,7 +1729,7 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
     while (! done)
     {
         bool bad = false;
-        std::vector<QPDFObjectHandle>& olist = olist_stack.back();
+        SparseOHArray& olist = olist_stack.back();
         parser_state_e state = state_stack.back();
         offset = offset_stack.back();
 
@@ -1828,7 +1829,7 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
             }
             else
             {
-                olist_stack.push_back(std::vector<QPDFObjectHandle>());
+                olist_stack.push_back(SparseOHArray());
                 state = st_start;
                 offset_stack.push_back(input->tell());
                 state_stack.push_back(
@@ -1883,8 +1884,8 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 			context,
 			olist.at(olist.size() - 2).getIntValueAsInt(),
 			olist.at(olist.size() - 1).getIntValueAsInt());
-		    olist.pop_back();
-		    olist.pop_back();
+		    olist.remove_last();
+		    olist.remove_last();
 		}
 		else if ((value == "endobj") && (state == st_top))
 		{
@@ -1996,7 +1997,7 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
             setObjectDescriptionFromInput(
                 object, context, object_description, input,
                 input->getLastOffset());
-            olist.push_back(object);
+            olist.append(object);
             break;
 
           case st_top:
@@ -2017,7 +2018,9 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
             state_stack.pop_back();
             if (old_state == st_array)
             {
-                object = newArray(olist);
+                // There's no newArray(SparseOHArray) since
+                // SparseOHArray is not part of the public API.
+                object = QPDFObjectHandle(new QPDF_Array(olist));
                 setObjectDescriptionFromInput(
                     object, context, object_description, input, offset);
             }
@@ -2027,13 +2030,13 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
                 // Attempt to recover more or less gracefully from
                 // invalid dictionaries.
                 std::set<std::string> names;
-                for (std::vector<QPDFObjectHandle>::iterator iter =
-                         olist.begin();
-                     iter != olist.end(); ++iter)
+                size_t n_elements = olist.size();
+                for (size_t i = 0; i < n_elements; ++i)
                 {
-                    if ((! (*iter).isIndirect()) && (*iter).isName())
+                    QPDFObjectHandle oh = olist.at(i);
+                    if ((! oh.isIndirect()) && oh.isName())
                     {
-                        names.insert((*iter).getName());
+                        names.insert(oh.getName());
                     }
                 }
 
@@ -2097,7 +2100,7 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
             }
             else
             {
-                olist_stack.back().push_back(object);
+                olist_stack.back().append(object);
             }
         }
     }
