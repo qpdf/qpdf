@@ -374,10 +374,6 @@ QPDF::parse(char const* password)
         // version 1.2 for /FlateDecode
         this->m->pdf_version = "1.2";
     }
-    if (atof(this->m->pdf_version.c_str()) < 1.2)
-    {
-        this->m->tokenizer.allowPoundAnywhereInName();
-    }
 
     // PDF spec says %%EOF must be found within the last 1024 bytes of
     // the file.  We add an extra 30 characters to leave room for the

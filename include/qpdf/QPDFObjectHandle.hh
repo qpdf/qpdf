@@ -1039,7 +1039,8 @@ class QPDFObjectHandle
     static void parseContentStream_data(
         PointerHolder<Buffer>,
         std::string const& description,
-        ParserCallbacks* callbacks);
+        ParserCallbacks* callbacks,
+        QPDF* context);
     std::vector<QPDFObjectHandle> arrayOrStreamToStreamArray(
         std::string const& description, std::string& all_description);
     static void warn(QPDF*, QPDFExc const&);

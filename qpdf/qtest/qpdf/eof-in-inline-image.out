@@ -22,4 +22,6 @@ name: /Fl
 name: /DP
 dictionary: << /Columns 1 /Predictor 15 >>
 operator: ID
-page object 3 0 stream 4 0 (stream data, offset 139): EOF found while reading inline image
+WARNING: page object 3 0 stream 4 0 (stream data, offset 139): EOF found while reading inline image
+-EOF-
+test 37 done

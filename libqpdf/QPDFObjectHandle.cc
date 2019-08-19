@@ -1616,7 +1616,8 @@ QPDFObjectHandle::parseContentStream_internal(
     PointerHolder<Buffer> stream_data = buf.getBuffer();
     try
     {
-        parseContentStream_data(stream_data, all_description, callbacks);
+        parseContentStream_data(stream_data, all_description,
+                                callbacks, getOwningQPDF());
     }
     catch (TerminateParsing&)
     {
@@ -1629,7 +1630,8 @@ void
 QPDFObjectHandle::parseContentStream_data(
     PointerHolder<Buffer> stream_data,
     std::string const& description,
-    ParserCallbacks* callbacks)
+    ParserCallbacks* callbacks,
+    QPDF* context)
 {
     size_t length = stream_data->getSize();
     PointerHolder<InputSource> input =
@@ -1640,7 +1642,8 @@ QPDFObjectHandle::parseContentStream_data(
     while (QIntC::to_size(input->tell()) < length)
     {
         QPDFObjectHandle obj =
-            parseInternal(input, "content", tokenizer, empty, 0, 0, true);
+            parseInternal(input, "content", tokenizer,
+                          empty, 0, context, true);
         if (! obj.isInitialized())
         {
             // EOF
@@ -1660,9 +1663,10 @@ QPDFObjectHandle::parseContentStream_data(
             if (t.getType() == QPDFTokenizer::tt_bad)
             {
                 QTC::TC("qpdf", "QPDFObjectHandle EOF in inline image");
-                throw QPDFExc(qpdf_e_damaged_pdf, input->getName(),
-                              "stream data", input->tell(),
-                              "EOF found while reading inline image");
+                warn(context,
+                     QPDFExc(qpdf_e_damaged_pdf, input->getName(),
+                             "stream data", input->tell(),
+                             "EOF found while reading inline image"));
             }
             else
             {
@@ -1737,6 +1741,16 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 
 	QPDFTokenizer::Token token =
             tokenizer.readToken(input, object_description, true);
+        std::string const& token_error_message = token.getErrorMessage();
+        if (! token_error_message.empty())
+        {
+            // Tokens other than tt_bad can still generate warnings.
+            warn(context,
+                 QPDFExc(qpdf_e_damaged_pdf, input->getName(),
+                         object_description,
+                         input->getLastOffset(),
+                         token_error_message));
+        }
 
 	switch (token.getType())
 	{
@@ -1756,11 +1770,6 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 
           case QPDFTokenizer::tt_bad:
 	    QTC::TC("qpdf", "QPDFObjectHandle bad token in parse");
-            warn(context,
-                 QPDFExc(qpdf_e_damaged_pdf, input->getName(),
-                         object_description,
-                         input->getLastOffset(),
-                         token.getErrorMessage()));
             bad = true;
             object = newNull();
 	    break;

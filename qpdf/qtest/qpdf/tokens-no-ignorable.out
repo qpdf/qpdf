@@ -349,7 +349,7 @@ skipping to endstream
 242: bad: ) (unexpected ))
 243: bad: > (unexpected >)
 244: word: quack
-250: bad: /name#oops (invalid name token)
+250: name: /name\x00oops (raw: /name#oops) (invalid name token)
 261: name: /name (raw: /n#61me)
 269: word: one
 273: bool: true

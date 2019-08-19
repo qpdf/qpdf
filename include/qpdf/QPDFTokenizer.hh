@@ -106,14 +106,6 @@ class QPDFTokenizer
     QPDF_DLL
     QPDFTokenizer();
 
-    // PDF files with version < 1.2 allowed the pound character
-    // anywhere in a name.  Starting with version 1.2, the pound
-    // character was allowed only when followed by two hexadecimal
-    // digits.  This method should be called when parsing a PDF file
-    // whose version is older than 1.2.
-    QPDF_DLL
-    void allowPoundAnywhereInName();
-
     // If called, treat EOF as a separate token type instead of an
     // error.  This was introduced in QPDF 4.1 to facilitate
     // tokenizing content streams.
@@ -221,7 +213,6 @@ class QPDFTokenizer
         // Lexer state
         state_e state;
 
-        bool pound_special_in_name;
         bool allow_eof;
         bool include_ignorable;
 

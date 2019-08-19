@@ -1,3 +1,30 @@
+2019-08-19  Jay Berkenbilt  <ejb@ql.org>
+
+	* Properly handle name tokens containing # not preceding two
+	hexadecimal digits. Such names are invalid in PDF >= 1.2 but valid
+	in PDF 1.0 and 1.1. Prior to this fix, qpdf's behavior was to
+	treat such tokens as an error for PDF >= 1.2, but for older PDF
+	tokens, the name was silently accepted, and when the name token
+	was written out, the # was changed to #23, which is the correct
+	way to represent a # character. This behavior was problematic for
+	several reasons: one is that, ordinarily, content streams are not
+	parsed, so this would cause things like image references whose
+	names contained # to break. Also, even if the input file was 1.0
+	or 1.1, there's no guarantee that the output file wouldn't be
+	written at a new version, resulting in invalid name tokens. The
+	new behavior is to issue a warning upon encountering such a token
+	but to accept it, regardless of the PDF version. Such tokens are
+	written out properly as well. Additionally, the warning message
+	indicates that the tokens are invalid for PDF >= 1.2. Fixes #332.
+
+	* Non-compatible API change: remove
+	QPDFTokenizer::allowPoundAnywhereInName(). There were a lot of
+	problems with this. When it was used, any name tokens read would
+	always be modified on output, which is never the correct behavior.
+	This method used to signal QPDFTokenizer to not treat # specially
+	in name tokens, which resulted in the incorrect behavior whose fix
+	is described in the preceding item.
+
 2019-08-18  Jay Berkenbilt  <ejb@ql.org>
 
 	* When traversing the pages tree, if an invalid /Type key is

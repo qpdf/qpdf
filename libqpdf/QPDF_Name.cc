@@ -22,11 +22,17 @@ QPDF_Name::normalizeName(std::string const& name)
     }
     std::string result;
     result += name.at(0);
-    for (unsigned int i = 1; i < name.length(); ++i)
+    for (size_t i = 1; i < name.length(); ++i)
     {
 	char ch = name.at(i);
 	// Don't use locale/ctype here; follow PDF spec guidelines.
-	if (strchr("#()<>[]{}/%", ch) || (ch < 33) || (ch > 126))
+        if (ch == '\0')
+        {
+            // QPDFTokenizer embeds a null character to encode an
+            // invalid #.
+            result += "#";
+        }
+	else if (strchr("#()<>[]{}/%", ch) || (ch < 33) || (ch > 126))
 	{
             result += "#" + QUtil::hex_encode(std::string(&ch, 1));
 	}

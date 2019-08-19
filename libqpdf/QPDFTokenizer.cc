@@ -78,7 +78,6 @@ QPDFWordTokenFinder::check()
 }
 
 QPDFTokenizer::Members::Members() :
-    pound_special_in_name(true),
     allow_eof(false),
     include_ignorable(false)
 {
@@ -129,13 +128,6 @@ QPDFTokenizer::QPDFTokenizer() :
 }
 
 void
-QPDFTokenizer::allowPoundAnywhereInName()
-{
-    QTC::TC("qpdf", "QPDFTokenizer allow pound anywhere in name");
-    this->m->pound_special_in_name = false;
-}
-
-void
 QPDFTokenizer::allowEOF()
 {
     this->m->allow_eof = true;
@@ -169,17 +161,19 @@ QPDFTokenizer::resolveLiteral()
         // valid name, so don't strip leading /.  That way we
         // don't have to deal with the empty string as a name.
         std::string nval = "/";
-        char const* valstr = this->m->val.c_str() + 1;
-        for (char const* p = valstr; *p; ++p)
+        size_t len = this->m->val.length();
+        for (size_t i = 1; i < len; ++i)
         {
-            if ((*p == '#') && this->m->pound_special_in_name)
+            char ch = this->m->val.at(i);
+            if (ch == '#')
             {
-                if (p[1] && p[2] &&
-                    QUtil::is_hex_digit(p[1]) && QUtil::is_hex_digit(p[2]))
+                if ((i + 2 < len) &&
+                    QUtil::is_hex_digit(this->m->val.at(i+1)) &&
+                    QUtil::is_hex_digit(this->m->val.at(i+2)))
                 {
                     char num[3];
-                    num[0] = p[1];
-                    num[1] = p[2];
+                    num[0] = this->m->val.at(i+1);
+                    num[1] = this->m->val.at(i+2);
                     num[2] = '\0';
                     char ch = static_cast<char>(strtol(num, 0, 16));
                     if (ch == '\0')
@@ -192,21 +186,22 @@ QPDFTokenizer::resolveLiteral()
                     }
                     else
                     {
-                        nval += ch;
+                        nval.append(1, ch);
                     }
-                    p += 2;
+                    i += 2;
                 }
                 else
                 {
                     QTC::TC("qpdf", "QPDFTokenizer bad name");
-                    this->m->type = tt_bad;
                     this->m->error_message = "invalid name token";
-                    nval += *p;
+                    // Use null to encode a bad # -- this is reversed
+                    // in QPDF_Name::normalizeName.
+                    nval += '\0';
                 }
             }
             else
             {
-                nval += *p;
+                nval.append(1, ch);
             }
         }
         this->m->val = nval;

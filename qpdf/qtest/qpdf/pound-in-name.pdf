@@ -74,6 +74,13 @@ trailer <<
   /Size 7
   /Root 1 0 R
   /QTest /#
+  /Other#20Tests <<
+    /## 1
+    /#20# 2
+    /#40 3
+    /a#b [ 4 /##00## /Som#ething ]
+    /Som#ething (else)
+  >>
 >>
 
 startxref

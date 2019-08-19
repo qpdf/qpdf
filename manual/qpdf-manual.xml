@@ -4326,6 +4326,15 @@ print "\n";
         </listitem>
         <listitem>
          <para>
+          Remove method
+          <function>QPDFTokenizer::allowPoundAnywhereInName</function>.
+          This function would allow creation of name tokens whose
+          value would change when unparsed, which is never the correct
+          behavior.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
           When <command>qpdf --check</command> or <command>qpdf
           --check-linearization</command> encounters a file with
           linearization warnings but not errors, it now properly exits
@@ -4506,6 +4515,17 @@ print "\n";
           All conditions previously reported by
           <function>QPDF::checkLinearization()</function> as errors
           are now presented as warnings.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Name tokens containing the <literal>#</literal> character
+          not preceded by two hexadecimal digits, which is invalid in
+          PDF 1.2 and above, are properly handled by the library: a
+          warning is generated, and the name token is properly
+          preserved, even if invalid, in the output. See
+          <filename>ChangeLog</filename> for a more complete
+          description of this change.
          </para>
         </listitem>
        </itemizedlist>

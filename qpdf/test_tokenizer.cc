@@ -171,7 +171,7 @@ dump_tokens(PointerHolder<InputSource> is, std::string const& label,
                 std::cout << " (raw: " << sanitize(token.getRawValue()) << ")";
             }
         }
-        if (token.getType() == QPDFTokenizer::tt_bad)
+        if (! token.getErrorMessage().empty())
         {
             std::cout << " (" << token.getErrorMessage() << ")";
         }
