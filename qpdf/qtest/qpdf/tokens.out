@@ -705,7 +705,7 @@ skipping to endstream
 243: bad: > (unexpected >)
 244: word: quack
 249: space:  
-250: name: /name\x00oops (raw: /name#oops) (invalid name token)
+250: name: /name\x00oops (raw: /name#oops) (name with stray # will not work with PDF >= 1.2)
 260: space:  
 261: name: /name (raw: /n#61me)
 268: space:  

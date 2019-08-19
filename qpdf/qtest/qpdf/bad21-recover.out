@@ -1,4 +1,4 @@
-WARNING: bad21.pdf (trailer, offset 742): invalid name token
+WARNING: bad21.pdf (trailer, offset 742): name with stray # will not work with PDF >= 1.2
 /QTest is implicit
 /QTest is direct and has type null (2)
 /QTest is null

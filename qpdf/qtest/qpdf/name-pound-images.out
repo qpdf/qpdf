@@ -2,7 +2,7 @@ checking name-pound-images.pdf
 PDF Version: 1.0
 File is not encrypted
 File is not linearized
-WARNING: name-pound-images.pdf (object 3 0, offset 471): invalid name token
-WARNING: name-pound-images.pdf (object 3 0, offset 508): invalid name token
-WARNING: page object 3 0 stream 4 0 (content, offset 59): invalid name token
-WARNING: page object 3 0 stream 4 0 (content, offset 131): invalid name token
+WARNING: name-pound-images.pdf (object 3 0, offset 471): name with stray # will not work with PDF >= 1.2
+WARNING: name-pound-images.pdf (object 3 0, offset 508): name with stray # will not work with PDF >= 1.2
+WARNING: page object 3 0 stream 4 0 (content, offset 59): name with stray # will not work with PDF >= 1.2
+WARNING: page object 3 0 stream 4 0 (content, offset 131): name with stray # will not work with PDF >= 1.2

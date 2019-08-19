@@ -193,7 +193,8 @@ QPDFTokenizer::resolveLiteral()
                 else
                 {
                     QTC::TC("qpdf", "QPDFTokenizer bad name");
-                    this->m->error_message = "invalid name token";
+                    this->m->error_message =
+                        "name with stray # will not work with PDF >= 1.2";
                     // Use null to encode a bad # -- this is reversed
                     // in QPDF_Name::normalizeName.
                     nval += '\0';
