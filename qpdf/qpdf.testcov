@@ -275,7 +275,6 @@ QPDFObjectHandle no val for last key 0
 QPDF resolve failure to null 0
 QPDFWriter preserve unreferenced standard 0
 QPDFObjectHandle errors in parsecontent 0
-QPDF stream with non-space 0
 qpdf same file error 0
 qpdf read args from stdin 0
 qpdf read args from file 0

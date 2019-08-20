@@ -1477,8 +1477,13 @@ QPDF::readObject(PointerHolder<InputSource> input,
             // stream data.  However, some readers, including
             // Adobe reader, accept a carriage return by itself
             // when followed by a non-newline character, so that's
-            // what we do here.
+            // what we do here. We have also seen files that have
+            // extraneous whitespace between the stream keyword and
+            // the newline.
+            bool done = false;
+            while (! done)
             {
+                done = true;
                 char ch;
                 if (input->read(&ch, 1) == 0)
                 {
@@ -1519,14 +1524,21 @@ QPDF::readObject(PointerHolder<InputSource> input,
                         }
                     }
                 }
+                else if (QUtil::is_space(ch))
+                {
+                    warn(QPDFExc(
+                             qpdf_e_damaged_pdf,
+                             input->getName(),
+                             this->m->last_object_description,
+                             input->tell(),
+                             "stream keyword followed by"
+                             " extraneous whitespace"));
+                    done = false;
+                }
                 else
                 {
                     QTC::TC("qpdf", "QPDF stream without newline");
-                    if (! QUtil::is_space(ch))
-                    {
-                        QTC::TC("qpdf", "QPDF stream with non-space");
-                        input->unreadCh(ch);
-                    }
+                    input->unreadCh(ch);
                     warn(QPDFExc(qpdf_e_damaged_pdf, input->getName(),
                                  this->m->last_object_description,
                                  input->tell(),

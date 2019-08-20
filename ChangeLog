@@ -1,5 +1,8 @@
 2019-08-19  Jay Berkenbilt  <ejb@ql.org>
 
+	* Accept (and warn for) extraneous whitespace between the stream
+	keyword and newline. Fixes #329.
+
 	* Properly handle name tokens containing # not preceding two
 	hexadecimal digits. Such names are invalid in PDF >= 1.2 but valid
 	in PDF 1.0 and 1.1. Prior to this fix, qpdf's behavior was to

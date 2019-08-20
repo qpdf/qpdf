@@ -1,4 +1,6 @@
-WARNING: stream-line-enders.pdf (object 5 0, offset 384): stream keyword followed by carriage return only
-WARNING: stream-line-enders.pdf (object 6 0, offset 443): stream keyword not followed by proper line terminator
-WARNING: stream-line-enders.pdf (object 7 0, offset 503): stream keyword not followed by proper line terminator
+WARNING: stream-line-enders.pdf (object 5 0, offset 391): stream keyword followed by carriage return only
+WARNING: stream-line-enders.pdf (object 6 0, offset 450): stream keyword followed by extraneous whitespace
+WARNING: stream-line-enders.pdf (object 6 0, offset 450): stream keyword not followed by proper line terminator
+WARNING: stream-line-enders.pdf (object 7 0, offset 509): stream keyword not followed by proper line terminator
+WARNING: stream-line-enders.pdf (object 8 0, offset 567): stream keyword followed by extraneous whitespace
 qpdf: operation succeeded with warnings; resulting file may have some problems
