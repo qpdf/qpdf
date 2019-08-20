@@ -570,6 +570,37 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
         char buf[7];
         memset(buf, 0, sizeof(buf));
 	this->m->file->seek(xref_offset, SEEK_SET);
+        // Some files miss the mark a little with startxref. We could
+        // do a better job of searching in the neighborhood for
+        // something that looks like either an xref table or stream,
+        // but the simple heuristic of skipping whitespace can help
+        // with the xref table case and is harmless with the stream
+        // case.
+        bool done = false;
+        bool skipped_space = false;
+        while (! done)
+        {
+            char ch;
+            if (1 == this->m->file->read(&ch, 1))
+            {
+                if (QUtil::is_space(ch))
+                {
+                    skipped_space = true;
+                }
+                else
+                {
+                    this->m->file->unreadCh(ch);
+                    done = true;
+                }
+            }
+            else
+            {
+                QTC::TC("qpdf", "QPDF eof skipping spaces before xref",
+                        skipped_space ? 0 : 1);
+                done = true;
+            }
+        }
+
 	this->m->file->read(buf, sizeof(buf) - 1);
         // The PDF spec says xref must be followed by a line
         // terminator, but files exist in the wild where it is
@@ -577,6 +608,13 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
         if ((strncmp(buf, "xref", 4) == 0) &&
             QUtil::is_space(buf[4]))
 	{
+            if (skipped_space)
+            {
+                QTC::TC("qpdf", "QPDF xref skipped space");
+                warn(QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
+                             "", 0,
+                             "extraneous whitespace seen before xref"));
+            }
             QTC::TC("qpdf", "QPDF xref space",
                     ((buf[4] == '\n') ? 0 :
                      (buf[4] == '\r') ? 1 :

@@ -1,5 +1,8 @@
 2019-08-19  Jay Berkenbilt  <ejb@ql.org>
 
+	* Accept (and warn for) extraneous whitespace preceding the xref
+	table. Fixes #341.
+
 	* Accept (and warn for) extraneous whitespace between the stream
 	keyword and newline. Fixes #329.
 

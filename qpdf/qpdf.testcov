@@ -441,3 +441,5 @@ QPDFObjectHandle int returning INT_MIN 0
 QPDFObjectHandle int returning INT_MAX 0
 QPDFObjectHandle uint returning UINT_MAX 0
 QPDFObjectHandle uint uint returning 0 0
+QPDF xref skipped space 0
+QPDF eof skipping spaces before xref 1

@@ -2291,6 +2291,8 @@ my @badfiles = ("not a PDF file", 			# 1
 		"obj/gen in wrong place",		# 34
 		"object stream of wrong type",		# 35
                 "bad dictionary key",                   # 36
+                "space before xref",                    # 37
+                "startxref to space then eof",          # 38
 		);
 
 $n_tests += @badfiles + 6;
@@ -2301,7 +2303,7 @@ $n_tests += @badfiles + 6;
 # have error conditions that used to be fatal but are now considered
 # non-fatal.
 my %badtest_overrides = ();
-for(6, 12..15, 17, 18..32, 34, 36)
+for(6, 12..15, 17, 18..32, 34, 36..37)
 {
     $badtest_overrides{$_} = 0;
 }
