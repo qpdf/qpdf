@@ -1714,7 +1714,11 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
     // This method must take care not to resolve any objects. Don't
     // check the type of any object without first ensuring that it is
     // a direct object. Otherwise, doing so may have the side effect
-    // of reading the object and changing the file pointer.
+    // of reading the object and changing the file pointer. If you do
+    // this, it will cause a logic error to be thrown from
+    // QPDF::inParse().
+
+    QPDF::ParseGuard pg(context);
 
     empty = false;
 

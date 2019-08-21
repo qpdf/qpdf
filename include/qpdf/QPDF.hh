@@ -657,6 +657,31 @@ class QPDF
     };
     friend class Warner;
 
+    // ParseGuard class allows QPDFObjectHandle to detect re-entrant
+    // resolution
+    class ParseGuard
+    {
+	friend class QPDFObjectHandle;
+      private:
+        ParseGuard(QPDF* qpdf) :
+            qpdf(qpdf)
+        {
+            if (qpdf)
+            {
+                qpdf->inParse(true);
+            }
+        }
+        ~ParseGuard()
+        {
+            if (qpdf)
+            {
+                qpdf->inParse(false);
+            }
+        }
+        QPDF* qpdf;
+    };
+    friend class ParseGuard;
+
     // Pipe class is restricted to QPDF_Stream
     class Pipe
     {
@@ -816,6 +841,7 @@ class QPDF
     friend class ResolveRecorder;
 
     void parse(char const* password);
+    void inParse(bool);
     void warn(QPDFExc const& e);
     void setTrailer(QPDFObjectHandle obj);
     void read_xref(qpdf_offset_t offset);
@@ -1352,6 +1378,7 @@ class QPDF
         bool reconstructed_xref;
         bool fixed_dangling_refs;
         bool immediate_copy_from;
+        bool in_parse;
 
         // Linearization data
         qpdf_offset_t first_xref_item_offset; // actual value from file

@@ -150,6 +150,7 @@ QPDF::Members::Members() :
     reconstructed_xref(false),
     fixed_dangling_refs(false),
     immediate_copy_from(false),
+    in_parse(false),
     first_xref_item_offset(0),
     uncompressed_after_compressed(false)
 {
@@ -414,6 +415,20 @@ QPDF::parse(char const* password)
 
     initializeEncryption();
     findAttachmentStreams();
+}
+
+void
+QPDF::inParse(bool v)
+{
+    if (this->m->in_parse == v)
+    {
+        // This happens of QPDFObjectHandle::parseInternal tries to
+        // resolve an indirect object while it is parsing.
+        throw std::logic_error(
+            "QPDF: re-entrant parsing detected. This is a qpdf bug."
+            " Please report at https://github.com/qpdf/qpdf/issues.");
+    }
+    this->m->in_parse = v;
 }
 
 void
