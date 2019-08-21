@@ -98,7 +98,13 @@ class QPDFObjectHandle
     // for being written to output, or calling writeToken with a
     // string token will also work. The correct way to construct a
     // string token that would write the literal value (str) is
-    // QPDFTokenizer::Token(QPDFTokenizer::tt_string, "str").
+    // QPDFTokenizer::Token(QPDFTokenizer::tt_string, "str"). A
+    // similar situation exists with tt_name. token.getValue() returns
+    // a normalized name with # codes resolved into characters, and
+    // may not be suitable for writing. You can pass it to
+    // QPDF_Name::normalizeName first, or you can use writeToken with
+    // a name token. The correct way to create a name token is
+    // QPDFTokenizer::Token(QPDFTokenizer::tt_name, "/Name").
     class QPDF_DLL_CLASS TokenFilter
     {
       public:
