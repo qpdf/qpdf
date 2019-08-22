@@ -27,7 +27,6 @@ QPDF lin outlines in part 1
 QPDF lin nshared_total > nshared_first_page 1
 QPDF lin part 8 empty 1
 QPDF lin check shared past first page 0
-QPDFWriter flatten array null 0
 main QTest implicit 0
 main QTest indirect 1
 main QTest null 0

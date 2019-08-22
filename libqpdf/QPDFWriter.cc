@@ -2390,13 +2390,7 @@ QPDFWriter::prepareFileForWrite()
 	    for (int i = 0; i < nitems; ++i)
 	    {
 		QPDFObjectHandle oh = node.getArrayItem(i);
-                if (oh.isIndirect() && oh.isNull())
-                {
-                    QTC::TC("qpdf", "QPDFWriter flatten array null");
-                    oh.makeDirect();
-                    node.setArrayItem(i, oh);
-                }
-		else if (! oh.isScalar())
+                if (! oh.isScalar())
 		{
 		    queue.push_back(oh);
 		}

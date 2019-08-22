@@ -1,3 +1,8 @@
+2019-08-22  Jay Berkenbilt  <ejb@ql.org>
+
+	* Stop replacing indirect references to null with literal null in
+	arrays when writing output with QPDFWriter.
+
 2019-08-19  Jay Berkenbilt  <ejb@ql.org>
 
 	* Accept (and warn for) extraneous whitespace preceding the xref
