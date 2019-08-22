@@ -1,86 +1,88 @@
-name: /potato
+content size: 44
+name, offset=0, length=7: /potato
 test suite: terminating parsing
-real: 0.1
-integer: 0
-integer: 0
-real: 0.1
-integer: 0
-integer: 0
-operator: cm
-operator: q
-integer: 0
-real: 1.1999
-real: -1.1999
-integer: 0
-real: 121.19
-real: 150.009
-operator: cm
-operator: BI
-name: /CS
-name: /G
-name: /W
-integer: 1
-name: /H
-integer: 1
-name: /BPC
-integer: 8
-name: /F
-name: /Fl
-name: /DP
-dictionary: << /Columns 1 /Predictor 15 >>
-operator: ID
-inline-image: 789c63fc0f00010301010a
-operator: EI
-operator: Q
-operator: q
-integer: 0
-real: 35.997
-real: -128.389
-integer: 0
-real: 431.964
-real: 7269.02
-operator: cm
-operator: BI
-name: /CS
-name: /G
-name: /W
-integer: 30
-name: /H
-integer: 107
-name: /BPC
-integer: 8
-name: /F
-name: /Fl
-name: /DP
-dictionary: << /Columns 30 /Predictor 15 >>
-operator: ID
-inline-image: 789cedd1a11100300800b1b2ffd06503148283bc8dfcf8af2a306ee352eff2e06318638c31c63b3801627b620a0a
-operator: EI
-operator: Q
-operator: q
-integer: 0
-real: 38.3968
-real: -93.5922
-integer: 0
-real: 431.964
-real: 7567.79
-operator: cm
-operator: BI
-name: /CS
-name: /G
-name: /W
-integer: 32
-name: /H
-integer: 78
-name: /BPC
-integer: 8
-name: /F
-name: /Fl
-name: /DP
-dictionary: << /Columns 32 /Predictor 15 >>
-operator: ID
-inline-image: 789c63fccf801f308e2a185530aa60882a20203faa605401890a0643aa1e5530aa6054010d140000bdd03c130a
-operator: EI
-operator: Q
+content size: 454
+real, offset=0, length=3: 0.1
+integer, offset=4, length=1: 0
+integer, offset=6, length=1: 0
+real, offset=8, length=3: 0.1
+integer, offset=12, length=1: 0
+integer, offset=14, length=1: 0
+operator, offset=16, length=2: cm
+operator, offset=19, length=1: q
+integer, offset=21, length=1: 0
+real, offset=23, length=6: 1.1999
+real, offset=30, length=7: -1.1999
+integer, offset=38, length=2: 0
+real, offset=41, length=6: 121.19
+real, offset=48, length=7: 150.009
+operator, offset=56, length=2: cm
+operator, offset=59, length=2: BI
+name, offset=62, length=3: /CS
+name, offset=66, length=2: /G
+name, offset=68, length=2: /W
+integer, offset=71, length=1: 1
+name, offset=72, length=2: /H
+integer, offset=75, length=1: 1
+name, offset=76, length=4: /BPC
+integer, offset=81, length=1: 8
+name, offset=82, length=2: /F
+name, offset=84, length=3: /Fl
+name, offset=87, length=3: /DP
+dictionary, offset=90, length=27: << /Columns 1 /Predictor 15 >>
+operator, offset=118, length=2: ID
+inline-image, offset=121, length=11: 789c63fc0f00010301010a
+operator, offset=132, length=2: EI
+operator, offset=135, length=1: Q
+operator, offset=137, length=1: q
+integer, offset=139, length=1: 0
+real, offset=141, length=6: 35.997
+real, offset=148, length=8: -128.389
+integer, offset=157, length=2: 0
+real, offset=160, length=7: 431.964
+real, offset=168, length=7: 7269.02
+operator, offset=176, length=2: cm
+operator, offset=179, length=2: BI
+name, offset=182, length=3: /CS
+name, offset=186, length=2: /G
+name, offset=188, length=2: /W
+integer, offset=191, length=2: 30
+name, offset=193, length=2: /H
+integer, offset=196, length=3: 107
+name, offset=199, length=4: /BPC
+integer, offset=204, length=1: 8
+name, offset=205, length=2: /F
+name, offset=207, length=3: /Fl
+name, offset=210, length=3: /DP
+dictionary, offset=213, length=28: << /Columns 30 /Predictor 15 >>
+operator, offset=242, length=2: ID
+inline-image, offset=245, length=46: 789cedd1a11100300800b1b2ffd06503148283bc8dfcf8af2a306ee352eff2e06318638c31c63b3801627b620a0a
+operator, offset=291, length=2: EI
+operator, offset=294, length=1: Q
+operator, offset=296, length=1: q
+integer, offset=298, length=1: 0
+real, offset=300, length=7: 38.3968
+real, offset=308, length=8: -93.5922
+integer, offset=317, length=2: 0
+real, offset=320, length=7: 431.964
+real, offset=328, length=7: 7567.79
+operator, offset=336, length=2: cm
+operator, offset=339, length=2: BI
+name, offset=342, length=3: /CS
+name, offset=346, length=2: /G
+name, offset=348, length=2: /W
+integer, offset=351, length=2: 32
+name, offset=353, length=2: /H
+integer, offset=356, length=2: 78
+name, offset=358, length=4: /BPC
+integer, offset=363, length=1: 8
+name, offset=364, length=2: /F
+name, offset=366, length=3: /Fl
+name, offset=369, length=3: /DP
+dictionary, offset=372, length=28: << /Columns 32 /Predictor 15 >>
+operator, offset=401, length=2: ID
+inline-image, offset=404, length=45: 789c63fccf801f308e2a185530aa60882a20203faa605401890a0643aa1e5530aa6054010d140000bdd03c130a
+operator, offset=449, length=2: EI
+operator, offset=452, length=1: Q
 -EOF-
 test 37 done

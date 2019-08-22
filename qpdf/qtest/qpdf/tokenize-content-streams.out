@@ -1,95 +1,100 @@
-operator: BT
-name: /F1
-integer: 24
-operator: Tf
-integer: 72
-integer: 720
-operator: Td
-string: (Potato)
-operator: Tj
-operator: ET
+content size: 44
+operator, offset=0, length=2: BT
+name, offset=5, length=3: /F1
+integer, offset=9, length=2: 24
+operator, offset=12, length=2: Tf
+integer, offset=17, length=2: 72
+integer, offset=20, length=3: 720
+operator, offset=24, length=2: Td
+string, offset=29, length=8: (Potato)
+operator, offset=38, length=2: Tj
+operator, offset=41, length=2: ET
 -EOF-
-real: 0.1
-integer: 0
-integer: 0
-real: 0.1
-integer: 0
-integer: 0
-operator: cm
-operator: q
-integer: 0
-real: 1.1999
-real: -1.1999
-integer: 0
-real: 121.19
-real: 150.009
-operator: cm
-operator: BI
-name: /CS
-name: /G
-name: /W
-integer: 1
-name: /H
-integer: 1
-name: /BPC
-integer: 8
-name: /F
-name: /Fl
-name: /DP
-dictionary: << /Columns 1 /Predictor 15 >>
-operator: ID
-inline-image: 789c63fc0f00010301010a
-operator: EI
-operator: Q
-operator: q
-integer: 0
-real: 35.997
-real: -128.389
-integer: 0
-real: 431.964
-real: 7269.02
-operator: cm
-operator: BI
-name: /CS
-name: /G
-name: /W
-integer: 30
-name: /H
-integer: 107
-name: /BPC
-integer: 8
-name: /F
-name: /Fl
-name: /DP
-dictionary: << /Columns 30 /Predictor 15 >>
-operator: ID
-inline-image: 789cedd1a11100300800b1b2ffd06503148283bc8dfcf8af2a306ee352eff2e06318638c31c63b3801627b620a0a
-operator: EI
-operator: Q
-operator: q
-integer: 0
-real: 38.3968
-real: -93.5922
-integer: 0
-real: 431.964
-real: 7567.79
-operator: cm
-operator: BI
-name: /CS
-name: /G
-name: /W
-integer: 32
-name: /H
-integer: 78
-name: /BPC
-integer: 8
-name: /F
-name: /Fl
-name: /DP
-dictionary: << /Columns 32 /Predictor 15 >>
-operator: ID
-inline-image: 789c63fccf801f308e2a185530aa60882a20203faa605401890a0643aa1e5530aa6054010d140000bdd03c130a
-operator: EI
-operator: Q
+content size: 490
+real, offset=0, length=3: 0.1
+integer, offset=4, length=1: 0
+integer, offset=6, length=1: 0
+real, offset=8, length=3: 0.1
+integer, offset=12, length=1: 0
+integer, offset=14, length=1: 0
+operator, offset=16, length=2: cm
+operator, offset=19, length=1: q
+integer, offset=21, length=1: 0
+real, offset=23, length=6: 1.1999
+real, offset=30, length=7: -1.1999
+integer, offset=38, length=2: 0
+real, offset=41, length=6: 121.19
+real, offset=48, length=7: 150.009
+operator, offset=56, length=2: cm
+operator, offset=59, length=2: BI
+name, offset=62, length=3: /CS
+name, offset=66, length=2: /G
+name, offset=68, length=2: /W
+integer, offset=71, length=1: 1
+name, offset=72, length=2: /H
+integer, offset=75, length=1: 1
+name, offset=76, length=4: /BPC
+integer, offset=81, length=1: 8
+name, offset=82, length=2: /F
+name, offset=84, length=3: /Fl
+name, offset=87, length=3: /DP
+dictionary, offset=90, length=27: << /Columns 1 /Predictor 15 >>
+operator, offset=118, length=2: ID
+inline-image, offset=121, length=11: 789c63fc0f00010301010a
+operator, offset=132, length=2: EI
+operator, offset=135, length=1: Q
+operator, offset=137, length=1: q
+integer, offset=139, length=1: 0
+real, offset=141, length=6: 35.997
+real, offset=148, length=8: -128.389
+integer, offset=157, length=2: 0
+real, offset=160, length=7: 431.964
+real, offset=168, length=7: 7269.02
+operator, offset=176, length=2: cm
+operator, offset=179, length=2: BI
+name, offset=182, length=3: /CS
+name, offset=186, length=2: /G
+name, offset=188, length=2: /W
+integer, offset=191, length=2: 30
+name, offset=193, length=2: /H
+integer, offset=196, length=3: 107
+name, offset=199, length=4: /BPC
+integer, offset=204, length=1: 8
+name, offset=205, length=2: /F
+name, offset=207, length=3: /Fl
+name, offset=210, length=3: /DP
+dictionary, offset=214, length=28: << /Columns 30 /Predictor 15 >>
+operator, offset=243, length=2: ID
+inline-image, offset=246, length=46: 789cedd1a11100300800b1b2ffd06503148283bc8dfcf8af2a306ee352eff2e06318638c31c63b3801627b620a0a
+operator, offset=292, length=2: EI
+operator, offset=295, length=1: Q
+operator, offset=297, length=1: q
+array, offset=299, length=30: [ 1 /two (three) << /four 5 >> ]
+operator, offset=330, length=1: Q
+operator, offset=332, length=1: q
+integer, offset=334, length=1: 0
+real, offset=336, length=7: 38.3968
+real, offset=344, length=8: -93.5922
+integer, offset=353, length=2: 0
+real, offset=356, length=7: 431.964
+real, offset=364, length=7: 7567.79
+operator, offset=372, length=2: cm
+operator, offset=375, length=2: BI
+name, offset=378, length=3: /CS
+name, offset=382, length=2: /G
+name, offset=384, length=2: /W
+integer, offset=387, length=2: 32
+name, offset=389, length=2: /H
+integer, offset=392, length=2: 78
+name, offset=394, length=4: /BPC
+integer, offset=399, length=1: 8
+name, offset=400, length=2: /F
+name, offset=402, length=3: /Fl
+name, offset=405, length=3: /DP
+dictionary, offset=408, length=28: << /Columns 32 /Predictor 15 >>
+operator, offset=437, length=2: ID
+inline-image, offset=440, length=45: 789c63fccf801f308e2a185530aa60882a20203faa605401890a0643aa1e5530aa6054010d140000bdd03c130a
+operator, offset=485, length=2: EI
+operator, offset=488, length=1: Q
 -EOF-
 test 37 done

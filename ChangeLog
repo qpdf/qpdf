@@ -1,5 +1,19 @@
 2019-08-22  Jay Berkenbilt  <ejb@ql.org>
 
+	* In QPDFObjectHandle::ParserCallbacks, in addition to
+	handleObject(QPDFObjectHandle), allow developers to override
+	handleObject(QPDFObjectHandle, size_t offset, size_t length). If
+	this method appears instead, it is called with the offset of the
+	object in the content stream (which may be concatenated from an
+	array of streams) and the length of the object. Intervening
+	whitespace and comments are not included in offset and length.
+
+	* Add method
+	QPDFObjectHandle::ParserCallbacks::contentSize(size_t). If
+	defined, it is called by the content stream parser before the
+	first call to handleObject, and the argument is the total size in
+	bytes of the content streams.
+
 	* Add QPDFObjectHandle::isDirectNull() -- a const method that
 	allows determining whether an object is a literal null without
 	attempting to resolve it.

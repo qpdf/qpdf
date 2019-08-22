@@ -4491,6 +4491,25 @@ print "\n";
         </listitem>
         <listitem>
          <para>
+          When parsing content streams with
+          <classname>QPDFObjectHandle::ParserCallbacks</classname>, in
+          place of the method
+          <function>handleObject(QPDFObjectHandle)</function>, the
+          developer may override
+          <function>handleObject(QPDFObjectHandle, size_t offset,
+          size_t length)</function>. If this method is defined, it
+          will be invoked with the object along with its offset and
+          length within the overall contents being parsed. Intervening
+          spaces and comments are not included in offset and length.
+          Additionally, a new method
+          <function>contentSize(size_t)</function> may be implemented.
+          If present, it will be called prior to the first call to
+          <function>handleObject</function> with the total size in
+          bytes of the combined contents.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
           The underlying implementation of QPDF arrays has been
           enhanced to be much more memory efficient when dealing with
           arrays with lots of nulls. This enables qpdf to use

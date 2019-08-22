@@ -1,11 +1,12 @@
-operator: BT
-name: /F1
-integer: 24
-operator: Tf
-integer: 72
-integer: 720
-operator: Td
-string: (Potato)
-operator: Tj
-operator: ET
+content size: 44
+operator, offset=0, length=2: BT
+name, offset=5, length=3: /F1
+integer, offset=9, length=2: 24
+operator, offset=12, length=2: Tf
+integer, offset=17, length=2: 72
+integer, offset=20, length=3: 720
+operator, offset=24, length=2: Td
+string, offset=29, length=8: (Potato)
+operator, offset=38, length=2: Tj
+operator, offset=41, length=2: ET
 -EOF-

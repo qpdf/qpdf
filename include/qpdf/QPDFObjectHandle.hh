@@ -159,15 +159,27 @@ class QPDFObjectHandle
     // This class is used by parsePageContents. Callers must
     // instantiate a subclass of this with handlers defined to accept
     // QPDFObjectHandles that are parsed from the stream.
-    class ParserCallbacks
+    class QPDF_DLL_CLASS ParserCallbacks
     {
       public:
         QPDF_DLL
         virtual ~ParserCallbacks()
         {
         }
-        virtual void handleObject(QPDFObjectHandle) = 0;
+        // One of the handleObject methods must be overridden.
+        QPDF_DLL
+        virtual void handleObject(QPDFObjectHandle);
+        QPDF_DLL
+        virtual void handleObject(
+            QPDFObjectHandle, size_t offset, size_t length);
+
         virtual void handleEOF() = 0;
+
+        // Override this if you want to know the full size of the
+        // contents, possibly after concatenation of multiple streams.
+        // This is called before the first call to handleObject.
+        QPDF_DLL
+        virtual void contentSize(size_t);
 
       protected:
         // Implementors may call this method during parsing to

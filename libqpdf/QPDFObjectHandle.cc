@@ -106,6 +106,29 @@ QPDFObjectHandle::TokenFilter::writeToken(QPDFTokenizer::Token const& token)
 }
 
 void
+QPDFObjectHandle::ParserCallbacks::handleObject(QPDFObjectHandle)
+{
+    throw std::logic_error("You must override one of the"
+                           " handleObject methods in ParserCallbacks");
+}
+
+void
+QPDFObjectHandle::ParserCallbacks::handleObject(
+    QPDFObjectHandle oh, size_t, size_t)
+{
+    // This version of handleObject was added in qpdf 9. If the
+    // developer did not override it, fall back to the older
+    // interface.
+    handleObject(oh);
+}
+
+void
+QPDFObjectHandle::ParserCallbacks::contentSize(size_t)
+{
+    // Ignore by default; overriding this is optional.
+}
+
+void
 QPDFObjectHandle::ParserCallbacks::terminateParsing()
 {
     throw TerminateParsing();
@@ -1615,6 +1638,7 @@ QPDFObjectHandle::parseContentStream_internal(
     std::string all_description;
     pipeContentStreams(&buf, description, all_description);
     PointerHolder<Buffer> stream_data = buf.getBuffer();
+    callbacks->contentSize(stream_data->getSize());
     try
     {
         parseContentStream_data(stream_data, all_description,
@@ -1642,6 +1666,13 @@ QPDFObjectHandle::parseContentStream_data(
     bool empty = false;
     while (QIntC::to_size(input->tell()) < length)
     {
+        // Read a token and seek to the beginning. The offset we get
+        // from this process is the beginning of the next
+        // non-ignorable (space, comment) token. This way, the offset
+        // and don't including ignorable content.
+        tokenizer.readToken(input, "content", true);
+        qpdf_offset_t offset = input->getLastOffset();
+        input->seek(offset, SEEK_SET);
         QPDFObjectHandle obj =
             parseInternal(input, "content", tokenizer,
                           empty, 0, context, true);
@@ -1650,8 +1681,9 @@ QPDFObjectHandle::parseContentStream_data(
             // EOF
             break;
         }
+        size_t length = QIntC::to_size(input->tell() - offset);
 
-        callbacks->handleObject(obj);
+        callbacks->handleObject(obj, QIntC::to_size(offset), length);
         if (obj.isOperator() && (obj.getOperatorValue() == "ID"))
         {
             // Discard next character; it is the space after ID that
@@ -1661,6 +1693,8 @@ QPDFObjectHandle::parseContentStream_data(
             tokenizer.expectInlineImage(input);
             QPDFTokenizer::Token t =
                 tokenizer.readToken(input, description, true);
+            offset = input->getLastOffset();
+            length = QIntC::to_size(input->tell() - offset);
             if (t.getType() == QPDFTokenizer::tt_bad)
             {
                 QTC::TC("qpdf", "QPDFObjectHandle EOF in inline image");
@@ -1674,7 +1708,8 @@ QPDFObjectHandle::parseContentStream_data(
                 std::string inline_image = t.getValue();
                 QTC::TC("qpdf", "QPDFObjectHandle inline image token");
                 callbacks->handleObject(
-                    QPDFObjectHandle::newInlineImage(inline_image));
+                    QPDFObjectHandle::newInlineImage(inline_image),
+                    QIntC::to_size(offset), length);
             }
         }
     }

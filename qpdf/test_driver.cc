@@ -76,19 +76,28 @@ class ParserCallbacks: public QPDFObjectHandle::ParserCallbacks
     {
     }
 
-    virtual void handleObject(QPDFObjectHandle);
+    virtual void contentSize(size_t size);
+    virtual void handleObject(QPDFObjectHandle, size_t, size_t);
     virtual void handleEOF();
 };
 
 void
-ParserCallbacks::handleObject(QPDFObjectHandle obj)
+ParserCallbacks::contentSize(size_t size)
+{
+    std::cout << "content size: " << size << std::endl;
+}
+
+void
+ParserCallbacks::handleObject(QPDFObjectHandle obj,
+                              size_t offset, size_t length)
 {
     if (obj.isName() && (obj.getName() == "/Abort"))
     {
         std::cout << "test suite: terminating parsing" << std::endl;
         terminateParsing();
     }
-    std::cout << obj.getTypeName() << ": ";
+    std::cout << obj.getTypeName() << ", offset=" << offset
+              << ", length=" << length << ": ";
     if (obj.isInlineImage())
     {
         // Exercise getTypeCode

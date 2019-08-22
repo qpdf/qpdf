@@ -1,27 +1,28 @@
-operator: BT
-name: /F1
-integer: 24
-operator: Tf
-integer: 72
-integer: 720
-operator: Td
-string: (Potato)
-operator: Tj
-operator: ET
-operator: BI
-name: /CS
-name: /G
-name: /W
-integer: 1
-name: /H
-integer: 1
-name: /BPC
-integer: 8
-name: /F
-name: /Fl
-name: /DP
-dictionary: << /Columns 1 /Predictor 15 >>
-operator: ID
+content size: 139
+operator, offset=0, length=2: BT
+name, offset=5, length=3: /F1
+integer, offset=9, length=2: 24
+operator, offset=12, length=2: Tf
+integer, offset=17, length=2: 72
+integer, offset=20, length=3: 720
+operator, offset=24, length=2: Td
+string, offset=29, length=8: (Potato)
+operator, offset=38, length=2: Tj
+operator, offset=41, length=2: ET
+operator, offset=66, length=2: BI
+name, offset=69, length=3: /CS
+name, offset=73, length=2: /G
+name, offset=75, length=2: /W
+integer, offset=78, length=1: 1
+name, offset=79, length=2: /H
+integer, offset=82, length=1: 1
+name, offset=83, length=4: /BPC
+integer, offset=88, length=1: 8
+name, offset=89, length=2: /F
+name, offset=91, length=3: /Fl
+name, offset=94, length=3: /DP
+dictionary, offset=97, length=27: << /Columns 1 /Predictor 15 >>
+operator, offset=125, length=2: ID
 WARNING: page object 3 0 stream 4 0 (stream data, offset 139): EOF found while reading inline image
 -EOF-
 test 37 done

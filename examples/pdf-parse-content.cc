@@ -26,14 +26,23 @@ class ParserCallbacks: public QPDFObjectHandle::ParserCallbacks
     {
     }
 
-    virtual void handleObject(QPDFObjectHandle);
+    virtual void contentSize(size_t);
+    virtual void handleObject(QPDFObjectHandle, size_t offset, size_t length);
     virtual void handleEOF();
 };
 
 void
-ParserCallbacks::handleObject(QPDFObjectHandle obj)
+ParserCallbacks::contentSize(size_t size)
 {
-    std::cout << obj.getTypeName() << ": ";
+    std::cout << "content size: " << size << std::endl;
+}
+
+void
+ParserCallbacks::handleObject(QPDFObjectHandle obj,
+                              size_t offset, size_t length)
+{
+    std::cout << obj.getTypeName() << ", offset=" << offset
+              << ", length=" << length << ": ";
     if (obj.isInlineImage())
     {
         std::cout << QUtil::hex_encode(obj.getInlineImageValue()) << std::endl;
