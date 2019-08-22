@@ -1,0 +1,11 @@
+/QTest is indirect and has type array (8)
+/QTest is an array with 6 items
+  item 0 is direct
+  item 1 is direct
+  item 2 is direct
+  item 3 is indirect
+  item 4 is direct
+  item 5 is indirect
+unparse: 9 0 R
+unparseResolved: [ /literal null /indirect 8 0 R /undefined 10 0 R ]
+test 1 done

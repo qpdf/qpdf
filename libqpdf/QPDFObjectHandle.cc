@@ -263,9 +263,10 @@ QPDFObjectHandle::isBool()
 }
 
 bool
-QPDFObjectHandle::isResolvedNull() const
+QPDFObjectHandle::isDirectNull() const
 {
-    return QPDFObjectTypeAccessor<QPDF_Null>::check(m->obj.getPointer());
+    return (this->m->initialized && (this->m->objid == 0) &&
+            QPDFObjectTypeAccessor<QPDF_Null>::check(m->obj.getPointer()));
 }
 
 bool

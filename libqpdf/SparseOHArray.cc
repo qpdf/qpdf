@@ -15,7 +15,7 @@ SparseOHArray::size() const
 void
 SparseOHArray::append(QPDFObjectHandle oh)
 {
-    if (! oh.isResolvedNull())
+    if (! oh.isDirectNull())
     {
         this->elements[this->n_elements] = oh;
     }
@@ -73,7 +73,7 @@ SparseOHArray::setAt(size_t idx, QPDFObjectHandle oh)
     {
 	throw std::logic_error("bounds error setting item in SparseOHArray");
     }
-    if (oh.isResolvedNull())
+    if (oh.isDirectNull())
     {
         this->elements.erase(idx);
     }

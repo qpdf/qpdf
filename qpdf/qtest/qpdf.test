@@ -2456,6 +2456,7 @@ my @goodfiles = ("implicit null",			# 1
 		 "hybrid xref old mode",		# 18
 		 "xref with prev",			# 19
 		 "lots of compressible objects",	# 20
+                 "array with indirect nulls",           # 21
 		 );
 
 $n_tests += (3 * @goodfiles) + 6;

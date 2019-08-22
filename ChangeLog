@@ -1,5 +1,9 @@
 2019-08-22  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add QPDFObjectHandle::isDirectNull() -- a const method that
+	allows determining whether an object is a literal null without
+	attempting to resolve it.
+
 	* Stop replacing indirect references to null with literal null in
 	arrays when writing output with QPDFWriter.
 
