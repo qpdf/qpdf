@@ -13,6 +13,7 @@
 #include <qpdf/Pl_Discard.hh>
 #include <qpdf/Pl_DCT.hh>
 #include <qpdf/Pl_Count.hh>
+#include <qpdf/Pl_Flate.hh>
 #include <qpdf/PointerHolder.hh>
 
 #include <qpdf/QPDF.hh>
@@ -124,6 +125,9 @@ struct Options
         stream_data_mode(qpdf_s_compress),
         compress_streams(true),
         compress_streams_set(false),
+        recompress_flate(false),
+        recompress_flate_set(false),
+        compression_level(-1),
         decode_level(qpdf_dl_generalized),
         decode_level_set(false),
         normalize_set(false),
@@ -217,6 +221,9 @@ struct Options
     qpdf_stream_data_e stream_data_mode;
     bool compress_streams;
     bool compress_streams_set;
+    bool recompress_flate;
+    bool recompress_flate_set;
+    int compression_level;
     qpdf_stream_decode_level_e decode_level;
     bool decode_level_set;
     bool normalize_set;
@@ -632,6 +639,8 @@ class ArgParser
     void argCollate();
     void argStreamData(char* parameter);
     void argCompressStreams(char* parameter);
+    void argRecompressFlate();
+    void argCompressionLevel(char* parameter);
     void argDecodeLevel(char* parameter);
     void argNormalizeContent(char* parameter);
     void argSuppressRecovery();
@@ -847,6 +856,9 @@ ArgParser::initOptionTable()
         &ArgParser::argStreamData, stream_data_choices);
     (*t)["compress-streams"] = oe_requiredChoices(
         &ArgParser::argCompressStreams, yn);
+    (*t)["recompress-flate"] = oe_bare(&ArgParser::argRecompressFlate);
+    (*t)["compression-level"] = oe_requiredParameter(
+        &ArgParser::argCompressionLevel, "level");
     char const* decode_level_choices[] =
         {"none", "generalized", "specialized", "all", 0};
     (*t)["decode-level"] = oe_requiredChoices(
@@ -1328,6 +1340,9 @@ ArgParser::argHelp()
         << "--stream-data=option      controls transformation of stream data (below)\n"
         << "--compress-streams=[yn]   controls whether to compress streams on output\n"
         << "--decode-level=option     controls how to filter streams from the input\n"
+        << "--recompress-flate        recompress streams already compressed with Flate\n"
+        << "--compression-level=n     set zlib compression level; most effective with\n"
+        << "                          --recompress-flate --object-streams=generate\n"
         << "--normalize-content=[yn]  enables or disables normalization of content streams\n"
         << "--object-streams=mode     controls handing of object streams\n"
         << "--preserve-unreferenced   preserve unreferenced objects\n"
@@ -1722,6 +1737,19 @@ ArgParser::argCompressStreams(char* parameter)
 {
     o.compress_streams_set = true;
     o.compress_streams = (strcmp(parameter, "y") == 0);
+}
+
+void
+ArgParser::argRecompressFlate()
+{
+    o.recompress_flate_set = true;
+    o.recompress_flate = true;
+}
+
+void
+ArgParser::argCompressionLevel(char* parameter)
+{
+    o.compression_level = QUtil::string_to_int(parameter);
 }
 
 void
@@ -4889,6 +4917,10 @@ static void set_encryption_options(QPDF& pdf, Options& o, QPDFWriter& w)
 
 static void set_writer_options(QPDF& pdf, Options& o, QPDFWriter& w)
 {
+    if (o.compression_level >= 0)
+    {
+        Pl_Flate::setCompressionLevel(o.compression_level);
+    }
     if (o.qdf_mode)
     {
         w.setQDFMode(true);
@@ -4912,6 +4944,10 @@ static void set_writer_options(QPDF& pdf, Options& o, QPDFWriter& w)
     if (o.compress_streams_set)
     {
         w.setCompressStreams(o.compress_streams);
+    }
+    if (o.recompress_flate_set)
+    {
+        w.setRecompressFlate(o.recompress_flate);
     }
     if (o.decode_level_set)
     {

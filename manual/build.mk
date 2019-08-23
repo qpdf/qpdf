@@ -26,7 +26,8 @@ endif
 
 $(OUTDOC).pdf: $(OUTDOC).fo qpdf/build/qpdf
 	$(FOP) $< -pdf $@.tmp
-	qpdf/build/qpdf --linearize $@.tmp $@
+	qpdf/build/qpdf --linearize --object-streams=generate \
+		--recompress-flate --compression-level=9 $@.tmp $@
 
 $(OUTDOC).html: $(INDOC).xml manual/html.xsl $(VALIDATE)
 	$(XSLTPROC) --output $@ manual/html.xsl $<

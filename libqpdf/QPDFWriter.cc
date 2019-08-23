@@ -37,6 +37,7 @@ QPDFWriter::Members::Members(QPDF& pdf) :
     compress_streams_set(false),
     stream_decode_level(qpdf_dl_none),
     stream_decode_level_set(false),
+    recompress_flate(false),
     qdf_mode(false),
     preserve_unreferenced_objects(false),
     newline_before_endstream(false),
@@ -204,6 +205,12 @@ QPDFWriter::setDecodeLevel(qpdf_stream_decode_level_e val)
 {
     this->m->stream_decode_level = val;
     this->m->stream_decode_level_set = true;
+}
+
+void
+QPDFWriter::setRecompressFlate(bool val)
+{
+    this->m->recompress_flate = val;
 }
 
 void
@@ -1716,13 +1723,14 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	if (this->m->compress_streams)
 	{
 	    // Don't filter if the stream is already compressed with
-	    // FlateDecode.  We don't want to make it worse by getting
-	    // rid of a predictor or otherwise messing with it.  We
-	    // should also avoid messing with anything that's
-	    // compressed with a lossy compression scheme, but we
-	    // don't support any of those right now.
+	    // FlateDecode. This way we don't make it worse if the
+	    // original file used a better Flate algorithm, and we
+	    // don't spend time and CPU cycles uncompressing and
+	    // recompressing stuff. This can be overridden with
+	    // setRecompressFlate(true).
 	    QPDFObjectHandle filter_obj = stream_dict.getKey("/Filter");
-            if ((! object.isDataModified()) &&
+            if ((! this->m->recompress_flate) &&
+                (! object.isDataModified()) &&
                 filter_obj.isName() &&
 		((filter_obj.getName() == "/FlateDecode") ||
 		 (filter_obj.getName() == "/Fl")))

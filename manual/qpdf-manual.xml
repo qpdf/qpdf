@@ -1433,27 +1433,32 @@ outfile.pdf</option>
          <listitem>
           <para>
            <option>generalized</option>: decode streams filtered with
-           supported generalized filters: <option>/LZWDecode</option>,
-           <option>/FlateDecode</option>,
-           <option>/ASCII85Decode</option>, and
-           <option>/ASCIIHexDecode</option>. We define generalized
+           supported generalized filters:
+           <literal>/LZWDecode</literal>,
+           <literal>/FlateDecode</literal>,
+           <literal>/ASCII85Decode</literal>, and
+           <literal>/ASCIIHexDecode</literal>. We define generalized
            filters as those to be used for general-purpose compression
            or encoding, as opposed to filters specifically designed
-           for image data.
+           for image data. Note that, by default, streams already
+           compressed with <literal>/FlateDecode</literal> are not
+           uncompressed and recompressed unless you also specify
+           <option>--recompress-flate</option>.
           </para>
          </listitem>
          <listitem>
           <para>
            <option>specialized</option>: in addition to generalized,
            decode streams with supported non-lossy specialized
-           filters; currently this is just <option>/RunLengthDecode</option>
+           filters; currently this is just
+           <literal>/RunLengthDecode</literal>
           </para>
          </listitem>
          <listitem>
           <para>
            <option>all</option>: in addition to generalized and
            specialized, decode streams with supported lossy filters;
-           currently this is just <option>/DCTDecode</option> (JPEG)
+           currently this is just <literal>/DCTDecode</literal> (JPEG)
           </para>
          </listitem>
         </itemizedlist>
@@ -1476,7 +1481,10 @@ outfile.pdf</option>
            <option>compress</option>: recompress stream data when
            possible (default); equivalent to
            <option>--compress-streams=y</option>
-           <option>--decode-level=generalized</option>
+           <option>--decode-level=generalized</option>. Does not
+           recompress streams already compressed with
+           <literal>/FlateDecode</literal> unless
+           <option>--recompress-flate</option> is also specified.
           </para>
          </listitem>
          <listitem>
@@ -1495,6 +1503,37 @@ outfile.pdf</option>
           </para>
          </listitem>
         </itemizedlist>
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--recompress-flate</option></term>
+      <listitem>
+       <para>
+        By default, streams already compressed with
+        <literal>/FlateDecode</literal> are left alone rather than
+        being uncompressed and recompressed. This option causes qpdf
+        to uncompress and recompress the streams. There is a
+        significant performance cost to using this option, but you
+        probably want to use it if you specify
+        <option>--compression-level</option>.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--compression-level=<replaceable>level</replaceable></option></term>
+      <listitem>
+       <para>
+        When writing new streams that are compressed with
+        <literal>/FlateDecode</literal>, use the specified compression
+        level. The value of <option>level</option> should be a number
+        from 1 to 9 and is passed directly to zlib, which implements
+        deflate compression. Note that qpdf doesn't uncompress and
+        recompress streams by default. To have this option apply to
+        already compressed streams, you should also specify
+        <option>--recompress-flate</option>. If your goal is to shrink
+        the size of PDF files, you should also use
+        <option>--object-streams=generate</option>.
        </para>
       </listitem>
      </varlistentry>
@@ -4449,7 +4488,7 @@ print "\n";
       </listitem>
       <listitem>
        <para>
-        Library Enhancements
+        Library and CLI Enhancements
        </para>
        <itemizedlist>
         <listitem>
@@ -4506,6 +4545,41 @@ print "\n";
           If present, it will be called prior to the first call to
           <function>handleObject</function> with the total size in
           bytes of the combined contents.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Static method
+          <function>Pl_Flate::setCompressionLevel</function> can be
+          called to set the zlib compression level globally used by
+          all instances of Pl_Flate in deflate mode.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          The method
+          <function>QPDFWriter::setRecompressFlate</function> can be
+          called to tell <classname>QPDFWriter</classname> to
+          uncompress and recompress streams already compressed with
+          <literal>/FlateDecode</literal>.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          CLI enhancement: the <option>--recompress-flate</option>
+          instructs <command>qpdf</command> to recompress streams that
+          are already compressed with <literal>/FlateDecode</literal>.
+          Useful with <option>--compression-level</option>.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          CLI enhancement: the
+          <option>--compression-level=<replaceable>level</replaceable></option>
+          sets the zlib compression level used for any streams
+          compressed by <literal>/FlateDecode</literal>. Most
+          effective when combined with
+          <option>--recompress-flate</option>.
          </para>
         </listitem>
         <listitem>
@@ -5699,9 +5773,9 @@ print "\n";
       <listitem>
        <para>
         Disregard data check errors when uncompressing
-        <option>/FlateDecode</option> streams. This is consistent with
-        most other PDF readers and allows qpdf to recover data from
-        another class of malformed PDF files.
+        <literal>/FlateDecode</literal> streams. This is consistent
+        with most other PDF readers and allows qpdf to recover data
+        from another class of malformed PDF files.
        </para>
       </listitem>
       <listitem>

@@ -3876,8 +3876,20 @@ $td->runtest("convert inline-images to qdf",
 compare_pdfs("inline-images.pdf", "a.pdf");
 
 show_ntests();
+# ----------
+$td->notify("--- Compression Level ---");
+$n_tests += 4;
 
+check_pdf("recompress with level",
+	  "qpdf --static-id --recompress-flate --compression-level=9" .
+          " --object-streams=generate minimal.pdf",
+          "minimal-9.pdf", 0);
+check_pdf("recompress with level",
+	  "qpdf --static-id --recompress-flate --compression-level=1" .
+          " --object-streams=generate minimal.pdf",
+          "minimal-1.pdf", 0);
 
+show_ntests();
 # ----------
 $td->notify("--- Specialized filtering Tests ---");
 $n_tests += 3;

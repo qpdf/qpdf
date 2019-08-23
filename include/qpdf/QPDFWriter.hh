@@ -189,10 +189,11 @@ class QPDFWriter
     // filters on the input. When combined with
     // setCompressStreams(true), which the default, the effect of this
     // is that streams filtered with these older and less efficient
-    // filters will be recompressed with the Flate filter. As a
-    // special case, if a stream is already compressed with
+    // filters will be recompressed with the Flate filter. By default,
+    // as a special case, if a stream is already compressed with
     // FlateDecode and setCompressStreams is enabled, the original
-    // compressed data will be preserved.
+    // compressed data will be preserved. This behavior can be
+    // overridden by calling setRecompressFlate(true).
     //
     // qpdf_dl_specialized: In addition to uncompressing the
     // generalized compression formats, supported non-lossy
@@ -208,6 +209,15 @@ class QPDFWriter
     // retrieving image data.
     QPDF_DLL
     void setDecodeLevel(qpdf_stream_decode_level_e);
+
+    // By default, when both the input and output contents of a stream
+    // are compressed with Flate, qpdf does not uncompress and
+    // recompress the stream. Passing true here causes it to do so.
+    // This can be useful if recompressing all streams with a higher
+    // compression level, which can be set by calling the static
+    // method Pl_Flate::setCompressionLevel.
+    QPDF_DLL
+    void setRecompressFlate(bool);
 
     // Set value of content stream normalization.  The default is
     // "false".  If true, we attempt to normalize newlines inside of
@@ -597,6 +607,7 @@ class QPDFWriter
         bool compress_streams_set;
         qpdf_stream_decode_level_e stream_decode_level;
         bool stream_decode_level_set;
+        bool recompress_flate;
         bool qdf_mode;
         bool preserve_unreferenced_objects;
         bool newline_before_endstream;
