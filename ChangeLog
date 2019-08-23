@@ -1,3 +1,8 @@
+2019-08-23  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add option Pl_Flate::setCompressionLevel to globally set the
+	zlib compression level used by all Pl_Flate pipelines.
+
 2019-08-22  Jay Berkenbilt  <ejb@ql.org>
 
 	* In QPDFObjectHandle::ParserCallbacks, in addition to

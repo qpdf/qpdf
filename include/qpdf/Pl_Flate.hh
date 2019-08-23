@@ -28,6 +28,7 @@ class Pl_Flate: public Pipeline
 {
   public:
     static unsigned int const def_bufsize = 65536;
+    static int compression_level;
 
     enum action_e { a_inflate, a_deflate };
 
@@ -41,6 +42,15 @@ class Pl_Flate: public Pipeline
     virtual void write(unsigned char* data, size_t len);
     QPDF_DLL
     virtual void finish();
+
+    // Globally set compression level from 1 (fastest, least
+    // compression) to 9 (slowest, most compression). Use -1 to set
+    // the default compression level. This is passed directly to zlib.
+    // This method returns a pointer to the current Pl_Flate object so
+    // you can create a pipeline with
+    // Pl_Flate(...)->setCompressionLevel(...)
+    QPDF_DLL
+    static void setCompressionLevel(int);
 
   private:
     void handleData(unsigned char* data, size_t len, int flush);

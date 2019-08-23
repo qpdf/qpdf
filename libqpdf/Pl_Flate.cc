@@ -6,6 +6,8 @@
 #include <qpdf/QUtil.hh>
 #include <qpdf/QIntC.hh>
 
+int Pl_Flate::compression_level = Z_DEFAULT_COMPRESSION;
+
 Pl_Flate::Members::Members(size_t out_bufsize,
                            action_e action) :
     out_bufsize(out_bufsize),
@@ -120,7 +122,7 @@ Pl_Flate::handleData(unsigned char* data, size_t len, int flush)
 #endif
 	if (this->m->action == a_deflate)
 	{
-	    err = deflateInit(&zstream, Z_DEFAULT_COMPRESSION);
+	    err = deflateInit(&zstream, compression_level);
 	}
 	else
 	{
@@ -233,6 +235,12 @@ Pl_Flate::finish()
         throw e;
     }
     this->getNext()->finish();
+}
+
+void
+Pl_Flate::setCompressionLevel(int level)
+{
+    compression_level = level;
 }
 
 void

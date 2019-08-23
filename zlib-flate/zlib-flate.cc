@@ -12,8 +12,14 @@ static char const* whoami = 0;
 
 void usage()
 {
-    std::cerr << "Usage: " << whoami << " { -uncompress | -compress }"
-	      << std::endl;
+    std::cerr << "Usage: " << whoami << " { -uncompress | -compress[=n] }"
+	      << std::endl
+              << "If n is specified with -compress, it is a"
+              << " zlib compression level from" << std::endl
+              << "1 to 9 where lower numbers are faster and"
+              << " less compressed and higher" << std::endl
+              << "numbers are slower and more compresed"
+              << std::endl;
     exit(2);
 }
 
@@ -43,6 +49,7 @@ int main(int argc, char* argv[])
     {
 	usage();
     }
+    // QXXXQ level
 
     Pl_Flate::action_e action = Pl_Flate::a_inflate;
 
@@ -53,6 +60,12 @@ int main(int argc, char* argv[])
     else if ((strcmp(argv[1], "-compress") == 0))
     {
 	action = Pl_Flate::a_deflate;
+    }
+    else if ((strncmp(argv[1], "-compress=", 10) == 0))
+    {
+	action = Pl_Flate::a_deflate;
+        int level = QUtil::string_to_int(argv[1] + 10);
+        Pl_Flate::setCompressionLevel(level);
     }
     else
     {
