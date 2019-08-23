@@ -4,7 +4,7 @@ ROUTINE DEVELOPMENT
 
 Default:
 
-./configure --enable-werror --disable-shared
+./configure --enable-werror
 
 Debugging:
 
