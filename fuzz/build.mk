@@ -30,8 +30,8 @@ LIB_FUZZING_ENGINE ?= $(OBJ_DEFAULT_FUZZ)
 $(BINS_fuzz): $(TARGETS_libqpdf) $(OBJ_DEFAULT_FUZZ)
 
 # Files from the test suite that are good for seeding the fuzzer.
-# Update $n_test_files in qtest/fuzz.test if you change this list.
-SEED_CORPUS_FILES = \
+# Update $qpdf_n_test_files in qtest/fuzz.test if you change this list.
+CORPUS_FROM_TEST = \
 	stream-data.pdf \
 	lin5.pdf \
 	field-types.pdf \
@@ -62,23 +62,28 @@ SEED_CORPUS_FILES = \
 	issue-335a.pdf \
 	issue-335b.pdf
 
+# Any file that qpdf_fuzzer should be tested with can be named
+# something.fuzz and dropped into this directory.
+CORPUS_OTHER = $(wildcard fuzz/qpdf_extra/*.fuzz)
+
 # -----
 
-CORPUS_FROM_TEST := $(foreach F,$(SEED_CORPUS_FILES),qpdf/qtest/qpdf/$F)
+CORPUS_EXTRA := $(foreach F,$(CORPUS_FROM_TEST),qpdf/qtest/qpdf/$F) \
+	$(CORPUS_OTHER)
 CORPUS_DIR := fuzz/$(OUTPUT_DIR)/qpdf_fuzzer_seed_corpus
 
 .PHONY: fuzz_corpus
 fuzz_corpus:: fuzz/$(OUTPUT_DIR)/fuzz_corpus.stamp
-$(foreach F,$(CORPUS_FROM_TEST),$(eval \
+$(foreach F,$(CORPUS_EXTRA),$(eval \
   SHA1_$(notdir $(F)) := $(shell perl fuzz/get_sha1 < $F)))
-$(foreach F,$(CORPUS_FROM_TEST),$(eval \
+$(foreach F,$(CORPUS_EXTRA),$(eval \
   fuzz_corpus:: $(CORPUS_DIR)/$(SHA1_$(notdir $(F)))))
-$(foreach F,$(CORPUS_FROM_TEST),$(eval \
+$(foreach F,$(CORPUS_EXTRA),$(eval \
   $(CORPUS_DIR)/$(SHA1_$(notdir $(F))): $(F) ; \
 	mkdir -p $(CORPUS_DIR); \
 	cp $(F) $(CORPUS_DIR)/$(SHA1_$(notdir $(F)))))
 
-fuzz/$(OUTPUT_DIR)/fuzz_corpus.stamp: fuzz/original-corpus.tar.gz $(CORPUS_FROM_TEST)
+fuzz/$(OUTPUT_DIR)/fuzz_corpus.stamp: fuzz/original-corpus.tar.gz $(CORPUS_EXTRA)
 	mkdir -p $(CORPUS_DIR)
 	(cd $(CORPUS_DIR); tar xzf ../../original-corpus.tar.gz)
 	touch $@

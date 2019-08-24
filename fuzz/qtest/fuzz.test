@@ -10,8 +10,13 @@ require TestDriver;
 my $td = new TestDriver('fuzz');
 
 my $qpdf_n_test_files = 29;
+my @extra = glob("../qpdf_extra/*.fuzz");
+my $qpdf_n_extra_files = scalar(@extra);
 my $qpdf_n_orig_files = 2559;
-my $qpdf_n_files = $qpdf_n_test_files + $qpdf_n_orig_files;
+my $qpdf_n_files = ($qpdf_n_test_files +
+                    $qpdf_n_extra_files +
+                    $qpdf_n_orig_files);
+
 
 my @fuzzers = (
     ['qpdf' => $qpdf_n_files],
