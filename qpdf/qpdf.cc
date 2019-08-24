@@ -2550,6 +2550,14 @@ static void show_encryption(QPDF& pdf, Options& o)
             std::cout << "Encryption key = "
                       << QUtil::hex_encode(encryption_key) << std::endl;
         }
+        if (pdf.ownerPasswordMatched())
+        {
+            std::cout << "Supplied password is owner password" << std::endl;
+        }
+        if (pdf.userPasswordMatched())
+        {
+            std::cout << "Supplied password is user password" << std::endl;
+        }
         std::cout << "extract for accessibility: "
 		  << show_bool(pdf.allowAccessibility()) << std::endl
                   << "extract for any purpose: "

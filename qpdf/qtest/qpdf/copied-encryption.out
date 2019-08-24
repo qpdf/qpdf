@@ -1,6 +1,7 @@
 R = 4
 P = -20
 User password = user
+Supplied password is owner password
 extract for accessibility: allowed
 extract for any purpose: not allowed
 print low resolution: allowed

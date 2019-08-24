@@ -3,6 +3,7 @@ PDF Version: 1.7 extension level 8
 R = 6
 P = -4
 User password = u
+Supplied password is user password
 extract for accessibility: allowed
 extract for any purpose: allowed
 print low resolution: allowed

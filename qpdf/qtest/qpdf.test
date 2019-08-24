@@ -3005,81 +3005,84 @@ $td->notify("--- Encryption Tests ---");
 # print-low-res, print-high-res, modify-assembly, modify-forms,
 # modify-annotate, modify-other, modify-all
 my @encrypted_files =
-    (['base', ''],
-     ['R3,V2', '',
+    (['base', ''],              # 1
+     ['R3,V2', '',              # 2
       '-accessibility=n -extract=n -print=full -modify=all', -532,
-      0, 0, 1, 1, 1, 1, 1, 1, 1],
-     ['R3,V2,U=view', 'view',
+      1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1],
+     ['R3,V2,U=view', 'view',   # 3
       '-accessibility=y -extract=n -print=none -modify=none', -3392,
-      1, 0, 0, 0, 0, 0, 0, 0, 0],
-     ['R3,V2,O=master', 'master',
+      1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+     ['R3,V2,O=master', 'master', # 4
       '-accessibility=n -extract=y -print=none -modify=annotate', -2576,
-      0, 1, 0, 0, 1, 1, 1, 0, 0],
-     ['R3,V2,O=master', '',
+      1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0],
+     ['R3,V2,O=master', '',     # 5
       '-accessibility=n -extract=n -print=none -modify=form', -2624,
-      0, 0, 0, 0, 1, 1, 0, 0, 0],
-     ['R3,V2,U=view,O=master', 'view',
+      0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0],
+     ['R3,V2,U=view,O=master', 'view', # 6
       '-accessibility=n -extract=n -print=none -modify=assembly', -2880,
-      0, 0, 0, 0, 1, 0, 0, 0, 0],
-     ['R3,V2,U=view,O=master', 'master',
+      0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+     ['R3,V2,U=view,O=master', 'master', # 7
       '-accessibility=n -print=low', -2564,
-      0, 1, 1, 0, 1, 1, 1, 1, 1],
-     ['R3,V2,U=view,O=master', 'master',
+      1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1],
+     ['R3,V2,U=view,O=master', 'master', # 8
       '-modify=all -assemble=n', -1028,
-      1, 1, 1, 1, 0, 1, 1, 1, 0],
-     ['R3,V2,U=view,O=master', 'master',
+      1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0],
+     ['R3,V2,U=view,O=master', 'master', # 9
       '-modify=none -form=y', -1068,
-      1, 1, 1, 1, 0, 1, 0, 0, 0],
-     ['R3,V2,U=view,O=master', 'master',
+      1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0],
+     ['R3,V2,U=view,O=master', 'master', # 10
       '-modify=annotate -assemble=n', -1036,
-      1, 1, 1, 1, 0, 1, 1, 0, 0],
-     ['R3,V2,U=view,O=master', 'master',
+      1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0],
+     ['R3,V2,U=view,O=master', 'master', # 11
       '-form=n', -260,
-      1, 1, 1, 1, 1, 0, 1, 1, 0],
-     ['R3,V2,U=view,O=master', 'master',
+      1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0],
+     ['R3,V2,U=view,O=master', 'master', # 12
       '-annotate=n', -36,
-      1, 1, 1, 1, 1, 1, 0, 1, 0],
-     ['R3,V2,U=view,O=master', 'master',
+      1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0],
+     ['R3,V2,U=view,O=master', 'master', # 13
       '-modify-other=n', -12,
-      1, 1, 1, 1, 1, 1, 1, 0, 0],
-     ['R2,V1', '',
+      1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+     ['R2,V1', '',              # 14
       '-print=n -modify=n -extract=n -annotate=n', -64,
-      0, 0, 0, 0, 0, 0, 0, 0, 0],
-     ['R2,V1,U=view', 'view',
+      1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+     ['R2,V1,U=view', 'view',   # 15
       '-print=y -modify=n -extract=n -annotate=n', -60,
-      0, 0, 1, 1, 0, 0, 0, 0, 0],
-     ['R2,V1,O=master', 'master',
+      1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0],
+     ['R2,V1,O=master', 'master', # 16
       '-print=n -modify=y -extract=n -annotate=n', -56,
-      0, 0, 0, 0, 1, 0, 0, 1, 0],
-     ['R2,V1,O=master', '',
+      1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0],
+     ['R2,V1,O=master', '',     # 17
       '-print=n -modify=n -extract=y -annotate=n', -48,
-      1, 1, 0, 0, 0, 0, 0, 0, 0],
-     ['R2,V1,U=view,O=master', 'view',
+      0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+     ['R2,V1,U=view,O=master', 'view', # 18
       '-print=n -modify=n -extract=n -annotate=y', -32,
-      0, 0, 0, 0, 0, 1, 1, 0, 0],
-     ['R2,V1,U=view,O=master', 'master',
+      0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0],
+     ['R2,V1,U=view,O=master', 'master', # 19
       '', -4,
-      1, 1, 1, 1, 1, 1, 1, 1, 1],
-     ['long-password', 'asdf asdf asdf asdf asdf asdf qwer'],
-     ['long-password', 'asdf asdf asdf asdf asdf asdf qw'],
-     ['XI-base', ''],
-     ['XI-R6,V5,O=master', '',
+      1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+     ['long-password', 'asdf asdf asdf asdf asdf asdf qwer'], # 20
+     ['long-password', 'asdf asdf asdf asdf asdf asdf qw'],   # 21
+     ['XI-base', ''],                                         # 22
+     ['XI-R6,V5,O=master', '',                                # 23
       '-extract=n -print=none -modify=assembly', -2368,
-      1, 0, 0, 0, 1, 0, 0, 0, 0],
-     ['XI-R6,V5,O=master', 'master',
+      0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0],
+     ['XI-R6,V5,O=master', 'master', # 24
       '-extract=n -print=none -modify=assembly', -2368,
-      1, 0, 0, 0, 1, 0, 0, 0, 0],
-     ['XI-R6,V5,U=view,O=master', 'view',
+      1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0],
+     ['XI-R6,V5,U=view,O=master', 'view', # 25
       '-print=low', -2052,
-      1, 1, 1, 0, 1, 1, 1, 1, 1],
-     ['XI-R6,V5,U=view,O=master', 'master',
+      0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1],
+     ['XI-R6,V5,U=view,O=master', 'master', # 26
       '-print=low', -2052,
-      1, 1, 1, 0, 1, 1, 1, 1, 1],
-     ['XI-R6,V5,U=view,O=master', 'master',
+      1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1],
+     ['XI-R6,V5,U=view,O=master', 'master', # 27
       '-accessibility=n', -4, # -accessibility=n has no effect
-      1, 1, 1, 1, 1, 1, 1, 1, 1],
-     ['XI-long-password', 'qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm'],
-     ['XI-long-password', 'qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcv'],
+      1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+     ['XI-long-password', 'qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm'], # 28; -accessibility=n has no effect
+     ['XI-long-password', 'qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcv'], # 29
+     ['XI-R6,V5,U=wwwww,O=wwwww', 'wwwww', # 30
+      '', -4,
+      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     );
 
 $n_tests += 5 + (2 * (@encrypted_files)) + (6 * (@encrypted_files - 6)) + 9;
@@ -3112,15 +3115,26 @@ $td->runtest("significant password characters (V = 5)",
              {$td->REGEXP => ".*invalid password.*", $td->EXIT_STATUS => 2});
 
 my $enc_base = undef;
+my $enc_n = 0;
 foreach my $d (@encrypted_files)
 {
-    my ($file, $pass, $xeflags, $P,
+    ++$enc_n;
+    my ($file, $pass, $xeflags, $P, $match_owner, $match_user,
 	$accessible, $extract, $printlow, $printhigh,
 	$modifyassembly, $modifyform, $modifyannot,
 	$modifyother, $modifyall) = @$d;
 
     my $f = sub { $_[0] ? "allowed" : "not allowed" };
-    my $enc_details =
+    my $enc_details = "";
+    if ($match_owner)
+    {
+        $enc_details .= "Supplied password is owner password\n";
+    }
+    if ($match_user)
+    {
+        $enc_details .= "Supplied password is user password\n";
+    }
+    $enc_details .=
 	"extract for accessibility: " . &$f($accessible) . "\n" .
 	"extract for any purpose: " . &$f($extract) . "\n" .
 	"print low resolution: " . &$f($printlow) . "\n" .
@@ -3194,7 +3208,7 @@ foreach my $d (@encrypted_files)
 		     {$td->STRING => $accessibility_warning,
 		      $td->EXIT_STATUS => 0},
                      $td->NORMALIZE_NEWLINES);
-	$td->runtest("check /P",
+	$td->runtest("check /P enc2 ($enc_n)",
 		     {$td->COMMAND =>
 			  "qpdf --show-encryption --password=\"$pass\"" .
 			  " $file.enc2"},
@@ -3218,7 +3232,7 @@ foreach my $d (@encrypted_files)
 			  " $file.enc2 $file.enc4"},
 		     {$td->STRING => "",
 		      $td->EXIT_STATUS => 0});
-	$td->runtest("check /P",
+	$td->runtest("check /P enc4 ($enc_n)",
 		     {$td->COMMAND =>
 			  "qpdf --show-encryption --password=\"$pass\"" .
 			  " $file.enc4"},
@@ -3306,7 +3320,7 @@ $td->runtest("linearize encrypted file",
 	      $td->EXIT_STATUS => 0});
 $td->runtest("check encryption",
 	     {$td->COMMAND => "qpdf --show-encryption a.pdf",
-	      $td->FILTER => "grep -v allowed"},
+	      $td->FILTER => "grep -v allowed | grep -v Supplied"},
 	     {$td->STRING => "R = 3\nP = -4\nUser password = \n",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
@@ -3323,7 +3337,7 @@ $td->runtest("linearize and encrypt file",
 	      $td->EXIT_STATUS => 0});
 $td->runtest("check encryption",
 	     {$td->COMMAND => "qpdf --show-encryption --password=owner a.pdf",
-	      $td->FILTER => "grep -v allowed | grep -v method"},
+	      $td->FILTER => "grep -v allowed | grep -v method | grep -v Supplied"},
 	     {$td->STRING => "R = 4\nP = -4\nUser password = user\n",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
@@ -3342,7 +3356,7 @@ $td->runtest("encrypt with AES",
 	     {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("check encryption",
 	     {$td->COMMAND => "qpdf --show-encryption a.pdf",
-	      $td->FILTER => "grep -v allowed | grep -v method"},
+	      $td->FILTER => "grep -v allowed | grep -v method | grep -v Supplied"},
 	     {$td->STRING => "R = 4\nP = -4\nUser password = \n",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
@@ -3363,7 +3377,7 @@ $td->runtest("linearize with AES and object streams",
 	     {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("check encryption",
 	     {$td->COMMAND => "qpdf --show-encryption a.pdf",
-	      $td->FILTER => "grep -v allowed | grep -v method"},
+	      $td->FILTER => "grep -v allowed | grep -v method | grep -v Supplied"},
 	     {$td->STRING => "R = 4\nP = -4\nUser password = \n",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);

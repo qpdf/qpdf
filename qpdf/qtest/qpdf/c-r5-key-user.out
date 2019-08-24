@@ -4,6 +4,7 @@ R = 5
 P = -2052
 User password = user3
 Encryption key = 35ea16a48b6a3045133b69ac0906c2e8fb0a2cc97903ae17b51a5786ebdba020
+Supplied password is user password
 extract for accessibility: allowed
 extract for any purpose: allowed
 print low resolution: allowed
