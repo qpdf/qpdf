@@ -3490,6 +3490,38 @@ outfile.pdf</option>
     The only exception to this is that clear-text metadata will be
     preserved as clear-text if it is that way in the original file.
    </para>
+   <para>
+    One point of confusion some people have about encrypted PDF files
+    is that encryption is not the same as password protection.
+    Password protected files are always encrypted, but it is also
+    possible to create encrypted files that do not have passwords.
+    Internally, such files use the empty string as a password, and
+    most readers try the empty string first to see if it works and
+    prompt for a password only if the empty string doesn't work.
+    Normally such files have an empty user password and a non-empty
+    owner password. In that way, if the file is opened by an ordinary
+    reader without specification of password, the restrictions
+    specified in the encryption dictionary can be enforced. Most users
+    wouldn't even realize such a file was encrypted. Since qpdf always
+    ignores the restrictions (except for the purpose of reporting what
+    they are), qpdf doesn't care which password you use. QPDF will
+    allow you to create PDF files with non-empty user passwords and
+    empty owner passwords. Some readers will require a password when
+    you open these files, and others will open the files without a
+    password and not enforce restrictions. Having a non-empty user
+    password and an empty owner password doesn't really make sense
+    because it would mean that opening the file with the user password
+    would be more restrictive than not supplying a password at all.
+    QPDF also allows you to create PDF files with the same password as
+    both the user and owner password. Some readers will not ever allow
+    such files to be accessed without restrictions because they never
+    try the password as the owner password if it works as the user
+    password. Nonetheless, one of the powerful aspects of qpdf is that
+    it allows you to finely specify the way encrypted files are
+    created, even if the results are not useful to some readers. One
+    use case for this would be for testing a PDF reader to ensure that
+    it handles odd configurations of input files.
+   </para>
   </sect1>
   <sect1 id="ref.random-numbers">
    <title>Random Number Generation</title>
