@@ -132,7 +132,9 @@ QPDF::EncryptionParameters::EncryptionParameters() :
     cf_string(e_none),
     cf_file(e_none),
     cached_key_objid(0),
-    cached_key_generation(0)
+    cached_key_generation(0),
+    user_password_matched(false),
+    owner_password_matched(false)
 {
 }
 

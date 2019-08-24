@@ -1041,21 +1041,43 @@ QPDF::initializeEncryption()
     {
         // ignore passwords in file
     }
-    else if (check_owner_password(
-                 this->m->encp->user_password,
-                 this->m->encp->provided_password, data))
-    {
-	// password supplied was owner password; user_password has
-	// been initialized for V < 5
-    }
-    else if (check_user_password(this->m->encp->provided_password, data))
-    {
-	this->m->encp->user_password = this->m->encp->provided_password;
-    }
     else
     {
-	throw QPDFExc(qpdf_e_password, this->m->file->getName(),
-		      "", 0, "invalid password");
+        this->m->encp->owner_password_matched = check_owner_password(
+            this->m->encp->user_password,
+            this->m->encp->provided_password, data);
+        if (this->m->encp->owner_password_matched && (V < 5))
+        {
+            // password supplied was owner password; user_password has
+            // been initialized for V < 5
+            if (getTrimmedUserPassword() == this->m->encp->provided_password)
+            {
+                this->m->encp->user_password_matched = true;
+                QTC::TC("qpdf", "QPDF_encryption user matches owner V < 5");
+            }
+        }
+        else
+        {
+            this->m->encp->user_password_matched = check_user_password(
+                this->m->encp->provided_password, data);
+            if (this->m->encp->user_password_matched)
+            {
+                this->m->encp->user_password =
+                    this->m->encp->provided_password;
+            }
+        }
+        if (this->m->encp->user_password_matched &&
+            this->m->encp->owner_password_matched)
+        {
+            QTC::TC("qpdf", "QPDF_encryption same password",
+                    (V < 5) ? 0 : 1);
+        }
+        if (! (this->m->encp->owner_password_matched ||
+               this->m->encp->user_password_matched))
+        {
+            throw QPDFExc(qpdf_e_password, this->m->file->getName(),
+                          "", 0, "invalid password");
+        }
     }
 
     if (this->m->provided_password_is_hex_key)
@@ -1438,6 +1460,18 @@ QPDF::isEncrypted(int& R, int& P, int& V,
     {
 	return false;
     }
+}
+
+bool
+QPDF::ownerPasswordMatched() const
+{
+    return this->m->encp->owner_password_matched;
+}
+
+bool
+QPDF::userPasswordMatched() const
+{
+    return this->m->encp->user_password_matched;
 }
 
 static bool

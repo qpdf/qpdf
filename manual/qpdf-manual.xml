@@ -4581,6 +4581,17 @@ print "\n";
         </listitem>
         <listitem>
          <para>
+          New methods <function>QPDF::userPasswordMatched</function>
+          and <function>QPDF::ownerPasswordMatched</function> have
+          been added to enable a caller to determine whether the
+          supplied password was the user password, the owner password,
+          or both. This information is also displayed by <command>qpdf
+          --show-encryption</command> and <command>qpdf
+          --check</command>.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
           Static method
           <function>Pl_Flate::setCompressionLevel</function> can be
           called to set the zlib compression level globally used by

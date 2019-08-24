@@ -406,6 +406,12 @@ class QPDF
                      encryption_method_e& string_method,
                      encryption_method_e& file_method);
 
+    QPDF_DLL
+    bool ownerPasswordMatched() const;
+
+    QPDF_DLL
+    bool userPasswordMatched() const;
+
     // Encryption permissions -- not enforced by QPDF
     QPDF_DLL
     bool allowAccessibility();
@@ -756,6 +762,8 @@ class QPDF
         std::string cached_object_encryption_key;
         int cached_key_objid;
         int cached_key_generation;
+        bool user_password_matched;
+        bool owner_password_matched;
     };
 
     class ForeignStreamData
