@@ -2310,6 +2310,11 @@ QPDFObjectHandle::newStream(QPDF* qpdf, int objid, int generation,
 QPDFObjectHandle
 QPDFObjectHandle::newStream(QPDF* qpdf)
 {
+    if (qpdf == 0)
+    {
+        throw std::runtime_error(
+            "attempt to create stream in null qpdf object");
+    }
     QTC::TC("qpdf", "QPDFObjectHandle newStream");
     QPDFObjectHandle stream_dict = newDictionary();
     QPDFObjectHandle result = qpdf->makeIndirectObject(
