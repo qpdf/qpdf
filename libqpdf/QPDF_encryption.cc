@@ -440,9 +440,11 @@ QPDF::compute_encryption_key_from_password(
 	md5.encodeDataIncrementally(bytes, 4);
     }
     MD5::Digest digest;
-    int key_len = std::min(QIntC::to_int(sizeof(digest)), data.getLengthBytes());
+    int key_len =
+        std::min(QIntC::to_int(sizeof(digest)), data.getLengthBytes());
     iterate_md5_digest(md5, digest, ((data.getR() >= 3) ? 50 : 0), key_len);
-    return std::string(reinterpret_cast<char*>(digest), QIntC::to_size(key_len));
+    return std::string(reinterpret_cast<char*>(digest),
+                       QIntC::to_size(key_len));
 }
 
 static void
