@@ -107,7 +107,7 @@ Pl_LZWDecoder::getFirstChar(unsigned int code)
 	unsigned int idx = code - 258;
 	if (idx >= table.size())
         {
-            throw std::logic_error(
+            throw std::runtime_error(
                 "Pl_LZWDecoder::getFirstChar: table overflow");
         }
 	Buffer& b = table.at(idx);
@@ -115,7 +115,7 @@ Pl_LZWDecoder::getFirstChar(unsigned int code)
     }
     else
     {
-        throw std::logic_error(
+        throw std::runtime_error(
             "Pl_LZWDecoder::getFirstChar called with invalid code (" +
             QUtil::int_to_string(code) + ")");
     }
@@ -140,7 +140,7 @@ Pl_LZWDecoder::addToTable(unsigned char next)
 	unsigned int idx = this->last_code - 258;
 	if (idx >= table.size())
         {
-            throw std::logic_error(
+            throw std::runtime_error(
                 "Pl_LZWDecoder::addToTable: table overflow");
         }
 	Buffer& b = table.at(idx);
@@ -149,7 +149,7 @@ Pl_LZWDecoder::addToTable(unsigned char next)
     }
     else
     {
-        throw std::logic_error(
+        throw std::runtime_error(
             "Pl_LZWDecoder::addToTable called with invalid code (" +
             QUtil::int_to_string(this->last_code) + ")");
     }
@@ -239,7 +239,13 @@ Pl_LZWDecoder::handleCode(unsigned int code)
 	}
 	else
 	{
-	    Buffer& b = table.at(code - 258);
+            unsigned int idx = code - 258;
+            if (idx >= table.size())
+            {
+                throw std::runtime_error(
+                    "Pl_LZWDecoder::handleCode: table overflow");
+            }
+	    Buffer& b = table.at(idx);
 	    getNext()->write(b.getBuffer(), b.getSize());
 	}
     }
