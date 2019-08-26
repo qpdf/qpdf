@@ -19,7 +19,6 @@ my $qpdf_n_files = ($qpdf_n_test_files +
 
 
 my @fuzzers = (
-    ['qpdf' => $qpdf_n_files],
     ['ascii85' => 1],
     ['dct' => 1],
     ['flate' => 1],
@@ -28,6 +27,7 @@ my @fuzzers = (
     ['pngpredictor' => 1],
     ['runlength' => 6],
     ['tiffpredictor' => 1],
+    ['qpdf' => $qpdf_n_files],
     );
 
 my $n_tests = 0;
