@@ -24,6 +24,7 @@ class OffsetInputSource: public InputSource
   private:
     PointerHolder<InputSource> proxied;
     qpdf_offset_t global_offset;
+    qpdf_offset_t max_safe_offset;
 };
 
 #endif // QPDF_OFFSETINPUTSOURCE_HH
