@@ -1632,7 +1632,9 @@ QPDF::readObject(PointerHolder<InputSource> input,
                 }
 
                 length = toS(length_obj.getUIntValue());
-                input->seek(stream_offset + toO(length), SEEK_SET);
+                // Seek in two steps to avoid potential integer overflow
+                input->seek(stream_offset, SEEK_SET);
+                input->seek(toO(length), SEEK_CUR);
                 if (! (readToken(input) ==
                        QPDFTokenizer::Token(
                            QPDFTokenizer::tt_word, "endstream")))
