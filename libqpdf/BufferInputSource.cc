@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdexcept>
 #include <algorithm>
+#include <limits>
+#include <sstream>
 
 BufferInputSource::Members::Members(bool own_memory,
                                     std::string const& description,
@@ -10,7 +12,8 @@ BufferInputSource::Members::Members(bool own_memory,
     own_memory(own_memory),
     description(description),
     buf(buf),
-    cur_offset(0)
+    cur_offset(0),
+    max_offset(buf ? QIntC::to_offset(buf->getSize()) : 0)
 {
 }
 
@@ -29,6 +32,7 @@ BufferInputSource::BufferInputSource(std::string const& description,
     m(new Members(true, description, 0))
 {
     this->m->buf = new Buffer(contents.length());
+    this->m->max_offset = QIntC::to_offset(this->m->buf->getSize());
     unsigned char* bp = this->m->buf->getBuffer();
     memcpy(bp, contents.c_str(), contents.length());
 }
@@ -41,12 +45,6 @@ BufferInputSource::~BufferInputSource()
     }
 }
 
-qpdf_offset_t const
-BufferInputSource::bufSizeAsOffset() const
-{
-    return QIntC::to_offset(this->m->buf->getSize());
-}
-
 qpdf_offset_t
 BufferInputSource::findAndSkipNextEOL()
 {
@@ -54,7 +52,7 @@ BufferInputSource::findAndSkipNextEOL()
     {
         throw std::logic_error("INTERNAL ERROR: BufferInputSource offset < 0");
     }
-    qpdf_offset_t end_pos = bufSizeAsOffset();
+    qpdf_offset_t end_pos = this->m->max_offset;
     if (this->m->cur_offset >= end_pos)
     {
 	this->last_offset = end_pos;
@@ -103,6 +101,20 @@ BufferInputSource::tell()
 }
 
 void
+BufferInputSource::range_check(qpdf_offset_t cur, qpdf_offset_t delta)
+{
+    if ((delta > 0) &&
+        ((std::numeric_limits<qpdf_offset_t>::max() - cur) < delta))
+    {
+        std::ostringstream msg;
+        msg << "seeking forward from " << cur
+            << " by " << delta
+            << " would cause an overflow of the offset type";
+        throw std::range_error(msg.str());
+    }
+}
+
+void
 BufferInputSource::seek(qpdf_offset_t offset, int whence)
 {
     switch (whence)
@@ -112,10 +124,12 @@ BufferInputSource::seek(qpdf_offset_t offset, int whence)
 	break;
 
       case SEEK_END:
-	this->m->cur_offset = bufSizeAsOffset() + offset;
+        range_check(this->m->max_offset, offset);
+	this->m->cur_offset = this->m->max_offset + offset;
 	break;
 
       case SEEK_CUR:
+        range_check(this->m->cur_offset, offset);
 	this->m->cur_offset += offset;
 	break;
 
@@ -145,7 +159,7 @@ BufferInputSource::read(char* buffer, size_t length)
     {
         throw std::logic_error("INTERNAL ERROR: BufferInputSource offset < 0");
     }
-    qpdf_offset_t end_pos = bufSizeAsOffset();
+    qpdf_offset_t end_pos = this->m->max_offset;
     if (this->m->cur_offset >= end_pos)
     {
 	this->last_offset = end_pos;

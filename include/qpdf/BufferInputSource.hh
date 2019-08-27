@@ -54,7 +54,7 @@ class BufferInputSource: public InputSource
     virtual void unreadCh(char ch);
 
   private:
-    qpdf_offset_t const bufSizeAsOffset() const;
+    static void range_check(qpdf_offset_t cur, qpdf_offset_t delta);
 
     class Members
     {
@@ -72,6 +72,7 @@ class BufferInputSource: public InputSource
         std::string description;
         Buffer* buf;
         qpdf_offset_t cur_offset;
+        qpdf_offset_t max_offset;
     };
 
     PointerHolder<Members> m;
