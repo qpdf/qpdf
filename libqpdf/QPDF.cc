@@ -672,14 +672,14 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
     {
 	max_obj = std::max(max_obj, *(this->m->deleted_objects.rbegin()));
     }
-    if (size != max_obj + 1)
+    if (size - 1 != max_obj)
     {
 	QTC::TC("qpdf", "QPDF xref size mismatch");
 	warn(QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(), "", 0,
 		     std::string("reported number of objects (") +
 		     QUtil::int_to_string(size) +
-		     ") inconsistent with actual number of objects (" +
-		     QUtil::int_to_string(max_obj + 1) + ")"));
+		     ") is not one plus the highest object number (" +
+		     QUtil::int_to_string(max_obj) + ")"));
     }
 
     // We no longer need the deleted_objects table, so go ahead and

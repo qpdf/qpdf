@@ -1,5 +1,5 @@
 WARNING: issue-51.pdf: can't find PDF header
-WARNING: issue-51.pdf: reported number of objects (0) inconsistent with actual number of objects (9)
+WARNING: issue-51.pdf: reported number of objects (0) is not one plus the highest object number (8)
 WARNING: issue-51.pdf (object 7 0, offset 553): expected endobj
 WARNING: issue-51.pdf (object 1 0, offset 359): expected endobj
 WARNING: issue-51.pdf (offset 70): loop detected resolving object 2 0
