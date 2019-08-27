@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <limits>
 #include <stdlib.h>
 #include <string.h>
 #include <memory.h>
@@ -2151,6 +2152,11 @@ QPDFObjectHandle
 QPDF::makeIndirectObject(QPDFObjectHandle oh)
 {
     int max_objid = toI(getObjectCount());
+    if (max_objid == std::numeric_limits<int>::max())
+    {
+        throw std::range_error(
+            "max object id is too high to create new objects");
+    }
     QPDFObjGen next(max_objid + 1, 0);
     this->m->obj_cache[next] =
 	ObjCache(QPDFObjectHandle::ObjAccessor::getObject(oh), -1, -1);
