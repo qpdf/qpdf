@@ -41,6 +41,7 @@ CORPUS_FROM_TEST = \
 	outlines-with-old-root-dests.pdf \
 	page-labels-and-outlines.pdf \
 	page-labels-num-tree.pdf \
+	fuzz-16214.pdf \
 	issue-99b.pdf \
 	issue-99.pdf \
 	issue-100.pdf \

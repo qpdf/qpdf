@@ -105,7 +105,8 @@ QPDF_Stream::setStreamDescription()
 {
     setDescription(
         this->qpdf,
-        "stream object " + QUtil::int_to_string(this->objid) + " " +
+        this->qpdf->getFilename() +
+        ", stream object " + QUtil::int_to_string(this->objid) + " " +
         QUtil::int_to_string(this->generation));
 }
 

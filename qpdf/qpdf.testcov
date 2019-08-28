@@ -444,3 +444,4 @@ QPDF xref skipped space 0
 QPDF eof skipping spaces before xref 1
 QPDF_encryption user matches owner V < 5 0
 QPDF_encryption same password 1
+QPDFWriter stream in ostream 0
