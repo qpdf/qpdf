@@ -70,6 +70,8 @@ class QPDF_DLL_CLASS Pipeline
     virtual void write(unsigned char* data, size_t len) = 0;
     QPDF_DLL
     virtual void finish() = 0;
+    QPDF_DLL
+    std::string getIdentifier() const;
 
   protected:
     Pipeline* getNext(bool allow_null = false);

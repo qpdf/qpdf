@@ -473,6 +473,34 @@ class QPDFWriter
 
     enum trailer_e { t_normal, t_lin_first, t_lin_second };
 
+    // An reference to a PipelinePopper instance is passed into
+    // activatePipelineStack. When the PipelinePopper goes out of
+    // scope, the pipeline stack is popped. PipelinePopper's
+    // destructor calls finish on the current pipeline and pops the
+    // pipeline stack until the top of stack is a previous active top
+    // of stack, and restores the pipeline to that point. It deletes
+    // any pipelines that it pops. If the bp argument is non-null and
+    // any of the stack items are of type Pl_Buffer, the buffer is
+    // retrieved.
+    class PipelinePopper
+    {
+        friend class QPDFWriter;
+      public:
+        PipelinePopper(QPDFWriter* qw,
+                       PointerHolder<Buffer>* bp = 0) :
+            qw(qw),
+            bp(bp)
+        {
+        }
+        ~PipelinePopper();
+
+      private:
+        QPDFWriter* qw;
+        PointerHolder<Buffer>* bp;
+        std::string stack_id;
+    };
+    friend class PipelinePopper;
+
     unsigned int bytesNeeded(long long n);
     void writeBinary(unsigned long long val, unsigned int bytes);
     void writeString(std::string const& str);
@@ -560,24 +588,17 @@ class QPDFWriter
     int calculateXrefStreamPadding(qpdf_offset_t xref_bytes);
 
     // When filtering subsections, push additional pipelines to the
-    // stack.  When ready to switch, activate the pipeline stack.
-    // Pipelines passed to pushPipeline are deleted when
-    // clearPipelineStack is called.
+    // stack. When ready to switch, activate the pipeline stack. When
+    // the passed in PipelinePopper goes out of scope, the stack is
+    // popped.
     Pipeline* pushPipeline(Pipeline*);
-    void activatePipelineStack();
+    void activatePipelineStack(PipelinePopper&);
     void initializePipelineStack(Pipeline *);
 
-    // Calls finish on the current pipeline and pops the pipeline
-    // stack until the top of stack is a previous active top of stack,
-    // and restores the pipeline to that point.  Deletes any pipelines
-    // that it pops.  If the bp argument is non-null and any of the
-    // stack items are of type Pl_Buffer, the buffer is retrieved.
-    void popPipelineStack(PointerHolder<Buffer>* bp = 0);
-
     void adjustAESStreamLength(size_t& length);
-    void pushEncryptionFilter();
-    void pushDiscardFilter();
-    void pushMD5Pipeline();
+    void pushEncryptionFilter(PipelinePopper&);
+    void pushDiscardFilter(PipelinePopper&);
+    void pushMD5Pipeline(PipelinePopper&);
     void computeDeterministicIDData();
 
     void discardGeneration(std::map<QPDFObjGen, int> const& in,
@@ -654,6 +675,7 @@ class QPDFWriter
         std::map<QPDFObjGen, int> object_to_object_stream;
         std::map<int, std::set<QPDFObjGen> > object_stream_to_objects;
         std::list<Pipeline*> pipeline_stack;
+        unsigned long long next_stack_id;
         bool deterministic_id;
         Pl_MD5* md5_pipeline;
         std::string deterministic_id_data;

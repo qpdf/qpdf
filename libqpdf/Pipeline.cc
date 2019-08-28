@@ -31,3 +31,9 @@ Pipeline::getNext(bool allow_null)
     }
     return this->m->next;
 }
+
+std::string
+Pipeline::getIdentifier() const
+{
+    return this->identifier;
+}
