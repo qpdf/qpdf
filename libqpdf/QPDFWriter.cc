@@ -1341,7 +1341,11 @@ QPDFWriter::writeTrailer(trailer_e which, int size, bool xref_stream,
                          qpdf_offset_t prev, int linearization_pass)
 {
     QPDFObjectHandle trailer = getTrimmedTrailer();
-    if (! xref_stream)
+    if (xref_stream)
+    {
+        this->m->cur_data_key.clear();
+    }
+    else
     {
 	writeString("trailer <<");
     }
@@ -3320,7 +3324,10 @@ QPDFWriter::writeLinearized()
 		if (this->m->pipeline->getCount() != first_xref_end)
                 {
                     throw std::logic_error(
-                        "insufficient padding for first pass xref stream");
+                        "insufficient padding for first pass xref stream; "
+                        "first_xref_end=" +
+                        QUtil::int_to_string(first_xref_end) +
+                        "; endpos=" + QUtil::int_to_string(endpos));
                 }
 	    }
 	    writeString("\n");
