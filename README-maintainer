@@ -27,6 +27,8 @@ Memory checks:
 
 GOOGLE OSS-FUZZ
 
+* See ../misc/fuzz (not in repo) for unfixed, downloaded fuzz test cases
+
 * qpdf project: https://github.com/google/oss-fuzz/tree/master/projects/qpdf
 
 * To test locally, see https://github.com/google/oss-fuzz/tree/master/docs/,
@@ -38,10 +40,16 @@ GOOGLE OSS-FUZZ
   from a qpdf fork/branch rather than qpdf/master.
 
   python infra/helper.py build_image --pull qpdf
-  python infra/helper.py build_fuzzers qpdf
+  python infra/helper.py build_fuzzers [ --sanitizer memory|undefined|address qpdf
   python infra/helper.py check_build qpdf
   python infra/helper.py build_fuzzers --sanitizer coverage qpdf
   python infra/helper.py coverage qpdf
+
+  To reproduce a test case, build with the correct sanitizer, then run
+
+  python infra/helper.py reproduce qpdf fuzzer testcase
+
+  where fuzzer is the fuzzer used in the crash.
 
   The fuzzer is in build/out/qpdf. It can be run with a directory as
   an argument to run against files in a directory. You can use
