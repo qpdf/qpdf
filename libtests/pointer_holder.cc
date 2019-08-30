@@ -54,7 +54,7 @@ void callHello(ObjectHolder const& oh)
     (*oh).hello();
 }
 
-int main(int argc, char* argv[])
+void test_ph()
 {
     std::list<ObjectHolder> ol1;
 
@@ -96,6 +96,67 @@ int main(int argc, char* argv[])
     (*ol1.front()).hello();
     callHello(ol1.front());
     ol1.pop_front();
+    std::cout << "array" << std::endl;
+    PointerHolder<Object> oarr1_ph(true, new Object[2]);
     std::cout << "goodbye" << std::endl;
+}
+
+PointerHolder<Object> make_object_ph()
+{
+    return new Object;
+}
+
+std::shared_ptr<Object> make_object_sp()
+{
+    return std::make_shared<Object>();
+}
+
+void hello_ph(PointerHolder<Object> o)
+{
+    o->hello();
+}
+
+void hello_sp(std::shared_ptr<Object> o)
+{
+    o->hello();
+}
+
+void ph_sp_compat()
+{
+    // Ensure bidirectional compatibility between PointerHolder and
+    // shared_ptr.
+    std::cout << "compat" << std::endl;
+    PointerHolder<Object> ph_from_ph = make_object_ph();
+    std::shared_ptr<Object> sp_from_ph = make_object_ph();
+    PointerHolder<Object> ph_from_sp = make_object_sp();
+    std::shared_ptr<Object> sp_from_sp = make_object_sp();
+    hello_sp(ph_from_ph);
+    hello_ph(sp_from_ph);
+    hello_sp(ph_from_sp);
+    hello_ph(sp_from_sp);
+    PointerHolder<Object> arr1_ph;
+    {
+        std::cout << "initialize ph array from shared_ptr" << std::endl;
+        std::shared_ptr<Object> arr1(
+            new Object[2], std::default_delete<Object[]>());
+        arr1_ph = arr1;
+    }
+    std::cout << "delete ph array" << std::endl;
+    arr1_ph = nullptr;
+    std::shared_ptr<Object> arr2_sp;
+    {
+        std::cout << "initialize sp array from PointerHolder" << std::endl;
+        PointerHolder<Object> arr2(true, new Object[2]);
+        arr2_sp = arr2;
+    }
+    std::cout << "delete sp array" << std::endl;
+    arr2_sp = nullptr;
+    std::cout << "end compat" << std::endl;
+}
+
+int main(int argc, char* argv[])
+{
+    test_ph();
+    ph_sp_compat();
     return 0;
 }

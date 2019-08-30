@@ -22,8 +22,11 @@
 #ifndef POINTERHOLDER_HH
 #define POINTERHOLDER_HH
 
-// This class is basically std::shared_ptr but predates that by
-// several years.
+// Starting with qpdf 10, this class is a wrapper around
+// std::shared_ptr with special handling for arrays and ordering.
+// PointerHolder<T> can be used interchangeably with
+// std::shared_ptr<T> as bidirectional conversion is supported. This
+// goes for both the regular and array forms.
 
 // This class expects to be initialized with a dynamically allocated
 // object pointer.  It keeps a reference count and deletes this once
@@ -50,136 +53,80 @@
 // the underlying pointers provides a well-defined, if not
 // particularly meaningful, ordering.
 
+#include <memory>
+
 template <class T>
 class PointerHolder
 {
-  private:
-    class Data
-    {
-      public:
-	Data(T* pointer, bool array) :
-	    pointer(pointer),
-	    array(array),
-	    refcount(0)
-	    {
-	    }
-	~Data()
-	    {
-		if (array)
-		{
-		    delete [] this->pointer;
-		}
-		else
-		{
-		    delete this->pointer;
-		}
-	    }
-	T* pointer;
-	bool array;
-	int refcount;
-      private:
-	Data(Data const&);
-	Data& operator=(Data const&);
-    };
-
   public:
-    PointerHolder(T* pointer = 0)
-	{
-	    this->init(new Data(pointer, false));
-	}
+    PointerHolder(T* pointer = 0) :
+        p(pointer)
+    {
+    }
     // Special constructor indicating to free memory with delete []
     // instead of delete
-    PointerHolder(bool, T* pointer)
-	{
-	    this->init(new Data(pointer, true));
-	}
-    PointerHolder(PointerHolder const& rhs)
-	{
-	    this->copy(rhs);
-	}
-    PointerHolder& operator=(PointerHolder const& rhs)
-	{
-	    if (this != &rhs)
-	    {
-		this->destroy();
-		this->copy(rhs);
-	    }
-	    return *this;
-	}
-    ~PointerHolder()
-	{
-	    this->destroy();
-	}
+    PointerHolder(bool, T* pointer) :
+        p(pointer, std::default_delete<T[]>())
+    {
+    }
+    // Construct with a shared_ptr
+    PointerHolder(std::shared_ptr<T> const& p) :
+        p(p)
+    {
+    }
+
     bool operator==(PointerHolder const& rhs) const
     {
-	return this->data->pointer == rhs.data->pointer;
+	return this->p.get() == rhs.p.get();
     }
     bool operator<(PointerHolder const& rhs) const
     {
-	return this->data->pointer < rhs.data->pointer;
+	return this->p.get() < rhs.p.get();
+    }
+    operator std::shared_ptr<T> const() const
+    {
+        return this->p;
+    }
+    operator std::shared_ptr<T>()
+    {
+        return this->p;
     }
 
     // NOTE: The pointer returned by getPointer turns into a pumpkin
     // when the last PointerHolder that contains it disappears.
     T* getPointer()
-	{
-	    return this->data->pointer;
-	}
+    {
+        return this->p.get();
+    }
     T const* getPointer() const
-	{
-	    return this->data->pointer;
-	}
+    {
+        return this->p.get();
+    }
     int getRefcount() const
-	{
-	    return this->data->refcount;
-	}
+    {
+        return static_cast<int>(this->p.use_count());
+    }
 
     T const& operator*() const
     {
-        return *this->data->pointer;
+        return *(this->p);
     }
     T& operator*()
     {
-        return *this->data->pointer;
+        return *(this->p);
     }
 
     T const* operator->() const
     {
-        return this->data->pointer;
+        return this->p.get();
     }
     T* operator->()
     {
-        return this->data->pointer;
+        return this->p.get();
     }
 
   private:
-    void init(Data* data)
-	{
-	    this->data = data;
-	    {
-		++this->data->refcount;
-	    }
-	}
-    void copy(PointerHolder const& rhs)
-	{
-	    this->init(rhs.data);
-	}
-    void destroy()
-	{
-	    bool gone = false;
-	    {
-		if (--this->data->refcount == 0)
-		{
-		    gone = true;
-		}
-	    }
-	    if (gone)
-	    {
-		delete this->data;
-	    }
-	}
-
-    Data* data;
+    std::shared_ptr<T> p;
 };
 
 #endif // POINTERHOLDER_HH
