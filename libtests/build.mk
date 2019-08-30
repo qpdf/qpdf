@@ -1,4 +1,5 @@
 BINS_libtests = \
+	cxx11 \
 	aes \
 	ascii85 \
 	bits \
