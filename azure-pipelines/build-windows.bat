@@ -2,9 +2,9 @@
 @rem Usage: build-windows {32|64} {msvc|mingw}
 if %2 == msvc (
     if %1 == 64 (
-       call "%VS140COMNTOOLS%\..\..\VC\bin\amd64\vcvars64.bat"
+       call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
     ) else (
-       call "%VS140COMNTOOLS%\..\..\VC\bin\vcvars32.bat"
+       call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
     )
     choco install zip
     bash ./azure-pipelines/build-windows %1 %2
