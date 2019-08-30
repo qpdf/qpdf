@@ -15,15 +15,19 @@ C++-11 (for qpdf 10)
 
 * My c++11 branch adds autoconf tests to require C++-11 and
   re-implements PointerHolder so that it is interchangeable with
-  std::shared_ptr. Once this is in master, it will be possible to
-  globally replace PointerHolder with std::shared_ptr. This will break
-  binary compatibility, but if people want source compatibility, they
-  just have to explicitly include qpdf/PointerHolder.hh. We should
-  actually look at every use of PointerHolder to see which ones need
-  to be std::shared_ptr and which ones can be std::unique_ptr. For
-  source compatibility, all uses of PointerHolder in the API should be
-  changed to std::shared_ptr, though most likely they have to be that
-  anyway since std::unique_ptr is not copiable.
+  std::shared_ptr. It is not actually possible to just replace
+  PointerHolder with std::shared_ptr for two reasons: there is no
+  automatic creation of std::shared_ptr<T> from T* like there is for
+  PointerHolder, which breaks some code, and also there is no
+  automatic conversion from something like
+  std::vector<PointerHolder<T>> to std::vector<std::shared_ptr<T>>. It
+  may be a good idea to replace PointerHolder with std::shared_ptr in
+  the API even if it requires some work for the developer, but even if
+  that isn't worth it, we should find all occurrences of PointerHolder
+  within the code and replace with std::shared_ptr or std::unique_ptr
+  as needed. This will definitely break binary compatibility as the
+  PointerHolder<Members> pattern is part of the ABI for almost every
+  class.
 
 * QIntC.hh could be simplified with type_traits.
 
