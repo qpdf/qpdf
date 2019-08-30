@@ -1,6 +1,10 @@
 hello
 created Object, id 1
+oh1 refcount = 1
+oh1 refcount = 2
+oh2 refcount = 2
 created Object, id 2
+oh5 refcount = 1
 nulls equal
 destroyed Object, id 2
 equal okay

@@ -63,10 +63,14 @@ int main(int argc, char* argv[])
 	std::cout << "hello" << std::endl;
 	Object* o1 = new Object;
 	ObjectHolder oh1(o1);
+        std::cout << "oh1 refcount = " << oh1.getRefcount() << std::endl;
 	ObjectHolder oh2(oh1);
+        std::cout << "oh1 refcount = " << oh1.getRefcount() << std::endl;
+        std::cout << "oh2 refcount = " << oh2.getRefcount() << std::endl;
 	ObjectHolder oh3(new Object);
 	ObjectHolder oh4;
 	ObjectHolder oh5;
+        std::cout << "oh5 refcount = " << oh5.getRefcount() << std::endl;
 	if (oh4 == oh5)
 	{
 	    std::cout << "nulls equal" << std::endl;
