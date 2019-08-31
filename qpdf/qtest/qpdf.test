@@ -191,6 +191,47 @@ foreach my $d (['auto-ü', 1], ['auto-öπ', 2])
 
 show_ntests();
 # ----------
+$td->notify("--- Replace Input ---");
+$n_tests += 8;
+
+# Use Unicode file names to test replace input so we can be sure it
+# works for that case.
+$td->runtest("create unicode filenames",
+             {$td->COMMAND => "test_unicode_filenames"},
+             {$td->STRING => "created Unicode filenames\n",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+foreach my $d (['auto-ü', 1], ['auto-öπ', 2])
+{
+    my ($u, $n) = @$d;
+    $td->runtest("replace input $u",
+                 {$td->COMMAND => "qpdf --deterministic-id" .
+                      " --object-streams=generate --replace-input $u.pdf"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("check output ($u)",
+                 {$td->FILE => "$u.pdf"},
+                 {$td->FILE => "replace-input.pdf"},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+system("cp xref-with-short-size.pdf auto-warn.pdf") == 0 or die;
+$td->runtest("replace input with warnings",
+             {$td->COMMAND =>
+                  "qpdf --deterministic-id --replace-input auto-warn.pdf"},
+             {$td->FILE => "replace-warn.out", $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("check output",
+             {$td->FILE => "auto-warn.pdf"},
+             {$td->FILE => "warn-replace.pdf"});
+$td->runtest("check orig output",
+             {$td->FILE => "auto-warn.pdf.~qpdf-orig"},
+             {$td->FILE => "xref-with-short-size.pdf"});
+
+show_ntests();
+# ----------
 $td->notify("--- Final Version ---");
 $n_tests += 1;
 
@@ -4233,5 +4274,5 @@ sub get_md5_checksum
 sub cleanup
 {
     system("rm -rf *.ps *.pnm ?.pdf ?.qdf *.enc* tif1 tif2 tiff-cache");
-    system("rm -rf *split-out* ???-kfo.pdf *.tmpout \@file.pdf auto-*.pdf");
+    system("rm -rf *split-out* ???-kfo.pdf *.tmpout \@file.pdf auto-*");
 }

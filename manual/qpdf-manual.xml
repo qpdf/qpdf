@@ -331,10 +331,12 @@ make
     <option>outfilename</option> does not have to be seekable, even
     when generating linearized files.  Specifying
     &ldquo;<option>-</option>&rdquo; as <option>outfilename</option>
-    means to write to standard output.  However, you can't specify the
-    same file as both the input and the output because qpdf reads data
-    from the input file as it writes to the output file. QPDF attempts
-    to detect this case and fail without overwriting the output file.
+    means to write to standard output. If you want to overwrite the
+    input file with the output, use the option
+    <option>--replace-input</option> and omit the output file name.
+    You can't specify the same file as both the input and the output.
+    If you do this, qpdf will tell you about the
+    <option>--replace-input</option> option.
    </para>
    <para>
     Most options require an output file, but some testing or
@@ -446,6 +448,21 @@ make
       <listitem>
        <para>
         Causes generation of a linearized (web-optimized) output file.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--replace-input</option></term>
+      <listitem>
+       <para>
+        If specified, the output file name should be omitted. This
+        option tells qpdf to replace the input file with the output.
+        It does this by writing to
+        <filename>.~qpdf-temp.<replaceable>infilename</replaceable>#</filename>
+        and, when done, overwriting the input file with the temporary
+        file. If there were any warnings, the original input is saved
+        as
+        <filename><replaceable>infilename</replaceable>.~qpdf-orig</filename>.
        </para>
       </listitem>
      </varlistentry>
@@ -4419,6 +4436,15 @@ print "\n";
         CLI Enhancements
        </para>
        <itemizedlist>
+        <listitem>
+         <para>
+          The <option>--replace-input</option> option may be given in
+          place of an output file name. This causes qpdf to overwrite
+          the input file with the output. See the description of
+          <option>--replace-input</option> in <xref
+          linkend="ref.basic-options"/> for more details.
+         </para>
+        </listitem>
         <listitem>
          <para>
           The <option>--recompress-flate</option> instructs

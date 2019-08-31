@@ -23,6 +23,7 @@
 #include <qpdf/QPDFOutlineDocumentHelper.hh>
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
 #include <qpdf/QPDFExc.hh>
+#include <qpdf/QPDFSystemError.hh>
 
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QIntC.hh>
@@ -180,6 +181,7 @@ struct Options
         overlay("overlay"),
         under_overlay(0),
         require_outfile(true),
+        replace_input(false),
         infilename(0),
         outfilename(0)
     {
@@ -283,6 +285,7 @@ struct Options
     std::vector<PageSpec> page_specs;
     std::map<std::string, RotationSpec> rotations;
     bool require_outfile;
+    bool replace_input;
     char const* infilename;
     char const* outfilename;
 };
@@ -712,6 +715,7 @@ class ArgParser
     void argUOrepeat(char* parameter);
     void argUOpassword(char* parameter);
     void argEndUnderOverlay();
+    void argReplaceInput();
 
     void usage(std::string const& message);
     void checkCompletion();
@@ -940,6 +944,7 @@ ArgParser::initOptionTable()
         &ArgParser::argIiMinBytes, "minimum-bytes");
     (*t)["overlay"] = oe_bare(&ArgParser::argOverlay);
     (*t)["underlay"] = oe_bare(&ArgParser::argUnderlay);
+    (*t)["replace-input"] = oe_bare(&ArgParser::argReplaceInput);
 
     t = &this->encrypt40_option_table;
     (*t)["--"] = oe_bare(&ArgParser::argEndEncrypt);
@@ -1080,6 +1085,9 @@ ArgParser::argHelp()
         << "will be interpreted as an argument. No interpolation is done. Line\n"
         << "terminators are stripped. @- can be specified to read from standard input.\n"
         << "\n"
+        << "The output file can be - to indicate writing to standard output, or it can\n"
+        << "be --replace-input to cause qpdf to replace the input file with the output.\n"
+        << "\n"
         << "Note that when contradictory options are provided, whichever options are\n"
         << "provided last take precedence.\n"
         << "\n"
@@ -1097,6 +1105,8 @@ ArgParser::argHelp()
         << "--progress              give progress indicators while writing output\n"
         << "--no-warn               suppress warnings\n"
         << "--linearize             generated a linearized (web optimized) file\n"
+        << "--replace-input         use in place of specifying an output file; qpdf will\n"
+        << "                        replace the input file with the output\n"
         << "--copy-encryption=file  copy encryption parameters from specified file\n"
         << "--encryption-file-password=password\n"
         << "                        password used to open the file from which encryption\n"
@@ -2317,6 +2327,12 @@ ArgParser::argEndUnderOverlay()
 }
 
 void
+ArgParser::argReplaceInput()
+{
+    o.replace_input = true;
+}
+
+void
 ArgParser::handleArgFileArguments()
 {
     // Support reading arguments from files. Create a new argv. Ensure
@@ -3048,15 +3064,28 @@ ArgParser::doFinalChecks()
     {
         usage("missing -- at end of options");
     }
+    if (o.replace_input)
+    {
+        if (o.outfilename)
+        {
+            usage("--replace-input may not be used when"
+                  " an output file is specified");
+        }
+        else if (o.split_pages)
+        {
+            usage("--split-pages may not be used with --replace-input");
+        }
+    }
     if (o.infilename == 0)
     {
         usage("an input file name is required");
     }
-    else if (o.require_outfile && (o.outfilename == 0))
+    else if (o.require_outfile && (o.outfilename == 0) && (! o.replace_input))
     {
         usage("an output file name is required; use - for standard output");
     }
-    else if ((! o.require_outfile) && (o.outfilename != 0))
+    else if ((! o.require_outfile) &&
+             ((o.outfilename != 0) || o.replace_input))
     {
         usage("no output file may be given for this option");
     }
@@ -3065,7 +3094,8 @@ ArgParser::doFinalChecks()
         o.externalize_inline_images = true;
     }
 
-    if (o.require_outfile && (strcmp(o.outfilename, "-") == 0))
+    if (o.require_outfile && o.outfilename &&
+        (strcmp(o.outfilename, "-") == 0))
     {
         if (o.split_pages)
         {
@@ -3088,7 +3118,7 @@ ArgParser::doFinalChecks()
     {
         QTC::TC("qpdf", "qpdf same file error");
         usage("input file and output file are the same;"
-              " this would cause input file to be lost");
+              " use --replace-input to intentionally overwrite the input file");
     }
 }
 
@@ -3860,6 +3890,12 @@ static void do_inspection(QPDF& pdf, Options& o)
     if (o.show_pages)
     {
         do_show_pages(pdf, o);
+    }
+    if ((! pdf.getWarnings().empty()) && (exit_code != EXIT_ERROR))
+    {
+        std::cerr << whoami
+                  << ": operation succeeded with warnings" << std::endl;
+        exit_code = EXIT_WARNING;
     }
     if (exit_code)
     {
@@ -5109,17 +5145,79 @@ static void do_split_pages(QPDF& pdf, Options& o)
 
 static void write_outfile(QPDF& pdf, Options& o)
 {
-    if (strcmp(o.outfilename, "-") == 0)
+    std::string temp_out;
+    if (o.replace_input)
+    {
+        // Use a file name that is hidden by default in the OS to
+        // avoid having it become momentarily visible in a
+        // graphical file manager or in case it gets left behind
+        // because of some kind of error.
+        temp_out = ".~qpdf-temp." + std::string(o.infilename) + "#";
+        // o.outfilename will be restored to 0 before temp_out
+        // goes out of scope.
+        o.outfilename = temp_out.c_str();
+    }
+    else if (strcmp(o.outfilename, "-") == 0)
     {
         o.outfilename = 0;
     }
-    QPDFWriter w(pdf, o.outfilename);
-    set_writer_options(pdf, o, w);
-    w.write();
-    if (o.verbose)
+    {
+        // Private scope so QPDFWriter will close the output file
+        QPDFWriter w(pdf, o.outfilename);
+        set_writer_options(pdf, o, w);
+        w.write();
+    }
+    if (o.verbose && o.outfilename)
     {
         std::cout << whoami << ": wrote file "
                   << o.outfilename << std::endl;
+    }
+    if (o.replace_input)
+    {
+        o.outfilename = 0;
+    }
+    if (o.replace_input)
+    {
+        // We must close the input before we can rename files
+        pdf.closeInputSource();
+        std::string backup;
+        bool warnings = pdf.anyWarnings();
+        if (warnings)
+        {
+            // If there are warnings, the user may care about this
+            // file, so give it a non-hidden name that will be
+            // lexically grouped with the original file.
+            backup = std::string(o.infilename) + ".~qpdf-orig";
+        }
+        else
+        {
+            backup = ".~qpdf-orig." + std::string(o.infilename) + "#";
+        }
+        QUtil::rename_file(o.infilename, backup.c_str());
+        QUtil::rename_file(temp_out.c_str(), o.infilename);
+        if (warnings)
+        {
+            std::cerr << whoami
+                      << ": there are warnings; original file kept in "
+                      << backup << std::endl;
+        }
+        else
+        {
+            try
+            {
+                QUtil::remove_file(backup.c_str());
+            }
+            catch (QPDFSystemError& e)
+            {
+                std::cerr
+                    << whoami
+                    << ": unable to delete original file ("
+                    << e.what() << ");"
+                    << " original file left in " << backup
+                    << ", but the input was successfully replaced"
+                    << std::endl;
+            }
+        }
     }
 }
 
@@ -5156,7 +5254,7 @@ int realmain(int argc, char* argv[])
         handle_under_overlay(pdf, o);
         handle_transformations(pdf, o);
 
-	if (o.outfilename == 0)
+	if ((o.outfilename == 0) && (! o.replace_input))
 	{
             do_inspection(pdf, o);
 	}

@@ -11,4 +11,4 @@ WARNING: xref-with-short-size.pdf (xref stream, offset 16227): Cross-reference s
 10/0: compressed; stream = 5, index = 3
 11/0: compressed; stream = 5, index = 7
 12/0: compressed; stream = 5, index = 8
-qpdf: operation succeeded with warnings; resulting file may have some problems
+qpdf: operation succeeded with warnings
