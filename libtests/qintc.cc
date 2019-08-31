@@ -32,7 +32,7 @@ int main()
     uint64_t ul1 = 1099511627776LL; // Too big for 32-bit
     uint64_t ul2 = 12345;           // Fits into 32-bit
     int32_t i2 = 81;                // Fits in char and uchar
-    char c1 = '\xf7';               // Signed vaule when char
+    char c1 = '\xf7';               // Signed value when char
 
     // Verify i1 and u1 have same bit pattern
     assert(static_cast<uint32_t>(i1) == u1);

@@ -18,7 +18,7 @@ void usage()
               << " zlib compression level from" << std::endl
               << "1 to 9 where lower numbers are faster and"
               << " less compressed and higher" << std::endl
-              << "numbers are slower and more compresed"
+              << "numbers are slower and more compressed"
               << std::endl;
     exit(2);
 }

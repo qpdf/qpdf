@@ -1,7 +1,7 @@
 2019-08-24  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add QPDF::userPasswordMatched() and QPDF::ownerPasswordMatched()
-	methods so it can be deterined separately whether the supplied
+	methods so it can be determined separately whether the supplied
 	password matched the user password, the owner password, or both.
 	Fixes #159.
 

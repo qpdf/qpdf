@@ -179,8 +179,8 @@ namespace QIntC // QIntC = qpdf Integer Conversion
         }
     };
 
-    // Specific converers. The return type of each function must match
-    // the second template prameter to IntConverter.
+    // Specific converters. The return type of each function must match
+    // the second template parameter to IntConverter.
     template <typename T>
     char to_char(T const& i)
     {
