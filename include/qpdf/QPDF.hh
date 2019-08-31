@@ -101,6 +101,14 @@ class QPDF
     void processInputSource(PointerHolder<InputSource>,
                             char const* password = 0);
 
+    // Close or otherwise release the input source. Once this has been
+    // called, no other methods of qpdf can be called safely except
+    // for getWarnings and anyWarnings(). After this has been called,
+    // it is safe to perform operations on the input file such as
+    // deleting or renaming it.
+    QPDF_DLL
+    void closeInputSource();
+
     // For certain forensic or investigatory purposes, it may
     // sometimes be useful to specify the encryption key directly,
     // even though regular PDF applications do not provide a way to do
@@ -205,6 +213,11 @@ class QPDF
     // here will have already been output.
     QPDF_DLL
     std::vector<QPDFExc> getWarnings();
+
+    // Indicate whether any warnings have been issued so far. Does not
+    // clear the list of warnings.
+    QPDF_DLL
+    bool anyWarnings() const;
 
     // Return an application-scoped unique ID for this QPDF object.
     // This is not a globally unique ID. It is constructing using a

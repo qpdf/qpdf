@@ -1,5 +1,11 @@
 2019-08-31  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add QPDF::anyWarnings() method to find out whether there have
+	been any warnings without resetting the list.
+
+	* Add QPDF::closeInputSource() method to release the input source
+	so the input file can be deleted or renamed.
+
 	* Add methods rename_file and remove_file to QUtil.
 
 2019-08-24  Jay Berkenbilt  <ejb@ql.org>

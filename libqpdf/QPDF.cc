@@ -240,6 +240,12 @@ QPDF::processInputSource(PointerHolder<InputSource> source,
 }
 
 void
+QPDF::closeInputSource()
+{
+    this->m->file = 0;
+}
+
+void
 QPDF::setPasswordIsHexKey(bool val)
 {
     this->m->provided_password_is_hex_key = val;
@@ -288,6 +294,12 @@ QPDF::getWarnings()
     std::vector<QPDFExc> result = this->m->warnings;
     this->m->warnings.clear();
     return result;
+}
+
+bool
+QPDF::anyWarnings() const
+{
+    return ! this->m->warnings.empty();
 }
 
 bool

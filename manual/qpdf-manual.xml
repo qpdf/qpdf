@@ -4429,7 +4429,7 @@ print "\n";
         </listitem>
         <listitem>
          <para>
-          the
+          The
           <option>--compression-level=<replaceable>level</replaceable></option>
           sets the zlib compression level used for any streams
           compressed by <literal>/FlateDecode</literal>. Most
@@ -4455,6 +4455,20 @@ print "\n";
           inspected to see if it could use one of these safe
           converters instead. See <xref linkend="ref.casting"/> for
           additional details.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Method <function>QPDF::anyWarnings</function> tells whether
+          there have been any warnings without clearing the list of
+          warnings.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Method <function>QPDF::closeInputSource</function> closes or
+          otherwise releases the input source. This enables the input
+          file to be deleted or renamed.
          </para>
         </listitem>
         <listitem>
