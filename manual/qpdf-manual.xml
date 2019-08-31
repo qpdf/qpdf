@@ -4416,6 +4416,161 @@ print "\n";
       </listitem>
       <listitem>
        <para>
+        CLI Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          The <option>--recompress-flate</option> instructs
+          <command>qpdf</command> to recompress streams that are
+          already compressed with <literal>/FlateDecode</literal>.
+          Useful with <option>--compression-level</option>.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          the
+          <option>--compression-level=<replaceable>level</replaceable></option>
+          sets the zlib compression level used for any streams
+          compressed by <literal>/FlateDecode</literal>. Most
+          effective when combined with
+          <option>--recompress-flate</option>.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Library Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          A new namespace <classname>QIntC</classname>, provided by
+          <filename>qpdf/QIntC.hh</filename>, provides safe conversion
+          methods between different integer types. These conversion
+          methods do range checking to ensure that the cast can be
+          performed with no loss of information. Every use of
+          <function>static_cast</function> in the library was
+          inspected to see if it could use one of these safe
+          converters instead. See <xref linkend="ref.casting"/> for
+          additional details.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          New methods have been added to <classname>QUtil</classname>
+          for converting back and forth between strings and unsigned
+          integers: <function>uint_to_string</function>,
+          <function>uint_to_string_base</function>,
+          <function>string_to_uint</function>, and
+          <function>string_to_ull</function>.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          New methods have been added to
+          <classname>QPDFObjectHandle</classname> that return the
+          value of <classname>Integer</classname> objects as
+          <type>int</type> or <type>unsigned int</type> with range
+          checking and sensible fallback values, and a new method was
+          added to return an unsigned value. This makes it easier to
+          write code that is safe from unintentional data loss.
+          Functions: <function>getUIntValue</function>,
+          <function>getIntVauleAsInt</function>,
+          <function>getUIntValueAsUInt</function>.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          When parsing content streams with
+          <classname>QPDFObjectHandle::ParserCallbacks</classname>, in
+          place of the method
+          <function>handleObject(QPDFObjectHandle)</function>, the
+          developer may override
+          <function>handleObject(QPDFObjectHandle, size_t offset,
+          size_t length)</function>. If this method is defined, it
+          will be invoked with the object along with its offset and
+          length within the overall contents being parsed. Intervening
+          spaces and comments are not included in offset and length.
+          Additionally, a new method
+          <function>contentSize(size_t)</function> may be implemented.
+          If present, it will be called prior to the first call to
+          <function>handleObject</function> with the total size in
+          bytes of the combined contents.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          New methods <function>QPDF::userPasswordMatched</function>
+          and <function>QPDF::ownerPasswordMatched</function> have
+          been added to enable a caller to determine whether the
+          supplied password was the user password, the owner password,
+          or both. This information is also displayed by <command>qpdf
+          --show-encryption</command> and <command>qpdf
+          --check</command>.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Static method
+          <function>Pl_Flate::setCompressionLevel</function> can be
+          called to set the zlib compression level globally used by
+          all instances of Pl_Flate in deflate mode.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          The method
+          <function>QPDFWriter::setRecompressFlate</function> can be
+          called to tell <classname>QPDFWriter</classname> to
+          uncompress and recompress streams already compressed with
+          <literal>/FlateDecode</literal>.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          The underlying implementation of QPDF arrays has been
+          enhanced to be much more memory efficient when dealing with
+          arrays with lots of nulls. This enables qpdf to use
+          drastically less memory for certain types of files.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          When traversing the pages tree, if nodes are encountered
+          with invalid types, the types are fixed, and a warning is
+          issued.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          A new helper method
+          <function>QUtil::read_file_into_memory</function> was added.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          All conditions previously reported by
+          <function>QPDF::checkLinearization()</function> as errors
+          are now presented as warnings.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Name tokens containing the <literal>#</literal> character
+          not preceded by two hexadecimal digits, which is invalid in
+          PDF 1.2 and above, are properly handled by the library: a
+          warning is generated, and the name token is properly
+          preserved, even if invalid, in the output. See
+          <filename>ChangeLog</filename> for a more complete
+          description of this change.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
         Bug Fixes
        </para>
        <itemizedlist>
@@ -4514,154 +4669,6 @@ print "\n";
           locate <filename>libjpeg</filename> and
           <filename>zlib</filename> dependencies, falling back on old
           behavior if unsuccessful.
-         </para>
-        </listitem>
-       </itemizedlist>
-      </listitem>
-      <listitem>
-       <para>
-        Library and CLI Enhancements
-       </para>
-       <itemizedlist>
-        <listitem>
-         <para>
-          A new namespace <classname>QIntC</classname>, provided by
-          <filename>qpdf/QIntC.hh</filename>, provides safe conversion
-          methods between different integer types. These conversion
-          methods do range checking to ensure that the cast can be
-          performed with no loss of information. Every use of
-          <function>static_cast</function> in the library was
-          inspected to see if it could use one of these safe
-          converters instead. See <xref linkend="ref.casting"/> for
-          additional details.
-         </para>
-        </listitem>
-        <listitem>
-         <para>
-          New methods have been added to <classname>QUtil</classname>
-          for converting back and forth between strings and unsigned
-          integers: <function>uint_to_string</function>,
-          <function>uint_to_string_base</function>,
-          <function>string_to_uint</function>, and
-          <function>string_to_ull</function>.
-         </para>
-        </listitem>
-        <listitem>
-         <para>
-          New methods have been added to
-          <classname>QPDFObjectHandle</classname> that return the
-          value of <classname>Integer</classname> objects as
-          <type>int</type> or <type>unsigned int</type> with range
-          checking and sensible fallback values, and a new method was
-          added to return an unsigned value. This makes it easier to
-          write code that is safe from unintentional data loss.
-          Functions: <function>getUIntValue</function>,
-          <function>getIntVauleAsInt</function>,
-          <function>getUIntValueAsUInt</function>.
-         </para>
-        </listitem>
-        <listitem>
-         <para>
-          When parsing content streams with
-          <classname>QPDFObjectHandle::ParserCallbacks</classname>, in
-          place of the method
-          <function>handleObject(QPDFObjectHandle)</function>, the
-          developer may override
-          <function>handleObject(QPDFObjectHandle, size_t offset,
-          size_t length)</function>. If this method is defined, it
-          will be invoked with the object along with its offset and
-          length within the overall contents being parsed. Intervening
-          spaces and comments are not included in offset and length.
-          Additionally, a new method
-          <function>contentSize(size_t)</function> may be implemented.
-          If present, it will be called prior to the first call to
-          <function>handleObject</function> with the total size in
-          bytes of the combined contents.
-         </para>
-        </listitem>
-        <listitem>
-         <para>
-          New methods <function>QPDF::userPasswordMatched</function>
-          and <function>QPDF::ownerPasswordMatched</function> have
-          been added to enable a caller to determine whether the
-          supplied password was the user password, the owner password,
-          or both. This information is also displayed by <command>qpdf
-          --show-encryption</command> and <command>qpdf
-          --check</command>.
-         </para>
-        </listitem>
-        <listitem>
-         <para>
-          Static method
-          <function>Pl_Flate::setCompressionLevel</function> can be
-          called to set the zlib compression level globally used by
-          all instances of Pl_Flate in deflate mode.
-         </para>
-        </listitem>
-        <listitem>
-         <para>
-          The method
-          <function>QPDFWriter::setRecompressFlate</function> can be
-          called to tell <classname>QPDFWriter</classname> to
-          uncompress and recompress streams already compressed with
-          <literal>/FlateDecode</literal>.
-         </para>
-        </listitem>
-        <listitem>
-         <para>
-          CLI enhancement: the <option>--recompress-flate</option>
-          instructs <command>qpdf</command> to recompress streams that
-          are already compressed with <literal>/FlateDecode</literal>.
-          Useful with <option>--compression-level</option>.
-         </para>
-        </listitem>
-        <listitem>
-         <para>
-          CLI enhancement: the
-          <option>--compression-level=<replaceable>level</replaceable></option>
-          sets the zlib compression level used for any streams
-          compressed by <literal>/FlateDecode</literal>. Most
-          effective when combined with
-          <option>--recompress-flate</option>.
-         </para>
-        </listitem>
-        <listitem>
-         <para>
-          The underlying implementation of QPDF arrays has been
-          enhanced to be much more memory efficient when dealing with
-          arrays with lots of nulls. This enables qpdf to use
-          drastically less memory for certain types of files.
-         </para>
-        </listitem>
-        <listitem>
-         <para>
-          When traversing the pages tree, if nodes are encountered
-          with invalid types, the types are fixed, and a warning is
-          issued.
-         </para>
-        </listitem>
-        <listitem>
-         <para>
-          A new helper method
-          <function>QUtil::read_file_into_memory</function> was added.
-         </para>
-        </listitem>
-        <listitem>
-         <para>
-          All conditions previously reported by
-          <function>QPDF::checkLinearization()</function> as errors
-          are now presented as warnings.
-         </para>
-        </listitem>
-        <listitem>
-         <para>
-          Name tokens containing the <literal>#</literal> character
-          not preceded by two hexadecimal digits, which is invalid in
-          PDF 1.2 and above, are properly handled by the library: a
-          warning is generated, and the name token is properly
-          preserved, even if invalid, in the output. See
-          <filename>ChangeLog</filename> for a more complete
-          description of this change.
          </para>
         </listitem>
        </itemizedlist>
