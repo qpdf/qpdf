@@ -72,6 +72,7 @@ annots
 ansi
 antivirus
 anyBadTokens
+anyWarnings
 aobjid
 aoh
 ap
@@ -151,6 +152,7 @@ argQdf
 argRawStreamData
 argRecompressFlate
 argRemovePageLabels
+argReplaceInput
 argRotate
 args
 argShowEncryption
@@ -353,6 +355,7 @@ ClearTextMetadata
 CLI
 ClosedFileInputSource
 CloseHandle
+closeInputSource
 closeObject
 clusterfuzz
 cmath
@@ -1318,6 +1321,7 @@ newInlineImage
 newInteger
 NEWKEYSET
 newName
+newname
 newNull
 newOperator
 newpage
@@ -1411,6 +1415,7 @@ oi
 oiter
 okey
 ol
+oldname
 oldpdf
 olist
 omap
@@ -1975,6 +1980,7 @@ td
 Te
 TerminateParsing
 terminateParsing
+testcase
 testOutlines
 testPages
 TESTSUITE
@@ -2152,8 +2158,11 @@ wmain
 wmatrix
 wmode
 wmodep
-Wold
+wnew
+wold
+wpath
 wrapInArray
+wrename
 writeAppearance
 writeBinary
 writeBits
@@ -2181,6 +2190,7 @@ writeTrailer
 writeXRefStream
 writeXRefTable
 Wsign
+wunlink
 www
 WX
 wxWindows
