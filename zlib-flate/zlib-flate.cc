@@ -49,7 +49,6 @@ int main(int argc, char* argv[])
     {
 	usage();
     }
-    // QXXXQ level
 
     Pl_Flate::action_e action = Pl_Flate::a_inflate;
 
