@@ -119,11 +119,12 @@ RELEASE PREPARATION
   with newer version of gcc if available.
 
 * Test 32-bit. Pass `CC=i686-linux-gnu-gcc CXX=i686-linux-gnu-g++` to
-  `./configure`.
+  `./configure`. (Done in CI.)
 
-* Test build on a mac.
+* Test build on a mac. (Done in CI.)
 
-* Test with address sanitizer as described above.
+* Test with address sanitizer as described above. (Done in CI with
+  gcc; test locally with clang.)
 
 * A small handful of additional files have been taken from autotools
   programs. These should probably be updated from time to time.
@@ -151,7 +152,7 @@ RELEASE PREPARATION
   properly handled with QIntC or the appropriate cast.
 
 * Increment shared library version information as needed (`LT_*` in
-  `configure.ac`)
+  `configure.ac`). Remember to rerun ./autogen.sh.
 
 * Test for binary compatibility:
   * Check out the last release
