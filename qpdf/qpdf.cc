@@ -5024,104 +5024,102 @@ static void set_writer_options(QPDF& pdf, Options& o, QPDFWriter& w)
     }
 }
 
-static void write_outfile(QPDF& pdf, Options& o)
+static void do_split_pages(QPDF& pdf, Options& o)
 {
-    if (o.split_pages)
+    // Generate output file pattern
+    std::string before;
+    std::string after;
+    size_t len = strlen(o.outfilename);
+    char* num_spot = strstr(const_cast<char*>(o.outfilename), "%d");
+    if (num_spot != 0)
     {
-        // Generate output file pattern
-        std::string before;
-        std::string after;
-        size_t len = strlen(o.outfilename);
-        char* num_spot = strstr(const_cast<char*>(o.outfilename), "%d");
-        if (num_spot != 0)
-        {
-            QTC::TC("qpdf", "qpdf split-pages %d");
-            before = std::string(o.outfilename,
-                                 QIntC::to_size(num_spot - o.outfilename));
-            after = num_spot + 2;
-        }
-        else if ((len >= 4) &&
-                 (QUtil::str_compare_nocase(
-                     o.outfilename + len - 4, ".pdf") == 0))
-        {
-            QTC::TC("qpdf", "qpdf split-pages .pdf");
-            before = std::string(o.outfilename, len - 4) + "-";
-            after = o.outfilename + len - 4;
-        }
-        else
-        {
-            QTC::TC("qpdf", "qpdf split-pages other");
-            before = std::string(o.outfilename) + "-";
-        }
-
-        if (! o.preserve_unreferenced_page_resources)
-        {
-            QPDFPageDocumentHelper dh(pdf);
-            dh.removeUnreferencedResources();
-        }
-        QPDFPageLabelDocumentHelper pldh(pdf);
-        std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
-        size_t pageno_len = QUtil::uint_to_string(pages.size()).length();
-        size_t num_pages = pages.size();
-        for (size_t i = 0; i < num_pages; i += QIntC::to_size(o.split_pages))
-        {
-            size_t first = i + 1;
-            size_t last = i + QIntC::to_size(o.split_pages);
-            if (last > num_pages)
-            {
-                last = num_pages;
-            }
-            QPDF outpdf;
-            outpdf.emptyPDF();
-            for (size_t pageno = first; pageno <= last; ++pageno)
-            {
-                QPDFObjectHandle page = pages.at(pageno - 1);
-                outpdf.addPage(page, false);
-            }
-            if (pldh.hasPageLabels())
-            {
-                std::vector<QPDFObjectHandle> labels;
-                pldh.getLabelsForPageRange(
-                    QIntC::to_longlong(first - 1),
-                    QIntC::to_longlong(last - 1),
-                    0, labels);
-                QPDFObjectHandle page_labels =
-                    QPDFObjectHandle::newDictionary();
-                page_labels.replaceKey(
-                    "/Nums", QPDFObjectHandle::newArray(labels));
-                outpdf.getRoot().replaceKey("/PageLabels", page_labels);
-            }
-            std::string page_range =
-                QUtil::uint_to_string(first, QIntC::to_int(pageno_len));
-            if (o.split_pages > 1)
-            {
-                page_range += "-" +
-                    QUtil::uint_to_string(last, QIntC::to_int(pageno_len));
-            }
-            std::string outfile = before + page_range + after;
-            QPDFWriter w(outpdf, outfile.c_str());
-            set_writer_options(outpdf, o, w);
-            w.write();
-            if (o.verbose)
-            {
-                std::cout << whoami << ": wrote file " << outfile << std::endl;
-            }
-        }
+        QTC::TC("qpdf", "qpdf split-pages %d");
+        before = std::string(o.outfilename,
+                             QIntC::to_size(num_spot - o.outfilename));
+        after = num_spot + 2;
+    }
+    else if ((len >= 4) &&
+             (QUtil::str_compare_nocase(
+                 o.outfilename + len - 4, ".pdf") == 0))
+    {
+        QTC::TC("qpdf", "qpdf split-pages .pdf");
+        before = std::string(o.outfilename, len - 4) + "-";
+        after = o.outfilename + len - 4;
     }
     else
     {
-        if (strcmp(o.outfilename, "-") == 0)
+        QTC::TC("qpdf", "qpdf split-pages other");
+        before = std::string(o.outfilename) + "-";
+    }
+
+    if (! o.preserve_unreferenced_page_resources)
+    {
+        QPDFPageDocumentHelper dh(pdf);
+        dh.removeUnreferencedResources();
+    }
+    QPDFPageLabelDocumentHelper pldh(pdf);
+    std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
+    size_t pageno_len = QUtil::uint_to_string(pages.size()).length();
+    size_t num_pages = pages.size();
+    for (size_t i = 0; i < num_pages; i += QIntC::to_size(o.split_pages))
+    {
+        size_t first = i + 1;
+        size_t last = i + QIntC::to_size(o.split_pages);
+        if (last > num_pages)
         {
-            o.outfilename = 0;
+            last = num_pages;
         }
-        QPDFWriter w(pdf, o.outfilename);
-        set_writer_options(pdf, o, w);
+        QPDF outpdf;
+        outpdf.emptyPDF();
+        for (size_t pageno = first; pageno <= last; ++pageno)
+        {
+            QPDFObjectHandle page = pages.at(pageno - 1);
+            outpdf.addPage(page, false);
+        }
+        if (pldh.hasPageLabels())
+        {
+            std::vector<QPDFObjectHandle> labels;
+            pldh.getLabelsForPageRange(
+                QIntC::to_longlong(first - 1),
+                QIntC::to_longlong(last - 1),
+                0, labels);
+            QPDFObjectHandle page_labels =
+                QPDFObjectHandle::newDictionary();
+            page_labels.replaceKey(
+                "/Nums", QPDFObjectHandle::newArray(labels));
+            outpdf.getRoot().replaceKey("/PageLabels", page_labels);
+        }
+        std::string page_range =
+            QUtil::uint_to_string(first, QIntC::to_int(pageno_len));
+        if (o.split_pages > 1)
+        {
+            page_range += "-" +
+                QUtil::uint_to_string(last, QIntC::to_int(pageno_len));
+        }
+        std::string outfile = before + page_range + after;
+        QPDFWriter w(outpdf, outfile.c_str());
+        set_writer_options(outpdf, o, w);
         w.write();
         if (o.verbose)
         {
-            std::cout << whoami << ": wrote file "
-                      << o.outfilename << std::endl;
+            std::cout << whoami << ": wrote file " << outfile << std::endl;
         }
+    }
+}
+
+static void write_outfile(QPDF& pdf, Options& o)
+{
+    if (strcmp(o.outfilename, "-") == 0)
+    {
+        o.outfilename = 0;
+    }
+    QPDFWriter w(pdf, o.outfilename);
+    set_writer_options(pdf, o, w);
+    w.write();
+    if (o.verbose)
+    {
+        std::cout << whoami << ": wrote file "
+                  << o.outfilename << std::endl;
     }
 }
 
@@ -5162,6 +5160,10 @@ int realmain(int argc, char* argv[])
 	{
             do_inspection(pdf, o);
 	}
+        else if (o.split_pages)
+        {
+            do_split_pages(pdf, o);
+        }
 	else
 	{
             write_outfile(pdf, o);
