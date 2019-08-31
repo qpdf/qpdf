@@ -1,3 +1,7 @@
+2019-08-31  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add methods rename_file and remove_file to QUtil.
+
 2019-08-24  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add QPDF::userPasswordMatched() and QPDF::ownerPasswordMatched()

@@ -394,15 +394,14 @@ QUtil::os_wrapper(std::string const& description, int status)
     return status;
 }
 
-FILE*
-QUtil::safe_fopen(char const* filename, char const* mode)
-{
-    FILE* f = 0;
 #ifdef _WIN32
+static PointerHolder<wchar_t>
+win_convert_filename(char const* filename)
+{
     // Convert the utf-8 encoded filename argument to wchar_t*. First,
     // convert to utf16, then to wchar_t*. Note that u16 will start
     // with the UTF16 marker, which we skip.
-    std::string u16 = utf8_to_utf16(filename);
+    std::string u16 = QUtil::utf8_to_utf16(filename);
     size_t len = u16.length();
     size_t wlen = (len / 2) - 1;
     PointerHolder<wchar_t> wfilenamep(true, new wchar_t[wlen + 1]);
@@ -415,6 +414,17 @@ QUtil::safe_fopen(char const* filename, char const* mode)
                 (static_cast<unsigned char>(u16.at(i)) << 8) +
                 static_cast<unsigned char>(u16.at(i+1)));
     }
+    return wfilenamep;
+}
+#endif
+
+FILE*
+QUtil::safe_fopen(char const* filename, char const* mode)
+{
+    FILE* f = 0;
+#ifdef _WIN32
+    PointerHolder<wchar_t> wfilenamep = win_convert_filename(filename);
+    wchar_t* wfilename = wfilenamep.getPointer();
     PointerHolder<wchar_t> wmodep(true, new wchar_t[strlen(mode) + 1]);
     wchar_t* wmode = wmodep.getPointer();
     wmode[strlen(mode)] = 0;
@@ -535,6 +545,40 @@ QUtil::same_file(char const* name1, char const* name2)
     }
 #endif
     return false;
+}
+
+
+void
+QUtil::remove_file(char const* path)
+{
+#ifdef _WIN32
+    PointerHolder<wchar_t> wpath = win_convert_filename(path);
+    os_wrapper(std::string("remove ") + path, _wunlink(wpath.getPointer()));
+#else
+    os_wrapper(std::string("remove ") + path, unlink(path));
+#endif
+}
+
+void
+QUtil::rename_file(char const* oldname, char const* newname)
+{
+#ifdef _WIN32
+    try
+    {
+        remove_file(newname);
+    }
+    catch (QPDFSystemError&)
+    {
+        // ignore
+    }
+    PointerHolder<wchar_t> wold = win_convert_filename(oldname);
+    PointerHolder<wchar_t> wnew = win_convert_filename(newname);
+    os_wrapper(std::string("rename ") + oldname + " " + newname,
+               _wrename(wold.getPointer(), wnew.getPointer()));
+#else
+    os_wrapper(std::string("rename ") + oldname + " " + newname,
+               rename(oldname, newname));
+#endif
 }
 
 char*

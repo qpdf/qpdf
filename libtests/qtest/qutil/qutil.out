@@ -99,3 +99,9 @@ read 24652 bytes
 ---- hex encode/decode
 begin hex encode/decode
 end hex encode/decode
+---- rename/delete
+create file
+rename file
+create file
+rename over existing
+delete file

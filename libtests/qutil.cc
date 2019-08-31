@@ -457,6 +457,57 @@ void hex_encode_decode_test()
     std::cout << "end hex encode/decode\n";
 }
 
+static void assert_no_file(char const* filename)
+{
+    try
+    {
+        fclose(QUtil::safe_fopen(filename, "r"));
+        assert(false);
+    }
+    catch (QPDFSystemError&)
+    {
+    }
+}
+
+void rename_delete_test()
+{
+    PointerHolder<char> buf;
+    size_t size = 0;
+
+    try
+    {
+        QUtil::remove_file("old\xcf\x80");
+    }
+    catch (QPDFSystemError&)
+    {
+    }
+    assert_no_file("old\xcf\x80");
+    std::cout << "create file" << std::endl;;
+    FILE* f1 = QUtil::safe_fopen("old\xcf\x80", "w");
+    fprintf(f1, "one");
+    fclose(f1);
+    QUtil::read_file_into_memory("old\xcf\x80", buf, size);
+    assert(memcmp(buf.getPointer(), "one", 3) == 0);
+    std::cout << "rename file" << std::endl;;
+    QUtil::rename_file("old\xcf\x80", "old\xcf\x80.~tmp");
+    QUtil::read_file_into_memory("old\xcf\x80.~tmp", buf, size);
+    assert(memcmp(buf.getPointer(), "one", 3) == 0);
+    assert_no_file("old\xcf\x80");
+    std::cout << "create file" << std::endl;;
+    f1 = QUtil::safe_fopen("old\xcf\x80", "w");
+    fprintf(f1, "two");
+    fclose(f1);
+    std::cout << "rename over existing" << std::endl;;
+    QUtil::rename_file("old\xcf\x80", "old\xcf\x80.~tmp");
+    QUtil::read_file_into_memory("old\xcf\x80.~tmp", buf, size);
+    assert(memcmp(buf.getPointer(), "two", 3) == 0);
+    assert_no_file("old\xcf\x80");
+    std::cout << "delete file" << std::endl;;
+    QUtil::remove_file("old\xcf\x80.~tmp");
+    assert_no_file("old\xcf\x80");
+    assert_no_file("old\xcf\x80.~tmp");
+}
+
 int main(int argc, char* argv[])
 {
     try
@@ -485,6 +536,8 @@ int main(int argc, char* argv[])
 	read_from_file_test();
 	std::cout << "---- hex encode/decode" << std::endl;
 	hex_encode_decode_test();
+	std::cout << "---- rename/delete" << std::endl;
+	rename_delete_test();
     }
     catch (std::exception& e)
     {

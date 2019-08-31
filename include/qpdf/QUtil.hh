@@ -111,6 +111,13 @@ namespace QUtil
     bool same_file(char const* name1, char const* name2);
 
     QPDF_DLL
+    void remove_file(char const* path);
+
+    // rename_file will overwrite newname if it exists
+    QPDF_DLL
+    void rename_file(char const* oldname, char const* newname);
+
+    QPDF_DLL
     char* copy_string(std::string const&);
 
     // Returns lower-case hex-encoded version of the string, treating
