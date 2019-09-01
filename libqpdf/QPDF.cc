@@ -23,7 +23,7 @@
 #include <qpdf/QPDF_Stream.hh>
 #include <qpdf/QPDF_Array.hh>
 
-std::string QPDF::qpdf_version = "8.4.2";
+std::string QPDF::qpdf_version = "9.0.0";
 
 static char const* EMPTY_PDF =
     "%PDF-1.3\n"

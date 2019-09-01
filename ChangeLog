@@ -1,5 +1,7 @@
 2019-08-31  Jay Berkenbilt  <ejb@ql.org>
 
+	* 9.0.0: release
+
 	* Add QPDF::anyWarnings() method to find out whether there have
 	been any warnings without resetting the list.
 
