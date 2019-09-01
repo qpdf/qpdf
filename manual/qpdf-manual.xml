@@ -4421,14 +4421,6 @@ print "\n";
           behavior.
          </para>
         </listitem>
-        <listitem>
-         <para>
-          When <command>qpdf --check</command> or <command>qpdf
-          --check-linearization</command> encounters a file with
-          linearization warnings but not errors, it now properly exits
-          with exit code 3 instead of 2.
-         </para>
-        </listitem>
        </itemizedlist>
       </listitem>
       <listitem>
@@ -4652,14 +4644,6 @@ print "\n";
           regarding encryption key length. This allows qpdf to open
           encrypted files in most cases when they have invalid or
           missing /Length keys in the encryption dictionary.
-         </para>
-        </listitem>
-        <listitem>
-         <para>
-          When <command>qpdf --check</command> or <command>qpdf
-          --check-linearization</command> encounters a file with
-          linearization warnings but not errors, it now properly exits
-          with exit code 3 instead of 2.
          </para>
         </listitem>
        </itemizedlist>
