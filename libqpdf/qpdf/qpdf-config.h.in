@@ -12,6 +12,9 @@
 /* Define to 1 if you have the `fseeko64' function. */
 #undef HAVE_FSEEKO64
 
+/* If cryptography will be supplied by GNU TLS */
+#undef HAVE_GNUTLS
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 

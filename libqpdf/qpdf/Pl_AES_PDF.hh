@@ -7,6 +7,10 @@
 # include <stdint.h>
 #endif
 
+#ifdef HAVE_GNUTLS
+# include <gnutls/crypto.h>
+#endif
+
 // This pipeline implements AES-128 and AES-256 with CBC and block
 // padding as specified in the PDF specification.
 
@@ -65,6 +69,11 @@ class Pl_AES_PDF: public Pipeline
     bool use_zero_iv;
     bool use_specified_iv;
     bool disable_padding;
+
+#ifdef HAVE_GNUTLS
+    gnutls_cipher_hd_t ctx;
+    size_t keylen;
+#endif
 };
 
 #endif // PL_AES_PDF_HH

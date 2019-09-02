@@ -12,6 +12,10 @@
 #endif
 #include <string>
 
+#ifdef HAVE_GNUTLS
+# include <gnutls/crypto.h>
+#endif
+
 class MD5
 {
   public:
@@ -89,6 +93,9 @@ class MD5
 
     bool finalized;
     Digest digest_val;
+#ifdef HAVE_GNUTLS
+    gnutls_hash_hd_t ctx;
+#endif
 };
 
 #endif // MD5_HH

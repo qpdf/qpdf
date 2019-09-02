@@ -47,6 +47,12 @@ extern "C" {
 #include <stddef.h>
 #include "sph_types.h"
 
+#include <qpdf/qpdf-config.h>
+
+#ifdef HAVE_GNUTLS
+# include "sph_sha2_gnutls.h"
+#else
+
 /**
  * Output size (in bits) for SHA-224.
  */
@@ -370,6 +376,8 @@ void sph_sha512_comp(const sph_u64 msg[16], sph_u64 val[8]);
 #endif
 
 #endif
+
+#endif /* HAVE_GNUTLS */
 
 #ifdef __cplusplus
 }

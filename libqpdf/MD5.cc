@@ -37,6 +37,10 @@
 #include <string.h>
 #include <errno.h>
 
+#ifdef HAVE_GNUTLS
+# include "MD5-gnutls.cc"
+#else
+
 int const S11 = 7;
 int const S12 = 12;
 int const S13 = 17;
@@ -294,6 +298,8 @@ void MD5::decode(UINT4 *output, unsigned char *input, size_t len)
 	    (static_cast<UINT4>(input[j+2]) << 16) |
             (static_cast<UINT4>(input[j+3]) << 24);
 }
+
+#endif /* HAVE_GNUTLS */
 
 // Public functions
 

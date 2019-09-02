@@ -3,6 +3,12 @@
 
 #include <stddef.h>
 
+#include <qpdf/qpdf-config.h>
+
+#ifdef HAVE_GNUTLS
+# include <gnutls/crypto.h>
+#endif
+
 class RC4
 {
   public:
@@ -12,6 +18,10 @@ class RC4
     // out_data = 0 means to encrypt/decrypt in place
     void process(unsigned char* in_data, size_t len,
                  unsigned char* out_data = 0);
+
+#ifdef HAVE_GNUTLS
+    ~RC4();
+#endif
 
   private:
     class RC4Key
@@ -23,6 +33,11 @@ class RC4
     };
 
     RC4Key key;
+
+
+#ifdef HAVE_GNUTLS
+    gnutls_cipher_hd_t ctx;
+#endif
 };
 
 #endif // RC4_HH

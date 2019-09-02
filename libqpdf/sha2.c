@@ -35,6 +35,10 @@
 
 #include "sph/sph_sha2.h"
 
+#ifdef HAVE_GNUTLS
+# include "sha2-gnutls.c"
+#else
+
 #if SPH_SMALL_FOOTPRINT && !defined SPH_SMALL_FOOTPRINT_SHA2
 #define SPH_SMALL_FOOTPRINT_SHA2   1
 #endif
@@ -688,3 +692,5 @@ sph_sha224_comp(const sph_u32 msg[16], sph_u32 val[8])
 	SHA2_ROUND_BODY(SHA2_IN, val);
 #undef SHA2_IN
 }
+
+#endif /* HAVE_GNUTLS */

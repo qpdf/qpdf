@@ -10,6 +10,10 @@
 #endif
 #include <stddef.h>
 
+#ifdef HAVE_GNUTLS
+# include "qpdf/rijndael-gnutls.h"
+#else
+
 unsigned int rijndaelSetupEncrypt(uint32_t *rk, const unsigned char *key,
   size_t keybits);
 unsigned int rijndaelSetupDecrypt(uint32_t *rk, const unsigned char *key,
@@ -22,5 +26,7 @@ void rijndaelDecrypt(const uint32_t *rk, unsigned int nrounds,
 #define KEYLENGTH(keybits) ((keybits)/8)
 #define RKLENGTH(keybits)  ((keybits)/8+28)
 #define NROUNDS(keybits)   ((keybits)/32+6)
+
+#endif /* HAVE_GNUTLS */
 
 #endif

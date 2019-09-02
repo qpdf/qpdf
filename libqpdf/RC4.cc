@@ -3,6 +3,10 @@
 
 #include <string.h>
 
+#ifdef HAVE_GNUTLS
+# include "RC4-gnutls.cc"
+#else
+
 static void swap_byte(unsigned char &a, unsigned char &b)
 {
     unsigned char t;
@@ -55,3 +59,5 @@ RC4::process(unsigned char *in_data, size_t len, unsigned char* out_data)
 	out_data[i] = in_data[i] ^ key.state[xor_index];
     }
 }
+
+#endif /* HAVE_GNUTLS */

@@ -2,6 +2,10 @@
 
 #include "qpdf/rijndael.h"
 
+#ifdef HAVE_GNUTLS
+# include "rijndael-gnutls.cc"
+#else
+
 typedef uint32_t u32;
 typedef unsigned char u8;
 
@@ -1208,3 +1212,4 @@ void rijndaelDecrypt(const u32 *rk, unsigned int nrounds,
     rk[3];
   PUTU32(plaintext + 12, s3);
 }
+#endif /* HAVE_GNUTLS */

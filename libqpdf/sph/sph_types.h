@@ -48,6 +48,7 @@
 #define SPH_TYPES_H
 
 #include <limits.h>
+#include <qpdf/qpdf-config.h>
 
 /*
  * All our I/O functions are defined over octet streams. We do not know

@@ -11,6 +11,10 @@
 # endif
 #endif
 
+#ifdef HAVE_GNUTLS
+# include <gnutls/crypto.h>
+#endif
+
 SecureRandomDataProvider::SecureRandomDataProvider()
 {
 }
@@ -111,7 +115,19 @@ class WindowsCryptProvider
 void
 SecureRandomDataProvider::provideRandomData(unsigned char* data, size_t len)
 {
-#if defined(_WIN32)
+#if defined(HAVE_GNUTLS)
+
+    int ret = 0;
+
+    ret = gnutls_rnd(GNUTLS_RND_NONCE, data, len);
+    if (ret < 0)
+    {
+        throw std::runtime_error(
+            "GNU TLS: unable to generate secure random data " +
+            std::string(gnutls_strerror(ret)));
+    }
+
+#elif defined(_WIN32)
 
     // Optimization: make the WindowsCryptProvider static as long as
     // it can be done in a thread-safe fashion.
