@@ -5,6 +5,7 @@
 #include <map>
 #include <algorithm>
 #include <limits>
+#include <sstream>
 #include <stdlib.h>
 #include <string.h>
 #include <memory.h>
@@ -1202,7 +1203,16 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
 	// based on /Index.  The generation number is 0 unless this is
 	// an uncompressed object record, in which case the generation
 	// number appears as the third field.
-	int obj = toI(indx.at(cur_chunk)) + chunk_count;
+	int obj = toI(indx.at(cur_chunk));
+        if ((std::numeric_limits<int>::max() - obj) < chunk_count)
+        {
+            std::ostringstream msg;
+            msg << "adding " << chunk_count << " to " << obj
+                << " while computing index in xref stream would cause"
+                << " an integer overflow";
+            throw std::range_error(msg.str());
+        }
+        obj += chunk_count;
 	++chunk_count;
 	if (chunk_count >= indx.at(cur_chunk + 1))
 	{
