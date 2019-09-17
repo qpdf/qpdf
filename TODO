@@ -6,7 +6,6 @@ Fuzz Errors
 * Ignoring these:
   * Problems inside the jpeg library: 15454, 15471, 15751, 15987
   * Timeout in xref reconstruction (won't fix): 15659
-  * Out of memory: 15730
 
 C++-11 (for qpdf 10)
 ====================
