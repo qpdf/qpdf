@@ -32,12 +32,13 @@ int main()
     uint64_t ul1 = 1099511627776LL; // Too big for 32-bit
     uint64_t ul2 = 12345;           // Fits into 32-bit
     int32_t i2 = 81;                // Fits in char and uchar
-    char c1 = '\xf7';               // Signed value when char
+    signed char c1 = static_cast<signed char>('\xf7'); // Signed value when char
+    char c2 = 'W';                  // char; may be signed or unsigned
 
     // Verify i1 and u1 have same bit pattern
     assert(static_cast<uint32_t>(i1) == u1);
-    // Verify that we can unsafely convert between char and unsigned char
-    assert(c1 == static_cast<char>(static_cast<unsigned char>(c1)));
+    // Verify that we can unsafely convert between signed and unsigned char
+    assert(c1 == static_cast<signed char>(static_cast<unsigned char>(c1)));
 
     try_convert(true,  QIntC::to_int<int32_t>, i1);
     try_convert(true,  QIntC::to_uint<uint32_t>, u1);
@@ -51,7 +52,9 @@ int main()
     try_convert(false, QIntC::to_ulonglong<int32_t>, i1);
     try_convert(true,  QIntC::to_char<int32_t>, i2);
     try_convert(true,  QIntC::to_uchar<int32_t>, i2);
-    try_convert(false, QIntC::to_uchar<char>, c1);
+    try_convert(false, QIntC::to_uchar<signed char>, c1);
+    try_convert(true,  QIntC::to_uchar<char>, c2);
+    try_convert(true,  QIntC::to_char<char>, c2);
 
     return 0;
 }

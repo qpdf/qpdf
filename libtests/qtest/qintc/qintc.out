@@ -10,4 +10,6 @@ QIntC::to_offset<int32_t>(i1): -1153374643 -1153374643 PASSED
 QIntC::to_ulonglong<int32_t>(i1): integer out of range converting -1153374643 from a 4-byte signed type to a 8-byte unsigned type PASSED
 QIntC::to_char<int32_t>(i2): 81 Q PASSED
 QIntC::to_uchar<int32_t>(i2): 81 Q PASSED
-QIntC::to_uchar<char>(c1): integer out of range converting ÷ from a 1-byte signed type to a 1-byte unsigned type PASSED
+QIntC::to_uchar<signed char>(c1): integer out of range converting ÷ from a 1-byte signed type to a 1-byte unsigned type PASSED
+QIntC::to_uchar<char>(c2): W W PASSED
+QIntC::to_char<char>(c2): W W PASSED

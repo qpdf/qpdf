@@ -1,3 +1,7 @@
+2019-09-17  Jay Berkenbilt  <ejb@ql.org>
+
+	* QIntC tests: don't assume char is signed. Fixes #361.
+
 2019-08-31  Jay Berkenbilt  <ejb@ql.org>
 
 	* 9.0.0: release

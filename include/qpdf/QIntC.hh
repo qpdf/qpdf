@@ -51,6 +51,13 @@ namespace QIntC // QIntC = qpdf Integer Conversion
     };
 
     template <>
+    class to_u<signed char>
+    {
+      public:
+        typedef unsigned char type;
+    };
+
+    template <>
     class to_u<short>
     {
       public:
