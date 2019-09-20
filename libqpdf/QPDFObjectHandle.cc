@@ -30,6 +30,7 @@
 #include <ctype.h>
 #include <limits.h>
 #include <cstring>
+#include <algorithm>
 
 class TerminateParsing
 {
@@ -717,10 +718,17 @@ QPDFObjectHandle::getArrayAsRectangle()
     Rectangle result;
     if (isRectangle())
     {
-        result = Rectangle(getArrayItem(0).getNumericValue(),
-                           getArrayItem(1).getNumericValue(),
-                           getArrayItem(2).getNumericValue(),
-                           getArrayItem(3).getNumericValue());
+        // Rectangle coordinates are always supposed to be llx, lly,
+        // urx, ury, but files have been found in the wild where
+        // llx > urx or lly > ury.
+        double i0 = getArrayItem(0).getNumericValue();
+        double i1 = getArrayItem(1).getNumericValue();
+        double i2 = getArrayItem(2).getNumericValue();
+        double i3 = getArrayItem(3).getNumericValue();
+        result = Rectangle(std::min(i0, i2),
+                           std::min(i1, i3),
+                           std::max(i0, i2),
+                           std::max(i1, i3));
     }
     return result;
 }

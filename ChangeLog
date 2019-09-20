@@ -1,5 +1,9 @@
 2019-09-19  Jay Berkenbilt  <ejb@ql.org>
 
+	* When converting an array to a Rectangle, ensure that llx <= urx
+	and lly <= ury. This prevents flatten-annotations from flipping
+	fields whose coordinates are messed up in the input. Fixes #363.
+
 	* Warn when duplicated dictionary keys are found during parsing.
 	The behavior remains as before: later keys override earlier ones.
 	However, this generates a warning now rather than being silently
