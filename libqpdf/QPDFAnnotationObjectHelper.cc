@@ -112,7 +112,7 @@ QPDFAnnotationObjectHelper::getPageContentForAppearance(
     //   page's rotation
 
     // When rendering a form xobject in isolation, just drawn with a
-    // /Do operator, the is no form field, so page rotation is not
+    // /Do operator, there is no form field, so page rotation is not
     // relevant, and there is no annotation, so /Rect is not relevant,
     // so only /BBox and /Matrix are relevant. The effect of these are
     // as follows:
