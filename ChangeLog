@@ -11,6 +11,8 @@
 
 2019-09-17  Jay Berkenbilt  <ejb@ql.org>
 
+	* Fix a few integer warnings for big-endian systems.
+
 	* QIntC tests: don't assume char is signed. Fixes #361.
 
 2019-08-31  Jay Berkenbilt  <ejb@ql.org>

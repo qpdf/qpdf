@@ -4365,6 +4365,45 @@ print "\n";
   </para>
   <variablelist>
    <varlistentry>
+    <term>9.0.1: September XXX, 2019</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Bug Fixes/Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Fix some build and test issues on big-endian systems and
+          compilers with characters that are unsigned by default.
+          The problems were in build and test only. There were no
+          actual bugs in the qpdf library itself relating to
+          endianness or unsigned characters.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          When a dictionary has a duplicated key, report this with a
+          warning. The behavior of the library in this case is
+          unchanged, but the error condition is no longer silently
+          ignored.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          When a form field's display rectangle is erroneously
+          specified with inverted coordinates, detect and correct this
+          situation. This avoids some form fields from being flipped
+          when flattening annotations on files with this condition.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
     <term>9.0.0: August 31, 2019</term>
     <listitem>
      <itemizedlist>
