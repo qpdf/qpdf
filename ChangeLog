@@ -1,3 +1,7 @@
+2019-09-20  Jay Berkenbilt  <ejb@ql.org>
+
+	* 9.0.1: release
+
 2019-09-19  Jay Berkenbilt  <ejb@ql.org>
 
 	* When converting an array to a Rectangle, ensure that llx <= urx
