@@ -1,3 +1,10 @@
+2019-09-19  Jay Berkenbilt  <ejb@ql.org>
+
+	* Warn when duplicated dictionary keys are found during parsing.
+	The behavior remains as before: later keys override earlier ones.
+	However, this generates a warning now rather than being silently
+	ignored. Fixes #345.
+
 2019-09-17  Jay Berkenbilt  <ejb@ql.org>
 
 	* QIntC tests: don't assume char is signed. Fixes #361.

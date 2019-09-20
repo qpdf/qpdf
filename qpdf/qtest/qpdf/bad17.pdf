@@ -73,6 +73,8 @@ xref
 trailer <<
   /Size 7
   /Root 1 0 R
+  /K 1
+  /K 2
   /Something
 >>
 startxref

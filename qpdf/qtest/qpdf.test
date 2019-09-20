@@ -2314,7 +2314,7 @@ my @badfiles = ("not a PDF file", 			# 1
 		"bad }",				# 14
 		"bad ]",				# 15
 		"bad >>",				# 16
-		"odd number of dictionary items",	# 17
+		"dictionary errors",                    # 17
 		"bad )",				# 18
 		"bad >",				# 19
 		"invalid hexstring character",		# 20

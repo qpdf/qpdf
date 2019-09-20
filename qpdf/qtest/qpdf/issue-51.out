@@ -1,6 +1,8 @@
 WARNING: issue-51.pdf: can't find PDF header
 WARNING: issue-51.pdf: reported number of objects (0) is not one plus the highest object number (8)
+WARNING: issue-51.pdf (object 7 0, offset 476): dictionary has duplicated key /0000; last occurrence overrides earlier ones
 WARNING: issue-51.pdf (object 7 0, offset 553): expected endobj
+WARNING: issue-51.pdf (object 1 0, offset 236): dictionary has duplicated key /00000000; last occurrence overrides earlier ones
 WARNING: issue-51.pdf (object 1 0, offset 359): expected endobj
 WARNING: issue-51.pdf (offset 70): loop detected resolving object 2 0
 WARNING: issue-51.pdf (object 2 0, offset 26): /Length key in stream dictionary is not an integer

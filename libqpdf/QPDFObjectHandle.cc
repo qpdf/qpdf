@@ -2135,7 +2135,18 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
                     {
                         val = olist.at(++i);
                     }
-                    dict[key_obj.getName()] = val;
+                    std::string key = key_obj.getName();
+                    if (dict.count(key) > 0)
+                    {
+                        QTC::TC("qpdf", "QPDFObjectHandle duplicate dict key");
+                        warn(context,
+                             QPDFExc(
+                                 qpdf_e_damaged_pdf,
+                                 input->getName(), object_description, offset,
+                                 "dictionary has duplicated key " + key +
+                                 "; last occurrence overrides earlier ones"));
+                    }
+                    dict[key] = val;
                 }
                 object = newDictionary(dict);
                 setObjectDescriptionFromInput(
