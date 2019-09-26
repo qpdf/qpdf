@@ -4103,6 +4103,27 @@ for (my $large = 0; $large < $nlarge; ++$large)
     unlink $file;
 }
 # ----------
+$td->notify("--- Signature Dictionary ---");
+$n_tests += 2;
+
+$td->runtest("--object-streams=preserve",
+	     {$td->COMMAND =>
+		  "qpdf --object-streams=preserve digitally-signed.pdf a.pdf" .
+		  "; grep -f digitally-signed-sig-dict-contents.out a.pdf"},
+	     {$td->REGEXP => ".*",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("--object-streams=disable",
+	     {$td->COMMAND =>
+		  "qpdf --object-streams=disable digitally-signed.pdf a.pdf" .
+		  "; grep -f digitally-signed-sig-dict-contents.out a.pdf"},
+	     {$td->REGEXP => ".*",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+show_ntests();
+# ----------
 
 cleanup();
 
