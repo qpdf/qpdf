@@ -1687,7 +1687,20 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	    writeStringNoQDF(" ");
 	    writeString(QPDF_Name::normalizeName(key));
 	    writeString(" ");
-            unparseChild(object.getKey(key), level + 1, child_flags);
+	    if (key == "/Contents" &&
+		object.hasKey("/Type") &&
+		object.getKey("/Type").isName() &&
+		object.getKey("/Type").getName() == "/Sig" &&
+		object.hasKey("/ByteRange"))
+	    {
+                QTC::TC("qpdf", "QPDFWriter no encryption sig contents");
+		unparseChild(object.getKey(key), level + 1,
+			     child_flags | f_hex_string);
+	    }
+	    else
+	    {
+		unparseChild(object.getKey(key), level + 1, child_flags);
+	    }
 	    writeStringQDF("\n");
 	}
 
@@ -1881,6 +1894,10 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 		rc4.process(QUtil::unsigned_char_pointer(tmp), vlen);
 		val = QPDF_String(std::string(tmp, vlen)).unparse();
 	    }
+	}
+	else if (flags & f_hex_string)
+	{
+	    val = QPDF_String(object.getStringValue()).unparse(true);
 	}
 	else
 	{
