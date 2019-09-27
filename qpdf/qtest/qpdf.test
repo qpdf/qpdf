@@ -3998,9 +3998,9 @@ $td->runtest("fix-qdf with big object stream", # > 255 objects in a stream
 show_ntests();
 # ----------
 $td->notify("--- Signature Dictionary ---");
-$n_tests += 4;
+$n_tests += 6;
 
-foreach my $i (qw(preserve disable))
+foreach my $i (qw(preserve disable generate))
 {
     $td->runtest("sig dict contents hex (object-streams=$i)",
                  {$td->COMMAND =>

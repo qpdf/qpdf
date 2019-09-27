@@ -2673,7 +2673,13 @@ QPDF::getCompressibleObjGens()
 	    {
 		QTC::TC("qpdf", "QPDF exclude encryption dictionary");
 	    }
-	    else if (! obj.isStream())
+	    else if ((! obj.isStream()) &&
+		     (! (obj.isDictionary() &&
+                         obj.hasKey("/ByteRange") &&
+                         obj.hasKey("/Contents") &&
+                         obj.hasKey("/Type") &&
+                         obj.getKey("/Type").isName() &&
+                         obj.getKey("/Type").getName() == "/Sig")))
 	    {
 		result.push_back(og);
 	    }
