@@ -4104,9 +4104,9 @@ for (my $large = 0; $large < $nlarge; ++$large)
 }
 # ----------
 $td->notify("--- Signature Dictionary ---");
-$n_tests += 4;
+$n_tests += 6;
 
-foreach my $i (qw(preserve disable))
+foreach my $i (qw(preserve disable generate))
 {
     $td->runtest("sig dict contents hex (object-streams=$i)",
                  {$td->COMMAND =>
