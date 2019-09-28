@@ -4019,6 +4019,23 @@ foreach my $i (qw(preserve disable generate))
 
 show_ntests();
 # ----------
+$td->notify("--- Get XRef Table ---");
+$n_tests += 2;
+
+$td->runtest("without object streams",
+	     {$td->COMMAND => "test_xref minimal.pdf"},
+	     {$td->FILE => "minimal-xref.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("with object streams",
+	     {$td->COMMAND => "test_xref digitally-signed.pdf"},
+	     {$td->FILE => "digitally-signed-xref.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+show_ntests();
+# ----------
 $td->notify("--- Large File Tests ---");
 my $nlarge = 1;
 if (defined $large_file_test_path)
