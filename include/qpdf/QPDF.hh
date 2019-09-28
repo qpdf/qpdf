@@ -239,6 +239,8 @@ class QPDF
     QPDFObjectHandle getTrailer();
     QPDF_DLL
     QPDFObjectHandle getRoot();
+    QPDF_DLL
+    std::map<QPDFObjGen, QPDFXRefEntry> getXRefTable();
 
     // Install this object handle as an indirect object and return an
     // indirect reference to it.
@@ -1400,6 +1402,7 @@ class QPDF
         bool fixed_dangling_refs;
         bool immediate_copy_from;
         bool in_parse;
+        bool parsed;
 
         // Linearization data
         qpdf_offset_t first_xref_item_offset; // actual value from file
