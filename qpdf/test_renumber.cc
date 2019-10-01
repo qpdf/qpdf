@@ -5,6 +5,7 @@
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFObjGen.hh>
 #include <qpdf/QPDFWriter.hh>
+#include <qpdf/QPDFXRefEntry.hh>
 
 #include <algorithm>
 #include <iostream>
@@ -158,6 +159,77 @@ bool compare(QPDFObjectHandle a, QPDFObjectHandle b)
     return true;
 }
 
+bool compare_xref_table(std::map<QPDFObjGen, QPDFXRefEntry> a,
+                        std::map<QPDFObjGen, QPDFXRefEntry> b)
+{
+    if (a.size() != b.size())
+    {
+        std::cerr
+            << "different size"
+            << std::endl;
+        return false;
+    }
+
+    for (std::map<QPDFObjGen, QPDFXRefEntry>::iterator iter = a.begin();
+         iter != a.end(); ++iter)
+    {
+        std::cout
+            << "xref entry for "
+            << iter->first.getObj() << "/" << iter->first.getGen()
+            << std::endl;
+
+        if (b.count(iter->first) == 0)
+        {
+            std::cerr
+                << "not found"
+                << std::endl;
+            return false;
+        }
+
+        QPDFXRefEntry xref_a = iter->second;
+        QPDFXRefEntry xref_b = b[iter->first];
+        if (xref_a.getType() != xref_b.getType())
+        {
+            std::cerr
+                << "different xref entry type"
+                << std::endl;
+            return false;
+        }
+
+        switch (xref_a.getType())
+        {
+          case 0:
+            break;
+          case 1:
+            if (xref_a.getOffset() != xref_a.getOffset())
+            {
+                std::cerr
+                    << "different offset"
+                    << std::endl;
+                return false;
+            }
+            break;
+          case 2:
+            if (xref_a.getObjStreamNumber() != xref_a.getObjStreamNumber() ||
+                xref_a.getObjStreamIndex() != xref_a.getObjStreamIndex())
+            {
+                std::cerr
+                    << "different stream number or index"
+                    << std::endl;
+                return false;
+            }
+            break;
+          default:
+            std::cerr
+                << "unknown xref entry type"
+                << std::endl;
+            std::exit(2);
+        }
+    }
+
+    return true;
+}
+
 int main(int argc, char *argv[])
 {
     if (argc < 2)
@@ -226,13 +298,20 @@ int main(int argc, char *argv[])
         w.setPreserveUnreferencedObjects(bpreserve_unreferenced);
         w.write();
 
+        std::map<QPDFObjGen, QPDFXRefEntry> xrefs_w
+            = w.getWrittenXRefTable();
         PointerHolder<Buffer> buf = w.getBuffer();
 
         QPDF qpdf_ren;
         qpdf_ren.processMemoryFile("renumbered",
                                    reinterpret_cast<char*>(buf->getBuffer()),
                                    buf->getSize());
+        std::map<QPDFObjGen, QPDFXRefEntry> xrefs_ren
+            = qpdf_ren.getXRefTable();
 
+        std::cout
+            << "--- compare between input and renumbered objects ---"
+            << std::endl;
         for (std::vector<QPDFObjectHandle>::iterator iter = objs_in.begin();
              iter != objs_in.end(); ++iter)
         {
@@ -260,6 +339,19 @@ int main(int argc, char *argv[])
                 std::exit(2);
             }
         }
+        std::cout << "complete" << std::endl;
+
+        std::cout
+            << "--- compare between written and reloaded xref tables ---"
+            << std::endl;
+        if (!compare_xref_table(xrefs_w, xrefs_ren))
+        {
+            std::cerr
+                << "different"
+                << std::endl;
+            std::exit(2);
+        }
+        std::cout << "complete" << std::endl;
 
         std::cout << "succeeded" << std::endl;
     }

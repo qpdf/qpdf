@@ -2747,6 +2747,23 @@ QPDFWriter::getRenumberedObjGen(QPDFObjGen og)
     return QPDFObjGen(this->m->obj_renumber[og], 0);
 }
 
+std::map<QPDFObjGen, QPDFXRefEntry>
+QPDFWriter::getWrittenXRefTable()
+{
+    std::map<QPDFObjGen, QPDFXRefEntry> result;
+
+    for (std::map<int, QPDFXRefEntry>::iterator iter = this->m->xref.begin();
+         iter != this->m->xref.end(); ++iter)
+    {
+        if (iter->first != 0 && iter->second.getType() != 0)
+        {
+            result[QPDFObjGen(iter->first, 0)] = iter->second;
+        }
+    }
+
+    return result;
+}
+
 void
 QPDFWriter::enqueuePart(std::vector<QPDFObjectHandle>& part)
 {
