@@ -5,6 +5,7 @@ BINS_qpdf = \
     test_large_file \
     test_pdf_doc_encoding \
     test_pdf_unicode \
+    test_renumber \
     test_tokenizer \
     test_unicode_filenames \
     test_xref
