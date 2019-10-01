@@ -465,6 +465,11 @@ class QPDFWriter
     QPDF_DLL
     void write();
 
+    // Return renumbered ObjGen that was written into the final file.
+    // This method can be used after calling write().
+    QPDF_DLL
+    QPDFObjGen getRenumberedObjGen(QPDFObjGen);
+
   private:
     // flags used by unparseObject
     static int const f_stream = 	1 << 0;
