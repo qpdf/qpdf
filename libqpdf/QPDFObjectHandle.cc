@@ -2178,6 +2178,22 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
     return object;
 }
 
+qpdf_offset_t
+QPDFObjectHandle::getParsedOffset()
+{
+    dereference();
+    return this->m->obj->getParsedOffset();
+}
+
+void
+QPDFObjectHandle::setParsedOffset(qpdf_offset_t offset)
+{
+    if (this->m->obj.getPointer())
+    {
+        this->m->obj->setParsedOffset(offset);
+    }
+}
+
 QPDFObjectHandle
 QPDFObjectHandle::newIndirect(QPDF* qpdf, int objid, int generation)
 {
