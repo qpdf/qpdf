@@ -341,6 +341,14 @@ class QPDFObjectHandle
                                   StringDecrypter* decrypter,
                                   QPDF* context);
 
+    // Return the offset where the object was found when parsed. A
+    // negative value means that the object was created without
+    // parsing. If the object is in a stream, the offset is from the
+    // beginning of the stream. Otherwise, the offset is from the
+    // beginning of the file.
+    QPDF_DLL
+    qpdf_offset_t getParsedOffset();
+
     // Older method: stream_or_array should be the value of /Contents
     // from a page object. It's more convenient to just call
     // QPDFPageObjectHelper::parsePageContents on the page object, and
@@ -1050,6 +1058,7 @@ class QPDFObjectHandle
         QPDFTokenizer& tokenizer, bool& empty,
         StringDecrypter* decrypter, QPDF* context,
         bool content_stream);
+    void setParsedOffset(qpdf_offset_t offset);
     void parseContentStream_internal(
         std::string const& description,
         ParserCallbacks* callbacks);

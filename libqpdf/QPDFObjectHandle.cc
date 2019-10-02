@@ -1767,6 +1767,7 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
     empty = false;
 
     QPDFObjectHandle object;
+    bool set_offset = false;
 
     std::vector<SparseOHArray> olist_stack;
     olist_stack.push_back(SparseOHArray());
@@ -1786,6 +1787,7 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
         offset = offset_stack.back();
 
 	object = QPDFObjectHandle();
+	set_offset = false;
 
 	QPDFTokenizer::Token token =
             tokenizer.readToken(input, object_description, true);
@@ -2054,6 +2056,8 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
             setObjectDescriptionFromInput(
                 object, context, object_description, input,
                 input->getLastOffset());
+            object.setParsedOffset(input->getLastOffset());
+            set_offset = true;
             olist.append(object);
             break;
 
@@ -2080,6 +2084,14 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
                 object = QPDFObjectHandle(new QPDF_Array(olist));
                 setObjectDescriptionFromInput(
                     object, context, object_description, input, offset);
+                // The `offset` points to the next of "[". Set the
+                // rewind offset to point to the beginning of "[".
+                // This has been explicitly tested with whitespace
+                // surrounding the array start delimiter.
+                // getLastOffset points to the array end token and
+                // therefore can't be used here.
+                object.setParsedOffset(offset - 1);
+                set_offset = true;
             }
             else if (old_state == st_dictionary)
             {
@@ -2159,6 +2171,14 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
                 object = newDictionary(dict);
                 setObjectDescriptionFromInput(
                     object, context, object_description, input, offset);
+                // The `offset` points to the next of "<<". Set the
+                // rewind offset to point to the beginning of "<<".
+                // This has been explicitly tested with whitespace
+                // surrounding the dictionary start delimiter.
+                // getLastOffset points to the dictionary end token
+                // and therefore can't be used here.
+                object.setParsedOffset(offset - 2);
+                set_offset = true;
             }
             olist_stack.pop_back();
             offset_stack.pop_back();
@@ -2173,9 +2193,29 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
         }
     }
 
-    setObjectDescriptionFromInput(
-        object, context, object_description, input, offset);
+    if (! set_offset)
+    {
+        setObjectDescriptionFromInput(
+            object, context, object_description, input, offset);
+        object.setParsedOffset(offset);
+    }
     return object;
+}
+
+qpdf_offset_t
+QPDFObjectHandle::getParsedOffset()
+{
+    dereference();
+    return this->m->obj->getParsedOffset();
+}
+
+void
+QPDFObjectHandle::setParsedOffset(qpdf_offset_t offset)
+{
+    if (this->m->obj.getPointer())
+    {
+        this->m->obj->setParsedOffset(offset);
+    }
 }
 
 QPDFObjectHandle
@@ -2321,9 +2361,14 @@ QPDFObjectHandle::newStream(QPDF* qpdf, int objid, int generation,
 			    QPDFObjectHandle stream_dict,
 			    qpdf_offset_t offset, size_t length)
 {
-    return QPDFObjectHandle(new QPDF_Stream(
+    QPDFObjectHandle result = QPDFObjectHandle(new QPDF_Stream(
 				qpdf, objid, generation,
 				stream_dict, offset, length));
+    if (offset)
+    {
+        result.setParsedOffset(offset);
+    }
+    return result;
 }
 
 QPDFObjectHandle

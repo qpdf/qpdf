@@ -3,6 +3,7 @@ BINS_qpdf = \
     pdf_from_scratch \
     test_driver \
     test_large_file \
+    test_parsedoffset \
     test_pdf_doc_encoding \
     test_pdf_unicode \
     test_renumber \

@@ -23,6 +23,7 @@
 #define QPDFOBJECT_HH
 
 #include <qpdf/DLL.h>
+#include <qpdf/Types.h>
 #include <qpdf/PointerHolder.hh>
 #include <qpdf/JSON.hh>
 
@@ -92,6 +93,9 @@ class QPDFObject
     bool getDescription(QPDF*&, std::string&);
     bool hasDescription();
 
+    void setParsedOffset(qpdf_offset_t offset);
+    qpdf_offset_t getParsedOffset();
+
   protected:
     virtual void releaseResolved() {}
 
@@ -108,6 +112,7 @@ class QPDFObject
         Members();
         QPDF* owning_qpdf;
         std::string object_description;
+        qpdf_offset_t parsed_offset;
     };
     PointerHolder<Members> m;
 };
