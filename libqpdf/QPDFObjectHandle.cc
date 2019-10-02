@@ -2162,6 +2162,9 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
                 object = newDictionary(dict);
                 setObjectDescriptionFromInput(
                     object, context, object_description, input, offset);
+                // The `offset` points to the next of "<<".
+                // Set the rewind offset to point to the beginning of "<<".
+                object.setParsedOffset(offset - 2);
             }
             olist_stack.pop_back();
             offset_stack.pop_back();
