@@ -2080,6 +2080,9 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
                 object = QPDFObjectHandle(new QPDF_Array(olist));
                 setObjectDescriptionFromInput(
                     object, context, object_description, input, offset);
+                // The `offset` points to the next of "[".
+                // Set the rewind offset to point to the beginning of "[".
+                object.setParsedOffset(offset - 1);
             }
             else if (old_state == st_dictionary)
             {
