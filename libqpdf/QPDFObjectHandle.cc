@@ -2343,9 +2343,14 @@ QPDFObjectHandle::newStream(QPDF* qpdf, int objid, int generation,
 			    QPDFObjectHandle stream_dict,
 			    qpdf_offset_t offset, size_t length)
 {
-    return QPDFObjectHandle(new QPDF_Stream(
+    QPDFObjectHandle result = QPDFObjectHandle(new QPDF_Stream(
 				qpdf, objid, generation,
 				stream_dict, offset, length));
+    if (offset)
+    {
+        result.setParsedOffset(offset);
+    }
+    return result;
 }
 
 QPDFObjectHandle
