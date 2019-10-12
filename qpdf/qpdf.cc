@@ -33,7 +33,7 @@ static int const EXIT_WARNING = 3;
 
 static char const* whoami = 0;
 
-static std::string expected_version = "9.0.1";
+static std::string expected_version = "9.0.2";
 
 struct PageSpec
 {
