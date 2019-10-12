@@ -458,7 +458,7 @@ make
         If specified, the output file name should be omitted. This
         option tells qpdf to replace the input file with the output.
         It does this by writing to
-        <filename>.~qpdf-temp.<replaceable>infilename</replaceable>#</filename>
+        <filename><replaceable>infilename</replaceable>.~qpdf-temp#</filename>
         and, when done, overwriting the input file with the temporary
         file. If there were any warnings, the original input is saved
         as
@@ -4364,6 +4364,27 @@ print "\n";
    <filename>ChangeLog</filename> in the source distribution.
   </para>
   <variablelist>
+   <varlistentry>
+    <term>9.0.2: XXX</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Bug Fix
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Fix the name of the temporary file used by
+          <option>--replace-input</option> so that it doesn't require
+          path splitting and works with paths include directories.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
     <term>9.0.1: September 20, 2019</term>
     <listitem>

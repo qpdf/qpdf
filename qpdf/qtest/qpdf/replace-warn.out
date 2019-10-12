@@ -1,3 +1,3 @@
-WARNING: auto-warn.pdf (xref stream, offset 16227): Cross-reference stream data has the wrong size; expected = 52; actual = 56
-qpdf: there are warnings; original file kept in auto-warn.pdf.~qpdf-orig
+WARNING: ./auto-warn.pdf (xref stream, offset 16227): Cross-reference stream data has the wrong size; expected = 52; actual = 56
+qpdf: there are warnings; original file kept in ./auto-warn.pdf.~qpdf-orig
 qpdf: operation succeeded with warnings; resulting file may have some problems

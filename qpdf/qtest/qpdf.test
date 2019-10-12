@@ -207,7 +207,7 @@ foreach my $d (['auto-ü', 1], ['auto-öπ', 2])
     my ($u, $n) = @$d;
     $td->runtest("replace input $u",
                  {$td->COMMAND => "qpdf --deterministic-id" .
-                      " --object-streams=generate --replace-input $u.pdf"},
+                      " --object-streams=generate --replace-input ./$u.pdf"},
                  {$td->STRING => "", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
     $td->runtest("check output ($u)",
@@ -219,7 +219,7 @@ foreach my $d (['auto-ü', 1], ['auto-öπ', 2])
 system("cp xref-with-short-size.pdf auto-warn.pdf") == 0 or die;
 $td->runtest("replace input with warnings",
              {$td->COMMAND =>
-                  "qpdf --deterministic-id --replace-input auto-warn.pdf"},
+                  "qpdf --deterministic-id --replace-input ./auto-warn.pdf"},
              {$td->FILE => "replace-warn.out", $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 

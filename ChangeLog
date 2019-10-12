@@ -1,3 +1,9 @@
+2019-10-12  Jay Berkenbilt  <ejb@ql.org>
+
+	* Change the name of the temporary file used by --replace-input to
+	work with arbitrary absolute or relative paths without requiring
+	path splitting logic. Fixes #365.
+
 2019-09-20  Jay Berkenbilt  <ejb@ql.org>
 
 	* 9.0.1: release

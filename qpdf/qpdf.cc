@@ -5148,11 +5148,10 @@ static void write_outfile(QPDF& pdf, Options& o)
     std::string temp_out;
     if (o.replace_input)
     {
-        // Use a file name that is hidden by default in the OS to
-        // avoid having it become momentarily visible in a
-        // graphical file manager or in case it gets left behind
-        // because of some kind of error.
-        temp_out = ".~qpdf-temp." + std::string(o.infilename) + "#";
+        // Append but don't prepend to the path to generate a
+        // temporary name. This saves us from having to split the path
+        // by directory and non-directory.
+        temp_out = std::string(o.infilename) + ".~qpdf-temp#";
         // o.outfilename will be restored to 0 before temp_out
         // goes out of scope.
         o.outfilename = temp_out.c_str();
@@ -5180,18 +5179,11 @@ static void write_outfile(QPDF& pdf, Options& o)
     {
         // We must close the input before we can rename files
         pdf.closeInputSource();
-        std::string backup;
+        std::string backup = std::string(o.infilename) + ".~qpdf-orig";
         bool warnings = pdf.anyWarnings();
-        if (warnings)
+        if (! warnings)
         {
-            // If there are warnings, the user may care about this
-            // file, so give it a non-hidden name that will be
-            // lexically grouped with the original file.
-            backup = std::string(o.infilename) + ".~qpdf-orig";
-        }
-        else
-        {
-            backup = ".~qpdf-orig." + std::string(o.infilename) + "#";
+            backup.append(1, '#');
         }
         QUtil::rename_file(o.infilename, backup.c_str());
         QUtil::rename_file(temp_out.c_str(), o.infilename);
