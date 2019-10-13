@@ -4104,7 +4104,7 @@ for (my $large = 0; $large < $nlarge; ++$large)
 }
 # ----------
 $td->notify("--- Signature Dictionary ---");
-$n_tests += 2;
+$n_tests += 3;
 
 $td->runtest("--object-streams=preserve",
 	     {$td->COMMAND =>
@@ -4117,6 +4117,14 @@ $td->runtest("--object-streams=preserve",
 $td->runtest("--object-streams=disable",
 	     {$td->COMMAND =>
 		  "qpdf --object-streams=disable digitally-signed.pdf a.pdf" .
+		  "; grep -f digitally-signed-sig-dict-contents.out a.pdf"},
+	     {$td->REGEXP => ".*",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("--object-streams=generate",
+	     {$td->COMMAND =>
+		  "qpdf --object-streams=generate digitally-signed.pdf a.pdf" .
 		  "; grep -f digitally-signed-sig-dict-contents.out a.pdf"},
 	     {$td->REGEXP => ".*",
 	      $td->EXIT_STATUS => 0},
