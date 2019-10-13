@@ -4103,6 +4103,23 @@ for (my $large = 0; $large < $nlarge; ++$large)
     unlink $file;
 }
 # ----------
+$td->notify("--- Get XRef Table ---");
+$n_tests += 2;
+
+$td->runtest("without object streams",
+	     {$td->COMMAND => "test_xref minimal.pdf"},
+	     {$td->FILE => "minimal-xref.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("with object streams",
+	     {$td->COMMAND => "test_xref digitally-signed.pdf"},
+	     {$td->FILE => "digitally-signed-xref.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+show_ntests();
+# ----------
 
 cleanup();
 
