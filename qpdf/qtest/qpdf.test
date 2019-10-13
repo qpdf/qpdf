@@ -4120,7 +4120,7 @@ $td->runtest("with object streams",
 
 show_ntests();
 # ----------
-$td->notify("--- Renumber Objects ---");
+$td->notify("--- Renumber Objects / XRef ---");
 $n_tests += 8;
 
 $td->runtest("w/o objstm",
