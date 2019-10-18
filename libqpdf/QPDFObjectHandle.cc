@@ -1779,12 +1779,19 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
     bool done = false;
     int bad_count = 0;
     int good_count = 0;
+    bool b_contents = false;
+    std::vector<std::string> contents_string_stack;
+    contents_string_stack.push_back("");
+    std::vector<qpdf_offset_t> contents_offset_stack;
+    contents_offset_stack.push_back(-1);
     while (! done)
     {
         bool bad = false;
         SparseOHArray& olist = olist_stack.back();
         parser_state_e state = state_stack.back();
         offset = offset_stack.back();
+        std::string& contents_string = contents_string_stack.back();
+        qpdf_offset_t& contents_offset = contents_offset_stack.back();
 
 	object = QPDFObjectHandle();
 	set_offset = false;
@@ -1894,6 +1901,9 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
                 state_stack.push_back(
                     (token.getType() == QPDFTokenizer::tt_array_open) ?
                     st_array : st_dictionary);
+                b_contents = false;
+                contents_string_stack.push_back("");
+                contents_offset_stack.push_back(-1);
             }
 	    break;
 
@@ -1914,7 +1924,19 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 	    break;
 
 	  case QPDFTokenizer::tt_name:
-	    object = newName(token.getValue());
+	    {
+		std::string name = token.getValue();
+		object = newName(name);
+
+		if (name == "/Contents")
+		{
+		    b_contents = true;
+		}
+		else
+		{
+		    b_contents = false;
+		}
+	    }
 	    break;
 
 	  case QPDFTokenizer::tt_word:
@@ -1975,6 +1997,12 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 		std::string val = token.getValue();
                 if (decrypter)
                 {
+                    if (b_contents)
+                    {
+                        contents_string = val;
+                        contents_offset = input->getLastOffset();
+                        b_contents = false;
+                    }
                     decrypter->decryptString(val);
                 }
 		object = QPDFObjectHandle::newString(val);
@@ -2164,6 +2192,18 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
                     }
                     dict[key] = val;
                 }
+		if (!contents_string.empty() &&
+		    dict.count("/Type") &&
+		    dict["/Type"].isName() &&
+		    dict["/Type"].getName() == "/Sig" &&
+		    dict.count("/ByteRange") &&
+		    dict.count("/Contents") &&
+		    dict["/Contents"].isString())
+		{
+		    dict["/Contents"]
+		      = QPDFObjectHandle::newString(contents_string);
+		    dict["/Contents"].setParsedOffset(contents_offset);
+		}
                 object = newDictionary(dict);
                 setObjectDescriptionFromInput(
                     object, context, object_description, input, offset);
@@ -2182,6 +2222,8 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
             {
                 olist_stack.back().append(object);
             }
+            contents_string_stack.pop_back();
+            contents_offset_stack.pop_back();
         }
     }
 

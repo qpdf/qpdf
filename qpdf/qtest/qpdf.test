@@ -4123,6 +4123,23 @@ foreach my $i (qw(preserve disable generate))
                       $td->EXIT_STATUS => 0});
 }
 
+$n_tests += 2;
+$td->runtest("encrypt",
+      {$td->COMMAND =>
+           "qpdf --encrypt \"\" \"\" 40 -- digitally-signed.pdf a.pdf" .
+           "; grep -f digitally-signed-sig-dict-contents.out a.pdf"},
+      {$td->REGEXP => ".*",
+       $td->EXIT_STATUS => 0},
+      $td->NORMALIZE_NEWLINES);
+
+$td->runtest("decrypt",
+      {$td->COMMAND =>
+           "qpdf --decrypt a.pdf b.pdf" .
+           "; grep -f digitally-signed-sig-dict-contents.out b.pdf"},
+      {$td->REGEXP => ".*",
+       $td->EXIT_STATUS => 0},
+      $td->NORMALIZE_NEWLINES);
+
 show_ntests();
 # ----------
 $td->notify("--- Get XRef Table ---");

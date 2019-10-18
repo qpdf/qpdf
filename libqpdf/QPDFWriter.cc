@@ -1695,7 +1695,7 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	    {
                 QTC::TC("qpdf", "QPDFWriter no encryption sig contents");
 		unparseChild(object.getKey(key), level + 1,
-			     child_flags | f_hex_string);
+			     child_flags | f_hex_string | f_no_encryption);
 	    }
 	    else
 	    {
@@ -1866,6 +1866,7 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	std::string val;
 	if (this->m->encrypted &&
 	    (! (flags & f_in_ostream)) &&
+	    (! (flags & f_no_encryption)) &&
 	    (! this->m->cur_data_key.empty()))
 	{
 	    val = object.getStringValue();
