@@ -3,10 +3,13 @@ BINS_qpdf = \
     pdf_from_scratch \
     test_driver \
     test_large_file \
+    test_parsedoffset \
     test_pdf_doc_encoding \
     test_pdf_unicode \
+    test_renumber \
     test_tokenizer \
-    test_unicode_filenames
+    test_unicode_filenames \
+    test_xref
 CBINS_qpdf = qpdf-ctest
 
 TARGETS_qpdf = $(foreach B,$(BINS_qpdf) $(CBINS_qpdf),qpdf/$(OUTPUT_DIR)/$(call binname,$(B)))

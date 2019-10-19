@@ -1,7 +1,8 @@
 #include <qpdf/QPDFObject.hh>
 
 QPDFObject::Members::Members() :
-    owning_qpdf(0)
+    owning_qpdf(0),
+    parsed_offset(-1)
 {
 }
 
@@ -33,4 +34,16 @@ bool
 QPDFObject::hasDescription()
 {
     return this->m->owning_qpdf != 0;
+}
+
+void
+QPDFObject::setParsedOffset(qpdf_offset_t offset)
+{
+    this->m->parsed_offset = offset;
+}
+
+qpdf_offset_t
+QPDFObject::getParsedOffset()
+{
+    return this->m->parsed_offset;
 }

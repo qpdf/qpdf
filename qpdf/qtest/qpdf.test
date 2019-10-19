@@ -4132,6 +4132,99 @@ $td->runtest("--object-streams=generate",
 
 show_ntests();
 # ----------
+$td->notify("--- Get XRef Table ---");
+$n_tests += 2;
+
+$td->runtest("without object streams",
+	     {$td->COMMAND => "test_xref minimal.pdf"},
+	     {$td->FILE => "minimal-xref.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("with object streams",
+	     {$td->COMMAND => "test_xref digitally-signed.pdf"},
+	     {$td->FILE => "digitally-signed-xref.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+show_ntests();
+# ----------
+$td->notify("--- Renumber Objects / XRef ---");
+$n_tests += 8;
+
+$td->runtest("w/o objstm",
+	     {$td->COMMAND => "test_renumber minimal.pdf"},
+	     {$td->REGEXP => "succeeded\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("w/ objstm",
+	     {$td->COMMAND => "test_renumber digitally-signed.pdf"},
+	     {$td->REGEXP => "succeeded\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("w/o objstm, --object-streams=generate",
+	     {$td->COMMAND =>
+		  "test_renumber --object-streams=generate minimal.pdf"},
+	     {$td->REGEXP => "succeeded\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("w/ objstm, --object-streams=generate",
+	     {$td->COMMAND =>
+		  "test_renumber --object-streams=generate digitally-signed.pdf"},
+	     {$td->REGEXP => "succeeded\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("w/o objstm, --linearize",
+	     {$td->COMMAND =>
+		  "test_renumber --linearize minimal.pdf"},
+	     {$td->REGEXP => "succeeded\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("w/ objstm, --linearize",
+	     {$td->COMMAND =>
+		  "test_renumber --linearize digitally-signed.pdf"},
+	     {$td->REGEXP => "succeeded\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("w/o objstm, --preserve-unreferenced",
+	     {$td->COMMAND =>
+		  "test_renumber --preserve-unreferenced minimal.pdf"},
+	     {$td->REGEXP => "succeeded\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("w/ objstm, --preserve-unreferenced",
+	     {$td->COMMAND =>
+		  "test_renumber --preserve-unreferenced digitally-signed.pdf"},
+	     {$td->REGEXP => "succeeded\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+show_ntests();
+# ----------
+$td->notify("--- Parsed Offset ---");
+$n_tests += 2;
+
+$td->runtest("without object streams",
+	     {$td->COMMAND => "test_parsedoffset minimal.pdf"},
+	     {$td->FILE => "minimal-parsedoffset.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("with object streams",
+	     {$td->COMMAND => "test_parsedoffset digitally-signed.pdf"},
+	     {$td->FILE => "digitally-signed-parsedoffset.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+show_ntests();
+# ----------
 
 cleanup();
 
