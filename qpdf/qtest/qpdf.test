@@ -4104,23 +4104,24 @@ for (my $large = 0; $large < $nlarge; ++$large)
 }
 # ----------
 $td->notify("--- Signature Dictionary ---");
-$n_tests += 2;
+$n_tests += 4;
 
-$td->runtest("--object-streams=preserve",
-	     {$td->COMMAND =>
-		  "qpdf --object-streams=preserve digitally-signed.pdf a.pdf" .
-		  "; grep -f digitally-signed-sig-dict-contents.out a.pdf"},
-	     {$td->REGEXP => ".*",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("--object-streams=disable",
-	     {$td->COMMAND =>
-		  "qpdf --object-streams=disable digitally-signed.pdf a.pdf" .
-		  "; grep -f digitally-signed-sig-dict-contents.out a.pdf"},
-	     {$td->REGEXP => ".*",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
+foreach my $i (qw(preserve disable))
+{
+    $td->runtest("sig dict contents hex (object-streams=$i)",
+                 {$td->COMMAND =>
+                      "qpdf --object-streams=$i digitally-signed.pdf a.pdf"},
+                 {$td->STRING => "",
+                      $td->EXIT_STATUS => 0});
+    # Use grep -f rather than writing something in test_driver because
+    # the point of the test is to ensure that the contents appears in
+    # the output file in the correct format.
+    $td->runtest("find desired contents (object-streams=$i)",
+                 {$td->COMMAND =>
+                      "grep -f digitally-signed-sig-dict-contents.out a.pdf"},
+                 {$td->REGEXP => ".*",
+                      $td->EXIT_STATUS => 0});
+}
 
 show_ntests();
 # ----------

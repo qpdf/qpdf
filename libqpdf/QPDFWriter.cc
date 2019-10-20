@@ -1693,6 +1693,7 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 		object.getKey("/Type").getName() == "/Sig" &&
 		object.hasKey("/ByteRange"))
 	    {
+                QTC::TC("qpdf", "QPDFWriter no encryption sig contents");
 		unparseChild(object.getKey(key), level + 1,
 			     child_flags | f_hex_string);
 	    }
