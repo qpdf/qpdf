@@ -4105,7 +4105,6 @@ for (my $large = 0; $large < $nlarge; ++$large)
 # ----------
 $td->notify("--- Signature Dictionary ---");
 $n_tests += 6;
-
 foreach my $i (qw(preserve disable generate))
 {
     $td->runtest("sig dict contents hex (object-streams=$i)",
@@ -4123,22 +4122,30 @@ foreach my $i (qw(preserve disable generate))
                       $td->EXIT_STATUS => 0});
 }
 
-$n_tests += 2;
-$td->runtest("encrypt",
-      {$td->COMMAND =>
-           "qpdf --encrypt \"\" \"\" 40 -- digitally-signed.pdf a.pdf" .
-           "; grep -f digitally-signed-sig-dict-contents.out a.pdf"},
-      {$td->REGEXP => ".*",
-       $td->EXIT_STATUS => 0},
-      $td->NORMALIZE_NEWLINES);
-
-$td->runtest("decrypt",
-      {$td->COMMAND =>
-           "qpdf --decrypt a.pdf b.pdf" .
-           "; grep -f digitally-signed-sig-dict-contents.out b.pdf"},
-      {$td->REGEXP => ".*",
-       $td->EXIT_STATUS => 0},
-      $td->NORMALIZE_NEWLINES);
+$n_tests += 12;
+foreach my $i (qw(40 128 256))
+{
+    $td->runtest("encrypt $i",
+                 {$td->COMMAND =>
+                      "qpdf --encrypt '' o $i -- digitally-signed.pdf a.pdf"},
+                 {$td->STRING => "",
+                      $td->EXIT_STATUS => 0});
+    $td->runtest("find desired contents (encrypt $i)",
+                 {$td->COMMAND =>
+                      "grep -f digitally-signed-sig-dict-contents.out a.pdf"},
+                 {$td->REGEXP => ".*",
+                      $td->EXIT_STATUS => 0});
+    $td->runtest("decrypt",
+                 {$td->COMMAND =>
+                      "qpdf --decrypt a.pdf b.pdf"},
+                 {$td->REGEXP => ".*",
+                      $td->EXIT_STATUS => 0});
+    $td->runtest("find desired contents (decrypt $i)",
+                 {$td->COMMAND =>
+                      "grep -f digitally-signed-sig-dict-contents.out b.pdf"},
+                 {$td->REGEXP => ".*",
+                      $td->EXIT_STATUS => 0});
+}
 
 show_ntests();
 # ----------
