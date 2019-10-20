@@ -1767,7 +1767,7 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
     empty = false;
 
     QPDFObjectHandle object;
-    bool set_object;
+    bool set_offset = false;
 
     std::vector<SparseOHArray> olist_stack;
     olist_stack.push_back(SparseOHArray());
@@ -1787,7 +1787,7 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
         offset = offset_stack.back();
 
 	object = QPDFObjectHandle();
-	set_object = false;
+	set_offset = false;
 
 	QPDFTokenizer::Token token =
             tokenizer.readToken(input, object_description, true);
@@ -2057,7 +2057,7 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
                 object, context, object_description, input,
                 input->getLastOffset());
             object.setParsedOffset(input->getLastOffset());
-            set_object = true;
+            set_offset = true;
             olist.append(object);
             break;
 
@@ -2087,7 +2087,7 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
                 // The `offset` points to the next of "[".
                 // Set the rewind offset to point to the beginning of "[".
                 object.setParsedOffset(offset - 1);
-                set_object = true;
+                set_offset = true;
             }
             else if (old_state == st_dictionary)
             {
@@ -2170,7 +2170,7 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
                 // The `offset` points to the next of "<<".
                 // Set the rewind offset to point to the beginning of "<<".
                 object.setParsedOffset(offset - 2);
-                set_object = true;
+                set_offset = true;
             }
             olist_stack.pop_back();
             offset_stack.pop_back();
@@ -2185,7 +2185,7 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
         }
     }
 
-    if (! set_object)
+    if (! set_offset)
     {
         setObjectDescriptionFromInput(
             object, context, object_description, input, offset);

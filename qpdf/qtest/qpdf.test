@@ -4204,13 +4204,13 @@ show_ntests();
 $td->notify("--- Parsed Offset ---");
 $n_tests += 2;
 
-$td->runtest("without object streams",
+$td->runtest("parsed offset without object streams",
 	     {$td->COMMAND => "test_parsedoffset minimal.pdf"},
 	     {$td->FILE => "minimal-parsedoffset.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-$td->runtest("with object streams",
+$td->runtest("pased offset with object streams",
 	     {$td->COMMAND => "test_parsedoffset digitally-signed.pdf"},
 	     {$td->FILE => "digitally-signed-parsedoffset.out",
 	      $td->EXIT_STATUS => 0},

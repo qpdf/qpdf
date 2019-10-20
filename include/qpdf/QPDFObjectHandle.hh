@@ -341,11 +341,11 @@ class QPDFObjectHandle
                                   StringDecrypter* decrypter,
                                   QPDF* context);
 
-    // Return the offset where the object existed when parsed.
-    // Negative value means that the object was created without parsing.
-    // If the object is in an object stream, the offset means from
-    // the beginning of the stream. Otherwise, the offset means from
-    // the beginning of the file.
+    // Return the offset where the object was found when parsed. A
+    // negative value means that the object was created without
+    // parsing. If the object is in a stream, the offset is from the
+    // beginning of the stream. Otherwise, the offset is from the
+    // beginning of the file.
     QPDF_DLL
     qpdf_offset_t getParsedOffset();
 
