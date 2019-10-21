@@ -4185,7 +4185,7 @@ $td->runtest("parsed offset without object streams",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-$td->runtest("pased offset with object streams",
+$td->runtest("parsed offset with object streams",
 	     {$td->COMMAND => "test_parsedoffset digitally-signed.pdf"},
 	     {$td->FILE => "digitally-signed-parsedoffset.out",
 	      $td->EXIT_STATUS => 0},
