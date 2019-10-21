@@ -68,8 +68,10 @@ void walk(size_t stream_number, QPDFObjectHandle obj,
         for(std::vector<QPDFObjectHandle>::iterator iter = array.begin();
             iter != array.end(); ++iter)
         {
-            if (iter->isIndirect())
+            if (!iter->isIndirect())
             {
+                // QPDF::GetAllObjects() enumerates all indirect objects.
+                // So only the direct objects are recursed here.
                 walk(stream_number, *iter, result);
             }
         }
@@ -81,8 +83,10 @@ void walk(size_t stream_number, QPDFObjectHandle obj,
             iter != keys.end(); ++iter)
         {
             QPDFObjectHandle item = obj.getKey(*iter);
-            if(!item.isIndirect())
+            if (!item.isIndirect())
             {
+                // QPDF::GetAllObjects() enumerates all indirect objects.
+                // So only the direct objects are recursed here.
                 walk(stream_number, item, result);
             }
         }
