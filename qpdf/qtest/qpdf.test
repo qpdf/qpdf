@@ -4016,6 +4016,33 @@ foreach my $i (qw(preserve disable generate))
                       $td->EXIT_STATUS => 0});
 }
 
+$n_tests += 4;
+foreach my $i (qw(preserve disable))
+{
+    $td->runtest("non sig dict contents text string (object-streams=$i)",
+                 {$td->COMMAND =>
+                      "qpdf --object-streams=$i comment-annotation.pdf a.pdf"},
+                 {$td->STRING => "",
+                      $td->EXIT_STATUS => 0});
+    $td->runtest("find desired contents as non hex (object-streams=$i)",
+                 {$td->COMMAND =>
+                      "grep \"/Contents (Salad)\" a.pdf"},
+                 {$td->REGEXP => ".*",
+                      $td->EXIT_STATUS => 0});
+}
+
+$n_tests += 2;
+    $td->runtest("non sig dict contents text string (object-streams=generate)",
+                 {$td->COMMAND =>
+                      "qpdf --object-streams=generate comment-annotation.pdf a.pdf"},
+                 {$td->STRING => "",
+                      $td->EXIT_STATUS => 0});
+    $td->runtest("plain text not found due to compression (object-streams=generate)",
+                 {$td->COMMAND =>
+                      "grep \"/Contents (Salad)\" a.pdf"},
+                 {$td->REGEXP => ".*",
+                      $td->EXIT_STATUS => 1});
+
 $n_tests += 12;
 foreach my $i (qw(40 128 256))
 {
@@ -4037,6 +4064,36 @@ foreach my $i (qw(40 128 256))
     $td->runtest("find desired contents (decrypt $i)",
                  {$td->COMMAND =>
                       "grep -f digitally-signed-sig-dict-contents.out b.pdf"},
+                 {$td->REGEXP => ".*",
+                      $td->EXIT_STATUS => 0});
+}
+
+$n_tests += 15;
+foreach my $i (qw(40 128 256))
+{
+    $td->runtest("non sig dict encrypt $i",
+                 {$td->COMMAND =>
+                      "qpdf --encrypt '' o $i -- comment-annotation.pdf a.pdf"},
+                 {$td->STRING => "",
+                      $td->EXIT_STATUS => 0});
+    $td->runtest("plain text not found due to encryption (non sig dict encrypt $i)",
+                 {$td->COMMAND =>
+                      "grep \"/Contents (Salad)\" a.pdf"},
+                 {$td->REGEXP => ".*",
+                      $td->EXIT_STATUS => 1});
+    $td->runtest("find encrypted contents (non sig dict encrypt $i)",
+                 {$td->COMMAND =>
+                      "grep \"/Contents <.*>\" a.pdf"},
+                 {$td->REGEXP => ".*",
+                      $td->EXIT_STATUS => 0});
+    $td->runtest("non sig dict decrypt",
+                 {$td->COMMAND =>
+                      "qpdf --decrypt a.pdf b.pdf"},
+                 {$td->REGEXP => ".*",
+                      $td->EXIT_STATUS => 0});
+    $td->runtest("find desired contents (non sig dict decrypt $i)",
+                 {$td->COMMAND =>
+                      "grep \"/Contents (Salad)\" b.pdf"},
                  {$td->REGEXP => ".*",
                       $td->EXIT_STATUS => 0});
 }
