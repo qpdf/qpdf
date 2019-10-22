@@ -1,3 +1,29 @@
+2019-10-22  Jay Berkenbilt  <ejb@ql.org>
+
+	* Incorporate changes from Masamichi Hosoda <trueroad@trueroad.jp>
+	to properly handle signature in the following ways:
+	  - Always represent /Contents in a signature dictionary as a hex
+	    string
+	  - Do not compress signature dictionaries when generating object
+	    streams
+	  - Do not encrypt/decrypt the /Contents field of the signature
+	    dictionary when creating or reading encrypted files
+
+	* Incorporate changes from Masamichi Hosoda <trueroad@trueroad.jp>
+	to add additional methods for making it possible to gain deeper
+	insight into cross reference tables and object renumbering. These
+	new API calls make it possible for applications to go into PDF
+	files created by qpdf and make changes to them that go beyond
+	working with the PDF at the object level. The specific use case
+	for these changes was to write an external tool to perform digital
+	signature, but there could be other uses as well. New methods
+	include the following, all of which are described in their
+	respective headers:
+	  - QPDF::getXRefTable()
+	  - QPDFObjectHandle::getParsedOffset()
+	  - QPDFWriter::getRenumberedObjGen(QPDFObjGen)
+	  - QPDFWriter::getWrittenXRefTable()
+
 2019-10-12  Jay Berkenbilt  <ejb@ql.org>
 
 	* 9.0.2: release

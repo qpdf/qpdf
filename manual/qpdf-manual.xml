@@ -4365,6 +4365,45 @@ print "\n";
   </para>
   <variablelist>
    <varlistentry>
+    <term>9.1.0: XXX</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+         Library Enhancements
+       </para>
+       <itemizedlist>
+         <listitem>
+           <para>
+             Incorporate contribution from Masamichi Hosoda to
+             properly handle signature dictionaries by not including
+             them in object streams, formatting the
+             <literal>/Contents</literal> key has a hexadecimal
+             string, and excluding the <literal>/Contents</literal>
+             key from encryption and decryption.
+           </para>
+         </listitem>
+         <listitem>
+           <para>
+             Incorporate contribution from Masamichi Hosoda to provide
+             new API calls for getting file-level information about
+             input and output files, enabling certain operations on
+             the files at the file level rather than the object level.
+             New methods include
+             <function>QPDF::getXRefTable()</function>,
+             <function>QPDFObjectHandle::getParsedOffset()</function>,
+             <function>QPDFWriter::getRenumberedObjGen(QPDFObjGen)</function>,
+             and <function>QPDFWriter::getWrittenXRefTable()</function>.
+           </para>
+         </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  <variablelist>
+   <varlistentry>
     <term>9.0.2: October 12, 2019</term>
     <listitem>
      <itemizedlist>
