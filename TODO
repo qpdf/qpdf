@@ -4,7 +4,7 @@ Fuzz Errors
 * https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=<N>
 
 * Ignoring these:
-  * Problems inside the jpeg library: 15454, 15470, 15471, 15751, 15987
+  * Problems inside the jpeg library: 15470, 15751, 18633
   * Timeout: 17630
 
 C++-11 (for qpdf 10)
