@@ -688,7 +688,7 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
     {
 	max_obj = std::max(max_obj, *(this->m->deleted_objects.rbegin()));
     }
-    if (size - 1 != max_obj)
+    if ((size < 1) || (size - 1 != max_obj))
     {
 	QTC::TC("qpdf", "QPDF xref size mismatch");
 	warn(QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(), "", 0,
@@ -1206,7 +1206,8 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
 	// an uncompressed object record, in which case the generation
 	// number appears as the third field.
 	int obj = toI(indx.at(cur_chunk));
-        if ((std::numeric_limits<int>::max() - obj) < chunk_count)
+        if ((obj < 0) ||
+            ((std::numeric_limits<int>::max() - obj) < chunk_count))
         {
             std::ostringstream msg;
             msg << "adding " << chunk_count << " to " << obj
