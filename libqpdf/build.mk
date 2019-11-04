@@ -39,6 +39,8 @@ SRCS_libqpdf = \
 	libqpdf/QPDF.cc \
 	libqpdf/QPDFAcroFormDocumentHelper.cc \
 	libqpdf/QPDFAnnotationObjectHelper.cc \
+	libqpdf/QPDFCryptoProvider.cc \
+	libqpdf/QPDFCrypto_native.cc \
 	libqpdf/QPDFExc.cc \
 	libqpdf/QPDFFormFieldObjectHelper.cc \
 	libqpdf/QPDFMatrix.cc \
