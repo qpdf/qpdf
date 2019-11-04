@@ -5,6 +5,7 @@ LDFLAGS_libqpdf = -Llibqpdf/$(OUTPUT_DIR)
 LIBS_libqpdf = -lqpdf
 
 SRCS_libqpdf = \
+	libqpdf/AES_PDF_native.cc \
 	libqpdf/BitStream.cc \
 	libqpdf/BitWriter.cc \
 	libqpdf/Buffer.cc \

@@ -6,6 +6,7 @@
 #include <qpdf/MD5_native.hh>
 #include <qpdf/RC4_native.hh>
 #include <qpdf/SHA2_native.hh>
+#include <qpdf/AES_PDF_native.hh>
 #include <memory>
 
 class QPDFCrypto_native: public QPDFCryptoImpl
@@ -31,10 +32,17 @@ class QPDFCrypto_native: public QPDFCryptoImpl
     virtual void SHA2_finalize();
     virtual std::string SHA2_digest();
 
+    virtual void rijndael_init(
+        bool encrypt, unsigned char const* key_data, size_t key_len);
+    virtual void rijndael_process(
+        unsigned char* in_data, unsigned char* out_data);
+    virtual void rijndael_finalize();
+
   private:
     std::shared_ptr<MD5_native> md5;
     std::shared_ptr<RC4_native> rc4;
     std::shared_ptr<SHA2_native> sha2;
+    std::shared_ptr<AES_PDF_native> aes_pdf;
 };
 
 #endif // QPDFCRYPTO_NATIVE_HH
