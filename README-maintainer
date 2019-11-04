@@ -4,16 +4,17 @@ ROUTINE DEVELOPMENT
 
 Default:
 
-./configure --enable-werror
+./configure CXX="g++ --std=c++11" --enable-werror
 
 Debugging:
 
-./configure CFLAGS="-g" CXXFLAGS="-g" --enable-werror --disable-shared
+./configure CXX="g++ --std=c++11" CFLAGS="-g" CXXFLAGS="-g" \
+   --enable-werror --disable-shared
 
 Profiling:
 
-./configure CFLAGS="-g -pg" CXXFLAGS="-g -pg" LDFLAGS="-pg" \
-   --enable-werror --disable-shared
+./configure CXX="g++ --std=c++11" CFLAGS="-g -pg" CXXFLAGS="-g -pg" \
+   LDFLAGS="-pg" --enable-werror --disable-shared
 
 Then run `gprof gmon.out`. Note that gmon.out is not cumulative.
 
@@ -22,7 +23,7 @@ Memory checks:
 ./configure CFLAGS="-fsanitize=address -fsanitize=undefined -g" \
    CXXFLAGS="-fsanitize=address -fsanitize=undefined -g" \
    LDFLAGS="-fsanitize=address -fsanitize=undefined" \
-   CC=clang CXX=clang++ \
+   CC=clang CXX="clang++ --std=c++11" \
    --enable-werror --disable-shared
 
 GOOGLE OSS-FUZZ
