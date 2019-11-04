@@ -23,6 +23,7 @@
 #define QPDFCRYPTOIMPL_HH
 
 #include <qpdf/DLL.h>
+#include <cstring>
 
 // This class is part of qpdf's pluggable crypto provider support.
 // Most users won't need to know or care about this class, but you can
@@ -39,6 +40,16 @@ class QPDF_DLL_CLASS QPDFCryptoImpl
 
     QPDF_DLL
     virtual ~QPDFCryptoImpl() = default;
+
+    typedef unsigned char MD5_Digest[16];
+    QPDF_DLL
+    virtual void MD5_init() = 0;
+    QPDF_DLL
+    virtual void MD5_update(unsigned char const* data, size_t len) = 0;
+    QPDF_DLL
+    virtual void MD5_finalize() = 0;
+    QPDF_DLL
+    virtual void MD5_digest(MD5_Digest) = 0;
 };
 
 #endif // QPDFCRYPTOIMPL_HH

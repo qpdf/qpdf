@@ -16,6 +16,7 @@ SRCS_libqpdf = \
 	libqpdf/InsecureRandomDataProvider.cc \
 	libqpdf/JSON.cc \
 	libqpdf/MD5.cc \
+	libqpdf/MD5_native.cc \
 	libqpdf/OffsetInputSource.cc \
 	libqpdf/Pipeline.cc \
 	libqpdf/Pl_AES_PDF.cc \

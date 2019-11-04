@@ -27,7 +27,7 @@
 //
 /////////////////////////////////////////////////////////////////////////
 
-#include <qpdf/MD5.hh>
+#include <qpdf/MD5_native.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/QIntC.hh>
 
@@ -72,28 +72,33 @@ static unsigned char PADDING[64] = {
 // FF, GG, HH, and II transformations for rounds 1, 2, 3, and 4.
 // Rotation is separate from addition to prevent recomputation.
 #define FF(a, b, c, d, x, s, ac) { \
- (a) += F ((b), (c), (d)) + (x) + static_cast<UINT4>(ac); \
+ (a) += F ((b), (c), (d)) + (x) + static_cast<uint32_t>(ac); \
  (a) = ROTATE_LEFT ((a), (s)); \
  (a) += (b); \
   }
 #define GG(a, b, c, d, x, s, ac) { \
- (a) += G ((b), (c), (d)) + (x) + static_cast<UINT4>(ac); \
+ (a) += G ((b), (c), (d)) + (x) + static_cast<uint32_t>(ac); \
  (a) = ROTATE_LEFT ((a), (s)); \
  (a) += (b); \
   }
 #define HH(a, b, c, d, x, s, ac) { \
- (a) += H ((b), (c), (d)) + (x) + static_cast<UINT4>(ac); \
+ (a) += H ((b), (c), (d)) + (x) + static_cast<uint32_t>(ac); \
  (a) = ROTATE_LEFT ((a), (s)); \
  (a) += (b); \
   }
 #define II(a, b, c, d, x, s, ac) { \
- (a) += I ((b), (c), (d)) + (x) + static_cast<UINT4>(ac); \
+ (a) += I ((b), (c), (d)) + (x) + static_cast<uint32_t>(ac); \
  (a) = ROTATE_LEFT ((a), (s)); \
  (a) += (b); \
   }
 
+MD5_native::MD5_native()
+{
+    init();
+}
+
 // MD5 initialization. Begins an MD5 operation, writing a new context.
-void MD5::init()
+void MD5_native::init()
 {
     count[0] = count[1] = 0;
     // Load magic initialization constants.
@@ -110,7 +115,7 @@ void MD5::init()
 // operation, processing another message block, and updating the
 // context.
 
-void MD5::update(unsigned char *input,
+void MD5_native::update(unsigned char *input,
 		 size_t inputLen)
 {
     unsigned int i, index, partLen;
@@ -119,10 +124,10 @@ void MD5::update(unsigned char *input,
     index = static_cast<unsigned int>((count[0] >> 3) & 0x3f);
 
     // Update number of bits
-    if ((count[0] += (static_cast<UINT4>(inputLen) << 3)) <
-        (static_cast<UINT4>(inputLen) << 3))
+    if ((count[0] += (static_cast<uint32_t>(inputLen) << 3)) <
+        (static_cast<uint32_t>(inputLen) << 3))
 	count[1]++;
-    count[1] += (static_cast<UINT4>(inputLen) >> 29);
+    count[1] += (static_cast<uint32_t>(inputLen) >> 29);
 
     partLen = 64 - index;
 
@@ -146,7 +151,7 @@ void MD5::update(unsigned char *input,
 
 // MD5 finalization. Ends an MD5 message-digest operation, writing the
 // the message digest and zeroizing the context.
-void MD5::final()
+void MD5_native::finalize()
 {
     if (finalized)
     {
@@ -178,10 +183,16 @@ void MD5::final()
     finalized = true;
 }
 
-// MD5 basic transformation. Transforms state based on block.
-void MD5::transform(UINT4 state[4], unsigned char block[64])
+void
+MD5_native::digest(Digest result)
 {
-    UINT4 a = state[0], b = state[1], c = state[2], d = state[3], x[16];
+    memcpy(result, digest_val, sizeof(digest_val));
+}
+
+// MD5 basic transformation. Transforms state based on block.
+void MD5_native::transform(uint32_t state[4], unsigned char block[64])
+{
+    uint32_t a = state[0], b = state[1], c = state[2], d = state[3], x[16];
 
     decode(x, block, 64);
 
@@ -267,9 +278,9 @@ void MD5::transform(UINT4 state[4], unsigned char block[64])
     memset (x, 0, sizeof (x));
 }
 
-// Encodes input (UINT4) into output (unsigned char). Assumes len is a
+// Encodes input (uint32_t) into output (unsigned char). Assumes len is a
 // multiple of 4.
-void MD5::encode(unsigned char *output, UINT4 *input, size_t len)
+void MD5_native::encode(unsigned char *output, uint32_t *input, size_t len)
 {
     unsigned int i, j;
 
@@ -281,155 +292,16 @@ void MD5::encode(unsigned char *output, UINT4 *input, size_t len)
     }
 }
 
-// Decodes input (unsigned char) into output (UINT4). Assumes len is a
+// Decodes input (unsigned char) into output (uint32_t). Assumes len is a
 // multiple of 4.
-void MD5::decode(UINT4 *output, unsigned char *input, size_t len)
+void MD5_native::decode(uint32_t *output, unsigned char *input, size_t len)
 {
     unsigned int i, j;
 
     for (i = 0, j = 0; j < len; i++, j += 4)
 	output[i] =
-            static_cast<UINT4>(input[j]) |
-            (static_cast<UINT4>(input[j+1]) << 8) |
-	    (static_cast<UINT4>(input[j+2]) << 16) |
-            (static_cast<UINT4>(input[j+3]) << 24);
-}
-
-// Public functions
-
-MD5::MD5()
-{
-    init();
-}
-
-void MD5::reset()
-{
-    init();
-}
-
-void MD5::encodeString(char const* str)
-{
-    size_t len = strlen(str);
-
-    update(QUtil::unsigned_char_pointer(str), len);
-    final();
-}
-
-void MD5::appendString(char const* input_string)
-{
-    update(QUtil::unsigned_char_pointer(input_string), strlen(input_string));
-}
-
-void MD5::encodeDataIncrementally(char const* data, size_t len)
-{
-    update(QUtil::unsigned_char_pointer(data), len);
-}
-
-void MD5::encodeFile(char const *filename, qpdf_offset_t up_to_offset)
-{
-    unsigned char buffer[1024];
-
-    FILE *file = QUtil::safe_fopen(filename, "rb");
-    size_t len;
-    size_t so_far = 0;
-    size_t to_try = 1024;
-    size_t up_to_size = 0;
-    if (up_to_offset >= 0)
-    {
-        up_to_size = QIntC::to_size(up_to_offset);
-    }
-    do
-    {
-	if ((up_to_offset >= 0) && ((so_far + to_try) > up_to_size))
-	{
-	    to_try = up_to_size - so_far;
-	}
-	len = fread(buffer, 1, to_try, file);
-	if (len > 0)
-	{
-	    update(buffer, len);
-	    so_far += len;
-	    if ((up_to_offset >= 0) && (so_far >= up_to_size))
-	    {
-		break;
-	    }
-	}
-    } while (len > 0);
-    if (ferror(file))
-    {
-	// Assume, perhaps incorrectly, that errno was set by the
-	// underlying call to read....
-	(void) fclose(file);
-	QUtil::throw_system_error(
-	    std::string("MD5: read error on ") + filename);
-    }
-    (void) fclose(file);
-
-    final();
-}
-
-void MD5::digest(Digest result)
-{
-    final();
-    memcpy(result, digest_val, sizeof(digest_val));
-}
-
-void MD5::print()
-{
-    final();
-
-    unsigned int i;
-    for (i = 0; i < 16; ++i)
-    {
-	printf("%02x", digest_val[i]);
-    }
-    printf("\n");
-}
-
-std::string MD5::unparse()
-{
-    final();
-    return QUtil::hex_encode(
-        std::string(reinterpret_cast<char*>(digest_val), 16));
-}
-
-std::string
-MD5::getDataChecksum(char const* buf, size_t len)
-{
-    MD5 m;
-    m.encodeDataIncrementally(buf, len);
-    return m.unparse();
-}
-
-std::string
-MD5::getFileChecksum(char const* filename, qpdf_offset_t up_to_offset)
-{
-    MD5 m;
-    m.encodeFile(filename, up_to_offset);
-    return m.unparse();
-}
-
-bool
-MD5::checkDataChecksum(char const* const checksum,
-		       char const* buf, size_t len)
-{
-    std::string actual_checksum = getDataChecksum(buf, len);
-    return (checksum == actual_checksum);
-}
-
-bool
-MD5::checkFileChecksum(char const* const checksum,
-		       char const* filename, qpdf_offset_t up_to_offset)
-{
-    bool result = false;
-    try
-    {
-	std::string actual_checksum = getFileChecksum(filename, up_to_offset);
-	result = (checksum == actual_checksum);
-    }
-    catch (std::runtime_error const&)
-    {
-	// Ignore -- return false
-    }
-    return result;
+            static_cast<uint32_t>(input[j]) |
+            (static_cast<uint32_t>(input[j+1]) << 8) |
+	    (static_cast<uint32_t>(input[j+2]) << 16) |
+            (static_cast<uint32_t>(input[j+3]) << 24);
 }
