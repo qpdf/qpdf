@@ -2,7 +2,6 @@
 #define PL_AES_PDF_HH
 
 #include <qpdf/Pipeline.hh>
-#include <qpdf/qpdf-config.h>
 #include <qpdf/QPDFCryptoImpl.hh>
 #include <memory>
 
@@ -47,7 +46,7 @@ class Pl_AES_PDF: public Pipeline
     void flush(bool discard_padding);
     void initializeVector();
 
-    static unsigned int const buf_size = 16;
+    static unsigned int const buf_size = QPDFCryptoImpl::rijndael_buf_size;
     static bool use_static_iv;
 
     std::shared_ptr<QPDFCryptoImpl> crypto;
@@ -56,6 +55,7 @@ class Pl_AES_PDF: public Pipeline
     bool first;
     size_t offset;              // offset into memory buffer
     std::unique_ptr<unsigned char[]> key;
+    size_t key_bytes;
     unsigned char inbuf[buf_size];
     unsigned char outbuf[buf_size];
     unsigned char cbc_block[buf_size];

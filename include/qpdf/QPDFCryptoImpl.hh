@@ -74,9 +74,11 @@ class QPDF_DLL_CLASS QPDFCryptoImpl
     QPDF_DLL
     virtual void RC4_finalize() = 0;
 
+    static size_t constexpr rijndael_buf_size = 16;
     QPDF_DLL
     virtual void rijndael_init(
-        bool encrypt, unsigned char const* key_data, size_t key_len) = 0;
+        bool encrypt, unsigned char const* key_data, size_t key_len,
+        bool cbc_mode, unsigned char* cbc_block) = 0;
     QPDF_DLL
     virtual void rijndael_process(
         unsigned char* in_data, unsigned char* out_data) = 0;

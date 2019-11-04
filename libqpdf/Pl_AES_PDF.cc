@@ -19,6 +19,7 @@ Pl_AES_PDF::Pl_AES_PDF(char const* identifier, Pipeline* next,
     cbc_mode(true),
     first(true),
     offset(0),
+    key_bytes(key_bytes),
     use_zero_iv(false),
     use_specified_iv(false),
     disable_padding(false)
@@ -30,7 +31,6 @@ Pl_AES_PDF::Pl_AES_PDF(char const* identifier, Pipeline* next,
     std::memset(this->inbuf, 0, this->buf_size);
     std::memset(this->outbuf, 0, this->buf_size);
     std::memset(this->cbc_block, 0, this->buf_size);
-    this->crypto->rijndael_init(encrypt, this->key.get(), key_bytes);
 }
 
 Pl_AES_PDF::~Pl_AES_PDF()
@@ -172,6 +172,7 @@ Pl_AES_PDF::flush(bool strip_padding)
     if (first)
     {
 	first = false;
+        bool return_after_init = false;
 	if (this->cbc_mode)
 	{
 	    if (encrypt)
@@ -196,37 +197,25 @@ Pl_AES_PDF::flush(bool strip_padding)
 		// vector.  There's nothing to write at this time.
 		memcpy(this->cbc_block, this->inbuf, this->buf_size);
 		this->offset = 0;
-		return;
+                return_after_init = true;
 	    }
 	}
+        this->crypto->rijndael_init(
+            encrypt, this->key.get(), key_bytes,
+            this->cbc_mode, this->cbc_block);
+        if (return_after_init)
+        {
+            return;
+        }
     }
 
     if (this->encrypt)
     {
-	if (this->cbc_mode)
-	{
-	    for (unsigned int i = 0; i < this->buf_size; ++i)
-	    {
-		this->inbuf[i] ^= this->cbc_block[i];
-	    }
-	}
 	this->crypto->rijndael_process(this->inbuf, this->outbuf);
-	if (this->cbc_mode)
-	{
-	    memcpy(this->cbc_block, this->outbuf, this->buf_size);
-	}
     }
     else
     {
 	this->crypto->rijndael_process(this->inbuf, this->outbuf);
-	if (this->cbc_mode)
-	{
-	    for (unsigned int i = 0; i < this->buf_size; ++i)
-	    {
-		this->outbuf[i] ^= this->cbc_block[i];
-	    }
-	    memcpy(this->cbc_block, this->inbuf, this->buf_size);
-	}
     }
     unsigned int bytes = this->buf_size;
     if (strip_padding)

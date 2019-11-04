@@ -33,7 +33,8 @@ class QPDFCrypto_native: public QPDFCryptoImpl
     virtual std::string SHA2_digest();
 
     virtual void rijndael_init(
-        bool encrypt, unsigned char const* key_data, size_t key_len);
+        bool encrypt, unsigned char const* key_data, size_t key_len,
+        bool cbc_mode, unsigned char* cbc_block);
     virtual void rijndael_process(
         unsigned char* in_data, unsigned char* out_data);
     virtual void rijndael_finalize();

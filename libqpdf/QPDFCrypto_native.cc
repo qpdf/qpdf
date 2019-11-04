@@ -69,10 +69,12 @@ QPDFCrypto_native::SHA2_digest()
 
 void
 QPDFCrypto_native::rijndael_init(
-    bool encrypt, unsigned char const* key_data, size_t key_len)
+    bool encrypt, unsigned char const* key_data, size_t key_len,
+    bool cbc_mode, unsigned char* cbc_block)
+
 {
     this->aes_pdf = std::make_shared<AES_PDF_native>(
-        encrypt, key_data, key_len);
+        encrypt, key_data, key_len, cbc_mode, cbc_block);
 }
 
 void
