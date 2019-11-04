@@ -4,8 +4,17 @@ INCLUDES_libqpdf = include libqpdf
 LDFLAGS_libqpdf = -Llibqpdf/$(OUTPUT_DIR)
 LIBS_libqpdf = -lqpdf
 
-SRCS_libqpdf = \
+CRYPTO_NATIVE = \
 	libqpdf/AES_PDF_native.cc \
+	libqpdf/MD5_native.cc \
+	libqpdf/QPDFCrypto_native.cc \
+	libqpdf/RC4_native.cc \
+	libqpdf/SHA2_native.cc \
+	libqpdf/rijndael.cc \
+	libqpdf/sha2.c \
+	libqpdf/sha2big.c
+
+SRCS_libqpdf = \
 	libqpdf/BitStream.cc \
 	libqpdf/BitWriter.cc \
 	libqpdf/Buffer.cc \
@@ -17,7 +26,6 @@ SRCS_libqpdf = \
 	libqpdf/InsecureRandomDataProvider.cc \
 	libqpdf/JSON.cc \
 	libqpdf/MD5.cc \
-	libqpdf/MD5_native.cc \
 	libqpdf/OffsetInputSource.cc \
 	libqpdf/Pipeline.cc \
 	libqpdf/Pl_AES_PDF.cc \
@@ -42,7 +50,6 @@ SRCS_libqpdf = \
 	libqpdf/QPDFAcroFormDocumentHelper.cc \
 	libqpdf/QPDFAnnotationObjectHelper.cc \
 	libqpdf/QPDFCryptoProvider.cc \
-	libqpdf/QPDFCrypto_native.cc \
 	libqpdf/QPDFExc.cc \
 	libqpdf/QPDFFormFieldObjectHelper.cc \
 	libqpdf/QPDFMatrix.cc \
@@ -79,14 +86,11 @@ SRCS_libqpdf = \
 	libqpdf/QTC.cc \
 	libqpdf/QUtil.cc \
 	libqpdf/RC4.cc \
-	libqpdf/RC4_native.cc \
-	libqpdf/SHA2_native.cc \
 	libqpdf/SecureRandomDataProvider.cc \
 	libqpdf/SparseOHArray.cc \
-	libqpdf/qpdf-c.cc \
-	libqpdf/rijndael.cc \
-	libqpdf/sha2.c \
-	libqpdf/sha2big.c
+	libqpdf/qpdf-c.cc
+
+SRCS_libqpdf += $(CRYPTO_NATIVE)
 
 # -----
 
