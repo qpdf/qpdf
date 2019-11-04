@@ -1,13 +1,13 @@
-#ifndef RC4_HH
-#define RC4_HH
+#ifndef RC4_NATIVE_HH
+#define RC4_NATIVE_HH
 
-#include <stddef.h>
+#include <cstring>
 
-class RC4
+class RC4_native
 {
   public:
     // key_len of -1 means treat key_data as a null-terminated string
-    RC4(unsigned char const* key_data, int key_len = -1);
+    RC4_native(unsigned char const* key_data, int key_len = -1);
 
     // out_data = 0 means to encrypt/decrypt in place
     void process(unsigned char* in_data, size_t len,
@@ -25,4 +25,4 @@ class RC4
     RC4Key key;
 };
 
-#endif // RC4_HH
+#endif // RC4_NATIVE_HH

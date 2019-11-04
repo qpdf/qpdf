@@ -1,4 +1,4 @@
-#include <qpdf/RC4.hh>
+#include <qpdf/RC4_native.hh>
 #include <qpdf/QIntC.hh>
 
 #include <string.h>
@@ -12,7 +12,7 @@ static void swap_byte(unsigned char &a, unsigned char &b)
     b = t;
 }
 
-RC4::RC4(unsigned char const* key_data, int key_len)
+RC4_native::RC4_native(unsigned char const* key_data, int key_len)
 {
     if (key_len == -1)
     {
@@ -38,7 +38,7 @@ RC4::RC4(unsigned char const* key_data, int key_len)
 }
 
 void
-RC4::process(unsigned char *in_data, size_t len, unsigned char* out_data)
+RC4_native::process(unsigned char *in_data, size_t len, unsigned char* out_data)
 {
     if (out_data == 0)
     {

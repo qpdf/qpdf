@@ -50,6 +50,16 @@ class QPDF_DLL_CLASS QPDFCryptoImpl
     virtual void MD5_finalize() = 0;
     QPDF_DLL
     virtual void MD5_digest(MD5_Digest) = 0;
+
+    // key_len of -1 means treat key_data as a null-terminated string
+    QPDF_DLL
+    virtual void RC4_init(unsigned char const* key_data, int key_len = -1) = 0;
+    // out_data = 0 means to encrypt/decrypt in place
+    QPDF_DLL
+    virtual void RC4_process(unsigned char* in_data, size_t len,
+                             unsigned char* out_data = 0) = 0;
+    QPDF_DLL
+    virtual void RC4_finalize() = 0;
 };
 
 #endif // QPDFCRYPTOIMPL_HH
