@@ -42,3 +42,27 @@ void
 QPDFCrypto_native::RC4_finalize()
 {
 }
+
+void
+QPDFCrypto_native::SHA2_init(int bits)
+{
+    this->sha2 = std::make_shared<SHA2_native>(bits);
+}
+
+void
+QPDFCrypto_native::SHA2_update(unsigned char const* data, size_t len)
+{
+    this->sha2->update(data, len);
+}
+
+void
+QPDFCrypto_native::SHA2_finalize()
+{
+    this->sha2->finalize();
+}
+
+std::string
+QPDFCrypto_native::SHA2_digest()
+{
+    return this->sha2->getRawDigest();
+}

@@ -23,7 +23,7 @@
 #define QPDFCRYPTOIMPL_HH
 
 #include <qpdf/DLL.h>
-#include <cstring>
+#include <string>
 
 // This class is part of qpdf's pluggable crypto provider support.
 // Most users won't need to know or care about this class, but you can
@@ -41,6 +41,8 @@ class QPDF_DLL_CLASS QPDFCryptoImpl
     QPDF_DLL
     virtual ~QPDFCryptoImpl() = default;
 
+    // Hashing
+
     typedef unsigned char MD5_Digest[16];
     QPDF_DLL
     virtual void MD5_init() = 0;
@@ -50,6 +52,17 @@ class QPDF_DLL_CLASS QPDFCryptoImpl
     virtual void MD5_finalize() = 0;
     QPDF_DLL
     virtual void MD5_digest(MD5_Digest) = 0;
+
+    QPDF_DLL
+    virtual void SHA2_init(int bits) = 0;
+    QPDF_DLL
+    virtual void SHA2_update(unsigned char const* data, size_t len) = 0;
+    QPDF_DLL
+    virtual void SHA2_finalize() = 0;
+    QPDF_DLL
+    virtual std::string SHA2_digest() = 0;
+
+    // Encryption/Decryption
 
     // key_len of -1 means treat key_data as a null-terminated string
     QPDF_DLL
