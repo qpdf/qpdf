@@ -14,6 +14,9 @@ CRYPTO_NATIVE = \
 	libqpdf/sha2.c \
 	libqpdf/sha2big.c
 
+CRYPTO_GNUTLS = \
+	libqpdf/QPDFCrypto_gnutls.cc
+
 SRCS_libqpdf = \
 	libqpdf/BitStream.cc \
 	libqpdf/BitWriter.cc \
@@ -92,6 +95,10 @@ SRCS_libqpdf = \
 
 ifeq ($(USE_CRYPTO_NATIVE), 1)
 SRCS_libqpdf += $(CRYPTO_NATIVE)
+endif
+
+ifeq ($(USE_CRYPTO_GNUTLS), 1)
+SRCS_libqpdf += $(CRYPTO_GNUTLS)
 endif
 
 # -----

@@ -5,6 +5,9 @@
 #ifdef USE_CRYPTO_NATIVE
 # include <qpdf/QPDFCrypto_native.hh>
 #endif
+#ifdef USE_CRYPTO_GNUTLS
+# include <qpdf/QPDFCrypto_gnutls.hh>
+#endif
 
 std::shared_ptr<QPDFCryptoImpl>
 QPDFCryptoProvider::getImpl()
@@ -42,6 +45,9 @@ QPDFCryptoProvider::QPDFCryptoProvider() :
 {
 #ifdef USE_CRYPTO_NATIVE
     registerImpl_internal<QPDFCrypto_native>("native");
+#endif
+#ifdef USE_CRYPTO_GNUTLS
+    registerImpl_internal<QPDFCrypto_gnutls>("gnutls");
 #endif
     setDefaultProvider_internal(DEFAULT_CRYPTO);
 }
