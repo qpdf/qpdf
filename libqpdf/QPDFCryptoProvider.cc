@@ -1,7 +1,10 @@
 #include <qpdf/QPDFCryptoProvider.hh>
+#include <qpdf/qpdf-config.h>
 #include <stdexcept>
 
-#include <qpdf/QPDFCrypto_native.hh>
+#ifdef USE_CRYPTO_NATIVE
+# include <qpdf/QPDFCrypto_native.hh>
+#endif
 
 std::shared_ptr<QPDFCryptoImpl>
 QPDFCryptoProvider::getImpl()
@@ -37,8 +40,10 @@ QPDFCryptoProvider::setDefaultProvider(std::string const& name)
 QPDFCryptoProvider::QPDFCryptoProvider() :
     m(std::make_shared<Members>())
 {
+#ifdef USE_CRYPTO_NATIVE
     registerImpl_internal<QPDFCrypto_native>("native");
-    setDefaultProvider_internal("native");
+#endif
+    setDefaultProvider_internal(DEFAULT_CRYPTO);
 }
 
 QPDFCryptoProvider&

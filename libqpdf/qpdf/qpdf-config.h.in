@@ -3,6 +3,9 @@
 /* Whether to avoid use of HANDLE in Windows */
 #undef AVOID_WINDOWS_HANDLE
 
+/* Default crypto provider */
+#undef DEFAULT_CRYPTO
+
 /* define if the compiler supports basic C++11 syntax */
 #undef HAVE_CXX11
 
@@ -80,6 +83,9 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
+
+/* Whether to use the native crypto provider */
+#undef USE_CRYPTO_NATIVE
 
 /* Whether to use insecure random numbers */
 #undef USE_INSECURE_RANDOM

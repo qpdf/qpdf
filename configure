@@ -642,6 +642,8 @@ DOCBOOK_FO
 DOCBOOK_XHTML
 SHOW_FAILED_TEST_OUTPUT
 QPDF_SKIP_TEST_COMPARE_IMAGES
+DEFAULT_CRYPTO
+USE_CRYPTO_NATIVE
 CXXWFLAGS
 WFLAGS
 BUILDRULES
@@ -776,6 +778,9 @@ enable_ld_version_script
 with_buildrules
 enable_werror
 enable_int_warnings
+enable_implicit_crypto
+enable_crypto_native
+with_default_crypto
 enable_test_compare_images
 enable_show_failed_test_output
 with_docbook_xsl
@@ -1456,6 +1461,11 @@ Optional Features:
   --enable-werror         whether to treat warnings as errors (default is no)
   --enable-int-warnings   whether to turn on integer type warnings (default is
                           yes)
+  --enable-implicit-crypto
+                          whether to enable available crypto providers that
+                          are not explicitly requested; true by default
+  --enable-crypto-native  whether to include support for native crypto
+                          provider
   --enable-test-compare-images
                           whether to compare images in test suite; disabled by
                           default, enabling requires ghostscript and tiffcmp
@@ -1491,6 +1501,9 @@ Optional Packages:
                           QPDF_LARGE_FILE_TEST_PATH environment variable to
                           the path before running the test suite.
   --with-buildrules=rules which build rules to use; see README.md
+  --with-default-crypto=provider
+                          which crypto provider to use by default; see
+                          README.md
   --with-docbook-xsl=DIR  location of docbook 4.x xml stylesheets
   --with-docbookx-dtd=FILE
                           location of docbook 4.x xml DTD
@@ -17567,6 +17580,84 @@ else
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 fi
+
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for whether to use implicit crypto" >&5
+$as_echo_n "checking for whether to use implicit crypto... " >&6; }
+# Check whether --enable-implicit-crypto was given.
+if test "${enable_implicit_crypto+set}" = set; then :
+  enableval=$enable_implicit_crypto; if test "$enableval" = "yes"; then
+      IMPLICIT_CRYPTO=1
+    else
+      IMPLICIT_CRYPTO=0
+    fi
+else
+  IMPLICIT_CRYPTO=1
+fi
+
+if test "$IMPLICIT_CRYPTO" = "1"; then
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+
+# Check whether --enable-crypto-native was given.
+if test "${enable_crypto_native+set}" = set; then :
+  enableval=$enable_crypto_native; if test "$enableval" = "yes"; then
+      USE_CRYPTO_NATIVE=1
+    else
+      USE_CRYPTO_NATIVE=0
+    fi
+else
+  USE_CRYPTO_NATIVE=$IMPLICIT_CRYPTO
+fi
+
+if test "$USE_CRYPTO_NATIVE" = "1"; then
+
+$as_echo "#define USE_CRYPTO_NATIVE 1" >>confdefs.h
+
+  DEFAULT_CRYPTO=native
+fi
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking which crypto to use by default" >&5
+$as_echo_n "checking which crypto to use by default... " >&6; }
+
+
+# Check whether --with-default-crypto was given.
+if test "${with_default_crypto+set}" = set; then :
+  withval=$with_default_crypto; DEFAULT_CRYPTO=$withval
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $DEFAULT_CRYPTO" >&5
+$as_echo "$DEFAULT_CRYPTO" >&6; }
+
+cat >>confdefs.h <<_ACEOF
+#define DEFAULT_CRYPTO "$DEFAULT_CRYPTO"
+_ACEOF
+
+
+
+bad_crypto=0
+case "$DEFAULT_CRYPTO" in
+  "native")
+    if test "$USE_CRYPTO_NATIVE" != "1"; then
+      bad_crypto=1
+    fi
+  ;;
+  *)
+    bad_crypto=1
+  ;;
+esac
+if test "$bad_crypto" = "1"; then
+  as_fn_error $? "Unsupported default crypto: $DEFAULT_CRYPTO" "$LINENO" 5
+fi
+
 
 
 # Check whether --enable-test-compare-images was given.

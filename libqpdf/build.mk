@@ -90,7 +90,9 @@ SRCS_libqpdf = \
 	libqpdf/SparseOHArray.cc \
 	libqpdf/qpdf-c.cc
 
+ifeq ($(USE_CRYPTO_NATIVE), 1)
 SRCS_libqpdf += $(CRYPTO_NATIVE)
+endif
 
 # -----
 

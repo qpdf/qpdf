@@ -465,6 +465,78 @@ else
    AC_MSG_RESULT(no)
 fi
 
+dnl BEGIN CRYPTO
+
+dnl By default, we build in support for every crypto provider that we
+dnl can. If implicit crypto is disabled, we don't build support for
+dnl any crypto that is not explicitly enabled. Test for various crypto
+dnl providers in increasing order of priority. The last one found
+dnl becomes the default unless a default is explicitly specified.
+
+AC_MSG_CHECKING(for whether to use implicit crypto)
+AC_ARG_ENABLE(implicit-crypto,
+   AS_HELP_STRING([--enable-implicit-crypto],
+		  [whether to enable available crypto providers that are not explicitly requested; true by default]),
+   [if test "$enableval" = "yes"; then
+      IMPLICIT_CRYPTO=1
+    else
+      IMPLICIT_CRYPTO=0
+    fi],
+   [IMPLICIT_CRYPTO=1])
+if test "$IMPLICIT_CRYPTO" = "1"; then
+   AC_MSG_RESULT(yes)
+else
+   AC_MSG_RESULT(no)
+fi
+
+dnl Native crypto is always available unless explicitly disabled.
+
+AC_SUBST(USE_CRYPTO_NATIVE)
+AC_ARG_ENABLE(crypto-native,
+   AS_HELP_STRING([--enable-crypto-native],
+                  [whether to include support for native crypto provider]),
+   [if test "$enableval" = "yes"; then
+      USE_CRYPTO_NATIVE=1
+    else
+      USE_CRYPTO_NATIVE=0
+    fi],
+   [USE_CRYPTO_NATIVE=$IMPLICIT_CRYPTO])
+if test "$USE_CRYPTO_NATIVE" = "1"; then
+  AC_DEFINE([USE_CRYPTO_NATIVE], 1, [Whether to use the native crypto provider])
+  DEFAULT_CRYPTO=native
+fi
+
+dnl Allow the default crypto provider to be specified explicitly.
+
+AC_MSG_CHECKING(which crypto to use by default)
+AC_SUBST(DEFAULT_CRYPTO)
+AC_ARG_WITH(default-crypto,
+   AS_HELP_STRING([--with-default-crypto=provider],
+		  [which crypto provider to use by default; see README.md]),
+   [DEFAULT_CRYPTO=$withval],
+   [])
+AC_MSG_RESULT($DEFAULT_CRYPTO)
+AC_DEFINE_UNQUOTED([DEFAULT_CRYPTO], "$DEFAULT_CRYPTO", [Default crypto provider])
+
+dnl Make sure the default crypto provider is actually being built.
+
+bad_crypto=0
+case "$DEFAULT_CRYPTO" in
+  "native")
+    if test "$USE_CRYPTO_NATIVE" != "1"; then
+      bad_crypto=1
+    fi
+  ;;
+  *)
+    bad_crypto=1
+  ;;
+esac
+if test "$bad_crypto" = "1"; then
+  AC_MSG_ERROR(Unsupported default crypto: $DEFAULT_CRYPTO)
+fi
+
+dnl END CRYPTO
+
 AC_SUBST(QPDF_SKIP_TEST_COMPARE_IMAGES)
 AC_ARG_ENABLE(test-compare-images,
    AS_HELP_STRING([--enable-test-compare-images],
