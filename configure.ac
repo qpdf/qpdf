@@ -29,7 +29,7 @@ AC_CHECK_PROG(ACLOCAL,aclocal,1,0)
 AC_CHECK_PROG(SHA256SUM,sha256sum,1,0)
 if test "$CHECK_AUTOFILES$AUTOCONF$AUTOHEADER$ACLOCAL$SHA256SUM" = "11111"; then
    if ! sha256sum -c autofiles.sums; then
-       AC_MSG_ERROR(autofiles are autodated; rerun autogen.sh)
+       AC_MSG_ERROR(autofiles are outdated; rerun autogen.sh)
    fi
 fi
 
@@ -116,7 +116,7 @@ if test "$qpdf_OS_SECURE_RANDOM" = "1"; then
    AC_MSG_RESULT(yes)
 else
    AC_MSG_RESULT(no)
-   AC_DEFINE([SKIP_OS_SECURE_RANDOM], [1], [Whether to suppres use of OS-provided secure random numbers])
+   AC_DEFINE([SKIP_OS_SECURE_RANDOM], [1], [Whether to suppress use of OS-provided secure random numbers])
 fi
 
 AX_RANDOM_DEVICE
