@@ -25,6 +25,8 @@ fi
   --enable-oss-fuzz \
   --enable-static \
   --disable-shared \
+  --enable-crypto-native \
+  --disable-implicit-crypto \
   --prefix="$WORK" \
   LDFLAGS="-L$WORK/lib" \
   CPPFLAGS="-I$WORK/include" \
