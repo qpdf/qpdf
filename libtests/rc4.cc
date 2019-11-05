@@ -7,9 +7,29 @@
 #include <string.h>
 #include <iostream>
 #include <stdlib.h>
+#include <cassert>
+
+static void other_tests()
+{
+    // Test cases not covered by the pipeline: string as key, convert
+    // in place
+    RC4 r(reinterpret_cast<unsigned char const*>("quack"));
+    auto data = std::unique_ptr<unsigned char[]>(
+        new unsigned char[6], std::default_delete<unsigned char[]>());
+    memcpy(data.get(), "potato", 6);
+    r.process(data.get(), 6);
+    assert(memcmp(data.get(), "\xa5\x6f\xe7\x27\x2b\x5c", 6) == 0);
+    std::cout << "passed" << std::endl;
+}
 
 int main(int argc, char* argv[])
 {
+    if ((argc == 2) && (strcmp(argv[1], "other") == 0))
+    {
+        other_tests();
+        return 0;
+    }
+
     if (argc != 4)
     {
 	std::cerr << "Usage: rc4 hex-key infile outfile" << std::endl;

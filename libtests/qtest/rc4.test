@@ -35,9 +35,14 @@ foreach my $key (@tests)
 		 {$td->FILE => "test$n.in"});
 }
 
+$td->runtest("other tests",
+             {$td->COMMAND => "rc4 other"},
+             {$td->STRING => "passed\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
 cleanup();
 
-$td->report(4 * scalar(@tests));
+$td->report(1 + (4 * scalar(@tests)));
 
 sub cleanup
 {
