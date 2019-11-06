@@ -26,6 +26,7 @@
 #include <qpdf/QPDFCryptoImpl.hh>
 #include <string>
 #include <map>
+#include <set>
 #include <memory>
 #include <functional>
 
@@ -63,6 +64,14 @@ class QPDFCryptoProvider
     // default crypto implementation.
     QPDF_DLL
     static void setDefaultProvider(std::string const& name);
+
+    // Get the names of registered implementations
+    QPDF_DLL
+    static std::set<std::string> getRegisteredImpls();
+
+    // Get the name of the default crypto provider
+    QPDF_DLL
+    static std::string getDefaultProvider();
 
   private:
     QPDFCryptoProvider();

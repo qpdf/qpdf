@@ -1,5 +1,6 @@
 #include <qpdf/QPDFCryptoProvider.hh>
 #include <qpdf/qpdf-config.h>
+#include <qpdf/QUtil.hh>
 #include <stdexcept>
 
 #ifdef USE_CRYPTO_NATIVE
@@ -49,7 +50,12 @@ QPDFCryptoProvider::QPDFCryptoProvider() :
 #ifdef USE_CRYPTO_GNUTLS
     registerImpl_internal<QPDFCrypto_gnutls>("gnutls");
 #endif
-    setDefaultProvider_internal(DEFAULT_CRYPTO);
+    std::string default_crypto;
+    if (! QUtil::get_env("QPDF_CRYPTO_PROVIDER", &default_crypto))
+    {
+        default_crypto = DEFAULT_CRYPTO;
+    }
+    setDefaultProvider_internal(default_crypto);
 }
 
 QPDFCryptoProvider&
@@ -83,5 +89,31 @@ QPDFCryptoProvider::registerImpl_internal(std::string const& name)
 void
 QPDFCryptoProvider::setDefaultProvider_internal(std::string const& name)
 {
+    if (! this->m->providers.count(name))
+    {
+        throw std::logic_error(
+            "QPDFCryptoProvider: request to set default"
+            " provider to unknown implementation \"" +
+            name + "\"");
+    }
     this->m->default_provider = name;
+}
+
+std::set<std::string>
+QPDFCryptoProvider::getRegisteredImpls()
+{
+    std::set<std::string> result;
+    QPDFCryptoProvider& p = getInstance();
+    for (auto iter = p.m->providers.begin(); iter != p.m->providers.end();
+         ++iter)
+    {
+        result.insert((*iter).first);
+    }
+    return result;
+}
+
+std::string
+QPDFCryptoProvider::getDefaultProvider()
+{
+    return getInstance().m->default_provider;
 }
