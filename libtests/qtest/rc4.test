@@ -9,40 +9,60 @@ require TestDriver;
 
 my $td = new TestDriver('RC4');
 
-cleanup();
-
-my @tests = ('0123456789abcdef',
-	     '0123456789abcdef',
-	     '0000000000000000',
-	     'ef012345',
-	     '0123456789abcdef');
-
-my $n = 0;
-foreach my $key (@tests)
+my @providers = ();
+if (exists $ENV{'QPDF_CRYPTO_PROVIDER'})
 {
-    ++$n;
-    $td->runtest("test $n",
-		 {$td->COMMAND => "rc4 $key test$n.in tmp1-$n.out"},
-		 {$td->STRING => "", $td->EXIT_STATUS => 0});
-    $td->runtest("check output",
-		 {$td->FILE => "tmp1-$n.out"},
-		 {$td->FILE => "test$n.out"});
-    $td->runtest("test $n reverse",
-		 {$td->COMMAND => "rc4 $key test$n.out tmp2-$n.out"},
-		 {$td->STRING => "", $td->EXIT_STATUS => 0});
-    $td->runtest("check output",
-		 {$td->FILE => "tmp2-$n.out"},
-		 {$td->FILE => "test$n.in"});
+    push(@providers, $ENV{'QPDF_CRYPTO_PROVIDER'});
+}
+else
+{
+    open(Q, "qpdf --show-crypto|") or die;
+    while (<Q>)
+    {
+        s/\s+$//s;
+        push(@providers, $_);
+    }
+    close(Q);
+}
+my @tests = ('0123456789abcdef',
+             '0123456789abcdef',
+             '0000000000000000',
+             'ef012345',
+             '0123456789abcdef');
+
+foreach my $p (@providers)
+{
+    $ENV{'QPDF_CRYPTO_PROVIDER'} = $p;
+
+    cleanup();
+
+    my $n = 0;
+    foreach my $key (@tests)
+    {
+        ++$n;
+        $td->runtest("test $n ($p)",
+                     {$td->COMMAND => "rc4 $key test$n.in tmp1-$n.out"},
+                     {$td->STRING => "", $td->EXIT_STATUS => 0});
+        $td->runtest("check output",
+                     {$td->FILE => "tmp1-$n.out"},
+                     {$td->FILE => "test$n.out"});
+        $td->runtest("test $n reverse ($p)",
+                     {$td->COMMAND => "rc4 $key test$n.out tmp2-$n.out"},
+                     {$td->STRING => "", $td->EXIT_STATUS => 0});
+        $td->runtest("check output",
+                     {$td->FILE => "tmp2-$n.out"},
+                     {$td->FILE => "test$n.in"});
+    }
+
+    $td->runtest("other tests ($p)",
+                 {$td->COMMAND => "rc4 other"},
+                 {$td->STRING => "passed\n", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+
+    cleanup();
 }
 
-$td->runtest("other tests",
-             {$td->COMMAND => "rc4 other"},
-             {$td->STRING => "passed\n", $td->EXIT_STATUS => 0},
-             $td->NORMALIZE_NEWLINES);
-
-cleanup();
-
-$td->report(1 + (4 * scalar(@tests)));
+$td->report((1 + (4 * scalar(@tests))) * scalar(@providers));
 
 sub cleanup
 {
