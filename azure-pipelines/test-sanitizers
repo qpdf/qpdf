@@ -2,11 +2,15 @@
 set -e
 sudo apt-get update
 sudo apt-get -y install \
-   autoconf build-essential zlib1g-dev libjpeg-dev
+   autoconf build-essential zlib1g-dev libjpeg-dev libgnutls28-dev
 ./configure \
    CFLAGS="-fsanitize=address -fsanitize=undefined -g" \
    CXXFLAGS="-fsanitize=address -fsanitize=undefined -g" \
    LDFLAGS="-fsanitize=address -fsanitize=undefined" \
+   --enable-crypto-native --enable-crypto-gnutls \
    --enable-werror --disable-shared --enable-show-failed-test-output
 make -j$(nproc) -k
-make -k check
+for i in $(./qpdf/build/qpdf --show-crypto); do
+    echo "*** Running tests with crypto provider $i"
+    env QPDF_CRYPTO_PROVIDER=$i make -k check
+done

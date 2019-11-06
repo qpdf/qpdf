@@ -2,12 +2,16 @@
 set -ex
 sudo apt-get update
 sudo apt-get -y install \
-   autoconf build-essential zlib1g-dev libjpeg-dev \
+   autoconf build-essential zlib1g-dev libjpeg-dev libgnutls28-dev \
    docbook-xsl fop xsltproc libxml2-utils inkscape imagemagick
 ./configure --enable-werror --enable-doc-maintenance \
+    --enable-crypto-native --enable-crypto-gnutls \
     --enable-show-failed-test-output
 make -j$(nproc) -k
-make -k check
+for i in $(./qpdf/build/qpdf --show-crypto); do
+    echo "*** Running tests with crypto provider $i"
+    env QPDF_CRYPTO_PROVIDER=$i make -k check
+done
 make distfiles.zip
 ./make_dist --ci --no-tests
 mkdir distribution
