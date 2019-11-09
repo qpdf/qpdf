@@ -762,7 +762,7 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
 	    V,
 	    encrypt.getKey("/R").getIntValueAsInt(),
     	    key_len,
-	    encrypt.getKey("/P").getIntValueAsInt(),
+	    static_cast<int>(encrypt.getKey("/P").getIntValue()),
 	    encrypt.getKey("/O").getStringValue(),
 	    encrypt.getKey("/U").getStringValue(),
             OE,

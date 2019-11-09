@@ -1,3 +1,14 @@
+2019-11-09  Jay Berkenbilt  <ejb@ql.org>
+
+	* When reading /P from the encryption dictionary, use static_cast
+	instead of QIntC to convert the value to a signed integer. The
+	value of /P is a bit field, and PDF files have been found in the
+	wild where /P is represented as an unsigned integer even though
+	the spec states that it is a signed 32-bit value. By using
+	static_cast, we allow qpdf to compensate for writers that
+	incorrectly represent the correct bit field as an unsigned value.
+	Fixes #382.
+
 2019-11-05  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add support for pluggable crypto providers, enabling multiple

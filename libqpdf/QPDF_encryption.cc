@@ -877,7 +877,7 @@ QPDF::initializeEncryption()
     int R = encryption_dict.getKey("/R").getIntValueAsInt();
     std::string O = encryption_dict.getKey("/O").getStringValue();
     std::string U = encryption_dict.getKey("/U").getStringValue();
-    int P = encryption_dict.getKey("/P").getIntValueAsInt();
+    int P = static_cast<int>(encryption_dict.getKey("/P").getIntValue());
 
     // If supporting new encryption R/V values, remember to update
     // error message inside this if statement.
@@ -1448,7 +1448,7 @@ QPDF::isEncrypted(int& R, int& P, int& V,
 	QPDFObjectHandle Pkey = encrypt.getKey("/P");
 	QPDFObjectHandle Rkey = encrypt.getKey("/R");
         QPDFObjectHandle Vkey = encrypt.getKey("/V");
-	P = Pkey.getIntValueAsInt();
+	P = static_cast<int>(Pkey.getIntValue());
 	R = Rkey.getIntValueAsInt();
         V = Vkey.getIntValueAsInt();
         stream_method = this->m->encp->cf_stream;

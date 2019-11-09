@@ -721,6 +721,32 @@ foreach my $d (@bug_tests)
 }
 show_ntests();
 # ----------
+$td->notify("--- Positive /P in encryption dictionary ---");
+$n_tests += 4;
+
+# Files have been seen where /P in the encryption dictionary was an
+# unsigned rather than a signed integer. To create
+# encrypted-positive-P.pdf, I temporarily modified QPDFWriter.cc to
+# introduce this error.
+
+$td->runtest("decrypt positive P",
+	     {$td->COMMAND =>
+                  "qpdf --decrypt --static-id encrypted-positive-P.pdf a.pdf"},
+	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "decrypted-positive-P.pdf"});
+$td->runtest("copy encryption positive P",
+	     {$td->COMMAND =>
+                  "qpdf --static-id --static-aes-iv" .
+                  " encrypted-positive-P.pdf a.pdf"},
+	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "copied-positive-P.pdf"});
+
+show_ntests();
+# ----------
 $td->notify("--- Library version ---");
 $n_tests += 3;
 

@@ -661,6 +661,7 @@ QPDFPageObjectHelper::getFormXObjectForPage(bool handle_transformations)
     return result;
 }
 
+// ABI: name should be std:string const&
 std::string
 QPDFPageObjectHelper::placeFormXObject(
     QPDFObjectHandle fo, std::string name,
