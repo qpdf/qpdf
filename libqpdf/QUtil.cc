@@ -1116,6 +1116,8 @@ QUtil::parse_numrange(char const* range, int max)
         std::vector<int> work;
         static int const comma = -1;
         static int const dash = -2;
+        size_t start_idx = 0;
+        size_t skip = 1;
 
         enum { st_top,
                st_in_number,
@@ -1182,6 +1184,14 @@ QUtil::parse_numrange(char const* range, int max)
                     work.push_back(dash);
                 }
             }
+            else if (ch == ':')
+            {
+                if (! ((state == st_in_number) || (state == st_after_number)))
+                {
+                    throw std::runtime_error("unexpected colon");
+                }
+                break;
+            }
             else
             {
                 throw std::runtime_error("unexpected character");
@@ -1196,6 +1206,22 @@ QUtil::parse_numrange(char const* range, int max)
         else
         {
             throw std::runtime_error("number expected");
+        }
+        if (*p == ':')
+        {
+            if (strcmp(p, ":odd") == 0)
+            {
+                skip = 2;
+            }
+            else if (strcmp(p, ":even") == 0)
+            {
+                skip = 2;
+                start_idx = 1;
+            }
+            else
+            {
+                throw std::runtime_error("unexpected even/odd modifier");
+            }
         }
 
         p = 0;
@@ -1243,6 +1269,15 @@ QUtil::parse_numrange(char const* range, int max)
                     throw std::logic_error(
                         "INTERNAL ERROR parsing numeric range");
                 }
+            }
+        }
+        if ((start_idx > 0) || (skip != 1))
+        {
+            auto t = result;
+            result.clear();
+            for (size_t i = start_idx; i < t.size(); i += skip)
+            {
+                result.push_back(t.at(i));
             }
         }
     }

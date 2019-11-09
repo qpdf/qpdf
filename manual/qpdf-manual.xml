@@ -1391,9 +1391,12 @@ make
     <literal>r3-r1</literal> would be the last three pages of the
     document. Pages can appear in any order. Ranges can appear with a
     high number followed by a low number, which causes the pages to
-    appear in reverse. Repeating a number will cause an error, but you
-    can use the workaround discussed above should you really want to
-    include the same page twice.
+    appear in reverse. Numbers may be repeated in a page range. A page
+    range may be optionally appended with <literal>:even</literal> or
+    <literal>:odd</literal> to indicate only the even or odd pages in
+    the given range. Note that even and odd refer to the positions
+    within the specified, range, not whether the original number is
+    even or odd.
    </para>
    <para>
     Example page ranges:
@@ -1418,6 +1421,18 @@ make
       <para>
        <literal>r1-r3</literal>: the last three pages of the document
        in reverse order
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       <literal>1-20:even</literal>: even pages from 2 to 20
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       <literal>5,7-9,12:odd</literal>: pages 5, 8, and, 12, which are
+       the pages in odd positions from among the original range, which
+       represents pages 5, 7, 8, 9, and 12.
       </para>
      </listitem>
     </itemizedlist>
@@ -4661,6 +4676,13 @@ print "\n";
           Addition of the <option>--show-crypto</option> option in
           support of selectable crypto providers, as described in
           <xref linkend="ref.crypto"/>.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Allow <literal>:even</literal> or <literal>:odd</literal> to
+          be appended to numeric ranges for specification of the even
+          or odd pages from among the pages specified in the range.
          </para>
         </listitem>
        </itemizedlist>

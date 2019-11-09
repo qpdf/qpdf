@@ -49,6 +49,24 @@ my @nrange_tests = (
      "numeric range r1-r15" .
      " -> 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1",
      0],
+    ["1-10:quack",
+     "error at * in numeric range 1-10*:quack: unexpected even/odd modifier",
+     2],
+    ["1-10:",
+     "error at * in numeric range 1-10*:: unexpected even/odd modifier",
+     2],
+    ["1-10,r:",
+     "error at * in numeric range 1-10,r*:: unexpected even/odd modifier",
+     2],
+    ["1-10,:",
+     "error at * in numeric range 1-10,*:: unexpected colon",
+     2],
+    ["1-6,8-12:odd",
+     "numeric range 1-6,8-12:odd -> 1 3 5 8 10 12",
+     0],
+    ["1-6,8-12:even",
+     "numeric range 1-6,8-12:even -> 2 4 6 9 11",
+     0],
     );
 foreach my $d (@nrange_tests)
 {
