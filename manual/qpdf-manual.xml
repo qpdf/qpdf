@@ -1862,10 +1862,14 @@ outfile.pdf</option>
         Starting with qpdf 8.1, when splitting pages, qpdf ordinarily
         attempts to remove images and fonts that are not used by a
         page even if they are referenced in the page's resources
-        dictionary. This option suppresses that behavior. The only
-        reason to use this is if you suspect that qpdf is removing
-        resources it shouldn't be removing. If you encounter that
-        case, please report it as a bug.
+        dictionary. This option suppresses that behavior. There are
+        few reasons to use this option. One reason to use this is if
+        you suspect that qpdf is removing resources it shouldn't be
+        removing. If you encounter that case, please report it as a
+        bug. Another reason is that the new behavior can be much
+        slower for files that include a very large number of images or
+        other XObjects on a page. In that case, using this option will
+        return qpdf to the old behavior and speed.
        </para>
        <para>
         See also <option>--preserve-unreferenced</option>, which does
@@ -6013,11 +6017,13 @@ print "\n";
           not actually referenced and omits them from the output file.
           This change can cause a significant reduction in the size of
           split PDF files for files created by some software packages.
-          Prior versions of qpdf would believe the document metadata
-          and sometimes include all the images from all the other
-          pages even though the pages were no longer present. In the
-          unlikely event that the old behavior should be desired, it
-          can be enabled by specifying
+          In some cases, it can also make page splitting slower. Prior
+          versions of qpdf would believe the document metadata and
+          sometimes include all the images from all the other pages
+          even though the pages were no longer present. In the
+          unlikely event that the old behavior should be desired, or
+          if you have a case where page splitting is very slow, the
+          old behavior (and speed) can be enabled by specifying
           <option>--preserve-unreferenced-resources</option>. For
           additional details, please see <xref
           linkend="ref.advanced-transformation"/>.
