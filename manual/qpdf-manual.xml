@@ -4606,32 +4606,59 @@ print "\n";
      <itemizedlist>
       <listitem>
        <para>
-         Library Enhancements
+        Library Enhancements
        </para>
        <itemizedlist>
-         <listitem>
-           <para>
-             Incorporate contribution from Masamichi Hosoda to
-             properly handle signature dictionaries by not including
-             them in object streams, formatting the
-             <literal>/Contents</literal> key has a hexadecimal
-             string, and excluding the <literal>/Contents</literal>
-             key from encryption and decryption.
-           </para>
-         </listitem>
-         <listitem>
-           <para>
-             Incorporate contribution from Masamichi Hosoda to provide
-             new API calls for getting file-level information about
-             input and output files, enabling certain operations on
-             the files at the file level rather than the object level.
-             New methods include
-             <function>QPDF::getXRefTable()</function>,
-             <function>QPDFObjectHandle::getParsedOffset()</function>,
-             <function>QPDFWriter::getRenumberedObjGen(QPDFObjGen)</function>,
-             and <function>QPDFWriter::getWrittenXRefTable()</function>.
-           </para>
-         </listitem>
+        <listitem>
+         <para>
+          Incorporate contribution from Masamichi Hosoda to properly
+          handle signature dictionaries by not including them in
+          object streams, formatting the <literal>Contents</literal>
+          key has a hexadecimal string, and excluding the
+          <literal>/Contents</literal> key from encryption and
+          decryption.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Incorporate contribution from Masamichi Hosoda to provide
+          new API calls for getting file-level information about
+          input and output files, enabling certain operations on
+          the files at the file level rather than the object level.
+          New methods include
+          <function>QPDF::getXRefTable()</function>,
+          <function>QPDFObjectHandle::getParsedOffset()</function>,
+          <function>QPDFWriter::getRenumberedObjGen(QPDFObjGen)</function>,
+          and <function>QPDFWriter::getWrittenXRefTable()</function>.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Support build-time and runtime selectable crypto providers.
+          This includes the addition of new classes
+          <classname>QPDFCryptoProvider</classname> and
+          <classname>QPDFCryptoImpl</classname> and the recognition
+          of the <literal>QPDF_CRYPTO_PROVIDER</literal> environment
+          variable. Crypto providers are described in depth in <xref
+          linkend="ref.crypto"/>.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+     <itemizedlist>
+      <listitem>
+       <para>
+        CLI Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Addition of the <option>--show-crypto</option> option in
+          support of selectable crypto providers, as described in
+          <xref linkend="ref.crypto"/>.
+         </para>
+        </listitem>
        </itemizedlist>
       </listitem>
      </itemizedlist>
