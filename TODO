@@ -7,6 +7,15 @@ Fuzz Errors
   * Problems inside the jpeg library: 15470, 15751, 18633
   * Timeout: 17630
 
+ABI Changes
+===========
+
+This is a list of changes to make next time there is an ABI change.
+Comments appear in the code prefixed by "ABI"
+
+* QPDFPageObjectHelper::placeFormXObject: name should be std::string
+  const& (issue #374)
+
 C++-11
 ======
 
