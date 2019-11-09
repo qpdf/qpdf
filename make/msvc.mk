@@ -76,10 +76,11 @@ define makelib
 	mv $(basename $(2))$(shell expr $(5) - $(7)).lib $(2)
 endef
 
-#                       1    2      3       4
-# Usage: $(call makebin,objs,binary,ldflags,libs)
+#                       1    2      3       4    5
+# Usage: $(call makebin,objs,binary,ldflags,libs,xlinkflags)
 define makebin
 	cl -nologo -O2 -Zi -Gy -EHsc -MD $(1) \
+		$(if $(5),$(5),$(WINDOWS_MAIN_XLINK_FLAGS)) \
 		-link -SUBSYSTEM:CONSOLE,5.01 -incremental:no -OUT:$(2) \
 		$(foreach L,$(subst -L,,$(3)),-LIBPATH:$(L)) \
 		$(foreach L,$(subst -l,,$(4)),$(L).lib)

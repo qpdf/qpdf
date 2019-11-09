@@ -98,10 +98,10 @@ define makelib
 		 -rpath $(libdir) -version-info $(5):$(6):$(7) -no-undefined
 endef
 
-#                       1    2      3       4
-# Usage: $(call makebin,objs,binary,ldflags,libs)
+#                       1    2      3       4    5
+# Usage: $(call makebin,objs,binary,ldflags,libs,xlinkflags)
 define makebin
-	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(1) -o $(2) $(3) $(4)
+	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(5) $(1) -o $(2) $(3) $(4)
 endef
 
 # Install target

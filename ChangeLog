@@ -1,5 +1,15 @@
 2019-11-09  Jay Berkenbilt  <ejb@ql.org>
 
+	* Improve behavior of wildcard expansion for msvc executable when
+	run from the Windows cmd.exe shell. The behavior is not identical
+	to UNIX or to running the mingw executable in that, for msvc,
+	wildcard expansion is performed transparently by qpdf.exe itself.
+	That means that *.pdf and "*.pdf*" are interpreted identically. If
+	you need to specify the name of a file that has a * or ? in its
+	actual filename on the Windows CLI with the msvc-built executable,
+	you can write the name of the file in another file and use the
+	@file syntax to prevent expansion. Fixes #224.
+
 	* When reading /P from the encryption dictionary, use static_cast
 	instead of QIntC to convert the value to a signed integer. The
 	value of /P is a bit field, and PDF files have been found in the

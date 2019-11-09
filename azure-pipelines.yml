@@ -23,6 +23,7 @@ jobs:
       buildPlatform: Linux
 - job: Windows
   pool:
+    # If updating this, see note in TODO about MSVC wildcard expansion.
     vmImage: windows-2019
   strategy:
     matrix:

@@ -647,6 +647,8 @@ USE_CRYPTO_GNUTLS
 pc_gnutls_LIBS
 pc_gnutls_CFLAGS
 USE_CRYPTO_NATIVE
+WINDOWS_MAIN_XLINK_FLAGS
+WINDOWS_WMAIN_XLINK_FLAGS
 CXXWFLAGS
 WFLAGS
 BUILDRULES
@@ -17591,6 +17593,13 @@ $as_echo "yes" >&6; }
 else
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
+fi
+
+
+
+if test "$BUILDRULES" = "msvc"; then
+  WINDOWS_WMAIN_XLINK_FLAGS="-link wsetargv.obj"
+  WINDOWS_MAIN_XLINK_FLAGS="-link setargv.obj"
 fi
 
 

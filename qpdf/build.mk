@@ -26,6 +26,8 @@ XCXXFLAGS_qpdf_qpdf := $(WINDOWS_WMAIN_COMPILE)
 XLDFLAGS_qpdf_qpdf := $(WINDOWS_WMAIN_LINK)
 XCXXFLAGS_qpdf_test_unicode_filenames := $(WINDOWS_WMAIN_COMPILE)
 XLDFLAGS_qpdf_test_unicode_filenames := $(WINDOWS_WMAIN_LINK)
+XLINK_FLAGS_qpdf_qpdf := $(WINDOWS_WMAIN_XLINK_FLAGS)
+XLINK_FLAGS_qpdf_test_unicode_filenames := $(WINDOWS_WMAIN_XLINK_FLAGS)
 
 $(foreach B,$(BINS_qpdf),$(eval \
   OBJS_$(B) = $(call src_to_obj,qpdf/$(B).cc)))
@@ -46,4 +48,4 @@ $(foreach B,$(CBINS_qpdf),$(eval \
 
 $(foreach B,$(BINS_qpdf) $(CBINS_qpdf),$(eval \
   qpdf/$(OUTPUT_DIR)/$(call binname,$(B)): $(OBJS_$(B)) ; \
-	$(call makebin,$(OBJS_$(B)),$$@,$(LDFLAGS_libqpdf) $(LDFLAGS) $(XLDFLAGS_qpdf_$(B)),$(LIBS_libqpdf) $(LIBS))))
+	$(call makebin,$(OBJS_$(B)),$$@,$(LDFLAGS_libqpdf) $(LDFLAGS) $(XLDFLAGS_qpdf_$(B)),$(LIBS_libqpdf) $(LIBS),$(XLINK_FLAGS_qpdf_$(B)))))

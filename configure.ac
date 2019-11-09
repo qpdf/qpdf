@@ -465,6 +465,13 @@ else
    AC_MSG_RESULT(no)
 fi
 
+AC_SUBST(WINDOWS_WMAIN_XLINK_FLAGS)
+AC_SUBST(WINDOWS_MAIN_XLINK_FLAGS)
+if test "$BUILDRULES" = "msvc"; then
+  WINDOWS_WMAIN_XLINK_FLAGS="-link wsetargv.obj"
+  WINDOWS_MAIN_XLINK_FLAGS="-link setargv.obj"
+fi
+
 dnl BEGIN CRYPTO
 
 dnl By default, we build in support for every crypto provider that we

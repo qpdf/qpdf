@@ -132,6 +132,33 @@ Page splitting/merging
 
  * Form fields: should be similar to outlines.
 
+MSVC Wildcard Expansion
+=======================
+
+(This section is referenced in azure_pipelines.yml.)
+
+The qpdf executable built with msvc is linked with setargv.obj or
+wsetargv.obj so that wildcard expansion works. It doesn't work exactly
+the way a UNIX system would work in that the program itself does the
+expansion (rather than the shell), which means that invoking qpdf.exe
+as built by msvc will expand "*.pdf" just as it will expand *.pdf. In
+some earlier versions, wildcard expansion didn't work with the msvc
+executable. The way to make this work appears to be different in some
+versions of MSVC than in others. As such, if upgrading MSVC or
+changing the build environment, the wildcard expansion behavior of the
+qpdf executable in Windows should be retested manually.
+
+Unfortunately, there is no automated test for wildcard expansion with
+MSVC because I can't figure out how to prevent qtest from expanding
+the wildcards before passing them in, and explicitly running "cmd /c
+..." from qtest doesn't seem to work in Azure Pipelines, though I can
+make it work locally.
+
+Ideally, we should figure out a way to test this in CI by having a
+test that fails if wildcard expansion is broken. In the absence of
+this, it will be necessary to test the behavior manually in both mingw
+and msvc when run from cmd and from msys bash.
+
 General
 =======
 

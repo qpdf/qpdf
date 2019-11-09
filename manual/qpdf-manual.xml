@@ -4685,6 +4685,13 @@ print "\n";
           or odd pages from among the pages specified in the range.
          </para>
         </listitem>
+        <listitem>
+         <para>
+          Improve shell wildcard expansion behavior
+          (<literal>*</literal> and <literal>?</literal>) of the
+          <command>qpdf.exe</command> as built my MSVC.
+         </para>
+        </listitem>
        </itemizedlist>
       </listitem>
      </itemizedlist>
