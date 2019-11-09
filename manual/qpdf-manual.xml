@@ -242,12 +242,237 @@ make
     top-level <filename>Makefile</filename>.
    </para>
   </sect1>
+  <sect1 id="ref.crypto">
+   <title>Crypto Providers</title>
+   <para>
+    Starting with qpdf 9.1.0, the qpdf library can be built with
+    multiple implementations of providers of cryptographic functions,
+    which we refer to as &ldquo;crypto providers.&rdquo; At the time
+    of writing, a crypto implementation must provide MD5 and SHA2
+    (256, 384, and 512-bit) hashes and RC4 and AES256 with and without
+    CBC encryption. In the future, if digital signature is added to
+    qpdf, there may be additional requirements beyond this.
+   </para>
+   <para>
+    Starting with qpdf version 9.1.0, the available implementations
+    are <literal>native</literal> and <literal>gnutls</literal>.
+    Additional implementations may be added if needed. It is also
+    possible for a developer to provide their own implementation
+    without modifying the qpdf library.
+   </para>
+   <sect2 id="ref.crypto.build">
+    <title>Build Support For Cyrpto Providers</title>
+    <para>
+     When building with qpdf's build system, crypto providers can be
+     enabled at build time using various
+     <command>./configure</command> options. The default behavior is
+     for <command>./configure</command> to discover which crypto
+     providers can be supported based on available external libraries,
+     to build all available crypto providers, and to use an external
+     provider as the default over the native one. This behavior can be
+     changed with the following flags to
+     <command>./configure</command>:
+     <itemizedlist>
+      <listitem>
+       <para>
+        <option>--enable-crypto-<replaceable>x</replaceable></option>
+        (where <replaceable>x</replaceable> is a supported crypto
+        provider): enable the <replaceable>x</replaceable> crypto
+        provider, requiring any external dependencies it needs
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <option>--disable-crypto-<replaceable>x</replaceable></option>:
+        disable the <replaceable>x</replaceable> provider, and do not
+        link against its dependencies even if they are available
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <option>--with-default-crypto=<replaceable>x</replaceable></option>:
+        make <replaceable>x</replaceable> the default provider even if
+        a higher priority one is available
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <option>--disable-implicit-crypto</option>: only build crypto
+        providers that are explicitly requested with an
+        <option>--enable-crypto-<replaceable>x</replaceable></option>
+        option
+       </para>
+      </listitem>
+     </itemizedlist>
+    </para>
+    <para>
+     For example, if you want to guarantee that the gnutls crypto
+     provider is used and that the native provider is not built, you
+     could run <command>./configure --enable-crypto-gnutls
+     --disable-implicit-crypto</command>.
+    </para>
+    <para>
+     If you build qpdf using your own build system, in order for qpdf
+     to work at all, you need to enable at least one crypto provider.
+     The file <filename>include/qpdf/qpdf-config.h.in</filename>
+     provides macros <literal>DEFAULT_CRYPTO</literal>, whose value
+     must be a string naming the default crypto provider, and various
+     symbols starting with <literal>USE_CRYPTO_</literal>, at least
+     one of which has to be enabled. Additionally, you must compile
+     the source files that implement a crypto provider. To get a list
+     of those files, look at <filename>libqpdf/build.mk</filename>. If
+     you want to omit a particular crypto provider, as long as its
+     <literal>USE_CRYPTO_</literal> symbol is undefined, you can
+     completely ignore the source files that belong to a particular
+     crypto provider. Additionally, crypto providers may have their
+     own external dependencies that can be omitted if the crypto
+     provider is not used. For example, if you are building qpdf
+     yourself and are using an environment that does not support
+     gnutls, you can ensure that <literal>USE_CRYPTO_NATIVE</literal>
+     is defined, <literal>USE_CRYPTO_GNUTLS</literal> is not defined,
+     and <literal>DEFAULT_CRYPTO</literal> is defined to
+     <literal>"native"</literal>. Then you must include the source
+     files used in the native implementation, some of which were added
+     or renamed from earlier versions, to your build, and you can
+     ignore <filename>QPDFCrypto_gnutls.cc</filename>. Always consult
+     <filename>libqpdf/build.mk</filename> to get the list of source
+     files you need to build.
+    </para>
+   </sect2>
+   <sect2 id="ref.crypto.runtime">
+    <title>Runtime Cryto Provider Selection</title>
+    <para>
+     You can use the <option>--show-crypto</option> option to
+     <command>qpdf</command> to get a list of available crypto
+     providers. The default provider is always listed first, and the
+     rest are listed in lexical order. Each crypto provider is listed
+     on a line by itself with no other text, enabling the output of
+     this command to be used easily in scripts.
+    </para>
+    <para>
+     You can override which crypto provider is used by setting the
+     <literal>QPDF_CRYPTO_PROVIDER</literal> environment variable.
+     There are few reasons to ever do this, but you might want to do
+     it if you were explicitly trying to compare behavior of two
+     different crypto providers while testing performance or
+     reproducing a bug. It could also be useful for people who are
+     implementing their own crypto providers.
+    </para>
+   </sect2>
+   <sect2 id="ref.crypto.develop">
+    <title>Cryto Provider Information for Developers</title>
+    <para>
+     If you are writing code that uses libqpdf and you want to force a
+     certain crypto provider to be used, you can call the method
+     <function>QPDFCryptoProvider::setDefaultProvider</function>. The
+     argument is the name of a built-in or developer-supplied
+     provider. To add your own crypto provider, you have to create a
+     class derived from <classname>QPDFCryptoImpl</classname> and
+     register it with <classname>QPDFCryptoProvider</classname>. For
+     additional information, see comments in
+     <filename>include/qpdf/QPDFCryptoImpl.hh</filename>.
+    </para>
+   </sect2>
+   <sect2 id="ref.crypto.design">
+    <title>Crypto Provider Design Notes</title>
+    <para>
+     This section describes a few bits of rationale for why the crypto
+     provider interface was set up the way it was. You don't need to
+     know any of this information, but it's provided for the record
+     and in case it's interesting.
+    </para>
+    <para>
+     As a general rule, I want to avoid as much as possible including
+     large blocks of code that are conditionally compiled such that,
+     in most builds, some code is never built. This is dangerous
+     because it makes it very easy for invalid code to creep in
+     unnoticed. As such, I want it to be possible to build qpdf with
+     all available crypto providers, and this is the way I build qpdf
+     for local development. At the same time, if a particular packager
+     feels that it is a security liability for qpdf to use crypto
+     functionality from other than a library that gets considerable
+     scrutiny for this specific purpose (such as gnutls, openssl, or
+     nettle), then I want to give that packager the ability to
+     completely disable qpdf's native implementation. Or if someone
+     wants to avoid adding a dependency on one of the external crypto
+     providers, I don't want the availability of the provider to
+     impose additional external dependencies within that environment.
+     Both of these are situations that I know to be true for some
+     users of qpdf.
+    </para>
+    <para>
+     I want registration and selection of crypto providers to be
+     thread-safe, and I want it to work deterministically for a
+     developer to provide their own crypto provider and be able to set
+     it up as the default. This was the primary motivation behind
+     requiring C++-11 as doing so enabled me to exploit the guaranteed
+     thread safety of local block static initialization. The
+     <classname>QPDFCryptoProvider</classname> class uses a singleton
+     pattern with thread-safe initialization to create the singleton
+     instance of <classname>QPDFCryptoProvider</classname> and exposes
+     only static methods in its public interface. In this way, if a
+     developer wants to call any
+     <classname>QPDFCryptoProvider</classname> methods, the library
+     guarantees the <classname>QPDFCryptoProvider</classname> is fully
+     initialized and all built-in crypto providers are registered.
+     Making <classname>QPDFCryptoProvider</classname> actually know
+     about all the built-in providers may seem a bit sad at first, but
+     this choice makes it extremely clear exactly what the
+     initialization behavior is. There's no question about provider
+     implementations automatically registering themselves in a
+     nondeterministic order. It also means that implementations do not
+     need to know anything about the provider interface, which makes
+     them easier to test in isolation. Another advantage of this
+     approach is that a developer who wants to develop their own
+     crypto provider can do so in complete isolation from the qpdf
+     library and, with just two calls, can make qpdf use their
+     provider in their application. If they decided to contribute
+     their code, plugging it into the qpdf library would require a
+     very small change to qpdf's source code.
+    </para>
+    <para>
+     The decision to make the crypto provider selectable at runtime
+     was one I struggled with a little, but I decided to do it for
+     various reasons. Allowing an end user to switch crypto providers
+     easily could be very useful for reproducing a potential bug. If a
+     user reports a bug that some cryptographic thing is broken, I can
+     easily ask that person to try with the
+     <literal>QPDF_CRYPTO_PROVIDER</literal> variable set to different
+     values. The same could apply in the event of a performance
+     problem. This also makes it easier for qpdf's own test suite to
+     exercise code with different providers without having to make
+     every program that links with qpdf aware of the possibility of
+     multiple providers. In qpdf's continuous integration environment,
+     the entire test suite is run for each supported crypto provider.
+     This is made simple by being able to select the provider using an
+     environment variable.
+    </para>
+    <para>
+     Finally, making crypto providers selectable in this way establish
+     a pattern that I may follow again in the future for stream filter
+     providers. One could imagine a future enhancement where someone
+     could provide their own implementations for basic filters like
+     <literal>/FlateDecode</literal> or for other filters that qpdf
+     doesn't support. Implementing the registration functions and
+     internal storage of registered providers was also easier using
+     C++-11's functional interfaces, which was another reason to
+     require C++-11 at this time.
+    </para>
+   </sect2>
+  </sect1>
   <sect1 id="ref.packaging">
    <title>Notes for Packagers</title>
    <para>
     If you are packaging qpdf for an operating system distribution,
     here are some things you may want to keep in mind:
     <itemizedlist>
+     <listitem>
+      <para>
+       Make sure you are getting the intended behavior with regard to
+       crypto providers. Read <xref linkend="ref.crypto.build"/> for
+       details.
+      </para>
+     </listitem>
      <listitem>
       <para>
        Passing <option>--enable-show-failed-test-output</option> to
@@ -383,6 +608,17 @@ make
       <listitem>
        <para>
         Show detailed copyright information.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--show-crypto</option></term>
+      <listitem>
+       <para>
+        Show a list of available crypto providers, each on a line by
+        itself. The default provider is always listed first. See <xref
+        linkend="ref.crypto"/> for more information about crypto
+        providers.
        </para>
       </listitem>
      </varlistentry>

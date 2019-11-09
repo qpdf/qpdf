@@ -31,11 +31,32 @@ QPDF requires a C++ compiler that supports C++-11.
 
 QPDF depends on the external libraries [zlib](http://www.zlib.net/) and [jpeg](http://www.ijg.org/files/). The [libjpeg-turbo](https://libjpeg-turbo.org/) library is also known to work since it is compatible with the regular jpeg library, and QPDF doesn't use any interfaces that aren't present in the straight jpeg8 API. These are part of every Linux distribution and are readily available. Download information appears in the documentation. For Windows, you can download pre-built binary versions of these libraries for some compilers; see [README-windows.md](README-windows.md) for additional details.
 
+If the optional gnutls crypto provider is enabled, then gnutls is also required. This is discussed more in `Crypto providers` below.
+
 # Licensing terms of embedded software
 
-QPDF makes use of zlib and jpeg libraries for its functionality. These packages can be downloaded separately from their own download locations, or they can be downloaded in the external-libs area of the qpdf download site.
+QPDF makes use of zlib and jpeg libraries for its functionality. These packages can be downloaded separately from their own download locations, or they can be downloaded in the external-libs area of the qpdf download site. If the optional gnutls crypto provider is enabled, then gnutls is also required.
 
 Please see the [NOTICE](NOTICE.md) file for information on licenses of embedded software.
+
+# Crypto providers
+
+As of version 9.1.0, qpdf can use different crypto implementations. These can be selected at compile time or at runtime. The native crypto implementations that were used in all versions prior to 9.1.0 are still present and enabled by default.
+
+Initially, the following providers are available:
+* `native`: a native implementation where all the source is embedded in qpdf and no external dependencies are required
+* `gnutls`: an implementation that uses the gnutls library to provide cyrpto; causes libqpdf to link with the gnutls library
+
+The default behavior is for ./configure to discover which other crypto providers can be supported based on available external libraries, to build all available crypto providers, and to use an external provider as the default over the native one. This behavior can be changed with the following flags to ./configure:
+
+* `--enable-crypto-x` -- (where `x` is a supported crypto provider): enable the `x` crypto provider, requiring any external dependencies it needs
+* `--disable-crypto-x` -- disable the `x` provider, and do not link against its dependencies even if they are available
+* `--with-default-crypto=x` -- make `x` the default provider even if a higher priority one is available
+* `--disable-implicit-crypto` -- only build crypto providers that are explicitly requested with an `--enable-crypto-x` option
+
+For example, if you want to guarantee that the gnutls crypto provider is used, you could run ./configure with `--enable-crypto-gnutls --disable-implicit-crypto`.
+
+Please see the section on cyrpto providers in the manual for more details.
 
 # Building from a pristine checkout
 
@@ -59,7 +80,7 @@ QPDF is known to build and pass its test suite with mingw (latest version tested
 
 # Additional Notes on Build
 
-QPDF's build system, inspired by [abuild](http://www.abuild.org), can optionally use its own built-in rules rather than using libtool and obeying the compiler specified with configure.  This can be enabled by passing `--with-buildrules=buildrules` where buildrules corresponds to one of the `.mk` files (other than `rules.mk`) in the make directory. This should never be necessary on a UNIX system, but may be necessary on a Windows system.  See [README-windows.md](README-windows.md) for details.
+QPDF's build system, inspired by [abuild](http://www.qbilt.org/abuild), can optionally use its own built-in rules rather than using libtool and obeying the compiler specified with configure.  This can be enabled by passing `--with-buildrules=buildrules` where buildrules corresponds to one of the `.mk` files (other than `rules.mk`) in the make directory. This should never be necessary on a UNIX system, but may be necessary on a Windows system.  See [README-windows.md](README-windows.md) for details.
 
 The QPDF package provides some executables and a software library.  A user manual can be found in the "doc" directory.  The docbook sources to the user manual can be found in the `manual` directory.
 

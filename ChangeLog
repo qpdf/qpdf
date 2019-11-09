@@ -1,3 +1,36 @@
+2019-11-05  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add support for pluggable crypto providers, enabling multiple
+	implementations of the cryptographic functions needed by qpdf.
+	This feature was added by request of Red Hat, which recognized the
+	use of qpdf's native crypto implementations as a potential
+	security liability, preferring instead to get all crypto
+	functionality from a third-party library that receives a lot of
+	scrutiny. However it was also important to me to not impose any
+	unnecessary third party depdendencies on my users or packagers,
+	some of which build qpdf for lots of environments, some of which
+	may not easily support gnutls. Starting in qpdf 9.1.0, it is be
+	possible to build qpdf with both the native and gnutls crypto
+	providers or with either in isolation. In support of this feature,
+	new classes QPDFCryptoProvider and QPDFCryptoImpl have been added
+	to the public interface. See QPDFCryptoImpl.hh for details about
+	adding your own crypto provider and QPDFCryptoProvider.hh for
+	details about choosing which one is used. Note that selection of
+	crypto providers is invisible to anyone who doesn't explicitly
+	care. Neither end users nor developers have to be concerned about
+	it.
+
+	* The environment variable QPDF_CRYPTO_PROVIDER can be used to
+	override qpdf's default choice of crypto provider. The
+	--show-crypto flag to the qpdf CLI can be used to present a list
+	of supported crypto providers with the default provider always
+	listed first.
+
+	* Add gnutls crypto provider. Thanks to Zdenek Dohnal for
+	contributing the code that I ultimately used in the gnutls crypto
+	provider and for engaging in an extended discussion about this
+	feature. Fixes #218.
+
 2019-10-22  Jay Berkenbilt  <ejb@ql.org>
 
 	* Incorporate changes from Masamichi Hosoda <trueroad@trueroad.jp>
