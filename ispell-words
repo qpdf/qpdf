@@ -35,6 +35,7 @@ addOptionsToCompletions
 addPage
 addPageAt
 addPageContents
+addr
 addTokenFilter
 addToTable
 adjustAESStreamLength
@@ -52,6 +53,7 @@ ageneration
 AHx
 ai
 AIX
+alg
 alloc
 allocator
 allowAccessibility
@@ -90,6 +92,7 @@ AppImage
 appimage
 appspot
 arandom
+ARCFOUR
 arg
 argc
 argCheck
@@ -155,6 +158,7 @@ argRemovePageLabels
 argReplaceInput
 argRotate
 args
+argShowCrypto
 argShowEncryption
 argShowEncryptionKey
 argShowLinearization
@@ -256,6 +260,7 @@ bitstream
 BitStream
 BitWriter
 BleedBox
+blinearize
 bmc
 BogusRandomDataProvider
 boldseq
@@ -266,6 +271,7 @@ bp
 BPC
 bpp
 bpr
+bpreserve
 brdp
 bs
 BT
@@ -280,6 +286,7 @@ BUGREPORT
 buildrules
 bw
 bx
+ByteRange
 bytesNeeded
 ca
 calc
@@ -382,6 +389,7 @@ Cond
 config
 conftest
 const
+constexpr
 ContentNormalizer
 ContentProvider
 contentSize
@@ -415,7 +423,9 @@ CryptReleaseContext
 cso
 csoe
 css
+cstdint
 cstdio
+cstdlib
 cstr
 cstring
 ctest
@@ -427,6 +437,7 @@ cxx
 CXXFLAGS
 cy
 cygwin
+cyrpto
 da
 daae
 dae
@@ -441,6 +452,7 @@ de
 debian
 dec
 declspec
+decltype
 decodeAverage
 decodelevel
 decodeLevelChoices
@@ -451,6 +463,7 @@ decodeRow
 decodeStreams
 decodeSub
 decodeUp
+decr
 decrypt
 decrypted
 decrypter
@@ -463,6 +476,7 @@ definitionId
 deflateEnd
 deflateInit
 defq
+deinit
 delphi
 deobfuscated
 dep
@@ -480,6 +494,7 @@ devel
 DeviceCMYK
 DeviceGray
 DeviceRGB
+DF
 dh
 DIAERESIS
 dict
@@ -513,6 +528,7 @@ DocOpen
 DOCTYPE
 DocumentHelper
 doFinalChecks
+Dohnal
 DOTLESS
 doubleBoxSize
 doWrite
@@ -546,6 +562,7 @@ EarlyChange
 eb
 EBADF
 ebae
+ECB
 ecc
 ecedd
 ecks
@@ -627,6 +644,7 @@ fclose
 fcntl
 fd
 fdict
+fe
 feebbd
 ferror
 ff
@@ -735,6 +753,7 @@ generateObjectStreams
 generateTextAppearance
 genok
 getAllObjects
+GetAllObjects
 getAllPages
 getAllPagesInternal
 getAlternativeName
@@ -766,6 +785,7 @@ getCropBox
 getDA
 getDataChecksum
 getDefaultAppearance
+getDefaultProvider
 getDefaultValue
 getDefaultValueAsString
 getDescription
@@ -802,6 +822,7 @@ getHeight
 getHexDigest
 getId
 getIdentifier
+getImpl
 getInheritableFieldValue
 getInheritableFieldValueAsName
 getInheritableFieldValueAsString
@@ -862,6 +883,7 @@ getPageContentForAppearance
 getPageContents
 getPageImages
 getParent
+getParsedOffset
 getPartialName
 getPDFVersion
 getPerms
@@ -877,6 +899,8 @@ getRawValue
 getRealValue
 getRect
 getRefcount
+getRegisteredImpls
+getRenumberedObjGen
 getResourceNames
 getRoot
 getSize
@@ -916,6 +940,9 @@ getWhoami
 getWidgetAnnotationsForPage
 getWidth
 getWriter
+getWrittenXRefTable
+getX
+getXRefTable
 GG
 ghostscript
 GhostScript
@@ -928,6 +955,7 @@ gm
 gmail
 gmon
 GNUC
+gnutls
 gnuwin
 googleapis
 GoTo
@@ -964,6 +992,7 @@ hasPageLabels
 hb
 hbp
 HCRYPTPROV
+hd
 Hdict
 Helvetica
 hexkey
@@ -979,6 +1008,7 @@ hijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstn
 hlen
 Hoffmann
 HOi
+Hosoda
 HPageOffset
 HPageOffsetEntry
 hr
@@ -1017,6 +1047,7 @@ ImageOptimizer
 ImageProvider
 inbuf
 includeIgnorable
+incr
 indicateProgress
 INDOC
 indx
@@ -1133,6 +1164,7 @@ jmpbuf
 JMSG
 jnull
 jo
+jp
 jpeg
 jpeglib
 jpg
@@ -1245,6 +1277,7 @@ makeString
 malloc
 manualFinish
 mappingname
+Masamichi
 Mateusz
 maxEnd
 maxlen
@@ -1387,6 +1420,7 @@ obj
 ObjAccessor
 ObjCache
 ObjCopier
+objdesc
 OBJDIR
 objdump
 ObjectHelper
@@ -1400,6 +1434,7 @@ objGenToIndirect
 objid
 objidok
 objok
+objs
 objspec
 ObjStm
 objstm
@@ -1426,6 +1461,7 @@ opages
 OpenAction
 openObject
 opensource
+openssl
 optionalParameter
 OptionEntry
 ord
@@ -1477,6 +1513,7 @@ params
 parms
 parsecontent
 parseContentStream
+parsedoffset
 ParseGuard
 parseInternal
 parseNumrange
@@ -1604,6 +1641,7 @@ py
 pypi
 qarray
 QArray
+qbilt
 qdf
 QDFObject
 QDFWriter
@@ -1622,6 +1660,9 @@ QPDFAcroFormDocumentHelper's
 QPDFAnnotationObjectHelper
 qpdfbuild
 QPDFCONSTANTS
+QPDFCrypto
+QPDFCryptoImpl
+QPDFCryptoProvider
 QPDFDocumentHelper
 QPDFExc
 QPDFFake
@@ -1714,6 +1755,7 @@ refpage
 refpos
 regexp
 registerForeignStream
+registerImpl
 registerProgressReporter
 releaseResolved
 ReleaseResolver
@@ -1722,6 +1764,7 @@ removeKey
 removePage
 removereplace
 removeUnreferencedResources
+ren
 repl
 replaceDict
 replaceFilterData
@@ -1801,6 +1844,7 @@ sendNextCode
 sep
 seq
 serif
+setargv
 setArrayFromVector
 setArrayItem
 setAt
@@ -1812,6 +1856,7 @@ setCompressStreams
 setContentNormalization
 setDataKey
 setDecodeLevel
+setDefaultProvider
 setDescription
 setDeterministicID
 setDictDescription
@@ -1846,6 +1891,7 @@ setOutputFilename
 setOutputMemory
 setOutputPipeline
 setOutputStreams
+setParsedOffset
 setPasswordIsHexKey
 setPCLm
 setPipeline
@@ -1875,6 +1921,7 @@ shallowCopy
 shallowCopyPage
 showLinearizationData
 showXRefTable
+sig
 sizeof
 skipToNextByte
 soe
@@ -1892,6 +1939,7 @@ srand
 srandom
 src
 srdp
+ss
 sstream
 stampfile
 stamppdf
@@ -1930,6 +1978,7 @@ StringCounter
 StringDecrypter
 stringprep
 StringReverser
+stringstream
 stripesize
 strlen
 strncmp
@@ -2033,6 +2082,7 @@ traverseField
 travis
 TrimBox
 trimTrailerForWrite
+trueroad
 tt
 ttype
 TU
@@ -2122,6 +2172,7 @@ valstr
 ValueSetter
 var
 variablelist
+variadic
 varlistentry
 varname
 vc
@@ -2190,6 +2241,7 @@ writeToken
 writeTrailer
 writeXRefStream
 writeXRefTable
+wsetargv
 Wsign
 wunlink
 www
@@ -2245,6 +2297,7 @@ XRef
 xref
 xrefEntry
 xrefFirst
+xrefs
 XRefStm
 xrefStream
 xrefTable
@@ -2253,6 +2306,7 @@ xsl
 XSLTPROC
 XXX
 xy
+yml
 yn
 yp
 yscale
@@ -2264,6 +2318,7 @@ zarko
 Zarko's
 zcaron
 zdata
+Zdenek
 zdenop
 Zeroize
 zeroizing

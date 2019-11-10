@@ -28,7 +28,7 @@
 	security liability, preferring instead to get all crypto
 	functionality from a third-party library that receives a lot of
 	scrutiny. However it was also important to me to not impose any
-	unnecessary third party depdendencies on my users or packagers,
+	unnecessary third party dependencies on my users or packagers,
 	some of which build qpdf for lots of environments, some of which
 	may not easily support gnutls. Starting in qpdf 9.1.0, it is be
 	possible to build qpdf with both the native and gnutls crypto

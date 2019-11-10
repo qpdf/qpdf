@@ -340,7 +340,7 @@ make
     </para>
    </sect2>
    <sect2 id="ref.crypto.runtime">
-    <title>Runtime Cryto Provider Selection</title>
+    <title>Runtime Crypto Provider Selection</title>
     <para>
      You can use the <option>--show-crypto</option> option to
      <command>qpdf</command> to get a list of available crypto
@@ -360,7 +360,7 @@ make
     </para>
    </sect2>
    <sect2 id="ref.crypto.develop">
-    <title>Cryto Provider Information for Developers</title>
+    <title>Crypto Provider Information for Developers</title>
     <para>
      If you are writing code that uses libqpdf and you want to force a
      certain crypto provider to be used, you can call the method

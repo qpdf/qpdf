@@ -313,7 +313,7 @@ I find it useful to make reference to them in this list
    spec, and look at ~/Q/pdf-collection/form-with-full-save.pdf, which
    came from Adobe's example site. See also
    ../misc/digital-sign-from-trueroad/. If digital signatures are
-   implemented, update the docs on crytpo providers, which mention
+   implemented, update the docs on crypto providers, which mention
    that this may happen in the future.
 
  * See if we can avoid preserving unreferenced objects in object
