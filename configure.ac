@@ -519,6 +519,10 @@ dnl gnutls is available. If the gnutls provider is explicitly
 dnl disabled, do not link with gnutls even if present.
 
 PKG_CHECK_MODULES([pc_gnutls], [gnutls], [GNUTLS_FOUND=1], [GNUTLS_FOUND=0])
+if test "$GNUTLS_FOUND" = "0"; then
+  AC_CHECK_HEADER(gnutls/gnutls.h,[GNUTLS_FOUND=1],[GNUTLS_FOUND=0])
+  AC_SEARCH_LIBS(gnutls_hash_init,gnutls,[GNUTLS_FOUND=1],[GNUTLS_FOUND=0])
+fi
 
 IMPLICIT_GNUTLS=0
 USE_CRYPTO_GNUTLS=0
