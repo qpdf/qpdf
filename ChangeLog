@@ -1,5 +1,7 @@
 2019-11-09  Jay Berkenbilt  <ejb@ql.org>
 
+	* 9.1.rc1: release
+
 	* Improve behavior of wildcard expansion for msvc executable when
 	run from the Windows cmd.exe shell. The behavior is not identical
 	to UNIX or to running the mingw executable in that, for msvc,
