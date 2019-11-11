@@ -31,7 +31,9 @@ QPDF requires a C++ compiler that supports C++-11.
 
 QPDF depends on the external libraries [zlib](http://www.zlib.net/) and [jpeg](http://www.ijg.org/files/). The [libjpeg-turbo](https://libjpeg-turbo.org/) library is also known to work since it is compatible with the regular jpeg library, and QPDF doesn't use any interfaces that aren't present in the straight jpeg8 API. These are part of every Linux distribution and are readily available. Download information appears in the documentation. For Windows, you can download pre-built binary versions of these libraries for some compilers; see [README-windows.md](README-windows.md) for additional details.
 
-If the optional gnutls crypto provider is enabled, then gnutls is also required. This is discussed more in `Crypto providers` below.
+If the optional gnutls crypto provider is enabled,
+then [gnutls](https://www.gnutls.org/) is also required. This is
+discussed more in `Crypto providers` below.
 
 # Licensing terms of embedded software
 

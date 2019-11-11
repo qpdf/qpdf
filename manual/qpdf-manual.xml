@@ -118,6 +118,11 @@
     <itemizedlist>
      <listitem>
       <para>
+       A C++ compiler that supports C++-11.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
        zlib: <ulink url="http://www.zlib.net/">http://www.zlib.net/</ulink>
       </para>
      </listitem>
@@ -127,6 +132,13 @@
        url="http://www.ijg.org/files/">http://www.ijg.org/files/</ulink>
        or <ulink
        url="https://libjpeg-turbo.org/">https://libjpeg-turbo.org/</ulink>
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       <emphasis>Recommended but not required:</emphasis> gnutls:
+       <ulink url="https://www.gnutls.org/">https://www.gnutls.org/</ulink>
+       to be able to use the gnutls crypto provider
       </para>
      </listitem>
      <listitem>
@@ -149,13 +161,6 @@
        version of diff present on virtually all GNU/Linux systems.
        This is required because the test suite uses <command>diff
        -u</command>.
-      </para>
-     </listitem>
-     <listitem>
-      <para>
-       A C++ compiler that works well with STL and has the <type>long
-       long</type> type. Most modern C++ compilers should fit the bill
-       fine. QPDF is tested with gcc, clang, and Microsoft Visual C++.
       </para>
      </listitem>
     </itemizedlist>
@@ -4623,6 +4628,27 @@ print "\n";
     <term>9.1.rc1: November 9, 2019</term>
     <listitem>
      <itemizedlist>
+      <listitem>
+       <para>
+        Build Changes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          A C++-11 compiler is now required to build qpdf.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          A new crypto provider that uses gnutls for crypto functions
+          is now available and can be enabled at build time. See <xref
+          linkend="ref.crypto"/> for more information about crypto
+          providers and <xref linkend="ref.crypto.build"/> for
+          specific information about the build.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
       <listitem>
        <para>
         Library Enhancements
