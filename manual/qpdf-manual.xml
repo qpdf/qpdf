@@ -4687,9 +4687,9 @@ print "\n";
         </listitem>
         <listitem>
          <para>
-          Improve shell wildcard expansion behavior
-          (<literal>*</literal> and <literal>?</literal>) of the
-          <command>qpdf.exe</command> as built my MSVC.
+          Fix shell wildcard expansion behavior (<literal>*</literal>
+          and <literal>?</literal>) of the <command>qpdf.exe</command>
+          as built my MSVC.
          </para>
         </listitem>
        </itemizedlist>
