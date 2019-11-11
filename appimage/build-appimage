@@ -84,6 +84,7 @@ rm -rf $here/build
 
 # Prepare build of QPDF from sources:
 ./configure --prefix=/usr --enable-werror \
+            --enable-crypto-gnutls --disable-implicit-crypto \
             --enable-show-failed-test-output \
             --enable-html-doc --enable-pdf-doc "$CUSTOM_CONFIGURE"
 

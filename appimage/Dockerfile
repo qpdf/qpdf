@@ -1,7 +1,7 @@
 FROM ubuntu:14.04
 RUN apt-get update && \
     apt-get -y install screen autoconf git \
-       build-essential zlib1g-dev libjpeg-dev \
+       build-essential zlib1g-dev libjpeg-dev libgnutls28-dev \
        docbook-xsl fop xsltproc \
        inkscape imagemagick busybox-static wget fuse && \
     apt-get clean && \
