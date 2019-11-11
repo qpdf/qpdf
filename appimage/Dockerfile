@@ -1,6 +1,6 @@
-FROM ubuntu:14.04
+FROM ubuntu:16.04
 RUN apt-get update && \
-    apt-get -y install screen autoconf git \
+    apt-get -y install screen autoconf git sudo \
        build-essential zlib1g-dev libjpeg-dev libgnutls28-dev \
        docbook-xsl fop xsltproc \
        inkscape imagemagick busybox-static wget fuse && \
