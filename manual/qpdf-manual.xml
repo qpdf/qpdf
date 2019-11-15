@@ -319,7 +319,7 @@ make
     <para>
      If you build qpdf using your own build system, in order for qpdf
      to work at all, you need to enable at least one crypto provider.
-     The file <filename>include/qpdf/qpdf-config.h.in</filename>
+     The file <filename>libqpdf/qpdf/qpdf-config.h.in</filename>
      provides macros <literal>DEFAULT_CRYPTO</literal>, whose value
      must be a string naming the default crypto provider, and various
      symbols starting with <literal>USE_CRYPTO_</literal>, at least
