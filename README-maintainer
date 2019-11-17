@@ -26,6 +26,7 @@ Memory checks:
    CC=clang CXX="clang++ --std=c++11" \
    --enable-werror --disable-shared
 
+
 GOOGLE OSS-FUZZ
 
 * See ../misc/fuzz (not in repo) for unfixed, downloaded fuzz test cases
@@ -70,6 +71,7 @@ GOOGLE OSS-FUZZ
 * Latest corpus:
   gs://qpdf-backup.clusterfuzz-external.appspot.com/corpus/libFuzzer/qpdf_fuzzer/latest.zip
 
+
 CODING RULES
 
 * Avoid atoi. Use QUtil::string_to_int instead. It does
@@ -89,6 +91,7 @@ CODING RULES
 
 * Put private member variables in PointerHolder<Members> for all
   public classes. Remember to use QPDF_DLL on ~Members().
+
 
 RELEASE PREPARATION
 
@@ -247,13 +250,22 @@ indicating a pre-release, adding release notes, etc.
 # Publish release
 gcurl -XPOST $url -d'{"draft": false}'
 
-* Upload files to sourceforge. Make the source package the default for
-  all but Windows, and make the 32-bit mingw build the default for
-  Windows. Publish a news item manually on sourceforge.
+* Upload files to sourceforge.
+
+rsync -vrlcO ./ jay_berkenbilt,qpdf@frs.sourceforge.net:/home/frs/project/q/qp/qpdf/qpdf/$version/
+
+* On sourceforge, make the source package the default for all but
+  Windows, and make the 32-bit mingw build the default for Windows.
+
+* Publish a news item manually on sourceforge.
 
 * Update the web page to indicate the new version and to put the new
   documentation in the `files` subdirectory of the website on
   sourceforge.net.
+
+(cd /tmp; mkdir -p z; cd z; \
+ tar xf ~/Q/storage/releases/qpdf/qpdf/$version/qpdf-$version.tar.gz qpdf-$version/doc; \
+ scp -p qpdf-$version/doc/qpdf-* jay_berkenbilt,qpdf@frs.sourceforge.net:htdocs/files/)
 
 * Email the qpdf-announce list.
 
@@ -286,6 +298,7 @@ For local iteration on the AppImage generation, it works to just
 the distribution directory. You can also pass -e SKIP_TESTS=1
 build-appimage, which passes it along to to docker, to skip the test
 suite, which useful for rapid iteration.
+
 
 GENERAL BUILD STUFF
 
