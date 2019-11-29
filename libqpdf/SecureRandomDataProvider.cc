@@ -65,7 +65,7 @@ class WindowsCryptProvider
                                           "Container",
                                           NULL,
                                           PROV_RSA_FULL,
-                                          CRYPT_NEWKEYSET))
+                                          CRYPT_NEWKEYSET|CRYPT_MACHINE_KEYSET))
                 {
                     throw std::runtime_error(
                         "unable to acquire crypt context with new keyset: " +
