@@ -1,5 +1,8 @@
 2020-01-14  Jay Berkenbilt  <ejb@ql.org>
 
+	* Fix for Windows being unable to acquire crypt context with a new
+	keyset. Thanks to Cloudmersive for the fix. Fixes #387.
+
 	* Rewrite fix-qdf in C++. This means fix-qdf is a proper
 	executable now, and there is no longer a runtime requirement on
 	perl.
