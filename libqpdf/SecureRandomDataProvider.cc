@@ -46,7 +46,7 @@ class WindowsCryptProvider
                                  "Container",
                                  NULL,
                                  PROV_RSA_FULL,
-                                 0))
+                                 CRYPT_MACHINE_KEYSET))
         {
 #if ((defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
      defined(__clang__))
