@@ -72,13 +72,13 @@ class WindowsCryptProvider
                         getErrorMessage());
                 }
             }
-            else if (GetLastError() == NTE_EXISTS)
+            else if (GetLastError() == ((long unsigned int) NTE_EXISTS))
             {
                 throw std::runtime_error(
                     "unable to acquire crypt context; The key container already exists, but you are attempting to create it. If a previous attempt to open the key failed with NTE_BAD_KEYSET, it implies that access to the key container is denied.: " +
                     getErrorMessage());
             }
-            else if (GetLastError() == NTE_KEYSET_NOT_DEF)
+            else if (GetLastError() == ((long unsigned int) NTE_KEYSET_NOT_DEF))
             {
                 throw std::runtime_error(
                     "unable to acquire crypt context; The Crypto Service Provider (CSP) may not be set up correctly. Use of Regsvr32.exe on CSP DLLs (Rsabase.dll or Rsaenh.dll) may fix the problem, depending on the provider being used.: " +
