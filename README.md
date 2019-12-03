@@ -1,11 +1,10 @@
-
 # QPDF
 
 [![QPDF](logo/qpdf.svg)](http://qpdf.sourceforge.net)
 
 [![Azure Pipeline Build Status](https://dev.azure.com/qpdf/qpdf/_apis/build/status/qpdf.qpdf)](https://dev.azure.com/qpdf/qpdf/_build/latest?definitionId=5) [![Travis Build Status](https://travis-ci.org/qpdf/qpdf.svg?branch=master)](https://travis-ci.org/qpdf/qpdf)
 
-This is the QPDF package.  Information about it can be found at http://qpdf.sourceforge.net.  The source code repository is hosted at github: https://github.com/qpdf/qpdf.
+This is the QPDF package.  Information about it can be found at http://qpdf.sourceforge.net.  The source code repository is hosted at GitHub: https://github.com/qpdf/qpdf.
 
 # Verifying Distributions
 
@@ -17,7 +16,7 @@ QPDF is copyright (c) 2005-2019 Jay Berkenbilt
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
-  http://www.apache.org/licenses/LICENSE-2.0
+  https://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
@@ -29,15 +28,15 @@ Versions of qpdf prior to version 7 were released under the terms of version 2.0
 
 QPDF requires a C++ compiler that supports C++-11.
 
-QPDF depends on the external libraries [zlib](http://www.zlib.net/) and [jpeg](http://www.ijg.org/files/). The [libjpeg-turbo](https://libjpeg-turbo.org/) library is also known to work since it is compatible with the regular jpeg library, and QPDF doesn't use any interfaces that aren't present in the straight jpeg8 API. These are part of every Linux distribution and are readily available. Download information appears in the documentation. For Windows, you can download pre-built binary versions of these libraries for some compilers; see [README-windows.md](README-windows.md) for additional details.
+QPDF depends on the external libraries [zlib](https://www.zlib.net/) and [jpeg](https://www.ijg.org/files/). The [libjpeg-turbo](https://libjpeg-turbo.org/) library is also known to work since it is compatible with the regular jpeg library, and QPDF doesn't use any interfaces that aren't present in the straight jpeg8 API. These are part of every Linux distribution and are readily available. Download information appears in the documentation. For Windows, you can download pre-built binary versions of these libraries for some compilers; see [README-windows.md](README-windows.md) for additional details.
 
-If the optional gnutls crypto provider is enabled,
-then [gnutls](https://www.gnutls.org/) is also required. This is
+If the optional GnuTLS crypto provider is enabled,
+then [GnuTLS](https://www.gnutls.org/) is also required. This is
 discussed more in `Crypto providers` below.
 
 # Licensing terms of embedded software
 
-QPDF makes use of zlib and jpeg libraries for its functionality. These packages can be downloaded separately from their own download locations, or they can be downloaded in the external-libs area of the qpdf download site. If the optional gnutls crypto provider is enabled, then gnutls is also required.
+QPDF makes use of zlib and jpeg libraries for its functionality. These packages can be downloaded separately from their own download locations, or they can be downloaded in the external-libs area of the qpdf download site. If the optional GnuTLS crypto provider is enabled, then GnuTLS is also required.
 
 Please see the [NOTICE](NOTICE.md) file for information on licenses of embedded software.
 
@@ -47,7 +46,7 @@ As of version 9.1.0, qpdf can use different crypto implementations. These can be
 
 Initially, the following providers are available:
 * `native`: a native implementation where all the source is embedded in qpdf and no external dependencies are required
-* `gnutls`: an implementation that uses the gnutls library to provide cyrpto; causes libqpdf to link with the gnutls library
+* `gnutls`: an implementation that uses the GnuTLS library to provide crypto; causes libqpdf to link with the GnuTLS library
 
 The default behavior is for ./configure to discover which other crypto providers can be supported based on available external libraries, to build all available crypto providers, and to use an external provider as the default over the native one. This behavior can be changed with the following flags to ./configure:
 
@@ -56,9 +55,9 @@ The default behavior is for ./configure to discover which other crypto providers
 * `--with-default-crypto=x` -- make `x` the default provider even if a higher priority one is available
 * `--disable-implicit-crypto` -- only build crypto providers that are explicitly requested with an `--enable-crypto-x` option
 
-For example, if you want to guarantee that the gnutls crypto provider is used, you could run ./configure with `--enable-crypto-gnutls --disable-implicit-crypto`.
+For example, if you want to guarantee that the GnuTLS crypto provider is used, you could run ./configure with `--enable-crypto-gnutls --disable-implicit-crypto`.
 
-Please see the section on cyrpto providers in the manual for more details.
+Please see the section on crypto providers in the manual for more details.
 
 # Building from a pristine checkout
 
@@ -82,7 +81,7 @@ QPDF is known to build and pass its test suite with mingw (latest version tested
 
 # Additional Notes on Build
 
-QPDF's build system, inspired by [abuild](http://www.qbilt.org/abuild), can optionally use its own built-in rules rather than using libtool and obeying the compiler specified with configure.  This can be enabled by passing `--with-buildrules=buildrules` where buildrules corresponds to one of the `.mk` files (other than `rules.mk`) in the make directory. This should never be necessary on a UNIX system, but may be necessary on a Windows system.  See [README-windows.md](README-windows.md) for details.
+QPDF's build system, inspired by [abuild](https://www.qbilt.org/abuild), can optionally use its own built-in rules rather than using libtool and obeying the compiler specified with configure.  This can be enabled by passing `--with-buildrules=buildrules` where buildrules corresponds to one of the `.mk` files (other than `rules.mk`) in the make directory. This should never be necessary on a UNIX system, but may be necessary on a Windows system.  See [README-windows.md](README-windows.md) for details.
 
 The QPDF package provides some executables and a software library.  A user manual can be found in the "doc" directory.  The docbook sources to the user manual can be found in the `manual` directory.
 
@@ -95,7 +94,7 @@ To learn about using the library, please read comments in the header files in `i
 
 By default, slow tests and tests that require dependencies beyond those needed to build qpdf are disabled.  Slow tests include image comparison tests and large file tests.  Image comparison tests can be enabled by passing `--enable-test-compare-images` to ./configure.  This was on by default in qpdf versions prior to 3.0, but is now off by default.  Large file tests can be enabled by passing `--with-large-file-test-path=path` to `./configure` or by setting the `QPDF_LARGE_FILE_TEST_PATH` environment variable.  On Windows, this should be a Windows path.  Run `./configure --help` for additional options.  The test suite provides nearly full coverage even without these tests.  Unless you are making deep changes to the library that would impact the contents of the generated PDF files or testing this on a new platform for the first time, there is no real reason to run these tests.  If you're just running the test suite to make sure that qpdf works for your build, the default tests are adequate.  The configure rules for these tests do nothing other than setting variables in `autoconf.mk`, so you can feel free to turn these on and off directly in `autoconf.mk` rather than rerunning configure.
 
-If you are packaging qpdf for a distribution and preparing a build that is run by an autobuilder, you may want to add the `--enable-show-failed-test-output` to configure options.  This way, if the test suite fails, test failure detail will be included in the build output.  Otherwise, you will have to have access to the `qtest.log` file from the build to view test failures.  The debian packages for qpdf enable this option.
+If you are packaging qpdf for a distribution and preparing a build that is run by an autobuilder, you may want to add the `--enable-show-failed-test-output` to configure options.  This way, if the test suite fails, test failure detail will be included in the build output.  Otherwise, you will have to have access to the `qtest.log` file from the build to view test failures.  The Debian packages for qpdf enable this option.
 
 # Random Number Generation
 
