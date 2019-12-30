@@ -59,29 +59,6 @@ C++-11
   time.
 
 
-Lexical
-=======
-
- * Make it possible to run the lexer (tokenizer) over a whole file
-   such that the following things would be possible:
-
-   * Rewrite fix-qdf in C++ so that there is no longer a runtime perl
-     dependency
-
-   * Make it possible to replace all strings in a file lexically even
-     on badly broken files. Ideally this should work files that are
-     lacking xref, have broken links, etc., and ideally it should work
-     with encrypted files if possible. This should go through the
-     streams and strings and replace them with fixed or random
-     characters, preferably, but not necessarily, in a manner that
-     works with fonts. One possibility would be to detect whether a
-     string contains characters with normal encoding, and if so, use
-     0x41. If the string uses character maps, use 0x01. The output
-     should otherwise be unrelated to the input. This could be built
-     after the filtering and tokenizer rewrite and should be done in a
-     manner that takes advantage of the other lexical features. This
-     sanitizer should also clear metadata and replace images.
-
 Page splitting/merging
 ======================
 
@@ -407,3 +384,21 @@ I find it useful to make reference to them in this list
  * If I ever decide to make appearance stream-generation aware of
    fonts or font metrics, see email from Tobias with Message-ID
    <5C3C9C6C.8000102@thax.hardliners.org> dated 2019-01-14.
+
+ * Consider creating a sanitizer to make it easier for people to send
+   broken files. Now that we have json mode, this is probably no
+   longer worth doing. Here is the previous idea, possibly implemented
+   by making it possible to run the lexer (tokenizer) over a whole
+   file. Make it possible to replace all strings in a file lexically
+   even on badly broken files. Ideally this should work files that are
+   lacking xref, have broken links, etc., and ideally it should work
+   with encrypted files if possible. This should go through the
+   streams and strings and replace them with fixed or random
+   characters, preferably, but not necessarily, in a manner that works
+   with fonts. One possibility would be to detect whether a string
+   contains characters with normal encoding, and if so, use 0x41. If
+   the string uses character maps, use 0x01. The output should
+   otherwise be unrelated to the input. This could be built after the
+   filtering and tokenizer rewrite and should be done in a manner that
+   takes advantage of the other lexical features. This sanitizer
+   should also clear metadata and replace images.
