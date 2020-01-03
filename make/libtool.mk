@@ -122,7 +122,9 @@ install: all
 	$(LIBTOOL) --mode=install ./install-sh \
 		zlib-flate/$(OUTPUT_DIR)/zlib-flate \
 		$(DESTDIR)$(bindir)/zlib-flate
-	./install-sh -m 0755 qpdf/fix-qdf $(DESTDIR)$(bindir)
+	$(LIBTOOL) --mode=install ./install-sh \
+		qpdf/$(OUTPUT_DIR)/fix-qdf \
+		$(DESTDIR)$(bindir)/fix-qdf
 	./install-sh -m 0644 include/qpdf/*.h $(DESTDIR)$(includedir)/qpdf
 	./install-sh -m 0644 include/qpdf/*.hh $(DESTDIR)$(includedir)/qpdf
 	./install-sh -m 0644 doc/stylesheet.css $(DESTDIR)$(docdir)

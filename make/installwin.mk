@@ -14,7 +14,7 @@ installwin: all
 	perl copy_dlls libqpdf/$(OUTPUT_DIR)/qpdf*.dll $(DEST)/bin $(OBJDUMP) $(WINDOWS_WORDSIZE)
 	cp qpdf/$(OUTPUT_DIR)/qpdf.exe $(DEST)/bin
 	cp zlib-flate/$(OUTPUT_DIR)/zlib-flate.exe $(DEST)/bin
-	cp qpdf/fix-qdf $(DEST)/bin
+	cp qpdf/$(OUTPUT_DIR)/fix-qdf.exe $(DEST)/bin
 	cp include/qpdf/*.h $(DEST)/include/qpdf
 	cp include/qpdf/*.hh $(DEST)/include/qpdf
 	cp doc/stylesheet.css $(DEST)/doc

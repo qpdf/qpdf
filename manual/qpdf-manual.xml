@@ -150,7 +150,8 @@
       <para>
        perl version 5.8 or newer:
        <ulink url="http://www.perl.org/">http://www.perl.org/</ulink>;
-       required for <command>fix-qdf</command> and the test suite.
+       required for running the test suite. Starting with qpdf version
+       9.1.1, perl is no longer required at runtime.
       </para>
      </listitem>
      <listitem>
@@ -471,6 +472,13 @@ make
     If you are packaging qpdf for an operating system distribution,
     here are some things you may want to keep in mind:
     <itemizedlist>
+     <listitem>
+      <para>
+       Starting in qpdf version 9.1.1, qpdf no longer has a runtime
+       dependency on perl. This is because fix-qdf was rewritten in
+       C++. However, qpdf still has a build-time dependency on perl.
+      </para>
+     </listitem>
      <listitem>
       <para>
        Make sure you are getting the intended behavior with regard to

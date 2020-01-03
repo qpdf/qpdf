@@ -1,5 +1,6 @@
 BINS_qpdf = \
     qpdf \
+    fix-qdf \
     pdf_from_scratch \
     test_driver \
     test_large_file \
@@ -24,10 +25,13 @@ TC_SRCS_qpdf = $(wildcard libqpdf/*.cc) $(wildcard qpdf/*.cc)
 
 XCXXFLAGS_qpdf_qpdf := $(WINDOWS_WMAIN_COMPILE)
 XLDFLAGS_qpdf_qpdf := $(WINDOWS_WMAIN_LINK)
+XLINK_FLAGS_qpdf_qpdf := $(WINDOWS_WMAIN_XLINK_FLAGS)
 XCXXFLAGS_qpdf_test_unicode_filenames := $(WINDOWS_WMAIN_COMPILE)
 XLDFLAGS_qpdf_test_unicode_filenames := $(WINDOWS_WMAIN_LINK)
-XLINK_FLAGS_qpdf_qpdf := $(WINDOWS_WMAIN_XLINK_FLAGS)
 XLINK_FLAGS_qpdf_test_unicode_filenames := $(WINDOWS_WMAIN_XLINK_FLAGS)
+XCXXFLAGS_qpdf_fix-qdf := $(WINDOWS_WMAIN_COMPILE)
+XLDFLAGS_qpdf_fix-qdf := $(WINDOWS_WMAIN_LINK)
+XLINK_FLAGS_qpdf_fix-qdf := $(WINDOWS_WMAIN_XLINK_FLAGS)
 
 $(foreach B,$(BINS_qpdf),$(eval \
   OBJS_$(B) = $(call src_to_obj,qpdf/$(B).cc)))
