@@ -6,6 +6,7 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include <regex>
 
 // Functional programming
 
@@ -290,6 +291,69 @@ void do_smart_pointers()
     C::check(0, 0, 0);
 }
 
+// Regular expressions
+
+void do_regex()
+{
+    // Basic match/search. Match matches whole string; search searches
+    // within string. Use std::smatch for matching std::string and
+    // std::cmatch for matching char const*.
+
+    std::regex expr1("([0-9]+)");
+    std::regex expr2("([0-9]+)\\s*([a-z]+)[[:space:]]*([0-9]+)");
+    std::string str1("one 234 fifth 678 nine");
+    std::string str2("234 five 678 nine");
+    std::string str3("one 234 five 678");
+    std::string str4("234");
+    std::string str5("234 five 678");
+    std::smatch match1;
+    assert(! std::regex_match(str1, match1, expr1));
+    assert(! std::regex_match(str2, match1, expr1));
+    assert(! std::regex_match(str3, match1, expr1));
+    assert(std::regex_match(str4, match1, expr1));
+    assert(match1[0].first == match1[1].first);
+    assert(match1[0].second == match1[1].second);
+    std::string s;
+    s.assign(match1[1].first, match1[1].second);
+    assert("234" == s);
+    assert(s == match1[1].str());
+    assert(std::regex_match(str5, match1, expr2));
+    assert("234 five 678" == match1[0].str());
+    assert("234" == match1[1].str());
+    assert("five" == match1[2].str());
+    assert("678" == match1[3].str());
+    assert(std::regex_search(str1, match1, expr2));
+    assert("234 fifth 678" == match1[0].str());
+    assert("234" == match1[1].str());
+    assert("fifth" == match1[2].str());
+    assert("678" == match1[3].str());
+
+    // Iterator
+    std::regex expr3("[[:digit:]]+");
+    std::string str6 = "asdf234erasdf9453.kgdl423asdf";
+    std::sregex_iterator m1(str6.begin(), str6.end(), expr3);
+    std::sregex_iterator m2;
+    s.clear();
+    for (std::sregex_iterator iter = m1; iter != m2; ++iter)
+    {
+	std::smatch const& match2 = *iter;
+        s += match2[0].str() + "|";
+    }
+    assert("234|9453|423|" == s);
+
+    // Submatches
+    std::regex expr4("(?:(asdf)|(qwer))");
+    char const* str7 = "0asdf1qwer2";
+    std::cregex_iterator m3(str7, str7 + std::strlen(str7), expr4);
+    assert("asdf" == (*m3)[0].str());
+    assert((*m3)[1].matched);
+    assert(! (*m3)[2].matched);
+    ++m3;
+    assert("qwer" == (*m3)[0].str());
+    assert(! (*m3)[1].matched);
+    assert((*m3)[2].matched);
+}
+
 int main()
 {
     do_functional();
@@ -298,6 +362,7 @@ int main()
     do_variadic();
     do_default_deleted();
     do_smart_pointers();
+    do_regex();
     std::cout << "assertions passed\n";
     return 0;
 }
