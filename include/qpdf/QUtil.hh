@@ -29,6 +29,7 @@
 #include <list>
 #include <vector>
 #include <stdexcept>
+#include <functional>
 #include <stdio.h>
 #include <time.h>
 
@@ -90,8 +91,9 @@ namespace QUtil
     QPDF_DLL
     int os_wrapper(std::string const& description, int status);
 
-    // If the open fails, throws std::runtime_error.  Otherwise, the
-    // FILE* is returned.
+    // If the open fails, throws std::runtime_error. Otherwise, the
+    // FILE* is returned. The filename should be UTF-8 encoded, even
+    // on Windows. It will be converted as needed on Windows.
     QPDF_DLL
     FILE* safe_fopen(char const* filename, char const* mode);
 
@@ -308,10 +310,29 @@ namespace QUtil
     QPDF_DLL
     RandomDataProvider* getRandomDataProvider();
 
+    // Filename is UTF-8 encoded, even on Windows, as described in the
+    // comments for safe_fopen.
     QPDF_DLL
     std::list<std::string> read_lines_from_file(char const* filename);
+    // ABI: make preserve_eol an optional arg and remove single-arg version
+    QPDF_DLL
+    std::list<std::string> read_lines_from_file(
+        char const* filename, bool preserve_eol);
     QPDF_DLL
     std::list<std::string> read_lines_from_file(std::istream&);
+    // ABI: make preserve_eol an optional arg and remove single-arg version
+    QPDF_DLL
+    std::list<std::string> read_lines_from_file(
+        std::istream&, bool preserve_eol);
+    QPDF_DLL
+    std::list<std::string> read_lines_from_file(
+        FILE*, bool preserve_eol = false);
+    QPDF_DLL
+    void read_lines_from_file(
+        std::function<bool(char&)> next_char,
+        std::list<std::string>& lines,
+        bool preserve_eol = false);
+
     QPDF_DLL
     void read_file_into_memory(
         char const* filename, PointerHolder<char>& file_buf, size_t& size);

@@ -234,6 +234,23 @@ static unsigned short mac_roman_to_unicode[] = {
     0x02c7,    // 0xff
 };
 
+class FileCloser
+{
+  public:
+    FileCloser(FILE* f) :
+        f(f)
+    {
+    }
+
+    ~FileCloser()
+    {
+        fclose(f);
+    }
+
+  private:
+    FILE* f;
+};
+
 template <typename T>
 static
 std::string
@@ -987,19 +1004,6 @@ QUtil::is_number(char const* p)
     return found_digit;
 }
 
-std::list<std::string>
-QUtil::read_lines_from_file(char const* filename)
-{
-    std::ifstream in(filename, std::ios_base::binary);
-    if (! in.is_open())
-    {
-        throw_system_error(std::string("open ") + filename);
-    }
-    std::list<std::string> lines = read_lines_from_file(in);
-    in.close();
-    return lines;
-}
-
 void
 QUtil::read_file_into_memory(
     char const* filename,
@@ -1040,18 +1044,69 @@ QUtil::read_file_into_memory(
 }
 
 std::list<std::string>
+QUtil::read_lines_from_file(char const* filename)
+{
+    // ABI: remove this method
+    std::list<std::string> lines;
+    FILE* f = safe_fopen(filename, "rb");
+    FileCloser fc(f);
+    auto next_char = [&f](char& ch) { return (fread(&ch, 1, 1, f) > 0); };
+    read_lines_from_file(next_char, lines, false);
+    return lines;
+}
+
+std::list<std::string>
+QUtil::read_lines_from_file(char const* filename, bool preserve_eol)
+{
+    std::list<std::string> lines;
+    FILE* f = safe_fopen(filename, "rb");
+    FileCloser fc(f);
+    auto next_char = [&f](char& ch) { return (fread(&ch, 1, 1, f) > 0); };
+    read_lines_from_file(next_char, lines, preserve_eol);
+    return lines;
+}
+
+std::list<std::string>
 QUtil::read_lines_from_file(std::istream& in)
 {
-    std::list<std::string> result;
-    std::string* buf = 0;
+    // ABI: remove this method
+    std::list<std::string> lines;
+    auto next_char = [&in](char& ch) { return (in.get(ch)) ? true: false; };
+    read_lines_from_file(next_char, lines, false);
+    return lines;
+}
 
+std::list<std::string>
+QUtil::read_lines_from_file(std::istream& in, bool preserve_eol)
+{
+    std::list<std::string> lines;
+    auto next_char = [&in](char& ch) { return (in.get(ch)) ? true: false; };
+    read_lines_from_file(next_char, lines, preserve_eol);
+    return lines;
+}
+
+std::list<std::string>
+QUtil::read_lines_from_file(FILE* f, bool preserve_eol)
+{
+    std::list<std::string> lines;
+    auto next_char = [&f](char& ch) { return (fread(&ch, 1, 1, f) > 0); };
+    read_lines_from_file(next_char, lines, preserve_eol);
+    return lines;
+}
+
+void
+QUtil::read_lines_from_file(std::function<bool(char&)> next_char,
+                            std::list<std::string>& lines,
+                            bool preserve_eol)
+{
+    std::string* buf = 0;
     char c;
-    while (in.get(c))
+    while (next_char(c))
     {
 	if (buf == 0)
 	{
-	    result.push_back("");
-	    buf = &(result.back());
+	    lines.push_back("");
+	    buf = &(lines.back());
 	    buf->reserve(80);
 	}
 
@@ -1074,8 +1129,6 @@ QUtil::read_lines_from_file(std::istream& in)
 	    buf->append(1, c);
 	}
     }
-
-    return result;
 }
 
 int

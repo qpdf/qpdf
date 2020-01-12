@@ -9,6 +9,7 @@
 #include <string.h>
 #include <limits.h>
 #include <assert.h>
+#include <fstream>
 
 #ifdef _WIN32
 # include <io.h>
@@ -408,6 +409,15 @@ void read_from_file_test()
     {
         std::cout << *iter << std::endl;
     }
+    // Test the other versions and make sure we get the same results
+    {
+        std::ifstream infs("other-file", std::ios_base::binary);
+        assert(QUtil::read_lines_from_file(infs) == lines);
+        FILE* fp = QUtil::safe_fopen("other-file", "rb");
+        assert(QUtil::read_lines_from_file(fp) == lines);
+        fclose(fp);
+    }
+
     PointerHolder<char> buf;
     size_t size = 0;
     QUtil::read_file_into_memory("other-file", buf, size);
