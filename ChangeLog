@@ -1,3 +1,10 @@
+2020-01-13  Jay Berkenbilt  <ejb@ql.org>
+
+	* QUtil::read_lines_from_file: add new versions that use FILE*,
+	use FILE* instead if std::ifstream internally to support correct
+	handling of Unicode filenames in Windows, and add the option to
+	preserve line endings.
+
 2019-11-17  Jay Berkenbilt  <ejb@ql.org>
 
 	* 9.1.0: release

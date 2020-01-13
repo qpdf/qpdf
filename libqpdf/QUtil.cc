@@ -1116,11 +1116,18 @@ QUtil::read_lines_from_file(std::function<bool(char&)> next_char,
 	}
 	if (c == '\n')
 	{
-            // Remove any carriage return that preceded the
-            // newline and discard the newline
-            if ((! buf->empty()) && ((*(buf->rbegin())) == '\r'))
+            if (preserve_eol)
             {
-                buf->erase(buf->length() - 1);
+                buf->append(1, c);
+            }
+            else
+            {
+                // Remove any carriage return that preceded the
+                // newline and discard the newline
+                if ((! buf->empty()) && ((*(buf->rbegin())) == '\r'))
+                {
+                    buf->erase(buf->length() - 1);
+                }
             }
 	    buf = 0;
 	}

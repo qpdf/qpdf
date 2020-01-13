@@ -418,6 +418,31 @@ void read_from_file_test()
         fclose(fp);
     }
 
+    // Test with EOL preservation
+    std::list<std::string> lines2 =
+        QUtil::read_lines_from_file("other-file", true);
+    auto line = lines2.begin();
+    assert(37 == (*line).length());
+    assert('.' == (*line).at(35));
+    assert('\n' == (*line).at(36));
+    ++line;
+    assert(24 == (*line).length());
+    assert('.' == (*line).at(21));
+    assert('\r' == (*line).at(22));
+    assert('\n' == (*line).at(23));
+    ++line;
+    assert(24591 == (*line).length());
+    assert('.' == (*line).at(24589));
+    assert('\n' == (*line).at(24590));
+    // Test the other versions and make sure we get the same results
+    {
+        std::ifstream infs("other-file", std::ios_base::binary);
+        assert(QUtil::read_lines_from_file(infs, true) == lines2);
+        FILE* fp = QUtil::safe_fopen("other-file", "rb");
+        assert(QUtil::read_lines_from_file(fp, true) == lines2);
+        fclose(fp);
+    }
+
     PointerHolder<char> buf;
     size_t size = 0;
     QUtil::read_file_into_memory("other-file", buf, size);
