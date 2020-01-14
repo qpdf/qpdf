@@ -4633,6 +4633,54 @@ print "\n";
   </para>
   <variablelist>
    <varlistentry>
+    <term>9.1.1: XXX, 2020</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Build/Packaging Changes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          The fix-qdf program was converted from perl to C++. As such,
+          qpdf no longer has a runtime dependency on perl.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Library Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Added new helper routine
+          <function>QUtil::call_main_from_wmain</function> which
+          converts <type>wchar_t</type> arguments to UTF-8 encoded
+          strings. This is useful for qpdf because library methods
+          expect file names to be UTF-8 encoded, even on Windows
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Added new <function>QUtil::read_lines_from_file</function>
+          methods that take <type>FILE*</type> arguments and that
+          allow preservation of end-of-line characters. This also
+          fixes a bug where
+          <function>QUtil::read_lines_from_file</function> wouldn't
+          work properly with Unicode filenames.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  <variablelist>
+   <varlistentry>
     <term>9.1.0: November 17, 2019</term>
     <listitem>
      <itemizedlist>
