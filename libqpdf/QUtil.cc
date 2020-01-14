@@ -1043,6 +1043,20 @@ QUtil::read_file_into_memory(
     fclose(f);
 }
 
+static bool read_char_from_FILE(char& ch, FILE* f)
+{
+    auto len = fread(&ch, 1, 1, f);
+    if (len == 0)
+    {
+        if (ferror(f))
+        {
+            throw std::runtime_error("failure reading character from file");
+        }
+        return false;
+    }
+    return true;
+}
+
 std::list<std::string>
 QUtil::read_lines_from_file(char const* filename)
 {
@@ -1050,7 +1064,7 @@ QUtil::read_lines_from_file(char const* filename)
     std::list<std::string> lines;
     FILE* f = safe_fopen(filename, "rb");
     FileCloser fc(f);
-    auto next_char = [&f](char& ch) { return (fread(&ch, 1, 1, f) > 0); };
+    auto next_char = [&f](char& ch) { return read_char_from_FILE(ch, f); };
     read_lines_from_file(next_char, lines, false);
     return lines;
 }
@@ -1061,7 +1075,7 @@ QUtil::read_lines_from_file(char const* filename, bool preserve_eol)
     std::list<std::string> lines;
     FILE* f = safe_fopen(filename, "rb");
     FileCloser fc(f);
-    auto next_char = [&f](char& ch) { return (fread(&ch, 1, 1, f) > 0); };
+    auto next_char = [&f](char& ch) { return read_char_from_FILE(ch, f); };
     read_lines_from_file(next_char, lines, preserve_eol);
     return lines;
 }
@@ -1089,7 +1103,7 @@ std::list<std::string>
 QUtil::read_lines_from_file(FILE* f, bool preserve_eol)
 {
     std::list<std::string> lines;
-    auto next_char = [&f](char& ch) { return (fread(&ch, 1, 1, f) > 0); };
+    auto next_char = [&f](char& ch) { return read_char_from_FILE(ch, f); };
     read_lines_from_file(next_char, lines, preserve_eol);
     return lines;
 }
