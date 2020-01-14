@@ -362,6 +362,13 @@ namespace QUtil
     // command-line tool. May throw std::runtime_error.
     QPDF_DLL
     std::vector<int> parse_numrange(char const* range, int max);
+
+    // Take an argv array consisting of wchar_t, as when wmain is
+    // invoked, convert all UTF-16 encoded strings to UTF-8, and call
+    // another main.
+    QPDF_DLL
+    int call_main_from_wmain(int argc, wchar_t* argv[],
+                             std::function<int(int, char*[])> realmain);
 };
 
 #endif // QUTIL_HH

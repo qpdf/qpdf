@@ -1,3 +1,9 @@
+2020-01-14  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add QUtil::call_main_from_wmain, a helper function that can be
+	called in the body of wmain to convert UTF-16 arguments to UTF-8
+	arguments and then call another main function.
+
 2020-01-13  Jay Berkenbilt  <ejb@ql.org>
 
 	* QUtil::read_lines_from_file: add new versions that use FILE*,

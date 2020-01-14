@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
+#include <memory>
 #ifdef _WIN32
 #include <windows.h>
 #include <direct.h>
@@ -2360,4 +2361,39 @@ QUtil::possible_repaired_encodings(std::string supplied)
         }
     }
     return t;
+}
+
+int
+QUtil::call_main_from_wmain(int argc, wchar_t* argv[], std::function<int(int, char*[])> realmain)
+{
+    // argv contains UTF-16-encoded strings with a 16-bit wchar_t.
+    // Convert this to UTF-8-encoded strings for compatibility with
+    // other systems. That way the rest of qpdf.cc can just act like
+    // arguments are UTF-8.
+
+    std::vector<std::shared_ptr<char>> utf8_argv;
+    for (int i = 0; i < argc; ++i)
+    {
+        std::string utf16;
+        for (size_t j = 0; j < wcslen(argv[i]); ++j)
+        {
+            unsigned short codepoint = static_cast<unsigned short>(argv[i][j]);
+            utf16.append(1, static_cast<char>(
+                             QIntC::to_uchar(codepoint >> 8)));
+            utf16.append(1, static_cast<char>(
+                             QIntC::to_uchar(codepoint & 0xff)));
+        }
+        std::string utf8 = QUtil::utf16_to_utf8(utf16);
+        utf8_argv.push_back(std::shared_ptr<char>(QUtil::copy_string(utf8.c_str()), std::default_delete<char[]>()));
+    }
+    auto utf8_argv_sp =
+        std::shared_ptr<char*>(new char*[1+utf8_argv.size()], std::default_delete<char*[]>());
+    char** new_argv = utf8_argv_sp.get();
+    for (size_t i = 0; i < utf8_argv.size(); ++i)
+    {
+        new_argv[i] = utf8_argv.at(i).get();
+    }
+    argc = QIntC::to_int(utf8_argv.size());
+    new_argv[argc] = 0;
+    return realmain(argc, new_argv);
 }
