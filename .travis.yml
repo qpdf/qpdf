@@ -5,7 +5,7 @@ dist: xenial
 
 install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq docbook-xsl fop xsltproc less inkscape
+  - sudo apt-get install -qq libgnutls28-dev docbook-xsl fop xsltproc less inkscape
 
 script:
   - appimage/build-appimage
