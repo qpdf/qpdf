@@ -67,7 +67,7 @@ jobs:
   condition: succeeded()
 - job: macOS
   pool:
-    vmImage: macOS-10.13
+    vmImage: macOS-10.14
   steps:
   - task: DownloadBuildArtifacts@0
     displayName: 'Download distribution files'
