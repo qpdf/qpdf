@@ -135,7 +135,9 @@ RELEASE PREPARATION
 
   * `config.guess`, `config.sub`, `ltmain.sh`, and the `m4` directory:
     these were created by running `libtoolize -c`. To update, run
-    `libtoolize -f -c` or remove the files and rerun `libtoolize`.
+    `libtoolize -f -c` or remove the files and rerun `libtoolize`. For
+    `config.guess` and `config.sub`, search for "latest" in the files,
+    and follow directions for updating them.
 
   * Other files copied as indicated:
     ```
