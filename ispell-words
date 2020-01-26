@@ -39,6 +39,7 @@ addr
 addTokenFilter
 addToTable
 adjustAESStreamLength
+adjustOstreamXref
 admon
 Adobeâ
 ae
@@ -122,6 +123,7 @@ argGenerateAppearances
 argHelp
 argIgnoreXrefStreams
 argIiMinBytes
+argIsEncrypted
 argJson
 argJsonHelp
 argJsonKey
@@ -156,6 +158,7 @@ argRawStreamData
 argRecompressFlate
 argRemovePageLabels
 argReplaceInput
+argRequiresPassword
 argRotate
 args
 argShowCrypto
@@ -247,7 +250,7 @@ bbox
 bc
 beb
 BeforeQuack
-Berkenbilt
+berkenbilt
 betweenTokens
 bf
 bi
@@ -334,6 +337,7 @@ checkHPageOffset
 checkHSharedObject
 checkLinearization
 checkLinearizationInternal
+checkObjId
 checkPageContents
 checkSchema
 checkSchemaInternal
@@ -364,7 +368,9 @@ ClosedFileInputSource
 CloseHandle
 closeInputSource
 closeObject
+Cloudmersive
 clusterfuzz
+cmatch
 cmath
 cmd
 cmyk
@@ -412,6 +418,7 @@ CreateFile
 createPageContents
 createWhat
 CreationDate
+cregex
 CRNL
 CropBox
 CryptAcquireContext
@@ -422,6 +429,7 @@ cryptolog
 CryptReleaseContext
 cso
 csoe
+CSP
 css
 cstdint
 cstdio
@@ -635,6 +643,7 @@ extern
 externalize
 externalized
 externalizeInlineImages
+externalizing
 fb
 fBqpdf
 fc
@@ -658,8 +667,10 @@ fI
 fieldflags
 fieldtype
 fIinfilename
+FileCloser
 fileinfo
 FileInputSource
+filemethod
 fileno
 filenow
 filep
@@ -715,6 +726,7 @@ fprintf
 fR
 fr
 fread
+frs
 FS
 fsanitize
 fseek
@@ -955,6 +967,7 @@ gmail
 gmon
 GNUC
 gnutls
+GnuTLS
 gnuwin
 googleapis
 GoTo
@@ -1019,6 +1032,7 @@ HSi
 HSomething
 HSomethingEntry
 htcondor
+htdocs
 htm
 html
 http
@@ -1056,6 +1070,7 @@ infilename
 inflateEnd
 inflateInit
 inflateReset
+infs
 ing
 init
 initializeByPage
@@ -1220,6 +1235,7 @@ linearized
 linearizing
 linebuf
 linefeeds
+lineno
 linkend
 linkey
 linp
@@ -1307,8 +1323,13 @@ mins
 misc
 MixColumn
 mk
+mkdir
 mkinstalldirs
 mklink
+moddifyannotations
+modifyassembly
+modifyforms
+modifyother
 ModOther
 monoseq
 mr
@@ -1454,6 +1475,7 @@ oldname
 oldpdf
 olist
 omap
+onum
 ooh
 op
 opages
@@ -1490,6 +1512,7 @@ outputLengthNextN
 ovecsize
 ovector
 ownerPasswordMatched
+ownerpasswordmatched
 pacman
 padLen
 Paeth
@@ -1510,6 +1533,7 @@ para
 param
 params
 parms
+parseable
 parsecontent
 parseContentStream
 parsedoffset
@@ -1601,9 +1625,12 @@ preserveObjectStreams
 prev
 printability
 printf
+printhigh
+printlow
 processChar
 processFile
 processInputSource
+processLines
 processMemoryFile
 processRow
 processXRefStream
@@ -1642,15 +1669,19 @@ qarray
 QArray
 qbilt
 qdf
+qdf's
+QdfFixer
 QDFObject
 QDFWriter
 qdict
 QDict
 QEXC
+qf
 QIntC
 ql
 qnumbers
 QNumbers
+qp
 qpdf
 qpdf's
 QPDF's
@@ -1715,7 +1746,9 @@ quotesinglbase
 QUtil
 qutil
 qw
+qwer
 qwert
+qwww
 rand
 RandomDataProvider
 randoms
@@ -1752,10 +1785,12 @@ refactor
 refcount
 refpage
 refpos
+regex
 regexp
 registerForeignStream
 registerImpl
 registerProgressReporter
+Regsvr
 releaseResolved
 ReleaseResolver
 remotesensing
@@ -1814,9 +1849,12 @@ RotationSpec
 roundoff
 rr
 RSA
+Rsabase
+Rsaenh
 rspec
 rstream
 RStream
+rsync
 RunLength
 runlength
 RunLengthDecode
@@ -1832,6 +1870,7 @@ savable
 scanline
 scanlines
 sch
+scp
 sdk
 sdp
 se
@@ -1923,11 +1962,13 @@ showXRefTable
 sig
 sizeof
 skipToNextByte
+smatch
 soe
 softlink
 solidus
 sourceforge
 SourceForge
+sp
 SparseOHArray
 sph
 sphlib
@@ -1938,6 +1979,7 @@ srand
 srandom
 src
 srdp
+sregex
 ss
 sstream
 stampfile
@@ -1970,11 +2012,13 @@ strcmp
 strcpy
 streamDataChoices
 StreamDataProvider
+streammethod
 strerror
 StrF
 stricmp
 StringCounter
 StringDecrypter
+stringmethod
 stringprep
 StringReverser
 stringstream
@@ -2002,6 +2046,7 @@ SubFilter
 SubFilters
 SUBLANG
 sublicense
+Submatches
 subparsers
 Subramanyam
 substr
@@ -2154,6 +2199,7 @@ usageExit
 UseAes
 UseOutlines
 userPasswordMatched
+userpasswordmatched
 UserUnit
 useStaticIV
 useZeroIV
@@ -2186,6 +2232,7 @@ Vkey
 vlen
 voidpf
 vp
+vrlcO
 vvv
 warnIfPossible
 wb
@@ -2231,6 +2278,7 @@ writeNext
 writeObject
 writeObjectStream
 writeObjectStreamOffsets
+writeOstream
 writePad
 writeStandard
 writeString

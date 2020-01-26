@@ -267,7 +267,7 @@ make
     without modifying the qpdf library.
    </para>
    <sect2 id="ref.crypto.build">
-    <title>Build Support For Cyrpto Providers</title>
+    <title>Build Support For Crypto Providers</title>
     <para>
      When building with qpdf's build system, crypto providers can be
      enabled at build time using various

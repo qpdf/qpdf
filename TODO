@@ -22,7 +22,7 @@ Comments appear in the code prefixed by "ABI"
 * QPDFPageObjectHelper::placeFormXObject: name should be std::string
   const& (issue #374)
 
-* (Source compatibiliy) As somewhat discussed in issue 219, the
+* (Source compatibility) As somewhat discussed in issue 219, the
   original pipeStreamData in QPDF_Stream has various logic for
   reporting warnings and letting the caller retry. This logic is not
   implemented for stream data providers. When copying foreign streams,
