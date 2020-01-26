@@ -1,5 +1,9 @@
 2020-01-26  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add "encrypt" key to the json output. This contains largely the
+	same information as given by --show-encryption but in a
+	consistent, parseable format.
+
 	* Add options --is-encrypted and --requires-password. These can be
 	used with files, including encrypted files with unknown passwords,
 	to determine whether or not a file is encrypted and whether a

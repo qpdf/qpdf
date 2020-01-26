@@ -4,6 +4,33 @@
     "hasacroform": false,
     "needappearances": false
   },
+  "encrypt": {
+    "capabilities": {
+      "accessibility": true,
+      "extract": true,
+      "moddifyannotations": true,
+      "modify": true,
+      "modifyassembly": true,
+      "modifyforms": true,
+      "modifyother": true,
+      "printhigh": true,
+      "printlow": true
+    },
+    "encrypted": false,
+    "ownerpasswordmatched": false,
+    "parameters": {
+      "P": 0,
+      "R": 0,
+      "V": 0,
+      "bits": 0,
+      "filemethod": "none",
+      "key": null,
+      "method": "none",
+      "streammethod": "none",
+      "stringmethod": "none"
+    },
+    "userpasswordmatched": false
+  },
   "objects": {
     "1 0 R": {
       "/Outlines": "95 0 R",

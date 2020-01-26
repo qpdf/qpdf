@@ -607,6 +607,7 @@ my @json_files = (
     ['image-streams', []],
     ['image-streams-small', []],
     ['field-types', []],
+    ['field-types', ['--show-encryption-key']],
     ['image-streams', ['--decode-level=all']],
     ['image-streams', ['--decode-level=specialized']],
     ['page-labels-and-outlines', ['--json-key=objects']],
@@ -621,6 +622,8 @@ my @json_files = (
      ['--json-key=objects', '--json-object=trailer', '--json-object=2 0 R']],
     ['field-types', ['--json-key=acroform']],
     ['need-appearances', ['--json-key=acroform']],
+    ['V4-aes', ['--json-key=encrypt']],
+    ['V4-aes', ['--json-key=encrypt', '--show-encryption-key']],
 );
 $n_tests += scalar(@json_files);
 foreach my $d (@json_files)
@@ -3176,7 +3179,7 @@ my @encrypted_files =
       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     );
 
-$n_tests += 5 + (2 * (@encrypted_files)) + (6 * (@encrypted_files - 6)) + 9;
+$n_tests += 5 + (2 * (@encrypted_files)) + (7 * (@encrypted_files - 6)) + 9;
 
 $td->runtest("encrypted file",
 	     {$td->COMMAND => "test_driver 2 encrypted-with-images.pdf"},
@@ -3216,7 +3219,9 @@ foreach my $d (@encrypted_files)
 	$modifyother, $modifyall) = @$d;
 
     my $f = sub { $_[0] ? "allowed" : "not allowed" };
+    my $jf = sub { $_[0] ? "true" : "false" };
     my $enc_details = "";
+    my $enc_json = "{\n  \"encrypt\": {\n    \"capabilities\": {\n";
     if ($match_owner)
     {
         $enc_details .= "Supplied password is owner password\n";
@@ -3235,6 +3240,37 @@ foreach my $d (@encrypted_files)
 	"modify annotations: " . &$f($modifyannot) . "\n" .
 	"modify other: " . &$f($modifyother) . "\n" .
 	"modify anything: " . &$f($modifyall) . "\n";
+    $enc_json .=
+        "      \"accessibility\": " . &$jf($accessible) . ",\n" .
+        "      \"extract\": " . &$jf($extract) . ",\n" .
+        "      \"moddifyannotations\": " . &$jf($modifyannot) . ",\n" .
+        "      \"modify\": " . &$jf($modifyall) . ",\n" .
+        "      \"modifyassembly\": " . &$jf($modifyassembly) . ",\n" .
+        "      \"modifyforms\": " . &$jf($modifyform) . ",\n" .
+        "      \"modifyother\": " . &$jf($modifyother) . ",\n" .
+        "      \"printhigh\": " . &$jf($printhigh) . ",\n" .
+        "      \"printlow\": " . &$jf($printlow) . "\n" .
+        "    },\n" .
+        "    \"encrypted\": true,\n" .
+        "    \"ownerpasswordmatched\": ---opm---,\n" .
+        "    \"parameters\": {\n" .
+        "      \"P\": ---P---,\n" .
+        "      \"R\": ---R---,\n" .
+        "      \"V\": ---V---,\n" .
+        "      \"bits\": ---bits---,\n" .
+        "      \"filemethod\": \"---method---\",\n" .
+        "      \"key\": null,\n" .
+        "      \"method\": \"---method---\",\n" .
+        "      \"streammethod\": \"---method---\",\n" .
+        "      \"stringmethod\": \"---method---\"\n" .
+        "    },\n" .
+        "    \"userpasswordmatched\": ---upm---\n" .
+        "  },\n" .
+        "  \"parameters\": {\n" .
+        "    \"decodelevel\": \"generalized\"\n" .
+        "  },\n" .
+        "  \"version\": 1\n" .
+        "}\n";
     if ($file =~ m/XI-/)
     {
         $enc_details .=
@@ -3277,6 +3313,16 @@ foreach my $d (@encrypted_files)
 	my $upass = $3 || "";
 	my $opass = $4 || "";
 	my $bits = (($V == 5) ? 256 : ($V == 2) ? 128 : 40);
+        my $method = $bits == 256 ? "AESv3" : "RC4";
+        my $opm = ($pass eq $opass ? "true" : "false");
+        my $upm = ($pass eq $upass ? "true" : "false");
+        $enc_json =~ s/---R---/$R/;
+        $enc_json =~ s/---P---/$P/;
+        $enc_json =~ s/---V---/$V/;
+        $enc_json =~ s/---bits---/$bits/;
+        $enc_json =~ s/---method---/$method/g;
+        $enc_json =~ s/---opm---/$opm/;
+        $enc_json =~ s/---upm---/$upm/;
 
 	my $eflags = "-encrypt \"$upass\" \"$opass\" $bits $xeflags --";
         if (($pass ne $upass) && ($V >= 5))
@@ -3306,6 +3352,13 @@ foreach my $d (@encrypted_files)
 		     {$td->STRING => "R = $R\nP = $P\n" .
 			  "User password = $upass\n$enc_details",
 			  $td->EXIT_STATUS => 0},
+		     $td->NORMALIZE_NEWLINES);
+        $td->runtest("json encrypt key ($enc_n)",
+		     {$td->COMMAND =>
+			  "qpdf --json --json-key=encrypt" .
+                          " --password=\"$pass\"" .
+			  " $file.enc2"},
+		     {$td->STRING => $enc_json, $td->EXIT_STATUS => 0},
 		     $td->NORMALIZE_NEWLINES);
 	$td->runtest("decrypt again",
 		     {$td->COMMAND =>

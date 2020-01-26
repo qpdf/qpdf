@@ -4725,6 +4725,18 @@ print "\n";
          </para>
         </listitem>
        </itemizedlist>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Added <literal>encrypt</literal> key to JSON options. With
+          the exception of the reconstructed user password for older
+          encryption formats, this provides the same information as
+          <option>--show-encryption</option> but in a consistent,
+          parseable format. See output of <command>qpdf
+          --json-help</command> for details.
+         </para>
+        </listitem>
+       </itemizedlist>
       </listitem>
      </itemizedlist>
     </listitem>

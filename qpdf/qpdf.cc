@@ -564,6 +564,83 @@ static JSON json_schema(std::set<std::string>* keys = 0)
                 "annotation flags from /F --"
                 " see pdf_annotation_flag_e in qpdf/Constants.h"));
     }
+    if (all_keys || keys->count("encrypt"))
+    {
+        JSON encrypt = schema.addDictionaryMember(
+            "encrypt", JSON::makeDictionary());
+        encrypt.addDictionaryMember(
+            "encrypted",
+            JSON::makeString("whether the document is encrypted"));
+        encrypt.addDictionaryMember(
+            "userpasswordmatched",
+            JSON::makeString("whether supplied password matched user password;"
+                             " always false for non-encrypted files"));
+        encrypt.addDictionaryMember(
+            "ownerpasswordmatched",
+            JSON::makeString("whether supplied password matched owner password;"
+                             " always false for non-encrypted files"));
+        JSON capabilities = encrypt.addDictionaryMember(
+            "capabilities", JSON::makeDictionary());
+        capabilities.addDictionaryMember(
+            "accessibility",
+            JSON::makeString("allow extraction for accessibility?"));
+        capabilities.addDictionaryMember(
+            "extract",
+            JSON::makeString("allow extraction?"));
+        capabilities.addDictionaryMember(
+            "printlow",
+            JSON::makeString("allow low resolution printing?"));
+        capabilities.addDictionaryMember(
+            "printhigh",
+            JSON::makeString("allow high resolution printing?"));
+        capabilities.addDictionaryMember(
+            "modifyassembly",
+            JSON::makeString("allow modifying document assembly?"));
+        capabilities.addDictionaryMember(
+            "modifyforms",
+            JSON::makeString("allow modifying forms?"));
+        capabilities.addDictionaryMember(
+            "moddifyannotations",
+            JSON::makeString("allow modifying annotations?"));
+        capabilities.addDictionaryMember(
+            "modifyother",
+            JSON::makeString("allow other modifications?"));
+        capabilities.addDictionaryMember(
+            "modify",
+            JSON::makeString("allow all modifications?"));
+
+        JSON parameters = encrypt.addDictionaryMember(
+            "parameters", JSON::makeDictionary());
+        parameters.addDictionaryMember(
+            "R",
+            JSON::makeString("R value from Encrypt dictionary"));
+        parameters.addDictionaryMember(
+            "V",
+            JSON::makeString("V value from Encrypt dictionary"));
+        parameters.addDictionaryMember(
+            "P",
+            JSON::makeString("P value from Encrypt dictionary"));
+        parameters.addDictionaryMember(
+            "bits",
+            JSON::makeString("encryption key bit length"));
+        parameters.addDictionaryMember(
+            "key",
+            JSON::makeString("encryption key; will be null"
+                             " unless --show-encryption-key was specified"));
+        parameters.addDictionaryMember(
+            "method",
+            JSON::makeString("overall encryption method:"
+                             " none, mixed, RC4, AESv2, AESv3"));
+        parameters.addDictionaryMember(
+            "streammethod",
+            JSON::makeString("encryption method for streams"));
+        parameters.addDictionaryMember(
+            "stringmethod",
+            JSON::makeString("encryption method for string"));
+        parameters.addDictionaryMember(
+            "filemethod",
+            JSON::makeString("encryption method for attachments"));
+    }
     return schema;
 }
 
@@ -936,7 +1013,8 @@ ArgParser::initOptionTable()
     // The list of selectable top-level keys id duplicated in three
     // places: json_schema, do_json, and initOptionTable.
     char const* json_key_choices[] = {
-        "objects", "pages", "pagelabels", "outlines", "acroform", 0};
+        "objects", "pages", "pagelabels", "outlines", "acroform",
+        "encrypt", 0};
     (*t)["json-key"] = oe_requiredChoices(
         &ArgParser::argJsonKey, json_key_choices);
     (*t)["json-object"] = oe_requiredParameter(
@@ -1568,8 +1646,11 @@ ArgParser::argJsonHelp()
         << std::endl
         << "specify a subset of top-level keys when you invoke qpdf, but the \"version\""
         << std::endl
-        << "and \"parameters\" keys will always be present."
+        << "and \"parameters\" keys will always be present. Note that the \"encrypt\""
         << std::endl
+        << "key's values will be populated for non-encrypted files. Some values will"
+        << std::endl
+        << "be null, and others will have values that apply to unencrypted files."
         << std::endl
         << json_schema().unparse()
         << std::endl;
@@ -3817,6 +3898,106 @@ static void do_json_acroform(QPDF& pdf, Options& o, JSON& j)
     }
 }
 
+static void do_json_encrypt(QPDF& pdf, Options& o, JSON& j)
+{
+    int R = 0;
+    int P = 0;
+    int V = 0;
+    QPDF::encryption_method_e stream_method = QPDF::e_none;
+    QPDF::encryption_method_e string_method = QPDF::e_none;
+    QPDF::encryption_method_e file_method = QPDF::e_none;
+    bool is_encrypted = pdf.isEncrypted(
+        R, P, V, stream_method, string_method, file_method);
+    JSON j_encrypt = j.addDictionaryMember(
+        "encrypt", JSON::makeDictionary());
+    j_encrypt.addDictionaryMember(
+        "encrypted",
+        JSON::makeBool(is_encrypted));
+    j_encrypt.addDictionaryMember(
+        "userpasswordmatched",
+        JSON::makeBool(is_encrypted && pdf.userPasswordMatched()));
+    j_encrypt.addDictionaryMember(
+        "ownerpasswordmatched",
+        JSON::makeBool(is_encrypted && pdf.ownerPasswordMatched()));
+    JSON j_capabilities = j_encrypt.addDictionaryMember(
+        "capabilities", JSON::makeDictionary());
+    j_capabilities.addDictionaryMember(
+        "accessibility",
+        JSON::makeBool(pdf.allowAccessibility()));
+    j_capabilities.addDictionaryMember(
+        "extract",
+        JSON::makeBool(pdf.allowExtractAll()));
+    j_capabilities.addDictionaryMember(
+        "printlow",
+        JSON::makeBool(pdf.allowPrintLowRes()));
+    j_capabilities.addDictionaryMember(
+        "printhigh",
+        JSON::makeBool(pdf.allowPrintHighRes()));
+    j_capabilities.addDictionaryMember(
+        "modifyassembly",
+        JSON::makeBool(pdf.allowModifyAssembly()));
+    j_capabilities.addDictionaryMember(
+        "modifyforms",
+        JSON::makeBool(pdf.allowModifyForm()));
+    j_capabilities.addDictionaryMember(
+        "moddifyannotations",
+        JSON::makeBool(pdf.allowModifyAnnotation()));
+    j_capabilities.addDictionaryMember(
+        "modifyother",
+        JSON::makeBool(pdf.allowModifyOther()));
+    j_capabilities.addDictionaryMember(
+        "modify",
+        JSON::makeBool(pdf.allowModifyAll()));
+    JSON j_parameters = j_encrypt.addDictionaryMember(
+        "parameters", JSON::makeDictionary());
+    j_parameters.addDictionaryMember("R", JSON::makeInt(R));
+    j_parameters.addDictionaryMember("V", JSON::makeInt(V));
+    j_parameters.addDictionaryMember("P", JSON::makeInt(P));
+    int bits = 0;
+    JSON key = JSON::makeNull();
+    if (is_encrypted)
+    {
+        std::string encryption_key = pdf.getEncryptionKey();
+        bits = QIntC::to_int(encryption_key.length() * 8);
+        if (o.show_encryption_key)
+        {
+            key = JSON::makeString(QUtil::hex_encode(encryption_key));
+        }
+    }
+    j_parameters.addDictionaryMember("bits", JSON::makeInt(bits));
+    j_parameters.addDictionaryMember("key", key);
+    auto fix_method = [is_encrypted](QPDF::encryption_method_e& m) {
+                          if (is_encrypted && m == QPDF::e_none)
+                          {
+                              m = QPDF::e_rc4;
+                          }
+                      };
+    fix_method(stream_method);
+    fix_method(string_method);
+    fix_method(file_method);
+    std::string s_stream_method = show_encryption_method(stream_method);
+    std::string s_string_method = show_encryption_method(string_method);
+    std::string s_file_method = show_encryption_method(file_method);
+    std::string s_overall_method;
+    if ((stream_method == string_method) &&
+        (stream_method == file_method))
+    {
+        s_overall_method = s_stream_method;
+    }
+    else
+    {
+        s_overall_method = "mixed";
+    }
+    j_parameters.addDictionaryMember(
+        "method", JSON::makeString(s_overall_method));
+    j_parameters.addDictionaryMember(
+        "streammethod", JSON::makeString(s_stream_method));
+    j_parameters.addDictionaryMember(
+        "stringmethod", JSON::makeString(s_string_method));
+    j_parameters.addDictionaryMember(
+        "filemethod", JSON::makeString(s_file_method));
+}
+
 static void do_json(QPDF& pdf, Options& o)
 {
     JSON j = JSON::makeDictionary();
@@ -3868,6 +4049,10 @@ static void do_json(QPDF& pdf, Options& o)
     if (all_keys || o.json_keys.count("acroform"))
     {
         do_json_acroform(pdf, o, j);
+    }
+    if (all_keys || o.json_keys.count("encrypt"))
+    {
+        do_json_encrypt(pdf, o, j);
     }
 
     // Check against schema
