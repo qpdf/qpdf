@@ -809,7 +809,7 @@ $td->runtest("check pass1 file",
 show_ntests();
 # ----------
 $td->notify("--- Inline Images ---");
-$n_tests += 8;
+$n_tests += 10;
 
 # The file large-inline-image.pdf is a hand-crafted file with several
 # inline images of various sizes including one that is two megabytes,
@@ -853,6 +853,16 @@ $td->runtest("externalize damaged image",
 $td->runtest("check output",
 	     {$td->FILE => "a.pdf"},
 	     {$td->FILE => "damaged-inline-image-out.pdf"});
+$td->runtest("named colorspace",
+             {$td->COMMAND =>
+                  "qpdf --static-id --externalize-inline-images" .
+                  " --ii-min-bytes=0 inline-image-colorspace-lookup.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "inline-image-colorspace-lookup-out.pdf"});
+
 
 my @eii_tests = (
     ['inline-images', 80],

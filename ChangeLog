@@ -1,5 +1,9 @@
 2020-01-26  Jay Berkenbilt  <ejb@ql.org>
 
+	* Bug fix: when externalizing inline images, a colorspace value
+	that was a lookup key in the page's /Resource -> /ColorSpace
+	dictionary was not properly handled. Fixes #392.
+
 	* Add "encrypt" key to the json output. This contains largely the
 	same information as given by --show-encryption but in a
 	consistent, parseable format.

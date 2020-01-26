@@ -141,6 +141,22 @@ InlineImageTracker::convertIIDict(QPDFObjectHandle odict)
                 }
                 else
                 {
+                    // This is a key in the page's /Resources ->
+                    // /ColorSpace dictionary. We need to look it up
+                    // and use its value as the color space for the
+                    // image.
+                    QPDFObjectHandle colorspace =
+                        resources.getKey("/ColorSpace");
+                    if (colorspace.isDictionary() && colorspace.hasKey(name))
+                    {
+                        QTC::TC("qpdf", "QPDFPageObjectHelper colorspace lookup");
+                        value = colorspace.getKey(name);
+                    }
+                    else
+                    {
+                        resources.warnIfPossible(
+                            "unable to resolve colorspace " + name);
+                    }
                     name.clear();
                 }
                 if (! name.empty())
