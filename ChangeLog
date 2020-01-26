@@ -1,3 +1,13 @@
+2020-01-26  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add options --is-encrypted and --requires-password. These can be
+	used with files, including encrypted files with unknown passwords,
+	to determine whether or not a file is encrypted and whether a
+	password is required to open the file. The --requires-password
+	option can also be used to determine whether a supplied password
+	is correct. Information is supplied through exit codes, making
+	these options particularly useful for shell scripts. Fixes #390.
+
 2020-01-14  Jay Berkenbilt  <ejb@ql.org>
 
 	* Fix for Windows being unable to acquire crypt context with a new

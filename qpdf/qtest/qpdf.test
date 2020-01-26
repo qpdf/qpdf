@@ -252,6 +252,28 @@ $td->runtest("check exception handling",
 
 show_ntests();
 # ----------
+$td->notify("--- Check encryption/password ---");
+my @check_encryption_password = (
+    # file, password, is-encrypted, requires-password
+    ["minimal.pdf", "", 2, 2],
+    ["20-pages.pdf", "", 0, 0],
+    ["20-pages.pdf", "user", 0, 3],
+    );
+$n_tests += 2 * scalar(@check_encryption_password);
+foreach my $d (@check_encryption_password)
+{
+    my ($file, $pass, $is_encrypted, $requires_password) = @$d;
+    $td->runtest("is encrypted ($file, pass=$pass)",
+                 {$td->COMMAND => "qpdf --is-encrypted --password=$pass $file"},
+                 {$td->STRING => "", $td->EXIT_STATUS => $is_encrypted});
+    $td->runtest("requires password ($file, pass=$pass)",
+                 {$td->COMMAND => "qpdf --requires-password" .
+                      " --password=$pass $file"},
+                 {$td->STRING => "", $td->EXIT_STATUS => $requires_password});
+}
+
+show_ntests();
+# ----------
 $td->notify("--- Dangling Refs ---");
 my @dangling = (qw(minimal dangling-refs));
 $n_tests += 2 * scalar(@dangling);

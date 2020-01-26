@@ -666,6 +666,40 @@ make
       </listitem>
      </varlistentry>
      <varlistentry>
+      <term><option>--is-encrypted</option></term>
+      <listitem>
+       <para>
+        Silently exit with status 0 if the file is encrypted or status
+        2 if the file is not encrypted. This is useful for shell
+        scripts. Other options are ignored if this is given. This
+        option is mutually exclusive with
+        <option>--requires-password</option>. Both this option and
+        <option>--requires-password</option> exit with status 2 for
+        non-encrypted files.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--requires-password</option></term>
+      <listitem>
+       <para>
+        Silently exit with status 0 if a password (other than as
+        supplied) is required. Exit with status 2 if the file is not
+        encrypted. Exit with status 3 if the file is encrypted but
+        requires no password or the correct password has been
+        supplied. This is useful for shell scripts. Note that any
+        supplied password is used when opening the file. When used
+        with a <option>--password</option> option, this option can be
+        used to check the correctness of the password. In that case,
+        an exit status of 3 means the file works with the supplied
+        password. This option is mutually exclusive with
+        <option>--is-encrypted</option>. Both this option and
+        <option>--is-encrypted</option> exit with status 2 for
+        non-encrypted files.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
       <term><option>--verbose</option></term>
       <listitem>
        <para>
@@ -4671,6 +4705,23 @@ print "\n";
           fixes a bug where
           <function>QUtil::read_lines_from_file</function> wouldn't
           work properly with Unicode filenames.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        CLI Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Added options <option>--is-encrypted</option> and
+          <option>--requires-password</option> for testing whether a
+          file is encrypted or requires a password other than the
+          supplied (or empty) password. These communicate via exit
+          status, making them useful for shell scripts. They also work
+          on encrypted files with unknown passwords.
          </para>
         </listitem>
        </itemizedlist>

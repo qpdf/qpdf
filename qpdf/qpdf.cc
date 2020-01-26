@@ -29,8 +29,12 @@
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QIntC.hh>
 
-static int const EXIT_ERROR = 2;
-static int const EXIT_WARNING = 3;
+static int constexpr EXIT_ERROR = 2;
+static int constexpr EXIT_WARNING = 3;
+
+// For is-encrypted and requires-password
+static int constexpr EXIT_IS_NOT_ENCRYPTED = 2;
+static int constexpr EXIT_CORRECT_PASSWORD = 3;
 
 static char const* whoami = 0;
 
@@ -183,6 +187,8 @@ struct Options
         under_overlay(0),
         require_outfile(true),
         replace_input(false),
+        check_is_encrypted(false),
+        check_requires_password(false),
         infilename(0),
         outfilename(0)
     {
@@ -287,6 +293,8 @@ struct Options
     std::map<std::string, RotationSpec> rotations;
     bool require_outfile;
     bool replace_input;
+    bool check_is_encrypted;
+    bool check_requires_password;
     char const* infilename;
     char const* outfilename;
 };
@@ -718,6 +726,8 @@ class ArgParser
     void argUOpassword(char* parameter);
     void argEndUnderOverlay();
     void argReplaceInput();
+    void argIsEncrypted();
+    void argRequiresPassword();
 
     void usage(std::string const& message);
     void checkCompletion();
@@ -948,6 +958,8 @@ ArgParser::initOptionTable()
     (*t)["overlay"] = oe_bare(&ArgParser::argOverlay);
     (*t)["underlay"] = oe_bare(&ArgParser::argUnderlay);
     (*t)["replace-input"] = oe_bare(&ArgParser::argReplaceInput);
+    (*t)["is-encrypted"] = oe_bare(&ArgParser::argIsEncrypted);
+    (*t)["requires-password"] = oe_bare(&ArgParser::argRequiresPassword);
 
     t = &this->encrypt40_option_table;
     (*t)["--"] = oe_bare(&ArgParser::argEndEncrypt);
@@ -1105,6 +1117,13 @@ ArgParser::argHelp()
         << "--completion-bash       output a bash complete command you can eval\n"
         << "--completion-zsh        output a zsh complete command you can eval\n"
         << "--password=password     specify a password for accessing encrypted files\n"
+        << "--is-encrypted          silently exit 0 if the file is encrypted or 2\n"
+        << "                        if not; useful for shell scripts\n"
+        << "--requires-password     silently exit 0 if a password (other than as\n"
+        << "                        supplied) is required, 2 if the file is not\n"
+        << "                        encrypted, or 3 if the file is encrypted\n"
+        << "                        but requires no password or the supplied password\n"
+        << "                        is correct; useful for shell scripts\n"
         << "--verbose               provide additional informational output\n"
         << "--progress              give progress indicators while writing output\n"
         << "--no-warn               suppress warnings\n"
@@ -2353,6 +2372,20 @@ ArgParser::argReplaceInput()
 }
 
 void
+ArgParser::argIsEncrypted()
+{
+    o.check_is_encrypted = true;
+    o.require_outfile = false;
+}
+
+void
+ArgParser::argRequiresPassword()
+{
+    o.check_requires_password = true;
+    o.require_outfile = false;
+}
+
+void
 ArgParser::handleArgFileArguments()
 {
     // Support reading arguments from files. Create a new argv. Ensure
@@ -3112,6 +3145,11 @@ ArgParser::doFinalChecks()
     if (o.optimize_images && (! o.keep_inline_images))
     {
         o.externalize_inline_images = true;
+    }
+    if (o.check_requires_password && o.check_is_encrypted)
+    {
+        usage("--requires-password and --is-encrypted may not be given"
+              " together");
     }
 
     if (o.require_outfile && o.outfilename &&
@@ -5252,9 +5290,45 @@ int realmain(int argc, char* argv[])
     try
     {
         ap.parseOptions();
-	PointerHolder<QPDF> pdf_ph =
-            process_file(o.infilename, o.password, o);
+	PointerHolder<QPDF> pdf_ph;
+        try
+        {
+            pdf_ph = process_file(o.infilename, o.password, o);
+        }
+        catch (QPDFExc& e)
+        {
+            if ((e.getErrorCode() == qpdf_e_password) &&
+                (o.check_is_encrypted || o.check_requires_password))
+            {
+                // Allow --is-encrypted and --requires-password to
+                // work when an incorrect password is supplied.
+                exit(0);
+            }
+            throw e;
+        }
         QPDF& pdf = *pdf_ph;
+        if (o.check_is_encrypted)
+        {
+            if (pdf.isEncrypted())
+            {
+                exit(0);
+            }
+            else
+            {
+                exit(EXIT_IS_NOT_ENCRYPTED);
+            }
+        }
+        else if (o.check_requires_password)
+        {
+            if (pdf.isEncrypted())
+            {
+                exit(EXIT_CORRECT_PASSWORD);
+            }
+            else
+            {
+                exit(EXIT_IS_NOT_ENCRYPTED);
+            }
+        }
         if (! o.page_specs.empty())
         {
             handle_page_specs(pdf, o);
