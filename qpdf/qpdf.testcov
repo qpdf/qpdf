@@ -448,3 +448,4 @@ QPDFWriter stream in ostream 0
 QPDFObjectHandle duplicate dict key 0
 QPDFWriter no encryption sig contents 0
 QPDFPageObjectHelper colorspace lookup 0
+QPDFWriter ignore XRef in qdf mode 0

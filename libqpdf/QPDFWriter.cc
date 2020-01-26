@@ -1241,6 +1241,21 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
                 " another file.");
         }
 
+        if (this->m->qdf_mode &&
+            object.isStream() && object.getDict().getKey("/Type").isName() &&
+            (object.getDict().getKey("/Type").getName() == "/XRef"))
+        {
+            // As a special case, do not output any extraneous XRef
+            // streams in QDF mode. Doing so will confuse fix-qdf,
+            // which expects to see only one XRef stream at the end of
+            // the file. This case can occur when creating a QDF from
+            // a file with object streams when preserving unreferenced
+            // objects since the old cross reference streams are not
+            // actually referenced by object number.
+            QTC::TC("qpdf", "QPDFWriter ignore XRef in qdf mode");
+            return;
+        }
+
 	QPDFObjGen og = object.getObjGen();
 
 	if (this->m->obj_renumber.count(og) == 0)

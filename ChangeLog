@@ -1,5 +1,12 @@
 2020-01-26  Jay Berkenbilt  <ejb@ql.org>
 
+	* Bug fix: in qdf mode, do not write out any XRef streams that may
+	have appeared in the original file. These are usually
+	unreferenced, but with --preserve-unreferenced, they could be
+	written out, which breaks fix-qdf's assumption that there is at
+	most one XRef stream and that it appears at the end of the file.
+	Fixes #386.
+
 	* Bug fix: when externalizing inline images, a colorspace value
 	that was a lookup key in the page's /Resource -> /ColorSpace
 	dictionary was not properly handled. Fixes #392.

@@ -2779,7 +2779,7 @@ for (my $n = 16; $n <= 19; ++$n)
 show_ntests();
 # ----------
 $td->notify("--- Specific File Tests ---");
-$n_tests += 4;
+$n_tests += 7;
 
 # Special PDF files that caused problems at some point
 
@@ -2800,6 +2800,16 @@ $td->runtest("compress objstm and xref",
 $td->runtest("check output",
 	     {$td->FILE => "a.pdf"},
 	     {$td->FILE => "compress-objstm-xref.pdf"});
+$td->runtest("qdf + preserved-unreferenced + xref streams",
+	     {$td->COMMAND => "qpdf --qdf --preserve-unreferenced" .
+                  " --static-id compress-objstm-xref.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "compress-objstm-xref-qdf.pdf"});
+$td->runtest("check fix-qdf idempotency",
+	     {$td->COMMAND => "fix-qdf a.pdf"},
+	     {$td->FILE => "a.pdf", $td->EXIT_STATUS => 0});
 
 show_ntests();
 # ----------
