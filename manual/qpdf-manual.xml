@@ -4738,6 +4738,35 @@ print "\n";
         </listitem>
        </itemizedlist>
       </listitem>
+      <listitem>
+       <para>
+        Bug Fixes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          In QDF mode, be sure not to write more than one XRef stream
+          to a file, even when
+          <option>--preserve-unreferenced</option> is used.
+          <command>fix-qdf</command> assumes that there is only one
+          XRef stream, and that it appears at the end of the file.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          When externalizing inline images, properly handle images
+          whose color space is a reference to an object in the page's
+          resource dictionary.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Windows-specific fix for acquiring crypt context with a new
+          keyset.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
      </itemizedlist>
     </listitem>
    </varlistentry>
