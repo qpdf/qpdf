@@ -3100,7 +3100,7 @@ my @encrypted_files =
      ['R3,V2', '',              # 2
       '-accessibility=n -extract=n -print=full -modify=all', -532,
       1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1],
-     ['R3,V2,U=view', 'view',   # 3
+     ['R3,V2,U=view,O=view', 'view', # 3
       '-accessibility=y -extract=n -print=none -modify=none', -3392,
       1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
      ['R3,V2,O=master', 'master', # 4
@@ -3136,7 +3136,7 @@ my @encrypted_files =
      ['R2,V1', '',              # 14
       '-print=n -modify=n -extract=n -annotate=n', -64,
       1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-     ['R2,V1,U=view', 'view',   # 15
+     ['R2,V1,U=view,O=view', 'view', # 15
       '-print=y -modify=n -extract=n -annotate=n', -60,
       1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0],
      ['R2,V1,O=master', 'master', # 16
@@ -3342,12 +3342,13 @@ $td->runtest("non-encrypted",
 
 $td->runtest("invalid password",
 	     {$td->COMMAND => "qpdf -qdf --password=quack" .
-		  " enc-R2,V1,U=view.pdf a.qdf"},
-	     {$td->STRING => "enc-R2,V1,U=view.pdf: invalid password\n",
+		  " enc-R2,V1,U=view,O=view.pdf a.qdf"},
+	     {$td->STRING => "enc-R2,V1,U=view,O=view.pdf: invalid password\n",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("C API: invalid password",
-	     {$td->COMMAND => "qpdf-ctest 2 enc-R2,V1,U=view.pdf '' a.qdf"},
+	     {$td->COMMAND =>
+                  "qpdf-ctest 2 enc-R2,V1,U=view,O=view.pdf '' a.qdf"},
 	     {$td->FILE => "c-invalid-password.out", $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
