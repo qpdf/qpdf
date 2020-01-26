@@ -3,9 +3,15 @@ Fuzz Errors
 
 * https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=<N>
 
+* To fix:
+  * 19253 - indirect leaks. Not sure of the cause, but it might have
+    something to do with multiple instances of the same object being
+    read and discarded during file recovery. Maybe there's a missing
+    call to releaseResolved.
+
 * Ignoring these:
-  * Problems inside the jpeg library: 15470, 15751, 18633
-  * Timeout: 17630
+  * Problems inside the jpeg library: 15470, 15751, 18633, 18732, 18745
+  * Timeout: 15471, 17630
 
 ABI Changes
 ===========

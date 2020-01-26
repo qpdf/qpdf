@@ -42,7 +42,7 @@ GOOGLE OSS-FUZZ
   from a qpdf fork/branch rather than qpdf/master.
 
   python infra/helper.py build_image --pull qpdf
-  python infra/helper.py build_fuzzers [ --sanitizer memory|undefined|address qpdf
+  python infra/helper.py build_fuzzers [ --sanitizer memory|undefined|address ] qpdf
   python infra/helper.py check_build qpdf
   python infra/helper.py build_fuzzers --sanitizer coverage qpdf
   python infra/helper.py coverage qpdf
