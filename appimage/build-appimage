@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (c) 2019 Jay Berkenbilt and Kurt Pfeifle
+# Copyright (c) 2019-2020 Jay Berkenbilt and Kurt Pfeifle
 #
 # This script is mainly meant to build an 'AppImage' from GitHub
 # sources of QPDF via Travis CI on an Ubuntu Trusty (14.04) LTS system

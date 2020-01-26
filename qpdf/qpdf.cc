@@ -1132,7 +1132,7 @@ ArgParser::argCopyright()
     std::cout
         << whoami << " version " << QPDF::QPDFVersion() << std::endl
         << std::endl
-        << "Copyright (c) 2005-2019 Jay Berkenbilt"
+        << "Copyright (c) 2005-2020 Jay Berkenbilt"
         << std::endl
         << "QPDF is licensed under the Apache License, Version 2.0 (the \"License\");"
         << std::endl
