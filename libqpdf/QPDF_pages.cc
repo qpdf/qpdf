@@ -49,8 +49,36 @@ QPDF::getAllPages()
     {
         std::set<QPDFObjGen> visited;
         std::set<QPDFObjGen> seen;
-	getAllPagesInternal(getRoot().getKey("/Pages"), this->m->all_pages,
-                            visited, seen);
+        QPDFObjectHandle pages = getRoot().getKey("/Pages");
+        bool warned = false;
+        bool changed_pages = false;
+        while (pages.isDictionary() && pages.hasKey("/Parent"))
+        {
+            if (seen.count(pages.getObjGen()))
+            {
+                // loop -- will be detected again and reported later
+                break;
+            }
+            // Files have been found in the wild where /Pages in the
+            // catalog points to the first page. Try to work around
+            // this and similar cases with this heuristic.
+            if (! warned)
+            {
+                getRoot().warnIfPossible(
+                    "document page tree root (root -> /Pages) doesn't point"
+                    " to the root of the page tree; attempting to correct");
+                warned = true;
+            }
+            seen.insert(pages.getObjGen());
+            changed_pages = true;
+            pages = pages.getKey("/Parent");
+        }
+        if (changed_pages)
+        {
+            getRoot().replaceKey("/Pages", pages);
+        }
+        seen.clear();
+	getAllPagesInternal(pages, this->m->all_pages, visited, seen);
     }
     return this->m->all_pages;
 }

@@ -1,0 +1,2 @@
+WARNING: pages-is-page.pdf, object 1 0 at offset 19: document page tree root (root -> /Pages) doesn't point to the root of the page tree; attempting to correct
+qpdf: operation succeeded with warnings; resulting file may have some problems
