@@ -1,5 +1,9 @@
 2020-02-22  Jay Berkenbilt  <ejb@ql.org>
 
+	* Update pdf-set-form-values.cc to use and mention
+	generateAppearance, which hadn't been added when the example was
+	originally created.
+
 	* Detect, warn, and correct the case of /Pages in the document
 	catalog incorrectly pointing to a page or intermediate node
 	instead of the root of the pages tree. Fixes #398.
