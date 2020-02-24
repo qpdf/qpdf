@@ -68,6 +68,9 @@
 	Windows leaves it up to the executable to expand its own
 	wildcards. Fixes #224.
 
+	* Allow :even or :odd to be appended to numeric ranges for
+	--pages, --rotate, and other options that take page ranges.
+
 	* When reading /P from the encryption dictionary, use static_cast
 	instead of QIntC to convert the value to a signed integer. The
 	value of /P is a bit field, and PDF files have been found in the
