@@ -24,6 +24,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <memory>
+#include <cwchar>
 #ifdef _WIN32
 #include <windows.h>
 #include <direct.h>
@@ -2375,7 +2376,7 @@ QUtil::call_main_from_wmain(int argc, wchar_t* argv[], std::function<int(int, ch
     for (int i = 0; i < argc; ++i)
     {
         std::string utf16;
-        for (size_t j = 0; j < wcslen(argv[i]); ++j)
+        for (size_t j = 0; j < std::wcslen(argv[i]); ++j)
         {
             unsigned short codepoint = static_cast<unsigned short>(argv[i][j]);
             utf16.append(1, static_cast<char>(
