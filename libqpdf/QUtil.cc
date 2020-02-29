@@ -2366,6 +2366,7 @@ QUtil::possible_repaired_encodings(std::string supplied)
 int
 QUtil::call_main_from_wmain(int argc, wchar_t* argv[], std::function<int(int, char*[])> realmain)
 {
+#ifdef WINDOWS_WMAIN
     // argv contains UTF-16-encoded strings with a 16-bit wchar_t.
     // Convert this to UTF-8-encoded strings for compatibility with
     // other systems. That way the rest of qpdf.cc can just act like
@@ -2396,4 +2397,7 @@ QUtil::call_main_from_wmain(int argc, wchar_t* argv[], std::function<int(int, ch
     argc = QIntC::to_int(utf8_argv.size());
     new_argv[argc] = 0;
     return realmain(argc, new_argv);
+#else
+    return -1;
+#endif
 }
