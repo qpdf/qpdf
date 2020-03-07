@@ -753,10 +753,6 @@ QPDFPageObjectHelper::placeFormXObject(
     double xscale = rect_w / t_w;
     double yscale = rect_h / t_h;
     double scale = (xscale < yscale ? xscale : yscale);
-    if (scale > 1.0)
-    {
-        scale = 1.0;
-    }
 
     // Step 2: figure out what translation is required to get the
     // rectangle to the right spot: centered within the destination.
