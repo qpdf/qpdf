@@ -1599,12 +1599,17 @@ void
 ArgParser::argCompletionBash()
 {
     std::string progname = argv[0];
-    // Detect if we're in an AppImage and adjust
+    std::string executable;
     std::string appdir;
     std::string appimage;
-    if (QUtil::get_env("APPDIR", &appdir) &&
-        QUtil::get_env("APPIMAGE", &appimage))
+    if (QUtil::get_env("QPDF_EXECUTABLE", &executable))
     {
+        progname = executable;
+    }
+    else if (QUtil::get_env("APPDIR", &appdir) &&
+             QUtil::get_env("APPIMAGE", &appimage))
+    {
+        // Detect if we're in an AppImage and adjust
         if ((appdir.length() < strlen(argv[0])) &&
             (strncmp(appdir.c_str(), argv[0], appdir.length()) == 0))
         {

@@ -593,6 +593,14 @@ make
     path, it will warn you, and the completion won't work if you're in
     a different directory.
    </para>
+   <para>
+    qpdf will use <literal>argv[0]</literal> to figure out where its
+    executable is. This may produce unwanted results in some cases,
+    especially if you are trying to use completion with copy of qpdf
+    that is built from source. You can specify a full path to the qpdf
+    you want to use for completion in the
+    <literal>QPDF_EXECUTABLE</literal> environment variable.
+   </para>
   </sect1>
   <sect1 id="ref.basic-options">
    <title>Basic Options</title>
