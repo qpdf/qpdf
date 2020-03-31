@@ -568,6 +568,29 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
             {
                 dict.removeKey(*k_iter);
             }
+            QPDFObjectHandle resource = dict.getKey(*k_iter);
+            if (resource.isStream() &&
+                resource.getDict().getKey("/Type").isName() &&
+                ("/XObject" == resource.getDict().getKey("/Type").getName()) &&
+                resource.getDict().getKey("/Subtype").isName() &&
+                ("/Form" == resource.getDict().getKey("/Subtype").getName()))
+            {
+                QTC::TC("qpdf", "QPDFPageObjectHelper filter form xobject");
+                removeUnreferencedResourcesHelper(
+                    resource.getDict(), seen,
+                    [&resource]() {
+                        auto result = resource.getDict().getKey("/Resources");
+                        if (result.isDictionary())
+                        {
+                            result = result.shallowCopy();
+                            resource.getDict().replaceKey("/Resources", result);
+                        }
+                        return result;
+                    },
+                    [&resource](QPDFObjectHandle::TokenFilter* f) {
+                        resource.filterAsContents(f);
+                    });
+            }
         }
     }
 }

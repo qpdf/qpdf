@@ -1,5 +1,9 @@
 2020-03-31  Jay Berkenbilt  <ejb@ql.org>
 
+	* When detecting unreferenced images during page splitting, if any
+	XObjects are form XObjects, recursively descend into them and
+	remove any unreferenced objects from them too. Fixes #373.
+
 	* Add QPDFObjectHandle::filterAsContents, which filters a stream's
 	data as if it were page contents. This can be useful to filter
 	form XObjects the same way we would filter page contents.
