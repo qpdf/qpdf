@@ -28,6 +28,7 @@
 #include <qpdf/DLL.h>
 
 #include <qpdf/QPDFObjectHandle.hh>
+#include <functional>
 
 class QPDFPageObjectHelper: public QPDFObjectHelper
 {
@@ -231,6 +232,12 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
         bool invert_transformations = true);
 
   private:
+    static void
+    removeUnreferencedResourcesHelper(
+        QPDFObjectHandle oh, std::set<QPDFObjGen>& seen,
+        std::function<QPDFObjectHandle()> get_resource,
+        std::function<void(QPDFObjectHandle::TokenFilter*)> filter_content);
+
     class Members
     {
         friend class QPDFPageObjectHelper;

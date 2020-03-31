@@ -1630,6 +1630,16 @@ QPDFObjectHandle::filterPageContents(TokenFilter* filter, Pipeline* next)
 }
 
 void
+QPDFObjectHandle::filterAsContents(TokenFilter* filter, Pipeline* next)
+{
+    std::string description = "token filter for object " +
+        QUtil::int_to_string(this->m->objid) + " " +
+        QUtil::int_to_string(this->m->generation);
+    Pl_QPDFTokenizer token_pipeline(description.c_str(), filter, next);
+    this->pipeStreamData(&token_pipeline, 0, qpdf_dl_specialized);
+}
+
+void
 QPDFObjectHandle::parseContentStream(QPDFObjectHandle stream_or_array,
                                      ParserCallbacks* callbacks)
 {

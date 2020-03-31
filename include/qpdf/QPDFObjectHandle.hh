@@ -400,6 +400,12 @@ class QPDFObjectHandle
     void addContentTokenFilter(PointerHolder<TokenFilter> token_filter);
     // End legacy content stream helpers
 
+    // Called on a stream to filter the stream as if it were page
+    // contents. This can be used to apply a TokenFilter to a form
+    // XObject, whose data is in the same format as a content stream.
+    QPDF_DLL
+    void filterAsContents(TokenFilter* filter, Pipeline* next = 0);
+
     // Type-specific factories
     QPDF_DLL
     static QPDFObjectHandle newNull();

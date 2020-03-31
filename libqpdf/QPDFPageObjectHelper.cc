@@ -511,16 +511,24 @@ NameWatcher::handleToken(QPDFTokenizer::Token const& token)
 }
 
 void
-QPDFPageObjectHelper::removeUnreferencedResources()
+QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
+    QPDFObjectHandle oh, std::set<QPDFObjGen>& seen,
+    std::function<QPDFObjectHandle()> get_resource,
+    std::function<void(QPDFObjectHandle::TokenFilter*)> filter_content)
 {
+    if (seen.count(oh.getObjGen()))
+    {
+        return;
+    }
+    seen.insert(oh.getObjGen());
     NameWatcher nw;
     try
     {
-        filterPageContents(&nw);
+        filter_content(&nw);
     }
     catch (std::exception& e)
     {
-        this->oh.warnIfPossible(
+        oh.warnIfPossible(
             std::string("Unable to parse content stream: ") + e.what() +
             "; not attempting to remove unreferenced objects from this page");
         return;
@@ -528,7 +536,7 @@ QPDFPageObjectHelper::removeUnreferencedResources()
     if (nw.saw_bad)
     {
         QTC::TC("qpdf", "QPDFPageObjectHelper bad token finding names");
-        this->oh.warnIfPossible(
+        oh.warnIfPossible(
             "Bad token found while scanning content stream; "
             "not attempting to remove unreferenced objects from this page");
         return;
@@ -541,7 +549,7 @@ QPDFPageObjectHelper::removeUnreferencedResources()
     std::vector<std::string> to_filter;
     to_filter.push_back("/Font");
     to_filter.push_back("/XObject");
-    QPDFObjectHandle resources = getAttribute("/Resources", true);
+    QPDFObjectHandle resources = get_resource();
     for (std::vector<std::string>::iterator d_iter = to_filter.begin();
          d_iter != to_filter.end(); ++d_iter)
     {
@@ -562,6 +570,18 @@ QPDFPageObjectHelper::removeUnreferencedResources()
             }
         }
     }
+}
+
+void
+QPDFPageObjectHelper::removeUnreferencedResources()
+{
+    std::set<QPDFObjGen> seen;
+    removeUnreferencedResourcesHelper(
+        this->oh, seen,
+        [this]() { return this->getAttribute("/Resources", true); },
+        [this](QPDFObjectHandle::TokenFilter* f) {
+            this->filterPageContents(f);
+        });
 }
 
 QPDFPageObjectHelper
