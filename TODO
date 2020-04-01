@@ -1,3 +1,24 @@
+Next
+====
+
+* See about having a "streams" in the json.
+
+* Consider this approach for deciding on the default for looking for
+  unreferenced objects.
+
+  * If /Resources appears on any non-leave page tree nodes: true
+  * Else
+    * Make a table mapping /Resources or /XObject dictionaries to
+      pages that reference them:
+      * If /Resources is indirect, add to table
+      * If /Resources./XObject is indirect, add to table
+      * For each object in /XObject
+        * If it is a form xobject, repeat for form xobject
+    * If at any time during the process of creating this table we
+      discover a /Resources or /XObject dictionary that is used by
+      more than one page, stop and set the default to true.
+
+
 Fuzz Errors
 ===========
 
