@@ -2055,9 +2055,11 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 
           case st_dictionary:
           case st_array:
+if (false) { // QXXXQ
             setObjectDescriptionFromInput(
                 object, context, object_description, input,
                 input->getLastOffset());
+} // QXXXQ
             object.setParsedOffset(input->getLastOffset());
             set_offset = true;
             olist.append(object);
@@ -2084,8 +2086,10 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
                 // There's no newArray(SparseOHArray) since
                 // SparseOHArray is not part of the public API.
                 object = QPDFObjectHandle(new QPDF_Array(olist));
+if (false) { // QXXXQ
                 setObjectDescriptionFromInput(
                     object, context, object_description, input, offset);
+} // QXXXQ
                 // The `offset` points to the next of "[". Set the
                 // rewind offset to point to the beginning of "[".
                 // This has been explicitly tested with whitespace
@@ -2150,8 +2154,10 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
                                  "dictionary ended prematurely; "
                                  "using null as value for last key"));
                         val = newNull();
+if (false) { // QXXXQ
                         setObjectDescriptionFromInput(
                             val, context, object_description, input, offset);
+} // QXXXQ
                     }
                     else
                     {
@@ -2183,8 +2189,10 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 		    dict["/Contents"].setParsedOffset(contents_offset);
 		}
                 object = newDictionary(dict);
+if (false) { // QXXXQ
                 setObjectDescriptionFromInput(
                     object, context, object_description, input, offset);
+} // QXXXQ
                 // The `offset` points to the next of "<<". Set the
                 // rewind offset to point to the beginning of "<<".
                 // This has been explicitly tested with whitespace
@@ -2211,8 +2219,10 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 
     if (! set_offset)
     {
+if (false) { // QXXXQ
         setObjectDescriptionFromInput(
             object, context, object_description, input, offset);
+} // QXXXQ
         object.setParsedOffset(offset);
     }
     return object;
@@ -2442,10 +2452,12 @@ void
 QPDFObjectHandle::setObjectDescription(QPDF* owning_qpdf,
                                        std::string const& object_description)
 {
+if (false) { // QXXXQ
     if (isInitialized() && this->obj.getPointer())
     {
         this->obj->setDescription(owning_qpdf, object_description);
     }
+} // QXXXQ
 }
 
 bool
