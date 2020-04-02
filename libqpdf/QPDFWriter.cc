@@ -1502,12 +1502,14 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
     else if (object.isDictionary())
     {
         // Make a shallow copy of this object so we can modify it
-        // safely without affecting the original.  This code makes
+        // safely without affecting the original. This code makes
         // assumptions about things that are made true in
         // prepareFileForWrite, such as that certain things are direct
         // objects so that replacing them doesn't leave unreferenced
-        // objects in the output.
-        object = object.shallowCopy();
+        // objects in the output. We can use unsafeShallowCopy here
+        // because we are all we are doing is removing or replacing
+        // top-level keys.
+        object = object.unsafeShallowCopy();
 
         // Handle special cases for specific dictionaries.
 
@@ -2413,7 +2415,7 @@ QPDFWriter::getTrimmedTrailer()
     // Remove keys from the trailer that necessarily have to be
     // replaced when writing the file.
 
-    QPDFObjectHandle trailer = this->m->pdf.getTrailer().shallowCopy();
+    QPDFObjectHandle trailer = this->m->pdf.getTrailer().unsafeShallowCopy();
 
     // Remove encryption keys
     trailer.removeKey("/ID");
