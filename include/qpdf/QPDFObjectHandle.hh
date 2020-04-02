@@ -251,10 +251,10 @@ class QPDFObjectHandle
     QPDF_DLL
     QPDFObjectHandle();
     QPDF_DLL
-    QPDFObjectHandle(QPDFObjectHandle const&);
+    QPDFObjectHandle(QPDFObjectHandle const&) = default;
     QPDF_DLL
     QPDFObjectHandle&
-    operator=(QPDFObjectHandle const&);
+    operator=(QPDFObjectHandle const&) = default;
     QPDF_DLL
     bool isInitialized() const;
 
@@ -957,7 +957,7 @@ class QPDFObjectHandle
 	static PointerHolder<QPDFObject> getObject(QPDFObjectHandle& o)
 	{
 	    o.dereference();
-	    return o.m->obj;
+	    return o.obj;
 	}
     };
     friend class ObjAccessor;
@@ -1077,29 +1077,16 @@ class QPDFObjectHandle
         std::string const& description, std::string& all_description);
     static void warn(QPDF*, QPDFExc const&);
 
-    class Members
-    {
-        friend class ObjAccessor;
-        friend class QPDFObjectHandle;
+    bool initialized;
 
-      public:
-        QPDF_DLL
-        ~Members();
-
-      private:
-        Members();
-        Members(QPDF* qpdf, int objid, int generation);
-        Members(QPDFObject* data);
-
-        bool initialized;
-
-        QPDF* qpdf;
-        int objid;			// 0 for direct object
-        int generation;
-        PointerHolder<QPDFObject> obj;
-        bool reserved;
-    };
-    PointerHolder<Members> m;
+    // Moving members of QPDFObjectHandle into a smart pointer incurs
+    // a substantial performance penalty since QPDFObjectHandle
+    // objects are copied around so frequently.
+    QPDF* qpdf;
+    int objid;			// 0 for direct object
+    int generation;
+    PointerHolder<QPDFObject> obj;
+    bool reserved;
 };
 
 #endif // QPDFOBJECTHANDLE_HH

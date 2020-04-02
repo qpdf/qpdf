@@ -1,3 +1,9 @@
+2020-04-02  Jay Berkenbilt  <ejb@ql.org>
+
+	* Remove Members class indirection for QPDFObjectHandle. Those are
+	copied and assigned too often, and that change caused a very
+	substantial performance hit.
+
 2020-03-31  Jay Berkenbilt  <ejb@ql.org>
 
 	* When detecting unreferenced images during page splitting, if any
