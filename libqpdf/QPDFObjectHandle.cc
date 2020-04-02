@@ -2461,6 +2461,23 @@ QPDFObjectHandle::hasObjectDescription()
 QPDFObjectHandle
 QPDFObjectHandle::shallowCopy()
 {
+    QPDFObjectHandle result;
+    shallowCopyInternal(result, false);
+    return result;
+}
+
+QPDFObjectHandle
+QPDFObjectHandle::unsafeShallowCopy()
+{
+    QPDFObjectHandle result;
+    shallowCopyInternal(result, true);
+    return result;
+}
+
+void
+QPDFObjectHandle::shallowCopyInternal(QPDFObjectHandle& new_obj,
+                                      bool first_level_only)
+{
     assertInitialized();
 
     if (isStream())
@@ -2470,7 +2487,6 @@ QPDFObjectHandle::shallowCopy()
 	    "attempt to make a shallow copy of a stream");
     }
 
-    QPDFObjectHandle new_obj;
     if (isArray())
     {
 	QTC::TC("qpdf", "QPDFObjectHandle shallow copy array");
@@ -2491,13 +2507,12 @@ QPDFObjectHandle::shallowCopy()
     }
 
     std::set<QPDFObjGen> visited;
-    new_obj.copyObject(visited, false);
-    return new_obj;
+    new_obj.copyObject(visited, false, first_level_only);
 }
 
 void
 QPDFObjectHandle::copyObject(std::set<QPDFObjGen>& visited,
-                             bool cross_indirect)
+                             bool cross_indirect, bool first_level_only)
 {
     assertInitialized();
 
@@ -2573,9 +2588,11 @@ QPDFObjectHandle::copyObject(std::set<QPDFObjGen>& visited,
 	for (int i = 0; i < n; ++i)
 	{
 	    items.push_back(getArrayItem(i));
-            if (cross_indirect || (! items.back().isIndirect()))
+            if ((! first_level_only) &&
+                (cross_indirect || (! items.back().isIndirect())))
             {
-                items.back().copyObject(visited, cross_indirect);
+                items.back().copyObject(
+                    visited, cross_indirect, first_level_only);
             }
 	}
 	new_obj = new QPDF_Array(items);
@@ -2589,9 +2606,11 @@ QPDFObjectHandle::copyObject(std::set<QPDFObjGen>& visited,
 	     iter != keys.end(); ++iter)
 	{
 	    items[*iter] = getKey(*iter);
-            if (cross_indirect || (! items[*iter].isIndirect()))
+            if ((! first_level_only) &&
+                (cross_indirect || (! items[*iter].isIndirect())))
             {
-                items[*iter].copyObject(visited, cross_indirect);
+                items[*iter].copyObject(
+                    visited, cross_indirect, first_level_only);
             }
 	}
 	new_obj = new QPDF_Dictionary(items);
@@ -2614,7 +2633,7 @@ void
 QPDFObjectHandle::makeDirect()
 {
     std::set<QPDFObjGen> visited;
-    copyObject(visited, true);
+    copyObject(visited, true, false);
 }
 
 void

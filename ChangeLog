@@ -1,5 +1,9 @@
 2020-04-02  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add method QPDFObjectHandle::unsafeShallowCopy for copying only
+	top-level dictionary keys or array items. See comments in
+	QPDFObjectHandle.hh for when this should be used.
+
 	* Remove Members class indirection for QPDFObjectHandle. Those are
 	copied and assigned too often, and that change caused a very
 	substantial performance hit.

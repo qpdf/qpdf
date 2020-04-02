@@ -670,9 +670,23 @@ class QPDFObjectHandle
     // traverse across indirect object boundaries. That means that,
     // for dictionaries and arrays, any keys or items that were
     // indirect objects will still be indirect objects that point to
-    // the same place.
+    // the same place. In the strictest sense, this is not a shallow
+    // copy because it recursively descends arrays and dictionaries;
+    // it just doesn't cross over indirect objects. See also
+    // unsafeShallowCopy().
     QPDF_DLL
     QPDFObjectHandle shallowCopy();
+
+    // Create a true shallow copy of an array or dictionary, just
+    // copying the immediate items (array) or keys (dictionary). This
+    // is "unsafe" because, if you *modify* any of the items in the
+    // copy, you are modifying the original, which is almost never
+    // what you want. However, if your intention is merely to
+    // *replace* top-level items or keys and not to modify lower-level
+    // items in the copy, this method is much faster than
+    // shallowCopy().
+    QPDF_DLL
+    QPDFObjectHandle unsafeShallowCopy();
 
     // Mutator methods.  Use with caution.
 
@@ -1053,7 +1067,9 @@ class QPDFObjectHandle
     void objectWarning(std::string const& warning);
     void assertType(char const* type_name, bool istype);
     void dereference();
-    void copyObject(std::set<QPDFObjGen>& visited, bool cross_indirect);
+    void copyObject(std::set<QPDFObjGen>& visited, bool cross_indirect,
+                    bool first_level_only);
+    void shallowCopyInternal(QPDFObjectHandle& oh, bool first_level_only);
     void releaseResolved();
     static void setObjectDescriptionFromInput(
         QPDFObjectHandle, QPDF*, std::string const&,
