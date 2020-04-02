@@ -24,7 +24,6 @@
 
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
-#include <qpdf/PointerHolder.hh>
 #include <qpdf/JSON.hh>
 
 #include <string>
@@ -100,21 +99,12 @@ class QPDFObject
     virtual void releaseResolved() {}
 
   private:
-    QPDFObject(QPDFObject const&);
-    QPDFObject& operator=(QPDFObject const&);
-    class Members
-    {
-        friend class QPDFObject;
-      public:
-        QPDF_DLL
-        ~Members();
-      private:
-        Members();
-        QPDF* owning_qpdf;
-        std::string object_description;
-        qpdf_offset_t parsed_offset;
-    };
-    PointerHolder<Members> m;
+    QPDFObject(QPDFObject const&) = delete;
+    QPDFObject& operator=(QPDFObject const&) = delete;
+
+    QPDF* owning_qpdf;
+    std::string object_description;
+    qpdf_offset_t parsed_offset;
 };
 
 #endif // QPDFOBJECT_HH
