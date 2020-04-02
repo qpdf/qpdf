@@ -156,7 +156,7 @@ QPDF::Members::Members() :
     immediate_copy_from(false),
     in_parse(false),
     parsed(false),
-    use_object_descriptions(false),
+    use_object_descriptions(true),
     first_xref_item_offset(0),
     uncompressed_after_compressed(false)
 {

@@ -189,10 +189,13 @@ QPDFObjectHandle::setObjectDescriptionFromInput(
     std::string const& description, PointerHolder<InputSource> input,
     qpdf_offset_t offset)
 {
-    object.setObjectDescription(
-        context,
-        input->getName() + ", " + description +
-        " at offset " + QUtil::int_to_string(offset));
+    if (context && context->usingObjectDescriptions())
+    {
+        object.setObjectDescription(
+            context,
+            input->getName() + ", " + description +
+            " at offset " + QUtil::int_to_string(offset));
+    }
 }
 
 bool
@@ -2055,11 +2058,9 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
 
           case st_dictionary:
           case st_array:
-if (false) { // QXXXQ
             setObjectDescriptionFromInput(
                 object, context, object_description, input,
                 input->getLastOffset());
-} // QXXXQ
             object.setParsedOffset(input->getLastOffset());
             set_offset = true;
             olist.append(object);
@@ -2086,10 +2087,8 @@ if (false) { // QXXXQ
                 // There's no newArray(SparseOHArray) since
                 // SparseOHArray is not part of the public API.
                 object = QPDFObjectHandle(new QPDF_Array(olist));
-if (false) { // QXXXQ
                 setObjectDescriptionFromInput(
                     object, context, object_description, input, offset);
-} // QXXXQ
                 // The `offset` points to the next of "[". Set the
                 // rewind offset to point to the beginning of "[".
                 // This has been explicitly tested with whitespace
@@ -2154,10 +2153,8 @@ if (false) { // QXXXQ
                                  "dictionary ended prematurely; "
                                  "using null as value for last key"));
                         val = newNull();
-if (false) { // QXXXQ
                         setObjectDescriptionFromInput(
                             val, context, object_description, input, offset);
-} // QXXXQ
                     }
                     else
                     {
@@ -2189,10 +2186,8 @@ if (false) { // QXXXQ
 		    dict["/Contents"].setParsedOffset(contents_offset);
 		}
                 object = newDictionary(dict);
-if (false) { // QXXXQ
                 setObjectDescriptionFromInput(
                     object, context, object_description, input, offset);
-} // QXXXQ
                 // The `offset` points to the next of "<<". Set the
                 // rewind offset to point to the beginning of "<<".
                 // This has been explicitly tested with whitespace
@@ -2219,10 +2214,8 @@ if (false) { // QXXXQ
 
     if (! set_offset)
     {
-if (false) { // QXXXQ
         setObjectDescriptionFromInput(
             object, context, object_description, input, offset);
-} // QXXXQ
         object.setParsedOffset(offset);
     }
     return object;
@@ -2452,12 +2445,11 @@ void
 QPDFObjectHandle::setObjectDescription(QPDF* owning_qpdf,
                                        std::string const& object_description)
 {
-if (false) { // QXXXQ
-    if (isInitialized() && this->obj.getPointer())
+    if (owning_qpdf && owning_qpdf->usingObjectDescriptions() &&
+        isInitialized() && this->obj.getPointer())
     {
         this->obj->setDescription(owning_qpdf, object_description);
     }
-} // QXXXQ
 }
 
 bool
