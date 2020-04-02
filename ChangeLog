@@ -1,5 +1,13 @@
 2020-04-02  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add option --no-object-descriptions and method
+	QPDF::useObjectDescriptions. By default, qpdf attaches a detailed
+	description to each object, which enables warnings and error
+	messages to point to the specific place in the object or the file
+	where the problem occurs. This option suppresses that behavior,
+	which increases performance by about 7% at the expense of
+	providing better error messages.
+
 	* Add method QPDFObjectHandle::unsafeShallowCopy for copying only
 	top-level dictionary keys or array items. See comments in
 	QPDFObjectHandle.hh for when this should be used.

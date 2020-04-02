@@ -142,6 +142,7 @@ struct Options
         object_stream_set(false),
         object_stream_mode(qpdf_o_preserve),
         ignore_xref_streams(false),
+        no_object_descriptions(false),
         qdf_mode(false),
         preserve_unreferenced_objects(false),
         preserve_unreferenced_page_resources(false),
@@ -241,6 +242,7 @@ struct Options
     bool object_stream_set;
     qpdf_object_stream_e object_stream_mode;
     bool ignore_xref_streams;
+    bool no_object_descriptions;
     bool qdf_mode;
     bool preserve_unreferenced_objects;
     bool preserve_unreferenced_page_resources;
@@ -736,6 +738,7 @@ class ArgParser
     void argSuppressRecovery();
     void argObjectStreams(char* parameter);
     void argIgnoreXrefStreams();
+    void argNoObjectDescriptions();
     void argQdf();
     void argPreserveUnreferenced();
     void argPreserveUnreferencedResources();
@@ -965,6 +968,7 @@ ArgParser::initOptionTable()
     (*t)["object-streams"] = oe_requiredChoices(
         &ArgParser::argObjectStreams, object_streams_choices);
     (*t)["ignore-xref-streams"] = oe_bare(&ArgParser::argIgnoreXrefStreams);
+    (*t)["no-object-descriptions"] = oe_bare(&ArgParser::argNoObjectDescriptions);
     (*t)["qdf"] = oe_bare(&ArgParser::argQdf);
     (*t)["preserve-unreferenced"] = oe_bare(
         &ArgParser::argPreserveUnreferenced);
@@ -1440,6 +1444,9 @@ ArgParser::argHelp()
         << "\n"
         << "--suppress-recovery       prevents qpdf from attempting to recover damaged files\n"
         << "--ignore-xref-streams     tells qpdf to ignore any cross-reference streams\n"
+        << "--no-object-descriptions  prevents creation of detailed object descriptions\n"
+        << "                          in error messages; saves some time that may matter\n"
+        << "                          for long-running operations on large files\n"
         << "\n"
         << "\n"
         << "Advanced Transformation Options\n"
@@ -1956,6 +1963,12 @@ void
 ArgParser::argIgnoreXrefStreams()
 {
     o.ignore_xref_streams = true;
+}
+
+void
+ArgParser::argNoObjectDescriptions()
+{
+    o.no_object_descriptions = true;
 }
 
 void
@@ -3382,6 +3395,10 @@ static void set_qpdf_options(QPDF& pdf, Options& o)
     if (o.ignore_xref_streams)
     {
         pdf.setIgnoreXRefStreams(true);
+    }
+    if (o.no_object_descriptions)
+    {
+        pdf.useObjectDescriptions(false);
     }
     if (o.suppress_recovery)
     {
