@@ -1,7 +1,7 @@
 #include <qpdf/QPDFObject.hh>
 
 QPDFObject::QPDFObject() :
-    owning_qpdf(0),
+///    owning_qpdf(0),
     parsed_offset(-1)
 {
 }
@@ -9,22 +9,24 @@ QPDFObject::QPDFObject() :
 void
 QPDFObject::setDescription(QPDF* qpdf, std::string const& description)
 {
-    this->owning_qpdf = qpdf;
-    this->object_description = description;
+///    this->owning_qpdf = qpdf;
+///    this->object_description = description;
 }
 
 bool
 QPDFObject::getDescription(QPDF*& qpdf, std::string& description)
 {
-    qpdf = this->owning_qpdf;
-    description = this->object_description;
-    return this->owning_qpdf != 0;
+///    qpdf = this->owning_qpdf;
+///    description = this->object_description;
+///    return this->owning_qpdf != 0;
+    return false;
 }
 
 bool
 QPDFObject::hasDescription()
 {
-    return this->owning_qpdf != 0;
+///    return this->owning_qpdf != 0;
+    return false;
 }
 
 void
