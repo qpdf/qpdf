@@ -156,6 +156,7 @@ QPDF::Members::Members() :
     immediate_copy_from(false),
     in_parse(false),
     parsed(false),
+    use_object_descriptions(false),
     first_xref_item_offset(0),
     uncompressed_after_compressed(false)
 {
@@ -288,6 +289,18 @@ void
 QPDF::setImmediateCopyFrom(bool val)
 {
     this->m->immediate_copy_from = val;
+}
+
+void
+QPDF::useObjectDescriptions(bool val)
+{
+    this->m->use_object_descriptions = val;
+}
+
+bool
+QPDF::usingObjectDescriptions() const
+{
+    return this->m->use_object_descriptions;
 }
 
 std::vector<QPDFExc>

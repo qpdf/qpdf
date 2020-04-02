@@ -204,6 +204,13 @@ class QPDF
     QPDF_DLL
     void setImmediateCopyFrom(bool);
 
+    // QXXXQ
+    QPDF_DLL
+    void useObjectDescriptions(bool);
+
+    QPDF_DLL
+    bool usingObjectDescriptions() const;
+
     // Other public methods
 
     // Return the list of warnings that have been issued so far and
@@ -1403,6 +1410,7 @@ class QPDF
         bool immediate_copy_from;
         bool in_parse;
         bool parsed;
+        bool use_object_descriptions;
 
         // Linearization data
         qpdf_offset_t first_xref_item_offset; // actual value from file
