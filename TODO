@@ -10,7 +10,8 @@ Fuzz Errors
     call to releaseResolved.
 
 * Ignoring these:
-  * Problems inside the jpeg library: 15470, 15751, 18633, 18732, 18745
+  * Problems inside the jpeg library: 15470, 15751, 18633, 18732,
+    18745, 20391
   * Timeout: 15471, 17630
 
 ABI Changes
