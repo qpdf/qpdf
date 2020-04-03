@@ -724,11 +724,12 @@ std::string
 QPDFPageObjectHelper::placeFormXObject(
     QPDFObjectHandle fo, std::string const& name,
     QPDFObjectHandle::Rectangle rect,
-    bool invert_transformations)
+    bool invert_transformations,
+    bool allow_shrink, bool allow_expand)
 {
     // Calculate the transformation matrix that will place the given
-    // form XObject fully inside the given rectangle, shrinking and
-    // centering if needed.
+    // form XObject fully inside the given rectangle, center and
+    // shrinking or expanding as needed if requested.
 
     // When rendering a form XObject, the transformation in the
     // graphics state (cm) is applied first (of course -- when it is
@@ -797,7 +798,17 @@ QPDFPageObjectHelper::placeFormXObject(
     double scale = (xscale < yscale ? xscale : yscale);
     if (scale > 1.0)
     {
-        scale = 1.0;
+        if (! allow_expand)
+        {
+            scale = 1.0;
+        }
+    }
+    else if (scale < 1.0)
+    {
+        if (! allow_shrink)
+        {
+            scale = 1.0;
+        }
     }
 
     // Step 2: figure out what translation is required to get the

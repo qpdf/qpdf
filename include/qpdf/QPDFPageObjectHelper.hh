@@ -209,27 +209,33 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
 
     // Return content stream text that will place the given form
     // XObject (fo) using the resource name "name" on this page
-    // centered within the given rectangle and shrunk to fit if
-    // necessary. If invert_transformations is true, the effect of any
-    // rotation (/Rotate) and scaling (/UserUnit) applied to the
-    // current page will be inverted in the form XObject placement.
-    // This will cause the form XObject's absolute orientation to be
-    // preserved. You could overlay one page on another by calling
-    // getFormXObjectForPage on the original page,
-    // QPDFObjectHandle::getUniqueResourceName on the destination
-    // page's Resources dictionary to generate a name for the
-    // resulting object, and calling placeFormXObject on the
+    // centered within the given rectangle. If invert_transformations
+    // is true, the effect of any rotation (/Rotate) and scaling
+    // (/UserUnit) applied to the current page will be inverted in the
+    // form XObject placement. This will cause the form XObject's
+    // absolute orientation to be preserved. You could overlay one
+    // page on another by calling getFormXObjectForPage on the
+    // original page, QPDFObjectHandle::getUniqueResourceName on the
+    // destination page's Resources dictionary to generate a name for
+    // the resulting object, and calling placeFormXObject on the
     // destination page. Then insert the new fo (or, if it comes from
     // a different file, the result of calling copyForeignObject on
     // it) into the resources dictionary using name, and append or
     // prepend the content to the page's content streams. See the
     // overlay/underlay code in qpdf.cc or
-    // examples/pdf-overlay-page.cc for an example.
+    // examples/pdf-overlay-page.cc for an example. From qpdf 10.0.0,
+    // the allow_shrink and allow_expand parameters control whether
+    // the form XObject is allowed to be shrunk or expanded to stay
+    // within or maximally fill the destination rectangle. The default
+    // values are for backward compatibility with the pre-10.0.0
+    // behavior.
     QPDF_DLL
     std::string placeFormXObject(
         QPDFObjectHandle fo, std::string const& name,
         QPDFObjectHandle::Rectangle rect,
-        bool invert_transformations = true);
+        bool invert_transformations = true,
+        bool allow_shrink = true,
+        bool allow_expand = false);
 
   private:
     static void

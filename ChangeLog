@@ -1,3 +1,11 @@
+2020-04-03  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add two extra optional arguments to
+	QPDFPageObjectHelper::placeFormXObject to control whether the
+	placed item is allowed to be shrunk or expanded to fit within or
+	maximally fill the destination rectangle. Prior to this change,
+	placeFormXObject might shrink it but would never expand it.
+
 2020-04-02  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add method QPDFObjectHandle::unsafeShallowCopy for copying only

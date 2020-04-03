@@ -412,7 +412,7 @@ foreach my $i (@choice_values)
 show_ntests();
 # ----------
 $td->notify("--- Form XObject, underlay, overlay ---");
-$n_tests += 10;
+$n_tests += 18;
 
 $td->runtest("form xobject creation",
              {$td->COMMAND => "test_driver 55 fxo-red.pdf"},
@@ -427,6 +427,19 @@ foreach (my $i = 56; $i <= 59; ++$i)
     # the resulting files should look like.
     $td->runtest("overlay transformations",
                  {$td->COMMAND => "test_driver $i fxo-red.pdf fxo-blue.pdf"},
+                 {$td->STRING => "test $i done\n", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("compare files",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => "fx-overlay-$i.pdf"});
+}
+foreach (my $i = 64; $i <= 67; ++$i)
+{
+    # See comments in test_driver.cc for a verbal description of what
+    # the resulting files should look like.
+    $td->runtest("overlay shrink/expand",
+                 {$td->COMMAND =>
+                      "test_driver $i fxo-bigsmall.pdf fxo-smallbig.pdf"},
                  {$td->STRING => "test $i done\n", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
     $td->runtest("compare files",

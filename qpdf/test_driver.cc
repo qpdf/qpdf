@@ -2116,6 +2116,57 @@ void runtest(int n, char const* filename1, char const* arg2)
         w.setOutputFilename("a.pdf");
         w.write();
     }
+    else if ((n >= 64) && (n <= 67))
+    {
+        // Placing form XObjects: expand, shrink
+        assert(arg2);
+        QPDF pdf2;
+        pdf2.processFile(arg2);
+
+        // Overlay file2 on file1.
+        // 64: allow neither shrink nor shrink
+        // 65: allow shrink but not expand
+        // 66: allow expand but not shrink
+        // 67: allow both shrink and expand
+        bool allow_shrink = ((n == 65) || (n == 67));
+        bool allow_expand = ((n == 66) || (n == 67));
+        std::vector<QPDFPageObjectHelper> pages1 =
+            QPDFPageDocumentHelper(pdf).getAllPages();
+        std::vector<QPDFPageObjectHelper> pages2 =
+            QPDFPageDocumentHelper(pdf2).getAllPages();
+        size_t npages = (pages1.size() < pages2.size()
+                         ? pages1.size() : pages2.size());
+        for (size_t i = 0; i < npages; ++i)
+        {
+            QPDFPageObjectHelper& ph1 = pages1.at(i);
+            QPDFPageObjectHelper& ph2 = pages2.at(i);
+            QPDFObjectHandle fo = pdf.copyForeignObject(
+                ph2.getFormXObjectForPage());
+            int min_suffix = 1;
+            QPDFObjectHandle resources = ph1.getAttribute("/Resources", true);
+            std::string name = resources.getUniqueResourceName(
+                "/Fx", min_suffix);
+            std::string content =
+                ph1.placeFormXObject(
+                    fo, name, ph1.getTrimBox().getArrayAsRectangle(),
+                    false, allow_shrink, allow_expand);
+            if (! content.empty())
+            {
+                resources.mergeResources(
+                    QPDFObjectHandle::parse("<< /XObject << >> >>"));
+                resources.getKey("/XObject").replaceKey(name, fo);
+                ph1.addPageContents(
+                    QPDFObjectHandle::newStream(&pdf, "q\n"), true);
+                ph1.addPageContents(
+                    QPDFObjectHandle::newStream(&pdf, "\nQ\n" + content),
+                    false);
+            }
+        }
+        QPDFWriter w(pdf, "a.pdf");
+	w.setQDFMode(true);
+        w.setStaticID(true);
+        w.write();
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +
