@@ -58,7 +58,6 @@ C++-11
   definitely break binary compatibility as the PointerHolder<Members>
   pattern is part of the ABI for almost every class.
 
-
 Page splitting/merging
 ======================
 
@@ -208,6 +207,26 @@ Future ideas:
 Also, it turns out that PointerHolder is more performant than
 std::shared_ptr.
 
+Analytics
+=========
+
+Consider features that make it easier to detect certain patterns in
+PDF files. The information below could be computed using an external
+program that reads the existing json, but if it's useful enough, we
+could add it directly to the json output.
+
+ * Add to "pages" in the json:
+   * "inheritsresources": bool; whether there are any inherited
+     attributes from ancestor page tree nodes
+   * "sharedresources": a list of indirect objects that are
+     "/Resources" dictionaries or "XObject" resource dictionary subkeys
+     of either the page itself or of any form XObject referenced by the
+     page.
+
+ * Add to "objectinfo" in json: "directpagerefcount": the number of
+   pages that directly reference this object (i.e., you can find an
+   indirect reference to the object in the page dictionary without
+   traversing over any indirect objects)
 
 General
 =======
