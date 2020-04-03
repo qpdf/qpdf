@@ -78,8 +78,8 @@ class PointerHolder
 	bool array;
 	int refcount;
       private:
-	Data(Data const&);
-	Data& operator=(Data const&);
+	Data(Data const&) = delete;
+	Data& operator=(Data const&) = delete;
     };
 
   public:

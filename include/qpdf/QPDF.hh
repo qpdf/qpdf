@@ -393,8 +393,8 @@ class QPDF
                                        std::string const& Perms);
 
       private:
-        EncryptionData(EncryptionData const&);
-        EncryptionData& operator=(EncryptionData const&);
+        EncryptionData(EncryptionData const&) = delete;
+        EncryptionData& operator=(EncryptionData const&) = delete;
 
 	int V;
 	int R;

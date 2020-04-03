@@ -63,8 +63,8 @@ class ClosedFileInputSource: public InputSource
     void stayOpen(bool);
 
   private:
-    ClosedFileInputSource(ClosedFileInputSource const&);
-    ClosedFileInputSource& operator=(ClosedFileInputSource const&);
+    ClosedFileInputSource(ClosedFileInputSource const&) = delete;
+    ClosedFileInputSource& operator=(ClosedFileInputSource const&) = delete;
 
     void before();
     void after();

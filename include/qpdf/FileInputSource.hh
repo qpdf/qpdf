@@ -51,8 +51,8 @@ class FileInputSource: public InputSource
     virtual void unreadCh(char ch);
 
   private:
-    FileInputSource(FileInputSource const&);
-    FileInputSource& operator=(FileInputSource const&);
+    FileInputSource(FileInputSource const&) = delete;
+    FileInputSource& operator=(FileInputSource const&) = delete;
 
     class Members
     {

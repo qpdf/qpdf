@@ -39,8 +39,8 @@ class QPDF_DLL_CLASS RandomDataProvider
     }
 
   private:
-    RandomDataProvider(RandomDataProvider const&);
-    RandomDataProvider& operator=(RandomDataProvider const&);
+    RandomDataProvider(RandomDataProvider const&) = delete;
+    RandomDataProvider& operator=(RandomDataProvider const&) = delete;
 };
 
 #endif // RANDOMDATAPROVIDER_HH

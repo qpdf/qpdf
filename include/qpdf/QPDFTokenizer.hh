@@ -183,9 +183,8 @@ class QPDFTokenizer
     void expectInlineImage(PointerHolder<InputSource> input);
 
   private:
-    // Do not implement copy or assignment
-    QPDFTokenizer(QPDFTokenizer const&);
-    QPDFTokenizer& operator=(QPDFTokenizer const&);
+    QPDFTokenizer(QPDFTokenizer const&) = delete;
+    QPDFTokenizer& operator=(QPDFTokenizer const&) = delete;
 
     void resolveLiteral();
     bool isSpace(char);
