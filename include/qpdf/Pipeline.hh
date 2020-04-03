@@ -78,26 +78,10 @@ class QPDF_DLL_CLASS Pipeline
     std::string identifier;
 
   private:
-    // Do not implement copy or assign
-    Pipeline(Pipeline const&);
-    Pipeline& operator=(Pipeline const&);
+    Pipeline(Pipeline const&) = delete;
+    Pipeline& operator=(Pipeline const&) = delete;
 
-    class Members
-    {
-        friend class Pipeline;
-
-      public:
-        QPDF_DLL
-        ~Members();
-
-      private:
-        Members(Pipeline* next);
-        Members(Members const&);
-
-        Pipeline* next;
-    };
-
-    PointerHolder<Members> m;
+    Pipeline* next;
 };
 
 #endif // PIPELINE_HH
