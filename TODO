@@ -154,6 +154,67 @@ test that fails if wildcard expansion is broken. In the absence of
 this, it will be necessary to test the behavior manually in both mingw
 and msvc when run from cmd and from msys bash.
 
+Performance
+===========
+
+As described in https://github.com/qpdf/qpdf/issues/401, there was
+great performance degradation between qpdf 7.1.1 and 9.1.1. Doing a
+bisect between dac65a21fb4fa5f871e31c314280b75adde89a6c and
+release-qpdf-7.1.1, I found several commits that damaged performance.
+I fixed some of them to improve performance by about 70% (as measured
+by saying that old times were 170% of new times). The remaining
+commits that broke performance either can't be correct because they
+would re-introduce an old bug or aren't worth correcting because of
+the high value they offer relative to a relatively low penalty. For
+historical reference, here are the commits. The numbers are the time
+in seconds on the machine I happened to be using of splitting the
+first 100 pages of PDF32000_2008.pdf 20 times and taking an average
+duration.
+
+Commits that broke performance:
+
+* d0e99f195a987c483bbb6c5449cf39bee34e08a1 -- object description and
+  context: 0.39 -> 0.45
+* a01359189b32c60c2d55b039f7aefd6c3ce0ebde (minus 313ba08) -- fix
+  dangling references: 0.55 -> 0.6
+* e5f504b6c5dc34337cc0b316b4a7b1fca7e614b1 -- sparse array: 0.6 -> 0.62
+
+Other intermediate steps that were previously fixed:
+
+* 313ba081265f69ac9a0324f9fe87087c72918191 -- copy outlines into
+  split: 0.55 -> 4.0
+* a01359189b32c60c2d55b039f7aefd6c3ce0ebde -- fix dangling references:
+  4.0 -> 9.0
+
+This commit fixed the awful problem introduced in 313ba081:
+
+* a5a016cdd26a8e5c99e5f019bc30d1bdf6c050a2 -- revert outline
+  preservation: 9.0 -> 0.6
+
+Note that the fix dangling references commit had a much worse impact
+prior to removing the outline preservation, so I also measured its
+impact in isolation.
+
+A few important lessons:
+
+* Indirection through PointerHolder<Members> is expensive, and should
+  not be used for things that are created and destroyed frequently
+  such as QPDFObjectHandle and QPDFObject.
+* Traversal of objects is expensive and should be avoided where
+  possible.
+
+Future ideas:
+
+* Look at places in the code where object traversal is being done and,
+  where possible, try to avoid it entirely or at least avoid ever
+  traversing the same objects multiple times.
+* Avoid attaching too much metadata to objects and object handles
+  since those have to get copied around a lot.
+
+Also, it turns out that PointerHolder is more performant than
+std::shared_ptr.
+
+
 General
 =======
 
