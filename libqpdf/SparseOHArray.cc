@@ -30,8 +30,7 @@ SparseOHArray::at(size_t idx) const
 	throw std::logic_error(
 	    "INTERNAL ERROR: bounds error accessing SparseOHArray element");
     }
-    std::map<size_t, QPDFObjectHandle>::const_iterator iter =
-        this->elements.find(idx);
+    auto iter = this->elements.find(idx);
     if (iter == this->elements.end())
     {
         return QPDFObjectHandle::newNull();
@@ -58,8 +57,7 @@ SparseOHArray::remove_last()
 void
 SparseOHArray::releaseResolved()
 {
-    for (std::map<size_t, QPDFObjectHandle>::iterator iter =
-             this->elements.begin();
+    for (auto iter = this->elements.begin();
 	 iter != this->elements.end(); ++iter)
     {
 	QPDFObjectHandle::ReleaseResolver::releaseResolved((*iter).second);
@@ -90,9 +88,8 @@ SparseOHArray::erase(size_t idx)
     {
 	throw std::logic_error("bounds error erasing item from SparseOHArray");
     }
-    std::map<size_t, QPDFObjectHandle> dest;
-    for (std::map<size_t, QPDFObjectHandle>::iterator iter =
-             this->elements.begin();
+    decltype(this->elements) dest;
+    for (auto iter = this->elements.begin();
 	 iter != this->elements.end(); ++iter)
     {
         if ((*iter).first < idx)
@@ -122,9 +119,8 @@ SparseOHArray::insert(size_t idx, QPDFObjectHandle oh)
     }
     else
     {
-        std::map<size_t, QPDFObjectHandle> dest;
-        for (std::map<size_t, QPDFObjectHandle>::iterator iter =
-                 this->elements.begin();
+        decltype(this->elements) dest;
+        for (auto iter = this->elements.begin();
              iter != this->elements.end(); ++iter)
         {
             if ((*iter).first < idx)
