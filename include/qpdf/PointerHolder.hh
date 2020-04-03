@@ -156,9 +156,7 @@ class PointerHolder
     void init(Data* data)
 	{
 	    this->data = data;
-	    {
-		++this->data->refcount;
-	    }
+            ++this->data->refcount;
 	}
     void copy(PointerHolder const& rhs)
 	{
