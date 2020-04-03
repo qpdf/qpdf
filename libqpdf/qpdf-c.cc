@@ -251,19 +251,19 @@ QPDF_ERROR_CODE qpdf_check_pdf(qpdf_data qpdf)
 void qpdf_set_suppress_warnings(qpdf_data qpdf, QPDF_BOOL value)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_set_suppress_warnings");
-    qpdf->qpdf->setSuppressWarnings(value == QPDF_TRUE);
+    qpdf->qpdf->setSuppressWarnings(value != QPDF_FALSE);
 }
 
 void qpdf_set_ignore_xref_streams(qpdf_data qpdf, QPDF_BOOL value)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_set_ignore_xref_streams");
-    qpdf->qpdf->setIgnoreXRefStreams(value == QPDF_TRUE);
+    qpdf->qpdf->setIgnoreXRefStreams(value != QPDF_FALSE);
 }
 
 void qpdf_set_attempt_recovery(qpdf_data qpdf, QPDF_BOOL value)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_set_attempt_recovery");
-    qpdf->qpdf->setAttemptRecovery(value == QPDF_TRUE);
+    qpdf->qpdf->setAttemptRecovery(value != QPDF_FALSE);
 }
 
 QPDF_ERROR_CODE qpdf_read(qpdf_data qpdf, char const* filename,
@@ -515,7 +515,7 @@ void qpdf_set_object_stream_mode(qpdf_data qpdf, qpdf_object_stream_e mode)
 void qpdf_set_compress_streams(qpdf_data qpdf, QPDF_BOOL value)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_set_compress_streams");
-    qpdf->qpdf_writer->setCompressStreams(value == QPDF_TRUE);
+    qpdf->qpdf_writer->setCompressStreams(value != QPDF_FALSE);
 }
 
 void qpdf_set_decode_level(qpdf_data qpdf, qpdf_stream_decode_level_e level)
@@ -527,13 +527,13 @@ void qpdf_set_decode_level(qpdf_data qpdf, qpdf_stream_decode_level_e level)
 void qpdf_set_preserve_unreferenced_objects(qpdf_data qpdf, QPDF_BOOL value)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_set_preserve_unreferenced_objects");
-    qpdf->qpdf_writer->setPreserveUnreferencedObjects(value == QPDF_TRUE);
+    qpdf->qpdf_writer->setPreserveUnreferencedObjects(value != QPDF_FALSE);
 }
 
 void qpdf_set_newline_before_endstream(qpdf_data qpdf, QPDF_BOOL value)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_set_newline_before_endstream");
-    qpdf->qpdf_writer->setNewlineBeforeEndstream(value == QPDF_TRUE);
+    qpdf->qpdf_writer->setNewlineBeforeEndstream(value != QPDF_FALSE);
 }
 
 void qpdf_set_stream_data_mode(qpdf_data qpdf, qpdf_stream_data_e mode)
@@ -545,44 +545,44 @@ void qpdf_set_stream_data_mode(qpdf_data qpdf, qpdf_stream_data_e mode)
 void qpdf_set_content_normalization(qpdf_data qpdf, QPDF_BOOL value)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_set_content_normalization");
-    qpdf->qpdf_writer->setContentNormalization(value == QPDF_TRUE);
+    qpdf->qpdf_writer->setContentNormalization(value != QPDF_FALSE);
 }
 
 void qpdf_set_qdf_mode(qpdf_data qpdf, QPDF_BOOL value)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_set_qdf_mode");
-    qpdf->qpdf_writer->setQDFMode(value == QPDF_TRUE);
+    qpdf->qpdf_writer->setQDFMode(value != QPDF_FALSE);
 }
 
 void qpdf_set_deterministic_ID(qpdf_data qpdf, QPDF_BOOL value)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_set_deterministic_ID");
-    qpdf->qpdf_writer->setDeterministicID(value == QPDF_TRUE);
+    qpdf->qpdf_writer->setDeterministicID(value != QPDF_FALSE);
 }
 
 void qpdf_set_static_ID(qpdf_data qpdf, QPDF_BOOL value)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_set_static_ID");
-    qpdf->qpdf_writer->setStaticID(value == QPDF_TRUE);
+    qpdf->qpdf_writer->setStaticID(value != QPDF_FALSE);
 }
 
 void qpdf_set_static_aes_IV(qpdf_data qpdf, QPDF_BOOL value)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_set_static_aes_IV");
-    qpdf->qpdf_writer->setStaticAesIV(value == QPDF_TRUE);
+    qpdf->qpdf_writer->setStaticAesIV(value != QPDF_FALSE);
 }
 
 void qpdf_set_suppress_original_object_IDs(
     qpdf_data qpdf, QPDF_BOOL value)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_set_suppress_original_object_IDs");
-    qpdf->qpdf_writer->setSuppressOriginalObjectIDs(value == QPDF_TRUE);
+    qpdf->qpdf_writer->setSuppressOriginalObjectIDs(value != QPDF_FALSE);
 }
 
 void qpdf_set_preserve_encryption(qpdf_data qpdf, QPDF_BOOL value)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_set_preserve_encryption");
-    qpdf->qpdf_writer->setPreserveEncryption(value == QPDF_TRUE);
+    qpdf->qpdf_writer->setPreserveEncryption(value != QPDF_FALSE);
 }
 
 void qpdf_set_r2_encryption_parameters(
@@ -593,8 +593,8 @@ void qpdf_set_r2_encryption_parameters(
     QTC::TC("qpdf", "qpdf-c called qpdf_set_r2_encryption_parameters");
     qpdf->qpdf_writer->setR2EncryptionParameters(
 	user_password, owner_password,
-	allow_print == QPDF_TRUE, allow_modify == QPDF_TRUE,
-        allow_extract == QPDF_TRUE, allow_annotate == QPDF_TRUE);
+	allow_print != QPDF_FALSE, allow_modify != QPDF_FALSE,
+        allow_extract != QPDF_FALSE, allow_annotate != QPDF_FALSE);
 }
 
 void qpdf_set_r3_encryption_parameters2(
@@ -607,9 +607,9 @@ void qpdf_set_r3_encryption_parameters2(
     QTC::TC("qpdf", "qpdf-c called qpdf_set_r3_encryption_parameters");
     qpdf->qpdf_writer->setR3EncryptionParameters(
         user_password, owner_password,
-        allow_accessibility == QPDF_TRUE, allow_extract == QPDF_TRUE,
-        allow_assemble == QPDF_TRUE, allow_annotate_and_form == QPDF_TRUE,
-        allow_form_filling == QPDF_TRUE, allow_modify_other == QPDF_TRUE,
+        allow_accessibility != QPDF_FALSE, allow_extract != QPDF_FALSE,
+        allow_assemble != QPDF_FALSE, allow_annotate_and_form != QPDF_FALSE,
+        allow_form_filling != QPDF_FALSE, allow_modify_other != QPDF_FALSE,
         print);
 }
 
@@ -624,10 +624,10 @@ void qpdf_set_r4_encryption_parameters2(
     QTC::TC("qpdf", "qpdf-c called qpdf_set_r4_encryption_parameters");
     qpdf->qpdf_writer->setR4EncryptionParameters(
         user_password, owner_password,
-        allow_accessibility == QPDF_TRUE, allow_extract == QPDF_TRUE,
-        allow_assemble == QPDF_TRUE, allow_annotate_and_form == QPDF_TRUE,
-        allow_form_filling == QPDF_TRUE, allow_modify_other == QPDF_TRUE,
-        print, encrypt_metadata == QPDF_TRUE, use_aes == QPDF_TRUE);
+        allow_accessibility != QPDF_FALSE, allow_extract != QPDF_FALSE,
+        allow_assemble != QPDF_FALSE, allow_annotate_and_form != QPDF_FALSE,
+        allow_form_filling != QPDF_FALSE, allow_modify_other != QPDF_FALSE,
+        print, encrypt_metadata != QPDF_FALSE, use_aes != QPDF_FALSE);
 }
 
 
@@ -641,10 +641,10 @@ void qpdf_set_r5_encryption_parameters2(
     QTC::TC("qpdf", "qpdf-c called qpdf_set_r5_encryption_parameters");
     qpdf->qpdf_writer->setR5EncryptionParameters(
         user_password, owner_password,
-        allow_accessibility == QPDF_TRUE, allow_extract == QPDF_TRUE,
-        allow_assemble == QPDF_TRUE, allow_annotate_and_form == QPDF_TRUE,
-        allow_form_filling == QPDF_TRUE, allow_modify_other == QPDF_TRUE,
-        print, encrypt_metadata == QPDF_TRUE);
+        allow_accessibility != QPDF_FALSE, allow_extract != QPDF_FALSE,
+        allow_assemble != QPDF_FALSE, allow_annotate_and_form != QPDF_FALSE,
+        allow_form_filling != QPDF_FALSE, allow_modify_other != QPDF_FALSE,
+        print, encrypt_metadata != QPDF_FALSE);
 }
 
 void qpdf_set_r6_encryption_parameters2(
@@ -657,10 +657,10 @@ void qpdf_set_r6_encryption_parameters2(
     QTC::TC("qpdf", "qpdf-c called qpdf_set_r6_encryption_parameters");
     qpdf->qpdf_writer->setR6EncryptionParameters(
         user_password, owner_password,
-        allow_accessibility == QPDF_TRUE, allow_extract == QPDF_TRUE,
-        allow_assemble == QPDF_TRUE, allow_annotate_and_form == QPDF_TRUE,
-        allow_form_filling == QPDF_TRUE, allow_modify_other == QPDF_TRUE,
-        print, encrypt_metadata == QPDF_TRUE);
+        allow_accessibility != QPDF_FALSE, allow_extract != QPDF_FALSE,
+        allow_assemble != QPDF_FALSE, allow_annotate_and_form != QPDF_FALSE,
+        allow_form_filling != QPDF_FALSE, allow_modify_other != QPDF_FALSE,
+        print, encrypt_metadata != QPDF_FALSE);
 }
 
 void qpdf_set_r3_encryption_parameters(
@@ -670,7 +670,7 @@ void qpdf_set_r3_encryption_parameters(
 {
     qpdf->qpdf_writer->setR3EncryptionParameters(
 	user_password, owner_password,
-	allow_accessibility == QPDF_TRUE, allow_extract == QPDF_TRUE,
+	allow_accessibility != QPDF_FALSE, allow_extract != QPDF_FALSE,
         print, modify);
 }
 
@@ -682,9 +682,9 @@ void qpdf_set_r4_encryption_parameters(
 {
     qpdf->qpdf_writer->setR4EncryptionParameters(
 	user_password, owner_password,
-	allow_accessibility == QPDF_TRUE, allow_extract == QPDF_TRUE,
+	allow_accessibility != QPDF_FALSE, allow_extract != QPDF_FALSE,
         print, modify,
-	encrypt_metadata == QPDF_TRUE, use_aes == QPDF_TRUE);
+	encrypt_metadata != QPDF_FALSE, use_aes != QPDF_FALSE);
 }
 
 void qpdf_set_r5_encryption_parameters(
@@ -695,9 +695,9 @@ void qpdf_set_r5_encryption_parameters(
 {
     qpdf->qpdf_writer->setR5EncryptionParameters(
 	user_password, owner_password,
-	allow_accessibility == QPDF_TRUE, allow_extract == QPDF_TRUE,
+	allow_accessibility != QPDF_FALSE, allow_extract != QPDF_FALSE,
         print, modify,
-	encrypt_metadata == QPDF_TRUE);
+	encrypt_metadata != QPDF_FALSE);
 }
 
 void qpdf_set_r6_encryption_parameters(
@@ -708,14 +708,14 @@ void qpdf_set_r6_encryption_parameters(
 {
     qpdf->qpdf_writer->setR6EncryptionParameters(
 	user_password, owner_password,
-	allow_accessibility == QPDF_TRUE, allow_extract == QPDF_TRUE,
-        print, modify, encrypt_metadata == QPDF_TRUE);
+	allow_accessibility != QPDF_FALSE, allow_extract != QPDF_FALSE,
+        print, modify, encrypt_metadata != QPDF_FALSE);
 }
 
 void qpdf_set_linearization(qpdf_data qpdf, QPDF_BOOL value)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_set_linearization");
-    qpdf->qpdf_writer->setLinearization(value == QPDF_TRUE);
+    qpdf->qpdf_writer->setLinearization(value != QPDF_FALSE);
 }
 
 void qpdf_set_minimum_pdf_version(qpdf_data qpdf, char const* version)
