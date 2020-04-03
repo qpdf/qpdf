@@ -29,60 +29,20 @@
 #include <limits>
 #include <sstream>
 #include <cassert>
+#include <type_traits>
 
 // This namespace provides safe integer conversion that detects
 // overflows. It uses short, cryptic names for brevity.
 
 namespace QIntC // QIntC = qpdf Integer Conversion
 {
-    // Create templates to get the unsigned version of integer types.
-    // With C++11, we could use std::make_unsigned, but qpdf, at least
-    // for now, supports pre-c++11 compilers.
+    // to_u is here for backward-compatibility from before we required
+    // C++-11.
     template <typename T>
     class to_u
     {
-    };
-
-    template <>
-    class to_u<char>
-    {
       public:
-        typedef unsigned char type;
-    };
-
-    template <>
-    class to_u<signed char>
-    {
-      public:
-        typedef unsigned char type;
-    };
-
-    template <>
-    class to_u<short>
-    {
-      public:
-        typedef unsigned short type;
-    };
-
-    template <>
-    class to_u<int>
-    {
-      public:
-        typedef unsigned int type;
-    };
-
-    template <>
-    class to_u<long>
-    {
-      public:
-        typedef unsigned long type;
-    };
-
-    template <>
-    class to_u<long long>
-    {
-      public:
-        typedef unsigned long long type;
+        typedef typename std::make_unsigned<T>::type type;
     };
 
     // Basic IntConverter class, which converts an integer from the
@@ -147,8 +107,7 @@ namespace QIntC // QIntC = qpdf Integer Conversion
             // From is signed, and To is unsigned. If i > 0, it's safe to
             // convert it to the corresponding unsigned type and to
             // compare with To's max.
-            typename to_u<From>::type ii =
-                static_cast<typename to_u<From>::type>(i);
+            auto ii = static_cast<typename to_u<From>::type>(i);
             if ((i < 0) || (ii > std::numeric_limits<To>::max()))
             {
                 std::ostringstream msg;
@@ -170,9 +129,8 @@ namespace QIntC // QIntC = qpdf Integer Conversion
         {
             // From is unsigned, and to is signed. Convert To's max to the
             // unsigned version of To and compare i against that.
-            typename to_u<To>::type maxval =
-                static_cast<typename to_u<To>::type>(
-                    std::numeric_limits<To>::max());
+            auto maxval = static_cast<typename to_u<To>::type>(
+                std::numeric_limits<To>::max());
             if (i > maxval)
             {
                 std::ostringstream msg;
