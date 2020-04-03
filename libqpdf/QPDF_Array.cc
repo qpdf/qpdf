@@ -146,8 +146,7 @@ QPDF_Array::getElementsForShallowCopy() const
 void
 QPDF_Array::addExplicitElementsToList(std::list<QPDFObjectHandle>& l) const
 {
-    for (std::map<size_t, QPDFObjectHandle>::const_iterator iter =
-             this->elements.begin();
+    for (auto iter = this->elements.begin();
          iter != this->elements.end(); ++iter)
     {
         l.push_back((*iter).second);
