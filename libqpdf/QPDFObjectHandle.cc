@@ -2652,6 +2652,7 @@ QPDFObjectHandle::typeWarning(char const* expected_type,
 {
     QPDF* context = 0;
     std::string description;
+    dereference();
     if (this->obj->getDescription(context, description))
     {
         warn(context,
@@ -2674,6 +2675,7 @@ QPDFObjectHandle::warnIfPossible(std::string const& warning,
 {
     QPDF* context = 0;
     std::string description;
+    dereference();
     if (this->obj->getDescription(context, description))
     {
         warn(context,
