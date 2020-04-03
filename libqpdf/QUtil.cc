@@ -1060,18 +1060,6 @@ static bool read_char_from_FILE(char& ch, FILE* f)
 }
 
 std::list<std::string>
-QUtil::read_lines_from_file(char const* filename)
-{
-    // ABI: remove this method
-    std::list<std::string> lines;
-    FILE* f = safe_fopen(filename, "rb");
-    FileCloser fc(f);
-    auto next_char = [&f](char& ch) { return read_char_from_FILE(ch, f); };
-    read_lines_from_file(next_char, lines, false);
-    return lines;
-}
-
-std::list<std::string>
 QUtil::read_lines_from_file(char const* filename, bool preserve_eol)
 {
     std::list<std::string> lines;
@@ -1079,16 +1067,6 @@ QUtil::read_lines_from_file(char const* filename, bool preserve_eol)
     FileCloser fc(f);
     auto next_char = [&f](char& ch) { return read_char_from_FILE(ch, f); };
     read_lines_from_file(next_char, lines, preserve_eol);
-    return lines;
-}
-
-std::list<std::string>
-QUtil::read_lines_from_file(std::istream& in)
-{
-    // ABI: remove this method
-    std::list<std::string> lines;
-    auto next_char = [&in](char& ch) { return (in.get(ch)) ? true: false; };
-    read_lines_from_file(next_char, lines, false);
     return lines;
 }
 

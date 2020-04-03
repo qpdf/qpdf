@@ -313,17 +313,11 @@ namespace QUtil
     // Filename is UTF-8 encoded, even on Windows, as described in the
     // comments for safe_fopen.
     QPDF_DLL
-    std::list<std::string> read_lines_from_file(char const* filename);
-    // ABI: make preserve_eol an optional arg and remove single-arg version
+    std::list<std::string> read_lines_from_file(
+        char const* filename, bool preserve_eol = false);
     QPDF_DLL
     std::list<std::string> read_lines_from_file(
-        char const* filename, bool preserve_eol);
-    QPDF_DLL
-    std::list<std::string> read_lines_from_file(std::istream&);
-    // ABI: make preserve_eol an optional arg and remove single-arg version
-    QPDF_DLL
-    std::list<std::string> read_lines_from_file(
-        std::istream&, bool preserve_eol);
+        std::istream&, bool preserve_eol = false);
     QPDF_DLL
     std::list<std::string> read_lines_from_file(
         FILE*, bool preserve_eol = false);
