@@ -720,10 +720,9 @@ QPDFPageObjectHelper::getFormXObjectForPage(bool handle_transformations)
     return result;
 }
 
-// ABI: name should be std:string const&
 std::string
 QPDFPageObjectHelper::placeFormXObject(
-    QPDFObjectHandle fo, std::string name,
+    QPDFObjectHandle fo, std::string const& name,
     QPDFObjectHandle::Rectangle rect,
     bool invert_transformations)
 {

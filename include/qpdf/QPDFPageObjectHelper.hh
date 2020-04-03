@@ -227,7 +227,7 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     // examples/pdf-overlay-page.cc for an example.
     QPDF_DLL
     std::string placeFormXObject(
-        QPDFObjectHandle fo, std::string name,
+        QPDFObjectHandle fo, std::string const& name,
         QPDFObjectHandle::Rectangle rect,
         bool invert_transformations = true);
 

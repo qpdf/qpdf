@@ -19,9 +19,6 @@ ABI Changes
 This is a list of changes to make next time there is an ABI change.
 Comments appear in the code prefixed by "ABI"
 
-* QPDFPageObjectHelper::placeFormXObject: name should be std::string
-  const& (issue #374)
-
 * (Source compatibility) As somewhat discussed in issue 219, the
   original pipeStreamData in QPDF_Stream has various logic for
   reporting warnings and letting the caller retry. This logic is not
