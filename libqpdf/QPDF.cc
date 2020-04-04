@@ -1,6 +1,7 @@
 #include <qpdf/qpdf-config.h>  // include first for large file support
 #include <qpdf/QPDF.hh>
 
+#include <atomic>
 #include <vector>
 #include <map>
 #include <algorithm>
@@ -172,9 +173,8 @@ QPDF::QPDF() :
     // Generate a unique ID. It just has to be unique among all QPDF
     // objects allocated throughout the lifetime of this running
     // application.
-    m->unique_id = static_cast<unsigned long>(QUtil::get_current_time());
-    m->unique_id <<= 32;
-    m->unique_id |= static_cast<unsigned long>(QUtil::random());
+    static std::atomic<unsigned long long> unique_id{0};
+    m->unique_id = unique_id.fetch_add(1ULL);
 }
 
 QPDF::~QPDF()
