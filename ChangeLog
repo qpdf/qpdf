@@ -1,3 +1,20 @@
+2020-04-04  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add new option --remove-unreferenced-resources that takes auto,
+	yes, or no as options. This tells qpdf whether to attempt to
+	remove unreferenced resources from pages when doing page splitting
+	operations. Prior to this change, the default was to attempt to
+	remove unreferenced resources, but this operation was very slow,
+	especially for large and complex files. The new default is "auto",
+	which tells qpdf to analyze the file for shared resources. This is
+	a relatively quick test. If no shared resources are found, then we
+	don't attempt to remove unreferenced resources, because
+	unreferenced resources never occur in files without shared
+	resources. To force qpdf to look for and remove unreferenced
+	resources, use --remove-unreferenced-resources=yes. The option
+	--preserve-unreferenced-resources is now a synonym for
+	--remove-unreferenced-resources=no.
+
 2020-04-03  Jay Berkenbilt  <ejb@ql.org>
 
 	* Allow qpdf to be built on systems without wchar_t. All "normal"

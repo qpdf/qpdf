@@ -94,6 +94,8 @@ struct UnderOverlay
     std::vector<int> repeat_pagenos;
 };
 
+enum remove_unref_e { re_auto, re_yes, re_no };
+
 struct Options
 {
     Options() :
@@ -144,7 +146,7 @@ struct Options
         ignore_xref_streams(false),
         qdf_mode(false),
         preserve_unreferenced_objects(false),
-        preserve_unreferenced_page_resources(false),
+        remove_unreferenced_page_resources(re_auto),
         keep_files_open(true),
         keep_files_open_set(false),
         keep_files_open_threshold(200), // default known in help and docs
@@ -243,7 +245,7 @@ struct Options
     bool ignore_xref_streams;
     bool qdf_mode;
     bool preserve_unreferenced_objects;
-    bool preserve_unreferenced_page_resources;
+    remove_unref_e remove_unreferenced_page_resources;
     bool keep_files_open;
     bool keep_files_open_set;
     size_t keep_files_open_threshold;
@@ -739,6 +741,7 @@ class ArgParser
     void argQdf();
     void argPreserveUnreferenced();
     void argPreserveUnreferencedResources();
+    void argRemoveUnreferencedResources(char* parameter);
     void argKeepFilesOpen(char* parameter);
     void argKeepFilesOpenThreshold(char* parameter);
     void argNewlineBeforeEndstream();
@@ -970,6 +973,10 @@ ArgParser::initOptionTable()
         &ArgParser::argPreserveUnreferenced);
     (*t)["preserve-unreferenced-resources"] = oe_bare(
         &ArgParser::argPreserveUnreferencedResources);
+    char const* remove_unref_choices[] = {
+        "auto", "yes", "no", 0};
+    (*t)["remove-unreferenced-resources"] = oe_requiredChoices(
+        &ArgParser::argRemoveUnreferencedResources, remove_unref_choices);
     (*t)["keep-files-open"] = oe_requiredChoices(
         &ArgParser::argKeepFilesOpen, yn);
     (*t)["keep-files-open-threshold"] = oe_requiredParameter(
@@ -1459,7 +1466,9 @@ ArgParser::argHelp()
         << "--object-streams=mode     controls handing of object streams\n"
         << "--preserve-unreferenced   preserve unreferenced objects\n"
         << "--preserve-unreferenced-resources\n"
-        << "                          preserve unreferenced page resources\n"
+        << "                          synonym for --remove-unreferenced-resources=no\n"
+        << "--remove-unreferenced-resources={auto,yes,no}\n"
+        << "                          whether to remove unreferenced page resources\n"
         << "--newline-before-endstream  always put a newline before endstream\n"
         << "--coalesce-contents       force all pages' content to be a single stream\n"
         << "--flatten-annotations=option\n"
@@ -1973,7 +1982,30 @@ ArgParser::argPreserveUnreferenced()
 void
 ArgParser::argPreserveUnreferencedResources()
 {
-    o.preserve_unreferenced_page_resources = true;
+    o.remove_unreferenced_page_resources = re_no;
+}
+
+void
+ArgParser::argRemoveUnreferencedResources(char* parameter)
+{
+    if (strcmp(parameter, "auto") == 0)
+    {
+        o.remove_unreferenced_page_resources = re_auto;
+    }
+    else if (strcmp(parameter, "yes") == 0)
+    {
+        o.remove_unreferenced_page_resources = re_yes;
+    }
+    else if (strcmp(parameter, "no") == 0)
+    {
+        o.remove_unreferenced_page_resources = re_no;
+    }
+    else
+    {
+        // If this happens, it means remove_unref_choices in
+        // ArgParser::initOptionTable is wrong.
+        usage("invalid value for --remove-unreferenced-page-resources");
+    }
 }
 
 void
@@ -4838,7 +4870,7 @@ static void handle_page_specs(QPDF& pdf, Options& o)
                          page_spec.range));
     }
 
-    if (! o.preserve_unreferenced_page_resources)
+    if (o.remove_unreferenced_page_resources != re_no)
     {
         for (std::map<std::string, QPDF*>::iterator iter =
                  page_spec_qpdfs.begin();
@@ -5336,7 +5368,7 @@ static void do_split_pages(QPDF& pdf, Options& o)
         before = std::string(o.outfilename) + "-";
     }
 
-    if (! o.preserve_unreferenced_page_resources)
+    if (o.remove_unreferenced_page_resources != re_no)
     {
         QPDFPageDocumentHelper dh(pdf);
         dh.removeUnreferencedResources();
