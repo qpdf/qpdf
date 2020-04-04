@@ -382,6 +382,24 @@ static JSON json_schema(std::set<std::string>* keys = 0)
                 "dictionary of original objects;"
                 " keys are 'trailer' or 'n n R'"));
     }
+    if (all_keys || keys->count("objectinfo"))
+    {
+        JSON objectinfo = schema.addDictionaryMember(
+            "objectinfo", JSON::makeDictionary());
+        JSON details = objectinfo.addDictionaryMember(
+            "<object-id>", JSON::makeDictionary());
+        JSON stream = details.addDictionaryMember(
+            "stream", JSON::makeDictionary());
+        stream.addDictionaryMember(
+            "is",
+            JSON::makeString("whether the object is a stream"));
+        stream.addDictionaryMember(
+            "length",
+            JSON::makeString("if stream, its length, otherwise null"));
+        stream.addDictionaryMember(
+            "filter",
+            JSON::makeString("if stream, its length, otherwise null"));
+    }
     if (all_keys || keys->count("pages"))
     {
         JSON page = schema.addDictionaryMember("pages", JSON::makeArray()).
@@ -1020,8 +1038,8 @@ ArgParser::initOptionTable()
     // The list of selectable top-level keys id duplicated in three
     // places: json_schema, do_json, and initOptionTable.
     char const* json_key_choices[] = {
-        "objects", "pages", "pagelabels", "outlines", "acroform",
-        "encrypt", 0};
+        "objects", "objectinfo", "pages", "pagelabels", "outlines",
+        "acroform", "encrypt", 0};
     (*t)["json-key"] = oe_requiredChoices(
         &ArgParser::argJsonKey, json_key_choices);
     (*t)["json-object"] = oe_requiredParameter(
@@ -3624,25 +3642,31 @@ static void do_show_pages(QPDF& pdf, Options& o)
     }
 }
 
+static std::set<QPDFObjGen>
+get_wanted_json_objects(Options& o)
+{
+    std::set<QPDFObjGen> wanted_og;
+    for (auto iter: o.json_objects)
+    {
+        bool trailer;
+        int obj = 0;
+        int gen = 0;
+        parse_object_id(iter, trailer, obj, gen);
+        if (obj)
+        {
+            wanted_og.insert(QPDFObjGen(obj, gen));
+        }
+    }
+    return wanted_og;
+}
+
 static void do_json_objects(QPDF& pdf, Options& o, JSON& j)
 {
     // Add all objects. Do this first before other code below modifies
     // things by doing stuff like calling
     // pushInheritedAttributesToPage.
     bool all_objects = o.json_objects.empty();
-    std::set<QPDFObjGen> wanted_og;
-    for (std::set<std::string>::iterator iter = o.json_objects.begin();
-         iter != o.json_objects.end(); ++iter)
-    {
-        bool trailer;
-        int obj = 0;
-        int gen = 0;
-        parse_object_id(*iter, trailer, obj, gen);
-        if (obj)
-        {
-            wanted_og.insert(QPDFObjGen(obj, gen));
-        }
-    }
+    std::set<QPDFObjGen> wanted_og = get_wanted_json_objects(o);
     JSON j_objects = j.addDictionaryMember("objects", JSON::makeDictionary());
     if (all_objects || o.json_objects.count("trailer"))
     {
@@ -3657,6 +3681,39 @@ static void do_json_objects(QPDF& pdf, Options& o, JSON& j)
         {
             j_objects.addDictionaryMember(
                 (*iter).unparse(), (*iter).getJSON(true));
+        }
+    }
+}
+
+static void do_json_objectinfo(QPDF& pdf, Options& o, JSON& j)
+{
+    // Do this first before other code below modifies things by doing
+    // stuff like calling pushInheritedAttributesToPage.
+    bool all_objects = o.json_objects.empty();
+    std::set<QPDFObjGen> wanted_og = get_wanted_json_objects(o);
+    JSON j_objectinfo = j.addDictionaryMember(
+        "objectinfo", JSON::makeDictionary());
+    for (auto obj: pdf.getAllObjects())
+    {
+        if (all_objects || wanted_og.count(obj.getObjGen()))
+        {
+            auto j_details = j_objectinfo.addDictionaryMember(
+                obj.unparse(), JSON::makeDictionary());
+            auto j_stream = j_details.addDictionaryMember(
+                "stream", JSON::makeDictionary());
+            bool is_stream = obj.isStream();
+            j_stream.addDictionaryMember(
+                "is", JSON::makeBool(is_stream));
+            j_stream.addDictionaryMember(
+                "length",
+                (is_stream
+                 ? obj.getDict().getKey("/Length").getJSON(true)
+                 : JSON::makeNull()));
+            j_stream.addDictionaryMember(
+                "filter",
+                (is_stream
+                 ? obj.getDict().getKey("/Filter").getJSON(true)
+                 : JSON::makeNull()));
         }
     }
 }
@@ -4070,6 +4127,10 @@ static void do_json(QPDF& pdf, Options& o)
     if (all_keys || o.json_keys.count("objects"))
     {
         do_json_objects(pdf, o, j);
+    }
+    if (all_keys || o.json_keys.count("objectinfo"))
+    {
+        do_json_objectinfo(pdf, o, j);
     }
     if (all_keys || o.json_keys.count("pages"))
     {

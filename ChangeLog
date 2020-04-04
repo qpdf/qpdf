@@ -1,5 +1,11 @@
 2020-04-04  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add "objectinfo" section to json output. In this release,
+	information about whether each object is a stream or not is
+	provided. There's otherwise no way to tell conclusively from the
+	json output. Over time, other computed information about objects
+	may be added here.
+
 	* Add new option --remove-unreferenced-resources that takes auto,
 	yes, or no as options. This tells qpdf whether to attempt to
 	remove unreferenced resources from pages when doing page splitting

@@ -31,6 +31,218 @@
     },
     "userpasswordmatched": false
   },
+  "objectinfo": {
+    "1 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "10 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "11 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "12 0 R": {
+      "stream": {
+        "filter": "/FlateDecode",
+        "is": true,
+        "length": 97
+      }
+    },
+    "13 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "14 0 R": {
+      "stream": {
+        "filter": "/FlateDecode",
+        "is": true,
+        "length": 51
+      }
+    },
+    "15 0 R": {
+      "stream": {
+        "filter": "/FlateDecode",
+        "is": true,
+        "length": 102
+      }
+    },
+    "16 0 R": {
+      "stream": {
+        "filter": "/DCTDecode",
+        "is": true,
+        "length": 454
+      }
+    },
+    "17 0 R": {
+      "stream": {
+        "filter": "/FlateDecode",
+        "is": true,
+        "length": 108
+      }
+    },
+    "18 0 R": {
+      "stream": {
+        "filter": "/RunLengthDecode",
+        "is": true,
+        "length": 7688
+      }
+    },
+    "19 0 R": {
+      "stream": {
+        "filter": "/FlateDecode",
+        "is": true,
+        "length": 96
+      }
+    },
+    "2 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "20 0 R": {
+      "stream": {
+        "filter": "/FlateDecode",
+        "is": true,
+        "length": 46
+      }
+    },
+    "21 0 R": {
+      "stream": {
+        "filter": "/FlateDecode",
+        "is": true,
+        "length": 99
+      }
+    },
+    "22 0 R": {
+      "stream": {
+        "filter": "/DCTDecode",
+        "is": true,
+        "length": 849
+      }
+    },
+    "23 0 R": {
+      "stream": {
+        "filter": "/FlateDecode",
+        "is": true,
+        "length": 106
+      }
+    },
+    "24 0 R": {
+      "stream": {
+        "filter": "/RunLengthDecode",
+        "is": true,
+        "length": 6411
+      }
+    },
+    "25 0 R": {
+      "stream": {
+        "filter": "/FlateDecode",
+        "is": true,
+        "length": 97
+      }
+    },
+    "26 0 R": {
+      "stream": {
+        "filter": "/FlateDecode",
+        "is": true,
+        "length": 36
+      }
+    },
+    "27 0 R": {
+      "stream": {
+        "filter": "/FlateDecode",
+        "is": true,
+        "length": 101
+      }
+    },
+    "28 0 R": {
+      "stream": {
+        "filter": "/DCTDecode",
+        "is": true,
+        "length": 359
+      }
+    },
+    "29 0 R": {
+      "stream": {
+        "filter": "/FlateDecode",
+        "is": true,
+        "length": 108
+      }
+    },
+    "3 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "30 0 R": {
+      "stream": {
+        "filter": "/RunLengthDecode",
+        "is": true,
+        "length": 37
+      }
+    },
+    "4 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "5 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "6 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "7 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "8 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "9 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    }
+  },
   "objects": {
     "1 0 R": {
       "/Pages": "2 0 R",

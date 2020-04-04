@@ -31,6 +31,50 @@
     },
     "userpasswordmatched": false
   },
+  "objectinfo": {
+    "1 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "2 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "3 0 R": {
+      "stream": {
+        "filter": null,
+        "is": true,
+        "length": 44
+      }
+    },
+    "4 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "5 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    },
+    "6 0 R": {
+      "stream": {
+        "filter": null,
+        "is": false,
+        "length": null
+      }
+    }
+  },
   "objects": {
     "1 0 R": {
       "/Pages": "2 0 R",
