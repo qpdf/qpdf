@@ -87,7 +87,7 @@ For example, to build qpdf on a system without wchar_t, be sure that -DQPDF_NO_W
 
 Note that, when you build code with libqpdf, it is *not necessary* to have the definition of QPDF_NO_WCHAR_T in your build match what was defined when the library was built as long as you are not calling QUtil::call_main_from_wmain in your code. In other words, if your qpdf library was built on a system without wchar_t and you are using that system to build at some later time after wchar_t was available, as long as you don't call the function that uses it, you can just build normally.
 
-Note that QPDF_NO_WCHAR_T is never defined by autoconf or any other automated method. There is a hard rule in qpdf that values determined by autoconf are not available in the public API. This is because there is never a guarantee or even expectation that those values will match between the system on which qpdf was build and the system on which a user is building code with libqpdf.
+Note qpdf will never define QPDF_NO_WCHAR_T using autoconf or any other automated method in spite of the fact that it would be easy to do so. That is because there is a hard rule in qpdf that values determined by autoconf are not available in the public API. This is because there is never a guarantee or even expectation that those values will match between the system on which qpdf was build and the system on which a user is building code with libqpdf, and qpdf's include directory should look the same across all systems.
 
 # Building on Windows
 
