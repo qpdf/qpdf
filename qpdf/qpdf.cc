@@ -4750,6 +4750,140 @@ static void handle_transformations(QPDF& pdf, Options& o)
     }
 }
 
+static bool should_remove_unreferenced_resources(QPDF& pdf, Options& o)
+{
+    if (o.remove_unreferenced_page_resources == re_no)
+    {
+        return false;
+    }
+    else if (o.remove_unreferenced_page_resources == re_yes)
+    {
+        return true;
+    }
+
+    // Unreferenced resources are common in files where resources
+    // dictionaries are shared across pages. As a heuristic, we look
+    // in the file for shared resources dictionaries or shared XObject
+    // subkeys of resources dictionaries either on pages or on form
+    // XObjects in pages. If we find any, then there is a higher
+    // likeilihood that the expensive process of finding unreferenced
+    // resources is worth it.
+
+    // Return true as soon as we find any shared resources.
+
+    std::set<QPDFObjGen> resources_seen;      // shared resources detection
+    std::set<QPDFObjGen> nodes_seen;          // loop detection
+
+    if (o.verbose)
+    {
+        std::cout << whoami << ": " << pdf.getFilename()
+                  << ": checking for shared resources" << std::endl;
+    }
+
+    std::list<QPDFObjectHandle> queue;
+    queue.push_back(pdf.getRoot().getKey("/Pages"));
+    while (! queue.empty())
+    {
+        QPDFObjectHandle node = *queue.begin();
+        QPDFObjGen og = node.getObjGen();
+        if (nodes_seen.count(og))
+        {
+            continue;
+        }
+        nodes_seen.insert(og);
+        queue.pop_front();
+        QPDFObjectHandle dict = node.isStream() ? node.getDict() : node;
+        QPDFObjectHandle kids = dict.getKey("/Kids");
+        if (kids.isArray())
+        {
+            // This is a non-leaf node.
+            if (dict.hasKey("/Resources"))
+            {
+                QTC::TC("qpdf", "qpdf found resources in non-leaf");
+                if (o.verbose)
+                {
+                    std::cout << "  found resources in non-leaf page node "
+                              << og.getObj() << " " << og.getGen()
+                              << std::endl;
+                }
+                return true;
+            }
+            int n = kids.getArrayNItems();
+            for (int i = 0; i < n; ++i)
+            {
+                queue.push_back(kids.getArrayItem(i));
+            }
+        }
+        else
+        {
+            // This is a leaf node or a form XObject.
+            QPDFObjectHandle resources = dict.getKey("/Resources");
+            if (resources.isIndirect())
+            {
+                QPDFObjGen resources_og = resources.getObjGen();
+                if (resources_seen.count(resources_og))
+                {
+                    QTC::TC("qpdf", "qpdf found shared resources in leaf");
+                    if (o.verbose)
+                    {
+                        std::cout << "  found shared resources in leaf node "
+                                  << og.getObj() << " " << og.getGen()
+                                  << ": "
+                                  << resources_og.getObj() << " "
+                                  << resources_og.getGen()
+                                  << std::endl;
+                    }
+                    return true;
+                }
+                resources_seen.insert(resources_og);
+            }
+            QPDFObjectHandle xobject = resources.getKey("/XObject");
+            if (xobject.isIndirect())
+            {
+                QPDFObjGen xobject_og = xobject.getObjGen();
+                if (resources_seen.count(xobject_og))
+                {
+                    QTC::TC("qpdf", "qpdf found shared xobject in leaf");
+                    if (o.verbose)
+                    {
+                        std::cout << "  found shared xobject in leaf node "
+                                  << og.getObj() << " " << og.getGen()
+                                  << ": "
+                                  << xobject_og.getObj() << " "
+                                  << xobject_og.getGen()
+                                  << std::endl;
+                    }
+                    return true;
+                }
+                resources_seen.insert(xobject_og);
+            }
+            if (xobject.isDictionary())
+            {
+                for (auto k: xobject.getKeys())
+                {
+                    QPDFObjectHandle xobj = xobject.getKey(k);
+                    if (xobj.isStream() &&
+                        xobj.getDict().getKey("/Type").isName() &&
+                        ("/XObject" ==
+                         xobj.getDict().getKey("/Type").getName()) &&
+                        xobj.getDict().getKey("/Subtype").isName() &&
+                        ("/Form" ==
+                         xobj.getDict().getKey("/Subtype").getName()))
+                    {
+                        queue.push_back(xobj);
+                    }
+                }
+            }
+        }
+    }
+
+    if (o.verbose)
+    {
+        std::cout << whoami << ": no shared resources found" << std::endl;
+    }
+    return false;
+}
+
 static void handle_page_specs(QPDF& pdf, Options& o)
 {
     // Parse all page specifications and translate them into lists of
@@ -4883,8 +5017,12 @@ static void handle_page_specs(QPDF& pdf, Options& o)
                 cis = page_spec_cfis[filename];
                 cis->stayOpen(true);
             }
-            QPDFPageDocumentHelper dh(*((*iter).second));
-            dh.removeUnreferencedResources();
+            QPDF& other(*((*iter).second));
+            if (should_remove_unreferenced_resources(other, o))
+            {
+                QPDFPageDocumentHelper dh(other);
+                dh.removeUnreferencedResources();
+            }
             if (cis)
             {
                 cis->stayOpen(false);
@@ -5368,7 +5506,7 @@ static void do_split_pages(QPDF& pdf, Options& o)
         before = std::string(o.outfilename) + "-";
     }
 
-    if (o.remove_unreferenced_page_resources != re_no)
+    if (should_remove_unreferenced_resources(pdf, o))
     {
         QPDFPageDocumentHelper dh(pdf);
         dh.removeUnreferencedResources();

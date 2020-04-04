@@ -50,6 +50,110 @@ qpdf: processing 048-kfo.pdf
 qpdf: processing 049-kfo.pdf
 qpdf: processing 050-kfo.pdf
 qpdf: processing 051-kfo.pdf
+qpdf: empty PDF: checking for shared resources
+qpdf: no shared resources found
+qpdf: 001-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 002-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 003-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 004-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 005-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 006-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 007-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 008-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 009-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 010-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 011-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 012-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 013-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 014-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 015-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 016-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 017-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 018-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 019-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 020-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 021-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 022-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 023-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 024-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 025-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 026-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 027-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 028-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 029-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 030-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 031-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 032-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 033-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 034-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 035-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 036-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 037-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 038-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 039-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 040-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 041-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 042-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 043-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 044-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 045-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 046-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 047-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 048-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 049-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 050-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 051-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
 qpdf: removing unreferenced pages from primary input
 qpdf: adding pages from 001-kfo.pdf
 qpdf: adding pages from 002-kfo.pdf

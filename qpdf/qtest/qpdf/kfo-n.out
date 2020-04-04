@@ -7,6 +7,26 @@ qpdf: processing 006-kfo.pdf
 qpdf: processing 007-kfo.pdf
 qpdf: processing 008-kfo.pdf
 qpdf: processing 009-kfo.pdf
+qpdf: empty PDF: checking for shared resources
+qpdf: no shared resources found
+qpdf: 001-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 002-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 003-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 004-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 005-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 006-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 007-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 008-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
+qpdf: 009-kfo.pdf: checking for shared resources
+qpdf: no shared resources found
 qpdf: removing unreferenced pages from primary input
 qpdf: adding pages from 001-kfo.pdf
 qpdf: adding pages from 002-kfo.pdf

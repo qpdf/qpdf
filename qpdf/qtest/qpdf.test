@@ -1699,7 +1699,7 @@ my @sp_cases = (
     [11, 'pdf extension', '', 'split-out.Pdf'],
     [4, 'fallback', '--pages 11-pages.pdf 1-3 minimal.pdf --', 'split-out'],
     );
-$n_tests += 32;
+$n_tests += 35;
 $n_compare_pdfs += 1;
 for (@sp_cases)
 {
@@ -1808,6 +1808,7 @@ foreach my $i (qw(1 2 3 4))
 $td->runtest("unreferenced resources with bad token",
              {$td->COMMAND =>
                   "qpdf --qdf --static-id --split-pages=2" .
+                  " --remove-unreferenced-resources=yes" .
                   " coalesce.pdf split-out-bad-token.pdf"},
              {$td->FILE => "coalesce-split.out", $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
@@ -1833,6 +1834,18 @@ $td->runtest("check output",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "shared-form-images-merged.pdf"});
 compare_pdfs("shared-form-images.pdf", "a.pdf");
+
+$td->runtest("shared form xobject subkey",
+             {$td->COMMAND => "qpdf --qdf --static-id --split-pages".
+                  " shared-form-images-xobject.pdf" .
+                  " split-out-shared-form-xobject.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+foreach my $i (qw(1 2))
+{
+    $td->runtest("check output ($i)",
+                 {$td->FILE => "split-out-shared-form-xobject-$i.pdf"},
+                 {$td->FILE => "shared-form-xobject-split-$i.pdf"});
+}
 
 show_ntests();
 # ----------

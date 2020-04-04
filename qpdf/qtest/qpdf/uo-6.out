@@ -1,4 +1,6 @@
 qpdf: selecting --keep-open-files=y
+qpdf: fxo-red.pdf: checking for shared resources
+qpdf: no shared resources found
 qpdf: removing unreferenced pages from primary input
 qpdf: adding pages from fxo-red.pdf
 qpdf: processing underlay/overlay
