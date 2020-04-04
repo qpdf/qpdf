@@ -99,6 +99,8 @@
 
 	* 9.1.0: release
 
+	* This is the first version of qpdf that requires C++-11.
+
 2019-11-09  Jay Berkenbilt  <ejb@ql.org>
 
 	* 9.1.rc1: release
