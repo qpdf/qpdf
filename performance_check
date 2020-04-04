@@ -1,0 +1,223 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+use File::Basename;
+use Time::HiRes qw(gettimeofday tv_interval);
+use File::Path qw(make_path);
+
+my $whoami = basename($0);
+$| = 1;
+
+# [ name, [ args ] ]
+my @tests = (
+    ['no arguments', []],
+    ['split pages', ['--split-pages', '--remove-unreferenced-resources=no']],
+    ['shared resource check', ['--split-pages', '--remove-unreferenced-resources=auto']],
+    ['linearize', ['--linearize']],
+    );
+
+# If arg is not found in help output, look here. If not here, skip test.
+# { new => old } -- if new is not found, replace with old; if old is
+#                   if old is empty, remove argument
+my %arg_compat = (
+    '--remove-unreferenced-resources=no' => '--preserve-unreferenced-resources',
+    '--remove-unreferenced-resources=yes' => '',
+    '--remove-unreferenced-resources=auto' => undef,
+    );
+
+my $executable = undef;
+my $test_dir = undef;
+my $test_file = undef;
+my $workdir = undef;
+my $maxtime = undef;
+
+my $default_executable = 'qpdf/build/qpdf';
+my $default_test_dir = '../performance-test-files';
+my $default_test_file = undef;
+my $default_workdir = 'qpdf/build/perf';
+my $default_maxtime = 20;
+
+sub usage
+{
+    die "
+Usage: $whoami [ args ]
+  --dir dir           test on all files in dir (default: $default_test_dir)
+  --file file         test only on the named file
+  --executable qpdf   use the specified qpdf (default: $default_executable)
+  --workdir           where to write output pdfs (default: $default_workdir)
+  --maxtime           maximum time for a test; 0 means unlimited (default: $default_maxtime)
+";
+}
+
+while (@ARGV)
+{
+    my $arg = shift(@ARGV);
+    if ('--dir' eq $arg)
+    {
+        usage() unless @ARGV;
+        $test_dir = shift(@ARGV);
+        $test_file = undef;
+    }
+    elsif ('--file' eq $arg)
+    {
+        usage() unless @ARGV;
+        $test_file = shift(@ARGV);
+        $test_dir = undef;
+    }
+    elsif ('--executable' eq $arg)
+    {
+        usage() unless @ARGV;
+        $executable = shift(@ARGV);
+    }
+    elsif ('--workdir' eq $arg)
+    {
+        usage() unless @ARGV;
+        $workdir = shift(@ARGV);
+    }
+    elsif ('--maxtime' eq $arg)
+    {
+        usage() unless @ARGV;
+        $maxtime = shift(@ARGV);
+    }
+    else
+    {
+        usage();
+    }
+}
+
+if ((! defined $test_dir) && (! defined $test_file))
+{
+    $test_dir = $default_test_dir;
+}
+if (! defined $executable)
+{
+    $executable = $default_executable;
+}
+if (! defined $workdir)
+{
+    $workdir = $default_workdir;
+}
+if (! defined $maxtime)
+{
+    $maxtime = $default_maxtime;
+}
+
+my @test_files = ();
+if (defined $test_file)
+{
+    push(@test_files, $test_file);
+}
+else
+{
+    opendir(D, $test_dir) or
+        die "$whoami: can't open directory $test_dir: $!\n";
+    my @entries = readdir(D);
+    closedir(D);
+    for (sort @entries)
+    {
+        push(@test_files, "$test_dir/$_") unless (('.' eq $_) || ('..' eq $_));
+    }
+}
+
+run_tests();
+
+sub filter_args
+{
+    my $args = shift;
+    my $help = `$executable --help`;
+    my $new_args = [];
+    foreach my $arg (@$args)
+    {
+        my $to_check = $arg;
+        $to_check =~ s/=.*$//;
+        if (index($help, $to_check) == -1)
+        {
+            my $new_arg = $arg_compat{$arg};
+            if (! defined $new_arg)
+            {
+                return undef;
+            }
+            if ($new_arg ne '')
+            {
+                print "  replacing $arg with $new_arg\n";
+                push(@$new_args, $new_arg);
+            }
+        }
+        else
+        {
+            push(@$new_args, $arg);
+        }
+    }
+    $new_args;
+}
+
+sub run_tests
+{
+    my $args = shift;
+
+    chomp(my $commit = `git describe @`);
+    print "commit: $commit\n";
+    make_path($workdir);
+    foreach my $test (@tests)
+    {
+        my ($name, $args) = @$test;
+        print " test: $name\n";
+        $args = filter_args($args);
+        if (! defined $args)
+        {
+            print "  skipping (unknown arguments)\n";
+            next;
+        }
+        foreach my $file (@test_files)
+        {
+            my $time = run_test($file, $args);
+            if (defined $time)
+            {
+                print "  $time  " . basename($file) ."\n";
+            }
+            else
+            {
+                print "   $file skipped\n";
+            }
+        }
+    }
+}
+
+sub run_test
+{
+    my ($file, $args) = @_;
+
+    my $iterations = 20;
+    my @cmd = ($executable, @$args, $file, "$workdir/out.pdf");
+    # Run once and discard to update caches
+    system("sync");
+    system(@cmd);
+    my $i = 0;
+    my $total = 0;
+    while ($i < $iterations)
+    {
+        my $start = [gettimeofday];
+        my $r = system(@cmd);
+        if ($r == 2)
+        {
+            # interrupt
+            exit(2);
+        }
+        my $end = [gettimeofday];
+        if ($r != 0)
+        {
+            print "  command failed; ignoring results\n";
+            return undef;
+        }
+        my $elapsed = tv_interval($start, $end);
+        $total += $elapsed;
+        ++$i;
+        if (($maxtime > 0) && ($total >= $maxtime) && ($i >= 3))
+        {
+            # This is taking too long, so take what we have
+            last;
+        }
+    }
+    return sprintf("%0.4f", $total / $i);
+}
