@@ -3082,11 +3082,18 @@ outfile.pdf</option>
         <itemizedlist>
          <listitem>
           <para>
-           A dictionary in the help output means that the corresponding
-           location in the actual JSON output is also a dictionary with
-           exactly the same keys; that is, no keys present in help are
-           absent in the real output, and no keys will be present in
-           the real output that are not in help.
+           A dictionary in the help output means that the
+           corresponding location in the actual JSON output is also a
+           dictionary with exactly the same keys; that is, no keys
+           present in help are absent in the real output, and no keys
+           will be present in the real output that are not in help. As
+           a special case, if the dictionary has a single key whose
+           name starts with <literal>&lt;</literal> and ends with
+           <literal>&gt;</literal>, it means that the JSON output is a
+           dictionary that can have any keys, each of which conforms
+           to the value of the special key. This is used for cases in
+           which the keys of the dictionary are things like object
+           IDs.
           </para>
          </listitem>
          <listitem>

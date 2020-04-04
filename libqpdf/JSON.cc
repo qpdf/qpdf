@@ -323,6 +323,7 @@ JSON::checkSchemaInternal(JSON_value* this_v, JSON_value* sch_v,
         err_prefix = "json key \"" + prefix + "\"";
     }
 
+    std::string pattern_key;
     if (sch_dict)
     {
         if (! this_dict)
@@ -331,6 +332,31 @@ JSON::checkSchemaInternal(JSON_value* this_v, JSON_value* sch_v,
             errors.push_back(err_prefix + " is supposed to be a dictionary");
             return false;
         }
+        auto members = sch_dict->members;
+        std::string key;
+        if ((members.size() == 1) &&
+            ((key = members.begin()->first, key.length() > 2) &&
+             (key.at(0) == '<') &&
+             (key.at(key.length() - 1) == '>')))
+        {
+            pattern_key = key;
+        }
+    }
+
+    if (sch_dict && (! pattern_key.empty()))
+    {
+        auto pattern_schema = sch_dict->members[pattern_key].getPointer();
+        for (auto iter: this_dict->members)
+        {
+            std::string const& key = iter.first;
+            checkSchemaInternal(
+                this_dict->members[key].getPointer(),
+                pattern_schema,
+                errors, prefix + "." + key);
+        }
+    }
+    else if (sch_dict)
+    {
         for (std::map<std::string, PointerHolder<JSON_value> >::iterator iter =
                  sch_dict->members.begin();
              iter != sch_dict->members.end(); ++iter)

@@ -112,6 +112,11 @@ static void test_schema()
         "    >>"
         "  ]"
         ">>").getJSON();
+    JSON three = JSON::makeDictionary();
+    three.addDictionaryMember(
+        "<objid>",
+        QPDFObjectHandle::parse("<< /z (ebra) >>").getJSON());
+    schema.addDictionaryMember("/three", three);
     JSON a = QPDFObjectHandle::parse("[(not a) (dictionary)]").getJSON();
     check_schema(a, schema, false, "top-level type mismatch");
     JSON b = QPDFObjectHandle::parse(
@@ -142,8 +147,12 @@ static void test_schema()
         "      /glarp (4 enspliel)"
         "    >>"
         "  ]"
+        "  /three <<"
+        "    /anything << /x (oops) >>"
+        "    /else << /z (okay) >>"
+        "  >>"
         ">>").getJSON();
-    check_schema(b, schema, false, "top-level type mismatch");
+    check_schema(b, schema, false, "missing items");
     check_schema(a, a, false, "top-level schema array error");
     check_schema(b, b, false, "lower-level schema array error");
     check_schema(schema, schema, true, "pass");
