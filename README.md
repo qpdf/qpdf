@@ -75,6 +75,20 @@ make install
 
 Packagers may set DESTDIR, in which case make install will install inside of DESTDIR, as is customary with many packages.  For more detailed general information, see the "INSTALL" file in this directory.  If you are already accustomed to building and installing software that uses autoconf, there's nothing new for you in the INSTALL file. Note that qpdf uses `autoconf` but not `automake`. We have our own system of Makefiles that allows cross-directory dependencies, doesn't use recursive make, and works better on non-UNIX platforms.
 
+# Building without wchar_t
+
+Executive summary: manually define -DQPDF_NO_WCHAR_T in your build if you are building on a system without wchar_t. For details, read the rest of this section.
+
+While wchar_t is part of the C++ standard library and should be present on virtually every system, there are some stripped down systems, such as those targetting certain embedded environments, that lack wchar_t. Internally, qpdf uses UTF-8 encoding for everything, so there is nothing important in qpdf's API that uses wchar_t. However, there is a helper method for converting between wchar_t* and char* that uses wchar_t.
+
+If you are building in an environment that does not support wchar_t, you can define the preprocessor symbol QPDF_NO_WCHAR_T in your build. This will work whether you are building qpdf and need to avoid compiling the code that uses wchar_t or whether you are building client code that uses qpdf.
+
+For example, to build qpdf on a system without wchar_t, be sure that -DQPDF_NO_WCHAR_T is part of your CXXFLAGS. Similar techniques will work in other places.
+
+Note that, when you build code with libqpdf, it is *not necessary* to have the definition of QPDF_NO_WCHAR_T in your build match what was defined when the library was built as long as you are not calling QUtil::call_main_from_wmain in your code. In other words, if your qpdf library was built on a system without wchar_t and you are using that system to build at some later time after wchar_t was available, as long as you don't call the function that uses it, you can just build normally.
+
+Note that QPDF_NO_WCHAR_T is never defined by autoconf or any other automated method. There is a hard rule in qpdf that values determined by autoconf are not available in the public API. This is because there is never a guarantee or even expectation that those values will match between the system on which qpdf was build and the system on which a user is building code with libqpdf.
+
 # Building on Windows
 
 QPDF is known to build and pass its test suite with mingw (latest version tested: gcc 7.2.0), mingw64 (latest version tested: 7.2.0) and Microsoft Visual C++ 2015, both 32-bit and 64-bit versions.  MSYS2 is required to build as well in order to get make and other related tools.  See [README-windows.md](README-windows.md) for details on how to build under Windows.

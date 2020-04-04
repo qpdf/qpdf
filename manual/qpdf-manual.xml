@@ -240,6 +240,16 @@ make
     <filename>README-windows.md</filename>.
    </para>
    <para>
+    While <type>wchar_t</type> is part of the C++ standard, qpdf uses
+    it in only one place in the public API, and it's just in a helper
+    function. It is possible to build qpdf on a system that doesn't
+    have <type>wchar_t</type>, and it's also possible to compile a
+    program that uses qpdf on a system without <type>wchar_t</type> as
+    long as you don't call that one method. This is a very unusual
+    situation. For a detailed discussion, please see the top-level
+    README.md file in qpdf's source distribution.
+   </para>
+   <para>
     There are some other things you can do with the build.  Although
     qpdf uses <application>autoconf</application>, it does not use
     <application>automake</application> but instead uses a

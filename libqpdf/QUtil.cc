@@ -2342,8 +2342,10 @@ QUtil::possible_repaired_encodings(std::string supplied)
     return t;
 }
 
+#ifndef QPDF_NO_WCHAR_T
 int
-QUtil::call_main_from_wmain(int argc, wchar_t* argv[], std::function<int(int, char*[])> realmain)
+QUtil::call_main_from_wmain(int argc, wchar_t* argv[],
+                            std::function<int(int, char*[])> realmain)
 {
     // argv contains UTF-16-encoded strings with a 16-bit wchar_t.
     // Convert this to UTF-8-encoded strings for compatibility with
@@ -2376,3 +2378,4 @@ QUtil::call_main_from_wmain(int argc, wchar_t* argv[], std::function<int(int, ch
     new_argv[argc] = 0;
     return realmain(argc, new_argv);
 }
+#endif // QPDF_NO_WCHAR_T

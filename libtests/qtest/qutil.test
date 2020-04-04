@@ -15,4 +15,20 @@ $td->runtest("QUtil",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES | $td->RM_WS_ONLY_LINES);
 
-$td->report(1);
+my $mfw = `main_from_wmain`;
+if ($mfw eq '')
+{
+    $td->runtest("skipping main_from_wmain",
+                 {$td->STRING => ""},
+                 {$td->STRING => ""})
+}
+else
+{
+    $td->runtest("main_from_wmain",
+                 {$td->COMMAND => "main_from_wmain"},
+                 {$td->FILE => "wmain.out",
+                      $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES | $td->RM_WS_ONLY_LINES);
+}
+
+$td->report(2);

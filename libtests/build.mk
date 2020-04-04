@@ -13,6 +13,7 @@ BINS_libtests = \
 	input_source \
 	json \
 	lzw \
+	main_from_wmain \
 	matrix \
 	md5 \
 	numrange \

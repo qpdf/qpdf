@@ -357,12 +357,20 @@ namespace QUtil
     QPDF_DLL
     std::vector<int> parse_numrange(char const* range, int max);
 
+#ifndef QPDF_NO_WCHAR_T
+    // If you are building qpdf on a stripped down system that doesn't
+    // have wchar_t, such as may be the case in some embedded
+    // environments, you may define QPDF_NO_WCHAR_T in your build.
+    // This symbol is never defined automatically. Search for wchar_t
+    // in qpdf's top-level README.md file for details.
+
     // Take an argv array consisting of wchar_t, as when wmain is
     // invoked, convert all UTF-16 encoded strings to UTF-8, and call
     // another main.
     QPDF_DLL
     int call_main_from_wmain(int argc, wchar_t* argv[],
                              std::function<int(int, char*[])> realmain);
+#endif // QPDF_NO_WCHAR_T
 };
 
 #endif // QUTIL_HH

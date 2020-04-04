@@ -1,5 +1,11 @@
 2020-04-03  Jay Berkenbilt  <ejb@ql.org>
 
+	* Allow qpdf to be built on systems without wchar_t. All "normal"
+	systems have wchar_t because it is part of the C++ standard, but
+	there are some stripped down environments that don't have it. See
+	README.md (search for wchar_t) for instructions and a discussion.
+	Fixes #406.
+
 	* Add two extra optional arguments to
 	QPDFPageObjectHelper::placeFormXObject to control whether the
 	placed item is allowed to be shrunk or expanded to fit within or

@@ -543,17 +543,6 @@ void rename_delete_test()
     assert_no_file("old\xcf\x80.~tmp");
 }
 
-void wmain_test()
-{
-    auto realmain = [](int argc, char* argv[]) {
-                        for (int i = 0; i < argc; ++i) { std::cout << argv[i] << std::endl; } return 0; };
-    wchar_t* argv[3];
-    argv[0] = const_cast<wchar_t*>(L"ascii");
-    argv[1] = const_cast<wchar_t*>(L"10 \xf7 2 = 5");
-    argv[2] = const_cast<wchar_t*>(L"qwww\xf7\x03c0");
-    QUtil::call_main_from_wmain(3, argv, realmain);
-}
-
 int main(int argc, char* argv[])
 {
     try
@@ -584,8 +573,6 @@ int main(int argc, char* argv[])
 	hex_encode_decode_test();
 	std::cout << "---- rename/delete" << std::endl;
 	rename_delete_test();
-	std::cout << "---- wmain" << std::endl;
-	wmain_test();
     }
     catch (std::exception& e)
     {
