@@ -1588,7 +1588,16 @@ outfile.pdf</option>
     Prior to version 8.4, it was not possible to specify the same page
     from the same file directly more than once, and the workaround of
     specifying the same file in more than one way was required.
-    Version 8.4 removes this limitation.
+    Version 8.4 removes this limitation, but there is still a valid
+    use case. When you specify the same page from the same file more
+    than once, qpdf will share objects between the pages. If you are
+    going to do further manipulation on the file and need the two
+    instances of the same original page to be deep copies, then you
+    can specify the file in two different ways. For example
+    <command>qpdf in.pdf --pages . 1 ./in.pdf 1 -- out.pdf</command>
+    would create a file with two copies of the first page of the
+    input, and the two copies would share any objects in common. This
+    includes fonts, images, and anything else the page references.
    </para>
   </sect1>
   <sect1 id="ref.overlay-underlay">

@@ -2057,7 +2057,7 @@ foreach my $f (qw(page_api_2 direct-pages))
 show_ntests();
 # ----------
 $td->notify("--- Merging and Splitting ---");
-$n_tests += 24;
+$n_tests += 26;
 
 # Select pages from the same file multiple times including selecting
 # twice from an encrypted file and specifying the password only the
@@ -2199,6 +2199,19 @@ $td->runtest("duplicate pages",
 $td->runtest("check output",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "duplicate-pages.pdf"});
+
+# See https://github.com/qpdf/qpdf/issues/399 -- we don't want to
+# break this, especially if we ever implement deduplication of
+# identical streams.
+$td->runtest("force full page duplication",
+             {$td->COMMAND => "qpdf --static-id minimal.pdf" .
+                  " --pages . ./minimal.pdf -- a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "deep-duplicate-pages.pdf"});
+
 
 show_ntests();
 # ----------
