@@ -57,6 +57,9 @@ class QPDFObjectHandle
     class QPDF_DLL_CLASS StreamDataProvider
     {
       public:
+        QPDF_DLL
+        StreamDataProvider(bool supports_retry = false);
+
 	QPDF_DLL
 	virtual ~StreamDataProvider()
 	{
@@ -74,8 +77,30 @@ class QPDFObjectHandle
 	// information is made available just to make it more
 	// convenient to use a single StreamDataProvider object to
 	// provide data for multiple streams.
+
+        // Prior to qpdf 10.0.0, it was not possible to handle errors
+        // the way pipeStreamData does or to pass back success.
+        // Starting in qpdf 10.0.0, those capabilities have been added
+        // by allowing an alternative provideStreamData to be
+        // implemented. You must implement at least one of the
+        // versions of provideStreamData below. If you implement the
+        // version that supports retry and returns a value, you should
+        // pass true as the value of supports_retry in the base class
+        // constructor. This will cause the library to call that
+        // version of the method, which should also return a boolean
+        // indicating whether it ran without errors.
+        QPDF_DLL
 	virtual void provideStreamData(int objid, int generation,
-				       Pipeline* pipeline) = 0;
+				       Pipeline* pipeline);
+        QPDF_DLL
+	virtual bool provideStreamData(
+            int objid, int generation, Pipeline* pipeline,
+            bool suppress_warnings, bool will_retry);
+        QPDF_DLL
+	bool supportsRetry();
+
+      private:
+        bool supports_retry;
     };
 
     // The TokenFilter class provides a way to filter content streams
@@ -779,18 +804,39 @@ class QPDFObjectHandle
     // we determine that we know how to apply all requested filters,
     // do so and return true if we are successful.
     //
-    // In all cases, a return value of true means that filtered data
-    // has been written successfully. If filtering is requested but
-    // this method returns false, it means there was some error in the
-    // filtering, in which case the resulting data is likely partially
-    // filtered and/or incomplete and may not be consistent with the
-    // configured filters. QPDFWriter handles this by attempting to
-    // get the stream data without filtering, but callers should
-    // consider a false return value when decode_level is not
-    // qpdf_dl_none to be a potential loss of data. If you intend to
-    // retry in that case, pass true as the value of will_retry. This
-    // changes the warning issued by the library to indicate that the
-    // operation will be retried without filtering to avoid data loss.
+    // The exact meaning of the return value differs the different
+    // versions of this function, but for any version, the meaning has
+    // been the same. For the main version, added in qpdf 10, the
+    // return value indicates whether the overall operation succeeded.
+    // The filter parameter, if specified, will be set to whether or
+    // not filtering was attempted. If filtering was not requested,
+    // this value will be false even if the overall operation
+    // succeeded.
+    //
+    // If filtering is requested but this method returns false, it
+    // means there was some error in the filtering, in which case the
+    // resulting data is likely partially filtered and/or incomplete
+    // and may not be consistent with the configured filters.
+    // QPDFWriter handles this by attempting to get the stream data
+    // without filtering, but callers should consider a false return
+    // value when decode_level is not qpdf_dl_none to be a potential
+    // loss of data. If you intend to retry in that case, pass true as
+    // the value of will_retry. This changes the warning issued by the
+    // library to indicate that the operation will be retried without
+    // filtering to avoid data loss.
+
+    // Return value is overall success, even if filtering is not
+    // requested.
+    QPDF_DLL
+    bool pipeStreamData(Pipeline*, bool* filtering_attempted,
+                        int encode_flags,
+                        qpdf_stream_decode_level_e decode_level,
+                        bool suppress_warnings = false,
+                        bool will_retry = false);
+
+    // Legacy version. Return value is whether filtering was
+    // attempted. There is no way to determine success if filtering
+    // was not attempted.
     QPDF_DLL
     bool pipeStreamData(Pipeline*,
                         int encode_flags,
@@ -804,6 +850,7 @@ class QPDFObjectHandle
     //  filter = true                   -> decode_level = qpdf_dl_generalized
     //    normalize = true -> encode_flags |= qpdf_sf_normalize
     //    compress = true  -> encode_flags |= qpdf_sf_compress
+    // Return value is whether filtering was attempted.
     QPDF_DLL
     bool pipeStreamData(Pipeline*, bool filter,
 			bool normalize, bool compress);

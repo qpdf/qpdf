@@ -1,0 +1,3 @@
+WARNING: copy-foreign-objects-in.pdf (offset 3627): error decoding stream data for object 26 0: LZWDecoder: bad code received
+WARNING: copy-foreign-objects-in.pdf (offset 3627): stream will be re-processed without filtering to avoid data loss
+test 27 done

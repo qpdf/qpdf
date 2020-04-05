@@ -31,7 +31,7 @@ class QPDF_Stream: public QPDFObject
     PointerHolder<QPDFObjectHandle::StreamDataProvider> getStreamDataProvider() const;
 
     // See comments in QPDFObjectHandle.hh for these methods.
-    bool pipeStreamData(Pipeline*,
+    bool pipeStreamData(Pipeline*, bool* tried_filtering,
                         int encode_flags,
                         qpdf_stream_decode_level_e decode_level,
                         bool suppress_warnings, bool will_retry);

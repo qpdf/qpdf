@@ -1,5 +1,20 @@
 2020-04-04  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add a new provideStreamData method for StreamDataProvider that
+	allows a success code to be returned and that accepts the
+	suppress_warnings and will_retry methods. This makes it possible
+	to have a StreamDataProvider call pipeStreamData and propagate its
+	results back. This change allows better error handling and
+	recovery when objects are copied from other files and when
+	"immediate copy from" is enabled.
+
+	* Add a new version of QPDFObjectHandle::pipeStreamData whose
+	return value indicates overall success or failure rather than
+	whether nor not filtering was attempted. It should have always
+	been this way. This change was done in a backward-compatible
+	fashion. Previously existing pipeStreamData methods' return values
+	mean the same as always.
+
 	* Add "objectinfo" section to json output. In this release,
 	information about whether each object is a stream or not is
 	provided. There's otherwise no way to tell conclusively from the

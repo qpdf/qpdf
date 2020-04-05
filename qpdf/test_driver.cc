@@ -1210,7 +1210,8 @@ void runtest(int n, char const* filename1, char const* arg2)
 
 	QPDFWriter w(pdf, "a.pdf");
 	w.setStaticID(true);
-	w.setStreamDataMode(qpdf_s_preserve);
+        w.setCompressStreams(false);
+        w.setDecodeLevel(qpdf_dl_generalized);
 	w.write();
     }
     else if (n == 28)

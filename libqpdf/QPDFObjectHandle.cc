@@ -36,6 +36,36 @@ class TerminateParsing
 {
 };
 
+QPDFObjectHandle::StreamDataProvider::StreamDataProvider(
+    bool supports_retry) :
+    supports_retry(supports_retry)
+{
+}
+
+void
+QPDFObjectHandle::StreamDataProvider::provideStreamData(
+    int objid, int generation, Pipeline* pipeline)
+{
+    throw std::logic_error(
+        "you must override provideStreamData -- see QPDFObjectHandle.hh");
+}
+
+bool
+QPDFObjectHandle::StreamDataProvider::provideStreamData(
+    int objid, int generation, Pipeline* pipeline,
+    bool suppress_warnings, bool will_retry)
+{
+    throw std::logic_error(
+        "you must override provideStreamData -- see QPDFObjectHandle.hh");
+    return false;
+}
+
+bool
+QPDFObjectHandle::StreamDataProvider::supportsRetry()
+{
+    return this->supports_retry;
+}
+
 class CoalesceProvider: public QPDFObjectHandle::StreamDataProvider
 {
   public:
@@ -1135,14 +1165,29 @@ QPDFObjectHandle::getRawStreamData()
 }
 
 bool
-QPDFObjectHandle::pipeStreamData(Pipeline* p,
+QPDFObjectHandle::pipeStreamData(Pipeline* p, bool* filtering_attempted,
                                  int encode_flags,
                                  qpdf_stream_decode_level_e decode_level,
                                  bool suppress_warnings, bool will_retry)
 {
     assertStream();
     return dynamic_cast<QPDF_Stream*>(obj.getPointer())->pipeStreamData(
-	p, encode_flags, decode_level, suppress_warnings, will_retry);
+	p, filtering_attempted, encode_flags, decode_level,
+        suppress_warnings, will_retry);
+}
+
+bool
+QPDFObjectHandle::pipeStreamData(Pipeline* p,
+                                 int encode_flags,
+                                 qpdf_stream_decode_level_e decode_level,
+                                 bool suppress_warnings, bool will_retry)
+{
+    assertStream();
+    bool filtering_attempted;
+    dynamic_cast<QPDF_Stream*>(obj.getPointer())->pipeStreamData(
+	p, &filtering_attempted, encode_flags, decode_level,
+        suppress_warnings, will_retry);
+    return filtering_attempted;
 }
 
 bool

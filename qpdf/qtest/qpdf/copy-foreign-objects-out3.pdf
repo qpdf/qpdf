@@ -4,7 +4,7 @@
 << /Pages 6 0 R /Type /Catalog >>
 endobj
 2 0 obj
-<< /O1 7 0 R /O2 8 0 R /O3 9 0 R /This-is-QTest true >>
+<< /O1 7 0 R /O2 8 0 R /O3 9 0 R /O4 10 0 R /This-is-QTest true >>
 endobj
 3 0 obj
 << /Length 20 >>
@@ -25,39 +25,45 @@ more data for stream
 endstream
 endobj
 6 0 obj
-<< /Count 3 /Kids [ 10 0 R 11 0 R 9 0 R ] /Type /Pages >>
+<< /Count 3 /Kids [ 11 0 R 12 0 R 9 0 R ] /Type /Pages >>
 endobj
 7 0 obj
-[ /This-is-O1 /potato << /O2 [ 3.14159 << /O2 8 0 R >> 2.17828 ] >> /salad /O2 8 0 R /Stream1 12 0 R ]
+[ /This-is-O1 /potato << /O2 [ 3.14159 << /O2 8 0 R >> 2.17828 ] >> /salad /O2 8 0 R /Stream1 13 0 R ]
 endobj
 8 0 obj
 << /K1 [ 2.236 /O1 7 0 R 1.732 ] /O1 7 0 R /This-is-O2 true >>
 endobj
 9 0 obj
-<< /Contents 13 0 R /MediaBox [ 0 0 612 792 ] /OtherPage 11 0 R /Parent 6 0 R /Resources << /Font << /F1 14 0 R >> /ProcSet [ /PDF /Text ] >> /Rotate 180 /This-is-O3 true /Type /Page >>
+<< /Contents 14 0 R /MediaBox [ 0 0 612 792 ] /OtherPage 12 0 R /Parent 6 0 R /Resources << /Font << /F1 15 0 R >> /ProcSet [ /PDF /Text ] >> /Rotate 180 /This-is-O3 true /Type /Page >>
 endobj
 10 0 obj
-<< /Contents 15 0 R /MediaBox [ 0 0 612 792 ] /Parent 6 0 R /Resources << /Font << /F1 16 0 R >> /ProcSet 17 0 R >> /Type /Page >>
+<< /Filter /LZWDecode /Length 22 >>
+stream
+Not really compresed.
+endstream
 endobj
 11 0 obj
-<< /Contents 18 0 R /MediaBox [ 0 0 612 792 ] /Parent 6 0 R /Resources << /Font << /F1 14 0 R >> /ProcSet [ /PDF /Text ] >> /Rotate 180 /This-is-O3-other-page true /Type /Page >>
+<< /Contents 16 0 R /MediaBox [ 0 0 612 792 ] /Parent 6 0 R /Resources << /Font << /F1 17 0 R >> /ProcSet 18 0 R >> /Type /Page >>
 endobj
 12 0 obj
-<< /Stream2 19 0 R /This-is-Stream1 true /Length 18 >>
+<< /Contents 19 0 R /MediaBox [ 0 0 612 792 ] /Parent 6 0 R /Resources << /Font << /F1 15 0 R >> /ProcSet [ /PDF /Text ] >> /Rotate 180 /This-is-O3-other-page true /Type /Page >>
+endobj
+13 0 obj
+<< /Stream2 20 0 R /This-is-Stream1 true /Length 18 >>
 stream
 This is stream 1.
 endstream
 endobj
-13 0 obj
+14 0 obj
 << /Length 47 >>
 stream
 BT /F1 15 Tf 72 720 Td (Original page 2) Tj ET
 endstream
 endobj
-14 0 obj
+15 0 obj
 << /BaseFont /Times-Roman /Encoding /WinAnsiEncoding /Subtype /Type1 /Type /Font >>
 endobj
-15 0 obj
+16 0 obj
 << /Length 44 >>
 stream
 BT
@@ -67,47 +73,48 @@ BT
 ET
 endstream
 endobj
-16 0 obj
+17 0 obj
 << /BaseFont /Helvetica /Encoding /WinAnsiEncoding /Name /F1 /Subtype /Type1 /Type /Font >>
 endobj
-17 0 obj
+18 0 obj
 [ /PDF /Text ]
 endobj
-18 0 obj
+19 0 obj
 << /Length 47 >>
 stream
 BT /F1 15 Tf 72 720 Td (Original page 3) Tj ET
 endstream
 endobj
-19 0 obj
-<< /Stream1 12 0 R /This-is-Stream2 true /Length 18 >>
+20 0 obj
+<< /Stream1 13 0 R /This-is-Stream2 true /Length 18 >>
 stream
 This is stream 2.
 endstream
 endobj
 xref
-0 20
+0 21
 0000000000 65535 f 
 0000000015 00000 n 
 0000000064 00000 n 
-0000000135 00000 n 
-0000000204 00000 n 
-0000000259 00000 n 
-0000000329 00000 n 
-0000000402 00000 n 
-0000000520 00000 n 
-0000000598 00000 n 
-0000000799 00000 n 
-0000000946 00000 n 
-0000001141 00000 n 
-0000001247 00000 n 
-0000001344 00000 n 
-0000001444 00000 n 
-0000001538 00000 n 
-0000001646 00000 n 
-0000001677 00000 n 
-0000001774 00000 n 
-trailer << /QTest 2 0 R /QTest2 [ 3 0 R 4 0 R 5 0 R ] /Root 1 0 R /Size 20 /ID [<31415926535897932384626433832795><31415926535897932384626433832795>] >>
+0000000146 00000 n 
+0000000215 00000 n 
+0000000270 00000 n 
+0000000340 00000 n 
+0000000413 00000 n 
+0000000531 00000 n 
+0000000609 00000 n 
+0000000810 00000 n 
+0000000901 00000 n 
+0000001048 00000 n 
+0000001243 00000 n 
+0000001349 00000 n 
+0000001446 00000 n 
+0000001546 00000 n 
+0000001640 00000 n 
+0000001748 00000 n 
+0000001779 00000 n 
+0000001876 00000 n 
+trailer << /QTest 2 0 R /QTest2 [ 3 0 R 4 0 R 5 0 R ] /Root 1 0 R /Size 21 /ID [<31415926535897932384626433832795><31415926535897932384626433832795>] >>
 startxref
-1880
+1982
 %%EOF

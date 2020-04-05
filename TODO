@@ -20,18 +20,6 @@ ABI Changes
 This is a list of changes to make next time there is an ABI change.
 Comments appear in the code prefixed by "ABI"
 
-* (Source compatibility) As somewhat discussed in issue 219, the
-  original pipeStreamData in QPDF_Stream has various logic for
-  reporting warnings and letting the caller retry. This logic is not
-  implemented for stream data providers. When copying foreign streams,
-  qpdf uses a stream data provider (QPDF::CopiedStreamDataProvider) to
-  read the stream data from the original file. While a warning is
-  issued for that case, there is no way to actually propagate failure
-  information back through because
-  StreamDataProvider::provideStreamData doesn't take the
-  suppress_warnings or will_retry options, and adding them would break
-  source compatibility.
-
 C++-11
 ======
 

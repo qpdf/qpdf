@@ -163,7 +163,7 @@ PointerHolder<Buffer>
 QPDF_Stream::getStreamData(qpdf_stream_decode_level_e decode_level)
 {
     Pl_Buffer buf("stream data buffer");
-    if (! pipeStreamData(&buf, 0, decode_level, false, false))
+    if (! pipeStreamData(&buf, nullptr, 0, decode_level, false, false))
     {
 	throw QPDFExc(qpdf_e_unsupported, qpdf->getFilename(),
                       "", this->offset,
@@ -177,7 +177,12 @@ PointerHolder<Buffer>
 QPDF_Stream::getRawStreamData()
 {
     Pl_Buffer buf("stream data buffer");
-    pipeStreamData(&buf, 0, qpdf_dl_none, false, false);
+    if (! pipeStreamData(&buf, nullptr, 0, qpdf_dl_none, false, false))
+    {
+	throw QPDFExc(qpdf_e_unsupported, qpdf->getFilename(),
+                      "", this->offset,
+                      "error getting raw stream data");
+    }
     QTC::TC("qpdf", "QPDF_Stream getRawStreamData");
     return buf.getBuffer();
 }
@@ -467,7 +472,7 @@ QPDF_Stream::filterable(std::vector<std::string>& filters,
 }
 
 bool
-QPDF_Stream::pipeStreamData(Pipeline* pipeline,
+QPDF_Stream::pipeStreamData(Pipeline* pipeline, bool* filterp,
                             int encode_flags,
                             qpdf_stream_decode_level_e decode_level,
                             bool suppress_warnings, bool will_retry)
@@ -480,7 +485,14 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline,
     bool early_code_change = true;
     bool specialized_compression = false;
     bool lossy_compression = false;
-    bool filter = (! ((encode_flags == 0) && (decode_level == qpdf_dl_none)));
+    bool ignored;
+    if (filterp == nullptr)
+    {
+        filterp = &ignored;
+    }
+    bool& filter = *filterp;
+    filter = (! ((encode_flags == 0) && (decode_level == qpdf_dl_none)));
+    bool success = true;
     if (filter)
     {
 	filter = filterable(filters, specialized_compression, lossy_compression,
@@ -505,6 +517,7 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline,
     if (pipeline == 0)
     {
 	QTC::TC("qpdf", "QPDF_Stream pipeStreamData with null pipeline");
+        // Return value is whether we can filter in this case.
 	return filter;
     }
 
@@ -625,8 +638,21 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline,
     else if (this->stream_provider.getPointer())
     {
 	Pl_Count count("stream provider count", pipeline);
-	this->stream_provider->provideStreamData(
-	    this->objid, this->generation, &count);
+        if (this->stream_provider->supportsRetry())
+        {
+            if (! this->stream_provider->provideStreamData(
+                    this->objid, this->generation, &count,
+                    suppress_warnings, will_retry))
+            {
+                filter = false;
+                success = false;
+            }
+        }
+        else
+        {
+            this->stream_provider->provideStreamData(
+                this->objid, this->generation, &count);
+        }
 	qpdf_offset_t actual_length = count.getCount();
 	qpdf_offset_t desired_length = 0;
         if (this->stream_dict.hasKey("/Length"))
@@ -674,6 +700,7 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline,
                                          will_retry))
         {
             filter = false;
+            success = false;
         }
     }
 
@@ -704,7 +731,7 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline,
                      " for content normalization in the manual."));
     }
 
-    return filter;
+    return success;
 }
 
 void

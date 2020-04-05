@@ -813,8 +813,9 @@ class QPDF
         virtual ~CopiedStreamDataProvider()
         {
         }
-	virtual void provideStreamData(int objid, int generation,
-				       Pipeline* pipeline);
+	virtual bool provideStreamData(
+            int objid, int generation, Pipeline* pipeline,
+            bool suppress_warnings, bool will_retry) override;
         void registerForeignStream(QPDFObjGen const& local_og,
                                    QPDFObjectHandle foreign_stream);
         void registerForeignStream(QPDFObjGen const& local_og,
@@ -909,9 +910,7 @@ class QPDF
                         bool will_retry);
     bool pipeForeignStreamData(
         PointerHolder<ForeignStreamData>,
-        Pipeline*,
-        int encode_flags,
-        qpdf_stream_decode_level_e decode_level);
+        Pipeline*, bool suppress_warnings, bool will_retry);
     static bool pipeStreamData(PointerHolder<QPDF::EncryptionParameters> encp,
                                PointerHolder<InputSource> file,
                                QPDF& qpdf_for_warning,

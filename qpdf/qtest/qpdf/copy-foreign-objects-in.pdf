@@ -7,12 +7,13 @@
 % file.
 
 % The /QTest key in trailer has pointers to several indirect objects:
-% O1, O2, O3 where O1 is an array that contains a dictionary that has
-% a key that points to O2, O2 is a dictionary that contains an array
-% that points to O1, and O3 is a page object that inherits some
-% resource from its parent /Pages and also points to some other page.
-% O1 also points to a stream whose dictionary has a key that points to
-% another stream whose dictionary points back to the first stream.
+% O1, O2, O3, O4 where O1 is an array that contains a dictionary that
+% has a key that points to O2, O2 is a dictionary that contains an
+% array that points to O1, O3 is a page object that inherits some
+% resource from its parent /Pages and also points to some other page,
+% and O4 is a stream with invalid compressed data. O1 also points to a
+% stream whose dictionary has a key that points to another stream
+% whose dictionary points back to the first stream.
 
 1 0 obj
 <<
@@ -293,43 +294,59 @@ endobj
 
 % QTest
 25 0 obj
-<< /This-is-QTest true /O1 19 0 R /O2 20 0 R /O3 5 0 R >>
+<< /This-is-QTest true /O1 19 0 R /O2 20 0 R /O3 5 0 R /O4 26 0 R >>
+endobj
+
+26 0 obj
+<<
+  /Length 27 0 R
+  /Filter /LZWDecode
+>>
+stream
+Not really compresed.
+endstream
+endobj
+
+27 0 obj
+22
 endobj
 
 xref
-0 26
+0 28
 0000000000 65535 f 
-0000000655 00000 n 
-0000000709 00000 n 
-0000000845 00000 n 
-0000001073 00000 n 
-0000001313 00000 n 
-0000001580 00000 n 
-0000001839 00000 n 
-0000002081 00000 n 
-0000002183 00000 n 
-0000002202 00000 n 
-0000002334 00000 n 
-0000002438 00000 n 
-0000002481 00000 n 
-0000002585 00000 n 
-0000002628 00000 n 
-0000002732 00000 n 
-0000002775 00000 n 
-0000002879 00000 n 
-0000002904 00000 n 
-0000003042 00000 n 
-0000003138 00000 n 
-0000003255 00000 n 
-0000003285 00000 n 
-0000003402 00000 n 
-0000003430 00000 n 
+0000000706 00000 n 
+0000000760 00000 n 
+0000000896 00000 n 
+0000001124 00000 n 
+0000001364 00000 n 
+0000001631 00000 n 
+0000001890 00000 n 
+0000002132 00000 n 
+0000002234 00000 n 
+0000002253 00000 n 
+0000002385 00000 n 
+0000002489 00000 n 
+0000002532 00000 n 
+0000002636 00000 n 
+0000002679 00000 n 
+0000002783 00000 n 
+0000002826 00000 n 
+0000002930 00000 n 
+0000002955 00000 n 
+0000003093 00000 n 
+0000003189 00000 n 
+0000003306 00000 n 
+0000003336 00000 n 
+0000003453 00000 n 
+0000003481 00000 n 
+0000003567 00000 n 
+0000003667 00000 n 
 trailer <<
   /Root 1 0 R
-  /Size 26
+  /Size 28
   /QTest 25 0 R
   /ID [<d15f7aca3be584a96c1c94adb0931e71><9adb6b2fdb22e857340f7103917b16e4>]
 >>
 startxref
-3505
+3687
 %%EOF
