@@ -878,57 +878,81 @@ QUtil::toUTF16(unsigned long uval)
 
 // Random data support
 
-static RandomDataProvider* random_data_provider = 0;
-
-#ifdef USE_INSECURE_RANDOM
-static RandomDataProvider* insecure_random_data_provider =
-    InsecureRandomDataProvider::getInstance();
-#else
-static RandomDataProvider* insecure_random_data_provider = 0;
-#endif
-static RandomDataProvider* secure_random_data_provider =
-    SecureRandomDataProvider::getInstance();
-
-static void
-initialize_random_data_provider()
+class RandomDataProviderProvider
 {
-    if (random_data_provider == 0)
-    {
-        if (secure_random_data_provider)
-        {
-            random_data_provider = secure_random_data_provider;
-        }
-        else if (insecure_random_data_provider)
-        {
-            random_data_provider = insecure_random_data_provider;
-        }
-    }
+  public:
+    RandomDataProviderProvider();
+    void setProvider(RandomDataProvider*);
+    RandomDataProvider* getProvider();
+
+  private:
+    RandomDataProvider* default_provider;
+    RandomDataProvider* current_provider;
+};
+
+RandomDataProviderProvider::RandomDataProviderProvider() :
+    default_provider(0),
+    current_provider(0)
+{
+#ifdef USE_INSECURE_RANDOM
+    static RandomDataProvider* insecure_random_data_provider =
+        InsecureRandomDataProvider::getInstance();
+#else
+    static RandomDataProvider* insecure_random_data_provider = 0;
+#endif
+    static RandomDataProvider* secure_random_data_provider =
+        SecureRandomDataProvider::getInstance();
+
+    this->default_provider = (
+        secure_random_data_provider ? secure_random_data_provider
+        : insecure_random_data_provider ? insecure_random_data_provider
+        : 0);
+
     // QUtil.hh has comments indicating that getRandomDataProvider(),
     // which calls this method, never returns null.
-    if (random_data_provider == 0)
+    if (this->default_provider == 0)
     {
         throw std::logic_error("QPDF has no random data provider");
     }
+    this->current_provider = default_provider;
+}
+
+RandomDataProvider*
+RandomDataProviderProvider::getProvider()
+{
+    return this->current_provider;
+}
+
+void
+RandomDataProviderProvider::setProvider(RandomDataProvider* p)
+{
+    this->current_provider = p ? p : this->default_provider;
+}
+
+static RandomDataProviderProvider*
+getRandomDataProviderProvider()
+{
+    // Thread-safe static initializer
+    static RandomDataProviderProvider rdpp;
+    return &rdpp;
 }
 
 void
 QUtil::setRandomDataProvider(RandomDataProvider* p)
 {
-    random_data_provider = p;
+    getRandomDataProviderProvider()->setProvider(p);
 }
 
 RandomDataProvider*
 QUtil::getRandomDataProvider()
 {
-    initialize_random_data_provider();
-    return random_data_provider;
+    return getRandomDataProviderProvider()->getProvider();
 }
 
 void
 QUtil::initializeWithRandomBytes(unsigned char* data, size_t len)
 {
-    initialize_random_data_provider();
-    random_data_provider->provideRandomData(data, len);
+    getRandomDataProvider()->provideRandomData(data, len);
 }
 
 long
