@@ -3,9 +3,9 @@ set -ex
 sudo apt-get update
 sudo apt-get -y install \
    autoconf build-essential zlib1g-dev libjpeg-dev libgnutls28-dev \
-   docbook-xsl fop xsltproc libxml2-utils inkscape imagemagick
+   libssl-dev docbook-xsl fop xsltproc libxml2-utils inkscape imagemagick
 ./configure --enable-werror --enable-doc-maintenance \
-    --enable-crypto-native --enable-crypto-gnutls \
+    --enable-crypto-native --enable-crypto-openssl --enable-crypto-gnutls \
     --enable-show-failed-test-output
 make -j$(nproc) -k
 for i in $(./qpdf/build/qpdf --show-crypto); do

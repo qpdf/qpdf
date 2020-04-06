@@ -7,7 +7,7 @@ sudo apt-get -y install \
    CFLAGS="-fsanitize=address -fsanitize=undefined -g" \
    CXXFLAGS="-fsanitize=address -fsanitize=undefined -g" \
    LDFLAGS="-fsanitize=address -fsanitize=undefined" \
-   --enable-crypto-native --enable-crypto-gnutls \
+   --enable-crypto-native --enable-crypto-openssl --enable-crypto-gnutls \
    --enable-werror --disable-shared --enable-show-failed-test-output
 make -j$(nproc) -k
 for i in $(./qpdf/build/qpdf --show-crypto); do
