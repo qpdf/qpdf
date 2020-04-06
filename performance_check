@@ -15,6 +15,7 @@ my @tests = (
     ['split pages', ['--split-pages', '--remove-unreferenced-resources=no']],
     ['shared resource check', ['--split-pages', '--remove-unreferenced-resources=auto']],
     ['linearize', ['--linearize']],
+    ['encrypt', ['--encrypt', 'u', 'o', '256', '--']],
     );
 
 # If arg is not found in help output, look here. If not here, skip test.
