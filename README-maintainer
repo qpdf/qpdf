@@ -188,6 +188,8 @@ RELEASE PREPARATION
   * qpdf/qpdf.cc
   `make_dist` verifies this consistency.
 
+* Run ./autogen.sh
+
 * Add a release entry to ChangeLog.
 
 

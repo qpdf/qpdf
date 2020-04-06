@@ -1,5 +1,7 @@
 2020-04-06  Jay Berkenbilt  <ejb@ql.org>
 
+	* 10.0.0: release
+
 	* Move random number generation into the crypto providers. The old
 	os-based secure random number generation with fallback to insecure
 	random number generation (only if allowed at build time) has moved
