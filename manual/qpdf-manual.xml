@@ -1945,20 +1945,50 @@ outfile.pdf</option>
       </listitem>
      </varlistentry>
      <varlistentry>
+      <term><option>--remove-unreferenced-resources=<replaceable>option</replaceable></option></term>
+      <listitem>
+       <para>
+        The <replaceable>option</replaceable> may be
+        <literal>auto</literal>, <literal>yes</literal>, or
+        <literal>no</literal>. The default is <literal>auto</literal>.
+       </para>
+       <para>
+        Starting with qpdf 8.1, when splitting pages, qpdf is able to
+        attempt to remove images and fonts that are not used by a page
+        even if they are referenced in the page's resources
+        dictionary. When shared resources are in use, this behavior
+        can greatly reduce the file sizes of split pages, but the
+        analysis is very slow. In versions from 8.1 through 9.1.1,
+        qpdf did this analysis by default. Starting in qpdf 10.0.0, if
+        <literal>auto</literal> is used, qpdf does a quick analysis of
+        the file to determine whether the file is likely to have
+        unreferenced objects on pages, a pattern that frequently
+        occurs when resource dictionaries are shared across multiple
+        pages and rarely occurs otherwise. If it discovers this
+        pattern, then it will attempt to remove unreferenced
+        resources. Usually this means you get the slower splitting
+        speed only when it's actually going to create smaller files.
+        You can suppress removal of unreferenced resources altogether
+        by specifying <literal>no</literal> or force it to do the full
+        algorithm by specifying <literal>yes</literal>.
+       </para>
+       <para>
+        Other than cases in which you don't care about file size and
+        care a lot about runtime, there are few reasons to use this
+        option, especially now that <literal>auto</literal> mode is
+        supported. One reason to use this is if you suspect that qpdf
+        is removing resources it shouldn't be removing. If you
+        encounter that case, please report it as bug at <ulink
+        url="https://github.com/qpdf/qpdf/issues/">https://github.com/qpdf/qpdf/issues/</ulink>.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
       <term><option>--preserve-unreferenced-resources</option></term>
       <listitem>
        <para>
-        Starting with qpdf 8.1, when splitting pages, qpdf ordinarily
-        attempts to remove images and fonts that are not used by a
-        page even if they are referenced in the page's resources
-        dictionary. This option suppresses that behavior. There are
-        few reasons to use this option. One reason to use this is if
-        you suspect that qpdf is removing resources it shouldn't be
-        removing. If you encounter that case, please report it as a
-        bug. Another reason is that the new behavior can be much
-        slower for files that include a very large number of images or
-        other XObjects on a page. In that case, using this option will
-        return qpdf to the old behavior and speed.
+        This is a synonym for
+        <option>--remove-unreferenced-resources=no</option>.
        </para>
        <para>
         See also <option>--preserve-unreferenced</option>, which does
@@ -4700,6 +4730,239 @@ print "\n";
    <filename>ChangeLog</filename> in the source distribution.
   </para>
   <variablelist>
+<!--
+   <varlistentry>
+    <term>x.y.z: Month dd, YYYY</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Category
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Item
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Item
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Category
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Item
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Item
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+-->
+   <varlistentry>
+    <term>10.0.0: April 6, 2020</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Performance Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          The qpdf library and executable should run much faster in
+          this version than in the last several releases. Several
+          internal library optimizations have been made, and there has
+          been improved behavior on page splitting as well. This
+          version of qpdf should outperform any of the 8.x or 9.x
+          versions.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        CLI Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Add <literal>objectinfo</literal> key to the JSON output.
+          This will be a place to put computed metadata or other
+          information about PDF objects that are not immediately
+          evident in other ways or that seem useful for some other
+          reason. In this version, information is provided about each
+          object indicating whether it is a stream and, if so, what
+          its length and filters are. Without this, it was not
+          possible to tell conclusively from the JSON output alone
+          whether or not an object was a stream. Run <command>qpdf
+          --json-help</command> for details.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add new option
+          <option>--remove-unreferenced-resources</option> which takes
+          <literal>auto</literal>, <literal>yes</literal>, or
+          <literal>no</literal> as arguments. The new
+          <literal>auto</literal> mode, which is the default, performs
+          a fast heuristic over a PDF file when splitting pages to
+          determine whether the expensive process of finding and
+          removing unreferenced resources is likely to be of benefit.
+          For most files, this new default will result in a
+          significant performance improvement for splitting pages. See
+          <xref linkend="ref.advanced-transformation"/> for a more
+          detailed discussion.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          The <option>--preserve-unreferenced-resources</option> is
+          now just a synonym for
+          <option>--remove-unreferenced-resources=no</option>.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          If the <literal>QPDF_EXECUTABLE</literal> environment
+          variable is set when invoking <command>qpdf
+          --bash-completion</command> or <command>qpdf
+          --zsh-completion</command>, the completion command that it
+          outputs will refer to qpdf using the value of that variable
+          rather than what <command>qpdf</command> determines its
+          executable path to be. This can be useful when wrapping
+          <command>qpdf</command> with a script, working with a
+          version in the source tree, using an AppImage, or other
+          situations where there is some indirection.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Library Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Add a new version of
+          <function>QPDFObjectHandle::StreamDataProvider::provideStreamData</function>
+          that accepts the <function>suppress_warnings</function> and
+          <function>will_retry</function> options and allows a success
+          code to be returned. This makes it possible to implement a
+          <classname>StreamDataProvider</classname> that calls
+          <function>pipeStreamData</function> on another stream and to
+          pass the response back to the caller, which enables better
+          error handling on those proxied streams.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Update <function>QPDFObjectHandle::pipeStreamData</function>
+          to return an overall success code that goes beyond whether
+          or not filtered data was written successfully. This allows
+          better error handling of cases that were not filtering
+          errors. You have to call this explicitly. Methods in
+          previously existing APIs have the same semantics as before.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          The
+          <function>QPDFPageObjectHelper::placeFormXObject</function>
+          method now allows separate control over whether it should be
+          willing to shrink or expand objects to fit them better into
+          the destination rectangle. The previous behavior was that
+          shrinking was allowed but expansion was not. The previous
+          behavior is still the default.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          When calling the C API, any non-zero value passed to a
+          boolean parameter is treated as <literal>TRUE</literal>.
+          Previously only the value <literal>1</literal> was accepted.
+          This makes the C API behave more like most C interfaces and
+          is known to improve compatibility with some Windows
+          environments that dynamically load the DLL and call
+          functions from it.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add <function>QPDFObjectHandle::unsafeShallowCopy</function>
+          for copying only top-level dictionary keys or array items.
+          This is unsafe because it creates a situation in which
+          changing a lower-level item in one object may also change it
+          in another object, but for cases in which you
+          <emphasis>know</emphasis> you are only inserting or
+          replacing top-level items, it is much faster than
+          <function>QPDFObjectHandle::shallowCopy</function>.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add <function>QPDFObjectHandle::filterAsContents</function>,
+          which filter's a stream's data as a content stream. This is
+          useful for parsing the contents for form XObjects in the
+          same way as parsing page content streams.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Bug Fixes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          When detecting and removing unreferenced resources during
+          page splitting, traverse into form XObjects and handle their
+          resources dictionaries as well.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          The same error recovery is applied to streams in other than
+          the primary input file when merging or splitting pages.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Build Changes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Allow qpdf to built on stripped down systems whose C/C++
+          libraries lack the <classname>wchar_t</classname> type.
+          Search for <classname>wchar_t</classname> in qpdf's
+          README.md for details. This should be very rare, but it is
+          known to be helpful in some embedded environments.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
    <term>9.1.1: January 26, 2020</term>
     <listitem>
@@ -4804,8 +5067,6 @@ print "\n";
      </itemizedlist>
     </listitem>
    </varlistentry>
-  </variablelist>
-  <variablelist>
    <varlistentry>
     <term>9.1.0: November 17, 2019</term>
     <listitem>
@@ -4905,8 +5166,6 @@ print "\n";
      </itemizedlist>
     </listitem>
    </varlistentry>
-  </variablelist>
-  <variablelist>
    <varlistentry>
     <term>9.0.2: October 12, 2019</term>
     <listitem>
@@ -5272,7 +5531,7 @@ print "\n";
           in dynamically linked code catching exceptions or
           subclassing, this could be the reason. If you see this,
           please report a bug at <ulink
-          url="https://github.com/qpdf/qpdf/issues/">pikepdf</ulink>.
+          url="https://github.com/qpdf/qpdf/issues/">https://github.com/qpdf/qpdf/issues/</ulink>.
          </para>
         </listitem>
         <listitem>

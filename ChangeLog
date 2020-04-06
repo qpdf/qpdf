@@ -8,6 +8,12 @@
 	recovery when objects are copied from other files and when
 	"immediate copy from" is enabled.
 
+	* When copying foreign streams with immediateCopyFrom set, the
+	same type of recovery from streams with filtering errors is
+	performed as when dealing with streams in the original input. This
+	could happen, for example, if you are using the --pages option to
+	take pages from another file and that file has errors in it.
+
 	* Add a new version of QPDFObjectHandle::pipeStreamData whose
 	return value indicates overall success or failure rather than
 	whether nor not filtering was attempted. It should have always
@@ -36,6 +42,12 @@
 	--preserve-unreferenced-resources is now a synonym for
 	--remove-unreferenced-resources=no.
 
+	* Use std::atomic for unique ID generation internally within the
+	library. This eliminates the already extremely low chance of a
+	collision, improves thread safety, and removes a dependency on a
+	random number generator. Thanks to Dean Scarff for the
+	contribution.
+
 2020-04-03  Jay Berkenbilt  <ejb@ql.org>
 
 	* Allow qpdf to be built on systems without wchar_t. All "normal"
@@ -49,6 +61,10 @@
 	placed item is allowed to be shrunk or expanded to fit within or
 	maximally fill the destination rectangle. Prior to this change,
 	placeFormXObject might shrink it but would never expand it.
+
+	* When calling the C API, accept any non-zero value as TRUE rather
+	than just 1. This appears to resolve issues on Windows when
+	calling some versions of the DLL directly from other languages.
 
 2020-04-02  Jay Berkenbilt  <ejb@ql.org>
 
