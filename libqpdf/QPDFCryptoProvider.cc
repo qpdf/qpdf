@@ -9,6 +9,9 @@
 #ifdef USE_CRYPTO_GNUTLS
 # include <qpdf/QPDFCrypto_gnutls.hh>
 #endif
+#ifdef USE_CRYPTO_OPENSSL
+# include <qpdf/QPDFCrypto_openssl.hh>
+#endif
 
 std::shared_ptr<QPDFCryptoImpl>
 QPDFCryptoProvider::getImpl()
@@ -49,6 +52,9 @@ QPDFCryptoProvider::QPDFCryptoProvider() :
 #endif
 #ifdef USE_CRYPTO_GNUTLS
     registerImpl_internal<QPDFCrypto_gnutls>("gnutls");
+#endif
+#ifdef USE_CRYPTO_OPENSSL
+    registerImpl_internal<QPDFCrypto_openssl>("openssl");
 #endif
     std::string default_crypto;
     if (! QUtil::get_env("QPDF_CRYPTO_PROVIDER", &default_crypto))

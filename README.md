@@ -30,9 +30,7 @@ QPDF requires a C++ compiler that supports C++-11.
 
 QPDF depends on the external libraries [zlib](https://www.zlib.net/) and [jpeg](https://www.ijg.org/files/). The [libjpeg-turbo](https://libjpeg-turbo.org/) library is also known to work since it is compatible with the regular jpeg library, and QPDF doesn't use any interfaces that aren't present in the straight jpeg8 API. These are part of every Linux distribution and are readily available. Download information appears in the documentation. For Windows, you can download pre-built binary versions of these libraries for some compilers; see [README-windows.md](README-windows.md) for additional details.
 
-If the optional GnuTLS crypto provider is enabled,
-then [GnuTLS](https://www.gnutls.org/) is also required. This is
-discussed more in `Crypto providers` below.
+Depending on which crypto providers are enabled, then [GnuTLS](https://www.gnutls.org/) and [OpenSSL](https://openssl.org) may also be required. This is discussed more in `Crypto providers` below.
 
 # Licensing terms of embedded software
 
@@ -46,6 +44,7 @@ As of version 9.1.0, qpdf can use different crypto implementations. These can be
 
 Initially, the following providers are available:
 * `native`: a native implementation where all the source is embedded in qpdf and no external dependencies are required
+* `openssl`: an implementation that can use the OpenSSL (or BoringSSL) libraries to provide crypto; causes libqpdf to link with the OpenSSL library
 * `gnutls`: an implementation that uses the GnuTLS library to provide crypto; causes libqpdf to link with the GnuTLS library
 
 The default behavior is for ./configure to discover which other crypto providers can be supported based on available external libraries, to build all available crypto providers, and to use an external provider as the default over the native one. This behavior can be changed with the following flags to ./configure:
