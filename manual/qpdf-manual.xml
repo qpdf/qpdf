@@ -138,7 +138,9 @@
       <para>
        <emphasis>Recommended but not required:</emphasis> gnutls:
        <ulink url="https://www.gnutls.org/">https://www.gnutls.org/</ulink>
-       to be able to use the gnutls crypto provider
+       to be able to use the gnutls crypto provider, and/or openssl:
+       <ulink url="https://openssl.org/">https://openssl.org/</ulink>
+       to be able to use the openssl crypto provider.
       </para>
      </listitem>
      <listitem>
@@ -271,10 +273,11 @@ make
    </para>
    <para>
     Starting with qpdf version 9.1.0, the available implementations
-    are <literal>native</literal> and <literal>gnutls</literal>.
-    Additional implementations may be added if needed. It is also
-    possible for a developer to provide their own implementation
-    without modifying the qpdf library.
+    are <literal>native</literal> and <literal>gnutls</literal>. In
+    qpdf 10.0.0, <literal>openssl</literal> was added. Additional
+    implementations may be added if needed. It is also possible for a
+    developer to provide their own implementation without modifying
+    the qpdf library.
    </para>
    <sect2 id="ref.crypto.build">
     <title>Build Support For Crypto Providers</title>
@@ -344,9 +347,10 @@ make
      own external dependencies that can be omitted if the crypto
      provider is not used. For example, if you are building qpdf
      yourself and are using an environment that does not support
-     gnutls, you can ensure that <literal>USE_CRYPTO_NATIVE</literal>
-     is defined, <literal>USE_CRYPTO_GNUTLS</literal> is not defined,
-     and <literal>DEFAULT_CRYPTO</literal> is defined to
+     gnutls or openssl, you can ensure that
+     <literal>USE_CRYPTO_NATIVE</literal> is defined,
+     <literal>USE_CRYPTO_GNUTLS</literal> is not defined, and
+     <literal>DEFAULT_CRYPTO</literal> is defined to
      <literal>"native"</literal>. Then you must include the source
      files used in the native implementation, some of which were added
      or renamed from earlier versions, to your build, and you can
@@ -4796,6 +4800,35 @@ print "\n";
       </listitem>
       <listitem>
        <para>
+        Build/Packaging Changes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Add a <literal>openssl</literal> crypto provider, which is
+          implemented with OpenSSL and also works with BoringSSL.
+          Thanks to Dean Scarff for this contribution. If you maintain
+          qpdf for a distribution, pay special attention to make sure
+          that you are including support for the crypto providers you
+          want. Package maintainers will have to weigh the advantages
+          of allowing users to pick a crypto provider at runtime
+          against the disadvantages of adding more dependencies to
+          qpdf.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Allow qpdf to built on stripped down systems whose C/C++
+          libraries lack the <classname>wchar_t</classname> type.
+          Search for <classname>wchar_t</classname> in qpdf's
+          README.md for details. This should be very rare, but it is
+          known to be helpful in some embedded environments.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
         CLI Enhancements
        </para>
        <itemizedlist>
@@ -4940,22 +4973,6 @@ print "\n";
          <para>
           The same error recovery is applied to streams in other than
           the primary input file when merging or splitting pages.
-         </para>
-        </listitem>
-       </itemizedlist>
-      </listitem>
-      <listitem>
-       <para>
-        Build Changes
-       </para>
-       <itemizedlist>
-        <listitem>
-         <para>
-          Allow qpdf to built on stripped down systems whose C/C++
-          libraries lack the <classname>wchar_t</classname> type.
-          Search for <classname>wchar_t</classname> in qpdf's
-          README.md for details. This should be very rare, but it is
-          known to be helpful in some embedded environments.
          </para>
         </listitem>
        </itemizedlist>

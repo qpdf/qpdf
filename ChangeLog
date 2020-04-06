@@ -1,3 +1,9 @@
+2020-04-06  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add openssl crypto provider, contributed by Dean Scarff. This
+	provider is implemented using OpenSSL and also works with
+	BoringSSL.
+
 2020-04-04  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add a new provideStreamData method for StreamDataProvider that
