@@ -21,14 +21,16 @@
 #include <string.h>
 #include <fcntl.h>
 #include <memory>
-#include <cwchar>
+#ifndef QPDF_NO_WCHAR_T
+# include <cwchar>
+#endif
 #ifdef _WIN32
-#include <windows.h>
-#include <direct.h>
-#include <io.h>
+# include <windows.h>
+# include <direct.h>
+# include <io.h>
 #else
-#include <unistd.h>
-#include <sys/stat.h>
+# include <unistd.h>
+# include <sys/stat.h>
 #endif
 
 // First element is 128
