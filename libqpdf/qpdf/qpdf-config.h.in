@@ -90,6 +90,9 @@
 /* Whether to use the native crypto provider */
 #undef USE_CRYPTO_NATIVE
 
+/* Whether to use the openssl crypto provider */
+#undef USE_CRYPTO_OPENSSL
+
 /* Whether to use insecure random numbers */
 #undef USE_INSECURE_RANDOM
 
