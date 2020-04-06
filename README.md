@@ -78,7 +78,7 @@ Packagers may set DESTDIR, in which case make install will install inside of DES
 
 Executive summary: manually define -DQPDF_NO_WCHAR_T in your build if you are building on a system without wchar_t. For details, read the rest of this section.
 
-While wchar_t is part of the C++ standard library and should be present on virtually every system, there are some stripped down systems, such as those targetting certain embedded environments, that lack wchar_t. Internally, qpdf uses UTF-8 encoding for everything, so there is nothing important in qpdf's API that uses wchar_t. However, there is a helper method for converting between wchar_t* and char* that uses wchar_t.
+While wchar_t is part of the C++ standard library and should be present on virtually every system, there are some stripped down systems, such as those targeting certain embedded environments, that lack wchar_t. Internally, qpdf uses UTF-8 encoding for everything, so there is nothing important in qpdf's API that uses wchar_t. However, there is a helper method for converting between wchar_t* and char* that uses wchar_t.
 
 If you are building in an environment that does not support wchar_t, you can define the preprocessor symbol QPDF_NO_WCHAR_T in your build. This will work whether you are building qpdf and need to avoid compiling the code that uses wchar_t or whether you are building client code that uses qpdf.
 

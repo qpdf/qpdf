@@ -108,7 +108,7 @@
 
 	* If QPDF_EXECUTABLE is set, use it as the path to qpdf for
 	purposes of completion. This variable is only read during the
-	executation of `qpdf --completion-zsh` and `qpdf
+	execution of `qpdf --completion-zsh` and `qpdf
 	--completion-bash`. It is not used during the actual evaluation of
 	completions.
 

@@ -30,6 +30,7 @@ addArrayElement
 addChoicesToCompletions
 addContentTokenFilter
 addDictionaryMember
+adde
 addExplicitElementsToList
 addOptionsToCompletions
 addPage
@@ -44,6 +45,7 @@ admon
 Adobeâ
 ae
 aeadb
+aefd
 AEP
 aes
 AESv
@@ -157,6 +159,7 @@ argQdf
 argRawStreamData
 argRecompressFlate
 argRemovePageLabels
+argRemoveUnreferencedResources
 argReplaceInput
 argRequiresPassword
 argRotate
@@ -196,6 +199,7 @@ ascii
 asciiHex
 ASCIIHexDecode
 ASCIIHexDecoder
+asdf
 asMap
 assertArray
 assertBool
@@ -245,6 +249,7 @@ BaseVersion
 bashcompinit
 bashdefault
 bb
+bbb
 BBox
 bbox
 bc
@@ -269,6 +274,7 @@ BogusRandomDataProvider
 boldseq
 bookinfo
 bool
+BoringSSL
 BORLANDC
 bp
 BPC
@@ -355,7 +361,9 @@ CHSomething
 ci
 cin
 cinfo
+CipherInit
 ciphertext
+CipherUpdate
 cis
 cl
 classname
@@ -426,6 +434,7 @@ CryptFilterDecodeParms
 CryptGenRandom
 crypto
 cryptolog
+CryptoRandomDataProvider
 CryptReleaseContext
 cso
 csoe
@@ -440,6 +449,7 @@ ctest
 ctx
 ctype
 CVE
+cwchar
 cx
 cxx
 CXXFLAGS
@@ -447,6 +457,7 @@ cy
 cygwin
 da
 daae
+dac
 dae
 db
 dc
@@ -510,7 +521,11 @@ didierstevens
 diff
 diffs
 diffutils
+DigestFinal
+DigestInit
+DigestUpdate
 DIR
+directpagerefcount
 dirname
 disableCBC
 disableIncompatibleEncryption
@@ -542,6 +557,7 @@ doWrite
 doWriteSetup
 Doxygen
 dp
+DQPDF
 dquote
 dr
 driverless
@@ -569,7 +585,9 @@ EarlyChange
 eb
 EBADF
 ebae
-ECB
+ebde
+ebra
+ecb
 ecc
 ecedd
 ecks
@@ -595,9 +613,11 @@ encodeFile
 encodeRow
 encodeString
 encp
+EncryptInit
 EncryptionData
 EncryptionParameters
 EncryptMetadata
+EncryptUpdate
 endian
 endianness
 endif
@@ -624,6 +644,7 @@ ep
 epub
 eq
 ERANGE
+erasdf
 eraseItem
 Erdelsky's
 errno
@@ -633,6 +654,7 @@ errptr
 esize
 esses
 eval
+evp
 exc
 exe
 exp
@@ -678,7 +700,9 @@ Filespec
 FILETIME
 filetrailer
 filterability
+filterAsContents
 filterCompressedObjects
+filterp
 filterPageContents
 findAndSkipNextEOL
 findAttachmentStreams
@@ -899,11 +923,14 @@ getPartialName
 getPDFVersion
 getPerms
 getPointer
+getProvider
 getQPDF
 getQpdf
 getQuadding
 getR
 getRandomDataProvider
+getRandomDataProviderProvider
+getRandomProvider
 getRawDigest
 getRawStreamData
 getRawValue
@@ -1058,6 +1085,7 @@ ImageInverter
 ImageMask
 ImageOptimizer
 ImageProvider
+immediateCopyFrom
 inbuf
 includeIgnorable
 incr
@@ -1072,6 +1100,7 @@ inflateInit
 inflateReset
 infs
 ing
+inheritsresources
 init
 initializeByPage
 initializeEncryption
@@ -1194,6 +1223,7 @@ keybits
 keylen
 KEYLENGTH
 keyset
+kgdl
 LARGEFILE
 lastnum
 lastreleased
@@ -1445,6 +1475,7 @@ OBJDIR
 objdump
 ObjectHelper
 ObjectHolder
+objectinfo
 objectStreamsChoices
 objectWarning
 ObjGen
@@ -1483,6 +1514,7 @@ OpenAction
 openObject
 opensource
 openssl
+OpenSSL
 optionalParameter
 OptionEntry
 ord
@@ -1571,6 +1603,7 @@ pdfs
 pdh
 pdlin
 pe
+perf
 performant
 perl
 persistAcrossFinish
@@ -1751,6 +1784,7 @@ qwert
 qwww
 rand
 RandomDataProvider
+RandomDataProviderProvider
 randoms
 rb
 rbegin
@@ -1758,6 +1792,7 @@ rc
 rcon
 RDONLY
 rdp
+rdpp
 rdquo
 readArgsFromFile
 readHGeneric
@@ -1798,6 +1833,7 @@ removeKey
 removePage
 removereplace
 removeUnreferencedResources
+removeUnreferencedResourcesHelper
 ren
 repl
 replaceDict
@@ -1841,6 +1877,7 @@ Rkey
 RKLENGTH
 rl
 rm
+rnd
 RNRT
 rollover
 rotatePage
@@ -1869,6 +1906,7 @@ SASLprep
 savable
 scanline
 scanlines
+Scarff
 sch
 scp
 sdk
@@ -1936,6 +1974,7 @@ setPipeline
 setprecision
 setPreserveEncryption
 setPreserveUnreferencedObjects
+setProvider
 setQDFMode
 setR
 setRadioButtonValue
@@ -1956,7 +1995,9 @@ sev
 sf
 sha
 shallowCopy
+shallowCopyInternal
 shallowCopyPage
+sharedresources
 showLinearizationData
 showXRefTable
 sig
@@ -2044,6 +2085,7 @@ subdictionaries
 subdictionary
 SubFilter
 SubFilters
+subkeys
 SUBLANG
 sublicense
 Submatches
@@ -2054,6 +2096,7 @@ substring
 Subtype
 sudo
 supp
+supportsRetry
 suppressions
 svg
 swapObjects
@@ -2180,9 +2223,11 @@ unparseObject
 unparseResolved
 unparsing
 unreadCh
+unref
 unreferenced
 unresolvable
 unretrieved
+unsafeShallowCopy
 uo
 upages
 upass
@@ -2358,6 +2403,7 @@ yn
 yp
 yscale
 yuiop
+YYYY
 yyyymmdd
 z's
 zalloc

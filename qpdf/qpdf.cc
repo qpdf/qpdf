@@ -4827,7 +4827,7 @@ static bool should_remove_unreferenced_resources(QPDF& pdf, Options& o)
     // in the file for shared resources dictionaries or shared XObject
     // subkeys of resources dictionaries either on pages or on form
     // XObjects in pages. If we find any, then there is a higher
-    // likeilihood that the expensive process of finding unreferenced
+    // likelihood that the expensive process of finding unreferenced
     // resources is worth it.
 
     // Return true as soon as we find any shared resources.
