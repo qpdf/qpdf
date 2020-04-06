@@ -102,7 +102,8 @@ RELEASE PREPARATION
 * Check for open fuzz crashes at https://oss-fuzz.com
 
 * Check all open issues and pull requests in github and the
-  sourceforge trackers. See ~/scripts/github-issues.
+  sourceforge trackers. See ~/scripts/github-issues. Don't forget pull
+  requests.
 
 * Check `TODO` file to make sure all planned items for the release are
   done or retargeted.
@@ -160,7 +161,11 @@ RELEASE PREPARATION
 * Increment shared library version information as needed (`LT_*` in
   `configure.ac`). Remember to rerun ./autogen.sh.
 
-* Test for performance binary compatibility:
+* Performance test is included with binary compatibility steps. Even
+  if releasing a new major release and not doing binary compatibility
+  testing, do performance testing.
+
+* Test for performance and binary compatibility:
   * Check out the last release
   * ./configure --enable-werror && make -j$(nproc)
   * Check out the current version
