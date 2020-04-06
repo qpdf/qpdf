@@ -1,6 +1,41 @@
 #include <qpdf/QPDFCrypto_native.hh>
 #include <qpdf/QUtil.hh>
 
+#ifdef USE_INSECURE_RANDOM
+# include <qpdf/InsecureRandomDataProvider.hh>
+#endif
+#include <qpdf/SecureRandomDataProvider.hh>
+
+static RandomDataProvider* getRandomProvider()
+{
+#ifdef USE_INSECURE_RANDOM
+    static RandomDataProvider* insecure_random_data_provider =
+        InsecureRandomDataProvider::getInstance();
+#else
+    static RandomDataProvider* insecure_random_data_provider = 0;
+#endif
+    static RandomDataProvider* secure_random_data_provider =
+        SecureRandomDataProvider::getInstance();
+
+    static RandomDataProvider* provider = (
+        secure_random_data_provider ? secure_random_data_provider
+        : insecure_random_data_provider ? insecure_random_data_provider
+        : 0);
+
+    if (provider == 0)
+    {
+        throw std::logic_error("QPDFCrypto_native has no random data provider");
+    }
+
+    return provider;
+}
+
+void
+QPDFCrypto_native::provideRandomData(unsigned char* data, size_t len)
+{
+    getRandomProvider()->provideRandomData(data, len);
+}
+
 void
 QPDFCrypto_native::MD5_init()
 {

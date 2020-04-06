@@ -263,35 +263,25 @@ namespace QUtil
     QPDF_DLL
     std::vector<std::string> possible_repaired_encodings(std::string);
 
-    // If secure random number generation is supported on your
-    // platform and qpdf was not compiled with insecure random number
-    // generation, this returns a cryptographically secure random
-    // number.  Otherwise it falls back to random from stdlib and
-    // calls srandom automatically the first time it is called.
+    // Return a cryptographically secure random number.
     QPDF_DLL
     long random();
 
-    // Initialize a buffer with random bytes.  By default, qpdf tries
-    // to use a secure random number source.  It can be configured at
-    // compile time to use an insecure random number source (from
-    // stdlib).  You can also call setRandomDataProvider with a
-    // RandomDataProvider, in which case this method will get its
-    // random bytes from that.
-
+    // Initialize a buffer with cryptographically secure random bytes.
     QPDF_DLL
     void initializeWithRandomBytes(unsigned char* data, size_t len);
 
-    // Supply a random data provider.  If not supplied, depending on
-    // compile time options, qpdf will either use the operating
-    // system's secure random number source or an insecure random
-    // source from stdlib.  The caller is responsible for managing the
-    // memory for the RandomDataProvider.  This method modifies a
-    // static variable.  If you are providing your own random data
-    // provider, you should call this at the beginning of your program
-    // before creating any QPDF objects.  Passing a null to this
-    // method will reset the library back to whichever of the built-in
-    // random data handlers is appropriate based on how qpdf was
-    // compiled.
+    // Supply a random data provider. Starting in qpdf 10.0.0, qpdf
+    // uses the crypto provider as its source of random numbers. If
+    // you are using the native crypto provider, then qpdf will either
+    // use the operating system's secure random number source or, only
+    // if enabled at build time, an insecure random source from
+    // stdlib. The caller is responsible for managing the memory for
+    // the RandomDataProvider. This method modifies a static variable.
+    // If you are providing your own random data provider, you should
+    // call this at the beginning of your program before creating any
+    // QPDF objects. Passing a null to this method will reset the
+    // library back to its default random data provider.
     QPDF_DLL
     void setRandomDataProvider(RandomDataProvider*);
 

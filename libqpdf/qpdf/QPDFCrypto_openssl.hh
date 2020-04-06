@@ -9,6 +9,7 @@
 #else
 #include <openssl/evp.h>
 #endif
+#include <openssl/rand.h>
 
 class QPDFCrypto_openssl: public QPDFCryptoImpl
 {
@@ -17,6 +18,8 @@ class QPDFCrypto_openssl: public QPDFCryptoImpl
 
     QPDF_DLL
     ~QPDFCrypto_openssl() override;
+
+    void provideRandomData(unsigned char* data, size_t len) override;
 
     void MD5_init() override;
     void MD5_update(unsigned char const* data, size_t len) override;

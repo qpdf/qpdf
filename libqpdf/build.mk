@@ -27,6 +27,7 @@ SRCS_libqpdf = \
 	libqpdf/BufferInputSource.cc \
 	libqpdf/ClosedFileInputSource.cc \
 	libqpdf/ContentNormalizer.cc \
+	libqpdf/CryptoRandomDataProvider.cc \
 	libqpdf/FileInputSource.cc \
 	libqpdf/InputSource.cc \
 	libqpdf/InsecureRandomDataProvider.cc \

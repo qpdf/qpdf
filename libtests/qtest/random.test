@@ -7,10 +7,30 @@ require TestDriver;
 
 my $td = new TestDriver('random');
 
-$td->runtest("Random Data Providers",
-	     {$td->COMMAND => "random"},
-	     {$td->STRING => "random: end of tests\n",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
+my @providers = ();
+if (exists $ENV{'QPDF_CRYPTO_PROVIDER'})
+{
+    push(@providers, $ENV{'QPDF_CRYPTO_PROVIDER'});
+}
+else
+{
+    open(Q, "qpdf --show-crypto|") or die;
+    while (<Q>)
+    {
+        s/\s+$//s;
+        push(@providers, $_);
+    }
+    close(Q);
+}
+foreach my $p (@providers)
+{
+    $ENV{'QPDF_CRYPTO_PROVIDER'} = $p;
 
-$td->report(1);
+    $td->runtest("Random Data Providers ($p)",
+                 {$td->COMMAND => "random"},
+                 {$td->STRING => "random: end of tests\n",
+                      $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+$td->report(scalar(@providers));

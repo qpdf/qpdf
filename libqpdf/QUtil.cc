@@ -3,10 +3,7 @@
 
 #include <qpdf/QUtil.hh>
 #include <qpdf/PointerHolder.hh>
-#ifdef USE_INSECURE_RANDOM
-# include <qpdf/InsecureRandomDataProvider.hh>
-#endif
-#include <qpdf/SecureRandomDataProvider.hh>
+#include <qpdf/CryptoRandomDataProvider.hh>
 #include <qpdf/QPDFSystemError.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QIntC.hh>
@@ -891,29 +888,9 @@ class RandomDataProviderProvider
 };
 
 RandomDataProviderProvider::RandomDataProviderProvider() :
-    default_provider(0),
+    default_provider(CryptoRandomDataProvider::getInstance()),
     current_provider(0)
 {
-#ifdef USE_INSECURE_RANDOM
-    static RandomDataProvider* insecure_random_data_provider =
-        InsecureRandomDataProvider::getInstance();
-#else
-    static RandomDataProvider* insecure_random_data_provider = 0;
-#endif
-    static RandomDataProvider* secure_random_data_provider =
-        SecureRandomDataProvider::getInstance();
-
-    this->default_provider = (
-        secure_random_data_provider ? secure_random_data_provider
-        : insecure_random_data_provider ? insecure_random_data_provider
-        : 0);
-
-    // QUtil.hh has comments indicating that getRandomDataProvider(),
-    // which calls this method, never returns null.
-    if (this->default_provider == 0)
-    {
-        throw std::logic_error("QPDF has no random data provider");
-    }
     this->current_provider = default_provider;
 }
 

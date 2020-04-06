@@ -17,6 +17,8 @@ class QPDFCrypto_native: public QPDFCryptoImpl
     QPDF_DLL
     virtual ~QPDFCrypto_native() = default;
 
+    virtual void provideRandomData(unsigned char* data, size_t len);
+
     virtual void MD5_init();
     virtual void MD5_update(unsigned char const* data, size_t len);
     virtual void MD5_finalize();

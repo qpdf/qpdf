@@ -1,5 +1,13 @@
 2020-04-06  Jay Berkenbilt  <ejb@ql.org>
 
+	* Move random number generation into the crypto providers. The old
+	os-based secure random number generation with fallback to insecure
+	random number generation (only if allowed at build time) has moved
+	into the native crypto provider. If using other providers
+	(currently gnutls or openssl), random number generation will use
+	those libraries. The old interfaces for supplying your own random
+	number generator are still in place. Fixes #418.
+
 	* Source-level incompatibility: remove QUtil::srandom. There was
 	no reason to ever call this, and it didn't do anything unless
 	insecure random number generation was compiled in, which it is not

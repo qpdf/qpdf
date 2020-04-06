@@ -41,6 +41,11 @@ class QPDF_DLL_CLASS QPDFCryptoImpl
     QPDF_DLL
     virtual ~QPDFCryptoImpl() = default;
 
+    // Random Number Generation
+
+    QPDF_DLL
+    virtual void provideRandomData(unsigned char* data, size_t len) = 0;
+
     // Hashing
 
     typedef unsigned char MD5_Digest[16];

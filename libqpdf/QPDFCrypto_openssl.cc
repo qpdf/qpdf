@@ -39,6 +39,12 @@ QPDFCrypto_openssl::~QPDFCrypto_openssl()
 }
 
 void
+QPDFCrypto_openssl::provideRandomData(unsigned char* data, size_t len)
+{
+    check_openssl(RAND_bytes(data, QIntC::to_int(len)));
+}
+
+void
 QPDFCrypto_openssl::MD5_init()
 {
     check_openssl(EVP_MD_CTX_reset(md_ctx));

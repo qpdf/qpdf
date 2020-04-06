@@ -30,6 +30,18 @@ QPDFCrypto_gnutls::~QPDFCrypto_gnutls()
 }
 
 void
+QPDFCrypto_gnutls::provideRandomData(unsigned char* data, size_t len)
+{
+    int code = gnutls_rnd (GNUTLS_RND_KEY, data, len);
+    if (code < 0)
+    {
+	throw std::runtime_error(
+	    std::string("gnutls: random number generation error: ") +
+            std::string(gnutls_strerror(code)));
+    }
+}
+
+void
 QPDFCrypto_gnutls::MD5_init()
 {
     MD5_finalize();
