@@ -16,7 +16,7 @@ sudo apt-get update
 
 sudo apt-get -y install \
    autoconf build-essential zlib1g-dev:i386 libjpeg-dev:i386 \
-   g++-multilib
+   libssl-dev:i386 g++-multilib
 ./configure --enable-werror --enable-show-failed-test-output \
     CFLAGS=-m32 CXXFLAGS=-m32 LDFLAGS=-m32
 
