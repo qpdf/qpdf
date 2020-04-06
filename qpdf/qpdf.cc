@@ -4846,13 +4846,13 @@ static bool should_remove_unreferenced_resources(QPDF& pdf, Options& o)
     while (! queue.empty())
     {
         QPDFObjectHandle node = *queue.begin();
+        queue.pop_front();
         QPDFObjGen og = node.getObjGen();
         if (nodes_seen.count(og))
         {
             continue;
         }
         nodes_seen.insert(og);
-        queue.pop_front();
         QPDFObjectHandle dict = node.isStream() ? node.getDict() : node;
         QPDFObjectHandle kids = dict.getKey("/Kids");
         if (kids.isArray())
@@ -4898,7 +4898,9 @@ static bool should_remove_unreferenced_resources(QPDF& pdf, Options& o)
                 }
                 resources_seen.insert(resources_og);
             }
-            QPDFObjectHandle xobject = resources.getKey("/XObject");
+            QPDFObjectHandle xobject = (resources.isDictionary() ?
+                                        resources.getKey("/XObject") :
+                                        QPDFObjectHandle::newNull());
             if (xobject.isIndirect())
             {
                 QPDFObjGen xobject_og = xobject.getObjGen();
