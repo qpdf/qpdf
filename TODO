@@ -14,6 +14,12 @@ Fuzz Errors
     18745, 20391
   * Timeout: 15471, 17630
 
+Windows Build
+=============
+
+Update the Windows build so that it uses current versions of external
+libraries and uses either gnutls or openssl as its crypto provider.
+
 ABI Changes
 ===========
 
