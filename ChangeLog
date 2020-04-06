@@ -1,5 +1,11 @@
 2020-04-06  Jay Berkenbilt  <ejb@ql.org>
 
+	* Source-level incompatibility: remove QUtil::srandom. There was
+	no reason to ever call this, and it didn't do anything unless
+	insecure random number generation was compiled in, which it is not
+	by default. If you were calling this, just remove the call because
+	it wasn't doing anything anyway.
+
 	* Add openssl crypto provider, contributed by Dean Scarff. This
 	provider is implemented using OpenSSL and also works with
 	BoringSSL.

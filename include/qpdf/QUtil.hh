@@ -271,13 +271,6 @@ namespace QUtil
     QPDF_DLL
     long random();
 
-    // Wrapper around srandom from stdlib.  Seeds the standard library
-    // weak random number generator, which is not used if secure
-    // random number generation is being used.  You never need to call
-    // this method as it is called automatically if needed.
-    QPDF_DLL
-    void srandom(unsigned int seed);
-
     // Initialize a buffer with random bytes.  By default, qpdf tries
     // to use a secure random number source.  It can be configured at
     // compile time to use an insecure random number source (from

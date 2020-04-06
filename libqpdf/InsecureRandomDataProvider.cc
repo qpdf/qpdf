@@ -30,8 +30,13 @@ InsecureRandomDataProvider::random()
 	// Seed the random number generator with something simple, but
 	// just to be interesting, don't use the unmodified current
 	// time.  It would be better if this were a more secure seed.
-        QUtil::srandom(static_cast<unsigned int>(
-                           QUtil::get_current_time() ^ 0xcccc));
+        unsigned int seed = static_cast<unsigned int>(
+            QUtil::get_current_time() ^ 0xcccc);
+#ifdef HAVE_RANDOM
+        ::srandom(seed);
+#else
+        srand(seed);
+#endif
 	this->seeded_random = true;
     }
 

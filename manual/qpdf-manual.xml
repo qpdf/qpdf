@@ -4800,6 +4800,22 @@ print "\n";
       </listitem>
       <listitem>
        <para>
+        Incompatible API (source-level) Changes (minor)
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          The <function>QUtil::srandom</function> method was removed.
+          It didn't do anything unless insecure random numbers were
+          compiled in, and they have been off by default for a long
+          time. If you were calling it, just remove the call since it
+          wasn't doing anything anyway.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
         Build/Packaging Changes
        </para>
        <itemizedlist>

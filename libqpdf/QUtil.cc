@@ -878,16 +878,6 @@ QUtil::toUTF16(unsigned long uval)
 
 // Random data support
 
-long
-QUtil::random()
-{
-    long result = 0L;
-    initializeWithRandomBytes(
-        reinterpret_cast<unsigned char*>(&result),
-        sizeof(result));
-    return result;
-}
-
 static RandomDataProvider* random_data_provider = 0;
 
 #ifdef USE_INSECURE_RANDOM
@@ -941,14 +931,14 @@ QUtil::initializeWithRandomBytes(unsigned char* data, size_t len)
     random_data_provider->provideRandomData(data, len);
 }
 
-void
-QUtil::srandom(unsigned int seed)
+long
+QUtil::random()
 {
-#ifdef HAVE_RANDOM
-    ::srandom(seed);
-#else
-    srand(seed);
-#endif
+    long result = 0L;
+    initializeWithRandomBytes(
+        reinterpret_cast<unsigned char*>(&result),
+        sizeof(result));
+    return result;
 }
 
 bool
