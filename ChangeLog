@@ -30,11 +30,11 @@
 	recovery when objects are copied from other files and when
 	"immediate copy from" is enabled.
 
-	* When copying foreign streams with immediateCopyFrom set, the
-	same type of recovery from streams with filtering errors is
-	performed as when dealing with streams in the original input. This
-	could happen, for example, if you are using the --pages option to
-	take pages from another file and that file has errors in it.
+	* When copying foreign streams, the same type of recovery from
+	streams with filtering errors is performed as when dealing with
+	streams in the original input. This could happen, for example, if
+	you are using the --pages option to take pages from another file
+	and that file has errors in it.
 
 	* Add a new version of QPDFObjectHandle::pipeStreamData whose
 	return value indicates overall success or failure rather than
