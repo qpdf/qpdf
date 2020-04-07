@@ -1,3 +1,12 @@
+2020-04-07  Jay Berkenbilt  <ejb@ql.org>
+
+	* Improve pdf-invert-images example to show a pattern of copying
+	streams into another QPDF object to enable a stream data provider
+	to access the original stream data.
+
+	* Fix error that caused a compilation error with clang. Fixes
+	#424.
+
 2020-04-06  Jay Berkenbilt  <ejb@ql.org>
 
 	* 10.0.0: release
