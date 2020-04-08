@@ -235,8 +235,6 @@ I find it useful to make reference to them in this list
  * Figure out how to render Gajić correctly in the PDF version of the
    qpdf manual.
 
- * Consider creating a PPA for Ubuntu
-
  * Investigate whether there is a way to automate the memory checker
    tests for Windows.
 

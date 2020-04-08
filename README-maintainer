@@ -279,6 +279,8 @@ rsync -vrlcO ./ jay_berkenbilt,qpdf@frs.sourceforge.net:/home/frs/project/q/qp/q
  tar xf ~/Q/storage/releases/qpdf/qpdf/$version/qpdf-$version.tar.gz qpdf-$version/doc; \
  scp -p qpdf-$version/doc/qpdf-* jay_berkenbilt,qpdf@frs.sourceforge.net:htdocs/files/)
 
+* Upload the debian package and Ubuntu ppa backports.
+
 * Email the qpdf-announce list.
 
 
