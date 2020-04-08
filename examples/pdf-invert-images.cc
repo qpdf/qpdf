@@ -40,12 +40,12 @@ class ImageInverter: public QPDFObjectHandle::StreamDataProvider
     virtual void provideStreamData(int objid, int generation,
 				   Pipeline* pipeline) override;
 
-    void setSelfPh(PointerHolder<QPDFObjectHandle::StreamDataProvider>);
-    void registerImage(QPDFObjectHandle image);
+    void registerImage(
+        QPDFObjectHandle image,
+        PointerHolder<QPDFObjectHandle::StreamDataProvider> self);
 
   private:
     QPDF other;
-    PointerHolder<QPDFObjectHandle::StreamDataProvider> self_ph;
     // Map og in original to copied image
     std::map<QPDFObjGen, QPDFObjectHandle> copied_images;
 };
@@ -56,18 +56,18 @@ ImageInverter::ImageInverter()
 }
 
 void
-ImageInverter::setSelfPh(PointerHolder<QPDFObjectHandle::StreamDataProvider> p)
+ImageInverter::registerImage(
+    QPDFObjectHandle image,
+    PointerHolder<QPDFObjectHandle::StreamDataProvider> self)
 {
     // replaceStreamData requires a pointer holder to the stream data
     // provider, but there's no way for us to generate one ourselves,
-    // so we have to have it handed to us.
-    this->self_ph = p;
-}
+    // so we have to have it handed to us. Don't be tempted to have
+    // the class contain a PointerHolder to itself as a member. Doing
+    // this will prevent the class from ever being deleted since the
+    // reference count will never drop to zero (and PointerHolder
+    // doesn't have weak references).
 
-
-void
-ImageInverter::registerImage(QPDFObjectHandle image)
-{
     QPDFObjGen og(image.getObjGen());
     // Store information about the images based on the object and
     // generation number. Recall that a single image object may be
@@ -88,7 +88,7 @@ ImageInverter::registerImage(QPDFObjectHandle image)
     // filterable in the input QPDF object, so we don't have to deal
     // with it explicitly here. We could explicitly use /DCTDecode and
     // write through a DCT filter if we wanted.
-    image.replaceStreamData(this->self_ph,
+    image.replaceStreamData(self,
 			    QPDFObjectHandle::newNull(),
 			    QPDFObjectHandle::newNull());
 }
@@ -149,9 +149,6 @@ int main(int argc, char* argv[])
 
 	ImageInverter* inv = new ImageInverter;
 	PointerHolder<QPDFObjectHandle::StreamDataProvider> p = inv;
-        // We need to give ImageInverter the pointer holder that it
-        // needs to pass to replaceStreamData.
-        inv->setSelfPh(p);
 
 	// For each page...
 	std::vector<QPDFPageObjectHelper> pages =
@@ -186,7 +183,7 @@ int main(int argc, char* argv[])
 		    (color_space.getName() == "/DeviceGray") &&
 		    (bits_per_component.getIntValue() == 8))
 		{
-                    inv->registerImage(image);
+                    inv->registerImage(image, p);
                 }
 	    }
 	}
