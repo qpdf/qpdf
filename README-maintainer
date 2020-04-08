@@ -176,6 +176,21 @@ RELEASE PREPARATION
   * make -j$(nproc)
   * ./performance_check | tee -a /tmp/perf
 
+* Run pikepdf's test suite. Do this in a separate shell.
+
+cd ...qpdf-source-tree...
+export QPDF_SOURCE_TREE=$PWD
+export LD_LIBRARY_PATH=$QPDF_SOURCE_TREE/libqpdf/build/.libs
+cd /tmp/z
+git clone git@github.com:pikepdf/pikepdf
+virtualenv v
+source v/bin/activate
+cd pikepdf
+pip3 install -r requirements/test.txt
+rehash
+pip3 install .
+pytest -n auto
+
 * Update release notes in manual. Look at diffs and ChangeLog. Update
   release date in `manual/qpdf-manual.xml`. Remember to ensure that
   the entities at the top of the document are consistent with the
