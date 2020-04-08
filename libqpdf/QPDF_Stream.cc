@@ -163,7 +163,9 @@ PointerHolder<Buffer>
 QPDF_Stream::getStreamData(qpdf_stream_decode_level_e decode_level)
 {
     Pl_Buffer buf("stream data buffer");
-    if (! pipeStreamData(&buf, nullptr, 0, decode_level, false, false))
+    bool filtered;
+    pipeStreamData(&buf, &filtered, 0, decode_level, false, false);
+    if (! filtered)
     {
 	throw QPDFExc(qpdf_e_unsupported, qpdf->getFilename(),
                       "", this->offset,

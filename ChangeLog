@@ -1,3 +1,10 @@
+2020-04-08  Jay Berkenbilt  <ejb@ql.org>
+
+	* Bug fix: qpdf 10.0.0 introduced a bug in which
+	QPDFObjectHandle::getStreamData would return the raw data when
+	called on an unfilterable stream instead of throwing an exception
+	like it's supposed to. Fixes #425.
+
 2020-04-07  Jay Berkenbilt  <ejb@ql.org>
 
 	* Improve pdf-invert-images example to show a pattern of copying

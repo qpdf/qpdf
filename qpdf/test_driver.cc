@@ -2168,6 +2168,35 @@ void runtest(int n, char const* filename1, char const* arg2)
         w.setStaticID(true);
         w.write();
     }
+    else if (n == 68)
+    {
+	QPDFObjectHandle root = pdf.getRoot();
+	QPDFObjectHandle qstream = root.getKey("/QStream");
+        try
+        {
+            qstream.getStreamData();
+            std::cout << "oops -- didn't throw" << std::endl;
+        }
+        catch (std::exception& e)
+        {
+            std::cout << "get unfilterable stream: " << e.what()
+                      << std::endl;
+        }
+	PointerHolder<Buffer> b1 = qstream.getStreamData(qpdf_dl_all);
+	if ((b1->getSize() > 10) &&
+	    (memcmp(b1->getBuffer(),
+                    "wwwwwwwww", 9) == 0))
+	{
+	    std::cout << "filtered stream data okay" << std::endl;
+	}
+	PointerHolder<Buffer> b2 = qstream.getRawStreamData();
+	if ((b2->getSize() > 10) &&
+	    (memcmp(b2->getBuffer(),
+                    "\xff\xd8\xff\xe0\x00\x10\x4a\x46\x49\x46", 10) == 0))
+	{
+	    std::cout << "raw stream data okay" << std::endl;
+	}
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +
