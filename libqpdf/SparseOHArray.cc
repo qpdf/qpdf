@@ -30,7 +30,7 @@ SparseOHArray::at(size_t idx) const
 	throw std::logic_error(
 	    "INTERNAL ERROR: bounds error accessing SparseOHArray element");
     }
-    auto iter = this->elements.find(idx);
+    auto const& iter = this->elements.find(idx);
     if (iter == this->elements.end())
     {
         return QPDFObjectHandle::newNull();
@@ -57,10 +57,9 @@ SparseOHArray::remove_last()
 void
 SparseOHArray::releaseResolved()
 {
-    for (auto iter = this->elements.begin();
-	 iter != this->elements.end(); ++iter)
+    for (auto iter: this->elements)
     {
-	QPDFObjectHandle::ReleaseResolver::releaseResolved((*iter).second);
+	QPDFObjectHandle::ReleaseResolver::releaseResolved(iter.second);
     }
 }
 
@@ -89,16 +88,15 @@ SparseOHArray::erase(size_t idx)
 	throw std::logic_error("bounds error erasing item from SparseOHArray");
     }
     decltype(this->elements) dest;
-    for (auto iter = this->elements.begin();
-	 iter != this->elements.end(); ++iter)
+    for (auto const& iter: this->elements)
     {
-        if ((*iter).first < idx)
+        if (iter.first < idx)
         {
-            dest.insert(*iter);
+            dest.insert(iter);
         }
-        else if ((*iter).first > idx)
+        else if (iter.first > idx)
         {
-            dest[(*iter).first - 1] = (*iter).second;
+            dest[iter.first - 1] = iter.second;
         }
     }
     this->elements = dest;
@@ -120,16 +118,15 @@ SparseOHArray::insert(size_t idx, QPDFObjectHandle oh)
     else
     {
         decltype(this->elements) dest;
-        for (auto iter = this->elements.begin();
-             iter != this->elements.end(); ++iter)
+        for (auto const& iter: this->elements)
         {
-            if ((*iter).first < idx)
+            if (iter.first < idx)
             {
-                dest.insert(*iter);
+                dest.insert(iter);
             }
             else
             {
-                dest[(*iter).first + 1] = (*iter).second;
+                dest[iter.first + 1] = iter.second;
             }
         }
         this->elements = dest;

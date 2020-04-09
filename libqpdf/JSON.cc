@@ -346,7 +346,7 @@ JSON::checkSchemaInternal(JSON_value* this_v, JSON_value* sch_v,
     if (sch_dict && (! pattern_key.empty()))
     {
         auto pattern_schema = sch_dict->members[pattern_key].getPointer();
-        for (auto iter: this_dict->members)
+        for (auto const& iter: this_dict->members)
         {
             std::string const& key = iter.first;
             checkSchemaInternal(

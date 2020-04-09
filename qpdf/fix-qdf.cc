@@ -387,13 +387,12 @@ QdfFixer::writeOstream()
     auto onum = ostream_id;
     std::string offsets;
     auto n = ostream_offsets.size();
-    for (auto iter = ostream_offsets.begin();
-         iter != ostream_offsets.end(); ++iter)
+    for (auto iter: ostream_offsets)
     {
-	(*iter) -= QIntC::to_offset(first);
+	iter -= QIntC::to_offset(first);
 	++onum;
 	offsets += QUtil::int_to_string(onum) + " " +
-            QUtil::int_to_string(*iter) + "\n";
+            QUtil::int_to_string(iter) + "\n";
     }
     auto offset_adjust = QIntC::to_offset(offsets.size());
     first += offset_adjust;

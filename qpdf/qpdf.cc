@@ -1694,11 +1694,11 @@ ArgParser::argShowCrypto()
     auto crypto = QPDFCryptoProvider::getRegisteredImpls();
     std::string default_crypto = QPDFCryptoProvider::getDefaultProvider();
     std::cout << default_crypto << std::endl;
-    for (auto iter = crypto.begin(); iter != crypto.end(); ++iter)
+    for (auto const& iter: crypto)
     {
-        if (*iter != default_crypto)
+        if (iter != default_crypto)
         {
-            std::cout << *iter << std::endl;
+            std::cout << iter << std::endl;
         }
     }
 }
@@ -3646,7 +3646,7 @@ static std::set<QPDFObjGen>
 get_wanted_json_objects(Options& o)
 {
     std::set<QPDFObjGen> wanted_og;
-    for (auto iter: o.json_objects)
+    for (auto const& iter: o.json_objects)
     {
         bool trailer;
         int obj = 0;

@@ -110,10 +110,9 @@ QPDFCryptoProvider::getRegisteredImpls()
 {
     std::set<std::string> result;
     QPDFCryptoProvider& p = getInstance();
-    for (auto iter = p.m->providers.begin(); iter != p.m->providers.end();
-         ++iter)
+    for (auto const& iter: p.m->providers)
     {
-        result.insert((*iter).first);
+        result.insert(iter.first);
     }
     return result;
 }
