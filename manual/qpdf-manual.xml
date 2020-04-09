@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "10.0.0">
-<!ENTITY lastreleased "April 6, 2020">
+<!ENTITY swversion "10.0.1">
+<!ENTITY lastreleased "April 9, 2020">
 ]>
 <book>
  <bookinfo>
@@ -4768,6 +4768,48 @@ print "\n";
     </listitem>
    </varlistentry>
 -->
+   <varlistentry>
+    <term>10.0.1: April 9, 2020</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Bug Fixes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          10.0.0 introduced a bug in which calling
+          <function>QPDFObjectHandle::getStreamData</function> on a
+          stream that can't be filtered was returning the raw data
+          instead of throwing an exception. This is now fixed.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Fix a bug that was preventing qpdf from linking with some
+          versions of clang on some platforms.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Improve the <filename>pdf-invert-images</filename> example
+          to avoid having to load all the images into RAM at the same
+          time.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
     <term>10.0.0: April 6, 2020</term>
     <listitem>
