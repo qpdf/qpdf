@@ -11,7 +11,7 @@ my $td = new TestDriver('invert-images');
 
 cleanup();
 
-$td->runtest("double page size",
+$td->runtest("invert images",
 	     {$td->COMMAND => ['pdf-invert-images', ' --static-id',
                                'in.pdf', 'a.pdf']},
 	     {$td->STRING =>
