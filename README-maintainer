@@ -173,6 +173,7 @@ RELEASE PREPARATION
   * ./configure --enable-werror && make -j$(nproc) build_libqpdf
   * Checkout the last release
   * make -k check NO_REBUILD=1
+  * Check out the current version
   * make -j$(nproc)
   * ./performance_check | tee -a /tmp/perf
 
