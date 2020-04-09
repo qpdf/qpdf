@@ -5,10 +5,8 @@ abacc
 abc
 ABCD
 abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnom
-abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnom
 abcde
 abcdefABCDEF
-abcdefghbcdefghicdefghijdefghijkefghijklfghijklmg
 abcdefghbcdefghicdefghijdefghijkefghijklfghijklmg
 abcdefghijklmnopqrstuvwxyz
 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghi
@@ -235,6 +233,7 @@ autoload
 automake
 autotools
 ba
+backports
 backref
 backreference
 backrefs
@@ -1043,7 +1042,6 @@ HGeneric
 hh
 HighPart
 hijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstn
-hijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstn
 hlen
 Hoffmann
 HOi
@@ -1613,6 +1611,7 @@ ph
 phe
 php
 pikepdf
+pikepdf's
 pipeContentStreams
 pipeForeignStreamData
 PipelineAccessor
@@ -1643,7 +1642,7 @@ pornin
 pos
 POSIX
 pp
-PPA
+ppa
 pr
 pragma
 pre
@@ -1698,6 +1697,7 @@ PUTU
 PWD
 py
 pypi
+pytest
 qarray
 QArray
 qbilt
@@ -1823,6 +1823,7 @@ refpos
 regex
 regexp
 registerForeignStream
+registerImage
 registerImpl
 registerProgressReporter
 Regsvr
@@ -2272,6 +2273,7 @@ VER
 versioned
 viewable
 ViewerPreferences
+virtualenv
 Vitaliy
 Vkey
 vlen
@@ -2337,6 +2339,7 @@ wsetargv
 Wsign
 wunlink
 www
+wwwwwwwww
 WX
 wxWindows
 xA
