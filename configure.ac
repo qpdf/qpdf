@@ -240,6 +240,32 @@ for i in 0 1; do
 done
 AC_LANG_POP
 
+AC_LANG_PUSH([C++])
+AC_MSG_CHECKING(whether to use -latomic)
+dnl On some platforms with some versions of gcc, you have to link with
+dnl -latomic in order for std::atomic to work. Passing --as-needed
+dnl prevents unnecessary linking with -latomic.
+oLDFLAGS="$LDFLAGS"
+LDFLAGS="$LDFLAGS -Wl,--as-needed -latomic"
+AC_LINK_IFELSE([AC_LANG_SOURCE(
+  [[#include <atomic>
+    int main()
+    {
+        static std::atomic<int> a{0};
+        a = a.fetch_add(1);
+        return 0;
+    }
+   ]])],
+   [qpdf_USE_ATOMIC=1],
+   [qpdf_USE_ATOMIC=0])
+if test "$qpdf_USE_ATOMIC" = "1"; then
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+  LDFLAGS="$oLDFLAGS"
+fi
+AC_LANG_POP
+
 if test "x$qpdf_OS_SECURE_RANDOM" = "x1"; then
   OLIBS=$LIBS
   LIBS="$LIBS Advapi32.lib"
