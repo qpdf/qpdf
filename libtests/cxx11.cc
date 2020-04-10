@@ -105,7 +105,7 @@ void do_iteration()
     std::vector<int> v = { 1, 2, 3, 4 };
     assert(v.size() == 4);
     int sum = 0;
-    for (auto i: v)
+    for (auto& i: v)
     {
         sum += i;
     }

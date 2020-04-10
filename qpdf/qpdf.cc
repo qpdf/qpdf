@@ -3693,7 +3693,7 @@ static void do_json_objectinfo(QPDF& pdf, Options& o, JSON& j)
     std::set<QPDFObjGen> wanted_og = get_wanted_json_objects(o);
     JSON j_objectinfo = j.addDictionaryMember(
         "objectinfo", JSON::makeDictionary());
-    for (auto obj: pdf.getAllObjects())
+    for (auto& obj: pdf.getAllObjects())
     {
         if (all_objects || wanted_og.count(obj.getObjGen()))
         {
@@ -4922,7 +4922,7 @@ static bool should_remove_unreferenced_resources(QPDF& pdf, Options& o)
             }
             if (xobject.isDictionary())
             {
-                for (auto k: xobject.getKeys())
+                for (auto const& k: xobject.getKeys())
                 {
                     QPDFObjectHandle xobj = xobject.getKey(k);
                     if (xobj.isStream() &&

@@ -110,7 +110,7 @@ QdfFixer::processLines(std::list<std::string>& lines)
     static std::regex re_dict_end("^>>\n$");
 
     lineno = 0;
-    for (auto line: lines)
+    for (auto const& line: lines)
     {
         ++lineno;
         last_offset = offset;
@@ -163,7 +163,7 @@ QdfFixer::processLines(std::list<std::string>& lines)
                 // index. Make sure we get at least 1 byte even if
                 // there are no object streams.
                 int max_objects = 1;
-                for (auto e: xref)
+                for (auto const& e: xref)
                 {
                     if ((e.getType() == 2) &&
                         (e.getObjStreamIndex() > max_objects))
@@ -258,7 +258,7 @@ QdfFixer::processLines(std::list<std::string>& lines)
                 writeBinary(0, 1);
                 writeBinary(0, xref_f1_nbytes);
                 writeBinary(0, xref_f2_nbytes);
-                for (auto x: xref)
+                for (auto const& x: xref)
                 {
                     unsigned long long f1 = 0;
                     unsigned long long f2 = 0;
@@ -321,7 +321,7 @@ QdfFixer::processLines(std::list<std::string>& lines)
         {
             auto n = xref.size();
             std::cout << "0 " << 1 + n << "\n0000000000 65535 f \n";
-            for (auto e: xref)
+            for (auto const& e: xref)
             {
                 std::cout << QUtil::int_to_string(e.getOffset(), 10)
                           << " 00000 n \n";
@@ -410,12 +410,12 @@ QdfFixer::writeOstream()
     std::cout << dict_data
               << "stream\n"
               << offsets;
-    for (auto o: ostream)
+    for (auto const& o: ostream)
     {
 	std::cout << o;
     }
 
-    for (auto o: ostream_discarded)
+    for (auto const& o: ostream_discarded)
     {
 	offset -= QIntC::to_offset(o.length());
     }

@@ -57,7 +57,7 @@ SparseOHArray::remove_last()
 void
 SparseOHArray::releaseResolved()
 {
-    for (auto iter: this->elements)
+    for (auto& iter: this->elements)
     {
 	QPDFObjectHandle::ReleaseResolver::releaseResolved(iter.second);
     }
