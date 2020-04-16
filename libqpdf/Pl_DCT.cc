@@ -302,8 +302,9 @@ Pl_DCT::compress(void* cinfo_p, Buffer* b)
     unsigned int width = cinfo->image_width *
         QIntC::to_uint(cinfo->input_components);
     size_t expected_size =
-        cinfo->image_height * cinfo->image_width *
-        QIntC::to_uint(cinfo->input_components);
+        QIntC::to_size(cinfo->image_height) *
+        QIntC::to_size(cinfo->image_width) *
+        QIntC::to_size(cinfo->input_components);
     if (b->getSize() != expected_size)
     {
         throw std::runtime_error(

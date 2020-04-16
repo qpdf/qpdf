@@ -3610,13 +3610,10 @@ static void do_show_pages(QPDF& pdf, Options& o)
             if (! images.empty())
             {
                 std::cout << "  images:" << std::endl;
-                for (std::map<std::string,
-                         QPDFObjectHandle>::iterator
-                         iter = images.begin();
-                     iter != images.end(); ++iter)
+                for (auto const& iter2: images)
                 {
-                    std::string const& name = (*iter).first;
-                    QPDFObjectHandle image = (*iter).second;
+                    std::string const& name = iter2.first;
+                    QPDFObjectHandle image = iter2.second;
                     QPDFObjectHandle dict = image.getDict();
                     int width =
                         dict.getKey("/Width").getIntValueAsInt();
@@ -3633,11 +3630,9 @@ static void do_show_pages(QPDF& pdf, Options& o)
         std::cout << "  content:" << std::endl;
         std::vector<QPDFObjectHandle> content =
             ph.getPageContents();
-        for (std::vector<QPDFObjectHandle>::iterator iter =
-                 content.begin();
-             iter != content.end(); ++iter)
+        for (auto& iter2: content)
         {
-            std::cout << "    " << (*iter).unparse() << std::endl;
+            std::cout << "    " << iter2.unparse() << std::endl;
         }
     }
 }
@@ -3738,14 +3733,12 @@ static void do_json_pages(QPDF& pdf, Options& o, JSON& j)
             "images", JSON::makeArray());
         std::map<std::string, QPDFObjectHandle> images =
             ph.getPageImages();
-        for (std::map<std::string, QPDFObjectHandle>::iterator iter =
-                 images.begin();
-             iter != images.end(); ++iter)
+        for (auto const& iter2: images)
         {
             JSON j_image = j_images.addArrayElement(JSON::makeDictionary());
             j_image.addDictionaryMember(
-                "name", JSON::makeString((*iter).first));
-            QPDFObjectHandle image = (*iter).second;
+                "name", JSON::makeString(iter2.first));
+            QPDFObjectHandle image = iter2.second;
             QPDFObjectHandle dict = image.getDict();
             j_image.addDictionaryMember("object", image.getJSON());
             j_image.addDictionaryMember(
@@ -3783,10 +3776,9 @@ static void do_json_pages(QPDF& pdf, Options& o, JSON& j)
         JSON j_contents = j_page.addDictionaryMember(
             "contents", JSON::makeArray());
         std::vector<QPDFObjectHandle> content = ph.getPageContents();
-        for (std::vector<QPDFObjectHandle>::iterator iter = content.begin();
-             iter != content.end(); ++iter)
+        for (auto& iter2: content)
         {
-            j_contents.addArrayElement((*iter).getJSON());
+            j_contents.addArrayElement(iter2.getJSON());
         }
         j_page.addDictionaryMember(
             "label", pldh.getLabelForPage(pageno).getJSON());
@@ -4761,12 +4753,10 @@ static void handle_transformations(QPDF& pdf, Options& o)
             QPDFObjectHandle page = ph.getObjectHandle();
             std::map<std::string, QPDFObjectHandle> images =
                 ph.getPageImages();
-            for (std::map<std::string, QPDFObjectHandle>::iterator iter =
-                     images.begin();
-                 iter != images.end(); ++iter)
+            for (auto& iter2: images)
             {
-                std::string name = (*iter).first;
-                QPDFObjectHandle& image = (*iter).second;
+                std::string name = iter2.first;
+                QPDFObjectHandle& image = iter2.second;
                 ImageOptimizer* io = new ImageOptimizer(o, image);
                 PointerHolder<QPDFObjectHandle::StreamDataProvider> sdp(io);
                 if (io->evaluate("image " + name + " on page " +

@@ -1607,12 +1607,12 @@ QPDFObjectHandle::pipeContentStreams(
         std::string og =
             QUtil::int_to_string(stream.getObjectID()) + " " +
             QUtil::int_to_string(stream.getGeneration());
-        std::string description = "content stream object " + og;
+        std::string w_description = "content stream object " + og;
         if (! stream.pipeStreamData(p, 0, qpdf_dl_specialized))
         {
             QTC::TC("qpdf", "QPDFObjectHandle errors in parsecontent");
             throw QPDFExc(qpdf_e_damaged_pdf, "content stream",
-                          description, 0,
+                          w_description, 0,
                           "errors while decoding content stream");
         }
     }
@@ -1685,13 +1685,13 @@ QPDFObjectHandle::parseContentStream_data(
     ParserCallbacks* callbacks,
     QPDF* context)
 {
-    size_t length = stream_data->getSize();
+    size_t stream_length = stream_data->getSize();
     PointerHolder<InputSource> input =
         new BufferInputSource(description, stream_data.getPointer());
     QPDFTokenizer tokenizer;
     tokenizer.allowEOF();
     bool empty = false;
-    while (QIntC::to_size(input->tell()) < length)
+    while (QIntC::to_size(input->tell()) < stream_length)
     {
         // Read a token and seek to the beginning. The offset we get
         // from this process is the beginning of the next

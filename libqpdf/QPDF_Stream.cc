@@ -555,12 +555,14 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline, bool* filterp,
             to_delete.push_back(pipeline);
         }
 
-	for (std::vector<std::string>::reverse_iterator iter = filters.rbegin();
-	     iter != filters.rend(); ++iter)
+	for (std::vector<std::string>::reverse_iterator f_iter =
+                 filters.rbegin();
+	     f_iter != filters.rend(); ++f_iter)
 	{
-	    std::string const& filter = *iter;
+	    std::string const& filter_name = *f_iter;
 
-            if ((filter == "/FlateDecode") || (filter == "/LZWDecode"))
+            if ((filter_name == "/FlateDecode") ||
+                (filter_name == "/LZWDecode"))
             {
                 if ((predictor >= 10) && (predictor <= 15))
                 {
@@ -584,39 +586,39 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline, bool* filterp,
                 }
             }
 
-	    if (filter == "/Crypt")
+	    if (filter_name == "/Crypt")
 	    {
 		// Ignore -- handled by pipeStreamData
 	    }
-	    else if (filter == "/FlateDecode")
+	    else if (filter_name == "/FlateDecode")
 	    {
 		pipeline = new Pl_Flate("stream inflate",
 					pipeline, Pl_Flate::a_inflate);
 		to_delete.push_back(pipeline);
 	    }
-	    else if (filter == "/ASCII85Decode")
+	    else if (filter_name == "/ASCII85Decode")
 	    {
 		pipeline = new Pl_ASCII85Decoder("ascii85 decode", pipeline);
 		to_delete.push_back(pipeline);
 	    }
-	    else if (filter == "/ASCIIHexDecode")
+	    else if (filter_name == "/ASCIIHexDecode")
 	    {
 		pipeline = new Pl_ASCIIHexDecoder("asciiHex decode", pipeline);
 		to_delete.push_back(pipeline);
 	    }
-	    else if (filter == "/LZWDecode")
+	    else if (filter_name == "/LZWDecode")
 	    {
 		pipeline = new Pl_LZWDecoder("lzw decode", pipeline,
 					     early_code_change);
 		to_delete.push_back(pipeline);
 	    }
-	    else if (filter == "/RunLengthDecode")
+	    else if (filter_name == "/RunLengthDecode")
 	    {
 		pipeline = new Pl_RunLength("runlength decode", pipeline,
                                             Pl_RunLength::a_decode);
 		to_delete.push_back(pipeline);
 	    }
-	    else if (filter == "/DCTDecode")
+	    else if (filter_name == "/DCTDecode")
 	    {
 		pipeline = new Pl_DCT("DCT decode", pipeline);
 		to_delete.push_back(pipeline);

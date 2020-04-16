@@ -46,8 +46,7 @@ void dumpInfoDict(QPDF& pdf,
 	{
 	    QPDFObjectHandle elt = info.getKey(*it);
 	    std::string val;
-	    if (false) {}
-	    else if (elt.isString())
+	    if (elt.isString())
 	    {
 		val = elt.getStringValue();
 	    }

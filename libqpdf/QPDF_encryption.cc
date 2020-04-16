@@ -322,10 +322,10 @@ hash_V5(std::string const& password,
             int next_hash = ((E_mod_3 == 0) ? 256 :
                              (E_mod_3 == 1) ? 384 :
                              512);
-            Pl_SHA2 hash(next_hash);
-            hash.write(QUtil::unsigned_char_pointer(E), E.length());
-            hash.finish();
-            K = hash.getRawDigest();
+            Pl_SHA2 sha2(next_hash);
+            sha2.write(QUtil::unsigned_char_pointer(E), E.length());
+            sha2.finish();
+            K = sha2.getRawDigest();
 
             if (round_number >= 64)
             {

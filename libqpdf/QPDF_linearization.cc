@@ -374,9 +374,9 @@ QPDF::readHintStream(Pipeline& pl, qpdf_offset_t offset, size_t length)
 	QTC::TC("qpdf", "QPDF hint table length indirect");
 	// Force resolution
 	(void) length_obj.getIntValue();
-	ObjCache& oc = this->m->obj_cache[length_obj.getObjGen()];
-	min_end_offset = oc.end_before_space;
-	max_end_offset = oc.end_after_space;
+	ObjCache& oc2 = this->m->obj_cache[length_obj.getObjGen()];
+	min_end_offset = oc2.end_before_space;
+	max_end_offset = oc2.end_after_space;
     }
     else
     {

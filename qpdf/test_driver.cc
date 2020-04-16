@@ -347,10 +347,10 @@ void runtest(int n, char const* filename1, char const* arg2)
 	else if (qtest.isArray())
 	{
 	    QTC::TC("qpdf", "main QTest array");
-	    int n = qtest.getArrayNItems();
+	    int nitems = qtest.getArrayNItems();
 	    std::cout << "/QTest is an array with "
-		      << n << " items" << std::endl;
-	    for (int i = 0; i < n; ++i)
+		      << nitems << " items" << std::endl;
+	    for (int i = 0; i < nitems; ++i)
 	    {
 		QTC::TC("qpdf", "main QTest array indirect",
 			qtest.getArrayItem(i).isIndirect() ? 1 : 0);
@@ -510,11 +510,10 @@ void runtest(int n, char const* filename1, char const* arg2)
 	    std::cout << "  images:" << std::endl;
 	    std::map<std::string, QPDFObjectHandle> images =
 		page.getPageImages();
-	    for (std::map<std::string, QPDFObjectHandle>::iterator iter =
-		     images.begin(); iter != images.end(); ++iter)
+	    for (auto const& iter2: images)
 	    {
-		std::string const& name = (*iter).first;
-		QPDFObjectHandle image = (*iter).second;
+		std::string const& name = iter2.first;
+		QPDFObjectHandle image = iter2.second;
 		QPDFObjectHandle dict = image.getDict();
 		long long width = dict.getKey("/Width").getIntValue();
 		long long height = dict.getKey("/Height").getIntValue();
@@ -525,10 +524,9 @@ void runtest(int n, char const* filename1, char const* arg2)
 
 	    std::cout << "  content:" << std::endl;
 	    std::vector<QPDFObjectHandle> content = page.getPageContents();
-	    for (std::vector<QPDFObjectHandle>::iterator iter = content.begin();
-		 iter != content.end(); ++iter)
+	    for (auto& iter2: content)
 	    {
-		std::cout << "    " << (*iter).unparse() << std::endl;
+		std::cout << "    " << iter2.unparse() << std::endl;
 	    }
 
 	    std::cout << "end page " << pageno << std::endl;
@@ -539,8 +537,8 @@ void runtest(int n, char const* filename1, char const* arg2)
 	if (qstrings.isArray())
 	{
 	    std::cout << "QStrings:" << std::endl;
-	    int n = qstrings.getArrayNItems();
-	    for (int i = 0; i < n; ++i)
+	    int nitems = qstrings.getArrayNItems();
+	    for (int i = 0; i < nitems; ++i)
 	    {
 		std::cout << qstrings.getArrayItem(i).getUTF8Value()
 			  << std::endl;
@@ -551,8 +549,8 @@ void runtest(int n, char const* filename1, char const* arg2)
 	if (qnumbers.isArray())
 	{
 	    std::cout << "QNumbers:" << std::endl;
-	    int n = qnumbers.getArrayNItems();
-	    for (int i = 0; i < n; ++i)
+	    int nitems = qnumbers.getArrayNItems();
+	    for (int i = 0; i < nitems; ++i)
 	    {
 		std::cout << QUtil::double_to_string(
 		    qnumbers.getArrayItem(i).getNumericValue(), 3)
@@ -1853,8 +1851,8 @@ void runtest(int n, char const* filename1, char const* arg2)
         // button-set*.pdf are designed for this test case.
         QPDFObjectHandle acroform = pdf.getRoot().getKey("/AcroForm");
         QPDFObjectHandle fields = acroform.getKey("/Fields");
-        int n = fields.getArrayNItems();
-        for (int i = 0; i < n; ++i)
+        int nitems = fields.getArrayNItems();
+        for (int i = 0; i < nitems; ++i)
         {
             QPDFObjectHandle field = fields.getArrayItem(i);
             QPDFObjectHandle T = field.getKey("/T");
@@ -1900,8 +1898,8 @@ void runtest(int n, char const* filename1, char const* arg2)
         // generating testing.
         QPDFObjectHandle acroform = pdf.getRoot().getKey("/AcroForm");
         QPDFObjectHandle fields = acroform.getKey("/Fields");
-        int n = fields.getArrayNItems();
-        for (int i = 0; i < n; ++i)
+        int nitems = fields.getArrayNItems();
+        for (int i = 0; i < nitems; ++i)
         {
             QPDFObjectHandle field = fields.getArrayItem(i);
             QPDFObjectHandle T = field.getKey("/T");

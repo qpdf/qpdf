@@ -175,8 +175,8 @@ QPDFTokenizer::resolveLiteral()
                     num[0] = this->m->val.at(i+1);
                     num[1] = this->m->val.at(i+2);
                     num[2] = '\0';
-                    char ch = static_cast<char>(strtol(num, 0, 16));
-                    if (ch == '\0')
+                    char ch2 = static_cast<char>(strtol(num, 0, 16));
+                    if (ch2 == '\0')
                     {
                         this->m->type = tt_bad;
                         QTC::TC("qpdf", "QPDFTokenizer null in name");
@@ -186,7 +186,7 @@ QPDFTokenizer::resolveLiteral()
                     }
                     else
                     {
-                        nval.append(1, ch);
+                        nval.append(1, ch2);
                     }
                     i += 2;
                 }
@@ -719,7 +719,7 @@ QPDFTokenizer::findEI(PointerHolder<InputSource> input)
                 for (std::string::iterator iter = value.begin();
                      iter != value.end(); ++iter)
                 {
-                    char ch = *iter;
+                    signed char ch = *iter;
                     if (((ch >= 'a') && (ch <= 'z')) ||
                         ((ch >= 'A') && (ch <= 'Z')) ||
                         (ch == '*'))
@@ -729,8 +729,10 @@ QPDFTokenizer::findEI(PointerHolder<InputSource> input)
                         // alphabetic characters.
                         found_alpha = true;
                     }
-                    else if (((ch < 32) && (! isSpace(ch))) || (ch > 127))
+                    else if ((ch < 32) && (! isSpace(ch)))
                     {
+                        // ch is signed, so characters outside of
+                        // 7-bit will be < 0.
                         found_non_printable = true;
                         break;
                     }

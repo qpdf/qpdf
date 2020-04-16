@@ -15,7 +15,6 @@
 #include <string>
 #include <cstring>
 
-static char const* whoami = 0;
 static bool static_id = false;
 
 static void process(char const* whoami,
@@ -50,7 +49,7 @@ static void process(char const* whoami,
     }
 }
 
-void usage()
+void usage(char const* whoami)
 {
     std::cerr << "Usage: " << whoami << " infile outprefix" << std::endl;
     exit(2);
@@ -58,7 +57,7 @@ void usage()
 
 int main(int argc, char* argv[])
 {
-    whoami = QUtil::getWhoami(argv[0]);
+    char const* whoami = QUtil::getWhoami(argv[0]);
 
     // For libtool's sake....
     if (strncmp(whoami, "lt-", 3) == 0)
@@ -75,7 +74,7 @@ int main(int argc, char* argv[])
 
     if (argc != 3)
     {
-        usage();
+        usage(whoami);
     }
     try
     {

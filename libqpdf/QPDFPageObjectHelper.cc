@@ -76,10 +76,8 @@ InlineImageTracker::convertIIDict(QPDFObjectHandle odict)
     dict.replaceKey("/Type", QPDFObjectHandle::newName("/XObject"));
     dict.replaceKey("/Subtype", QPDFObjectHandle::newName("/Image"));
     std::set<std::string> keys = odict.getKeys();
-    for (std::set<std::string>::iterator iter = keys.begin();
-         iter != keys.end(); ++iter)
+    for (auto key: keys)
     {
-        std::string key = *iter;
         QPDFObjectHandle value = odict.getKey(key);
         if (key == "/BPC")
         {
@@ -176,14 +174,12 @@ InlineImageTracker::convertIIDict(QPDFObjectHandle odict)
             {
                 filters = value.getArrayAsVector();
             }
-            for (std::vector<QPDFObjectHandle>::iterator iter =
-                     filters.begin();
-                 iter != filters.end(); ++iter)
+            for (auto& iter: filters)
             {
                 std::string name;
-                if ((*iter).isName())
+                if (iter.isName())
                 {
-                    name = (*iter).getName();
+                    name = iter.getName();
                 }
                 if (name == "/AHx")
                 {
@@ -219,7 +215,7 @@ InlineImageTracker::convertIIDict(QPDFObjectHandle odict)
                 }
                 if (! name.empty())
                 {
-                    *iter = QPDFObjectHandle::newName(name);
+                    iter = QPDFObjectHandle::newName(name);
                 }
             }
             if (value.isName() && (filters.size() == 1))
