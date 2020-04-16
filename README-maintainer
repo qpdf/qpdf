@@ -101,6 +101,8 @@ RELEASE PREPARATION
 
 * Check for open fuzz crashes at https://oss-fuzz.com
 
+* Check lgtm: https://lgtm.com/projects/g/qpdf/qpdf/?mode=list
+
 * Check all open issues and pull requests in github and the
   sourceforge trackers. See ~/scripts/github-issues. Don't forget pull
   requests.

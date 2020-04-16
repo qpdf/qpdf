@@ -1237,6 +1237,7 @@ len
 lengthNextN
 lexer
 LF
+lgtm
 lhs
 libclang
 libfuzzer
