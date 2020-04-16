@@ -475,20 +475,34 @@ if test "$BUILDRULES" = "msvc"; then
 else
    try_flags="-Wconversion -Wsign-conversion"
 fi
+oCFLAGS=$CFLAGS
+CFLAGS="$CFLAGS $try_flags"
 AC_MSG_CHECKING(for whether to use $try_flags)
-AC_ARG_ENABLE(int-warnings,
-   AS_HELP_STRING([--enable-int-warnings],
-                  [whether to turn on integer type warnings (default is yes)]),
-   [if test "$enableval" = "yes"; then
-      qpdf_INT_WARNINGS=1;
-    else
-      qpdf_INT_WARNINGS=0;
-    fi], [qpdf_INT_WARNINGS=1])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[int a = 1; int b = a; a = b;]])],
+                  [qpdf_INT_WARNINGS=1],[qpdf_INT_WARNINGS=0])
 if test "$qpdf_INT_WARNINGS" = "1"; then
    AC_MSG_RESULT(yes)
-   WFLAGS="$WFLAGS $try_flags"
+   CXXFLAGS="$CXXFLAGS $try_flags"
 else
    AC_MSG_RESULT(no)
+   CFLAGS=$oCFLAGS
+fi
+
+if test "$BUILDRULES" != "msvc"; then
+   try_flags="-Wshadow=local"
+   oCFLAGS=$CFLAGS
+   CFLAGS="$CFLAGS $try_flags -Werror"
+   AC_MSG_CHECKING(for whether to use $try_flags)
+   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[int a = 1; int b = a; a = b;]])],
+                     [qpdf_SHADOW_WARNINGS=1],[qpdf_SHADOW_WARNINGS=0])
+   if test "$qpdf_SHADOW_WARNINGS" = "1"; then
+      AC_MSG_RESULT(yes)
+      CFLAGS="$oCFLAGS $try_flags"
+      CXXFLAGS="$CXXFLAGS $try_flags"
+   else
+      AC_MSG_RESULT(no)
+      CFLAGS=$oCFLAGS
+   fi
 fi
 
 AC_SUBST(WINDOWS_WMAIN_XLINK_FLAGS)
