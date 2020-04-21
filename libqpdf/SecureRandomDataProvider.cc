@@ -42,60 +42,15 @@ class WindowsCryptProvider
   public:
     WindowsCryptProvider()
     {
-        if (!CryptAcquireContext(&crypt_prov,
-                                 "Container",
+        if (!CryptAcquireContextW(&crypt_prov,
+                                 NULL,
                                  NULL,
                                  PROV_RSA_FULL,
-                                 CRYPT_MACHINE_KEYSET))
+                                 CRYPT_VERIFYCONTEXT))
         {
-#if ((defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
-     defined(__clang__))
-#           pragma GCC diagnostic push
-#           pragma GCC diagnostic ignored "-Wold-style-cast"
-#           pragma GCC diagnostic ignored "-Wsign-compare"
-#           pragma GCC diagnostic ignored "-Wsign-conversion"
-#endif
-            if (GetLastError() == NTE_BAD_KEYSET)
-            {
-                if (! CryptAcquireContext(&crypt_prov,
-                                          "Container",
-                                          NULL,
-                                          PROV_RSA_FULL,
-                                          CRYPT_NEWKEYSET|CRYPT_MACHINE_KEYSET))
-                {
-                    throw std::runtime_error(
-                        "unable to acquire crypt context with new keyset: " +
-                        getErrorMessage());
-                }
-            }
-            else if (GetLastError() == NTE_EXISTS)
-            {
-                throw std::runtime_error(
-                    "unable to acquire crypt context; the key container"
-                    " already exists, but you are attempting to create it."
-                    " If a previous attempt to open the key failed with"
-                    " NTE_BAD_KEYSET, it implies that access to the key"
-                    " container is denied. Error: " + getErrorMessage());
-            }
-            else if (GetLastError() == NTE_KEYSET_NOT_DEF)
-            {
-                throw std::runtime_error(
-                    "unable to acquire crypt context; the Crypto Service"
-                    " Provider (CSP) may not be set up correctly. Use of"
-                    " Regsvr32.exe on CSP DLLs (Rsabase.dll or Rsaenh.dll)"
-                    " may fix the problem, depending on the provider being"
-                    " used. Error: " + getErrorMessage());
-            }
-            else
-            {
                 throw std::runtime_error(
                     "unable to acquire crypt context: " +
                     getErrorMessage());
-            }
-#if ((defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
-     defined(__clang__))
-#           pragma GCC diagnostic pop
-#endif
         }
     }
     ~WindowsCryptProvider()
