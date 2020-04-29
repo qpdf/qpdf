@@ -73,7 +73,7 @@ QPDF::checkLinearization()
     }
     catch (QPDFExc& e)
     {
-	*this->m->out_stream << e.what() << std::endl;
+	*this->m->err_stream << e.what() << std::endl;
     }
     return result;
 }
@@ -386,7 +386,7 @@ QPDF::readHintStream(Pipeline& pl, qpdf_offset_t offset, size_t length)
     if ((computed_end < min_end_offset) ||
 	(computed_end > max_end_offset))
     {
-	*this->m->out_stream << "expected = " << computed_end
+	*this->m->err_stream << "expected = " << computed_end
                              << "; actual = " << min_end_offset << ".."
                              << max_end_offset << std::endl;
 	throw QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
@@ -661,7 +661,7 @@ QPDF::checkLinearizationInternal()
 	for (std::list<std::string>::iterator iter = errors.begin();
 	     iter != errors.end(); ++iter)
 	{
-	    *this->m->out_stream << "WARNING: " << (*iter) << std::endl;
+	    *this->m->err_stream << "WARNING: " << (*iter) << std::endl;
 	}
     }
 
@@ -671,7 +671,7 @@ QPDF::checkLinearizationInternal()
 	for (std::list<std::string>::iterator iter = warnings.begin();
 	     iter != warnings.end(); ++iter)
 	{
-	    *this->m->out_stream << "WARNING: " << (*iter) << std::endl;
+	    *this->m->err_stream << "WARNING: " << (*iter) << std::endl;
 	}
     }
 
@@ -1094,7 +1094,7 @@ QPDF::showLinearizationData()
     }
     catch (QPDFExc& e)
     {
-	*this->m->out_stream << e.what() << std::endl;
+	*this->m->err_stream << e.what() << std::endl;
     }
 }
 

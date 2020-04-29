@@ -1,3 +1,8 @@
+2020-04-29  Jay Berkenbilt  <ejb@ql.org>
+
+	* Bug fix: qpdf --check was writing errors and warnings reported
+	by checkLinearization to stdout instead of stderr. Fixes #438.
+
 2020-04-09  Jay Berkenbilt  <ejb@ql.org>
 
 	* 10.0.1: release
