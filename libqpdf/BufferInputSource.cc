@@ -61,14 +61,15 @@ BufferInputSource::findAndSkipNextEOL()
     }
 
     qpdf_offset_t result = 0;
-    size_t len = QIntC::to_size(end_pos - this->m->cur_offset);
     unsigned char const* buffer = this->m->buf->getBuffer();
+    unsigned char const* end = buffer + end_pos;
+    unsigned char const* p = buffer + this->m->cur_offset;
 
-    void* start = const_cast<unsigned char*>(buffer) + this->m->cur_offset;
-    unsigned char* p1 = static_cast<unsigned char*>(memchr(start, '\r', len));
-    unsigned char* p2 = static_cast<unsigned char*>(memchr(start, '\n', len));
-    unsigned char* p = (p1 && p2) ? std::min(p1, p2) : p1 ? p1 : p2;
-    if (p)
+    while ((p < end) && !((*p == '\r') || (*p == '\n')))
+    {
+        ++p;
+    }
+    if (p < end)
     {
         result = p - buffer;
         this->m->cur_offset = result + 1;
