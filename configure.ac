@@ -553,23 +553,27 @@ if test "$USE_CRYPTO_NATIVE" = "1"; then
   DEFAULT_CRYPTO=native
 fi
 
-dnl If the openssl/BoringSSL provider is explicitly requested, require openssl
+dnl If the openssl/BoringSSL provider is explicitly requested, require openssl.
 dnl If the openssl provider is not explicitly disabled, enable it if
 dnl openssl is available. If the openssl provider is explicitly
 dnl disabled, do not link with openssl even if present.
 
-PKG_CHECK_MODULES([pc_openssl], [openssl], [OPENSSL_FOUND=1], [OPENSSL_FOUND=0])
-if test "$OPENSSL_FOUND" = "0"; then
-  AC_CHECK_HEADER([openssl/evp.h],[OPENSSL_FOUND=1],[OPENSSL_FOUND=0])
-  AC_SEARCH_LIBS(EVP_DigestInit_ex,openssl,[OPENSSL_FOUND=1],[OPENSSL_FOUND=0])
-fi
+PKG_CHECK_MODULES([pc_openssl], [openssl >= 1.1.0],
+                  [OPENSSL_FOUND=1], [OPENSSL_FOUND=0])
+
+dnl Override pkg-config if headers and libraries are present.
+AS_IF([test "$OPENSSL_FOUND" = "0"],
+      [AC_CHECK_HEADER(
+       [openssl/evp.h],
+       [AC_SEARCH_LIBS(EVP_MD_CTX_new,crypto,[OPENSSL_FOUND=1])])
+      ])
 
 IMPLICIT_OPENSSL=0
 USE_CRYPTO_OPENSSL=0
 AC_SUBST(USE_CRYPTO_OPENSSL)
 AC_ARG_ENABLE(crypto-openssl,
    AS_HELP_STRING([--enable-crypto-openssl],
-                  [whether to include support for the BoringSSL crypto provider]),
+                  [whether to include support for the openssl crypto provider]),
    [if test "$enableval" = "yes"; then
       USE_CRYPTO_OPENSSL=1
     else
