@@ -2151,8 +2151,8 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
 	}
 
 	int num = QUtil::string_to_int(tnum.getValue().c_str());
-	int offset = QUtil::string_to_int(toffset.getValue().c_str());
-	offsets[num] = offset + first;
+	long long offset = QUtil::string_to_int(toffset.getValue().c_str());
+	offsets[num] = QIntC::to_int(offset + first);
     }
 
     // To avoid having to read the object stream multiple times, store
