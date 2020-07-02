@@ -1477,7 +1477,7 @@ Optional Features:
                           are not explicitly requested; true by default
   --enable-crypto-native  whether to include support for native crypto
                           provider
-  --enable-crypto-openssl whether to include support for the BoringSSL crypto
+  --enable-crypto-openssl whether to include support for the openssl crypto
                           provider
   --enable-crypto-gnutls  whether to include support for gnutls crypto
                           provider
@@ -17811,12 +17811,12 @@ if test -n "$pc_openssl_CFLAGS"; then
     pkg_cv_pc_openssl_CFLAGS="$pc_openssl_CFLAGS"
  elif test -n "$PKG_CONFIG"; then
     if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"openssl\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "openssl") 2>&5
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"openssl >= 1.1.0\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "openssl >= 1.1.0") 2>&5
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_pc_openssl_CFLAGS=`$PKG_CONFIG --cflags "openssl" 2>/dev/null`
+  pkg_cv_pc_openssl_CFLAGS=`$PKG_CONFIG --cflags "openssl >= 1.1.0" 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes
 else
   pkg_failed=yes
@@ -17828,12 +17828,12 @@ if test -n "$pc_openssl_LIBS"; then
     pkg_cv_pc_openssl_LIBS="$pc_openssl_LIBS"
  elif test -n "$PKG_CONFIG"; then
     if test -n "$PKG_CONFIG" && \
-    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"openssl\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "openssl") 2>&5
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"openssl >= 1.1.0\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "openssl >= 1.1.0") 2>&5
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_pc_openssl_LIBS=`$PKG_CONFIG --libs "openssl" 2>/dev/null`
+  pkg_cv_pc_openssl_LIBS=`$PKG_CONFIG --libs "openssl >= 1.1.0" 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes
 else
   pkg_failed=yes
@@ -17854,9 +17854,9 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        pc_openssl_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "openssl" 2>&1`
+	        pc_openssl_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "openssl >= 1.1.0" 2>&1`
         else
-	        pc_openssl_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "openssl" 2>&1`
+	        pc_openssl_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "openssl >= 1.1.0" 2>&1`
         fi
 	# Put the nasty error message in config.log where it belongs
 	echo "$pc_openssl_PKG_ERRORS" >&5
@@ -17873,18 +17873,13 @@ else
 $as_echo "yes" >&6; }
 	OPENSSL_FOUND=1
 fi
-if test "$OPENSSL_FOUND" = "0"; then
+
+if test "$OPENSSL_FOUND" = "0"; then :
   ac_fn_c_check_header_mongrel "$LINENO" "openssl/evp.h" "ac_cv_header_openssl_evp_h" "$ac_includes_default"
 if test "x$ac_cv_header_openssl_evp_h" = xyes; then :
-  OPENSSL_FOUND=1
-else
-  OPENSSL_FOUND=0
-fi
-
-
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing EVP_DigestInit_ex" >&5
-$as_echo_n "checking for library containing EVP_DigestInit_ex... " >&6; }
-if ${ac_cv_search_EVP_DigestInit_ex+:} false; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing EVP_MD_CTX_new" >&5
+$as_echo_n "checking for library containing EVP_MD_CTX_new... " >&6; }
+if ${ac_cv_search_EVP_MD_CTX_new+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_func_search_save_LIBS=$LIBS
@@ -17897,16 +17892,16 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char EVP_DigestInit_ex ();
+char EVP_MD_CTX_new ();
 int
 main ()
 {
-return EVP_DigestInit_ex ();
+return EVP_MD_CTX_new ();
   ;
   return 0;
 }
 _ACEOF
-for ac_lib in '' openssl; do
+for ac_lib in '' crypto; do
   if test -z "$ac_lib"; then
     ac_res="none required"
   else
@@ -17914,31 +17909,33 @@ for ac_lib in '' openssl; do
     LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
   fi
   if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_search_EVP_DigestInit_ex=$ac_res
+  ac_cv_search_EVP_MD_CTX_new=$ac_res
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext
-  if ${ac_cv_search_EVP_DigestInit_ex+:} false; then :
+  if ${ac_cv_search_EVP_MD_CTX_new+:} false; then :
   break
 fi
 done
-if ${ac_cv_search_EVP_DigestInit_ex+:} false; then :
+if ${ac_cv_search_EVP_MD_CTX_new+:} false; then :
 
 else
-  ac_cv_search_EVP_DigestInit_ex=no
+  ac_cv_search_EVP_MD_CTX_new=no
 fi
 rm conftest.$ac_ext
 LIBS=$ac_func_search_save_LIBS
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_EVP_DigestInit_ex" >&5
-$as_echo "$ac_cv_search_EVP_DigestInit_ex" >&6; }
-ac_res=$ac_cv_search_EVP_DigestInit_ex
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_EVP_MD_CTX_new" >&5
+$as_echo "$ac_cv_search_EVP_MD_CTX_new" >&6; }
+ac_res=$ac_cv_search_EVP_MD_CTX_new
 if test "$ac_res" != no; then :
   test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
   OPENSSL_FOUND=1
-else
-  OPENSSL_FOUND=0
 fi
+
+fi
+
+
 
 fi
 
