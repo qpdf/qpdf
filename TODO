@@ -2,7 +2,6 @@ Candidates for upcoming release
 ===============================
 
 * Trivial fixes:
-  * #470: odd/even -- doc bug
   * #468: doc typo
   * Remove travisci
   * Update manual to clearly state qpdf's exit codes including mention
