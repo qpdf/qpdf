@@ -960,10 +960,6 @@ QPDF::initializeEncryption()
                 Length = 0;
             }
         }
-        if (Length == 0)
-        {
-            Length = 128;
-        }
     }
     if (Length == 0)
     {

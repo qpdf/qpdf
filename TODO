@@ -2,7 +2,6 @@ Candidates for upcoming release
 ===============================
 
 * Trivial fixes:
-  * lgtm warning
   * #470: odd/even -- doc bug
   * #468: doc typo
   * Remove travisci
