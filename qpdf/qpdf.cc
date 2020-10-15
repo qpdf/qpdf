@@ -1621,7 +1621,8 @@ ArgParser::argHelp()
         << "Ordinarily, qpdf exits with a status of 0 on success or a status of 2\n"
         << "if any errors occurred.  If there were warnings but not errors, qpdf\n"
         << "exits with a status of 3. If warnings would have been issued but --no-warn\n"
-        << "was given, an exit status of 3 is still used.\n";
+        << "was given, an exit status of 3 is still used. qpdf does not use exit\n"
+        << "status 1, since that is used by the shell if it can't execute qpdf.\n";
 }
 
 void

@@ -594,6 +594,40 @@ make
     Most options require an output file, but some testing or
     inspection commands do not.  These are specifically noted.
    </para>
+   <sect2 id="ref.exit-status">
+    <title>Exit Status</title>
+    <para>
+     The exit status of <command>qpdf</command> may be interpreted as
+     follows:
+     <itemizedlist>
+      <listitem>
+       <para>
+        <literal>0</literal>: no errors or warnings were found. The
+        file may still have problems qpdf can't detect.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <literal>2</literal>: errors were found. qpdf was not able to
+        fully process the file.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <literal>3</literal>: qpdf encountered problems that it was
+        able to recover from. In some cases, the resulting file may
+        still be damaged. Note that qpdf still exits with status
+        <literal>3</literal> if it finds warnings even when
+        <option>--no-warn</option> is specified.
+       </para>
+      </listitem>
+     </itemizedlist>
+     Note that <command>qpdf</command> never exists with status
+     <literal>1</literal>. If you get an exit status of
+     <literal>1</literal>, it was something else, like the shell not
+     being able to find or execute <command>qpdf</command>.
+    </para>
+   </sect2>
   </sect1>
   <sect1 id="ref.shell-completion">
    <title>Shell Completion</title>
