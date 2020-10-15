@@ -76,9 +76,6 @@ Candidates for upcoming release
   has a different interface but still ultimately creates the same
   tokens.
 
-* See about tying lgtm.com into qpdf's CI.
-
-
 Fuzz Errors
 ===========
 
