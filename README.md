@@ -2,8 +2,7 @@
 
 [![QPDF](logo/qpdf.svg)](http://qpdf.sourceforge.net)
 
-[![Azure Pipeline Build Status](https://dev.azure.com/qpdf/qpdf/_apis/build/status/qpdf.qpdf)](https://dev.azure.com/qpdf/qpdf/_build/latest?definitionId=5) [![Travis Build Status](https://travis-ci.org/qpdf/qpdf.svg?branch=master)](https://travis-ci.org/qpdf/qpdf)
-[![Total lgtm alerts](https://img.shields.io/lgtm/alerts/g/qpdf/qpdf.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/qpdf/qpdf/alerts/)
+[![Azure Pipeline Build Status](https://dev.azure.com/qpdf/qpdf/_apis/build/status/qpdf.qpdf)](https://dev.azure.com/qpdf/qpdf/_build/latest?definitionId=5) [![Total lgtm alerts](https://img.shields.io/lgtm/alerts/g/qpdf/qpdf.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/qpdf/qpdf/alerts/)
 [![Language grade on lgtm: C/C++](https://img.shields.io/lgtm/grade/cpp/g/qpdf/qpdf.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/qpdf/qpdf/context:cpp)
 
 This is the QPDF package.  Information about it can be found at http://qpdf.sourceforge.net.  The source code repository is hosted at GitHub: https://github.com/qpdf/qpdf.

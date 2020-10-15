@@ -1,9 +1,6 @@
 Candidates for upcoming release
 ===============================
 
-* Trivial fixes:
-  * Remove travisci
-
 * Quick issues:
   * #438: things written to stdout instead of stderr; --no-warn issues
   * #454: integer overflow

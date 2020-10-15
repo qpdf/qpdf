@@ -2,14 +2,12 @@
 
 # Copyright (c) 2019-2020 Jay Berkenbilt and Kurt Pfeifle
 #
-# This script is mainly meant to build an 'AppImage' from GitHub
-# sources of QPDF via Travis CI on an Ubuntu Trusty (14.04) LTS system
-# (see https://appimage.org/).
-#
-# But it also allows Linux users to build such an AppImage on their
-# own systems. Please read 'README.md' from the top level Git sources
-# to see what preconditions you must meet to build QPDF in general.
-# The same apply to build an AppImage. Then follow these three steps:
+# This script is used to build an 'AppImage' from GitHub sources of
+# QPDF (see https://appimage.org/). It is used in CI, but it also
+# allows Linux users to build such an AppImage on their own systems.
+# Please read 'README.md' from the top level Git sources to see what
+# preconditions you must meet to build QPDF in general. The same apply
+# to build an AppImage. Then follow these three steps:
 #
 #   1. Clone Git sources:  `git clone https://github.com/qpdf/qpdf.git git.qpdf`
 #   2. Change into git dir:  `cd git.qpdf`
@@ -33,8 +31,8 @@
 #   2. If you build the AppImage on a too recent Linux distribution,
 #      it may only work on the exact distribution you build it on. For
 #      an AppImage to work on a wide range of different distributions
-#      from the last 3-4 years if should be built on Ubuntu Trusty
-#      (14.04).
+#      from the last 3-4 years if should be built on the oldest
+#      supported Ubuntu LTS release.
 
 set -ex
 
@@ -172,7 +170,7 @@ else
     set +x
     echo ""
     echo " Running 'appimagetool' with '-n' parameter..."
-    echo " Reason: this does not seem to be a Travis CI build running on"
+    echo " Reason: this does not seem to be a build running on"
     echo " Ubuntu Trusty 14.04."
     echo " '-n' disables checking of AppStream data by the 'appstreamcli'"
     echo " utility since post-Trusty versions have incompatible changes."
@@ -183,13 +181,8 @@ fi
 # Set up a version string to include in the AppImage name
 MAJOR_QPDF_VERSION=$( ./appdir/usr/bin/qpdf --version | grep "qpdf version" | awk '{print $3}' )
 declare -a UPDATE_INFO
-if [ "$TRAVIS_JOB_NUMBER" != "" ]; then
-    VERSION=${MAJOR_QPDF_VERSION}-continuous-${TRAVIS_JOB_NUMBER}-$(date "+%Y-%m-%d")-git.$(git rev-parse --short HEAD)
-    # No update info supported for travis builds for now.
-else
-    VERSION=${MAJOR_QPDF_VERSION}
-    UPDATE_INFO=(-u "gh-releases-zsync|qpdf|qpdf|latest|qpdf-*x86_64.AppImage.zsync")
-fi
+VERSION=${MAJOR_QPDF_VERSION}
+UPDATE_INFO=(-u "gh-releases-zsync|qpdf|qpdf|latest|qpdf-*x86_64.AppImage.zsync")
 
 # Remove the default AppRun/symlink and use our own custom AppRun script
 rm appdir/AppRun; cp $top/appimage/AppRun appdir; chmod a+x appdir/AppRun
