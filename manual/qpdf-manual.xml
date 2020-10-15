@@ -777,7 +777,7 @@ make
        <para>
         Encrypt the file using the same encryption parameters,
         including user and owner password, as the specified file.  Use
-        <option>--encrypt-file-password</option> to specify a password
+        <option>--encryption-file-password</option> to specify a password
         if one is needed to open this file.  Note that copying the
         encryption parameters from a file also copies the first half
         of <literal>/ID</literal> from the file since this is part of
@@ -786,7 +786,7 @@ make
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term><option>--encrypt-file-password=password</option></term>
+      <term><option>--encryption-file-password=password</option></term>
       <listitem>
        <para>
         If the file specified with <option>--copy-encryption</option>

@@ -2,7 +2,6 @@ Candidates for upcoming release
 ===============================
 
 * Trivial fixes:
-  * #468: doc typo
   * Remove travisci
   * Update manual to clearly state qpdf's exit codes including mention
     of not exiting with code 1.
