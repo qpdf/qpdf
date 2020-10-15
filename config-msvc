@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 set -x
-if echo $PATH | grep -q /mingw64; then
+if cl 2>&1 | grep -q 'for x64'; then
     wordsize=64
 else
     wordsize=32

@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 set -x
-if echo $PATH | grep -q /mingw64; then
+if g++ -v 2>&1 | grep Target: | grep -q x86_64; then
     wordsize=64
 else
     wordsize=32
