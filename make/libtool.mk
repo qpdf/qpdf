@@ -47,10 +47,10 @@ define compile
 		-c $(1) -o $(call src_to_obj,$(1))
 endef
 
-#                       1   2
-# Usage: $(call c_compile,src,includes)
+#                         1   2        3
+# Usage: $(call c_compile,src,includes,xflags)
 define c_compile
-	$(CC) $(CFLAGS) \
+	$(CC) $(CFLAGS) $(3) \
 		$(call depflags,$(basename $(call c_src_to_obj,$(1)))) \
 		$(foreach I,$(2),-I$(I)) \
 		$(CPPFLAGS) \

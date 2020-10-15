@@ -48,7 +48,7 @@ $(foreach B,$(BINS_qpdf),$(eval \
 
 $(foreach B,$(CBINS_qpdf),$(eval \
   $(OBJS_$(B)): qpdf/$(OUTPUT_DIR)/%.$(OBJ): qpdf/$(B).c ; \
-	$(call c_compile,qpdf/$(B).c,$(INCLUDES_qpdf))))
+	$(call c_compile,qpdf/$(B).c,$(INCLUDES_qpdf),$(XCFLAGS_qpdf_$(B)))))
 
 $(foreach B,$(BINS_qpdf) $(CBINS_qpdf),$(eval \
   qpdf/$(OUTPUT_DIR)/$(call binname,$(B)): $(OBJS_$(B)) ; \

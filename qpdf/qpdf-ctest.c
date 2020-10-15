@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include "../libqpdf/qpdf/qpdf-config.h" // for LL_FMT
 
 static char* whoami = 0;
 static qpdf_data qpdf = 0;
@@ -36,13 +37,7 @@ static FILE* safe_fopen(char const* filename, char const* mode)
 
 static void report_errors()
 {
-#ifdef _WIN32
-# define POS_FMT "  pos : %I64d\n"
-#else
-/* If your compiler doesn't support lld, change to ld and lose
-   precision on offsets in error messages. */
-# define POS_FMT "  pos : %lld\n"
-#endif
+#define POS_FMT "  pos : " LL_FMT "\n"
     qpdf_error e = 0;
     while (qpdf_more_warnings(qpdf))
     {

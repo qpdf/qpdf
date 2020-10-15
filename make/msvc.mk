@@ -32,10 +32,10 @@ define compile
 		-c $(1) -Fo$(call src_to_obj,$(1))
 endef
 
-#                       1   2
-# Usage: $(call c_compile,src,includes)
+#                         1   2        3
+# Usage: $(call c_compile,src,includes,xflags)
 define c_compile
-	cl -nologo -O2 -Zi -Gy -EHsc -MD $(CPPFLAGS) $(CFLAGS) \
+	cl -nologo -O2 -Zi -Gy -EHsc -MD $(CPPFLAGS) $(CFLAGS) $(3) \
 		$(foreach I,$(2),-I$(I)) \
 		-c $(1) -Fo$(call c_src_to_obj,$(1))
 endef

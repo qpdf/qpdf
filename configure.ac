@@ -505,6 +505,39 @@ if test "$BUILDRULES" != "msvc"; then
    fi
 fi
 
+LL_FMT=""
+oCFLAGS=$CFLAGS
+CFLAGS="$WFLAGS $CFLAGS"
+for fmt in "%lld" "%I64d" "%I64lld"; do
+  if test "$LL_FMT" = ""; then
+    AC_MSG_CHECKING(printf format for long long: $fmt)
+    AC_RUN_IFELSE([AC_LANG_PROGRAM(
+     [[
+        #define _CRT_SECURE_NO_WARNINGS
+        #include <stdio.h>
+        #include <string.h>
+     ]],
+     [[
+        long long int a = 123456789012345ll;
+        char s[30];
+        sprintf(s, "]$fmt[", a);
+        return (strcmp(s, "123456789012345") == 0) ? 0 : 1
+     ]]
+     )],
+     [LL_FMT=$fmt],[],[LL_FMT="%lld"])
+    if test "$LL_FMT" != ""; then
+       AC_MSG_RESULT(yes)
+    else
+       AC_MSG_RESULT(no)
+    fi
+  fi
+done
+CFLAGS=$oCFLAGS
+if test "LL_FMT" = ""; then
+  LL_FMT="%lld%"
+fi
+AC_DEFINE_UNQUOTED([LL_FMT], ["$LL_FMT"], [printf format for long long])
+
 AC_SUBST(WINDOWS_WMAIN_XLINK_FLAGS)
 AC_SUBST(WINDOWS_MAIN_XLINK_FLAGS)
 if test "$BUILDRULES" = "msvc"; then
