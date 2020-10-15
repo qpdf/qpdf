@@ -2,11 +2,12 @@
 set -e
 sudo apt-get update
 sudo apt-get -y install \
-   autoconf build-essential zlib1g-dev libjpeg-dev libgnutls28-dev
+   autoconf build-essential zlib1g-dev libjpeg-dev libgnutls28-dev libssl-dev
 ./configure \
    CFLAGS="-fsanitize=address -fsanitize=undefined -g" \
    CXXFLAGS="-fsanitize=address -fsanitize=undefined -g" \
    LDFLAGS="-fsanitize=address -fsanitize=undefined" \
+   CC=clang CXX="clang++ --std=c++11" \
    --enable-crypto-native --enable-crypto-openssl --enable-crypto-gnutls \
    --enable-werror --disable-shared --enable-show-failed-test-output
 make -j$(nproc) -k
