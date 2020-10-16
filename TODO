@@ -29,7 +29,8 @@ Candidates for upcoming release
     * #446: recognize edited QDF files
     * #436: parsing of document with form xobject
 
-* Try migrating to github actions
+* Complete migratiion to GitHub Actions. Do a case-insensitive search
+  for azure to find documentation references.
 
 * Remember to check work `qpdf` project for private issues
   * file with very slow page extraction
@@ -207,7 +208,8 @@ Page splitting/merging
 MSVC Wildcard Expansion
 =======================
 
-(This section is referenced in azure_pipelines.yml.)
+(This section is referenced in azure_pipelines.yml and
+.github/workflows/main.yml.)
 
 The qpdf executable built with msvc is linked with setargv.obj or
 wsetargv.obj so that wildcard expansion works. It doesn't work exactly
@@ -223,8 +225,8 @@ qpdf executable in Windows should be retested manually.
 Unfortunately, there is no automated test for wildcard expansion with
 MSVC because I can't figure out how to prevent qtest from expanding
 the wildcards before passing them in, and explicitly running "cmd /c
-..." from qtest doesn't seem to work in Azure Pipelines, though I can
-make it work locally.
+..." from qtest doesn't seem to work in Azure Pipelines (haven't
+attempted in GitHub Actions), though I can make it work locally.
 
 Ideally, we should figure out a way to test this in CI by having a
 test that fails if wildcard expansion is broken. In the absence of

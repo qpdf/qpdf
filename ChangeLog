@@ -1,3 +1,9 @@
+2020-10-16  Jay Berkenbilt  <ejb@ql.org>
+
+	* Build using GitHub Actions. The intention is that this will
+	replace Azure Pipelines as the official CI for qpdf for the next
+	release.
+
 2020-04-29  Jay Berkenbilt  <ejb@ql.org>
 
 	* Bug fix: qpdf --check was writing errors and warnings reported
