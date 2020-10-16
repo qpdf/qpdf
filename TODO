@@ -91,6 +91,19 @@ Fuzz Errors
     18745, 20391, 23581
   * Timeout: 15471, 17630
 
+GitHub Actions
+==============
+
+* Actions are triggered on push to main and master. When we eventually
+  rename master to main, make sure the reference to master is removed
+  from .github/workflows/*.yml.
+
+* At the time of migrating from Azure Pipelines to GitHub Actions
+  (2020-10), there was no standard test result publisher (to replace
+  the PublishTestResults@2 task). There are some third-party actions,
+  but I'd rather not depend on them. Keep an eye open for this coming
+  to GitHub Actions.
+
 Windows Build
 =============
 

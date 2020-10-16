@@ -1,0 +1,108 @@
+name: QPDF Build
+env:
+  QTEST_COLOR: 1
+on:
+  push:
+    branches:
+      - main
+      - master
+      - build
+  pull_request:
+jobs:
+  Distfiles:
+    # Generate distfiles.zip, which is a prerequisite for the mac and
+    # Windows builds. Only the mac and Windows builds actually "need"
+    # it, but declaring all the jobs to need it forces it to run
+    # first.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: 'Create distfiles.zip'
+        run: build-scripts/make-distfiles
+      - name: 'Upload extra distribution files'
+        uses: actions/upload-artifact@v1
+        with:
+          name: distfiles
+          path: distfiles.zip
+  Linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: 'Generate, build, and test'
+        run: build-scripts/build-linux
+      - name: Upload distribution
+        uses: actions/upload-artifact@v1
+        with:
+          name: distribution
+          path: distribution
+  Windows:
+    # If updating this, see note in TODO about MSVC wildcard expansion.
+    runs-on: windows-2019
+    needs: Distfiles
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        tool: [msvc, mingw]
+        wordsize: [64, 32]
+    steps:
+      - name: 'Disable git autocrlf'
+        shell: bash
+        run: git config --global core.autocrlf input
+      - uses: actions/checkout@v2
+      - name: 'Download distribution files'
+        uses: actions/download-artifact@v2
+        with:
+          name: distfiles
+      - name: 'Build, test, generate binary distributions'
+        shell: cmd
+        run: build-scripts/build-windows.bat ${{ matrix.wordsize }} ${{ matrix.tool }}
+      - name: 'Upload binary distributions'
+        uses: actions/upload-artifact@v1
+        with:
+          name: distribution
+          path: distribution
+  macOS:
+    runs-on: macos-10.15
+    needs: Distfiles
+    steps:
+      - uses: actions/checkout@v2
+      - name: 'Download distribution files'
+        uses: actions/download-artifact@v2
+        with:
+          name: distfiles
+      - name: 'Mac build and test'
+        run: build-scripts/build-mac
+  AppImage:
+    runs-on: ubuntu-latest
+    needs: Distfiles
+    steps:
+      - uses: actions/checkout@v2
+      - name: 'Build AppImage'
+        run: build-scripts/build-appimage
+      - name: 'Upload AppImage'
+        uses: actions/upload-artifact@v1
+        with:
+          name: distribution
+          path: distribution
+  Linux32:
+    runs-on: ubuntu-latest
+    needs: Distfiles
+    steps:
+      - uses: actions/checkout@v2
+      - name: 'Linux 32-bit'
+        run: build-scripts/build-linux32
+  Fuzzers:
+    runs-on: ubuntu-latest
+    needs: Distfiles
+    steps:
+      - uses: actions/checkout@v2
+      - name: 'Build Fuzzer'
+        run: build-scripts/build-fuzzer
+  Sanitizers:
+    runs-on: ubuntu-latest
+    needs: Distfiles
+    steps:
+      - uses: actions/checkout@v2
+      - name: 'Sanitizer Tests'
+        run: build-scripts/test-sanitizers
