@@ -4,7 +4,7 @@
 # https://github.com/google/oss-fuzz/blob/master/projects/qpdf/build.sh
 
 # It should be run from the top level directory of a clean checkout of
-# qpdf. It is also exercised in ../azure-pipelines/build-fuzzer
+# qpdf. It is also exercised in ../build-scripts/build-fuzzer
 
 if [[ $GITHUB_FORK != "" ]]; then
     git remote add fork https://github.com/$GITHUB_FORK/qpdf

@@ -326,7 +326,7 @@ When releasing on sourceforge, `external-libs` distributions go in
 `external-libs/yyyymmdd`, and qpdf distributions go in `qpdf/vvv`.
 
 For local iteration on the AppImage generation, it works to just
-./azure-pipelines/build-appimage and get the resulting AppImage from
+./build-scripts/build-appimage and get the resulting AppImage from
 the distribution directory. You can also pass -e SKIP_TESTS=1
 build-appimage, which passes it along to to docker, to skip the test
 suite, which useful for rapid iteration.

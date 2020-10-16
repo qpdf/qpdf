@@ -3,7 +3,7 @@ jobs:
   pool:
     vmImage: ubuntu-16.04
   steps:
-  - script: azure-pipelines/build-linux
+  - script: build-scripts/build-linux
     displayName: 'Generate, build, and test'
   - task: PublishBuildArtifacts@1
     inputs:
@@ -51,7 +51,7 @@ jobs:
       artifactName: distfiles
       downloadPath: $(System.DefaultWorkingDirectory)
     condition: eq(variables['System.PullRequest.IsFork'], 'False')
-  - script: azure-pipelines/build-windows.bat $(wordsize) $(tool)
+  - script: build-scripts/build-windows.bat $(wordsize) $(tool)
     displayName: 'Build, test, generate binary distributions'
   - task: PublishBuildArtifacts@1
     inputs:
@@ -75,7 +75,7 @@ jobs:
       artifactName: distfiles
       downloadPath: $(System.DefaultWorkingDirectory)
     condition: eq(variables['System.PullRequest.IsFork'], 'False')
-  - script: azure-pipelines/build-mac
+  - script: build-scripts/build-mac
     displayName: 'Mac build and test'
   - task: PublishTestResults@2
     inputs:
@@ -87,7 +87,7 @@ jobs:
   pool:
     vmImage: ubuntu-16.04
   steps:
-  - script: azure-pipelines/build-appimage
+  - script: build-scripts/build-appimage
     displayName: 'Build AppImage'
   - task: PublishBuildArtifacts@1
     inputs:
@@ -105,7 +105,7 @@ jobs:
   pool:
     vmImage: ubuntu-16.04
   steps:
-  - script: azure-pipelines/build-linux32
+  - script: build-scripts/build-linux32
     displayName: 'Linux 32-bit'
   - task: PublishTestResults@2
     inputs:
@@ -117,7 +117,7 @@ jobs:
   pool:
     vmImage: ubuntu-16.04
   steps:
-  - script: azure-pipelines/build-fuzzer
+  - script: build-scripts/build-fuzzer
     displayName: 'Build Fuzzer'
   dependsOn: Linux
   condition: succeeded()
@@ -125,7 +125,7 @@ jobs:
   pool:
     vmImage: ubuntu-16.04
   steps:
-  - script: azure-pipelines/test-sanitizers
+  - script: build-scripts/test-sanitizers
     displayName: 'Sanitizer Tests'
   - task: PublishTestResults@2
     inputs:
