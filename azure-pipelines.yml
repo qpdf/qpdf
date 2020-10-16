@@ -1,16 +1,22 @@
 jobs:
-- job: Linux
+- job: Distfiles
   pool:
     vmImage: ubuntu-16.04
   steps:
-  - script: build-scripts/build-linux
-    displayName: 'Generate, build, and test'
+  - script: build-scripts/make-distfiles
+    displayName: 'Create distfiles.zip'
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: '$(System.DefaultWorkingDirectory)/distfiles.zip'
       artifactName: distfiles
     displayName: 'Upload extra distribution files'
     condition: eq(variables['System.PullRequest.IsFork'], 'False')
+- job: Linux
+  pool:
+    vmImage: ubuntu-16.04
+  steps:
+  - script: build-scripts/build-linux
+    displayName: 'Generate, build, and test'
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: '$(System.DefaultWorkingDirectory)/distribution'
@@ -63,7 +69,7 @@ jobs:
     inputs:
       testRunTitle: Windows-$(wordsize)$(tool)
       buildPlatform: Windows-$(wordsize)$(tool)
-  dependsOn: Linux
+  dependsOn: Distfiles
   condition: succeeded()
 - job: macOS
   pool:
@@ -81,7 +87,7 @@ jobs:
     inputs:
       testRunTitle: MacOS
       buildPlatform: MacOS
-  dependsOn: Linux
+  dependsOn: Distfiles
   condition: succeeded()
 - job: AppImage
   pool:
@@ -99,8 +105,6 @@ jobs:
     inputs:
       testRunTitle: AppImage
       buildPlatform: AppImage
-  dependsOn: Linux
-  condition: succeeded()
 - job: Linux32
   pool:
     vmImage: ubuntu-16.04
@@ -111,16 +115,12 @@ jobs:
     inputs:
       testRunTitle: Linux32
       buildPlatform: Linux32
-  dependsOn: Linux
-  condition: succeeded()
 - job: Fuzzers
   pool:
     vmImage: ubuntu-16.04
   steps:
   - script: build-scripts/build-fuzzer
     displayName: 'Build Fuzzer'
-  dependsOn: Linux
-  condition: succeeded()
 - job: Sanitizers
   pool:
     vmImage: ubuntu-16.04
@@ -131,5 +131,3 @@ jobs:
     inputs:
       testRunTitle: Sanitizers
       buildPlatform: Sanitizers
-  dependsOn: Linux
-  condition: succeeded()

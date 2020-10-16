@@ -12,7 +12,6 @@ for i in $(./qpdf/build/qpdf --show-crypto); do
     echo "*** Running tests with crypto provider $i"
     env QPDF_CRYPTO_PROVIDER=$i make -k check
 done
-make distfiles.zip
 ./make_dist --ci --no-tests
 mkdir distribution
 cp /tmp/qpdf*-ci.tar.gz distribution
