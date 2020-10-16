@@ -48,12 +48,18 @@ else
 depflags=
 endif
 
+ifeq ($(QTEST_COLOR),1)
+ QTEST_ARGS := -stdout-tty=1
+else
+ QTEST_ARGS :=
+endif
+
 # Usage: $(call run_qtest,dir)
 define run_qtest
 	@echo running qtest-driver for $(1)
 	@(cd $(1)/$(OUTPUT_DIR); \
          if TC_SRCS="$(foreach T,$(TC_SRCS_$(1)),../../$(T))" \
-	 $(QTEST) -bindirs .:..:../../qpdf/$(OUTPUT_DIR) \
+	 $(QTEST) $(QTEST_ARGS) -bindirs .:..:../../qpdf/$(OUTPUT_DIR) \
 		-datadir ../qtest -covdir .. \
 	        -junit-suffix `basename $(1)`; then \
 	    true; \
