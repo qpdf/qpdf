@@ -7,6 +7,7 @@ on:
       - main
       - master
       - build
+      - build/*
   pull_request:
 jobs:
   Distfiles:
