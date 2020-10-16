@@ -83,6 +83,9 @@ class QPDF_DLL_CLASS InputSource
     virtual void seek(qpdf_offset_t offset, int whence) = 0;
     virtual void rewind() = 0;
     virtual size_t read(char* buffer, size_t length) = 0;
+
+    // Note: you can only unread the character you just read. The
+    // specific character is ignored by some implementations.
     virtual void unreadCh(char ch) = 0;
 
   protected:

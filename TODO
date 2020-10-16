@@ -315,6 +315,12 @@ I find it useful to make reference to them in this list
  * Investigate whether there is a way to automate the memory checker
    tests for Windows.
 
+ * Part of closed_file_input_source.cc is disabled on Windows because
+   of odd failures. It might be worth investigating so we can fully
+   exercise this in the test suite. That said, ClosedFileInputSource
+   is exercised elsewhere in qpdf's test suite, so this is not that
+   pressing.
+
  * Support user-pluggable stream filters.  This would enable external
    code to provide interpretation for filters that are missing from
    qpdf.  Make it possible for user-provided filters to override

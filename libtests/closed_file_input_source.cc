@@ -38,9 +38,9 @@ void do_tests(InputSource* is)
     is->seek(521, SEEK_SET);
     is->read(b, 1);
 #else
-    is->unreadCh('Q');
+    is->unreadCh('\n');
     check("read unread character", 1 == is->read(b, 1));
-    check("got character", 'Q' == b[0]);
+    check("got character", '\n' == b[0]);
 #endif
     check("last offset after read unread", 521 == is->getLastOffset());
     is->seek(0, SEEK_END);
