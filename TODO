@@ -3,15 +3,9 @@ Candidates for upcoming release
 
 * Quick issues:
   * #438: things written to stdout instead of stderr; --no-warn issues
-  * #454: integer overflow
-  * #451: BufferInputSource performance enhancement
-  * #432: WindowsCryptProvider fixes
   * Add --warning-exit-0 option. Search for --no-warn in the docs.
 
 * Easy build/test
-  * #429: cygwin build and openssl version (see #455)
-  * #455: openssl configure checks
-  * #453: improve openssl error messages
   * #422: disable rpath when building RPM
   * #352: building standalone executables (lambda layer)
   * #460: potential malware in fuzzer seed corpus

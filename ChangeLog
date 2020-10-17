@@ -1,5 +1,14 @@
 2020-10-16  Jay Berkenbilt  <ejb@ql.org>
 
+	* Accept pull request that improves how the Windows native crypto
+	provider is obtained.
+
+	* Accept pull request that improves performance in processing
+	files in memory.
+
+	* Accept pull requests that improve openssl configuration and
+	error reporting.
+
 	* Build using GitHub Actions. The intention is that this will
 	replace Azure Pipelines as the official CI for qpdf for the next
 	release.
