@@ -9,6 +9,9 @@ Candidates for upcoming release
   * #422: disable rpath when building RPM
   * #352: building standalone executables (lambda layer)
   * #460: potential malware in fuzzer seed corpus
+  * Consider building workflow on a schedule to detect build rot. This
+    may enable safe use of *-latest especially if Windows wildcard is
+    testable.
 
 * Fuzz crashes
   * See "New" below
@@ -25,6 +28,9 @@ Candidates for upcoming release
 
 * Complete migratiion to GitHub Actions. Do a case-insensitive search
   for azure to find documentation references.
+
+* Find a way to deal with MSVC wildcard expansion, even if it requires
+  creating a separate step or adding code to build-windows.bat.
 
 * Remember to check work `qpdf` project for private issues
   * file with very slow page extraction
