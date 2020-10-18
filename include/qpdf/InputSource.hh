@@ -85,8 +85,13 @@ class QPDF_DLL_CLASS InputSource
     virtual size_t read(char* buffer, size_t length) = 0;
 
     // Note: you can only unread the character you just read. The
-    // specific character is ignored by some implementations.
+    // specific character is ignored by some implementations. unreadCh
+    // will be removed from the API in qpdf 11.
     virtual void unreadCh(char ch) = 0;
+
+    // ABI: delete unreadCh, and direct people to seek backward by 1
+    // character instead.
+    // virtual void unreadCh(char ch) final = delete;
 
   protected:
     qpdf_offset_t last_offset;

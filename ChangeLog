@@ -1,3 +1,12 @@
+2020-10-18  Jay Berkenbilt  <ejb@ql.org>
+
+	* Note that InputSource::unreadCh is deprecated and will be
+	removed in qpdf 11. Use seek(-1, SEEK_CUR) instead. This is what
+	it has always effectively done with some input sources and some
+	operating systems which don't allow unreading other than the most
+	recently read character. InputSource::unreadCh is no longer used
+	internally within libqpdf.
+
 2020-10-16  Jay Berkenbilt  <ejb@ql.org>
 
 	* Accept pull request that improves how the Windows native crypto

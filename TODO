@@ -117,6 +117,10 @@ ABI Changes
 This is a list of changes to make next time there is an ABI change.
 Comments appear in the code prefixed by "ABI"
 
+* Consider removing InputSource::unreadCh. Maybe we can declare it
+  final and delete so it will be forced to be removed from derived
+  classes.
+
 C++-11
 ======
 

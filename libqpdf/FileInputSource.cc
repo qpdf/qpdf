@@ -80,7 +80,7 @@ FileInputSource::findAndSkipNextEOL()
                     }
                     else if (! ((ch == '\r') || (ch == '\n')))
                     {
-                        this->unreadCh(ch);
+                        this->seek(-1, SEEK_CUR);
                         done = true;
                     }
                 }

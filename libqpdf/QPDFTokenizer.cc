@@ -855,7 +855,7 @@ QPDFTokenizer::readToken(PointerHolder<InputSource> input,
 
     if (unread_char)
     {
-	input->unreadCh(char_to_unread);
+	input->seek(-1, SEEK_CUR);
     }
 
     if (token.getType() != tt_eof)

@@ -632,7 +632,7 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
                 }
                 else
                 {
-                    this->m->file->unreadCh(ch);
+                    this->m->file->seek(-1, SEEK_CUR);
                     done = true;
                 }
             }
@@ -1604,7 +1604,7 @@ QPDF::readObject(PointerHolder<InputSource> input,
                             // start reading stream data in spite
                             // of not having seen a newline.
                             QTC::TC("qpdf", "QPDF stream with CR only");
-                            input->unreadCh(ch);
+                            input->seek(-1, SEEK_CUR);
                             warn(QPDFExc(
                                      qpdf_e_damaged_pdf,
                                      input->getName(),
@@ -1629,7 +1629,7 @@ QPDF::readObject(PointerHolder<InputSource> input,
                 else
                 {
                     QTC::TC("qpdf", "QPDF stream without newline");
-                    input->unreadCh(ch);
+                    input->seek(-1, SEEK_CUR);
                     warn(QPDFExc(qpdf_e_damaged_pdf, input->getName(),
                                  this->m->last_object_description,
                                  input->tell(),
