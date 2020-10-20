@@ -8,6 +8,10 @@ on:
       - master
       - build
       - build/*
+    paths-ignore:
+      - 'ChangeLog'
+      - 'README*'
+      - 'TODO'
   pull_request:
 jobs:
   Distfiles:
