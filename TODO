@@ -1,9 +1,6 @@
 Candidates for upcoming release
 ===============================
 
-* Quick issues:
-  * Add --warning-exit-0 option. Search for --no-warn in the docs.
-
 * Easy build/test
   * #352: building standalone executables (lambda layer)
   * #460: potential malware in fuzzer seed corpus

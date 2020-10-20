@@ -603,7 +603,9 @@ make
       <listitem>
        <para>
         <literal>0</literal>: no errors or warnings were found. The
-        file may still have problems qpdf can't detect.
+        file may still have problems qpdf can't detect. If
+        <option>--warning-exit-0</option> was specified, exit status 0
+        is used even if there are warnings.
        </para>
       </listitem>
       <listitem>
@@ -618,7 +620,9 @@ make
         able to recover from. In some cases, the resulting file may
         still be damaged. Note that qpdf still exits with status
         <literal>3</literal> if it finds warnings even when
-        <option>--no-warn</option> is specified.
+        <option>--no-warn</option> is specified. With
+        <option>--warning-exit-0</option>, warnings without errors
+        exit with status 0 instead of 3.
        </para>
       </listitem>
      </itemizedlist>
@@ -778,7 +782,19 @@ make
        <para>
         Suppress writing of warnings to stderr. If warnings were
         detected and suppressed, <command>qpdf</command> will still
-        exit with exit code 3.
+        exit with exit code 3. See also
+        <option>--warning-exit-0</option>.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--warning-exit-0</option></term>
+      <listitem>
+       <para>
+        If warnings are found but no errors, exit with exit code 0
+        instead 3. When combined with <option>--no-warn</option>, the
+        effect is for <command>qpdf</command> to completely ignore
+        warnings.
        </para>
       </listitem>
      </varlistentry>

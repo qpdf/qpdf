@@ -30,7 +30,7 @@
 #include <qpdf/QIntC.hh>
 
 static int constexpr EXIT_ERROR = 2;
-static int constexpr EXIT_WARNING = 3;
+static int EXIT_WARNING = 3;    // may be changed to 0 at runtime
 
 // For is-encrypted and requires-password
 static int constexpr EXIT_IS_NOT_ENCRYPTED = 2;
@@ -773,6 +773,7 @@ class ArgParser
     void argVerbose();
     void argProgress();
     void argNoWarn();
+    void argWarningExitZero();
     void argDeterministicId();
     void argStaticId();
     void argStaticAesIv();
@@ -1017,6 +1018,7 @@ ArgParser::initOptionTable()
     (*t)["verbose"] = oe_bare(&ArgParser::argVerbose);
     (*t)["progress"] = oe_bare(&ArgParser::argProgress);
     (*t)["no-warn"] = oe_bare(&ArgParser::argNoWarn);
+    (*t)["warning-exit-0"] = oe_bare(&ArgParser::argWarningExitZero);
     (*t)["deterministic-id"] = oe_bare(&ArgParser::argDeterministicId);
     (*t)["static-id"] = oe_bare(&ArgParser::argStaticId);
     (*t)["static-aes-iv"] = oe_bare(&ArgParser::argStaticAesIv);
@@ -1230,6 +1232,7 @@ ArgParser::argHelp()
         << "--verbose               provide additional informational output\n"
         << "--progress              give progress indicators while writing output\n"
         << "--no-warn               suppress warnings\n"
+        << "--warning-exit-0        exit with code 0 instead of 3 if there are warnings\n"
         << "--linearize             generated a linearized (web optimized) file\n"
         << "--replace-input         use in place of specifying an output file; qpdf will\n"
         << "                        replace the input file with the output\n"
@@ -1621,8 +1624,11 @@ ArgParser::argHelp()
         << "Ordinarily, qpdf exits with a status of 0 on success or a status of 2\n"
         << "if any errors occurred.  If there were warnings but not errors, qpdf\n"
         << "exits with a status of 3. If warnings would have been issued but --no-warn\n"
-        << "was given, an exit status of 3 is still used. qpdf does not use exit\n"
-        << "status 1, since that is used by the shell if it can't execute qpdf.\n";
+        << "was given, an exit status of 3 is still used. If you want qpdf to exit\n"
+        << "with status 0 when there are warnings, use the --warning-exit-0 flag.\n"
+        << "When --no-warn and --warning-exit-0 are used together, the effect is for\n"
+        << "qpdf to completely ignore warnings.  qpdf does not use exit status 1,\n"
+        << "since that is used by the shell if it can't execute qpdf.\n";
 }
 
 void
@@ -2116,6 +2122,12 @@ void
 ArgParser::argNoWarn()
 {
     o.suppress_warnings = true;
+}
+
+void
+ArgParser::argWarningExitZero()
+{
+    ::EXIT_WARNING = 0;
 }
 
 void

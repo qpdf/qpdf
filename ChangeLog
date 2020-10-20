@@ -1,5 +1,13 @@
 2020-10-20  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add --warning-exit-0 option to the qpdf command line. When
+	specified, qpdf will exit with a status of 0 rather than 3 when
+	there are warnings without errors. Combine with --no-warn to
+	completely ignore warnings.
+
+	* Bug fix: fix further cases in which errors were written to
+	stdout. Fixes #438.
+
 	* Build option: add --disable-rpath option to ./configure, which
 	disables passing -rpath to the linker when building shared
 	libraries with libtool. Fixes #422.

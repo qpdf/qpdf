@@ -2472,7 +2472,7 @@ my @badfiles = ("not a PDF file", 			# 1
                 "startxref to space then eof",          # 38
 		);
 
-$n_tests += @badfiles + 6;
+$n_tests += @badfiles + 7;
 
 # Test 6 contains errors in the free table consistency, but we no
 # longer have any consistency check for this since it is not important
@@ -2499,6 +2499,10 @@ for (my $i = 1; $i <= scalar(@badfiles); ++$i)
 $td->runtest("Suppress warnings",
              {$td->COMMAND => "qpdf --no-warn bad14.pdf a.pdf"},
              {$td->STRING => "", $td->EXIT_STATUS => 3});
+$td->runtest("Suppress warnings",
+             {$td->COMMAND =>
+                  "qpdf --no-warn --warning-exit-0 bad14.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("Suppress warnings with --check",
              {$td->COMMAND => "qpdf --check --no-warn bad14.pdf"},
              {$td->FILE => "bad14-check-no-warn.out",
