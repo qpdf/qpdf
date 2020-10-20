@@ -2,7 +2,6 @@ Candidates for upcoming release
 ===============================
 
 * Quick issues:
-  * #438: things written to stdout instead of stderr; --no-warn issues
   * Add --warning-exit-0 option. Search for --no-warn in the docs.
 
 * Easy build/test

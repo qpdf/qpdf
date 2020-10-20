@@ -3513,14 +3513,14 @@ static void do_check(QPDF& pdf, Options& o, int& exit_code)
             catch (QPDFExc& e)
             {
                 okay = false;
-                std::cout << "page " << pageno << ": "
+                std::cerr << "ERROR: page " << pageno << ": "
                           << e.what() << std::endl;
             }
         }
     }
     catch (std::exception& e)
     {
-        std::cout << e.what() << std::endl;
+        std::cerr << "ERROR: " << e.what() << std::endl;
         okay = false;
     }
     if (okay)
