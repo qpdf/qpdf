@@ -25,11 +25,19 @@ Candidates for upcoming release
     * #446: recognize edited QDF files
     * #436: parsing of document with form xobject
 
-* Complete migratiion to GitHub Actions. Do a case-insensitive search
-  for azure to find documentation references.
+* GitHub Actions:
+
+  * Complete migration. Do a case-insensitive search for azure to find
+    documentation references.
+
+  * Build qpdf weekly so we can notice if things start breaking
+    because of changes in the build environment, library dependencies,
+    compiler upgrades, etc.
 
 * Find a way to deal with MSVC wildcard expansion, even if it requires
   creating a separate step or adding code to build-windows.bat.
+
+* See if we can work in Windows Build/External Libraries (below)
 
 * Remember to check work `qpdf` project for private issues
   * file with very slow page extraction
@@ -104,11 +112,20 @@ GitHub Actions
   but I'd rather not depend on them. Keep an eye open for this coming
   to GitHub Actions.
 
-Windows Build
-=============
+Windows Build/External Libraries
+================================
 
-Update the Windows build so that it uses current versions of external
-libraries and uses either gnutls or openssl as its crypto provider.
+* Migrate external library build code to a separate repository.
+
+* Automate downloading and building latest versions of external
+  libraries. Add openssl.
+
+* Build external libraries on a schedule and create releases
+  periodically or when they change. See if we can get rid of the
+  external-libs branch in qpdf/qpdf.
+
+* Update the Windows build so that it uses current versions of
+  external libraries and openssl as its crypto provider.
 
 ABI Changes
 ===========
