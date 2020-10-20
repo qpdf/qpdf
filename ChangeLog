@@ -1,3 +1,9 @@
+2020-10-20  Jay Berkenbilt  <ejb@ql.org>
+
+	* Build option: add --disable-rpath option to ./configure, which
+	disables passing -rpath to the linker when building shared
+	libraries with libtool. Fixes #422.
+
 2020-10-18  Jay Berkenbilt  <ejb@ql.org>
 
 	* Note that InputSource::unreadCh is deprecated and will be

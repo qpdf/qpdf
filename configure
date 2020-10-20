@@ -670,6 +670,7 @@ PKG_CONFIG
 WINDOWS_WORDSIZE
 IS_32BIT
 RANDOM_DEVICE
+RPATH
 LT_SONAME
 LT_AGE
 LT_REVISION
@@ -775,6 +776,7 @@ with_aix_soname
 with_gnu_ld
 with_sysroot
 enable_libtool_lock
+enable_rpath
 enable_insecure_random
 enable_os_secure_random
 with_random
@@ -1458,6 +1460,8 @@ Optional Features:
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
+  --enable-rpath          whether to pass -rpath to the linker when building
+                          libraries
   --enable-insecure-random
                           whether to use stdlib's random number generator
                           (default is no)
@@ -16211,6 +16215,29 @@ LT_REVISION=1
 
 
 LT_SONAME=$(expr $LT_CURRENT - $LT_AGE)
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for whether to use -rpath" >&5
+$as_echo_n "checking for whether to use -rpath... " >&6; }
+# Check whether --enable-rpath was given.
+if test "${enable_rpath+set}" = set; then :
+  enableval=$enable_rpath; if test "$enableval" = "yes"; then
+      qpdf_USE_RPATH=1;
+    else
+      qpdf_USE_RPATH=0;
+    fi
+else
+  qpdf_USE_RPATH=1
+fi
+
+if test "$qpdf_USE_RPATH" = "1"; then
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+   RPATH='-rpath $(libdir)'
+else
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
 
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for -fvisibility=hidden" >&5

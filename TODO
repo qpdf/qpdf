@@ -6,7 +6,6 @@ Candidates for upcoming release
   * Add --warning-exit-0 option. Search for --no-warn in the docs.
 
 * Easy build/test
-  * #422: disable rpath when building RPM
   * #352: building standalone executables (lambda layer)
   * #460: potential malware in fuzzer seed corpus
   * Consider building workflow on a schedule to detect build rot. This

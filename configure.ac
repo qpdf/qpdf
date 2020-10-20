@@ -61,6 +61,23 @@ AC_SUBST(LT_AGE)
 LT_SONAME=$(expr $LT_CURRENT - $LT_AGE)
 AC_SUBST(LT_SONAME)
 
+AC_MSG_CHECKING(for whether to use -rpath)
+AC_ARG_ENABLE(rpath,
+   AS_HELP_STRING([--enable-rpath],
+                  [whether to pass -rpath to the linker when building libraries]),
+   [if test "$enableval" = "yes"; then
+      qpdf_USE_RPATH=1;
+    else
+      qpdf_USE_RPATH=0;
+    fi], [qpdf_USE_RPATH=1])
+if test "$qpdf_USE_RPATH" = "1"; then
+   AC_MSG_RESULT(yes)
+   RPATH='-rpath $(libdir)'
+else
+   AC_MSG_RESULT(no)
+fi
+AC_SUBST(RPATH)
+
 AC_MSG_CHECKING(for -fvisibility=hidden)
 try_flags=-fvisibility=hidden
 oCXXFLAGS=$CXXFLAGS
