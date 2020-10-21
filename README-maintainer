@@ -118,6 +118,8 @@ RELEASE PREPARATION
 * Check `TODO` file to make sure all planned items for the release are
   done or retargeted.
 
+* Check work `qpdf` project for private issues
+
 * Run a spelling checker over the source code to catch errors in
   variable names, strings, and comments.
 
