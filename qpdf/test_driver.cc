@@ -2195,6 +2195,22 @@ void runtest(int n, char const* filename1, char const* arg2)
 	    std::cout << "raw stream data okay" << std::endl;
 	}
     }
+    else if (n == 69)
+    {
+        pdf.setImmediateCopyFrom(true);
+        auto pages = pdf.getAllPages();
+        for (size_t i = 0; i < pages.size(); ++i)
+        {
+            QPDF out;
+            out.emptyPDF();
+            out.addPage(pages.at(i), false);
+            std::string outname = std::string("auto-") +
+                QUtil::uint_to_string(i) + ".pdf";
+            QPDFWriter w(out, outname.c_str());
+            w.setStaticID(true);
+            w.write();
+        }
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +

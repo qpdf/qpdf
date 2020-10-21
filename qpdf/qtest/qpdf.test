@@ -2417,7 +2417,7 @@ $td->runtest("check output",
 show_ntests();
 # ----------
 $td->notify("--- Copy Foreign Objects ---");
-$n_tests += 7;
+$n_tests += 10;
 
 foreach my $d ([25, 1], [26, 2], [27, 3])
 {
@@ -2438,6 +2438,19 @@ $td->runtest("copy objects error",
              {$td->FILE => "copy-foreign-objects-errors.out",
               $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
+
+$td->runtest("indirect filters",
+             {$td->COMMAND => "test_driver 69 indirect-filter.pdf"},
+             {$td->STRING => "test 69 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+foreach my $i (0, 1)
+{
+    $td->runtest("check output",
+                 {$td->FILE => "auto-$i.pdf"},
+                 {$td->FILE => "indirect-filter-out-$i.pdf"});
+}
+
+
 show_ntests();
 # ----------
 $td->notify("--- Error Condition Tests ---");

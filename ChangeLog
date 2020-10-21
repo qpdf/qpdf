@@ -1,5 +1,11 @@
 2020-10-21  Jay Berkenbilt  <ejb@ql.org>
 
+	* Bug fix: properly handle copying foreign streams that have
+	indirect /Filter or /DecodeParms keys when stream data has been
+	replaced. The circumstances leading to this bug are very unusual
+	but would cause qpdf to either generate an internal error or some
+	other kind of warning situation if it would occur. Fixes #449.
+
 	* Qpdf's build and CI has been migrated from Azure Pipelines
 	(Azure Devops) to GitHub Actions.
 
