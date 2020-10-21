@@ -7,7 +7,6 @@ Candidates for upcoming release
 * Open "next" issues
   * bugs
     * #473: zsh completion with directories
-    * #459: locale-sensitivity
     * #449: internal error with case to reproduce (from pikepdf)
     * #444: concatenated stream/whitespace bug
   * Non-bugs

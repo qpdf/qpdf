@@ -47,6 +47,7 @@ OffsetInputSource::seek(qpdf_offset_t offset, int whence)
         if (offset > this->max_safe_offset)
         {
             std::ostringstream msg;
+            msg.imbue(std::locale::classic());
             msg << "seeking to " << offset
                 << " offset by " << global_offset
                 << " would cause an overflow of the offset type";

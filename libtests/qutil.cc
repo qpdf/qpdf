@@ -10,6 +10,7 @@
 #include <limits.h>
 #include <assert.h>
 #include <fstream>
+#include <locale>
 
 #ifdef _WIN32
 # include <io.h>
@@ -80,8 +81,38 @@ void test_to_ull(char const* str, unsigned long long wanted, bool error)
     test_to_number(str, wanted, error, QUtil::string_to_ull);
 }
 
+static void set_locale()
+{
+    try
+    {
+        // First try a locale known to put commas in numbers.
+        std::locale::global(std::locale("en_US.UTF-8"));
+    }
+    catch (std::runtime_error&)
+    {
+        try
+        {
+            // If that fails, fall back to the user's default locale.
+            std::locale::global(std::locale(""));
+        }
+        catch (std::runtime_error& e)
+        {
+            // Ignore this error on Windows without MSVC. We get
+            // enough test coverage on other platforms, and mingw
+            // seems to have limited locale support (as of
+            // 2020-10).
+#if ! defined(_WIN32) || defined(_MSC_VER)
+            throw e;
+#endif
+        }
+    }
+}
+
 void string_conversion_test()
 {
+    // Make sure the code produces consistent results even if we load
+    // a non-C locale.
+    set_locale();
     std::cout << QUtil::int_to_string(16059) << std::endl
 	      << QUtil::int_to_string(16059, 7) << std::endl
 	      << QUtil::int_to_string(16059, -7) << std::endl

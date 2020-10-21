@@ -1220,6 +1220,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
             ((std::numeric_limits<int>::max() - obj) < chunk_count))
         {
             std::ostringstream msg;
+            msg.imbue(std::locale::classic());
             msg << "adding " << chunk_count << " to " << obj
                 << " while computing index in xref stream would cause"
                 << " an integer overflow";

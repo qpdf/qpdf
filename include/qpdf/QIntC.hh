@@ -29,6 +29,7 @@
 #include <limits>
 #include <sstream>
 #include <cassert>
+#include <locale>
 #include <type_traits>
 
 // This namespace provides safe integer conversion that detects
@@ -67,6 +68,7 @@ namespace QIntC // QIntC = qpdf Integer Conversion
             if (i > std::numeric_limits<To>::max())
             {
                 std::ostringstream msg;
+                msg.imbue(std::locale::classic());
                 msg << "integer out of range converting " << i
                     << " from a "
                     << sizeof(From) << "-byte unsigned type to a "
@@ -88,6 +90,7 @@ namespace QIntC // QIntC = qpdf Integer Conversion
                 (i > std::numeric_limits<To>::max()))
             {
                 std::ostringstream msg;
+                msg.imbue(std::locale::classic());
                 msg << "integer out of range converting " << i
                     << " from a "
                     << sizeof(From) << "-byte signed type to a "
@@ -111,6 +114,7 @@ namespace QIntC // QIntC = qpdf Integer Conversion
             if ((i < 0) || (ii > std::numeric_limits<To>::max()))
             {
                 std::ostringstream msg;
+                msg.imbue(std::locale::classic());
                 msg << "integer out of range converting " << i
                     << " from a "
                     << sizeof(From) << "-byte signed type to a "
@@ -134,6 +138,7 @@ namespace QIntC // QIntC = qpdf Integer Conversion
             if (i > maxval)
             {
                 std::ostringstream msg;
+                msg.imbue(std::locale::classic());
                 msg << "integer out of range converting " << i
                     << " from a "
                     << sizeof(From) << "-byte unsigned type to a "

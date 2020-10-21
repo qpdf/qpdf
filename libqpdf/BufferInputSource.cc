@@ -108,6 +108,7 @@ BufferInputSource::range_check(qpdf_offset_t cur, qpdf_offset_t delta)
         ((std::numeric_limits<qpdf_offset_t>::max() - cur) < delta))
     {
         std::ostringstream msg;
+        msg.imbue(std::locale::classic());
         msg << "seeking forward from " << cur
             << " by " << delta
             << " would cause an overflow of the offset type";

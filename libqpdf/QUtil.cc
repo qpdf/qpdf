@@ -21,6 +21,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <memory>
+#include <locale>
 #ifndef QPDF_NO_WCHAR_T
 # include <cwchar>
 #endif
@@ -267,6 +268,7 @@ int_to_string_base_internal(T num, int base, int length)
             "int_to_string_base called with unsupported base");
     }
     std::ostringstream buf;
+    buf.imbue(std::locale::classic());
     buf << std::setbase(base) << std::nouppercase << num;
     std::string result;
     int str_length = QIntC::to_int(buf.str().length());
@@ -318,6 +320,7 @@ QUtil::double_to_string(double num, int decimal_places)
         decimal_places = 6;
     }
     std::ostringstream buf;
+    buf.imbue(std::locale::classic());
     buf << std::setprecision(decimal_places) << std::fixed << num;
     return buf.str();
 }

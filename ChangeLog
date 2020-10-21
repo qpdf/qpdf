@@ -1,5 +1,8 @@
 2020-10-21  Jay Berkenbilt  <ejb@ql.org>
 
+	* Ensure that numeric conversion is not affected by the user's
+	global locale setting. Fixes #459.
+
 	* Add qpdf-<version>-linux-x86_64.zip to the list of built
 	distributions. This is a simple zip file that contains just the
 	qpdf executables and the dependent shared libraries that would not
