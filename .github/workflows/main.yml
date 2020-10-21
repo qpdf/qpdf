@@ -13,6 +13,12 @@ on:
       - 'README*'
       - 'TODO'
   pull_request:
+  schedule:
+    # Building regularly with cron makes it safe for us to use
+    # *-latest with runs-on. If a new version of tools or agents comes
+    # out, we'll find out fast if our builds break on it because we
+    # have reliable testing.
+    - cron: '12 4 * * 5'
 jobs:
   Distfiles:
     # Generate distfiles.zip, which is a prerequisite for the mac and
@@ -41,7 +47,7 @@ jobs:
           name: distribution
           path: distribution
   Windows:
-    runs-on: windows-2019
+    runs-on: windows-latest
     needs: Distfiles
     strategy:
       fail-fast: false
@@ -67,7 +73,7 @@ jobs:
           name: distribution
           path: distribution
   macOS:
-    runs-on: macos-10.15
+    runs-on: macos-latest
     needs: Distfiles
     steps:
       - uses: actions/checkout@v2

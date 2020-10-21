@@ -3,8 +3,6 @@ Candidates for upcoming release
 
 * Easy build/test
   * #460: potential malware in fuzzer seed corpus
-  * Consider building workflow on a schedule to detect build rot. This
-    should enable safe use of *-latest on runners.
 
 * Fuzz crashes
   * See "New" below
@@ -23,10 +21,6 @@ Candidates for upcoming release
 
   * Complete migration. Do a case-insensitive search for azure to find
     documentation references.
-
-  * Build qpdf weekly so we can notice if things start breaking
-    because of changes in the build environment, library dependencies,
-    compiler upgrades, etc.
 
 * See if we can work in Windows Build/External Libraries (below)
 
