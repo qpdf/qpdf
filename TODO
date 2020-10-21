@@ -1,9 +1,6 @@
 Candidates for upcoming release
 ===============================
 
-* Easy build/test
-  * #460: potential malware in fuzzer seed corpus
-
 * Fuzz crashes
   * See "New" below
 
