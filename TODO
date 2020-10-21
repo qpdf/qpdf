@@ -13,11 +13,6 @@ Candidates for upcoming release
     * #446: recognize edited QDF files
     * #436: parsing of document with form xobject
 
-* GitHub Actions:
-
-  * Complete migration. Do a case-insensitive search for azure to find
-    documentation references.
-
 * See if we can work in Windows Build/External Libraries (below)
 
 * Remember to check work `qpdf` project for private issues

@@ -1,5 +1,8 @@
 2020-10-21  Jay Berkenbilt  <ejb@ql.org>
 
+	* Qpdf's build and CI has been migrated from Azure Pipelines
+	(Azure Devops) to GitHub Actions.
+
 	* Ensure that numeric conversion is not affected by the user's
 	global locale setting. Fixes #459.
 

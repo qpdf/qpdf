@@ -221,10 +221,10 @@ pytest -n auto
 
 CREATING A RELEASE
 
-* Push to master. The azure pipeline will create an artifact called
-  distribution which will contain all the distribution files. Download
-  these, verify the checksums from the job output, rename to remove
-  -ci from the names, and copy to the release archive area.
+* Push to master. This will create an artifact called distribution
+  which will contain all the distribution files. Download these,
+  verify the checksums from the job output, rename to remove -ci from
+  the names, and copy to the release archive area.
 
 * Sign the source distribution:
 
