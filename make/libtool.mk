@@ -106,6 +106,8 @@ endef
 
 # Install target
 
+# NOTE: If installing any new executables, remember to update the
+# lambda layer code in build-scripts/build-appimage.
 install: all
 	./mkinstalldirs -m 0755 $(DESTDIR)$(libdir)/pkgconfig
 	./mkinstalldirs -m 0755 $(DESTDIR)$(bindir)

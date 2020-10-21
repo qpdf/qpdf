@@ -1,3 +1,14 @@
+2020-10-21  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add qpdf-<version>-linux-x86_64.zip to the list of built
+	distributions. This is a simple zip file that contains just the
+	qpdf executables and the dependent shared libraries that would not
+	ordinarily be present on a base system. This minimal binary
+	distribution works as is when used as a Lambda layer in AWS and
+	could be suitable for inclusion in a docker image or other
+	standalone Linux/x86_64 environment where you want minimal support
+	for running the qpdf executable. Fixes #352.
+
 2020-10-20  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add --warning-exit-0 option to the qpdf command line. When

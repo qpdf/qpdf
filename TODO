@@ -2,7 +2,6 @@ Candidates for upcoming release
 ===============================
 
 * Easy build/test
-  * #352: building standalone executables (lambda layer)
   * #460: potential malware in fuzzer seed corpus
   * Consider building workflow on a schedule to detect build rot. This
     may enable safe use of *-latest especially if Windows wildcard is
