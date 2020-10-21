@@ -191,6 +191,17 @@ foreach my $d (['auto-ü', 1], ['auto-öπ', 2])
 
 show_ntests();
 # ----------
+$td->notify("--- Windows shell globbing ---");
+
+$td->runtest("shell wildcard expansion",
+             {$td->COMMAND => "test_shell_glob 'good*.pdf'"},
+             {$td->STRING => "PASSED\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$n_tests += 1;
+
+show_ntests();
+# ----------
 $td->notify("--- Replace Input ---");
 $n_tests += 8;
 

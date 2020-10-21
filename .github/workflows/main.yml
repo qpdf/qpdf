@@ -41,7 +41,6 @@ jobs:
           name: distribution
           path: distribution
   Windows:
-    # If updating this, see note in TODO about MSVC wildcard expansion.
     runs-on: windows-2019
     needs: Distfiles
     strategy:

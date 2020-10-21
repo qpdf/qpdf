@@ -4,8 +4,7 @@ Candidates for upcoming release
 * Easy build/test
   * #460: potential malware in fuzzer seed corpus
   * Consider building workflow on a schedule to detect build rot. This
-    may enable safe use of *-latest especially if Windows wildcard is
-    testable.
+    should enable safe use of *-latest on runners.
 
 * Fuzz crashes
   * See "New" below
@@ -28,9 +27,6 @@ Candidates for upcoming release
   * Build qpdf weekly so we can notice if things start breaking
     because of changes in the build environment, library dependencies,
     compiler upgrades, etc.
-
-* Find a way to deal with MSVC wildcard expansion, even if it requires
-  creating a separate step or adding code to build-windows.bat.
 
 * See if we can work in Windows Build/External Libraries (below)
 
@@ -219,34 +215,6 @@ Page splitting/merging
    https://mail.google.com/mail/u/0/#search/rfc822msgid%3A02aa01d3d013%249f766990%24de633cb0%24%40mono.hr)
 
  * Form fields: should be similar to outlines.
-
-MSVC Wildcard Expansion
-=======================
-
-(This section is referenced in azure_pipelines.yml and
-.github/workflows/main.yml.)
-
-The qpdf executable built with msvc is linked with setargv.obj or
-wsetargv.obj so that wildcard expansion works. It doesn't work exactly
-the way a UNIX system would work in that the program itself does the
-expansion (rather than the shell), which means that invoking qpdf.exe
-as built by msvc will expand "*.pdf" just as it will expand *.pdf. In
-some earlier versions, wildcard expansion didn't work with the msvc
-executable. The way to make this work appears to be different in some
-versions of MSVC than in others. As such, if upgrading MSVC or
-changing the build environment, the wildcard expansion behavior of the
-qpdf executable in Windows should be retested manually.
-
-Unfortunately, there is no automated test for wildcard expansion with
-MSVC because I can't figure out how to prevent qtest from expanding
-the wildcards before passing them in, and explicitly running "cmd /c
-..." from qtest doesn't seem to work in Azure Pipelines (haven't
-attempted in GitHub Actions), though I can make it work locally.
-
-Ideally, we should figure out a way to test this in CI by having a
-test that fails if wildcard expansion is broken. In the absence of
-this, it will be necessary to test the behavior manually in both mingw
-and msvc when run from cmd and from msys bash.
 
 Performance
 ===========
