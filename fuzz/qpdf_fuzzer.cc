@@ -9,6 +9,7 @@
 #include <qpdf/QPDFPageLabelDocumentHelper.hh>
 #include <qpdf/QPDFOutlineDocumentHelper.hh>
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
+#include <cstdlib>
 
 class DiscardContents: public QPDFObjectHandle::ParserCallbacks
 {
@@ -223,6 +224,11 @@ FuzzHelper::run()
 
 extern "C" int LLVMFuzzerTestOneInput(unsigned char const* data, size_t size)
 {
+#ifndef _WIN32
+    // Used by jpeg library to work around false positives in memory
+    // sanitizer.
+    setenv("JSIMD_FORCENONE", "1", 1);
+#endif
     FuzzHelper f(data, size);
     f.run();
     return 0;

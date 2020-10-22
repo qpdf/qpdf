@@ -2,6 +2,7 @@
 #include <qpdf/Pl_DCT.hh>
 #include <iostream>
 #include <stdexcept>
+#include <cstdlib>
 
 class FuzzHelper
 {
@@ -46,6 +47,11 @@ FuzzHelper::run()
 
 extern "C" int LLVMFuzzerTestOneInput(unsigned char const* data, size_t size)
 {
+#ifndef _WIN32
+    // Used by jpeg library to work around false positives in memory
+    // sanitizer.
+    setenv("JSIMD_FORCENONE", "1", 1);
+#endif
     FuzzHelper f(data, size);
     f.run();
     return 0;

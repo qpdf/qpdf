@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <stdlib.h>
 #include <string>
+#include <cstring>
 
 #if BITS_IN_JSAMPLE != 8
 # error "qpdf does not support libjpeg built with BITS_IN_JSAMPLE != 8"
