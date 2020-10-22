@@ -1,3 +1,8 @@
+2020-10-22  Jay Berkenbilt  <ejb@ql.org>
+
+	* Fix loop detection problem when traversing page thumbnails
+	during optimization (fuzz issue 23172).
+
 2020-10-21  Jay Berkenbilt  <ejb@ql.org>
 
 	* Bug fix: properly handle copying foreign streams that have

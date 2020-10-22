@@ -65,7 +65,6 @@ Fuzz Errors
 * https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=<N>
 
 * New:
-  * 23172: stack overflow (https://oss-fuzz.com/testcase-detail/5719543787028480)
   * 23599: integer overflow: https://oss-fuzz.com/testcase?key=6290807920525312
   * 23642: leak: https://oss-fuzz.com/testcase-detail/4906569690251264
 
