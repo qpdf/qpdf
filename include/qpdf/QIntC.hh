@@ -222,6 +222,20 @@ namespace QIntC // QIntC = qpdf Integer Conversion
     {
         return IntConverter<T, unsigned long long>::convert(i);
     }
+
+    template <typename T>
+    void range_check(T const& cur, T const& delta)
+    {
+        if ((delta > 0) &&
+            ((std::numeric_limits<T>::max() - cur) < delta))
+        {
+            std::ostringstream msg;
+            msg.imbue(std::locale::classic());
+            msg << "adding " << delta << " to " << cur
+                << " would cause an integer overflow";
+            throw std::range_error(msg.str());
+        }
+    }
 };
 
 #endif // QINTC_HH

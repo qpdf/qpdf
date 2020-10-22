@@ -54,8 +54,6 @@ class BufferInputSource: public InputSource
     virtual void unreadCh(char ch);
 
   private:
-    static void range_check(qpdf_offset_t cur, qpdf_offset_t delta);
-
     class Members
     {
         friend class BufferInputSource;
