@@ -1464,7 +1464,6 @@ QPDF::fixDanglingReferences(bool force)
                 queue.push_back(sub);
             }
         }
-
     }
 }
 

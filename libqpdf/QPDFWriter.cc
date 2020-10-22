@@ -2370,7 +2370,7 @@ QPDFWriter::generateObjectStreams()
 
     // This code doesn't do anything with /Extends.
 
-    std::vector<QPDFObjGen> const& eligible =
+    std::vector<QPDFObjGen> eligible =
         QPDF::Writer::getCompressibleObjGens(this->m->pdf);
     size_t n_object_streams = (eligible.size() + 99U) / 100U;
     if (n_object_streams == 0)

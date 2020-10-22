@@ -5730,7 +5730,7 @@ int realmain(int argc, char* argv[])
             {
                 // Allow --is-encrypted and --requires-password to
                 // work when an incorrect password is supplied.
-                exit(0);
+                return 0;
             }
             throw e;
         }
@@ -5739,22 +5739,22 @@ int realmain(int argc, char* argv[])
         {
             if (pdf.isEncrypted())
             {
-                exit(0);
+                return 0;
             }
             else
             {
-                exit(EXIT_IS_NOT_ENCRYPTED);
+                return EXIT_IS_NOT_ENCRYPTED;
             }
         }
         else if (o.check_requires_password)
         {
             if (pdf.isEncrypted())
             {
-                exit(EXIT_CORRECT_PASSWORD);
+                return EXIT_CORRECT_PASSWORD;
             }
             else
             {
-                exit(EXIT_IS_NOT_ENCRYPTED);
+                return EXIT_IS_NOT_ENCRYPTED;
             }
         }
         if (! o.page_specs.empty())
@@ -5788,14 +5788,14 @@ int realmain(int argc, char* argv[])
                           << " resulting file may have some problems"
                           << std::endl;
             }
-            // Still exit with warning code even if warnings were suppressed.
-            exit(EXIT_WARNING);
+            // Still return with warning code even if warnings were suppressed.
+            return EXIT_WARNING;
 	}
     }
     catch (std::exception& e)
     {
 	std::cerr << e.what() << std::endl;
-	exit(EXIT_ERROR);
+	return EXIT_ERROR;
     }
 
     return 0;
