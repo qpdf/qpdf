@@ -2082,6 +2082,11 @@ QPDF::resolve(int objid, int generation)
 void
 QPDF::resolveObjectsInStream(int obj_stream_number)
 {
+    if (this->m->resolved_object_streams.count(obj_stream_number))
+    {
+        return;
+    }
+    this->m->resolved_object_streams.insert(obj_stream_number);
     // Force resolution of object stream
     QPDFObjectHandle obj_stream = getObjectByID(obj_stream_number, 0);
     if (! obj_stream.isStream())

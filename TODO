@@ -1,9 +1,6 @@
 Candidates for upcoming release
 ===============================
 
-* Fuzz crashes
-  * See "New" below
-
 * Open "next" issues
   * bugs
     * #473: zsh completion with directories
@@ -63,9 +60,6 @@ Fuzz Errors
 ===========
 
 * https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=<N>
-
-* New:
-  * 23642: leak: https://oss-fuzz.com/testcase-detail/4906569690251264
 
 * Ignoring these:
   * Problems inside the jpeg library: 15470, 15751, 18633, 18732,

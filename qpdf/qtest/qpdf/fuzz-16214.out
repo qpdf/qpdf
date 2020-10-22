@@ -11,8 +11,6 @@ WARNING: fuzz-16214.pdf (object 1 0, offset 7189): expected n n obj
 WARNING: fuzz-16214.pdf: Attempting to reconstruct cross-reference table
 WARNING: fuzz-16214.pdf (offset 7207): error decoding stream data for object 2 0: stream inflate: inflate: data: invalid code lengths set
 WARNING: fuzz-16214.pdf (offset 7207): getStreamData called on unfilterable stream
-WARNING: fuzz-16214.pdf (offset 7207): error decoding stream data for object 2 0: stream inflate: inflate: data: invalid code lengths set
-WARNING: fuzz-16214.pdf (offset 7207): getStreamData called on unfilterable stream
 WARNING: fuzz-16214.pdf (object 11 0, offset 11551): supposed object stream 5 has wrong type
 WARNING: fuzz-16214.pdf (object 21 0, offset 3639): expected endstream
 WARNING: fuzz-16214.pdf (object 21 0, offset 3112): attempting to recover stream length

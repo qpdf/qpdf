@@ -1403,6 +1403,7 @@ class QPDF
         bool immediate_copy_from;
         bool in_parse;
         bool parsed;
+        std::set<int> resolved_object_streams;
 
         // Linearization data
         qpdf_offset_t first_xref_item_offset; // actual value from file

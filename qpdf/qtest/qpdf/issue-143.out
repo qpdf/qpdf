@@ -15,6 +15,4 @@ WARNING: issue-143.pdf (object 1 0, offset 84): attempting to recover stream len
 WARNING: issue-143.pdf (object 1 0, offset 84): recovered stream length: 606
 WARNING: issue-143.pdf object stream 1 (object 2 0, offset 33): expected dictionary key but found non-name object; inserting key /QPDFFake1
 WARNING: issue-143.pdf (object 2 0, offset 84): supposed object stream 12336 is not a stream
-WARNING: issue-143.pdf (object 2 0, offset 84): supposed object stream 12336 is not a stream
-WARNING: issue-143.pdf (object 2 0, offset 84): supposed object stream 12336 is not a stream
 qpdf: operation succeeded with warnings; resulting file may have some problems
