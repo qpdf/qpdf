@@ -168,17 +168,11 @@ class QPDFTokenizer
     // Calling this method puts the tokenizer in a state for reading
     // inline images. You should call this method after reading the
     // character following the ID operator. In that state, it will
-    // return all data up to BUT NOT INCLUDING the next EI token. This
-    // is a difference in behavior from the legacy version. After you
-    // call this method, the next call to readToken (or the token
-    // created next time getToken returns true) will either be
+    // return all data up to BUT NOT INCLUDING the next EI token.
+    // After you call this method, the next call to readToken (or the
+    // token created next time getToken returns true) will either be
     // tt_inline_image or tt_bad. This is the only way readToken
-    // returns a tt_inline_image token. The older version of this
-    // method that takes does not take a PointerHolder<InputSource>
-    // will always end the inline image the first time it sees
-    // something that looks like an EI operator and will include the
-    // EI operator in the token. It is being maintained for backward
-    // compatibility only and will likely be removed in the future.
+    // returns a tt_inline_image token.
     QPDF_DLL
     void expectInlineImage(PointerHolder<InputSource> input);
 
