@@ -53,6 +53,7 @@ QPDFPageLabelDocumentHelper::getLabelForPage(long long page_idx)
     {
         start = St.getIntValue();
     }
+    QIntC::range_check(start, offset);
     start += offset;
     result = QPDFObjectHandle::newDictionary();
     result.replaceOrRemoveKey("/S", S);
