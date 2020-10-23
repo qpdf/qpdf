@@ -1,5 +1,11 @@
 2020-10-23  Jay Berkenbilt  <ejb@ql.org>
 
+	* Bug fix: when concatenating content streams, insert a newline if
+	needed to prevent the last token from the old stream from being
+	merged with the first token of the new stream. Qpdf was mistakenly
+	concatenating the streams without regard to the specification that
+	content streams are to be broken on token boundaries. Fixes #444.
+
 	* Bug fix: fix-qdf: properly handle empty streams with ignore
 	newline.
 

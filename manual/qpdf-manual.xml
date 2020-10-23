@@ -2090,14 +2090,9 @@ outfile.pdf</option>
         option causes qpdf to combine them into a single stream. Use
         of this option is never necessary for ordinary usage, but it
         can help when working with some files in some cases. For
-        example, some PDF writers split page contents into small
-        streams at arbitrary points that may fall in the middle of
-        lexical tokens within the content, and some PDF readers may
-        get confused on such files. If you use qpdf to coalesce the
-        content streams, such readers may be able to work with the
-        file more easily. This can also be combined with QDF mode or
-        content normalization to make it easier to look at all of a
-        page's contents at once.
+        example, this can also be combined with QDF mode or content
+        normalization to make it easier to look at all of a page's
+        contents at once.
        </para>
       </listitem>
      </varlistentry>
@@ -2398,25 +2393,15 @@ outfile.pdf</option>
     You should not use this for &ldquo;production&rdquo; PDF files.
    </para>
    <para>
-    This paragraph discusses edge cases of content normalization that
-    are not of concern to most users and are not relevant when content
-    normalization is not enabled. When normalizing content, if qpdf
-    runs into any lexical errors, it will print a warning indicating
-    that content may be damaged. The only situation in which qpdf is
-    known to cause damage during content normalization is when a
-    page's contents are split across multiple streams and streams are
-    split in the middle of a lexical token such as a string, name, or
-    inline image. There may be some pathological cases in which qpdf
-    could damage content without noticing this, such as if the partial
-    tokens at the end of one stream and the beginning of the next
-    stream are both valid, but usually qpdf will be able to detect
-    this case. For slightly increased safety, you can specify
-    <option>--coalesce-contents</option> in addition to
-    <option>--normalize-content</option> or <option>--qdf</option>.
-    This will cause qpdf to combine all the content streams into one,
-    thus recombining any split tokens. However doing this will prevent
-    you from being able to see the original layout of the content
-    streams. If you must inspect the original content streams in an
+    When normalizing content, if qpdf runs into any lexical errors, it
+    will print a warning indicating that content may be damaged. The
+    only situation in which qpdf is known to cause damage during
+    content normalization is when a page's contents are split across
+    multiple streams and streams are split in the middle of a lexical
+    token such as a string, name, or inline image. Note that files
+    that do this are invalid since the PDF specification states that
+    content streams are not to be split in the middle of a token. If
+    you want to inspect the original content streams in an
     uncompressed format, you can always run with <option>--qdf
     --normalize-content=n</option> for a QDF file without content
     normalization, or alternatively

@@ -4,7 +4,6 @@ Candidates for upcoming release
 * Open "next" issues
   * bugs
     * #473: zsh completion with directories
-    * #444: concatenated stream/whitespace bug
   * Non-bugs
     * #446: recognize edited QDF files
     * #436: parsing of document with form xobject

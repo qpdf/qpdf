@@ -1591,12 +1591,20 @@ $td->runtest("type checks with object streams",
 
 # ----------
 $td->notify("--- Coalesce contents ---");
-$n_tests += 6;
+$n_tests += 8;
 
 $td->runtest("qdf with normalize warnings",
              {$td->COMMAND =>
-                  "qpdf --qdf --static-id coalesce.pdf a.pdf"},
+                  "qpdf --qdf --static-id split-tokens.pdf a.pdf"},
              {$td->FILE => "normalize-warnings.out", $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "split-tokens.qdf"});
+$td->runtest("coalesce to qdf",
+             {$td->COMMAND =>
+                  "qpdf --qdf --static-id coalesce.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
              {$td->FILE => "a.pdf"},
@@ -1831,12 +1839,12 @@ $td->runtest("unreferenced resources with bad token",
              {$td->COMMAND =>
                   "qpdf --qdf --static-id --split-pages=2" .
                   " --remove-unreferenced-resources=yes" .
-                  " coalesce.pdf split-out-bad-token.pdf"},
-             {$td->FILE => "coalesce-split.out", $td->EXIT_STATUS => 3},
+                  " split-tokens.pdf split-out-bad-token.pdf"},
+             {$td->FILE => "split-tokens-split.out", $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
              {$td->FILE => "split-out-bad-token-1-2.pdf"},
-             {$td->FILE => "coalesce-split-1-2.pdf"});
+             {$td->FILE => "split-tokens-split-1-2.pdf"});
 
 $td->runtest("shared images in form xobject",
              {$td->COMMAND => "qpdf --qdf --static-id --split-pages".

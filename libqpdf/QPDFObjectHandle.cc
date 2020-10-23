@@ -165,6 +165,47 @@ QPDFObjectHandle::ParserCallbacks::terminateParsing()
     throw TerminateParsing();
 }
 
+class LastChar: public Pipeline
+{
+  public:
+    LastChar(Pipeline* next);
+    virtual ~LastChar() = default;
+    virtual void write(unsigned char* data, size_t len);
+    virtual void finish();
+    unsigned char getLastChar();
+
+  private:
+    unsigned char last_char;
+};
+
+LastChar::LastChar(Pipeline* next) :
+    Pipeline("lastchar", next),
+    last_char(0)
+{
+}
+
+void
+LastChar::write(unsigned char* data, size_t len)
+{
+    if (len > 0)
+    {
+        this->last_char = data[len - 1];
+    }
+    getNext()->write(data, len);
+}
+
+void
+LastChar::finish()
+{
+    getNext()->finish();
+}
+
+unsigned char
+LastChar::getLastChar()
+{
+    return this->last_char;
+}
+
 QPDFObjectHandle::QPDFObjectHandle() :
     initialized(false),
     qpdf(0),
@@ -1600,21 +1641,31 @@ QPDFObjectHandle::pipeContentStreams(
     std::vector<QPDFObjectHandle> streams =
         arrayOrStreamToStreamArray(
             description, all_description);
+    bool need_newline = false;
     for (std::vector<QPDFObjectHandle>::iterator iter = streams.begin();
          iter != streams.end(); ++iter)
     {
+        if (need_newline)
+        {
+            p->write(QUtil::unsigned_char_pointer("\n"), 1);
+        }
+        LastChar lc(p);
         QPDFObjectHandle stream = *iter;
         std::string og =
             QUtil::int_to_string(stream.getObjectID()) + " " +
             QUtil::int_to_string(stream.getGeneration());
         std::string w_description = "content stream object " + og;
-        if (! stream.pipeStreamData(p, 0, qpdf_dl_specialized))
+        if (! stream.pipeStreamData(&lc, 0, qpdf_dl_specialized))
         {
             QTC::TC("qpdf", "QPDFObjectHandle errors in parsecontent");
             throw QPDFExc(qpdf_e_damaged_pdf, "content stream",
                           w_description, 0,
                           "errors while decoding content stream");
         }
+        lc.finish();
+        need_newline = (lc.getLastChar() != static_cast<unsigned char>('\n'));
+        QTC::TC("qpdf", "QPDFObjectHandle need_newline",
+                need_newline ? 0 : 1);
     }
 }
 

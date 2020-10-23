@@ -1,4 +1,4 @@
-WARNING: coalesce.pdf, object 3 0 at offset 181: Bad token found while scanning content stream; not attempting to remove unreferenced objects from this page
+WARNING: split-tokens.pdf, object 3 0 at offset 181: Bad token found while scanning content stream; not attempting to remove unreferenced objects from this page
 WARNING: empty PDF: content normalization encountered bad tokens
 WARNING: empty PDF: normalized content ended with a bad token; you may be able to resolve this by coalescing content streams in combination with normalizing content. From the command line, specify --coalesce-contents
 WARNING: empty PDF: Resulting stream data may be corrupted but is may still useful for manual inspection. For more information on this warning, search for content normalization in the manual.
