@@ -1724,7 +1724,7 @@ my @sp_cases = (
     [1, 'broken data', '--pages broken-lzw.pdf --', 'split-out.pdf',
      {$td->FILE => "broken-lzw.out", $td->EXIT_STATUS => 3}],
     );
-$n_tests += 35;
+$n_tests += 36;
 $n_compare_pdfs += 1;
 for (@sp_cases)
 {
@@ -1845,6 +1845,13 @@ $td->runtest("unreferenced resources with bad token",
 $td->runtest("check output",
              {$td->FILE => "split-out-bad-token-1-2.pdf"},
              {$td->FILE => "split-tokens-split-1-2.pdf"});
+$td->runtest("--no-warn with proxied warnings during split",
+             {$td->COMMAND =>
+                  "qpdf --qdf --static-id --split-pages=2" .
+                  " --no-warn --remove-unreferenced-resources=yes" .
+                  " split-tokens.pdf split-out-bad-token.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
 
 $td->runtest("shared images in form xobject",
              {$td->COMMAND => "qpdf --qdf --static-id --split-pages".

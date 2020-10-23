@@ -5593,6 +5593,10 @@ static void do_split_pages(QPDF& pdf, Options& o)
         }
         QPDF outpdf;
         outpdf.emptyPDF();
+        if (o.suppress_warnings)
+        {
+            outpdf.setSuppressWarnings(true);
+        }
         for (size_t pageno = first; pageno <= last; ++pageno)
         {
             QPDFObjectHandle page = pages.at(pageno - 1);
