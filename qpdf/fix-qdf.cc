@@ -294,7 +294,10 @@ QdfFixer::processLines(std::list<std::string>& lines)
         {
             if (matches(re_ignore_newline))
             {
-                --stream_length;
+                if (stream_length > 0)
+                {
+                    --stream_length;
+                }
             }
             else if (matches(re_n_0_obj))
             {
