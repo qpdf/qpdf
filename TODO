@@ -61,9 +61,8 @@ Fuzz Errors
 * https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=<N>
 
 * Ignoring these:
-  * Problems inside the jpeg library: 15470, 15751, 18633, 18732,
-    18745, 20391, 23581
   * Timeout: 15471, 17630
+  * Out of memory: 15470
 
 GitHub Actions
 ==============
