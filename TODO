@@ -10,6 +10,23 @@ Candidates for upcoming release
 
 * See if we can work in Windows Build/External Libraries (below)
 
+* QPDFObjectHandle::pipeContentStreams calls finish() after each
+  stream. In some code paths, Pl_Concatenate is used, which suppresses
+  that, but in other code paths, it's not used, and the library relies
+  on the behavior of finish() being called. Then there's the issue of
+  nested Pl_Concatenate pipelines -- calling manualFinish() on the top
+  one doesn't call manualFinish() on the lower ones, and there are no
+  exposed methods that allow us to apply things down the pipeline
+  stack, so it's hard to fix this without changing the API (at least
+  making Pipeline::getNext() public, which may be undesirable). To see
+  this problem in action, stick a Pl_Concatenate in front of the
+  pipeline in pipeContentStreams and observe the test failure. One
+  solution might be to add an additional argument indicating whether
+  or not to delay calling finish() until the end. See comments on
+  QPDFPageObjectHelper::filterPageContents,
+  QPDFObjectHandle::filterPageContents, and
+  QPDFObjectHandle::pipeContentStreams
+
 * Remember to check work `qpdf` project for private issues
   * file with very slow page extraction
   * big page even with --remove-unreferenced-resources=yes, even with --empty

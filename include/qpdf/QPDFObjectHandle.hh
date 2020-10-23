@@ -393,7 +393,12 @@ class QPDFObjectHandle
     // messages. The all_description argument is initialized to
     // something that could be used to describe the result of the
     // pipeline. It is the description amended with the identifiers of
-    // the underlying objects.
+    // the underlying objects. Please note that if there is an array
+    // of content streams, p->finish() is called after each stream. If
+    // you pass a pipeline that doesn't allow write() to be called
+    // after finish(), you can wrap it in an instance of
+    // Pl_Concatenate and then call manualFinish() on the
+    // Pl_Concatenate pipeline at the end.
     QPDF_DLL
     void pipeContentStreams(Pipeline* p, std::string const& description,
                             std::string& all_description);
@@ -419,6 +424,7 @@ class QPDFObjectHandle
     void parsePageContents(ParserCallbacks* callbacks);
     QPDF_DLL
     void filterPageContents(TokenFilter* filter, Pipeline* next = 0);
+    // See comments for QPDFPageObjectHelper::pipePageContents.
     QPDF_DLL
     void pipePageContents(Pipeline* p);
     QPDF_DLL
