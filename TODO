@@ -8,8 +8,6 @@ Candidates for upcoming release
     * #446: recognize edited QDF files
     * #436: parsing of document with form xobject
 
-* See if we can work in Windows Build/External Libraries (below)
-
 * QPDFObjectHandle::pipeContentStreams calls finish() after each
   stream. In some code paths, Pl_Concatenate is used, which suppresses
   that, but in other code paths, it's not used, and the library relies
@@ -94,20 +92,62 @@ GitHub Actions
   but I'd rather not depend on them. Keep an eye open for this coming
   to GitHub Actions.
 
-Windows Build/External Libraries
-================================
+External Libraries
+==================
 
-* Migrate external library build code to a separate repository.
+Current state (10.0.2):
 
-* Automate downloading and building latest versions of external
-  libraries. Add openssl.
+* qpdf/external-libs repository builds external-libs on a schedule.
+  It detects and downloads the latest versions of zlib, jpeg, and
+  openssl and creates source and binary distribution zip files in an
+  artifact called "distribution".
 
-* Build external libraries on a schedule and create releases
-  periodically or when they change. See if we can get rid of the
-  external-libs branch in qpdf/qpdf.
+* Releases in qpdf/external-libs are made manually. They contain
+  qpdf-external-libs-{bin,src}.zip.
 
-* Update the Windows build so that it uses current versions of
-  external libraries and openssl as its crypto provider.
+* The qpdf build finds the latest non-prerelease release and downloads
+  the qpdf-external-libs-*.zip files from the releases in the setup
+  stage.
+
+* To upgrade to a new version of external-libs, create a new release
+  of qpdf/external-libs (see README-maintainer in external-libs) from
+  the distribution artifact of the most recent successful build after
+  ensuring that it works.
+
+Desired state:
+
+* The qpdf/external-libs repository should create release candidates.
+  Ideally, every scheduled run would make its zip files available.
+  A personal access token with actions:read scope for the
+  qpdf/external-libs repository is required to download the artifact
+  from an action run, and qpdf/qpdf's secrets.GITHUB_TOKEN doesn't
+  have this access. As an alternative, we could have a draft release
+  in qpdf/external-libs that the qpdf/external-libs build could update
+  with each candidate.
+
+* Scheduled runs of the qpdf build in the qpdf/qpdf repository (not a
+  fork or pull request) could download external-libs from the release
+  candidate area instead of the latest stable release. Pushes to the
+  build branch should still use the latest release so it always
+  matches the main branch.
+
+* Periodically, we would create a release of external-libs from the
+  release candidate zip files. This could be done safely because we
+  know the latest qpdf works with it. This could be done at least
+  before every release of qpdf, but potientially it could be done at
+  other times, such as when a new dependency version is available or
+  after some period of time.
+
+Other notes:
+
+* The external-libs branch in qpdf/qpdf was never documented. We might
+  be able to get away with deleting it.
+
+* See README-maintainer in qpdf/external-libs for information on
+  creating a release. This could be at least partially scripted in a
+  way that works for the qpdf/qpdf repository as well since they are
+  very similar.
+
 
 ABI Changes
 ===========

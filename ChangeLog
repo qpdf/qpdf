@@ -1,3 +1,9 @@
+2020-10-25  Jay Berkenbilt  <ejb@ql.org>
+
+	* Official Windows releases are now built using the openssl crypto
+	provider. The native provider is still available for selection at
+	runtime using the QPDF_CRYPTO_PROVIDER environment variable.
+
 2020-10-23  Jay Berkenbilt  <ejb@ql.org>
 
 	* Bug fix: when concatenating content streams, insert a newline if

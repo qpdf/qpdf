@@ -17829,6 +17829,9 @@ $as_echo "#define USE_CRYPTO_NATIVE 1" >>confdefs.h
 fi
 
 
+if test "$USE_EXTERNAL_LIBS" = "1"; then
+  OPENSSL_FOUND=1
+else
 
 pkg_failed=no
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for pc_openssl" >&5
@@ -17899,6 +17902,7 @@ else
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	OPENSSL_FOUND=1
+fi
 fi
 
 if test "$OPENSSL_FOUND" = "0"; then :
@@ -18601,7 +18605,7 @@ if test "$USE_EXTERNAL_LIBS" = "1"; then
    # much trouble getting it to work with a different compiler.
    CPPFLAGS="$CPPFLAGS -Iexternal-libs/include"
    LDFLAGS="$LDFLAGS -Lexternal-libs/lib-$BUILDRULES$WINDOWS_WORDSIZE"
-   LIBS="$LIBS -lz -ljpeg"
+   LIBS="$LIBS -lz -ljpeg -lssl -lcrypto -lmsvcrt -lws2_32 -lshell32 -ladvapi32 -lgdi32 -luser32 -lcrypt32"
 fi
 
 cat >confcache <<\_ACEOF

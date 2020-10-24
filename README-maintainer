@@ -326,20 +326,6 @@ To construct a source distribution from a pristine checkout,
 make build_manual
 make distclean
 
-To create a source release of external libs, do an export from the
-version control system into a directory called `qpdf-external-libs`
-and just make a zip file of the result called
-`qpdf-external-libs-src.zip`. See the README.txt file there for
-information on creating binary external libs releases. Run this from
-the external-libs repository:
-
-git archive --prefix=external-libs/ HEAD . | (cd /tmp; tar xf -)
-cd /tmp
-zip -r qpdf-external-libs-src.zip external-libs
-
-When releasing on sourceforge, `external-libs` distributions go in
-`external-libs/yyyymmdd`, and qpdf distributions go in `qpdf/vvv`.
-
 For local iteration on the AppImage generation, it works to just
 ./build-scripts/build-appimage and get the resulting AppImage from
 the distribution directory. You can also pass -e SKIP_TESTS=1

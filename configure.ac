@@ -608,8 +608,12 @@ dnl If the openssl provider is not explicitly disabled, enable it if
 dnl openssl is available. If the openssl provider is explicitly
 dnl disabled, do not link with openssl even if present.
 
-PKG_CHECK_MODULES([pc_openssl], [openssl >= 1.1.0],
-                  [OPENSSL_FOUND=1], [OPENSSL_FOUND=0])
+if test "$USE_EXTERNAL_LIBS" = "1"; then
+  OPENSSL_FOUND=1
+else
+  PKG_CHECK_MODULES([pc_openssl], [openssl >= 1.1.0],
+                    [OPENSSL_FOUND=1], [OPENSSL_FOUND=0])
+fi
 
 dnl Override pkg-config if headers and libraries are present.
 AS_IF([test "$OPENSSL_FOUND" = "0"],
@@ -958,7 +962,7 @@ if test "$USE_EXTERNAL_LIBS" = "1"; then
    # much trouble getting it to work with a different compiler.
    CPPFLAGS="$CPPFLAGS -Iexternal-libs/include"
    LDFLAGS="$LDFLAGS -Lexternal-libs/lib-$BUILDRULES$WINDOWS_WORDSIZE"
-   LIBS="$LIBS -lz -ljpeg"
+   LIBS="$LIBS -lz -ljpeg -lssl -lcrypto -lmsvcrt -lws2_32 -lshell32 -ladvapi32 -lgdi32 -luser32 -lcrypt32"
 fi
 
 AC_OUTPUT

@@ -1,8 +1,9 @@
 #!/bin/bash
 set -ex
-curl -L https://github.com/qpdf/qpdf/raw/external-libs/jpegsrc.v9c.tar.gz -o jpegsrc.v9c.tar.gz
-tar xzf jpegsrc.v9c.tar.gz
-cd jpeg-9c
+cd $(dirname $0)/..
+unzip qpdf-external-libs-src.zip
+tar xzf external-libs-src/jpegsrc*
+cd jpeg-*
 ./configure
 make -k
 sudo make install

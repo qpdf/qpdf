@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+import json
+import os
+import requests
+import sys
+from zipfile import ZipFile
+from operator import itemgetter
+
+
+def warn(*args, **kwargs):
+    print(*args, **kwargs, file=sys.stderr)
+
+
+def download_file(url, local_filename):
+    # From https://stackoverflow.com/questions/16694907/
+    # download-large-file-in-python-with-requests
+    if os.path.exists(local_filename):
+        warn('Using existing', local_filename)
+        return
+    warn('Downloading', local_filename)
+    with requests.get(url, stream=True) as r:
+        r.raise_for_status()
+        with open(local_filename, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                f.write(chunk)
+    return local_filename
+
+
+bin_name = 'qpdf-external-libs-bin.zip'
+src_name = 'qpdf-external-libs-src.zip'
+dir_name = 'external-libs-dist'
+os.makedirs(dir_name, exist_ok=True)
+
+r = requests.get(
+    'https://api.github.com/repos/qpdf/external-libs/releases')
+releases = json.loads(r.text)
+by_tag = sorted(
+    [(r['tag_name'], r) for r in releases
+     if r['prerelease'] is False],
+    reverse=True)
+latest = by_tag[0][1]
+bin_url = None
+src_url = None
+for i in latest['assets']:
+    if i['name'] == bin_name:
+        bin_url = i['browser_download_url']
+    elif i['name'] == src_name:
+        src_url = i['browser_download_url']
+print(bin_url)
+download_file(bin_url, f'{dir_name}/{bin_name}')
+download_file(src_url, f'{dir_name}/{src_name}')
+
+print('\n** external library information **')
+with ZipFile(f'{dir_name}/{src_name}') as z1:
+    with z1.open('external-libs-src/versions') as z2:
+        print(z2.read().decode())

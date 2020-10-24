@@ -98,6 +98,7 @@ sub get_dlls
             my $dll = $1;
             $dll =~ tr/A-Z/a-z/;
             next if $dll =~ m/^(kernel32|user32|msvcrt|advapi32)\.dll$/;
+            next if $dll =~ m/^(api-ms-win.*|ws2_32|crypt32|bcrypt)\.dll$/;
             push(@result, $dll);
         }
         elsif (m/^Magic.*\((PE.+?)\)/)

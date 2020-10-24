@@ -32,11 +32,11 @@ Image comparison tests are disabled by default, but it is possible to run them o
 
 # External Libraries
 
-In order to build qpdf, you must have a copy of `zlib` and the `jpeg` library. The easy way to get it is to download the external libs from the qpdf download area. There are packages called `external-libs-bin.zip` and `external-libs-src.zip`. If you are building with MSVC 2015 or MINGW with MSYS2, you can just extract the `qpdf-external-libs-bin.zip` zip file into the top-level qpdf source tree. Note that you need the 2017-08-21 version (at least) to build qpdf 7.0 or greater since this includes jpeg. Passing `--enable-external-libs` to `./configure` (which is done automatically if you follow the instructions below) is sufficient to find them.
+In order to build qpdf, you must have a copy of `zlib` and the `jpeg` library. You can download [prebuilt static external libraries from the qpdf/external-libs github repository](https://github.com/qpdf/external-libs/releases). These include `zlib`, `jpeg`, and `openssl` libraries. There are packages called `external-libs-bin.zip` and `external-libs-src.zip`. If you are building with a recent MSVC or MINGW with MSYS2, you can just extract the `qpdf-external-libs-bin.zip` zip file into the top-level qpdf source tree. Note that you need the 2020-10-24 version (at least) to build qpdf 10.0.2 or greater since this includes openssl. Passing `--enable-external-libs` to `./configure` (which is done automatically if you follow the instructions below) is sufficient to find them.
 
 You can also obtain `zlib` and `jpeg` directly on your own and install them. If you are using mingw, you can just set `CPPFLAGS`, `LDFLAGS`, and `LIBS` when you run ./configure so that it can find the header files and libraries. If you are building with MSVC and you want to do this, it probably won't work because `./configure` doesn't know how to interpret `LDFLAGS` and `LIBS` properly for MSVC (though qpdf's own build system does). In this case, you can probably get away with cheating by passing `--enable-external-libs` to `./configure` and then just editing `CPPFLAGS`, `LDFLAGS`, `LIBS` in the generated autoconf.mk file. Note that you should use UNIX-like syntax (`-I`, `-L`, `-l`) even though this is not what cl takes on the command line. qpdf's build rules will fix it.
 
-You can also download `qpdf-external-libs-src.zip` and follow the instructions in the README.txt there for how to build external libs.
+External libraries are built using GitHub Actions from the [qpdf/external-libs](https://github.com/qpdf/external-libs) repository.
 
 # Building from version control
 

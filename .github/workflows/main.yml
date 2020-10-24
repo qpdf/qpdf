@@ -35,6 +35,11 @@ jobs:
         with:
           name: distfiles
           path: distfiles.zip
+      - name: 'Upload external libs'
+        uses: actions/upload-artifact@v1
+        with:
+          name: external-libs
+          path: external-libs-dist
   Linux:
     runs-on: ubuntu-latest
     steps:
@@ -64,6 +69,11 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: distfiles
+      - name: 'Download external libs'
+        uses: actions/download-artifact@v2
+        with:
+          name: external-libs
+          path: .
       - name: 'Build, test, generate binary distributions'
         shell: cmd
         run: build-scripts/build-windows.bat ${{ matrix.wordsize }} ${{ matrix.tool }}
@@ -81,6 +91,11 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: distfiles
+      - name: 'Download external libs'
+        uses: actions/download-artifact@v2
+        with:
+          name: external-libs
+          path: .
       - name: 'Mac build and test'
         run: build-scripts/build-mac
   AppImage:

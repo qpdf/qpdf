@@ -36,7 +36,7 @@ Depending on which crypto providers are enabled, then [GnuTLS](https://www.gnutl
 
 # Licensing terms of embedded software
 
-QPDF makes use of zlib and jpeg libraries for its functionality. These packages can be downloaded separately from their own download locations, or they can be downloaded in the external-libs area of the qpdf download site. If the optional GnuTLS crypto provider is enabled, then GnuTLS is also required.
+QPDF makes use of zlib and jpeg libraries for its functionality. These packages can be downloaded separately from their own download locations. If the optional GnuTLS or OpenSSL crypto providers are enabled, then GnuTLS and/or OpenSSL are also required.
 
 Please see the [NOTICE](NOTICE.md) file for information on licenses of embedded software.
 

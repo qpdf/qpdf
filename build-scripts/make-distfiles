@@ -1,4 +1,5 @@
 #!/bin/bash
+cd $(dirname $0)/..
 set -ex
 sudo apt-get update
 sudo apt-get -y install \
@@ -6,3 +7,4 @@ sudo apt-get -y install \
    docbook-xsl fop xsltproc libxml2-utils inkscape imagemagick
 ./configure --enable-doc-maintenance
 make -j$(nproc) distfiles.zip
+build-scripts/download-external-libs
