@@ -29,7 +29,7 @@ BINS_libtests = \
 
 TARGETS_libtests = $(foreach B,$(BINS_libtests),libtests/$(OUTPUT_DIR)/$(call binname,$(B)))
 
-$(TARGETS_libtests): $(TARGETS_libqpdf)
+$(TARGETS_libtests): $(TARGETS_libqpdf) $(TARGETS_qpdf)
 
 INCLUDES_libtests = include libqpdf
 

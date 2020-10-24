@@ -35,7 +35,7 @@
 # install to install in a separate location.  This is useful for
 # packagers.
 
-BUILD_ITEMS := manual libqpdf zlib-flate libtests qpdf fuzz examples
+BUILD_ITEMS := manual libqpdf qpdf zlib-flate libtests fuzz examples
 OUTPUT_DIR = build
 ALL_TARGETS =
 
