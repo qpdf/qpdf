@@ -112,6 +112,11 @@ RELEASE PREPARATION
   search for copyright. Don't forget copyright in manual. Also update
   debian copyright in debian package. Last updated: 2020.
 
+* Take a look at "External Libraries" in TODO to see if we need to
+  make any changes. There is still some automation work left to do, so
+  handling external-libs releases is still manual. See also
+  README-maintainer in external-libs.
+
 * Check for open fuzz crashes at https://oss-fuzz.com
 
 * Check lgtm: https://lgtm.com/projects/g/qpdf/qpdf/?mode=list
@@ -244,13 +249,11 @@ gpg --detach-sign --armor qpdf-$version.tar.gz
   Windows binaries, the AppImage, the source tarball, and the source
   tarball signature.
 
-\rm -f *.{md5,sha1,sha512}
+\rm -f *.sha256
 files=(*)
-for i in md5 sha1 sha512; do
-  ${i}sum ${files[*]} >| qpdf-$version.$i
-  gpg --clearsign --armor qpdf-$version.$i
-  mv qpdf-$version.$i.asc qpdf-$version.$i
-done
+sha256sum ${files[*]} >| qpdf-$version.sha256
+gpg --clearsign --armor qpdf-$version.sha256
+mv qpdf-$version.sha256.asc qpdf-$version.sha256
 chmod 444 *
 chmod 555 *.AppImage
 

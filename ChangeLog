@@ -1,5 +1,9 @@
 2020-10-25  Jay Berkenbilt  <ejb@ql.org>
 
+	* When signing distribution files, generate sha256 checksums
+	instead of md5, sha1, and sha512. sha256 seems to be more widely
+	used, and there's no reason to use md5 or sha1 anymore.
+
 	* Official Windows releases are now built using the openssl crypto
 	provider. The native provider is still available for selection at
 	runtime using the QPDF_CRYPTO_PROVIDER environment variable.
