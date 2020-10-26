@@ -112,6 +112,12 @@
 	newer version of gcc and MSVC toolchains. Add several cosmetic
 	improvements to build output in CI.
 
+	* Added LL_FMT to config.h.in. This is populated automatically by
+	autoconf, but if build with your own build system, you may need to
+	define it as whatever the format string needed by printf for long
+	long is. Usually this is "%lld", but it can be "%I64d" for some
+	older Windows-based compilers.
+
 2020-04-29  Jay Berkenbilt  <ejb@ql.org>
 
 	* Bug fix: qpdf --check was writing errors and warnings reported

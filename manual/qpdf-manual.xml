@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "10.0.1">
-<!ENTITY lastreleased "April 9, 2020">
+<!ENTITY swversion "10.0.2">
+<!ENTITY lastreleased "October 27, 2020">
 ]>
 <book>
  <bookinfo>
@@ -4805,6 +4805,193 @@ print "\n";
     </listitem>
    </varlistentry>
 -->
+   <varlistentry>
+    <term>10.0.2: October 27, 2020</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Bug Fixes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          When concatenating content streams, as with
+          <option>--coalesce-contents</option>, there were cases in
+          which qpdf would merge two lexical tokens together, creating
+          invalid results. A newline is now inserted between
+          merged content streams if one is not already present.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Fix an internal error that could occur when copying foreign
+          streams whose stream data had been replaced using a stream
+          data provider if those streams had indirect filters or
+          decode parameters. This is a rare corner case.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Ensure that the caller's locale settings do not change the
+          results of numeric conversions performed internally by the
+          qpdf library. Note that the problem here could only be
+          caused when the qpdf library was used programmatically.
+          Using the qpdf CLI already ignored the user's locale for
+          numeric conversion.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Fix several instances in which warnings were not suppressed
+          in spite of <option>--no-warn</option> and/or errors or
+          warnings were written to standard output rather than
+          standard error.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Fixed a memory leak that could occur under specific
+          circumstances when
+          <option>--object-streams=generate</option> was used.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Fix various integer overflows and similar conditions found
+          by the OSS-Fuzz project.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          New option <option>--warning-exit-0</option> causes qpdf to
+          exit with a status of <literal>0</literal> rather than
+          <literal>3</literal> if there are warnings but no errors.
+          Combine with <option>--no-warn</option> to completely ignore
+          warnings.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Performance improvements have been made to
+          <function>QPDF::processMemoryFile</function>.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          The OpenSSL crypto provider produces more detailed error
+          messages.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Build Changes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          The option <option>--disable-rpath</option> is now supported
+          by qpdf's <command>./configure</command> script. Some
+          distributions' packaging standards recommended the use of
+          this option.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Selection of a printf format string for <type>long
+          long</type> has been moved from <literal>ifdefs</literal> to
+          an autoconf test. If you are using your own build system,
+          you will need to provide a value for
+          <literal>LL_FMT</literal> in
+          <filename>libqpdf/qpdf/qpdf-config.h</filename>, which would
+          typically be <literal>&quot;%lld&quot;</literal> or, for
+          some Windows compilers, <literal>&quot;%I64d&quot;</literal>.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Several improvements were made to build-time configuration
+          of the OpenSSL crypto provider.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          A nearly stand-alone Linux binary zip file is now included
+          with the qpdf release. This is built on an older (but
+          supported) Ubuntu LTS release, but would work on most
+          reasonably recent Linux distributions. It contains only the
+          executables and required shared libraries that would not be
+          present on a minimal system. It can be used for including
+          qpdf in a minimal environment, such as a docker container.
+          The zip file is also known to work as a layer in AWS Lambda.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          QPDF's automated build has been migrated from Azure
+          Pipelines to GitHub Actions.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Windows-specific Changes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          The Windows executables distributed with qpdf releases now
+          use the OpenSSL crypto provider by default. The native
+          crypto provider is also compiled in and can be selected at
+          runtime with the <literal>QPDF_CRYPTO_PROVIDER</literal>
+          environment variable.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Improvements have been made to how a cryptographic provider
+          is obtained in the native Windows crypto implementation.
+          However mostly this is shadowed by OpenSSL being used by
+          default.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Notice of upcoming API change
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+	  The method <function>InputSource::unreadCh(unsigned
+	  char)</function> is deprecated and will be removed in qpdf
+	  11. It has never worked properly to pass a character to
+	  <function>unreadCh</function> other than the most recently
+	  read character. If you happen to be deriving a class from
+	  <type>InputSource</type>, just implement
+	  <function>unreadCh</function> to seek backward by one
+	  character if the current position is greater than 0. If you
+	  are calling this in your own code, replacing with
+	  <literal>seek(-1, SEEK_CUR)</literal> should work in all
+	  cases.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
     <term>10.0.1: April 9, 2020</term>
     <listitem>
