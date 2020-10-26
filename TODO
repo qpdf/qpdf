@@ -117,13 +117,15 @@ Current state (10.0.2):
 Desired state:
 
 * The qpdf/external-libs repository should create release candidates.
-  Ideally, every scheduled run would make its zip files available.
-  A personal access token with actions:read scope for the
+  Ideally, every scheduled run would make its zip files available. A
+  personal access token with actions:read scope for the
   qpdf/external-libs repository is required to download the artifact
   from an action run, and qpdf/qpdf's secrets.GITHUB_TOKEN doesn't
-  have this access. As an alternative, we could have a draft release
-  in qpdf/external-libs that the qpdf/external-libs build could update
-  with each candidate.
+  have this access. We could create a service account for this
+  purpose. As an alternative, we could have a draft release in
+  qpdf/external-libs that the qpdf/external-libs build could update
+  with each candidate. It may also be possible to solve this by
+  developing a simple GitHub app.
 
 * Scheduled runs of the qpdf build in the qpdf/qpdf repository (not a
   fork or pull request) could download external-libs from the release
