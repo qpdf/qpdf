@@ -2,7 +2,7 @@ To build from source for Linux or other UNIX/UNIX-like systems, it is generally 
 
 Windows Binaries
 
-You can download Windiows binaries that are statically linked with qpdf's external dependencies and use the OpenSSL crypto provider. There are several options:
+You can download Windows binaries that are statically linked with qpdf's external dependencies and use the OpenSSL crypto provider. There are several options:
 
 * `qpdf-<version>-bin-mingw32.zip` - 32-bit executables that should work on basically any Windows system, including 64-bit systems. The 32-bit executables are capable of handling files larger than 2 GB. If you just want to use the qpdf command line program or use the qpdf DLL's C-language interface, you can download this file.  You can also download this version if you are using MINGW's gcc and want to program using the C++ interface.
 

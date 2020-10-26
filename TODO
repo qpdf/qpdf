@@ -136,7 +136,7 @@ Desired state:
 * Periodically, we would create a release of external-libs from the
   release candidate zip files. This could be done safely because we
   know the latest qpdf works with it. This could be done at least
-  before every release of qpdf, but potientially it could be done at
+  before every release of qpdf, but potentially it could be done at
   other times, such as when a new dependency version is available or
   after some period of time.
 

@@ -83,6 +83,7 @@ apexcovantage
 api
 APIs
 apis
+app
 appdir
 appearancestate
 appendable
@@ -185,6 +186,7 @@ argUOto
 argv
 argVerbose
 argVersion
+argWarningExitZero
 argWithImages
 arko
 arko's
@@ -419,6 +421,7 @@ cp
 cph
 cphe
 cplusplus
+cpp
 CPPFLAGS
 cr
 CreateFile
@@ -429,6 +432,7 @@ cregex
 CRNL
 CropBox
 CryptAcquireContext
+CryptAcquireContextW
 CryptFilterDecodeParms
 CryptGenRandom
 crypto
@@ -511,6 +515,7 @@ devel
 DeviceCMYK
 DeviceGray
 DeviceRGB
+DevOps
 DF
 dh
 DIAERESIS
@@ -729,6 +734,7 @@ FlateDecode
 flattenAnnotations
 flattenAnnotationsForPage
 flattenPagesTree
+flattenRotation
 flattenScalarReferences
 Florian
 fmatrix
@@ -738,6 +744,7 @@ fname
 fo
 foh
 fopen
+FORCENONE
 forcePDFVersion
 ForceR
 ForceV
@@ -988,6 +995,7 @@ github
 glarp
 glerbl
 glibc
+globbing
 gm
 gmail
 gmon
@@ -1068,6 +1076,7 @@ iconv
 IDs
 idx
 ifdef
+ifdefs
 ifeq
 iff
 ifndef
@@ -1083,6 +1092,7 @@ ImageInverter
 ImageMask
 ImageOptimizer
 ImageProvider
+img
 immediateCopyFrom
 inbuf
 includeIgnorable
@@ -1214,6 +1224,7 @@ jq
 JSAMPARRAY
 JSAMPLE
 JSAMPROW
+JSIMD
 json
 jstr
 Jurczyk
@@ -1223,6 +1234,8 @@ KEYLENGTH
 keyset
 kgdl
 LARGEFILE
+LastChar
+lastchar
 lastnum
 lastreleased
 lastTokenWasBad
@@ -1281,6 +1294,7 @@ LLVMFuzzerTestOneInput
 llx
 lly
 LocalFree
+logoWidth
 longjmp
 longlong
 lookup
@@ -1291,6 +1305,7 @@ lqpdf
 lsb
 lt
 ltmain
+LTS
 lu
 lval
 lx
@@ -1524,6 +1539,7 @@ os
 oss
 ostream
 ostringstream
+ostringstreams
 ot
 OtherPage
 ou
@@ -1647,11 +1663,13 @@ ppa
 pr
 pragma
 pre
+prebuilt
 precheck
 precompiled
 prefilering
 prefiltering
 prepareFileForWrite
+prerelease
 presentCharacter
 presentEOF
 preserveObjectStreams
@@ -1687,6 +1705,7 @@ ptemp
 pthread
 ptr
 pubkey
+PublishTestResults
 pushDiscardFilter
 pushEncryptionFilter
 pushInheritedAttributesToPage
@@ -1772,6 +1791,7 @@ qtest
 QTest
 quadding
 QuadPart
+quot
 quotedblbase
 quotedblright
 quoteleft
@@ -1886,6 +1906,7 @@ rotatePage
 rotatex
 RotationSpec
 roundoff
+rpath
 rr
 RSA
 Rsabase
@@ -1940,6 +1961,7 @@ setDeterministicID
 setDictDescription
 setEncryptionParameters
 setEncryptionParametersInternal
+setenv
 setExtraHeaderText
 setFieldAttribute
 setFile
@@ -2027,6 +2049,7 @@ ss
 sstream
 stampfile
 stamppdf
+standalone
 StandardEncoding
 startoffset
 startxref
@@ -2225,6 +2248,7 @@ unparseObject
 unparseResolved
 unparsing
 unreadCh
+unreading
 unref
 unreferenced
 unresolvable
@@ -2271,6 +2295,7 @@ vc
 vec
 vecs
 VER
+VERIFYCONTEXT
 versioned
 viewable
 ViewerPreferences

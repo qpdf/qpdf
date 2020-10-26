@@ -94,7 +94,7 @@ CODING RULES
   One could argue that error messages containing numbers should
   respect the user's locale, but I think it's more important for
   output to be consistent, since the messages in question are not
-  really targetted at the end user.
+  really targeted at the end user.
 
 * Use QPDF_DLL on all methods that are to be exported in the shared
   library/DLL. Use QPDF_DLL_CLASS for all classes whose type

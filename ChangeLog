@@ -48,7 +48,7 @@
 	other kind of warning situation if it would occur. Fixes #449.
 
 	* Qpdf's build and CI has been migrated from Azure Pipelines
-	(Azure Devops) to GitHub Actions.
+	(Azure DevOps) to GitHub Actions.
 
 	* Remove some fuzz files that triggered Mal/PDFEx-H with some
 	virus scanners. There's plenty of coverage in the fuzz corpus
