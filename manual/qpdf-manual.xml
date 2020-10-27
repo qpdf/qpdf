@@ -4967,28 +4967,6 @@ print "\n";
         </listitem>
        </itemizedlist>
       </listitem>
-      <listitem>
-       <para>
-        Notice of upcoming API change
-       </para>
-       <itemizedlist>
-        <listitem>
-         <para>
-	  The method <function>InputSource::unreadCh(unsigned
-	  char)</function> is deprecated and will be removed in qpdf
-	  11. It has never worked properly to pass a character to
-	  <function>unreadCh</function> other than the most recently
-	  read character. If you happen to be deriving a class from
-	  <type>InputSource</type>, just implement
-	  <function>unreadCh</function> to seek backward by one
-	  character if the current position is greater than 0. If you
-	  are calling this in your own code, replacing with
-	  <literal>seek(-1, SEEK_CUR)</literal> should work in all
-	  cases.
-         </para>
-        </listitem>
-       </itemizedlist>
-      </listitem>
      </itemizedlist>
     </listitem>
    </varlistentry>
