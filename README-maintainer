@@ -142,16 +142,17 @@ RELEASE PREPARATION
 
   For Windows, use a Windows style path, not an MSYS path for large files.
 
-* Test with clang. Pass `CC=clang CXX=clang++` to `./configure`. Test
-  with newer version of gcc if available.
+* Test with clang. Pass `CC=clang CXX=clang++` to `./configure`. (Done
+  in CI).
+
+* Test with newer version of gcc if available.
 
 * Test 32-bit. Pass `CC=i686-linux-gnu-gcc CXX=i686-linux-gnu-g++` to
   `./configure`. (Done in CI.)
 
 * Test build on a mac. (Done in CI.)
 
-* Test with address sanitizer as described above. (Done in CI with
-  gcc; test locally with clang.)
+* Test with address sanitizer as described above. (Done in CI.)
 
 * A small handful of additional files have been taken from autotools
   programs. These should probably be updated from time to time.

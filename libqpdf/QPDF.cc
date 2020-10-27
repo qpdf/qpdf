@@ -25,7 +25,7 @@
 #include <qpdf/QPDF_Stream.hh>
 #include <qpdf/QPDF_Array.hh>
 
-std::string QPDF::qpdf_version = "10.0.1";
+std::string QPDF::qpdf_version = "10.0.2";
 
 static char const* EMPTY_PDF =
     "%PDF-1.3\n"
