@@ -150,38 +150,11 @@ Other notes:
   way that works for the qpdf/qpdf repository as well since they are
   very similar.
 
-
 ABI Changes
 ===========
 
 This is a list of changes to make next time there is an ABI change.
 Comments appear in the code prefixed by "ABI"
-
-C++-11
-======
-
-* Search for ::iterator and ::const_iterator and replace with either
-  auto or foreach-style iteration.
-
-* There may be some places where std::function and lambdas can
-  simplify handlers rather than using classes with apply methods.
-
-* My c++11 branch adds re-implements PointerHolder so that it is
-  interchangeable with std::shared_ptr. We may not actually want to
-  ever do this because it turns out PointerHolder is slightly more
-  performant than std::shared_ptr, at least as of g++ 9.2.1. It is not
-  actually possible to just replace PointerHolder with std::shared_ptr
-  for two reasons: there is no automatic creation of
-  std::shared_ptr<T> from T* like there is for PointerHolder, which
-  breaks some code, and also there is no automatic conversion from
-  something like std::vector<PointerHolder<T>> to
-  std::vector<std::shared_ptr<T>>. It may be a good idea to replace
-  PointerHolder with std::shared_ptr in the API even if it requires
-  some work for the developer, but even if that isn't worth it, we
-  should find all occurrences of PointerHolder within the code and
-  replace with std::shared_ptr or std::unique_ptr as needed. This will
-  definitely break binary compatibility as the PointerHolder<Members>
-  pattern is part of the ABI for almost every class.
 
 Page splitting/merging
 ======================
