@@ -267,16 +267,26 @@ int_to_string_base_internal(T num, int base, int length)
         throw std::logic_error(
             "int_to_string_base called with unsupported base");
     }
-    std::ostringstream buf;
-    buf.imbue(std::locale::classic());
-    buf << std::setbase(base) << std::nouppercase << num;
+    std::string cvt;
+    if (base == 10)
+    {
+        // Use the more efficient std::to_string when possible
+        cvt = std::to_string(num);
+    }
+    else
+    {
+        std::ostringstream buf;
+        buf.imbue(std::locale::classic());
+        buf << std::setbase(base) << std::nouppercase << num;
+        cvt = buf.str();
+    }
     std::string result;
-    int str_length = QIntC::to_int(buf.str().length());
+    int str_length = QIntC::to_int(cvt.length());
     if ((length > 0) && (str_length < length))
     {
 	result.append(QIntC::to_size(length - str_length), '0');
     }
-    result += buf.str();
+    result += cvt;
     if ((length < 0) && (str_length < -length))
     {
 	result.append(QIntC::to_size(-length - str_length), ' ');
