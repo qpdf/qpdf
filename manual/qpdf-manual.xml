@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "10.0.2">
-<!ENTITY lastreleased "October 27, 2020">
+<!ENTITY swversion "10.0.3">
+<!ENTITY lastreleased "October 31, 2020">
 ]>
 <book>
  <bookinfo>
@@ -4805,6 +4805,28 @@ print "\n";
     </listitem>
    </varlistentry>
 -->
+   <varlistentry>
+    <term>10.0.3: October 31, 2020</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Bug Fixes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          The fix to the bug involving copying streams with indirect
+          filters was incorrect and introduced a new, more serious
+          bug. The original bug has been fixed correctly, as has the
+          bug introduced in 10.0.2.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
     <term>10.0.2: October 27, 2020</term>
     <listitem>

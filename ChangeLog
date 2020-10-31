@@ -1,5 +1,7 @@
 2020-10-31  Jay Berkenbilt  <ejb@ql.org>
 
+	* 10.0.3: release
+
 	* Don't enter extension initialization in QPDFWriter on a direct
 	object. Fixes stack overflow in pathological case of /Root being a
 	direct object (fuzz issue 26761).
