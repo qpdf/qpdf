@@ -1537,7 +1537,8 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
         bool have_extensions_adbe = false;
 
         QPDFObjectHandle extensions;
-        if (old_og == this->m->pdf.getRoot().getObjGen())
+        if ((old_og.getObj() != 0) &&
+            (old_og == this->m->pdf.getRoot().getObjGen()))
         {
             is_root = true;
             if (object.hasKey("/Extensions") &&
