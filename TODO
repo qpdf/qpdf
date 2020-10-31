@@ -5,7 +5,6 @@ Candidates for upcoming release
   * bugs
     * #473: zsh completion with directories
   * Non-bugs
-    * #446: recognize edited QDF files
     * #436: parsing of document with form xobject
 
 * QPDFObjectHandle::pipeContentStreams calls finish() after each
