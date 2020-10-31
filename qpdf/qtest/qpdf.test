@@ -2432,7 +2432,7 @@ $td->runtest("check output",
 show_ntests();
 # ----------
 $td->notify("--- Copy Foreign Objects ---");
-$n_tests += 10;
+$n_tests += 11;
 
 foreach my $d ([25, 1], [26, 2], [27, 3])
 {
@@ -2454,6 +2454,14 @@ $td->runtest("copy objects error",
               $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
+# Issue 449 involved indirect /Filter or /DecodeParms in streams that
+# had their stream data replaced. The hand-generated
+# indirect-filter.pdf file more or less reproduces the situation but
+# doesn't result in the same internal error that 449 did with 10.0.1.
+# The file issue-449.pdf was minimized by hand from a test case and
+# does produce an internal error, though the exact reason is unclear.
+# It seems to just have to do with the order in which things are
+# copied.
 $td->runtest("indirect filters",
              {$td->COMMAND => "test_driver 69 indirect-filter.pdf"},
              {$td->STRING => "test 69 done\n", $td->EXIT_STATUS => 0},
@@ -2464,7 +2472,10 @@ foreach my $i (0, 1)
                  {$td->FILE => "auto-$i.pdf"},
                  {$td->FILE => "indirect-filter-out-$i.pdf"});
 }
-
+$td->runtest("issue 449",
+             {$td->COMMAND => "test_driver 69 issue-449.pdf"},
+             {$td->STRING => "test 69 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 show_ntests();
 # ----------
