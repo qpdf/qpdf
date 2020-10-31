@@ -2253,9 +2253,50 @@ QPDF::replaceReserved(QPDFObjectHandle reserved,
 QPDFObjectHandle
 QPDF::copyForeignObject(QPDFObjectHandle foreign)
 {
-    // Do not preclude use of copyForeignObject on page objects. It is
-    // a documented use case to copy pages this way if the intention
-    // is to not update the pages tree.
+    // Here's an explanation of what's going on here.
+    //
+    // A QPDFObjectHandle that is an indirect object has an owning
+    // QPDF. The object ID and generation refers to an object in the
+    // owning QPDF. When we copy the QPDFObjectHandle from a foreign
+    // QPDF into the local QPDF, we have to replace all indirect
+    // object references with references to the corresponding object
+    // in the local file.
+    //
+    // To do this, we maintain mappings from foreign object IDs to
+    // local object IDs for each foreign QPDF that we are copying
+    // from. The mapping is stored in an ObjCopier, which contains a
+    // mapping from the foreign ObjGen to the local QPDFObjectHandle.
+    //
+    // To copy, we do a deep traversal of the foreign object with loop
+    // detection to discover all indirect objects that are
+    // encountered, stopping at page boundaries. Whenever we encounter
+    // an indirect object, we check to see if we have already created
+    // a local copy of it. If not, we allocate a "reserved" object
+    // (or, for a stream, just a new stream) and store in the map the
+    // mapping from the foreign object ID to the new object. While we
+    // do this, we keep a list of objects to copy.
+    //
+    // Once we are done with the traversal, we copy all the objects
+    // that we need to copy. However, the copies will contain indirect
+    // object IDs that refer to objects in the foreign file. We need
+    // to replace them with references to objects in the local file.
+    // This is what replaceForeignIndirectObjects does. Once we have
+    // created a copy of the foreign object with all the indirect
+    // references replaced with new ones in the local context, we can
+    // replace the local reserved object with the copy. This mechanism
+    // allows us to copy objects with circular references in any
+    // order.
+
+    // For streams, rather than copying the objects, we set up the
+    // stream data to pull from the original stream by using a stream
+    // data provider. This is done in a manner that doesn't require
+    // the original QPDF object but may require the original source of
+    // the stream data with special handling for immediate_copy_from.
+    // This logic is also in replaceForeignIndirectObjects.
+
+    // Note that we explicitly allow use of copyForeignObject on page
+    // objects. It is a documented use case to copy pages this way if
+    // the intention is to not update the pages tree.
     if (! foreign.isIndirect())
     {
         QTC::TC("qpdf", "QPDF copyForeign direct");
