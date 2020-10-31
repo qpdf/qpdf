@@ -1,3 +1,10 @@
+2020-10-31  Jay Berkenbilt  <ejb@ql.org>
+
+	* My previous fix to #449 (handling foreign streams with indirect
+	objects in /Filter and/or /DecodeParms) was incorrect and caused
+	other problems. There is a now a correct fix to the original
+	problem. Fixes #478.
+
 2020-10-27  Jay Berkenbilt  <ejb@ql.org>
 
 	* 10.0.2: release
