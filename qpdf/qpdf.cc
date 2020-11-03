@@ -398,7 +398,7 @@ static JSON json_schema(std::set<std::string>* keys = 0)
             JSON::makeString("if stream, its length, otherwise null"));
         stream.addDictionaryMember(
             "filter",
-            JSON::makeString("if stream, its length, otherwise null"));
+            JSON::makeString("if stream, its filters, otherwise null"));
     }
     if (all_keys || keys->count("pages"))
     {
