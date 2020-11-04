@@ -425,7 +425,20 @@ QPDF::parse(char const* password)
 	    throw QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(), "", 0,
 			  "can't find startxref");
 	}
-	read_xref(xref_offset);
+        try
+        {
+            read_xref(xref_offset);
+        }
+        catch (QPDFExc&)
+        {
+            throw;
+        }
+        catch (std::exception& e)
+        {
+	    throw QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(), "", 0,
+			  std::string("error reading xref: ") + e.what());
+
+        }
     }
     catch (QPDFExc& e)
     {
@@ -1250,6 +1263,14 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
 	    // This is needed by checkLinearization()
 	    this->m->first_xref_item_offset = xref_offset;
 	}
+        if (fields[0] == 0)
+        {
+            // Ignore fields[2], which we don't care about in this
+            // case. This works around the issue of some PDF files
+            // that put invalid values, like -1, here for deleted
+            // objects.
+            fields[2] = 0;
+        }
 	insertXrefEntry(obj, toI(fields[0]),
                         fields[1], toI(fields[2]));
     }

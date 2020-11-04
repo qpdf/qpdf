@@ -1496,7 +1496,7 @@ $td->runtest("detect loops in pages structure",
 show_ntests();
 # ----------
 $td->notify("--- Xref ---");
-$n_tests += 5;
+$n_tests += 6;
 
 # Handle file with invalid xref table and object 0 as a regular object
 # (bug 3159950).
@@ -1536,6 +1536,12 @@ $td->runtest("show number of pages",
              {$td->COMMAND =>
                   "qpdf --show-npages 20-pages.pdf --password=user"},
              {$td->STRING => "20\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+# Issue 482 -- don't range check fields[2] for xref entry type 0.
+$td->runtest("out of range in deleted object",
+             {$td->COMMAND => "qpdf --check xref-range.pdf"},
+             {$td->FILE => "xref-range.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 show_ntests();

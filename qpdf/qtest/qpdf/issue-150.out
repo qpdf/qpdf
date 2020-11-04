@@ -1,2 +1,5 @@
 WARNING: issue-150.pdf: can't find PDF header
-overflow/underflow converting 9900000000000000000 to 64-bit integer
+WARNING: issue-150.pdf: file is damaged
+WARNING: issue-150.pdf: error reading xref: overflow/underflow converting 9900000000000000000 to 64-bit integer
+WARNING: issue-150.pdf: Attempting to reconstruct cross-reference table
+issue-150.pdf: unable to find trailer dictionary while recovering damaged file
