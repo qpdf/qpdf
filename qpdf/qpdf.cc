@@ -2877,9 +2877,17 @@ ArgParser::parsePagesOptions()
                 // The range is invalid.  Let's see if it's a file.
                 try
                 {
-                    fclose(QUtil::safe_fopen(range, "rb"));
-                    // Yup, it's a file.
-                    QTC::TC("qpdf", "qpdf pages range omitted in middle");
+                    if (strcmp(range, ".") == 0)
+                    {
+                        // "." means the input file.
+                        QTC::TC("qpdf", "qpdf pages range omitted with .");
+                    }
+                    else
+                    {
+                        fclose(QUtil::safe_fopen(range, "rb"));
+                        QTC::TC("qpdf", "qpdf pages range omitted in middle");
+                        // Yup, it's a file.
+                    }
                     range_omitted = true;
                 }
                 catch (std::runtime_error&)

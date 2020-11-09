@@ -2093,7 +2093,7 @@ foreach my $f (qw(page_api_2 direct-pages))
 show_ntests();
 # ----------
 $td->notify("--- Merging and Splitting ---");
-$n_tests += 26;
+$n_tests += 28;
 
 # Select pages from the same file multiple times including selecting
 # twice from an encrypted file and specifying the password only the
@@ -2149,6 +2149,14 @@ $td->runtest("merge with implicit ranges",
 $td->runtest("check output",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "merge-implicit-ranges.pdf"});
+$td->runtest("merge with . and implicit ranges",
+             {$td->COMMAND =>
+                  "qpdf minimal.pdf a.pdf --pages minimal.pdf . 1 --" .
+                  " --static-id"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "merge-dot-implicit-ranges.pdf"});
 $td->runtest("merge with multiple labels",
              {$td->COMMAND =>
                   "qpdf --empty a.pdf" .
