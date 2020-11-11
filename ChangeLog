@@ -1,3 +1,9 @@
+2020-11-11  Jay Berkenbilt  <ejb@ql.org>
+
+	* Treat a direct page object as a runtime error rather than a
+	logic error since it is actually possible to create a file that
+	has this (fuzz issue 27393).
+
 2020-11-09  Jay Berkenbilt  <ejb@ql.org>
 
 	* Handle "." appearing in --pages not preceded by a numeric range

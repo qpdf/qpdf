@@ -1512,9 +1512,11 @@ QPDFObjectHandle::coalesceContentStreams()
     {
         // Should not be possible for a page object to not have an
         // owning PDF unless it was manually constructed in some
-        // incorrect way.
-        throw std::logic_error("coalesceContentStreams called on object"
-                               " with no associated PDF file");
+        // incorrect way. However, it can happen in a PDF file whose
+        // page structure is direct, which is against spec but still
+        // possible to hand construct, as in fuzz issue 27393.
+        throw std::runtime_error("coalesceContentStreams called on object"
+                                 " with no associated PDF file");
     }
     QPDFObjectHandle new_contents = newStream(qpdf);
     this->replaceKey("/Contents", new_contents);
