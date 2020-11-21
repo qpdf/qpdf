@@ -13,3 +13,16 @@ QIntC::to_uchar<int32_t>(i2): 81 Q PASSED
 QIntC::to_uchar<signed char>(c1): integer out of range converting ÷ from a 1-byte signed type to a 1-byte unsigned type PASSED
 QIntC::to_uchar<char>(c2): W W PASSED
 QIntC::to_char<char>(c2): W W PASSED
+1 + 2: okay PASSED
+-1 + 2: okay PASSED
+-100 + -200: okay PASSED
+max_ll + 0LL: okay PASSED
+max_ll + 1LL: adding 1 to 9223372036854775807 would cause an integer overflow PASSED
+max_ll + 0LL: okay PASSED
+max_ll + 1LL: adding 1 to 9223372036854775807 would cause an integer overflow PASSED
+max_ull + 0ULL: okay PASSED
+max_ull + 1ULL: adding 1 to 18446744073709551615 would cause an integer overflow PASSED
+min_ll + 0LL: okay PASSED
+min_ll + -1LL: adding -1 to -9223372036854775808 would cause an integer underflow PASSED
+max_sc + max_sc: adding  to  would cause an integer overflow PASSED
+'!' + '#': okay PASSED

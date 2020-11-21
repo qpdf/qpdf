@@ -226,6 +226,11 @@ namespace QIntC // QIntC = qpdf Integer Conversion
     template <typename T>
     void range_check(T const& cur, T const& delta)
     {
+        if ((delta > 0) != (cur > 0))
+        {
+            return;
+        }
+
         if ((delta > 0) &&
             ((std::numeric_limits<T>::max() - cur) < delta))
         {
@@ -233,6 +238,15 @@ namespace QIntC // QIntC = qpdf Integer Conversion
             msg.imbue(std::locale::classic());
             msg << "adding " << delta << " to " << cur
                 << " would cause an integer overflow";
+            throw std::range_error(msg.str());
+        }
+        else if ((delta < 0) &&
+            ((std::numeric_limits<T>::min() - cur) > delta))
+        {
+            std::ostringstream msg;
+            msg.imbue(std::locale::classic());
+            msg << "adding " << delta << " to " << cur
+                << " would cause an integer underflow";
             throw std::range_error(msg.str());
         }
     }

@@ -1,3 +1,8 @@
+2020-11-21  Jay Berkenbilt  <ejb@ql.org>
+
+	* Fix QIntC::range_check to handle negative numbers properly (fuzz
+	issue 26994).
+
 2020-11-11  Jay Berkenbilt  <ejb@ql.org>
 
 	* Treat a direct page object as a runtime error rather than a

@@ -25,6 +25,29 @@ static void try_convert_real(
     std::cout << ((passed == exp_pass) ? " PASSED" : " FAILED") << std::endl;
 }
 
+#define try_range_check(exp_pass, a, b) \
+    try_range_check_real(#a " + " #b, exp_pass, a, b)
+
+template <typename T>
+static void try_range_check_real(
+    char const* description, bool exp_pass,
+    T const& a, T const& b)
+{
+    bool passed = false;
+    try
+    {
+        QIntC::range_check(a, b);
+        std::cout << description << ": okay";
+        passed = true;
+    }
+    catch (std::range_error& e)
+    {
+        std::cout << description << ": " << e.what();
+        passed = false;
+    }
+    std::cout << ((passed == exp_pass) ? " PASSED" : " FAILED") << std::endl;
+}
+
 int main()
 {
     uint32_t u1 = 3141592653U;      // Too big for signed type
@@ -56,5 +79,22 @@ int main()
     try_convert(true,  QIntC::to_uchar<char>, c2);
     try_convert(true,  QIntC::to_char<char>, c2);
 
+    auto constexpr max_ll = std::numeric_limits<long long>::max();
+    auto constexpr max_ull = std::numeric_limits<unsigned long long>::max();
+    auto constexpr min_ll = std::numeric_limits<long long>::min();
+    auto constexpr max_sc = std::numeric_limits<signed char>::max();
+    try_range_check(true, 1, 2);
+    try_range_check(true, -1, 2);
+    try_range_check(true, -100, -200);
+    try_range_check(true, max_ll, 0LL);
+    try_range_check(false, max_ll, 1LL);
+    try_range_check(true, max_ll, 0LL);
+    try_range_check(false, max_ll, 1LL);
+    try_range_check(true, max_ull, 0ULL);
+    try_range_check(false, max_ull, 1ULL);
+    try_range_check(true, min_ll, 0LL);
+    try_range_check(false, min_ll, -1LL);
+    try_range_check(false, max_sc, max_sc);
+    try_range_check(true, '!', '#');
     return 0;
 }
