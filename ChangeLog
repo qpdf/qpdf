@@ -1,5 +1,7 @@
 2020-11-21  Jay Berkenbilt  <ejb@ql.org>
 
+	* 10.0.4: release
+
 	* Fix QIntC::range_check to handle negative numbers properly (fuzz
 	issue 26994).
 

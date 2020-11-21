@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "10.0.3">
-<!ENTITY lastreleased "October 31, 2020">
+<!ENTITY swversion "10.0.4">
+<!ENTITY lastreleased "November 21, 2020">
 ]>
 <book>
  <bookinfo>
@@ -4805,6 +4805,27 @@ print "\n";
     </listitem>
    </varlistentry>
 -->
+   <varlistentry>
+    <term>10.0.4: November 21, 2020</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Bug Fixes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Fix a handful of integer overflows. This includes cases
+          found by fuzzing as well as having qpdf not do range
+          checking on unused values in the xref stream.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
    <varlistentry>
     <term>10.0.3: October 31, 2020</term>
     <listitem>

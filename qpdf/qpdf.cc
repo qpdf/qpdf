@@ -38,7 +38,7 @@ static int constexpr EXIT_CORRECT_PASSWORD = 3;
 
 static char const* whoami = 0;
 
-static std::string expected_version = "10.0.3";
+static std::string expected_version = "10.0.4";
 
 struct PageSpec
 {
