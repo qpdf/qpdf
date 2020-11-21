@@ -7,7 +7,7 @@
 2020-11-09  Jay Berkenbilt  <ejb@ql.org>
 
 	* Handle "." appearing in --pages not preceded by a numeric range
-	as a special case in comand-line parsing code.
+	as a special case in command-line parsing code.
 
 2020-11-04  Jay Berkenbilt  <ejb@ql.org>
 
