@@ -1,3 +1,11 @@
+2020-11-28  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add new functions to the C API for manipulating
+	QPDFObjectHandles. The new functions allow creation and
+	modification of objects, which brings a lot of additional power to
+	the C API. See include/qpdf/qpdf-c.h for details and
+	examples/pdf-c-objects.c for a simple example.
+
 2020-11-21  Jay Berkenbilt  <ejb@ql.org>
 
 	* 10.0.4: release

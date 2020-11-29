@@ -471,6 +471,230 @@ extern "C" {
     QPDF_DLL
     QPDF_ERROR_CODE qpdf_write(qpdf_data qpdf);
 
+    /* Object handling.
+     *
+     * These methods take and return a qpdf_oh, which is just an
+     * unsigned integer. The value 0 is never returned, which makes it
+     * usable as an uninitialized value.
+     *
+     * Each function below, starting with qpdf_oh, corresponds to a
+     * specific method of QPDFObjectHandler. For example,
+     * qpdf_oh_is_bool corresponds to QPDFObjectHandle::isBool. If the
+     * C++ method is overloaded, the C function's name will be
+     * disambiguated. If the C++ method takes optional argumens, the C
+     * method will have required arguments in those positions. For
+     * details about the method, please see comments in
+     * QPDFObjectHandle.hh. Comments here only explain things that are
+     * specific to the "C" API.
+     *
+     * Only a fraction of the methods of QPDFObjectHandle are
+     * available here. Most of the basic methods for creating,
+     * accessing, and modifying most types of objects are present.
+     * Most of the higher-level functions are not implemented.
+     * Functions for dealing with content streams as well as objects
+     * that only exist in content streams (operators and inline
+     * images) are mostly not provided.
+     *
+     * To refer to a specific QPDFObjectHandle, you need a pair
+     * consisting of a qpdf_data and a qpdf_oh, which is just an index
+     * into an internal table of objects. All memory allocated by any
+     * of these methods is returned when qpdf_cleanup is called.
+     *
+     * Regarding memory, the same rules apply as the above functions.
+     * Specifically, if a method returns a char*, the memory is
+     * managed by the library and, unless otherwise specified, is not
+     * expected to be valid after the next qpdf call.
+     *
+     * The qpdf_data object keeps a cache of objects returned by these
+     * methods. Once you are finished referencing an object, you can
+     * optionally release it. Releasing objects is optional since they
+     * will all get released by qpdf_cleanup, but it can help to
+     * reduce the memory footprint of the qpdf_data object to release
+     * them when you're done. Releasing an object does not destroy the
+     * object. All QPDFObjectHandle objects are deleted when they are
+     * no longer referenced. Releasing an object simply invalidates
+     * the qpdf_oh handle to it. For example, if you create an object,
+     * add it to an existing dictionary or array, and then release it,
+     * the object is safely part of the dictionary or array.
+     * Explicitly releasing an object is essentially the same as
+     * letting a QPDFObjectHandle go out of scope in the C++ API.
+     */
+
+    /* For examples of using this API, see examples/pdf-c-objects.c */
+
+    typedef unsigned int qpdf_oh;
+
+    /* Releasing objects -- see comments above. These methods have no
+     * equivalent in the C++ API.
+     */
+    QPDF_DLL
+    void qpdf_oh_release(qpdf_data data, qpdf_oh oh);
+    QPDF_DLL
+    void qpdf_oh_release_all(qpdf_data data);
+
+    /* Get trailer and root objects */
+    QPDF_DLL
+    qpdf_oh qpdf_get_trailer(qpdf_data data);
+    QPDF_DLL
+    qpdf_oh qpdf_get_root(qpdf_data data);
+
+    /* Wrappers around QPDFObjectHandle methods. Be sure to read
+     * corresponding comments in QPDFObjectHandle.hh to understand
+     * what each function does and what kinds of objects it applies
+     * to.
+     */
+
+    QPDF_DLL
+    QPDF_BOOL qpdf_oh_is_bool(qpdf_data data, qpdf_oh oh);
+    QPDF_DLL
+    QPDF_BOOL qpdf_oh_is_null(qpdf_data data, qpdf_oh oh);
+    QPDF_DLL
+    QPDF_BOOL qpdf_oh_is_integer(qpdf_data data, qpdf_oh oh);
+    QPDF_DLL
+    QPDF_BOOL qpdf_oh_is_real(qpdf_data data, qpdf_oh oh);
+    QPDF_DLL
+    QPDF_BOOL qpdf_oh_is_name(qpdf_data data, qpdf_oh oh);
+    QPDF_DLL
+    QPDF_BOOL qpdf_oh_is_string(qpdf_data data, qpdf_oh oh);
+    QPDF_DLL
+    QPDF_BOOL qpdf_oh_is_operator(qpdf_data data, qpdf_oh oh);
+    QPDF_DLL
+    QPDF_BOOL qpdf_oh_is_inline_image(qpdf_data data, qpdf_oh oh);
+    QPDF_DLL
+    QPDF_BOOL qpdf_oh_is_array(qpdf_data data, qpdf_oh oh);
+    QPDF_DLL
+    QPDF_BOOL qpdf_oh_is_dictionary(qpdf_data data, qpdf_oh oh);
+    QPDF_DLL
+    QPDF_BOOL qpdf_oh_is_stream(qpdf_data data, qpdf_oh oh);
+    QPDF_DLL
+    QPDF_BOOL qpdf_oh_is_indirect(qpdf_data data, qpdf_oh oh);
+    QPDF_DLL
+    QPDF_BOOL qpdf_oh_is_scalar(qpdf_data data, qpdf_oh oh);
+
+    QPDF_DLL
+    qpdf_oh qpdf_oh_wrap_in_array(qpdf_data data, qpdf_oh oh);
+
+    QPDF_DLL
+    qpdf_oh qpdf_oh_parse(qpdf_data data, char const* object_str);
+
+    QPDF_DLL
+    QPDF_BOOL qpdf_oh_get_bool_value(qpdf_data data, qpdf_oh oh);
+
+    QPDF_DLL
+    long long qpdf_oh_get_int_value(qpdf_data data, qpdf_oh oh);
+    QPDF_DLL
+    int qpdf_oh_get_int_value_as_int(qpdf_data data, qpdf_oh oh);
+    QPDF_DLL
+    unsigned long long qpdf_oh_get_uint_value(qpdf_data data, qpdf_oh oh);
+    QPDF_DLL
+    unsigned int qpdf_oh_get_uint_value_as_uint(qpdf_data data, qpdf_oh oh);
+
+    QPDF_DLL
+    char const* qpdf_oh_get_real_value(qpdf_data data, qpdf_oh oh);
+
+    QPDF_DLL
+    QPDF_BOOL qpdf_oh_is_number(qpdf_data data, qpdf_oh oh);
+    QPDF_DLL
+    double qpdf_oh_get_numeric_value(qpdf_data data, qpdf_oh oh);
+
+    QPDF_DLL
+    char const* qpdf_oh_get_name(qpdf_data data, qpdf_oh oh);
+
+    QPDF_DLL
+    char const* qpdf_oh_get_string_value(qpdf_data data, qpdf_oh oh);
+    QPDF_DLL
+    char const* qpdf_oh_get_utf8_value(qpdf_data data, qpdf_oh oh);
+
+    QPDF_DLL
+    int qpdf_oh_get_array_n_items(qpdf_data data, qpdf_oh oh);
+    QPDF_DLL
+    qpdf_oh qpdf_oh_get_array_item(qpdf_data data, qpdf_oh oh, int n);
+
+    /* "C"-specific dictionary key iteration */
+
+    /* Iteration is allowed on only one dictionary at a time. */
+    QPDF_DLL
+    void qpdf_oh_begin_dict_key_iter(qpdf_data data, qpdf_oh dict);
+    QPDF_DLL
+    QPDF_BOOL qpdf_oh_dict_more_keys(qpdf_data data);
+    /* The memory returned by qpdf_oh_dict_next_key is owned by
+     * qpdf_data. It is good until the next call to
+     * qpdf_oh_dict_next_key with the same qpdf_data object. Calling
+     * the method again, even with a different dict, invalidates
+     * previous return values.
+     */
+    QPDF_DLL
+    char const* qpdf_oh_dict_next_key(qpdf_data data);
+
+    /* end "C"-specific dictionary key iteration */
+
+    QPDF_DLL
+    QPDF_BOOL qpdf_oh_has_key(qpdf_data data, qpdf_oh oh, char const* key);
+    QPDF_DLL
+    qpdf_oh qpdf_oh_get_key(qpdf_data data, qpdf_oh oh, char const* key);
+
+    QPDF_DLL
+    QPDF_BOOL qpdf_oh_is_or_has_name(
+        qpdf_data data, qpdf_oh oh, char const* key);
+
+    QPDF_DLL
+    qpdf_oh qpdf_oh_new_null(qpdf_data data);
+    QPDF_DLL
+    qpdf_oh qpdf_oh_new_bool(qpdf_data data, QPDF_BOOL value);
+    QPDF_DLL
+    qpdf_oh qpdf_oh_new_integer(qpdf_data data, long long value);
+    QPDF_DLL
+    qpdf_oh qpdf_oh_new_real_from_string(qpdf_data data, char const* value);
+    QPDF_DLL
+    qpdf_oh qpdf_oh_new_real_from_double(qpdf_data data,
+                                         double value, int decimal_places);
+    QPDF_DLL
+    qpdf_oh qpdf_oh_new_name(qpdf_data data, char const* name);
+    QPDF_DLL
+    qpdf_oh qpdf_oh_new_string(qpdf_data data, char const* str);
+    QPDF_DLL
+    qpdf_oh qpdf_oh_new_unicode_string(qpdf_data data, char const* utf8_str);
+    QPDF_DLL
+    qpdf_oh qpdf_oh_new_array(qpdf_data data);
+    QPDF_DLL
+    qpdf_oh qpdf_oh_new_dictionary(qpdf_data data);
+
+    QPDF_DLL
+    void qpdf_oh_make_direct(qpdf_data data, qpdf_oh oh);
+
+    QPDF_DLL
+    void qpdf_oh_set_array_item(qpdf_data data, qpdf_oh oh,
+                                int at, qpdf_oh item);
+    QPDF_DLL
+    void qpdf_oh_insert_item(qpdf_data data, qpdf_oh oh, int at, qpdf_oh item);
+    QPDF_DLL
+    void qpdf_oh_append_item(qpdf_data data, qpdf_oh oh, qpdf_oh item);
+    QPDF_DLL
+    void qpdf_oh_erase_item(qpdf_data data, qpdf_oh oh, int at);
+
+    QPDF_DLL
+    void qpdf_oh_replace_key(qpdf_data data, qpdf_oh oh,
+                             char const* key, qpdf_oh item);
+    QPDF_DLL
+    void qpdf_oh_remove_key(qpdf_data data, qpdf_oh oh, char const* key);
+    QPDF_DLL
+    void qpdf_oh_replace_or_remove_key(qpdf_data data, qpdf_oh oh,
+                                       char const* key, qpdf_oh item);
+
+    QPDF_DLL
+    qpdf_oh qpdf_oh_get_dict(qpdf_data data, qpdf_oh oh);
+
+    QPDF_DLL
+    int qpdf_oh_get_object_id(qpdf_data data, qpdf_oh oh);
+    QPDF_DLL
+    int qpdf_oh_get_generation(qpdf_data data, qpdf_oh oh);
+
+    QPDF_DLL
+    char const* qpdf_oh_unparse(qpdf_data data, qpdf_oh oh);
+    QPDF_DLL
+    char const* qpdf_oh_unparse_resolved(qpdf_data data, qpdf_oh oh);
+    QPDF_DLL
+    char const* qpdf_oh_unparse_binary(qpdf_data data, qpdf_oh oh);
 #ifdef __cplusplus
 }
 #endif

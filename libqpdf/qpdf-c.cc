@@ -6,6 +6,7 @@
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/Pl_Discard.hh>
 #include <qpdf/QIntC.hh>
+#include <qpdf/QUtil.hh>
 
 #include <list>
 #include <string>
@@ -37,10 +38,18 @@ struct _qpdf_data
     char const* password;
     bool write_memory;
     PointerHolder<Buffer> output_buffer;
+
+    // QPDFObjectHandle support
+    std::map<qpdf_oh, PointerHolder<QPDFObjectHandle>> oh_cache;
+    qpdf_oh next_oh;
+    std::set<std::string> cur_iter_dict_keys;
+    std::set<std::string>::const_iterator dict_iter;
+    std::string cur_dict_key;
 };
 
 _qpdf_data::_qpdf_data() :
-    write_memory(false)
+    write_memory(false),
+    next_oh(0)
 {
 }
 
@@ -134,6 +143,7 @@ qpdf_data qpdf_init()
 void qpdf_cleanup(qpdf_data* qpdf)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_cleanup");
+    qpdf_oh_release_all(*qpdf);
     delete *qpdf;
     *qpdf = 0;
 }
@@ -748,4 +758,593 @@ QPDF_ERROR_CODE qpdf_write(qpdf_data qpdf)
     status = trap_errors(qpdf, &call_write);
     QTC::TC("qpdf", "qpdf-c called qpdf_write", (status == 0) ? 0 : 1);
     return status;
+}
+
+static qpdf_oh
+new_object(qpdf_data qpdf, QPDFObjectHandle const& qoh)
+{
+    qpdf_oh oh = ++qpdf->next_oh; // never return 0
+    qpdf->oh_cache[oh] = new QPDFObjectHandle(qoh);
+    return oh;
+}
+
+void qpdf_oh_release(qpdf_data qpdf, qpdf_oh oh)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_release");
+    qpdf->oh_cache.erase(oh);
+}
+
+void qpdf_oh_release_all(qpdf_data qpdf)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_release_all");
+    qpdf->oh_cache.clear();
+}
+
+qpdf_oh qpdf_get_trailer(qpdf_data qpdf)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_get_trailer");
+    return new_object(qpdf, qpdf->qpdf->getTrailer());
+}
+
+qpdf_oh qpdf_get_root(qpdf_data qpdf)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_get_root");
+    return new_object(qpdf, qpdf->qpdf->getRoot());
+}
+
+static bool
+qpdf_oh_valid_internal(qpdf_data qpdf, qpdf_oh oh)
+{
+    auto i = qpdf->oh_cache.find(oh);
+    bool result = ((i != qpdf->oh_cache.end()) &&
+                   (i->second).getPointer() &&
+                   (i->second)->isInitialized());
+    if (! result)
+    {
+        QTC::TC("qpdf", "qpdf-c invalid object handle");
+        qpdf->warnings.push_back(
+            QPDFExc(
+                qpdf_e_damaged_pdf,
+                qpdf->qpdf->getFilename(),
+                std::string("C API object handle ") +
+                QUtil::uint_to_string(oh),
+                0, "attempted access to unknown/uninitialized object handle"));
+    }
+    return result;
+}
+
+QPDF_BOOL qpdf_oh_is_bool(qpdf_data qpdf, qpdf_oh oh)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_bool");
+    return (qpdf_oh_valid_internal(qpdf, oh) &&
+            qpdf->oh_cache[oh]->isBool());
+}
+
+QPDF_BOOL qpdf_oh_is_null(qpdf_data qpdf, qpdf_oh oh)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_null");
+    return (qpdf_oh_valid_internal(qpdf, oh) &&
+            qpdf->oh_cache[oh]->isNull());
+}
+
+QPDF_BOOL qpdf_oh_is_integer(qpdf_data qpdf, qpdf_oh oh)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_integer");
+    return (qpdf_oh_valid_internal(qpdf, oh) &&
+            qpdf->oh_cache[oh]->isInteger());
+}
+
+QPDF_BOOL qpdf_oh_is_real(qpdf_data qpdf, qpdf_oh oh)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_real");
+    return (qpdf_oh_valid_internal(qpdf, oh) &&
+            qpdf->oh_cache[oh]->isReal());
+}
+
+QPDF_BOOL qpdf_oh_is_name(qpdf_data qpdf, qpdf_oh oh)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_name");
+    return (qpdf_oh_valid_internal(qpdf, oh) &&
+            qpdf->oh_cache[oh]->isName());
+}
+
+QPDF_BOOL qpdf_oh_is_string(qpdf_data qpdf, qpdf_oh oh)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_string");
+    return (qpdf_oh_valid_internal(qpdf, oh) &&
+            qpdf->oh_cache[oh]->isString());
+}
+
+QPDF_BOOL qpdf_oh_is_operator(qpdf_data qpdf, qpdf_oh oh)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_operator");
+    return (qpdf_oh_valid_internal(qpdf, oh) &&
+            qpdf->oh_cache[oh]->isOperator());
+}
+
+QPDF_BOOL qpdf_oh_is_inline_image(qpdf_data qpdf, qpdf_oh oh)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_inline_image");
+    return (qpdf_oh_valid_internal(qpdf, oh) &&
+            qpdf->oh_cache[oh]->isInlineImage());
+}
+
+QPDF_BOOL qpdf_oh_is_array(qpdf_data qpdf, qpdf_oh oh)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_array");
+    return (qpdf_oh_valid_internal(qpdf, oh) &&
+            qpdf->oh_cache[oh]->isArray());
+}
+
+QPDF_BOOL qpdf_oh_is_dictionary(qpdf_data qpdf, qpdf_oh oh)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_dictionary");
+    return (qpdf_oh_valid_internal(qpdf, oh) &&
+            qpdf->oh_cache[oh]->isDictionary());
+}
+
+QPDF_BOOL qpdf_oh_is_stream(qpdf_data qpdf, qpdf_oh oh)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_stream");
+    return (qpdf_oh_valid_internal(qpdf, oh) &&
+            qpdf->oh_cache[oh]->isStream());
+}
+
+QPDF_BOOL qpdf_oh_is_indirect(qpdf_data qpdf, qpdf_oh oh)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_indirect");
+    return (qpdf_oh_valid_internal(qpdf, oh) &&
+            qpdf->oh_cache[oh]->isIndirect());
+}
+
+QPDF_BOOL qpdf_oh_is_scalar(qpdf_data qpdf, qpdf_oh oh)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_scalar");
+    return (qpdf_oh_valid_internal(qpdf, oh) &&
+            qpdf->oh_cache[oh]->isScalar());
+}
+
+qpdf_oh qpdf_oh_wrap_in_array(qpdf_data qpdf, qpdf_oh oh)
+{
+    if (! qpdf_oh_valid_internal(qpdf, oh))
+    {
+        return qpdf_oh_new_array(qpdf);
+    }
+    auto qoh = qpdf->oh_cache[oh];
+    if (qoh->isArray())
+    {
+        QTC::TC("qpdf", "qpdf-c array to wrap_in_array");
+        return oh;
+    }
+    else
+    {
+        QTC::TC("qpdf", "qpdf-c non-array to wrap_in_array");
+        return new_object(qpdf,
+                          QPDFObjectHandle::newArray(
+                              std::vector<QPDFObjectHandle>{
+                                  *qpdf->oh_cache[oh]}));
+    }
+}
+
+qpdf_oh qpdf_oh_parse(qpdf_data qpdf, char const* object_str)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_parse");
+    return new_object(qpdf, QPDFObjectHandle::parse(object_str));
+}
+
+QPDF_BOOL qpdf_oh_get_bool_value(qpdf_data qpdf, qpdf_oh oh)
+{
+    if (! qpdf_oh_valid_internal(qpdf, oh))
+    {
+        return QPDF_FALSE;
+    }
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_bool_value");
+    return qpdf->oh_cache[oh]->getBoolValue();
+}
+
+long long qpdf_oh_get_int_value(qpdf_data qpdf, qpdf_oh oh)
+{
+    if (! qpdf_oh_valid_internal(qpdf, oh))
+    {
+        return 0LL;
+    }
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_int_value");
+    return qpdf->oh_cache[oh]->getIntValue();
+}
+
+int qpdf_oh_get_int_value_as_int(qpdf_data qpdf, qpdf_oh oh)
+{
+    if (! qpdf_oh_valid_internal(qpdf, oh))
+    {
+        return 0;
+    }
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_int_value_as_int");
+    return qpdf->oh_cache[oh]->getIntValueAsInt();
+}
+
+unsigned long long qpdf_oh_get_uint_value(qpdf_data qpdf, qpdf_oh oh)
+{
+    if (! qpdf_oh_valid_internal(qpdf, oh))
+    {
+        return 0ULL;
+    }
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_uint_value");
+    return qpdf->oh_cache[oh]->getUIntValue();
+}
+
+unsigned int qpdf_oh_get_uint_value_as_uint(qpdf_data qpdf, qpdf_oh oh)
+{
+    if (! qpdf_oh_valid_internal(qpdf, oh))
+    {
+        return 0U;
+    }
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_uint_value_as_uint");
+    return qpdf->oh_cache[oh]->getUIntValueAsUInt();
+}
+
+char const* qpdf_oh_get_real_value(qpdf_data qpdf, qpdf_oh oh)
+{
+    if (! qpdf_oh_valid_internal(qpdf, oh))
+    {
+        return "";
+    }
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_real_value");
+    qpdf->tmp_string = qpdf->oh_cache[oh]->getRealValue();
+    return qpdf->tmp_string.c_str();
+}
+
+QPDF_BOOL qpdf_oh_is_number(qpdf_data qpdf, qpdf_oh oh)
+{
+    if (! qpdf_oh_valid_internal(qpdf, oh))
+    {
+        return QPDF_FALSE;
+    }
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_number");
+    return qpdf->oh_cache[oh]->isNumber();
+}
+
+double qpdf_oh_get_numeric_value(qpdf_data qpdf, qpdf_oh oh)
+{
+    if (! qpdf_oh_valid_internal(qpdf, oh))
+    {
+        return 0.0;
+    }
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_numeric_value");
+    return qpdf->oh_cache[oh]->getNumericValue();
+}
+
+char const* qpdf_oh_get_name(qpdf_data qpdf, qpdf_oh oh)
+{
+    if (! qpdf_oh_valid_internal(qpdf, oh))
+    {
+        return "";
+    }
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_name");
+    qpdf->tmp_string = qpdf->oh_cache[oh]->getName();
+    return qpdf->tmp_string.c_str();
+}
+
+char const* qpdf_oh_get_string_value(qpdf_data qpdf, qpdf_oh oh)
+{
+    if (! qpdf_oh_valid_internal(qpdf, oh))
+    {
+        return "";
+    }
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_string_value");
+    qpdf->tmp_string = qpdf->oh_cache[oh]->getStringValue();
+    return qpdf->tmp_string.c_str();
+}
+
+char const* qpdf_oh_get_utf8_value(qpdf_data qpdf, qpdf_oh oh)
+{
+    if (! qpdf_oh_valid_internal(qpdf, oh))
+    {
+        return "";
+    }
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_utf8_value");
+    qpdf->tmp_string = qpdf->oh_cache[oh]->getUTF8Value();
+    return qpdf->tmp_string.c_str();
+}
+
+int qpdf_oh_get_array_n_items(qpdf_data qpdf, qpdf_oh oh)
+{
+    if (! qpdf_oh_valid_internal(qpdf, oh))
+    {
+        return 0;
+    }
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_array_n_items");
+    return qpdf->oh_cache[oh]->getArrayNItems();
+}
+
+qpdf_oh qpdf_oh_get_array_item(qpdf_data qpdf, qpdf_oh oh, int n)
+{
+    if (! qpdf_oh_valid_internal(qpdf, oh))
+    {
+        return qpdf_oh_new_null(qpdf);
+    }
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_array_item");
+    return new_object(qpdf, qpdf->oh_cache[oh]->getArrayItem(n));
+}
+
+void qpdf_oh_begin_dict_key_iter(qpdf_data qpdf, qpdf_oh oh)
+{
+    if (qpdf_oh_valid_internal(qpdf, oh) &&
+        qpdf_oh_is_dictionary(qpdf, oh))
+    {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_begin_dict_key_iter");
+        qpdf->cur_iter_dict_keys = qpdf->oh_cache[oh]->getKeys();
+    }
+    else
+    {
+        qpdf->cur_iter_dict_keys = {};
+    }
+    qpdf->dict_iter = qpdf->cur_iter_dict_keys.begin();
+}
+
+QPDF_BOOL qpdf_oh_dict_more_keys(qpdf_data qpdf)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_dict_more_keys");
+    return qpdf->dict_iter != qpdf->cur_iter_dict_keys.end();
+}
+
+char const* qpdf_oh_dict_next_key(qpdf_data qpdf)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_dict_next_key");
+    if (qpdf_oh_dict_more_keys(qpdf))
+    {
+        qpdf->cur_dict_key = *qpdf->dict_iter;
+        ++qpdf->dict_iter;
+        return qpdf->cur_dict_key.c_str();
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+QPDF_BOOL qpdf_oh_has_key(qpdf_data qpdf, qpdf_oh oh, char const* key)
+{
+    if (! qpdf_oh_valid_internal(qpdf, oh))
+    {
+        return QPDF_FALSE;
+    }
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_has_key");
+    return qpdf->oh_cache[oh]->hasKey(key);
+}
+
+qpdf_oh qpdf_oh_get_key(qpdf_data qpdf, qpdf_oh oh, char const* key)
+{
+    if (! qpdf_oh_valid_internal(qpdf, oh))
+    {
+        return qpdf_oh_new_null(qpdf);
+    }
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_key");
+    return new_object(qpdf, qpdf->oh_cache[oh]->getKey(key));
+}
+
+QPDF_BOOL qpdf_oh_is_or_has_name(qpdf_data qpdf, qpdf_oh oh, char const* key)
+{
+    if (! qpdf_oh_valid_internal(qpdf, oh))
+    {
+        return QPDF_FALSE;
+    }
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_or_has_name");
+    return qpdf->oh_cache[oh]->isOrHasName(key);
+}
+
+qpdf_oh qpdf_oh_new_null(qpdf_data qpdf)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_new_null");
+    return new_object(qpdf, QPDFObjectHandle::newNull());
+}
+
+qpdf_oh qpdf_oh_new_bool(qpdf_data qpdf, QPDF_BOOL value)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_new_bool");
+    return new_object(qpdf, QPDFObjectHandle::newBool(value));
+}
+
+qpdf_oh qpdf_oh_new_integer(qpdf_data qpdf, long long value)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_new_integer");
+    return new_object(qpdf, QPDFObjectHandle::newInteger(value));
+}
+
+qpdf_oh qpdf_oh_new_real_from_string(qpdf_data qpdf, char const* value)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_new_real_from_string");
+    return new_object(qpdf, QPDFObjectHandle::newReal(value));
+}
+
+qpdf_oh qpdf_oh_new_real_from_double(qpdf_data qpdf,
+                                     double value, int decimal_places)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_new_real_from_double");
+    return new_object(qpdf, QPDFObjectHandle::newReal(value, decimal_places));
+}
+
+qpdf_oh qpdf_oh_new_name(qpdf_data qpdf, char const* name)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_new_name");
+    return new_object(qpdf, QPDFObjectHandle::newName(name));
+}
+
+qpdf_oh qpdf_oh_new_string(qpdf_data qpdf, char const* str)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_new_string");
+    return new_object(qpdf, QPDFObjectHandle::newString(str));
+}
+
+qpdf_oh qpdf_oh_new_unicode_string(qpdf_data qpdf, char const* utf8_str)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_new_unicode_string");
+    return new_object(qpdf, QPDFObjectHandle::newUnicodeString(utf8_str));
+}
+
+qpdf_oh qpdf_oh_new_array(qpdf_data qpdf)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_new_array");
+    return new_object(qpdf, QPDFObjectHandle::newArray());
+}
+
+qpdf_oh qpdf_oh_new_dictionary(qpdf_data qpdf)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_new_dictionary");
+    return new_object(qpdf, QPDFObjectHandle::newDictionary());
+}
+
+void qpdf_oh_make_direct(qpdf_data qpdf, qpdf_oh oh)
+{
+    if (qpdf_oh_valid_internal(qpdf, oh))
+    {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_make_direct");
+        qpdf->oh_cache[oh]->makeDirect();
+    }
+}
+
+static QPDFObjectHandle
+qpdf_oh_item_internal(qpdf_data qpdf, qpdf_oh item)
+{
+    if (qpdf_oh_valid_internal(qpdf, item))
+    {
+        return *(qpdf->oh_cache[item]);
+    }
+    else
+    {
+        return QPDFObjectHandle::newNull();
+    }
+}
+
+void qpdf_oh_set_array_item(qpdf_data qpdf, qpdf_oh oh,
+                            int at, qpdf_oh item)
+{
+    if (qpdf_oh_is_array(qpdf, oh))
+    {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_set_array_item");
+        qpdf->oh_cache[oh]->setArrayItem(
+            at, qpdf_oh_item_internal(qpdf, item));
+    }
+}
+
+void qpdf_oh_insert_item(qpdf_data qpdf, qpdf_oh oh, int at, qpdf_oh item)
+{
+    if (qpdf_oh_is_array(qpdf, oh))
+    {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_insert_item");
+        qpdf->oh_cache[oh]->insertItem(
+            at, qpdf_oh_item_internal(qpdf, item));
+    }
+}
+
+void qpdf_oh_append_item(qpdf_data qpdf, qpdf_oh oh, qpdf_oh item)
+{
+    if (qpdf_oh_is_array(qpdf, oh))
+    {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_append_item");
+        qpdf->oh_cache[oh]->appendItem(
+            qpdf_oh_item_internal(qpdf, item));
+    }
+}
+
+void qpdf_oh_erase_item(qpdf_data qpdf, qpdf_oh oh, int at)
+{
+    if (qpdf_oh_is_array(qpdf, oh))
+    {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_erase_item");
+        qpdf->oh_cache[oh]->eraseItem(at);
+    }
+}
+
+void qpdf_oh_replace_key(qpdf_data qpdf, qpdf_oh oh,
+                         char const* key, qpdf_oh item)
+{
+    if (qpdf_oh_is_dictionary(qpdf, oh))
+    {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_replace_key");
+        qpdf->oh_cache[oh]->replaceKey(
+            key, qpdf_oh_item_internal(qpdf, item));
+    }
+}
+
+void qpdf_oh_remove_key(qpdf_data qpdf, qpdf_oh oh, char const* key)
+{
+    if (qpdf_oh_is_dictionary(qpdf, oh))
+    {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_remove_key");
+        qpdf->oh_cache[oh]->removeKey(key);
+    }
+}
+
+void qpdf_oh_replace_or_remove_key(qpdf_data qpdf, qpdf_oh oh,
+                                   char const* key, qpdf_oh item)
+{
+    if (qpdf_oh_is_dictionary(qpdf, oh))
+    {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_replace_or_remove_key");
+        qpdf->oh_cache[oh]->replaceOrRemoveKey(
+            key, qpdf_oh_item_internal(qpdf, item));
+    }
+}
+
+qpdf_oh qpdf_oh_get_dict(qpdf_data qpdf, qpdf_oh oh)
+{
+    if (! qpdf_oh_valid_internal(qpdf, oh))
+    {
+        return qpdf_oh_new_null(qpdf);
+    }
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_dict");
+    return new_object(qpdf, qpdf->oh_cache[oh]->getDict());
+}
+
+int qpdf_oh_get_object_id(qpdf_data qpdf, qpdf_oh oh)
+{
+    if (! qpdf_oh_valid_internal(qpdf, oh))
+    {
+        return 0;
+    }
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_object_id");
+    return qpdf->oh_cache[oh]->getObjectID();
+}
+
+int qpdf_oh_get_generation(qpdf_data qpdf, qpdf_oh oh)
+{
+    if (! qpdf_oh_valid_internal(qpdf, oh))
+    {
+        return 0;
+    }
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_generation");
+    return qpdf->oh_cache[oh]->getGeneration();
+}
+
+char const* qpdf_oh_unparse(qpdf_data qpdf, qpdf_oh oh)
+{
+    if (! qpdf_oh_valid_internal(qpdf, oh))
+    {
+        return "";
+    }
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_unparse");
+    qpdf->tmp_string = qpdf->oh_cache[oh]->unparse();
+    return qpdf->tmp_string.c_str();
+}
+
+char const* qpdf_oh_unparse_resolved(qpdf_data qpdf, qpdf_oh oh)
+{
+    if (! qpdf_oh_valid_internal(qpdf, oh))
+    {
+        return "";
+    }
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_unparse_resolved");
+    qpdf->tmp_string = qpdf->oh_cache[oh]->unparseResolved();
+    return qpdf->tmp_string.c_str();
+}
+
+char const* qpdf_oh_unparse_binary(qpdf_data qpdf, qpdf_oh oh)
+{
+    if (! qpdf_oh_valid_internal(qpdf, oh))
+    {
+        return "";
+    }
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_unparse_binary");
+    qpdf->tmp_string = qpdf->oh_cache[oh]->unparseBinary();
+    return qpdf->tmp_string.c_str();
 }

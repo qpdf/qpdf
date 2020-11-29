@@ -495,6 +495,177 @@ static void test23(char const* infile,
     report_errors();
 }
 
+static void test24(char const* infile,
+		   char const* password,
+		   char const* outfile,
+		   char const* outfile2)
+{
+    /* This test case is designed for minimal.pdf. */
+    qpdf_read(qpdf, infile, password);
+    qpdf_oh trailer = qpdf_get_trailer(qpdf);
+    /* The library never returns 0 */
+    assert(trailer == 1);
+    qpdf_oh root = qpdf_get_root(qpdf);
+    assert(qpdf_oh_get_generation(qpdf, root) == 0);
+    qpdf_oh root_from_trailer = qpdf_oh_get_key(qpdf, trailer, "/Root");
+    assert(qpdf_oh_get_object_id(qpdf, root) ==
+           qpdf_oh_get_object_id(qpdf, root_from_trailer));
+    qpdf_oh pages = qpdf_oh_get_key(qpdf, root, "/Pages");
+    assert(qpdf_oh_is_dictionary(qpdf, pages));
+    qpdf_oh kids = qpdf_oh_get_key(qpdf, pages, "/Kids");
+    assert(qpdf_oh_is_array(qpdf, kids));
+    assert(qpdf_oh_get_array_n_items(qpdf, kids) == 1);
+    qpdf_oh page1 = qpdf_oh_get_array_item(qpdf, kids, 0);
+    qpdf_oh_begin_dict_key_iter(qpdf, page1);
+    while (qpdf_oh_dict_more_keys(qpdf))
+    {
+        printf("page dictionary key: %s\n", qpdf_oh_dict_next_key(qpdf));
+    }
+    qpdf_oh type = qpdf_oh_get_key(qpdf, page1, "/Type");
+    assert(qpdf_oh_is_name(qpdf, type));
+    assert(strcmp(qpdf_oh_get_name(qpdf, type), "/Page") == 0);
+    qpdf_oh parent = qpdf_oh_get_key(qpdf, page1, "/Parent");
+    assert(qpdf_oh_is_indirect(qpdf, parent));
+    qpdf_oh mediabox = qpdf_oh_get_key(qpdf, page1, "/MediaBox");
+    assert(! qpdf_oh_is_scalar(qpdf, mediabox));
+    assert(qpdf_oh_is_array(qpdf, mediabox));
+    assert(qpdf_oh_get_array_n_items(qpdf, mediabox) == 4);
+    assert(qpdf_oh_wrap_in_array(qpdf, mediabox) == mediabox);
+    for (int i = 0; i < 4; ++i)
+    {
+        qpdf_oh item = qpdf_oh_get_array_item(qpdf, mediabox, i);
+        printf("item %d: %d %.2f\n",
+               i, qpdf_oh_get_int_value_as_int(qpdf, item),
+               qpdf_oh_get_numeric_value(qpdf, item));
+        qpdf_oh_release(qpdf, item);
+    }
+    qpdf_oh i2 = qpdf_oh_get_array_item(qpdf, mediabox, 2);
+    assert(qpdf_oh_get_int_value_as_int(qpdf, i2) == 612);
+    assert(qpdf_oh_get_int_value(qpdf, i2) == 612ll);
+    assert(qpdf_oh_get_uint_value_as_uint(qpdf, i2) == 612u);
+    assert(qpdf_oh_get_uint_value(qpdf, i2) == 612ull);
+    assert(! qpdf_oh_is_operator(qpdf, i2));
+    assert(! qpdf_oh_is_inline_image(qpdf, i2));
+    qpdf_oh encoding = qpdf_oh_get_key(
+        qpdf, qpdf_oh_get_key(
+            qpdf, qpdf_oh_get_key(
+                qpdf, qpdf_oh_get_key(
+                    qpdf, page1, "/Resources"),
+                "/Font"),
+            "/F1"),
+        "/Encoding");
+    assert(strcmp(qpdf_oh_get_name(qpdf, encoding), "/WinAnsiEncoding") == 0);
+    qpdf_oh contents = qpdf_oh_get_key(qpdf, page1, "/Contents");
+    assert(qpdf_oh_is_stream(qpdf, contents));
+    qpdf_oh contents_dict = qpdf_oh_get_dict(qpdf, contents);
+    assert(! qpdf_oh_is_scalar(qpdf, contents));
+    assert(! qpdf_oh_is_scalar(qpdf, contents_dict));
+    qpdf_oh contents_length = qpdf_oh_get_key(qpdf, contents_dict, "/Length");
+    assert(qpdf_oh_is_integer(qpdf, contents_length));
+    assert(qpdf_oh_is_scalar(qpdf, contents_length));
+    assert(qpdf_oh_is_number(qpdf, contents_length));
+    qpdf_oh contents_array = qpdf_oh_wrap_in_array(qpdf, contents);
+    assert(qpdf_oh_get_array_n_items(qpdf, contents_array) == 1);
+    assert(qpdf_oh_get_object_id(
+               qpdf, qpdf_oh_get_array_item(qpdf, contents_array, 0)) ==
+           qpdf_oh_get_object_id(qpdf, contents));
+    qpdf_oh resources = qpdf_oh_get_key(qpdf, page1, "/Resources");
+    qpdf_oh procset = qpdf_oh_get_key(qpdf, resources, "/ProcSet");
+    assert(strcmp(qpdf_oh_unparse(qpdf, procset),
+           "5 0 R") == 0);
+    assert(strcmp(qpdf_oh_unparse_resolved(qpdf, procset),
+           "[ /PDF /Text ]") == 0);
+    qpdf_oh_make_direct(qpdf, procset);
+    assert(strcmp(qpdf_oh_unparse(qpdf, procset),
+           "[ /PDF /Text ]") == 0);
+    qpdf_oh_replace_key(qpdf, resources, "/ProcSet", procset);
+
+    qpdf_oh parsed = qpdf_oh_parse(
+        qpdf, "[ 1 2.0 (3\xf7) << /Four [/Five] >> null true ]");
+    qpdf_oh p_int = qpdf_oh_get_array_item(qpdf, parsed, 0);
+    qpdf_oh p_real = qpdf_oh_get_array_item(qpdf, parsed, 1);
+    qpdf_oh p_string = qpdf_oh_get_array_item(qpdf, parsed, 2);
+    qpdf_oh p_dict = qpdf_oh_get_array_item(qpdf, parsed, 3);
+    qpdf_oh p_null = qpdf_oh_get_array_item(qpdf, parsed, 4);
+    qpdf_oh p_bool = qpdf_oh_get_array_item(qpdf, parsed, 5);
+    assert(qpdf_oh_is_integer(qpdf, p_int) &&
+           qpdf_oh_get_int_value_as_int(qpdf, p_int) == 1);
+    assert(qpdf_oh_is_real(qpdf, p_real) &&
+           (strcmp(qpdf_oh_get_real_value(qpdf, p_real), "2.0") == 0) &&
+           qpdf_oh_get_numeric_value(qpdf, p_real) == 2.0);
+    assert(qpdf_oh_is_string(qpdf, p_string) &&
+           (strcmp(qpdf_oh_get_string_value(qpdf, p_string), "3\xf7") == 0) &&
+           (strcmp(qpdf_oh_get_utf8_value(qpdf, p_string), "3\xc3\xb7") == 0) &&
+           (strcmp(qpdf_oh_unparse_binary(qpdf, p_string), "<33f7>") == 0));
+    assert(qpdf_oh_is_dictionary(qpdf, p_dict));
+    qpdf_oh p_five = qpdf_oh_get_key(qpdf, p_dict, "/Four");
+    assert(qpdf_oh_is_or_has_name(qpdf, p_five, "/Five"));
+    assert(qpdf_oh_is_or_has_name(
+               qpdf, qpdf_oh_get_array_item(qpdf, p_five, 0), "/Five"));
+    assert(qpdf_oh_is_null(qpdf, p_null));
+    assert(qpdf_oh_is_bool(qpdf, p_bool) &&
+           (qpdf_oh_get_bool_value(qpdf, p_bool) == QPDF_TRUE));
+    qpdf_oh_erase_item(qpdf, parsed, 4);
+    qpdf_oh_insert_item(
+        qpdf, parsed, 2,
+        qpdf_oh_parse(qpdf, "<</A 1 /B 2 /C 3 /D 4>>"));
+    qpdf_oh new_dict = qpdf_oh_get_array_item(qpdf, parsed, 2);
+    assert(qpdf_oh_has_key(qpdf, new_dict, "/A"));
+    assert(qpdf_oh_has_key(qpdf, new_dict, "/D"));
+    qpdf_oh new_array = qpdf_oh_new_array(qpdf);
+    qpdf_oh_replace_or_remove_key(
+        qpdf, new_dict, "/A", qpdf_oh_new_null(qpdf));
+    qpdf_oh_replace_or_remove_key(
+        qpdf, new_dict, "/B", new_array);
+    qpdf_oh_replace_key(
+        qpdf, new_dict, "/C", qpdf_oh_new_dictionary(qpdf));
+    qpdf_oh_remove_key(qpdf, new_dict, "/D");
+    assert(! qpdf_oh_has_key(qpdf, new_dict, "/A"));
+    assert(! qpdf_oh_has_key(qpdf, new_dict, "/D"));
+    qpdf_oh_append_item(
+        qpdf, new_array, qpdf_oh_new_string(qpdf, "potato"));
+    qpdf_oh_append_item(
+        qpdf, new_array,
+        qpdf_oh_new_unicode_string(qpdf, "qww\xc3\xb7\xcf\x80"));
+    qpdf_oh_append_item(qpdf, new_array, qpdf_oh_new_null(qpdf)); /* 2 */
+    qpdf_oh_append_item(qpdf, new_array, qpdf_oh_new_null(qpdf)); /* 3 */
+    qpdf_oh_set_array_item(
+        qpdf, new_array, 2,
+        qpdf_oh_new_name(qpdf, "/Quack"));
+    qpdf_oh_append_item(
+        qpdf, new_array,
+        qpdf_oh_new_real_from_double(qpdf, 4.0, 2));
+    qpdf_oh_append_item(
+        qpdf, new_array,
+        qpdf_oh_new_real_from_string(qpdf, "5.0"));
+    qpdf_oh_append_item(
+        qpdf, new_array,
+        qpdf_oh_new_integer(qpdf, 6));
+    qpdf_oh_append_item(
+        qpdf, new_array, qpdf_oh_new_bool(qpdf, QPDF_TRUE));
+    qpdf_oh_replace_key(qpdf, root, "/QTest", new_dict);
+
+    /* Release and access to exercise warnings */
+    qpdf_oh_release(qpdf, page1);
+    contents = qpdf_oh_get_key(qpdf, page1, "/Contents");
+    assert(qpdf_oh_is_null(qpdf, contents));
+    assert(qpdf_oh_is_array(qpdf, mediabox));
+    qpdf_oh_release_all(qpdf);
+    assert(! qpdf_oh_is_null(qpdf, mediabox));
+    assert(! qpdf_oh_is_array(qpdf, mediabox));
+    /* Make sure something is assigned when we exit so we check that
+     * it gets properl freed.
+     */
+    qpdf_get_root(qpdf);
+
+    qpdf_init_write(qpdf, outfile);
+    qpdf_set_static_ID(qpdf, QPDF_TRUE);
+    qpdf_set_qdf_mode(qpdf, QPDF_TRUE);
+    qpdf_set_suppress_original_object_IDs(qpdf, QPDF_TRUE);
+    qpdf_write(qpdf);
+    report_errors();
+}
+
 int main(int argc, char* argv[])
 {
     char* p = 0;
@@ -558,6 +729,7 @@ int main(int argc, char* argv[])
 	  (n == 21) ? test21 :
 	  (n == 22) ? test22 :
 	  (n == 23) ? test23 :
+	  (n == 24) ? test24 :
 	  0);
 
     if (fn == 0)

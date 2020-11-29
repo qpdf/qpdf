@@ -457,3 +457,67 @@ QPDF copy foreign with data 1
 QPDF copy foreign with foreign_stream 1
 QPDFObjectHandle need_newline 1
 qpdf pages range omitted with . 0
+qpdf-c invalid object handle 0
+qpdf-c called qpdf_oh_release 0
+qpdf-c called qpdf_oh_release_all 0
+qpdf-c called qpdf_get_trailer 0
+qpdf-c called qpdf_get_root 0
+qpdf-c called qpdf_oh_is_bool 0
+qpdf-c called qpdf_oh_is_null 0
+qpdf-c called qpdf_oh_is_integer 0
+qpdf-c called qpdf_oh_is_real 0
+qpdf-c called qpdf_oh_is_name 0
+qpdf-c called qpdf_oh_is_string 0
+qpdf-c called qpdf_oh_is_operator 0
+qpdf-c called qpdf_oh_is_inline_image 0
+qpdf-c called qpdf_oh_is_array 0
+qpdf-c called qpdf_oh_is_dictionary 0
+qpdf-c called qpdf_oh_is_stream 0
+qpdf-c called qpdf_oh_is_indirect 0
+qpdf-c called qpdf_oh_is_scalar 0
+qpdf-c array to wrap_in_array 0
+qpdf-c non-array to wrap_in_array 0
+qpdf-c called qpdf_oh_parse 0
+qpdf-c called qpdf_oh_get_bool_value 0
+qpdf-c called qpdf_oh_get_int_value 0
+qpdf-c called qpdf_oh_get_int_value_as_int 0
+qpdf-c called qpdf_oh_get_uint_value 0
+qpdf-c called qpdf_oh_get_uint_value_as_uint 0
+qpdf-c called qpdf_oh_get_real_value 0
+qpdf-c called qpdf_oh_is_number 0
+qpdf-c called qpdf_oh_get_numeric_value 0
+qpdf-c called qpdf_oh_get_name 0
+qpdf-c called qpdf_oh_get_string_value 0
+qpdf-c called qpdf_oh_get_utf8_value 0
+qpdf-c called qpdf_oh_get_array_n_items 0
+qpdf-c called qpdf_oh_get_array_item 0
+qpdf-c called qpdf_oh_begin_dict_key_iter 0
+qpdf-c called qpdf_oh_dict_more_keys 0
+qpdf-c called qpdf_oh_dict_next_key 0
+qpdf-c called qpdf_oh_has_key 0
+qpdf-c called qpdf_oh_get_key 0
+qpdf-c called qpdf_oh_is_or_has_name 0
+qpdf-c called qpdf_oh_new_null 0
+qpdf-c called qpdf_oh_new_bool 0
+qpdf-c called qpdf_oh_new_integer 0
+qpdf-c called qpdf_oh_new_real_from_string 0
+qpdf-c called qpdf_oh_new_real_from_double 0
+qpdf-c called qpdf_oh_new_name 0
+qpdf-c called qpdf_oh_new_string 0
+qpdf-c called qpdf_oh_new_unicode_string 0
+qpdf-c called qpdf_oh_new_array 0
+qpdf-c called qpdf_oh_new_dictionary 0
+qpdf-c called qpdf_oh_make_direct 0
+qpdf-c called qpdf_oh_set_array_item 0
+qpdf-c called qpdf_oh_insert_item 0
+qpdf-c called qpdf_oh_append_item 0
+qpdf-c called qpdf_oh_erase_item 0
+qpdf-c called qpdf_oh_replace_key 0
+qpdf-c called qpdf_oh_remove_key 0
+qpdf-c called qpdf_oh_replace_or_remove_key 0
+qpdf-c called qpdf_oh_get_dict 0
+qpdf-c called qpdf_oh_get_object_id 0
+qpdf-c called qpdf_oh_get_generation 0
+qpdf-c called qpdf_oh_unparse 0
+qpdf-c called qpdf_oh_unparse_resolved 0
+qpdf-c called qpdf_oh_unparse_binary 0

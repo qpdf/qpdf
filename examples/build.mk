@@ -11,7 +11,9 @@ BINS_examples = \
 	pdf-count-strings \
 	pdf-set-form-values \
 	pdf-overlay-page
-CBINS_examples = pdf-linearize
+CBINS_examples = \
+	pdf-c-objects \
+	pdf-linearize
 
 TARGETS_examples = $(foreach B,$(BINS_examples) $(CBINS_examples),examples/$(OUTPUT_DIR)/$(call binname,$(B)))
 

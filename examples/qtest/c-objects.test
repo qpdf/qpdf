@@ -1,0 +1,33 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+chdir("c-objects") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('c-objects');
+
+my $qpdf = $ENV{'QPDF_BIN'} or die;
+
+foreach my $i (qw(1 2))
+{
+    $td->runtest("c-objects ($i)",
+                 {$td->COMMAND => "pdf-c-objects $i.pdf '' a.pdf"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0});
+    $td->runtest("check output",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => "$i-out.pdf"});
+}
+
+cleanup();
+
+$td->report(4);
+
+sub cleanup
+{
+    unlink "a.pdf";
+}

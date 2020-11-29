@@ -4120,6 +4120,21 @@ foreach my $i (@c_check_types)
 
 show_ntests();
 # ----------
+$td->notify("--- C API Object Handle ---");
+$n_tests += scalar(@c_check_types);
+
+$td->runtest("C check object handles",
+             {$td->COMMAND => "qpdf-ctest 24 minimal.pdf '' a.pdf"},
+             {$td->FILE => "c-object-handles.out",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("check output",
+	     {$td->FILE => 'a.pdf'},
+	     {$td->FILE => 'c-object-handles-out.pdf'});
+
+show_ntests();
+# ----------
 $td->notify("--- Content Preservation Tests ---");
 # $n_tests incremented below
 
