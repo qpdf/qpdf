@@ -167,6 +167,8 @@ QPDF::Members::Members() :
     immediate_copy_from(false),
     in_parse(false),
     parsed(false),
+    obj_cache_prunable(false),
+    obj_cache_was_prunable(false),
     first_xref_item_offset(0),
     uncompressed_after_compressed(false)
 {
@@ -1488,6 +1490,92 @@ QPDF::fixDanglingReferences(bool force)
     }
 }
 
+void
+QPDF::maybePruneObjectCache()
+{
+    if (! this->m->obj_cache_was_prunable)
+    {
+        return;
+    }
+
+    size_t const max_objects = 100000; // QXXXQ configurable?
+    size_t const target_objects = max_objects - 10000; // QXXXQ
+
+    if (this->m->obj_cache.size() <= max_objects)
+    {
+        return;
+    }
+
+    std::set<int> ostreams;
+    size_t num_to_remove = this->m->obj_cache.size() - target_objects;
+    std::set<QPDFObjGen> to_remove;
+    for (auto const& iter: this->m->obj_cache)
+    {
+        if (iter.second.prunable)
+        {
+            QPDFObjGen const& og = iter.first;
+            to_remove.insert(og);
+            if (og.getGen() == 0)
+            {
+                auto ostream_iter =
+                    this->m->object_to_ostream.find(og.getObj());
+                if (ostream_iter != this->m->object_to_ostream.end())
+                {
+                    ostreams.insert((*ostream_iter).second);
+                }
+            }
+            if (--num_to_remove == 0)
+            {
+                break;
+            }
+        }
+    }
+
+    // If we remove any object that belongs to an object stream, we
+    // must remove all of them, and we must clear the object stream
+    // from the list of resolved object streams.
+    QTC::TC("qpdf", "prune with ostreams",
+            ostreams.empty() ? 0 : 1);
+    for (auto i: ostreams)
+    {
+        for (auto j: this->m->ostream_to_objects[i])
+        {
+            to_remove.insert(QPDFObjGen(j, 0));
+        }
+        this->m->resolved_object_streams.erase(i);
+    }
+
+    removeFromObjCache(to_remove);
+}
+
+void
+QPDF::removePrunableObjects()
+{
+    std::set<QPDFObjGen> to_remove;
+    for (auto const& iter: this->m->obj_cache)
+    {
+        if (iter.second.prunable)
+        {
+            to_remove.insert(iter.first);
+        }
+    }
+    removeFromObjCache(to_remove);
+    this->m->obj_cache_was_prunable = false;
+}
+
+void
+QPDF::removeFromObjCache(std::set<QPDFObjGen> const& to_remove)
+{
+    for (auto const& og: to_remove)
+    {
+        auto iter = this->m->obj_cache.find(og);
+	QPDFObject::ObjAccessor::releaseResolved(
+	    (*iter).second.object.getPointer());
+        this->m->obj_cache.erase(iter);
+    }
+}
+
+
 size_t
 QPDF::getObjectCount()
 {
@@ -2007,7 +2095,8 @@ QPDF::readObjectAtOffset(bool try_recovery,
 
 	this->m->obj_cache[og] =
 	    ObjCache(QPDFObjectHandle::ObjAccessor::getObject(oh),
-		     end_before_space, end_after_space);
+		     this->m->obj_cache_prunable,
+                     end_before_space, end_after_space);
     }
 
     return oh;
@@ -2016,6 +2105,8 @@ QPDF::readObjectAtOffset(bool try_recovery,
 PointerHolder<QPDFObject>
 QPDF::resolve(int objid, int generation)
 {
+    maybePruneObjectCache();
+
     // Check object cache before checking xref table.  This allows us
     // to insert things into the object cache that don't actually
     // exist in the file.
@@ -2086,7 +2177,8 @@ QPDF::resolve(int objid, int generation)
         QTC::TC("qpdf", "QPDF resolve failure to null");
         QPDFObjectHandle oh = QPDFObjectHandle::newNull();
         this->m->obj_cache[og] =
-            ObjCache(QPDFObjectHandle::ObjAccessor::getObject(oh), -1, -1);
+            ObjCache(QPDFObjectHandle::ObjAccessor::getObject(oh),
+                     false, -1, -1);
     }
 
     PointerHolder<QPDFObject> result(this->m->obj_cache[og].object);
@@ -2186,6 +2278,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
     // that some objects stored here might have been overridden by new
     // objects appended to the file, so it is necessary to recheck the
     // xref table and only cache what would actually be resolved here.
+    std::set<int> objects_in_ostream;
     for (std::map<int, int>::iterator iter = offsets.begin();
 	 iter != offsets.end(); ++iter)
     {
@@ -2195,11 +2288,14 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
         if ((entry.getType() == 2) &&
             (entry.getObjStreamNumber() == obj_stream_number))
         {
+            objects_in_ostream.insert(obj);
+            this->m->object_to_ostream[obj] = obj_stream_number;
             int offset = (*iter).second;
             input->seek(offset, SEEK_SET);
             QPDFObjectHandle oh = readObject(input, "", obj, 0, true);
             this->m->obj_cache[og] =
                 ObjCache(QPDFObjectHandle::ObjAccessor::getObject(oh),
+                         this->m->obj_cache_prunable,
                          end_before_space, end_after_space);
         }
         else
@@ -2207,6 +2303,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
             QTC::TC("qpdf", "QPDF not caching overridden objstm object");
         }
     }
+    this->m->ostream_to_objects[obj_stream_number] = objects_in_ostream;
 }
 
 QPDFObjectHandle
@@ -2220,7 +2317,8 @@ QPDF::makeIndirectObject(QPDFObjectHandle oh)
     }
     QPDFObjGen next(max_objid + 1, 0);
     this->m->obj_cache[next] =
-	ObjCache(QPDFObjectHandle::ObjAccessor::getObject(oh), -1, -1);
+	ObjCache(QPDFObjectHandle::ObjAccessor::getObject(oh),
+                 this->m->obj_cache_prunable, -1, -1);
     return QPDFObjectHandle::Factory::newIndirect(
         this, next.getObj(), next.getGen());
 }
@@ -2259,7 +2357,7 @@ QPDF::replaceObject(int objid, int generation, QPDFObjectHandle oh)
     // Replace the object in the object cache
     QPDFObjGen og(objid, generation);
     this->m->obj_cache[og] =
-	ObjCache(QPDFObjectHandle::ObjAccessor::getObject(oh), -1, -1);
+	ObjCache(QPDFObjectHandle::ObjAccessor::getObject(oh), false, -1, -1);
 }
 
 void

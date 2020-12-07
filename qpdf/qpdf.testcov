@@ -457,3 +457,4 @@ QPDF copy foreign with data 1
 QPDF copy foreign with foreign_stream 1
 QPDFObjectHandle need_newline 1
 qpdf pages range omitted with . 0
+prune with ostreams 1

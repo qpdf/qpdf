@@ -1,6 +1,10 @@
 Candidates for upcoming release
 ===============================
 
+* Prunable cache. Add something to the manual in the design section.
+  Call it "Pruning the Object Cache" (ref.pruneing-object-cache) and
+  add it as a subjection under ref.implementation-notes.
+
 * Open "next" issues
   * bugs
     * #473: zsh completion with directories

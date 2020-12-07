@@ -651,6 +651,46 @@ class QPDF
         }
     };
 
+    // PrunableCache class allows the library internally to set the
+    // object cache to a prunable state for the duration of a specific
+    // operation. See ref.pruneing-object-cache in the manual for a
+    // detailed discussion.
+    class PrunableCache
+    {
+        friend class QPDF;
+        friend class QPDFWriter;
+      private:
+        PrunableCache(QPDF* qpdf, bool v) :
+            qpdf(qpdf),
+            old_value(qpdf->m->obj_cache_prunable)
+        {
+            qpdf->m->obj_cache_prunable = v;
+            if (v)
+            {
+                qpdf->m->obj_cache_was_prunable = true;
+            }
+        }
+        ~PrunableCache()
+        {
+            bool v = this->qpdf->m->obj_cache_prunable;
+            this->qpdf->m->obj_cache_prunable = this->old_value;
+            if (v && (! this->old_value))
+            {
+                // After we finish inserting prunable objects, we have
+                // to remove them from the cache so that subsequent
+                // modifications will stick.
+                this->qpdf->removePrunableObjects();
+            }
+        }
+
+        PrunableCache(PrunableCache const&) = delete;
+        PrunableCache& operator=(PrunableCache const&) = delete;
+
+        QPDF* qpdf;
+        bool old_value;
+    };
+    friend class PrunableCache;
+
     // Resolver class is restricted to QPDFObjectHandle so that only
     // it can resolve indirect references.
     class Resolver
@@ -734,6 +774,7 @@ class QPDF
 	{
 	}
 	ObjCache(PointerHolder<QPDFObject> object,
+                 bool prunable,
 		 qpdf_offset_t end_before_space,
 		 qpdf_offset_t end_after_space) :
 	    object(object),
@@ -743,6 +784,7 @@ class QPDF
 	}
 
 	PointerHolder<QPDFObject> object;
+        bool prunable;
 	qpdf_offset_t end_before_space;
 	qpdf_offset_t end_after_space;
     };
@@ -921,6 +963,9 @@ class QPDF
                                Pipeline* pipeline,
                                bool suppress_warnings,
                                bool will_retry);
+    void maybePruneObjectCache();
+    void removePrunableObjects();
+    void removeFromObjCache(std::set<QPDFObjGen> const& to_remove);
 
     // For QPDFWriter:
 
@@ -1404,6 +1449,10 @@ class QPDF
         bool in_parse;
         bool parsed;
         std::set<int> resolved_object_streams;
+        bool obj_cache_prunable;
+        bool obj_cache_was_prunable;
+        std::map<int, int> object_to_ostream;
+        std::map<int, std::set<int>> ostream_to_objects;
 
         // Linearization data
         qpdf_offset_t first_xref_item_offset; // actual value from file
