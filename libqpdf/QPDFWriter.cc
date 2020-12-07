@@ -1501,16 +1501,6 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
     }
     else if (object.isDictionary())
     {
-        // Make a shallow copy of this object so we can modify it
-        // safely without affecting the original. This code makes
-        // assumptions about things that are made true in
-        // prepareFileForWrite, such as that certain things are direct
-        // objects so that replacing them doesn't leave unreferenced
-        // objects in the output. We can use unsafeShallowCopy here
-        // because we are all we are doing is removing or replacing
-        // top-level keys.
-        object = object.unsafeShallowCopy();
-
         // Handle special cases for specific dictionaries.
 
         // Extensions dictionaries.
@@ -1629,25 +1619,26 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 
         // Stream dictionaries.
 
+        std::set<std::string> suppressed_keys;
         if (flags & f_stream)
         {
             // Suppress /Length since we will write it manually
-            object.removeKey("/Length");
+            suppressed_keys.insert("/Length");
 
             // If /DecodeParms is an empty list, remove it.
             if (object.getKey("/DecodeParms").isArray() &&
                 (0 == object.getKey("/DecodeParms").getArrayNItems()))
             {
                 QTC::TC("qpdf", "QPDFWriter remove empty DecodeParms");
-                object.removeKey("/DecodeParms");
+                suppressed_keys.insert("/DecodeParms");
             }
 
 	    if (flags & f_filtered)
             {
                 // We will supply our own filter and decode
                 // parameters.
-                object.removeKey("/Filter");
-                object.removeKey("/DecodeParms");
+                suppressed_keys.insert("/Filter");
+                suppressed_keys.insert("/DecodeParms");
             }
             else
             {
@@ -1659,8 +1650,8 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
                 {
                     if (filter.isName())
                     {
-                        object.removeKey("/Filter");
-                        object.removeKey("/DecodeParms");
+                        suppressed_keys.insert("/Filter");
+                        suppressed_keys.insert("/DecodeParms");
                     }
                     else
                     {
@@ -1699,6 +1690,11 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	     iter != keys.end(); ++iter)
 	{
 	    std::string const& key = *iter;
+
+            if (suppressed_keys.count(key) > 0)
+            {
+                continue;
+            }
 
 	    writeStringQDF(indent);
 	    writeStringQDF("  ");
@@ -2440,6 +2436,10 @@ QPDFWriter::getTrimmedTrailer()
 void
 QPDFWriter::prepareFileForWrite()
 {
+    // QXXXQ Stop doing a traversal here. Instead, just do the root
+    // stuff, and for stream dict keys, catch it while enqueueing.
+
+
     // Do a traversal of the entire PDF file structure replacing all
     // indirect objects that QPDFWriter wants to be direct.  This
     // includes stream lengths, stream filtering parameters, and
@@ -2504,7 +2504,12 @@ QPDFWriter::prepareFileForWrite()
                 bool add_to_queue = true;
                 if (is_stream)
                 {
-                    if (oh.isIndirect() &&
+                    // QXXXQ this block only matters for linearized
+                    // files. Figure out why. It has to do with the
+                    // way objects are added to the queue...we end up
+                    // not skipping indirect versions of these.
+                    if ((this->m->linearized) &&
+                        oh.isIndirect() &&
                         ((key == "/Length") ||
                          (filterable &&
                           ((key == "/Filter") ||
