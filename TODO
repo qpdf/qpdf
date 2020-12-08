@@ -1,9 +1,96 @@
-Candidates for upcoming release
-===============================
+Prunable Cache
+==============
+
+This abandoned branch includes a partial implementation of a prunable
+cache. The way qpdf works internally is that, once an object is read
+from the file, the object appears in obj_cache. Mutations on the
+object are performed in the cache. If an object were removed from the
+cache, any modifications to the object would be lost. Also, as new
+objects are created or dangling references are resolved to nulls, new
+objects are created in the cache that aren't reflected in the original
+file.
+
+A side effect of this implementation is that any traversal of the
+file, including fixDanglingReferences, optimization for linearization,
+getAllObjects, and writing, result in all objects being loaded into
+the cache. If a file has a very large number of objects, this can
+result in using a very large amount of memory. A file was encountered
+in the wild that has 1.2 million objects, mostly from document
+structure, such that qpdf grew to over 3 GB of RAM when all objects
+were loaded into cache.
+
+In order to reduce the amount of RAM used by qpdf, I had considered
+implementation a prunable cache. The idea was that, if there were
+operations that caused all objects to be loaded into the cache but it
+was known that no object not already in the cache would be modified,
+it would be safe to subsequently remove those items from the cache.
+Furthermore, it would be safe to remove items from the cache during
+the process to keep the cache from growing too large. This would limit
+the overall memory usage at the expense of having to read objects from
+the input source multiple times. The implementation works like this:
+
+* Have a flag that indicates that we are doing an operation in which
+  no objects already in the cache will be modified. Turn this on
+  before any large traversal, taking care to avoid modifying objects
+  during the traversal. Any objects loaded into the cache at this time
+  would be marked as prunable.
+
+* If the cache exceeds a certain side, prune objects, taking care of
+  the following details:
+
+  * Call releaseResolved on any object before removing it from the
+    cache
+  * Take care to remove all objects from an object stream if removing
+    any objects from the object stream; exercise the same precaution
+    about overridden objects as existing code
+
+* At the end of an operation that loads prunable objects into the
+  cache, remove all of them from the cache. This prevents a subsequent
+  modification to one of those items from being lost if that item
+  should later be flushed from the cache.
+
+The code to do this was implemented but not tested, and I lack
+confidence that the code is really safe. I am concerned about whether
+releaseResolved is really working in this case or whether this is
+creating memory leaks, and it's really hard to be sure that it's
+possible to avoid mutation during some of these traversals. For
+example, pushInheritedAttributesToPage does mutations, and there are
+lots of mutations in QPDFWriter. Also, there are several cases in the
+qpdf code that assume a traversal (or iteration through all objects)
+is relatively cheap once everything is in cache. There are places in
+the code that assume that, once fixDanglingReferences has been called,
+iterating through the object cache is sufficient to touch all objects.
+These assumptions would be invalidated by this change, which creates a
+high risk for bugs that would be very hard to track down.
+
+For these reasons, this change was abandoned.
+
+If we ever really wanted to reduce qpdf's memory footprint in the case
+of files with large numbers of objects, the code would have to be
+scrutinized very carefully before an approach like this could be
+safely considered. Alternatively, some entirely different approach
+could be used, such as having the object cache backed to some
+temporary file on disk like maybe a sqlite database. However this
+could also require using lots of RAM, and so far, qpdf has been able
+to avoid the thorny issue of temporary files, which are not possible
+to use in some environments.
+
+If I were going to finish this implementation, my intention was to
+write a section in the manual. Here was the bullet in the TODO. There
+was a reference in a code comment to this.
 
 * Prunable cache. Add something to the manual in the design section.
   Call it "Pruning the Object Cache" (ref.pruneing-object-cache) and
   add it as a subjection under ref.implementation-notes.
+
+At the time of abandoning this branch, check_qpdf failed with some
+coverage failures for newly added coverage cases. There was also one
+test failure for recovery from an infinite loop that no longer
+occurred.
+
+
+Candidates for upcoming release
+===============================
 
 * Open "next" issues
   * bugs
