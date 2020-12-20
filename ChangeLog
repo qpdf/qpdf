@@ -1,3 +1,8 @@
+2020-12-20  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add qpdf_register_progress_reporter method to C API,
+	corresponding to QPDFWriter::registerProgressReporter. Fixes #487.
+
 2020-11-28  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add new functions to the C API for manipulating

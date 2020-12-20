@@ -57,6 +57,30 @@ _qpdf_data::~_qpdf_data()
 {
 }
 
+class ProgressReporter: public QPDFWriter::ProgressReporter
+{
+  public:
+    ProgressReporter(void (*handler)(int, void*), void* data);
+    virtual ~ProgressReporter() = default;
+    virtual void reportProgress(int);
+
+  private:
+    void (*handler)(int, void*);
+    void* data;
+};
+
+ProgressReporter::ProgressReporter(void (*handler)(int, void*), void* data) :
+    handler(handler),
+    data(data)
+{
+}
+
+void
+ProgressReporter::reportProgress(int progress)
+{
+    this->handler(progress, this->data);
+}
+
 // must set qpdf->filename and qpdf->password
 static void call_read(qpdf_data qpdf)
 {
@@ -750,6 +774,15 @@ void qpdf_force_pdf_version_and_extension(
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_force_pdf_version");
     qpdf->qpdf_writer->forcePDFVersion(version, extension_level);
+}
+
+void qpdf_register_progress_reporter(
+    qpdf_data qpdf,
+    void (*report_progress)(int percent, void* data),
+    void* data)
+{
+    qpdf->qpdf_writer->registerProgressReporter(
+        new ProgressReporter(report_progress, data));
 }
 
 QPDF_ERROR_CODE qpdf_write(qpdf_data qpdf)

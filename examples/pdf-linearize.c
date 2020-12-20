@@ -15,6 +15,11 @@ static void usage()
     exit(2);
 }
 
+static void write_progress(int percent, void* data)
+{
+    printf("%s progress: %d%%\n", (char const*)(data), percent);
+}
+
 int main(int argc, char* argv[])
 {
     char* infile = NULL;
@@ -55,6 +60,7 @@ int main(int argc, char* argv[])
          * qpdf_set_deterministic_ID. */
 	qpdf_set_static_ID(qpdf, QPDF_TRUE); /* for testing only */
 	qpdf_set_linearization(qpdf, QPDF_TRUE);
+        qpdf_register_progress_reporter(qpdf, write_progress, infile);
 	qpdf_write(qpdf);
     }
     while (qpdf_more_warnings(qpdf))

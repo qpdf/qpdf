@@ -467,6 +467,18 @@ extern "C" {
     void qpdf_force_pdf_version_and_extension(
         qpdf_data qpdf, char const* version, int extension_level);
 
+    /* During write, your report_progress function will be called with
+     * a value between 0 and 100 representing the approximate write
+     * progress. The data object you pass to
+     * qpdf_register_progress_reporter will be handed back to your
+     * function.
+     */
+    QPDF_DLL
+    void qpdf_register_progress_reporter(
+        qpdf_data qpdf,
+        void (*report_progress)(int percent, void* data),
+        void* data);
+
     /* Do actual write operation. */
     QPDF_DLL
     QPDF_ERROR_CODE qpdf_write(qpdf_data qpdf);
