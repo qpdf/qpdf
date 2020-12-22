@@ -69,7 +69,7 @@ enum qpdf_stream_decode_level_e
     qpdf_dl_none = 0,           /* preserve all stream filters */
     qpdf_dl_generalized,        /* decode general-purpose filters */
     qpdf_dl_specialized,        /* also decode other non-lossy filters */
-    qpdf_dl_all                 /* also decode loss filters */
+    qpdf_dl_all                 /* also decode lossy filters */
 };
 
 /* R3 Encryption Parameters */

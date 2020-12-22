@@ -206,7 +206,7 @@ namespace QIntC // QIntC = qpdf Integer Conversion
     }
 
     template <typename T>
-    unsigned long  to_ulong(T const& i)
+    unsigned long to_ulong(T const& i)
     {
         return IntConverter<T, unsigned long >::convert(i);
     }
