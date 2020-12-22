@@ -1,3 +1,10 @@
+2020-12-22  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add QPDFObjectHandle::makeDirect(bool allow_streams) -- if
+	allow_streams is true, preserve indirect references to streams
+	rather than throwing an exception. This allows the object to be
+	made as direct as possible while preserving stream references.
+
 2020-12-20  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add qpdf_register_progress_reporter method to C API,

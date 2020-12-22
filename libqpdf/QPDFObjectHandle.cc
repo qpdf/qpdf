@@ -2605,18 +2605,24 @@ QPDFObjectHandle::shallowCopyInternal(QPDFObjectHandle& new_obj,
     }
 
     std::set<QPDFObjGen> visited;
-    new_obj.copyObject(visited, false, first_level_only);
+    new_obj.copyObject(visited, false, first_level_only, false);
 }
 
 void
 QPDFObjectHandle::copyObject(std::set<QPDFObjGen>& visited,
-                             bool cross_indirect, bool first_level_only)
+                             bool cross_indirect, bool first_level_only,
+                             bool stop_at_streams)
 {
     assertInitialized();
 
     if (isStream())
     {
-	QTC::TC("qpdf", "QPDFObjectHandle ERR clone stream");
+	QTC::TC("qpdf", "QPDFObjectHandle copy stream",
+                stop_at_streams ? 0 : 1);
+        if (stop_at_streams)
+        {
+            return;
+        }
 	throw std::runtime_error(
 	    "attempt to make a stream into a direct object");
     }
@@ -2690,7 +2696,8 @@ QPDFObjectHandle::copyObject(std::set<QPDFObjGen>& visited,
                 (cross_indirect || (! items.back().isIndirect())))
             {
                 items.back().copyObject(
-                    visited, cross_indirect, first_level_only);
+                    visited, cross_indirect,
+                    first_level_only, stop_at_streams);
             }
 	}
 	new_obj = new QPDF_Array(items);
@@ -2708,7 +2715,8 @@ QPDFObjectHandle::copyObject(std::set<QPDFObjGen>& visited,
                 (cross_indirect || (! items[*iter].isIndirect())))
             {
                 items[*iter].copyObject(
-                    visited, cross_indirect, first_level_only);
+                    visited, cross_indirect,
+                    first_level_only, stop_at_streams);
             }
 	}
 	new_obj = new QPDF_Dictionary(items);
@@ -2730,8 +2738,14 @@ QPDFObjectHandle::copyObject(std::set<QPDFObjGen>& visited,
 void
 QPDFObjectHandle::makeDirect()
 {
+    makeDirect(false);
+}
+
+void
+QPDFObjectHandle::makeDirect(bool allow_streams)
+{
     std::set<QPDFObjGen> visited;
-    copyObject(visited, true, false);
+    copyObject(visited, true, false, allow_streams);
 }
 
 void

@@ -79,7 +79,7 @@ QPDFObjectHandle clone string 0
 QPDFObjectHandle clone array 0
 QPDFObjectHandle clone dictionary 0
 QPDFObjectHandle makeDirect loop 0
-QPDFObjectHandle ERR clone stream 0
+QPDFObjectHandle copy stream 1
 QPDF default for xref stream field 0 0
 QPDF prev key in xref stream dictionary 0
 QPDF prev key in trailer dictionary 0

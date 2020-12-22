@@ -155,6 +155,8 @@ ABI Changes
 This is a list of changes to make next time there is an ABI change.
 Comments appear in the code prefixed by "ABI"
 
+* Merge two versions of QPDFObjectHandle::makeDirect per comment
+
 Page splitting/merging
 ======================
 

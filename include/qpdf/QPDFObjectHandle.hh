@@ -721,8 +721,20 @@ class QPDFObjectHandle
 
     // Mutator methods.  Use with caution.
 
-    // Recursively copy this object, making it direct.  Throws an
-    // exception if a loop is detected or any sub-object is a stream.
+    // Recursively copy this object, making it direct. An exception is
+    // thrown if a loop is detected. With allow_streams true, keep
+    // indirect object references to streams. Otherwise, throw an
+    // exception if any sub-object is a stream. Note that, when
+    // allow_streams is true and a stream is found, the resulting
+    // object is still associated with the containing qpdf. When
+    // allow_streams is false, the object will no longer be connected
+    // to the original QPDF object after this call completes
+    // successfully.
+    QPDF_DLL
+    void makeDirect(bool allow_streams);
+    // Zero-arg version is equivalent to makeDirect(false).
+    // ABI: delete zero-arg version of makeDirect, and make
+    // allow_streams default to false.
     QPDF_DLL
     void makeDirect();
 
@@ -1121,7 +1133,7 @@ class QPDFObjectHandle
     void assertType(char const* type_name, bool istype);
     void dereference();
     void copyObject(std::set<QPDFObjGen>& visited, bool cross_indirect,
-                    bool first_level_only);
+                    bool first_level_only, bool stop_at_streams);
     void shallowCopyInternal(QPDFObjectHandle& oh, bool first_level_only);
     void releaseResolved();
     static void setObjectDescriptionFromInput(

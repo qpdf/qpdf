@@ -2963,7 +2963,7 @@ $td->runtest("check output",
 show_ntests();
 # ----------
 $td->notify("--- Mutability Tests ---");
-$n_tests += 4;
+$n_tests += 5;
 
 $td->runtest("no normalization",
 	     {$td->COMMAND => "test_driver 4 test4-1.pdf"},
@@ -2975,13 +2975,18 @@ $td->runtest("object ordering",
 	     {$td->FILE => "test4-4.qdf",
 	      $td->EXIT_STATUS => 0});
 
-$td->runtest("loop detected",
+$td->runtest("make direct with allow_streams",
+	     {$td->COMMAND => "test_driver 4 test4-5.pdf"},
+	     {$td->FILE => "test4-5.qdf",
+	      $td->EXIT_STATUS => 0});
+
+$td->runtest("stream detected",
 	     {$td->COMMAND => "test_driver 4 test4-2.pdf"},
 	     {$td->FILE => "test4-2.out",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
-$td->runtest("stream detected",
+$td->runtest("loop detected",
 	     {$td->COMMAND => "test_driver 4 test4-3.pdf"},
 	     {$td->FILE => "test4-3.out",
 	      $td->EXIT_STATUS => 2},

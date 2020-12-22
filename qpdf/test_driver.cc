@@ -485,6 +485,14 @@ void runtest(int n, char const* filename1, char const* arg2)
             A.setArrayFromVector(items);
         }
 
+        QPDFObjectHandle qtest2 = trailer.getKey("/QTest2");
+        if (! qtest2.isNull())
+        {
+            // Test allow_streams=true
+            qtest2.makeDirect(true);
+            trailer.replaceKey("/QTest2", qtest2);
+        }
+
 	trailer.replaceKey("/Info", pdf.makeIndirectObject(qtest));
 	QPDFWriter w(pdf, 0);
 	w.setQDFMode(true);
