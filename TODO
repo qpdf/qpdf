@@ -29,11 +29,6 @@ Candidates for upcoming release
   * big page even with --remove-unreferenced-resources=yes, even with --empty
   * optimize image failure because of colorspace
 
-* Make it possible for StreamDataProvider to modify the stream
-  dictionary in addition to the stream data so it can calculate things
-  about the dictionary at runtime. Will require a small change to
-  QPDFWriter.
-
 * Take flattenRotation code from pdf-split and do something with it,
   maybe adding it to the library. Once there, call it from pdf-split
   and bump up the required version of qpdf.
@@ -558,3 +553,49 @@ I find it useful to make reference to them in this list
    filtering and tokenizer rewrite and should be done in a manner that
    takes advantage of the other lexical features. This sanitizer
    should also clear metadata and replace images.
+
+ * Here are some notes about having stream data providers modify
+   stream dictionaries. I had wanted to add this functionality to make
+   it more efficient to create stream data providers that may
+   dynamically decide what kind of filters to use and that may end up
+   modifying the dictionary conditionally depending on the original
+   stream data. Ultimately I decided not to implement this feature.
+   This paragraph describes why.
+
+   * When writing, the way objects are placed into the queue for
+     writing strongly precludes creation of any new indirect objects,
+     or even changing which indirect objects are referenced from which
+     other objects, because we sometimes write as we are traversing
+     and enqueuing objects. For non-linearized files, there is a risk
+     that an indirect object that used to be referenced would no
+     longer be referenced, and whether it was already written to the
+     output file would be based on an accident of where it was
+     encountered when traversing the object structure. For linearized
+     files, the situation is considerably worse. We decide which
+     section of the file to write an object to based on a mapping of
+     which objects are used by which other objects. Changing this
+     mapping could cause an object to appear in the wrong section, to
+     be written even though it is unreferenced, or to be entirely
+     omitted since, during linearization, we don't enqueue new objects
+     as we traverse for writing.
+
+   * There are several places in QPDFWriter that query a stream's
+     dictionary in order to prepare for writing or to make decisions
+     about certain aspects of the writing process. If the stream data
+     provider has the chance to modify the dictionary, every piece of
+     code that gets stream data would have to be aware of this. This
+     would potentially include end user code. For example, any code
+     that called getDict() on a stream before installing a stream data
+     provider and expected that dictionary to be valid would
+     potentially be broken. As implemented right now, you must perform
+     any modifications on the dictionary in advance and provided
+     /Filter and /DecodeParms at the time you installed the stream
+     data provider. This means that some computations would have to be
+     done more than once, but for linearized files, stream data
+     providers are already called more than once. If the work done by
+     a stream data provider is especially expensive, it can implement
+     its own cache.
+
+   The implementation of pluggable stream filters includes an example
+   that illustrates how a program might handle making decisions about
+   filters and decode parameters based on the input data.

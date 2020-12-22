@@ -70,13 +70,28 @@ class QPDFObjectHandle
 	// QPDFWriter may, in some cases, add compression, but if it
 	// does, it will update the filters as needed. Every call to
 	// provideStreamData for a given stream must write the same
-	// data. The object ID and generation passed to this method
-	// are those that belong to the stream on behalf of which the
-	// provider is called. They may be ignored or used by the
-	// implementation for indexing or other purposes. This
-	// information is made available just to make it more
-	// convenient to use a single StreamDataProvider object to
-	// provide data for multiple streams.
+	// data. Note that, when writing linearized files, qpdf will
+	// call your provideStreamData twice, and if it generates
+	// different output, you risk generating invalid output or
+	// having qpdf throw an exception. The object ID and
+	// generation passed to this method are those that belong to
+	// the stream on behalf of which the provider is called. They
+	// may be ignored or used by the implementation for indexing
+	// or other purposes. This information is made available just
+	// to make it more convenient to use a single
+	// StreamDataProvider object to provide data for multiple
+	// streams.
+
+        // A few things to keep in mind:
+        //
+        // * Stream data providers must not modify any objects since
+        //   they may be called after some parts of the file have
+        //   already been written.
+        //
+        // * Since qpdf may call provideStreamData multiple times when
+        //   writing linearized files, if the work done by your stream
+        //   data provider is slow or computationally intensive, you
+        //   might want to implement your own cache.
 
         // Prior to qpdf 10.0.0, it was not possible to handle errors
         // the way pipeStreamData does or to pass back success.
