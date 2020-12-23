@@ -70,6 +70,7 @@ SRCS_libqpdf = \
 	libqpdf/QPDFPageDocumentHelper.cc \
 	libqpdf/QPDFPageLabelDocumentHelper.cc \
 	libqpdf/QPDFPageObjectHelper.cc \
+	libqpdf/QPDFStreamFilter.cc \
 	libqpdf/QPDFSystemError.cc \
 	libqpdf/QPDFTokenizer.cc \
 	libqpdf/QPDFWriter.cc \
@@ -94,6 +95,7 @@ SRCS_libqpdf = \
 	libqpdf/QUtil.cc \
 	libqpdf/RC4.cc \
 	libqpdf/SecureRandomDataProvider.cc \
+	libqpdf/SF_FlateLzwDecode.cc \
 	libqpdf/SparseOHArray.cc \
 	libqpdf/qpdf-c.cc
 

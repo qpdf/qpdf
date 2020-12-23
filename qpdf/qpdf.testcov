@@ -86,7 +86,7 @@ QPDF prev key in trailer dictionary 0
 QPDF found xref stream 0
 QPDF ignoring XRefStm in trailer 0
 QPDF xref deleted object 0
-QPDF_Stream PNG filter 0
+SF_FlateLzwDecode PNG filter 0
 QPDF xref /Index is null 0
 QPDF xref /Index is array 1
 QPDFWriter copy Extends 0
@@ -294,7 +294,7 @@ qpdf-c called qpdf_set_decode_level 0
 qpdf-c called qpdf_set_compress_streams 0
 qpdf-c called qpdf_set_preserve_unreferenced_objects 0
 qpdf-c called qpdf_set_newline_before_endstream 0
-QPDF_Stream TIFF predictor 0
+SF_FlateLzwDecode TIFF predictor 0
 QPDFTokenizer inline image at EOF 0
 Pl_QPDFTokenizer found ID 0
 QPDFObjectHandle non-stream in stream array 0

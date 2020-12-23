@@ -1,3 +1,13 @@
+2020-12-23  Jay Berkenbilt  <ejb@ql.org>
+
+	* Allow library users to provide their own decoders for stream
+	filters by deriving classes from QPDFStreamFilter and registering
+	them using QPDF::registerStreamFilter. Registered stream filters
+	provide code to validate and interpret /DecodeParms for a specific
+	/Filter and also to provide a pipeline that will decode. Note that
+	it is possible to encode to a filter type that is not supported
+	even without this feature.
+
 2020-12-22  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add QPDFObjectHandle::makeDirect(bool allow_streams) -- if

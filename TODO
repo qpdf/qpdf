@@ -317,13 +317,6 @@ I find it useful to make reference to them in this list
    is exercised elsewhere in qpdf's test suite, so this is not that
    pressing.
 
- * Support user-pluggable stream filters.  This would enable external
-   code to provide interpretation for filters that are missing from
-   qpdf.  Make it possible for user-provided filters to override
-   built-in filters.  Make sure that the pluggable filters can be
-   prioritized so that we can poll all registered filters to see
-   whether they are capable of filtering a particular stream.
-
  * If possible, consider adding CCITT3, CCITT4, or any other easy
    filters. For some reference code that we probably can't use but may
    be handy anyway, see

@@ -270,6 +270,14 @@ QPDF::emptyPDF()
 }
 
 void
+QPDF::registerStreamFilter(
+    std::string const& filter_name,
+    std::function<std::shared_ptr<QPDFStreamFilter> ()> factory)
+{
+    QPDF_Stream::registerStreamFilter(filter_name, factory);
+}
+
+void
 QPDF::setIgnoreXRefStreams(bool val)
 {
     this->m->ignore_xref_streams = val;

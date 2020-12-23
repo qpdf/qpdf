@@ -31,6 +31,8 @@
 #include <list>
 #include <iostream>
 #include <vector>
+#include <functional>
+#include <memory>
 
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFExc.hh>
@@ -39,6 +41,7 @@
 #include <qpdf/QPDFXRefEntry.hh>
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFTokenizer.hh>
+#include <qpdf/QPDFStreamFilter.hh>
 #include <qpdf/Buffer.hh>
 #include <qpdf/InputSource.hh>
 
@@ -131,6 +134,20 @@ class QPDF
     // how to use this method to create a PDF file from scratch.
     QPDF_DLL
     void emptyPDF();
+
+    // From 10.1: register a new filter implementation for a specific
+    // stream filter. You can add your own implementations for new
+    // filter types or override existing ones provided by the library.
+    // Registered stream filters are used for decoding only as you can
+    // override encoding with stream data providers. For example, you
+    // could use this method to support for one of the other filter
+    // types by using additional third-party libraries that qpdf does
+    // not presently use. The standard filters are implemented using
+    // QPDFStreamFilter classes.
+    QPDF_DLL
+    static void registerStreamFilter(
+        std::string const& filter_name,
+        std::function<std::shared_ptr<QPDFStreamFilter> ()> factory);
 
     // Parameter settings
 
