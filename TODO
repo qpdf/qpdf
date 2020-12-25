@@ -1,11 +1,21 @@
 Candidates for upcoming release
 ===============================
 
+* Enable discussions in github. See if any open issues should be there.
+
 * Open "next" issues
   * bugs
     * #473: zsh completion with directories
+      * Investigate how serverless does completion
   * Non-bugs
     * #436: parsing of document with form xobject
+    * #488: allow specification of jpeg compression quality; may also
+      need an option to recompress jpeg
+
+* Json mode enhancements:
+  * Put something in the json that makes it easier to find the
+    definition of an object without breaking compatibility
+  * See if the objects part can be sorted by object number
 
 * QPDFObjectHandle::pipeContentStreams calls finish() after each
   stream. In some code paths, Pl_Concatenate is used, which suppresses
@@ -44,20 +54,6 @@ Candidates for upcoming release
     probably move into the library. This includes externalizing inline
     images and page splitting as those operations become more
     elaborate, particularly with handling of form XObjects.
-
-* Flattening of form XObjects seems like something that would be
-  useful in the library. We are seeing more cases of completely valid
-  PDF files with form XObjects that cause problems in other software.
-  Flattening of form XObjects could be a useful way to work around
-  those issues or to prepare files for additional processing, making
-  it possible for users of the qpdf library to not be concerned about
-  form XObjects. This could be done recursively; i.e., we could have a
-  method to embed a form XObject into whatever contains it, whether
-  that is a form XObject or a page. This would require more
-  significant interpretation of the content stream. We would need a
-  test file in which the placement of the form XObject has to be in
-  the right place, e.g., the form XObject partially obscures earlier
-  code and is partially obscured by later code.
 
 * See if the tokenizer is a performance bottleneck and, if so,
   optimize it. We might end up with a high-performance tokenizer that
@@ -301,7 +297,26 @@ General
 NOTE: Some items in this list refer to files in my personal home
 directory or that are otherwise not publicly accessible. This includes
 things sent to me by email that are specifically not public. Even so,
-I find it useful to make reference to them in this list
+I find it useful to make reference to them in this list.
+
+ * If I do more with json, take a look at this C++ header-only JSON
+   library: https://github.com/nlohmann/json/releases
+
+ * Flattening of form XObjects seems like something that would be
+   useful in the library. We are seeing more cases of completely valid
+   PDF files with form XObjects that cause problems in other software.
+   Flattening of form XObjects could be a useful way to work around
+   those issues or to prepare files for additional processing, making
+   it possible for users of the qpdf library to not be concerned about
+   form XObjects. This could be done recursively; i.e., we could have a
+   method to embed a form XObject into whatever contains it, whether
+   that is a form XObject or a page. This would require more
+   significant interpretation of the content stream. We would need a
+   test file in which the placement of the form XObject has to be in
+   the right place, e.g., the form XObject partially obscures earlier
+   code and is partially obscured by later code. Keys in the resource
+   dictionary may need to be changed -- create test cases with lots of
+   duplicated/overlapping keys.
 
  * Add support for writing name and number trees
 
