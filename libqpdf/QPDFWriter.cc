@@ -1463,6 +1463,96 @@ QPDFWriter::writeTrailer(trailer_e which, int size, bool xref_stream,
     writeString(">>");
 }
 
+bool
+QPDFWriter::willFilterStream(QPDFObjectHandle stream,
+                             bool& compress_stream, bool& is_metadata,
+                             PointerHolder<Buffer>* stream_data)
+{
+    compress_stream = false;
+    is_metadata = false;
+    QPDFObjGen old_og = stream.getObjGen();
+    QPDFObjectHandle stream_dict = stream.getDict();
+
+    if (stream_dict.getKey("/Type").isName() &&
+        (stream_dict.getKey("/Type").getName() == "/Metadata"))
+    {
+        is_metadata = true;
+    }
+    bool filter = (stream.isDataModified() ||
+                   this->m->compress_streams ||
+                   this->m->stream_decode_level);
+    if (this->m->compress_streams)
+    {
+        // Don't filter if the stream is already compressed with
+        // FlateDecode. This way we don't make it worse if the
+        // original file used a better Flate algorithm, and we
+        // don't spend time and CPU cycles uncompressing and
+        // recompressing stuff. This can be overridden with
+        // setRecompressFlate(true).
+        QPDFObjectHandle filter_obj = stream_dict.getKey("/Filter");
+        if ((! this->m->recompress_flate) &&
+            (! stream.isDataModified()) &&
+            filter_obj.isName() &&
+            ((filter_obj.getName() == "/FlateDecode") ||
+             (filter_obj.getName() == "/Fl")))
+        {
+            QTC::TC("qpdf", "QPDFWriter not recompressing /FlateDecode");
+            filter = false;
+        }
+    }
+    bool normalize = false;
+    bool uncompress = false;
+    if (is_metadata &&
+        ((! this->m->encrypted) || (this->m->encrypt_metadata == false)))
+    {
+        QTC::TC("qpdf", "QPDFWriter not compressing metadata");
+        filter = true;
+        compress_stream = false;
+        uncompress = true;
+    }
+    else if (this->m->normalize_content &&
+             this->m->normalized_streams.count(old_og))
+    {
+        normalize = true;
+        filter = true;
+    }
+    else if (filter && this->m->compress_streams)
+    {
+        compress_stream = true;
+        QTC::TC("qpdf", "QPDFWriter compressing uncompressed stream");
+    }
+
+    bool filtered = false;
+    for (int attempt = 1; attempt <= 2; ++attempt)
+    {
+        pushPipeline(new Pl_Buffer("stream data"));
+        PipelinePopper pp_stream_data(this, stream_data);
+        activatePipelineStack(pp_stream_data);
+        filtered =
+            stream.pipeStreamData(
+                this->m->pipeline,
+                (((filter && normalize) ? qpdf_ef_normalize : 0) |
+                 ((filter && compress_stream) ? qpdf_ef_compress : 0)),
+                (filter
+                 ? (uncompress ? qpdf_dl_all : this->m->stream_decode_level)
+                 : qpdf_dl_none), false, (attempt == 1));
+        if (filter && (! filtered))
+        {
+            // Try again
+            filter = false;
+        }
+        else
+        {
+            break;
+        }
+    }
+    if (! filtered)
+    {
+        compress_stream = false;
+    }
+    return filtered;
+}
+
 void
 QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 			  int flags, size_t stream_length,
@@ -1502,13 +1592,12 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
     else if (object.isDictionary())
     {
         // Make a shallow copy of this object so we can modify it
-        // safely without affecting the original. This code makes
-        // assumptions about things that are made true in
-        // prepareFileForWrite, such as that certain things are direct
-        // objects so that replacing them doesn't leave unreferenced
-        // objects in the output. We can use unsafeShallowCopy here
-        // because we are all we are doing is removing or replacing
-        // top-level keys.
+        // safely without affecting the original. This code has logic
+        // to skip certain keys in agreement with prepareFileForWrite
+        // and with skip_stream_parameters so that replacing them
+        // doesn't leave unreferenced objects in the output. We can
+        // use unsafeShallowCopy here because we are all we are doing
+        // is removing or replacing top-level keys.
         object = object.unsafeShallowCopy();
 
         // Handle special cases for specific dictionaries.
@@ -1760,94 +1849,17 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	{
 	    this->m->cur_stream_length_id = new_id + 1;
 	}
-	QPDFObjectHandle stream_dict = object.getDict();
-
-	bool is_metadata = false;
-	if (stream_dict.getKey("/Type").isName() &&
-	    (stream_dict.getKey("/Type").getName() == "/Metadata"))
-	{
-	    is_metadata = true;
-	}
-	bool filter = (object.isDataModified() ||
-                       this->m->compress_streams ||
-                       this->m->stream_decode_level);
-	if (this->m->compress_streams)
-	{
-	    // Don't filter if the stream is already compressed with
-	    // FlateDecode. This way we don't make it worse if the
-	    // original file used a better Flate algorithm, and we
-	    // don't spend time and CPU cycles uncompressing and
-	    // recompressing stuff. This can be overridden with
-	    // setRecompressFlate(true).
-	    QPDFObjectHandle filter_obj = stream_dict.getKey("/Filter");
-            if ((! this->m->recompress_flate) &&
-                (! object.isDataModified()) &&
-                filter_obj.isName() &&
-		((filter_obj.getName() == "/FlateDecode") ||
-		 (filter_obj.getName() == "/Fl")))
-	    {
-		QTC::TC("qpdf", "QPDFWriter not recompressing /FlateDecode");
-		filter = false;
-	    }
-	}
-	bool normalize = false;
-	bool compress_stream = false;
-        bool uncompress = false;
-	if (is_metadata &&
-	    ((! this->m->encrypted) || (this->m->encrypt_metadata == false)))
-	{
-	    QTC::TC("qpdf", "QPDFWriter not compressing metadata");
-	    filter = true;
-	    compress_stream = false;
-            uncompress = true;
-	}
-	else if (this->m->normalize_content &&
-                 this->m->normalized_streams.count(old_og))
-	{
-	    normalize = true;
-	    filter = true;
-	}
-	else if (filter && this->m->compress_streams)
-	{
-	    compress_stream = true;
-	    QTC::TC("qpdf", "QPDFWriter compressing uncompressed stream");
-	}
 
 	flags |= f_stream;
-
+	bool compress_stream = false;
+        bool is_metadata = false;
         PointerHolder<Buffer> stream_data;
-        bool filtered = false;
-        for (int attempt = 1; attempt <= 2; ++attempt)
-        {
-            pushPipeline(new Pl_Buffer("stream data"));
-            PipelinePopper pp_stream_data(this, &stream_data);
-            activatePipelineStack(pp_stream_data);
-            filtered =
-                object.pipeStreamData(
-                    this->m->pipeline,
-                    (((filter && normalize) ? qpdf_ef_normalize : 0) |
-                     ((filter && compress_stream) ? qpdf_ef_compress : 0)),
-                    (filter
-                     ? (uncompress ? qpdf_dl_all : this->m->stream_decode_level)
-                     : qpdf_dl_none), false, (attempt == 1));
-            if (filter && (! filtered))
-            {
-                // Try again
-                filter = false;
-            }
-            else
-            {
-                break;
-            }
-        }
-	if (filtered)
+        if (willFilterStream(object, compress_stream,
+                             is_metadata, &stream_data))
 	{
 	    flags |= f_filtered;
 	}
-	else
-	{
-	    compress_stream = false;
-	}
+        QPDFObjectHandle stream_dict = object.getDict();
 
 	this->m->cur_stream_length = stream_data->getSize();
 	if (is_metadata && this->m->encrypted && (! this->m->encrypt_metadata))
