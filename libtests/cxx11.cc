@@ -48,6 +48,12 @@ void do_functional()
     };
 
     assert(make_addr_lambda(6)(8) == 14);
+
+    // nullptr and {} are empty functions
+    std::function<void()> f1 = {};
+    assert(! f1);
+    std::function<void()> f2 = nullptr;
+    assert(! f2);
 }
 
 // Integer types, type traits
