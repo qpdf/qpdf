@@ -716,7 +716,7 @@ my @bug_tests = (
     ["99b", "object 0", 2],
     ["100", "xref reconstruction loop", 2],
     ["101", "resolve for exception text", 2],
-    ["117", "other infinite loop", 2],
+    ["117", "other infinite loop", 3],
     ["118", "other infinite loop", 2],
     ["119", "other infinite loop", 3],
     ["120", "other infinite loop", 3],

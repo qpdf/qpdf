@@ -1,3 +1,11 @@
+2020-12-25  Jay Berkenbilt  <ejb@ql.org>
+
+	* Refactor write code to eliminate an extra full traversal of
+	objects in the file and to remove assumptions that preclude stream
+	references from appearing in /DecodeParms of filterable streams.
+	This results in an approximately 8% performance reduction in write
+	times.
+
 2020-12-23  Jay Berkenbilt  <ejb@ql.org>
 
 	* Allow library users to provide their own decoders for stream

@@ -2452,115 +2452,36 @@ QPDFWriter::getTrimmedTrailer()
 void
 QPDFWriter::prepareFileForWrite()
 {
-    // Do a traversal of the entire PDF file structure replacing all
-    // indirect objects that QPDFWriter wants to be direct.  This
-    // includes stream lengths, stream filtering parameters, and
-    // document extension level information.
+    // Make document extension level information direct as required by
+    // the spec.
 
     this->m->pdf.fixDanglingReferences(true);
-    std::list<QPDFObjectHandle> queue;
-    queue.push_back(getTrimmedTrailer());
-    std::set<int> visited;
-
-    while (! queue.empty())
+    QPDFObjectHandle root = this->m->pdf.getRoot();
+    for (auto const& key: root.getKeys())
     {
-	QPDFObjectHandle node = queue.front();
-	queue.pop_front();
-	if (node.isIndirect())
-	{
-	    if (visited.count(node.getObjectID()) > 0)
-	    {
-		continue;
-	    }
-            indicateProgress(false, false);
-	    visited.insert(node.getObjectID());
-	}
-
-	if (node.isArray())
-	{
-	    int nitems = node.getArrayNItems();
-	    for (int i = 0; i < nitems; ++i)
-	    {
-		QPDFObjectHandle oh = node.getArrayItem(i);
-                if (! oh.isScalar())
-		{
-		    queue.push_back(oh);
-		}
-	    }
-	}
-	else if (node.isDictionary() || node.isStream())
-	{
-            bool is_stream = false;
-            bool is_root = false;
-            bool filterable = false;
-	    QPDFObjectHandle dict = node;
-	    if (node.isStream())
-	    {
-                is_stream = true;
-		dict = node.getDict();
-                // See whether we are able to filter this stream.
-                filterable = node.pipeStreamData(
-                    0, 0, this->m->stream_decode_level, true);
-	    }
-            else if (this->m->pdf.getRoot().getObjectID() == node.getObjectID())
+        QPDFObjectHandle oh = root.getKey(key);
+        if ((key == "/Extensions") && (oh.isDictionary()))
+        {
+            bool extensions_indirect = false;
+            if (oh.isIndirect())
             {
-                is_root = true;
+                QTC::TC("qpdf", "QPDFWriter make Extensions direct");
+                extensions_indirect = true;
+                oh = oh.shallowCopy();
+                root.replaceKey(key, oh);
             }
-
-	    std::set<std::string> keys = dict.getKeys();
-	    for (std::set<std::string>::iterator iter = keys.begin();
-		 iter != keys.end(); ++iter)
-	    {
-		std::string const& key = *iter;
-		QPDFObjectHandle oh = dict.getKey(key);
-                bool add_to_queue = true;
-                if (is_stream)
+            if (oh.hasKey("/ADBE"))
+            {
+                QPDFObjectHandle adbe = oh.getKey("/ADBE");
+                if (adbe.isIndirect())
                 {
-                    if (oh.isIndirect() &&
-                        ((key == "/Length") ||
-                         (filterable &&
-                          ((key == "/Filter") ||
-                           (key == "/DecodeParms")))))
-                    {
-                        QTC::TC("qpdf", "QPDFWriter make stream key direct");
-                        add_to_queue = false;
-                        oh.makeDirect();
-                        dict.replaceKey(key, oh);
-                    }
+                    QTC::TC("qpdf", "QPDFWriter make ADBE direct",
+                            extensions_indirect ? 0 : 1);
+                    adbe.makeDirect();
+                    oh.replaceKey("/ADBE", adbe);
                 }
-                else if (is_root)
-                {
-                    if ((key == "/Extensions") && (oh.isDictionary()))
-                    {
-                        bool extensions_indirect = false;
-                        if (oh.isIndirect())
-                        {
-                            QTC::TC("qpdf", "QPDFWriter make Extensions direct");
-                            extensions_indirect = true;
-                            add_to_queue = false;
-                            oh = oh.shallowCopy();
-                            dict.replaceKey(key, oh);
-                        }
-                        if (oh.hasKey("/ADBE"))
-                        {
-                            QPDFObjectHandle adbe = oh.getKey("/ADBE");
-                            if (adbe.isIndirect())
-                            {
-                                QTC::TC("qpdf", "QPDFWriter make ADBE direct",
-                                        extensions_indirect ? 0 : 1);
-                                adbe.makeDirect();
-                                oh.replaceKey("/ADBE", adbe);
-                            }
-                        }
-                    }
-                }
-
-                if (add_to_queue)
-                {
-                    queue.push_back(oh);
-		}
-	    }
-	}
+            }
+        }
     }
 }
 
@@ -2737,14 +2658,11 @@ QPDFWriter::write()
 {
     doWriteSetup();
 
-    // Set up progress reporting. We spent about equal amounts of time
-    // preparing and writing one pass. To get a rough estimate of
-    // progress, we track handling of indirect objects. For linearized
-    // files, we write two passes. events_expected is an
-    // approximation, but it's good enough for progress reporting,
-    // which is mostly a guess anyway.
+    // Set up progress reporting. For linearized files, we write two
+    // passes. events_expected is an approximation, but it's good
+    // enough for progress reporting, which is mostly a guess anyway.
     this->m->events_expected = QIntC::to_int(
-        this->m->pdf.getObjectCount() * (this->m->linearized ? 3 : 2));
+        this->m->pdf.getObjectCount() * (this->m->linearized ? 2 : 1));
 
     prepareFileForWrite();
 
@@ -3138,8 +3056,21 @@ QPDFWriter::writeLinearized()
     discardGeneration(this->m->object_to_object_stream,
                       this->m->object_to_object_stream_no_gen);
 
-    bool need_xref_stream = (! this->m->object_to_object_stream.empty());
-    this->m->pdf.optimize(this->m->object_to_object_stream_no_gen);
+    auto skip_stream_parameters = [this](QPDFObjectHandle& stream) {
+        bool compress_stream;
+        bool is_metadata;
+        if (willFilterStream(stream, compress_stream, is_metadata, nullptr))
+        {
+            return 2;
+        }
+        else
+        {
+            return 1;
+        }
+    };
+
+    this->m->pdf.optimize(this->m->object_to_object_stream_no_gen,
+                          true, skip_stream_parameters);
 
     std::vector<QPDFObjectHandle> part4;
     std::vector<QPDFObjectHandle> part6;
@@ -3173,6 +3104,7 @@ QPDFWriter::writeLinearized()
     int after_second_half = 1 + second_half_uncompressed;
     this->m->next_objid = after_second_half;
     int second_half_xref = 0;
+    bool need_xref_stream = (! this->m->object_to_object_stream.empty());
     if (need_xref_stream)
     {
 	second_half_xref = this->m->next_objid++;

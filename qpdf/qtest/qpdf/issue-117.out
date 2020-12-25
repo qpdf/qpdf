@@ -13,4 +13,4 @@ WARNING: issue-117.pdf (object 7 0, offset 1791): unknown token while reading ob
 WARNING: issue-117.pdf (object 7 0, offset 1267): /Length key in stream dictionary is not an integer
 WARNING: issue-117.pdf (object 7 0, offset 1418): attempting to recover stream length
 WARNING: issue-117.pdf (object 7 0, offset 1418): recovered stream length: 347
-attempt to make a stream into a direct object
+qpdf: operation succeeded with warnings; resulting file may have some problems
