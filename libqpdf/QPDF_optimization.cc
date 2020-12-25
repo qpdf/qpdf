@@ -62,6 +62,14 @@ void
 QPDF::optimize(std::map<int, int> const& object_stream_data,
 	       bool allow_changes)
 {
+    optimize(object_stream_data, allow_changes, nullptr);
+}
+
+void
+QPDF::optimize(std::map<int, int> const& object_stream_data,
+	       bool allow_changes,
+               std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
+{
     if (! this->m->obj_user_to_objects.empty())
     {
 	// already optimized
@@ -91,7 +99,8 @@ QPDF::optimize(std::map<int, int> const& object_stream_data,
     for (int pageno = 0; pageno < n; ++pageno)
     {
         updateObjectMaps(ObjUser(ObjUser::ou_page, pageno),
-                         this->m->all_pages.at(toS(pageno)));
+                         this->m->all_pages.at(toS(pageno)),
+                         skip_stream_parameters);
     }
 
     // Traverse document-level items
@@ -107,7 +116,8 @@ QPDF::optimize(std::map<int, int> const& object_stream_data,
 	else
 	{
 	    updateObjectMaps(ObjUser(ObjUser::ou_trailer_key, key),
-			     this->m->trailer.getKey(key));
+			     this->m->trailer.getKey(key),
+                             skip_stream_parameters);
 	}
     }
 
@@ -124,7 +134,8 @@ QPDF::optimize(std::map<int, int> const& object_stream_data,
 
 	std::string const& key = *iter;
 	updateObjectMaps(ObjUser(ObjUser::ou_root_key, key),
-			 root.getKey(key));
+			 root.getKey(key),
+                         skip_stream_parameters);
     }
 
     ObjUser root_ou = ObjUser(ObjUser::ou_root);
@@ -351,16 +362,20 @@ QPDF::pushInheritedAttributesToPageInternal(
 }
 
 void
-QPDF::updateObjectMaps(ObjUser const& ou, QPDFObjectHandle oh)
+QPDF::updateObjectMaps(
+    ObjUser const& ou, QPDFObjectHandle oh,
+    std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
 {
     std::set<QPDFObjGen> visited;
-    updateObjectMapsInternal(ou, oh, visited, true, 0);
+    updateObjectMapsInternal(ou, oh, skip_stream_parameters, visited, true, 0);
 }
 
 void
-QPDF::updateObjectMapsInternal(ObjUser const& ou, QPDFObjectHandle oh,
-			       std::set<QPDFObjGen>& visited, bool top,
-                               int depth)
+QPDF::updateObjectMapsInternal(
+    ObjUser const& ou, QPDFObjectHandle oh,
+    std::function<int(QPDFObjectHandle&)> skip_stream_parameters,
+    std::set<QPDFObjGen>& visited, bool top,
+    int depth)
 {
     // Traverse the object tree from this point taking care to avoid
     // crossing page boundaries.
@@ -399,15 +414,22 @@ QPDF::updateObjectMapsInternal(ObjUser const& ou, QPDFObjectHandle oh,
 	for (int i = 0; i < n; ++i)
 	{
 	    updateObjectMapsInternal(
-                ou, oh.getArrayItem(i), visited, false, 1 + depth);
+                ou, oh.getArrayItem(i), skip_stream_parameters,
+                visited, false, 1 + depth);
 	}
     }
     else if (oh.isDictionary() || oh.isStream())
     {
 	QPDFObjectHandle dict = oh;
-	if (oh.isStream())
+        bool is_stream = oh.isStream();
+        int ssp = 0;
+	if (is_stream)
 	{
 	    dict = oh.getDict();
+            if (skip_stream_parameters)
+            {
+                ssp = skip_stream_parameters(oh);
+            }
 	}
 
 	std::set<std::string> keys = dict.getKeys();
@@ -421,16 +443,25 @@ QPDF::updateObjectMapsInternal(ObjUser const& ou, QPDFObjectHandle oh,
 		// case.
 		updateObjectMapsInternal(
                     ObjUser(ObjUser::ou_thumb, ou.pageno),
-                    dict.getKey(key), visited, false, 1 + depth);
+                    dict.getKey(key), skip_stream_parameters,
+                    visited, false, 1 + depth);
 	    }
 	    else if (is_page_node && (key == "/Parent"))
 	    {
 		// Don't traverse back up the page tree
 	    }
+            else if (((ssp >= 1) && (key == "/Length")) ||
+                     ((ssp >= 2) && ((key == "/Filter") ||
+                                     (key == "/DecodeParms"))))
+            {
+                // Don't traverse into stream parameters that we are
+                // not going to write.
+            }
 	    else
 	    {
 		updateObjectMapsInternal(
-                    ou, dict.getKey(key), visited, false, 1 + depth);
+                    ou, dict.getKey(key), skip_stream_parameters,
+                    visited, false, 1 + depth);
 	    }
 	}
     }
