@@ -23,6 +23,7 @@
 #define QPDFOBJGEN_HH
 
 #include <qpdf/DLL.h>
+#include <iostream>
 
 // This class represents an object ID and generation pair.  It is
 // suitable to use as a key in a map or set.
@@ -42,6 +43,9 @@ class QPDFObjGen
     int getObj() const;
     QPDF_DLL
     int getGen() const;
+
+    QPDF_DLL
+    friend std::ostream& operator<<(std::ostream&, const QPDFObjGen&);
 
   private:
     // This class does not use the Members pattern to avoid a memory

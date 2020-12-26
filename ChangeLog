@@ -1,3 +1,8 @@
+2020-12-26  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add ostream << for QPDFObjGen. (Don't ask why it took 7.5 years
+	for me to decide to do this.)
+
 2020-12-25  Jay Berkenbilt  <ejb@ql.org>
 
 	* Refactor write code to eliminate an extra full traversal of

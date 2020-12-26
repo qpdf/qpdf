@@ -36,3 +36,9 @@ QPDFObjGen::getGen() const
 {
     return this->gen;
 }
+
+std::ostream& operator<<(std::ostream& os, const QPDFObjGen& og)
+{
+    os << og.obj << "," << og.gen;
+    return os;
+}
