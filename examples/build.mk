@@ -1,16 +1,17 @@
 BINS_examples = \
 	pdf-bookmarks \
+	pdf-count-strings \
+	pdf-create \
+	pdf-custom-filter \
+	pdf-double-page-size \
+	pdf-filter-tokens \
+	pdf-invert-images \
 	pdf-mod-info \
 	pdf-npages \
-	pdf-double-page-size \
-	pdf-invert-images \
-	pdf-create \
+	pdf-overlay-page \
 	pdf-parse-content \
-	pdf-split-pages \
-	pdf-filter-tokens \
-	pdf-count-strings \
 	pdf-set-form-values \
-	pdf-overlay-page
+	pdf-split-pages
 CBINS_examples = \
 	pdf-c-objects \
 	pdf-linearize

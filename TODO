@@ -589,6 +589,8 @@ I find it useful to make reference to them in this list
      a stream data provider is especially expensive, it can implement
      its own cache.
 
-   The implementation of pluggable stream filters includes an example
-   that illustrates how a program might handle making decisions about
-   filters and decode parameters based on the input data.
+   The example examples/pdf-custom-filter.cc demonstrates the use of
+   custom stream filters. This includes a custom pipeline, a custom
+   stream filter, as well as modification of a stream's dictionary to
+   include creation of a new stream that is referenced from
+   /DecodeParms.

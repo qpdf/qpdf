@@ -27,7 +27,8 @@
 	provide code to validate and interpret /DecodeParms for a specific
 	/Filter and also to provide a pipeline that will decode. Note that
 	it is possible to encode to a filter type that is not supported
-	even without this feature.
+	even without this feature. See examples/pdf-custom-filter.cc for
+	an example of using custom stream filters.
 
 2020-12-22  Jay Berkenbilt  <ejb@ql.org>
 

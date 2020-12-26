@@ -92,6 +92,15 @@ class QPDFObjectHandle
         //   writing linearized files, if the work done by your stream
         //   data provider is slow or computationally intensive, you
         //   might want to implement your own cache.
+        //
+        // * Once you have called replaceStreamData, the original
+        //   stream data is no longer directly accessible from the
+        //   stream, but this is easy to work around by copying the
+        //   stream to a separate QPDF object. The qpdf library
+        //   implements this very efficiently without actually making
+        //   a copy of the stream data. You can find examples of this
+        //   pattern in some of the examples, including
+        //   pdf-custom-filter.cc and pdf-invert-images.cc.
 
         // Prior to qpdf 10.0.0, it was not possible to handle errors
         // the way pipeStreamData does or to pass back success.

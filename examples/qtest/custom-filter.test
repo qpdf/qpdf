@@ -1,0 +1,47 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+chdir("custom-filter") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('custom-filter');
+
+# The file input.pdf contains two streams, whose contents appear
+# uncompressed with explanatory text. They are marked with the keys
+# that pdf-custom-filter uses to decide 1) to re-encode using the
+# fictitious /XORDecode filter, and 2) whether to protect the stream
+# to prevent decoding using the custom filter even when decoding
+# specialized filters is requested.
+
+$td->runtest("custom filter, decode generalized",
+             {$td->COMMAND => "pdf-custom-filter input.pdf a.pdf"},
+             {$td->STRING => "pdf-custom-filter: new file written to a.pdf\n",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "generalized.pdf"});
+
+$td->runtest("custom filter, decode specialized",
+             {$td->COMMAND =>
+                  "pdf-custom-filter --decode-specialized input.pdf a.pdf"},
+             {$td->STRING => "pdf-custom-filter: new file written to a.pdf\n",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "specialized.pdf"});
+
+cleanup();
+
+$td->report(4);
+
+sub cleanup
+{
+    unlink "a.pdf";
+}
