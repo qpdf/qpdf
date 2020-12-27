@@ -786,6 +786,22 @@ class QPDFObjectHandle
     QPDF_DLL
     QPDFObjectHandle getDict();
 
+    // By default, or if true passed, QPDFWriter will attempt to
+    // filter a stream based on decode level, whether compression is
+    // enabled, and its ability to filter. Passing false will prevent
+    // QPDFWriter from attempting to filter the stream even if it can.
+    // This includes both decoding and compressing. This makes it
+    // possible for you to prevent QPDFWriter from uncompressing and
+    // recompressing a stream that it knows how to operate on for any
+    // application-specific reason, such as that you have already
+    // optimized its filtering. Note that this doesn't affect any
+    // other ways to get the stream's data, such as pipeStreamData or
+    // getStreamData.
+    QPDF_DLL
+    void setFilterOnWrite(bool);
+    QPDF_DLL
+    bool getFilterOnWrite();
+
     // If addTokenFilter has been called for this stream, then the
     // original data should be considered to be modified. This means we
     // should avoid optimizations such as not filtering a stream that

@@ -2219,6 +2219,16 @@ void runtest(int n, char const* filename1, char const* arg2)
             w.write();
         }
     }
+    else if (n == 70)
+    {
+        auto trailer = pdf.getTrailer();
+        trailer.getKey("/S1").setFilterOnWrite(false);
+        trailer.getKey("/S2").setFilterOnWrite(false);
+        QPDFWriter w(pdf, "a.pdf");
+        w.setStaticID(true);
+        w.setDecodeLevel(qpdf_dl_specialized);
+        w.write();
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +

@@ -1470,6 +1470,7 @@ QPDFWriter::willFilterStream(QPDFObjectHandle stream,
 {
     compress_stream = false;
     is_metadata = false;
+
     QPDFObjGen old_og = stream.getObjGen();
     QPDFObjectHandle stream_dict = stream.getDict();
 
@@ -1481,7 +1482,13 @@ QPDFWriter::willFilterStream(QPDFObjectHandle stream,
     bool filter = (stream.isDataModified() ||
                    this->m->compress_streams ||
                    this->m->stream_decode_level);
-    if (this->m->compress_streams)
+    bool filter_on_write = stream.getFilterOnWrite();
+    if (! filter_on_write)
+    {
+        QTC::TC("qpdf", "QPDFWriter getFilterOnWrite false");
+        filter = false;
+    }
+    if (filter_on_write && this->m->compress_streams)
     {
         // Don't filter if the stream is already compressed with
         // FlateDecode. This way we don't make it worse if the
@@ -1502,7 +1509,7 @@ QPDFWriter::willFilterStream(QPDFObjectHandle stream,
     }
     bool normalize = false;
     bool uncompress = false;
-    if (is_metadata &&
+    if (filter_on_write && is_metadata &&
         ((! this->m->encrypted) || (this->m->encrypt_metadata == false)))
     {
         QTC::TC("qpdf", "QPDFWriter not compressing metadata");
@@ -1510,13 +1517,13 @@ QPDFWriter::willFilterStream(QPDFObjectHandle stream,
         compress_stream = false;
         uncompress = true;
     }
-    else if (this->m->normalize_content &&
+    else if (filter_on_write && this->m->normalize_content &&
              this->m->normalized_streams.count(old_og))
     {
         normalize = true;
         filter = true;
     }
-    else if (filter && this->m->compress_streams)
+    else if (filter_on_write && filter && this->m->compress_streams)
     {
         compress_stream = true;
         QTC::TC("qpdf", "QPDFWriter compressing uncompressed stream");

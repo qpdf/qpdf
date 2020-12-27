@@ -1176,6 +1176,20 @@ QPDFObjectHandle::getDict()
     return dynamic_cast<QPDF_Stream*>(obj.getPointer())->getDict();
 }
 
+void
+QPDFObjectHandle::setFilterOnWrite(bool val)
+{
+    assertStream();
+    dynamic_cast<QPDF_Stream*>(obj.getPointer())->setFilterOnWrite(val);
+}
+
+bool
+QPDFObjectHandle::getFilterOnWrite()
+{
+    assertStream();
+    return dynamic_cast<QPDF_Stream*>(obj.getPointer())->getFilterOnWrite();
+}
+
 bool
 QPDFObjectHandle::isDataModified()
 {

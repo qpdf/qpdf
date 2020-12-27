@@ -1181,6 +1181,19 @@ $td->runtest("check output",
 
 show_ntests();
 # ----------
+$td->notify("--- Disable filter on write ---");
+$n_tests += 2;
+
+$td->runtest("no filter on write",
+	     {$td->COMMAND => "test_driver 70 filter-on-write.pdf"},
+	     {$td->STRING => "test 70 done\n", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "filter-on-write-out.pdf"});
+
+show_ntests();
+# ----------
 $td->notify("--- Invalid objects ---");
 $n_tests += 2;
 
@@ -1197,7 +1210,7 @@ $td->runtest("object with zero offset",
 
 show_ntests();
 # ----------
-$td->notify("--- Error/output rediction ---");
+$td->notify("--- Error/output redirection ---");
 $n_tests += 2;
 
 $td->runtest("error/output redirection to null",

@@ -90,6 +90,7 @@ QPDF_Stream::QPDF_Stream(QPDF* qpdf, int objid, int generation,
     qpdf(qpdf),
     objid(objid),
     generation(generation),
+    filter_on_write(true),
     stream_dict(stream_dict),
     offset(offset),
     length(length)
@@ -113,6 +114,18 @@ QPDF_Stream::registerStreamFilter(
     std::function<std::shared_ptr<QPDFStreamFilter>()> factory)
 {
     filter_factories[filter_name] = factory;
+}
+
+void
+QPDF_Stream::setFilterOnWrite(bool val)
+{
+    this->filter_on_write = val;
+}
+
+bool
+QPDF_Stream::getFilterOnWrite() const
+{
+    return this->filter_on_write;
 }
 
 void

@@ -27,6 +27,8 @@ class QPDF_Stream: public QPDFObject
     virtual void setDescription(QPDF*, std::string const&);
     QPDFObjectHandle getDict() const;
     bool isDataModified() const;
+    void setFilterOnWrite(bool);
+    bool getFilterOnWrite() const;
 
     // Methods to help QPDF copy foreign streams
     qpdf_offset_t getOffset() const;
@@ -83,6 +85,7 @@ class QPDF_Stream: public QPDFObject
     QPDF* qpdf;
     int objid;
     int generation;
+    bool filter_on_write;
     QPDFObjectHandle stream_dict;
     qpdf_offset_t offset;
     size_t length;

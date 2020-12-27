@@ -1,5 +1,13 @@
 2020-12-26  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add QPDFObjectHandle::setFilterOnWrite, which can be used to
+	tell QPDFWriter not to filter a stream on output even if it can.
+	You can use this to prevent QPDFWriter from touching a stream
+	(either uncompressing or compressing) that you have optimized or
+	otherwise ensured looks exactly the way you want it, even if
+	decode level or stream compression would otherwise cause
+	QPDFWriter to modify the stream.
+
 	* Add ostream << for QPDFObjGen. (Don't ask why it took 7.5 years
 	for me to decide to do this.)
 
