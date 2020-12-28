@@ -74,6 +74,7 @@ class QPDF_DLL_CLASS Pipeline
     std::string getIdentifier() const;
 
   protected:
+    QPDF_DLL
     Pipeline* getNext(bool allow_null = false);
     std::string identifier;
 
