@@ -4819,6 +4819,128 @@ print "\n";
    </varlistentry>
 -->
    <varlistentry>
+    <term>10.1.0: XXX Month dd, YYYY</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        CLI Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Add <option>--flatten-rotation</option> command-line option,
+          which causes all pages that are rotated using parameters in
+          the page's dictionary to instead be identically rotated in
+          the page's contents. The change is not user-visible for
+          compliant PDF readers but can be used to work around broken
+          PDF applications that don't properly handle page rotation.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Library Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Support for user-provided (pluggable, modular) stream
+          filters. It is now possible to derive a class from
+          <classname>QPDFStreamFilter</classname> and register it with
+          <classname>QPDF</classname> so that regular library methods,
+          including those used by <classname>QPDFWriter</classname>,
+          can decode streams with filters not directly supported by
+          the library. The example
+          <filename>examples/pdf-custom-filter.cc</filename>
+          illustrates how to use this capability.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add the optional <function>allow_streams</function>
+          parameter <function>QPDFObjectHandle::makeDirect</function>.
+          When <function>QPDFObjectHandle::makeDirect</function> is
+          called in this way, it preserves references to streams
+          rather than throwing an exception.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add <function>QPDFObjectHandle::setFilterOnWrite</function>
+          method. Calling this on a stream prevents
+          <function>QPDFWriter</function> from attempting to
+          uncompress, recompress, or otherwise filter a stream even if
+          it could. Developers can use this to protect streams that
+          are optimized should be protected from
+          <classname>QPDFWriter</classname>'s default behavior for any
+          other reason.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add <classname>ostream</classname>
+          <literal>&lt;&lt;</literal> operator for
+          <classname>QPDFObjGen</classname>. This is useful to have
+          for debugging.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add method
+          <function>QPDFPageObjectHelper::flattenRotation</function>,
+          which replaces a page's <literal>/Rotate</literal> keyword
+          by rotating the page within the content stream and altering
+          the page's bounding boxes so the rendering is the same. This
+          can be used to work around buggy PDF readers that can't
+          properly handle page rotation.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        C API Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Add several new functions to the C API for working with
+          objects. These are wrappers around many of the methods in
+          <classname>QPDFObjectHandle</classname>. Their inclusion
+          adds considerable new capability to the C API.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add <function>qpdf_register_progress_reporter</function> to
+          the C API, corresponding to
+          <function>QPDFWriter::registerProgressReporter</function>.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Performance Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Improve steps <classname>QPDFWriter</classname> takes to
+          prepare a <classname>QPDF</classname> object for writing,
+          resulting in about an 8% improvement in write performance
+          while allowing indirect objects to appear in
+          <literal>/DecodeParms</literal>.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
     <term>10.0.4: November 21, 2020</term>
     <listitem>
      <itemizedlist>
