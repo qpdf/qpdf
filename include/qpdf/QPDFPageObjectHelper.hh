@@ -175,7 +175,7 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     void removeUnreferencedResources();
 
-    // Return a new QPDFPageDocumentHelper that is a duplicate of the
+    // Return a new QPDFPageObjectHelper that is a duplicate of the
     // page. The returned object is an indirect object that is ready
     // to be inserted into the same or a different QPDF object using
     // any of the addPage methods in QPDFPageDocumentHelper or QPDF.
