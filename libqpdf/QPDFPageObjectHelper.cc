@@ -835,3 +835,135 @@ QPDFPageObjectHelper::placeFormXObject(
         name + " Do\n" +
         "Q\n");
 }
+
+void
+QPDFPageObjectHelper::flattenRotation()
+{
+    QPDF* qpdf = this->oh.getOwningQPDF();
+    if (! qpdf)
+    {
+        throw std::runtime_error(
+            "QPDFPageObjectHelper::flattenRotation"
+            " called with a direct object");
+    }
+
+    auto rotate_oh = this->oh.getKey("/Rotate");
+    int rotate = 0;
+    if (rotate_oh.isInteger())
+    {
+        rotate = rotate_oh.getIntValueAsInt();
+    }
+    if (! ((rotate == 90) || (rotate == 180) || (rotate == 270)))
+    {
+        return;
+    }
+    auto mediabox = this->oh.getKey("/MediaBox");
+    if (! mediabox.isRectangle())
+    {
+        return;
+    }
+    auto media_rect = mediabox.getArrayAsRectangle();
+
+    std::vector<std::string> boxes = {
+        "/MediaBox", "/CropBox", "/BleedBox", "/TrimBox", "/ArtBox",
+    };
+    for (auto const& boxkey: boxes)
+    {
+        auto box = this->oh.getKey(boxkey);
+        if (! box.isRectangle())
+        {
+            continue;
+        }
+        auto rect = box.getArrayAsRectangle();
+        decltype(rect) new_rect;
+
+        // How far are the edges of our rectangle from the edges
+        // of the media box?
+        auto left_x   = rect.llx - media_rect.llx;
+        auto right_x  = media_rect.urx - rect.urx;
+        auto bottom_y = rect.lly - media_rect.lly;
+        auto top_y    = media_rect.ury - rect.ury;
+
+        // Rotating the page 180 degrees does not change
+        // /MediaBox. Rotating 90 or 270 degrees reverses llx and
+        // lly and also reverse urx and ury. For all the other
+        // boxes, we want the corners to be the correct distance
+        // away from the corners of the mediabox.
+        switch (rotate)
+        {
+          case 90:
+            new_rect.llx = media_rect.lly + bottom_y;
+            new_rect.urx = media_rect.ury - top_y;
+            new_rect.lly = media_rect.llx + right_x;
+            new_rect.ury = media_rect.urx - left_x;
+            break;
+
+          case 180:
+            new_rect.llx = media_rect.llx + right_x;
+            new_rect.urx = media_rect.urx - left_x;
+            new_rect.lly = media_rect.lly + top_y;
+            new_rect.ury = media_rect.ury - bottom_y;
+            break;
+
+          case 270:
+            new_rect.llx = media_rect.lly + top_y;
+            new_rect.urx = media_rect.ury - bottom_y;
+            new_rect.lly = media_rect.llx + left_x;
+            new_rect.ury = media_rect.urx - right_x;
+            break;
+
+          default:
+            // ignore
+            break;
+        }
+
+        this->oh.replaceKey(
+            boxkey, QPDFObjectHandle::newFromRectangle(new_rect));
+    }
+
+    // When we rotate the page, pivot about the point 0, 0 and then
+    // translate so the page is visible with the origin point being
+    // the same offset from the lower left corner of the media box.
+    // These calculations have been verified emperically with various
+    // PDF readers.
+    QPDFObjectHandle::Matrix cm;
+    cm.e = 0.0;
+    cm.f = 0.0;
+    switch (rotate)
+    {
+      case 90:
+        cm.b = -1;
+        cm.c = 1;
+        cm.f = media_rect.urx + media_rect.llx;
+        break;
+
+      case 180:
+        cm.a = -1;
+        cm.d = -1;
+        cm.e = media_rect.urx + media_rect.llx;
+        cm.f = media_rect.ury + media_rect.lly;
+        break;
+
+      case 270:
+        cm.b = 1;
+        cm.c = -1;
+        cm.e = media_rect.ury + media_rect.lly;
+        break;
+
+      default:
+        break;
+    }
+    std::string cm_str =
+        std::string("q\n") +
+        QUtil::double_to_string(cm.a, 2) + " " +
+        QUtil::double_to_string(cm.b, 2) + " " +
+        QUtil::double_to_string(cm.c, 2) + " " +
+        QUtil::double_to_string(cm.d, 2) + " " +
+        QUtil::double_to_string(cm.e, 2) + " " +
+        QUtil::double_to_string(cm.f, 2) + " cm\n";
+    this->oh.addPageContents(
+        QPDFObjectHandle::newStream(qpdf, cm_str), true);
+    this->oh.addPageContents(
+        QPDFObjectHandle::newStream(qpdf, "\nQ\n"), false);
+    this->oh.removeKey("/Rotate");
+}

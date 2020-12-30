@@ -671,7 +671,7 @@ foreach my $d (@json_files)
 show_ntests();
 # ----------
 $td->notify("--- Page API Tests ---");
-$n_tests += 9;
+$n_tests += 11;
 
 $td->runtest("basic page API",
 	     {$td->COMMAND => "test_driver 15 page_api_1.pdf"},
@@ -706,6 +706,15 @@ $td->runtest("remove page we don't have",
 	     {$td->COMMAND => "test_driver 22 page_api_1.pdf"},
 	     {$td->FILE => "page_api_1.out2", $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
+$td->runtest("flatten rotation",
+	     {$td->COMMAND => "qpdf --static-id --qdf".
+                  " --no-original-object-ids" .
+                  " --flatten-rotation boxes.pdf a.pdf"},
+	     {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "boxes-flattened.pdf"});
 show_ntests();
 # ----------
 $td->notify("--- Files for specific bugs ---");

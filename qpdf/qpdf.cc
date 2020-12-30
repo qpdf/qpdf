@@ -174,6 +174,7 @@ struct Options
         show_pages(false),
         show_page_images(false),
         collate(false),
+        flatten_rotation(false),
         json(false),
         check(false),
         optimize_images(false),
@@ -276,6 +277,7 @@ struct Options
     bool show_pages;
     bool show_page_images;
     bool collate;
+    bool flatten_rotation;
     bool json;
     std::set<std::string> json_keys;
     std::set<std::string> json_objects;
@@ -747,6 +749,7 @@ class ArgParser
     void argOverlay();
     void argRotate(char* parameter);
     void argCollate();
+    void argFlattenRotation();
     void argStreamData(char* parameter);
     void argCompressStreams(char* parameter);
     void argRecompressFlate();
@@ -968,6 +971,7 @@ ArgParser::initOptionTable()
     char const* stream_data_choices[] =
         {"compress", "preserve", "uncompress", 0};
     (*t)["collate"] = oe_bare(&ArgParser::argCollate);
+    (*t)["flatten-rotation"] = oe_bare(&ArgParser::argFlattenRotation);
     (*t)["stream-data"] = oe_requiredChoices(
         &ArgParser::argStreamData, stream_data_choices);
     (*t)["compress-streams"] = oe_requiredChoices(
@@ -1250,6 +1254,7 @@ ArgParser::argHelp()
         << "--pages options --      select specific pages from one or more files\n"
         << "--collate               causes files specified in --pages to be collated\n"
         << "                        rather than concatenated\n"
+        << "--flatten-rotation      move page rotation from /Rotate key to content\n"
         << "--rotate=[+|-]angle[:page-range]\n"
         << "                        rotate each specified page 90, 180, or 270 degrees;\n"
         << "                        rotate all pages if no page range is given\n"
@@ -1877,6 +1882,12 @@ void
 ArgParser::argRotate(char* parameter)
 {
     parseRotationParameter(parameter);
+}
+
+void
+ArgParser::argFlattenRotation()
+{
+    o.flatten_rotation = true;
 }
 
 void
@@ -4816,6 +4827,13 @@ static void handle_transformations(QPDF& pdf, Options& o)
              iter != pages.end(); ++iter)
         {
             (*iter).coalesceContentStreams();
+        }
+    }
+    if (o.flatten_rotation)
+    {
+        for (auto& page: dh.getAllPages())
+        {
+            page.flattenRotation();
         }
     }
     if (o.remove_page_labels)

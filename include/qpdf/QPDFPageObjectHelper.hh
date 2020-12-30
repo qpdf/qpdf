@@ -242,6 +242,16 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
         bool allow_shrink = true,
         bool allow_expand = false);
 
+    // If a page is rotated using /Rotate in the page's dictionary,
+    // instead rotate the page by the same amount by altering the
+    // contents and removing the /Rotate key. This method adjusts the
+    // various page bounding boxes (/MediaBox, etc.) so that the page
+    // will have the same semantics. This can be useful to work around
+    // problems with PDF applications that can't properly handle
+    // rotated pages.
+    QPDF_DLL
+    void flattenRotation();
+
   private:
     static void
     removeUnreferencedResourcesHelper(

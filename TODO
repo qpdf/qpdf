@@ -39,10 +39,6 @@ Candidates for upcoming release
   * big page even with --remove-unreferenced-resources=yes, even with --empty
   * optimize image failure because of colorspace
 
-* Take flattenRotation code from pdf-split and do something with it,
-  maybe adding it to the library. Once there, call it from pdf-split
-  and bump up the required version of qpdf.
-
 * Externalize inline images doesn't walk into form XObjects. In
   general:
 

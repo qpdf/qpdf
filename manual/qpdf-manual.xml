@@ -1063,6 +1063,19 @@ make
       </listitem>
      </varlistentry>
      <varlistentry>
+      <term><option>--flatten-rotation</option></term>
+      <listitem>
+       <para>
+        For each page that is rotated using the
+        <literal>/Rotate</literal> key in the page's dictionary,
+        remove the <literal>/Rotate</literal> key and implement the
+        identical rotation semantics by modifying the page's contents.
+        This option can be useful to prepare files for buggy PDF
+        applications that don't properly handle rotated pages.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
       <term><option>--split-pages=[n]</option></term>
       <listitem>
        <para>

@@ -1,3 +1,14 @@
+2020-12-30  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add QPDFPageObjectHelper::flattenRotation and --flatten-rotation
+	option to the qpdf CLI. The flattenRotation method removes any
+	/Rotate key from a page dictionary and implements the same
+	rotation by modifying the page's contents such that the various
+	page boxes are altered and the page renders identically. This can
+	be used to work around buggy PDF applications that don't properly
+	handle page rotation. The --flatten-rotation option to the qpdf
+	CLI calls flattenRotation for every page.
+
 2020-12-26  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add QPDFObjectHandle::setFilterOnWrite, which can be used to
