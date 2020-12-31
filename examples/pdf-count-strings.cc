@@ -1,8 +1,7 @@
 //
 // This example illustrates the use of QPDFObjectHandle::TokenFilter
-// with filterPageContents. See also pdf-filter-tokens.cc for an
-// example that uses QPDFObjectHandle::TokenFilter with
-// addContentTokenFilter.
+// with filterContents. See also pdf-filter-tokens.cc for an example
+// that uses QPDFObjectHandle::TokenFilter with addContentTokenFilter.
 //
 
 #include <iostream>
@@ -108,14 +107,14 @@ int main(int argc, char* argv[])
             if (pageno % 2)
             {
                 // Ignore output for odd pages.
-                ph.filterPageContents(&counter);
+                ph.filterContents(&counter);
             }
             else
             {
                 // Write output to stdout for even pages.
                 Pl_StdioFile out("stdout", stdout);
                 std::cout << "% Contents of page " << pageno << std::endl;
-                ph.filterPageContents(&counter, &out);
+                ph.filterContents(&counter, &out);
                 std::cout << "\n% end " << pageno << std::endl;
             }
             std::cout << "Page " << pageno

@@ -2,7 +2,7 @@
 // This example illustrates the use of QPDFObjectHandle::TokenFilter
 // with addContentTokenFilter. Please see comments inline for details.
 // See also pdf-count-strings.cc for a use of
-// QPDFObjectHandle::TokenFilter with filterPageContents.
+// QPDFObjectHandle::TokenFilter with filterContents.
 //
 
 #include <iostream>

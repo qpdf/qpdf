@@ -1,9 +1,10 @@
 2020-12-31  Jay Berkenbilt  <ejb@ql.org>
 
-	* Rename QPDFPageObjectHelper::getPageImages to
-	QPDFPageObjectHelper::getImages and make it support form XObjects
-	as well as pages. The old name will be preserved for
-	compatibility.
+	* Rename some QPDFPageObjectHelper methods and make them support
+	form XObjects as well as pages. The old names will be preserved
+	from compatibility.
+	- getPageImages -> getImages
+	- filterPageContents -> filterContents
 
 	* Add QPDFObjectHandle::isFormXObject to test whether an object is
 	a form XObject.

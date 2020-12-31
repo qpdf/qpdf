@@ -435,7 +435,7 @@ QPDFPageObjectHelper::externalizeInlineImages(size_t min_size)
         QPDFObjectHandle::parse("<< /XObject << >> >>"));
     InlineImageTracker iit(this->oh.getOwningQPDF(), min_size, resources);
     Pl_Buffer b("new page content");
-    filterPageContents(&iit, &b);
+    filterContents(&iit, &b);
     if (iit.any_images)
     {
         getObjectHandle().replaceKey(
@@ -504,7 +504,22 @@ QPDFPageObjectHelper::filterPageContents(
     QPDFObjectHandle::TokenFilter* filter,
     Pipeline* next)
 {
-    this->oh.filterPageContents(filter, next);
+    return filterContents(filter, next);
+}
+
+void
+QPDFPageObjectHelper::filterContents(
+    QPDFObjectHandle::TokenFilter* filter,
+    Pipeline* next)
+{
+    if (this->oh.isFormXObject())
+    {
+        this->oh.filterAsContents(filter, next);
+    }
+    else
+    {
+        this->oh.filterPageContents(filter, next);
+    }
 }
 
 void
@@ -554,23 +569,21 @@ NameWatcher::handleToken(QPDFTokenizer::Token const& token)
 
 void
 QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
-    QPDFObjectHandle oh, std::set<QPDFObjGen>& seen,
-    std::function<QPDFObjectHandle()> get_resource,
-    std::function<void(QPDFObjectHandle::TokenFilter*)> filter_content)
+    QPDFPageObjectHelper ph, std::set<QPDFObjGen>& seen)
 {
-    if (seen.count(oh.getObjGen()))
+    if (seen.count(ph.oh.getObjGen()))
     {
         return;
     }
-    seen.insert(oh.getObjGen());
+    seen.insert(ph.oh.getObjGen());
     NameWatcher nw;
     try
     {
-        filter_content(&nw);
+        ph.filterContents(&nw);
     }
     catch (std::exception& e)
     {
-        oh.warnIfPossible(
+        ph.oh.warnIfPossible(
             std::string("Unable to parse content stream: ") + e.what() +
             "; not attempting to remove unreferenced objects from this page");
         return;
@@ -578,7 +591,7 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
     if (nw.saw_bad)
     {
         QTC::TC("qpdf", "QPDFPageObjectHelper bad token finding names");
-        oh.warnIfPossible(
+        ph.oh.warnIfPossible(
             "Bad token found while scanning content stream; "
             "not attempting to remove unreferenced objects from this page");
         return;
@@ -591,7 +604,7 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
     std::vector<std::string> to_filter;
     to_filter.push_back("/Font");
     to_filter.push_back("/XObject");
-    QPDFObjectHandle resources = get_resource();
+    QPDFObjectHandle resources = ph.getAttribute("/Resources", true);
     for (std::vector<std::string>::iterator d_iter = to_filter.begin();
          d_iter != to_filter.end(); ++d_iter)
     {
@@ -615,14 +628,7 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
             {
                 QTC::TC("qpdf", "QPDFPageObjectHelper filter form xobject");
                 removeUnreferencedResourcesHelper(
-                    resource.getDict(), seen,
-                    [&resource]() {
-                        return QPDFPageObjectHelper(resource)
-                            .getAttribute("/Resources", true);
-                    },
-                    [&resource](QPDFObjectHandle::TokenFilter* f) {
-                        resource.filterAsContents(f);
-                    });
+                    QPDFPageObjectHelper(resource), seen);
             }
         }
     }
@@ -632,12 +638,7 @@ void
 QPDFPageObjectHelper::removeUnreferencedResources()
 {
     std::set<QPDFObjGen> seen;
-    removeUnreferencedResourcesHelper(
-        this->oh, seen,
-        [this]() { return this->getAttribute("/Resources", true); },
-        [this](QPDFObjectHandle::TokenFilter* f) {
-            this->filterPageContents(f);
-        });
+    removeUnreferencedResourcesHelper(*this, seen);
 }
 
 QPDFPageObjectHelper
