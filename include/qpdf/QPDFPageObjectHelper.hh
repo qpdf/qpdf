@@ -32,6 +32,10 @@
 
 class QPDFPageObjectHelper: public QPDFObjectHelper
 {
+    // This is a helper class for page objects, but as of qpdf 10.1,
+    // many of the methods also work for form XObjects. When this is
+    // the case, it is noted in the comment.
+
   public:
     QPDF_DLL
     QPDFPageObjectHelper(QPDFObjectHandle);
@@ -40,14 +44,15 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     {
     }
 
-    // Return the effective value of this attribute for the page. If
-    // the requested attribute is not present on the page but is
+    // Works with pages and form XObjects. Return the effective value
+    // of this attribute for the page/form XObject. For pages, if the
+    // requested attribute is not present on the page but is
     // inheritable, look up through the page's ancestors in the page
     // tree. If copy_if_shared is true, then this method will replace
     // the attribute with a shallow copy if it is in indirect or
     // inherited and return the copy. You should do this if you are
     // going to modify the returned object and want the modifications
-    // to apply to the current page only.
+    // to apply to the current page/form XObject only.
     QPDF_DLL
     QPDFObjectHandle
     getAttribute(std::string const& name, bool copy_if_shared);
@@ -70,7 +75,8 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     // Returns an empty map if there are no images or no resources.
     // Prior to qpdf 8.4.0, this function did not support inherited
     // resources, but it does now. Return value is a map from XObject
-    // name to the image object, which is always a stream.
+    // name to the image object, which is always a stream. Works with
+    // form XObjects as well as pages.
     QPDF_DLL
     std::map<std::string, QPDFObjectHandle> getPageImages();
 

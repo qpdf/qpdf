@@ -314,33 +314,46 @@ QPDFObjectHandle
 QPDFPageObjectHelper::getAttribute(std::string const& name,
                                    bool copy_if_shared)
 {
-    bool inheritable = ((name == "/MediaBox") || (name == "/CropBox") ||
-                        (name == "/Resources") || (name == "/Rotate"));
-
-    QPDFObjectHandle node = this->oh;
-    QPDFObjectHandle result(node.getKey(name));
-    std::set<QPDFObjGen> seen;
+    QPDFObjectHandle result;
+    QPDFObjectHandle dict;
+    bool is_form_xobject = this->oh.isFormXObject();
     bool inherited = false;
-    while (inheritable && result.isNull() && node.hasKey("/Parent"))
+    if (is_form_xobject)
     {
-        seen.insert(node.getObjGen());
-        node = node.getKey("/Parent");
-        if (seen.count(node.getObjGen()))
-        {
-            break;
-        }
+        dict = this->oh.getDict();
+        result = dict.getKey(name);
+    }
+    else
+    {
+        dict = this->oh;
+        bool inheritable = ((name == "/MediaBox") || (name == "/CropBox") ||
+                            (name == "/Resources") || (name == "/Rotate"));
+
+        QPDFObjectHandle node = dict;
         result = node.getKey(name);
-        if (! result.isNull())
+        std::set<QPDFObjGen> seen;
+        while (inheritable && result.isNull() && node.hasKey("/Parent"))
         {
-            QTC::TC("qpdf", "QPDFPageObjectHelper non-trivial inheritance");
-            inherited = true;
+            seen.insert(node.getObjGen());
+            node = node.getKey("/Parent");
+            if (seen.count(node.getObjGen()))
+            {
+                break;
+            }
+            result = node.getKey(name);
+            if (! result.isNull())
+            {
+                QTC::TC("qpdf", "QPDFPageObjectHelper non-trivial inheritance");
+                inherited = true;
+            }
         }
     }
     if (copy_if_shared && (inherited || result.isIndirect()))
     {
-        QTC::TC("qpdf", "QPDFPageObjectHelper copy shared attribute");
+        QTC::TC("qpdf", "QPDFPageObjectHelper copy shared attribute",
+                is_form_xobject ? 0 : 1);
         result = result.shallowCopy();
-        this->oh.replaceKey(name, result);
+        dict.replaceKey(name, result);
     }
     return result;
 }
@@ -376,7 +389,34 @@ QPDFPageObjectHelper::getMediaBox(bool copy_if_shared)
 std::map<std::string, QPDFObjectHandle>
 QPDFPageObjectHelper::getPageImages()
 {
-    return this->oh.getPageImages();
+    std::map<std::string, QPDFObjectHandle> result;
+    QPDFObjectHandle resources = getAttribute("/Resources", false);
+    if (resources.isDictionary())
+    {
+	if (resources.hasKey("/XObject"))
+	{
+	    QPDFObjectHandle xobject = resources.getKey("/XObject");
+	    std::set<std::string> keys = xobject.getKeys();
+	    for (std::set<std::string>::iterator iter = keys.begin();
+		 iter != keys.end(); ++iter)
+	    {
+		std::string key = (*iter);
+		QPDFObjectHandle value = xobject.getKey(key);
+		if (value.isStream())
+		{
+		    QPDFObjectHandle dict = value.getDict();
+		    if (dict.hasKey("/Subtype") &&
+			(dict.getKey("/Subtype").getName() == "/Image") &&
+			(! dict.hasKey("/ImageMask")))
+		    {
+			result[key] = value;
+		    }
+		}
+	    }
+	}
+    }
+
+    return result;
 }
 
 void
@@ -571,13 +611,8 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
                 removeUnreferencedResourcesHelper(
                     resource.getDict(), seen,
                     [&resource]() {
-                        auto result = resource.getDict().getKey("/Resources");
-                        if (result.isDictionary())
-                        {
-                            result = result.shallowCopy();
-                            resource.getDict().replaceKey("/Resources", result);
-                        }
-                        return result;
+                        return QPDFPageObjectHelper(resource)
+                            .getAttribute("/Resources", true);
                     },
                     [&resource](QPDFObjectHandle::TokenFilter* f) {
                         resource.filterAsContents(f);

@@ -422,7 +422,7 @@ QPDFFormFieldObjectHelper create AP from scratch 0
 QPDFFormFieldObjectHelper replaced BMC at EOF 0
 QPDFFormFieldObjectHelper fallback Tf 0
 QPDFPageObjectHelper non-trivial inheritance 0
-QPDFPageObjectHelper copy shared attribute 0
+QPDFPageObjectHelper copy shared attribute 1
 qpdf from_nr from repeat_nr 0
 QPDF resolve duplicated page object 0
 QPDF handle direct page object 0
