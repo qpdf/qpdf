@@ -1320,7 +1320,7 @@ QPDFObjectHandle::getGeneration() const
 std::map<std::string, QPDFObjectHandle>
 QPDFObjectHandle::getPageImages()
 {
-    return QPDFPageObjectHelper(*this).getPageImages();
+    return QPDFPageObjectHelper(*this).getImages();
 }
 
 std::vector<QPDFObjectHandle>

@@ -159,7 +159,7 @@ int main(int argc, char* argv[])
 	    QPDFPageObjectHelper& page(*iter);
 	    // Get all images on the page.
 	    std::map<std::string, QPDFObjectHandle> images =
-		page.getPageImages();
+		page.getImages();
 	    for (auto& iter2: images)
 	    {
 		QPDFObjectHandle& image = iter2.second;

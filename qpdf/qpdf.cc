@@ -3639,8 +3639,7 @@ static void do_show_pages(QPDF& pdf, Options& o)
                   << page.getGeneration() << " R" << std::endl;
         if (o.show_page_images)
         {
-            std::map<std::string, QPDFObjectHandle> images =
-                ph.getPageImages();
+            std::map<std::string, QPDFObjectHandle> images = ph.getImages();
             if (! images.empty())
             {
                 std::cout << "  images:" << std::endl;
@@ -3765,8 +3764,7 @@ static void do_json_pages(QPDF& pdf, Options& o, JSON& j)
         j_page.addDictionaryMember("object", page.getJSON());
         JSON j_images = j_page.addDictionaryMember(
             "images", JSON::makeArray());
-        std::map<std::string, QPDFObjectHandle> images =
-            ph.getPageImages();
+        std::map<std::string, QPDFObjectHandle> images = ph.getImages();
         for (auto const& iter2: images)
         {
             JSON j_image = j_images.addArrayElement(JSON::makeDictionary());
@@ -4785,8 +4783,7 @@ static void handle_transformations(QPDF& pdf, Options& o)
             ++pageno;
             QPDFPageObjectHelper& ph(*iter);
             QPDFObjectHandle page = ph.getObjectHandle();
-            std::map<std::string, QPDFObjectHandle> images =
-                ph.getPageImages();
+            std::map<std::string, QPDFObjectHandle> images = ph.getImages();
             for (auto& iter2: images)
             {
                 std::string name = iter2.first;

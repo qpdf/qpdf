@@ -516,8 +516,7 @@ void runtest(int n, char const* filename1, char const* arg2)
 	    std::cout << "page " << pageno << ":" << std::endl;
 
 	    std::cout << "  images:" << std::endl;
-	    std::map<std::string, QPDFObjectHandle> images =
-		page.getPageImages();
+	    std::map<std::string, QPDFObjectHandle> images = page.getImages();
 	    for (auto const& iter2: images)
 	    {
 		std::string const& name = iter2.first;
@@ -1488,7 +1487,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         {
             std::cout << "page " << ++pageno << std::endl;
 	    std::map<std::string, QPDFObjectHandle> images =
-		(*p_iter).getPageImages();
+		(*p_iter).getImages();
 	    for (std::map<std::string, QPDFObjectHandle>::iterator i_iter =
 		     images.begin(); i_iter != images.end(); ++i_iter)
 	    {

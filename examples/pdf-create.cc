@@ -268,7 +268,7 @@ static void check(char const* filename,
          page_iter != pages.end(); ++page_iter)
     {
         QPDFPageObjectHelper& page(*page_iter);
-        std::map<std::string, QPDFObjectHandle> images = page.getPageImages();
+        std::map<std::string, QPDFObjectHandle> images = page.getImages();
         if (images.size() != 1)
         {
             throw std::logic_error("incorrect number of images on page");

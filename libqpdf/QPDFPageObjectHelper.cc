@@ -389,6 +389,12 @@ QPDFPageObjectHelper::getMediaBox(bool copy_if_shared)
 std::map<std::string, QPDFObjectHandle>
 QPDFPageObjectHelper::getPageImages()
 {
+    return getImages();
+}
+
+std::map<std::string, QPDFObjectHandle>
+QPDFPageObjectHelper::getImages()
+{
     std::map<std::string, QPDFObjectHandle> result;
     QPDFObjectHandle resources = getAttribute("/Resources", false);
     if (resources.isDictionary())

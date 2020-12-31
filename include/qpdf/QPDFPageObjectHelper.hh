@@ -78,6 +78,10 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     // name to the image object, which is always a stream. Works with
     // form XObjects as well as pages.
     QPDF_DLL
+    std::map<std::string, QPDFObjectHandle> getImages();
+
+    // Old name -- calls getImages()
+    QPDF_DLL
     std::map<std::string, QPDFObjectHandle> getPageImages();
 
     // Convert each inline image to an external (normal) image if the
