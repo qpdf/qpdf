@@ -1,5 +1,9 @@
 2020-12-31  Jay Berkenbilt  <ejb@ql.org>
 
+	* QPDFPageObjectHelper::removeUnreferencedResources can now be
+	called with a QPDFPageObjectHelper created from a form XObject.
+	The method already recursed into form XObjects.
+
 	* Rename some QPDFPageObjectHelper methods and make them support
 	form XObjects as well as pages. The old names will be preserved
 	from compatibility.

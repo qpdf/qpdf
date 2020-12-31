@@ -186,7 +186,8 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     // QPDFPageDocumentHelper::pushInheritedAttributesToPage(). This
     // method is used by page splitting code to avoid copying unused
     // objects in files that used shared resource dictionaries across
-    // multiple pages.
+    // multiple pages. This method recurses into form XObjects and can
+    // be called with a form XObject as well as a page.
     QPDF_DLL
     void removeUnreferencedResources();
 
