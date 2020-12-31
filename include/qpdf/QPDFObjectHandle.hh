@@ -1147,6 +1147,9 @@ class QPDFObjectHandle
     QPDF_DLL
     void assertPageObject();
 
+    QPDF_DLL
+    bool isFormXObject();
+
   private:
     QPDFObjectHandle(QPDF*, int objid, int generation);
     QPDFObjectHandle(QPDFObject*);

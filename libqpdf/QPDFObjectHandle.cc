@@ -2962,6 +2962,20 @@ QPDFObjectHandle::isPagesObject()
     return (this->isDictionary() && this->hasKey("/Kids"));
 }
 
+bool
+QPDFObjectHandle::isFormXObject()
+{
+    if (! this->isStream())
+    {
+        return false;
+    }
+    QPDFObjectHandle dict = this->getDict();
+    return (dict.getKey("/Type").isName() &&
+            ("/XObject" == dict.getKey("/Type").getName()) &&
+            dict.getKey("/Subtype").isName() &&
+            ("/Form" == dict.getKey("/Subtype").getName()));
+}
+
 void
 QPDFObjectHandle::assertPageObject()
 {

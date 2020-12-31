@@ -1,3 +1,8 @@
+2020-12-31  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add QPDFObjectHandle::isFormXObject to test whether an object is
+	a form XObject.
+
 2020-12-30  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add QPDFPageObjectHelper::flattenRotation and --flatten-rotation
