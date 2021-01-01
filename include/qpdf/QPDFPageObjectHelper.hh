@@ -72,17 +72,56 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     QPDFObjectHandle
     getMediaBox(bool copy_if_shared = false);
 
+    // Iterate through XObjects, possibly recursing into form
+    // XObjects. This works with pages or form XObjects. Call action
+    // on each XObject for which selector, if specified, returns true.
+    // With no selector, calls action for every object. In addition to
+    // the object being passed to action, the containing XObject
+    // dictionary and key are passed in. Remember that the XObject
+    // dictionary may be shared, and the object may appear in multiple
+    // XObject dictionaries.
+    QPDF_DLL
+    void forEachXObject(
+        bool recursive,
+        std::function<void(QPDFObjectHandle& obj,
+                           QPDFObjectHandle& xobj_dict,
+                           std::string const& key)> action,
+        std::function<bool(QPDFObjectHandle)> selector=nullptr);
+    // Only call action for images
+    QPDF_DLL
+    void forEachImage(
+        bool recursive,
+        std::function<void(QPDFObjectHandle& obj,
+                           QPDFObjectHandle& xobj_dict,
+                           std::string const& key)> action);
+    // Only call action for form XObjects
+    QPDF_DLL
+    void forEachFormXObject(
+        bool recursive,
+        std::function<void(QPDFObjectHandle& obj,
+                           QPDFObjectHandle& xobj_dict,
+                           std::string const& key)> action);
+
     // Returns an empty map if there are no images or no resources.
     // Prior to qpdf 8.4.0, this function did not support inherited
     // resources, but it does now. Return value is a map from XObject
     // name to the image object, which is always a stream. Works with
-    // form XObjects as well as pages.
+    // form XObjects as well as pages. This method does not recurse
+    // into nested form XObjects. For that, use forEachImage.
     QPDF_DLL
     std::map<std::string, QPDFObjectHandle> getImages();
 
     // Old name -- calls getImages()
     QPDF_DLL
     std::map<std::string, QPDFObjectHandle> getPageImages();
+
+    // Returns an empty map if there are no form XObjects or no
+    // resources. Otherwise, returns a map of keys to form XObjects
+    // directly referenced from this page or form XObjects. This does
+    // not recurse into nested form XObjects. For that, use
+    // forEachFormXObject.
+    QPDF_DLL
+    std::map<std::string, QPDFObjectHandle> getFormXObjects();
 
     // Convert each inline image to an external (normal) image if the
     // size is at least the specified number of bytes.

@@ -1,0 +1,49 @@
+--- recursive, all ---
+<< /Fx1 12 0 R /Im1 14 0 R /Im2 16 0 R >> -> /Fx1 -> 12 0 R
+<< /Fx1 12 0 R /Im1 14 0 R /Im2 16 0 R >> -> /Im1 -> 14 0 R
+<< /Fx1 12 0 R /Im1 14 0 R /Im2 16 0 R >> -> /Im2 -> 16 0 R
+<< /Fx1 20 0 R /Im1 22 0 R /Im2 24 0 R >> -> /Fx1 -> 20 0 R
+<< /Fx1 20 0 R /Im1 22 0 R /Im2 24 0 R >> -> /Im1 -> 22 0 R
+<< /Fx1 20 0 R /Im1 22 0 R /Im2 24 0 R >> -> /Im2 -> 24 0 R
+<< /Im1 26 0 R /Im2 28 0 R >> -> /Im1 -> 26 0 R
+<< /Im1 26 0 R /Im2 28 0 R >> -> /Im2 -> 28 0 R
+--- non-recursive, all ---
+<< /Fx1 12 0 R /Im1 14 0 R /Im2 16 0 R >> -> /Fx1 -> 12 0 R
+<< /Fx1 12 0 R /Im1 14 0 R /Im2 16 0 R >> -> /Im1 -> 14 0 R
+<< /Fx1 12 0 R /Im1 14 0 R /Im2 16 0 R >> -> /Im2 -> 16 0 R
+--- recursive, images ---
+<< /Fx1 12 0 R /Im1 14 0 R /Im2 16 0 R >> -> /Im1 -> 14 0 R
+<< /Fx1 12 0 R /Im1 14 0 R /Im2 16 0 R >> -> /Im2 -> 16 0 R
+<< /Fx1 20 0 R /Im1 22 0 R /Im2 24 0 R >> -> /Im1 -> 22 0 R
+<< /Fx1 20 0 R /Im1 22 0 R /Im2 24 0 R >> -> /Im2 -> 24 0 R
+<< /Im1 26 0 R /Im2 28 0 R >> -> /Im1 -> 26 0 R
+<< /Im1 26 0 R /Im2 28 0 R >> -> /Im2 -> 28 0 R
+--- non-recursive, images ---
+<< /Fx1 12 0 R /Im1 14 0 R /Im2 16 0 R >> -> /Im1 -> 14 0 R
+<< /Fx1 12 0 R /Im1 14 0 R /Im2 16 0 R >> -> /Im2 -> 16 0 R
+--- recursive, form XObjects ---
+<< /Fx1 12 0 R /Im1 14 0 R /Im2 16 0 R >> -> /Fx1 -> 12 0 R
+<< /Fx1 20 0 R /Im1 22 0 R /Im2 24 0 R >> -> /Fx1 -> 20 0 R
+--- non-recursive, form XObjects ---
+<< /Fx1 12 0 R /Im1 14 0 R /Im2 16 0 R >> -> /Fx1 -> 12 0 R
+--- recursive, all, from fx1 ---
+<< /Fx1 20 0 R /Im1 22 0 R /Im2 24 0 R >> -> /Fx1 -> 20 0 R
+<< /Fx1 20 0 R /Im1 22 0 R /Im2 24 0 R >> -> /Im1 -> 22 0 R
+<< /Fx1 20 0 R /Im1 22 0 R /Im2 24 0 R >> -> /Im2 -> 24 0 R
+<< /Im1 26 0 R /Im2 28 0 R >> -> /Im1 -> 26 0 R
+<< /Im1 26 0 R /Im2 28 0 R >> -> /Im2 -> 28 0 R
+--- non-recursive, all, from fx1 ---
+<< /Fx1 20 0 R /Im1 22 0 R /Im2 24 0 R >> -> /Fx1 -> 20 0 R
+<< /Fx1 20 0 R /Im1 22 0 R /Im2 24 0 R >> -> /Im1 -> 22 0 R
+<< /Fx1 20 0 R /Im1 22 0 R /Im2 24 0 R >> -> /Im2 -> 24 0 R
+--- get images, page ---
+/Im1 -> 14 0 R
+/Im2 -> 16 0 R
+--- get images, fx ---
+/Im1 -> 22 0 R
+/Im2 -> 24 0 R
+--- get form XObjects, page ---
+/Fx1 -> 12 0 R
+--- get form XObjects, fx ---
+/Fx1 -> 20 0 R
+test 71 done

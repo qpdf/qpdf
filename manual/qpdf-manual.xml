@@ -4859,6 +4859,60 @@ print "\n";
         </listitem>
         <listitem>
          <para>
+          Add methods to <classname>QPDFPageObjectHelper</classname>
+          to iterate through XObjects on a page or form XObjects,
+          possibly recursing into nested form XObjects:
+          <function>forEachXObject</function>,
+          <function>ForEachImage</function>,
+          <function>forEachFormXObject</function>.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Enhance several methods in
+          <classname>QPDFPageObjectHelper</classname> to work with
+          form XObjects as well as pages, as noted in comments. See
+          <filename>ChangeLog</filename> for a full list.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Rename some functions in
+          <classname>QPDFPageObjectHelper</classname>, while keeping
+          old names for compatibility:
+          <itemizedlist>
+           <listitem>
+            <para>
+             <function>getPageImages</function> to
+             <function>getImages</function>
+            </para>
+           </listitem>
+           <listitem>
+            <para>
+             <function>filterPageContents</function> to
+             <function>filterContents</function>
+            </para>
+           </listitem>
+          </itemizedlist>
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add method
+          <function>QPDFPageObjectHelper::getFormXObjects</function>
+          to return a map of form XObjects directly on a page or form
+          XObject
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add new helper methods to
+          <classname>QPDFObjectHandle</classname>:
+          <function>isFormXObject</function>, <function>isImage</function>
+         </para>
+        </listitem>
+        <listitem>
+         <para>
           Add the optional <function>allow_streams</function>
           parameter <function>QPDFObjectHandle::makeDirect</function>.
           When <function>QPDFObjectHandle::makeDirect</function> is

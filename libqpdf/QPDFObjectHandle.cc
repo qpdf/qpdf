@@ -2948,6 +2948,21 @@ QPDFObjectHandle::isFormXObject()
             ("/Form" == dict.getKey("/Subtype").getName()));
 }
 
+bool
+QPDFObjectHandle::isImage(bool exclude_imagemask)
+{
+    if (! this->isStream())
+    {
+        return false;
+    }
+    QPDFObjectHandle dict = this->getDict();
+    return (dict.hasKey("/Subtype") &&
+            (dict.getKey("/Subtype").getName() == "/Image") &&
+            ((! exclude_imagemask) ||
+             (! (dict.getKey("/ImageMask").isBool() &&
+                 dict.getKey("/ImageMask").getBoolValue()))));
+}
+
 void
 QPDFObjectHandle::assertPageObject()
 {

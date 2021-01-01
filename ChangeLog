@@ -1,3 +1,17 @@
+2021-01-01  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add methods to QPDFPageObjectHelper: forEachXObject,
+	forEachImage, forEachFormXObject to call a function on each
+	XObject (or image or form XObject) in a page or form XObject,
+	possibly recursing into nested form XObjects.
+
+	* Add method QPDFPageObjectHelper::getFormXObjects to return a map
+	of keys to form XObjects (non-recursively) from a page or form
+	XObject.
+
+	* Add method QPDFObjectHandle::isImage to test whether an object
+	is an image.
+
 2020-12-31  Jay Berkenbilt  <ejb@ql.org>
 
 	* QPDFPageObjectHelper::removeUnreferencedResources can now be

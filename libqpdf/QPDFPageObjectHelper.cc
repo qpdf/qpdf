@@ -386,6 +386,73 @@ QPDFPageObjectHelper::getMediaBox(bool copy_if_shared)
     return getAttribute("/MediaBox", copy_if_shared);
 }
 
+void
+QPDFPageObjectHelper::forEachXObject(
+    bool recursive,
+    std::function<void(QPDFObjectHandle& obj,
+                       QPDFObjectHandle& xobj_dict,
+                       std::string const& key)> action,
+    std::function<bool(QPDFObjectHandle)> selector)
+{
+    QTC::TC("qpdf", "QPDFPageObjectHelper::forEachXObject",
+            recursive
+            ? (this->oh.isFormXObject() ? 0 : 1)
+            : (this->oh.isFormXObject() ? 2 : 3));
+    std::set<QPDFObjGen> seen;
+    std::list<QPDFPageObjectHelper> queue;
+    queue.push_back(*this);
+    while (! queue.empty())
+    {
+        QPDFPageObjectHelper ph = queue.front();
+        queue.pop_front();
+        QPDFObjGen og = ph.oh.getObjGen();
+        if (seen.count(og))
+        {
+            continue;
+        }
+        seen.insert(og);
+        QPDFObjectHandle resources = ph.getAttribute("/Resources", false);
+        if (resources.isDictionary() && resources.hasKey("/XObject"))
+        {
+            QPDFObjectHandle xobj_dict = resources.getKey("/XObject");
+            for (auto const& key: xobj_dict.getKeys())
+            {
+                QPDFObjectHandle obj = xobj_dict.getKey(key);
+                if ((! selector) || selector(obj))
+                {
+                    action(obj, xobj_dict, key);
+                }
+                if (recursive && obj.isFormXObject())
+                {
+                    queue.push_back(QPDFPageObjectHelper(obj));
+                }
+            }
+	}
+    }
+}
+
+void
+QPDFPageObjectHelper::forEachImage(
+    bool recursive,
+    std::function<void(QPDFObjectHandle& obj,
+                       QPDFObjectHandle& xobj_dict,
+                       std::string const& key)> action)
+{
+    forEachXObject(recursive, action,
+                   [](QPDFObjectHandle obj) { return obj.isImage(); });
+}
+
+void
+QPDFPageObjectHelper::forEachFormXObject(
+    bool recursive,
+    std::function<void(QPDFObjectHandle& obj,
+                       QPDFObjectHandle& xobj_dict,
+                       std::string const& key)> action)
+{
+    forEachXObject(recursive, action,
+                   [](QPDFObjectHandle obj) { return obj.isFormXObject(); });
+}
+
 std::map<std::string, QPDFObjectHandle>
 QPDFPageObjectHelper::getPageImages()
 {
@@ -396,32 +463,23 @@ std::map<std::string, QPDFObjectHandle>
 QPDFPageObjectHelper::getImages()
 {
     std::map<std::string, QPDFObjectHandle> result;
-    QPDFObjectHandle resources = getAttribute("/Resources", false);
-    if (resources.isDictionary())
-    {
-	if (resources.hasKey("/XObject"))
-	{
-	    QPDFObjectHandle xobject = resources.getKey("/XObject");
-	    std::set<std::string> keys = xobject.getKeys();
-	    for (std::set<std::string>::iterator iter = keys.begin();
-		 iter != keys.end(); ++iter)
-	    {
-		std::string key = (*iter);
-		QPDFObjectHandle value = xobject.getKey(key);
-		if (value.isStream())
-		{
-		    QPDFObjectHandle dict = value.getDict();
-		    if (dict.hasKey("/Subtype") &&
-			(dict.getKey("/Subtype").getName() == "/Image") &&
-			(! dict.hasKey("/ImageMask")))
-		    {
-			result[key] = value;
-		    }
-		}
-	    }
-	}
-    }
+    forEachImage(false, [&result](QPDFObjectHandle& obj,
+                                  QPDFObjectHandle&,
+                                  std::string const& key) {
+        result[key] = obj;
+    });
+    return result;
+}
 
+std::map<std::string, QPDFObjectHandle>
+QPDFPageObjectHelper::getFormXObjects()
+{
+    std::map<std::string, QPDFObjectHandle> result;
+    forEachFormXObject(false, [&result](QPDFObjectHandle& obj,
+                                        QPDFObjectHandle&,
+                                        std::string const& key) {
+        result[key] = obj;
+    });
     return result;
 }
 

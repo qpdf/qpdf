@@ -1150,6 +1150,11 @@ class QPDFObjectHandle
     QPDF_DLL
     bool isFormXObject();
 
+    // Indicate if this is an image. If exclude_imagemask is true,
+    // don't count image masks as images.
+    QPDF_DLL
+    bool isImage(bool exclude_imagemask=true);
+
   private:
     QPDFObjectHandle(QPDF*, int objid, int generation);
     QPDFObjectHandle(QPDFObject*);

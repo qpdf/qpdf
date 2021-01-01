@@ -8,7 +8,6 @@ Candidates for upcoming release
     * #473: zsh completion with directories
       * Investigate how serverless does completion
   * Non-bugs
-    * #436: parsing of document with form xobject
     * #488: allow specification of jpeg compression quality; may also
       need an option to recompress jpeg
 

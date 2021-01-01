@@ -2228,6 +2228,57 @@ void runtest(int n, char const* filename1, char const* arg2)
         w.setDecodeLevel(qpdf_dl_specialized);
         w.write();
     }
+    else if (n == 71)
+    {
+        auto show = [](QPDFObjectHandle& obj,
+                       QPDFObjectHandle& xobj_dict,
+                       std::string const& key) {
+            std::cout << xobj_dict.unparse() << " -> "
+                      << key << " -> " << obj.unparse() << std::endl;
+        };
+        auto page = QPDFPageDocumentHelper(pdf).getAllPages().at(0);
+        std::cout << "--- recursive, all ---" << std::endl;
+        page.forEachXObject(true, show);
+        std::cout << "--- non-recursive, all ---" << std::endl;
+        page.forEachXObject(false, show);
+        std::cout << "--- recursive, images ---" << std::endl;
+        page.forEachImage(true, show);
+        std::cout << "--- non-recursive, images ---" << std::endl;
+        page.forEachImage(false, show);
+        std::cout << "--- recursive, form XObjects ---" << std::endl;
+        page.forEachFormXObject(true, show);
+        std::cout << "--- non-recursive, form XObjects ---" << std::endl;
+        page.forEachFormXObject(false, show);
+        auto fx1 = QPDFPageObjectHelper(
+            page.getObjectHandle()
+            .getKey("/Resources")
+            .getKey("/XObject")
+            .getKey("/Fx1"));
+        std::cout << "--- recursive, all, from fx1 ---" << std::endl;
+        fx1.forEachXObject(true, show);
+        std::cout << "--- non-recursive, all, from fx1 ---" << std::endl;
+        fx1.forEachXObject(false, show);
+        std::cout << "--- get images, page ---" << std::endl;
+        for (auto& i: page.getImages())
+        {
+            std::cout << i.first << " -> " << i.second.unparse() << std::endl;
+        }
+        std::cout << "--- get images, fx ---" << std::endl;
+        for (auto& i: fx1.getImages())
+        {
+            std::cout << i.first << " -> " << i.second.unparse() << std::endl;
+        }
+        std::cout << "--- get form XObjects, page ---" << std::endl;
+        for (auto& i: page.getFormXObjects())
+        {
+            std::cout << i.first << " -> " << i.second.unparse() << std::endl;
+        }
+        std::cout << "--- get form XObjects, fx ---" << std::endl;
+        for (auto& i: fx1.getFormXObjects())
+        {
+            std::cout << i.first << " -> " << i.second.unparse() << std::endl;
+        }
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +
