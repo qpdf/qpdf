@@ -1,30 +1,14 @@
 Candidates for upcoming release
 ===============================
 
-* Enable discussions in github. See if any open issues should be there.
-
 * Open "next" issues
   * bugs
     * #473: zsh completion with directories
       * Investigate how serverless does completion
-  * Non-bugs
-    * #488: allow specification of jpeg compression quality; may also
-      need an option to recompress jpeg
-
-* Json mode enhancements:
-  * Put something in the json that makes it easier to find the
-    definition of an object without breaking compatibility
-  * See if the objects part can be sorted by object number
 
 * Remember to check work `qpdf` project for private issues
   * file with very slow page extraction
   * big page even with --remove-unreferenced-resources=yes, even with --empty
-  * optimize image failure because of colorspace
-
-* See if the tokenizer is a performance bottleneck and, if so,
-  optimize it. We might end up with a high-performance tokenizer that
-  has a different interface but still ultimately creates the same
-  tokens.
 
 Fuzz Errors
 ===========
