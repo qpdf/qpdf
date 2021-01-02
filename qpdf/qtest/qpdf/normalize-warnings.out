@@ -6,4 +6,7 @@ WARNING: split-tokens.pdf (offset 823): Resulting stream data may be corrupted b
 WARNING: split-tokens.pdf (offset 962): content normalization encountered bad tokens
 WARNING: split-tokens.pdf (offset 962): normalized content ended with a bad token; you may be able to resolve this by coalescing content streams in combination with normalizing content. From the command line, specify --coalesce-contents
 WARNING: split-tokens.pdf (offset 962): Resulting stream data may be corrupted but is may still useful for manual inspection. For more information on this warning, search for content normalization in the manual.
+WARNING: split-tokens.pdf (offset 1338): content normalization encountered bad tokens
+WARNING: split-tokens.pdf (offset 1338): normalized content ended with a bad token; you may be able to resolve this by coalescing content streams in combination with normalizing content. From the command line, specify --coalesce-contents
+WARNING: split-tokens.pdf (offset 1338): Resulting stream data may be corrupted but is may still useful for manual inspection. For more information on this warning, search for content normalization in the manual.
 qpdf: operation succeeded with warnings; resulting file may have some problems

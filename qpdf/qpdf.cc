@@ -5569,7 +5569,7 @@ static void set_writer_options(QPDF& pdf, Options& o, QPDFWriter& w)
     }
 }
 
-static void do_split_pages(QPDF& pdf, Options& o)
+static void do_split_pages(QPDF& pdf, Options& o, bool& warnings)
 {
     // Generate output file pattern
     std::string before;
@@ -5652,6 +5652,10 @@ static void do_split_pages(QPDF& pdf, Options& o)
         if (o.verbose)
         {
             std::cout << whoami << ": wrote file " << outfile << std::endl;
+        }
+        if (outpdf.anyWarnings())
+        {
+            warnings = true;
         }
     }
 }
@@ -5794,6 +5798,7 @@ int realmain(int argc, char* argv[])
         }
         handle_under_overlay(pdf, o);
         handle_transformations(pdf, o);
+        bool split_warnings = false;
 
 	if ((o.outfilename == 0) && (! o.replace_input))
 	{
@@ -5801,13 +5806,13 @@ int realmain(int argc, char* argv[])
 	}
         else if (o.split_pages)
         {
-            do_split_pages(pdf, o);
+            do_split_pages(pdf, o, split_warnings);
         }
 	else
 	{
             write_outfile(pdf, o);
 	}
-	if (! pdf.getWarnings().empty())
+	if ((! pdf.getWarnings().empty()) || split_warnings)
 	{
             if (! o.suppress_warnings)
             {

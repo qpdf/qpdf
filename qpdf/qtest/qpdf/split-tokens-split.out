@@ -7,4 +7,7 @@ WARNING: empty PDF: Resulting stream data may be corrupted but is may still usef
 WARNING: empty PDF: content normalization encountered bad tokens
 WARNING: empty PDF: normalized content ended with a bad token; you may be able to resolve this by coalescing content streams in combination with normalizing content. From the command line, specify --coalesce-contents
 WARNING: empty PDF: Resulting stream data may be corrupted but is may still useful for manual inspection. For more information on this warning, search for content normalization in the manual.
+WARNING: empty PDF: content normalization encountered bad tokens
+WARNING: empty PDF: normalized content ended with a bad token; you may be able to resolve this by coalescing content streams in combination with normalizing content. From the command line, specify --coalesce-contents
+WARNING: empty PDF: Resulting stream data may be corrupted but is may still useful for manual inspection. For more information on this warning, search for content normalization in the manual.
 qpdf: operation succeeded with warnings; resulting file may have some problems

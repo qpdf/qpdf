@@ -14,7 +14,6 @@
 #include <qpdf/QPDF_Stream.hh>
 #include <qpdf/QPDF_Reserved.hh>
 #include <qpdf/Pl_Buffer.hh>
-#include <qpdf/Pl_Concatenate.hh>
 #include <qpdf/Pl_QPDFTokenizer.hh>
 #include <qpdf/BufferInputSource.hh>
 #include <qpdf/QPDFExc.hh>
@@ -90,13 +89,11 @@ void
 CoalesceProvider::provideStreamData(int, int, Pipeline* p)
 {
     QTC::TC("qpdf", "QPDFObjectHandle coalesce provide stream data");
-    Pl_Concatenate concat("concatenate", p);
     std::string description = "page object " +
         QUtil::int_to_string(containing_page.getObjectID()) + " " +
         QUtil::int_to_string(containing_page.getGeneration());
     std::string all_description;
-    old_contents.pipeContentStreams(&concat, description, all_description);
-    concat.manualFinish();
+    old_contents.pipeContentStreams(p, description, all_description);
 }
 
 void
@@ -1630,14 +1627,15 @@ QPDFObjectHandle::pipeContentStreams(
         arrayOrStreamToStreamArray(
             description, all_description);
     bool need_newline = false;
+    Pl_Buffer buf("concatenated content stream buffer");
     for (std::vector<QPDFObjectHandle>::iterator iter = streams.begin();
          iter != streams.end(); ++iter)
     {
         if (need_newline)
         {
-            p->write(QUtil::unsigned_char_pointer("\n"), 1);
+            buf.write(QUtil::unsigned_char_pointer("\n"), 1);
         }
-        LastChar lc(p);
+        LastChar lc(&buf);
         QPDFObjectHandle stream = *iter;
         std::string og =
             QUtil::int_to_string(stream.getObjectID()) + " " +
@@ -1655,6 +1653,9 @@ QPDFObjectHandle::pipeContentStreams(
         QTC::TC("qpdf", "QPDFObjectHandle need_newline",
                 need_newline ? 0 : 1);
     }
+    std::unique_ptr<Buffer> b(buf.getBuffer());
+    p->write(b->getBuffer(), b->getSize());
+    p->finish();
 }
 
 void

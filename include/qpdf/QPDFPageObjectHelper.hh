@@ -199,12 +199,7 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
 
     // Pipe a page's contents through the given pipeline. This method
     // works whether the contents are a single stream or an array of
-    // streams. Call on a page object. Please note that if there is an
-    // array of content streams, p->finish() is called after each
-    // stream. If you pass a pipeline that doesn't allow write() to be
-    // called after finish(), you can wrap it in an instance of
-    // Pl_Concatenate and then call manualFinish() on the
-    // Pl_Concatenate pipeline at the end.
+    // streams.
     QPDF_DLL
     void pipePageContents(Pipeline* p);
 
