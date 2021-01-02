@@ -938,8 +938,8 @@ QPDFPageObjectHelper::placeFormXObject(
     QPDFObjectHandle::Rectangle bbox = bbox_obj.getArrayAsRectangle();
     QPDFObjectHandle::Rectangle T = wmatrix.transformRectangle(bbox);
 
-    // Calculate a scale factor, if needed. If the transformed
-    // rectangle is too big, shrink it. Never expand it.
+    // Calculate a scale factor, if needed. Shrink or expand if needed
+    // and allowed.
     if ((T.urx == T.llx) || (T.ury == T.lly))
     {
         // avoid division by zero
