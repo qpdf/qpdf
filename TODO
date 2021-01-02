@@ -21,18 +21,6 @@ Candidates for upcoming release
   * big page even with --remove-unreferenced-resources=yes, even with --empty
   * optimize image failure because of colorspace
 
-* Externalize inline images doesn't walk into form XObjects. In
-  general:
-
-  * Check QPDFPageObjectHelper and see what can be applied to form
-    XObjects. Maybe think about generalizing it to work with form
-    XObjects.
-
-  * There is an increasing amount of logic in qpdf.cc that should
-    probably move into the library. This includes externalizing inline
-    images and page splitting as those operations become more
-    elaborate, particularly with handling of form XObjects.
-
 * See if the tokenizer is a performance bottleneck and, if so,
   optimize it. We might end up with a high-performance tokenizer that
   has a different interface but still ultimately creates the same

@@ -905,6 +905,7 @@ $td->runtest("check output",
 my @eii_tests = (
     ['inline-images', 80],
     ['large-inline-image', 1024],
+    ['nested-form-xobjects-inline-images', 20],
     );
 $n_tests += 4 * scalar(@eii_tests);
 $n_compare_pdfs += 2 * scalar(@eii_tests);

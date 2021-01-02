@@ -1,0 +1,385 @@
+%PDF-1.3
+%¿÷¢þ
+%QDF-1.0
+
+%% Original object ID: 1 0
+1 0 obj
+<<
+  /Pages 2 0 R
+  /Type /Catalog
+>>
+endobj
+
+%% Original object ID: 2 0
+2 0 obj
+<<
+  /Count 1
+  /Kids [
+    3 0 R
+  ]
+  /Type /Pages
+>>
+endobj
+
+%% Page 1
+%% Original object ID: 3 0
+3 0 obj
+<<
+  /Contents 4 0 R
+  /MediaBox [
+    0
+    0
+    612
+    792
+  ]
+  /Parent 2 0 R
+  /Resources <<
+    /Font <<
+      /F1 6 0 R
+    >>
+    /ProcSet 7 0 R
+    /XObject <<
+      /Fx1 8 0 R
+      /IIm1 10 0 R
+      /IIm2 12 0 R
+    >>
+  >>
+  /Type /Page
+>>
+endobj
+
+%% Contents for page 1
+%% Original object ID: 20 0
+4 0 obj
+<<
+  /Length 5 0 R
+>>
+stream
+q
+BT
+  /F1 24 Tf
+  72 720 Td
+  (Page) Tj
+ET
+q
+100 0 0 100 72 600 cm
+/IIm1 Do
+
+Q
+q
+100 0 0 100 192 600 cm
+/IIm2 Do
+
+Q
+
+Q
+q
+1.00000 0.00000 0.00000 1.00000 72.00000 200.00000 cm
+/Fx1 Do
+Q
+endstream
+endobj
+
+5 0 obj
+186
+endobj
+
+%% Original object ID: 10 0
+6 0 obj
+<<
+  /BaseFont /Helvetica
+  /Encoding /WinAnsiEncoding
+  /Name /F1
+  /Subtype /Type1
+  /Type /Font
+>>
+endobj
+
+%% Original object ID: 11 0
+7 0 obj
+[
+  /PDF
+  /Text
+  /ImageC
+]
+endobj
+
+%% Original object ID: 12 0
+8 0 obj
+<<
+  /BBox [
+    0
+    0
+    300
+    500
+  ]
+  /Resources <<
+    /Font <<
+      /F1 14 0 R
+    >>
+    /ProcSet 15 0 R
+    /XObject <<
+      /Fx1 16 0 R
+      /IIm1 18 0 R
+      /IIm2 20 0 R
+    >>
+  >>
+  /Subtype /Form
+  /Type /XObject
+  /Length 9 0 R
+>>
+stream
+BT
+  /F1 24 Tf
+  0 320 Td
+  (FX1) Tj
+ET
+q
+100 0 0 100 000 200 cm
+/IIm1 Do
+
+Q
+q
+100 0 0 100 120 200 cm
+/IIm2 Do
+
+Q
+q
+1.00000 0.00000 0.00000 1.00000 0.00000 0.00000 cm
+/Fx1 Do
+Q
+endstream
+endobj
+
+9 0 obj
+177
+endobj
+
+%% Original object ID: 18 0
+10 0 obj
+<<
+  /BitsPerComponent 8
+  /ColorSpace /DeviceGray
+  /Height 15
+  /Subtype /Image
+  /Type /XObject
+  /Width 15
+  /Length 11 0 R
+>>
+stream
+`````@@@@@@@@@@`````@@@@@@@@@@`````@@@@@@@@@@`````@@@@@@@@@@`````@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+endstream
+endobj
+
+%QDF: ignore_newline
+11 0 obj
+225
+endobj
+
+%% Original object ID: 19 0
+12 0 obj
+<<
+  /BitsPerComponent 8
+  /ColorSpace /DeviceGray
+  /Height 15
+  /Subtype /Image
+  /Type /XObject
+  /Width 15
+  /Length 13 0 R
+>>
+stream
+@@@@@`````@@@@@@@@@@`````@@@@@@@@@@`````@@@@@@@@@@`````@@@@@@@@@@`````@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+endstream
+endobj
+
+%QDF: ignore_newline
+13 0 obj
+225
+endobj
+
+%% Original object ID: 14 0
+14 0 obj
+<<
+  /BaseFont /Helvetica
+  /Encoding /WinAnsiEncoding
+  /Name /F1
+  /Subtype /Type1
+  /Type /Font
+>>
+endobj
+
+%% Original object ID: 15 0
+15 0 obj
+[
+  /PDF
+  /Text
+  /ImageC
+]
+endobj
+
+%% Original object ID: 16 0
+16 0 obj
+<<
+  /BBox [
+    0
+    0
+    300
+    200
+  ]
+  /Resources <<
+    /Font <<
+      /F1 14 0 R
+    >>
+    /ProcSet 15 0 R
+    /XObject <<
+      /IIm1 22 0 R
+      /IIm2 24 0 R
+    >>
+  >>
+  /Subtype /Form
+  /Type /XObject
+  /Length 17 0 R
+>>
+stream
+BT
+  /F1 24 Tf
+  0 120 Td
+  (FX2) Tj
+ET
+q
+100 0 0 100 0 0 cm
+/IIm1 Do
+
+Q
+q
+100 0 0 100 120 0 cm
+/IIm2 Do
+
+Q
+endstream
+endobj
+
+17 0 obj
+108
+endobj
+
+%% Original object ID: 21 0
+18 0 obj
+<<
+  /BitsPerComponent 8
+  /ColorSpace /DeviceGray
+  /Height 15
+  /Subtype /Image
+  /Type /XObject
+  /Width 15
+  /Length 19 0 R
+>>
+stream
+@@@@@@@@@@`````@@@@@@@@@@`````@@@@@@@@@@`````@@@@@@@@@@`````@@@@@@@@@@`````@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+endstream
+endobj
+
+%QDF: ignore_newline
+19 0 obj
+225
+endobj
+
+%% Original object ID: 22 0
+20 0 obj
+<<
+  /BitsPerComponent 8
+  /ColorSpace /DeviceGray
+  /Height 15
+  /Subtype /Image
+  /Type /XObject
+  /Width 15
+  /Length 21 0 R
+>>
+stream
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@`````@@@@@@@@@@`````@@@@@@@@@@`````@@@@@@@@@@`````@@@@@@@@@@`````@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+endstream
+endobj
+
+%QDF: ignore_newline
+21 0 obj
+225
+endobj
+
+%% Original object ID: 23 0
+22 0 obj
+<<
+  /BitsPerComponent 8
+  /ColorSpace /DeviceGray
+  /Height 15
+  /Subtype /Image
+  /Type /XObject
+  /Width 15
+  /Length 23 0 R
+>>
+stream
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@`````@@@@@@@@@@`````@@@@@@@@@@`````@@@@@@@@@@`````@@@@@@@@@@`````@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+endstream
+endobj
+
+%QDF: ignore_newline
+23 0 obj
+225
+endobj
+
+%% Original object ID: 24 0
+24 0 obj
+<<
+  /BitsPerComponent 8
+  /ColorSpace /DeviceGray
+  /Height 15
+  /Subtype /Image
+  /Type /XObject
+  /Width 15
+  /Length 25 0 R
+>>
+stream
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@`````@@@@@@@@@@`````@@@@@@@@@@`````@@@@@@@@@@`````@@@@@@@@@@`````@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+endstream
+endobj
+
+%QDF: ignore_newline
+25 0 obj
+225
+endobj
+
+xref
+0 26
+0000000000 65535 f 
+0000000052 00000 n 
+0000000133 00000 n 
+0000000242 00000 n 
+0000000563 00000 n 
+0000000804 00000 n 
+0000000852 00000 n 
+0000000998 00000 n 
+0000001071 00000 n 
+0000001536 00000 n 
+0000001584 00000 n 
+0000001996 00000 n 
+0000002045 00000 n 
+0000002457 00000 n 
+0000002506 00000 n 
+0000002653 00000 n 
+0000002727 00000 n 
+0000003107 00000 n 
+0000003156 00000 n 
+0000003568 00000 n 
+0000003617 00000 n 
+0000004029 00000 n 
+0000004078 00000 n 
+0000004490 00000 n 
+0000004539 00000 n 
+0000004951 00000 n 
+trailer <<
+  /Root 1 0 R
+  /Size 26
+  /ID [<55269d37282af9edc76855e4cb859987><31415926535897932384626433832795>]
+>>
+startxref
+4972
+%%EOF

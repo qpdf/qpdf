@@ -4991,6 +4991,26 @@ print "\n";
         </listitem>
        </itemizedlist>
       </listitem>
+      <listitem>
+       <para>
+        Bug Fixes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          <function>QPDFPageObjectHelper::externalizeInlineImages</function>
+          was not externalizing images referenced from form XObjects
+          that appeared on the page.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          <function>QPDFObjectHandle::filterPageContents</function>
+          was broken for pages with multiple content streams.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
      </itemizedlist>
     </listitem>
    </varlistentry>

@@ -123,8 +123,15 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     std::map<std::string, QPDFObjectHandle> getFormXObjects();
 
-    // Convert each inline image to an external (normal) image if the
-    // size is at least the specified number of bytes.
+    // Converts each inline image to an external (normal) image if the
+    // size is at least the specified number of bytes. This method
+    // works with pages or form XObjects. By default, it recursively
+    // processes nested form XObjects. Pass true as shallow to avoid
+    // this behavior. Prior to qpdf 10.1, form XObjects were ignored,
+    // but this was considered a bug.
+    QPDF_DLL
+    void externalizeInlineImages(size_t min_size, bool shallow);
+    // ABI: make shallow optional (default false) and merge
     QPDF_DLL
     void externalizeInlineImages(size_t min_size = 0);
 

@@ -486,20 +486,50 @@ QPDFPageObjectHelper::getFormXObjects()
 void
 QPDFPageObjectHelper::externalizeInlineImages(size_t min_size)
 {
-    QPDFObjectHandle resources = getAttribute("/Resources", true);
-    // Calling mergeResources also ensures that /XObject becomes
-    // direct and is not shared with other pages.
-    resources.mergeResources(
-        QPDFObjectHandle::parse("<< /XObject << >> >>"));
-    InlineImageTracker iit(this->oh.getOwningQPDF(), min_size, resources);
-    Pl_Buffer b("new page content");
-    filterContents(&iit, &b);
-    if (iit.any_images)
+    externalizeInlineImages(min_size, false);
+}
+
+void
+QPDFPageObjectHelper::externalizeInlineImages(size_t min_size, bool shallow)
+{
+    if (shallow)
     {
-        getObjectHandle().replaceKey(
-            "/Contents",
-            QPDFObjectHandle::newStream(
-                this->oh.getOwningQPDF(), b.getBuffer()));
+        QPDFObjectHandle resources = getAttribute("/Resources", true);
+        // Calling mergeResources also ensures that /XObject becomes
+        // direct and is not shared with other pages.
+        resources.mergeResources(
+            QPDFObjectHandle::parse("<< /XObject << >> >>"));
+        InlineImageTracker iit(this->oh.getOwningQPDF(), min_size, resources);
+        Pl_Buffer b("new page content");
+        filterContents(&iit, &b);
+        if (iit.any_images)
+        {
+            if (this->oh.isFormXObject())
+            {
+                this->oh.replaceStreamData(
+                    b.getBuffer(),
+                    QPDFObjectHandle::newNull(),
+                    QPDFObjectHandle::newNull());
+            }
+            else
+            {
+                this->oh.replaceKey(
+                    "/Contents",
+                    QPDFObjectHandle::newStream(
+                        this->oh.getOwningQPDF(), b.getBuffer()));
+            }
+        }
+    }
+    else
+    {
+        externalizeInlineImages(min_size, true);
+        forEachFormXObject(
+            true,
+            [min_size](QPDFObjectHandle& obj,
+                       QPDFObjectHandle&, std::string const&) {
+                QPDFPageObjectHelper(obj).externalizeInlineImages(
+                    min_size, true);
+            });
     }
 }
 

@@ -1,3 +1,18 @@
+2021-01-02  Jay Berkenbilt  <ejb@ql.org>
+
+	* QPDFPageObjectHelper::externalizeInlineImages can be called with
+	form XObjects as well as pages.
+
+	* Bug fix: QPDFPageObjectHelper::externalizeInlineImages was not
+	descending into form XObjects on a page. It now does this by
+	default. In the extremely unlikely event that anyone was actually
+	depending on the old behavior, it is available by passing
+	shallow=true to the externalizeInlineImages call.
+
+	* Bug fix: QPDFObjectHandle::filterPageContents was broken for
+	pages with an array of content streams. This caused
+	externalize-inline-images to also be broken for this case.
+
 2021-01-01  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add methods to QPDFPageObjectHelper: forEachXObject,
