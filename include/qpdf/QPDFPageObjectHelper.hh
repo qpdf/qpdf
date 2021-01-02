@@ -182,7 +182,11 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
 
     // Parse a page's contents through ParserCallbacks, described
     // above. This method works whether the contents are a single
-    // stream or an array of streams. Call on a page object.
+    // stream or an array of streams. Call on a page object. Also
+    // works for form XObjects.
+    QPDF_DLL
+    void parseContents(QPDFObjectHandle::ParserCallbacks* callbacks);
+    // Old name
     QPDF_DLL
     void parsePageContents(QPDFObjectHandle::ParserCallbacks* callbacks);
 
@@ -206,14 +210,17 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
 
     // Pipe a page's contents through the given pipeline. This method
     // works whether the contents are a single stream or an array of
-    // streams.
+    // streams. Also works on form XObjects.
+    QPDF_DLL
+    void pipeContents(Pipeline* p);
+    // Old name
     QPDF_DLL
     void pipePageContents(Pipeline* p);
 
     // Attach a token filter to a page's contents. If the page's
     // contents is an array of streams, it is automatically coalesced.
     // The token filter is applied to the page's contents as a single
-    // stream.
+    // stream. Also works on form XObjects.
     QPDF_DLL
     void addContentTokenFilter(
         PointerHolder<QPDFObjectHandle::TokenFilter> token_filter);

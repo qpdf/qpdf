@@ -142,7 +142,7 @@ FuzzHelper::testPages()
         try
         {
             page.coalesceContentStreams();
-            page.parsePageContents(&discard_contents);
+            page.parseContents(&discard_contents);
             page.getImages();
             pldh.getLabelForPage(pageno);
             QPDFObjectHandle page_obj(page.getObjectHandle());

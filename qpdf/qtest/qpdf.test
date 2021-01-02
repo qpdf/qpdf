@@ -423,7 +423,7 @@ foreach my $i (@choice_values)
 show_ntests();
 # ----------
 $td->notify("--- Form XObject, underlay, overlay ---");
-$n_tests += 19;
+$n_tests += 20;
 
 $td->runtest("form xobject creation",
              {$td->COMMAND => "test_driver 55 fxo-red.pdf"},
@@ -489,6 +489,11 @@ for (my $i = 1; $i <= scalar(@uo_cases); ++$i)
 $td->runtest("foreach",
              {$td->COMMAND => "test_driver 71 nested-form-xobjects.pdf"},
              {$td->FILE => "nested-form-xobjects.out",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("page operations on form xobject",
+             {$td->COMMAND => "test_driver 72 nested-form-xobjects.pdf"},
+             {$td->FILE => "page-ops-on-form-xobject.out",
                   $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 

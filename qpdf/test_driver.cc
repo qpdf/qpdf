@@ -1463,7 +1463,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         {
             QPDFPageObjectHelper& page(*iter);
             ParserCallbacks cb;
-            page.parsePageContents(&cb);
+            page.parseContents(&cb);
         }
     }
     else if (n == 38)
@@ -2278,6 +2278,27 @@ void runtest(int n, char const* filename1, char const* arg2)
         {
             std::cout << i.first << " -> " << i.second.unparse() << std::endl;
         }
+    }
+    else if (n == 72)
+    {
+        // Call some QPDFPageObjectHelper methods on form XObjects.
+        auto page = QPDFPageDocumentHelper(pdf).getAllPages().at(0);
+        auto fx1 = QPDFPageObjectHelper(
+            page.getObjectHandle()
+            .getKey("/Resources")
+            .getKey("/XObject")
+            .getKey("/Fx1"));
+        std::cout << "--- parseContents ---" << std::endl;
+        ParserCallbacks cb;
+        fx1.parseContents(&cb);
+        Pl_Buffer b("buffer");
+        fx1.addContentTokenFilter(new TokenFilter);
+        fx1.pipeContents(&b);
+        std::unique_ptr<Buffer> buf(b.getBuffer());
+        std::string s(
+            reinterpret_cast<char const*>(buf->getBuffer()),
+            buf->getSize());
+        assert(s.find("/bye") != std::string::npos);
     }
     else
     {

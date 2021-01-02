@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
 
         QPDFPageObjectHelper& page = pages.at(QIntC::to_size(pageno-1));
         ParserCallbacks cb;
-        page.parsePageContents(&cb);
+        page.parseContents(&cb);
     }
     catch (std::exception& e)
     {

@@ -4893,6 +4893,18 @@ print "\n";
              <function>filterContents</function>
             </para>
            </listitem>
+           <listitem>
+            <para>
+             <function>pipePageContents</function> to
+             <function>pipeContents</function>
+            </para>
+           </listitem>
+           <listitem>
+            <para>
+             <function>parsePageContents</function> to
+             <function>parseContents</function>
+            </para>
+           </listitem>
           </itemizedlist>
          </para>
         </listitem>

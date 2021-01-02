@@ -1669,6 +1669,15 @@ QPDFObjectHandle::parsePageContents(ParserCallbacks* callbacks)
 }
 
 void
+QPDFObjectHandle::parseAsContents(ParserCallbacks* callbacks)
+{
+    std::string description = "object " +
+        QUtil::int_to_string(this->objid) + " " +
+        QUtil::int_to_string(this->generation);
+    this->parseContentStream_internal(description, callbacks);
+}
+
+void
 QPDFObjectHandle::filterPageContents(TokenFilter* filter, Pipeline* next)
 {
     std::string description = "token filter for page object " +

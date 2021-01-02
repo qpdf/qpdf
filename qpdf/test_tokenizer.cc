@@ -219,7 +219,7 @@ static void process(char const* filename, bool include_ignorable,
     {
         ++pageno;
         Pl_Buffer plb("buffer");
-        (*iter).pipePageContents(&plb);
+        (*iter).pipeContents(&plb);
         PointerHolder<Buffer> content_data = plb.getBuffer();
         BufferInputSource* bis = new BufferInputSource(
             "content data", content_data.getPointer());

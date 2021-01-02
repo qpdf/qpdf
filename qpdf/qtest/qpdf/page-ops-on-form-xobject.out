@@ -1,0 +1,47 @@
+--- parseContents ---
+content size: 173
+operator, offset=0, length=2: BT
+name, offset=5, length=3: /F1
+integer, offset=9, length=2: 24
+operator, offset=12, length=2: Tf
+integer, offset=17, length=1: 0
+integer, offset=19, length=3: 320
+operator, offset=23, length=2: Td
+string, offset=28, length=5: (FX1)
+operator, offset=34, length=2: Tj
+operator, offset=37, length=2: ET
+operator, offset=40, length=1: q
+integer, offset=42, length=3: 100
+integer, offset=46, length=1: 0
+integer, offset=48, length=1: 0
+integer, offset=50, length=3: 100
+integer, offset=54, length=3: 0
+integer, offset=58, length=3: 200
+operator, offset=62, length=2: cm
+name, offset=65, length=4: /Im1
+operator, offset=70, length=2: Do
+operator, offset=73, length=1: Q
+operator, offset=75, length=1: q
+integer, offset=77, length=3: 100
+integer, offset=81, length=1: 0
+integer, offset=83, length=1: 0
+integer, offset=85, length=3: 100
+integer, offset=89, length=3: 120
+integer, offset=93, length=3: 200
+operator, offset=97, length=2: cm
+name, offset=100, length=4: /Im2
+operator, offset=105, length=2: Do
+operator, offset=108, length=1: Q
+operator, offset=110, length=1: q
+real, offset=112, length=7: 1.00000
+real, offset=120, length=7: 0.00000
+real, offset=128, length=7: 0.00000
+real, offset=136, length=7: 1.00000
+real, offset=144, length=7: 0.00000
+real, offset=152, length=7: 0.00000
+operator, offset=160, length=2: cm
+name, offset=163, length=4: /Fx1
+operator, offset=168, length=2: Do
+operator, offset=171, length=1: Q
+-EOF-
+test 72 done

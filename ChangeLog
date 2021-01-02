@@ -1,5 +1,17 @@
 2021-01-02  Jay Berkenbilt  <ejb@ql.org>
 
+	* Make QPDFPageObjectHelper methods pipeContents, parseContents,
+	and addContentTokenFilter work with form XObjects.
+
+	* Rename some QPDFPageObjectHelper methods and make them support
+	form XObjects as well as pages. The old names will be preserved
+	from compatibility.
+	- pipePageContents -> pipeContents
+	- parsePageContents -> parseContents
+
+	* Add QPDFObjectHandle::parseAsContents to apply ParserCallbacks
+	to a form XObject.
+
 	* QPDFPageObjectHelper::externalizeInlineImages can be called with
 	form XObjects as well as pages.
 

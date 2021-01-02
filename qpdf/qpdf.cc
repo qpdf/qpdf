@@ -3539,7 +3539,7 @@ static void do_check(QPDF& pdf, Options& o, int& exit_code)
             ++pageno;
             try
             {
-                page.parsePageContents(&discard_contents);
+                page.parseContents(&discard_contents);
             }
             catch (QPDFExc& e)
             {

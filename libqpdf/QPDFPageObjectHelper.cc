@@ -584,7 +584,21 @@ void
 QPDFPageObjectHelper::parsePageContents(
     QPDFObjectHandle::ParserCallbacks* callbacks)
 {
-    this->oh.parsePageContents(callbacks);
+    parseContents(callbacks);
+}
+
+void
+QPDFPageObjectHelper::parseContents(
+    QPDFObjectHandle::ParserCallbacks* callbacks)
+{
+    if (this->oh.isFormXObject())
+    {
+        this->oh.parseAsContents(callbacks);
+    }
+    else
+    {
+        this->oh.parsePageContents(callbacks);
+    }
 }
 
 void
@@ -613,14 +627,34 @@ QPDFPageObjectHelper::filterContents(
 void
 QPDFPageObjectHelper::pipePageContents(Pipeline* p)
 {
-    this->oh.pipePageContents(p);
+    pipeContents(p);
+}
+
+void
+QPDFPageObjectHelper::pipeContents(Pipeline* p)
+{
+    if (this->oh.isFormXObject())
+    {
+        this->oh.pipeStreamData(p, 0, qpdf_dl_specialized);
+    }
+    else
+    {
+        this->oh.pipePageContents(p);
+    }
 }
 
 void
 QPDFPageObjectHelper::addContentTokenFilter(
     PointerHolder<QPDFObjectHandle::TokenFilter> token_filter)
 {
-    this->oh.addContentTokenFilter(token_filter);
+    if (this->oh.isFormXObject())
+    {
+        this->oh.addTokenFilter(token_filter);
+    }
+    else
+    {
+        this->oh.addContentTokenFilter(token_filter);
+    }
 }
 
 class NameWatcher: public QPDFObjectHandle::TokenFilter
