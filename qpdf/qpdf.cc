@@ -726,6 +726,8 @@ class ArgParser
     OptionEntry oe_optionalParameter(param_arg_handler_t);
     OptionEntry oe_requiredChoices(param_arg_handler_t, char const** choices);
 
+    void completionCommon(bool zsh);
+
     void argHelp();
     void argVersion();
     void argCopyright();
@@ -1637,7 +1639,7 @@ ArgParser::argHelp()
 }
 
 void
-ArgParser::argCompletionBash()
+ArgParser::completionCommon(bool zsh)
 {
     std::string progname = argv[0];
     std::string executable;
@@ -1657,8 +1659,16 @@ ArgParser::argCompletionBash()
             progname = appimage;
         }
     }
-    std::cout << "complete -o bashdefault -o default -o nospace"
-              << " -C " << progname << " " << whoami << std::endl;
+    if (zsh)
+    {
+        std::cout << "autoload -U +X bashcompinit && bashcompinit && ";
+    }
+    std::cout << "complete -o bashdefault -o default";
+    if (! zsh)
+    {
+        std::cout << " -o nospace";
+    }
+    std::cout << " -C " << progname << " " << whoami << std::endl;
     // Put output before error so calling from zsh works properly
     std::string path = progname;
     size_t slash = path.find('/');
@@ -1670,10 +1680,15 @@ ArgParser::argCompletionBash()
 }
 
 void
+ArgParser::argCompletionBash()
+{
+    completionCommon(false);
+}
+
+void
 ArgParser::argCompletionZsh()
 {
-    std::cout << "autoload -U +X bashcompinit && bashcompinit && ";
-    argCompletionBash();
+    completionCommon(true);
 }
 void
 ArgParser::argJsonHelp()
@@ -3373,10 +3388,20 @@ ArgParser::addOptionsToCompletions()
          iter != this->option_table->end(); ++iter)
     {
         std::string const& arg = (*iter).first;
+        if (arg == "--")
+        {
+            continue;
+        }
         OptionEntry& oe = (*iter).second;
         std::string base = "--" + arg;
         if (oe.param_arg_handler)
         {
+            if (zsh_completion)
+            {
+                // zsh doesn't treat = as a word separator, so add all
+                // the options so we don't get a space after the =.
+                addChoicesToCompletions(arg, base + "=");
+            }
             completions.insert(base + "=");
         }
         if (! oe.parameter_needed)

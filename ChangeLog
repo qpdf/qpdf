@@ -1,3 +1,8 @@
+2021-01-03  Jay Berkenbilt  <ejb@ql.org>
+
+	* Don't include -o nospace with zsh completion setup so file
+	completion works normally. Fixes #473.
+
 2021-01-02  Jay Berkenbilt  <ejb@ql.org>
 
 	* Make QPDFPageObjectHelper methods pipeContents, parseContents,

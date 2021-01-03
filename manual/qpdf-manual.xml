@@ -5021,6 +5021,12 @@ print "\n";
           was broken for pages with multiple content streams.
          </para>
         </listitem>
+        <listitem>
+         <para>
+          Tweak zsh completion code to behave a little better with
+          respect to path completion.
+         </para>
+        </listitem>
        </itemizedlist>
       </listitem>
      </itemizedlist>

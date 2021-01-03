@@ -1,11 +1,6 @@
 Candidates for upcoming release
 ===============================
 
-* Open "next" issues
-  * bugs
-    * #473: zsh completion with directories
-      * Investigate how serverless does completion
-
 * Remember to check work `qpdf` project for private issues
   * file with very slow page extraction
   * big page even with --remove-unreferenced-resources=yes, even with --empty

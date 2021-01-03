@@ -1,0 +1,7 @@
+--check
+--decode-level=all
+--encrypt
+!--completion-bash
+!--copyright
+!--help
+!--version
