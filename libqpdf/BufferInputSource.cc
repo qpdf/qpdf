@@ -13,7 +13,8 @@ BufferInputSource::Members::Members(bool own_memory,
     description(description),
     buf(buf),
     cur_offset(0),
-    max_offset(buf ? QIntC::to_offset(buf->getSize()) : 0)
+    max_offset(buf ? QIntC::to_offset(buf->getSize()) : 0),
+    bp(buf->getBuffer())
 {
 }
 
@@ -61,7 +62,7 @@ BufferInputSource::findAndSkipNextEOL()
     }
 
     qpdf_offset_t result = 0;
-    unsigned char const* buffer = this->m->buf->getBuffer();
+    unsigned char const* buffer = this->m->bp;
     unsigned char const* end = buffer + end_pos;
     unsigned char const* p = buffer + this->m->cur_offset;
 
@@ -156,7 +157,15 @@ BufferInputSource::read(char* buffer, size_t length)
     this->last_offset = this->m->cur_offset;
     size_t len = std::min(
         QIntC::to_size(end_pos - this->m->cur_offset), length);
-    memcpy(buffer, this->m->buf->getBuffer() + this->m->cur_offset, len);
+    std::cout
+        << "XXX read "
+        << reinterpret_cast<void *>(this)
+        << " " << reinterpret_cast<void const*>(this->m.getPointer())
+        << " " << reinterpret_cast<void const*>(this->m->buf)
+        << " " << reinterpret_cast<void const*>(this->m->bp)
+        << " " << this->m->cur_offset << ", " << len << std::endl;
+    memcpy(buffer, this->m->bp + this->m->cur_offset, len);
+    std::cout << "XXX done " << this->m->cur_offset << ", " << len << std::endl;
     this->m->cur_offset += QIntC::to_offset(len);
     return len;
 }

@@ -91,6 +91,15 @@ namespace QUtil
     QPDF_DLL
     int os_wrapper(std::string const& description, int status);
 
+    QPDF_DLL
+    bool with_mmapped_file(
+        char const* filename,
+        std::function<void(char const* buf, size_t len)> action);
+    QPDF_DLL
+    bool with_mmapped_file(
+        FILE* f,
+        std::function<void(char const* buf, size_t len)> action);
+
     // If the open fails, throws std::runtime_error. Otherwise, the
     // FILE* is returned. The filename should be UTF-8 encoded, even
     // on Windows. It will be converted as needed on Windows.

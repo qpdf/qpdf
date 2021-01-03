@@ -71,6 +71,7 @@ class BufferInputSource: public InputSource
         Buffer* buf;
         qpdf_offset_t cur_offset;
         qpdf_offset_t max_offset;
+        unsigned char const* bp;
     };
 
     PointerHolder<Members> m;

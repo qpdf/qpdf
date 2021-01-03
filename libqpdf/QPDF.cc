@@ -216,18 +216,32 @@ QPDF::~QPDF()
 void
 QPDF::processFile(char const* filename, char const* password)
 {
-    FileInputSource* fi = new FileInputSource();
-    fi->setFilename(filename);
-    processInputSource(fi, password);
+    if (! QUtil::with_mmapped_file(
+            filename,
+            [this, password, filename](char const* buf, size_t len) {
+                processMemoryFile(filename, buf, len, password);
+            }))
+    {
+        FileInputSource* fi = new FileInputSource();
+        fi->setFilename(filename);
+        processInputSource(fi, password);
+    }
 }
 
 void
 QPDF::processFile(char const* description, FILE* filep,
                   bool close_file, char const* password)
 {
-    FileInputSource* fi = new FileInputSource();
-    fi->setFile(description, filep, close_file);
-    processInputSource(fi, password);
+    if (! QUtil::with_mmapped_file(
+            filep,
+            [this, password, description](char const* buf, size_t len) {
+                processMemoryFile(description, buf, len, password);
+            }))
+    {
+        FileInputSource* fi = new FileInputSource();
+        fi->setFile(description, filep, close_file);
+        processInputSource(fi, password);
+    }
 }
 
 void

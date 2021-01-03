@@ -33,6 +33,12 @@
 # include <unistd.h>
 # include <sys/stat.h>
 #endif
+#ifdef MMAP_FILE
+# include <sys/mman.h>
+# include <sys/stat.h>
+# include <sys/types.h>
+# include <unistd.h>
+#endif
 
 // First element is 128
 static unsigned short pdf_doc_to_unicode[] = {
@@ -448,6 +454,60 @@ win_convert_filename(char const* filename)
     return wfilenamep;
 }
 #endif
+
+bool
+QUtil::with_mmapped_file(
+    char const* filename,
+    std::function<void(char const* buf, size_t len)> action)
+{
+#ifndef MMAP_FILE
+    return false;
+#else
+    FILE* f = fopen(filename, "rb");
+    if (f == nullptr)
+    {
+        return false;
+    }
+    FileCloser fc(f);
+    return with_mmapped_file(f, action);
+#endif
+}
+
+bool
+QUtil::with_mmapped_file(
+    FILE* f, std::function<void(char const* buf, size_t len)> action)
+{
+#ifndef MMAP_FILE
+    return false;
+#else
+    int fd = fileno(f);
+    struct stat statbuf;
+    if (fstat(fd, &statbuf) == -1)
+    {
+        return false;
+    }
+    size_t filesize = QIntC::to_size(statbuf.st_size);
+    size_t pagesize = QIntC::to_size(getpagesize());
+    size_t len = (filesize + pagesize - 1) & ~(pagesize - 1);
+    void* mem = mmap(0, len, PROT_READ, MAP_SHARED, fd, 0);
+    if (mem == reinterpret_cast<void*>(-1))
+    {
+        return false;
+    }
+    try
+    {
+        std::cout << "XXX calling action with mmap" << std::endl;
+        action(reinterpret_cast<char const*>(mem), filesize);
+        munmap(mem, len);
+    }
+    catch (std::exception& e)
+    {
+        munmap(mem, len);
+        throw e;
+    }
+    return true;
+#endif
+}
 
 FILE*
 QUtil::safe_fopen(char const* filename, char const* mode)
