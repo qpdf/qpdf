@@ -562,6 +562,59 @@ if test "$BUILDRULES" = "msvc"; then
   WINDOWS_MAIN_XLINK_FLAGS="-link setargv.obj"
 fi
 
+AC_LANG_PUSH([C++])
+MMAP_FILE=""
+AC_MSG_CHECKING(whether mmap file works)
+AC_RUN_IFELSE([AC_LANG_PROGRAM(
+ [[
+    #include <sys/mman.h>
+    #include <sys/stat.h>
+    #include <sys/types.h>
+    #include <unistd.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
+]],
+ [[
+    FILE* f = fopen("qpdf/qpdf.cc", "rb");
+    if (! f)
+    {
+        exit(2);
+    }
+    int fd = fileno(f);
+    struct stat statbuf;
+    if (fstat(fd, &statbuf) == -1)
+    {
+        exit(3);
+    }
+    size_t len = static_cast<size_t>(statbuf.st_size);
+    size_t pagesize = static_cast<size_t>(getpagesize());
+    len += pagesize - 1;
+    len &= ~(pagesize - 1);
+    void* mem = mmap(0, len, PROT_READ, MAP_SHARED, fd, 0);
+    if (mem == reinterpret_cast<void*>(-1))
+    {
+        exit(4);
+    }
+    fclose(f);
+    char const* buf = reinterpret_cast<char const*>(mem);
+    char const* p = strstr(buf, "QPDF");
+    if (p == nullptr)
+    {
+        exit(5);
+    }
+    munmap(mem, len);
+ ]]
+ )],
+ [MMAP_FILE=1],[MMAP_FILE=0],[MMAP_FILE=0])
+AC_LANG_POP
+if test "$MMAP_FILE" = "1"; then
+   AC_MSG_RESULT(yes)
+   AC_DEFINE([MMAP_FILE], [1], [Whether we can use mmap on files])
+else
+   AC_MSG_RESULT(no)
+fi
+
 dnl BEGIN CRYPTO
 
 dnl By default, we build in support for every crypto provider that we
