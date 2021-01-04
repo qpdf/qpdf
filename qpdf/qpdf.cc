@@ -5120,6 +5120,7 @@ static void handle_page_specs(QPDF& pdf, Options& o)
                          page_spec.range));
     }
 
+    std::map<unsigned long long, bool> remove_unreferenced;
     if (o.remove_unreferenced_page_resources != re_no)
     {
         for (std::map<std::string, QPDF*>::iterator iter =
@@ -5134,10 +5135,11 @@ static void handle_page_specs(QPDF& pdf, Options& o)
                 cis->stayOpen(true);
             }
             QPDF& other(*((*iter).second));
-            if (should_remove_unreferenced_resources(other, o))
+            auto other_uuid = other.getUniqueId();
+            if (remove_unreferenced.count(other_uuid) == 0)
             {
-                QPDFPageDocumentHelper dh(other);
-                dh.removeUnreferencedResources();
+                remove_unreferenced[other_uuid] =
+                    should_remove_unreferenced_resources(other, o);
             }
             if (cis)
             {
@@ -5246,6 +5248,10 @@ static void handle_page_specs(QPDF& pdf, Options& o)
             else
             {
                 copied_pages[from_uuid].insert(to_copy_og);
+                if (remove_unreferenced[from_uuid])
+                {
+                    to_copy.removeUnreferencedResources();
+                }
             }
             dh.addPage(to_copy, false);
             if (page_data.qpdf == &pdf)

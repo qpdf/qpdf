@@ -1,3 +1,0 @@
-WARNING: shared-images-errors.pdf (offset 4933): error decoding stream data for object 19 0: stream inflate: inflate: data: incorrect header check
-WARNING: shared-images-errors.pdf, object 4 0 at offset 676: Unable to parse content stream: content stream (content stream object 19 0): errors while decoding content stream; not attempting to remove unreferenced objects from this page
-qpdf: operation succeeded with warnings; resulting file may have some problems

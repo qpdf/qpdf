@@ -1,5 +1,10 @@
 2021-01-04  Jay Berkenbilt  <ejb@ql.org>
 
+	* When qpdf CLI extracts pages, it now only attempts to remove
+	unreferenced resourecs from the pages that it is keeping. This
+	change dramatically reduces the time it takes to extract a small
+	number of pages from a large, complex file.
+
 	* Move getNext()->write() calls in some pipelines to ensure that
 	state gates properly reset even if the next pipeline's write
 	throws an exception (fuzz issue 28262).

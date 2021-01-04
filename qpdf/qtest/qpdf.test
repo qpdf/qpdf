@@ -2247,12 +2247,15 @@ $td->runtest("check output",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "shared-images-errors-2-out.pdf"});
 
+# This test used to generate warnings about images on pages we didn't
+# care about, but qpdf was modified not to process those pages, so the
+# "irrelevant" errors went away.
 $td->runtest("shared resources irrelevant errors",
              {$td->COMMAND =>
                   "qpdf --qdf --static-id" .
                   " shared-images-errors.pdf --pages . 1 -- a.pdf"},
-             {$td->FILE => "shared-images-errors-1.out",
-                  $td->EXIT_STATUS => 3},
+             {$td->STRING => "",
+                  $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
              {$td->FILE => "a.pdf"},

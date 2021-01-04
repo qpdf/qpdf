@@ -5001,6 +5001,15 @@ print "\n";
           <literal>/DecodeParms</literal>.
          </para>
         </listitem>
+        <listitem>
+         <para>
+          When extracting pages, the <command>qpdf</command> CLI only
+          removes unreferenced resources from the pages that are being
+          kept, resulting in a significant performance improvement
+          when extracting small numbers of pages from large, complex
+          documents.
+         </para>
+        </listitem>
        </itemizedlist>
       </listitem>
       <listitem>
