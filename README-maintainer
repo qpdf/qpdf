@@ -108,9 +108,18 @@ CODING RULES
 
 RELEASE PREPARATION
 
-* Each year, update copyright notices. Just do a case-insensitive
-  search for copyright. Don't forget copyright in manual. Also update
-  debian copyright in debian package. Last updated: 2020.
+* Each year, update copyright notices. This will find all relevant
+  places (assuming current copyright is from last year) except the
+  manual:
+
+  git --no-pager grep -i -n -P "copyright.*$(expr $(date +%Y) - 1).*berkenbilt"
+
+  Also update the copyright in these places:
+  * manual
+  * debian package -- search for copyright.*berkenbilt in debian/copyright
+  * qtest-driver, TestDriver.pm in qtest source
+
+  Copyright last updated: 2021.
 
 * Take a look at "External Libraries" in TODO to see if we need to
   make any changes. There is still some automation work left to do, so

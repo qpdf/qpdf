@@ -14,7 +14,7 @@ The public key used to sign qpdf source distributions has fingerprint `C2C9 6B10
 
 # Copyright, License
 
-QPDF is copyright (c) 2005-2020 Jay Berkenbilt
+QPDF is copyright (c) 2005-2021 Jay Berkenbilt
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
