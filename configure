@@ -16208,9 +16208,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 # * Otherwise, increment LT_REVISION
 
 # LT = libtool
-LT_CURRENT=28
-LT_AGE=0
-LT_REVISION=4
+LT_CURRENT=29
+LT_AGE=1
+LT_REVISION=0
 
 
 
