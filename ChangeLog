@@ -1,3 +1,7 @@
+2021-01-05  Jay Berkenbilt  <ejb@ql.org>
+
+	* 10.1.0: release
+
 2021-01-04  Jay Berkenbilt  <ejb@ql.org>
 
 	* When qpdf CLI extracts pages, it now only attempts to remove
