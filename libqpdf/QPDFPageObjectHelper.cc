@@ -1084,7 +1084,7 @@ QPDFPageObjectHelper::flattenRotation()
     // When we rotate the page, pivot about the point 0, 0 and then
     // translate so the page is visible with the origin point being
     // the same offset from the lower left corner of the media box.
-    // These calculations have been verified emperically with various
+    // These calculations have been verified empirically with various
     // PDF readers.
     QPDFObjectHandle::Matrix cm;
     cm.e = 0.0;

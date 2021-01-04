@@ -23,7 +23,7 @@
 // is no such filter in PDF, so the streams created by the example
 // would not be usable by any PDF reader. However, the techniques here
 // would work if you were going to implement support for a filter that
-// qpdf does not support natively. For example, using the techinques
+// qpdf does not support natively. For example, using the techniques
 // shown here, it would be possible to create an application that
 // downsampled or re-encoded images or that re-compressed streams
 // using a more efficient "deflate" implementation than zlib.
@@ -85,7 +85,7 @@ class SF_XORDecode: public QPDFStreamFilter
     // validate and interpret decode parameters (/DecodeParms) for the
     // made-up /XORDecode stream filter. Since this is not a real
     // stream filter, no actual PDF reader would know how to interpret
-    // it. This is just to illlustrate how to create a stream filter.
+    // it. This is just to illustrate how to create a stream filter.
     // In main(), we call QPDF::registerStreamFilter to tell the
     // library about the filter. See comments in QPDFStreamFilter.hh
     // for details on how to implement the methods. For purposes of
@@ -260,7 +260,7 @@ StreamReplacer::maybeReplace(QPDFObjGen const& og,
     // necessary setup. When we are actually ready to supply the data,
     // this method is called again with pipeline populated and
     // dict_updates as a nullptr. In this mode, we are not allowed to
-    // change anything, sincing writing is already in progress. We
+    // change anything, since writing is already in progress. We
     // must simply provide the stream data.
 
     // The return value indicates whether or not we should replace the

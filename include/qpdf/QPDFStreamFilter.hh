@@ -39,7 +39,7 @@ class QPDF_DLL_CLASS QPDFStreamFilter
     // setDecodeParms() and getDecodePipeline(). QPDF will always call
     // setDecodeParms() before calling getDecodePipeline(). It is
     // expected that you will store any needed information from
-    // decode_parms (or the decode_parms object iself) in your
+    // decode_parms (or the decode_parms object itself) in your
     // instance so that it can be used to construct the decode
     // pipeline.
 

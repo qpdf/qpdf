@@ -119,6 +119,7 @@ argExternalizeInlineImages
 argfile
 argFilteredStreamData
 argFlattenAnnotations
+argFlattenRotation
 argForceVersion
 argGenerateAppearances
 argHelp
@@ -277,6 +278,7 @@ bookinfo
 bool
 BoringSSL
 BORLANDC
+boxkey
 bp
 BPC
 bpp
@@ -397,6 +399,7 @@ commandline
 COMP
 compareVersions
 compatbility
+completionCommon
 CompressConfig
 computeDeterministicIDData
 concat
@@ -428,6 +431,7 @@ CreateFile
 createPageContents
 createWhat
 CreationDate
+cred
 cregex
 CRNL
 CropBox
@@ -558,8 +562,11 @@ doFinalChecks
 Dohnal
 DOTLESS
 doubleBoxSize
+downsampled
+downsampler
 doWrite
 doWriteSetup
+DoXOR
 Doxygen
 dp
 DQPDF
@@ -707,6 +714,7 @@ filetrailer
 filterability
 filterAsContents
 filterCompressedObjects
+filterContents
 filterp
 filterPageContents
 findAndSkipNextEOL
@@ -732,6 +740,7 @@ flarp
 flate
 Flate's
 FlateDecode
+FlateLzwDecode
 flattenAnnotations
 flattenAnnotationsForPage
 flattenPagesTree
@@ -750,6 +759,10 @@ forcePDFVersion
 ForceR
 ForceV
 foreach
+forEachFormXObject
+forEachImage
+ForEachImage
+forEachXObject
 ForeignStreamData
 FormatMessageA
 fp
@@ -826,6 +839,7 @@ getCount
 getCropBox
 getDA
 getDataChecksum
+getDecodePipeline
 getDefaultAppearance
 getDefaultProvider
 getDefaultValue
@@ -850,6 +864,7 @@ getFileChecksum
 GetFileInformationByHandle
 getFilename
 getFilePosition
+getFilterOnWrite
 getFinalVersion
 getFirstChar
 getFlags
@@ -857,6 +872,7 @@ getFontFromResource
 getFontName
 getFormFields
 getFormXObjectForPage
+getFormXObjects
 getFullyQualifiedName
 getGen
 getGeneration
@@ -864,6 +880,7 @@ getHeight
 getHexDigest
 getId
 getIdentifier
+getImages
 getImpl
 getInheritableFieldValue
 getInheritableFieldValueAsName
@@ -1091,6 +1108,7 @@ ImageC
 ImageChecker
 ImageInverter
 ImageMask
+imagemask
 ImageOptimizer
 ImageProvider
 img
@@ -1163,12 +1181,15 @@ isDictionary
 isdigit
 isDirectNull
 isEncrypted
+isFormXObject
 isIgnorable
+isImage
 isIndirect
 isInitialized
 isInlineImage
 isInteger
 isLinearized
+isLossyCompression
 isMatrix
 isName
 isNull
@@ -1189,6 +1210,7 @@ isReserved
 isScalar
 isspace
 isSpace
+isSpecializedCompression
 isStream
 isString
 isText
@@ -1202,6 +1224,7 @@ iter
 ith
 iz
 jarr
+JBIG
 JCS
 JDIMENSION
 jdouble
@@ -1233,6 +1256,7 @@ keybits
 keylen
 KEYLENGTH
 keyset
+KeyStream
 kgdl
 LARGEFILE
 LastChar
@@ -1334,6 +1358,7 @@ makeNumber
 makePipeline
 makeReal
 makeString
+Mal
 malloc
 manualFinish
 mappingname
@@ -1342,6 +1367,7 @@ Mateusz
 maxEnd
 maxlen
 maxval
+maybeReplace
 md
 mdash
 MDd
@@ -1439,6 +1465,7 @@ nitems
 nkids
 nl
 nlines
+nlohmann
 nmatches
 nMatches
 NoBackref
@@ -1535,6 +1562,7 @@ OptionEntry
 ord
 org
 orig
+OrigLength
 orred
 os
 oss
@@ -1582,7 +1610,9 @@ param
 params
 parms
 parseable
+parseAsContents
 parsecontent
+parseContents
 parseContentStream
 parsedoffset
 ParseGuard
@@ -1614,6 +1644,7 @@ pdfdoc
 PDFDoc
 PDFDocEncoding
 pdfDumpInfoDict
+PDFEx
 PDFs
 pdfs
 pdh
@@ -1630,6 +1661,7 @@ phe
 php
 pikepdf
 pikepdf's
+pipeContents
 pipeContentStreams
 pipeForeignStreamData
 PipelineAccessor
@@ -1694,6 +1726,7 @@ programlisting
 programmatically
 ProgressReporter
 Projet
+ProtectXOR
 prov
 provideRandomData
 provideStreamData
@@ -1722,6 +1755,7 @@ pytest
 qarray
 QArray
 qbilt
+qdata
 qdf
 qdf's
 QdfFixer
@@ -1735,6 +1769,7 @@ QIntC
 ql
 qnumbers
 QNumbers
+qoh
 qp
 qpdf
 qpdf's
@@ -1773,6 +1808,7 @@ qpdfs
 QPDFSomethingDocumentHelper
 QPDFSomethingObjectHelper
 QPDFStream
+QPDFStreamFilter
 QPDFSystemError
 QPDFTokenizer
 QPDFTYPES
@@ -1848,6 +1884,8 @@ registerForeignStream
 registerImage
 registerImpl
 registerProgressReporter
+registerStream
+registerStreamFilter
 Regsvr
 releaseResolved
 ReleaseResolver
@@ -1872,6 +1910,7 @@ reportProgress
 repos
 requiredChoices
 requiredParameter
+resampler
 resave
 reserveObjects
 resetBits
@@ -1928,6 +1967,7 @@ saphir
 sarray
 SASLprep
 savable
+sc
 scanline
 scanlines
 Scarff
@@ -1956,6 +1996,7 @@ setCompressStreams
 setContentNormalization
 setDataKey
 setDecodeLevel
+setDecodeParms
 setDefaultProvider
 setDescription
 setDeterministicID
@@ -1967,6 +2008,7 @@ setExtraHeaderText
 setFieldAttribute
 setFile
 setFilename
+setFilterOnWrite
 setFromVector
 setIgnoreXRefStreams
 setImmediateCopyFrom
@@ -2047,6 +2089,7 @@ src
 srdp
 sregex
 ss
+ssp
 sstream
 stampfile
 stamppdf
@@ -2080,6 +2123,7 @@ strcpy
 streamDataChoices
 StreamDataProvider
 streammethod
+StreamReplacer
 strerror
 StrF
 stricmp
@@ -2144,6 +2188,7 @@ Te
 TerminateParsing
 terminateParsing
 testcase
+TestDriver
 testOutlines
 testPages
 TESTSUITE
@@ -2320,6 +2365,7 @@ wfilenamep
 WFLAGS
 wfopen
 whoami
+willFilterStream
 WinAnsi
 winansi
 WinAnsiEncoding
@@ -2411,6 +2457,8 @@ XObject
 XObject's
 XObjects
 xor
+XORDecode
+XORs
 xp
 xpacket
 xpdf
