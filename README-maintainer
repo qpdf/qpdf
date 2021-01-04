@@ -174,8 +174,8 @@ RELEASE PREPARATION
 
   * Other files copied as indicated:
     ```
-    cp /usr/share/automake-1.11/install-sh .
-    cp /usr/share/automake-1.11/mkinstalldirs .
+    cp /usr/share/automake-1.16/install-sh .
+    cp /usr/share/automake-1.16/mkinstalldirs .
     cp /usr/share/aclocal/pkg.m4 m4
     ```
 
