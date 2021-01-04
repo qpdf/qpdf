@@ -97,12 +97,14 @@ Pl_ASCIIHexDecoder::flush()
 
     QTC::TC("libtests", "Pl_ASCIIHexDecoder partial flush",
 	    (this->pos == 2) ? 0 : 1);
-    getNext()->write(&ch, 1);
-
+    // Reset before calling getNext()->write in case that throws an
+    // exception.
     this->pos = 0;
     this->inbuf[0] = '0';
     this->inbuf[1] = '0';
     this->inbuf[2] = '\0';
+
+    getNext()->write(&ch, 1);
 }
 
 void

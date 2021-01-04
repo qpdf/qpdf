@@ -119,10 +119,13 @@ Pl_ASCII85Decoder::flush()
 
     QTC::TC("libtests", "Pl_ASCII85Decoder partial flush",
 	    (this->pos == 5) ? 0 : 1);
-    getNext()->write(outbuf, this->pos - 1);
-
+    // Reset before calling getNext()->write in case that throws an
+    // exception.
+    auto t = this->pos - 1;
     this->pos = 0;
     memset(this->inbuf, 117, 5);
+
+    getNext()->write(outbuf, t);
 }
 
 void

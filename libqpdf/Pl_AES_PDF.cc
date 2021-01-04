@@ -238,6 +238,6 @@ Pl_AES_PDF::flush(bool strip_padding)
 	    }
 	}
     }
-    getNext()->write(this->outbuf, bytes);
     this->offset = 0;
+    getNext()->write(this->outbuf, bytes);
 }

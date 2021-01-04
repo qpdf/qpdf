@@ -1,3 +1,9 @@
+2021-01-04  Jay Berkenbilt  <ejb@ql.org>
+
+	* Move getNext()->write() calls in some pipelines to ensure that
+	state gates properly reset even if the next pipeline's write
+	throws an exception (fuzz issue 28262).
+
 2021-01-03  Jay Berkenbilt  <ejb@ql.org>
 
 	* Don't include -o nospace with zsh completion setup so file
