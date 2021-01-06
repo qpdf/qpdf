@@ -1,3 +1,8 @@
+2021-01-06  Jay Berkenbilt  <ejb@ql.org>
+
+	* Give warnings instead of segfaulting if a QPDF operation is
+	attempted after calling closeInputSource(). Fixes #495.
+
 2021-01-05  Jay Berkenbilt  <ejb@ql.org>
 
 	* 10.1.0: release

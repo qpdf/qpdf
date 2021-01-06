@@ -2300,6 +2300,11 @@ void runtest(int n, char const* filename1, char const* arg2)
             buf->getSize());
         assert(s.find("/bye") != std::string::npos);
     }
+    else if (n == 73)
+    {
+        pdf.closeInputSource();
+        pdf.getRoot().getKey("/Pages").unparseResolved();
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +

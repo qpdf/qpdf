@@ -45,6 +45,51 @@ static char const* EMPTY_PDF =
     "110\n"
     "%%EOF\n";
 
+class InvalidInputSource: public InputSource
+{
+  public:
+    virtual ~InvalidInputSource() = default;
+    virtual qpdf_offset_t findAndSkipNextEOL() override
+    {
+        throwException();
+        return 0;
+    }
+    virtual std::string const& getName() const override
+    {
+        static std::string name("closed input source");
+        return name;
+    }
+    virtual qpdf_offset_t tell() override
+    {
+        throwException();
+        return 0;
+    }
+    virtual void seek(qpdf_offset_t offset, int whence) override
+    {
+        throwException();
+    }
+    virtual void rewind() override
+    {
+        throwException();
+    }
+    virtual size_t read(char* buffer, size_t length) override
+    {
+        throwException();
+        return 0;
+    }
+    virtual void unreadCh(char ch) override
+    {
+        throwException();
+    }
+
+  private:
+    void throwException()
+    {
+        throw std::runtime_error(
+            "QPDF operation attempted after closing input source");
+    }
+};
+
 QPDF::ForeignStreamData::ForeignStreamData(
     PointerHolder<EncryptionParameters> encp,
     PointerHolder<InputSource> file,
@@ -254,7 +299,7 @@ QPDF::processInputSource(PointerHolder<InputSource> source,
 void
 QPDF::closeInputSource()
 {
-    this->m->file = 0;
+    this->m->file = new InvalidInputSource();
 }
 
 void

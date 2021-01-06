@@ -1215,7 +1215,13 @@ $td->runtest("check output",
 show_ntests();
 # ----------
 $td->notify("--- Invalid objects ---");
-$n_tests += 2;
+$n_tests += 3;
+
+$td->runtest("closed input source",
+	     {$td->COMMAND => "test_driver 73 minimal.pdf"},
+	     {$td->FILE => "test73.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("empty object",
 	     {$td->COMMAND => "qpdf -show-object=7,0 empty-object.pdf"},
