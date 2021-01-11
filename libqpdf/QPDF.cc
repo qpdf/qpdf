@@ -18,6 +18,7 @@
 #include <qpdf/FileInputSource.hh>
 #include <qpdf/BufferInputSource.hh>
 #include <qpdf/OffsetInputSource.hh>
+#include <qpdf/QPDFNameTreeObjectHelper.hh>
 
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDF_Null.hh>
@@ -3004,22 +3005,17 @@ QPDF::findAttachmentStreams()
     {
         return;
     }
-    QPDFObjectHandle embeddedFiles = names.getKey("/EmbeddedFiles");
-    if (! embeddedFiles.isDictionary())
+    QPDFObjectHandle embedded_files = names.getKey("/EmbeddedFiles");
+    if (! embedded_files.isDictionary())
     {
         return;
     }
-    names = embeddedFiles.getKey("/Names");
-    if (! names.isArray())
+    QPDFNameTreeObjectHelper ef_tree(embedded_files);
+    auto ef_tree_map = ef_tree.getAsMap();
+    for (auto& i: ef_tree_map)
     {
-        return;
-    }
-    for (int i = 0; i < names.getArrayNItems(); ++i)
-    {
-        QPDFObjectHandle item = names.getArrayItem(i);
+        QPDFObjectHandle item = i.second;
         if (item.isDictionary() &&
-            item.getKey("/Type").isName() &&
-            (item.getKey("/Type").getName() == "/Filespec") &&
             item.getKey("/EF").isDictionary() &&
             item.getKey("/EF").getKey("/F").isStream())
         {

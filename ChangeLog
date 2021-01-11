@@ -1,3 +1,9 @@
+2021-01-11  Jay Berkenbilt  <ejb@ql.org>
+
+	* Fix very old error in code that was finding attachment streams.
+	Probably this error never mattered, but the code was still not
+	exactly right.
+
 2021-01-06  Jay Berkenbilt  <ejb@ql.org>
 
 	* Give warnings instead of segfaulting if a QPDF operation is
