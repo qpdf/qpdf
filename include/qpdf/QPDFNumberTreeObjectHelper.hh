@@ -60,7 +60,7 @@ class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
     bool hasIndex(numtree_number idx);
 
     // Find an object with a specific index. If found, returns true
-    // and initializes oh.
+    // and initializes oh. See also find().
     QPDF_DLL
     bool findObject(numtree_number idx, QPDFObjectHandle& oh);
     // Find the object at the index or, if not found, the object whose
@@ -70,7 +70,8 @@ class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
     // offset to the difference between the requested index and the
     // actual index. For example, if a number tree has values for 3
     // and 6 and idx is 5, this method would return true, initialize
-    // oh to the value with index 3, and set offset to 2 (5 - 3).
+    // oh to the value with index 3, and set offset to 2 (5 - 3). See
+    // also find().
     QPDF_DLL
     bool findObjectAtOrBelow(numtree_number idx, QPDFObjectHandle& oh,
                              numtree_number& offset);

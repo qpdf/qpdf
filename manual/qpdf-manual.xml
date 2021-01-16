@@ -4833,6 +4833,13 @@ print "\n";
           <classname>QPDF</classname>'s public API.
          </para>
         </listitem>
+        <listitem>
+         <para>
+          Re-implement <classname>QPDFNameTreeObjectHelper</classname>
+          and <classname>QPDFNumberTreeObjectHelper</classname> to be
+          more efficient, and add an iterator-based API.
+         </para>
+        </listitem>
        </itemizedlist>
       </listitem>
      </itemizedlist>

@@ -53,7 +53,7 @@ class QPDFNameTreeObjectHelper: public QPDFObjectHelper
     bool hasName(std::string const& utf8);
 
     // Find an object by name. If found, returns true and initializes
-    // oh.
+    // oh. See also find().
     QPDF_DLL
     bool findObject(std::string const& utf8, QPDFObjectHandle& oh);
 

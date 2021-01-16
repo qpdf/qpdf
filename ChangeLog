@@ -1,5 +1,13 @@
 2021-01-16  Jay Berkenbilt  <ejb@ql.org>
 
+	* Re-implement QPDFNameTreeObjectHelper and
+	QPDFNumberTreeObjectHelper to be much more efficient and to have
+	an iterator-based API in addition to the existing one. This makes
+	it possible to use "range-for" loops over these helpers and to
+	iterate through name and number trees without creating a map
+	containing all the keys and values, which is slow and potentially
+	consumes a lot of memory.
+
 	* Add warn() to QPDF's public API.
 
 2021-01-11  Jay Berkenbilt  <ejb@ql.org>

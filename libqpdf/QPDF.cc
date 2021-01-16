@@ -3011,8 +3011,7 @@ QPDF::findAttachmentStreams()
         return;
     }
     QPDFNameTreeObjectHelper ef_tree(embedded_files);
-    auto ef_tree_map = ef_tree.getAsMap();
-    for (auto& i: ef_tree_map)
+    for (auto i: ef_tree)
     {
         QPDFObjectHandle item = i.second;
         if (item.isDictionary() &&
