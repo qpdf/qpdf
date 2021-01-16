@@ -26,4 +26,6 @@
 22 twenty-two
 23 twenty-three
 29 twenty-nine
+WARNING: number-tree.pdf (Name/Number tree node (object 14)): name/number tree node has neither /Kids nor /Names
+WARNING: number-tree.pdf (Name/Number tree node (object 13)): loop detected while traversing name/number tree
 test 46 done

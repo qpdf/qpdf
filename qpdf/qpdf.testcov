@@ -522,3 +522,5 @@ qpdf-c called qpdf_oh_unparse_resolved 0
 qpdf-c called qpdf_oh_unparse_binary 0
 QPDFWriter getFilterOnWrite false 0
 QPDFPageObjectHelper::forEachXObject 3
+NNTree deepen: invalid node 0
+NNTree deepen: loop 0

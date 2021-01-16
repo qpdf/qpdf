@@ -33,14 +33,22 @@ QPDFNumberTreeObjectHelper::Members::~Members()
 {
 }
 
-QPDFNumberTreeObjectHelper::Members::Members(QPDFObjectHandle& oh) :
-    impl(std::make_shared<NNTreeImpl>(number_tree_details, nullptr, oh, false))
+QPDFNumberTreeObjectHelper::Members::Members(
+    QPDFObjectHandle& oh, QPDF* q, bool auto_repair) :
+    impl(std::make_shared<NNTreeImpl>(number_tree_details, q, oh, auto_repair))
+{
+}
+
+QPDFNumberTreeObjectHelper::QPDFNumberTreeObjectHelper(
+    QPDFObjectHandle oh, QPDF& q, bool auto_repair) :
+    QPDFObjectHelper(oh),
+    m(new Members(oh, &q, auto_repair))
 {
 }
 
 QPDFNumberTreeObjectHelper::QPDFNumberTreeObjectHelper(QPDFObjectHandle oh) :
     QPDFObjectHelper(oh),
-    m(new Members(oh))
+    m(new Members(oh, nullptr, false))
 {
 }
 

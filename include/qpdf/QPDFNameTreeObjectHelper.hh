@@ -42,6 +42,16 @@ class NNTreeDetails;
 class QPDFNameTreeObjectHelper: public QPDFObjectHelper
 {
   public:
+    // The qpdf object is required so that this class can issue
+    // warnings, attempt repairs, and add indirect objects.
+    QPDF_DLL
+    QPDFNameTreeObjectHelper(QPDFObjectHandle, QPDF&,
+                             bool auto_repair = true);
+
+    // ABI: Legacy Constructor will be removed in QPDF 11. A
+    // QPDFNameTreeObjectHelper constructed in this way can't be
+    // modified or repaired and will silently ignore problems in the
+    // structure.
     QPDF_DLL
     QPDFNameTreeObjectHelper(QPDFObjectHandle);
     QPDF_DLL
@@ -133,7 +143,7 @@ class QPDFNameTreeObjectHelper: public QPDFObjectHelper
         ~Members();
 
       private:
-        Members(QPDFObjectHandle& oh);
+        Members(QPDFObjectHandle& oh, QPDF*, bool auto_repair);
         Members(Members const&) = delete;
 
         std::shared_ptr<NNTreeImpl> impl;

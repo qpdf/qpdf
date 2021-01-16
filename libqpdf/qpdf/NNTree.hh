@@ -57,17 +57,21 @@ class NNTreeIterator: public std::iterator<
         int kid_number;
     };
 
-    NNTreeIterator(NNTreeDetails const& details) :
+    // ABI: for qpdf 11, make qpdf a reference
+    NNTreeIterator(NNTreeDetails const& details, QPDF* qpdf) :
         details(details),
+        qpdf(qpdf),
         item_number(-1)
     {
     }
+    void reset();
     void deepen(QPDFObjectHandle node, bool first);
     void setItemNumber(QPDFObjectHandle const& node, int);
     void addPathElement(QPDFObjectHandle const& node, int kid_number);
     void increment(bool backward);
 
     NNTreeDetails const& details;
+    QPDF* qpdf;
     std::list<PathElement> path;
     QPDFObjectHandle node;
     int item_number;
@@ -99,6 +103,7 @@ class NNTreeImpl
         QPDFObjectHandle& key, QPDFObjectHandle& items, int idx);
 
     NNTreeDetails const& details;
+    QPDF* qpdf;
     QPDFObjectHandle oh;
 };
 

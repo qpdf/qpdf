@@ -1775,6 +1775,16 @@ void runtest(int n, char const* filename1, char const* arg2)
         assert(ntoh.findObjectAtOrBelow(8, oh, offset));
         assert("six" == oh.getStringValue());
         assert(2 == offset);
+
+        // Exercise deprecated API until qpdf 11
+        auto bad1 = QPDFNumberTreeObjectHelper(
+            pdf.getTrailer().getKey("/Bad1"));
+        assert(bad1.begin() == bad1.end());
+
+        bad1 = QPDFNumberTreeObjectHelper(
+            pdf.getTrailer().getKey("/Bad1"), pdf);
+        assert(bad1.begin() == bad1.end());
+        assert(bad1.last() == bad1.end());
     }
     else if (n == 47)
     {

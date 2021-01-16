@@ -1,5 +1,11 @@
 2021-01-16  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add new constructors for QPDFNameTreeObjectHelper and
+	QPDFNumberTreeObjectHelper that take a QPDF object so they can
+	create indirect objects and issue warnings. The old constructors
+	are deprecated and will be removed in qpdf 11. Just pass in the
+	owning QPDF of the object handle used to initialize the helpers.
+
 	* Re-implement QPDFNameTreeObjectHelper and
 	QPDFNumberTreeObjectHelper to be much more efficient and to have
 	an iterator-based API in addition to the existing one. This makes

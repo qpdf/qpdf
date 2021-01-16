@@ -84,7 +84,12 @@ ABI Changes
 This is a list of changes to make next time there is an ABI change.
 Comments appear in the code prefixed by "ABI"
 
+* Search for ABI to find items not listed here.
 * Merge two versions of QPDFObjectHandle::makeDirect per comment
+* After removing legacy QPDFNameTreeObjectHelper and
+  QPDFNumberTreeObjectHelper constructors, NNTreeImpl can switch to
+  having a QPDF reference and assume that the reference is always
+  valid.
 
 Page splitting/merging
 ======================
