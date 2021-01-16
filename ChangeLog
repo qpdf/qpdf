@@ -1,3 +1,7 @@
+2021-01-16  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add warn() to QPDF's public API.
+
 2021-01-11  Jay Berkenbilt  <ejb@ql.org>
 
 	* Fix very old error in code that was finding attachment streams.

@@ -679,5 +679,5 @@ QPDF_Stream::replaceDict(QPDFObjectHandle new_dict)
 void
 QPDF_Stream::warn(QPDFExc const& e)
 {
-    QPDF::Warner::warn(this->qpdf, e);
+    this->qpdf->warn(e);
 }

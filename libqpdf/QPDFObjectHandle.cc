@@ -3016,7 +3016,7 @@ QPDFObjectHandle::warn(QPDF* qpdf, QPDFExc const& e)
     // string, then just throw the exception.
     if (qpdf)
     {
-        QPDF::Warner::warn(qpdf, e);
+        qpdf->warn(e);
     }
     else
     {

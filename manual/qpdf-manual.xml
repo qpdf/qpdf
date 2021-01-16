@@ -4819,6 +4819,26 @@ print "\n";
    </varlistentry>
 -->
    <varlistentry>
+    <term>10.2.0: Month dd, YYYY</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Library Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Add <function>warn</function> to
+          <classname>QPDF</classname>'s public API.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
     <term>10.1.0: January 5, 2021</term>
     <listitem>
      <itemizedlist>

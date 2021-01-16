@@ -246,6 +246,12 @@ class QPDF
     QPDF_DLL
     unsigned long long getUniqueId() const;
 
+    // Issue a warning on behalf of this QPDF object. It will be
+    // emitted with other warnings, following warning suppression
+    // rules, and it will be available with getWarnings().
+    QPDF_DLL
+    void warn(QPDFExc const& e);
+
     QPDF_DLL
     std::string getFilename() const;
     QPDF_DLL
@@ -694,19 +700,6 @@ class QPDF
     };
     friend class Resolver;
 
-    // Warner class allows QPDFObjectHandle to create warnings
-    class Warner
-    {
-	friend class QPDFObjectHandle;
-        friend class QPDF_Stream;
-      private:
-        static void warn(QPDF* qpdf, QPDFExc const& e)
-        {
-            qpdf->warn(e);
-        }
-    };
-    friend class Warner;
-
     // ParseGuard class allows QPDFObjectHandle to detect re-entrant
     // resolution
     class ParseGuard
@@ -895,7 +888,6 @@ class QPDF
 
     void parse(char const* password);
     void inParse(bool);
-    void warn(QPDFExc const& e);
     void setTrailer(QPDFObjectHandle obj);
     void read_xref(qpdf_offset_t offset);
     void reconstruct_xref(QPDFExc& e);
