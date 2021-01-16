@@ -33,6 +33,8 @@
 // PDF spec (ISO 32000) for a description of number trees.
 
 class NNTreeImpl;
+class NNTreeIterator;
+class NNTreeDetails;
 
 class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
 {
@@ -72,6 +74,65 @@ class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     bool findObjectAtOrBelow(numtree_number idx, QPDFObjectHandle& oh,
                              numtree_number& offset);
+
+    class iterator: public std::iterator<
+        std::bidirectional_iterator_tag,
+        std::pair<numtree_number, QPDFObjectHandle>,
+        void,
+        std::pair<numtree_number, QPDFObjectHandle>*,
+        std::pair<numtree_number, QPDFObjectHandle>>
+    {
+        friend class QPDFNumberTreeObjectHelper;
+      public:
+        QPDF_DLL
+        bool valid() const;
+        QPDF_DLL
+        iterator& operator++();
+        QPDF_DLL
+        iterator operator++(int)
+        {
+            iterator t = *this;
+            ++(*this);
+            return t;
+        }
+        QPDF_DLL
+        iterator& operator--();
+        QPDF_DLL
+        iterator operator--(int)
+        {
+            iterator t = *this;
+            --(*this);
+            return t;
+        }
+        QPDF_DLL
+        reference operator*();
+        QPDF_DLL
+        bool operator==(iterator const& other) const;
+        QPDF_DLL
+        bool operator!=(iterator const& other) const
+        {
+            return ! operator==(other);
+        }
+
+      private:
+        iterator(std::shared_ptr<NNTreeIterator> const&);
+        std::shared_ptr<NNTreeIterator> impl;
+    };
+
+    // The iterator looks like map iterator, so i.first is a string
+    // and i.second is a QPDFObjectHandle.
+    QPDF_DLL
+    iterator begin() const;
+    QPDF_DLL
+    iterator end() const;
+    // Return a bidirectional iterator that points to the last item.
+    QPDF_DLL
+    iterator last() const;
+
+    // Find the entry with the given key. If return_prev_if_not_found
+    // is true and the item is not found, return the next lower item.
+    QPDF_DLL
+    iterator find(numtree_number key, bool return_prev_if_not_found = false);
 
     // Return the contents of the number tree as a map. Note that
     // number trees may be very large, so this may use a lot of RAM.

@@ -1749,13 +1749,17 @@ void runtest(int n, char const* filename1, char const* arg2)
         // number-tree.pdf
         QPDFObjectHandle qtest = pdf.getTrailer().getKey("/QTest");
         QPDFNumberTreeObjectHelper ntoh(qtest);
-        QPDFNumberTreeObjectHelper::idx_map ntoh_map = ntoh.getAsMap();
-        for (QPDFNumberTreeObjectHelper::idx_map::iterator iter =
-                 ntoh_map.begin();
-             iter != ntoh_map.end(); ++iter)
+        for (auto iter: ntoh)
         {
-            std::cout << (*iter).first << " "
-                      << (*iter).second.getStringValue()
+            std::cout << iter.first << " "
+                      << iter.second.getStringValue()
+                      << std::endl;
+        }
+        QPDFNumberTreeObjectHelper::idx_map ntoh_map = ntoh.getAsMap();
+        for (auto& iter: ntoh_map)
+        {
+            std::cout << iter.first << " "
+                      << iter.second.getStringValue()
                       << std::endl;
         }
         assert(1 == ntoh.getMin());
@@ -1793,13 +1797,17 @@ void runtest(int n, char const* filename1, char const* arg2)
         // name-tree.pdf
         QPDFObjectHandle qtest = pdf.getTrailer().getKey("/QTest");
         QPDFNameTreeObjectHelper ntoh(qtest);
-        std::map<std::string, QPDFObjectHandle> ntoh_map = ntoh.getAsMap();
-        for (std::map<std::string, QPDFObjectHandle>::iterator iter =
-                 ntoh_map.begin();
-             iter != ntoh_map.end(); ++iter)
+        for (auto iter: ntoh)
         {
-            std::cout << (*iter).first << " -> "
-                      << (*iter).second.getStringValue()
+            std::cout << iter.first << " -> "
+                      << iter.second.getStringValue()
+                      << std::endl;
+        }
+        std::map<std::string, QPDFObjectHandle> ntoh_map = ntoh.getAsMap();
+        for (auto& iter: ntoh_map)
+        {
+            std::cout << iter.first << " -> "
+                      << iter.second.getStringValue()
                       << std::endl;
         }
         assert(ntoh.hasName("11 elephant"));
@@ -1809,6 +1817,9 @@ void runtest(int n, char const* filename1, char const* arg2)
         assert(! ntoh.findObject("potato", oh));
         assert(ntoh.findObject("07 sev\xe2\x80\xa2n", oh));
         assert("seven!" == oh.getStringValue());
+        auto last = ntoh.last();
+        assert((*last).first == "29 twenty-nine");
+        assert((*last).second.getUTF8Value() == "twenty-nine!");
     }
     else if (n == 49)
     {

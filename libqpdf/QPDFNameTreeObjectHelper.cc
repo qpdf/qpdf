@@ -48,19 +48,85 @@ QPDFNameTreeObjectHelper::~QPDFNameTreeObjectHelper()
 {
 }
 
+QPDFNameTreeObjectHelper::iterator::iterator(
+    std::shared_ptr<NNTreeIterator> const& i) :
+    impl(i)
+{
+}
+
+bool
+QPDFNameTreeObjectHelper::iterator::valid() const
+{
+    return impl->valid();
+}
+
+QPDFNameTreeObjectHelper::iterator&
+QPDFNameTreeObjectHelper::iterator::operator++()
+{
+    ++(*impl);
+    return *this;
+}
+
+QPDFNameTreeObjectHelper::iterator&
+QPDFNameTreeObjectHelper::iterator::operator--()
+{
+    --(*impl);
+    return *this;
+}
+
+QPDFNameTreeObjectHelper::iterator::reference
+QPDFNameTreeObjectHelper::iterator::operator*()
+{
+    auto p = **impl;
+    return std::make_pair(p.first.getUTF8Value(), p.second);
+}
+
+bool
+QPDFNameTreeObjectHelper::iterator::operator==(iterator const& other) const
+{
+    return *(impl) == *(other.impl);
+}
+
+QPDFNameTreeObjectHelper::iterator
+QPDFNameTreeObjectHelper::begin() const
+{
+    return iterator(std::make_shared<NNTreeIterator>(this->m->impl->begin()));
+}
+
+QPDFNameTreeObjectHelper::iterator
+QPDFNameTreeObjectHelper::end() const
+{
+    return iterator(std::make_shared<NNTreeIterator>(this->m->impl->end()));
+}
+
+QPDFNameTreeObjectHelper::iterator
+QPDFNameTreeObjectHelper::last() const
+{
+    return iterator(std::make_shared<NNTreeIterator>(this->m->impl->last()));
+}
+
+QPDFNameTreeObjectHelper::iterator
+QPDFNameTreeObjectHelper::find(std::string const& key,
+                               bool return_prev_if_not_found)
+{
+    auto i = this->m->impl->find(QPDFObjectHandle::newUnicodeString(key),
+                                 return_prev_if_not_found);
+    return iterator(std::make_shared<NNTreeIterator>(i));
+}
+
 bool
 QPDFNameTreeObjectHelper::hasName(std::string const& name)
 {
-    auto i = this->m->impl->find(QPDFObjectHandle::newUnicodeString(name));
-    return (i != this->m->impl->end());
+    auto i = find(name);
+    return (i != end());
 }
 
 bool
 QPDFNameTreeObjectHelper::findObject(
     std::string const& name, QPDFObjectHandle& oh)
 {
-    auto i = this->m->impl->find(QPDFObjectHandle::newUnicodeString(name));
-    if (i == this->m->impl->end())
+    auto i = find(name);
+    if (i == end())
     {
         return false;
     }
@@ -72,11 +138,6 @@ std::map<std::string, QPDFObjectHandle>
 QPDFNameTreeObjectHelper::getAsMap() const
 {
     std::map<std::string, QPDFObjectHandle> result;
-    for (auto i: *(this->m->impl))
-    {
-        result.insert(
-            std::make_pair(i.first.getUTF8Value(),
-                           i.second));
-    }
+    result.insert(begin(), end());
     return result;
 }

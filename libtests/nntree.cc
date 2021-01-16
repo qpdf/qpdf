@@ -1,7 +1,10 @@
 #include <qpdf/QPDFNumberTreeObjectHelper.hh>
+#include <qpdf/QPDFNameTreeObjectHelper.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QUtil.hh>
 #include <iostream>
+
+static bool any_failures = false;
 
 bool report(QPDFObjectHandle oh, long long item, long long exp_item)
 {
@@ -56,7 +59,7 @@ bool report(QPDFObjectHandle oh, long long item, long long exp_item)
     return failed;
 }
 
-int main()
+void test_bsearch()
 {
     QPDF q;
     q.emptyPDF();
@@ -78,8 +81,7 @@ int main()
         return node;
     };
 
-    bool any_failures = false;
-    auto r = [&any_failures](QPDFObjectHandle& oh, int item, int exp) {
+    auto r = [](QPDFObjectHandle& oh, int item, int exp) {
         if (report(oh, item, exp))
         {
             any_failures = true;
@@ -119,6 +121,133 @@ int main()
 
     if (! any_failures)
     {
-        std::cout << "all tests passed" << std::endl;
+        std::cout << "bsearch tests passed" << std::endl;
     }
 }
+
+QPDFObjectHandle new_node(QPDF& q, std::string const& key)
+{
+    auto dict = QPDFObjectHandle::newDictionary();
+    dict.replaceKey(key, QPDFObjectHandle::newArray());
+    return q.makeIndirectObject(dict);
+}
+
+static void check_find(QPDFNameTreeObjectHelper& nh,
+                       std::string const& key, bool prev_if_not_found)
+{
+    auto i = nh.find(key, prev_if_not_found);
+    std::cout << "find " << key << " (" << prev_if_not_found << "): ";
+    if (i == nh.end())
+    {
+        std::cout << "not found";
+    }
+    else
+    {
+        std::cout << (*i).first << " -> " << (*i).second.unparse();
+    }
+    std::cout << std::endl;
+}
+
+void test_depth()
+{
+    int constexpr NITEMS = 3;
+    QPDF q;
+    q.emptyPDF();
+    auto root = q.getRoot();
+    auto n0 = new_node(q, "/Kids");
+    root.replaceKey("/NT", n0);
+    auto k0 = root.getKey("/NT").getKey("/Kids");
+    for (int i1 = 0; i1 < NITEMS; ++i1)
+    {
+        auto n1 = new_node(q, "/Kids");
+        k0.appendItem(n1);
+        auto k1 = n1.getKey("/Kids");
+        for (int i2 = 0; i2 < NITEMS; ++i2)
+        {
+            auto n2 = new_node(q, "/Kids");
+            k1.appendItem(n2);
+            auto k2 = n2.getKey("/Kids");
+            for (int i3 = 0; i3 < NITEMS; ++i3)
+            {
+                auto n3 = new_node(q, "/Names");
+                k2.appendItem(n3);
+                auto items = n3.getKey("/Names");
+                std::string first;
+                std::string last;
+                for (int i4 = 0; i4 < NITEMS; ++i4)
+                {
+                    int val = (((((i1
+                                   * NITEMS) + i2)
+                                 * NITEMS) + i3)
+                               * NITEMS) + i4;
+                    std::string str = QUtil::int_to_string(10 * val, 6);
+                    items.appendItem(
+                        QPDFObjectHandle::newString(str));
+                    items.appendItem(
+                        QPDFObjectHandle::newString("val " + str));
+                    if (i4 == 0)
+                    {
+                        first = str;
+                    }
+                    else if (i4 == NITEMS - 1)
+                    {
+                        last = str;
+                    }
+                }
+                auto limits = QPDFObjectHandle::newArray();
+                n3.replaceKey("/Limits", limits);
+                limits.appendItem(QPDFObjectHandle::newString(first));
+                limits.appendItem(QPDFObjectHandle::newString(last));
+            }
+            auto limits = QPDFObjectHandle::newArray();
+            n2.replaceKey("/Limits", limits);
+            limits.appendItem(k2.getArrayItem(0)
+                              .getKey("/Limits")
+                              .getArrayItem(0));
+            limits.appendItem(k2.getArrayItem(NITEMS - 1)
+                              .getKey("/Limits")
+                              .getArrayItem(1));
+        }
+        auto limits = QPDFObjectHandle::newArray();
+        n1.replaceKey("/Limits", limits);
+        limits.appendItem(k1.getArrayItem(0)
+                          .getKey("/Limits")
+                          .getArrayItem(0));
+        limits.appendItem(k1.getArrayItem(NITEMS - 1)
+                          .getKey("/Limits")
+                          .getArrayItem(1));
+    }
+
+    QPDFNameTreeObjectHelper nh(n0);
+    std::cout << "--- forward ---" << std::endl;
+    for (auto i: nh)
+    {
+        std::cout << i.first << " -> "
+                  << i.second.unparse() << std::endl;
+    }
+    std::cout << "--- backward ---" << std::endl;
+    for (auto i = nh.last(); i.valid(); --i)
+    {
+        std::cout << (*i).first << " -> "
+                  << (*i).second.unparse() << std::endl;
+    }
+
+    // Find
+    check_find(nh, "000300", false);
+    check_find(nh, "000305", true);
+    check_find(nh, "000305", false);
+    check_find(nh, "00000", false);
+    check_find(nh, "00000", true);
+    check_find(nh, "000800", false);
+    check_find(nh, "000805", false);
+    check_find(nh, "000805", true);
+}
+
+int main()
+{
+    test_bsearch();
+    test_depth();
+
+    return 0;
+}
+

@@ -44,41 +44,107 @@ QPDFNumberTreeObjectHelper::QPDFNumberTreeObjectHelper(QPDFObjectHandle oh) :
 {
 }
 
+QPDFNumberTreeObjectHelper::iterator::iterator(
+    std::shared_ptr<NNTreeIterator> const& i) :
+    impl(i)
+{
+}
+
+bool
+QPDFNumberTreeObjectHelper::iterator::valid() const
+{
+    return impl->valid();
+}
+
+QPDFNumberTreeObjectHelper::iterator&
+QPDFNumberTreeObjectHelper::iterator::operator++()
+{
+    ++(*impl);
+    return *this;
+}
+
+QPDFNumberTreeObjectHelper::iterator&
+QPDFNumberTreeObjectHelper::iterator::operator--()
+{
+    --(*impl);
+    return *this;
+}
+
+QPDFNumberTreeObjectHelper::iterator::reference
+QPDFNumberTreeObjectHelper::iterator::operator*()
+{
+    auto p = **impl;
+    return std::make_pair(p.first.getIntValue(), p.second);
+}
+
+bool
+QPDFNumberTreeObjectHelper::iterator::operator==(iterator const& other) const
+{
+    return *(impl) == *(other.impl);
+}
+
+QPDFNumberTreeObjectHelper::iterator
+QPDFNumberTreeObjectHelper::begin() const
+{
+    return iterator(std::make_shared<NNTreeIterator>(this->m->impl->begin()));
+}
+
+QPDFNumberTreeObjectHelper::iterator
+QPDFNumberTreeObjectHelper::end() const
+{
+    return iterator(std::make_shared<NNTreeIterator>(this->m->impl->end()));
+}
+
+QPDFNumberTreeObjectHelper::iterator
+QPDFNumberTreeObjectHelper::last() const
+{
+    return iterator(std::make_shared<NNTreeIterator>(this->m->impl->last()));
+}
+
+QPDFNumberTreeObjectHelper::iterator
+QPDFNumberTreeObjectHelper::find(numtree_number key,
+                                 bool return_prev_if_not_found)
+{
+    auto i = this->m->impl->find(QPDFObjectHandle::newInteger(key),
+                                 return_prev_if_not_found);
+    return iterator(std::make_shared<NNTreeIterator>(i));
+}
+
 QPDFNumberTreeObjectHelper::numtree_number
 QPDFNumberTreeObjectHelper::getMin()
 {
-    auto i = this->m->impl->begin();
-    if (i == this->m->impl->end())
+    auto i = begin();
+    if (i == end())
     {
         return 0;
     }
-    return (*i).first.getIntValue();
+    return (*i).first;
 }
 
 QPDFNumberTreeObjectHelper::numtree_number
 QPDFNumberTreeObjectHelper::getMax()
 {
-    auto i = this->m->impl->last();
-    if (i == this->m->impl->end())
+    auto i = last();
+    if (i == end())
     {
         return 0;
     }
-    return (*i).first.getIntValue();
+    return (*i).first;
 }
 
 bool
 QPDFNumberTreeObjectHelper::hasIndex(numtree_number idx)
 {
-    auto i = this->m->impl->find(QPDFObjectHandle::newInteger(idx));
-    return (i != this->m->impl->end());
+    auto i = find(idx);
+    return (i != this->end());
 }
 
 bool
 QPDFNumberTreeObjectHelper::findObject(
     numtree_number idx, QPDFObjectHandle& oh)
 {
-    auto i = this->m->impl->find(QPDFObjectHandle::newInteger(idx));
-    if (i == this->m->impl->end())
+    auto i = find(idx);
+    if (i == end())
     {
         return false;
     }
@@ -91,13 +157,13 @@ QPDFNumberTreeObjectHelper::findObjectAtOrBelow(
     numtree_number idx, QPDFObjectHandle& oh,
     numtree_number& offset)
 {
-    auto i = this->m->impl->find(QPDFObjectHandle::newInteger(idx), true);
-    if (i == this->m->impl->end())
+    auto i = find(idx, true);
+    if (i == end())
     {
         return false;
     }
     oh = (*i).second;
-    offset = idx - (*i).first.getIntValue();
+    offset = idx - (*i).first;
     return true;
 }
 
@@ -105,11 +171,6 @@ std::map<QPDFNumberTreeObjectHelper::numtree_number, QPDFObjectHandle>
 QPDFNumberTreeObjectHelper::getAsMap() const
 {
     std::map<numtree_number, QPDFObjectHandle> result;
-    for (auto i: *(this->m->impl))
-    {
-        result.insert(
-            std::make_pair(i.first.getIntValue(),
-                           i.second));
-    }
+    result.insert(begin(), end());
     return result;
 }

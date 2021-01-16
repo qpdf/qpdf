@@ -3,14 +3,15 @@ require 5.008;
 use warnings;
 use strict;
 
+chdir("nntree") or die "chdir testdir failed: $!\n";
+
 require TestDriver;
 
 my $td = new TestDriver('nntree');
 
 $td->runtest("nntree",
 	     {$td->COMMAND => "nntree"},
-	     {$td->STRING => "all tests passed\n",
-	      $td->EXIT_STATUS => 0},
+	     {$td->FILE => "nntree.out", $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 $td->report(1);

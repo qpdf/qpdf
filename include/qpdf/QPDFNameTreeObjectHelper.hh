@@ -26,6 +26,7 @@
 #include <qpdf/QPDFObjGen.hh>
 #include <map>
 #include <memory>
+#include <iterator>
 
 #include <qpdf/DLL.h>
 
@@ -35,6 +36,8 @@
 // normalized for lookup purposes.
 
 class NNTreeImpl;
+class NNTreeIterator;
+class NNTreeDetails;
 
 class QPDFNameTreeObjectHelper: public QPDFObjectHelper
 {
@@ -53,6 +56,66 @@ class QPDFNameTreeObjectHelper: public QPDFObjectHelper
     // oh.
     QPDF_DLL
     bool findObject(std::string const& utf8, QPDFObjectHandle& oh);
+
+    class iterator: public std::iterator<
+        std::bidirectional_iterator_tag,
+        std::pair<std::string, QPDFObjectHandle>,
+        void,
+        std::pair<std::string, QPDFObjectHandle>*,
+        std::pair<std::string, QPDFObjectHandle>>
+    {
+        friend class QPDFNameTreeObjectHelper;
+      public:
+        QPDF_DLL
+        bool valid() const;
+        QPDF_DLL
+        iterator& operator++();
+        QPDF_DLL
+        iterator operator++(int)
+        {
+            iterator t = *this;
+            ++(*this);
+            return t;
+        }
+        QPDF_DLL
+        iterator& operator--();
+        QPDF_DLL
+        iterator operator--(int)
+        {
+            iterator t = *this;
+            --(*this);
+            return t;
+        }
+        QPDF_DLL
+        reference operator*();
+        QPDF_DLL
+        bool operator==(iterator const& other) const;
+        QPDF_DLL
+        bool operator!=(iterator const& other) const
+        {
+            return ! operator==(other);
+        }
+
+      private:
+        iterator(std::shared_ptr<NNTreeIterator> const&);
+        std::shared_ptr<NNTreeIterator> impl;
+    };
+
+    // The iterator looks like map iterator, so i.first is a string
+    // and i.second is a QPDFObjectHandle.
+    QPDF_DLL
+    iterator begin() const;
+    QPDF_DLL
+    iterator end() const;
+    // Return a bidirectional iterator that points to the last item.
+    QPDF_DLL
+    iterator last() const;
+
+    // Find the entry with the given key. If return_prev_if_not_found
+    // is true and the item is not found, return the next lower item.
+    QPDF_DLL
+    iterator find(std::string const& key,
+                  bool return_prev_if_not_found = false);
 
     // Return the contents of the name tree as a map. Note that name
     // trees may be very large, so this may use a lot of RAM. It is
