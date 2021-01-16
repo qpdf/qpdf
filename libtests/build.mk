@@ -16,6 +16,7 @@ BINS_libtests = \
 	main_from_wmain \
 	matrix \
 	md5 \
+	nntree \
 	numrange \
 	pointer_holder \
 	predictors \

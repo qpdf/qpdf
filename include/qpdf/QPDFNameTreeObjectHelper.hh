@@ -25,17 +25,16 @@
 #include <qpdf/QPDFObjectHelper.hh>
 #include <qpdf/QPDFObjGen.hh>
 #include <map>
+#include <memory>
 
 #include <qpdf/DLL.h>
 
 // This is an object helper for name trees. See section 7.9.6 in the
-// PDF spec (ISO 32000) for a description of name trees. This
-// implementation disregards stated limits and sequencing and simply
-// builds a map from string object. If the array of values does not
-// contain a string where expected, this implementation silently skips
-// forward until it finds a string. When looking up items in the name
-// tree, use UTF-8 strings. All names are normalized for lookup
-// purposes.
+// PDF spec (ISO 32000) for a description of name trees. When looking
+// up items in the name tree, use UTF-8 strings. All names are
+// normalized for lookup purposes.
+
+class NNTreeImpl;
 
 class QPDFNameTreeObjectHelper: public QPDFObjectHelper
 {
@@ -55,6 +54,9 @@ class QPDFNameTreeObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     bool findObject(std::string const& utf8, QPDFObjectHandle& oh);
 
+    // Return the contents of the name tree as a map. Note that name
+    // trees may be very large, so this may use a lot of RAM. It is
+    // more efficient to use QPDFNameTreeObjectHelper's iterator.
     QPDF_DLL
     std::map<std::string, QPDFObjectHandle> getAsMap() const;
 
@@ -68,14 +70,11 @@ class QPDFNameTreeObjectHelper: public QPDFObjectHelper
         ~Members();
 
       private:
-        Members();
-        Members(Members const&);
+        Members(QPDFObjectHandle& oh);
+        Members(Members const&) = delete;
 
-        std::map<std::string, QPDFObjectHandle> entries;
-        std::set<QPDFObjGen> seen;
+        std::shared_ptr<NNTreeImpl> impl;
     };
-
-    void updateMap(QPDFObjectHandle oh);
 
     PointerHolder<Members> m;
 };

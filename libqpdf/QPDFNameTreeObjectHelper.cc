@@ -1,73 +1,66 @@
 #include <qpdf/QPDFNameTreeObjectHelper.hh>
+#include <qpdf/NNTree.hh>
+
+class NameTreeDetails: public NNTreeDetails
+{
+  public:
+    virtual std::string const& itemsKey() const override
+    {
+        static std::string k("/Names");
+        return k;
+    }
+    virtual bool keyValid(QPDFObjectHandle oh) const override
+    {
+        return oh.isString();
+    }
+    virtual int compareKeys(
+        QPDFObjectHandle a, QPDFObjectHandle b) const override
+    {
+        if (! (keyValid(a) && keyValid(b)))
+        {
+            // We don't call this without calling keyValid first
+            throw std::logic_error("comparing invalid keys");
+        }
+        auto as = a.getUTF8Value();
+        auto bs = b.getUTF8Value();
+        return ((as < bs) ? -1 : (as > bs) ? 1 : 0);
+    }
+};
+
+static NameTreeDetails name_tree_details;
 
 QPDFNameTreeObjectHelper::Members::~Members()
 {
 }
 
-QPDFNameTreeObjectHelper::Members::Members()
+QPDFNameTreeObjectHelper::Members::Members(QPDFObjectHandle& oh) :
+    impl(std::make_shared<NNTreeImpl>(name_tree_details, nullptr, oh, false))
 {
 }
 
 QPDFNameTreeObjectHelper::QPDFNameTreeObjectHelper(QPDFObjectHandle oh) :
     QPDFObjectHelper(oh),
-    m(new Members())
+    m(new Members(oh))
 {
-    updateMap(oh);
 }
 
 QPDFNameTreeObjectHelper::~QPDFNameTreeObjectHelper()
 {
 }
 
-void
-QPDFNameTreeObjectHelper::updateMap(QPDFObjectHandle oh)
-{
-    if (this->m->seen.count(oh.getObjGen()))
-    {
-        return;
-    }
-    this->m->seen.insert(oh.getObjGen());
-    QPDFObjectHandle names = oh.getKey("/Names");
-    if (names.isArray())
-    {
-        int nitems = names.getArrayNItems();
-        int i = 0;
-        while (i < nitems - 1)
-        {
-            QPDFObjectHandle name = names.getArrayItem(i);
-            if (name.isString())
-            {
-                ++i;
-                QPDFObjectHandle obj = names.getArrayItem(i);
-                this->m->entries[name.getUTF8Value()] = obj;
-            }
-            ++i;
-        }
-    }
-    QPDFObjectHandle kids = oh.getKey("/Kids");
-    if (kids.isArray())
-    {
-        int nitems = kids.getArrayNItems();
-        for (int i = 0; i < nitems; ++i)
-        {
-            updateMap(kids.getArrayItem(i));
-        }
-    }
-}
-
 bool
 QPDFNameTreeObjectHelper::hasName(std::string const& name)
 {
-    return this->m->entries.count(name) != 0;
+    auto i = this->m->impl->find(QPDFObjectHandle::newUnicodeString(name));
+    return (i != this->m->impl->end());
 }
 
 bool
 QPDFNameTreeObjectHelper::findObject(
     std::string const& name, QPDFObjectHandle& oh)
 {
-    std::map<std::string, QPDFObjectHandle>::iterator i =
-        this->m->entries.find(name);
-    if (i == this->m->entries.end())
+    auto i = this->m->impl->find(QPDFObjectHandle::newUnicodeString(name));
+    if (i == this->m->impl->end())
     {
         return false;
     }
@@ -78,5 +71,12 @@ QPDFNameTreeObjectHelper::findObject(
 std::map<std::string, QPDFObjectHandle>
 QPDFNameTreeObjectHelper::getAsMap() const
 {
-    return this->m->entries;
+    std::map<std::string, QPDFObjectHandle> result;
+    for (auto i: *(this->m->impl))
+    {
+        result.insert(
+            std::make_pair(i.first.getUTF8Value(),
+                           i.second));
+    }
+    return result;
 }

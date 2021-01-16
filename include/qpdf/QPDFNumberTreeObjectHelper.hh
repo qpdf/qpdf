@@ -24,17 +24,15 @@
 
 #include <qpdf/QPDFObjectHelper.hh>
 #include <qpdf/QPDFObjGen.hh>
-#include <functional>
 #include <map>
+#include <memory>
 
 #include <qpdf/DLL.h>
 
 // This is an object helper for number trees. See section 7.9.7 in the
-// PDF spec (ISO 32000) for a description of number trees. This
-// implementation disregards stated limits and sequencing and simply
-// builds a map from numerical index to object. If the array of
-// numbers does not contain a numerical value where expected, this
-// implementation silently skips forward until it finds a number.
+// PDF spec (ISO 32000) for a description of number trees.
+
+class NNTreeImpl;
 
 class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
 {
@@ -75,6 +73,10 @@ class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
     bool findObjectAtOrBelow(numtree_number idx, QPDFObjectHandle& oh,
                              numtree_number& offset);
 
+    // Return the contents of the number tree as a map. Note that
+    // number trees may be very large, so this may use a lot of RAM.
+    // It is more efficient to use QPDFNumberTreeObjectHelper's
+    // iterator.
     typedef std::map<numtree_number, QPDFObjectHandle> idx_map;
     QPDF_DLL
     idx_map getAsMap() const;
@@ -90,23 +92,11 @@ class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
         ~Members();
 
       private:
-        Members();
-        Members(Members const&);
+        Members(QPDFObjectHandle& oh);
+        Members(Members const&) = delete;
 
-        // Use a reverse sorted map so we can use the lower_bound
-        // method for searching. lower_bound returns smallest entry
-        // not before the searched entry, meaning that the searched
-        // entry is the lower bound. There's also an upper_bound
-        // method, but it does not do what you'd think it should.
-        // lower_bound implements >=, and upper_bound implements >.
-        typedef std::map<numtree_number,
-                         QPDFObjectHandle,
-                         std::greater<numtree_number> > idx_map;
-        idx_map entries;
-        std::set<QPDFObjGen> seen;
+        std::shared_ptr<NNTreeImpl> impl;
     };
-
-    void updateMap(QPDFObjectHandle oh);
 
     PointerHolder<Members> m;
 };

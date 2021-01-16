@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+require TestDriver;
+
+my $td = new TestDriver('nntree');
+
+$td->runtest("nntree",
+	     {$td->COMMAND => "nntree"},
+	     {$td->STRING => "all tests passed\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->report(1);
