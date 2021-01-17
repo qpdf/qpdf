@@ -3010,7 +3010,7 @@ QPDF::findAttachmentStreams()
     {
         return;
     }
-    QPDFNameTreeObjectHelper ef_tree(embedded_files);
+    QPDFNameTreeObjectHelper ef_tree(embedded_files, *this);
     for (auto i: ef_tree)
     {
         QPDFObjectHandle item = i.second;

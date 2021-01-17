@@ -6,9 +6,9 @@
 
 static bool any_failures = false;
 
-bool report(QPDFObjectHandle oh, long long item, long long exp_item)
+bool report(QPDF& q, QPDFObjectHandle oh, long long item, long long exp_item)
 {
-    QPDFNumberTreeObjectHelper nh(oh);
+    QPDFNumberTreeObjectHelper nh(oh, q);
     QPDFObjectHandle o1;
     long long offset = 0;
     bool f1 = nh.findObjectAtOrBelow(item, o1, offset);
@@ -81,8 +81,8 @@ void test_bsearch()
         return node;
     };
 
-    auto r = [](QPDFObjectHandle& oh, int item, int exp) {
-        if (report(oh, item, exp))
+    auto r = [&q](QPDFObjectHandle& oh, int item, int exp) {
+        if (report(q, oh, item, exp))
         {
             any_failures = true;
         }
@@ -218,7 +218,7 @@ void test_depth()
                           .getArrayItem(1));
     }
 
-    QPDFNameTreeObjectHelper nh(n0);
+    QPDFNameTreeObjectHelper nh(n0, q);
     std::cout << "--- forward ---" << std::endl;
     for (auto i: nh)
     {

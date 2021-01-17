@@ -1748,7 +1748,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         // Test number tree. This test is crafted to work with
         // number-tree.pdf
         QPDFObjectHandle qtest = pdf.getTrailer().getKey("/QTest");
-        QPDFNumberTreeObjectHelper ntoh(qtest);
+        QPDFNumberTreeObjectHelper ntoh(qtest, pdf);
         for (auto iter: ntoh)
         {
             std::cout << iter.first << " "
@@ -1806,7 +1806,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         // Test name tree. This test is crafted to work with
         // name-tree.pdf
         QPDFObjectHandle qtest = pdf.getTrailer().getKey("/QTest");
-        QPDFNameTreeObjectHelper ntoh(qtest);
+        QPDFNameTreeObjectHelper ntoh(qtest, pdf);
         for (auto iter: ntoh)
         {
             std::cout << iter.first << " -> "
