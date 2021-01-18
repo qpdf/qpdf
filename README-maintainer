@@ -256,6 +256,9 @@ gpg --detach-sign --armor qpdf-$version.tar.gz
 
 * Build and test the debian package
 
+* Add a calendar reminder to check the status of the debian package to
+  make sure it is transitioning properly and to resolve any issues.
+
 * Sign the releases. The release archive area should contain the
   Windows binaries, the AppImage, the source tarball, and the source
   tarball signature.
