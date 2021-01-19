@@ -471,7 +471,11 @@ extern "C" {
      * a value between 0 and 100 representing the approximate write
      * progress. The data object you pass to
      * qpdf_register_progress_reporter will be handed back to your
-     * function.
+     * function. This function must be called after qpdf_init_write
+     * (or qpdf_init_write_memory) and before qpdf_write. The
+     * registered progress reporter applies only to a single write, so
+     * you must call it again if you perform a subsequent write with a
+     * new writer.
      */
     QPDF_DLL
     void qpdf_register_progress_reporter(
