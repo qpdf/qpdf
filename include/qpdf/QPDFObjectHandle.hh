@@ -480,10 +480,12 @@ class QPDFObjectHandle
     static QPDFObjectHandle newName(std::string const& name);
     QPDF_DLL
     static QPDFObjectHandle newString(std::string const& str);
-    // Create a string encoded in UTF-16 from the given utf8-encoded
-    // string. Such strings are appropriately encoded to appear in PDF
-    // files outside of content streams, such as in document metadata
-    // form field values, page labels, outlines, and similar locations.
+    // Create a string encoded from the given utf8-encoded string
+    // appropriately encoded to appear in PDF files outside of content
+    // streams, such as in document metadata form field values, page
+    // labels, outlines, and similar locations. We try ASCII first,
+    // then PDFDocEncoding, then UTF-16 as needed to successfully
+    // encode all the characters.
     QPDF_DLL
     static QPDFObjectHandle newUnicodeString(std::string const& utf8_str);
     QPDF_DLL

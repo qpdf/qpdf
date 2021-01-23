@@ -1,3 +1,15 @@
+2021-01-23  Jay Berkenbilt  <ejb@ql.org>
+
+	* Change behavior of QPDFObjectHandle::newUnicodeString so that it
+	encodes ASCII or PDFDocEncoding if those encodings will support
+	all the characters in the string, resorting to UTF-16 only if the
+	other encodings are insufficient. This is a cleaner implementation
+	of the intention of encoding strings for use outside of contents
+	and results in fewer instances of ASCII strings being needlessly
+	encoded as UTF-16. This change may cause qpdf to generate
+	different output from the same input when form field values are
+	set using methods from QPDFFormFieldObjectHelper.
+
 2021-01-16  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add new constructors for QPDFNameTreeObjectHelper and

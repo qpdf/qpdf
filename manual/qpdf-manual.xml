@@ -4824,6 +4824,26 @@ print "\n";
      <itemizedlist>
       <listitem>
        <para>
+        Behavior Changes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          <function>QPDFObjectHandle::newUnicodeString</function> now
+          uses whichever of ASCII, PDFDocEncoding, of UTF-16 is
+          sufficient to encode all the characters in the string. This
+          reduces needless encoding in UTF-16 of strings that can be
+          encoded in ASCII. This change may cause qpdf to generate
+          different output than before when form field values are set
+          using <classname>QPDFFormFieldObjectHelper</classname>.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+     <itemizedlist>
+      <listitem>
+       <para>
         Library Enhancements
        </para>
        <itemizedlist>
