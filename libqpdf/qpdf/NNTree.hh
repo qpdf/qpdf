@@ -15,6 +15,7 @@ class NNTreeDetails
     virtual int compareKeys(QPDFObjectHandle, QPDFObjectHandle) const = 0;
 };
 
+class NNTreeImpl;
 class NNTreeIterator: public std::iterator<
     std::bidirectional_iterator_tag,
     std::pair<QPDFObjectHandle, QPDFObjectHandle>,
@@ -46,32 +47,34 @@ class NNTreeIterator: public std::iterator<
         return ! operator==(other);
     }
 
+    void insertAfter(
+        QPDFObjectHandle key, QPDFObjectHandle value);
+
   private:
     class PathElement
     {
       public:
         PathElement(QPDFObjectHandle const& node, int kid_number);
-        QPDFObjectHandle getNextKid(bool backward);
 
         QPDFObjectHandle node;
         int kid_number;
     };
 
     // ABI: for qpdf 11, make qpdf a reference
-    NNTreeIterator(NNTreeDetails const& details, QPDF* qpdf) :
-        details(details),
-        qpdf(qpdf),
-        item_number(-1)
-    {
-    }
-    void reset();
-    void deepen(QPDFObjectHandle node, bool first);
+    NNTreeIterator(NNTreeImpl& impl);
+    bool deepen(QPDFObjectHandle node, bool first, bool allow_empty);
     void setItemNumber(QPDFObjectHandle const& node, int);
     void addPathElement(QPDFObjectHandle const& node, int kid_number);
+    QPDFObjectHandle getNextKid(PathElement& element, bool backward);
     void increment(bool backward);
+    void resetLimits(QPDFObjectHandle node,
+                     std::list<PathElement>::iterator parent);
 
-    NNTreeDetails const& details;
-    QPDF* qpdf;
+    void split(QPDFObjectHandle to_split,
+               std::list<PathElement>::iterator parent);
+    std::list<PathElement>::iterator lastPathElement();
+
+    NNTreeImpl& impl;
     std::list<PathElement> path;
     QPDFObjectHandle node;
     int item_number;
@@ -79,6 +82,7 @@ class NNTreeIterator: public std::iterator<
 
 class NNTreeImpl
 {
+    friend class NNTreeIterator;
   public:
     typedef NNTreeIterator iterator;
 
@@ -88,14 +92,24 @@ class NNTreeImpl
     iterator end();
     iterator last();
     iterator find(QPDFObjectHandle key, bool return_prev_if_not_found = false);
+    iterator insertFirst(QPDFObjectHandle key, QPDFObjectHandle value);
+    iterator insert(QPDFObjectHandle key, QPDFObjectHandle value);
+
+    // Change the split threshold for easier testing. There's no real
+    // reason to expose this to downstream tree helpers, but it has to
+    // be public so we can call it from the test suite.
+    void setSplitThreshold(int split_threshold);
 
   private:
+    void repair();
+    iterator findInternal(
+        QPDFObjectHandle key, bool return_prev_if_not_found = false);
     int withinLimits(QPDFObjectHandle key, QPDFObjectHandle node);
     int binarySearch(
         QPDFObjectHandle key, QPDFObjectHandle items,
         int num_items, bool return_prev_if_not_found,
         int (NNTreeImpl::*compare)(QPDFObjectHandle& key,
-                                 QPDFObjectHandle& node,
+                                 QPDFObjectHandle& arr,
                                  int item));
     int compareKeyItem(
         QPDFObjectHandle& key, QPDFObjectHandle& items, int idx);
@@ -104,7 +118,9 @@ class NNTreeImpl
 
     NNTreeDetails const& details;
     QPDF* qpdf;
+    int split_threshold;
     QPDFObjectHandle oh;
+    bool auto_repair;
 };
 
 #endif // NNTREE_HH

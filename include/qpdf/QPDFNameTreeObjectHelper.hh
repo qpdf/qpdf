@@ -127,11 +127,20 @@ class QPDFNameTreeObjectHelper: public QPDFObjectHelper
     iterator find(std::string const& key,
                   bool return_prev_if_not_found = false);
 
+    // Insert a new item. If the key already exists, it is replaced.
+    QPDF_DLL
+    iterator insert(std::string const& key, QPDFObjectHandle value);
+
     // Return the contents of the name tree as a map. Note that name
     // trees may be very large, so this may use a lot of RAM. It is
     // more efficient to use QPDFNameTreeObjectHelper's iterator.
     QPDF_DLL
     std::map<std::string, QPDFObjectHandle> getAsMap() const;
+
+    // Split a node if the number of items exceeds this value. There's
+    // no real reason to ever set this except for testing.
+    QPDF_DLL
+    void setSplitThreshold(int);
 
   private:
     class Members

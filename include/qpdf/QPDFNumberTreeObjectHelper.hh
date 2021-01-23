@@ -145,6 +145,10 @@ class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     iterator find(numtree_number key, bool return_prev_if_not_found = false);
 
+    // Insert a new item. If the key already exists, it is replaced.
+    QPDF_DLL
+    iterator insert(numtree_number key, QPDFObjectHandle value);
+
     // Return the contents of the number tree as a map. Note that
     // number trees may be very large, so this may use a lot of RAM.
     // It is more efficient to use QPDFNumberTreeObjectHelper's
@@ -152,6 +156,11 @@ class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
     typedef std::map<numtree_number, QPDFObjectHandle> idx_map;
     QPDF_DLL
     idx_map getAsMap() const;
+
+    // Split a node if the number of items exceeds this value. There's
+    // no real reason to ever set this except for testing.
+    QPDF_DLL
+    void setSplitThreshold(int);
 
   private:
     class Members

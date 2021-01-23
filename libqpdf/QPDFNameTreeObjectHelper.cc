@@ -122,6 +122,15 @@ QPDFNameTreeObjectHelper::find(std::string const& key,
     return iterator(std::make_shared<NNTreeIterator>(i));
 }
 
+QPDFNameTreeObjectHelper::iterator
+QPDFNameTreeObjectHelper::insert(std::string const& key,
+                                 QPDFObjectHandle value)
+{
+    auto i = this->m->impl->insert(
+        QPDFObjectHandle::newUnicodeString(key), value);
+    return iterator(std::make_shared<NNTreeIterator>(i));
+}
+
 bool
 QPDFNameTreeObjectHelper::hasName(std::string const& name)
 {
@@ -140,6 +149,12 @@ QPDFNameTreeObjectHelper::findObject(
     }
     oh = (*i).second;
     return true;
+}
+
+void
+QPDFNameTreeObjectHelper::setSplitThreshold(int t)
+{
+    this->m->impl->setSplitThreshold(t);
 }
 
 std::map<std::string, QPDFObjectHandle>

@@ -1777,14 +1777,92 @@ void runtest(int n, char const* filename1, char const* arg2)
         assert(2 == offset);
 
         // Exercise deprecated API until qpdf 11
+        std::cout << "/Bad1: deprecated API" << std::endl;
         auto bad1 = QPDFNumberTreeObjectHelper(
             pdf.getTrailer().getKey("/Bad1"));
         assert(bad1.begin() == bad1.end());
 
+        std::cout << "/Bad1" << std::endl;
         bad1 = QPDFNumberTreeObjectHelper(
             pdf.getTrailer().getKey("/Bad1"), pdf);
         assert(bad1.begin() == bad1.end());
         assert(bad1.last() == bad1.end());
+
+        std::cout << "/Bad2" << std::endl;
+        auto bad2 = QPDFNumberTreeObjectHelper(
+            pdf.getTrailer().getKey("/Bad2"), pdf);
+        for (auto i: bad2)
+        {
+            std::cout << i.first << " " << i.second.unparse() << std::endl;
+        }
+
+        std::vector<std::string> empties = {"/Empty1", "/Empty2"};
+        for (auto const& k: empties)
+        {
+            std::cout << k << std::endl;
+            auto empty = QPDFNumberTreeObjectHelper(
+                pdf.getTrailer().getKey(k), pdf);
+            assert(empty.begin() == empty.end());
+            assert(empty.last() == empty.end());
+            auto i = empty.insert(5, QPDFObjectHandle::newString("5"));
+            assert((*i).first == 5);
+            assert((*i).second.getStringValue() == "5");
+            assert((*empty.begin()).first == 5);
+            assert((*empty.last()).first == 5);
+            assert((*empty.begin()).second.getStringValue() == "5");
+            i = empty.insert(5, QPDFObjectHandle::newString("5+"));
+            assert((*i).first == 5);
+            assert((*i).second.getStringValue() == "5+");
+            assert((*empty.begin()).second.getStringValue() == "5+");
+            i = empty.insert(6, QPDFObjectHandle::newString("6"));
+            assert((*i).first == 6);
+            assert((*i).second.getStringValue() == "6");
+            assert((*empty.begin()).second.getStringValue() == "5+");
+            assert((*empty.last()).first == 6);
+            assert((*empty.last()).second.getStringValue() == "6");
+        }
+        std::cout << "Insert into invalid" << std::endl;
+        auto invalid1 = QPDFNumberTreeObjectHelper(
+            QPDFObjectHandle::newDictionary(), pdf);
+        try
+        {
+            invalid1.insert(1, QPDFObjectHandle::newNull());
+        }
+        catch (QPDFExc& e)
+        {
+            std::cout << e.what() << std::endl;
+        }
+
+        std::cout << "/Bad3, no repair" << std::endl;
+        auto bad3_oh = pdf.getTrailer().getKey("/Bad3");
+        auto bad3 = QPDFNumberTreeObjectHelper(bad3_oh, pdf, false);
+        for (auto i: bad3)
+        {
+            std::cout << i.first << " " << i.second.unparse() << std::endl;
+        }
+        assert(! bad3_oh.getKey("/Kids").getArrayItem(0).isIndirect());
+
+        std::cout << "/Bad3, repair" << std::endl;
+        bad3 = QPDFNumberTreeObjectHelper(bad3_oh, pdf, true);
+        for (auto i: bad3)
+        {
+            std::cout << i.first << " " << i.second.unparse() << std::endl;
+        }
+        assert(bad3_oh.getKey("/Kids").getArrayItem(0).isIndirect());
+
+        std::cout << "/Bad4 -- missing limits" << std::endl;
+        auto bad4 = QPDFNumberTreeObjectHelper(
+            pdf.getTrailer().getKey("/Bad4"), pdf);
+        bad4.insert(5, QPDFObjectHandle::newString("5"));
+        for (auto i: bad4)
+        {
+            std::cout << i.first << " " << i.second.unparse() << std::endl;
+        }
+
+        std::cout << "/Bad5 -- limit errors" << std::endl;
+        auto bad5 = QPDFNumberTreeObjectHelper(
+            pdf.getTrailer().getKey("/Bad5"), pdf);
+        assert(bad5.find(10) == bad5.end());
     }
     else if (n == 47)
     {
@@ -1830,6 +1908,88 @@ void runtest(int n, char const* filename1, char const* arg2)
         auto last = ntoh.last();
         assert((*last).first == "29 twenty-nine");
         assert((*last).second.getUTF8Value() == "twenty-nine!");
+
+        std::vector<std::string> empties = {"/Empty1", "/Empty2"};
+        for (auto const& k: empties)
+        {
+            std::cout << k << std::endl;
+            auto empty = QPDFNameTreeObjectHelper(
+                pdf.getTrailer().getKey(k), pdf);
+            assert(empty.begin() == empty.end());
+            assert(empty.last() == empty.end());
+            auto i = empty.insert("five", QPDFObjectHandle::newString("5"));
+            assert((*i).first == "five");
+            assert((*i).second.getStringValue() == "5");
+            assert((*empty.begin()).first == "five");
+            assert((*empty.last()).first == "five");
+            assert((*empty.begin()).second.getStringValue() == "5");
+            i = empty.insert("five", QPDFObjectHandle::newString("5+"));
+            assert((*i).first == "five");
+            assert((*i).second.getStringValue() == "5+");
+            assert((*empty.begin()).second.getStringValue() == "5+");
+            i = empty.insert("six", QPDFObjectHandle::newString("6"));
+            assert((*i).first == "six");
+            assert((*i).second.getStringValue() == "6");
+            assert((*empty.begin()).second.getStringValue() == "5+");
+            assert((*empty.last()).first == "six");
+            assert((*empty.last()).second.getStringValue() == "6");
+        }
+
+        // Exercise deprecated API until qpdf 11
+        std::cout << "/Bad1: deprecated API" << std::endl;
+        auto bad1 = QPDFNameTreeObjectHelper(
+            pdf.getTrailer().getKey("/Bad1"));
+        try
+        {
+            bad1.find("G", true);
+            assert(false);
+        }
+        catch (std::runtime_error& e)
+        {
+            std::cout << e.what() << std::endl;
+        }
+
+        std::cout << "/Bad1 -- wrong key type" << std::endl;
+        bad1 = QPDFNameTreeObjectHelper(
+            pdf.getTrailer().getKey("/Bad1"), pdf);
+        assert((*bad1.find("G", true)).first == "A");
+        for (auto i: bad1)
+        {
+            std::cout << i.first << std::endl;
+        }
+
+        std::cout << "/Bad2 -- invalid kid" << std::endl;
+        auto bad2 = QPDFNameTreeObjectHelper(
+            pdf.getTrailer().getKey("/Bad2"), pdf);
+        assert((*bad2.find("G", true)).first == "B");
+        for (auto i: bad2)
+        {
+            std::cout << i.first << std::endl;
+        }
+
+        std::cout << "/Bad3 -- invalid kid" << std::endl;
+        auto bad3 = QPDFNameTreeObjectHelper(
+            pdf.getTrailer().getKey("/Bad3"), pdf);
+        assert(bad3.find("G", true) == bad3.end());
+
+        std::cout << "/Bad4 -- invalid kid" << std::endl;
+        auto bad4 = QPDFNameTreeObjectHelper(
+            pdf.getTrailer().getKey("/Bad4"), pdf);
+        assert((*bad4.find("F", true)).first == "C");
+        for (auto i: bad4)
+        {
+            std::cout << i.first << std::endl;
+        }
+
+        std::cout << "/Bad5 -- loop in find" << std::endl;
+        auto bad5 = QPDFNameTreeObjectHelper(
+            pdf.getTrailer().getKey("/Bad5"), pdf);
+        assert((*bad5.find("F", true)).first == "D");
+
+        std::cout << "/Bad6 -- bad limits" << std::endl;
+        auto bad6 = QPDFNameTreeObjectHelper(
+            pdf.getTrailer().getKey("/Bad6"), pdf);
+        assert((*bad6.insert("H", QPDFObjectHandle::newNull())).first == "H");
     }
     else if (n == 49)
     {
@@ -2325,6 +2485,57 @@ void runtest(int n, char const* filename1, char const* arg2)
     {
         pdf.closeInputSource();
         pdf.getRoot().getKey("/Pages").unparseResolved();
+    }
+    else if (n == 74)
+    {
+        // This test is crafted to work with split-nntree.pdf
+        std::cout << "/Split1" << std::endl;
+        auto split1 = QPDFNumberTreeObjectHelper(
+            pdf.getTrailer().getKey("/Split1"), pdf);
+        split1.setSplitThreshold(4);
+        auto check_split1 = [&split1](int k) {
+            auto i = split1.insert(k, QPDFObjectHandle::newString(
+                                       QUtil::int_to_string(k)));
+            assert((*i).first == k);
+        };
+        check_split1(15);
+        check_split1(35);
+        check_split1(125);
+        for (auto i: split1)
+        {
+            std::cout << i.first << std::endl;
+        }
+
+        std::cout << "/Split2" << std::endl;
+        auto split2 = QPDFNameTreeObjectHelper(
+            pdf.getTrailer().getKey("/Split2"), pdf);
+        split2.setSplitThreshold(4);
+        auto check_split2 = [](QPDFNameTreeObjectHelper& noh,
+                               std::string const& k) {
+            auto i = noh.insert(k, QPDFObjectHandle::newUnicodeString(k));
+            assert((*i).first == k);
+        };
+        check_split2(split2, "C");
+        for (auto i: split2)
+        {
+            std::cout << i.first << std::endl;
+        }
+
+        std::cout << "/Split3" << std::endl;
+        auto split3 = QPDFNameTreeObjectHelper(
+            pdf.getTrailer().getKey("/Split3"), pdf);
+        split3.setSplitThreshold(4);
+        check_split2(split3, "P");
+        check_split2(split3, "\xcf\x80");
+        for (auto i: split3)
+        {
+            std::cout << i.first << " " << i.second.unparse() << std::endl;
+        }
+
+        QPDFWriter w(pdf, "a.pdf");
+        w.setStaticID(true);
+        w.setQDFMode(true);
+        w.write();
     }
     else
     {

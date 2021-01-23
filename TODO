@@ -261,8 +261,6 @@ I find it useful to make reference to them in this list.
    dictionary may need to be changed -- create test cases with lots of
    duplicated/overlapping keys.
 
- * Add support for writing name and number trees
-
  * Figure out how to render Gajić correctly in the PDF version of the
    qpdf manual.
 

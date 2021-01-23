@@ -1,5 +1,12 @@
 2021-01-23  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add an insert method to QPDFNameTreeObjectHelper and
+	QPDFNumberTreeObjectHelper.
+
+	* QPDFNameTreeObjectHelper and QPDFNumberTreeObjectHelper will
+	automatically repair broken name and number trees by default. This
+	behavior can be turned off.
+
 	* Change behavior of QPDFObjectHandle::newUnicodeString so that it
 	encodes ASCII or PDFDocEncoding if those encodings will support
 	all the characters in the string, resorting to UTF-16 only if the

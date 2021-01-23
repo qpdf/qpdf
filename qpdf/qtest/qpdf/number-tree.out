@@ -26,6 +26,39 @@
 22 twenty-two
 23 twenty-three
 29 twenty-nine
-WARNING: number-tree.pdf (Name/Number tree node (object 14)): name/number tree node has neither /Kids nor /Names
+/Bad1: deprecated API
+/Bad1
+WARNING: number-tree.pdf (Name/Number tree node (object 14)): name/number tree node has neither non-empty /Nums nor /Kids
 WARNING: number-tree.pdf (Name/Number tree node (object 13)): loop detected while traversing name/number tree
+/Bad2
+10 (10)
+WARNING: number-tree.pdf (Name/Number tree node (object 16)): item 2 has the wrong type
+15 (15)
+WARNING: number-tree.pdf (Name/Number tree node (object 16)): items array doesn't have enough elements
+WARNING: number-tree.pdf (Name/Number tree node (object 15)): skipping over invalid kid at index 1
+WARNING: number-tree.pdf (Name/Number tree node (object 17)): name/number tree node has neither non-empty /Nums nor /Kids
+35 (35)
+38 (38)
+WARNING: number-tree.pdf (Name/Number tree node (object 19)): name/number tree node has neither non-empty /Nums nor /Kids
+/Empty1
+/Empty2
+Insert into invalid
+WARNING: number-tree.pdf (Name/Number tree node): name/number tree node has neither non-empty /Nums nor /Kids
+WARNING: number-tree.pdf (Name/Number tree node): name/number tree node has neither non-empty /Nums nor /Kids
+number-tree.pdf (Name/Number tree node): unable to find a valid items node
+/Bad3, no repair
+WARNING: number-tree.pdf (Name/Number tree node (object 23)): kid number 0 is not an indirect object
+0 (zero)
+10 (ten)
+/Bad3, repair
+WARNING: number-tree.pdf (Name/Number tree node (object 23)): converting kid number 0 to an indirect object
+0 (zero)
+10 (ten)
+/Bad4 -- missing limits
+WARNING: number-tree.pdf (Name/Number tree node (object 24)): attempting to repair after error: number-tree.pdf (Name/Number tree node (object 25)): node is missing /Limits
+0 (0)
+5 (5)
+10 (10)
+/Bad5 -- limit errors
+WARNING: number-tree.pdf (Name/Number tree node (object 28)): attempting to repair after error: number-tree.pdf (Name/Number tree node (object 29)): unexpected -1 from binary search of kids; limits may by wrong
 test 46 done
