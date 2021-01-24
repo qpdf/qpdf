@@ -103,9 +103,9 @@ NNTreeIterator::increment(bool backward)
 {
     if (this->item_number < 0)
     {
-        throw std::logic_error(
-            "attempt made to increment or decrement an invalid"
-            " name/number tree iterator");
+        QTC::TC("qpdf", "NNTree increment end()");
+        deepen(impl.oh, ! backward, true);
+        return;
     }
     bool found_valid_key = false;
     while (valid() && (! found_valid_key))

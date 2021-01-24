@@ -1776,6 +1776,32 @@ void runtest(int n, char const* filename1, char const* arg2)
         assert("six" == oh.getStringValue());
         assert(2 == offset);
 
+        auto new1 = QPDFNumberTreeObjectHelper::newEmpty(pdf);
+        auto iter1 = new1.begin();
+        assert(iter1 == new1.end());
+        ++iter1;
+        assert(iter1 == new1.end());
+        --iter1;
+        assert(iter1 == new1.end());
+        new1.insert(1, QPDFObjectHandle::newString("1"));
+        ++iter1;
+        assert((*iter1).first == 1);
+        --iter1;
+        assert(iter1 == new1.end());
+        --iter1;
+        assert((*iter1).first == 1);
+        new1.insert(2, QPDFObjectHandle::newString("2"));
+        ++iter1;
+        assert((*iter1).first == 2);
+        ++iter1;
+        assert(iter1 == new1.end());
+        ++iter1;
+        assert((*iter1).first == 1);
+        --iter1;
+        assert(iter1 == new1.end());
+        --iter1;
+        assert((*iter1).first == 2);
+
         // Exercise deprecated API until qpdf 11
         std::cout << "/Bad1: deprecated API" << std::endl;
         auto bad1 = QPDFNumberTreeObjectHelper(
@@ -1908,6 +1934,32 @@ void runtest(int n, char const* filename1, char const* arg2)
         auto last = ntoh.last();
         assert((*last).first == "29 twenty-nine");
         assert((*last).second.getUTF8Value() == "twenty-nine!");
+
+        auto new1 = QPDFNameTreeObjectHelper::newEmpty(pdf);
+        auto iter1 = new1.begin();
+        assert(iter1 == new1.end());
+        ++iter1;
+        assert(iter1 == new1.end());
+        --iter1;
+        assert(iter1 == new1.end());
+        new1.insert("1", QPDFObjectHandle::newString("1"));
+        ++iter1;
+        assert((*iter1).first == "1");
+        --iter1;
+        assert(iter1 == new1.end());
+        --iter1;
+        assert((*iter1).first == "1");
+        new1.insert("2", QPDFObjectHandle::newString("2"));
+        ++iter1;
+        assert((*iter1).first == "2");
+        ++iter1;
+        assert(iter1 == new1.end());
+        ++iter1;
+        assert((*iter1).first == "1");
+        --iter1;
+        assert(iter1 == new1.end());
+        --iter1;
+        assert((*iter1).first == "2");
 
         std::vector<std::string> empties = {"/Empty1", "/Empty2"};
         for (auto const& k: empties)

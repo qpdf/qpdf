@@ -51,10 +51,16 @@ class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
     // structure.
     QPDF_DLL
     QPDFNumberTreeObjectHelper(QPDFObjectHandle);
+
+    // ABI: = default
     QPDF_DLL
     virtual ~QPDFNumberTreeObjectHelper()
     {
     }
+
+    // Create an empty number tree
+    QPDF_DLL
+    static QPDFNumberTreeObjectHelper newEmpty(QPDF&, bool auto_repair = true);
 
     typedef long long int numtree_number;
 
@@ -131,7 +137,9 @@ class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
     };
 
     // The iterator looks like map iterator, so i.first is a string
-    // and i.second is a QPDFObjectHandle.
+    // and i.second is a QPDFObjectHandle. Incrementing end() brings
+    // you to the first item. Decrementing end() brings you to the
+    // last item.
     QPDF_DLL
     iterator begin() const;
     QPDF_DLL

@@ -52,6 +52,13 @@ QPDFNumberTreeObjectHelper::QPDFNumberTreeObjectHelper(QPDFObjectHandle oh) :
 {
 }
 
+QPDFNumberTreeObjectHelper
+QPDFNumberTreeObjectHelper::newEmpty(QPDF& qpdf, bool auto_repair)
+{
+    return QPDFNumberTreeObjectHelper(
+        QPDFObjectHandle::parse("<< /Nums [] >>"), qpdf, auto_repair);
+}
+
 QPDFNumberTreeObjectHelper::iterator::iterator(
     std::shared_ptr<NNTreeIterator> const& i) :
     impl(i)

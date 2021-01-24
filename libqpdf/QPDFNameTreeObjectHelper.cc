@@ -56,6 +56,13 @@ QPDFNameTreeObjectHelper::~QPDFNameTreeObjectHelper()
 {
 }
 
+QPDFNameTreeObjectHelper
+QPDFNameTreeObjectHelper::newEmpty(QPDF& qpdf, bool auto_repair)
+{
+    return QPDFNameTreeObjectHelper(
+        QPDFObjectHandle::parse("<< /Names [] >>"), qpdf, auto_repair);
+}
+
 QPDFNameTreeObjectHelper::iterator::iterator(
     std::shared_ptr<NNTreeIterator> const& i) :
     impl(i)

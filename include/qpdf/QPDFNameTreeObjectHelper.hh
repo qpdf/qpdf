@@ -54,6 +54,12 @@ class QPDFNameTreeObjectHelper: public QPDFObjectHelper
     // structure.
     QPDF_DLL
     QPDFNameTreeObjectHelper(QPDFObjectHandle);
+
+    // Create an empty name tree
+    QPDF_DLL
+    static QPDFNameTreeObjectHelper newEmpty(QPDF&, bool auto_repair = true);
+
+    // ABI: = default
     QPDF_DLL
     virtual ~QPDFNameTreeObjectHelper();
 
@@ -112,7 +118,9 @@ class QPDFNameTreeObjectHelper: public QPDFObjectHelper
     };
 
     // The iterator looks like map iterator, so i.first is a string
-    // and i.second is a QPDFObjectHandle.
+    // and i.second is a QPDFObjectHandle. Incrementing end() brings
+    // you to the first item. Decrementing end() brings you to the
+    // last item.
     QPDF_DLL
     iterator begin() const;
     QPDF_DLL
