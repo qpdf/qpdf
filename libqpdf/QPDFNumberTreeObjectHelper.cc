@@ -105,6 +105,12 @@ QPDFNumberTreeObjectHelper::iterator::insertAfter(
     impl->insertAfter(QPDFObjectHandle::newInteger(key), value);
 }
 
+void
+QPDFNumberTreeObjectHelper::iterator::remove()
+{
+    impl->remove();
+}
+
 QPDFNumberTreeObjectHelper::iterator
 QPDFNumberTreeObjectHelper::begin() const
 {
@@ -138,6 +144,14 @@ QPDFNumberTreeObjectHelper::insert(numtree_number key, QPDFObjectHandle value)
     auto i = this->m->impl->insert(
         QPDFObjectHandle::newInteger(key), value);
     return iterator(std::make_shared<NNTreeIterator>(i));
+}
+
+bool
+QPDFNumberTreeObjectHelper::remove(numtree_number key,
+                                   QPDFObjectHandle* value)
+{
+    return this->m->impl->remove(
+        QPDFObjectHandle::newInteger(key), value);
 }
 
 QPDFNumberTreeObjectHelper::numtree_number

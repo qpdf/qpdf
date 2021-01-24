@@ -49,6 +49,7 @@ class NNTreeIterator: public std::iterator<
 
     void insertAfter(
         QPDFObjectHandle key, QPDFObjectHandle value);
+    void remove();
 
   private:
     class PathElement
@@ -94,6 +95,7 @@ class NNTreeImpl
     iterator find(QPDFObjectHandle key, bool return_prev_if_not_found = false);
     iterator insertFirst(QPDFObjectHandle key, QPDFObjectHandle value);
     iterator insert(QPDFObjectHandle key, QPDFObjectHandle value);
+    bool remove(QPDFObjectHandle key, QPDFObjectHandle* value = nullptr);
 
     // Change the split threshold for easier testing. There's no real
     // reason to expose this to downstream tree helpers, but it has to

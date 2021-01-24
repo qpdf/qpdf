@@ -1,3 +1,9 @@
+2021-01-24  Jay Berkenbilt  <ejb@ql.org>
+
+	* Implement remove for name and number trees as well as exposing
+	remove and insertAfter methods for iterators. With this addition,
+	qpdf now has robust read/write support for name and number trees.
+
 2021-01-23  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add an insert method to QPDFNameTreeObjectHelper and

@@ -2615,6 +2615,65 @@ void runtest(int n, char const* filename1, char const* arg2)
         w.setQDFMode(true);
         w.write();
     }
+    else if (n == 75)
+    {
+        // This test is crafted to work with erase-nntree.pdf
+        auto erase1 = QPDFNameTreeObjectHelper(
+            pdf.getTrailer().getKey("/Erase1"), pdf);
+        QPDFObjectHandle value;
+        assert(! erase1.remove("1X"));
+        assert(erase1.remove("1C", &value));
+        assert(value.getUTF8Value() == "c");
+        auto iter1 = erase1.find("1B");
+        iter1.remove();
+        assert((*iter1).first == "1D");
+        iter1.remove();
+        assert(iter1 == erase1.end());
+        --iter1;
+        assert((*iter1).first == "1A");
+        iter1.remove();
+        assert(iter1 == erase1.end());
+
+        auto erase2_oh = pdf.getTrailer().getKey("/Erase2");
+        auto erase2 = QPDFNumberTreeObjectHelper(erase2_oh, pdf);
+        auto iter2 = erase2.find(250);
+        iter2.remove();
+        assert(iter2 == erase2.end());
+        --iter2;
+        assert((*iter2).first == 240);
+        auto k1 = erase2_oh.getKey("/Kids").getArrayItem(1);
+        auto l1 = k1.getKey("/Limits");
+        assert(l1.getArrayItem(0).getIntValue() == 230);
+        assert(l1.getArrayItem(1).getIntValue() == 240);
+        iter2 = erase2.find(210);
+        iter2.remove();
+        assert((*iter2).first == 220);
+        k1 = erase2_oh.getKey("/Kids").getArrayItem(0);
+        l1 = k1.getKey("/Limits");
+        assert(l1.getArrayItem(0).getIntValue() == 220);
+        assert(l1.getArrayItem(1).getIntValue() == 220);
+        k1 = k1.getKey("/Kids");
+        assert(k1.getArrayNItems() == 1);
+
+        auto erase3 = QPDFNumberTreeObjectHelper(
+            pdf.getTrailer().getKey("/Erase3"), pdf);
+        iter2 = erase3.find(320);
+        iter2.remove();
+        assert(iter2 == erase3.end());
+        erase3.remove(310);
+        assert(erase3.begin() == erase3.end());
+
+        auto erase4 = QPDFNumberTreeObjectHelper(
+            pdf.getTrailer().getKey("/Erase4"), pdf);
+        iter2 = erase4.find(420);
+        iter2.remove();
+        assert((*iter2).first == 430);
+
+        QPDFWriter w(pdf, "a.pdf");
+        w.setStaticID(true);
+        w.setQDFMode(true);
+        w.write();
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +

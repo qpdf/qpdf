@@ -109,6 +109,12 @@ QPDFNameTreeObjectHelper::iterator::insertAfter(
     impl->insertAfter(QPDFObjectHandle::newUnicodeString(key), value);
 }
 
+void
+QPDFNameTreeObjectHelper::iterator::remove()
+{
+    impl->remove();
+}
+
 QPDFNameTreeObjectHelper::iterator
 QPDFNameTreeObjectHelper::begin() const
 {
@@ -143,6 +149,14 @@ QPDFNameTreeObjectHelper::insert(std::string const& key,
     auto i = this->m->impl->insert(
         QPDFObjectHandle::newUnicodeString(key), value);
     return iterator(std::make_shared<NNTreeIterator>(i));
+}
+
+bool
+QPDFNameTreeObjectHelper::remove(std::string const& key,
+                                 QPDFObjectHandle* value)
+{
+    return this->m->impl->remove(
+        QPDFObjectHandle::newUnicodeString(key), value);
 }
 
 bool

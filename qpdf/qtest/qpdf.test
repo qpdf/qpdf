@@ -583,7 +583,7 @@ foreach my $input (@ext_inputs)
 show_ntests();
 # ----------
 $td->notify("--- Number and Name Trees ---");
-$n_tests += 4;
+$n_tests += 6;
 
 $td->runtest("number trees",
 	     {$td->COMMAND => "test_driver 46 number-tree.pdf"},
@@ -600,6 +600,13 @@ $td->runtest("nntree split",
 $td->runtest("check file",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "split-nntree-out.pdf"});
+$td->runtest("nntree erase",
+	     {$td->COMMAND => "test_driver 75 erase-nntree.pdf"},
+	     {$td->FILE => "erase-nntree.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check file",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "erase-nntree-out.pdf"});
 
 show_ntests();
 # ----------

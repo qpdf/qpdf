@@ -4859,7 +4859,8 @@ print "\n";
           and <classname>QPDFNumberTreeObjectHelper</classname> to be
           more efficient, add an iterator-based API, give them the
           capability to repair broken trees, and create methods for
-          modifying the trees.
+          modifying the trees. With this change, qpdf has a robust
+          read/write implementation of name and number trees.
          </para>
         </listitem>
        </itemizedlist>

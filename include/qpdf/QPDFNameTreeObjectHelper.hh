@@ -125,6 +125,11 @@ class QPDFNameTreeObjectHelper: public QPDFObjectHelper
         QPDF_DLL
         void insertAfter(std::string const& key, QPDFObjectHandle value);
 
+        // Remove the current item and advance the iterator to the
+        // next item.
+        QPDF_DLL
+        void remove();
+
       private:
         iterator(std::shared_ptr<NNTreeIterator> const&);
         std::shared_ptr<NNTreeIterator> impl;
@@ -151,6 +156,12 @@ class QPDFNameTreeObjectHelper: public QPDFObjectHelper
     // Insert a new item. If the key already exists, it is replaced.
     QPDF_DLL
     iterator insert(std::string const& key, QPDFObjectHandle value);
+
+    // Remove an item. Return true if the item was found and removed;
+    // otherwise return false. If value is not null, initialize it to
+    // the value that was removed.
+    QPDF_DLL
+    bool remove(std::string const& key, QPDFObjectHandle* value = nullptr);
 
     // Return the contents of the name tree as a map. Note that name
     // trees may be very large, so this may use a lot of RAM. It is
