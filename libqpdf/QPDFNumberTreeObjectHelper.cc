@@ -98,6 +98,13 @@ QPDFNumberTreeObjectHelper::iterator::operator==(iterator const& other) const
     return *(impl) == *(other.impl);
 }
 
+void
+QPDFNumberTreeObjectHelper::iterator::insertAfter(
+    numtree_number key, QPDFObjectHandle value)
+{
+    impl->insertAfter(QPDFObjectHandle::newInteger(key), value);
+}
+
 QPDFNumberTreeObjectHelper::iterator
 QPDFNumberTreeObjectHelper::begin() const
 {

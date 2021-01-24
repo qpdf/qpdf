@@ -131,6 +131,19 @@ class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
             return ! operator==(other);
         }
 
+        // DANGER: this method can create inconsistent trees if not
+        // used properly! Insert a new item immediately after the
+        // current iterator and increment so that it points to the new
+        // item. If the current iterator is end(), insert at the
+        // beginning. This method does not check for proper ordering,
+        // so if you use it, you must ensure that the item you are
+        // inserting belongs where you are putting it. The reason for
+        // this method is that it is more efficient than insert() and
+        // can be used safely when you are creating a new tree and
+        // inserting items in sorted order.
+        QPDF_DLL
+        void insertAfter(numtree_number key, QPDFObjectHandle value);
+
       private:
         iterator(std::shared_ptr<NNTreeIterator> const&);
         std::shared_ptr<NNTreeIterator> impl;

@@ -1802,6 +1802,19 @@ void runtest(int n, char const* filename1, char const* arg2)
         --iter1;
         assert((*iter1).first == 2);
 
+        std::cout << "insertAfter" << std::endl;
+        auto new2 = QPDFNumberTreeObjectHelper::newEmpty(pdf);
+        auto iter2 = new2.begin();
+        assert(iter2 == new2.end());
+        iter2.insertAfter(3, QPDFObjectHandle::newString("3!"));
+        assert((*iter2).first == 3);
+        iter2.insertAfter(4, QPDFObjectHandle::newString("4!"));
+        assert((*iter2).first == 4);
+        for (auto i: new2)
+        {
+            std::cout << i.first << " " << i.second.unparse() << std::endl;
+        }
+
         // Exercise deprecated API until qpdf 11
         std::cout << "/Bad1: deprecated API" << std::endl;
         auto bad1 = QPDFNumberTreeObjectHelper(
@@ -1960,6 +1973,19 @@ void runtest(int n, char const* filename1, char const* arg2)
         assert(iter1 == new1.end());
         --iter1;
         assert((*iter1).first == "2");
+
+        std::cout << "insertAfter" << std::endl;
+        auto new2 = QPDFNameTreeObjectHelper::newEmpty(pdf);
+        auto iter2 = new2.begin();
+        assert(iter2 == new2.end());
+        iter2.insertAfter("3", QPDFObjectHandle::newString("3!"));
+        assert((*iter2).first == "3");
+        iter2.insertAfter("4", QPDFObjectHandle::newString("4!"));
+        assert((*iter2).first == "4");
+        for (auto i: new2)
+        {
+            std::cout << i.first << " " << i.second.unparse() << std::endl;
+        }
 
         std::vector<std::string> empties = {"/Empty1", "/Empty2"};
         for (auto const& k: empties)

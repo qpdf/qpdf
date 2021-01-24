@@ -102,6 +102,13 @@ QPDFNameTreeObjectHelper::iterator::operator==(iterator const& other) const
     return *(impl) == *(other.impl);
 }
 
+void
+QPDFNameTreeObjectHelper::iterator::insertAfter(
+    std::string const& key, QPDFObjectHandle value)
+{
+    impl->insertAfter(QPDFObjectHandle::newUnicodeString(key), value);
+}
+
 QPDFNameTreeObjectHelper::iterator
 QPDFNameTreeObjectHelper::begin() const
 {

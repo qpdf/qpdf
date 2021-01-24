@@ -552,3 +552,4 @@ NNTree bad node during find 0
 NNTree node is not a dictionary 0
 NNTree limits didn't change 0
 NNTree increment end() 0
+NNTree insertAfter inserts first 0

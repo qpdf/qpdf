@@ -16,6 +16,9 @@
 20 twenty -> twenty.
 22 twenty-two -> twenty-two!
 29 twenty-nine -> twenty-nine!
+insertAfter
+3 (3!)
+4 (4!)
 /Empty1
 /Empty2
 /Bad1: deprecated API

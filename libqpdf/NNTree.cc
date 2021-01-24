@@ -444,6 +444,14 @@ NNTreeIterator::lastPathElement()
 void
 NNTreeIterator::insertAfter(QPDFObjectHandle key, QPDFObjectHandle value)
 {
+    if (! valid())
+    {
+        QTC::TC("qpdf", "NNTree insertAfter inserts first");
+        impl.insertFirst(key, value);
+        deepen(impl.oh, true, false);
+        return;
+    }
+
     auto items = this->node.getKey(impl.details.itemsKey());
     if (! items.isArray())
     {
@@ -457,6 +465,7 @@ NNTreeIterator::insertAfter(QPDFObjectHandle key, QPDFObjectHandle value)
     items.insertItem(this->item_number + 3, value);
     resetLimits(this->node, lastPathElement());
     split(this->node, lastPathElement());
+    increment(false);
 }
 
 NNTreeIterator&
@@ -968,7 +977,6 @@ NNTreeImpl::insert(QPDFObjectHandle key, QPDFObjectHandle value)
     {
         QTC::TC("qpdf", "NNTree insert inserts after");
         iter.insertAfter(key, value);
-        ++iter;
     }
     return iter;
 }

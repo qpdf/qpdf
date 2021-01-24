@@ -26,6 +26,9 @@
 22 twenty-two
 23 twenty-three
 29 twenty-nine
+insertAfter
+3 (3!)
+4 (4!)
 /Bad1: deprecated API
 /Bad1
 WARNING: number-tree.pdf (Name/Number tree node (object 14)): name/number tree node has neither non-empty /Nums nor /Kids
