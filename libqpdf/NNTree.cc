@@ -50,6 +50,57 @@ NNTreeIterator::NNTreeIterator(NNTreeImpl& impl) :
 {
 }
 
+void
+NNTreeIterator::updateIValue(bool allow_invalid)
+{
+    // ivalue should never be used inside the class since we return a
+    // pointer/reference to it. Every bit of code that ever changes
+    // what object the iterator points to should take care to call
+    // updateIValue. Failure to do this means that any old references
+    // to *iter will point to incorrect objects, though the next
+    // dereference of the iterator will fix it. This isn't necessarily
+    // catastrophic, but it would be confusing. The test suite
+    // attempts to exercise various cases to ensure we don't introduce
+    // that bug in the future, but sadly it's tricky to verify by
+    // reasoning about the code that this constraint is always
+    // satisfied. Whenever we update what the iterator points to, we
+    // should call setItemNumber, which calls this. If we change what
+    // the iterator in some other way, such as replacing a value or
+    // removing an item and making the iterator point at a different
+    // item in potentially the same position, we must call
+    // updateIValue as well. These cases are handled, and for good
+    // measure, we also call updateIValue in operator* and operator->.
+
+    bool okay = false;
+    if ((item_number >= 0) &&
+        this->node.isInitialized() &&
+        this->node.isDictionary())
+    {
+        auto items = this->node.getKey(impl.details.itemsKey());
+        if (this->item_number + 1 < items.getArrayNItems())
+        {
+            okay = true;
+            this->ivalue.first = items.getArrayItem(this->item_number);
+            this->ivalue.second = items.getArrayItem(1+this->item_number);
+        }
+        else
+        {
+            error(impl.qpdf, node, "update ivalue: items array is too short");
+        }
+    }
+    if (! okay)
+    {
+        if (! allow_invalid)
+        {
+            throw std::logic_error(
+                "attempt made to dereference an invalid"
+                " name/number tree iterator");
+        }
+        this->ivalue.first = QPDFObjectHandle();
+        this->ivalue.second = QPDFObjectHandle();
+    }
+}
+
 NNTreeIterator::PathElement::PathElement(
     QPDFObjectHandle const& node, int kid_number) :
     node(node),
@@ -522,6 +573,7 @@ NNTreeIterator::remove()
             // We don't have to do anything since the removed item's
             // successor now occupies its former location.
             QTC::TC("qpdf", "NNTree erased non-last item");
+            updateIValue();
         }
         else
         {
@@ -630,19 +682,15 @@ NNTreeIterator::operator--()
 NNTreeIterator::reference
 NNTreeIterator::operator*()
 {
-    if (this->item_number < 0)
-    {
-        throw std::logic_error(
-            "attempt made to dereference an invalid"
-            " name/number tree iterator");
-    }
-    auto items = this->node.getKey(impl.details.itemsKey());
-    if (items.getArrayNItems() < this->item_number + 2)
-    {
-        error(impl.qpdf, node, "operator*: items array is too short");
-    }
-    return std::make_pair(items.getArrayItem(this->item_number),
-                          items.getArrayItem(1+this->item_number));
+    updateIValue(false);
+    return this->ivalue;
+}
+
+NNTreeIterator::pointer
+NNTreeIterator::operator->()
+{
+    updateIValue(false);
+    return &(this->ivalue);
 }
 
 bool
@@ -660,7 +708,7 @@ NNTreeIterator::operator==(NNTreeIterator const& other) const
     auto opi = other.path.begin();
     while (tpi != this->path.end())
     {
-        if ((*tpi).kid_number != (*opi).kid_number)
+        if (tpi->kid_number != opi->kid_number)
         {
             return false;
         }
@@ -679,6 +727,7 @@ NNTreeIterator::setItemNumber(QPDFObjectHandle const& node, int n)
 {
     this->node = node;
     this->item_number = n;
+    updateIValue();
 }
 
 void
@@ -961,7 +1010,7 @@ NNTreeImpl::repair()
     auto new_node = QPDFObjectHandle::newDictionary();
     new_node.replaceKey(details.itemsKey(), QPDFObjectHandle::newArray());
     NNTreeImpl repl(details, qpdf, new_node, false);
-    for (auto i: *this)
+    for (auto const& i: *this)
     {
         repl.insert(i.first, i.second);
     }
@@ -1005,15 +1054,15 @@ NNTreeImpl::findInternal(QPDFObjectHandle key, bool return_prev_if_not_found)
         return end();
     }
     else if (first_item.valid() &&
-        details.keyValid((*first_item).first) &&
-        details.compareKeys(key, (*first_item).first) < 0)
+        details.keyValid(first_item->first) &&
+        details.compareKeys(key, first_item->first) < 0)
     {
         // Before the first key
         return end();
     }
     else if (last_item.valid() &&
-             details.keyValid((*last_item).first) &&
-             details.compareKeys(key, (*last_item).first) > 0)
+             details.keyValid(last_item->first) &&
+             details.compareKeys(key, last_item->first) > 0)
     {
         // After the last key
         if (return_prev_if_not_found)
@@ -1097,10 +1146,10 @@ NNTreeImpl::insertFirst(QPDFObjectHandle key, QPDFObjectHandle value)
     }
     items.insertItem(0, key);
     items.insertItem(1, value);
-    iter.item_number = 0;
+    iter.setItemNumber(iter.node, 0);
     iter.resetLimits(iter.node, iter.lastPathElement());
     iter.split(iter.node, iter.lastPathElement());
-    return begin();
+    return iter;
 }
 
 NNTreeImpl::iterator
@@ -1112,11 +1161,12 @@ NNTreeImpl::insert(QPDFObjectHandle key, QPDFObjectHandle value)
         QTC::TC("qpdf", "NNTree insert inserts first");
         return insertFirst(key, value);
     }
-    else if (details.compareKeys(key, (*iter).first) == 0)
+    else if (details.compareKeys(key, iter->first) == 0)
     {
         QTC::TC("qpdf", "NNTree insert replaces");
         auto items = iter.node.getKey(details.itemsKey());
         items.setArrayItem(iter.item_number + 1, value);
+        iter.updateIValue();
     }
     else
     {
@@ -1137,7 +1187,7 @@ NNTreeImpl::remove(QPDFObjectHandle key, QPDFObjectHandle* value)
     }
     if (value)
     {
-        *value = (*iter).second;
+        *value = iter->second;
     }
     iter.remove();
     return true;

@@ -75,6 +75,7 @@ QPDFNumberTreeObjectHelper::iterator&
 QPDFNumberTreeObjectHelper::iterator::operator++()
 {
     ++(*impl);
+    updateIValue();
     return *this;
 }
 
@@ -82,14 +83,38 @@ QPDFNumberTreeObjectHelper::iterator&
 QPDFNumberTreeObjectHelper::iterator::operator--()
 {
     --(*impl);
+    updateIValue();
     return *this;
+}
+
+void
+QPDFNumberTreeObjectHelper::iterator::updateIValue()
+{
+    if (impl->valid())
+    {
+        auto p = *impl;
+        this->ivalue.first = p->first.getIntValue();
+        this->ivalue.second = p->second;
+    }
+    else
+    {
+        this->ivalue.first = 0;
+        this->ivalue.second = QPDFObjectHandle();
+    }
 }
 
 QPDFNumberTreeObjectHelper::iterator::reference
 QPDFNumberTreeObjectHelper::iterator::operator*()
 {
-    auto p = **impl;
-    return std::make_pair(p.first.getIntValue(), p.second);
+    updateIValue();
+    return this->ivalue;
+}
+
+QPDFNumberTreeObjectHelper::iterator::pointer
+QPDFNumberTreeObjectHelper::iterator::operator->()
+{
+    updateIValue();
+    return &this->ivalue;
 }
 
 bool
@@ -103,12 +128,14 @@ QPDFNumberTreeObjectHelper::iterator::insertAfter(
     numtree_number key, QPDFObjectHandle value)
 {
     impl->insertAfter(QPDFObjectHandle::newInteger(key), value);
+    updateIValue();
 }
 
 void
 QPDFNumberTreeObjectHelper::iterator::remove()
 {
     impl->remove();
+    updateIValue();
 }
 
 QPDFNumberTreeObjectHelper::iterator
@@ -162,7 +189,7 @@ QPDFNumberTreeObjectHelper::getMin()
     {
         return 0;
     }
-    return (*i).first;
+    return i->first;
 }
 
 QPDFNumberTreeObjectHelper::numtree_number
@@ -173,7 +200,7 @@ QPDFNumberTreeObjectHelper::getMax()
     {
         return 0;
     }
-    return (*i).first;
+    return i->first;
 }
 
 bool
@@ -192,7 +219,7 @@ QPDFNumberTreeObjectHelper::findObject(
     {
         return false;
     }
-    oh = (*i).second;
+    oh = i->second;
     return true;
 }
 
@@ -206,8 +233,8 @@ QPDFNumberTreeObjectHelper::findObjectAtOrBelow(
     {
         return false;
     }
-    oh = (*i).second;
-    offset = idx - (*i).first;
+    oh = i->second;
+    offset = idx - i->first;
     return true;
 }
 

@@ -75,9 +75,6 @@ class QPDFNameTreeObjectHelper: public QPDFObjectHelper
 
     class iterator: public std::iterator<
         std::bidirectional_iterator_tag,
-        std::pair<std::string, QPDFObjectHandle>,
-        void,
-        std::pair<std::string, QPDFObjectHandle>*,
         std::pair<std::string, QPDFObjectHandle>>
     {
         friend class QPDFNameTreeObjectHelper;
@@ -105,6 +102,8 @@ class QPDFNameTreeObjectHelper: public QPDFObjectHelper
         QPDF_DLL
         reference operator*();
         QPDF_DLL
+        pointer operator->();
+        QPDF_DLL
         bool operator==(iterator const& other) const;
         QPDF_DLL
         bool operator!=(iterator const& other) const
@@ -131,8 +130,11 @@ class QPDFNameTreeObjectHelper: public QPDFObjectHelper
         void remove();
 
       private:
+        void updateIValue();
+
         iterator(std::shared_ptr<NNTreeIterator> const&);
         std::shared_ptr<NNTreeIterator> impl;
+        value_type ivalue;
     };
 
     // The iterator looks like map iterator, so i.first is a string

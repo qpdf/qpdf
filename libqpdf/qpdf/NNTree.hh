@@ -6,6 +6,7 @@
 
 #include <iterator>
 #include <list>
+#include <memory>
 
 class NNTreeDetails
 {
@@ -18,9 +19,6 @@ class NNTreeDetails
 class NNTreeImpl;
 class NNTreeIterator: public std::iterator<
     std::bidirectional_iterator_tag,
-    std::pair<QPDFObjectHandle, QPDFObjectHandle>,
-    void,
-    std::pair<QPDFObjectHandle, QPDFObjectHandle>*,
     std::pair<QPDFObjectHandle, QPDFObjectHandle>>
 {
     friend class NNTreeImpl;
@@ -41,6 +39,7 @@ class NNTreeIterator: public std::iterator<
         return t;
     }
     reference operator*();
+    pointer operator->();
     bool operator==(NNTreeIterator const& other) const;
     bool operator!=(NNTreeIterator const& other) const
     {
@@ -63,6 +62,7 @@ class NNTreeIterator: public std::iterator<
 
     // ABI: for qpdf 11, make qpdf a reference
     NNTreeIterator(NNTreeImpl& impl);
+    void updateIValue(bool allow_invalid = true);
     bool deepen(QPDFObjectHandle node, bool first, bool allow_empty);
     void setItemNumber(QPDFObjectHandle const& node, int);
     void addPathElement(QPDFObjectHandle const& node, int kid_number);
@@ -79,6 +79,7 @@ class NNTreeIterator: public std::iterator<
     std::list<PathElement> path;
     QPDFObjectHandle node;
     int item_number;
+    value_type ivalue;
 };
 
 class NNTreeImpl

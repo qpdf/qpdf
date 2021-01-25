@@ -79,6 +79,7 @@ QPDFNameTreeObjectHelper::iterator&
 QPDFNameTreeObjectHelper::iterator::operator++()
 {
     ++(*impl);
+    updateIValue();
     return *this;
 }
 
@@ -86,14 +87,38 @@ QPDFNameTreeObjectHelper::iterator&
 QPDFNameTreeObjectHelper::iterator::operator--()
 {
     --(*impl);
+    updateIValue();
     return *this;
+}
+
+void
+QPDFNameTreeObjectHelper::iterator::updateIValue()
+{
+    if (impl->valid())
+    {
+        auto p = *impl;
+        this->ivalue.first = p->first.getUTF8Value();
+        this->ivalue.second = p->second;
+    }
+    else
+    {
+        this->ivalue.first = "";
+        this->ivalue.second = QPDFObjectHandle();
+    }
 }
 
 QPDFNameTreeObjectHelper::iterator::reference
 QPDFNameTreeObjectHelper::iterator::operator*()
 {
-    auto p = **impl;
-    return std::make_pair(p.first.getUTF8Value(), p.second);
+    updateIValue();
+    return this->ivalue;
+}
+
+QPDFNameTreeObjectHelper::iterator::pointer
+QPDFNameTreeObjectHelper::iterator::operator->()
+{
+    updateIValue();
+    return &this->ivalue;
 }
 
 bool
@@ -107,12 +132,14 @@ QPDFNameTreeObjectHelper::iterator::insertAfter(
     std::string const& key, QPDFObjectHandle value)
 {
     impl->insertAfter(QPDFObjectHandle::newUnicodeString(key), value);
+    updateIValue();
 }
 
 void
 QPDFNameTreeObjectHelper::iterator::remove()
 {
     impl->remove();
+    updateIValue();
 }
 
 QPDFNameTreeObjectHelper::iterator
@@ -175,7 +202,7 @@ QPDFNameTreeObjectHelper::findObject(
     {
         return false;
     }
-    oh = (*i).second;
+    oh = i->second;
     return true;
 }
 
