@@ -491,17 +491,19 @@ I find it useful to make reference to them in this list.
    by making it possible to run the lexer (tokenizer) over a whole
    file. Make it possible to replace all strings in a file lexically
    even on badly broken files. Ideally this should work files that are
-   lacking xref, have broken links, etc., and ideally it should work
-   with encrypted files if possible. This should go through the
-   streams and strings and replace them with fixed or random
-   characters, preferably, but not necessarily, in a manner that works
-   with fonts. One possibility would be to detect whether a string
-   contains characters with normal encoding, and if so, use 0x41. If
-   the string uses character maps, use 0x01. The output should
-   otherwise be unrelated to the input. This could be built after the
-   filtering and tokenizer rewrite and should be done in a manner that
-   takes advantage of the other lexical features. This sanitizer
-   should also clear metadata and replace images.
+   lacking xref, have broken links, duplicated dictionary keys, syntax
+   errors, etc., and ideally it should work with encrypted files if
+   possible. This should go through the streams and strings and
+   replace them with fixed or random characters, preferably, but not
+   necessarily, in a manner that works with fonts. One possibility
+   would be to detect whether a string contains characters with normal
+   encoding, and if so, use 0x41. If the string uses character maps,
+   use 0x01. The output should otherwise be unrelated to the input.
+   This could be built after the filtering and tokenizer rewrite and
+   should be done in a manner that takes advantage of the other
+   lexical features. This sanitizer should also clear metadata and
+   replace images. If I ever do this, the file from issue #494 would
+   be a great one to look at.
 
  * Here are some notes about having stream data providers modify
    stream dictionaries. I had wanted to add this functionality to make
