@@ -23,6 +23,7 @@ class NNTreeIterator: public std::iterator<
 {
     friend class NNTreeImpl;
   public:
+    virtual ~NNTreeIterator() = default;
     bool valid() const;
     NNTreeIterator& operator++();
     NNTreeIterator operator++(int)

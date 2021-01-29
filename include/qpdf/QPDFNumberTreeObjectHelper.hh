@@ -98,6 +98,7 @@ class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
     {
         friend class QPDFNumberTreeObjectHelper;
       public:
+        virtual ~iterator() = default;
         QPDF_DLL
         bool valid() const;
         QPDF_DLL

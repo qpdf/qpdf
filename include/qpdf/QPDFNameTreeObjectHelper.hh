@@ -79,6 +79,7 @@ class QPDFNameTreeObjectHelper: public QPDFObjectHelper
     {
         friend class QPDFNameTreeObjectHelper;
       public:
+        virtual ~iterator() = default;
         QPDF_DLL
         bool valid() const;
         QPDF_DLL
