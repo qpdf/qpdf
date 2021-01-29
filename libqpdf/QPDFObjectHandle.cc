@@ -314,6 +314,10 @@ class QPDFObjectTypeAccessor
 bool
 QPDFObjectHandle::isBool()
 {
+    if (! this->initialized)
+    {
+        return false;
+    }
     dereference();
     return QPDFObjectTypeAccessor<QPDF_Bool>::check(obj.getPointer());
 }
@@ -328,6 +332,10 @@ QPDFObjectHandle::isDirectNull() const
 bool
 QPDFObjectHandle::isNull()
 {
+    if (! this->initialized)
+    {
+        return false;
+    }
     dereference();
     return QPDFObjectTypeAccessor<QPDF_Null>::check(obj.getPointer());
 }
@@ -335,6 +343,10 @@ QPDFObjectHandle::isNull()
 bool
 QPDFObjectHandle::isInteger()
 {
+    if (! this->initialized)
+    {
+        return false;
+    }
     dereference();
     return QPDFObjectTypeAccessor<QPDF_Integer>::check(obj.getPointer());
 }
@@ -342,6 +354,10 @@ QPDFObjectHandle::isInteger()
 bool
 QPDFObjectHandle::isReal()
 {
+    if (! this->initialized)
+    {
+        return false;
+    }
     dereference();
     return QPDFObjectTypeAccessor<QPDF_Real>::check(obj.getPointer());
 }
@@ -375,6 +391,10 @@ QPDFObjectHandle::getNumericValue()
 bool
 QPDFObjectHandle::isName()
 {
+    if (! this->initialized)
+    {
+        return false;
+    }
     dereference();
     return QPDFObjectTypeAccessor<QPDF_Name>::check(obj.getPointer());
 }
@@ -382,6 +402,10 @@ QPDFObjectHandle::isName()
 bool
 QPDFObjectHandle::isString()
 {
+    if (! this->initialized)
+    {
+        return false;
+    }
     dereference();
     return QPDFObjectTypeAccessor<QPDF_String>::check(obj.getPointer());
 }
@@ -389,6 +413,10 @@ QPDFObjectHandle::isString()
 bool
 QPDFObjectHandle::isOperator()
 {
+    if (! this->initialized)
+    {
+        return false;
+    }
     dereference();
     return QPDFObjectTypeAccessor<QPDF_Operator>::check(obj.getPointer());
 }
@@ -396,6 +424,10 @@ QPDFObjectHandle::isOperator()
 bool
 QPDFObjectHandle::isInlineImage()
 {
+    if (! this->initialized)
+    {
+        return false;
+    }
     dereference();
     return QPDFObjectTypeAccessor<QPDF_InlineImage>::check(obj.getPointer());
 }
@@ -403,6 +435,10 @@ QPDFObjectHandle::isInlineImage()
 bool
 QPDFObjectHandle::isArray()
 {
+    if (! this->initialized)
+    {
+        return false;
+    }
     dereference();
     return QPDFObjectTypeAccessor<QPDF_Array>::check(obj.getPointer());
 }
@@ -410,6 +446,10 @@ QPDFObjectHandle::isArray()
 bool
 QPDFObjectHandle::isDictionary()
 {
+    if (! this->initialized)
+    {
+        return false;
+    }
     dereference();
     return QPDFObjectTypeAccessor<QPDF_Dictionary>::check(obj.getPointer());
 }
@@ -417,6 +457,10 @@ QPDFObjectHandle::isDictionary()
 bool
 QPDFObjectHandle::isStream()
 {
+    if (! this->initialized)
+    {
+        return false;
+    }
     dereference();
     return QPDFObjectTypeAccessor<QPDF_Stream>::check(obj.getPointer());
 }
@@ -424,6 +468,10 @@ QPDFObjectHandle::isStream()
 bool
 QPDFObjectHandle::isReserved()
 {
+    if (! this->initialized)
+    {
+        return false;
+    }
     // dereference will clear reserved if this has been replaced
     dereference();
     return this->reserved;
@@ -432,7 +480,10 @@ QPDFObjectHandle::isReserved()
 bool
 QPDFObjectHandle::isIndirect()
 {
-    assertInitialized();
+    if (! this->initialized)
+    {
+        return false;
+    }
     return (this->objid != 0);
 }
 
@@ -2985,6 +3036,11 @@ QPDFObjectHandle::assertPageObject()
 void
 QPDFObjectHandle::dereference()
 {
+    if (! this->initialized)
+    {
+        throw std::logic_error(
+            "attempted to dereference an uninitialized QPDFObjectHandle");
+    }
     if (this->obj.getPointer() == 0)
     {
         PointerHolder<QPDFObject> obj = QPDF::Resolver::resolve(

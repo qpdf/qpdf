@@ -1,3 +1,9 @@
+2021-01-29  Jay Berkenbilt  <ejb@ql.org>
+
+	* QPDFObjectHandle::is* methods to check type now return false on
+	uninitialized objects rather than crashing or throwing a logic
+	error.
+
 2021-01-24  Jay Berkenbilt  <ejb@ql.org>
 
 	* Implement remove for name and number trees as well as exposing

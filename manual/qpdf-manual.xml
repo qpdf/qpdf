@@ -4855,6 +4855,13 @@ print "\n";
         </listitem>
         <listitem>
          <para>
+          <function>QPDFObjectHandle::is*</function> methods now return
+          false rather than crashing when called with an uninitialized
+          <classname>QPDFObjectHandle</classname> object.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
           Re-implement <classname>QPDFNameTreeObjectHelper</classname>
           and <classname>QPDFNumberTreeObjectHelper</classname> to be
           more efficient, add an iterator-based API, give them the
