@@ -3079,3 +3079,180 @@ QPDFObjectHandle::warn(QPDF* qpdf, QPDFExc const& e)
         throw e;
     }
 }
+
+QPDFDictItems::QPDFDictItems(QPDFObjectHandle& oh) :
+    oh(oh)
+{
+}
+
+QPDFDictItems::iterator&
+QPDFDictItems::iterator::operator++()
+{
+    ++this->m->iter;
+    updateIValue();
+    return *this;
+}
+
+QPDFDictItems::iterator&
+QPDFDictItems::iterator::operator--()
+{
+    --this->m->iter;
+    updateIValue();
+    return *this;
+}
+
+QPDFDictItems::iterator::reference
+QPDFDictItems::iterator:: operator*()
+{
+    updateIValue();
+    return this->ivalue;
+}
+
+QPDFDictItems::iterator::pointer
+QPDFDictItems::iterator::operator->()
+{
+    updateIValue();
+    return &this->ivalue;
+}
+
+bool
+QPDFDictItems::iterator::operator==(iterator const& other) const
+{
+    if (this->m->is_end && other.m->is_end)
+    {
+        return true;
+    }
+    if (this->m->is_end || other.m->is_end)
+    {
+        return false;
+    }
+    return (this->ivalue.first == other.ivalue.first);
+}
+
+QPDFDictItems::iterator::iterator(QPDFObjectHandle& oh, bool for_begin) :
+    m(new Members(oh, for_begin))
+{
+    updateIValue();
+}
+
+void
+QPDFDictItems::iterator::updateIValue()
+{
+    this->m->is_end = (this->m->iter == this->m->keys.end());
+    if (this->m->is_end)
+    {
+        this->ivalue.first = "";
+        this->ivalue.second = QPDFObjectHandle();
+    }
+    else
+    {
+        this->ivalue.first = *(this->m->iter);
+        this->ivalue.second = this->m->oh.getKey(this->ivalue.first);
+    }
+}
+
+QPDFDictItems::iterator::Members::Members(
+    QPDFObjectHandle& oh, bool for_begin) :
+    oh(oh)
+{
+    this->keys = oh.getKeys();
+    this->iter = for_begin ? this->keys.begin() : this->keys.end();
+}
+
+QPDFDictItems::iterator
+QPDFDictItems::begin()
+{
+    return iterator(oh, true);
+}
+
+QPDFDictItems::iterator
+QPDFDictItems::end()
+{
+    return iterator(oh, false);
+}
+
+QPDFArrayItems::QPDFArrayItems(QPDFObjectHandle& oh) :
+    oh(oh)
+{
+}
+
+QPDFArrayItems::iterator&
+QPDFArrayItems::iterator::operator++()
+{
+    if (! this->m->is_end)
+    {
+        ++this->m->item_number;
+        updateIValue();
+    }
+    return *this;
+}
+
+QPDFArrayItems::iterator&
+QPDFArrayItems::iterator::operator--()
+{
+    if (this->m->item_number > 0)
+    {
+        --this->m->item_number;
+        updateIValue();
+    }
+    return *this;
+}
+
+QPDFArrayItems::iterator::reference
+QPDFArrayItems::iterator:: operator*()
+{
+    updateIValue();
+    return this->ivalue;
+}
+
+QPDFArrayItems::iterator::pointer
+QPDFArrayItems::iterator::operator->()
+{
+    updateIValue();
+    return &this->ivalue;
+}
+
+bool
+QPDFArrayItems::iterator::operator==(iterator const& other) const
+{
+    return (this->m->item_number == other.m->item_number);
+}
+
+QPDFArrayItems::iterator::iterator(QPDFObjectHandle& oh, bool for_begin) :
+    m(new Members(oh, for_begin))
+{
+    updateIValue();
+}
+
+void
+QPDFArrayItems::iterator::updateIValue()
+{
+    this->m->is_end = (this->m->item_number >= this->m->oh.getArrayNItems());
+    if (this->m->is_end)
+    {
+        this->ivalue = QPDFObjectHandle();
+    }
+    else
+    {
+        this->ivalue = this->m->oh.getArrayItem(this->m->item_number);
+    }
+}
+
+QPDFArrayItems::iterator::Members::Members(
+    QPDFObjectHandle& oh, bool for_begin) :
+    oh(oh)
+{
+    this->item_number = for_begin ? 0 : oh.getArrayNItems();
+}
+
+QPDFArrayItems::iterator
+QPDFArrayItems::begin()
+{
+    return iterator(oh, true);
+}
+
+QPDFArrayItems::iterator
+QPDFArrayItems::end()
+{
+    return iterator(oh, false);
+}

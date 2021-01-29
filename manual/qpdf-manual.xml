@@ -4849,6 +4849,17 @@ print "\n";
        <itemizedlist>
         <listitem>
          <para>
+          Add <classname>QPDFDictItems</classname> and
+          <classname>QPDFArrayItems</classname> wrappers around
+          <classname>QPDFObjectHandle</classname>, allowing C++-style
+          iteration, including range-for iteration, over dictionary
+          and array QPDFObjectHandles. See comments in
+          <filename>include/qpdf/QPDFObjectHandle.hh</filename> for
+          details.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
           Add <function>warn</function> to
           <classname>QPDF</classname>'s public API.
          </para>

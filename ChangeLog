@@ -1,5 +1,19 @@
 2021-01-29  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add wrappers QPDFDictItems and QPDFArrayItems around
+	QPDFObjectHandle that provide a C++ iterator API, including C++11
+	range-for iteration, over arrays and dictionaries. With this, you
+	can do
+
+	for (auto i: QPDFDictItems(oh))
+	{
+	    // i.first is a string, i.second is a QPDFObjectHandle
+	}
+	for (auto i: QPDFArrayItems(oh))
+	{
+	    // i is a QPDFObjectHandle
+	}
+
 	* QPDFObjectHandle::is* methods to check type now return false on
 	uninitialized objects rather than crashing or throwing a logic
 	error.

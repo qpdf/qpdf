@@ -347,30 +347,29 @@ void runtest(int n, char const* filename1, char const* arg2)
 	else if (qtest.isArray())
 	{
 	    QTC::TC("qpdf", "main QTest array");
-	    int nitems = qtest.getArrayNItems();
 	    std::cout << "/QTest is an array with "
-		      << nitems << " items" << std::endl;
-	    for (int i = 0; i < nitems; ++i)
+		      << qtest.getArrayNItems() << " items" << std::endl;
+            int i = 0;
+	    for (auto& iter: QPDFArrayItems(qtest))
 	    {
 		QTC::TC("qpdf", "main QTest array indirect",
-			qtest.getArrayItem(i).isIndirect() ? 1 : 0);
+			iter.isIndirect() ? 1 : 0);
 		std::cout << "  item " << i << " is "
-			  << (qtest.getArrayItem(i).isIndirect() ? "in" : "")
+			  << (iter.isIndirect() ? "in" : "")
 			  << "direct" << std::endl;
+                ++i;
 	    }
 	}
 	else if (qtest.isDictionary())
 	{
 	    QTC::TC("qpdf", "main QTest dictionary");
 	    std::cout << "/QTest is a dictionary" << std::endl;
-	    std::set<std::string> keys = qtest.getKeys();
-	    for (std::set<std::string>::iterator iter = keys.begin();
-		 iter != keys.end(); ++iter)
-	    {
+            for (auto& iter: QPDFDictItems(qtest))
+            {
 		QTC::TC("qpdf", "main QTest dictionary indirect",
-			(qtest.getKey(*iter).isIndirect() ? 1 : 0));
-		std::cout << "  " << *iter << " is "
-			  << (qtest.getKey(*iter).isIndirect() ? "in" : "")
+			iter.second.isIndirect() ? 1 : 0);
+		std::cout << "  " << iter.first << " is "
+			  << (iter.second.isIndirect() ? "in" : "")
 			  << "direct" << std::endl;
 	    }
 	}
@@ -1539,7 +1538,38 @@ void runtest(int n, char const* filename1, char const* arg2)
         QPDFObjectHandle integer = qtest.getKey("/Integer");
         QPDFObjectHandle null = QPDFObjectHandle::newNull();
         assert(array.isArray());
+        {
+            // Exercise iterators directly
+            QPDFArrayItems ai(array);
+            auto i = ai.begin();
+            assert(i->getName() == "/Item0");
+            auto& i_value = *i;
+            --i;
+            assert(i->getName() == "/Item0");
+            ++i;
+            ++i;
+            ++i;
+            assert(i == ai.end());
+            ++i;
+            assert(i == ai.end());
+            assert(! i_value.isInitialized());
+            --i;
+            assert(i_value.getName() == "/Item2");
+            assert(i->getName() == "/Item2");
+        }
         assert(dictionary.isDictionary());
+        {
+            // Exercise iterators directly
+            QPDFDictItems di(dictionary);
+            auto i = di.begin();
+            assert(i->first == "/Key1");
+            auto& i_value = *i;
+            assert(i->second.getName() == "/Value1");
+            ++i;
+            ++i;
+            assert(i == di.end());
+            assert(! i_value.second.isInitialized());
+        }
         assert("" == qtest.getStringValue());
         array.getArrayItem(-1).assertNull();
         array.getArrayItem(16059).assertNull();
@@ -1599,6 +1629,10 @@ void runtest(int n, char const* filename1, char const* arg2)
                (r1.lly > 3.39) && (r1.lly < 3.41) &&
                (r1.urx > 5.59) && (r1.urx < 5.61) &&
                (r1.ury > 7.79) && (r1.ury < 7.81));
+        QPDFObjectHandle uninitialized;
+        assert(! uninitialized.isInitialized());
+        assert(! uninitialized.isInteger());
+        assert(! uninitialized.isDictionary());
     }
     else if (n == 43)
     {

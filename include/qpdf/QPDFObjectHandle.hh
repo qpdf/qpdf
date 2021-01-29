@@ -631,7 +631,8 @@ class QPDFObjectHandle
     QPDF_DLL
     std::string getInlineImageValue();
 
-    // Methods for array objects; see also name and array objects
+    // Methods for array objects; see also name and array objects. See
+    // also QPDFArrayItems later in this file.
     QPDF_DLL
     int getArrayNItems();
     QPDF_DLL
@@ -655,7 +656,8 @@ class QPDFObjectHandle
     QPDF_DLL
     Matrix getArrayAsMatrix();
 
-    // Methods for dictionary objects
+    // Methods for dictionary objects. See also QPDFDictItems later in
+    // this file.
     QPDF_DLL
     bool hasKey(std::string const&);
     QPDF_DLL
@@ -1223,5 +1225,180 @@ class QPDFObjectHandle
     PointerHolder<QPDFObject> obj;
     bool reserved;
 };
+
+class QPDFDictItems
+{
+    // This class allows C++-style iteration, including range-for
+    // iteration, around dictionaries. You can write
+
+    // for (auto iter: QPDFDictItems(dictionary_obj))
+    // {
+    //     // iter.first is a string
+    //     // iter.second is a QPDFObjectHandle
+    // }
+
+  public:
+    QPDF_DLL
+    QPDFDictItems(QPDFObjectHandle& oh);
+
+    class iterator: public std::iterator<
+        std::bidirectional_iterator_tag,
+        std::pair<std::string, QPDFObjectHandle>>
+    {
+        friend class QPDFDictItems;
+      public:
+        QPDF_DLL
+        virtual ~iterator() = default;
+        QPDF_DLL
+        iterator& operator++();
+        QPDF_DLL
+        iterator operator++(int)
+        {
+            iterator t = *this;
+            ++(*this);
+            return t;
+        }
+        QPDF_DLL
+        iterator& operator--();
+        QPDF_DLL
+        iterator operator--(int)
+        {
+            iterator t = *this;
+            --(*this);
+            return t;
+        }
+        QPDF_DLL
+        reference operator*();
+        QPDF_DLL
+        pointer operator->();
+        QPDF_DLL
+        bool operator==(iterator const& other) const;
+        QPDF_DLL
+        bool operator!=(iterator const& other) const
+        {
+            return ! operator==(other);
+        }
+
+      private:
+        iterator(QPDFObjectHandle& oh, bool for_begin);
+        void updateIValue();
+
+        class Members
+        {
+            friend class QPDFDictItems::iterator;
+
+          public:
+            QPDF_DLL
+            ~Members() = default;
+
+          private:
+            Members(QPDFObjectHandle& oh, bool for_begin);
+            Members() = delete;
+            Members(Members const&) = delete;
+
+            QPDFObjectHandle& oh;
+            std::set<std::string> keys;
+            std::set<std::string>::iterator iter;
+            bool is_end;
+        };
+        PointerHolder<Members> m;
+        value_type ivalue;
+    };
+
+    QPDF_DLL
+    iterator begin();
+    QPDF_DLL
+    iterator end();
+
+  private:
+    QPDFObjectHandle& oh;
+};
+
+class QPDFArrayItems
+{
+    // This class allows C++-style iteration, including range-for
+    // iteration, around arrays. You can write
+
+    // for (auto iter: QPDFArrayItems(array_obj))
+    // {
+    //     // iter is a QPDFObjectHandle
+    // }
+
+  public:
+    QPDF_DLL
+    QPDFArrayItems(QPDFObjectHandle& oh);
+
+    class iterator: public std::iterator<
+        std::bidirectional_iterator_tag,
+        QPDFObjectHandle>
+    {
+        friend class QPDFArrayItems;
+      public:
+        QPDF_DLL
+        virtual ~iterator() = default;
+        QPDF_DLL
+        iterator& operator++();
+        QPDF_DLL
+        iterator operator++(int)
+        {
+            iterator t = *this;
+            ++(*this);
+            return t;
+        }
+        QPDF_DLL
+        iterator& operator--();
+        QPDF_DLL
+        iterator operator--(int)
+        {
+            iterator t = *this;
+            --(*this);
+            return t;
+        }
+        QPDF_DLL
+        reference operator*();
+        QPDF_DLL
+        pointer operator->();
+        QPDF_DLL
+        bool operator==(iterator const& other) const;
+        QPDF_DLL
+        bool operator!=(iterator const& other) const
+        {
+            return ! operator==(other);
+        }
+
+      private:
+        iterator(QPDFObjectHandle& oh, bool for_begin);
+        void updateIValue();
+
+        class Members
+        {
+            friend class QPDFArrayItems::iterator;
+
+          public:
+            QPDF_DLL
+            ~Members() = default;
+
+          private:
+            Members(QPDFObjectHandle& oh, bool for_begin);
+            Members() = delete;
+            Members(Members const&) = delete;
+
+            QPDFObjectHandle& oh;
+            int item_number;
+            bool is_end;
+        };
+        PointerHolder<Members> m;
+        value_type ivalue;
+    };
+
+    QPDF_DLL
+    iterator begin();
+    QPDF_DLL
+    iterator end();
+
+  private:
+    QPDFObjectHandle& oh;
+};
+
 
 #endif // QPDFOBJECTHANDLE_HH
