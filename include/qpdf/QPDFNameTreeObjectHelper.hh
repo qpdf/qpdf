@@ -35,6 +35,9 @@
 // up items in the name tree, use UTF-8 strings. All names are
 // normalized for lookup purposes.
 
+// See examples/pdf-name-number-tree.cc for a demonstration of using
+// QPDFNameTreeObjectHelper.
+
 class NNTreeImpl;
 class NNTreeIterator;
 class NNTreeDetails;

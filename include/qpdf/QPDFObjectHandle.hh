@@ -1237,6 +1237,9 @@ class QPDFDictItems
     //     // iter.second is a QPDFObjectHandle
     // }
 
+    // See examples/pdf-name-number-tree.cc for a demonstration of
+    // using this API.
+
   public:
     QPDF_DLL
     QPDFDictItems(QPDFObjectHandle& oh);
@@ -1323,6 +1326,9 @@ class QPDFArrayItems
     // {
     //     // iter is a QPDFObjectHandle
     // }
+
+    // See examples/pdf-name-number-tree.cc for a demonstration of
+    // using this API.
 
   public:
     QPDF_DLL

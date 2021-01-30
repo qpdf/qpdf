@@ -7,6 +7,7 @@ BINS_examples = \
 	pdf-filter-tokens \
 	pdf-invert-images \
 	pdf-mod-info \
+	pdf-name-number-tree \
 	pdf-npages \
 	pdf-overlay-page \
 	pdf-parse-content \

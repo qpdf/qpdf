@@ -32,6 +32,9 @@
 // This is an object helper for number trees. See section 7.9.7 in the
 // PDF spec (ISO 32000) for a description of number trees.
 
+// See examples/pdf-name-number-tree.cc for a demonstration of using
+// QPDFNumberTreeObjectHelper.
+
 class NNTreeImpl;
 class NNTreeIterator;
 class NNTreeDetails;

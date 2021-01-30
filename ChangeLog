@@ -1,3 +1,8 @@
+2021-01-30  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add examples/pdf-name-number-tree.cc to illustrate new
+	name/number tree API and new array/dictionary iterator API.
+
 2021-01-29  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add wrappers QPDFDictItems and QPDFArrayItems around

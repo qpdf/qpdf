@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+chdir("name-number-tree") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('name-number-tree');
+
+cleanup();
+
+$td->runtest("name/number tree",
+	     {$td->COMMAND => 'pdf-name-number-tree a.pdf'},
+	     {$td->FILE => 'nn.out', $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "out.pdf"});
+
+cleanup();
+
+$td->report(2);
+
+sub cleanup
+{
+    unlink 'a.pdf';
+}
