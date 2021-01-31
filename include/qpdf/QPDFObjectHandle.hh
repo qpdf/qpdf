@@ -1242,7 +1242,7 @@ class QPDFDictItems
 
   public:
     QPDF_DLL
-    QPDFDictItems(QPDFObjectHandle& oh);
+    QPDFDictItems(QPDFObjectHandle const& oh);
 
     class iterator: public std::iterator<
         std::bidirectional_iterator_tag,
@@ -1314,7 +1314,7 @@ class QPDFDictItems
     iterator end();
 
   private:
-    QPDFObjectHandle& oh;
+    QPDFObjectHandle oh;
 };
 
 class QPDFArrayItems
@@ -1332,7 +1332,7 @@ class QPDFArrayItems
 
   public:
     QPDF_DLL
-    QPDFArrayItems(QPDFObjectHandle& oh);
+    QPDFArrayItems(QPDFObjectHandle const& oh);
 
     class iterator: public std::iterator<
         std::bidirectional_iterator_tag,
@@ -1403,7 +1403,7 @@ class QPDFArrayItems
     iterator end();
 
   private:
-    QPDFObjectHandle& oh;
+    QPDFObjectHandle oh;
 };
 
 

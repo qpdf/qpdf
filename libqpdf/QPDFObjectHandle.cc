@@ -3080,7 +3080,7 @@ QPDFObjectHandle::warn(QPDF* qpdf, QPDFExc const& e)
     }
 }
 
-QPDFDictItems::QPDFDictItems(QPDFObjectHandle& oh) :
+QPDFDictItems::QPDFDictItems(QPDFObjectHandle const& oh) :
     oh(oh)
 {
 }
@@ -3171,7 +3171,7 @@ QPDFDictItems::end()
     return iterator(oh, false);
 }
 
-QPDFArrayItems::QPDFArrayItems(QPDFObjectHandle& oh) :
+QPDFArrayItems::QPDFArrayItems(QPDFObjectHandle const& oh) :
     oh(oh)
 {
 }
