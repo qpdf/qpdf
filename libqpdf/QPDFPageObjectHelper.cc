@@ -501,8 +501,20 @@ QPDFPageObjectHelper::externalizeInlineImages(size_t min_size, bool shallow)
             QPDFObjectHandle::parse("<< /XObject << >> >>"));
         InlineImageTracker iit(this->oh.getOwningQPDF(), min_size, resources);
         Pl_Buffer b("new page content");
-        filterContents(&iit, &b);
-        if (iit.any_images)
+        bool filtered = false;
+        try
+        {
+            filterContents(&iit, &b);
+            filtered = true;
+        }
+        catch (std::exception& e)
+        {
+            this->oh.warnIfPossible(
+                std::string("Unable to filter content stream: ") + e.what() +
+                "; not attempting to externalize inline images"
+                " from this stream");
+        }
+        if (filtered && iit.any_images)
         {
             if (this->oh.isFormXObject())
             {
