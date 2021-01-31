@@ -281,8 +281,8 @@ InlineImageTracker::handleToken(QPDFTokenizer::Token const& token)
         }
         else
         {
-            bi_str += token.getValue();
-            dict_str += token.getValue();
+            bi_str += token.getRawValue();
+            dict_str += token.getRawValue();
         }
     }
     else if (token == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "BI"))

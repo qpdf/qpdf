@@ -1,3 +1,8 @@
+2021-01-31  Jay Berkenbilt  <ejb@ql.org>
+
+	* Bug fix: properly handle strings if they appear in inline image
+	dictionaries while externalizing inline images.
+
 2021-01-30  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add examples/pdf-name-number-tree.cc to illustrate new
