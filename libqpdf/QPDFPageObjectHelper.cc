@@ -703,13 +703,8 @@ NameWatcher::handleToken(QPDFTokenizer::Token const& token)
 
 void
 QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
-    QPDFPageObjectHelper ph, std::set<QPDFObjGen>& seen)
+    QPDFPageObjectHelper ph)
 {
-    if (seen.count(ph.oh.getObjGen()))
-    {
-        return;
-    }
-    seen.insert(ph.oh.getObjGen());
     NameWatcher nw;
     try
     {
@@ -730,39 +725,35 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
             "not attempting to remove unreferenced objects from this page");
         return;
     }
-    // Walk through /Font and /XObject dictionaries, removing any
-    // resources that are not referenced. We must make copies of
+
+    // We will walk through /Font and /XObject dictionaries, removing
+    // any resources that are not referenced. We must make copies of
     // resource dictionaries down into the dictionaries are mutating
     // to prevent mutating one dictionary from having the side effect
     // of mutating the one it was copied from.
-    std::vector<std::string> to_filter;
-    to_filter.push_back("/Font");
-    to_filter.push_back("/XObject");
     QPDFObjectHandle resources = ph.getAttribute("/Resources", true);
-    for (std::vector<std::string>::iterator d_iter = to_filter.begin();
-         d_iter != to_filter.end(); ++d_iter)
+    std::vector<QPDFObjectHandle> rdicts;
+    if (resources.isDictionary())
     {
-        QPDFObjectHandle dict = resources.getKey(*d_iter);
-        if (! dict.isDictionary())
+        std::vector<std::string> to_filter = {"/Font", "/XObject"};
+        for (auto const& iter: to_filter)
         {
-            continue;
-        }
-        dict = dict.shallowCopy();
-        resources.replaceKey(*d_iter, dict);
-        std::set<std::string> keys = dict.getKeys();
-        for (std::set<std::string>::iterator k_iter = keys.begin();
-             k_iter != keys.end(); ++k_iter)
-        {
-            if (! nw.names.count(*k_iter))
+            QPDFObjectHandle dict = resources.getKey(iter);
+            if (dict.isDictionary())
             {
-                dict.removeKey(*k_iter);
+                dict = dict.shallowCopy();
+                resources.replaceKey(iter, dict);
+                rdicts.push_back(dict);
             }
-            QPDFObjectHandle resource = dict.getKey(*k_iter);
-            if (resource.isFormXObject())
+        }
+    }
+    for (auto& dict: rdicts)
+    {
+        for (auto const& key: dict.getKeys())
+        {
+            if (! nw.names.count(key))
             {
-                QTC::TC("qpdf", "QPDFPageObjectHelper filter form xobject");
-                removeUnreferencedResourcesHelper(
-                    QPDFPageObjectHelper(resource), seen);
+                dict.removeKey(key);
             }
         }
     }
@@ -771,8 +762,15 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
 void
 QPDFPageObjectHelper::removeUnreferencedResources()
 {
-    std::set<QPDFObjGen> seen;
-    removeUnreferencedResourcesHelper(*this, seen);
+    forEachFormXObject(
+        true,
+        [](
+            QPDFObjectHandle& obj, QPDFObjectHandle&, std::string const&)
+        {
+            QTC::TC("qpdf", "QPDFPageObjectHelper filter form xobject");
+            removeUnreferencedResourcesHelper(QPDFPageObjectHelper(obj));
+        });
+    removeUnreferencedResourcesHelper(*this);
 }
 
 QPDFPageObjectHelper

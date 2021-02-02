@@ -319,7 +319,7 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
   private:
     static void
     removeUnreferencedResourcesHelper(
-        QPDFPageObjectHelper ph, std::set<QPDFObjGen>& seen);
+        QPDFPageObjectHelper ph);
 
     class Members
     {
