@@ -5000,7 +5000,7 @@ static bool should_remove_unreferenced_resources(QPDF& pdf, Options& o)
     return false;
 }
 
-static void handle_page_specs(QPDF& pdf, Options& o)
+static void handle_page_specs(QPDF& pdf, Options& o, bool& warnings)
 {
     // Parse all page specifications and translate them into lists of
     // actual pages.
@@ -5260,6 +5260,10 @@ static void handle_page_specs(QPDF& pdf, Options& o)
                 // of the fact that we are using it.
                 selected_from_orig.insert(pageno);
             }
+        }
+        if (page_data.qpdf->anyWarnings())
+        {
+            warnings = true;
         }
         if (cis)
         {
@@ -5819,9 +5823,10 @@ int realmain(int argc, char* argv[])
                 return EXIT_IS_NOT_ENCRYPTED;
             }
         }
+        bool other_warnings = false;
         if (! o.page_specs.empty())
         {
-            handle_page_specs(pdf, o);
+            handle_page_specs(pdf, o, other_warnings);
         }
         if (! o.rotations.empty())
         {
@@ -5829,7 +5834,6 @@ int realmain(int argc, char* argv[])
         }
         handle_under_overlay(pdf, o);
         handle_transformations(pdf, o);
-        bool split_warnings = false;
 
 	if ((o.outfilename == 0) && (! o.replace_input))
 	{
@@ -5837,13 +5841,13 @@ int realmain(int argc, char* argv[])
 	}
         else if (o.split_pages)
         {
-            do_split_pages(pdf, o, split_warnings);
+            do_split_pages(pdf, o, other_warnings);
         }
 	else
 	{
             write_outfile(pdf, o);
 	}
-	if ((! pdf.getWarnings().empty()) || split_warnings)
+	if ((! pdf.getWarnings().empty()) || other_warnings)
 	{
             if (! o.suppress_warnings)
             {
