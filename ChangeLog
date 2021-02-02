@@ -1,3 +1,12 @@
+2021-02-02  Jay Berkenbilt  <ejb@ql.org>
+
+	* Bug fix: if a form XObject lacks a resources dictionary,
+	consider any names in that form XObject to be referenced from the
+	containing page. This is compliant with older PDF versions. Also
+	detect if any form XObjects have any unresolved names and, if so,
+	don't remove unreferenced resources from them or from the page
+	that contains them. Fixes #494.
+
 2021-01-31  Jay Berkenbilt  <ejb@ql.org>
 
 	* Bug fix: properly handle strings if they appear in inline image

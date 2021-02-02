@@ -1783,8 +1783,8 @@ my @sp_cases = (
     [1, 'broken data', '--pages broken-lzw.pdf --', 'split-out.pdf',
      {$td->FILE => "broken-lzw.out", $td->EXIT_STATUS => 3}],
     );
-$n_tests += 36;
-$n_compare_pdfs += 1;
+$n_tests += 43;
+$n_compare_pdfs += 2;
 for (@sp_cases)
 {
     $n_tests += 1 + $_->[0];
@@ -1942,6 +1942,38 @@ foreach my $i (qw(1 2))
                  {$td->FILE => "split-out-shared-form-xobject-$i.pdf"},
                  {$td->FILE => "shared-form-xobject-split-$i.pdf"});
 }
+
+my @fo_resources = (['form-xobjects-no-resources', 0],
+                    ['form-xobjects-some-resources1', 3],
+                    ['form-xobjects-some-resources2', 3]);
+foreach my $d (@fo_resources)
+{
+    my ($f, $status) = @$d;
+    my $expout = ($status == 0 ?
+                  {$td->STRING => ""} :
+                  {$td->FILE => "$f.out"});
+    $expout->{$td->EXIT_STATUS} = $status;
+    $td->runtest("split $f",
+                 {$td->COMMAND =>
+                      "qpdf --empty --static-id --pages $f.pdf 1 --" .
+                      " --remove-unreferenced-resources=yes a.pdf"},
+                 $expout, $td->NORMALIZE_NEWLINES);
+    $td->runtest("check output ($f)",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => "$f-out.pdf"});
+    if ($status == 0)
+    {
+        compare_pdfs("$f.pdf", "a.pdf");
+    }
+}
+
+$td->runtest("no warn with pages warnings",
+             {$td->COMMAND =>
+                  "qpdf --no-warn --empty --static-id".
+                  " --pages form-xobjects-some-resources1.pdf 1 --" .
+                  " --remove-unreferenced-resources=yes a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
 
 show_ntests();
 # ----------

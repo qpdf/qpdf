@@ -701,10 +701,16 @@ NameWatcher::handleToken(QPDFTokenizer::Token const& token)
     writeToken(token);
 }
 
-void
+bool
 QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
-    QPDFPageObjectHelper ph)
+    QPDFPageObjectHelper ph, std::set<std::string>& unresolved)
 {
+    bool is_page = (! ph.oh.isFormXObject());
+    if (! is_page)
+    {
+        QTC::TC("qpdf", "QPDFPageObjectHelper filter form xobject");
+    }
+
     NameWatcher nw;
     try
     {
@@ -714,16 +720,17 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
     {
         ph.oh.warnIfPossible(
             std::string("Unable to parse content stream: ") + e.what() +
-            "; not attempting to remove unreferenced objects from this page");
-        return;
+            "; not attempting to remove unreferenced objects"
+            " from this object");
+        return false;
     }
     if (nw.saw_bad)
     {
         QTC::TC("qpdf", "QPDFPageObjectHelper bad token finding names");
         ph.oh.warnIfPossible(
             "Bad token found while scanning content stream; "
-            "not attempting to remove unreferenced objects from this page");
-        return;
+            "not attempting to remove unreferenced objects from this object");
+        return false;
     }
 
     // We will walk through /Font and /XObject dictionaries, removing
@@ -733,6 +740,7 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
     // of mutating the one it was copied from.
     QPDFObjectHandle resources = ph.getAttribute("/Resources", true);
     std::vector<QPDFObjectHandle> rdicts;
+    std::set<std::string> known_names;
     if (resources.isDictionary())
     {
         std::vector<std::string> to_filter = {"/Font", "/XObject"};
@@ -744,33 +752,86 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
                 dict = dict.shallowCopy();
                 resources.replaceKey(iter, dict);
                 rdicts.push_back(dict);
+                auto keys = dict.getKeys();
+                known_names.insert(keys.begin(), keys.end());
             }
         }
     }
+
+    std::set<std::string> local_unresolved;
+    for (auto const& name: nw.names)
+    {
+        if (! known_names.count(name))
+        {
+            unresolved.insert(name);
+            local_unresolved.insert(name);
+        }
+    }
+    // Older versions of the PDF spec allowed form XObjects to omit
+    // their resources dictionaries, in which case names were resolved
+    // from the containing page. This behavior seems to be widely
+    // supported by viewers. If a form XObjects has a resources
+    // dictionary and has some unresolved names, some viewers fail to
+    // resolve them, and others allow them to be inherited from the
+    // page or from another form XObjects that contains them. Since
+    // this behavior is inconsistent across viewers, we consider an
+    // unresolved name when a resources dictionary is present to be
+    // reason not to remove unreferenced resources. An unresolved name
+    // in the absence of a resource dictionary is not considered a
+    // problem. For form XObjects, we just accumulate a list of
+    // unresolved names, and for page objects, we avoid removing any
+    // such names found in nested form XObjects.
+
+    if ((! local_unresolved.empty()) && resources.isDictionary())
+    {
+        QTC::TC("qpdf", "QPDFPageObjectHelper unresolved names");
+        ph.oh.warnIfPossible(
+            "Unresolved names found while scanning content stream; "
+            "not attempting to remove unreferenced objects from this object");
+        return false;
+    }
+
     for (auto& dict: rdicts)
     {
         for (auto const& key: dict.getKeys())
         {
-            if (! nw.names.count(key))
+            if (is_page && unresolved.count(key))
+            {
+                // This name is referenced by some nested form
+                // xobject, so don't remove it.
+                QTC::TC("qpdf", "QPDFPageObjectHelper resolving unresolved");
+            }
+            else if (! nw.names.count(key))
             {
                 dict.removeKey(key);
             }
         }
     }
+    return true;
 }
 
 void
 QPDFPageObjectHelper::removeUnreferencedResources()
 {
+    // Accumulate a list of unresolved names across all nested form
+    // XObjects.
+    std::set<std::string> unresolved;
+    bool any_failures = false;
     forEachFormXObject(
         true,
-        [](
+        [&any_failures, &unresolved](
             QPDFObjectHandle& obj, QPDFObjectHandle&, std::string const&)
         {
-            QTC::TC("qpdf", "QPDFPageObjectHelper filter form xobject");
-            removeUnreferencedResourcesHelper(QPDFPageObjectHelper(obj));
+            if (! removeUnreferencedResourcesHelper(
+                    QPDFPageObjectHelper(obj), unresolved))
+            {
+                any_failures = true;
+            }
         });
-    removeUnreferencedResourcesHelper(*this);
+    if (this->oh.isFormXObject() || (! any_failures))
+    {
+        removeUnreferencedResourcesHelper(*this, unresolved);
+    }
 }
 
 QPDFPageObjectHelper

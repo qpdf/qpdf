@@ -317,9 +317,9 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     void flattenRotation();
 
   private:
-    static void
+    static bool
     removeUnreferencedResourcesHelper(
-        QPDFPageObjectHelper ph);
+        QPDFPageObjectHelper ph, std::set<std::string>& unresolved);
 
     class Members
     {
