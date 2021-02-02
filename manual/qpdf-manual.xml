@@ -4840,8 +4840,6 @@ print "\n";
         </listitem>
        </itemizedlist>
       </listitem>
-     </itemizedlist>
-     <itemizedlist>
       <listitem>
        <para>
         Library Enhancements
@@ -4880,6 +4878,19 @@ print "\n";
           capability to repair broken trees, and create methods for
           modifying the trees. With this change, qpdf has a robust
           read/write implementation of name and number trees.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Bug Fixes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+	  Properly handle strings if they appear in inline image
+	  dictionaries while externalizing inline images.
          </para>
         </listitem>
        </itemizedlist>
