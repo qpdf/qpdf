@@ -113,6 +113,7 @@ struct Options
         password_is_hex_key(false),
         suppress_password_recovery(false),
         password_mode(pm_auto),
+        allow_insecure(false),
         keylen(0),
         r2_print(true),
         r2_modify(true),
@@ -211,6 +212,7 @@ struct Options
     bool password_is_hex_key;
     bool suppress_password_recovery;
     password_mode_e password_mode;
+    bool allow_insecure;
     std::string user_password;
     std::string owner_password;
     int keylen;
@@ -742,6 +744,7 @@ class ArgParser
     void argEncrypt();
     void argDecrypt();
     void argPasswordIsHexKey();
+    void argAllowInsecure();
     void argPasswordMode(char* parameter);
     void argSuppressPasswordRecovery();
     void argCopyEncryption(char* parameter);
@@ -1074,13 +1077,17 @@ ArgParser::initOptionTable()
 
     t = &this->encrypt40_option_table;
     (*t)["--"] = oe_bare(&ArgParser::argEndEncrypt);
+    (*t)["allow-insecure"] = oe_bare(&ArgParser::argAllowInsecure);
+    // The above 40-bit options are also 128-bit and 256-bit options,
+    // so copy what we have so far to 128. Then continue separately
+    // with 128. We later copy 128 to 256.
+    this->encrypt128_option_table = this->encrypt40_option_table;
     (*t)["print"] = oe_requiredChoices(&ArgParser::arg40Print, yn);
     (*t)["modify"] = oe_requiredChoices(&ArgParser::arg40Modify, yn);
     (*t)["extract"] = oe_requiredChoices(&ArgParser::arg40Extract, yn);
     (*t)["annotate"] = oe_requiredChoices(&ArgParser::arg40Annotate, yn);
 
     t = &this->encrypt128_option_table;
-    (*t)["--"] = oe_bare(&ArgParser::argEndEncrypt);
     (*t)["accessibility"] = oe_requiredChoices(
         &ArgParser::arg128Accessibility, yn);
     (*t)["extract"] = oe_requiredChoices(&ArgParser::arg128Extract, yn);
@@ -1316,6 +1323,10 @@ ArgParser::argHelp()
         << "key-length may be 40, 128, or 256\n"
         << "\n"
         << "Additional flags are dependent upon key length.\n"
+        << "\n"
+        << "  For all key lengths:\n"
+        << "    --allow-insecure         allow the owner password to be empty or the\n"
+        << "                             same as the user password\n"
         << "\n"
         << "  If 40:\n"
         << "\n"
@@ -1847,6 +1858,12 @@ ArgParser::argPasswordMode(char* parameter)
     {
         usage("invalid password-mode option");
     }
+}
+
+void
+ArgParser::argAllowInsecure()
+{
+    o.allow_insecure = true;
 }
 
 void
@@ -3335,6 +3352,18 @@ ArgParser::doFinalChecks()
     {
         usage("--requires-password and --is-encrypted may not be given"
               " together");
+    }
+
+    if (o.encrypt && (! o.allow_insecure) &&
+        (o.owner_password.empty() ||
+         (o.owner_password == o.user_password)))
+    {
+        usage("An encrypted PDF with an empty owner password or an"
+              " owner password that is the same as a user password"
+              " is insecure and can't be opened by some viewers. If you"
+              " really want to do this, you must also give the"
+              " --allow-insecure option before the -- that follows"
+              " --encrypt.");
     }
 
     if (o.require_outfile && o.outfilename &&

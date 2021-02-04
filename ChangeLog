@@ -1,3 +1,12 @@
+2021-02-04  Jay Berkenbilt  <ejb@ql.org>
+
+	* By default, give an error if a user attempts to encrypt a file
+	with an empty owner password or an owner password that is the same
+	as the user password. Such files are insecure. Most viewers either
+	won't open such files or will not enforce security settings. To
+	allow explicit creation of files like this, pass the new
+	--allow-insecure option. Fixes #501.
+
 2021-02-02  Jay Berkenbilt  <ejb@ql.org>
 
 	* Bug fix: if a form XObject lacks a resources dictionary,

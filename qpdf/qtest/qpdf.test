@@ -3189,19 +3189,19 @@ foreach my $f (qw(compressed-metadata.pdf enc-base.pdf))
 	check_metadata("a.pdf", 0, 1);
 	$td->runtest("encrypt normally",
 		     {$td->COMMAND =>
-			  "qpdf --encrypt '' '' 128 -- a.pdf b.pdf"},
+			  "qpdf --encrypt '' o 128 -- a.pdf b.pdf"},
 		     {$td->STRING => "", $td->EXIT_STATUS => 0});
 	check_metadata("b.pdf", 1, 0);
 	unlink "b.pdf";
 	$td->runtest("encrypt V4",
 		     {$td->COMMAND =>
-			  "qpdf --encrypt '' '' 128 --force-V4 -- a.pdf b.pdf"},
+			  "qpdf --encrypt '' o 128 --force-V4 -- a.pdf b.pdf"},
 		     {$td->STRING => "", $td->EXIT_STATUS => 0});
 	check_metadata("b.pdf", 1, 0);
 	unlink "b.pdf";
 	$td->runtest("encrypt with cleartext metadata",
 		     {$td->COMMAND =>
-			  "qpdf --encrypt '' '' 128 --cleartext-metadata --" .
+			  "qpdf --encrypt '' o 128 --cleartext-metadata --" .
 			  " a.pdf b.pdf"},
 		     {$td->STRING => "", $td->EXIT_STATUS => 0});
 	check_metadata("b.pdf", 1, 1);
@@ -3212,7 +3212,7 @@ foreach my $f (qw(compressed-metadata.pdf enc-base.pdf))
 	unlink "b.pdf", "c.pdf";
 	$td->runtest("encrypt with aes and cleartext metadata",
 		     {$td->COMMAND =>
-			  "qpdf --encrypt '' '' 128" .
+			  "qpdf --encrypt '' o 128" .
 			  " --cleartext-metadata --use-aes=y -- a.pdf b.pdf"},
 		     {$td->STRING => "", $td->EXIT_STATUS => 0});
 	check_metadata("b.pdf", 1, 1);
@@ -3441,7 +3441,7 @@ my @encrypted_files =
       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     );
 
-$n_tests += 5 + (2 * (@encrypted_files)) + (7 * (@encrypted_files - 6)) + 9;
+$n_tests += 9 + (2 * (@encrypted_files)) + (7 * (@encrypted_files - 6)) + 9;
 
 $td->runtest("encrypted file",
 	     {$td->COMMAND => "test_driver 2 encrypted-with-images.pdf"},
@@ -3457,6 +3457,26 @@ $td->runtest("recheck encrypted file",
 	     {$td->FILE => "encrypted1.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("empty owner password",
+             {$td->COMMAND => "qpdf --encrypt '' '' 128 -- minimal.pdf a.pdf"},
+             {$td->REGEXP => ".*is insecure.*--allow-insecure.*",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("matching user/owner password",
+             {$td->COMMAND => "qpdf --encrypt q q 128 -- minimal.pdf a.pdf"},
+             {$td->REGEXP => ".*is insecure.*--allow-insecure.*",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("allow insecure",
+             {$td->COMMAND => "qpdf --encrypt '' '' 128 --allow-insecure --" .
+                  " minimal.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check insecure",
+             {$td->COMMAND => "qpdf --check a.pdf"},
+             {$td->FILE => "insecure-passwords.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 # Test that long passwords that are one character too short fail.  We
 # test the truncation cases in the loop below by using passwords
@@ -3587,6 +3607,10 @@ foreach my $d (@encrypted_files)
         $enc_json =~ s/---upm---/$upm/;
 
 	my $eflags = "-encrypt \"$upass\" \"$opass\" $bits $xeflags --";
+        if (($opass eq "") || ($opass eq $upass))
+        {
+            $eflags =~ s/--$/--allow-insecure --/;
+        }
         if (($pass ne $upass) && ($V >= 5))
         {
             # V >= 5 can no longer recover user password with owner
@@ -3758,7 +3782,7 @@ $td->runtest("check linearization",
 # Test AES encryption in various ways.
 $n_tests += 18;
 $td->runtest("encrypt with AES",
-	     {$td->COMMAND => "qpdf --encrypt '' '' 128 --use-aes=y --" .
+	     {$td->COMMAND => "qpdf --encrypt '' o 128 --use-aes=y --" .
 		  " enc-base.pdf a.pdf"},
 	     {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("check encryption",
@@ -3779,7 +3803,7 @@ $td->runtest("compare files",
 	     {$td->FILE => 'a.qdf'},
 	     {$td->FILE => 'b.qdf'});
 $td->runtest("linearize with AES and object streams",
-	     {$td->COMMAND => "qpdf --encrypt '' '' 128 --use-aes=y --" .
+	     {$td->COMMAND => "qpdf --encrypt '' o 128 --use-aes=y --" .
 		  " --linearize --object-streams=generate enc-base.pdf a.pdf"},
 	     {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("check encryption",
@@ -3845,7 +3869,8 @@ foreach my $d (['--force-V4', 'V4'],
     my ($args, $out) = @$d;
     $td->runtest("encrypt $args",
 		 {$td->COMMAND => "qpdf --static-aes-iv --static-id" .
-		      " --encrypt '' '' 128 $args -- enc-base.pdf a.pdf"},
+		      " --encrypt '' '' 128 $args --allow-insecure --" .
+                      " enc-base.pdf a.pdf"},
 		 {$td->STRING => "", $td->EXIT_STATUS => 0});
     $td->runtest("check output",
 		 {$td->FILE => "a.pdf"},

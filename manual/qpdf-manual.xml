@@ -1214,7 +1214,11 @@ make
    </para>
    <para>
     Either or both of the user password and the owner password may be
-    empty strings.
+    empty strings. Starting in qpdf 10.2, qpdf defaults to not
+    allowing creation of PDF files with an empty owner password or an
+    owner password that matches the user password. If you want to
+    create such files, specify the encryption option
+    <option>--allow-insecure</option>, as described below.
    </para>
    <para>
     The value for
@@ -1222,6 +1226,25 @@ make
     128, or 256.  The restriction flags are dependent upon key length.
     When no additional restrictions are given, the default is to be
     fully permissive.
+   </para>
+   <para>
+    For all key lengths, the following options are available:
+    <variablelist>
+     <varlistentry>
+      <term><option>--allow-insecure</option></term>
+      <listitem>
+       <para>
+        From qpdf 10.2, qpdf defaults to not allowing creation of PDF
+        files where the owner password is blank or matches the user
+        password. Files created in this way are insecure and can't be
+        opened by some viewers. Users would ordinarily never want to
+        create such files. If you are using qpdf to intentionally
+        created strange files for testing (a definite valid use of
+        qpdf!), this option allows you to create such insecure files.
+       </para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
    </para>
    <para>
     If <option><replaceable>key-length</replaceable></option> is 40,
@@ -4824,7 +4847,28 @@ print "\n";
      <itemizedlist>
       <listitem>
        <para>
-        Behavior Changes
+        CLI Behavior Changes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          By default, <command>qpdf</command> no longer allows
+          creation of encrypted PDF files whose owner password is
+          empty or matches the user password. The
+          <option>--allow-insecure</option>, specified inside the
+          <option>--encrypt</option> options, allows creation of such
+          files. Behavior changes in the CLI are avoided when
+          possible, but an exception was made here because this is
+          security-related. qpdf must always allow creation of weird
+          files for testing purposes, but it should not default to
+          letting users unknowingly create insecure files.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Library Behavior Changes
        </para>
        <itemizedlist>
         <listitem>
