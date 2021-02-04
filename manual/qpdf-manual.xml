@@ -571,13 +571,17 @@ make
     linkend="ref.page-selection"/>.
    </para>
    <para>
-    If <option>@filename</option> appears anywhere in the
+    If <option>@filename</option> appears as a word anywhere in the
     command-line, it will be read line by line, and each line will be
     treated as a command-line argument. The <option>@-</option> option
     allows arguments to be read from standard input. This allows qpdf
     to be invoked with an arbitrary number of arbitrarily long
     arguments. It is also very useful for avoiding having to pass
-    passwords on the command line.
+    passwords on the command line. Note that the
+    <option>@filename</option> can't appear in the middle of an
+    argument, so constructs such as <option>--arg=@option</option>
+    will not work. You would have to include the argument and its
+    options together in the arguments file.
    </para>
    <para>
     <option>outfilename</option> does not have to be seekable, even
@@ -714,14 +718,34 @@ make
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term><option>--password=password</option></term>
+      <term><option>--password=<replaceable>password</replaceable></option></term>
       <listitem>
        <para>
-        Specifies a password for accessing encrypted files. Note that
-        you can use <option>@filename</option> or <option>@-</option>
-        as described above to put the password in a file or pass it
-        via standard input so you can avoid specifying it on the
-        command line.
+        Specifies a password for accessing encrypted files. To read
+        the password from a file or standard input, you can use
+        <option>--password-file</option>, added in qpdf 10.2. Note
+        that you can also use <option>@filename</option> or
+        <option>@-</option> as described above to put the password in
+        a file or pass it via standard input, but you would do so by
+        specifying the entire
+        <option>--password=<replaceable>password</replaceable></option>
+        option in the file. Syntax such as
+        <option>--password=@filename</option> won't work since
+        <option>@filename</option> is not recognized in the middle of
+        an argument.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--password-file=<replaceable>filename</replaceable></option></term>
+      <listitem>
+       <para>
+        Reads the first line from the specified file and uses it as
+        the password for accessing encrypted files.
+        <option><replaceable>filename</replaceable></option> may be
+        <literal>-</literal> to read the password from standard input.
+        Note that, in this case, the password is echoed and there is
+        no prompt, so use with caution.
        </para>
       </listitem>
      </varlistentry>
@@ -4880,6 +4904,24 @@ print "\n";
           encoded in ASCII. This change may cause qpdf to generate
           different output than before when form field values are set
           using <classname>QPDFFormFieldObjectHelper</classname>.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        CLI Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          The option
+          <option>--password-file=<replaceable>filename</replaceable></option>
+          can now be used to read the decryption password from a file.
+          You can use <literal>-</literal> as the file name to read
+          the password from standard input. This is an easier/more
+          obvious way to read passwords from files or standard input
+          than using <option>@file</option> for this purpose.
          </para>
         </listitem>
        </itemizedlist>

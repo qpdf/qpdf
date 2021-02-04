@@ -568,3 +568,5 @@ NNTree erased last item in tree 0
 NNTree remove limits from root 0
 QPDFPageObjectHelper unresolved names 0
 QPDFPageObjectHelper resolving unresolved 0
+qpdf password stdin 0
+qpdf password file 0

@@ -270,7 +270,7 @@ my @check_encryption_password = (
     ["20-pages.pdf", "", 0, 0],
     ["20-pages.pdf", "user", 0, 3],
     );
-$n_tests += 2 * scalar(@check_encryption_password);
+$n_tests += 3 * scalar(@check_encryption_password);
 foreach my $d (@check_encryption_password)
 {
     my ($file, $pass, $is_encrypted, $requires_password) = @$d;
@@ -282,6 +282,29 @@ foreach my $d (@check_encryption_password)
                       " --password=$pass $file"},
                  {$td->STRING => "", $td->EXIT_STATUS => $requires_password});
 }
+
+# Exercise reading password from file
+open(F, ">args") or die;
+print F "user\n";
+close(F);
+$td->runtest("password from file)",
+             {$td->COMMAND => "qpdf --check --password-file=args 20-pages.pdf"},
+             {$td->FILE => "20-pages-check.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+open(F, ">>args") or die;
+print F "ignored\n";
+close(F);
+$td->runtest("ignore extra args from file)",
+             {$td->COMMAND => "qpdf --check --password-file=args 20-pages.pdf"},
+             {$td->FILE => "20-pages-check-password-warning.out",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+unlink "args";
+$td->runtest("password from stdin)",
+             {$td->COMMAND => "echo user |" .
+                  " qpdf --check --password-file=- 20-pages.pdf"},
+             {$td->FILE => "20-pages-check.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 show_ntests();
 # ----------

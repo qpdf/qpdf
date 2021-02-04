@@ -1,5 +1,9 @@
 2021-02-04  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add new option --pasword-file=file for reading the decryption
+	password from a file. file may be "-" to read from standard input.
+	Fixes #499.
+
 	* By default, give an error if a user attempts to encrypt a file
 	with an empty owner password or an owner password that is the same
 	as the user password. Such files are insecure. Most viewers either

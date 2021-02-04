@@ -4,6 +4,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <memory>
 
 #include <qpdf/QUtil.hh>
 #include <qpdf/QTC.hh>
@@ -199,6 +200,7 @@ struct Options
     }
 
     char const* password;
+    std::shared_ptr<char> password_alloc;
     bool linearize;
     bool decrypt;
     int split_pages;
@@ -739,6 +741,7 @@ class ArgParser
     void argShowCrypto();
     void argPositional(char* arg);
     void argPassword(char* parameter);
+    void argPasswordFile(char* paramter);
     void argEmpty();
     void argLinearize();
     void argEncrypt();
@@ -955,6 +958,8 @@ ArgParser::initOptionTable()
     (*t)[""] = oe_positional(&ArgParser::argPositional);
     (*t)["password"] = oe_requiredParameter(
         &ArgParser::argPassword, "password");
+    (*t)["password-file"] = oe_requiredParameter(
+        &ArgParser::argPasswordFile, "password-file");
     (*t)["empty"] = oe_bare(&ArgParser::argEmpty);
     (*t)["linearize"] = oe_bare(&ArgParser::argLinearize);
     (*t)["encrypt"] = oe_bare(&ArgParser::argEncrypt);
@@ -1235,6 +1240,9 @@ ArgParser::argHelp()
         << "--completion-bash       output a bash complete command you can eval\n"
         << "--completion-zsh        output a zsh complete command you can eval\n"
         << "--password=password     specify a password for accessing encrypted files\n"
+        << "--password-file=file    get the password the first line \"file\"; use \"-\"\n"
+        << "                        to read the password from stdin (without prompt or\n"
+        << "                        disabling echo, so use with caution)\n"
         << "--is-encrypted          silently exit 0 if the file is encrypted or 2\n"
         << "                        if not; useful for shell scripts\n"
         << "--requires-password     silently exit 0 if a password (other than as\n"
@@ -1273,7 +1281,8 @@ ArgParser::argHelp()
         << "\n"
         << "Note that you can use the @filename or @- syntax for any argument at any\n"
         << "point in the command. This provides a good way to specify a password without\n"
-        << "having to explicitly put it on the command line.\n"
+        << "having to explicitly put it on the command line. @filename or @- must be a\n"
+        << "word by itself. Syntax such as --arg=@filename doesn't work.\n"
         << "\n"
         << "If none of --copy-encryption, --encrypt or --decrypt are given, qpdf will\n"
         << "preserve any encryption data associated with a file.\n"
@@ -1747,6 +1756,36 @@ void
 ArgParser::argPassword(char* parameter)
 {
     o.password = parameter;
+}
+
+void
+ArgParser::argPasswordFile(char* parameter)
+{
+    std::list<std::string> lines;
+    if (strcmp(parameter, "-") == 0)
+    {
+        QTC::TC("qpdf", "qpdf password stdin");
+        lines = QUtil::read_lines_from_file(std::cin);
+    }
+    else
+    {
+        QTC::TC("qpdf", "qpdf password file");
+        lines = QUtil::read_lines_from_file(parameter);
+    }
+    if (lines.size() >= 1)
+    {
+        // Make sure the memory for this stays in scope.
+        o.password_alloc = std::shared_ptr<char>(
+            QUtil::copy_string(lines.front().c_str()),
+            std::default_delete<char[]>());
+        o.password = o.password_alloc.get();
+
+        if (lines.size() > 1)
+        {
+            std::cerr << whoami << ": WARNING: all but the first line of"
+                      << " the password file are ignored" << std::endl;
+        }
+    }
 }
 
 void
