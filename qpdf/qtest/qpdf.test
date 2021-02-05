@@ -3464,7 +3464,7 @@ my @encrypted_files =
       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     );
 
-$n_tests += 9 + (2 * (@encrypted_files)) + (7 * (@encrypted_files - 6)) + 9;
+$n_tests += 8 + (2 * (@encrypted_files)) + (7 * (@encrypted_files - 6)) + 9;
 
 $td->runtest("encrypted file",
 	     {$td->COMMAND => "test_driver 2 encrypted-with-images.pdf"},
@@ -3482,17 +3482,12 @@ $td->runtest("recheck encrypted file",
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("empty owner password",
-             {$td->COMMAND => "qpdf --encrypt '' '' 128 -- minimal.pdf a.pdf"},
-             {$td->REGEXP => ".*is insecure.*--allow-insecure.*",
-                  $td->EXIT_STATUS => 2},
-             $td->NORMALIZE_NEWLINES);
-$td->runtest("matching user/owner password",
-             {$td->COMMAND => "qpdf --encrypt q q 128 -- minimal.pdf a.pdf"},
+             {$td->COMMAND => "qpdf --encrypt u '' 256 -- minimal.pdf a.pdf"},
              {$td->REGEXP => ".*is insecure.*--allow-insecure.*",
                   $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("allow insecure",
-             {$td->COMMAND => "qpdf --encrypt '' '' 128 --allow-insecure --" .
+             {$td->COMMAND => "qpdf --encrypt u '' 256 --allow-insecure --" .
                   " minimal.pdf a.pdf"},
              {$td->STRING => "", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
@@ -3630,7 +3625,7 @@ foreach my $d (@encrypted_files)
         $enc_json =~ s/---upm---/$upm/;
 
 	my $eflags = "-encrypt \"$upass\" \"$opass\" $bits $xeflags --";
-        if (($opass eq "") || ($opass eq $upass))
+        if (($opass eq "") && ($bits == 256))
         {
             $eflags =~ s/--$/--allow-insecure --/;
         }
@@ -3892,7 +3887,7 @@ foreach my $d (['--force-V4', 'V4'],
     my ($args, $out) = @$d;
     $td->runtest("encrypt $args",
 		 {$td->COMMAND => "qpdf --static-aes-iv --static-id" .
-		      " --encrypt '' '' 128 $args --allow-insecure --" .
+		      " --encrypt '' '' 128 $args --" .
                       " enc-base.pdf a.pdf"},
 		 {$td->STRING => "", $td->EXIT_STATUS => 0});
     $td->runtest("check output",

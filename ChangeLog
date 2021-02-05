@@ -5,11 +5,11 @@
 	Fixes #499.
 
 	* By default, give an error if a user attempts to encrypt a file
-	with an empty owner password or an owner password that is the same
-	as the user password. Such files are insecure. Most viewers either
-	won't open such files or will not enforce security settings. To
-	allow explicit creation of files like this, pass the new
-	--allow-insecure option. Fixes #501.
+	with a 256-bit key, a non-empty user password, and an empty owner
+	password. Such files are insecure since they can be opened with no
+	password. To allow explicit creation of files like this, pass the
+	new --allow-insecure option. Thanks to github user RobK88 for a
+	detailed analysis and for reporting this issue. Fixes #501.
 
 2021-02-02  Jay Berkenbilt  <ejb@ql.org>
 

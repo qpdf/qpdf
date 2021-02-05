@@ -1082,7 +1082,6 @@ ArgParser::initOptionTable()
 
     t = &this->encrypt40_option_table;
     (*t)["--"] = oe_bare(&ArgParser::argEndEncrypt);
-    (*t)["allow-insecure"] = oe_bare(&ArgParser::argAllowInsecure);
     // The above 40-bit options are also 128-bit and 256-bit options,
     // so copy what we have so far to 128. Then continue separately
     // with 128. We later copy 128 to 256.
@@ -1117,6 +1116,7 @@ ArgParser::initOptionTable()
 
     t = &this->encrypt256_option_table;
     (*t)["force-R5"] = oe_bare(&ArgParser::arg256ForceR5);
+    (*t)["allow-insecure"] = oe_bare(&ArgParser::argAllowInsecure);
 
     t = &this->under_overlay_option_table;
     (*t)[""] = oe_positional(&ArgParser::argUOpositional);
@@ -1333,10 +1333,6 @@ ArgParser::argHelp()
         << "\n"
         << "Additional flags are dependent upon key length.\n"
         << "\n"
-        << "  For all key lengths:\n"
-        << "    --allow-insecure         allow the owner password to be empty or the\n"
-        << "                             same as the user password\n"
-        << "\n"
         << "  If 40:\n"
         << "\n"
         << "    --print=[yn]             allow printing\n"
@@ -1362,6 +1358,9 @@ ArgParser::argHelp()
         << "    --force-V4               this option is not available with 256-bit keys\n"
         << "    --use-aes                this option is always on with 256-bit keys\n"
         << "    --force-R5               forces use of deprecated R=5 encryption\n"
+        << "    --allow-insecure         allow the owner password to be empty when the\n"
+        << "                             user password is not empty\n"
+        << "\n"
         << "\n"
         << "    print-opt may be:\n"
         << "\n"
@@ -3394,15 +3393,21 @@ ArgParser::doFinalChecks()
     }
 
     if (o.encrypt && (! o.allow_insecure) &&
-        (o.owner_password.empty() ||
-         (o.owner_password == o.user_password)))
+        (o.owner_password.empty() &&
+         (! o.user_password.empty()) &&
+         (o.keylen == 256)))
     {
-        usage("An encrypted PDF with an empty owner password or an"
-              " owner password that is the same as a user password"
-              " is insecure and can't be opened by some viewers. If you"
-              " really want to do this, you must also give the"
-              " --allow-insecure option before the -- that follows"
-              " --encrypt.");
+        // Note that empty owner passwords for R < 5 are copied from
+        // the user password, so this lack of security is not an issue
+        // for those files. Also we are consider only the ability to
+        // open the file without a password to be insecure. We are not
+        // concerned about whether the viwer enforces security
+        // settings when the user and owner password match.
+        usage("A PDF with a non-empty user password and an empty owner"
+              " password encrypted with a 256-bit key is insecure as it"
+              " can be opened without a password. If you really want to"
+              " do this, you must also give the --allow-insecure option"
+              " before the -- that follows --encrypt.");
     }
 
     if (o.require_outfile && o.outfilename &&
