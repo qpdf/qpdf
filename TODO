@@ -285,6 +285,10 @@ I find it useful to make reference to them in this list.
 
     - See ../misc/broken-files
 
+    - See ../misc/bad-files-issue-476. This directory contains a
+      snapshot of the google doc and linked PDF files from issue #476.
+      Please see the issue for details.
+
  * Additional form features
    * set value from CLI? Specify title, and provide way to
      disambiguate, probably by giving objgen of field
