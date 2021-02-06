@@ -814,7 +814,6 @@ class QPDF
             int foreign_generation,
             qpdf_offset_t offset,
             size_t length,
-            bool is_attachment_stream,
             QPDFObjectHandle local_dict);
 
       private:
@@ -824,7 +823,6 @@ class QPDF
         int foreign_generation;
         qpdf_offset_t offset;
         size_t length;
-        bool is_attachment_stream;
         QPDFObjectHandle local_dict;
     };
 
@@ -919,7 +917,6 @@ class QPDF
 	int& act_objid, int& act_generation);
     PointerHolder<QPDFObject> resolve(int objid, int generation);
     void resolveObjectsInStream(int obj_stream_number);
-    void findAttachmentStreams();
     void stopOnError(std::string const& message);
 
     // Calls finish() on the pipeline when done but does not delete it
@@ -938,7 +935,6 @@ class QPDF
                                int objid, int generation,
                                qpdf_offset_t offset, size_t length,
                                QPDFObjectHandle dict,
-                               bool is_attachment_stream,
                                Pipeline* pipeline,
                                bool suppress_warnings,
                                bool will_retry);
@@ -1001,7 +997,7 @@ class QPDF
         PointerHolder<InputSource> file,
         QPDF& qpdf_for_warning, Pipeline*& pipeline,
         int objid, int generation,
-	QPDFObjectHandle& stream_dict, bool is_attachment_stream,
+	QPDFObjectHandle& stream_dict,
 	std::vector<PointerHolder<Pipeline> >& heap);
 
     // Methods to support object copying
@@ -1422,7 +1418,6 @@ class QPDF
         PointerHolder<QPDFObjectHandle::StreamDataProvider> copied_streams;
         // copied_stream_data_provider is owned by copied_streams
         CopiedStreamDataProvider* copied_stream_data_provider;
-        std::set<QPDFObjGen> attachment_streams;
         bool reconstructed_xref;
         bool fixed_dangling_refs;
         bool immediate_copy_from;

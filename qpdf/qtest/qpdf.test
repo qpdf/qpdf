@@ -1257,7 +1257,7 @@ $n_tests += 3;
 $td->runtest("closed input source",
 	     {$td->COMMAND => "test_driver 73 minimal.pdf"},
 	     {$td->FILE => "test73.out",
-	      $td->EXIT_STATUS => 0},
+	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("empty object",
@@ -3878,7 +3878,7 @@ $td->runtest("check encryption",
 	     $td->NORMALIZE_NEWLINES);
 
 # Look at some actual V4 files
-$n_tests += 14;
+$n_tests += 17;
 foreach my $d (['--force-V4', 'V4'],
 	       ['--cleartext-metadata', 'V4-clearmeta'],
 	       ['--use-aes=y', 'V4-aes'],
@@ -3906,6 +3906,19 @@ $td->runtest("decrypt with crypt filter",
 $td->runtest("check output",
 	     {$td->FILE => 'a.pdf'},
 	     {$td->FILE => 'decrypted-crypt-filter.pdf'});
+$td->runtest("nontrivial crypt filter",
+	     {$td->COMMAND => "qpdf --qdf --decrypt --static-id" .
+		  " nontrivial-crypt-filter.pdf --password=asdfqwer a.pdf"},
+	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+	     {$td->FILE => 'a.pdf'},
+	     {$td->FILE => 'nontrivial-crypt-filter-decrypted.pdf'});
+$td->runtest("show nontrivial EFF",
+	     {$td->COMMAND => "qpdf --show-encryption" .
+		  " nontrivial-crypt-filter.pdf --password=asdfqwer"},
+	     {$td->FILE => "nontrivial-crypt-filter.out",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 # Copy encryption parameters
 $n_tests += 10;

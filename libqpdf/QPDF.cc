@@ -18,7 +18,6 @@
 #include <qpdf/FileInputSource.hh>
 #include <qpdf/BufferInputSource.hh>
 #include <qpdf/OffsetInputSource.hh>
-#include <qpdf/QPDFNameTreeObjectHelper.hh>
 
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDF_Null.hh>
@@ -98,7 +97,6 @@ QPDF::ForeignStreamData::ForeignStreamData(
     int foreign_generation,
     qpdf_offset_t offset,
     size_t length,
-    bool is_attachment_stream,
     QPDFObjectHandle local_dict)
     :
     encp(encp),
@@ -107,7 +105,6 @@ QPDF::ForeignStreamData::ForeignStreamData(
     foreign_generation(foreign_generation),
     offset(offset),
     length(length),
-    is_attachment_stream(is_attachment_stream),
     local_dict(local_dict)
 {
 }
@@ -508,7 +505,6 @@ QPDF::parse(char const* password)
     }
 
     initializeEncryption();
-    findAttachmentStreams();
     this->m->parsed = true;
 }
 
@@ -2648,8 +2644,6 @@ QPDF::replaceForeignIndirectObjects(
                     foreign.getGeneration(),
                     stream->getOffset(),
                     stream->getLength(),
-                    (foreign_stream_qpdf->m->attachment_streams.count(
-                        foreign.getObjGen()) > 0),
                     dict);
             this->m->copied_stream_data_provider->registerForeignStream(
                 local_og, foreign_stream_data);
@@ -2882,7 +2876,6 @@ QPDF::pipeStreamData(PointerHolder<EncryptionParameters> encp,
                      int objid, int generation,
 		     qpdf_offset_t offset, size_t length,
 		     QPDFObjectHandle stream_dict,
-                     bool is_attachment_stream,
 		     Pipeline* pipeline,
                      bool suppress_warnings,
                      bool will_retry)
@@ -2892,7 +2885,7 @@ QPDF::pipeStreamData(PointerHolder<EncryptionParameters> encp,
     {
 	decryptStream(encp, file, qpdf_for_warning,
                       pipeline, objid, generation,
-                      stream_dict, is_attachment_stream, to_delete);
+                      stream_dict, to_delete);
     }
 
     bool success = false;
@@ -2968,14 +2961,11 @@ QPDF::pipeStreamData(int objid, int generation,
                      bool suppress_warnings,
                      bool will_retry)
 {
-    bool is_attachment_stream = (
-        this->m->attachment_streams.count(
-            QPDFObjGen(objid, generation)) > 0);
     return pipeStreamData(
         this->m->encp, this->m->file, *this,
         objid, generation, offset, length,
-        stream_dict, is_attachment_stream,
-        pipeline, suppress_warnings, will_retry);
+        stream_dict, pipeline,
+        suppress_warnings, will_retry);
 }
 
 bool
@@ -2992,36 +2982,8 @@ QPDF::pipeForeignStreamData(
         foreign->encp, foreign->file, *this,
         foreign->foreign_objid, foreign->foreign_generation,
         foreign->offset, foreign->length,
-        foreign->local_dict, foreign->is_attachment_stream,
-        pipeline, suppress_warnings, will_retry);
-}
-
-void
-QPDF::findAttachmentStreams()
-{
-    QPDFObjectHandle root = getRoot();
-    QPDFObjectHandle names = root.getKey("/Names");
-    if (! names.isDictionary())
-    {
-        return;
-    }
-    QPDFObjectHandle embedded_files = names.getKey("/EmbeddedFiles");
-    if (! embedded_files.isDictionary())
-    {
-        return;
-    }
-    QPDFNameTreeObjectHelper ef_tree(embedded_files, *this);
-    for (auto const& i: ef_tree)
-    {
-        QPDFObjectHandle item = i.second;
-        if (item.isDictionary() &&
-            item.getKey("/EF").isDictionary() &&
-            item.getKey("/EF").getKey("/F").isStream())
-        {
-            QPDFObjectHandle stream = item.getKey("/EF").getKey("/F");
-            this->m->attachment_streams.insert(stream.getObjGen());
-        }
-    }
+        foreign->local_dict, pipeline,
+        suppress_warnings, will_retry);
 }
 
 void
