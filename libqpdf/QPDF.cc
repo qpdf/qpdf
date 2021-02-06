@@ -2187,12 +2187,12 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
 	   dict.getKey("/Type").getName() == "/ObjStm"))
     {
 	QTC::TC("qpdf", "QPDF ERR object stream with wrong type");
-	throw QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
-		      this->m->last_object_description,
-		      this->m->file->getLastOffset(),
-		      "supposed object stream " +
-		      QUtil::int_to_string(obj_stream_number) +
-		      " has wrong type");
+	warn(QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
+                     this->m->last_object_description,
+                     this->m->file->getLastOffset(),
+                     "supposed object stream " +
+                     QUtil::int_to_string(obj_stream_number) +
+                     " has wrong type"));
     }
 
     if (! (dict.getKey("/N").isInteger() &&

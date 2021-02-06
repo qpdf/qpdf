@@ -2655,7 +2655,7 @@ $n_tests += @badfiles + 7;
 # have error conditions that used to be fatal but are now considered
 # non-fatal.
 my %badtest_overrides = ();
-for(6, 12..15, 17, 18..32, 34, 36..37)
+for(6, 12..15, 17, 18..32, 34..37)
 {
     $badtest_overrides{$_} = 0;
 }
@@ -2715,7 +2715,7 @@ $n_tests += @badfiles + 9;
 # though in some cases it may.  Acrobat Reader would not be able to
 # recover any of these files any better.
 my %recover_failures = ();
-for (1, 7, 16, 35)
+for (1, 7, 16)
 {
     $recover_failures{$_} = 1;
 }

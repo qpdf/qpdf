@@ -1,2 +1,11 @@
 WARNING: bad35.pdf (object 1 0, offset 521): supposed object stream 1 has wrong type
-bad35.pdf (offset 521): unable to find /Root dictionary
+/QTest is indirect and has type dictionary (9)
+/QTest is a dictionary
+  /Contents is indirect
+  /MediaBox is direct
+  /Parent is indirect
+  /Resources is direct
+  /Type is direct
+unparse: 4 0 R
+unparseResolved: << /Contents 7 0 R /MediaBox [ 0 0 612 792 ] /Parent 3 0 R /Resources << /Font << /F1 6 0 R >> /ProcSet 5 0 R >> /Type /Page >>
+test 0 done
