@@ -6,37 +6,57 @@
 1 0 obj
 <<
   /Example <<
-    /NameTree <<
-      /Names [
-        (B)
-        (bishop)
-        (N)
-        (knight)
-        (Q)
-        (queen)
-        (R)
-        (rook)
-      ]
-    >>
-    /NumberTree <<
-      /Kids [
-        2 0 R
-        3 0 R
-        4 0 R
-      ]
-      /Limits [
-        7
-        343
-      ]
-    >>
+    /NameTree 2 0 R
+    /NumberTree 3 0 R
   >>
-  /Pages 5 0 R
+  /Pages 4 0 R
   /Type /Catalog
 >>
 endobj
 
 %% Original object ID: 3 0
 2 0 obj
+<<
+  /Names [
+    (B)
+    (bishop)
+    (N)
+    (knight)
+    (Q)
+    (queen)
+    (R)
+    (rook)
+  ]
+>>
+endobj
+
+%% Original object ID: 4 0
+3 0 obj
+<<
+  /Kids [
+    5 0 R
+    6 0 R
+    7 0 R
+  ]
+  /Limits [
+    7
+    343
+  ]
+>>
+endobj
+
+%% Original object ID: 2 0
+4 0 obj
+<<
+  /Count 0
+  /Kids [
+  ]
+  /Type /Pages
+>>
+endobj
+
+%% Original object ID: 5 0
+5 0 obj
 <<
   /Limits [
     7
@@ -73,8 +93,8 @@ endobj
 >>
 endobj
 
-%% Original object ID: 4 0
-3 0 obj
+%% Original object ID: 6 0
+6 0 obj
 <<
   /Limits [
     119
@@ -111,8 +131,8 @@ endobj
 >>
 endobj
 
-%% Original object ID: 5 0
-4 0 obj
+%% Original object ID: 7 0
+7 0 obj
 <<
   /Limits [
     231
@@ -151,29 +171,21 @@ endobj
 >>
 endobj
 
-%% Original object ID: 2 0
-5 0 obj
-<<
-  /Count 0
-  /Kids [
-  ]
-  /Type /Pages
->>
-endobj
-
 xref
-0 6
+0 8
 0000000000 65535 f 
 0000000052 00000 n 
-0000000448 00000 n 
-0000000775 00000 n 
-0000001130 00000 n 
-0000001505 00000 n 
+0000000194 00000 n 
+0000000339 00000 n 
+0000000462 00000 n 
+0000000551 00000 n 
+0000000878 00000 n 
+0000001233 00000 n 
 trailer <<
   /Root 1 0 R
-  /Size 6
+  /Size 8
   /ID [<31415926535897932384626433832795><31415926535897932384626433832795>]
 >>
 startxref
-1567
+1581
 %%EOF

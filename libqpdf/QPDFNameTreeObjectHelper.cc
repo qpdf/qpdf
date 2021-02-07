@@ -60,7 +60,8 @@ QPDFNameTreeObjectHelper
 QPDFNameTreeObjectHelper::newEmpty(QPDF& qpdf, bool auto_repair)
 {
     return QPDFNameTreeObjectHelper(
-        QPDFObjectHandle::parse("<< /Names [] >>"), qpdf, auto_repair);
+        qpdf.makeIndirectObject(
+            QPDFObjectHandle::parse("<< /Names [] >>")), qpdf, auto_repair);
 }
 
 QPDFNameTreeObjectHelper::iterator::iterator(

@@ -487,7 +487,7 @@ void read_from_file_test()
     Pl_Buffer b2("buffer");
     // QUtil::file_provider also exercises QUtil::pipe_file
     QUtil::file_provider("other-file")(&b2);
-    auto buf2 = b2.getBuffer();
+    PointerHolder<Buffer> buf2 = b2.getBuffer();
     assert(buf2->getSize() == size);
     assert(memcmp(buf2->getBuffer(), p, size) == 0);
 }
