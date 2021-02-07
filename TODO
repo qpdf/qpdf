@@ -90,6 +90,13 @@ Comments appear in the code prefixed by "ABI"
   QPDFNumberTreeObjectHelper constructors, NNTreeImpl can switch to
   having a QPDF reference and assume that the reference is always
   valid.
+* Use `= delete` and `= default` for constructors and destructors
+  where possible
+* Consider having setters return Class& where possible to allow for
+  use of fluent interfaces
+* Consider having addArrayItem, replaceKey, etc. return the new value
+  so you can say
+  auto oh = dict.replaceKey("/Key", QPDFObjectHandle::newSomething());
 
 Page splitting/merging
 ======================
