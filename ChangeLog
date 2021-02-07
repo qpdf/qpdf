@@ -1,3 +1,8 @@
+2021-02-07  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add new functions QUtil::pipe_file and QUtil::file_provider for
+	sending the contents of a file through a pipeline as binary data.
+
 2021-02-04  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add new option --pasword-file=file for reading the decryption

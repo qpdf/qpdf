@@ -34,6 +34,7 @@
 #include <time.h>
 
 class RandomDataProvider;
+class Pipeline;
 
 namespace QUtil
 {
@@ -118,6 +119,18 @@ namespace QUtil
     // rename_file will overwrite newname if it exists
     QPDF_DLL
     void rename_file(char const* oldname, char const* newname);
+
+    // Write the contents of filename as a binary file to the
+    // pipeline.
+    QPDF_DLL
+    void
+    pipe_file(char const* filename, Pipeline* p);
+
+    // Return a function that will send the contents of the given file
+    // through the given pipeline as binary data.
+    QPDF_DLL
+    std::function<void(Pipeline*)>
+    file_provider(std::string const& filename);
 
     QPDF_DLL
     char* copy_string(std::string const&);

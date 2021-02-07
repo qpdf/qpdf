@@ -4964,6 +4964,13 @@ print "\n";
           read/write implementation of name and number trees.
          </para>
         </listitem>
+        <listitem>
+         <para>
+          Add new functions <function>QUtil::pipe_file</function> and
+          <function>QUtil::file_provider</function> for sending the
+          contents of a file through a pipeline as binary data.
+         </para>
+        </listitem>
        </itemizedlist>
       </listitem>
       <listitem>

@@ -7,6 +7,7 @@
 #include <qpdf/QPDFSystemError.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QIntC.hh>
+#include <qpdf/Pipeline.hh>
 
 #include <cmath>
 #include <iomanip>
@@ -612,6 +613,35 @@ QUtil::rename_file(char const* oldname, char const* newname)
 #endif
 }
 
+void
+QUtil::pipe_file(char const* filename, Pipeline* p)
+{
+    // Exercised in test suite by testing file_provider.
+    FILE* f = safe_fopen(filename, "rb");
+    FileCloser fc(f);
+    size_t len = 0;
+    int constexpr size = 8192;
+    unsigned char buf[size];
+    while ((len = fread(buf, 1, size, f)) > 0)
+    {
+        p->write(buf, len);
+    }
+    p->finish();
+    if (ferror(f))
+    {
+        throw std::runtime_error(
+            std::string("failure reading file ") + filename);
+    }
+}
+
+std::function<void(Pipeline*)>
+QUtil::file_provider(std::string const& filename)
+{
+    return [filename](Pipeline* p) {
+        pipe_file(filename.c_str(), p);
+    };
+}
+
 char*
 QUtil::copy_string(std::string const& str)
 {
@@ -1018,6 +1048,7 @@ QUtil::read_file_into_memory(
     PointerHolder<char>& file_buf, size_t& size)
 {
     FILE* f = safe_fopen(filename, "rb");
+    FileCloser fc(f);
     fseek(f, 0, SEEK_END);
     size = QIntC::to_size(QUtil::tell(f));
     fseek(f, 0, SEEK_SET);
@@ -1048,7 +1079,6 @@ QUtil::read_file_into_memory(
                 uint_to_string(size));
         }
     }
-    fclose(f);
 }
 
 static bool read_char_from_FILE(char& ch, FILE* f)

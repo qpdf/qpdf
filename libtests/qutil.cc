@@ -6,6 +6,7 @@
 #include <qpdf/QUtil.hh>
 #include <qpdf/PointerHolder.hh>
 #include <qpdf/QPDFSystemError.hh>
+#include <qpdf/Pl_Buffer.hh>
 #include <string.h>
 #include <limits.h>
 #include <assert.h>
@@ -483,6 +484,12 @@ void read_from_file_test()
     assert(memcmp(p, "This file is used for qutil testing.", 36) == 0);
     assert(p[59] == static_cast<char>(13));
     assert(memcmp(p + 24641, "very long.", 10) == 0);
+    Pl_Buffer b2("buffer");
+    // QUtil::file_provider also exercises QUtil::pipe_file
+    QUtil::file_provider("other-file")(&b2);
+    auto buf2 = b2.getBuffer();
+    assert(buf2->getSize() == size);
+    assert(memcmp(buf2->getBuffer(), p, size) == 0);
 }
 
 void assert_hex_encode(std::string const& input, std::string const& expected)
