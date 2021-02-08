@@ -522,6 +522,29 @@ $td->runtest("page operations on form xobject",
 
 show_ntests();
 # ----------
+$td->notify("--- File Attachments ---");
+$n_tests += 4;
+
+open(F, ">auto-txt") or die;
+print F "from file";
+close(F);
+$td->runtest("attachments",
+	     {$td->COMMAND => "test_driver 76 minimal.pdf auto-txt"},
+	     {$td->FILE => "test76.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "test76.pdf"});
+$td->runtest("attachments",
+	     {$td->COMMAND => "test_driver 77 test76.pdf"},
+	     {$td->STRING => "test 77 done\n", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "test77.pdf"});
+
+show_ntests();
+# ----------
 $td->notify("--- Stream Replacement Tests ---");
 $n_tests += 8;
 

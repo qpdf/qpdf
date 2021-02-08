@@ -4951,6 +4951,16 @@ print "\n";
         </listitem>
         <listitem>
          <para>
+          Add new helper classes for supporting file attachments, also
+          known as embedded files. New classes are
+          <classname>QPDFEmbeddedFileDocumentHelper</classname>,
+          <classname>QPDFFileSpecObjectHelper</classname>, and
+          <classname>QPDFEFStreamObjectHelper</classname>. See their
+          respective headers for details.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
           Add <function>warn</function> to
           <classname>QPDF</classname>'s public API.
          </para>

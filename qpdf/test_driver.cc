@@ -10,6 +10,7 @@
 #include <qpdf/QPDFNameTreeObjectHelper.hh>
 #include <qpdf/QPDFPageLabelDocumentHelper.hh>
 #include <qpdf/QPDFOutlineDocumentHelper.hh>
+#include <qpdf/QPDFEmbeddedFileDocumentHelper.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/Pl_StdioFile.hh>
@@ -2710,6 +2711,67 @@ void runtest(int n, char const* filename1, char const* arg2)
         iter2 = erase4.find(420);
         iter2.remove();
         assert(iter2->first == 430);
+
+        QPDFWriter w(pdf, "a.pdf");
+        w.setStaticID(true);
+        w.setQDFMode(true);
+        w.write();
+    }
+    else if (n == 76)
+    {
+        // Embedded files. arg2 is a file to attach. Hard-code the
+        // mime type and file name for test purposes.
+        QPDFEmbeddedFileDocumentHelper efdh(pdf);
+        auto fs1 = QPDFFileSpecObjectHelper::createFileSpec(
+            pdf, "att1.txt", arg2);
+        fs1.setDescription("some text");
+        auto efs1 = QPDFEFStreamObjectHelper(fs1.getEmbeddedFileStream());
+        efs1.setSubtype("text/plain")
+            .setCreationDate("D:20210207191121-05'00'")
+            .setModDate("D:20210208001122Z");
+        efdh.replaceEmbeddedFile("att1", fs1);
+        auto efs2 = QPDFEFStreamObjectHelper::createEFStream(
+            pdf, "from string");
+        efs2.setSubtype("text/plain");
+        Pl_Buffer p("buffer");
+        p.write(QUtil::unsigned_char_pointer("from buffer"), 11);
+        p.finish();
+        auto efs3 = QPDFEFStreamObjectHelper::createEFStream(
+            pdf, p.getBuffer());
+        efs3.setSubtype("text/plain");
+        efdh.replaceEmbeddedFile(
+            "att2", QPDFFileSpecObjectHelper::createFileSpec(
+                pdf, "att2.txt", efs2));
+        auto fs3 = QPDFFileSpecObjectHelper::createFileSpec(
+            pdf, "att3.txt", efs3);
+        efdh.replaceEmbeddedFile("att3", fs3);
+        fs3.setFilename("\xcf\x80.txt", "att3.txt");
+
+        assert(efs1.getCreationDate() == "D:20210207191121-05'00'");
+        assert(efs1.getModDate() == "D:20210208001122Z");
+        assert(efs2.getSize() == 11);
+        assert(efs2.getSubtype() == "text/plain");
+        assert(QUtil::hex_encode(efs2.getChecksum()) ==
+               "2fce9c8228e360ba9b04a1bd1bf63d6b");
+
+        for (auto iter: efdh.getEmbeddedFiles())
+        {
+            std::cout << iter.first << " -> " << iter.second->getFilename()
+                      << std::endl;
+        }
+        assert(efdh.getEmbeddedFile("att1")->getFilename() == "att1.txt");
+        assert(! efdh.getEmbeddedFile("potato"));
+
+        QPDFWriter w(pdf, "a.pdf");
+        w.setStaticID(true);
+        w.setQDFMode(true);
+        w.write();
+    }
+    else if (n == 77)
+    {
+        QPDFEmbeddedFileDocumentHelper efdh(pdf);
+        assert(efdh.removeEmbeddedFile("att2"));
+        assert(! efdh.removeEmbeddedFile("att2"));
 
         QPDFWriter w(pdf, "a.pdf");
         w.setStaticID(true);
