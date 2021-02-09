@@ -23,6 +23,7 @@
 #include <fcntl.h>
 #include <memory>
 #include <locale>
+#include <regex>
 #ifndef QPDF_NO_WCHAR_T
 # include <cwchar>
 #endif
@@ -821,6 +822,108 @@ QUtil::get_current_time()
 #else
     return time(0);
 #endif
+}
+
+QUtil::QPDFTime
+QUtil::get_current_qpdf_time()
+{
+#ifdef _WIN32
+    SYSTEMTIME ltime;
+    GetLocalTime(&ltime);
+    TIME_ZONE_INFORMATION tzinfo;
+    GetTimeZoneInformation(&tzinfo);
+    return QPDFTime(static_cast<int>(ltime.wYear),
+                    static_cast<int>(ltime.wMonth),
+                    static_cast<int>(ltime.wDay),
+                    static_cast<int>(ltime.wHour),
+                    static_cast<int>(ltime.wMinute),
+                    static_cast<int>(ltime.wSecond),
+                    static_cast<int>(tzinfo.Bias));
+#else
+    struct tm ltime;
+    time_t now = time(0);
+    tzset();
+    localtime_r(&now, &ltime);
+    return QPDFTime(static_cast<int>(ltime.tm_year + 1900),
+                    static_cast<int>(ltime.tm_mon + 1),
+                    static_cast<int>(ltime.tm_mday),
+                    static_cast<int>(ltime.tm_hour),
+                    static_cast<int>(ltime.tm_min),
+                    static_cast<int>(ltime.tm_sec),
+                    static_cast<int>(timezone / 60));
+#endif
+}
+
+std::string
+QUtil::qpdf_time_to_pdf_time(QPDFTime const& qtm)
+{
+    std::string tz_offset;
+    int t = qtm.tz_delta;
+    if (t == 0)
+    {
+        tz_offset = "Z";
+    }
+    else
+    {
+        if (t < 0)
+        {
+            t = -t;
+            tz_offset += "+";
+        }
+        else
+        {
+            tz_offset += "-";
+        }
+        tz_offset +=
+            QUtil::int_to_string(t / 60, 2) + "'" +
+            QUtil::int_to_string(t % 60, 2) + "'";
+    }
+    return ("D:" +
+            QUtil::int_to_string(qtm.year, 4) +
+            QUtil::int_to_string(qtm.month, 2) +
+            QUtil::int_to_string(qtm.day, 2) +
+            QUtil::int_to_string(qtm.hour, 2) +
+            QUtil::int_to_string(qtm.minute, 2) +
+            QUtil::int_to_string(qtm.second, 2) +
+            tz_offset);
+}
+
+bool
+QUtil::pdf_time_to_qpdf_time(std::string const& str, QPDFTime* qtm)
+{
+    static std::regex pdf_date("^D:([0-9]{4})([0-9]{2})([0-9]{2})"
+                               "([0-9]{2})([0-9]{2})([0-9]{2})"
+                               "(?:(Z)|([\\+\\-])([0-9]{2})'([0-9]{2})')$");
+    std::smatch m;
+    if (! std::regex_match(str, m, pdf_date))
+    {
+        return false;
+    }
+    int tz_delta = 0;
+    auto to_i = [](std::string const& s) {
+        return QUtil::string_to_int(s.c_str());
+    };
+
+    if (m[7] == "")
+    {
+        tz_delta = ((to_i(m[9]) * 60) +
+                    to_i(m[10]));
+        if (m[8] == "+")
+        {
+            tz_delta = -tz_delta;
+        }
+    }
+    if (qtm)
+    {
+        *qtm = QPDFTime(to_i(m[1]),
+                        to_i(m[2]),
+                        to_i(m[3]),
+                        to_i(m[4]),
+                        to_i(m[5]),
+                        to_i(m[6]),
+                        tz_delta);
+    }
+    return true;
 }
 
 std::string

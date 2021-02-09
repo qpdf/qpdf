@@ -1,3 +1,9 @@
+2021-02-09  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add methods to QUtil for working with PDF timestamp strings:
+	pdf_time_to_qpdf_time, qpdf_time_to_pdf_time,
+	get_current_qpdf_time.
+
 2021-02-07  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add new functions QUtil::pipe_file and QUtil::file_provider for

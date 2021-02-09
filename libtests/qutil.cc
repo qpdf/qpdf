@@ -581,6 +581,27 @@ void rename_delete_test()
     assert_no_file("old\xcf\x80.~tmp");
 }
 
+void timestamp_test()
+{
+    auto check = [](QUtil::QPDFTime const& t) {
+        std::string pdf = QUtil::qpdf_time_to_pdf_time(t);
+        std::cout << pdf << std::endl;
+        QUtil::QPDFTime t2;
+        assert(QUtil::pdf_time_to_qpdf_time(pdf, &t2));
+        assert(QUtil::qpdf_time_to_pdf_time(t2) == pdf);
+    };
+    check(QUtil::QPDFTime(2021, 2, 9, 14, 49, 25, 300));
+    check(QUtil::QPDFTime(2021, 2, 10, 1, 19, 25, -330));
+    check(QUtil::QPDFTime(2021, 2, 9, 19, 19, 25, 0));
+    assert(! QUtil::pdf_time_to_qpdf_time("potato"));
+    // Round trip on the current time without actually printing it.
+    // Manual testing was done to ensure that we are actually getting
+    // back the current time in various timezones.
+    assert(QUtil::pdf_time_to_qpdf_time(
+               QUtil::qpdf_time_to_pdf_time(
+                   QUtil::get_current_qpdf_time())));
+}
+
 int main(int argc, char* argv[])
 {
     try
@@ -611,6 +632,8 @@ int main(int argc, char* argv[])
 	hex_encode_decode_test();
 	std::cout << "---- rename/delete" << std::endl;
 	rename_delete_test();
+	std::cout << "---- timestamp" << std::endl;
+	timestamp_test();
     }
     catch (std::exception& e)
     {

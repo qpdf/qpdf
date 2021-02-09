@@ -158,7 +158,6 @@ namespace QUtil
     QPDF_DLL
     void setLineBuf(FILE*);
 
-
     // May modify argv0
     QPDF_DLL
     char* getWhoami(char* argv0);
@@ -171,6 +170,51 @@ namespace QUtil
 
     QPDF_DLL
     time_t get_current_time();
+
+    // Portable structure representing a point in time with second
+    // granularity and time zone offset
+    struct QPDFTime
+    {
+        QPDFTime() = default;
+        QPDFTime(QPDFTime const&) = default;
+        QPDFTime& operator=(QPDFTime const&) = default;
+        QPDFTime(int year, int month, int day, int hour,
+                 int minute, int second, int tz_delta) :
+            year(year),
+            month(month),
+            day(day),
+            hour(hour),
+            minute(minute),
+            second(second),
+            tz_delta(tz_delta)
+        {
+        }
+        int year;               // actual year, no 1900 stuff
+        int month;              // 1--12
+        int day;                // 1--31
+        int hour;
+        int minute;
+        int second;
+        int tz_delta;           // minutes before UTC
+    };
+
+    QPDF_DLL
+    QPDFTime get_current_qpdf_time();
+
+    // Convert a QPDFTime structure to a PDF timestamp string, which
+    // is "D:yyyymmddhhmmss<z>" where <z> is either "Z" for UTC or
+    // "-hh'mm'" or "+hh'mm'" for timezone offset. Examples:
+    // "D:20210207161528-05'00'", "D:20210207211528Z". See
+    // get_current_qpdf_time and the QPDFTime structure above.
+    QPDF_DLL
+    std::string qpdf_time_to_pdf_time(QPDFTime const&);
+
+    // Convert a PDF timestamp string to a QPDFTime. If syntactically
+    // valid, return true and fill in qtm. If not valid, return false,
+    // and do not modify qtm. If qtm is null, just check the validity
+    // of the string.
+    QPDF_DLL
+    bool pdf_time_to_qpdf_time(std::string const&, QPDFTime* qtm = nullptr);
 
     // Return a string containing the byte representation of the UTF-8
     // encoding for the unicode value passed in.
