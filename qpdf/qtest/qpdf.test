@@ -523,7 +523,7 @@ $td->runtest("page operations on form xobject",
 show_ntests();
 # ----------
 $td->notify("--- File Attachments ---");
-$n_tests += 4;
+$n_tests += 33;
 
 open(F, ">auto-txt") or die;
 print F "from file";
@@ -532,16 +532,183 @@ $td->runtest("attachments",
 	     {$td->COMMAND => "test_driver 76 minimal.pdf auto-txt"},
 	     {$td->FILE => "test76.out", $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
+$td->runtest("show attachment",
+	     {$td->COMMAND => "qpdf --show-attachment=att1 a.pdf"},
+	     {$td->STRING => "from file", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "test76.pdf"});
-$td->runtest("attachments",
+$td->runtest("list attachments",
+	     {$td->COMMAND => "qpdf --list-attachments a.pdf"},
+	     {$td->FILE => "test76-list.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("list attachments verbose",
+	     {$td->COMMAND => "qpdf --list-attachments --verbose a.pdf"},
+	     {$td->FILE => "test76-list-verbose.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("remove attachment (test_driver)",
 	     {$td->COMMAND => "test_driver 77 test76.pdf"},
 	     {$td->STRING => "test 77 done\n", $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "test77.pdf"});
+$td->runtest("remove attachment (cli)",
+	     {$td->COMMAND => "qpdf --remove-attachment=att2 test76.pdf" .
+                  " --static-id --qdf --verbose b.pdf"},
+	     {$td->FILE => "remove-attachment.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "b.pdf"},
+             {$td->FILE => "test77.pdf"});
+$td->runtest("show missing attachment",
+	     {$td->COMMAND => "qpdf --show-attachment=att2 b.pdf"},
+	     {$td->STRING => "qpdf: attachment att2 not found\n",
+                  $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("remove missing attachment",
+	     {$td->COMMAND => "qpdf --remove-attachment=att2 b.pdf c.pdf"},
+	     {$td->STRING => "qpdf: attachment att2 not found\n",
+                  $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("add attachment: bad creation date",
+	     {$td->COMMAND => "qpdf minimal.pdf a.pdf" .
+                  " --add-attachment auto-txt --creationdate=potato --"},
+	     {$td->REGEXP => ".*potato is not a valid PDF timestamp.*",
+                  $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("add attachment: bad mod date",
+	     {$td->COMMAND => "qpdf minimal.pdf a.pdf" .
+                  " --add-attachment auto-txt --moddate=potato --"},
+	     {$td->REGEXP => ".*potato is not a valid PDF timestamp.*",
+                  $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("add attachment: bad mod date",
+	     {$td->COMMAND => "qpdf minimal.pdf a.pdf" .
+                  " --add-attachment auto-txt --mimetype=potato --"},
+	     {$td->REGEXP =>
+                  ".*mime type should be specified as type/subtype.*",
+                  $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("add attachment: trailing slash",
+	     {$td->COMMAND => "qpdf minimal.pdf a.pdf" .
+                  " --add-attachment auto-txt/ --"},
+	     {$td->REGEXP => ".*may not end with a path separator.*",
+                  $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("add attachment: trailing slash",
+	     {$td->COMMAND => "qpdf minimal.pdf a.pdf" .
+                  " --add-attachment --"},
+	     {$td->REGEXP => ".*add attachment: no path specified.*",
+                  $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+foreach my $i (qw(1 2 3))
+{
+    open(F, ">auto-$i") or die;
+    print F "attachment $i";
+    close(F);
+}
+my @dates = ("--creationdate=D:20210210091359-05'00'",
+             "--moddate=D:20210210141359Z");
+$td->runtest("add attachments",
+	     {$td->COMMAND =>
+                  [qw(qpdf minimal.pdf a.pdf --no-original-object-ids),
+                   qw(--verbose --static-id --qdf),
+                   qw(--add-attachment ./auto-1), @dates,
+                   qw(--mimetype=text/plain --),
+                   qw(--add-attachment ./auto-2 --key=auto-Two), @dates, '--',
+                   qw(--add-attachment ./auto-3 --filename=auto-Three.txt),
+                   @dates, '--description=two words', '--']},
+             {$td->FILE => "add-attachments-1.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("list attachments",
+	     {$td->COMMAND => "qpdf --list-attachments a.pdf --verbose"},
+	     {$td->FILE => "list-attachments-1.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "add-attachments-1.pdf"},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("add attachments: duplicate",
+	     {$td->COMMAND =>
+                  "qpdf a.pdf b.pdf --verbose --add-attachment ./auto-1 --"},
+             {$td->FILE => "add-attachments-duplicate.out",
+                  $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("add attachments: replace",
+	     {$td->COMMAND =>
+                  [qw(qpdf a.pdf b.pdf --no-original-object-ids),
+                   qw(--verbose --static-id --qdf),
+                   qw(--add-attachment ./auto-2 --key=auto-1 --replace),
+                   @dates, '--']},
+             {$td->FILE => "add-attachments-2.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("list attachments",
+	     {$td->COMMAND => "qpdf --list-attachments b.pdf --verbose"},
+	     {$td->FILE => "list-attachments-3.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "b.pdf"},
+	     {$td->FILE => "add-attachments-2.pdf"},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("copy attachments",
+	     {$td->COMMAND =>
+                  "qpdf --verbose --no-original-object-ids" .
+                  " --static-id --qdf minimal.pdf b.pdf" .
+                  " --copy-attachments-from a.pdf --"},
+             {$td->FILE => "copy-attachments-1.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("list attachments",
+	     {$td->COMMAND => "qpdf --list-attachments b.pdf --verbose"},
+	     {$td->FILE => "list-attachments-1.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "b.pdf"},
+	     {$td->FILE => "add-attachments-1.pdf"},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("copy attachments: duplicate",
+	     {$td->COMMAND =>
+                  "qpdf --verbose --no-original-object-ids" .
+                  " --static-id --qdf a.pdf c.pdf" .
+                  " --copy-attachments-from b.pdf --"},
+             {$td->FILE => "copy-attachments-duplicate.out",
+                  $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("copy attachments: prefix",
+	     {$td->COMMAND =>
+                  "qpdf --verbose --no-original-object-ids" .
+                  " --static-id --qdf a.pdf c.pdf" .
+                  " --copy-attachments-from b.pdf --prefix=1- --"},
+             {$td->FILE => "copy-attachments-2.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("list attachments",
+	     {$td->COMMAND => "qpdf --list-attachments c.pdf --verbose"},
+	     {$td->FILE => "list-attachments-2.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "c.pdf"},
+	     {$td->FILE => "copy-attachments-2.pdf"},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("add attachments: current date",
+	     {$td->COMMAND =>
+                  [qw(qpdf minimal.pdf a.pdf --encrypt u o 256 --),
+                   qw(--verbose --add-attachment ./auto-1 --)]},
+             {$td->FILE => "add-attachments-3.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("list attachments",
+	     {$td->COMMAND =>
+                  "qpdf --password=u --list-attachments a.pdf --verbose"},
+	     {$td->FILE => "list-attachments-4.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+# The object to show here is the one in list-attachments-4.out
+$td->runtest("check dates",
+	     {$td->COMMAND => "qpdf --show-object=6 a.pdf --password=u"},
+             {$td->REGEXP => ".*CreationDate \\(D:\\d+.*ModDate \\(D:\\d+.*",
+                  $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
 
 show_ntests();
 # ----------

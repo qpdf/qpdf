@@ -1801,6 +1801,181 @@ outfile.pdf</option>
     </itemizedlist>
    </para>
   </sect1>
+  <sect1 id="ref.attachments">
+   <title>Embedded Files/Attachments Options</title>
+   <para>
+    Starting with qpdf 10.2, you can work with file attachments in PDF
+    files from the command line. The following options are available:
+    <variablelist>
+     <varlistentry>
+      <term><option>--list-attachments</option></term>
+      <listitem>
+       <para>
+        Show the &ldquo;key&rdquo; and stream number for embedded
+        files. With <option>--verbose</option>, additional
+        information, including preferred file name, description,
+        dates, and more are also displayed. The key is usually but not
+        always equal to the file name, and is needed by some of the
+        other options.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--show-attachment=<replaceable>key</replaceable></option></term>
+      <listitem>
+       <para>
+        Write the contents of the specified attachment to standard
+        output as binary data. The key should match one of the keys
+        shown by <option>--list-attachments</option>. If specified
+        multiple times, only the last attachment will be shown.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--add-attachment <replaceable>file</replaceable> <replaceable>options</replaceable> --</option></term>
+      <listitem>
+       <para>
+        Add or replace an attachment with the contents of
+        <replaceable>file</replaceable>. This may be specified more
+        than once. The following additional options may appear before
+        the <literal>--</literal> that ends this option:
+        <variablelist>
+         <varlistentry>
+          <term><option>--key=<replaceable>key</replaceable></option></term>
+          <listitem>
+           <para>
+            The key to use to register the attachment in the embedded
+            files table. Defaults to the last path element of
+            <replaceable>file</replaceable>.
+           </para>
+          </listitem>
+         </varlistentry>
+         <varlistentry>
+          <term><option>--filename=<replaceable>name</replaceable></option></term>
+          <listitem>
+           <para>
+            The file name to be used for the attachment. This is what is usually
+            displayed to the user and is the name most graphical PDF
+            viewers will use when saving a file. It defaults to the
+            last path element of <replaceable>file</replaceable>.
+           </para>
+          </listitem>
+         </varlistentry>
+         <varlistentry>
+          <term><option>--creationdate=<replaceable>date</replaceable></option></term>
+          <listitem>
+           <para>
+            The attachment's creation date in PDF format; defaults to
+            the current time. The date format is explained below.
+           </para>
+          </listitem>
+         </varlistentry>
+         <varlistentry>
+          <term><option>--moddate=<replaceable>date</replaceable></option></term>
+          <listitem>
+           <para>
+            The attachment's modification date in PDF format; defaults
+            to the current time. The date format is explained below.
+           </para>
+          </listitem>
+         </varlistentry>
+         <varlistentry>
+          <term><option>--mimetype=<replaceable>type/subtype</replaceable></option></term>
+          <listitem>
+           <para>
+            The mime type for the attachment, e.g.
+            <literal>text/plain</literal> or
+            <literal>application/pdf</literal>. Note that the mimetype
+            appears in a field called <literal>/Subtype</literal> in
+            the PDF but actually includes the full type and subtype of
+            the mime type.
+           </para>
+          </listitem>
+         </varlistentry>
+         <varlistentry>
+          <term><option>--description=<replaceable>&quot;text&quot;</replaceable></option></term>
+          <listitem>
+           <para>
+            Descriptive text for the attachment, displayed by some PDF
+            viewers.
+           </para>
+          </listitem>
+         </varlistentry>
+         <varlistentry>
+          <term><option>--replace</option></term>
+          <listitem>
+           <para>
+            Indicates that any existing attachment with the same key
+            should be replaced by the new attachment. Otherwise,
+            <command>qpdf</command> gives an error if an attachment
+            with that key is already present.
+           </para>
+          </listitem>
+         </varlistentry>
+        </variablelist>
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--remove-attachment=<replaceable>key</replaceable></option></term>
+      <listitem>
+       <para>
+        Remove the specified attachment. This doesn't only remove the
+        attachment from the embedded files table but also clears out
+        the file specification. That means that any potential internal
+        links to the attachment will be broken. This option may be
+        specified multiple times. Run with <option>--verbose</option>
+        to see status of the removal.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><option>--copy-attachments-from <replaceable>file</replaceable> <replaceable>options</replaceable> --</option></term>
+      <listitem>
+       <para>
+        Copy attachments from another file. This may be specified more
+        than once. The following additional options may appear before
+        the <literal>--</literal> that ends this option:
+        <variablelist>
+         <varlistentry>
+          <term><option>--password=<replaceable>password</replaceable></option></term>
+          <listitem>
+           <para>
+            If required, the password needed to open
+            <replaceable>file</replaceable>
+           </para>
+          </listitem>
+         </varlistentry>
+         <varlistentry>
+          <term><option>--prefix=<replaceable>prefix</replaceable></option></term>
+          <listitem>
+           <para>
+            Only required if the file from which attachments are being
+            copied has attachments with keys that conflict with
+            attachments already in the file. In this case, the
+            specified prefix will be prepended to each key. This
+            affects only the key in the embedded files table, not the
+            file name. The PDF specification doesn't preclude multiple
+            attachments having the same file name.
+           </para>
+          </listitem>
+         </varlistentry>
+        </variablelist>
+       </para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+    When a date is required, the date should conform to the PDF date
+    format specification, which is
+    <literal>D:</literal><replaceable>yyyymmddhhmmss&lt;z&gt;</replaceable>,
+    where <replaceable>&lt;z&gt;</replaceable> is either
+    <literal>Z</literal> for UTC or a timezone offset in the form
+    <replaceable>-hh'mm'</replaceable> or
+    <replaceable>+hh'mm'</replaceable>. Examples:
+    <literal>D:20210207161528-05'00'</literal>,
+    <literal>D:20210207211528Z</literal>.
+   </para>
+  </sect1>
   <sect1 id="ref.advanced-parsing">
    <title>Advanced Parsing Options</title>
    <para>
@@ -4911,6 +5086,13 @@ print "\n";
         CLI Enhancements
        </para>
        <itemizedlist>
+        <listitem>
+         <para>
+          Add new command line options for listing, saving, adding,
+          removing, and and copying file attachments. See <xref
+          linkend="ref.attachments"/> for details.
+         </para>
+        </listitem>
         <listitem>
          <para>
           The option

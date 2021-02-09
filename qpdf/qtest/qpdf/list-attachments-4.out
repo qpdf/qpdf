@@ -1,0 +1,8 @@
+auto-1 -> 6,0
+  preferred name: auto-1
+  all names:
+    /F -> auto-1
+    /UF -> auto-1
+  all data streams:
+    /F -> 6,0
+    /UF -> 6,0

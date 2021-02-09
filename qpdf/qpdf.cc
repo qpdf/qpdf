@@ -26,6 +26,7 @@
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFSystemError.hh>
 #include <qpdf/QPDFCryptoProvider.hh>
+#include <qpdf/QPDFEmbeddedFileDocumentHelper.hh>
 
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QIntC.hh>
@@ -94,6 +95,31 @@ struct UnderOverlay
     std::vector<int> from_pagenos;
     std::vector<int> repeat_pagenos;
 };
+
+struct AddAttachment
+{
+    AddAttachment() :
+        replace(false)
+    {
+    }
+
+    std::string path;
+    std::string key;
+    std::string filename;
+    std::string creationdate;
+    std::string moddate;
+    std::string mimetype;
+    std::string description;
+    bool replace;
+};
+
+struct CopyAttachmentFrom
+{
+    std::string path;
+    std::string password;
+    std::string prefix;
+};
+
 
 enum remove_unref_e { re_auto, re_yes, re_no };
 
@@ -177,6 +203,7 @@ struct Options
         show_page_images(false),
         collate(false),
         flatten_rotation(false),
+        list_attachments(false),
         json(false),
         check(false),
         optimize_images(false),
@@ -282,6 +309,11 @@ struct Options
     bool show_page_images;
     bool collate;
     bool flatten_rotation;
+    bool list_attachments;
+    std::string attachment_to_show;
+    std::list<std::string> attachments_to_remove;
+    std::list<AddAttachment> attachments_to_add;
+    std::list<CopyAttachmentFrom> attachments_to_copy;
     bool json;
     std::set<std::string> json_keys;
     std::set<std::string> json_objects;
@@ -758,6 +790,11 @@ class ArgParser
     void argRotate(char* parameter);
     void argCollate();
     void argFlattenRotation();
+    void argListAttachments();
+    void argShowAttachment(char* parameter);
+    void argRemoveAttachment(char* parameter);
+    void argAddAttachment();
+    void argCopyAttachments();
     void argStreamData(char* parameter);
     void argCompressStreams(char* parameter);
     void argRecompressFlate();
@@ -838,6 +875,19 @@ class ArgParser
     void argReplaceInput();
     void argIsEncrypted();
     void argRequiresPassword();
+    void argAApositional(char* arg);
+    void argAAKey(char* parameter);
+    void argAAFilename(char* parameter);
+    void argAACreationDate(char* parameter);
+    void argAAModDate(char* parameter);
+    void argAAMimeType(char* parameter);
+    void argAADescription(char* parameter);
+    void argAAReplace();
+    void argEndAddAttachment();
+    void argCApositional(char* arg);
+    void argCAprefix(char* parameter);
+    void argCApassword(char* parameter);
+    void argEndCopyAttachments();
 
     void usage(std::string const& message);
     void checkCompletion();
@@ -874,6 +924,8 @@ class ArgParser
     std::map<std::string, OptionEntry> encrypt128_option_table;
     std::map<std::string, OptionEntry> encrypt256_option_table;
     std::map<std::string, OptionEntry> under_overlay_option_table;
+    std::map<std::string, OptionEntry> add_attachment_option_table;
+    std::map<std::string, OptionEntry> copy_attachments_option_table;
     std::vector<PointerHolder<char> > new_argv;
     std::vector<PointerHolder<char> > bash_argv;
     PointerHolder<char*> argv_ph;
@@ -982,6 +1034,13 @@ ArgParser::initOptionTable()
         {"compress", "preserve", "uncompress", 0};
     (*t)["collate"] = oe_bare(&ArgParser::argCollate);
     (*t)["flatten-rotation"] = oe_bare(&ArgParser::argFlattenRotation);
+    (*t)["list-attachments"] = oe_bare(&ArgParser::argListAttachments);
+    (*t)["show-attachment"] = oe_requiredParameter(
+        &ArgParser::argShowAttachment, "attachment-key");
+    (*t)["remove-attachment"] = oe_requiredParameter(
+        &ArgParser::argRemoveAttachment, "attachment-key");
+    (*t)["add-attachment"] = oe_bare(&ArgParser::argAddAttachment);
+    (*t)["copy-attachments-from"] = oe_bare(&ArgParser::argCopyAttachments);
     (*t)["stream-data"] = oe_requiredChoices(
         &ArgParser::argStreamData, stream_data_choices);
     (*t)["compress-streams"] = oe_requiredChoices(
@@ -1129,6 +1188,31 @@ ArgParser::initOptionTable()
     (*t)["password"] = oe_requiredParameter(
         &ArgParser::argUOpassword, "password");
     (*t)["--"] = oe_bare(&ArgParser::argEndUnderOverlay);
+
+    t = &this->add_attachment_option_table;
+    (*t)[""] = oe_positional(&ArgParser::argAApositional);
+    (*t)["key"] = oe_requiredParameter(
+        &ArgParser::argAAKey, "attachment-key");
+    (*t)["filename"] = oe_requiredParameter(
+        &ArgParser::argAAFilename, "filename");
+    (*t)["creationdate"] = oe_requiredParameter(
+        &ArgParser::argAACreationDate, "creation-date");
+    (*t)["moddate"] = oe_requiredParameter(
+        &ArgParser::argAAModDate, "modification-date");
+    (*t)["mimetype"] = oe_requiredParameter(
+        &ArgParser::argAAMimeType, "mime/type");
+    (*t)["description"] = oe_requiredParameter(
+        &ArgParser::argAADescription, "description");
+    (*t)["replace"] = oe_bare(&ArgParser::argAAReplace);
+    (*t)["--"] = oe_bare(&ArgParser::argEndAddAttachment);
+
+    t = &this->copy_attachments_option_table;
+    (*t)[""] = oe_positional(&ArgParser::argCApositional);
+    (*t)["prefix"] = oe_requiredParameter(
+        &ArgParser::argCAprefix, "prefix");
+    (*t)["password"] = oe_requiredParameter(
+        &ArgParser::argCApassword, "password");
+    (*t)["--"] = oe_bare(&ArgParser::argEndCopyAttachments);
 }
 
 void
@@ -1361,7 +1445,6 @@ ArgParser::argHelp()
         << "    --allow-insecure         allow the owner password to be empty when the\n"
         << "                             user password is not empty\n"
         << "\n"
-        << "\n"
         << "    print-opt may be:\n"
         << "\n"
         << "      full                  allow full printing\n"
@@ -1485,6 +1568,55 @@ ArgParser::argHelp()
         << "  --from:   the pages from the overlay/underlay file that are used\n"
         << "  --repeat: pages from the overlay/underlay that are repeated after\n"
         << "            any \"from\" pages have been exhausted\n"
+        << "\n"
+        << "\n"
+        << "Embedded Files/Attachments Options\n"
+        << "----------------------------------\n"
+        << "\n"
+        << "These options can be used to work with embedded files, also known as\n"
+        << "attachments.\n"
+        << "\n"
+        << "--list-attachments        show key and stream number for embedded files;\n"
+        << "                          combine with --verbose for more detailed information\n"
+        << "--show-attachment=key     write the contents of the specified attachment to\n"
+        << "                          standard output as binary data\n"
+        << "--add-attachment file options --\n"
+        << "                          add or replace an attachment\n"
+        << "--remove-attachment=key   remove the specified attachment; repeatable\n"
+        << "--copy-attachments-from file options --\n"
+        << "                          copy attachments from another file\n"
+        << "\n"
+        << "The \"key\" option is the unique name under which the attachment is registered\n"
+        << "within the PDF file. You can get this using the --list-attachments option. This\n"
+        << "is usually the same as the filename, but it doesn't have to be.\n"
+        << "\n"
+        << "Options for adding attachments:\n"
+        << "\n"
+        << "  file                    path to the file to attach\n"
+        << "  --key=key               the name of this in the embedded files table;\n"
+        << "                          defaults to the last path element of file\n"
+        << "  --filename=name         the file name of the attachment; this is what is\n"
+        << "                          usually displayed to the user; defaults to the\n"
+        << "                          last path element of file\n"
+        << "  --creationdate=date     creation date in PDF format; defaults to the\n"
+        << "                          current time\n"
+        << "  --moddate=date          modification date in PDF format; defaults to the\n"
+        << "                          current time\n"
+        << "  --mimetype=type/subtype   mime type of attachment (e.g. application/pdf)\n"
+        << "  --description=\"text\"    attachment description\n"
+        << "  --replace               replace any existing attachment with the same key\n"
+        << "\n"
+        << "Options for copying attachments:\n"
+        << "\n"
+        << "  file                    file whose attachments should be copied\n"
+        << "  --password=password     password to open the other file, if needed\n"
+        << "  --prefix=prefix         a prefix to insert in front of each key;\n"
+        << "                          required if needed to ensure each attachment\n"
+        << "                          has a unique key\n"
+        << "\n"
+        << "Date format: D:yyyymmddhhmmss<z> where <z> is either Z for UTC or a timezone\n"
+        << "offset in the form -hh'mm' or +hh'mm'.\n"
+        << "Examples: D:20210207161528-05'00', D:20210207211528Z\n"
         << "\n"
         << "\n"
         << "Advanced Parsing Options\n"
@@ -1958,6 +2090,40 @@ void
 ArgParser::argFlattenRotation()
 {
     o.flatten_rotation = true;
+}
+
+void
+ArgParser::argListAttachments()
+{
+    o.list_attachments = true;
+    o.require_outfile = false;
+}
+
+void
+ArgParser::argShowAttachment(char* parameter)
+{
+    o.attachment_to_show = parameter;
+    o.require_outfile = false;
+}
+
+void
+ArgParser::argRemoveAttachment(char* parameter)
+{
+    o.attachments_to_remove.push_back(parameter);
+}
+
+void
+ArgParser::argAddAttachment()
+{
+    this->option_table = &(this->add_attachment_option_table);
+    o.attachments_to_add.push_back(AddAttachment());
+}
+
+void
+ArgParser::argCopyAttachments()
+{
+    this->option_table = &(this->copy_attachments_option_table);
+    o.attachments_to_copy.push_back(CopyAttachmentFrom());
 }
 
 void
@@ -2615,6 +2781,134 @@ ArgParser::argRequiresPassword()
 {
     o.check_requires_password = true;
     o.require_outfile = false;
+}
+
+void
+ArgParser::argAApositional(char* arg)
+{
+    o.attachments_to_add.back().path = arg;
+}
+
+void
+ArgParser::argAAKey(char* parameter)
+{
+    o.attachments_to_add.back().key = parameter;
+}
+
+void
+ArgParser::argAAFilename(char* parameter)
+{
+    o.attachments_to_add.back().filename = parameter;
+}
+
+void
+ArgParser::argAACreationDate(char* parameter)
+{
+    if (! QUtil::pdf_time_to_qpdf_time(parameter))
+    {
+        usage(std::string(parameter) + " is not a valid PDF timestamp");
+    }
+    o.attachments_to_add.back().creationdate = parameter;
+}
+
+void
+ArgParser::argAAModDate(char* parameter)
+{
+    if (! QUtil::pdf_time_to_qpdf_time(parameter))
+    {
+        usage(std::string(parameter) + " is not a valid PDF timestamp");
+    }
+    o.attachments_to_add.back().moddate = parameter;
+}
+
+void
+ArgParser::argAAMimeType(char* parameter)
+{
+    if (strchr(parameter, '/') == nullptr)
+    {
+        usage("mime type should be specified as type/subtype");
+    }
+    o.attachments_to_add.back().mimetype = parameter;
+}
+
+void
+ArgParser::argAADescription(char* parameter)
+{
+    o.attachments_to_add.back().description = parameter;
+}
+
+void
+ArgParser::argAAReplace()
+{
+    o.attachments_to_add.back().replace = true;
+}
+
+void
+ArgParser::argEndAddAttachment()
+{
+    static std::string now = QUtil::qpdf_time_to_pdf_time(
+        QUtil::get_current_qpdf_time());
+    this->option_table = &(this->main_option_table);
+    auto& cur = o.attachments_to_add.back();
+    if (cur.path.empty())
+    {
+        usage("add attachment: no path specified");
+    }
+    std::string last_element = cur.path;
+    size_t pathsep = cur.path.find_last_of("/\\");
+    if (pathsep != std::string::npos)
+    {
+        last_element = cur.path.substr(pathsep + 1);
+        if (last_element.empty())
+        {
+            usage("path for --add-attachment may not end"
+                  " with a path separator");
+        }
+    }
+    if (cur.filename.empty())
+    {
+        cur.filename = last_element;
+    }
+    if (cur.key.empty())
+    {
+        cur.key = last_element;
+    }
+    if (cur.creationdate.empty())
+    {
+        cur.creationdate = now;
+    }
+    if (cur.moddate.empty())
+    {
+        cur.moddate = now;
+    }
+}
+
+void
+ArgParser::argCApositional(char* arg)
+{
+    o.attachments_to_copy.back().path = arg;
+}
+
+void
+ArgParser::argCAprefix(char* parameter)
+{
+    o.attachments_to_copy.back().prefix = parameter;
+}
+
+void
+ArgParser::argCApassword(char* parameter)
+{
+    o.attachments_to_copy.back().password = parameter;
+}
+
+void
+ArgParser::argEndCopyAttachments()
+{
+    this->option_table = &(this->main_option_table);
+    if (o.attachments_to_copy.back().path.empty())
+    {
+        usage("copy attachments: no path specified");
+    }
 }
 
 void
@@ -3768,6 +4062,66 @@ static void do_show_pages(QPDF& pdf, Options& o)
     }
 }
 
+static void do_list_attachments(QPDF& pdf, Options& o)
+{
+    QPDFEmbeddedFileDocumentHelper efdh(pdf);
+    if (efdh.hasEmbeddedFiles())
+    {
+        for (auto const& i: efdh.getEmbeddedFiles())
+        {
+            std::string const& key = i.first;
+            auto efoh = i.second;
+            std::cout << key << " -> "
+                      << efoh->getEmbeddedFileStream().getObjGen()
+                      << std::endl;
+            if (o.verbose)
+            {
+                auto desc = efoh->getDescription();
+                if (! desc.empty())
+                {
+                    std::cout << "  description: " << desc << std::endl;
+                }
+                std::cout << "  preferred name: " << efoh->getFilename()
+                          << std::endl;
+                std::cout << "  all names:" << std::endl;
+                for (auto const& i2: efoh->getFilenames())
+                {
+                    std::cout << "    " << i2.first << " -> " << i2.second
+                              << std::endl;
+                }
+                std::cout << "  all data streams:" << std::endl;
+                for (auto i2: QPDFDictItems(efoh->getEmbeddedFileStreams()))
+                {
+                    std::cout << "    " << i2.first << " -> "
+                              << i2.second.getObjGen()
+                              << std::endl;
+                }
+            }
+        }
+    }
+    else
+    {
+        std::cout << o.infilename << " has no embedded files" << std::endl;
+    }
+}
+
+static void do_show_attachment(QPDF& pdf, Options& o, int& exit_code)
+{
+    QPDFEmbeddedFileDocumentHelper efdh(pdf);
+    auto fs = efdh.getEmbeddedFile(o.attachment_to_show);
+    if (! fs)
+    {
+        std::cerr << whoami << ": attachment " << o.attachment_to_show
+                  << " not found" << std::endl;
+        exit_code = EXIT_ERROR;
+        return;
+    }
+    auto efs = fs->getEmbeddedFileStream();
+    QUtil::binary_stdout();
+    Pl_StdioFile out("stdout", stdout);
+    efs.pipeStreamData(&out, 0, qpdf_dl_all);
+}
+
 static std::set<QPDFObjGen>
 get_wanted_json_objects(Options& o)
 {
@@ -4354,6 +4708,14 @@ static void do_inspection(QPDF& pdf, Options& o)
     {
         do_show_pages(pdf, o);
     }
+    if (o.list_attachments)
+    {
+        do_list_attachments(pdf, o);
+    }
+    if (! o.attachment_to_show.empty())
+    {
+        do_show_attachment(pdf, o, exit_code);
+    }
     if ((! pdf.getWarnings().empty()) && (exit_code != EXIT_ERROR))
     {
         std::cerr << whoami
@@ -4858,7 +5220,106 @@ static void handle_under_overlay(QPDF& pdf, Options& o)
     }
 }
 
-static void handle_transformations(QPDF& pdf, Options& o)
+static void maybe_set_pagemode(QPDF& pdf, std::string const& pagemode)
+{
+    auto root = pdf.getRoot();
+    if (root.getKey("/PageMode").isNull())
+    {
+        root.replaceKey("/PageMode", QPDFObjectHandle::newName(pagemode));
+    }
+}
+
+static void add_attachments(QPDF& pdf, Options& o, int& exit_code)
+{
+    maybe_set_pagemode(pdf, "/UseAttachments");
+    QPDFEmbeddedFileDocumentHelper efdh(pdf);
+    for (auto const& to_add: o.attachments_to_add)
+    {
+        if ((! to_add.replace) && efdh.getEmbeddedFile(to_add.key))
+        {
+            std::cerr << whoami << ": " << pdf.getFilename()
+                      << " already has an attachment with key = "
+                      << to_add.key << "; use --replace to replace"
+                      << " or --key to specificy a different key"
+                      << std::endl;
+            exit_code = EXIT_ERROR;
+            continue;
+        }
+
+        auto fs = QPDFFileSpecObjectHelper::createFileSpec(
+            pdf, to_add.filename, to_add.path);
+        if (! to_add.description.empty())
+        {
+            fs.setDescription(to_add.description);
+        }
+        auto efs = QPDFEFStreamObjectHelper(fs.getEmbeddedFileStream());
+        efs.setCreationDate(to_add.creationdate)
+            .setModDate(to_add.moddate);
+        if (! to_add.mimetype.empty())
+        {
+            efs.setSubtype(to_add.mimetype);
+        }
+
+        efdh.replaceEmbeddedFile(to_add.key, fs);
+        if (o.verbose)
+        {
+            std::cout << whoami << ": attached " << to_add.path
+                      << " as " << to_add.filename
+                      << " with key " << to_add.key << std::endl;
+        }
+    }
+}
+
+static void copy_attachments(QPDF& pdf, Options& o, int& exit_code)
+{
+    maybe_set_pagemode(pdf, "/UseAttachments");
+    QPDFEmbeddedFileDocumentHelper efdh(pdf);
+    for (auto const& to_copy: o.attachments_to_copy)
+    {
+        auto other = process_file(
+            to_copy.path.c_str(), to_copy.password.c_str(), o);
+        QPDFEmbeddedFileDocumentHelper other_efdh(*other);
+        auto other_attachments = other_efdh.getEmbeddedFiles();
+        for (auto const& iter: other_attachments)
+        {
+            if (o.verbose)
+            {
+                std::cout << whoami << ": copying attachments from "
+                          << to_copy.path << std::endl;
+            }
+            std::string new_key = to_copy.prefix + iter.first;
+            if (efdh.getEmbeddedFile(new_key))
+            {
+                exit_code = EXIT_ERROR;
+                std::cerr << whoami << to_copy.path << " and "
+                          << pdf.getFilename()
+                          << " both have attachments with key " << new_key
+                          << "; use --prefix with --copy-attachments-from"
+                          << " or manually copy individual attachments"
+                          << std::endl;
+            }
+            else
+            {
+                auto new_fs_oh = pdf.copyForeignObject(
+                    iter.second->getObjectHandle());
+                efdh.replaceEmbeddedFile(
+                    new_key, QPDFFileSpecObjectHelper(new_fs_oh));
+                if (o.verbose)
+                {
+                    std::cout << "  " << iter.first << " -> " << new_key
+                              << std::endl;
+                }
+            }
+        }
+
+        if ((other->anyWarnings()) && (exit_code == 0))
+        {
+            exit_code = EXIT_WARNING;
+        }
+    }
+}
+
+static void handle_transformations(QPDF& pdf, Options& o, int& exit_code)
 {
     QPDFPageDocumentHelper dh(pdf);
     if (o.externalize_inline_images)
@@ -4934,6 +5395,35 @@ static void handle_transformations(QPDF& pdf, Options& o)
     if (o.remove_page_labels)
     {
         pdf.getRoot().removeKey("/PageLabels");
+    }
+    if (! o.attachments_to_remove.empty())
+    {
+        QPDFEmbeddedFileDocumentHelper efdh(pdf);
+        for (auto const& key: o.attachments_to_remove)
+        {
+            if (efdh.removeEmbeddedFile(key))
+            {
+                if (o.verbose)
+                {
+                    std::cout << whoami <<
+                        ": removed attachment " << key << std::endl;
+                }
+            }
+            else
+            {
+                std::cerr << whoami <<
+                    ": attachment " << key << " not found" << std::endl;
+                exit_code = EXIT_ERROR;
+            }
+        }
+    }
+    if (! o.attachments_to_add.empty())
+    {
+        add_attachments(pdf, o, exit_code);
+    }
+    if (! o.attachments_to_copy.empty())
+    {
+        copy_attachments(pdf, o, exit_code);
     }
 }
 
@@ -5854,6 +6344,7 @@ int realmain(int argc, char* argv[])
     Options o;
     ArgParser ap(argc, argv, o);
 
+    int exit_code = 0;
     try
     {
         ap.parseOptions();
@@ -5906,7 +6397,7 @@ int realmain(int argc, char* argv[])
             handle_rotations(pdf, o);
         }
         handle_under_overlay(pdf, o);
-        handle_transformations(pdf, o);
+        handle_transformations(pdf, o, exit_code);
 
 	if ((o.outfilename == 0) && (! o.replace_input))
 	{
@@ -5929,7 +6420,10 @@ int realmain(int argc, char* argv[])
                           << std::endl;
             }
             // Still return with warning code even if warnings were suppressed.
-            return EXIT_WARNING;
+            if (exit_code == 0)
+            {
+                exit_code = EXIT_WARNING;
+            }
 	}
     }
     catch (std::exception& e)
@@ -5938,7 +6432,7 @@ int realmain(int argc, char* argv[])
 	return EXIT_ERROR;
     }
 
-    return 0;
+    return exit_code;
 }
 
 #ifdef WINDOWS_WMAIN

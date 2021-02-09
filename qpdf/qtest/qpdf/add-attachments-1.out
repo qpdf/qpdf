@@ -1,0 +1,4 @@
+qpdf: attached ./auto-1 as auto-1 with key auto-1
+qpdf: attached ./auto-2 as auto-2 with key auto-Two
+qpdf: attached ./auto-3 as auto-Three.txt with key auto-3
+qpdf: wrote file a.pdf

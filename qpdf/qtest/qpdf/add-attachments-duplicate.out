@@ -1,0 +1,2 @@
+qpdf: a.pdf already has an attachment with key = auto-1; use --replace to replace or --key to specificy a different key
+qpdf: wrote file b.pdf

@@ -1,0 +1,25 @@
+auto-1 -> 8,0
+  preferred name: auto-1
+  all names:
+    /F -> auto-1
+    /UF -> auto-1
+  all data streams:
+    /F -> 8,0
+    /UF -> 8,0
+auto-3 -> 10,0
+  description: two words
+  preferred name: auto-Three.txt
+  all names:
+    /F -> auto-Three.txt
+    /UF -> auto-Three.txt
+  all data streams:
+    /F -> 10,0
+    /UF -> 10,0
+auto-Two -> 12,0
+  preferred name: auto-2
+  all names:
+    /F -> auto-2
+    /UF -> auto-2
+  all data streams:
+    /F -> 12,0
+    /UF -> 12,0

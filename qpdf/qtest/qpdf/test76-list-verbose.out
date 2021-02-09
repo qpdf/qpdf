@@ -1,0 +1,25 @@
+att1 -> 8,0
+  description: some text
+  preferred name: att1.txt
+  all names:
+    /F -> att1.txt
+    /UF -> att1.txt
+  all data streams:
+    /F -> 8,0
+    /UF -> 8,0
+att2 -> 10,0
+  preferred name: att2.txt
+  all names:
+    /F -> att2.txt
+    /UF -> att2.txt
+  all data streams:
+    /F -> 10,0
+    /UF -> 10,0
+att3 -> 12,0
+  preferred name: π.txt
+  all names:
+    /F -> att3.txt
+    /UF -> π.txt
+  all data streams:
+    /F -> 12,0
+    /UF -> 12,0
