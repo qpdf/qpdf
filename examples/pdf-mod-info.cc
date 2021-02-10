@@ -9,13 +9,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#ifdef _WIN32
-#include <windows.h>
-#include <direct.h>
-#include <io.h>
-#else
-#include <unistd.h>
-#endif
 
 static char const* version = "1.1";
 static char const* whoami = 0;

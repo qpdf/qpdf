@@ -1,7 +1,8 @@
 #ifdef _WIN32
-#include <windows.h>
-#include <direct.h>
-#include <io.h>
+# define WIN32_LEAN_AND_MEAN
+# include <windows.h>
+# include <direct.h>
+# include <io.h>
 #endif
 
 #include <iostream>
