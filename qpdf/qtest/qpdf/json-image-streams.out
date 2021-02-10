@@ -4,6 +4,7 @@
     "hasacroform": false,
     "needappearances": false
   },
+  "attachments": {},
   "encrypt": {
     "capabilities": {
       "accessibility": true,

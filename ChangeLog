@@ -1,5 +1,8 @@
 2021-02-10  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add "attachments" as an additional json key, and add some
+	information about attachments to the json output.
+
 	* Add new command-line arguments for operating on attachments:
 	--list-attachments, --add-attachment, --remove-attachment,
 	--copy-attachments-from. See --help and manual for details.

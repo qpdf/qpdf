@@ -1,0 +1,23 @@
+{
+  "attachments": {
+    "att1": {
+      "filespec": "4 0 R",
+      "preferredcontents": "8 0 R",
+      "preferredname": "att1.txt"
+    },
+    "att2": {
+      "filespec": "5 0 R",
+      "preferredcontents": "10 0 R",
+      "preferredname": "att2.txt"
+    },
+    "att3": {
+      "filespec": "6 0 R",
+      "preferredcontents": "12 0 R",
+      "preferredname": "π.txt"
+    }
+  },
+  "parameters": {
+    "decodelevel": "generalized"
+  },
+  "version": 1
+}

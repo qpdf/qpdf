@@ -523,7 +523,7 @@ $td->runtest("page operations on form xobject",
 show_ntests();
 # ----------
 $td->notify("--- File Attachments ---");
-$n_tests += 33;
+$n_tests += 34;
 
 open(F, ">auto-txt") or die;
 print F "from file";
@@ -546,6 +546,10 @@ $td->runtest("list attachments",
 $td->runtest("list attachments verbose",
 	     {$td->COMMAND => "qpdf --list-attachments --verbose a.pdf"},
 	     {$td->FILE => "test76-list-verbose.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("attachments json",
+	     {$td->COMMAND => "qpdf --json --json-key=attachments a.pdf"},
+	     {$td->FILE => "test76-json.out", $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("remove attachment (test_driver)",
 	     {$td->COMMAND => "test_driver 77 test76.pdf"},

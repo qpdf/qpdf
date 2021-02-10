@@ -699,6 +699,22 @@ static JSON json_schema(std::set<std::string>* keys = 0)
             "filemethod",
             JSON::makeString("encryption method for attachments"));
     }
+    if (all_keys || keys->count("attachments"))
+    {
+        JSON attachments = schema.addDictionaryMember(
+            "attachments", JSON::makeDictionary());
+        JSON details = attachments.addDictionaryMember(
+            "<attachment-key>", JSON::makeDictionary());
+        details.addDictionaryMember(
+            "filespec",
+            JSON::makeString("object containing the file spec"));
+        details.addDictionaryMember(
+            "preferredname",
+            JSON::makeString("most preferred file name"));
+        details.addDictionaryMember(
+            "preferredcontents",
+            JSON::makeString("most preferred embedded file stream"));
+    }
     return schema;
 }
 
@@ -1114,7 +1130,7 @@ ArgParser::initOptionTable()
     // places: json_schema, do_json, and initOptionTable.
     char const* json_key_choices[] = {
         "objects", "objectinfo", "pages", "pagelabels", "outlines",
-        "acroform", "encrypt", 0};
+        "acroform", "encrypt", "attachments", 0};
     (*t)["json-key"] = oe_requiredChoices(
         &ArgParser::argJsonKey, json_key_choices);
     (*t)["json-object"] = oe_requiredParameter(
@@ -4568,6 +4584,28 @@ static void do_json_encrypt(QPDF& pdf, Options& o, JSON& j)
         "filemethod", JSON::makeString(s_file_method));
 }
 
+static void do_json_attachments(QPDF& pdf, Options& o, JSON& j)
+{
+    JSON j_attachments = j.addDictionaryMember(
+        "attachments", JSON::makeDictionary());
+    QPDFEmbeddedFileDocumentHelper efdh(pdf);
+    for (auto const& iter: efdh.getEmbeddedFiles())
+    {
+        std::string const& key = iter.first;
+        auto fsoh = iter.second;
+        auto j_details = j_attachments.addDictionaryMember(
+            key, JSON::makeDictionary());
+        j_details.addDictionaryMember(
+            "filespec",
+            JSON::makeString(fsoh->getObjectHandle().unparse()));
+        j_details.addDictionaryMember(
+            "preferredname", JSON::makeString(fsoh->getFilename()));
+        j_details.addDictionaryMember(
+            "preferredcontents",
+            JSON::makeString(fsoh->getEmbeddedFileStream().unparse()));
+    }
+}
+
 static void do_json(QPDF& pdf, Options& o)
 {
     JSON j = JSON::makeDictionary();
@@ -4627,6 +4665,10 @@ static void do_json(QPDF& pdf, Options& o)
     if (all_keys || o.json_keys.count("encrypt"))
     {
         do_json_encrypt(pdf, o, j);
+    }
+    if (all_keys || o.json_keys.count("attachments"))
+    {
+        do_json_attachments(pdf, o, j);
     }
 
     // Check against schema

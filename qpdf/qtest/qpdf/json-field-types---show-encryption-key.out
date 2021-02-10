@@ -385,6 +385,7 @@
     "hasacroform": true,
     "needappearances": true
   },
+  "attachments": {},
   "encrypt": {
     "capabilities": {
       "accessibility": true,

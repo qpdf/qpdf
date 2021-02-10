@@ -5104,6 +5104,19 @@ print "\n";
           than using <option>@file</option> for this purpose.
          </para>
         </listitem>
+        <listitem>
+         <para>
+          Add some information about attachments to the json output,
+          and added <literal>attachments</literal> as an additional
+          json key. The information included here is limited to the
+          preferred name and content stream and a reference to the
+          file spec object. This is enough detail for clients to avoid
+          the hassle of navigating a name tree and provides what is
+          needed for basic enumeration and extraction of attachments.
+          More detailed information can be obtained by following the
+          reference to the file spec object.
+         </para>
+        </listitem>
        </itemizedlist>
       </listitem>
       <listitem>
