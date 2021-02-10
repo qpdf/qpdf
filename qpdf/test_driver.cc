@@ -1856,8 +1856,18 @@ void runtest(int n, char const* filename1, char const* arg2)
 
         // Exercise deprecated API until qpdf 11
         std::cout << "/Bad1: deprecated API" << std::endl;
+#ifdef _MSC_VER
+# pragma warning (disable: 4996)
+#endif
+#if (defined(__GNUC__) || defined(__clang__))
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         auto bad1 = QPDFNumberTreeObjectHelper(
             pdf.getTrailer().getKey("/Bad1"));
+#if (defined(__GNUC__) || defined(__clang__))
+# pragma GCC diagnostic pop
+#endif
         assert(bad1.begin() == bad1.end());
 
         std::cout << "/Bad1" << std::endl;
@@ -2058,8 +2068,18 @@ void runtest(int n, char const* filename1, char const* arg2)
 
         // Exercise deprecated API until qpdf 11
         std::cout << "/Bad1: deprecated API" << std::endl;
+#ifdef _MSC_VER
+# pragma warning (disable: 4996)
+#endif
+#if (defined(__GNUC__) || defined(__clang__))
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         auto bad1 = QPDFNameTreeObjectHelper(
             pdf.getTrailer().getKey("/Bad1"));
+#if (defined(__GNUC__) || defined(__clang__))
+# pragma GCC diagnostic pop
+#endif
         try
         {
             bad1.find("G", true);

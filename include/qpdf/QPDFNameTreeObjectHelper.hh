@@ -55,6 +55,7 @@ class QPDFNameTreeObjectHelper: public QPDFObjectHelper
     // QPDFNameTreeObjectHelper constructed in this way can't be
     // modified or repaired and will silently ignore problems in the
     // structure.
+    [[deprecated]]
     QPDF_DLL
     QPDFNameTreeObjectHelper(QPDFObjectHandle);
 
