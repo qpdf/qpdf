@@ -17,7 +17,7 @@ QPDFPageLabelDocumentHelper::QPDFPageLabelDocumentHelper(QPDF& qpdf) :
     if (root.hasKey("/PageLabels"))
     {
         this->m->labels = new QPDFNumberTreeObjectHelper(
-            root.getKey("/PageLabels"));
+            root.getKey("/PageLabels"), this->qpdf);
     }
 }
 

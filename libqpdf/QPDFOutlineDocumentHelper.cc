@@ -106,7 +106,7 @@ QPDFOutlineDocumentHelper::resolveNamedDest(QPDFObjectHandle name)
                 if (dests.isDictionary())
                 {
                     this->m->names_dest =
-                        new QPDFNameTreeObjectHelper(dests);
+                        new QPDFNameTreeObjectHelper(dests, this->qpdf);
                 }
             }
         }
