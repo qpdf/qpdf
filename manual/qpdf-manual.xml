@@ -118,7 +118,7 @@
     <itemizedlist>
      <listitem>
       <para>
-       A C++ compiler that supports C++-11.
+       A C++ compiler that supports C++-14.
       </para>
      </listitem>
      <listitem>
@@ -5182,6 +5182,21 @@ print "\n";
           Add new functions <function>QUtil::pipe_file</function> and
           <function>QUtil::file_provider</function> for sending the
           contents of a file through a pipeline as binary data.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Build Changes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          A C++-14 compiler is now required to build qpdf. There is no
+          intention to require anything newer than that for a while.
+          C++-14 includes modest enhancements to C++-11 and appears to
+          be supported about as widely as C++-11.
          </para>
         </listitem>
        </itemizedlist>

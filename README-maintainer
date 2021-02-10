@@ -4,16 +4,16 @@ ROUTINE DEVELOPMENT
 
 Default:
 
-./configure CXX="g++ --std=c++11" --enable-werror
+./configure CXX="g++ --std=c++14" --enable-werror
 
 Debugging:
 
-./configure CXX="g++ --std=c++11" CFLAGS="-g" CXXFLAGS="-g" \
+./configure CXX="g++ --std=c++14" CFLAGS="-g" CXXFLAGS="-g" \
    --enable-werror --disable-shared
 
 Profiling:
 
-./configure CXX="g++ --std=c++11" CFLAGS="-g -pg" CXXFLAGS="-g -pg" \
+./configure CXX="g++ --std=c++14" CFLAGS="-g -pg" CXXFLAGS="-g -pg" \
    LDFLAGS="-pg" --enable-werror --disable-shared
 
 Then run `gprof gmon.out`. Note that gmon.out is not cumulative.
@@ -23,7 +23,7 @@ Memory checks:
 ./configure CFLAGS="-fsanitize=address -fsanitize=undefined -g" \
    CXXFLAGS="-fsanitize=address -fsanitize=undefined -g" \
    LDFLAGS="-fsanitize=address -fsanitize=undefined" \
-   CC=clang CXX="clang++ --std=c++11" \
+   CC=clang CXX="clang++ --std=c++14" \
    --enable-werror --disable-shared
 
 

@@ -28,7 +28,7 @@ Versions of qpdf prior to version 7 were released under the terms of version 2.0
 
 # Prerequisites
 
-QPDF requires a C++ compiler that supports C++-11.
+QPDF requires a C++ compiler that supports C++-14.
 
 QPDF depends on the external libraries [zlib](https://www.zlib.net/) and [jpeg](https://www.ijg.org/files/). The [libjpeg-turbo](https://libjpeg-turbo.org/) library is also known to work since it is compatible with the regular jpeg library, and QPDF doesn't use any interfaces that aren't present in the straight jpeg8 API. These are part of every Linux distribution and are readily available. Download information appears in the documentation. For Windows, you can download pre-built binary versions of these libraries for some compilers; see [README-windows.md](README-windows.md) for additional details.
 

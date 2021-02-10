@@ -1,5 +1,7 @@
 2021-02-10  Jay Berkenbilt  <ejb@ql.org>
 
+	* Require a C++-14 compiler.
+
 	* Detect loops when adding when reading outlines dictionary upon
 	initialization of QPDFOutlineDocumentHelper (fuzz issue 30507).
 

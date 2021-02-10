@@ -7,7 +7,7 @@ sudo apt-get -y install \
    CFLAGS="-fsanitize=address -fsanitize=undefined -g" \
    CXXFLAGS="-fsanitize=address -fsanitize=undefined -g" \
    LDFLAGS="-fsanitize=address -fsanitize=undefined" \
-   CC=clang CXX="clang++ --std=c++11" \
+   CC=clang CXX="clang++ --std=c++14" \
    --enable-crypto-native --enable-crypto-openssl --enable-crypto-gnutls \
    --enable-werror --disable-shared --enable-show-failed-test-output
 make -j$(nproc) -k
