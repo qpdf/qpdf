@@ -844,7 +844,11 @@ QUtil::get_current_qpdf_time()
     struct tm ltime;
     time_t now = time(0);
     tzset();
+#ifdef HAVE_LOCALTIME_R
     localtime_r(&now, &ltime);
+#else
+    ltime = *localtime(&now);
+#endif
     return QPDFTime(static_cast<int>(ltime.tm_year + 1900),
                     static_cast<int>(ltime.tm_mon + 1),
                     static_cast<int>(ltime.tm_mday),

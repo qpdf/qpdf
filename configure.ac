@@ -310,9 +310,7 @@ AC_ARG_WITH(large-file-test-path,
 
 AC_SYS_LARGEFILE
 AC_FUNC_FSEEKO
-AC_CHECK_FUNCS([fseeko64])
-
-AC_CHECK_FUNCS(random)
+AC_CHECK_FUNCS([fseeko64 random localtime_r])
 
 # Check if LD supports linker scripts, and define conditional
 # HAVE_LD_VERSION_SCRIPT if so.  This functionality is currently
