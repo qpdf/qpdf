@@ -203,8 +203,9 @@ namespace QUtil
 
     // Convert a QPDFTime structure to a PDF timestamp string, which
     // is "D:yyyymmddhhmmss<z>" where <z> is either "Z" for UTC or
-    // "-hh'mm'" or "+hh'mm'" for timezone offset. Examples:
-    // "D:20210207161528-05'00'", "D:20210207211528Z". See
+    // "-hh'mm'" or "+hh'mm'" for timezone offset. <z> may also be
+    // omitted. Examples: "D:20210207161528-05'00'",
+    // "D:20210207211528Z", "D:20210207211528". See
     // get_current_qpdf_time and the QPDFTime structure above.
     QPDF_DLL
     std::string qpdf_time_to_pdf_time(QPDFTime const&);

@@ -898,7 +898,7 @@ QUtil::pdf_time_to_qpdf_time(std::string const& str, QPDFTime* qtm)
 {
     static std::regex pdf_date("^D:([0-9]{4})([0-9]{2})([0-9]{2})"
                                "([0-9]{2})([0-9]{2})([0-9]{2})"
-                               "(?:(Z)|([\\+\\-])([0-9]{2})'([0-9]{2})')$");
+                               "(?:(Z?)|([\\+\\-])([0-9]{2})'([0-9]{2})')$");
     std::smatch m;
     if (! std::regex_match(str, m, pdf_date))
     {
@@ -909,7 +909,7 @@ QUtil::pdf_time_to_qpdf_time(std::string const& str, QPDFTime* qtm)
         return QUtil::string_to_int(s.c_str());
     };
 
-    if (m[7] == "")
+    if (m[8] != "")
     {
         tz_delta = ((to_i(m[9]) * 60) +
                     to_i(m[10]));

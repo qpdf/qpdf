@@ -594,6 +594,10 @@ void timestamp_test()
     check(QUtil::QPDFTime(2021, 2, 10, 1, 19, 25, -330));
     check(QUtil::QPDFTime(2021, 2, 9, 19, 19, 25, 0));
     assert(! QUtil::pdf_time_to_qpdf_time("potato"));
+    assert(QUtil::pdf_time_to_qpdf_time("D:20210211064743Z"));
+    assert(QUtil::pdf_time_to_qpdf_time("D:20210211064743-05'00'"));
+    assert(QUtil::pdf_time_to_qpdf_time("D:20210211064743+05'30'"));
+    assert(QUtil::pdf_time_to_qpdf_time("D:20210211064743"));
     // Round trip on the current time without actually printing it.
     // Manual testing was done to ensure that we are actually getting
     // back the current time in various timezones.
