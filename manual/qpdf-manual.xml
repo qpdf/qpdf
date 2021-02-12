@@ -5220,6 +5220,15 @@ print "\n";
           rotations.
          </para>
         </listitem>
+        <listitem>
+         <para>
+          The <classname>QPDFMatrix</classname> class, formerly a
+          private, internal class, has been added to the public API.
+          See <filename>include/qpdf/QPDFMatrix.hh</filename> for
+          details. This class is for working with transformation
+          matrices.
+         </para>
+        </listitem>
        </itemizedlist>
       </listitem>
       <listitem>

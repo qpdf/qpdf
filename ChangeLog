@@ -1,5 +1,9 @@
 2021-02-12  Jay Berkenbilt  <ejb@ql.org>
 
+	* Move formerly internal QPDFMatrix class to the public API. This
+	class provides convenience methods for working with transformation
+	matrices.
+
 	* QUtil::double_to_string: trim trailing zeroes by default, and
 	add option to not trim trailing zeroes. This causes a syntactic
 	but semantically preserving change in output when doubles are
