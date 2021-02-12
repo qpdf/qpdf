@@ -634,7 +634,7 @@ static void test24(char const* infile,
         qpdf_oh_new_name(qpdf, "/Quack"));
     qpdf_oh_append_item(
         qpdf, new_array,
-        qpdf_oh_new_real_from_double(qpdf, 4.0, 2));
+        qpdf_oh_new_real_from_double(qpdf, 4.123, 2));
     qpdf_oh_append_item(
         qpdf, new_array,
         qpdf_oh_new_real_from_string(qpdf, "5.0"));

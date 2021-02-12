@@ -324,10 +324,17 @@ QUtil::uint_to_string_base(unsigned long long num, int base, int length)
 std::string
 QUtil::double_to_string(double num, int decimal_places)
 {
+    return double_to_string(num, decimal_places, true);
+}
+
+std::string
+QUtil::double_to_string(double num, int decimal_places,
+                        bool trim_trailing_zeroes)
+{
     // Backward compatibility -- this code used to use sprintf and
     // treated decimal_places <= 0 to mean to use the default, which
-    // was six decimal places.  Also sprintf with %*.f interprets the
-    // length as fixed point rather than significant figures.
+    // was six decimal places. Starting in 10.2, we trim trailing
+    // zeroes by default.
     if (decimal_places <= 0)
     {
         decimal_places = 6;
@@ -335,7 +342,19 @@ QUtil::double_to_string(double num, int decimal_places)
     std::ostringstream buf;
     buf.imbue(std::locale::classic());
     buf << std::setprecision(decimal_places) << std::fixed << num;
-    return buf.str();
+    std::string result = buf.str();
+    if (trim_trailing_zeroes)
+    {
+        while ((result.length() > 1) && (result.back() == '0'))
+        {
+            result.pop_back();
+        }
+        if ((result.length() > 1) && (result.back() == '.'))
+        {
+            result.pop_back();
+        }
+    }
+    return result;
 }
 
 long long

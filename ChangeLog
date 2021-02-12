@@ -1,3 +1,15 @@
+2021-02-12  Jay Berkenbilt  <ejb@ql.org>
+
+	* QUtil::double_to_string: trim trailing zeroes by default, and
+	add option to not trim trailing zeroes. This causes a syntactic
+	but semantically preserving change in output when doubles are
+	converted to strings. The library uses double_to_string in only a
+	few places. In practice, output will be different (trailing zeroes
+	removed) in code that creates form XObjects (mostly generation of
+	appearance streams for form fields as well as overlay and
+	underlay) and in the flatten rotation code that was added in qpdf
+	10.1.
+
 2021-02-10  Jay Berkenbilt  <ejb@ql.org>
 
 	* Require a C++-14 compiler.

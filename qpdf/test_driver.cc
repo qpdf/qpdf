@@ -560,7 +560,7 @@ void runtest(int n, char const* filename1, char const* arg2)
 	    for (int i = 0; i < nitems; ++i)
 	    {
 		std::cout << QUtil::double_to_string(
-		    qnumbers.getArrayItem(i).getNumericValue(), 3)
+		    qnumbers.getArrayItem(i).getNumericValue(), 3, false)
 			  << std::endl;
 	    }
 	}

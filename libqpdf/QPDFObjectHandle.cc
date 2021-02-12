@@ -2422,7 +2422,16 @@ QPDFObjectHandle::newReal(std::string const& value)
 QPDFObjectHandle
 QPDFObjectHandle::newReal(double value, int decimal_places)
 {
-    return QPDFObjectHandle(new QPDF_Real(value, decimal_places));
+    return QPDFObjectHandle(
+        new QPDF_Real(value, decimal_places, true));
+}
+
+QPDFObjectHandle
+QPDFObjectHandle::newReal(double value, int decimal_places,
+                          bool trim_trailing_zeroes)
+{
+    return QPDFObjectHandle(
+        new QPDF_Real(value, decimal_places, trim_trailing_zeroes));
 }
 
 QPDFObjectHandle

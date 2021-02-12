@@ -476,6 +476,11 @@ class QPDFObjectHandle
     static QPDFObjectHandle newReal(std::string const& value);
     QPDF_DLL
     static QPDFObjectHandle newReal(double value, int decimal_places = 0);
+    // ABI: combine with other newReal by adding trim_trailing_zeroes
+    // above as an optional parameter with a default of true.
+    QPDF_DLL
+    static QPDFObjectHandle newReal(double value, int decimal_places,
+                                    bool trim_trailing_zeroes);
     QPDF_DLL
     static QPDFObjectHandle newName(std::string const& name);
     QPDF_DLL

@@ -7,8 +7,9 @@ QPDF_Real::QPDF_Real(std::string const& val) :
 {
 }
 
-QPDF_Real::QPDF_Real(double value, int decimal_places) :
-    val(QUtil::double_to_string(value, decimal_places))
+QPDF_Real::QPDF_Real(double value, int decimal_places,
+                     bool trim_trailing_zeroes) :
+    val(QUtil::double_to_string(value, decimal_places, trim_trailing_zeroes))
 {
 }
 

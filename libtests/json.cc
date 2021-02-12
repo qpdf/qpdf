@@ -36,7 +36,7 @@ static void test_main()
           "  \"a\\tb\",\n"
           "  null,\n"
           "  16059,\n"
-          "  3.141590,\n"
+          "  3.14159,\n"
           "  2.1e5\n"
           "]");
     JSON jmap = JSON::makeDictionary();
@@ -56,7 +56,7 @@ static void test_main()
           "    \"a\\tb\",\n"
           "    null,\n"
           "    16059,\n"
-          "    3.141590,\n"
+          "    3.14159,\n"
           "    2.1e5\n"
           "  ],\n"
           "  \"b\": \"a\\tb\",\n"
