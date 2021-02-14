@@ -16,6 +16,7 @@
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/Pl_Flate.hh>
+#include <qpdf/Pl_Discard.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QPDFSystemError.hh>
 #include <qpdf/QIntC.hh>
@@ -2793,6 +2794,48 @@ void runtest(int n, char const* filename1, char const* arg2)
         assert(efdh.removeEmbeddedFile("att2"));
         assert(! efdh.removeEmbeddedFile("att2"));
 
+        QPDFWriter w(pdf, "a.pdf");
+        w.setStaticID(true);
+        w.setQDFMode(true);
+        w.write();
+    }
+    else if (n == 78)
+    {
+        // Test functional versions of replaceStreamData()
+
+        auto f1 = [](Pipeline* p) {
+            p->write(QUtil::unsigned_char_pointer("potato"), 6);
+            p->finish();
+        };
+        auto f2 = [](Pipeline* p, bool suppress_warnings, bool will_retry) {
+            std::cerr << "f2" << std::endl;
+            if (will_retry)
+            {
+                std::cerr << "failing" << std::endl;
+                return false;
+            }
+            if (! suppress_warnings)
+            {
+                std::cerr << "warning" << std::endl;
+            }
+            p->write(QUtil::unsigned_char_pointer("salad"), 5);
+            p->finish();
+            std::cerr << "f2 done" << std::endl;
+            return true;
+        };
+
+        auto null = QPDFObjectHandle::newNull();
+        auto s1 = QPDFObjectHandle::newStream(&pdf);
+        s1.replaceStreamData(f1, null, null);
+        auto s2 = QPDFObjectHandle::newStream(&pdf);
+        s2.replaceStreamData(f2, null, null);
+        pdf.getTrailer().replaceKey(
+            "/Streams", QPDFObjectHandle::newArray({s1, s2}));
+        std::cout << "piping with warning suppression" << std::endl;
+        Pl_Discard d;
+        s2.pipeStreamData(&d, nullptr, 0, qpdf_dl_all, true, false);
+
+        std::cout << "writing" << std::endl;
         QPDFWriter w(pdf, "a.pdf");
         w.setStaticID(true);
         w.setQDFMode(true);

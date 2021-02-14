@@ -30,6 +30,7 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <functional>
 
 #include <qpdf/QPDFObjGen.hh>
 #include <qpdf/PointerHolder.hh>
@@ -985,6 +986,26 @@ class QPDFObjectHandle
     void replaceStreamData(PointerHolder<StreamDataProvider> provider,
 			   QPDFObjectHandle const& filter,
 			   QPDFObjectHandle const& decode_parms);
+
+    // Starting in qpdf 10.2, you can use C++-11 function objects
+    // instead of StreamDataProvider.
+
+    // The provider should write the stream data to the pipeline. For
+    // a one-liner to replace stream data with the contents of a file,
+    // pass QUtil::file_provider(filename) as provider.
+    QPDF_DLL
+    void replaceStreamData(std::function<void(Pipeline*)> provider,
+			   QPDFObjectHandle const& filter,
+			   QPDFObjectHandle const& decode_parms);
+    // The provider should write the stream data to the pipeline,
+    // returning true if it succeeded without errors.
+    QPDF_DLL
+    void replaceStreamData(
+        std::function<bool(Pipeline*,
+                           bool suppress_warnings,
+                           bool will_retry)> provider,
+        QPDFObjectHandle const& filter,
+        QPDFObjectHandle const& decode_parms);
 
     // Access object ID and generation.  For direct objects, return
     // object ID 0.

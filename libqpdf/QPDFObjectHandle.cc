@@ -1347,6 +1347,62 @@ QPDFObjectHandle::replaceStreamData(PointerHolder<StreamDataProvider> provider,
 	provider, filter, decode_parms);
 }
 
+class FunctionProvider: public QPDFObjectHandle::StreamDataProvider
+{
+  public:
+    FunctionProvider(std::function<void(Pipeline*)> provider) :
+        StreamDataProvider(false),
+        p1(provider),
+        p2(nullptr)
+    {
+    }
+    FunctionProvider(std::function<bool(Pipeline*, bool, bool)> provider) :
+        StreamDataProvider(true),
+        p1(nullptr),
+        p2(provider)
+    {
+    }
+
+    virtual void provideStreamData(int, int, Pipeline* pipeline) override
+    {
+        p1(pipeline);
+    }
+
+    virtual bool provideStreamData(int, int, Pipeline* pipeline,
+                                   bool suppress_warnings,
+                                   bool will_retry) override
+    {
+        return p2(pipeline, suppress_warnings, will_retry);
+    }
+
+  private:
+    std::function<void(Pipeline*)> p1;
+    std::function<bool(Pipeline*, bool, bool)> p2;
+};
+
+void
+QPDFObjectHandle::replaceStreamData(std::function<void(Pipeline*)> provider,
+                                    QPDFObjectHandle const& filter,
+                                    QPDFObjectHandle const& decode_parms)
+{
+    assertStream();
+    PointerHolder<StreamDataProvider> sdp = new FunctionProvider(provider);
+    dynamic_cast<QPDF_Stream*>(obj.getPointer())->replaceStreamData(
+	sdp, filter, decode_parms);
+}
+
+void
+QPDFObjectHandle::replaceStreamData(
+    std::function<bool(Pipeline*, bool, bool)> provider,
+    QPDFObjectHandle const& filter,
+    QPDFObjectHandle const& decode_parms)
+{
+    assertStream();
+    PointerHolder<StreamDataProvider> sdp = new FunctionProvider(provider);
+    dynamic_cast<QPDF_Stream*>(obj.getPointer())->replaceStreamData(
+	sdp, filter, decode_parms);
+}
+
 QPDFObjGen
 QPDFObjectHandle::getObjGen() const
 {

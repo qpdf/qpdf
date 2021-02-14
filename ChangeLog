@@ -1,3 +1,11 @@
+2021-02-14  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add new versions of QPDFObjectHandle::replaceStreamData that
+	take std::function objects for cases when you need something
+	between a static string and a full-fledged StreamDataProvider.
+	Using this with QUtil::file_provider is a very easy way to create
+	a stream from the contents of a file.
+
 2021-02-12  Jay Berkenbilt  <ejb@ql.org>
 
 	* Move formerly internal QPDFMatrix class to the public API. This

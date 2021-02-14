@@ -533,7 +533,7 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline, bool* filterp,
         }
 	qpdf_offset_t actual_length = count.getCount();
 	qpdf_offset_t desired_length = 0;
-        if (this->stream_dict.hasKey("/Length"))
+        if (success && this->stream_dict.hasKey("/Length"))
         {
 	    desired_length = this->stream_dict.getKey("/Length").getIntValue();
             if (actual_length == desired_length)
@@ -555,7 +555,7 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline, bool* filterp,
                     QUtil::int_to_string(desired_length) + " bytes");
             }
         }
-        else
+        else if (success)
         {
             QTC::TC("qpdf", "QPDF_Stream provider length not provided");
             this->stream_dict.replaceKey(

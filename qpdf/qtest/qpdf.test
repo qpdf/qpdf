@@ -717,7 +717,7 @@ $td->runtest("check dates",
 show_ntests();
 # ----------
 $td->notify("--- Stream Replacement Tests ---");
-$n_tests += 8;
+$n_tests += 10;
 
 $td->runtest("replace stream data",
 	     {$td->COMMAND => "test_driver 7 qstream.pdf"},
@@ -747,6 +747,13 @@ $td->runtest("add page contents",
 $td->runtest("new stream",
 	     {$td->FILE => "a.pdf"},
 	     {$td->FILE => "add-contents.pdf"});
+$td->runtest("functional replace stream data",
+	     {$td->COMMAND => "test_driver 78 minimal.pdf"},
+	     {$td->FILE => "test78.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "test78.pdf"});
 
 show_ntests();
 # ----------

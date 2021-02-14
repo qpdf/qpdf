@@ -5213,6 +5213,17 @@ print "\n";
         </listitem>
         <listitem>
          <para>
+	  Add new versions of
+	  <function>QPDFObjectHandle::replaceStreamData</function>
+	  that take <classname>std::function</classname> objects for
+	  cases when you need something between a static string and a
+	  full-fledged StreamDataProvider. Using this with
+	  QUtil::file_provider is a very easy way to create a stream
+	  from the contents of a file.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
           Add option to <function>QUtil::double_to_string</function>
           to trim trailing zeroes, which is on by default. Within the
           qpdf library, this causes changes to output the from code
