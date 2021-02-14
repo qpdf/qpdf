@@ -113,34 +113,12 @@ QPDFEFStreamObjectHelper::createEFStream(
     return newFromStream(QPDFObjectHandle::newStream(&qpdf, data));
 }
 
-namespace QEF
-{
-    class Provider: public QPDFObjectHandle::StreamDataProvider
-    {
-      public:
-        Provider(std::function<void(Pipeline*)> provider) :
-            StreamDataProvider(false),
-            provider(provider)
-        {
-        }
-        virtual ~Provider() = default;
-        virtual void provideStreamData(int objid, int generation,
-                                       Pipeline* pipeline) override
-        {
-            this->provider(pipeline);
-        }
-
-      private:
-        std::function<void(Pipeline*)> provider;
-    };
-};
-
 QPDFEFStreamObjectHelper
 QPDFEFStreamObjectHelper::createEFStream(
     QPDF& qpdf, std::function<void(Pipeline*)> provider)
 {
     auto stream = QPDFObjectHandle::newStream(&qpdf);
-    stream.replaceStreamData(new QEF::Provider(provider),
+    stream.replaceStreamData(provider,
                              QPDFObjectHandle::newNull(),
                              QPDFObjectHandle::newNull());
     return newFromStream(stream);
