@@ -379,6 +379,20 @@ class QPDFObjectHandle
     static QPDFObjectHandle parse(std::string const& object_str,
                                   std::string const& object_description = "");
 
+    // Construct an object of any type from a string representation of
+    // the object. Indirect object syntax (obj gen R) is allowed and
+    // will create indirect references within the passed-in context.
+    // If object_description is provided, it will appear in the
+    // message of any QPDFExc exception thrown for invalid syntax.
+    // Note that you can't parse an indirect object reference all by
+    // itself as parse will stop at the end of the first complete
+    // object, which will just be the first number and will report
+    // that there is trailing data at the end of the string.
+    QPDF_DLL
+    static QPDFObjectHandle parse(QPDF* context,
+                                  std::string const& object_str,
+                                  std::string const& object_description = "");
+
     // Construct an object as above by reading from the given
     // InputSource at its current position and using the tokenizer you
     // supply.  Indirect objects and encrypted strings are permitted.

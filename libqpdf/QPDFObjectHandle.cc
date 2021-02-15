@@ -1693,12 +1693,20 @@ QPDFObjectHandle
 QPDFObjectHandle::parse(std::string const& object_str,
                         std::string const& object_description)
 {
+    return parse(nullptr, object_str, object_description);
+}
+
+QPDFObjectHandle
+QPDFObjectHandle::parse(QPDF* context,
+                        std::string const& object_str,
+                        std::string const& object_description)
+{
     PointerHolder<InputSource> input =
         new BufferInputSource("parsed object", object_str);
     QPDFTokenizer tokenizer;
     bool empty = false;
     QPDFObjectHandle result =
-        parse(input, object_description, tokenizer, empty, 0, 0);
+        parse(input, object_description, tokenizer, empty, 0, context);
     size_t offset = QIntC::to_size(input->tell());
     while (offset < object_str.length())
     {

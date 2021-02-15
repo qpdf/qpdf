@@ -1319,6 +1319,9 @@ void runtest(int n, char const* filename1, char const* arg2)
             std::cout << "trailing data: " << e.what()
                       << std::endl;
         }
+        assert(QPDFObjectHandle::parse(
+                   &pdf, "[1 0 R]", "indirect test").unparse() ==
+               "[ 1 0 R ]");
     }
     else if (n == 32)
     {

@@ -5196,6 +5196,14 @@ print "\n";
         </listitem>
         <listitem>
          <para>
+          Add a version of
+          <function>QPDFObjectHandle::parse</function> that takes a
+          <classname>QPDF</classname> pointer as context so that it
+          can parse strings containing indirect object references.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
           Re-implement <classname>QPDFNameTreeObjectHelper</classname>
           and <classname>QPDFNumberTreeObjectHelper</classname> to be
           more efficient, add an iterator-based API, give them the
