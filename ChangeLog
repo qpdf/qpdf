@@ -1,3 +1,8 @@
+2021-02-18  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add examples/pdf-attach-file.cc to illustrate new file
+	attachment method and also new parse that takes indirect objects.
+
 2021-02-17  Jay Berkenbilt  <ejb@ql.org>
 
 	* Allow optional numeric argument to --collate. If --collate=n is

@@ -1,0 +1,35 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+chdir("attach-file") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('attach-file');
+
+$td->runtest("attach file",
+             {$td->COMMAND =>
+                  "pdf-attach-file --infile input.pdf" .
+                  " --attachment ./potato.png" .
+                  " --outfile a.pdf" .
+                  " --mimetype image/png"},
+             {$td->STRING =>
+                  "pdf-attach-file: attaching ./potato.png as potato.png\n",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "output.pdf"});
+
+cleanup();
+
+$td->report(2);
+
+sub cleanup
+{
+    unlink "a.pdf";
+}

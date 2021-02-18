@@ -249,6 +249,10 @@ directory or that are otherwise not publicly accessible. This includes
 things sent to me by email that are specifically not public. Even so,
 I find it useful to make reference to them in this list.
 
+ * Add code for creation of a file attachment annotation. It should
+   also be possible to create a widget annotation and a form field.
+   Update the pdf-attach-file.cc example with new APIs when ready.
+
  * If I do more with json, take a look at this C++ header-only JSON
    library: https://github.com/nlohmann/json/releases
 

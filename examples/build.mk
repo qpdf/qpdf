@@ -1,4 +1,5 @@
 BINS_examples = \
+	pdf-attach-file \
 	pdf-bookmarks \
 	pdf-count-strings \
 	pdf-create \

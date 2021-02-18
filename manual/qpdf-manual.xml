@@ -5209,7 +5209,9 @@ print "\n";
           <classname>QPDFEmbeddedFileDocumentHelper</classname>,
           <classname>QPDFFileSpecObjectHelper</classname>, and
           <classname>QPDFEFStreamObjectHelper</classname>. See their
-          respective headers for details.
+          respective headers for details and
+          <filename>examples/pdf-attach-file.cc</filename> for an
+          example.
          </para>
         </listitem>
         <listitem>
@@ -5231,6 +5233,8 @@ print "\n";
           <function>QPDFObjectHandle::parse</function> that takes a
           <classname>QPDF</classname> pointer as context so that it
           can parse strings containing indirect object references.
+          This is illustrated in
+          <filename>examples/pdf-attach-file.cc</filename>.
          </para>
         </listitem>
         <listitem>
