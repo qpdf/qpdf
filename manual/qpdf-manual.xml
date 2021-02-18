@@ -5286,10 +5286,18 @@ print "\n";
         <listitem>
          <para>
 	  Add
-	  <function>QPDFPageObjectHelper::getMatrixForFormXObjectPlacement</function>
+	  <function>QPDFPageObjectHelper::getMatrixForFormXObjectPlacement</function>,
 	  which returns the transformation matrix required to map from
 	  a form field's coordinate system into a specific rectangle
 	  within the page.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add method
+          <function>QPDFAcroFormDocumentHelper::addFormField</function>,
+          which adds a new form field, initializing the AcroForm
+          dictionary if needed.
          </para>
         </listitem>
         <listitem>

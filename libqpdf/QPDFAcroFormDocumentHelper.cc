@@ -32,6 +32,26 @@ QPDFAcroFormDocumentHelper::hasAcroForm()
     return this->qpdf.getRoot().hasKey("/AcroForm");
 }
 
+void
+QPDFAcroFormDocumentHelper::addFormField(QPDFFormFieldObjectHelper ff)
+{
+    invalidateCache();
+    auto acroform = this->qpdf.getRoot().getKey("/AcroForm");
+    if (! acroform.isDictionary())
+    {
+        acroform = this->qpdf.makeIndirectObject(
+            QPDFObjectHandle::newDictionary());
+        this->qpdf.getRoot().replaceKey("/AcroForm", acroform);
+    }
+    auto fields = acroform.getKey("/Fields");
+    if (! fields.isArray())
+    {
+        fields = QPDFObjectHandle::newArray();
+        acroform.replaceKey("/Fields", fields);
+    }
+    fields.appendItem(ff.getObjectHandle());
+}
+
 std::vector<QPDFFormFieldObjectHelper>
 QPDFAcroFormDocumentHelper::getFormFields()
 {

@@ -106,6 +106,13 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
     bool
     hasAcroForm();
 
+    // Add a form field, initializing the document's AcroForm
+    // dictionary if needed. Calling this method invalidates the
+    // cache, which makes it possible to add a field that is not yet
+    // associated with an annotation or page.
+    QPDF_DLL
+    void addFormField(QPDFFormFieldObjectHelper);
+
     // Return a vector of all terminal fields in a document. Terminal
     // fields are fields that have no children that are also fields.
     // Terminal fields may still have children that are annotations.

@@ -1,5 +1,8 @@
 2021-02-18  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add QPDFAcroFormDocumentHelper::addFormField, which adds a new
+	form field, initializing the AcroForm dictionary if needed.
+
 	* Add QPDFPageObjectHelper::getMatrixForFormXObjectPlacement,
 	which returns the transformation matrix required to map from a
 	form field's coordinate system into a specific rectangle within
