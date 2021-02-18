@@ -201,7 +201,7 @@ struct Options
         show_filtered_stream_data(false),
         show_pages(false),
         show_page_images(false),
-        collate(false),
+        collate(0),
         flatten_rotation(false),
         list_attachments(false),
         json(false),
@@ -307,7 +307,7 @@ struct Options
     bool show_filtered_stream_data;
     bool show_pages;
     bool show_page_images;
-    bool collate;
+    size_t collate;
     bool flatten_rotation;
     bool list_attachments;
     std::string attachment_to_show;
@@ -804,7 +804,7 @@ class ArgParser
     void argUnderlay();
     void argOverlay();
     void argRotate(char* parameter);
-    void argCollate();
+    void argCollate(char* parameter);
     void argFlattenRotation();
     void argListAttachments();
     void argShowAttachment(char* parameter);
@@ -1048,7 +1048,7 @@ ArgParser::initOptionTable()
         &ArgParser::argRotate, "[+|-]angle:page-range");
     char const* stream_data_choices[] =
         {"compress", "preserve", "uncompress", 0};
-    (*t)["collate"] = oe_bare(&ArgParser::argCollate);
+    (*t)["collate"] = oe_optionalParameter(&ArgParser::argCollate);
     (*t)["flatten-rotation"] = oe_bare(&ArgParser::argFlattenRotation);
     (*t)["list-attachments"] = oe_bare(&ArgParser::argListAttachments);
     (*t)["show-attachment"] = oe_requiredParameter(
@@ -1369,8 +1369,9 @@ ArgParser::argHelp()
         << "                        encoding errors\n"
         << "--password-mode=mode    control qpdf's encoding of passwords\n"
         << "--pages options --      select specific pages from one or more files\n"
-        << "--collate               causes files specified in --pages to be collated\n"
-        << "                        rather than concatenated\n"
+        << "--collate=n             causes files specified in --pages to be collated\n"
+        << "                        in groups of n pages (default 1) rather than\n"
+        << "                        concatenated\n"
         << "--flatten-rotation      move page rotation from /Rotate key to content\n"
         << "--rotate=[+|-]angle[:page-range]\n"
         << "                        rotate each specified page 90, 180, or 270 degrees;\n"
@@ -2068,9 +2069,11 @@ ArgParser::argEncryptionFilePassword(char* parameter)
 }
 
 void
-ArgParser::argCollate()
+ArgParser::argCollate(char* parameter)
 {
-    o.collate = true;
+    auto n = ((parameter == 0) ? 1 :
+              QUtil::string_to_uint(parameter));
+    o.collate = QIntC::to_size(n);
 }
 
 void
@@ -5788,16 +5791,19 @@ static void handle_page_specs(QPDF& pdf, Options& o, bool& warnings)
             for (size_t i = 0; i < nspecs; ++i)
             {
                 QPDFPageData& page_data = parsed_specs.at(i);
-                if (cur_page < page_data.selected_pages.size())
+                for (size_t j = 0; j < o.collate; ++j)
                 {
-                    got_pages = true;
-                    new_parsed_specs.push_back(
-                        QPDFPageData(
-                            page_data,
-                            page_data.selected_pages.at(cur_page)));
+                    if (cur_page + j < page_data.selected_pages.size())
+                    {
+                        got_pages = true;
+                        new_parsed_specs.push_back(
+                            QPDFPageData(
+                                page_data,
+                                page_data.selected_pages.at(cur_page + j)));
+                    }
                 }
             }
-            ++cur_page;
+            cur_page += o.collate;
         }
         parsed_specs = new_parsed_specs;
     }

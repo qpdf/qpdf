@@ -1,3 +1,9 @@
+2021-02-17  Jay Berkenbilt  <ejb@ql.org>
+
+	* Allow optional numeric argument to --collate. If --collate=n is
+	given, pull n pages from the first file, n pages from the second
+	file, etc., until we run out of pages.
+
 2021-02-15  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add a version of QPDFObjectHandle::parse that takes a QPDF* as

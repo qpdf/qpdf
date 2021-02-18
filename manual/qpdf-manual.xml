@@ -1077,12 +1077,14 @@ make
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term><option>--collate</option></term>
+      <term><option>--collate=<replaceable>n</replaceable></option></term>
       <listitem>
        <para>
         When specified, collate rather than concatenate pages from
-        files specified with <option>--pages</option>.  See <xref
-        linkend="ref.page-selection"/> for additional details.
+        files specified with <option>--pages</option>. With a numeric
+        argument, collate in groups of <replaceable>n</replaceable>.
+        The default is 1. See <xref linkend="ref.page-selection"/> for
+        additional details.
        </para>
       </listitem>
      </varlistentry>
@@ -1643,6 +1645,27 @@ make
      <listitem><para>a.pdf page 3</para></listitem>
      <listitem><para>b.pdf page 4</para></listitem>
      <listitem><para>a.pdf page 4</para></listitem>
+     <listitem><para>a.pdf page 5</para></listitem>
+    </itemizedlist>
+   </para>
+   <para>
+    Starting in qpdf version 10.2, you may specify a numeric argument
+    to <option>--collate</option>. With
+    <option>--collate=<replaceable>n</replaceable></option>, pull
+    groups of <replaceable>n</replaceable> pages from each file,
+    again, stopping when there are no more pages. For example, if you
+    ran <command>qpdf --collate=2 --empty --pages a.pdf 1-5 b.pdf 6-4
+    c.pdf r1 -- out.pdf</command>, you would get the following pages
+    in this order:
+    <itemizedlist>
+     <listitem><para>a.pdf page 1</para></listitem>
+     <listitem><para>a.pdf page 2</para></listitem>
+     <listitem><para>b.pdf page 6</para></listitem>
+     <listitem><para>b.pdf page 5</para></listitem>
+     <listitem><para>c.pdf last page</para></listitem>
+     <listitem><para>a.pdf page 3</para></listitem>
+     <listitem><para>a.pdf page 4</para></listitem>
+     <listitem><para>b.pdf page 4</para></listitem>
      <listitem><para>a.pdf page 5</para></listitem>
     </itemizedlist>
    </para>
@@ -5142,6 +5165,14 @@ print "\n";
           needed for basic enumeration and extraction of attachments.
           More detailed information can be obtained by following the
           reference to the file spec object.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add numeric option to <option>--collate</option>. If
+          <option>--collate=<replaceable>n</replaceable></option> is
+          given, take pages in groups of <replaceable>n</replaceable>
+          from the given files.
          </para>
         </listitem>
        </itemizedlist>

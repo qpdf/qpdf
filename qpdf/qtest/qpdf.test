@@ -2573,17 +2573,26 @@ show_ntests();
 # ----------
 $td->notify("--- Collating ---");
 my @collate = (
-    ["three-files", "collate-odd",
+    ["", "three-files", "collate-odd",
+     "collate-odd.pdf 1-5 minimal.pdf collate-even.pdf 7-1"],
+    [1, "three-files", "collate-odd",
+     "collate-odd.pdf 1-5 minimal.pdf collate-even.pdf 7-1"],
+    [2, "three-files-2", "collate-odd",
      "collate-odd.pdf 1-5 minimal.pdf collate-even.pdf 7-1"],
     );
 $n_tests += 2 * scalar(@collate);
 
 foreach my $d (@collate)
 {
-    my ($description, $first, $args) = @$d;
+    my ($n, $description, $first, $args) = @$d;
+    my $collate = '--collate';
+    if ($n)
+    {
+        $collate .= "=$n";
+    }
     $td->runtest("collate pages: $description",
                  {$td->COMMAND =>
-                      "qpdf --qdf --static-id --collate $first.pdf" .
+                      "qpdf --qdf --static-id $collate $first.pdf" .
                       " --pages $args -- a.pdf"},
                  {$td->STRING => "", $td->EXIT_STATUS => 0});
     $td->runtest("check output",
