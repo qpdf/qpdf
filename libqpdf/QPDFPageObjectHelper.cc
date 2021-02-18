@@ -947,10 +947,9 @@ QPDFPageObjectHelper::getFormXObjectForPage(bool handle_transformations)
     return result;
 }
 
-std::string
-QPDFPageObjectHelper::placeFormXObject(
-    QPDFObjectHandle fo, std::string const& name,
-    QPDFObjectHandle::Rectangle rect,
+QPDFMatrix
+QPDFPageObjectHelper::getMatrixForFormXObjectPlacement(
+    QPDFObjectHandle fo, QPDFObjectHandle::Rectangle rect,
     bool invert_transformations,
     bool allow_shrink, bool allow_expand)
 {
@@ -971,7 +970,7 @@ QPDFPageObjectHelper::placeFormXObject(
     QPDFObjectHandle bbox_obj = fdict.getKey("/BBox");
     if (! bbox_obj.isRectangle())
     {
-        return "";
+        return QPDFMatrix();
     }
 
     QPDFMatrix wmatrix;         // work matrix
@@ -1014,7 +1013,7 @@ QPDFPageObjectHelper::placeFormXObject(
     if ((T.urx == T.llx) || (T.ury == T.lly))
     {
         // avoid division by zero
-        return "";
+        return QPDFMatrix();
     }
     double rect_w = rect.urx - rect.llx;
     double rect_h = rect.ury - rect.lly;
@@ -1060,6 +1059,18 @@ QPDFPageObjectHelper::placeFormXObject(
     cm.translate(tx, ty);
     cm.scale(scale, scale);
     cm.concat(tmatrix);
+    return cm;
+}
+
+std::string
+QPDFPageObjectHelper::placeFormXObject(
+    QPDFObjectHandle fo, std::string const& name,
+    QPDFObjectHandle::Rectangle rect,
+    bool invert_transformations,
+    bool allow_shrink, bool allow_expand)
+{
+    QPDFMatrix cm = getMatrixForFormXObjectPlacement(
+        fo, rect, invert_transformations, allow_shrink, allow_expand);
     return (
         "q\n" +
         cm.unparse() + " cm\n" +

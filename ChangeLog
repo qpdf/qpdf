@@ -1,5 +1,10 @@
 2021-02-18  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add QPDFPageObjectHelper::getMatrixForFormXObjectPlacement,
+	which returns the transformation matrix required to map from a
+	form field's coordinate system into a specific rectangle within
+	the page.
+
 	* Add QUtil::path_basename to get last element of a path.
 
 	* Add examples/pdf-attach-file.cc to illustrate new file

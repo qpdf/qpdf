@@ -24,6 +24,7 @@
 
 #include <qpdf/QPDFObjectHelper.hh>
 #include <qpdf/QPDFAnnotationObjectHelper.hh>
+#include <qpdf/QPDFMatrix.hh>
 
 #include <qpdf/DLL.h>
 
@@ -305,6 +306,16 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
         bool invert_transformations = true,
         bool allow_shrink = true,
         bool allow_expand = false);
+
+    // Return the transformation matrix that translates from the given
+    // form XObject's coordinate system into the given rectangular
+    // region on the page. The parameters have the same meaning as for
+    // placeFormXObject.
+    QPDF_DLL
+    QPDFMatrix getMatrixForFormXObjectPlacement(
+        QPDFObjectHandle fo, QPDFObjectHandle::Rectangle rect,
+        bool invert_transformations = true,
+        bool allow_shrink = true, bool allow_expand = false);
 
     // If a page is rotated using /Rotate in the page's dictionary,
     // instead rotate the page by the same amount by altering the

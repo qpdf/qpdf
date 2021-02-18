@@ -5285,6 +5285,15 @@ print "\n";
         </listitem>
         <listitem>
          <para>
+	  Add
+	  <function>QPDFPageObjectHelper::getMatrixForFormXObjectPlacement</function>
+	  which returns the transformation matrix required to map from
+	  a form field's coordinate system into a specific rectangle
+	  within the page.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
           Add <function>QUtil::path_basename</function> to return the
           last element of a path.
          </para>
