@@ -60,16 +60,7 @@ static void process(char const* infilename, char const* password,
             ">>"));
 
     // Create a file spec.
-    std::string key(attachment);
-    size_t pos = key.find_last_of("/\\");
-    if (pos != std::string::npos)
-    {
-        key = key.substr(pos + 1);
-    }
-    if (key.empty())
-    {
-        throw std::runtime_error("can't get last path element of attachment");
-    }
+    std::string key = QUtil::path_basename(attachment);
     std::cout << whoami << ": attaching " << attachment << " as " << key
               << std::endl;
     auto fs = QPDFFileSpecObjectHelper::createFileSpec(q, key, attachment);

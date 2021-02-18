@@ -2873,16 +2873,10 @@ ArgParser::argEndAddAttachment()
     {
         usage("add attachment: no path specified");
     }
-    std::string last_element = cur.path;
-    size_t pathsep = cur.path.find_last_of("/\\");
-    if (pathsep != std::string::npos)
+    std::string last_element = QUtil::path_basename(cur.path);
+    if (last_element.empty())
     {
-        last_element = cur.path.substr(pathsep + 1);
-        if (last_element.empty())
-        {
-            usage("path for --add-attachment may not end"
-                  " with a path separator");
-        }
+        usage("path for --add-attachment may not be empty");
     }
     if (cur.filename.empty())
     {
