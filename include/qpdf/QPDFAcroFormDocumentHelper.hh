@@ -134,8 +134,8 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
     // field dictionary, the underlying object will be the same, but
     // this is not always the case. Note that if you call this method
     // with an annotation that is not a widget annotation, there will
-    // not be an associated field, and this method will raise an
-    // exception.
+    // not be an associated field, and this method will return a
+    // helper associated with a null object (isNull() == true).
     QPDF_DLL
     QPDFFormFieldObjectHelper
     getFieldForAnnotation(QPDFAnnotationObjectHelper);

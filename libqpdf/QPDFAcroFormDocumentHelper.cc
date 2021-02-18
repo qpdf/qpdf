@@ -70,16 +70,14 @@ QPDFFormFieldObjectHelper
 QPDFAcroFormDocumentHelper::getFieldForAnnotation(QPDFAnnotationObjectHelper h)
 {
     QPDFObjectHandle oh = h.getObjectHandle();
+    QPDFFormFieldObjectHelper result(QPDFObjectHandle::newNull());
     if (! (oh.isDictionary() &&
            oh.getKey("/Subtype").isName() &&
            (oh.getKey("/Subtype").getName() == "/Widget")))
     {
-        throw std::logic_error(
-            "QPDFAnnotationObjectHelper::getFieldForAnnotation called for"
-            " non-/Widget annotation");
+        return result;
     }
     analyze();
-    QPDFFormFieldObjectHelper result(QPDFObjectHandle::newNull());
     QPDFObjGen og(oh.getObjGen());
     if (this->m->annotation_to_field.count(og))
     {
