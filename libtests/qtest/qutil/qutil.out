@@ -97,6 +97,13 @@ file1: -qutil.out-, file2: -other-file-; same: 0: PASS
 file1: -qutil.out-, file2: --; same: 0: PASS
 file1: -qutil.out-, file2: -(null)-; same: 0: PASS
 file1: --, file2: -qutil.out-; same: 0: PASS
+---- path
+//// -> /
+a/b/cdef -> cdef
+a/b/cdef/ -> cdef
+/ -> /
+ -> 
+quack -> quack
 ---- read from file
 This file is used for qutil testing.
 It has mixed newlines.

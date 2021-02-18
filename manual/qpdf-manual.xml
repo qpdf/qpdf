@@ -5283,6 +5283,12 @@ print "\n";
           matrices.
          </para>
         </listitem>
+        <listitem>
+         <para>
+          Add <function>QUtil::path_basename</function> to return the
+          last element of a path.
+         </para>
+        </listitem>
        </itemizedlist>
       </listitem>
       <listitem>

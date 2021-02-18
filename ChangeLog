@@ -1,5 +1,7 @@
 2021-02-18  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add QUtil::path_basename to get last element of a path.
+
 	* Add examples/pdf-attach-file.cc to illustrate new file
 	attachment method and also new parse that takes indirect objects.
 

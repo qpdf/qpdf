@@ -663,6 +663,37 @@ QUtil::file_provider(std::string const& filename)
     };
 }
 
+std::string
+QUtil::path_basename(std::string const& filename)
+{
+#ifdef _WIN32
+    char const* pathsep = "/\\";
+#else
+    char const* pathsep = "/";
+#endif
+    std::string last = filename;
+    auto len = last.length();
+    while (len > 1)
+    {
+        auto pos = last.find_last_of(pathsep);
+        if (pos == len - 1)
+        {
+            last.pop_back();
+            --len;
+        }
+        else if (pos == std::string::npos)
+        {
+            break;
+        }
+        else
+        {
+            last = last.substr(pos + 1);
+            break;
+        }
+    }
+    return last;
+}
+
 char*
 QUtil::copy_string(std::string const& str)
 {

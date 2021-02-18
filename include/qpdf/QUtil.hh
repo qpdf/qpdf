@@ -130,14 +130,22 @@ namespace QUtil
     // Write the contents of filename as a binary file to the
     // pipeline.
     QPDF_DLL
-    void
-    pipe_file(char const* filename, Pipeline* p);
+    void pipe_file(char const* filename, Pipeline* p);
 
     // Return a function that will send the contents of the given file
     // through the given pipeline as binary data.
     QPDF_DLL
-    std::function<void(Pipeline*)>
-    file_provider(std::string const& filename);
+    std::function<void(Pipeline*)> file_provider(std::string const& filename);
+
+    // Return the last path element. On Windows, either / or \ are
+    // path separators. Otherwise, only / is a path separator. Strip
+    // any trailing path separators. Then, if any path separators
+    // remain, return everything after the last path separator.
+    // Otherwise, return the whole string. As a special case, if a
+    // string consists entirely of path separators, the first
+    // character is returned.
+    QPDF_DLL
+    std::string path_basename(std::string const& filename);
 
     QPDF_DLL
     char* copy_string(std::string const&);

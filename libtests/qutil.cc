@@ -439,6 +439,29 @@ void same_file_test()
     assert_same_file("", "qutil.out", false);
 }
 
+void path_test()
+{
+    auto check = [](bool print, std::string const& a, std::string const& b) {
+        auto result = QUtil::path_basename(a);
+        if (print)
+        {
+            std::cout << a << " -> " << result << std::endl;
+        }
+        assert(result == b);
+    };
+
+#ifdef _WIN32
+    check(false, "asdf\\qwer", "qwer");
+    check(false, "asdf\\qwer/\\", "qwer");
+#endif
+    check(true, "////", "/");
+    check(true, "a/b/cdef", "cdef");
+    check(true, "a/b/cdef/", "cdef");
+    check(true, "/", "/");
+    check(true, "", "");
+    check(true, "quack", "quack");
+}
+
 void read_from_file_test()
 {
     std::list<std::string> lines = QUtil::read_lines_from_file("other-file");
@@ -636,6 +659,8 @@ int main(int argc, char* argv[])
 	get_whoami_test();
 	std::cout << "---- file" << std::endl;
 	same_file_test();
+	std::cout << "---- path" << std::endl;
+	path_test();
 	std::cout << "---- read from file" << std::endl;
 	read_from_file_test();
 	std::cout << "---- hex encode/decode" << std::endl;
