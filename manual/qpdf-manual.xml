@@ -1008,7 +1008,7 @@ make
         linkend="ref.page-selection"/>. If the page range is omitted,
         the rotation is applied to all pages. The
         <option>angle</option> portion of the parameter may be either
-        90, 180, or 270. If preceded by <option>+</option> or
+        0, 90, 180, or 270. If preceded by <option>+</option> or
         <option>-</option>, the angle is added to or subtracted from
         the specified pages' original rotations. This is almost always
         what you want. Otherwise the pages' rotations are set to the
@@ -5173,6 +5173,12 @@ print "\n";
           <option>--collate=<replaceable>n</replaceable></option> is
           given, take pages in groups of <replaceable>n</replaceable>
           from the given files.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          It is now valid to provide <option>--rotate=0</option> to
+          clear rotation from a page.
          </para>
         </listitem>
        </itemizedlist>

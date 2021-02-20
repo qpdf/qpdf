@@ -1579,6 +1579,8 @@ QPDFObjectHandle::rotatePage(int angle, bool relative)
         new_angle += old_angle;
     }
     new_angle = (new_angle + 360) % 360;
+    // Make this explicit even with new_angle == 0 since /Rotate can
+    // be inherited.
     replaceKey("/Rotate", QPDFObjectHandle::newInteger(new_angle));
 }
 

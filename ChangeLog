@@ -1,3 +1,7 @@
+2021-02-20  Jay Berkenbilt  <ejb@ql.org>
+
+	* Allow --rotate=0 to clear rotation from a page.
+
 2021-02-18  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add QPDFAcroFormDocumentHelper::addFormField, which adds a new

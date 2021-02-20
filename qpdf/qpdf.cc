@@ -1374,8 +1374,8 @@ ArgParser::argHelp()
         << "                        concatenated\n"
         << "--flatten-rotation      move page rotation from /Rotate key to content\n"
         << "--rotate=[+|-]angle[:page-range]\n"
-        << "                        rotate each specified page 90, 180, or 270 degrees;\n"
-        << "                        rotate all pages if no page range is given\n"
+        << "                        rotate each specified page 0, 90, 180, or 270\n"
+        << "                        degrees; rotate all pages if no page range is given\n"
         << "--split-pages=[n]       write each output page to a separate file\n"
         << "--overlay options --    overlay pages from another file\n"
         << "--underlay options --   underlay pages from another file\n"
@@ -1399,7 +1399,7 @@ ArgParser::argHelp()
         << "or investigatory purposes. See manual for further discussion.\n"
         << "\n"
         << "The --rotate flag can be used to specify pages to rotate pages either\n"
-        << "90, 180, or 270 degrees. The page range is specified in the same\n"
+        << "0, 90, 180, or 270 degrees. The page range is specified in the same\n"
         << "format as with the --pages option, described below. Repeat the option\n"
         << "to rotate multiple groups of pages. If the angle is preceded by + or -,\n"
         << "it is added to or subtracted from the original rotation. Otherwise, the\n"
@@ -3448,7 +3448,8 @@ ArgParser::parseRotationParameter(std::string const& parameter)
         // ignore
     }
     if (range_valid &&
-        ((angle_str == "90") || (angle_str == "180") || (angle_str == "270")))
+        ((angle_str == "0") ||(angle_str == "90") ||
+         (angle_str == "180") || (angle_str == "270")))
     {
         int angle = QUtil::string_to_int(angle_str.c_str());
         if (relative == -1)
