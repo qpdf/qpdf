@@ -97,6 +97,8 @@ Comments appear in the code prefixed by "ABI"
 * Consider having addArrayItem, replaceKey, etc. return the new value
   so you can say
   auto oh = dict.replaceKey("/Key", QPDFObjectHandle::newSomething());
+* Do something about QPDFObjectHandle::Matrix and QPDFMatrix. They
+  should be the same thing.
 
 Page splitting/merging
 ======================
