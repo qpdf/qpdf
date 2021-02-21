@@ -90,7 +90,6 @@ class QPDFMatrix
     QPDFObjectHandle::Rectangle transformRectangle(
         QPDFObjectHandle::Rectangle r);
 
-  private:
     double a;
     double b;
     double c;

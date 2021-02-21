@@ -47,6 +47,7 @@ class QPDF_Array;
 class QPDFTokenizer;
 class QPDFExc;
 class Pl_QPDFTokenizer;
+class QPDFMatrix;
 
 class QPDFObjectHandle
 {
@@ -522,6 +523,8 @@ class QPDFObjectHandle
     QPDF_DLL
     static QPDFObjectHandle newArray(Matrix const&);
     QPDF_DLL
+    static QPDFObjectHandle newArray(QPDFMatrix const&);
+    QPDF_DLL
     static QPDFObjectHandle newDictionary();
     QPDF_DLL
     static QPDFObjectHandle newDictionary(
@@ -535,6 +538,8 @@ class QPDFObjectHandle
     // form of newArray.
     QPDF_DLL
     static QPDFObjectHandle newFromMatrix(Matrix const&);
+    QPDF_DLL
+    static QPDFObjectHandle newFromMatrix(QPDFMatrix const&);
 
     // Create a new stream and associate it with the given qpdf
     // object.  A subsequent call must be made to replaceStreamData()

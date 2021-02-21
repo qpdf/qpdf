@@ -19,6 +19,7 @@
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/SparseOHArray.hh>
+#include <qpdf/QPDFMatrix.hh>
 
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
@@ -2567,15 +2568,34 @@ QPDFObjectHandle::newArray(Matrix const& matrix)
 }
 
 QPDFObjectHandle
+QPDFObjectHandle::newArray(QPDFMatrix const& matrix)
+{
+    std::vector<QPDFObjectHandle> items;
+    items.push_back(newReal(matrix.a));
+    items.push_back(newReal(matrix.b));
+    items.push_back(newReal(matrix.c));
+    items.push_back(newReal(matrix.d));
+    items.push_back(newReal(matrix.e));
+    items.push_back(newReal(matrix.f));
+    return newArray(items);
+}
+
+QPDFObjectHandle
 QPDFObjectHandle::newFromRectangle(Rectangle const& rect)
 {
     return newArray(rect);
 }
 
 QPDFObjectHandle
-QPDFObjectHandle::newFromMatrix(Matrix const& rect)
+QPDFObjectHandle::newFromMatrix(Matrix const& m)
 {
-    return newArray(rect);
+    return newArray(m);
+}
+
+QPDFObjectHandle
+QPDFObjectHandle::newFromMatrix(QPDFMatrix const& m)
+{
+    return newArray(m);
 }
 
 QPDFObjectHandle

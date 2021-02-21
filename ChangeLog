@@ -1,3 +1,11 @@
+2021-02-21  Jay Berkenbilt  <ejb@ql.org>
+
+	* Allow QPDFObjectHandle::newArray and
+	QPDFObjectHandle::newFromMatrix take QPDFMatrix as well as
+	QPDFObjectHandle::Matrix
+
+	* Make member variables a--f of QPDFMatrix public
+
 2021-02-20  Jay Berkenbilt  <ejb@ql.org>
 
 	* Allow --rotate=0 to clear rotation from a page.
