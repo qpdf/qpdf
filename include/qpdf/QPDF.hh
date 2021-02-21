@@ -1005,6 +1005,8 @@ class QPDF
                         bool top);
     QPDFObjectHandle replaceForeignIndirectObjects(
         QPDFObjectHandle foreign, ObjCopier& obj_copier, bool top);
+    void copyStreamData(
+        QPDFObjectHandle dest_stream, QPDFObjectHandle src_stream);
 
     // Linearization Hint table structures.
     // Naming conventions:
