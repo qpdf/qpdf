@@ -35,7 +35,6 @@ QPDFAcroFormDocumentHelper::hasAcroForm()
 void
 QPDFAcroFormDocumentHelper::addFormField(QPDFFormFieldObjectHelper ff)
 {
-    invalidateCache();
     auto acroform = this->qpdf.getRoot().getKey("/AcroForm");
     if (! acroform.isDictionary())
     {
@@ -50,6 +49,9 @@ QPDFAcroFormDocumentHelper::addFormField(QPDFFormFieldObjectHelper ff)
         acroform.replaceKey("/Fields", fields);
     }
     fields.appendItem(ff.getObjectHandle());
+    std::set<QPDFObjGen> visited;
+    traverseField(
+        ff.getObjectHandle(), QPDFObjectHandle::newNull(), 0, visited);
 }
 
 std::vector<QPDFFormFieldObjectHelper>
