@@ -1,5 +1,7 @@
 2021-02-21  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add QPDFObjGen::unparse()
+
 	* Add QPDFObjectHandle::copyStream() for making a copy of a stream
 	within the same QPDF instance.
 

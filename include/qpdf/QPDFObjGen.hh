@@ -43,6 +43,8 @@ class QPDFObjGen
     int getObj() const;
     QPDF_DLL
     int getGen() const;
+    QPDF_DLL
+    std::string unparse() const;
 
     QPDF_DLL
     friend std::ostream& operator<<(std::ostream&, const QPDFObjGen&);

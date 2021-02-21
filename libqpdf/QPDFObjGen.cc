@@ -1,4 +1,5 @@
 #include <qpdf/QPDFObjGen.hh>
+#include <qpdf/QUtil.hh>
 
 QPDFObjGen::QPDFObjGen() :
     obj(0),
@@ -41,4 +42,11 @@ std::ostream& operator<<(std::ostream& os, const QPDFObjGen& og)
 {
     os << og.obj << "," << og.gen;
     return os;
+}
+
+std::string
+QPDFObjGen::unparse() const
+{
+    return QUtil::int_to_string(this->obj) + "," +
+        QUtil::int_to_string(this->gen);
 }
