@@ -5202,6 +5202,13 @@ print "\n";
         </listitem>
         <listitem>
          <para>
+          Add <function>QPDFObjectHandle::copyStream</function> for
+          making a copy of a stream within the same
+          <classname>QPDF</classname> instance.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
           Add <function>QUtil::get_current_qpdf_time</function>,
           <function>QUtil::pdf_time_to_qpdf_time</function>, and
           <function>QUtil::qpdf_time_to_pdf_time</function> for

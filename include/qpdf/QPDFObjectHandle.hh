@@ -761,7 +761,8 @@ class QPDFObjectHandle
     // the same place. In the strictest sense, this is not a shallow
     // copy because it recursively descends arrays and dictionaries;
     // it just doesn't cross over indirect objects. See also
-    // unsafeShallowCopy().
+    // unsafeShallowCopy(). You can't copy a stream this way. See
+    // copyStream() instead.
     QPDF_DLL
     QPDFObjectHandle shallowCopy();
 
@@ -775,6 +776,19 @@ class QPDFObjectHandle
     // shallowCopy().
     QPDF_DLL
     QPDFObjectHandle unsafeShallowCopy();
+
+    // Create a copy of this stream. The new stream and the old stream
+    // are independent: after the copy, either the original or the
+    // copy's dictionary or data can be modified without affecting the
+    // other. This uses StreamDataProvider internally, so no
+    // unnecessary copies of the stream's data are made. If the source
+    // stream's data is already being provided by a
+    // StreamDataProvider, the new stream will use the same one, so
+    // you have to make sure your StreamDataProvider can handle that
+    // case. But if you're already using a StreamDataProvider, you
+    // probably don't need to call this method.
+    QPDF_DLL
+    QPDFObjectHandle copyStream();
 
     // Mutator methods.  Use with caution.
 

@@ -2596,6 +2596,10 @@ QPDF::replaceForeignIndirectObjects(
 void
 QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
 {
+    // This method was originally written for copying foreign streams,
+    // but it is used by QPDFObjectHandle to copy streams from the
+    // same QPDF object as well.
+
     QPDFObjectHandle dict = result.getDict();
     QPDFObjectHandle old_dict = foreign.getDict();
     if (this->m->copied_stream_data_provider == 0)

@@ -1549,7 +1549,7 @@ unlink "a.pdf" or die;
 show_ntests();
 # ----------
 $td->notify("--- Object copying ---");
-$n_tests += 7;
+$n_tests += 9;
 
 $td->runtest("shallow copy an array",
 	     {$td->COMMAND => "test_driver 20 shallow_array.pdf"},
@@ -1578,6 +1578,13 @@ $td->runtest("detect foreign object in write",
                   " copy-foreign-objects-in.pdf minimal.pdf"},
              {$td->FILE => "foreign-in-write.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
+$td->runtest("copy a stream",
+             {$td->COMMAND => "test_driver 79 minimal.pdf"},
+             {$td->STRING => "test 79 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "test79.pdf"});
 
 show_ntests();
 # ----------

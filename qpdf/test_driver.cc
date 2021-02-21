@@ -2844,6 +2844,67 @@ void runtest(int n, char const* filename1, char const* arg2)
         w.setQDFMode(true);
         w.write();
     }
+    else if (n == 79)
+    {
+        // Exercise stream copier
+
+        // Copy streams. Modify the original and make sure the copy is
+        // unaffected.
+        auto copies = QPDFObjectHandle::newArray();
+        pdf.getTrailer().replaceKey("/Copies", copies);
+        auto null = QPDFObjectHandle::newNull();
+
+        // Get a regular stream from the file
+        auto p1 = pdf.getAllPages().at(0);
+        auto s1 = p1.getKey("/Contents");
+
+        // Create a stream from a string
+        auto s2 = QPDFObjectHandle::newStream(&pdf, "from string");
+        // Add direct and indirect objects to the dictionary
+        s2.getDict().replaceKey(
+            "/Stuff",
+            QPDFObjectHandle::parse(
+                &pdf,
+                "<< /Direct 3 /Indirect " +
+                pdf.makeIndirectObject(
+                    QPDFObjectHandle::newInteger(16059)).unparse() + ">>"));
+        s2.getDict().replaceKey(
+            "/Other", QPDFObjectHandle::newString("other stuff"));
+
+        // Use a provider
+        Pl_Buffer b("buffer");
+        b.write(QUtil::unsigned_char_pointer("from buffer"), 11);
+        b.finish();
+        PointerHolder<Buffer> bp = b.getBuffer();
+        auto s3 = QPDFObjectHandle::newStream(&pdf, bp);
+
+        std::vector<QPDFObjectHandle> streams = {s1, s2, s3};
+        pdf.getTrailer().replaceKey(
+            "/Originals", QPDFObjectHandle::newArray(streams));
+
+        int i = 0;
+        for (auto orig: streams)
+        {
+            ++i;
+            auto istr = QUtil::int_to_string(i);
+            auto orig_data = orig.getStreamData();
+            auto copy = orig.copyStream();
+            copy.getDict().replaceKey(
+                "/Other", QPDFObjectHandle::newString("other: " + istr));
+            orig.replaceStreamData("something new " + istr, null, null);
+            auto copy_data = copy.getStreamData();
+            assert(orig_data->getSize() == copy_data->getSize());
+            assert(memcmp(orig_data->getBuffer(),
+                          copy_data->getBuffer(),
+                          orig_data->getSize()) == 0);
+            copies.appendItem(copy);
+        }
+
+        QPDFWriter w(pdf, "a.pdf");
+        w.setStaticID(true);
+        w.setQDFMode(true);
+        w.write();
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +

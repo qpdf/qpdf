@@ -700,6 +700,21 @@ class QPDF
     };
     friend class Resolver;
 
+    // StreamCopier class is restricted to QPDFObjectHandle so it can
+    // copy stream data.
+    class StreamCopier
+    {
+	friend class QPDFObjectHandle;
+      private:
+	static void copyStreamData(QPDF* qpdf,
+                                   QPDFObjectHandle const& dest,
+                                   QPDFObjectHandle const& src)
+	{
+	    qpdf->copyStreamData(dest, src);
+	}
+    };
+    friend class Resolver;
+
     // ParseGuard class allows QPDFObjectHandle to detect re-entrant
     // resolution
     class ParseGuard

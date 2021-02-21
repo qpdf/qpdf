@@ -1,5 +1,8 @@
 2021-02-21  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add QPDFObjectHandle::copyStream() for making a copy of a stream
+	within the same QPDF instance.
+
 	* Allow QPDFObjectHandle::newArray and
 	QPDFObjectHandle::newFromMatrix take QPDFMatrix as well as
 	QPDFObjectHandle::Matrix
