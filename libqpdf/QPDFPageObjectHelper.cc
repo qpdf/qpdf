@@ -1168,9 +1168,7 @@ QPDFPageObjectHelper::flattenRotation()
     // the same offset from the lower left corner of the media box.
     // These calculations have been verified empirically with various
     // PDF readers.
-    QPDFObjectHandle::Matrix cm;
-    cm.e = 0.0;
-    cm.f = 0.0;
+    QPDFMatrix cm(0, 0, 0, 0, 0, 0);
     switch (rotate)
     {
       case 90:
@@ -1196,13 +1194,7 @@ QPDFPageObjectHelper::flattenRotation()
         break;
     }
     std::string cm_str =
-        std::string("q\n") +
-        QUtil::double_to_string(cm.a, 2) + " " +
-        QUtil::double_to_string(cm.b, 2) + " " +
-        QUtil::double_to_string(cm.c, 2) + " " +
-        QUtil::double_to_string(cm.d, 2) + " " +
-        QUtil::double_to_string(cm.e, 2) + " " +
-        QUtil::double_to_string(cm.f, 2) + " cm\n";
+        std::string("q\n") + cm.unparse() + " cm\n";
     this->oh.addPageContents(
         QPDFObjectHandle::newStream(qpdf, cm_str), true);
     this->oh.addPageContents(
