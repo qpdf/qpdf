@@ -3039,6 +3039,12 @@ bool
 QPDFObjectHandle::isPageObject()
 {
     // See comments in QPDFObjectHandle.hh.
+    if (getOwningQPDF() == nullptr)
+    {
+        return false;
+    }
+    // getAllPages repairs /Type when traversing the page tree.
+    getOwningQPDF()->getAllPages();
     if (! this->isDictionary())
     {
         return false;
@@ -3066,8 +3072,16 @@ QPDFObjectHandle::isPageObject()
 bool
 QPDFObjectHandle::isPagesObject()
 {
-    // Some PDF files have /Type broken on pages.
-    return (this->isDictionary() && this->hasKey("/Kids"));
+    if (getOwningQPDF() == nullptr)
+    {
+        return false;
+    }
+    // getAllPages repairs /Type when traversing the page tree.
+    getOwningQPDF()->getAllPages();
+    return (this->isDictionary() &&
+            this->hasKey("/Type") &&
+            this->getKey("/Type").isName() &&
+            this->getKey("/Type").getName() == "/Pages");
 }
 
 bool
