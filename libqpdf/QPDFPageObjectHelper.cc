@@ -1236,3 +1236,78 @@ QPDFPageObjectHelper::flattenRotation(QPDFAcroFormDocumentHelper* afdh)
         this->oh.replaceKey("/Annots", QPDFObjectHandle::newArray(new_annots));
     }
 }
+
+void
+QPDFPageObjectHelper::copyAnnotations(
+    QPDFPageObjectHelper from_page, QPDFMatrix const& cm,
+    QPDFAcroFormDocumentHelper* afdh,
+    QPDFAcroFormDocumentHelper* from_afdh)
+{
+    auto old_annots = from_page.getObjectHandle().getKey("/Annots");
+    if (! old_annots.isArray())
+    {
+        return;
+    }
+
+    QPDF* from_qpdf = from_page.getObjectHandle().getOwningQPDF();
+    if (! from_qpdf)
+    {
+        throw std::runtime_error(
+            "QPDFPageObjectHelper::copyAnnotations:"
+            " from page is a direct object");
+    }
+    QPDF* this_qpdf = this->oh.getOwningQPDF();
+    if (! this_qpdf)
+    {
+        throw std::runtime_error(
+            "QPDFPageObjectHelper::copyAnnotations:"
+            " this page is a direct object");
+    }
+
+    std::vector<QPDFObjectHandle> new_annots;
+    std::vector<QPDFObjectHandle> new_fields;
+    std::set<QPDFObjGen> old_fields;
+    PointerHolder<QPDFAcroFormDocumentHelper> afdhph;
+    PointerHolder<QPDFAcroFormDocumentHelper> from_afdhph;
+    if (! afdh)
+    {
+        afdhph = new QPDFAcroFormDocumentHelper(*this_qpdf);
+        afdh = afdhph.getPointer();
+    }
+    if (this_qpdf == from_qpdf)
+    {
+        from_afdh = afdh;
+    }
+    else if (from_afdh)
+    {
+        if (from_afdh->getQPDF().getUniqueId() != from_qpdf->getUniqueId())
+        {
+            throw std::logic_error(
+                "QPDFAcroFormDocumentHelper::copyAnnotations: from_afdh"
+                " is not from the same QPDF as from_page");
+        }
+    }
+    else
+    {
+        from_afdhph = new QPDFAcroFormDocumentHelper(*from_qpdf);
+        from_afdh = from_afdhph.getPointer();
+    }
+
+    afdh->transformAnnotations(
+        old_annots, new_annots, new_fields, old_fields, cm,
+        from_qpdf, from_afdh);
+    for (auto const& f: new_fields)
+    {
+        afdh->addFormField(QPDFFormFieldObjectHelper(f));
+    }
+    auto annots = this->oh.getKey("/Annots");
+    if (! annots.isArray())
+    {
+        annots = QPDFObjectHandle::newArray();
+        this->oh.replaceKey("/Annots", annots);
+    }
+    for (auto const& annot: new_annots)
+    {
+        annots.appendItem(annot);
+    }
+}

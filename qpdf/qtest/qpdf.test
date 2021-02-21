@@ -2413,6 +2413,53 @@ foreach my $f (qw(screen print))
 
 show_ntests();
 # ----------
+$td->notify("--- Copy Annotations ---");
+$n_tests += 16;
+
+$td->runtest("complex copy annotations",
+             {$td->COMMAND =>
+                  "qpdf --qdf --static-id --no-original-object-ids" .
+                  " fxo-red.pdf --overlay form-fields-and-annotations.pdf" .
+                  " --repeat=1 -- a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "overlay-copy-annotations.pdf"});
+
+foreach my $page (1, 2, 5, 6)
+{
+    $td->runtest("copy annotations single page ($page)",
+                 {$td->COMMAND =>
+                      "qpdf --qdf --static-id --no-original-object-ids" .
+                      " --pages . $page --" .
+                      " fxo-red.pdf --overlay form-fields-and-annotations.pdf" .
+                      " --repeat=1 -- a.pdf"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("check output",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => "overlay-copy-annotations-p$page.pdf"});
+}
+
+foreach my $d ([1, "appearances-1.pdf"],
+               [2, "appearances-1-rotated.pdf"])
+{
+    my ($n, $file1) = @$d;
+    $td->runtest("copy/transfer with defaults",
+                 {$td->COMMAND => "test_driver 80 $file1 minimal.pdf"},
+                 {$td->STRING => "test 80 done\n", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("check output A",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => "test80a$n.pdf"});
+    $td->runtest("check output B",
+                 {$td->FILE => "b.pdf"},
+                 {$td->FILE => "test80b$n.pdf"});
+}
+
+show_ntests();
+# ----------
 $td->notify("--- Page Tree Issues ---");
 $n_tests += 9;
 

@@ -2905,6 +2905,56 @@ void runtest(int n, char const* filename1, char const* arg2)
         w.setQDFMode(true);
         w.write();
     }
+    else if (n == 80)
+    {
+        // Exercise transform/copy annotations without passing in
+        // QPDFAcroFormDocumentHelper pointers. The case of passing
+        // them in is sufficiently exercised by testing through the
+        // qpdf CLI.
+
+        // The main file is a file that has lots of annotations. Arg2
+        // is a file to copy annotations to.
+
+        QPDFMatrix m;
+        m.translate(306, 396);
+        m.scale(0.4, 0.4);
+        auto page1 = pdf.getAllPages().at(0);
+        auto old_annots = page1.getKey("/Annots");
+        // Transform annotations and copy them back to the same page.
+        std::vector<QPDFObjectHandle> new_annots;
+        std::vector<QPDFObjectHandle> new_fields;
+        std::set<QPDFObjGen> old_fields;
+        QPDFAcroFormDocumentHelper afdh(pdf);
+        // Use defaults for from_qpdf and from_afdh.
+        afdh.transformAnnotations(
+            old_annots, new_annots, new_fields, old_fields, m);
+        for (auto const& annot: new_annots)
+        {
+            old_annots.appendItem(annot);
+        }
+        for (auto const& field: new_fields)
+        {
+            afdh.addFormField(QPDFFormFieldObjectHelper(field));
+        }
+
+        m = QPDFMatrix();
+        m.translate(612, 0);
+        m.scale(-1, 1);
+        QPDF pdf2;
+        pdf2.processFile(arg2);
+        auto page2 = QPDFPageDocumentHelper(pdf2).getAllPages().at(0);
+        page2.copyAnnotations(page1, m);
+
+        QPDFWriter w1(pdf, "a.pdf");
+        w1.setStaticID(true);
+        w1.setQDFMode(true);
+        w1.write();
+
+        QPDFWriter w2(pdf2, "b.pdf");
+        w2.setStaticID(true);
+        w2.setQDFMode(true);
+        w2.write();
+    }
     else
     {
 	throw std::runtime_error(std::string("invalid test ") +

@@ -572,6 +572,6 @@ qpdf password file 0
 QPDFFileSpecObjectHelper empty compat_name 0
 QPDFFileSpecObjectHelper non-empty compat_name 0
 QPDFPageObjectHelper flatten inherit rotate 0
-QPDFAcroFormDocumentHelper copy annotation 1
-QPDFAcroFormDocumentHelper field with parent 1
+QPDFAcroFormDocumentHelper copy annotation 3
+QPDFAcroFormDocumentHelper field with parent 3
 QPDFAcroFormDocumentHelper modify ap matrix 0

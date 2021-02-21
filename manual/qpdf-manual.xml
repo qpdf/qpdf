@@ -5321,6 +5321,15 @@ print "\n";
         </listitem>
         <listitem>
          <para>
+	  Add
+	  <function>QPDFPageObjectHelper::copyAnnotations</function>,
+	  which copies annotations and, if applicable, associated form
+	  fields, from one page to another, possibly transforming the
+	  rectangles.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
           Add <function>QUtil::path_basename</function> to return the
           last element of a path.
          </para>

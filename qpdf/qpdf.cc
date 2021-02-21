@@ -5160,6 +5160,19 @@ static void do_under_overlay_for_page(
         return;
     }
 
+    std::map<unsigned long long,
+             PointerHolder<QPDFAcroFormDocumentHelper>> afdh;
+    auto make_afdh = [&](QPDFPageObjectHelper& ph) {
+        QPDF* q = ph.getObjectHandle().getOwningQPDF();
+        auto uid = q->getUniqueId();
+        if (! afdh.count(uid))
+        {
+            afdh[uid] = new QPDFAcroFormDocumentHelper(*q);
+        }
+        return afdh[uid].getPointer();
+    };
+    auto dest_afdh = make_afdh(dest_page);
+
     std::string content;
     int min_suffix = 1;
     QPDFObjectHandle resources = dest_page.getAttribute("/Resources", true);
@@ -5171,13 +5184,19 @@ static void do_under_overlay_for_page(
         {
             std::cout << "    " << uo.which << " " << from_pageno << std::endl;
         }
+        auto from_page = pages.at(QIntC::to_size(from_pageno - 1));
         if (0 == fo.count(from_pageno))
         {
             fo[from_pageno] =
                 pdf.copyForeignObject(
-                    pages.at(QIntC::to_size(from_pageno - 1)).
-                    getFormXObjectForPage());
+                    from_page.getFormXObjectForPage());
         }
+        auto cm = dest_page.getMatrixForFormXObjectPlacement(
+            fo[from_pageno],
+            dest_page.getTrimBox().getArrayAsRectangle());
+        dest_page.copyAnnotations(
+            from_page, cm, dest_afdh, make_afdh(from_page));
+
         // If the same page is overlaid or underlaid multiple times,
         // we'll generate multiple names for it, but that's harmless
         // and also a pretty goofy case that's not worth coding

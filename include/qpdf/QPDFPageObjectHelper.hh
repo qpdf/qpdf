@@ -335,6 +335,33 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     void flattenRotation(QPDFAcroFormDocumentHelper* afdh);
 
+    // Copy annotations from another page into this page. The other
+    // page may be from the same QPDF or from a different QPDF. Each
+    // annotation's rectangle is transformed by the given matrix. If
+    // the annotation is a widget annotation that is associated with a
+    // form field, the form field is copied into this document's
+    // AcroForm dictionary as well. You can use this to copy
+    // annotations from a page that was converted to a form XObject
+    // and added to another page. For example of this, see
+    // examples/pdf-overlay-page.cc. Note that if you use this to copy
+    // annotations from one page to another in the same document and
+    // you use a transformation matrix other than the identity matrix,
+    // it will alter the original annotation, which is probably not
+    // what you want. Also, if you copy the same page multiple times
+    // with different transformation matrices, the effect will be
+    // cumulative, which is probably also not what you want.
+    //
+    // If you pass in a QPDFAcroFormDocumentHelper*, the method will
+    // use that instead of creating one in the function. Creating
+    // QPDFAcroFormDocumentHelper objects is expensive, so if you're
+    // doing a lot of copying, it can be more efficient to create
+    // these outside and pass them in.
+    QPDF_DLL
+    void copyAnnotations(
+        QPDFPageObjectHelper from_page, QPDFMatrix const& cm = QPDFMatrix(),
+        QPDFAcroFormDocumentHelper* afdh = nullptr,
+        QPDFAcroFormDocumentHelper* from_afdh = nullptr);
+
   private:
     static bool
     removeUnreferencedResourcesHelper(

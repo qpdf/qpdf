@@ -1,5 +1,12 @@
 2021-02-21  Jay Berkenbilt  <ejb@ql.org>
 
+	* From qpdf CLI, --overlay and --underlay will copy annotations
+	and form fields from overlay/underlay file. Fixes #395.
+
+	* Add QPDFPageObjectHelper::copyAnnotations, which copies
+	annotations and, if applicable, associated form fields, from one
+	page to another, possibly transforming the rectangles.
+
 	* Bug fix: --flatten-rotation now applies the required
 	transformation to annotations on the page.
 
