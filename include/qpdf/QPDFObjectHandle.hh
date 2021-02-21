@@ -267,7 +267,10 @@ class QPDFObjectHandle
         double ury;
     };
 
-    // Convenience object for transformation matrices
+    // Convenience object for transformation matrices. See also
+    // QPDFMatrix. Unfortunately we can't replace this with QPDFMatrix
+    // because QPDFMatrix's default constructor creates the identity
+    // transform matrix and this one is all zeroes.
     class Matrix
     {
       public:
