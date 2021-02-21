@@ -5315,6 +5315,13 @@ print "\n";
         </listitem>
         <listitem>
          <para>
+          Add method
+          <function>QPDFAcroFormDocumentHelper::transformAnnotations</function>,
+          which applies a transformation to each annotation on a page.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
           Add <function>QUtil::path_basename</function> to return the
           last element of a path.
          </para>
@@ -5341,6 +5348,12 @@ print "\n";
         Bug Fixes
        </para>
        <itemizedlist>
+        <listitem>
+         <para>
+	  The <option>--flatten-rotations</option> option applies
+          transformations to any annotations that may be on the page.
+         </para>
+        </listitem>
         <listitem>
          <para>
 	  If a form XObject lacks a resources dictionary, consider any

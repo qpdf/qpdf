@@ -1,5 +1,11 @@
 2021-02-21  Jay Berkenbilt  <ejb@ql.org>
 
+	* Bug fix: --flatten-rotation now applies the required
+	transformation to annotations on the page.
+
+	* Add QPDFAcroFormDocumentHelper::transformAnnotations to apply a
+	transformation to a group of annotations.
+
 	* Add QPDFObjGen::unparse()
 
 	* Add QPDFObjectHandle::copyStream() for making a copy of a stream

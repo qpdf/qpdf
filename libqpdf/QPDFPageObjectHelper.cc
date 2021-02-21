@@ -7,6 +7,7 @@
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFMatrix.hh>
 #include <qpdf/QIntC.hh>
+#include <qpdf/QPDFAcroFormDocumentHelper.hh>
 
 class ContentProvider: public QPDFObjectHandle::StreamDataProvider
 {
@@ -1081,6 +1082,12 @@ QPDFPageObjectHelper::placeFormXObject(
 void
 QPDFPageObjectHelper::flattenRotation()
 {
+    flattenRotation(nullptr);
+}
+
+void
+QPDFPageObjectHelper::flattenRotation(QPDFAcroFormDocumentHelper* afdh)
+{
     QPDF* qpdf = this->oh.getOwningQPDF();
     if (! qpdf)
     {
@@ -1205,5 +1212,27 @@ QPDFPageObjectHelper::flattenRotation()
     {
         QTC::TC("qpdf", "QPDFPageObjectHelper flatten inherit rotate");
         this->oh.replaceKey("/Rotate", QPDFObjectHandle::newInteger(0));
+    }
+
+    QPDFObjectHandle annots = this->oh.getKey("/Annots");
+    if (annots.isArray())
+    {
+        std::vector<QPDFObjectHandle> new_annots;
+        std::vector<QPDFObjectHandle> new_fields;
+        std::set<QPDFObjGen> old_fields;
+        PointerHolder<QPDFAcroFormDocumentHelper> afdhph;
+        if (! afdh)
+        {
+            afdhph = new QPDFAcroFormDocumentHelper(*qpdf);
+            afdh = afdhph.getPointer();
+        }
+        afdh->transformAnnotations(
+            annots, new_annots, new_fields, old_fields, cm);
+        afdh->removeFormFields(old_fields);
+        for (auto const& f: new_fields)
+        {
+            afdh->addFormField(QPDFFormFieldObjectHelper(f));
+        }
+        this->oh.replaceKey("/Annots", QPDFObjectHandle::newArray(new_annots));
     }
 }

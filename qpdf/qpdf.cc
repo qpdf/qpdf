@@ -5362,6 +5362,13 @@ static void copy_attachments(QPDF& pdf, Options& o, int& exit_code)
 static void handle_transformations(QPDF& pdf, Options& o, int& exit_code)
 {
     QPDFPageDocumentHelper dh(pdf);
+    PointerHolder<QPDFAcroFormDocumentHelper> afdh;
+    auto make_afdh = [&]() {
+        if (! afdh.getPointer())
+        {
+            afdh = new QPDFAcroFormDocumentHelper(pdf);
+        }
+    };
     if (o.externalize_inline_images)
     {
         std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
@@ -5408,8 +5415,8 @@ static void handle_transformations(QPDF& pdf, Options& o, int& exit_code)
     }
     if (o.generate_appearances)
     {
-        QPDFAcroFormDocumentHelper afdh(pdf);
-        afdh.generateAppearancesIfNeeded();
+        make_afdh();
+        afdh->generateAppearancesIfNeeded();
     }
     if (o.flatten_annotations)
     {
@@ -5427,9 +5434,10 @@ static void handle_transformations(QPDF& pdf, Options& o, int& exit_code)
     }
     if (o.flatten_rotation)
     {
+        make_afdh();
         for (auto& page: dh.getAllPages())
         {
-            page.flattenRotation();
+            page.flattenRotation(afdh.getPointer());
         }
     }
     if (o.remove_page_labels)

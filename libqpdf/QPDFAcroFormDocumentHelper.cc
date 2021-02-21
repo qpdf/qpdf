@@ -54,6 +54,50 @@ QPDFAcroFormDocumentHelper::addFormField(QPDFFormFieldObjectHelper ff)
         ff.getObjectHandle(), QPDFObjectHandle::newNull(), 0, visited);
 }
 
+void
+QPDFAcroFormDocumentHelper::removeFormFields(
+    std::set<QPDFObjGen> const& to_remove)
+{
+    auto acroform = this->qpdf.getRoot().getKey("/AcroForm");
+    if (! acroform.isDictionary())
+    {
+        return;
+    }
+    auto fields = acroform.getKey("/Fields");
+    if (! fields.isArray())
+    {
+        return;
+    }
+
+    for (auto const& og: to_remove)
+    {
+        auto annotations = this->m->field_to_annotations.find(og);
+        if (annotations != this->m->field_to_annotations.end())
+        {
+            for (auto aoh: annotations->second)
+            {
+                this->m->annotation_to_field.erase(
+                    aoh.getObjectHandle().getObjGen());
+            }
+            this->m->field_to_annotations.erase(og);
+        }
+    }
+
+    int i = 0;
+    while (i < fields.getArrayNItems())
+    {
+        auto field = fields.getArrayItem(i);
+        if (to_remove.count(field.getObjGen()))
+        {
+            fields.eraseItem(i);
+        }
+        else
+        {
+            ++i;
+        }
+    }
+}
+
 std::vector<QPDFFormFieldObjectHelper>
 QPDFAcroFormDocumentHelper::getFormFields()
 {
@@ -349,4 +393,274 @@ QPDFAcroFormDocumentHelper::generateAppearancesIfNeeded()
         }
     }
     setNeedAppearances(false);
+}
+
+void
+QPDFAcroFormDocumentHelper::transformAnnotations(
+    QPDFObjectHandle old_annots,
+    std::vector<QPDFObjectHandle>& new_annots,
+    std::vector<QPDFObjectHandle>& new_fields,
+    std::set<QPDFObjGen>& old_fields,
+    QPDFMatrix const& cm,
+    QPDF* from_qpdf,
+    QPDFAcroFormDocumentHelper* from_afdh)
+{
+    PointerHolder<QPDFAcroFormDocumentHelper> afdhph;
+    if (! from_qpdf)
+    {
+        // Assume these are from the same QPDF.
+        from_qpdf = &this->qpdf;
+        from_afdh = this;
+    }
+    else if ((from_qpdf != &this->qpdf) && (! from_afdh))
+    {
+        afdhph = new QPDFAcroFormDocumentHelper(*from_qpdf);
+        from_afdh = afdhph.getPointer();
+    }
+    bool foreign = (from_qpdf != &this->qpdf);
+
+    std::set<QPDFObjGen> added_new_fields;
+
+    // This helper prevents us from copying the same object
+    // multiple times.
+    std::map<QPDFObjGen, QPDFObjectHandle> copied_objects;
+    auto maybe_copy_object = [&](QPDFObjectHandle& to_copy) {
+        auto og = to_copy.getObjGen();
+        if (copied_objects.count(og))
+        {
+            to_copy = copied_objects[og];
+            return false;
+        }
+        else
+        {
+            to_copy = this->qpdf.makeIndirectObject(to_copy.shallowCopy());
+            copied_objects[og] = to_copy;
+            return true;
+        }
+    };
+
+    for (auto annot: QPDFArrayItems(old_annots))
+    {
+        if (annot.isStream())
+        {
+            annot.warnIfPossible("ignoring annotation that's a stream");
+            continue;
+        }
+
+        // Make copies of annotations and fields down to the
+        // appearance streams, preserving all internal referential
+        // integrity. When the incoming annotations are from a
+        // different file, we first copy them locally. Then, whether
+        // local or foreign, we copy them again so that if we bring
+        // the same annotation in multiple times (e.g. overlaying a
+        // foreign page onto multiple local pages or a local page onto
+        // multiple other local pages), we don't create annotations
+        // that are referenced in more than one place. If we did that,
+        // the effect of applying transformations would be cumulative,
+        // which is definitely not what we want. Besides, annotations
+        // and fields are not intended to be referenced in multiple
+        // places.
+
+        // Determine if this annotation is attached to a form field.
+        // If so, the annotation may be the same object as the form
+        // field, or the form field may have the annotation as a kid.
+        // In either case, we have to walk up the field structure to
+        // find the top-level field. Within one iteration through a
+        // set of annotations, we don't want to copy the same item
+        // more than once. For example, suppose we have field A with
+        // kids B, C, and D, each of which has annotations BA, CA, and
+        // DA. When we get to BA, we will find that BA is a kid of B
+        // which is under A. When we do a copyForeignObject of A, it
+        // will also copy everything else because of the indirect
+        // references. When we clone BA, we will want to clone A and
+        // then update A's clone's kid to point B's clone and B's
+        // clone's parent to point to A's clone. The same thing holds
+        // for annotatons. Next, when we get to CA, we will again
+        // discover that A is the top, but we don't want to re-copy A.
+        // We want CA's clone to be linked to the same clone as BA's.
+        // Failure to do this will break up things like radio button
+        // groups, which all have to kids of the same parent.
+
+        auto ffield = from_afdh->getFieldForAnnotation(annot);
+        auto ffield_oh = ffield.getObjectHandle();
+        QPDFObjectHandle top_field;
+        bool have_field = false;
+        bool have_parent = false;
+        if (ffield_oh.isStream())
+        {
+            ffield_oh.warnIfPossible("ignoring form field that's a stream");
+        }
+        else if ((! ffield_oh.isNull()) && (! ffield_oh.isIndirect()))
+        {
+            ffield_oh.warnIfPossible("ignoring form field not indirect");
+        }
+        else if (! ffield_oh.isNull())
+        {
+            // A field and its associated annotation can be the same
+            // object. This matters because we don't want to clone the
+            // annotation and field separately in this case.
+            have_field = true;
+            // Find the top-level field. It may be the field itself.
+            top_field = ffield_oh;
+            std::set<QPDFObjGen> seen;
+            while (! top_field.getKey("/Parent").isNull())
+            {
+                top_field = top_field.getKey("/Parent");
+                have_parent = true;
+                auto og = top_field.getObjGen();
+                if (seen.count(og))
+                {
+                    break;
+                }
+                seen.insert(og);
+            }
+            if (foreign)
+            {
+                // copyForeignObject returns the same value if called
+                // multiple times with the same field. Create/retrieve
+                // the local copy of the original field. This pulls
+                // over everything the field references including
+                // annotations and appearance streams, but it's
+                // harmless to call copyForeignObject on them too.
+                // They will already be copied, so we'll get the right
+                // object back.
+
+                top_field = this->qpdf.copyForeignObject(top_field);
+                ffield_oh = this->qpdf.copyForeignObject(ffield_oh);
+            }
+            old_fields.insert(top_field.getObjGen());
+
+            // Traverse the field, copying kids, and preserving
+            // integrity.
+            std::list<QPDFObjectHandle> queue;
+            if (maybe_copy_object(top_field))
+            {
+                queue.push_back(top_field);
+            }
+            seen.clear();
+            while (! queue.empty())
+            {
+                QPDFObjectHandle obj = queue.front();
+                queue.pop_front();
+                auto orig_og = obj.getObjGen();
+                if (seen.count(orig_og))
+                {
+                    // loop
+                    break;
+                }
+                seen.insert(orig_og);
+                auto parent = obj.getKey("/Parent");
+                if (parent.isIndirect())
+                {
+                    auto parent_og = parent.getObjGen();
+                    if (copied_objects.count(parent_og))
+                    {
+                        obj.replaceKey("/Parent", copied_objects[parent_og]);
+                    }
+                    else
+                    {
+                        parent.warnIfPossible(
+                            "while traversing field " +
+                            obj.getObjGen().unparse() +
+                            ", found parent (" + parent_og.unparse() +
+                            ") that had not been seen, indicating likely"
+                            " invalid field structure");
+                    }
+                }
+                auto kids = obj.getKey("/Kids");
+                if (kids.isArray())
+                {
+                    for (int i = 0; i < kids.getArrayNItems(); ++i)
+                    {
+                        auto kid = kids.getArrayItem(i);
+                        if (maybe_copy_object(kid))
+                        {
+                            kids.setArrayItem(i, kid);
+                            queue.push_back(kid);
+                        }
+                    }
+                }
+            }
+
+            // Now switch to copies. We already switched for top_field
+            maybe_copy_object(ffield_oh);
+            ffield = QPDFFormFieldObjectHelper(ffield_oh);
+        }
+
+        QTC::TC("qpdf", "QPDFAcroFormDocumentHelper copy annotation",
+                (have_field ? 1 : 0) | (foreign ? 2 : 0));
+        if (have_field)
+        {
+            QTC::TC("qpdf", "QPDFAcroFormDocumentHelper field with parent",
+                    (have_parent ? 1 : 0) | (foreign ? 2 : 0));
+        }
+        if (foreign)
+        {
+            annot = this->qpdf.copyForeignObject(annot);
+        }
+        maybe_copy_object(annot);
+
+        // Now we have copies, so we can safely mutate.
+        if (have_field && ! added_new_fields.count(top_field.getObjGen()))
+        {
+            new_fields.push_back(top_field);
+            added_new_fields.insert(top_field.getObjGen());
+        }
+        new_annots.push_back(annot);
+
+        // Identify and copy any appearance streams
+
+        auto ah = QPDFAnnotationObjectHelper(annot);
+        auto apdict = ah.getAppearanceDictionary();
+        std::vector<QPDFObjectHandle> streams;
+        auto replace_stream = [](auto& dict, auto& key, auto& old) {
+            auto new_stream = old.copyStream();
+            dict.replaceKey(key, new_stream);
+            return new_stream;
+        };
+        if (apdict.isDictionary())
+        {
+            for (auto& ap: QPDFDictItems(apdict))
+            {
+                if (ap.second.isStream())
+                {
+                    streams.push_back(
+                        replace_stream(apdict, ap.first, ap.second));
+                }
+                else if (ap.second.isDictionary())
+                {
+                    for (auto& ap2: QPDFDictItems(ap.second))
+                    {
+                        if (ap2.second.isStream())
+                        {
+                            streams.push_back(
+                                replace_stream(
+                                    ap.second, ap2.first, ap2.second));
+                        }
+                    }
+                }
+            }
+        }
+
+        // Now we can safely mutate the annotation and its appearance
+        // streams.
+        for (auto& stream: streams)
+        {
+            auto omatrix = stream.getDict().getKey("/Matrix");
+            QPDFMatrix apcm;
+            if (omatrix.isArray())
+            {
+                QTC::TC("qpdf", "QPDFAcroFormDocumentHelper modify ap matrix");
+                auto m1 = omatrix.getArrayAsMatrix();
+                apcm = QPDFMatrix(m1);
+            }
+            apcm.concat(cm);
+            auto new_matrix = QPDFObjectHandle::newFromMatrix(apcm);
+            stream.getDict().replaceKey("/Matrix", new_matrix);
+        }
+        auto rect = cm.transformRectangle(
+            annot.getKey("/Rect").getArrayAsRectangle());
+        annot.replaceKey(
+            "/Rect", QPDFObjectHandle::newFromRectangle(rect));
+    }
 }

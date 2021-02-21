@@ -40,6 +40,13 @@ class QPDFAnnotationObjectHelper: public QPDFObjectHelper
     // This class provides helper methods for annotations. More
     // functionality will likely be added in the future.
 
+    // Some functionality for annotations is also implemented in
+    // QPDFAcroFormDocumentHelper and QPDFFormFieldObjectHelper. In
+    // some cases, functions defined there work for other annotations
+    // besides widget annotations, but they are implemented with form
+    // fields so that they can properly handle form fields when
+    // needed.
+
     // Return the subtype of the annotation as a string (e.g.
     // "/Widget"). Returns the empty string if the subtype (which is
     // required by the spec) is missing.

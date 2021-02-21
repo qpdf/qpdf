@@ -113,6 +113,10 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
     QPDF_DLL
     void addFormField(QPDFFormFieldObjectHelper);
 
+    // Remove fields from the fields array
+    QPDF_DLL
+    void removeFormFields(std::set<QPDFObjGen> const&);
+
     // Return a vector of all terminal fields in a document. Terminal
     // fields are fields that have no children that are also fields.
     // Terminal fields may still have children that are annotations.
@@ -173,6 +177,32 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
     // appearance streams.
     QPDF_DLL
     void generateAppearancesIfNeeded();
+
+    // Note: this method works on all annotations, not just ones with
+    // associated fields. For each annotation in old_annots, apply the
+    // given transformation matrix to create a new annotation. New
+    // annotations are appended to new_annots. If the annotation is
+    // associated with a form field, a new form field is created that
+    // points to the new annotation and is appended to new_fields, and
+    // the old field is added to old_fields.
+    //
+    // old_annots may belong to a different QPDF object. In that case,
+    // you should pass in from_qpdf, and copyForeignObject will be
+    // called automatically. If this is the case, for efficiency, you
+    // may pass in a QPDFAcroFormDocumentHelper for the other file to
+    // avoid the expensive process of creating one for each call to
+    // transformAnnotations. New fields and annotations are not added
+    // to the document or pages. You have to do that yourself after
+    // calling transformAnnotations.
+    QPDF_DLL
+    void transformAnnotations(
+        QPDFObjectHandle old_annots,
+        std::vector<QPDFObjectHandle>& new_annots,
+        std::vector<QPDFObjectHandle>& new_fields,
+        std::set<QPDFObjGen>& old_fields,
+        QPDFMatrix const& cm,
+        QPDF* from_qpdf = nullptr,
+        QPDFAcroFormDocumentHelper* from_afdh = nullptr);
 
   private:
     void analyze();

@@ -2248,7 +2248,7 @@ $td->runtest("explicit keep files open = n",
 show_ntests();
 # ----------
 $td->notify("--- Rotate Pages ---");
-$n_tests += 8;
+$n_tests += 18;
 # Do absolute, positive, and negative on ranges that include
 # inherited and non-inherited.
 # Pages 11-15 inherit /Rotate 90
@@ -2289,6 +2289,49 @@ $td->runtest("flatten with inherited rotate",
 $td->runtest("check output",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "inherited-flattened.pdf"});
+
+foreach my $angle (qw(90 180 270))
+{
+    $td->runtest("rotate annotations",
+                 {$td->COMMAND =>
+                      "qpdf --static-id --qdf --rotate=$angle" .
+                      " --flatten-rotation --no-original-object-ids" .
+                      " form-fields-and-annotations.pdf a.pdf"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0});
+    $td->runtest("check output (flatten $angle)",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => "annotations-rotated-$angle.pdf"});
+}
+
+# The file form-fields-and-annotations-shared.pdf contains some
+# annotations that appear in multiple pages /Annots, some non-shared
+# things that share appearance streams, some form fields appear on
+# multiple pages, and an indirect /Annotations array. It is out of
+# spec in several ways but still works in most viewers. These test
+# make sure we don't make anything worse and also end up exercising
+# some cases of things being copied more than once, though we also
+# exercise that with legitimate test cases using overlay.
+
+$td->runtest("shared annotations 1 page",
+             {$td->COMMAND =>
+                  "qpdf --qdf --no-original-object-ids --static-id" .
+                  " --rotate=90:1 form-fields-and-annotations-shared.pdf" .
+                  " a.pdf --flatten-rotation"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "rotated-shared-annotations-1.pdf"});
+$td->runtest("shared annotations 2 pages",
+             {$td->COMMAND =>
+                  "qpdf --qdf --no-original-object-ids --static-id" .
+                  " --rotate=90:1,2 form-fields-and-annotations-shared.pdf" .
+                  " a.pdf --flatten-rotation"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "rotated-shared-annotations-2.pdf"});
 
 show_ntests();
 # ----------

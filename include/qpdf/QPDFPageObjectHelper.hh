@@ -31,6 +31,8 @@
 #include <qpdf/QPDFObjectHandle.hh>
 #include <functional>
 
+class QPDFAcroFormDocumentHelper;
+
 class QPDFPageObjectHelper: public QPDFObjectHelper
 {
     // This is a helper class for page objects, but as of qpdf 10.1,
@@ -323,9 +325,15 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     // various page bounding boxes (/MediaBox, etc.) so that the page
     // will have the same semantics. This can be useful to work around
     // problems with PDF applications that can't properly handle
-    // rotated pages.
+    // rotated pages. If a QPDFAcroFormDocumentHelper is provided, it
+    // will be used for resolving any form fields that have to be
+    // rotated. If not, one will be created inside the function, which
+    // is less efficient.
     QPDF_DLL
     void flattenRotation();
+    // ABI: merge versions and make afdh default to nullptr
+    QPDF_DLL
+    void flattenRotation(QPDFAcroFormDocumentHelper* afdh);
 
   private:
     static bool
