@@ -1200,4 +1200,10 @@ QPDFPageObjectHelper::flattenRotation()
     this->oh.addPageContents(
         QPDFObjectHandle::newStream(qpdf, "\nQ\n"), false);
     this->oh.removeKey("/Rotate");
+    QPDFObjectHandle rotate_obj = getAttribute("/Rotate", false);
+    if (! rotate_obj.isNull())
+    {
+        QTC::TC("qpdf", "QPDFPageObjectHelper flatten inherit rotate");
+        this->oh.replaceKey("/Rotate", QPDFObjectHandle::newInteger(0));
+    }
 }

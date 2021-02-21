@@ -571,3 +571,4 @@ qpdf password stdin 0
 qpdf password file 0
 QPDFFileSpecObjectHelper empty compat_name 0
 QPDFFileSpecObjectHelper non-empty compat_name 0
+QPDFPageObjectHelper flatten inherit rotate 0

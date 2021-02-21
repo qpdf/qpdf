@@ -2248,7 +2248,7 @@ $td->runtest("explicit keep files open = n",
 show_ntests();
 # ----------
 $td->notify("--- Rotate Pages ---");
-$n_tests += 6;
+$n_tests += 8;
 # Do absolute, positive, and negative on ranges that include
 # inherited and non-inherited.
 # Pages 11-15 inherit /Rotate 90
@@ -2280,6 +2280,15 @@ $td->runtest("rotate all pages",
 $td->runtest("check output",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "minimal-rotated.pdf"});
+
+$td->runtest("flatten with inherited rotate",
+             {$td->COMMAND =>
+                  "qpdf --static-id --flatten-rotation" .
+                  " inherited-rotate.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "inherited-flattened.pdf"});
 
 show_ntests();
 # ----------
