@@ -5191,20 +5191,18 @@ static void do_under_overlay_for_page(
                 pdf.copyForeignObject(
                     from_page.getFormXObjectForPage());
         }
-        auto cm = dest_page.getMatrixForFormXObjectPlacement(
-            fo[from_pageno],
-            dest_page.getTrimBox().getArrayAsRectangle());
-        dest_page.copyAnnotations(
-            from_page, cm, dest_afdh, make_afdh(from_page));
 
         // If the same page is overlaid or underlaid multiple times,
         // we'll generate multiple names for it, but that's harmless
         // and also a pretty goofy case that's not worth coding
         // around.
         std::string name = resources.getUniqueResourceName("/Fx", min_suffix);
+        QPDFMatrix cm;
         std::string new_content = dest_page.placeFormXObject(
             fo[from_pageno], name,
-            dest_page.getTrimBox().getArrayAsRectangle());
+            dest_page.getTrimBox().getArrayAsRectangle(), cm);
+        dest_page.copyAnnotations(
+            from_page, cm, dest_afdh, make_afdh(from_page));
         if (! new_content.empty())
         {
             resources.mergeResources(

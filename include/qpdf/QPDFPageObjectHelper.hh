@@ -309,6 +309,17 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
         bool allow_shrink = true,
         bool allow_expand = false);
 
+    // Alternative version that also fills in the transformation
+    // matrix that was used.
+    QPDF_DLL
+    std::string placeFormXObject(
+        QPDFObjectHandle fo, std::string const& name,
+        QPDFObjectHandle::Rectangle rect,
+        QPDFMatrix& cm,
+        bool invert_transformations = true,
+        bool allow_shrink = true,
+        bool allow_expand = false);
+
     // Return the transformation matrix that translates from the given
     // form XObject's coordinate system into the given rectangular
     // region on the page. The parameters have the same meaning as for

@@ -1070,7 +1070,22 @@ QPDFPageObjectHelper::placeFormXObject(
     bool invert_transformations,
     bool allow_shrink, bool allow_expand)
 {
-    QPDFMatrix cm = getMatrixForFormXObjectPlacement(
+    QPDFMatrix cm;
+    return placeFormXObject(
+        fo, name, rect, cm, invert_transformations,
+        allow_shrink, allow_expand);
+}
+
+std::string
+QPDFPageObjectHelper::placeFormXObject(
+    QPDFObjectHandle fo, std::string const& name,
+    QPDFObjectHandle::Rectangle rect,
+    QPDFMatrix& cm,
+    bool invert_transformations,
+    bool allow_shrink,
+    bool allow_expand)
+{
+    cm = getMatrixForFormXObjectPlacement(
         fo, rect, invert_transformations, allow_shrink, allow_expand);
     return (
         "q\n" +

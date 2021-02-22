@@ -1,3 +1,10 @@
+2021-02-22  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add a new version of QPDFPageObjectHelper::placeFormXObject that
+	initializes the transformation matrix that was used so you don't
+	have to call both placeFormXObject and
+	getMatrixForFormXObjectPlacement.
+
 2021-02-21  Jay Berkenbilt  <ejb@ql.org>
 
 	* From qpdf CLI, --overlay and --underlay will copy annotations
