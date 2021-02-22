@@ -132,6 +132,23 @@ QPDFAcroFormDocumentHelper::getWidgetAnnotationsForPage(QPDFPageObjectHelper h)
     return h.getAnnotations("/Widget");
 }
 
+std::vector<QPDFFormFieldObjectHelper>
+QPDFAcroFormDocumentHelper::getFormFieldsForPage(QPDFPageObjectHelper ph)
+{
+    std::vector<QPDFFormFieldObjectHelper> result;
+    auto widget_annotations = getWidgetAnnotationsForPage(ph);
+    for (auto annot: widget_annotations)
+    {
+        auto field = getFieldForAnnotation(annot);
+        field = field.getTopLevelField();
+        if (field.getObjectHandle().isDictionary())
+        {
+            result.push_back(field);
+        }
+    }
+    return result;
+}
+
 QPDFFormFieldObjectHelper
 QPDFAcroFormDocumentHelper::getFieldForAnnotation(QPDFAnnotationObjectHelper h)
 {
@@ -501,19 +518,8 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
             // annotation and field separately in this case.
             have_field = true;
             // Find the top-level field. It may be the field itself.
-            top_field = ffield_oh;
-            std::set<QPDFObjGen> seen;
-            while (! top_field.getKey("/Parent").isNull())
-            {
-                top_field = top_field.getKey("/Parent");
-                have_parent = true;
-                auto og = top_field.getObjGen();
-                if (seen.count(og))
-                {
-                    break;
-                }
-                seen.insert(og);
-            }
+            top_field = ffield.getTopLevelField(
+                &have_parent).getObjectHandle();
             if (foreign)
             {
                 // copyForeignObject returns the same value if called
@@ -537,7 +543,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
             {
                 queue.push_back(top_field);
             }
-            seen.clear();
+            std::set<QPDFObjGen> seen;
             while (! queue.empty())
             {
                 QPDFObjectHandle obj = queue.front();
@@ -662,5 +668,18 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
             annot.getKey("/Rect").getArrayAsRectangle());
         annot.replaceKey(
             "/Rect", QPDFObjectHandle::newFromRectangle(rect));
+    }
+}
+
+void
+QPDFAcroFormDocumentHelper::copyFieldsFromForeignPage(
+    QPDFPageObjectHelper foreign_page,
+    QPDFAcroFormDocumentHelper& foreign_afdh)
+{
+    for (auto field: foreign_afdh.getFormFieldsForPage(foreign_page))
+    {
+        auto new_field = this->qpdf.copyForeignObject(
+            field.getObjectHandle());
+        addFormField(new_field);
     }
 }

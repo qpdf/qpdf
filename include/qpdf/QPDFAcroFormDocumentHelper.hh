@@ -140,6 +140,11 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
     std::vector<QPDFAnnotationObjectHelper>
     getWidgetAnnotationsForPage(QPDFPageObjectHelper);
 
+    // Return form fields for a page.
+    QPDF_DLL
+    std::vector<QPDFFormFieldObjectHelper>
+    getFormFieldsForPage(QPDFPageObjectHelper);
+
     // Return the terminal field that is associated with this
     // annotation. If the annotation dictionary is merged with the
     // field dictionary, the underlying object will be the same, but
@@ -203,6 +208,13 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
         QPDFMatrix const& cm,
         QPDF* from_qpdf = nullptr,
         QPDFAcroFormDocumentHelper* from_afdh = nullptr);
+
+    // Copy form fields from a page in a different QPDF object to this
+    // QPDF.
+    QPDF_DLL
+    void copyFieldsFromForeignPage(
+        QPDFPageObjectHelper foreign_page,
+        QPDFAcroFormDocumentHelper& foreign_afdh);
 
   private:
     void analyze();

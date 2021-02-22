@@ -39,6 +39,29 @@ QPDFFormFieldObjectHelper::getParent()
     return this->oh.getKey("/Parent"); // may be null
 }
 
+QPDFFormFieldObjectHelper
+QPDFFormFieldObjectHelper::getTopLevelField(bool* is_different)
+{
+    auto top_field = this->oh;
+    std::set<QPDFObjGen> seen;
+    while (top_field.isDictionary() &&
+           (! top_field.getKey("/Parent").isNull()))
+    {
+        top_field = top_field.getKey("/Parent");
+        if (is_different)
+        {
+            *is_different = true;
+        }
+        auto og = top_field.getObjGen();
+        if (seen.count(og))
+        {
+            break;
+        }
+        seen.insert(og);
+    }
+    return QPDFFormFieldObjectHelper(top_field);
+}
+
 QPDFObjectHandle
 QPDFFormFieldObjectHelper::getInheritableFieldValue(std::string const& name)
 {

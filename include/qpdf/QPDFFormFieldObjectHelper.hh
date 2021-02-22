@@ -54,6 +54,13 @@ class QPDFFormFieldObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     QPDFFormFieldObjectHelper getParent();
 
+    // Return the top-level field for this field. Typically this will
+    // be the field itself or its parent. If is_different is provided,
+    // it is set to true if the top-level field is different from the
+    // field itself; otherwise it is set to false.
+    QPDF_DLL
+    QPDFFormFieldObjectHelper getTopLevelField(bool* is_different = nullptr);
+
     // Get a field value, possibly inheriting the value from an
     // ancestor node.
     QPDF_DLL

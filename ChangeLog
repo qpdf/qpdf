@@ -1,5 +1,11 @@
 2021-02-22  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add QPDFAcroFormDocumentHelper::copyFieldsFromForeignPage to
+	copy form fields from a foreign page into the current file.
+
+	* Add QPDFFormFieldObjectHelper::getTopLevelField to get the
+	top-level field for a given form field.
+
 	* Update pdf-overlay-page example to include copying of
 	annotations.
 
