@@ -439,7 +439,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
         }
     };
 
-    for (auto annot: QPDFArrayItems(old_annots))
+    for (auto annot: old_annots.aitems())
     {
         if (annot.isStream())
         {
@@ -620,7 +620,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
         };
         if (apdict.isDictionary())
         {
-            for (auto& ap: QPDFDictItems(apdict))
+            for (auto& ap: apdict.ditems())
             {
                 if (ap.second.isStream())
                 {
@@ -629,7 +629,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
                 }
                 else if (ap.second.isDictionary())
                 {
-                    for (auto& ap2: QPDFDictItems(ap.second))
+                    for (auto& ap2: ap.second.ditems())
                     {
                         if (ap2.second.isStream())
                         {

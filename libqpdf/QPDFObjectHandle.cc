@@ -705,6 +705,12 @@ QPDFObjectHandle::getInlineImageValue()
 
 // Array accessors
 
+QPDFObjectHandle::QPDFArrayItems
+QPDFObjectHandle::aitems()
+{
+    return QPDFArrayItems(*this);
+}
+
 int
 QPDFObjectHandle::getArrayNItems()
 {
@@ -930,6 +936,12 @@ QPDFObjectHandle::eraseItem(int at)
 }
 
 // Dictionary accessors
+
+QPDFObjectHandle::QPDFDictItems
+QPDFObjectHandle::ditems()
+{
+    return QPDFDictItems(*this);
+}
 
 bool
 QPDFObjectHandle::hasKey(std::string const& key)
@@ -3211,43 +3223,44 @@ QPDFObjectHandle::warn(QPDF* qpdf, QPDFExc const& e)
     }
 }
 
-QPDFDictItems::QPDFDictItems(QPDFObjectHandle const& oh) :
+QPDFObjectHandle::QPDFDictItems::QPDFDictItems(QPDFObjectHandle const& oh) :
     oh(oh)
 {
 }
 
-QPDFDictItems::iterator&
-QPDFDictItems::iterator::operator++()
+QPDFObjectHandle::QPDFDictItems::iterator&
+QPDFObjectHandle::QPDFDictItems::iterator::operator++()
 {
     ++this->m->iter;
     updateIValue();
     return *this;
 }
 
-QPDFDictItems::iterator&
-QPDFDictItems::iterator::operator--()
+QPDFObjectHandle::QPDFDictItems::iterator&
+QPDFObjectHandle::QPDFDictItems::iterator::operator--()
 {
     --this->m->iter;
     updateIValue();
     return *this;
 }
 
-QPDFDictItems::iterator::reference
-QPDFDictItems::iterator:: operator*()
+QPDFObjectHandle::QPDFDictItems::iterator::reference
+QPDFObjectHandle::QPDFDictItems::iterator:: operator*()
 {
     updateIValue();
     return this->ivalue;
 }
 
-QPDFDictItems::iterator::pointer
-QPDFDictItems::iterator::operator->()
+QPDFObjectHandle::QPDFDictItems::iterator::pointer
+QPDFObjectHandle::QPDFDictItems::iterator::operator->()
 {
     updateIValue();
     return &this->ivalue;
 }
 
 bool
-QPDFDictItems::iterator::operator==(iterator const& other) const
+QPDFObjectHandle::QPDFDictItems::iterator::operator==(
+    iterator const& other) const
 {
     if (this->m->is_end && other.m->is_end)
     {
@@ -3260,14 +3273,15 @@ QPDFDictItems::iterator::operator==(iterator const& other) const
     return (this->ivalue.first == other.ivalue.first);
 }
 
-QPDFDictItems::iterator::iterator(QPDFObjectHandle& oh, bool for_begin) :
+QPDFObjectHandle::QPDFDictItems::iterator::iterator(
+    QPDFObjectHandle& oh, bool for_begin) :
     m(new Members(oh, for_begin))
 {
     updateIValue();
 }
 
 void
-QPDFDictItems::iterator::updateIValue()
+QPDFObjectHandle::QPDFDictItems::iterator::updateIValue()
 {
     this->m->is_end = (this->m->iter == this->m->keys.end());
     if (this->m->is_end)
@@ -3282,7 +3296,7 @@ QPDFDictItems::iterator::updateIValue()
     }
 }
 
-QPDFDictItems::iterator::Members::Members(
+QPDFObjectHandle::QPDFDictItems::iterator::Members::Members(
     QPDFObjectHandle& oh, bool for_begin) :
     oh(oh)
 {
@@ -3290,25 +3304,25 @@ QPDFDictItems::iterator::Members::Members(
     this->iter = for_begin ? this->keys.begin() : this->keys.end();
 }
 
-QPDFDictItems::iterator
-QPDFDictItems::begin()
+QPDFObjectHandle::QPDFDictItems::iterator
+QPDFObjectHandle::QPDFDictItems::begin()
 {
     return iterator(oh, true);
 }
 
-QPDFDictItems::iterator
-QPDFDictItems::end()
+QPDFObjectHandle::QPDFDictItems::iterator
+QPDFObjectHandle::QPDFDictItems::end()
 {
     return iterator(oh, false);
 }
 
-QPDFArrayItems::QPDFArrayItems(QPDFObjectHandle const& oh) :
+QPDFObjectHandle::QPDFArrayItems::QPDFArrayItems(QPDFObjectHandle const& oh) :
     oh(oh)
 {
 }
 
-QPDFArrayItems::iterator&
-QPDFArrayItems::iterator::operator++()
+QPDFObjectHandle::QPDFArrayItems::iterator&
+QPDFObjectHandle::QPDFArrayItems::iterator::operator++()
 {
     if (! this->m->is_end)
     {
@@ -3318,8 +3332,8 @@ QPDFArrayItems::iterator::operator++()
     return *this;
 }
 
-QPDFArrayItems::iterator&
-QPDFArrayItems::iterator::operator--()
+QPDFObjectHandle::QPDFArrayItems::iterator&
+QPDFObjectHandle::QPDFArrayItems::iterator::operator--()
 {
     if (this->m->item_number > 0)
     {
@@ -3329,34 +3343,36 @@ QPDFArrayItems::iterator::operator--()
     return *this;
 }
 
-QPDFArrayItems::iterator::reference
-QPDFArrayItems::iterator:: operator*()
+QPDFObjectHandle::QPDFArrayItems::iterator::reference
+QPDFObjectHandle::QPDFArrayItems::iterator:: operator*()
 {
     updateIValue();
     return this->ivalue;
 }
 
-QPDFArrayItems::iterator::pointer
-QPDFArrayItems::iterator::operator->()
+QPDFObjectHandle::QPDFArrayItems::iterator::pointer
+QPDFObjectHandle::QPDFArrayItems::iterator::operator->()
 {
     updateIValue();
     return &this->ivalue;
 }
 
 bool
-QPDFArrayItems::iterator::operator==(iterator const& other) const
+QPDFObjectHandle::QPDFArrayItems::iterator::operator==(
+    iterator const& other) const
 {
     return (this->m->item_number == other.m->item_number);
 }
 
-QPDFArrayItems::iterator::iterator(QPDFObjectHandle& oh, bool for_begin) :
+QPDFObjectHandle::QPDFArrayItems::iterator::iterator(
+    QPDFObjectHandle& oh, bool for_begin) :
     m(new Members(oh, for_begin))
 {
     updateIValue();
 }
 
 void
-QPDFArrayItems::iterator::updateIValue()
+QPDFObjectHandle::QPDFArrayItems::iterator::updateIValue()
 {
     this->m->is_end = (this->m->item_number >= this->m->oh.getArrayNItems());
     if (this->m->is_end)
@@ -3369,21 +3385,21 @@ QPDFArrayItems::iterator::updateIValue()
     }
 }
 
-QPDFArrayItems::iterator::Members::Members(
+QPDFObjectHandle::QPDFArrayItems::iterator::Members::Members(
     QPDFObjectHandle& oh, bool for_begin) :
     oh(oh)
 {
     this->item_number = for_begin ? 0 : oh.getArrayNItems();
 }
 
-QPDFArrayItems::iterator
-QPDFArrayItems::begin()
+QPDFObjectHandle::QPDFArrayItems::iterator
+QPDFObjectHandle::QPDFArrayItems::begin()
 {
     return iterator(oh, true);
 }
 
-QPDFArrayItems::iterator
-QPDFArrayItems::end()
+QPDFObjectHandle::QPDFArrayItems::iterator
+QPDFObjectHandle::QPDFArrayItems::end()
 {
     return iterator(oh, false);
 }

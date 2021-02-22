@@ -4104,7 +4104,7 @@ static void do_list_attachments(QPDF& pdf, Options& o)
                               << std::endl;
                 }
                 std::cout << "  all data streams:" << std::endl;
-                for (auto i2: QPDFDictItems(efoh->getEmbeddedFileStreams()))
+                for (auto i2: efoh->getEmbeddedFileStreams().ditems())
                 {
                     std::cout << "    " << i2.first << " -> "
                               << i2.second.getObjGen()

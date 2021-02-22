@@ -5190,11 +5190,10 @@ print "\n";
        <itemizedlist>
         <listitem>
          <para>
-          Add <classname>QPDFDictItems</classname> and
-          <classname>QPDFArrayItems</classname> wrappers around
-          <classname>QPDFObjectHandle</classname>, allowing C++-style
-          iteration, including range-for iteration, over dictionary
-          and array QPDFObjectHandles. See comments in
+          Add <function>QPDFObjectHandle::ditems()</function> and
+          <function>QPDFObjectHandle::aitems()</function> that enable
+          C++-style iteration, including range-for iteration, over
+          dictionary and array QPDFObjectHandles. See comments in
           <filename>include/qpdf/QPDFObjectHandle.hh</filename> and
           <filename>examples/pdf-name-number-tree.cc</filename> for
           details.

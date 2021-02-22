@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
     // look at it using dictionary and array iterators.
     std::cout << "Keys in name tree object:" << std::endl;
     QPDFObjectHandle names;
-    for (auto const& i: QPDFDictItems(name_tree_oh))
+    for (auto const& i: name_tree_oh.ditems())
     {
         std::cout << i.first << std::endl;
         if (i.first == "/Names")
@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
     }
     // Values in names array:
     std::cout << "Values in names:" << std::endl;
-    for (auto& i: QPDFArrayItems(names))
+    for (auto& i: names.aitems())
     {
         std::cout << "  " << i.unparse() << std::endl;
     }

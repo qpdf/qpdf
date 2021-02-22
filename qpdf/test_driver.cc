@@ -352,7 +352,7 @@ void runtest(int n, char const* filename1, char const* arg2)
 	    std::cout << "/QTest is an array with "
 		      << qtest.getArrayNItems() << " items" << std::endl;
             int i = 0;
-	    for (auto& iter: QPDFArrayItems(qtest))
+	    for (auto& iter: qtest.aitems())
 	    {
 		QTC::TC("qpdf", "main QTest array indirect",
 			iter.isIndirect() ? 1 : 0);
@@ -366,7 +366,7 @@ void runtest(int n, char const* filename1, char const* arg2)
 	{
 	    QTC::TC("qpdf", "main QTest dictionary");
 	    std::cout << "/QTest is a dictionary" << std::endl;
-            for (auto& iter: QPDFDictItems(qtest))
+            for (auto& iter: qtest.ditems())
             {
 		QTC::TC("qpdf", "main QTest dictionary indirect",
 			iter.second.isIndirect() ? 1 : 0);
@@ -1545,7 +1545,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         assert(array.isArray());
         {
             // Exercise iterators directly
-            QPDFArrayItems ai(array);
+            auto ai = array.aitems();
             auto i = ai.begin();
             assert(i->getName() == "/Item0");
             auto& i_value = *i;
@@ -1565,7 +1565,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         assert(dictionary.isDictionary());
         {
             // Exercise iterators directly
-            QPDFDictItems di(dictionary);
+            auto di = dictionary.ditems();
             auto i = di.begin();
             assert(i->first == "/Key1");
             auto& i_value = *i;

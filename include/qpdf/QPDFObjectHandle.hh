@@ -659,8 +659,19 @@ class QPDFObjectHandle
     QPDF_DLL
     std::string getInlineImageValue();
 
-    // Methods for array objects; see also name and array objects. See
-    // also QPDFArrayItems later in this file.
+    // Methods for array objects; see also name and array objects.
+
+    // Return an object that enables iteration over members. You can
+    // do
+    //
+    // for (auto iter: obj.aitems())
+    // {
+    //     // iter is an array element
+    // }
+    class QPDFArrayItems;
+    QPDF_DLL
+    QPDFArrayItems aitems();
+
     QPDF_DLL
     int getArrayNItems();
     QPDF_DLL
@@ -684,8 +695,20 @@ class QPDFObjectHandle
     QPDF_DLL
     Matrix getArrayAsMatrix();
 
-    // Methods for dictionary objects. See also QPDFDictItems later in
-    // this file.
+    // Methods for dictionary objects.
+
+    // Return an object that enables iteration over members. You can
+    // do
+    //
+    // for (auto iter: obj.ditems())
+    // {
+    //     // iter.first is the key
+    //     // iter.second is the value
+    // }
+    class QPDFDictItems;
+    QPDF_DLL
+    QPDFDictItems ditems();
+
     QPDF_DLL
     bool hasKey(std::string const&);
     QPDF_DLL
@@ -1288,7 +1311,7 @@ class QPDFObjectHandle
     bool reserved;
 };
 
-class QPDFDictItems
+class QPDFObjectHandle::QPDFDictItems
 {
     // This class allows C++-style iteration, including range-for
     // iteration, around dictionaries. You can write
@@ -1379,7 +1402,7 @@ class QPDFDictItems
     QPDFObjectHandle oh;
 };
 
-class QPDFArrayItems
+class QPDFObjectHandle::QPDFArrayItems
 {
     // This class allows C++-style iteration, including range-for
     // iteration, around arrays. You can write
