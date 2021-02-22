@@ -5301,7 +5301,11 @@ print "\n";
 	  <function>QPDFPageObjectHelper::getMatrixForFormXObjectPlacement</function>,
 	  which returns the transformation matrix required to map from
 	  a form field's coordinate system into a specific rectangle
-	  within the page.
+	  within the page. Also add a version of
+	  <function>QPDFPageObjectHelper::placeFormXObject</function>
+	  that initializes a <classname>QPDFMatrix</classname>
+	  reference. For example, see
+	  <filename>examples/pdf-overlay-page.cc</filename>.
          </para>
         </listitem>
         <listitem>

@@ -1,5 +1,8 @@
 2021-02-22  Jay Berkenbilt  <ejb@ql.org>
 
+	* Update pdf-overlay-page example to include copying of
+	annotations.
+
 	* Add a new version of QPDFPageObjectHelper::placeFormXObject that
 	initializes the transformation matrix that was used so you don't
 	have to call both placeFormXObject and
