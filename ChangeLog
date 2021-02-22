@@ -1,5 +1,8 @@
 2021-02-22  Jay Berkenbilt  <ejb@ql.org>
 
+	* From qpdf CLI, --pages and --split-pages will properly preserve
+	interactive form functionality. Fixes #340.
+
 	* Add QPDFAcroFormDocumentHelper::copyFieldsFromForeignPage to
 	copy form fields from a foreign page into the current file.
 

@@ -5143,6 +5143,19 @@ static void get_uo_pagenos(UnderOverlay& uo,
     }
 }
 
+static QPDFAcroFormDocumentHelper* get_afdh_for_qpdf(
+    std::map<unsigned long long,
+             PointerHolder<QPDFAcroFormDocumentHelper>>& afdh_map,
+    QPDF* q)
+{
+    auto uid = q->getUniqueId();
+    if (! afdh_map.count(uid))
+    {
+        afdh_map[uid] = new QPDFAcroFormDocumentHelper(*q);
+    }
+    return afdh_map[uid].getPointer();
+}
+
 static void do_under_overlay_for_page(
     QPDF& pdf,
     Options& o,
@@ -5164,12 +5177,7 @@ static void do_under_overlay_for_page(
              PointerHolder<QPDFAcroFormDocumentHelper>> afdh;
     auto make_afdh = [&](QPDFPageObjectHelper& ph) {
         QPDF* q = ph.getObjectHandle().getOwningQPDF();
-        auto uid = q->getUniqueId();
-        if (! afdh.count(uid))
-        {
-            afdh[uid] = new QPDFAcroFormDocumentHelper(*q);
-        }
-        return afdh[uid].getPointer();
+        return get_afdh_for_qpdf(afdh, q);
     };
     auto dest_afdh = make_afdh(dest_page);
 
@@ -5835,6 +5843,9 @@ static void handle_page_specs(QPDF& pdf, Options& o, bool& warnings)
     std::vector<QPDFObjectHandle> new_labels;
     bool any_page_labels = false;
     int out_pageno = 0;
+    std::map<unsigned long long,
+             PointerHolder<QPDFAcroFormDocumentHelper>> afdh_map;
+    auto this_afdh = get_afdh_for_qpdf(afdh_map, &pdf);
     for (std::vector<QPDFPageData>::iterator iter =
              parsed_specs.begin();
          iter != parsed_specs.end(); ++iter)
@@ -5847,6 +5858,7 @@ static void handle_page_specs(QPDF& pdf, Options& o, bool& warnings)
             cis->stayOpen(true);
         }
         QPDFPageLabelDocumentHelper pldh(*page_data.qpdf);
+        auto other_afdh = get_afdh_for_qpdf(afdh_map, page_data.qpdf);
         if (pldh.hasPageLabels())
         {
             any_page_labels = true;
@@ -5890,6 +5902,11 @@ static void handle_page_specs(QPDF& pdf, Options& o, bool& warnings)
                 // This is a page from the original file. Keep track
                 // of the fact that we are using it.
                 selected_from_orig.insert(pageno);
+            }
+            else if (other_afdh->hasAcroForm())
+            {
+                QTC::TC("qpdf", "qpdf copy form fields in pages");
+                this_afdh->copyFieldsFromForeignPage(to_copy, *other_afdh);
             }
         }
         if (page_data.qpdf->anyWarnings())
@@ -6269,6 +6286,7 @@ static void do_split_pages(QPDF& pdf, Options& o, bool& warnings)
         dh.removeUnreferencedResources();
     }
     QPDFPageLabelDocumentHelper pldh(pdf);
+    QPDFAcroFormDocumentHelper afdh(pdf);
     std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
     size_t pageno_len = QUtil::uint_to_string(pages.size()).length();
     size_t num_pages = pages.size();
@@ -6282,6 +6300,11 @@ static void do_split_pages(QPDF& pdf, Options& o, bool& warnings)
         }
         QPDF outpdf;
         outpdf.emptyPDF();
+        PointerHolder<QPDFAcroFormDocumentHelper> out_afdh;
+        if (afdh.hasAcroForm())
+        {
+            out_afdh = new QPDFAcroFormDocumentHelper(outpdf);
+        }
         if (o.suppress_warnings)
         {
             outpdf.setSuppressWarnings(true);
@@ -6290,6 +6313,12 @@ static void do_split_pages(QPDF& pdf, Options& o, bool& warnings)
         {
             QPDFObjectHandle page = pages.at(pageno - 1);
             outpdf.addPage(page, false);
+            if (out_afdh.getPointer())
+            {
+                QTC::TC("qpdf", "qpdf copy form fields in split_pages");
+                out_afdh->copyFieldsFromForeignPage(
+                    QPDFPageObjectHelper(page), afdh);
+            }
         }
         if (pldh.hasPageLabels())
         {

@@ -2414,7 +2414,7 @@ foreach my $f (qw(screen print))
 show_ntests();
 # ----------
 $td->notify("--- Copy Annotations ---");
-$n_tests += 16;
+$n_tests += 21;
 
 $td->runtest("complex copy annotations",
              {$td->COMMAND =>
@@ -2456,6 +2456,28 @@ foreach my $d ([1, "appearances-1.pdf"],
     $td->runtest("check output B",
                  {$td->FILE => "b.pdf"},
                  {$td->FILE => "test80b$n.pdf"});
+}
+
+$td->runtest("page extraction with fields",
+             {$td->COMMAND =>
+                  "qpdf --static-id --empty" .
+                  " --pages fields-two-pages.pdf -- a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "fields-pages-out.pdf"});
+$td->runtest("page splitting with fields",
+             {$td->COMMAND =>
+                  "qpdf --static-id" .
+                  " --split-pages fields-two-pages.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+for (my $i = 1; $i <= 2; ++$i)
+{
+    $td->runtest("check output",
+                 {$td->FILE => "a-$i.pdf"},
+                 {$td->FILE => "fields-split-$i.pdf"});
 }
 
 show_ntests();

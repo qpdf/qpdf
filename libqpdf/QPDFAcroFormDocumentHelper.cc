@@ -676,10 +676,16 @@ QPDFAcroFormDocumentHelper::copyFieldsFromForeignPage(
     QPDFPageObjectHelper foreign_page,
     QPDFAcroFormDocumentHelper& foreign_afdh)
 {
+    std::set<QPDFObjGen> added;
     for (auto field: foreign_afdh.getFormFieldsForPage(foreign_page))
     {
         auto new_field = this->qpdf.copyForeignObject(
             field.getObjectHandle());
-        addFormField(new_field);
+        auto og = new_field.getObjGen();
+        if (! added.count(og))
+        {
+            addFormField(new_field);
+            added.insert(og);
+        }
     }
 }
