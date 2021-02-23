@@ -2470,13 +2470,13 @@ $td->runtest("check output",
 $td->runtest("page splitting with fields",
              {$td->COMMAND =>
                   "qpdf --static-id" .
-                  " --split-pages fields-two-pages.pdf a.pdf"},
+                  " --split-pages fields-two-pages.pdf split-out.pdf"},
              {$td->STRING => "", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 for (my $i = 1; $i <= 2; ++$i)
 {
     $td->runtest("check output",
-                 {$td->FILE => "a-$i.pdf"},
+                 {$td->FILE => "split-out-$i.pdf"},
                  {$td->FILE => "fields-split-$i.pdf"});
 }
 
