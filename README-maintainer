@@ -190,8 +190,19 @@ RELEASE PREPARATION
   casting policy in the manual, and ensure that integer types are
   properly handled with QIntC or the appropriate cast.
 
-* Increment shared library version information as needed (`LT_CURRENT`
-  in `configure.ac`). Remember to rerun ./autogen.sh.
+* Update versions and shared library details
+
+  * Increment shared library version information as needed
+    (`LT_CURRENT` in `configure.ac`)
+
+  * Make sure version numbers are consistent in the following locations:
+    * configure.ac
+    * libqpdf/QPDF.cc
+    * manual/qpdf-manual.xml
+    * qpdf/qpdf.cc
+    `make_dist` verifies this consistency.
+
+  * Run ./autogen.sh
 
 * Performance test is included with binary compatibility steps. Even
   if releasing a new major release and not doing binary compatibility
@@ -229,15 +240,6 @@ pytest -n auto
   release date in `manual/qpdf-manual.xml`. Remember to ensure that
   the entities at the top of the document are consistent with the
   release notes for both version and release date.
-
-* Make sure version numbers are consistent in the following locations:
-  * configure.ac
-  * libqpdf/QPDF.cc
-  * manual/qpdf-manual.xml
-  * qpdf/qpdf.cc
-  `make_dist` verifies this consistency.
-
-* Run ./autogen.sh
 
 * Add a release entry to ChangeLog.
 
