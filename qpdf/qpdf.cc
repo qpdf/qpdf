@@ -3738,7 +3738,7 @@ ArgParser::doFinalChecks()
         }
     }
 
-    if (QUtil::same_file(o.infilename, o.outfilename))
+    if ((! o.split_pages) && QUtil::same_file(o.infilename, o.outfilename))
     {
         QTC::TC("qpdf", "qpdf same file error");
         usage("input file and output file are the same;"
@@ -6389,6 +6389,13 @@ static void do_split_pages(QPDF& pdf, Options& o, bool& warnings)
                 QUtil::uint_to_string(last, QIntC::to_int(pageno_len));
         }
         std::string outfile = before + page_range + after;
+        if (QUtil::same_file(o.infilename, outfile.c_str()))
+        {
+            std::cerr << whoami
+                      << ": split pages would overwrite input file with "
+                      << outfile << std::endl;
+            exit(EXIT_ERROR);
+        }
         QPDFWriter w(outpdf, outfile.c_str());
         set_writer_options(outpdf, o, w);
         w.write();

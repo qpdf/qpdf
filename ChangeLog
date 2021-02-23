@@ -1,3 +1,9 @@
+2021-02-23  Jay Berkenbilt  <ejb@ql.org>
+
+	* The test for the input and output files being the same wasn't
+	implemented correctly for --split-pages since the specified output
+	file is really a pattern, not the actual output file.
+
 2021-02-22  Jay Berkenbilt  <ejb@ql.org>
 
 	* From qpdf CLI, --pages and --split-pages will properly preserve
