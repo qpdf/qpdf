@@ -135,15 +135,21 @@ QPDFAcroFormDocumentHelper::getWidgetAnnotationsForPage(QPDFPageObjectHelper h)
 std::vector<QPDFFormFieldObjectHelper>
 QPDFAcroFormDocumentHelper::getFormFieldsForPage(QPDFPageObjectHelper ph)
 {
+    std::set<QPDFObjGen> added;
     std::vector<QPDFFormFieldObjectHelper> result;
     auto widget_annotations = getWidgetAnnotationsForPage(ph);
     for (auto annot: widget_annotations)
     {
         auto field = getFieldForAnnotation(annot);
         field = field.getTopLevelField();
-        if (field.getObjectHandle().isDictionary())
+        auto og = field.getObjectHandle().getObjGen();
+        if (! added.count(og))
         {
-            result.push_back(field);
+            added.insert(og);
+            if (field.getObjectHandle().isDictionary())
+            {
+                result.push_back(field);
+            }
         }
     }
     return result;
@@ -674,18 +680,27 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
 void
 QPDFAcroFormDocumentHelper::copyFieldsFromForeignPage(
     QPDFPageObjectHelper foreign_page,
-    QPDFAcroFormDocumentHelper& foreign_afdh)
+    QPDFAcroFormDocumentHelper& foreign_afdh,
+    std::vector<QPDFObjectHandle>* copied_fields)
 {
     std::set<QPDFObjGen> added;
     for (auto field: foreign_afdh.getFormFieldsForPage(foreign_page))
     {
         auto new_field = this->qpdf.copyForeignObject(
             field.getObjectHandle());
+        if (! new_field.isIndirect())
+        {
+            new_field = this->qpdf.makeIndirectObject(new_field);
+        }
         auto og = new_field.getObjGen();
         if (! added.count(og))
         {
             addFormField(new_field);
             added.insert(og);
+            if (copied_fields)
+            {
+                copied_fields->push_back(new_field);
+            }
         }
     }
 }

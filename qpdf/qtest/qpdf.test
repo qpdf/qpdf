@@ -2414,7 +2414,7 @@ foreach my $f (qw(screen print))
 show_ntests();
 # ----------
 $td->notify("--- Copy Annotations ---");
-$n_tests += 21;
+$n_tests += 25;
 
 $td->runtest("complex copy annotations",
              {$td->COMMAND =>
@@ -2479,6 +2479,24 @@ for (my $i = 1; $i <= 2; ++$i)
                  {$td->FILE => "split-out-$i.pdf"},
                  {$td->FILE => "fields-split-$i.pdf"});
 }
+$td->runtest("keeping some fields",
+             {$td->COMMAND =>
+                  "qpdf --static-id fields-two-pages.pdf" .
+                  " --pages . 1 minimal.pdf -- a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "kept-some-fields.pdf"});
+$td->runtest("not keeping any fields",
+             {$td->COMMAND =>
+                  "qpdf --static-id kept-some-fields.pdf" .
+                  " --pages . 2 -- a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "kept-no-fields.pdf"});
 
 show_ntests();
 # ----------

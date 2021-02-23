@@ -577,3 +577,6 @@ QPDFAcroFormDocumentHelper field with parent 3
 QPDFAcroFormDocumentHelper modify ap matrix 0
 qpdf copy form fields in split_pages 0
 qpdf copy form fields in pages 0
+qpdf keep some fields in pages 0
+qpdf pages keeping field from original 0
+qpdf no more fields in pages 0

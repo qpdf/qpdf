@@ -140,7 +140,7 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
     std::vector<QPDFAnnotationObjectHelper>
     getWidgetAnnotationsForPage(QPDFPageObjectHelper);
 
-    // Return form fields for a page.
+    // Return top-level form fields for a page.
     QPDF_DLL
     std::vector<QPDFFormFieldObjectHelper>
     getFormFieldsForPage(QPDFPageObjectHelper);
@@ -210,11 +210,15 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
         QPDFAcroFormDocumentHelper* from_afdh = nullptr);
 
     // Copy form fields from a page in a different QPDF object to this
-    // QPDF.
+    // QPDF. If copied_fields is not null, it will be initialized with
+    // the fields that were copied. Items in the vector are objects in
+    // the receiving QPDF (the one associated with this
+    // QPDFAcroFormDocumentHelper).
     QPDF_DLL
     void copyFieldsFromForeignPage(
         QPDFPageObjectHelper foreign_page,
-        QPDFAcroFormDocumentHelper& foreign_afdh);
+        QPDFAcroFormDocumentHelper& foreign_afdh,
+        std::vector<QPDFObjectHandle>* copied_fields = nullptr);
 
   private:
     void analyze();

@@ -5846,6 +5846,7 @@ static void handle_page_specs(QPDF& pdf, Options& o, bool& warnings)
     std::map<unsigned long long,
              PointerHolder<QPDFAcroFormDocumentHelper>> afdh_map;
     auto this_afdh = get_afdh_for_qpdf(afdh_map, &pdf);
+    std::set<QPDFObjGen> referenced_fields;
     for (std::vector<QPDFPageData>::iterator iter =
              parsed_specs.begin();
          iter != parsed_specs.end(); ++iter)
@@ -5906,7 +5907,13 @@ static void handle_page_specs(QPDF& pdf, Options& o, bool& warnings)
             else if (other_afdh->hasAcroForm())
             {
                 QTC::TC("qpdf", "qpdf copy form fields in pages");
-                this_afdh->copyFieldsFromForeignPage(to_copy, *other_afdh);
+                std::vector<QPDFObjectHandle> copied_fields;
+                this_afdh->copyFieldsFromForeignPage(
+                    to_copy, *other_afdh, &copied_fields);
+                for (auto const& cf: copied_fields)
+                {
+                    referenced_fields.insert(cf.getObjGen());
+                }
             }
         }
         if (page_data.qpdf->anyWarnings())
@@ -5929,14 +5936,55 @@ static void handle_page_specs(QPDF& pdf, Options& o, bool& warnings)
 
     // Delete page objects for unused page in primary. This prevents
     // those objects from being preserved by being referred to from
-    // other places, such as the outlines dictionary.
+    // other places, such as the outlines dictionary. Also make sure
+    // we keep form fields from pages we preserved.
     for (size_t pageno = 0; pageno < orig_pages.size(); ++pageno)
     {
-        if (selected_from_orig.count(QIntC::to_int(pageno)) == 0)
+        auto page = orig_pages.at(pageno);
+        if (selected_from_orig.count(QIntC::to_int(pageno)))
+        {
+            for (auto field: this_afdh->getFormFieldsForPage(page))
+            {
+                QTC::TC("qpdf", "qpdf pages keeping field from original");
+                referenced_fields.insert(field.getObjectHandle().getObjGen());
+            }
+        }
+        else
         {
             pdf.replaceObject(
-                orig_pages.at(pageno).getObjectHandle().getObjGen(),
+                page.getObjectHandle().getObjGen(),
                 QPDFObjectHandle::newNull());
+        }
+    }
+    // Remove unreferenced form fields
+    if (this_afdh->hasAcroForm())
+    {
+        auto acroform = pdf.getRoot().getKey("/AcroForm");
+        auto fields = acroform.getKey("/Fields");
+        if (fields.isArray())
+        {
+            auto new_fields = QPDFObjectHandle::newArray();
+            if (fields.isIndirect())
+            {
+                new_fields = pdf.makeIndirectObject(new_fields);
+            }
+            for (auto const& field: fields.aitems())
+            {
+                if (referenced_fields.count(field.getObjGen()))
+                {
+                    new_fields.appendItem(field);
+                }
+            }
+            if (new_fields.getArrayNItems() > 0)
+            {
+                QTC::TC("qpdf", "qpdf keep some fields in pages");
+                acroform.replaceKey("/Fields", new_fields);
+            }
+            else
+            {
+                QTC::TC("qpdf", "qpdf no more fields in pages");
+                pdf.getRoot().removeKey("/AcroForm");
+            }
         }
     }
 }
