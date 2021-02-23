@@ -137,7 +137,7 @@
 
 2021-02-04  Jay Berkenbilt  <ejb@ql.org>
 
-	* Add new option --pasword-file=file for reading the decryption
+	* Add new option --password-file=file for reading the decryption
 	password from a file. file may be "-" to read from standard input.
 	Fixes #499.
 

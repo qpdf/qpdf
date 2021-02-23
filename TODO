@@ -480,7 +480,7 @@ I find it useful to make reference to them in this list.
    encrypts, it never generates streams with explicit crypt filters.
    Prior to 10.2, there was an incorrect attempt to treat /EFF as a
    default value for decrypting file attachment streams, but it is not
-   supposed to mean that. Instead, it is intended for comforming
+   supposed to mean that. Instead, it is intended for conforming
    writers to obey this when adding new attachments. Qpdf is not a
    conforming writer in that respect.
 

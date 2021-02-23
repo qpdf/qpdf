@@ -789,7 +789,7 @@ class ArgParser
     void argShowCrypto();
     void argPositional(char* arg);
     void argPassword(char* parameter);
-    void argPasswordFile(char* paramter);
+    void argPasswordFile(char* parameter);
     void argEmpty();
     void argLinearize();
     void argEncrypt();
@@ -3709,7 +3709,7 @@ ArgParser::doFinalChecks()
         // the user password, so this lack of security is not an issue
         // for those files. Also we are consider only the ability to
         // open the file without a password to be insecure. We are not
-        // concerned about whether the viwer enforces security
+        // concerned about whether the viewer enforces security
         // settings when the user and owner password match.
         usage("A PDF with a non-empty user password and an empty owner"
               " password encrypted with a 256-bit key is insecure as it"
@@ -5305,7 +5305,7 @@ static void add_attachments(QPDF& pdf, Options& o, int& exit_code)
             std::cerr << whoami << ": " << pdf.getFilename()
                       << " already has an attachment with key = "
                       << to_add.key << "; use --replace to replace"
-                      << " or --key to specificy a different key"
+                      << " or --key to specify a different key"
                       << std::endl;
             exit_code = EXIT_ERROR;
             continue;

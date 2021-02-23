@@ -498,7 +498,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
         // references. When we clone BA, we will want to clone A and
         // then update A's clone's kid to point B's clone and B's
         // clone's parent to point to A's clone. The same thing holds
-        // for annotatons. Next, when we get to CA, we will again
+        // for annotations. Next, when we get to CA, we will again
         // discover that A is the top, but we don't want to re-copy A.
         // We want CA's clone to be linked to the same clone as BA's.
         // Failure to do this will break up things like radio button

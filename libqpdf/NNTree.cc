@@ -303,7 +303,7 @@ NNTreeIterator::split(QPDFObjectHandle to_split,
     // item.
 
     // In examples, for simplicity, /Nums is show to just contain
-    // numbers instead of pairs. Imagine this tre:
+    // numbers instead of pairs. Imagine this tree:
     //
     // root: << /Kids [ A B C D ] >>
     // A: << /Nums [ 1 2 3 4 ] >>

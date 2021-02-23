@@ -629,7 +629,7 @@ void timestamp_test()
     assert(QUtil::pdf_time_to_qpdf_time("D:20210211064743"));
     // Round trip on the current time without actually printing it.
     // Manual testing was done to ensure that we are actually getting
-    // back the current time in various timezones.
+    // back the current time in various time zones.
     assert(QUtil::pdf_time_to_qpdf_time(
                QUtil::qpdf_time_to_pdf_time(
                    QUtil::get_current_qpdf_time())));
