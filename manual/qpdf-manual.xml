@@ -5071,6 +5071,19 @@ print "\n";
        <itemizedlist>
         <listitem>
          <para>
+          Operations that work on combining pages are much better
+          about protecting form fields. In particular,
+          <option>--split-pages</option> and <option>--pages</option>
+          now preserve interaction form functionality by copying the
+          relevant form field information from the original files.
+          Additionally, if you use <option>--pages</option> to select
+          only some pages from the original input file, unused form
+          fields are removed, which prevents lots of unused
+          annotations from being retained.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
           By default, <command>qpdf</command> no longer allows
           creation of encrypted PDF files whose user password is
           non-empty and owner password is empty when a 256-bit key is
@@ -5145,6 +5158,23 @@ print "\n";
         </listitem>
         <listitem>
          <para>
+          Page splitting and merging operations, as well as
+          <option>--flatten-rotation</option>, are better behaved
+          with respect to annotations and interactive form fields. In
+          most cases, interactive form field functionality and proper
+          formatting and functionality of annotations is preserved by
+          these operations. There are still some cases that aren't
+          perfect, such as when functionality of annotations depends
+          on document-level data that qpdf doesn't yet understand or
+          when there are problems with referential integrity among
+          form fields and annotations (e.g., when a single form field
+          object or its associated annotations are shared across
+          multiple pages, a case that is out of spec but that works in
+          most viewers anyway).
+         </para>
+        </listitem>
+        <listitem>
+         <para>
           The option
           <option>--password-file=<replaceable>filename</replaceable></option>
           can now be used to read the decryption password from a file.
@@ -5190,6 +5220,15 @@ print "\n";
        <itemizedlist>
         <listitem>
          <para>
+          This release includes numerous additions to the API. Not all
+          changes are listed here. Please see the
+          <filename>ChangeLog</filename> file in the source
+          distribution for a comprehensive list. Highlights appear
+          below.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
           Add <function>QPDFObjectHandle::ditems()</function> and
           <function>QPDFObjectHandle::aitems()</function> that enable
           C++-style iteration, including range-for iteration, over
@@ -5208,14 +5247,6 @@ print "\n";
         </listitem>
         <listitem>
          <para>
-          Add <function>QUtil::get_current_qpdf_time</function>,
-          <function>QUtil::pdf_time_to_qpdf_time</function>, and
-          <function>QUtil::qpdf_time_to_pdf_time</function> for
-          working with PDF timestamp strings.
-         </para>
-        </listitem>
-        <listitem>
-         <para>
           Add new helper classes for supporting file attachments, also
           known as embedded files. New classes are
           <classname>QPDFEmbeddedFileDocumentHelper</classname>,
@@ -5224,19 +5255,6 @@ print "\n";
           respective headers for details and
           <filename>examples/pdf-attach-file.cc</filename> for an
           example.
-         </para>
-        </listitem>
-        <listitem>
-         <para>
-          Add <function>warn</function> to
-          <classname>QPDF</classname>'s public API.
-         </para>
-        </listitem>
-        <listitem>
-         <para>
-          <function>QPDFObjectHandle::is*</function> methods now return
-          false rather than crashing when called with an uninitialized
-          <classname>QPDFObjectHandle</classname> object.
          </para>
         </listitem>
         <listitem>
@@ -5261,29 +5279,13 @@ print "\n";
         </listitem>
         <listitem>
          <para>
-          Add new functions <function>QUtil::pipe_file</function> and
-          <function>QUtil::file_provider</function> for sending the
-          contents of a file through a pipeline as binary data.
-         </para>
-        </listitem>
-        <listitem>
-         <para>
 	  Add new versions of
 	  <function>QPDFObjectHandle::replaceStreamData</function>
 	  that take <classname>std::function</classname> objects for
 	  cases when you need something between a static string and a
 	  full-fledged StreamDataProvider. Using this with
-	  QUtil::file_provider is a very easy way to create a stream
-	  from the contents of a file.
-         </para>
-        </listitem>
-        <listitem>
-         <para>
-          Add option to <function>QUtil::double_to_string</function>
-          to trim trailing zeroes, which is on by default. Within the
-          qpdf library, this causes changes to output the from code
-          that places form XObjects and the code that flattens
-          rotations.
+	  <function>QUtil::file_provider</function> is a very easy way
+	  to create a stream from the contents of a file.
          </para>
         </listitem>
         <listitem>
@@ -5292,28 +5294,19 @@ print "\n";
           private, internal class, has been added to the public API.
           See <filename>include/qpdf/QPDFMatrix.hh</filename> for
           details. This class is for working with transformation
-          matrices.
+          matrices. Some methods in
+          <classname>QPDFPageObjectHelper</classname> make use of this
+          to make information about transformation matrices available.
+          For an example, see
+          <filename>examples/pdf-overlay-page.cc</filename>.
          </para>
         </listitem>
         <listitem>
          <para>
-	  Add
-	  <function>QPDFPageObjectHelper::getMatrixForFormXObjectPlacement</function>,
-	  which returns the transformation matrix required to map from
-	  a form field's coordinate system into a specific rectangle
-	  within the page. Also add a version of
-	  <function>QPDFPageObjectHelper::placeFormXObject</function>
-	  that initializes a <classname>QPDFMatrix</classname>
-	  reference. For example, see
-	  <filename>examples/pdf-overlay-page.cc</filename>.
-         </para>
-        </listitem>
-        <listitem>
-         <para>
-          Add method
-          <function>QPDFAcroFormDocumentHelper::addFormField</function>,
-          which adds a new form field, initializing the AcroForm
-          dictionary if needed.
+          Several new methods were added to
+          <classname>QPDFAcroFormDocumentHelper</classname> for
+          adding, removing, getting information about, and enumerating
+          form fields.
          </para>
         </listitem>
         <listitem>
@@ -5330,12 +5323,6 @@ print "\n";
 	  which copies annotations and, if applicable, associated form
 	  fields, from one page to another, possibly transforming the
 	  rectangles.
-         </para>
-        </listitem>
-        <listitem>
-         <para>
-          Add <function>QUtil::path_basename</function> to return the
-          last element of a path.
          </para>
         </listitem>
        </itemizedlist>
@@ -5362,7 +5349,7 @@ print "\n";
        <itemizedlist>
         <listitem>
          <para>
-	  The <option>--flatten-rotations</option> option applies
+	  The <option>--flatten-rotation</option> option applies
           transformations to any annotations that may be on the page.
          </para>
         </listitem>
@@ -5373,7 +5360,15 @@ print "\n";
 	  containing page. This is compliant with older PDF versions.
 	  Also detect if any form XObjects have any unresolved names
 	  and, if so, don't remove unreferenced resources from them or
-	  from the page that contains them.
+	  from the page that contains them. Unfortunately this has the
+	  side effect of preventing removal of unreferenced resources
+	  in some cases where names appear that don't refer to
+	  resources, such as with tagged PDF. This is a bit of a
+	  corner case that is not likely to cause a significant
+	  problem in practice, but the only side effect would be lack
+	  of removal of shared resources. A future version of qpdf may
+	  be more sophisticated in its detection of names that refer
+	  to resources.
          </para>
         </listitem>
         <listitem>
