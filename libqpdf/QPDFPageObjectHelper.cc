@@ -785,10 +785,12 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
 
     if ((! local_unresolved.empty()) && resources.isDictionary())
     {
+        // Don't issue a warning for this case. There are some cases
+        // of names that aren't XObject references, for example,
+        // /Artifact in tagged PDF. Until we are certain that we know
+        // the meaning of every name in a content stream, we don't
+        // want to give warnings because they will be false positives.
         QTC::TC("qpdf", "QPDFPageObjectHelper unresolved names");
-        ph.oh.warnIfPossible(
-            "Unresolved names found while scanning content stream; "
-            "not attempting to remove unreferenced objects from this object");
         return false;
     }
 
