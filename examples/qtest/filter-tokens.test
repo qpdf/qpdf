@@ -9,6 +9,8 @@ require TestDriver;
 
 my $td = new TestDriver('pdf-filter-tokens');
 
+cleanup();
+
 $td->runtest("filter tokens",
 	     {$td->COMMAND => "pdf-filter-tokens in.pdf a.pdf"},
 	     {$td->STRING => "", $td->EXIT_STATUS => 0});
@@ -17,4 +19,11 @@ $td->runtest("check output",
 	     {$td->FILE => "a.pdf"},
 	     {$td->FILE => "out.pdf"});
 
+cleanup();
+
 $td->report(2);
+
+sub cleanup
+{
+    unlink 'a.pdf';
+}
