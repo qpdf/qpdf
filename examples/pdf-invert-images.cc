@@ -25,15 +25,13 @@ void usage()
 // allocate memory up front for the objects. We want to replace the
 // stream data with a function of the original stream data. In order
 // to do this without actually holding all the images in memory, we
-// create another QPDF object and copy the streams. Copying the
-// streams doesn't actually copy the data. Internally, the qpdf
-// library is holding onto the location of the stream data in the
-// original file, which makes it possible for the StreamDataProvider
-// to access it when it needs it.
+// create copies of the streams. Copying the streams doesn't actually
+// copy the data. Internally, the qpdf library is holding onto the
+// location of the original stream data, which makes it possible for
+// the StreamDataProvider to access it when it needs it.
 class ImageInverter: public QPDFObjectHandle::StreamDataProvider
 {
   public:
-    ImageInverter();
     virtual ~ImageInverter()
     {
     }
@@ -45,15 +43,8 @@ class ImageInverter: public QPDFObjectHandle::StreamDataProvider
         PointerHolder<QPDFObjectHandle::StreamDataProvider> self);
 
   private:
-    QPDF other;
-    // Map og in original to copied image
     std::map<QPDFObjGen, QPDFObjectHandle> copied_images;
 };
-
-ImageInverter::ImageInverter()
-{
-    this->other.emptyPDF();
-}
 
 void
 ImageInverter::registerImage(
@@ -77,7 +68,7 @@ ImageInverter::registerImage(
     {
         return;
     }
-    this->copied_images[og] = this->other.copyForeignObject(image);
+    this->copied_images[og] = image.copyStream();
 
     // Register our stream data provider for this stream. Future calls
     // to getStreamData or pipeStreamData will use the new

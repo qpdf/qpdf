@@ -198,8 +198,7 @@ class StreamReplacer: public QPDFObjectHandle::StreamDataProvider
     //   original stream data is no longer directly accessible. Trying
     //   to retrieve the stream data would be an infinite loop because
     //   it would just end up calling provideStreamData again. This is
-    //   why maybeReplace uses a stashed copy of the original stream
-    //   from the "other" QPDF object.
+    //   why maybeReplace uses a stashed copy of the original stream.
 
     // Additional explanation can be found in the method
     // implementations.
@@ -223,11 +222,6 @@ class StreamReplacer: public QPDFObjectHandle::StreamDataProvider
     // we are replacing. We need this to create a new stream.
     QPDF* pdf;
 
-    // This second QPDF instance gives us a place to copy streams to
-    // so that we can access the original stream data of the streams
-    // whose data we are replacing.
-    QPDF other;
-
     // Map the object/generation in original file to the copied stream
     // in "other". We use this to retrieve the original data.
     std::map<QPDFObjGen, QPDFObjectHandle> copied_streams;
@@ -241,10 +235,6 @@ class StreamReplacer: public QPDFObjectHandle::StreamDataProvider
 StreamReplacer::StreamReplacer(QPDF* pdf) :
     pdf(pdf)
 {
-    // Our "other" QPDF is just a place to stash streams. It doesn't
-    // have to be a valid PDF with pages, etc. We are never going to
-    // write this out.
-    this->other.emptyPDF();
 }
 
 bool
@@ -375,9 +365,11 @@ StreamReplacer::registerStream(
 
     if (should_replace)
     {
-        // Copy the stream to another QPDF object so we can get to the
-        // original data from the stream data provider.
-        this->copied_streams[og] = this->other.copyForeignObject(stream);
+        // Copy the stream so we can get to the original data from the
+        // stream data provider. This doesn't actually copy any data,
+        // but the copy retains the original stream data after the
+        // original one is modified.
+        this->copied_streams[og] = stream.copyStream();
         // Update the stream dictionary with any changes.
         auto dict = stream.getDict();
         for (auto const& k: dict_updates.getKeys())

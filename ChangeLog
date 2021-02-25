@@ -1,5 +1,10 @@
 2021-02-25  Jay Berkenbilt  <ejb@ql.org>
 
+	* Update StreamDataProvider examples to use copyStream() when they
+	want to get to the original stream data from the provider. Prior
+	to 10.2.0, we had to copy the stream to another QPDF, but now we
+	can just use copyStream().
+
 	* Bug fix/behavior change: when QPDF::replaceObject or
 	QPDF::swapObjects is called, existing QPDFObjectHandle instances
 	will now notice the change. This removes a long-standing source of
