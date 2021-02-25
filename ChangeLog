@@ -7,6 +7,8 @@
 
 2021-02-23  Jay Berkenbilt  <ejb@ql.org>
 
+	* 10.2.0: release
+
 	* The test for the input and output files being the same wasn't
 	implemented correctly for --split-pages since the specified output
 	file is really a pattern, not the actual output file.
