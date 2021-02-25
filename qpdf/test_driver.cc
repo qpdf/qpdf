@@ -740,7 +740,13 @@ void runtest(int n, char const* filename1, char const* arg2)
 				   " not called 4-page file");
 	}
 	// Swap pages 2 and 3
-	pdf.swapObjects(pages.at(1).getObjGen(), pages.at(2).getObjGen());
+        auto orig_page2 = pages.at(1);
+        auto orig_page3 = pages.at(2);
+        assert(orig_page2.getKey("/OrigPage").getIntValue() == 2);
+        assert(orig_page3.getKey("/OrigPage").getIntValue() == 3);
+	pdf.swapObjects(orig_page2.getObjGen(), orig_page3.getObjGen());
+        assert(orig_page2.getKey("/OrigPage").getIntValue() == 3);
+        assert(orig_page3.getKey("/OrigPage").getIntValue() == 2);
 	// Replace object and swap objects
 	QPDFObjectHandle trailer = pdf.getTrailer();
 	QPDFObjectHandle qdict = trailer.getKey("/QDict");
@@ -759,18 +765,18 @@ void runtest(int n, char const* filename1, char const* arg2)
 	    std::cout << "caught logic error as expected" << std::endl;
 	}
 	pdf.replaceObject(qdict.getObjGen(), new_dict);
-	// Now qdict still points to the old dictionary
-	std::cout << "old dict: " << qdict.getKey("/Dict").getIntValue()
+	// Now qdict points to the new dictionary
+	std::cout << "old dict: " << qdict.getKey("/NewDict").getIntValue()
 		  << std::endl;
 	// Swap dict and array
 	pdf.swapObjects(qdict.getObjGen(), qarray.getObjGen());
-	// Now qarray will resolve to new object but qdict is still
-	// the old object
-	std::cout << "old dict: " << qdict.getKey("/Dict").getIntValue()
+	// Now qarray will resolve to new object and qdict resolves to
+        // the array
+	std::cout << "swapped array: " << qdict.getArrayItem(0).getName()
 		  << std::endl;
 	std::cout << "new dict: " << qarray.getKey("/NewDict").getIntValue()
 		  << std::endl;
-	// Reread qdict, now pointing to an array
+	// Reread qdict, still pointing to an array
 	qdict = pdf.getObjectByObjGen(qdict.getObjGen());
 	std::cout << "swapped array: " << qdict.getArrayItem(0).getName()
 		  << std::endl;

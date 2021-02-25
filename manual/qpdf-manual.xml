@@ -5061,6 +5061,32 @@ print "\n";
    </varlistentry>
 -->
    <varlistentry>
+    <term>XXX 10.2.1: Month dd, YYYY</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Bug Fixes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          When <function>QPDF::replaceObject</function> or
+          <function>QPDF::swapObjects</function> is called, existing
+          <classname>QPDFObjectHandle</classname> instances no longer
+          point to the old objects. The next time they are
+          accessed, they automatically notice the change to the
+          underlying object and update themselves. This resolves a
+          very longstanding source of confusion, albeit in a very
+          rarely used method call.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
     <term>10.2.0: February 23, 2021</term>
     <listitem>
      <itemizedlist>

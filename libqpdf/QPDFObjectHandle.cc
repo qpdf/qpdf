@@ -3194,6 +3194,12 @@ QPDFObjectHandle::dereference()
         throw std::logic_error(
             "attempted to dereference an uninitialized QPDFObjectHandle");
     }
+    if (this->obj.getPointer() && this->objid &&
+        QPDF::Resolver::objectChanged(
+            this->qpdf, QPDFObjGen(this->objid, this->generation), this->obj))
+    {
+        this->obj = nullptr;
+    }
     if (this->obj.getPointer() == 0)
     {
         PointerHolder<QPDFObject> obj = QPDF::Resolver::resolve(

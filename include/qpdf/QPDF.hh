@@ -278,34 +278,26 @@ class QPDF
     QPDFObjectHandle getObjectByID(int objid, int generation);
 
     // Replace the object with the given object id with the given
-    // object.  The object handle passed in must be a direct object,
+    // object. The object handle passed in must be a direct object,
     // though it may contain references to other indirect objects
-    // within it.  Calling this method can have somewhat confusing
-    // results.  Any existing QPDFObjectHandle instances that point to
-    // the old object and that have been resolved (which happens
-    // automatically if you access them in any way) will continue to
-    // point to the old object even though that object will no longer
-    // be associated with the PDF file.  Note that replacing an object
-    // with QPDFObjectHandle::newNull() effectively removes the object
-    // from the file since a non-existent object is treated as a null
-    // object.  To replace a reserved object, call replaceReserved
+    // within it. Prior to qpdf 10.2.1, after calling this method,
+    // existing QPDFObjectHandle instances that pointed to the
+    // original object still pointed to the original object, resulting
+    // in confusing and incorrect behavior. This was fixed in 10.2.1,
+    // so existing QPDFObjectHandle objects will start pointing to the
+    // newly replaced object. Note that replacing an object with
+    // QPDFObjectHandle::newNull() effectively removes the object from
+    // the file since a non-existent object is treated as a null
+    // object. To replace a reserved object, call replaceReserved
     // instead.
     QPDF_DLL
     void replaceObject(QPDFObjGen const& og, QPDFObjectHandle);
     QPDF_DLL
     void replaceObject(int objid, int generation, QPDFObjectHandle);
 
-    // Swap two objects given by ID.  Calling this method can have
-    // confusing results.  After swapping two objects, existing
-    // QPDFObjectHandle instances that reference them will still
-    // reference the same underlying objects, at which point those
-    // existing QPDFObjectHandle instances will have incorrect
-    // information about the object and generation number of those
-    // objects.  While this does not necessarily cause a problem, it
-    // can certainly be confusing.  It is therefore recommended that
-    // you replace any existing QPDFObjectHandle instances that point
-    // to the swapped objects with new ones, possibly by calling
-    // getObjectByID.
+    // Swap two objects given by ID. Prior to qpdf 10.2.1, existing
+    // QPDFObjectHandle instances that reference them objects not
+    // notice the swap, but this was fixed in 10.2.1.
     QPDF_DLL
     void swapObjects(QPDFObjGen const& og1, QPDFObjGen const& og2);
     QPDF_DLL
@@ -697,6 +689,11 @@ class QPDF
 	{
 	    return qpdf->resolve(objid, generation);
 	}
+        static bool objectChanged(
+            QPDF* qpdf, QPDFObjGen const& og, PointerHolder<QPDFObject>& oph)
+        {
+            return qpdf->objectChanged(og, oph);
+        }
     };
     friend class Resolver;
 
@@ -930,6 +927,7 @@ class QPDF
 	qpdf_offset_t offset, std::string const& description,
 	int exp_objid, int exp_generation,
 	int& act_objid, int& act_generation);
+    bool objectChanged(QPDFObjGen const& og, PointerHolder<QPDFObject>& oph);
     PointerHolder<QPDFObject> resolve(int objid, int generation);
     void resolveObjectsInStream(int obj_stream_number);
     void stopOnError(std::string const& message);
@@ -1441,6 +1439,7 @@ class QPDF
         bool in_parse;
         bool parsed;
         std::set<int> resolved_object_streams;
+        bool ever_replaced_objects;
 
         // Linearization data
         qpdf_offset_t first_xref_item_offset; // actual value from file

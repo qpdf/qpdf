@@ -1,3 +1,10 @@
+2021-02-25  Jay Berkenbilt  <ejb@ql.org>
+
+	* Bug fix/behavior change: when QPDF::replaceObject or
+	QPDF::swapObjects is called, existing QPDFObjectHandle instances
+	will now notice the change. This removes a long-standing source of
+	bugs and confusing behavior.
+
 2021-02-23  Jay Berkenbilt  <ejb@ql.org>
 
 	* The test for the input and output files being the same wasn't
