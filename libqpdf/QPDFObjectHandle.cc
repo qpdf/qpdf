@@ -326,6 +326,8 @@ QPDFObjectHandle::isBool()
 bool
 QPDFObjectHandle::isDirectNull() const
 {
+    // Don't call dereference() -- this is a const method, and we know
+    // objid == 0, so there's nothing to resolve.
     return (this->initialized && (this->objid == 0) &&
             QPDFObjectTypeAccessor<QPDF_Null>::check(obj.getPointer()));
 }
@@ -2452,6 +2454,8 @@ QPDFObjectHandle::getParsedOffset()
 void
 QPDFObjectHandle::setParsedOffset(qpdf_offset_t offset)
 {
+    // This is called during parsing on newly created direct objects,
+    // so we can't call dereference() here.
     if (this->obj.getPointer())
     {
         this->obj->setParsedOffset(offset);
@@ -2694,6 +2698,8 @@ void
 QPDFObjectHandle::setObjectDescription(QPDF* owning_qpdf,
                                        std::string const& object_description)
 {
+    // This is called during parsing on newly created direct objects,
+    // so we can't call dereference() here.
     if (isInitialized() && this->obj.getPointer())
     {
         this->obj->setDescription(owning_qpdf, object_description);
@@ -2703,9 +2709,13 @@ QPDFObjectHandle::setObjectDescription(QPDF* owning_qpdf,
 bool
 QPDFObjectHandle::hasObjectDescription()
 {
-    if (isInitialized() && this->obj.getPointer())
+    if (isInitialized())
     {
-        return this->obj->hasDescription();
+        dereference();
+        if (this->obj.getPointer())
+        {
+            return this->obj->hasDescription();
+        }
     }
     return false;
 }
