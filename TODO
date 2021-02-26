@@ -1,6 +1,15 @@
 Document-level work
 ===================
 
+* QPDFPageCopier -- object for moving pages around within files or
+  between files and performing various transformations
+
+  * handle all the stuff of pages and split-pages
+  * do n-up, booklet, collation
+  * look through cli and see what else...flatten-*?
+  * See comments in QPDFPageDocumentHelper.hh for addPage -- search
+   for "a future version".
+
 * See also issues tagged with "pages"
 
 * There is going to be a lot of duplicated code for doc-level stuff
