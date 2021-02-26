@@ -63,6 +63,24 @@ QPDFFormFieldObjectHelper::getTopLevelField(bool* is_different)
 }
 
 QPDFObjectHandle
+QPDFFormFieldObjectHelper::getFieldFromAcroForm(std::string const& name)
+{
+    QPDFObjectHandle result = QPDFObjectHandle::newNull();
+    // Fields are supposed to be indirect, so this should work.
+    QPDF* q = this->oh.getOwningQPDF();
+    if (! q)
+    {
+        return result;
+    }
+    auto acroform = q->getRoot().getKey("/AcroForm");
+    if (! acroform.isDictionary())
+    {
+        return result;
+    }
+    return acroform.getKey(name);
+}
+
+QPDFObjectHandle
 QPDFFormFieldObjectHelper::getInheritableFieldValue(std::string const& name)
 {
     QPDFObjectHandle node = this->oh;
@@ -203,20 +221,47 @@ QPDFFormFieldObjectHelper::getDefaultValueAsString()
     return getInheritableFieldValueAsString("/DV");
 }
 
+QPDFObjectHandle
+QPDFFormFieldObjectHelper::getDefaultResources()
+{
+    return getFieldFromAcroForm("/DR");
+}
+
 std::string
 QPDFFormFieldObjectHelper::getDefaultAppearance()
 {
-    return getInheritableFieldValueAsString("/DA");
+    auto value = getInheritableFieldValue("/DA");
+    bool looked_in_acroform = false;
+    if (! value.isString())
+    {
+        value = getFieldFromAcroForm("/DA");
+        looked_in_acroform = true;
+    }
+    std::string result;
+    if (value.isString())
+    {
+        QTC::TC("qpdf", "QPDFFormFieldObjectHelper DA present",
+                looked_in_acroform ? 0 : 1);
+        result = value.getUTF8Value();
+    }
+    return result;
 }
 
 int
 QPDFFormFieldObjectHelper::getQuadding()
 {
-    int result = 0;
     QPDFObjectHandle fv = getInheritableFieldValue("/Q");
+    bool looked_in_acroform = false;
+    if (! fv.isInteger())
+    {
+        fv = getFieldFromAcroForm("/Q");
+        looked_in_acroform = true;
+    }
+    int result = 0;
     if (fv.isInteger())
     {
-        QTC::TC("qpdf", "QPDFFormFieldObjectHelper Q present");
+        QTC::TC("qpdf", "QPDFFormFieldObjectHelper Q present",
+                looked_in_acroform ? 0 : 1);
         result = QIntC::to_int(fv.getIntValue());
     }
     return result;
@@ -920,7 +965,7 @@ QPDFFormFieldObjectHelper::generateTextAppearance(
         QPDFObjectHandle font = getFontFromResource(resources, font_name);
         if (! font.isInitialized())
         {
-            QPDFObjectHandle dr = getInheritableFieldValue("/DR");
+            QPDFObjectHandle dr = getDefaultResources();
             font = getFontFromResource(dr, font_name);
         }
         if (font.isInitialized() &&

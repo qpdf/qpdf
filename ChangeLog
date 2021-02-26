@@ -1,3 +1,16 @@
+2021-02-26  Jay Berkenbilt  <ejb@ql.org>
+
+	* Bug fix: QPDFFormFieldObjectHelper was mis-handling /DA, /Q, and
+	/DR in ways that usually didn't matter but were still wrong. /DA
+	and /Q were being found in the field hierarchy, but if not found,
+	the default values in the /AcroForm dictionary were not being
+	used. /DR was being treated as an inherited field in the field
+	dictionary, which is wrong. It is actually supposed to come from
+	the /AcroForm dictionary. We were getting away with this since
+	many popular form writers seem to copy it to the field as well,
+	even though the spec makes no mention of doing this. To support
+	this, QPDFFormFieldObjectHelper::getDefaultResources was added.
+
 2021-02-25  Jay Berkenbilt  <ejb@ql.org>
 
 	* Update StreamDataProvider examples to use copyStream() when they

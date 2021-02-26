@@ -148,8 +148,7 @@ QPDFPageDocumentHelper::flattenAnnotationsForPage(
                         "/Resources", as_resources.shallowCopy());
                     as_resources = as.getDict().getKey("/Resources");
                 }
-                as_resources.mergeResources(
-                    ff.getInheritableFieldValue("/DR"));
+                as_resources.mergeResources(ff.getDefaultResources());
             }
             else
             {

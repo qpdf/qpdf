@@ -335,6 +335,7 @@ my @form_tests = (
     'form-filled-with-atril',
     'form-bad-fields-array',
     'form-errors',
+    'form-document-defaults',
     );
 
 $n_tests += scalar(@form_tests) + 6;

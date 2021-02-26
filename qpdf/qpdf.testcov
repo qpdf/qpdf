@@ -337,7 +337,8 @@ QPDFFormFieldObjectHelper TU present 0
 QPDFFormFieldObjectHelper TM present 0
 QPDFFormFieldObjectHelper TU absent 0
 QPDFFormFieldObjectHelper TM absent 0
-QPDFFormFieldObjectHelper Q present 0
+QPDFFormFieldObjectHelper Q present 1
+QPDFFormFieldObjectHelper DA present 1
 QPDFAnnotationObjectHelper AS present 0
 QPDFAnnotationObjectHelper AS absent 0
 QPDFAnnotationObjectHelper AP stream 0

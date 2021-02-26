@@ -121,12 +121,22 @@ class QPDFFormFieldObjectHelper: public QPDFObjectHelper
     // the field tree into account. Returns the empty string if the
     // default appearance string is not available (because it's
     // erroneously absent or because this is not a variable text
-    // field).
+    // field). If not found in the field hierarchy, look in /AcroForm.
     QPDF_DLL
     std::string getDefaultAppearance();
 
+    // Return the default resource dictionary for the field. This
+    // comes not from the field but from the document-level /AcroForm
+    // dictionary. While several PDF generates put a /DR key in the
+    // form field's dictionary, experimentation suggests that many
+    // popular readers, including Adobe Acrobat and Acrobat Reader,
+    // ignore any /DR item on the field.
+    QPDF_DLL
+    QPDFObjectHandle getDefaultResources();
+
     // Return the quadding value, taking inheritance from the field
-    // tree into account. Returns 0 if quadding is not specified.
+    // tree into account. Returns 0 if quadding is not specified. Look
+    // in /AcroForm if not found in the field hierarchy.
     QPDF_DLL
     int getQuadding();
 
@@ -200,6 +210,7 @@ class QPDFFormFieldObjectHelper: public QPDFObjectHelper
     void generateAppearance(QPDFAnnotationObjectHelper&);
 
   private:
+    QPDFObjectHandle getFieldFromAcroForm(std::string const& name);
     void setRadioButtonValue(QPDFObjectHandle name);
     void setCheckBoxValue(bool value);
     void generateTextAppearance(QPDFAnnotationObjectHelper&);
