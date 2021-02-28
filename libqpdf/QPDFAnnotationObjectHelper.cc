@@ -76,12 +76,12 @@ QPDFAnnotationObjectHelper::getAppearanceStream(
             QPDFObjectHandle ap_sub_val = ap_sub.getKey(desired_state);
             if (ap_sub_val.isStream())
             {
-                QTC::TC("qpdf", "QPDFAnnotationObjectHelper AN sub stream");
+                QTC::TC("qpdf", "QPDFAnnotationObjectHelper AP sub stream");
                 return ap_sub_val;
             }
         }
     }
-    QTC::TC("qpdf", "QPDFAnnotationObjectHelper AN null");
+    QTC::TC("qpdf", "QPDFAnnotationObjectHelper AP null");
     return QPDFObjectHandle::newNull();
 }
 

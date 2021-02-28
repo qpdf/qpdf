@@ -343,8 +343,8 @@ QPDFAnnotationObjectHelper AS present 0
 QPDFAnnotationObjectHelper AS absent 0
 QPDFAnnotationObjectHelper AP stream 0
 QPDFAnnotationObjectHelper AP dictionary 0
-QPDFAnnotationObjectHelper AN sub stream 0
-QPDFAnnotationObjectHelper AN null 0
+QPDFAnnotationObjectHelper AP sub stream 0
+QPDFAnnotationObjectHelper AP null 0
 QPDFAcroFormDocumentHelper fields not array 0
 QPDFAcroFormDocumentHelper orphaned widget 0
 QPDFAcroFormDocumentHelper direct field 0
