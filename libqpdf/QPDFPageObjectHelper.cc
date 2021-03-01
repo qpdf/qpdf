@@ -8,6 +8,7 @@
 #include <qpdf/QPDFMatrix.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
+#include <qpdf/ResourceFinder.hh>
 
 class ContentProvider: public QPDFObjectHandle::StreamDataProvider
 {
@@ -670,38 +671,6 @@ QPDFPageObjectHelper::addContentTokenFilter(
     }
 }
 
-class NameWatcher: public QPDFObjectHandle::TokenFilter
-{
-  public:
-    NameWatcher() :
-        saw_bad(false)
-    {
-    }
-    virtual ~NameWatcher()
-    {
-    }
-    virtual void handleToken(QPDFTokenizer::Token const&);
-    std::set<std::string> names;
-    bool saw_bad;
-};
-
-void
-NameWatcher::handleToken(QPDFTokenizer::Token const& token)
-{
-    if (token.getType() == QPDFTokenizer::tt_name)
-    {
-        // Create a name object and get its name. This canonicalizes
-        // the representation of the name
-        this->names.insert(
-            QPDFObjectHandle::newName(token.getValue()).getName());
-    }
-    else if (token.getType() == QPDFTokenizer::tt_bad)
-    {
-        saw_bad = true;
-    }
-    writeToken(token);
-}
-
 bool
 QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
     QPDFPageObjectHelper ph, std::set<std::string>& unresolved)
@@ -712,10 +681,10 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
         QTC::TC("qpdf", "QPDFPageObjectHelper filter form xobject");
     }
 
-    NameWatcher nw;
+    ResourceFinder rf;
     try
     {
-        ph.filterContents(&nw);
+        ph.filterContents(&rf);
     }
     catch (std::exception& e)
     {
@@ -725,7 +694,7 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
             " from this object");
         return false;
     }
-    if (nw.saw_bad)
+    if (rf.sawBad())
     {
         QTC::TC("qpdf", "QPDFPageObjectHelper bad token finding names");
         ph.oh.warnIfPossible(
@@ -760,7 +729,7 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
     }
 
     std::set<std::string> local_unresolved;
-    for (auto const& name: nw.names)
+    for (auto const& name: rf.getNames())
     {
         if (! known_names.count(name))
         {
@@ -804,7 +773,7 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
                 // xobject, so don't remove it.
                 QTC::TC("qpdf", "QPDFPageObjectHelper resolving unresolved");
             }
-            else if (! nw.names.count(key))
+            else if (! rf.getNames().count(key))
             {
                 dict.removeKey(key);
             }

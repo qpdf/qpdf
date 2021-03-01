@@ -98,6 +98,7 @@ SRCS_libqpdf = \
 	libqpdf/QTC.cc \
 	libqpdf/QUtil.cc \
 	libqpdf/RC4.cc \
+	libqpdf/ResourceFinder.cc \
 	libqpdf/SecureRandomDataProvider.cc \
 	libqpdf/SF_FlateLzwDecode.cc \
 	libqpdf/SparseOHArray.cc \
