@@ -1,5 +1,12 @@
 2021-03-01  Jay Berkenbilt  <ejb@ql.org>
 
+	* Improve code that finds unreferenced resources to ignore names
+	in the content stream that are not fonts or XObjects. This should
+	reduce the number of cases when qpdf needlessly decides not to
+	remove unreferenced resources. Hopefully it doesn't create any new
+	bugs where it removes unreferenced resources that it isn't
+	supposed to.
+
 	* QPDFObjectHandle::ParserCallbacks: add virtual handleWarning
 	method, and provide default (empty) implementation of it and
 	handleEOF().

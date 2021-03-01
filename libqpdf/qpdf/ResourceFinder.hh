@@ -3,19 +3,26 @@
 
 #include <qpdf/QPDFObjectHandle.hh>
 
-class ResourceFinder: public QPDFObjectHandle::TokenFilter
+class ResourceFinder: public QPDFObjectHandle::ParserCallbacks
 {
   public:
     ResourceFinder();
     virtual ~ResourceFinder() = default;
-    virtual void handleToken(QPDFTokenizer::Token const&) override;
+    virtual void handleObject(QPDFObjectHandle, size_t, size_t) override;
+    virtual void handleWarning() override;
     std::set<std::string> const& getNames() const;
+    std::map<std::string,
+             std::map<std::string,
+                      std::set<size_t>>> const& getNamesByResourceType() const;
     bool sawBad() const;
 
   private:
     std::string last_name;
+    size_t last_name_offset;
     std::set<std::string> names;
-    std::map<std::string, std::set<std::string>> names_by_resource_type;
+    std::map<std::string,
+             std::map<std::string,
+                      std::set<size_t>>> names_by_resource_type;
     bool saw_bad;
 };
 

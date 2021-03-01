@@ -34,15 +34,6 @@ Document-level work
   --copy-attachments-from to preserve these. What will the strategy be
   for deduplicating in the automatic case?
 
-* When I get to tagged PDF, note that the presence of /Artifact and
-  /Standard (and maybe others?) causes a false positive on detection
-  of unresolved names. Example: form-fields-and-annotations.pdf. This
-  used to give a warning (never in a released version), but the
-  warning was removed. See comments about tagged pdf in
-  QPDFPageObjectHelper::removeUnreferencedResourcesHelper. Another
-  potential solution is to recognize names that refer to fonts and
-  xobjects but only looking at names used with Tf and Do operators.
-
 Fuzz Errors
 ===========
 

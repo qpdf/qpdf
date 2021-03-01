@@ -684,7 +684,7 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
     ResourceFinder rf;
     try
     {
-        ph.filterContents(&rf);
+        ph.parseContents(&rf);
     }
     catch (std::exception& e)
     {
@@ -711,9 +711,9 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
     QPDFObjectHandle resources = ph.getAttribute("/Resources", true);
     std::vector<QPDFObjectHandle> rdicts;
     std::set<std::string> known_names;
+    std::vector<std::string> to_filter = {"/Font", "/XObject"};
     if (resources.isDictionary())
     {
-        std::vector<std::string> to_filter = {"/Font", "/XObject"};
         for (auto const& iter: to_filter)
         {
             QPDFObjectHandle dict = resources.getKey(iter);
@@ -729,12 +729,17 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
     }
 
     std::set<std::string> local_unresolved;
-    for (auto const& name: rf.getNames())
+    auto names_by_rtype = rf.getNamesByResourceType();
+    for (auto const& i1: to_filter)
     {
-        if (! known_names.count(name))
+        for (auto const& n_iter: names_by_rtype[i1])
         {
-            unresolved.insert(name);
-            local_unresolved.insert(name);
+            std::string const& name = n_iter.first;
+            if (! known_names.count(name))
+            {
+                unresolved.insert(name);
+                local_unresolved.insert(name);
+            }
         }
     }
     // Older versions of the PDF spec allowed form XObjects to omit
@@ -754,11 +759,17 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
 
     if ((! local_unresolved.empty()) && resources.isDictionary())
     {
-        // Don't issue a warning for this case. There are some cases
-        // of names that aren't XObject references, for example,
-        // /Artifact in tagged PDF. Until we are certain that we know
-        // the meaning of every name in a content stream, we don't
-        // want to give warnings because they will be false positives.
+        // It's not worth issuing a warning for this case. From qpdf
+        // 10.3, we are hopefully only looking at names that are
+        // referencing fonts and XObjects, but until we're certain
+        // that we know the meaning of every name in a content stream,
+        // we don't want to give warnings that might be false
+        // positives. Also, this can happen in legitimate cases with
+        // older PDFs, and there's nothing to be done about it, so
+        // there's no good reason to issue a warning. The only sad
+        // thing is that it was a false positive that alerted me to a
+        // logic error in the code, and any future such errors would
+        // now be hidden.
         QTC::TC("qpdf", "QPDFPageObjectHelper unresolved names");
         return false;
     }
