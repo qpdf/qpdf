@@ -224,7 +224,16 @@ class QPDFObjectHandle
         virtual void handleObject(
             QPDFObjectHandle, size_t offset, size_t length);
 
-        virtual void handleEOF() = 0;
+        // handleWarning is called if a warning was issued during the
+        // parsing of the most recent object. There's no good way to
+        // get information about the warning, but implementors can use
+        // this to become aware that there was some problem while
+        // parsing this content stream.
+        QPDF_DLL
+        virtual void handleWarning();
+
+        QPDF_DLL
+        virtual void handleEOF();
 
         // Override this if you want to know the full size of the
         // contents, possibly after concatenation of multiple streams.
