@@ -366,6 +366,12 @@ QPDF::anyWarnings() const
     return ! this->m->warnings.empty();
 }
 
+size_t
+QPDF::numWarnings() const
+{
+    return this->m->warnings.size();
+}
+
 bool
 QPDF::findHeader()
 {

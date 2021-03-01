@@ -236,6 +236,11 @@ class QPDF
     QPDF_DLL
     bool anyWarnings() const;
 
+    // Indicate the number of warnings that have been issued so far.
+    // Does not clear the list of warnings.
+    QPDF_DLL
+    size_t numWarnings() const;
+
     // Return an application-scoped unique ID for this QPDF object.
     // This is not a globally unique ID. It is constructing using a
     // timestamp and a random number and is intended to be unique

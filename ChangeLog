@@ -1,3 +1,8 @@
+2021-03-01  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add QPDF::numWarnings() -- useful to tell whether any warnings
+	were issued by a specific bit of code.
+
 2021-02-26  Jay Berkenbilt  <ejb@ql.org>
 
 	* Bug fix: QPDFFormFieldObjectHelper was mis-handling /DA, /Q, and
