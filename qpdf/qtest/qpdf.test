@@ -1598,7 +1598,7 @@ $td->runtest("merge dictionary",
              $td->NORMALIZE_NEWLINES);
 $td->runtest("unique resource name",
              {$td->COMMAND => "test_driver 60 minimal.pdf"},
-             {$td->STRING => "test 60 done\n", $td->EXIT_STATUS => 0},
+             {$td->FILE => "test60.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
              {$td->FILE => "a.pdf"},

@@ -1,3 +1,14 @@
+2021-03-03  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add QPDFObjectHandle::makeResourcesIndirect
+
+2021-03-02  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add an optional resource_names argument to getUniqueResourceName
+	for added efficiency.
+
+	* Add conflict detection QPDFObjectHandle::mergeResources.
+
 2021-03-01  Jay Berkenbilt  <ejb@ql.org>
 
 	* Improve code that finds unreferenced resources to ignore names

@@ -2362,7 +2362,9 @@ void runtest(int n, char const* filename1, char const* arg2)
     }
     else if (n == 60)
     {
-        // Boundary condition testing for getUniqueResourceName
+        // Boundary condition testing for getUniqueResourceName;
+        // additional testing of mergeResources with conflict
+        // detection
         QPDFObjectHandle r1 = QPDFObjectHandle::newDictionary();
         int min_suffix = 1;
         for (int i = 1; i < 3; ++i)
@@ -2372,8 +2374,69 @@ void runtest(int n, char const* filename1, char const* arg2)
             r1.getKey("/Z").replaceKey(
                 name, QPDFObjectHandle::newString("moo"));
         }
-        pdf.getTrailer().replaceKey("/QTest", r1);
+        auto make_resource = [&](QPDFObjectHandle& dict,
+                                 std::string const& key,
+                                 std::string const& str) {
+            auto o1 = QPDFObjectHandle::newArray();
+            o1.appendItem(QPDFObjectHandle::newString(str));
+            dict.replaceKey(key, pdf.makeIndirectObject(o1));
+        };
+
+        auto z = r1.getKey("/Z");
+        r1.replaceKey("/Y", QPDFObjectHandle::newDictionary());
+        auto y = r1.getKey("/Y");
+        make_resource(z, "/F1", "r1.Z.F1");
+        make_resource(z, "/F2", "r1.Z.F2");
+        make_resource(y, "/F2", "r1.Y.F2");
+        make_resource(y, "/F3", "r1.Y.F3");
+        QPDFObjectHandle r2 =
+            QPDFObjectHandle::parse("<< /Z << >> /Y << >> >>");
+        z = r2.getKey("/Z");
+        y = r2.getKey("/Y");
+        make_resource(z, "/F2", "r2.Z.F2");
+        make_resource(y, "/F3", "r2.Y.F3");
+        make_resource(y, "/F4", "r2.Y.F4");
+        // Add a direct object
+        y.replaceKey("/F5", QPDFObjectHandle::newString("direct r2.Y.F5"));
+
+        std::map<std::string, std::map<std::string, std::string>> conflicts;
+        auto show_conflicts = [&](std::string const& msg) {
+            std::cout << msg << std::endl;
+            for (auto const& i1: conflicts)
+            {
+                std::cout << i1.first << ":" << std::endl;
+                for (auto const& i2: i1.second)
+                {
+                    std::cout << "  " << i2.first << " -> " << i2.second
+                              << std::endl;
+                }
+            }
+        };
+
+        r1.mergeResources(r2, &conflicts);
+        show_conflicts("first merge");
+        auto r3 = r1.shallowCopy();
+        // Merge again. The direct object gets recopied. Everything
+        // else is the same.
+        r1.mergeResources(r2, &conflicts);
+        show_conflicts("second merge");
+
+        // Make all resources in r2 direct. Then merge two more times.
+        // We should get the one previously direct object copied one
+        // time as an indirect object.
+        r2.makeResourcesIndirect(pdf);
+        r1.mergeResources(r2, &conflicts);
+        show_conflicts("third merge");
+        r1.mergeResources(r2, &conflicts);
+        show_conflicts("fourth merge");
+
+        // The only differences between /QTest and /QTest3 should be
+        // the direct objects merged from r2.
+        pdf.getTrailer().replaceKey("/QTest1", r1);
+        pdf.getTrailer().replaceKey("/QTest2", r2);
+        pdf.getTrailer().replaceKey("/QTest3", r3);
         QPDFWriter w(pdf, "a.pdf");
+        w.setQDFMode(true);
         w.setStaticID(true);
         w.write();
     }

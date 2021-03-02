@@ -1,0 +1,24 @@
+first merge
+/Y:
+  /F3 -> /F3_1
+/Z:
+  /F2 -> /F2_1
+second merge
+/Y:
+  /F3 -> /F3_1
+  /F5 -> /F5_1
+/Z:
+  /F2 -> /F2_1
+third merge
+/Y:
+  /F3 -> /F3_1
+  /F5 -> /F5_1
+/Z:
+  /F2 -> /F2_1
+fourth merge
+/Y:
+  /F3 -> /F3_1
+  /F5 -> /F5_1
+/Z:
+  /F2 -> /F2_1
+test 60 done

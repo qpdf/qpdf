@@ -731,13 +731,27 @@ class QPDFObjectHandle
     QPDF_DLL
     bool isOrHasName(std::string const&);
 
-    // Merge resource dictionaries. Assumes resource dictionaries have
-    // the property that the collection of keys of all first-level
-    // dictionary members contains no duplicates. This method does
-    // nothing if both this object and the other object are not
-    // dictionaries. Otherwise, it has following behavior, where
-    // "object" refers to the object whose method is invoked, and
-    // "other" refers to the argument:
+    // Make all resources in a resource dictionary indirect. This just
+    // goes through all entries of top-level subdictionaries and
+    // converts any direct objects to indirect objects. This can be
+    // useful to call before mergeResources if it is going to be
+    // called multiple times to prevent resources from being copied
+    // multiple times.
+    QPDF_DLL
+    void makeResourcesIndirect(QPDF& owning_qpdf);
+
+    // Merge resource dictionaries. If the "conflicts" parameter is
+    // provided, conflicts in dictionary subitems are resolved, and
+    // "conflicts" is initialized to a map such that
+    // conflicts[resource_type][old_key] == [new_key]
+    //
+    // See also makeResourcesIndirect, which can be useful to call
+    // before calling this.
+    //
+    // This method does nothing if both this object and the other
+    // object are not dictionaries. Otherwise, it has following
+    // behavior, where "object" refers to the object whose method is
+    // invoked, and "other" refers to the argument:
     //
     // * For each key in "other" whose value is an array:
     //   * If "object" does not have that entry, shallow copy it.
@@ -747,20 +761,32 @@ class QPDFObjectHandle
     // * For each key in "other" whose value is a dictionary:
     //   * If "object" does not have that entry, shallow copy it.
     //   * Otherwise, for each key in the subdictionary:
-    //     * If key is not present in "object"'s entry, shallow copy it.
-    //     * Otherwise, ignore. Conflicts are not detected.
+    //     * If key is not present in "object"'s entry, shallow copy
+    //       it if direct or just add it if indirect.
+    //     * Otherwise, if conflicts are being detected:
+    //       * If there is a key (oldkey) already in the dictionary
+    //         that points to the same indirect destination as key,
+    //         indicate that key was replaced by oldkey. This would
+    //         happen if these two resource dictionaries have
+    //         previously been merged.
+    //       * Otherwise pick a new key (newkey) that is unique within
+    //         the resource dictionary, store that in the resource
+    //         dictionary with key's destination as its destination,
+    //         and indicate that key was replaced by newkey.
     //
     // The primary purpose of this method is to facilitate merging of
     // resource dictionaries that are supposed to have the same scope
     // as each other. For example, this can be used to merge a form
-    // XObject's /Resources dictionary with a form field's /DR.
-    // Conflicts are not detected. If, in the future, there should be
-    // a need to detect conflicts, this method could detect them and
-    // return a mapping from old to new names. This mapping could be
-    // used for filtering the stream. This would be necessary, for
-    // example, to merge a form XObject's resources with a page's
-    // resources with the intention of concatenating the content
-    // streams.
+    // XObject's /Resources dictionary with a form field's /DR or to
+    // merge two /DR dictionaries. The "conflicts" parameter may be
+    // previously initialized. This method adds to whatever is already
+    // there, which can be useful when merging with multiple things.
+    QPDF_DLL
+    void mergeResources(
+        QPDFObjectHandle other,
+        std::map<std::string, std::map<std::string, std::string>>* conflicts);
+    // ABI: eliminate version without conflicts and make conflicts
+    // default to nullptr.
     QPDF_DLL
     void mergeResources(QPDFObjectHandle other);
 
@@ -779,7 +805,19 @@ class QPDFObjectHandle
     // increase efficiency if adding multiple items with the same
     // prefix. (Why doesn't it set min_suffix to the next number?
     // Well, maybe you aren't going to actually use the name it
-    // returns.)
+    // returns.) If you are calling this multiple times on the same
+    // resource dictionary, you can initialize resource_names by
+    // calling getResourceNames(), incrementally update it as you add
+    // resources, and keep passing it in so that getUniqueResourceName
+    // doesn't have to traverse the resource dictionary each time it's
+    // called.
+    QPDF_DLL
+    std::string getUniqueResourceName(
+        std::string const& prefix,
+        int& min_suffix,
+        std::set<std::string>* resource_names);
+    // ABI: remove this version and make resource_names default to
+    // nullptr.
     QPDF_DLL
     std::string getUniqueResourceName(std::string const& prefix,
                                       int& min_suffix);
