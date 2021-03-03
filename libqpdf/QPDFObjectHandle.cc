@@ -1754,12 +1754,12 @@ QPDFObjectHandle::unparse()
 std::string
 QPDFObjectHandle::unparseResolved()
 {
+    dereference();
     if (this->reserved)
     {
         throw std::logic_error(
             "QPDFObjectHandle: attempting to unparse a reserved object");
     }
-    dereference();
     return this->obj->unparse();
 }
 
@@ -1786,12 +1786,12 @@ QPDFObjectHandle::getJSON(bool dereference_indirect)
     }
     else
     {
+        dereference();
         if (this->reserved)
         {
             throw std::logic_error(
                 "QPDFObjectHandle: attempting to unparse a reserved object");
         }
-        dereference();
         return this->obj->getJSON();
     }
 }
