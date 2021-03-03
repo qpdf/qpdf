@@ -52,7 +52,7 @@ class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
     // QPDFNumberTreeObjectHelper constructed in this way can't be
     // modified or repaired and will silently ignore problems in the
     // structure.
-    [[deprecated]]
+    [[deprecated("use constructor that takes QPDF&")]]
     QPDF_DLL
     QPDFNumberTreeObjectHelper(QPDFObjectHandle);
 
