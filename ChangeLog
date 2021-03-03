@@ -1,5 +1,7 @@
 2021-03-03  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add QPDFMatrix::operator==
+
 	* Add QPDFObjectHandle::makeResourcesIndirect
 
 2021-03-02  Jay Berkenbilt  <ejb@ql.org>

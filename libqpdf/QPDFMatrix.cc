@@ -142,3 +142,14 @@ QPDFMatrix::transformRectangle(QPDFObjectHandle::Rectangle r) const
         *std::max_element(tx.begin(), tx.end()),
         *std::max_element(ty.begin(), ty.end()));
 }
+
+bool
+QPDFMatrix::operator==(QPDFMatrix const& rhs) const
+{
+    return ((this->a == rhs.a) &&
+            (this->b == rhs.b) &&
+            (this->c == rhs.c) &&
+            (this->d == rhs.d) &&
+            (this->e == rhs.e) &&
+            (this->f == rhs.f));
+}

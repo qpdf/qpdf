@@ -90,6 +90,16 @@ class QPDFMatrix
     QPDFObjectHandle::Rectangle transformRectangle(
         QPDFObjectHandle::Rectangle r);
 
+    // operator== tests for exact equality, not considering deltas for
+    // floating point.
+    QPDF_DLL
+    bool operator==(QPDFMatrix const& rhs) const;
+    QPDF_DLL
+    bool operator!=(QPDFMatrix const& rhs) const
+    {
+        return ! operator==(rhs);
+    }
+
     double a;
     double b;
     double c;
