@@ -385,7 +385,7 @@ $td->runtest("compare files",
 show_ntests();
 # ----------
 $td->notify("--- Appearance Streams ---");
-$n_tests += 8;
+$n_tests += 10;
 
 foreach my $f ('need-appearances',
                'need-appearances-more',
@@ -443,6 +443,17 @@ foreach my $i (@choice_values)
                  {$td->FILE => "b.pdf"},
                  {$td->FILE => "appearances-$i.pdf"});
 }
+
+$td->runtest("Update resources from /DR",
+             {$td->COMMAND =>
+                      "qpdf --qdf --no-original-object-ids --static-id" .
+                      " --generate-appearances" .
+                      " resource-from-dr.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("compare files",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "resource-from-dr-out.pdf"});
 
 show_ntests();
 # ----------

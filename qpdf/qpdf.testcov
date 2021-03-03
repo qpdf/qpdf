@@ -583,3 +583,4 @@ qpdf pages keeping field from original 0
 qpdf no more fields in pages 0
 QPDFObjectHandle merge reuse 0
 QPDFObjectHandle merge generate 0
+QPDFFormFieldObjectHelper get font from /DR 0

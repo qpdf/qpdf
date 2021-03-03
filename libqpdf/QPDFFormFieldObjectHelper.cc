@@ -963,11 +963,28 @@ QPDFFormFieldObjectHelper::generateTextAppearance(
         // See if the font is encoded with something we know about.
         QPDFObjectHandle resources = AS.getDict().getKey("/Resources");
         QPDFObjectHandle font = getFontFromResource(resources, font_name);
+        bool found_font_in_dr = false;
         if (! font.isInitialized())
         {
             QPDFObjectHandle dr = getDefaultResources();
             font = getFontFromResource(dr, font_name);
+            found_font_in_dr = (font.isInitialized() && font.isDictionary());
         }
+        if (found_font_in_dr && resources.isDictionary())
+        {
+            QTC::TC("qpdf", "QPDFFormFieldObjectHelper get font from /DR");
+            if (resources.isIndirect())
+            {
+                resources = resources.getOwningQPDF()->makeIndirectObject(
+                    resources.shallowCopy());
+                AS.getDict().replaceKey("/Resources", resources);
+            }
+            // Use mergeResources to force /Font to be local
+            resources.mergeResources(
+                QPDFObjectHandle::parse("<< /Font << >> >>"));
+            resources.getKey("/Font").replaceKey(font_name, font);
+        }
+
         if (font.isInitialized() &&
             font.isDictionary() &&
             font.getKey("/Encoding").isName())
