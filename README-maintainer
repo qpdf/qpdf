@@ -202,7 +202,16 @@ RELEASE PREPARATION
     * qpdf/qpdf.cc
     `make_dist` verifies this consistency.
 
+  * Update release notes in manual. Look at diffs and ChangeLog.
+    Update release date in `manual/qpdf-manual.xml`. Remember to
+    ensure that the entities at the top of the document are consistent
+    with the release notes for both version and release date.
+
+  * Add a release entry to ChangeLog: "x.y.z: release"
+
   * Run ./autogen.sh
+
+  * Commit title: "Prepare x.y.z release"
 
 * Performance test is included with binary compatibility steps. Even
   if releasing a new major release and not doing binary compatibility
@@ -235,13 +244,6 @@ pip3 install -r requirements/test.txt
 rehash
 pip3 install .
 pytest -n auto
-
-* Update release notes in manual. Look at diffs and ChangeLog. Update
-  release date in `manual/qpdf-manual.xml`. Remember to ensure that
-  the entities at the top of the document are consistent with the
-  release notes for both version and release date.
-
-* Add a release entry to ChangeLog.
 
 
 CREATING A RELEASE
