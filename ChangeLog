@@ -1,5 +1,7 @@
 2021-03-04  Jay Berkenbilt  <ejb@ql.org>
 
+	* 10.3.0: release
+
 	* The last several changes are in support of fixing more complex
 	cases of keeping form fields working properly through page copying
 	operations. Fixes #509.
