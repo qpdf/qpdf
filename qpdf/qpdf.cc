@@ -5636,6 +5636,23 @@ static bool should_remove_unreferenced_resources(QPDF& pdf, Options& o)
     return false;
 }
 
+static QPDFObjectHandle added_page(QPDF& pdf, QPDFObjectHandle page)
+{
+    QPDFObjectHandle result = page;
+    if (page.getOwningQPDF() != &pdf)
+    {
+        // Calling copyForeignObject on an object we already copied
+        // will give us the already existing copy.
+        result = pdf.copyForeignObject(page);
+    }
+    return result;
+}
+
+static QPDFObjectHandle added_page(QPDF& pdf, QPDFPageObjectHelper page)
+{
+    return added_page(pdf, page.getObjectHandle());
+}
+
 static void handle_page_specs(QPDF& pdf, Options& o, bool& warnings)
 {
     // Parse all page specifications and translate them into lists of
@@ -5903,17 +5920,15 @@ static void handle_page_specs(QPDF& pdf, Options& o, bool& warnings)
                 // This is a page from the original file. Keep track
                 // of the fact that we are using it.
                 selected_from_orig.insert(pageno);
+
             }
-            else if (other_afdh->hasAcroForm())
+            auto new_page = added_page(pdf, to_copy);
+            if (other_afdh->hasAcroForm())
             {
                 QTC::TC("qpdf", "qpdf copy form fields in pages");
-                std::vector<QPDFObjectHandle> copied_fields;
-                this_afdh->copyFieldsFromForeignPage(
-                    to_copy, *other_afdh, &copied_fields);
-                for (auto const& cf: copied_fields)
-                {
-                    referenced_fields.insert(cf.getObjGen());
-                }
+                this_afdh->fixCopiedAnnotations(
+                    new_page, to_copy.getObjectHandle(), *other_afdh,
+                    &referenced_fields);
             }
         }
         if (page_data.qpdf->anyWarnings())
@@ -6361,11 +6376,11 @@ static void do_split_pages(QPDF& pdf, Options& o, bool& warnings)
         {
             QPDFObjectHandle page = pages.at(pageno - 1);
             outpdf.addPage(page, false);
+            auto new_page = added_page(outpdf, page);
             if (out_afdh.getPointer())
             {
                 QTC::TC("qpdf", "qpdf copy form fields in split_pages");
-                out_afdh->copyFieldsFromForeignPage(
-                    QPDFPageObjectHelper(page), afdh);
+                out_afdh->fixCopiedAnnotations(new_page, page, afdh);
             }
         }
         if (pldh.hasPageLabels())

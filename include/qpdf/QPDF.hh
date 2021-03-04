@@ -628,7 +628,8 @@ class QPDF
     // identical to the identically named methods there, except that
     // these versions use QPDFObjectHandle instead of
     // QPDFPageObjectHelper, so please see comments in that file for
-    // descriptions.
+    // descriptions. There are subtleties you need to know about, so
+    // please look at the comments there.
     QPDF_DLL
     void pushInheritedAttributesToPage();
     QPDF_DLL

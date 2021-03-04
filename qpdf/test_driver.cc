@@ -3001,10 +3001,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         {
             old_annots.appendItem(annot);
         }
-        for (auto const& field: new_fields)
-        {
-            afdh.addFormField(QPDFFormFieldObjectHelper(field));
-        }
+        afdh.addAndRenameFormFields(new_fields);
 
         m = QPDFMatrix();
         m.translate(612, 0);

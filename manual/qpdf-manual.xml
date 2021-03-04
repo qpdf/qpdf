@@ -5071,6 +5071,21 @@ print "\n";
        <itemizedlist>
         <listitem>
          <para>
+          The code for handling form fields when copying pages from
+          10.2.0 was not quite right and didn't work in a number of
+          situations, such as when the same page was copied multiple
+          times or when there were conflicting resource or field names
+          across multiple copies. The 10.3.0 code has been much more
+          thoroughly tested with more complex cases and with a
+          multitude of readers and should be much closer to correct.
+          The 10.2.0 code worked well enough for page splitting or for
+          copying pages with form fields into documents that didn't
+          already have them but was still not quite correct in
+          handling of field-level resources.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
           When <function>QPDF::replaceObject</function> or
           <function>QPDF::swapObjects</function> is called, existing
           <classname>QPDFObjectHandle</classname> instances no longer
@@ -5089,6 +5104,41 @@ print "\n";
           document-level interactive form dictionary that it was
           supposed to be finding there. This required adding a few new
           methods to <classname>QPDFFormFieldObjectHelper</classname>.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Library Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Reworked the code that handles copying annotations and form
+          fields during page operations. There were additional methods
+          added to the public API from 10.2.0 and a one deprecation of
+          a method added in 10.2.0. The majority of the API changes
+          are in methods most people would never call and that will
+          hopefully be superseded by higher-level interfaces for
+          handling page copies. Please see the
+          <filename>ChangeLog</filename> file for details.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          The virtual method
+          <function>QPDFObjectHandle::ParserCallbacks::handleWarning</function>
+          is now called whenever a warning is encountered while
+          parsing a content stream. Prior to this, the caller had no
+          way to know if this had happened.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          The method <function>QPDF::numWarnings</function> was added
+          so that you can tell whether any warnings happened during a
+          specific block of code.
          </para>
         </listitem>
        </itemizedlist>

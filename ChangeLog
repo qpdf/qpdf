@@ -1,4 +1,35 @@
+2021-03-04  Jay Berkenbilt  <ejb@ql.org>
+
+	* The last several changes are in support of fixing more complex
+	cases of keeping form fields working properly through page copying
+	operations. Fixes #509.
+
+	* Deprecated QPDFAcroFormDocumentHelper::copyFieldsFromForeignPage
+	-- use QPDFAcroFormDocumentHelper::fixCopiedAnnotations instead.
+	The API for dealing with annotations and form fields around
+	copying pages is extremely complex and very hard to get right. It
+	is planned for a future version of qpdf to have a higher level
+	interface for dealing with copying pages around and preserving
+	document-level constructs.
+
+	* Add QPDFAcroFormDocumentHelper::getFieldsWithQualifiedName for
+	returning a list of fields by name.
+
+	* Add QPDFAcroFormDocumentHelper::addAndRenameFormFields to add a
+	collection of fields while ensuring that, within the collection,
+	fields with the same name continue to have the same name, but that
+	they don't conflict with exiting fields in the document.
+
+	* Add QPDFAcroFormDocumentHelper::setFormFieldName for changing
+	the name of a form field in a manner that preserves
+	QPDFAcroFormDocumentHelper's cache.
+
 2021-03-03  Jay Berkenbilt  <ejb@ql.org>
+
+	* Handle /DR properly when copying form fields. This is a
+	significant rework of the form field copying from 10.2.0. It
+	ensures that when copy fields from different files, we resolve any
+	conflicting names in resources.
 
 	* Add QPDFMatrix::operator==
 
@@ -66,7 +97,8 @@
 	interactive form functionality. Fixes #340.
 
 	* Add QPDFAcroFormDocumentHelper::copyFieldsFromForeignPage to
-	copy form fields from a foreign page into the current file.
+	copy form fields from a foreign page into the current file. (This
+	method didn't work and was deprecated in 10.3.0.)
 
 	* Add QPDFFormFieldObjectHelper::getTopLevelField to get the
 	top-level field for a given form field.

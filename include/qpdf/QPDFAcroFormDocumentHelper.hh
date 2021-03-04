@@ -103,19 +103,32 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
     void invalidateCache();
 
     QPDF_DLL
-    bool
-    hasAcroForm();
+    bool hasAcroForm();
 
     // Add a form field, initializing the document's AcroForm
-    // dictionary if needed. Calling this method invalidates the
-    // cache, which makes it possible to add a field that is not yet
-    // associated with an annotation or page.
+    // dictionary if needed, updating the cache if necessary. Note
+    // that you are adding fields that are copies of other fields,
+    // this method may result in multiple fields existing with the
+    // same qualified name, which can have unexpected side effects. In
+    // that case, you should use addAndRenameFormFields() instead.
     QPDF_DLL
     void addFormField(QPDFFormFieldObjectHelper);
+
+    // Add a collection of form fields making sure that their fully
+    // qualified names don't conflict with already present form
+    // fields. Fields within the collection of new fields that have
+    // the same name as each other will continue to do so.
+    QPDF_DLL
+    void addAndRenameFormFields(std::vector<QPDFObjectHandle> fields);
 
     // Remove fields from the fields array
     QPDF_DLL
     void removeFormFields(std::set<QPDFObjGen> const&);
+
+    // Set the name of a field, updating internal records of field
+    // names. Name should be UTF-8 encoded.
+    QPDF_DLL
+    void setFormFieldName(QPDFFormFieldObjectHelper, std::string const& name);
 
     // Return a vector of all terminal fields in a document. Terminal
     // fields are fields that have no children that are also fields.
@@ -124,8 +137,15 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
     // list, but you can still reach them through the getParent method
     // of the field object helper.
     QPDF_DLL
-    std::vector<QPDFFormFieldObjectHelper>
-    getFormFields();
+    std::vector<QPDFFormFieldObjectHelper> getFormFields();
+
+    // Return all the form fields that have the given fully-qualified
+    // name and also have an explicit "/T" attribute. For this
+    // information to be accurate, any changes to field names must be
+    // done through setFormFieldName() above.
+    QPDF_DLL
+    std::set<QPDFObjGen>
+    getFieldsWithQualifiedName(std::string const& name) const;
 
     // Return the annotations associated with a terminal field. Note
     // that in the case of a field having a single annotation, the
@@ -198,7 +218,11 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
     // avoid the expensive process of creating one for each call to
     // transformAnnotations. New fields and annotations are not added
     // to the document or pages. You have to do that yourself after
-    // calling transformAnnotations.
+    // calling transformAnnotations. If this operation will leave
+    // orphaned fields behind, such as if you are replacing the old
+    // annotations with the new ones on the same page and the fields
+    // and annotations are not shared, you will also need to remove
+    // the old fields to prevent them from hanging round unreferenced.
     QPDF_DLL
     void transformAnnotations(
         QPDFObjectHandle old_annots,
@@ -209,11 +233,33 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
         QPDF* from_qpdf = nullptr,
         QPDFAcroFormDocumentHelper* from_afdh = nullptr);
 
-    // Copy form fields from a page in a different QPDF object to this
-    // QPDF. If copied_fields is not null, it will be initialized with
-    // the fields that were copied. Items in the vector are objects in
-    // the receiving QPDF (the one associated with this
-    // QPDFAcroFormDocumentHelper).
+    // Copy form fields and annotations from one page to another,
+    // allowing the from page to be in a different QPDF or in the same
+    // QPDF. This would typically be called after calling addPage to
+    // add field/annotation awareness. When just copying the page by
+    // itself, annotations end up being shared, and fields end up
+    // being omitted because there is no reference to the field from
+    // the page. This method ensures that each separate copy of a page
+    // has private annotations and that fields and annotations are
+    // properly updated to resolve conflicts that may occur from
+    // common resource and field names across documents. It is
+    // basically a wrapper around transformAnnotations that handles
+    // updating the receiving page. If new_fields is non-null, any
+    // newly created fields are added to it.
+    QPDF_DLL
+    void fixCopiedAnnotations(
+        QPDFObjectHandle to_page,
+        QPDFObjectHandle from_page,
+        QPDFAcroFormDocumentHelper& from_afdh,
+        std::set<QPDFObjGen>* new_fields = nullptr);
+
+    // copyFieldsFromForeignPage was added in qpdf 10.2 and made to do
+    // nothing in 10.3. It wasn't actually doing the right thing and
+    // would result in broken files in all but the simplest case of a
+    // single page from one file being added to another file, as
+    // happens with qpdf --split-pages.
+    [[deprecated("Use fixCopiedAnnotations instead")]]
+    // ABI: delete this method
     QPDF_DLL
     void copyFieldsFromForeignPage(
         QPDFPageObjectHelper foreign_page,
@@ -225,6 +271,19 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
     void traverseField(QPDFObjectHandle field,
                        QPDFObjectHandle parent,
                        int depth, std::set<QPDFObjGen>& visited);
+    QPDFObjectHandle getOrCreateAcroForm();
+    void adjustInheritedFields(
+        QPDFObjectHandle obj,
+        bool override_da, std::string const& from_default_da,
+        bool override_q, int from_default_q);
+    void adjustDefaultAppearances(
+        QPDFObjectHandle obj,
+        std::map<std::string,
+                 std::map<std::string, std::string>> const& dr_map);
+    void adjustAppearanceStream(
+        QPDFObjectHandle stream,
+        std::map<std::string,
+                 std::map<std::string, std::string>> dr_map);
 
     class Members
     {
@@ -243,6 +302,8 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
                  std::vector<QPDFAnnotationObjectHelper>
                  > field_to_annotations;
         std::map<QPDFObjGen, QPDFFormFieldObjectHelper> annotation_to_field;
+        std::map<QPDFObjGen, std::string> field_to_name;
+        std::map<std::string, std::set<QPDFObjGen>> name_to_fields;
     };
 
     PointerHolder<Members> m;

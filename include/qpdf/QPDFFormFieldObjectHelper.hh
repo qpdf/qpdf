@@ -172,12 +172,18 @@ class QPDFFormFieldObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     std::vector<std::string> getChoices();
 
-    // Set an attribute to the given value
+    // Set an attribute to the given value. If you have a
+    // QPDFAcroFormDocumentHelper and you want to set the name of a
+    // field, use QPDFAcroFormDocumentHelper::setFormFieldName
+    // instead.
     QPDF_DLL
     void setFieldAttribute(std::string const& key, QPDFObjectHandle value);
 
     // Set an attribute to the given value as a Unicode string (UTF-16
-    // BE encoded). The input string should be UTF-8 encoded.
+    // BE encoded). The input string should be UTF-8 encoded. If you
+    // have a QPDFAcroFormDocumentHelper and you want to set the name
+    // of a field, use QPDFAcroFormDocumentHelper::setFormFieldName
+    // instead.
     QPDF_DLL
     void setFieldAttribute(std::string const& key,
                            std::string const& utf8_value);

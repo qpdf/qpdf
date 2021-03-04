@@ -1,0 +1,3 @@
+WARNING: object 41 0 stream 41 0 (content, offset 27): treating unexpected array close token as null
+WARNING: object 42 0 stream 42 0 (content): treating unexpected array close token as null
+qpdf: operation succeeded with warnings; resulting file may have some problems

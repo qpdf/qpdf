@@ -584,3 +584,10 @@ qpdf no more fields in pages 0
 QPDFObjectHandle merge reuse 0
 QPDFObjectHandle merge generate 0
 QPDFFormFieldObjectHelper get font from /DR 0
+QPDFAcroFormDocumentHelper override da 0
+QPDFAcroFormDocumentHelper override q 0
+QPDFAcroFormDocumentHelper replaced DA token 0
+QPDFAcroFormDocumentHelper ap conflict 0
+QPDFAcroFormDocumentHelper ap rename 0
+QPDFAcroFormDocumentHelper /DA parse error 0
+QPDFAcroFormDocumentHelper AP parse error 0

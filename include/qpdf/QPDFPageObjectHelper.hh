@@ -354,13 +354,16 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     // AcroForm dictionary as well. You can use this to copy
     // annotations from a page that was converted to a form XObject
     // and added to another page. For example of this, see
-    // examples/pdf-overlay-page.cc. Note that if you use this to copy
-    // annotations from one page to another in the same document and
-    // you use a transformation matrix other than the identity matrix,
-    // it will alter the original annotation, which is probably not
-    // what you want. Also, if you copy the same page multiple times
-    // with different transformation matrices, the effect will be
-    // cumulative, which is probably also not what you want.
+    // examples/pdf-overlay-page.cc. This method calls
+    // QPDFAcroFormDocumentHelper::transformAnnotations, which will
+    // copy annotations and form fields so that you can copy
+    // annotations from a source page to any number of other pages,
+    // even with different matrices, and maintain independence from
+    // the original annotations. See also
+    // QPDFAcroFormDocumentHelper::fixCopiedAnnotations, which can be
+    // used if you copy a page and want to repair the annotations on
+    // the destination page to make them independent from the original
+    // page's annotations.
     //
     // If you pass in a QPDFAcroFormDocumentHelper*, the method will
     // use that instead of creating one in the function. Creating

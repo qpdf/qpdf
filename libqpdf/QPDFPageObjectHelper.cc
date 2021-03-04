@@ -1293,10 +1293,7 @@ QPDFPageObjectHelper::copyAnnotations(
     afdh->transformAnnotations(
         old_annots, new_annots, new_fields, old_fields, cm,
         from_qpdf, from_afdh);
-    for (auto const& f: new_fields)
-    {
-        afdh->addFormField(QPDFFormFieldObjectHelper(f));
-    }
+    afdh->addAndRenameFormFields(new_fields);
     auto annots = this->oh.getKey("/Annots");
     if (! annots.isArray())
     {

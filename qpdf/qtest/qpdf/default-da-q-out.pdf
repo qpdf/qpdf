@@ -1,0 +1,1944 @@
+%PDF-1.6
+%¿÷¢þ
+%QDF-1.0
+
+1 0 obj
+<<
+  /AcroForm <<
+    /DR 2 0 R
+    /Fields [
+      3 0 R
+      4 0 R
+      5 0 R
+      6 0 R
+      7 0 R
+      8 0 R
+    ]
+  >>
+  /Names <<
+    /EmbeddedFiles 9 0 R
+  >>
+  /Pages 10 0 R
+  /Type /Catalog
+>>
+endobj
+
+2 0 obj
+<<
+  /Font <<
+    /F1 11 0 R
+    /F1_1 12 0 R
+  >>
+>>
+endobj
+
+3 0 obj
+<<
+  /AP <<
+    /N 13 0 R
+  >>
+  /DA (0 0.4 0 rg /F1 18 Tf)
+  /DR 2 0 R
+  /DV ()
+  /FT /Tx
+  /Ff 0
+  /Rect [
+    72
+    470.774
+    190.8
+    484.922
+  ]
+  /Subtype /Widget
+  /T (Text Box 1+1)
+  /Type /Annot
+  /V (Formy field)
+>>
+endobj
+
+4 0 obj
+<<
+  /AP <<
+    /N 15 0 R
+  >>
+  /DA (0 0.4 0 rg /F1 18 Tf)
+  /DR 2 0 R
+  /DV ()
+  /FT /Tx
+  /Ff 0
+  /Rect [
+    372
+    330.774
+    386.148
+    470.374
+  ]
+  /Subtype /Widget
+  /T (Text Box 2+1)
+  /Type /Annot
+  /V (Rot-ccw field)
+>>
+endobj
+
+5 0 obj
+<<
+  /DV /1
+  /FT /Btn
+  /Ff 49152
+  /Kids [
+    17 0 R
+    18 0 R
+    19 0 R
+  ]
+  /T (r1+1)
+  /V /2
+>>
+endobj
+
+6 0 obj
+<<
+  /AP <<
+    /N 20 0 R
+  >>
+  /DA (0 0 0.95 rg /F1_1 18 Tf)
+  /DR 2 0 R
+  /DV ()
+  /FT /Tx
+  /Ff 0
+  /Q 0
+  /Rect [
+    72
+    470.774
+    190.8
+    484.922
+  ]
+  /Subtype /Widget
+  /T (Text Box 1+2)
+  /Type /Annot
+  /V (Formy field)
+>>
+endobj
+
+7 0 obj
+<<
+  /AP <<
+    /N 22 0 R
+  >>
+  /DA (0 0 0.95 rg /F1_1 18 Tf)
+  /DR 2 0 R
+  /DV ()
+  /FT /Tx
+  /Ff 0
+  /Q 1
+  /Rect [
+    372
+    330.774
+    386.148
+    470.374
+  ]
+  /Subtype /Widget
+  /T (Text Box 2+2)
+  /Type /Annot
+  /V (Rot-ccw field)
+>>
+endobj
+
+8 0 obj
+<<
+  /DA (0 0 0.95 rg /F1_1 18 Tf)
+  /DV /1
+  /FT /Btn
+  /Ff 49152
+  /Kids [
+    24 0 R
+    25 0 R
+    26 0 R
+  ]
+  /Q 1
+  /T (r1+2)
+  /V /2
+>>
+endobj
+
+9 0 obj
+<<
+  /Names [
+    (attachment1.txt)
+    27 0 R
+  ]
+>>
+endobj
+
+10 0 obj
+<<
+  /Count 2
+  /Kids [
+    28 0 R
+    29 0 R
+  ]
+  /Type /Pages
+>>
+endobj
+
+11 0 obj
+<<
+  /BaseFont /Courier
+  /Encoding /WinAnsiEncoding
+  /Subtype /Type1
+  /Type /Font
+>>
+endobj
+
+12 0 obj
+<<
+  /BaseFont /Courier
+  /Encoding /WinAnsiEncoding
+  /Subtype /Type1
+  /Type /Font
+>>
+endobj
+
+13 0 obj
+<<
+  /BBox [
+    0
+    -2.826
+    118.8
+    11.322
+  ]
+  /Resources 2 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 14 0 R
+>>
+stream
+/Tx BMC
+q
+BT
+0 0.4 0 rg /F1 18 Tf
+1 -5.778 Td
+(Formy field) Tj
+ET
+Q
+EMC
+endstream
+endobj
+
+14 0 obj
+72
+endobj
+
+15 0 obj
+<<
+  /BBox [
+    0
+    -2.826
+    140.4
+    11.322
+  ]
+  /Matrix [
+    0
+    1
+    -1
+    0
+    0
+    0
+  ]
+  /Resources 2 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 16 0 R
+>>
+stream
+/Tx BMC
+q
+BT
+0 0.4 0 rg /F1 18 Tf
+1 -5.778 Td
+(Rot-ccw field) Tj
+ET
+Q
+EMC
+endstream
+endobj
+
+16 0 obj
+74
+endobj
+
+17 0 obj
+<<
+  /AP <<
+    /N <<
+      /1 30 0 R
+      /Off 32 0 R
+    >>
+  >>
+  /AS /Off
+  /DA (0.18039 0.20392 0.21176 rg /ZaDi 0 Tf)
+  /DR <<
+    /Font <<
+      /ZaDi 34 0 R
+    >>
+  >>
+  /F 4
+  /FT /Btn
+  /MK <<
+    /CA (l)
+  >>
+  /Parent 5 0 R
+  /Rect [
+    152.749
+    648.501
+    164.801
+    660.549
+  ]
+  /Subtype /Widget
+  /Type /Annot
+>>
+endobj
+
+18 0 obj
+<<
+  /AP <<
+    /N <<
+      /2 35 0 R
+      /Off 37 0 R
+    >>
+  >>
+  /AS /2
+  /DA (0.18039 0.20392 0.21176 rg /ZaDi 0 Tf)
+  /DR <<
+    /Font <<
+      /ZaDi 34 0 R
+    >>
+  >>
+  /F 4
+  /FT /Btn
+  /MK <<
+    /CA (l)
+  >>
+  /Parent 5 0 R
+  /Rect [
+    152.749
+    627.301
+    164.801
+    639.349
+  ]
+  /Subtype /Widget
+  /Type /Annot
+>>
+endobj
+
+19 0 obj
+<<
+  /AP <<
+    /N <<
+      /3 39 0 R
+      /Off 41 0 R
+    >>
+  >>
+  /AS /Off
+  /DA (0.18039 0.20392 0.21176 rg /ZaDi 0 Tf)
+  /DR <<
+    /Font <<
+      /ZaDi 34 0 R
+    >>
+  >>
+  /F 4
+  /FT /Btn
+  /MK <<
+    /CA (l)
+  >>
+  /Parent 5 0 R
+  /Rect [
+    151.399
+    606.501
+    163.451
+    618.549
+  ]
+  /Subtype /Widget
+  /Type /Annot
+>>
+endobj
+
+20 0 obj
+<<
+  /BBox [
+    0
+    -2.826
+    118.8
+    11.322
+  ]
+  /Resources 43 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 21 0 R
+>>
+stream
+/Tx BMC
+q
+BT
+0 0 0.95 rg /F1_1 18 Tf
+1 -5.778 Td
+(Formy field) Tj
+ET
+Q
+EMC
+endstream
+endobj
+
+21 0 obj
+75
+endobj
+
+22 0 obj
+<<
+  /BBox [
+    0
+    -2.826
+    140.4
+    11.322
+  ]
+  /Matrix [
+    0
+    1
+    -1
+    0
+    0
+    0
+  ]
+  /Resources 44 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 23 0 R
+>>
+stream
+/Tx BMC
+q
+BT
+0 0 0.95 rg /F1_1 18 Tf
+1 -5.778 Td
+(Rot-ccw field) Tj
+ET
+Q
+EMC
+endstream
+endobj
+
+23 0 obj
+77
+endobj
+
+24 0 obj
+<<
+  /AP <<
+    /N <<
+      /1 45 0 R
+      /Off 47 0 R
+    >>
+  >>
+  /AS /Off
+  /DA (0.18039 0.20392 0.21176 rg /ZaDi 0 Tf)
+  /DR 2 0 R
+  /F 4
+  /FT /Btn
+  /MK <<
+    /CA (l)
+  >>
+  /Parent 8 0 R
+  /Rect [
+    152.749
+    648.501
+    164.801
+    660.549
+  ]
+  /Subtype /Widget
+  /Type /Annot
+>>
+endobj
+
+25 0 obj
+<<
+  /AP <<
+    /N <<
+      /2 49 0 R
+      /Off 51 0 R
+    >>
+  >>
+  /AS /2
+  /DA (0.18039 0.20392 0.21176 rg /ZaDi 0 Tf)
+  /DR 2 0 R
+  /F 4
+  /FT /Btn
+  /MK <<
+    /CA (l)
+  >>
+  /Parent 8 0 R
+  /Rect [
+    152.749
+    627.301
+    164.801
+    639.349
+  ]
+  /Subtype /Widget
+  /Type /Annot
+>>
+endobj
+
+26 0 obj
+<<
+  /AP <<
+    /N <<
+      /3 53 0 R
+      /Off 55 0 R
+    >>
+  >>
+  /AS /Off
+  /DA (0.18039 0.20392 0.21176 rg /ZaDi 0 Tf)
+  /DR 2 0 R
+  /F 4
+  /FT /Btn
+  /MK <<
+    /CA (l)
+  >>
+  /Parent 8 0 R
+  /Rect [
+    151.399
+    606.501
+    163.451
+    618.549
+  ]
+  /Subtype /Widget
+  /Type /Annot
+>>
+endobj
+
+27 0 obj
+<<
+  /EF <<
+    /F 57 0 R
+    /UF 57 0 R
+  >>
+  /F (attachment1.txt)
+  /Type /Filespec
+  /UF (attachment1.txt)
+>>
+endobj
+
+%% Page 1
+28 0 obj
+<<
+  /Annots [
+    59 0 R
+    3 0 R
+    60 0 R
+    4 0 R
+    61 0 R
+    62 0 R
+    63 0 R
+    64 0 R
+    17 0 R
+    18 0 R
+    19 0 R
+  ]
+  /Contents 65 0 R
+  /MediaBox [
+    0
+    0
+    612
+    792
+  ]
+  /Parent 10 0 R
+  /Resources 2 0 R
+  /Type /Page
+>>
+endobj
+
+%% Page 2
+29 0 obj
+<<
+  /Annots [
+    67 0 R
+    6 0 R
+    68 0 R
+    7 0 R
+    69 0 R
+    70 0 R
+    71 0 R
+    72 0 R
+    24 0 R
+    25 0 R
+    26 0 R
+  ]
+  /Contents 73 0 R
+  /MediaBox [
+    0
+    0
+    612
+    792
+  ]
+  /Parent 10 0 R
+  /Resources 75 0 R
+  /Type /Page
+>>
+endobj
+
+30 0 obj
+<<
+  /BBox [
+    0
+    0
+    12.05
+    12.05
+  ]
+  /Resources 76 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 31 0 R
+>>
+stream
+/Tx BMC
+q BT
+0.18039 0.20392 0.21176 rg /ZaDi 12.05 Tf
+0 0 Td
+ET
+Q
+1 0 0 rg
+6 8.4 m 7.35 8.4 8.45 7.35 8.45 6 c
+8.45 4.65 7.35 3.55 6 3.55 c
+4.65 3.55 3.6 4.65 3.6 6 c
+3.6 7.35 4.65 8.4 6 8.4 c f*
+
+EMC
+endstream
+endobj
+
+31 0 obj
+202
+endobj
+
+32 0 obj
+<<
+  /BBox [
+    0
+    0
+    12.05
+    12.05
+  ]
+  /Resources 76 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 33 0 R
+>>
+stream
+/Tx BMC
+EMC
+endstream
+endobj
+
+33 0 obj
+12
+endobj
+
+34 0 obj
+<<
+  /BaseFont /ZapfDingbats
+  /Subtype /Type1
+  /Type /Font
+>>
+endobj
+
+35 0 obj
+<<
+  /BBox [
+    0
+    0
+    12.05
+    12.05
+  ]
+  /Resources 76 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 36 0 R
+>>
+stream
+/Tx BMC
+q BT
+0.18039 0.20392 0.21176 rg /ZaDi 12.05 Tf
+0 0 Td
+ET
+Q
+0 1 0 rg
+6 8.4 m 7.35 8.4 8.45 7.35 8.45 6 c
+8.45 4.65 7.35 3.55 6 3.55 c
+4.65 3.55 3.6 4.65 3.6 6 c
+3.6 7.35 4.65 8.4 6 8.4 c f*
+
+EMC
+endstream
+endobj
+
+36 0 obj
+202
+endobj
+
+37 0 obj
+<<
+  /BBox [
+    0
+    0
+    12.05
+    12.05
+  ]
+  /Resources 76 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 38 0 R
+>>
+stream
+/Tx BMC
+EMC
+endstream
+endobj
+
+38 0 obj
+12
+endobj
+
+39 0 obj
+<<
+  /BBox [
+    0
+    0
+    12.05
+    12.05
+  ]
+  /Resources 76 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 40 0 R
+>>
+stream
+/Tx BMC
+q BT
+0.18039 0.20392 0.21176 rg /ZaDi 12.05 Tf
+0 0 Td
+ET
+Q
+0 0 1 rg
+6 8.4 m 7.35 8.4 8.45 7.35 8.45 6 c
+8.45 4.65 7.35 3.55 6 3.55 c
+4.65 3.55 3.6 4.65 3.6 6 c
+3.6 7.35 4.65 8.4 6 8.4 c f*
+
+EMC
+endstream
+endobj
+
+40 0 obj
+202
+endobj
+
+41 0 obj
+<<
+  /BBox [
+    0
+    0
+    12.05
+    12.05
+  ]
+  /Resources 76 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 42 0 R
+>>
+stream
+/Tx BMC
+EMC
+endstream
+endobj
+
+42 0 obj
+12
+endobj
+
+43 0 obj
+<<
+  /Font <<
+    /F1_1 12 0 R
+  >>
+>>
+endobj
+
+44 0 obj
+<<
+  /Font <<
+    /F1_1 12 0 R
+  >>
+>>
+endobj
+
+45 0 obj
+<<
+  /BBox [
+    0
+    0
+    12.05
+    12.05
+  ]
+  /Resources 77 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 46 0 R
+>>
+stream
+/Tx BMC
+q BT
+0.18039 0.20392 0.21176 rg /ZaDi 12.05 Tf
+0 0 Td
+ET
+Q
+1 0 0 rg
+6 8.4 m 7.35 8.4 8.45 7.35 8.45 6 c
+8.45 4.65 7.35 3.55 6 3.55 c
+4.65 3.55 3.6 4.65 3.6 6 c
+3.6 7.35 4.65 8.4 6 8.4 c f*
+
+EMC
+endstream
+endobj
+
+46 0 obj
+202
+endobj
+
+47 0 obj
+<<
+  /BBox [
+    0
+    0
+    12.05
+    12.05
+  ]
+  /Resources 78 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 48 0 R
+>>
+stream
+/Tx BMC
+EMC
+endstream
+endobj
+
+48 0 obj
+12
+endobj
+
+49 0 obj
+<<
+  /BBox [
+    0
+    0
+    12.05
+    12.05
+  ]
+  /Resources 79 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 50 0 R
+>>
+stream
+/Tx BMC
+q BT
+0.18039 0.20392 0.21176 rg /ZaDi 12.05 Tf
+0 0 Td
+ET
+Q
+0 1 0 rg
+6 8.4 m 7.35 8.4 8.45 7.35 8.45 6 c
+8.45 4.65 7.35 3.55 6 3.55 c
+4.65 3.55 3.6 4.65 3.6 6 c
+3.6 7.35 4.65 8.4 6 8.4 c f*
+
+EMC
+endstream
+endobj
+
+50 0 obj
+202
+endobj
+
+51 0 obj
+<<
+  /BBox [
+    0
+    0
+    12.05
+    12.05
+  ]
+  /Resources 80 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 52 0 R
+>>
+stream
+/Tx BMC
+EMC
+endstream
+endobj
+
+52 0 obj
+12
+endobj
+
+53 0 obj
+<<
+  /BBox [
+    0
+    0
+    12.05
+    12.05
+  ]
+  /Resources 81 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 54 0 R
+>>
+stream
+/Tx BMC
+q BT
+0.18039 0.20392 0.21176 rg /ZaDi 12.05 Tf
+0 0 Td
+ET
+Q
+0 0 1 rg
+6 8.4 m 7.35 8.4 8.45 7.35 8.45 6 c
+8.45 4.65 7.35 3.55 6 3.55 c
+4.65 3.55 3.6 4.65 3.6 6 c
+3.6 7.35 4.65 8.4 6 8.4 c f*
+
+EMC
+endstream
+endobj
+
+54 0 obj
+202
+endobj
+
+55 0 obj
+<<
+  /BBox [
+    0
+    0
+    12.05
+    12.05
+  ]
+  /Resources 82 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 56 0 R
+>>
+stream
+/Tx BMC
+EMC
+endstream
+endobj
+
+56 0 obj
+12
+endobj
+
+57 0 obj
+<<
+  /Params <<
+    /CheckSum <80a33fc110b5a7b8b4d58b8d57e814bc>
+    /Size 22
+    /Subtype /text#2fplain
+  >>
+  /Type /EmbeddedFile
+  /Length 58 0 R
+>>
+stream
+content of attachment
+endstream
+endobj
+
+58 0 obj
+22
+endobj
+
+59 0 obj
+<<
+  /A <<
+    /S /URI
+    /URI (https://www.qbilt.org/)
+  >>
+  /Border [
+    0
+    0
+    .4
+  ]
+  /C [
+    .8
+    .6
+    .6
+  ]
+  /H /I
+  /Rect [
+    72
+    501.832
+    374.4
+    520.696
+  ]
+  /Subtype /Link
+  /Type /Annot
+>>
+endobj
+
+60 0 obj
+<<
+  /AP <<
+    /N 83 0 R
+  >>
+  /Contents (attachment1.txt)
+  /FS 27 0 R
+  /NM (attachment1.txt)
+  /Rect [
+    72
+    400
+    92
+    420
+  ]
+  /Subtype /FileAttachment
+  /Type /Annot
+>>
+endobj
+
+61 0 obj
+<<
+  /AP <<
+    /N 85 0 R
+  >>
+  /DA ()
+  /Rect [
+    72
+    350
+    92
+    360
+  ]
+  /Subtype /FreeText
+  /Type /Annot
+>>
+endobj
+
+62 0 obj
+<<
+  /AP <<
+    /N 87 0 R
+  >>
+  /DA ()
+  /Rect [
+    102
+    350
+    112
+    370
+  ]
+  /Subtype /FreeText
+  /Type /Annot
+>>
+endobj
+
+63 0 obj
+<<
+  /AP <<
+    /N 89 0 R
+  >>
+  /DA ()
+  /Rect [
+    122
+    350
+    142
+    360
+  ]
+  /Subtype /FreeText
+  /Type /Annot
+>>
+endobj
+
+64 0 obj
+<<
+  /AP <<
+    /N 91 0 R
+  >>
+  /DA ()
+  /Rect [
+    152
+    350
+    162
+    370
+  ]
+  /Subtype /FreeText
+  /Type /Annot
+>>
+endobj
+
+%% Contents for page 1
+65 0 obj
+<<
+  /Length 66 0 R
+>>
+stream
+q
+1 1 .7 rg
+.5 .5 0 RG
+72 470.77 118.8 14.15 re
+B
+Q
+q
+0 .5 .5 RG
+0 1 1 rg
+372 330.77 14.15 139.4 re
+B
+Q
+q
+1 0 0 RG
+72 310 20 10 re
+72 310 5 10 re
+S
+0 1 0 RG
+102 310 10 20 re
+102 310 10 5 re
+S
+0 0 1 RG
+122 310 20 10 re
+137 310 5 10 re
+S
+0.5 0 1 RG
+152 310 10 20 re
+152 325 10 5 re
+S
+10 w
+0.14 .33 .18 RG
+5 5 602 782 re
+S
+Q
+BT
+  /F1 16 Tf
+  20.6 TL
+  170 650 Td
+  (radio button 1) Tj
+  (radio button 2) '
+  (radio button 3) '
+  1 0 0 1 72 546 Tm
+  /F1 20 Tf
+  (Thick green border surrounds page.) Tj
+  0 -40 Td
+  /F1 24 Tf
+  0 0 1 rg
+  (https://www.qbilt.org) Tj
+  /F1 12 Tf
+  1 0 0 1 202 474 Tm
+  (<- Formy field in yellow) Tj
+  1 0 0 1 392 410 Tm
+  14.4 TL
+  (<- Rot-ccw field) Tj
+  (with "Rot" at bottom) '
+  (and text going up) '
+  0 g
+  1 0 0 1 102 405 Tm
+  (Arrow to the left points down.) Tj
+  1 0 0 1 182 310 Tm
+  (<- Drawn rectangles appear below annotations.) Tj
+ET
+endstream
+endobj
+
+66 0 obj
+874
+endobj
+
+67 0 obj
+<<
+  /A <<
+    /S /URI
+    /URI (https://www.qbilt.org/)
+  >>
+  /Border [
+    0
+    0
+    .4
+  ]
+  /C [
+    .8
+    .6
+    .6
+  ]
+  /H /I
+  /Rect [
+    72
+    501.832
+    374.4
+    520.696
+  ]
+  /Subtype /Link
+  /Type /Annot
+>>
+endobj
+
+68 0 obj
+<<
+  /AP <<
+    /N 93 0 R
+  >>
+  /Contents (attachment1.txt)
+  /FS 95 0 R
+  /NM (attachment1.txt)
+  /Rect [
+    72
+    400
+    92
+    420
+  ]
+  /Subtype /FileAttachment
+  /Type /Annot
+>>
+endobj
+
+69 0 obj
+<<
+  /AP <<
+    /N 96 0 R
+  >>
+  /DA ()
+  /Rect [
+    72
+    350
+    92
+    360
+  ]
+  /Subtype /FreeText
+  /Type /Annot
+>>
+endobj
+
+70 0 obj
+<<
+  /AP <<
+    /N 98 0 R
+  >>
+  /DA ()
+  /Rect [
+    102
+    350
+    112
+    370
+  ]
+  /Subtype /FreeText
+  /Type /Annot
+>>
+endobj
+
+71 0 obj
+<<
+  /AP <<
+    /N 100 0 R
+  >>
+  /DA ()
+  /Rect [
+    122
+    350
+    142
+    360
+  ]
+  /Subtype /FreeText
+  /Type /Annot
+>>
+endobj
+
+72 0 obj
+<<
+  /AP <<
+    /N 102 0 R
+  >>
+  /DA ()
+  /Rect [
+    152
+    350
+    162
+    370
+  ]
+  /Subtype /FreeText
+  /Type /Annot
+>>
+endobj
+
+%% Contents for page 2
+73 0 obj
+<<
+  /Length 74 0 R
+>>
+stream
+q
+1 1 .7 rg
+.5 .5 0 RG
+72 470.77 118.8 14.15 re
+B
+Q
+q
+0 .5 .5 RG
+0 1 1 rg
+372 330.77 14.15 139.4 re
+B
+Q
+q
+1 0 0 RG
+72 310 20 10 re
+72 310 5 10 re
+S
+0 1 0 RG
+102 310 10 20 re
+102 310 10 5 re
+S
+0 0 1 RG
+122 310 20 10 re
+137 310 5 10 re
+S
+0.5 0 1 RG
+152 310 10 20 re
+152 325 10 5 re
+S
+10 w
+0.14 .33 .18 RG
+5 5 602 782 re
+S
+Q
+BT
+  /F1 16 Tf
+  20.6 TL
+  170 650 Td
+  (radio button 1) Tj
+  (radio button 2) '
+  (radio button 3) '
+  1 0 0 1 72 546 Tm
+  /F1 20 Tf
+  (Thick green border surrounds page.) Tj
+  0 -40 Td
+  /F1 24 Tf
+  0 0 1 rg
+  (https://www.qbilt.org) Tj
+  /F1 12 Tf
+  1 0 0 1 202 474 Tm
+  (<- Formy field in yellow) Tj
+  1 0 0 1 392 410 Tm
+  14.4 TL
+  (<- Rot-ccw field) Tj
+  (with "Rot" at bottom) '
+  (and text going up) '
+  0 g
+  1 0 0 1 102 405 Tm
+  (Arrow to the left points down.) Tj
+  1 0 0 1 182 310 Tm
+  (<- Drawn rectangles appear below annotations.) Tj
+ET
+endstream
+endobj
+
+74 0 obj
+874
+endobj
+
+75 0 obj
+<<
+  /Font <<
+    /F1 12 0 R
+  >>
+>>
+endobj
+
+76 0 obj
+<<
+  /Font 104 0 R
+  /ProcSet [
+    /PDF
+    /Text
+  ]
+>>
+endobj
+
+77 0 obj
+<<
+  /Font <<
+    /ZaDi 105 0 R
+  >>
+  /ProcSet [
+    /PDF
+    /Text
+  ]
+>>
+endobj
+
+78 0 obj
+<<
+  /Font <<
+    /ZaDi 105 0 R
+  >>
+  /ProcSet [
+    /PDF
+    /Text
+  ]
+>>
+endobj
+
+79 0 obj
+<<
+  /Font <<
+    /ZaDi 105 0 R
+  >>
+  /ProcSet [
+    /PDF
+    /Text
+  ]
+>>
+endobj
+
+80 0 obj
+<<
+  /Font <<
+    /ZaDi 105 0 R
+  >>
+  /ProcSet [
+    /PDF
+    /Text
+  ]
+>>
+endobj
+
+81 0 obj
+<<
+  /Font <<
+    /ZaDi 105 0 R
+  >>
+  /ProcSet [
+    /PDF
+    /Text
+  ]
+>>
+endobj
+
+82 0 obj
+<<
+  /Font <<
+    /ZaDi 105 0 R
+  >>
+  /ProcSet [
+    /PDF
+    /Text
+  ]
+>>
+endobj
+
+83 0 obj
+<<
+  /BBox [
+    0
+    0
+    20
+    20
+  ]
+  /Resources <<
+  >>
+  /Subtype /Form
+  /Type /XObject
+  /Length 84 0 R
+>>
+stream
+0 10 m
+10 0 l
+20 10 l
+10 0 m
+10 20 l
+0 0 20 20 re
+S
+endstream
+endobj
+
+84 0 obj
+52
+endobj
+
+85 0 obj
+<<
+  /BBox [
+    0
+    0
+    20
+    10
+  ]
+  /Resources 2 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 86 0 R
+>>
+stream
+1 0 0 RG
+0 0 20 10 re
+0 0 5 10 re
+S
+endstream
+endobj
+
+86 0 obj
+36
+endobj
+
+87 0 obj
+<<
+  /BBox [
+    0
+    0
+    20
+    10
+  ]
+  /Matrix [
+    0
+    1
+    -1
+    0
+    0
+    0
+  ]
+  /Resources 2 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 88 0 R
+>>
+stream
+0 1 0 RG
+0 0 20 10 re
+0 0 5 10 re
+S
+endstream
+endobj
+
+88 0 obj
+36
+endobj
+
+89 0 obj
+<<
+  /BBox [
+    0
+    0
+    20
+    10
+  ]
+  /Matrix [
+    -1
+    0
+    0
+    -1
+    0
+    0
+  ]
+  /Resources 2 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 90 0 R
+>>
+stream
+0 0 1 RG
+0 0 20 10 re
+0 0 5 10 re
+S
+endstream
+endobj
+
+90 0 obj
+36
+endobj
+
+91 0 obj
+<<
+  /BBox [
+    0
+    0
+    20
+    10
+  ]
+  /Matrix [
+    0
+    -1
+    1
+    0
+    0
+    0
+  ]
+  /Resources 2 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 92 0 R
+>>
+stream
+0.5 0 1 RG
+0 0 20 10 re
+0 0 5 10 re
+S
+endstream
+endobj
+
+92 0 obj
+38
+endobj
+
+93 0 obj
+<<
+  /BBox [
+    0
+    0
+    20
+    20
+  ]
+  /Resources <<
+  >>
+  /Subtype /Form
+  /Type /XObject
+  /Length 94 0 R
+>>
+stream
+0 10 m
+10 0 l
+20 10 l
+10 0 m
+10 20 l
+0 0 20 20 re
+S
+endstream
+endobj
+
+94 0 obj
+52
+endobj
+
+95 0 obj
+<<
+  /EF <<
+    /F 106 0 R
+    /UF 106 0 R
+  >>
+  /F (attachment1.txt)
+  /Type /Filespec
+  /UF (attachment1.txt)
+>>
+endobj
+
+96 0 obj
+<<
+  /BBox [
+    0
+    0
+    20
+    10
+  ]
+  /Resources 108 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 97 0 R
+>>
+stream
+1 0 0 RG
+0 0 20 10 re
+0 0 5 10 re
+S
+endstream
+endobj
+
+97 0 obj
+36
+endobj
+
+98 0 obj
+<<
+  /BBox [
+    0
+    0
+    20
+    10
+  ]
+  /Matrix [
+    0
+    1
+    -1
+    0
+    0
+    0
+  ]
+  /Resources 109 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 99 0 R
+>>
+stream
+0 1 0 RG
+0 0 20 10 re
+0 0 5 10 re
+S
+endstream
+endobj
+
+99 0 obj
+36
+endobj
+
+100 0 obj
+<<
+  /BBox [
+    0
+    0
+    20
+    10
+  ]
+  /Matrix [
+    -1
+    0
+    0
+    -1
+    0
+    0
+  ]
+  /Resources 110 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 101 0 R
+>>
+stream
+0 0 1 RG
+0 0 20 10 re
+0 0 5 10 re
+S
+endstream
+endobj
+
+101 0 obj
+36
+endobj
+
+102 0 obj
+<<
+  /BBox [
+    0
+    0
+    20
+    10
+  ]
+  /Matrix [
+    0
+    -1
+    1
+    0
+    0
+    0
+  ]
+  /Resources 111 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 103 0 R
+>>
+stream
+0.5 0 1 RG
+0 0 20 10 re
+0 0 5 10 re
+S
+endstream
+endobj
+
+103 0 obj
+38
+endobj
+
+104 0 obj
+<<
+  /ZaDi 34 0 R
+>>
+endobj
+
+105 0 obj
+<<
+  /BaseFont /ZapfDingbats
+  /Subtype /Type1
+  /Type /Font
+>>
+endobj
+
+106 0 obj
+<<
+  /Params <<
+    /CheckSum <80a33fc110b5a7b8b4d58b8d57e814bc>
+    /Size 22
+    /Subtype /text#2fplain
+  >>
+  /Type /EmbeddedFile
+  /Length 107 0 R
+>>
+stream
+content of attachment
+endstream
+endobj
+
+107 0 obj
+22
+endobj
+
+108 0 obj
+<<
+  /Font <<
+    /F1_1 12 0 R
+  >>
+>>
+endobj
+
+109 0 obj
+<<
+  /Font <<
+    /F1_1 12 0 R
+  >>
+>>
+endobj
+
+110 0 obj
+<<
+  /Font <<
+    /F1_1 12 0 R
+  >>
+>>
+endobj
+
+111 0 obj
+<<
+  /Font <<
+    /F1_1 12 0 R
+  >>
+>>
+endobj
+
+xref
+0 112
+0000000000 65535 f 
+0000000025 00000 n 
+0000000248 00000 n 
+0000000318 00000 n 
+0000000564 00000 n 
+0000000815 00000 n 
+0000000936 00000 n 
+0000001192 00000 n 
+0000001453 00000 n 
+0000001613 00000 n 
+0000001683 00000 n 
+0000001768 00000 n 
+0000001873 00000 n 
+0000001978 00000 n 
+0000002212 00000 n 
+0000002232 00000 n 
+0000002521 00000 n 
+0000002541 00000 n 
+0000002895 00000 n 
+0000003247 00000 n 
+0000003601 00000 n 
+0000003839 00000 n 
+0000003859 00000 n 
+0000004152 00000 n 
+0000004172 00000 n 
+0000004485 00000 n 
+0000004796 00000 n 
+0000005109 00000 n 
+0000005250 00000 n 
+0000005533 00000 n 
+0000005807 00000 n 
+0000006166 00000 n 
+0000006187 00000 n 
+0000006356 00000 n 
+0000006376 00000 n 
+0000006457 00000 n 
+0000006816 00000 n 
+0000006837 00000 n 
+0000007006 00000 n 
+0000007026 00000 n 
+0000007385 00000 n 
+0000007406 00000 n 
+0000007575 00000 n 
+0000007595 00000 n 
+0000007651 00000 n 
+0000007707 00000 n 
+0000008066 00000 n 
+0000008087 00000 n 
+0000008256 00000 n 
+0000008276 00000 n 
+0000008635 00000 n 
+0000008656 00000 n 
+0000008825 00000 n 
+0000008845 00000 n 
+0000009204 00000 n 
+0000009225 00000 n 
+0000009394 00000 n 
+0000009414 00000 n 
+0000009622 00000 n 
+0000009642 00000 n 
+0000009886 00000 n 
+0000010090 00000 n 
+0000010230 00000 n 
+0000010372 00000 n 
+0000010514 00000 n 
+0000010679 00000 n 
+0000011610 00000 n 
+0000011631 00000 n 
+0000011875 00000 n 
+0000012079 00000 n 
+0000012219 00000 n 
+0000012361 00000 n 
+0000012504 00000 n 
+0000012670 00000 n 
+0000013601 00000 n 
+0000013622 00000 n 
+0000013676 00000 n 
+0000013751 00000 n 
+0000013844 00000 n 
+0000013937 00000 n 
+0000014030 00000 n 
+0000014123 00000 n 
+0000014216 00000 n 
+0000014309 00000 n 
+0000014513 00000 n 
+0000014533 00000 n 
+0000014719 00000 n 
+0000014739 00000 n 
+0000014978 00000 n 
+0000014998 00000 n 
+0000015238 00000 n 
+0000015258 00000 n 
+0000015499 00000 n 
+0000015519 00000 n 
+0000015723 00000 n 
+0000015743 00000 n 
+0000015876 00000 n 
+0000016064 00000 n 
+0000016084 00000 n 
+0000016325 00000 n 
+0000016345 00000 n 
+0000016589 00000 n 
+0000016610 00000 n 
+0000016855 00000 n 
+0000016876 00000 n 
+0000016915 00000 n 
+0000016997 00000 n 
+0000017207 00000 n 
+0000017228 00000 n 
+0000017285 00000 n 
+0000017342 00000 n 
+0000017399 00000 n 
+trailer <<
+  /Root 1 0 R
+  /Size 112
+  /ID [<a2f146daeb6d814a742556489dab9882><31415926535897932384626433832795>]
+>>
+startxref
+17456
+%%EOF

@@ -79,6 +79,18 @@ class QPDFPageDocumentHelper: public QPDFDocumentHelper
     // file. You could do this, for example, to convert a page into a
     // form XObject, though for that, you're better off using
     // QPDFPageObjectHelper::getFormXObjectForPage.
+    //
+    // This method does not have any specific awareness of annotations
+    // or form fields, so if you just add a page without thinking
+    // about it, you might end up with two pages that share form
+    // fields or annotations. While the page may look fine, it will
+    // probably not function properly with regard to interactive
+    // features. To work around this, you should called
+    // QPDFAcroFormDocumentHelper::fixCopiedAnnotations. A future
+    // version of qpdf will likely provide a higher-level interface
+    // for copying pages around that will handle document-level
+    // constructs in a less error-prone fashion.
+
     QPDF_DLL
     void addPage(QPDFPageObjectHelper newpage, bool first);
 
