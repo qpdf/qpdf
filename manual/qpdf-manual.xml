@@ -5127,15 +5127,6 @@ print "\n";
         </listitem>
         <listitem>
          <para>
-          The virtual method
-          <function>QPDFObjectHandle::ParserCallbacks::handleWarning</function>
-          is now called whenever a warning is encountered while
-          parsing a content stream. Prior to this, the caller had no
-          way to know if this had happened.
-         </para>
-        </listitem>
-        <listitem>
-         <para>
           The method <function>QPDF::numWarnings</function> was added
           so that you can tell whether any warnings happened during a
           specific block of code.

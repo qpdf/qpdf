@@ -164,6 +164,11 @@ Comments appear in the code prefixed by "ABI"
 * Consider having addArrayItem, replaceKey, etc. return the new value
   so you can say
   auto oh = dict.replaceKey("/Key", QPDFObjectHandle::newSomething());
+* Added QPDFObjectHandle::ParserCallbacks::handleWarning but had to
+  revert because it was not binary compatible. Consider re-adding. The
+  commit that added this comment includes the reverting of the change.
+  The previous commit removes the code that was calling and using
+  handleWarning.
 
 Page splitting/merging
 ======================

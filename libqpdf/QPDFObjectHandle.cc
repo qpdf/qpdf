@@ -152,16 +152,6 @@ QPDFObjectHandle::ParserCallbacks::handleObject(
 }
 
 void
-QPDFObjectHandle::ParserCallbacks::handleWarning()
-{
-}
-
-void
-QPDFObjectHandle::ParserCallbacks::handleEOF()
-{
-}
-
-void
 QPDFObjectHandle::ParserCallbacks::contentSize(size_t)
 {
     // Ignore by default; overriding this is optional.
@@ -1983,15 +1973,9 @@ QPDFObjectHandle::parseContentStream_data(
         tokenizer.readToken(input, "content", true);
         qpdf_offset_t offset = input->getLastOffset();
         input->seek(offset, SEEK_SET);
-        size_t before_nwarnings = (context ? context->numWarnings() : 0);
         QPDFObjectHandle obj =
             parseInternal(input, "content", tokenizer,
                           empty, 0, context, true);
-        size_t after_nwarnings = (context ? context->numWarnings() : 0);
-        if (after_nwarnings > before_nwarnings)
-        {
-            callbacks->handleWarning();
-        }
         if (! obj.isInitialized())
         {
             // EOF
@@ -2018,7 +2002,6 @@ QPDFObjectHandle::parseContentStream_data(
                      QPDFExc(qpdf_e_damaged_pdf, input->getName(),
                              "stream data", input->tell(),
                              "EOF found while reading inline image"));
-                callbacks->handleWarning();
             }
             else
             {

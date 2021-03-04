@@ -51,10 +51,6 @@
 	bugs where it removes unreferenced resources that it isn't
 	supposed to.
 
-	* QPDFObjectHandle::ParserCallbacks: add virtual handleWarning
-	method, and provide default (empty) implementation of it and
-	handleEOF().
-
 	* Add QPDF::numWarnings() -- useful to tell whether any warnings
 	were issued by a specific bit of code.
 
