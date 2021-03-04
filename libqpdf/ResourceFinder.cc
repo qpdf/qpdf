@@ -1,8 +1,7 @@
 #include <qpdf/ResourceFinder.hh>
 
 ResourceFinder::ResourceFinder() :
-    last_name_offset(0),
-    saw_bad(false)
+    last_name_offset(0)
 {
 }
 
@@ -45,9 +44,8 @@ ResourceFinder::handleObject(QPDFObjectHandle obj, size_t offset, size_t)
 }
 
 void
-ResourceFinder::handleWarning()
+ResourceFinder::handleEOF()
 {
-    this->saw_bad = true;
 }
 
 std::set<std::string> const&
@@ -60,10 +58,4 @@ std::map<std::string, std::map<std::string, std::set<size_t>>> const&
 ResourceFinder::getNamesByResourceType() const
 {
     return this->names_by_resource_type;
-}
-
-bool
-ResourceFinder::sawBad() const
-{
-    return this->saw_bad;
 }

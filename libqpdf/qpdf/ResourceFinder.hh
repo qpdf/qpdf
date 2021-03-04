@@ -9,12 +9,11 @@ class ResourceFinder: public QPDFObjectHandle::ParserCallbacks
     ResourceFinder();
     virtual ~ResourceFinder() = default;
     virtual void handleObject(QPDFObjectHandle, size_t, size_t) override;
-    virtual void handleWarning() override;
+    virtual void handleEOF() override;
     std::set<std::string> const& getNames() const;
     std::map<std::string,
              std::map<std::string,
                       std::set<size_t>>> const& getNamesByResourceType() const;
-    bool sawBad() const;
 
   private:
     std::string last_name;
@@ -23,7 +22,6 @@ class ResourceFinder: public QPDFObjectHandle::ParserCallbacks
     std::map<std::string,
              std::map<std::string,
                       std::set<size_t>>> names_by_resource_type;
-    bool saw_bad;
 };
 
 #endif // RESOURCEFINDER_HH

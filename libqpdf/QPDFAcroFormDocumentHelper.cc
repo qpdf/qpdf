@@ -742,8 +742,9 @@ QPDFAcroFormDocumentHelper::adjustDefaultAppearances(
         &this->qpdf, DA.getUTF8Value());
     try
     {
+        auto nwarnings = this->qpdf.numWarnings();
         da_stream.parseAsContents(&rf);
-        if (rf.sawBad())
+        if (this->qpdf.numWarnings() > nwarnings)
         {
             QTC::TC("qpdf", "QPDFAcroFormDocumentHelper /DA parse error");
         }
@@ -858,8 +859,9 @@ QPDFAcroFormDocumentHelper::adjustAppearanceStream(
     ResourceFinder rf;
     try
     {
+        auto nwarnings = this->qpdf.numWarnings();
         stream.parseAsContents(&rf);
-        if (rf.sawBad())
+        if (this->qpdf.numWarnings() > nwarnings)
         {
             QTC::TC("qpdf", "QPDFAcroFormDocumentHelper AP parse error");
         }

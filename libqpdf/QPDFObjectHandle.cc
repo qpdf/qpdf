@@ -1949,15 +1949,10 @@ QPDFObjectHandle::parseContentStream_internal(
     pipeContentStreams(&buf, description, all_description);
     PointerHolder<Buffer> stream_data = buf.getBuffer();
     callbacks->contentSize(stream_data->getSize());
-    QPDF* context = getOwningQPDF();
-    if ((! context) && isArray() && (getArrayNItems() > 0))
-    {
-        context = getArrayItem(0).getOwningQPDF();
-    }
     try
     {
         parseContentStream_data(stream_data, all_description,
-                                callbacks, context);
+                                callbacks, getOwningQPDF());
     }
     catch (TerminateParsing&)
     {

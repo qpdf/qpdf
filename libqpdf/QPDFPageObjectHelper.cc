@@ -684,22 +684,26 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
     ResourceFinder rf;
     try
     {
+        auto q = ph.oh.getOwningQPDF();
+        size_t before_nw = (q ? q->numWarnings() : 0);
         ph.parseContents(&rf);
+        size_t after_nw = (q ? q->numWarnings() : 0);
+        if (after_nw > before_nw)
+        {
+            ph.oh.warnIfPossible(
+                "Bad token found while scanning content stream; "
+                "not attempting to remove unreferenced objects from"
+                " this object");
+            return false;
+        }
     }
     catch (std::exception& e)
     {
+        QTC::TC("qpdf", "QPDFPageObjectHelper bad token finding names");
         ph.oh.warnIfPossible(
             std::string("Unable to parse content stream: ") + e.what() +
             "; not attempting to remove unreferenced objects"
             " from this object");
-        return false;
-    }
-    if (rf.sawBad())
-    {
-        QTC::TC("qpdf", "QPDFPageObjectHelper bad token finding names");
-        ph.oh.warnIfPossible(
-            "Bad token found while scanning content stream; "
-            "not attempting to remove unreferenced objects from this object");
         return false;
     }
 
