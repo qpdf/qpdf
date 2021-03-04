@@ -24,6 +24,7 @@ activatePipelineStack
 ActiveState
 acyclic
 adbe
+addAndRenameFormFields
 addArrayElement
 addArrayItem
 AddAttachment
@@ -42,6 +43,9 @@ addr
 addTokenFilter
 addToTable
 adjustAESStreamLength
+adjustAppearanceStream
+adjustDefaultAppearances
+adjustInheritedFields
 adjustOstreamXref
 admon
 Adobeâ
@@ -285,6 +289,7 @@ bbb
 BBox
 bbox
 bc
+BDC
 beb
 BeforeQuack
 berkenbilt
@@ -409,7 +414,7 @@ clearPipelineStack
 clearsign
 cleartext
 ClearTextMetadata
-CLI
+cli
 ClosedFileInputSource
 CloseHandle
 closeInputSource
@@ -734,6 +739,7 @@ externalize
 externalized
 externalizeInlineImages
 externalizing
+ExtGState
 fb
 fBqpdf
 fc
@@ -792,9 +798,11 @@ findSource
 findStartxref
 fIoptions
 fIoutfilename
+firefox
 firstname
 firstterm
 fis
+fixCopiedAnnotations
 fixDanglingReferences
 fl
 flarp
@@ -909,6 +917,7 @@ getDataChecksum
 getDecodePipeline
 getDefaultAppearance
 getDefaultProvider
+getDefaultResources
 getDefaultValue
 getDefaultValueAsString
 getDescription
@@ -930,6 +939,8 @@ getErrorCode
 getErrorMessage
 getExtensionLevel
 getFieldForAnnotation
+getFieldFromAcroForm
+getFieldsWithQualifiedName
 getFieldType
 getFileChecksum
 GetFileInformationByHandle
@@ -989,6 +1000,8 @@ getMessageDetail
 getMin
 getModDate
 getName
+getNames
+getNamesByResourceType
 getNeedAppearances
 getNext
 getNextKid
@@ -1010,6 +1023,7 @@ getOE
 getOffset
 getOffsetLength
 getOperatorValue
+getOrCreateAcroForm
 getOriginalID
 getOutlinesForPage
 getOwningQPDF
@@ -1124,6 +1138,7 @@ handleEOF
 handleHelpArgs
 handleObject
 handleToken
+handleWarning
 hasAcroForm
 hasacroform
 hasDescription
@@ -1349,6 +1364,7 @@ keyset
 KeyStream
 keyValid
 kgdl
+ko
 LARGEFILE
 LastChar
 lastchar
@@ -1452,6 +1468,7 @@ makeNull
 makeNumber
 makePipeline
 makeReal
+makeResourcesIndirect
 makeString
 Mal
 malloc
@@ -1488,6 +1505,7 @@ mingw
 MinGW
 MINGW's
 mins
+mis
 misc
 MixColumn
 mk
@@ -1518,6 +1536,7 @@ multithreaded
 Mutator
 mutators
 mv
+namesp
 NameTree
 NameTreeDetails
 NameWatcher
@@ -1548,6 +1567,7 @@ newFromStream
 newIndirect
 newInlineImage
 newInteger
+newkey
 NEWKEYSET
 newName
 newname
@@ -1620,9 +1640,11 @@ numericValue
 numrange
 nums
 numtree
+numWarnings
 nval
 nw
 nwalsh
+nwarnings
 obj
 ObjAccessor
 ObjCache
@@ -1630,6 +1652,7 @@ ObjCopier
 objdesc
 OBJDIR
 objdump
+objectChanged
 ObjectHelper
 ObjectHolder
 objectinfo
@@ -1661,6 +1684,7 @@ oiter
 okey
 ol
 olast
+oldkey
 oldname
 oldpdf
 olimits
@@ -1677,6 +1701,7 @@ openObject
 opensource
 openssl
 OpenSSL
+oph
 opi
 optionalParameter
 OptionEntry
@@ -1684,6 +1709,7 @@ ord
 org
 orig
 OrigLength
+OrigPage
 orred
 os
 oss
@@ -1706,6 +1732,7 @@ outpdf
 outpdfw
 outprefix
 outputLengthNextN
+ov
 ovecsize
 ovector
 ownerPasswordMatched
@@ -1760,6 +1787,7 @@ PCLm
 pclm
 pcre
 pdf
+pdf's
 PDFâ
 PDFContext
 pdfdoc
@@ -1933,6 +1961,7 @@ QPDFObjGen
 QPDFObjGens
 QPDFOutlineDocumentHelper
 QPDFOutlineObjectHelper
+QPDFPageCopier
 QPDFPageData
 QPDFPageDocumentHelper
 QPDFPageLabelDocumentHelper
@@ -2059,6 +2088,8 @@ resolveLiteral
 resolveNamedDest
 resolveObjectsInStream
 ResolveRecorder
+ResourceFinder
+ResourceReplacer
 resync
 retargeted
 retested
@@ -2080,6 +2111,8 @@ Rkey
 RKLENGTH
 rl
 rm
+rn
+rnames
 rnd
 RNRT
 RobK
@@ -2097,10 +2130,12 @@ rspec
 rstream
 RStream
 rsync
+rtype
 RunLength
 runlength
 RunLengthDecode
 runtest
+rval
 Sahil
 sahilarora
 sAlT
@@ -2109,11 +2144,13 @@ saphir
 sarray
 SASLprep
 savable
+sawBad
 sc
 scanline
 scanlines
 Scarff
 sch
+scn
 scp
 sdk
 sdp
@@ -2153,6 +2190,7 @@ setFieldAttribute
 setFile
 setFilename
 setFilterOnWrite
+setFormFieldName
 setFromVector
 setIgnoreXRefStreams
 setImmediateCopyFrom
@@ -2301,10 +2339,12 @@ stylesheets
 subclassed
 subclasses
 subclassing
+subdict
 subdictionaries
 subdictionary
 SubFilter
 SubFilters
+subitems
 subkeys
 SUBLANG
 sublicense
@@ -2343,6 +2383,7 @@ testOutlines
 testPages
 TESTSUITE
 testWrite
+TextBuilder
 tf
 tff
 TfFinder
