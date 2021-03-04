@@ -34,6 +34,37 @@ Document-level work
   --copy-attachments-from to preserve these. What will the strategy be
   for deduplicating in the automatic case?
 
+Text Appearance Streams
+=======================
+
+This is a list of known issues with text appearance streams and things
+we might do about it.
+
+* For variable text, the spec says to pull any resources from /DR that
+  are referenced in /DA but if the resource dictionary already has
+  that resource, just use the one that's there. The current code looks
+  only for /Tf and adds it if needed. We might want to instead merge
+  /DR with resources and then remove anything that's unreferenced. We
+  have all the code required for that in ResourceFinder except
+  TfFinder also gets the font size, which ResourceFinder doesn't do.
+
+* There are things we are missing because we don't look at font
+  metrics. The code from TextBuilder (work) has almost everything in
+  it that is required. Once we have knowledge of character widths, we
+  can support quadding and multiline text fields (/Ff 4096), and we
+  can potentially squeeze text to fit into a field. For multiline,
+  first squeeze vertically down to the font height, then squeeze
+  horizontally with Tz. For single line, squeeze horizontally with Tz.
+  If we use Tz, issue a warning.
+
+* When mapping characters to widths, we will need to care about
+  character encoding. For built-in fonts, we can create a map from
+  Unicode code point to width and then go from the font's encoding to
+  unicode to the width. Get rid of "ugly switch statements" in
+  QUtil.cc and replace with static map initializers. See
+  misc/character-encoding/ (not on github) and font metric information
+  for the 14 standard fonts in my local pdf-spec directory.
+
 Fuzz Errors
 ===========
 
