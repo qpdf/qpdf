@@ -145,7 +145,7 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
     // done through setFormFieldName() above.
     QPDF_DLL
     std::set<QPDFObjGen>
-    getFieldsWithQualifiedName(std::string const& name) const;
+    getFieldsWithQualifiedName(std::string const& name);
 
     // Return the annotations associated with a terminal field. Note
     // that in the case of a field having a single annotation, the

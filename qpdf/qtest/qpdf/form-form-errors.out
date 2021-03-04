@@ -1,9 +1,9 @@
-iterating over form fields
 WARNING: form-errors.pdf, object 4 0 at offset 625: loop detected while traversing /AcroForm
 WARNING: form-errors.pdf, object 5 0 at offset 993: encountered a direct object as a field or annotation while traversing /AcroForm; ignoring field or annotation
 WARNING: form-errors.pdf, object 15 0 at offset 3452: encountered a non-dictionary as a field or annotation while traversing /AcroForm; ignoring field or annotation
 WARNING: form-errors.pdf, object 16 0 at offset 3475: this widget annotation is not reachable from /AcroForm in the document catalog
 WARNING: form-errors.pdf, object 32 0 at offset 5974: this widget annotation is not reachable from /AcroForm in the document catalog
+iterating over form fields
 Field: 4 0 R
   Parent: none
   Fully qualified name: Text Box 1

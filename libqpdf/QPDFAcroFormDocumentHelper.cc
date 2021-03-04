@@ -19,6 +19,10 @@ QPDFAcroFormDocumentHelper::QPDFAcroFormDocumentHelper(QPDF& qpdf) :
     QPDFDocumentHelper(qpdf),
     m(new Members())
 {
+    // We have to analyze up front. Otherwise, when we are adding
+    // annotations and fields, we are in a temporarily unstable
+    // configuration where some widget annotations are not reachable.
+    analyze();
 }
 
 void
@@ -68,6 +72,7 @@ void
 QPDFAcroFormDocumentHelper::addAndRenameFormFields(
     std::vector<QPDFObjectHandle> fields)
 {
+    analyze();
     std::map<std::string, std::string> renames;
     std::list<QPDFObjectHandle> queue;
     queue.insert(queue.begin(), fields.begin(), fields.end());
@@ -214,8 +219,9 @@ QPDFAcroFormDocumentHelper::getFormFields()
 
 std::set<QPDFObjGen>
 QPDFAcroFormDocumentHelper::getFieldsWithQualifiedName(
-    std::string const& name) const
+    std::string const& name)
 {
+    analyze();
     // Keep from creating an empty entry
     std::set<QPDFObjGen> result;
     auto iter = this->m->name_to_fields.find(name);
@@ -248,6 +254,7 @@ QPDFAcroFormDocumentHelper::getWidgetAnnotationsForPage(QPDFPageObjectHelper h)
 std::vector<QPDFFormFieldObjectHelper>
 QPDFAcroFormDocumentHelper::getFormFieldsForPage(QPDFPageObjectHelper ph)
 {
+    analyze();
     std::set<QPDFObjGen> added;
     std::vector<QPDFFormFieldObjectHelper> result;
     auto widget_annotations = getWidgetAnnotationsForPage(ph);

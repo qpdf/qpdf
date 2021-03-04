@@ -1,4 +1,3 @@
-iterating over form fields
 WARNING: form-bad-fields-array.pdf, object 1 0 at offset 50: /Fields key of /AcroForm dictionary is not an array; ignoring
 WARNING: form-bad-fields-array.pdf, object 4 0 at offset 615: this widget annotation is not reachable from /AcroForm in the document catalog
 WARNING: form-bad-fields-array.pdf, object 16 0 at offset 3419: this widget annotation is not reachable from /AcroForm in the document catalog
@@ -11,6 +10,7 @@ WARNING: form-bad-fields-array.pdf, object 32 0 at offset 5893: this widget anno
 WARNING: form-bad-fields-array.pdf, object 33 0 at offset 6251: this widget annotation is not reachable from /AcroForm in the document catalog
 WARNING: form-bad-fields-array.pdf, object 34 0 at offset 6607: this widget annotation is not reachable from /AcroForm in the document catalog
 WARNING: form-bad-fields-array.pdf, object 10 0 at offset 2311: this widget annotation is not reachable from /AcroForm in the document catalog
+iterating over form fields
 Field: 4 0 R
   Parent: none
   Fully qualified name: Text Box 1
