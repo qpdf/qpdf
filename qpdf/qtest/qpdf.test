@@ -2425,7 +2425,7 @@ foreach my $f (qw(screen print))
 show_ntests();
 # ----------
 $td->notify("--- Copy Annotations ---");
-$n_tests += 35;
+$n_tests += 37;
 
 $td->runtest("complex copy annotations",
              {$td->COMMAND =>
@@ -2508,6 +2508,16 @@ $td->runtest("not keeping any fields",
 $td->runtest("check output",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "kept-no-fields.pdf"});
+$td->runtest("other file first",
+             {$td->COMMAND =>
+                  "qpdf --qdf --no-original-object-ids" .
+                  " --static-id fields-two-pages.pdf" .
+                  " --pages ./fields-two-pages.pdf . 1 -- a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "other-file-first.pdf"});
 
 $td->runtest("field conflict resolution",
              {$td->COMMAND =>

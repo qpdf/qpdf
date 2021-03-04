@@ -5915,17 +5915,37 @@ static void handle_page_specs(QPDF& pdf, Options& o, bool& warnings)
                 }
             }
             dh.addPage(to_copy, false);
-            if (page_data.qpdf == &pdf)
+            bool first_copy_from_orig = false;
+            bool this_file = (page_data.qpdf == &pdf);
+            if (this_file)
             {
                 // This is a page from the original file. Keep track
                 // of the fact that we are using it.
+                first_copy_from_orig = (selected_from_orig.count(pageno) == 0);
                 selected_from_orig.insert(pageno);
-
             }
             auto new_page = added_page(pdf, to_copy);
-            if (other_afdh->hasAcroForm())
+            // Try to avoid gratuitously renaming fields. In the case
+            // of where we're just extracting a bunch of pages from
+            // the original file and not copying any page more than
+            // once, there's no reason to do anything with the fields.
+            // Since we don't remove fields from the original file
+            // until all copy operations are completed, any foreign
+            // pages that conflict with original pages will be
+            // adjusted. If we copy any page from the original file
+            // more than once, that page would be in conflict with the
+            // previous copy of itself.
+            if (other_afdh->hasAcroForm() &&
+                ((! this_file) || (! first_copy_from_orig)))
             {
-                QTC::TC("qpdf", "qpdf copy form fields in pages");
+                if (! this_file)
+                {
+                    QTC::TC("qpdf", "qpdf copy fields not this file");
+                }
+                else if (! first_copy_from_orig)
+                {
+                    QTC::TC("qpdf", "qpdf copy fields non-first from orig");
+                }
                 this_afdh->fixCopiedAnnotations(
                     new_page, to_copy.getObjectHandle(), *other_afdh,
                     &referenced_fields);
