@@ -4,23 +4,27 @@ Document-level work
 * QPDFPageCopier -- object for moving pages around within files or
   between files and performing various transformations
 
-  * handle all the stuff of pages and split-pages
-  * do n-up, booklet, collation
-  * look through cli and see what else...flatten-*?
+  * Handle all the stuff of pages and split-pages
+  * Do n-up, booklet, collation
+  * Look through cli and see what else...flatten-*?
   * See comments in QPDFPageDocumentHelper.hh for addPage -- search
-   for "a future version".
+    for "a future version".
+  * Make it efficient for bulk operations
+  * Make certain doc-level features selectable
+  * qpdf.cc should do all its page operations, including
+    overlay/underlay, splitting, and merging, using this
+  * There should also be example code
+
+* After doc-level checks are in, call --check on the output files in
+  the "Copy Annotations" tests.
+
+* Document-level checks. For example, for forms, make sure all form
+  fields point to an annotation on exactly one page as well as that
+  all widget annotations are associated with a form field. Hook this
+  into QPDFPageCopier as well as the doc helpers. Make sure it is
+  called from --check.
 
 * See also issues tagged with "pages"
-
-* There is going to be a lot of duplicated code for doc-level stuff
-  between pages and split pages. That should be refactored. Perhaps
-  some kind of general method should be added to
-  QPDFPageDocumentHelper for copying a page from one file to another
-  and preserving document-level features. I will need to think about
-  how to make it efficient for bulk operations. Probably making it
-  work from qpdf.cc will be sufficient. I also need to think about how
-  to selectively turn on or off specific document-level features,
-  perhaps using flags or something.
 
 * Add flags to CLI to select which document-level options to
   preserve or not preserve. We will probably need a pair of mutually
