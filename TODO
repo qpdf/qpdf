@@ -173,6 +173,15 @@ Comments appear in the code prefixed by "ABI"
   commit that added this comment includes the reverting of the change.
   The previous commit removes the code that was calling and using
   handleWarning.
+* Make it easier to deal with objects that should be indirect. Search
+  for makeIndirectObject in the code to find patterns. For example, it
+  would be nice to have a one-liner for the case of one or all
+  dictionary values or array items being replaced with an indirect
+  objects if direct. Maybe we want a version of copyForeignObject that
+  takes the foreign qpdf and converts the source object to indirect
+  before copying, though maybe we don't because it could cause
+  multiple copies to be made...usually it's better to handle that
+  explicitly.
 
 Page splitting/merging
 ======================
