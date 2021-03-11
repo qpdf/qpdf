@@ -5946,9 +5946,20 @@ static void handle_page_specs(QPDF& pdf, Options& o, bool& warnings)
                 {
                     QTC::TC("qpdf", "qpdf copy fields non-first from orig");
                 }
-                this_afdh->fixCopiedAnnotations(
-                    new_page, to_copy.getObjectHandle(), *other_afdh,
-                    &referenced_fields);
+                try
+                {
+                    this_afdh->fixCopiedAnnotations(
+                        new_page, to_copy.getObjectHandle(), *other_afdh,
+                        &referenced_fields);
+                }
+                catch (std::exception& e)
+                {
+                    pdf.warn(
+                        QPDFExc(qpdf_e_damaged_pdf, pdf.getFilename(),
+                                "", 0, "Exception caught while fixing copied"
+                                " annotations. This may be a qpdf bug." +
+                                std::string("Exception: ") + e.what()));
+                }
             }
         }
         if (page_data.qpdf->anyWarnings())
@@ -6400,7 +6411,18 @@ static void do_split_pages(QPDF& pdf, Options& o, bool& warnings)
             if (out_afdh.getPointer())
             {
                 QTC::TC("qpdf", "qpdf copy form fields in split_pages");
-                out_afdh->fixCopiedAnnotations(new_page, page, afdh);
+                try
+                {
+                    out_afdh->fixCopiedAnnotations(new_page, page, afdh);
+                }
+                catch (std::exception& e)
+                {
+                    pdf.warn(
+                        QPDFExc(qpdf_e_damaged_pdf, pdf.getFilename(),
+                                "", 0, "Exception caught while fixing copied"
+                                " annotations. This may be a qpdf bug." +
+                                std::string("Exception: ") + e.what()));
+                }
             }
         }
         if (pldh.hasPageLabels())
