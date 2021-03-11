@@ -5061,6 +5061,26 @@ print "\n";
    </varlistentry>
 -->
    <varlistentry>
+    <term>10.3.1: Month dd, YYYY</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Bug Fixes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Form field copying failed on files where /DR was a direct
+          object in the document-level form dictionary.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
     <term>10.3.0: March 4, 2021</term>
     <listitem>
      <itemizedlist>

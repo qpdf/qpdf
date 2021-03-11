@@ -1,3 +1,7 @@
+2021-03-11  Jay Berkenbilt  <ejb@ql.org>
+
+	* Bug fix: allow /DR to be direct in /AcroForm
+
 2021-03-04  Jay Berkenbilt  <ejb@ql.org>
 
 	* 10.3.0: release

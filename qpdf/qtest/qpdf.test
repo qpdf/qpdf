@@ -2425,7 +2425,7 @@ foreach my $f (qw(screen print))
 show_ntests();
 # ----------
 $td->notify("--- Copy Annotations ---");
-$n_tests += 37;
+$n_tests += 39;
 
 $td->runtest("complex copy annotations",
              {$td->COMMAND =>
@@ -2581,6 +2581,17 @@ $td->runtest("DA/appearance stream errors",
 $td->runtest("check output",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "field-parse-errors-out.pdf"});
+
+$td->runtest("Direct DR and annotations",
+             {$td->COMMAND =>
+                  "qpdf direct-dr.pdf --split-pages" .
+                  " --qdf --static-id --no-original-object-ids" .
+                  " split-out.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "split-out-1.pdf"},
+             {$td->FILE => "direct-dr-out.pdf"});
 
 show_ntests();
 # ----------

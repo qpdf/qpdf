@@ -947,8 +947,12 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
         {
             if (from_acroform.getKey("/DR").isDictionary())
             {
-                from_dr = this->qpdf.copyForeignObject(
-                    from_acroform.getKey("/DR"));
+                from_dr = from_acroform.getKey("/DR");
+                if (! from_dr.isIndirect())
+                {
+                    from_dr = from_qpdf->makeIndirectObject(from_dr);
+                }
+                from_dr = this->qpdf.copyForeignObject(from_dr);
             }
             if (from_acroform.getKey("/DA").isString())
             {
@@ -1105,6 +1109,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
                 // They will already be copied, so we'll get the right
                 // object back.
 
+                // top_field and ffield_oh are known to be indirect.
                 top_field = this->qpdf.copyForeignObject(top_field);
                 ffield_oh = this->qpdf.copyForeignObject(ffield_oh);
             }
@@ -1216,6 +1221,10 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
         }
         if (foreign)
         {
+            if (! annot.isIndirect())
+            {
+                annot = from_qpdf->makeIndirectObject(annot);
+            }
             annot = this->qpdf.copyForeignObject(annot);
         }
         maybe_copy_object(annot);
