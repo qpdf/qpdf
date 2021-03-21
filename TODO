@@ -1,6 +1,12 @@
 Document-level work
 ===================
 
+* Implement the tree helper described in the ABI section and provide
+  the getPagesTree method so QPDF::getAllPages can be deprecated in
+  10.4 and people have time to transition before qpdf 11. Maybe I
+  should have a qpdf 11 branch so I can make sure I have the
+  interfaces the way I want them before releasing 10.4.
+
 * QPDFPageCopier -- object for moving pages around within files or
   between files and performing various transformations
 
@@ -182,6 +188,25 @@ Comments appear in the code prefixed by "ABI"
   before copying, though maybe we don't because it could cause
   multiple copies to be made...usually it's better to handle that
   explicitly.
+* (Also API) Create a helper class for tree structures like the pages
+  tree that have /Kids and /Count. It would be great to be able to
+  eliminate flattenPagesTree and all the page object to page caching,
+  and to get rid of getAllPages() that returns a reference to an
+  internal data structure. The tree helper object can have
+  bidirectional iterator and const_iterator, implement at and
+  operator[], and have reasonable insertion and deletion semantics.
+  Then a new getAllPages, perhaps getPagesTree, can return that and
+  make it easy to change existing code even if it assumes the result
+  of getAllPages() is mutating automatically as the pages tree is
+  manipulated. This will free us up to finally get rid of the
+  troublesome pages cache and its exposure by getAllPages. See also
+  note below with "balance the pages tree". Maybe we can get rid of
+  pageobj_to_pages_pos as well or convert it into something that is
+  merely advisory and not so heavily trusted. We should either make
+  the code not care if the same object appears more than once in the
+  pages tree or detect it and shallow copy, though the latter would
+  cause a significant performance penalty when manipulating pages if
+  we get rid of the cache.
 
 Page splitting/merging
 ======================
@@ -333,6 +358,8 @@ NOTE: Some items in this list refer to files in my personal home
 directory or that are otherwise not publicly accessible. This includes
 things sent to me by email that are specifically not public. Even so,
 I find it useful to make reference to them in this list.
+
+ * Get rid of remaining assert() calls from non-test code.
 
  * Consider updating the fuzzer with code that exercises
    copyAnnotations, file attachments, and name and number trees. Check

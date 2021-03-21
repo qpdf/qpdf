@@ -255,13 +255,11 @@ QPDF::insertPage(QPDFObjectHandle newpage, int pos)
     int npages = kids.getArrayNItems();
     pages.replaceKey("/Count", QPDFObjectHandle::newInteger(npages));
     this->m->all_pages.insert(this->m->all_pages.begin() + pos, newpage);
-    assert(this->m->all_pages.size() == QIntC::to_size(npages));
     for (int i = pos + 1; i < npages; ++i)
     {
         insertPageobjToPage(this->m->all_pages.at(toS(i)), i, false);
     }
     insertPageobjToPage(newpage, pos, true);
-    assert(this->m->pageobj_to_pages_pos.size() == QIntC::to_size(npages));
 }
 
 void
@@ -280,9 +278,7 @@ QPDF::removePage(QPDFObjectHandle page)
     int npages = kids.getArrayNItems();
     pages.replaceKey("/Count", QPDFObjectHandle::newInteger(npages));
     this->m->all_pages.erase(this->m->all_pages.begin() + pos);
-    assert(this->m->all_pages.size() == QIntC::to_size(npages));
     this->m->pageobj_to_pages_pos.erase(page.getObjGen());
-    assert(this->m->pageobj_to_pages_pos.size() == QIntC::to_size(npages));
     for (int i = pos; i < npages; ++i)
     {
         insertPageobjToPage(this->m->all_pages.at(toS(i)), i, false);
