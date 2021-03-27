@@ -82,7 +82,7 @@ Fuzz Errors
 
 * Ignoring these:
   * Timeout: 15471, 17630
-  * Out of memory: 15470
+  * Out of memory: 15470, 32516 (contains 65322×64506 JPEG)
 
 GitHub Actions
 ==============
