@@ -61,7 +61,6 @@ class NNTreeIterator: public std::iterator<
         int kid_number;
     };
 
-    // ABI: for qpdf 11, make qpdf a reference
     NNTreeIterator(NNTreeImpl& impl);
     void updateIValue(bool allow_invalid = true);
     bool deepen(QPDFObjectHandle node, bool first, bool allow_empty);
@@ -89,6 +88,7 @@ class NNTreeImpl
   public:
     typedef NNTreeIterator iterator;
 
+    // ABI: for qpdf 11, make qpdf a reference
     NNTreeImpl(NNTreeDetails const&, QPDF*, QPDFObjectHandle&,
                bool auto_repair = true);
     iterator begin();
