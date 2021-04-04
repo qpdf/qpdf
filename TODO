@@ -1,3 +1,23 @@
+XXX QPDFPagesTree
+=================
+
+* This branch has been abandoned. In the end, it looks like we will
+  end up having to fully traverse the pages tree to detect duplicates
+  and fix /Type, so the end state will be no better than the old code
+  but will be less efficient than having the cache. The cache has been
+  in the code for 9 years and is stable, so there's no reason to
+  remove it.
+
+* QPDFPagesTree does not proactively fix /Type or correct page objects
+  that are used multiple times. It would be nice if we would do that
+  somewhere but not do it more often than necessary so isPagesObject
+  and isPageObject are reliable and can be made more reliable. Maybe
+  add a validate or repair function? It should also make sure /Count
+  and /Parent are correct. Maybe QPDF has a shared_ptr<QPDFPagesTree>
+  that is cached to replace the old caches. When we call getPagesTree,
+  if not cached, create one, call validate, and cache. Then return
+  copy of cached value.
+
 Document-level work
 ===================
 
