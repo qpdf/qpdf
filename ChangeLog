@@ -13,6 +13,8 @@
 
 2021-04-04  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add QPDF::getPagesTree()
+
 	* Add new class QPDFPagesTree for iterating over and manipulating
 	the pages tree without gratuitously flattening it.
 

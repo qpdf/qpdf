@@ -6,6 +6,12 @@
 #include <qpdf/QUtil.hh>
 #include <qpdf/QPDFExc.hh>
 
+QPDFPagesTree
+QPDF::getPagesTree()
+{
+    return QPDFPagesTree(*this);
+}
+
 // In support of page manipulation APIs, these methods internally
 // maintain state about pages in a pair of data structures: all_pages,
 // which is a vector of page objects, and pageobj_to_pages_pos, which
