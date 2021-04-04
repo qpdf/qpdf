@@ -1780,7 +1780,7 @@ $td->runtest("check output",
              {$td->FILE => "no-pages-types-fixed.pdf"});
 $td->runtest("detect loops in pages structure",
              {$td->COMMAND => "qpdf --check pages-loop.pdf"},
-             {$td->FILE => "pages-loop.out", $td->EXIT_STATUS => 2},
+             {$td->FILE => "pages-loop.out", $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 
 show_ntests();

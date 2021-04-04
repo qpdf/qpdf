@@ -2327,12 +2327,9 @@ QPDFWriter::initializeSpecialStreams()
 {
     // Mark all page content streams in case we are filtering or
     // normalizing.
-    std::vector<QPDFObjectHandle> pages = this->m->pdf.getAllPages();
     int num = 0;
-    for (std::vector<QPDFObjectHandle>::iterator iter = pages.begin();
-	 iter != pages.end(); ++iter)
+    for (auto& page: this->m->pdf.getPagesTree())
     {
-	QPDFObjectHandle& page = *iter;
 	this->m->page_object_to_seq[page.getObjGen()] = ++num;
 	QPDFObjectHandle contents = page.getKey("/Contents");
 	std::vector<QPDFObjGen> contents_objects;
@@ -2600,11 +2597,8 @@ QPDFWriter::doWriteSetup()
     if (this->m->linearized)
     {
 	// Page dictionaries are not allowed to be compressed objects.
-	std::vector<QPDFObjectHandle> pages = this->m->pdf.getAllPages();
-	for (std::vector<QPDFObjectHandle>::iterator iter = pages.begin();
-	     iter != pages.end(); ++iter)
+	for (auto& page: this->m->pdf.getPagesTree())
 	{
-	    QPDFObjectHandle& page = *iter;
 	    QPDFObjGen og = page.getObjGen();
 	    if (this->m->object_to_object_stream.count(og))
 	    {
@@ -3528,19 +3522,17 @@ QPDFWriter::enqueueObjectsPCLm()
     std::string image_transform_content = "q /image Do Q\n";
 
     // enqueue all pages first
-    std::vector<QPDFObjectHandle> all = this->m->pdf.getAllPages();
-    for (std::vector<QPDFObjectHandle>::iterator iter = all.begin();
-         iter != all.end(); ++iter)
+    for (auto& page: this->m->pdf.getPagesTree())
     {
         // enqueue page
-        enqueueObject(*iter);
+        enqueueObject(page);
 
         // enqueue page contents stream
-        enqueueObject((*iter).getKey("/Contents"));
+        enqueueObject(page.getKey("/Contents"));
 
         // enqueue all the strips for each page
         QPDFObjectHandle strips =
-            (*iter).getKey("/Resources").getKey("/XObject");
+            page.getKey("/Resources").getKey("/XObject");
         std::set<std::string> keys = strips.getKeys();
         for (std::set<std::string>::iterator image = keys.begin();
              image != keys.end(); ++image)
