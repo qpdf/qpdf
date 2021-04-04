@@ -450,8 +450,8 @@ NNTreeIterator::split(QPDFObjectHandle to_split,
 
     // CURRENT STATE: half the items from the kids or items array in
     // the node being split have been moved into a new node. The new
-    // node is not yet attached to the tree. The iterator have a path
-    // element or leaf node that is out of bounds.
+    // node is not yet attached to the tree. The iterator may have a
+    // path element or leaf node that is out of bounds.
 
     // We need to adjust the parent to add the second node to /Kids
     // and, if needed, update kid_number to traverse through it. We
@@ -748,6 +748,13 @@ NNTreeIterator::deepen(QPDFObjectHandle node, bool first, bool allow_empty)
     bool failed = false;
 
     std::set<QPDFObjGen> seen;
+    for (auto i: this->path)
+    {
+        if (i.node.isIndirect())
+        {
+            seen.insert(i.node.getObjGen());
+        }
+    }
     while (! failed)
     {
         if (node.isIndirect())
