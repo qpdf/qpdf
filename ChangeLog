@@ -11,6 +11,11 @@
 	the case.) That means that, if you are going to do subsequent
 	modification on the page, you should retrieve it again.
 
+2021-04-04  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add new class QPDFPagesTree for iterating over and manipulating
+	the pages tree without gratuitously flattening it.
+
 2021-03-11  Jay Berkenbilt  <ejb@ql.org>
 
 	* 10.3.1: release

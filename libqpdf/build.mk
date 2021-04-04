@@ -74,6 +74,7 @@ SRCS_libqpdf = \
 	libqpdf/QPDFPageDocumentHelper.cc \
 	libqpdf/QPDFPageLabelDocumentHelper.cc \
 	libqpdf/QPDFPageObjectHelper.cc \
+	libqpdf/QPDFPagesTree.cc \
 	libqpdf/QPDFStreamFilter.cc \
 	libqpdf/QPDFSystemError.cc \
 	libqpdf/QPDFTokenizer.cc \
