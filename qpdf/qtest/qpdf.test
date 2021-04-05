@@ -954,7 +954,7 @@ $td->runtest("check output",
 	     {$td->FILE => "page_api_1-out3.pdf"});
 $td->runtest("duplicate page",
 	     {$td->COMMAND => "test_driver 19 page_api_1.pdf"},
-	     {$td->FILE => "page_api_1.out", $td->EXIT_STATUS => 2},
+	     {$td->FILE => "page_api_1.out", $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("remove page we don't have",
 	     {$td->COMMAND => "test_driver 22 page_api_1.pdf"},

@@ -193,7 +193,6 @@ qpdf-c called qpdf_init_write_memory 0
 exercise processFile(name) 0
 exercise processFile(FILE*) 0
 exercise processMemoryFile 0
-QPDF duplicate page reference 0
 QPDF remove page 2
 QPDF insert page 2
 QPDF updateAllPagesCache 0
@@ -592,3 +591,4 @@ QPDFAcroFormDocumentHelper /DA parse error 0
 QPDFAcroFormDocumentHelper AP parse error 0
 qpdf copy fields not this file 0
 qpdf copy fields non-first from orig 0
+QPDF resolve duplicated page in insert 0

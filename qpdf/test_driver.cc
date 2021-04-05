@@ -970,12 +970,18 @@ void runtest(int n, char const* filename1, char const* arg2)
     else if (n == 19)
     {
         // Remove a page and re-insert it in the same file.
-        QPDFPageDocumentHelper dh(pdf);
-        std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
+        std::vector<QPDFObjectHandle> const& pages = pdf.getAllPages();
 
-        // Try to insert a page that's already there.
-        dh.addPage(pages.at(5), false);
-        std::cout << "you can't see this" << std::endl;
+        // Try to insert a page that's already there. A shallow copy
+        // gets inserted instead.
+        auto newpage = pages.at(5);
+        size_t count = pages.size();
+        pdf.addPage(newpage, false);
+        auto last = pages.back();
+        assert(pages.size() == count + 1);
+        assert(! (last.getObjGen() == newpage.getObjGen()));
+        assert(last.getKey("/Contents").getObjGen() ==
+               newpage.getKey("/Contents").getObjGen());
     }
     else if (n == 20)
     {

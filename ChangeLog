@@ -1,3 +1,16 @@
+2021-04-05  Jay Berkenbilt  <ejb@ql.org>
+
+	* When adding a page, if the page already exists, make a shallow
+	copy of the page instead of throwing an exception. This makes the
+	behavior of adding a page from the library consistent with what
+	the CLI does and also with what the library does if it starts with
+	a file that already has a duplicated page. Note that this means
+	that, in some cases, the page you pass to addPage or addPageAt
+	(either in QPDF or QPDFPageDocumentHelper) will not be the same
+	object that actually gets added. (This has actually always been
+	the case.) That means that, if you are going to do subsequent
+	modification on the page, you should retrieve it again.
+
 2021-03-11  Jay Berkenbilt  <ejb@ql.org>
 
 	* 10.3.1: release

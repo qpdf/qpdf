@@ -14,7 +14,15 @@
 // to all_pages and has been in the public API long before the
 // introduction of mutation APIs, so we're pretty much stuck with it.
 // Anyway, there are lots of calls to it in the library, so the
-// efficiency of having it cached is probably worth keeping it.
+// efficiency of having it cached is probably worth keeping it. At one
+// point, I had partially implemented a helper class specifically for
+// the pages tree, but once you work in all the logic that handles
+// repairing the /Type keys of page tree nodes (both /Pages and /Page)
+// and deal with duplicate pages, it's just as complex and less
+// efficient than what's here. So, in spite of the fact that a const
+// reference is returned, the current code is fine and does not need
+// to be replaced. A partial implementation of QPDFPagesTree is in
+// github in attic in case there is ever a reason to resurrect it.
 
 // The goal of this code is to ensure that the all_pages vector, which
 // users may have a reference to, and the pageobj_to_pages_pos map,
@@ -178,7 +186,10 @@ QPDF::flattenPagesTree()
     size_t const len = this->m->all_pages.size();
     for (size_t pos = 0; pos < len; ++pos)
     {
-        // populate pageobj_to_pages_pos and fix parent pointer
+        // Populate pageobj_to_pages_pos and fix parent pointer. There
+        // should be no duplicates at this point because
+        // pushInheritedAttributesToPage calls getAllPages which
+        // resolves duplicates.
         insertPageobjToPage(this->m->all_pages.at(pos), toI(pos), true);
         this->m->all_pages.at(pos).replaceKey("/Parent", pages);
     }
@@ -201,7 +212,8 @@ QPDF::insertPageobjToPage(QPDFObjectHandle const& obj, int pos,
         if (! this->m->pageobj_to_pages_pos.insert(
                 std::make_pair(og, pos)).second)
         {
-            QTC::TC("qpdf", "QPDF duplicate page reference");
+            // The library never calls insertPageobjToPage in a way
+            // that causes this to happen.
             setLastObjectDescription("page " + QUtil::int_to_string(pos) +
                                      " (numbered from zero)",
                                      og.getObj(), og.getGen());
@@ -245,6 +257,13 @@ QPDF::insertPage(QPDFObjectHandle newpage, int pos)
             (pos == 0) ? 0 :                      // insert at beginning
             (pos == QIntC::to_int(this->m->all_pages.size())) ? 1 : // at end
             2);                                   // insert in middle
+
+    auto og = newpage.getObjGen();
+    if (this->m->pageobj_to_pages_pos.count(og))
+    {
+        QTC::TC("qpdf", "QPDF resolve duplicated page in insert");
+        newpage = makeIndirectObject(QPDFObjectHandle(newpage).shallowCopy());
+    }
 
     QPDFObjectHandle pages = getRoot().getKey("/Pages");
     QPDFObjectHandle kids = pages.getKey("/Kids");

@@ -73,12 +73,21 @@ class QPDFPageDocumentHelper: public QPDFDocumentHelper
     // indirect. If it is an indirect object from another QPDF, this
     // method will call pushInheritedAttributesToPage on the other
     // file and then copy the page to this QPDF using the same
-    // underlying code as copyForeignObject. Note that you can call
-    // copyForeignObject directly to copy a page from a different
-    // file, but the resulting object will not be a page in the new
-    // file. You could do this, for example, to convert a page into a
-    // form XObject, though for that, you're better off using
-    // QPDFPageObjectHelper::getFormXObjectForPage.
+    // underlying code as copyForeignObject. At this stage, if the
+    // indirect object is already in the pages tree, a shallow copy is
+    // made to avoid adding the same page more than once. In version
+    // 10.3.1 and earlier, adding a page that already existed would
+    // throw an exception and could cause qpdf to crash on subsequent
+    // page insertions in some cases. Note that this means that, in
+    // some cases, the page actually added won't be exactly the same
+    // object as the one passed in. If you want to do subsequent
+    // modification on the page, you should retrieve it again.
+    //
+    // Note that you can call copyForeignObject directly to copy a
+    // page from a different file, but the resulting object will not
+    // be a page in the new file. You could do this, for example, to
+    // convert a page into a form XObject, though for that, you're
+    // better off using QPDFPageObjectHelper::getFormXObjectForPage.
     //
     // This method does not have any specific awareness of annotations
     // or form fields, so if you just add a page without thinking
