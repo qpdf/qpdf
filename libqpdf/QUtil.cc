@@ -889,6 +889,7 @@ QUtil::get_current_qpdf_time()
                     static_cast<int>(ltime.wHour),
                     static_cast<int>(ltime.wMinute),
                     static_cast<int>(ltime.wSecond),
+                    // tzinfo.Bias is minutes before UTC
                     static_cast<int>(tzinfo.Bias));
 #else
     struct tm ltime;
@@ -899,13 +900,23 @@ QUtil::get_current_qpdf_time()
 #else
     ltime = *localtime(&now);
 #endif
+#if HAVE_TM_GMTOFF
+    // tm_gmtoff is seconds after UTC
+    int tzoff = -static_cast<int>(ltime.tm_gmtoff / 60);
+#elif HAVE_EXTERN_LONG_TIMEZONE
+    // timezone is seconds before UTC, not adjusted for daylight saving time
+    int tzoff = static_cast<int>(timezone / 60);
+#else
+    // Don't know how to get timezone on this platform
+    int tzoff = 0;
+#endif
     return QPDFTime(static_cast<int>(ltime.tm_year + 1900),
                     static_cast<int>(ltime.tm_mon + 1),
                     static_cast<int>(ltime.tm_mday),
                     static_cast<int>(ltime.tm_hour),
                     static_cast<int>(ltime.tm_min),
                     static_cast<int>(ltime.tm_sec),
-                    static_cast<int>(timezone / 60));
+                    tzoff);
 #endif
 }
 

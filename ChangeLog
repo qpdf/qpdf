@@ -1,3 +1,10 @@
+2021-04-17  Jay Berkenbilt  <ejb@ql.org>
+
+	* Portability fix: use tm_gmtoff rather than global timezone
+	variable if available to get timezone offset. This fixes
+	compilation on BSD and also results in a daylight saving
+	time-aware offset for Linux or other GNU systems. Fixes #515.
+
 2021-04-05  Jay Berkenbilt  <ejb@ql.org>
 
 	* When adding a page, if the page already exists, make a shallow

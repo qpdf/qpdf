@@ -520,6 +520,35 @@ if test "$BUILDRULES" != "msvc"; then
    fi
 fi
 
+AC_MSG_CHECKING(for tm_gmtoff in struct tm)
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+      #include <time.h>
+   ]],[[
+      struct tm tm;
+      tm.tm_gmtoff = 1;
+   ]])], [qpdf_TM_GMTOFF=1], [qpdf_TM_GMTOFF=0])
+if test "$qpdf_TM_GMTOFF" = "1"; then
+   AC_MSG_RESULT(yes)
+   AC_DEFINE([HAVE_TM_GMTOFF], [1], [Whether struct tm has tm_gmtoff])
+else
+   AC_MSG_RESULT(no)
+fi
+
+AC_MSG_CHECKING(for extern long timezone)
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+      #include <time.h>
+      #include <stdio.h>
+   ]],[[
+      tzset();
+      printf("%ld\n", timezone);
+   ]])], [qpdf_EXTERN_LONG_TIMEZONE=1], [qpdf_EXTERN_LONG_TIMEZONE=0])
+if test "$qpdf_EXTERN_LONG_TIMEZONE" = "1"; then
+   AC_MSG_RESULT(yes)
+   AC_DEFINE([HAVE_EXTERN_LONG_TIMEZONE], [1], [Whether extern long timezone is available])
+else
+   AC_MSG_RESULT(no)
+fi
+
 LL_FMT=""
 oCFLAGS=$CFLAGS
 CFLAGS="$WFLAGS $CFLAGS"
