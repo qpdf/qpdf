@@ -209,14 +209,7 @@ Pl_AES_PDF::flush(bool strip_padding)
         }
     }
 
-    if (this->encrypt)
-    {
-	this->crypto->rijndael_process(this->inbuf, this->outbuf);
-    }
-    else
-    {
-	this->crypto->rijndael_process(this->inbuf, this->outbuf);
-    }
+    this->crypto->rijndael_process(this->inbuf, this->outbuf);
     unsigned int bytes = this->buf_size;
     if (strip_padding)
     {
