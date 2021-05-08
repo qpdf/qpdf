@@ -12,6 +12,8 @@ $| = 1;
 # [ name, [ args ] ]
 my @tests = (
     ['no arguments', []],
+    ['generate object streams', ['--object-streams=generate']],
+    ['disable object streams', ['--object-streams=disable']],
     ['split pages', ['--split-pages', '--remove-unreferenced-resources=no']],
     ['shared resource check', ['--split-pages', '--remove-unreferenced-resources=auto']],
     ['linearize', ['--linearize']],
