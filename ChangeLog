@@ -1,5 +1,7 @@
 2021-05-08  Jay Berkenbilt  <ejb@ql.org>
 
+	* 10.3.2: release
+
 	* Fix problem that caused the generated manual from being included
 	in the Windows distributions. Fixes #521.
 
