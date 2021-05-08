@@ -20,9 +20,7 @@ if [[ $tool == mingw ]]; then
 elif [[ $tool == msvc ]]; then
     cl
 fi
-if [ -f distfiles/distfiles.zip ]; then
-    unzip distfiles/distfiles.zip
-fi
+unzip distfiles.zip
 unzip qpdf-external-libs-bin.zip
 cwd=`pwd`
 PATH=$cwd/libqpdf/build:$PATH

@@ -69,6 +69,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: distfiles
+          path: .
       - name: 'Download external libs'
         uses: actions/download-artifact@v2
         with:
