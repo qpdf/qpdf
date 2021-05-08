@@ -1111,6 +1111,7 @@ globbing
 gm
 gmail
 gmon
+gmtoff
 GNUC
 gnutls
 GnuTLS
@@ -1966,6 +1967,7 @@ QPDFPageData
 QPDFPageDocumentHelper
 QPDFPageLabelDocumentHelper
 QPDFPageObjectHelper
+QPDFPagesTree
 qpdfs
 QPDFSomethingDocumentHelper
 QPDFSomethingObjectHelper
@@ -2448,6 +2450,7 @@ typename
 typeWarning
 tz
 tzinfo
+tzoff
 tzset
 ubuntu
 uc
