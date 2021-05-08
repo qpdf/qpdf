@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "10.3.1">
-<!ENTITY lastreleased "March 11, 2021">
+<!ENTITY swversion "10.3.2">
+<!ENTITY lastreleased "May 8, 2021">
 ]>
 <book>
  <bookinfo>
@@ -5074,6 +5074,21 @@ print "\n";
           When generating a file while preserving object streams,
           unreferenced objects are correctly removed unless
           <option>--preserve-unreferenced</option> is specified.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Library Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          When adding a page that already exists, make a shallow copy
+          instead of throwing an exception. This makes the library
+          behavior consistent with the CLI behavior. See
+          <filename>ChangeLog</filename> for additional notes.
          </para>
         </listitem>
        </itemizedlist>
