@@ -5061,6 +5061,27 @@ print "\n";
    </varlistentry>
 -->
    <varlistentry>
+    <term>10.3.2: May 8, 2021</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Bug Fixes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          When generating a file while preserving object streams,
+          unreferenced objects are correctly removed unless
+          <option>--preserve-unreferenced</option> is specified.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
     <term>10.3.1: March 11, 2021</term>
     <listitem>
      <itemizedlist>

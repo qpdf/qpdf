@@ -2363,17 +2363,36 @@ QPDFWriter::preserveObjectStreams()
 {
     // Our object_to_object_stream map has to map ObjGen -> ObjGen
     // since we may be generating object streams out of old objects
-    // that have generation numbers greater than zero.  However in an
+    // that have generation numbers greater than zero. However in an
     // existing PDF, all object stream objects and all objects in them
     // must have generation 0 because the PDF spec does not provide
-    // any way to do otherwise.
+    // any way to do otherwise. This code filters out objects that are
+    // not allowed to be in object streams. In addition to removing
+    // objects that were erroneously included in object streams in the
+    // source PDF, it also prevents unreferenced objects from being
+    // included.
+    std::set<QPDFObjGen> eligible;
+    if (! this->m->preserve_unreferenced_objects)
+    {
+        std::vector<QPDFObjGen> eligible_v =
+            QPDF::Writer::getCompressibleObjGens(this->m->pdf);
+        eligible = std::set<QPDFObjGen>(eligible_v.begin(), eligible_v.end());
+    }
+    QTC::TC("qpdf", "QPDFWriter preserve object streams",
+            this->m->preserve_unreferenced_objects ? 0 : 1);
     std::map<int, int> omap;
     QPDF::Writer::getObjectStreamData(this->m->pdf, omap);
-    for (std::map<int, int>::iterator iter = omap.begin();
-         iter != omap.end(); ++iter)
+    for (auto iter: omap)
     {
-        this->m->object_to_object_stream[QPDFObjGen((*iter).first, 0)] =
-            (*iter).second;
+        QPDFObjGen og(iter.first, 0);
+        if (eligible.count(og) || this->m->preserve_unreferenced_objects)
+        {
+            this->m->object_to_object_stream[og] = iter.second;
+        }
+        else
+        {
+            QTC::TC("qpdf", "QPDFWriter exclude from object stream");
+        }
     }
 }
 

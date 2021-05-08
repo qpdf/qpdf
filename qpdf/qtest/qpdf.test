@@ -986,7 +986,7 @@ my @bug_tests = (
     ["106", "zlib data error", 3],
     ["141a", "/W entry size 0", 2],
     ["141b", "/W entry size 0", 2],
-    ["143", "self-referential ostream", 3],
+    ["143", "self-referential ostream", 3, "--preserve-unreferenced"],
     ["146", "very deeply nested array", 2],
     ["147", "previously caused memory error", 2],
     ["148", "free memory on bad flate", 2],
@@ -996,14 +996,18 @@ my @bug_tests = (
     ["263", "empty xref stream", 2],
     ["335a", "ozz-fuzz-12152", 2],
     ["335b", "ozz-fuzz-14845", 2],
-    ["fuzz-16214", "stream in object stream", 3],
+    ["fuzz-16214", "stream in object stream", 3, "--preserve-unreferenced"],
     # When adding to this list, consider adding to SEED_CORPUS_FILES
     # in fuzz/build.mk and updating the count in fuzz/qtest/fuzz.test.
     );
 $n_tests += scalar(@bug_tests);
 foreach my $d (@bug_tests)
 {
-    my ($n, $description, $exit_status) = @$d;
+    my ($n, $description, $exit_status, $xargs) = @$d;
+    if (! defined $xargs)
+    {
+        $xargs = "";
+    }
     if (-f "issue-$n.obfuscated")
     {
         # Some of the PDF files in the test suite trigger anti-virus
@@ -1025,7 +1029,7 @@ foreach my $d (@bug_tests)
     {
         my $base = (-f "issue-$n.pdf") ? "issue-$n" : "$n";
         $td->runtest($description,
-                     {$td->COMMAND => "qpdf $base.pdf a.pdf"},
+                     {$td->COMMAND => "qpdf $xargs $base.pdf a.pdf"},
                      {$td->FILE => "$base.out",
                           $td->EXIT_STATUS => $exit_status},
                      $td->NORMALIZE_NEWLINES);
@@ -1304,7 +1308,8 @@ $n_tests += 2;
 # that in turn contains an indirect scalar (bug 2974522).
 $td->runtest("unreferenced indirect scalar",
 	     {$td->COMMAND =>
-		  "qpdf --qdf --static-id --object-streams=preserve" .
+		  "qpdf --qdf --static-id --preserve-unreferenced" .
+                  " --object-streams=preserve" .
 		  " unreferenced-indirect-scalar.pdf a.qdf"},
 	     {$td->STRING => "",
 	      $td->EXIT_STATUS => 0},

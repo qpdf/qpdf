@@ -511,9 +511,6 @@ I find it useful to make reference to them in this list.
    implemented, update the docs on crypto providers, which mention
    that this may happen in the future.
 
- * See if we can avoid preserving unreferenced objects in object
-   streams even when preserving the object streams.
-
  * Provide APIs for embedded files.  See *attachments*.pdf in test
    suite.  The private method findAttachmentStreams finds at least
    cases for modern versions of Adobe Reader (>= 1.7, maybe earlier).

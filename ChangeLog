@@ -1,3 +1,8 @@
+2021-05-08  Jay Berkenbilt  <ejb@ql.org>
+
+	* Fix 11-year-old bug of leaving unreferenced objects in preserved
+	object streams. Fixes #520.
+
 2021-04-17  Jay Berkenbilt  <ejb@ql.org>
 
 	* Portability fix: use tm_gmtoff rather than global timezone
