@@ -2361,6 +2361,12 @@ QPDFWriter::initializeSpecialStreams()
 void
 QPDFWriter::preserveObjectStreams()
 {
+    std::map<int, int> omap;
+    QPDF::Writer::getObjectStreamData(this->m->pdf, omap);
+    if (omap.empty())
+    {
+        return;
+    }
     // Our object_to_object_stream map has to map ObjGen -> ObjGen
     // since we may be generating object streams out of old objects
     // that have generation numbers greater than zero. However in an
@@ -2380,8 +2386,6 @@ QPDFWriter::preserveObjectStreams()
     }
     QTC::TC("qpdf", "QPDFWriter preserve object streams",
             this->m->preserve_unreferenced_objects ? 0 : 1);
-    std::map<int, int> omap;
-    QPDF::Writer::getObjectStreamData(this->m->pdf, omap);
     for (auto iter: omap)
     {
         QPDFObjGen og(iter.first, 0);

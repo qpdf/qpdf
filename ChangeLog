@@ -1,3 +1,9 @@
+2021-05-09  Jay Berkenbilt  <ejb@ql.org>
+
+	* Improve performance of preservation of object streams by
+	avoiding unnecessary traversal of objects when there are no object
+	streams.
+
 2021-05-08  Jay Berkenbilt  <ejb@ql.org>
 
 	* 10.3.2: release
