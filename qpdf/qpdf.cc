@@ -3469,15 +3469,26 @@ ArgParser::checkCompletion()
 {
     // See if we're being invoked from bash completion.
     std::string bash_point_env;
-    if (QUtil::get_env("COMP_LINE", &bash_line) &&
-        QUtil::get_env("COMP_POINT", &bash_point_env))
+    // On Windows with mingw, there have been times when there appears
+    // to be no way to distinguish between an empty environment
+    // variable and an unset variable. There are also conditions under
+    // which bash doesn't set COMP_LINE. Therefore, enter this logic
+    // if either COMP_LINE or COMP_POINT are set. They will both be
+    // set together under ordinary circumstances.
+    bool got_line = QUtil::get_env("COMP_LINE", &bash_line);
+    bool got_point = QUtil::get_env("COMP_POINT", &bash_point_env);
+    if (got_line || got_point)
     {
         size_t p = QUtil::string_to_uint(bash_point_env.c_str());
-        if ((p > 0) && (p <= bash_line.length()))
+        if (p < bash_line.length())
         {
             // Truncate the line. We ignore everything at or after the
             // cursor for completion purposes.
             bash_line = bash_line.substr(0, p);
+        }
+        if (p > bash_line.length())
+        {
+            p = bash_line.length();
         }
         // Set bash_cur and bash_prev based on bash_line rather than
         // relying on argv. This enables us to use bashcompinit to get
@@ -3489,8 +3500,9 @@ ArgParser::checkCompletion()
         // for the first separator. bash_cur is everything after the
         // last separator, possibly empty.
         char sep(0);
-        while (--p > 0)
+        while (p > 0)
         {
+            --p;
             char ch = bash_line.at(p);
             if ((ch == ' ') || (ch == '=') || (ch == ':'))
             {
@@ -3498,7 +3510,10 @@ ArgParser::checkCompletion()
                 break;
             }
         }
-        bash_cur = bash_line.substr(1+p, std::string::npos);
+        if (1+p <= bash_line.length())
+        {
+            bash_cur = bash_line.substr(1+p, std::string::npos);
+        }
         if ((sep == ':') || (sep == '='))
         {
             // Bash sets prev to the non-space separator if any.
@@ -3512,8 +3527,9 @@ ArgParser::checkCompletion()
             // Go back to the last separator and set prev based on
             // that.
             size_t p1 = p;
-            while (--p1 > 0)
+            while (p1 > 0)
             {
+                --p1;
                 char ch = bash_line.at(p1);
                 if ((ch == ' ') || (ch == ':') || (ch == '='))
                 {

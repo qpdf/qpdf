@@ -86,6 +86,10 @@ $td->runtest("UTF-16 encoding errors",
 	     $td->NORMALIZE_NEWLINES);
 
 my @completion_tests = (
+    ['', 0, 'bad-input-1'],
+    ['', 1, 'bad-input-2'],
+    ['', 2, 'bad-input-3'],
+    ['qpdf', 2, 'bad-input-4'],
     ['qpdf ', undef, 'top'],
     ['qpdf -', undef, 'top-arg'],
     ['qpdf --enc', undef, 'enc'],
@@ -5229,8 +5233,13 @@ sub bash_completion
         $point = length($line);
     }
     my $before_point = substr($line, 0, $point);
-    $before_point =~ m/^(.*)([ =])([^= ]*)$/ or die;
-    my ($first, $sep, $cur) = ($1, $2, $3);
+    my $first = '';
+    my $sep = '';
+    my $cur = '';
+    if ($before_point =~ m/^(.*)([ =])([^= ]*)$/)
+    {
+        ($first, $sep, $cur) = ($1, $2, $3);
+    }
     my $prev = ($sep eq '=' ? $sep : $first);
     $prev =~ s/.* (\S+)$/$1/;
     my $this = $first;
