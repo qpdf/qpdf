@@ -60,7 +60,7 @@ endef
 #                          1   2
 # Usage: $(call libcompile,src,includes)
 define libcompile
-	$(LIBTOOL) --quiet --mode=compile \
+	$(LIBTOOL) --quiet --mode=compile --tag=CXX \
 		$(CXX) $(CXXFLAGS) \
 		$(call libdepflags,$(basename $(call src_to_obj,$(1)))) \
 		$(foreach I,$(2),-I$(I)) \
@@ -72,7 +72,7 @@ endef
 #                          1   2
 # Usage: $(call libcompile,src,includes)
 define c_libcompile
-	$(LIBTOOL) --quiet --mode=compile \
+	$(LIBTOOL) --quiet --mode=compile --tag=CC \
 		$(CC) $(CFLAGS) \
 		$(call libdepflags,$(basename $(call c_src_to_obj,$(1)))) \
 		$(foreach I,$(2),-I$(I)) \
@@ -92,7 +92,7 @@ endef
 #                       1    2       3       4    5       6        7
 # Usage: $(call makelib,objs,library,ldflags,libs,current,revision,age)
 define makelib
-	$(LIBTOOL) --mode=link \
+	$(LIBTOOL) --mode=link --tag=CXX \
 		$(CXX) $(CXXFLAGS) $(LD_VERSION_FLAGS) \
 		 -o $(2) $(1) $(3) $(4) \
 		 $(RPATH) -version-info $(5):$(6):$(7) -no-undefined
@@ -101,7 +101,8 @@ endef
 #                       1    2      3       4    5
 # Usage: $(call makebin,objs,binary,ldflags,libs,xlinkflags)
 define makebin
-	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(5) $(1) -o $(2) $(3) $(4)
+	$(LIBTOOL) --mode=link --tag=CXX \
+		$(CXX) $(CXXFLAGS) $(5) $(1) -o $(2) $(3) $(4)
 endef
 
 # Install target
