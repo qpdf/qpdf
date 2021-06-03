@@ -105,20 +105,25 @@ define makebin
 		$(CXX) $(CXXFLAGS) $(5) $(1) -o $(2) $(3) $(4)
 endef
 
-# Install target
-
-# NOTE: If installing any new executables, remember to update the
-# lambda layer code in build-scripts/build-appimage.
-install: all
+install-libs: build_libqpdf
 	./mkinstalldirs -m 0755 $(DESTDIR)$(libdir)/pkgconfig
-	./mkinstalldirs -m 0755 $(DESTDIR)$(bindir)
 	./mkinstalldirs -m 0755 $(DESTDIR)$(includedir)/qpdf
-	./mkinstalldirs -m 0755 $(DESTDIR)$(docdir)
-	./mkinstalldirs -m 0755 $(DESTDIR)$(mandir)/man1
 	$(LIBTOOL) --mode=install ./install-sh \
 		libqpdf/$(OUTPUT_DIR)/libqpdf.la \
 		$(DESTDIR)$(libdir)/libqpdf.la
 	$(LIBTOOL) --finish $(DESTDIR)$(libdir)
+	./install-sh -m 0644 include/qpdf/*.h $(DESTDIR)$(includedir)/qpdf
+	./install-sh -m 0644 include/qpdf/*.hh $(DESTDIR)$(includedir)/qpdf
+	./install-sh -m 0644 libqpdf.pc $(DESTDIR)$(libdir)/pkgconfig
+
+# Install target
+
+# NOTE: If installing any new executables, remember to update the
+# lambda layer code in build-scripts/build-appimage.
+install: all install-libs
+	./mkinstalldirs -m 0755 $(DESTDIR)$(bindir)
+	./mkinstalldirs -m 0755 $(DESTDIR)$(docdir)
+	./mkinstalldirs -m 0755 $(DESTDIR)$(mandir)/man1
 	$(LIBTOOL) --mode=install ./install-sh \
 		qpdf/$(OUTPUT_DIR)/qpdf \
 		$(DESTDIR)$(bindir)/qpdf
@@ -128,10 +133,7 @@ install: all
 	$(LIBTOOL) --mode=install ./install-sh \
 		qpdf/$(OUTPUT_DIR)/fix-qdf \
 		$(DESTDIR)$(bindir)/fix-qdf
-	./install-sh -m 0644 include/qpdf/*.h $(DESTDIR)$(includedir)/qpdf
-	./install-sh -m 0644 include/qpdf/*.hh $(DESTDIR)$(includedir)/qpdf
 	./install-sh -m 0644 doc/stylesheet.css $(DESTDIR)$(docdir)
-	./install-sh -m 0644 libqpdf.pc $(DESTDIR)$(libdir)/pkgconfig
 	if [ -f doc/qpdf-manual.html ]; then \
 		./install-sh -m 0644 doc/qpdf-manual.html $(DESTDIR)$(docdir); \
 	fi
