@@ -1,3 +1,9 @@
+Documentation
+=============
+
+* See #530 -- add an appendix explaining PDF encryption in general
+  plus how it's handled by qpdf.
+
 Document-level work
 ===================
 
