@@ -76,7 +76,7 @@ QPDFEFStreamObjectHelper::getSize()
 std::string
 QPDFEFStreamObjectHelper::getSubtype()
 {
-    auto val = getParam("/Subtype");
+    auto val = this->oh.getDict().getKey("/Subtype");
     if (val.isName())
     {
         auto n = val.getName();
@@ -141,7 +141,8 @@ QPDFEFStreamObjectHelper::setModDate(std::string const& date)
 QPDFEFStreamObjectHelper&
 QPDFEFStreamObjectHelper::setSubtype(std::string const& subtype)
 {
-    setParam("/Subtype", QPDFObjectHandle::newName("/" + subtype));
+    this->oh.getDict().replaceKey(
+        "/Subtype", QPDFObjectHandle::newName("/" + subtype));
     return *this;
 }
 
