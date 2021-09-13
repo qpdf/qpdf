@@ -132,6 +132,11 @@ all: $(ALL_TARGETS) ;
 
 check: $(TEST_TARGETS)
 
+.PHONY: spell
+# npm install -g cspell; add exceptions to cSpell.json
+spell:
+	cspell **/*.hh **/*.cc manual/* ChangeLog README* TODO
+
 # Install targets are in the make directory in the rules-specific make
 # fragments.
 

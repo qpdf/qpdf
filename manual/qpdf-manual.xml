@@ -6623,7 +6623,7 @@ print "\n";
           added to return an unsigned value. This makes it easier to
           write code that is safe from unintentional data loss.
           Functions: <function>getUIntValue</function>,
-          <function>getIntVauleAsInt</function>,
+          <function>getIntValueAsInt</function>,
           <function>getUIntValueAsUInt</function>.
          </para>
         </listitem>
