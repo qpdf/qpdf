@@ -670,7 +670,6 @@ PKG_CONFIG
 WINDOWS_WORDSIZE
 IS_32BIT
 RANDOM_DEVICE
-RPATH
 LT_SONAME
 LT_AGE
 LT_REVISION
@@ -16353,10 +16352,17 @@ fi
 if test "$qpdf_USE_RPATH" = "1"; then
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-   RPATH='-rpath $(libdir)'
 else
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
+   if test "${hardcode_libdir_flag_spec/rpath/}" != "$hardcode_libdir_flag_spec"; then
+      hardcode_libdir_flag_spec=
+   fi
+   runpath_var=
+   if test "${hardcode_libdir_flag_spec_CXX/rpath/}" != "$hardcode_libdir_flag_spec_CXX"; then
+      hardcode_libdir_flag_spec_CXX=
+   fi
+   runpath_var_CXX=
 fi
 
 

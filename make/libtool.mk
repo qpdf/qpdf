@@ -95,7 +95,7 @@ define makelib
 	$(LIBTOOL) --mode=link --tag=CXX \
 		$(CXX) $(CXXFLAGS) $(LD_VERSION_FLAGS) \
 		 -o $(2) $(1) $(3) $(4) \
-		 $(RPATH) -version-info $(5):$(6):$(7) -no-undefined
+		 -rpath $(libdir) -version-info $(5):$(6):$(7) -no-undefined
 endef
 
 #                       1    2      3       4    5

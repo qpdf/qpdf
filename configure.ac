@@ -72,11 +72,17 @@ AC_ARG_ENABLE(rpath,
     fi], [qpdf_USE_RPATH=1])
 if test "$qpdf_USE_RPATH" = "1"; then
    AC_MSG_RESULT(yes)
-   RPATH='-rpath $(libdir)'
 else
    AC_MSG_RESULT(no)
+   if test "${hardcode_libdir_flag_spec/rpath/}" != "$hardcode_libdir_flag_spec"; then
+      hardcode_libdir_flag_spec=
+   fi
+   runpath_var=
+   if test "${hardcode_libdir_flag_spec_CXX/rpath/}" != "$hardcode_libdir_flag_spec_CXX"; then
+      hardcode_libdir_flag_spec_CXX=
+   fi
+   runpath_var_CXX=
 fi
-AC_SUBST(RPATH)
 
 AC_MSG_CHECKING(for -fvisibility=hidden)
 try_flags=-fvisibility=hidden
