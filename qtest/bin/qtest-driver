@@ -33,7 +33,7 @@ require TestDriver;
 
 if ((@ARGV == 1) && ($ARGV[0] eq '--version'))
 {
-    print "$whoami version 1.6\n";
+    print "$whoami version 1.7\n";
     exit 0;
 }
 if ((@ARGV == 1) && ($ARGV[0] eq '--print-path'))
@@ -545,7 +545,7 @@ sub tc_do_initial_checks
 	    # Look for coverage calls in the source subject to certain
 	    # lexical constraints
 	    my ($lscope, $case);
-	    if (m/^\s*\&?QTC(?:::|\.)TC\(\"([^\"]+)\",\s*\"([^\"]+)\"/)
+	    if (m/^\s*\&?(?:QTC|qtc)(?:::|\.)TC\(\"([^\"]+)\",\s*\"([^\"]+)\"/)
 	    {
 		# C++, Java, Perl, etc.
 		($lscope, $case) = ($1, $2);
