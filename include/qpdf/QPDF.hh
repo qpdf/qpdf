@@ -605,6 +605,15 @@ class QPDF
     QPDF_DLL
     std::vector<QPDFObjectHandle> const& getAllPages();
 
+    // These methods, given a page object or its object/generation
+    // number, returns the 0-based index into the array returned by
+    // getAllPages() for that page. An exception is thrown if the page
+    // is not found.
+    QPDF_DLL
+    int findPage(QPDFObjGen const& og);
+    QPDF_DLL
+    int findPage(QPDFObjectHandle& page);
+
     // This method synchronizes QPDF's cache of the page structure
     // with the actual /Pages tree.  If you restrict changes to the
     // /Pages tree, including addition, removal, or replacement of
@@ -990,8 +999,6 @@ class QPDF
                              std::set<QPDFObjGen>& visited,
                              std::set<QPDFObjGen>& seen);
     void insertPage(QPDFObjectHandle newpage, int pos);
-    int findPage(QPDFObjGen const& og);
-    int findPage(QPDFObjectHandle& page);
     void flattenPagesTree();
     void insertPageobjToPage(QPDFObjectHandle const& obj, int pos,
                              bool check_duplicate);

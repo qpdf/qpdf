@@ -595,3 +595,4 @@ QPDF resolve duplicated page in insert 0
 QPDFWriter preserve object streams 1
 QPDFWriter exclude from object stream 0
 check unclosed --pages 1
+QPDF_pages findPage not found 0

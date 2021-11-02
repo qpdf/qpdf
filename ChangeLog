@@ -1,5 +1,9 @@
 2021-11-02  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add QPDF::findPage to the public API. This is primarily to help
+	improve the efficiency of code that wraps the qpdf library, such
+	as pikepdf. Fixes #516.
+
 	* zlib-flate: warn and exit with code 3 when there is corrupted
 	input data even when decompression is possible. We do this in the
 	zlib-flate CLI so that it can be more reliably used to test the

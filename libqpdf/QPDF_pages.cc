@@ -345,6 +345,7 @@ QPDF::findPage(QPDFObjGen const& og)
         this->m->pageobj_to_pages_pos.find(og);
     if (it == this->m->pageobj_to_pages_pos.end())
     {
+        QTC::TC("qpdf", "QPDF_pages findPage not found");
         setLastObjectDescription("page object", og.getObj(), og.getGen());
         throw QPDFExc(qpdf_e_pages, this->m->file->getName(),
                       this->m->last_object_description, 0,
