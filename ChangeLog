@@ -1,5 +1,18 @@
 2021-11-02  Jay Berkenbilt  <ejb@ql.org>
 
+	* zlib-flate: warn and exit with code 3 when there is corrupted
+	input data even when decompression is possible. We do this in the
+	zlib-flate CLI so that it can be more reliably used to test the
+	validity of zlib streams, but we don't warn by default in qpdf
+	itself because PDF files in the wild exist with this problem and
+	other readers appear to tolerate it. There is a PDF in the qpdf
+	test suite (form-filled-by-acrobat.pdf) that was written by a
+	version of Adobe Acrobat that exhibits this problem. Fixes #562.
+
+	* Add Pl_Flate::setWarnCallback to make it possible to be notified
+	of data errors that are recoverable but still indicate invalid
+	data.
+
 	* Improve error reporting when someone forgets the -- after
 	--pages. Fixes #555.
 

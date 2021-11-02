@@ -76,6 +76,12 @@ int main(int argc, char* argv[])
     PointerHolder<Pl_StdioFile> out = new Pl_StdioFile("stdout", stdout);
     PointerHolder<Pl_Flate> flate =
         new Pl_Flate("flate", out.getPointer(), action);
+    bool warn = false;
+    flate->setWarnCallback([&warn](char const* msg, int code) {
+        warn = true;
+        std::cerr << whoami << ": WARNING: zlib code " << code
+                  << ", msg = " << msg << std::endl;
+    });
 
     try
     {
@@ -97,9 +103,13 @@ int main(int argc, char* argv[])
     }
     catch (std::exception& e)
     {
-	std::cerr << e.what() << std::endl;
+	std::cerr << whoami << ": " << e.what() << std::endl;
 	exit(2);
     }
 
+    if (warn)
+    {
+        exit(3);
+    }
     return 0;
 }

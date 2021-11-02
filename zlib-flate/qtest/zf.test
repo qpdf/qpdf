@@ -29,4 +29,11 @@ $td->runtest("error",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
-$td->report(7);
+$td->runtest("corrupted input",
+	     {$td->COMMAND => "zlib-flate -uncompress < missing-z-finish.in"},
+	     {$td->REGEXP =>
+                  "input stream is complete but output may still be valid",
+                  $td->EXIT_STATUS => 3},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->report(8);

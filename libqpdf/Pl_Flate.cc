@@ -72,6 +72,21 @@ Pl_Flate::~Pl_Flate()
 }
 
 void
+Pl_Flate::setWarnCallback(std::function<void(char const*, int)> callback)
+{
+    this->m->callback = callback;
+}
+
+void
+Pl_Flate::warn(char const* msg, int code)
+{
+    if (this->m->callback != nullptr)
+    {
+        this->m->callback(msg, code);
+    }
+}
+
+void
 Pl_Flate::write(unsigned char* data, size_t len)
 {
     if (this->m->outbuf.getPointer() == 0)
@@ -164,7 +179,14 @@ Pl_Flate::handleData(unsigned char* data, size_t len, int flush)
 	    // Probably shouldn't be able to happen, but possible as a
 	    // boundary condition: if the last call to inflate exactly
 	    // filled the output buffer, it's possible that the next
-	    // call to inflate could have nothing to do.
+	    // call to inflate could have nothing to do. There are PDF
+	    // files in the wild that have this error (including at
+	    // least one in qpdf's test suite). In some cases, we want
+	    // to know about this, because it indicates incorrect
+	    // compression, so call a callback if provided.
+            this->warn(
+                "input stream is complete but output may still be valid",
+                err);
 	    done = true;
 	    break;
 
@@ -231,8 +253,15 @@ Pl_Flate::finish()
     }
     catch (std::exception& e)
     {
-        this->getNext()->finish();
-        throw e;
+        try
+        {
+            this->getNext()->finish();
+        }
+        catch (...)
+        {
+            // ignore secondary exception
+        }
+        throw std::runtime_error(e.what());
     }
     this->getNext()->finish();
 }

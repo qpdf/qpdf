@@ -503,6 +503,14 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline, bool* filterp,
             {
                 pipeline = decode_pipeline;
             }
+            Pl_Flate* flate = dynamic_cast<Pl_Flate*>(pipeline);
+            if (flate != nullptr)
+            {
+                flate->setWarnCallback([this](char const* msg, int code) {
+                    warn(QPDFExc(qpdf_e_damaged_pdf, qpdf->getFilename(),
+                                 "", this->offset, msg));
+                });
+            }
 	}
     }
 

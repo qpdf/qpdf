@@ -23,6 +23,7 @@
 #define PL_FLATE_HH
 
 #include <qpdf/Pipeline.hh>
+#include <functional>
 
 class Pl_Flate: public Pipeline
 {
@@ -52,9 +53,13 @@ class Pl_Flate: public Pipeline
     QPDF_DLL
     static void setCompressionLevel(int);
 
+    QPDF_DLL
+    void setWarnCallback(std::function<void(char const*, int)> callback);
+
   private:
     void handleData(unsigned char* data, size_t len, int flush);
     void checkError(char const* prefix, int error_code);
+    void warn(char const*, int error_code);
 
     class Members
     {
@@ -73,6 +78,7 @@ class Pl_Flate: public Pipeline
         action_e action;
         bool initialized;
         void* zdata;
+        std::function<void(char const*, int)> callback;
     };
 
     PointerHolder<Members> m;
