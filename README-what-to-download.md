@@ -18,7 +18,7 @@ Virtually all Linux distributions include packages for qpdf. There is also a PPA
 
 * `qpdf-<version>-x86_64.AppImage` - If you'd like to run the latest version of qpdf as an [AppImage](https://appimage.org/), you can download this. This is a self-contained executable that you make symlink `qpdf` to and run on most reasonably recent Linux distributions. See README-appimage.md in the qpdf source distribution for additional details, or run the AppImage with the `--ai-usage` argument to get help specific to the AppImage.
 
-* `qpdf-<version>-bin-linux-x86_64.zip` - This is a (nearly) stand-alone Linux binary, built using an Ubuntu LTS release. It contains the qpdf executables and shared libraries as well as dependent shared libraries that would not typically be present on a minimal system. This can be used to include qpdf in a minimal environment such as a docker container. It is also known to work as a layer in AWS Lambda and was initially created for that purpose.
+* `qpdf-<version>-bin-linux-x86_64.zip` - This is not intended to be an end-user distribution. It is a (nearly) stand-alone Linux binary, built using an Ubuntu LTS release. It contains the qpdf executables and shared libraries as well as dependent shared libraries that would not typically be present on a minimal system. This can be used to include qpdf in a minimal environment such as a docker container. It is also known to work as a layer in AWS Lambda and was initially created for that purpose.
 
 Windows Build Support
 

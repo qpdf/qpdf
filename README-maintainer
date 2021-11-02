@@ -314,6 +314,16 @@ done
 If needed, go onto github and make any manual updates such as
 indicating a pre-release, adding release notes, etc.
 
+Template for release notes:
+
+```
+This is qpdf version x.y.z. (Brief description)
+
+For a full list of changes from previous releases, please see the [release notes](http://qpdf.sourceforge.net/files/qpdf-manual.html#ref.release-notes). See also [README-what-to-download](./README-what-to-download.md) for details on the available source and binary distributions.
+```
+
+
+
 # Publish release
 gcurl -XPOST $url -d'{"draft": false}'
 
