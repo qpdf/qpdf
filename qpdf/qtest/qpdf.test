@@ -139,7 +139,7 @@ foreach my $c (@completion_tests)
 show_ntests();
 # ----------
 $td->notify("--- Argument Parsing ---");
-$n_tests += 6;
+$n_tests += 9;
 
 $td->runtest("required argument",
              {$td->COMMAND => "qpdf --password minimal.pdf"},
@@ -169,6 +169,21 @@ $td->runtest("missing underlay filename",
 $td->runtest("extra overlay filename",
              {$td->COMMAND => "qpdf --overlay x x --"},
              {$td->REGEXP => ".*overlay file already specified.*",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("multiple pages options",
+             {$td->COMMAND => "qpdf --pages . -- --pages . --"},
+             {$td->REGEXP => ".*--pages may only be specified one time.*",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("bad numeric range detects unclosed --pages",
+             {$td->COMMAND => "qpdf --pages . --pages . --"},
+             {$td->REGEXP => ".*--pages option must be terminated with --.*",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("bad file detected as unclosed --pages",
+             {$td->COMMAND => "qpdf --pages . 1 --xyz out"},
+             {$td->REGEXP => ".*--pages option must be terminated with --.*",
                   $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 

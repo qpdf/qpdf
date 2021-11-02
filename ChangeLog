@@ -1,3 +1,8 @@
+2021-11-02  Jay Berkenbilt  <ejb@ql.org>
+
+	* Improve error reporting when someone forgets the -- after
+	--pages. Fixes #555.
+
 2021-05-12  Jay Berkenbilt  <ejb@ql.org>
 
 	* Bug fix: ensure we don't overflow any string bounds while

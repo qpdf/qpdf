@@ -738,6 +738,21 @@ static void parse_object_id(std::string const& objspec,
     }
 }
 
+static bool file_exists(char const* filename)
+{
+    try
+    {
+        fclose(QUtil::safe_fopen(filename, "rb"));
+        return true;
+    }
+    catch (std::runtime_error&)
+    {
+        // can't open the file
+    }
+    return false;
+}
+
+
 // This is not a general-purpose argument parser. It is tightly
 // crafted to work with qpdf. qpdf's command-line syntax is very
 // complex because of its long history, and it doesn't really follow
@@ -2080,6 +2095,10 @@ void
 ArgParser::argPages()
 {
     ++cur_arg;
+    if (! o.page_specs.empty())
+    {
+        usage("the --pages may only be specified one time");
+    }
     o.page_specs = parsePagesOptions();
     if (o.page_specs.empty())
     {
@@ -2937,18 +2956,14 @@ ArgParser::handleArgFileArguments()
         char* argfile = 0;
         if ((strlen(argv[i]) > 1) && (argv[i][0] == '@'))
         {
-            try
+            argfile = 1 + argv[i];
+            if (strcmp(argfile, "-") != 0)
             {
-                argfile = 1 + argv[i];
-                if (strcmp(argfile, "-") != 0)
+                if (! file_exists(argfile))
                 {
-                    fclose(QUtil::safe_fopen(argfile, "rb"));
+                    // The file's not there; treating as regular option
+                    argfile = nullptr;
                 }
-            }
-            catch (std::runtime_error&)
-            {
-                // The file's not there; treating as regular option
-                argfile = 0;
             }
         }
         if (argfile)
@@ -3220,6 +3235,16 @@ ArgParser::parseNumrange(char const* range, int max, bool throw_error)
 std::vector<PageSpec>
 ArgParser::parsePagesOptions()
 {
+    auto check_unclosed = [this](char const* arg, int n) {
+        if ((strlen(arg) > 0) && (arg[0] == '-'))
+        {
+            // A common error is to forget to close --pages with --,
+            // so catch this as special case
+            QTC::TC("qpdf", "check unclosed --pages", n);
+            usage("the --pages option must be terminated with -- by itself");
+        }
+    };
+
     std::vector<PageSpec> result;
     while (1)
     {
@@ -3234,6 +3259,10 @@ ArgParser::parsePagesOptions()
         char const* file = argv[cur_arg++];
         char const* password = 0;
         char const* range = argv[cur_arg++];
+        if (! file_exists(file))
+        {
+            check_unclosed(file, 0);
+        }
         if (strncmp(range, "--password=", 11) == 0)
         {
             // Oh, that's the password, not the range
@@ -3263,23 +3292,20 @@ ArgParser::parsePagesOptions()
             catch (std::runtime_error& e1)
             {
                 // The range is invalid.  Let's see if it's a file.
-                try
+                range_omitted = true;
+                if (strcmp(range, ".") == 0)
                 {
-                    if (strcmp(range, ".") == 0)
-                    {
-                        // "." means the input file.
-                        QTC::TC("qpdf", "qpdf pages range omitted with .");
-                    }
-                    else
-                    {
-                        fclose(QUtil::safe_fopen(range, "rb"));
-                        QTC::TC("qpdf", "qpdf pages range omitted in middle");
-                        // Yup, it's a file.
-                    }
-                    range_omitted = true;
+                    // "." means the input file.
+                    QTC::TC("qpdf", "qpdf pages range omitted with .");
                 }
-                catch (std::runtime_error&)
+                else if (file_exists(range))
                 {
+                    QTC::TC("qpdf", "qpdf pages range omitted in middle");
+                    // Yup, it's a file.
+                }
+                else
+                {
+                    check_unclosed(range, 1);
                     // Give the range error
                     usage(e1.what());
                 }

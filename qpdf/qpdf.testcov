@@ -594,3 +594,4 @@ qpdf copy fields non-first from orig 0
 QPDF resolve duplicated page in insert 0
 QPDFWriter preserve object streams 1
 QPDFWriter exclude from object stream 0
+check unclosed --pages 1
