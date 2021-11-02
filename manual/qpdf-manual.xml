@@ -2943,7 +2943,12 @@ outfile.pdf</option>
         recover, after which other options are effectively operating
         on the recovered file. Combining <option>--check</option> with
         other options in this way can be useful for manually
-        recovering severely damaged files.
+        recovering severely damaged files. Note that
+        <option>--check</option> produces no output to standard output
+        when everything is valid, so if you are using this to
+        programmatically validate files in bulk, it is safe to run
+        without output redirected to <filename>/dev/null</filename>
+        and just check for a 0 exit code.
        </para>
       </listitem>
      </varlistentry>
