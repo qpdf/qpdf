@@ -1,12 +1,14 @@
 # QPDF
 
-[![QPDF](logo/qpdf.svg)](http://qpdf.sourceforge.net)
+[![QPDF](logo/qpdf.svg)](https://qpdf.sourceforge.io)
 
 [![QPDF Build](https://github.com/qpdf/qpdf/workflows/QPDF%20Build/badge.svg)](https://github.com/qpdf/qpdf/actions)
 [![Total lgtm alerts](https://img.shields.io/lgtm/alerts/g/qpdf/qpdf.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/qpdf/qpdf/alerts/)
 [![Language grade on lgtm: C/C++](https://img.shields.io/lgtm/grade/cpp/g/qpdf/qpdf.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/qpdf/qpdf/context:cpp)
 
-This is the QPDF package.  Information about it can be found at http://qpdf.sourceforge.net.  The source code repository is hosted at GitHub: https://github.com/qpdf/qpdf.
+This is the QPDF package. QPDF is a command-line tool and C++ library that performs content-preserving transformations on PDF files. It supports linearization, encryption, and numerous other features. It can also be used for splitting and merging files, creating PDF files (but you have to supply all the content yourself), and inspecting files for study or analysis. QPDF does not render PDFs or perform text extraction, and it does not contain higher-level interfaces for working with page contents. It is a low-level tool for working with the structure of PDF files and can be a valuable tool for anyone who wants to do programmatic or command-line-based manipulation of PDF files.
+
+Additional information about it can be found at https://qpdf.sourceforge.io.  The source code repository is hosted at GitHub: https://github.com/qpdf/qpdf.
 
 # Verifying Distributions
 

@@ -31,7 +31,7 @@
 			can't password-protect them, web-optimize them, or perform other transformations of that type.</p>
 	</description>
 	<x-launchable type="desktop-id">qpdf.desktop</x-launchable>
-	<url type="homepage">http://qpdf.sourceforge.net/</url>
+	<url type="homepage">https://qpdf.sourceforge.io/</url>
 	<url type="bugtracker">https://github.com/qpdf/qpdf/issues</url>
 	<screenshots>
 		<screenshot type="default">

@@ -8,7 +8,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 Versions of qpdf prior to version 7 were released under the terms of version 2.0 of the Artistic License. At your option, you may continue to consider qpdf to be licensed under those terms. Please see the manual for additional information.
 
-The qpdf distribution includes a copy of [qtest](http://qtest.qbilt.org), which is released under the terms of the [version 2.0 of the Artistic license](https://opensource.org/licenses/Artistic-2.0), which can be found at https://opensource.org/licenses/Artistic-2.0.
+The qpdf distribution includes a copy of [qtest](https://qtest.sourceforge.io), which is released under the terms of the [version 2.0 of the Artistic license](https://opensource.org/licenses/Artistic-2.0), which can be found at https://opensource.org/licenses/Artistic-2.0.
 
 The Rijndael encryption implementation used as the basis for AES encryption and decryption support comes from Philip J. Erdelsky's public domain implementation.  The files `libqpdf/rijndael.cc` and `libqpdf/qpdf/rijndael.h` remain in the public domain.  They were obtained from
 * http://www.efgh.com/software/rijndael.htm

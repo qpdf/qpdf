@@ -142,7 +142,7 @@ RELEASE PREPARATION
 * Run a spelling checker over the source code to catch errors in
   variable names, strings, and comments.
 
-  make spell
+  make spell CLEAN=1
 
   This uses cspell. Install with `npm install -g cspell`. The output
   of cspell is suitable for use with `M-x grep` in emacs. Add
