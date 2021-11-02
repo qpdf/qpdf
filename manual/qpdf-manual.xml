@@ -5066,6 +5066,57 @@ print "\n";
    </varlistentry>
 -->
    <varlistentry>
+    <term>10.4.0: Month dd, YYYY</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Bug Fixes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Fix potential bounds error when handling shell completion
+          that could occur when given bogus input.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        Library Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Make <function>QPDF::findPage</function> functions public.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          Add methods to <classname>Pl_Flate</classname> to be able to
+          receive warnings on certain recoverable conditions.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+      <listitem>
+       <para>
+        CLI Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Improve diagnostics around parsing <option>--pages</option>
+          command-line options
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
     <term>10.3.2: May 8, 2021</term>
     <listitem>
      <itemizedlist>
