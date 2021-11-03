@@ -5080,6 +5080,12 @@ print "\n";
           that could occur when given bogus input.
          </para>
         </listitem>
+        <listitem>
+         <para>
+          Properly handle overlay/underlay on completely empty pages
+          (with no resource dictionary).
+         </para>
+        </listitem>
        </itemizedlist>
       </listitem>
       <listitem>

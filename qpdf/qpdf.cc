@@ -5226,6 +5226,12 @@ static void do_under_overlay_for_page(
     std::string content;
     int min_suffix = 1;
     QPDFObjectHandle resources = dest_page.getAttribute("/Resources", true);
+    if (! resources.isDictionary())
+    {
+        QTC::TC("qpdf", "qpdf overlay page with no resources");
+        resources = QPDFObjectHandle::newDictionary();
+        dest_page.getObjectHandle().replaceKey("/Resources", resources);
+    }
     for (std::vector<int>::iterator iter = pagenos[pageno].begin();
          iter != pagenos[pageno].end(); ++iter)
     {
@@ -5257,7 +5263,11 @@ static void do_under_overlay_for_page(
         {
             resources.mergeResources(
                 QPDFObjectHandle::parse("<< /XObject << >> >>"));
-            resources.getKey("/XObject").replaceKey(name, fo[from_pageno]);
+            auto xobject = resources.getKey("/XObject");
+            if (xobject.isDictionary())
+            {
+                xobject.replaceKey(name, fo[from_pageno]);
+            }
             ++min_suffix;
             content += new_content;
         }

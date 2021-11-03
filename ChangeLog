@@ -1,3 +1,8 @@
+2021-11-03  Jay Berkenbilt  <ejb@ql.org>
+
+	* Bug fix: make overlay/underlay work on a page with no resource
+	dictionary. Fixes #527.
+
 2021-11-02  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add QPDF::findPage to the public API. This is primarily to help
