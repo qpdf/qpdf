@@ -81,8 +81,7 @@ Fuzz Errors
 * https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=<N>
 
 * Ignoring these:
-  * Timeout: 15471, 17630
-  * Out of memory: 15470, 32516 (contains 65322×64506 JPEG)
+  * Out of memory in dct: 35001, 32516
 
 GitHub Actions
 ==============
