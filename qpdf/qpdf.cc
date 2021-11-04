@@ -5705,7 +5705,9 @@ static QPDFObjectHandle added_page(QPDF& pdf, QPDFPageObjectHelper page)
     return added_page(pdf, page.getObjectHandle());
 }
 
-static void handle_page_specs(QPDF& pdf, Options& o, bool& warnings)
+static void handle_page_specs(
+    QPDF& pdf, Options& o, bool& warnings,
+    std::vector<PointerHolder<QPDF>>& page_heap)
 {
     // Parse all page specifications and translate them into lists of
     // actual pages.
@@ -5757,7 +5759,6 @@ static void handle_page_specs(QPDF& pdf, Options& o, bool& warnings)
     }
 
     // Create a QPDF object for each file that we may take pages from.
-    std::vector<PointerHolder<QPDF> > page_heap;
     std::map<std::string, QPDF*> page_spec_qpdfs;
     std::map<std::string, ClosedFileInputSource*> page_spec_cfis;
     page_spec_qpdfs[o.infilename] = &pdf;
@@ -6009,7 +6010,7 @@ static void handle_page_specs(QPDF& pdf, Options& o, bool& warnings)
                     pdf.warn(
                         QPDFExc(qpdf_e_damaged_pdf, pdf.getFilename(),
                                 "", 0, "Exception caught while fixing copied"
-                                " annotations. This may be a qpdf bug." +
+                                " annotations. This may be a qpdf bug. " +
                                 std::string("Exception: ") + e.what()));
                 }
             }
@@ -6649,9 +6650,10 @@ int realmain(int argc, char* argv[])
             }
         }
         bool other_warnings = false;
+        std::vector<PointerHolder<QPDF>> page_heap;
         if (! o.page_specs.empty())
         {
-            handle_page_specs(pdf, o, other_warnings);
+            handle_page_specs(pdf, o, other_warnings, page_heap);
         }
         if (! o.rotations.empty())
         {

@@ -5104,6 +5104,16 @@ print "\n";
           receive warnings on certain recoverable conditions.
          </para>
         </listitem>
+        <listitem>
+         <para>
+          Add an extra check to the library to detect when foreign
+          objects are inserted directly (instead of using
+          <function>QPDF::copyForeignObject</function>) at the time of
+          insertion rather than when the file is written. Catching the
+          error sooner makes it much easier to locate the incorrect
+          code.
+         </para>
+        </listitem>
        </itemizedlist>
       </listitem>
       <listitem>

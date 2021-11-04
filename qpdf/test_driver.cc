@@ -1274,6 +1274,18 @@ void runtest(int n, char const* filename1, char const* arg2)
         {
             std::cout << "logic error: " << e.what() << std::endl;
         }
+
+        // Detect adding a foreign object
+        auto root1 = pdf.getRoot();
+        auto root2 = other.getRoot();
+        try
+        {
+            root1.replaceKey("/Oops", root2);
+        }
+        catch (std::logic_error const& e)
+        {
+            std::cout << "logic error: " << e.what() << std::endl;
+        }
     }
     else if (n == 30)
     {

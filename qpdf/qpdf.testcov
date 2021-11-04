@@ -597,3 +597,4 @@ QPDFWriter exclude from object stream 0
 check unclosed --pages 1
 QPDF_pages findPage not found 0
 qpdf overlay page with no resources 0
+QPDFObjectHandle check ownership 0

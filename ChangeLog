@@ -1,3 +1,11 @@
+2021-11-04  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add an extra check to the library to detect when foreign objects
+	are inserted directly (instead of using
+	<function>QPDF::copyForeignObject</function>) at the time of
+	insertion rather than when the file is written. Catching the error
+	sooner makes it much easier to locate the incorrect code.
+
 2021-11-03  Jay Berkenbilt  <ejb@ql.org>
 
 	* Bug fix: make overlay/underlay work on a page with no resource

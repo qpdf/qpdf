@@ -1336,6 +1336,7 @@ class QPDFObjectHandle
     std::vector<QPDFObjectHandle> arrayOrStreamToStreamArray(
         std::string const& description, std::string& all_description);
     static void warn(QPDF*, QPDFExc const&);
+    void checkOwnership(QPDFObjectHandle const&) const;
 
     bool initialized;
 
