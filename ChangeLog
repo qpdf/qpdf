@@ -1,5 +1,9 @@
 2021-11-04  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add QIntC::range_check_substract to do range checking on
+	subtraction, which has different boundary conditions from
+	addition.
+
 	* Bug fix: fix crash that could occur under certain conditions
 	when using --pages with files that had form fields. Fixes #548.
 

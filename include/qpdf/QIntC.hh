@@ -250,6 +250,34 @@ namespace QIntC // QIntC = qpdf Integer Conversion
             throw std::range_error(msg.str());
         }
     }
+
+    template <typename T>
+    void range_check_substract(T const& cur, T const& delta)
+    {
+        if ((delta >= 0) == (cur >= 0))
+        {
+            return;
+        }
+
+        if ((delta > 0) &&
+            ((std::numeric_limits<T>::min() + delta) > cur))
+        {
+            std::ostringstream msg;
+            msg.imbue(std::locale::classic());
+            msg << "subtracting " << delta << " from " << cur
+                << " would cause an integer underflow";
+            throw std::range_error(msg.str());
+        }
+        else if ((delta < 0) &&
+            ((std::numeric_limits<T>::max() + delta) < cur))
+        {
+            std::ostringstream msg;
+            msg.imbue(std::locale::classic());
+            msg << "subtracting " << delta << " from " << cur
+                << " would cause an integer overflow";
+            throw std::range_error(msg.str());
+        }
+    }
 };
 
 #endif // QINTC_HH

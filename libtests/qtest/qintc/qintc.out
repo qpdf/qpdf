@@ -26,3 +26,12 @@ min_ll + 0LL: okay PASSED
 min_ll + -1LL: adding -1 to -9223372036854775808 would cause an integer underflow PASSED
 max_sc + max_sc: adding  to  would cause an integer overflow PASSED
 '!' + '#': okay PASSED
+1 - 2: okay PASSED
+-1 - -2: okay PASSED
+1 - 10: okay PASSED
+-1 - -10: okay PASSED
+0LL - min_ll: subtracting -9223372036854775808 from 0 would cause an integer overflow PASSED
+1LL - min_ll: subtracting -9223372036854775808 from 1 would cause an integer overflow PASSED
+0LL - max_ll: okay PASSED
+-1LL - max_ll: okay PASSED
+-2LL - max_ll: subtracting 9223372036854775807 from -2 would cause an integer underflow PASSED

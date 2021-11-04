@@ -48,6 +48,29 @@ static void try_range_check_real(
     std::cout << ((passed == exp_pass) ? " PASSED" : " FAILED") << std::endl;
 }
 
+#define try_range_check_subtract(exp_pass, a, b) \
+    try_range_check_subtract_real(#a " - " #b, exp_pass, a, b)
+
+template <typename T>
+static void try_range_check_subtract_real(
+    char const* description, bool exp_pass,
+    T const& a, T const& b)
+{
+    bool passed = false;
+    try
+    {
+        QIntC::range_check_substract(a, b);
+        std::cout << description << ": okay";
+        passed = true;
+    }
+    catch (std::range_error& e)
+    {
+        std::cout << description << ": " << e.what();
+        passed = false;
+    }
+    std::cout << ((passed == exp_pass) ? " PASSED" : " FAILED") << std::endl;
+}
+
 int main()
 {
     uint32_t u1 = 3141592653U;      // Too big for signed type
@@ -96,5 +119,14 @@ int main()
     try_range_check(false, min_ll, -1LL);
     try_range_check(false, max_sc, max_sc);
     try_range_check(true, '!', '#');
+    try_range_check_subtract(true, 1, 2);
+    try_range_check_subtract(true, -1, -2);
+    try_range_check_subtract(true, 1, 10);
+    try_range_check_subtract(true, -1, -10);
+    try_range_check_subtract(false, 0LL, min_ll);
+    try_range_check_subtract(false, 1LL, min_ll);
+    try_range_check_subtract(true, 0LL, max_ll);
+    try_range_check_subtract(true, -1LL, max_ll);
+    try_range_check_subtract(false, -2LL, max_ll);
     return 0;
 }
