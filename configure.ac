@@ -186,12 +186,12 @@ if test "$BUILD_INTERNAL_LIBS" = "0"; then
     if test "$PKG_CONFIG" != ""; then
        PKG_CHECK_MODULES([pc_zlib], [zlib],
          [CFLAGS="$CFLAGS $pc_zlib_CFLAGS"
-          CXXFLAGS="$CXXFLAGS $pc_zlib_CXXFLAGS"
+          CXXFLAGS="$CXXFLAGS $pc_zlib_CFLAGS $pc_zlib_CXXFLAGS"
           LIBS="$LIBS $pc_zlib_LIBS"
          ], [:])
        PKG_CHECK_MODULES([pc_libjpeg], [libjpeg],
          [CFLAGS="$CFLAGS $pc_libjpeg_CFLAGS"
-          CXXFLAGS="$CXXFLAGS $pc_libjpeg_CXXFLAGS"
+          CXXFLAGS="$CXXFLAGS $pc_libjpeg_CFLAGS $pc_libjpeg_CXXFLAGS"
           LIBS="$LIBS $pc_libjpeg_LIBS"
          ],[:])
     fi
@@ -677,7 +677,7 @@ fi
 
 if test "$USE_CRYPTO_OPENSSL" = "1"; then
   CFLAGS="$CFLAGS $pc_openssl_CFLAGS"
-  CXXFLAGS="$CXXFLAGS $pc_openssl_CXXFLAGS"
+  CXXFLAGS="$CXXFLAGS $pc_openssl_CFLAGS $pc_openssl_CXXFLAGS"
   LIBS="$LIBS $pc_openssl_LIBS"
   AC_DEFINE([USE_CRYPTO_OPENSSL], 1, [Whether to use the openssl crypto provider])
   DEFAULT_CRYPTO=openssl
@@ -724,7 +724,7 @@ fi
 
 if test "$USE_CRYPTO_GNUTLS" = "1"; then
   CFLAGS="$CFLAGS $pc_gnutls_CFLAGS"
-  CXXFLAGS="$CXXFLAGS $pc_gnutls_CXXFLAGS"
+  CXXFLAGS="$CXXFLAGS $pc_gnutls_CFLAGS $pc_gnutls_CXXFLAGS"
   LIBS="$LIBS $pc_gnutls_LIBS"
   AC_DEFINE([USE_CRYPTO_GNUTLS], 1, [Whether to use the gnutls crypto provider])
   DEFAULT_CRYPTO=gnutls

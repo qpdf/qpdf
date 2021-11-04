@@ -16830,7 +16830,7 @@ else
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	CFLAGS="$CFLAGS $pc_zlib_CFLAGS"
-          CXXFLAGS="$CXXFLAGS $pc_zlib_CXXFLAGS"
+          CXXFLAGS="$CXXFLAGS $pc_zlib_CFLAGS $pc_zlib_CXXFLAGS"
           LIBS="$LIBS $pc_zlib_LIBS"
 
 fi
@@ -16904,7 +16904,7 @@ else
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	CFLAGS="$CFLAGS $pc_libjpeg_CFLAGS"
-          CXXFLAGS="$CXXFLAGS $pc_libjpeg_CXXFLAGS"
+          CXXFLAGS="$CXXFLAGS $pc_libjpeg_CFLAGS $pc_libjpeg_CXXFLAGS"
           LIBS="$LIBS $pc_libjpeg_LIBS"
 
 fi
@@ -18183,7 +18183,7 @@ fi
 
 if test "$USE_CRYPTO_OPENSSL" = "1"; then
   CFLAGS="$CFLAGS $pc_openssl_CFLAGS"
-  CXXFLAGS="$CXXFLAGS $pc_openssl_CXXFLAGS"
+  CXXFLAGS="$CXXFLAGS $pc_openssl_CFLAGS $pc_openssl_CXXFLAGS"
   LIBS="$LIBS $pc_openssl_LIBS"
 
 $as_echo "#define USE_CRYPTO_OPENSSL 1" >>confdefs.h
@@ -18367,7 +18367,7 @@ fi
 
 if test "$USE_CRYPTO_GNUTLS" = "1"; then
   CFLAGS="$CFLAGS $pc_gnutls_CFLAGS"
-  CXXFLAGS="$CXXFLAGS $pc_gnutls_CXXFLAGS"
+  CXXFLAGS="$CXXFLAGS $pc_gnutls_CFLAGS $pc_gnutls_CXXFLAGS"
   LIBS="$LIBS $pc_gnutls_LIBS"
 
 $as_echo "#define USE_CRYPTO_GNUTLS 1" >>confdefs.h
