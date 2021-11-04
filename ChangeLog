@@ -1,5 +1,7 @@
 2021-11-04  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add range check in QPDFNumberTreeObjectHelper (fuzz issue 37740).
+
 	* Add QIntC::range_check_substract to do range checking on
 	subtraction, which has different boundary conditions from
 	addition.
