@@ -1,5 +1,20 @@
 2021-11-04  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add support for OpenSSL 3. Fixes #568.
+
+	The OpenSSL version is detected at compile-time. If you want to
+	build with OpenSSL 3 on a system that has OpenSSL 1 installed, you
+	can run configure like this (or similar to this depending on how
+	you installed openssl3):
+
+	pc_openssl_CFLAGS=-I/path/to/openssl3/include \
+	pc_openssl_LIBS='-L/path/to/openssl3/lib64 -lssl -lcrypto' \
+	./configure
+
+	where /path/to/openssl3 is wherever your OpenSSL 3 distribution is
+	installed. You may also need to set the LD_LIBRARY_PATH
+	environment variable if it's not installed in a standard location.
+
 	* Add range check in QPDFNumberTreeObjectHelper (fuzz issue 37740).
 
 	* Add QIntC::range_check_substract to do range checking on

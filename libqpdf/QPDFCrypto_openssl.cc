@@ -4,10 +4,19 @@
 #include <stdexcept>
 #include <string>
 
+#if (defined(__GNUC__) || defined(__clang__))
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
 #include <openssl/err.h>
+#ifndef QPDF_OPENSSL_1
+# include <openssl/provider.h>
+#endif
+#if (defined(__GNUC__) || defined(__clang__))
+# pragma GCC diagnostic pop
+#endif
 
 #include <qpdf/QIntC.hh>
-
 
 static void
 bad_bits(int bits)
@@ -33,8 +42,35 @@ check_openssl(int status)
 }
 
 QPDFCrypto_openssl::QPDFCrypto_openssl() :
-    md_ctx(EVP_MD_CTX_new()), cipher_ctx(EVP_CIPHER_CTX_new())
+#ifdef QPDF_OPENSSL_1
+    rc4(EVP_rc4()),
+#endif
+    md_ctx(EVP_MD_CTX_new()),
+    cipher_ctx(EVP_CIPHER_CTX_new())
 {
+#ifndef QPDF_OPENSSL_1
+    libctx = OSSL_LIB_CTX_new();
+    if (libctx == nullptr)
+    {
+        throw std::runtime_error("unable to create openssl library context");
+        return;
+    }
+    legacy = OSSL_PROVIDER_load(libctx, "legacy");
+    if (legacy == nullptr)
+    {
+        OSSL_LIB_CTX_free(libctx);
+        throw std::runtime_error("unable to load openssl legacy provider");
+        return;
+    }
+    rc4 = EVP_CIPHER_fetch(libctx, "RC4", nullptr);
+    if (rc4 == nullptr)
+    {
+        OSSL_PROVIDER_unload(legacy);
+        OSSL_LIB_CTX_free(libctx);
+        throw std::runtime_error("unable to load openssl rc4 algorithm");
+        return;
+    }
+#endif
     memset(md_out, 0, sizeof(md_out));
     EVP_MD_CTX_init(md_ctx);
     EVP_CIPHER_CTX_init(cipher_ctx);
@@ -45,6 +81,11 @@ QPDFCrypto_openssl::~QPDFCrypto_openssl()
     EVP_MD_CTX_reset(md_ctx);
     EVP_CIPHER_CTX_reset(cipher_ctx);
     EVP_CIPHER_CTX_free(cipher_ctx);
+#ifndef QPDF_OPENSSL_1
+    EVP_CIPHER_free(rc4);
+    OSSL_PROVIDER_unload(legacy);
+    OSSL_LIB_CTX_free(libctx);
+#endif
     EVP_MD_CTX_free(md_ctx);
 }
 
@@ -100,7 +141,12 @@ QPDFCrypto_openssl::SHA2_update(unsigned char const* data, size_t len)
 void
 QPDFCrypto_openssl::MD5_finalize()
 {
-    if (EVP_MD_CTX_md(md_ctx))
+#ifdef QPDF_OPENSSL_1
+    auto md = EVP_MD_CTX_md(md_ctx);
+#else
+    auto md = EVP_MD_CTX_get0_md(md_ctx);
+#endif
+    if (md)
     {
         check_openssl(EVP_DigestFinal(md_ctx, md_out + 0, nullptr));
     }
@@ -109,7 +155,12 @@ QPDFCrypto_openssl::MD5_finalize()
 void
 QPDFCrypto_openssl::SHA2_finalize()
 {
-    if (EVP_MD_CTX_md(md_ctx))
+#ifdef QPDF_OPENSSL_1
+    auto md = EVP_MD_CTX_md(md_ctx);
+#else
+    auto md = EVP_MD_CTX_get0_md(md_ctx);
+#endif
+    if (md)
     {
          check_openssl(EVP_DigestFinal(md_ctx, md_out + 0, nullptr));
     }
@@ -137,7 +188,7 @@ QPDFCrypto_openssl::RC4_init(unsigned char const* key_data, int key_len)
             strlen(reinterpret_cast<const char*>(key_data)));
     }
     check_openssl(
-        EVP_EncryptInit_ex(cipher_ctx, EVP_rc4(), nullptr, nullptr, nullptr));
+        EVP_EncryptInit_ex(cipher_ctx, rc4, nullptr, nullptr, nullptr));
     check_openssl(EVP_CIPHER_CTX_set_key_length(cipher_ctx, key_len));
     check_openssl(
         EVP_EncryptInit_ex(cipher_ctx, nullptr, nullptr, key_data, nullptr));

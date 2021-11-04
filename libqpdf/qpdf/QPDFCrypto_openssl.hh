@@ -3,12 +3,23 @@
 
 #include <qpdf/QPDFCryptoImpl.hh>
 #include <string>
+#if (defined(__GNUC__) || defined(__clang__))
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
+#include <openssl/opensslv.h>
+#if !defined(OPENSSL_VERSION_MAJOR) || OPENSSL_VERSION_MAJOR < 3
+# define QPDF_OPENSSL_1
+#endif
 #include <openssl/rand.h>
 #ifdef OPENSSL_IS_BORINGSSL
 #include <openssl/cipher.h>
 #include <openssl/digest.h>
 #else
 #include <openssl/evp.h>
+#endif
+#if (defined(__GNUC__) || defined(__clang__))
+# pragma GCC diagnostic pop
 #endif
 
 class QPDFCrypto_openssl: public QPDFCryptoImpl
@@ -44,6 +55,13 @@ class QPDFCrypto_openssl: public QPDFCryptoImpl
     void rijndael_finalize() override;
 
   private:
+#ifdef QPDF_OPENSSL_1
+    EVP_CIPHER const* rc4;
+#else
+    OSSL_LIB_CTX* libctx;
+    OSSL_PROVIDER* legacy;
+    EVP_CIPHER* rc4;
+#endif
     EVP_MD_CTX* const md_ctx;
     EVP_CIPHER_CTX* const cipher_ctx;
     uint8_t md_out[EVP_MAX_MD_SIZE];
