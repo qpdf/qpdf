@@ -1002,8 +1002,10 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
             }
             // Merge the other document's /DR, creating a conflict
             // map. mergeResources checks to make sure both objects
-            // are dictionaries.
-            from_dr.makeResourcesIndirect(*from_qpdf);
+            // are dictionaries. By this point, if this is foreign,
+            // from_dr has been copied, so we use the target qpdf as
+            // the owning qpdf.
+            from_dr.makeResourcesIndirect(this->qpdf);
             dr.mergeResources(from_dr, &dr_map);
 
             if (from_afdh->getNeedAppearances())

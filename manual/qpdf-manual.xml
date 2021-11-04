@@ -5086,6 +5086,13 @@ print "\n";
           (with no resource dictionary).
          </para>
         </listitem>
+        <listitem>
+         <para>
+          Fix crash that could occur under certain conditions when
+          using <option>--pages</option> with files that had form
+          fields.
+         </para>
+        </listitem>
        </itemizedlist>
       </listitem>
       <listitem>

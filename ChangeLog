@@ -1,5 +1,8 @@
 2021-11-04  Jay Berkenbilt  <ejb@ql.org>
 
+	* Bug fix: fix crash that could occur under certain conditions
+	when using --pages with files that had form fields. Fixes #548.
+
 	* Add an extra check to the library to detect when foreign objects
 	are inserted directly (instead of using
 	<function>QPDF::copyForeignObject</function>) at the time of

@@ -1025,7 +1025,7 @@ my @bug_tests = (
     ["335a", "ozz-fuzz-12152", 2],
     ["335b", "ozz-fuzz-14845", 2],
     ["fuzz-16214", "stream in object stream", 3, "--preserve-unreferenced"],
-    # When adding to this list, consider adding to SEED_CORPUS_FILES
+    # When adding to this list, consider adding to CORPUS_FROM_TEST
     # in fuzz/build.mk and updating the count in fuzz/qtest/fuzz.test.
     );
 $n_tests += scalar(@bug_tests);
@@ -3517,7 +3517,7 @@ for (my $n = 16; $n <= 19; ++$n)
 show_ntests();
 # ----------
 $td->notify("--- Specific File Tests ---");
-$n_tests += 9;
+$n_tests += 11;
 
 # Special PDF files that caused problems at some point
 
@@ -3556,6 +3556,15 @@ $td->runtest("pages points to page",
 $td->runtest("check output",
 	     {$td->FILE => "a.pdf"},
 	     {$td->FILE => "pages-is-page-out.pdf"});
+$td->runtest("Acroform /DR with indirect subkey",
+             {$td->COMMAND =>
+                  "qpdf --static-id --empty" .
+                  " --pages dr-with-indirect-item.pdf -- a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "dr-with-indirect-item-out.pdf"});
 
 show_ntests();
 # ----------
