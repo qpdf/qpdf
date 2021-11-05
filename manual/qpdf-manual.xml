@@ -1700,7 +1700,7 @@ make
     <filename>file1.pdf</filename> and pages 11&ndash;15 from
     <filename>file2.pdf</filename> in reverse, you would run
 
-    <programlisting><command>qpdf</command> <option>file1.pdf --pages file1.pdf 1-5 . 15-11 -- outfile.pdf</option>
+    <programlisting><command>qpdf</command> <option>file2.pdf --pages file1.pdf 1-5 . 15-11 -- outfile.pdf</option>
 </programlisting>
     If, for some reason, you wanted to take the first page of an
     encrypted file called <filename>encrypted.pdf</filename> with
