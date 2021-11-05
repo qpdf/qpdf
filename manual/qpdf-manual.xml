@@ -5137,6 +5137,19 @@ print "\n";
         </listitem>
        </itemizedlist>
       </listitem>
+      <listitem>
+       <para>
+        Packaging Changes
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          The Windows binary distribution is now built with crypto
+          provided by OpenSSL 3.0.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
      </itemizedlist>
     </listitem>
    </varlistentry>
