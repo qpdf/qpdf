@@ -802,4 +802,515 @@ WARNING: issue-335a.pdf (trailer, offset 3589): unexpected )
 WARNING: issue-335a.pdf (trailer, offset 3602): unknown token while reading object; treating as string
 WARNING: issue-335a.pdf (trailer, offset 3610): unknown token while reading object; treating as string
 WARNING: issue-335a.pdf (trailer, offset 3610): too many errors; giving up on reading object
-issue-335a.pdf: unable to find trailer dictionary while recovering damaged file
+WARNING: issue-335a.pdf (trailer, offset 16485): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16528): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16529): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 16530): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16545): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 16546): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16546): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 16498): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16513): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 16528): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16529): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 16530): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16545): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 16545): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 16511): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16512): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 16513): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 16528): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16529): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 16530): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16530): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 16526): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16527): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 16528): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16529): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 16530): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16545): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 16545): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 16543): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16544): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 16545): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 16546): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16547): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 16548): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16548): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 16561): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16562): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 16563): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 16763): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 16764): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16766): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 16766): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 16575): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16599): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16613): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16614): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 16615): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16739): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 16763): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 16763): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 16674): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16717): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16718): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 16719): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16734): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 16739): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 16739): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 16687): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16702): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 16717): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16718): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 16719): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16734): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 16734): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 16700): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16701): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 16702): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 16717): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16718): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 16719): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16719): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 16715): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16716): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 16717): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16718): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 16719): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16734): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 16734): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 16732): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16733): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 16734): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 16739): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 16763): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 16764): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16764): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 16752): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16761): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16762): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 16763): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 16764): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16766): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 16766): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 16779): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16782): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16793): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 19808): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 19810): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 19872): name with stray # will not work with PDF >= 1.2
+WARNING: issue-335a.pdf (trailer, offset 19875): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 19875): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 16793): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 19808): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 19810): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 19872): name with stray # will not work with PDF >= 1.2
+WARNING: issue-335a.pdf (trailer, offset 19875): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 19876): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 19956): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 19956): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 16806): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16821): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 19808): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 19810): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 19872): name with stray # will not work with PDF >= 1.2
+WARNING: issue-335a.pdf (trailer, offset 19875): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 19876): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 19876): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 16819): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 16820): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 16821): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 19808): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 19810): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 19872): name with stray # will not work with PDF >= 1.2
+WARNING: issue-335a.pdf (trailer, offset 19875): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 19875): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 19837): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 19838): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 19871): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 19872): name with stray # will not work with PDF >= 1.2
+WARNING: issue-335a.pdf (trailer, offset 19875): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 19876): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 19956): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 19956): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 19852): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 19869): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 19870): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 19871): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 19872): name with stray # will not work with PDF >= 1.2
+WARNING: issue-335a.pdf (trailer, offset 19875): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 19876): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 19876): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 19867): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 19868): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 19869): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 19870): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 19871): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 19872): name with stray # will not work with PDF >= 1.2
+WARNING: issue-335a.pdf (trailer, offset 19875): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 19875): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 19890): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 19906): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 19956): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 19959): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 19968): invalid character (t) in hexstring
+WARNING: issue-335a.pdf (trailer, offset 19971): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 19971): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 19904): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 19905): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 19906): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 19956): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 19959): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 19968): invalid character (t) in hexstring
+WARNING: issue-335a.pdf (trailer, offset 19968): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 19920): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 19954): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 19956): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 19959): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 19968): invalid character (t) in hexstring
+WARNING: issue-335a.pdf (trailer, offset 19971): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 19971): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 19968): invalid character (t) in hexstring
+WARNING: issue-335a.pdf (trailer, offset 19971): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20092): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20103): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20110): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20114): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20114): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 20164): unexpected >
+WARNING: issue-335a.pdf (trailer, offset 20170): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20173): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20186): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20189): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20219): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20219): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 20230): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20232): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 20233): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 20234): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20236): invalid character ({) in hexstring
+WARNING: issue-335a.pdf (trailer, offset 20238): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 20238): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 20424): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20431): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20446): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20601): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 20602): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20604): invalid character ({) in hexstring
+WARNING: issue-335a.pdf (trailer, offset 20604): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 20446): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20601): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 20602): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20604): invalid character ({) in hexstring
+WARNING: issue-335a.pdf (trailer, offset 20606): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 20607): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 20607): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 20598): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20600): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 20601): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 20602): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20604): invalid character ({) in hexstring
+WARNING: issue-335a.pdf (trailer, offset 20606): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 20606): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 20684): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20683): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-335a.pdf (trailer, offset 20748): stream keyword followed by extraneous whitespace
+WARNING: issue-335a.pdf (trailer, offset 20679): stream dictionary lacks /Length key
+WARNING: issue-335a.pdf (trailer, offset 20749): attempting to recover stream length
+WARNING: issue-335a.pdf (trailer, offset 20749): unable to recover stream data; treating stream as empty
+WARNING: issue-335a.pdf (trailer, offset 20756): /Length key in stream dictionary is not an integer
+WARNING: issue-335a.pdf (trailer, offset 20787): attempting to recover stream length
+WARNING: issue-335a.pdf (trailer, offset 20787): unable to recover stream data; treating stream as empty
+WARNING: issue-335a.pdf (trailer, offset 20812): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20803): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-335a.pdf (trailer, offset 20803): dictionary has duplicated key /Length; last occurrence overrides earlier ones
+WARNING: issue-335a.pdf (trailer, offset 20843): stream keyword followed by extraneous whitespace
+WARNING: issue-335a.pdf (trailer, offset 20800): /Length key in stream dictionary is not an integer
+WARNING: issue-335a.pdf (trailer, offset 20844): attempting to recover stream length
+WARNING: issue-335a.pdf (trailer, offset 20844): unable to recover stream data; treating stream as empty
+WARNING: issue-335a.pdf (trailer, offset 20851): /Length key in stream dictionary is not an integer
+WARNING: issue-335a.pdf (trailer, offset 20882): attempting to recover stream length
+WARNING: issue-335a.pdf (trailer, offset 20882): unable to recover stream data; treating stream as empty
+WARNING: issue-335a.pdf (trailer, offset 20914): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20898): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-335a.pdf (trailer, offset 20895): /Length key in stream dictionary is not an integer
+WARNING: issue-335a.pdf (trailer, offset 20929): attempting to recover stream length
+WARNING: issue-335a.pdf (trailer, offset 20929): unable to recover stream data; treating stream as empty
+WARNING: issue-335a.pdf (trailer, offset 20949): unexpected >
+WARNING: issue-335a.pdf (trailer, offset 20957): unexpected >
+WARNING: issue-335a.pdf (trailer, offset 20958): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20960): unexpected >
+WARNING: issue-335a.pdf (trailer, offset 20961): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 20972): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 20973): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 20973): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 21042): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21026): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-335a.pdf (trailer, offset 21023): /Length key in stream dictionary is not an integer
+WARNING: issue-335a.pdf (trailer, offset 21057): attempting to recover stream length
+WARNING: issue-335a.pdf (trailer, offset 21057): unable to recover stream data; treating stream as empty
+WARNING: issue-335a.pdf (trailer, offset 21077): unexpected >
+WARNING: issue-335a.pdf (trailer, offset 21085): unexpected >
+WARNING: issue-335a.pdf (trailer, offset 21086): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21088): unexpected >
+WARNING: issue-335a.pdf (trailer, offset 21089): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21100): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 21101): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 21101): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 21118): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21158): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 21202): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21205): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 21207): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21212): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21212): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 21132): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21138): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21156): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21157): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 21158): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 21202): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21202): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 21154): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 21155): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 21156): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21157): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 21158): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 21202): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21202): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 21172): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21199): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21201): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 21202): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21205): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 21207): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21207): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 21228): treating unexpected brace token as null
+WARNING: issue-335a.pdf (trailer, offset 21229): unexpected )
+WARNING: issue-335a.pdf (trailer, offset 21230): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21262): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21267): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21277): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21277): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 21277): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21287): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21389): unexpected dictionary close token
+WARNING: issue-335a.pdf (trailer, offset 21392): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21400): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21430): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21438): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21441): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21444): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21452): invalid character (-) in hexstring
+WARNING: issue-335a.pdf (trailer, offset 21819): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21819): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 21287): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21389): unexpected dictionary close token
+WARNING: issue-335a.pdf (trailer, offset 21392): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21400): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21430): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21438): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21441): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21444): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21452): invalid character (-) in hexstring
+WARNING: issue-335a.pdf (trailer, offset 21819): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21819): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 21407): /Length key in stream dictionary is not an integer
+WARNING: issue-335a.pdf (trailer, offset 21438): attempting to recover stream length
+WARNING: issue-335a.pdf (trailer, offset 21438): unable to recover stream data; treating stream as empty
+WARNING: issue-335a.pdf (trailer, offset 21452): invalid character (-) in hexstring
+WARNING: issue-335a.pdf (trailer, offset 21837): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21850): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-335a.pdf (trailer, offset 21892): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21900): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21903): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21906): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21918): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21925): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21925): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 21918): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21925): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21937): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21962): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21991): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22000): invalid character (t) in hexstring
+WARNING: issue-335a.pdf (trailer, offset 22003): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22028): unexpected >
+WARNING: issue-335a.pdf (trailer, offset 22030): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22038): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21936): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-335a.pdf (trailer, offset 21936): expected dictionary key but found non-name object; inserting key /QPDFFake2
+WARNING: issue-335a.pdf (trailer, offset 21936): expected dictionary key but found non-name object; inserting key /QPDFFake3
+WARNING: issue-335a.pdf (trailer, offset 21936): expected dictionary key but found non-name object; inserting key /QPDFFake4
+WARNING: issue-335a.pdf (trailer, offset 21936): expected dictionary key but found non-name object; inserting key /QPDFFake5
+WARNING: issue-335a.pdf (trailer, offset 21936): expected dictionary key but found non-name object; inserting key /QPDFFake6
+WARNING: issue-335a.pdf (trailer, offset 21936): dictionary has duplicated key /Length; last occurrence overrides earlier ones
+WARNING: issue-335a.pdf (trailer, offset 21936): expected dictionary key but found non-name object; inserting key /QPDFFake7
+WARNING: issue-335a.pdf (trailer, offset 21936): expected dictionary key but found non-name object; inserting key /QPDFFake8
+WARNING: issue-335a.pdf (trailer, offset 21936): expected dictionary key but found non-name object; inserting key /QPDFFake9
+WARNING: issue-335a.pdf (trailer, offset 22044): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22052): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22064): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22064): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 21937): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21962): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21991): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22000): invalid character (t) in hexstring
+WARNING: issue-335a.pdf (trailer, offset 22003): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22028): unexpected >
+WARNING: issue-335a.pdf (trailer, offset 22030): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22038): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 21936): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-335a.pdf (trailer, offset 21936): expected dictionary key but found non-name object; inserting key /QPDFFake2
+WARNING: issue-335a.pdf (trailer, offset 21936): expected dictionary key but found non-name object; inserting key /QPDFFake3
+WARNING: issue-335a.pdf (trailer, offset 21936): expected dictionary key but found non-name object; inserting key /QPDFFake4
+WARNING: issue-335a.pdf (trailer, offset 21936): expected dictionary key but found non-name object; inserting key /QPDFFake5
+WARNING: issue-335a.pdf (trailer, offset 21936): expected dictionary key but found non-name object; inserting key /QPDFFake6
+WARNING: issue-335a.pdf (trailer, offset 21936): dictionary has duplicated key /Length; last occurrence overrides earlier ones
+WARNING: issue-335a.pdf (trailer, offset 21936): expected dictionary key but found non-name object; inserting key /QPDFFake7
+WARNING: issue-335a.pdf (trailer, offset 21936): expected dictionary key but found non-name object; inserting key /QPDFFake8
+WARNING: issue-335a.pdf (trailer, offset 21936): expected dictionary key but found non-name object; inserting key /QPDFFake9
+WARNING: issue-335a.pdf (trailer, offset 21932): /Length key in stream dictionary is not an integer
+WARNING: issue-335a.pdf (trailer, offset 22052): attempting to recover stream length
+WARNING: issue-335a.pdf (trailer, offset 22052): unable to recover stream data; treating stream as empty
+WARNING: issue-335a.pdf (trailer, offset 22000): invalid character (t) in hexstring
+WARNING: issue-335a.pdf (trailer, offset 22088): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22087): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-335a.pdf (trailer, offset 22083): /Length key in stream dictionary is not an integer
+WARNING: issue-335a.pdf (trailer, offset 22136): attempting to recover stream length
+WARNING: issue-335a.pdf (trailer, offset 22136): unable to recover stream data; treating stream as empty
+WARNING: issue-335a.pdf (trailer, offset 22178): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22190): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22202): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22218): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22201): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-335a.pdf (trailer, offset 22201): expected dictionary key but found non-name object; inserting key /QPDFFake2
+WARNING: issue-335a.pdf (trailer, offset 22230): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22238): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22177): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-335a.pdf (trailer, offset 22177): expected dictionary key but found non-name object; inserting key /QPDFFake2
+WARNING: issue-335a.pdf (trailer, offset 22177): expected dictionary key but found non-name object; inserting key /QPDFFake3
+WARNING: issue-335a.pdf (trailer, offset 22177): expected dictionary key but found non-name object; inserting key /QPDFFake4
+WARNING: issue-335a.pdf (trailer, offset 22177): expected dictionary key but found non-name object; inserting key /QPDFFake5
+WARNING: issue-335a.pdf (trailer, offset 22276): stream keyword followed by carriage return only
+WARNING: issue-335a.pdf (trailer, offset 22173): /Length key in stream dictionary is not an integer
+WARNING: issue-335a.pdf (trailer, offset 22276): attempting to recover stream length
+WARNING: issue-335a.pdf (trailer, offset 22276): unable to recover stream data; treating stream as empty
+WARNING: issue-335a.pdf (trailer, offset 22202): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22218): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22201): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-335a.pdf (trailer, offset 22201): expected dictionary key but found non-name object; inserting key /QPDFFake2
+WARNING: issue-335a.pdf (trailer, offset 22197): stream dictionary lacks /Length key
+WARNING: issue-335a.pdf (trailer, offset 22238): attempting to recover stream length
+WARNING: issue-335a.pdf (trailer, offset 22238): unable to recover stream data; treating stream as empty
+WARNING: issue-335a.pdf (trailer, offset 22327): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22336): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22338): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22355): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22360): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22326): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-335a.pdf (trailer, offset 22326): expected dictionary key but found non-name object; inserting key /QPDFFake2
+WARNING: issue-335a.pdf (trailer, offset 22326): expected dictionary key but found non-name object; inserting key /QPDFFake3
+WARNING: issue-335a.pdf (trailer, offset 22326): expected dictionary key but found non-name object; inserting key /QPDFFake4
+WARNING: issue-335a.pdf (trailer, offset 22326): expected dictionary key but found non-name object; inserting key /QPDFFake5
+WARNING: issue-335a.pdf (trailer, offset 22322): /Length key in stream dictionary is not an integer
+WARNING: issue-335a.pdf (trailer, offset 22373): attempting to recover stream length
+WARNING: issue-335a.pdf (trailer, offset 22373): unable to recover stream data; treating stream as empty
+WARNING: issue-335a.pdf (trailer, offset 22437): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22436): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-335a.pdf (trailer, offset 22432): /Length key in stream dictionary is not an integer
+WARNING: issue-335a.pdf (trailer, offset 22484): attempting to recover stream length
+WARNING: issue-335a.pdf (trailer, offset 22484): unable to recover stream data; treating stream as empty
+WARNING: issue-335a.pdf (trailer, offset 22650): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22656): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22675): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22687): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22690): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22702): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22701): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-335a.pdf (trailer, offset 22740): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22748): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22761): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22791): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22794): unexpected >
+WARNING: issue-335a.pdf (trailer, offset 22796): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22804): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22686): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-335a.pdf (trailer, offset 22686): expected dictionary key but found non-name object; inserting key /QPDFFake2
+WARNING: issue-335a.pdf (trailer, offset 22686): expected dictionary key but found non-name object; inserting key /QPDFFake3
+WARNING: issue-335a.pdf (trailer, offset 22686): expected dictionary key but found non-name object; inserting key /QPDFFake4
+WARNING: issue-335a.pdf (trailer, offset 22686): expected dictionary key but found non-name object; inserting key /QPDFFake5
+WARNING: issue-335a.pdf (trailer, offset 22686): expected dictionary key but found non-name object; inserting key /QPDFFake6
+WARNING: issue-335a.pdf (trailer, offset 22686): expected dictionary key but found non-name object; inserting key /QPDFFake7
+WARNING: issue-335a.pdf (trailer, offset 22686): expected dictionary key but found non-name object; inserting key /QPDFFake8
+WARNING: issue-335a.pdf (trailer, offset 22686): expected dictionary key but found non-name object; inserting key /QPDFFake9
+WARNING: issue-335a.pdf (trailer, offset 22686): expected dictionary key but found non-name object; inserting key /QPDFFake10
+WARNING: issue-335a.pdf (trailer, offset 22686): expected dictionary key but found non-name object; inserting key /QPDFFake11
+WARNING: issue-335a.pdf (trailer, offset 22810): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22817): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22817): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 22687): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22690): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22702): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22701): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-335a.pdf (trailer, offset 22740): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22748): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22761): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22791): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22794): unexpected >
+WARNING: issue-335a.pdf (trailer, offset 22796): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22804): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22686): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-335a.pdf (trailer, offset 22686): expected dictionary key but found non-name object; inserting key /QPDFFake2
+WARNING: issue-335a.pdf (trailer, offset 22686): expected dictionary key but found non-name object; inserting key /QPDFFake3
+WARNING: issue-335a.pdf (trailer, offset 22686): expected dictionary key but found non-name object; inserting key /QPDFFake4
+WARNING: issue-335a.pdf (trailer, offset 22686): expected dictionary key but found non-name object; inserting key /QPDFFake5
+WARNING: issue-335a.pdf (trailer, offset 22686): expected dictionary key but found non-name object; inserting key /QPDFFake6
+WARNING: issue-335a.pdf (trailer, offset 22686): expected dictionary key but found non-name object; inserting key /QPDFFake7
+WARNING: issue-335a.pdf (trailer, offset 22686): expected dictionary key but found non-name object; inserting key /QPDFFake8
+WARNING: issue-335a.pdf (trailer, offset 22686): expected dictionary key but found non-name object; inserting key /QPDFFake9
+WARNING: issue-335a.pdf (trailer, offset 22686): expected dictionary key but found non-name object; inserting key /QPDFFake10
+WARNING: issue-335a.pdf (trailer, offset 22686): expected dictionary key but found non-name object; inserting key /QPDFFake11
+WARNING: issue-335a.pdf (trailer, offset 22817): stream keyword followed by carriage return only
+WARNING: issue-335a.pdf (trailer, offset 22682): stream dictionary lacks /Length key
+WARNING: issue-335a.pdf (trailer, offset 22817): attempting to recover stream length
+WARNING: issue-335a.pdf (trailer, offset 22817): unable to recover stream data; treating stream as empty
+WARNING: issue-335a.pdf (trailer, offset 22702): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22701): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-335a.pdf (trailer, offset 22697): /Length key in stream dictionary is not an integer
+WARNING: issue-335a.pdf (trailer, offset 22748): attempting to recover stream length
+WARNING: issue-335a.pdf (trailer, offset 22748): unable to recover stream data; treating stream as empty
+WARNING: issue-335a.pdf (trailer, offset 22845): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22869): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 22844): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-335a.pdf (trailer, offset 22844): expected dictionary key but found non-name object; inserting key /QPDFFake2
+WARNING: issue-335a.pdf (trailer, offset 22844): expected dictionary key but found non-name object; inserting key /QPDFFake3
+WARNING: issue-335a.pdf (trailer, offset 22898): expected endstream
+WARNING: issue-335a.pdf (trailer, offset 22882): attempting to recover stream length
+WARNING: issue-335a.pdf (trailer, offset 22882): unable to recover stream data; treating stream as empty
+WARNING: issue-335a.pdf (trailer, offset 23098): invalid character (t) in hexstring
+WARNING: issue-335a.pdf (trailer, offset 23101): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 23108): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 23130): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 23147): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 23155): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 23155): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 23108): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 23130): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 23147): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 23155): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 23196): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 23324): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (trailer, offset 23324): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 23411): dictionary ended prematurely; using null as value for last key
+WARNING: issue-335a.pdf (object 5 0, offset 23451): invalid character (ÿ) in hexstring
+WARNING: issue-335a.pdf (object 5 0, offset 23458): unknown token while reading object; treating as string
+WARNING: issue-335a.pdf (object 5 0, offset 23444): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: issue-335a.pdf (object 5 0, offset 23444): expected dictionary key but found non-name object; inserting key /QPDFFake2
+WARNING: issue-335a.pdf (object 5 0, offset 23440): /Length key in stream dictionary is not an integer
+WARNING: issue-335a.pdf (object 5 0, offset 23485): attempting to recover stream length
+WARNING: issue-335a.pdf (object 5 0, offset 23485): unable to recover stream data; treating stream as empty
+WARNING: issue-335a.pdf (object 5 0, offset 24974): expected endobj
+WARNING: issue-335a.pdf (object 5 0, offset 24974): EOF after endobj
+issue-335a.pdf (offset 24974): unable to find /Root dictionary

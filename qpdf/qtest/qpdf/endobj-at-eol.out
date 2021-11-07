@@ -1,0 +1,4 @@
+WARNING: endobj-at-eol.pdf: file is damaged
+WARNING: endobj-at-eol.pdf (offset 523): xref not found
+WARNING: endobj-at-eol.pdf: Attempting to reconstruct cross-reference table
+qpdf: operation succeeded with warnings; resulting file may have some problems

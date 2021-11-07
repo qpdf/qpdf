@@ -1,3 +1,9 @@
+2021-11-07  Jay Berkenbilt  <ejb@ql.org>
+
+	* Relax xref recovery logic a bit so that files whose objects are
+	either missing endobj or have endobj at other than the beginning
+	of a line can still be recovered. Fixes #573.
+
 2021-11-04  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add support for OpenSSL 3. Fixes #568.

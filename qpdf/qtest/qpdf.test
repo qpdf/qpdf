@@ -3193,7 +3193,7 @@ $td->runtest("integer type checks",
 show_ntests();
 # ----------
 $td->notify("--- Recovery Tests ---");
-$n_tests += @badfiles + 9;
+$n_tests += @badfiles + 11;
 
 # Recovery tests.  These are mostly after-the-fact -- when recovery
 # was implemented, some degree of recovery was possible on many of the
@@ -3268,10 +3268,19 @@ $td->runtest("xref loop with append",
              {$td->FILE => "append-xref-loop.out",
               $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
-
 $td->runtest("check output",
 	     {$td->FILE => "a.pdf"},
 	     {$td->FILE => "append-xref-loop-fixed.pdf"});
+
+$td->runtest("endobj not at newline",
+             {$td->COMMAND =>
+                  "qpdf --deterministic-id endobj-at-eol.pdf a.pdf"},
+             {$td->FILE => "endobj-at-eol.out",
+              $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "endobj-at-eol-fixed.pdf"});
 
 show_ntests();
 # ----------

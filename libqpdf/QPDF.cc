@@ -590,7 +590,6 @@ QPDF::reconstruct_xref(QPDFExc& e)
     this->m->file->seek(0, SEEK_END);
     qpdf_offset_t eof = this->m->file->tell();
     this->m->file->seek(0, SEEK_SET);
-    bool in_obj = false;
     qpdf_offset_t line_start = 0;
     // Don't allow very long tokens here during recovery.
     static size_t const MAX_LEN = 100;
@@ -604,46 +603,36 @@ QPDF::reconstruct_xref(QPDFExc& e)
             this->m->file->tell() - toO(t1.getValue().length());
         if (token_start >= next_line_start)
         {
-            // don't process yet
+            // don't process yet -- wait until we get to the line
+            // containing this token
         }
-	else if (in_obj)
-	{
-            if (t1 == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "endobj"))
-	    {
-		in_obj = false;
-	    }
-	}
-        else
+	else if (t1.getType() == QPDFTokenizer::tt_integer)
         {
-            if (t1.getType() == QPDFTokenizer::tt_integer)
+            QPDFTokenizer::Token t2 =
+                readToken(this->m->file, MAX_LEN);
+            QPDFTokenizer::Token t3 =
+                readToken(this->m->file, MAX_LEN);
+            if ((t2.getType() == QPDFTokenizer::tt_integer) &&
+                (t3 == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "obj")))
             {
-                QPDFTokenizer::Token t2 =
-                    readToken(this->m->file, MAX_LEN);
-                QPDFTokenizer::Token t3 =
-                    readToken(this->m->file, MAX_LEN);
-                if ((t2.getType() == QPDFTokenizer::tt_integer) &&
-                    (t3 == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "obj")))
-                {
-                    in_obj = true;
-                    int obj = QUtil::string_to_int(t1.getValue().c_str());
-                    int gen = QUtil::string_to_int(t2.getValue().c_str());
-                    insertXrefEntry(obj, 1, token_start, gen, true);
-                }
+                int obj = QUtil::string_to_int(t1.getValue().c_str());
+                int gen = QUtil::string_to_int(t2.getValue().c_str());
+                insertXrefEntry(obj, 1, token_start, gen, true);
             }
-            else if ((! this->m->trailer.isInitialized()) &&
-                     (t1 == QPDFTokenizer::Token(
-                         QPDFTokenizer::tt_word, "trailer")))
-            {
-                QPDFObjectHandle t =
+        }
+        else if ((! this->m->trailer.isInitialized()) &&
+                 (t1 == QPDFTokenizer::Token(
+                     QPDFTokenizer::tt_word, "trailer")))
+        {
+            QPDFObjectHandle t =
                     readObject(this->m->file, "trailer", 0, 0, false);
-                if (! t.isDictionary())
-                {
-                    // Oh well.  It was worth a try.
-                }
-                else
-                {
-                    setTrailer(t);
-                }
+            if (! t.isDictionary())
+            {
+                // Oh well.  It was worth a try.
+            }
+            else
+            {
+                setTrailer(t);
             }
 	}
         this->m->file->seek(next_line_start, SEEK_SET);
