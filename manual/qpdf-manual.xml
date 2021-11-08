@@ -1017,7 +1017,7 @@ make
         command <command>qpdf in.pdf out.pdf --rotate=+90:2,4,6
         --rotate=180:7-8</command> would rotate pages 2, 4, and 6 90
         degrees clockwise from their original rotation and force the
-        rotation of pages 7 through 9 to 180 degrees regardless of
+        rotation of pages 7 through 8 to 180 degrees regardless of
         their original rotation, and the command <command>qpdf in.pdf
         out.pdf --rotate=+180</command> would rotate all pages by 180
         degrees.
