@@ -702,10 +702,20 @@ void qpdf_set_r3_encryption_parameters(
     QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
     qpdf_r3_print_e print, qpdf_r3_modify_e modify)
 {
+#ifdef _MSC_VER
+# pragma warning (disable: 4996)
+#endif
+#if (defined(__GNUC__) || defined(__clang__))
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     qpdf->qpdf_writer->setR3EncryptionParameters(
 	user_password, owner_password,
 	allow_accessibility != QPDF_FALSE, allow_extract != QPDF_FALSE,
         print, modify);
+#if (defined(__GNUC__) || defined(__clang__))
+# pragma GCC diagnostic pop
+#endif
 }
 
 void qpdf_set_r4_encryption_parameters(
@@ -714,11 +724,21 @@ void qpdf_set_r4_encryption_parameters(
     qpdf_r3_print_e print, qpdf_r3_modify_e modify,
     QPDF_BOOL encrypt_metadata, QPDF_BOOL use_aes)
 {
+#ifdef _MSC_VER
+# pragma warning (disable: 4996)
+#endif
+#if (defined(__GNUC__) || defined(__clang__))
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     qpdf->qpdf_writer->setR4EncryptionParameters(
 	user_password, owner_password,
 	allow_accessibility != QPDF_FALSE, allow_extract != QPDF_FALSE,
         print, modify,
 	encrypt_metadata != QPDF_FALSE, use_aes != QPDF_FALSE);
+#if (defined(__GNUC__) || defined(__clang__))
+# pragma GCC diagnostic pop
+#endif
 }
 
 void qpdf_set_r5_encryption_parameters(
@@ -727,11 +747,21 @@ void qpdf_set_r5_encryption_parameters(
     qpdf_r3_print_e print, qpdf_r3_modify_e modify,
     QPDF_BOOL encrypt_metadata)
 {
+#ifdef _MSC_VER
+# pragma warning (disable: 4996)
+#endif
+#if (defined(__GNUC__) || defined(__clang__))
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     qpdf->qpdf_writer->setR5EncryptionParameters(
 	user_password, owner_password,
 	allow_accessibility != QPDF_FALSE, allow_extract != QPDF_FALSE,
         print, modify,
 	encrypt_metadata != QPDF_FALSE);
+#if (defined(__GNUC__) || defined(__clang__))
+# pragma GCC diagnostic pop
+#endif
 }
 
 void qpdf_set_r6_encryption_parameters(
@@ -740,10 +770,20 @@ void qpdf_set_r6_encryption_parameters(
     qpdf_r3_print_e print, qpdf_r3_modify_e modify,
     QPDF_BOOL encrypt_metadata)
 {
+#ifdef _MSC_VER
+# pragma warning (disable: 4996)
+#endif
+#if (defined(__GNUC__) || defined(__clang__))
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     qpdf->qpdf_writer->setR6EncryptionParameters(
 	user_password, owner_password,
 	allow_accessibility != QPDF_FALSE, allow_extract != QPDF_FALSE,
         print, modify, encrypt_metadata != QPDF_FALSE);
+#if (defined(__GNUC__) || defined(__clang__))
+# pragma GCC diagnostic pop
+#endif
 }
 
 void qpdf_set_linearization(qpdf_data qpdf, QPDF_BOOL value)

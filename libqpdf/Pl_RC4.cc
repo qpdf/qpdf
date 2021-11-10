@@ -34,6 +34,7 @@ Pl_RC4::write(unsigned char* data, size_t len)
 	size_t bytes =
             (bytes_left < this->out_bufsize ? bytes_left : out_bufsize);
 	bytes_left -= bytes;
+        // lgtm[cpp/weak-cryptographic-algorithm]
 	rc4.process(p, bytes, outbuf.getPointer());
 	p += bytes;
 	getNext()->write(outbuf.getPointer(), bytes);

@@ -1,0 +1,11 @@
+# See https://lgtm.com/help/lgtm/lgtm.yml-configuration-file
+
+# Suppress alerts for weak cryptographic algorithms. The PDF file
+# format used to rely on various weak algorithms. It is no longer
+# necessary to use them when creating encrypted PDF files, but qpdf
+# must always retain support for those algorithms in order to be able
+# to read older files. qpdf issues warnings to try to prevent users
+# from creating new files with weak encryption algorithms.
+
+queries:
+- exclude: cpp/weak-cryptographic-algorithm

@@ -141,6 +141,7 @@ struct Options
         suppress_password_recovery(false),
         password_mode(pm_auto),
         allow_insecure(false),
+        allow_weak_crypto(false),
         keylen(0),
         r2_print(true),
         r2_modify(true),
@@ -242,6 +243,7 @@ struct Options
     bool suppress_password_recovery;
     password_mode_e password_mode;
     bool allow_insecure;
+    bool allow_weak_crypto;
     std::string user_password;
     std::string owner_password;
     int keylen;
@@ -811,6 +813,7 @@ class ArgParser
     void argDecrypt();
     void argPasswordIsHexKey();
     void argAllowInsecure();
+    void argAllowWeakCrypto();
     void argPasswordMode(char* parameter);
     void argSuppressPasswordRecovery();
     void argCopyEncryption(char* parameter);
@@ -1169,6 +1172,7 @@ ArgParser::initOptionTable()
     (*t)["replace-input"] = oe_bare(&ArgParser::argReplaceInput);
     (*t)["is-encrypted"] = oe_bare(&ArgParser::argIsEncrypted);
     (*t)["requires-password"] = oe_bare(&ArgParser::argRequiresPassword);
+    (*t)["allow-weak-crypto"] = oe_bare(&ArgParser::argAllowWeakCrypto);
 
     t = &this->encrypt40_option_table;
     (*t)["--"] = oe_bare(&ArgParser::argEndEncrypt);
@@ -1376,6 +1380,8 @@ ArgParser::argHelp()
         << "--encryption-file-password=password\n"
         << "                        password used to open the file from which encryption\n"
         << "                        parameters are being copied\n"
+        << "--allow-weak-crypto     allow creation of files using weak cryptographic\n"
+        << "                        algorithms\n"
         << "--encrypt options --    generate an encrypted file\n"
         << "--decrypt               remove any encryption on the file\n"
         << "--password-is-hex-key   treat primary password option as a hex-encoded key\n"
@@ -1501,6 +1507,11 @@ ArgParser::argHelp()
         << "The --force-V4 flag forces the V=4 encryption handler introduced in PDF 1.5\n"
         << "to be used even if not otherwise needed.  This option is primarily useful\n"
         << "for testing qpdf and has no other practical use.\n"
+        << "\n"
+        << "A warning will be issued if you attempt to encrypt a file with a format that\n"
+        << "uses a weak cryptographic algorithm such as RC4. To suppress the warning,\n"
+        << "specify the option --allow-weak-crypto. This option is outside of encryption\n"
+        << "options (e.g. --allow-week-crypto --encrypt u o 128 --)\n"
         << "\n"
         << "\n"
         << "Password Modes\n"
@@ -2066,6 +2077,12 @@ void
 ArgParser::argAllowInsecure()
 {
     o.allow_insecure = true;
+}
+
+void
+ArgParser::argAllowWeakCrypto()
+{
+    o.allow_weak_crypto = true;
 }
 
 void
@@ -6253,6 +6270,26 @@ static void set_encryption_options(QPDF& pdf, Options& o, QPDFWriter& w)
     }
     maybe_fix_write_password(R, o, o.user_password);
     maybe_fix_write_password(R, o, o.owner_password);
+    if ((R < 4) || ((R == 4) && (! o.use_aes)))
+    {
+        if (! o.allow_weak_crypto)
+        {
+            // Do not set exit code to EXIT_WARNING for this case as
+            // this does not reflect a potential problem with the
+            // input file.
+            QTC::TC("qpdf", "qpdf weak crypto warning");
+            std::cerr
+                << whoami
+                << ": writing a file with RC4, a weak cryptographic algorithm"
+                << std::endl
+                << "Please use 256-bit keys for better security."
+                << std::endl
+                << "Pass --allow-weak-crypto to suppress this warning."
+                << std::endl
+                << "This will become an error in a future version of qpdf."
+                << std::endl;
+        }
+    }
     switch (R)
     {
       case 2:

@@ -62,6 +62,10 @@ For example, if you want to guarantee that the GnuTLS crypto provider is used, y
 
 Please see the section on crypto providers in the manual for more details.
 
+## Note about weak cryptographic algorithms
+
+The PDF file format used to rely on RC4 for encryption. Using 256-bit keys always uses AES instead, and with 128-bit keys, you can elect to use AES. qpdf does its best to warn when someone is writing a file with weak cryptographic algorithms, but qpdf must always retain support for being able to read and even write files with weak encryption to be able to fully support older PDF files and older PDF readers.
+
 # Building from a pristine checkout
 
 When building qpdf from a pristine checkout from version control, generated documentation files are not present. You may either generate them (by passing `--enable-doc-maintenance` to `./configure` and satisfying the extra build-time dependencies) or obtain them from a released source package, which includes them. If you want to grab just the files that are in the source distribution but not in the repository, extract a source distribution in a temporary directory, and run `make CLEAN=1 distfiles.zip`. This will create a file called `distfiles.zip`, which can you can extract in a checkout of the source repository. This step is optional unless you are running make install and want the html and PDF versions of the documentation to be installed.

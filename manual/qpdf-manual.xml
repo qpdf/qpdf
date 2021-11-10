@@ -874,6 +874,19 @@ make
       </listitem>
      </varlistentry>
      <varlistentry>
+      <term><option>--allow-weak-crypto</option></term>
+      <listitem>
+       <para>
+        Starting with version 10.4, qpdf issues warnings when
+        requested to create files using RC4 encryption. This option
+        suppresses those warnings. In future versions of qpdf, qpdf
+        will refuse to create files with weak cryptography when this
+        flag is not given. See <xref linkend="ref.weak-crypto"/> for
+        additional details.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
       <term><option>--encrypt options --</option></term>
       <listitem>
        <para>
@@ -3355,6 +3368,43 @@ outfile.pdf</option>
    </para>
   </sect1>
  </chapter>
+ <chapter id="ref.weak-crypto">
+  <title>Weak Cryptography</title>
+  <para>
+   Start with version 10.4, qpdf is taking steps to reduce the
+   likelihood of a user <emphasis>accidentally</emphasis> creating PDF
+   files with insecure cryptography but will continue to allow
+   creation of such files indefinitely with explicit acknowledgment.
+  </para>
+  <para>
+   The PDF file format makes use of RC4, which is known to be a weak
+   cryptography algorithm, and MD5, which is a weak hashing algorithm.
+   In version 10.4, qpdf generates warnings for some (but not all)
+   cases of writing files with weak cryptography when invoked from the
+   command-line. These warnings can be suppressed using the
+   <option>--allow-weak-crypto</option> option.
+  </para>
+  <para>
+   It is planned for qpdf version 11 to be stricter, making it an
+   error to write files with insecure cryptography from the
+   command-line tool in most cases without specifying the
+   <option>--allow-weak-crypto</option> flag and also to require
+   explicit steps when using the C++ library to enable use of insecure
+   cryptography.
+  </para>
+  <para>
+   Note that qpdf must always retain support for weak cryptographic
+   algorithms since this is required for reading older PDF files that
+   use it. Additionally, qpdf will always retain the ability to create
+   files using weak cryptographic algorithms since, as a development
+   tool, qpdf explicitly supports creating older or deprecated types
+   of PDF files since these are sometimes needed to test or work with
+   older versions of software. Even if other cryptography libraries
+   drop support for RC4 or MD5, qpdf can always fall back to its
+   internal implementations of those algorithms, so they are not going
+   to disappear from qpdf.
+  </para>
+ </chapter>
  <chapter id="ref.json">
   <title>QPDF JSON</title>
   <sect1 id="ref.json-overview">
@@ -5070,6 +5120,27 @@ print "\n";
     <term>10.4.0: Month dd, YYYY</term>
     <listitem>
      <itemizedlist>
+      <listitem>
+       <para>
+        Handling of Weak Cryptography Algorithms
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          From the qpdf CLI, the <option>--allow-weak-crypto</option>
+          is now required to suppress a warning when explicitly
+          creating PDF files using RC4 encryption. While qpdf will
+          always retain the ability to read and write such files,
+          doing so will require explicit acknowledgment moving
+          forward. For qpdf 10.4, this change only affects the
+          command-line tool. Starting in qpdf 11, there will be small
+          API changes to require explicit acknowledgment in those
+          cases as well. For additional information, see <xref
+          linkend="ref.weak-crypto"/>.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
       <listitem>
        <para>
         Bug Fixes

@@ -107,7 +107,7 @@ FuzzHelper::testWrite()
     w->setStaticID(true);
     w->setObjectStreamMode(qpdf_o_disable);
     w->setR3EncryptionParameters(
-	"u", "o", true, true, qpdf_r3p_full, qpdf_r3m_all);
+	"u", "o", true, true, true, true, true, true, qpdf_r3p_full);
     doWrite(w);
 
     q = getQpdf();

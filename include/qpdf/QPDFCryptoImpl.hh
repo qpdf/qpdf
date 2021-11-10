@@ -69,6 +69,9 @@ class QPDF_DLL_CLASS QPDFCryptoImpl
 
     // Encryption/Decryption
 
+    // QPDF must support RC4 to be able to work with older PDF files
+    // and readers. Search for RC4 in README.md
+
     // key_len of -1 means treat key_data as a null-terminated string
     QPDF_DLL
     virtual void RC4_init(unsigned char const* key_data, int key_len = -1) = 0;

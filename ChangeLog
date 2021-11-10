@@ -1,3 +1,9 @@
+2021-11-10  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add --allow-weak-crypto option to suppress warnings about use of
+	weak cryptographic algorithms. Update documentation around this
+	issue. Fixes #358.
+
 2021-11-07  Jay Berkenbilt  <ejb@ql.org>
 
 	* Relax xref recovery logic a bit so that files whose objects are

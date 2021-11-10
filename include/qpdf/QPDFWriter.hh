@@ -359,6 +359,16 @@ class QPDFWriter
     // this from your own application, QUtil contains many transcoding
     // functions that could be useful to you, most notably
     // utf8_to_pdf_doc.
+
+    // R3 uses RC4, which is a weak cryptographic algorithm. Don't use
+    // it unless you have to.
+    QPDF_DLL
+    void setR2EncryptionParameters(
+	char const* user_password, char const* owner_password,
+	bool allow_print, bool allow_modify,
+	bool allow_extract, bool allow_annotate);
+    // R3 uses RC4, which is a weak cryptographic algorithm. Don't use
+    // it unless you have to.
     QPDF_DLL
     void setR3EncryptionParameters(
 	char const* user_password, char const* owner_password,
@@ -366,6 +376,8 @@ class QPDFWriter
         bool allow_assemble, bool allow_annotate_and_form,
         bool allow_form_filling, bool allow_modify_other,
 	qpdf_r3_print_e print);
+    // R4 uses RC4, which is a weak cryptographic algorithm, when
+    // use_aes=false. Don't use it unless you have to.
     QPDF_DLL
     void setR4EncryptionParameters(
 	char const* user_password, char const* owner_password,
@@ -392,28 +404,27 @@ class QPDFWriter
 	qpdf_r3_print_e print, bool encrypt_metadata_aes);
 
     // Pre qpdf 8.4.0 API
-    QPDF_DLL
-    void setR2EncryptionParameters(
-	char const* user_password, char const* owner_password,
-	bool allow_print, bool allow_modify,
-	bool allow_extract, bool allow_annotate);
+    [[deprecated("see newer API above")]]
     QPDF_DLL
     void setR3EncryptionParameters(
 	char const* user_password, char const* owner_password,
 	bool allow_accessibility, bool allow_extract,
 	qpdf_r3_print_e print, qpdf_r3_modify_e modify);
+    [[deprecated("see newer API above")]]
     QPDF_DLL
     void setR4EncryptionParameters(
 	char const* user_password, char const* owner_password,
 	bool allow_accessibility, bool allow_extract,
 	qpdf_r3_print_e print, qpdf_r3_modify_e modify,
 	bool encrypt_metadata, bool use_aes);
+    [[deprecated("see newer API above")]]
     QPDF_DLL
     void setR5EncryptionParameters(
 	char const* user_password, char const* owner_password,
 	bool allow_accessibility, bool allow_extract,
 	qpdf_r3_print_e print, qpdf_r3_modify_e modify,
 	bool encrypt_metadata);
+    [[deprecated("see newer API above")]]
     QPDF_DLL
     void setR6EncryptionParameters(
 	char const* user_password, char const* owner_password,

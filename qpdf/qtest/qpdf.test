@@ -1358,7 +1358,8 @@ foreach my $file (qw(short-id long-id))
 {
     $td->runtest("encrypt $file.pdf",
 		 {$td->COMMAND =>
-		      "qpdf --encrypt '' pass 40 -- $file.pdf a.pdf"},
+		      "qpdf --allow-weak-crypto".
+                      " --encrypt '' pass 40 -- $file.pdf a.pdf"},
 		 {$td->STRING => "",
 		  $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
@@ -2057,7 +2058,8 @@ $td->notify("--- Split Pages ---");
 my @sp_cases = (
     [11, '%d at beginning', '', '%d_split-out.zdf'],
     [11, '%d at end', '--qdf', 'split-out.zdf_%d'],
-    [11, '%d in middle', '--encrypt u o 128 --', 'a-%d-split-out.zdf'],
+    [11, '%d in middle', '--allow-weak-crypto --encrypt u o 128 --',
+     'a-%d-split-out.zdf'],
     [11, 'pdf extension', '', 'split-out.Pdf'],
     [4, 'fallback', '--pages 11-pages.pdf 1-3 minimal.pdf --', 'split-out'],
     [1, 'broken data', '--pages broken-lzw.pdf --', 'split-out.pdf',
@@ -2718,6 +2720,7 @@ $td->runtest("check output",
 $td->runtest("avoid respecification of password",
              {$td->COMMAND =>
                   "qpdf --empty a.pdf --copy-encryption=20-pages.pdf" .
+                  " --allow-weak-crypto" .
                   " --encryption-file-password=user" .
                   " --pages 20-pages.pdf 1,z -- --static-id"},
              {$td->STRING => "", $td->EXIT_STATUS => 0});
@@ -3483,7 +3486,7 @@ for (my $n = 16; $n <= 19; ++$n)
 		       '-object-streams=preserve',
 		       '-object-streams=generate')
     {
-	foreach my $qdf ('-qdf', '', '-encrypt "" x 128 --')
+	foreach my $qdf ('-qdf', '', '-allow-weak-crypto -encrypt "" x 128 --')
 	{
 	    # 4 tests + 1 compare_pdfs * 36 cases
 	    # 2 additional tests * 12 cases
@@ -3716,19 +3719,22 @@ foreach my $f (qw(compressed-metadata.pdf enc-base.pdf))
 	check_metadata("a.pdf", 0, 1);
 	$td->runtest("encrypt normally",
 		     {$td->COMMAND =>
-			  "qpdf --encrypt '' o 128 -- a.pdf b.pdf"},
+			  "qpdf --allow-weak-crypto" .
+                          " --encrypt '' o 128 -- a.pdf b.pdf"},
 		     {$td->STRING => "", $td->EXIT_STATUS => 0});
 	check_metadata("b.pdf", 1, 0);
 	unlink "b.pdf";
 	$td->runtest("encrypt V4",
 		     {$td->COMMAND =>
-			  "qpdf --encrypt '' o 128 --force-V4 -- a.pdf b.pdf"},
+			  "qpdf --allow-weak-crypto" .
+                          " --encrypt '' o 128 --force-V4 -- a.pdf b.pdf"},
 		     {$td->STRING => "", $td->EXIT_STATUS => 0});
 	check_metadata("b.pdf", 1, 0);
 	unlink "b.pdf";
 	$td->runtest("encrypt with cleartext metadata",
 		     {$td->COMMAND =>
-			  "qpdf --encrypt '' o 128 --cleartext-metadata --" .
+			  "qpdf --allow-weak-crypto" .
+                          " --encrypt '' o 128 --cleartext-metadata --" .
 			  " a.pdf b.pdf"},
 		     {$td->STRING => "", $td->EXIT_STATUS => 0});
 	check_metadata("b.pdf", 1, 1);
@@ -3750,6 +3756,31 @@ foreach my $f (qw(compressed-metadata.pdf enc-base.pdf))
 	unlink "b.pdf", "c.pdf";
     }
 }
+
+show_ntests();
+# ----------
+$td->notify("--- Weak Cryptography ---");
+$n_tests += 4;
+$td->runtest("256-bit: no warning",
+             {$td->COMMAND => 'qpdf --encrypt "" "" 256 -- minimal.pdf a.pdf'},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("128-bit with AES: no warning",
+             {$td->COMMAND => 'qpdf --encrypt "" "" 128 --use-aes=y --' .
+                  ' minimal.pdf a.pdf'},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+# Note: we intentionally have exit status 0 for this warning.
+$td->runtest("128-bit without AES: warning",
+             {$td->COMMAND => 'qpdf --encrypt "" "" 128 -- minimal.pdf a.pdf'},
+             {$td->REGEXP => "Pass --allow-weak-crypto to suppress",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("40-bit: warning",
+             {$td->COMMAND => 'qpdf --encrypt "" "" 40 -- minimal.pdf a.pdf'},
+             {$td->REGEXP => "Pass --allow-weak-crypto to suppress",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 show_ntests();
 # ----------
@@ -4128,7 +4159,8 @@ foreach my $d (@encrypted_files)
         $enc_json =~ s/---opm---/$opm/;
         $enc_json =~ s/---upm---/$upm/;
 
-	my $eflags = "-encrypt \"$upass\" \"$opass\" $bits $xeflags --";
+	my $eflags = "--allow-weak-crypto" .
+            " -encrypt \"$upass\" \"$opass\" $bits $xeflags --";
         if (($opass eq "") && ($bits == 256))
         {
             $eflags =~ s/--$/--allow-insecure --/;
@@ -4391,7 +4423,7 @@ foreach my $d (['--force-V4', 'V4'],
     my ($args, $out) = @$d;
     $td->runtest("encrypt $args",
 		 {$td->COMMAND => "qpdf --static-aes-iv --static-id" .
-		      " --encrypt '' '' 128 $args --" .
+		      " --allow-weak-crypto --encrypt '' '' 128 $args --" .
                       " enc-base.pdf a.pdf"},
 		 {$td->STRING => "", $td->EXIT_STATUS => 0});
     $td->runtest("check output",
@@ -4677,6 +4709,7 @@ foreach my $d (@unicode_pw_cases)
     $td->runtest("encode $bits, $pw, $w_encoding",
                  {$td->COMMAND =>
                       "qpdf $xargs --static-id --static-aes-iv" .
+                      " --allow-weak-crypto" .
                       " --encrypt $upass o $bits -- minimal.pdf a.pdf"},
                  {$td->STRING => $exp, $td->EXIT_STATUS => ($exp ? 2 : 0)},
                  $td->NORMALIZE_NEWLINES);
@@ -4718,7 +4751,8 @@ $n_tests += 5;
 
 $td->runtest("bytes fallback warning",
              {$td->COMMAND =>
-                  "qpdf --encrypt \@password-bare-complex-utf8 o 128 --" .
+                  "qpdf --allow-weak-crypto" .
+                  " --encrypt \@password-bare-complex-utf8 o 128 --" .
                   " minimal.pdf a.pdf"},
              {$td->FILE => "bytes-fallback.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
@@ -4814,9 +4848,9 @@ my @flags = (["-qdf",						# 1
 	      "decrypted"],
 	     ["-linearize",					# 9
 	      "linearized"],
-	     ["-encrypt \"\" owner 128 --",			# 10
+	     ["-allow-weak-crypto -encrypt \"\" owner 128 --",  # 10
 	      "encrypted"],
-	     ["-linearize -encrypt \"\" o 128 --",		# 11
+	     ["-linearize -allow-weak-crypto -encrypt \"\" o 128 --", # 11
 	      "linearized and encrypted"],
 	     ["",						# 12
 	      "no arguments"],
@@ -4985,9 +5019,15 @@ $n_tests += 2;
 $n_tests += 12;
 foreach my $i (qw(40 128 256))
 {
+    my $x = "";
+    if ($i < 256)
+    {
+        $x = "--allow-weak-crypto";
+    }
     $td->runtest("encrypt $i",
                  {$td->COMMAND =>
-                      "qpdf --encrypt '' o $i -- digitally-signed.pdf a.pdf"},
+                      "qpdf $x --encrypt '' o $i --" .
+                      " digitally-signed.pdf a.pdf"},
                  {$td->STRING => "",
                       $td->EXIT_STATUS => 0});
     $td->runtest("find desired contents (encrypt $i)",
@@ -5010,9 +5050,15 @@ foreach my $i (qw(40 128 256))
 $n_tests += 15;
 foreach my $i (qw(40 128 256))
 {
+    my $x = "";
+    if ($i < 256)
+    {
+        $x = "--allow-weak-crypto";
+    }
     $td->runtest("non sig dict encrypt $i",
                  {$td->COMMAND =>
-                      "qpdf --encrypt '' o $i -- comment-annotation.pdf a.pdf"},
+                      "qpdf $x --encrypt '' o $i --" .
+                      " comment-annotation.pdf a.pdf"},
                  {$td->STRING => "",
                       $td->EXIT_STATUS => 0});
     $td->runtest("plain text not found due to encryption (non sig dict encrypt $i)",
