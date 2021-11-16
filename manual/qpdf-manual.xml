@@ -5,8 +5,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY ndash "&#x2013;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "10.3.2">
-<!ENTITY lastreleased "May 8, 2021">
+<!ENTITY swversion "10.4.0">
+<!ENTITY lastreleased "November 16, 2021">
 ]>
 <book>
  <bookinfo>
@@ -5117,7 +5117,7 @@ print "\n";
    </varlistentry>
 -->
    <varlistentry>
-    <term>10.4.0: Month dd, YYYY</term>
+    <term>10.4.0: November 16, 2021</term>
     <listitem>
      <itemizedlist>
       <listitem>

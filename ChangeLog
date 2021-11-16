@@ -1,3 +1,7 @@
+2021-11-16  Jay Berkenbilt  <ejb@ql.org>
+
+	* 10.4.0: release
+
 2021-11-10  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add --allow-weak-crypto option to suppress warnings about use of
