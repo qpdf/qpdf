@@ -44,7 +44,7 @@ GOOGLE OSS-FUZZ
   Clone the oss-fuzz project. From the root directory of the repository:
 
   Add `-e GITHUB_FORK=fork -e GITHUB_BRANCH=branch` to build_fuzzers
-  from a qpdf fork/branch rather than qpdf/master.
+  from a qpdf fork/branch rather than qpdf/main.
 
   python3 infra/helper.py build_image --pull qpdf
   python3 infra/helper.py build_fuzzers [ --sanitizer memory|undefined|address ] qpdf
@@ -252,7 +252,7 @@ pytest -n auto
 
 CREATING A RELEASE
 
-* Push to master. This will create an artifact called distribution
+* Push to main. This will create an artifact called distribution
   which will contain all the distribution files. Download these,
   verify the checksums from the job output, rename to remove -ci from
   the names, and copy to the release archive area.
@@ -283,12 +283,12 @@ chmod 555 *.AppImage
   `README-what-to-download.md` separately onto the download area if
   needed.
 
-* Ensure that the master branch has been pushed to github. The
+* Ensure that the main branch has been pushed to github. The
   rev-parse command below should show the same commit hash for all its
   arguments. Create and push a signed tag. This should be run with
-  HEAD pointing to the tip of master.
+  HEAD pointing to the tip of main.
 
-git rev-parse upstream/master @
+git rev-parse upstream/main @
 git tag -s release-qpdf-$version @ -m"qpdf $version"
 git push upstream release-qpdf-$version
 
