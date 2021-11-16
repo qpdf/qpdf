@@ -288,9 +288,9 @@ chmod 555 *.AppImage
   arguments. Create and push a signed tag. This should be run with
   HEAD pointing to the tip of main.
 
-git rev-parse upstream/main @
+git rev-parse qpdf/main @
 git tag -s release-qpdf-$version @ -m"qpdf $version"
-git push upstream release-qpdf-$version
+git push qpdf release-qpdf-$version
 
 * Create a github release after pushing the tag. `gcurl` is an alias
   that includes the auth token.
@@ -321,8 +321,6 @@ This is qpdf version x.y.z. (Brief description)
 
 For a full list of changes from previous releases, please see the [release notes](http://qpdf.sourceforge.net/files/qpdf-manual.html#ref.release-notes). See also [README-what-to-download](./README-what-to-download.md) for details on the available source and binary distributions.
 ```
-
-
 
 # Publish release
 gcurl -XPOST $url -d'{"draft": false}'
