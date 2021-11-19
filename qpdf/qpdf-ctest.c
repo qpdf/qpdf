@@ -536,6 +536,9 @@ static void test24(char const* infile,
     for (int i = 0; i < 4; ++i)
     {
         qpdf_oh item = qpdf_oh_get_array_item(qpdf, mediabox, i);
+        qpdf_oh item2 = qpdf_oh_get_array_item(qpdf, wrapped_mediabox, i);
+        assert(qpdf_oh_get_int_value_as_int(qpdf, item) ==
+               qpdf_oh_get_int_value_as_int(qpdf, item2));
         printf("item %d: %d %.2f\n",
                i, qpdf_oh_get_int_value_as_int(qpdf, item),
                qpdf_oh_get_numeric_value(qpdf, item));
@@ -570,6 +573,12 @@ static void test24(char const* infile,
     assert(qpdf_oh_get_array_n_items(qpdf, contents_array) == 1);
     assert(qpdf_oh_get_object_id(
                qpdf, qpdf_oh_get_array_item(qpdf, contents_array, 0)) ==
+           qpdf_oh_get_object_id(qpdf, contents));
+    qpdf_oh wrapped_contents_array =
+        qpdf_oh_wrap_in_array(qpdf, contents_array);
+    assert(qpdf_oh_get_array_n_items(qpdf, wrapped_contents_array) == 1);
+    assert(qpdf_oh_get_object_id(
+               qpdf, qpdf_oh_get_array_item(qpdf, wrapped_contents_array, 0)) ==
            qpdf_oh_get_object_id(qpdf, contents));
     qpdf_oh resources = qpdf_oh_get_key(qpdf, page1, "/Resources");
     qpdf_oh procset = qpdf_oh_get_key(qpdf, resources, "/ProcSet");
