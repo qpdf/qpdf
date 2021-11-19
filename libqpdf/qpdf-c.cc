@@ -987,7 +987,7 @@ qpdf_oh qpdf_oh_wrap_in_array(qpdf_data qpdf, qpdf_oh oh)
     if (qoh->isArray())
     {
         QTC::TC("qpdf", "qpdf-c array to wrap_in_array");
-        return oh;
+        return new_object(qpdf, *qoh);
     }
     else
     {

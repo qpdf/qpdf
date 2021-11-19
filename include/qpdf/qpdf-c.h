@@ -134,7 +134,7 @@ extern "C" {
 
     /* Returns the error condition, if any.  The return value is a
      * pointer to data that will become invalid after the next call to
-     * this function, qpdf_next_warning, or qpdf_destroy.  After this
+     * this function, qpdf_next_warning, or qpdf_cleanup.  After this
      * function is called, qpdf_has_error will return QPDF_FALSE until
      * the next error condition occurs.  If there is no error
      * condition, this function returns a null pointer.
@@ -201,7 +201,7 @@ extern "C" {
     /* Calling qpdf_read causes processFile to be called in the C++
      * API.  Basic parsing is performed, but data from the file is
      * only read as needed.  For files without passwords, pass a null
-     * pointer as the password.
+     * pointer or an empty string as the password.
      */
     QPDF_DLL
     QPDF_ERROR_CODE qpdf_read(qpdf_data qpdf, char const* filename,
@@ -489,16 +489,19 @@ extern "C" {
 
     /* Object handling.
      *
-     * These methods take and return a qpdf_oh, which is just an
-     * unsigned integer. The value 0 is never returned, which makes it
-     * usable as an uninitialized value.
+     * These functions take and return a qpdf_oh object handle, which
+     * is just an unsigned integer. The value 0 is never returned, which
+     * makes it usable as an uninitialized value. The handles returned by
+     * these functions are guaranteed to be unique, i.e. two calls to
+     * (the same of different) functions will return distinct handles
+     * even when they refer to the same object.
      *
      * Each function below, starting with qpdf_oh, corresponds to a
      * specific method of QPDFObjectHandler. For example,
      * qpdf_oh_is_bool corresponds to QPDFObjectHandle::isBool. If the
      * C++ method is overloaded, the C function's name will be
      * disambiguated. If the C++ method takes optional argumens, the C
-     * method will have required arguments in those positions. For
+     * function will have required arguments in those positions. For
      * details about the method, please see comments in
      * QPDFObjectHandle.hh. Comments here only explain things that are
      * specific to the "C" API.
@@ -514,25 +517,26 @@ extern "C" {
      * To refer to a specific QPDFObjectHandle, you need a pair
      * consisting of a qpdf_data and a qpdf_oh, which is just an index
      * into an internal table of objects. All memory allocated by any
-     * of these methods is returned when qpdf_cleanup is called.
+     * of these functions is returned when qpdf_cleanup is called.
      *
      * Regarding memory, the same rules apply as the above functions.
-     * Specifically, if a method returns a char*, the memory is
+     * Specifically, if a function returns a char*, the memory is
      * managed by the library and, unless otherwise specified, is not
      * expected to be valid after the next qpdf call.
      *
-     * The qpdf_data object keeps a cache of objects returned by these
-     * methods. Once you are finished referencing an object, you can
-     * optionally release it. Releasing objects is optional since they
+     * The qpdf_data object keeps a cache of handles returned by these
+     * functions. Once you are finished referencing an handle, you can
+     * optionally release it. Releasing handles is optional since they
      * will all get released by qpdf_cleanup, but it can help to
      * reduce the memory footprint of the qpdf_data object to release
-     * them when you're done. Releasing an object does not destroy the
+     * them when you're done. Releasing a handle does not destroy the
      * object. All QPDFObjectHandle objects are deleted when they are
-     * no longer referenced. Releasing an object simply invalidates
-     * the qpdf_oh handle to it. For example, if you create an object,
-     * add it to an existing dictionary or array, and then release it,
-     * the object is safely part of the dictionary or array.
-     * Explicitly releasing an object is essentially the same as
+     * no longer referenced. Releasing an object handle simply
+     * invalidates it. For example, if you create an object,
+     * add it to an existing dictionary or array, and then release it's
+     * handle, the object is safely part of the dictionary or array.
+     * Similarly, any other object handle refering to the object remains
+     * valid. Explicitly releasing an object is essentially the same as
      * letting a QPDFObjectHandle go out of scope in the C++ API.
      */
 
@@ -540,7 +544,7 @@ extern "C" {
 
     typedef unsigned int qpdf_oh;
 
-    /* Releasing objects -- see comments above. These methods have no
+    /* Releasing objects -- see comments above. These functions have no
      * equivalent in the C++ API.
      */
     QPDF_DLL

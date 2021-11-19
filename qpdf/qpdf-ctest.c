@@ -530,7 +530,9 @@ static void test24(char const* infile,
     assert(! qpdf_oh_is_scalar(qpdf, mediabox));
     assert(qpdf_oh_is_array(qpdf, mediabox));
     assert(qpdf_oh_get_array_n_items(qpdf, mediabox) == 4);
-    assert(qpdf_oh_wrap_in_array(qpdf, mediabox) == mediabox);
+    qpdf_oh wrapped_mediabox = qpdf_oh_wrap_in_array(qpdf, mediabox);
+    assert(wrapped_mediabox != mediabox);
+    assert(qpdf_oh_get_array_n_items(qpdf, wrapped_mediabox) == 4);
     for (int i = 0; i < 4; ++i)
     {
         qpdf_oh item = qpdf_oh_get_array_item(qpdf, mediabox, i);
