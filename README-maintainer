@@ -192,7 +192,9 @@ RELEASE PREPARATION
 * If any interfaces were added or changed, check C API to see whether
   changes are appropriate there as well. If necessary, review the
   casting policy in the manual, and ensure that integer types are
-  properly handled with QIntC or the appropriate cast.
+  properly handled with QIntC or the appropriate cast. Remember to
+  ensure that any exceptions thrown by the library are caught and
+  converted. See `trap_errors` in qpdf-c.cc.
 
 * Update versions and shared library details
 
