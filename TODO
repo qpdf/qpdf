@@ -1,3 +1,9 @@
+Next
+====
+
+* Add a method to the C API that returns the length of tmp_str so that
+  we can handle strings with embedded null characters.
+
 Documentation
 =============
 
