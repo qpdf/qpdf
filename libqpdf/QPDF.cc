@@ -196,6 +196,7 @@ QPDF::EncryptionParameters::EncryptionParameters() :
 
 QPDF::Members::Members() :
     unique_id(0),
+    file(new InvalidInputSource()),
     provided_password_is_hex_key(false),
     ignore_xref_streams(false),
     suppress_warnings(false),
