@@ -2730,7 +2730,12 @@ QPDF::getUniqueId() const
 std::string
 QPDF::getFilename() const
 {
-    return this->m->file->getName();
+    std::string fn = "";
+    if (this->m->file.getPointer())
+    {
+        fn = this->m->file->getName();
+    }
+    return fn;
 }
 
 std::string
