@@ -2769,7 +2769,15 @@ QPDF::getExtensionLevel()
 QPDFObjectHandle
 QPDF::getTrailer()
 {
-    return this->m->trailer;
+    QPDFObjectHandle trailer = this->m->trailer;
+    if (! trailer.isDictionary() 
+        || this->m->file->getName() == "closed input source")
+    {
+        throw QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
+                      "", this->m->file->getLastOffset(),
+                      "unable to find trailer dictionary");
+    }
+    return trailer;
 }
 
 QPDFObjectHandle

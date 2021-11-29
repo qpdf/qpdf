@@ -2724,7 +2724,6 @@ void runtest(int n, char const* filename1, char const* arg2)
         {
             std::cerr << "getRoot: " << e.what() << std::endl;
         }
-
         pdf.closeInputSource();
         pdf.getRoot().getKey("/Pages").unparseResolved();
     }
@@ -3048,6 +3047,20 @@ void runtest(int n, char const* filename1, char const* arg2)
         w2.setStaticID(true);
         w2.setQDFMode(true);
         w2.write();
+    }
+    else if (n == 81)
+    {
+        try
+        {
+            QPDF pdf2;
+            pdf2.getTrailer();
+        }
+        catch (std::exception& e)
+        {
+            std::cerr << "getTrailer: " << e.what() << std::endl;
+        }
+        pdf.closeInputSource();
+        pdf.getTrailer().getKey("/Root").unparseResolved();
     }
     else
     {

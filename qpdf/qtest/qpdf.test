@@ -1493,11 +1493,17 @@ $td->runtest("check output",
 show_ntests();
 # ----------
 $td->notify("--- Invalid objects ---");
-$n_tests += 3;
+$n_tests += 4;
 
 $td->runtest("closed input source",
 	     {$td->COMMAND => "test_driver 73 minimal.pdf"},
 	     {$td->FILE => "test73.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("closed input source trailer",
+	     {$td->COMMAND => "test_driver 81 minimal.pdf"},
+	     {$td->FILE => "test81.out",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
