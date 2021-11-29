@@ -2715,6 +2715,16 @@ void runtest(int n, char const* filename1, char const* arg2)
     }
     else if (n == 73)
     {
+        try
+        {
+            QPDF pdf2;
+            pdf2.getRoot();
+        }
+        catch (std::exception& e)
+        {
+            std::cerr << "getRoot: " << e.what() << std::endl;
+        }
+
         pdf.closeInputSource();
         pdf.getRoot().getKey("/Pages").unparseResolved();
     }
