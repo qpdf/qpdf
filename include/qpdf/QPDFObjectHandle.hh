@@ -320,8 +320,9 @@ class QPDFObjectHandle
     QPDF_DLL
     char const* getTypeName();
 
-    // Exactly one of these will return true for any initialized object.  Operator
-    // and InlineImage are only allowed in content streams.
+    // Exactly one of these will return true for any initialized
+    // object. Operator and InlineImage are only allowed in content
+    // streams.
     QPDF_DLL
     bool isBool();
     QPDF_DLL

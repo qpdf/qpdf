@@ -535,7 +535,7 @@ extern "C" {
      * object. All QPDFObjectHandle objects are deleted when they are
      * no longer referenced. Releasing an object handle simply
      * invalidates it. For example, if you create an object,
-     * add it to an existing dictionary or array, and then release it's
+     * add it to an existing dictionary or array, and then release its
      * handle, the object is safely part of the dictionary or array.
      * Similarly, any other object handle refering to the object remains
      * valid. Explicitly releasing an object handle is essentially the
