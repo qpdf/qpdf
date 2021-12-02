@@ -12,6 +12,7 @@
 #include <string>
 #include <stdexcept>
 #include <cstring>
+#include <functional>
 
 struct _qpdf_error
 {
@@ -120,7 +121,8 @@ static void call_check(qpdf_data qpdf)
     w.write();
 }
 
-static QPDF_ERROR_CODE trap_errors(qpdf_data qpdf, void (*fn)(qpdf_data))
+static QPDF_ERROR_CODE trap_errors(
+    qpdf_data qpdf, std::function<void(qpdf_data)> fn)
 {
     QPDF_ERROR_CODE status = QPDF_SUCCESS;
     try
