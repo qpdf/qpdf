@@ -881,8 +881,7 @@ qpdf_oh_valid_internal(qpdf_data qpdf, qpdf_oh oh)
 {
     auto i = qpdf->oh_cache.find(oh);
     bool result = ((i != qpdf->oh_cache.end()) &&
-                   (i->second).getPointer() &&
-                   (i->second)->isInitialized());
+                   (i->second).getPointer());
     if (! result)
     {
         QTC::TC("qpdf", "qpdf-c invalid object handle");
@@ -892,9 +891,16 @@ qpdf_oh_valid_internal(qpdf_data qpdf, qpdf_oh oh)
                 qpdf->qpdf->getFilename(),
                 std::string("C API object handle ") +
                 QUtil::uint_to_string(oh),
-                0, "attempted access to unknown/uninitialized object handle"));
+                0, "attempted access to unknown object handle"));
     }
     return result;
+}
+
+QPDF_BOOL qpdf_oh_is_initialized(qpdf_data qpdf, qpdf_oh oh)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_is_initialized");
+    return (qpdf_oh_valid_internal(qpdf, oh) &&
+            qpdf->oh_cache[oh]->isInitialized());
 }
 
 QPDF_BOOL qpdf_oh_is_bool(qpdf_data qpdf, qpdf_oh oh)

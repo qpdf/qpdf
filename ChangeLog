@@ -1,5 +1,7 @@
 2021-12-02  Jay Berkenbilt  <ejb@ql.org>
 
+	* C API: Add qpdf_oh_is_initialized.
+
 	* C API: Add qpdf_get_last_string_length to return the length of
 	the last string returned. This is necessary in order to fully
 	retrieve values of strings that may contain embedded null characters.

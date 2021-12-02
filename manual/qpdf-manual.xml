@@ -5133,6 +5133,13 @@ print "\n";
           embedded null characters.
          </para>
         </listitem>
+        <listitem>
+         <para>
+          Add <function>qpdf_oh_is_initialized</function> to the
+          C API. While you can't directly create uninitialized objects
+          from the C API, you still have to be able to detect them.
+         </para>
+        </listitem>
        </itemizedlist>
       </listitem>
      </itemizedlist>

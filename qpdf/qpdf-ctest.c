@@ -512,6 +512,7 @@ static void test24(char const* infile,
            qpdf_oh_get_object_id(qpdf, root_from_trailer));
     qpdf_oh pages = qpdf_oh_get_key(qpdf, root, "/Pages");
     assert(qpdf_oh_is_dictionary(qpdf, pages));
+    assert(qpdf_oh_is_initialized(qpdf, pages));
     qpdf_oh kids = qpdf_oh_get_key(qpdf, pages, "/Kids");
     assert(qpdf_oh_is_array(qpdf, kids));
     assert(qpdf_oh_get_array_n_items(qpdf, kids) == 1);
@@ -687,6 +688,12 @@ static void test24(char const* infile,
     qpdf_set_suppress_original_object_IDs(qpdf, QPDF_TRUE);
     qpdf_write(qpdf);
     report_errors();
+
+    /* Make sure we detect uninitialized objects */
+    qpdf_data qpdf2 = qpdf_init();
+    trailer = qpdf_get_trailer(qpdf2);
+    assert(! qpdf_oh_is_initialized(qpdf2, trailer));
+    qpdf_cleanup(&qpdf2);
 }
 
 int main(int argc, char* argv[])

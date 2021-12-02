@@ -582,6 +582,8 @@ extern "C" {
      */
 
     QPDF_DLL
+    QPDF_BOOL qpdf_oh_is_initialized(qpdf_data data, qpdf_oh oh);
+    QPDF_DLL
     QPDF_BOOL qpdf_oh_is_bool(qpdf_data data, qpdf_oh oh);
     QPDF_DLL
     QPDF_BOOL qpdf_oh_is_null(qpdf_data data, qpdf_oh oh);
