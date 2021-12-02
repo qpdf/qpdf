@@ -49,14 +49,17 @@
  *     itself, is managed by the library.  You must create a qpdf_data
  *     object using qpdf_init and free it using qpdf_cleanup.
  *
- *     Many functions return char*.  In all cases, the char* values
- *     returned are pointers to data inside the qpdf_data object.  As
- *     such, they are always freed by qpdf_cleanup.  In most cases,
+ *     Many functions return char*. In all cases, the char* values
+ *     returned are pointers to data inside the qpdf_data object. As
+ *     such, they are always freed by qpdf_cleanup. In most cases,
  *     strings returned by functions here may be invalidated by
  *     subsequent function calls, sometimes even to different
- *     functions.  If you want a string to last past the next qpdf
- *     call or after a call to qpdf_cleanup, you should make a copy of
- *     it.
+ *     functions. If you want a string to last past the next qpdf call
+ *     or after a call to qpdf_cleanup, you should make a copy of it.
+ *     It is possible for the internal string data to contain null
+ *     characters. To handle that case, you call
+ *     qpdf_get_last_string_length() to get the length of whatever
+ *     string was just returned.
  *
  *     Many functions defined here merely set parameters and therefore
  *     never return error conditions.  Functions that may cause PDF
@@ -125,6 +128,14 @@ extern "C" {
      */
     QPDF_DLL
     void qpdf_cleanup(qpdf_data* qpdf);
+
+    /* Return the length of the last string returned. This enables you
+     * to retrieve the entire string for cases in which a char*
+     * returned by one of the functions below points to a string with
+     * embedded null characters.
+     */
+    QPDF_DLL
+    size_t qpdf_get_last_string_length(qpdf_data qpdf);
 
     /* ERROR REPORTING */
 

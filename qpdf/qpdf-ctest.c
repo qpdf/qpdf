@@ -613,6 +613,13 @@ static void test24(char const* infile,
            (strcmp(qpdf_oh_get_string_value(qpdf, p_string), "3\xf7") == 0) &&
            (strcmp(qpdf_oh_get_utf8_value(qpdf, p_string), "3\xc3\xb7") == 0) &&
            (strcmp(qpdf_oh_unparse_binary(qpdf, p_string), "<33f7>") == 0));
+    qpdf_oh p_string_with_null = qpdf_oh_parse(qpdf, "<6f6e650074776f>");
+    assert(qpdf_oh_is_string(qpdf, p_string_with_null) &&
+           (strcmp(qpdf_oh_get_string_value(qpdf, p_string_with_null),
+                   "one") == 0) &&
+           (qpdf_get_last_string_length(qpdf) == 7) &&
+           (memcmp(qpdf_oh_get_string_value(qpdf, p_string_with_null),
+                   "one\000two", 7) == 0));
     assert(qpdf_oh_is_dictionary(qpdf, p_dict));
     qpdf_oh p_five = qpdf_oh_get_key(qpdf, p_dict, "/Four");
     assert(qpdf_oh_is_or_has_name(qpdf, p_five, "/Five"));

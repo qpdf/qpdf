@@ -5117,6 +5117,28 @@ print "\n";
    </varlistentry>
 -->
    <varlistentry>
+    <term>10.5.0: XXX Month dd, YYYY</term>
+    <listitem>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Library Enhancements
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Add <function>qpdf_get_last_string_length</function> to the
+          C API to get the length of the last string that was
+          returned. This is needed to handle strings that contain
+          embedded null characters.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
     <term>10.4.0: November 16, 2021</term>
     <listitem>
      <itemizedlist>

@@ -172,6 +172,11 @@ void qpdf_cleanup(qpdf_data* qpdf)
     *qpdf = 0;
 }
 
+size_t qpdf_get_last_string_length(qpdf_data qpdf)
+{
+    return qpdf->tmp_string.length();
+}
+
 QPDF_BOOL qpdf_more_warnings(qpdf_data qpdf)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_more_warnings");
