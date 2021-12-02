@@ -554,6 +554,10 @@ extern "C" {
     QPDF_DLL
     void qpdf_oh_release_all(qpdf_data data);
 
+    /* Clone an object handle */
+    QPDF_DLL
+    qpdf_oh qpdf_oh_new_object(qpdf_data qpdf, qpdf_oh oh);
+
     /* Get trailer and root objects */
     QPDF_DLL
     qpdf_oh qpdf_get_trailer(qpdf_data data);

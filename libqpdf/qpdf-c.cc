@@ -841,6 +841,12 @@ new_object(qpdf_data qpdf, QPDFObjectHandle const& qoh)
     return oh;
 }
 
+qpdf_oh qpdf_oh_new_object(qpdf_data qpdf, qpdf_oh oh)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_new_object");
+    return new_object(qpdf, *(qpdf->oh_cache[oh]));
+}
+
 void qpdf_oh_release(qpdf_data qpdf, qpdf_oh oh)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_oh_release");

@@ -531,14 +531,19 @@ static void test24(char const* infile,
     assert(qpdf_oh_is_array(qpdf, mediabox));
     assert(qpdf_oh_get_array_n_items(qpdf, mediabox) == 4);
     qpdf_oh wrapped_mediabox = qpdf_oh_wrap_in_array(qpdf, mediabox);
+    qpdf_oh cloned_mediabox = qpdf_oh_new_object(qpdf, mediabox);
     assert(wrapped_mediabox != mediabox);
+    assert(cloned_mediabox != mediabox);
     assert(qpdf_oh_get_array_n_items(qpdf, wrapped_mediabox) == 4);
     for (int i = 0; i < 4; ++i)
     {
         qpdf_oh item = qpdf_oh_get_array_item(qpdf, mediabox, i);
         qpdf_oh item2 = qpdf_oh_get_array_item(qpdf, wrapped_mediabox, i);
+        qpdf_oh item3 = qpdf_oh_get_array_item(qpdf, cloned_mediabox, i);
         assert(qpdf_oh_get_int_value_as_int(qpdf, item) ==
                qpdf_oh_get_int_value_as_int(qpdf, item2));
+        assert(qpdf_oh_get_int_value_as_int(qpdf, item) ==
+               qpdf_oh_get_int_value_as_int(qpdf, item3));
         printf("item %d: %d %.2f\n",
                i, qpdf_oh_get_int_value_as_int(qpdf, item),
                qpdf_oh_get_numeric_value(qpdf, item));
