@@ -5140,6 +5140,12 @@ print "\n";
           from the C API, you still have to be able to detect them.
          </para>
         </listitem>
+        <listitem>
+         <para>
+          Add <function>qpdf_oh_new_object</function> to the
+          C API. This allows you to clone an object handle.
+         </para>
+        </listitem>
        </itemizedlist>
       </listitem>
      </itemizedlist>

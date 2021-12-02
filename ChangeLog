@@ -6,6 +6,9 @@
 	the last string returned. This is necessary in order to fully
 	retrieve values of strings that may contain embedded null characters.
 
+	* C API: Add qpdf_oh_new_object to clone an object handle. Change
+	implemented by m-holger in #587.
+
 2021-11-16  Jay Berkenbilt  <ejb@ql.org>
 
 	* 10.4.0: release
