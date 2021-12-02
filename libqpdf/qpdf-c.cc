@@ -150,6 +150,27 @@ static QPDF_ERROR_CODE trap_errors(qpdf_data qpdf, void (*fn)(qpdf_data))
     return status;
 }
 
+static qpdf_oh trap_errors_oh(qpdf_data qpdf, qpdf_oh (*fn)(qpdf_data))
+{
+    try
+    {
+    return fn(qpdf);
+    }
+    catch (QPDFExc& e)
+    {
+	qpdf->error = new QPDFExc(e);
+    }
+    catch (std::runtime_error& e)
+    {
+	qpdf->error = new QPDFExc(qpdf_e_system, "", "", 0, e.what());
+    }
+    catch (std::exception& e)
+    {
+	qpdf->error = new QPDFExc(qpdf_e_internal, "", "", 0, e.what());
+    }
+    return qpdf_oh_new_null(qpdf); 
+}
+
 char const* qpdf_get_qpdf_version()
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_get_qpdf_version");
@@ -859,10 +880,15 @@ qpdf_oh qpdf_get_trailer(qpdf_data qpdf)
     return new_object(qpdf, qpdf->qpdf->getTrailer());
 }
 
+static qpdf_oh call_get_root(qpdf_data qpdf)
+{
+    return new_object(qpdf, qpdf->qpdf->getRoot());
+}
+
 qpdf_oh qpdf_get_root(qpdf_data qpdf)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_get_root");
-    return new_object(qpdf, qpdf->qpdf->getRoot());
+    return trap_errors_oh(qpdf, &call_get_root);
 }
 
 static bool

@@ -510,6 +510,10 @@ static void test24(char const* infile,
     qpdf_oh root_from_trailer = qpdf_oh_get_key(qpdf, trailer, "/Root");
     assert(qpdf_oh_get_object_id(qpdf, root) ==
            qpdf_oh_get_object_id(qpdf, root_from_trailer));
+    qpdf_data pdf2 = qpdf_init();
+    qpdf_oh uninit_root = qpdf_get_root(pdf2);
+    assert(qpdf_oh_is_null(pdf2, uninit_root));
+    assert(qpdf_has_error(pdf2));
     qpdf_oh pages = qpdf_oh_get_key(qpdf, root, "/Pages");
     assert(qpdf_oh_is_dictionary(qpdf, pages));
     qpdf_oh kids = qpdf_oh_get_key(qpdf, pages, "/Kids");
