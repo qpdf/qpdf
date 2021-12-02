@@ -4,62 +4,6 @@ Documentation
 * See #530 -- add an appendix explaining PDF encryption in general
   plus how it's handled by qpdf.
 
-Safer QPDFObjectHandle
-======================
-
-Consider one of the following or something similar to make it possible
-to completely eliminate warnings from treating objects of one type as
-objects of a different type.
-
-Modeled after rust's Option type:
-
-```
-QPDFSafeObjectHandle soh = getObjectFromSomewhere();
-
-// QPDFSafeObjectHandle would be just like QPDFObjectHandle except
-// none of the type-specific methods would be there.
-QPDFDictionaryHandle dh = soh.asDictionary();
-if (dh.isValid()) {
-  QPDFSafeObjectHandle value = dh.value().getKey("/Key");
-}
-```
-
-More like typescript's narrowing:
-
-```
-QPDFSafeObjectHandle soh = getObjectFromSomewhere();
-QPDFSafeObjectHandle value = soh.getKey("/Key");
-```
-
-this would raise `std::logic_error` even if soh was a dictionary. But this would work:
-
-```
-QPDFSafeObjectHandle soh = getObjectFromSomewhere();
-if (soh.isDictionary()) {
-  QPDFSafeObjectHandle value = soh.getKey("/Key");
-}
-```
-
-In safe mode, we would have checkers (like we do now) but we would
-track whether a specific checker had been called and throw a
-`std::logic_error` if we call a type-specific method without first
-calling a checker. This means that code that passes the happy path
-still has to always do type checks, and this should completely
-eliminate type mismatch warnings.
-
-Migrating existing code to use this safe version would just be a
-matter of changing all occurrences of `QPDFObjectHandle` to
-`QPDFSafeObjectHandle` and making sure you had test coverage on every
-accessor/mutator method call. If you did and the code worked for the
-happy path, then you would be assured of never getting a warning about
-the a method called on an object of the wrong type.
-
-Implementation idea: maybe make a QPDFObjectHandleInternal<bool safe>
-template with QPDFObjectHandle as QPDFObjectHandleInternal<false> and
-QPDFSafeObjectHandle as QPDFObjectHandle<true>. We could then
-potentially specialize certain methods to reduce the overhead and code
-duplication without causing a change to the behavior of any existing
-code.
 
 Document-level work
 ===================
