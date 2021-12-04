@@ -1,6 +1,6 @@
 
 qpdf: --split-pages may not be used when writing to standard output
 
-Usage: qpdf [options] infile outfile
+Usage: qpdf [options] {infile | --empty} [page_selection_options] outfile
 For detailed help, run qpdf --help
 

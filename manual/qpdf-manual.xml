@@ -556,7 +556,7 @@ make
    <para>
     When running qpdf, the basic invocation is as follows:
 
-    <programlisting><command>qpdf</command><option> [ <replaceable>options</replaceable> ] <replaceable>infilename</replaceable> [ <replaceable>outfilename</replaceable> ]</option>
+    <programlisting><command>qpdf</command><option> [ <replaceable>options</replaceable> ] { <replaceable>infilename</replaceable> | <option>--empty</option> } [ <replaceable>page_selection_options</replaceable> ] <replaceable>outfilename</replaceable></option>
 </programlisting>
     This converts PDF file <option>infilename</option> to PDF file
     <option>outfilename</option>.  The output file is functionally
@@ -1551,7 +1551,7 @@ make
    </para>
    <para>
     Starting with qpf 8.4, the special input file name
-    &ldquo;<filename>.</filename>&rdquo; can be used shortcut for the
+    &ldquo;<filename>.</filename>&rdquo; can be used as a shortcut for the
     primary input filename.
    </para>
    <para>

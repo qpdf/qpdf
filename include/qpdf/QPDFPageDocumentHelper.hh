@@ -46,11 +46,11 @@ class QPDFPageDocumentHelper: public QPDFDocumentHelper
 
     // Traverse page tree, and return all /Page objects wrapped in
     // QPDFPageObjectHelper objects. Unlike with
-    // QPDFObjectHandle::getAllPages, the vector of pages returned by
+    // QPDF::getAllPages, the vector of pages returned by
     // this call is not affected by additions or removals of pages. If
     // you manipulate pages, you will have to call this again to get a
-    // new copy. Please comments in QPDFObjectHandle.hh for
-    // getAllPages() for additional details.
+    // new copy. Please see comments in QPDF.hh for getAllPages() for
+    // additional details.
     QPDF_DLL
     std::vector<QPDFPageObjectHelper> getAllPages();
 
