@@ -461,6 +461,8 @@ qpdf-c called qpdf_oh_release_all 0
 qpdf-c called qpdf_new_object 0
 qpdf-c called qpdf_get_trailer 0
 qpdf-c called qpdf_get_root 0
+qpdf-c called qpdf_get_object_by_id 0
+qpdf-c called qpdf_replace_object 0
 qpdf-c called qpdf_oh_is_bool 0
 qpdf-c called qpdf_oh_is_null 0
 qpdf-c called qpdf_oh_is_integer 0

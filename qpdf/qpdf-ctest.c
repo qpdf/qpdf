@@ -532,6 +532,8 @@ static void test24(char const* infile,
     assert(qpdf_oh_get_array_n_items(qpdf, mediabox) == 4);
     qpdf_oh wrapped_mediabox = qpdf_oh_wrap_in_array(qpdf, mediabox);
     qpdf_oh cloned_mediabox = qpdf_oh_new_object(qpdf, mediabox);
+    qpdf_oh root_by_id = qpdf_get_object_by_id(qpdf,3,0);
+    qpdf_oh retrieved_mediabox =  qpdf_oh_get_key(qpdf, root_by_id , "/MediaBox") ;
     assert(wrapped_mediabox != mediabox);
     assert(cloned_mediabox != mediabox);
     assert(qpdf_oh_get_array_n_items(qpdf, wrapped_mediabox) == 4);
@@ -540,10 +542,13 @@ static void test24(char const* infile,
         qpdf_oh item = qpdf_oh_get_array_item(qpdf, mediabox, i);
         qpdf_oh item2 = qpdf_oh_get_array_item(qpdf, wrapped_mediabox, i);
         qpdf_oh item3 = qpdf_oh_get_array_item(qpdf, cloned_mediabox, i);
+        qpdf_oh item4 = qpdf_oh_get_array_item(qpdf, retrieved_mediabox, i);
         assert(qpdf_oh_get_int_value_as_int(qpdf, item) ==
                qpdf_oh_get_int_value_as_int(qpdf, item2));
         assert(qpdf_oh_get_int_value_as_int(qpdf, item) ==
                qpdf_oh_get_int_value_as_int(qpdf, item3));
+        assert(qpdf_oh_get_int_value_as_int(qpdf, item) ==
+               qpdf_oh_get_int_value_as_int(qpdf, item4));
         printf("item %d: %d %.2f\n",
                i, qpdf_oh_get_int_value_as_int(qpdf, item),
                qpdf_oh_get_numeric_value(qpdf, item));
@@ -679,6 +684,10 @@ static void test24(char const* infile,
     qpdf_set_qdf_mode(qpdf, QPDF_TRUE);
     qpdf_set_suppress_original_object_IDs(qpdf, QPDF_TRUE);
     qpdf_write(qpdf);
+
+    /* Test qpdf_replace_object - this destroys the page1/Contents object */
+    qpdf_replace_object(qpdf, 4, 0, qpdf_oh_new_array(qpdf));
+    assert(qpdf_oh_is_array(qpdf, qpdf_get_object_by_id(qpdf, 4, 0)));
     report_errors();
 }
 

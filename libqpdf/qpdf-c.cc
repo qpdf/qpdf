@@ -847,6 +847,40 @@ qpdf_oh qpdf_oh_new_object(qpdf_data qpdf, qpdf_oh oh)
     return new_object(qpdf, *(qpdf->oh_cache[oh]));
 }
 
+static bool
+qpdf_oh_valid_internal(qpdf_data qpdf, qpdf_oh oh)
+{
+    auto i = qpdf->oh_cache.find(oh);
+    bool result = ((i != qpdf->oh_cache.end()) &&
+                   (i->second).getPointer() &&
+                   (i->second)->isInitialized());
+    if (! result)
+    {
+        QTC::TC("qpdf", "qpdf-c invalid object handle");
+        qpdf->warnings.push_back(
+            QPDFExc(
+                qpdf_e_damaged_pdf,
+                qpdf->qpdf->getFilename(),
+                std::string("C API object handle ") +
+                QUtil::uint_to_string(oh),
+                0, "attempted access to unknown/uninitialized object handle"));
+    }
+    return result;
+}
+
+static QPDFObjectHandle
+qpdf_oh_item_internal(qpdf_data qpdf, qpdf_oh item)
+{
+    if (qpdf_oh_valid_internal(qpdf, item))
+    {
+        return *(qpdf->oh_cache[item]);
+    }
+    else
+    {
+        return QPDFObjectHandle::newNull();
+    }
+}
+
 void qpdf_oh_release(qpdf_data qpdf, qpdf_oh oh)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_oh_release");
@@ -871,25 +905,17 @@ qpdf_oh qpdf_get_root(qpdf_data qpdf)
     return new_object(qpdf, qpdf->qpdf->getRoot());
 }
 
-static bool
-qpdf_oh_valid_internal(qpdf_data qpdf, qpdf_oh oh)
+
+qpdf_oh qpdf_get_object_by_id(qpdf_data qpdf, int objid, int generation)
 {
-    auto i = qpdf->oh_cache.find(oh);
-    bool result = ((i != qpdf->oh_cache.end()) &&
-                   (i->second).getPointer() &&
-                   (i->second)->isInitialized());
-    if (! result)
-    {
-        QTC::TC("qpdf", "qpdf-c invalid object handle");
-        qpdf->warnings.push_back(
-            QPDFExc(
-                qpdf_e_damaged_pdf,
-                qpdf->qpdf->getFilename(),
-                std::string("C API object handle ") +
-                QUtil::uint_to_string(oh),
-                0, "attempted access to unknown/uninitialized object handle"));
-    }
-    return result;
+    QTC::TC("qpdf", "qpdf-c called qpdf_get_object_by_id");
+    return new_object(qpdf, qpdf->qpdf->getObjectByID(objid, generation));
+}
+
+void qpdf_replace_object(qpdf_data qpdf, int objid, int generation, qpdf_oh oh)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_replace_object");
+    qpdf->qpdf->replaceObject(objid, generation, qpdf_oh_item_internal(qpdf, oh));
 }
 
 QPDF_BOOL qpdf_oh_is_bool(qpdf_data qpdf, qpdf_oh oh)
@@ -1278,19 +1304,6 @@ void qpdf_oh_make_direct(qpdf_data qpdf, qpdf_oh oh)
     {
         QTC::TC("qpdf", "qpdf-c called qpdf_oh_make_direct");
         qpdf->oh_cache[oh]->makeDirect();
-    }
-}
-
-static QPDFObjectHandle
-qpdf_oh_item_internal(qpdf_data qpdf, qpdf_oh item)
-{
-    if (qpdf_oh_valid_internal(qpdf, item))
-    {
-        return *(qpdf->oh_cache[item]);
-    }
-    else
-    {
-        return QPDFObjectHandle::newNull();
     }
 }
 
