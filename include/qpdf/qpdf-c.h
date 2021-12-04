@@ -502,7 +502,7 @@ extern "C" {
      * specific method of QPDFObjectHandler. For example,
      * qpdf_oh_is_bool corresponds to QPDFObjectHandle::isBool. If the
      * C++ method is overloaded, the C function's name will be
-     * disambiguated. If the C++ method takes optional argumens, the C
+     * disambiguated. If the C++ method takes optional arguments, the C
      * function will have required arguments in those positions. For
      * details about the method, please see comments in
      * QPDFObjectHandle.hh. Comments here only explain things that are
@@ -527,7 +527,7 @@ extern "C" {
      * expected to be valid after the next qpdf call.
      *
      * The qpdf_data object keeps a cache of handles returned by these
-     * functions. Once you are finished referencing an handle, you can
+     * functions. Once you are finished referencing a handle, you can
      * optionally release it. Releasing handles is optional since they
      * will all get released by qpdf_cleanup, but it can help to
      * reduce the memory footprint of the qpdf_data object to release
@@ -538,8 +538,8 @@ extern "C" {
      * add it to an existing dictionary or array, and then release it's
      * handle, the object is safely part of the dictionary or array.
      * Similarly, any other object handle refering to the object remains
-     * valid. Explicitly releasing an object is essentially the same as
-     * letting a QPDFObjectHandle go out of scope in the C++ API.
+     * valid. Explicitly releasing an object handle is essentially the
+     * same as letting a QPDFObjectHandle go out of scope in the C++ API.
      */
 
     /* For examples of using this API, see examples/pdf-c-objects.c */

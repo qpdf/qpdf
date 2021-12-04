@@ -320,7 +320,7 @@ class QPDFObjectHandle
     QPDF_DLL
     char const* getTypeName();
 
-    // Exactly one of these will return true for any object.  Operator
+    // Exactly one of these will return true for any initialized object.  Operator
     // and InlineImage are only allowed in content streams.
     QPDF_DLL
     bool isBool();
@@ -594,7 +594,7 @@ class QPDFObjectHandle
     static QPDFObjectHandle newReserved(QPDF* qpdf);
 
     // Provide an owning qpdf and object description. The library does
-    // this automatically with objects that are read from from the
+    // this automatically with objects that are read from the
     // input PDF and with objects that are created programmatically
     // and inserted into the QPDF by adding them to an array or a
     // dictionary or creating a new indirect object. Most end user
@@ -648,7 +648,7 @@ class QPDFObjectHandle
     // with PDF Doc Encoding. PDF Doc Encoding is identical to
     // ISO-8859-1 except in the range from 0200 through 0240, where
     // there is a mapping of characters to Unicode. QPDF versions
-    // prior to version erroneously left characters in that range
+    // prior to version 8.0.0 erroneously left characters in that range
     // unmapped.
     QPDF_DLL
     std::string getUTF8Value();
@@ -684,13 +684,13 @@ class QPDFObjectHandle
     std::vector<QPDFObjectHandle> getArrayAsVector();
     QPDF_DLL
     bool isRectangle();
-    // If the array an array of four numeric values, return as a
+    // If the array is an array of four numeric values, return as a
     // rectangle. Otherwise, return the rectangle [0, 0, 0, 0]
     QPDF_DLL
     Rectangle getArrayAsRectangle();
     QPDF_DLL
     bool isMatrix();
-    // If the array an array of six numeric values, return as a
+    // If the array is an array of six numeric values, return as a
     // matrix. Otherwise, return the matrix [1, 0, 0, 1, 0, 0]
     QPDF_DLL
     Matrix getArrayAsMatrix();
