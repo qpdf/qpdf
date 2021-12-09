@@ -500,16 +500,23 @@ static void test24(char const* infile,
 		   char const* outfile,
 		   char const* outfile2)
 {
-    /* This test case is designed for minimal.pdf. */
+    /* This test case is designed for minimal.pdf. Pull objects out of
+     * minimal.pdf to make sure all our accessors work as expected.
+     */
+
     qpdf_read(qpdf, infile, password);
     qpdf_oh trailer = qpdf_get_trailer(qpdf);
     /* The library never returns 0 */
     assert(trailer == 1);
+
+    /* Get root two different ways */
     qpdf_oh root = qpdf_get_root(qpdf);
     assert(qpdf_oh_get_generation(qpdf, root) == 0);
     qpdf_oh root_from_trailer = qpdf_oh_get_key(qpdf, trailer, "/Root");
     assert(qpdf_oh_get_object_id(qpdf, root) ==
            qpdf_oh_get_object_id(qpdf, root_from_trailer));
+
+    /* Go to the first page and look at all the keys */
     qpdf_oh pages = qpdf_oh_get_key(qpdf, root, "/Pages");
     assert(qpdf_oh_is_dictionary(qpdf, pages));
     assert(qpdf_oh_is_initialized(qpdf, pages));
@@ -522,6 +529,8 @@ static void test24(char const* infile,
     {
         printf("page dictionary key: %s\n", qpdf_oh_dict_next_key(qpdf));
     }
+
+    /* Inspect the first page */
     qpdf_oh type = qpdf_oh_get_key(qpdf, page1, "/Type");
     assert(qpdf_oh_is_name(qpdf, type));
     assert(strcmp(qpdf_oh_get_name(qpdf, type), "/Page") == 0);
@@ -531,32 +540,24 @@ static void test24(char const* infile,
     assert(! qpdf_oh_is_scalar(qpdf, mediabox));
     assert(qpdf_oh_is_array(qpdf, mediabox));
     assert(qpdf_oh_get_array_n_items(qpdf, mediabox) == 4);
-    qpdf_oh wrapped_mediabox = qpdf_oh_wrap_in_array(qpdf, mediabox);
-    qpdf_oh cloned_mediabox = qpdf_oh_new_object(qpdf, mediabox);
-    assert(wrapped_mediabox != mediabox);
-    assert(cloned_mediabox != mediabox);
-    assert(qpdf_oh_get_array_n_items(qpdf, wrapped_mediabox) == 4);
     for (int i = 0; i < 4; ++i)
     {
         qpdf_oh item = qpdf_oh_get_array_item(qpdf, mediabox, i);
-        qpdf_oh item2 = qpdf_oh_get_array_item(qpdf, wrapped_mediabox, i);
-        qpdf_oh item3 = qpdf_oh_get_array_item(qpdf, cloned_mediabox, i);
-        assert(qpdf_oh_get_int_value_as_int(qpdf, item) ==
-               qpdf_oh_get_int_value_as_int(qpdf, item2));
-        assert(qpdf_oh_get_int_value_as_int(qpdf, item) ==
-               qpdf_oh_get_int_value_as_int(qpdf, item3));
         printf("item %d: %d %.2f\n",
                i, qpdf_oh_get_int_value_as_int(qpdf, item),
                qpdf_oh_get_numeric_value(qpdf, item));
-        qpdf_oh_release(qpdf, item);
     }
+
+    /* Exercise different ways of looking at integers */
     qpdf_oh i2 = qpdf_oh_get_array_item(qpdf, mediabox, 2);
     assert(qpdf_oh_get_int_value_as_int(qpdf, i2) == 612);
     assert(qpdf_oh_get_int_value(qpdf, i2) == 612ll);
     assert(qpdf_oh_get_uint_value_as_uint(qpdf, i2) == 612u);
     assert(qpdf_oh_get_uint_value(qpdf, i2) == 612ull);
+    /* Exercise accessors of other object types */
     assert(! qpdf_oh_is_operator(qpdf, i2));
     assert(! qpdf_oh_is_inline_image(qpdf, i2));
+    /* Chain calls. */
     qpdf_oh encoding = qpdf_oh_get_key(
         qpdf, qpdf_oh_get_key(
             qpdf, qpdf_oh_get_key(
@@ -566,6 +567,8 @@ static void test24(char const* infile,
             "/F1"),
         "/Encoding");
     assert(strcmp(qpdf_oh_get_name(qpdf, encoding), "/WinAnsiEncoding") == 0);
+
+    /* Look at page contents to exercise stream functions */
     qpdf_oh contents = qpdf_oh_get_key(qpdf, page1, "/Contents");
     assert(qpdf_oh_is_stream(qpdf, contents));
     qpdf_oh contents_dict = qpdf_oh_get_dict(qpdf, contents);
@@ -580,12 +583,15 @@ static void test24(char const* infile,
     assert(qpdf_oh_get_object_id(
                qpdf, qpdf_oh_get_array_item(qpdf, contents_array, 0)) ==
            qpdf_oh_get_object_id(qpdf, contents));
+    /* Wrap in array for a non-trivial case */
     qpdf_oh wrapped_contents_array =
         qpdf_oh_wrap_in_array(qpdf, contents_array);
     assert(qpdf_oh_get_array_n_items(qpdf, wrapped_contents_array) == 1);
     assert(qpdf_oh_get_object_id(
                qpdf, qpdf_oh_get_array_item(qpdf, wrapped_contents_array, 0)) ==
            qpdf_oh_get_object_id(qpdf, contents));
+
+    /* Exercise functions that work with indirect objects */
     qpdf_oh resources = qpdf_oh_get_key(qpdf, page1, "/Resources");
     qpdf_oh procset = qpdf_oh_get_key(qpdf, resources, "/ProcSet");
     assert(strcmp(qpdf_oh_unparse(qpdf, procset),
@@ -595,8 +601,44 @@ static void test24(char const* infile,
     qpdf_oh_make_direct(qpdf, procset);
     assert(strcmp(qpdf_oh_unparse(qpdf, procset),
            "[ /PDF /Text ]") == 0);
+    /* The replaced /ProcSet can be seen to be a direct object in the
+     * expected output PDF.
+     */
     qpdf_oh_replace_key(qpdf, resources, "/ProcSet", procset);
 
+    /* Release and access to exercise warnings and to show that write
+     * still works after releasing.
+     */
+    qpdf_oh_release(qpdf, page1);
+    contents = qpdf_oh_get_key(qpdf, page1, "/Contents");
+    assert(qpdf_oh_is_null(qpdf, contents));
+    assert(qpdf_oh_is_array(qpdf, mediabox));
+    qpdf_oh_release_all(qpdf);
+    assert(! qpdf_oh_is_null(qpdf, mediabox));
+    assert(! qpdf_oh_is_array(qpdf, mediabox));
+    /* Make sure something is assigned when we exit so we check that
+     * it gets properly freed.
+     */
+    qpdf_get_root(qpdf);
+
+    qpdf_init_write(qpdf, outfile);
+    qpdf_set_static_ID(qpdf, QPDF_TRUE);
+    qpdf_set_qdf_mode(qpdf, QPDF_TRUE);
+    qpdf_set_suppress_original_object_IDs(qpdf, QPDF_TRUE);
+    qpdf_write(qpdf);
+    report_errors();
+}
+
+static void test25(char const* infile,
+		   char const* password,
+		   char const* outfile,
+		   char const* outfile2)
+{
+    /* This test case is designed for minimal.pdf. */
+    qpdf_read(qpdf, infile, password);
+    qpdf_oh root = qpdf_get_root(qpdf);
+
+    /* Parse objects from a string */
     qpdf_oh parsed = qpdf_oh_parse(
         qpdf, "[ 1 2.0 (3\xf7) << /Four [/Five] >> null true ]");
     qpdf_oh p_int = qpdf_oh_get_array_item(qpdf, parsed, 0);
@@ -614,13 +656,6 @@ static void test24(char const* infile,
            (strcmp(qpdf_oh_get_string_value(qpdf, p_string), "3\xf7") == 0) &&
            (strcmp(qpdf_oh_get_utf8_value(qpdf, p_string), "3\xc3\xb7") == 0) &&
            (strcmp(qpdf_oh_unparse_binary(qpdf, p_string), "<33f7>") == 0));
-    qpdf_oh p_string_with_null = qpdf_oh_parse(qpdf, "<6f6e650074776f>");
-    assert(qpdf_oh_is_string(qpdf, p_string_with_null) &&
-           (strcmp(qpdf_oh_get_string_value(qpdf, p_string_with_null),
-                   "one") == 0) &&
-           (qpdf_get_last_string_length(qpdf) == 7) &&
-           (memcmp(qpdf_oh_get_string_value(qpdf, p_string_with_null),
-                   "one\000two", 7) == 0));
     assert(qpdf_oh_is_dictionary(qpdf, p_dict));
     qpdf_oh p_five = qpdf_oh_get_key(qpdf, p_dict, "/Four");
     assert(qpdf_oh_is_or_has_name(qpdf, p_five, "/Five"));
@@ -669,31 +704,82 @@ static void test24(char const* infile,
         qpdf, new_array, qpdf_oh_new_bool(qpdf, QPDF_TRUE));
     qpdf_oh_replace_key(qpdf, root, "/QTest", new_dict);
 
-    /* Release and access to exercise warnings */
-    qpdf_oh_release(qpdf, page1);
-    contents = qpdf_oh_get_key(qpdf, page1, "/Contents");
-    assert(qpdf_oh_is_null(qpdf, contents));
-    assert(qpdf_oh_is_array(qpdf, mediabox));
-    qpdf_oh_release_all(qpdf);
-    assert(! qpdf_oh_is_null(qpdf, mediabox));
-    assert(! qpdf_oh_is_array(qpdf, mediabox));
-    /* Make sure something is assigned when we exit so we check that
-     * it gets properl freed.
-     */
-    qpdf_get_root(qpdf);
-
     qpdf_init_write(qpdf, outfile);
     qpdf_set_static_ID(qpdf, QPDF_TRUE);
     qpdf_set_qdf_mode(qpdf, QPDF_TRUE);
     qpdf_set_suppress_original_object_IDs(qpdf, QPDF_TRUE);
     qpdf_write(qpdf);
     report_errors();
-
+}
+static void test26(char const* infile,
+		   char const* password,
+		   char const* outfile,
+		   char const* outfile2)
+{
     /* Make sure we detect uninitialized objects */
     qpdf_data qpdf2 = qpdf_init();
-    trailer = qpdf_get_trailer(qpdf2);
+    qpdf_oh trailer = qpdf_get_trailer(qpdf2);
     assert(! qpdf_oh_is_initialized(qpdf2, trailer));
     qpdf_cleanup(&qpdf2);
+}
+
+static void test27(char const* infile,
+		   char const* password,
+		   char const* outfile,
+		   char const* outfile2)
+{
+    /* Exercise a string with a null. Since the regular methods return
+     * char*, we can't see past the null character without looking
+     * explicitly at the length.
+     */
+    qpdf_oh p_string_with_null = qpdf_oh_parse(qpdf, "<6f6e650074776f>");
+    assert(qpdf_oh_is_string(qpdf, p_string_with_null));
+    assert(strcmp(qpdf_oh_get_string_value(qpdf, p_string_with_null),
+                  "one") == 0);
+    assert(qpdf_get_last_string_length(qpdf) == 7);
+    assert(memcmp(qpdf_oh_get_string_value(qpdf, p_string_with_null),
+                  "one\000two", 7) == 0);
+}
+
+static void test28(char const* infile,
+		   char const* password,
+		   char const* outfile,
+		   char const* outfile2)
+{
+    /* This test case is designed for minimal.pdf. */
+
+    /* Look at the media box. The media box is in array. Trivially
+     * wrap it and also clone it and make sure we get different
+     * handles with the same contents.
+     */
+    qpdf_read(qpdf, infile, password);
+    qpdf_oh root = qpdf_get_root(qpdf);
+    qpdf_oh pages = qpdf_oh_get_key(qpdf, root, "/Pages");
+    qpdf_oh kids = qpdf_oh_get_key(qpdf, pages, "/Kids");
+    qpdf_oh page1 = qpdf_oh_get_array_item(qpdf, kids, 0);
+    qpdf_oh mediabox = qpdf_oh_get_key(qpdf, page1, "/MediaBox");
+    qpdf_oh wrapped_mediabox = qpdf_oh_wrap_in_array(qpdf, mediabox);
+    qpdf_oh cloned_mediabox = qpdf_oh_new_object(qpdf, mediabox);
+    assert(wrapped_mediabox != mediabox);
+    assert(cloned_mediabox != mediabox);
+    assert(qpdf_oh_get_array_n_items(qpdf, wrapped_mediabox) == 4);
+    for (int i = 0; i < 4; ++i)
+    {
+        qpdf_oh item = qpdf_oh_get_array_item(qpdf, mediabox, i);
+        qpdf_oh item2 = qpdf_oh_get_array_item(qpdf, wrapped_mediabox, i);
+        qpdf_oh item3 = qpdf_oh_get_array_item(qpdf, cloned_mediabox, i);
+        assert(qpdf_oh_get_int_value_as_int(qpdf, item) ==
+               (i == 0 ? 0 :
+                i == 1 ? 0 :
+                i == 2 ? 612 :
+                i == 3 ? 792 :
+                -1));
+        assert(qpdf_oh_get_int_value_as_int(qpdf, item) ==
+               qpdf_oh_get_int_value_as_int(qpdf, item2));
+        assert(qpdf_oh_get_int_value_as_int(qpdf, item) ==
+               qpdf_oh_get_int_value_as_int(qpdf, item3));
+        qpdf_oh_release(qpdf, item);
+    }
 }
 
 int main(int argc, char* argv[])
@@ -760,6 +846,10 @@ int main(int argc, char* argv[])
 	  (n == 22) ? test22 :
 	  (n == 23) ? test23 :
 	  (n == 24) ? test24 :
+	  (n == 25) ? test25 :
+	  (n == 26) ? test26 :
+	  (n == 27) ? test27 :
+	  (n == 28) ? test28 :
 	  0);
 
     if (fn == 0)

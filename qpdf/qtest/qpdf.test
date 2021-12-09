@@ -4808,17 +4808,37 @@ foreach my $i (@c_check_types)
 show_ntests();
 # ----------
 $td->notify("--- C API Object Handle ---");
-$n_tests += scalar(@c_check_types);
+$n_tests += 7;
 
 $td->runtest("C check object handles",
              {$td->COMMAND => "qpdf-ctest 24 minimal.pdf '' a.pdf"},
              {$td->FILE => "c-object-handles.out",
                   $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
-
 $td->runtest("check output",
 	     {$td->FILE => 'a.pdf'},
 	     {$td->FILE => 'c-object-handles-out.pdf'});
+
+$td->runtest("C check object handle creation",
+             {$td->COMMAND => "qpdf-ctest 25 minimal.pdf '' a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => 'a.pdf'},
+	     {$td->FILE => 'c-object-handle-creation-out.pdf'});
+
+$td->runtest("C uninitialized objects",
+             {$td->COMMAND => "qpdf-ctest 26 '' '' ''"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("C string with embedded null",
+             {$td->COMMAND => "qpdf-ctest 27 '' '' ''"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("C wrap and clone objects",
+             {$td->COMMAND => "qpdf-ctest 28 minimal.pdf '' ''"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 show_ntests();
 # ----------
