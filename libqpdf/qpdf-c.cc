@@ -828,6 +828,7 @@ void qpdf_register_progress_reporter(
     void (*report_progress)(int percent, void* data),
     void* data)
 {
+    QTC::TC("qpdf", "qpdf-c registered progress reporter");
     qpdf->qpdf_writer->registerProgressReporter(
         new ProgressReporter(report_progress, data));
 }

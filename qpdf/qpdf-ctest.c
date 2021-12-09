@@ -117,6 +117,11 @@ static void read_file_into_memory(char const* filename,
     fclose(f);
 }
 
+static void count_progress(int percent, void* data)
+{
+    ++(*(int*)data);
+}
+
 static void test01(char const* infile,
 		   char const* password,
 		   char const* outfile,
@@ -201,11 +206,15 @@ static void test05(char const* infile,
 		   char const* outfile,
 		   char const* outfile2)
 {
+    int count = 0;
     qpdf_read(qpdf, infile, password);
     qpdf_init_write(qpdf, outfile);
+    qpdf_register_progress_reporter(qpdf, count_progress, (void*)&count);
     qpdf_set_static_ID(qpdf, QPDF_TRUE);
     qpdf_set_linearization(qpdf, QPDF_TRUE);
     qpdf_write(qpdf);
+    /* make sure progress reporter was called */
+    assert(count > 0);
     report_errors();
 }
 
