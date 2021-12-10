@@ -4560,6 +4560,96 @@ outfile.pdf</option>
     filtered stream contents to a given pipeline.
    </para>
   </sect1>
+  <sect1 id="ref.object-accessors">
+   <!-- This section is referenced in QPDFObjectHandle.hh -->
+   <title>Object Accessor Methods</title>
+   <para>
+    For general information about how to access instances of
+    <classname>QPDFObjectHandle</classname>, please see the comments
+    in <filename>QPDFObjectHandle.hh</filename>. Search for
+    &ldquo;Accessor methods&rdquo;. This section provides a more
+    in-depth discussion of the behavior and the rationale for the
+    behavior.
+   </para>
+   <para>
+    <emphasis>Why were type errors made into warnings?</emphasis> When
+    type checks were introduced into qpdf in the early days, it was
+    expected that type errors would only occur as a result of
+    programmer error. However, in practice, type errors would occur
+    with malformed PDF files because of assumptions made in code,
+    including code within the qpdf library and code written by library
+    users. The most common case would be chaining calls to
+    <function>getKey()</function> to access keys deep within a
+    dictionary. In many cases, qpdf would be able to recover from
+    these situations, but the old behavior often resulted in crashes
+    rather than graceful recovery. For this reason, the errors were
+    changed to warnings.
+   </para>
+   <para>
+    <emphasis>Why even warn about type errors when the user can't
+    usually do anything about them?</emphasis> Type warnings are
+    extremely valuable during development. Since it's impossible to
+    catch at compile time things like typos in dictionary key names or
+    logic errors around what the structure of a PDF file might be, the
+    presence of type warnings can save lots of developer time. They
+    have also proven useful in exposing issues in qpdf itself that
+    would have otherwise gone undetected.
+   </para>
+   <para>
+    <emphasis>Can there be a type-safe
+    <classname>QPDFObjectHandle</classname>?</emphasis> It would be
+    great if <classname>QPDFObjectHandle</classname> could be more
+    strongly typed so that you'd have to have check that something was
+    of a particular type before calling type-specific accessor
+    methods. However, implementing this at this stage of the library's
+    history would be quite difficult, and it would make a the common
+    pattern of drilling into an object no longer work. While it would
+    be possible to have a parallel interface, it would create a lot of
+    extra code. If qpdf were written in a language like rust, an
+    interface like this would make a lot of sense, but, for a variety
+    of reasons, the qpdf API is consistent with other APIs of its
+    time, relying on exception handling to catch errors. The
+    underlying PDF objects are inherently not type-safe. Forcing
+    stronger type safety in <classname>QPDFObjectHandle</classname>
+    would ultimately cause a lot more code to have to be written and
+    would like make software that uses qpdf more brittle, and even so,
+    checks would have to occur at runtime.
+   </para>
+   <para>
+    <emphasis>Why do type errors sometimes raise
+    exceptions?</emphasis> The way warnings work in qpdf requires a
+    <classname>QPDF</classname> object to be associated with an object
+    handle for a warning to be issued. It would be nice if this could
+    be fixed, but it would require major changes to the API. Rather
+    than throwing away these conditions, we convert them to
+    exceptions. It's not that bad though. Since any object handle that
+    was read from a file has an associated <classname>QPDF</classname>
+    object, it would only be type errors on objects that were created
+    explicitly that would cause exceptions, and in that case, type
+    errors are much more likely to be the result of a coding error
+    than invalid input.
+   </para>
+   <para>
+    <emphasis>Why does the behavior of a type exception differ between
+    the C and C++ API?</emphasis> There is no way to throw and catch
+    exceptions in C short of something like
+    <function>setjmp</function> and <function>longjmp</function>, and
+    that approach is not portable across language barriers. Since the
+    C API is often used from other languages, it's important to keep
+    things as simple as possible. Starting in qpdf 10.5, exceptions
+    that used to crash code using the C API will be written to stderr
+    by default, and it is possible to register an error handler.
+    There's no reason that the error handler can't simulate exception
+    handling in some way, such as by using <function>setjmp</function>
+    and <function>longjmp</function> or by setting some variable that
+    can be checked after library calls are made. In retrospect, it
+    might have been better if the C API object handle methods returned
+    error codes like the other methods and set return values in
+    passed-in pointers, but this would complicate both the
+    implementation and the use of the library for a case that is
+    actually quite rare and largely avoidable.
+   </para>
+  </sect1>
  </chapter>
  <chapter id="ref.linearization">
   <title>Linearization</title>
@@ -5125,6 +5215,20 @@ print "\n";
         Library Enhancements
        </para>
        <itemizedlist>
+        <listitem>
+         <para>
+          Since qpdf version 8, using object accessor methods on an
+          instance of <classname>QPDFObjectHandle</classname> may
+          create warnings if the object is not of the expected type.
+          These warnings now have an error code of
+          <literal>qpdf_e_object</literal> instead of
+          <literal>qpdf_e_damaged_pdf</literal>. Also, comments have
+          been added to <filename>QPDFObjectHandle.hh</filename> to
+          explain in more detail what the behavior is. See <xref
+          linkend="ref.object-accessors"/> for a more in-depth
+          discussion.
+         </para>
+        </listitem>
         <listitem>
          <para>
           Add <function>qpdf_get_last_string_length</function> to the

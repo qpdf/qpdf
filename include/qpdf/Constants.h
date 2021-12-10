@@ -38,6 +38,7 @@ enum qpdf_error_code_e
     qpdf_e_password,		/* incorrect password for encrypted file */
     qpdf_e_damaged_pdf,		/* syntax errors or other damage in PDF */
     qpdf_e_pages,               /* erroneous or unsupported pages structure */
+    qpdf_e_object,              /* type/bounds errors accessing objects */
 };
 
 /* Write Parameters. See QPDFWriter.hh for details. */

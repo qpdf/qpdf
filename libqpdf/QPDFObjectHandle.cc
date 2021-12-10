@@ -3048,23 +3048,17 @@ void
 QPDFObjectHandle::typeWarning(char const* expected_type,
                               std::string const& warning)
 {
-    QPDF* context = 0;
+    QPDF* context = nullptr;
     std::string description;
     dereference();
-    if (this->obj->getDescription(context, description))
-    {
-        warn(context,
-             QPDFExc(
-                 qpdf_e_damaged_pdf,
+    this->obj->getDescription(context, description);
+    // Null context handled by warn
+    warn(context,
+         QPDFExc(qpdf_e_object,
                  "", description, 0,
                  std::string("operation for ") + expected_type +
                  " attempted on object of type " +
                  getTypeName() + ": " + warning));
-    }
-    else
-    {
-        assertType(expected_type, false);
-    }
 }
 
 void
@@ -3091,7 +3085,12 @@ QPDFObjectHandle::warnIfPossible(std::string const& warning,
 void
 QPDFObjectHandle::objectWarning(std::string const& warning)
 {
-    warnIfPossible(warning, true);
+    QPDF* context = nullptr;
+    std::string description;
+    dereference();
+    this->obj->getDescription(context, description);
+    // Null context handled by warn
+    warn(context, QPDFExc(qpdf_e_object, "", description, 0, warning));
 }
 
 void

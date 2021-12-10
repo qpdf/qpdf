@@ -132,7 +132,9 @@ RELEASE PREPARATION
 
 * Check all open issues and pull requests in github and the
   sourceforge trackers. See ~/scripts/github-issues. Don't forget pull
-  requests.
+  requests. Note: If the location for reporting issues changes, do a
+  careful check of documentation and code to make sure any comments
+  that include the issue creation URL are updated.
 
 * Check `TODO` file to make sure all planned items for the release are
   done or retargeted.

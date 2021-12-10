@@ -259,7 +259,7 @@ void runtest(int n, char const* filename1, char const* arg2)
 	pdf.processMemoryFile((std::string(filename1) + ".pdf").c_str(),
                               p, size);
     }
-    else if (n == 61)
+    else if ((n == 61) || (n == 81))
     {
         // Ignore filename argument entirely
     }
@@ -3048,6 +3048,19 @@ void runtest(int n, char const* filename1, char const* arg2)
         w2.setStaticID(true);
         w2.setQDFMode(true);
         w2.write();
+    }
+    else if (n == 81)
+    {
+        // Exercise that type errors get their own special type
+        try
+        {
+            QPDFObjectHandle::newNull().getIntValue();
+            assert(false);
+        }
+        catch (QPDFExc& e)
+        {
+            assert(e.getErrorCode() == qpdf_e_object);
+        }
     }
     else
     {

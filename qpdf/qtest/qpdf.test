@@ -273,11 +273,15 @@ $td->runtest("check final version",
 show_ntests();
 # ----------
 $td->notify("--- Exceptions ---");
-$n_tests += 1;
+$n_tests += 2;
 
 $td->runtest("check exception handling",
              {$td->COMMAND => "test_driver 61 -"},
              {$td->FILE => "exceptions.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check certain exception types",
+             {$td->COMMAND => "test_driver 81 -"},
+             {$td->STRING => "test 81 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 show_ntests();
@@ -5303,6 +5307,7 @@ for (my $large = 0; $large < $nlarge; ++$large)
                  $td->NORMALIZE_NEWLINES);
     unlink $file;
 }
+show_ntests();
 # ----------
 
 cleanup();
