@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <qpdf/QTC.hh>
 #include <qpdf/Pipeline.hh>
+#include <qpdf/QUtil.hh>
 
 // These functions may be run at places where the function call
 // overhead from test coverage testing would be too high.  Therefore,
@@ -28,7 +29,10 @@ read_bits(unsigned char const*& p, size_t& bit_offset,
 
     if (bits_wanted > bits_available)
     {
-	throw std::length_error("overflow reading bit stream");
+	throw std::runtime_error(
+            "overflow reading bit stream: wanted = " +
+            QUtil::uint_to_string(bits_wanted) + "; available = " +
+            QUtil::uint_to_string(bits_available));
     }
     if (bits_wanted > 32)
     {

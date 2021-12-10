@@ -1788,12 +1788,12 @@ $td->runtest("bounds check linearization data 2",
              {$td->FILE => "linearization-bounds-2.out",
               $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
-# Throws logic error, not bad_alloc
+# Throws runtime error, not bad_alloc
 $td->runtest("sanity check array size",
              {$td->COMMAND =>
                   "qpdf --check linearization-large-vector-alloc.pdf"},
              {$td->FILE => "linearization-large-vector-alloc.out",
-              $td->EXIT_STATUS => 2},
+              $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 
 show_ntests();

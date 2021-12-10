@@ -5,4 +5,4 @@ File is linearized
 WARNING: linearization-large-vector-alloc.pdf (linearization hint stream: object 62 0, offset 1282): expected endstream
 WARNING: linearization-large-vector-alloc.pdf (linearization hint stream: object 62 0, offset 1183): attempting to recover stream length
 WARNING: linearization-large-vector-alloc.pdf (linearization hint stream: object 62 0, offset 1183): recovered stream length: 106
-ERROR: overflow reading bit stream
+WARNING: error encountered while checking linearization data: overflow reading bit stream: wanted = 12556; available = 968

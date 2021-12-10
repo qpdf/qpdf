@@ -1,5 +1,7 @@
 2021-12-10  Jay Berkenbilt  <ejb@ql.org>
 
+	* Handle bitstream overflow errors more gracefully. Fixes #581.
+
 	* C API: add qpdf_get_object_by_id, qpdf_make_indirect_object, and
 	qpdf_replace_object, exposing the corresponding methods in QPDF
 	and QPDFObjectHandle. Fixes #588.

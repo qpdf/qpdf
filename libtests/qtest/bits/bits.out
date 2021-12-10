@@ -17,7 +17,7 @@ bits read: 0, result = 0
 byte offset = 4, bit offset = 3, bits available = 28
 bits read: 25, result = 5320361
 byte offset = 7, bit offset = 2, bits available = 3
-exception: overflow reading bit stream
+exception: overflow reading bit stream: wanted = 4; available = 3
 byte offset = 7, bit offset = 2, bits available = 3
 bits read: 3, result = 3
 byte offset = 8, bit offset = 7, bits available = 0

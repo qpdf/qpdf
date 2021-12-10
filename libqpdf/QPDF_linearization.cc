@@ -71,9 +71,11 @@ QPDF::checkLinearization()
 	readLinearizationData();
 	result = checkLinearizationInternal();
     }
-    catch (QPDFExc& e)
+    catch (std::runtime_error& e)
     {
-	*this->m->err_stream << e.what() << std::endl;
+	*this->m->err_stream
+            << "WARNING: error encountered while checking linearization data: "
+            << e.what() << std::endl;
     }
     return result;
 }
