@@ -2704,14 +2704,27 @@ void runtest(int n, char const* filename1, char const* arg2)
         std::cout << "--- parseContents ---" << std::endl;
         ParserCallbacks cb;
         fx1.parseContents(&cb);
-        Pl_Buffer b("buffer");
-        fx1.addContentTokenFilter(new TokenFilter);
-        fx1.pipeContents(&b);
-        std::unique_ptr<Buffer> buf(b.getBuffer());
-        std::string s(
-            reinterpret_cast<char const*>(buf->getBuffer()),
-            buf->getSize());
-        assert(s.find("/bye") != std::string::npos);
+        // Do this once with addContentTokenFilter and once with
+        // addTokenFilter to show that they are the same and to ensure
+        // that addTokenFilter is directly exercised in testing.
+        for (int i = 0; i < 2; i++)
+        {
+            Pl_Buffer b("buffer");
+            if (i == 0)
+            {
+                fx1.addContentTokenFilter(new TokenFilter);
+            }
+            else
+            {
+                fx1.getObjectHandle().addTokenFilter(new TokenFilter);
+            }
+            fx1.pipeContents(&b);
+            std::unique_ptr<Buffer> buf(b.getBuffer());
+            std::string s(
+                reinterpret_cast<char const*>(buf->getBuffer()),
+                buf->getSize());
+            assert(s.find("/bye") != std::string::npos);
+        }
     }
     else if (n == 73)
     {

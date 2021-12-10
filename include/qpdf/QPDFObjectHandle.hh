@@ -456,6 +456,7 @@ class QPDFObjectHandle
     // be applied to a page object, and which will automatically
     // handle the case of pages whose contents are split across
     // multiple streams.
+    QPDF_DLL
     void addTokenFilter(PointerHolder<TokenFilter> token_filter);
 
     // Legacy helpers for parsing content streams. These methods are

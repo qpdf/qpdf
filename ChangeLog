@@ -1,5 +1,9 @@
 2021-12-10  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add missing QPDF_DLL to QPDFObjectHandle::addTokenFilter so that
+	it is actually accessible as part of the public interface as
+	intended. Fixes #580.
+
 	* C API: Overhaul how errors are handle the C API's object handle
 	interfaces. Clarify documentation regarding object accessors and
 	how type errors and warnings are handled. Many cases that used to
