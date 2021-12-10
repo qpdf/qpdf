@@ -7,18 +7,11 @@ item 0: 0 0.00
 item 1: 0 0.00
 item 2: 612 612.00
 item 3: 792 792.00
-warning: minimal.pdf (C API object handle 6): attempted access to unknown object handle
-  code: 5
+minimal.pdf (C API object handle 6): attempted access to unknown object handle
+minimal.pdf (C API object handle 9): attempted access to unknown object handle
+minimal.pdf (C API object handle 9): attempted access to unknown object handle
+warning: minimal.pdf: C API object handle accessor errors occurred, and the application did not define an error handler
+  code: 1
   file: minimal.pdf
   pos : 0
-  text: attempted access to unknown object handle
-warning: minimal.pdf (C API object handle 9): attempted access to unknown object handle
-  code: 5
-  file: minimal.pdf
-  pos : 0
-  text: attempted access to unknown object handle
-warning: minimal.pdf (C API object handle 9): attempted access to unknown object handle
-  code: 5
-  file: minimal.pdf
-  pos : 0
-  text: attempted access to unknown object handle
+  text: C API object handle accessor errors occurred, and the application did not define an error handler

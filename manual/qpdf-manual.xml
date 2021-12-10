@@ -5231,6 +5231,19 @@ print "\n";
         </listitem>
         <listitem>
          <para>
+          Overhaul error handling for the object handle functions in
+          the C API. See comments in the &ldquo;Object handling&rdquo;
+          section of <filename>include/qpdf/qpdf-c.h</filename> for
+          details. In particular, exceptions thrown by the underlying
+          C++ code when calling object accessors are caught and
+          converted into errors. The errors can be trapped by
+          registering an error handler with
+          <function>qpdf_register_oh_error_handler</function> or will
+          be written to stderr if no handler is registered.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
           Add <function>qpdf_get_last_string_length</function> to the
           C API to get the length of the last string that was
           returned. This is needed to handle strings that contain
@@ -5239,9 +5252,9 @@ print "\n";
         </listitem>
         <listitem>
          <para>
-          Add <function>qpdf_oh_is_initialized</function> to the
-          C API. While you can't directly create uninitialized objects
-          from the C API, you still have to be able to detect them.
+          Add <function>qpdf_oh_is_initialized</function> and
+          <function>qpdf_oh_new_uninitialized</function> to the C API
+          to make it possible to work with uninitialized objects.
          </para>
         </listitem>
         <listitem>

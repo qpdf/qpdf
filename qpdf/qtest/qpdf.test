@@ -4812,7 +4812,7 @@ foreach my $i (@c_check_types)
 show_ntests();
 # ----------
 $td->notify("--- C API Object Handle ---");
-$n_tests += 7;
+$n_tests += 10;
 
 $td->runtest("C check object handles",
              {$td->COMMAND => "qpdf-ctest 24 minimal.pdf '' a.pdf"},
@@ -4842,6 +4842,18 @@ $td->runtest("C string with embedded null",
 $td->runtest("C wrap and clone objects",
              {$td->COMMAND => "qpdf-ctest 28 minimal.pdf '' ''"},
              {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("C object handle errors",
+             {$td->COMMAND => "qpdf-ctest 29 minimal.pdf '' ''"},
+             {$td->FILE => "c-oh-errors.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("C unhandled error warning",
+             {$td->COMMAND => "qpdf-ctest 30 bad1.pdf '' ''"},
+             {$td->FILE => "c-unhandled-error.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("C type mismatch warning",
+             {$td->COMMAND => "qpdf-ctest 31 minimal.pdf '' ''"},
+             {$td->FILE => "c-type-warning.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 show_ntests();

@@ -62,22 +62,27 @@
  *     string was just returned.
  *
  *     Many functions defined here merely set parameters and therefore
- *     never return error conditions.  Functions that may cause PDF
- *     files to be read or written may return error conditions.  Such
- *     functions return an error code.  If there were no errors or
- *     warnings, they return QPDF_SUCCESS.  If there were warnings,
- *     the return value has the QPDF_WARNINGS bit set.  If there
- *     errors, the QPDF_ERRORS bit is set.  In other words, if there
- *     are both warnings and errors, then the return status will be
- *     QPDF_WARNINGS | QPDF_ERRORS.  You may also call the
+ *     never return error conditions. Functions that access or return
+ *     qpdf_oh object handles may generate warnings but have no way to
+ *     return errors, but the errors may be checked afterwards or
+ *     handled using a registered handler. This is discussed in more
+ *     detail in the section on object handling. Functions that may
+ *     cause PDF files to be read or written may return error
+ *     conditions. Such functions return an error code. If there were
+ *     no errors or warnings, they return QPDF_SUCCESS. If there were
+ *     warnings, the return value has the QPDF_WARNINGS bit set. If
+ *     there were errors, the QPDF_ERRORS bit is set. In other words,
+ *     if there are both warnings and errors, then the return status
+ *     will be QPDF_WARNINGS | QPDF_ERRORS. You may also call the
  *     qpdf_more_warnings and qpdf_more_errors functions to test
- *     whether there are unseen warning or error conditions.  By
+ *     whether there are unseen warning or error conditions. By
  *     default, warnings are written to stderr when detected, but this
- *     behavior can be suppressed.  In all cases, errors and warnings
+ *     behavior can be suppressed. In all cases, errors and warnings
  *     may be retrieved by calling qpdf_next_warning and
- *     qpdf_next_error.  All exceptions thrown by the C++ interface
- *     are caught and converted into error messages by the C
- *     interface.
+ *     qpdf_get_error. All exceptions thrown by the C++ interface are
+ *     caught and converted into error messages by the C interface.
+ *     Any exceptions to this are qpdf bugs and should be reported at
+ *     https://github.com/qpdf/qpdf/issues/new.
  *
  *     Most functions defined here have obvious counterparts that are
  *     methods to either QPDF or QPDFWriter.  Please see comments in
@@ -550,12 +555,50 @@ extern "C" {
      * handle, the object is safely part of the dictionary or array.
      * Similarly, any other object handle refering to the object remains
      * valid. Explicitly releasing an object handle is essentially the
-     * same as letting a QPDFObjectHandle go out of scope in the C++ API.
+     * same as letting a QPDFObjectHandle go out of scope in the C++
+     * API.
+     *
+     * Important note about error handling:
+     *
+     * While many of the functions that operate on the QPDF object
+     * return error codes, the qpdf_oh functions return values such as
+     * object handles or data. They have no way to return error codes.
+     * If they generate warnings, the warnings are handled using the
+     * error/warning handling functions described above. If the
+     * underlying C++ call throws an exception, the error handler
+     * registered with qpdf_register_oh_error_handler() will be
+     * called. If no handler is registered, the exception is written
+     * to STDERR. In either case, a sensible fallback value is
+     * returned (0 for numbers, QPDF_FALSE for booleans, "" for
+     * strings, or a null object). It is sensible for a C program to
+     * use setjmp and longjmp with this error handler since the C++
+     * code has raised an exception, but you can also just set a flag
+     * and check it after each call.
+     *
+     * All conditions under which exceptions would be thrown by object
+     * accessors are caused by programmer error or major problems such
+     * as running out of memory or not being able to read the input
+     * file. If they are ever caused by invalid data in the PDF file,
+     * it is a bug in qpdf, which should be reported at
+     * https://github.com/qpdf/qpdf/issues/new.
      */
 
     /* For examples of using this API, see examples/pdf-c-objects.c */
 
     typedef unsigned int qpdf_oh;
+
+    /* If an exception is thrown by the C++ code when any of the
+     * qpdf_oh functions are called, the registered handle_error
+     * function will be called. The value passed to data will be
+     * passed along to the error handler function. If any errors occur
+     * and no error handler is accessed, a single warning will be
+     * issued, and the error will be written to stderr.
+     */
+    QPDF_DLL
+    void qpdf_register_oh_error_handler(
+        qpdf_data qpdf,
+        void (*handle_error)(qpdf_data qpdf, qpdf_error error, void* data),
+        void* data);
 
     /* Releasing objects -- see comments above. These functions have no
      * equivalent in the C++ API.
@@ -659,7 +702,7 @@ extern "C" {
     /* The memory returned by qpdf_oh_dict_next_key is owned by
      * qpdf_data. It is good until the next call to
      * qpdf_oh_dict_next_key with the same qpdf_data object. Calling
-     * the method again, even with a different dict, invalidates
+     * the function again, even with a different dict, invalidates
      * previous return values.
      */
     QPDF_DLL
@@ -676,6 +719,8 @@ extern "C" {
     QPDF_BOOL qpdf_oh_is_or_has_name(
         qpdf_data data, qpdf_oh oh, char const* key);
 
+    QPDF_DLL
+    qpdf_oh qpdf_oh_new_uninitialized(qpdf_data qpdf);
     QPDF_DLL
     qpdf_oh qpdf_oh_new_null(qpdf_data data);
     QPDF_DLL

@@ -1,0 +1,55 @@
+get root: attempted to dereference an uninitialized QPDFObjectHandle
+  code: 1
+  file: 
+  pos : 0
+  text: attempted to dereference an uninitialized QPDFObjectHandle
+bad parse: parsed object (offset 1): unknown token while reading object; treating as string
+  code: 5
+  file: parsed object
+  pos : 1
+  text: unknown token while reading object; treating as string
+type mismatch: operation for integer attempted on object of type string: returning 0
+  code: 7
+  file: 
+  pos : 0
+  text: operation for integer attempted on object of type string: returning 0
+type mismatch: operation for string attempted on object of type integer: returning empty string
+  code: 7
+  file: 
+  pos : 0
+  text: operation for string attempted on object of type integer: returning empty string
+array type mismatch: operation for array attempted on object of type integer: treating as empty
+  code: 7
+  file: 
+  pos : 0
+  text: operation for array attempted on object of type integer: treating as empty
+array type mismatch: operation for array attempted on object of type integer: returning null
+  code: 7
+  file: 
+  pos : 0
+  text: operation for array attempted on object of type integer: returning null
+append to non-array: operation for array attempted on object of type integer: ignoring attempt to append item
+  code: 7
+  file: 
+  pos : 0
+  text: operation for array attempted on object of type integer: ignoring attempt to append item
+array bounds: returning null for out of bounds array access
+  code: 7
+  file: 
+  pos : 0
+  text: returning null for out of bounds array access
+dictionary iter type mismatch: operation for dictionary attempted on object of type integer: treating as empty
+  code: 7
+  file: 
+  pos : 0
+  text: operation for dictionary attempted on object of type integer: treating as empty
+dictionary type mismatch: operation for dictionary attempted on object of type integer: returning null for attempted key retrieval
+  code: 7
+  file: 
+  pos : 0
+  text: operation for dictionary attempted on object of type integer: returning null for attempted key retrieval
+dictionary type mismatch: operation for dictionary attempted on object of type integer: returning false for a key containment request
+  code: 7
+  file: 
+  pos : 0
+  text: operation for dictionary attempted on object of type integer: returning false for a key containment request

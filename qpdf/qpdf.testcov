@@ -602,3 +602,7 @@ QPDFObjectHandle check ownership 0
 qpdf weak crypto warning 0
 qpdf-c called qpdf_oh_is_initialized 0
 qpdf-c registered progress reporter 0
+qpdf-c called qpdf_oh_new_uninitialized 0
+qpdf-c warn about oh error 1
+qpdf-c registered oh error handler 0
+qpdf-c cleanup warned about unhandled error 0

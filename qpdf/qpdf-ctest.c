@@ -35,28 +35,29 @@ static FILE* safe_fopen(char const* filename, char const* mode)
     return f;
 }
 
-static void report_errors()
+static void print_error(char const* label, qpdf_data qpdf, qpdf_error e)
 {
 #define POS_FMT "  pos : " LL_FMT "\n"
+    printf("%s: %s\n", label, qpdf_get_error_full_text(qpdf, e));
+    printf("  code: %d\n", qpdf_get_error_code(qpdf, e));
+    printf("  file: %s\n", qpdf_get_error_filename(qpdf, e));
+    printf(POS_FMT, qpdf_get_error_file_position(qpdf, e));
+    printf("  text: %s\n", qpdf_get_error_message_detail(qpdf, e));
+}
+
+static void report_errors()
+{
     qpdf_error e = 0;
     while (qpdf_more_warnings(qpdf))
     {
 	e = qpdf_next_warning(qpdf);
-	printf("warning: %s\n", qpdf_get_error_full_text(qpdf, e));
-	printf("  code: %d\n", qpdf_get_error_code(qpdf, e));
-	printf("  file: %s\n", qpdf_get_error_filename(qpdf, e));
-	printf(POS_FMT, qpdf_get_error_file_position(qpdf, e));
-	printf("  text: %s\n", qpdf_get_error_message_detail(qpdf, e));
+        print_error("warning", qpdf, e);
     }
     if (qpdf_has_error(qpdf))
     {
 	e = qpdf_get_error(qpdf);
 	assert(qpdf_has_error(qpdf) == QPDF_FALSE);
-	printf("error: %s\n", qpdf_get_error_full_text(qpdf, e));
-	printf("  code: %d\n", qpdf_get_error_code(qpdf, e));
-	printf("  file: %s\n", qpdf_get_error_filename(qpdf, e));
-	printf(POS_FMT, qpdf_get_error_file_position(qpdf, e));
-	printf("  text: %s\n", qpdf_get_error_message_detail(qpdf, e));
+        print_error("error", qpdf, e);
     }
     else
     {
@@ -70,6 +71,16 @@ static void report_errors()
 	(void)qpdf_get_error_file_position(qpdf, e);
 	(void)qpdf_get_error_message_detail(qpdf, e);
     }
+}
+
+static void handle_oh_error(qpdf_data qpdf, qpdf_error error, void* data)
+{
+    char const* label = "oh error";
+    if (data)
+    {
+        label = *((char const**)data);
+    }
+    print_error(label, qpdf, error);
 }
 
 static void read_file_into_memory(char const* filename,
@@ -615,8 +626,11 @@ static void test24(char const* infile,
      */
     qpdf_oh_replace_key(qpdf, resources, "/ProcSet", procset);
 
-    /* Release and access to exercise warnings and to show that write
-     * still works after releasing.
+    /* Release and access to exercise handling of object handle errors
+     * and to show that write still works after releasing. This test
+     * uses the default oh error handler, so messages get written to
+     * stderr. The warning about using the default error handler only
+     * appears once.
      */
     qpdf_oh_release(qpdf, page1);
     contents = qpdf_oh_get_key(qpdf, page1, "/Contents");
@@ -791,6 +805,82 @@ static void test28(char const* infile,
     }
 }
 
+static void test29(char const* infile,
+		   char const* password,
+		   char const* outfile,
+		   char const* outfile2)
+{
+    /* Trap exceptions thrown by object accessors. Type mismatches are
+     * errors rather than warnings when they don't have an owning QPDF
+     * object.
+     */
+    char const* label = "oh error";
+    qpdf_register_oh_error_handler(qpdf, handle_oh_error, (void*)&label);
+
+    /* get_root fails when we have no trailer */
+    label = "get root";
+    qpdf_oh root = qpdf_get_root(qpdf);
+    assert(root != 0);
+    assert(! qpdf_oh_is_initialized(qpdf, root));
+
+    label = "bad parse";
+    assert(! qpdf_oh_is_initialized(qpdf, qpdf_oh_parse(qpdf, "[oops")));
+    report_errors();
+
+    label = "type mismatch";
+    assert(qpdf_oh_get_int_value_as_int(
+               qpdf, qpdf_oh_new_string(qpdf, "x")) == 0);
+    qpdf_oh int_oh = qpdf_oh_new_integer(qpdf, 12);
+    assert(strlen(qpdf_oh_get_string_value(qpdf, int_oh)) == 0);
+
+    // This doesn't test every possible error flow, but it tests each
+    // way of handling errors in the library code.
+    label = "array type mismatch";
+    assert(qpdf_oh_get_array_n_items(qpdf, int_oh) == 0);
+    assert(qpdf_oh_is_null(qpdf, qpdf_oh_get_array_item(qpdf, int_oh, 3)));
+    label = "append to non-array";
+    qpdf_oh_append_item(qpdf, int_oh, qpdf_oh_new_null(qpdf));
+    qpdf_oh array = qpdf_oh_new_array(qpdf);
+    label = "array bounds";
+    assert(qpdf_oh_is_null(qpdf, qpdf_oh_get_array_item(qpdf, array, 3)));
+
+    label = "dictionary iter type mismatch";
+    qpdf_oh_begin_dict_key_iter(qpdf, int_oh);
+    assert(qpdf_oh_dict_more_keys(qpdf) == QPDF_FALSE);
+    label = "dictionary type mismatch";
+    assert(qpdf_oh_is_null(qpdf, qpdf_oh_get_key(qpdf, int_oh, "potato")));
+    assert(qpdf_oh_has_key(qpdf, int_oh, "potato") == QPDF_FALSE);
+
+    report_errors();
+}
+
+static void test30(char const* infile,
+		   char const* password,
+		   char const* outfile,
+		   char const* outfile2)
+{
+    assert(qpdf_read(qpdf, infile, password) & QPDF_ERRORS);
+    /* Fail to handle error */
+}
+
+static void test31(char const* infile,
+		   char const* password,
+		   char const* outfile,
+		   char const* outfile2)
+{
+    /* Make sure type warnings have a specific error code. This test
+     * case is designed for minimal.pdf.
+     */
+    qpdf_read(qpdf, infile, password);
+    qpdf_oh trailer = qpdf_get_trailer(qpdf);
+    assert(qpdf_oh_get_int_value(qpdf, trailer) == 0LL);
+    assert(! qpdf_has_error(qpdf));
+    assert(qpdf_more_warnings(qpdf));
+    qpdf_error e = qpdf_next_warning(qpdf);
+    assert(qpdf_get_error_code(qpdf, e) == qpdf_e_object);
+    report_errors();
+}
+
 int main(int argc, char* argv[])
 {
     char* p = 0;
@@ -859,6 +949,9 @@ int main(int argc, char* argv[])
 	  (n == 26) ? test26 :
 	  (n == 27) ? test27 :
 	  (n == 28) ? test28 :
+	  (n == 29) ? test29 :
+	  (n == 30) ? test30 :
+	  (n == 31) ? test31 :
 	  0);
 
     if (fn == 0)

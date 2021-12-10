@@ -1,3 +1,21 @@
+2021-12-10  Jay Berkenbilt  <ejb@ql.org>
+
+	* C API: Overhaul how errors are handle the C API's object handle
+	interfaces. Clarify documentation regarding object accessors and
+	how type errors and warnings are handled. Many cases that used to
+	crash code that used the C API can now be trapped and will be
+	written stderr if not trapped. The new method
+	qpdf_register_oh_error_handler can be used to specifically handle
+	errors that occur when accessing object handles. See qpdf-c.h for
+	details.
+
+	* C API: Add qpdf_oh_new_uninitialized to explicitly create
+	uninitialized object handles.
+
+	* Add new error code qpdf_e_object that is used for exceptions
+	(including warnings) that are caused by using QPDFObjectHandle
+	methods on object handles of the wrong type.
+
 2021-12-02  Jay Berkenbilt  <ejb@ql.org>
 
 	* C API: Add qpdf_oh_is_initialized.
