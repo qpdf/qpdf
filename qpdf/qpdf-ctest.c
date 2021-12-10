@@ -881,6 +881,56 @@ static void test31(char const* infile,
     report_errors();
 }
 
+static void test32(char const* infile,
+		   char const* password,
+		   char const* outfile,
+		   char const* outfile2)
+{
+    /* This test case is designed for minimal.pdf. */
+    assert(qpdf_read(qpdf, infile, password) == 0);
+    qpdf_oh page = qpdf_get_object_by_id(qpdf, 3, 0);
+    assert(qpdf_oh_is_dictionary(qpdf, page));
+    assert(qpdf_oh_has_key(qpdf, page, "/MediaBox"));
+    report_errors();
+}
+
+static void test33(char const* infile,
+		   char const* password,
+		   char const* outfile,
+		   char const* outfile2)
+{
+    /* This test case is designed for minimal.pdf. */
+
+    /* Convert a direct object to an indirect object and replace it. */
+    assert(qpdf_read(qpdf, infile, password) == 0);
+    qpdf_oh root = qpdf_get_root(qpdf);
+    qpdf_oh pages = qpdf_oh_get_key(qpdf, root, "/Pages");
+    qpdf_oh kids = qpdf_oh_get_key(qpdf, pages, "/Kids");
+    qpdf_oh page1 = qpdf_oh_get_array_item(qpdf, kids, 0);
+    qpdf_oh mediabox = qpdf_oh_get_key(qpdf, page1, "/MediaBox");
+    assert(! qpdf_oh_is_indirect(qpdf, mediabox));
+    qpdf_oh i_mediabox = qpdf_make_indirect_object(qpdf, mediabox);
+    assert(qpdf_oh_is_indirect(qpdf, i_mediabox));
+    qpdf_oh_replace_key(qpdf, page1, "/MediaBox", i_mediabox);
+
+    /* Replace a different indirect object */
+    qpdf_oh resources = qpdf_oh_get_key(qpdf, page1, "/Resources");
+    qpdf_oh procset = qpdf_oh_get_key(qpdf, resources, "/ProcSet");
+    assert(qpdf_oh_is_indirect(qpdf, procset));
+    qpdf_replace_object(
+        qpdf,
+        qpdf_oh_get_object_id(qpdf, procset),
+        qpdf_oh_get_generation(qpdf, procset),
+        qpdf_oh_parse(qpdf, "[/PDF]"));
+
+    qpdf_init_write(qpdf, outfile);
+    qpdf_set_static_ID(qpdf, QPDF_TRUE);
+    qpdf_set_qdf_mode(qpdf, QPDF_TRUE);
+    qpdf_set_suppress_original_object_IDs(qpdf, QPDF_TRUE);
+    qpdf_write(qpdf);
+    report_errors();
+}
+
 int main(int argc, char* argv[])
 {
     char* p = 0;
@@ -952,6 +1002,8 @@ int main(int argc, char* argv[])
 	  (n == 29) ? test29 :
 	  (n == 30) ? test30 :
 	  (n == 31) ? test31 :
+	  (n == 32) ? test32 :
+	  (n == 33) ? test33 :
 	  0);
 
     if (fn == 0)

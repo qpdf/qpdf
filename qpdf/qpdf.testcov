@@ -606,3 +606,5 @@ qpdf-c called qpdf_oh_new_uninitialized 0
 qpdf-c warn about oh error 1
 qpdf-c registered oh error handler 0
 qpdf-c cleanup warned about unhandled error 0
+qpdf-c called qpdf_get_object_by_id 0
+qpdf-c called qpdf_replace_object 0

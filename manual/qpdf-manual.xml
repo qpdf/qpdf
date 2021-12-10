@@ -5263,6 +5263,15 @@ print "\n";
           C API. This allows you to clone an object handle.
          </para>
         </listitem>
+        <listitem>
+         <para>
+	  Add <function>qpdf_get_object_by_id</function>,
+	  <function>qpdf_make_indirect_object</function>, and
+	  <function>qpdf_replace_object</function>, exposing the
+	  corresponding methods in <classname>QPDF</classname> and
+	  <classname>QPDFObjectHandle</classname>.
+         </para>
+        </listitem>
        </itemizedlist>
       </listitem>
      </itemizedlist>

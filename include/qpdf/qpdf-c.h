@@ -618,6 +618,15 @@ extern "C" {
     QPDF_DLL
     qpdf_oh qpdf_get_root(qpdf_data data);
 
+    /* Retrieve and replace indirect objects */
+    QPDF_DLL
+    qpdf_oh qpdf_get_object_by_id(qpdf_data qpdf, int objid, int generation);
+    QPDF_DLL
+    qpdf_oh qpdf_make_indirect_object(qpdf_data qpdf, qpdf_oh oh);
+    QPDF_DLL
+    void qpdf_replace_object(
+        qpdf_data qpdf, int objid, int generation, qpdf_oh oh);
+
     /* Wrappers around QPDFObjectHandle methods. Be sure to read
      * corresponding comments in QPDFObjectHandle.hh to understand
      * what each function does and what kinds of objects it applies

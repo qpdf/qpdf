@@ -4812,7 +4812,7 @@ foreach my $i (@c_check_types)
 show_ntests();
 # ----------
 $td->notify("--- C API Object Handle ---");
-$n_tests += 10;
+$n_tests += 13;
 
 $td->runtest("C check object handles",
              {$td->COMMAND => "qpdf-ctest 24 minimal.pdf '' a.pdf"},
@@ -4830,6 +4830,14 @@ $td->runtest("C check object handle creation",
 $td->runtest("check output",
 	     {$td->FILE => 'a.pdf'},
 	     {$td->FILE => 'c-object-handle-creation-out.pdf'});
+
+$td->runtest("C indirect objects",
+             {$td->COMMAND => "qpdf-ctest 33 minimal.pdf '' a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => 'a.pdf'},
+	     {$td->FILE => 'c-indirect-objects-out.pdf'});
 
 $td->runtest("C uninitialized objects",
              {$td->COMMAND => "qpdf-ctest 26 '' '' ''"},
@@ -4854,6 +4862,10 @@ $td->runtest("C unhandled error warning",
 $td->runtest("C type mismatch warning",
              {$td->COMMAND => "qpdf-ctest 31 minimal.pdf '' ''"},
              {$td->FILE => "c-type-warning.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("C get object by ID",
+             {$td->COMMAND => "qpdf-ctest 32 minimal.pdf '' ''"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 show_ntests();

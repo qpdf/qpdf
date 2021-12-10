@@ -1,5 +1,9 @@
 2021-12-10  Jay Berkenbilt  <ejb@ql.org>
 
+	* C API: add qpdf_get_object_by_id, qpdf_make_indirect_object, and
+	qpdf_replace_object, exposing the corresponding methods in QPDF
+	and QPDFObjectHandle. Fixes #588.
+
 	* Add missing QPDF_DLL to QPDFObjectHandle::addTokenFilter so that
 	it is actually accessible as part of the public interface as
 	intended. Fixes #580.

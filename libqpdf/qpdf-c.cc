@@ -972,6 +972,12 @@ qpdf_oh qpdf_get_root(qpdf_data qpdf)
         });
 }
 
+qpdf_oh qpdf_get_object_by_id(qpdf_data qpdf, int objid, int generation)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_get_object_by_id");
+    return new_object(qpdf, qpdf->qpdf->getObjectByID(objid, generation));
+}
+
 template<class RET>
 static RET do_with_oh(
     qpdf_data qpdf, qpdf_oh oh,
@@ -1005,6 +1011,15 @@ static void do_with_oh_void(
         qpdf, oh, return_T<bool>(false), [&fn](QPDFObjectHandle& o) {
             fn(o);
             return true; // unused
+        });
+}
+
+void qpdf_replace_object(qpdf_data qpdf, int objid, int generation, qpdf_oh oh)
+{
+    do_with_oh_void(
+        qpdf, oh, [&qpdf, &objid, &generation](QPDFObjectHandle& o) {
+            QTC::TC("qpdf", "qpdf-c called qpdf_replace_object");
+            qpdf->qpdf->replaceObject(objid, generation, o);
         });
 }
 
@@ -1418,6 +1433,16 @@ void qpdf_oh_make_direct(qpdf_data qpdf, qpdf_oh oh)
         qpdf, oh, [](QPDFObjectHandle& o) {
             QTC::TC("qpdf", "qpdf-c called qpdf_oh_make_direct");
             o.makeDirect();
+        });
+}
+
+qpdf_oh qpdf_make_indirect_object(qpdf_data qpdf, qpdf_oh oh)
+{
+    return do_with_oh<qpdf_oh>(
+        qpdf, oh,
+        return_uninitialized(qpdf),
+        [&qpdf](QPDFObjectHandle& o) {
+            return new_object(qpdf, qpdf->qpdf->makeIndirectObject(o));
         });
 }
 
