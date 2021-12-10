@@ -573,12 +573,14 @@ make
    <para>
     If <option>@filename</option> appears as a word anywhere in the
     command-line, it will be read line by line, and each line will be
-    treated as a command-line argument. The <option>@-</option> option
-    allows arguments to be read from standard input. This allows qpdf
-    to be invoked with an arbitrary number of arbitrarily long
-    arguments. It is also very useful for avoiding having to pass
-    passwords on the command line. Note that the
-    <option>@filename</option> can't appear in the middle of an
+    treated as a command-line argument. Leading and trailing
+    whitespace is intentionally not removed from lines, which makes it
+    possible to handle arguments that start or end with spaces. The
+    <option>@-</option> option allows arguments to be read from
+    standard input. This allows qpdf to be invoked with an arbitrary
+    number of arbitrarily long arguments. It is also very useful for
+    avoiding having to pass passwords on the command line. Note that
+    the <option>@filename</option> can't appear in the middle of an
     argument, so constructs such as <option>--arg=@option</option>
     will not work. You would have to include the argument and its
     options together in the arguments file.
