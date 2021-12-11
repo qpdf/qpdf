@@ -2230,8 +2230,7 @@ the library itself is reading comments in
 
 All header files are installed in the
 @1@filename@1@include/qpdf@2@filename@2@ directory. It is recommend that
-you use ``#include
-    <qpdf/QPDF.hh>`` rather than adding
+you use ``#include <qpdf/QPDF.hh>`` rather than adding
 @1@filename@1@include/qpdf@2@filename@2@ to your include path.
 
 When linking against the qpdf static library, you may also need to
@@ -2882,8 +2881,8 @@ common when switching between signed and unsigned characters. A lot of
 qpdf's code uses unsigned characters internally, but ``std::string`` and
 ``char`` are signed. Using ``QIntC::to_char`` would be wrong for
 converting from unsigned to signed characters because a negative
-``char`` value and the corresponding ``unsigned
-    char`` value greater than 127 *mean the same thing*. There are also
+``char`` value and the corresponding ``unsigned char`` value greater
+than 127 *mean the same thing*. There are also
 cases in which we use ``static_cast`` when working with bit fields where
 we are not representing a numerical value but rather a bunch of bits
 packed together in some integer type. Also note that ``size_t`` and
@@ -2896,12 +2895,13 @@ platforms, and the test suite is very thorough, so it is hard to make
 any of the potential errors here without being caught in build or test.
 
 Non-const ``unsigned char*`` is used in the ``Pipeline`` interface. The
-pipeline interface has a ``write`` call that uses ``unsigned
-    char*`` without a ``const`` qualifier. The main reason for this is
+pipeline interface has a ``write`` call that uses ``unsigned char*``
+without a ``const`` qualifier. The main reason for this is
 to support pipelines that make calls to third-party libraries, such as
 zlib, that don't include ``const`` in their interfaces. Unfortunately,
-there are many places in the code where it is desirable to have ``const
-    char*`` with pipelines. None of the pipeline implementations in qpdf
+there are many places in the code where it is desirable to have
+``const char*`` with pipelines. None of the pipeline implementations
+in qpdf
 currently modify the data passed to write, and doing so would be counter
 to the intent of ``Pipeline``, but there is nothing in the code to
 prevent this from being done. There are places in the code where
@@ -3589,17 +3589,14 @@ type is "``1``". All other default values are "``0``".
 
 PDF 1.5 has three field types:
 
--  0: for free objects. Format: ``0 obj
-           next-generation``, same as the free table in a traditional
-   cross-reference table
+-  0: for free objects. Format: ``0 obj next-generation``, same as the
+   free table in a traditional cross-reference table
 
--  1: regular non-compressed object. Format: ``1 offset
-          generation``
+-  1: regular non-compressed object. Format: ``1 offset generation``
 
--  2: for objects in object streams. Format: ``2
-          object-stream-number index``, the number of object stream
-   containing the object and the index within the object stream of the
-   object.
+-  2: for objects in object streams. Format: ``2 object-stream-number
+   index``, the number of object stream containing the object and the
+   index within the object stream of the object.
 
 It seems standard to have the first entry in the table be ``0 0 0``
 instead of ``0 0 ffff`` if there are no deleted objects.
@@ -4171,8 +4168,8 @@ For a detailed list of changes, please see the file
          script. Some distributions' packaging standards recommended the
          use of this option.
 
-      -  Selection of a printf format string for ``long
-                   long`` has been moved from ``ifdefs`` to an autoconf
+      -  Selection of a printf format string for ``long long`` has
+         been moved from ``ifdefs`` to an autoconf
          test. If you are using your own build system, you will need to
          provide a value for ``LL_FMT`` in
          @1@filename@1@libqpdf/qpdf/qpdf-config.h@2@filename@2@, which
@@ -4559,8 +4556,8 @@ For a detailed list of changes, please see the file
       -  When parsing content streams with
          ``QPDFObjectHandle::ParserCallbacks``, in place of the method
          ``handleObject(QPDFObjectHandle)``, the developer may override
-         ``handleObject(QPDFObjectHandle, size_t offset,
-                   size_t length)``. If this method is defined, it will
+         ``handleObject(QPDFObjectHandle, size_t offset, size_t
+         length)``. If this method is defined, it will
          be invoked with the object along with its offset and length
          within the overall contents being parsed. Intervening spaces
          and comments are not included in offset and length.
