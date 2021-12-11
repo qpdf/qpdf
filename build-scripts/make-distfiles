@@ -4,7 +4,8 @@ set -ex
 sudo apt-get update
 sudo apt-get -y install \
    autoconf build-essential zlib1g-dev libjpeg-dev \
-   docbook-xsl fop xsltproc libxml2-utils inkscape imagemagick
+   python3-pip texlive-latex-extra latexmk inkscape imagemagick
+pip3 install sphinx
 ./configure --enable-doc-maintenance
 make -j$(nproc) distfiles.zip
 build-scripts/download-external-libs

@@ -78,7 +78,7 @@ if ($version ne $code_version)
 }
 if ($version ne $doc_version)
 {
-    print "$whoami: qpdf-manual.xml version = $doc_version\n";
+    print "$whoami: doc version = $doc_version\n";
     $version_error = 1;
 }
 if ($version ne $cli_version)
@@ -153,11 +153,11 @@ sub get_version_from_source
 
 sub get_version_from_manual
 {
-    my $fh = safe_open("manual/qpdf-manual.xml");
+    my $fh = safe_open("manual/conf.py");
     my $doc_version = 'unknown';
     while (<$fh>)
     {
-        if (m/swversion "([^\"]+)\"/)
+        if (m/release = '([^\']+)\'/)
         {
             $doc_version = $1;
             last;

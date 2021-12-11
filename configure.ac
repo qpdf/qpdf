@@ -6,7 +6,6 @@ AC_INIT([qpdf],[10.4.0])
 
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_FILES([autoconf.mk])
-AC_CONFIG_FILES([manual/html.xsl manual/print.xsl])
 AC_CONFIG_FILES([libqpdf.pc])
 AC_CONFIG_FILES([libqpdf.map])
 AC_CONFIG_HEADERS([libqpdf/qpdf/qpdf-config.h])
@@ -795,48 +794,10 @@ AC_ARG_ENABLE(show-failed-test-output,
     fi],
    [SHOW_FAILED_TEST_OUTPUT=0])
 
-AC_ARG_WITH(docbook-xsl,
-   AS_HELP_STRING([--with-docbook-xsl=DIR],
-		  [location of docbook 4.x xml stylesheets]),
-   [DOCBOOK_XSL=$withval],
-   [DOCBOOK_XSL=/usr/share/xml/docbook/stylesheet/nwalsh])
-
-DOCBOOK_XHTML=
-AC_SUBST(DOCBOOK_XHTML)
-AC_MSG_CHECKING(for xml to xhtml docbook stylesheets)
-if test -f "$DOCBOOK_XSL/xhtml/docbook.xsl"; then
-   DOCBOOK_XHTML="$DOCBOOK_XSL/xhtml/docbook.xsl"
-   AC_MSG_RESULT($DOCBOOK_XHTML)
-else
-   AC_MSG_RESULT(no)
-fi
-DOCBOOK_FO=
-AC_SUBST(DOCBOOK_FO)
-AC_MSG_CHECKING(for xml to fo docbook stylesheets)
-if test -f "$DOCBOOK_XSL/fo/docbook.xsl"; then
-   DOCBOOK_FO="$DOCBOOK_XSL/fo/docbook.xsl"
-   AC_MSG_RESULT($DOCBOOK_FO)
-else
-   AC_MSG_RESULT(no)
-fi
-
-DOCBOOKX_DTD=
-AC_SUBST(DOCBOOKX_DTD)
-AC_ARG_WITH(docbookx-dtd,
-   AS_HELP_STRING([--with-docbookx-dtd=FILE],
-		  [location of docbook 4.x xml DTD]),
-   [DOCBOOKX_DTD=$withval],
-   [DOCBOOKX_DTD=/usr/share/xml/docbook/schema/dtd/4/docbookx.dtd])
-AC_MSG_CHECKING(for docbook 4.x xml DTD)
-if test -f "$DOCBOOKX_DTD"; then
-   AC_MSG_RESULT($DOCBOOKX_DTD)
-else
-   AC_MSG_RESULT(no)
-fi
-
-AC_CHECK_PROG(FOP,fop,fop,[])
-AC_CHECK_PROG(XSLTPROC,xsltproc,xsltproc,[])
-AC_CHECK_PROG(XMLLINT,xmllint,xmllint,[])
+AC_CHECK_PROG(LATEX,latex,latex,[])
+AC_CHECK_PROG(PDFLATEX,pdflatex,pdflatex,[])
+AC_CHECK_PROG(LATEXMK,latexmk,latexmk,[])
+AC_CHECK_PROG(SPHINX,sphinx-build,sphinx-build,[])
 
 AC_ARG_ENABLE(doc-maintenance,
    AS_HELP_STRING([--enable-doc-maintenance],
@@ -870,17 +831,6 @@ AC_ARG_ENABLE(pdf-doc,
       BUILD_PDF=0;
     fi],
    [BUILD_PDF=$doc_default])
-VALIDATE_DOC=0
-AC_SUBST(VALIDATE_DOC)
-AC_ARG_ENABLE(validate-doc,
-   AS_HELP_STRING([--enable-validate-doc],
-		  [whether to validate xml document source]),
-   [if test "$enableval" = "yes"; then
-      VALIDATE_DOC=1;
-    else
-      VALIDATE_DOC=0;
-    fi],
-   [VALIDATE_DOC=$doc_default])
 
 AC_SUBST(OSS_FUZZ)
 AC_ARG_ENABLE(oss-fuzz,
@@ -893,37 +843,30 @@ AC_ARG_ENABLE(oss-fuzz,
     fi],
    [OSS_FUZZ=0])
 
-if test "$VALIDATE_DOC" = "1"; then
-   if test "$XMLLINT" = ""; then
-      MISSING_XMLLINT=1
-      MISSING_ANY=1
-   fi
-fi
 if test "$BUILD_HTML" = "1"; then
-   if test "$XSLTPROC" = ""; then
-      MISSING_XSLTPROC=1
-      MISSING_ANY=1
-   fi
-   if test "$DOCBOOK_XHTML" = ""; then
-      MISSING_DOCBOOK_XHTML=1
+   if test "$SPHINX" = ""; then
+      MISSING_SPHINX=1
       MISSING_ANY=1
    fi
 fi
 if test "$BUILD_PDF" = "1"; then
-   if test "$XSLTPROC" = ""; then
-      MISSING_XSLTPROC=1
+   if test "$SPHINX" = ""; then
+      MISSING_SPHINX=1
       MISSING_ANY=1
    fi
-   if test "$DOCBOOK_FO" = ""; then
-      MISSING_DOCBOOK_FO=1
+   if test "$LATEX" = ""; then
+      MISSING_LATEX=1
       MISSING_ANY=1
    fi
-   if test "$FOP" = ""; then
-      MISSING_FOP=1
+   if test "$LATEXMK" = ""; then
+      MISSING_LATEXMK=1
+      MISSING_ANY=1
+   fi
+   if test "$PDFLATEX" = ""; then
+      MISSING_PDFLATEX=1
       MISSING_ANY=1
    fi
 fi
-
 
 if test "$MISSING_ANY" = "1"; then
   ISSUE_WARNINGS=1
@@ -953,24 +896,20 @@ if test "$MISSING_JPEG" = "1"; then
   AC_MSG_WARN(unable to find required library jpeg)
 fi
 
-if test "$MISSING_DOCBOOK_FO" = "1"; then
-  AC_MSG_WARN(docbook fo stylesheets are required to build PDF documentation)
+if test "$MISSING_LATEX" = "1"; then
+  AC_MSG_WARN(latex is required to build PDF documentation)
 fi
 
-if test "$MISSING_DOCBOOK_XHTML" = "1"; then
-  AC_MSG_WARN(docbook xhmtl stylesheets are required to build HTML documentation)
+if test "$MISSING_LATEXMK" = "1"; then
+  AC_MSG_WARN(latexmk is required to build PDF documentation)
 fi
 
-if test "$MISSING_FOP" = "1"; then
-  AC_MSG_WARN(apache fop is required to build PDF documentation)
+if test "$MISSING_PDFLATEX" = "1"; then
+  AC_MSG_WARN(pdflatex is required to build PDF documentation)
 fi
 
-if test "$MISSING_XMLLINT" = "1"; then
-  AC_MSG_WARN(xmllint is required to validate documentation)
-fi
-
-if test "$MISSING_XSLTPROC" = "1"; then
-  AC_MSG_WARN(xsltproc is required to build documentation)
+if test "$MISSING_SPHINX" = "1"; then
+  AC_MSG_WARN(sphinx-build is required to build documentation)
 fi
 
 if test "$ISSUE_WARNINGS" = "1"; then

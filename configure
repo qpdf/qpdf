@@ -631,15 +631,12 @@ ac_includes_default="\
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
 OSS_FUZZ
-VALIDATE_DOC
 BUILD_PDF
 BUILD_HTML
-XMLLINT
-XSLTPROC
-FOP
-DOCBOOKX_DTD
-DOCBOOK_FO
-DOCBOOK_XHTML
+SPHINX
+LATEXMK
+PDFLATEX
+LATEX
 SHOW_FAILED_TEST_OUTPUT
 QPDF_SKIP_TEST_COMPARE_IMAGES
 DEFAULT_CRYPTO
@@ -794,12 +791,9 @@ enable_crypto_gnutls
 with_default_crypto
 enable_test_compare_images
 enable_show_failed_test_output
-with_docbook_xsl
-with_docbookx_dtd
 enable_doc_maintenance
 enable_html_doc
 enable_pdf_doc
-enable_validate_doc
 enable_oss_fuzz
 '
       ac_precious_vars='build_alias
@@ -1497,7 +1491,6 @@ Optional Features:
                           if set, enables all documentation options
   --enable-html-doc       whether to build HTML documents
   --enable-pdf-doc        whether to build PDF documents
-  --enable-validate-doc   whether to validate xml document source
   --enable-oss-fuzz       if set, build static fuzzers for oss-fuzz
 
 Optional Packages:
@@ -1523,9 +1516,6 @@ Optional Packages:
   --with-default-crypto=provider
                           which crypto provider to use by default; see
                           README.md
-  --with-docbook-xsl=DIR  location of docbook 4.x xml stylesheets
-  --with-docbookx-dtd=FILE
-                          location of docbook 4.x xml DTD
 
 Some influential environment variables:
   CC          C compiler command
@@ -2649,8 +2639,6 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 ac_config_files="$ac_config_files autoconf.mk"
-
-ac_config_files="$ac_config_files manual/html.xsl manual/print.xsl"
 
 ac_config_files="$ac_config_files libqpdf.pc"
 
@@ -18449,69 +18437,15 @@ else
 fi
 
 
-
-# Check whether --with-docbook-xsl was given.
-if test "${with_docbook_xsl+set}" = set; then :
-  withval=$with_docbook_xsl; DOCBOOK_XSL=$withval
-else
-  DOCBOOK_XSL=/usr/share/xml/docbook/stylesheet/nwalsh
-fi
-
-
-DOCBOOK_XHTML=
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for xml to xhtml docbook stylesheets" >&5
-$as_echo_n "checking for xml to xhtml docbook stylesheets... " >&6; }
-if test -f "$DOCBOOK_XSL/xhtml/docbook.xsl"; then
-   DOCBOOK_XHTML="$DOCBOOK_XSL/xhtml/docbook.xsl"
-   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $DOCBOOK_XHTML" >&5
-$as_echo "$DOCBOOK_XHTML" >&6; }
-else
-   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-DOCBOOK_FO=
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for xml to fo docbook stylesheets" >&5
-$as_echo_n "checking for xml to fo docbook stylesheets... " >&6; }
-if test -f "$DOCBOOK_XSL/fo/docbook.xsl"; then
-   DOCBOOK_FO="$DOCBOOK_XSL/fo/docbook.xsl"
-   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $DOCBOOK_FO" >&5
-$as_echo "$DOCBOOK_FO" >&6; }
-else
-   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-DOCBOOKX_DTD=
-
-
-# Check whether --with-docbookx-dtd was given.
-if test "${with_docbookx_dtd+set}" = set; then :
-  withval=$with_docbookx_dtd; DOCBOOKX_DTD=$withval
-else
-  DOCBOOKX_DTD=/usr/share/xml/docbook/schema/dtd/4/docbookx.dtd
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for docbook 4.x xml DTD" >&5
-$as_echo_n "checking for docbook 4.x xml DTD... " >&6; }
-if test -f "$DOCBOOKX_DTD"; then
-   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $DOCBOOKX_DTD" >&5
-$as_echo "$DOCBOOKX_DTD" >&6; }
-else
-   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-# Extract the first word of "fop", so it can be a program name with args.
-set dummy fop; ac_word=$2
+# Extract the first word of "latex", so it can be a program name with args.
+set dummy latex; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_FOP+:} false; then :
+if ${ac_cv_prog_LATEX+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  if test -n "$FOP"; then
-  ac_cv_prog_FOP="$FOP" # Let the user override the test.
+  if test -n "$LATEX"; then
+  ac_cv_prog_LATEX="$LATEX" # Let the user override the test.
 else
 as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
 for as_dir in $PATH
@@ -18520,7 +18454,7 @@ do
   test -z "$as_dir" && as_dir=.
     for ac_exec_ext in '' $ac_executable_extensions; do
   if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_FOP="fop"
+    ac_cv_prog_LATEX="latex"
     $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -18530,25 +18464,25 @@ IFS=$as_save_IFS
 
 fi
 fi
-FOP=$ac_cv_prog_FOP
-if test -n "$FOP"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $FOP" >&5
-$as_echo "$FOP" >&6; }
+LATEX=$ac_cv_prog_LATEX
+if test -n "$LATEX"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $LATEX" >&5
+$as_echo "$LATEX" >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 fi
 
 
-# Extract the first word of "xsltproc", so it can be a program name with args.
-set dummy xsltproc; ac_word=$2
+# Extract the first word of "pdflatex", so it can be a program name with args.
+set dummy pdflatex; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_XSLTPROC+:} false; then :
+if ${ac_cv_prog_PDFLATEX+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  if test -n "$XSLTPROC"; then
-  ac_cv_prog_XSLTPROC="$XSLTPROC" # Let the user override the test.
+  if test -n "$PDFLATEX"; then
+  ac_cv_prog_PDFLATEX="$PDFLATEX" # Let the user override the test.
 else
 as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
 for as_dir in $PATH
@@ -18557,7 +18491,7 @@ do
   test -z "$as_dir" && as_dir=.
     for ac_exec_ext in '' $ac_executable_extensions; do
   if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_XSLTPROC="xsltproc"
+    ac_cv_prog_PDFLATEX="pdflatex"
     $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -18567,25 +18501,25 @@ IFS=$as_save_IFS
 
 fi
 fi
-XSLTPROC=$ac_cv_prog_XSLTPROC
-if test -n "$XSLTPROC"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $XSLTPROC" >&5
-$as_echo "$XSLTPROC" >&6; }
+PDFLATEX=$ac_cv_prog_PDFLATEX
+if test -n "$PDFLATEX"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $PDFLATEX" >&5
+$as_echo "$PDFLATEX" >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 fi
 
 
-# Extract the first word of "xmllint", so it can be a program name with args.
-set dummy xmllint; ac_word=$2
+# Extract the first word of "latexmk", so it can be a program name with args.
+set dummy latexmk; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_prog_XMLLINT+:} false; then :
+if ${ac_cv_prog_LATEXMK+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  if test -n "$XMLLINT"; then
-  ac_cv_prog_XMLLINT="$XMLLINT" # Let the user override the test.
+  if test -n "$LATEXMK"; then
+  ac_cv_prog_LATEXMK="$LATEXMK" # Let the user override the test.
 else
 as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
 for as_dir in $PATH
@@ -18594,7 +18528,7 @@ do
   test -z "$as_dir" && as_dir=.
     for ac_exec_ext in '' $ac_executable_extensions; do
   if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_XMLLINT="xmllint"
+    ac_cv_prog_LATEXMK="latexmk"
     $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -18604,10 +18538,47 @@ IFS=$as_save_IFS
 
 fi
 fi
-XMLLINT=$ac_cv_prog_XMLLINT
-if test -n "$XMLLINT"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $XMLLINT" >&5
-$as_echo "$XMLLINT" >&6; }
+LATEXMK=$ac_cv_prog_LATEXMK
+if test -n "$LATEXMK"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $LATEXMK" >&5
+$as_echo "$LATEXMK" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+# Extract the first word of "sphinx-build", so it can be a program name with args.
+set dummy sphinx-build; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_SPHINX+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$SPHINX"; then
+  ac_cv_prog_SPHINX="$SPHINX" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_SPHINX="sphinx-build"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+SPHINX=$ac_cv_prog_SPHINX
+if test -n "$SPHINX"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $SPHINX" >&5
+$as_echo "$SPHINX" >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -18653,19 +18624,6 @@ else
   BUILD_PDF=$doc_default
 fi
 
-VALIDATE_DOC=0
-
-# Check whether --enable-validate-doc was given.
-if test "${enable_validate_doc+set}" = set; then :
-  enableval=$enable_validate_doc; if test "$enableval" = "yes"; then
-      VALIDATE_DOC=1;
-    else
-      VALIDATE_DOC=0;
-    fi
-else
-  VALIDATE_DOC=$doc_default
-fi
-
 
 
 # Check whether --enable-oss-fuzz was given.
@@ -18680,37 +18638,30 @@ else
 fi
 
 
-if test "$VALIDATE_DOC" = "1"; then
-   if test "$XMLLINT" = ""; then
-      MISSING_XMLLINT=1
-      MISSING_ANY=1
-   fi
-fi
 if test "$BUILD_HTML" = "1"; then
-   if test "$XSLTPROC" = ""; then
-      MISSING_XSLTPROC=1
-      MISSING_ANY=1
-   fi
-   if test "$DOCBOOK_XHTML" = ""; then
-      MISSING_DOCBOOK_XHTML=1
+   if test "$SPHINX" = ""; then
+      MISSING_SPHINX=1
       MISSING_ANY=1
    fi
 fi
 if test "$BUILD_PDF" = "1"; then
-   if test "$XSLTPROC" = ""; then
-      MISSING_XSLTPROC=1
+   if test "$SPHINX" = ""; then
+      MISSING_SPHINX=1
       MISSING_ANY=1
    fi
-   if test "$DOCBOOK_FO" = ""; then
-      MISSING_DOCBOOK_FO=1
+   if test "$LATEX" = ""; then
+      MISSING_LATEX=1
       MISSING_ANY=1
    fi
-   if test "$FOP" = ""; then
-      MISSING_FOP=1
+   if test "$LATEXMK" = ""; then
+      MISSING_LATEXMK=1
+      MISSING_ANY=1
+   fi
+   if test "$PDFLATEX" = ""; then
+      MISSING_PDFLATEX=1
       MISSING_ANY=1
    fi
 fi
-
 
 if test "$MISSING_ANY" = "1"; then
   ISSUE_WARNINGS=1
@@ -18745,29 +18696,24 @@ if test "$MISSING_JPEG" = "1"; then
 $as_echo "$as_me: WARNING: unable to find required library jpeg" >&2;}
 fi
 
-if test "$MISSING_DOCBOOK_FO" = "1"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: docbook fo stylesheets are required to build PDF documentation" >&5
-$as_echo "$as_me: WARNING: docbook fo stylesheets are required to build PDF documentation" >&2;}
+if test "$MISSING_LATEX" = "1"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: latex is required to build PDF documentation" >&5
+$as_echo "$as_me: WARNING: latex is required to build PDF documentation" >&2;}
 fi
 
-if test "$MISSING_DOCBOOK_XHTML" = "1"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: docbook xhmtl stylesheets are required to build HTML documentation" >&5
-$as_echo "$as_me: WARNING: docbook xhmtl stylesheets are required to build HTML documentation" >&2;}
+if test "$MISSING_LATEXMK" = "1"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: latexmk is required to build PDF documentation" >&5
+$as_echo "$as_me: WARNING: latexmk is required to build PDF documentation" >&2;}
 fi
 
-if test "$MISSING_FOP" = "1"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: apache fop is required to build PDF documentation" >&5
-$as_echo "$as_me: WARNING: apache fop is required to build PDF documentation" >&2;}
+if test "$MISSING_PDFLATEX" = "1"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: pdflatex is required to build PDF documentation" >&5
+$as_echo "$as_me: WARNING: pdflatex is required to build PDF documentation" >&2;}
 fi
 
-if test "$MISSING_XMLLINT" = "1"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: xmllint is required to validate documentation" >&5
-$as_echo "$as_me: WARNING: xmllint is required to validate documentation" >&2;}
-fi
-
-if test "$MISSING_XSLTPROC" = "1"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: xsltproc is required to build documentation" >&5
-$as_echo "$as_me: WARNING: xsltproc is required to build documentation" >&2;}
+if test "$MISSING_SPHINX" = "1"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: sphinx-build is required to build documentation" >&5
+$as_echo "$as_me: WARNING: sphinx-build is required to build documentation" >&2;}
 fi
 
 if test "$ISSUE_WARNINGS" = "1"; then
@@ -19871,8 +19817,6 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "autoconf.mk") CONFIG_FILES="$CONFIG_FILES autoconf.mk" ;;
-    "manual/html.xsl") CONFIG_FILES="$CONFIG_FILES manual/html.xsl" ;;
-    "manual/print.xsl") CONFIG_FILES="$CONFIG_FILES manual/print.xsl" ;;
     "libqpdf.pc") CONFIG_FILES="$CONFIG_FILES libqpdf.pc" ;;
     "libqpdf.map") CONFIG_FILES="$CONFIG_FILES libqpdf.map" ;;
     "libqpdf/qpdf/qpdf-config.h") CONFIG_HEADERS="$CONFIG_HEADERS libqpdf/qpdf/qpdf-config.h" ;;

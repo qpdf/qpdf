@@ -17,9 +17,10 @@ installwin: all
 	cp qpdf/$(OUTPUT_DIR)/fix-qdf.exe $(DEST)/bin
 	cp include/qpdf/*.h $(DEST)/include/qpdf
 	cp include/qpdf/*.hh $(DEST)/include/qpdf
-	cp doc/stylesheet.css $(DEST)/doc
 	if [ -f doc/qpdf-manual.html ]; then \
+	    mkdir $(DEST)/doc/_static; \
 	    cp doc/qpdf-manual.html $(DEST)/doc; \
+	    cp doc/_static/* $(DEST)/doc/_static; \
 	fi
 	if [ -f doc/qpdf-manual.pdf ]; then \
 	    cp doc/qpdf-manual.pdf $(DEST)/doc; \

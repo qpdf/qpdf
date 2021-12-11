@@ -42,20 +42,6 @@ Correct placement of comment: <!-- This section is referenced in QPDFObjectHandl
 <firstterm> -> just use literal
 <replaceable> -> Make sure in :file: or :samp:, then use {}
 
-Build:
-
-apt install python3-pip texlive-latex-extra latexmk
-pip install sphinx
-
-sphinx-build -M help . .
-sphinx-build -M latexpdf source build
-sphinx-build -M html source build
-sphinx-build -M singlehtml source build
-
-autoconf should detect sphinx and its dependencies, not fop, etc.
-Remove VALIDATE_DOC
-Fix installation of documentation in doc
-
 Additional cleanup:
 
 * Indices and tables section

@@ -100,7 +100,7 @@ $(foreach B,$(BUILD_ITEMS),$(eval \
 DISTFILES = doc/qpdf-manual.html doc/qpdf-manual.pdf
 distfiles.zip: $(DISTFILES)
 	$(RM) distfiles.zip
-	zip distfiles.zip $(DISTFILES)
+	zip -r distfiles.zip $(DISTFILES) doc/_static
 
 distclean: clean
 	$(RM) -r autoconf.mk autom4te.cache config.log config.status libtool
