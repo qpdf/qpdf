@@ -24,8 +24,6 @@ Things to fix:
 
 Entities/Unicode
 
-Gajic -> Gajić
-
 <!ENTITY lastreleased "November 16, 2021"> (not needed)
 <!ENTITY ldquo "&#x201C;">
 <!ENTITY mdash "&#x2014;">
@@ -473,9 +471,6 @@ I find it useful to make reference to them in this list.
    code and is partially obscured by later code. Keys in the resource
    dictionary may need to be changed -- create test cases with lots of
    duplicated/overlapping keys.
-
- * Figure out how to render Gajić correctly in the PDF version of the
-   qpdf manual.
 
  * Investigate whether there is a way to automate the memory checker
    tests for Windows.
