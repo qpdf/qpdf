@@ -97,26 +97,26 @@ System Requirements
 The qpdf package has few external dependencies. In order to build qpdf,
 the following packages are required:
 
--  A C++ compiler that supports C++-14.
+- A C++ compiler that supports C++-14.
 
--  zlib: http://www.zlib.net/
+- zlib: http://www.zlib.net/
 
--  jpeg: http://www.ijg.org/files/ or https://libjpeg-turbo.org/
+- jpeg: http://www.ijg.org/files/ or https://libjpeg-turbo.org/
 
--  *Recommended but not required:* gnutls: https://www.gnutls.org/ to be
-   able to use the gnutls crypto provider, and/or openssl:
-   https://openssl.org/ to be able to use the openssl crypto provider.
+- *Recommended but not required:* gnutls: https://www.gnutls.org/ to be
+  able to use the gnutls crypto provider, and/or openssl:
+  https://openssl.org/ to be able to use the openssl crypto provider.
 
--  gnu make 3.81 or newer: http://www.gnu.org/software/make
+- gnu make 3.81 or newer: http://www.gnu.org/software/make
 
--  perl version 5.8 or newer: http://www.perl.org/; required for running
-   the test suite. Starting with qpdf version 9.1.1, perl is no longer
-   required at runtime.
+- perl version 5.8 or newer: http://www.perl.org/; required for running
+  the test suite. Starting with qpdf version 9.1.1, perl is no longer
+  required at runtime.
 
--  GNU diffutils (any version): http://www.gnu.org/software/diffutils/
-   is required to run the test suite. Note that this is the version of
-   diff present on virtually all GNU/Linux systems. This is required
-   because the test suite uses @1@command@1@diff -u@2@command@2@.
+- GNU diffutils (any version): http://www.gnu.org/software/diffutils/
+  is required to run the test suite. Note that this is the version of
+  diff present on virtually all GNU/Linux systems. This is required
+  because the test suite uses @1@command@1@diff -u@2@command@2@.
 
 Part of qpdf's test suite does comparisons of the contents PDF files by
 converting them images and comparing the images. The image comparison
@@ -135,9 +135,9 @@ running @1@command@1@configure@2@command@2@ with the
 this, the following additional requirements are required by the test
 suite. Note that in no case are these items required to use qpdf.
 
--  libtiff: http://www.remotesensing.org/libtiff/
+- libtiff: http://www.remotesensing.org/libtiff/
 
--  GhostScript version 8.60 or newer: http://www.ghostscript.com
+- GhostScript version 8.60 or newer: http://www.ghostscript.com
 
 If you do not enable this, then you do not need to have tiff and
 ghostscript.
@@ -226,23 +226,23 @@ available crypto providers, and to use an external provider as the
 default over the native one. This behavior can be changed with the
 following flags to @1@command@1@./configure@2@command@2@:
 
--  @1@option@1@--enable-crypto-@1@replaceable@1@x@2@replaceable@2@@2@option@2@
-   (where @1@replaceable@1@x@2@replaceable@2@ is a supported crypto
-   provider): enable the @1@replaceable@1@x@2@replaceable@2@ crypto
-   provider, requiring any external dependencies it needs
+- @1@option@1@--enable-crypto-@1@replaceable@1@x@2@replaceable@2@@2@option@2@
+  (where @1@replaceable@1@x@2@replaceable@2@ is a supported crypto
+  provider): enable the @1@replaceable@1@x@2@replaceable@2@ crypto
+  provider, requiring any external dependencies it needs
 
--  @1@option@1@--disable-crypto-@1@replaceable@1@x@2@replaceable@2@@2@option@2@:
-   disable the @1@replaceable@1@x@2@replaceable@2@ provider, and do not
-   link against its dependencies even if they are available
+- @1@option@1@--disable-crypto-@1@replaceable@1@x@2@replaceable@2@@2@option@2@:
+  disable the @1@replaceable@1@x@2@replaceable@2@ provider, and do not
+  link against its dependencies even if they are available
 
--  @1@option@1@--with-default-crypto=@1@replaceable@1@x@2@replaceable@2@@2@option@2@:
-   make @1@replaceable@1@x@2@replaceable@2@ the default provider even if
-   a higher priority one is available
+- @1@option@1@--with-default-crypto=@1@replaceable@1@x@2@replaceable@2@@2@option@2@:
+  make @1@replaceable@1@x@2@replaceable@2@ the default provider even if
+  a higher priority one is available
 
--  @1@option@1@--disable-implicit-crypto@2@option@2@: only build crypto
-   providers that are explicitly requested with an
-   @1@option@1@--enable-crypto-@1@replaceable@1@x@2@replaceable@2@@2@option@2@
-   option
+- @1@option@1@--disable-implicit-crypto@2@option@2@: only build crypto
+  providers that are explicitly requested with an
+  @1@option@1@--enable-crypto-@1@replaceable@1@x@2@replaceable@2@@2@option@2@
+  option
 
 For example, if you want to guarantee that the gnutls crypto provider is
 used and that the native provider is not built, you could run
@@ -387,41 +387,41 @@ Notes for Packagers
 If you are packaging qpdf for an operating system distribution, here are
 some things you may want to keep in mind:
 
--  Starting in qpdf version 9.1.1, qpdf no longer has a runtime
-   dependency on perl. This is because fix-qdf was rewritten in C++.
-   However, qpdf still has a build-time dependency on perl.
+- Starting in qpdf version 9.1.1, qpdf no longer has a runtime
+  dependency on perl. This is because fix-qdf was rewritten in C++.
+  However, qpdf still has a build-time dependency on perl.
 
--  Make sure you are getting the intended behavior with regard to crypto
-   providers. Read `Build Support For Crypto
-   Providers <#ref.crypto.build>`__ for details.
+- Make sure you are getting the intended behavior with regard to crypto
+  providers. Read `Build Support For Crypto
+  Providers <#ref.crypto.build>`__ for details.
 
--  Passing @1@option@1@--enable-show-failed-test-output@2@option@2@ to
-   @1@command@1@./configure@2@command@2@ will cause any failed test
-   output to be written to the console. This can be very useful for
-   seeing test failures generated by autobuilders where you can't access
-   qtest.log after the fact.
+- Passing @1@option@1@--enable-show-failed-test-output@2@option@2@ to
+  @1@command@1@./configure@2@command@2@ will cause any failed test
+  output to be written to the console. This can be very useful for
+  seeing test failures generated by autobuilders where you can't access
+  qtest.log after the fact.
 
--  If qpdf's build environment detects the presence of autoconf and
-   related tools, it will check to ensure that automatically generated
-   files are up-to-date with recorded checksums and fail if it detects a
-   discrepancy. This feature is intended to prevent you from
-   accidentally forgetting to regenerate automatic files after modifying
-   their sources. If your packaging environment automatically refreshes
-   automatic files, it can cause this check to fail. Suppress qpdf's
-   checks by passing @1@option@1@--disable-check-autofiles@2@option@2@
-   to @1@command@1@/.configure@2@command@2@. This is safe since qpdf's
-   @1@command@1@autogen.sh@2@command@2@ just runs autotools in the
-   normal way.
+- If qpdf's build environment detects the presence of autoconf and
+  related tools, it will check to ensure that automatically generated
+  files are up-to-date with recorded checksums and fail if it detects a
+  discrepancy. This feature is intended to prevent you from
+  accidentally forgetting to regenerate automatic files after modifying
+  their sources. If your packaging environment automatically refreshes
+  automatic files, it can cause this check to fail. Suppress qpdf's
+  checks by passing @1@option@1@--disable-check-autofiles@2@option@2@
+  to @1@command@1@/.configure@2@command@2@. This is safe since qpdf's
+  @1@command@1@autogen.sh@2@command@2@ just runs autotools in the
+  normal way.
 
--  QPDF's @1@command@1@make install@2@command@2@ does not install
-   completion files by default, but as a packager, it's good if you
-   install them wherever your distribution expects such files to go. You
-   can find completion files to install in the
-   @1@filename@1@completions@2@filename@2@ directory.
+- QPDF's @1@command@1@make install@2@command@2@ does not install
+  completion files by default, but as a packager, it's good if you
+  install them wherever your distribution expects such files to go. You
+  can find completion files to install in the
+  @1@filename@1@completions@2@filename@2@ directory.
 
--  Packagers are encouraged to install the source files from the
-   @1@filename@1@examples@2@filename@2@ directory along with qpdf
-   development packages.
+- Packagers are encouraged to install the source files from the
+  @1@filename@1@examples@2@filename@2@ directory along with qpdf
+  development packages.
 
 .. _ref.using:
 
@@ -487,20 +487,20 @@ Exit Status
 The exit status of @1@command@1@qpdf@2@command@2@ may be interpreted as
 follows:
 
--  ``0``: no errors or warnings were found. The file may still have
-   problems qpdf can't detect. If
-   @1@option@1@--warning-exit-0@2@option@2@ was specified, exit status 0
-   is used even if there are warnings.
+- ``0``: no errors or warnings were found. The file may still have
+  problems qpdf can't detect. If
+  @1@option@1@--warning-exit-0@2@option@2@ was specified, exit status 0
+  is used even if there are warnings.
 
--  ``2``: errors were found. qpdf was not able to fully process the
-   file.
+- ``2``: errors were found. qpdf was not able to fully process the
+  file.
 
--  ``3``: qpdf encountered problems that it was able to recover from. In
-   some cases, the resulting file may still be damaged. Note that qpdf
-   still exits with status ``3`` if it finds warnings even when
-   @1@option@1@--no-warn@2@option@2@ is specified. With
-   @1@option@1@--warning-exit-0@2@option@2@, warnings without errors
-   exit with status 0 instead of 3.
+- ``3``: qpdf encountered problems that it was able to recover from. In
+  some cases, the resulting file may still be damaged. Note that qpdf
+  still exits with status ``3`` if it finds warnings even when
+  @1@option@1@--no-warn@2@option@2@ is specified. With
+  @1@option@1@--warning-exit-0@2@option@2@, warnings without errors
+  exit with status 0 instead of 3.
 
 Note that @1@command@1@qpdf@2@command@2@ never exists with status ``1``.
 If you get an exit status of ``1``, it was something else, like the
@@ -703,39 +703,39 @@ needed transformations.
    `Unicode Passwords <#ref.unicode-passwords>`__. The following modes
    are supported:
 
-   -  @1@option@1@auto@2@option@2@: Automatically determine whether the
-      specified password is a properly encoded Unicode (UTF-8) string,
-      and transcode it as required by the PDF spec based on the type
-      encryption being applied. On Windows starting with version 8.4.0,
-      and on almost all other modern platforms, incoming passwords will
-      be properly encoded in UTF-8, so this is almost always what you
-      want.
+   - @1@option@1@auto@2@option@2@: Automatically determine whether the
+     specified password is a properly encoded Unicode (UTF-8) string,
+     and transcode it as required by the PDF spec based on the type
+     encryption being applied. On Windows starting with version 8.4.0,
+     and on almost all other modern platforms, incoming passwords will
+     be properly encoded in UTF-8, so this is almost always what you
+     want.
 
-   -  @1@option@1@unicode@2@option@2@: Tells qpdf that the incoming
-      password is UTF-8, overriding whatever its automatic detection
-      determines. The only difference between this mode and
-      @1@option@1@auto@2@option@2@ is that qpdf will fail with an error
-      message if the password is not valid UTF-8 instead of falling back
-      to @1@option@1@bytes@2@option@2@ mode with a warning.
+   - @1@option@1@unicode@2@option@2@: Tells qpdf that the incoming
+     password is UTF-8, overriding whatever its automatic detection
+     determines. The only difference between this mode and
+     @1@option@1@auto@2@option@2@ is that qpdf will fail with an error
+     message if the password is not valid UTF-8 instead of falling back
+     to @1@option@1@bytes@2@option@2@ mode with a warning.
 
-   -  @1@option@1@bytes@2@option@2@: Interpret the password as a literal
-      byte string. For non-Windows platforms, this is what versions of
-      qpdf prior to 8.4.0 did. For Windows platforms, there is no way to
-      specify strings of binary data on the command line directly, but
-      you can use the @1@option@1@@filename@2@option@2@ option to do it,
-      in which case this option forces qpdf to respect the string of
-      bytes as provided. This option will allow you to encrypt PDF files
-      with passwords that will not be usable by other readers.
+   - @1@option@1@bytes@2@option@2@: Interpret the password as a literal
+     byte string. For non-Windows platforms, this is what versions of
+     qpdf prior to 8.4.0 did. For Windows platforms, there is no way to
+     specify strings of binary data on the command line directly, but
+     you can use the @1@option@1@@filename@2@option@2@ option to do it,
+     in which case this option forces qpdf to respect the string of
+     bytes as provided. This option will allow you to encrypt PDF files
+     with passwords that will not be usable by other readers.
 
-   -  @1@option@1@hex-bytes@2@option@2@: Interpret the password as a
-      hex-encoded string. This provides a way to pass binary data as a
-      password on all platforms including Windows. As with
-      @1@option@1@bytes@2@option@2@, this option may allow creation of
-      files that can't be opened by other readers. This mode affects
-      qpdf's interpretation of passwords specified for decrypting files
-      as well as for encrypting them. It makes it possible to specify
-      strings that are encoded in some manner other than the system's
-      default encoding.
+   - @1@option@1@hex-bytes@2@option@2@: Interpret the password as a
+     hex-encoded string. This provides a way to pass binary data as a
+     password on all platforms including Windows. As with
+     @1@option@1@bytes@2@option@2@, this option may allow creation of
+     files that can't be opened by other readers. This mode affects
+     qpdf's interpretation of passwords specified for decrypting files
+     as well as for encrypting them. It makes it possible to specify
+     strings that are encoded in some manner other than the system's
+     default encoding.
 
 @1@option@1@--rotate=[+|-]angle[:page-range]@2@option@2@
    Apply rotation to specified pages. The
@@ -811,34 +811,34 @@ needed transformations.
    output file. If @1@option@1@n@2@option@2@ is not specified, create
    single pages. Output file names are generated as follows:
 
-   -  If the string ``%d`` appears in the output file name, it is
-      replaced with a range of zero-padded page numbers starting from 1.
+   - If the string ``%d`` appears in the output file name, it is
+     replaced with a range of zero-padded page numbers starting from 1.
 
-   -  Otherwise, if the output file name ends in
-      @1@filename@1@.pdf@2@filename@2@ (case insensitive), a zero-padded
-      page range, preceded by a dash, is inserted before the file
-      extension.
+   - Otherwise, if the output file name ends in
+     @1@filename@1@.pdf@2@filename@2@ (case insensitive), a zero-padded
+     page range, preceded by a dash, is inserted before the file
+     extension.
 
-   -  Otherwise, the file name is appended with a zero-padded page range
-      preceded by a dash.
+   - Otherwise, the file name is appended with a zero-padded page range
+     preceded by a dash.
 
    Page ranges are a single number in the case of single-page groups or
    two numbers separated by a dash otherwise. For example, if
    @1@filename@1@infile.pdf@2@filename@2@ has 12 pages
 
-   -  @1@command@1@qpdf --split-pages infile.pdf %d-out@2@command@2@
-      would generate files @1@filename@1@01-out@2@filename@2@ through
-      @1@filename@1@12-out@2@filename@2@
+   - @1@command@1@qpdf --split-pages infile.pdf %d-out@2@command@2@
+     would generate files @1@filename@1@01-out@2@filename@2@ through
+     @1@filename@1@12-out@2@filename@2@
 
-   -  @1@command@1@qpdf --split-pages=2 infile.pdf
-      outfile.pdf@2@command@2@ would generate files
-      @1@filename@1@outfile-01-02.pdf@2@filename@2@ through
-      @1@filename@1@outfile-11-12.pdf@2@filename@2@
+   - @1@command@1@qpdf --split-pages=2 infile.pdf
+     outfile.pdf@2@command@2@ would generate files
+     @1@filename@1@outfile-01-02.pdf@2@filename@2@ through
+     @1@filename@1@outfile-11-12.pdf@2@filename@2@
 
-   -  @1@command@1@qpdf --split-pages infile.pdf
-      something.else@2@command@2@ would generate files
-      @1@filename@1@something.else-01@2@filename@2@ through
-      @1@filename@1@something.else-12@2@filename@2@
+   - @1@command@1@qpdf --split-pages infile.pdf
+     something.else@2@command@2@ would generate files
+     @1@filename@1@something.else-01@2@filename@2@ through
+     @1@filename@1@something.else-12@2@filename@2@
 
    Note that outlines, threads, and other global features of the
    original PDF file are not preserved. For each page of output, this
@@ -965,11 +965,11 @@ is 128, the following restriction options are available:
    @1@option@1@@1@replaceable@1@print-opt@2@replaceable@2@@2@option@2@
    may be one of the following:
 
-   -  @1@option@1@full@2@option@2@: allow full printing
+   - @1@option@1@full@2@option@2@: allow full printing
 
-   -  @1@option@1@low@2@option@2@: allow low-resolution printing only
+   - @1@option@1@low@2@option@2@: allow low-resolution printing only
 
-   -  @1@option@1@none@2@option@2@: disallow printing
+   - @1@option@1@none@2@option@2@: disallow printing
 
 @1@option@1@--modify=@1@replaceable@1@modify-opt@2@replaceable@2@@2@option@2@
    Controls modify access. This way of controlling modify access has
@@ -977,17 +977,17 @@ is 128, the following restriction options are available:
    @1@option@1@@1@replaceable@1@modify-opt@2@replaceable@2@@2@option@2@
    may be one of the following:
 
-   -  @1@option@1@all@2@option@2@: allow full document modification
+   - @1@option@1@all@2@option@2@: allow full document modification
 
-   -  @1@option@1@annotate@2@option@2@: allow comment authoring, form
-      operations, and document assembly
+   - @1@option@1@annotate@2@option@2@: allow comment authoring, form
+     operations, and document assembly
 
-   -  @1@option@1@form@2@option@2@: allow form field fill-in and signing
-      and document assembly
+   - @1@option@1@form@2@option@2@: allow form field fill-in and signing
+     and document assembly
 
-   -  @1@option@1@assembly@2@option@2@: allow document assembly only
+   - @1@option@1@assembly@2@option@2@: allow document assembly only
 
-   -  @1@option@1@none@2@option@2@: allow no modifications
+   - @1@option@1@none@2@option@2@: allow no modifications
 
    Using the @1@option@1@--modify@2@option@2@ option does not allow you
    to create certain combinations of permissions such as allowing form
@@ -1101,20 +1101,20 @@ is even or odd.
 
 Example page ranges:
 
--  ``1,3,5-9,15-12``: pages 1, 3, 5, 6, 7, 8, 9, 15, 14, 13, and 12 in
-   that order.
+- ``1,3,5-9,15-12``: pages 1, 3, 5, 6, 7, 8, 9, 15, 14, 13, and 12 in
+  that order.
 
--  ``z-1``: all pages in the document in reverse
+- ``z-1``: all pages in the document in reverse
 
--  ``r3-r1``: the last three pages of the document
+- ``r3-r1``: the last three pages of the document
 
--  ``r1-r3``: the last three pages of the document in reverse order
+- ``r1-r3``: the last three pages of the document in reverse order
 
--  ``1-20:even``: even pages from 2 to 20
+- ``1-20:even``: even pages from 2 to 20
 
--  ``5,7-9,12:odd``: pages 5, 8, and, 12, which are the pages in odd
-   positions from among the original range, which represents pages 5, 7,
-   8, 9, and 12.
+- ``5,7-9,12:odd``: pages 5, 8, and, 12, which are the pages in odd
+  positions from among the original range, which represents pages 5, 7,
+  8, 9, and 12.
 
 Starting in qpdf version 8.3, you can specify the
 @1@option@1@--collate@2@option@2@ option. Note that this option is
@@ -1134,23 +1134,23 @@ example, if you ran @1@command@1@qpdf --collate --empty --pages a.pdf
 1-5 b.pdf 6-4 c.pdf r1 -- out.pdf@2@command@2@, you would get the
 following pages in this order:
 
--  a.pdf page 1
+- a.pdf page 1
 
--  b.pdf page 6
+- b.pdf page 6
 
--  c.pdf last page
+- c.pdf last page
 
--  a.pdf page 2
+- a.pdf page 2
 
--  b.pdf page 5
+- b.pdf page 5
 
--  a.pdf page 3
+- a.pdf page 3
 
--  b.pdf page 4
+- b.pdf page 4
 
--  a.pdf page 4
+- a.pdf page 4
 
--  a.pdf page 5
+- a.pdf page 5
 
 Starting in qpdf version 10.2, you may specify a numeric argument to
 @1@option@1@--collate@2@option@2@. With
@@ -1161,23 +1161,23 @@ again, stopping when there are no more pages. For example, if you ran
 r1 -- out.pdf@2@command@2@, you would get the following pages in this
 order:
 
--  a.pdf page 1
+- a.pdf page 1
 
--  a.pdf page 2
+- a.pdf page 2
 
--  b.pdf page 6
+- b.pdf page 6
 
--  b.pdf page 5
+- b.pdf page 5
 
--  c.pdf last page
+- c.pdf last page
 
--  a.pdf page 3
+- a.pdf page 3
 
--  a.pdf page 4
+- a.pdf page 4
 
--  b.pdf page 4
+- b.pdf page 4
 
--  a.pdf page 5
+- a.pdf page 5
 
 Starting in qpdf version 8.3, when you split and merge files, any page
 labels (page numbers) are preserved in the final file. It is expected
@@ -1280,40 +1280,40 @@ between the @1@option@1@--overlay@2@option@2@ or
 @1@option@1@--underlay@2@option@2@ flag and the
 @1@option@1@--@2@option@2@ option. The following options are supported:
 
--  @1@option@1@--password=password@2@option@2@: supply a password if the
-   overlay/underlay file is encrypted.
+- @1@option@1@--password=password@2@option@2@: supply a password if the
+  overlay/underlay file is encrypted.
 
--  @1@option@1@--to=page-range@2@option@2@: a range of pages in the same
-   form at described in `Page Selection Options <#ref.page-selection>`__
-   indicates which pages in the output should have the overlay/underlay
-   applied. If not specified, overlay/underlay are applied to all pages.
+- @1@option@1@--to=page-range@2@option@2@: a range of pages in the same
+  form at described in `Page Selection Options <#ref.page-selection>`__
+  indicates which pages in the output should have the overlay/underlay
+  applied. If not specified, overlay/underlay are applied to all pages.
 
--  @1@option@1@--from=[page-range]@2@option@2@: a range of pages that
-   specifies which pages in the overlay/underlay file will be used for
-   overlay or underlay. If not specified, all pages will be used. This
-   can be explicitly specified to be empty if
-   @1@option@1@--repeat@2@option@2@ is used.
+- @1@option@1@--from=[page-range]@2@option@2@: a range of pages that
+  specifies which pages in the overlay/underlay file will be used for
+  overlay or underlay. If not specified, all pages will be used. This
+  can be explicitly specified to be empty if
+  @1@option@1@--repeat@2@option@2@ is used.
 
--  @1@option@1@--repeat=page-range@2@option@2@: an optional range of
-   pages that specifies which pages in the overlay/underlay file will be
-   repeated after the "from" pages are used up. If you want to repeat a
-   range of pages starting at the beginning, you can explicitly use
-   @1@option@1@--from=@2@option@2@.
+- @1@option@1@--repeat=page-range@2@option@2@: an optional range of
+  pages that specifies which pages in the overlay/underlay file will be
+  repeated after the "from" pages are used up. If you want to repeat a
+  range of pages starting at the beginning, you can explicitly use
+  @1@option@1@--from=@2@option@2@.
 
 Here are some examples.
 
--  @1@command@1@--overlay o.pdf --to=1-5 --from=1-3 --repeat=4
-   --@2@command@2@: overlay the first three pages from file
-   @1@filename@1@o.pdf@2@filename@2@ onto the first three pages of the
-   output, then overlay page 4 from @1@filename@1@o.pdf@2@filename@2@
-   onto pages 4 and 5 of the output. Leave remaining output pages
-   untouched.
+- @1@command@1@--overlay o.pdf --to=1-5 --from=1-3 --repeat=4
+  --@2@command@2@: overlay the first three pages from file
+  @1@filename@1@o.pdf@2@filename@2@ onto the first three pages of the
+  output, then overlay page 4 from @1@filename@1@o.pdf@2@filename@2@
+  onto pages 4 and 5 of the output. Leave remaining output pages
+  untouched.
 
--  @1@command@1@--underlay footer.pdf --from= --repeat=1,2
-   --@2@command@2@: Underlay page 1 of
-   @1@filename@1@footer.pdf@2@filename@2@ on all odd output pages, and
-   underlay page 2 of @1@filename@1@footer.pdf@2@filename@2@ on all even
-   output pages.
+- @1@command@1@--underlay footer.pdf --from= --repeat=1,2
+  --@2@command@2@: Underlay page 1 of
+  @1@filename@1@footer.pdf@2@filename@2@ on all odd output pages, and
+  underlay page 2 of @1@filename@1@footer.pdf@2@filename@2@ on all even
+  output pages.
 
 .. _ref.attachments:
 
@@ -1468,24 +1468,24 @@ following options are available:
    @1@option@1@generalized@2@option@2@. The following options are
    available:
 
-   -  @1@option@1@none@2@option@2@: do not attempt to decode any streams
+   - @1@option@1@none@2@option@2@: do not attempt to decode any streams
 
-   -  @1@option@1@generalized@2@option@2@: decode streams filtered with
-      supported generalized filters: ``/LZWDecode``, ``/FlateDecode``,
-      ``/ASCII85Decode``, and ``/ASCIIHexDecode``. We define generalized
-      filters as those to be used for general-purpose compression or
-      encoding, as opposed to filters specifically designed for image
-      data. Note that, by default, streams already compressed with
-      ``/FlateDecode`` are not uncompressed and recompressed unless you
-      also specify @1@option@1@--recompress-flate@2@option@2@.
+   - @1@option@1@generalized@2@option@2@: decode streams filtered with
+     supported generalized filters: ``/LZWDecode``, ``/FlateDecode``,
+     ``/ASCII85Decode``, and ``/ASCIIHexDecode``. We define generalized
+     filters as those to be used for general-purpose compression or
+     encoding, as opposed to filters specifically designed for image
+     data. Note that, by default, streams already compressed with
+     ``/FlateDecode`` are not uncompressed and recompressed unless you
+     also specify @1@option@1@--recompress-flate@2@option@2@.
 
-   -  @1@option@1@specialized@2@option@2@: in addition to generalized,
-      decode streams with supported non-lossy specialized filters;
-      currently this is just ``/RunLengthDecode``
+   - @1@option@1@specialized@2@option@2@: in addition to generalized,
+     decode streams with supported non-lossy specialized filters;
+     currently this is just ``/RunLengthDecode``
 
-   -  @1@option@1@all@2@option@2@: in addition to generalized and
-      specialized, decode streams with supported lossy filters;
-      currently this is just ``/DCTDecode`` (JPEG)
+   - @1@option@1@all@2@option@2@: in addition to generalized and
+     specialized, decode streams with supported lossy filters;
+     currently this is just ``/DCTDecode`` (JPEG)
 
 @1@option@1@--stream-data=@1@replaceable@1@option@2@replaceable@2@@2@option@2@
    Controls transformation of stream data. This option predates the
@@ -1495,21 +1495,21 @@ following options are available:
    @1@option@1@@1@replaceable@1@option@2@replaceable@2@@2@option@2@ may
    be one of the following:
 
-   -  @1@option@1@compress@2@option@2@: recompress stream data when
-      possible (default); equivalent to
-      @1@option@1@--compress-streams=y@2@option@2@
-      @1@option@1@--decode-level=generalized@2@option@2@. Does not
-      recompress streams already compressed with ``/FlateDecode`` unless
-      @1@option@1@--recompress-flate@2@option@2@ is also specified.
+   - @1@option@1@compress@2@option@2@: recompress stream data when
+     possible (default); equivalent to
+     @1@option@1@--compress-streams=y@2@option@2@
+     @1@option@1@--decode-level=generalized@2@option@2@. Does not
+     recompress streams already compressed with ``/FlateDecode`` unless
+     @1@option@1@--recompress-flate@2@option@2@ is also specified.
 
-   -  @1@option@1@preserve@2@option@2@: leave all stream data as is;
-      equivalent to @1@option@1@--compress-streams=n@2@option@2@
-      @1@option@1@--decode-level=none@2@option@2@
+   - @1@option@1@preserve@2@option@2@: leave all stream data as is;
+     equivalent to @1@option@1@--compress-streams=n@2@option@2@
+     @1@option@1@--decode-level=none@2@option@2@
 
-   -  @1@option@1@uncompress@2@option@2@: uncompress stream data
-      compressed with generalized filters when possible; equivalent to
-      @1@option@1@--compress-streams=n@2@option@2@
-      @1@option@1@--decode-level=generalized@2@option@2@
+   - @1@option@1@uncompress@2@option@2@: uncompress stream data
+     compressed with generalized filters when possible; equivalent to
+     @1@option@1@--compress-streams=n@2@option@2@
+     @1@option@1@--decode-level=generalized@2@option@2@
 
 @1@option@1@--recompress-flate@2@option@2@
    By default, streams already compressed with ``/FlateDecode`` are left
@@ -1540,13 +1540,13 @@ following options are available:
    @1@option@1@@1@replaceable@1@mode@2@replaceable@2@@2@option@2@ may be
    one of the following:
 
-   -  @1@option@1@preserve@2@option@2@: preserve original object streams
-      (default)
+   - @1@option@1@preserve@2@option@2@: preserve original object streams
+     (default)
 
-   -  @1@option@1@disable@2@option@2@: don't write any object streams
+   - @1@option@1@disable@2@option@2@: don't write any object streams
 
-   -  @1@option@1@generate@2@option@2@: use object streams wherever
-      possible
+   - @1@option@1@generate@2@option@2@: use object streams wherever
+     possible
 
 @1@option@1@--preserve-unreferenced@2@option@2@
    Tells qpdf to preserve objects that are not referenced when writing
@@ -1637,14 +1637,14 @@ following options are available:
    annotations. The @1@replaceable@1@option@2@replaceable@2@ parameter
    may be any of the following:
 
-   -  @1@option@1@all@2@option@2@: include all annotations that are not
-      marked invisible or hidden
+   - @1@option@1@all@2@option@2@: include all annotations that are not
+     marked invisible or hidden
 
-   -  @1@option@1@print@2@option@2@: only include annotations that
-      indicate that they should appear when the page is printed
+   - @1@option@1@print@2@option@2@: only include annotations that
+     indicate that they should appear when the page is printed
 
-   -  @1@option@1@screen@2@option@2@: omit annotations that indicate
-      they should not appear on the screen
+   - @1@option@1@screen@2@option@2@: omit annotations that indicate
+     they should not appear on the screen
 
    Note that form fields are special because the annotations that are
    used to render filled-in form fields may become out of date from the
@@ -1666,25 +1666,25 @@ following options are available:
    option. Most of these are not a problem with well-behaved PDF files.
    The limitations are as follows:
 
-   -  Radio button and checkbox appearances use the pre-set values in
-      the PDF file. QPDF just makes sure that the correct appearance is
-      displayed based on the value of the field. This is fine for PDF
-      files that create their forms properly. Some PDF writers save
-      appearances for fields when they change, which could cause some
-      controls to have inconsistent appearances.
+   - Radio button and checkbox appearances use the pre-set values in
+     the PDF file. QPDF just makes sure that the correct appearance is
+     displayed based on the value of the field. This is fine for PDF
+     files that create their forms properly. Some PDF writers save
+     appearances for fields when they change, which could cause some
+     controls to have inconsistent appearances.
 
-   -  For text fields and list boxes, any characters that fall outside
-      of US-ASCII or, if detected, "Windows ANSI" or "Mac Roman"
-      encoding, will be replaced by the ``?`` character.
+   - For text fields and list boxes, any characters that fall outside
+     of US-ASCII or, if detected, "Windows ANSI" or "Mac Roman"
+     encoding, will be replaced by the ``?`` character.
 
-   -  Quadding is ignored. Quadding is used to specify whether the
-      contents of a field should be left, center, or right aligned with
-      the field.
+   - Quadding is ignored. Quadding is used to specify whether the
+     contents of a field should be left, center, or right aligned with
+     the field.
 
-   -  Rich text, multi-line, and other more elaborate formatting
-      directives are ignored.
+   - Rich text, multi-line, and other more elaborate formatting
+     directives are ignored.
 
-   -  There is no support for multi-select fields or signature fields.
+   - There is no support for multi-select fields or signature fields.
 
    If qpdf doesn't do a good enough job with your form, use an external
    application to save your filled-in form before processing it with
@@ -2141,41 +2141,41 @@ writes a repaired file to standard output.
 
 The following attributes characterize a QDF file:
 
--  All objects appear in numerical order in the PDF file, including when
-   objects appear in object streams.
+- All objects appear in numerical order in the PDF file, including when
+  objects appear in object streams.
 
--  Objects are printed in an easy-to-read format, and all line endings
-   are normalized to UNIX line endings.
+- Objects are printed in an easy-to-read format, and all line endings
+  are normalized to UNIX line endings.
 
--  Unless specifically overridden, streams appear uncompressed (when
-   qpdf supports the filters and they are compressed with a non-lossy
-   compression scheme), and most content streams are normalized (line
-   endings are converted to just a UNIX-style linefeeds).
+- Unless specifically overridden, streams appear uncompressed (when
+  qpdf supports the filters and they are compressed with a non-lossy
+  compression scheme), and most content streams are normalized (line
+  endings are converted to just a UNIX-style linefeeds).
 
--  All streams lengths are represented as indirect objects, and the
-   stream length object is always the next object after the stream. If
-   the stream data does not end with a newline, an extra newline is
-   inserted, and a special comment appears after the stream indicating
-   that this has been done.
+- All streams lengths are represented as indirect objects, and the
+  stream length object is always the next object after the stream. If
+  the stream data does not end with a newline, an extra newline is
+  inserted, and a special comment appears after the stream indicating
+  that this has been done.
 
--  If the PDF file contains object streams, if object stream *n*
-   contains *k* objects, those objects are numbered from *n+1* through
-   *n+k*, and the object number/offset pairs appear on a separate line
-   for each object. Additionally, each object in the object stream is
-   preceded by a comment indicating its object number and index. This
-   makes it very easy to find objects in object streams.
+- If the PDF file contains object streams, if object stream *n*
+  contains *k* objects, those objects are numbered from *n+1* through
+  *n+k*, and the object number/offset pairs appear on a separate line
+  for each object. Additionally, each object in the object stream is
+  preceded by a comment indicating its object number and index. This
+  makes it very easy to find objects in object streams.
 
--  All beginnings of objects, ``stream`` tokens, ``endstream`` tokens,
-   and ``endobj`` tokens appear on lines by themselves. A blank line
-   follows every ``endobj`` token.
+- All beginnings of objects, ``stream`` tokens, ``endstream`` tokens,
+  and ``endobj`` tokens appear on lines by themselves. A blank line
+  follows every ``endobj`` token.
 
--  If there is a cross-reference stream, it is unfiltered.
+- If there is a cross-reference stream, it is unfiltered.
 
--  Page dictionaries and page content streams are marked with special
-   comments that make them easy to find.
+- Page dictionaries and page content streams are marked with special
+  comments that make them easy to find.
 
--  Comments precede each object indicating the object number of the
-   corresponding object in the original file.
+- Comments precede each object indicating the object number of the
+  corresponding object in the original file.
 
 When editing a QDF file, any edits can be made as long as the above
 constraints are maintained. This means that you can freely edit a page's
@@ -2195,18 +2195,18 @@ object.
 When @1@command@1@fix-qdf@2@command@2@ is run, it goes through the file
 and recomputes the following parts of the file:
 
--  the ``/N``, ``/W``, and ``/First`` keys of all object stream
-   dictionaries
+- the ``/N``, ``/W``, and ``/First`` keys of all object stream
+  dictionaries
 
--  the pairs of numbers representing object numbers and offsets of
-   objects in object streams
+- the pairs of numbers representing object numbers and offsets of
+  objects in object streams
 
--  all stream lengths
+- all stream lengths
 
--  the cross-reference table or cross-reference stream
+- the cross-reference table or cross-reference stream
 
--  the offset to the cross-reference table or cross-reference stream
-   following the ``startxref`` token
+- the offset to the cross-reference table or cross-reference stream
+  following the ``startxref`` token
 
 .. _ref.using-library:
 
@@ -2393,26 +2393,26 @@ Documentation
    of the corresponding field in the JSON output. The specific
    guarantees are as follows:
 
-   -  A dictionary in the help output means that the corresponding
-      location in the actual JSON output is also a dictionary with
-      exactly the same keys; that is, no keys present in help are absent
-      in the real output, and no keys will be present in the real output
-      that are not in help. As a special case, if the dictionary has a
-      single key whose name starts with ``<`` and ends with ``>``, it
-      means that the JSON output is a dictionary that can have any keys,
-      each of which conforms to the value of the special key. This is
-      used for cases in which the keys of the dictionary are things like
-      object IDs.
+   - A dictionary in the help output means that the corresponding
+     location in the actual JSON output is also a dictionary with
+     exactly the same keys; that is, no keys present in help are absent
+     in the real output, and no keys will be present in the real output
+     that are not in help. As a special case, if the dictionary has a
+     single key whose name starts with ``<`` and ends with ``>``, it
+     means that the JSON output is a dictionary that can have any keys,
+     each of which conforms to the value of the special key. This is
+     used for cases in which the keys of the dictionary are things like
+     object IDs.
 
-   -  A string in the help output is a description of the item that
-      appears in the corresponding location of the actual output. The
-      corresponding output can have any format.
+   - A string in the help output is a description of the item that
+     appears in the corresponding location of the actual output. The
+     corresponding output can have any format.
 
-   -  An array in the help output always contains a single element. It
-      indicates that the corresponding location in the actual output is
-      also an array, and that each element of the array has whatever
-      format is implied by the single element of the help output's
-      array.
+   - An array in the help output always contains a single element. It
+     indicates that the corresponding location in the actual output is
+     also an array, and that each element of the array has whatever
+     format is implied by the single element of the help output's
+     array.
 
    For example, the help output indicates includes a "``pagelabels``"
    key whose value is an array of one element. That element is a
@@ -2438,41 +2438,41 @@ Limitations of JSON Representation
 
 There are a few limitations to be aware of with the JSON structure:
 
--  Strings, names, and indirect object references in the original PDF
-   file are all converted to strings in the JSON representation. In the
-   case of a "normal" PDF file, you can tell the difference because a
-   name starts with a slash (``/``), and an indirect object reference
-   looks like ``n n R``, but if there were to be a string that looked
-   like a name or indirect object reference, there would be no way to
-   tell this from the JSON output. Note that there are certain cases
-   where you know for sure what something is, such as knowing that
-   dictionary keys in objects are always names and that certain things
-   in the higher-level computed data are known to contain indirect
-   object references.
+- Strings, names, and indirect object references in the original PDF
+  file are all converted to strings in the JSON representation. In the
+  case of a "normal" PDF file, you can tell the difference because a
+  name starts with a slash (``/``), and an indirect object reference
+  looks like ``n n R``, but if there were to be a string that looked
+  like a name or indirect object reference, there would be no way to
+  tell this from the JSON output. Note that there are certain cases
+  where you know for sure what something is, such as knowing that
+  dictionary keys in objects are always names and that certain things
+  in the higher-level computed data are known to contain indirect
+  object references.
 
--  The JSON format doesn't support binary data very well. Mostly the
-   details are not important, but they are presented here for
-   information. When qpdf outputs a string in the JSON representation,
-   it converts the string to UTF-8, assuming usual PDF string semantics.
-   Specifically, if the original string is UTF-16, it is converted to
-   UTF-8. Otherwise, it is assumed to have PDF doc encoding, and is
-   converted to UTF-8 with that assumption. This causes strange things
-   to happen to binary strings. For example, if you had the binary
-   string ``<038051>``, this would be output to the JSON as ``\u0003•Q``
-   because ``03`` is not a printable character and ``80`` is the bullet
-   character in PDF doc encoding and is mapped to the Unicode value
-   ``2022``. Since ``51`` is ``Q``, it is output as is. If you wanted to
-   convert back from here to a binary string, would have to recognize
-   Unicode values whose code points are higher than ``0xFF`` and map
-   those back to their corresponding PDF doc encoding characters. There
-   is no way to tell the difference between a Unicode string that was
-   originally encoded as UTF-16 or one that was converted from PDF doc
-   encoding. In other words, it's best if you don't try to use the JSON
-   format to extract binary strings from the PDF file, but if you really
-   had to, it could be done. Note that qpdf's
-   @1@option@1@--show-object@2@option@2@ option does not have this
-   limitation and will reveal the string as encoded in the original
-   file.
+- The JSON format doesn't support binary data very well. Mostly the
+  details are not important, but they are presented here for
+  information. When qpdf outputs a string in the JSON representation,
+  it converts the string to UTF-8, assuming usual PDF string semantics.
+  Specifically, if the original string is UTF-16, it is converted to
+  UTF-8. Otherwise, it is assumed to have PDF doc encoding, and is
+  converted to UTF-8 with that assumption. This causes strange things
+  to happen to binary strings. For example, if you had the binary
+  string ``<038051>``, this would be output to the JSON as ``\u0003•Q``
+  because ``03`` is not a printable character and ``80`` is the bullet
+  character in PDF doc encoding and is mapped to the Unicode value
+  ``2022``. Since ``51`` is ``Q``, it is output as is. If you wanted to
+  convert back from here to a binary string, would have to recognize
+  Unicode values whose code points are higher than ``0xFF`` and map
+  those back to their corresponding PDF doc encoding characters. There
+  is no way to tell the difference between a Unicode string that was
+  originally encoded as UTF-16 or one that was converted from PDF doc
+  encoding. In other words, it's best if you don't try to use the JSON
+  format to extract binary strings from the PDF file, but if you really
+  had to, it could be done. Note that qpdf's
+  @1@option@1@--show-object@2@option@2@ option does not have this
+  limitation and will reveal the string as encoded in the original
+  file.
 
 .. _json.considerations:
 
@@ -2483,34 +2483,34 @@ For the most part, the built-in JSON help tells you everything you need
 to know about the JSON format, but there are a few non-obvious things to
 be aware of:
 
--  While qpdf guarantees that keys present in the help will be present
-   in the output, those fields may be null or empty if the information
-   is not known or absent in the file. Also, if you specify
-   @1@option@1@--json-keys@2@option@2@, the keys that are not listed
-   will be excluded entirely except for those that
-   @1@option@1@--json-help@2@option@2@ says are always present.
+- While qpdf guarantees that keys present in the help will be present
+  in the output, those fields may be null or empty if the information
+  is not known or absent in the file. Also, if you specify
+  @1@option@1@--json-keys@2@option@2@, the keys that are not listed
+  will be excluded entirely except for those that
+  @1@option@1@--json-help@2@option@2@ says are always present.
 
--  In a few places, there are keys with names containing
-   ``pageposfrom1``. The values of these keys are null or an integer. If
-   an integer, they point to a page index within the file numbering from
-   1. Note that JSON indexes from 0, and you would also use 0-based
-   indexing using the API. However, 1-based indexing is easier in this
-   case because the command-line syntax for specifying page ranges is
-   1-based. If you were going to write a program that looked through the
-   JSON for information about specific pages and then use the
-   command-line to extract those pages, 1-based indexing is easier.
-   Besides, it's more convenient to subtract 1 from a program in a real
-   programming language than it is to add 1 from shell code.
+- In a few places, there are keys with names containing
+  ``pageposfrom1``. The values of these keys are null or an integer. If
+  an integer, they point to a page index within the file numbering from
+  1. Note that JSON indexes from 0, and you would also use 0-based
+  indexing using the API. However, 1-based indexing is easier in this
+  case because the command-line syntax for specifying page ranges is
+  1-based. If you were going to write a program that looked through the
+  JSON for information about specific pages and then use the
+  command-line to extract those pages, 1-based indexing is easier.
+  Besides, it's more convenient to subtract 1 from a program in a real
+  programming language than it is to add 1 from shell code.
 
--  The image information included in the ``page`` section of the JSON
-   output includes the key "``filterable``". Note that the value of this
-   field may depend on the @1@option@1@--decode-level@2@option@2@ that
-   you invoke qpdf with. The JSON output includes a top-level key
-   "``parameters``" that indicates the decode level used for computing
-   whether a stream was filterable. For example, jpeg images will be
-   shown as not filterable by default, but they will be shown as
-   filterable if you run @1@command@1@qpdf --json
-   --decode-level=all@2@command@2@.
+- The image information included in the ``page`` section of the JSON
+  output includes the key "``filterable``". Note that the value of this
+  field may depend on the @1@option@1@--decode-level@2@option@2@ that
+  you invoke qpdf with. The JSON output includes a top-level key
+  "``parameters``" that indicates the decode level used for computing
+  whether a stream was filterable. For example, jpeg images will be
+  shown as not filterable by default, but they will be shown as
+  filterable if you run @1@command@1@qpdf --json
+  --decode-level=all@2@command@2@.
 
 .. _ref.design:
 
@@ -2703,29 +2703,29 @@ find them by looking at
 In order to avoid creation of circular dependencies, the following
 general guidelines are followed with helper classes:
 
--  Core class interfaces do not know about helper classes. For example,
-   no methods of ``QPDF`` or ``QPDFObjectHandle`` will include helper
-   classes in their interfaces.
+- Core class interfaces do not know about helper classes. For example,
+  no methods of ``QPDF`` or ``QPDFObjectHandle`` will include helper
+  classes in their interfaces.
 
--  Interfaces of object helpers will usually not use document helpers in
-   their interfaces. This is because it is much more useful for document
-   helpers to have methods that return object helpers. Most operations
-   in PDF files start at the document level and go from there to the
-   object level rather than the other way around. It can sometimes be
-   useful to map back from object-level structures to document-level
-   structures. If there is a desire to do this, it will generally be
-   provided by a method in the document helper class.
+- Interfaces of object helpers will usually not use document helpers in
+  their interfaces. This is because it is much more useful for document
+  helpers to have methods that return object helpers. Most operations
+  in PDF files start at the document level and go from there to the
+  object level rather than the other way around. It can sometimes be
+  useful to map back from object-level structures to document-level
+  structures. If there is a desire to do this, it will generally be
+  provided by a method in the document helper class.
 
--  Most of the time, object helpers don't know about other object
-   helpers. However, in some cases, one type of object may be a
-   container for another type of object, in which case it may make sense
-   for the outer object to know about the inner object. For example,
-   there are methods in the ``QPDFPageObjectHelper`` that know
-   ``QPDFAnnotationObjectHelper`` because references to annotations are
-   contained in page dictionaries.
+- Most of the time, object helpers don't know about other object
+  helpers. However, in some cases, one type of object may be a
+  container for another type of object, in which case it may make sense
+  for the outer object to know about the inner object. For example,
+  there are methods in the ``QPDFPageObjectHelper`` that know
+  ``QPDFAnnotationObjectHelper`` because references to annotations are
+  contained in page dictionaries.
 
--  Any helper or core library class may use helpers in their
-   implementations.
+- Any helper or core library class may use helpers in their
+  implementations.
 
 Prior to qpdf version 8.1, higher level interfaces were added as
 "convenience functions" in either ``QPDF`` or ``QPDFObjectHandle``. For
@@ -2786,55 +2786,55 @@ stream are cached.
 The following example should clarify how ``QPDF`` processes a simple
 file.
 
--  Client constructs ``QPDF`` ``pdf`` and calls
-   ``pdf.processFile("a.pdf");``.
+- Client constructs ``QPDF`` ``pdf`` and calls
+  ``pdf.processFile("a.pdf");``.
 
--  The ``QPDF`` class checks the beginning of
-   @1@filename@1@a.pdf@2@filename@2@ for a PDF header. It then reads the
-   cross reference table mentioned at the end of the file, ensuring that
-   it is looking before the last ``%%EOF``. After getting to ``trailer``
-   keyword, it invokes the parser.
+- The ``QPDF`` class checks the beginning of
+  @1@filename@1@a.pdf@2@filename@2@ for a PDF header. It then reads the
+  cross reference table mentioned at the end of the file, ensuring that
+  it is looking before the last ``%%EOF``. After getting to ``trailer``
+  keyword, it invokes the parser.
 
--  The parser sees "``<<``", so it calls itself recursively in
-   dictionary creation mode.
+- The parser sees "``<<``", so it calls itself recursively in
+  dictionary creation mode.
 
--  In dictionary creation mode, the parser keeps accumulating objects
-   until it encounters "``>>``". Each object that is read is pushed onto
-   a stack. If "``R``" is read, the last two objects on the stack are
-   inspected. If they are integers, they are popped off the stack and
-   their values are used to construct an indirect object handle which is
-   then pushed onto the stack. When "``>>``" is finally read, the stack
-   is converted into a ``QPDF_Dictionary`` which is placed in a
-   ``QPDFObjectHandle`` and returned.
+- In dictionary creation mode, the parser keeps accumulating objects
+  until it encounters "``>>``". Each object that is read is pushed onto
+  a stack. If "``R``" is read, the last two objects on the stack are
+  inspected. If they are integers, they are popped off the stack and
+  their values are used to construct an indirect object handle which is
+  then pushed onto the stack. When "``>>``" is finally read, the stack
+  is converted into a ``QPDF_Dictionary`` which is placed in a
+  ``QPDFObjectHandle`` and returned.
 
--  The resulting dictionary is saved as the trailer dictionary.
+- The resulting dictionary is saved as the trailer dictionary.
 
--  The ``/Prev`` key is searched. If present, ``QPDF`` seeks to that
-   point and repeats except that the new trailer dictionary is not
-   saved. If ``/Prev`` is not present, the initial parsing process is
-   complete.
+- The ``/Prev`` key is searched. If present, ``QPDF`` seeks to that
+  point and repeats except that the new trailer dictionary is not
+  saved. If ``/Prev`` is not present, the initial parsing process is
+  complete.
 
-   If there is an encryption dictionary, the document's encryption
-   parameters are initialized.
+  If there is an encryption dictionary, the document's encryption
+  parameters are initialized.
 
--  The client requests root object. The ``QPDF`` class gets the value of
-   root key from trailer dictionary and returns it. It is an unresolved
-   indirect ``QPDFObjectHandle``.
+- The client requests root object. The ``QPDF`` class gets the value of
+  root key from trailer dictionary and returns it. It is an unresolved
+  indirect ``QPDFObjectHandle``.
 
--  The client requests the ``/Pages`` key from root
-   ``QPDFObjectHandle``. The ``QPDFObjectHandle`` notices that it is
-   indirect so it asks ``QPDF`` to resolve it. ``QPDF`` looks in the
-   object cache for an object with the root dictionary's object ID and
-   generation number. Upon not seeing it, it checks the cross reference
-   table, gets the offset, and reads the object present at that offset.
-   It stores the result in the object cache and returns the cached
-   result. The calling ``QPDFObjectHandle`` replaces its object pointer
-   with the one from the resolved ``QPDFObjectHandle``, verifies that it
-   a valid dictionary object, and returns the (unresolved indirect)
-   ``QPDFObject`` handle to the top of the Pages hierarchy.
+- The client requests the ``/Pages`` key from root
+  ``QPDFObjectHandle``. The ``QPDFObjectHandle`` notices that it is
+  indirect so it asks ``QPDF`` to resolve it. ``QPDF`` looks in the
+  object cache for an object with the root dictionary's object ID and
+  generation number. Upon not seeing it, it checks the cross reference
+  table, gets the offset, and reads the object present at that offset.
+  It stores the result in the object cache and returns the cached
+  result. The calling ``QPDFObjectHandle`` replaces its object pointer
+  with the one from the resolved ``QPDFObjectHandle``, verifies that it
+  a valid dictionary object, and returns the (unresolved indirect)
+  ``QPDFObject`` handle to the top of the Pages hierarchy.
 
-   As the client continues to request objects, the same process is
-   followed for each new requested object.
+  As the client continues to request objects, the same process is
+  followed for each new requested object.
 
 .. _ref.casting:
 
@@ -3093,66 +3093,66 @@ This outline was written prior to implementation and is not exactly
 accurate, but it provides a correct "notional" idea of how writing
 works. Look at the code in ``QPDFWriter`` for exact details.
 
--  Initialize state:
+- Initialize state:
 
-   -  next object number = 1
+  - next object number = 1
 
-   -  object queue = empty
+  - object queue = empty
 
-   -  renumber table: old object id/generation to new id/0 = empty
+  - renumber table: old object id/generation to new id/0 = empty
 
-   -  xref table: new id -> offset = empty
+  - xref table: new id -> offset = empty
 
--  Create a QPDF object from a file.
+- Create a QPDF object from a file.
 
--  Write header for new PDF file.
+- Write header for new PDF file.
 
--  Request the trailer dictionary.
+- Request the trailer dictionary.
 
--  For each value that is an indirect object, grab the next object
-   number (via an operation that returns and increments the number). Map
-   object to new number in renumber table. Push object onto queue.
+- For each value that is an indirect object, grab the next object
+  number (via an operation that returns and increments the number). Map
+  object to new number in renumber table. Push object onto queue.
 
--  While there are more objects on the queue:
+- While there are more objects on the queue:
 
-   -  Pop queue.
+  - Pop queue.
 
-   -  Look up object's new number *n* in the renumbering table.
+  - Look up object's new number *n* in the renumbering table.
 
-   -  Store current offset into xref table.
+  - Store current offset into xref table.
 
-   -  Write ``@1@replaceable@1@n@2@replaceable@2@ 0 obj``.
+  - Write ``@1@replaceable@1@n@2@replaceable@2@ 0 obj``.
 
-   -  If object is null, whether direct or indirect, write out null,
-      thus eliminating unresolvable indirect object references.
+  - If object is null, whether direct or indirect, write out null,
+    thus eliminating unresolvable indirect object references.
 
-   -  If the object is a stream stream, write stream contents, piped
-      through any filters as required, to a memory buffer. Use this
-      buffer to determine the stream length.
+  - If the object is a stream stream, write stream contents, piped
+    through any filters as required, to a memory buffer. Use this
+    buffer to determine the stream length.
 
-   -  If object is not a stream, array, or dictionary, write out its
-      contents.
+  - If object is not a stream, array, or dictionary, write out its
+    contents.
 
-   -  If object is an array or dictionary (including stream), traverse
-      its elements (for array) or values (for dictionaries), handling
-      recursive dictionaries and arrays, looking for indirect objects.
-      When an indirect object is found, if it is not resolvable, ignore.
-      (This case is handled when writing it out.) Otherwise, look it up
-      in the renumbering table. If not found, grab the next available
-      object number, assign to the referenced object in the renumbering
-      table, and push the referenced object onto the queue. As a special
-      case, when writing out a stream dictionary, replace length,
-      filters, and decode parameters as required.
+  - If object is an array or dictionary (including stream), traverse
+    its elements (for array) or values (for dictionaries), handling
+    recursive dictionaries and arrays, looking for indirect objects.
+    When an indirect object is found, if it is not resolvable, ignore.
+    (This case is handled when writing it out.) Otherwise, look it up
+    in the renumbering table. If not found, grab the next available
+    object number, assign to the referenced object in the renumbering
+    table, and push the referenced object onto the queue. As a special
+    case, when writing out a stream dictionary, replace length,
+    filters, and decode parameters as required.
 
-      Write out dictionary or array, replacing any unresolvable indirect
-      object references with null (pdf spec says reference to
-      non-existent object is legal and resolves to null) and any
-      resolvable ones with references to the renumbered objects.
+    Write out dictionary or array, replacing any unresolvable indirect
+    object references with null (pdf spec says reference to
+    non-existent object is legal and resolves to null) and any
+    resolvable ones with references to the renumbered objects.
 
-   -  If the object is a stream, write ``stream\n``, the stream contents
-      (from the memory buffer), and ``\nendstream\n``.
+  - If the object is a stream, write ``stream\n``, the stream contents
+    (from the memory buffer), and ``\nendstream\n``.
 
-   -  When done, write ``endobj``.
+  - When done, write ``endobj``.
 
 Once we have finished the queue, all referenced objects will have been
 written out and all deleted objects or unreferenced objects will have
@@ -3307,11 +3307,11 @@ refer to linearization as optimization or web optimization.
 When creating linearized PDF files from optimized PDF files, there are
 really only a few issues that need to be dealt with:
 
--  Creation of hints tables
+- Creation of hints tables
 
--  Placing objects in the correct order
+- Placing objects in the correct order
 
--  Filling in offsets and byte sizes
+- Filling in offsets and byte sizes
 
 .. _ref.optimization:
 
@@ -3424,17 +3424,17 @@ various other programs that create linearized files have many of these
 same issues. These items make reference to terminology used in the
 linearization appendix of the PDF specification.
 
--  Thread Dictionary information keys appear in part 4 with the rest of
-   Threads instead of in part 9. Objects in part 9 are not grouped
-   together functionally.
+- Thread Dictionary information keys appear in part 4 with the rest of
+  Threads instead of in part 9. Objects in part 9 are not grouped
+  together functionally.
 
--  We are not calculating numerators for shared object positions within
-   content streams or interleaving them within content streams.
+- We are not calculating numerators for shared object positions within
+  content streams or interleaving them within content streams.
 
--  We generate only page offset, shared object, and outline hint tables.
-   It would be relatively easy to add some additional tables. We gather
-   most of the information needed to create thumbnail hint tables. There
-   are comments in the code about this.
+- We generate only page offset, shared object, and outline hint tables.
+  It would be relatively easy to add some additional tables. We gather
+  most of the information needed to create thumbnail hint tables. There
+  are comments in the code about this.
 
 .. _ref.linearization-debugging:
 
@@ -3475,13 +3475,13 @@ Object Streams
 
 Object streams can contain any regular object except the following:
 
--  stream objects
+- stream objects
 
--  objects with generation > 0
+- objects with generation > 0
 
--  the encryption dictionary
+- the encryption dictionary
 
--  objects containing the /Length of another stream
+- objects containing the /Length of another stream
 
 In addition, Adobe reader (at least as of version 8.0.0) appears to not
 be able to handle having the document catalog appear in an object stream
@@ -3501,11 +3501,11 @@ a regular object.
 
 The object stream dictionary has the following keys:
 
--  ``/N``: number of objects
+- ``/N``: number of objects
 
--  ``/First``: byte offset of first object
+- ``/First``: byte offset of first object
 
--  ``/Extends``: indirect reference to stream that this extends
+- ``/Extends``: indirect reference to stream that this extends
 
 Stream collections are formed with ``/Extends``. They must form a
 directed acyclic graph. These can be used for semantic information and
@@ -3555,21 +3555,21 @@ Since xref streams must be read very early, they may not be encrypted,
 and the may not contain indirect objects for keys required to read them,
 which are these:
 
--  ``/Type``: value ``/XRef``
+- ``/Type``: value ``/XRef``
 
--  ``/Size``: value *n+1*: where *n* is highest object number (same as
-   ``/Size`` in the trailer dictionary)
+- ``/Size``: value *n+1*: where *n* is highest object number (same as
+  ``/Size`` in the trailer dictionary)
 
--  ``/Index`` (optional): value
-   ``[@1@replaceable@1@n count@2@replaceable@2@ ...]`` used to determine
-   which objects' information is stored in this stream. The default is
-   ``[0 /Size]``.
+- ``/Index`` (optional): value
+  ``[@1@replaceable@1@n count@2@replaceable@2@ ...]`` used to determine
+  which objects' information is stored in this stream. The default is
+  ``[0 /Size]``.
 
--  ``/Prev``: value @1@replaceable@1@offset@2@replaceable@2@: byte
-   offset of previous xref stream (same as ``/Prev`` in the trailer
-   dictionary)
+- ``/Prev``: value @1@replaceable@1@offset@2@replaceable@2@: byte
+  offset of previous xref stream (same as ``/Prev`` in the trailer
+  dictionary)
 
--  ``/W [...]``: sizes of each field in the xref table
+- ``/W [...]``: sizes of each field in the xref table
 
 The other fields in the xref stream, which may be indirect if desired,
 are the union of those from the xref table's trailer dictionary.
@@ -3589,14 +3589,14 @@ type is "``1``". All other default values are "``0``".
 
 PDF 1.5 has three field types:
 
--  0: for free objects. Format: ``0 obj next-generation``, same as the
-   free table in a traditional cross-reference table
+- 0: for free objects. Format: ``0 obj next-generation``, same as the
+  free table in a traditional cross-reference table
 
--  1: regular non-compressed object. Format: ``1 offset generation``
+- 1: regular non-compressed object. Format: ``1 offset generation``
 
--  2: for objects in object streams. Format: ``2 object-stream-number
-   index``, the number of object stream containing the object and the
-   index within the object stream of the object.
+- 2: for objects in object streams. Format: ``2 object-stream-number
+  index``, the number of object stream containing the object and the
+  index within the object stream of the object.
 
 It seems standard to have the first entry in the table be ``0 0 0``
 instead of ``0 0 ffff`` if there are no deleted objects.
@@ -3657,1014 +3657,1014 @@ For a detailed list of changes, please see the file
 @1@filename@1@ChangeLog@2@filename@2@ in the source distribution.
 
 10.5.0: XXX Month dd, YYYY
-   -  Library Enhancements
+  - Library Enhancements
 
-      -  Since qpdf version 8, using object accessor methods on an
-         instance of ``QPDFObjectHandle`` may create warnings if the
-         object is not of the expected type. These warnings now have an
-         error code of ``qpdf_e_object`` instead of
-         ``qpdf_e_damaged_pdf``. Also, comments have been added to
-         @1@filename@1@QPDFObjectHandle.hh@2@filename@2@ to explain in
-         more detail what the behavior is. See `Object Accessor
-         Methods <#ref.object-accessors>`__ for a more in-depth
-         discussion.
+    - Since qpdf version 8, using object accessor methods on an
+      instance of ``QPDFObjectHandle`` may create warnings if the
+      object is not of the expected type. These warnings now have an
+      error code of ``qpdf_e_object`` instead of
+      ``qpdf_e_damaged_pdf``. Also, comments have been added to
+      @1@filename@1@QPDFObjectHandle.hh@2@filename@2@ to explain in
+      more detail what the behavior is. See `Object Accessor
+      Methods <#ref.object-accessors>`__ for a more in-depth
+      discussion.
 
-      -  Overhaul error handling for the object handle functions in the
-         C API. See comments in the "Object handling" section of
-         @1@filename@1@include/qpdf/qpdf-c.h@2@filename@2@ for details.
-         In particular, exceptions thrown by the underlying C++ code
-         when calling object accessors are caught and converted into
-         errors. The errors can be trapped by registering an error
-         handler with ``qpdf_register_oh_error_handler`` or will be
-         written to stderr if no handler is registered.
+    - Overhaul error handling for the object handle functions in the
+      C API. See comments in the "Object handling" section of
+      @1@filename@1@include/qpdf/qpdf-c.h@2@filename@2@ for details.
+      In particular, exceptions thrown by the underlying C++ code
+      when calling object accessors are caught and converted into
+      errors. The errors can be trapped by registering an error
+      handler with ``qpdf_register_oh_error_handler`` or will be
+      written to stderr if no handler is registered.
 
-      -  Add ``qpdf_get_last_string_length`` to the C API to get the
-         length of the last string that was returned. This is needed to
-         handle strings that contain embedded null characters.
+    - Add ``qpdf_get_last_string_length`` to the C API to get the
+      length of the last string that was returned. This is needed to
+      handle strings that contain embedded null characters.
 
-      -  Add ``qpdf_oh_is_initialized`` and
-         ``qpdf_oh_new_uninitialized`` to the C API to make it possible
-         to work with uninitialized objects.
+    - Add ``qpdf_oh_is_initialized`` and
+      ``qpdf_oh_new_uninitialized`` to the C API to make it possible
+      to work with uninitialized objects.
 
-      -  Add ``qpdf_oh_new_object`` to the C API. This allows you to
-         clone an object handle.
+    - Add ``qpdf_oh_new_object`` to the C API. This allows you to
+      clone an object handle.
 
-      -  Add ``qpdf_get_object_by_id``, ``qpdf_make_indirect_object``,
-         and ``qpdf_replace_object``, exposing the corresponding methods
-         in ``QPDF`` and ``QPDFObjectHandle``.
+    - Add ``qpdf_get_object_by_id``, ``qpdf_make_indirect_object``,
+      and ``qpdf_replace_object``, exposing the corresponding methods
+      in ``QPDF`` and ``QPDFObjectHandle``.
 
 10.4.0: November 16, 2021
-   -  Handling of Weak Cryptography Algorithms
+  - Handling of Weak Cryptography Algorithms
 
-      -  From the qpdf CLI, the
-         @1@option@1@--allow-weak-crypto@2@option@2@ is now required to
-         suppress a warning when explicitly creating PDF files using RC4
-         encryption. While qpdf will always retain the ability to read
-         and write such files, doing so will require explicit
-         acknowledgment moving forward. For qpdf 10.4, this change only
-         affects the command-line tool. Starting in qpdf 11, there will
-         be small API changes to require explicit acknowledgment in
-         those cases as well. For additional information, see `Weak
-         Cryptography <#ref.weak-crypto>`__.
+    - From the qpdf CLI, the
+      @1@option@1@--allow-weak-crypto@2@option@2@ is now required to
+      suppress a warning when explicitly creating PDF files using RC4
+      encryption. While qpdf will always retain the ability to read
+      and write such files, doing so will require explicit
+      acknowledgment moving forward. For qpdf 10.4, this change only
+      affects the command-line tool. Starting in qpdf 11, there will
+      be small API changes to require explicit acknowledgment in
+      those cases as well. For additional information, see `Weak
+      Cryptography <#ref.weak-crypto>`__.
 
-   -  Bug Fixes
+  - Bug Fixes
 
-      -  Fix potential bounds error when handling shell completion that
-         could occur when given bogus input.
+    - Fix potential bounds error when handling shell completion that
+      could occur when given bogus input.
 
-      -  Properly handle overlay/underlay on completely empty pages
-         (with no resource dictionary).
+    - Properly handle overlay/underlay on completely empty pages
+      (with no resource dictionary).
 
-      -  Fix crash that could occur under certain conditions when using
-         @1@option@1@--pages@2@option@2@ with files that had form
-         fields.
+    - Fix crash that could occur under certain conditions when using
+      @1@option@1@--pages@2@option@2@ with files that had form
+      fields.
 
-   -  Library Enhancements
+  - Library Enhancements
 
-      -  Make ``QPDF::findPage`` functions public.
+    - Make ``QPDF::findPage`` functions public.
 
-      -  Add methods to ``Pl_Flate`` to be able to receive warnings on
-         certain recoverable conditions.
+    - Add methods to ``Pl_Flate`` to be able to receive warnings on
+      certain recoverable conditions.
 
-      -  Add an extra check to the library to detect when foreign
-         objects are inserted directly (instead of using
-         ``QPDF::copyForeignObject``) at the time of insertion rather
-         than when the file is written. Catching the error sooner makes
-         it much easier to locate the incorrect code.
+    - Add an extra check to the library to detect when foreign
+      objects are inserted directly (instead of using
+      ``QPDF::copyForeignObject``) at the time of insertion rather
+      than when the file is written. Catching the error sooner makes
+      it much easier to locate the incorrect code.
 
-   -  CLI Enhancements
+  - CLI Enhancements
 
-      -  Improve diagnostics around parsing
-         @1@option@1@--pages@2@option@2@ command-line options
+    - Improve diagnostics around parsing
+      @1@option@1@--pages@2@option@2@ command-line options
 
-   -  Packaging Changes
+  - Packaging Changes
 
-      -  The Windows binary distribution is now built with crypto
-         provided by OpenSSL 3.0.
+    - The Windows binary distribution is now built with crypto
+      provided by OpenSSL 3.0.
 
 10.3.2: May 8, 2021
-   -  Bug Fixes
+  - Bug Fixes
 
-      -  When generating a file while preserving object streams,
-         unreferenced objects are correctly removed unless
-         @1@option@1@--preserve-unreferenced@2@option@2@ is specified.
+    - When generating a file while preserving object streams,
+      unreferenced objects are correctly removed unless
+      @1@option@1@--preserve-unreferenced@2@option@2@ is specified.
 
-   -  Library Enhancements
+  - Library Enhancements
 
-      -  When adding a page that already exists, make a shallow copy
-         instead of throwing an exception. This makes the library
-         behavior consistent with the CLI behavior. See
-         @1@filename@1@ChangeLog@2@filename@2@ for additional notes.
+    - When adding a page that already exists, make a shallow copy
+      instead of throwing an exception. This makes the library
+      behavior consistent with the CLI behavior. See
+      @1@filename@1@ChangeLog@2@filename@2@ for additional notes.
 
 10.3.1: March 11, 2021
-   -  Bug Fixes
+  - Bug Fixes
 
-      -  Form field copying failed on files where /DR was a direct
-         object in the document-level form dictionary.
+    - Form field copying failed on files where /DR was a direct
+      object in the document-level form dictionary.
 
 10.3.0: March 4, 2021
-   -  Bug Fixes
+  - Bug Fixes
 
-      -  The code for handling form fields when copying pages from
-         10.2.0 was not quite right and didn't work in a number of
-         situations, such as when the same page was copied multiple
-         times or when there were conflicting resource or field names
-         across multiple copies. The 10.3.0 code has been much more
-         thoroughly tested with more complex cases and with a multitude
-         of readers and should be much closer to correct. The 10.2.0
-         code worked well enough for page splitting or for copying pages
-         with form fields into documents that didn't already have them
-         but was still not quite correct in handling of field-level
-         resources.
+    - The code for handling form fields when copying pages from
+      10.2.0 was not quite right and didn't work in a number of
+      situations, such as when the same page was copied multiple
+      times or when there were conflicting resource or field names
+      across multiple copies. The 10.3.0 code has been much more
+      thoroughly tested with more complex cases and with a multitude
+      of readers and should be much closer to correct. The 10.2.0
+      code worked well enough for page splitting or for copying pages
+      with form fields into documents that didn't already have them
+      but was still not quite correct in handling of field-level
+      resources.
 
-      -  When ``QPDF::replaceObject`` or ``QPDF::swapObjects`` is
-         called, existing ``QPDFObjectHandle`` instances no longer point
-         to the old objects. The next time they are accessed, they
-         automatically notice the change to the underlying object and
-         update themselves. This resolves a very longstanding source of
-         confusion, albeit in a very rarely used method call.
+    - When ``QPDF::replaceObject`` or ``QPDF::swapObjects`` is
+      called, existing ``QPDFObjectHandle`` instances no longer point
+      to the old objects. The next time they are accessed, they
+      automatically notice the change to the underlying object and
+      update themselves. This resolves a very longstanding source of
+      confusion, albeit in a very rarely used method call.
 
-      -  Fix form field handling code to look for default appearances,
-         quadding, and default resources in the right places. The code
-         was not looking for things in the document-level interactive
-         form dictionary that it was supposed to be finding there. This
-         required adding a few new methods to
-         ``QPDFFormFieldObjectHelper``.
+    - Fix form field handling code to look for default appearances,
+      quadding, and default resources in the right places. The code
+      was not looking for things in the document-level interactive
+      form dictionary that it was supposed to be finding there. This
+      required adding a few new methods to
+      ``QPDFFormFieldObjectHelper``.
 
-   -  Library Enhancements
+  - Library Enhancements
 
-      -  Reworked the code that handles copying annotations and form
-         fields during page operations. There were additional methods
-         added to the public API from 10.2.0 and a one deprecation of a
-         method added in 10.2.0. The majority of the API changes are in
-         methods most people would never call and that will hopefully be
-         superseded by higher-level interfaces for handling page copies.
-         Please see the @1@filename@1@ChangeLog@2@filename@2@ file for
-         details.
+    - Reworked the code that handles copying annotations and form
+      fields during page operations. There were additional methods
+      added to the public API from 10.2.0 and a one deprecation of a
+      method added in 10.2.0. The majority of the API changes are in
+      methods most people would never call and that will hopefully be
+      superseded by higher-level interfaces for handling page copies.
+      Please see the @1@filename@1@ChangeLog@2@filename@2@ file for
+      details.
 
-      -  The method ``QPDF::numWarnings`` was added so that you can tell
-         whether any warnings happened during a specific block of code.
+    - The method ``QPDF::numWarnings`` was added so that you can tell
+      whether any warnings happened during a specific block of code.
 
 10.2.0: February 23, 2021
-   -  CLI Behavior Changes
+  - CLI Behavior Changes
 
-      -  Operations that work on combining pages are much better about
-         protecting form fields. In particular,
-         @1@option@1@--split-pages@2@option@2@ and
-         @1@option@1@--pages@2@option@2@ now preserve interaction form
-         functionality by copying the relevant form field information
-         from the original files. Additionally, if you use
-         @1@option@1@--pages@2@option@2@ to select only some pages from
-         the original input file, unused form fields are removed, which
-         prevents lots of unused annotations from being retained.
+    - Operations that work on combining pages are much better about
+      protecting form fields. In particular,
+      @1@option@1@--split-pages@2@option@2@ and
+      @1@option@1@--pages@2@option@2@ now preserve interaction form
+      functionality by copying the relevant form field information
+      from the original files. Additionally, if you use
+      @1@option@1@--pages@2@option@2@ to select only some pages from
+      the original input file, unused form fields are removed, which
+      prevents lots of unused annotations from being retained.
 
-      -  By default, @1@command@1@qpdf@2@command@2@ no longer allows
-         creation of encrypted PDF files whose user password is
-         non-empty and owner password is empty when a 256-bit key is in
-         use. The @1@option@1@--allow-insecure@2@option@2@ option,
-         specified inside the @1@option@1@--encrypt@2@option@2@ options,
-         allows creation of such files. Behavior changes in the CLI are
-         avoided when possible, but an exception was made here because
-         this is security-related. qpdf must always allow creation of
-         weird files for testing purposes, but it should not default to
-         letting users unknowingly create insecure files.
+    - By default, @1@command@1@qpdf@2@command@2@ no longer allows
+      creation of encrypted PDF files whose user password is
+      non-empty and owner password is empty when a 256-bit key is in
+      use. The @1@option@1@--allow-insecure@2@option@2@ option,
+      specified inside the @1@option@1@--encrypt@2@option@2@ options,
+      allows creation of such files. Behavior changes in the CLI are
+      avoided when possible, but an exception was made here because
+      this is security-related. qpdf must always allow creation of
+      weird files for testing purposes, but it should not default to
+      letting users unknowingly create insecure files.
 
-   -  Library Behavior Changes
+  - Library Behavior Changes
 
-      -  Note: the changes in this section cause differences in output
-         in some cases. These differences change the syntax of the PDF
-         but do not change the semantics (meaning). I make a strong
-         effort to avoid gratuitous changes in qpdf's output so that
-         qpdf changes don't break people's tests. In this case, the
-         changes significantly improve the readability of the generated
-         PDF and don't affect any output that's generated by simple
-         transformation. If you are annoyed by having to update test
-         files, please rest assured that changes like this have been and
-         will continue to be rare events.
+    - Note: the changes in this section cause differences in output
+      in some cases. These differences change the syntax of the PDF
+      but do not change the semantics (meaning). I make a strong
+      effort to avoid gratuitous changes in qpdf's output so that
+      qpdf changes don't break people's tests. In this case, the
+      changes significantly improve the readability of the generated
+      PDF and don't affect any output that's generated by simple
+      transformation. If you are annoyed by having to update test
+      files, please rest assured that changes like this have been and
+      will continue to be rare events.
 
-      -  ``QPDFObjectHandle::newUnicodeString`` now uses whichever of
-         ASCII, PDFDocEncoding, of UTF-16 is sufficient to encode all
-         the characters in the string. This reduces needless encoding in
-         UTF-16 of strings that can be encoded in ASCII. This change may
-         cause qpdf to generate different output than before when form
-         field values are set using ``QPDFFormFieldObjectHelper`` but
-         does not change the meaning of the output.
+    - ``QPDFObjectHandle::newUnicodeString`` now uses whichever of
+      ASCII, PDFDocEncoding, of UTF-16 is sufficient to encode all
+      the characters in the string. This reduces needless encoding in
+      UTF-16 of strings that can be encoded in ASCII. This change may
+      cause qpdf to generate different output than before when form
+      field values are set using ``QPDFFormFieldObjectHelper`` but
+      does not change the meaning of the output.
 
-      -  The code that places form XObjects and also the code that
-         flattens rotations trim trailing zeroes from real numbers that
-         they calculate. This causes slight (but semantically
-         equivalent) differences in generated appearance streams and
-         form XObject invocations in overlay/underlay code or in user
-         code that calls the methods that place form XObjects on a page.
+    - The code that places form XObjects and also the code that
+      flattens rotations trim trailing zeroes from real numbers that
+      they calculate. This causes slight (but semantically
+      equivalent) differences in generated appearance streams and
+      form XObject invocations in overlay/underlay code or in user
+      code that calls the methods that place form XObjects on a page.
 
-   -  CLI Enhancements
+  - CLI Enhancements
 
-      -  Add new command line options for listing, saving, adding,
-         removing, and and copying file attachments. See `Embedded
-         Files/Attachments Options <#ref.attachments>`__ for details.
+    - Add new command line options for listing, saving, adding,
+      removing, and and copying file attachments. See `Embedded
+      Files/Attachments Options <#ref.attachments>`__ for details.
 
-      -  Page splitting and merging operations, as well as
-         @1@option@1@--flatten-rotation@2@option@2@, are better behaved
-         with respect to annotations and interactive form fields. In
-         most cases, interactive form field functionality and proper
-         formatting and functionality of annotations is preserved by
-         these operations. There are still some cases that aren't
-         perfect, such as when functionality of annotations depends on
-         document-level data that qpdf doesn't yet understand or when
-         there are problems with referential integrity among form fields
-         and annotations (e.g., when a single form field object or its
-         associated annotations are shared across multiple pages, a case
-         that is out of spec but that works in most viewers anyway).
+    - Page splitting and merging operations, as well as
+      @1@option@1@--flatten-rotation@2@option@2@, are better behaved
+      with respect to annotations and interactive form fields. In
+      most cases, interactive form field functionality and proper
+      formatting and functionality of annotations is preserved by
+      these operations. There are still some cases that aren't
+      perfect, such as when functionality of annotations depends on
+      document-level data that qpdf doesn't yet understand or when
+      there are problems with referential integrity among form fields
+      and annotations (e.g., when a single form field object or its
+      associated annotations are shared across multiple pages, a case
+      that is out of spec but that works in most viewers anyway).
 
-      -  The option
-         @1@option@1@--password-file=@1@replaceable@1@filename@2@replaceable@2@@2@option@2@
-         can now be used to read the decryption password from a file.
-         You can use ``-`` as the file name to read the password from
-         standard input. This is an easier/more obvious way to read
-         passwords from files or standard input than using
-         @1@option@1@@file@2@option@2@ for this purpose.
+    - The option
+      @1@option@1@--password-file=@1@replaceable@1@filename@2@replaceable@2@@2@option@2@
+      can now be used to read the decryption password from a file.
+      You can use ``-`` as the file name to read the password from
+      standard input. This is an easier/more obvious way to read
+      passwords from files or standard input than using
+      @1@option@1@@file@2@option@2@ for this purpose.
 
-      -  Add some information about attachments to the json output, and
-         added ``attachments`` as an additional json key. The
-         information included here is limited to the preferred name and
-         content stream and a reference to the file spec object. This is
-         enough detail for clients to avoid the hassle of navigating a
-         name tree and provides what is needed for basic enumeration and
-         extraction of attachments. More detailed information can be
-         obtained by following the reference to the file spec object.
+    - Add some information about attachments to the json output, and
+      added ``attachments`` as an additional json key. The
+      information included here is limited to the preferred name and
+      content stream and a reference to the file spec object. This is
+      enough detail for clients to avoid the hassle of navigating a
+      name tree and provides what is needed for basic enumeration and
+      extraction of attachments. More detailed information can be
+      obtained by following the reference to the file spec object.
 
-      -  Add numeric option to @1@option@1@--collate@2@option@2@. If
-         @1@option@1@--collate=@1@replaceable@1@n@2@replaceable@2@@2@option@2@
-         is given, take pages in groups of
-         @1@replaceable@1@n@2@replaceable@2@ from the given files.
+    - Add numeric option to @1@option@1@--collate@2@option@2@. If
+      @1@option@1@--collate=@1@replaceable@1@n@2@replaceable@2@@2@option@2@
+      is given, take pages in groups of
+      @1@replaceable@1@n@2@replaceable@2@ from the given files.
 
-      -  It is now valid to provide @1@option@1@--rotate=0@2@option@2@
-         to clear rotation from a page.
+    - It is now valid to provide @1@option@1@--rotate=0@2@option@2@
+      to clear rotation from a page.
 
-   -  Library Enhancements
+  - Library Enhancements
 
-      -  This release includes numerous additions to the API. Not all
-         changes are listed here. Please see the
-         @1@filename@1@ChangeLog@2@filename@2@ file in the source
-         distribution for a comprehensive list. Highlights appear below.
+    - This release includes numerous additions to the API. Not all
+      changes are listed here. Please see the
+      @1@filename@1@ChangeLog@2@filename@2@ file in the source
+      distribution for a comprehensive list. Highlights appear below.
 
-      -  Add ``QPDFObjectHandle::ditems()`` and
-         ``QPDFObjectHandle::aitems()`` that enable C++-style iteration,
-         including range-for iteration, over dictionary and array
-         QPDFObjectHandles. See comments in
-         @1@filename@1@include/qpdf/QPDFObjectHandle.hh@2@filename@2@
-         and
-         @1@filename@1@examples/pdf-name-number-tree.cc@2@filename@2@
-         for details.
+    - Add ``QPDFObjectHandle::ditems()`` and
+      ``QPDFObjectHandle::aitems()`` that enable C++-style iteration,
+      including range-for iteration, over dictionary and array
+      QPDFObjectHandles. See comments in
+      @1@filename@1@include/qpdf/QPDFObjectHandle.hh@2@filename@2@
+      and
+      @1@filename@1@examples/pdf-name-number-tree.cc@2@filename@2@
+      for details.
 
-      -  Add ``QPDFObjectHandle::copyStream`` for making a copy of a
-         stream within the same ``QPDF`` instance.
+    - Add ``QPDFObjectHandle::copyStream`` for making a copy of a
+      stream within the same ``QPDF`` instance.
 
-      -  Add new helper classes for supporting file attachments, also
-         known as embedded files. New classes are
-         ``QPDFEmbeddedFileDocumentHelper``,
-         ``QPDFFileSpecObjectHelper``, and ``QPDFEFStreamObjectHelper``.
-         See their respective headers for details and
-         @1@filename@1@examples/pdf-attach-file.cc@2@filename@2@ for an
-         example.
+    - Add new helper classes for supporting file attachments, also
+      known as embedded files. New classes are
+      ``QPDFEmbeddedFileDocumentHelper``,
+      ``QPDFFileSpecObjectHelper``, and ``QPDFEFStreamObjectHelper``.
+      See their respective headers for details and
+      @1@filename@1@examples/pdf-attach-file.cc@2@filename@2@ for an
+      example.
 
-      -  Add a version of ``QPDFObjectHandle::parse`` that takes a
-         ``QPDF`` pointer as context so that it can parse strings
-         containing indirect object references. This is illustrated in
-         @1@filename@1@examples/pdf-attach-file.cc@2@filename@2@.
+    - Add a version of ``QPDFObjectHandle::parse`` that takes a
+      ``QPDF`` pointer as context so that it can parse strings
+      containing indirect object references. This is illustrated in
+      @1@filename@1@examples/pdf-attach-file.cc@2@filename@2@.
 
-      -  Re-implement ``QPDFNameTreeObjectHelper`` and
-         ``QPDFNumberTreeObjectHelper`` to be more efficient, add an
-         iterator-based API, give them the capability to repair broken
-         trees, and create methods for modifying the trees. With this
-         change, qpdf has a robust read/write implementation of name and
-         number trees.
+    - Re-implement ``QPDFNameTreeObjectHelper`` and
+      ``QPDFNumberTreeObjectHelper`` to be more efficient, add an
+      iterator-based API, give them the capability to repair broken
+      trees, and create methods for modifying the trees. With this
+      change, qpdf has a robust read/write implementation of name and
+      number trees.
 
-      -  Add new versions of ``QPDFObjectHandle::replaceStreamData``
-         that take ``std::function`` objects for cases when you need
-         something between a static string and a full-fledged
-         StreamDataProvider. Using this with ``QUtil::file_provider`` is
-         a very easy way to create a stream from the contents of a file.
+    - Add new versions of ``QPDFObjectHandle::replaceStreamData``
+      that take ``std::function`` objects for cases when you need
+      something between a static string and a full-fledged
+      StreamDataProvider. Using this with ``QUtil::file_provider`` is
+      a very easy way to create a stream from the contents of a file.
 
-      -  The ``QPDFMatrix`` class, formerly a private, internal class,
-         has been added to the public API. See
-         @1@filename@1@include/qpdf/QPDFMatrix.hh@2@filename@2@ for
-         details. This class is for working with transformation
-         matrices. Some methods in ``QPDFPageObjectHelper`` make use of
-         this to make information about transformation matrices
-         available. For an example, see
-         @1@filename@1@examples/pdf-overlay-page.cc@2@filename@2@.
+    - The ``QPDFMatrix`` class, formerly a private, internal class,
+      has been added to the public API. See
+      @1@filename@1@include/qpdf/QPDFMatrix.hh@2@filename@2@ for
+      details. This class is for working with transformation
+      matrices. Some methods in ``QPDFPageObjectHelper`` make use of
+      this to make information about transformation matrices
+      available. For an example, see
+      @1@filename@1@examples/pdf-overlay-page.cc@2@filename@2@.
 
-      -  Several new methods were added to
-         ``QPDFAcroFormDocumentHelper`` for adding, removing, getting
-         information about, and enumerating form fields.
+    - Several new methods were added to
+      ``QPDFAcroFormDocumentHelper`` for adding, removing, getting
+      information about, and enumerating form fields.
 
-      -  Add method
-         ``QPDFAcroFormDocumentHelper::transformAnnotations``, which
-         applies a transformation to each annotation on a page.
+    - Add method
+      ``QPDFAcroFormDocumentHelper::transformAnnotations``, which
+      applies a transformation to each annotation on a page.
 
-      -  Add ``QPDFPageObjectHelper::copyAnnotations``, which copies
-         annotations and, if applicable, associated form fields, from
-         one page to another, possibly transforming the rectangles.
+    - Add ``QPDFPageObjectHelper::copyAnnotations``, which copies
+      annotations and, if applicable, associated form fields, from
+      one page to another, possibly transforming the rectangles.
 
-   -  Build Changes
+  - Build Changes
 
-      -  A C++-14 compiler is now required to build qpdf. There is no
-         intention to require anything newer than that for a while.
-         C++-14 includes modest enhancements to C++-11 and appears to be
-         supported about as widely as C++-11.
+    - A C++-14 compiler is now required to build qpdf. There is no
+      intention to require anything newer than that for a while.
+      C++-14 includes modest enhancements to C++-11 and appears to be
+      supported about as widely as C++-11.
 
-   -  Bug Fixes
+  - Bug Fixes
 
-      -  The @1@option@1@--flatten-rotation@2@option@2@ option applies
-         transformations to any annotations that may be on the page.
+    - The @1@option@1@--flatten-rotation@2@option@2@ option applies
+      transformations to any annotations that may be on the page.
 
-      -  If a form XObject lacks a resources dictionary, consider any
-         names in that form XObject to be referenced from the containing
-         page. This is compliant with older PDF versions. Also detect if
-         any form XObjects have any unresolved names and, if so, don't
-         remove unreferenced resources from them or from the page that
-         contains them. Unfortunately this has the side effect of
-         preventing removal of unreferenced resources in some cases
-         where names appear that don't refer to resources, such as with
-         tagged PDF. This is a bit of a corner case that is not likely
-         to cause a significant problem in practice, but the only side
-         effect would be lack of removal of shared resources. A future
-         version of qpdf may be more sophisticated in its detection of
-         names that refer to resources.
+    - If a form XObject lacks a resources dictionary, consider any
+      names in that form XObject to be referenced from the containing
+      page. This is compliant with older PDF versions. Also detect if
+      any form XObjects have any unresolved names and, if so, don't
+      remove unreferenced resources from them or from the page that
+      contains them. Unfortunately this has the side effect of
+      preventing removal of unreferenced resources in some cases
+      where names appear that don't refer to resources, such as with
+      tagged PDF. This is a bit of a corner case that is not likely
+      to cause a significant problem in practice, but the only side
+      effect would be lack of removal of shared resources. A future
+      version of qpdf may be more sophisticated in its detection of
+      names that refer to resources.
 
-      -  Properly handle strings if they appear in inline image
-         dictionaries while externalizing inline images.
+    - Properly handle strings if they appear in inline image
+      dictionaries while externalizing inline images.
 
 10.1.0: January 5, 2021
-   -  CLI Enhancements
+  - CLI Enhancements
 
-      -  Add @1@option@1@--flatten-rotation@2@option@2@ command-line
-         option, which causes all pages that are rotated using
-         parameters in the page's dictionary to instead be identically
-         rotated in the page's contents. The change is not user-visible
-         for compliant PDF readers but can be used to work around broken
-         PDF applications that don't properly handle page rotation.
+    - Add @1@option@1@--flatten-rotation@2@option@2@ command-line
+      option, which causes all pages that are rotated using
+      parameters in the page's dictionary to instead be identically
+      rotated in the page's contents. The change is not user-visible
+      for compliant PDF readers but can be used to work around broken
+      PDF applications that don't properly handle page rotation.
 
-   -  Library Enhancements
+  - Library Enhancements
 
-      -  Support for user-provided (pluggable, modular) stream filters.
-         It is now possible to derive a class from ``QPDFStreamFilter``
-         and register it with ``QPDF`` so that regular library methods,
-         including those used by ``QPDFWriter``, can decode streams with
-         filters not directly supported by the library. The example
-         @1@filename@1@examples/pdf-custom-filter.cc@2@filename@2@
-         illustrates how to use this capability.
+    - Support for user-provided (pluggable, modular) stream filters.
+      It is now possible to derive a class from ``QPDFStreamFilter``
+      and register it with ``QPDF`` so that regular library methods,
+      including those used by ``QPDFWriter``, can decode streams with
+      filters not directly supported by the library. The example
+      @1@filename@1@examples/pdf-custom-filter.cc@2@filename@2@
+      illustrates how to use this capability.
 
-      -  Add methods to ``QPDFPageObjectHelper`` to iterate through
-         XObjects on a page or form XObjects, possibly recursing into
-         nested form XObjects: ``forEachXObject``, ``ForEachImage``,
-         ``forEachFormXObject``.
+    - Add methods to ``QPDFPageObjectHelper`` to iterate through
+      XObjects on a page or form XObjects, possibly recursing into
+      nested form XObjects: ``forEachXObject``, ``ForEachImage``,
+      ``forEachFormXObject``.
 
-      -  Enhance several methods in ``QPDFPageObjectHelper`` to work
-         with form XObjects as well as pages, as noted in comments. See
-         @1@filename@1@ChangeLog@2@filename@2@ for a full list.
+    - Enhance several methods in ``QPDFPageObjectHelper`` to work
+      with form XObjects as well as pages, as noted in comments. See
+      @1@filename@1@ChangeLog@2@filename@2@ for a full list.
 
-      -  Rename some functions in ``QPDFPageObjectHelper``, while
-         keeping old names for compatibility:
+    - Rename some functions in ``QPDFPageObjectHelper``, while
+      keeping old names for compatibility:
 
-         -  ``getPageImages`` to ``getImages``
+      - ``getPageImages`` to ``getImages``
 
-         -  ``filterPageContents`` to ``filterContents``
+      - ``filterPageContents`` to ``filterContents``
 
-         -  ``pipePageContents`` to ``pipeContents``
+      - ``pipePageContents`` to ``pipeContents``
 
-         -  ``parsePageContents`` to ``parseContents``
+      - ``parsePageContents`` to ``parseContents``
 
-      -  Add method ``QPDFPageObjectHelper::getFormXObjects`` to return
-         a map of form XObjects directly on a page or form XObject
+    - Add method ``QPDFPageObjectHelper::getFormXObjects`` to return
+      a map of form XObjects directly on a page or form XObject
 
-      -  Add new helper methods to ``QPDFObjectHandle``:
-         ``isFormXObject``, ``isImage``
+    - Add new helper methods to ``QPDFObjectHandle``:
+      ``isFormXObject``, ``isImage``
 
-      -  Add the optional ``allow_streams`` parameter
-         ``QPDFObjectHandle::makeDirect``. When
-         ``QPDFObjectHandle::makeDirect`` is called in this way, it
-         preserves references to streams rather than throwing an
-         exception.
+    - Add the optional ``allow_streams`` parameter
+      ``QPDFObjectHandle::makeDirect``. When
+      ``QPDFObjectHandle::makeDirect`` is called in this way, it
+      preserves references to streams rather than throwing an
+      exception.
 
-      -  Add ``QPDFObjectHandle::setFilterOnWrite`` method. Calling this
-         on a stream prevents ``QPDFWriter`` from attempting to
-         uncompress, recompress, or otherwise filter a stream even if it
-         could. Developers can use this to protect streams that are
-         optimized should be protected from ``QPDFWriter``'s default
-         behavior for any other reason.
+    - Add ``QPDFObjectHandle::setFilterOnWrite`` method. Calling this
+      on a stream prevents ``QPDFWriter`` from attempting to
+      uncompress, recompress, or otherwise filter a stream even if it
+      could. Developers can use this to protect streams that are
+      optimized should be protected from ``QPDFWriter``'s default
+      behavior for any other reason.
 
-      -  Add ``ostream`` ``<<`` operator for ``QPDFObjGen``. This is
-         useful to have for debugging.
+    - Add ``ostream`` ``<<`` operator for ``QPDFObjGen``. This is
+      useful to have for debugging.
 
-      -  Add method ``QPDFPageObjectHelper::flattenRotation``, which
-         replaces a page's ``/Rotate`` keyword by rotating the page
-         within the content stream and altering the page's bounding
-         boxes so the rendering is the same. This can be used to work
-         around buggy PDF readers that can't properly handle page
-         rotation.
+    - Add method ``QPDFPageObjectHelper::flattenRotation``, which
+      replaces a page's ``/Rotate`` keyword by rotating the page
+      within the content stream and altering the page's bounding
+      boxes so the rendering is the same. This can be used to work
+      around buggy PDF readers that can't properly handle page
+      rotation.
 
-   -  C API Enhancements
+  - C API Enhancements
 
-      -  Add several new functions to the C API for working with
-         objects. These are wrappers around many of the methods in
-         ``QPDFObjectHandle``. Their inclusion adds considerable new
-         capability to the C API.
+    - Add several new functions to the C API for working with
+      objects. These are wrappers around many of the methods in
+      ``QPDFObjectHandle``. Their inclusion adds considerable new
+      capability to the C API.
 
-      -  Add ``qpdf_register_progress_reporter`` to the C API,
-         corresponding to ``QPDFWriter::registerProgressReporter``.
+    - Add ``qpdf_register_progress_reporter`` to the C API,
+      corresponding to ``QPDFWriter::registerProgressReporter``.
 
-   -  Performance Enhancements
+  - Performance Enhancements
 
-      -  Improve steps ``QPDFWriter`` takes to prepare a ``QPDF`` object
-         for writing, resulting in about an 8% improvement in write
-         performance while allowing indirect objects to appear in
-         ``/DecodeParms``.
+    - Improve steps ``QPDFWriter`` takes to prepare a ``QPDF`` object
+      for writing, resulting in about an 8% improvement in write
+      performance while allowing indirect objects to appear in
+      ``/DecodeParms``.
 
-      -  When extracting pages, the @1@command@1@qpdf@2@command@2@ CLI
-         only removes unreferenced resources from the pages that are
-         being kept, resulting in a significant performance improvement
-         when extracting small numbers of pages from large, complex
-         documents.
+    - When extracting pages, the @1@command@1@qpdf@2@command@2@ CLI
+      only removes unreferenced resources from the pages that are
+      being kept, resulting in a significant performance improvement
+      when extracting small numbers of pages from large, complex
+      documents.
 
-   -  Bug Fixes
+  - Bug Fixes
 
-      -  ``QPDFPageObjectHelper::externalizeInlineImages`` was not
-         externalizing images referenced from form XObjects that
-         appeared on the page.
+    - ``QPDFPageObjectHelper::externalizeInlineImages`` was not
+      externalizing images referenced from form XObjects that
+      appeared on the page.
 
-      -  ``QPDFObjectHandle::filterPageContents`` was broken for pages
-         with multiple content streams.
+    - ``QPDFObjectHandle::filterPageContents`` was broken for pages
+      with multiple content streams.
 
-      -  Tweak zsh completion code to behave a little better with
-         respect to path completion.
+    - Tweak zsh completion code to behave a little better with
+      respect to path completion.
 
 10.0.4: November 21, 2020
-   -  Bug Fixes
+  - Bug Fixes
 
-      -  Fix a handful of integer overflows. This includes cases found
-         by fuzzing as well as having qpdf not do range checking on
-         unused values in the xref stream.
+    - Fix a handful of integer overflows. This includes cases found
+      by fuzzing as well as having qpdf not do range checking on
+      unused values in the xref stream.
 
 10.0.3: October 31, 2020
-   -  Bug Fixes
+  - Bug Fixes
 
-      -  The fix to the bug involving copying streams with indirect
-         filters was incorrect and introduced a new, more serious bug.
-         The original bug has been fixed correctly, as has the bug
-         introduced in 10.0.2.
+    - The fix to the bug involving copying streams with indirect
+      filters was incorrect and introduced a new, more serious bug.
+      The original bug has been fixed correctly, as has the bug
+      introduced in 10.0.2.
 
 10.0.2: October 27, 2020
-   -  Bug Fixes
+  - Bug Fixes
 
-      -  When concatenating content streams, as with
-         @1@option@1@--coalesce-contents@2@option@2@, there were cases
-         in which qpdf would merge two lexical tokens together, creating
-         invalid results. A newline is now inserted between merged
-         content streams if one is not already present.
+    - When concatenating content streams, as with
+      @1@option@1@--coalesce-contents@2@option@2@, there were cases
+      in which qpdf would merge two lexical tokens together, creating
+      invalid results. A newline is now inserted between merged
+      content streams if one is not already present.
 
-      -  Fix an internal error that could occur when copying foreign
-         streams whose stream data had been replaced using a stream data
-         provider if those streams had indirect filters or decode
-         parameters. This is a rare corner case.
+    - Fix an internal error that could occur when copying foreign
+      streams whose stream data had been replaced using a stream data
+      provider if those streams had indirect filters or decode
+      parameters. This is a rare corner case.
 
-      -  Ensure that the caller's locale settings do not change the
-         results of numeric conversions performed internally by the qpdf
-         library. Note that the problem here could only be caused when
-         the qpdf library was used programmatically. Using the qpdf CLI
-         already ignored the user's locale for numeric conversion.
+    - Ensure that the caller's locale settings do not change the
+      results of numeric conversions performed internally by the qpdf
+      library. Note that the problem here could only be caused when
+      the qpdf library was used programmatically. Using the qpdf CLI
+      already ignored the user's locale for numeric conversion.
 
-      -  Fix several instances in which warnings were not suppressed in
-         spite of @1@option@1@--no-warn@2@option@2@ and/or errors or
-         warnings were written to standard output rather than standard
-         error.
+    - Fix several instances in which warnings were not suppressed in
+      spite of @1@option@1@--no-warn@2@option@2@ and/or errors or
+      warnings were written to standard output rather than standard
+      error.
 
-      -  Fixed a memory leak that could occur under specific
-         circumstances when
-         @1@option@1@--object-streams=generate@2@option@2@ was used.
+    - Fixed a memory leak that could occur under specific
+      circumstances when
+      @1@option@1@--object-streams=generate@2@option@2@ was used.
 
-      -  Fix various integer overflows and similar conditions found by
-         the OSS-Fuzz project.
+    - Fix various integer overflows and similar conditions found by
+      the OSS-Fuzz project.
 
-   -  Enhancements
+  - Enhancements
 
-      -  New option @1@option@1@--warning-exit-0@2@option@2@ causes qpdf
-         to exit with a status of ``0`` rather than ``3`` if there are
-         warnings but no errors. Combine with
-         @1@option@1@--no-warn@2@option@2@ to completely ignore
-         warnings.
+    - New option @1@option@1@--warning-exit-0@2@option@2@ causes qpdf
+      to exit with a status of ``0`` rather than ``3`` if there are
+      warnings but no errors. Combine with
+      @1@option@1@--no-warn@2@option@2@ to completely ignore
+      warnings.
 
-      -  Performance improvements have been made to
-         ``QPDF::processMemoryFile``.
+    - Performance improvements have been made to
+      ``QPDF::processMemoryFile``.
 
-      -  The OpenSSL crypto provider produces more detailed error
-         messages.
+    - The OpenSSL crypto provider produces more detailed error
+      messages.
 
-   -  Build Changes
+  - Build Changes
 
-      -  The option @1@option@1@--disable-rpath@2@option@2@ is now
-         supported by qpdf's @1@command@1@./configure@2@command@2@
-         script. Some distributions' packaging standards recommended the
-         use of this option.
+    - The option @1@option@1@--disable-rpath@2@option@2@ is now
+      supported by qpdf's @1@command@1@./configure@2@command@2@
+      script. Some distributions' packaging standards recommended the
+      use of this option.
 
-      -  Selection of a printf format string for ``long long`` has
-         been moved from ``ifdefs`` to an autoconf
-         test. If you are using your own build system, you will need to
-         provide a value for ``LL_FMT`` in
-         @1@filename@1@libqpdf/qpdf/qpdf-config.h@2@filename@2@, which
-         would typically be ``"%lld"`` or, for some Windows compilers,
-         ``"%I64d"``.
+    - Selection of a printf format string for ``long long`` has
+      been moved from ``ifdefs`` to an autoconf
+      test. If you are using your own build system, you will need to
+      provide a value for ``LL_FMT`` in
+      @1@filename@1@libqpdf/qpdf/qpdf-config.h@2@filename@2@, which
+      would typically be ``"%lld"`` or, for some Windows compilers,
+      ``"%I64d"``.
 
-      -  Several improvements were made to build-time configuration of
-         the OpenSSL crypto provider.
+    - Several improvements were made to build-time configuration of
+      the OpenSSL crypto provider.
 
-      -  A nearly stand-alone Linux binary zip file is now included with
-         the qpdf release. This is built on an older (but supported)
-         Ubuntu LTS release, but would work on most reasonably recent
-         Linux distributions. It contains only the executables and
-         required shared libraries that would not be present on a
-         minimal system. It can be used for including qpdf in a minimal
-         environment, such as a docker container. The zip file is also
-         known to work as a layer in AWS Lambda.
+    - A nearly stand-alone Linux binary zip file is now included with
+      the qpdf release. This is built on an older (but supported)
+      Ubuntu LTS release, but would work on most reasonably recent
+      Linux distributions. It contains only the executables and
+      required shared libraries that would not be present on a
+      minimal system. It can be used for including qpdf in a minimal
+      environment, such as a docker container. The zip file is also
+      known to work as a layer in AWS Lambda.
 
-      -  QPDF's automated build has been migrated from Azure Pipelines
-         to GitHub Actions.
+    - QPDF's automated build has been migrated from Azure Pipelines
+      to GitHub Actions.
 
-   -  Windows-specific Changes
+  - Windows-specific Changes
 
-      -  The Windows executables distributed with qpdf releases now use
-         the OpenSSL crypto provider by default. The native crypto
-         provider is also compiled in and can be selected at runtime
-         with the ``QPDF_CRYPTO_PROVIDER`` environment variable.
+    - The Windows executables distributed with qpdf releases now use
+      the OpenSSL crypto provider by default. The native crypto
+      provider is also compiled in and can be selected at runtime
+      with the ``QPDF_CRYPTO_PROVIDER`` environment variable.
 
-      -  Improvements have been made to how a cryptographic provider is
-         obtained in the native Windows crypto implementation. However
-         mostly this is shadowed by OpenSSL being used by default.
+    - Improvements have been made to how a cryptographic provider is
+      obtained in the native Windows crypto implementation. However
+      mostly this is shadowed by OpenSSL being used by default.
 
 10.0.1: April 9, 2020
-   -  Bug Fixes
+  - Bug Fixes
 
-      -  10.0.0 introduced a bug in which calling
-         ``QPDFObjectHandle::getStreamData`` on a stream that can't be
-         filtered was returning the raw data instead of throwing an
-         exception. This is now fixed.
+    - 10.0.0 introduced a bug in which calling
+      ``QPDFObjectHandle::getStreamData`` on a stream that can't be
+      filtered was returning the raw data instead of throwing an
+      exception. This is now fixed.
 
-      -  Fix a bug that was preventing qpdf from linking with some
-         versions of clang on some platforms.
+    - Fix a bug that was preventing qpdf from linking with some
+      versions of clang on some platforms.
 
-   -  Enhancements
+  - Enhancements
 
-      -  Improve the @1@filename@1@pdf-invert-images@2@filename@2@
-         example to avoid having to load all the images into RAM at the
-         same time.
+    - Improve the @1@filename@1@pdf-invert-images@2@filename@2@
+      example to avoid having to load all the images into RAM at the
+      same time.
 
 10.0.0: April 6, 2020
-   -  Performance Enhancements
+  - Performance Enhancements
 
-      -  The qpdf library and executable should run much faster in this
-         version than in the last several releases. Several internal
-         library optimizations have been made, and there has been
-         improved behavior on page splitting as well. This version of
-         qpdf should outperform any of the 8.x or 9.x versions.
+    - The qpdf library and executable should run much faster in this
+      version than in the last several releases. Several internal
+      library optimizations have been made, and there has been
+      improved behavior on page splitting as well. This version of
+      qpdf should outperform any of the 8.x or 9.x versions.
 
-   -  Incompatible API (source-level) Changes (minor)
+  - Incompatible API (source-level) Changes (minor)
 
-      -  The ``QUtil::srandom`` method was removed. It didn't do
-         anything unless insecure random numbers were compiled in, and
-         they have been off by default for a long time. If you were
-         calling it, just remove the call since it wasn't doing anything
-         anyway.
+    - The ``QUtil::srandom`` method was removed. It didn't do
+      anything unless insecure random numbers were compiled in, and
+      they have been off by default for a long time. If you were
+      calling it, just remove the call since it wasn't doing anything
+      anyway.
 
-   -  Build/Packaging Changes
+  - Build/Packaging Changes
 
-      -  Add a ``openssl`` crypto provider, which is implemented with
-         OpenSSL and also works with BoringSSL. Thanks to Dean Scarff
-         for this contribution. If you maintain qpdf for a distribution,
-         pay special attention to make sure that you are including
-         support for the crypto providers you want. Package maintainers
-         will have to weigh the advantages of allowing users to pick a
-         crypto provider at runtime against the disadvantages of adding
-         more dependencies to qpdf.
+    - Add a ``openssl`` crypto provider, which is implemented with
+      OpenSSL and also works with BoringSSL. Thanks to Dean Scarff
+      for this contribution. If you maintain qpdf for a distribution,
+      pay special attention to make sure that you are including
+      support for the crypto providers you want. Package maintainers
+      will have to weigh the advantages of allowing users to pick a
+      crypto provider at runtime against the disadvantages of adding
+      more dependencies to qpdf.
 
-      -  Allow qpdf to built on stripped down systems whose C/C++
-         libraries lack the ``wchar_t`` type. Search for ``wchar_t`` in
-         qpdf's README.md for details. This should be very rare, but it
-         is known to be helpful in some embedded environments.
+    - Allow qpdf to built on stripped down systems whose C/C++
+      libraries lack the ``wchar_t`` type. Search for ``wchar_t`` in
+      qpdf's README.md for details. This should be very rare, but it
+      is known to be helpful in some embedded environments.
 
-   -  CLI Enhancements
+  - CLI Enhancements
 
-      -  Add ``objectinfo`` key to the JSON output. This will be a place
-         to put computed metadata or other information about PDF objects
-         that are not immediately evident in other ways or that seem
-         useful for some other reason. In this version, information is
-         provided about each object indicating whether it is a stream
-         and, if so, what its length and filters are. Without this, it
-         was not possible to tell conclusively from the JSON output
-         alone whether or not an object was a stream. Run
-         @1@command@1@qpdf --json-help@2@command@2@ for details.
+    - Add ``objectinfo`` key to the JSON output. This will be a place
+      to put computed metadata or other information about PDF objects
+      that are not immediately evident in other ways or that seem
+      useful for some other reason. In this version, information is
+      provided about each object indicating whether it is a stream
+      and, if so, what its length and filters are. Without this, it
+      was not possible to tell conclusively from the JSON output
+      alone whether or not an object was a stream. Run
+      @1@command@1@qpdf --json-help@2@command@2@ for details.
 
-      -  Add new option
-         @1@option@1@--remove-unreferenced-resources@2@option@2@ which
-         takes ``auto``, ``yes``, or ``no`` as arguments. The new
-         ``auto`` mode, which is the default, performs a fast heuristic
-         over a PDF file when splitting pages to determine whether the
-         expensive process of finding and removing unreferenced
-         resources is likely to be of benefit. For most files, this new
-         default will result in a significant performance improvement
-         for splitting pages. See `Advanced Transformation
-         Options <#ref.advanced-transformation>`__ for a more detailed
-         discussion.
+    - Add new option
+      @1@option@1@--remove-unreferenced-resources@2@option@2@ which
+      takes ``auto``, ``yes``, or ``no`` as arguments. The new
+      ``auto`` mode, which is the default, performs a fast heuristic
+      over a PDF file when splitting pages to determine whether the
+      expensive process of finding and removing unreferenced
+      resources is likely to be of benefit. For most files, this new
+      default will result in a significant performance improvement
+      for splitting pages. See `Advanced Transformation
+      Options <#ref.advanced-transformation>`__ for a more detailed
+      discussion.
 
-      -  The @1@option@1@--preserve-unreferenced-resources@2@option@2@
-         is now just a synonym for
-         @1@option@1@--remove-unreferenced-resources=no@2@option@2@.
+    - The @1@option@1@--preserve-unreferenced-resources@2@option@2@
+      is now just a synonym for
+      @1@option@1@--remove-unreferenced-resources=no@2@option@2@.
 
-      -  If the ``QPDF_EXECUTABLE`` environment variable is set when
-         invoking @1@command@1@qpdf --bash-completion@2@command@2@ or
-         @1@command@1@qpdf --zsh-completion@2@command@2@, the completion
-         command that it outputs will refer to qpdf using the value of
-         that variable rather than what @1@command@1@qpdf@2@command@2@
-         determines its executable path to be. This can be useful when
-         wrapping @1@command@1@qpdf@2@command@2@ with a script, working
-         with a version in the source tree, using an AppImage, or other
-         situations where there is some indirection.
+    - If the ``QPDF_EXECUTABLE`` environment variable is set when
+      invoking @1@command@1@qpdf --bash-completion@2@command@2@ or
+      @1@command@1@qpdf --zsh-completion@2@command@2@, the completion
+      command that it outputs will refer to qpdf using the value of
+      that variable rather than what @1@command@1@qpdf@2@command@2@
+      determines its executable path to be. This can be useful when
+      wrapping @1@command@1@qpdf@2@command@2@ with a script, working
+      with a version in the source tree, using an AppImage, or other
+      situations where there is some indirection.
 
-   -  Library Enhancements
+  - Library Enhancements
 
-      -  Random number generation is now delegated to the crypto
-         provider. The old behavior is still used by the native crypto
-         provider. It is still possible to provide your own random
-         number generator.
+    - Random number generation is now delegated to the crypto
+      provider. The old behavior is still used by the native crypto
+      provider. It is still possible to provide your own random
+      number generator.
 
-      -  Add a new version of
-         ``QPDFObjectHandle::StreamDataProvider::provideStreamData``
-         that accepts the ``suppress_warnings`` and ``will_retry``
-         options and allows a success code to be returned. This makes it
-         possible to implement a ``StreamDataProvider`` that calls
-         ``pipeStreamData`` on another stream and to pass the response
-         back to the caller, which enables better error handling on
-         those proxied streams.
+    - Add a new version of
+      ``QPDFObjectHandle::StreamDataProvider::provideStreamData``
+      that accepts the ``suppress_warnings`` and ``will_retry``
+      options and allows a success code to be returned. This makes it
+      possible to implement a ``StreamDataProvider`` that calls
+      ``pipeStreamData`` on another stream and to pass the response
+      back to the caller, which enables better error handling on
+      those proxied streams.
 
-      -  Update ``QPDFObjectHandle::pipeStreamData`` to return an
-         overall success code that goes beyond whether or not filtered
-         data was written successfully. This allows better error
-         handling of cases that were not filtering errors. You have to
-         call this explicitly. Methods in previously existing APIs have
-         the same semantics as before.
+    - Update ``QPDFObjectHandle::pipeStreamData`` to return an
+      overall success code that goes beyond whether or not filtered
+      data was written successfully. This allows better error
+      handling of cases that were not filtering errors. You have to
+      call this explicitly. Methods in previously existing APIs have
+      the same semantics as before.
 
-      -  The ``QPDFPageObjectHelper::placeFormXObject`` method now
-         allows separate control over whether it should be willing to
-         shrink or expand objects to fit them better into the
-         destination rectangle. The previous behavior was that shrinking
-         was allowed but expansion was not. The previous behavior is
-         still the default.
+    - The ``QPDFPageObjectHelper::placeFormXObject`` method now
+      allows separate control over whether it should be willing to
+      shrink or expand objects to fit them better into the
+      destination rectangle. The previous behavior was that shrinking
+      was allowed but expansion was not. The previous behavior is
+      still the default.
 
-      -  When calling the C API, any non-zero value passed to a boolean
-         parameter is treated as ``TRUE``. Previously only the value
-         ``1`` was accepted. This makes the C API behave more like most
-         C interfaces and is known to improve compatibility with some
-         Windows environments that dynamically load the DLL and call
-         functions from it.
+    - When calling the C API, any non-zero value passed to a boolean
+      parameter is treated as ``TRUE``. Previously only the value
+      ``1`` was accepted. This makes the C API behave more like most
+      C interfaces and is known to improve compatibility with some
+      Windows environments that dynamically load the DLL and call
+      functions from it.
 
-      -  Add ``QPDFObjectHandle::unsafeShallowCopy`` for copying only
-         top-level dictionary keys or array items. This is unsafe
-         because it creates a situation in which changing a lower-level
-         item in one object may also change it in another object, but
-         for cases in which you *know* you are only inserting or
-         replacing top-level items, it is much faster than
-         ``QPDFObjectHandle::shallowCopy``.
+    - Add ``QPDFObjectHandle::unsafeShallowCopy`` for copying only
+      top-level dictionary keys or array items. This is unsafe
+      because it creates a situation in which changing a lower-level
+      item in one object may also change it in another object, but
+      for cases in which you *know* you are only inserting or
+      replacing top-level items, it is much faster than
+      ``QPDFObjectHandle::shallowCopy``.
 
-      -  Add ``QPDFObjectHandle::filterAsContents``, which filter's a
-         stream's data as a content stream. This is useful for parsing
-         the contents for form XObjects in the same way as parsing page
-         content streams.
+    - Add ``QPDFObjectHandle::filterAsContents``, which filter's a
+      stream's data as a content stream. This is useful for parsing
+      the contents for form XObjects in the same way as parsing page
+      content streams.
 
-   -  Bug Fixes
+  - Bug Fixes
 
-      -  When detecting and removing unreferenced resources during page
-         splitting, traverse into form XObjects and handle their
-         resources dictionaries as well.
+    - When detecting and removing unreferenced resources during page
+      splitting, traverse into form XObjects and handle their
+      resources dictionaries as well.
 
-      -  The same error recovery is applied to streams in other than the
-         primary input file when merging or splitting pages.
+    - The same error recovery is applied to streams in other than the
+      primary input file when merging or splitting pages.
 
 9.1.1: January 26, 2020
-   -  Build/Packaging Changes
+  - Build/Packaging Changes
 
-      -  The fix-qdf program was converted from perl to C++. As such,
-         qpdf no longer has a runtime dependency on perl.
+    - The fix-qdf program was converted from perl to C++. As such,
+      qpdf no longer has a runtime dependency on perl.
 
-   -  Library Enhancements
+  - Library Enhancements
 
-      -  Added new helper routine ``QUtil::call_main_from_wmain`` which
-         converts ``wchar_t`` arguments to UTF-8 encoded strings. This
-         is useful for qpdf because library methods expect file names to
-         be UTF-8 encoded, even on Windows
+    - Added new helper routine ``QUtil::call_main_from_wmain`` which
+      converts ``wchar_t`` arguments to UTF-8 encoded strings. This
+      is useful for qpdf because library methods expect file names to
+      be UTF-8 encoded, even on Windows
 
-      -  Added new ``QUtil::read_lines_from_file`` methods that take
-         ``FILE*`` arguments and that allow preservation of end-of-line
-         characters. This also fixes a bug where
-         ``QUtil::read_lines_from_file`` wouldn't work properly with
-         Unicode filenames.
+    - Added new ``QUtil::read_lines_from_file`` methods that take
+      ``FILE*`` arguments and that allow preservation of end-of-line
+      characters. This also fixes a bug where
+      ``QUtil::read_lines_from_file`` wouldn't work properly with
+      Unicode filenames.
 
-   -  CLI Enhancements
+  - CLI Enhancements
 
-      -  Added options @1@option@1@--is-encrypted@2@option@2@ and
-         @1@option@1@--requires-password@2@option@2@ for testing whether
-         a file is encrypted or requires a password other than the
-         supplied (or empty) password. These communicate via exit
-         status, making them useful for shell scripts. They also work on
-         encrypted files with unknown passwords.
+    - Added options @1@option@1@--is-encrypted@2@option@2@ and
+      @1@option@1@--requires-password@2@option@2@ for testing whether
+      a file is encrypted or requires a password other than the
+      supplied (or empty) password. These communicate via exit
+      status, making them useful for shell scripts. They also work on
+      encrypted files with unknown passwords.
 
-      -  Added ``encrypt`` key to JSON options. With the exception of
-         the reconstructed user password for older encryption formats,
-         this provides the same information as
-         @1@option@1@--show-encryption@2@option@2@ but in a consistent,
-         parseable format. See output of @1@command@1@qpdf
-         --json-help@2@command@2@ for details.
+    - Added ``encrypt`` key to JSON options. With the exception of
+      the reconstructed user password for older encryption formats,
+      this provides the same information as
+      @1@option@1@--show-encryption@2@option@2@ but in a consistent,
+      parseable format. See output of @1@command@1@qpdf
+      --json-help@2@command@2@ for details.
 
-   -  Bug Fixes
+  - Bug Fixes
 
-      -  In QDF mode, be sure not to write more than one XRef stream to
-         a file, even when
-         @1@option@1@--preserve-unreferenced@2@option@2@ is used.
-         @1@command@1@fix-qdf@2@command@2@ assumes that there is only
-         one XRef stream, and that it appears at the end of the file.
+    - In QDF mode, be sure not to write more than one XRef stream to
+      a file, even when
+      @1@option@1@--preserve-unreferenced@2@option@2@ is used.
+      @1@command@1@fix-qdf@2@command@2@ assumes that there is only
+      one XRef stream, and that it appears at the end of the file.
 
-      -  When externalizing inline images, properly handle images whose
-         color space is a reference to an object in the page's resource
-         dictionary.
+    - When externalizing inline images, properly handle images whose
+      color space is a reference to an object in the page's resource
+      dictionary.
 
-      -  Windows-specific fix for acquiring crypt context with a new
-         keyset.
+    - Windows-specific fix for acquiring crypt context with a new
+      keyset.
 
 9.1.0: November 17, 2019
-   -  Build Changes
+  - Build Changes
 
-      -  A C++-11 compiler is now required to build qpdf.
+    - A C++-11 compiler is now required to build qpdf.
 
-      -  A new crypto provider that uses gnutls for crypto functions is
-         now available and can be enabled at build time. See `Crypto
-         Providers <#ref.crypto>`__ for more information about crypto
-         providers and `Build Support For Crypto
-         Providers <#ref.crypto.build>`__ for specific information about
-         the build.
+    - A new crypto provider that uses gnutls for crypto functions is
+      now available and can be enabled at build time. See `Crypto
+      Providers <#ref.crypto>`__ for more information about crypto
+      providers and `Build Support For Crypto
+      Providers <#ref.crypto.build>`__ for specific information about
+      the build.
 
-   -  Library Enhancements
+  - Library Enhancements
 
-      -  Incorporate contribution from Masamichi Hosoda to properly
-         handle signature dictionaries by not including them in object
-         streams, formatting the ``Contents`` key has a hexadecimal
-         string, and excluding the ``/Contents`` key from encryption and
-         decryption.
+    - Incorporate contribution from Masamichi Hosoda to properly
+      handle signature dictionaries by not including them in object
+      streams, formatting the ``Contents`` key has a hexadecimal
+      string, and excluding the ``/Contents`` key from encryption and
+      decryption.
 
-      -  Incorporate contribution from Masamichi Hosoda to provide new
-         API calls for getting file-level information about input and
-         output files, enabling certain operations on the files at the
-         file level rather than the object level. New methods include
-         ``QPDF::getXRefTable()``,
-         ``QPDFObjectHandle::getParsedOffset()``,
-         ``QPDFWriter::getRenumberedObjGen(QPDFObjGen)``, and
-         ``QPDFWriter::getWrittenXRefTable()``.
+    - Incorporate contribution from Masamichi Hosoda to provide new
+      API calls for getting file-level information about input and
+      output files, enabling certain operations on the files at the
+      file level rather than the object level. New methods include
+      ``QPDF::getXRefTable()``,
+      ``QPDFObjectHandle::getParsedOffset()``,
+      ``QPDFWriter::getRenumberedObjGen(QPDFObjGen)``, and
+      ``QPDFWriter::getWrittenXRefTable()``.
 
-      -  Support build-time and runtime selectable crypto providers.
-         This includes the addition of new classes
-         ``QPDFCryptoProvider`` and ``QPDFCryptoImpl`` and the
-         recognition of the ``QPDF_CRYPTO_PROVIDER`` environment
-         variable. Crypto providers are described in depth in `Crypto
-         Providers <#ref.crypto>`__.
+    - Support build-time and runtime selectable crypto providers.
+      This includes the addition of new classes
+      ``QPDFCryptoProvider`` and ``QPDFCryptoImpl`` and the
+      recognition of the ``QPDF_CRYPTO_PROVIDER`` environment
+      variable. Crypto providers are described in depth in `Crypto
+      Providers <#ref.crypto>`__.
 
-   -  CLI Enhancements
+  - CLI Enhancements
 
-      -  Addition of the @1@option@1@--show-crypto@2@option@2@ option in
-         support of selectable crypto providers, as described in `Crypto
-         Providers <#ref.crypto>`__.
+    - Addition of the @1@option@1@--show-crypto@2@option@2@ option in
+      support of selectable crypto providers, as described in `Crypto
+      Providers <#ref.crypto>`__.
 
-      -  Allow ``:even`` or ``:odd`` to be appended to numeric ranges
-         for specification of the even or odd pages from among the pages
-         specified in the range.
+    - Allow ``:even`` or ``:odd`` to be appended to numeric ranges
+      for specification of the even or odd pages from among the pages
+      specified in the range.
 
-      -  Fix shell wildcard expansion behavior (``*`` and ``?``) of the
-         @1@command@1@qpdf.exe@2@command@2@ as built my MSVC.
+    - Fix shell wildcard expansion behavior (``*`` and ``?``) of the
+      @1@command@1@qpdf.exe@2@command@2@ as built my MSVC.
 
 9.0.2: October 12, 2019
-   -  Bug Fix
+  - Bug Fix
 
-      -  Fix the name of the temporary file used by
-         @1@option@1@--replace-input@2@option@2@ so that it doesn't
-         require path splitting and works with paths include
-         directories.
+    - Fix the name of the temporary file used by
+      @1@option@1@--replace-input@2@option@2@ so that it doesn't
+      require path splitting and works with paths include
+      directories.
 
 9.0.1: September 20, 2019
-   -  Bug Fixes/Enhancements
+  - Bug Fixes/Enhancements
 
-      -  Fix some build and test issues on big-endian systems and
-         compilers with characters that are unsigned by default. The
-         problems were in build and test only. There were no actual bugs
-         in the qpdf library itself relating to endianness or unsigned
-         characters.
+    - Fix some build and test issues on big-endian systems and
+      compilers with characters that are unsigned by default. The
+      problems were in build and test only. There were no actual bugs
+      in the qpdf library itself relating to endianness or unsigned
+      characters.
 
-      -  When a dictionary has a duplicated key, report this with a
-         warning. The behavior of the library in this case is unchanged,
-         but the error condition is no longer silently ignored.
+    - When a dictionary has a duplicated key, report this with a
+      warning. The behavior of the library in this case is unchanged,
+      but the error condition is no longer silently ignored.
 
-      -  When a form field's display rectangle is erroneously specified
-         with inverted coordinates, detect and correct this situation.
-         This avoids some form fields from being flipped when flattening
-         annotations on files with this condition.
+    - When a form field's display rectangle is erroneously specified
+      with inverted coordinates, detect and correct this situation.
+      This avoids some form fields from being flipped when flattening
+      annotations on files with this condition.
 
 9.0.0: August 31, 2019
-   -  Incompatible API (source-level) Changes (minor)
+  - Incompatible API (source-level) Changes (minor)
 
-      -  The method ``QUtil::strcasecmp`` has been renamed to
-         ``QUtil::str_compare_nocase``. This incompatible change is
-         necessary to enable qpdf to build on platforms that define
-         ``strcasecmp`` as a macro.
+    - The method ``QUtil::strcasecmp`` has been renamed to
+      ``QUtil::str_compare_nocase``. This incompatible change is
+      necessary to enable qpdf to build on platforms that define
+      ``strcasecmp`` as a macro.
 
-      -  The ``QPDF::copyForeignObject`` method had an overloaded
-         version that took a boolean parameter that was not used. If you
-         were using this version, just omit the extra parameter.
+    - The ``QPDF::copyForeignObject`` method had an overloaded
+      version that took a boolean parameter that was not used. If you
+      were using this version, just omit the extra parameter.
 
-      -  There was a version ``QPDFTokenizer::expectInlineImage`` that
-         took no arguments. This version has been removed since it
-         caused the tokenizer to return incorrect inline images. A new
-         version was added some time ago that produces correct output.
-         This is a very low level method that doesn't make sense to call
-         outside of qpdf's lexical engine. There are higher level
-         methods for tokenizing content streams.
+    - There was a version ``QPDFTokenizer::expectInlineImage`` that
+      took no arguments. This version has been removed since it
+      caused the tokenizer to return incorrect inline images. A new
+      version was added some time ago that produces correct output.
+      This is a very low level method that doesn't make sense to call
+      outside of qpdf's lexical engine. There are higher level
+      methods for tokenizing content streams.
 
-      -  Change ``QPDFOutlineDocumentHelper::getTopLevelOutlines`` and
-         ``QPDFOutlineObjectHelper::getKids`` to return a
-         ``std::vector`` instead of a ``std::list`` of
-         ``QPDFOutlineObjectHelper`` objects.
+    - Change ``QPDFOutlineDocumentHelper::getTopLevelOutlines`` and
+      ``QPDFOutlineObjectHelper::getKids`` to return a
+      ``std::vector`` instead of a ``std::list`` of
+      ``QPDFOutlineObjectHelper`` objects.
 
-      -  Remove method ``QPDFTokenizer::allowPoundAnywhereInName``. This
-         function would allow creation of name tokens whose value would
-         change when unparsed, which is never the correct behavior.
+    - Remove method ``QPDFTokenizer::allowPoundAnywhereInName``. This
+      function would allow creation of name tokens whose value would
+      change when unparsed, which is never the correct behavior.
 
-   -  CLI Enhancements
+  - CLI Enhancements
 
-      -  The @1@option@1@--replace-input@2@option@2@ option may be given
-         in place of an output file name. This causes qpdf to overwrite
-         the input file with the output. See the description of
-         @1@option@1@--replace-input@2@option@2@ in `Basic
-         Options <#ref.basic-options>`__ for more details.
+    - The @1@option@1@--replace-input@2@option@2@ option may be given
+      in place of an output file name. This causes qpdf to overwrite
+      the input file with the output. See the description of
+      @1@option@1@--replace-input@2@option@2@ in `Basic
+      Options <#ref.basic-options>`__ for more details.
 
-      -  The @1@option@1@--recompress-flate@2@option@2@ instructs
-         @1@command@1@qpdf@2@command@2@ to recompress streams that are
-         already compressed with ``/FlateDecode``. Useful with
-         @1@option@1@--compression-level@2@option@2@.
+    - The @1@option@1@--recompress-flate@2@option@2@ instructs
+      @1@command@1@qpdf@2@command@2@ to recompress streams that are
+      already compressed with ``/FlateDecode``. Useful with
+      @1@option@1@--compression-level@2@option@2@.
 
-      -  The
-         @1@option@1@--compression-level=@1@replaceable@1@level@2@replaceable@2@@2@option@2@
-         sets the zlib compression level used for any streams compressed
-         by ``/FlateDecode``. Most effective when combined with
-         @1@option@1@--recompress-flate@2@option@2@.
+    - The
+      @1@option@1@--compression-level=@1@replaceable@1@level@2@replaceable@2@@2@option@2@
+      sets the zlib compression level used for any streams compressed
+      by ``/FlateDecode``. Most effective when combined with
+      @1@option@1@--recompress-flate@2@option@2@.
 
-   -  Library Enhancements
+  - Library Enhancements
 
-      -  A new namespace ``QIntC``, provided by
-         @1@filename@1@qpdf/QIntC.hh@2@filename@2@, provides safe
-         conversion methods between different integer types. These
-         conversion methods do range checking to ensure that the cast
-         can be performed with no loss of information. Every use of
-         ``static_cast`` in the library was inspected to see if it could
-         use one of these safe converters instead. See `Casting
-         Policy <#ref.casting>`__ for additional details.
+    - A new namespace ``QIntC``, provided by
+      @1@filename@1@qpdf/QIntC.hh@2@filename@2@, provides safe
+      conversion methods between different integer types. These
+      conversion methods do range checking to ensure that the cast
+      can be performed with no loss of information. Every use of
+      ``static_cast`` in the library was inspected to see if it could
+      use one of these safe converters instead. See `Casting
+      Policy <#ref.casting>`__ for additional details.
 
-      -  Method ``QPDF::anyWarnings`` tells whether there have been any
-         warnings without clearing the list of warnings.
+    - Method ``QPDF::anyWarnings`` tells whether there have been any
+      warnings without clearing the list of warnings.
 
-      -  Method ``QPDF::closeInputSource`` closes or otherwise releases
-         the input source. This enables the input file to be deleted or
-         renamed.
+    - Method ``QPDF::closeInputSource`` closes or otherwise releases
+      the input source. This enables the input file to be deleted or
+      renamed.
 
-      -  New methods have been added to ``QUtil`` for converting back
-         and forth between strings and unsigned integers:
-         ``uint_to_string``, ``uint_to_string_base``,
-         ``string_to_uint``, and ``string_to_ull``.
+    - New methods have been added to ``QUtil`` for converting back
+      and forth between strings and unsigned integers:
+      ``uint_to_string``, ``uint_to_string_base``,
+      ``string_to_uint``, and ``string_to_ull``.
 
-      -  New methods have been added to ``QPDFObjectHandle`` that return
-         the value of ``Integer`` objects as ``int`` or ``unsigned int``
-         with range checking and sensible fallback values, and a new
-         method was added to return an unsigned value. This makes it
-         easier to write code that is safe from unintentional data loss.
-         Functions: ``getUIntValue``, ``getIntValueAsInt``,
-         ``getUIntValueAsUInt``.
+    - New methods have been added to ``QPDFObjectHandle`` that return
+      the value of ``Integer`` objects as ``int`` or ``unsigned int``
+      with range checking and sensible fallback values, and a new
+      method was added to return an unsigned value. This makes it
+      easier to write code that is safe from unintentional data loss.
+      Functions: ``getUIntValue``, ``getIntValueAsInt``,
+      ``getUIntValueAsUInt``.
 
-      -  When parsing content streams with
-         ``QPDFObjectHandle::ParserCallbacks``, in place of the method
-         ``handleObject(QPDFObjectHandle)``, the developer may override
-         ``handleObject(QPDFObjectHandle, size_t offset, size_t
-         length)``. If this method is defined, it will
-         be invoked with the object along with its offset and length
-         within the overall contents being parsed. Intervening spaces
-         and comments are not included in offset and length.
-         Additionally, a new method ``contentSize(size_t)`` may be
-         implemented. If present, it will be called prior to the first
-         call to ``handleObject`` with the total size in bytes of the
-         combined contents.
+    - When parsing content streams with
+      ``QPDFObjectHandle::ParserCallbacks``, in place of the method
+      ``handleObject(QPDFObjectHandle)``, the developer may override
+      ``handleObject(QPDFObjectHandle, size_t offset, size_t
+      length)``. If this method is defined, it will
+      be invoked with the object along with its offset and length
+      within the overall contents being parsed. Intervening spaces
+      and comments are not included in offset and length.
+      Additionally, a new method ``contentSize(size_t)`` may be
+      implemented. If present, it will be called prior to the first
+      call to ``handleObject`` with the total size in bytes of the
+      combined contents.
 
-      -  New methods ``QPDF::userPasswordMatched`` and
-         ``QPDF::ownerPasswordMatched`` have been added to enable a
-         caller to determine whether the supplied password was the user
-         password, the owner password, or both. This information is also
-         displayed by @1@command@1@qpdf --show-encryption@2@command@2@
-         and @1@command@1@qpdf --check@2@command@2@.
+    - New methods ``QPDF::userPasswordMatched`` and
+      ``QPDF::ownerPasswordMatched`` have been added to enable a
+      caller to determine whether the supplied password was the user
+      password, the owner password, or both. This information is also
+      displayed by @1@command@1@qpdf --show-encryption@2@command@2@
+      and @1@command@1@qpdf --check@2@command@2@.
 
-      -  Static method ``Pl_Flate::setCompressionLevel`` can be called
-         to set the zlib compression level globally used by all
-         instances of Pl_Flate in deflate mode.
+    - Static method ``Pl_Flate::setCompressionLevel`` can be called
+      to set the zlib compression level globally used by all
+      instances of Pl_Flate in deflate mode.
 
-      -  The method ``QPDFWriter::setRecompressFlate`` can be called to
-         tell ``QPDFWriter`` to uncompress and recompress streams
-         already compressed with ``/FlateDecode``.
+    - The method ``QPDFWriter::setRecompressFlate`` can be called to
+      tell ``QPDFWriter`` to uncompress and recompress streams
+      already compressed with ``/FlateDecode``.
 
-      -  The underlying implementation of QPDF arrays has been enhanced
-         to be much more memory efficient when dealing with arrays with
-         lots of nulls. This enables qpdf to use drastically less memory
-         for certain types of files.
+    - The underlying implementation of QPDF arrays has been enhanced
+      to be much more memory efficient when dealing with arrays with
+      lots of nulls. This enables qpdf to use drastically less memory
+      for certain types of files.
 
-      -  When traversing the pages tree, if nodes are encountered with
-         invalid types, the types are fixed, and a warning is issued.
+    - When traversing the pages tree, if nodes are encountered with
+      invalid types, the types are fixed, and a warning is issued.
 
-      -  A new helper method ``QUtil::read_file_into_memory`` was added.
+    - A new helper method ``QUtil::read_file_into_memory`` was added.
 
-      -  All conditions previously reported by
-         ``QPDF::checkLinearization()`` as errors are now presented as
-         warnings.
+    - All conditions previously reported by
+      ``QPDF::checkLinearization()`` as errors are now presented as
+      warnings.
 
-      -  Name tokens containing the ``#`` character not preceded by two
-         hexadecimal digits, which is invalid in PDF 1.2 and above, are
-         properly handled by the library: a warning is generated, and
-         the name token is properly preserved, even if invalid, in the
-         output. See @1@filename@1@ChangeLog@2@filename@2@ for a more
-         complete description of this change.
+    - Name tokens containing the ``#`` character not preceded by two
+      hexadecimal digits, which is invalid in PDF 1.2 and above, are
+      properly handled by the library: a warning is generated, and
+      the name token is properly preserved, even if invalid, in the
+      output. See @1@filename@1@ChangeLog@2@filename@2@ for a more
+      complete description of this change.
 
-   -  Bug Fixes
+  - Bug Fixes
 
-      -  A small handful of memory issues, assertion failures, and
-         unhandled exceptions that could occur on badly mangled input
-         files have been fixed. Most of these problems were found by
-         Google's OSS-Fuzz project.
+    - A small handful of memory issues, assertion failures, and
+      unhandled exceptions that could occur on badly mangled input
+      files have been fixed. Most of these problems were found by
+      Google's OSS-Fuzz project.
 
-      -  When @1@command@1@qpdf --check@2@command@2@ or
-         @1@command@1@qpdf --check-linearization@2@command@2@ encounters
-         a file with linearization warnings but not errors, it now
-         properly exits with exit code 3 instead of 2.
+    - When @1@command@1@qpdf --check@2@command@2@ or
+      @1@command@1@qpdf --check-linearization@2@command@2@ encounters
+      a file with linearization warnings but not errors, it now
+      properly exits with exit code 3 instead of 2.
 
-      -  The @1@option@1@--completion-bash@2@option@2@ and
-         @1@option@1@--completion-zsh@2@option@2@ options now work
-         properly when qpdf is invoked as an AppImage.
+    - The @1@option@1@--completion-bash@2@option@2@ and
+      @1@option@1@--completion-zsh@2@option@2@ options now work
+      properly when qpdf is invoked as an AppImage.
 
-      -  Calling ``QPDFWriter::set*EncryptionParameters`` on a
-         ``QPDFWriter`` object whose output filename has not yet been
-         set no longer produces a segmentation fault.
+    - Calling ``QPDFWriter::set*EncryptionParameters`` on a
+      ``QPDFWriter`` object whose output filename has not yet been
+      set no longer produces a segmentation fault.
 
-      -  When reading encrypted files, follow the spec more closely
-         regarding encryption key length. This allows qpdf to open
-         encrypted files in most cases when they have invalid or missing
-         /Length keys in the encryption dictionary.
+    - When reading encrypted files, follow the spec more closely
+      regarding encryption key length. This allows qpdf to open
+      encrypted files in most cases when they have invalid or missing
+      /Length keys in the encryption dictionary.
 
-   -  Build Changes
+  - Build Changes
 
-      -  On platforms that support it, qpdf now builds with
-         @1@option@1@-fvisibility=hidden@2@option@2@. If you build qpdf
-         with your own build system, this is now safe to use. This
-         prevents methods that are not part of the public API from being
-         exported by the shared library, and makes qpdf's ELF shared
-         libraries (used on Linux, MacOS, and most other UNIX flavors)
-         behave more like the Windows DLL. Since the DLL already behaves
-         in much this way, it is unlikely that there are any methods
-         that were accidentally not exported. However, with ELF shared
-         libraries, typeinfo for some classes has to be explicitly
-         exported. If there are problems in dynamically linked code
-         catching exceptions or subclassing, this could be the reason.
-         If you see this, please report a bug at
-         https://github.com/qpdf/qpdf/issues/.
+    - On platforms that support it, qpdf now builds with
+      @1@option@1@-fvisibility=hidden@2@option@2@. If you build qpdf
+      with your own build system, this is now safe to use. This
+      prevents methods that are not part of the public API from being
+      exported by the shared library, and makes qpdf's ELF shared
+      libraries (used on Linux, MacOS, and most other UNIX flavors)
+      behave more like the Windows DLL. Since the DLL already behaves
+      in much this way, it is unlikely that there are any methods
+      that were accidentally not exported. However, with ELF shared
+      libraries, typeinfo for some classes has to be explicitly
+      exported. If there are problems in dynamically linked code
+      catching exceptions or subclassing, this could be the reason.
+      If you see this, please report a bug at
+      https://github.com/qpdf/qpdf/issues/.
 
-      -  QPDF is now compiled with integer conversion and sign
-         conversion warnings enabled. Numerous changes were made to the
-         library to make this safe.
+    - QPDF is now compiled with integer conversion and sign
+      conversion warnings enabled. Numerous changes were made to the
+      library to make this safe.
 
-      -  QPDF's @1@command@1@make install@2@command@2@ target explicitly
-         specifies the mode to use when installing files instead of
-         relying the user's umask. It was previously doing this for some
-         files but not others.
+    - QPDF's @1@command@1@make install@2@command@2@ target explicitly
+      specifies the mode to use when installing files instead of
+      relying the user's umask. It was previously doing this for some
+      files but not others.
 
-      -  If @1@command@1@pkg-config@2@command@2@ is available, use it to
-         locate @1@filename@1@libjpeg@2@filename@2@ and
-         @1@filename@1@zlib@2@filename@2@ dependencies, falling back on
-         old behavior if unsuccessful.
+    - If @1@command@1@pkg-config@2@command@2@ is available, use it to
+      locate @1@filename@1@libjpeg@2@filename@2@ and
+      @1@filename@1@zlib@2@filename@2@ dependencies, falling back on
+      old behavior if unsuccessful.
 
-   -  Other Notes
+  - Other Notes
 
-      -  QPDF has been fully integrated into `Google's OSS-Fuzz
-         project <https://github.com/google/oss-fuzz>`__. This project
-         exercises code with randomly mutated inputs and is great for
-         discovering hidden security crashes and security issues.
-         Several bugs found by oss-fuzz have already been fixed in qpdf.
+    - QPDF has been fully integrated into `Google's OSS-Fuzz
+      project <https://github.com/google/oss-fuzz>`__. This project
+      exercises code with randomly mutated inputs and is great for
+      discovering hidden security crashes and security issues.
+      Several bugs found by oss-fuzz have already been fixed in qpdf.
 
 8.4.2: May 18, 2019
    This release has just one change: correction of a buffer overrun in
@@ -4672,1560 +4672,1560 @@ For a detailed list of changes, please see the file
    update. There are no code changes that affect non-Windows releases.
 
 8.4.1: April 27, 2019
-   -  Enhancements
+  - Enhancements
 
-      -  When @1@command@1@qpdf --version@2@command@2@ is run, it will
-         detect if the qpdf CLI was built with a different version of
-         qpdf than the library, which may indicate a problem with the
-         installation.
+    - When @1@command@1@qpdf --version@2@command@2@ is run, it will
+      detect if the qpdf CLI was built with a different version of
+      qpdf than the library, which may indicate a problem with the
+      installation.
 
-      -  New option @1@option@1@--remove-page-labels@2@option@2@ will
-         remove page labels before generating output. This used to
-         happen if you ran @1@command@1@qpdf --empty --pages ..
-         --@2@command@2@, but the behavior changed in qpdf 8.3.0. This
-         option enables people who were relying on the old behavior to
-         get it again.
+    - New option @1@option@1@--remove-page-labels@2@option@2@ will
+      remove page labels before generating output. This used to
+      happen if you ran @1@command@1@qpdf --empty --pages ..
+      --@2@command@2@, but the behavior changed in qpdf 8.3.0. This
+      option enables people who were relying on the old behavior to
+      get it again.
 
-      -  New option
-         @1@option@1@--keep-files-open-threshold=@1@replaceable@1@count@2@replaceable@2@@2@option@2@
-         can be used to override number of files that qpdf will use to
-         trigger the behavior of not keeping all files open when merging
-         files. This may be necessary if your system allows fewer than
-         the default value of 200 files to be open at the same time.
+    - New option
+      @1@option@1@--keep-files-open-threshold=@1@replaceable@1@count@2@replaceable@2@@2@option@2@
+      can be used to override number of files that qpdf will use to
+      trigger the behavior of not keeping all files open when merging
+      files. This may be necessary if your system allows fewer than
+      the default value of 200 files to be open at the same time.
 
-   -  Bug Fixes
+  - Bug Fixes
 
-      -  Handle Unicode characters in filenames on Windows. The changes
-         to support Unicode on the CLI in Windows broke Unicode
-         filenames for Windows.
+    - Handle Unicode characters in filenames on Windows. The changes
+      to support Unicode on the CLI in Windows broke Unicode
+      filenames for Windows.
 
-      -  Slightly tighten logic that determines whether an object is a
-         page. This should resolve problems in some rare files where
-         some non-page objects were passing qpdf's test for whether
-         something was a page, thus causing them to be erroneously lost
-         during page splitting operations.
+    - Slightly tighten logic that determines whether an object is a
+      page. This should resolve problems in some rare files where
+      some non-page objects were passing qpdf's test for whether
+      something was a page, thus causing them to be erroneously lost
+      during page splitting operations.
 
-      -  Revert change that included preservation of outlines
-         (bookmarks) in @1@option@1@--split-pages@2@option@2@. The way
-         it was implemented in 8.3.0 and 8.4.0 caused a very significant
-         degradation of performance for splitting certain files. A
-         future release of qpdf may re-introduce the behavior in a more
-         performant and also more correct fashion.
+    - Revert change that included preservation of outlines
+      (bookmarks) in @1@option@1@--split-pages@2@option@2@. The way
+      it was implemented in 8.3.0 and 8.4.0 caused a very significant
+      degradation of performance for splitting certain files. A
+      future release of qpdf may re-introduce the behavior in a more
+      performant and also more correct fashion.
 
-      -  In JSON mode, add missing leading 0 to decimal values between
-         -1 and 1 even if not present in the input. The JSON
-         specification requires the leading 0. The PDF specification
-         does not.
+    - In JSON mode, add missing leading 0 to decimal values between
+      -1 and 1 even if not present in the input. The JSON
+      specification requires the leading 0. The PDF specification
+      does not.
 
 8.4.0: February 1, 2019
-   -  Command-line Enhancements
+  - Command-line Enhancements
 
-      -  *Non-compatible CLI change:* The qpdf command-line tool
-         interprets passwords given at the command-line differently from
-         previous releases when the passwords contain non-ASCII
-         characters. In some cases, the behavior differs from previous
-         releases. For a discussion of the current behavior, please see
-         `Unicode Passwords <#ref.unicode-passwords>`__. The
-         incompatibilities are as follows:
+    - *Non-compatible CLI change:* The qpdf command-line tool
+      interprets passwords given at the command-line differently from
+      previous releases when the passwords contain non-ASCII
+      characters. In some cases, the behavior differs from previous
+      releases. For a discussion of the current behavior, please see
+      `Unicode Passwords <#ref.unicode-passwords>`__. The
+      incompatibilities are as follows:
 
-         -  On Windows, qpdf now receives all command-line options as
-            Unicode strings if it can figure out the appropriate
-            compile/link options. This is enabled at least for MSVC and
-            mingw builds. That means that if non-ASCII strings are
-            passed to the qpdf CLI in Windows, qpdf will now correctly
-            receive them. In the past, they would have either been
-            encoded as Windows code page 1252 (also known as "Windows
-            ANSI" or as something unintelligible. In almost all cases,
-            qpdf is able to properly interpret Unicode arguments now,
-            whereas in the past, it would almost never interpret them
-            properly. The result is that non-ASCII passwords given to
-            the qpdf CLI on Windows now have a much greater chance of
-            creating PDF files that can be opened by a variety of
-            readers. In the past, usually files encrypted from the
-            Windows CLI using non-ASCII passwords would not be readable
-            by most viewers. Note that the current version of qpdf is
-            able to decrypt files that it previously created using the
-            previously supplied password.
+      - On Windows, qpdf now receives all command-line options as
+        Unicode strings if it can figure out the appropriate
+        compile/link options. This is enabled at least for MSVC and
+        mingw builds. That means that if non-ASCII strings are
+        passed to the qpdf CLI in Windows, qpdf will now correctly
+        receive them. In the past, they would have either been
+        encoded as Windows code page 1252 (also known as "Windows
+        ANSI" or as something unintelligible. In almost all cases,
+        qpdf is able to properly interpret Unicode arguments now,
+        whereas in the past, it would almost never interpret them
+        properly. The result is that non-ASCII passwords given to
+        the qpdf CLI on Windows now have a much greater chance of
+        creating PDF files that can be opened by a variety of
+        readers. In the past, usually files encrypted from the
+        Windows CLI using non-ASCII passwords would not be readable
+        by most viewers. Note that the current version of qpdf is
+        able to decrypt files that it previously created using the
+        previously supplied password.
 
-         -  The PDF specification requires passwords to be encoded as
-            UTF-8 for 256-bit encryption and with PDF Doc encoding for
-            40-bit or 128-bit encryption. Older versions of qpdf left it
-            up to the user to provide passwords with the correct
-            encoding. The qpdf CLI now detects when a password is given
-            with UTF-8 encoding and automatically transcodes it to what
-            the PDF spec requires. While this is almost always the
-            correct behavior, it is possible to override the behavior if
-            there is some reason to do so. This is discussed in more
-            depth in `Unicode Passwords <#ref.unicode-passwords>`__.
+      - The PDF specification requires passwords to be encoded as
+        UTF-8 for 256-bit encryption and with PDF Doc encoding for
+        40-bit or 128-bit encryption. Older versions of qpdf left it
+        up to the user to provide passwords with the correct
+        encoding. The qpdf CLI now detects when a password is given
+        with UTF-8 encoding and automatically transcodes it to what
+        the PDF spec requires. While this is almost always the
+        correct behavior, it is possible to override the behavior if
+        there is some reason to do so. This is discussed in more
+        depth in `Unicode Passwords <#ref.unicode-passwords>`__.
 
-      -  New options
-         @1@option@1@--externalize-inline-images@2@option@2@,
-         @1@option@1@--ii-min-bytes@2@option@2@, and
-         @1@option@1@--keep-inline-images@2@option@2@ control qpdf's
-         handling of inline images and possible conversion of them to
-         regular images. By default,
-         @1@option@1@--optimize-images@2@option@2@ now also applies to
-         inline images. These options are discussed in `Advanced
-         Transformation Options <#ref.advanced-transformation>`__.
+    - New options
+      @1@option@1@--externalize-inline-images@2@option@2@,
+      @1@option@1@--ii-min-bytes@2@option@2@, and
+      @1@option@1@--keep-inline-images@2@option@2@ control qpdf's
+      handling of inline images and possible conversion of them to
+      regular images. By default,
+      @1@option@1@--optimize-images@2@option@2@ now also applies to
+      inline images. These options are discussed in `Advanced
+      Transformation Options <#ref.advanced-transformation>`__.
 
-      -  Add options @1@option@1@--overlay@2@option@2@ and
-         @1@option@1@--underlay@2@option@2@ for overlaying or
-         underlaying pages of other files onto output pages. See
-         `Overlay and Underlay Options <#ref.overlay-underlay>`__ for
-         details.
+    - Add options @1@option@1@--overlay@2@option@2@ and
+      @1@option@1@--underlay@2@option@2@ for overlaying or
+      underlaying pages of other files onto output pages. See
+      `Overlay and Underlay Options <#ref.overlay-underlay>`__ for
+      details.
 
-      -  When opening an encrypted file with a password, if the
-         specified password doesn't work and the password contains any
-         non-ASCII characters, qpdf will try a number of alternative
-         passwords to try to compensate for possible character encoding
-         errors. This behavior can be suppressed with the
-         @1@option@1@--suppress-password-recovery@2@option@2@ option.
-         See `Unicode Passwords <#ref.unicode-passwords>`__ for a full
-         discussion.
+    - When opening an encrypted file with a password, if the
+      specified password doesn't work and the password contains any
+      non-ASCII characters, qpdf will try a number of alternative
+      passwords to try to compensate for possible character encoding
+      errors. This behavior can be suppressed with the
+      @1@option@1@--suppress-password-recovery@2@option@2@ option.
+      See `Unicode Passwords <#ref.unicode-passwords>`__ for a full
+      discussion.
 
-      -  Add the @1@option@1@--password-mode@2@option@2@ option to
-         fine-tune how qpdf interprets password arguments, especially
-         when they contain non-ASCII characters. See `Unicode
-         Passwords <#ref.unicode-passwords>`__ for more information.
+    - Add the @1@option@1@--password-mode@2@option@2@ option to
+      fine-tune how qpdf interprets password arguments, especially
+      when they contain non-ASCII characters. See `Unicode
+      Passwords <#ref.unicode-passwords>`__ for more information.
 
-      -  In the @1@option@1@--pages@2@option@2@ option, it is now
-         possible to copy the same page more than once from the same
-         file without using the previous workaround of specifying two
-         different paths to the same file.
+    - In the @1@option@1@--pages@2@option@2@ option, it is now
+      possible to copy the same page more than once from the same
+      file without using the previous workaround of specifying two
+      different paths to the same file.
 
-      -  In the @1@option@1@--pages@2@option@2@ option, allow use of "."
-         as a shortcut for the primary input file. That way, you can do
-         @1@command@1@qpdf in.pdf --pages . 1-2 -- out.pdf@2@command@2@
-         instead of having to repeat @1@filename@1@in.pdf@2@filename@2@
-         in the command.
+    - In the @1@option@1@--pages@2@option@2@ option, allow use of "."
+      as a shortcut for the primary input file. That way, you can do
+      @1@command@1@qpdf in.pdf --pages . 1-2 -- out.pdf@2@command@2@
+      instead of having to repeat @1@filename@1@in.pdf@2@filename@2@
+      in the command.
 
-      -  When encrypting with 128-bit and 256-bit encryption, new
-         encryption options @1@option@1@--assemble@2@option@2@,
-         @1@option@1@--annotate@2@option@2@,
-         @1@option@1@--form@2@option@2@, and
-         @1@option@1@--modify-other@2@option@2@ allow more fine-grained
-         granularity in configuring options. Before, the
-         @1@option@1@--modify@2@option@2@ option only configured certain
-         predefined groups of permissions.
+    - When encrypting with 128-bit and 256-bit encryption, new
+      encryption options @1@option@1@--assemble@2@option@2@,
+      @1@option@1@--annotate@2@option@2@,
+      @1@option@1@--form@2@option@2@, and
+      @1@option@1@--modify-other@2@option@2@ allow more fine-grained
+      granularity in configuring options. Before, the
+      @1@option@1@--modify@2@option@2@ option only configured certain
+      predefined groups of permissions.
 
-   -  Bug Fixes and Enhancements
+  - Bug Fixes and Enhancements
 
-      -  *Potential data-loss bug:* Versions of qpdf between 8.1.0 and
-         8.3.0 had a bug that could cause page splitting and merging
-         operations to drop some font or image resources if the PDF
-         file's internal structure shared these resource lists across
-         pages and if some but not all of the pages in the output did
-         not reference all the fonts and images. Using the
-         @1@option@1@--preserve-unreferenced-resources@2@option@2@
-         option would work around the incorrect behavior. This bug was
-         the result of a typo in the code and a deficiency in the test
-         suite. The case that triggered the error was known, just not
-         handled properly. This case is now exercised in qpdf's test
-         suite and properly handled.
+    - *Potential data-loss bug:* Versions of qpdf between 8.1.0 and
+      8.3.0 had a bug that could cause page splitting and merging
+      operations to drop some font or image resources if the PDF
+      file's internal structure shared these resource lists across
+      pages and if some but not all of the pages in the output did
+      not reference all the fonts and images. Using the
+      @1@option@1@--preserve-unreferenced-resources@2@option@2@
+      option would work around the incorrect behavior. This bug was
+      the result of a typo in the code and a deficiency in the test
+      suite. The case that triggered the error was known, just not
+      handled properly. This case is now exercised in qpdf's test
+      suite and properly handled.
 
-      -  When optimizing images, detect and refuse to optimize images
-         that can't be converted to JPEG because of bit depth or color
-         space.
+    - When optimizing images, detect and refuse to optimize images
+      that can't be converted to JPEG because of bit depth or color
+      space.
 
-      -  Linearization and page manipulation APIs now detect and recover
-         from files that have duplicate Page objects in the pages tree.
+    - Linearization and page manipulation APIs now detect and recover
+      from files that have duplicate Page objects in the pages tree.
 
-      -  Using older option
-         @1@option@1@--stream-data=compress@2@option@2@ with object
-         streams, object streams and xref streams were not compressed.
+    - Using older option
+      @1@option@1@--stream-data=compress@2@option@2@ with object
+      streams, object streams and xref streams were not compressed.
 
-      -  When the tokenizer returns inline image tokens, delimiters
-         following ``ID`` and ``EI`` operators are no longer excluded.
-         This makes it possible to reliably extract the actual image
-         data.
+    - When the tokenizer returns inline image tokens, delimiters
+      following ``ID`` and ``EI`` operators are no longer excluded.
+      This makes it possible to reliably extract the actual image
+      data.
 
-   -  Library Enhancements
+  - Library Enhancements
 
-      -  Add method ``QPDFPageObjectHelper::externalizeInlineImages`` to
-         convert inline images to regular images.
+    - Add method ``QPDFPageObjectHelper::externalizeInlineImages`` to
+      convert inline images to regular images.
 
-      -  Add method ``QUtil::possible_repaired_encodings()`` to generate
-         a list of strings that represent other ways the given string
-         could have been encoded. This is the method the QPDF CLI uses
-         to generate the strings it tries when recovering incorrectly
-         encoded Unicode passwords.
+    - Add method ``QUtil::possible_repaired_encodings()`` to generate
+      a list of strings that represent other ways the given string
+      could have been encoded. This is the method the QPDF CLI uses
+      to generate the strings it tries when recovering incorrectly
+      encoded Unicode passwords.
 
-      -  Add new versions of
-         ``QPDFWriter::setR{3,4,5,6}EncryptionParameters`` that allow
-         more granular setting of permissions bits. See
-         @1@filename@1@QPDFWriter.hh@2@filename@2@ for details.
+    - Add new versions of
+      ``QPDFWriter::setR{3,4,5,6}EncryptionParameters`` that allow
+      more granular setting of permissions bits. See
+      @1@filename@1@QPDFWriter.hh@2@filename@2@ for details.
 
-      -  Add new versions of the transcoders from UTF-8 to single-byte
-         coding systems in ``QUtil`` that report success or failure
-         rather than just substituting a specified unknown character.
+    - Add new versions of the transcoders from UTF-8 to single-byte
+      coding systems in ``QUtil`` that report success or failure
+      rather than just substituting a specified unknown character.
 
-      -  Add method ``QUtil::analyze_encoding()`` to determine whether a
-         string has high-bit characters and is appears to be UTF-16 or
-         valid UTF-8 encoding.
+    - Add method ``QUtil::analyze_encoding()`` to determine whether a
+      string has high-bit characters and is appears to be UTF-16 or
+      valid UTF-8 encoding.
 
-      -  Add new method ``QPDFPageObjectHelper::shallowCopyPage()`` to
-         copy a new page that is a "shallow copy" of a page. The
-         resulting object is an indirect object ready to be passed to
-         ``QPDFPageDocumentHelper::addPage()`` for either the original
-         ``QPDF`` object or a different one. This is what the
-         @1@command@1@qpdf@2@command@2@ command-line tool uses to copy
-         the same page multiple times from the same file during
-         splitting and merging operations.
+    - Add new method ``QPDFPageObjectHelper::shallowCopyPage()`` to
+      copy a new page that is a "shallow copy" of a page. The
+      resulting object is an indirect object ready to be passed to
+      ``QPDFPageDocumentHelper::addPage()`` for either the original
+      ``QPDF`` object or a different one. This is what the
+      @1@command@1@qpdf@2@command@2@ command-line tool uses to copy
+      the same page multiple times from the same file during
+      splitting and merging operations.
 
-      -  Add method ``QPDF::getUniqueId()``, which returns a unique
-         identifier for the given QPDF object. The identifier will be
-         unique across the life of the application. The returned value
-         can be safely used as a map key.
+    - Add method ``QPDF::getUniqueId()``, which returns a unique
+      identifier for the given QPDF object. The identifier will be
+      unique across the life of the application. The returned value
+      can be safely used as a map key.
 
-      -  Add method ``QPDF::setImmediateCopyFrom``. This further
-         enhances qpdf's ability to allow a ``QPDF`` object from which
-         objects are being copied to go out of scope before the
-         destination object is written. If you call this method on a
-         ``QPDF`` instances, objects copied *from* this instance will be
-         copied immediately instead of lazily. This option uses more
-         memory but allows the source object to go out of scope before
-         the destination object is written in all cases. See comments in
-         @1@filename@1@QPDF.hh@2@filename@2@ for details.
+    - Add method ``QPDF::setImmediateCopyFrom``. This further
+      enhances qpdf's ability to allow a ``QPDF`` object from which
+      objects are being copied to go out of scope before the
+      destination object is written. If you call this method on a
+      ``QPDF`` instances, objects copied *from* this instance will be
+      copied immediately instead of lazily. This option uses more
+      memory but allows the source object to go out of scope before
+      the destination object is written in all cases. See comments in
+      @1@filename@1@QPDF.hh@2@filename@2@ for details.
 
-      -  Add method ``QPDFPageObjectHelper::getAttribute`` for
-         retrieving an attribute from the page dictionary taking
-         inheritance into consideration, and optionally making a copy if
-         your intention is to modify the attribute.
+    - Add method ``QPDFPageObjectHelper::getAttribute`` for
+      retrieving an attribute from the page dictionary taking
+      inheritance into consideration, and optionally making a copy if
+      your intention is to modify the attribute.
 
-      -  Fix long-standing limitation of
-         ``QPDFPageObjectHelper::getPageImages`` so that it now properly
-         reports images from inherited resources dictionaries,
-         eliminating the need to call
-         ``QPDFPageDocumentHelper::pushInheritedAttributesToPage`` in
-         this case.
+    - Fix long-standing limitation of
+      ``QPDFPageObjectHelper::getPageImages`` so that it now properly
+      reports images from inherited resources dictionaries,
+      eliminating the need to call
+      ``QPDFPageDocumentHelper::pushInheritedAttributesToPage`` in
+      this case.
 
-      -  Add method ``QPDFObjectHandle::getUniqueResourceName`` for
-         finding an unused name in a resource dictionary.
+    - Add method ``QPDFObjectHandle::getUniqueResourceName`` for
+      finding an unused name in a resource dictionary.
 
-      -  Add method ``QPDFPageObjectHelper::getFormXObjectForPage`` for
-         generating a form XObject equivalent to a page. The resulting
-         object can be used in the same file or copied to another file
-         with ``copyForeignObject``. This can be useful for implementing
-         underlay, overlay, n-up, thumbnails, or any other functionality
-         requiring replication of pages in other contexts.
+    - Add method ``QPDFPageObjectHelper::getFormXObjectForPage`` for
+      generating a form XObject equivalent to a page. The resulting
+      object can be used in the same file or copied to another file
+      with ``copyForeignObject``. This can be useful for implementing
+      underlay, overlay, n-up, thumbnails, or any other functionality
+      requiring replication of pages in other contexts.
 
-      -  Add method ``QPDFPageObjectHelper::placeFormXObject`` for
-         generating content stream text that places a given form XObject
-         on a page, centered and fit within a specified rectangle. This
-         method takes care of computing the proper transformation matrix
-         and may optionally compensate for rotation or scaling of the
-         destination page.
+    - Add method ``QPDFPageObjectHelper::placeFormXObject`` for
+      generating content stream text that places a given form XObject
+      on a page, centered and fit within a specified rectangle. This
+      method takes care of computing the proper transformation matrix
+      and may optionally compensate for rotation or scaling of the
+      destination page.
 
-   -  Build Improvements
+  - Build Improvements
 
-      -  Add new configure option
-         @1@option@1@--enable-avoid-windows-handle@2@option@2@, which
-         causes the preprocessor symbol ``AVOID_WINDOWS_HANDLE`` to be
-         defined. When defined, qpdf will avoid referencing the Windows
-         ``HANDLE`` type, which is disallowed with certain versions of
-         the Windows SDK.
+    - Add new configure option
+      @1@option@1@--enable-avoid-windows-handle@2@option@2@, which
+      causes the preprocessor symbol ``AVOID_WINDOWS_HANDLE`` to be
+      defined. When defined, qpdf will avoid referencing the Windows
+      ``HANDLE`` type, which is disallowed with certain versions of
+      the Windows SDK.
 
-      -  For Windows builds, attempt to determine what options, if any,
-         have to be passed to the compiler and linker to enable use of
-         ``wmain``. This causes the preprocessor symbol
-         ``WINDOWS_WMAIN`` to be defined. If you do your own builds with
-         other compilers, you can define this symbol to cause ``wmain``
-         to be used. This is needed to allow the Windows
-         @1@command@1@qpdf@2@command@2@ command to receive Unicode
-         command-line options.
+    - For Windows builds, attempt to determine what options, if any,
+      have to be passed to the compiler and linker to enable use of
+      ``wmain``. This causes the preprocessor symbol
+      ``WINDOWS_WMAIN`` to be defined. If you do your own builds with
+      other compilers, you can define this symbol to cause ``wmain``
+      to be used. This is needed to allow the Windows
+      @1@command@1@qpdf@2@command@2@ command to receive Unicode
+      command-line options.
 
 8.3.0: January 7, 2019
-   -  Command-line Enhancements
+  - Command-line Enhancements
 
-      -  Shell completion: you can now use eval @1@command@1@$(qpdf
-         --completion-bash)@2@command@2@ and eval @1@command@1@$(qpdf
-         --completion-zsh)@2@command@2@ to enable shell completion for
-         bash and zsh.
+    - Shell completion: you can now use eval @1@command@1@$(qpdf
+      --completion-bash)@2@command@2@ and eval @1@command@1@$(qpdf
+      --completion-zsh)@2@command@2@ to enable shell completion for
+      bash and zsh.
 
-      -  Page numbers (also known as page labels) are now preserved when
-         merging and splitting files with the
-         @1@option@1@--pages@2@option@2@ and
-         @1@option@1@--split-pages@2@option@2@ options.
+    - Page numbers (also known as page labels) are now preserved when
+      merging and splitting files with the
+      @1@option@1@--pages@2@option@2@ and
+      @1@option@1@--split-pages@2@option@2@ options.
 
-      -  Bookmarks are partially preserved when splitting pages with the
-         @1@option@1@--split-pages@2@option@2@ option. Specifically, the
-         outlines dictionary and some supporting metadata are copied
-         into the split files. The result is that all bookmarks from the
-         original file appear, those that point to pages that are
-         preserved work, and those that point to pages that are not
-         preserved don't do anything. This is an interim step toward
-         proper support for bookmarks in splitting and merging
-         operations.
+    - Bookmarks are partially preserved when splitting pages with the
+      @1@option@1@--split-pages@2@option@2@ option. Specifically, the
+      outlines dictionary and some supporting metadata are copied
+      into the split files. The result is that all bookmarks from the
+      original file appear, those that point to pages that are
+      preserved work, and those that point to pages that are not
+      preserved don't do anything. This is an interim step toward
+      proper support for bookmarks in splitting and merging
+      operations.
 
-      -  Page collation: add new option
-         @1@option@1@--collate@2@option@2@. When specified, the
-         semantics of @1@option@1@--pages@2@option@2@ change from
-         concatenation to collation. See `Page Selection
-         Options <#ref.page-selection>`__ for examples and discussion.
+    - Page collation: add new option
+      @1@option@1@--collate@2@option@2@. When specified, the
+      semantics of @1@option@1@--pages@2@option@2@ change from
+      concatenation to collation. See `Page Selection
+      Options <#ref.page-selection>`__ for examples and discussion.
 
-      -  Generation of information in JSON format, primarily to
-         facilitate use of qpdf from languages other than C++. Add new
-         options @1@option@1@--json@2@option@2@,
-         @1@option@1@--json-key@2@option@2@, and
-         @1@option@1@--json-object@2@option@2@ to generate a JSON
-         representation of the PDF file. Run @1@command@1@qpdf
-         --json-help@2@command@2@ to get a description of the JSON
-         format. For more information, see `QPDF JSON <#ref.json>`__.
+    - Generation of information in JSON format, primarily to
+      facilitate use of qpdf from languages other than C++. Add new
+      options @1@option@1@--json@2@option@2@,
+      @1@option@1@--json-key@2@option@2@, and
+      @1@option@1@--json-object@2@option@2@ to generate a JSON
+      representation of the PDF file. Run @1@command@1@qpdf
+      --json-help@2@command@2@ to get a description of the JSON
+      format. For more information, see `QPDF JSON <#ref.json>`__.
 
-      -  The @1@option@1@--generate-appearances@2@option@2@ flag will
-         cause qpdf to generate appearances for form fields if the PDF
-         file indicates that form field appearances are out of date.
-         This can happen when PDF forms are filled in by a program that
-         doesn't know how to regenerate the appearances of the filled-in
-         fields.
+    - The @1@option@1@--generate-appearances@2@option@2@ flag will
+      cause qpdf to generate appearances for form fields if the PDF
+      file indicates that form field appearances are out of date.
+      This can happen when PDF forms are filled in by a program that
+      doesn't know how to regenerate the appearances of the filled-in
+      fields.
 
-      -  The @1@option@1@--flatten-annotations@2@option@2@ flag can be
-         used to *flatten* annotations, including form fields.
-         Ordinarily, annotations are drawn separately from the page.
-         Flattening annotations is the process of combining their
-         appearances into the page's contents. You might want to do this
-         if you are going to rotate or combine pages using a tool that
-         doesn't understand about annotations. You may also want to use
-         @1@option@1@--generate-appearances@2@option@2@ when using this
-         flag since annotations for outdated form fields are not
-         flattened as that would cause loss of information.
+    - The @1@option@1@--flatten-annotations@2@option@2@ flag can be
+      used to *flatten* annotations, including form fields.
+      Ordinarily, annotations are drawn separately from the page.
+      Flattening annotations is the process of combining their
+      appearances into the page's contents. You might want to do this
+      if you are going to rotate or combine pages using a tool that
+      doesn't understand about annotations. You may also want to use
+      @1@option@1@--generate-appearances@2@option@2@ when using this
+      flag since annotations for outdated form fields are not
+      flattened as that would cause loss of information.
 
-      -  The @1@option@1@--optimize-images@2@option@2@ flag tells qpdf
-         to recompresses every image using DCT (JPEG) compression as
-         long as the image is not already compressed with lossy
-         compression and recompressing the image reduces its size. The
-         additional options @1@option@1@--oi-min-width@2@option@2@,
-         @1@option@1@--oi-min-height@2@option@2@, and
-         @1@option@1@--oi-min-area@2@option@2@ prevent recompression of
-         images whose width, height, or pixel area (width × height) are
-         below a specified threshold.
+    - The @1@option@1@--optimize-images@2@option@2@ flag tells qpdf
+      to recompresses every image using DCT (JPEG) compression as
+      long as the image is not already compressed with lossy
+      compression and recompressing the image reduces its size. The
+      additional options @1@option@1@--oi-min-width@2@option@2@,
+      @1@option@1@--oi-min-height@2@option@2@, and
+      @1@option@1@--oi-min-area@2@option@2@ prevent recompression of
+      images whose width, height, or pixel area (width × height) are
+      below a specified threshold.
 
-      -  The @1@option@1@--show-object@2@option@2@ option can now be
-         given as @1@option@1@--show-object=trailer@2@option@2@ to show
-         the trailer dictionary.
+    - The @1@option@1@--show-object@2@option@2@ option can now be
+      given as @1@option@1@--show-object=trailer@2@option@2@ to show
+      the trailer dictionary.
 
-   -  Bug Fixes and Enhancements
+  - Bug Fixes and Enhancements
 
-      -  QPDF now automatically detects and recovers from dangling
-         references. If a PDF file contained an indirect reference to a
-         non-existent object, which is valid, when adding a new object
-         to the file, it was possible for the new object to take the
-         object ID of the dangling reference, thereby causing the
-         dangling reference to point to the new object. This case is now
-         prevented.
+    - QPDF now automatically detects and recovers from dangling
+      references. If a PDF file contained an indirect reference to a
+      non-existent object, which is valid, when adding a new object
+      to the file, it was possible for the new object to take the
+      object ID of the dangling reference, thereby causing the
+      dangling reference to point to the new object. This case is now
+      prevented.
 
-      -  Fixes to form field setting code: strings are always written in
-         UTF-16 format, and checkboxes and radio buttons are handled
-         properly with respect to synchronization of values and
-         appearance states.
+    - Fixes to form field setting code: strings are always written in
+      UTF-16 format, and checkboxes and radio buttons are handled
+      properly with respect to synchronization of values and
+      appearance states.
 
-      -  The ``QPDF::checkLinearization()`` no longer causes the program
-         to crash when it detects problems with linearization data.
-         Instead, it issues a normal warning or error.
+    - The ``QPDF::checkLinearization()`` no longer causes the program
+      to crash when it detects problems with linearization data.
+      Instead, it issues a normal warning or error.
 
-      -  Ordinarily qpdf treats an argument of the form
-         @1@option@1@@file@2@option@2@ to mean that command-line options
-         should be read from @1@filename@1@file@2@filename@2@. Now, if
-         @1@filename@1@file@2@filename@2@ does not exist but
-         @1@filename@1@@file@2@filename@2@ does, qpdf will treat
-         @1@filename@1@@file@2@filename@2@ as a regular option. This
-         makes it possible to work more easily with PDF files whose
-         names happen to start with the ``@`` character.
+    - Ordinarily qpdf treats an argument of the form
+      @1@option@1@@file@2@option@2@ to mean that command-line options
+      should be read from @1@filename@1@file@2@filename@2@. Now, if
+      @1@filename@1@file@2@filename@2@ does not exist but
+      @1@filename@1@@file@2@filename@2@ does, qpdf will treat
+      @1@filename@1@@file@2@filename@2@ as a regular option. This
+      makes it possible to work more easily with PDF files whose
+      names happen to start with the ``@`` character.
 
-   -  Library Enhancements
+  - Library Enhancements
 
-      -  Remove the restriction in most cases that the source QPDF
-         object used in a ``QPDF::copyForeignObject`` call has to stick
-         around until the destination QPDF is written. The exceptional
-         case is when the source stream gets is data using a
-         QPDFObjectHandle::StreamDataProvider. For a more in-depth
-         discussion, see comments around ``copyForeignObject`` in
-         @1@filename@1@QPDF.hh@2@filename@2@.
+    - Remove the restriction in most cases that the source QPDF
+      object used in a ``QPDF::copyForeignObject`` call has to stick
+      around until the destination QPDF is written. The exceptional
+      case is when the source stream gets is data using a
+      QPDFObjectHandle::StreamDataProvider. For a more in-depth
+      discussion, see comments around ``copyForeignObject`` in
+      @1@filename@1@QPDF.hh@2@filename@2@.
 
-      -  Add new method ``QPDFWriter::getFinalVersion()``, which returns
-         the PDF version that will ultimately be written to the final
-         file. See comments in @1@filename@1@QPDFWriter.hh@2@filename@2@
-         for some restrictions on its use.
+    - Add new method ``QPDFWriter::getFinalVersion()``, which returns
+      the PDF version that will ultimately be written to the final
+      file. See comments in @1@filename@1@QPDFWriter.hh@2@filename@2@
+      for some restrictions on its use.
 
-      -  Add several methods for transcoding strings to some of the
-         character sets used in PDF files: ``QUtil::utf8_to_ascii``,
-         ``QUtil::utf8_to_win_ansi``, ``QUtil::utf8_to_mac_roman``, and
-         ``QUtil::utf8_to_utf16``. For the single-byte encodings that
-         support only a limited character sets, these methods replace
-         unsupported characters with a specified substitute.
+    - Add several methods for transcoding strings to some of the
+      character sets used in PDF files: ``QUtil::utf8_to_ascii``,
+      ``QUtil::utf8_to_win_ansi``, ``QUtil::utf8_to_mac_roman``, and
+      ``QUtil::utf8_to_utf16``. For the single-byte encodings that
+      support only a limited character sets, these methods replace
+      unsupported characters with a specified substitute.
 
-      -  Add new methods to ``QPDFAnnotationObjectHelper`` and
-         ``QPDFFormFieldObjectHelper`` for querying flags and
-         interpretation of different field types. Define constants in
-         @1@filename@1@qpdf/Constants.h@2@filename@2@ to help with
-         interpretation of flag values.
+    - Add new methods to ``QPDFAnnotationObjectHelper`` and
+      ``QPDFFormFieldObjectHelper`` for querying flags and
+      interpretation of different field types. Define constants in
+      @1@filename@1@qpdf/Constants.h@2@filename@2@ to help with
+      interpretation of flag values.
 
-      -  Add new methods
-         ``QPDFAcroFormDocumentHelper::generateAppearancesIfNeeded`` and
-         ``QPDFFormFieldObjectHelper::generateAppearance`` for
-         generating appearance streams. See discussion in
-         @1@filename@1@QPDFFormFieldObjectHelper.hh@2@filename@2@ for
-         limitations.
+    - Add new methods
+      ``QPDFAcroFormDocumentHelper::generateAppearancesIfNeeded`` and
+      ``QPDFFormFieldObjectHelper::generateAppearance`` for
+      generating appearance streams. See discussion in
+      @1@filename@1@QPDFFormFieldObjectHelper.hh@2@filename@2@ for
+      limitations.
 
-      -  Add two new helper functions for dealing with resource
-         dictionaries: ``QPDFObjectHandle::getResourceNames()`` returns
-         a list of all second-level keys, which correspond to the names
-         of resources, and ``QPDFObjectHandle::mergeResources()`` merges
-         two resources dictionaries as long as they have non-conflicting
-         keys. These methods are useful for certain types of objects
-         that resolve resources from multiple places, such as form
-         fields.
+    - Add two new helper functions for dealing with resource
+      dictionaries: ``QPDFObjectHandle::getResourceNames()`` returns
+      a list of all second-level keys, which correspond to the names
+      of resources, and ``QPDFObjectHandle::mergeResources()`` merges
+      two resources dictionaries as long as they have non-conflicting
+      keys. These methods are useful for certain types of objects
+      that resolve resources from multiple places, such as form
+      fields.
 
-      -  Add methods ``QPDFPageDocumentHelper::flattenAnnotations()``
-         and
-         ``QPDFAnnotationObjectHelper::getPageContentForAppearance()``
-         for handling low-level details of annotation flattening.
+    - Add methods ``QPDFPageDocumentHelper::flattenAnnotations()``
+      and
+      ``QPDFAnnotationObjectHelper::getPageContentForAppearance()``
+      for handling low-level details of annotation flattening.
 
-      -  Add new helper classes: ``QPDFOutlineDocumentHelper``,
-         ``QPDFOutlineObjectHelper``, ``QPDFPageLabelDocumentHelper``,
-         ``QPDFNameTreeObjectHelper``, and
-         ``QPDFNumberTreeObjectHelper``.
+    - Add new helper classes: ``QPDFOutlineDocumentHelper``,
+      ``QPDFOutlineObjectHelper``, ``QPDFPageLabelDocumentHelper``,
+      ``QPDFNameTreeObjectHelper``, and
+      ``QPDFNumberTreeObjectHelper``.
 
-      -  Add method ``QPDFObjectHandle::getJSON()`` that returns a JSON
-         representation of the object. Call ``serialize()`` on the
-         result to convert it to a string.
+    - Add method ``QPDFObjectHandle::getJSON()`` that returns a JSON
+      representation of the object. Call ``serialize()`` on the
+      result to convert it to a string.
 
-      -  Add a simple JSON serializer. This is not a complete or
-         general-purpose JSON library. It allows assembly and
-         serialization of JSON structures with some restrictions, which
-         are described in the header file. This is the serializer used
-         by qpdf's new JSON representation.
+    - Add a simple JSON serializer. This is not a complete or
+      general-purpose JSON library. It allows assembly and
+      serialization of JSON structures with some restrictions, which
+      are described in the header file. This is the serializer used
+      by qpdf's new JSON representation.
 
-      -  Add new ``QPDFObjectHandle::Matrix`` class along with a few
-         convenience methods for dealing with six-element numerical
-         arrays as matrices.
+    - Add new ``QPDFObjectHandle::Matrix`` class along with a few
+      convenience methods for dealing with six-element numerical
+      arrays as matrices.
 
-      -  Add new method ``QPDFObjectHandle::wrapInArray``, which returns
-         the object itself if it is an array, or an array containing the
-         object otherwise. This is a common construct in PDF. This
-         method prevents you from having to explicitly test whether
-         something is a single element or an array.
+    - Add new method ``QPDFObjectHandle::wrapInArray``, which returns
+      the object itself if it is an array, or an array containing the
+      object otherwise. This is a common construct in PDF. This
+      method prevents you from having to explicitly test whether
+      something is a single element or an array.
 
-   -  Build Improvements
+  - Build Improvements
 
-      -  It is no longer necessary to run
-         @1@command@1@autogen.sh@2@command@2@ to build from a pristine
-         checkout. Automatically generated files are now committed so
-         that it is possible to build on platforms without autoconf
-         directly from a clean checkout of the repository. The
-         @1@command@1@configure@2@command@2@ script detects if the files
-         are out of date when it also determines that the tools are
-         present to regenerate them.
+    - It is no longer necessary to run
+      @1@command@1@autogen.sh@2@command@2@ to build from a pristine
+      checkout. Automatically generated files are now committed so
+      that it is possible to build on platforms without autoconf
+      directly from a clean checkout of the repository. The
+      @1@command@1@configure@2@command@2@ script detects if the files
+      are out of date when it also determines that the tools are
+      present to regenerate them.
 
-      -  Pull requests and the master branch are now built automatically
-         in `Azure
-         Pipelines <https://dev.azure.com/qpdf/qpdf/_build>`__, which is
-         free for open source projects. The build includes Linux, mac,
-         Windows 32-bit and 64-bit with mingw and MSVC, and an AppImage
-         build. Official qpdf releases are now built with Azure
-         Pipelines.
+    - Pull requests and the master branch are now built automatically
+      in `Azure
+      Pipelines <https://dev.azure.com/qpdf/qpdf/_build>`__, which is
+      free for open source projects. The build includes Linux, mac,
+      Windows 32-bit and 64-bit with mingw and MSVC, and an AppImage
+      build. Official qpdf releases are now built with Azure
+      Pipelines.
 
-   -  Notes for Packagers
+  - Notes for Packagers
 
-      -  A new section has been added to the documentation with notes
-         for packagers. Please see `Notes for
-         Packagers <#ref.packaging>`__.
+    - A new section has been added to the documentation with notes
+      for packagers. Please see `Notes for
+      Packagers <#ref.packaging>`__.
 
-      -  The qpdf detects out-of-date automatically generated files. If
-         your packaging system automatically refreshes libtool or
-         autoconf files, it could cause this check to fail. To avoid
-         this problem, pass
-         @1@option@1@--disable-check-autofiles@2@option@2@ to
-         @1@command@1@configure@2@command@2@.
+    - The qpdf detects out-of-date automatically generated files. If
+      your packaging system automatically refreshes libtool or
+      autoconf files, it could cause this check to fail. To avoid
+      this problem, pass
+      @1@option@1@--disable-check-autofiles@2@option@2@ to
+      @1@command@1@configure@2@command@2@.
 
-      -  If you would like to have qpdf completion enabled
-         automatically, you can install completion files in the
-         distribution's default location. You can find sample completion
-         files to install in the @1@filename@1@completions@2@filename@2@
-         directory.
+    - If you would like to have qpdf completion enabled
+      automatically, you can install completion files in the
+      distribution's default location. You can find sample completion
+      files to install in the @1@filename@1@completions@2@filename@2@
+      directory.
 
 8.2.1: August 18, 2018
-   -  Command-line Enhancements
+  - Command-line Enhancements
 
-      -  Add
-         @1@option@1@--keep-files-open=@1@replaceable@1@[yn]@2@replaceable@2@@2@option@2@
-         to override default determination of whether to keep files open
-         when merging. Please see the discussion of
-         @1@option@1@--keep-files-open@2@option@2@ in `Basic
-         Options <#ref.basic-options>`__ for additional details.
+    - Add
+      @1@option@1@--keep-files-open=@1@replaceable@1@[yn]@2@replaceable@2@@2@option@2@
+      to override default determination of whether to keep files open
+      when merging. Please see the discussion of
+      @1@option@1@--keep-files-open@2@option@2@ in `Basic
+      Options <#ref.basic-options>`__ for additional details.
 
 8.2.0: August 16, 2018
-   -  Command-line Enhancements
+  - Command-line Enhancements
 
-      -  Add @1@option@1@--no-warn@2@option@2@ option to suppress
-         issuing warning messages. If there are any conditions that
-         would have caused warnings to be issued, the exit status is
-         still 3.
+    - Add @1@option@1@--no-warn@2@option@2@ option to suppress
+      issuing warning messages. If there are any conditions that
+      would have caused warnings to be issued, the exit status is
+      still 3.
 
-   -  Bug Fixes and Optimizations
+  - Bug Fixes and Optimizations
 
-      -  Performance fix: optimize page merging operation to avoid
-         unnecessary open/close calls on files being merged. This solves
-         a dramatic slow-down that was observed when merging certain
-         types of files.
+    - Performance fix: optimize page merging operation to avoid
+      unnecessary open/close calls on files being merged. This solves
+      a dramatic slow-down that was observed when merging certain
+      types of files.
 
-      -  Optimize how memory was used for the TIFF predictor,
-         drastically improving performance and memory usage for files
-         containing high-resolution images compressed with Flate using
-         the TIFF predictor.
+    - Optimize how memory was used for the TIFF predictor,
+      drastically improving performance and memory usage for files
+      containing high-resolution images compressed with Flate using
+      the TIFF predictor.
 
-      -  Bug fix: end of line characters were not properly handled
-         inside strings in some cases.
+    - Bug fix: end of line characters were not properly handled
+      inside strings in some cases.
 
-      -  Bug fix: using @1@option@1@--progress@2@option@2@ on very small
-         files could cause an infinite loop.
+    - Bug fix: using @1@option@1@--progress@2@option@2@ on very small
+      files could cause an infinite loop.
 
-   -  API enhancements
+  - API enhancements
 
-      -  Add new class ``QPDFSystemError``, derived from
-         ``std::runtime_error``, which is now thrown by
-         ``QUtil::throw_system_error``. This enables the triggering
-         ``errno`` value to be retrieved.
+    - Add new class ``QPDFSystemError``, derived from
+      ``std::runtime_error``, which is now thrown by
+      ``QUtil::throw_system_error``. This enables the triggering
+      ``errno`` value to be retrieved.
 
-      -  Add ``ClosedFileInputSource::stayOpen`` method, enabling a
-         ``ClosedFileInputSource`` to stay open during manually
-         indicated periods of high activity, thus reducing the overhead
-         of frequent open/close operations.
+    - Add ``ClosedFileInputSource::stayOpen`` method, enabling a
+      ``ClosedFileInputSource`` to stay open during manually
+      indicated periods of high activity, thus reducing the overhead
+      of frequent open/close operations.
 
-   -  Build Changes
+  - Build Changes
 
-      -  For the mingw builds, change the name of the DLL import library
-         from @1@filename@1@libqpdf.a@2@filename@2@ to
-         @1@filename@1@libqpdf.dll.a@2@filename@2@ to more accurately
-         reflect that it is an import library rather than a static
-         library. This potentially clears the way for supporting a
-         static library in the future, though presently, the qpdf
-         Windows build only builds the DLL and executables.
+    - For the mingw builds, change the name of the DLL import library
+      from @1@filename@1@libqpdf.a@2@filename@2@ to
+      @1@filename@1@libqpdf.dll.a@2@filename@2@ to more accurately
+      reflect that it is an import library rather than a static
+      library. This potentially clears the way for supporting a
+      static library in the future, though presently, the qpdf
+      Windows build only builds the DLL and executables.
 
 8.1.0: June 23, 2018
-   -  Usability Improvements
+  - Usability Improvements
 
-      -  When splitting files, qpdf detects fonts and images that the
-         document metadata claims are referenced from a page but are not
-         actually referenced and omits them from the output file. This
-         change can cause a significant reduction in the size of split
-         PDF files for files created by some software packages. In some
-         cases, it can also make page splitting slower. Prior versions
-         of qpdf would believe the document metadata and sometimes
-         include all the images from all the other pages even though the
-         pages were no longer present. In the unlikely event that the
-         old behavior should be desired, or if you have a case where
-         page splitting is very slow, the old behavior (and speed) can
-         be enabled by specifying
-         @1@option@1@--preserve-unreferenced-resources@2@option@2@. For
-         additional details, please see `Advanced Transformation
-         Options <#ref.advanced-transformation>`__.
+    - When splitting files, qpdf detects fonts and images that the
+      document metadata claims are referenced from a page but are not
+      actually referenced and omits them from the output file. This
+      change can cause a significant reduction in the size of split
+      PDF files for files created by some software packages. In some
+      cases, it can also make page splitting slower. Prior versions
+      of qpdf would believe the document metadata and sometimes
+      include all the images from all the other pages even though the
+      pages were no longer present. In the unlikely event that the
+      old behavior should be desired, or if you have a case where
+      page splitting is very slow, the old behavior (and speed) can
+      be enabled by specifying
+      @1@option@1@--preserve-unreferenced-resources@2@option@2@. For
+      additional details, please see `Advanced Transformation
+      Options <#ref.advanced-transformation>`__.
 
-      -  When merging multiple PDF files, qpdf no longer leaves all the
-         files open. This makes it possible to merge numbers of files
-         that may exceed the operating system's limit for the maximum
-         number of open files.
+    - When merging multiple PDF files, qpdf no longer leaves all the
+      files open. This makes it possible to merge numbers of files
+      that may exceed the operating system's limit for the maximum
+      number of open files.
 
-      -  The @1@option@1@--rotate@2@option@2@ option's syntax has been
-         extended to make the page range optional. If you specify
-         @1@option@1@--rotate=@1@replaceable@1@angle@2@replaceable@2@@2@option@2@
-         without specifying a page range, the rotation will be applied
-         to all pages. This can be especially useful for adjusting a PDF
-         created from a multi-page document that was scanned upside
-         down.
+    - The @1@option@1@--rotate@2@option@2@ option's syntax has been
+      extended to make the page range optional. If you specify
+      @1@option@1@--rotate=@1@replaceable@1@angle@2@replaceable@2@@2@option@2@
+      without specifying a page range, the rotation will be applied
+      to all pages. This can be especially useful for adjusting a PDF
+      created from a multi-page document that was scanned upside
+      down.
 
-      -  When merging multiple files, the
-         @1@option@1@--verbose@2@option@2@ option now prints information
-         about each file as it operates on that file.
+    - When merging multiple files, the
+      @1@option@1@--verbose@2@option@2@ option now prints information
+      about each file as it operates on that file.
 
-      -  When the @1@option@1@--progress@2@option@2@ option is
-         specified, qpdf will print a running indicator of its best
-         guess at how far through the writing process it is. Note that,
-         as with all progress meters, it's an approximation. This option
-         is implemented in a way that makes it useful for software that
-         uses the qpdf library; see API Enhancements below.
+    - When the @1@option@1@--progress@2@option@2@ option is
+      specified, qpdf will print a running indicator of its best
+      guess at how far through the writing process it is. Note that,
+      as with all progress meters, it's an approximation. This option
+      is implemented in a way that makes it useful for software that
+      uses the qpdf library; see API Enhancements below.
 
-   -  Bug Fixes
+  - Bug Fixes
 
-      -  Properly decrypt files that use revision 3 of the standard
-         security handler but use 40 bit keys (even though revision 3
-         supports 128-bit keys).
+    - Properly decrypt files that use revision 3 of the standard
+      security handler but use 40 bit keys (even though revision 3
+      supports 128-bit keys).
 
-      -  Limit depth of nested data structures to prevent crashes from
-         certain types of malformed (malicious) PDFs.
+    - Limit depth of nested data structures to prevent crashes from
+      certain types of malformed (malicious) PDFs.
 
-      -  In "newline before endstream" mode, insert the required extra
-         newline before the ``endstream`` at the end of object streams.
-         This one case was previously omitted.
+    - In "newline before endstream" mode, insert the required extra
+      newline before the ``endstream`` at the end of object streams.
+      This one case was previously omitted.
 
-   -  API Enhancements
+  - API Enhancements
 
-      -  The first round of higher level "helper" interfaces has been
-         introduced. These are designed to provide a more convenient way
-         of interacting with certain document features than using
-         ``QPDFObjectHandle`` directly. For details on helpers, see
-         `Helper Classes <#ref.helper-classes>`__. Specific additional
-         interfaces are described below.
+    - The first round of higher level "helper" interfaces has been
+      introduced. These are designed to provide a more convenient way
+      of interacting with certain document features than using
+      ``QPDFObjectHandle`` directly. For details on helpers, see
+      `Helper Classes <#ref.helper-classes>`__. Specific additional
+      interfaces are described below.
 
-      -  Add two new document helper classes: ``QPDFPageDocumentHelper``
-         for working with pages, and ``QPDFAcroFormDocumentHelper`` for
-         working with interactive forms. No old methods have been
-         removed, but ``QPDFPageDocumentHelper`` is now the preferred
-         way to perform operations on pages rather than calling the old
-         methods in ``QPDFObjectHandle`` and ``QPDF`` directly. Comments
-         in the header files direct you to the new interfaces. Please
-         see the header files and @1@filename@1@ChangeLog@2@filename@2@
-         for additional details.
+    - Add two new document helper classes: ``QPDFPageDocumentHelper``
+      for working with pages, and ``QPDFAcroFormDocumentHelper`` for
+      working with interactive forms. No old methods have been
+      removed, but ``QPDFPageDocumentHelper`` is now the preferred
+      way to perform operations on pages rather than calling the old
+      methods in ``QPDFObjectHandle`` and ``QPDF`` directly. Comments
+      in the header files direct you to the new interfaces. Please
+      see the header files and @1@filename@1@ChangeLog@2@filename@2@
+      for additional details.
 
-      -  Add three new object helper class: ``QPDFPageObjectHelper`` for
-         pages, ``QPDFFormFieldObjectHelper`` for interactive form
-         fields, and ``QPDFAnnotationObjectHelper`` for annotations. All
-         three classes are fairly sparse at the moment, but they have
-         some useful, basic functionality.
+    - Add three new object helper class: ``QPDFPageObjectHelper`` for
+      pages, ``QPDFFormFieldObjectHelper`` for interactive form
+      fields, and ``QPDFAnnotationObjectHelper`` for annotations. All
+      three classes are fairly sparse at the moment, but they have
+      some useful, basic functionality.
 
-      -  A new example program
-         @1@filename@1@examples/pdf-set-form-values.cc@2@filename@2@ has
-         been added that illustrates use of the new document and object
-         helpers.
+    - A new example program
+      @1@filename@1@examples/pdf-set-form-values.cc@2@filename@2@ has
+      been added that illustrates use of the new document and object
+      helpers.
 
-      -  The method ``QPDFWriter::registerProgressReporter`` has been
-         added. This method allows you to register a function that is
-         called by ``QPDFWriter`` to update your idea of the percentage
-         it thinks it is through writing its output. Client programs can
-         use this to implement reasonably accurate progress meters. The
-         @1@command@1@qpdf@2@command@2@ command line tool uses this to
-         implement its @1@option@1@--progress@2@option@2@ option.
+    - The method ``QPDFWriter::registerProgressReporter`` has been
+      added. This method allows you to register a function that is
+      called by ``QPDFWriter`` to update your idea of the percentage
+      it thinks it is through writing its output. Client programs can
+      use this to implement reasonably accurate progress meters. The
+      @1@command@1@qpdf@2@command@2@ command line tool uses this to
+      implement its @1@option@1@--progress@2@option@2@ option.
 
-      -  New methods ``QPDFObjectHandle::newUnicodeString`` and
-         ``QPDFObject::unparseBinary`` have been added to allow for more
-         convenient creation of strings that are explicitly encoded
-         using big-endian UTF-16. This is useful for creating strings
-         that appear outside of content streams, such as labels, form
-         fields, outlines, document metadata, etc.
+    - New methods ``QPDFObjectHandle::newUnicodeString`` and
+      ``QPDFObject::unparseBinary`` have been added to allow for more
+      convenient creation of strings that are explicitly encoded
+      using big-endian UTF-16. This is useful for creating strings
+      that appear outside of content streams, such as labels, form
+      fields, outlines, document metadata, etc.
 
-      -  A new class ``QPDFObjectHandle::Rectangle`` has been added to
-         ease working with PDF rectangles, which are just arrays of four
-         numeric values.
+    - A new class ``QPDFObjectHandle::Rectangle`` has been added to
+      ease working with PDF rectangles, which are just arrays of four
+      numeric values.
 
 8.0.2: March 6, 2018
-   -  When a loop is detected while following cross reference streams or
-      tables, treat this as damage instead of silently ignoring the
-      previous table. This prevents loss of otherwise recoverable data
-      in some damaged files.
+  - When a loop is detected while following cross reference streams or
+    tables, treat this as damage instead of silently ignoring the
+    previous table. This prevents loss of otherwise recoverable data
+    in some damaged files.
 
-   -  Properly handle pages with no contents.
+  - Properly handle pages with no contents.
 
 8.0.1: March 4, 2018
-   -  Disregard data check errors when uncompressing ``/FlateDecode``
-      streams. This is consistent with most other PDF readers and allows
-      qpdf to recover data from another class of malformed PDF files.
+  - Disregard data check errors when uncompressing ``/FlateDecode``
+    streams. This is consistent with most other PDF readers and allows
+    qpdf to recover data from another class of malformed PDF files.
 
-   -  On the command line when specifying page ranges, support preceding
-      a page number by "r" to indicate that it should be counted from
-      the end. For example, the range ``r3-r1`` would indicate the last
-      three pages of a document.
+  - On the command line when specifying page ranges, support preceding
+    a page number by "r" to indicate that it should be counted from
+    the end. For example, the range ``r3-r1`` would indicate the last
+    three pages of a document.
 
 8.0.0: February 25, 2018
-   -  Packaging and Distribution Changes
+  - Packaging and Distribution Changes
 
-      -  QPDF is now distributed as an
-         `AppImage <https://appimage.org/>`__ in addition to all the
-         other ways it is distributed. The AppImage can be found in the
-         download area with the other packages. Thanks to Kurt Pfeifle
-         and Simon Peter for their contributions.
+    - QPDF is now distributed as an
+      `AppImage <https://appimage.org/>`__ in addition to all the
+      other ways it is distributed. The AppImage can be found in the
+      download area with the other packages. Thanks to Kurt Pfeifle
+      and Simon Peter for their contributions.
 
-   -  Bug Fixes
+  - Bug Fixes
 
-      -  ``QPDFObjectHandle::getUTF8Val`` now properly treats
-         non-Unicode strings as encoded with PDF Doc Encoding.
+    - ``QPDFObjectHandle::getUTF8Val`` now properly treats
+      non-Unicode strings as encoded with PDF Doc Encoding.
 
-      -  Improvements to handling of objects in PDF files that are not
-         of the expected type. In most cases, qpdf will be able to warn
-         for such cases rather than fail with an exception. Previous
-         versions of qpdf would sometimes fail with errors such as
-         "operation for dictionary object attempted on object of wrong
-         type". This situation should be mostly or entirely eliminated
-         now.
+    - Improvements to handling of objects in PDF files that are not
+      of the expected type. In most cases, qpdf will be able to warn
+      for such cases rather than fail with an exception. Previous
+      versions of qpdf would sometimes fail with errors such as
+      "operation for dictionary object attempted on object of wrong
+      type". This situation should be mostly or entirely eliminated
+      now.
 
-   -  Enhancements to the @1@command@1@qpdf@2@command@2@ Command-line
-      Tool. All new options listed here are documented in more detail in
-      `Running QPDF <#ref.using>`__.
+  - Enhancements to the @1@command@1@qpdf@2@command@2@ Command-line
+    Tool. All new options listed here are documented in more detail in
+    `Running QPDF <#ref.using>`__.
 
-      -  The option
-         @1@option@1@--linearize-pass1=@1@replaceable@1@file@2@replaceable@2@@2@option@2@
-         has been added for debugging qpdf's linearization code.
+    - The option
+      @1@option@1@--linearize-pass1=@1@replaceable@1@file@2@replaceable@2@@2@option@2@
+      has been added for debugging qpdf's linearization code.
 
-      -  The option @1@option@1@--coalesce-contents@2@option@2@ can be
-         used to combine content streams of a page whose contents are an
-         array of streams into a single stream.
+    - The option @1@option@1@--coalesce-contents@2@option@2@ can be
+      used to combine content streams of a page whose contents are an
+      array of streams into a single stream.
 
-   -  API Enhancements. All new API calls are documented in their
-      respective classes' header files. There are no non-compatible
-      changes to the API.
+  - API Enhancements. All new API calls are documented in their
+    respective classes' header files. There are no non-compatible
+    changes to the API.
 
-      -  Add function ``qpdf_check_pdf`` to the C API. This function
-         does basic checking that is a subset of what @1@command@1@qpdf
-         --check@2@command@2@ performs.
+    - Add function ``qpdf_check_pdf`` to the C API. This function
+      does basic checking that is a subset of what @1@command@1@qpdf
+      --check@2@command@2@ performs.
 
-      -  Major enhancements to the lexical layer of qpdf. For a complete
-         list of enhancements, please refer to the
-         @1@filename@1@ChangeLog@2@filename@2@ file. Most of the changes
-         result in improvements to qpdf's ability handle erroneous
-         files. It is also possible for programs to handle whitespace,
-         comments, and inline images as tokens.
+    - Major enhancements to the lexical layer of qpdf. For a complete
+      list of enhancements, please refer to the
+      @1@filename@1@ChangeLog@2@filename@2@ file. Most of the changes
+      result in improvements to qpdf's ability handle erroneous
+      files. It is also possible for programs to handle whitespace,
+      comments, and inline images as tokens.
 
-      -  New API for working with PDF content streams at a lexical
-         level. The new class ``QPDFObjectHandle::TokenFilter`` allows
-         the developer to provide token handlers. Token filters can be
-         used with several different methods in ``QPDFObjectHandle`` as
-         well as with a lower-level interface. See comments in
-         @1@filename@1@QPDFObjectHandle.hh@2@filename@2@ as well as the
-         new examples
-         @1@filename@1@examples/pdf-filter-tokens.cc@2@filename@2@ and
-         @1@filename@1@examples/pdf-count-strings.cc@2@filename@2@ for
-         details.
+    - New API for working with PDF content streams at a lexical
+      level. The new class ``QPDFObjectHandle::TokenFilter`` allows
+      the developer to provide token handlers. Token filters can be
+      used with several different methods in ``QPDFObjectHandle`` as
+      well as with a lower-level interface. See comments in
+      @1@filename@1@QPDFObjectHandle.hh@2@filename@2@ as well as the
+      new examples
+      @1@filename@1@examples/pdf-filter-tokens.cc@2@filename@2@ and
+      @1@filename@1@examples/pdf-count-strings.cc@2@filename@2@ for
+      details.
 
 7.1.1: February 4, 2018
-   -  Bug fix: files whose /ID fields were other than 16 bytes long can
-      now be properly linearized
+  - Bug fix: files whose /ID fields were other than 16 bytes long can
+    now be properly linearized
 
-   -  A few compile and link issues have been corrected for some
-      platforms.
+  - A few compile and link issues have been corrected for some
+    platforms.
 
 7.1.0: January 14, 2018
-   -  PDF files contain streams that may be compressed with various
-      compression algorithms which, in some cases, may be enhanced by
-      various predictor functions. Previously only the PNG up predictor
-      was supported. In this version, all the PNG predictors as well as
-      the TIFF predictor are supported. This increases the range of
-      files that qpdf is able to handle.
+  - PDF files contain streams that may be compressed with various
+    compression algorithms which, in some cases, may be enhanced by
+    various predictor functions. Previously only the PNG up predictor
+    was supported. In this version, all the PNG predictors as well as
+    the TIFF predictor are supported. This increases the range of
+    files that qpdf is able to handle.
 
-   -  QPDF now allows a raw encryption key to be specified in place of a
-      password when opening encrypted files, and will optionally display
-      the encryption key used by a file. This is a non-standard
-      operation, but it can be useful in certain situations. Please see
-      the discussion of @1@option@1@--password-is-hex-key@2@option@2@ in
-      `Basic Options <#ref.basic-options>`__ or the comments around
-      ``QPDF::setPasswordIsHexKey`` in
-      @1@filename@1@QPDF.hh@2@filename@2@ for additional details.
+  - QPDF now allows a raw encryption key to be specified in place of a
+    password when opening encrypted files, and will optionally display
+    the encryption key used by a file. This is a non-standard
+    operation, but it can be useful in certain situations. Please see
+    the discussion of @1@option@1@--password-is-hex-key@2@option@2@ in
+    `Basic Options <#ref.basic-options>`__ or the comments around
+    ``QPDF::setPasswordIsHexKey`` in
+    @1@filename@1@QPDF.hh@2@filename@2@ for additional details.
 
-   -  Bug fix: numbers ending with a trailing decimal point are now
-      properly recognized as numbers.
+  - Bug fix: numbers ending with a trailing decimal point are now
+    properly recognized as numbers.
 
-   -  Bug fix: when building qpdf from source on some platforms
-      (especially MacOS), the build could get confused by older versions
-      of qpdf installed on the system. This has been corrected.
+  - Bug fix: when building qpdf from source on some platforms
+    (especially MacOS), the build could get confused by older versions
+    of qpdf installed on the system. This has been corrected.
 
 7.0.0: September 15, 2017
-   -  Packaging and Distribution Changes
-
-      -  QPDF's primary license is now `version 2.0 of the Apache
-         License <http://www.apache.org/licenses/LICENSE-2.0>`__ rather
-         than version 2.0 of the Artistic License. You may still, at
-         your option, consider qpdf to be licensed with version 2.0 of
-         the Artistic license.
-
-      -  QPDF no longer has a dependency on the PCRE (Perl-Compatible
-         Regular Expression) library. QPDF now has an added dependency
-         on the JPEG library.
-
-   -  Bug Fixes
-
-      -  This release contains many bug fixes for various infinite
-         loops, memory leaks, and other memory errors that could be
-         encountered with specially crafted or otherwise erroneous PDF
-         files.
-
-   -  New Features
-
-      -  QPDF now supports reading and writing streams encoded with JPEG
-         or RunLength encoding. Library API enhancements and
-         command-line options have been added to control this behavior.
-         See command-line options
-         @1@option@1@--compress-streams@2@option@2@ and
-         @1@option@1@--decode-level@2@option@2@ and methods
-         ``QPDFWriter::setCompressStreams`` and
-         ``QPDFWriter::setDecodeLevel``.
-
-      -  QPDF is much better at recovering from broken files. In most
-         cases, qpdf will skip invalid objects and will preserve broken
-         stream data by not attempting to filter broken streams. QPDF is
-         now able to recover or at least not crash on dozens of broken
-         test files I have received over the past few years.
-
-      -  Page rotation is now supported and accessible from both the
-         library and the command line.
-
-      -  ``QPDFWriter`` supports writing files in a way that preserves
-         PCLm compliance in support of driverless printing. This is very
-         specialized and is only useful to applications that already
-         know how to create PCLm files.
-
-   -  Enhancements to the @1@command@1@qpdf@2@command@2@ Command-line
-      Tool. All new options listed here are documented in more detail in
-      `Running QPDF <#ref.using>`__.
-
-      -  Command-line arguments can now be read from files or standard
-         input using ``@file`` or ``@-`` syntax. Please see `Basic
-         Invocation <#ref.invocation>`__.
-
-      -  @1@option@1@--rotate@2@option@2@: request page rotation
-
-      -  @1@option@1@--newline-before-endstream@2@option@2@: ensure that
-         a newline appears before every ``endstream`` keyword in the
-         file; used to prevent qpdf from breaking PDF/A compliance on
-         already compliant files.
-
-      -  @1@option@1@--preserve-unreferenced@2@option@2@: preserve
-         unreferenced objects in the input PDF
-
-      -  @1@option@1@--split-pages@2@option@2@: break output into chunks
-         with fixed numbers of pages
-
-      -  @1@option@1@--verbose@2@option@2@: print the name of each
-         output file that is created
-
-      -  @1@option@1@--compress-streams@2@option@2@ and
-         @1@option@1@--decode-level@2@option@2@ replace
-         @1@option@1@--stream-data@2@option@2@ for improving granularity
-         of controlling compression and decompression of stream data.
-         The @1@option@1@--stream-data@2@option@2@ option will remain
-         available.
-
-      -  When running @1@command@1@qpdf --check@2@command@2@ with other
-         options, checks are always run first. This enables qpdf to
-         perform its full recovery logic before outputting other
-         information. This can be especially useful when manually
-         recovering broken files, looking at qpdf's regenerated cross
-         reference table, or other similar operations.
-
-      -  Process @1@command@1@--pages@2@command@2@ earlier so that other
-         options like @1@option@1@--show-pages@2@option@2@ or
-         @1@option@1@--split-pages@2@option@2@ can operate on the file
-         after page splitting/merging has occurred.
-
-   -  API Changes. All new API calls are documented in their respective
-      classes' header files.
-
-      -  ``QPDFObjectHandle::rotatePage``: apply rotation to a page
-         object
-
-      -  ``QPDFWriter::setNewlineBeforeEndstream``: force newline to
-         appear before ``endstream``
-
-      -  ``QPDFWriter::setPreserveUnreferencedObjects``: preserve
-         unreferenced objects that appear in the input PDF. The default
-         behavior is to discard them.
-
-      -  New ``Pipeline`` types ``Pl_RunLength`` and ``Pl_DCT`` are
-         available for developers who wish to produce or consume
-         RunLength or DCT stream data directly. The
-         @1@filename@1@examples/pdf-create.cc@2@filename@2@ example
-         illustrates their use.
-
-      -  ``QPDFWriter::setCompressStreams`` and
-         ``QPDFWriter::setDecodeLevel`` methods control handling of
-         different types of stream compression.
-
-      -  Add new C API functions ``qpdf_set_compress_streams``,
-         ``qpdf_set_decode_level``,
-         ``qpdf_set_preserve_unreferenced_objects``, and
-         ``qpdf_set_newline_before_endstream`` corresponding to the new
-         ``QPDFWriter`` methods.
-
-6.0.0: November 10, 2015
-   -  Implement @1@option@1@--deterministic-id@2@option@2@ command-line
-      option and ``QPDFWriter::setDeterministicID`` as well as C API
-      function ``qpdf_set_deterministic_ID`` for generating a
-      deterministic ID for non-encrypted files. When this option is
-      selected, the ID of the file depends on the contents of the output
-      file, and not on transient items such as the timestamp or output
-      file name.
-
-   -  Make qpdf more tolerant of files whose xref table entries are not
-      the correct length.
-
-5.1.3: May 24, 2015
-   -  Bug fix: fix-qdf was not properly handling files that contained
-      object streams with more than 255 objects in them.
-
-   -  Bug fix: qpdf was not properly initializing Microsoft's secure
-      crypto provider on fresh Windows installations that had not had
-      any keys created yet.
-
-   -  Fix a few errors found by Gynvael Coldwind and Mateusz Jurczyk of
-      the Google Security Team. Please see the ChangeLog for details.
-
-   -  Properly handle pages that have no contents at all. There were
-      many cases in which qpdf handled this fine, but a few methods
-      blindly obtained page contents with handling the possibility that
-      there were no contents.
-
-   -  Make qpdf more robust for a few more kinds of problems that may
-      occur in invalid PDF files.
-
-5.1.2: June 7, 2014
-   -  Bug fix: linearizing files could create a corrupted output file
-      under extremely unlikely file size circumstances. See ChangeLog
-      for details. The odds of getting hit by this are very low, though
-      one person did.
-
-   -  Bug fix: qpdf would fail to write files that had streams with
-      decode parameters referencing other streams.
-
-   -  New example program: @1@command@1@pdf-split-pages@2@command@2@:
-      efficiently split PDF files into individual pages. The example
-      program does this more efficiently than using @1@command@1@qpdf
-      --pages@2@command@2@ to do it.
-
-   -  Packaging fix: Visual C++ binaries did not support Windows XP.
-      This has been rectified by updating the compilers used to generate
-      the release binaries.
-
-5.1.1: January 14, 2014
-   -  Performance fix: copying foreign objects could be very slow with
-      certain types of files. This was most likely to be visible during
-      page splitting and was due to traversing the same objects multiple
-      times in some cases.
-
-5.1.0: December 17, 2013
-   -  Added runtime option (``QUtil::setRandomDataProvider``) to supply
-      your own random data provider. You can use this if you want to
-      avoid using the OS-provided secure random number generation
-      facility or stdlib's less secure version. See comments in
-      include/qpdf/QUtil.hh for details.
-
-   -  Fixed image comparison tests to not create 12-bit-per-pixel images
-      since some versions of tiffcmp have bugs in comparing them in some
-      cases. This increases the disk space required by the image
-      comparison tests, which are off by default anyway.
-
-   -  Introduce a number of small fixes for compilation on the latest
-      clang in MacOS and the latest Visual C++ in Windows.
-
-   -  Be able to handle broken files that end the xref table header with
-      a space instead of a newline.
-
-5.0.1: October 18, 2013
-   -  Thanks to a detailed review by Florian Weimer and the Red Hat
-      Product Security Team, this release includes a number of
-      non-user-visible security hardening changes. Please see the
-      ChangeLog file in the source distribution for the complete list.
-
-   -  When available, operating system-specific secure random number
-      generation is used for generating initialization vectors and other
-      random values used during encryption or file creation. For the
-      Windows build, this results in an added dependency on Microsoft's
-      cryptography API. To disable the OS-specific cryptography and use
-      the old version, pass the
-      @1@option@1@--enable-insecure-random@2@option@2@ option to
-      @1@command@1@./configure@2@command@2@.
-
-   -  The @1@command@1@qpdf@2@command@2@ command-line tool now issues a
-      warning when @1@option@1@-accessibility=n@2@option@2@ is specified
-      for newer encryption versions stating that the option is ignored.
-      qpdf, per the spec, has always ignored this flag, but it
-      previously did so silently. This warning is issued only by the
-      command-line tool, not by the library. The library's handling of
-      this flag is unchanged.
-
-5.0.0: July 10, 2013
-   -  Bug fix: previous versions of qpdf would lose objects with
-      generation != 0 when generating object streams. Fixing this
-      required changes to the public API.
-
-   -  Removed methods from public API that were only supposed to be
-      called by QPDFWriter and couldn't realistically be called anywhere
-      else. See ChangeLog for details.
-
-   -  New ``QPDFObjGen`` class added to represent an object
-      ID/generation pair. ``QPDFObjectHandle::getObjGen()`` is now
-      preferred over ``QPDFObjectHandle::getObjectID()`` and
-      ``QPDFObjectHandle::getGeneration()`` as it makes it less likely
-      for people to accidentally write code that ignores the generation
-      number. See @1@filename@1@QPDF.hh@2@filename@2@ and
-      @1@filename@1@QPDFObjectHandle.hh@2@filename@2@ for additional
-      notes.
-
-   -  Add @1@option@1@--show-npages@2@option@2@ command-line option to
-      the @1@command@1@qpdf@2@command@2@ command to show the number of
-      pages in a file.
-
-   -  Allow omission of the page range within
-      @1@option@1@--pages@2@option@2@ for the
-      @1@command@1@qpdf@2@command@2@ command. When omitted, the page
-      range is implicitly taken to be all the pages in the file.
-
-   -  Various enhancements were made to support different types of
-      broken files or broken readers. Details can be found in
-      @1@filename@1@ChangeLog@2@filename@2@.
-
-4.1.0: April 14, 2013
-   -  Note to people including qpdf in distributions: the
-      @1@filename@1@.la@2@filename@2@ files generated by libtool are now
-      installed by qpdf's @1@command@1@make install@2@command@2@ target.
-      Before, they were not installed. This means that if your
-      distribution does not want to include
-      @1@filename@1@.la@2@filename@2@ files, you must remove them as
-      part of your packaging process.
-
-   -  Major enhancement: API enhancements have been made to support
-      parsing of content streams. This enhancement includes the
-      following changes:
-
-      -  ``QPDFObjectHandle::parseContentStream`` method parses objects
-         in a content stream and calls handlers in a callback class. The
-         example
-         @1@filename@1@examples/pdf-parse-content.cc@2@filename@2@
-         illustrates how this may be used.
-
-      -  ``QPDFObjectHandle`` can now represent operators and inline
-         images, object types that may only appear in content streams.
-
-      -  Method ``QPDFObjectHandle::getTypeCode()`` returns an
-         enumerated type value representing the underlying object type.
-         Method ``QPDFObjectHandle::getTypeName()`` returns a text
-         string describing the name of the type of a
-         ``QPDFObjectHandle`` object. These methods can be used for more
-         efficient parsing and debugging/diagnostic messages.
-
-   -  @1@command@1@qpdf --check@2@command@2@ now parses all pages'
-      content streams in addition to doing other checks. While there are
-      still many types of errors that cannot be detected, syntactic
-      errors in content streams will now be reported.
-
-   -  Minor compilation enhancements have been made to facilitate easier
-      for support for a broader range of compilers and compiler
-      versions.
-
-      -  Warning flags have been moved into a separate variable in
-         @1@filename@1@autoconf.mk@2@filename@2@
-
-      -  The configure flag @1@option@1@--enable-werror@2@option@2@ work
-         for Microsoft compilers
-
-      -  All MSVC CRT security warnings have been resolved.
-
-      -  All C-style casts in C++ Code have been replaced by C++ casts,
-         and many casts that had been included to suppress higher
-         warning levels for some compilers have been removed, primarily
-         for clarity. Places where integer type coercion occurs have
-         been scrutinized. A new casting policy has been documented in
-         the manual. This is of concern mainly to people porting qpdf to
-         new platforms or compilers. It is not visible to programmers
-         writing code that uses the library
-
-      -  Some internal limits have been removed in code that converts
-         numbers to strings. This is largely invisible to users, but it
-         does trigger a bug in some older versions of mingw-w64's C++
-         library. See @1@filename@1@README-windows.md@2@filename@2@ in
-         the source distribution if you think this may affect you. The
-         copy of the DLL distributed with qpdf's binary distribution is
-         not affected by this problem.
-
-   -  The RPM spec file previously included with qpdf has been removed.
-      This is because virtually all Linux distributions include qpdf now
-      that it is a dependency of CUPS filters.
-
-   -  A few bug fixes are included:
-
-      -  Overridden compressed objects are properly handled. Before,
-         there were certain constructs that could cause qpdf to see old
-         versions of some objects. The most usual manifestation of this
-         was loss of filled in form values for certain files.
-
-      -  Installation no longer uses GNU/Linux-specific versions of some
-         commands, so @1@command@1@make install@2@command@2@ works on
-         Solaris with native tools.
-
-      -  The 64-bit mingw Windows binary package no longer includes a
-         32-bit DLL.
-
-4.0.1: January 17, 2013
-   -  Fix detection of binary attachments in test suite to avoid false
-      test failures on some platforms.
-
-   -  Add clarifying comment in @1@filename@1@QPDF.hh@2@filename@2@ to
-      methods that return the user password explaining that it is no
-      longer possible with newer encryption formats to recover the user
-      password knowing the owner password. In earlier encryption
-      formats, the user password was encrypted in the file using the
-      owner password. In newer encryption formats, a separate encryption
-      key is used on the file, and that key is independently encrypted
-      using both the user password and the owner password.
-
-4.0.0: December 31, 2012
-   -  Major enhancement: support has been added for newer encryption
-      schemes supported by version X of Adobe Acrobat. This includes use
-      of 127-character passwords, 256-bit encryption keys, and the
-      encryption scheme specified in ISO 32000-2, the PDF 2.0
-      specification. This scheme can be chosen from the command line by
-      specifying use of 256-bit keys. qpdf also supports the deprecated
-      encryption method used by Acrobat IX. This encryption style has
-      known security weaknesses and should not be used in practice.
-      However, such files exist "in the wild," so support for this
-      scheme is still useful. New methods
-      ``QPDFWriter::setR6EncryptionParameters`` (for the PDF 2.0 scheme)
-      and ``QPDFWriter::setR5EncryptionParameters`` (for the deprecated
-      scheme) have been added to enable these new encryption schemes.
-      Corresponding functions have been added to the C API as well.
-
-   -  Full support for Adobe extension levels in PDF version
-      information. Starting with PDF version 1.7, corresponding to ISO
-      32000, Adobe adds new functionality by increasing the extension
-      level rather than increasing the version. This support includes
-      addition of the ``QPDF::getExtensionLevel`` method for retrieving
-      the document's extension level, addition of versions of
-      ``QPDFWriter::setMinimumPDFVersion`` and
-      ``QPDFWriter::forcePDFVersion`` that accept an extension level,
-      and extended syntax for specifying forced and minimum versions on
-      the command line as described in `Advanced Transformation
-      Options <#ref.advanced-transformation>`__. Corresponding functions
-      have been added to the C API as well.
-
-   -  Minor fixes to prevent qpdf from referencing objects in the file
-      that are not referenced in the file's overall structure. Most
-      files don't have any such objects, but some files have contain
-      unreferenced objects with errors, so these fixes prevent qpdf from
-      needlessly rejecting or complaining about such objects.
-
-   -  Add new generalized methods for reading and writing files from/to
-      programmer-defined sources. The method
-      ``QPDF::processInputSource`` allows the programmer to use any
-      input source for the input file, and
-      ``QPDFWriter::setOutputPipeline`` allows the programmer to write
-      the output file through any pipeline. These methods would make it
-      possible to perform any number of specialized operations, such as
-      accessing external storage systems, creating bindings for qpdf in
-      other programming languages that have their own I/O systems, etc.
-
-   -  Add new method ``QPDF::getEncryptionKey`` for retrieving the
-      underlying encryption key used in the file.
-
-   -  This release includes a small handful of non-compatible API
-      changes. While effort is made to avoid such changes, all the
-      non-compatible API changes in this version were to parts of the
-      API that would likely never be used outside the library itself. In
-      all cases, the altered methods or structures were parts of the
-      ``QPDF`` that were public to enable them to be called from either
-      ``QPDFWriter`` or were part of validation code that was
-      over-zealous in reporting problems in parts of the file that would
-      not ordinarily be referenced. In no case did any of the removed
-      methods do anything worse that falsely report error conditions in
-      files that were broken in ways that didn't matter. The following
-      public parts of the ``QPDF`` class were changed in a
-      non-compatible way:
-
-      -  Updated nested ``QPDF::EncryptionData`` class to add fields
-         needed by the newer encryption formats, member variables
-         changed to private so that future changes will not require
-         breaking backward compatibility.
-
-      -  Added additional parameters to ``compute_data_key``, which is
-         used by ``QPDFWriter`` to compute the encryption key used to
-         encrypt a specific object.
-
-      -  Removed the method ``flattenScalarReferences``. This method was
-         previously used prior to writing a new PDF file, but it has the
-         undesired side effect of causing qpdf to read objects in the
-         file that were not referenced. Some otherwise files have
-         unreferenced objects with errors in them, so this could cause
-         qpdf to reject files that would be accepted by virtually all
-         other PDF readers. In fact, qpdf relied on only a very small
-         part of what flattenScalarReferences did, so only this part has
-         been preserved, and it is now done directly inside
-         ``QPDFWriter``.
-
-      -  Removed the method ``decodeStreams``. This method was used by
-         the @1@option@1@--check@2@option@2@ option of the
-         @1@command@1@qpdf@2@command@2@ command-line tool to force all
-         streams in the file to be decoded, but it also suffered from
-         the problem of opening otherwise unreferenced streams and thus
-         could report false positive. The
-         @1@option@1@--check@2@option@2@ option now causes qpdf to go
-         through all the motions of writing a new file based on the
-         original one, so it will always reference and check exactly
-         those parts of a file that any ordinary viewer would check.
-
-      -  Removed the method ``trimTrailerForWrite``. This method was
-         used by ``QPDFWriter`` to modify the original QPDF object by
-         removing fields from the trailer dictionary that wouldn't apply
-         to the newly written file. This functionality, though generally
-         harmless, was a poor implementation and has been replaced by
-         having QPDFWriter filter these out when copying the trailer
-         rather than modifying the original QPDF object. (Note that qpdf
-         never modifies the original file itself.)
-
-   -  Allow the PDF header to appear anywhere in the first 1024 bytes of
-      the file. This is consistent with what other readers do.
-
-   -  Fix the @1@command@1@pkg-config@2@command@2@ files to list zlib
-      and pcre in ``Requires.private`` to better support static linking
-      using @1@command@1@pkg-config@2@command@2@.
-
-3.0.2: September 6, 2012
-   -  Bug fix: ``QPDFWriter::setOutputMemory`` did not work when not
-      used with ``QPDFWriter::setStaticID``, which made it pretty much
-      useless. This has been fixed.
-
-   -  New API call ``QPDFWriter::setExtraHeaderText`` inserts additional
-      text near the header of the PDF file. The intended use case is to
-      insert comments that may be consumed by a downstream application,
-      though other use cases may exist.
-
-3.0.1: August 11, 2012
-   -  Version 3.0.0 included addition of files for
-      @1@command@1@pkg-config@2@command@2@, but this was not mentioned
-      in the release notes. The release notes for 3.0.0 were updated to
-      mention this.
-
-   -  Bug fix: if an object stream ended with a scalar object not
-      followed by space, qpdf would incorrectly report that it
-      encountered a premature EOF. This bug has been in qpdf since
-      version 2.0.
-
-3.0.0: August 2, 2012
-   -  Acknowledgment: I would like to express gratitude for the
-      contributions of Tobias Hoffmann toward the release of qpdf
-      version 3.0. He is responsible for most of the implementation and
-      design of the new API for manipulating pages, and contributed code
-      and ideas for many of the improvements made in version 3.0.
-      Without his work, this release would certainly not have happened
-      as soon as it did, if at all.
-
-   -  *Non-compatible API change:* The version of
-      ``QPDFObjectHandle::replaceStreamData`` that uses a
-      ``StreamDataProvider`` no longer requires (or accepts) a
-      ``length`` parameter. See
-      `appendix_title <#ref.upgrading-to-3.0>`__ for an explanation.
-      While care is taken to avoid non-compatible API changes in
-      general, an exception was made this time because the new interface
-      offers an opportunity to significantly simplify calling code.
-
-   -  Support has been added for large files. The test suite verifies
-      support for files larger than 4 gigabytes, and manual testing has
-      verified support for files larger than 10 gigabytes. Large file
-      support is available for both 32-bit and 64-bit platforms as long
-      as the compiler and underlying platforms support it.
-
-   -  Support for page selection (splitting and merging PDF files) has
-      been added to the @1@command@1@qpdf@2@command@2@ command-line
-      tool. See `Page Selection Options <#ref.page-selection>`__.
-
-   -  Options have been added to the @1@command@1@qpdf@2@command@2@
-      command-line tool for copying encryption parameters from another
-      file. See `Basic Options <#ref.basic-options>`__.
-
-   -  New methods have been added to the ``QPDF`` object for adding and
-      removing pages. See `Adding and Removing
-      Pages <#ref.adding-and-remove-pages>`__.
-
-   -  New methods have been added to the ``QPDF`` object for copying
-      objects from other PDF files. See `Copying Objects From Other PDF
-      Files <#ref.foreign-objects>`__
-
-   -  A new method ``QPDFObjectHandle::parse`` has been added for
-      constructing ``QPDFObjectHandle`` objects from a string
-      description.
-
-   -  Methods have been added to ``QPDFWriter`` to allow writing to an
-      already open stdio ``FILE*`` addition to writing to standard
-      output or a named file. Methods have been added to ``QPDF`` to be
-      able to process a file from an already open stdio ``FILE*``. This
-      makes it possible to read and write PDF from secure temporary
-      files that have been unlinked prior to being fully read or
-      written.
-
-   -  The ``QPDF::emptyPDF`` can be used to allow creation of PDF files
-      from scratch. The example
-      @1@filename@1@examples/pdf-create.cc@2@filename@2@ illustrates how
-      it can be used.
-
-   -  Several methods to take ``PointerHolder<Buffer>`` can now also
-      accept ``std::string`` arguments.
-
-   -  Many new convenience methods have been added to the library, most
-      in ``QPDFObjectHandle``. See @1@filename@1@ChangeLog@2@filename@2@
-      for a full list.
-
-   -  When building on a platform that supports ELF shared libraries
-      (such as Linux), symbol versions are enabled by default. They can
-      be disabled by passing
-      @1@option@1@--disable-ld-version-script@2@option@2@ to
-      @1@command@1@./configure@2@command@2@.
-
-   -  The file @1@filename@1@libqpdf.pc@2@filename@2@ is now installed
-      to support @1@command@1@pkg-config@2@command@2@.
-
-   -  Image comparison tests are off by default now since they are not
-      needed to verify a correct build or port of qpdf. They are needed
-      only when changing the actual PDF output generated by qpdf. You
-      should enable them if you are making deep changes to qpdf itself.
-      See @1@filename@1@README.md@2@filename@2@ for details.
-
-   -  Large file tests are off by default but can be turned on with
-      @1@command@1@./configure@2@command@2@ or by setting an environment
-      variable before running the test suite. See
-      @1@filename@1@README.md@2@filename@2@ for details.
-
-   -  When qpdf's test suite fails, failures are not printed to the
-      terminal anymore by default. Instead, find them in
-      @1@filename@1@build/qtest.log@2@filename@2@. For packagers who are
-      building with an autobuilder, you can add the
-      @1@option@1@--enable-show-failed-test-output@2@option@2@ option to
-      @1@command@1@./configure@2@command@2@ to restore the old behavior.
-
-2.3.1: December 28, 2011
-   -  Fix thread-safety problem resulting from non-thread-safe use of
-      the PCRE library.
-
-   -  Made a few minor documentation fixes.
-
-   -  Add workaround for a bug that appears in some versions of
-      ghostscript to the test suite
-
-   -  Fix minor build issue for Visual C++ 2010.
-
-2.3.0: August 11, 2011
-   -  Bug fix: when preserving existing encryption on encrypted files
-      with cleartext metadata, older qpdf versions would generate
-      password-protected files with no valid password. This operation
-      now works. This bug only affected files created by copying
-      existing encryption parameters; explicit encryption with
-      specification of cleartext metadata worked before and continues to
-      work.
-
-   -  Enhance ``QPDFWriter`` with a new constructor that allows you to
-      delay the specification of the output file. When using this
-      constructor, you may now call ``QPDFWriter::setOutputFilename`` to
-      specify the output file, or you may use
-      ``QPDFWriter::setOutputMemory`` to cause ``QPDFWriter`` to write
-      the resulting PDF file to a memory buffer. You may then use
-      ``QPDFWriter::getBuffer`` to retrieve the memory buffer.
-
-   -  Add new API call ``QPDF::replaceObject`` for replacing objects by
-      object ID
-
-   -  Add new API call ``QPDF::swapObjects`` for swapping two objects by
-      object ID
-
-   -  Add ``QPDFObjectHandle::getDictAsMap`` and
-      ``QPDFObjectHandle::getArrayAsVector`` to allow retrieval of
-      dictionary objects as maps and array objects as vectors.
-
-   -  Add functions ``qpdf_get_info_key`` and ``qpdf_set_info_key`` to
-      the C API for manipulating string fields of the document's
-      ``/Info`` dictionary.
-
-   -  Add functions ``qpdf_init_write_memory``,
-      ``qpdf_get_buffer_length``, and ``qpdf_get_buffer`` to the C API
-      for writing PDF files to a memory buffer instead of a file.
-
-2.2.4: June 25, 2011
-   -  Fix installation and compilation issues; no functionality changes.
-
-2.2.3: April 30, 2011
-   -  Handle some damaged streams with incorrect characters following
-      the stream keyword.
-
-   -  Improve handling of inline images when normalizing content
-      streams.
-
-   -  Enhance error recovery to properly handle files that use object 0
-      as a regular object, which is specifically disallowed by the spec.
-
-2.2.2: October 4, 2010
-   -  Add new function ``qpdf_read_memory`` to the C API to call
-      ``QPDF::processMemoryFile``. This was an omission in qpdf 2.2.1.
-
-2.2.1: October 1, 2010
-   -  Add new method ``QPDF::setOutputStreams`` to replace ``std::cout``
-      and ``std::cerr`` with other streams for generation of diagnostic
-      messages and error messages. This can be useful for GUIs or other
-      applications that want to capture any output generated by the
-      library to present to the user in some other way. Note that QPDF
-      does not write to ``std::cout`` (or the specified output stream)
-      except where explicitly mentioned in
-      @1@filename@1@QPDF.hh@2@filename@2@, and that the only use of the
-      error stream is for warnings. Note also that output of warnings is
-      suppressed when ``setSuppressWarnings(true)`` is called.
-
-   -  Add new method ``QPDF::processMemoryFile`` for operating on PDF
-      files that are loaded into memory rather than in a file on disk.
-
-   -  Give a warning but otherwise ignore empty PDF objects by treating
-      them as null. Empty object are not permitted by the PDF
-      specification but have been known to appear in some actual PDF
+  - Packaging and Distribution Changes
+
+    - QPDF's primary license is now `version 2.0 of the Apache
+      License <http://www.apache.org/licenses/LICENSE-2.0>`__ rather
+      than version 2.0 of the Artistic License. You may still, at
+      your option, consider qpdf to be licensed with version 2.0 of
+      the Artistic license.
+
+    - QPDF no longer has a dependency on the PCRE (Perl-Compatible
+      Regular Expression) library. QPDF now has an added dependency
+      on the JPEG library.
+
+  - Bug Fixes
+
+    - This release contains many bug fixes for various infinite
+      loops, memory leaks, and other memory errors that could be
+      encountered with specially crafted or otherwise erroneous PDF
       files.
 
-   -  Handle inline image filter abbreviations when the appear as stream
-      filter abbreviations. The PDF specification does not allow use of
-      stream filter abbreviations in this way, but Adobe Reader and some
-      other PDF readers accept them since they sometimes appear
-      incorrectly in actual PDF files.
+  - New Features
 
-   -  Implement miscellaneous enhancements to ``PointerHolder`` and
-      ``Buffer`` to support other changes.
+    - QPDF now supports reading and writing streams encoded with JPEG
+      or RunLength encoding. Library API enhancements and
+      command-line options have been added to control this behavior.
+      See command-line options
+      @1@option@1@--compress-streams@2@option@2@ and
+      @1@option@1@--decode-level@2@option@2@ and methods
+      ``QPDFWriter::setCompressStreams`` and
+      ``QPDFWriter::setDecodeLevel``.
+
+    - QPDF is much better at recovering from broken files. In most
+      cases, qpdf will skip invalid objects and will preserve broken
+      stream data by not attempting to filter broken streams. QPDF is
+      now able to recover or at least not crash on dozens of broken
+      test files I have received over the past few years.
+
+    - Page rotation is now supported and accessible from both the
+      library and the command line.
+
+    - ``QPDFWriter`` supports writing files in a way that preserves
+      PCLm compliance in support of driverless printing. This is very
+      specialized and is only useful to applications that already
+      know how to create PCLm files.
+
+  - Enhancements to the @1@command@1@qpdf@2@command@2@ Command-line
+    Tool. All new options listed here are documented in more detail in
+    `Running QPDF <#ref.using>`__.
+
+    - Command-line arguments can now be read from files or standard
+      input using ``@file`` or ``@-`` syntax. Please see `Basic
+      Invocation <#ref.invocation>`__.
+
+    - @1@option@1@--rotate@2@option@2@: request page rotation
+
+    - @1@option@1@--newline-before-endstream@2@option@2@: ensure that
+      a newline appears before every ``endstream`` keyword in the
+      file; used to prevent qpdf from breaking PDF/A compliance on
+      already compliant files.
+
+    - @1@option@1@--preserve-unreferenced@2@option@2@: preserve
+      unreferenced objects in the input PDF
+
+    - @1@option@1@--split-pages@2@option@2@: break output into chunks
+      with fixed numbers of pages
+
+    - @1@option@1@--verbose@2@option@2@: print the name of each
+      output file that is created
+
+    - @1@option@1@--compress-streams@2@option@2@ and
+      @1@option@1@--decode-level@2@option@2@ replace
+      @1@option@1@--stream-data@2@option@2@ for improving granularity
+      of controlling compression and decompression of stream data.
+      The @1@option@1@--stream-data@2@option@2@ option will remain
+      available.
+
+    - When running @1@command@1@qpdf --check@2@command@2@ with other
+      options, checks are always run first. This enables qpdf to
+      perform its full recovery logic before outputting other
+      information. This can be especially useful when manually
+      recovering broken files, looking at qpdf's regenerated cross
+      reference table, or other similar operations.
+
+    - Process @1@command@1@--pages@2@command@2@ earlier so that other
+      options like @1@option@1@--show-pages@2@option@2@ or
+      @1@option@1@--split-pages@2@option@2@ can operate on the file
+      after page splitting/merging has occurred.
+
+  - API Changes. All new API calls are documented in their respective
+    classes' header files.
+
+    - ``QPDFObjectHandle::rotatePage``: apply rotation to a page
+      object
+
+    - ``QPDFWriter::setNewlineBeforeEndstream``: force newline to
+      appear before ``endstream``
+
+    - ``QPDFWriter::setPreserveUnreferencedObjects``: preserve
+      unreferenced objects that appear in the input PDF. The default
+      behavior is to discard them.
+
+    - New ``Pipeline`` types ``Pl_RunLength`` and ``Pl_DCT`` are
+      available for developers who wish to produce or consume
+      RunLength or DCT stream data directly. The
+      @1@filename@1@examples/pdf-create.cc@2@filename@2@ example
+      illustrates their use.
+
+    - ``QPDFWriter::setCompressStreams`` and
+      ``QPDFWriter::setDecodeLevel`` methods control handling of
+      different types of stream compression.
+
+    - Add new C API functions ``qpdf_set_compress_streams``,
+      ``qpdf_set_decode_level``,
+      ``qpdf_set_preserve_unreferenced_objects``, and
+      ``qpdf_set_newline_before_endstream`` corresponding to the new
+      ``QPDFWriter`` methods.
+
+6.0.0: November 10, 2015
+  - Implement @1@option@1@--deterministic-id@2@option@2@ command-line
+    option and ``QPDFWriter::setDeterministicID`` as well as C API
+    function ``qpdf_set_deterministic_ID`` for generating a
+    deterministic ID for non-encrypted files. When this option is
+    selected, the ID of the file depends on the contents of the output
+    file, and not on transient items such as the timestamp or output
+    file name.
+
+  - Make qpdf more tolerant of files whose xref table entries are not
+    the correct length.
+
+5.1.3: May 24, 2015
+  - Bug fix: fix-qdf was not properly handling files that contained
+    object streams with more than 255 objects in them.
+
+  - Bug fix: qpdf was not properly initializing Microsoft's secure
+    crypto provider on fresh Windows installations that had not had
+    any keys created yet.
+
+  - Fix a few errors found by Gynvael Coldwind and Mateusz Jurczyk of
+    the Google Security Team. Please see the ChangeLog for details.
+
+  - Properly handle pages that have no contents at all. There were
+    many cases in which qpdf handled this fine, but a few methods
+    blindly obtained page contents with handling the possibility that
+    there were no contents.
+
+  - Make qpdf more robust for a few more kinds of problems that may
+    occur in invalid PDF files.
+
+5.1.2: June 7, 2014
+  - Bug fix: linearizing files could create a corrupted output file
+    under extremely unlikely file size circumstances. See ChangeLog
+    for details. The odds of getting hit by this are very low, though
+    one person did.
+
+  - Bug fix: qpdf would fail to write files that had streams with
+    decode parameters referencing other streams.
+
+  - New example program: @1@command@1@pdf-split-pages@2@command@2@:
+    efficiently split PDF files into individual pages. The example
+    program does this more efficiently than using @1@command@1@qpdf
+    --pages@2@command@2@ to do it.
+
+  - Packaging fix: Visual C++ binaries did not support Windows XP.
+    This has been rectified by updating the compilers used to generate
+    the release binaries.
+
+5.1.1: January 14, 2014
+  - Performance fix: copying foreign objects could be very slow with
+    certain types of files. This was most likely to be visible during
+    page splitting and was due to traversing the same objects multiple
+    times in some cases.
+
+5.1.0: December 17, 2013
+  - Added runtime option (``QUtil::setRandomDataProvider``) to supply
+    your own random data provider. You can use this if you want to
+    avoid using the OS-provided secure random number generation
+    facility or stdlib's less secure version. See comments in
+    include/qpdf/QUtil.hh for details.
+
+  - Fixed image comparison tests to not create 12-bit-per-pixel images
+    since some versions of tiffcmp have bugs in comparing them in some
+    cases. This increases the disk space required by the image
+    comparison tests, which are off by default anyway.
+
+  - Introduce a number of small fixes for compilation on the latest
+    clang in MacOS and the latest Visual C++ in Windows.
+
+  - Be able to handle broken files that end the xref table header with
+    a space instead of a newline.
+
+5.0.1: October 18, 2013
+  - Thanks to a detailed review by Florian Weimer and the Red Hat
+    Product Security Team, this release includes a number of
+    non-user-visible security hardening changes. Please see the
+    ChangeLog file in the source distribution for the complete list.
+
+  - When available, operating system-specific secure random number
+    generation is used for generating initialization vectors and other
+    random values used during encryption or file creation. For the
+    Windows build, this results in an added dependency on Microsoft's
+    cryptography API. To disable the OS-specific cryptography and use
+    the old version, pass the
+    @1@option@1@--enable-insecure-random@2@option@2@ option to
+    @1@command@1@./configure@2@command@2@.
+
+  - The @1@command@1@qpdf@2@command@2@ command-line tool now issues a
+    warning when @1@option@1@-accessibility=n@2@option@2@ is specified
+    for newer encryption versions stating that the option is ignored.
+    qpdf, per the spec, has always ignored this flag, but it
+    previously did so silently. This warning is issued only by the
+    command-line tool, not by the library. The library's handling of
+    this flag is unchanged.
+
+5.0.0: July 10, 2013
+  - Bug fix: previous versions of qpdf would lose objects with
+    generation != 0 when generating object streams. Fixing this
+    required changes to the public API.
+
+  - Removed methods from public API that were only supposed to be
+    called by QPDFWriter and couldn't realistically be called anywhere
+    else. See ChangeLog for details.
+
+  - New ``QPDFObjGen`` class added to represent an object
+    ID/generation pair. ``QPDFObjectHandle::getObjGen()`` is now
+    preferred over ``QPDFObjectHandle::getObjectID()`` and
+    ``QPDFObjectHandle::getGeneration()`` as it makes it less likely
+    for people to accidentally write code that ignores the generation
+    number. See @1@filename@1@QPDF.hh@2@filename@2@ and
+    @1@filename@1@QPDFObjectHandle.hh@2@filename@2@ for additional
+    notes.
+
+  - Add @1@option@1@--show-npages@2@option@2@ command-line option to
+    the @1@command@1@qpdf@2@command@2@ command to show the number of
+    pages in a file.
+
+  - Allow omission of the page range within
+    @1@option@1@--pages@2@option@2@ for the
+    @1@command@1@qpdf@2@command@2@ command. When omitted, the page
+    range is implicitly taken to be all the pages in the file.
+
+  - Various enhancements were made to support different types of
+    broken files or broken readers. Details can be found in
+    @1@filename@1@ChangeLog@2@filename@2@.
+
+4.1.0: April 14, 2013
+  - Note to people including qpdf in distributions: the
+    @1@filename@1@.la@2@filename@2@ files generated by libtool are now
+    installed by qpdf's @1@command@1@make install@2@command@2@ target.
+    Before, they were not installed. This means that if your
+    distribution does not want to include
+    @1@filename@1@.la@2@filename@2@ files, you must remove them as
+    part of your packaging process.
+
+  - Major enhancement: API enhancements have been made to support
+    parsing of content streams. This enhancement includes the
+    following changes:
+
+    - ``QPDFObjectHandle::parseContentStream`` method parses objects
+      in a content stream and calls handlers in a callback class. The
+      example
+      @1@filename@1@examples/pdf-parse-content.cc@2@filename@2@
+      illustrates how this may be used.
+
+    - ``QPDFObjectHandle`` can now represent operators and inline
+      images, object types that may only appear in content streams.
+
+    - Method ``QPDFObjectHandle::getTypeCode()`` returns an
+      enumerated type value representing the underlying object type.
+      Method ``QPDFObjectHandle::getTypeName()`` returns a text
+      string describing the name of the type of a
+      ``QPDFObjectHandle`` object. These methods can be used for more
+      efficient parsing and debugging/diagnostic messages.
+
+  - @1@command@1@qpdf --check@2@command@2@ now parses all pages'
+    content streams in addition to doing other checks. While there are
+    still many types of errors that cannot be detected, syntactic
+    errors in content streams will now be reported.
+
+  - Minor compilation enhancements have been made to facilitate easier
+    for support for a broader range of compilers and compiler
+    versions.
+
+    - Warning flags have been moved into a separate variable in
+      @1@filename@1@autoconf.mk@2@filename@2@
+
+    - The configure flag @1@option@1@--enable-werror@2@option@2@ work
+      for Microsoft compilers
+
+    - All MSVC CRT security warnings have been resolved.
+
+    - All C-style casts in C++ Code have been replaced by C++ casts,
+      and many casts that had been included to suppress higher
+      warning levels for some compilers have been removed, primarily
+      for clarity. Places where integer type coercion occurs have
+      been scrutinized. A new casting policy has been documented in
+      the manual. This is of concern mainly to people porting qpdf to
+      new platforms or compilers. It is not visible to programmers
+      writing code that uses the library
+
+    - Some internal limits have been removed in code that converts
+      numbers to strings. This is largely invisible to users, but it
+      does trigger a bug in some older versions of mingw-w64's C++
+      library. See @1@filename@1@README-windows.md@2@filename@2@ in
+      the source distribution if you think this may affect you. The
+      copy of the DLL distributed with qpdf's binary distribution is
+      not affected by this problem.
+
+  - The RPM spec file previously included with qpdf has been removed.
+    This is because virtually all Linux distributions include qpdf now
+    that it is a dependency of CUPS filters.
+
+  - A few bug fixes are included:
+
+    - Overridden compressed objects are properly handled. Before,
+      there were certain constructs that could cause qpdf to see old
+      versions of some objects. The most usual manifestation of this
+      was loss of filled in form values for certain files.
+
+    - Installation no longer uses GNU/Linux-specific versions of some
+      commands, so @1@command@1@make install@2@command@2@ works on
+      Solaris with native tools.
+
+    - The 64-bit mingw Windows binary package no longer includes a
+      32-bit DLL.
+
+4.0.1: January 17, 2013
+  - Fix detection of binary attachments in test suite to avoid false
+    test failures on some platforms.
+
+  - Add clarifying comment in @1@filename@1@QPDF.hh@2@filename@2@ to
+    methods that return the user password explaining that it is no
+    longer possible with newer encryption formats to recover the user
+    password knowing the owner password. In earlier encryption
+    formats, the user password was encrypted in the file using the
+    owner password. In newer encryption formats, a separate encryption
+    key is used on the file, and that key is independently encrypted
+    using both the user password and the owner password.
+
+4.0.0: December 31, 2012
+  - Major enhancement: support has been added for newer encryption
+    schemes supported by version X of Adobe Acrobat. This includes use
+    of 127-character passwords, 256-bit encryption keys, and the
+    encryption scheme specified in ISO 32000-2, the PDF 2.0
+    specification. This scheme can be chosen from the command line by
+    specifying use of 256-bit keys. qpdf also supports the deprecated
+    encryption method used by Acrobat IX. This encryption style has
+    known security weaknesses and should not be used in practice.
+    However, such files exist "in the wild," so support for this
+    scheme is still useful. New methods
+    ``QPDFWriter::setR6EncryptionParameters`` (for the PDF 2.0 scheme)
+    and ``QPDFWriter::setR5EncryptionParameters`` (for the deprecated
+    scheme) have been added to enable these new encryption schemes.
+    Corresponding functions have been added to the C API as well.
+
+  - Full support for Adobe extension levels in PDF version
+    information. Starting with PDF version 1.7, corresponding to ISO
+    32000, Adobe adds new functionality by increasing the extension
+    level rather than increasing the version. This support includes
+    addition of the ``QPDF::getExtensionLevel`` method for retrieving
+    the document's extension level, addition of versions of
+    ``QPDFWriter::setMinimumPDFVersion`` and
+    ``QPDFWriter::forcePDFVersion`` that accept an extension level,
+    and extended syntax for specifying forced and minimum versions on
+    the command line as described in `Advanced Transformation
+    Options <#ref.advanced-transformation>`__. Corresponding functions
+    have been added to the C API as well.
+
+  - Minor fixes to prevent qpdf from referencing objects in the file
+    that are not referenced in the file's overall structure. Most
+    files don't have any such objects, but some files have contain
+    unreferenced objects with errors, so these fixes prevent qpdf from
+    needlessly rejecting or complaining about such objects.
+
+  - Add new generalized methods for reading and writing files from/to
+    programmer-defined sources. The method
+    ``QPDF::processInputSource`` allows the programmer to use any
+    input source for the input file, and
+    ``QPDFWriter::setOutputPipeline`` allows the programmer to write
+    the output file through any pipeline. These methods would make it
+    possible to perform any number of specialized operations, such as
+    accessing external storage systems, creating bindings for qpdf in
+    other programming languages that have their own I/O systems, etc.
+
+  - Add new method ``QPDF::getEncryptionKey`` for retrieving the
+    underlying encryption key used in the file.
+
+  - This release includes a small handful of non-compatible API
+    changes. While effort is made to avoid such changes, all the
+    non-compatible API changes in this version were to parts of the
+    API that would likely never be used outside the library itself. In
+    all cases, the altered methods or structures were parts of the
+    ``QPDF`` that were public to enable them to be called from either
+    ``QPDFWriter`` or were part of validation code that was
+    over-zealous in reporting problems in parts of the file that would
+    not ordinarily be referenced. In no case did any of the removed
+    methods do anything worse that falsely report error conditions in
+    files that were broken in ways that didn't matter. The following
+    public parts of the ``QPDF`` class were changed in a
+    non-compatible way:
+
+    - Updated nested ``QPDF::EncryptionData`` class to add fields
+      needed by the newer encryption formats, member variables
+      changed to private so that future changes will not require
+      breaking backward compatibility.
+
+    - Added additional parameters to ``compute_data_key``, which is
+      used by ``QPDFWriter`` to compute the encryption key used to
+      encrypt a specific object.
+
+    - Removed the method ``flattenScalarReferences``. This method was
+      previously used prior to writing a new PDF file, but it has the
+      undesired side effect of causing qpdf to read objects in the
+      file that were not referenced. Some otherwise files have
+      unreferenced objects with errors in them, so this could cause
+      qpdf to reject files that would be accepted by virtually all
+      other PDF readers. In fact, qpdf relied on only a very small
+      part of what flattenScalarReferences did, so only this part has
+      been preserved, and it is now done directly inside
+      ``QPDFWriter``.
+
+    - Removed the method ``decodeStreams``. This method was used by
+      the @1@option@1@--check@2@option@2@ option of the
+      @1@command@1@qpdf@2@command@2@ command-line tool to force all
+      streams in the file to be decoded, but it also suffered from
+      the problem of opening otherwise unreferenced streams and thus
+      could report false positive. The
+      @1@option@1@--check@2@option@2@ option now causes qpdf to go
+      through all the motions of writing a new file based on the
+      original one, so it will always reference and check exactly
+      those parts of a file that any ordinary viewer would check.
+
+    - Removed the method ``trimTrailerForWrite``. This method was
+      used by ``QPDFWriter`` to modify the original QPDF object by
+      removing fields from the trailer dictionary that wouldn't apply
+      to the newly written file. This functionality, though generally
+      harmless, was a poor implementation and has been replaced by
+      having QPDFWriter filter these out when copying the trailer
+      rather than modifying the original QPDF object. (Note that qpdf
+      never modifies the original file itself.)
+
+  - Allow the PDF header to appear anywhere in the first 1024 bytes of
+    the file. This is consistent with what other readers do.
+
+  - Fix the @1@command@1@pkg-config@2@command@2@ files to list zlib
+    and pcre in ``Requires.private`` to better support static linking
+    using @1@command@1@pkg-config@2@command@2@.
+
+3.0.2: September 6, 2012
+  - Bug fix: ``QPDFWriter::setOutputMemory`` did not work when not
+    used with ``QPDFWriter::setStaticID``, which made it pretty much
+    useless. This has been fixed.
+
+  - New API call ``QPDFWriter::setExtraHeaderText`` inserts additional
+    text near the header of the PDF file. The intended use case is to
+    insert comments that may be consumed by a downstream application,
+    though other use cases may exist.
+
+3.0.1: August 11, 2012
+  - Version 3.0.0 included addition of files for
+    @1@command@1@pkg-config@2@command@2@, but this was not mentioned
+    in the release notes. The release notes for 3.0.0 were updated to
+    mention this.
+
+  - Bug fix: if an object stream ended with a scalar object not
+    followed by space, qpdf would incorrectly report that it
+    encountered a premature EOF. This bug has been in qpdf since
+    version 2.0.
+
+3.0.0: August 2, 2012
+  - Acknowledgment: I would like to express gratitude for the
+    contributions of Tobias Hoffmann toward the release of qpdf
+    version 3.0. He is responsible for most of the implementation and
+    design of the new API for manipulating pages, and contributed code
+    and ideas for many of the improvements made in version 3.0.
+    Without his work, this release would certainly not have happened
+    as soon as it did, if at all.
+
+  - *Non-compatible API change:* The version of
+    ``QPDFObjectHandle::replaceStreamData`` that uses a
+    ``StreamDataProvider`` no longer requires (or accepts) a
+    ``length`` parameter. See
+    `appendix_title <#ref.upgrading-to-3.0>`__ for an explanation.
+    While care is taken to avoid non-compatible API changes in
+    general, an exception was made this time because the new interface
+    offers an opportunity to significantly simplify calling code.
+
+  - Support has been added for large files. The test suite verifies
+    support for files larger than 4 gigabytes, and manual testing has
+    verified support for files larger than 10 gigabytes. Large file
+    support is available for both 32-bit and 64-bit platforms as long
+    as the compiler and underlying platforms support it.
+
+  - Support for page selection (splitting and merging PDF files) has
+    been added to the @1@command@1@qpdf@2@command@2@ command-line
+    tool. See `Page Selection Options <#ref.page-selection>`__.
+
+  - Options have been added to the @1@command@1@qpdf@2@command@2@
+    command-line tool for copying encryption parameters from another
+    file. See `Basic Options <#ref.basic-options>`__.
+
+  - New methods have been added to the ``QPDF`` object for adding and
+    removing pages. See `Adding and Removing
+    Pages <#ref.adding-and-remove-pages>`__.
+
+  - New methods have been added to the ``QPDF`` object for copying
+    objects from other PDF files. See `Copying Objects From Other PDF
+    Files <#ref.foreign-objects>`__
+
+  - A new method ``QPDFObjectHandle::parse`` has been added for
+    constructing ``QPDFObjectHandle`` objects from a string
+    description.
+
+  - Methods have been added to ``QPDFWriter`` to allow writing to an
+    already open stdio ``FILE*`` addition to writing to standard
+    output or a named file. Methods have been added to ``QPDF`` to be
+    able to process a file from an already open stdio ``FILE*``. This
+    makes it possible to read and write PDF from secure temporary
+    files that have been unlinked prior to being fully read or
+    written.
+
+  - The ``QPDF::emptyPDF`` can be used to allow creation of PDF files
+    from scratch. The example
+    @1@filename@1@examples/pdf-create.cc@2@filename@2@ illustrates how
+    it can be used.
+
+  - Several methods to take ``PointerHolder<Buffer>`` can now also
+    accept ``std::string`` arguments.
+
+  - Many new convenience methods have been added to the library, most
+    in ``QPDFObjectHandle``. See @1@filename@1@ChangeLog@2@filename@2@
+    for a full list.
+
+  - When building on a platform that supports ELF shared libraries
+    (such as Linux), symbol versions are enabled by default. They can
+    be disabled by passing
+    @1@option@1@--disable-ld-version-script@2@option@2@ to
+    @1@command@1@./configure@2@command@2@.
+
+  - The file @1@filename@1@libqpdf.pc@2@filename@2@ is now installed
+    to support @1@command@1@pkg-config@2@command@2@.
+
+  - Image comparison tests are off by default now since they are not
+    needed to verify a correct build or port of qpdf. They are needed
+    only when changing the actual PDF output generated by qpdf. You
+    should enable them if you are making deep changes to qpdf itself.
+    See @1@filename@1@README.md@2@filename@2@ for details.
+
+  - Large file tests are off by default but can be turned on with
+    @1@command@1@./configure@2@command@2@ or by setting an environment
+    variable before running the test suite. See
+    @1@filename@1@README.md@2@filename@2@ for details.
+
+  - When qpdf's test suite fails, failures are not printed to the
+    terminal anymore by default. Instead, find them in
+    @1@filename@1@build/qtest.log@2@filename@2@. For packagers who are
+    building with an autobuilder, you can add the
+    @1@option@1@--enable-show-failed-test-output@2@option@2@ option to
+    @1@command@1@./configure@2@command@2@ to restore the old behavior.
+
+2.3.1: December 28, 2011
+  - Fix thread-safety problem resulting from non-thread-safe use of
+    the PCRE library.
+
+  - Made a few minor documentation fixes.
+
+  - Add workaround for a bug that appears in some versions of
+    ghostscript to the test suite
+
+  - Fix minor build issue for Visual C++ 2010.
+
+2.3.0: August 11, 2011
+  - Bug fix: when preserving existing encryption on encrypted files
+    with cleartext metadata, older qpdf versions would generate
+    password-protected files with no valid password. This operation
+    now works. This bug only affected files created by copying
+    existing encryption parameters; explicit encryption with
+    specification of cleartext metadata worked before and continues to
+    work.
+
+  - Enhance ``QPDFWriter`` with a new constructor that allows you to
+    delay the specification of the output file. When using this
+    constructor, you may now call ``QPDFWriter::setOutputFilename`` to
+    specify the output file, or you may use
+    ``QPDFWriter::setOutputMemory`` to cause ``QPDFWriter`` to write
+    the resulting PDF file to a memory buffer. You may then use
+    ``QPDFWriter::getBuffer`` to retrieve the memory buffer.
+
+  - Add new API call ``QPDF::replaceObject`` for replacing objects by
+    object ID
+
+  - Add new API call ``QPDF::swapObjects`` for swapping two objects by
+    object ID
+
+  - Add ``QPDFObjectHandle::getDictAsMap`` and
+    ``QPDFObjectHandle::getArrayAsVector`` to allow retrieval of
+    dictionary objects as maps and array objects as vectors.
+
+  - Add functions ``qpdf_get_info_key`` and ``qpdf_set_info_key`` to
+    the C API for manipulating string fields of the document's
+    ``/Info`` dictionary.
+
+  - Add functions ``qpdf_init_write_memory``,
+    ``qpdf_get_buffer_length``, and ``qpdf_get_buffer`` to the C API
+    for writing PDF files to a memory buffer instead of a file.
+
+2.2.4: June 25, 2011
+  - Fix installation and compilation issues; no functionality changes.
+
+2.2.3: April 30, 2011
+  - Handle some damaged streams with incorrect characters following
+    the stream keyword.
+
+  - Improve handling of inline images when normalizing content
+    streams.
+
+  - Enhance error recovery to properly handle files that use object 0
+    as a regular object, which is specifically disallowed by the spec.
+
+2.2.2: October 4, 2010
+  - Add new function ``qpdf_read_memory`` to the C API to call
+    ``QPDF::processMemoryFile``. This was an omission in qpdf 2.2.1.
+
+2.2.1: October 1, 2010
+  - Add new method ``QPDF::setOutputStreams`` to replace ``std::cout``
+    and ``std::cerr`` with other streams for generation of diagnostic
+    messages and error messages. This can be useful for GUIs or other
+    applications that want to capture any output generated by the
+    library to present to the user in some other way. Note that QPDF
+    does not write to ``std::cout`` (or the specified output stream)
+    except where explicitly mentioned in
+    @1@filename@1@QPDF.hh@2@filename@2@, and that the only use of the
+    error stream is for warnings. Note also that output of warnings is
+    suppressed when ``setSuppressWarnings(true)`` is called.
+
+  - Add new method ``QPDF::processMemoryFile`` for operating on PDF
+    files that are loaded into memory rather than in a file on disk.
+
+  - Give a warning but otherwise ignore empty PDF objects by treating
+    them as null. Empty object are not permitted by the PDF
+    specification but have been known to appear in some actual PDF
+    files.
+
+  - Handle inline image filter abbreviations when the appear as stream
+    filter abbreviations. The PDF specification does not allow use of
+    stream filter abbreviations in this way, but Adobe Reader and some
+    other PDF readers accept them since they sometimes appear
+    incorrectly in actual PDF files.
+
+  - Implement miscellaneous enhancements to ``PointerHolder`` and
+    ``Buffer`` to support other changes.
 
 2.2.0: August 14, 2010
-   -  Add new methods to ``QPDFObjectHandle`` (``newStream`` and
-      ``replaceStreamData`` for creating new streams and replacing
-      stream data. This makes it possible to perform a wide range of
-      operations that were not previously possible.
+  - Add new methods to ``QPDFObjectHandle`` (``newStream`` and
+    ``replaceStreamData`` for creating new streams and replacing
+    stream data. This makes it possible to perform a wide range of
+    operations that were not previously possible.
 
-   -  Add new helper method in ``QPDFObjectHandle``
-      (``addPageContents``) for appending or prepending new content
-      streams to a page. This method makes it possible to manipulate
-      content streams without having to be concerned whether a page's
-      contents are a single stream or an array of streams.
+  - Add new helper method in ``QPDFObjectHandle``
+    (``addPageContents``) for appending or prepending new content
+    streams to a page. This method makes it possible to manipulate
+    content streams without having to be concerned whether a page's
+    contents are a single stream or an array of streams.
 
-   -  Add new method in ``QPDFObjectHandle``: ``replaceOrRemoveKey``,
-      which replaces a dictionary key with a given value unless the
-      value is null, in which case it removes the key instead.
+  - Add new method in ``QPDFObjectHandle``: ``replaceOrRemoveKey``,
+    which replaces a dictionary key with a given value unless the
+    value is null, in which case it removes the key instead.
 
-   -  Add new method in ``QPDFObjectHandle``: ``getRawStreamData``,
-      which returns the raw (unfiltered) stream data into a buffer. This
-      complements the ``getStreamData`` method, which returns the
-      filtered (uncompressed) stream data and can only be used when the
-      stream's data is filterable.
+  - Add new method in ``QPDFObjectHandle``: ``getRawStreamData``,
+    which returns the raw (unfiltered) stream data into a buffer. This
+    complements the ``getStreamData`` method, which returns the
+    filtered (uncompressed) stream data and can only be used when the
+    stream's data is filterable.
 
-   -  Provide two new examples:
-      @1@command@1@pdf-double-page-size@2@command@2@ and
-      @1@command@1@pdf-invert-images@2@command@2@ that illustrate the
-      newly added interfaces.
+  - Provide two new examples:
+    @1@command@1@pdf-double-page-size@2@command@2@ and
+    @1@command@1@pdf-invert-images@2@command@2@ that illustrate the
+    newly added interfaces.
 
-   -  Fix a memory leak that would cause loss of a few bytes for every
-      object involved in a cycle of object references. Thanks to Jian Ma
-      for calling my attention to the leak.
+  - Fix a memory leak that would cause loss of a few bytes for every
+    object involved in a cycle of object references. Thanks to Jian Ma
+    for calling my attention to the leak.
 
 2.1.5: April 25, 2010
-   -  Remove restriction of file identifier strings to 16 bytes. This
-      unnecessary restriction was preventing qpdf from being able to
-      encrypt or decrypt files with identifier strings that were not
-      exactly 16 bytes long. The specification imposes no such
-      restriction.
+  - Remove restriction of file identifier strings to 16 bytes. This
+    unnecessary restriction was preventing qpdf from being able to
+    encrypt or decrypt files with identifier strings that were not
+    exactly 16 bytes long. The specification imposes no such
+    restriction.
 
 2.1.4: April 18, 2010
-   -  Apply the same padding calculation fix from version 2.1.2 to the
-      main cross reference stream as well.
+  - Apply the same padding calculation fix from version 2.1.2 to the
+    main cross reference stream as well.
 
-   -  Since @1@command@1@qpdf --check@2@command@2@ only performs limited
-      checks, clarify the output to make it clear that there still may
-      be errors that qpdf can't check. This should make it less
-      surprising to people when another PDF reader is unable to read a
-      file that qpdf thinks is okay.
+  - Since @1@command@1@qpdf --check@2@command@2@ only performs limited
+    checks, clarify the output to make it clear that there still may
+    be errors that qpdf can't check. This should make it less
+    surprising to people when another PDF reader is unable to read a
+    file that qpdf thinks is okay.
 
 2.1.3: March 27, 2010
-   -  Fix bug that could cause a failure when rewriting PDF files that
-      contain object streams with unreferenced objects that in turn
-      reference indirect scalars.
+  - Fix bug that could cause a failure when rewriting PDF files that
+    contain object streams with unreferenced objects that in turn
+    reference indirect scalars.
 
-   -  Don't complain about (invalid) AES streams that aren't a multiple
-      of 16 bytes. Instead, pad them before decrypting.
+  - Don't complain about (invalid) AES streams that aren't a multiple
+    of 16 bytes. Instead, pad them before decrypting.
 
 2.1.2: January 24, 2010
-   -  Fix bug in padding around first half cross reference stream in
-      linearized files. The bug could cause an assertion failure when
-      linearizing certain unlucky files.
+  - Fix bug in padding around first half cross reference stream in
+    linearized files. The bug could cause an assertion failure when
+    linearizing certain unlucky files.
 
 2.1.1: December 14, 2009
-   -  No changes in functionality; insert missing include in an internal
-      library header file to support gcc 4.4, and update test suite to
-      ignore broken Adobe Reader installations.
+  - No changes in functionality; insert missing include in an internal
+    library header file to support gcc 4.4, and update test suite to
+    ignore broken Adobe Reader installations.
 
 2.1: October 30, 2009
-   -  This is the first version of qpdf to include Windows support. On
-      Windows, it is possible to build a DLL. Additionally, a partial
-      C-language API has been introduced, which makes it possible to
-      call qpdf functions from non-C++ environments. I am very grateful
-      to Žarko Gajić (http://zarko-gajic.iz.hr/) for tirelessly testing
-      numerous pre-release versions of this DLL and providing many
-      excellent suggestions on improving the interface.
+  - This is the first version of qpdf to include Windows support. On
+    Windows, it is possible to build a DLL. Additionally, a partial
+    C-language API has been introduced, which makes it possible to
+    call qpdf functions from non-C++ environments. I am very grateful
+    to Žarko Gajić (http://zarko-gajic.iz.hr/) for tirelessly testing
+    numerous pre-release versions of this DLL and providing many
+    excellent suggestions on improving the interface.
 
-      For programming to the C interface, please see the header file
-      @1@filename@1@qpdf/qpdf-c.h@2@filename@2@ and the example
-      @1@filename@1@examples/pdf-linearize.c@2@filename@2@.
+    For programming to the C interface, please see the header file
+    @1@filename@1@qpdf/qpdf-c.h@2@filename@2@ and the example
+    @1@filename@1@examples/pdf-linearize.c@2@filename@2@.
 
-   -  Žarko Gajić has written a Delphi wrapper for qpdf, which can be
-      downloaded from qpdf's download side. Žarko's Delphi wrapper is
-      released with the same licensing terms as qpdf itself and comes
-      with this disclaimer: "Delphi wrapper unit
-      @1@filename@1@qpdf.pas@2@filename@2@ created by Žarko Gajić
-      (http://zarko-gajic.iz.hr/). Use at your own risk and for whatever
-      purpose you want. No support is provided. Sample code is
-      provided."
+  - Žarko Gajić has written a Delphi wrapper for qpdf, which can be
+    downloaded from qpdf's download side. Žarko's Delphi wrapper is
+    released with the same licensing terms as qpdf itself and comes
+    with this disclaimer: "Delphi wrapper unit
+    @1@filename@1@qpdf.pas@2@filename@2@ created by Žarko Gajić
+    (http://zarko-gajic.iz.hr/). Use at your own risk and for whatever
+    purpose you want. No support is provided. Sample code is
+    provided."
 
-   -  Support has been added for AES encryption and crypt filters.
-      Although qpdf does not presently support files that use PKI-based
-      encryption, with the addition of AES and crypt filters, qpdf is
-      now be able to open most encrypted files created with newer
-      versions of Acrobat or other PDF creation software. Note that I
-      have not been able to get very many files encrypted in this way,
-      so it's possible there could still be some cases that qpdf can't
-      handle. Please report them if you find them.
+  - Support has been added for AES encryption and crypt filters.
+    Although qpdf does not presently support files that use PKI-based
+    encryption, with the addition of AES and crypt filters, qpdf is
+    now be able to open most encrypted files created with newer
+    versions of Acrobat or other PDF creation software. Note that I
+    have not been able to get very many files encrypted in this way,
+    so it's possible there could still be some cases that qpdf can't
+    handle. Please report them if you find them.
 
-   -  Many error messages have been improved to include more information
-      in hopes of making qpdf a more useful tool for PDF experts to use
-      in manually recovering damaged PDF files.
+  - Many error messages have been improved to include more information
+    in hopes of making qpdf a more useful tool for PDF experts to use
+    in manually recovering damaged PDF files.
 
-   -  Attempt to avoid compressing metadata streams if possible. This is
-      consistent with other PDF creation applications.
+  - Attempt to avoid compressing metadata streams if possible. This is
+    consistent with other PDF creation applications.
 
-   -  Provide new command-line options for AES encrypt, cleartext
-      metadata, and setting the minimum and forced PDF versions of
-      output files.
+  - Provide new command-line options for AES encrypt, cleartext
+    metadata, and setting the minimum and forced PDF versions of
+    output files.
 
-   -  Add additional methods to the ``QPDF`` object for querying the
-      document's permissions. Although qpdf does not enforce these
-      permissions, it does make them available so that applications that
-      use qpdf can enforce permissions.
+  - Add additional methods to the ``QPDF`` object for querying the
+    document's permissions. Although qpdf does not enforce these
+    permissions, it does make them available so that applications that
+    use qpdf can enforce permissions.
 
-   -  The @1@option@1@--check@2@option@2@ option to
-      @1@command@1@qpdf@2@command@2@ has been extended to include some
-      additional information.
+  - The @1@option@1@--check@2@option@2@ option to
+    @1@command@1@qpdf@2@command@2@ has been extended to include some
+    additional information.
 
-   -  There have been a handful of non-compatible API changes. For
-      details, see `appendix_title <#ref.upgrading-to-2.1>`__.
+  - There have been a handful of non-compatible API changes. For
+    details, see `appendix_title <#ref.upgrading-to-2.1>`__.
 
 2.0.6: May 3, 2009
-   -  Do not attempt to uncompress streams that have decode parameters
-      we don't recognize. Earlier versions of qpdf would have rejected
-      files with such streams.
+  - Do not attempt to uncompress streams that have decode parameters
+    we don't recognize. Earlier versions of qpdf would have rejected
+    files with such streams.
 
 2.0.5: March 10, 2009
-   -  Improve error handling in the LZW decoder, and fix a small error
-      introduced in the previous version with regard to handling full
-      tables. The LZW decoder has been more strongly verified in this
-      release.
+  - Improve error handling in the LZW decoder, and fix a small error
+    introduced in the previous version with regard to handling full
+    tables. The LZW decoder has been more strongly verified in this
+    release.
 
 2.0.4: February 21, 2009
-   -  Include proper support for LZW streams encoded without the "early
-      code change" flag. Special thanks to Atom Smasher who reported the
-      problem and provided an input file compressed in this way, which I
-      did not previously have.
+  - Include proper support for LZW streams encoded without the "early
+    code change" flag. Special thanks to Atom Smasher who reported the
+    problem and provided an input file compressed in this way, which I
+    did not previously have.
 
-   -  Implement some improvements to file recovery logic.
+  - Implement some improvements to file recovery logic.
 
 2.0.3: February 15, 2009
-   -  Compile cleanly with gcc 4.4.
+  - Compile cleanly with gcc 4.4.
 
-   -  Handle strings encoded as UTF-16BE properly.
+  - Handle strings encoded as UTF-16BE properly.
 
 2.0.2: June 30, 2008
-   -  Update test suite to work properly with a
-      non-@1@command@1@bash@2@command@2@
-      @1@filename@1@/bin/sh@2@filename@2@ and with Perl 5.10. No changes
-      were made to the actual qpdf source code itself for this release.
+  - Update test suite to work properly with a
+    non-@1@command@1@bash@2@command@2@
+    @1@filename@1@/bin/sh@2@filename@2@ and with Perl 5.10. No changes
+    were made to the actual qpdf source code itself for this release.
 
 2.0.1: May 6, 2008
-   -  No changes in functionality or interface. This release includes
-      fixes to the source code so that qpdf compiles properly and passes
-      its test suite on a broader range of platforms. See
-      @1@filename@1@ChangeLog@2@filename@2@ in the source distribution
-      for details.
+  - No changes in functionality or interface. This release includes
+    fixes to the source code so that qpdf compiles properly and passes
+    its test suite on a broader range of platforms. See
+    @1@filename@1@ChangeLog@2@filename@2@ in the source distribution
+    for details.
 
 2.0: April 29, 2008
-   -  First public release.
+  - First public release.
 
 .. _ref.upgrading-to-2.1:
 
@@ -6240,46 +6240,46 @@ you may have to update your code. The changes are enumerated here. There
 are also some new interfaces; for those, please refer to the header
 files.
 
--  QPDF's exception handling mechanism now uses ``std::logic_error`` for
-   internal errors and ``std::runtime_error`` for runtime errors in
-   favor of the now removed ``QEXC`` classes used in previous versions.
-   The ``QEXC`` exception classes predated the addition of the
-   @1@filename@1@<stdexcept>@2@filename@2@ header file to the C++
-   standard library. Most of the exceptions thrown by the qpdf library
-   itself are still of type ``QPDFExc`` which is now derived from
-   ``std::runtime_error``. Programs that caught an instance of
-   ``std::exception`` and displayed it by calling the ``what()`` method
-   will not need to be changed.
+- QPDF's exception handling mechanism now uses ``std::logic_error`` for
+  internal errors and ``std::runtime_error`` for runtime errors in
+  favor of the now removed ``QEXC`` classes used in previous versions.
+  The ``QEXC`` exception classes predated the addition of the
+  @1@filename@1@<stdexcept>@2@filename@2@ header file to the C++
+  standard library. Most of the exceptions thrown by the qpdf library
+  itself are still of type ``QPDFExc`` which is now derived from
+  ``std::runtime_error``. Programs that caught an instance of
+  ``std::exception`` and displayed it by calling the ``what()`` method
+  will not need to be changed.
 
--  The ``QPDFExc`` class now internally represents various fields of the
-   error condition and provides interfaces for querying them. Among the
-   fields is a numeric error code that can help applications act
-   differently on (a small number of) different error conditions. See
-   @1@filename@1@QPDFExc.hh@2@filename@2@ for details.
+- The ``QPDFExc`` class now internally represents various fields of the
+  error condition and provides interfaces for querying them. Among the
+  fields is a numeric error code that can help applications act
+  differently on (a small number of) different error conditions. See
+  @1@filename@1@QPDFExc.hh@2@filename@2@ for details.
 
--  Warnings can be retrieved from qpdf as instances of ``QPDFExc``
-   instead of strings.
+- Warnings can be retrieved from qpdf as instances of ``QPDFExc``
+  instead of strings.
 
--  The nested ``QPDF::EncryptionData`` class's constructor takes an
-   additional argument. This class is primarily intended to be used by
-   ``QPDFWriter``. There's not really anything useful an end-user
-   application could do with it. It probably shouldn't really be part of
-   the public interface to begin with. Likewise, some of the methods for
-   computing internal encryption dictionary parameters have changed to
-   support ``/R=4`` encryption.
+- The nested ``QPDF::EncryptionData`` class's constructor takes an
+  additional argument. This class is primarily intended to be used by
+  ``QPDFWriter``. There's not really anything useful an end-user
+  application could do with it. It probably shouldn't really be part of
+  the public interface to begin with. Likewise, some of the methods for
+  computing internal encryption dictionary parameters have changed to
+  support ``/R=4`` encryption.
 
--  The method ``QPDF::getUserPassword`` has been removed since it didn't
-   do what people would think it did. There are now two new methods:
-   ``QPDF::getPaddedUserPassword`` and ``QPDF::getTrimmedUserPassword``.
-   The first one does what the old ``QPDF::getUserPassword`` method used
-   to do, which is to return the password with possible binary padding
-   as specified by the PDF specification. The second one returns a
-   human-readable password string.
+- The method ``QPDF::getUserPassword`` has been removed since it didn't
+  do what people would think it did. There are now two new methods:
+  ``QPDF::getPaddedUserPassword`` and ``QPDF::getTrimmedUserPassword``.
+  The first one does what the old ``QPDF::getUserPassword`` method used
+  to do, which is to return the password with possible binary padding
+  as specified by the PDF specification. The second one returns a
+  human-readable password string.
 
--  The enumerated types that used to be nested in ``QPDFWriter`` have
-   moved to top-level enumerated types and are now defined in the file
-   @1@filename@1@qpdf/Constants.h@2@filename@2@. This enables them to be
-   shared by both the C and C++ interfaces.
+- The enumerated types that used to be nested in ``QPDFWriter`` have
+  moved to top-level enumerated types and are now defined in the file
+  @1@filename@1@qpdf/Constants.h@2@filename@2@. This enables them to be
+  shared by both the C and C++ interfaces.
 
 .. _ref.upgrading-to-3.0:
 
@@ -6289,28 +6289,28 @@ Upgrading to 3.0
 For the most part, the API for qpdf version 3.0 is backward compatible
 with versions 2.1 and later. There are two exceptions:
 
--  The method ``QPDFObjectHandle::replaceStreamData`` that uses a
-   ``StreamDataProvider`` to provide the stream data no longer takes a
-   ``length`` parameter. While it would have been easy enough to keep
-   the parameter for backward compatibility, in this case, the parameter
-   was removed since this provides the user an opportunity to simplify
-   the calling code. This method was introduced in version 2.2. At the
-   time, the ``length`` parameter was required in order to ensure that
-   calls to the stream data provider returned the same length for a
-   specific stream every time they were invoked. In particular, the
-   linearization code depends on this. Instead, qpdf 3.0 and newer check
-   for that constraint explicitly. The first time the stream data
-   provider is called for a specific stream, the actual length is saved,
-   and subsequent calls are required to return the same number of bytes.
-   This means the calling code no longer has to compute the length in
-   advance, which can be a significant simplification. If your code
-   fails to compile because of the extra argument and you don't want to
-   make other changes to your code, just omit the argument.
+- The method ``QPDFObjectHandle::replaceStreamData`` that uses a
+  ``StreamDataProvider`` to provide the stream data no longer takes a
+  ``length`` parameter. While it would have been easy enough to keep
+  the parameter for backward compatibility, in this case, the parameter
+  was removed since this provides the user an opportunity to simplify
+  the calling code. This method was introduced in version 2.2. At the
+  time, the ``length`` parameter was required in order to ensure that
+  calls to the stream data provider returned the same length for a
+  specific stream every time they were invoked. In particular, the
+  linearization code depends on this. Instead, qpdf 3.0 and newer check
+  for that constraint explicitly. The first time the stream data
+  provider is called for a specific stream, the actual length is saved,
+  and subsequent calls are required to return the same number of bytes.
+  This means the calling code no longer has to compute the length in
+  advance, which can be a significant simplification. If your code
+  fails to compile because of the extra argument and you don't want to
+  make other changes to your code, just omit the argument.
 
--  Many methods take ``long long`` instead of other integer types. Most
-   if not all existing code should compile fine with this change since
-   such parameters had always previously been smaller types. This change
-   was required to support files larger than two gigabytes in size.
+- Many methods take ``long long`` instead of other integer types. Most
+  if not all existing code should compile fine with this change since
+  such parameters had always previously been smaller types. This change
+  was required to support files larger than two gigabytes in size.
 
 .. _ref.upgrading-to-4.0:
 
