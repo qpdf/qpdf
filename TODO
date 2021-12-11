@@ -25,12 +25,6 @@ Things to fix:
 Entities/Unicode
 
 <!ENTITY lastreleased "November 16, 2021"> (not needed)
-<!ENTITY ldquo "&#x201C;">
-<!ENTITY mdash "&#x2014;">
-<!ENTITY nbsp "&#xA0;">
-<!ENTITY ndash "&#x2013;">
-<!ENTITY rdquo "&#x201D;">
-<!ENTITY swversion "10.4.0"> -> |release|
 
 Elements:
 

@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE book [
-<!ENTITY ldquo "&#x201C;">
-<!ENTITY rdquo "&#x201D;">
-<!ENTITY mdash "&#x2014;">
-<!ENTITY ndash "&#x2013;">
-<!ENTITY nbsp "&#xA0;">
 <!ENTITY swversion "10.4.0">
 <!ENTITY lastreleased "November 16, 2021">
 ]>
@@ -265,7 +260,7 @@ make
    <para>
     Starting with qpdf 9.1.0, the qpdf library can be built with
     multiple implementations of providers of cryptographic functions,
-    which we refer to as &ldquo;crypto providers.&rdquo; At the time
+    which we refer to as "crypto providers." At the time
     of writing, a crypto implementation must provide MD5 and SHA2
     (256, 384, and 512-bit) hashes and RC4 and AES256 with and without
     CBC encryption. In the future, if digital signature is added to
@@ -588,7 +583,7 @@ make
    <para>
     @1@option@1@outfilename@2@option@2@ does not have to be seekable, even
     when generating linearized files.  Specifying
-    &ldquo;@1@option@1@-@2@option@2@&rdquo; as @1@option@1@outfilename@2@option@2@
+    "@1@option@1@-@2@option@2@" as @1@option@1@outfilename@2@option@2@
     means to write to standard output. If you want to overwrite the
     input file with the output, use the option
     @1@option@1@--replace-input@2@option@2@ and omit the output file name.
@@ -1249,7 +1244,7 @@ make
 
     <programlisting>@1@option@1@--encrypt @1@replaceable@1@user-password@2@replaceable@2@ @1@replaceable@1@owner-password@2@replaceable@2@ @1@replaceable@1@key-length@2@replaceable@2@ [ @1@replaceable@1@restrictions@2@replaceable@2@ ] --@2@option@2@
 </programlisting>
-    Note that &ldquo;@1@option@1@--@2@option@2@&rdquo; terminates parsing of
+    Note that "@1@option@1@--@2@option@2@" terminates parsing of
     encryption flags and must be present even if no restrictions are
     present.
    </para>
@@ -1548,12 +1543,12 @@ make
     Multiple input files may be specified.  Each one is given as the
     name of the input file, an optional password (if required to open
     the file), and the range of pages.  Note that
-    &ldquo;@1@option@1@--@2@option@2@&rdquo; terminates parsing of page
+    "@1@option@1@--@2@option@2@" terminates parsing of page
     selection flags.
    </para>
    <para>
     Starting with qpf 8.4, the special input file name
-    &ldquo;@1@filename@1@.@2@filename@2@&rdquo; can be used as a shortcut for the
+    "@1@filename@1@.@2@filename@2@" can be used as a shortcut for the
     primary input filename.
    </para>
    <para>
@@ -1581,8 +1576,8 @@ make
    <para>
     The page range is a set of numbers separated by commas, ranges of
     numbers separated dashes, or combinations of those. The character
-    &ldquo;z&rdquo; represents the last page. A number preceded by an
-    &ldquo;r&rdquo; indicates to count from the end, so
+    "z" represents the last page. A number preceded by an
+    "r" indicates to count from the end, so
     <literal>r3-r1</literal> would be the last three pages of the
     document. Pages can appear in any order. Ranges can appear with a
     high number followed by a low number, which causes the pages to
@@ -1635,7 +1630,7 @@ make
    <para>
     Starting in qpdf version 8.3, you can specify the
     @1@option@1@--collate@2@option@2@ option. Note that this option is
-    specified outside of @1@option@1@--pages&nbsp;...&nbsp;--@2@option@2@.
+    specified outside of @1@option@1@--pages ... --@2@option@2@.
     When @1@option@1@--collate@2@option@2@ is specified, it changes the
     meaning of @1@option@1@--pages@2@option@2@ so that the specified files,
     as modified by page ranges, are collated rather than concatenated.
@@ -1711,8 +1706,8 @@ make
 
     <programlisting>@1@command@1@qpdf@2@command@2@ @1@option@1@--empty --pages infile.pdf 1-5 -- outfile.pdf@2@option@2@
 </programlisting>
-    If you wanted to take pages 1&ndash;5 from
-    @1@filename@1@file1.pdf@2@filename@2@ and pages 11&ndash;15 from
+    If you wanted to take pages 1 through 5 from
+    @1@filename@1@file1.pdf@2@filename@2@ and pages 11 through 15 from
     @1@filename@1@file2.pdf@2@filename@2@ in reverse, taking document-level
     metadata from @1@filename@1@file2.pdf@2@filename@2@, you would run
 
@@ -1809,7 +1804,7 @@ outfile.pdf@2@option@2@
       <para>
        @1@option@1@--repeat=page-range@2@option@2@: an optional range of
        pages that specifies which pages in the overlay/underlay file
-       will be repeated after the &ldquo;from&rdquo; pages are used
+       will be repeated after the "from" pages are used
        up. If you want to repeat a range of pages starting at the
        beginning, you can explicitly use @1@option@1@--from=@2@option@2@.
       </para>
@@ -1850,7 +1845,7 @@ outfile.pdf@2@option@2@
       <term>@1@option@1@--list-attachments@2@option@2@</term>
       <listitem>
        <para>
-        Show the &ldquo;key&rdquo; and stream number for embedded
+        Show the "key" and stream number for embedded
         files. With @1@option@1@--verbose@2@option@2@, additional
         information, including preferred file name, description,
         dates, and more are also displayed. The key is usually but not
@@ -2447,8 +2442,8 @@ outfile.pdf@2@option@2@
          <listitem>
           <para>
            For text fields and list boxes, any characters that fall
-           outside of US-ASCII or, if detected, &ldquo;Windows
-           ANSI&rdquo; or &ldquo;Mac Roman&rdquo; encoding, will be
+           outside of US-ASCII or, if detected, "Windows
+           ANSI" or "Mac Roman" encoding, will be
            replaced by the <literal>?</literal> character.
           </para>
          </listitem>
@@ -2529,7 +2524,7 @@ outfile.pdf@2@option@2@
       <listitem>
        <para>
         Avoid optimizing images whose pixel count
-        (width&nbsp;×&nbsp;height) is below the specified amount. If
+        (width × height) is below the specified amount. If
         omitted, the default is 16,384 pixels. Use 0 for no minimum.
        </para>
       </listitem>
@@ -2661,7 +2656,7 @@ outfile.pdf@2@option@2@
     streams.  This is generally safe but could, in some cases, cause
     damage to the content streams.  This option is intended for people
     who wish to study PDF content streams or to debug PDF content.
-    You should not use this for &ldquo;production&rdquo; PDF files.
+    You should not use this for "production" PDF files.
    </para>
    <para>
     When normalizing content, if qpdf runs into any lexical errors, it
@@ -2841,7 +2836,7 @@ outfile.pdf@2@option@2@
        <para>
         Show the contents of the given object.  This is especially
         useful for inspecting objects that are inside of object
-        streams (also known as &ldquo;compressed objects&rdquo;).
+        streams (also known as "compressed objects").
        </para>
       </listitem>
      </varlistentry>
@@ -2934,7 +2929,7 @@ outfile.pdf@2@option@2@
        <para>
         This option is repeatable. If specified, only specified
         objects will be shown in the
-        &ldquo;<literal>objects</literal>&rdquo; key of the JSON
+        "<literal>objects</literal>" key of the JSON
         output. If absent, all objects will be shown.
        </para>
       </listitem>
@@ -2952,7 +2947,7 @@ outfile.pdf@2@option@2@
         conditions that @1@option@1@--check@2@option@2@ detects.  These are
         issued as warnings instead of errors.  If qpdf finds no errors
         but finds warnings, it will exit with a status of 3 (as of
-        version&nbsp;2.0.4). When @1@option@1@--check@2@option@2@ is combined
+        version 2.0.4). When @1@option@1@--check@2@option@2@ is combined
         with other options, checks are always performed before any
         other options are processed. For erroneous files,
         @1@option@1@--check@2@option@2@ will cause qpdf to attempt to
@@ -3300,10 +3295,10 @@ outfile.pdf@2@option@2@
    </para>
    <variablelist>
     <varlistentry>
-     <term>&ldquo;C&rdquo;</term>
+     <term>"C"</term>
      <listitem>
       <para>
-       The qpdf library includes a &ldquo;C&rdquo; language interface
+       The qpdf library includes a "C" language interface
        that provides a subset of the overall capabilities. The header
        file @1@filename@1@qpdf/qpdf-c.h@2@filename@2@ includes information
        about its use. As long as you use a C++ linker, you can link C
@@ -3451,7 +3446,7 @@ outfile.pdf@2@option@2@
        </para>
        <para>
         The top-level JSON structure contains a
-        &ldquo;<literal>version</literal>&rdquo; key whose value is
+        "<literal>version</literal>" key whose value is
         simple integer. The value of the <literal>version</literal> key
         will be incremented if a non-compatible change is made. A
         non-compatible change would be any change that involves removal
@@ -3507,10 +3502,10 @@ outfile.pdf@2@option@2@
          </listitem>
         </itemizedlist>
         For example, the help output indicates includes a
-        &ldquo;<literal>pagelabels</literal>&rdquo; key whose value is
+        "<literal>pagelabels</literal>" key whose value is
         an array of one element. That element is a dictionary with keys
-        &ldquo;<literal>index</literal>&rdquo; and
-        &ldquo;<literal>label</literal>&rdquo;. In addition to
+        "<literal>index</literal>" and
+        "<literal>label</literal>". In addition to
         describing the meaning of those keys, this tells you that the
         actual JSON output will contain a <literal>pagelabels</literal>
         array, each of whose elements is a dictionary that contains an
@@ -3546,7 +3541,7 @@ outfile.pdf@2@option@2@
       <para>
        Strings, names, and indirect object references in the original
        PDF file are all converted to strings in the JSON
-       representation. In the case of a &ldquo;normal&rdquo; PDF file,
+       representation. In the case of a "normal" PDF file,
        you can tell the difference because a name starts with a slash
        (<literal>/</literal>), and an indirect object reference looks
        like <literal>n n R</literal>, but if there were to be a string
@@ -3631,11 +3626,11 @@ outfile.pdf@2@option@2@
       <para>
        The image information included in the <literal>page</literal>
        section of the JSON output includes the key
-       &ldquo;<literal>filterable</literal>&rdquo;. Note that the
+       "<literal>filterable</literal>". Note that the
        value of this field may depend on the
        @1@option@1@--decode-level@2@option@2@ that you invoke qpdf with. The
        JSON output includes a top-level key
-       &ldquo;<literal>parameters</literal>&rdquo; that indicates the
+       "<literal>parameters</literal>" that indicates the
        decode level used for computing whether a stream was
        filterable. For example, jpeg images will be shown as not
        filterable by default, but they will be shown as filterable if
@@ -3674,8 +3669,8 @@ outfile.pdf@2@option@2@
     is to generating warnings for recoverable problems. Note that
     recovery will not always produce the desired results even if it is
     able to get through the file. Unlike most other PDF files that
-    produce generic warnings such as &ldquo;This file is
-    damaged,&rdquo;, qpdf generally issues a detailed error message
+    produce generic warnings such as "This file is
+    damaged,", qpdf generally issues a detailed error message
     that would be most useful to a PDF developer. This is by design as
     there seems to be a shortage of PDF validation tools out there.
     This was, in fact, one of the major motivations behind the initial
@@ -3918,7 +3913,7 @@ outfile.pdf@2@option@2@
    </para>
    <para>
     Prior to qpdf version 8.1, higher level interfaces were added as
-    &ldquo;convenience functions&rdquo; in either
+    "convenience functions" in either
     <classname>QPDF</classname> or
     <classname>QPDFObjectHandle</classname>. For compatibility, older
     convenience functions for operating with pages will remain in
@@ -3954,7 +3949,7 @@ outfile.pdf@2@option@2@
     immediately constructed from the single token and the parser
     returns. Otherwise, the parser iterates in a special mode in which
     it accumulates objects until it finds a balancing closer. During
-    this process, the &ldquo;<literal>R</literal>&rdquo; keyword is
+    this process, the "<literal>R</literal>" keyword is
     recognized and an indirect <classname>QPDFObjectHandle</classname>
     may be constructed.
    </para>
@@ -4008,7 +4003,7 @@ outfile.pdf@2@option@2@
      </listitem>
      <listitem>
       <para>
-       The parser sees &ldquo;<literal>&lt;&lt;</literal>&rdquo;, so
+       The parser sees "<literal>&lt;&lt;</literal>", so
        it calls itself recursively in dictionary creation mode.
       </para>
      </listitem>
@@ -4016,13 +4011,13 @@ outfile.pdf@2@option@2@
       <para>
        In dictionary creation mode, the parser keeps accumulating
        objects until it encounters
-       &ldquo;<literal>&gt;&gt;</literal>&rdquo;.  Each object that is
+       "<literal>&gt;&gt;</literal>".  Each object that is
        read is pushed onto a stack.  If
-       &ldquo;<literal>R</literal>&rdquo; is read, the last two
+       "<literal>R</literal>" is read, the last two
        objects on the stack are inspected.  If they are integers, they
        are popped off the stack and their values are used to construct
        an indirect object handle which is then pushed onto the stack.
-       When &ldquo;<literal>&gt;&gt;</literal>&rdquo; is finally read,
+       When "<literal>&gt;&gt;</literal>" is finally read,
        the stack is converted into a
        <classname>QPDF_Dictionary</classname> which is placed in a
        <classname>QPDFObjectHandle</classname> and returned.
@@ -4296,7 +4291,7 @@ outfile.pdf@2@option@2@
     other after adding them.  Now it is possible to create a
     @1@firstterm@1@reserved object@2@firstterm@2@ using
     <function>QPDFObjectHandle::newReserved</function>.  This is an
-    indirect object that stays &ldquo;unresolved&rdquo; even if it is
+    indirect object that stays "unresolved" even if it is
     queried for its type.  So now, if you want to create a set of
     mutually referential objects, you can create reservations for each
     one of them and use those reservations to construct the
@@ -4317,7 +4312,7 @@ outfile.pdf@2@option@2@
     <classname>QPDF</classname> object from a different
     <classname>QPDF</classname> object, which we refer to as
     @1@firstterm@1@foreign objects@2@firstterm@2@. This allows arbitrary
-    merging of PDF files. The &ldquo;from&rdquo;
+    merging of PDF files. The "from"
     <classname>QPDF</classname> object must remain valid after the
     copy as discussed in the note below. The @1@command@1@qpdf@2@command@2@
     command-line tool provides limited support for basic page
@@ -4371,7 +4366,7 @@ outfile.pdf@2@option@2@
    </para>
    <para>
     This outline was written prior to implementation and is not
-    exactly accurate, but it provides a correct &ldquo;notional&rdquo;
+    exactly accurate, but it provides a correct "notional"
     idea of how writing works.  Look at the code in
     <classname>QPDFWriter</classname> for exact details.
     <itemizedlist>
@@ -4561,7 +4556,7 @@ outfile.pdf@2@option@2@
     For general information about how to access instances of
     <classname>QPDFObjectHandle</classname>, please see the comments
     in @1@filename@1@QPDFObjectHandle.hh@2@filename@2@. Search for
-    &ldquo;Accessor methods&rdquo;. This section provides a more
+    "Accessor methods". This section provides a more
     in-depth discussion of the behavior and the rationale for the
     behavior.
    </para>
@@ -4807,8 +4802,8 @@ outfile.pdf@2@option@2@
    <para>
     Once a file is optimized, we have information about which objects
     access which other objects.  We can then process these tables to
-    decide which part (as described in &ldquo;Linearized PDF Document
-    Structure&rdquo; in the PDF specification) each object is
+    decide which part (as described in "Linearized PDF Document
+    Structure" in the PDF specification) each object is
     contained within.  This tells us the exact order in which objects
     are written.  The <classname>QPDFWriter</classname> class asks for
     this information and enqueues objects for writing in the proper
@@ -4923,7 +4918,7 @@ print "\n";
    </para>
    <para>
     The PDF specification refers to objects in object streams as
-    &ldquo;compressed objects&rdquo; regardless of whether the object
+    "compressed objects" regardless of whether the object
     stream is compressed.
    </para>
    <para>
@@ -5061,8 +5056,8 @@ print "\n";
      by <literal>/W</literal> above.  A 0 in <literal>/W</literal>
      indicates that the field is omitted and has the default value.
      The default value for the field type is
-     &ldquo;<literal>1</literal>&rdquo;.  All other default values are
-     &ldquo;<literal>0</literal>&rdquo;.
+     "<literal>1</literal>".  All other default values are
+     "<literal>0</literal>".
     </para>
     <para>
      PDF 1.5 has three field types:
@@ -5226,7 +5221,7 @@ print "\n";
         <listitem>
          <para>
           Overhaul error handling for the object handle functions in
-          the C API. See comments in the &ldquo;Object handling&rdquo;
+          the C API. See comments in the "Object handling"
           section of @1@filename@1@include/qpdf/qpdf-c.h@2@filename@2@ for
           details. In particular, exceptions thrown by the underlying
           C++ code when calling object accessors are caught and
@@ -7273,7 +7268,7 @@ print "\n";
              are passed to the qpdf CLI in Windows, qpdf will now
              correctly receive them. In the past, they would have
              either been encoded as Windows code page 1252 (also known
-             as &ldquo;Windows ANSI&rdquo; or as something
+             as "Windows ANSI" or as something
              unintelligible. In almost all cases, qpdf is able to
              properly interpret Unicode arguments now, whereas in the
              past, it would almost never interpret them properly. The
@@ -7356,7 +7351,7 @@ print "\n";
         <listitem>
          <para>
           In the @1@option@1@--pages@2@option@2@ option, allow use of
-          &ldquo;.&rdquo; as a shortcut for the primary input file.
+          "." as a shortcut for the primary input file.
           That way, you can do @1@command@1@qpdf in.pdf --pages . 1-2 --
           out.pdf@2@command@2@ instead of having to repeat
           @1@filename@1@in.pdf@2@filename@2@ in the command.
@@ -7477,7 +7472,7 @@ print "\n";
          <para>
           Add new method
           <function>QPDFPageObjectHelper::shallowCopyPage()</function>
-          to copy a new page that is a &ldquo;shallow copy&rdquo; of a
+          to copy a new page that is a "shallow copy" of a
           page. The resulting object is an indirect object ready to be
           passed to
           <function>QPDFPageDocumentHelper::addPage()</function> for
@@ -7689,7 +7684,7 @@ print "\n";
           @1@option@1@--oi-min-height@2@option@2@, and
           @1@option@1@--oi-min-area@2@option@2@ prevent recompression of
           images whose width, height, or pixel area
-          (width&nbsp;&#xd7;&nbsp;height) are below a specified
+          (width &#xd7; height) are below a specified
           threshold.
          </para>
         </listitem>
@@ -8154,7 +8149,7 @@ print "\n";
         </listitem>
         <listitem>
          <para>
-          In &ldquo;newline before endstream&rdquo; mode, insert the
+          In "newline before endstream" mode, insert the
           required extra newline before the
           <literal>endstream</literal> at the end of object streams.
           This one case was previously omitted.
@@ -8169,7 +8164,7 @@ print "\n";
        <itemizedlist>
         <listitem>
          <para>
-          The first round of higher level &ldquo;helper&rdquo;
+          The first round of higher level "helper"
           interfaces has been introduced. These are designed to
           provide a more convenient way of interacting with certain
           document features than using
@@ -8290,7 +8285,7 @@ print "\n";
       <listitem>
        <para>
         On the command line when specifying page ranges, support
-        preceding a page number by &ldquo;r&rdquo; to indicate that it
+        preceding a page number by "r" to indicate that it
         should be counted from the end. For example, the range
         <literal>r3-r1</literal> would indicate the last three pages
         of a document.
@@ -8337,8 +8332,8 @@ print "\n";
           not of the expected type. In most cases, qpdf will be able
           to warn for such cases rather than fail with an exception.
           Previous versions of qpdf would sometimes fail with errors
-          such as &ldquo;operation for dictionary object attempted on
-          object of wrong type&rdquo;. This situation should be mostly
+          such as "operation for dictionary object attempted on
+          object of wrong type". This situation should be mostly
           or entirely eliminated now.
          </para>
         </listitem>
@@ -9142,8 +9137,8 @@ print "\n";
         command line by specifying use of 256-bit keys.  qpdf also
         supports the deprecated encryption method used by Acrobat IX.
         This encryption style has known security weaknesses and should
-        not be used in practice.  However, such files exist &ldquo;in
-        the wild,&rdquo; so support for this scheme is still useful.
+        not be used in practice.  However, such files exist "in
+        the wild," so support for this scheme is still useful.
         New methods
         <function>QPDFWriter::setR6EncryptionParameters</function>
         (for the PDF 2.0 scheme) and
@@ -9340,7 +9335,7 @@ print "\n";
         Bug fix: if an object stream ended with a scalar object not
         followed by space, qpdf would incorrectly report that it
         encountered a premature EOF.  This bug has been in qpdf since
-        version&nbsp;2.0.
+        version 2.0.
        </para>
       </listitem>
      </itemizedlist>
@@ -9881,12 +9876,12 @@ print "\n";
         Žarko Gajić has written a Delphi wrapper for qpdf, which can
         be downloaded from qpdf's download side.  Žarko's Delphi
         wrapper is released with the same licensing terms as qpdf
-        itself and comes with this disclaimer: &ldquo;Delphi wrapper
+        itself and comes with this disclaimer: "Delphi wrapper
         unit @1@filename@1@qpdf.pas@2@filename@2@ created by Žarko Gajić
         (<ulink
         url="http://zarko-gajic.iz.hr/">http://zarko-gajic.iz.hr/</ulink>).
         Use at your own risk and for whatever purpose you want.  No
-        support is provided.  Sample code is provided.&rdquo;
+        support is provided.  Sample code is provided."
        </para>
       </listitem>
       <listitem>
@@ -9982,7 +9977,7 @@ print "\n";
       <listitem>
        <para>
         Include proper support for LZW streams encoded without the
-        &ldquo;early code change&rdquo; flag.  Special thanks to Atom
+        "early code change" flag.  Special thanks to Atom
         Smasher who reported the problem and provided an input file
         compressed in this way, which I did not previously have.
        </para>
