@@ -17,6 +17,68 @@ Next
   thrown when an uninitialized trailer is accessed provides useful
   information. Test from the C API as well as the C++ API.
 
+Doc conversion Notes
+====================
+
+Things to fix:
+
+Entities/Unicode
+
+Gajic -> Gajić
+
+<!ENTITY lastreleased "November 16, 2021"> (not needed)
+<!ENTITY ldquo "&#x201C;">
+<!ENTITY mdash "&#x2014;">
+<!ENTITY nbsp "&#xA0;">
+<!ENTITY ndash "&#x2013;">
+<!ENTITY rdquo "&#x201D;">
+<!ENTITY swversion "10.4.0"> -> |release|
+
+Elements:
+
+See https://www.sphinx-doc.org/en/master/usage/restructuredtext/roles.html
+
+<appendix>/<chapter>/<preface> -- no distinction
+<programlisting> went to :: -- check them each
+Make sure the information from <book> is in there
+<xref> -- find #ref. in converted rst
+Correct placement of comment: <!-- This section is referenced in QPDFObjectHandle.hh -->
+
+<application>, <command> -> :command:
+<filename> -> :file: (allows {x})
+<option> -> :samp: (allows {x})
+<firstterm> -> just use literal
+<replaceable> -> Make sure in :file: or :samp:, then use {}
+
+Build:
+
+apt install python3-pip texlive-latex-extra latexmk
+pip install sphinx
+
+sphinx-build -M help . .
+sphinx-build -M latexpdf source build
+sphinx-build -M html source build
+sphinx-build -M singlehtml source build
+
+autoconf should detect sphinx and its dependencies, not fop, etc.
+Remove VALIDATE_DOC
+Fix installation of documentation in doc
+
+Additional cleanup:
+
+* Indices and tables section
+
+Future work:
+
+* :ref: -- would be nice if it were suitable for printed documentation
+* README-maintainer: Fix installation of documentation to website
+* Release notes link changed (need #ref.release-notes as well as #release-note)
+* Decide about readthedocs; if using, with multiple versions/latest
+* Change order of sections
+* Get navigation working properly
+* Generate stuff (options, code samples, etc.) as needed
+* Figure out where to put :ref:`search` so we get doc search
+
 Documentation
 =============
 
