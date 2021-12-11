@@ -3761,16 +3761,6 @@ outfile.pdf</option>
     password-protected files.  QPDF does not enforce encryption
     parameters and will treat user and owner passwords equivalently.
     Either password may be used to access an encrypted file.
-    <footnote>
-     <para>
-      As pointed out earlier, the intention is not for qpdf to be used
-      to bypass security on files. but as any open source PDF consumer
-      may be easily modified to bypass basic PDF document security,
-      and qpdf offers may transformations that can do this as well,
-      there seems to be little point in the added complexity of
-      conditionally enforcing document security.
-     </para>
-    </footnote>
     <classname>QPDF</classname> will allow recovery of a user password
     given an owner password.  The input PDF file must be seekable.
     (Output files written by <classname>QPDFWriter</classname> need
