@@ -4553,8 +4553,10 @@ outfile.pdf@2@option@2@
    </para>
   </sect1>
   <sect1 id="ref.object-accessors">
-   <!-- This section is referenced in QPDFObjectHandle.hh -->
    <title>Object Accessor Methods</title>
+   <para>
+    @1@comment: This section is referenced in QPDFObjectHandle.hh @1@
+   </para>
    <para>
     For general information about how to access instances of
     <classname>QPDFObjectHandle</classname>, please see the comments
