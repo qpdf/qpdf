@@ -37,7 +37,7 @@ Make sure the information from <book> is in there
 Correct placement of comment: <!-- This section is referenced in QPDFObjectHandle.hh -->
 
 <firstterm> -> just use literal
-<replaceable> -> Make sure in :file: or :samp:, then use {}
+<replaceable> -> use {}
 
 Additional cleanup:
 

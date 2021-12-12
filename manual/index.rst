@@ -227,16 +227,16 @@ default over the native one. This behavior can be changed with the
 following flags to :command:`./configure`:
 
 - :samp:`--enable-crypto-@3@replaceable@3@x@4@replaceable@4@`
-  (where @1@replaceable@1@x@2@replaceable@2@ is a supported crypto
-  provider): enable the @1@replaceable@1@x@2@replaceable@2@ crypto
+  (where :samp:`@1@replaceable@1@x@2@replaceable@2@` is a supported crypto
+  provider): enable the :samp:`@1@replaceable@1@x@2@replaceable@2@` crypto
   provider, requiring any external dependencies it needs
 
 - :samp:`--disable-crypto-@3@replaceable@3@x@4@replaceable@4@`:
-  disable the @1@replaceable@1@x@2@replaceable@2@ provider, and do not
+  disable the :samp:`@1@replaceable@1@x@2@replaceable@2@` provider, and do not
   link against its dependencies even if they are available
 
 - :samp:`--with-default-crypto=@3@replaceable@3@x@4@replaceable@4@`:
-  make @1@replaceable@1@x@2@replaceable@2@ the default provider even if
+  make :samp:`@1@replaceable@1@x@2@replaceable@2@` the default provider even if
   a higher priority one is available
 
 - :samp:`--disable-implicit-crypto`: only build crypto
@@ -795,7 +795,7 @@ needed transformations.
 :samp:`--collate=@3@replaceable@3@n@4@replaceable@4@`
    When specified, collate rather than concatenate pages from files
    specified with :samp:`--pages`. With a numeric
-   argument, collate in groups of @1@replaceable@1@n@2@replaceable@2@.
+   argument, collate in groups of :samp:`@1@replaceable@1@n@2@replaceable@2@`.
    The default is 1. See `Page Selection
    Options <#ref.page-selection>`__ for additional details.
 
@@ -1155,7 +1155,7 @@ following pages in this order:
 Starting in qpdf version 10.2, you may specify a numeric argument to
 :samp:`--collate`. With
 :samp:`--collate=@3@replaceable@3@n@4@replaceable@4@`,
-pull groups of @1@replaceable@1@n@2@replaceable@2@ pages from each file,
+pull groups of :samp:`@1@replaceable@1@n@2@replaceable@2@` pages from each file,
 again, stopping when there are no more pages. For example, if you ran
 :command:`qpdf --collate=2 --empty --pages a.pdf 1-5 b.pdf 6-4 c.pdf
 r1 -- out.pdf`, you would get the following pages in this
@@ -1338,20 +1338,20 @@ from the command line. The following options are available:
 
 :samp:`--add-attachment @3@replaceable@3@file@4@replaceable@4@ @3@replaceable@3@options@4@replaceable@4@ --`
    Add or replace an attachment with the contents of
-   @1@replaceable@1@file@2@replaceable@2@. This may be specified more
+   :samp:`@1@replaceable@1@file@2@replaceable@2@`. This may be specified more
    than once. The following additional options may appear before the
    ``--`` that ends this option:
 
    :samp:`--key=@3@replaceable@3@key@4@replaceable@4@`
       The key to use to register the attachment in the embedded files
       table. Defaults to the last path element of
-      @1@replaceable@1@file@2@replaceable@2@.
+      :samp:`@1@replaceable@1@file@2@replaceable@2@`.
 
    :samp:`--filename=@3@replaceable@3@name@4@replaceable@4@`
       The file name to be used for the attachment. This is what is
       usually displayed to the user and is the name most graphical PDF
       viewers will use when saving a file. It defaults to the last path
-      element of @1@replaceable@1@file@2@replaceable@2@.
+      element of :samp:`@1@replaceable@1@file@2@replaceable@2@`.
 
    :samp:`--creationdate=@3@replaceable@3@date@4@replaceable@4@`
       The attachment's creation date in PDF format; defaults to the
@@ -1392,7 +1392,7 @@ from the command line. The following options are available:
 
    :samp:`--password=@3@replaceable@3@password@4@replaceable@4@`
       If required, the password needed to open
-      @1@replaceable@1@file@2@replaceable@2@
+      :samp:`@1@replaceable@1@file@2@replaceable@2@`
 
    :samp:`--prefix=@3@replaceable@3@prefix@4@replaceable@4@`
       Only required if the file from which attachments are being copied
@@ -1404,10 +1404,10 @@ from the command line. The following options are available:
 
 When a date is required, the date should conform to the PDF date format
 specification, which is
-``D:``\ @1@replaceable@1@yyyymmddhhmmss<z>@2@replaceable@2@, where
-@1@replaceable@1@<z>@2@replaceable@2@ is either ``Z`` for UTC or a
-timezone offset in the form @1@replaceable@1@-hh'mm'@2@replaceable@2@ or
-@1@replaceable@1@+hh'mm'@2@replaceable@2@. Examples:
+``D:``\ :samp:`@1@replaceable@1@yyyymmddhhmmss<z>@2@replaceable@2@`, where
+:samp:`@1@replaceable@1@<z>@2@replaceable@2@` is either ``Z`` for UTC or a
+timezone offset in the form :samp:`@1@replaceable@1@-hh'mm'@2@replaceable@2@` or
+:samp:`@1@replaceable@1@+hh'mm'@2@replaceable@2@`. Examples:
 ``D:20210207161528-05'00'``, ``D:20210207211528Z``.
 
 .. _ref.advanced-parsing:
@@ -1566,7 +1566,7 @@ following options are available:
    which does something completely different.
 
 :samp:`--remove-unreferenced-resources=@3@replaceable@3@option@4@replaceable@4@`
-   The @1@replaceable@1@option@2@replaceable@2@ may be ``auto``,
+   The :samp:`@1@replaceable@1@option@2@replaceable@2@` may be ``auto``,
    ``yes``, or ``no``. The default is ``auto``.
 
    Starting with qpdf 8.1, when splitting pages, qpdf is able to attempt
@@ -1634,7 +1634,7 @@ following options are available:
    transformations. The library functionality backing this option was
    added for the benefit of programs that want to create *n-up* page
    layouts and other similar things that don't work well with
-   annotations. The @1@replaceable@1@option@2@replaceable@2@ parameter
+   annotations. The :samp:`@1@replaceable@1@option@2@replaceable@2@` parameter
    may be any of the following:
 
    - :samp:`all`: include all annotations that are not
@@ -1746,7 +1746,7 @@ following options are available:
 
 :samp:`--min-version=@3@replaceable@3@version@4@replaceable@4@`
    Forces the PDF version of the output file to be at least
-   @1@replaceable@1@version@2@replaceable@2@. In other words, if the
+   :samp:`@1@replaceable@1@version@2@replaceable@2@`. In other words, if the
    input file has a lower version than the specified version, the
    specified version will be used. If the input file has a higher
    version, the input file's original version will be used. It is seldom
@@ -1755,10 +1755,10 @@ following options are available:
    readers.
 
    The version number may be expressed in the form
-   @1@replaceable@1@major.minor.extension-level@2@replaceable@2@, in
+   :samp:`@1@replaceable@1@major.minor.extension-level@2@replaceable@2@`, in
    which case the version is interpreted as
-   @1@replaceable@1@major.minor@2@replaceable@2@ at extension level
-   @1@replaceable@1@extension-level@2@replaceable@2@. For example,
+   :samp:`@1@replaceable@1@major.minor@2@replaceable@2@` at extension level
+   :samp:`@1@replaceable@1@extension-level@2@replaceable@2@`. For example,
    version ``1.7.8`` represents version 1.7 at extension level 8. Note
    that minimal syntax checking is done on the command line.
 
@@ -3121,7 +3121,7 @@ works. Look at the code in ``QPDFWriter`` for exact details.
 
   - Store current offset into xref table.
 
-  - Write ``@1@replaceable@1@n@2@replaceable@2@ 0 obj``.
+  - Write ``:samp:`@1@replaceable@1@n@2@replaceable@2@` 0 obj``.
 
   - If object is null, whether direct or indirect, write out null,
     thus eliminating unresolvable indirect object references.
@@ -3561,11 +3561,11 @@ which are these:
   ``/Size`` in the trailer dictionary)
 
 - ``/Index`` (optional): value
-  ``[@1@replaceable@1@n count@2@replaceable@2@ ...]`` used to determine
+  ``[:samp:`@1@replaceable@1@n count@2@replaceable@2@` ...]`` used to determine
   which objects' information is stored in this stream. The default is
   ``[0 /Size]``.
 
-- ``/Prev``: value @1@replaceable@1@offset@2@replaceable@2@: byte
+- ``/Prev``: value :samp:`@1@replaceable@1@offset@2@replaceable@2@`: byte
   offset of previous xref stream (same as ``/Prev`` in the trailer
   dictionary)
 
@@ -3896,7 +3896,7 @@ For a detailed list of changes, please see the file
     - Add numeric option to :samp:`--collate`. If
       :samp:`--collate=@3@replaceable@3@n@4@replaceable@4@`
       is given, take pages in groups of
-      @1@replaceable@1@n@2@replaceable@2@ from the given files.
+      :samp:`@1@replaceable@1@n@2@replaceable@2@` from the given files.
 
     - It is now valid to provide :samp:`--rotate=0`
       to clear rotation from a page.
