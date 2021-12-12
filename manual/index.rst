@@ -3435,7 +3435,7 @@ stream (since linearization tables are bit streams written without
 regard to byte boundaries), you can pipe the resulting data through the
 following perl code:
 
-::
+.. code-block:: perl
 
    use bytes;
    binmode STDIN;

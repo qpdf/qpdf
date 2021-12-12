@@ -26,12 +26,6 @@ Entities/Unicode
 
 <!ENTITY lastreleased "November 16, 2021"> (not needed)
 
-Elements:
-
-See https://www.sphinx-doc.org/en/master/usage/restructuredtext/roles.html
-
-<appendix>/<chapter>/<preface> -- no distinction
-<programlisting> went to :: -- check them each
 Make sure the information from <book> is in there
 
 Additional cleanup:
@@ -44,7 +38,8 @@ Future work:
 * README-maintainer: Fix installation of documentation to website
 * Release notes link changed (need #ref.release-notes as well as #release-note)
 * Decide about readthedocs; if using, with multiple versions/latest
-* Change order of sections
+* Change order of sections. Disinction between
+  <preface>/<chapter>/<appendix>  was lost
 * Get navigation working properly
 * Generate stuff (options, code samples, etc.) as needed
 * Figure out where to put :ref:`search` so we get doc search
