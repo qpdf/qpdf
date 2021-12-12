@@ -22,8 +22,12 @@ Doc conversion
 
 Before release:
 
+* Figure out what to do about the fact that the release notes are now
+  at #release-notes instead of #ref.release-notes. This invalidates
+  the link in all previous release announcements, but there's not much
+  I can do about, and it doesn't seem work fixing. Maybe mention it
+  somewhere?
 * README-maintainer: Fix installation of documentation to website
-* Release notes link changed (need #ref.release-notes as well as #release-notes)
 * Get navigation working properly
 * Figure out where to put :ref:`search` so we get doc search
 
