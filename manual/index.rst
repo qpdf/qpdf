@@ -117,7 +117,7 @@ ghostscript.
 
 Pre-built documentation is distributed with qpdf, so you should
 generally not need to rebuild the documentation. In order to build the
-documentation from source, you need to install `sphinx
+documentation from source, you need to install `Sphinx
 <https://sphinx-doc.org>`__. To build the PDF version of the
 documentation, you need `pdflatex`, `latexmk`, and a fairly complete
 LaTeX installation. Detailed requirements can be found in the Sphinx
@@ -3649,6 +3649,16 @@ For a detailed list of changes, please see the file
     - Add ``qpdf_get_object_by_id``, ``qpdf_make_indirect_object``,
       and ``qpdf_replace_object``, exposing the corresponding methods
       in ``QPDF`` and ``QPDFObjectHandle``.
+
+  - Documentation change
+
+    - The documentation sources have been switched from docbook to
+      reStructuredText processed with `Sphinx
+      <https://sphinx-doc.org>`__. This is mostly transparent (other
+      than format change) with the exception that all section links
+      have changed. What used to be `#ref.something` is now
+      `#something`. A top-to-bottom review of the documentation is
+      planned for an upcoming release.
 
 10.4.0: November 16, 2021
   - Handling of Weak Cryptography Algorithms

@@ -1,3 +1,7 @@
+2021-12-12  Jay Berkenbilt  <ejb@ql.org>
+
+	* Convert documentation from docbook to reStructuredText/Sphinx.
+
 2021-12-10  Jay Berkenbilt  <ejb@ql.org>
 
 	* Handle bitstream overflow errors more gracefully. Fixes #581.
