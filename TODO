@@ -36,7 +36,6 @@ Make sure the information from <book> is in there
 <xref> -- find #ref. in converted rst
 Correct placement of comment: <!-- This section is referenced in QPDFObjectHandle.hh -->
 
-<filename> -> :file: (allows {x})
 <option> -> :samp: (allows {x})
 <firstterm> -> just use literal
 <replaceable> -> Make sure in :file: or :samp:, then use {}

@@ -86,8 +86,8 @@ Building and Installing QPDF
 ============================
 
 This chapter describes how to build and install qpdf. Please see also
-the @1@filename@1@README.md@2@filename@2@ and
-@1@filename@1@INSTALL@2@filename@2@ files in the source distribution.
+the :file:`README.md` and
+:file:`INSTALL` files in the source distribution.
 
 .. _ref.prerequisites:
 
@@ -167,16 +167,16 @@ suite and :command:`make install` to install. Please run
 configured. You can also set the value of ``DESTDIR`` during
 installation to install to a temporary location, as is common with many
 open source packages. Please see also the
-@1@filename@1@README.md@2@filename@2@ and
-@1@filename@1@INSTALL@2@filename@2@ files in the source distribution.
+:file:`README.md` and
+:file:`INSTALL` files in the source distribution.
 
 Building on Windows is a little bit more complicated. For details,
-please see @1@filename@1@README-windows.md@2@filename@2@ in the source
+please see :file:`README-windows.md` in the source
 distribution. You can also download a binary distribution for Windows.
 There is a port of qpdf to Visual C++ version 6 in the
-@1@filename@1@contrib@2@filename@2@ area generously contributed by Jian
+:file:`contrib` area generously contributed by Jian
 Ma. This is also discussed in more detail in
-@1@filename@1@README-windows.md@2@filename@2@.
+:file:`README-windows.md`.
 
 While ``wchar_t`` is part of the C++ standard, qpdf uses it in only one
 place in the public API, and it's just in a helper function. It is
@@ -191,7 +191,7 @@ uses :command:`autoconf`, it does not use
 :command:`automake` but instead uses a
 hand-crafted non-recursive Makefile that requires gnu make. If you're
 really interested, please read the comments in the top-level
-@1@filename@1@Makefile@2@filename@2@.
+:file:`Makefile`.
 
 .. _ref.crypto:
 
@@ -251,13 +251,13 @@ used and that the native provider is not built, you could run
 
 If you build qpdf using your own build system, in order for qpdf to work
 at all, you need to enable at least one crypto provider. The file
-@1@filename@1@libqpdf/qpdf/qpdf-config.h.in@2@filename@2@ provides
+:file:`libqpdf/qpdf/qpdf-config.h.in` provides
 macros ``DEFAULT_CRYPTO``, whose value must be a string naming the
 default crypto provider, and various symbols starting with
 ``USE_CRYPTO_``, at least one of which has to be enabled. Additionally,
 you must compile the source files that implement a crypto provider. To
 get a list of those files, look at
-@1@filename@1@libqpdf/build.mk@2@filename@2@. If you want to omit a
+:file:`libqpdf/build.mk`. If you want to omit a
 particular crypto provider, as long as its ``USE_CRYPTO_`` symbol is
 undefined, you can completely ignore the source files that belong to a
 particular crypto provider. Additionally, crypto providers may have
@@ -269,8 +269,8 @@ is not defined, and ``DEFAULT_CRYPTO`` is defined to ``"native"``. Then
 you must include the source files used in the native implementation,
 some of which were added or renamed from earlier versions, to your
 build, and you can ignore
-@1@filename@1@QPDFCrypto_gnutls.cc@2@filename@2@. Always consult
-@1@filename@1@libqpdf/build.mk@2@filename@2@ to get the list of source
+:file:`QPDFCrypto_gnutls.cc`. Always consult
+:file:`libqpdf/build.mk` to get the list of source
 files you need to build.
 
 .. _ref.crypto.runtime:
@@ -303,7 +303,7 @@ certain crypto provider to be used, you can call the method
 a built-in or developer-supplied provider. To add your own crypto
 provider, you have to create a class derived from ``QPDFCryptoImpl`` and
 register it with ``QPDFCryptoProvider``. For additional information, see
-comments in @1@filename@1@include/qpdf/QPDFCryptoImpl.hh@2@filename@2@.
+comments in :file:`include/qpdf/QPDFCryptoImpl.hh`.
 
 .. _ref.crypto.design:
 
@@ -417,10 +417,10 @@ some things you may want to keep in mind:
   completion files by default, but as a packager, it's good if you
   install them wherever your distribution expects such files to go. You
   can find completion files to install in the
-  @1@filename@1@completions@2@filename@2@ directory.
+  :file:`completions` directory.
 
 - Packagers are encouraged to install the source files from the
-  @1@filename@1@examples@2@filename@2@ directory along with qpdf
+  :file:`examples` directory along with qpdf
   development packages.
 
 .. _ref.using:
@@ -625,10 +625,10 @@ needed transformations.
    If specified, the output file name should be omitted. This option
    tells qpdf to replace the input file with the output. It does this by
    writing to
-   @1@filename@1@@1@replaceable@1@infilename@2@replaceable@2@.~qpdf-temp#@2@filename@2@
+   :file:`@1@replaceable@1@infilename@2@replaceable@2@.~qpdf-temp#`
    and, when done, overwriting the input file with the temporary file.
    If there were any warnings, the original input is saved as
-   @1@filename@1@@1@replaceable@1@infilename@2@replaceable@2@.~qpdf-orig@2@filename@2@.
+   :file:`@1@replaceable@1@infilename@2@replaceable@2@.~qpdf-orig`.
 
 @1@option@1@--copy-encryption=file@2@option@2@
    Encrypt the file using the same encryption parameters, including user
@@ -815,7 +815,7 @@ needed transformations.
      replaced with a range of zero-padded page numbers starting from 1.
 
    - Otherwise, if the output file name ends in
-     @1@filename@1@.pdf@2@filename@2@ (case insensitive), a zero-padded
+     :file:`.pdf` (case insensitive), a zero-padded
      page range, preceded by a dash, is inserted before the file
      extension.
 
@@ -824,21 +824,21 @@ needed transformations.
 
    Page ranges are a single number in the case of single-page groups or
    two numbers separated by a dash otherwise. For example, if
-   @1@filename@1@infile.pdf@2@filename@2@ has 12 pages
+   :file:`infile.pdf` has 12 pages
 
    - :command:`qpdf --split-pages infile.pdf %d-out`
-     would generate files @1@filename@1@01-out@2@filename@2@ through
-     @1@filename@1@12-out@2@filename@2@
+     would generate files :file:`01-out` through
+     :file:`12-out`
 
    - :command:`qpdf --split-pages=2 infile.pdf
      outfile.pdf` would generate files
-     @1@filename@1@outfile-01-02.pdf@2@filename@2@ through
-     @1@filename@1@outfile-11-12.pdf@2@filename@2@
+     :file:`outfile-01-02.pdf` through
+     :file:`outfile-11-12.pdf`
 
    - :command:`qpdf --split-pages infile.pdf
      something.else` would generate files
-     @1@filename@1@something.else-01@2@filename@2@ through
-     @1@filename@1@something.else-12@2@filename@2@
+     :file:`something.else-01` through
+     :file:`something.else-12`
 
    Note that outlines, threads, and other global features of the
    original PDF file are not preserved. For each page of output, this
@@ -1065,7 +1065,7 @@ the range of pages. Note that "@1@option@1@--@2@option@2@" terminates
 parsing of page selection flags.
 
 Starting with qpf 8.4, the special input file name
-"@1@filename@1@.@2@filename@2@" can be used as a shortcut for the
+":file:`.`" can be used as a shortcut for the
 primary input filename.
 
 For each file that pages should be taken from, specify the file, a
@@ -1122,8 +1122,8 @@ specified outside of @1@option@1@--pages ... --@2@option@2@. When
 @1@option@1@--collate@2@option@2@ is specified, it changes the meaning
 of @1@option@1@--pages@2@option@2@ so that the specified files, as
 modified by page ranges, are collated rather than concatenated. For
-example, if you add the files @1@filename@1@odd.pdf@2@filename@2@ and
-@1@filename@1@even.pdf@2@filename@2@ containing odd and even pages of a
+example, if you add the files :file:`odd.pdf` and
+:file:`even.pdf` containing odd and even pages of a
 document respectively, you could run :command:`qpdf --collate odd.pdf
 --pages odd.pdf even.pdf -- all.pdf` to collate the pages.
 This would pick page 1 from odd, page 1 from even, page 2 from odd, page
@@ -1193,7 +1193,7 @@ required in order to implement this in your own application if you need
 it.) In the mean time, you can always use
 @1@option@1@--empty@2@option@2@ as the primary input file to avoid
 copying all of that from the first file. For example, to take pages 1
-through 5 from a @1@filename@1@infile.pdf@2@filename@2@ while preserving
+through 5 from a :file:`infile.pdf` while preserving
 all metadata associated with that file, you could use
 
 ::
@@ -1201,7 +1201,7 @@ all metadata associated with that file, you could use
    :command:`qpdf` @1@option@1@infile.pdf --pages . 1-5 -- outfile.pdf@2@option@2@
 
 If you wanted pages 1 through 5 from
-@1@filename@1@infile.pdf@2@filename@2@ but you wanted the rest of the
+:file:`infile.pdf` but you wanted the rest of the
 metadata to be dropped, you could instead run
 
 ::
@@ -1209,16 +1209,16 @@ metadata to be dropped, you could instead run
    :command:`qpdf` @1@option@1@--empty --pages infile.pdf 1-5 -- outfile.pdf@2@option@2@
 
 If you wanted to take pages 1 through 5 from
-@1@filename@1@file1.pdf@2@filename@2@ and pages 11 through 15 from
-@1@filename@1@file2.pdf@2@filename@2@ in reverse, taking document-level
-metadata from @1@filename@1@file2.pdf@2@filename@2@, you would run
+:file:`file1.pdf` and pages 11 through 15 from
+:file:`file2.pdf` in reverse, taking document-level
+metadata from :file:`file2.pdf`, you would run
 
 ::
 
    :command:`qpdf` @1@option@1@file2.pdf --pages file1.pdf 1-5 . 15-11 -- outfile.pdf@2@option@2@
 
 If, for some reason, you wanted to take the first page of an encrypted
-file called @1@filename@1@encrypted.pdf@2@filename@2@ with password
+file called :file:`encrypted.pdf` with password
 ``pass`` and repeat it twice in an output file, and if you wanted to
 drop document-level metadata but preserve encryption, you would use
 
@@ -1231,8 +1231,8 @@ drop document-level metadata but preserve encryption, you would use
 Note that we had to specify the password all three times because giving
 a password as @1@option@1@--encryption-file-password@2@option@2@ doesn't
 count for page selection, and as far as qpdf is concerned,
-@1@filename@1@encrypted.pdf@2@filename@2@ and
-@1@filename@1@./encrypted.pdf@2@filename@2@ are separated files. These
+:file:`encrypted.pdf` and
+:file:`./encrypted.pdf` are separated files. These
 are all corner cases that most users should hopefully never have to be
 bothered with.
 
@@ -1304,15 +1304,15 @@ Here are some examples.
 
 - :command:`--overlay o.pdf --to=1-5 --from=1-3 --repeat=4
   --`: overlay the first three pages from file
-  @1@filename@1@o.pdf@2@filename@2@ onto the first three pages of the
-  output, then overlay page 4 from @1@filename@1@o.pdf@2@filename@2@
+  :file:`o.pdf` onto the first three pages of the
+  output, then overlay page 4 from :file:`o.pdf`
   onto pages 4 and 5 of the output. Leave remaining output pages
   untouched.
 
 - :command:`--underlay footer.pdf --from= --repeat=1,2
   --`: Underlay page 1 of
-  @1@filename@1@footer.pdf@2@filename@2@ on all odd output pages, and
-  underlay page 2 of @1@filename@1@footer.pdf@2@filename@2@ on all even
+  :file:`footer.pdf` on all odd output pages, and
+  underlay page 2 of :file:`footer.pdf` on all even
   output pages.
 
 .. _ref.attachments:
@@ -1991,7 +1991,7 @@ given. The following options are available:
    @1@option@1@--check@2@option@2@ produces no output to standard output
    when everything is valid, so if you are using this to
    programmatically validate files in bulk, it is safe to run without
-   output redirected to @1@filename@1@/dev/null@2@filename@2@ and just
+   output redirected to :file:`/dev/null` and just
    check for a 0 exit code.
 
 The @1@option@1@--raw-stream-data@2@option@2@ and
@@ -2219,23 +2219,23 @@ Using QPDF from C++
 -------------------
 
 The source tree for the qpdf package has an
-@1@filename@1@examples@2@filename@2@ directory that contains a few
-example programs. The @1@filename@1@qpdf/qpdf.cc@2@filename@2@ source
+:file:`examples` directory that contains a few
+example programs. The :file:`qpdf/qpdf.cc` source
 file also serves as a useful example since it exercises almost all of
 the qpdf library's public interface. The best source of documentation on
 the library itself is reading comments in
-@1@filename@1@include/qpdf/QPDF.hh@2@filename@2@,
-@1@filename@1@include/qpdf/QPDFWriter.hh@2@filename@2@, and
-@1@filename@1@include/qpdf/QPDFObjectHandle.hh@2@filename@2@.
+:file:`include/qpdf/QPDF.hh`,
+:file:`include/qpdf/QPDFWriter.hh`, and
+:file:`include/qpdf/QPDFObjectHandle.hh`.
 
 All header files are installed in the
-@1@filename@1@include/qpdf@2@filename@2@ directory. It is recommend that
+:file:`include/qpdf` directory. It is recommend that
 you use ``#include <qpdf/QPDF.hh>`` rather than adding
-@1@filename@1@include/qpdf@2@filename@2@ to your include path.
+:file:`include/qpdf` to your include path.
 
 When linking against the qpdf static library, you may also need to
 specify ``-lz -ljpeg`` on your link command. If your system understands
-how to read libtool @1@filename@1@.la@2@filename@2@ files, this may not
+how to read libtool :file:`.la` files, this may not
 be necessary.
 
 The qpdf library is safe to use in a multithreaded program, but no
@@ -2255,7 +2255,7 @@ directly in other languages. There are a few things that can help.
 "C"
    The qpdf library includes a "C" language interface that provides a
    subset of the overall capabilities. The header file
-   @1@filename@1@qpdf/qpdf-c.h@2@filename@2@ includes information about
+   :file:`qpdf/qpdf-c.h` includes information about
    its use. As long as you use a C++ linker, you can link C programs
    with qpdf and use the C API. For languages that can directly load
    methods from a shared library, the C API can also be useful. People
@@ -2600,7 +2600,7 @@ are factory methods for each type of object as well as a convenience
 method ``QPDFObjectHandle::parse`` that creates an object from a string
 representation of the object. Existing instances of ``QPDFObjectHandle``
 can also be modified in several ways. See comments in
-@1@filename@1@QPDFObjectHandle.hh@2@filename@2@ for details.
+:file:`QPDFObjectHandle.hh` for details.
 
 An instance of ``QPDF`` is constructed by using the class's default
 constructor. If desired, the ``QPDF`` object may be configured with
@@ -2629,8 +2629,8 @@ instead.
 There are some convenience routines for very common operations such as
 walking the page tree and returning a vector of all page objects. For
 full details, please see the header files
-@1@filename@1@QPDF.hh@2@filename@2@ and
-@1@filename@1@QPDFObjectHandle.hh@2@filename@2@. There are also some
+:file:`QPDF.hh` and
+:file:`QPDFObjectHandle.hh`. There are also some
 additional helper classes that provide higher level API functions for
 certain document constructions. These are discussed in `Helper
 Classes <#ref.helper-classes>`__.
@@ -2697,8 +2697,8 @@ By Convention, document helpers are called
 ``QPDFSomethingObjectHelper`` and are derived from ``QPDFObjectHelper``.
 For details on specific helpers, please see their header files. You can
 find them by looking at
-@1@filename@1@include/qpdf/QPDF*DocumentHelper.hh@2@filename@2@ and
-@1@filename@1@include/qpdf/QPDF*ObjectHelper.hh@2@filename@2@.
+:file:`include/qpdf/QPDF*DocumentHelper.hh` and
+:file:`include/qpdf/QPDF*ObjectHelper.hh`.
 
 In order to avoid creation of circular dependencies, the following
 general guidelines are followed with helper classes:
@@ -2790,7 +2790,7 @@ file.
   ``pdf.processFile("a.pdf");``.
 
 - The ``QPDF`` class checks the beginning of
-  @1@filename@1@a.pdf@2@filename@2@ for a PDF header. It then reads the
+  :file:`a.pdf` for a PDF header. It then reads the
   cross reference table mentioned at the end of the file, ensuring that
   it is looking before the last ``%%EOF``. After getting to ``trailer``
   keyword, it invokes the parser.
@@ -2859,7 +2859,7 @@ warnings about the use of old-style casts in code that is shared between
 C and C++ code.
 
 The ``QIntC`` namespace, provided by
-@1@filename@1@include/qpdf/QIntC.hh@2@filename@2@, implements safe
+:file:`include/qpdf/QIntC.hh`, implements safe
 functions for converting between integer types. These functions do range
 checking and throw a ``std::range_error``, which is subclass of
 ``std::runtime_error``, if conversion from one integer type to another
@@ -2997,7 +2997,7 @@ useful on Windows if you want to avoid a dependency on Microsoft's
 cryptography API. You can also supply your own random data provider. For
 details on how to do this, please refer to the top-level README.md file
 in the source distribution and to comments in
-@1@filename@1@QUtil.hh@2@filename@2@.
+:file:`QUtil.hh`.
 
 .. _ref.adding-and-remove-pages:
 
@@ -3010,7 +3010,7 @@ pages. These are largely convenience routines that handle two tricky
 issues: pushing inheritable resources from the ``/Pages`` tree down to
 individual pages and manipulation of the ``/Pages`` tree itself. For
 details, see ``addPage`` and surrounding methods in
-@1@filename@1@QPDF.hh@2@filename@2@.
+:file:`QPDF.hh`.
 
 .. _ref.reserved-objects:
 
@@ -3038,7 +3038,7 @@ it is used internally by QPDF when copying objects from other PDF files,
 as discussed in `Copying Objects From Other PDF
 Files <#ref.foreign-objects>`__. For an example of how to use reserved
 objects, search for ``newReserved`` in
-@1@filename@1@test_driver.cc@2@filename@2@ in qpdf's sources.
+:file:`test_driver.cc` in qpdf's sources.
 
 .. _ref.foreign-objects:
 
@@ -3178,7 +3178,7 @@ and then writes the data (possibly modified) to its successor.
 Alternatively, a pipeline may be an end-of-the-line pipeline that does
 something like store its output to a file or a memory buffer ignoring a
 successor. For additional details, look at
-@1@filename@1@Pipeline.hh@2@filename@2@.
+:file:`Pipeline.hh`.
 
 ``QPDF`` can read raw or filtered streams. When reading a filtered
 stream, the ``QPDF`` class creates a ``Pipeline`` object for one of each
@@ -3196,7 +3196,7 @@ Object Accessor Methods
 
 For general information about how to access instances of
 ``QPDFObjectHandle``, please see the comments in
-@1@filename@1@QPDFObjectHandle.hh@2@filename@2@. Search for "Accessor
+:file:`QPDFObjectHandle.hh`. Search for "Accessor
 methods". This section provides a more in-depth discussion of the
 behavior and the rationale for the behavior.
 
@@ -3332,7 +3332,7 @@ this optimization was initially motivated by the need to create
 linearized files, we are using these terms separately.
 
 PDF file optimization is implemented in the
-@1@filename@1@QPDF_optimization.cc@2@filename@2@ source file. That file
+:file:`QPDF_optimization.cc` source file. That file
 is richly commented and serves as the primary reference for the
 optimization process.
 
@@ -3654,7 +3654,7 @@ Release Notes
 =============
 
 For a detailed list of changes, please see the file
-@1@filename@1@ChangeLog@2@filename@2@ in the source distribution.
+:file:`ChangeLog` in the source distribution.
 
 10.5.0: XXX Month dd, YYYY
   - Library Enhancements
@@ -3664,14 +3664,14 @@ For a detailed list of changes, please see the file
       object is not of the expected type. These warnings now have an
       error code of ``qpdf_e_object`` instead of
       ``qpdf_e_damaged_pdf``. Also, comments have been added to
-      @1@filename@1@QPDFObjectHandle.hh@2@filename@2@ to explain in
+      :file:`QPDFObjectHandle.hh` to explain in
       more detail what the behavior is. See `Object Accessor
       Methods <#ref.object-accessors>`__ for a more in-depth
       discussion.
 
     - Overhaul error handling for the object handle functions in the
       C API. See comments in the "Object handling" section of
-      @1@filename@1@include/qpdf/qpdf-c.h@2@filename@2@ for details.
+      :file:`include/qpdf/qpdf-c.h` for details.
       In particular, exceptions thrown by the underlying C++ code
       when calling object accessors are caught and converted into
       errors. The errors can be trapped by registering an error
@@ -3754,7 +3754,7 @@ For a detailed list of changes, please see the file
     - When adding a page that already exists, make a shallow copy
       instead of throwing an exception. This makes the library
       behavior consistent with the CLI behavior. See
-      @1@filename@1@ChangeLog@2@filename@2@ for additional notes.
+      :file:`ChangeLog` for additional notes.
 
 10.3.1: March 11, 2021
   - Bug Fixes
@@ -3799,7 +3799,7 @@ For a detailed list of changes, please see the file
       method added in 10.2.0. The majority of the API changes are in
       methods most people would never call and that will hopefully be
       superseded by higher-level interfaces for handling page copies.
-      Please see the @1@filename@1@ChangeLog@2@filename@2@ file for
+      Please see the :file:`ChangeLog` file for
       details.
 
     - The method ``QPDF::numWarnings`` was added so that you can tell
@@ -3905,16 +3905,16 @@ For a detailed list of changes, please see the file
 
     - This release includes numerous additions to the API. Not all
       changes are listed here. Please see the
-      @1@filename@1@ChangeLog@2@filename@2@ file in the source
+      :file:`ChangeLog` file in the source
       distribution for a comprehensive list. Highlights appear below.
 
     - Add ``QPDFObjectHandle::ditems()`` and
       ``QPDFObjectHandle::aitems()`` that enable C++-style iteration,
       including range-for iteration, over dictionary and array
       QPDFObjectHandles. See comments in
-      @1@filename@1@include/qpdf/QPDFObjectHandle.hh@2@filename@2@
+      :file:`include/qpdf/QPDFObjectHandle.hh`
       and
-      @1@filename@1@examples/pdf-name-number-tree.cc@2@filename@2@
+      :file:`examples/pdf-name-number-tree.cc`
       for details.
 
     - Add ``QPDFObjectHandle::copyStream`` for making a copy of a
@@ -3925,13 +3925,13 @@ For a detailed list of changes, please see the file
       ``QPDFEmbeddedFileDocumentHelper``,
       ``QPDFFileSpecObjectHelper``, and ``QPDFEFStreamObjectHelper``.
       See their respective headers for details and
-      @1@filename@1@examples/pdf-attach-file.cc@2@filename@2@ for an
+      :file:`examples/pdf-attach-file.cc` for an
       example.
 
     - Add a version of ``QPDFObjectHandle::parse`` that takes a
       ``QPDF`` pointer as context so that it can parse strings
       containing indirect object references. This is illustrated in
-      @1@filename@1@examples/pdf-attach-file.cc@2@filename@2@.
+      :file:`examples/pdf-attach-file.cc`.
 
     - Re-implement ``QPDFNameTreeObjectHelper`` and
       ``QPDFNumberTreeObjectHelper`` to be more efficient, add an
@@ -3948,12 +3948,12 @@ For a detailed list of changes, please see the file
 
     - The ``QPDFMatrix`` class, formerly a private, internal class,
       has been added to the public API. See
-      @1@filename@1@include/qpdf/QPDFMatrix.hh@2@filename@2@ for
+      :file:`include/qpdf/QPDFMatrix.hh` for
       details. This class is for working with transformation
       matrices. Some methods in ``QPDFPageObjectHelper`` make use of
       this to make information about transformation matrices
       available. For an example, see
-      @1@filename@1@examples/pdf-overlay-page.cc@2@filename@2@.
+      :file:`examples/pdf-overlay-page.cc`.
 
     - Several new methods were added to
       ``QPDFAcroFormDocumentHelper`` for adding, removing, getting
@@ -4013,7 +4013,7 @@ For a detailed list of changes, please see the file
       and register it with ``QPDF`` so that regular library methods,
       including those used by ``QPDFWriter``, can decode streams with
       filters not directly supported by the library. The example
-      @1@filename@1@examples/pdf-custom-filter.cc@2@filename@2@
+      :file:`examples/pdf-custom-filter.cc`
       illustrates how to use this capability.
 
     - Add methods to ``QPDFPageObjectHelper`` to iterate through
@@ -4023,7 +4023,7 @@ For a detailed list of changes, please see the file
 
     - Enhance several methods in ``QPDFPageObjectHelper`` to work
       with form XObjects as well as pages, as noted in comments. See
-      @1@filename@1@ChangeLog@2@filename@2@ for a full list.
+      :file:`ChangeLog` for a full list.
 
     - Rename some functions in ``QPDFPageObjectHelper``, while
       keeping old names for compatibility:
@@ -4172,7 +4172,7 @@ For a detailed list of changes, please see the file
       been moved from ``ifdefs`` to an autoconf
       test. If you are using your own build system, you will need to
       provide a value for ``LL_FMT`` in
-      @1@filename@1@libqpdf/qpdf/qpdf-config.h@2@filename@2@, which
+      :file:`libqpdf/qpdf/qpdf-config.h`, which
       would typically be ``"%lld"`` or, for some Windows compilers,
       ``"%I64d"``.
 
@@ -4215,7 +4215,7 @@ For a detailed list of changes, please see the file
 
   - Enhancements
 
-    - Improve the @1@filename@1@pdf-invert-images@2@filename@2@
+    - Improve the :file:`pdf-invert-images`
       example to avoid having to load all the images into RAM at the
       same time.
 
@@ -4525,7 +4525,7 @@ For a detailed list of changes, please see the file
   - Library Enhancements
 
     - A new namespace ``QIntC``, provided by
-      @1@filename@1@qpdf/QIntC.hh@2@filename@2@, provides safe
+      :file:`qpdf/QIntC.hh`, provides safe
       conversion methods between different integer types. These
       conversion methods do range checking to ensure that the cast
       can be performed with no loss of information. Every use of
@@ -4599,7 +4599,7 @@ For a detailed list of changes, please see the file
       hexadecimal digits, which is invalid in PDF 1.2 and above, are
       properly handled by the library: a warning is generated, and
       the name token is properly preserved, even if invalid, in the
-      output. See @1@filename@1@ChangeLog@2@filename@2@ for a more
+      output. See :file:`ChangeLog` for a more
       complete description of this change.
 
   - Bug Fixes
@@ -4654,8 +4654,8 @@ For a detailed list of changes, please see the file
       files but not others.
 
     - If :command:`pkg-config` is available, use it to
-      locate @1@filename@1@libjpeg@2@filename@2@ and
-      @1@filename@1@zlib@2@filename@2@ dependencies, falling back on
+      locate :file:`libjpeg` and
+      :file:`zlib` dependencies, falling back on
       old behavior if unsuccessful.
 
   - Other Notes
@@ -4796,7 +4796,7 @@ For a detailed list of changes, please see the file
     - In the @1@option@1@--pages@2@option@2@ option, allow use of "."
       as a shortcut for the primary input file. That way, you can do
       :command:`qpdf in.pdf --pages . 1-2 -- out.pdf`
-      instead of having to repeat @1@filename@1@in.pdf@2@filename@2@
+      instead of having to repeat :file:`in.pdf`
       in the command.
 
     - When encrypting with 128-bit and 256-bit encryption, new
@@ -4853,7 +4853,7 @@ For a detailed list of changes, please see the file
     - Add new versions of
       ``QPDFWriter::setR{3,4,5,6}EncryptionParameters`` that allow
       more granular setting of permissions bits. See
-      @1@filename@1@QPDFWriter.hh@2@filename@2@ for details.
+      :file:`QPDFWriter.hh` for details.
 
     - Add new versions of the transcoders from UTF-8 to single-byte
       coding systems in ``QUtil`` that report success or failure
@@ -4885,7 +4885,7 @@ For a detailed list of changes, please see the file
       copied immediately instead of lazily. This option uses more
       memory but allows the source object to go out of scope before
       the destination object is written in all cases. See comments in
-      @1@filename@1@QPDF.hh@2@filename@2@ for details.
+      :file:`QPDF.hh` for details.
 
     - Add method ``QPDFPageObjectHelper::getAttribute`` for
       retrieving an attribute from the page dictionary taking
@@ -5025,10 +5025,10 @@ For a detailed list of changes, please see the file
 
     - Ordinarily qpdf treats an argument of the form
       @1@option@1@@file@2@option@2@ to mean that command-line options
-      should be read from @1@filename@1@file@2@filename@2@. Now, if
-      @1@filename@1@file@2@filename@2@ does not exist but
-      @1@filename@1@@file@2@filename@2@ does, qpdf will treat
-      @1@filename@1@@file@2@filename@2@ as a regular option. This
+      should be read from :file:`file`. Now, if
+      :file:`file` does not exist but
+      :file:`@file` does, qpdf will treat
+      :file:`@file` as a regular option. This
       makes it possible to work more easily with PDF files whose
       names happen to start with the ``@`` character.
 
@@ -5040,11 +5040,11 @@ For a detailed list of changes, please see the file
       case is when the source stream gets is data using a
       QPDFObjectHandle::StreamDataProvider. For a more in-depth
       discussion, see comments around ``copyForeignObject`` in
-      @1@filename@1@QPDF.hh@2@filename@2@.
+      :file:`QPDF.hh`.
 
     - Add new method ``QPDFWriter::getFinalVersion()``, which returns
       the PDF version that will ultimately be written to the final
-      file. See comments in @1@filename@1@QPDFWriter.hh@2@filename@2@
+      file. See comments in :file:`QPDFWriter.hh`
       for some restrictions on its use.
 
     - Add several methods for transcoding strings to some of the
@@ -5057,14 +5057,14 @@ For a detailed list of changes, please see the file
     - Add new methods to ``QPDFAnnotationObjectHelper`` and
       ``QPDFFormFieldObjectHelper`` for querying flags and
       interpretation of different field types. Define constants in
-      @1@filename@1@qpdf/Constants.h@2@filename@2@ to help with
+      :file:`qpdf/Constants.h` to help with
       interpretation of flag values.
 
     - Add new methods
       ``QPDFAcroFormDocumentHelper::generateAppearancesIfNeeded`` and
       ``QPDFFormFieldObjectHelper::generateAppearance`` for
       generating appearance streams. See discussion in
-      @1@filename@1@QPDFFormFieldObjectHelper.hh@2@filename@2@ for
+      :file:`QPDFFormFieldObjectHelper.hh` for
       limitations.
 
     - Add two new helper functions for dealing with resource
@@ -5141,7 +5141,7 @@ For a detailed list of changes, please see the file
     - If you would like to have qpdf completion enabled
       automatically, you can install completion files in the
       distribution's default location. You can find sample completion
-      files to install in the @1@filename@1@completions@2@filename@2@
+      files to install in the :file:`completions`
       directory.
 
 8.2.1: August 18, 2018
@@ -5195,8 +5195,8 @@ For a detailed list of changes, please see the file
   - Build Changes
 
     - For the mingw builds, change the name of the DLL import library
-      from @1@filename@1@libqpdf.a@2@filename@2@ to
-      @1@filename@1@libqpdf.dll.a@2@filename@2@ to more accurately
+      from :file:`libqpdf.a` to
+      :file:`libqpdf.dll.a` to more accurately
       reflect that it is an import library rather than a static
       library. This potentially clears the way for supporting a
       static library in the future, though presently, the qpdf
@@ -5274,7 +5274,7 @@ For a detailed list of changes, please see the file
       way to perform operations on pages rather than calling the old
       methods in ``QPDFObjectHandle`` and ``QPDF`` directly. Comments
       in the header files direct you to the new interfaces. Please
-      see the header files and @1@filename@1@ChangeLog@2@filename@2@
+      see the header files and :file:`ChangeLog`
       for additional details.
 
     - Add three new object helper class: ``QPDFPageObjectHelper`` for
@@ -5284,7 +5284,7 @@ For a detailed list of changes, please see the file
       some useful, basic functionality.
 
     - A new example program
-      @1@filename@1@examples/pdf-set-form-values.cc@2@filename@2@ has
+      :file:`examples/pdf-set-form-values.cc` has
       been added that illustrates use of the new document and object
       helpers.
 
@@ -5369,7 +5369,7 @@ For a detailed list of changes, please see the file
 
     - Major enhancements to the lexical layer of qpdf. For a complete
       list of enhancements, please refer to the
-      @1@filename@1@ChangeLog@2@filename@2@ file. Most of the changes
+      :file:`ChangeLog` file. Most of the changes
       result in improvements to qpdf's ability handle erroneous
       files. It is also possible for programs to handle whitespace,
       comments, and inline images as tokens.
@@ -5379,10 +5379,10 @@ For a detailed list of changes, please see the file
       the developer to provide token handlers. Token filters can be
       used with several different methods in ``QPDFObjectHandle`` as
       well as with a lower-level interface. See comments in
-      @1@filename@1@QPDFObjectHandle.hh@2@filename@2@ as well as the
+      :file:`QPDFObjectHandle.hh` as well as the
       new examples
-      @1@filename@1@examples/pdf-filter-tokens.cc@2@filename@2@ and
-      @1@filename@1@examples/pdf-count-strings.cc@2@filename@2@ for
+      :file:`examples/pdf-filter-tokens.cc` and
+      :file:`examples/pdf-count-strings.cc` for
       details.
 
 7.1.1: February 4, 2018
@@ -5407,7 +5407,7 @@ For a detailed list of changes, please see the file
     the discussion of @1@option@1@--password-is-hex-key@2@option@2@ in
     `Basic Options <#ref.basic-options>`__ or the comments around
     ``QPDF::setPasswordIsHexKey`` in
-    @1@filename@1@QPDF.hh@2@filename@2@ for additional details.
+    :file:`QPDF.hh` for additional details.
 
   - Bug fix: numbers ending with a trailing decimal point are now
     properly recognized as numbers.
@@ -5520,7 +5520,7 @@ For a detailed list of changes, please see the file
     - New ``Pipeline`` types ``Pl_RunLength`` and ``Pl_DCT`` are
       available for developers who wish to produce or consume
       RunLength or DCT stream data directly. The
-      @1@filename@1@examples/pdf-create.cc@2@filename@2@ example
+      :file:`examples/pdf-create.cc` example
       illustrates their use.
 
     - ``QPDFWriter::setCompressStreams`` and
@@ -5643,8 +5643,8 @@ For a detailed list of changes, please see the file
     preferred over ``QPDFObjectHandle::getObjectID()`` and
     ``QPDFObjectHandle::getGeneration()`` as it makes it less likely
     for people to accidentally write code that ignores the generation
-    number. See @1@filename@1@QPDF.hh@2@filename@2@ and
-    @1@filename@1@QPDFObjectHandle.hh@2@filename@2@ for additional
+    number. See :file:`QPDF.hh` and
+    :file:`QPDFObjectHandle.hh` for additional
     notes.
 
   - Add @1@option@1@--show-npages@2@option@2@ command-line option to
@@ -5658,15 +5658,15 @@ For a detailed list of changes, please see the file
 
   - Various enhancements were made to support different types of
     broken files or broken readers. Details can be found in
-    @1@filename@1@ChangeLog@2@filename@2@.
+    :file:`ChangeLog`.
 
 4.1.0: April 14, 2013
   - Note to people including qpdf in distributions: the
-    @1@filename@1@.la@2@filename@2@ files generated by libtool are now
+    :file:`.la` files generated by libtool are now
     installed by qpdf's :command:`make install` target.
     Before, they were not installed. This means that if your
     distribution does not want to include
-    @1@filename@1@.la@2@filename@2@ files, you must remove them as
+    :file:`.la` files, you must remove them as
     part of your packaging process.
 
   - Major enhancement: API enhancements have been made to support
@@ -5676,7 +5676,7 @@ For a detailed list of changes, please see the file
     - ``QPDFObjectHandle::parseContentStream`` method parses objects
       in a content stream and calls handlers in a callback class. The
       example
-      @1@filename@1@examples/pdf-parse-content.cc@2@filename@2@
+      :file:`examples/pdf-parse-content.cc`
       illustrates how this may be used.
 
     - ``QPDFObjectHandle`` can now represent operators and inline
@@ -5699,7 +5699,7 @@ For a detailed list of changes, please see the file
     versions.
 
     - Warning flags have been moved into a separate variable in
-      @1@filename@1@autoconf.mk@2@filename@2@
+      :file:`autoconf.mk`
 
     - The configure flag @1@option@1@--enable-werror@2@option@2@ work
       for Microsoft compilers
@@ -5718,7 +5718,7 @@ For a detailed list of changes, please see the file
     - Some internal limits have been removed in code that converts
       numbers to strings. This is largely invisible to users, but it
       does trigger a bug in some older versions of mingw-w64's C++
-      library. See @1@filename@1@README-windows.md@2@filename@2@ in
+      library. See :file:`README-windows.md` in
       the source distribution if you think this may affect you. The
       copy of the DLL distributed with qpdf's binary distribution is
       not affected by this problem.
@@ -5745,7 +5745,7 @@ For a detailed list of changes, please see the file
   - Fix detection of binary attachments in test suite to avoid false
     test failures on some platforms.
 
-  - Add clarifying comment in @1@filename@1@QPDF.hh@2@filename@2@ to
+  - Add clarifying comment in :file:`QPDF.hh` to
     methods that return the user password explaining that it is no
     longer possible with newer encryption formats to recover the user
     password knowing the owner password. In earlier encryption
@@ -5938,14 +5938,14 @@ For a detailed list of changes, please see the file
 
   - The ``QPDF::emptyPDF`` can be used to allow creation of PDF files
     from scratch. The example
-    @1@filename@1@examples/pdf-create.cc@2@filename@2@ illustrates how
+    :file:`examples/pdf-create.cc` illustrates how
     it can be used.
 
   - Several methods to take ``PointerHolder<Buffer>`` can now also
     accept ``std::string`` arguments.
 
   - Many new convenience methods have been added to the library, most
-    in ``QPDFObjectHandle``. See @1@filename@1@ChangeLog@2@filename@2@
+    in ``QPDFObjectHandle``. See :file:`ChangeLog`
     for a full list.
 
   - When building on a platform that supports ELF shared libraries
@@ -5954,23 +5954,23 @@ For a detailed list of changes, please see the file
     @1@option@1@--disable-ld-version-script@2@option@2@ to
     :command:`./configure`.
 
-  - The file @1@filename@1@libqpdf.pc@2@filename@2@ is now installed
+  - The file :file:`libqpdf.pc` is now installed
     to support :command:`pkg-config`.
 
   - Image comparison tests are off by default now since they are not
     needed to verify a correct build or port of qpdf. They are needed
     only when changing the actual PDF output generated by qpdf. You
     should enable them if you are making deep changes to qpdf itself.
-    See @1@filename@1@README.md@2@filename@2@ for details.
+    See :file:`README.md` for details.
 
   - Large file tests are off by default but can be turned on with
     :command:`./configure` or by setting an environment
     variable before running the test suite. See
-    @1@filename@1@README.md@2@filename@2@ for details.
+    :file:`README.md` for details.
 
   - When qpdf's test suite fails, failures are not printed to the
     terminal anymore by default. Instead, find them in
-    @1@filename@1@build/qtest.log@2@filename@2@. For packagers who are
+    :file:`build/qtest.log`. For packagers who are
     building with an autobuilder, you can add the
     @1@option@1@--enable-show-failed-test-output@2@option@2@ option to
     :command:`./configure` to restore the old behavior.
@@ -6046,7 +6046,7 @@ For a detailed list of changes, please see the file
     library to present to the user in some other way. Note that QPDF
     does not write to ``std::cout`` (or the specified output stream)
     except where explicitly mentioned in
-    @1@filename@1@QPDF.hh@2@filename@2@, and that the only use of the
+    :file:`QPDF.hh`, and that the only use of the
     error stream is for warnings. Note also that output of warnings is
     suppressed when ``setSuppressWarnings(true)`` is called.
 
@@ -6143,14 +6143,14 @@ For a detailed list of changes, please see the file
     excellent suggestions on improving the interface.
 
     For programming to the C interface, please see the header file
-    @1@filename@1@qpdf/qpdf-c.h@2@filename@2@ and the example
-    @1@filename@1@examples/pdf-linearize.c@2@filename@2@.
+    :file:`qpdf/qpdf-c.h` and the example
+    :file:`examples/pdf-linearize.c`.
 
   - Žarko Gajić has written a Delphi wrapper for qpdf, which can be
     downloaded from qpdf's download side. Žarko's Delphi wrapper is
     released with the same licensing terms as qpdf itself and comes
     with this disclaimer: "Delphi wrapper unit
-    @1@filename@1@qpdf.pas@2@filename@2@ created by Žarko Gajić
+    :file:`qpdf.pas` created by Žarko Gajić
     (http://zarko-gajic.iz.hr/). Use at your own risk and for whatever
     purpose you want. No support is provided. Sample code is
     provided."
@@ -6214,14 +6214,14 @@ For a detailed list of changes, please see the file
 2.0.2: June 30, 2008
   - Update test suite to work properly with a
     non-:command:`bash`
-    @1@filename@1@/bin/sh@2@filename@2@ and with Perl 5.10. No changes
+    :file:`/bin/sh` and with Perl 5.10. No changes
     were made to the actual qpdf source code itself for this release.
 
 2.0.1: May 6, 2008
   - No changes in functionality or interface. This release includes
     fixes to the source code so that qpdf compiles properly and passes
     its test suite on a broader range of platforms. See
-    @1@filename@1@ChangeLog@2@filename@2@ in the source distribution
+    :file:`ChangeLog` in the source distribution
     for details.
 
 2.0: April 29, 2008
@@ -6244,7 +6244,7 @@ files.
   internal errors and ``std::runtime_error`` for runtime errors in
   favor of the now removed ``QEXC`` classes used in previous versions.
   The ``QEXC`` exception classes predated the addition of the
-  @1@filename@1@<stdexcept>@2@filename@2@ header file to the C++
+  :file:`<stdexcept>` header file to the C++
   standard library. Most of the exceptions thrown by the qpdf library
   itself are still of type ``QPDFExc`` which is now derived from
   ``std::runtime_error``. Programs that caught an instance of
@@ -6255,7 +6255,7 @@ files.
   error condition and provides interfaces for querying them. Among the
   fields is a numeric error code that can help applications act
   differently on (a small number of) different error conditions. See
-  @1@filename@1@QPDFExc.hh@2@filename@2@ for details.
+  :file:`QPDFExc.hh` for details.
 
 - Warnings can be retrieved from qpdf as instances of ``QPDFExc``
   instead of strings.
@@ -6278,7 +6278,7 @@ files.
 
 - The enumerated types that used to be nested in ``QPDFWriter`` have
   moved to top-level enumerated types and are now defined in the file
-  @1@filename@1@qpdf/Constants.h@2@filename@2@. This enables them to be
+  :file:`qpdf/Constants.h`. This enables them to be
   shared by both the C and C++ interfaces.
 
 .. _ref.upgrading-to-3.0:
