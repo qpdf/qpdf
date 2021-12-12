@@ -26,8 +26,6 @@ Before release:
 * Release notes link changed (need #ref.release-notes as well as #release-notes)
 * Get navigation working properly
 * Figure out where to put :ref:`search` so we get doc search
-* Change order of sections. Disinction between
-  <preface>/<chapter>/<appendix>  was lost
 
 Soon:
 

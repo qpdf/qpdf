@@ -5833,14 +5833,31 @@ For a detailed list of changes, please see the file
     Without his work, this release would certainly not have happened
     as soon as it did, if at all.
 
-  - *Non-compatible API change:* The version of
-    ``QPDFObjectHandle::replaceStreamData`` that uses a
-    ``StreamDataProvider`` no longer requires (or accepts) a
-    ``length`` parameter. See
-    :ref:`ref.upgrading-to-3.0` for an explanation.
-    While care is taken to avoid non-compatible API changes in
-    general, an exception was made this time because the new interface
-    offers an opportunity to significantly simplify calling code.
+  - *Non-compatible API changes:*
+
+    - The method ``QPDFObjectHandle::replaceStreamData`` that uses a
+      ``StreamDataProvider`` to provide the stream data no longer
+      takes a ``length`` parameter. The parameter was removed since
+      this provides the user an opportunity to simplify the calling
+      code. This method was introduced in version 2.2. At the time,
+      the ``length`` parameter was required in order to ensure that
+      calls to the stream data provider returned the same length for a
+      specific stream every time they were invoked. In particular, the
+      linearization code depends on this. Instead, qpdf 3.0 and newer
+      check for that constraint explicitly. The first time the stream
+      data provider is called for a specific stream, the actual length
+      is saved, and subsequent calls are required to return the same
+      number of bytes. This means the calling code no longer has to
+      compute the length in advance, which can be a significant
+      simplification. If your code fails to compile because of the
+      extra argument and you don't want to make other changes to your
+      code, just omit the argument.
+
+    - Many methods take ``long long`` instead of other integer types.
+      Most if not all existing code should compile fine with this
+      change since such parameters had always previously been smaller
+      types. This change was required to support files larger than two
+      gigabytes in size.
 
   - Support has been added for large files. The test suite verifies
     support for files larger than 4 gigabytes, and manual testing has
@@ -6122,8 +6139,50 @@ For a detailed list of changes, please see the file
     :command:`qpdf` has been extended to include some
     additional information.
 
-  - There have been a handful of non-compatible API changes. For
-    details, see :ref:`ref.upgrading-to-2.1`.
+  - *Non-compatible API changes:*
+
+    - QPDF's exception handling mechanism now uses
+      ``std::logic_error`` for internal errors and
+      ``std::runtime_error`` for runtime errors in favor of the now
+      removed ``QEXC`` classes used in previous versions. The ``QEXC``
+      exception classes predated the addition of the
+      :file:`<stdexcept>` header file to the C++ standard library.
+      Most of the exceptions thrown by the qpdf library itself are
+      still of type ``QPDFExc`` which is now derived from
+      ``std::runtime_error``. Programs that caught an instance of
+      ``std::exception`` and displayed it by calling the ``what()``
+      method will not need to be changed.
+
+    - The ``QPDFExc`` class now internally represents various fields
+      of the error condition and provides interfaces for querying
+      them. Among the fields is a numeric error code that can help
+      applications act differently on (a small number of) different
+      error conditions. See :file:`QPDFExc.hh` for details.
+
+    - Warnings can be retrieved from qpdf as instances of ``QPDFExc``
+      instead of strings.
+
+    - The nested ``QPDF::EncryptionData`` class's constructor takes an
+      additional argument. This class is primarily intended to be used
+      by ``QPDFWriter``. There's not really anything useful an
+      end-user application could do with it. It probably shouldn't
+      really be part of the public interface to begin with. Likewise,
+      some of the methods for computing internal encryption dictionary
+      parameters have changed to support ``/R=4`` encryption.
+
+    - The method ``QPDF::getUserPassword`` has been removed since it
+      didn't do what people would think it did. There are now two new
+      methods: ``QPDF::getPaddedUserPassword`` and
+      ``QPDF::getTrimmedUserPassword``. The first one does what the
+      old ``QPDF::getUserPassword`` method used to do, which is to
+      return the password with possible binary padding as specified by
+      the PDF specification. The second one returns a human-readable
+      password string.
+
+    - The enumerated types that used to be nested in ``QPDFWriter``
+      have moved to top-level enumerated types and are now defined in
+      the file :file:`qpdf/Constants.h`. This enables them to be
+      shared by both the C and C++ interfaces.
 
 2.0.6: May 3, 2009
   - Do not attempt to uncompress streams that have decode parameters
@@ -6164,91 +6223,6 @@ For a detailed list of changes, please see the file
 
 2.0: April 29, 2008
   - First public release.
-
-.. _ref.upgrading-to-2.1:
-
-Upgrading from 2.0 to 2.1
-=========================
-
-Although, as a general rule, we like to avoid introducing source-level
-incompatibilities in qpdf's interface, there were a few non-compatible
-changes made in this version. A considerable amount of source code that
-uses qpdf will probably compile without any changes, but in some cases,
-you may have to update your code. The changes are enumerated here. There
-are also some new interfaces; for those, please refer to the header
-files.
-
-- QPDF's exception handling mechanism now uses ``std::logic_error`` for
-  internal errors and ``std::runtime_error`` for runtime errors in
-  favor of the now removed ``QEXC`` classes used in previous versions.
-  The ``QEXC`` exception classes predated the addition of the
-  :file:`<stdexcept>` header file to the C++
-  standard library. Most of the exceptions thrown by the qpdf library
-  itself are still of type ``QPDFExc`` which is now derived from
-  ``std::runtime_error``. Programs that caught an instance of
-  ``std::exception`` and displayed it by calling the ``what()`` method
-  will not need to be changed.
-
-- The ``QPDFExc`` class now internally represents various fields of the
-  error condition and provides interfaces for querying them. Among the
-  fields is a numeric error code that can help applications act
-  differently on (a small number of) different error conditions. See
-  :file:`QPDFExc.hh` for details.
-
-- Warnings can be retrieved from qpdf as instances of ``QPDFExc``
-  instead of strings.
-
-- The nested ``QPDF::EncryptionData`` class's constructor takes an
-  additional argument. This class is primarily intended to be used by
-  ``QPDFWriter``. There's not really anything useful an end-user
-  application could do with it. It probably shouldn't really be part of
-  the public interface to begin with. Likewise, some of the methods for
-  computing internal encryption dictionary parameters have changed to
-  support ``/R=4`` encryption.
-
-- The method ``QPDF::getUserPassword`` has been removed since it didn't
-  do what people would think it did. There are now two new methods:
-  ``QPDF::getPaddedUserPassword`` and ``QPDF::getTrimmedUserPassword``.
-  The first one does what the old ``QPDF::getUserPassword`` method used
-  to do, which is to return the password with possible binary padding
-  as specified by the PDF specification. The second one returns a
-  human-readable password string.
-
-- The enumerated types that used to be nested in ``QPDFWriter`` have
-  moved to top-level enumerated types and are now defined in the file
-  :file:`qpdf/Constants.h`. This enables them to be
-  shared by both the C and C++ interfaces.
-
-.. _ref.upgrading-to-3.0:
-
-Upgrading to 3.0
-================
-
-For the most part, the API for qpdf version 3.0 is backward compatible
-with versions 2.1 and later. There are two exceptions:
-
-- The method ``QPDFObjectHandle::replaceStreamData`` that uses a
-  ``StreamDataProvider`` to provide the stream data no longer takes a
-  ``length`` parameter. While it would have been easy enough to keep
-  the parameter for backward compatibility, in this case, the parameter
-  was removed since this provides the user an opportunity to simplify
-  the calling code. This method was introduced in version 2.2. At the
-  time, the ``length`` parameter was required in order to ensure that
-  calls to the stream data provider returned the same length for a
-  specific stream every time they were invoked. In particular, the
-  linearization code depends on this. Instead, qpdf 3.0 and newer check
-  for that constraint explicitly. The first time the stream data
-  provider is called for a specific stream, the actual length is saved,
-  and subsequent calls are required to return the same number of bytes.
-  This means the calling code no longer has to compute the length in
-  advance, which can be a significant simplification. If your code
-  fails to compile because of the extra argument and you don't want to
-  make other changes to your code, just omit the argument.
-
-- Many methods take ``long long`` instead of other integer types. Most
-  if not all existing code should compile fine with this change since
-  such parameters had always previously been smaller types. This change
-  was required to support files larger than two gigabytes in size.
 
 .. _acknowledgments:
 
