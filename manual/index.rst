@@ -2116,8 +2116,8 @@ purposes or for brute-force recovery of files with unknown passwords.
 QDF Mode
 ========
 
-In QDF mode, qpdf creates PDF files in what we call @1@firstterm@1@QDF
-form@2@firstterm@2@. A PDF file in QDF form, sometimes called a QDF
+In QDF mode, qpdf creates PDF files in what we call *QDF
+form*. A PDF file in QDF form, sometimes called a QDF
 file, is a completely valid PDF file that has ``%QDF-1.0`` as its third
 line (after the pdf header and binary characters) and has certain other
 characteristics. The purpose of QDF form is to make it possible to edit
@@ -3026,7 +3026,7 @@ add it to the ``QPDF`` object with ``QPDF::makeIndirectObject``. The
 only way to add two mutually referential objects to a ``QPDF`` object
 prior to version 3.0 would be to add the new objects first and then make
 them refer to each other after adding them. Now it is possible to create
-a @1@firstterm@1@reserved object@2@firstterm@2@ using
+a *reserved object* using
 ``QPDFObjectHandle::newReserved``. This is an indirect object that stays
 "unresolved" even if it is queried for its type. So now, if you want to
 create a set of mutually referential objects, you can create
@@ -3047,7 +3047,7 @@ Copying Objects From Other PDF Files
 
 Version 3.0 of qpdf introduced the ability to copy objects into a
 ``QPDF`` object from a different ``QPDF`` object, which we refer to as
-@1@firstterm@1@foreign objects@2@firstterm@2@. This allows arbitrary
+*foreign objects*. This allows arbitrary
 merging of PDF files. The "from" ``QPDF`` object must remain valid after
 the copy as discussed in the note below. The
 :command:`qpdf` command-line tool provides limited
@@ -3298,10 +3298,10 @@ to the page level (and not inherited from parents in the ``/Pages``
 tree). We also have to know which objects refer to which other objects,
 being concerned with page boundaries and a few other cases. We refer to
 this part of preparing the PDF file as
-@1@firstterm@1@optimization@2@firstterm@2@, discussed in
+*optimization*, discussed in
 `Optimization <#ref.optimization>`__. Note the, in this context, the
-term @1@firstterm@1@optimization@2@firstterm@2@ is a qpdf term, and the
-term @1@firstterm@1@linearization@2@firstterm@2@ is a term from the PDF
+term *optimization* is a qpdf term, and the
+term *linearization* is a term from the PDF
 specification. Do not be confused by the fact that many applications
 refer to linearization as optimization or web optimization.
 
@@ -3327,7 +3327,7 @@ attributes appear directly at the page level and are not inherited from
 parents in the pages tree.
 
 We refer to the process of enforcing these constraints as
-@1@firstterm@1@optimization@2@firstterm@2@. As mentioned above, note
+*optimization*. As mentioned above, note
 that some applications refer to linearization as optimization. Although
 this optimization was initially motivated by the need to create
 linearized files, we are using these terms separately.
