@@ -34,7 +34,6 @@ See https://www.sphinx-doc.org/en/master/usage/restructuredtext/roles.html
 <programlisting> went to :: -- check them each
 Make sure the information from <book> is in there
 <xref> -- find #ref. in converted rst
-Correct placement of comment: <!-- This section is referenced in QPDFObjectHandle.hh -->
 
 <firstterm> -> just use literal
 

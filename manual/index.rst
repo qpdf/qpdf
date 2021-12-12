@@ -3192,7 +3192,8 @@ pipeline.
 Object Accessor Methods
 -----------------------
 
-@1@comment: This section is referenced in QPDFObjectHandle.hh @1@
+..
+  This section is referenced in QPDFObjectHandle.hh
 
 For general information about how to access instances of
 ``QPDFObjectHandle``, please see the comments in
