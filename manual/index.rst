@@ -6250,19 +6250,6 @@ with versions 2.1 and later. There are two exceptions:
   such parameters had always previously been smaller types. This change
   was required to support files larger than two gigabytes in size.
 
-.. _ref.upgrading-to-4.0:
-
-Upgrading to 4.0
-================
-
-While version 4.0 includes a few non-compatible API changes, it is very
-unlikely that anyone's code would have used any of those parts of the
-API since they generally required information that would only be
-available inside the library. In the unlikely event that you should run
-into trouble, please see the ChangeLog. See also
-:ref:`ref.release-notes` for a complete list of the
-non-compatible API changes made in this version.
-
 .. _acknowledgments:
 
 Acknowledgment
