@@ -226,22 +226,22 @@ available crypto providers, and to use an external provider as the
 default over the native one. This behavior can be changed with the
 following flags to :command:`./configure`:
 
-- :samp:`--enable-crypto-@1@replaceable@1@x@2@replaceable@2@`
+- :samp:`--enable-crypto-@3@replaceable@3@x@4@replaceable@4@`
   (where @1@replaceable@1@x@2@replaceable@2@ is a supported crypto
   provider): enable the @1@replaceable@1@x@2@replaceable@2@ crypto
   provider, requiring any external dependencies it needs
 
-- :samp:`--disable-crypto-@1@replaceable@1@x@2@replaceable@2@`:
+- :samp:`--disable-crypto-@3@replaceable@3@x@4@replaceable@4@`:
   disable the @1@replaceable@1@x@2@replaceable@2@ provider, and do not
   link against its dependencies even if they are available
 
-- :samp:`--with-default-crypto=@1@replaceable@1@x@2@replaceable@2@`:
+- :samp:`--with-default-crypto=@3@replaceable@3@x@4@replaceable@4@`:
   make @1@replaceable@1@x@2@replaceable@2@ the default provider even if
   a higher priority one is available
 
 - :samp:`--disable-implicit-crypto`: only build crypto
   providers that are explicitly requested with an
-  :samp:`--enable-crypto-@1@replaceable@1@x@2@replaceable@2@`
+  :samp:`--enable-crypto-@3@replaceable@3@x@4@replaceable@4@`
   option
 
 For example, if you want to guarantee that the gnutls crypto provider is
@@ -557,7 +557,7 @@ needed transformations.
    Output a completion command you can eval to enable shell completion
    from zsh.
 
-:samp:`--password=@1@replaceable@1@password@2@replaceable@2@`
+:samp:`--password=@3@replaceable@3@password@4@replaceable@4@`
    Specifies a password for accessing encrypted files. To read the
    password from a file or standard input, you can use
    :samp:`--password-file`, added in qpdf 10.2. Note
@@ -565,16 +565,16 @@ needed transformations.
    :samp:`@-` as described above to put the password in
    a file or pass it via standard input, but you would do so by
    specifying the entire
-   :samp:`--password=@1@replaceable@1@password@2@replaceable@2@`
+   :samp:`--password=@3@replaceable@3@password@4@replaceable@4@`
    option in the file. Syntax such as
    :samp:`--password=@filename` won't work since
    :samp:`@filename` is not recognized in the middle of
    an argument.
 
-:samp:`--password-file=@1@replaceable@1@filename@2@replaceable@2@`
+:samp:`--password-file=@3@replaceable@3@filename@4@replaceable@4@`
    Reads the first line from the specified file and uses it as the
    password for accessing encrypted files.
-   :samp:`@1@replaceable@1@filename@2@replaceable@2@`
+   :samp:`@3@replaceable@3@filename@4@replaceable@4@`
    may be ``-`` to read the password from standard input. Note that, in
    this case, the password is echoed and there is no prompt, so use with
    caution.
@@ -625,10 +625,10 @@ needed transformations.
    If specified, the output file name should be omitted. This option
    tells qpdf to replace the input file with the output. It does this by
    writing to
-   :file:`@1@replaceable@1@infilename@2@replaceable@2@.~qpdf-temp#`
+   :file:`@3@replaceable@3@infilename@4@replaceable@4@.~qpdf-temp#`
    and, when done, overwriting the input file with the temporary file.
    If there were any warnings, the original input is saved as
-   :file:`@1@replaceable@1@infilename@2@replaceable@2@.~qpdf-orig`.
+   :file:`@3@replaceable@3@infilename@4@replaceable@4@.~qpdf-orig`.
 
 :samp:`--copy-encryption=file`
    Encrypt the file using the same encryption parameters, including user
@@ -692,7 +692,7 @@ needed transformations.
    this option. See `Unicode Passwords <#ref.unicode-passwords>`__ for a
    discussion
 
-:samp:`--password-mode=@1@replaceable@1@mode@2@replaceable@2@`
+:samp:`--password-mode=@3@replaceable@3@mode@4@replaceable@4@`
    This option can be used to fine-tune how qpdf interprets Unicode
    (non-ASCII) password strings passed on the command line. With the
    exception of the :samp:`hex-bytes` mode, these only
@@ -757,7 +757,7 @@ needed transformations.
    out.pdf --rotate=+180` would rotate all pages by 180
    degrees.
 
-:samp:`--keep-files-open=@1@replaceable@1@[yn]@2@replaceable@2@`
+:samp:`--keep-files-open=@3@replaceable@3@[yn]@4@replaceable@4@`
    This option controls whether qpdf keeps individual files open while
    merging. Prior to version 8.1.0, qpdf always kept all files open, but
    this meant that the number of files that could be merged was limited
@@ -782,7 +782,7 @@ needed transformations.
    switching may be changed from the default 200 with the
    :samp:`--keep-files-open-threshold` option.
 
-:samp:`--keep-files-open-threshold=@1@replaceable@1@count@2@replaceable@2@`
+:samp:`--keep-files-open-threshold=@3@replaceable@3@count@4@replaceable@4@`
    If specified, overrides the default value of 200 used as the
    threshold for qpdf deciding whether or not to keep files open. See
    :samp:`--keep-files-open` for details.
@@ -792,7 +792,7 @@ needed transformations.
    Selection Options <#ref.page-selection>`__ for details on how to do
    page selection (splitting and merging).
 
-:samp:`--collate=@1@replaceable@1@n@2@replaceable@2@`
+:samp:`--collate=@3@replaceable@3@n@4@replaceable@4@`
    When specified, collate rather than concatenate pages from files
    specified with :samp:`--pages`. With a numeric
    argument, collate in groups of @1@replaceable@1@n@2@replaceable@2@.
@@ -906,12 +906,12 @@ you want to create such files, specify the encryption option
 :samp:`--allow-insecure`, as described below.
 
 The value for
-:samp:`@1@replaceable@1@key-length@2@replaceable@2@` may
+:samp:`@3@replaceable@3@key-length@4@replaceable@4@` may
 be 40, 128, or 256. The restriction flags are dependent upon key length.
 When no additional restrictions are given, the default is to be fully
 permissive.
 
-If :samp:`@1@replaceable@1@key-length@2@replaceable@2@`
+If :samp:`@3@replaceable@3@key-length@4@replaceable@4@`
 is 40, the following restriction options are available:
 
 :samp:`--print=[yn]`
@@ -927,7 +927,7 @@ is 40, the following restriction options are available:
    Determines whether or not to allow comments and form fill-in and
    signing.
 
-If :samp:`@1@replaceable@1@key-length@2@replaceable@2@`
+If :samp:`@3@replaceable@3@key-length@4@replaceable@4@`
 is 128, the following restriction options are available:
 
 :samp:`--accessibility=[yn]`
@@ -960,9 +960,9 @@ is 128, the following restriction options are available:
    :samp:`--annotate`, and
    :samp:`--form` options.
 
-:samp:`--print=@1@replaceable@1@print-opt@2@replaceable@2@`
+:samp:`--print=@3@replaceable@3@print-opt@4@replaceable@4@`
    Controls printing access.
-   :samp:`@1@replaceable@1@print-opt@2@replaceable@2@`
+   :samp:`@3@replaceable@3@print-opt@4@replaceable@4@`
    may be one of the following:
 
    - :samp:`full`: allow full printing
@@ -971,10 +971,10 @@ is 128, the following restriction options are available:
 
    - :samp:`none`: disallow printing
 
-:samp:`--modify=@1@replaceable@1@modify-opt@2@replaceable@2@`
+:samp:`--modify=@3@replaceable@3@modify-opt@4@replaceable@4@`
    Controls modify access. This way of controlling modify access has
    less granularity than new options added in qpdf 8.4.
-   :samp:`@1@replaceable@1@modify-opt@2@replaceable@2@`
+   :samp:`@3@replaceable@3@modify-opt@4@replaceable@4@`
    may be one of the following:
 
    - :samp:`all`: allow full document modification
@@ -1022,7 +1022,7 @@ is 128, the following restriction options are available:
    ever use this option. It exists primarily for use in testing qpdf
    itself. This option also forces the PDF version to be at least 1.5.
 
-If :samp:`@1@replaceable@1@key-length@2@replaceable@2@`
+If :samp:`@3@replaceable@3@key-length@4@replaceable@4@`
 is 256, the minimum PDF version is 1.7 with extension level 8, and the
 AES-based encryption format used is the PDF 2.0 encryption method
 supported by Acrobat X. the same options are available as with 128 bits
@@ -1154,7 +1154,7 @@ following pages in this order:
 
 Starting in qpdf version 10.2, you may specify a numeric argument to
 :samp:`--collate`. With
-:samp:`--collate=@1@replaceable@1@n@2@replaceable@2@`,
+:samp:`--collate=@3@replaceable@3@n@4@replaceable@4@`,
 pull groups of @1@replaceable@1@n@2@replaceable@2@ pages from each file,
 again, stopping when there are no more pages. For example, if you ran
 :command:`qpdf --collate=2 --empty --pages a.pdf 1-5 b.pdf 6-4 c.pdf
@@ -1330,44 +1330,44 @@ from the command line. The following options are available:
    The key is usually but not always equal to the file name, and is
    needed by some of the other options.
 
-:samp:`--show-attachment=@1@replaceable@1@key@2@replaceable@2@`
+:samp:`--show-attachment=@3@replaceable@3@key@4@replaceable@4@`
    Write the contents of the specified attachment to standard output as
    binary data. The key should match one of the keys shown by
    :samp:`--list-attachments`. If specified multiple
    times, only the last attachment will be shown.
 
-:samp:`--add-attachment @1@replaceable@1@file@2@replaceable@2@ @1@replaceable@1@options@2@replaceable@2@ --`
+:samp:`--add-attachment @3@replaceable@3@file@4@replaceable@4@ @3@replaceable@3@options@4@replaceable@4@ --`
    Add or replace an attachment with the contents of
    @1@replaceable@1@file@2@replaceable@2@. This may be specified more
    than once. The following additional options may appear before the
    ``--`` that ends this option:
 
-   :samp:`--key=@1@replaceable@1@key@2@replaceable@2@`
+   :samp:`--key=@3@replaceable@3@key@4@replaceable@4@`
       The key to use to register the attachment in the embedded files
       table. Defaults to the last path element of
       @1@replaceable@1@file@2@replaceable@2@.
 
-   :samp:`--filename=@1@replaceable@1@name@2@replaceable@2@`
+   :samp:`--filename=@3@replaceable@3@name@4@replaceable@4@`
       The file name to be used for the attachment. This is what is
       usually displayed to the user and is the name most graphical PDF
       viewers will use when saving a file. It defaults to the last path
       element of @1@replaceable@1@file@2@replaceable@2@.
 
-   :samp:`--creationdate=@1@replaceable@1@date@2@replaceable@2@`
+   :samp:`--creationdate=@3@replaceable@3@date@4@replaceable@4@`
       The attachment's creation date in PDF format; defaults to the
       current time. The date format is explained below.
 
-   :samp:`--moddate=@1@replaceable@1@date@2@replaceable@2@`
+   :samp:`--moddate=@3@replaceable@3@date@4@replaceable@4@`
       The attachment's modification date in PDF format; defaults to the
       current time. The date format is explained below.
 
-   :samp:`--mimetype=@1@replaceable@1@type/subtype@2@replaceable@2@`
+   :samp:`--mimetype=@3@replaceable@3@type/subtype@4@replaceable@4@`
       The mime type for the attachment, e.g. ``text/plain`` or
       ``application/pdf``. Note that the mimetype appears in a field
       called ``/Subtype`` in the PDF but actually includes the full type
       and subtype of the mime type.
 
-   :samp:`--description=@1@replaceable@1@"text"@2@replaceable@2@`
+   :samp:`--description=@3@replaceable@3@"text"@4@replaceable@4@`
       Descriptive text for the attachment, displayed by some PDF
       viewers.
 
@@ -1377,7 +1377,7 @@ from the command line. The following options are available:
       :command:`qpdf` gives an error if an attachment
       with that key is already present.
 
-:samp:`--remove-attachment=@1@replaceable@1@key@2@replaceable@2@`
+:samp:`--remove-attachment=@3@replaceable@3@key@4@replaceable@4@`
    Remove the specified attachment. This doesn't only remove the
    attachment from the embedded files table but also clears out the file
    specification. That means that any potential internal links to the
@@ -1385,16 +1385,16 @@ from the command line. The following options are available:
    times. Run with :samp:`--verbose` to see status of
    the removal.
 
-:samp:`--copy-attachments-from @1@replaceable@1@file@2@replaceable@2@ @1@replaceable@1@options@2@replaceable@2@ --`
+:samp:`--copy-attachments-from @3@replaceable@3@file@4@replaceable@4@ @3@replaceable@3@options@4@replaceable@4@ --`
    Copy attachments from another file. This may be specified more than
    once. The following additional options may appear before the ``--``
    that ends this option:
 
-   :samp:`--password=@1@replaceable@1@password@2@replaceable@2@`
+   :samp:`--password=@3@replaceable@3@password@4@replaceable@4@`
       If required, the password needed to open
       @1@replaceable@1@file@2@replaceable@2@
 
-   :samp:`--prefix=@1@replaceable@1@prefix@2@replaceable@2@`
+   :samp:`--prefix=@3@replaceable@3@prefix@4@replaceable@4@`
       Only required if the file from which attachments are being copied
       has attachments with keys that conflict with attachments already
       in the file. In this case, the specified prefix will be prepended
@@ -1456,14 +1456,14 @@ output file. Mostly these are of use only to people who are very
 familiar with the PDF file format or who are PDF developers. The
 following options are available:
 
-:samp:`--compress-streams=@1@replaceable@1@[yn]@2@replaceable@2@`
+:samp:`--compress-streams=@3@replaceable@3@[yn]@4@replaceable@4@`
    By default, or with :samp:`--compress-streams=y`,
    qpdf will compress any stream with no other filters applied to it
    with the ``/FlateDecode`` filter when it writes it. To suppress this
    behavior and preserve uncompressed streams as uncompressed, use
    :samp:`--compress-streams=n`.
 
-:samp:`--decode-level=@1@replaceable@1@option@2@replaceable@2@`
+:samp:`--decode-level=@3@replaceable@3@option@4@replaceable@4@`
    Controls which streams qpdf tries to decode. The default is
    :samp:`generalized`. The following options are
    available:
@@ -1487,12 +1487,12 @@ following options are available:
      specialized, decode streams with supported lossy filters;
      currently this is just ``/DCTDecode`` (JPEG)
 
-:samp:`--stream-data=@1@replaceable@1@option@2@replaceable@2@`
+:samp:`--stream-data=@3@replaceable@3@option@4@replaceable@4@`
    Controls transformation of stream data. This option predates the
    :samp:`--compress-streams` and
    :samp:`--decode-level` options. Those options can be
    used to achieve the same affect with more control. The value of
-   :samp:`@1@replaceable@1@option@2@replaceable@2@` may
+   :samp:`@3@replaceable@3@option@4@replaceable@4@` may
    be one of the following:
 
    - :samp:`compress`: recompress stream data when
@@ -1519,7 +1519,7 @@ following options are available:
    want to use it if you specify
    :samp:`--compression-level`.
 
-:samp:`--compression-level=@1@replaceable@1@level@2@replaceable@2@`
+:samp:`--compression-level=@3@replaceable@3@level@4@replaceable@4@`
    When writing new streams that are compressed with ``/FlateDecode``,
    use the specified compression level. The value of
    :samp:`level` should be a number from 1 to 9 and is
@@ -1535,9 +1535,9 @@ following options are available:
    normalization is enabled by default in QDF mode. Please see `QDF
    Mode <#ref.qdf>`__ for additional discussion of QDF mode.
 
-:samp:`--object-streams=@1@replaceable@1@mode@2@replaceable@2@`
+:samp:`--object-streams=@3@replaceable@3@mode@4@replaceable@4@`
    Controls handling of object streams. The value of
-   :samp:`@1@replaceable@1@mode@2@replaceable@2@` may be
+   :samp:`@3@replaceable@3@mode@4@replaceable@4@` may be
    one of the following:
 
    - :samp:`preserve`: preserve original object streams
@@ -1565,7 +1565,7 @@ following options are available:
    See also :samp:`--preserve-unreferenced-resources`,
    which does something completely different.
 
-:samp:`--remove-unreferenced-resources=@1@replaceable@1@option@2@replaceable@2@`
+:samp:`--remove-unreferenced-resources=@3@replaceable@3@option@4@replaceable@4@`
    The @1@replaceable@1@option@2@replaceable@2@ may be ``auto``,
    ``yes``, or ``no``. The default is ``auto``.
 
@@ -1608,7 +1608,7 @@ following options are available:
    at least prevents it from removing compliance on already compliant
    files.
 
-:samp:`--linearize-pass1=@1@replaceable@1@file@2@replaceable@2@`
+:samp:`--linearize-pass1=@3@replaceable@3@file@4@replaceable@4@`
    Write the first pass of linearization to the named file. The
    resulting file is not a valid PDF file. This option is useful only
    for debugging ``QPDFWriter``'s linearization code. When qpdf
@@ -1625,7 +1625,7 @@ following options are available:
    with QDF mode or content normalization to make it easier to look at
    all of a page's contents at once.
 
-:samp:`--flatten-annotations=@1@replaceable@1@option@2@replaceable@2@`
+:samp:`--flatten-annotations=@3@replaceable@3@option@4@replaceable@4@`
    This option collapses annotations into the pages' contents with
    special handling for form fields. Ordinarily, an annotation is
    rendered separately and on top of the page. Combining annotations
@@ -1704,15 +1704,15 @@ following options are available:
    optimized as well. Use :samp:`--keep-inline-images`
    to prevent inline images from being included.
 
-:samp:`--oi-min-width=@1@replaceable@1@width@2@replaceable@2@`
+:samp:`--oi-min-width=@3@replaceable@3@width@4@replaceable@4@`
    Avoid optimizing images whose width is below the specified amount. If
    omitted, the default is 128 pixels. Use 0 for no minimum.
 
-:samp:`--oi-min-height=@1@replaceable@1@height@2@replaceable@2@`
+:samp:`--oi-min-height=@3@replaceable@3@height@4@replaceable@4@`
    Avoid optimizing images whose height is below the specified amount.
    If omitted, the default is 128 pixels. Use 0 for no minimum.
 
-:samp:`--oi-min-area=@1@replaceable@1@area-in-pixels@2@replaceable@2@`
+:samp:`--oi-min-area=@3@replaceable@3@area-in-pixels@4@replaceable@4@`
    Avoid optimizing images whose pixel count (width × height) is below
    the specified amount. If omitted, the default is 16,384 pixels. Use 0
    for no minimum.
@@ -1726,7 +1726,7 @@ following options are available:
    :samp:`--keep-inline-images` to exclude inline images
    from image optimization.
 
-:samp:`--ii-min-bytes=@1@replaceable@1@bytes@2@replaceable@2@`
+:samp:`--ii-min-bytes=@3@replaceable@3@bytes@4@replaceable@4@`
    Avoid converting inline images whose size is below the specified
    minimum size to regular images. If omitted, the default is 1,024
    bytes. Use 0 for no minimum.
@@ -1744,7 +1744,7 @@ following options are available:
    Mode <#ref.qdf>`__. Note that :samp:`--linearize`
    disables QDF mode.
 
-:samp:`--min-version=@1@replaceable@1@version@2@replaceable@2@`
+:samp:`--min-version=@3@replaceable@3@version@4@replaceable@4@`
    Forces the PDF version of the output file to be at least
    @1@replaceable@1@version@2@replaceable@2@. In other words, if the
    input file has a lower version than the specified version, the
@@ -1762,7 +1762,7 @@ following options are available:
    version ``1.7.8`` represents version 1.7 at extension level 8. Note
    that minimal syntax checking is done on the command line.
 
-:samp:`--force-version=@1@replaceable@1@version@2@replaceable@2@`
+:samp:`--force-version=@3@replaceable@3@version@4@replaceable@4@`
    This option forces the PDF version to be the exact version specified
    *even when the file may have content that is not supported in that
    version*. The version number is interpreted in the same way as with
@@ -3877,7 +3877,7 @@ For a detailed list of changes, please see the file
       that is out of spec but that works in most viewers anyway).
 
     - The option
-      :samp:`--password-file=@1@replaceable@1@filename@2@replaceable@2@`
+      :samp:`--password-file=@3@replaceable@3@filename@4@replaceable@4@`
       can now be used to read the decryption password from a file.
       You can use ``-`` as the file name to read the password from
       standard input. This is an easier/more obvious way to read
@@ -3894,7 +3894,7 @@ For a detailed list of changes, please see the file
       obtained by following the reference to the file spec object.
 
     - Add numeric option to :samp:`--collate`. If
-      :samp:`--collate=@1@replaceable@1@n@2@replaceable@2@`
+      :samp:`--collate=@3@replaceable@3@n@4@replaceable@4@`
       is given, take pages in groups of
       @1@replaceable@1@n@2@replaceable@2@ from the given files.
 
@@ -4517,7 +4517,7 @@ For a detailed list of changes, please see the file
       :samp:`--compression-level`.
 
     - The
-      :samp:`--compression-level=@1@replaceable@1@level@2@replaceable@2@`
+      :samp:`--compression-level=@3@replaceable@3@level@4@replaceable@4@`
       sets the zlib compression level used for any streams compressed
       by ``/FlateDecode``. Most effective when combined with
       :samp:`--recompress-flate`.
@@ -4687,7 +4687,7 @@ For a detailed list of changes, please see the file
       get it again.
 
     - New option
-      :samp:`--keep-files-open-threshold=@1@replaceable@1@count@2@replaceable@2@`
+      :samp:`--keep-files-open-threshold=@3@replaceable@3@count@4@replaceable@4@`
       can be used to override number of files that qpdf will use to
       trigger the behavior of not keeping all files open when merging
       files. This may be necessary if your system allows fewer than
@@ -5148,7 +5148,7 @@ For a detailed list of changes, please see the file
   - Command-line Enhancements
 
     - Add
-      :samp:`--keep-files-open=@1@replaceable@1@[yn]@2@replaceable@2@`
+      :samp:`--keep-files-open=@3@replaceable@3@[yn]@4@replaceable@4@`
       to override default determination of whether to keep files open
       when merging. Please see the discussion of
       :samp:`--keep-files-open` in `Basic
@@ -5228,7 +5228,7 @@ For a detailed list of changes, please see the file
 
     - The :samp:`--rotate` option's syntax has been
       extended to make the page range optional. If you specify
-      :samp:`--rotate=@1@replaceable@1@angle@2@replaceable@2@`
+      :samp:`--rotate=@3@replaceable@3@angle@4@replaceable@4@`
       without specifying a page range, the rotation will be applied
       to all pages. This can be especially useful for adjusting a PDF
       created from a multi-page document that was scanned upside
@@ -5352,7 +5352,7 @@ For a detailed list of changes, please see the file
     `Running QPDF <#ref.using>`__.
 
     - The option
-      :samp:`--linearize-pass1=@1@replaceable@1@file@2@replaceable@2@`
+      :samp:`--linearize-pass1=@3@replaceable@3@file@4@replaceable@4@`
       has been added for debugging qpdf's linearization code.
 
     - The option :samp:`--coalesce-contents` can be
