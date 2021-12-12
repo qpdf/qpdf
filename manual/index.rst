@@ -6,68 +6,28 @@ QPDF version |release|
    :maxdepth: 2
    :caption: Contents:
 
-.. _acknowledgments:
-
-General Information
-===================
-
-QPDF is a program that does structural, content-preserving
-transformations on PDF files. QPDF's website is located at
-https://qpdf.sourceforge.io/. QPDF's source code is hosted on github at
-https://github.com/qpdf/qpdf.
-
-QPDF is licensed under `the Apache License, Version
-2.0 <http://www.apache.org/licenses/LICENSE-2.0>`__ (the "License").
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
-Versions of qpdf prior to version 7 were released under the terms of
-`the Artistic License, version
-2.0 <https://opensource.org/licenses/Artistic-2.0>`__. At your option,
-you may continue to consider qpdf to be licensed under those terms. The
-Apache License 2.0 permits everything that the Artistic License 2.0
-permits but is slightly less restrictive. Allowing the Artistic License
-to continue being used is primary to help people who may have to get
-specific approval to use qpdf in their products.
-
-QPDF is intentionally released with a permissive license. However, if
-there is some reason that the licensing terms don't work for your
-requirements, please feel free to contact the copyright holder to make
-other arrangements.
-
-QPDF was originally created in 2001 and modified periodically between
-2001 and 2005 during my employment at `Apex
-CoVantage <http://www.apexcovantage.com>`__. Upon my departure from
-Apex, the company graciously allowed me to take ownership of the
-software and continue maintaining as an open source project, a decision
-for which I am very grateful. I have made considerable enhancements to
-it since that time. I feel fortunate to have worked for people who would
-make such a decision. This work would not have been possible without
-their support.
-
 .. _ref.overview:
 
 What is QPDF?
 =============
 
-QPDF is a program that does structural, content-preserving
-transformations on PDF files. It could have been called something like
-*pdf-to-pdf*. It also provides many useful capabilities to developers of
-PDF-producing software or for people who just want to look at the
-innards of a PDF file to learn more about how they work.
+QPDF is a program and C++ library for structural, content-preserving
+transformations on PDF files. QPDF's website is located at
+https://qpdf.sourceforge.io/. QPDF's source code is hosted on github
+at https://github.com/qpdf/qpdf.
 
-With QPDF, it is possible to copy objects from one PDF file into another
-and to manipulate the list of pages in a PDF file. This makes it
-possible to merge and split PDF files. The QPDF library also makes it
-possible for you to create PDF files from scratch. In this mode, you are
-responsible for supplying all the contents of the file, while the QPDF
-library takes care off all the syntactical representation of the
-objects, creation of cross references tables and, if you use them,
-object streams, encryption, linearization, and other syntactic details.
-You are still responsible for generating PDF content on your own.
+QPDF provides many useful capabilities to developers of PDF-producing
+software or for people who just want to look at the innards of a PDF
+file to learn more about how they work. With QPDF, it is possible to
+copy objects from one PDF file into another and to manipulate the list
+of pages in a PDF file. This makes it possible to merge and split PDF
+files. The QPDF library also makes it possible for you to create PDF
+files from scratch. In this mode, you are responsible for supplying
+all the contents of the file, while the QPDF library takes care of all
+the syntactical representation of the objects, creation of cross
+references tables and, if you use them, object streams, encryption,
+linearization, and other syntactic details. You are still responsible
+for generating PDF content on your own.
 
 QPDF has been designed with very few external dependencies, and it is
 intentionally very lightweight. QPDF is *not* a PDF content creation
@@ -79,6 +39,19 @@ be used to transform that file in ways perhaps your original PDF
 creation can't handle. For example, many programs generate simple PDF
 files but can't password-protect them, web-optimize them, or perform
 other transformations of that type.
+
+.. _ref.license:
+
+License
+=======
+
+QPDF is licensed under `the Apache License, Version 2.0
+<http://www.apache.org/licenses/LICENSE-2.0>`__ (the "License").
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+implied. See the License for the specific language governing
+permissions and limitations under the License.
 
 .. _ref.installing:
 
@@ -6289,3 +6262,18 @@ available inside the library. In the unlikely event that you should run
 into trouble, please see the ChangeLog. See also
 :ref:`ref.release-notes` for a complete list of the
 non-compatible API changes made in this version.
+
+.. _acknowledgments:
+
+Acknowledgment
+==============
+
+QPDF was originally created in 2001 and modified periodically between
+2001 and 2005 during my employment at `Apex CoVantage
+<http://www.apexcovantage.com>`__. Upon my departure from Apex, the
+company graciously allowed me to take ownership of the software and
+continue maintaining as an open source project, a decision for which I
+am very grateful. I have made considerable enhancements to it since
+that time. I feel fortunate to have worked for people who would make
+such a decision. This work would not have been possible without their
+support.
