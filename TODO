@@ -17,32 +17,23 @@ Next
   thrown when an uninitialized trailer is accessed provides useful
   information. Test from the C API as well as the C++ API.
 
-Doc conversion Notes
-====================
+Doc conversion
+==============
 
-Things to fix:
+Before release:
 
-Entities/Unicode
-
-<!ENTITY lastreleased "November 16, 2021"> (not needed)
-
-Make sure the information from <book> is in there
-
-Additional cleanup:
-
-* Indices and tables section
-
-Future work:
-
-* :ref: -- would be nice if it were suitable for printed documentation
 * README-maintainer: Fix installation of documentation to website
-* Release notes link changed (need #ref.release-notes as well as #release-note)
-* Decide about readthedocs; if using, with multiple versions/latest
+* Release notes link changed (need #ref.release-notes as well as #release-notes)
+* Get navigation working properly
+* Figure out where to put :ref:`search` so we get doc search
 * Change order of sections. Disinction between
   <preface>/<chapter>/<appendix>  was lost
-* Get navigation working properly
+
+Soon:
+
+* :ref: -- would be nice if it were suitable for printed documentation
+* Decide about readthedocs; if using, with multiple versions/latest
 * Generate stuff (options, code samples, etc.) as needed
-* Figure out where to put :ref:`search` so we get doc search
 
 Documentation
 =============

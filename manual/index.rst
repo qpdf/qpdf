@@ -6288,12 +6288,3 @@ available inside the library. In the unlikely event that you should run
 into trouble, please see the ChangeLog. See also
 :ref:`ref.release-notes` for a complete list of the
 non-compatible API changes made in this version.
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
