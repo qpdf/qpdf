@@ -5,7 +5,7 @@ Next
 
 * Refactor test_driver.cc so that runtest is not one huge function.
 
-* Consider creating a qpdf wiki.
+* Consider creating a qpdf wiki. See also Documentation below.
 
 * For QPDFObjectHandle, provide a way on and after construction
   to specify the error message that will be thrown if the
@@ -25,7 +25,7 @@ Before release:
 * Figure out what to do about the fact that the release notes are now
   at #release-notes instead of #ref.release-notes. This invalidates
   the link in all previous release announcements, but there's not much
-  I can do about, and it doesn't seem work fixing. Maybe mention it
+  I can do about, and it doesn't seem worth fixing. Maybe mention it
   somewhere?
 * README-maintainer: Fix installation of documentation to website
 * Get navigation working properly
@@ -40,8 +40,17 @@ Soon:
 Documentation
 =============
 
+* Do a full pass through the documentation.
+
+  * Make sure `qpdf` is consistent. Use QPDF when just referring to
+    the package.
+  * Make sure markup is consistent
+  * Autogenerate where possible
+  * Consider which parts might be good candidates for moving to the
+    wiki.
+
 * See #530 -- add an appendix explaining PDF encryption in general
-  plus how it's handled by qpdf.
+  plus how it's handled by qpdf. Or maybe this should go on the wiki.
 
 
 Document-level work
