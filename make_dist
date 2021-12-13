@@ -11,10 +11,11 @@ use File::Basename;
 use Cwd;
 use Cwd 'abs_path';
 use IO::File;
-use File::Path qw(rmtree);
+use File::Path qw(rmtree make_path);
 
 my $whoami = basename($0);
 
+my $tmp = $ENV{'TMPDIR'} || '/tmp';
 my $run_tests = 1;
 my $keep_tmp = 0;
 my $ci_mode = 0;
@@ -51,12 +52,13 @@ if ($ci_mode && (! defined $version))
 usage() unless defined $version;
 usage() unless $version =~ m/^(\d+\.\d+(?:\.(a|b|rc)?\d+)?)$/;
 my $distname = "qpdf-$version";
-my $tmpdir = "/tmp/$distname";
+my $tmpdir = "${tmp}/$distname";
 if ((-d $tmpdir) && (! $keep_tmp))
 {
     rmtree($tmpdir);
 }
-run("git archive --prefix=qpdf-$version/ HEAD . | (cd /tmp; tar xf -)");
+make_path($tmp);
+run("git archive --prefix=qpdf-$version/ HEAD . | (cd $tmp; tar xf -)");
 cd($tmpdir);
 
 # Check versions
@@ -94,7 +96,7 @@ if ($version_error)
 run("./configure --disable-shared --enable-doc-maintenance --enable-werror");
 run("make -j8 build_manual");
 run("make distclean");
-cd("/tmp");
+cd($tmp);
 run("tar czvf $distname.tar.gz-candidate $distname");
 if ($run_tests)
 {
@@ -102,7 +104,7 @@ if ($run_tests)
     run("./configure");
     run("make -j8");
     run("make check");
-    cd("/tmp");
+    cd($tmp);
 }
 my $distfile = ($ci_mode ? "$distname-ci.tar.gz" : "$distname.tar.gz");
 rename "$distname.tar.gz-candidate", $distfile or die;
@@ -113,7 +115,7 @@ if (! $keep_tmp)
 }
 
 print "
-Source distribution created as /tmp/$distfile
+Source distribution created as ${tmp}/$distfile
 If this is a release, don't forget to tag the version control system and
 make a backup of the release tar file.
 
@@ -210,7 +212,7 @@ Usage: $whoami [ --no-tests --keep-tmp ] version
 Use of --no-tests can be used for internally testing releases, but do
 not use it for a real release.
 
-$whoami creates /tmp/qpdf-<version> and deletes it when done. With
+$whoami creates ${tmp}/qpdf-<version> and deletes it when done. With
 --keep-tmp, the directory is kept. This can be useful for debugging
 the release process.
 
