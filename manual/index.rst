@@ -35,8 +35,8 @@ library, a PDF viewer, or a program capable of converting PDF into other
 formats. In particular, QPDF knows nothing about the semantics of PDF
 content streams. If you are looking for something that can do that, you
 should look elsewhere. However, once you have a valid PDF file, QPDF can
-be used to transform that file in ways perhaps your original PDF
-creation can't handle. For example, many programs generate simple PDF
+be used to transform that file in ways that perhaps your original PDF
+creation tool can't handle. For example, many programs generate simple PDF
 files but can't password-protect them, web-optimize them, or perform
 other transformations of that type.
 
@@ -101,7 +101,7 @@ make sure that any content transformations don't break the rendering of
 pages. Transformations that affect the content streams themselves are
 off by default and are only provided to help developers look into the
 contents of PDF files. If you are making deep changes to the library
-that cause changes in the contents of the files that qpdf generates,
+that cause changes in the contents of the files that qpdf generate,
 then you should enable the image comparison tests. Enable them by
 running :command:`configure` with the
 :samp:`--enable-test-compare-images` flag. If you enable
@@ -736,7 +736,7 @@ needed transformations.
    was a small but unavoidable performance hit, but for networked file
    systems, the performance impact could be very high. Starting with
    version 8.2.1, the default behavior is that files are kept open if no
-   more than 200 files are specified, but that the behavior can be
+   more than 200 files are specified, but this default behavior can be
    explicitly overridden with the
    :samp:`--keep-files-open` flag. If you are merging
    more than 200 files but less than the operating system's max open
@@ -6159,7 +6159,7 @@ For a detailed list of changes, please see the file
       :file:`<stdexcept>` header file to the C++ standard library.
       Most of the exceptions thrown by the qpdf library itself are
       still of type ``QPDFExc`` which is now derived from
-      ``std::runtime_error``. Programs that caught an instance of
+      ``std::runtime_error``. Programs that catch an instance of
       ``std::exception`` and displayed it by calling the ``what()``
       method will not need to be changed.
 
@@ -6243,7 +6243,7 @@ QPDF was originally created in 2001 and modified periodically between
 2001 and 2005 during my employment at `Apex CoVantage
 <http://www.apexcovantage.com>`__. Upon my departure from Apex, the
 company graciously allowed me to take ownership of the software and
-continue maintaining as an open source project, a decision for which I
+continue maintaining it as an open source project, a decision for which I
 am very grateful. I have made considerable enhancements to it since
 that time. I feel fortunate to have worked for people who would make
 such a decision. This work would not have been possible without their

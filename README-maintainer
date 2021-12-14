@@ -323,7 +323,7 @@ Template for release notes:
 ```
 This is qpdf version x.y.z. (Brief description)
 
-For a full list of changes from previous releases, please see the [release notes](http://qpdf.sourceforge.net/files/qpdf-manual.html#release-notes). See also [README-what-to-download](./README-what-to-download.md) for details on the available source and binary distributions.
+For a full list of changes from previous releases, please see the [release notes](http://qpdf.sourceforge.net/files/qpdf-manual.html#release-notes). See also [README-what-to-download](./README-what-to-download.md) for details about the available source and binary distributions.
 ```
 
 # Publish release
