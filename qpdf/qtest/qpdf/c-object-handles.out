@@ -15,3 +15,4 @@ warning: minimal.pdf: C API object handle accessor errors occurred, and the appl
   file: minimal.pdf
   pos : 0
   text: C API object handle accessor errors occurred, and the application did not define an error handler
+C test 24 done

@@ -1152,6 +1152,7 @@ int main(int argc, char* argv[])
     fn(infile, password, outfile, xarg);
     qpdf_cleanup(&qpdf);
     assert(qpdf == 0);
+    printf("C test %d done\n", n);
 
     return 0;
 }

@@ -8,3 +8,4 @@ warning: damaged-stream.pdf (offset 426): stream will be re-processed without fi
   file: damaged-stream.pdf
   pos : 426
   text: stream will be re-processed without filtering to avoid data loss
+C test 2 done

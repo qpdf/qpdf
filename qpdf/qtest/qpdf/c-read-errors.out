@@ -23,3 +23,4 @@ error: bad1.pdf: unable to find trailer dictionary while recovering damaged file
   file: bad1.pdf
   pos : 0
   text: unable to find trailer dictionary while recovering damaged file
+C test 2 done

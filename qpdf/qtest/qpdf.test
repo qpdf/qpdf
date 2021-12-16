@@ -1452,7 +1452,7 @@ $td->runtest("check version",
 unlink "a.pdf", "b.pdf" or die;
 $td->runtest("C API: min/force versions",
 	     {$td->COMMAND => "qpdf-ctest 14 object-stream.pdf '' a.pdf b.pdf"},
-	     {$td->STRING => "",
+	     {$td->STRING => "C test 14 done\n",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("C check version 1",
@@ -2049,7 +2049,7 @@ foreach my $d (
 $td->runtest("newline before endstream (C)",
              {$td->COMMAND =>
                   "qpdf-ctest 22 streams-with-newlines.pdf '' a.pdf"},
-             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             {$td->STRING => "C test 22 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
              {$td->FILE => "a.pdf"},
@@ -2949,7 +2949,7 @@ foreach my $l (qw(none generalized specialized all))
 # C API
 $td->runtest("image-streams: C",
              {$td->COMMAND => "qpdf-ctest 20 image-streams.pdf '' a.pdf"},
-             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             {$td->STRING => "C test 20 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check image-streams: C",
              {$td->COMMAND => "test_driver 39 a.pdf"},
@@ -3043,7 +3043,8 @@ $td->runtest("check output",
 $td->runtest("keep unused objects (C)",
 	     {$td->COMMAND =>
                   "qpdf-ctest 21 unreferenced-objects.pdf '' a.pdf"},
-	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+	     {$td->STRING => "C test 21 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
 	     {$td->FILE => "a.pdf"},
 	     {$td->FILE => "unreferenced-preserved.pdf"});
@@ -3413,7 +3414,8 @@ foreach my $d (@capi)
     $outfile = "c-$outfile.pdf";
     $td->runtest($description,
 		 {$td->COMMAND => "qpdf-ctest $n hybrid-xref.pdf '' a.pdf"},
-		 {$td->STRING => "", $td->EXIT_STATUS => 0});
+		 {$td->STRING => "C test $n done\n", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
     $td->runtest("check $description",
 		 {$td->FILE => "a.pdf"},
 		 {$td->FILE => $outfile});
@@ -3472,8 +3474,9 @@ $td->runtest("deterministic ID with encryption",
 $td->runtest("deterministic ID (C API)",
              {$td->COMMAND =>
                   "qpdf-ctest 19 deterministic-id-in.pdf '' a.pdf"},
-             {$td->STRING => "",
-              $td->EXIT_STATUS => 0});
+             {$td->STRING => "C test 19 done\n",
+                  $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 $td->runtest("compare files",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "deterministic-id-nn.pdf"});
@@ -4275,7 +4278,8 @@ foreach my $d (@cenc)
     my $check_outfile = "c-$outfile.out";
     $td->runtest("C API encryption: $description",
 		 {$td->COMMAND => "qpdf-ctest $n $infile $pass a.pdf"},
-		 {$td->STRING => $output, $td->EXIT_STATUS => 0},
+		 {$td->STRING => $output . "C test $n done\n",
+                      $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
     if (-f $pdf_outfile)
     {
@@ -4825,7 +4829,7 @@ $td->runtest("check output",
 
 $td->runtest("C check object handle creation",
              {$td->COMMAND => "qpdf-ctest 25 minimal.pdf '' a.pdf"},
-             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             {$td->STRING => "C test 25 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
 	     {$td->FILE => 'a.pdf'},
@@ -4833,7 +4837,7 @@ $td->runtest("check output",
 
 $td->runtest("C indirect objects",
              {$td->COMMAND => "qpdf-ctest 33 minimal.pdf '' a.pdf"},
-             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             {$td->STRING => "C test 33 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
 	     {$td->FILE => 'a.pdf'},
@@ -4841,15 +4845,15 @@ $td->runtest("check output",
 
 $td->runtest("C uninitialized objects",
              {$td->COMMAND => "qpdf-ctest 26 '' '' ''"},
-             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             {$td->STRING => "C test 26 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("C string with embedded null",
              {$td->COMMAND => "qpdf-ctest 27 '' '' ''"},
-             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             {$td->STRING => "C test 27 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("C wrap and clone objects",
              {$td->COMMAND => "qpdf-ctest 28 minimal.pdf '' ''"},
-             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             {$td->STRING => "C test 28 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("C object handle errors",
              {$td->COMMAND => "qpdf-ctest 29 minimal.pdf '' ''"},
@@ -4865,7 +4869,7 @@ $td->runtest("C type mismatch warning",
              $td->NORMALIZE_NEWLINES);
 $td->runtest("C get object by ID",
              {$td->COMMAND => "qpdf-ctest 32 minimal.pdf '' ''"},
-             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             {$td->STRING => "C test 32 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 show_ntests();
@@ -4876,7 +4880,7 @@ $n_tests += 5;
 $td->runtest("C page normal",
              {$td->COMMAND =>
                   "qpdf-ctest 34 11-pages.pdf '' a.pdf minimal.pdf"},
-             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             {$td->STRING => "C test 34 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
 	     {$td->FILE => 'a.pdf'},
@@ -4890,12 +4894,12 @@ $td->runtest("C page errors",
 $td->runtest("C inherited page resources",
              {$td->COMMAND =>
                   "qpdf-ctest 36 inherited-rotate.pdf '' ''"},
-             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             {$td->STRING => "C test 36 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("C pages cache",
              {$td->COMMAND =>
                   "qpdf-ctest 37 11-pages.pdf '' ''"},
-             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             {$td->STRING => "C test 37 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 show_ntests();

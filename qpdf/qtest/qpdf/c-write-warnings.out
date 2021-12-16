@@ -18,3 +18,4 @@ warning: bad33.pdf (offset 629): stream filter type is not name or array
   file: bad33.pdf
   pos : 629
   text: stream filter type is not name or array
+C test 2 done
