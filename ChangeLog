@@ -1,3 +1,10 @@
+2021-12-16  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add several functions to the C API for working with pages. C
+	wrappers around sevearl of the "Legacy" page operations from
+	QPDFObjectHandle.hh have been added. See "PAGE FUNCTIONS" in
+	qpdf-c.h for details. Fixes #594.
+
 2021-12-12  Jay Berkenbilt  <ejb@ql.org>
 
 	* Convert documentation from docbook to reStructuredText/Sphinx.

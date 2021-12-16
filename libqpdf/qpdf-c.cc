@@ -1579,3 +1579,102 @@ char const* qpdf_oh_unparse_binary(qpdf_data qpdf, qpdf_oh oh)
             return qpdf->tmp_string.c_str();
         });
 }
+
+int qpdf_get_num_pages(qpdf_data qpdf)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_num_pages");
+    int n = -1;
+    QPDF_ERROR_CODE code = trap_errors(qpdf, [&n](qpdf_data q) {
+        n = QIntC::to_int(q->qpdf->getAllPages().size());
+    });
+    if (code & QPDF_ERRORS)
+    {
+        return -1;
+    }
+    return n;
+}
+
+qpdf_oh qpdf_get_page_n(qpdf_data qpdf, size_t i)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_get_page_n");
+    qpdf_oh result = 0;
+    QPDF_ERROR_CODE code = trap_errors(qpdf, [&result, i](qpdf_data q) {
+        result = new_object(q, q->qpdf->getAllPages().at(i));
+    });
+    if ((code & QPDF_ERRORS) || (result == 0))
+    {
+        return qpdf_oh_new_uninitialized(qpdf);
+    }
+    return result;
+}
+
+QPDF_ERROR_CODE qpdf_update_all_pages_cache(qpdf_data qpdf)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_update_all_pages_cache");
+    return trap_errors(qpdf, [](qpdf_data q) {
+        q->qpdf->updateAllPagesCache();
+    });
+}
+
+int qpdf_find_page_by_id(qpdf_data qpdf, int objid, int generation)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_find_page_by_id");
+    int n = -1;
+    QPDFObjGen og(objid, generation);
+    QPDF_ERROR_CODE code = trap_errors(qpdf, [&n, &og](qpdf_data q) {
+        n = QIntC::to_int(q->qpdf->findPage(og));
+    });
+    if (code & QPDF_ERRORS)
+    {
+        return -1;
+    }
+    return n;
+}
+
+int qpdf_find_page_by_oh(qpdf_data qpdf, qpdf_oh oh)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_find_page_by_oh");
+    return do_with_oh<int>(
+        qpdf, oh, return_T<int>(-1), [qpdf](QPDFObjectHandle& o) {
+            return qpdf->qpdf->findPage(o);
+        });
+}
+
+QPDF_ERROR_CODE qpdf_push_inherited_attributes_to_page(qpdf_data qpdf)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_push_inherited_attributes_to_page");
+    return trap_errors(qpdf, [](qpdf_data q) {
+        q->qpdf->pushInheritedAttributesToPage();
+    });
+}
+
+QPDF_ERROR_CODE qpdf_add_page(
+    qpdf_data qpdf, qpdf_data newpage_qpdf, qpdf_oh newpage, QPDF_BOOL first)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_add_page");
+    auto page = qpdf_oh_item_internal(newpage_qpdf, newpage);
+    return trap_errors(qpdf, [&page, first](qpdf_data q) {
+        q->qpdf->addPage(page, first);
+    });
+}
+
+QPDF_ERROR_CODE qpdf_add_page_at(
+    qpdf_data qpdf, qpdf_data newpage_qpdf, qpdf_oh newpage,
+    QPDF_BOOL before, qpdf_oh refpage)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_add_page_at");
+    auto page = qpdf_oh_item_internal(newpage_qpdf, newpage);
+    auto ref = qpdf_oh_item_internal(qpdf, refpage);
+    return trap_errors(qpdf, [&page, before, &ref](qpdf_data q) {
+        q->qpdf->addPageAt(page, before, ref);
+    });
+}
+
+QPDF_ERROR_CODE qpdf_remove_page(qpdf_data qpdf, qpdf_oh page)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_remove_page");
+    auto p = qpdf_oh_item_internal(qpdf, page);
+    return trap_errors(qpdf, [&p](qpdf_data q) {
+        q->qpdf->removePage(p);
+    });
+}

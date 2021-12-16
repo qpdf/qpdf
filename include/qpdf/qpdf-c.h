@@ -788,6 +788,67 @@ extern "C" {
     char const* qpdf_oh_unparse_resolved(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
     char const* qpdf_oh_unparse_binary(qpdf_data qpdf, qpdf_oh oh);
+
+    /* PAGE FUNCTIONS */
+
+    /* The first time a page function is called, qpdf will traverse
+     * the /Pages tree. Subsequent calls to retrieve the number of
+     * pages or a specific page run in constant time as they are
+     * accessing the pages cache. If you manipulate the page tree
+     * outside of these functions, you should call
+     * qpdf_update_all_pages_cache. See comments for getAllPages() and
+     * updateAllPagesCache() in QPDF.hh.
+     */
+
+    /* For each function, the corresponding method in QPDF.hh is
+     * referenced. Please see comments in QPDF.hh for details.
+     */
+
+    /* calls getAllPages(). On error, returns -1 and sets error for
+     * qpdf_get_error. */
+    QPDF_DLL
+    int qpdf_get_num_pages(qpdf_data qpdf);
+    /* returns uninitialized object if out of range */
+    QPDF_DLL
+    qpdf_oh qpdf_get_page_n(qpdf_data qpdf, size_t zero_based_index);
+
+    /* updateAllPagesCache() */
+    QPDF_DLL
+    QPDF_ERROR_CODE qpdf_update_all_pages_cache(qpdf_data qpdf);
+
+    /* findPage() -- return zero-based index. If page is not found,
+     * return -1 and save the error to be retrieved with
+     * qpdf_get_error.
+     */
+    QPDF_DLL
+    int qpdf_find_page_by_id(qpdf_data qpdf, int objid, int generation);
+    QPDF_DLL
+    int qpdf_find_page_by_oh(qpdf_data qpdf, qpdf_oh oh);
+
+    /* pushInheritedAttributesToPage() */
+    QPDF_DLL
+    QPDF_ERROR_CODE qpdf_push_inherited_attributes_to_page(qpdf_data qpdf);
+
+    /* Functions that add pages may add pages from other files. If
+     * adding a page from the same file, newpage_qpdf and qpdf are the
+     * same.
+     /*/
+
+    /* addPage() */
+    QPDF_DLL
+    QPDF_ERROR_CODE qpdf_add_page(
+        qpdf_data qpdf,
+        qpdf_data newpage_qpdf, qpdf_oh newpage,
+        QPDF_BOOL first);
+    /* addPageAt() */
+    QPDF_DLL
+    QPDF_ERROR_CODE qpdf_add_page_at(
+        qpdf_data qpdf,
+        qpdf_data newpage_qpdf, qpdf_oh newpage,
+        QPDF_BOOL before, qpdf_oh refpage);
+    /* removePage() */
+    QPDF_DLL
+    QPDF_ERROR_CODE qpdf_remove_page(qpdf_data qpdf, qpdf_oh page);
 #ifdef __cplusplus
 }
 #endif

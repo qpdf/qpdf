@@ -3626,7 +3626,9 @@ For a detailed list of changes, please see the file
       more detail what the behavior is. See :ref:`ref.object-accessors` for a more in-depth
       discussion.
 
-    - Overhaul error handling for the object handle functions in the
+  - C API Enhancements
+
+    - Overhaul error handling for the object handle functions
       C API. See comments in the "Object handling" section of
       :file:`include/qpdf/qpdf-c.h` for details.
       In particular, exceptions thrown by the underlying C++ code
@@ -3649,6 +3651,9 @@ For a detailed list of changes, please see the file
     - Add ``qpdf_get_object_by_id``, ``qpdf_make_indirect_object``,
       and ``qpdf_replace_object``, exposing the corresponding methods
       in ``QPDF`` and ``QPDFObjectHandle``.
+
+    - Add several functions for working with pages. See ``PAGE
+      FUNCTIONS`` in ``include/qpdf/qpdf-c.h`` for details.
 
   - Documentation change
 

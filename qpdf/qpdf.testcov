@@ -608,3 +608,12 @@ qpdf-c registered oh error handler 0
 qpdf-c cleanup warned about unhandled error 0
 qpdf-c called qpdf_get_object_by_id 0
 qpdf-c called qpdf_replace_object 0
+qpdf-c called qpdf_num_pages 0
+qpdf-c called qpdf_get_page_n 0
+qpdf-c called qpdf_update_all_pages_cache 0
+qpdf-c called qpdf_find_page_by_id 0
+qpdf-c called qpdf_find_page_by_oh 0
+qpdf-c called qpdf_push_inherited_attributes_to_page 0
+qpdf-c called qpdf_add_page 0
+qpdf-c called qpdf_add_page_at 0
+qpdf-c called qpdf_remove_page 0

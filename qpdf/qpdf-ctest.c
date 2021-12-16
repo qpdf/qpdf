@@ -931,6 +931,138 @@ static void test33(char const* infile,
     report_errors();
 }
 
+static void test34(char const* infile,
+		   char const* password,
+		   char const* outfile,
+		   char const* xarg)
+{
+    /* This test expects 11-pages.pdf as file1 and minimal.pdf as xarg. */
+
+    /* Non-error cases for page API */
+
+    qpdf_data qpdf2 = qpdf_init();
+    assert(qpdf_read(qpdf, infile, password) == 0);
+    assert(qpdf_read(qpdf2, xarg, "") == 0);
+    assert(qpdf_get_num_pages(qpdf) == 11);
+    assert(qpdf_get_num_pages(qpdf2) == 1);
+
+    /* At this time, there is no C API for accessing stream data, so
+     * we hard-code object IDs from a known input file.
+     */
+    assert(qpdf_oh_get_object_id(qpdf, qpdf_get_page_n(qpdf, 0)) == 4);
+    assert(qpdf_oh_get_object_id(qpdf, qpdf_get_page_n(qpdf, 10)) == 14);
+    qpdf_oh page3 = qpdf_get_page_n(qpdf, 3);
+    assert(qpdf_find_page_by_oh(qpdf, page3) == 3);
+    assert(qpdf_find_page_by_id(
+               qpdf, qpdf_oh_get_object_id(qpdf, page3), 0) == 3);
+
+    /* Add other page to the end */
+    qpdf_oh opage0 = qpdf_get_page_n(qpdf2, 0);
+    assert(qpdf_add_page(qpdf, qpdf2, opage0, QPDF_FALSE) == 0);
+    /* Add other page before page 3 */
+    assert(qpdf_add_page_at(qpdf, qpdf2, opage0, QPDF_TRUE, page3) == 0);
+    /* Remove page 3 */
+    assert(qpdf_remove_page(qpdf, page3) == 0);
+    /* At page 3 back at the beginning */
+    assert(qpdf_add_page(qpdf, qpdf, page3, QPDF_TRUE) == 0);
+
+    qpdf_init_write(qpdf, outfile);
+    qpdf_set_static_ID(qpdf, QPDF_TRUE);
+    qpdf_set_qdf_mode(qpdf, QPDF_TRUE);
+    qpdf_set_suppress_original_object_IDs(qpdf, QPDF_TRUE);
+    qpdf_write(qpdf);
+    report_errors();
+    qpdf_cleanup(&qpdf2);
+}
+
+static void test35(char const* infile,
+		   char const* password,
+		   char const* outfile,
+		   char const* xarg)
+{
+    /* This test uses 11-pages.pdf */
+
+    assert(qpdf_get_num_pages(qpdf) == -1);
+    assert(qpdf_has_error(qpdf));
+    qpdf_error e = qpdf_get_error(qpdf);
+    assert(qpdf_get_error_code(qpdf, e) != QPDF_SUCCESS);
+    assert(! qpdf_has_error(qpdf));
+
+    assert(qpdf_read(qpdf, infile, password) == 0);
+
+    qpdf_oh range = qpdf_get_page_n(qpdf, 11);
+    assert(! qpdf_oh_is_initialized(qpdf, range));
+    assert(qpdf_has_error(qpdf));
+    e = qpdf_get_error(qpdf);
+    assert(qpdf_get_error_code(qpdf, e) != QPDF_SUCCESS);
+    assert(! qpdf_has_error(qpdf));
+
+    assert(qpdf_find_page_by_id(qpdf, 100, 0) == -1);
+    assert(qpdf_has_error(qpdf));
+    e = qpdf_get_error(qpdf);
+    assert(qpdf_get_error_code(qpdf, e) != QPDF_SUCCESS);
+    assert(! qpdf_has_error(qpdf));
+
+    assert(qpdf_find_page_by_oh(qpdf, qpdf_get_root(qpdf)) == -1);
+    assert(qpdf_more_warnings(qpdf));
+    e = qpdf_next_warning(qpdf);
+    assert(qpdf_get_error_code(qpdf, e) != QPDF_SUCCESS);
+    assert(! qpdf_has_error(qpdf));
+
+    assert(qpdf_find_page_by_id(qpdf, 100, 0) == -1);
+    assert(qpdf_has_error(qpdf));
+    e = qpdf_get_error(qpdf);
+    assert(qpdf_get_error_code(qpdf, e) != QPDF_SUCCESS);
+    assert(! qpdf_has_error(qpdf));
+
+    assert(qpdf_add_page(qpdf, qpdf, 1000, QPDF_FALSE) != 0);
+
+    report_errors();
+}
+
+static void test36(char const* infile,
+		   char const* password,
+		   char const* outfile,
+		   char const* xarg)
+{
+    /* This test uses inherited-rotate.pdf */
+
+    assert(qpdf_read(qpdf, infile, password) == 0);
+
+    /* Non-trivially push inherited attributes */
+    qpdf_oh page0 = qpdf_get_object_by_id(qpdf, 3, 0);
+    assert(qpdf_oh_is_dictionary(qpdf, page0));
+    qpdf_oh r = qpdf_oh_get_key(qpdf, page0, "/Rotate");
+    assert(qpdf_oh_get_int_value(qpdf, r) == 90);
+    qpdf_oh_remove_key(qpdf, page0, "/Rotate");
+    assert(! qpdf_oh_has_key(qpdf, page0, "/Rotate"));
+
+    assert(qpdf_push_inherited_attributes_to_page(qpdf) == 0);
+    r = qpdf_oh_get_key(qpdf, page0, "/Rotate");
+    assert(qpdf_oh_get_int_value(qpdf, r) == 270);
+
+    assert(qpdf_add_page(qpdf, qpdf, page0, QPDF_TRUE) == 0);
+}
+
+static void test37(char const* infile,
+		   char const* password,
+		   char const* outfile,
+		   char const* xarg)
+{
+    /* This test uses 11-pages.pdf */
+
+    /* Manually manipulate pages tree */
+    assert(qpdf_read(qpdf, infile, password) == 0);
+    assert(qpdf_get_num_pages(qpdf) == 11);
+    qpdf_oh pages = qpdf_get_object_by_id(qpdf, 3, 0);
+    qpdf_oh kids = qpdf_oh_get_key(qpdf, pages, "/Kids");
+    assert(qpdf_oh_get_array_n_items(qpdf, kids) == 11);
+    qpdf_oh_erase_item(qpdf, kids, 0);
+    assert(qpdf_get_num_pages(qpdf) == 11);
+    assert(qpdf_update_all_pages_cache(qpdf) == 0);
+    assert(qpdf_get_num_pages(qpdf) == 10);
+}
+
 int main(int argc, char* argv[])
 {
     char* p = 0;
@@ -1004,6 +1136,10 @@ int main(int argc, char* argv[])
 	  (n == 31) ? test31 :
 	  (n == 32) ? test32 :
 	  (n == 33) ? test33 :
+	  (n == 34) ? test34 :
+	  (n == 35) ? test35 :
+	  (n == 36) ? test36 :
+	  (n == 37) ? test37 :
 	  0);
 
     if (fn == 0)
