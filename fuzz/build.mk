@@ -85,9 +85,8 @@ $(foreach F,$(CORPUS_EXTRA),$(eval \
 	mkdir -p $(CORPUS_DIR); \
 	cp $(F) $(CORPUS_DIR)/$(SHA1_$(notdir $(F)))))
 
-fuzz/$(OUTPUT_DIR)/fuzz_corpus.stamp: fuzz/original-corpus.tar.gz $(CORPUS_EXTRA)
+fuzz/$(OUTPUT_DIR)/fuzz_corpus.stamp: $(CORPUS_EXTRA)
 	mkdir -p $(CORPUS_DIR)
-	(cd $(CORPUS_DIR); tar xzf ../../original-corpus.tar.gz)
 	touch $@
 
 $(foreach B,$(FUZZERS),$(eval \
