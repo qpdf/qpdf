@@ -604,9 +604,9 @@ extern "C" {
      * equivalent in the C++ API.
      */
     QPDF_DLL
-    void qpdf_oh_release(qpdf_data data, qpdf_oh oh);
+    void qpdf_oh_release(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    void qpdf_oh_release_all(qpdf_data data);
+    void qpdf_oh_release_all(qpdf_data qpdf);
 
     /* Clone an object handle */
     QPDF_DLL
@@ -614,9 +614,9 @@ extern "C" {
 
     /* Get trailer and root objects */
     QPDF_DLL
-    qpdf_oh qpdf_get_trailer(qpdf_data data);
+    qpdf_oh qpdf_get_trailer(qpdf_data qpdf);
     QPDF_DLL
-    qpdf_oh qpdf_get_root(qpdf_data data);
+    qpdf_oh qpdf_get_root(qpdf_data qpdf);
 
     /* Retrieve and replace indirect objects */
     QPDF_DLL
@@ -634,80 +634,80 @@ extern "C" {
      */
 
     QPDF_DLL
-    QPDF_BOOL qpdf_oh_is_initialized(qpdf_data data, qpdf_oh oh);
+    QPDF_BOOL qpdf_oh_is_initialized(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    QPDF_BOOL qpdf_oh_is_bool(qpdf_data data, qpdf_oh oh);
+    QPDF_BOOL qpdf_oh_is_bool(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    QPDF_BOOL qpdf_oh_is_null(qpdf_data data, qpdf_oh oh);
+    QPDF_BOOL qpdf_oh_is_null(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    QPDF_BOOL qpdf_oh_is_integer(qpdf_data data, qpdf_oh oh);
+    QPDF_BOOL qpdf_oh_is_integer(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    QPDF_BOOL qpdf_oh_is_real(qpdf_data data, qpdf_oh oh);
+    QPDF_BOOL qpdf_oh_is_real(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    QPDF_BOOL qpdf_oh_is_name(qpdf_data data, qpdf_oh oh);
+    QPDF_BOOL qpdf_oh_is_name(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    QPDF_BOOL qpdf_oh_is_string(qpdf_data data, qpdf_oh oh);
+    QPDF_BOOL qpdf_oh_is_string(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    QPDF_BOOL qpdf_oh_is_operator(qpdf_data data, qpdf_oh oh);
+    QPDF_BOOL qpdf_oh_is_operator(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    QPDF_BOOL qpdf_oh_is_inline_image(qpdf_data data, qpdf_oh oh);
+    QPDF_BOOL qpdf_oh_is_inline_image(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    QPDF_BOOL qpdf_oh_is_array(qpdf_data data, qpdf_oh oh);
+    QPDF_BOOL qpdf_oh_is_array(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    QPDF_BOOL qpdf_oh_is_dictionary(qpdf_data data, qpdf_oh oh);
+    QPDF_BOOL qpdf_oh_is_dictionary(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    QPDF_BOOL qpdf_oh_is_stream(qpdf_data data, qpdf_oh oh);
+    QPDF_BOOL qpdf_oh_is_stream(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    QPDF_BOOL qpdf_oh_is_indirect(qpdf_data data, qpdf_oh oh);
+    QPDF_BOOL qpdf_oh_is_indirect(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    QPDF_BOOL qpdf_oh_is_scalar(qpdf_data data, qpdf_oh oh);
+    QPDF_BOOL qpdf_oh_is_scalar(qpdf_data qpdf, qpdf_oh oh);
 
     QPDF_DLL
-    qpdf_oh qpdf_oh_wrap_in_array(qpdf_data data, qpdf_oh oh);
+    qpdf_oh qpdf_oh_wrap_in_array(qpdf_data qpdf, qpdf_oh oh);
 
     QPDF_DLL
-    qpdf_oh qpdf_oh_parse(qpdf_data data, char const* object_str);
+    qpdf_oh qpdf_oh_parse(qpdf_data qpdf, char const* object_str);
 
     QPDF_DLL
-    QPDF_BOOL qpdf_oh_get_bool_value(qpdf_data data, qpdf_oh oh);
+    QPDF_BOOL qpdf_oh_get_bool_value(qpdf_data qpdf, qpdf_oh oh);
 
     QPDF_DLL
-    long long qpdf_oh_get_int_value(qpdf_data data, qpdf_oh oh);
+    long long qpdf_oh_get_int_value(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    int qpdf_oh_get_int_value_as_int(qpdf_data data, qpdf_oh oh);
+    int qpdf_oh_get_int_value_as_int(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    unsigned long long qpdf_oh_get_uint_value(qpdf_data data, qpdf_oh oh);
+    unsigned long long qpdf_oh_get_uint_value(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    unsigned int qpdf_oh_get_uint_value_as_uint(qpdf_data data, qpdf_oh oh);
+    unsigned int qpdf_oh_get_uint_value_as_uint(qpdf_data qpdf, qpdf_oh oh);
 
     QPDF_DLL
-    char const* qpdf_oh_get_real_value(qpdf_data data, qpdf_oh oh);
+    char const* qpdf_oh_get_real_value(qpdf_data qpdf, qpdf_oh oh);
 
     QPDF_DLL
-    QPDF_BOOL qpdf_oh_is_number(qpdf_data data, qpdf_oh oh);
+    QPDF_BOOL qpdf_oh_is_number(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    double qpdf_oh_get_numeric_value(qpdf_data data, qpdf_oh oh);
+    double qpdf_oh_get_numeric_value(qpdf_data qpdf, qpdf_oh oh);
 
     QPDF_DLL
-    char const* qpdf_oh_get_name(qpdf_data data, qpdf_oh oh);
+    char const* qpdf_oh_get_name(qpdf_data qpdf, qpdf_oh oh);
 
     QPDF_DLL
-    char const* qpdf_oh_get_string_value(qpdf_data data, qpdf_oh oh);
+    char const* qpdf_oh_get_string_value(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    char const* qpdf_oh_get_utf8_value(qpdf_data data, qpdf_oh oh);
+    char const* qpdf_oh_get_utf8_value(qpdf_data qpdf, qpdf_oh oh);
 
     QPDF_DLL
-    int qpdf_oh_get_array_n_items(qpdf_data data, qpdf_oh oh);
+    int qpdf_oh_get_array_n_items(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    qpdf_oh qpdf_oh_get_array_item(qpdf_data data, qpdf_oh oh, int n);
+    qpdf_oh qpdf_oh_get_array_item(qpdf_data qpdf, qpdf_oh oh, int n);
 
     /* "C"-specific dictionary key iteration */
 
     /* Iteration is allowed on only one dictionary at a time. */
     QPDF_DLL
-    void qpdf_oh_begin_dict_key_iter(qpdf_data data, qpdf_oh dict);
+    void qpdf_oh_begin_dict_key_iter(qpdf_data qpdf, qpdf_oh dict);
     QPDF_DLL
-    QPDF_BOOL qpdf_oh_dict_more_keys(qpdf_data data);
+    QPDF_BOOL qpdf_oh_dict_more_keys(qpdf_data qpdf);
     /* The memory returned by qpdf_oh_dict_next_key is owned by
      * qpdf_data. It is good until the next call to
      * qpdf_oh_dict_next_key with the same qpdf_data object. Calling
@@ -715,79 +715,79 @@ extern "C" {
      * previous return values.
      */
     QPDF_DLL
-    char const* qpdf_oh_dict_next_key(qpdf_data data);
+    char const* qpdf_oh_dict_next_key(qpdf_data qpdf);
 
     /* end "C"-specific dictionary key iteration */
 
     QPDF_DLL
-    QPDF_BOOL qpdf_oh_has_key(qpdf_data data, qpdf_oh oh, char const* key);
+    QPDF_BOOL qpdf_oh_has_key(qpdf_data qpdf, qpdf_oh oh, char const* key);
     QPDF_DLL
-    qpdf_oh qpdf_oh_get_key(qpdf_data data, qpdf_oh oh, char const* key);
+    qpdf_oh qpdf_oh_get_key(qpdf_data qpdf, qpdf_oh oh, char const* key);
 
     QPDF_DLL
     QPDF_BOOL qpdf_oh_is_or_has_name(
-        qpdf_data data, qpdf_oh oh, char const* key);
+        qpdf_data qpdf, qpdf_oh oh, char const* key);
 
     QPDF_DLL
     qpdf_oh qpdf_oh_new_uninitialized(qpdf_data qpdf);
     QPDF_DLL
-    qpdf_oh qpdf_oh_new_null(qpdf_data data);
+    qpdf_oh qpdf_oh_new_null(qpdf_data qpdf);
     QPDF_DLL
-    qpdf_oh qpdf_oh_new_bool(qpdf_data data, QPDF_BOOL value);
+    qpdf_oh qpdf_oh_new_bool(qpdf_data qpdf, QPDF_BOOL value);
     QPDF_DLL
-    qpdf_oh qpdf_oh_new_integer(qpdf_data data, long long value);
+    qpdf_oh qpdf_oh_new_integer(qpdf_data qpdf, long long value);
     QPDF_DLL
-    qpdf_oh qpdf_oh_new_real_from_string(qpdf_data data, char const* value);
+    qpdf_oh qpdf_oh_new_real_from_string(qpdf_data qpdf, char const* value);
     QPDF_DLL
-    qpdf_oh qpdf_oh_new_real_from_double(qpdf_data data,
+    qpdf_oh qpdf_oh_new_real_from_double(qpdf_data qpdf,
                                          double value, int decimal_places);
     QPDF_DLL
-    qpdf_oh qpdf_oh_new_name(qpdf_data data, char const* name);
+    qpdf_oh qpdf_oh_new_name(qpdf_data qpdf, char const* name);
     QPDF_DLL
-    qpdf_oh qpdf_oh_new_string(qpdf_data data, char const* str);
+    qpdf_oh qpdf_oh_new_string(qpdf_data qpdf, char const* str);
     QPDF_DLL
-    qpdf_oh qpdf_oh_new_unicode_string(qpdf_data data, char const* utf8_str);
+    qpdf_oh qpdf_oh_new_unicode_string(qpdf_data qpdf, char const* utf8_str);
     QPDF_DLL
-    qpdf_oh qpdf_oh_new_array(qpdf_data data);
+    qpdf_oh qpdf_oh_new_array(qpdf_data qpdf);
     QPDF_DLL
-    qpdf_oh qpdf_oh_new_dictionary(qpdf_data data);
+    qpdf_oh qpdf_oh_new_dictionary(qpdf_data qpdf);
 
     QPDF_DLL
-    void qpdf_oh_make_direct(qpdf_data data, qpdf_oh oh);
+    void qpdf_oh_make_direct(qpdf_data qpdf, qpdf_oh oh);
 
     QPDF_DLL
-    void qpdf_oh_set_array_item(qpdf_data data, qpdf_oh oh,
+    void qpdf_oh_set_array_item(qpdf_data qpdf, qpdf_oh oh,
                                 int at, qpdf_oh item);
     QPDF_DLL
-    void qpdf_oh_insert_item(qpdf_data data, qpdf_oh oh, int at, qpdf_oh item);
+    void qpdf_oh_insert_item(qpdf_data qpdf, qpdf_oh oh, int at, qpdf_oh item);
     QPDF_DLL
-    void qpdf_oh_append_item(qpdf_data data, qpdf_oh oh, qpdf_oh item);
+    void qpdf_oh_append_item(qpdf_data qpdf, qpdf_oh oh, qpdf_oh item);
     QPDF_DLL
-    void qpdf_oh_erase_item(qpdf_data data, qpdf_oh oh, int at);
+    void qpdf_oh_erase_item(qpdf_data qpdf, qpdf_oh oh, int at);
 
     QPDF_DLL
-    void qpdf_oh_replace_key(qpdf_data data, qpdf_oh oh,
+    void qpdf_oh_replace_key(qpdf_data qpdf, qpdf_oh oh,
                              char const* key, qpdf_oh item);
     QPDF_DLL
-    void qpdf_oh_remove_key(qpdf_data data, qpdf_oh oh, char const* key);
+    void qpdf_oh_remove_key(qpdf_data qpdf, qpdf_oh oh, char const* key);
     QPDF_DLL
-    void qpdf_oh_replace_or_remove_key(qpdf_data data, qpdf_oh oh,
+    void qpdf_oh_replace_or_remove_key(qpdf_data qpdf, qpdf_oh oh,
                                        char const* key, qpdf_oh item);
 
     QPDF_DLL
-    qpdf_oh qpdf_oh_get_dict(qpdf_data data, qpdf_oh oh);
+    qpdf_oh qpdf_oh_get_dict(qpdf_data qpdf, qpdf_oh oh);
 
     QPDF_DLL
-    int qpdf_oh_get_object_id(qpdf_data data, qpdf_oh oh);
+    int qpdf_oh_get_object_id(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    int qpdf_oh_get_generation(qpdf_data data, qpdf_oh oh);
+    int qpdf_oh_get_generation(qpdf_data qpdf, qpdf_oh oh);
 
     QPDF_DLL
-    char const* qpdf_oh_unparse(qpdf_data data, qpdf_oh oh);
+    char const* qpdf_oh_unparse(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    char const* qpdf_oh_unparse_resolved(qpdf_data data, qpdf_oh oh);
+    char const* qpdf_oh_unparse_resolved(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
-    char const* qpdf_oh_unparse_binary(qpdf_data data, qpdf_oh oh);
+    char const* qpdf_oh_unparse_binary(qpdf_data qpdf, qpdf_oh oh);
 #ifdef __cplusplus
 }
 #endif
