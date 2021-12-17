@@ -11,4 +11,5 @@ data: mooquack
 size: 0
 size: 0
 size: 0
+malloc buffer logic error: Pl_Buffer::getMallocBuffer() called when not ready
 done

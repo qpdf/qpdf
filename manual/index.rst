@@ -3622,9 +3622,13 @@ For a detailed list of changes, please see the file
       object is not of the expected type. These warnings now have an
       error code of ``qpdf_e_object`` instead of
       ``qpdf_e_damaged_pdf``. Also, comments have been added to
-      :file:`QPDFObjectHandle.hh` to explain in
-      more detail what the behavior is. See :ref:`ref.object-accessors` for a more in-depth
+      :file:`QPDFObjectHandle.hh` to explain in more detail what the
+      behavior is. See :ref:`ref.object-accessors` for a more in-depth
       discussion.
+
+    - Add ``Pl_Buffer::getMallocBuffer()`` to initialize a buffer
+      allocated with ``malloc()`` for better cross-language
+      interoperability.
 
   - C API Enhancements
 

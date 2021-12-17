@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <assert.h>
 #include <string.h>
+#include <stdlib.h>
 
 Pl_Buffer::Members::Members() :
     ready(true),
@@ -79,4 +80,26 @@ Pl_Buffer::getBuffer()
     }
     this->m = new Members();
     return b;
+}
+
+void
+Pl_Buffer::getMallocBuffer(unsigned char **buf, size_t* len)
+{
+    if (! this->m->ready)
+    {
+	throw std::logic_error(
+            "Pl_Buffer::getMallocBuffer() called when not ready");
+    }
+
+    *len = this->m->total_size;
+    if (this->m->total_size > 0)
+    {
+        *buf = reinterpret_cast<unsigned char*>(malloc(this->m->total_size));
+        memcpy(*buf, this->m->data->getBuffer(), this->m->total_size);
+    }
+    else
+    {
+        *buf = nullptr;
+    }
+    this->m = new Members();
 }

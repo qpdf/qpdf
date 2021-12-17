@@ -55,6 +55,15 @@ class Pl_Buffer: public Pipeline
     QPDF_DLL
     Buffer* getBuffer();
 
+    // getMallocBuffer behaves in the same was as getBuffer except the
+    // buffer is allocated with malloc(), making it suitable for use
+    // when calling from other languages. If there is no data, *buf is
+    // set to a null pointer and *len is set to 0. Otherwise, *buf is
+    // a buffer of size *len allocated with malloc(). It is the
+    // caller's responsibility to call free() on the buffer.
+    QPDF_DLL
+    void getMallocBuffer(unsigned char **buf, size_t* len);
+
   private:
     class Members
     {

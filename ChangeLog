@@ -1,3 +1,8 @@
+2021-12-17  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add Pl_Buffer::getMallocBuffer() to initialize a buffer with
+	malloc in support of the C API
+
 2021-12-16  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add several functions to the C API for working with pages. C

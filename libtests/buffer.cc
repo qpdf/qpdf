@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <cassert>
+#include <cstring>
 
 static unsigned char* uc(char const* s)
 {
@@ -98,6 +99,31 @@ int main()
         b = bp3.getBuffer();
         std::cout << "size: " << b->getSize() << std::endl;
         delete b;
+
+        // Malloc buffer should behave similarly.
+        Pl_Buffer bp4("bp4");
+        bp4.write(uc("asdf"), 4);
+        unsigned char* mbuf;
+        size_t len;
+        try
+        {
+            bp4.getMallocBuffer(&mbuf, &len);
+            assert(false);
+        }
+        catch (std::logic_error& e)
+        {
+            std::cout << "malloc buffer logic error: " << e.what() << std::endl;
+        }
+        bp4.finish();
+        bp4.getMallocBuffer(&mbuf, &len);
+        assert(len == 4);
+        assert(memcmp(mbuf, uc("asdf"), 4) == 0);
+        free(mbuf);
+        bp4.write(uc(""), 0);
+        bp4.finish();
+        bp4.getMallocBuffer(&mbuf, &len);
+        assert(mbuf == nullptr);
+        assert(len == 0);
     }
     catch (std::exception& e)
     {
