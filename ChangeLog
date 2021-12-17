@@ -1,5 +1,8 @@
 2021-12-17  Jay Berkenbilt  <ejb@ql.org>
 
+	* C API: expose getTypeCode and getTypeName from QPDFObjectHandle.
+	Fixes #597.
+
 	* C API: add functions for working with stream data. Search for
 	"STREAM FUNCTIONS" in qpdf-c.h. Fixes #596.
 

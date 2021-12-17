@@ -3662,6 +3662,8 @@ For a detailed list of changes, please see the file
     - Add several functions for working with streams. See ``STREAM
       FUNCTIONS`` in ``include/qpdf/qpdf-c.h`` for details.
 
+    - Add ``qpdf_oh_get_type_code`` and ``qpdf_oh_get_type_name``.
+
   - Documentation change
 
     - The documentation sources have been switched from docbook to
