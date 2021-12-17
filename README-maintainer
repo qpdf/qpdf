@@ -6,6 +6,10 @@ Default:
 
 ./configure CXX="g++ --std=c++14" --enable-werror
 
+Doc:
+
+./configure CXX="g++ --std=c++14" --enable-werror --enable-doc-maintenance
+
 Debugging:
 
 ./configure CXX="g++ --std=c++14" CFLAGS="-g" CXXFLAGS="-g" \
