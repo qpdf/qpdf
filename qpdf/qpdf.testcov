@@ -606,7 +606,6 @@ qpdf-c called qpdf_oh_is_initialized 0
 qpdf-c registered progress reporter 0
 qpdf-c called qpdf_oh_new_uninitialized 0
 qpdf-c warn about oh error 1
-qpdf-c registered oh error handler 0
 qpdf-c cleanup warned about unhandled error 0
 qpdf-c called qpdf_get_object_by_id 0
 qpdf-c called qpdf_replace_object 0
@@ -625,3 +624,4 @@ qpdf-c stream data filtered set 1
 qpdf-c stream data buf set 1
 qpdf-c called qpdf_oh_get_page_content_data 0
 qpdf-c called qpdf_oh_replace_stream_data 0
+qpdf-c silence oh errors 0

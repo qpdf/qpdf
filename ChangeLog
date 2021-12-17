@@ -1,5 +1,10 @@
 2021-12-17  Jay Berkenbilt  <ejb@ql.org>
 
+	* C API: simplify error handling for uncaught errors (never in a
+	released version) and clarify documentation in qpdf-c.h around
+	error handling. See qpdf-c.h for details, including how to check
+	for errors and the new function qpdf_silence_errors.
+
 	* C API: expose getTypeCode and getTypeName from QPDFObjectHandle.
 	Fixes #597.
 
@@ -40,10 +45,7 @@
 	interfaces. Clarify documentation regarding object accessors and
 	how type errors and warnings are handled. Many cases that used to
 	crash code that used the C API can now be trapped and will be
-	written stderr if not trapped. The new method
-	qpdf_register_oh_error_handler can be used to specifically handle
-	errors that occur when accessing object handles. See qpdf-c.h for
-	details.
+	written stderr if not trapped. See qpdf-c.h for details.
 
 	* C API: Add qpdf_oh_new_uninitialized to explicitly create
 	uninitialized object handles.

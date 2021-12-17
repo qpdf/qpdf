@@ -8,22 +8,22 @@ bad parse: parsed object (offset 1): unknown token while reading object; treatin
   file: parsed object
   pos : 1
   text: unknown token while reading object; treating as string
-type mismatch: operation for integer attempted on object of type string: returning 0
+type mismatch (int operation on string): operation for integer attempted on object of type string: returning 0
   code: 7
   file: 
   pos : 0
   text: operation for integer attempted on object of type string: returning 0
-type mismatch: operation for string attempted on object of type integer: returning empty string
+type mismatch (string operation on int): operation for string attempted on object of type integer: returning empty string
   code: 7
   file: 
   pos : 0
   text: operation for string attempted on object of type integer: returning empty string
-array type mismatch: operation for array attempted on object of type integer: treating as empty
+array type mismatch - n_items: operation for array attempted on object of type integer: treating as empty
   code: 7
   file: 
   pos : 0
   text: operation for array attempted on object of type integer: treating as empty
-array type mismatch: operation for array attempted on object of type integer: returning null
+array type mismatch - item: operation for array attempted on object of type integer: returning null
   code: 7
   file: 
   pos : 0

@@ -1,2 +1,3 @@
 closed input source (C API object handle 1): attempted access to unknown object handle
+WARNING: application did not handle error: closed input source (C API object handle 1): attempted access to unknown object handle
 C test 26 done

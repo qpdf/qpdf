@@ -10,9 +10,14 @@ item 3: 792 792.00
 minimal.pdf (C API object handle 6): attempted access to unknown object handle
 minimal.pdf (C API object handle 9): attempted access to unknown object handle
 minimal.pdf (C API object handle 9): attempted access to unknown object handle
-warning: minimal.pdf: C API object handle accessor errors occurred, and the application did not define an error handler
+warning: minimal.pdf: C API function caught an exception that it isn't returning; please point the application developer to ERROR HANDLING in qpdf-c.h
   code: 1
   file: minimal.pdf
   pos : 0
-  text: C API object handle accessor errors occurred, and the application did not define an error handler
+  text: C API function caught an exception that it isn't returning; please point the application developer to ERROR HANDLING in qpdf-c.h
+error: minimal.pdf (C API object handle 9): attempted access to unknown object handle
+  code: 1
+  file: minimal.pdf
+  pos : 0
+  text: attempted access to unknown object handle
 C test 24 done

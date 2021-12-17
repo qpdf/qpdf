@@ -73,14 +73,12 @@ static void report_errors()
     }
 }
 
-static void handle_oh_error(qpdf_data qpdf, qpdf_error error, void* data)
+static void handle_oh_error(qpdf_data qpdf, char const* label)
 {
-    char const* label = "oh error";
-    if (data)
+    if (qpdf_has_error(qpdf))
     {
-        label = *((char const**)data);
+        print_error(label, qpdf, qpdf_get_error(qpdf));
     }
-    print_error(label, qpdf, error);
 }
 
 static void read_file_into_memory(char const* filename,
@@ -837,42 +835,44 @@ static void test29(char const* infile,
      * errors rather than warnings when they don't have an owning QPDF
      * object.
      */
-    char const* label = "oh error";
-    qpdf_register_oh_error_handler(qpdf, handle_oh_error, (void*)&label);
+    qpdf_silence_errors(qpdf);
 
     /* get_root fails when we have no trailer */
-    label = "get root";
     qpdf_oh root = qpdf_get_root(qpdf);
+    handle_oh_error(qpdf, "get root");
     assert(root != 0);
     assert(! qpdf_oh_is_initialized(qpdf, root));
 
-    label = "bad parse";
     assert(! qpdf_oh_is_initialized(qpdf, qpdf_oh_parse(qpdf, "[oops")));
+    handle_oh_error(qpdf, "bad parse");
     report_errors();
 
-    label = "type mismatch";
     assert(qpdf_oh_get_int_value_as_int(
                qpdf, qpdf_oh_new_string(qpdf, "x")) == 0);
+    handle_oh_error(qpdf, "type mismatch (int operation on string)");
     qpdf_oh int_oh = qpdf_oh_new_integer(qpdf, 12);
     assert(strlen(qpdf_oh_get_string_value(qpdf, int_oh)) == 0);
+    handle_oh_error(qpdf, "type mismatch (string operation on int)");
 
     // This doesn't test every possible error flow, but it tests each
     // way of handling errors in the library code.
-    label = "array type mismatch";
     assert(qpdf_oh_get_array_n_items(qpdf, int_oh) == 0);
+    handle_oh_error(qpdf, "array type mismatch - n_items");
     assert(qpdf_oh_is_null(qpdf, qpdf_oh_get_array_item(qpdf, int_oh, 3)));
-    label = "append to non-array";
+    handle_oh_error(qpdf, "array type mismatch - item");
     qpdf_oh_append_item(qpdf, int_oh, qpdf_oh_new_null(qpdf));
+    handle_oh_error(qpdf, "append to non-array");
     qpdf_oh array = qpdf_oh_new_array(qpdf);
-    label = "array bounds";
     assert(qpdf_oh_is_null(qpdf, qpdf_oh_get_array_item(qpdf, array, 3)));
+    handle_oh_error(qpdf, "array bounds");
 
-    label = "dictionary iter type mismatch";
     qpdf_oh_begin_dict_key_iter(qpdf, int_oh);
     assert(qpdf_oh_dict_more_keys(qpdf) == QPDF_FALSE);
-    label = "dictionary type mismatch";
+    handle_oh_error(qpdf, "dictionary iter type mismatch");
     assert(qpdf_oh_is_null(qpdf, qpdf_oh_get_key(qpdf, int_oh, "potato")));
+    handle_oh_error(qpdf, "dictionary type mismatch");
     assert(qpdf_oh_has_key(qpdf, int_oh, "potato") == QPDF_FALSE);
+    handle_oh_error(qpdf, "dictionary type mismatch");
 
     report_errors();
 }
@@ -1029,6 +1029,9 @@ static void test35(char const* infile,
     assert(qpdf_find_page_by_oh(qpdf, qpdf_get_root(qpdf)) == -1);
     assert(qpdf_more_warnings(qpdf));
     e = qpdf_next_warning(qpdf);
+    assert(qpdf_get_error_code(qpdf, e) != QPDF_SUCCESS);
+    assert(qpdf_has_error(qpdf));
+    e = qpdf_get_error(qpdf);
     assert(qpdf_get_error_code(qpdf, e) != QPDF_SUCCESS);
     assert(! qpdf_has_error(qpdf));
 

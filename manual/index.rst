@@ -3632,14 +3632,16 @@ For a detailed list of changes, please see the file
 
   - C API Enhancements
 
-    - Overhaul error handling for the object handle functions
-      C API. See comments in the "Object handling" section of
-      :file:`include/qpdf/qpdf-c.h` for details.
-      In particular, exceptions thrown by the underlying C++ code
-      when calling object accessors are caught and converted into
-      errors. The errors can be trapped by registering an error
-      handler with ``qpdf_register_oh_error_handler`` or will be
-      written to stderr if no handler is registered.
+    - Overhaul error handling for the object handle functions C API.
+      Some rare error conditions that would previously have caused a
+      crash are now trapped and reported, and the functions that
+      generate them return fallback values. See comments in the
+      ``ERROR HANDLING`` section of :file:`include/qpdf/qpdf-c.h` for
+      details. In particular, exceptions thrown by the underlying C++
+      code when calling object accessors are caught and converted into
+      errors. The errors can be checked by call ``qpdf_has_error``.
+      Use ``qpdf_silence_errors`` to prevent the error from being
+      written to stderr.
 
     - Add ``qpdf_get_last_string_length`` to the C API to get the
       length of the last string that was returned. This is needed to

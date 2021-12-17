@@ -42,9 +42,8 @@ struct _qpdf_data
     PointerHolder<Buffer> output_buffer;
 
     // QPDFObjectHandle support
-    void (*oh_error_handler)(qpdf_data, qpdf_error, void*);
-    void* oh_error_handler_data;
-    bool default_oh_error_handler_called;
+    bool silence_errors;
+    bool oh_error_occurred;
     std::map<qpdf_oh, PointerHolder<QPDFObjectHandle>> oh_cache;
     qpdf_oh next_oh;
     std::set<std::string> cur_iter_dict_keys;
@@ -52,32 +51,10 @@ struct _qpdf_data
     std::string cur_dict_key;
 };
 
-static void default_oh_error_handler(qpdf_data qpdf, qpdf_error e, void* data)
-{
-    bool* called = reinterpret_cast<bool*>(data);
-    if (called != nullptr)
-    {
-        QTC::TC("qpdf", "qpdf-c warn about oh error", *called ? 0 : 1);
-        if (! *called)
-        {
-            qpdf->warnings.push_back(
-                QPDFExc(
-                    qpdf_e_internal,
-                    qpdf->qpdf->getFilename(),
-                    "", 0,
-                    "C API object handle accessor errors occurred,"
-                    " and the application did not define an error handler"));
-            *called = true;
-        }
-    }
-    std::cerr << e->exc->what() << std::endl;
-}
-
 _qpdf_data::_qpdf_data() :
     write_memory(false),
-    oh_error_handler(default_oh_error_handler),
-    oh_error_handler_data(&this->default_oh_error_handler_called),
-    default_oh_error_handler_called(false),
+    silence_errors(false),
+    oh_error_occurred(false),
     next_oh(0)
 {
 }
@@ -876,14 +853,10 @@ QPDF_ERROR_CODE qpdf_write(qpdf_data qpdf)
     return status;
 }
 
-void qpdf_register_oh_error_handler(
-    qpdf_data qpdf,
-    void (*handle_error)(qpdf_data qpdf, qpdf_error error, void* data),
-    void* data)
+void qpdf_silence_errors(qpdf_data qpdf)
 {
-    QTC::TC("qpdf", "qpdf-c registered oh error handler");
-    qpdf->oh_error_handler = handle_error;
-    qpdf->oh_error_handler_data = data;
+    QTC::TC("qpdf", "qpdf-c silence oh errors");
+    qpdf->silence_errors = true;
 }
 
 template<class RET>
@@ -901,8 +874,24 @@ static RET trap_oh_errors(
     });
     if (status & QPDF_ERRORS)
     {
-        (*qpdf->oh_error_handler)(
-            qpdf, qpdf_get_error(qpdf), qpdf->oh_error_handler_data);
+        if (! qpdf->silence_errors)
+        {
+            QTC::TC("qpdf", "qpdf-c warn about oh error",
+                    qpdf->oh_error_occurred ? 0 : 1);
+            if (! qpdf->oh_error_occurred)
+            {
+                qpdf->warnings.push_back(
+                    QPDFExc(
+                        qpdf_e_internal,
+                        qpdf->qpdf->getFilename(),
+                        "", 0,
+                        "C API function caught an exception that it isn't"
+                        " returning; please point the application developer"
+                        " to ERROR HANDLING in qpdf-c.h"));
+                qpdf->oh_error_occurred = true;
+            }
+            std::cerr << qpdf->error->what() << std::endl;
+        }
         return fallback();
     }
     return ret;
