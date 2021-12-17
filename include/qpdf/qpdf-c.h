@@ -663,6 +663,10 @@ extern "C" {
     QPDF_BOOL qpdf_oh_is_indirect(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
     QPDF_BOOL qpdf_oh_is_scalar(qpdf_data qpdf, qpdf_oh oh);
+    QPDF_DLL
+    enum qpdf_object_type_e qpdf_oh_get_type_code(qpdf_data qpdf, qpdf_oh oh);
+    QPDF_DLL
+    char const* qpdf_oh_get_type_name(qpdf_data qpdf, qpdf_oh oh);
 
     QPDF_DLL
     qpdf_oh qpdf_oh_wrap_in_array(qpdf_data qpdf, qpdf_oh oh);

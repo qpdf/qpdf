@@ -4845,7 +4845,8 @@ $td->runtest("check output",
 
 $td->runtest("C uninitialized objects",
              {$td->COMMAND => "qpdf-ctest 26 '' '' ''"},
-             {$td->STRING => "C test 26 done\n", $td->EXIT_STATUS => 0},
+             {$td->FILE => "c-oh-uninitialized-objects.out",
+                  $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("C string with embedded null",
              {$td->COMMAND => "qpdf-ctest 27 '' '' ''"},
