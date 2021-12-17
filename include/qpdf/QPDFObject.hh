@@ -25,6 +25,7 @@
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
 #include <qpdf/JSON.hh>
+#include <qpdf/Constants.h>
 
 #include <string>
 
@@ -37,29 +38,29 @@ class QPDF_DLL_CLASS QPDFObject
     QPDFObject();
 
     // Objects derived from QPDFObject are accessible through
-    // QPDFObjectHandle.  Each object returns a unique type code that
-    // has one of the values in the list below.  As new object types
-    // are added to qpdf, additional items may be added to the list,
-    // so code that switches on these values should take that into
-    // consideration.
-    enum object_type_e {
-        // Object types internal to qpdf
-        ot_uninitialized,
-        ot_reserved,
-        // Object types that can occur in the main document
-        ot_null,
-        ot_boolean,
-        ot_integer,
-        ot_real,
-        ot_string,
-        ot_name,
-        ot_array,
-        ot_dictionary,
-        ot_stream,
-        // Additional object types that can occur in content streams
-        ot_operator,
-        ot_inlineimage,
-    };
+    // QPDFObjectHandle. Each object returns a unique type code that
+    // has one of the valid qpdf_object_type_e values. As new object
+    // types are added to qpdf, additional items may be added to the
+    // list, so code that switches on these values should take that
+    // into consideration.
+
+    // Prior to qpdf 10.5, qpdf_object_type_e was
+    // QPDFObject::object_type_e but was moved to make it accessible
+    // to the C API. The code below is for backward compatibility.
+    typedef enum qpdf_object_type_e object_type_e;
+    static constexpr object_type_e ot_uninitialized = ::qpdf_ot_uninitialized;
+    static constexpr object_type_e ot_reserved = ::qpdf_ot_reserved;
+    static constexpr object_type_e ot_null = ::qpdf_ot_null;
+    static constexpr object_type_e ot_boolean = ::qpdf_ot_boolean;
+    static constexpr object_type_e ot_integer = ::qpdf_ot_integer;
+    static constexpr object_type_e ot_real = ::qpdf_ot_real;
+    static constexpr object_type_e ot_string = ::qpdf_ot_string;
+    static constexpr object_type_e ot_name = ::qpdf_ot_name;
+    static constexpr object_type_e ot_array = ::qpdf_ot_array;
+    static constexpr object_type_e ot_dictionary = ::qpdf_ot_dictionary;
+    static constexpr object_type_e ot_stream = ::qpdf_ot_stream;
+    static constexpr object_type_e ot_operator = ::qpdf_ot_operator;
+    static constexpr object_type_e ot_inlineimage = ::qpdf_ot_inlineimage;
 
     virtual ~QPDFObject() {}
     virtual std::string unparse() = 0;

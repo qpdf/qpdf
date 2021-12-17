@@ -1,5 +1,9 @@
 2021-12-17  Jay Berkenbilt  <ejb@ql.org>
 
+	* QPDFObjectHandle object types have been moved from
+	QPDFObject::object_type_e to qpdf_object_type_e (defined in
+	Constants.h). Old values are available for backward compatibility.
+
 	* Add Pl_Buffer::getMallocBuffer() to initialize a buffer with
 	malloc in support of the C API
 
