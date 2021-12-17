@@ -1,6 +1,8 @@
 Next
 ====
 
+* Add spell check to CI
+
 * High-level API/doc overhaul: #593
 
 * Refactor test_driver.cc so that runtest is not one huge function.
