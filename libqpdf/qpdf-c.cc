@@ -1158,6 +1158,26 @@ QPDF_BOOL qpdf_oh_is_number(qpdf_data qpdf, qpdf_oh oh)
         });
 }
 
+QPDF_OT_CODE qpdf_oh_get_type_code(qpdf_data qpdf, qpdf_oh oh)
+{
+    return do_with_oh<QPDF_OT_CODE>(
+        qpdf, oh, return_T<QPDF_OT_CODE>(QPDF_OT_UNINITIALIZED),
+        [](QPDFObjectHandle& o) {
+            QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_type_code");
+            return o.getTypeCode();
+        });
+}
+
+char const* qpdf_oh_get_type_name(qpdf_data qpdf, qpdf_oh oh)
+{
+    return do_with_oh<char const*>(
+        qpdf, oh, return_T<char const*>(""), [qpdf](QPDFObjectHandle& o) {
+            QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_type_name");
+            qpdf->tmp_string = o.getTypeName();
+            return qpdf->tmp_string.c_str();
+        });
+}
+
 qpdf_oh qpdf_oh_wrap_in_array(qpdf_data qpdf, qpdf_oh oh)
 {
     return do_with_oh<qpdf_oh>(

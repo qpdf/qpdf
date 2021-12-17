@@ -587,6 +587,21 @@ extern "C" {
 
     typedef unsigned int qpdf_oh;
 
+    typedef int QPDF_OT_CODE;
+#   define QPDF_OT_UNINITIALIZED 0
+#   define QPDF_OT_RESERVED 1
+#   define QPDF_OT_NULL 2
+#   define QPDF_OT_BOOLEAN 3
+#   define QPDF_OT_INTEGER 4
+#   define QPDF_OT_REAL 5
+#   define QPDF_OT_STRING 6
+#   define QPDF_OT_NAME 7
+#   define QPDF_OT_ARRAY 8
+#   define QPDF_OT_DICTIONARY 9
+#   define QPDF_OT_STREAM 10
+#   define QPDF_OT_OPERATOR 11
+#   define QPDF_OT_INLINEIMAGE 12
+
     /* If an exception is thrown by the C++ code when any of the
      * qpdf_oh functions are called, the registered handle_error
      * function will be called. The value passed to data will be
@@ -661,6 +676,10 @@ extern "C" {
     QPDF_BOOL qpdf_oh_is_indirect(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
     QPDF_BOOL qpdf_oh_is_scalar(qpdf_data qpdf, qpdf_oh oh);
+    QPDF_DLL
+    QPDF_OT_CODE qpdf_oh_get_type_code(qpdf_data qpdf, qpdf_oh oh);
+    QPDF_DLL
+    char const* qpdf_oh_get_type_name(qpdf_data qpdf, qpdf_oh oh);
 
     QPDF_DLL
     qpdf_oh qpdf_oh_wrap_in_array(qpdf_data qpdf, qpdf_oh oh);

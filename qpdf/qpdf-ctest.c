@@ -539,9 +539,13 @@ static void test24(char const* infile,
     /* Go to the first page and look at all the keys */
     qpdf_oh pages = qpdf_oh_get_key(qpdf, root, "/Pages");
     assert(qpdf_oh_is_dictionary(qpdf, pages));
+    assert(qpdf_oh_get_type_code(qpdf, pages) == QPDF_OT_DICTIONARY);
+    assert(strcmp(qpdf_oh_get_type_name(qpdf, pages), "dictionary") == 0);
     assert(qpdf_oh_is_initialized(qpdf, pages));
     qpdf_oh kids = qpdf_oh_get_key(qpdf, pages, "/Kids");
     assert(qpdf_oh_is_array(qpdf, kids));
+    assert(qpdf_oh_get_type_code(qpdf, kids) == QPDF_OT_ARRAY);
+    assert(strcmp(qpdf_oh_get_type_name(qpdf, kids), "array") == 0);
     assert(qpdf_oh_get_array_n_items(qpdf, kids) == 1);
     qpdf_oh page1 = qpdf_oh_get_array_item(qpdf, kids, 0);
     qpdf_oh_begin_dict_key_iter(qpdf, page1);
@@ -553,6 +557,8 @@ static void test24(char const* infile,
     /* Inspect the first page */
     qpdf_oh type = qpdf_oh_get_key(qpdf, page1, "/Type");
     assert(qpdf_oh_is_name(qpdf, type));
+    assert(qpdf_oh_get_type_code(qpdf, type) == QPDF_OT_NAME);
+    assert(strcmp(qpdf_oh_get_type_name(qpdf, type), "name") == 0);
     assert(strcmp(qpdf_oh_get_name(qpdf, type), "/Page") == 0);
     qpdf_oh parent = qpdf_oh_get_key(qpdf, page1, "/Parent");
     assert(qpdf_oh_is_indirect(qpdf, parent));
@@ -591,11 +597,15 @@ static void test24(char const* infile,
     /* Look at page contents to exercise stream functions */
     qpdf_oh contents = qpdf_oh_get_key(qpdf, page1, "/Contents");
     assert(qpdf_oh_is_stream(qpdf, contents));
+    assert(qpdf_oh_get_type_code(qpdf, contents) == QPDF_OT_STREAM);
+    assert(strcmp(qpdf_oh_get_type_name(qpdf, contents), "stream") == 0);
     qpdf_oh contents_dict = qpdf_oh_get_dict(qpdf, contents);
     assert(! qpdf_oh_is_scalar(qpdf, contents));
     assert(! qpdf_oh_is_scalar(qpdf, contents_dict));
     qpdf_oh contents_length = qpdf_oh_get_key(qpdf, contents_dict, "/Length");
     assert(qpdf_oh_is_integer(qpdf, contents_length));
+    assert(qpdf_oh_get_type_code(qpdf, contents_length) == QPDF_OT_INTEGER);
+    assert(strcmp(qpdf_oh_get_type_name(qpdf, contents_length), "integer") == 0);
     assert(qpdf_oh_is_scalar(qpdf, contents_length));
     assert(qpdf_oh_is_number(qpdf, contents_length));
     qpdf_oh contents_array = qpdf_oh_wrap_in_array(qpdf, contents);
@@ -635,6 +645,8 @@ static void test24(char const* infile,
     qpdf_oh_release(qpdf, page1);
     contents = qpdf_oh_get_key(qpdf, page1, "/Contents");
     assert(qpdf_oh_is_null(qpdf, contents));
+    assert(qpdf_oh_get_type_code(qpdf, contents) == QPDF_OT_NULL);
+    assert(strcmp(qpdf_oh_get_type_name(qpdf, contents), "null") == 0);
     assert(qpdf_oh_is_array(qpdf, mediabox));
     qpdf_oh_release_all(qpdf);
     assert(! qpdf_oh_is_null(qpdf, mediabox));
@@ -672,21 +684,31 @@ static void test25(char const* infile,
     qpdf_oh p_bool = qpdf_oh_get_array_item(qpdf, parsed, 5);
     assert(qpdf_oh_is_integer(qpdf, p_int) &&
            qpdf_oh_get_int_value_as_int(qpdf, p_int) == 1);
+    assert(qpdf_oh_get_type_code(qpdf, p_int) == QPDF_OT_INTEGER);
+    assert(strcmp(qpdf_oh_get_type_name(qpdf, p_int), "integer") == 0);
     assert(qpdf_oh_is_real(qpdf, p_real) &&
            (strcmp(qpdf_oh_get_real_value(qpdf, p_real), "2.0") == 0) &&
            qpdf_oh_get_numeric_value(qpdf, p_real) == 2.0);
+    assert(qpdf_oh_get_type_code(qpdf, p_real) == QPDF_OT_REAL);
+    assert(strcmp(qpdf_oh_get_type_name(qpdf, p_real), "real") == 0);
     assert(qpdf_oh_is_string(qpdf, p_string) &&
            (strcmp(qpdf_oh_get_string_value(qpdf, p_string), "3\xf7") == 0) &&
            (strcmp(qpdf_oh_get_utf8_value(qpdf, p_string), "3\xc3\xb7") == 0) &&
            (strcmp(qpdf_oh_unparse_binary(qpdf, p_string), "<33f7>") == 0));
+    assert(qpdf_oh_get_type_code(qpdf, p_string) == QPDF_OT_STRING);
+    assert(strcmp(qpdf_oh_get_type_name(qpdf, p_string), "string") == 0);
     assert(qpdf_oh_is_dictionary(qpdf, p_dict));
     qpdf_oh p_five = qpdf_oh_get_key(qpdf, p_dict, "/Four");
     assert(qpdf_oh_is_or_has_name(qpdf, p_five, "/Five"));
     assert(qpdf_oh_is_or_has_name(
                qpdf, qpdf_oh_get_array_item(qpdf, p_five, 0), "/Five"));
     assert(qpdf_oh_is_null(qpdf, p_null));
+    assert(qpdf_oh_get_type_code(qpdf, p_null) == QPDF_OT_NULL);
+    assert(strcmp(qpdf_oh_get_type_name(qpdf, p_null), "null") == 0);
     assert(qpdf_oh_is_bool(qpdf, p_bool) &&
            (qpdf_oh_get_bool_value(qpdf, p_bool) == QPDF_TRUE));
+    assert(qpdf_oh_get_type_code(qpdf, p_bool) == QPDF_OT_BOOLEAN);
+    assert(strcmp(qpdf_oh_get_type_name(qpdf, p_bool), "boolean") == 0);
     qpdf_oh_erase_item(qpdf, parsed, 4);
     qpdf_oh_insert_item(
         qpdf, parsed, 2,
@@ -743,6 +765,7 @@ static void test26(char const* infile,
     qpdf_data qpdf2 = qpdf_init();
     qpdf_oh trailer = qpdf_get_trailer(qpdf2);
     assert(! qpdf_oh_is_initialized(qpdf2, trailer));
+    assert(qpdf_oh_get_type_code(qpdf, trailer) == QPDF_OT_UNINITIALIZED);
     qpdf_cleanup(&qpdf2);
 }
 
