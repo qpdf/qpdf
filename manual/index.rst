@@ -3659,6 +3659,9 @@ For a detailed list of changes, please see the file
     - Add several functions for working with pages. See ``PAGE
       FUNCTIONS`` in ``include/qpdf/qpdf-c.h`` for details.
 
+    - Add several functions for working with streams. See ``STREAM
+      FUNCTIONS`` in ``include/qpdf/qpdf-c.h`` for details.
+
   - Documentation change
 
     - The documentation sources have been switched from docbook to

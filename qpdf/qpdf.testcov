@@ -617,3 +617,9 @@ qpdf-c called qpdf_push_inherited_attributes_to_page 0
 qpdf-c called qpdf_add_page 0
 qpdf-c called qpdf_add_page_at 0
 qpdf-c called qpdf_remove_page 0
+qpdf-c called qpdf_oh_new_stream 0
+qpdf-c called qpdf_oh_copy_foreign_object 0
+qpdf-c stream data filtered set 1
+qpdf-c stream data buf set 1
+qpdf-c called qpdf_oh_get_page_content_data 0
+qpdf-c called qpdf_oh_replace_stream_data 0

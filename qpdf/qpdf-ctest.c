@@ -1063,6 +1063,118 @@ static void test37(char const* infile,
     assert(qpdf_get_num_pages(qpdf) == 10);
 }
 
+static void test38(char const* infile,
+		   char const* password,
+		   char const* outfile,
+		   char const* xarg)
+{
+    /* This test expects 11-pages.pdf. */
+
+    /* Read stream data */
+
+    assert(qpdf_read(qpdf, infile, password) == 0);
+    qpdf_oh stream = qpdf_get_object_by_id(qpdf, 17, 0);
+    qpdf_oh dict = qpdf_oh_get_dict(qpdf, stream);
+    assert(qpdf_oh_get_int_value_as_int(
+               qpdf, qpdf_oh_get_key(qpdf, dict, "/Length")) == 53);
+    /* Get raw data */
+    unsigned char *buf = 0;
+    size_t len = 0;
+    assert(qpdf_oh_get_stream_data(
+               qpdf, stream, qpdf_dl_none, 0, &buf, &len) == 0);
+    assert(len == 53);
+    assert(((int)buf[0] == 'x') && ((int)buf[1] == 0234));
+    free(buf);
+
+    /* Test whether filterable */
+    QPDF_BOOL filtered = QPDF_FALSE;
+    assert(qpdf_oh_get_stream_data(
+               qpdf, stream, qpdf_dl_all, &filtered, 0, 0) == 0);
+    assert(filtered == QPDF_TRUE);
+
+    /* Get filtered data */
+    assert(qpdf_oh_get_stream_data(
+               qpdf, stream, qpdf_dl_all, 0, &buf, &len) == 0);
+    assert(len == 47);
+    assert(memcmp((char const*)buf,
+                  "BT /F1 15 Tf 72 720 Td (Original page 2) Tj ET\n",
+                  len) == 0);
+
+    /* Get page data */
+    qpdf_oh page2 = qpdf_get_page_n(qpdf, 1); /* 0-based index */
+    unsigned char* buf2 = 0;
+    assert(qpdf_oh_get_page_content_data(qpdf, page2, &buf2, &len) == 0);
+    assert(len == 47);
+    assert(memcmp(buf, buf2, len) == 0);
+    free(buf);
+    free(buf2);
+
+    /* errors */
+    printf("page content on broken page\n");
+    qpdf_oh_replace_key(qpdf, page2, "/Contents", qpdf_oh_new_integer(qpdf, 3));
+    buf = 0;
+    qpdf_oh_get_page_content_data(qpdf, page2, &buf, &len);
+    assert(buf == 0);
+    report_errors();
+    printf("stream data for non stream\n");
+    qpdf_oh root = qpdf_get_root(qpdf);
+    assert(qpdf_oh_get_stream_data(qpdf, root, qpdf_dl_all, 0, 0, 0) != 0);
+    report_errors();
+}
+
+static void test39(char const* infile,
+		   char const* password,
+		   char const* outfile,
+		   char const* xarg)
+{
+    /* This test expects 11-pages.pdf as file1 and minimal.pdf as xarg. */
+
+    /* Foreign object */
+
+    qpdf_data qpdf2 = qpdf_init();
+    assert(qpdf_read(qpdf, infile, password) == 0);
+    assert(qpdf_read(qpdf2, xarg, "") == 0);
+
+    qpdf_oh resources = qpdf_get_object_by_id(qpdf2, 3, 0);
+    qpdf_oh copy = qpdf_oh_copy_foreign_object(qpdf, qpdf2, resources);
+    qpdf_oh root = qpdf_get_root(qpdf);
+    qpdf_oh_replace_key(qpdf, root, "/Copy", copy);
+
+    qpdf_init_write(qpdf, outfile);
+    qpdf_set_static_ID(qpdf, QPDF_TRUE);
+    qpdf_set_qdf_mode(qpdf, QPDF_TRUE);
+    qpdf_set_suppress_original_object_IDs(qpdf, QPDF_TRUE);
+    qpdf_write(qpdf);
+    report_errors();
+    qpdf_cleanup(&qpdf2);
+}
+
+static void test40(char const* infile,
+		   char const* password,
+		   char const* outfile,
+		   char const* xarg)
+{
+    /* This test expects minimal.pdf. */
+
+    /* New stream */
+
+    assert(qpdf_read(qpdf, infile, password) == 0);
+    qpdf_oh stream = qpdf_oh_new_stream(qpdf);
+    qpdf_oh_replace_stream_data(
+        qpdf, stream,
+        (unsigned char*)"12345\000abcde", 11, /* embedded null */
+        qpdf_oh_new_null(qpdf), qpdf_oh_new_null(qpdf));
+    qpdf_oh root = qpdf_get_root(qpdf);
+    qpdf_oh_replace_key(qpdf, root, "/Potato", stream);
+
+    qpdf_init_write(qpdf, outfile);
+    qpdf_set_static_ID(qpdf, QPDF_TRUE);
+    qpdf_set_qdf_mode(qpdf, QPDF_TRUE);
+    qpdf_set_suppress_original_object_IDs(qpdf, QPDF_TRUE);
+    qpdf_write(qpdf);
+    report_errors();
+}
+
 int main(int argc, char* argv[])
 {
     char* p = 0;
@@ -1140,6 +1252,9 @@ int main(int argc, char* argv[])
 	  (n == 35) ? test35 :
 	  (n == 36) ? test36 :
 	  (n == 37) ? test37 :
+	  (n == 38) ? test38 :
+	  (n == 39) ? test39 :
+	  (n == 40) ? test40 :
 	  0);
 
     if (fn == 0)

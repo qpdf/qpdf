@@ -129,7 +129,9 @@ extern "C" {
     qpdf_data qpdf_init();
 
     /* Pass a pointer to the qpdf_data pointer created by qpdf_init to
-     * clean up resources.
+     * clean up resources. This does not include buffers initialized
+     * by functions that return stream data but it otherwise includes
+     * all data associated with the QPDF object or any object handles.
      */
     QPDF_DLL
     void qpdf_cleanup(qpdf_data* qpdf);
@@ -752,6 +754,15 @@ extern "C" {
     QPDF_DLL
     qpdf_oh qpdf_oh_new_dictionary(qpdf_data qpdf);
 
+    /* Create a new stream. Use qpdf_oh_get_dict to get (and
+     * subsequently modify) the stream dictionary if needed. See
+     * comments in QPDFObjectHandle.hh for newStream() for additional
+     * notes. You must call qpdf_oh_replace_stream_data to provide
+     * data for the stream. See STREAM FUNCTIONS below.
+    */
+    QPDF_DLL
+    qpdf_oh qpdf_oh_new_stream(qpdf_data qpdf);
+
     QPDF_DLL
     void qpdf_oh_make_direct(qpdf_data qpdf, qpdf_oh oh);
 
@@ -788,6 +799,67 @@ extern "C" {
     char const* qpdf_oh_unparse_resolved(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
     char const* qpdf_oh_unparse_binary(qpdf_data qpdf, qpdf_oh oh);
+
+    /* Note about foreign objects: the C API does not have enough
+     * information in the value of a qpdf_oh to know what QPDF object
+     * it belongs to. To uniquely specify a qpdf object handle from a
+     * specific qpdf_data instance, you always pair the qpdf_oh with
+     * the correct qpdf_data. Otherwise, you are likely to get
+     * completely the wrong object if you are not lucky enough to get
+     * an error about the object being invalid.
+     */
+
+    /* Copy foreign object: the qpdf_oh returned belongs to `qpdf`,
+     * while `foreign_oh` belongs to `other_qpdf`.
+     */
+    QPDF_DLL
+    qpdf_oh qpdf_oh_copy_foreign_object(
+        qpdf_data qpdf, qpdf_data other_qpdf, qpdf_oh foreign_oh);
+
+    /* STREAM FUNCTIONS */
+
+    /* These functions provide basic access to streams and stream
+     * data. They are not as comprehensive as what is in
+     * QPDFObjectHandle, but they do allow for working with streams
+     * and stream data as caller-managed memory.
+     */
+
+    /* Get stream data as a buffer. The buffer is allocated with
+     * malloc and must be freed by the caller. The size of the buffer
+     * is stored in *len. The arguments are similar to those in
+     * QPDFObjectHandle::pipeStreamData. To get raw stream data, pass
+     * qpdf_dl_none as decode_level. Otherwise, filtering is attempted
+     * and *filtered is set to indicate whether it was successful. If
+     * *filtered is QPDF_FALSE, then raw, unfiltered stream data was
+     * returned. You may pass a null pointer as filtered if you don't
+     * care about the result. If you pass a null pointer as bufp (and
+     * len), the value of filtered will be set to whether the stream
+     * can be filterable.
+     */
+    QPDF_DLL
+    QPDF_ERROR_CODE qpdf_oh_get_stream_data(
+        qpdf_data qpdf, qpdf_oh stream_oh,
+        enum qpdf_stream_decode_level_e decode_level, QPDF_BOOL* filtered,
+        unsigned char** bufp, size_t* len);
+
+    /* This function returns the concatenation of all of a page's
+     * content streams as a single, dynamically allocated buffer. As
+     * with qpdf_oh_get_stream_data, the buffer is allocated with
+     * malloc and must be freed by the caller.
+     */
+    QPDF_DLL
+    QPDF_ERROR_CODE qpdf_oh_get_page_content_data(
+        qpdf_data qpdf, qpdf_oh page_oh,
+        unsigned char** bufp, size_t* len);
+
+    /* The data pointed to by bufp will be copied by the library. It
+     * does not need to remain valid after the call returns.
+     */
+    QPDF_DLL
+    void qpdf_oh_replace_stream_data(
+        qpdf_data qpdf, qpdf_oh stream_oh,
+        unsigned char const* buf, size_t len,
+        qpdf_oh filter, qpdf_oh decode_parms);
 
     /* PAGE FUNCTIONS */
 

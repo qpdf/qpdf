@@ -1,0 +1,13 @@
+page content on broken page
+error: page object 5 0:  object is supposed to be a stream or an array of streams but is neither
+  code: 5
+  file: 
+  pos : 0
+  text:  object is supposed to be a stream or an array of streams but is neither
+stream data for non stream
+error: operation for stream attempted on object of type dictionary
+  code: 2
+  file: 
+  pos : 0
+  text: operation for stream attempted on object of type dictionary
+C test 38 done

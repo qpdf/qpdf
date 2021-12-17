@@ -5,6 +5,7 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/Pl_Discard.hh>
+#include <qpdf/Pl_Buffer.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QUtil.hh>
 
@@ -1427,6 +1428,13 @@ qpdf_oh qpdf_oh_new_dictionary(qpdf_data qpdf)
     return new_object(qpdf, QPDFObjectHandle::newDictionary());
 }
 
+qpdf_oh qpdf_oh_new_stream(qpdf_data qpdf)
+{
+    QTC::TC("qpdf", "qpdf-c called qpdf_oh_new_stream");
+    return new_object(
+        qpdf, QPDFObjectHandle::newStream(qpdf->qpdf.getPointer()));
+}
+
 void qpdf_oh_make_direct(qpdf_data qpdf, qpdf_oh oh)
 {
     do_with_oh_void(
@@ -1578,6 +1586,88 @@ char const* qpdf_oh_unparse_binary(qpdf_data qpdf, qpdf_oh oh)
             qpdf->tmp_string = o.unparseBinary();
             return qpdf->tmp_string.c_str();
         });
+}
+
+qpdf_oh qpdf_oh_copy_foreign_object(
+    qpdf_data qpdf, qpdf_data other_qpdf, qpdf_oh foreign_oh)
+{
+    return do_with_oh<qpdf_oh>(
+        other_qpdf, foreign_oh,
+        return_uninitialized(qpdf),
+        [qpdf](QPDFObjectHandle& o) {
+            QTC::TC("qpdf", "qpdf-c called qpdf_oh_copy_foreign_object");
+            return new_object(qpdf, qpdf->qpdf->copyForeignObject(o));
+        });
+}
+
+QPDF_ERROR_CODE qpdf_oh_get_stream_data(
+    qpdf_data qpdf, qpdf_oh stream_oh,
+    qpdf_stream_decode_level_e decode_level, QPDF_BOOL* filtered,
+    unsigned char** bufp, size_t* len)
+{
+    return trap_errors(qpdf, [stream_oh, decode_level,
+                              filtered, bufp, len] (qpdf_data q) {
+        auto stream = qpdf_oh_item_internal(q, stream_oh);
+        Pipeline* p = nullptr;
+        Pl_Buffer buf("stream data");
+        if (bufp)
+        {
+            p = &buf;
+        }
+        bool was_filtered = false;
+        if (stream.pipeStreamData(
+                p, &was_filtered, 0, decode_level, false, false))
+        {
+            QTC::TC("qpdf", "qpdf-c stream data buf set",
+                    bufp ? 0 : 1);
+            if (p && bufp && len)
+            {
+                buf.getMallocBuffer(bufp, len);
+            }
+            QTC::TC("qpdf", "qpdf-c stream data filtered set",
+                    filtered ? 0 : 1);
+            if (filtered)
+            {
+                *filtered = was_filtered ? QPDF_TRUE : QPDF_FALSE;
+            }
+        }
+        else
+        {
+            throw std::runtime_error(
+                "unable to access stream data for stream " + stream.unparse());
+        }
+    });
+}
+
+QPDF_ERROR_CODE qpdf_oh_get_page_content_data(
+    qpdf_data qpdf, qpdf_oh page_oh,
+    unsigned char** bufp, size_t* len)
+{
+    return trap_errors(qpdf, [page_oh, bufp, len] (qpdf_data q) {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_page_content_data");
+        auto o = qpdf_oh_item_internal(q, page_oh);
+        Pl_Buffer buf("page contents");
+        o.pipePageContents(&buf);
+        buf.getMallocBuffer(bufp, len);
+    });
+}
+
+void qpdf_oh_replace_stream_data(
+    qpdf_data qpdf, qpdf_oh stream_oh,
+    unsigned char const* buf, size_t len,
+    qpdf_oh filter_oh, qpdf_oh decode_parms_oh)
+{
+    do_with_oh_void(qpdf, stream_oh, [
+                        qpdf, buf, len, filter_oh,
+                        decode_parms_oh](QPDFObjectHandle& o) {
+        QTC::TC("qpdf", "qpdf-c called qpdf_oh_replace_stream_data");
+        auto filter = qpdf_oh_item_internal(qpdf, filter_oh);
+        auto decode_parms = qpdf_oh_item_internal(qpdf, decode_parms_oh);
+        // XXX test with binary data with null
+        o.replaceStreamData(
+            std::string(reinterpret_cast<char const*>(buf), len),
+            filter, decode_parms);
+    });
 }
 
 int qpdf_get_num_pages(qpdf_data qpdf)
