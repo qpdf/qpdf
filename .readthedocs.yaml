@@ -14,8 +14,7 @@ sphinx:
    configuration: manual/conf.py
 
 formats:
-  - pdf
-  - epub
+  - all
 
 sphinx:
   fail_on_warning: true

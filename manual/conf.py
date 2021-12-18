@@ -11,6 +11,7 @@ project = 'QPDF'
 copyright = '2005-2021, Jay Berkenbilt'
 author = 'Jay Berkenbilt'
 release = '10.4.0'
+version = release
 html_theme = 'nature'
 html_theme_options = {
     "body_max_width": None,
