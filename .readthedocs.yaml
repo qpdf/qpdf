@@ -13,8 +13,7 @@ build:
 sphinx:
    configuration: manual/conf.py
 
-formats:
-  - all
+formats: all
 
 sphinx:
   fail_on_warning: true
