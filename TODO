@@ -30,8 +30,6 @@ Before release:
   I can do about, and it doesn't seem worth fixing. Maybe mention it
   somewhere?
 * README-maintainer: Fix installation of documentation to website
-* Get navigation working properly
-* Figure out where to put :ref:`search` so we get doc search
 
 Soon:
 
