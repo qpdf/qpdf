@@ -16,4 +16,4 @@ useful primarily to PDF developers.
 .PP
 For a summary of qpdf's options, please run
 \fBqpdf \-\-help\fR.  A complete manual can be found in
-@docdir@/qpdf-manual.html or @docdir@/qpdf-manual.pdf.
+@docdir@/html/index.html or @docdir@/qpdf-manual.pdf.

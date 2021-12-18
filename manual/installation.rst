@@ -64,7 +64,7 @@ Pre-built documentation is distributed with qpdf, so you should
 generally not need to rebuild the documentation. In order to build the
 documentation from source, you need to install `Sphinx
 <https://sphinx-doc.org>`__. To build the PDF version of the
-documentation, you need `pdflatex`, `latexmk`, and a fairly complete
+documentation, you need ``pdflatex``, ``latexmk``, and a fairly complete
 LaTeX installation. Detailed requirements can be found in the Sphinx
 documentation.
 

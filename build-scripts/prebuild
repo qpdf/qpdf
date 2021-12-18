@@ -7,5 +7,6 @@ sudo apt-get -y install \
    python3-pip texlive-latex-extra latexmk inkscape imagemagick
 pip3 install sphinx
 ./configure --enable-doc-maintenance
-make -j$(nproc) distfiles.zip
+make -j$(nproc) build_manual
+zip -r doc.zip doc/*html doc/*.pdf
 build-scripts/download-external-libs

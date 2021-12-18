@@ -121,8 +121,6 @@ install-libs: build_libqpdf
 # NOTE: If installing any new executables, remember to update the
 # lambda layer code in build-scripts/build-appimage.
 
-# NOTE: See comments in manual/build.mk about html documentation.
-
 # Ensure that installwin in make/installwin.mk is consistent with
 # this.
 
@@ -139,12 +137,13 @@ install: all install-libs
 	$(LIBTOOL) --mode=install ./install-sh \
 		qpdf/$(OUTPUT_DIR)/fix-qdf \
 		$(DESTDIR)$(bindir)/fix-qdf
-	if [ -f doc/qpdf-manual.html ]; then \
-		./mkinstalldirs -m 0755 $(DESTDIR)$(docdir)/_static; \
-		./install-sh -m 0644 doc/qpdf-manual.html $(DESTDIR)$(docdir); \
-		./install-sh -m 0644 doc/_static/* $(DESTDIR)$(docdir)/_static; \
-	fi
 	if [ -f doc/qpdf-manual.pdf ]; then \
 		./install-sh -m 0644 doc/qpdf-manual.pdf $(DESTDIR)$(docdir); \
+	fi
+	if [ -d doc/html ]; then \
+		cp -r doc/html $(DESTDIR)/$(docdir); \
+	fi
+	if [ -d doc/singlehtml ]; then \
+		cp -r doc/singlehtml $(DESTDIR)/$(docdir); \
 	fi
 	./install-sh -m 0644 doc/*.1 $(DESTDIR)$(mandir)/man1

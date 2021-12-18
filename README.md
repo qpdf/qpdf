@@ -68,7 +68,7 @@ The PDF file format used to rely on RC4 for encryption. Using 256-bit keys alway
 
 # Building from a pristine checkout
 
-When building qpdf from a pristine checkout from version control, generated documentation files are not present. You may either generate them (by passing `--enable-doc-maintenance` to `./configure` and satisfying the extra build-time dependencies) or obtain them from a released source package, which includes them. If you want to grab just the files that are in the source distribution but not in the repository, extract a source distribution in a temporary directory, and run `make CLEAN=1 distfiles.zip`. This will create a file called `distfiles.zip`, which can you can extract in a checkout of the source repository. This step is optional unless you are running make install and want the html and PDF versions of the documentation to be installed.
+When building qpdf from a pristine checkout from version control, generated HTML and PDF documentation files are not present. You don't need them unless you are going to run `make install` and want the documentation to be installed. If you want them, you can either extract the `doc` directory from a source distribution, or you can satisfy the additional requirements for building documentation and pass `--enable-doc-maintenance` to `./configure`.
 
 # Building from source distribution on UNIX/Linux
 

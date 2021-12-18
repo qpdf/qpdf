@@ -119,7 +119,7 @@ RELEASE PREPARATION
   git --no-pager grep -i -n -P "copyright.*$(expr $(date +%Y) - 1).*berkenbilt"
 
   Also update the copyright in these places:
-  * manual
+  * manual/conf.py
   * debian package -- search for copyright.*berkenbilt in debian/copyright
   * qtest-driver, TestDriver.pm in qtest source
 
@@ -210,14 +210,12 @@ RELEASE PREPARATION
   * Make sure version numbers are consistent in the following locations:
     * configure.ac
     * libqpdf/QPDF.cc
-    * manual/qpdf-manual.xml
+    * manual/conf.py
     * qpdf/qpdf.cc
     `make_dist` verifies this consistency.
 
   * Update release notes in manual. Look at diffs and ChangeLog.
-    Update release date in `manual/qpdf-manual.xml`. Remember to
-    ensure that the entities at the top of the document are consistent
-    with the release notes for both version and release date.
+    Update release date in `manual/release-notes.rst`.
 
   * Add a release entry to ChangeLog: "x.y.z: release"
 
@@ -327,7 +325,7 @@ Template for release notes:
 ```
 This is qpdf version x.y.z. (Brief description)
 
-For a full list of changes from previous releases, please see the [release notes](http://qpdf.sourceforge.net/files/qpdf-manual.html#release-notes). See also [README-what-to-download](./README-what-to-download.md) for details about the available source and binary distributions.
+For a full list of changes from previous releases, please see the [release notes](https://qpdf.sourceforge.io/doc/html/release-notes.html). See also [README-what-to-download](./README-what-to-download.md) for details about the available source and binary distributions.
 ```
 
 # Publish release
@@ -348,7 +346,7 @@ rsync -vrlcO ./ jay_berkenbilt,qpdf@frs.sourceforge.net:/home/frs/project/q/qp/q
 
 (cd /tmp; mkdir -p z; cd z; \
  tar xf ~/Q/storage/releases/qpdf/qpdf/$version/qpdf-$version.tar.gz qpdf-$version/doc; \
- scp -p qpdf-$version/doc/qpdf-* jay_berkenbilt,qpdf@frs.sourceforge.net:htdocs/files/)
+ rsync -avx --delete --force --exclude '*.1' qpdf-$version/doc/ jay_berkenbilt,qpdf@frs.sourceforge.net:htdocs/doc/)
 
 * Upload the debian package and Ubuntu ppa backports.
 

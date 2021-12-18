@@ -7,6 +7,25 @@ For a detailed list of changes, please see the file
 :file:`ChangeLog` in the source distribution.
 
 10.5.0: XXX Month dd, YYYY
+  - Packaging changes
+
+    - The structure of the ``doc`` directory is different. The PDF
+      documentation is in the same place, but the files for the
+      previous HTML documentation are no longer there. Instead, there
+      are ``html`` and ``singlehtml`` directories, each of which
+      contain ``index.html`` and other files and directories. The
+      distribution files and ``make install`` target handle this, but
+      if you are building your own packages and including
+      documentation, please double check to make sure that you are
+      including the right documentation files.
+
+    - The documentation sources have been switched from docbook to
+      reStructuredText processed with `Sphinx
+      <https://sphinx-doc.org>`__. This will break previous
+      documentation links. A redirect is in place on the main website.
+      A top-to-bottom review of the documentation is planned for an
+      upcoming release.
+
   - Library Enhancements
 
     - Since qpdf version 8, using object accessor methods on an
@@ -57,16 +76,6 @@ For a detailed list of changes, please see the file
       FUNCTIONS`` in ``include/qpdf/qpdf-c.h`` for details.
 
     - Add ``qpdf_oh_get_type_code`` and ``qpdf_oh_get_type_name``.
-
-  - Documentation change
-
-    - The documentation sources have been switched from docbook to
-      reStructuredText processed with `Sphinx
-      <https://sphinx-doc.org>`__. This is mostly transparent (other
-      than format change) with the exception that all section links
-      have changed. What used to be `#ref.something` is now
-      `#something`. A top-to-bottom review of the documentation is
-      planned for an upcoming release.
 
 10.4.0: November 16, 2021
   - Handling of Weak Cryptography Algorithms

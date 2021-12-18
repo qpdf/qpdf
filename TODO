@@ -1,8 +1,6 @@
 Next
 ====
 
-* Add spell check to CI
-
 * High-level API/doc overhaul: #593
 
 * Refactor test_driver.cc so that runtest is not one huge function.
@@ -19,24 +17,6 @@ Next
   thrown when an uninitialized trailer is accessed provides useful
   information. Test from the C API as well as the C++ API.
 
-Doc conversion
-==============
-
-Before release:
-
-* Figure out what to do about the fact that the release notes are now
-  at #release-notes instead of #ref.release-notes. This invalidates
-  the link in all previous release announcements, but there's not much
-  I can do about, and it doesn't seem worth fixing. Maybe mention it
-  somewhere?
-* README-maintainer: Fix installation of documentation to website
-
-Soon:
-
-* :ref: -- would be nice if it were suitable for printed documentation
-* Decide about readthedocs; if using, with multiple versions/latest
-* Generate stuff (options, code samples, etc.) as needed
-
 Documentation
 =============
 
@@ -52,6 +32,8 @@ Documentation
 * See #530 -- add an appendix explaining PDF encryption in general
   plus how it's handled by qpdf. Or maybe this should go on the wiki.
 
+* Decide about readthedocs including supporting multiple released
+  versions of the docs and docs from main.
 
 Document-level work
 ===================

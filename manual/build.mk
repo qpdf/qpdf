@@ -8,10 +8,10 @@ PDF_TARGET := $(PDF_OUT)/qpdf.pdf
 
 TARGETS_manual := doc/qpdf.1 doc/fix-qdf.1 doc/zlib-flate.1
 ifeq ($(BUILD_HTML),1)
-TARGETS_manual += doc/qpdf-manual.html $(HTML_TARGET)
+TARGETS_manual += $(HTML_TARGET) $(S_HTML_TARGET)
 endif
 ifeq ($(BUILD_PDF),1)
-TARGETS_manual += doc/qpdf-manual.pdf
+TARGETS_manual += $(PDF_TARGET)
 endif
 
 MANUAL_DEPS = $(wildcard manual/*.rst) manual/conf.py
@@ -22,33 +22,20 @@ MANUAL_DEPS = $(wildcard manual/*.rst) manual/conf.py
 # the error "_pickle.UnpicklingError: pickle data was truncated"
 $(HTML_TARGET): $(MANUAL_DEPS)
 	$(SPHINX) -M html manual $(DOC_OUT) -W
+	mkdir -p doc
+	rm -rf doc/html
+	cp -r $(DOC_OUT)/html doc
 
 $(S_HTML_TARGET): $(MANUAL_DEPS) | $(HTML_TARGET)
 	$(SPHINX) -M singlehtml manual $(DOC_OUT) -W
+	mkdir -p doc
+	rm -rf doc/singlehtml
+	cp -r $(DOC_OUT)/singlehtml doc
 
 $(PDF_TARGET): $(MANUAL_DEPS) | $(S_HTML_TARGET) $(HTML_TARGET)
 	$(SPHINX) -M latexpdf manual $(DOC_OUT) -W
-
-# This depends on sphinx-build's singlehtml target creating index.html
-# and a _static directory. If that changes, this code has to be
-# adjusted. It will also be necessary to adjust the install target in
-# make/libtool.mk.
-doc/qpdf-manual.html: $(S_HTML_TARGET)
 	mkdir -p doc
-	@if [ "$(shell find $(S_HTML_OUT)/ -mindepth 1 -type d -print)" != \
-             "$(S_HTML_OUT)/_static" ]; then \
-	    echo "***"; \
-	    echo Expected only directory in $(S_HTML_OUT) to be _static; \
-	    echo "***"; \
-	    false; \
-	fi
-	cp $< $@
-	mkdir -p doc/_static
-	cp -p $(S_HTML_OUT)/_static/* doc/_static
-
-doc/qpdf-manual.pdf: $(PDF_TARGET)
-	mkdir -p doc
-	cp $< $@
+	cp $(PDF_TARGET) doc/qpdf-manual.pdf
 
 doc/%.1: manual/%.1.in
 	mkdir -p doc
