@@ -14,17 +14,19 @@ ifeq ($(BUILD_PDF),1)
 TARGETS_manual += doc/qpdf-manual.pdf
 endif
 
+MANUAL_DEPS = $(wildcard manual/*.rst) manual/conf.py
+
 # Prevent targets that run $(SPHINX) from running in parallel by using
 # order-only dependencies (the dependencies listed after the |) to
 # avoid clashes in temporary files that cause the build to fail with
 # the error "_pickle.UnpicklingError: pickle data was truncated"
-$(HTML_TARGET): manual/index.rst
+$(HTML_TARGET): $(MANUAL_DEPS)
 	$(SPHINX) -M html manual $(DOC_OUT) -W
 
-$(S_HTML_TARGET): manual/index.rst | $(HTML_TARGET)
+$(S_HTML_TARGET): $(MANUAL_DEPS) | $(HTML_TARGET)
 	$(SPHINX) -M singlehtml manual $(DOC_OUT) -W
 
-$(PDF_TARGET): manual/index.rst | $(S_HTML_TARGET) $(HTML_TARGET)
+$(PDF_TARGET): $(MANUAL_DEPS) | $(S_HTML_TARGET) $(HTML_TARGET)
 	$(SPHINX) -M latexpdf manual $(DOC_OUT) -W
 
 # This depends on sphinx-build's singlehtml target creating index.html
