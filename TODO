@@ -1,6 +1,9 @@
 Next
 ====
 
+* At the time of the release, update the webpage to point to
+  readthedocs if that's what we decide to do.
+
 * High-level API/doc overhaul: #593
 
 * Refactor test_driver.cc so that runtest is not one huge function.
@@ -31,9 +34,6 @@ Documentation
 
 * See #530 -- add an appendix explaining PDF encryption in general
   plus how it's handled by qpdf. Or maybe this should go on the wiki.
-
-* Decide about readthedocs including supporting multiple released
-  versions of the docs and docs from main.
 
 Document-level work
 ===================

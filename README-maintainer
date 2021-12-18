@@ -403,3 +403,18 @@ whichever `./config-*` is appropriate for whichever compiler I need to
 test with. Start one of the Visual Studio native compiler shells, and
 from there, run one of the msys shells. The Visual Studio step is not
 necessary if just building with mingw.
+
+
+DOCS ON readthedocs.org
+
+* Registered for an account at readthedocs.org with my github account
+* Project page: https://readthedocs.org/projects/qpdf/
+* Docs: https://qpdf.readthedocs.io/
+* Admin -> Settings
+  * Set project home page
+  * Advanced: Show version warning
+  * Email Notifications: set email address for build failures
+
+At this time, there is nothing in .github/workflows to support this.
+It's all set up as an integration directly between github and
+readthedocs.

@@ -26,6 +26,9 @@ For a detailed list of changes, please see the file
       A top-to-bottom review of the documentation is planned for an
       upcoming release.
 
+    - Documentation is now available at `https://qpdf.readthedocs.io
+      <https://qpdf.readthedocs.io>`__.
+
   - Library Enhancements
 
     - Since qpdf version 8, using object accessor methods on an
