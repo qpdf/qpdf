@@ -1,3 +1,6 @@
+..
+  Directives documentation:
+  https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html
 
 QPDF version |release|
 ======================
