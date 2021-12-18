@@ -15,3 +15,4 @@ html_theme = 'nature'
 html_theme_options = {
     "body_max_width": None,
 }
+highlight_language = 'none'

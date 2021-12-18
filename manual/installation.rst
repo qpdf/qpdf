@@ -75,7 +75,7 @@ Build Instructions
 
 Building qpdf on UNIX is generally just a matter of running
 
-.. code-block:: text
+::
 
    ./configure
    make
