@@ -35,14 +35,14 @@ static FILE* safe_fopen(char const* filename, char const* mode)
     return f;
 }
 
-static void print_error(char const* label, qpdf_data qpdf, qpdf_error e)
+static void print_error(char const* label, qpdf_data q, qpdf_error e)
 {
 #define POS_FMT "  pos : " LL_FMT "\n"
-    printf("%s: %s\n", label, qpdf_get_error_full_text(qpdf, e));
-    printf("  code: %d\n", qpdf_get_error_code(qpdf, e));
-    printf("  file: %s\n", qpdf_get_error_filename(qpdf, e));
-    printf(POS_FMT, qpdf_get_error_file_position(qpdf, e));
-    printf("  text: %s\n", qpdf_get_error_message_detail(qpdf, e));
+    printf("%s: %s\n", label, qpdf_get_error_full_text(q, e));
+    printf("  code: %d\n", qpdf_get_error_code(q, e));
+    printf("  file: %s\n", qpdf_get_error_filename(q, e));
+    printf(POS_FMT, qpdf_get_error_file_position(q, e));
+    printf("  text: %s\n", qpdf_get_error_message_detail(q, e));
 }
 
 static void report_errors()
@@ -73,11 +73,11 @@ static void report_errors()
     }
 }
 
-static void handle_oh_error(qpdf_data qpdf, char const* label)
+static void handle_oh_error(qpdf_data q, char const* label)
 {
-    if (qpdf_has_error(qpdf))
+    if (qpdf_has_error(q))
     {
-        print_error(label, qpdf, qpdf_get_error(qpdf));
+        print_error(label, q, qpdf_get_error(q));
     }
 }
 
