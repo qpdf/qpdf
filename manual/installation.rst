@@ -1,4 +1,4 @@
-.. _ref.installing:
+.. _installing:
 
 Building and Installing QPDF
 ============================
@@ -7,7 +7,7 @@ This chapter describes how to build and install qpdf. Please see also
 the :file:`README.md` and
 :file:`INSTALL` files in the source distribution.
 
-.. _ref.prerequisites:
+.. _prerequisites:
 
 System Requirements
 -------------------
@@ -68,7 +68,7 @@ documentation, you need ``pdflatex``, ``latexmk``, and a fairly complete
 LaTeX installation. Detailed requirements can be found in the Sphinx
 documentation.
 
-.. _ref.building:
+.. _building:
 
 Build Instructions
 ------------------
@@ -112,7 +112,7 @@ hand-crafted non-recursive Makefile that requires gnu make. If you're
 really interested, please read the comments in the top-level
 :file:`Makefile`.
 
-.. _ref.crypto:
+.. _crypto:
 
 Crypto Providers
 ----------------
@@ -131,7 +131,7 @@ Additional implementations may be added if needed. It is also possible
 for a developer to provide their own implementation without modifying
 the qpdf library.
 
-.. _ref.crypto.build:
+.. _crypto.build:
 
 Build Support For Crypto Providers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -192,7 +192,7 @@ build, and you can ignore
 :file:`libqpdf/build.mk` to get the list of source
 files you need to build.
 
-.. _ref.crypto.runtime:
+.. _crypto.runtime:
 
 Runtime Crypto Provider Selection
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -211,7 +211,7 @@ to compare behavior of two different crypto providers while testing
 performance or reproducing a bug. It could also be useful for people who
 are implementing their own crypto providers.
 
-.. _ref.crypto.develop:
+.. _crypto.develop:
 
 Crypto Provider Information for Developers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -224,7 +224,7 @@ provider, you have to create a class derived from ``QPDFCryptoImpl`` and
 register it with ``QPDFCryptoProvider``. For additional information, see
 comments in :file:`include/qpdf/QPDFCryptoImpl.hh`.
 
-.. _ref.crypto.design:
+.. _crypto.design:
 
 Crypto Provider Design Notes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -298,7 +298,7 @@ Implementing the registration functions and internal storage of
 registered providers was also easier using C++-11's functional
 interfaces, which was another reason to require C++-11 at this time.
 
-.. _ref.packaging:
+.. _packaging:
 
 Notes for Packagers
 -------------------
@@ -311,7 +311,7 @@ some things you may want to keep in mind:
   However, qpdf still has a build-time dependency on perl.
 
 - Make sure you are getting the intended behavior with regard to crypto
-  providers. Read :ref:`ref.crypto.build` for details.
+  providers. Read :ref:`crypto.build` for details.
 
 - Passing :samp:`--enable-show-failed-test-output` to
   :command:`./configure` will cause any failed test

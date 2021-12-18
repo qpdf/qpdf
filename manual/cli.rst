@@ -1,4 +1,4 @@
-.. _ref.using:
+.. _using:
 
 Running QPDF
 ============
@@ -6,7 +6,7 @@ Running QPDF
 This chapter describes how to run the qpdf program from the command
 line.
 
-.. _ref.invocation:
+.. _invocation:
 
 Basic Invocation
 ----------------
@@ -26,7 +26,7 @@ place of :samp:`infilename`, the parameter
 :samp:`--empty` may be specified. This causes qpdf to
 use a dummy input file that contains zero pages. The only normal use
 case for using :samp:`--empty` would be if you were
-going to add pages from another source, as discussed in :ref:`ref.page-selection`.
+going to add pages from another source, as discussed in :ref:`page-selection`.
 
 If :samp:`@filename` appears as a word anywhere in the
 command-line, it will be read line by line, and each line will be
@@ -53,7 +53,7 @@ If you do this, qpdf will tell you about the
 Most options require an output file, but some testing or inspection
 commands do not. These are specifically noted.
 
-.. _ref.exit-status:
+.. _exit-status:
 
 Exit Status
 ~~~~~~~~~~~
@@ -80,7 +80,7 @@ Note that :command:`qpdf` never exists with status ``1``.
 If you get an exit status of ``1``, it was something else, like the
 shell not being able to find or execute :command:`qpdf`.
 
-.. _ref.shell-completion:
+.. _shell-completion:
 
 Shell Completion
 ----------------
@@ -100,7 +100,7 @@ to use completion with copy of qpdf that is built from source. You can
 specify a full path to the qpdf you want to use for completion in the
 ``QPDF_EXECUTABLE`` environment variable.
 
-.. _ref.basic-options:
+.. _basic-options:
 
 Basic Options
 -------------
@@ -119,7 +119,7 @@ needed transformations.
 
 :samp:`--show-crypto`
    Show a list of available crypto providers, each on a line by itself.
-   The default provider is always listed first. See :ref:`ref.crypto` for more information about crypto
+   The default provider is always listed first. See :ref:`crypto` for more information about crypto
    providers.
 
 :samp:`--completion-bash`
@@ -225,10 +225,10 @@ needed transformations.
    Starting with version 10.4, qpdf issues warnings when requested to
    create files using RC4 encryption. This option suppresses those
    warnings. In future versions of qpdf, qpdf will refuse to create
-   files with weak cryptography when this flag is not given. See :ref:`ref.weak-crypto` for additional details.
+   files with weak cryptography when this flag is not given. See :ref:`weak-crypto` for additional details.
 
 :samp:`--encrypt options --`
-   Causes generation an encrypted output file. Please see :ref:`ref.encryption-options` for details on how to specify
+   Causes generation an encrypted output file. Please see :ref:`encryption-options` for details on how to specify
    encryption parameters.
 
 :samp:`--decrypt`
@@ -260,7 +260,7 @@ needed transformations.
    Ordinarily, qpdf attempts to automatically compensate for passwords
    specified in the wrong character encoding. This option suppresses
    that behavior. Under normal conditions, there are no reasons to use
-   this option. See :ref:`ref.unicode-passwords` for a
+   this option. See :ref:`unicode-passwords` for a
    discussion
 
 :samp:`--password-mode={mode}`
@@ -271,7 +271,7 @@ needed transformations.
    :samp:`hex-bytes` mode also applies to passwords
    specified for reading files. For additional discussion of the
    supported password modes and when you might want to use them, see
-   :ref:`ref.unicode-passwords`. The following modes
+   :ref:`unicode-passwords`. The following modes
    are supported:
 
    - :samp:`auto`: Automatically determine whether the
@@ -311,7 +311,7 @@ needed transformations.
 :samp:`--rotate=[+|-]angle[:page-range]`
    Apply rotation to specified pages. The
    :samp:`page-range` portion of the option value has
-   the same format as page ranges in :ref:`ref.page-selection`. If the page range is omitted, the
+   the same format as page ranges in :ref:`page-selection`. If the page range is omitted, the
    rotation is applied to all pages. The :samp:`angle`
    portion of the parameter may be either 0, 90, 180, or 270. If
    preceded by :samp:`+` or :samp:`-`,
@@ -358,14 +358,14 @@ needed transformations.
    :samp:`--keep-files-open` for details.
 
 :samp:`--pages options --`
-   Select specific pages from one or more input files. See :ref:`ref.page-selection` for details on how to do
+   Select specific pages from one or more input files. See :ref:`page-selection` for details on how to do
    page selection (splitting and merging).
 
 :samp:`--collate={n}`
    When specified, collate rather than concatenate pages from files
    specified with :samp:`--pages`. With a numeric
    argument, collate in groups of :samp:`{n}`.
-   The default is 1. See :ref:`ref.page-selection` for additional details.
+   The default is 1. See :ref:`page-selection` for additional details.
 
 :samp:`--flatten-rotation`
    For each page that is rotated using the ``/Rotate`` key in the page's
@@ -418,11 +418,11 @@ needed transformations.
    require the global data.
 
 :samp:`--overlay options --`
-   Overlay pages from another file onto the output pages. See :ref:`ref.overlay-underlay` for details on
+   Overlay pages from another file onto the output pages. See :ref:`overlay-underlay` for details on
    overlay/underlay.
 
 :samp:`--underlay options --`
-   Overlay pages from another file onto the output pages. See :ref:`ref.overlay-underlay` for details on
+   Overlay pages from another file onto the output pages. See :ref:`overlay-underlay` for details on
    overlay/underlay.
 
 Password-protected files may be opened by specifying a password. By
@@ -442,13 +442,13 @@ Prior to 8.4.0, in the case of passwords that contain characters that
 fall outside of 7-bit US-ASCII, qpdf left the burden of supplying
 properly encoded encryption and decryption passwords to the user.
 Starting in qpdf 8.4.0, qpdf does this automatically in most cases. For
-an in-depth discussion, please see :ref:`ref.unicode-passwords`. Previous versions of this manual
+an in-depth discussion, please see :ref:`unicode-passwords`. Previous versions of this manual
 described workarounds using the :command:`iconv` command.
 Such workarounds are no longer required or recommended with qpdf 8.4.0.
 However, for backward compatibility, qpdf attempts to detect those
 workarounds and do the right thing in most cases.
 
-.. _ref.encryption-options:
+.. _encryption-options:
 
 Encryption Options
 ------------------
@@ -610,7 +610,7 @@ with the following exceptions:
 
 The default for each permission option is to be fully permissive.
 
-.. _ref.page-selection:
+.. _page-selection:
 
 Page Selection Options
 ----------------------
@@ -814,7 +814,7 @@ would create a file with two copies of the first page of the input, and
 the two copies would share any objects in common. This includes fonts,
 images, and anything else the page references.
 
-.. _ref.overlay-underlay:
+.. _overlay-underlay:
 
 Overlay and Underlay Options
 ----------------------------
@@ -849,7 +849,7 @@ between the :samp:`--overlay` or
   overlay/underlay file is encrypted.
 
 - :samp:`--to=page-range`: a range of pages in the same
-  form at described in :ref:`ref.page-selection`
+  form at described in :ref:`page-selection`
   indicates which pages in the output should have the overlay/underlay
   applied. If not specified, overlay/underlay are applied to all pages.
 
@@ -880,7 +880,7 @@ Here are some examples.
   underlay page 2 of :file:`footer.pdf` on all even
   output pages.
 
-.. _ref.attachments:
+.. _attachments:
 
 Embedded Files/Attachments Options
 ----------------------------------
@@ -975,7 +975,7 @@ timezone offset in the form :samp:`{-hh'mm'}` or
 :samp:`{+hh'mm'}`. Examples:
 ``D:20210207161528-05'00'``, ``D:20210207211528Z``.
 
-.. _ref.advanced-parsing:
+.. _advanced-parsing:
 
 Advanced Parsing Options
 ------------------------
@@ -1011,7 +1011,7 @@ this feature is if you are testing creation of hybrid PDF files and wish
 to see how a PDF consumer that doesn't understand object and
 cross-reference streams would interpret such a file.
 
-.. _ref.advanced-transformation:
+.. _advanced-transformation:
 
 Advanced Transformation Options
 -------------------------------
@@ -1097,7 +1097,7 @@ following options are available:
 
 :samp:`--normalize-content=[yn]`
    Enables or disables normalization of content streams. Content
-   normalization is enabled by default in QDF mode. Please see :ref:`ref.qdf` for additional discussion of QDF mode.
+   normalization is enabled by default in QDF mode. Please see :ref:`qdf` for additional discussion of QDF mode.
 
 :samp:`--object-streams={mode}`
    Controls handling of object streams. The value of
@@ -1304,7 +1304,7 @@ following options are available:
    Remove page labels from the output file.
 
 :samp:`--qdf`
-   Turns on QDF mode. For additional information on QDF, please see :ref:`ref.qdf`. Note that :samp:`--linearize`
+   Turns on QDF mode. For additional information on QDF, please see :ref:`qdf`. Note that :samp:`--linearize`
    disables QDF mode.
 
 :samp:`--min-version={version}`
@@ -1413,9 +1413,9 @@ documents are interspersed with comments that make it easier for the
 user to find things and also make it possible for
 :command:`fix-qdf` to work properly. QDF mode is intended
 for people, mostly developers, who wish to inspect or modify PDF files
-in a text editor. For details, please see :ref:`ref.qdf`.
+in a text editor. For details, please see :ref:`qdf`.
 
-.. _ref.testing-options:
+.. _testing-options:
 
 Testing, Inspection, and Debugging Options
 ------------------------------------------
@@ -1519,7 +1519,7 @@ given. The following options are available:
 
 :samp:`--json`
    Generate a JSON representation of the file. This is described in
-   depth in :ref:`ref.json`
+   depth in :ref:`json`
 
 :samp:`--json-help`
    Describe the format of the JSON output.
@@ -1571,7 +1571,7 @@ attempt to normalize the stream data as if it is a page content stream.
 This attempt will be made even if it is not a page content stream, in
 which case it will produce unusable results.
 
-.. _ref.unicode-passwords:
+.. _unicode-passwords:
 
 Unicode Passwords
 -----------------

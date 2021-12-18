@@ -1,4 +1,4 @@
-.. _ref.license:
+.. _license:
 
 License
 =======

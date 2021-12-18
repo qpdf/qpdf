@@ -1,4 +1,4 @@
-.. _ref.release-notes:
+.. _release-notes:
 
 Release Notes
 =============
@@ -34,7 +34,7 @@ For a detailed list of changes, please see the file
       error code of ``qpdf_e_object`` instead of
       ``qpdf_e_damaged_pdf``. Also, comments have been added to
       :file:`QPDFObjectHandle.hh` to explain in more detail what the
-      behavior is. See :ref:`ref.object-accessors` for a more in-depth
+      behavior is. See :ref:`object-accessors` for a more in-depth
       discussion.
 
     - Add ``Pl_Buffer::getMallocBuffer()`` to initialize a buffer
@@ -88,7 +88,7 @@ For a detailed list of changes, please see the file
       acknowledgment moving forward. For qpdf 10.4, this change only
       affects the command-line tool. Starting in qpdf 11, there will
       be small API changes to require explicit acknowledgment in
-      those cases as well. For additional information, see :ref:`ref.weak-crypto`.
+      those cases as well. For additional information, see :ref:`weak-crypto`.
 
   - Bug Fixes
 
@@ -243,7 +243,7 @@ For a detailed list of changes, please see the file
   - CLI Enhancements
 
     - Add new command line options for listing, saving, adding,
-      removing, and and copying file attachments. See :ref:`ref.attachments` for details.
+      removing, and and copying file attachments. See :ref:`attachments` for details.
 
     - Page splitting and merging operations, as well as
       :samp:`--flatten-rotation`, are better behaved
@@ -654,7 +654,7 @@ For a detailed list of changes, please see the file
       expensive process of finding and removing unreferenced
       resources is likely to be of benefit. For most files, this new
       default will result in a significant performance improvement
-      for splitting pages. See :ref:`ref.advanced-transformation` for a more detailed
+      for splitting pages. See :ref:`advanced-transformation` for a more detailed
       discussion.
 
     - The :samp:`--preserve-unreferenced-resources`
@@ -786,8 +786,8 @@ For a detailed list of changes, please see the file
     - A C++-11 compiler is now required to build qpdf.
 
     - A new crypto provider that uses gnutls for crypto functions is
-      now available and can be enabled at build time. See :ref:`ref.crypto` for more information about crypto
-      providers and :ref:`ref.crypto.build` for specific information about
+      now available and can be enabled at build time. See :ref:`crypto` for more information about crypto
+      providers and :ref:`crypto.build` for specific information about
       the build.
 
   - Library Enhancements
@@ -811,12 +811,12 @@ For a detailed list of changes, please see the file
       This includes the addition of new classes
       ``QPDFCryptoProvider`` and ``QPDFCryptoImpl`` and the
       recognition of the ``QPDF_CRYPTO_PROVIDER`` environment
-      variable. Crypto providers are described in depth in :ref:`ref.crypto`.
+      variable. Crypto providers are described in depth in :ref:`crypto`.
 
   - CLI Enhancements
 
     - Addition of the :samp:`--show-crypto` option in
-      support of selectable crypto providers, as described in :ref:`ref.crypto`.
+      support of selectable crypto providers, as described in :ref:`crypto`.
 
     - Allow ``:even`` or ``:odd`` to be appended to numeric ranges
       for specification of the even or odd pages from among the pages
@@ -885,7 +885,7 @@ For a detailed list of changes, please see the file
     - The :samp:`--replace-input` option may be given
       in place of an output file name. This causes qpdf to overwrite
       the input file with the output. See the description of
-      :samp:`--replace-input` in :ref:`ref.basic-options` for more details.
+      :samp:`--replace-input` in :ref:`basic-options` for more details.
 
     - The :samp:`--recompress-flate` instructs
       :command:`qpdf` to recompress streams that are
@@ -906,7 +906,7 @@ For a detailed list of changes, please see the file
       conversion methods do range checking to ensure that the cast
       can be performed with no loss of information. Every use of
       ``static_cast`` in the library was inspected to see if it could
-      use one of these safe converters instead. See :ref:`ref.casting` for additional details.
+      use one of these safe converters instead. See :ref:`casting` for additional details.
 
     - Method ``QPDF::anyWarnings`` tells whether there have been any
       warnings without clearing the list of warnings.
@@ -1100,7 +1100,7 @@ For a detailed list of changes, please see the file
       previous releases when the passwords contain non-ASCII
       characters. In some cases, the behavior differs from previous
       releases. For a discussion of the current behavior, please see
-      :ref:`ref.unicode-passwords`. The
+      :ref:`unicode-passwords`. The
       incompatibilities are as follows:
 
       - On Windows, qpdf now receives all command-line options as
@@ -1131,7 +1131,7 @@ For a detailed list of changes, please see the file
         the PDF spec requires. While this is almost always the
         correct behavior, it is possible to override the behavior if
         there is some reason to do so. This is discussed in more
-        depth in :ref:`ref.unicode-passwords`.
+        depth in :ref:`unicode-passwords`.
 
     - New options
       :samp:`--externalize-inline-images`,
@@ -1140,12 +1140,12 @@ For a detailed list of changes, please see the file
       handling of inline images and possible conversion of them to
       regular images. By default,
       :samp:`--optimize-images` now also applies to
-      inline images. These options are discussed in :ref:`ref.advanced-transformation`.
+      inline images. These options are discussed in :ref:`advanced-transformation`.
 
     - Add options :samp:`--overlay` and
       :samp:`--underlay` for overlaying or
       underlaying pages of other files onto output pages. See
-      :ref:`ref.overlay-underlay` for
+      :ref:`overlay-underlay` for
       details.
 
     - When opening an encrypted file with a password, if the
@@ -1154,12 +1154,12 @@ For a detailed list of changes, please see the file
       passwords to try to compensate for possible character encoding
       errors. This behavior can be suppressed with the
       :samp:`--suppress-password-recovery` option.
-      See :ref:`ref.unicode-passwords` for a full
+      See :ref:`unicode-passwords` for a full
       discussion.
 
     - Add the :samp:`--password-mode` option to
       fine-tune how qpdf interprets password arguments, especially
-      when they contain non-ASCII characters. See :ref:`ref.unicode-passwords` for more information.
+      when they contain non-ASCII characters. See :ref:`unicode-passwords` for more information.
 
     - In the :samp:`--pages` option, it is now
       possible to copy the same page more than once from the same
@@ -1333,7 +1333,7 @@ For a detailed list of changes, please see the file
     - Page collation: add new option
       :samp:`--collate`. When specified, the
       semantics of :samp:`--pages` change from
-      concatenation to collation. See :ref:`ref.page-selection` for examples and discussion.
+      concatenation to collation. See :ref:`page-selection` for examples and discussion.
 
     - Generation of information in JSON format, primarily to
       facilitate use of qpdf from languages other than C++. Add new
@@ -1342,7 +1342,7 @@ For a detailed list of changes, please see the file
       :samp:`--json-object` to generate a JSON
       representation of the PDF file. Run :command:`qpdf
       --json-help` to get a description of the JSON
-      format. For more information, see :ref:`ref.json`.
+      format. For more information, see :ref:`json`.
 
     - The :samp:`--generate-appearances` flag will
       cause qpdf to generate appearances for form fields if the PDF
@@ -1500,7 +1500,7 @@ For a detailed list of changes, please see the file
   - Notes for Packagers
 
     - A new section has been added to the documentation with notes
-      for packagers. Please see :ref:`ref.packaging`.
+      for packagers. Please see :ref:`packaging`.
 
     - The qpdf detects out-of-date automatically generated files. If
       your packaging system automatically refreshes libtool or
@@ -1522,7 +1522,7 @@ For a detailed list of changes, please see the file
       :samp:`--keep-files-open={[yn]}`
       to override default determination of whether to keep files open
       when merging. Please see the discussion of
-      :samp:`--keep-files-open` in :ref:`ref.basic-options` for additional details.
+      :samp:`--keep-files-open` in :ref:`basic-options` for additional details.
 
 8.2.0: August 16, 2018
   - Command-line Enhancements
@@ -1588,7 +1588,7 @@ For a detailed list of changes, please see the file
       page splitting is very slow, the old behavior (and speed) can
       be enabled by specifying
       :samp:`--preserve-unreferenced-resources`. For
-      additional details, please see :ref:`ref.advanced-transformation`.
+      additional details, please see :ref:`advanced-transformation`.
 
     - When merging multiple PDF files, qpdf no longer leaves all the
       files open. This makes it possible to merge numbers of files
@@ -1633,7 +1633,7 @@ For a detailed list of changes, please see the file
       introduced. These are designed to provide a more convenient way
       of interacting with certain document features than using
       ``QPDFObjectHandle`` directly. For details on helpers, see
-      :ref:`ref.helper-classes`. Specific additional
+      :ref:`helper-classes`. Specific additional
       interfaces are described below.
 
     - Add two new document helper classes: ``QPDFPageDocumentHelper``
@@ -1718,7 +1718,7 @@ For a detailed list of changes, please see the file
 
   - Enhancements to the :command:`qpdf` Command-line
     Tool. All new options listed here are documented in more detail in
-    :ref:`ref.using`.
+    :ref:`using`.
 
     - The option
       :samp:`--linearize-pass1={file}`
@@ -1774,7 +1774,7 @@ For a detailed list of changes, please see the file
     the encryption key used by a file. This is a non-standard
     operation, but it can be useful in certain situations. Please see
     the discussion of :samp:`--password-is-hex-key` in
-    :ref:`ref.basic-options` or the comments around
+    :ref:`basic-options` or the comments around
     ``QPDF::setPasswordIsHexKey`` in
     :file:`QPDF.hh` for additional details.
 
@@ -1832,10 +1832,10 @@ For a detailed list of changes, please see the file
 
   - Enhancements to the :command:`qpdf` Command-line
     Tool. All new options listed here are documented in more detail in
-    :ref:`ref.using`.
+    :ref:`using`.
 
     - Command-line arguments can now be read from files or standard
-      input using ``@file`` or ``@-`` syntax. Please see :ref:`ref.invocation`.
+      input using ``@file`` or ``@-`` syntax. Please see :ref:`invocation`.
 
     - :samp:`--rotate`: request page rotation
 
@@ -2147,7 +2147,7 @@ For a detailed list of changes, please see the file
     ``QPDFWriter::setMinimumPDFVersion`` and
     ``QPDFWriter::forcePDFVersion`` that accept an extension level,
     and extended syntax for specifying forced and minimum versions on
-    the command line as described in :ref:`ref.advanced-transformation`. Corresponding functions
+    the command line as described in :ref:`advanced-transformation`. Corresponding functions
     have been added to the C API as well.
 
   - Minor fixes to prevent qpdf from referencing objects in the file
@@ -2294,17 +2294,17 @@ For a detailed list of changes, please see the file
 
   - Support for page selection (splitting and merging PDF files) has
     been added to the :command:`qpdf` command-line
-    tool. See :ref:`ref.page-selection`.
+    tool. See :ref:`page-selection`.
 
   - Options have been added to the :command:`qpdf`
     command-line tool for copying encryption parameters from another
-    file. See :ref:`ref.basic-options`.
+    file. See :ref:`basic-options`.
 
   - New methods have been added to the ``QPDF`` object for adding and
-    removing pages. See :ref:`ref.adding-and-remove-pages`.
+    removing pages. See :ref:`adding-and-remove-pages`.
 
   - New methods have been added to the ``QPDF`` object for copying
-    objects from other PDF files. See :ref:`ref.foreign-objects`
+    objects from other PDF files. See :ref:`foreign-objects`
 
   - A new method ``QPDFObjectHandle::parse`` has been added for
     constructing ``QPDFObjectHandle`` objects from a string

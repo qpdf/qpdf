@@ -1,4 +1,4 @@
-.. _ref.linearization:
+.. _linearization:
 
 Linearization
 =============
@@ -6,7 +6,7 @@ Linearization
 This chapter describes how ``QPDF`` and ``QPDFWriter`` implement
 creation and processing of linearized PDFS.
 
-.. _ref.linearization-strategy:
+.. _linearization-strategy:
 
 Basic Strategy for Linearization
 --------------------------------
@@ -22,7 +22,7 @@ was first tested against linearized files created by external tools
 (Acrobat and pdlin) and then used to validate files created by
 ``QPDFWriter`` itself.
 
-.. _ref.linearized.preparation:
+.. _linearized.preparation:
 
 Preparing For Linearization
 ---------------------------
@@ -34,7 +34,7 @@ tree). We also have to know which objects refer to which other objects,
 being concerned with page boundaries and a few other cases. We refer to
 this part of preparing the PDF file as
 *optimization*, discussed in
-:ref:`ref.optimization`. Note the, in this context, the
+:ref:`optimization`. Note the, in this context, the
 term *optimization* is a qpdf term, and the
 term *linearization* is a term from the PDF
 specification. Do not be confused by the fact that many applications
@@ -49,7 +49,7 @@ really only a few issues that need to be dealt with:
 
 - Filling in offsets and byte sizes
 
-.. _ref.optimization:
+.. _optimization:
 
 Optimization
 ------------
@@ -85,7 +85,7 @@ Note that pages and thumbnails have different object user types, so the
 above test on a page will not include objects referenced by the page's
 thumbnail dictionary and nothing else.
 
-.. _ref.linearization.writing:
+.. _linearization.writing:
 
 Writing Linearized Files
 ------------------------
@@ -131,7 +131,7 @@ Using this strategy, we can write linearized files to a non-seekable
 output stream with only a single pass to disk or wherever the output is
 going.
 
-.. _ref.linearization-data:
+.. _linearization-data:
 
 Calculating Linearization Data
 ------------------------------
@@ -147,7 +147,7 @@ object is encountered that has not already been queued. (This could
 happen only if there were a bug in the traversal code used to calculate
 the linearization data.)
 
-.. _ref.linearization-issues:
+.. _linearization-issues:
 
 Known Issues with Linearization
 -------------------------------
@@ -172,7 +172,7 @@ linearization appendix of the PDF specification.
   most of the information needed to create thumbnail hint tables. There
   are comments in the code about this.
 
-.. _ref.linearization-debugging:
+.. _linearization-debugging:
 
 Debugging Note
 --------------

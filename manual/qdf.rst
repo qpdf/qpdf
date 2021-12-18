@@ -1,4 +1,4 @@
-.. _ref.qdf:
+.. _qdf:
 
 QDF Mode
 ========

@@ -1,9 +1,9 @@
-.. _ref.json:
+.. _json:
 
 QPDF JSON
 =========
 
-.. _ref.json-overview:
+.. _json-overview:
 
 Overview
 --------
@@ -18,7 +18,7 @@ files programmatically from the command-line in languages that can't
 call or link with the qpdf library directly. Note that stream data can
 be extracted from PDF files using other qpdf command-line options.
 
-.. _ref.json-guarantees:
+.. _json-guarantees:
 
 JSON Guarantees
 ---------------

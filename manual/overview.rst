@@ -1,4 +1,4 @@
-.. _ref.overview:
+.. _overview:
 
 What is QPDF?
 =============

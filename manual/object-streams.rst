@@ -1,4 +1,4 @@
-.. _ref.object-and-xref-streams:
+.. _object-and-xref-streams:
 
 Object and Cross-Reference Streams
 ==================================
@@ -6,7 +6,7 @@ Object and Cross-Reference Streams
 This chapter provides information about the implementation of object
 stream and cross-reference stream support in qpdf.
 
-.. _ref.object-streams:
+.. _object-streams:
 
 Object Streams
 --------------
@@ -27,7 +27,7 @@ if the file is encrypted, though this is not specifically disallowed by
 the specification.
 
 There are additional restrictions for linearized files. See
-:ref:`ref.object-streams-linearization` for details.
+:ref:`object-streams-linearization` for details.
 
 The PDF specification refers to objects in object streams as "compressed
 objects" regardless of whether the object stream is compressed.
@@ -62,7 +62,7 @@ is the object number and the byte offset of the object relative to the
 first object in the stream, followed by the objects themselves,
 concatenated.
 
-.. _ref.xref-streams:
+.. _xref-streams:
 
 Cross-Reference Streams
 -----------------------
@@ -111,7 +111,7 @@ which are these:
 The other fields in the xref stream, which may be indirect if desired,
 are the union of those from the xref table's trailer dictionary.
 
-.. _ref.xref-stream-data:
+.. _xref-stream-data:
 
 Cross-Reference Stream Data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -138,7 +138,7 @@ PDF 1.5 has three field types:
 It seems standard to have the first entry in the table be ``0 0 0``
 instead of ``0 0 ffff`` if there are no deleted objects.
 
-.. _ref.object-streams-linearization:
+.. _object-streams-linearization:
 
 Implications for Linearized Files
 ---------------------------------
@@ -161,7 +161,7 @@ When numbering objects, all shared objects within both the first and
 second halves of the linearized files must be numbered consecutively
 after all normal uncompressed objects in that half.
 
-.. _ref.object-stream-implementation:
+.. _object-stream-implementation:
 
 Implementation Notes
 --------------------

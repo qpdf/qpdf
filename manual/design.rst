@@ -1,9 +1,9 @@
-.. _ref.design:
+.. _design:
 
 Design and Library Notes
 ========================
 
-.. _ref.design.intro:
+.. _design.intro:
 
 Introduction
 ------------
@@ -33,7 +33,7 @@ This is by design as there seems to be a shortage of PDF validation
 tools out there. This was, in fact, one of the major motivations behind
 the initial creation of qpdf.
 
-.. _ref.design-goals:
+.. _design-goals:
 
 Design Goals
 ------------
@@ -118,9 +118,9 @@ full details, please see the header files
 :file:`QPDF.hh` and
 :file:`QPDFObjectHandle.hh`. There are also some
 additional helper classes that provide higher level API functions for
-certain document constructions. These are discussed in :ref:`ref.helper-classes`.
+certain document constructions. These are discussed in :ref:`helper-classes`.
 
-.. _ref.helper-classes:
+.. _helper-classes:
 
 Helper Classes
 --------------
@@ -219,7 +219,7 @@ remain in those classes even as alternatives are provided in helper
 classes. Going forward, new higher level interfaces will be provided
 using helper classes.
 
-.. _ref.implementation-notes:
+.. _implementation-notes:
 
 Implementation Notes
 --------------------
@@ -321,7 +321,7 @@ file.
   As the client continues to request objects, the same process is
   followed for each new requested object.
 
-.. _ref.casting:
+.. _casting:
 
 Casting Policy
 --------------
@@ -395,7 +395,7 @@ prevent this from being done. There are places in the code where
 adequate testing to assert that it is safe and will remain safe in
 qpdf's code.
 
-.. _ref.encryption:
+.. _encryption:
 
 Encryption
 ----------
@@ -467,7 +467,7 @@ created, even if the results are not useful to some readers. One use
 case for this would be for testing a PDF reader to ensure that it
 handles odd configurations of input files.
 
-.. _ref.random-numbers:
+.. _random-numbers:
 
 Random Number Generation
 ------------------------
@@ -484,7 +484,7 @@ details on how to do this, please refer to the top-level README.md file
 in the source distribution and to comments in
 :file:`QUtil.hh`.
 
-.. _ref.adding-and-remove-pages:
+.. _adding-and-remove-pages:
 
 Adding and Removing Pages
 -------------------------
@@ -497,7 +497,7 @@ individual pages and manipulation of the ``/Pages`` tree itself. For
 details, see ``addPage`` and surrounding methods in
 :file:`QPDF.hh`.
 
-.. _ref.reserved-objects:
+.. _reserved-objects:
 
 Reserving Object Numbers
 ------------------------
@@ -520,11 +520,11 @@ construct the references. When finished, you can call
 ``QPDF::replaceReserved`` to replace the reserved objects with the real
 ones. This functionality will never be needed by most applications, but
 it is used internally by QPDF when copying objects from other PDF files,
-as discussed in :ref:`ref.foreign-objects`. For an example of how to use reserved
+as discussed in :ref:`foreign-objects`. For an example of how to use reserved
 objects, search for ``newReserved`` in
 :file:`test_driver.cc` in qpdf's sources.
 
-.. _ref.foreign-objects:
+.. _foreign-objects:
 
 Copying Objects From Other PDF Files
 ------------------------------------
@@ -560,7 +560,7 @@ source ``QPDF`` object must remain valid until you have finished with
 the destination object. This is because the original object is still
 used to retrieve any referenced stream data from the copied object.
 
-.. _ref.rewriting:
+.. _rewriting:
 
 Writing PDF Files
 -----------------
@@ -568,9 +568,9 @@ Writing PDF Files
 The qpdf library supports file writing of ``QPDF`` objects to PDF files
 through the ``QPDFWriter`` class. The ``QPDFWriter`` class has two
 writing modes: one for non-linearized files, and one for linearized
-files. See :ref:`ref.linearization` for a description of
+files. See :ref:`linearization` for a description of
 linearization is implemented. This section describes how we write
-non-linearized files including the creation of QDF files (see :ref:`ref.qdf`.
+non-linearized files including the creation of QDF files (see :ref:`qdf`.
 
 This outline was written prior to implementation and is not exactly
 accurate, but it provides a correct "notional" idea of how writing
@@ -645,7 +645,7 @@ can be used to write out a new xref table. Finally we can write out the
 trailer dictionary with appropriately computed /ID (see spec, 8.3, File
 Identifiers), the cross reference table offset, and ``%%EOF``.
 
-.. _ref.filtered-streams:
+.. _filtered-streams:
 
 Filtered Streams
 ----------------
@@ -670,7 +670,7 @@ should write to whatever type of output is required. The ``QPDF`` class
 has an interface to write raw or filtered stream contents to a given
 pipeline.
 
-.. _ref.object-accessors:
+.. _object-accessors:
 
 Object Accessor Methods
 -----------------------

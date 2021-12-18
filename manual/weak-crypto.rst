@@ -1,4 +1,4 @@
-.. _ref.weak-crypto:
+.. _weak-crypto:
 
 Weak Cryptography
 =================

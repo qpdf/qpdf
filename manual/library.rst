@@ -1,9 +1,9 @@
-.. _ref.using-library:
+.. _using-library:
 
 Using the QPDF Library
 ======================
 
-.. _ref.using.from-cxx:
+.. _using.from-cxx:
 
 Using QPDF from C++
 -------------------
@@ -34,7 +34,7 @@ individual ``QPDF`` object instance (including ``QPDF``,
 thread at a time. Multiple threads may simultaneously work with
 different instances of these and all other QPDF objects.
 
-.. _ref.using.other-languages:
+.. _using.other-languages:
 
 Using QPDF from other languages
 -------------------------------
@@ -65,9 +65,9 @@ Other Languages
    command-line tool can produce a JSON representation of the PDF file's
    non-content data. This can facilitate interacting programmatically
    with PDF files through qpdf's command line interface. For more
-   information, please see :ref:`ref.json`.
+   information, please see :ref:`json`.
 
-.. _ref.unicode-files:
+.. _unicode-files:
 
 A Note About Unicode File Names
 -------------------------------
