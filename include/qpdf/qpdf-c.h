@@ -84,10 +84,6 @@
  *
  * DETAILS:
  *
- * There is some complexity in this API's error handling as it tries
- * to adopt C++-style exception handling to work with languages that
- * don't support exceptions, such as C.
- *
  * The data type underlying qpdf_data maintains a list of warnings and
  * a single error. To retrieve warnings, call qpdf_next_warning while
  * qpdf_more_warnings is true. To retrieve the error, call
