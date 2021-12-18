@@ -4,7 +4,6 @@ import os
 import requests
 import sys
 from zipfile import ZipFile
-from operator import itemgetter
 
 
 def warn(*args, **kwargs):
