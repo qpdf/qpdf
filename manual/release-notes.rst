@@ -46,6 +46,12 @@ For a detailed list of changes, please see the file
 
   - C API Enhancements
 
+    - Many thanks to M. Holger whose contributions have heavily
+      influenced these C API enhancements. His several suggestions,
+      pull requests, questions, and critical reading of documentation
+      and comments have resulted in significant usability improvements
+      to the C API.
+
     - Overhaul error handling for the object handle functions C API.
       Some rare error conditions that would previously have caused a
       crash are now trapped and reported, and the functions that
@@ -79,6 +85,10 @@ For a detailed list of changes, please see the file
       FUNCTIONS`` in ``include/qpdf/qpdf-c.h`` for details.
 
     - Add ``qpdf_oh_get_type_code`` and ``qpdf_oh_get_type_name``.
+
+    - Add ``qpdf_oh_get_binary_string_value`` and
+      ``qpdf_oh_new_binary_string`` for making it easier to deal with
+      strings that contain embedded null characters.
 
 10.4.0: November 16, 2021
   - Handling of Weak Cryptography Algorithms

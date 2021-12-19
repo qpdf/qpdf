@@ -781,8 +781,17 @@ static void test27(char const* infile,
     assert(strcmp(qpdf_oh_get_string_value(qpdf, p_string_with_null),
                   "one") == 0);
     assert(qpdf_get_last_string_length(qpdf) == 7);
+    /* memcmp adds a character to verify the trailing null */
     assert(memcmp(qpdf_oh_get_string_value(qpdf, p_string_with_null),
-                  "one\000two", 7) == 0);
+                  "one\000two", 8) == 0);
+    size_t length = 0;
+    p_string_with_null = qpdf_oh_new_binary_string(qpdf, "potato\000salad", 12);
+    /* memcmp adds a character to verify the trailing null */
+    assert(memcmp(qpdf_oh_get_binary_string_value(
+                      qpdf, p_string_with_null, &length),
+                  "potato\000salad", 13) == 0);
+    assert(qpdf_get_last_string_length(qpdf) == 12);
+    assert(length == 12);
 }
 
 static void test28(char const* infile,

@@ -61,10 +61,12 @@
  *     subsequent function calls, sometimes even to different
  *     functions. If you want a string to last past the next qpdf call
  *     or after a call to qpdf_cleanup, you should make a copy of it.
- *     It is possible for the internal string data to contain null
- *     characters. To handle that case, you call
- *     qpdf_get_last_string_length() to get the length of whatever
- *     string was just returned.
+ *
+ *     Since it is possible for a PDF string to contain null
+ *     characters, a function that returns data originating from a PDF
+ *     string may also contain null characters. To handle that case,
+ *     you call qpdf_get_last_string_length() to get the length of
+ *     whatever string was just returned. See STRING FUNCTIONS below.
  *
  *     Most functions defined here have obvious counterparts that are
  *     methods to either QPDF or QPDFWriter.  Please see comments in
@@ -188,14 +190,6 @@ extern "C" {
      */
     QPDF_DLL
     void qpdf_cleanup(qpdf_data* qpdf);
-
-    /* Return the length of the last string returned. This enables you
-     * to retrieve the entire string for cases in which a char*
-     * returned by one of the functions below points to a string with
-     * embedded null characters.
-     */
-    QPDF_DLL
-    size_t qpdf_get_last_string_length(qpdf_data qpdf);
 
     /* ERROR REPORTING */
 
@@ -716,10 +710,29 @@ extern "C" {
     QPDF_DLL
     char const* qpdf_oh_get_name(qpdf_data qpdf, qpdf_oh oh);
 
+    /* Return the length of the last string returned. This enables you
+     * to retrieve the entire string for cases in which a char*
+     * returned by one of the functions below points to a string with
+     * embedded null characters. The function
+     * qpdf_oh_get_binary_string_value takes a length pointer, which
+     * can be useful if you are retrieving the value of a string that
+     * is expected to contain binary data, such as a checksum or
+     * document ID. It is always valid to call
+     * qpdf_get_last_string_length, but it is usually not necessary as
+     * C strings returned by the library are only expected to be able
+     * to contain null characters if their values originate from PDF
+     * strings in the input.
+     */
+    QPDF_DLL
+    size_t qpdf_get_last_string_length(qpdf_data qpdf);
+
     QPDF_DLL
     char const* qpdf_oh_get_string_value(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
     char const* qpdf_oh_get_utf8_value(qpdf_data qpdf, qpdf_oh oh);
+    QPDF_DLL
+    char const* qpdf_oh_get_binary_string_value(
+        qpdf_data qpdf, qpdf_oh oh, size_t* length);
 
     QPDF_DLL
     int qpdf_oh_get_array_n_items(qpdf_data qpdf, qpdf_oh oh);
@@ -772,6 +785,12 @@ extern "C" {
     qpdf_oh qpdf_oh_new_string(qpdf_data qpdf, char const* str);
     QPDF_DLL
     qpdf_oh qpdf_oh_new_unicode_string(qpdf_data qpdf, char const* utf8_str);
+    /* Use qpdf_oh_new_binary_string for creating a string that may
+     * contain atrbitary binary data including embedded null characters.
+     */
+    QPDF_DLL
+    qpdf_oh qpdf_oh_new_binary_string(
+        qpdf_data qpdf, char const* str, size_t length);
     QPDF_DLL
     qpdf_oh qpdf_oh_new_array(qpdf_data qpdf);
     QPDF_DLL

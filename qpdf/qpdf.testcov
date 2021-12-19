@@ -625,3 +625,5 @@ qpdf-c stream data buf set 1
 qpdf-c called qpdf_oh_get_page_content_data 0
 qpdf-c called qpdf_oh_replace_stream_data 0
 qpdf-c silence oh errors 0
+qpdf-c called qpdf_oh_get_binary_string_value 0
+qpdf-c called qpdf_oh_new_binary_string 0

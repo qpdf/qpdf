@@ -1,3 +1,11 @@
+2021-12-19  Jay Berkenbilt  <ejb@ql.org>
+
+	* C API: clarify documentation around string lengths. Add two new
+	methods: qpdf_oh_get_binary_string_value and
+	qpdf_oh_new_binary_string to make the need to handle the length
+	and data separate in more explicit in cases in which the string
+	data may contain embedded null characters.
+
 2021-12-17  Jay Berkenbilt  <ejb@ql.org>
 
 	* C API: simplify error handling for uncaught errors (never in a
