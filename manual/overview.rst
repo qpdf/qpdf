@@ -31,3 +31,7 @@ be used to transform that file in ways that perhaps your original PDF
 creation tool can't handle. For example, many programs generate simple PDF
 files but can't password-protect them, web-optimize them, or perform
 other transformations of that type.
+
+This documentation aims to be comprehensive, but there is also a `wiki
+<https://github.com/qpdf/qpdf/wiki>`__ for less polished material and
+ongoing work.
