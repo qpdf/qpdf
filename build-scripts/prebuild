@@ -5,7 +5,7 @@ sudo apt-get update
 sudo apt-get -y install \
    autoconf build-essential zlib1g-dev libjpeg-dev \
    python3-pip texlive-latex-extra latexmk inkscape imagemagick
-pip3 install sphinx
+pip3 install sphinx sphinx_rtd_theme
 ./configure --enable-doc-maintenance
 make -j$(nproc) build_manual
 zip -r doc.zip doc/*html doc/*.pdf

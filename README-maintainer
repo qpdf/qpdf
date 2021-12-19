@@ -31,6 +31,12 @@ Memory checks:
    --enable-werror --disable-shared
 
 
+CHECK DOCS ON readthedocs
+
+To check docs on readthedocs.io without running all of CI, push to the
+doc-check branch. Then visit https://qpdf.readthedocs.io/en/doc-check/
+Building docs from pull requests is also enabled.
+
 GOOGLE OSS-FUZZ
 
 * See ../misc/fuzz (not in repo) for unfixed, downloaded fuzz test cases
