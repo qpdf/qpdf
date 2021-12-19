@@ -11,6 +11,7 @@ QPDF version |release|
 
    overview
    license
+   download
    installation
    cli
    qdf
