@@ -305,6 +305,15 @@ git rev-parse qpdf/main @
 git tag -s release-qpdf-$version @ -m"qpdf $version"
 git push qpdf release-qpdf-$version
 
+* Update documentation branches
+
+git push qpdf @:$(echo $version | sed -E 's/\.[^\.]+$//')
+git push qpdf @:stable
+
+* If this is an x.y.0 release, visit
+  https://readthedocs.org/projects/qpdf/versions/ (log in with
+  github), and activate the latest major/minor version
+
 * Create a github release after pushing the tag. `gcurl` is an alias
   that includes the auth token.
 
@@ -332,7 +341,7 @@ Template for release notes:
 ```
 This is qpdf version x.y.z. (Brief description)
 
-For a full list of changes from previous releases, please see the [release notes](https://qpdf.sourceforge.io/doc/html/release-notes.html). See also [README-what-to-download](./README-what-to-download.md) for details about the available source and binary distributions.
+For a full list of changes from previous releases, please see the [release notes](https://qpdf.readthedocs.io/en/stable/release-notes.html). See also [README-what-to-download](./README-what-to-download.md) for details about the available source and binary distributions.
 ```
 
 # Publish release
@@ -346,14 +355,6 @@ rsync -vrlcO ./ jay_berkenbilt,qpdf@frs.sourceforge.net:/home/frs/project/q/qp/q
   Windows, and make the 32-bit mingw build the default for Windows.
 
 * Publish a news item manually on sourceforge.
-
-* Update the web page to indicate the new version and to put the new
-  documentation in the `files` subdirectory of the website on
-  sourceforge.net.
-
-(cd /tmp; mkdir -p z; cd z; \
- tar xf ~/Q/storage/releases/qpdf/qpdf/$version/qpdf-$version.tar.gz qpdf-$version/doc; \
- rsync -avx --delete --force --exclude '*.1' qpdf-$version/doc/ jay_berkenbilt,qpdf@frs.sourceforge.net:htdocs/doc/)
 
 * Upload the debian package and Ubuntu ppa backports.
 
@@ -419,9 +420,22 @@ DOCS ON readthedocs.org
 * Docs: https://qpdf.readthedocs.io/
 * Admin -> Settings
   * Set project home page
-  * Advanced: Show version warning
+  * Advanced
+    * Show version warning
+    * Default version: stable
   * Email Notifications: set email address for build failures
 
 At this time, there is nothing in .github/workflows to support this.
 It's all set up as an integration directly between github and
 readthedocs.
+
+The way readthedocs.org does stable and versions doesn't exactly work
+for qpdf. My tagging convention is different from what they expect,
+and I don't need versions for every point release. I have the
+following branching strategy to support docs:
+
+* x.y -- points to the latest x.y.z release
+* stable -- points to the latest release
+
+The release process includes updating the approach branches and
+activating versions.
