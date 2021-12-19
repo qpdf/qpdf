@@ -7,7 +7,7 @@ RUN apt-get update && \
        inkscape imagemagick busybox-static wget fuse && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-RUN pip3 install sphinx
+RUN pip3 install sphinx sphinx_rtd_theme
 COPY entrypoint /entrypoint
 RUN chmod +x /entrypoint
 ENTRYPOINT [ "/entrypoint" ]

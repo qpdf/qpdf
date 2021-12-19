@@ -6,14 +6,19 @@
 #
 # To see the default sample conf.py, run sphinx-quickstart in an empty
 # directory. Most of the original comments and options were removed.
+import sphinx_rtd_theme  # noQA F401
 
 project = 'QPDF'
 copyright = '2005-2021, Jay Berkenbilt'
 author = 'Jay Berkenbilt'
 release = '10.4.0'
 version = release
-html_theme = 'nature'
+extensions = [
+    'sphinx_rtd_theme',
+]
+html_theme = 'sphinx_rtd_theme'
 html_theme_options = {
     "body_max_width": None,
 }
+html_logo = '../logo/qpdf.svg'
 highlight_language = 'none'
