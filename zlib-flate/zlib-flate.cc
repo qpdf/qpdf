@@ -1,6 +1,7 @@
 #include <qpdf/Pl_Flate.hh>
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/QPDF.hh>
 
 #include <stdio.h>
 #include <string.h>
@@ -41,7 +42,8 @@ int main(int argc, char* argv[])
 
     if ((argc == 2) && (strcmp(argv[1], "--version") == 0))
     {
-	std::cout << whoami << " version 1.0" << std::endl;
+        std::cout << whoami << " from qpdf version "
+                  << QPDF::QPDFVersion() << std::endl;
 	exit(0);
     }
 
