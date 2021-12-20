@@ -11,16 +11,6 @@ Next
 
 * Consider creating a qpdf wiki. See also Documentation below.
 
-* For QPDFObjectHandle, provide a way on and after construction
-  to specify the error message that will be thrown if the
-  uninitialized object is accessed. Attach this to the trailer or any
-  other uninitialized object handle that might be returned. Explain in
-  getTrailer() that we don't explicitly check since the trailer is
-  only uninitialized when the user doesn't call a process method, and
-  adding a check for every call will be expensive. Make sure the error
-  thrown when an uninitialized trailer is accessed provides useful
-  information. Test from the C API as well as the C++ API.
-
 Documentation
 =============
 
