@@ -59,7 +59,7 @@ For a detailed list of changes, please see the file
       ``ERROR HANDLING`` section of :file:`include/qpdf/qpdf-c.h` for
       details. In particular, exceptions thrown by the underlying C++
       code when calling object accessors are caught and converted into
-      errors. The errors can be checked by call ``qpdf_has_error``.
+      errors. The errors can be checked by calling ``qpdf_has_error``.
       Use ``qpdf_silence_errors`` to prevent the error from being
       written to stderr.
 
