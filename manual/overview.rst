@@ -6,7 +6,8 @@ What is QPDF?
 QPDF is a program and C++ library for structural, content-preserving
 transformations on PDF files. QPDF's website is located at
 https://qpdf.sourceforge.io/. QPDF's source code is hosted on github
-at https://github.com/qpdf/qpdf.
+at https://github.com/qpdf/qpdf. You can find the latest version of
+this documentation at https://qpdf.readthedocs.io/.
 
 QPDF provides many useful capabilities to developers of PDF-producing
 software or for people who just want to look at the innards of a PDF
