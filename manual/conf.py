@@ -11,7 +11,7 @@ import sphinx_rtd_theme  # noQA F401
 project = 'QPDF'
 copyright = '2005-2021, Jay Berkenbilt'
 author = 'Jay Berkenbilt'
-release = '10.4.0'
+release = '10.5.0'
 version = release
 extensions = [
     'sphinx_rtd_theme',

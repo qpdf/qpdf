@@ -6,7 +6,7 @@ Release Notes
 For a detailed list of changes, please see the file
 :file:`ChangeLog` in the source distribution.
 
-10.5.0: XXX Month dd, YYYY
+10.5.0: December 20, 2021
   - Packaging changes
 
     - The structure of the ``doc`` directory is different. The PDF
