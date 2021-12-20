@@ -47,25 +47,29 @@ enum qpdf_error_code_e
  * qpdf_oh, have a unique type code that has one of the values in the
  * list below. As new object types are added to qpdf, additional items
  * may be added to the list, so code that switches on these values
- * should take that into consideration.
+ * should take that into consideration. (Maintainer note: it would be
+ * better to call this qpdf_ot_* rather than ot_* to reduce likelihood
+ * of name collision, but since QPDFObject::object_type_e is an alias
+ * to this type, changing the names of the values breaks backward
+ * compatibility.)
  */
 enum qpdf_object_type_e {
     /* Object types internal to qpdf */
-    qpdf_ot_uninitialized,
-    qpdf_ot_reserved,
+    ot_uninitialized,
+    ot_reserved,
     /* Object types that can occur in the main document */
-    qpdf_ot_null,
-    qpdf_ot_boolean,
-    qpdf_ot_integer,
-    qpdf_ot_real,
-    qpdf_ot_string,
-    qpdf_ot_name,
-    qpdf_ot_array,
-    qpdf_ot_dictionary,
-    qpdf_ot_stream,
+    ot_null,
+    ot_boolean,
+    ot_integer,
+    ot_real,
+    ot_string,
+    ot_name,
+    ot_array,
+    ot_dictionary,
+    ot_stream,
     /* Additional object types that can occur in content streams */
-    qpdf_ot_operator,
-    qpdf_ot_inlineimage,
+    ot_operator,
+    ot_inlineimage,
     /* NOTE: if adding to this list, update QPDFObject.hh */
 };
 
