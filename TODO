@@ -1,15 +1,9 @@
 Next
 ====
 
-* At the time of the release, update the webpage and make sure it's
-  stable. Check the old release notes link:
-  http://qpdf.sourceforge.net/files/qpdf-manual.html#ref.release-notes
-
 * High-level API/doc overhaul: #593
 
 * Refactor test_driver.cc so that runtest is not one huge function.
-
-* Consider creating a qpdf wiki. See also Documentation below.
 
 Documentation
 =============
