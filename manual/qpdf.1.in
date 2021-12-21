@@ -1,6 +1,6 @@
 .\" This file is not processed by autoconf, but rather by build.mk in
 .\" the manual directory.
-.TH QPDF "1" "April 2008" "qpdf version @PACKAGE_VERSION@" "User Commands"
+.TH QPDF "1" "" "qpdf version @PACKAGE_VERSION@" "User Commands"
 .SH NAME
 qpdf \- PDF transformation software
 .SH SYNOPSIS
@@ -14,6 +14,7 @@ viewing), encryption, and decryption of PDF files.  It also has many
 options for inspecting or checking PDF files, some of which are
 useful primarily to PDF developers.
 .PP
-For a summary of qpdf's options, please run
-\fBqpdf \-\-help\fR.  A complete manual can be found in
-@docdir@/html/index.html or @docdir@/qpdf-manual.pdf.
+For a summary of qpdf's options, please run \fBqpdf \-\-help\fR. A
+complete manual can be found in @docdir@/html/index.html or
+@docdir@/qpdf-manual.pdf. The latest version of the documentation can
+be found at https://qpdf.readthedocs.io.
