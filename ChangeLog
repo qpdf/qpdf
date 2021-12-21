@@ -1,5 +1,7 @@
 2021-12-21  Jay Berkenbilt  <ejb@ql.org>
 
+	* 10.5.0: release
+
 	* Discontinue inclusion of the pre-built documentation in the
 	source distribution. Consult the packaging documentation in the
 	manual for details. The file README-doc.txt is installed in the
