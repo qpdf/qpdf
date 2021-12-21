@@ -23,3 +23,7 @@ Virtually all Linux distributions include packages for qpdf. There is also a PPA
 Windows Build Support
 
 If you are building on Windows and want to use pre-built external static libraries, you should obtain current versions from https://github.com/qpdf/external-libs/releases. The `external-libs` directory contains older versions that will not work with qpdf versions >= 10.0.2. Please see README-windows.md in the qpdf source distribution.
+
+Documentation
+
+* `qpdf-<version>-doc.zip` - This is a downloadable version of the QPDF manual. An online version is hosted at https://qpdf.readthedocs.io.
