@@ -21,6 +21,7 @@ documentation, please visit `https://qpdf.readthedocs.io
    license
    download
    installation
+   packaging
    cli
    qdf
    library

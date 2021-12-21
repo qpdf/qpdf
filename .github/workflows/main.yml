@@ -21,14 +21,13 @@ on:
 jobs:
   Prebuild:
     # Run steps that are needed by the Windows build but are easier to
-    # build on Linux. Although only the Windows builds need this,
-    # other jobs depend on it to force it to run early.
+    # build on Linux. Also create the documentation distribution.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: 'Run pre-build steps'
         run: build-scripts/prebuild
-      - name: 'Upload extra distribution files'
+      - name: 'Upload documentation for later build steps'
         uses: actions/upload-artifact@v1
         with:
           name: doc
@@ -38,6 +37,11 @@ jobs:
         with:
           name: external-libs
           path: external-libs-dist
+      - name: 'Upload doc distribution'
+        uses: actions/upload-artifact@v1
+        with:
+          name: distribution
+          path: distribution
   Linux:
     runs-on: ubuntu-latest
     steps:

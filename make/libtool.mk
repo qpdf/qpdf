@@ -137,13 +137,5 @@ install: all install-libs
 	$(LIBTOOL) --mode=install ./install-sh \
 		qpdf/$(OUTPUT_DIR)/fix-qdf \
 		$(DESTDIR)$(bindir)/fix-qdf
-	if [ -f doc/qpdf-manual.pdf ]; then \
-		./install-sh -m 0644 doc/qpdf-manual.pdf $(DESTDIR)$(docdir); \
-	fi
-	if [ -d doc/html ]; then \
-		cp -r doc/html $(DESTDIR)/$(docdir); \
-	fi
-	if [ -d doc/singlehtml ]; then \
-		cp -r doc/singlehtml $(DESTDIR)/$(docdir); \
-	fi
-	./install-sh -m 0644 doc/*.1 $(DESTDIR)$(mandir)/man1
+	./install-sh -m 0644 README-doc.txt $(DESTDIR)$(docdir); \
+	./install-sh -m 0644 manual/$(OUTPUT_DIR)/*.1 $(DESTDIR)$(mandir)/man1

@@ -106,7 +106,6 @@ distclean: clean
 
 maintainer-clean: distclean
 	$(RM) -r install-mingw* install-msvc* external-libs
-	$(RM) -rf doc
 
 .PHONY: $(TEST_TARGETS)
 

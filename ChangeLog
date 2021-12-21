@@ -1,3 +1,11 @@
+2021-12-21  Jay Berkenbilt  <ejb@ql.org>
+
+	* Discontinue inclusion of the pre-built documentation in the
+	source distribution. Consult the packaging documentation in the
+	manual for details. The file README-doc.txt is installed in the
+	doc directory by default and contains information that users will
+	need to know to find the documentation.
+
 2021-12-19  Jay Berkenbilt  <ejb@ql.org>
 
 	* C API: clarify documentation around string lengths. Add two new

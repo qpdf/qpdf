@@ -6,28 +6,24 @@ Release Notes
 For a detailed list of changes, please see the file
 :file:`ChangeLog` in the source distribution.
 
-10.5.0: December 20, 2021
+10.5.0: December 21, 2021
   - Packaging changes
 
-    - The structure of the ``doc`` directory is different. The PDF
-      documentation is in the same place, but the files for the
-      previous HTML documentation are no longer there. Instead, there
-      are ``html`` and ``singlehtml`` directories, each of which
-      contain ``index.html`` and other files and directories. The
-      distribution files and ``make install`` target handle this, but
-      if you are building your own packages and including
-      documentation, please double check to make sure that you are
-      including the right documentation files.
+    - Pre-built documentation is no longer distributed with the source
+      distribution. The AppImage and Windows binary distributions
+      still contain embedded documentation, and a separate ``doc``
+      distribution file is available from the qpdf release site.
+      Documentation is now available at `https://qpdf.readthedocs.io
+      <https://qpdf.readthedocs.io>`__ for every major/minor version
+      starting with version 10.5. Please see :ref:`packaging-doc` for
+      details on how packagers should handle documentation.
 
     - The documentation sources have been switched from docbook to
       reStructuredText processed with `Sphinx
-      <https://sphinx-doc.org>`__. This will break previous
+      <https://www.sphinx-doc.org>`__. This will break previous
       documentation links. A redirect is in place on the main website.
       A top-to-bottom review of the documentation is planned for an
       upcoming release.
-
-    - Documentation is now available at `https://qpdf.readthedocs.io
-      <https://qpdf.readthedocs.io>`__.
 
   - Library Enhancements
 

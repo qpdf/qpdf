@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 #
 # This program creates a source distribution of qpdf.  For details,
-# see README-maintainer.md.
+# see README-maintainer.
 #
 
 require 5.008;
@@ -16,7 +16,6 @@ use File::Path qw(rmtree make_path);
 my $whoami = basename($0);
 
 my $tmp = $ENV{'TMPDIR'} || '/tmp';
-my $run_tests = 1;
 my $keep_tmp = 0;
 my $ci_mode = 0;
 my $version = undef;
@@ -24,7 +23,7 @@ foreach my $arg (@ARGV)
 {
     if ($arg eq '--no-tests')
     {
-	$run_tests = 0;
+        # ignore for compatibility
     }
     elsif ($arg eq '--keep-tmp')
     {
@@ -93,19 +92,8 @@ if ($version_error)
     die "$whoami: version numbers are not consistent\n";
 }
 
-run("./configure --disable-shared --enable-doc-maintenance --enable-werror");
-run("make -j8 build_manual");
-run("make distclean");
 cd($tmp);
 run("tar czvf $distname.tar.gz-candidate $distname");
-if ($run_tests)
-{
-    cd($tmpdir);
-    run("./configure");
-    run("make -j8");
-    run("make check");
-    cd($tmp);
-}
 my $distfile = ($ci_mode ? "$distname-ci.tar.gz" : "$distname.tar.gz");
 rename "$distname.tar.gz-candidate", $distfile or die;
 

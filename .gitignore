@@ -5,8 +5,6 @@ autoconf.mk
 autom4te.cache/
 config.log
 config.status
-doc
-doc.zip
 examples/build/
 external-libs
 fuzz/build/

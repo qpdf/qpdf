@@ -11,6 +11,7 @@ import sphinx_rtd_theme  # noQA F401
 project = 'QPDF'
 copyright = '2005-2021, Jay Berkenbilt'
 author = 'Jay Berkenbilt'
+# make_dist and the CI build lexically find the release version from this file.
 release = '10.5.0'
 version = release
 extensions = [

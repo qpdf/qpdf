@@ -21,8 +21,6 @@ This program should not be used as a general purpose compression
 tool.  Use something like gzip(1) instead.
 .PP
 For details about qpdf, please see the qpdf manual, which can be found
-in @docdir@/html/index.html or @docdir@/qpdf-manual.pdf. The latest
-version of the documentation can be found at
-https://qpdf.readthedocs.io.
+at https://qpdf.readthedocs.io.
 .SH "SEE ALSO"
 qpdf(1), gzip(1)

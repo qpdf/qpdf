@@ -15,6 +15,4 @@ options for inspecting or checking PDF files, some of which are
 useful primarily to PDF developers.
 .PP
 For a summary of qpdf's options, please run \fBqpdf \-\-help\fR. A
-complete manual can be found in @docdir@/html/index.html or
-@docdir@/qpdf-manual.pdf. The latest version of the documentation can
-be found at https://qpdf.readthedocs.io.
+complete manual can be found at https://qpdf.readthedocs.io.

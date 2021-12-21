@@ -14,8 +14,6 @@ the same file with stream lengths, cross-reference table entries, and
 object stream offset tables regenerated.
 .PP
 For details about fix-qdf and about PDF files in QDF mode, please see
-the qpdf manual, which can be found in @docdir@/html/index.html or
-@docdir@/qpdf-manual.pdf. The latest version of the documentation can
-be found at https://qpdf.readthedocs.io.
+the qpdf manual, which can be found at https://qpdf.readthedocs.io.
 .SH "SEE ALSO"
 qpdf(1)

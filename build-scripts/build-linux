@@ -3,10 +3,8 @@ set -ex
 sudo apt-get update
 sudo apt-get -y install \
    autoconf build-essential zlib1g-dev libjpeg-dev libgnutls28-dev \
-   libssl-dev python3-pip texlive-latex-extra latexmk \
-   inkscape imagemagick libtiff-tools ghostscript
-pip3 install sphinx sphinx_rtd_theme
-./configure --enable-werror --enable-doc-maintenance \
+   libssl-dev libtiff-tools ghostscript
+./configure --enable-werror \
     --enable-crypto-native --enable-crypto-openssl --enable-crypto-gnutls \
     --enable-show-failed-test-output --enable-test-compare-images
 make -j$(nproc) -k
@@ -16,7 +14,7 @@ for i in $(./qpdf/build/qpdf --show-crypto); do
 done
 export TMPDIR=$PWD/dist-tmp
 rm -rf $TMPDIR
-./make_dist --ci --no-tests
+./make_dist --ci
 mkdir distribution
 cp $TMPDIR/qpdf*-ci.tar.gz distribution
 sha256sum distribution/*

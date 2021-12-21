@@ -4,10 +4,6 @@ ROUTINE DEVELOPMENT
 
 Default:
 
-./configure CXX="g++ --std=c++14" --enable-werror
-
-Doc:
-
 ./configure CXX="g++ --std=c++14" --enable-werror --enable-doc-maintenance
 
 Debugging:
@@ -362,13 +358,6 @@ rsync -vrlcO ./ jay_berkenbilt,qpdf@frs.sourceforge.net:/home/frs/project/q/qp/q
 
 
 OTHER NOTES
-
-To construct a source distribution from a pristine checkout,
-`make_dist` does the following:
-
-./configure --enable-doc-maintenance --enable-werror
-make build_manual
-make distclean
 
 For local iteration on the AppImage generation, it works to just
 ./build-scripts/build-appimage and get the resulting AppImage from
