@@ -3,6 +3,23 @@ Next
 
 * High-level API/doc overhaul: #593
 
+Consider in the context of #593, possibly with a different
+implementation
+
+* replace mode: --replace-object, --replace-stream-raw,
+  --replace-stream-filtered
+  * update first paragraph of QPDF JSON in the manual to mention this
+  * object numbers are not preserved by write, so object ID lookup
+    has to be done separately for each invocation
+  * you don't have to specify length for streams
+  * you only have to specify filtering for streams if providing raw data
+
+* See if this has been done or is trivial with C++11 local static
+  initializers: Secure random number generation could be made more
+  efficient by using a local static to ensure a single random device
+  or crypt provider as long as this can be done in a thread-safe
+  fashion.
+
 Documentation
 =============
 
@@ -20,6 +37,8 @@ Documentation
 
 Document-level work
 ===================
+
+* Ideas here may by superseded by #593.
 
 * QPDFPageCopier -- object for moving pages around within files or
   between files and performing various transformations
@@ -96,19 +115,6 @@ Fuzz Errors
 
 * Ignoring these:
   * Out of memory in dct: 35001, 32516
-
-GitHub Actions
-==============
-
-* Actions are triggered on push to main and master. When we eventually
-  rename master to main, make sure the reference to master is removed
-  from .github/workflows/*.yml.
-
-* At the time of migrating from Azure Pipelines to GitHub Actions
-  (2020-10), there was no standard test result publisher (to replace
-  the PublishTestResults@2 task). There are some third-party actions,
-  but I'd rather not depend on them. Keep an eye open for this coming
-  to GitHub Actions.
 
 External Libraries
 ==================
@@ -288,66 +294,6 @@ Page splitting/merging
 
  * Form fields: should be similar to outlines.
 
-Performance
-===========
-
-As described in https://github.com/qpdf/qpdf/issues/401, there was
-great performance degradation between qpdf 7.1.1 and 9.1.1. Doing a
-bisect between dac65a21fb4fa5f871e31c314280b75adde89a6c and
-release-qpdf-7.1.1, I found several commits that damaged performance.
-I fixed some of them to improve performance by about 70% (as measured
-by saying that old times were 170% of new times). The remaining
-commits that broke performance either can't be correct because they
-would re-introduce an old bug or aren't worth correcting because of
-the high value they offer relative to a relatively low penalty. For
-historical reference, here are the commits. The numbers are the time
-in seconds on the machine I happened to be using of splitting the
-first 100 pages of PDF32000_2008.pdf 20 times and taking an average
-duration.
-
-Commits that broke performance:
-
-* d0e99f195a987c483bbb6c5449cf39bee34e08a1 -- object description and
-  context: 0.39 -> 0.45
-* a01359189b32c60c2d55b039f7aefd6c3ce0ebde (minus 313ba08) -- fix
-  dangling references: 0.55 -> 0.6
-* e5f504b6c5dc34337cc0b316b4a7b1fca7e614b1 -- sparse array: 0.6 -> 0.62
-
-Other intermediate steps that were previously fixed:
-
-* 313ba081265f69ac9a0324f9fe87087c72918191 -- copy outlines into
-  split: 0.55 -> 4.0
-* a01359189b32c60c2d55b039f7aefd6c3ce0ebde -- fix dangling references:
-  4.0 -> 9.0
-
-This commit fixed the awful problem introduced in 313ba081:
-
-* a5a016cdd26a8e5c99e5f019bc30d1bdf6c050a2 -- revert outline
-  preservation: 9.0 -> 0.6
-
-Note that the fix dangling references commit had a much worse impact
-prior to removing the outline preservation, so I also measured its
-impact in isolation.
-
-A few important lessons:
-
-* Indirection through PointerHolder<Members> is expensive, and should
-  not be used for things that are created and destroyed frequently
-  such as QPDFObjectHandle and QPDFObject.
-* Traversal of objects is expensive and should be avoided where
-  possible.
-
-Future ideas:
-
-* Look at places in the code where object traversal is being done and,
-  where possible, try to avoid it entirely or at least avoid ever
-  traversing the same objects multiple times.
-* Avoid attaching too much metadata to objects and object handles
-  since those have to get copied around a lot.
-
-Also, it turns out that PointerHolder is more performant than
-std::shared_ptr.
-
 Analytics
 =========
 
@@ -406,9 +352,6 @@ I find it useful to make reference to them in this list.
    dictionary may need to be changed -- create test cases with lots of
    duplicated/overlapping keys.
 
- * Investigate whether there is a way to automate the memory checker
-   tests for Windows.
-
  * Part of closed_file_input_source.cc is disabled on Windows because
    of odd failures. It might be worth investigating so we can fully
    exercise this in the test suite. That said, ClosedFileInputSource
@@ -434,14 +377,6 @@ I find it useful to make reference to them in this list.
  * Additional form features
    * set value from CLI? Specify title, and provide way to
      disambiguate, probably by giving objgen of field
-
- * replace mode: --replace-object, --replace-stream-raw,
-   --replace-stream-filtered
-   * update first paragraph of QPDF JSON in the manual to mention this
-   * object numbers are not preserved by write, so object ID lookup
-     has to be done separately for each invocation
-   * you don't have to specify length for streams
-   * you only have to specify filtering for streams if providing raw data
 
  * Pl_TIFFPredictor is pretty slow.
 
@@ -486,46 +421,6 @@ I find it useful to make reference to them in this list.
 
  * Look at ~/Q/pdf-collection/forms-from-appian/
 
- * Consider adding "uninstall" target to makefile. It should only
-   uninstall what it installed, which means that you must run
-   uninstall from the version you ran install with. It would only be
-   supported for the toolchains that support the install target
-   (libtool).
-
- * Provide support in QPDFWriter for writing incremental updates.
-   Provide support in qpdf for preserving incremental updates.  The
-   goal should be that QDF mode should be fully functional for files
-   with incremental updates including fix_qdf.
-
-   Note that there's nothing that says an indirect object in one
-   update can't refer to an object that doesn't appear until a later
-   update.  This means that QPDF has to treat indirect null objects
-   differently from how it does now.  QPDF drops indirect null objects
-   that appear as members of arrays or dictionaries.  For arrays, it's
-   handled in QPDFWriter where we make indirect nulls direct.  This is
-   in a single if block, and nothing else in the code cares about it.
-   We could just remove that if block and not break anything except a
-   few test cases that exercise the current behavior.  For
-   dictionaries, it's more complicated.  In this case,
-   QPDF_Dictionary::getKeys() ignores all keys with null values, and
-   hasKey() returns false for keys that have null values.  We would
-   probably want to make QPDF_Dictionary able to handle the special
-   case of keys that are indirect nulls and basically never have it
-   drop any keys that are indirect objects.
-
-   If we make a change to have qpdf preserve indirect references to
-   null objects, we have to note this in ChangeLog and in the release
-   notes since this will change output files.  We did this before when
-   we stopped flattening scalar references, so this is probably not a
-   big deal.  We also have to make sure that the testing for this
-   handles non-trivial cases of the targets of indirect nulls being
-   replaced by real objects in an update.  I'm not sure how this plays
-   with linearization, if at all.  For cases where incremental updates
-   are not being preserved as incremental updates and where the data
-   is being folded in (as is always the case with qpdf now), none of
-   this should make any difference in the actual semantics of the
-   files.
-
  * When decrypting files with /R=6, hash_V5 is called more than once
    with the same inputs.  Caching the results or refactoring to reduce
    the number of identical calls could improve performance for
@@ -536,12 +431,6 @@ I find it useful to make reference to them in this list.
    and replace the /Pages key of the root dictionary with the new
    tree.
 
- * Secure random number generation could be made more efficient by
-   using a local static to ensure a single random device or crypt
-   provider as long as this can be done in a thread-safe fashion.  In
-   the initial implementation, this is being skipped to avoid having
-   to add any dependencies on threading libraries.
-
  * Study what's required to support savable forms that can be saved by
    Adobe Reader. Does this require actually signing the document with
    an Adobe private key? Search for "Digital signatures" in the PDF
@@ -551,19 +440,6 @@ I find it useful to make reference to them in this list.
    implemented, update the docs on crypto providers, which mention
    that this may happen in the future.
 
- * Provide APIs for embedded files.  See *attachments*.pdf in test
-   suite.  The private method findAttachmentStreams finds at least
-   cases for modern versions of Adobe Reader (>= 1.7, maybe earlier).
-   PDF Reference 1.7 section 3.10, "File Specifications", discusses
-   this.
-
-   A sourceforge user asks if qpdf can handle extracting and embedded
-   resources and references these tools, which may be useful as a
-   reference.
-
-   http://multivalent.sourceforge.net/Tools/pdf/Extract.html
-   http://multivalent.sourceforge.net/Tools/pdf/Embed.html
-
  * Qpdf does not honor /EFF when adding new file attachments. When it
    encrypts, it never generates streams with explicit crypt filters.
    Prior to 10.2, there was an incorrect attempt to treat /EFF as a
@@ -571,15 +447,6 @@ I find it useful to make reference to them in this list.
    supposed to mean that. Instead, it is intended for conforming
    writers to obey this when adding new attachments. Qpdf is not a
    conforming writer in that respect.
-
- * The second xref stream for linearized files has to be padded only
-   because we need file_size as computed in pass 1 to be accurate.  If
-   we were not allowing writing to a pipe, we could seek back to the
-   beginning and fill in the value of /L in the linearization
-   dictionary as an optimization to alleviate the need for this
-   padding.  Doing so would require us to pad the /L value
-   individually and also to save the file descriptor and determine
-   whether it's seekable.  This is probably not worth bothering with.
 
  * The whole xref handling code in the QPDF object allows the same
    object with more than one generation to coexist, but a lot of logic
@@ -592,10 +459,6 @@ I find it useful to make reference to them in this list.
    that case.  In fact, it appears that Adobe reader and other PDF
    viewing software silently ignores objects of this type, so this is
    probably not a big deal.
-
- * Based on an idea suggested by user "Atom Smasher", consider
-   providing some mechanism to recover earlier versions of a file
-   embedded prior to appended sections.
 
  * From a suggestion in bug 3152169, consider having an option to
    re-encode inline images with an ASCII encoding.
@@ -616,70 +479,190 @@ I find it useful to make reference to them in this list.
    fonts or font metrics, see email from Tobias with Message-ID
    <5C3C9C6C.8000102@thax.hardliners.org> dated 2019-01-14.
 
- * Consider creating a sanitizer to make it easier for people to send
-   broken files. Now that we have json mode, this is probably no
-   longer worth doing. Here is the previous idea, possibly implemented
-   by making it possible to run the lexer (tokenizer) over a whole
-   file. Make it possible to replace all strings in a file lexically
-   even on badly broken files. Ideally this should work files that are
-   lacking xref, have broken links, duplicated dictionary keys, syntax
-   errors, etc., and ideally it should work with encrypted files if
-   possible. This should go through the streams and strings and
-   replace them with fixed or random characters, preferably, but not
-   necessarily, in a manner that works with fonts. One possibility
-   would be to detect whether a string contains characters with normal
-   encoding, and if so, use 0x41. If the string uses character maps,
-   use 0x01. The output should otherwise be unrelated to the input.
-   This could be built after the filtering and tokenizer rewrite and
-   should be done in a manner that takes advantage of the other
-   lexical features. This sanitizer should also clear metadata and
-   replace images. If I ever do this, the file from issue #494 would
-   be a great one to look at.
+ * Look at places in the code where object traversal is being done and,
+   where possible, try to avoid it entirely or at least avoid ever
+   traversing the same objects multiple times.
 
- * Here are some notes about having stream data providers modify
-   stream dictionaries. I had wanted to add this functionality to make
-   it more efficient to create stream data providers that may
-   dynamically decide what kind of filters to use and that may end up
-   modifying the dictionary conditionally depending on the original
-   stream data. Ultimately I decided not to implement this feature.
-   This paragraph describes why.
+----------------------------------------------------------------------
 
-   * When writing, the way objects are placed into the queue for
-     writing strongly precludes creation of any new indirect objects,
-     or even changing which indirect objects are referenced from which
-     other objects, because we sometimes write as we are traversing
-     and enqueuing objects. For non-linearized files, there is a risk
-     that an indirect object that used to be referenced would no
-     longer be referenced, and whether it was already written to the
-     output file would be based on an accident of where it was
-     encountered when traversing the object structure. For linearized
-     files, the situation is considerably worse. We decide which
-     section of the file to write an object to based on a mapping of
-     which objects are used by which other objects. Changing this
-     mapping could cause an object to appear in the wrong section, to
-     be written even though it is unreferenced, or to be entirely
-     omitted since, during linearization, we don't enqueue new objects
-     as we traverse for writing.
+HISTORICAL NOTES
 
-   * There are several places in QPDFWriter that query a stream's
-     dictionary in order to prepare for writing or to make decisions
-     about certain aspects of the writing process. If the stream data
-     provider has the chance to modify the dictionary, every piece of
-     code that gets stream data would have to be aware of this. This
-     would potentially include end user code. For example, any code
-     that called getDict() on a stream before installing a stream data
-     provider and expected that dictionary to be valid would
-     potentially be broken. As implemented right now, you must perform
-     any modifications on the dictionary in advance and provided
-     /Filter and /DecodeParms at the time you installed the stream
-     data provider. This means that some computations would have to be
-     done more than once, but for linearized files, stream data
-     providers are already called more than once. If the work done by
-     a stream data provider is especially expensive, it can implement
-     its own cache.
+Performance
+===========
 
-   The example examples/pdf-custom-filter.cc demonstrates the use of
-   custom stream filters. This includes a custom pipeline, a custom
-   stream filter, as well as modification of a stream's dictionary to
-   include creation of a new stream that is referenced from
-   /DecodeParms.
+As described in https://github.com/qpdf/qpdf/issues/401, there was
+great performance degradation between qpdf 7.1.1 and 9.1.1. Doing a
+bisect between dac65a21fb4fa5f871e31c314280b75adde89a6c and
+release-qpdf-7.1.1, I found several commits that damaged performance.
+I fixed some of them to improve performance by about 70% (as measured
+by saying that old times were 170% of new times). The remaining
+commits that broke performance either can't be correct because they
+would re-introduce an old bug or aren't worth correcting because of
+the high value they offer relative to a relatively low penalty. For
+historical reference, here are the commits. The numbers are the time
+in seconds on the machine I happened to be using of splitting the
+first 100 pages of PDF32000_2008.pdf 20 times and taking an average
+duration.
+
+Commits that broke performance:
+
+* d0e99f195a987c483bbb6c5449cf39bee34e08a1 -- object description and
+  context: 0.39 -> 0.45
+* a01359189b32c60c2d55b039f7aefd6c3ce0ebde (minus 313ba08) -- fix
+  dangling references: 0.55 -> 0.6
+* e5f504b6c5dc34337cc0b316b4a7b1fca7e614b1 -- sparse array: 0.6 -> 0.62
+
+Other intermediate steps that were previously fixed:
+
+* 313ba081265f69ac9a0324f9fe87087c72918191 -- copy outlines into
+  split: 0.55 -> 4.0
+* a01359189b32c60c2d55b039f7aefd6c3ce0ebde -- fix dangling references:
+  4.0 -> 9.0
+
+This commit fixed the awful problem introduced in 313ba081:
+
+* a5a016cdd26a8e5c99e5f019bc30d1bdf6c050a2 -- revert outline
+  preservation: 9.0 -> 0.6
+
+Note that the fix dangling references commit had a much worse impact
+prior to removing the outline preservation, so I also measured its
+impact in isolation.
+
+A few important lessons (in README-maintainer)
+
+* Indirection through PointerHolder<Members> is expensive, and should
+  not be used for things that are created and destroyed frequently
+  such as QPDFObjectHandle and QPDFObject.
+* Traversal of objects is expensive and should be avoided where
+  possible.
+
+Also, it turns out that PointerHolder is more performant than
+std::shared_ptr.
+
+
+Rejected Ideas
+==============
+
+* Investigate whether there is a way to automate the memory checker
+  tests for Windows.
+
+* Consider adding "uninstall" target to makefile. It should only
+  uninstall what it installed, which means that you must run
+  uninstall from the version you ran install with. It would only be
+  supported for the toolchains that support the install target
+  (libtool).
+
+* Provide support in QPDFWriter for writing incremental updates.
+  Provide support in qpdf for preserving incremental updates.  The
+  goal should be that QDF mode should be fully functional for files
+  with incremental updates including fix_qdf.
+
+  Note that there's nothing that says an indirect object in one
+  update can't refer to an object that doesn't appear until a later
+  update.  This means that QPDF has to treat indirect null objects
+  differently from how it does now.  QPDF drops indirect null objects
+  that appear as members of arrays or dictionaries.  For arrays, it's
+  handled in QPDFWriter where we make indirect nulls direct.  This is
+  in a single if block, and nothing else in the code cares about it.
+  We could just remove that if block and not break anything except a
+  few test cases that exercise the current behavior.  For
+  dictionaries, it's more complicated.  In this case,
+  QPDF_Dictionary::getKeys() ignores all keys with null values, and
+  hasKey() returns false for keys that have null values.  We would
+  probably want to make QPDF_Dictionary able to handle the special
+  case of keys that are indirect nulls and basically never have it
+  drop any keys that are indirect objects.
+
+  If we make a change to have qpdf preserve indirect references to
+  null objects, we have to note this in ChangeLog and in the release
+  notes since this will change output files.  We did this before when
+  we stopped flattening scalar references, so this is probably not a
+  big deal.  We also have to make sure that the testing for this
+  handles non-trivial cases of the targets of indirect nulls being
+  replaced by real objects in an update.  I'm not sure how this plays
+  with linearization, if at all.  For cases where incremental updates
+  are not being preserved as incremental updates and where the data
+  is being folded in (as is always the case with qpdf now), none of
+  this should make any difference in the actual semantics of the
+  files.
+
+* The second xref stream for linearized files has to be padded only
+  because we need file_size as computed in pass 1 to be accurate.  If
+  we were not allowing writing to a pipe, we could seek back to the
+  beginning and fill in the value of /L in the linearization
+  dictionary as an optimization to alleviate the need for this
+  padding.  Doing so would require us to pad the /L value
+  individually and also to save the file descriptor and determine
+  whether it's seekable.  This is probably not worth bothering with.
+
+* Based on an idea suggested by user "Atom Smasher", consider
+  providing some mechanism to recover earlier versions of a file
+  embedded prior to appended sections.
+
+* Consider creating a sanitizer to make it easier for people to send
+  broken files. Now that we have json mode, this is probably no
+  longer worth doing. Here is the previous idea, possibly implemented
+  by making it possible to run the lexer (tokenizer) over a whole
+  file. Make it possible to replace all strings in a file lexically
+  even on badly broken files. Ideally this should work files that are
+  lacking xref, have broken links, duplicated dictionary keys, syntax
+  errors, etc., and ideally it should work with encrypted files if
+  possible. This should go through the streams and strings and
+  replace them with fixed or random characters, preferably, but not
+  necessarily, in a manner that works with fonts. One possibility
+  would be to detect whether a string contains characters with normal
+  encoding, and if so, use 0x41. If the string uses character maps,
+  use 0x01. The output should otherwise be unrelated to the input.
+  This could be built after the filtering and tokenizer rewrite and
+  should be done in a manner that takes advantage of the other
+  lexical features. This sanitizer should also clear metadata and
+  replace images. If I ever do this, the file from issue #494 would
+  be a great one to look at.
+
+* Here are some notes about having stream data providers modify
+  stream dictionaries. I had wanted to add this functionality to make
+  it more efficient to create stream data providers that may
+  dynamically decide what kind of filters to use and that may end up
+  modifying the dictionary conditionally depending on the original
+  stream data. Ultimately I decided not to implement this feature.
+  This paragraph describes why.
+
+  * When writing, the way objects are placed into the queue for
+    writing strongly precludes creation of any new indirect objects,
+    or even changing which indirect objects are referenced from which
+    other objects, because we sometimes write as we are traversing
+    and enqueuing objects. For non-linearized files, there is a risk
+    that an indirect object that used to be referenced would no
+    longer be referenced, and whether it was already written to the
+    output file would be based on an accident of where it was
+    encountered when traversing the object structure. For linearized
+    files, the situation is considerably worse. We decide which
+    section of the file to write an object to based on a mapping of
+    which objects are used by which other objects. Changing this
+    mapping could cause an object to appear in the wrong section, to
+    be written even though it is unreferenced, or to be entirely
+    omitted since, during linearization, we don't enqueue new objects
+    as we traverse for writing.
+
+  * There are several places in QPDFWriter that query a stream's
+    dictionary in order to prepare for writing or to make decisions
+    about certain aspects of the writing process. If the stream data
+    provider has the chance to modify the dictionary, every piece of
+    code that gets stream data would have to be aware of this. This
+    would potentially include end user code. For example, any code
+    that called getDict() on a stream before installing a stream data
+    provider and expected that dictionary to be valid would
+    potentially be broken. As implemented right now, you must perform
+    any modifications on the dictionary in advance and provided
+    /Filter and /DecodeParms at the time you installed the stream
+    data provider. This means that some computations would have to be
+    done more than once, but for linearized files, stream data
+    providers are already called more than once. If the work done by
+    a stream data provider is especially expensive, it can implement
+    its own cache.
+
+  The example examples/pdf-custom-filter.cc demonstrates the use of
+  custom stream filters. This includes a custom pipeline, a custom
+  stream filter, as well as modification of a stream's dictionary to
+  include creation of a new stream that is referenced from
+  /DecodeParms.

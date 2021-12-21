@@ -110,7 +110,16 @@ CODING RULES
   the shared library boundary.
 
 * Put private member variables in PointerHolder<Members> for all
-  public classes. Remember to use QPDF_DLL on ~Members().
+  public classes. Remember to use QPDF_DLL on ~Members(). Exception:
+  indirection through PointerHolder<Members> is expensive, so don't do
+  it for classes that are copied a lot, like QPDFObjectHandle and
+  QPDFObject.
+
+* Traversal of objects is expensive. It's worth adding some complexity
+  to avoid needless traversals of objects.
+
+* Avoid attaching too much metadata to objects and object handles
+  since those have to get copied around a lot.
 
 
 RELEASE PREPARATION
