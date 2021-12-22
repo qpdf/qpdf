@@ -722,6 +722,7 @@ SHA256SUM
 ACLOCAL
 AUTOHEADER
 AUTOCONF
+MAINTAINER_MODE
 target_alias
 host_alias
 build_alias
@@ -764,6 +765,7 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
+enable_maintainer_mode
 enable_check_autofiles
 enable_shared
 enable_static
@@ -1445,6 +1447,10 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --enable-maintainer-mode
+                          turn on features intended for maintainers that may
+                          change generated files and require additional tools;
+                          implies enable-doc-maintenances
   --enable-check-autofiles
                           if specified, verify checksums on automatically
                           generated files (default=yes); package maintainers
@@ -1488,7 +1494,8 @@ Optional Features:
                           console; useful for building on build servers where
                           you can't easily open the test output files
   --enable-doc-maintenance
-                          if set, enables all documentation options
+                          if set, enables all documentation options; also
+                          turned on by maintainer mode
   --enable-html-doc       whether to build HTML documents
   --enable-pdf-doc        whether to build PDF documents
   --enable-oss-fuzz       if set, build static fuzzers for oss-fuzz
@@ -2645,6 +2652,19 @@ ac_config_files="$ac_config_files libqpdf.pc"
 ac_config_files="$ac_config_files libqpdf.map"
 
 ac_config_headers="$ac_config_headers libqpdf/qpdf/qpdf-config.h"
+
+
+
+# Check whether --enable-maintainer-mode was given.
+if test "${enable_maintainer_mode+set}" = set; then :
+  enableval=$enable_maintainer_mode; if test "$enableval" = "no"; then
+      MAINTAINER_MODE=0
+    else
+      MAINTAINER_MODE=1
+    fi
+else
+  MAINTAINER_MODE=0
+fi
 
 
 # Check whether --enable-check-autofiles was given.
@@ -18594,7 +18614,7 @@ if test "${enable_doc_maintenance+set}" = set; then :
       doc_default=0;
     fi
 else
-  doc_default=0
+  doc_default=$MAINTAINER_MODE
 fi
 
 

@@ -10,6 +10,17 @@ AC_CONFIG_FILES([libqpdf.pc])
 AC_CONFIG_FILES([libqpdf.map])
 AC_CONFIG_HEADERS([libqpdf/qpdf/qpdf-config.h])
 
+AC_SUBST(MAINTAINER_MODE)
+AC_ARG_ENABLE(maintainer-mode,
+   AS_HELP_STRING([--enable-maintainer-mode],
+		  [turn on features intended for maintainers that may change generated files and require additional tools; implies enable-doc-maintenances]),
+   [if test "$enableval" = "no"; then
+      MAINTAINER_MODE=0
+    else
+      MAINTAINER_MODE=1
+    fi],
+   [MAINTAINER_MODE=0])
+
 AC_ARG_ENABLE(check-autofiles,
    AS_HELP_STRING([--enable-check-autofiles],
 		  [if specified, verify checksums on automatically generated files (default=yes); package maintainers may want to disable this]),
@@ -801,13 +812,13 @@ AC_CHECK_PROG(SPHINX,sphinx-build,sphinx-build,[])
 
 AC_ARG_ENABLE(doc-maintenance,
    AS_HELP_STRING([--enable-doc-maintenance],
-		  [if set, enables all documentation options]),
+		  [if set, enables all documentation options; also turned on by maintainer mode]),
    [if test "$enableval" = "yes"; then
       doc_default=1;
     else
       doc_default=0;
     fi],
-   [doc_default=0])
+   [doc_default=$MAINTAINER_MODE])
 
 BUILD_HTML=0
 AC_SUBST(BUILD_HTML)

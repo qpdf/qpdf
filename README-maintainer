@@ -4,17 +4,17 @@ ROUTINE DEVELOPMENT
 
 Default:
 
-./configure CXX="g++ --std=c++14" --enable-werror --enable-doc-maintenance
+./configure CXX="g++ --std=c++14" --enable-werror --enable-maintainer-mode
 
 Debugging:
 
 ./configure CXX="g++ --std=c++14" CFLAGS="-g" CXXFLAGS="-g" \
-   --enable-werror --disable-shared
+   --enable-werror --disable-shared --enable-maintainer-mode
 
 Profiling:
 
 ./configure CXX="g++ --std=c++14" CFLAGS="-g -pg" CXXFLAGS="-g -pg" \
-   LDFLAGS="-pg" --enable-werror --disable-shared
+   LDFLAGS="-pg" --enable-werror --disable-shared --enable-maintainer-mode
 
 Then run `gprof gmon.out`. Note that gmon.out is not cumulative.
 
@@ -24,7 +24,7 @@ Memory checks:
    CXXFLAGS="-fsanitize=address -fsanitize=undefined -g" \
    LDFLAGS="-fsanitize=address -fsanitize=undefined" \
    CC=clang CXX="clang++ --std=c++14" \
-   --enable-werror --disable-shared
+   --enable-werror --disable-shared --enable-maintainer-mode
 
 
 CHECKING DOCS ON readthedocs
