@@ -1,5 +1,11 @@
 TARGETS_libqpdf = libqpdf/$(OUTPUT_DIR)/$(call libname,qpdf)
 
+ifeq ($(MAINTAINER_MODE), 1)
+ifeq ($(shell if ./generate_auto_job --check; then echo 0; else echo 1; fi), 1)
+_ := $(shell ./generate_auto_job --generate)
+endif
+endif
+
 INCLUDES_libqpdf = include libqpdf
 LDFLAGS_libqpdf = -Llibqpdf/$(OUTPUT_DIR)
 LIBS_libqpdf = -lqpdf
