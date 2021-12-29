@@ -926,7 +926,6 @@ class ArgParser
     void usage(std::string const& message);
     void checkCompletion();
     void initOptionTable();
-    void handleHelpArgs();
     void handleArgFileArguments();
     void handleBashArguments();
     void readArgsFromFile(char const* filename);
@@ -3412,37 +3411,6 @@ ArgParser::readArgsFromFile(char const* filename)
 }
 
 void
-ArgParser::handleHelpArgs()
-{
-    // Handle special-case informational options that are only
-    // available as the sole option.
-
-    if (argc != 2)
-    {
-        return;
-    }
-    char* arg = argv[1];
-    if (*arg != '-')
-    {
-        return;
-    }
-    ++arg;
-    if (*arg == '-')
-    {
-        ++arg;
-    }
-    if (! *arg)
-    {
-        return;
-    }
-    if (this->help_option_table.count(arg))
-    {
-        (this->*(this->help_option_table[arg].bare_arg_handler))();
-        exit(0);
-    }
-}
-
-void
 ArgParser::parseRotationParameter(std::string const& parameter)
 {
     std::string angle_str;
@@ -3601,22 +3569,23 @@ void
 ArgParser::parseOptions()
 {
     checkCompletion();
-    if (! this->bash_completion)
-    {
-        handleHelpArgs();
-    }
     handleArgFileArguments();
     for (cur_arg = 1; cur_arg < argc; ++cur_arg)
     {
+        bool help_option = false;
+        auto oep = this->option_table->end();
         char* arg = argv[cur_arg];
+        char* parameter = nullptr;
+        std::string o_arg(arg);
+        std::string arg_s(arg);
         if (strcmp(arg, "--") == 0)
         {
             // Special case for -- option, which is used to break out
             // of subparsers.
-            OptionEntry& oe = (*this->option_table)["--"];
-            if (oe.bare_arg_handler)
+            oep = this->option_table->find("--");
+            if (oep == this->option_table->end())
             {
-                (this->*(oe.bare_arg_handler))();
+                throw std::logic_error("ArgParser: -- handler not registered");
             }
         }
         else if ((arg[0] == '-') && (strcmp(arg, "-") != 0))
@@ -3627,7 +3596,6 @@ ArgParser::parseOptions()
                 // Be lax about -arg vs --arg
                 ++arg;
             }
-            char* parameter = 0;
             if (strlen(arg) > 0)
             {
                 // Prevent --=something from being treated as an empty
@@ -3640,72 +3608,82 @@ ArgParser::parseOptions()
                 *parameter++ = 0;
             }
 
-            std::string arg_s(arg);
-            if (arg_s.empty() ||
-                (arg_s.at(0) == '-') ||
-                (0 == this->option_table->count(arg_s)))
+            arg_s = arg;
+            if (! (arg_s.empty() || (arg_s.at(0) == '-')))
             {
-                usage(std::string("unknown option --") + arg);
+                oep = this->option_table->find(arg_s);
             }
 
-            OptionEntry& oe = (*this->option_table)[arg_s];
-            if ((oe.parameter_needed && (0 == parameter)) ||
-                ((! oe.choices.empty() &&
-                  ((0 == parameter) ||
-                   (0 == oe.choices.count(parameter))))))
+            if ((! this->bash_completion) &&
+                (argc == 2) && (cur_arg == 1) &&
+                (oep == this->option_table->end()))
             {
-                std::string message =
-                    "--" + arg_s + " must be given as --" + arg_s + "=";
-                if (! oe.choices.empty())
-                {
-                    QTC::TC("qpdf", "qpdf required choices");
-                    message += "{";
-                    for (std::set<std::string>::iterator iter =
-                             oe.choices.begin();
-                         iter != oe.choices.end(); ++iter)
-                    {
-                        if (iter != oe.choices.begin())
-                        {
-                            message += ",";
-                        }
-                        message += *iter;
-                    }
-                    message += "}";
-                }
-                else if (! oe.parameter_name.empty())
-                {
-                    QTC::TC("qpdf", "qpdf required parameter");
-                    message += oe.parameter_name;
-                }
-                else
-                {
-                    // should not be possible
-                    message += "option";
-                }
-                usage(message);
-            }
-            if (oe.bare_arg_handler)
-            {
-                (this->*(oe.bare_arg_handler))();
-            }
-            else if (oe.param_arg_handler)
-            {
-                (this->*(oe.param_arg_handler))(parameter);
-            }
-        }
-        else if (0 != this->option_table->count(""))
-        {
-            // The empty string maps to the positional argument
-            // handler.
-            OptionEntry& oe = (*this->option_table)[""];
-            if (oe.param_arg_handler)
-            {
-                (this->*(oe.param_arg_handler))(arg);
+                // Handle help option, which is only valid as the sole
+                // option.
+                oep = this->help_option_table.find(arg_s);
+                help_option = true;
             }
         }
         else
         {
-            usage(std::string("unknown argument ") + arg);
+            // The empty string maps to the positional argument
+            // handler.
+            oep = this->option_table->find("");
+            parameter = arg;
+        }
+
+        if (oep == this->option_table->end())
+        {
+            usage("unrecognized argument " + o_arg);
+        }
+
+        OptionEntry& oe = oep->second;
+        if ((oe.parameter_needed && (0 == parameter)) ||
+            ((! oe.choices.empty() &&
+              ((0 == parameter) ||
+               (0 == oe.choices.count(parameter))))))
+        {
+            std::string message =
+                "--" + arg_s + " must be given as --" + arg_s + "=";
+            if (! oe.choices.empty())
+            {
+                QTC::TC("qpdf", "qpdf required choices");
+                message += "{";
+                for (std::set<std::string>::iterator iter =
+                         oe.choices.begin();
+                     iter != oe.choices.end(); ++iter)
+                {
+                    if (iter != oe.choices.begin())
+                    {
+                        message += ",";
+                    }
+                    message += *iter;
+                }
+                message += "}";
+            }
+            else if (! oe.parameter_name.empty())
+            {
+                QTC::TC("qpdf", "qpdf required parameter");
+                message += oe.parameter_name;
+            }
+            else
+            {
+                // should not be possible
+                message += "option";
+            }
+            usage(message);
+        }
+        if (oe.bare_arg_handler)
+        {
+            (this->*(oe.bare_arg_handler))();
+        }
+        else if (oe.param_arg_handler)
+        {
+            (this->*(oe.param_arg_handler))(parameter);
+        }
+        if (help_option)
+        {
+            exit(0);
         }
     }
     if (this->bash_completion)
