@@ -399,6 +399,7 @@
     "strcasecmp",
     "strerror",
     "strtoui",
+    "struct",
     "stylesheet",
     "subclassing",
     "subkeys",
