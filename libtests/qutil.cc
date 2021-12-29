@@ -203,6 +203,9 @@ void fopen_wrapper_test()
 	std::cout << "exception: " << s.what() << std::endl;
         assert(s.getErrno() != 0);
     }
+
+    assert(QUtil::file_can_be_opened("qutil.out"));
+    assert(! QUtil::file_can_be_opened("/does/not/exist"));
 }
 
 void getenv_test()

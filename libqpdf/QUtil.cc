@@ -515,6 +515,21 @@ QUtil::fopen_wrapper(std::string const& description, FILE* f)
     return f;
 }
 
+bool
+QUtil::file_can_be_opened(char const* filename)
+{
+    try
+    {
+        fclose(safe_fopen(filename, "rb"));
+        return true;
+    }
+    catch (std::runtime_error&)
+    {
+        // can't open the file
+    }
+    return false;
+}
+
 int
 QUtil::seek(FILE* stream, qpdf_offset_t offset, int whence)
 {

@@ -740,21 +740,6 @@ static void parse_object_id(std::string const& objspec,
     }
 }
 
-static bool file_exists(char const* filename)
-{
-    try
-    {
-        fclose(QUtil::safe_fopen(filename, "rb"));
-        return true;
-    }
-    catch (std::runtime_error&)
-    {
-        // can't open the file
-    }
-    return false;
-}
-
-
 // This is not a general-purpose argument parser. It is tightly
 // crafted to work with qpdf. qpdf's command-line syntax is very
 // complex because of its long history, and it doesn't really follow
@@ -2976,7 +2961,7 @@ ArgParser::handleArgFileArguments()
             argfile = 1 + argv[i];
             if (strcmp(argfile, "-") != 0)
             {
-                if (! file_exists(argfile))
+                if (! QUtil::file_can_be_opened(argfile))
                 {
                     // The file's not there; treating as regular option
                     argfile = nullptr;
@@ -3276,7 +3261,7 @@ ArgParser::parsePagesOptions()
         char const* file = argv[cur_arg++];
         char const* password = 0;
         char const* range = argv[cur_arg++];
-        if (! file_exists(file))
+        if (! QUtil::file_can_be_opened(file))
         {
             check_unclosed(file, 0);
         }
@@ -3315,7 +3300,7 @@ ArgParser::parsePagesOptions()
                     // "." means the input file.
                     QTC::TC("qpdf", "qpdf pages range omitted with .");
                 }
-                else if (file_exists(range))
+                else if (QUtil::file_can_be_opened(range))
                 {
                     QTC::TC("qpdf", "qpdf pages range omitted in middle");
                     // Yup, it's a file.

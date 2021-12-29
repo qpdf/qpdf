@@ -111,6 +111,10 @@ namespace QUtil
     QPDF_DLL
     FILE* fopen_wrapper(std::string const&, FILE*);
 
+    // Attempt to open the file read only and then close again
+    QPDF_DLL
+    bool file_can_be_opened(char const* filename);
+
     // Wrap around off_t versions of fseek and ftell if available
     QPDF_DLL
     int seek(FILE* stream, qpdf_offset_t offset, int whence);
