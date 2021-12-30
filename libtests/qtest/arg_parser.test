@@ -1,0 +1,102 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+chdir("arg_parser") or die "chdir testdir failed: $!\n";
+unshift(@INC, '.');
+require completion_helpers;
+
+require TestDriver;
+
+my $td = new TestDriver('arg_parser');
+
+my @completion_tests = (
+    ['', 0, 'bad-input-1'],
+    ['', 1, 'bad-input-2'],
+    ['', 2, 'bad-input-3'],
+    ['arg_parser', 2, 'bad-input-4'],
+    ['arg_parser ', undef, 'top'],
+    ['arg_parser -', undef, 'top-arg'],
+    ['arg_parser --po', undef, 'po'],
+    ['arg_parser --potato ', undef, 'potato'],
+    ['arg_parser --quack ', undef, 'quack'],
+    ['arg_parser --quack -', undef, 'quack-'],
+    ['arg_parser --quack x ', undef, 'quack-x'],
+    ['arg_parser --quack x x ', undef, 'quack-x-x'],
+    ['arg_parser --baaa -', undef, 'baaa'],
+    ['arg_parser --baaa -- --', undef, 'second'],
+    ['arg_parser @quack-xyz ', undef, 'quack-x-y-z'],
+    ['arg_parser --quack \'user " password\' ', undef, 'quack-x'],
+    ['arg_parser --quack \'user password\' ', undef, 'quack-x'],
+    ['arg_parser --quack "user password" ', undef, 'quack-x'],
+    ['arg_parser --quack "user pass\'word" ', undef, 'quack-x'],
+    ['arg_parser --quack user\ password ', undef, 'quack-x'],
+    );
+
+foreach my $c (@completion_tests)
+{
+    my ($cmd, $point, $description) = @$c;
+    my $out = "completion-$description.out";
+    my $zout = "completion-$description-zsh.out";
+    if (! -f $zout)
+    {
+        $zout = $out;
+    }
+    $td->runtest("bash completion: $description",
+                 {$td->COMMAND =>
+                      [@{bash_completion("arg_parser", $cmd, $point)}],
+                      $td->FILTER => "perl filter-completion.pl $out"},
+                 {$td->FILE => "$out", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    $td->runtest("zsh completion: $description",
+                 {$td->COMMAND =>
+                      [@{zsh_completion("arg_parser", $cmd, $point)}],
+                      $td->FILTER => "perl filter-completion.pl $zout"},
+                 {$td->FILE => "$zout", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+my @arg_tests = (
+    ['--potato', 0],            # 0
+    ['--oops', 2],              # 1
+    ['--version', 0],           # 2
+    ['--version --potato', 2],  # 3
+    ['--potato --version', 2],  # 4
+    ['--quack', 2],             # 5
+    ['--quack --', 0],          # 6
+    ['--quack 1 2 3 --', 0],    # 7
+    ['--potato --quack 1 2 3 --' . # 8
+     ' --potato --quack a b c --' .
+     ' --baaa --ram --', 0],
+    ['--baaa --potato --', 2],  # 9
+    ['--baaa --ewe', 2],        # 10
+    ['--oink=baaa', 2],         # 11
+    ['--oink=sow', 0],          # 12
+    ['-oink=sow', 0],           # 13
+    ['@quack-xyz', 2],          # 14
+    ['@quack-xyz --', 0],       # 15
+    ['--salad', 2],             # 16
+    ['--salad=spinach', 0],     # 17
+    );
+
+for (my $i = 0; $i < scalar(@arg_tests); ++$i)
+{
+    my ($args, $status) = @{$arg_tests[$i]};
+    $td->runtest("arg_tests $i",
+                 {$td->COMMAND => "arg_parser $args"},
+                 {$td->FILE => "args-$i.out", $td->EXIT_STATUS => $status},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+$td->runtest("exceptions",
+             {$td->COMMAND => "arg_parser exceptions"},
+             {$td->FILE => "exceptions.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("args from stdin",
+             {$td->COMMAND => 'echo --potato | arg_parser @-'},
+             {$td->FILE => "stdin.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->report(2 + (2 * scalar(@completion_tests)) + scalar(@arg_tests));

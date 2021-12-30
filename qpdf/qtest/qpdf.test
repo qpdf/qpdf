@@ -88,6 +88,11 @@ $td->runtest("UTF-16 encoding errors",
 	     {$td->FILE => "unicode-errors.out", $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+# Tests to exercise QPDFArgParser belong in arg_parser.test in
+# libtests. These tests are supposed to be specific to the qpdf cli.
+# Since they were written prior to moving QPDFArgParser into the
+# library, there are several tests here that also exercise
+# QPDFArgParser logic.
 my @completion_tests = (
     ['', 0, 'bad-input-1'],
     ['', 1, 'bad-input-2'],

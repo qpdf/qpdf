@@ -57,6 +57,7 @@ SRCS_libqpdf = \
 	libqpdf/QPDF.cc \
 	libqpdf/QPDFAcroFormDocumentHelper.cc \
 	libqpdf/QPDFAnnotationObjectHelper.cc \
+	libqpdf/QPDFArgParser.cc \
 	libqpdf/QPDFCryptoProvider.cc \
 	libqpdf/QPDFEFStreamObjectHelper.cc \
 	libqpdf/QPDFEmbeddedFileDocumentHelper.cc \

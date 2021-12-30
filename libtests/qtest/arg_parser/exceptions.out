@@ -1,0 +1,4 @@
+duplicate handler: QPDFArgParser: adding a duplicate handler for option potato in main option table
+duplicate handler: QPDFArgParser: adding a duplicate handler for option ram in baaa option table
+duplicate table: QPDFArgParser: registering already registered option table baaa
+unknown table: QPDFArgParser: selecting unregistered option table aardvark

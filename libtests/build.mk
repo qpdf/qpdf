@@ -1,6 +1,7 @@
 BINS_libtests = \
 	cxx11 \
 	aes \
+	arg_parser \
 	ascii85 \
 	bits \
 	buffer \

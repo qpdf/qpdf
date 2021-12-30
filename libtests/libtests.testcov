@@ -39,3 +39,16 @@ JSON key missing in object 0
 JSON wanted array 0
 JSON schema array error 0
 JSON key extra in object 0
+QPDFArgParser read args from stdin 0
+QPDFArgParser read args from file 0
+QPDFArgParser required choices 0
+QPDFArgParser required parameter 0
+QPDFArgParser select unregistered table 0
+QPDFArgParser register registered table 0
+QPDFArgParser duplicate handler 0
+QPDFArgParser missing -- 0
+QPDFArgParser single dash 0
+QPDFArgParser help option 0
+QPDFArgParser positional 0
+QPDFArgParser unrecognized 0
+QPDFArgParser complete choices 0
