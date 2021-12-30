@@ -8,6 +8,9 @@ use File::Basename;
 use File::Copy;
 use File::Spec;
 
+unshift(@INC, '../../libtests/qtest/arg_parser');
+require completion_helpers;
+
 chdir("qpdf") or die "chdir testdir failed: $!\n";
 
 require TestDriver;
@@ -127,12 +130,12 @@ foreach my $c (@completion_tests)
         $zout = $out;
     }
     $td->runtest("bash completion: $description",
-                 {$td->COMMAND => [@{bash_completion($cmd, $point)}],
+                 {$td->COMMAND => [@{bash_completion("qpdf", $cmd, $point)}],
                       $td->FILTER => "$completion_filter $out"},
                  {$td->FILE => "$out", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
     $td->runtest("zsh completion: $description",
-                 {$td->COMMAND => [@{zsh_completion($cmd, $point)}],
+                 {$td->COMMAND => [@{zsh_completion("qpdf", $cmd, $point)}],
                       $td->FILTER => "$completion_filter $zout"},
                  {$td->FILE => "$zout", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
@@ -5425,39 +5428,6 @@ sub show_ntests
     # Calling cleanup here helps to ensure that sections of the test
     # suite are isolated.
     cleanup();
-}
-
-sub bash_completion
-{
-    my ($line, $point) = @_;
-    if (! defined $point)
-    {
-        $point = length($line);
-    }
-    my $before_point = substr($line, 0, $point);
-    my $first = '';
-    my $sep = '';
-    my $cur = '';
-    if ($before_point =~ m/^(.*)([ =])([^= ]*)$/)
-    {
-        ($first, $sep, $cur) = ($1, $2, $3);
-    }
-    my $prev = ($sep eq '=' ? $sep : $first);
-    $prev =~ s/.* (\S+)$/$1/;
-    my $this = $first;
-    $this =~ s/(\S+)\s.*/$1/;
-    ['env', "COMP_LINE=$line", "COMP_POINT=$point",
-     "qpdf", $this, $cur, $prev];
-}
-
-sub zsh_completion
-{
-    my ($line, $point) = @_;
-    if (! defined $point)
-    {
-        $point = length($line);
-    }
-    ['env', "COMP_LINE=$line", "COMP_POINT=$point", "qpdf"];
 }
 
 sub check_pdf
