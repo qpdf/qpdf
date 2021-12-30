@@ -115,6 +115,8 @@ my @completion_tests = (
     ['qpdf --encrypt user\ password ', undef, 'quoting'],
     );
 $n_tests += 2 * scalar(@completion_tests);
+my $completion_filter =
+    "perl ../../../libtests/qtest/arg_parser/filter-completion.pl";
 foreach my $c (@completion_tests)
 {
     my ($cmd, $point, $description) = @$c;
@@ -126,12 +128,12 @@ foreach my $c (@completion_tests)
     }
     $td->runtest("bash completion: $description",
                  {$td->COMMAND => [@{bash_completion($cmd, $point)}],
-                      $td->FILTER => "perl filter-completion.pl $out"},
+                      $td->FILTER => "$completion_filter $out"},
                  {$td->FILE => "$out", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
     $td->runtest("zsh completion: $description",
                  {$td->COMMAND => [@{zsh_completion($cmd, $point)}],
-                      $td->FILTER => "perl filter-completion.pl $zout"},
+                      $td->FILTER => "$completion_filter $zout"},
                  {$td->FILE => "$zout", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
 }

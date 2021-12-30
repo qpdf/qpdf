@@ -1,6 +1,8 @@
 use warnings;
 use strict;
 
+# THIS SCRIPT IS ALSO USED IN qpdf.test
+
 # Output every line from STDIN that appears in the file.
 my %wanted = ();
 my %notwanted = ();
