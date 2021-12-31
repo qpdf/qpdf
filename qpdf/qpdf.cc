@@ -27,6 +27,7 @@
 #include <qpdf/QPDFSystemError.hh>
 #include <qpdf/QPDFCryptoProvider.hh>
 #include <qpdf/QPDFEmbeddedFileDocumentHelper.hh>
+#include <qpdf/QPDFArgParser.hh>
 
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QIntC.hh>
@@ -740,14 +741,6 @@ static void parse_object_id(std::string const& objspec,
     }
 }
 
-// This is not a general-purpose argument parser. It is tightly
-// crafted to work with qpdf. qpdf's command-line syntax is very
-// complex because of its long history, and it doesn't really follow
-// any kind of normal standard for arguments, but I don't want to
-// break compatibility by changing what constitutes a valid command.
-// This class is intended to simplify the argument parsing code and
-// also to make it possible to add bash completion support while
-// guaranteeing consistency with the actual argument syntax.
 class ArgParser
 {
   public:
@@ -755,38 +748,18 @@ class ArgParser
     void parseOptions();
 
   private:
-    typedef void (ArgParser::*bare_arg_handler_t)();
-    typedef void (ArgParser::*param_arg_handler_t)(char* parameter);
-
-    struct OptionEntry
-    {
-        OptionEntry() :
-            parameter_needed(false),
-            bare_arg_handler(0),
-            param_arg_handler(0)
-        {
-        }
-        bool parameter_needed;
-        std::string parameter_name;
-        std::set<std::string> choices;
-        bare_arg_handler_t bare_arg_handler;
-        param_arg_handler_t param_arg_handler;
-    };
-    friend struct OptionEntry;
-
-    OptionEntry oe_positional(param_arg_handler_t);
-    OptionEntry oe_bare(bare_arg_handler_t);
-    OptionEntry oe_requiredParameter(param_arg_handler_t, char const* name);
-    OptionEntry oe_optionalParameter(param_arg_handler_t);
-    OptionEntry oe_requiredChoices(param_arg_handler_t, char const** choices);
-
-    void completionCommon(bool zsh);
+    static constexpr char const* O_PAGES = "pages";
+    static constexpr char const* O_ENCRYPT = "encryption";
+    static constexpr char const* O_ENCRYPT_40 = "40-bit encryption";
+    static constexpr char const* O_ENCRYPT_128 = "128-bit encryption";
+    static constexpr char const* O_ENCRYPT_256 = "256-bit encryption";
+    static constexpr char const* O_UNDER_OVERLAY = "underlay/overlay";
+    static constexpr char const* O_ATTACHMENT = "attachment";
+    static constexpr char const* O_COPY_ATTACHMENT = "copy attachment";
 
     void argHelp();
     void argVersion();
     void argCopyright();
-    void argCompletionBash();
-    void argCompletionZsh();
     void argJsonHelp();
     void argShowCrypto();
     void argPositional(char* arg);
@@ -804,6 +777,9 @@ class ArgParser
     void argCopyEncryption(char* parameter);
     void argEncryptionFilePassword(char* parameter);
     void argPages();
+    void argPagesPassword(char* parameter);
+    void argPagesPositional(char* parameter);
+    void argEndPages();
     void argUnderlay();
     void argOverlay();
     void argRotate(char* parameter);
@@ -884,6 +860,7 @@ class ArgParser
     void arg128UseAes(char* parameter);
     void arg128ForceV4();
     void arg256ForceR5();
+    void argEncryptPositional(char* arg);
     void argEndEncrypt();
     void argUOpositional(char* arg);
     void argUOto(char* parameter);
@@ -909,329 +886,257 @@ class ArgParser
     void argEndCopyAttachments();
 
     void usage(std::string const& message);
-    void checkCompletion();
     void initOptionTable();
-    void handleArgFileArguments();
-    void handleBashArguments();
-    void readArgsFromFile(char const* filename);
     void doFinalChecks();
-    void addOptionsToCompletions();
-    void addChoicesToCompletions(std::string const&, std::string const&);
-    void handleCompletion();
-    std::vector<PageSpec> parsePagesOptions();
     void parseUnderOverlayOptions(UnderOverlay*);
     void parseRotationParameter(std::string const&);
     std::vector<int> parseNumrange(char const* range, int max,
                                    bool throw_error = false);
 
-    int argc;
-    char** argv;
+    QPDFArgParser ap;
     Options& o;
-    int cur_arg;
-    bool bash_completion;
-    bool zsh_completion;
-    std::string bash_prev;
-    std::string bash_cur;
-    std::string bash_line;
-    std::set<std::string> completions;
-
-    std::map<std::string, OptionEntry>* option_table;
-    std::map<std::string, OptionEntry> help_option_table;
-    std::map<std::string, OptionEntry> main_option_table;
-    std::map<std::string, OptionEntry> encrypt40_option_table;
-    std::map<std::string, OptionEntry> encrypt128_option_table;
-    std::map<std::string, OptionEntry> encrypt256_option_table;
-    std::map<std::string, OptionEntry> under_overlay_option_table;
-    std::map<std::string, OptionEntry> add_attachment_option_table;
-    std::map<std::string, OptionEntry> copy_attachments_option_table;
-    std::vector<PointerHolder<char> > new_argv;
-    std::vector<PointerHolder<char> > bash_argv;
-    PointerHolder<char*> argv_ph;
-    PointerHolder<char*> bash_argv_ph;
+    std::vector<char*> accumulated_args;
+    char* pages_password;
 };
 
 ArgParser::ArgParser(int argc, char* argv[], Options& o) :
-    argc(argc),
-    argv(argv),
+    ap(argc, argv, "QPDF_EXECUTABLE"),
     o(o),
-    cur_arg(0),
-    bash_completion(false),
-    zsh_completion(false)
+    pages_password(nullptr)
 {
-    option_table = &main_option_table;
     initOptionTable();
-}
-
-ArgParser::OptionEntry
-ArgParser::oe_positional(param_arg_handler_t h)
-{
-    OptionEntry oe;
-    oe.param_arg_handler = h;
-    return oe;
-}
-
-ArgParser::OptionEntry
-ArgParser::oe_bare(bare_arg_handler_t h)
-{
-    OptionEntry oe;
-    oe.parameter_needed = false;
-    oe.bare_arg_handler = h;
-    return oe;
-}
-
-ArgParser::OptionEntry
-ArgParser::oe_requiredParameter(param_arg_handler_t h, char const* name)
-{
-    OptionEntry oe;
-    oe.parameter_needed = true;
-    oe.parameter_name = name;
-    oe.param_arg_handler = h;
-    return oe;
-}
-
-ArgParser::OptionEntry
-ArgParser::oe_optionalParameter(param_arg_handler_t h)
-{
-    OptionEntry oe;
-    oe.parameter_needed = false;
-    oe.param_arg_handler = h;
-    return oe;
-}
-
-ArgParser::OptionEntry
-ArgParser::oe_requiredChoices(param_arg_handler_t h, char const** choices)
-{
-    OptionEntry oe;
-    oe.parameter_needed = true;
-    oe.param_arg_handler = h;
-    for (char const** i = choices; *i; ++i)
-    {
-        oe.choices.insert(*i);
-    }
-    return oe;
 }
 
 void
 ArgParser::initOptionTable()
 {
-    std::map<std::string, OptionEntry>* t = &this->help_option_table;
-    (*t)["help"] = oe_bare(&ArgParser::argHelp);
-    (*t)["version"] = oe_bare(&ArgParser::argVersion);
-    (*t)["copyright"] = oe_bare(&ArgParser::argCopyright);
-    (*t)["completion-bash"] = oe_bare(&ArgParser::argCompletionBash);
-    (*t)["completion-zsh"] = oe_bare(&ArgParser::argCompletionZsh);
-    (*t)["json-help"] = oe_bare(&ArgParser::argJsonHelp);
-    (*t)["show-crypto"] = oe_bare(&ArgParser::argShowCrypto);
+    auto b = [this](void (ArgParser::*f)()) {
+        return QPDFArgParser::bindBare(f, this);
+    };
+    auto p = [this](void (ArgParser::*f)(char *)) {
+        return QPDFArgParser::bindParam(f, this);
+    };
 
-    t = &this->main_option_table;
+    this->ap.addFinalCheck(b(&ArgParser::doFinalChecks));
+
+    this->ap.selectHelpOptionTable();
+    this->ap.addBare("help", b(&ArgParser::argHelp));
+    this->ap.addBare("version", b(&ArgParser::argVersion));
+    this->ap.addBare("copyright", b(&ArgParser::argCopyright));
+    this->ap.addBare("json-help", b(&ArgParser::argJsonHelp));
+    this->ap.addBare("show-crypto", b(&ArgParser::argShowCrypto));
+
+    this->ap.selectMainOptionTable();
     char const* yn[] = {"y", "n", 0};
-    (*t)[""] = oe_positional(&ArgParser::argPositional);
-    (*t)["password"] = oe_requiredParameter(
-        &ArgParser::argPassword, "password");
-    (*t)["password-file"] = oe_requiredParameter(
-        &ArgParser::argPasswordFile, "password-file");
-    (*t)["empty"] = oe_bare(&ArgParser::argEmpty);
-    (*t)["linearize"] = oe_bare(&ArgParser::argLinearize);
-    (*t)["encrypt"] = oe_bare(&ArgParser::argEncrypt);
-    (*t)["decrypt"] = oe_bare(&ArgParser::argDecrypt);
-    (*t)["password-is-hex-key"] = oe_bare(&ArgParser::argPasswordIsHexKey);
-    (*t)["suppress-password-recovery"] =
-        oe_bare(&ArgParser::argSuppressPasswordRecovery);
+    this->ap.addPositional(p(&ArgParser::argPositional));
+    this->ap.addRequiredParameter("password",
+        p(&ArgParser::argPassword), "password");
+    this->ap.addRequiredParameter("password-file",
+        p(&ArgParser::argPasswordFile), "password-file");
+    this->ap.addBare("empty", b(&ArgParser::argEmpty));
+    this->ap.addBare("linearize", b(&ArgParser::argLinearize));
+    this->ap.addBare("decrypt", b(&ArgParser::argDecrypt));
+    this->ap.addBare("password-is-hex-key", b(&ArgParser::argPasswordIsHexKey));
+    this->ap.addBare("suppress-password-recovery",
+                     b(&ArgParser::argSuppressPasswordRecovery));
     char const* password_mode_choices[] =
         {"bytes", "hex-bytes", "unicode", "auto", 0};
-    (*t)["password-mode"] = oe_requiredChoices(
-        &ArgParser::argPasswordMode, password_mode_choices);
-    (*t)["copy-encryption"] = oe_requiredParameter(
-        &ArgParser::argCopyEncryption, "file");
-    (*t)["encryption-file-password"] = oe_requiredParameter(
-        &ArgParser::argEncryptionFilePassword, "password");
-    (*t)["pages"] = oe_bare(&ArgParser::argPages);
-    (*t)["rotate"] = oe_requiredParameter(
-        &ArgParser::argRotate, "[+|-]angle:page-range");
+    this->ap.addRequiredChoices("password-mode",
+        p(&ArgParser::argPasswordMode), password_mode_choices);
+    this->ap.addRequiredParameter("copy-encryption",
+        p(&ArgParser::argCopyEncryption), "file");
+    this->ap.addRequiredParameter("encryption-file-password",
+        p(&ArgParser::argEncryptionFilePassword), "password");
+    this->ap.addRequiredParameter("rotate",
+        p(&ArgParser::argRotate), "[+|-]angle:page-range");
     char const* stream_data_choices[] =
         {"compress", "preserve", "uncompress", 0};
-    (*t)["collate"] = oe_optionalParameter(&ArgParser::argCollate);
-    (*t)["flatten-rotation"] = oe_bare(&ArgParser::argFlattenRotation);
-    (*t)["list-attachments"] = oe_bare(&ArgParser::argListAttachments);
-    (*t)["show-attachment"] = oe_requiredParameter(
-        &ArgParser::argShowAttachment, "attachment-key");
-    (*t)["remove-attachment"] = oe_requiredParameter(
-        &ArgParser::argRemoveAttachment, "attachment-key");
-    (*t)["add-attachment"] = oe_bare(&ArgParser::argAddAttachment);
-    (*t)["copy-attachments-from"] = oe_bare(&ArgParser::argCopyAttachments);
-    (*t)["stream-data"] = oe_requiredChoices(
-        &ArgParser::argStreamData, stream_data_choices);
-    (*t)["compress-streams"] = oe_requiredChoices(
-        &ArgParser::argCompressStreams, yn);
-    (*t)["recompress-flate"] = oe_bare(&ArgParser::argRecompressFlate);
-    (*t)["compression-level"] = oe_requiredParameter(
-        &ArgParser::argCompressionLevel, "level");
+    this->ap.addOptionalParameter("collate",p(&ArgParser::argCollate));
+    this->ap.addBare("flatten-rotation", b(&ArgParser::argFlattenRotation));
+    this->ap.addBare("list-attachments", b(&ArgParser::argListAttachments));
+    this->ap.addRequiredParameter("show-attachment",
+        p(&ArgParser::argShowAttachment), "attachment-key");
+    this->ap.addRequiredParameter("remove-attachment",
+        p(&ArgParser::argRemoveAttachment), "attachment-key");
+    this->ap.addBare("add-attachment", b(&ArgParser::argAddAttachment));
+    this->ap.addBare(
+        "copy-attachments-from", b(&ArgParser::argCopyAttachments));
+    this->ap.addRequiredChoices("stream-data",
+        p(&ArgParser::argStreamData), stream_data_choices);
+    this->ap.addRequiredChoices("compress-streams",
+        p(&ArgParser::argCompressStreams), yn);
+    this->ap.addBare("recompress-flate", b(&ArgParser::argRecompressFlate));
+    this->ap.addRequiredParameter("compression-level",
+        p(&ArgParser::argCompressionLevel), "level");
     char const* decode_level_choices[] =
         {"none", "generalized", "specialized", "all", 0};
-    (*t)["decode-level"] = oe_requiredChoices(
-        &ArgParser::argDecodeLevel, decode_level_choices);
-    (*t)["normalize-content"] = oe_requiredChoices(
-        &ArgParser::argNormalizeContent, yn);
-    (*t)["suppress-recovery"] = oe_bare(&ArgParser::argSuppressRecovery);
+    this->ap.addRequiredChoices("decode-level",
+        p(&ArgParser::argDecodeLevel), decode_level_choices);
+    this->ap.addRequiredChoices("normalize-content",
+        p(&ArgParser::argNormalizeContent), yn);
+    this->ap.addBare("suppress-recovery", b(&ArgParser::argSuppressRecovery));
     char const* object_streams_choices[] = {
         "disable", "preserve", "generate", 0};
-    (*t)["object-streams"] = oe_requiredChoices(
-        &ArgParser::argObjectStreams, object_streams_choices);
-    (*t)["ignore-xref-streams"] = oe_bare(&ArgParser::argIgnoreXrefStreams);
-    (*t)["qdf"] = oe_bare(&ArgParser::argQdf);
-    (*t)["preserve-unreferenced"] = oe_bare(
-        &ArgParser::argPreserveUnreferenced);
-    (*t)["preserve-unreferenced-resources"] = oe_bare(
-        &ArgParser::argPreserveUnreferencedResources);
+    this->ap.addRequiredChoices("object-streams",
+        p(&ArgParser::argObjectStreams), object_streams_choices);
+    this->ap.addBare(
+        "ignore-xref-streams", b(&ArgParser::argIgnoreXrefStreams));
+    this->ap.addBare("qdf", b(&ArgParser::argQdf));
+    this->ap.addBare(
+        "preserve-unreferenced", b(&ArgParser::argPreserveUnreferenced));
+    this->ap.addBare(
+        "preserve-unreferenced-resources",
+        b(&ArgParser::argPreserveUnreferencedResources));
     char const* remove_unref_choices[] = {
         "auto", "yes", "no", 0};
-    (*t)["remove-unreferenced-resources"] = oe_requiredChoices(
-        &ArgParser::argRemoveUnreferencedResources, remove_unref_choices);
-    (*t)["keep-files-open"] = oe_requiredChoices(
-        &ArgParser::argKeepFilesOpen, yn);
-    (*t)["keep-files-open-threshold"] = oe_requiredParameter(
-        &ArgParser::argKeepFilesOpenThreshold, "count");
-    (*t)["newline-before-endstream"] = oe_bare(
-        &ArgParser::argNewlineBeforeEndstream);
-    (*t)["linearize-pass1"] = oe_requiredParameter(
-        &ArgParser::argLinearizePass1, "filename");
-    (*t)["coalesce-contents"] = oe_bare(&ArgParser::argCoalesceContents);
+    this->ap.addRequiredChoices("remove-unreferenced-resources",
+        p(&ArgParser::argRemoveUnreferencedResources), remove_unref_choices);
+    this->ap.addRequiredChoices("keep-files-open",
+        p(&ArgParser::argKeepFilesOpen), yn);
+    this->ap.addRequiredParameter("keep-files-open-threshold",
+        p(&ArgParser::argKeepFilesOpenThreshold), "count");
+    this->ap.addBare("newline-before-endstream", b(&ArgParser::argNewlineBeforeEndstream));
+    this->ap.addRequiredParameter("linearize-pass1",
+        p(&ArgParser::argLinearizePass1), "filename");
+    this->ap.addBare("coalesce-contents", b(&ArgParser::argCoalesceContents));
     char const* flatten_choices[] = {"all", "print", "screen", 0};
-    (*t)["flatten-annotations"] = oe_requiredChoices(
-        &ArgParser::argFlattenAnnotations, flatten_choices);
-    (*t)["generate-appearances"] =
-        oe_bare(&ArgParser::argGenerateAppearances);
-    (*t)["min-version"] = oe_requiredParameter(
-        &ArgParser::argMinVersion, "version");
-    (*t)["force-version"] = oe_requiredParameter(
-        &ArgParser::argForceVersion, "version");
-    (*t)["split-pages"] = oe_optionalParameter(&ArgParser::argSplitPages);
-    (*t)["verbose"] = oe_bare(&ArgParser::argVerbose);
-    (*t)["progress"] = oe_bare(&ArgParser::argProgress);
-    (*t)["no-warn"] = oe_bare(&ArgParser::argNoWarn);
-    (*t)["warning-exit-0"] = oe_bare(&ArgParser::argWarningExitZero);
-    (*t)["deterministic-id"] = oe_bare(&ArgParser::argDeterministicId);
-    (*t)["static-id"] = oe_bare(&ArgParser::argStaticId);
-    (*t)["static-aes-iv"] = oe_bare(&ArgParser::argStaticAesIv);
-    (*t)["no-original-object-ids"] = oe_bare(
-        &ArgParser::argNoOriginalObjectIds);
-    (*t)["show-encryption"] = oe_bare(&ArgParser::argShowEncryption);
-    (*t)["show-encryption-key"] = oe_bare(&ArgParser::argShowEncryptionKey);
-    (*t)["check-linearization"] = oe_bare(&ArgParser::argCheckLinearization);
-    (*t)["show-linearization"] = oe_bare(&ArgParser::argShowLinearization);
-    (*t)["show-xref"] = oe_bare(&ArgParser::argShowXref);
-    (*t)["show-object"] = oe_requiredParameter(
-        &ArgParser::argShowObject, "trailer|obj[,gen]");
-    (*t)["raw-stream-data"] = oe_bare(&ArgParser::argRawStreamData);
-    (*t)["filtered-stream-data"] = oe_bare(&ArgParser::argFilteredStreamData);
-    (*t)["show-npages"] = oe_bare(&ArgParser::argShowNpages);
-    (*t)["show-pages"] = oe_bare(&ArgParser::argShowPages);
-    (*t)["with-images"] = oe_bare(&ArgParser::argWithImages);
-    (*t)["json"] = oe_bare(&ArgParser::argJson);
+    this->ap.addRequiredChoices("flatten-annotations",
+        p(&ArgParser::argFlattenAnnotations), flatten_choices);
+    this->ap.addBare("generate-appearances", b(&ArgParser::argGenerateAppearances));
+    this->ap.addRequiredParameter("min-version",
+        p(&ArgParser::argMinVersion), "version");
+    this->ap.addRequiredParameter("force-version",
+        p(&ArgParser::argForceVersion), "version");
+    this->ap.addOptionalParameter("split-pages",p(&ArgParser::argSplitPages));
+    this->ap.addBare("verbose", b(&ArgParser::argVerbose));
+    this->ap.addBare("progress", b(&ArgParser::argProgress));
+    this->ap.addBare("no-warn", b(&ArgParser::argNoWarn));
+    this->ap.addBare("warning-exit-0", b(&ArgParser::argWarningExitZero));
+    this->ap.addBare("deterministic-id", b(&ArgParser::argDeterministicId));
+    this->ap.addBare("static-id", b(&ArgParser::argStaticId));
+    this->ap.addBare("static-aes-iv", b(&ArgParser::argStaticAesIv));
+    this->ap.addBare("no-original-object-ids", b(&ArgParser::argNoOriginalObjectIds));
+    this->ap.addBare("show-encryption", b(&ArgParser::argShowEncryption));
+    this->ap.addBare("show-encryption-key", b(&ArgParser::argShowEncryptionKey));
+    this->ap.addBare("check-linearization", b(&ArgParser::argCheckLinearization));
+    this->ap.addBare("show-linearization", b(&ArgParser::argShowLinearization));
+    this->ap.addBare("show-xref", b(&ArgParser::argShowXref));
+    this->ap.addRequiredParameter("show-object",
+        p(&ArgParser::argShowObject), "trailer|obj[,gen]");
+    this->ap.addBare("raw-stream-data", b(&ArgParser::argRawStreamData));
+    this->ap.addBare("filtered-stream-data", b(&ArgParser::argFilteredStreamData));
+    this->ap.addBare("show-npages", b(&ArgParser::argShowNpages));
+    this->ap.addBare("show-pages", b(&ArgParser::argShowPages));
+    this->ap.addBare("with-images", b(&ArgParser::argWithImages));
+    this->ap.addBare("json", b(&ArgParser::argJson));
     // The list of selectable top-level keys id duplicated in three
     // places: json_schema, do_json, and initOptionTable.
     char const* json_key_choices[] = {
         "objects", "objectinfo", "pages", "pagelabels", "outlines",
         "acroform", "encrypt", "attachments", 0};
-    (*t)["json-key"] = oe_requiredChoices(
-        &ArgParser::argJsonKey, json_key_choices);
-    (*t)["json-object"] = oe_requiredParameter(
-        &ArgParser::argJsonObject, "trailer|obj[,gen]");
-    (*t)["check"] = oe_bare(&ArgParser::argCheck);
-    (*t)["optimize-images"] = oe_bare(&ArgParser::argOptimizeImages);
-    (*t)["externalize-inline-images"] =
-        oe_bare(&ArgParser::argExternalizeInlineImages);
-    (*t)["keep-inline-images"] = oe_bare(&ArgParser::argKeepInlineImages);
-    (*t)["remove-page-labels"] = oe_bare(&ArgParser::argRemovePageLabels);
-    (*t)["oi-min-width"] = oe_requiredParameter(
-        &ArgParser::argOiMinWidth, "minimum-width");
-    (*t)["oi-min-height"] = oe_requiredParameter(
-        &ArgParser::argOiMinHeight, "minimum-height");
-    (*t)["oi-min-area"] = oe_requiredParameter(
-        &ArgParser::argOiMinArea, "minimum-area");
-    (*t)["ii-min-bytes"] = oe_requiredParameter(
-        &ArgParser::argIiMinBytes, "minimum-bytes");
-    (*t)["overlay"] = oe_bare(&ArgParser::argOverlay);
-    (*t)["underlay"] = oe_bare(&ArgParser::argUnderlay);
-    (*t)["replace-input"] = oe_bare(&ArgParser::argReplaceInput);
-    (*t)["is-encrypted"] = oe_bare(&ArgParser::argIsEncrypted);
-    (*t)["requires-password"] = oe_bare(&ArgParser::argRequiresPassword);
-    (*t)["allow-weak-crypto"] = oe_bare(&ArgParser::argAllowWeakCrypto);
+    this->ap.addRequiredChoices("json-key",
+        p(&ArgParser::argJsonKey), json_key_choices);
+    this->ap.addRequiredParameter("json-object",
+        p(&ArgParser::argJsonObject), "trailer|obj[,gen]");
+    this->ap.addBare("check", b(&ArgParser::argCheck));
+    this->ap.addBare("optimize-images", b(&ArgParser::argOptimizeImages));
+    this->ap.addBare("externalize-inline-images", b(&ArgParser::argExternalizeInlineImages));
+    this->ap.addBare("keep-inline-images", b(&ArgParser::argKeepInlineImages));
+    this->ap.addBare("remove-page-labels", b(&ArgParser::argRemovePageLabels));
+    this->ap.addRequiredParameter("oi-min-width",
+        p(&ArgParser::argOiMinWidth), "minimum-width");
+    this->ap.addRequiredParameter("oi-min-height",
+        p(&ArgParser::argOiMinHeight), "minimum-height");
+    this->ap.addRequiredParameter("oi-min-area",
+        p(&ArgParser::argOiMinArea), "minimum-area");
+    this->ap.addRequiredParameter("ii-min-bytes",
+        p(&ArgParser::argIiMinBytes), "minimum-bytes");
+    this->ap.addBare("overlay", b(&ArgParser::argOverlay));
+    this->ap.addBare("underlay", b(&ArgParser::argUnderlay));
+    this->ap.addBare("replace-input", b(&ArgParser::argReplaceInput));
+    this->ap.addBare("is-encrypted", b(&ArgParser::argIsEncrypted));
+    this->ap.addBare("requires-password", b(&ArgParser::argRequiresPassword));
+    this->ap.addBare("allow-weak-crypto", b(&ArgParser::argAllowWeakCrypto));
 
-    t = &this->encrypt40_option_table;
-    (*t)["--"] = oe_bare(&ArgParser::argEndEncrypt);
-    // The above 40-bit options are also 128-bit and 256-bit options,
-    // so copy what we have so far to 128. Then continue separately
-    // with 128. We later copy 128 to 256.
-    this->encrypt128_option_table = this->encrypt40_option_table;
-    (*t)["print"] = oe_requiredChoices(&ArgParser::arg40Print, yn);
-    (*t)["modify"] = oe_requiredChoices(&ArgParser::arg40Modify, yn);
-    (*t)["extract"] = oe_requiredChoices(&ArgParser::arg40Extract, yn);
-    (*t)["annotate"] = oe_requiredChoices(&ArgParser::arg40Annotate, yn);
+    this->ap.selectMainOptionTable();
+    this->ap.addBare("pages", b(&ArgParser::argPages));
+    this->ap.registerOptionTable(O_PAGES, b(&ArgParser::argEndPages));
+    this->ap.addRequiredParameter(
+        "password", p(&ArgParser::argPagesPassword), "password");
+    this->ap.addPositional(p(&ArgParser::argPagesPositional));
 
-    t = &this->encrypt128_option_table;
-    (*t)["accessibility"] = oe_requiredChoices(
-        &ArgParser::arg128Accessibility, yn);
-    (*t)["extract"] = oe_requiredChoices(&ArgParser::arg128Extract, yn);
-    char const* print128_choices[] = {"full", "low", "none", 0};
-    (*t)["print"] = oe_requiredChoices(
-        &ArgParser::arg128Print, print128_choices);
-    (*t)["assemble"] = oe_requiredChoices(&ArgParser::arg128Assemble, yn);
-    (*t)["annotate"] = oe_requiredChoices(&ArgParser::arg128Annotate, yn);
-    (*t)["form"] = oe_requiredChoices(&ArgParser::arg128Form, yn);
-    (*t)["modify-other"] = oe_requiredChoices(&ArgParser::arg128ModOther, yn);
-    char const* modify128_choices[] =
-        {"all", "annotate", "form", "assembly", "none", 0};
-    (*t)["modify"] = oe_requiredChoices(
-        &ArgParser::arg128Modify, modify128_choices);
-    (*t)["cleartext-metadata"] = oe_bare(&ArgParser::arg128ClearTextMetadata);
+    this->ap.selectMainOptionTable();
+    this->ap.addBare("encrypt", b(&ArgParser::argEncrypt));
+    this->ap.registerOptionTable(O_ENCRYPT, b(&ArgParser::argEndEncrypt));
+    this->ap.addPositional(p(&ArgParser::argEncryptPositional));
+    this->ap.registerOptionTable(O_ENCRYPT_40, b(&ArgParser::argEndEncrypt));
+    this->ap.addRequiredChoices("extract",p(&ArgParser::arg40Extract), yn);
+    this->ap.addRequiredChoices("annotate",p(&ArgParser::arg40Annotate), yn);
+    this->ap.addRequiredChoices("print",p(&ArgParser::arg40Print), yn);
+    this->ap.addRequiredChoices("modify",p(&ArgParser::arg40Modify), yn);
+    this->ap.registerOptionTable(O_ENCRYPT_128, b(&ArgParser::argEndEncrypt));
+    this->ap.registerOptionTable(O_ENCRYPT_256, b(&ArgParser::argEndEncrypt));
+    for (char const* k: {O_ENCRYPT_128, O_ENCRYPT_256})
+    {
+        this->ap.selectOptionTable(k);
+        this->ap.addRequiredChoices("accessibility",
+                                    p(&ArgParser::arg128Accessibility), yn);
+        this->ap.addRequiredChoices("extract", p(&ArgParser::arg128Extract), yn);
+        char const* print128_choices[] = {"full", "low", "none", 0};
+        this->ap.addRequiredChoices("print",
+                                    p(&ArgParser::arg128Print), print128_choices);
+        this->ap.addRequiredChoices("assemble",p(&ArgParser::arg128Assemble), yn);
+        this->ap.addRequiredChoices("annotate",p(&ArgParser::arg128Annotate), yn);
+        this->ap.addRequiredChoices("form",p(&ArgParser::arg128Form), yn);
+        this->ap.addRequiredChoices("modify-other",p(&ArgParser::arg128ModOther), yn);
+        char const* modify128_choices[] =
+            {"all", "annotate", "form", "assembly", "none", 0};
+        this->ap.addRequiredChoices("modify",
+                                    p(&ArgParser::arg128Modify), modify128_choices);
+        this->ap.addBare("cleartext-metadata", b(&ArgParser::arg128ClearTextMetadata));
+    }
 
-    // The above 128-bit options are also 256-bit options, so copy
-    // what we have so far. Then continue separately with 128 and 256.
-    this->encrypt256_option_table = this->encrypt128_option_table;
-    (*t)["use-aes"] = oe_requiredChoices(&ArgParser::arg128UseAes, yn);
-    (*t)["force-V4"] = oe_bare(&ArgParser::arg128ForceV4);
+    this->ap.selectOptionTable(O_ENCRYPT_128);
+    this->ap.addRequiredChoices("use-aes",p(&ArgParser::arg128UseAes), yn);
+    this->ap.addBare("force-V4", b(&ArgParser::arg128ForceV4));
 
-    t = &this->encrypt256_option_table;
-    (*t)["force-R5"] = oe_bare(&ArgParser::arg256ForceR5);
-    (*t)["allow-insecure"] = oe_bare(&ArgParser::argAllowInsecure);
+    this->ap.selectOptionTable(O_ENCRYPT_256);
+    this->ap.addBare("force-R5", b(&ArgParser::arg256ForceR5));
+    this->ap.addBare("allow-insecure", b(&ArgParser::argAllowInsecure));
 
-    t = &this->under_overlay_option_table;
-    (*t)[""] = oe_positional(&ArgParser::argUOpositional);
-    (*t)["to"] = oe_requiredParameter(
-        &ArgParser::argUOto, "page-range");
-    (*t)["from"] = oe_requiredParameter(
-        &ArgParser::argUOfrom, "page-range");
-    (*t)["repeat"] = oe_requiredParameter(
-        &ArgParser::argUOrepeat, "page-range");
-    (*t)["password"] = oe_requiredParameter(
-        &ArgParser::argUOpassword, "password");
-    (*t)["--"] = oe_bare(&ArgParser::argEndUnderOverlay);
+    this->ap.registerOptionTable(O_UNDER_OVERLAY, b(&ArgParser::argEndUnderOverlay));
+    this->ap.addPositional(p(&ArgParser::argUOpositional));
+    this->ap.addRequiredParameter("to",
+        p(&ArgParser::argUOto), "page-range");
+    this->ap.addRequiredParameter("from",
+        p(&ArgParser::argUOfrom), "page-range");
+    this->ap.addRequiredParameter("repeat",
+        p(&ArgParser::argUOrepeat), "page-range");
+    this->ap.addRequiredParameter("password",
+        p(&ArgParser::argUOpassword), "password");
 
-    t = &this->add_attachment_option_table;
-    (*t)[""] = oe_positional(&ArgParser::argAApositional);
-    (*t)["key"] = oe_requiredParameter(
-        &ArgParser::argAAKey, "attachment-key");
-    (*t)["filename"] = oe_requiredParameter(
-        &ArgParser::argAAFilename, "filename");
-    (*t)["creationdate"] = oe_requiredParameter(
-        &ArgParser::argAACreationDate, "creation-date");
-    (*t)["moddate"] = oe_requiredParameter(
-        &ArgParser::argAAModDate, "modification-date");
-    (*t)["mimetype"] = oe_requiredParameter(
-        &ArgParser::argAAMimeType, "mime/type");
-    (*t)["description"] = oe_requiredParameter(
-        &ArgParser::argAADescription, "description");
-    (*t)["replace"] = oe_bare(&ArgParser::argAAReplace);
-    (*t)["--"] = oe_bare(&ArgParser::argEndAddAttachment);
+    this->ap.registerOptionTable(O_ATTACHMENT, b(&ArgParser::argEndAddAttachment));
+    this->ap.addPositional(p(&ArgParser::argAApositional));
+    this->ap.addRequiredParameter("key",
+        p(&ArgParser::argAAKey), "attachment-key");
+    this->ap.addRequiredParameter("filename",
+        p(&ArgParser::argAAFilename), "filename");
+    this->ap.addRequiredParameter("creationdate",
+        p(&ArgParser::argAACreationDate), "creation-date");
+    this->ap.addRequiredParameter("moddate",
+        p(&ArgParser::argAAModDate), "modification-date");
+    this->ap.addRequiredParameter("mimetype",
+        p(&ArgParser::argAAMimeType), "mime/type");
+    this->ap.addRequiredParameter("description",
+        p(&ArgParser::argAADescription), "description");
+    this->ap.addBare("replace", b(&ArgParser::argAAReplace));
 
-    t = &this->copy_attachments_option_table;
-    (*t)[""] = oe_positional(&ArgParser::argCApositional);
-    (*t)["prefix"] = oe_requiredParameter(
-        &ArgParser::argCAprefix, "prefix");
-    (*t)["password"] = oe_requiredParameter(
-        &ArgParser::argCApassword, "password");
-    (*t)["--"] = oe_bare(&ArgParser::argEndCopyAttachments);
+    this->ap.registerOptionTable(O_COPY_ATTACHMENT, b(&ArgParser::argEndCopyAttachments));
+    this->ap.addPositional(p(&ArgParser::argCApositional));
+    this->ap.addRequiredParameter("prefix",
+        p(&ArgParser::argCAprefix), "prefix");
+    this->ap.addRequiredParameter("password",
+        p(&ArgParser::argCApassword), "password");
 }
 
 void
@@ -1818,58 +1723,6 @@ ArgParser::argHelp()
 }
 
 void
-ArgParser::completionCommon(bool zsh)
-{
-    std::string progname = argv[0];
-    std::string executable;
-    std::string appdir;
-    std::string appimage;
-    if (QUtil::get_env("QPDF_EXECUTABLE", &executable))
-    {
-        progname = executable;
-    }
-    else if (QUtil::get_env("APPDIR", &appdir) &&
-             QUtil::get_env("APPIMAGE", &appimage))
-    {
-        // Detect if we're in an AppImage and adjust
-        if ((appdir.length() < strlen(argv[0])) &&
-            (strncmp(appdir.c_str(), argv[0], appdir.length()) == 0))
-        {
-            progname = appimage;
-        }
-    }
-    if (zsh)
-    {
-        std::cout << "autoload -U +X bashcompinit && bashcompinit && ";
-    }
-    std::cout << "complete -o bashdefault -o default";
-    if (! zsh)
-    {
-        std::cout << " -o nospace";
-    }
-    std::cout << " -C " << progname << " " << whoami << std::endl;
-    // Put output before error so calling from zsh works properly
-    std::string path = progname;
-    size_t slash = path.find('/');
-    if ((slash != 0) && (slash != std::string::npos))
-    {
-        std::cerr << "WARNING: qpdf completion enabled"
-                  << " using relative path to qpdf" << std::endl;
-    }
-}
-
-void
-ArgParser::argCompletionBash()
-{
-    completionCommon(false);
-}
-
-void
-ArgParser::argCompletionZsh()
-{
-    completionCommon(true);
-}
-void
 ArgParser::argJsonHelp()
 {
     // Make sure the output looks right on an 80-column display.
@@ -1962,50 +1815,54 @@ ArgParser::argLinearize()
 void
 ArgParser::argEncrypt()
 {
-    ++cur_arg;
-    if (cur_arg + 3 > argc)
+    this->accumulated_args.clear();
+    if (this->ap.isCompleting() && this->ap.argsLeft() == 0)
     {
-        if (this->bash_completion)
-        {
-            if (cur_arg == argc)
-            {
-                this->completions.insert("user-password");
-            }
-            else if (cur_arg + 1 == argc)
-            {
-                this->completions.insert("owner-password");
-            }
-            else if (cur_arg + 2 == argc)
-            {
-                this->completions.insert("40");
-                this->completions.insert("128");
-                this->completions.insert("256");
-            }
-            return;
-        }
-        else
-        {
-            usage("insufficient arguments to --encrypt");
-        }
+        this->ap.insertCompletion("user-password");
     }
-    o.user_password = argv[cur_arg++];
-    o.owner_password = argv[cur_arg++];
-    std::string len_str = argv[cur_arg];
+    this->ap.selectOptionTable(O_ENCRYPT);
+}
+
+void
+ArgParser::argEncryptPositional(char* arg)
+{
+    this->accumulated_args.push_back(arg);
+    size_t n_args = this->accumulated_args.size();
+    if (n_args < 3)
+    {
+        if (this->ap.isCompleting() && (this->ap.argsLeft() == 0))
+        {
+            if (n_args == 1)
+            {
+                this->ap.insertCompletion("owner-password");
+            }
+            else if (n_args == 2)
+            {
+                this->ap.insertCompletion("40");
+                this->ap.insertCompletion("128");
+                this->ap.insertCompletion("256");
+            }
+        }
+        return;
+    }
+    o.user_password = this->accumulated_args.at(0);
+    o.owner_password = this->accumulated_args.at(1);
+    std::string len_str = this->accumulated_args.at(2);
     if (len_str == "40")
     {
 	o.keylen = 40;
-        this->option_table = &(this->encrypt40_option_table);
+        this->ap.selectOptionTable(O_ENCRYPT_40);
     }
     else if (len_str == "128")
     {
 	o.keylen = 128;
-        this->option_table = &(this->encrypt128_option_table);
+        this->ap.selectOptionTable(O_ENCRYPT_128);
     }
     else if (len_str == "256")
     {
 	o.keylen = 256;
         o.use_aes = true;
-        this->option_table = &(this->encrypt256_option_table);
+        this->ap.selectOptionTable(O_ENCRYPT_256);
     }
     else
     {
@@ -2096,12 +1953,116 @@ ArgParser::argCollate(char* parameter)
 void
 ArgParser::argPages()
 {
-    ++cur_arg;
     if (! o.page_specs.empty())
     {
         usage("the --pages may only be specified one time");
     }
-    o.page_specs = parsePagesOptions();
+    this->accumulated_args.clear();
+    this->ap.selectOptionTable(O_PAGES);
+}
+
+void
+ArgParser::argPagesPassword(char* parameter)
+{
+    if (this->pages_password != nullptr)
+    {
+        QTC::TC("qpdf", "qpdf duplicated pages password");
+        usage("--password already specified for this file");
+    }
+    if (this->accumulated_args.size() != 1)
+    {
+        QTC::TC("qpdf", "qpdf misplaced pages password");
+        usage("in --pages, --password must immediately follow a file name");
+    }
+    this->pages_password = parameter;
+}
+
+void
+ArgParser::argPagesPositional(char* arg)
+{
+    if (arg == nullptr)
+    {
+        if (this->accumulated_args.empty())
+        {
+            return;
+        }
+    }
+    else
+    {
+        this->accumulated_args.push_back(arg);
+    }
+
+    char const* file = this->accumulated_args.at(0);
+    char const* range = nullptr;
+
+    size_t n_args = this->accumulated_args.size();
+    if (n_args >= 2)
+    {
+        range = this->accumulated_args.at(1);
+    }
+
+    // See if the user omitted the range entirely, in which case we
+    // assume "1-z".
+    char* next_file = nullptr;
+    if (range == nullptr)
+    {
+        if (arg == nullptr)
+        {
+            // The filename or password was the last argument
+            QTC::TC("qpdf", "qpdf pages range omitted at end",
+                    this->pages_password == nullptr ? 0 : 1);
+        }
+        else
+        {
+            // We need to accumulate some more arguments
+            return;
+        }
+    }
+    else
+    {
+        try
+        {
+            parseNumrange(range, 0, true);
+        }
+        catch (std::runtime_error& e1)
+        {
+            // The range is invalid.  Let's see if it's a file.
+            if (strcmp(range, ".") == 0)
+            {
+                // "." means the input file.
+                QTC::TC("qpdf", "qpdf pages range omitted with .");
+            }
+            else if (QUtil::file_can_be_opened(range))
+            {
+                QTC::TC("qpdf", "qpdf pages range omitted in middle");
+                // Yup, it's a file.
+            }
+            else
+            {
+                // Give the range error
+                usage(e1.what());
+            }
+            next_file = const_cast<char*>(range);
+            range = nullptr;
+        }
+    }
+    if (range == nullptr)
+    {
+        range = "1-z";
+    }
+    o.page_specs.push_back(PageSpec(file, this->pages_password, range));
+    this->accumulated_args.clear();
+    this->pages_password = nullptr;
+    if (next_file != nullptr)
+    {
+        this->accumulated_args.push_back(next_file);
+    }
+}
+
+void
+ArgParser::argEndPages()
+{
+    argPagesPositional(nullptr);
     if (o.page_specs.empty())
     {
         usage("--pages: no page specifications given");
@@ -2155,15 +2116,15 @@ ArgParser::argRemoveAttachment(char* parameter)
 void
 ArgParser::argAddAttachment()
 {
-    this->option_table = &(this->add_attachment_option_table);
     o.attachments_to_add.push_back(AddAttachment());
+    this->ap.selectOptionTable(O_ATTACHMENT);
 }
 
 void
 ArgParser::argCopyAttachments()
 {
-    this->option_table = &(this->copy_attachments_option_table);
     o.attachments_to_copy.push_back(CopyAttachmentFrom());
+    this->ap.selectOptionTable(O_COPY_ATTACHMENT);
 }
 
 void
@@ -2743,7 +2704,6 @@ ArgParser::argEndEncrypt()
     o.encrypt = true;
     o.decrypt = false;
     o.copy_encryption = false;
-    this->option_table = &(this->main_option_table);
 }
 
 void
@@ -2795,7 +2755,6 @@ ArgParser::argUOpassword(char* parameter)
 void
 ArgParser::argEndUnderOverlay()
 {
-    this->option_table = &(this->main_option_table);
     if (0 == o.under_overlay->filename)
     {
         usage(o.under_overlay->which + " file not specified");
@@ -2888,7 +2847,6 @@ ArgParser::argEndAddAttachment()
 {
     static std::string now = QUtil::qpdf_time_to_pdf_time(
         QUtil::get_current_qpdf_time());
-    this->option_table = &(this->main_option_table);
     auto& cur = o.attachments_to_add.back();
     if (cur.path.empty())
     {
@@ -2938,159 +2896,10 @@ ArgParser::argCApassword(char* parameter)
 void
 ArgParser::argEndCopyAttachments()
 {
-    this->option_table = &(this->main_option_table);
     if (o.attachments_to_copy.back().path.empty())
     {
         usage("copy attachments: no path specified");
     }
-}
-
-void
-ArgParser::handleArgFileArguments()
-{
-    // Support reading arguments from files. Create a new argv. Ensure
-    // that argv itself as well as all its contents are automatically
-    // deleted by using PointerHolder objects to back the pointers in
-    // argv.
-    new_argv.push_back(PointerHolder<char>(true, QUtil::copy_string(argv[0])));
-    for (int i = 1; i < argc; ++i)
-    {
-        char* argfile = 0;
-        if ((strlen(argv[i]) > 1) && (argv[i][0] == '@'))
-        {
-            argfile = 1 + argv[i];
-            if (strcmp(argfile, "-") != 0)
-            {
-                if (! QUtil::file_can_be_opened(argfile))
-                {
-                    // The file's not there; treating as regular option
-                    argfile = nullptr;
-                }
-            }
-        }
-        if (argfile)
-        {
-            readArgsFromFile(1+argv[i]);
-        }
-        else
-        {
-            new_argv.push_back(
-                PointerHolder<char>(true, QUtil::copy_string(argv[i])));
-        }
-    }
-    argv_ph = PointerHolder<char*>(true, new char*[1+new_argv.size()]);
-    argv = argv_ph.getPointer();
-    for (size_t i = 0; i < new_argv.size(); ++i)
-    {
-        argv[i] = new_argv.at(i).getPointer();
-    }
-    argc = QIntC::to_int(new_argv.size());
-    argv[argc] = 0;
-}
-
-void
-ArgParser::handleBashArguments()
-{
-    // Do a minimal job of parsing bash_line into arguments. This
-    // doesn't do everything the shell does (e.g. $(...), variable
-    // expansion, arithmetic, globs, etc.), but it should be good
-    // enough for purposes of handling completion. As we build up the
-    // new argv, we can't use this->new_argv because this code has to
-    // interoperate with @file arguments, so memory for both ways of
-    // fabricating argv has to be protected.
-
-    bool last_was_backslash = false;
-    enum { st_top, st_squote, st_dquote } state = st_top;
-    std::string arg;
-    for (std::string::iterator iter = bash_line.begin();
-         iter != bash_line.end(); ++iter)
-    {
-        char ch = (*iter);
-        if (last_was_backslash)
-        {
-            arg.append(1, ch);
-            last_was_backslash = false;
-        }
-        else if (ch == '\\')
-        {
-            last_was_backslash = true;
-        }
-        else
-        {
-            bool append = false;
-            switch (state)
-            {
-              case st_top:
-                if (QUtil::is_space(ch))
-                {
-                    if (! arg.empty())
-                    {
-                        bash_argv.push_back(
-                            PointerHolder<char>(
-                                true, QUtil::copy_string(arg.c_str())));
-                        arg.clear();
-                    }
-                }
-                else if (ch == '"')
-                {
-                    state = st_dquote;
-                }
-                else if (ch == '\'')
-                {
-                    state = st_squote;
-                }
-                else
-                {
-                    append = true;
-                }
-                break;
-
-              case st_squote:
-                if (ch == '\'')
-                {
-                    state = st_top;
-                }
-                else
-                {
-                    append = true;
-                }
-                break;
-
-              case st_dquote:
-                if (ch == '"')
-                {
-                    state = st_top;
-                }
-                else
-                {
-                    append = true;
-                }
-                break;
-            }
-            if (append)
-            {
-                arg.append(1, ch);
-            }
-        }
-    }
-    if (bash_argv.empty())
-    {
-        // This can't happen if properly invoked by bash, but ensure
-        // we have a valid argv[0] regardless.
-        bash_argv.push_back(
-            PointerHolder<char>(
-                true, QUtil::copy_string(argv[0])));
-    }
-    // Explicitly discard any non-space-terminated word. The "current
-    // word" is handled specially.
-    bash_argv_ph = PointerHolder<char*>(true, new char*[1+bash_argv.size()]);
-    argv = bash_argv_ph.getPointer();
-    for (size_t i = 0; i < bash_argv.size(); ++i)
-    {
-        argv[i] = bash_argv.at(i).getPointer();
-    }
-    argc = QIntC::to_int(bash_argv.size());
-    argv[argc] = 0;
 }
 
 void usageExit(std::string const& msg)
@@ -3108,7 +2917,7 @@ void usageExit(std::string const& msg)
 void
 ArgParser::usage(std::string const& message)
 {
-    if (this->bash_completion)
+    if (this->ap.isCompleting())
     {
         // This will cause bash to fall back to regular file completion.
         exit(0);
@@ -3234,101 +3043,11 @@ ArgParser::parseNumrange(char const* range, int max, bool throw_error)
     return std::vector<int>();
 }
 
-std::vector<PageSpec>
-ArgParser::parsePagesOptions()
-{
-    auto check_unclosed = [this](char const* arg, int n) {
-        if ((strlen(arg) > 0) && (arg[0] == '-'))
-        {
-            // A common error is to forget to close --pages with --,
-            // so catch this as special case
-            QTC::TC("qpdf", "check unclosed --pages", n);
-            usage("the --pages option must be terminated with -- by itself");
-        }
-    };
-
-    std::vector<PageSpec> result;
-    while (1)
-    {
-        if ((cur_arg < argc) && (strcmp(argv[cur_arg], "--") == 0))
-        {
-            break;
-        }
-        if (cur_arg + 1 >= argc)
-        {
-            usage("insufficient arguments to --pages");
-        }
-        char const* file = argv[cur_arg++];
-        char const* password = 0;
-        char const* range = argv[cur_arg++];
-        if (! QUtil::file_can_be_opened(file))
-        {
-            check_unclosed(file, 0);
-        }
-        if (strncmp(range, "--password=", 11) == 0)
-        {
-            // Oh, that's the password, not the range
-            if (cur_arg + 1 >= argc)
-            {
-                usage("insufficient arguments to --pages");
-            }
-            password = range + 11;
-            range = argv[cur_arg++];
-        }
-
-        // See if the user omitted the range entirely, in which case
-        // we assume "1-z".
-        bool range_omitted = false;
-        if (strcmp(range, "--") == 0)
-        {
-            // The filename or password was the last argument
-            QTC::TC("qpdf", "qpdf pages range omitted at end");
-            range_omitted = true;
-        }
-        else
-        {
-            try
-            {
-                parseNumrange(range, 0, true);
-            }
-            catch (std::runtime_error& e1)
-            {
-                // The range is invalid.  Let's see if it's a file.
-                range_omitted = true;
-                if (strcmp(range, ".") == 0)
-                {
-                    // "." means the input file.
-                    QTC::TC("qpdf", "qpdf pages range omitted with .");
-                }
-                else if (QUtil::file_can_be_opened(range))
-                {
-                    QTC::TC("qpdf", "qpdf pages range omitted in middle");
-                    // Yup, it's a file.
-                }
-                else
-                {
-                    check_unclosed(range, 1);
-                    // Give the range error
-                    usage(e1.what());
-                }
-            }
-        }
-        if (range_omitted)
-        {
-            --cur_arg;
-            range = "1-z";
-        }
-
-        result.push_back(PageSpec(file, password, range));
-    }
-    return result;
-}
-
 void
 ArgParser::parseUnderOverlayOptions(UnderOverlay* uo)
 {
     o.under_overlay = uo;
-    this->option_table = &(this->under_overlay_option_table);
+    this->ap.selectOptionTable(O_UNDER_OVERLAY);
 }
 
 QPDFPageData::QPDFPageData(std::string const& filename,
@@ -3371,28 +3090,6 @@ static void parse_version(std::string const& full_version_string,
         extension_level = QUtil::string_to_int(p2);
     }
     version = v;
-}
-
-void
-ArgParser::readArgsFromFile(char const* filename)
-{
-    std::list<std::string> lines;
-    if (strcmp(filename, "-") == 0)
-    {
-        QTC::TC("qpdf", "qpdf read args from stdin");
-        lines = QUtil::read_lines_from_file(std::cin);
-    }
-    else
-    {
-        QTC::TC("qpdf", "qpdf read args from file");
-        lines = QUtil::read_lines_from_file(filename);
-    }
-    for (std::list<std::string>::iterator iter = lines.begin();
-         iter != lines.end(); ++iter)
-    {
-        new_argv.push_back(
-            PointerHolder<char>(true, QUtil::copy_string((*iter).c_str())));
-    }
 }
 
 void
@@ -3462,232 +3159,21 @@ ArgParser::parseRotationParameter(std::string const& parameter)
 }
 
 void
-ArgParser::checkCompletion()
-{
-    // See if we're being invoked from bash completion.
-    std::string bash_point_env;
-    // On Windows with mingw, there have been times when there appears
-    // to be no way to distinguish between an empty environment
-    // variable and an unset variable. There are also conditions under
-    // which bash doesn't set COMP_LINE. Therefore, enter this logic
-    // if either COMP_LINE or COMP_POINT are set. They will both be
-    // set together under ordinary circumstances.
-    bool got_line = QUtil::get_env("COMP_LINE", &bash_line);
-    bool got_point = QUtil::get_env("COMP_POINT", &bash_point_env);
-    if (got_line || got_point)
-    {
-        size_t p = QUtil::string_to_uint(bash_point_env.c_str());
-        if (p < bash_line.length())
-        {
-            // Truncate the line. We ignore everything at or after the
-            // cursor for completion purposes.
-            bash_line = bash_line.substr(0, p);
-        }
-        if (p > bash_line.length())
-        {
-            p = bash_line.length();
-        }
-        // Set bash_cur and bash_prev based on bash_line rather than
-        // relying on argv. This enables us to use bashcompinit to get
-        // completion in zsh too since bashcompinit sets COMP_LINE and
-        // COMP_POINT but doesn't invoke the command with options like
-        // bash does.
-
-        // p is equal to length of the string. Walk backwards looking
-        // for the first separator. bash_cur is everything after the
-        // last separator, possibly empty.
-        char sep(0);
-        while (p > 0)
-        {
-            --p;
-            char ch = bash_line.at(p);
-            if ((ch == ' ') || (ch == '=') || (ch == ':'))
-            {
-                sep = ch;
-                break;
-            }
-        }
-        if (1+p <= bash_line.length())
-        {
-            bash_cur = bash_line.substr(1+p, std::string::npos);
-        }
-        if ((sep == ':') || (sep == '='))
-        {
-            // Bash sets prev to the non-space separator if any.
-            // Actually, if there are multiple separators in a row,
-            // they are all included in prev, but that detail is not
-            // important to us and not worth coding.
-            bash_prev = bash_line.substr(p, 1);
-        }
-        else
-        {
-            // Go back to the last separator and set prev based on
-            // that.
-            size_t p1 = p;
-            while (p1 > 0)
-            {
-                --p1;
-                char ch = bash_line.at(p1);
-                if ((ch == ' ') || (ch == ':') || (ch == '='))
-                {
-                    bash_prev = bash_line.substr(p1 + 1, p - p1 - 1);
-                    break;
-                }
-            }
-        }
-        if (bash_prev.empty())
-        {
-            bash_prev = bash_line.substr(0, p);
-        }
-        if (argc == 1)
-        {
-            // This is probably zsh using bashcompinit. There are a
-            // few differences in the expected output.
-            zsh_completion = true;
-        }
-        handleBashArguments();
-        bash_completion = true;
-    }
-}
-
-void
 ArgParser::parseOptions()
 {
-    checkCompletion();
-    handleArgFileArguments();
-    for (cur_arg = 1; cur_arg < argc; ++cur_arg)
+    try
     {
-        bool help_option = false;
-        auto oep = this->option_table->end();
-        char* arg = argv[cur_arg];
-        char* parameter = nullptr;
-        std::string o_arg(arg);
-        std::string arg_s(arg);
-        if (strcmp(arg, "--") == 0)
-        {
-            // Special case for -- option, which is used to break out
-            // of subparsers.
-            oep = this->option_table->find("--");
-            if (oep == this->option_table->end())
-            {
-                throw std::logic_error("ArgParser: -- handler not registered");
-            }
-        }
-        else if ((arg[0] == '-') && (strcmp(arg, "-") != 0))
-        {
-            ++arg;
-            if (arg[0] == '-')
-            {
-                // Be lax about -arg vs --arg
-                ++arg;
-            }
-            if (strlen(arg) > 0)
-            {
-                // Prevent --=something from being treated as an empty
-                // arg since the empty string in the option table is
-                // for positional arguments.
-                parameter = const_cast<char*>(strchr(1 + arg, '='));
-            }
-            if (parameter)
-            {
-                *parameter++ = 0;
-            }
-
-            arg_s = arg;
-            if (! (arg_s.empty() || (arg_s.at(0) == '-')))
-            {
-                oep = this->option_table->find(arg_s);
-            }
-
-            if ((! this->bash_completion) &&
-                (argc == 2) && (cur_arg == 1) &&
-                (oep == this->option_table->end()))
-            {
-                // Handle help option, which is only valid as the sole
-                // option.
-                oep = this->help_option_table.find(arg_s);
-                help_option = true;
-            }
-        }
-        else
-        {
-            // The empty string maps to the positional argument
-            // handler.
-            oep = this->option_table->find("");
-            parameter = arg;
-        }
-
-        if (oep == this->option_table->end())
-        {
-            usage("unrecognized argument " + o_arg);
-        }
-
-        OptionEntry& oe = oep->second;
-        if ((oe.parameter_needed && (0 == parameter)) ||
-            ((! oe.choices.empty() &&
-              ((0 == parameter) ||
-               (0 == oe.choices.count(parameter))))))
-        {
-            std::string message =
-                "--" + arg_s + " must be given as --" + arg_s + "=";
-            if (! oe.choices.empty())
-            {
-                QTC::TC("qpdf", "qpdf required choices");
-                message += "{";
-                for (std::set<std::string>::iterator iter =
-                         oe.choices.begin();
-                     iter != oe.choices.end(); ++iter)
-                {
-                    if (iter != oe.choices.begin())
-                    {
-                        message += ",";
-                    }
-                    message += *iter;
-                }
-                message += "}";
-            }
-            else if (! oe.parameter_name.empty())
-            {
-                QTC::TC("qpdf", "qpdf required parameter");
-                message += oe.parameter_name;
-            }
-            else
-            {
-                // should not be possible
-                message += "option";
-            }
-            usage(message);
-        }
-        if (oe.bare_arg_handler)
-        {
-            (this->*(oe.bare_arg_handler))();
-        }
-        else if (oe.param_arg_handler)
-        {
-            (this->*(oe.param_arg_handler))(parameter);
-        }
-        if (help_option)
-        {
-            exit(0);
-        }
+        this->ap.parseArgs();
     }
-    if (this->bash_completion)
+    catch (QPDFArgParser::Usage& e)
     {
-        handleCompletion();
-    }
-    else
-    {
-        doFinalChecks();
+        usage(e.what());
     }
 }
 
 void
 ArgParser::doFinalChecks()
 {
-    if (this->option_table != &(this->main_option_table))
-    {
-        usage("missing -- at end of options");
-    }
     if (o.replace_input)
     {
         if (o.outfilename)
@@ -3767,127 +3253,6 @@ ArgParser::doFinalChecks()
         usage("input file and output file are the same;"
               " use --replace-input to intentionally overwrite the input file");
     }
-}
-
-void
-ArgParser::addChoicesToCompletions(std::string const& option,
-                                   std::string const& extra_prefix)
-{
-    if (this->option_table->count(option) != 0)
-    {
-        OptionEntry& oe = (*this->option_table)[option];
-        for (std::set<std::string>::iterator iter = oe.choices.begin();
-             iter != oe.choices.end(); ++iter)
-        {
-            completions.insert(extra_prefix + *iter);
-        }
-    }
-}
-
-void
-ArgParser::addOptionsToCompletions()
-{
-    for (std::map<std::string, OptionEntry>::iterator iter =
-             this->option_table->begin();
-         iter != this->option_table->end(); ++iter)
-    {
-        std::string const& arg = (*iter).first;
-        if (arg == "--")
-        {
-            continue;
-        }
-        OptionEntry& oe = (*iter).second;
-        std::string base = "--" + arg;
-        if (oe.param_arg_handler)
-        {
-            if (zsh_completion)
-            {
-                // zsh doesn't treat = as a word separator, so add all
-                // the options so we don't get a space after the =.
-                addChoicesToCompletions(arg, base + "=");
-            }
-            completions.insert(base + "=");
-        }
-        if (! oe.parameter_needed)
-        {
-            completions.insert(base);
-        }
-    }
-}
-
-void
-ArgParser::handleCompletion()
-{
-    std::string extra_prefix;
-    if (this->completions.empty())
-    {
-        // Detect --option=... Bash treats the = as a word separator.
-        std::string choice_option;
-        if (bash_cur.empty() && (bash_prev.length() > 2) &&
-            (bash_prev.at(0) == '-') &&
-            (bash_prev.at(1) == '-') &&
-            (bash_line.at(bash_line.length() - 1) == '='))
-        {
-            choice_option = bash_prev.substr(2, std::string::npos);
-        }
-        else if ((bash_prev == "=") &&
-                 (bash_line.length() > (bash_cur.length() + 1)))
-        {
-            // We're sitting at --option=x. Find previous option.
-            size_t end_mark = bash_line.length() - bash_cur.length() - 1;
-            char before_cur = bash_line.at(end_mark);
-            if (before_cur == '=')
-            {
-                size_t space = bash_line.find_last_of(' ', end_mark);
-                if (space != std::string::npos)
-                {
-                    std::string candidate =
-                        bash_line.substr(space + 1, end_mark - space - 1);
-                    if ((candidate.length() > 2) &&
-                        (candidate.at(0) == '-') &&
-                        (candidate.at(1) == '-'))
-                    {
-                        choice_option =
-                            candidate.substr(2, std::string::npos);
-                    }
-                }
-            }
-        }
-        if (! choice_option.empty())
-        {
-            if (zsh_completion)
-            {
-                // zsh wants --option=choice rather than just choice
-                extra_prefix = "--" + choice_option + "=";
-            }
-            addChoicesToCompletions(choice_option, extra_prefix);
-        }
-        else if ((! bash_cur.empty()) && (bash_cur.at(0) == '-'))
-        {
-            addOptionsToCompletions();
-            if (this->argc == 1)
-            {
-                // Help options are valid only by themselves.
-                for (std::map<std::string, OptionEntry>::iterator iter =
-                         this->help_option_table.begin();
-                     iter != this->help_option_table.end(); ++iter)
-                {
-                    this->completions.insert("--" + (*iter).first);
-                }
-            }
-        }
-    }
-    std::string prefix = extra_prefix + bash_cur;
-    for (std::set<std::string>::iterator iter = completions.begin();
-         iter != completions.end(); ++iter)
-    {
-        if (prefix.empty() ||
-            ((*iter).substr(0, prefix.length()) == prefix))
-        {
-            std::cout << *iter << std::endl;
-        }
-    }
-    exit(0);
 }
 
 static void set_qpdf_options(QPDF& pdf, Options& o)

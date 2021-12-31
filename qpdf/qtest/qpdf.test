@@ -149,7 +149,7 @@ foreach my $c (@completion_tests)
 show_ntests();
 # ----------
 $td->notify("--- Argument Parsing ---");
-$n_tests += 9;
+$n_tests += 12;
 
 $td->runtest("required argument",
              {$td->COMMAND => "qpdf --password minimal.pdf"},
@@ -182,18 +182,33 @@ $td->runtest("extra overlay filename",
                   $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("multiple pages options",
-             {$td->COMMAND => "qpdf --pages . -- --pages . --"},
+             {$td->COMMAND => "qpdf --pages . --password=x -- --pages . --"},
              {$td->REGEXP => ".*--pages may only be specified one time.*",
                   $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("bad numeric range detects unclosed --pages",
              {$td->COMMAND => "qpdf --pages . --pages . --"},
-             {$td->REGEXP => ".*--pages option must be terminated with --.*",
+             {$td->REGEXP => ".*pages options must be terminated with --.*",
                   $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("bad file detected as unclosed --pages",
              {$td->COMMAND => "qpdf --pages . 1 --xyz out"},
-             {$td->REGEXP => ".*--pages option must be terminated with --.*",
+             {$td->REGEXP => ".*pages options must be terminated with --.*",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("misplaced pages password 1",
+             {$td->COMMAND => "qpdf --pages . 1 --password=z --"},
+             {$td->REGEXP => ".*password must immediately follow a file name.*",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("misplaced pages password 2",
+             {$td->COMMAND => "qpdf --pages --password=z . 1 --"},
+             {$td->REGEXP => ".*password must immediately follow a file name.*",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("duplicated pages password",
+             {$td->COMMAND => "qpdf --pages . --password=z --password=z --"},
+             {$td->REGEXP => ".*password already specified.*",
                   $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 

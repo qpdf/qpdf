@@ -255,7 +255,7 @@ QPDF not caching overridden objstm object 0
 QPDFWriter original obj non-zero gen 0
 QPDF_optimization indirect outlines 0
 QPDF xref space 2
-qpdf pages range omitted at end 0
+qpdf pages range omitted at end 1
 qpdf pages range omitted in middle 0
 qpdf npages 0
 QPDF already reserved object 0
@@ -273,8 +273,6 @@ QPDF resolve failure to null 0
 QPDFWriter preserve unreferenced standard 0
 QPDFObjectHandle errors in parsecontent 0
 qpdf same file error 0
-qpdf read args from stdin 0
-qpdf read args from file 0
 qpdf split-pages %d 0
 qpdf split-pages .pdf 0
 qpdf split-pages other 0
@@ -362,8 +360,6 @@ QPDFOutlineObjectHelper named dest 0
 QPDFOutlineDocumentHelper name named dest 0
 QPDFOutlineDocumentHelper string named dest 0
 QPDFOutlineObjectHelper loop 0
-qpdf required parameter 0
-qpdf required choices 0
 QPDFObjectHandle merge top type mismatch 0
 QPDFObjectHandle merge shallow copy 0
 QPDFObjectHandle merge array 0
@@ -599,7 +595,6 @@ qpdf copy fields non-first from orig 0
 QPDF resolve duplicated page in insert 0
 QPDFWriter preserve object streams 1
 QPDFWriter exclude from object stream 0
-check unclosed --pages 1
 QPDF_pages findPage not found 0
 qpdf overlay page with no resources 0
 QPDFObjectHandle check ownership 0
@@ -629,3 +624,5 @@ qpdf-c called qpdf_oh_replace_stream_data 0
 qpdf-c silence oh errors 0
 qpdf-c called qpdf_oh_get_binary_string_value 0
 qpdf-c called qpdf_oh_new_binary_string 0
+qpdf duplicated pages password 0
+qpdf misplaced pages password 0
