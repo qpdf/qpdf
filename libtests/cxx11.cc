@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cassert>
 #include <cstring>
+#include <cstdlib>
 #include <functional>
 #include <type_traits>
 #include <cstdint>
@@ -361,6 +362,29 @@ void do_regex()
     assert((*m3)[2].matched);
 }
 
+static long operator ""_x(char const* v)
+{
+    return strtol(v, nullptr, 16);
+}
+
+static std::string operator ""_y(char const* v, size_t len)
+{
+    return "y" + std::string(v, len) + "y";
+}
+
+void do_user_defined_literals()
+{
+    assert(10_x == 16);         // operator""_x("10")
+    assert("abc"_y == "yabcy"); // operator""_y("abc", 3)
+    // Raw literals. Optional matching label before and after ()
+    // allows embedding something that looks like the default end
+    // delimiter in the string.
+    assert(R"(abc)"_y == "yabcy");
+
+    // This construct does not work in MSVC as of version 2019.
+    // assert(R"x(a)"bc)x"_y == "ya)\"bcy");
+}
+
 int main()
 {
     do_functional();
@@ -370,6 +394,7 @@ int main()
     do_default_deleted();
     do_smart_pointers();
     do_regex();
+    do_user_defined_literals();
     std::cout << "assertions passed\n";
     return 0;
 }
