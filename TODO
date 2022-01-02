@@ -2,6 +2,8 @@ Next
 ====
 
 * High-level API/doc overhaul: #593
+* Add user-defined initializer `QPDFObjectHandle operator ""_qpdf` to
+  be like QPDFObjectHandle::parse: `auto oh = "<< /a (b) >>"_qpdf;`
 
 Consider in the context of #593, possibly with a different
 implementation
