@@ -626,3 +626,8 @@ qpdf-c called qpdf_oh_get_binary_string_value 0
 qpdf-c called qpdf_oh_new_binary_string 0
 qpdf duplicated pages password 0
 qpdf misplaced pages password 0
+qpdf check encrypted encrypted 0
+qpdf check encrypted not encrypted 0
+qpdf check password password incorrect 0
+qpdf check password password correct 0
+qpdf check password not encrypted 0

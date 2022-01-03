@@ -1,7 +1,5 @@
 qpdf: copying attachments from b.pdf
   auto-1 -> 1-auto-1
-qpdf: copying attachments from b.pdf
   auto-3 -> 1-auto-3
-qpdf: copying attachments from b.pdf
   auto-Two -> 1-auto-Two
 qpdf: wrote file c.pdf

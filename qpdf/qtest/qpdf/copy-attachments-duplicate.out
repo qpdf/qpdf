@@ -1,7 +1,2 @@
 qpdf: copying attachments from b.pdf
-qpdfb.pdf and a.pdf both have attachments with key auto-1; use --prefix with --copy-attachments-from or manually copy individual attachments
-qpdf: copying attachments from b.pdf
-qpdfb.pdf and a.pdf both have attachments with key auto-3; use --prefix with --copy-attachments-from or manually copy individual attachments
-qpdf: copying attachments from b.pdf
-qpdfb.pdf and a.pdf both have attachments with key auto-Two; use --prefix with --copy-attachments-from or manually copy individual attachments
-qpdf: wrote file c.pdf
+qpdf: a.pdf already has attachments with keys that conflict with attachments from other files: file: b.pdf, key: auto-1; file: b.pdf, key: auto-3; file: b.pdf, key: auto-Two. Use --prefix with --copy-attachments-from or manually copy individual attachments.

@@ -24,6 +24,11 @@ QPDFArgParser::Members::Members(
     option_table(nullptr),
     final_check_handler(nullptr)
 {
+    // Remove prefix added by libtool for consistency during testing.
+    if (strncmp(whoami, "lt-", 3) == 0)
+    {
+	whoami += 3;
+    }
 }
 
 QPDFArgParser::QPDFArgParser(int argc, char* argv[], char const* progname_env) :

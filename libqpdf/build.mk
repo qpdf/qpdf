@@ -64,6 +64,7 @@ SRCS_libqpdf = \
 	libqpdf/QPDFExc.cc \
 	libqpdf/QPDFFileSpecObjectHelper.cc \
 	libqpdf/QPDFFormFieldObjectHelper.cc \
+	libqpdf/QPDFJob.cc \
 	libqpdf/QPDFMatrix.cc \
 	libqpdf/QPDFNameTreeObjectHelper.cc \
 	libqpdf/QPDFNumberTreeObjectHelper.cc \
