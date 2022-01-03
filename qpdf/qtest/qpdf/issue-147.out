@@ -5,4 +5,4 @@ WARNING: issue-147.pdf: Attempting to reconstruct cross-reference table
 WARNING: issue-147.pdf (trailer, offset 9): expected dictionary key but found non-name object; inserting key /QPDFFake1
 WARNING: issue-147.pdf (object 62 0, offset 88): expected endobj
 WARNING: issue-147.pdf (trailer, offset 90): invalid /ID in trailer dictionary
-issue-147.pdf: invalid password
+qpdf: issue-147.pdf: invalid password

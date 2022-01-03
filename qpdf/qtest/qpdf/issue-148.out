@@ -7,4 +7,4 @@ WARNING: issue-148.pdf (offset 73): error decoding stream data for object 8 0: s
 WARNING: issue-148.pdf: file is damaged
 WARNING: issue-148.pdf (offset 73): getStreamData called on unfilterable stream
 WARNING: issue-148.pdf: Attempting to reconstruct cross-reference table
-issue-148.pdf: unable to find trailer dictionary while recovering damaged file
+qpdf: issue-148.pdf: unable to find trailer dictionary while recovering damaged file

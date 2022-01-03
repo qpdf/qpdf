@@ -3494,7 +3494,7 @@ foreach my $d ('nn', 'ny', 'yn', 'yy')
 
 $td->runtest("deterministic ID with encryption",
              {$td->COMMAND => "qpdf -deterministic-id encrypted-with-images.pdf a.pdf"},
-             {$td->STRING => "INTERNAL ERROR: QPDFWriter::generateID" .
+             {$td->STRING => "qpdf: INTERNAL ERROR: QPDFWriter::generateID" .
                   " has no data for deterministic ID." .
                   "  This may happen if deterministic ID and" .
                   " file encryption are requested together.\n",
@@ -4272,8 +4272,9 @@ $td->runtest("non-encrypted",
 $td->runtest("invalid password",
 	     {$td->COMMAND => "qpdf -qdf --password=quack" .
 		  " enc-R2,V1,U=view,O=view.pdf a.qdf"},
-	     {$td->STRING => "enc-R2,V1,U=view,O=view.pdf: invalid password\n",
-	      $td->EXIT_STATUS => 2},
+	     {$td->STRING =>
+                  "qpdf: enc-R2,V1,U=view,O=view.pdf: invalid password\n",
+                  $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("C API: invalid password",
 	     {$td->COMMAND =>
@@ -4740,7 +4741,7 @@ foreach my $d (@unicode_pw_cases)
     my $exp = '';
     if (ref($decode_cases) ne 'ARRAY')
     {
-        $exp = $decode_cases;
+        $exp = "qpdf: $decode_cases";
         $decode_cases = [];
     }
     $td->runtest("encode $bits, $pw, $w_encoding",
@@ -4762,7 +4763,7 @@ foreach my $d (@unicode_pw_cases)
         $r_output .= "trying other\n" if $tried_others;
         if ($xfail)
         {
-            $r_output .= "a.pdf: invalid password\n";
+            $r_output .= "qpdf: a.pdf: invalid password\n";
         }
         else
         {

@@ -9,4 +9,4 @@ WARNING: issue-263.pdf (trailer, offset 82): unexpected )
 WARNING: issue-263.pdf (trailer, offset 83): unknown token while reading object; treating as string
 WARNING: issue-263.pdf (trailer, offset 87): unexpected >
 WARNING: issue-263.pdf (trailer, offset 87): too many errors; giving up on reading object
-issue-263.pdf: unable to find trailer dictionary while recovering damaged file
+qpdf: issue-263.pdf: unable to find trailer dictionary while recovering damaged file

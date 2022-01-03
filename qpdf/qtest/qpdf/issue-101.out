@@ -40,4 +40,4 @@ WARNING: issue-101.pdf (object 11 0, offset 639): unknown token while reading ob
 WARNING: issue-101.pdf (object 11 0, offset 644): unknown token while reading object; treating as string
 WARNING: issue-101.pdf (object 11 0, offset 644): too many errors; giving up on reading object
 WARNING: issue-101.pdf (object 11 0, offset 647): expected endobj
-issue-101.pdf (offset 687): unable to find /Root dictionary
+qpdf: issue-101.pdf (offset 687): unable to find /Root dictionary
