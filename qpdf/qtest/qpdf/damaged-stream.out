@@ -4,3 +4,4 @@ File is not encrypted
 File is not linearized
 WARNING: damaged-stream.pdf (offset 426): error decoding stream data for object 5 0: LZWDecoder: bad code received
 WARNING: damaged-stream.pdf (offset 426): stream will be re-processed without filtering to avoid data loss
+qpdf: operation succeeded with warnings

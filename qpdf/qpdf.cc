@@ -314,6 +314,7 @@ ArgParser::initOptionTable()
     this->ap.addBare("show-pages", b(&ArgParser::argShowPages));
     this->ap.addBare("with-images", b(&ArgParser::argWithImages));
     this->ap.addBare("json", b(&ArgParser::argJson));
+    // QXXXQ
     // The list of selectable top-level keys id duplicated in three
     // places: json_schema, do_json, and initOptionTable.
     char const* json_key_choices[] = {
@@ -2350,6 +2351,7 @@ ArgParser::doFinalChecks()
     }
     if (o.optimize_images && (! o.keep_inline_images))
     {
+        // QXXXQ this is not a check and doesn't belong here
         o.externalize_inline_images = true;
     }
     if (o.check_requires_password && o.check_is_encrypted)
@@ -2384,7 +2386,7 @@ ArgParser::doFinalChecks()
             usage("--split-pages may not be used when"
                   " writing to standard output");
         }
-        if (o.verbose)
+        if (o.verbose)     // QXXXQ
         {
             usage("--verbose may not be used when"
                   " writing to standard output");
@@ -2418,6 +2420,7 @@ int realmain(int argc, char* argv[])
     // ArgParser must stay in scope for the duration of qpdf's run as
     // it holds dynamic memory used for argv.
     QPDFJob j;
+    j.setMessagePrefix(whoami);
     ArgParser ap(argc, argv, j);
 
     bool errors = false;
@@ -2439,9 +2442,17 @@ int realmain(int argc, char* argv[])
     {
         if (! j.suppressWarnings())
         {
-            std::cerr << whoami << ": operation succeeded with warnings;"
-                      << " resulting file may have some problems"
-                      << std::endl;
+            if (j.createsOutput())
+            {
+                std::cerr << whoami << ": operation succeeded with warnings;"
+                          << " resulting file may have some problems"
+                          << std::endl;
+            }
+            else
+            {
+                std::cerr << whoami << ": operation succeeded with warnings"
+                          << std::endl;
+            }
         }
         // Still return with warning code even if warnings were
         // suppressed, so leave warnings == true.

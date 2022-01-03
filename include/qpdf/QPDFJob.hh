@@ -33,6 +33,7 @@
 #include <set>
 #include <map>
 #include <iostream>
+#include <functional>
 
 class QPDFWriter;
 
@@ -42,8 +43,22 @@ class QPDFJob
     QPDF_DLL
     QPDFJob();
 
+    // Set name that is used to prefix verbose messages, progress
+    // messages, and other things that the library writes to output
+    // and error streams on the caller's behalf. Defaults to "qpdf".
+    QPDF_DLL
+    void setMessagePrefix(std::string const&);
+
+    // Override streams that errors and output go to. Defaults are
+    // std::cout and std::cerr.
     QPDF_DLL
     void setOutputStreams(std::ostream* out_stream, std::ostream* err_stream);
+
+    // If in verbose mode, call the given function, passing in the
+    // output stream and message prefix.
+    QPDF_DLL
+    void doIfVerbose(
+        std::function<void(std::ostream&, std::string const& prefix)> fn);
 
     QPDF_DLL
     void run();
@@ -63,14 +78,13 @@ class QPDFJob
     QPDF_DLL
     bool checkIsEncrypted();
 
-
     // Return value is bitwise OR of values from qpdf_encryption_status_e
     QPDF_DLL
     unsigned long getEncryptionStatus();
 
-    // QXXXQ From here to END-PUBLIC should all be private
+    // QXXXQ From here to END-PUBLIC should all be private or
+    // different somehow
   public:
-
     QPDF_DLL
     static JSON json_schema(std::set<std::string>* keys = 0);
     QPDF_DLL
@@ -165,6 +179,10 @@ class QPDFJob
     void setWriterOptions(QPDF& pdf, QPDFWriter& w);
     void doSplitPages(QPDF& pdf, bool& warnings);
     void writeOutfile(QPDF& pdf);
+    void doJSON(QPDF& pdf);
+    void doInspection(QPDF& pdf);
+    void showEncryption(QPDF& pdf);
+    void doCheck(QPDF& pdf);
 
     enum remove_unref_e { re_auto, re_yes, re_no };
 
@@ -295,6 +313,7 @@ class QPDFJob
         Members();
         Members(Members const&) = delete;
 
+        std::string whoami;
         bool warnings;
         bool creates_output;
         std::ostream* out_stream;

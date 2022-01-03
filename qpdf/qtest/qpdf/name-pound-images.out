@@ -6,3 +6,4 @@ WARNING: name-pound-images.pdf (object 3 0, offset 471): name with stray # will 
 WARNING: name-pound-images.pdf (object 3 0, offset 508): name with stray # will not work with PDF >= 1.2
 WARNING: page object 3 0 stream 4 0 (content, offset 59): name with stray # will not work with PDF >= 1.2
 WARNING: page object 3 0 stream 4 0 (content, offset 131): name with stray # will not work with PDF >= 1.2
+qpdf: operation succeeded with warnings

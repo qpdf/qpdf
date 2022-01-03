@@ -4,3 +4,4 @@ File is not encrypted
 File is not linearized
 WARNING: bad-jpeg.pdf (offset 735): error decoding stream data for object 6 0: Not a JPEG file: starts with 0x77 0x77
 WARNING: bad-jpeg.pdf (offset 735): stream will be re-processed without filtering to avoid data loss
+qpdf: operation succeeded with warnings

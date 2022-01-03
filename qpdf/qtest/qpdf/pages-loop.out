@@ -3,3 +3,4 @@ PDF Version: 1.3
 File is not encrypted
 File is not linearized
 ERROR: pages-loop.pdf (object 3 0): Loop detected in /Pages structure (getAllPages)
+qpdf: errors detected

@@ -5,3 +5,4 @@ File is not linearized
 WARNING: page object 3 0 stream 7 0 (content, offset 52): parse error while reading object
 WARNING: page object 5 0 stream 15 0 (stream data, offset 117): EOF found while reading inline image
 WARNING: page object 6 0 stream 19 0 (content, offset 53): parse error while reading object
+qpdf: operation succeeded with warnings

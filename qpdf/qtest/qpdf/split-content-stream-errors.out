@@ -7,3 +7,4 @@ WARNING: split-content-stream-errors.pdf (offset 557): stream will be re-process
 WARNING: page object 3 0 (item index 0 (from 0)): ignoring non-stream in an array of streams
 WARNING: split-content-stream-errors.pdf (offset 557): error decoding stream data for object 6 0: LZWDecoder: bad code received
 ERROR: page 1: content stream (content stream object 6 0): errors while decoding content stream
+qpdf: errors detected

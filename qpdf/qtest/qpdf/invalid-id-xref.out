@@ -15,3 +15,4 @@ modify annotations: allowed
 modify other: not allowed
 modify anything: not allowed
 File is not linearized
+qpdf: operation succeeded with warnings

@@ -12,3 +12,4 @@ WARNING: bad-xref-entry.pdf: Attempting to reconstruct cross-reference table
 5/0: uncompressed; offset = 583
 6/0: uncompressed; offset = 629
 7/0: uncompressed; offset = 774
+qpdf: operation succeeded with warnings

@@ -6,3 +6,4 @@ WARNING: linearization-bounds-1.pdf (linearization hint stream: object 62 0, off
 WARNING: linearization-bounds-1.pdf (linearization hint stream: object 62 0, offset 1183): attempting to recover stream length
 WARNING: linearization-bounds-1.pdf (linearization hint stream: object 62 0, offset 1183): recovered stream length: 106
 WARNING: error encountered while checking linearization data: linearization-bounds-1.pdf (linearization hint table, offset 1183): /S (shared object) offset is out of bounds
+qpdf: operation succeeded with warnings
