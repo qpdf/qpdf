@@ -662,6 +662,12 @@ QPDFArgParser::parseArgs()
     }
 }
 
+std::string
+QPDFArgParser::getProgname()
+{
+    return this->m->whoami;
+}
+
 void
 QPDFArgParser::doFinalChecks()
 {

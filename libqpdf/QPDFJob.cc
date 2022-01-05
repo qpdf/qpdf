@@ -326,6 +326,7 @@ QPDFJob::QPDFJob() :
     verbose(false),
     progress(false),
     suppress_warnings(false),
+    warnings_exit_zero(false),
     copy_encryption(false),
     encryption_file(0),
     encryption_file_password(0),
@@ -526,6 +527,12 @@ bool
 QPDFJob::suppressWarnings()
 {
     return this->suppress_warnings;
+}
+
+bool
+QPDFJob::warningsExitZero()
+{
+    return this->warnings_exit_zero;
 }
 
 bool

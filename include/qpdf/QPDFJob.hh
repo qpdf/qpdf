@@ -27,6 +27,7 @@
 #include <qpdf/PointerHolder.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
+#include <qpdf/QPDFArgParser.hh>
 
 #include <string>
 #include <list>
@@ -43,6 +44,29 @@ class QPDFJob
   public:
     QPDF_DLL
     QPDFJob();
+
+    // Initialize a QPDFJob object from argv. The progname_env
+    // argument is the name of an environment variable which, if set,
+    // overrides the name of the executable for purposes of generating
+    // the --completion options. See QPDFArgParser for details. If a
+    // null pointer is passed in, the default value of
+    // "QPDF_EXECUTABLE" is used. This is used by the QPDF cli, which
+    // just initializes a QPDFJob from argv, calls run(), and handles
+    // errors and exit status issues. You can perform much of the cli
+    // functionality programmatically in this way rather than using
+    // the regular API. This is exposed in the C API, which makes it
+    // easier to get certain high-level qpdf functionality from other
+    // languages. If there are any command-line errors, this method
+    // will throw QPDFArgParser::Usage which is derived from
+    // std::runtime_error. Other exceptions may be thrown in some
+    // cases. Note that argc, and argv should be UTF-8 encoded. If you
+    // are calling this from a Windows Unicode-aware main (wmain), see
+    // QUtil::call_main_from_wmain for information about converting
+    // arguments to UTF-8. This method will mutate arguments that are
+    // passed to it.
+    QPDF_DLL
+    void initializeFromArgv(int argc, char* argv[],
+                            char const* progname_env = nullptr);
 
     // Set name that is used to prefix verbose messages, progress
     // messages, and other things that the library writes to output
@@ -72,6 +96,9 @@ class QPDFJob
 
     QPDF_DLL
     bool suppressWarnings();
+
+    QPDF_DLL
+    bool warningsExitZero();
 
     QPDF_DLL
     bool checkRequiresPassword();
@@ -180,6 +207,7 @@ class QPDFJob
     bool verbose;
     bool progress;
     bool suppress_warnings;
+    bool warnings_exit_zero;
     bool copy_encryption;
     char const* encryption_file;
     char const* encryption_file_password;
@@ -367,6 +395,7 @@ class QPDFJob
         std::ostream* cout;
         std::ostream* cerr;
         unsigned long encryption_status;
+        PointerHolder<QPDFArgParser> ap;
     };
     PointerHolder<Members> m;
 };

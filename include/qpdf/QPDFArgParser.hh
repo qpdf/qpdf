@@ -73,6 +73,11 @@ class QPDFArgParser
     QPDF_DLL
     void parseArgs();
 
+    // Return the program name as the last path element of the program
+    // executable.
+    QPDF_DLL
+    std::string getProgname();
+
     // Methods for registering arguments. QPDFArgParser starts off
     // with the main option table selected. You can add handlers for
     // arguments in the current option table, and you can select which
