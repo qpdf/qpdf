@@ -1830,11 +1830,9 @@ ImageOptimizer::provideStreamData(int, int, Pipeline* pipeline)
                          false, false);
 }
 
-template <typename T>
 static PointerHolder<QPDF> do_process_once(
-    void (QPDF::*fn)(T, char const*),
-    T item, char const* password,
-    QPDFJob& o, bool empty)
+    std::function<void(QPDF*, char const*)> fn,
+    char const* password, QPDFJob& o, bool empty)
 {
     PointerHolder<QPDF> pdf = new QPDF;
     set_qpdf_options(*pdf, o);
@@ -1844,16 +1842,14 @@ static PointerHolder<QPDF> do_process_once(
     }
     else
     {
-        ((*pdf).*fn)(item, password);
+        fn(pdf.getPointer(), password);
     }
     return pdf;
 }
 
-template <typename T>
 static PointerHolder<QPDF> do_process(
-    void (QPDF::*fn)(T, char const*),
-    T item, char const* password,
-    QPDFJob& o, bool empty)
+    std::function<void(QPDF*, char const*)> fn,
+    char const* password, QPDFJob& o, bool empty)
 {
     // If a password has been specified but doesn't work, try other
     // passwords that are equivalent in different character encodings.
@@ -1882,7 +1878,7 @@ static PointerHolder<QPDF> do_process(
     {
         // There is no password, or we're not doing recovery, so just
         // do the normal processing with the supplied password.
-        return do_process_once(fn, item, password, o, empty);
+        return do_process_once(fn, password, o, empty);
     }
 
     // Get a list of otherwise encoded strings. Keep in scope for this
@@ -1916,7 +1912,7 @@ static PointerHolder<QPDF> do_process(
     {
         try
         {
-            return do_process_once(fn, item, *iter, o, empty);
+            return do_process_once(fn, *iter, o, empty);
         }
         catch (QPDFExc& e)
         {
@@ -1946,14 +1942,19 @@ PointerHolder<QPDF>
 QPDFJob::processFile(char const* filename, char const* password)
 {
     QPDFJob& o = *this; // QXXXQ
-    return do_process(&QPDF::processFile, filename, password, o,
-                      strcmp(filename, "") == 0);
+    auto f1 = std::mem_fn<void(char const*, char const*)>(&QPDF::processFile);
+    auto fn = std::bind(
+        f1, std::placeholders::_1, filename, std::placeholders::_2);
+    return do_process(fn, password, o, strcmp(filename, "") == 0);
 }
 
 static PointerHolder<QPDF> process_input_source(
     PointerHolder<InputSource> is, char const* password, QPDFJob& o)
 {
-    return do_process(&QPDF::processInputSource, is, password, o, false);
+    auto f1 = std::mem_fn(&QPDF::processInputSource);
+    auto fn = std::bind(
+        f1, std::placeholders::_1, is, std::placeholders::_2);
+    return do_process(fn, password, o, false);
 }
 
 void
