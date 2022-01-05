@@ -24,8 +24,6 @@ static int constexpr EXIT_CORRECT_PASSWORD = 3;
 
 static char const* whoami = 0;
 
-static std::string expected_version = "10.5.0";
-
 class ArgParser
 {
   public:
@@ -445,17 +443,6 @@ ArgParser::argPositional(char* arg)
 void
 ArgParser::argVersion()
 {
-    if (expected_version != QPDF::QPDFVersion())
-    {
-        std::cerr << "***\n"
-                  << "WARNING: qpdf CLI from version " << expected_version
-                  << " is using library version " << QPDF::QPDFVersion()
-                  << ".\n"
-                  << "This probably means you have multiple versions of qpdf installed\n"
-                  << "and don't have your library path configured correctly.\n"
-                  << "***"
-                  << std::endl;
-    }
     std::cout
         << whoami << " version " << QPDF::QPDFVersion() << std::endl
         << "Run " << whoami << " --copyright to see copyright and license information."

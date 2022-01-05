@@ -223,7 +223,6 @@ RELEASE PREPARATION
     * configure.ac
     * libqpdf/QPDF.cc
     * manual/conf.py
-    * qpdf/qpdf.cc
     `make_dist` verifies this consistency.
 
   * Update release notes in manual. Look at diffs and ChangeLog.

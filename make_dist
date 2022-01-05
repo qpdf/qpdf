@@ -64,7 +64,6 @@ cd($tmpdir);
 my $config_version = get_version_from_configure();
 my $code_version = get_version_from_source();
 my $doc_version = get_version_from_manual();
-my $cli_version = get_version_from_cli();
 
 my $version_error = 0;
 if ($version ne $config_version)
@@ -80,11 +79,6 @@ if ($version ne $code_version)
 if ($version ne $doc_version)
 {
     print "$whoami: doc version = $doc_version\n";
-    $version_error = 1;
-}
-if ($version ne $cli_version)
-{
-    print "$whoami: qpdf.cc version = $cli_version\n";
     $version_error = 1;
 }
 if ($version_error)
@@ -155,22 +149,6 @@ sub get_version_from_manual
     }
     $fh->close();
     $doc_version;
-}
-
-sub get_version_from_cli
-{
-    my $fh = safe_open("qpdf/qpdf.cc");
-    my $cli_version = 'unknown';
-    while (<$fh>)
-    {
-        if (m/expected_version = \"([^\"]+)\"/)
-        {
-            $cli_version = $1;
-            last;
-        }
-    }
-    $fh->close();
-    $cli_version;
 }
 
 sub safe_open
