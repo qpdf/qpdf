@@ -170,60 +170,6 @@ class QPDFJob
         std::string prefix;
     };
 
-    PointerHolder<QPDF> doProcessOnce(
-        std::function<void(QPDF*, char const*)> fn,
-        char const* password, bool empty);
-    PointerHolder<QPDF> doProcess(
-        std::function<void(QPDF*, char const*)> fn,
-        char const* password, bool empty);
-    PointerHolder<QPDF> processFile(
-        char const* filename, char const* password);
-    void validateUnderOverlay(QPDF& pdf, QPDFJob::UnderOverlay* uo);
-    void handleUnderOverlay(QPDF& pdf);
-    void copyAttachments(QPDF& pdf);
-    void handleTransformations(QPDF& pdf);
-    void addAttachments(QPDF& pdf);
-    void setWriterOptions(QPDF& pdf, QPDFWriter& w);
-    void doSplitPages(QPDF& pdf, bool& warnings);
-    void writeOutfile(QPDF& pdf);
-    void doJSON(QPDF& pdf);
-    void doInspection(QPDF& pdf);
-    void setQPDFOptions(QPDF& pdf);
-    void showEncryption(QPDF& pdf);
-    void doCheck(QPDF& pdf);
-    void doShowObj(QPDF& pdf);
-    void doShowPages(QPDF& pdf);
-    void doListAttachments(QPDF& pdf);
-    void setEncryptionOptions(QPDF&, QPDFWriter&);
-    void maybeFixWritePassword(int R, std::string& password);
-
-    void doShowAttachment(QPDF& pdf);
-    std::set<QPDFObjGen> getWantedJSONObjects();
-    void doJSONObjects(QPDF& pdf, JSON& j);
-    void doJSONObjectinfo(QPDF& pdf, JSON& j);
-    void doJSONPages(QPDF& pdf, JSON& j);
-    void doJSONPageLabels(QPDF& pdf, JSON& j);
-    void doJSONOutlines(QPDF& pdf, JSON& j);
-    void doJSONAcroform(QPDF& pdf, JSON& j);
-    void doJSONEncrypt(QPDF& pdf, JSON& j);
-    void doJSONAttachments(QPDF& pdf, JSON& j);
-    PointerHolder<QPDF> processInputSource(
-        PointerHolder<InputSource> is, char const* password);
-    void doUnderOverlayForPage(
-        QPDF& pdf,
-        QPDFJob::UnderOverlay& uo,
-        std::map<int, std::vector<int> >& pagenos,
-        size_t page_idx,
-        std::map<int, QPDFObjectHandle>& fo,
-        std::vector<QPDFPageObjectHelper>& pages,
-        QPDFPageObjectHelper& dest_page,
-        bool before);
-    bool shouldRemoveUnreferencedResources(QPDF& pdf);
-    void handlePageSpecs(
-        QPDF& pdf, bool& warnings,
-        std::vector<PointerHolder<QPDF>>& page_heap);
-    void handleRotations(QPDF& pdf);
-
     enum remove_unref_e { re_auto, re_yes, re_no };
 
     char const* password;
@@ -341,6 +287,68 @@ class QPDFJob
     // QXXXQ END-PUBLIC
 
   private:
+    // Basic file processing
+    PointerHolder<QPDF> processFile(
+        char const* filename, char const* password);
+    PointerHolder<QPDF> processInputSource(
+        PointerHolder<InputSource> is, char const* password);
+    PointerHolder<QPDF> doProcess(
+        std::function<void(QPDF*, char const*)> fn,
+        char const* password, bool empty);
+    PointerHolder<QPDF> doProcessOnce(
+        std::function<void(QPDF*, char const*)> fn,
+        char const* password, bool empty);
+
+    // Transformations
+    void setQPDFOptions(QPDF& pdf);
+    void handlePageSpecs(
+        QPDF& pdf, bool& warnings,
+        std::vector<PointerHolder<QPDF>>& page_heap);
+    bool shouldRemoveUnreferencedResources(QPDF& pdf);
+    void handleRotations(QPDF& pdf);
+    void handleUnderOverlay(QPDF& pdf);
+    void doUnderOverlayForPage(
+        QPDF& pdf,
+        QPDFJob::UnderOverlay& uo,
+        std::map<int, std::vector<int> >& pagenos,
+        size_t page_idx,
+        std::map<int, QPDFObjectHandle>& fo,
+        std::vector<QPDFPageObjectHelper>& pages,
+        QPDFPageObjectHelper& dest_page,
+        bool before);
+    void validateUnderOverlay(QPDF& pdf, QPDFJob::UnderOverlay* uo);
+    void handleTransformations(QPDF& pdf);
+    void addAttachments(QPDF& pdf);
+    void copyAttachments(QPDF& pdf);
+
+    // Inspection
+    void doInspection(QPDF& pdf);
+    void doCheck(QPDF& pdf);
+    void showEncryption(QPDF& pdf);
+    void doShowObj(QPDF& pdf);
+    void doShowPages(QPDF& pdf);
+    void doListAttachments(QPDF& pdf);
+    void doShowAttachment(QPDF& pdf);
+
+    // Output generation
+    void doSplitPages(QPDF& pdf, bool& warnings);
+    void setWriterOptions(QPDF& pdf, QPDFWriter& w);
+    void setEncryptionOptions(QPDF&, QPDFWriter&);
+    void maybeFixWritePassword(int R, std::string& password);
+    void writeOutfile(QPDF& pdf);
+
+    // JSON
+    void doJSON(QPDF& pdf);
+    std::set<QPDFObjGen> getWantedJSONObjects();
+    void doJSONObjects(QPDF& pdf, JSON& j);
+    void doJSONObjectinfo(QPDF& pdf, JSON& j);
+    void doJSONPages(QPDF& pdf, JSON& j);
+    void doJSONPageLabels(QPDF& pdf, JSON& j);
+    void doJSONOutlines(QPDF& pdf, JSON& j);
+    void doJSONAcroform(QPDF& pdf, JSON& j);
+    void doJSONEncrypt(QPDF& pdf, JSON& j);
+    void doJSONAttachments(QPDF& pdf, JSON& j);
+
     class Members
     {
         friend class QPDFJob;

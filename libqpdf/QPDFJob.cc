@@ -97,6 +97,182 @@ namespace
     };
 }
 
+ImageOptimizer::ImageOptimizer(QPDFJob& o, QPDFObjectHandle& image) :
+    o(o),
+    image(image)
+{
+}
+
+PointerHolder<Pipeline>
+ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
+{
+    PointerHolder<Pipeline> result;
+    QPDFObjectHandle dict = image.getDict();
+    QPDFObjectHandle w_obj = dict.getKey("/Width");
+    QPDFObjectHandle h_obj = dict.getKey("/Height");
+    QPDFObjectHandle colorspace_obj = dict.getKey("/ColorSpace");
+    if (! (w_obj.isNumber() && h_obj.isNumber()))
+    {
+        if (! description.empty())
+        {
+            o.doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
+                cout << prefix << ": " << description
+                     << ": not optimizing because image dictionary"
+                     << " is missing required keys" << std::endl;
+            });
+        }
+        return result;
+    }
+    QPDFObjectHandle components_obj = dict.getKey("/BitsPerComponent");
+    if (! (components_obj.isInteger() && (components_obj.getIntValue() == 8)))
+    {
+        QTC::TC("qpdf", "qpdf image optimize bits per component");
+        if (! description.empty())
+        {
+            o.doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
+                cout << prefix << ": " << description
+                     << ": not optimizing because image has other than"
+                     << " 8 bits per component" << std::endl;
+            });
+        }
+        return result;
+    }
+    // Files have been seen in the wild whose width and height are
+    // floating point, which is goofy, but we can deal with it.
+    JDIMENSION w = 0;
+    if (w_obj.isInteger())
+    {
+        w = w_obj.getUIntValueAsUInt();
+    }
+    else
+    {
+        w = static_cast<JDIMENSION>(w_obj.getNumericValue());
+    }
+    JDIMENSION h = 0;
+    if (h_obj.isInteger())
+    {
+        h = h_obj.getUIntValueAsUInt();
+    }
+    else
+    {
+        h = static_cast<JDIMENSION>(h_obj.getNumericValue());
+    }
+    std::string colorspace = (colorspace_obj.isName() ?
+                              colorspace_obj.getName() :
+                              std::string());
+    int components = 0;
+    J_COLOR_SPACE cs = JCS_UNKNOWN;
+    if (colorspace == "/DeviceRGB")
+    {
+        components = 3;
+        cs = JCS_RGB;
+    }
+    else if (colorspace == "/DeviceGray")
+    {
+        components = 1;
+        cs = JCS_GRAYSCALE;
+    }
+    else if (colorspace == "/DeviceCMYK")
+    {
+        components = 4;
+        cs = JCS_CMYK;
+    }
+    else
+    {
+        QTC::TC("qpdf", "qpdf image optimize colorspace");
+        if (! description.empty())
+        {
+            o.doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
+                cout << prefix << ": " << description
+                     << ": not optimizing because qpdf can't optimize"
+                     << " images with this colorspace" << std::endl;
+            });
+        }
+        return result;
+    }
+    if (((o.oi_min_width > 0) && (w <= o.oi_min_width)) ||
+        ((o.oi_min_height > 0) && (h <= o.oi_min_height)) ||
+        ((o.oi_min_area > 0) && ((w * h) <= o.oi_min_area)))
+    {
+        QTC::TC("qpdf", "qpdf image optimize too small");
+        if (! description.empty())
+        {
+            o.doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
+                cout << prefix << ": " << description
+                     << ": not optimizing because image"
+                     << " is smaller than requested minimum dimensions"
+                     << std::endl;
+            });
+        }
+        return result;
+    }
+
+    result = new Pl_DCT("jpg", next, w, h, components, cs);
+    return result;
+}
+
+bool
+ImageOptimizer::evaluate(std::string const& description)
+{
+    if (! image.pipeStreamData(0, 0, qpdf_dl_specialized, true))
+    {
+        QTC::TC("qpdf", "qpdf image optimize no pipeline");
+        o.doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
+            cout << prefix << ": " << description
+                 << ": not optimizing because unable to decode data"
+                 << " or data already uses DCT"
+                 << std::endl;
+        });
+        return false;
+    }
+    Pl_Discard d;
+    Pl_Count c("count", &d);
+    PointerHolder<Pipeline> p = makePipeline(description, &c);
+    if (p.getPointer() == 0)
+    {
+        // message issued by makePipeline
+        return false;
+    }
+    if (! image.pipeStreamData(p.getPointer(), 0, qpdf_dl_specialized))
+    {
+        return false;
+    }
+    long long orig_length = image.getDict().getKey("/Length").getIntValue();
+    if (c.getCount() >= orig_length)
+    {
+        QTC::TC("qpdf", "qpdf image optimize no shrink");
+        o.doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
+            cout << prefix << ": " << description
+                 << ": not optimizing because DCT compression does not"
+                 << " reduce image size" << std::endl;
+        });
+        return false;
+    }
+    o.doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
+        cout << prefix << ": " << description
+             << ": optimizing image reduces size from "
+             << orig_length << " to " << c.getCount()
+             << std::endl;
+    });
+    return true;
+}
+
+void
+ImageOptimizer::provideStreamData(int, int, Pipeline* pipeline)
+{
+    PointerHolder<Pipeline> p = makePipeline("", pipeline);
+    if (p.getPointer() == 0)
+    {
+        // Should not be possible
+        image.warnIfPossible("unable to create pipeline after previous"
+                             " success; image data will be lost");
+        pipeline->finish();
+        return;
+    }
+    image.pipeStreamData(p.getPointer(), 0, qpdf_dl_specialized,
+                         false, false);
+}
+
 QPDFPageData::QPDFPageData(std::string const& filename,
                            QPDF* qpdf,
                            char const* range) :
@@ -131,7 +307,6 @@ ProgressReporter::reportProgress(int percentage)
     this->cout << prefix << ": " << filename << ": write progress: "
                << percentage << "%" << std::endl;
 }
-
 
 QPDFJob::Members::Members() :
     message_prefix("qpdf"),
@@ -246,6 +421,7 @@ QPDFJob::QPDFJob() :
 {
 }
 
+
 void
 QPDFJob::setMessagePrefix(std::string const& message_prefix)
 {
@@ -269,19 +445,105 @@ QPDFJob::doIfVerbose(
     }
 }
 
-static void parse_version(std::string const& full_version_string,
-                          std::string& version, int& extension_level)
+void
+QPDFJob::run()
 {
-    PointerHolder<char> vp(true, QUtil::copy_string(full_version_string));
-    char* v = vp.getPointer();
-    char* p1 = strchr(v, '.');
-    char* p2 = (p1 ? strchr(1 + p1, '.') : 0);
-    if (p2 && *(p2 + 1))
+    QPDFJob& o = *this; // QXXXQ
+    PointerHolder<QPDF> pdf_ph;
+    try
     {
-        *p2++ = '\0';
-        extension_level = QUtil::string_to_int(p2);
+        pdf_ph = processFile(o.infilename, o.password);
     }
-    version = v;
+    catch (QPDFExc& e)
+    {
+        if ((e.getErrorCode() == qpdf_e_password) &&
+            (o.check_is_encrypted || o.check_requires_password))
+        {
+            // Allow --is-encrypted and --requires-password to
+            // work when an incorrect password is supplied.
+            this->m->encryption_status =
+                qpdf_es_encrypted |
+                qpdf_es_password_incorrect;
+            return;
+        }
+        throw e;
+    }
+    QPDF& pdf = *pdf_ph;
+    if (pdf.isEncrypted())
+    {
+        this->m->encryption_status = qpdf_es_encrypted;
+    }
+
+    if (o.check_is_encrypted || o.check_requires_password)
+    {
+        return;
+    }
+    bool other_warnings = false;
+    std::vector<PointerHolder<QPDF>> page_heap;
+    if (! o.page_specs.empty())
+    {
+        handlePageSpecs(pdf, other_warnings, page_heap);
+    }
+    if (! o.rotations.empty())
+    {
+        handleRotations(pdf);
+    }
+    handleUnderOverlay(pdf);
+    handleTransformations(pdf);
+
+    this->m->creates_output = ((o.outfilename != nullptr) || o.replace_input);
+    if (! this->m->creates_output)
+    {
+        doInspection(pdf);
+    }
+    else if (o.split_pages)
+    {
+        doSplitPages(pdf, other_warnings);
+    }
+    else
+    {
+        writeOutfile(pdf);
+    }
+    if (! pdf.getWarnings().empty())
+    {
+        this->m->warnings = true;
+    }
+}
+
+bool
+QPDFJob::hasWarnings()
+{
+    return this->m->warnings;
+}
+
+bool
+QPDFJob::createsOutput()
+{
+    return this->m->creates_output;
+}
+
+bool
+QPDFJob::suppressWarnings()
+{
+    return this->suppress_warnings;
+}
+
+bool
+QPDFJob::checkRequiresPassword()
+{
+    return this->check_requires_password;
+}
+
+bool
+QPDFJob::checkIsEncrypted()
+{
+    return this->check_is_encrypted;
+}
+
+unsigned long
+QPDFJob::getEncryptionStatus()
+{
+    return this->m->encryption_status;
 }
 
 void
@@ -1670,183 +1932,6 @@ QPDFJob::doInspection(QPDF& pdf)
     }
 }
 
-
-ImageOptimizer::ImageOptimizer(QPDFJob& o, QPDFObjectHandle& image) :
-    o(o),
-    image(image)
-{
-}
-
-PointerHolder<Pipeline>
-ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
-{
-    PointerHolder<Pipeline> result;
-    QPDFObjectHandle dict = image.getDict();
-    QPDFObjectHandle w_obj = dict.getKey("/Width");
-    QPDFObjectHandle h_obj = dict.getKey("/Height");
-    QPDFObjectHandle colorspace_obj = dict.getKey("/ColorSpace");
-    if (! (w_obj.isNumber() && h_obj.isNumber()))
-    {
-        if (! description.empty())
-        {
-            o.doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
-                cout << prefix << ": " << description
-                     << ": not optimizing because image dictionary"
-                     << " is missing required keys" << std::endl;
-            });
-        }
-        return result;
-    }
-    QPDFObjectHandle components_obj = dict.getKey("/BitsPerComponent");
-    if (! (components_obj.isInteger() && (components_obj.getIntValue() == 8)))
-    {
-        QTC::TC("qpdf", "qpdf image optimize bits per component");
-        if (! description.empty())
-        {
-            o.doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
-                cout << prefix << ": " << description
-                     << ": not optimizing because image has other than"
-                     << " 8 bits per component" << std::endl;
-            });
-        }
-        return result;
-    }
-    // Files have been seen in the wild whose width and height are
-    // floating point, which is goofy, but we can deal with it.
-    JDIMENSION w = 0;
-    if (w_obj.isInteger())
-    {
-        w = w_obj.getUIntValueAsUInt();
-    }
-    else
-    {
-        w = static_cast<JDIMENSION>(w_obj.getNumericValue());
-    }
-    JDIMENSION h = 0;
-    if (h_obj.isInteger())
-    {
-        h = h_obj.getUIntValueAsUInt();
-    }
-    else
-    {
-        h = static_cast<JDIMENSION>(h_obj.getNumericValue());
-    }
-    std::string colorspace = (colorspace_obj.isName() ?
-                              colorspace_obj.getName() :
-                              std::string());
-    int components = 0;
-    J_COLOR_SPACE cs = JCS_UNKNOWN;
-    if (colorspace == "/DeviceRGB")
-    {
-        components = 3;
-        cs = JCS_RGB;
-    }
-    else if (colorspace == "/DeviceGray")
-    {
-        components = 1;
-        cs = JCS_GRAYSCALE;
-    }
-    else if (colorspace == "/DeviceCMYK")
-    {
-        components = 4;
-        cs = JCS_CMYK;
-    }
-    else
-    {
-        QTC::TC("qpdf", "qpdf image optimize colorspace");
-        if (! description.empty())
-        {
-            o.doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
-                cout << prefix << ": " << description
-                     << ": not optimizing because qpdf can't optimize"
-                     << " images with this colorspace" << std::endl;
-            });
-        }
-        return result;
-    }
-    if (((o.oi_min_width > 0) && (w <= o.oi_min_width)) ||
-        ((o.oi_min_height > 0) && (h <= o.oi_min_height)) ||
-        ((o.oi_min_area > 0) && ((w * h) <= o.oi_min_area)))
-    {
-        QTC::TC("qpdf", "qpdf image optimize too small");
-        if (! description.empty())
-        {
-            o.doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
-                cout << prefix << ": " << description
-                     << ": not optimizing because image"
-                     << " is smaller than requested minimum dimensions"
-                     << std::endl;
-            });
-        }
-        return result;
-    }
-
-    result = new Pl_DCT("jpg", next, w, h, components, cs);
-    return result;
-}
-
-bool
-ImageOptimizer::evaluate(std::string const& description)
-{
-    if (! image.pipeStreamData(0, 0, qpdf_dl_specialized, true))
-    {
-        QTC::TC("qpdf", "qpdf image optimize no pipeline");
-        o.doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
-            cout << prefix << ": " << description
-                 << ": not optimizing because unable to decode data"
-                 << " or data already uses DCT"
-                 << std::endl;
-        });
-        return false;
-    }
-    Pl_Discard d;
-    Pl_Count c("count", &d);
-    PointerHolder<Pipeline> p = makePipeline(description, &c);
-    if (p.getPointer() == 0)
-    {
-        // message issued by makePipeline
-        return false;
-    }
-    if (! image.pipeStreamData(p.getPointer(), 0, qpdf_dl_specialized))
-    {
-        return false;
-    }
-    long long orig_length = image.getDict().getKey("/Length").getIntValue();
-    if (c.getCount() >= orig_length)
-    {
-        QTC::TC("qpdf", "qpdf image optimize no shrink");
-        o.doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
-            cout << prefix << ": " << description
-                 << ": not optimizing because DCT compression does not"
-                 << " reduce image size" << std::endl;
-        });
-        return false;
-    }
-    o.doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
-        cout << prefix << ": " << description
-             << ": optimizing image reduces size from "
-             << orig_length << " to " << c.getCount()
-             << std::endl;
-    });
-    return true;
-}
-
-void
-ImageOptimizer::provideStreamData(int, int, Pipeline* pipeline)
-{
-    PointerHolder<Pipeline> p = makePipeline("", pipeline);
-    if (p.getPointer() == 0)
-    {
-        // Should not be possible
-        image.warnIfPossible("unable to create pipeline after previous"
-                             " success; image data will be lost");
-        pipeline->finish();
-        return;
-    }
-    image.pipeStreamData(p.getPointer(), 0, qpdf_dl_specialized,
-                         false, false);
-}
-
 PointerHolder<QPDF>
 QPDFJob::doProcessOnce(
     std::function<void(QPDF*, char const*)> fn,
@@ -2021,27 +2106,6 @@ QPDFJob::validateUnderOverlay(QPDF& pdf, QPDFJob::UnderOverlay* uo)
     }
 }
 
-static void get_uo_pagenos(QPDFJob::UnderOverlay& uo,
-                           std::map<int, std::vector<int> >& pagenos)
-{
-    size_t idx = 0;
-    size_t from_size = uo.from_pagenos.size();
-    size_t repeat_size = uo.repeat_pagenos.size();
-    for (std::vector<int>::iterator iter = uo.to_pagenos.begin();
-         iter != uo.to_pagenos.end(); ++iter, ++idx)
-    {
-        if (idx < from_size)
-        {
-            pagenos[*iter].push_back(uo.from_pagenos.at(idx));
-        }
-        else if (repeat_size)
-        {
-            pagenos[*iter].push_back(
-                uo.repeat_pagenos.at((idx - from_size) % repeat_size));
-        }
-    }
-}
-
 static QPDFAcroFormDocumentHelper* get_afdh_for_qpdf(
     std::map<unsigned long long,
              PointerHolder<QPDFAcroFormDocumentHelper>>& afdh_map,
@@ -2142,6 +2206,27 @@ QPDFJob::doUnderOverlayForPage(
                 QPDFObjectHandle::newStream(&pdf, "q\n"), true);
             dest_page.addPageContents(
                 QPDFObjectHandle::newStream(&pdf, "\nQ\n" + content), false);
+        }
+    }
+}
+
+static void get_uo_pagenos(QPDFJob::UnderOverlay& uo,
+                           std::map<int, std::vector<int> >& pagenos)
+{
+    size_t idx = 0;
+    size_t from_size = uo.from_pagenos.size();
+    size_t repeat_size = uo.repeat_pagenos.size();
+    for (std::vector<int>::iterator iter = uo.to_pagenos.begin();
+         iter != uo.to_pagenos.end(); ++iter, ++idx)
+    {
+        if (idx < from_size)
+        {
+            pagenos[*iter].push_back(uo.from_pagenos.at(idx));
+        }
+        else if (repeat_size)
+        {
+            pagenos[*iter].push_back(
+                uo.repeat_pagenos.at((idx - from_size) % repeat_size));
         }
     }
 }
@@ -3207,6 +3292,21 @@ QPDFJob::setEncryptionOptions(QPDF& pdf, QPDFWriter& w)
     }
 }
 
+static void parse_version(std::string const& full_version_string,
+                          std::string& version, int& extension_level)
+{
+    PointerHolder<char> vp(true, QUtil::copy_string(full_version_string));
+    char* v = vp.getPointer();
+    char* p1 = strchr(v, '.');
+    char* p2 = (p1 ? strchr(1 + p1, '.') : 0);
+    if (p2 && *(p2 + 1))
+    {
+        *p2++ = '\0';
+        extension_level = QUtil::string_to_int(p2);
+    }
+    version = v;
+}
+
 void
 QPDFJob::setWriterOptions(QPDF& pdf, QPDFWriter& w)
 {
@@ -3503,105 +3603,4 @@ QPDFJob::writeOutfile(QPDF& pdf)
             }
         }
     }
-}
-
-void
-QPDFJob::run()
-{
-    QPDFJob& o = *this; // QXXXQ
-    PointerHolder<QPDF> pdf_ph;
-    try
-    {
-        pdf_ph = processFile(o.infilename, o.password);
-    }
-    catch (QPDFExc& e)
-    {
-        if ((e.getErrorCode() == qpdf_e_password) &&
-            (o.check_is_encrypted || o.check_requires_password))
-        {
-            // Allow --is-encrypted and --requires-password to
-            // work when an incorrect password is supplied.
-            this->m->encryption_status =
-                qpdf_es_encrypted |
-                qpdf_es_password_incorrect;
-            return;
-        }
-        throw e;
-    }
-    QPDF& pdf = *pdf_ph;
-    if (pdf.isEncrypted())
-    {
-        this->m->encryption_status = qpdf_es_encrypted;
-    }
-
-    if (o.check_is_encrypted || o.check_requires_password)
-    {
-        return;
-    }
-    bool other_warnings = false;
-    std::vector<PointerHolder<QPDF>> page_heap;
-    if (! o.page_specs.empty())
-    {
-        handlePageSpecs(pdf, other_warnings, page_heap);
-    }
-    if (! o.rotations.empty())
-    {
-        handleRotations(pdf);
-    }
-    handleUnderOverlay(pdf);
-    handleTransformations(pdf);
-
-    this->m->creates_output = ((o.outfilename != nullptr) || o.replace_input);
-    if (! this->m->creates_output)
-    {
-        doInspection(pdf);
-    }
-    else if (o.split_pages)
-    {
-        doSplitPages(pdf, other_warnings);
-    }
-    else
-    {
-        writeOutfile(pdf);
-    }
-    if (! pdf.getWarnings().empty())
-    {
-        this->m->warnings = true;
-    }
-}
-
-bool
-QPDFJob::hasWarnings()
-{
-    return this->m->warnings;
-}
-
-bool
-QPDFJob::createsOutput()
-{
-    return this->m->creates_output;
-}
-
-unsigned long
-QPDFJob::getEncryptionStatus()
-{
-    return this->m->encryption_status;
-}
-
-bool
-QPDFJob::suppressWarnings()
-{
-    return this->suppress_warnings;
-}
-
-bool
-QPDFJob::checkRequiresPassword()
-{
-    return this->check_requires_password;
-}
-
-bool
-QPDFJob::checkIsEncrypted()
-{
-    return this->check_is_encrypted;
 }
