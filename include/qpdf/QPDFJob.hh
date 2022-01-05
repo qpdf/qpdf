@@ -23,9 +23,10 @@
 #define QPDFJOB_HH
 
 #include <qpdf/DLL.h>
+#include <qpdf/Constants.h>
 #include <qpdf/PointerHolder.hh>
 #include <qpdf/QPDF.hh>
-#include <qpdf/Constants.h>
+#include <qpdf/QPDFPageObjectHelper.hh>
 
 #include <string>
 #include <list>
@@ -169,6 +170,12 @@ class QPDFJob
         std::string prefix;
     };
 
+    PointerHolder<QPDF> doProcessOnce(
+        std::function<void(QPDF*, char const*)> fn,
+        char const* password, bool empty);
+    PointerHolder<QPDF> doProcess(
+        std::function<void(QPDF*, char const*)> fn,
+        char const* password, bool empty);
     PointerHolder<QPDF> processFile(
         char const* filename, char const* password);
     void validateUnderOverlay(QPDF& pdf, QPDFJob::UnderOverlay* uo);
@@ -181,6 +188,7 @@ class QPDFJob
     void writeOutfile(QPDF& pdf);
     void doJSON(QPDF& pdf);
     void doInspection(QPDF& pdf);
+    void setQPDFOptions(QPDF& pdf);
     void showEncryption(QPDF& pdf);
     void doCheck(QPDF& pdf);
     void doShowObj(QPDF& pdf);
@@ -188,6 +196,33 @@ class QPDFJob
     void doListAttachments(QPDF& pdf);
     void setEncryptionOptions(QPDF&, QPDFWriter&);
     void maybeFixWritePassword(int R, std::string& password);
+
+    void doShowAttachment(QPDF& pdf);
+    std::set<QPDFObjGen> getWantedJSONObjects();
+    void doJSONObjects(QPDF& pdf, JSON& j);
+    void doJSONObjectinfo(QPDF& pdf, JSON& j);
+    void doJSONPages(QPDF& pdf, JSON& j);
+    void doJSONPageLabels(QPDF& pdf, JSON& j);
+    void doJSONOutlines(QPDF& pdf, JSON& j);
+    void doJSONAcroform(QPDF& pdf, JSON& j);
+    void doJSONEncrypt(QPDF& pdf, JSON& j);
+    void doJSONAttachments(QPDF& pdf, JSON& j);
+    PointerHolder<QPDF> processInputSource(
+        PointerHolder<InputSource> is, char const* password);
+    void doUnderOverlayForPage(
+        QPDF& pdf,
+        QPDFJob::UnderOverlay& uo,
+        std::map<int, std::vector<int> >& pagenos,
+        size_t page_idx,
+        std::map<int, QPDFObjectHandle>& fo,
+        std::vector<QPDFPageObjectHelper>& pages,
+        QPDFPageObjectHelper& dest_page,
+        bool before);
+    bool shouldRemoveUnreferencedResources(QPDF& pdf);
+    void handlePageSpecs(
+        QPDF& pdf, bool& warnings,
+        std::vector<PointerHolder<QPDF>>& page_heap);
+    void handleRotations(QPDF& pdf);
 
     enum remove_unref_e { re_auto, re_yes, re_no };
 

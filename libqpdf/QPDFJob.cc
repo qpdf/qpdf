@@ -284,8 +284,10 @@ static void parse_version(std::string const& full_version_string,
     version = v;
 }
 
-static void set_qpdf_options(QPDF& pdf, QPDFJob& o)
+void
+QPDFJob::setQPDFOptions(QPDF& pdf)
 {
+    QPDFJob& o = *this; // QXXXQ
     if (o.ignore_xref_streams)
     {
         pdf.setIgnoreXRefStreams(true);
@@ -648,8 +650,10 @@ QPDFJob::doListAttachments(QPDF& pdf)
     }
 }
 
-static void do_show_attachment(QPDF& pdf, QPDFJob& o)
+void
+QPDFJob::doShowAttachment(QPDF& pdf)
 {
+    QPDFJob& o = *this; // QXXXQ
     QPDFEmbeddedFileDocumentHelper efdh(pdf);
     auto fs = efdh.getEmbeddedFile(o.attachment_to_show);
     if (! fs)
@@ -684,9 +688,10 @@ QPDFJob::parse_object_id(std::string const& objspec,
     }
 }
 
-static std::set<QPDFObjGen>
-get_wanted_json_objects(QPDFJob& o)
+std::set<QPDFObjGen>
+QPDFJob::getWantedJSONObjects()
 {
+    QPDFJob& o = *this; // QXXXQ
     std::set<QPDFObjGen> wanted_og;
     for (auto const& iter: o.json_objects)
     {
@@ -702,13 +707,15 @@ get_wanted_json_objects(QPDFJob& o)
     return wanted_og;
 }
 
-static void do_json_objects(QPDF& pdf, QPDFJob& o, JSON& j)
+void
+QPDFJob::doJSONObjects(QPDF& pdf, JSON& j)
 {
+    QPDFJob& o = *this; // QXXXQ
     // Add all objects. Do this first before other code below modifies
     // things by doing stuff like calling
     // pushInheritedAttributesToPage.
     bool all_objects = o.json_objects.empty();
-    std::set<QPDFObjGen> wanted_og = get_wanted_json_objects(o);
+    std::set<QPDFObjGen> wanted_og = getWantedJSONObjects();
     JSON j_objects = j.addDictionaryMember("objects", JSON::makeDictionary());
     if (all_objects || o.json_objects.count("trailer"))
     {
@@ -727,12 +734,14 @@ static void do_json_objects(QPDF& pdf, QPDFJob& o, JSON& j)
     }
 }
 
-static void do_json_objectinfo(QPDF& pdf, QPDFJob& o, JSON& j)
+void
+QPDFJob::doJSONObjectinfo(QPDF& pdf, JSON& j)
 {
+    QPDFJob& o = *this; // QXXXQ
     // Do this first before other code below modifies things by doing
     // stuff like calling pushInheritedAttributesToPage.
     bool all_objects = o.json_objects.empty();
-    std::set<QPDFObjGen> wanted_og = get_wanted_json_objects(o);
+    std::set<QPDFObjGen> wanted_og = getWantedJSONObjects();
     JSON j_objectinfo = j.addDictionaryMember(
         "objectinfo", JSON::makeDictionary());
     for (auto& obj: pdf.getAllObjects())
@@ -760,8 +769,10 @@ static void do_json_objectinfo(QPDF& pdf, QPDFJob& o, JSON& j)
     }
 }
 
-static void do_json_pages(QPDF& pdf, QPDFJob& o, JSON& j)
+void
+QPDFJob::doJSONPages(QPDF& pdf, JSON& j)
 {
+    QPDFJob& o = *this; // QXXXQ
     JSON j_pages = j.addDictionaryMember("pages", JSON::makeArray());
     QPDFPageDocumentHelper pdh(pdf);
     QPDFPageLabelDocumentHelper pldh(pdf);
@@ -848,7 +859,8 @@ static void do_json_pages(QPDF& pdf, QPDFJob& o, JSON& j)
     }
 }
 
-static void do_json_page_labels(QPDF& pdf, QPDFJob& o, JSON& j)
+void
+QPDFJob::doJSONPageLabels(QPDF& pdf, JSON& j)
 {
     JSON j_labels = j.addDictionaryMember("pagelabels", JSON::makeArray());
     QPDFPageLabelDocumentHelper pldh(pdf);
@@ -908,7 +920,8 @@ static void add_outlines_to_json(
     }
 }
 
-static void do_json_outlines(QPDF& pdf, QPDFJob& o, JSON& j)
+void
+QPDFJob::doJSONOutlines(QPDF& pdf, JSON& j)
 {
     std::map<QPDFObjGen, int> page_numbers;
     QPDFPageDocumentHelper dh(pdf);
@@ -927,7 +940,8 @@ static void do_json_outlines(QPDF& pdf, QPDFJob& o, JSON& j)
     add_outlines_to_json(odh.getTopLevelOutlines(), j_outlines, page_numbers);
 }
 
-static void do_json_acroform(QPDF& pdf, QPDFJob& o, JSON& j)
+void
+QPDFJob::doJSONAcroform(QPDF& pdf, JSON& j)
 {
     JSON j_acroform = j.addDictionaryMember(
         "acroform", JSON::makeDictionary());
@@ -1030,8 +1044,10 @@ static void do_json_acroform(QPDF& pdf, QPDFJob& o, JSON& j)
     }
 }
 
-static void do_json_encrypt(QPDF& pdf, QPDFJob& o, JSON& j)
+void
+QPDFJob::doJSONEncrypt(QPDF& pdf, JSON& j)
 {
+    QPDFJob& o = *this; // QXXXQ
     int R = 0;
     int P = 0;
     int V = 0;
@@ -1130,7 +1146,8 @@ static void do_json_encrypt(QPDF& pdf, QPDFJob& o, JSON& j)
         "filemethod", JSON::makeString(s_file_method));
 }
 
-static void do_json_attachments(QPDF& pdf, QPDFJob& o, JSON& j)
+void
+QPDFJob::doJSONAttachments(QPDF& pdf, JSON& j)
 {
     JSON j_attachments = j.addDictionaryMember(
         "attachments", JSON::makeDictionary());
@@ -1528,35 +1545,35 @@ QPDFJob::doJSON(QPDF& pdf)
     // places: json_schema, doJSON, and initOptionTable.
     if (all_keys || o.json_keys.count("objects"))
     {
-        do_json_objects(pdf, o, j);
+        doJSONObjects(pdf, j);
     }
     if (all_keys || o.json_keys.count("objectinfo"))
     {
-        do_json_objectinfo(pdf, o, j);
+        doJSONObjectinfo(pdf, j);
     }
     if (all_keys || o.json_keys.count("pages"))
     {
-        do_json_pages(pdf, o, j);
+        doJSONPages(pdf, j);
     }
     if (all_keys || o.json_keys.count("pagelabels"))
     {
-        do_json_page_labels(pdf, o, j);
+        doJSONPageLabels(pdf, j);
     }
     if (all_keys || o.json_keys.count("outlines"))
     {
-        do_json_outlines(pdf, o, j);
+        doJSONOutlines(pdf, j);
     }
     if (all_keys || o.json_keys.count("acroform"))
     {
-        do_json_acroform(pdf, o, j);
+        doJSONAcroform(pdf, j);
     }
     if (all_keys || o.json_keys.count("encrypt"))
     {
-        do_json_encrypt(pdf, o, j);
+        doJSONEncrypt(pdf, j);
     }
     if (all_keys || o.json_keys.count("attachments"))
     {
-        do_json_attachments(pdf, o, j);
+        doJSONAttachments(pdf, j);
     }
 
     // Check against schema
@@ -1645,7 +1662,7 @@ QPDFJob::doInspection(QPDF& pdf)
     }
     if (! o.attachment_to_show.empty())
     {
-        do_show_attachment(pdf, o);
+        doShowAttachment(pdf);
     }
     if (! pdf.getWarnings().empty())
     {
@@ -1830,12 +1847,13 @@ ImageOptimizer::provideStreamData(int, int, Pipeline* pipeline)
                          false, false);
 }
 
-static PointerHolder<QPDF> do_process_once(
+PointerHolder<QPDF>
+QPDFJob::doProcessOnce(
     std::function<void(QPDF*, char const*)> fn,
-    char const* password, QPDFJob& o, bool empty)
+    char const* password, bool empty)
 {
     PointerHolder<QPDF> pdf = new QPDF;
-    set_qpdf_options(*pdf, o);
+    setQPDFOptions(*pdf);
     if (empty)
     {
         pdf->emptyPDF();
@@ -1847,10 +1865,12 @@ static PointerHolder<QPDF> do_process_once(
     return pdf;
 }
 
-static PointerHolder<QPDF> do_process(
+PointerHolder<QPDF>
+QPDFJob::doProcess(
     std::function<void(QPDF*, char const*)> fn,
-    char const* password, QPDFJob& o, bool empty)
+    char const* password, bool empty)
 {
+    QPDFJob& o = *this; // QXXXQ
     // If a password has been specified but doesn't work, try other
     // passwords that are equivalent in different character encodings.
     // This makes it possible to open PDF files that were encrypted
@@ -1878,7 +1898,7 @@ static PointerHolder<QPDF> do_process(
     {
         // There is no password, or we're not doing recovery, so just
         // do the normal processing with the supplied password.
-        return do_process_once(fn, password, o, empty);
+        return doProcessOnce(fn, password, empty);
     }
 
     // Get a list of otherwise encoded strings. Keep in scope for this
@@ -1912,7 +1932,7 @@ static PointerHolder<QPDF> do_process(
     {
         try
         {
-            return do_process_once(fn, *iter, o, empty);
+            return doProcessOnce(fn, *iter, empty);
         }
         catch (QPDFExc& e)
         {
@@ -1941,20 +1961,20 @@ static PointerHolder<QPDF> do_process(
 PointerHolder<QPDF>
 QPDFJob::processFile(char const* filename, char const* password)
 {
-    QPDFJob& o = *this; // QXXXQ
     auto f1 = std::mem_fn<void(char const*, char const*)>(&QPDF::processFile);
     auto fn = std::bind(
         f1, std::placeholders::_1, filename, std::placeholders::_2);
-    return do_process(fn, password, o, strcmp(filename, "") == 0);
+    return doProcess(fn, password, strcmp(filename, "") == 0);
 }
 
-static PointerHolder<QPDF> process_input_source(
-    PointerHolder<InputSource> is, char const* password, QPDFJob& o)
+PointerHolder<QPDF>
+QPDFJob::processInputSource(
+    PointerHolder<InputSource> is, char const* password)
 {
     auto f1 = std::mem_fn(&QPDF::processInputSource);
     auto fn = std::bind(
         f1, std::placeholders::_1, is, std::placeholders::_2);
-    return do_process(fn, password, o, false);
+    return doProcess(fn, password, false);
 }
 
 void
@@ -2035,9 +2055,9 @@ static QPDFAcroFormDocumentHelper* get_afdh_for_qpdf(
     return afdh_map[uid].getPointer();
 }
 
-static void do_under_overlay_for_page(
+void
+QPDFJob::doUnderOverlayForPage(
     QPDF& pdf,
-    QPDFJob& o,
     QPDFJob::UnderOverlay& uo,
     std::map<int, std::vector<int> >& pagenos,
     size_t page_idx,
@@ -2046,6 +2066,7 @@ static void do_under_overlay_for_page(
     QPDFPageObjectHelper& dest_page,
     bool before)
 {
+    QPDFJob& o = *this; // QXXXQ
     int pageno = 1 + QIntC::to_int(page_idx);
     if (! pagenos.count(pageno))
     {
@@ -2164,12 +2185,12 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
         o.doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
             cout << "  page " << 1+i << std::endl;
         });
-        do_under_overlay_for_page(pdf, o, o.underlay, underlay_pagenos, i,
-                                  underlay_fo, upages, main_pages.at(i),
-                                  true);
-        do_under_overlay_for_page(pdf, o, o.overlay, overlay_pagenos, i,
-                                  overlay_fo, opages, main_pages.at(i),
-                                  false);
+        doUnderOverlayForPage(pdf, o.underlay, underlay_pagenos, i,
+                              underlay_fo, upages, main_pages.at(i),
+                              true);
+        doUnderOverlayForPage(pdf, o.overlay, overlay_pagenos, i,
+                              overlay_fo, opages, main_pages.at(i),
+                              false);
     }
 }
 
@@ -2419,8 +2440,10 @@ QPDFJob::handleTransformations(QPDF& pdf)
     }
 }
 
-static bool should_remove_unreferenced_resources(QPDF& pdf, QPDFJob& o)
+bool
+QPDFJob::shouldRemoveUnreferencedResources(QPDF& pdf)
 {
+    QPDFJob& o = *this; // QXXXQ
     if (o.remove_unreferenced_page_resources == QPDFJob::re_no)
     {
         return false;
@@ -2570,10 +2593,12 @@ static QPDFObjectHandle added_page(QPDF& pdf, QPDFPageObjectHelper page)
     return added_page(pdf, page.getObjectHandle());
 }
 
-static void handle_page_specs(
-    QPDF& pdf, QPDFJob& o, bool& warnings,
+void
+QPDFJob::handlePageSpecs(
+    QPDF& pdf, bool& warnings,
     std::vector<PointerHolder<QPDF>>& page_heap)
 {
+    QPDFJob& o = *this; // QXXXQ
     // Parse all page specifications and translate them into lists of
     // actual pages.
 
@@ -2668,7 +2693,7 @@ static void handle_page_specs(
                 is = fis;
                 fis->setFilename(page_spec.filename.c_str());
             }
-            PointerHolder<QPDF> qpdf_ph = process_input_source(is, password, o);
+            PointerHolder<QPDF> qpdf_ph = processInputSource(is, password);
             page_heap.push_back(qpdf_ph);
             page_spec_qpdfs[page_spec.filename] = qpdf_ph.getPointer();
             if (cis)
@@ -2705,7 +2730,7 @@ static void handle_page_specs(
             if (remove_unreferenced.count(other_uuid) == 0)
             {
                 remove_unreferenced[other_uuid] =
-                    should_remove_unreferenced_resources(other, o);
+                    shouldRemoveUnreferencedResources(other);
             }
             if (cis)
             {
@@ -2946,8 +2971,10 @@ static void handle_page_specs(
     }
 }
 
-static void handle_rotations(QPDF& pdf, QPDFJob& o)
+void
+QPDFJob::handleRotations(QPDF& pdf)
 {
+    QPDFJob& o = *this; // QXXXQ
     QPDFPageDocumentHelper dh(pdf);
     std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
     int npages = QIntC::to_int(pages.size());
@@ -3314,7 +3341,7 @@ QPDFJob::doSplitPages(QPDF& pdf, bool& warnings)
         before = std::string(o.outfilename) + "-";
     }
 
-    if (should_remove_unreferenced_resources(pdf, o))
+    if (shouldRemoveUnreferencedResources(pdf))
     {
         QPDFPageDocumentHelper dh(pdf);
         dh.removeUnreferencedResources();
@@ -3515,11 +3542,11 @@ QPDFJob::run()
     std::vector<PointerHolder<QPDF>> page_heap;
     if (! o.page_specs.empty())
     {
-        handle_page_specs(pdf, o, other_warnings, page_heap);
+        handlePageSpecs(pdf, other_warnings, page_heap);
     }
     if (! o.rotations.empty())
     {
-        handle_rotations(pdf, o);
+        handleRotations(pdf);
     }
     handleUnderOverlay(pdf);
     handleTransformations(pdf);
