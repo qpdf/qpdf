@@ -50,7 +50,7 @@ class QPDFJob
     void setMessagePrefix(std::string const&);
 
     // Override streams that errors and output go to. Defaults are
-    // std::cout and std::cerr.
+    // std::cout and std::cerr. Pass nullptr to use the default.
     QPDF_DLL
     void setOutputStreams(std::ostream* out_stream, std::ostream* err_stream);
 
@@ -183,6 +183,11 @@ class QPDFJob
     void doInspection(QPDF& pdf);
     void showEncryption(QPDF& pdf);
     void doCheck(QPDF& pdf);
+    void doShowObj(QPDF& pdf);
+    void doShowPages(QPDF& pdf);
+    void doListAttachments(QPDF& pdf);
+    void setEncryptionOptions(QPDF&, QPDFWriter&);
+    void maybeFixWritePassword(int R, std::string& password);
 
     enum remove_unref_e { re_auto, re_yes, re_no };
 
@@ -313,11 +318,11 @@ class QPDFJob
         Members();
         Members(Members const&) = delete;
 
-        std::string whoami;
+        std::string message_prefix;
         bool warnings;
         bool creates_output;
-        std::ostream* out_stream;
-        std::ostream* err_stream;
+        std::ostream* cout;
+        std::ostream* cerr;
         unsigned long encryption_status;
     };
     PointerHolder<Members> m;
