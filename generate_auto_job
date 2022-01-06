@@ -162,11 +162,66 @@ class Main:
                 print(f'void {identifier}();', file=f)
 
     def generate_init(self, data, f):
+        print('auto b = [this](void (ArgParser::*f)()) {', file=f)
+        print('    return QPDFArgParser::bindBare(f, this);', file=f)
+        print('};', file=f)
+        print('auto p = [this](void (ArgParser::*f)(char *)) {', file=f)
+        print('    return QPDFArgParser::bindParam(f, this);', file=f)
+        print('};', file=f)
+        print('', file=f)
         for k, v in data['choices'].items():
             print(f'char const* {k}_choices[] = {{', file=f, end='')
             for i in v:
                 print(f'"{i}", ', file=f, end='')
             print('0};', file=f)
+        print('', file=f)
+        for o in data['options']:
+            table = o['table']
+            if table == 'main':
+                print('this->ap.selectMainOptionTable();', file=f)
+            elif table == 'help':
+                print('this->ap.selectHelpOptionTable();', file=f)
+            else:
+                identifier = self.to_identifier(table, 'argEnd', False)
+                print(f'this->ap.registerOptionTable("{table}",'
+                      f' b(&ArgParser::{identifier}));', file=f)
+            prefix = 'arg' + o.get('prefix', '')
+            if o.get('positional', False):
+                print('this->ap.addPositional('
+                      f'p(&ArgParser::{prefix}Positional));', file=f)
+            for i in o.get('bare', []):
+                identifier = self.to_identifier(i, prefix, False)
+                print(f'this->ap.addBare("{i}", '
+                      f'b(&ArgParser::{identifier}));', file=f)
+            for i in o.get('optional_parameter', []):
+                identifier = self.to_identifier(i, prefix, False)
+                print(f'this->ap.addOptionalParameter("{i}", '
+                      f'p(&ArgParser::{identifier}));', file=f)
+            for k, v in o.get('required_parameter', {}).items():
+                identifier = self.to_identifier(k, prefix, False)
+                print(f'this->ap.addRequiredParameter("{k}", '
+                      f'p(&ArgParser::{identifier})'
+                      f', "{v}");', file=f)
+            for k, v in o.get('required_choices', {}).items():
+                identifier = self.to_identifier(k, prefix, False)
+                print(f'this->ap.addRequiredChoices("{k}", '
+                      f'p(&ArgParser::{identifier})'
+                      f', {v}_choices);', file=f)
+        for o in data['options']:
+            table = o['table']
+            if 'from_table' not in o:
+                continue
+            if table == 'main':
+                print('this->ap.selectMainOptionTable();', file=f)
+            elif table == 'help':
+                print('this->ap.selectHelpOptionTable();', file=f)
+            else:
+                print(f'this->ap.selectOptionTable("{table}");', file=f)
+            ft = o['from_table']
+            other_table = ft['table']
+            for j in ft['options']:
+                print('this->ap.copyFromOtherTable'
+                      f'("{j}", "{other_table}");', file=f)
 
 
 if __name__ == '__main__':

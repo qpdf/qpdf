@@ -165,12 +165,12 @@ options:
     required_choices:
       accessibility: yn
       extract: yn
-      print: print128_choices
+      print: print128
       assemble: yn
       annotate: yn
       form: yn
       modify-other: yn
-      modify: modify128_choices
+      modify: modify128
       use-aes: yn
   - table: 256-bit encryption
     prefix: Enc256
