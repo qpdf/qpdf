@@ -64,6 +64,10 @@ ArgParser::initOptions()
     ap.registerOptionTable("baaa", nullptr);
     ap.addBare("ewe", [this](){ output("you"); });
     ap.addBare("ram", [this](){ output("ram"); });
+    ap.selectMainOptionTable();
+    ap.addBare("sheep", [this](){ this->ap.selectOptionTable("sheep"); });
+    ap.registerOptionTable("sheep", nullptr);
+    ap.copyFromOtherTable("ewe", "baaa");
 }
 
 void
@@ -186,11 +190,28 @@ ArgParser::test_exceptions()
     {
         std::cout << "unknown table: " << e.what() << std::endl;
     }
+    try
+    {
+        ap.copyFromOtherTable("one", "two");
+        assert(false);
+    }
+    catch (std::exception& e)
+    {
+        std::cout << "copy from unknown table: " << e.what() << std::endl;
+    }
+    try
+    {
+        ap.copyFromOtherTable("two", "baaa");
+        assert(false);
+    }
+    catch (std::exception& e)
+    {
+        std::cout << "copy unknown from other table: " << e.what() << std::endl;
+    }
 }
 
 int main(int argc, char* argv[])
 {
-
     ArgParser ap(argc, argv);
     if ((argc == 2) && (strcmp(argv[1], "exceptions") == 0))
     {

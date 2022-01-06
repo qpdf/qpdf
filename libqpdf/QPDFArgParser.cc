@@ -154,6 +154,29 @@ QPDFArgParser::addRequiredChoices(
 }
 
 void
+QPDFArgParser::copyFromOtherTable(std::string const& arg,
+                                  std::string const& other_table)
+{
+    if (! this->m->option_tables.count(other_table))
+    {
+        QTC::TC("libtests", "QPDFArgParser copy from unknown");
+        throw std::logic_error(
+            "QPDFArgParser: attempt to copy from unknown table " +
+            other_table);
+    }
+    auto& ot = this->m->option_tables[other_table];
+    if (! ot.count(arg))
+    {
+        QTC::TC("libtests", "QPDFArgParser copy unknown");
+        throw std::logic_error(
+            "QPDFArgParser: attempt to copy unknown argument " + arg +
+            " from table " + other_table);
+    }
+    OptionEntry& oe = registerArg(arg);
+    oe = ot[arg];
+}
+
+void
 QPDFArgParser::addFinalCheck(bare_arg_handler_t handler)
 {
     this->m->final_check_handler = handler;
@@ -533,7 +556,8 @@ QPDFArgParser::parseArgs()
             if (oep == this->m->option_table->end())
             {
                 // This is registered automatically, so this can't happen.
-                throw std::logic_error("ArgParser: -- handler not registered");
+                throw std::logic_error(
+                    "QPDFArgParser: -- handler not registered");
             }
         }
         else if ((arg[0] == '-') && (strcmp(arg, "-") != 0))

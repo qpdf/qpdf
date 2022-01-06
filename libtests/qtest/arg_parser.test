@@ -32,6 +32,7 @@ my @completion_tests = (
     ['arg_parser --quack "user password" ', undef, 'quack-x'],
     ['arg_parser --quack "user pass\'word" ', undef, 'quack-x'],
     ['arg_parser --quack user\ password ', undef, 'quack-x'],
+    ['arg_parser --sheep --', undef, 'sheep'],
     );
 
 foreach my $c (@completion_tests)
@@ -78,6 +79,7 @@ my @arg_tests = (
     ['@quack-xyz --', 0],       # 15
     ['--salad', 2],             # 16
     ['--salad=spinach', 0],     # 17
+    ['--sheep --ewe --', 0],    # 18
     );
 
 for (my $i = 0; $i < scalar(@arg_tests); ++$i)

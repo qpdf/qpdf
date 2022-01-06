@@ -117,6 +117,14 @@ class QPDFArgParser
     QPDF_DLL
     void addRequiredChoices(
         std::string const& arg, param_arg_handler_t, char const** choices);
+    QPDF_DLL
+
+    // If an option is shared among multiple tables and uses identical
+    // handlers, you can just copy it instead of repeating the
+    // registration call.
+    void copyFromOtherTable(std::string const& arg,
+                            std::string const& other_table);
+
     // The final check handler is called at the very end of argument
     // parsing.
     QPDF_DLL
