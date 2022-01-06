@@ -3,3 +3,11 @@
 // Edits will be automatically overwritten if the build is
 // run in maintainer mode.
 //
+static constexpr char const* O_PAGES = "pages";
+static constexpr char const* O_ENCRYPTION = "encryption";
+static constexpr char const* O_40_BIT_ENCRYPTION = "40-bit encryption";
+static constexpr char const* O_128_BIT_ENCRYPTION = "128-bit encryption";
+static constexpr char const* O_256_BIT_ENCRYPTION = "256-bit encryption";
+static constexpr char const* O_UNDERLAY_OVERLAY = "underlay/overlay";
+static constexpr char const* O_ATTACHMENT = "attachment";
+static constexpr char const* O_COPY_ATTACHMENT = "copy attachment";

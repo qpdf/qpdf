@@ -23,14 +23,7 @@ namespace
         void parseOptions();
 
       private:
-        static constexpr char const* O_PAGES = "pages";
-        static constexpr char const* O_ENCRYPT = "encryption";
-        static constexpr char const* O_ENCRYPT_40 = "40-bit encryption";
-        static constexpr char const* O_ENCRYPT_128 = "128-bit encryption";
-        static constexpr char const* O_ENCRYPT_256 = "256-bit encryption";
-        static constexpr char const* O_UNDER_OVERLAY = "underlay/overlay";
-        static constexpr char const* O_ATTACHMENT = "attachment";
-        static constexpr char const* O_COPY_ATTACHMENT = "copy attachment";
+#       include <qpdf/auto_job_decl.hh>
 
         void argHelp();
         void argVersion();
@@ -344,16 +337,16 @@ ArgParser::initOptionTable()
 
     this->ap.selectMainOptionTable();
     this->ap.addBare("encrypt", b(&ArgParser::argEncrypt));
-    this->ap.registerOptionTable(O_ENCRYPT, b(&ArgParser::argEndEncrypt));
+    this->ap.registerOptionTable(O_ENCRYPTION, b(&ArgParser::argEndEncrypt));
     this->ap.addPositional(p(&ArgParser::argEncryptPositional));
-    this->ap.registerOptionTable(O_ENCRYPT_40, b(&ArgParser::argEndEncrypt));
+    this->ap.registerOptionTable(O_40_BIT_ENCRYPTION, b(&ArgParser::argEndEncrypt));
     this->ap.addRequiredChoices("extract",p(&ArgParser::arg40Extract), yn);
     this->ap.addRequiredChoices("annotate",p(&ArgParser::arg40Annotate), yn);
     this->ap.addRequiredChoices("print",p(&ArgParser::arg40Print), yn);
     this->ap.addRequiredChoices("modify",p(&ArgParser::arg40Modify), yn);
-    this->ap.registerOptionTable(O_ENCRYPT_128, b(&ArgParser::argEndEncrypt));
-    this->ap.registerOptionTable(O_ENCRYPT_256, b(&ArgParser::argEndEncrypt));
-    for (char const* k: {O_ENCRYPT_128, O_ENCRYPT_256})
+    this->ap.registerOptionTable(O_128_BIT_ENCRYPTION, b(&ArgParser::argEndEncrypt));
+    this->ap.registerOptionTable(O_256_BIT_ENCRYPTION, b(&ArgParser::argEndEncrypt));
+    for (char const* k: {O_128_BIT_ENCRYPTION, O_256_BIT_ENCRYPTION})
     {
         this->ap.selectOptionTable(k);
         this->ap.addRequiredChoices("accessibility",
@@ -373,15 +366,15 @@ ArgParser::initOptionTable()
         this->ap.addBare("cleartext-metadata", b(&ArgParser::arg128ClearTextMetadata));
     }
 
-    this->ap.selectOptionTable(O_ENCRYPT_128);
+    this->ap.selectOptionTable(O_128_BIT_ENCRYPTION);
     this->ap.addRequiredChoices("use-aes",p(&ArgParser::arg128UseAes), yn);
     this->ap.addBare("force-V4", b(&ArgParser::arg128ForceV4));
 
-    this->ap.selectOptionTable(O_ENCRYPT_256);
+    this->ap.selectOptionTable(O_256_BIT_ENCRYPTION);
     this->ap.addBare("force-R5", b(&ArgParser::arg256ForceR5));
     this->ap.addBare("allow-insecure", b(&ArgParser::argAllowInsecure));
 
-    this->ap.registerOptionTable(O_UNDER_OVERLAY, b(&ArgParser::argEndUnderOverlay));
+    this->ap.registerOptionTable(O_UNDERLAY_OVERLAY, b(&ArgParser::argEndUnderOverlay));
     this->ap.addPositional(p(&ArgParser::argUOpositional));
     this->ap.addRequiredParameter("to",
         p(&ArgParser::argUOto), "page-range");
@@ -1089,7 +1082,7 @@ ArgParser::argEncrypt()
     {
         this->ap.insertCompletion("user-password");
     }
-    this->ap.selectOptionTable(O_ENCRYPT);
+    this->ap.selectOptionTable(O_ENCRYPTION);
 }
 
 void
@@ -1120,18 +1113,18 @@ ArgParser::argEncryptPositional(char* arg)
     if (len_str == "40")
     {
         o.keylen = 40;
-        this->ap.selectOptionTable(O_ENCRYPT_40);
+        this->ap.selectOptionTable(O_40_BIT_ENCRYPTION);
     }
     else if (len_str == "128")
     {
         o.keylen = 128;
-        this->ap.selectOptionTable(O_ENCRYPT_128);
+        this->ap.selectOptionTable(O_128_BIT_ENCRYPTION);
     }
     else if (len_str == "256")
     {
         o.keylen = 256;
         o.use_aes = true;
-        this->ap.selectOptionTable(O_ENCRYPT_256);
+        this->ap.selectOptionTable(O_256_BIT_ENCRYPTION);
     }
     else
     {
@@ -2202,7 +2195,7 @@ void
 ArgParser::parseUnderOverlayOptions(QPDFJob::UnderOverlay* uo)
 {
     o.under_overlay = uo;
-    this->ap.selectOptionTable(O_UNDER_OVERLAY);
+    this->ap.selectOptionTable(O_UNDERLAY_OVERLAY);
 }
 
 void

@@ -4,6 +4,7 @@ import sys
 import argparse
 import hashlib
 import re
+import yaml
 
 whoami = os.path.basename(sys.argv[0])
 BANNER = f'''//
@@ -19,6 +20,9 @@ def warn(*args, **kwargs):
 
 class Main:
     SOURCES = [whoami, 'job.yml']
+    DESTS = {
+        'decl': 'libqpdf/qpdf/auto_job_decl.hh',
+    }
     SUMS = 'job.sums'
 
     def main(self, args=sys.argv[1:], prog=whoami):
@@ -49,11 +53,14 @@ class Main:
 
     def get_hashes(self):
         hashes = {}
-        for i in sorted(self.SOURCES):
+        for i in sorted([*self.SOURCES, *self.DESTS.values()]):
             m = hashlib.sha256()
-            with open(i, 'rb') as f:
-                m.update(f.read())
-            hashes[i] = m.hexdigest()
+            try:
+                with open(i, 'rb') as f:
+                    m.update(f.read())
+                hashes[i] = m.hexdigest()
+            except FileNotFoundError:
+                pass
         return hashes
 
     def check(self):
@@ -82,12 +89,51 @@ class Main:
     def generate(self):
         warn(f'{whoami}: regenerating auto job files')
 
-        with open('libqpdf/qpdf/auto_job_decl.hh', 'w') as f:
-            print(BANNER, file=f)
+        with open('job.yml', 'r') as f:
+            data = yaml.safe_load(f.read())
+        self.validate(data)
+        self.generate_decl(data)
 
         # Update hashes last to ensure that this will be rerun in the
         # event of a failure.
         self.update_hashes()
+        # DON'T ADD CODE TO generate AFTER update_hashes
+
+    def check_keys(self, what, d, exp):
+        if not isinstance(d, dict):
+            exit(f'{what} is not a dictionary')
+        actual = set(d.keys())
+        extra = actual - exp
+        if extra:
+            exit(f'{what}: unknown keys = {extra}')
+
+    def validate(self, data):
+        self.check_keys('top', data, set(['choices', 'options']))
+        for o in data['options']:
+            self.check_keys('top', o, set(
+                ['table', 'bare', 'positional',
+                 'optional_parameter', 'required_parameter',
+                 'required_choices', 'from_table']))
+
+    def to_identifier(self, label, prefix, const):
+        identifier = re.sub(r'[^a-zA-Z0-9]', '_', label)
+        if const:
+            identifier = identifier.upper()
+        else:
+            identifier = identifier.lower()
+            identifier = re.sub('_([a-z])', lambda x: x.group(1).upper(),
+                                identifier)
+        return prefix + identifier
+
+    def generate_decl(self, data):
+        with open(self.DESTS['decl'], 'w') as f:
+            print(BANNER, file=f)
+            for o in data['options']:
+                table = o['table']
+                if table in ('main', 'help'):
+                    continue
+                i = self.to_identifier(table, 'O_', True)
+                print(f'static constexpr char const* {i} = "{table}";', file=f)
 
 
 if __name__ == '__main__':
