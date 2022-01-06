@@ -150,6 +150,12 @@ class QPDFArgParser
     QPDF_DLL
     void insertCompletion(std::string const&);
 
+    // Throw a Usage exception with the given message. In completion
+    // mode, this just exits to prevent errors from partial commands
+    // or other error messages from messing up completion.
+    QPDF_DLL
+    void usage(std::string const& message);
+
   private:
     struct OptionEntry
     {
@@ -174,7 +180,6 @@ class QPDFArgParser
     void argCompletionBash();
     void argCompletionZsh();
 
-    void usage(std::string const& message);
     void checkCompletion();
     void handleArgFileArguments();
     void handleBashArguments();

@@ -2174,15 +2174,7 @@ ArgParser::argEndCopyAttachments()
 void
 ArgParser::usage(std::string const& message)
 {
-    if (this->ap.isCompleting())
-    {
-        // This will cause bash to fall back to regular file completion.
-        exit(0);
-    }
-    else
-    {
-        throw QPDFArgParser::Usage(message);
-    }
+    this->ap.usage(message);
 }
 
 std::vector<int>
