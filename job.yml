@@ -143,18 +143,22 @@ options:
       remove-unreferenced-resources: remove_unref
       stream-data: stream_data
   - table: pages
+    prefix: Pages
     positional: true
     required_parameter:
-      - password: password
+      password: password
   - table: encryption
+    prefix: Enc
     positional: true
   - table: 40-bit encryption
+    prefix: Enc40
     required_choices:
       extract: yn
       annotate: yn
       print: yn
       modify: yn
   - table: 128-bit encryption
+    prefix: Enc128
     bare:
       - cleartext-metadata
       - force-V4
@@ -169,6 +173,7 @@ options:
       modify: modify128_choices
       use-aes: yn
   - table: 256-bit encryption
+    prefix: Enc256
     from_table:
       table: 128-bit encryption
       options:
@@ -185,6 +190,7 @@ options:
       - force-R5
       - allow-insecure
   - table: underlay/overlay
+    prefix: UO
     positional: true
     required_parameter:
       to: page-range
@@ -192,6 +198,7 @@ options:
       repeat: page-range
       password: password
   - table: attachment
+    prefix: Att
     positional: true
     bare:
       - replace
@@ -203,6 +210,7 @@ options:
       mimetype: mime/type
       description: description
   - table: copy attachment
+    prefix: CopyAtt
     positional: true
     required_parameter:
       prefix: prefix

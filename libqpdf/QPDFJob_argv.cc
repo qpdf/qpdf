@@ -25,134 +25,6 @@ namespace
       private:
 #       include <qpdf/auto_job_decl.hh>
 
-        void argHelp();
-        void argVersion();
-        void argCopyright();
-        void argJsonHelp();
-        void argShowCrypto();
-        void argPositional(char* arg);
-        void argPassword(char* parameter);
-        void argPasswordFile(char* parameter);
-        void argEmpty();
-        void argLinearize();
-        void argEncrypt();
-        void argDecrypt();
-        void argPasswordIsHexKey();
-        void argAllowInsecure();
-        void argAllowWeakCrypto();
-        void argPasswordMode(char* parameter);
-        void argSuppressPasswordRecovery();
-        void argCopyEncryption(char* parameter);
-        void argEncryptionFilePassword(char* parameter);
-        void argPages();
-        void argPagesPassword(char* parameter);
-        void argPagesPositional(char* parameter);
-        void argEndPages();
-        void argUnderlay();
-        void argOverlay();
-        void argRotate(char* parameter);
-        void argCollate(char* parameter);
-        void argFlattenRotation();
-        void argListAttachments();
-        void argShowAttachment(char* parameter);
-        void argRemoveAttachment(char* parameter);
-        void argAddAttachment();
-        void argCopyAttachments();
-        void argStreamData(char* parameter);
-        void argCompressStreams(char* parameter);
-        void argRecompressFlate();
-        void argCompressionLevel(char* parameter);
-        void argDecodeLevel(char* parameter);
-        void argNormalizeContent(char* parameter);
-        void argSuppressRecovery();
-        void argObjectStreams(char* parameter);
-        void argIgnoreXrefStreams();
-        void argQdf();
-        void argPreserveUnreferenced();
-        void argPreserveUnreferencedResources();
-        void argRemoveUnreferencedResources(char* parameter);
-        void argKeepFilesOpen(char* parameter);
-        void argKeepFilesOpenThreshold(char* parameter);
-        void argNewlineBeforeEndstream();
-        void argLinearizePass1(char* parameter);
-        void argCoalesceContents();
-        void argFlattenAnnotations(char* parameter);
-        void argGenerateAppearances();
-        void argMinVersion(char* parameter);
-        void argForceVersion(char* parameter);
-        void argSplitPages(char* parameter);
-        void argVerbose();
-        void argProgress();
-        void argNoWarn();
-        void argWarningExitZero();
-        void argDeterministicId();
-        void argStaticId();
-        void argStaticAesIv();
-        void argNoOriginalObjectIds();
-        void argShowEncryption();
-        void argShowEncryptionKey();
-        void argCheckLinearization();
-        void argShowLinearization();
-        void argShowXref();
-        void argShowObject(char* parameter);
-        void argRawStreamData();
-        void argFilteredStreamData();
-        void argShowNpages();
-        void argShowPages();
-        void argWithImages();
-        void argJson();
-        void argJsonKey(char* parameter);
-        void argJsonObject(char* parameter);
-        void argCheck();
-        void argOptimizeImages();
-        void argExternalizeInlineImages();
-        void argKeepInlineImages();
-        void argRemovePageLabels();
-        void argOiMinWidth(char* parameter);
-        void argOiMinHeight(char* parameter);
-        void argOiMinArea(char* parameter);
-        void argIiMinBytes(char* parameter);
-        void arg40Print(char* parameter);
-        void arg40Modify(char* parameter);
-        void arg40Extract(char* parameter);
-        void arg40Annotate(char* parameter);
-        void arg128Accessibility(char* parameter);
-        void arg128Extract(char* parameter);
-        void arg128Print(char* parameter);
-        void arg128Modify(char* parameter);
-        void arg128ClearTextMetadata();
-        void arg128Assemble(char* parameter);
-        void arg128Annotate(char* parameter);
-        void arg128Form(char* parameter);
-        void arg128ModOther(char* parameter);
-        void arg128UseAes(char* parameter);
-        void arg128ForceV4();
-        void arg256ForceR5();
-        void argEncryptPositional(char* arg);
-        void argEndEncrypt();
-        void argUOpositional(char* arg);
-        void argUOto(char* parameter);
-        void argUOfrom(char* parameter);
-        void argUOrepeat(char* parameter);
-        void argUOpassword(char* parameter);
-        void argEndUnderOverlay();
-        void argReplaceInput();
-        void argIsEncrypted();
-        void argRequiresPassword();
-        void argAApositional(char* arg);
-        void argAAKey(char* parameter);
-        void argAAFilename(char* parameter);
-        void argAACreationDate(char* parameter);
-        void argAAModDate(char* parameter);
-        void argAAMimeType(char* parameter);
-        void argAADescription(char* parameter);
-        void argAAReplace();
-        void argEndAddAttachment();
-        void argCApositional(char* arg);
-        void argCAprefix(char* parameter);
-        void argCApassword(char* parameter);
-        void argEndCopyAttachments();
-
         void usage(std::string const& message);
         void initOptionTable();
         void doFinalChecks();
@@ -226,7 +98,7 @@ ArgParser::initOptionTable()
         p(&ArgParser::argRemoveAttachment), "attachment-key");
     this->ap.addBare("add-attachment", b(&ArgParser::argAddAttachment));
     this->ap.addBare(
-        "copy-attachments-from", b(&ArgParser::argCopyAttachments));
+        "copy-attachments-from", b(&ArgParser::argCopyAttachmentsFrom));
     this->ap.addRequiredChoices("stream-data",
         p(&ArgParser::argStreamData), stream_data_choices);
     this->ap.addRequiredChoices("compress-streams",
@@ -270,7 +142,7 @@ ArgParser::initOptionTable()
     this->ap.addBare("verbose", b(&ArgParser::argVerbose));
     this->ap.addBare("progress", b(&ArgParser::argProgress));
     this->ap.addBare("no-warn", b(&ArgParser::argNoWarn));
-    this->ap.addBare("warning-exit-0", b(&ArgParser::argWarningExitZero));
+    this->ap.addBare("warning-exit-0", b(&ArgParser::argWarningExit0));
     this->ap.addBare("deterministic-id", b(&ArgParser::argDeterministicId));
     this->ap.addBare("static-id", b(&ArgParser::argStaticId));
     this->ap.addBare("static-aes-iv", b(&ArgParser::argStaticAesIv));
@@ -321,73 +193,73 @@ ArgParser::initOptionTable()
 
     this->ap.selectMainOptionTable();
     this->ap.addBare("encrypt", b(&ArgParser::argEncrypt));
-    this->ap.registerOptionTable(O_ENCRYPTION, b(&ArgParser::argEndEncrypt));
-    this->ap.addPositional(p(&ArgParser::argEncryptPositional));
-    this->ap.registerOptionTable(O_40_BIT_ENCRYPTION, b(&ArgParser::argEndEncrypt));
-    this->ap.addRequiredChoices("extract",p(&ArgParser::arg40Extract), yn_choices);
-    this->ap.addRequiredChoices("annotate",p(&ArgParser::arg40Annotate), yn_choices);
-    this->ap.addRequiredChoices("print",p(&ArgParser::arg40Print), yn_choices);
-    this->ap.addRequiredChoices("modify",p(&ArgParser::arg40Modify), yn_choices);
-    this->ap.registerOptionTable(O_128_BIT_ENCRYPTION, b(&ArgParser::argEndEncrypt));
-    this->ap.registerOptionTable(O_256_BIT_ENCRYPTION, b(&ArgParser::argEndEncrypt));
+    this->ap.registerOptionTable(O_ENCRYPTION, b(&ArgParser::argEndEncryption));
+    this->ap.addPositional(p(&ArgParser::argEncPositional));
+    this->ap.registerOptionTable(O_40_BIT_ENCRYPTION, b(&ArgParser::argEndEncryption));
+    this->ap.addRequiredChoices("extract",p(&ArgParser::argEnc40Extract), yn_choices);
+    this->ap.addRequiredChoices("annotate",p(&ArgParser::argEnc40Annotate), yn_choices);
+    this->ap.addRequiredChoices("print",p(&ArgParser::argEnc40Print), yn_choices);
+    this->ap.addRequiredChoices("modify",p(&ArgParser::argEnc40Modify), yn_choices);
+    this->ap.registerOptionTable(O_128_BIT_ENCRYPTION, b(&ArgParser::argEndEncryption));
+    this->ap.registerOptionTable(O_256_BIT_ENCRYPTION, b(&ArgParser::argEndEncryption));
     for (char const* k: {O_128_BIT_ENCRYPTION, O_256_BIT_ENCRYPTION})
     {
         this->ap.selectOptionTable(k);
         this->ap.addRequiredChoices("accessibility",
-                                    p(&ArgParser::arg128Accessibility), yn_choices);
-        this->ap.addRequiredChoices("extract", p(&ArgParser::arg128Extract), yn_choices);
+                                    p(&ArgParser::argEnc128Accessibility), yn_choices);
+        this->ap.addRequiredChoices("extract", p(&ArgParser::argEnc128Extract), yn_choices);
         this->ap.addRequiredChoices("print",
-                                    p(&ArgParser::arg128Print), print128_choices);
-        this->ap.addRequiredChoices("assemble",p(&ArgParser::arg128Assemble), yn_choices);
-        this->ap.addRequiredChoices("annotate",p(&ArgParser::arg128Annotate), yn_choices);
-        this->ap.addRequiredChoices("form",p(&ArgParser::arg128Form), yn_choices);
-        this->ap.addRequiredChoices("modify-other",p(&ArgParser::arg128ModOther), yn_choices);
+                                    p(&ArgParser::argEnc128Print), print128_choices);
+        this->ap.addRequiredChoices("assemble",p(&ArgParser::argEnc128Assemble), yn_choices);
+        this->ap.addRequiredChoices("annotate",p(&ArgParser::argEnc128Annotate), yn_choices);
+        this->ap.addRequiredChoices("form",p(&ArgParser::argEnc128Form), yn_choices);
+        this->ap.addRequiredChoices("modify-other",p(&ArgParser::argEnc128ModifyOther), yn_choices);
         this->ap.addRequiredChoices("modify",
-                                    p(&ArgParser::arg128Modify), modify128_choices);
-        this->ap.addBare("cleartext-metadata", b(&ArgParser::arg128ClearTextMetadata));
+                                    p(&ArgParser::argEnc128Modify), modify128_choices);
+        this->ap.addBare("cleartext-metadata", b(&ArgParser::argEnc128CleartextMetadata));
     }
 
     this->ap.selectOptionTable(O_128_BIT_ENCRYPTION);
-    this->ap.addRequiredChoices("use-aes",p(&ArgParser::arg128UseAes), yn_choices);
-    this->ap.addBare("force-V4", b(&ArgParser::arg128ForceV4));
+    this->ap.addRequiredChoices("use-aes",p(&ArgParser::argEnc128UseAes), yn_choices);
+    this->ap.addBare("force-V4", b(&ArgParser::argEnc128ForceV4));
 
     this->ap.selectOptionTable(O_256_BIT_ENCRYPTION);
-    this->ap.addBare("force-R5", b(&ArgParser::arg256ForceR5));
-    this->ap.addBare("allow-insecure", b(&ArgParser::argAllowInsecure));
+    this->ap.addBare("force-R5", b(&ArgParser::argEnc256ForceR5));
+    this->ap.addBare("allow-insecure", b(&ArgParser::argEnc256AllowInsecure));
 
-    this->ap.registerOptionTable(O_UNDERLAY_OVERLAY, b(&ArgParser::argEndUnderOverlay));
-    this->ap.addPositional(p(&ArgParser::argUOpositional));
+    this->ap.registerOptionTable(O_UNDERLAY_OVERLAY, b(&ArgParser::argEndUnderlayOverlay));
+    this->ap.addPositional(p(&ArgParser::argUOPositional));
     this->ap.addRequiredParameter("to",
-        p(&ArgParser::argUOto), "page-range");
+        p(&ArgParser::argUOTo), "page-range");
     this->ap.addRequiredParameter("from",
-        p(&ArgParser::argUOfrom), "page-range");
+        p(&ArgParser::argUOFrom), "page-range");
     this->ap.addRequiredParameter("repeat",
-        p(&ArgParser::argUOrepeat), "page-range");
+        p(&ArgParser::argUORepeat), "page-range");
     this->ap.addRequiredParameter("password",
-        p(&ArgParser::argUOpassword), "password");
+        p(&ArgParser::argUOPassword), "password");
 
-    this->ap.registerOptionTable(O_ATTACHMENT, b(&ArgParser::argEndAddAttachment));
-    this->ap.addPositional(p(&ArgParser::argAApositional));
+    this->ap.registerOptionTable(O_ATTACHMENT, b(&ArgParser::argEndAttachment));
+    this->ap.addPositional(p(&ArgParser::argAttPositional));
     this->ap.addRequiredParameter("key",
-        p(&ArgParser::argAAKey), "attachment-key");
+        p(&ArgParser::argAttKey), "attachment-key");
     this->ap.addRequiredParameter("filename",
-        p(&ArgParser::argAAFilename), "filename");
+        p(&ArgParser::argAttFilename), "filename");
     this->ap.addRequiredParameter("creationdate",
-        p(&ArgParser::argAACreationDate), "creation-date");
+        p(&ArgParser::argAttCreationdate), "creation-date");
     this->ap.addRequiredParameter("moddate",
-        p(&ArgParser::argAAModDate), "modification-date");
+        p(&ArgParser::argAttModdate), "modification-date");
     this->ap.addRequiredParameter("mimetype",
-        p(&ArgParser::argAAMimeType), "mime/type");
+        p(&ArgParser::argAttMimetype), "mime/type");
     this->ap.addRequiredParameter("description",
-        p(&ArgParser::argAADescription), "description");
-    this->ap.addBare("replace", b(&ArgParser::argAAReplace));
+        p(&ArgParser::argAttDescription), "description");
+    this->ap.addBare("replace", b(&ArgParser::argAttReplace));
 
-    this->ap.registerOptionTable(O_COPY_ATTACHMENT, b(&ArgParser::argEndCopyAttachments));
-    this->ap.addPositional(p(&ArgParser::argCApositional));
+    this->ap.registerOptionTable(O_COPY_ATTACHMENT, b(&ArgParser::argEndCopyAttachment));
+    this->ap.addPositional(p(&ArgParser::argCopyAttPositional));
     this->ap.addRequiredParameter("prefix",
-        p(&ArgParser::argCAprefix), "prefix");
+        p(&ArgParser::argCopyAttPrefix), "prefix");
     this->ap.addRequiredParameter("password",
-        p(&ArgParser::argCApassword), "password");
+        p(&ArgParser::argCopyAttPassword), "password");
 }
 
 void
@@ -1067,7 +939,7 @@ ArgParser::argEncrypt()
 }
 
 void
-ArgParser::argEncryptPositional(char* arg)
+ArgParser::argEncPositional(char* arg)
 {
     this->accumulated_args.push_back(arg);
     size_t n_args = this->accumulated_args.size();
@@ -1159,7 +1031,7 @@ ArgParser::argPasswordMode(char* parameter)
 }
 
 void
-ArgParser::argAllowInsecure()
+ArgParser::argEnc256AllowInsecure()
 {
     o.allow_insecure = true;
 }
@@ -1364,7 +1236,7 @@ ArgParser::argAddAttachment()
 }
 
 void
-ArgParser::argCopyAttachments()
+ArgParser::argCopyAttachmentsFrom()
 {
     o.attachments_to_copy.push_back(QPDFJob::CopyAttachmentFrom());
     this->ap.selectOptionTable(O_COPY_ATTACHMENT);
@@ -1616,7 +1488,7 @@ ArgParser::argNoWarn()
 }
 
 void
-ArgParser::argWarningExitZero()
+ArgParser::argWarningExit0()
 {
     o.warnings_exit_zero = true;
 }
@@ -1793,43 +1665,43 @@ ArgParser::argIiMinBytes(char* parameter)
 }
 
 void
-ArgParser::arg40Print(char* parameter)
+ArgParser::argEnc40Print(char* parameter)
 {
     o.r2_print = (strcmp(parameter, "y") == 0);
 }
 
 void
-ArgParser::arg40Modify(char* parameter)
+ArgParser::argEnc40Modify(char* parameter)
 {
     o.r2_modify = (strcmp(parameter, "y") == 0);
 }
 
 void
-ArgParser::arg40Extract(char* parameter)
+ArgParser::argEnc40Extract(char* parameter)
 {
     o.r2_extract = (strcmp(parameter, "y") == 0);
 }
 
 void
-ArgParser::arg40Annotate(char* parameter)
+ArgParser::argEnc40Annotate(char* parameter)
 {
     o.r2_annotate = (strcmp(parameter, "y") == 0);
 }
 
 void
-ArgParser::arg128Accessibility(char* parameter)
+ArgParser::argEnc128Accessibility(char* parameter)
 {
     o.r3_accessibility = (strcmp(parameter, "y") == 0);
 }
 
 void
-ArgParser::arg128Extract(char* parameter)
+ArgParser::argEnc128Extract(char* parameter)
 {
     o.r3_extract = (strcmp(parameter, "y") == 0);
 }
 
 void
-ArgParser::arg128Print(char* parameter)
+ArgParser::argEnc128Print(char* parameter)
 {
     if (strcmp(parameter, "full") == 0)
     {
@@ -1850,7 +1722,7 @@ ArgParser::arg128Print(char* parameter)
 }
 
 void
-ArgParser::arg128Modify(char* parameter)
+ArgParser::argEnc128Modify(char* parameter)
 {
     if (strcmp(parameter, "all") == 0)
     {
@@ -1894,55 +1766,55 @@ ArgParser::arg128Modify(char* parameter)
 }
 
 void
-ArgParser::arg128ClearTextMetadata()
+ArgParser::argEnc128CleartextMetadata()
 {
     o.cleartext_metadata = true;
 }
 
 void
-ArgParser::arg128Assemble(char* parameter)
+ArgParser::argEnc128Assemble(char* parameter)
 {
     o.r3_assemble = (strcmp(parameter, "y") == 0);
 }
 
 void
-ArgParser::arg128Annotate(char* parameter)
+ArgParser::argEnc128Annotate(char* parameter)
 {
     o.r3_annotate_and_form = (strcmp(parameter, "y") == 0);
 }
 
 void
-ArgParser::arg128Form(char* parameter)
+ArgParser::argEnc128Form(char* parameter)
 {
     o.r3_form_filling = (strcmp(parameter, "y") == 0);
 }
 
 void
-ArgParser::arg128ModOther(char* parameter)
+ArgParser::argEnc128ModifyOther(char* parameter)
 {
     o.r3_modify_other = (strcmp(parameter, "y") == 0);
 }
 
 void
-ArgParser::arg128UseAes(char* parameter)
+ArgParser::argEnc128UseAes(char* parameter)
 {
     o.use_aes = (strcmp(parameter, "y") == 0);
 }
 
 void
-ArgParser::arg128ForceV4()
+ArgParser::argEnc128ForceV4()
 {
     o.force_V4 = true;
 }
 
 void
-ArgParser::arg256ForceR5()
+ArgParser::argEnc256ForceR5()
 {
     o.force_R5 = true;
 }
 
 void
-ArgParser::argEndEncrypt()
+ArgParser::argEndEncryption()
 {
     o.encrypt = true;
     o.decrypt = false;
@@ -1950,7 +1822,7 @@ ArgParser::argEndEncrypt()
 }
 
 void
-ArgParser::argUOpositional(char* arg)
+ArgParser::argUOPositional(char* arg)
 {
     if (o.under_overlay->filename)
     {
@@ -1963,14 +1835,14 @@ ArgParser::argUOpositional(char* arg)
 }
 
 void
-ArgParser::argUOto(char* parameter)
+ArgParser::argUOTo(char* parameter)
 {
     parseNumrange(parameter, 0);
     o.under_overlay->to_nr = parameter;
 }
 
 void
-ArgParser::argUOfrom(char* parameter)
+ArgParser::argUOFrom(char* parameter)
 {
     if (strlen(parameter))
     {
@@ -1980,7 +1852,7 @@ ArgParser::argUOfrom(char* parameter)
 }
 
 void
-ArgParser::argUOrepeat(char* parameter)
+ArgParser::argUORepeat(char* parameter)
 {
     if (strlen(parameter))
     {
@@ -1990,13 +1862,13 @@ ArgParser::argUOrepeat(char* parameter)
 }
 
 void
-ArgParser::argUOpassword(char* parameter)
+ArgParser::argUOPassword(char* parameter)
 {
     o.under_overlay->password = parameter;
 }
 
 void
-ArgParser::argEndUnderOverlay()
+ArgParser::argEndUnderlayOverlay()
 {
     if (0 == o.under_overlay->filename)
     {
@@ -2026,25 +1898,25 @@ ArgParser::argRequiresPassword()
 }
 
 void
-ArgParser::argAApositional(char* arg)
+ArgParser::argAttPositional(char* arg)
 {
     o.attachments_to_add.back().path = arg;
 }
 
 void
-ArgParser::argAAKey(char* parameter)
+ArgParser::argAttKey(char* parameter)
 {
     o.attachments_to_add.back().key = parameter;
 }
 
 void
-ArgParser::argAAFilename(char* parameter)
+ArgParser::argAttFilename(char* parameter)
 {
     o.attachments_to_add.back().filename = parameter;
 }
 
 void
-ArgParser::argAACreationDate(char* parameter)
+ArgParser::argAttCreationdate(char* parameter)
 {
     if (! QUtil::pdf_time_to_qpdf_time(parameter))
     {
@@ -2054,7 +1926,7 @@ ArgParser::argAACreationDate(char* parameter)
 }
 
 void
-ArgParser::argAAModDate(char* parameter)
+ArgParser::argAttModdate(char* parameter)
 {
     if (! QUtil::pdf_time_to_qpdf_time(parameter))
     {
@@ -2064,7 +1936,7 @@ ArgParser::argAAModDate(char* parameter)
 }
 
 void
-ArgParser::argAAMimeType(char* parameter)
+ArgParser::argAttMimetype(char* parameter)
 {
     if (strchr(parameter, '/') == nullptr)
     {
@@ -2074,19 +1946,19 @@ ArgParser::argAAMimeType(char* parameter)
 }
 
 void
-ArgParser::argAADescription(char* parameter)
+ArgParser::argAttDescription(char* parameter)
 {
     o.attachments_to_add.back().description = parameter;
 }
 
 void
-ArgParser::argAAReplace()
+ArgParser::argAttReplace()
 {
     o.attachments_to_add.back().replace = true;
 }
 
 void
-ArgParser::argEndAddAttachment()
+ArgParser::argEndAttachment()
 {
     static std::string now = QUtil::qpdf_time_to_pdf_time(
         QUtil::get_current_qpdf_time());
@@ -2119,25 +1991,25 @@ ArgParser::argEndAddAttachment()
 }
 
 void
-ArgParser::argCApositional(char* arg)
+ArgParser::argCopyAttPositional(char* arg)
 {
     o.attachments_to_copy.back().path = arg;
 }
 
 void
-ArgParser::argCAprefix(char* parameter)
+ArgParser::argCopyAttPrefix(char* parameter)
 {
     o.attachments_to_copy.back().prefix = parameter;
 }
 
 void
-ArgParser::argCApassword(char* parameter)
+ArgParser::argCopyAttPassword(char* parameter)
 {
     o.attachments_to_copy.back().password = parameter;
 }
 
 void
-ArgParser::argEndCopyAttachments()
+ArgParser::argEndCopyAttachment()
 {
     if (o.attachments_to_copy.back().path.empty())
     {
