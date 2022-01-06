@@ -188,6 +188,8 @@ ArgParser::initOptionTable()
 
     this->ap.addFinalCheck(b(&ArgParser::doFinalChecks));
 
+#   include <qpdf/auto_job_init.hh>
+
     this->ap.selectHelpOptionTable();
     this->ap.addBare("help", b(&ArgParser::argHelp));
     this->ap.addBare("version", b(&ArgParser::argVersion));
@@ -196,7 +198,6 @@ ArgParser::initOptionTable()
     this->ap.addBare("show-crypto", b(&ArgParser::argShowCrypto));
 
     this->ap.selectMainOptionTable();
-    char const* yn[] = {"y", "n", 0};
     this->ap.addPositional(p(&ArgParser::argPositional));
     this->ap.addRequiredParameter("password",
         p(&ArgParser::argPassword), "password");
@@ -208,8 +209,6 @@ ArgParser::initOptionTable()
     this->ap.addBare("password-is-hex-key", b(&ArgParser::argPasswordIsHexKey));
     this->ap.addBare("suppress-password-recovery",
                      b(&ArgParser::argSuppressPasswordRecovery));
-    char const* password_mode_choices[] =
-        {"bytes", "hex-bytes", "unicode", "auto", 0};
     this->ap.addRequiredChoices("password-mode",
         p(&ArgParser::argPasswordMode), password_mode_choices);
     this->ap.addRequiredParameter("copy-encryption",
@@ -218,8 +217,6 @@ ArgParser::initOptionTable()
         p(&ArgParser::argEncryptionFilePassword), "password");
     this->ap.addRequiredParameter("rotate",
         p(&ArgParser::argRotate), "[+|-]angle:page-range");
-    char const* stream_data_choices[] =
-        {"compress", "preserve", "uncompress", 0};
     this->ap.addOptionalParameter("collate",p(&ArgParser::argCollate));
     this->ap.addBare("flatten-rotation", b(&ArgParser::argFlattenRotation));
     this->ap.addBare("list-attachments", b(&ArgParser::argListAttachments));
@@ -233,19 +230,15 @@ ArgParser::initOptionTable()
     this->ap.addRequiredChoices("stream-data",
         p(&ArgParser::argStreamData), stream_data_choices);
     this->ap.addRequiredChoices("compress-streams",
-        p(&ArgParser::argCompressStreams), yn);
+        p(&ArgParser::argCompressStreams), yn_choices);
     this->ap.addBare("recompress-flate", b(&ArgParser::argRecompressFlate));
     this->ap.addRequiredParameter("compression-level",
         p(&ArgParser::argCompressionLevel), "level");
-    char const* decode_level_choices[] =
-        {"none", "generalized", "specialized", "all", 0};
     this->ap.addRequiredChoices("decode-level",
         p(&ArgParser::argDecodeLevel), decode_level_choices);
     this->ap.addRequiredChoices("normalize-content",
-        p(&ArgParser::argNormalizeContent), yn);
+        p(&ArgParser::argNormalizeContent), yn_choices);
     this->ap.addBare("suppress-recovery", b(&ArgParser::argSuppressRecovery));
-    char const* object_streams_choices[] = {
-        "disable", "preserve", "generate", 0};
     this->ap.addRequiredChoices("object-streams",
         p(&ArgParser::argObjectStreams), object_streams_choices);
     this->ap.addBare(
@@ -256,19 +249,16 @@ ArgParser::initOptionTable()
     this->ap.addBare(
         "preserve-unreferenced-resources",
         b(&ArgParser::argPreserveUnreferencedResources));
-    char const* remove_unref_choices[] = {
-        "auto", "yes", "no", 0};
     this->ap.addRequiredChoices("remove-unreferenced-resources",
         p(&ArgParser::argRemoveUnreferencedResources), remove_unref_choices);
     this->ap.addRequiredChoices("keep-files-open",
-        p(&ArgParser::argKeepFilesOpen), yn);
+        p(&ArgParser::argKeepFilesOpen), yn_choices);
     this->ap.addRequiredParameter("keep-files-open-threshold",
         p(&ArgParser::argKeepFilesOpenThreshold), "count");
     this->ap.addBare("newline-before-endstream", b(&ArgParser::argNewlineBeforeEndstream));
     this->ap.addRequiredParameter("linearize-pass1",
         p(&ArgParser::argLinearizePass1), "filename");
     this->ap.addBare("coalesce-contents", b(&ArgParser::argCoalesceContents));
-    char const* flatten_choices[] = {"all", "print", "screen", 0};
     this->ap.addRequiredChoices("flatten-annotations",
         p(&ArgParser::argFlattenAnnotations), flatten_choices);
     this->ap.addBare("generate-appearances", b(&ArgParser::argGenerateAppearances));
@@ -298,12 +288,6 @@ ArgParser::initOptionTable()
     this->ap.addBare("show-pages", b(&ArgParser::argShowPages));
     this->ap.addBare("with-images", b(&ArgParser::argWithImages));
     this->ap.addBare("json", b(&ArgParser::argJson));
-    // QXXXQ
-    // The list of selectable top-level keys id duplicated in three
-    // places: json_schema, do_json, and initOptionTable.
-    char const* json_key_choices[] = {
-        "objects", "objectinfo", "pages", "pagelabels", "outlines",
-        "acroform", "encrypt", "attachments", 0};
     this->ap.addRequiredChoices("json-key",
         p(&ArgParser::argJsonKey), json_key_choices);
     this->ap.addRequiredParameter("json-object",
@@ -340,34 +324,31 @@ ArgParser::initOptionTable()
     this->ap.registerOptionTable(O_ENCRYPTION, b(&ArgParser::argEndEncrypt));
     this->ap.addPositional(p(&ArgParser::argEncryptPositional));
     this->ap.registerOptionTable(O_40_BIT_ENCRYPTION, b(&ArgParser::argEndEncrypt));
-    this->ap.addRequiredChoices("extract",p(&ArgParser::arg40Extract), yn);
-    this->ap.addRequiredChoices("annotate",p(&ArgParser::arg40Annotate), yn);
-    this->ap.addRequiredChoices("print",p(&ArgParser::arg40Print), yn);
-    this->ap.addRequiredChoices("modify",p(&ArgParser::arg40Modify), yn);
+    this->ap.addRequiredChoices("extract",p(&ArgParser::arg40Extract), yn_choices);
+    this->ap.addRequiredChoices("annotate",p(&ArgParser::arg40Annotate), yn_choices);
+    this->ap.addRequiredChoices("print",p(&ArgParser::arg40Print), yn_choices);
+    this->ap.addRequiredChoices("modify",p(&ArgParser::arg40Modify), yn_choices);
     this->ap.registerOptionTable(O_128_BIT_ENCRYPTION, b(&ArgParser::argEndEncrypt));
     this->ap.registerOptionTable(O_256_BIT_ENCRYPTION, b(&ArgParser::argEndEncrypt));
     for (char const* k: {O_128_BIT_ENCRYPTION, O_256_BIT_ENCRYPTION})
     {
         this->ap.selectOptionTable(k);
         this->ap.addRequiredChoices("accessibility",
-                                    p(&ArgParser::arg128Accessibility), yn);
-        this->ap.addRequiredChoices("extract", p(&ArgParser::arg128Extract), yn);
-        char const* print128_choices[] = {"full", "low", "none", 0};
+                                    p(&ArgParser::arg128Accessibility), yn_choices);
+        this->ap.addRequiredChoices("extract", p(&ArgParser::arg128Extract), yn_choices);
         this->ap.addRequiredChoices("print",
                                     p(&ArgParser::arg128Print), print128_choices);
-        this->ap.addRequiredChoices("assemble",p(&ArgParser::arg128Assemble), yn);
-        this->ap.addRequiredChoices("annotate",p(&ArgParser::arg128Annotate), yn);
-        this->ap.addRequiredChoices("form",p(&ArgParser::arg128Form), yn);
-        this->ap.addRequiredChoices("modify-other",p(&ArgParser::arg128ModOther), yn);
-        char const* modify128_choices[] =
-            {"all", "annotate", "form", "assembly", "none", 0};
+        this->ap.addRequiredChoices("assemble",p(&ArgParser::arg128Assemble), yn_choices);
+        this->ap.addRequiredChoices("annotate",p(&ArgParser::arg128Annotate), yn_choices);
+        this->ap.addRequiredChoices("form",p(&ArgParser::arg128Form), yn_choices);
+        this->ap.addRequiredChoices("modify-other",p(&ArgParser::arg128ModOther), yn_choices);
         this->ap.addRequiredChoices("modify",
                                     p(&ArgParser::arg128Modify), modify128_choices);
         this->ap.addBare("cleartext-metadata", b(&ArgParser::arg128ClearTextMetadata));
     }
 
     this->ap.selectOptionTable(O_128_BIT_ENCRYPTION);
-    this->ap.addRequiredChoices("use-aes",p(&ArgParser::arg128UseAes), yn);
+    this->ap.addRequiredChoices("use-aes",p(&ArgParser::arg128UseAes), yn_choices);
     this->ap.addBare("force-V4", b(&ArgParser::arg128ForceV4));
 
     this->ap.selectOptionTable(O_256_BIT_ENCRYPTION);

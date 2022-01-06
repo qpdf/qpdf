@@ -22,6 +22,7 @@ class Main:
     SOURCES = [whoami, 'job.yml']
     DESTS = {
         'decl': 'libqpdf/qpdf/auto_job_decl.hh',
+        'init': 'libqpdf/qpdf/auto_job_init.hh',
     }
     SUMS = 'job.sums'
 
@@ -93,6 +94,7 @@ class Main:
             data = yaml.safe_load(f.read())
         self.validate(data)
         self.generate_decl(data)
+        self.generate_init(data)
 
         # Update hashes last to ensure that this will be rerun in the
         # event of a failure.
@@ -134,6 +136,15 @@ class Main:
                     continue
                 i = self.to_identifier(table, 'O_', True)
                 print(f'static constexpr char const* {i} = "{table}";', file=f)
+
+    def generate_init(self, data):
+        with open(self.DESTS['init'], 'w') as f:
+            print(BANNER, file=f)
+            for k, v in data['choices'].items():
+                print(f'char const* {k}_choices[] = {{', file=f, end='')
+                for i in v:
+                    print(f'"{i}", ', file=f, end='')
+                print('0};', file=f)
 
 
 if __name__ == '__main__':
