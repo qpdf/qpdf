@@ -1,1 +1,209 @@
----
+choices:
+  yn:
+    - "y"
+    - "n"
+  password_mode:
+    - bytes
+    - hex-bytes
+    - unicode
+    - auto
+  stream_data:
+    - compress
+    - preserve
+    - uncompress
+  decode_level:
+    - none
+    - generalized
+    - specialized
+    - all
+  object_streams:
+    - disable
+    - preserve
+    - generate
+  remove_unref:
+    - auto
+    - "yes"
+    - "no"
+  flatten:
+    - all
+    - print
+    - screen
+  json_key:
+    # QXXXQ duplicated top-level json keys
+    - acroform
+    - attachments
+    - encrypt
+    - objectinfo
+    - objects
+    - outlines
+    - pagelabels
+    - pages
+  print128:
+    - full
+    - low
+    - none
+  modify128:
+    - all
+    - annotate
+    - form
+    - assembly
+    - none
+options:
+  - table: help
+    bare:
+      - help
+      - version
+      - copyright
+      - json-help
+      - show-crypto
+  - table: main
+    positional: true
+    bare:
+      - add-attachment
+      - allow-weak-crypto
+      - check
+      - check-linearization
+      - coalesce-contents
+      - copy-attachments-from
+      - decrypt
+      - deterministic-id
+      - empty
+      - encrypt
+      - externalize-inline-images
+      - filtered-stream-data
+      - flatten-rotation
+      - generate-appearances
+      - ignore-xref-streams
+      - is-encrypted
+      - json
+      - keep-inline-images
+      - linearize
+      - list-attachments
+      - newline-before-endstream
+      - no-original-object-ids
+      - no-warn
+      - optimize-images
+      - overlay
+      - pages
+      - password-is-hex-key
+      - preserve-unreferenced
+      - preserve-unreferenced-resources
+      - progress
+      - qdf
+      - raw-stream-data
+      - recompress-flate
+      - remove-page-labels
+      - replace-input
+      - requires-password
+      - show-encryption
+      - show-encryption-key
+      - show-linearization
+      - show-npages
+      - show-pages
+      - show-xref
+      - static-aes-iv
+      - static-id
+      - suppress-password-recovery
+      - suppress-recovery
+      - underlay
+      - verbose
+      - warning-exit-0
+      - with-images
+    optional_parameter:
+      - collate
+      - split-pages
+    required_parameter:
+      compression-level: level
+      copy-encryption: file
+      encryption-file-password: password
+      force-version: version
+      ii-min-bytes: minimum
+      json-object: trailer
+      keep-files-open-threshold: count
+      linearize-pass1: filename
+      min-version: version
+      oi-min-area: minimum
+      oi-min-height: minimum
+      oi-min-width: minimum
+      password: password
+      password-file: password
+      remove-attachment: attachment
+      rotate: "[+|-]angle"
+      show-attachment: attachment
+      show-object: trailer
+    required_choices:
+      compress-streams: yn
+      decode-level: decode_level
+      flatten-annotations: flatten
+      json-key: json_key
+      keep-files-open: yn
+      normalize-content: yn
+      object-streams: object_streams
+      password-mode: password_mode
+      remove-unreferenced-resources: remove_unref
+      stream-data: stream_data
+  - table: pages
+    positional: true
+    required_parameter:
+      - password: password
+  - table: encryption
+    positional: true
+  - table: 40-bit encryption
+    required_choices:
+      extract: yn
+      annotate: yn
+      print: yn
+      modify: yn
+  - table: 128-bit encryption
+    bare:
+      - cleartext-metadata
+      - force-V4
+    required_choices:
+      accessibility: yn
+      extract: yn
+      print: print128_choices
+      assemble: yn
+      annotate: yn
+      form: yn
+      modify-other: yn
+      modify: modify128_choices
+      use-aes: yn
+  - table: 256-bit encryption
+    from_table:
+      table: 128-bit encryption
+      options:
+        - cleartext-metadata
+        - accessibility
+        - extract
+        - print
+        - assemble
+        - annotate
+        - form
+        - modify-other
+        - modify
+    bare:
+      - force-R5
+      - allow-insecure
+  - table: underlay/overlay
+    positional: true
+    required_parameter:
+      to: page-range
+      from: page-range
+      repeat: page-range
+      password: password
+  - table: attachment
+    positional: true
+    bare:
+      - replace
+    required_parameter:
+      key: attachment-key
+      filename: filename
+      creationdate: creation-date
+      moddate: modification-date
+      mimetype: mime/type
+      description: description
+  - table: copy attachment
+    positional: true
+    required_parameter:
+      prefix: prefix
+      password: password
