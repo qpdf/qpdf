@@ -35,7 +35,7 @@
 // crafted to work with qpdf. qpdf's command-line syntax is very
 // complex because of its long history, and it doesn't really follow
 // any kind of normal standard for arguments, but it's important for
-// backward compatibility not ensure we don't break what constitutes a
+// backward compatibility to ensure we don't break what constitutes a
 // valid command. This class handles the quirks of qpdf's argument
 // parsing, bash/zsh completion, and support for @argfile to read
 // arguments from a file.

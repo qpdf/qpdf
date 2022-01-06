@@ -710,7 +710,7 @@ QPDFJob::doCheck(QPDF& pdf)
             cout << "File is not linearized\n";
         }
 
-        // Write the file no nowhere, uncompressing
+        // Write the file to nowhere, uncompressing
         // streams.  This causes full file traversal and
         // decoding of all streams we can decode.
         QPDFWriter w(pdf);
@@ -1970,7 +1970,7 @@ QPDFJob::doProcess(
     // a password encoded in PDF Doc encoding or Windows code page
     // 1252 for an AES-encrypted file or a UTF-8-encoded password on
     // an RC4-encrypted file, or if the password was properly encoded
-    // by the password given here was incorrectly encoded, there's a
+    // but the password given here was incorrectly encoded, there's a
     // good chance we'd succeed here.
 
     std::string ptemp;
@@ -2754,7 +2754,7 @@ QPDFJob::handlePageSpecs(
             // survives through copying to the output but gets cleaned up
             // automatically at the end. Do not canonicalize the file
             // name. Using two different paths to refer to the same
-            // file is a document workaround for duplicating a page.
+            // file is a documented workaround for duplicating a page.
             // If you are using this an example of how to do this with
             // the API, you can just create two different QPDF objects
             // to the same underlying file with the same path to
