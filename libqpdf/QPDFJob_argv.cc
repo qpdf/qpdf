@@ -2320,11 +2320,6 @@ ArgParser::doFinalChecks()
     {
         usage("no output file may be given for this option");
     }
-    if (o.optimize_images && (! o.keep_inline_images))
-    {
-        // QXXXQ this is not a check and doesn't belong here
-        o.externalize_inline_images = true;
-    }
     if (o.check_requires_password && o.check_is_encrypted)
     {
         usage("--requires-password and --is-encrypted may not be given"
@@ -2357,7 +2352,7 @@ ArgParser::doFinalChecks()
             usage("--split-pages may not be used when"
                   " writing to standard output");
         }
-        if (o.verbose)     // QXXXQ
+        if (o.verbose)
         {
             usage("--verbose may not be used when"
                   " writing to standard output");

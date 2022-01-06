@@ -2428,7 +2428,8 @@ QPDFJob::handleTransformations(QPDF& pdf)
             afdh = new QPDFAcroFormDocumentHelper(pdf);
         }
     };
-    if (o.externalize_inline_images)
+    if (o.externalize_inline_images ||
+        (o.optimize_images && (! o.keep_inline_images)))
     {
         std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
         for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
