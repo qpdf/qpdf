@@ -2717,24 +2717,14 @@ QPDFJob::handlePageSpecs(
         {
             filenames.insert(page_spec.filename);
         }
-        if (filenames.size() > o.keep_files_open_threshold)
-        {
-            QTC::TC("qpdf", "qpdf disable keep files open");
-            o.doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
-                cout << prefix << ": selecting --keep-open-files=n"
-                     << std::endl;
-            });
-            o.keep_files_open = false;
-        }
-        else
-        {
-            o.doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
-                cout << prefix << ": selecting --keep-open-files=y"
-                     << std::endl;
-            });
-            o.keep_files_open = true;
-            QTC::TC("qpdf", "qpdf don't disable keep files open");
-        }
+        o.keep_files_open = (filenames.size() <= o.keep_files_open_threshold);
+        QTC::TC("qpdf", "qpdf automatically set keep files open",
+                o.keep_files_open ? 0 : 1);
+        o.doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
+            cout << prefix << ": selecting --keep-open-files="
+                 << (o.keep_files_open ? "y" : "n")
+                 << std::endl;
+        });
     }
 
     // Create a QPDF object for each file that we may take pages from.
