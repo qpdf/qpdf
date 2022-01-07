@@ -1469,9 +1469,9 @@ QPDFJob::json_schema(std::set<std::string>* keys)
 
     bool all_keys = ((keys == 0) || keys->empty());
 
-    // QXXXQ
-    // The list of selectable top-level keys id duplicated in three
-    // places: json_schema, doJSON, and initOptionTable.
+    // The list of selectable top-level keys id duplicated in the
+    // following places: job.yml, QPDFJob::json_schema, and
+    // QPDFJob::doJSON.
     if (all_keys || keys->count("objects"))
     {
         schema.addDictionaryMember(
@@ -1809,9 +1809,9 @@ QPDFJob::doJSON(QPDF& pdf)
         "decodelevel", JSON::makeString(decode_level_str));
 
     bool all_keys = o.json_keys.empty();
-    // QXXXQ
-    // The list of selectable top-level keys id duplicated in three
-    // places: json_schema, doJSON, and initOptionTable.
+    // The list of selectable top-level keys id duplicated in the
+    // following places: job.yml, QPDFJob::json_schema, and
+    // QPDFJob::doJSON.
     if (all_keys || o.json_keys.count("objects"))
     {
         doJSONObjects(pdf, j);

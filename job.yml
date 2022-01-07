@@ -29,7 +29,9 @@ choices:
     - print
     - screen
   json_key:
-    # QXXXQ duplicated top-level json keys
+    # The list of selectable top-level keys id duplicated in the
+    # following places: job.yml, QPDFJob::json_schema, and
+    # QPDFJob::doJSON.
     - acroform
     - attachments
     - encrypt
