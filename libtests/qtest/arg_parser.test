@@ -101,4 +101,30 @@ $td->runtest("args from stdin",
              {$td->FILE => "stdin.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
-$td->report(2 + (2 * scalar(@completion_tests)) + scalar(@arg_tests));
+my @help_tests = (
+    '',
+    '=all',
+    '=--ewe',
+    '=quack',
+    );
+foreach my $i (@help_tests)
+{
+    my $out = $i;
+    $out =~ s/[=-]//g;
+    if ($out ne '')
+    {
+        $out = "-$out";
+    }
+    $td->runtest("--help$i",
+                 {$td->COMMAND => "arg_parser --help$i"},
+                 {$td->FILE => "help$out.out", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+$td->runtest("bad help option",
+             {$td->COMMAND => 'arg_parser --help=--oops'},
+             {$td->FILE => "help-bad.out", $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+
+$td->report(3 + (2 * scalar(@completion_tests)) +
+            scalar(@arg_tests) + scalar(@help_tests));

@@ -2,7 +2,9 @@
 --completion-zsh
 --help
 --help=
+--help=--ewe
 --help=all
+--help=quack
 --moo
 --moo=
 --oink=

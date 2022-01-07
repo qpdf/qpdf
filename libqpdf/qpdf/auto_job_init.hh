@@ -162,3 +162,4 @@ this->ap.copyFromOtherTable("annotate", "128-bit encryption");
 this->ap.copyFromOtherTable("form", "128-bit encryption");
 this->ap.copyFromOtherTable("modify-other", "128-bit encryption");
 this->ap.copyFromOtherTable("modify", "128-bit encryption");
+this->ap.addHelpFooter("For detailed help, visit the qpdf manual: https://qpdf.readthedocs.io\n");

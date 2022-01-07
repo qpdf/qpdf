@@ -1,0 +1,32 @@
+Run "arg_parser --help=topic" for help on a topic.
+Run "arg_parser --help=option" for help on an option.
+Run "arg_parser --help=all" to see all available help.
+
+Topics:
+  baaa: Baaa Options
+  quack: Quack Options
+
+== topic baaa (Baaa Options) ==
+
+Ewe can do sheepish things.
+For example, ewe can add more ram to your computer.
+
+Related options:
+  --ewe: just for ewe
+  --ram: curly horns
+
+== topic quack (Quack Options) ==
+
+Just put stuff after quack to get a count at the end.
+
+== option --ewe (just for ewe) ==
+
+You are not a ewe.
+
+== option --ram (curly horns) ==
+
+curly horns
+
+====
+
+For more help, read the manual.

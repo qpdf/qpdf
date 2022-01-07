@@ -54,3 +54,10 @@ QPDFArgParser unrecognized 0
 QPDFArgParser complete choices 0
 QPDFArgParser copy from unknown 0
 QPDFArgParser copy unknown 0
+QPDFArgParser add reserved help topic 0
+QPDFArgParser add existing topic 0
+QPDFArgParser add to unknown topic 0
+QPDFArgParser duplicate option help 0
+QPDFArgParser bad option for help 0
+QPDFArgParser bad topic for help 0
+QPDFArgParser invalid choice handler to unknown 0

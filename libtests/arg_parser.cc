@@ -68,6 +68,18 @@ ArgParser::initOptions()
     ap.addBare("sheep", [this](){ this->ap.selectOptionTable("sheep"); });
     ap.registerOptionTable("sheep", nullptr);
     ap.copyFromOtherTable("ewe", "baaa");
+
+    ap.addHelpFooter("For more help, read the manual.\n");
+    ap.addHelpTopic(
+        "quack", "Quack Options",
+        "Just put stuff after quack to get a count at the end.\n");
+    ap.addHelpTopic(
+        "baaa", "Baaa Options",
+        "Ewe can do sheepish things.\n"
+        "For example, ewe can add more ram to your computer.\n");
+    ap.addOptionHelp("--ewe", "baaa",
+                     "just for ewe", "You are not a ewe.\n");
+    ap.addOptionHelp("--ram", "baaa", "curly horns", "");
 }
 
 void
@@ -152,62 +164,60 @@ ArgParser::finalChecks()
 void
 ArgParser::test_exceptions()
 {
-    try
-    {
+    auto err = [](char const* msg, std::function<void()> fn) {
+        try
+        {
+            fn();
+            assert(msg == nullptr);
+        }
+        catch (std::exception& e)
+        {
+            std::cout << msg << ": " << e.what() << std::endl;
+        }
+    };
+
+    err("duplicate handler", [this]() {
         ap.selectMainOptionTable();
         ap.addBare("potato", [](){});
-        assert(false);
-    }
-    catch (std::exception& e)
-    {
-        std::cout << "duplicate handler: " << e.what() << std::endl;
-    }
-    try
-    {
+    });
+    err("duplicate handler", [this]() {
         ap.selectOptionTable("baaa");
         ap.addBare("ram", [](){});
-        assert(false);
-    }
-    catch (std::exception& e)
-    {
-        std::cout << "duplicate handler: " << e.what() << std::endl;
-    }
-    try
-    {
+    });
+    err("duplicate table", [this]() {
         ap.registerOptionTable("baaa", nullptr);
-        assert(false);
-    }
-    catch (std::exception& e)
-    {
-        std::cout << "duplicate table: " << e.what() << std::endl;
-    }
-    try
-    {
+    });
+    err("unknown table", [this]() {
         ap.selectOptionTable("aardvark");
-        assert(false);
-    }
-    catch (std::exception& e)
-    {
-        std::cout << "unknown table: " << e.what() << std::endl;
-    }
-    try
-    {
+    });
+    err("copy from unknown table", [this]() {
         ap.copyFromOtherTable("one", "two");
-        assert(false);
-    }
-    catch (std::exception& e)
-    {
-        std::cout << "copy from unknown table: " << e.what() << std::endl;
-    }
-    try
-    {
+    });
+    err("copy unknown from other table", [this]() {
         ap.copyFromOtherTable("two", "baaa");
-        assert(false);
-    }
-    catch (std::exception& e)
-    {
-        std::cout << "copy unknown from other table: " << e.what() << std::endl;
-    }
+    });
+    err("add existing help topic", [this]() {
+        ap.addHelpTopic("baaa", "potato", "salad");
+    });
+    err("add reserved help topic", [this]() {
+        ap.addHelpTopic("all", "potato", "salad");
+    });
+    err("add to unknown topic", [this]() {
+        ap.addOptionHelp("--new", "oops", "potato", "salad");
+    });
+    err("bad option for help", [this]() {
+        ap.addOptionHelp("nodash", "baaa", "potato", "salad");
+    });
+    err("bad topic for help", [this]() {
+        ap.addHelpTopic("--dashes", "potato", "salad");
+    });
+    err("duplicate option help", [this]() {
+        ap.addOptionHelp("--ewe", "baaa", "potato", "salad");
+    });
+    err("invalid choice handler to unknown", [this]() {
+        ap.addInvalidChoiceHandler(
+            "elephant", [](char*){});
+    });
 }
 
 int main(int argc, char* argv[])

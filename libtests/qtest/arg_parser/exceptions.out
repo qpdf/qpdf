@@ -4,3 +4,10 @@ duplicate table: QPDFArgParser: registering already registered option table baaa
 unknown table: QPDFArgParser: selecting unregistered option table aardvark
 copy from unknown table: QPDFArgParser: attempt to copy from unknown table two
 copy unknown from other table: QPDFArgParser: attempt to copy unknown argument two from table baaa
+add existing help topic: QPDFArgParser: topic baaa has already been added
+add reserved help topic: QPDFArgParser: can't register reserved help topic all
+add to unknown topic: QPDFArgParser: unable to add option --new to unknown help topic oops
+bad option for help: QPDFArgParser: options for help must start with --
+bad topic for help: QPDFArgParser: help topics must not start with -
+duplicate option help: QPDFArgParser: option --ewe already has help
+invalid choice handler to unknown: QPDFArgParser: attempt to add invalid choice handler to unknown argument

@@ -36,12 +36,15 @@ QPDFArgParser::QPDFArgParser(int argc, char* argv[], char const* progname_env) :
 {
     selectHelpOptionTable();
     char const* help_choices[] = {"all", 0};
+    // More help choices are added dynamically.
     addChoices(
         "help", bindParam(&QPDFArgParser::argHelp, this), false, help_choices);
+    addInvalidChoiceHandler(
+        "help", bindParam(&QPDFArgParser::invalidHelpArg, this));
     addBare("completion-bash",
-            std::bind(std::mem_fn(&QPDFArgParser::argCompletionBash), this));
+            bindBare(&QPDFArgParser::argCompletionBash, this));
     addBare("completion-zsh",
-            std::bind(std::mem_fn(&QPDFArgParser::argCompletionZsh), this));
+            bindBare(&QPDFArgParser::argCompletionZsh, this));
     selectMainOptionTable();
 }
 
@@ -158,6 +161,22 @@ QPDFArgParser::addChoices(
 }
 
 void
+QPDFArgParser::addInvalidChoiceHandler(
+    std::string const& arg, param_arg_handler_t handler)
+{
+    auto i = this->m->option_table->find(arg);
+    if (i == this->m->option_table->end())
+    {
+        QTC::TC("libtests", "QPDFArgParser invalid choice handler to unknown");
+        throw std::logic_error(
+            "QPDFArgParser: attempt to add invalid choice handler"
+            " to unknown argument");
+    }
+    auto& oe = i->second;
+    oe.invalid_choice_handler = handler;
+}
+
+void
 QPDFArgParser::copyFromOtherTable(std::string const& arg,
                                   std::string const& other_table)
 {
@@ -258,9 +277,17 @@ QPDFArgParser::argCompletionZsh()
 }
 
 void
-QPDFArgParser::argHelp(char*)
+QPDFArgParser::argHelp(char* p)
 {
-    // QXXXQ
+    std::cout << getHelp(p);
+    exit(0);
+}
+
+void
+QPDFArgParser::invalidHelpArg(char* p)
+{
+    usage(std::string("unknown help option") +
+          (p ? (std::string(" ") + p) : ""));
 }
 
 void
@@ -640,7 +667,14 @@ QPDFArgParser::parseArgs()
         {
             std::string message =
                 "--" + arg_s + " must be given as --" + arg_s + "=";
-            if (! oe.choices.empty())
+            if (oe.invalid_choice_handler)
+            {
+                oe.invalid_choice_handler(parameter);
+                // Method should call usage() or exit. Just in case it
+                // doesn't...
+                message += "option";
+            }
+            else if (! oe.choices.empty())
             {
                 QTC::TC("libtests", "QPDFArgParser required choices");
                 message += "{";
@@ -843,4 +877,167 @@ QPDFArgParser::handleCompletion()
         }
     }
     exit(0);
+}
+
+void
+QPDFArgParser::addHelpFooter(std::string const& text)
+{
+    this->m->help_footer = "\n" + text;
+}
+
+void
+QPDFArgParser::addHelpTopic(std::string const& topic,
+                            std::string const& short_text,
+                            std::string const& long_text)
+{
+    if (topic == "all")
+    {
+        QTC::TC("libtests", "QPDFArgParser add reserved help topic");
+        throw std::logic_error(
+            "QPDFArgParser: can't register reserved help topic " + topic);
+    }
+    if (! ((topic.length() > 0) && (topic.at(0) != '-')))
+    {
+        QTC::TC("libtests", "QPDFArgParser bad topic for help");
+        throw std::logic_error(
+            "QPDFArgParser: help topics must not start with -");
+    }
+    if (this->m->help_topics.count(topic))
+    {
+        QTC::TC("libtests", "QPDFArgParser add existing topic");
+        throw std::logic_error(
+            "QPDFArgParser: topic " + topic + " has already been added");
+    }
+
+    this->m->help_topics[topic] = HelpTopic(short_text, long_text);
+    this->m->help_option_table["help"].choices.insert(topic);
+}
+
+void
+QPDFArgParser::addOptionHelp(std::string const& option_name,
+                             std::string const& topic,
+                             std::string const& short_text,
+                             std::string const& long_text)
+{
+    if (! ((option_name.length() > 2) &&
+           (option_name.at(0) == '-') &&
+           (option_name.at(1) == '-')))
+    {
+        QTC::TC("libtests", "QPDFArgParser bad option for help");
+        throw std::logic_error(
+            "QPDFArgParser: options for help must start with --");
+    }
+    if (this->m->option_help.count(option_name))
+    {
+        QTC::TC("libtests", "QPDFArgParser duplicate option help");
+        throw std::logic_error(
+            "QPDFArgParser: option " + option_name + " already has help");
+    }
+    auto ht = this->m->help_topics.find(topic);
+    if (ht == this->m->help_topics.end())
+    {
+        QTC::TC("libtests", "QPDFArgParser add to unknown topic");
+        throw std::logic_error(
+            "QPDFArgParser: unable to add option " + option_name +
+            " to unknown help topic " + topic);
+    }
+    this->m->option_help[option_name] = HelpTopic(short_text, long_text);
+    ht->second.options.insert(option_name);
+    this->m->help_option_table["help"].choices.insert(option_name);
+}
+
+void
+QPDFArgParser::getTopHelp(std::ostringstream& msg)
+{
+    msg << "Run \"" << this->m->whoami
+        << " --help=topic\" for help on a topic." << std::endl
+        << "Run \"" << this->m->whoami
+        << " --help=option\" for help on an option." << std::endl
+        << "Run \"" << this->m->whoami
+        << " --help=all\" to see all available help." << std::endl
+        << std::endl
+        << "Topics:" << std::endl;
+    for (auto const& i: this->m->help_topics)
+    {
+        msg << "  " << i.first << ": " << i.second.short_text << std::endl;
+    }
+}
+
+void
+QPDFArgParser::getAllHelp(std::ostringstream& msg)
+{
+    getTopHelp(msg);
+    auto show = [this, &msg](std::map<std::string, HelpTopic>& topics,
+                             std::string const& label) {
+        for (auto const& i: topics)
+        {
+            auto const& topic = i.first;
+            msg << std::endl
+                << "== " << label << " " << topic
+                << " (" << i.second.short_text << ") =="
+                << std::endl
+                << std::endl;
+            getTopicHelp(topic, i.second, msg);
+        }
+    };
+    show(this->m->help_topics, "topic");
+    show(this->m->option_help, "option");
+    msg << std::endl << "====" << std::endl;
+}
+
+void
+QPDFArgParser::getTopicHelp(std::string const& name,
+                            HelpTopic const& ht,
+                            std::ostringstream& msg)
+{
+    if (ht.long_text.empty())
+    {
+        msg << ht.short_text << std::endl;
+    }
+    else
+    {
+        msg << ht.long_text;
+    }
+    if (! ht.options.empty())
+    {
+        msg << std::endl << "Related options:" << std::endl;
+        for (auto const& i: ht.options)
+        {
+            msg << "  " << i << ": "
+                << this->m->option_help[i].short_text << std::endl;
+        }
+    }
+}
+
+std::string
+QPDFArgParser::getHelp(char const* topic_or_option)
+{
+    std::ostringstream msg;
+    if ((topic_or_option == nullptr) || (strlen(topic_or_option) == 0))
+    {
+        getTopHelp(msg);
+    }
+    else
+    {
+        std::string arg(topic_or_option);
+        if (arg == "all")
+        {
+            getAllHelp(msg);
+        }
+        else if (this->m->option_help.count(arg))
+        {
+            getTopicHelp(arg, this->m->option_help[arg], msg);
+        }
+        else if (this->m->help_topics.count(arg))
+        {
+            getTopicHelp(arg, this->m->help_topics[arg], msg);
+        }
+        else
+        {
+            // should not be possible
+            getTopHelp(msg);
+        }
+    }
+    msg << this->m->help_footer;
+    return msg.str();
 }
