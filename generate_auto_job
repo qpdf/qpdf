@@ -119,7 +119,7 @@ class Main:
             self.check_keys('top', o, set(
                 ['table', 'prefix', 'bare', 'positional',
                  'optional_parameter', 'required_parameter',
-                 'required_choices', 'from_table']))
+                 'required_choices', 'optional_choices', 'from_table']))
 
     def to_identifier(self, label, prefix, const):
         identifier = re.sub(r'[^a-zA-Z0-9]', '_', label)
@@ -155,6 +155,9 @@ class Main:
                 identifier = self.to_identifier(i, prefix, False)
                 print(f'void {identifier}(char *);', file=f)
             for i in o.get('required_choices', {}):
+                identifier = self.to_identifier(i, prefix, False)
+                print(f'void {identifier}(char *);', file=f)
+            for i in o.get('optional_choices', {}):
                 identifier = self.to_identifier(i, prefix, False)
                 print(f'void {identifier}(char *);', file=f)
             if table not in ('main', 'help'):
@@ -204,9 +207,14 @@ class Main:
                       f', "{v}");', file=f)
             for k, v in o.get('required_choices', {}).items():
                 identifier = self.to_identifier(k, prefix, False)
-                print(f'this->ap.addRequiredChoices("{k}", '
+                print(f'this->ap.addChoices("{k}", '
                       f'p(&ArgParser::{identifier})'
-                      f', {v}_choices);', file=f)
+                      f', true, {v}_choices);', file=f)
+            for k, v in o.get('optional_choices', {}).items():
+                identifier = self.to_identifier(k, prefix, False)
+                print(f'this->ap.addChoices("{k}", '
+                      f'p(&ArgParser::{identifier})'
+                      f', false, {v}_choices);', file=f)
         for o in data['options']:
             table = o['table']
             if 'from_table' not in o:

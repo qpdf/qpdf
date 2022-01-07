@@ -51,7 +51,7 @@ ArgParser::initOptions()
     ap.addRequiredParameter("salad", p(&ArgParser::handleSalad), "tossed");
     ap.addOptionalParameter("moo", p(&ArgParser::handleMoo));
     char const* choices[] = {"pig", "boar", "sow", 0};
-    ap.addRequiredChoices("oink", p(&ArgParser::handleOink), choices);
+    ap.addChoices("oink", p(&ArgParser::handleOink), true, choices);
     ap.selectHelpOptionTable();
     ap.addBare("version", [this](){ output("3.14159"); });
     ap.selectMainOptionTable();

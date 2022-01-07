@@ -51,7 +51,6 @@ choices:
 options:
   - table: help
     bare:
-      - help
       - version
       - copyright
       - json-help

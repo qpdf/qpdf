@@ -35,6 +35,9 @@ QPDFArgParser::QPDFArgParser(int argc, char* argv[], char const* progname_env) :
     m(new Members(argc, argv, progname_env))
 {
     selectHelpOptionTable();
+    char const* help_choices[] = {"all", 0};
+    addChoices(
+        "help", bindParam(&QPDFArgParser::argHelp, this), false, help_choices);
     addBare("completion-bash",
             std::bind(std::mem_fn(&QPDFArgParser::argCompletionBash), this));
     addBare("completion-zsh",
@@ -139,13 +142,14 @@ QPDFArgParser::addOptionalParameter(
 }
 
 void
-QPDFArgParser::addRequiredChoices(
+QPDFArgParser::addChoices(
     std::string const& arg,
     param_arg_handler_t handler,
+    bool required,
     char const** choices)
 {
     OptionEntry& oe = registerArg(arg);
-    oe.parameter_needed = true;
+    oe.parameter_needed = required;
     oe.param_arg_handler = handler;
     for (char const** i = choices; *i; ++i)
     {
@@ -251,6 +255,12 @@ void
 QPDFArgParser::argCompletionZsh()
 {
     completionCommon(true);
+}
+
+void
+QPDFArgParser::argHelp(char*)
+{
+    // QXXXQ
 }
 
 void
@@ -624,10 +634,9 @@ QPDFArgParser::parseArgs()
         }
 
         OptionEntry& oe = oep->second;
-        if ((oe.parameter_needed && (0 == parameter)) ||
-            ((! oe.choices.empty() &&
-              ((0 == parameter) ||
-               (0 == oe.choices.count(parameter))))))
+        if ((oe.parameter_needed && (nullptr == parameter)) ||
+            ((! oe.choices.empty() && (nullptr != parameter) &&
+              (0 == oe.choices.count(parameter)))))
         {
             std::string message =
                 "--" + arg_s + " must be given as --" + arg_s + "=";
@@ -708,12 +717,13 @@ QPDFArgParser::doFinalChecks()
 }
 
 void
-QPDFArgParser::addChoicesToCompletions(std::string const& option,
+QPDFArgParser::addChoicesToCompletions(option_table_t& option_table,
+                                       std::string const& option,
                                        std::string const& extra_prefix)
 {
-    if (this->m->option_table->count(option) != 0)
+    if (option_table.count(option) != 0)
     {
-        OptionEntry& oe = (*this->m->option_table)[option];
+        OptionEntry& oe = option_table[option];
         for (std::set<std::string>::iterator iter = oe.choices.begin();
              iter != oe.choices.end(); ++iter)
         {
@@ -724,18 +734,16 @@ QPDFArgParser::addChoicesToCompletions(std::string const& option,
 }
 
 void
-QPDFArgParser::addOptionsToCompletions()
+QPDFArgParser::addOptionsToCompletions(option_table_t& option_table)
 {
-    for (std::map<std::string, OptionEntry>::iterator iter =
-             this->m->option_table->begin();
-         iter != this->m->option_table->end(); ++iter)
+    for (auto& iter: option_table)
     {
-        std::string const& arg = (*iter).first;
+        std::string const& arg = iter.first;
         if (arg == "--")
         {
             continue;
         }
-        OptionEntry& oe = (*iter).second;
+        OptionEntry& oe = iter.second;
         std::string base = "--" + arg;
         if (oe.param_arg_handler)
         {
@@ -743,7 +751,7 @@ QPDFArgParser::addOptionsToCompletions()
             {
                 // zsh doesn't treat = as a word separator, so add all
                 // the options so we don't get a space after the =.
-                addChoicesToCompletions(arg, base + "=");
+                addChoicesToCompletions(option_table, arg, base + "=");
             }
             this->m->completions.insert(base + "=");
         }
@@ -751,6 +759,22 @@ QPDFArgParser::addOptionsToCompletions()
         {
             this->m->completions.insert(base);
         }
+    }
+}
+
+void
+QPDFArgParser::insertCompletions(option_table_t& option_table,
+                                 std::string const& choice_option,
+                                 std::string const& extra_prefix)
+{
+    if (! choice_option.empty())
+    {
+        addChoicesToCompletions(option_table, choice_option, extra_prefix);
+    }
+    else if ((! this->m->bash_cur.empty()) &&
+             (this->m->bash_cur.at(0) == '-'))
+    {
+        addOptionsToCompletions(option_table);
     }
 }
 
@@ -795,29 +819,17 @@ QPDFArgParser::handleCompletion()
                 }
             }
         }
-        if (! choice_option.empty())
+        if (this->m->zsh_completion && (! choice_option.empty()))
         {
-            if (this->m->zsh_completion)
-            {
-                // zsh wants --option=choice rather than just choice
-                extra_prefix = "--" + choice_option + "=";
-            }
-            addChoicesToCompletions(choice_option, extra_prefix);
+            // zsh wants --option=choice rather than just choice
+            extra_prefix = "--" + choice_option + "=";
         }
-        else if ((! this->m->bash_cur.empty()) &&
-                 (this->m->bash_cur.at(0) == '-'))
+        insertCompletions(*this->m->option_table, choice_option, extra_prefix);
+        if (this->m->argc == 1)
         {
-            addOptionsToCompletions();
-            if (this->m->argc == 1)
-            {
-                // Help options are valid only by themselves.
-                for (std::map<std::string, OptionEntry>::iterator iter =
-                         this->m->help_option_table.begin();
-                     iter != this->m->help_option_table.end(); ++iter)
-                {
-                    this->m->completions.insert("--" + (*iter).first);
-                }
-            }
+            // Help options are valid only by themselves.
+            insertCompletions(
+                this->m->help_option_table, choice_option, extra_prefix);
         }
     }
     std::string prefix = extra_prefix + this->m->bash_cur;

@@ -127,9 +127,11 @@ ArgParser::argCopyright()
         << std::endl;
 }
 
+#if 0
 void
 ArgParser::argHelp()
 {
+    // QXXXQ
     std::cout
         // 12345678901234567890123456789012345678901234567890123456789012345678901234567890
         << "Usage: qpdf [options] {infile | --empty} [page_selection_options] outfile\n"
@@ -630,6 +632,7 @@ ArgParser::argHelp()
         << "qpdf to completely ignore warnings.  qpdf does not use exit status 1,\n"
         << "since that is used by the shell if it can't execute qpdf.\n";
 }
+#endif
 
 void
 ArgParser::argJsonHelp()

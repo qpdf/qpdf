@@ -115,13 +115,14 @@ class QPDFArgParser
     QPDF_DLL
     void addOptionalParameter(std::string const& arg, param_arg_handler_t);
     QPDF_DLL
-    void addRequiredChoices(
-        std::string const& arg, param_arg_handler_t, char const** choices);
-    QPDF_DLL
+    void addChoices(
+        std::string const& arg, param_arg_handler_t,
+        bool required, char const** choices);
 
     // If an option is shared among multiple tables and uses identical
     // handlers, you can just copy it instead of repeating the
     // registration call.
+    QPDF_DLL
     void copyFromOtherTable(std::string const& arg,
                             std::string const& other_table);
 
@@ -179,7 +180,7 @@ class QPDFArgParser
         bare_arg_handler_t bare_arg_handler;
         param_arg_handler_t param_arg_handler;
     };
-    friend struct OptionEntry;
+    typedef std::map<std::string, OptionEntry> option_table_t;
 
     OptionEntry& registerArg(std::string const& arg);
 
@@ -187,17 +188,19 @@ class QPDFArgParser
 
     void argCompletionBash();
     void argCompletionZsh();
+    void argHelp(char*);
 
     void checkCompletion();
     void handleArgFileArguments();
     void handleBashArguments();
     void readArgsFromFile(char const* filename);
     void doFinalChecks();
-    void addOptionsToCompletions();
-    void addChoicesToCompletions(std::string const&, std::string const&);
+    void addOptionsToCompletions(option_table_t&);
+    void addChoicesToCompletions(
+        option_table_t&, std::string const&, std::string const&);
+    void insertCompletions(
+        option_table_t&, std::string const&, std::string const&);
     void handleCompletion();
-
-    typedef std::map<std::string, OptionEntry> option_table_t;
 
     class Members
     {

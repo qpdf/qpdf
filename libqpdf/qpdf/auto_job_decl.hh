@@ -12,7 +12,6 @@ static constexpr char const* O_UNDERLAY_OVERLAY = "underlay/overlay";
 static constexpr char const* O_ATTACHMENT = "attachment";
 static constexpr char const* O_COPY_ATTACHMENT = "copy attachment";
 
-void argHelp();
 void argVersion();
 void argCopyright();
 void argJsonHelp();
