@@ -719,7 +719,7 @@ QPDFTokenizer::findEI(PointerHolder<InputSource> input)
                 for (std::string::iterator iter = value.begin();
                      iter != value.end(); ++iter)
                 {
-                    signed char ch = *iter;
+                    char ch = *iter;
                     if (((ch >= 'a') && (ch <= 'z')) ||
                         ((ch >= 'A') && (ch <= 'Z')) ||
                         (ch == '*'))
@@ -729,10 +729,11 @@ QPDFTokenizer::findEI(PointerHolder<InputSource> input)
                         // alphabetic characters.
                         found_alpha = true;
                     }
-                    else if ((ch < 32) && (! isSpace(ch)))
+                    else if ((static_cast<signed char>(ch) < 32) &&
+                             (! isSpace(ch)))
                     {
-                        // ch is signed, so characters outside of
-                        // 7-bit will be < 0.
+                        // Compare ch as a signed char so characters
+                        // outside of 7-bit will be < 0.
                         found_non_printable = true;
                         break;
                     }
