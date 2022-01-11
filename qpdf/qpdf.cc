@@ -43,6 +43,7 @@ int realmain(int argc, char* argv[])
     bool errors = false;
     try
     {
+        // See "HOW TO ADD A COMMAND-LINE ARGUMENT" in README-maintainer.
         j.initializeFromArgv(argc, argv);
         j.run();
     }

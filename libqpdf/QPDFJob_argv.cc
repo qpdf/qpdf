@@ -1,5 +1,7 @@
 #include <qpdf/QPDFJob.hh>
 
+// See "HOW TO ADD A COMMAND-LINE ARGUMENT" in README-maintainer.
+
 #include <iostream>
 #include <string.h>
 #include <stdlib.h>

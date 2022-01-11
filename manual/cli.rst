@@ -1,5 +1,7 @@
 .. NOTES
 
+   See "HOW TO ADD A COMMAND-LINE ARGUMENT" in README-maintainer.
+
    This file contains text that is used for help file generation.
    Lines that start with the magic comment ".. help topic x: y"
    introduce a help topic called "x" with short text "y". The contents

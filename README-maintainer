@@ -122,6 +122,31 @@ CODING RULES
   since those have to get copied around a lot.
 
 
+HOW TO ADD A COMMAND-LINE ARGUMENT
+
+Command-line arguments are closely coupled with QPDFJob. To add a new
+command-line argument, add the option to the appropriate table in
+job.yml. This will automatically declare a method in the private
+ArgParser class in QPDFJob_argv.cc which you have to implement. The
+implementation should make calls to methods in QPDFJob.
+
+The build will fail until the new option is documented in
+manual/cli.rst. To do that, create documentation for the option by
+adding a ".. qpdf:option::" directive followed by a magic help comment
+as described at the top of manual/cli.rst. Put this in the correct
+help topic. Help topics roughly correspond with sections in that
+chapter and are created using a special ".. help-topic" comment.
+Follow the example of other options for style.
+
+When done, the following should happen:
+
+* qpdf --new-option should work as expected
+* qpdf --help=--new-option should show the help from the comment in cli.rst
+* qpdf --help=topic should list --new-option for the correct topic
+* --new-option should appear in the manual
+* --new-option should be in the command-line option index in the manual
+
+
 RELEASE PREPARATION
 
 * Each year, update copyright notices. This will find all relevant
