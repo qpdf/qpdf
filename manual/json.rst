@@ -51,7 +51,7 @@ Compatibility
 
 Documentation
    The :command:`qpdf` command can be invoked with the
-   :samp:`--json-help` option. This will output a JSON
+   :qpdf:ref:`--json-help` option. This will output a JSON
    structure that has the same structure as the JSON output that qpdf
    generates, except that each field in the help output is a description
    of the corresponding field in the JSON output. The specific
@@ -134,7 +134,7 @@ There are a few limitations to be aware of with the JSON structure:
   encoding. In other words, it's best if you don't try to use the JSON
   format to extract binary strings from the PDF file, but if you really
   had to, it could be done. Note that qpdf's
-  :samp:`--show-object` option does not have this
+  :qpdf:ref:`--show-object` option does not have this
   limitation and will reveal the string as encoded in the original
   file.
 
@@ -150,9 +150,9 @@ be aware of:
 - While qpdf guarantees that keys present in the help will be present
   in the output, those fields may be null or empty if the information
   is not known or absent in the file. Also, if you specify
-  :samp:`--json-keys`, the keys that are not listed
+  :qpdf:ref:`--json-key`, the keys that are not listed
   will be excluded entirely except for those that
-  :samp:`--json-help` says are always present.
+  :qpdf:ref:`--json-help` says are always present.
 
 - In a few places, there are keys with names containing
   ``pageposfrom1``. The values of these keys are null or an integer. If
@@ -168,7 +168,7 @@ be aware of:
 
 - The image information included in the ``page`` section of the JSON
   output includes the key "``filterable``". Note that the value of this
-  field may depend on the :samp:`--decode-level` that
+  field may depend on the :qpdf:ref:`--decode-level` that
   you invoke qpdf with. The JSON output includes a top-level key
   "``parameters``" that indicates the decode level used for computing
   whether a stream was filterable. For example, jpeg images will be

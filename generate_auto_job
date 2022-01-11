@@ -19,10 +19,16 @@ def warn(*args, **kwargs):
 
 
 class Main:
-    SOURCES = [whoami, 'job.yml', 'manual/cli.rst']
+    SOURCES = [
+        whoami,
+        'manual/_ext/qpdf.py',
+        'job.yml',
+        'manual/cli.rst',
+    ]
     DESTS = {
         'decl': 'libqpdf/qpdf/auto_job_decl.hh',
         'init': 'libqpdf/qpdf/auto_job_init.hh',
+        'help': 'libqpdf/qpdf/auto_job_help.hh',
     }
     SUMS = 'job.sums'
 
@@ -100,14 +106,22 @@ class Main:
         short_text = None
         long_text = None
 
-        print('this->ap.addHelpFooter("For detailed help, visit'
-              ' the qpdf manual: https://qpdf.readthedocs.io\\n");', file=f)
+        # Generate a bunch of short static functions rather than a big
+        # member function for help. Some compilers have problems with
+        # very large member functions in classes in anonymous
+        # namespaces.
+
+        help_files = 0
+        help_lines = 0
+
+        self.all_topics = set(self.options_without_help)
+        self.referenced_topics = set()
 
         def set_indent(x):
             nonlocal indent
             indent = ' ' * len(x)
 
-        def append_long_text(line):
+        def append_long_text(line, topic):
             nonlocal indent, long_text
             if line == '\n':
                 long_text += '\n'
@@ -115,13 +129,23 @@ class Main:
                 long_text += line[len(indent):]
             else:
                 long_text = long_text.strip()
-                if long_text != '':
-                    long_text += '\n'
+                if long_text == '':
+                    raise Exception(f'missing long text for {topic}')
+                long_text += '\n'
+                for i in re.finditer(r'--help=([^\.\s]+)', long_text):
+                    self.referenced_topics.add(i.group(1))
                 return True
             return False
 
         lineno = 0
         for line in df.readlines():
+            if help_lines == 0:
+                if help_files > 0:
+                    print('}', file=f)
+                help_files += 1
+                help_lines += 1
+                print(f'static void add_help_{help_files}(QPDFArgParser& ap)\n'
+                      '{', file=f)
             lineno += 1
             if state == st_top:
                 m = re.match(r'^(\s*\.\. )help-topic (\S+): (.*)$', line)
@@ -132,8 +156,9 @@ class Main:
                     long_text = ''
                     state = st_topic
                     continue
-                m = re.match(r'^(\s*\.\. )qpdf:option:: (([^=\s]+)(=(\S+))?)$',
-                             line)
+                m = re.match(
+                    r'^(\s*\.\. )qpdf:option:: (([^=\s]+)([= ](.+))?)$',
+                    line)
                 if m:
                     if topic is None:
                         raise Exception('option seen before topic')
@@ -150,9 +175,11 @@ class Main:
                     state = st_option
                     continue
             elif state == st_topic:
-                if append_long_text(line):
-                    print(f'this->ap.addHelpTopic("{topic}", "{short_text}",'
+                if append_long_text(line, topic):
+                    self.all_topics.add(topic)
+                    print(f'ap.addHelpTopic("{topic}", "{short_text}",'
                           f' R"({long_text})");', file=f)
+                    help_lines += 1
                     state = st_top
             elif state == st_option:
                 if line == '\n' or line.startswith(indent):
@@ -162,12 +189,36 @@ class Main:
                         short_text = m.group(2)
                         state = st_option_help
                 else:
+                    raise Exception('option without help text')
                     state = st_top
             elif state == st_option_help:
-                if append_long_text(line):
-                    print(f'this->ap.addOptionHelp("{option}", "{topic}",'
+                if append_long_text(line, option):
+                    if option in self.options_without_help:
+                        self.options_without_help.remove(option)
+                    else:
+                        raise Exception(
+                            f'help for unknown option {option},'
+                            f' lineno={lineno}')
+                    print(f'ap.addOptionHelp("{option}", "{topic}",'
                           f' "{short_text}", R"({long_text})");', file=f)
+                    help_lines += 1
                     state = st_top
+            if help_lines == 20:
+                help_lines = 0
+        print('}', file=f)
+        print('static void add_help(QPDFArgParser& ap)\n{', file=f)
+        for i in range(help_files):
+            print(f'    add_help_{i+1}(ap);', file=f)
+        print('ap.addHelpFooter("For detailed help, visit'
+              ' the qpdf manual: https://qpdf.readthedocs.io\\n");', file=f)
+        print('}\n', file=f)
+        for i in self.referenced_topics:
+            if i not in self.all_topics:
+                raise Exception(f'help text referenced --help={i}')
+        for i in self.options_without_help:
+            raise Exception(
+                'Options without help: ' +
+                ', '.join(self.options_without_help))
 
     def generate(self):
         warn(f'{whoami}: regenerating auto job files')
@@ -175,12 +226,19 @@ class Main:
         with open('job.yml', 'r') as f:
             data = yaml.safe_load(f.read())
         self.validate(data)
+        self.options_without_help = set(
+            ['--completion-bash', '--completion-zsh', '--help']
+        )
         with open(self.DESTS['decl'], 'w') as f:
             print(BANNER, file=f)
             self.generate_decl(data, f)
         with open(self.DESTS['init'], 'w') as f:
             print(BANNER, file=f)
             self.generate_init(data, f)
+        with open(self.DESTS['help'], 'w') as f:
+            with open('manual/cli.rst', 'r') as df:
+                print(BANNER, file=f)
+                self.generate_doc(df, f)
 
         # Update hashes last to ensure that this will be rerun in the
         # event of a failure.
@@ -275,24 +333,29 @@ class Main:
                 print('this->ap.addPositional('
                       f'p(&ArgParser::{prefix}Positional));', file=f)
             for i in o.get('bare', []):
+                self.options_without_help.add(f'--{i}')
                 identifier = self.to_identifier(i, prefix, False)
                 print(f'this->ap.addBare("{i}", '
                       f'b(&ArgParser::{identifier}));', file=f)
             for i in o.get('optional_parameter', []):
+                self.options_without_help.add(f'--{i}')
                 identifier = self.to_identifier(i, prefix, False)
                 print(f'this->ap.addOptionalParameter("{i}", '
                       f'p(&ArgParser::{identifier}));', file=f)
             for k, v in o.get('required_parameter', {}).items():
+                self.options_without_help.add(f'--{k}')
                 identifier = self.to_identifier(k, prefix, False)
                 print(f'this->ap.addRequiredParameter("{k}", '
                       f'p(&ArgParser::{identifier})'
                       f', "{v}");', file=f)
             for k, v in o.get('required_choices', {}).items():
+                self.options_without_help.add(f'--{k}')
                 identifier = self.to_identifier(k, prefix, False)
                 print(f'this->ap.addChoices("{k}", '
                       f'p(&ArgParser::{identifier})'
                       f', true, {v}_choices);', file=f)
             for k, v in o.get('optional_choices', {}).items():
+                self.options_without_help.add(f'--{k}')
                 identifier = self.to_identifier(k, prefix, False)
                 print(f'this->ap.addChoices("{k}", '
                       f'p(&ArgParser::{identifier})'
@@ -312,8 +375,6 @@ class Main:
             for j in ft['options']:
                 print('this->ap.copyFromOtherTable'
                       f'("{j}", "{other_table}");', file=f)
-        with open('manual/cli.rst', 'r') as df:
-            self.generate_doc(df, f)
 
 
 if __name__ == '__main__':

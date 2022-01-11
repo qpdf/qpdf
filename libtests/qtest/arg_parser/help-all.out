@@ -6,7 +6,7 @@ Topics:
   baaa: Baaa Options
   quack: Quack Options
 
-== topic baaa (Baaa Options) ==
+== baaa (Baaa Options) ==
 
 Ewe can do sheepish things.
 For example, ewe can add more ram to your computer.
@@ -15,15 +15,15 @@ Related options:
   --ewe: just for ewe
   --ram: curly horns
 
-== topic quack (Quack Options) ==
+== quack (Quack Options) ==
 
 Just put stuff after quack to get a count at the end.
 
-== option --ewe (just for ewe) ==
+== --ewe (just for ewe) ==
 
 You are not a ewe.
 
-== option --ram (curly horns) ==
+== --ram (curly horns) ==
 
 curly horns
 

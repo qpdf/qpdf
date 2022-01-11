@@ -30,5 +30,11 @@ documentation, please visit `https://qpdf.readthedocs.io
    design
    linearization
    object-streams
+   encryption
    release-notes
    acknowledgement
+
+Indices
+=======
+
+* :ref:`qpdf-options`

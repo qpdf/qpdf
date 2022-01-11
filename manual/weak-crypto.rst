@@ -13,12 +13,12 @@ cryptography algorithm, and MD5, which is a weak hashing algorithm. In
 version 10.4, qpdf generates warnings for some (but not all) cases of
 writing files with weak cryptography when invoked from the command-line.
 These warnings can be suppressed using the
-:samp:`--allow-weak-crypto` option.
+:qpdf:ref:`--allow-weak-crypto` option.
 
 It is planned for qpdf version 11 to be stricter, making it an error to
 write files with insecure cryptography from the command-line tool in
 most cases without specifying the
-:samp:`--allow-weak-crypto` flag and also to require
+:qpdf:ref:`--allow-weak-crypto` flag and also to require
 explicit steps when using the C++ library to enable use of insecure
 cryptography.
 

@@ -208,7 +208,7 @@ files you need to build.
 Runtime Crypto Provider Selection
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can use the :samp:`--show-crypto` option to
+You can use the :qpdf:ref:`--show-crypto` option to
 :command:`qpdf` to get a list of available crypto
 providers. The default provider is always listed first, and the rest are
 listed in lexical order. Each crypto provider is listed on a line by

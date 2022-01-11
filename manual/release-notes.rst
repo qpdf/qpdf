@@ -90,7 +90,7 @@ For a detailed list of changes, please see the file
   - Handling of Weak Cryptography Algorithms
 
     - From the qpdf CLI, the
-      :samp:`--allow-weak-crypto` is now required to
+      :qpdf:ref:`--allow-weak-crypto` is now required to
       suppress a warning when explicitly creating PDF files using RC4
       encryption. While qpdf will always retain the ability to read
       and write such files, doing so will require explicit
@@ -108,7 +108,7 @@ For a detailed list of changes, please see the file
       (with no resource dictionary).
 
     - Fix crash that could occur under certain conditions when using
-      :samp:`--pages` with files that had form
+      :qpdf:ref:`--pages` with files that had form
       fields.
 
   - Library Enhancements
@@ -127,7 +127,7 @@ For a detailed list of changes, please see the file
   - CLI Enhancements
 
     - Improve diagnostics around parsing
-      :samp:`--pages` command-line options
+      :qpdf:ref:`--pages` command-line options
 
   - Packaging Changes
 
@@ -139,7 +139,7 @@ For a detailed list of changes, please see the file
 
     - When generating a file while preserving object streams,
       unreferenced objects are correctly removed unless
-      :samp:`--preserve-unreferenced` is specified.
+      :qpdf:ref:`--preserve-unreferenced` is specified.
 
   - Library Enhancements
 
@@ -202,19 +202,19 @@ For a detailed list of changes, please see the file
 
     - Operations that work on combining pages are much better about
       protecting form fields. In particular,
-      :samp:`--split-pages` and
-      :samp:`--pages` now preserve interaction form
+      :qpdf:ref:`--split-pages` and
+      :qpdf:ref:`--pages` now preserve interaction form
       functionality by copying the relevant form field information
       from the original files. Additionally, if you use
-      :samp:`--pages` to select only some pages from
+      :qpdf:ref:`--pages` to select only some pages from
       the original input file, unused form fields are removed, which
       prevents lots of unused annotations from being retained.
 
     - By default, :command:`qpdf` no longer allows
       creation of encrypted PDF files whose user password is
       non-empty and owner password is empty when a 256-bit key is in
-      use. The :samp:`--allow-insecure` option,
-      specified inside the :samp:`--encrypt` options,
+      use. The :qpdf:ref:`--allow-insecure` option,
+      specified inside the :qpdf:ref:`--encrypt` options,
       allows creation of such files. Behavior changes in the CLI are
       avoided when possible, but an exception was made here because
       this is security-related. qpdf must always allow creation of
@@ -255,7 +255,7 @@ For a detailed list of changes, please see the file
       removing, and and copying file attachments. See :ref:`attachments` for details.
 
     - Page splitting and merging operations, as well as
-      :samp:`--flatten-rotation`, are better behaved
+      :qpdf:ref:`--flatten-rotation`, are better behaved
       with respect to annotations and interactive form fields. In
       most cases, interactive form field functionality and proper
       formatting and functionality of annotations is preserved by
@@ -284,7 +284,7 @@ For a detailed list of changes, please see the file
       extraction of attachments. More detailed information can be
       obtained by following the reference to the file spec object.
 
-    - Add numeric option to :samp:`--collate`. If
+    - Add numeric option to :qpdf:ref:`--collate`. If
       :samp:`--collate={n}`
       is given, take pages in groups of
       :samp:`{n}` from the given files.
@@ -367,7 +367,7 @@ For a detailed list of changes, please see the file
 
   - Bug Fixes
 
-    - The :samp:`--flatten-rotation` option applies
+    - The :qpdf:ref:`--flatten-rotation` option applies
       transformations to any annotations that may be on the page.
 
     - If a form XObject lacks a resources dictionary, consider any
@@ -390,7 +390,7 @@ For a detailed list of changes, please see the file
 10.1.0: January 5, 2021
   - CLI Enhancements
 
-    - Add :samp:`--flatten-rotation` command-line
+    - Add :qpdf:ref:`--flatten-rotation` command-line
       option, which causes all pages that are rotated using
       parameters in the page's dictionary to instead be identically
       rotated in the page's contents. The change is not user-visible
@@ -510,7 +510,7 @@ For a detailed list of changes, please see the file
   - Bug Fixes
 
     - When concatenating content streams, as with
-      :samp:`--coalesce-contents`, there were cases
+      :qpdf:ref:`--coalesce-contents`, there were cases
       in which qpdf would merge two lexical tokens together, creating
       invalid results. A newline is now inserted between merged
       content streams if one is not already present.
@@ -527,7 +527,7 @@ For a detailed list of changes, please see the file
       already ignored the user's locale for numeric conversion.
 
     - Fix several instances in which warnings were not suppressed in
-      spite of :samp:`--no-warn` and/or errors or
+      spite of :qpdf:ref:`--no-warn` and/or errors or
       warnings were written to standard output rather than standard
       error.
 
@@ -540,10 +540,10 @@ For a detailed list of changes, please see the file
 
   - Enhancements
 
-    - New option :samp:`--warning-exit-0` causes qpdf
+    - New option :qpdf:ref:`--warning-exit-0` causes qpdf
       to exit with a status of ``0`` rather than ``3`` if there are
       warnings but no errors. Combine with
-      :samp:`--no-warn` to completely ignore
+      :qpdf:ref:`--no-warn` to completely ignore
       warnings.
 
     - Performance improvements have been made to
@@ -656,17 +656,16 @@ For a detailed list of changes, please see the file
       :command:`qpdf --json-help` for details.
 
     - Add new option
-      :samp:`--remove-unreferenced-resources` which
+      :qpdf:ref:`--remove-unreferenced-resources` which
       takes ``auto``, ``yes``, or ``no`` as arguments. The new
       ``auto`` mode, which is the default, performs a fast heuristic
       over a PDF file when splitting pages to determine whether the
       expensive process of finding and removing unreferenced
       resources is likely to be of benefit. For most files, this new
       default will result in a significant performance improvement
-      for splitting pages. See :ref:`advanced-transformation` for a more detailed
-      discussion.
+      for splitting pages.
 
-    - The :samp:`--preserve-unreferenced-resources`
+    - The :qpdf:ref:`--preserve-unreferenced-resources`
       is now just a synonym for
       :samp:`--remove-unreferenced-resources=no`.
 
@@ -760,8 +759,8 @@ For a detailed list of changes, please see the file
 
   - CLI Enhancements
 
-    - Added options :samp:`--is-encrypted` and
-      :samp:`--requires-password` for testing whether
+    - Added options :qpdf:ref:`--is-encrypted` and
+      :qpdf:ref:`--requires-password` for testing whether
       a file is encrypted or requires a password other than the
       supplied (or empty) password. These communicate via exit
       status, making them useful for shell scripts. They also work on
@@ -770,7 +769,7 @@ For a detailed list of changes, please see the file
     - Added ``encrypt`` key to JSON options. With the exception of
       the reconstructed user password for older encryption formats,
       this provides the same information as
-      :samp:`--show-encryption` but in a consistent,
+      :qpdf:ref:`--show-encryption` but in a consistent,
       parseable format. See output of :command:`qpdf
       --json-help` for details.
 
@@ -778,7 +777,7 @@ For a detailed list of changes, please see the file
 
     - In QDF mode, be sure not to write more than one XRef stream to
       a file, even when
-      :samp:`--preserve-unreferenced` is used.
+      :qpdf:ref:`--preserve-unreferenced` is used.
       :command:`fix-qdf` assumes that there is only
       one XRef stream, and that it appears at the end of the file.
 
@@ -824,7 +823,7 @@ For a detailed list of changes, please see the file
 
   - CLI Enhancements
 
-    - Addition of the :samp:`--show-crypto` option in
+    - Addition of the :qpdf:ref:`--show-crypto` option in
       support of selectable crypto providers, as described in :ref:`crypto`.
 
     - Allow ``:even`` or ``:odd`` to be appended to numeric ranges
@@ -838,7 +837,7 @@ For a detailed list of changes, please see the file
   - Bug Fix
 
     - Fix the name of the temporary file used by
-      :samp:`--replace-input` so that it doesn't
+      :qpdf:ref:`--replace-input` so that it doesn't
       require path splitting and works with paths include
       directories.
 
@@ -891,21 +890,21 @@ For a detailed list of changes, please see the file
 
   - CLI Enhancements
 
-    - The :samp:`--replace-input` option may be given
+    - The :qpdf:ref:`--replace-input` option may be given
       in place of an output file name. This causes qpdf to overwrite
       the input file with the output. See the description of
-      :samp:`--replace-input` in :ref:`basic-options` for more details.
+      :qpdf:ref:`--replace-input` for more details.
 
-    - The :samp:`--recompress-flate` instructs
+    - The :qpdf:ref:`--recompress-flate` instructs
       :command:`qpdf` to recompress streams that are
       already compressed with ``/FlateDecode``. Useful with
-      :samp:`--compression-level`.
+      :qpdf:ref:`--compression-level`.
 
     - The
       :samp:`--compression-level={level}`
       sets the zlib compression level used for any streams compressed
       by ``/FlateDecode``. Most effective when combined with
-      :samp:`--recompress-flate`.
+      :qpdf:ref:`--recompress-flate`.
 
   - Library Enhancements
 
@@ -998,8 +997,8 @@ For a detailed list of changes, please see the file
       a file with linearization warnings but not errors, it now
       properly exits with exit code 3 instead of 2.
 
-    - The :samp:`--completion-bash` and
-      :samp:`--completion-zsh` options now work
+    - The :qpdf:ref:`--completion-bash` and
+      :qpdf:ref:`--completion-zsh` options now work
       properly when qpdf is invoked as an AppImage.
 
     - Calling ``QPDFWriter::set*EncryptionParameters`` on a
@@ -1063,7 +1062,7 @@ For a detailed list of changes, please see the file
       qpdf than the library, which may indicate a problem with the
       installation.
 
-    - New option :samp:`--remove-page-labels` will
+    - New option :qpdf:ref:`--remove-page-labels` will
       remove page labels before generating output. This used to
       happen if you ran :command:`qpdf --empty --pages ..
       --`, but the behavior changed in qpdf 8.3.0. This
@@ -1090,7 +1089,7 @@ For a detailed list of changes, please see the file
       during page splitting operations.
 
     - Revert change that included preservation of outlines
-      (bookmarks) in :samp:`--split-pages`. The way
+      (bookmarks) in :qpdf:ref:`--split-pages`. The way
       it was implemented in 8.3.0 and 8.4.0 caused a very significant
       degradation of performance for splitting certain files. A
       future release of qpdf may re-introduce the behavior in a more
@@ -1143,16 +1142,16 @@ For a detailed list of changes, please see the file
         depth in :ref:`unicode-passwords`.
 
     - New options
-      :samp:`--externalize-inline-images`,
-      :samp:`--ii-min-bytes`, and
-      :samp:`--keep-inline-images` control qpdf's
+      :qpdf:ref:`--externalize-inline-images`,
+      :qpdf:ref:`--ii-min-bytes`, and
+      :qpdf:ref:`--keep-inline-images` control qpdf's
       handling of inline images and possible conversion of them to
       regular images. By default,
-      :samp:`--optimize-images` now also applies to
-      inline images. These options are discussed in :ref:`advanced-transformation`.
+      :qpdf:ref:`--optimize-images` now also applies to
+      inline images.
 
-    - Add options :samp:`--overlay` and
-      :samp:`--underlay` for overlaying or
+    - Add options :qpdf:ref:`--overlay` and
+      :qpdf:ref:`--underlay` for overlaying or
       underlaying pages of other files onto output pages. See
       :ref:`overlay-underlay` for
       details.
@@ -1162,32 +1161,32 @@ For a detailed list of changes, please see the file
       non-ASCII characters, qpdf will try a number of alternative
       passwords to try to compensate for possible character encoding
       errors. This behavior can be suppressed with the
-      :samp:`--suppress-password-recovery` option.
+      :qpdf:ref:`--suppress-password-recovery` option.
       See :ref:`unicode-passwords` for a full
       discussion.
 
-    - Add the :samp:`--password-mode` option to
+    - Add the :qpdf:ref:`--password-mode` option to
       fine-tune how qpdf interprets password arguments, especially
       when they contain non-ASCII characters. See :ref:`unicode-passwords` for more information.
 
-    - In the :samp:`--pages` option, it is now
+    - In the :qpdf:ref:`--pages` option, it is now
       possible to copy the same page more than once from the same
       file without using the previous workaround of specifying two
       different paths to the same file.
 
-    - In the :samp:`--pages` option, allow use of "."
+    - In the :qpdf:ref:`--pages` option, allow use of "."
       as a shortcut for the primary input file. That way, you can do
       :command:`qpdf in.pdf --pages . 1-2 -- out.pdf`
       instead of having to repeat :file:`in.pdf`
       in the command.
 
     - When encrypting with 128-bit and 256-bit encryption, new
-      encryption options :samp:`--assemble`,
-      :samp:`--annotate`,
-      :samp:`--form`, and
-      :samp:`--modify-other` allow more fine-grained
+      encryption options :qpdf:ref:`--assemble`,
+      :qpdf:ref:`--annotate`,
+      :qpdf:ref:`--form`, and
+      :qpdf:ref:`--modify-other` allow more fine-grained
       granularity in configuring options. Before, the
-      :samp:`--modify` option only configured certain
+      :qpdf:ref:`--modify` option only configured certain
       predefined groups of permissions.
 
   - Bug Fixes and Enhancements
@@ -1198,7 +1197,7 @@ For a detailed list of changes, please see the file
       file's internal structure shared these resource lists across
       pages and if some but not all of the pages in the output did
       not reference all the fonts and images. Using the
-      :samp:`--preserve-unreferenced-resources`
+      :qpdf:ref:`--preserve-unreferenced-resources`
       option would work around the incorrect behavior. This bug was
       the result of a typo in the code and a deficiency in the test
       suite. The case that triggered the error was known, just not
@@ -1326,11 +1325,11 @@ For a detailed list of changes, please see the file
 
     - Page numbers (also known as page labels) are now preserved when
       merging and splitting files with the
-      :samp:`--pages` and
-      :samp:`--split-pages` options.
+      :qpdf:ref:`--pages` and
+      :qpdf:ref:`--split-pages` options.
 
     - Bookmarks are partially preserved when splitting pages with the
-      :samp:`--split-pages` option. Specifically, the
+      :qpdf:ref:`--split-pages` option. Specifically, the
       outlines dictionary and some supporting metadata are copied
       into the split files. The result is that all bookmarks from the
       original file appear, those that point to pages that are
@@ -1340,48 +1339,48 @@ For a detailed list of changes, please see the file
       operations.
 
     - Page collation: add new option
-      :samp:`--collate`. When specified, the
-      semantics of :samp:`--pages` change from
+      :qpdf:ref:`--collate`. When specified, the
+      semantics of :qpdf:ref:`--pages` change from
       concatenation to collation. See :ref:`page-selection` for examples and discussion.
 
     - Generation of information in JSON format, primarily to
       facilitate use of qpdf from languages other than C++. Add new
-      options :samp:`--json`,
-      :samp:`--json-key`, and
-      :samp:`--json-object` to generate a JSON
+      options :qpdf:ref:`--json`,
+      :qpdf:ref:`--json-key`, and
+      :qpdf:ref:`--json-object` to generate a JSON
       representation of the PDF file. Run :command:`qpdf
       --json-help` to get a description of the JSON
       format. For more information, see :ref:`json`.
 
-    - The :samp:`--generate-appearances` flag will
+    - The :qpdf:ref:`--generate-appearances` flag will
       cause qpdf to generate appearances for form fields if the PDF
       file indicates that form field appearances are out of date.
       This can happen when PDF forms are filled in by a program that
       doesn't know how to regenerate the appearances of the filled-in
       fields.
 
-    - The :samp:`--flatten-annotations` flag can be
+    - The :qpdf:ref:`--flatten-annotations` flag can be
       used to *flatten* annotations, including form fields.
       Ordinarily, annotations are drawn separately from the page.
       Flattening annotations is the process of combining their
       appearances into the page's contents. You might want to do this
       if you are going to rotate or combine pages using a tool that
       doesn't understand about annotations. You may also want to use
-      :samp:`--generate-appearances` when using this
+      :qpdf:ref:`--generate-appearances` when using this
       flag since annotations for outdated form fields are not
       flattened as that would cause loss of information.
 
-    - The :samp:`--optimize-images` flag tells qpdf
+    - The :qpdf:ref:`--optimize-images` flag tells qpdf
       to recompresses every image using DCT (JPEG) compression as
       long as the image is not already compressed with lossy
       compression and recompressing the image reduces its size. The
-      additional options :samp:`--oi-min-width`,
-      :samp:`--oi-min-height`, and
-      :samp:`--oi-min-area` prevent recompression of
+      additional options :qpdf:ref:`--oi-min-width`,
+      :qpdf:ref:`--oi-min-height`, and
+      :qpdf:ref:`--oi-min-area` prevent recompression of
       images whose width, height, or pixel area (width × height) are
       below a specified threshold.
 
-    - The :samp:`--show-object` option can now be
+    - The :qpdf:ref:`--show-object` option can now be
       given as :samp:`--show-object=trailer` to show
       the trailer dictionary.
 
@@ -1531,12 +1530,12 @@ For a detailed list of changes, please see the file
       :samp:`--keep-files-open={[yn]}`
       to override default determination of whether to keep files open
       when merging. Please see the discussion of
-      :samp:`--keep-files-open` in :ref:`basic-options` for additional details.
+      :qpdf:ref:`--keep-files-open` for additional details.
 
 8.2.0: August 16, 2018
   - Command-line Enhancements
 
-    - Add :samp:`--no-warn` option to suppress
+    - Add :qpdf:ref:`--no-warn` option to suppress
       issuing warning messages. If there are any conditions that
       would have caused warnings to be issued, the exit status is
       still 3.
@@ -1556,7 +1555,7 @@ For a detailed list of changes, please see the file
     - Bug fix: end of line characters were not properly handled
       inside strings in some cases.
 
-    - Bug fix: using :samp:`--progress` on very small
+    - Bug fix: using :qpdf:ref:`--progress` on very small
       files could cause an infinite loop.
 
   - API enhancements
@@ -1596,15 +1595,14 @@ For a detailed list of changes, please see the file
       old behavior should be desired, or if you have a case where
       page splitting is very slow, the old behavior (and speed) can
       be enabled by specifying
-      :samp:`--preserve-unreferenced-resources`. For
-      additional details, please see :ref:`advanced-transformation`.
+      :qpdf:ref:`--preserve-unreferenced-resources`.
 
     - When merging multiple PDF files, qpdf no longer leaves all the
       files open. This makes it possible to merge numbers of files
       that may exceed the operating system's limit for the maximum
       number of open files.
 
-    - The :samp:`--rotate` option's syntax has been
+    - The :qpdf:ref:`--rotate` option's syntax has been
       extended to make the page range optional. If you specify
       :samp:`--rotate={angle}`
       without specifying a page range, the rotation will be applied
@@ -1613,10 +1611,10 @@ For a detailed list of changes, please see the file
       down.
 
     - When merging multiple files, the
-      :samp:`--verbose` option now prints information
+      :qpdf:ref:`--verbose` option now prints information
       about each file as it operates on that file.
 
-    - When the :samp:`--progress` option is
+    - When the :qpdf:ref:`--progress` option is
       specified, qpdf will print a running indicator of its best
       guess at how far through the writing process it is. Note that,
       as with all progress meters, it's an approximation. This option
@@ -1672,7 +1670,7 @@ For a detailed list of changes, please see the file
       it thinks it is through writing its output. Client programs can
       use this to implement reasonably accurate progress meters. The
       :command:`qpdf` command line tool uses this to
-      implement its :samp:`--progress` option.
+      implement its :qpdf:ref:`--progress` option.
 
     - New methods ``QPDFObjectHandle::newUnicodeString`` and
       ``QPDFObject::unparseBinary`` have been added to allow for more
@@ -1733,7 +1731,7 @@ For a detailed list of changes, please see the file
       :samp:`--linearize-pass1={file}`
       has been added for debugging qpdf's linearization code.
 
-    - The option :samp:`--coalesce-contents` can be
+    - The option :qpdf:ref:`--coalesce-contents` can be
       used to combine content streams of a page whose contents are an
       array of streams into a single stream.
 
@@ -1782,8 +1780,7 @@ For a detailed list of changes, please see the file
     password when opening encrypted files, and will optionally display
     the encryption key used by a file. This is a non-standard
     operation, but it can be useful in certain situations. Please see
-    the discussion of :samp:`--password-is-hex-key` in
-    :ref:`basic-options` or the comments around
+    the discussion of :qpdf:ref:`--password-is-hex-key` or the comments around
     ``QPDF::setPasswordIsHexKey`` in
     :file:`QPDF.hh` for additional details.
 
@@ -1820,8 +1817,8 @@ For a detailed list of changes, please see the file
       or RunLength encoding. Library API enhancements and
       command-line options have been added to control this behavior.
       See command-line options
-      :samp:`--compress-streams` and
-      :samp:`--decode-level` and methods
+      :qpdf:ref:`--compress-streams` and
+      :qpdf:ref:`--decode-level` and methods
       ``QPDFWriter::setCompressStreams`` and
       ``QPDFWriter::setDecodeLevel``.
 
@@ -1846,27 +1843,27 @@ For a detailed list of changes, please see the file
     - Command-line arguments can now be read from files or standard
       input using ``@file`` or ``@-`` syntax. Please see :ref:`invocation`.
 
-    - :samp:`--rotate`: request page rotation
+    - :qpdf:ref:`--rotate`: request page rotation
 
-    - :samp:`--newline-before-endstream`: ensure that
+    - :qpdf:ref:`--newline-before-endstream`: ensure that
       a newline appears before every ``endstream`` keyword in the
       file; used to prevent qpdf from breaking PDF/A compliance on
       already compliant files.
 
-    - :samp:`--preserve-unreferenced`: preserve
+    - :qpdf:ref:`--preserve-unreferenced`: preserve
       unreferenced objects in the input PDF
 
-    - :samp:`--split-pages`: break output into chunks
+    - :qpdf:ref:`--split-pages`: break output into chunks
       with fixed numbers of pages
 
-    - :samp:`--verbose`: print the name of each
+    - :qpdf:ref:`--verbose`: print the name of each
       output file that is created
 
-    - :samp:`--compress-streams` and
-      :samp:`--decode-level` replace
-      :samp:`--stream-data` for improving granularity
+    - :qpdf:ref:`--compress-streams` and
+      :qpdf:ref:`--decode-level` replace
+      :qpdf:ref:`--stream-data` for improving granularity
       of controlling compression and decompression of stream data.
-      The :samp:`--stream-data` option will remain
+      The :qpdf:ref:`--stream-data` option will remain
       available.
 
     - When running :command:`qpdf --check` with other
@@ -1877,8 +1874,8 @@ For a detailed list of changes, please see the file
       reference table, or other similar operations.
 
     - Process :command:`--pages` earlier so that other
-      options like :samp:`--show-pages` or
-      :samp:`--split-pages` can operate on the file
+      options like :qpdf:ref:`--show-pages` or
+      :qpdf:ref:`--split-pages` can operate on the file
       after page splitting/merging has occurred.
 
   - API Changes. All new API calls are documented in their respective
@@ -1911,7 +1908,7 @@ For a detailed list of changes, please see the file
       ``QPDFWriter`` methods.
 
 6.0.0: November 10, 2015
-  - Implement :samp:`--deterministic-id` command-line
+  - Implement :qpdf:ref:`--deterministic-id` command-line
     option and ``QPDFWriter::setDeterministicID`` as well as C API
     function ``qpdf_set_deterministic_ID`` for generating a
     deterministic ID for non-encrypted files. When this option is
@@ -2024,12 +2021,12 @@ For a detailed list of changes, please see the file
     :file:`QPDFObjectHandle.hh` for additional
     notes.
 
-  - Add :samp:`--show-npages` command-line option to
+  - Add :qpdf:ref:`--show-npages` command-line option to
     the :command:`qpdf` command to show the number of
     pages in a file.
 
   - Allow omission of the page range within
-    :samp:`--pages` for the
+    :qpdf:ref:`--pages` for the
     :command:`qpdf` command. When omitted, the page
     range is implicitly taken to be all the pages in the file.
 
@@ -2156,8 +2153,9 @@ For a detailed list of changes, please see the file
     ``QPDFWriter::setMinimumPDFVersion`` and
     ``QPDFWriter::forcePDFVersion`` that accept an extension level,
     and extended syntax for specifying forced and minimum versions on
-    the command line as described in :ref:`advanced-transformation`. Corresponding functions
-    have been added to the C API as well.
+    the command line as described in :qpdf:ref:`--force-version` and
+    :qpdf:ref:`--min-version`. Corresponding functions have been added
+    to the C API as well.
 
   - Minor fixes to prevent qpdf from referencing objects in the file
     that are not referenced in the file's overall structure. Most
@@ -2213,12 +2211,12 @@ For a detailed list of changes, please see the file
       ``QPDFWriter``.
 
     - Removed the method ``decodeStreams``. This method was used by
-      the :samp:`--check` option of the
+      the :qpdf:ref:`--check` option of the
       :command:`qpdf` command-line tool to force all
       streams in the file to be decoded, but it also suffered from
       the problem of opening otherwise unreferenced streams and thus
       could report false positive. The
-      :samp:`--check` option now causes qpdf to go
+      :qpdf:ref:`--check` option now causes qpdf to go
       through all the motions of writing a new file based on the
       original one, so it will always reference and check exactly
       those parts of a file that any ordinary viewer would check.
@@ -2307,7 +2305,7 @@ For a detailed list of changes, please see the file
 
   - Options have been added to the :command:`qpdf`
     command-line tool for copying encryption parameters from another
-    file. See :ref:`basic-options`.
+    file. (QXXXQ Link)
 
   - New methods have been added to the ``QPDF`` object for adding and
     removing pages. See :ref:`adding-and-remove-pages`.
@@ -2571,7 +2569,7 @@ For a detailed list of changes, please see the file
     permissions, it does make them available so that applications that
     use qpdf can enforce permissions.
 
-  - The :samp:`--check` option to
+  - The :qpdf:ref:`--check` option to
     :command:`qpdf` has been extended to include some
     additional information.
 

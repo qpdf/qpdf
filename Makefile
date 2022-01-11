@@ -127,7 +127,9 @@ check: $(TEST_TARGETS)
 .PHONY: spell
 # npm install -g cspell; add exceptions to cSpell.json
 spell:
-	cspell **/*.hh include/qpdf/*.h **/*.cc manual/* ChangeLog README* TODO
+	cspell **/*.hh include/qpdf/*.h **/*.cc \
+	    manual/*.rst manual/*.in manual/_ext/*.py \
+	    ChangeLog README* TODO
 
 # Install targets are in the make directory in the rules-specific make
 # fragments.

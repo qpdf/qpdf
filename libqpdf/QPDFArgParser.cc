@@ -967,21 +967,20 @@ void
 QPDFArgParser::getAllHelp(std::ostringstream& msg)
 {
     getTopHelp(msg);
-    auto show = [this, &msg](std::map<std::string, HelpTopic>& topics,
-                             std::string const& label) {
+    auto show = [this, &msg](std::map<std::string, HelpTopic>& topics) {
         for (auto const& i: topics)
         {
             auto const& topic = i.first;
             msg << std::endl
-                << "== " << label << " " << topic
+                << "== " << topic
                 << " (" << i.second.short_text << ") =="
                 << std::endl
                 << std::endl;
             getTopicHelp(topic, i.second, msg);
         }
     };
-    show(this->m->help_topics, "topic");
-    show(this->m->option_help, "option");
+    show(this->m->help_topics);
+    show(this->m->option_help);
     msg << std::endl << "====" << std::endl;
 }
 

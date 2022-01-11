@@ -34,16 +34,14 @@ Documentation
   * Consider which parts might be good candidates for moving to the
     wiki.
 
-* See #530 -- add an appendix explaining PDF encryption in general
-  plus how it's handled by qpdf. Or maybe this should go on the wiki.
-
 Document-level work
 ===================
 
 * Ideas here may by superseded by #593.
 
 * QPDFPageCopier -- object for moving pages around within files or
-  between files and performing various transformations
+  between files and performing various transformations. Reread/rewrite
+  _page-selection in the manual if needed.
 
   * Handle all the stuff of pages and split-pages
   * Do n-up, booklet, collation

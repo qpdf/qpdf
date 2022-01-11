@@ -17,7 +17,7 @@ ifeq ($(BUILD_PDF),1)
 TARGETS_manual += $(PDF_TARGET)
 endif
 
-MANUAL_DEPS = $(wildcard manual/*.rst) manual/conf.py
+MANUAL_DEPS = $(wildcard manual/*.rst) manual/conf.py manual/_ext/qpdf.py
 
 # Prevent targets that run $(SPHINX) from running in parallel by using
 # order-only dependencies (the dependencies listed after the |) to

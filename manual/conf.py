@@ -7,6 +7,10 @@
 # To see the default sample conf.py, run sphinx-quickstart in an empty
 # directory. Most of the original comments and options were removed.
 import sphinx_rtd_theme  # noQA F401
+import os
+import sys
+
+sys.path.append(os.path.abspath("./_ext"))
 
 project = 'QPDF'
 copyright = '2005-2021, Jay Berkenbilt'
@@ -16,6 +20,7 @@ release = '10.5.0'
 version = release
 extensions = [
     'sphinx_rtd_theme',
+    'qpdf',
 ]
 html_theme = 'sphinx_rtd_theme'
 html_theme_options = {
