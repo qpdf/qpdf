@@ -69,6 +69,7 @@ HAGOOGAMAGOOGLE: 0
 <c0>Does * have fingers?
 ---- transcoding
 bidirectional pdf doc done
+bidirectional pdf doc low done
 bidirectional win ansi done
 bidirectional mac roman done
 analysis done
@@ -85,6 +86,8 @@ alternatives
 2: 83a9e99e
 0: 717561636b
 done alternatives
+w˘wˇwˆw˙w˝w˛w˚w˜w�w
+done low characters
 ---- whoami
 quack1
 quack2

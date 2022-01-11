@@ -1,3 +1,8 @@
+2022-01-11  Jay Berkenbilt  <ejb@ql.org>
+
+	* Bug fix: add missing characters from PDF doc encoding.
+	Fixes #606.
+
 2021-12-29  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add method QUtil::file_can_be_opened
