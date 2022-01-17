@@ -181,6 +181,9 @@ JSON::encode_string(std::string const& str)
           case '\b':
             result += "\\b";
             break;
+          case '\f':
+            result += "\\f";
+            break;
           case '\n':
             result += "\\n";
             break;
