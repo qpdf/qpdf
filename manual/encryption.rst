@@ -81,7 +81,7 @@ What does all this mean? Here are a few things to realize.
   5 bytes long and can be easily brute-forced. As such, files
   encrypted with 40-bit encryption are not secure regardless of how
   strong the password is. With 128-bit encryption, the default
-  security handler uses RC4 encryption, which is also known be
+  security handler uses RC4 encryption, which is also known to be
   insecure. As such, the only way to securely encrypt a PDF file using
   the standard security handler (as of the last review of this chapter
   in 2022) is to use AES encryption. This is the only supported
