@@ -27,4 +27,8 @@ html_theme_options = {
     "body_max_width": None,
 }
 html_logo = '../logo/qpdf.svg'
+html_static_path = ['_static']
+html_css_files = [
+    'css/wraptable.css',
+]
 highlight_language = 'none'
