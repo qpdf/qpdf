@@ -294,6 +294,20 @@ JSON::makeNull()
 }
 
 bool
+JSON::isArray() const
+{
+    return nullptr != dynamic_cast<JSON_array const*>(
+        this->m->value.getPointer());
+}
+
+bool
+JSON::isDictionary() const
+{
+    return nullptr != dynamic_cast<JSON_dictionary const*>(
+        this->m->value.getPointer());
+}
+
+bool
 JSON::checkSchema(JSON schema, std::list<std::string>& errors)
 {
     return checkSchemaInternal(this->m->value.getPointer(),

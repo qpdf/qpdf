@@ -69,6 +69,12 @@ class JSON
     QPDF_DLL
     static JSON makeNull();
 
+    QPDF_DLL
+    bool isArray() const;
+
+    QPDF_DLL
+    bool isDictionary() const;
+
     // Check this JSON object against a "schema". This is not a schema
     // according to any standard. It's just a template of what the
     // JSON is supposed to contain. The checking does the following:
