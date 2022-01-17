@@ -203,30 +203,46 @@ However, the values of bits other than those in the table are ignored,
 so having incorrect values probably doesn't break anything in most
 cases. A value of 1 indicates that the permission is granted.
 
-- 3: for ``R`` = 2 printing; for ``R`` >= 3, printing at low
-  resolution
+.. list-table:: P Parameter
+   :widths: 10 80
+   :header-rows: 1
 
-- 4: modifying the document except as controlled by bits 6,
-  9, and 11
+   - - bit
+     - meaning
 
-- 5: extracting text and graphics for purposes other than
-  accessibility to visually impaired users
+   - - 3
+     - for ``R`` = 2 printing; for ``R`` >= 3, printing at low
+       resolution
 
-- 6: add or modify annotations, fill in interactive form fields;
-  if bit 4 is also set, create or modify interactive form fields
+   - - 4
+     - modifying the document except as controlled by bits 6,
+       9, and 11
 
-- 9: for ``R`` >= 3, fill in interactive form fields even if bit 6 is
-  clear
+   - - 5
+     - extracting text and graphics for purposes other than
+       accessibility to visually impaired users
 
-- 10: not used; formerly granted permission to extract material
-  for accessibility, but the specification now disallows restriction
-  of accessibility, and conforming readers are to treat this bit as if
-  it is set regardless of its value
+   - - 6
+     - add or modify annotations, fill in interactive form fields;
+       if bit 4 is also set, create or modify interactive form fields
 
-- 11: for ``R`` >= 3, assemble document including inserting, rotating,
-  or deleting pages or creating document outlines or thumbnail images
+   - - 9
+     - for ``R`` >= 3, fill in interactive form fields even if bit 6 is
+       clear
 
-- 12: for ``R`` >= 3, allow printing at full resolution
+   - - 10
+     - not used; formerly granted permission to extract material for
+       accessibility, but the specification now disallows restriction of
+       accessibility, and conforming readers are to treat this bit as if
+       it is set regardless of its value
+
+   - - 11
+     - for ``R`` >= 3, assemble document including inserting, rotating,
+       or deleting pages or creating document outlines or thumbnail
+       images
+
+   - - 12
+     - for ``R`` >= 3, allow printing at full resolution
 
 .. _qpdf-P:
 
