@@ -22,13 +22,15 @@
 #ifndef JSON_HH
 #define JSON_HH
 
-// This is a simple JSON serializer, primarily designed for
-// serializing QPDF Objects as JSON. JSON objects contain their data
-// as smart pointers. One JSON object is added to another, this
-// pointer is copied. This means you can create temporary JSON objects
-// on the stack, add them to other objects, and let them go out of
-// scope safely. It also means that if the json JSON object is added
-// in more than one place, all copies share underlying data.
+// This is a simple JSON serializer and parser, primarily designed for
+// serializing QPDF Objects as JSON. While it may work as a
+// general-purpose JSON parser/serializer, there are better options.
+// JSON objects contain their data as smart pointers. One JSON object
+// is added to another, this pointer is copied. This means you can
+// create temporary JSON objects on the stack, add them to other
+// objects, and let them go out of scope safely. It also means that if
+// the json JSON object is added in more than one place, all copies
+// share underlying data.
 
 #include <qpdf/DLL.h>
 #include <qpdf/PointerHolder.hh>
@@ -97,6 +99,10 @@ class JSON
     // generates. Any discrepancies are a bug in qpdf.
     QPDF_DLL
     bool checkSchema(JSON schema, std::list<std::string>& errors);
+
+    // Create a JSON object from a string.
+    QPDF_DLL
+    static JSON parse(std::string const&);
 
   private:
     static std::string encode_string(std::string const& utf8);

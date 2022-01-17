@@ -1,0 +1,137 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+use File::Copy;
+use File::Compare;
+
+chdir("json_parse") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('json_parse');
+
+my $json_mod = 0;
+eval {
+    require JSON;
+    $json_mod = 1;
+};
+if ($@)
+{
+    $td->emphasize("JSON.pm not found -- using stored actual outputs");
+}
+
+cleanup();
+
+my $good = 9;
+
+for (my $i = 1; $i <= $good; ++$i)
+{
+    my $n = sprintf("%02d", $i);
+
+    unlink "out.json";
+    my $r = system("json_parse good-$n.json > out.json 2>&1");
+    if ($td->runtest("json_parse accepted $n",
+                     {$td->STRING => "$r\n"},
+                     {$td->STRING => "0\n"},
+                     $td->NORMALIZE_NEWLINES))
+    {
+        if ($json_mod)
+        {
+            if ($td->runtest("check output $n",
+                             {$td->STRING => normalize_json("out.json")},
+                             {$td->STRING => normalize_json("good-$n.json")},
+                             $td->NORMALIZE_NEWLINES))
+            {
+                if (compare("out.json", "save-$n.json"))
+                {
+                    copy("out.json", "save-$n.json");
+                    $td->emphasize("updated save-$n.json from out.json");
+                }
+            }
+        }
+        else
+        {
+            $td->runtest("check output $n against saved",
+                         {$td->FILE => "out.json"},
+                         {$td->FILE => "save-$n.json"},
+                         $td->NORMALIZE_NEWLINES);
+        }
+    }
+    else
+    {
+        $td->runtest("skip checking output $n",
+                     {$td->FILE => "out.json"},
+                     {$td->STRING => ""});
+    }
+}
+
+my @bad = (
+    "junk after string",        # 1
+    "junk after array",         # 2
+    "junk after dictionary",    # 3
+    "bad number",               # 4
+    "invalid keyword",          # 5
+    "missing colon",            # 6
+    "missing comma in dict",    # 7
+    "missing comma in array",   # 8
+    "dict key not string",      # 9
+    "unexpected } in array",    # 10
+    "unexpected } at top",      # 11
+    "unexpected } in dict",     # 12
+    "unexpected ] in dict",     # 13
+    "unexpected ] at top",      # 14
+    "unexpected :",             # 15
+    "unexpected ,",             # 16
+    "premature end array",      # 17
+    "null character",           # 18
+    "unexpected character",     # 19
+    "point in exponent",        # 20
+    "duplicate point",          # 21
+    "duplicate e",              # 22
+    "stray +",                  # 23
+    "bad character in number",  # 24
+    "bad character in keyword", # 25
+    "bad backslash character",  # 26
+    "unterminated string",      # 27
+    "unterminated after \\",    # 28
+    "leading +",                # 29
+    "decimal with no digits",   # 30
+    "minus with no digits",     # 31
+    "leading zero",             # 32
+    "leading zero negative",    # 33
+    "premature end after u",    # 34
+    "bad hex digit",            # 35
+    );
+
+my $i = 0;
+foreach my $d (@bad)
+{
+    ++$i;
+    my $n = sprintf("%02d", $i);
+    $td->runtest("$n: $d",
+                 {$td->COMMAND => "json_parse bad-$n.json"},
+                 {$td->FILE => "bad-$n.out", $td->EXIT_STATUS => 2},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+cleanup();
+
+$td->report((2 * $good) + scalar(@bad));
+
+sub cleanup
+{
+    unlink "out.json";
+}
+
+sub normalize_json
+{
+    my $file = shift;
+    open(F, "<$file") or die "can't open $file: $file: $!\n";
+    $/ = undef;
+    my $encoded = scalar(<F>);
+    close(F);
+    my $j = JSON->new->allow_nonref;
+    $j->canonical();
+    $j->utf8->pretty->encode($j->utf8->decode($encoded));
+}

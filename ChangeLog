@@ -4,7 +4,19 @@
 	to QPDFObjectHandle with corresponding functions added to the C
 	API. Thanks to m-holger for the contribution.
 
+2022-01-19  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add a JSONHandler class that allows sax-like, recursive handling
+	of JSON objects.
+
 2022-01-17  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add JSON::parse. Now qpdf's JSON class implements a
+	general-purpose JSON parser and serializer, but there are better
+	options for general use. This is really designed for qpdf's
+	internal use and is set up to be compatible with qpdf's existing
+	API and to hook into a planned JSON-based API to the QPDFJob
+	class.
 
 	* Add isDictionary and isArray to JSON
 
