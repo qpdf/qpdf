@@ -114,44 +114,69 @@ Algorithm parameters ``V`` and ``R``
   encrypting the file, handling keys, etc. It may have any of the
   following values:
 
-  - 1: The original algorithm, which encrypted files using 40-bit keys.
+  .. list-table:: Encryption Algorithms: ``V``
+     :widths: 10 80
+     :header-rows: 1
 
-  - 2: An extension of the original algorithm allowing longer keys.
-    Introduced in PDF 1.4.
+     - - V
+       - Meaning
 
-  - 3: An unpublished algorithm that permits file encryption key
-    lengths ranging from 40 to 128 bits. Introduced in PDF 1.4. qpdf
-    is believed to be able to read files with ``V`` = 3 but does not
-    write such files.
+     - - 1
+       - The original algorithm, which encrypted files using 40-bit keys.
 
-  - 4: An extension of the algorithm that allows it to be
-    parameterized by additional rules for handling strings and
-    streams. Introduced in PDF 1.5.
+     - - 2
+       - An extension of the original algorithm allowing longer keys.
+         Introduced in PDF 1.4.
 
-  - 5: An algorithm that allows specification of separate security
-    handlers for strings and streams as well as embedded files, and
-    which supports 256-bit keys. Introduced in PDF 1.7 extension level
-    3 and later extended in extension level 8. This is the encryption
-    system in the PDF 2.0 specification, ISO-32000.
+     - - 3
+       - An unpublished algorithm that permits file encryption key
+         lengths ranging from 40 to 128 bits. Introduced in PDF 1.4.
+         qpdf is believed to be able to read files with ``V`` = 3 but
+         does not write such files.
+
+     - - 4
+       - An extension of the algorithm that allows it to be
+         parameterized by additional rules for handling strings and
+         streams. Introduced in PDF 1.5.
+
+     - - 5
+       - An algorithm that allows specification of separate security
+         handlers for strings and streams as well as embedded files,
+         and which supports 256-bit keys. Introduced in PDF 1.7
+         extension level 3 and later extended in extension level 8.
+         This is the encryption system in the PDF 2.0 specification,
+         ISO-32000.
 
   ``R`` is a code specifying the revision of the standard handler. It
   is tightly coupled with the value of ``V``. ``R`` may have any of
   the following values:
 
-  - 2: ``V`` must be 1
+  .. list-table:: Relationship between ``R`` and ``V``
+     :widths: 10 80
+     :header-rows: 1
 
-  - 3: ``V`` must be 2 or 3
+     - - R
+       - Expected V
 
-  - 4: ``V`` must be 4
+     - - 2
+       - ``V`` must be 1
 
-  - 5: ``V`` must be 5; this extension was never fully specified and
-    existed for a short time in some versions of Acrobat.
-    :command:`qpdf` is able to read and write this format, but it
-    should not be used for any purpose other than testing
-    compatibility with the format.
+     - - 3
+       - ``V`` must be 2 or 3
 
-  - 6: ``V`` must be 5. This is the only value that is not deprecated
-    in the PDF 2.0 specification, ISO-32000.
+     - - 4
+       - ``V`` must be 4
+
+     - - 5
+       - ``V`` must be 5; this extension was never fully specified and
+         existed for a short time in some versions of Acrobat.
+         :command:`qpdf` is able to read and write this format, but it
+         should not be used for any purpose other than testing
+         compatibility with the format.
+
+     - - 6
+       - ``V`` must be 5. This is the only value that is not
+         deprecated in the PDF 2.0 specification, ISO-32000.
 
 Encryption Dictionary
   Encrypted PDF files have an encryption dictionary. There are several
@@ -203,12 +228,12 @@ However, the values of bits other than those in the table are ignored,
 so having incorrect values probably doesn't break anything in most
 cases. A value of 1 indicates that the permission is granted.
 
-.. list-table:: P Parameter
+.. list-table:: ``P`` Bit Values
    :widths: 10 80
    :header-rows: 1
 
-   - - bit
-     - meaning
+   - - Bit
+     - Meaning
 
    - - 3
      - for ``R`` = 2 printing; for ``R`` >= 3, printing at low
@@ -254,45 +279,83 @@ to ``P`` based on the various settings of different security options.
 
 - Start with all bits set except bits 1 and 2, which are cleared
 
-- For ``R`` = 2:
+- Clear bits and described in the table below:
 
-  - ``--print=n``: clear bit 3
+  .. list-table:: Command-line Arguments and ``P`` Bit Values
+     :widths: 20 25 45
+     :header-rows: 1
 
-  - ``--modify=n``: clear bit 4
+     - - R
+       - Argument
+       - Bits Cleared
 
-  - ``--extract=n``: clear bit 5
+     - - R = 2
+       - ``--print=n``
+       - 3
 
-  - ``--annotate=n``: clear bit 6
+     - - R = 2
+       - ``--modify=n``
+       - 4
 
-- For ``R >= 3``:
+     - - R = 2
+       - ``--extract=n``
+       - 5
 
-  - ``--accessibility=n``: for ``R`` = 3, clear bit 10; otherwise,
-    ignore so bit 10 is always clear if ``R`` >= 4. qpdf allows
-    creating files with bit 10 clear so that it can be used to create
-    test files to ensure that a conforming reader ignores the value of
-    the bit. You should never intentionally clear accessibility.
+     - - R = 2
+       - ``--annotate=n``
+       - 6
 
-  - ``--extract=n``: clear bit 5
+     - - R = 3
+       - ``--accessibility=n``
+       - 10
 
-  - ``--print=none``: clear bits 3 and 12
+     - - R >= 4
+       - ``--accessibility=n``
+       - ignored
 
-  - ``--print=low``: clear bit 12
+     - - R >= 3
+       - ``--extract=n``
+       - 5
 
-  - ``--modify=none``: clear bits 4, 6, 9, and 11
+     - - R >= 3
+       - ``--print=none``
+       - 3, 12
 
-  - ``--modify=assembly``: clear bits 4, 6, and 9
+     - - R >= 3
+       - ``--print=low``
+       - 12
 
-  - ``--modify=form``: clear bits 4 and 6
+     - - R >= 3
+       - ``--modify=none``
+       - 4, 6, 9, 11
 
-  - ``--modify=annotate``: clear bit 4
+     - - R >= 3
+       - ``--modify=assembly``
+       - 4, 6, 9
 
-  - ``--assemble=n``: clear bit 11
+     - - R >= 3
+       - ``--modify=form``
+       - 4, 6
 
-  - ``--annotate=n``: clear bit 6
+     - - R >= 3
+       - ``--modify=annotate``
+       - 4
 
-  - ``--form=n``: clear bit 9
+     - - R >= 3
+       - ``--assemble=n``
+       - 11
 
-  - ``--modify-other=n``: clear bit 4
+     - - R >= 3
+       - ``--annotate=n``
+       - 6
+
+     - - R >= 3
+       - ``--form=n``
+       - 9
+
+     - - R >= 3
+       - ``--modify-other=n``
+       - 4
 
 Options to :command:`qpdf`, both at the CLI and library level, allow
 more granular clearing of permission bits than do most tools,
