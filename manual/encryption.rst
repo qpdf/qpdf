@@ -236,7 +236,7 @@ cases. A value of 1 indicates that the permission is granted.
      - Meaning
 
    - - 3
-     - for ``R`` = 2 printing; for ``R`` >= 3, printing at low
+     - for ``R`` = 2 printing; for ``R`` ≥ 3, printing at low
        resolution
 
    - - 4
@@ -252,7 +252,7 @@ cases. A value of 1 indicates that the permission is granted.
        if bit 4 is also set, create or modify interactive form fields
 
    - - 9
-     - for ``R`` >= 3, fill in interactive form fields even if bit 6 is
+     - for ``R`` ≥ 3, fill in interactive form fields even if bit 6 is
        clear
 
    - - 10
@@ -262,12 +262,12 @@ cases. A value of 1 indicates that the permission is granted.
        it is set regardless of its value
 
    - - 11
-     - for ``R`` >= 3, assemble document including inserting, rotating,
+     - for ``R`` ≥ 3, assemble document including inserting, rotating,
        or deleting pages or creating document outlines or thumbnail
        images
 
    - - 12
-     - for ``R`` >= 3, allow printing at full resolution
+     - for ``R`` ≥ 3, allow printing at full resolution
 
 .. _qpdf-P:
 
@@ -309,51 +309,51 @@ to ``P`` based on the various settings of different security options.
        - ``--accessibility=n``
        - 10
 
-     - - R >= 4
+     - - R ≥ 4
        - ``--accessibility=n``
        - ignored
 
-     - - R >= 3
+     - - R ≥ 3
        - ``--extract=n``
        - 5
 
-     - - R >= 3
+     - - R ≥ 3
        - ``--print=none``
        - 3, 12
 
-     - - R >= 3
+     - - R ≥ 3
        - ``--print=low``
        - 12
 
-     - - R >= 3
+     - - R ≥ 3
        - ``--modify=none``
        - 4, 6, 9, 11
 
-     - - R >= 3
+     - - R ≥ 3
        - ``--modify=assembly``
        - 4, 6, 9
 
-     - - R >= 3
+     - - R ≥ 3
        - ``--modify=form``
        - 4, 6
 
-     - - R >= 3
+     - - R ≥ 3
        - ``--modify=annotate``
        - 4
 
-     - - R >= 3
+     - - R ≥ 3
        - ``--assemble=n``
        - 11
 
-     - - R >= 3
+     - - R ≥ 3
        - ``--annotate=n``
        - 6
 
-     - - R >= 3
+     - - R ≥ 3
        - ``--form=n``
        - 9
 
-     - - R >= 3
+     - - R ≥ 3
        - ``--modify-other=n``
        - 4
 
@@ -391,7 +391,7 @@ password prompt is given. Creating a file with an empty owner password
 is like creating a file with the same owner and user password: there
 is no way to open the file as an owner.
 
-For ``V`` >= 5, the main encryption key is independently encrypted
+For ``V`` ≥ 5, the main encryption key is independently encrypted
 using the user password and the owner password. There is no way to
 recover the user password from the owner password. Restrictions are
 imposed or not depending on which password was used. In this case, the
