@@ -34,6 +34,11 @@ Documentation
   * Consider which parts might be good candidates for moving to the
     wiki.
 
+* Commit 'Manual - enable line wrapping in table cells' from
+  Mon Jan 17 12:22:35 2022 +0000 enables table cell wrapping. See if
+  this can be incorporated directly into sphinx_rtd_theme and the
+  workaround can be removed.
+
 Document-level work
 ===================
 
