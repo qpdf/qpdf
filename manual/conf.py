@@ -31,4 +31,10 @@ html_static_path = ['_static']
 html_css_files = [
     'css/wraptable.css',
 ]
+latex_elements = {
+    'preamble': r'''
+\sphinxDUC{2264}{$\leq$}
+\sphinxDUC{2265}{$\geq$}
+''',
+}
 highlight_language = 'none'
