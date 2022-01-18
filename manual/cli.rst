@@ -141,25 +141,36 @@ Exit Status
 
 The exit status of :command:`qpdf` may be interpreted as follows:
 
-- ``0``: no errors or warnings were found. The file may still have
-  problems qpdf can't detect. If :qpdf:ref:`--warning-exit-0` was
-  specified, exit status ``0`` is used even if there are warnings.
+.. list-table:: Exit Codes
+   :widths: 5 80
+   :header-rows: 0
 
-- ``1``: :command:`qpdf` does not exit with status ``1`` since the
-  shell uses this exit code if it is unable to invoke the command.
+   - - 0
+     - no errors or warnings were found
 
-- ``2``: errors were found. qpdf was not able to fully process the
-  file.
+   - - 1
+     - not used
 
-- ``3``: qpdf encountered problems that it was able to recover from.
-  In some cases, the resulting file may still be damaged. Note that
-  qpdf still exits with status ``3`` if it finds warnings even when
-  :qpdf:ref:`--no-warn` is specified. With
-  :qpdf:ref:`--warning-exit-0`, warnings without errors exit with
-  status ``0`` instead of ``3``.
+   - - 2
+     - errors were found; the file was not processed
 
-The :qpdf:ref:`--is-encrypted` and :qpdf:ref:`--requires-password`
-options use different exit codes. See their help for details.
+   - - 3
+     - warnings were found without errors
+
+Notes:
+
+- A PDF file may have problems that qpdf can't detect.
+
+- With the :qpdf:ref:`--warning-exit-0` option, exit status ``0`` is
+  used even if there are warnings.
+
+- :command:`qpdf` does not exit with status ``1`` since the shell uses
+  this exit code if it is unable to invoke the command.
+
+- If both errors and warnings were found, exit status ``2`` is used.
+
+- The :qpdf:ref:`--is-encrypted` and :qpdf:ref:`--requires-password`
+  options use different exit codes. See their help for details.
 
 Related Options
 ~~~~~~~~~~~~~~~
@@ -938,13 +949,18 @@ Related Options
    Controls handling of object streams. The value of :samp:`{mode}`
    may be one of the following:
 
-   - :samp:`preserve`: preserve original object streams, if any (the
-     default)
+   .. list-table:: Object Stream Modes
+      :widths: 10 80
+      :header-rows: 0
 
-   - :samp:`disable`: create output files with no object streams
+      - - :samp:`preserve`
+        - preserve original object streams, if any (the default)
 
-   - :samp:`generate`: create object streams, and compress objects
-     when possible
+      - - :samp:`disable`
+        - create output files with no object streams
+
+      - - :samp:`generate`
+        - create object streams, and compress objects when possible
 
    Object streams are PDF streams that contain other objects. Putting
    objects in object streams allows the PDF objects themselves to be
@@ -1195,34 +1211,47 @@ options. This section describes the syntax of a page range.
   case, odd and even refer to positions in the final range, not
   whether the original page number is odd or even.
 
-Example page ranges:
+.. list-table:: Example Page Ranges
+   :widths: 20 80
+   :header-rows: 0
 
-- ``1,6,4``: pages 1, 6, and 4 in that order
+   - - ``1,6,4``
+     - pages 1, 6, and 4 in that order
 
-- ``3-7``: pages 3 through 7 inclusive in increasing order
+   - - ``3-7``
+     - pages 3 through 7 inclusive in increasing order
 
-- ``7-3``: pages 7, 6, 5, 4, and 3 in that order
+   - - ``7-3``
+     - pages 7, 6, 5, 4, and 3 in that order
 
-- ``1-z``: all pages in order
+   - - ``1-z``
+     - all pages in order
 
-- ``z-1``: all pages in reverse order
+   - - ``z-1``
+     - all pages in reverse order
 
-- ``1,3,5-9,15-12``: pages 1, 3, 5, 6, 7, 8, 9, 15, 14, 13, and 12 in
-  that order
+   - - ``1,3,5-9,15-12``
+     - pages 1, 3, 5, 6, 7, 8, 9, 15, 14, 13, and 12 in that order
 
-- ``r3-r1``: the last three pages of the document
+   - - ``r3-r1``
+     - the last three pages of the document
 
-- ``r1-r3``: the last three pages of the document in reverse order
+   - - ``r1-r3``
+     - the last three pages of the document in reverse order
 
-- ``1-20:even``: even pages from 2 to 20
+   - - ``1-20:even``
+     - even pages from 2 to 20
 
-- ``5,7-9,12``: pages 5, 7, 8, 9, and 12
+   - - ``5,7-9,12``
+     - pages 5, 7, 8, 9, and 12
 
-- ``5,7-9,12:odd``: pages 5, 8, and 12, which are the pages in odd
-  positions from the original set of 5, 7, 8, 9, 12
+   - - ``5,7-9,12:odd``
+     - pages 5, 8, and 12, which are the pages in odd positions from
+       the original set of 5, 7, 8, 9, 12
 
-- ``5,7-9,12:even``: pages 7 and 9, which are the pages in even
-  positions from the original set of 5, 7, 8, 9, 12
+   - - ``5,7-9,12:even``
+     - pages 7 and 9, which are the pages in even positions from the
+       original set of 5, 7, 8, 9, 12
 
 .. _modification-options:
 
@@ -1393,14 +1422,20 @@ Related Options
    annotations. The :samp:`{option}` parameter may be any of the
    following:
 
-   - :samp:`all`: include all annotations that are not marked
-     invisible or hidden
+   .. list-table:: Flatten Annotation Options
+      :widths: 10 80
+      :header-rows: 0
 
-   - :samp:`print`: only include annotations that indicate that they
-     should appear when the page is printed
+      - - :samp:`all`
+        - include all annotations that are not marked invisible or
+          hidden
 
-   - :samp:`screen`: omit annotations that indicate they should not
-     appear on the screen
+      - - :samp:`print`
+        - only include annotations that should appear when the page is
+          printed
+
+      - - :samp:`screen`
+        - omit annotations that should not appear on the screen
 
    In a PDF file, interactive form fields have a value and,
    independently, a set of instructions, called an appearance, to
@@ -1702,63 +1737,109 @@ does not obey encryption restrictions already imposed on the file.
 Doing so would be meaningless since qpdf can be used to remove
 encryption from the file entirely.
 
-Here is a summary of encryption options. Details are provided below.
+Here is a summary of encryption options. Details are provided in the
+help for each option.
 
-Options for 40-bit only
-  - ``--annotate=[yn]``: restrict comments, filling forms, and signing
 
-  - ``--extract=[yn]``: restrict text/graphic extraction
+.. list-table:: Options for 40-bit Encryption Only
+   :widths: 30 70
+   :header-rows: 0
 
-  - ``--modify=[yn]``: restrict document modification
+   - - ``--annotate=[yn]``
+     - restrict comments, filling forms, and signing
 
-  - ``--print=[yn]``: restrict printing
+   - - ``--extract=[yn]``
+     - restrict text/graphic extraction
 
-Options for 128-bit or 256-bit
-  - ``--accessibility=[yn]``: restrict accessibility (usually ignored)
+   - - ``--modify=[yn]``
+     - restrict document modification
 
-  - ``--annotate=[yn]``: restrict commenting/filling form fields
+   - - ``--print=[yn]``
+     - restrict printing
 
-  - ``--assemble=[yn]``: restrict document assembly
+.. list-table:: Options for 128-bit or 256-bit Encryption
+   :widths: 30 70
+   :header-rows: 0
 
-  - ``--extract=[yn]``: restrict text/graphic extraction
+   - - ``--accessibility=[yn]``
+     - restrict accessibility (usually ignored)
 
-  - ``--form=[yn]``: restrict filling form fields
+   - - ``--annotate=[yn]``
+     - restrict commenting/filling form fields
 
-  - ``--modify-other=[yn]``: restrict other modifications
+   - - ``--assemble=[yn]``
+     - restrict document assembly
 
-  - ``--modify=modify-opt``: control modify access by level
+   - - ``--extract=[yn]``
+     - restrict text/graphic extraction
 
-  - ``--print=print-opt``: control printing access
+   - - ``--form=[yn]``
+     - restrict filling form fields
 
-  - ``--cleartext-metadata``: prevent encryption of metadata
+   - - ``--modify-other=[yn]``
+     - restrict other modifications
 
-For 128-bit only
-  - ``--use-aes=[yn]``: indicates whether to use AES encryption
+   - - ``--modify=modify-opt``
+     - control modify access by level
 
-  - ``--force-V4``: forces use of V=4 encryption handler
+   - - ``--print=print-opt``
+     - control printing access
 
-For 256-bit only
-  - ``--force-R5``: forces use of deprecated ``R=5`` encryption algorithm
+   - - ``--cleartext-metadata``
+     - prevent encryption of metadata
 
-  - ``--allow-insecure``: allow user password with empty owner password
+.. list-table:: Options for 128-bit Encryption Only
+   :widths: 30 70
+   :header-rows: 0
 
-Values for :samp:`{print-opt}`
-  - ``none``: disallow printing
+   - - ``--use-aes=[yn]``
+     - indicates whether to use AES encryption
 
-  - ``low``: allow only low-resolution printing
+   - - ``--force-V4``
+     - forces use of V=4 encryption handler
 
-  - ``full``: allow full printing
+.. list-table:: Options for 256-bit Encryption Only
+   :widths: 30 70
+   :header-rows: 0
 
-Values for :samp:`{modify-opt}`
-  - ``none``: allow no modifications
+   - - ``--force-R5``
+     - forces use of deprecated ``R=5`` encryption algorithm
 
-  - ``assembly``: allow document assembly only
+   - - ``--allow-insecure``
+     - allow user password with empty owner password
 
-  - ``form``: ``assembly`` permissions plus filling in form fields and signing
+.. list-table:: Values for :samp:`{print-opt}`
+   :widths: 20 80
+   :header-rows: 0
 
-  - ``annotate``: ``form`` permissions plus commenting and modifying forms
+   - - ``none``
+     - disallow printing
 
-  - ``all``: allow full document modification
+   - - ``low``
+     - allow only low-resolution printing
+
+   - - ``full``
+     - allow full printing
+
+.. list-table:: Values for :samp:`{modify-opt}`
+   :widths: 20 80
+   :header-rows: 0
+
+   - - ``none``
+     - allow no modifications
+
+   - - ``assembly``
+     - allow document assembly only
+
+   - - ``form``
+     - ``assembly`` permissions plus filling in form fields and
+       signing
+
+   - - ``annotate``
+     - ``form`` permissions plus commenting and modifying forms
+
+   - - ``all``
+     - allow full document modification
 
 Related Options
 ~~~~~~~~~~~~~~~
@@ -1873,30 +1954,46 @@ Related Options
    allow enabling and disabling levels of restriction in a manner
    similar to how some PDF creation tools do it:
 
-   - ``none``: allow no modifications
+   .. list-table:: :samp:`{modify-opt}` for 128-bit and 256-bit Encryption
+      :widths: 10 80
+      :header-rows: 0
 
-   - ``assembly``: allow document assembly only
+      - - ``none``
+        - allow no modifications
 
-   - ``form``: ``assembly`` permissions plus filling in form fields
-     and signing
+      - - ``assembly``
+        - allow document assembly only
 
-   - ``annotate``: ``form`` permissions plus commenting and modifying
-     forms
+      - - ``form``
+        - ``assembly`` permissions plus filling in form fields and
+          signing
 
-   - ``all``: allow full document modification (the default)
+      - - ``annotate``
+        - ``form`` permissions plus commenting and modifying forms
 
-   :samp:`{modify-opt}` values map to other combinations of options as
-   follows:
+      - - ``all``
+        - allow full document modification (the default)
 
-   - ``none``: same as ``--modify-other=n --annotate=n --form=n --assemble=n``
+   Modify options correspond to the more granular options as follows:
 
-   - ``assembly``: same as ``--modify-other=n --annotate=n --form=n``
+   .. list-table:: Mapping :samp:`{modify-opt}` to Other Options
+      :widths: 10 80
+      :header-rows: 0
 
-   - ``form``: same as ``--modify-other=n --annotate=n``
+      - - ``none``
+        - ``--modify-other=n --annotate=n --form=n --assemble=n``
 
-   - ``annotate``: same as ``--modify-other=n``
+      - - ``assembly``
+        - ``--modify-other=n --annotate=n --form=n``
 
-   - ``all``: the default
+      - - ``form``
+        - ``--modify-other=n --annotate=n``
+
+      - - ``annotate``
+        - ``--modify-other=n``
+
+      - - ``all``
+        - no other modify options (the default)
 
    You can combine this option with the options listed above. If you
    do, later options override earlier options.
@@ -1919,11 +2016,18 @@ Related Options
    printing. For 128-bit and 256-bit encryption, :samp:`{print-opt}`
    may have the following values:
 
-   - :samp:`none`: disallow printing
+   .. list-table:: :samp:`{print-opt}` Values
+      :widths: 10 80
+      :header-rows: 0
 
-   - :samp:`low`: allow low-resolution printing only
+      - - :samp:`none`
+        - disallow printing
 
-   - :samp:`full`: allow full printing (the default)
+      - - :samp:`low`
+        - allow low-resolution printing only
+
+      - - :samp:`full`
+        - allow full printing (the default)
 
 .. qpdf:option:: --cleartext-metadata
 
@@ -2505,10 +2609,15 @@ indicate how far after. For example, US Eastern Standard Time
 (America/New_York) is ``-05'00'``, and Indian Standard Time
 (Asia/Calcutta) is ``+05'30'``.
 
-Examples:
-  - ``D:20210207161528-05'00'``: February 7, 2021 at 4:15:28 p.m.
+.. list-table:: PDF Date Examples
+   :widths: 30 70
+   :header-rows: 0
 
-  - ``D:20210207211528Z``: February 7, 2021 at 21:15:28 UTC
+   - - ``D:20210207161528-05'00'``
+     - February 7, 2021 at 4:15:28 p.m.
+
+   - - ``D:20210207211528Z``
+     - February 7, 2021 at 21:15:28 UTC
 
 .. _add-attachment:
 
@@ -2670,11 +2779,18 @@ Related Options
 
    Silently exit with a code indicating the file's encryption status:
 
-   - ``0``: the file is encrypted
+   .. list-table:: Exit Codes for ``--is-encrypted``
+      :widths: 5 80
+      :header-rows: 0
 
-   - ``1``: not used
+      - - ``0``
+        - the file is encrypted
 
-   - ``2``: the file is not encrypted
+      - - ``1``
+        - not used
+
+      - - ``2``
+        - the file is not encrypted
 
    This option can be used for password-protected files even if you
    don't know the password.
@@ -2698,14 +2814,22 @@ Related Options
 
    Silently exit with a code indicating the file's password status:
 
-   - ``0``: a password, other than as supplied, is required
+   .. list-table:: Exit Codes for ``--requires-password``
+      :widths: 5 80
+      :header-rows: 0
 
-   - ``1``: not used
+      - - ``0``
+        - a password, other than as supplied, is required
 
-   - ``2``: the file is not encrypted
+      - - ``1``
+        - not used
 
-   - ``3``: the file is encrypted, and correct password (if any) has
-     been supplied
+      - - ``2``
+        - the file is not encrypted
+
+      - - ``3``
+        - the file is encrypted, and correct password (if any) has
+          been supplied
 
    Use with the :qpdf:ref:`--password` option to specify the password
    to test.
@@ -2738,7 +2862,7 @@ Related Options
       standard output. Note that qpdf does not perform any validation
       of the actual PDF page content or semantic correctness of the
       PDF file. It merely checks that the PDF file is syntactically
-      valid.
+      valid. See also qpdf --help=exit-status.
 
    Check the file's structure and well as encryption, linearization,
    and encoding of stream data, and write information about the file
@@ -2763,6 +2887,8 @@ Related Options
    operating on the recovered file. Combining :samp:`--check` with
    other options in this way can be useful for manually recovering
    severely damaged files.
+
+   See also :ref:`exit-status`.
 
 .. qpdf:option:: --show-encryption
 

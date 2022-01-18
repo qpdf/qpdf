@@ -721,7 +721,7 @@ aspects of the file, and write information about the file to
 standard output. Note that qpdf does not perform any validation
 of the actual PDF page content or semantic correctness of the
 PDF file. It merely checks that the PDF file is syntactically
-valid.
+valid. See also qpdf --help=exit-status.
 )");
 ap.addOptionHelp("--show-encryption", "copy-attachments", "information about encrypted files", R"(Show document encryption parameters. Also show the document's
 user password if the owner password is given and the file was
