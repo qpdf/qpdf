@@ -1,7 +1,7 @@
 #include <qpdf/JSON.hh>
 #include <qpdf/QPDFObjectHandle.hh>
 #include <iostream>
-#include <assert.h>
+#include <cassert>
 
 static void check(JSON const& j, std::string const& exp)
 {
@@ -20,12 +20,25 @@ static void test_main()
           "\\u0003\\t\\b\\r\\n<4>\"");
     JSON jnull = JSON::makeNull();
     check(jnull, "null");
+    assert(jnull.isNull());
+    std::string value;
+    assert(! jnull.getNumber(value));
     JSON jarr = JSON::makeArray();
     check(jarr, "[]");
     JSON jstr2 = JSON::makeString("a\tb");
+    assert(jstr2.getString(value));
+    assert(value == "a\tb");
+    assert(! jstr2.getNumber(value));
     JSON jint = JSON::makeInt(16059);
     JSON jdouble = JSON::makeReal(3.14159);
     JSON jexp = JSON::makeNumber("2.1e5");
+    JSON jbool1 = JSON::makeBool(true);
+    JSON jbool2 = JSON::makeBool(false);
+    bool bvalue = false;
+    assert(jbool1.getBool(bvalue));
+    assert(bvalue);
+    assert(jbool2.getBool(bvalue));
+    assert(! bvalue);
     jarr.addArrayElement(jstr2);
     jarr.addArrayElement(jnull);
     jarr.addArrayElement(jint);
@@ -39,6 +52,18 @@ static void test_main()
           "  3.14159,\n"
           "  2.1e5\n"
           "]");
+    std::vector<std::string> avalue;
+    assert(jarr.forEachArrayItem([&avalue](JSON j) {
+        avalue.push_back(j.unparse());
+    }));
+    std::vector<std::string> xavalue = {
+        "\"a\\tb\"",
+        "null",
+        "16059",
+        "3.14159",
+        "2.1e5",
+    };
+    assert(avalue == xavalue);
     JSON jmap = JSON::makeDictionary();
     check(jmap, "{}");
     jmap.addDictionaryMember("b", jstr2);
@@ -73,6 +98,18 @@ static void test_main()
     check(QPDFObjectHandle::newReal(".34").getJSON(), "0.34");
     check(QPDFObjectHandle::newReal("-0.56").getJSON(), "-0.56");
     check(QPDFObjectHandle::newReal("-.78").getJSON(), "-0.78");
+    JSON jmap2 = JSON::parse(R"({"a": 1, "b": "two", "c": [true]})");
+    std::map<std::string, std::string> dvalue;
+    assert(jmap2.forEachDictItem([&dvalue]
+                                 (std::string const& k, JSON j) {
+        dvalue[k] = j.unparse();
+    }));
+    std::map<std::string, std::string> xdvalue = {
+        {"a", "1"},
+        {"b", "\"two\""},
+        {"c", "[\n  true\n]"},
+    };
+    assert(dvalue == xdvalue);
 }
 
 static void check_schema(JSON& obj, JSON& schema, bool exp,

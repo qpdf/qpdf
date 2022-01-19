@@ -13,6 +13,7 @@ BINS_libtests = \
 	hex \
 	input_source \
 	json \
+	json_handler \
 	json_parse \
 	lzw \
 	main_from_wmain \

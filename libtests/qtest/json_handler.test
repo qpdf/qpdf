@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+chdir("json_handler") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('json_handler');
+
+$td->runtest("JSON handler",
+             {$td->COMMAND => "json_handler"},
+             {$td->FILE => "json_handler.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->report(1);

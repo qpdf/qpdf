@@ -1,0 +1,22 @@
+-- scalar --
+.: string: potato
+-- all --
+.five[0]: string: x
+.five[1]: bool: false
+.five[2]: string: y
+.five[3]: null
+.five[4]: bool: true
+.four: json: [
+  "a",
+  1
+]
+.one: string: potato
+.phour: json: null
+.six.a.Q: json: "baaa"
+.six.a.b: string: quack
+.six.b: string: moo
+.three: bool: true
+.two: number: 3.14
+-- errors --
+bad type at top: JSON handler: value at . is not of expected type
+unexpected key: JSON handler found unexpected key x in object at .

@@ -87,3 +87,5 @@ JSON parse leading zero 0
 JSON parse number no digits 0
 JSON parse premature end of u 0
 JSON parse bad hex after u 0
+JSONHandler unhandled value 0
+JSONHandler unexpected key 0

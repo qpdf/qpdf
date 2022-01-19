@@ -90,6 +90,7 @@ std::string JSON::JSON_array::unparse(size_t depth) const
 }
 
 JSON::JSON_string::JSON_string(std::string const& utf8) :
+    utf8(utf8),
     encoded(encode_string(utf8))
 {
 }
@@ -309,6 +310,83 @@ JSON::isDictionary() const
 {
     return nullptr != dynamic_cast<JSON_dictionary const*>(
         this->m->value.getPointer());
+}
+
+bool
+JSON::getString(std::string& utf8) const
+{
+    auto v = dynamic_cast<JSON_string const*>(this->m->value.getPointer());
+    if (v == nullptr)
+    {
+        return false;
+    }
+    utf8 = v->utf8;
+    return true;
+}
+
+bool
+JSON::getNumber(std::string& value) const
+{
+    auto v = dynamic_cast<JSON_number const*>(this->m->value.getPointer());
+    if (v == nullptr)
+    {
+        return false;
+    }
+    value = v->encoded;
+    return true;
+}
+
+bool
+JSON::getBool(bool& value) const
+{
+    auto v = dynamic_cast<JSON_bool const*>(this->m->value.getPointer());
+    if (v == nullptr)
+    {
+        return false;
+    }
+    value = v->value;
+    return true;
+}
+
+bool
+JSON::isNull() const
+{
+    if (dynamic_cast<JSON_null const*>(this->m->value.getPointer()))
+    {
+        return true;
+    }
+    return false;
+}
+
+bool
+JSON::forEachDictItem(
+    std::function<void(std::string const& key, JSON value)> fn) const
+{
+    auto v = dynamic_cast<JSON_dictionary const*>(this->m->value.getPointer());
+    if (v == nullptr)
+    {
+        return false;
+    }
+    for (auto const& k: v->members)
+    {
+        fn(k.first, JSON(k.second));
+    }
+    return true;
+}
+
+bool
+JSON::forEachArrayItem(std::function<void(JSON value)> fn) const
+{
+    auto v = dynamic_cast<JSON_array const*>(this->m->value.getPointer());
+    if (v == nullptr)
+    {
+        return false;
+    }
+    for (auto const& i: v->elements)
+    {
+        fn(JSON(i));
+    }
+    return true;
 }
 
 bool

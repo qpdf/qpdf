@@ -30,7 +30,10 @@
 // create temporary JSON objects on the stack, add them to other
 // objects, and let them go out of scope safely. It also means that if
 // the json JSON object is added in more than one place, all copies
-// share underlying data.
+// share underlying data. This makes them similar in structure and
+// behavior to QPDFObjectHandle and may feel natural within the QPDF
+// codebase, but it is also a good reason not to use this as a
+// general-purpose JSON package.
 
 #include <qpdf/DLL.h>
 #include <qpdf/PointerHolder.hh>
@@ -38,6 +41,7 @@
 #include <map>
 #include <vector>
 #include <list>
+#include <functional>
 
 class JSON
 {
@@ -76,6 +80,24 @@ class JSON
 
     QPDF_DLL
     bool isDictionary() const;
+
+    // Accessors. Accessor behavior:
+    //
+    // - If argument is wrong type, including null, return false
+    // - If argument is right type, return true and initialize the value
+    QPDF_DLL
+    bool getString(std::string& utf8) const;
+    QPDF_DLL
+    bool getNumber(std::string& value) const;
+    QPDF_DLL
+    bool getBool(bool& value) const;
+    QPDF_DLL
+    bool isNull() const;
+    QPDF_DLL
+    bool forEachDictItem(
+        std::function<void(std::string const& key, JSON value)> fn) const;
+    QPDF_DLL
+    bool forEachArrayItem(std::function<void(JSON value)> fn) const;
 
     // Check this JSON object against a "schema". This is not a schema
     // according to any standard. It's just a template of what the
@@ -129,6 +151,7 @@ class JSON
         JSON_string(std::string const& utf8);
         virtual ~JSON_string();
         virtual std::string unparse(size_t depth) const;
+        std::string utf8;
         std::string encoded;
     };
     struct JSON_number: public JSON_value
