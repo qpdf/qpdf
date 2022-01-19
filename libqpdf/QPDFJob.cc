@@ -1474,9 +1474,9 @@ QPDFJob::json_schema(std::set<std::string>* keys)
     if (all_keys || keys->count("objects"))
     {
         schema.addDictionaryMember(
-            "objects", JSON::makeString(
-                "dictionary of original objects;"
-                " keys are 'trailer' or 'n n R'"));
+            "objects", JSON::parse(R"({
+  "<n n R|trailer>": "json representation of object"
+})"));
     }
     if (all_keys || keys->count("objectinfo"))
     {
