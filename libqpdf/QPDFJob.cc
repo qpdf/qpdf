@@ -1462,10 +1462,9 @@ QPDFJob::json_schema(std::set<std::string>* keys)
         "version", JSON::makeString(
             "JSON format serial number; increased for non-compatible changes"));
     JSON j_params = schema.addDictionaryMember(
-        "parameters", JSON::makeDictionary());
-    j_params.addDictionaryMember(
-        "decodelevel", JSON::makeString(
-            "decode level used to determine stream filterability"));
+        "parameters", JSON::parse(R"({
+  "decodelevel": "decode level used to determine stream filterability"
+})"));
 
     bool all_keys = ((keys == 0) || keys->empty());
 
@@ -1482,297 +1481,152 @@ QPDFJob::json_schema(std::set<std::string>* keys)
     if (all_keys || keys->count("objectinfo"))
     {
         JSON objectinfo = schema.addDictionaryMember(
-            "objectinfo", JSON::makeDictionary());
-        JSON details = objectinfo.addDictionaryMember(
-            "<object-id>", JSON::makeDictionary());
-        JSON stream = details.addDictionaryMember(
-            "stream", JSON::makeDictionary());
-        stream.addDictionaryMember(
-            "is",
-            JSON::makeString("whether the object is a stream"));
-        stream.addDictionaryMember(
-            "length",
-            JSON::makeString("if stream, its length, otherwise null"));
-        stream.addDictionaryMember(
-            "filter",
-            JSON::makeString("if stream, its filters, otherwise null"));
+            "objectinfo", JSON::parse(R"({
+  "<object-id>": {
+    "stream": {
+      "filter": "if stream, its filters, otherwise null",
+      "is": "whether the object is a stream",
+      "length": "if stream, its length, otherwise null"
+    }
+  }
+})"));
     }
     if (all_keys || keys->count("pages"))
     {
-        JSON page = schema.addDictionaryMember("pages", JSON::makeArray()).
-            addArrayElement(JSON::makeDictionary());
-        page.addDictionaryMember(
-            "object",
-            JSON::makeString("reference to original page object"));
-        JSON image = page.addDictionaryMember("images", JSON::makeArray()).
-            addArrayElement(JSON::makeDictionary());
-        image.addDictionaryMember(
-            "name",
-            JSON::makeString("name of image in XObject table"));
-        image.addDictionaryMember(
-            "object",
-            JSON::makeString("reference to image stream"));
-        image.addDictionaryMember(
-            "width",
-            JSON::makeString("image width"));
-        image.addDictionaryMember(
-            "height",
-            JSON::makeString("image height"));
-        image.addDictionaryMember(
-            "colorspace",
-            JSON::makeString("color space"));
-        image.addDictionaryMember(
-            "bitspercomponent",
-            JSON::makeString("bits per component"));
-        image.addDictionaryMember("filter", JSON::makeArray()).
-            addArrayElement(
-                JSON::makeString("filters applied to image data"));
-        image.addDictionaryMember("decodeparms", JSON::makeArray()).
-            addArrayElement(
-                JSON::makeString("decode parameters for image data"));
-        image.addDictionaryMember(
-            "filterable",
-            JSON::makeString("whether image data can be decoded"
-                             " using the decode level qpdf was invoked with"));
-        page.addDictionaryMember("contents", JSON::makeArray()).
-            addArrayElement(
-                JSON::makeString("reference to each content stream"));
-        page.addDictionaryMember(
-            "label",
-            JSON::makeString("page label dictionary, or null if none"));
-        JSON outline = page.addDictionaryMember("outlines", JSON::makeArray()).
-            addArrayElement(JSON::makeDictionary());
-        outline.addDictionaryMember(
-            "object",
-            JSON::makeString("reference to outline that targets this page"));
-        outline.addDictionaryMember(
-            "title",
-            JSON::makeString("outline title"));
-        outline.addDictionaryMember(
-            "dest",
-            JSON::makeString("outline destination dictionary"));
-        page.addDictionaryMember(
-            "pageposfrom1",
-            JSON::makeString("position of page in document numbering from 1"));
+        JSON page = schema.addDictionaryMember("pages", JSON::parse(R"([
+  {
+    "contents": [
+      "reference to each content stream"
+    ],
+    "images": [
+      {
+        "bitspercomponent": "bits per component",
+        "colorspace": "color space",
+        "decodeparms": [
+          "decode parameters for image data"
+        ],
+        "filter": [
+          "filters applied to image data"
+        ],
+        "filterable": "whether image data can be decoded using the decode level qpdf was invoked with",
+        "height": "image height",
+        "name": "name of image in XObject table",
+        "object": "reference to image stream",
+        "width": "image width"
+      }
+    ],
+    "label": "page label dictionary, or null if none",
+    "object": "reference to original page object",
+    "outlines": [
+      {
+        "dest": "outline destination dictionary",
+        "object": "reference to outline that targets this page",
+        "title": "outline title"
+      }
+    ],
+    "pageposfrom1": "position of page in document numbering from 1"
+  }
+])"));
     }
     if (all_keys || keys->count("pagelabels"))
     {
         JSON labels = schema.addDictionaryMember(
-            "pagelabels", JSON::makeArray()).
-            addArrayElement(JSON::makeDictionary());
-        labels.addDictionaryMember(
-            "index",
-            JSON::makeString("starting page position starting from zero"));
-        labels.addDictionaryMember(
-            "label",
-            JSON::makeString("page label dictionary"));
+            "pagelabels", JSON::parse(R"([
+  {
+    "index": "starting page position starting from zero",
+    "label": "page label dictionary"
+  }
+])"));
     }
     if (all_keys || keys->count("outlines"))
     {
         JSON outlines = schema.addDictionaryMember(
-            "outlines", JSON::makeArray()).
-            addArrayElement(JSON::makeDictionary());
-        outlines.addDictionaryMember(
-            "object",
-            JSON::makeString("reference to this outline"));
-        outlines.addDictionaryMember(
-            "title",
-            JSON::makeString("outline title"));
-        outlines.addDictionaryMember(
-            "dest",
-            JSON::makeString("outline destination dictionary"));
-        outlines.addDictionaryMember(
-            "kids",
-            JSON::makeString("array of descendent outlines"));
-        outlines.addDictionaryMember(
-            "open",
-            JSON::makeString("whether the outline is displayed expanded"));
-        outlines.addDictionaryMember(
-            "destpageposfrom1",
-            JSON::makeString("position of destination page in document"
-                             " numbered from 1; null if not known"));
+            "outlines", JSON::parse(R"([
+  {
+    "dest": "outline destination dictionary",
+    "destpageposfrom1": "position of destination page in document numbered from 1; null if not known",
+    "kids": "array of descendent outlines",
+    "object": "reference to this outline",
+    "open": "whether the outline is displayed expanded",
+    "title": "outline title"
+  }
+])"));
     }
     if (all_keys || keys->count("acroform"))
     {
         JSON acroform = schema.addDictionaryMember(
-            "acroform", JSON::makeDictionary());
-        acroform.addDictionaryMember(
-            "hasacroform",
-            JSON::makeString("whether the document has interactive forms"));
-        acroform.addDictionaryMember(
-            "needappearances",
-            JSON::makeString("whether the form fields' appearance"
-                             " streams need to be regenerated"));
-        JSON fields = acroform.addDictionaryMember(
-            "fields", JSON::makeArray()).
-            addArrayElement(JSON::makeDictionary());
-        fields.addDictionaryMember(
-            "object",
-            JSON::makeString("reference to this form field"));
-        fields.addDictionaryMember(
-            "parent",
-            JSON::makeString("reference to this field's parent"));
-        fields.addDictionaryMember(
-            "pageposfrom1",
-            JSON::makeString("position of containing page numbered from 1"));
-        fields.addDictionaryMember(
-            "fieldtype",
-            JSON::makeString("field type"));
-        fields.addDictionaryMember(
-            "fieldflags",
-            JSON::makeString(
-                "form field flags from /Ff --"
-                " see pdf_form_field_flag_e in qpdf/Constants.h"));
-        fields.addDictionaryMember(
-            "fullname",
-            JSON::makeString("full name of field"));
-        fields.addDictionaryMember(
-            "partialname",
-            JSON::makeString("partial name of field"));
-        fields.addDictionaryMember(
-            "alternativename",
-            JSON::makeString(
-                "alternative name of field --"
-                " this is the one usually shown to users"));
-        fields.addDictionaryMember(
-            "mappingname",
-            JSON::makeString("mapping name of field"));
-        fields.addDictionaryMember(
-            "value",
-            JSON::makeString("value of field"));
-        fields.addDictionaryMember(
-            "defaultvalue",
-            JSON::makeString("default value of field"));
-        fields.addDictionaryMember(
-            "quadding",
-            JSON::makeString(
-                "field quadding --"
-                " number indicating left, center, or right"));
-        fields.addDictionaryMember(
-            "ischeckbox",
-            JSON::makeString("whether field is a checkbox"));
-        fields.addDictionaryMember(
-            "isradiobutton",
-            JSON::makeString("whether field is a radio button --"
-                             " buttons in a single group share a parent"));
-        fields.addDictionaryMember(
-            "ischoice",
-            JSON::makeString("whether field is a list, combo, or dropdown"));
-        fields.addDictionaryMember(
-            "istext",
-            JSON::makeString("whether field is a text field"));
-        JSON j_choices = fields.addDictionaryMember(
-            "choices",
-            JSON::makeString("for choices fields, the list of"
-                             " choices presented to the user"));
-        JSON annotation = fields.addDictionaryMember(
-            "annotation", JSON::makeDictionary());
-        annotation.addDictionaryMember(
-            "object",
-            JSON::makeString("reference to the annotation object"));
-        annotation.addDictionaryMember(
-            "appearancestate",
-            JSON::makeString("appearance state --"
-                             " can be used to determine value for"
-                             " checkboxes and radio buttons"));
-        annotation.addDictionaryMember(
-            "annotationflags",
-            JSON::makeString(
-                "annotation flags from /F --"
-                " see pdf_annotation_flag_e in qpdf/Constants.h"));
+            "acroform", JSON::parse(R"({
+  "fields": [
+    {
+      "alternativename": "alternative name of field -- this is the one usually shown to users",
+      "annotation": {
+        "annotationflags": "annotation flags from /F -- see pdf_annotation_flag_e in qpdf/Constants.h",
+        "appearancestate": "appearance state -- can be used to determine value for checkboxes and radio buttons",
+        "object": "reference to the annotation object"
+      },
+      "choices": "for choices fields, the list of choices presented to the user",
+      "defaultvalue": "default value of field",
+      "fieldflags": "form field flags from /Ff -- see pdf_form_field_flag_e in qpdf/Constants.h",
+      "fieldtype": "field type",
+      "fullname": "full name of field",
+      "ischeckbox": "whether field is a checkbox",
+      "ischoice": "whether field is a list, combo, or dropdown",
+      "isradiobutton": "whether field is a radio button -- buttons in a single group share a parent",
+      "istext": "whether field is a text field",
+      "mappingname": "mapping name of field",
+      "object": "reference to this form field",
+      "pageposfrom1": "position of containing page numbered from 1",
+      "parent": "reference to this field's parent",
+      "partialname": "partial name of field",
+      "quadding": "field quadding -- number indicating left, center, or right",
+      "value": "value of field"
+    }
+  ],
+  "hasacroform": "whether the document has interactive forms",
+  "needappearances": "whether the form fields' appearance streams need to be regenerated"
+})"));
     }
     if (all_keys || keys->count("encrypt"))
     {
         JSON encrypt = schema.addDictionaryMember(
-            "encrypt", JSON::makeDictionary());
-        encrypt.addDictionaryMember(
-            "encrypted",
-            JSON::makeString("whether the document is encrypted"));
-        encrypt.addDictionaryMember(
-            "userpasswordmatched",
-            JSON::makeString("whether supplied password matched user password;"
-                             " always false for non-encrypted files"));
-        encrypt.addDictionaryMember(
-            "ownerpasswordmatched",
-            JSON::makeString("whether supplied password matched owner password;"
-                             " always false for non-encrypted files"));
-        JSON capabilities = encrypt.addDictionaryMember(
-            "capabilities", JSON::makeDictionary());
-        capabilities.addDictionaryMember(
-            "accessibility",
-            JSON::makeString("allow extraction for accessibility?"));
-        capabilities.addDictionaryMember(
-            "extract",
-            JSON::makeString("allow extraction?"));
-        capabilities.addDictionaryMember(
-            "printlow",
-            JSON::makeString("allow low resolution printing?"));
-        capabilities.addDictionaryMember(
-            "printhigh",
-            JSON::makeString("allow high resolution printing?"));
-        capabilities.addDictionaryMember(
-            "modifyassembly",
-            JSON::makeString("allow modifying document assembly?"));
-        capabilities.addDictionaryMember(
-            "modifyforms",
-            JSON::makeString("allow modifying forms?"));
-        capabilities.addDictionaryMember(
-            "moddifyannotations",
-            JSON::makeString("allow modifying annotations?"));
-        capabilities.addDictionaryMember(
-            "modifyother",
-            JSON::makeString("allow other modifications?"));
-        capabilities.addDictionaryMember(
-            "modify",
-            JSON::makeString("allow all modifications?"));
-
-        JSON parameters = encrypt.addDictionaryMember(
-            "parameters", JSON::makeDictionary());
-        parameters.addDictionaryMember(
-            "R",
-            JSON::makeString("R value from Encrypt dictionary"));
-        parameters.addDictionaryMember(
-            "V",
-            JSON::makeString("V value from Encrypt dictionary"));
-        parameters.addDictionaryMember(
-            "P",
-            JSON::makeString("P value from Encrypt dictionary"));
-        parameters.addDictionaryMember(
-            "bits",
-            JSON::makeString("encryption key bit length"));
-        parameters.addDictionaryMember(
-            "key",
-            JSON::makeString("encryption key; will be null"
-                             " unless --show-encryption-key was specified"));
-        parameters.addDictionaryMember(
-            "method",
-            JSON::makeString("overall encryption method:"
-                             " none, mixed, RC4, AESv2, AESv3"));
-        parameters.addDictionaryMember(
-            "streammethod",
-            JSON::makeString("encryption method for streams"));
-        parameters.addDictionaryMember(
-            "stringmethod",
-            JSON::makeString("encryption method for string"));
-        parameters.addDictionaryMember(
-            "filemethod",
-            JSON::makeString("encryption method for attachments"));
+            "encrypt", JSON::parse(R"({
+  "capabilities": {
+    "accessibility": "allow extraction for accessibility?",
+    "extract": "allow extraction?",
+    "moddifyannotations": "allow modifying annotations?",
+    "modify": "allow all modifications?",
+    "modifyassembly": "allow modifying document assembly?",
+    "modifyforms": "allow modifying forms?",
+    "modifyother": "allow other modifications?",
+    "printhigh": "allow high resolution printing?",
+    "printlow": "allow low resolution printing?"
+  },
+  "encrypted": "whether the document is encrypted",
+  "ownerpasswordmatched": "whether supplied password matched owner password; always false for non-encrypted files",
+  "parameters": {
+    "P": "P value from Encrypt dictionary",
+    "R": "R value from Encrypt dictionary",
+    "V": "V value from Encrypt dictionary",
+    "bits": "encryption key bit length",
+    "filemethod": "encryption method for attachments",
+    "key": "encryption key; will be null unless --show-encryption-key was specified",
+    "method": "overall encryption method: none, mixed, RC4, AESv2, AESv3",
+    "streammethod": "encryption method for streams",
+    "stringmethod": "encryption method for string"
+  },
+  "userpasswordmatched": "whether supplied password matched user password; always false for non-encrypted files"
+})"));
     }
     if (all_keys || keys->count("attachments"))
     {
         JSON attachments = schema.addDictionaryMember(
-            "attachments", JSON::makeDictionary());
-        JSON details = attachments.addDictionaryMember(
-            "<attachment-key>", JSON::makeDictionary());
-        details.addDictionaryMember(
-            "filespec",
-            JSON::makeString("object containing the file spec"));
-        details.addDictionaryMember(
-            "preferredname",
-            JSON::makeString("most preferred file name"));
-        details.addDictionaryMember(
-            "preferredcontents",
-            JSON::makeString("most preferred embedded file stream"));
+            "attachments", JSON::parse(R"({
+  "<attachment-key>": {
+    "filespec": "object containing the file spec",
+    "preferredcontents": "most preferred embedded file stream",
+    "preferredname": "most preferred file name"
+  }
+})"));
     }
     return schema;
 }
