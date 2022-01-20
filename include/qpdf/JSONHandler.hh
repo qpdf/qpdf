@@ -31,6 +31,11 @@
 #include <stdexcept>
 #include <memory>
 
+// This class allows a sax-like walk through a JSON object with
+// functionality that mostly mirrors QPDFArgParser. It is primarily
+// here to facilitate automatic generation of some of the code to help
+// keep QPDFJob json consistent with command-line arguments.
+
 class JSONHandler
 {
   public:
@@ -53,7 +58,8 @@ class JSONHandler
     // certain type. JSONHandler::Error is thrown otherwise. Multiple
     // handlers may be registered, which allows the object to be of
     // various types. If an anyHandler is added, no other handler will
-    // be called.
+    // be called. There is no "final" handler -- if the top-level is a
+    // dictionary or array, just use its end handler.
 
     typedef std::function<void(
         std::string const& path, JSON value)> json_handler_t;
@@ -80,19 +86,18 @@ class JSONHandler
     QPDF_DLL
     void addBoolHandler(bool_handler_t fn);
 
-    // Returns a reference to a map: keys are expected object keys,
-    // and values are handlers for that object.
     QPDF_DLL
-    std::map<std::string, std::shared_ptr<JSONHandler>>& addDictHandlers();
-
-    // Apply the given handler to any key not explicitly in dict
-    // handlers.
+    void addDictHandlers(void_handler_t start_fn, void_handler_t end_fn);
+    QPDF_DLL
+    void addDictKeyHandler(
+        std::string const& key, std::shared_ptr<JSONHandler>);
     QPDF_DLL
     void addFallbackDictHandler(std::shared_ptr<JSONHandler>);
 
-    // Apply the given handler to each element of the array.
     QPDF_DLL
-    void addArrayHandler(std::shared_ptr<JSONHandler>);
+    void addArrayHandlers(void_handler_t start_fn,
+                          void_handler_t end_fn,
+                          std::shared_ptr<JSONHandler> item_handlers);
 
     // Apply handlers recursively to a JSON object.
     QPDF_DLL
@@ -108,7 +113,12 @@ class JSONHandler
             null_handler(nullptr),
             string_handler(nullptr),
             number_handler(nullptr),
-            bool_handler(nullptr)
+            bool_handler(nullptr),
+            dict_start_handler(nullptr),
+            dict_end_handler(nullptr),
+            array_start_handler(nullptr),
+            array_end_handler(nullptr),
+            final_handler(nullptr)
         {
         }
 
@@ -117,9 +127,14 @@ class JSONHandler
         string_handler_t string_handler;
         string_handler_t number_handler;
         bool_handler_t bool_handler;
+        void_handler_t dict_start_handler;
+        void_handler_t dict_end_handler;
+        void_handler_t array_start_handler;
+        void_handler_t array_end_handler;
+        void_handler_t final_handler;
         std::map<std::string, std::shared_ptr<JSONHandler>> dict_handlers;
         std::shared_ptr<JSONHandler> fallback_dict_handler;
-        std::shared_ptr<JSONHandler> array_handler;
+        std::shared_ptr<JSONHandler> array_item_handler;
     };
 
     class Members

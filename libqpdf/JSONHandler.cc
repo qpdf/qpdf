@@ -46,10 +46,18 @@ JSONHandler::addBoolHandler(bool_handler_t fn)
     this->m->h.bool_handler = fn;
 }
 
-std::map<std::string, std::shared_ptr<JSONHandler>>&
-JSONHandler::addDictHandlers()
+void
+JSONHandler::addDictHandlers(void_handler_t start_fn, void_handler_t end_fn)
 {
-    return this->m->h.dict_handlers;
+    this->m->h.dict_start_handler = start_fn;
+    this->m->h.dict_end_handler = end_fn;
+}
+
+void
+JSONHandler::addDictKeyHandler(
+    std::string const& key, std::shared_ptr<JSONHandler> dkh)
+{
+    this->m->h.dict_handlers[key] = dkh;
 }
 
 void
@@ -59,9 +67,13 @@ JSONHandler::addFallbackDictHandler(std::shared_ptr<JSONHandler> fdh)
 }
 
 void
-JSONHandler::addArrayHandler(std::shared_ptr<JSONHandler> ah)
+JSONHandler::addArrayHandlers(void_handler_t start_fn,
+                              void_handler_t end_fn,
+                              std::shared_ptr<JSONHandler> ah)
 {
-    this->m->h.array_handler = ah;
+    this->m->h.array_start_handler = start_fn;
+    this->m->h.array_end_handler = end_fn;
+    this->m->h.array_item_handler = ah;
 }
 
 void
@@ -95,9 +107,9 @@ JSONHandler::handle(std::string const& path, JSON j)
         this->m->h.bool_handler(path, bvalue);
         handled = true;
     }
-    if ((this->m->h.fallback_dict_handler.get() ||
-         (! this->m->h.dict_handlers.empty())) && j.isDictionary())
+    if (this->m->h.dict_start_handler && j.isDictionary())
     {
+        this->m->h.dict_start_handler(path);
         std::string path_base = path;
         if (path_base != ".")
         {
@@ -126,22 +138,19 @@ JSONHandler::handle(std::string const& path, JSON j)
                 i->second->handle(path_base + k, v);
             }
         });
-
-        // Set handled = true even if we didn't call any handlers.
-        // This dictionary could have been empty, but it's okay since
-        // it's a dictionary like it's supposed to be.
+        this->m->h.dict_end_handler(path);
         handled = true;
     }
-    if (this->m->h.array_handler.get())
+    if (this->m->h.array_start_handler && j.isArray())
     {
+        this->m->h.array_start_handler(path);
         size_t i = 0;
         j.forEachArrayItem([&i, &path, this](JSON v) {
-            this->m->h.array_handler->handle(
+            this->m->h.array_item_handler->handle(
                 path + "[" + QUtil::uint_to_string(i) + "]", v);
             ++i;
         });
-        // Set handled = true even if we didn't call any handlers.
-        // This could have been an empty array.
+        this->m->h.array_end_handler(path);
         handled = true;
     }
 

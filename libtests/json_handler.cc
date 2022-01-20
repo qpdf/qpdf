@@ -28,6 +28,13 @@ static void print_json(std::string const& path, JSON value)
     std::cout << path << ": json: " << value.unparse() << std::endl;
 }
 
+static JSONHandler::void_handler_t make_print_message(std::string msg)
+{
+    return [msg](std::string const& path) {
+        std::cout << path << ": json: " << msg << std::endl;
+    };
+}
+
 static void test_scalar()
 {
     std::cout << "-- scalar --" << std::endl;
@@ -40,41 +47,50 @@ static void test_scalar()
 static std::shared_ptr<JSONHandler> make_all_handler()
 {
     auto h = std::make_shared<JSONHandler>();
-    auto& m = h->addDictHandlers();
+    h->addDictHandlers(
+        make_print_message("dict begin"),
+        make_print_message("dict end"));
     auto h1 = std::make_shared<JSONHandler>();
     h1->addStringHandler(print_string);
-    m["one"] = h1;
+    h->addDictKeyHandler("one", h1);
     auto h2 = std::make_shared<JSONHandler>();
     h2->addNumberHandler(print_number);
-    m["two"] = h2;
+    h->addDictKeyHandler("two", h2);
     auto h3 = std::make_shared<JSONHandler>();
     h3->addBoolHandler(print_bool);
-    m["three"] = h3;
+    h->addDictKeyHandler("three", h3);
     auto h4 = std::make_shared<JSONHandler>();
     h4->addAnyHandler(print_json);
-    m["four"] = h4;
-    m["phour"] = h4;           // share h4
+    h->addDictKeyHandler("four", h4);
+    h->addDictKeyHandler("phour", h4); // share h4
     auto h5 = std::make_shared<JSONHandler>();
     // Allow to be either string or bool
     h5->addBoolHandler(print_bool);
     h5->addStringHandler(print_string);
     h5->addNullHandler(print_null);
     auto h5s = std::make_shared<JSONHandler>();
-    m["five"] = h5s;
-    h5s->addArrayHandler(h5);
+    h->addDictKeyHandler("five", h5s);
+    h5s->addArrayHandlers(
+        make_print_message("array begin"),
+        make_print_message("array end"),
+        h5);
     auto h6 = std::make_shared<JSONHandler>();
-    auto& m6 = h6->addDictHandlers();
+    h6->addDictHandlers(
+        make_print_message("dict begin"),
+        make_print_message("dict end"));
     auto h6a = std::make_shared<JSONHandler>();
-    m6["a"] = h6a;
-    auto& m6a = h6a->addDictHandlers();
+    h6->addDictKeyHandler("a", h6a);
+    h6a->addDictHandlers(
+        make_print_message("dict begin"),
+        make_print_message("dict end"));
     auto h6ab = std::make_shared<JSONHandler>();
-    m6a["b"] = h6ab;
+    h6a->addDictKeyHandler("b", h6ab);
     auto h6ax = std::make_shared<JSONHandler>();
     h6ax->addAnyHandler(print_json);
     h6a->addFallbackDictHandler(h6ax);
-    m6["b"] = h6ab;             // share
+    h6->addDictKeyHandler("b", h6ab); // share
     h6ab->addStringHandler(print_string);
-    m["six"] = h6;
+    h->addDictKeyHandler("six", h6);
     return h;
 }
 
