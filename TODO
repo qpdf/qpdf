@@ -4,6 +4,10 @@ Next
 * High-level API/doc overhaul: #593
 * Add user-defined initializer `QPDFObjectHandle operator ""_qpdf` to
   be like QPDFObjectHandle::parse: `auto oh = "<< /a (b) >>"_qpdf;`
+* Add QPDF_MAJOR_VERSION, QPDF_MINOR_VERSION to some header, possibly
+  dll.h since this is everywhere that there's API
+* Take a fresh look at PointerHolder with a good plan for being able
+  to have developers phase it in using macros or something.
 
 Consider in the context of #593, possibly with a different
 implementation
