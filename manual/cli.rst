@@ -13,11 +13,34 @@
    for additional help. Command line arguments can be referenced using
    :qpdf:ref:`--option`. They also appear in an index.
 
+   STYLE NOTES
+
    In this text, :samp:`...` and ``...`` are used somewhat
    interchangeably. :samp: should be used when there is replaceable
    text enclosed in curly braces. Otherwise, either is fine. Ideally
    there should be a stricter editorial convention, but they render
-   the same, so I have not gone to the trouble of making it consistent.
+   the same, so I have not gone to the trouble of making it
+   consistent.
+
+   USE :qpdf:ref:`--option` to refer to an option whenever it is
+   specified without parameters in any place other than its own help.
+   This creates a link.
+
+   When referring to command-line options, use the following
+   terminology:
+
+   argument: any command-line argument whether option or positional
+   option: any argument starting with -- including its parameter, if any
+   flag: the --flag part of the option; only use to disambiguate
+   parameter: the parameter part of the option
+
+   Example: qpdf in.pdf --object-stream=generalized out.pdf
+
+   Each word is an argument.
+   The "--object-stream=generalized" option consists of
+   the "--object-stream" flag with the "generalized" parameter. It
+   would be okay to talk about "the --object-stream option" in the
+   text if there's no ambiguity.
 
 .. _using:
 
@@ -58,23 +81,24 @@ Basic Invocation
 The :command:`qpdf` command reads the PDF file :samp:`{infile}`,
 applies various transformations or modifications to the file in
 memory, and writes the results to :samp:`{outfile}`. When run with no
-arguments, the output file is functionally identical to the input file
+options, the output file is functionally identical to the input file
 but may be structurally reorganized, and orphaned objects are removed
 from the file. Many options are available for applying transformations
 or modifications to the file.
 
 :samp:`{infile}` can be a regular file, or it can be
-:qpdf:ref:`--empty` to start with an empty PDF file. :samp:`{outfile}`
-can be a regular file, ``-`` to represent standard output, or
-:qpdf:ref:`--replace-input` to indicate that the input file should be
-overwritten. The output file does not have to be seekable, even when
-generating linearized files. The input file *does* have to be
-seekable. You can't read from standard input or a pipe. You can also
-use :qpdf:ref:`--split-pages` to create separate output files for each
+:qpdf:ref:`--empty` to start with an empty PDF file. There is no way
+to use standard input since the input file has to be seekable.
+
+:samp:`{outfile}` can be a regular file, ``-`` to represent standard
+output, or :qpdf:ref:`--replace-input` to indicate that the input file
+should be overwritten. The output file does not have to be seekable,
+even when generating linearized files. You can also use
+:qpdf:ref:`--split-pages` to create separate output files for each
 page (or group of pages) instead of a single output file.
+
 Password-protected files may be opened by specifying a password with
-:qpdf:ref:`--password`. These and many other options are discussed in
-the remaining sections of this chapter.
+:qpdf:ref:`--password`.
 
 All options other than help options (see :ref:`help-options`) require
 an input file. If inspection options (see :ref:`inspection-options`)
@@ -92,8 +116,8 @@ is also very useful for avoiding having to pass passwords on the
 command line, though see also :qpdf:ref:`--password-file`. Note that
 the :samp:`@filename` can't appear in the middle of an argument, so
 constructs such as :samp:`--arg=@filename` will not work. Instead, you
-would have to include the argument and its parameter (e.g.,
-:samp:`--arg=parameter`) as a line in the :file:`filename` file and
+would have to include the option and its parameter (e.g.,
+:samp:`--option=parameter`) as a line in the :file:`filename` file and
 just pass :samp:`@filename` on the command line.
 
 Related Options
@@ -501,7 +525,7 @@ Related Options
    Overrides the usual computation/retrieval of the PDF file's
    encryption key from user/owner password with an explicit
    specification of the encryption key. When this option is specified,
-   the argument to the :qpdf:ref:`--password` option is interpreted as
+   the parameter to the :qpdf:ref:`--password` option is interpreted as
    a hexadecimal-encoded key value. This only applies to the password
    used to open the main input file. It does not apply to other files
    opened by :qpdf:ref:`--pages` or other options or to files being
@@ -791,7 +815,7 @@ Related Options
    :samp:`--compress-streams=n`. In QDF mode (see :ref:`qdf` and
    :qpdf:ref:`--qdf`), the default is to leave streams uncompressed.
 
-.. qpdf:option:: --decode-level=option
+.. qpdf:option:: --decode-level=parameter
 
    .. help: control which streams to uncompress
 
@@ -810,7 +834,7 @@ Related Options
    Controls which streams qpdf tries to decode. The default is
    :samp:`generalized`.
 
-   The following options are available:
+   The following values for :samp:`{parameter}` are available:
 
    - :samp:`none`: do not attempt to decode any streams
 
@@ -847,7 +871,7 @@ Related Options
    are not uncompressed and recompressed. You can change this behavior
    with :qpdf:ref:`--recompress-flate`.
 
-.. qpdf:option:: --stream-data=option
+.. qpdf:option:: --stream-data=parameter
 
    .. help: control stream compression
 
@@ -855,7 +879,7 @@ Related Options
       It is less granular than the newer options, --compress-streams
       and --decode-level.
 
-      Options:
+      Parameters:
       - compress: same as --compress-streams=y --decode-level=generalized
       - preserve: same as --compress-streams=n --decode-level=none
       - uncompress: same as --compress-streams=n --decode-level=generalized
@@ -863,7 +887,7 @@ Related Options
    Controls transformation of stream data. This option predates the
    :qpdf:ref:`--compress-streams` and :qpdf:ref:`--decode-level`
    options. Those options can be used to achieve the same affect with
-   more control. The value of :samp:`{option}` may be one of the
+   more control. The value of :samp:`{parameter}` may be one of the
    following:
 
    - :samp:`compress`: recompress stream data when possible (default);
@@ -1009,15 +1033,15 @@ Related Options
    See also :qpdf:ref:`--preserve-unreferenced-resources`, which does
    something completely different.
 
-.. qpdf:option:: --remove-unreferenced-resources=option
+.. qpdf:option:: --remove-unreferenced-resources=parameter
 
    .. help: remove unreferenced page resources
 
       Remove from a page's resource dictionary any resources that are
-      not referenced in the page's contents. Options: "auto"
+      not referenced in the page's contents. Parameters: "auto"
       (default), "yes", "no".
 
-   Options: ``auto`` (the default), ``yes``, or ``no``.
+   Parameters: ``auto`` (the default), ``yes``, or ``no``.
 
    Starting with qpdf 8.1, when splitting pages, qpdf is able to
    attempt to remove images and fonts that are not used by a page even
@@ -1189,8 +1213,8 @@ Page Ranges
    :even starts with the second page. These are odd and even pages
    from the resulting set, not based on the original page numbers.
 
-Several :command:`qpdf` command-line arguments accept page ranges as
-options. This section describes the syntax of a page range.
+Several :command:`qpdf` command-line options use page ranges. This
+section describes the syntax of a page range.
 
 - A plain number indicates a page numbered from ``1``, so ``1``
   represents the first page.
@@ -1290,12 +1314,12 @@ Related Options
    .. help: collate with --pages
 
       Collate rather than concatenate pages specified with --pages.
-      With a numeric argument, collate in groups of n. The default
+      With a numeric parameter, collate in groups of n. The default
       is 1. Run qpdf --help=page-selection for additional details.
 
    This option causes :command:`qpdf` to collate rather than
    concatenate pages specified with :qpdf:ref:`--pages`. With a
-   numeric argument, collate in groups of :samp:`{n}`. The default
+   numeric parameter, collate in groups of :samp:`{n}`. The default
    is 1.
 
    Please see :ref:`page-selection` for additional details.
@@ -1403,13 +1427,13 @@ Related Options
    reason to use this option unless you are working around a specific
    problem.
 
-.. qpdf:option:: --flatten-annotations=option
+.. qpdf:option:: --flatten-annotations=parameter
 
    .. help: push annotations into content
 
       Push page annotations into the content streams. This may be
       necessary in some case when printing or splitting files.
-      Options: "all", "print", "screen".
+      Parameters: "all", "print", "screen".
 
    This option collapses annotations into the pages' contents with
    special handling for form fields. Ordinarily, an annotation is
@@ -1419,10 +1443,10 @@ Related Options
    transformations. The library functionality backing this option was
    added for the benefit of programs that want to create *n-up* page
    layouts and other similar things that don't work well with
-   annotations. The :samp:`{option}` parameter may be any of the
+   annotations. The value of :samp:`{parameter}` may be any of the
    following:
 
-   .. list-table:: Flatten Annotation Options
+   .. list-table:: Flatten Annotation Parameters
       :widths: 10 80
       :header-rows: 0
 
@@ -2168,7 +2192,7 @@ repeat the following:
 :samp:`{filename} [ --password={password} ] [ {page-range} ]`
 
 Notes:
-  - The password argument is needed only for password-protected files.
+  - The password option is needed only for password-protected files.
     If you specify the same file more than once, you only need to supply
     the password the first time.
 
@@ -2255,7 +2279,7 @@ Examples
 
   - a.pdf page 5
 
-- You can specify a numeric argument to :qpdf:ref:`--collate`. With
+- You can specify a numeric parameter to :qpdf:ref:`--collate`. With
   :samp:`--collate={n}`, pull groups of :samp:`{n}` pages from each
   file, as always, stopping when there are no more pages. For example,
   if you ran
@@ -2917,7 +2941,7 @@ Related Options
    :qpdf:ref:`--check` or :qpdf:ref:`--show-encryption` is given, display the
    computed or retrieved encryption key as a hexadecimal string. This
    value is not ordinarily useful to users, but it can be used as the
-   argument to :qpdf:ref:`--password` if the :qpdf:ref:`--password-is-hex-key`
+   parameter to :qpdf:ref:`--password` if the :qpdf:ref:`--password-is-hex-key`
    is specified. Note that, when PDF files are encrypted, passwords
    and other metadata are used only to compute an encryption key, and
    the encryption key is what is actually used for encryption. This

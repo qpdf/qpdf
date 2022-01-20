@@ -173,7 +173,7 @@ streams uncompressed intentionally.
 }
 static void add_help_3(QPDFArgParser& ap)
 {
-ap.addOptionHelp("--decode-level", "transformation", "control which streams to uncompress", R"(--decode-level=option
+ap.addOptionHelp("--decode-level", "transformation", "control which streams to uncompress", R"(--decode-level=parameter
 
 When uncompressing streams, control which types of compression
 schemes should be uncompressed:
@@ -187,13 +187,13 @@ schemes should be uncompressed:
   with lossy compression schemes like JPEG (DCT)
 qpdf does not know how to uncompress all compression schemes.
 )");
-ap.addOptionHelp("--stream-data", "transformation", "control stream compression", R"(--stream-data=option
+ap.addOptionHelp("--stream-data", "transformation", "control stream compression", R"(--stream-data=parameter
 
 This option controls how streams are compressed in the output.
 It is less granular than the newer options, --compress-streams
 and --decode-level.
 
-Options:
+Parameters:
 - compress: same as --compress-streams=y --decode-level=generalized
 - preserve: same as --compress-streams=n --decode-level=none
 - uncompress: same as --compress-streams=n --decode-level=generalized
@@ -228,10 +228,10 @@ Control what qpdf does regarding object streams. Options:
 )");
 ap.addOptionHelp("--preserve-unreferenced", "transformation", "preserve unreferenced objects", R"(Preserve all objects from the input even if not referenced.
 )");
-ap.addOptionHelp("--remove-unreferenced-resources", "transformation", "remove unreferenced page resources", R"(--remove-unreferenced-resources=option
+ap.addOptionHelp("--remove-unreferenced-resources", "transformation", "remove unreferenced page resources", R"(--remove-unreferenced-resources=parameter
 
 Remove from a page's resource dictionary any resources that are
-not referenced in the page's contents. Options: "auto"
+not referenced in the page's contents. Parameters: "auto"
 (default), "yes", "no".
 )");
 ap.addOptionHelp("--preserve-unreferenced-resources", "transformation", "use --remove-unreferenced-resources=no", R"(Synonym for --remove-unreferenced-resources=no. Use that instead.
@@ -283,7 +283,7 @@ Run qpdf --help=page-selection for details.
 ap.addOptionHelp("--collate", "modification", "collate with --pages", R"(--collate=n
 
 Collate rather than concatenate pages specified with --pages.
-With a numeric argument, collate in groups of n. The default
+With a numeric parameter, collate in groups of n. The default
 is 1. Run qpdf --help=page-selection for additional details.
 )");
 }
@@ -321,11 +321,11 @@ ap.addOptionHelp("--flatten-rotation", "modification", "remove rotation from pag
 metadata. This can be useful if a broken PDF viewer fails to
 properly consider page rotation metadata.
 )");
-ap.addOptionHelp("--flatten-annotations", "modification", "push annotations into content", R"(--flatten-annotations=option
+ap.addOptionHelp("--flatten-annotations", "modification", "push annotations into content", R"(--flatten-annotations=parameter
 
 Push page annotations into the content streams. This may be
 necessary in some case when printing or splitting files.
-Options: "all", "print", "screen".
+Parameters: "all", "print", "screen".
 )");
 ap.addOptionHelp("--rotate", "modification", "rotate pages", R"(--rotate=[+|-]angle[:page-range]
 
