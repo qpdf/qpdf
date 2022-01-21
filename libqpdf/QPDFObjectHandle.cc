@@ -497,6 +497,34 @@ QPDFObjectHandle::isScalar()
                isOperator() || isInlineImage()));
 }
 
+bool
+QPDFObjectHandle::isNameAndEquals(std::string const& name)
+{
+    return isName() && (getName() == name);
+}
+
+bool
+QPDFObjectHandle::isDictionaryOfType(std::string const& type,
+                                     std::string const& subtype)
+{
+    if (isDictionary() && getKey("/Type").isNameAndEquals(type))
+    {
+        return (subtype == "") ||
+            (hasKey("/Subtype") && getKey("/Subtype").isNameAndEquals(subtype));
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool
+QPDFObjectHandle::isStreamOfType(std::string const& type,
+                                 std::string const& subtype)
+{
+    return isStream() && getDict().isDictionaryOfType(type, subtype);
+}
+
 // Bool accessors
 
 bool

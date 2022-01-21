@@ -694,12 +694,16 @@ static void test25(char const* infile,
            (strcmp(qpdf_oh_get_utf8_value(qpdf, p_string), "3\xc3\xb7") == 0) &&
            (strcmp(qpdf_oh_unparse_binary(qpdf, p_string), "<33f7>") == 0));
     assert(qpdf_oh_get_type_code(qpdf, p_string) == ot_string);
+    assert(! qpdf_oh_is_name_and_equals(qpdf, p_string, "3\xf7"));
     assert(strcmp(qpdf_oh_get_type_name(qpdf, p_string), "string") == 0);
     assert(qpdf_oh_is_dictionary(qpdf, p_dict));
     qpdf_oh p_five = qpdf_oh_get_key(qpdf, p_dict, "/Four");
     assert(qpdf_oh_is_or_has_name(qpdf, p_five, "/Five"));
+    assert(! qpdf_oh_is_name_and_equals(qpdf, p_five, "/Five"));
     assert(qpdf_oh_is_or_has_name(
                qpdf, qpdf_oh_get_array_item(qpdf, p_five, 0), "/Five"));
+    assert(qpdf_oh_is_name_and_equals(
+              qpdf, qpdf_oh_get_array_item(qpdf, p_five, 0), "/Five"));
     assert(qpdf_oh_is_null(qpdf, p_null));
     assert(qpdf_oh_get_type_code(qpdf, p_null) == ot_null);
     assert(strcmp(qpdf_oh_get_type_name(qpdf, p_null), "null") == 0);
@@ -710,10 +714,17 @@ static void test25(char const* infile,
     qpdf_oh_erase_item(qpdf, parsed, 4);
     qpdf_oh_insert_item(
         qpdf, parsed, 2,
-        qpdf_oh_parse(qpdf, "<</A 1 /B 2 /C 3 /D 4>>"));
+        qpdf_oh_parse(
+            qpdf, "<</A 1 /B 2 /C 3 /D 4 /Type /Test /Subtype /Marvin>>"));
     qpdf_oh new_dict = qpdf_oh_get_array_item(qpdf, parsed, 2);
     assert(qpdf_oh_has_key(qpdf, new_dict, "/A"));
     assert(qpdf_oh_has_key(qpdf, new_dict, "/D"));
+    assert(qpdf_oh_is_dictionary_of_type(qpdf, new_dict, "/Test", ""));
+    assert(qpdf_oh_is_dictionary_of_type(qpdf, new_dict, "/Test", 0));
+    assert(qpdf_oh_is_dictionary_of_type(qpdf, new_dict, "/Test", "/Marvin"));
+    assert(! qpdf_oh_is_dictionary_of_type(qpdf, new_dict, "/Test2", ""));
+    assert(! qpdf_oh_is_dictionary_of_type(qpdf, new_dict, "/Test", "/M"));
+    assert(! qpdf_oh_is_dictionary_of_type(qpdf, new_dict, "", ""));
     qpdf_oh new_array = qpdf_oh_new_array(qpdf);
     qpdf_oh_replace_or_remove_key(
         qpdf, new_dict, "/A", qpdf_oh_new_null(qpdf));
