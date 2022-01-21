@@ -43,6 +43,9 @@ Documentation
   this can be incorporated directly into sphinx_rtd_theme and the
   workaround can be removed.
 
+* When possible, update the debian package to include docs again. See
+  https://bugs.debian.org/1004159 for details.
+
 Document-level work
 ===================
 
@@ -546,7 +549,6 @@ A few important lessons (in README-maintainer)
 
 Also, it turns out that PointerHolder is more performant than
 std::shared_ptr.
-
 
 Rejected Ideas
 ==============
