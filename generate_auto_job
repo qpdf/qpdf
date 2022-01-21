@@ -229,12 +229,15 @@ class Main:
         self.options_without_help = set(
             ['--completion-bash', '--completion-zsh', '--help']
         )
+        self.prepare(data)
         with open(self.DESTS['decl'], 'w') as f:
             print(BANNER, file=f)
-            self.generate_decl(data, f)
+            for i in self.decls:
+                print(i, file=f)
         with open(self.DESTS['init'], 'w') as f:
             print(BANNER, file=f)
-            self.generate_init(data, f)
+            for i in self.init:
+                print(i, file=f)
         with open(self.DESTS['help'], 'w') as f:
             with open('manual/cli.rst', 'r') as df:
                 print(BANNER, file=f)
@@ -244,6 +247,100 @@ class Main:
         # event of a failure.
         self.update_hashes()
         # DON'T ADD CODE TO generate AFTER update_hashes
+
+    def prepare(self, data):
+        self.decls = []
+        self.init = []
+
+        self.init.append('auto b = [this](void (ArgParser::*f)()) {')
+        self.init.append('    return QPDFArgParser::bindBare(f, this);')
+        self.init.append('};')
+        self.init.append('auto p = [this](void (ArgParser::*f)(char *)) {')
+        self.init.append('    return QPDFArgParser::bindParam(f, this);')
+        self.init.append('};')
+        self.init.append('')
+        for k, v in data['choices'].items():
+            s = f'char const* {k}_choices[] = {{'
+            for i in v:
+                s += f'"{i}", '
+            self.init.append(s + '0};')
+        self.init.append('')
+
+        for o in data['options']:
+            table = o['table']
+            if table in ('main', 'help'):
+                continue
+            i = self.to_identifier(table, 'O', True)
+            self.decls.append(f'static constexpr char const* {i} = "{table}";')
+        self.decls.append('')
+        for o in data['options']:
+            table = o['table']
+
+            if table == 'main':
+                self.init.append('this->ap.selectMainOptionTable();')
+            elif table == 'help':
+                self.init.append('this->ap.selectHelpOptionTable();')
+            else:
+                identifier = self.to_identifier(table, 'argEnd', False)
+                self.init.append(f'this->ap.registerOptionTable("{table}",'
+                                 f' b(&ArgParser::{identifier}));')
+            prefix = 'arg' + o.get('prefix', '')
+            if o.get('positional', False):
+                identifier = self.to_identifier(i, prefix, False)
+                self.decls.append(f'void {prefix}Positional(char*);')
+                self.init.append('this->ap.addPositional('
+                                 f'p(&ArgParser::{prefix}Positional));')
+            for i in o.get('bare', []):
+                self.options_without_help.add(f'--{i}')
+                identifier = self.to_identifier(i, prefix, False)
+                self.decls.append(f'void {identifier}();')
+                self.init.append(f'this->ap.addBare("{i}", '
+                                 f'b(&ArgParser::{identifier}));')
+            for i in o.get('optional_parameter', []):
+                self.options_without_help.add(f'--{i}')
+                identifier = self.to_identifier(i, prefix, False)
+                self.decls.append(f'void {identifier}(char *);')
+                self.init.append(f'this->ap.addOptionalParameter("{i}", '
+                                 f'p(&ArgParser::{identifier}));')
+            for i, v in o.get('required_parameter', {}).items():
+                self.options_without_help.add(f'--{i}')
+                identifier = self.to_identifier(i, prefix, False)
+                self.decls.append(f'void {identifier}(char *);')
+                self.init.append(f'this->ap.addRequiredParameter("{i}", '
+                                 f'p(&ArgParser::{identifier})'
+                                 f', "{v}");')
+            for i, v in o.get('required_choices', {}).items():
+                self.options_without_help.add(f'--{i}')
+                identifier = self.to_identifier(i, prefix, False)
+                self.decls.append(f'void {identifier}(char *);')
+                self.init.append(f'this->ap.addChoices("{i}", '
+                                 f'p(&ArgParser::{identifier})'
+                                 f', true, {v}_choices);')
+            for i, v in o.get('optional_choices', {}).items():
+                self.options_without_help.add(f'--{i}')
+                identifier = self.to_identifier(i, prefix, False)
+                self.decls.append(f'void {identifier}(char *);')
+                self.init.append(f'this->ap.addChoices("{i}", '
+                                 f'p(&ArgParser::{identifier})'
+                                 f', false, {v}_choices);')
+            if table not in ('main', 'help'):
+                identifier = self.to_identifier(table, 'argEnd', False)
+                self.decls.append(f'void {identifier}();')
+        for o in data['options']:
+            table = o['table']
+            if 'from_table' not in o:
+                continue
+            if table == 'main':
+                self.init.append('this->ap.selectMainOptionTable();')
+            elif table == 'help':
+                self.init.append('this->ap.selectHelpOptionTable();')
+            else:
+                self.init.append(f'this->ap.selectOptionTable("{table}");')
+            ft = o['from_table']
+            other_table = ft['table']
+            for j in ft['options']:
+                self.init.append('this->ap.copyFromOtherTable'
+                                 f'("{j}", "{other_table}");')
 
     def check_keys(self, what, d, exp):
         if not isinstance(d, dict):
@@ -264,117 +361,13 @@ class Main:
     def to_identifier(self, label, prefix, const):
         identifier = re.sub(r'[^a-zA-Z0-9]', '_', label)
         if const:
-            identifier = identifier.upper()
+            identifier = f'{prefix}_{identifier.upper()}'
         else:
-            identifier = identifier.lower()
-            identifier = re.sub(r'(?:^|_)([a-z])',
+            identifier = f'{prefix}_{identifier.lower()}'
+            identifier = re.sub(r'_([a-z])',
                                 lambda x: x.group(1).upper(),
                                 identifier).replace('_', '')
-        return prefix + identifier
-
-    def generate_decl(self, data, f):
-        for o in data['options']:
-            table = o['table']
-            if table in ('main', 'help'):
-                continue
-            i = self.to_identifier(table, 'O_', True)
-            print(f'static constexpr char const* {i} = "{table}";', file=f)
-        print('', file=f)
-        for o in data['options']:
-            table = o['table']
-            prefix = 'arg' + o.get('prefix', '')
-            if o.get('positional', False):
-                print(f'void {prefix}Positional(char*);', file=f)
-            for i in o.get('bare', []):
-                identifier = self.to_identifier(i, prefix, False)
-                print(f'void {identifier}();', file=f)
-            for i in o.get('optional_parameter', []):
-                identifier = self.to_identifier(i, prefix, False)
-                print(f'void {identifier}(char *);', file=f)
-            for i in o.get('required_parameter', {}):
-                identifier = self.to_identifier(i, prefix, False)
-                print(f'void {identifier}(char *);', file=f)
-            for i in o.get('required_choices', {}):
-                identifier = self.to_identifier(i, prefix, False)
-                print(f'void {identifier}(char *);', file=f)
-            for i in o.get('optional_choices', {}):
-                identifier = self.to_identifier(i, prefix, False)
-                print(f'void {identifier}(char *);', file=f)
-            if table not in ('main', 'help'):
-                identifier = self.to_identifier(table, 'argEnd', False)
-                print(f'void {identifier}();', file=f)
-
-    def generate_init(self, data, f):
-        print('auto b = [this](void (ArgParser::*f)()) {', file=f)
-        print('    return QPDFArgParser::bindBare(f, this);', file=f)
-        print('};', file=f)
-        print('auto p = [this](void (ArgParser::*f)(char *)) {', file=f)
-        print('    return QPDFArgParser::bindParam(f, this);', file=f)
-        print('};', file=f)
-        print('', file=f)
-        for k, v in data['choices'].items():
-            print(f'char const* {k}_choices[] = {{', file=f, end='')
-            for i in v:
-                print(f'"{i}", ', file=f, end='')
-            print('0};', file=f)
-        print('', file=f)
-        for o in data['options']:
-            table = o['table']
-            if table == 'main':
-                print('this->ap.selectMainOptionTable();', file=f)
-            elif table == 'help':
-                print('this->ap.selectHelpOptionTable();', file=f)
-            else:
-                identifier = self.to_identifier(table, 'argEnd', False)
-                print(f'this->ap.registerOptionTable("{table}",'
-                      f' b(&ArgParser::{identifier}));', file=f)
-            prefix = 'arg' + o.get('prefix', '')
-            if o.get('positional', False):
-                print('this->ap.addPositional('
-                      f'p(&ArgParser::{prefix}Positional));', file=f)
-            for i in o.get('bare', []):
-                self.options_without_help.add(f'--{i}')
-                identifier = self.to_identifier(i, prefix, False)
-                print(f'this->ap.addBare("{i}", '
-                      f'b(&ArgParser::{identifier}));', file=f)
-            for i in o.get('optional_parameter', []):
-                self.options_without_help.add(f'--{i}')
-                identifier = self.to_identifier(i, prefix, False)
-                print(f'this->ap.addOptionalParameter("{i}", '
-                      f'p(&ArgParser::{identifier}));', file=f)
-            for k, v in o.get('required_parameter', {}).items():
-                self.options_without_help.add(f'--{k}')
-                identifier = self.to_identifier(k, prefix, False)
-                print(f'this->ap.addRequiredParameter("{k}", '
-                      f'p(&ArgParser::{identifier})'
-                      f', "{v}");', file=f)
-            for k, v in o.get('required_choices', {}).items():
-                self.options_without_help.add(f'--{k}')
-                identifier = self.to_identifier(k, prefix, False)
-                print(f'this->ap.addChoices("{k}", '
-                      f'p(&ArgParser::{identifier})'
-                      f', true, {v}_choices);', file=f)
-            for k, v in o.get('optional_choices', {}).items():
-                self.options_without_help.add(f'--{k}')
-                identifier = self.to_identifier(k, prefix, False)
-                print(f'this->ap.addChoices("{k}", '
-                      f'p(&ArgParser::{identifier})'
-                      f', false, {v}_choices);', file=f)
-        for o in data['options']:
-            table = o['table']
-            if 'from_table' not in o:
-                continue
-            if table == 'main':
-                print('this->ap.selectMainOptionTable();', file=f)
-            elif table == 'help':
-                print('this->ap.selectHelpOptionTable();', file=f)
-            else:
-                print(f'this->ap.selectOptionTable("{table}");', file=f)
-            ft = o['from_table']
-            other_table = ft['table']
-            for j in ft['options']:
-                print('this->ap.copyFromOtherTable'
-                      f'("{j}", "{other_table}");', file=f)
+        return identifier
 
 
 if __name__ == '__main__':
