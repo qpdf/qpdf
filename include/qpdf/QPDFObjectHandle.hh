@@ -365,6 +365,22 @@ class QPDFObjectHandle
     QPDF_DLL
     bool isScalar();
 
+    // True if the object is a name object representing the provided name.
+    QPDF_DLL
+    bool isNameAndEquals(std::string const& name);
+
+    // True if the object is a dictionary of the specified type and
+    // subtype, if any.
+    QPDF_DLL
+    bool isDictionaryOfType(std::string const& type,
+                          std::string const& subtype = "");
+
+    // True if the object is a stream of the specified type and
+    // subtype, if any.
+    QPDF_DLL
+    bool isStreamOfType(std::string const& type,
+                          std::string const& subtype = "");
+
     // Public factory methods
 
     // Wrap an object in an array if it is not already an array. This

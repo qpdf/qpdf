@@ -474,6 +474,8 @@ qpdf-c called qpdf_oh_is_dictionary 0
 qpdf-c called qpdf_oh_is_stream 0
 qpdf-c called qpdf_oh_is_indirect 0
 qpdf-c called qpdf_oh_is_scalar 0
+qpdf-c called qpdf_oh_is_name_and_equals 0
+qpdf-c called qpdf_oh_is_dictionary_of_type 0
 qpdf-c called qpdf_oh_get_type_code 0
 qpdf-c called qpdf_oh_get_type_name 0
 qpdf-c array to wrap_in_array 0

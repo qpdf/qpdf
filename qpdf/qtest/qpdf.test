@@ -1913,7 +1913,7 @@ $td->runtest("progress report on small file",
 show_ntests();
 # ----------
 $td->notify("--- Type checks ---");
-$n_tests += 4;
+$n_tests += 5;
 # Whenever object-types.pdf is edited, object-types-os.pdf should be
 # regenerated.
 $td->runtest("ensure object-types-os is up-to-date",
@@ -1936,6 +1936,10 @@ $td->runtest("type checks with object streams",
              {$td->COMMAND => "test_driver 42 object-types-os.pdf"},
              {$td->FILE => "object-types-os.out",
               $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("compound type checks",
+             {$td->COMMAND => "test_driver 82 object-types-os.pdf"},
+             {$td->STRING => "test 82 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 # ----------

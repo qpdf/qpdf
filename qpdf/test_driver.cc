@@ -3097,6 +3097,39 @@ static void test_81(QPDF& pdf, char const* arg2)
     }
 }
 
+static void test_82(QPDF& pdf, char const* arg2)
+{
+    // Exercise compound test methods QPDFObjectHandle::isNameAndEquals,
+    // isDictionaryOfType and isStreamOfType
+    auto name = QPDFObjectHandle::newName("/Marvin");
+    auto str = QPDFObjectHandle::newString("/Marvin");
+    assert(name.isNameAndEquals("/Marvin"));
+    assert(! name.isNameAndEquals("Marvin"));
+    assert(! str.isNameAndEquals("/Marvin"));
+    auto dict = QPDFObjectHandle::parse("<</A 1 /Type /Test /Subtype /Marvin>>");
+    assert(dict.isDictionaryOfType( "/Test", ""));
+    assert(dict.isDictionaryOfType("/Test"));
+    assert(dict.isDictionaryOfType("/Test", "/Marvin"));
+    assert(! dict.isDictionaryOfType("/Test2", ""));
+    assert(! dict.isDictionaryOfType("/Test2", "/Marvin"));
+    assert(! dict.isDictionaryOfType("/Test", "/M"));
+    assert(! dict.isDictionaryOfType("", "/Marvin"));
+    assert(! dict.isDictionaryOfType("", ""));
+    dict = QPDFObjectHandle::parse("<</A 1 /Type null /Subtype /Marvin>>");
+    assert(! dict.isDictionaryOfType("/Test"));
+    dict = QPDFObjectHandle::parse("<</A 1 /Type (Test) /Subtype /Marvin>>");
+    assert(! dict.isDictionaryOfType("Test"));
+    dict = QPDFObjectHandle::parse("<</A 1 /Type /Test /Subtype (Marvin)>>");
+    assert(! dict.isDictionaryOfType("Test"));
+    dict = QPDFObjectHandle::parse("<</A 1 /Subtype /Marvin>>");
+    assert(! dict.isDictionaryOfType("/Test", "Marvin"));
+    auto stream = pdf.getObjectByID(1,0);
+    assert(stream.isStreamOfType("/ObjStm"));
+    assert(! stream.isStreamOfType("/Test"));
+    assert(! pdf.getObjectByID(2,0).isStreamOfType("/Pages"));
+}
+
+
 void runtest(int n, char const* filename1, char const* arg2)
 {
     // Most tests here are crafted to work on specific files.  Look at
@@ -3210,7 +3243,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         {68, test_68}, {69, test_69}, {70, test_70}, {71, test_71},
         {72, test_72}, {73, test_73}, {74, test_74}, {75, test_75},
         {76, test_76}, {77, test_77}, {78, test_78}, {79, test_79},
-        {80, test_80}, {81, test_81},
+        {80, test_80}, {81, test_81}, {82, test_82},
     };
 
     auto fn = test_functions.find(n);
