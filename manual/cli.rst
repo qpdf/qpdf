@@ -2782,6 +2782,12 @@ Options in this section are valid between
 PDF Inspection
 --------------
 
+.. help-topic inspection: inspect PDF files
+
+   These options provide tools for inspecting PDF files. When any of
+   the options in this section are specified, no output file should be
+   given.
+
 These options provide tools for inspecting PDF files. When any of the
 options in this section are specified, no output file should be given.
 

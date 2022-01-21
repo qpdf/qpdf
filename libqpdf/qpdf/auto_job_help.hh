@@ -700,7 +700,11 @@ Prepend a prefix to each key; may be needed if there are
 duplicate attachment keys. This affects the key only, not the
 file name.
 )");
-ap.addOptionHelp("--is-encrypted", "copy-attachments", "silently test whether a file is encrypted", R"(Silently exit with a code indicating the file's encryption status:
+ap.addHelpTopic("inspection", "inspect PDF files", R"(These options provide tools for inspecting PDF files. When any of
+the options in this section are specified, no output file should be
+given.
+)");
+ap.addOptionHelp("--is-encrypted", "inspection", "silently test whether a file is encrypted", R"(Silently exit with a code indicating the file's encryption status:
 
 0: the file is encrypted
 1: not used
@@ -709,64 +713,64 @@ ap.addOptionHelp("--is-encrypted", "copy-attachments", "silently test whether a 
 This can be used with password-protected files even if you don't
 know the password.
 )");
-ap.addOptionHelp("--requires-password", "copy-attachments", "silently test a file's password", R"(Silently exit with a code indicating the file's password status:
+ap.addOptionHelp("--requires-password", "inspection", "silently test a file's password", R"(Silently exit with a code indicating the file's password status:
 
 0: a password, other than as supplied, is required
 1: not used
 2: the file is not encrypted
 3: the file is encrypted, and correct password (if any) has been supplied
 )");
-ap.addOptionHelp("--check", "copy-attachments", "partially check whether PDF is valid", R"(Check the structure of the PDF file as well as a number of other
+ap.addOptionHelp("--check", "inspection", "partially check whether PDF is valid", R"(Check the structure of the PDF file as well as a number of other
 aspects of the file, and write information about the file to
 standard output. Note that qpdf does not perform any validation
 of the actual PDF page content or semantic correctness of the
 PDF file. It merely checks that the PDF file is syntactically
 valid. See also qpdf --help=exit-status.
 )");
-ap.addOptionHelp("--show-encryption", "copy-attachments", "information about encrypted files", R"(Show document encryption parameters. Also show the document's
+ap.addOptionHelp("--show-encryption", "inspection", "information about encrypted files", R"(Show document encryption parameters. Also show the document's
 user password if the owner password is given and the file was
 encrypted using older encryption formats that allow user
 password recovery.
 )");
-ap.addOptionHelp("--show-encryption-key", "copy-attachments", "show key with --show-encryption", R"(When used with --show-encryption, causes the underlying
+ap.addOptionHelp("--show-encryption-key", "inspection", "show key with --show-encryption", R"(When used with --show-encryption, causes the underlying
 encryption key to be displayed.
 )");
-ap.addOptionHelp("--check-linearization", "copy-attachments", "check linearization tables", R"(Check to see whether a file is linearized and, if so, whether
+ap.addOptionHelp("--check-linearization", "inspection", "check linearization tables", R"(Check to see whether a file is linearized and, if so, whether
 the linearization hint tables are correct.
 )");
-ap.addOptionHelp("--show-linearization", "copy-attachments", "show linearization hint tables", R"(Check and display all data in the linearization hint tables.
-)");
-ap.addOptionHelp("--show-xref", "copy-attachments", "show cross reference data", R"(Show the contents of the cross-reference table or stream (object
-locations in the file) in a human-readable form. This is
-especially useful for files with cross-reference streams, which
-are stored in a binary format.
+ap.addOptionHelp("--show-linearization", "inspection", "show linearization hint tables", R"(Check and display all data in the linearization hint tables.
 )");
 }
 static void add_help_7(QPDFArgParser& ap)
 {
-ap.addOptionHelp("--show-object", "copy-attachments", "show contents of an object", R"(--show-object=trailer|obj[,gen]
+ap.addOptionHelp("--show-xref", "inspection", "show cross reference data", R"(Show the contents of the cross-reference table or stream (object
+locations in the file) in a human-readable form. This is
+especially useful for files with cross-reference streams, which
+are stored in a binary format.
+)");
+ap.addOptionHelp("--show-object", "inspection", "show contents of an object", R"(--show-object=trailer|obj[,gen]
 
 Show the contents of the given object. This is especially useful
 for inspecting objects that are inside of object streams (also
 known as "compressed objects").
 )");
-ap.addOptionHelp("--raw-stream-data", "copy-attachments", "show raw stream data", R"(When used with --show-object, if the object is a stream, write
+ap.addOptionHelp("--raw-stream-data", "inspection", "show raw stream data", R"(When used with --show-object, if the object is a stream, write
 the raw (compressed) binary stream data to standard output
 instead of the object's contents. See also
 --filtered-stream-data.
 )");
-ap.addOptionHelp("--filtered-stream-data", "copy-attachments", "show filtered stream data", R"(When used with --show-object, if the object is a stream, write
+ap.addOptionHelp("--filtered-stream-data", "inspection", "show filtered stream data", R"(When used with --show-object, if the object is a stream, write
 the filtered (uncompressed, potentially binary) stream data to
 standard output instead of the object's contents. See also
 --raw-stream-data.
 )");
-ap.addOptionHelp("--show-npages", "copy-attachments", "show number of pages", R"(Print the number of pages in the input file on a line by itself.
+ap.addOptionHelp("--show-npages", "inspection", "show number of pages", R"(Print the number of pages in the input file on a line by itself.
 Useful for scripts.
 )");
-ap.addOptionHelp("--show-pages", "copy-attachments", "display page dictionary information", R"(Show the object and generation number for each page dictionary
+ap.addOptionHelp("--show-pages", "inspection", "display page dictionary information", R"(Show the object and generation number for each page dictionary
 object and for each content stream associated with the page.
 )");
-ap.addOptionHelp("--with-images", "copy-attachments", "include image details with --show-pages", R"(When used with --show-pages, also shows the object and
+ap.addOptionHelp("--with-images", "inspection", "include image details with --show-pages", R"(When used with --show-pages, also shows the object and
 generation numbers for the image objects on each page.
 )");
 ap.addHelpTopic("json", "JSON output for PDF information", R"(Show information about the PDF file in JSON format. Please see the
