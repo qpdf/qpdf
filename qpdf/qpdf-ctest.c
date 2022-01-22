@@ -703,7 +703,7 @@ static void test25(char const* infile,
     assert(qpdf_oh_is_or_has_name(
                qpdf, qpdf_oh_get_array_item(qpdf, p_five, 0), "/Five"));
     assert(qpdf_oh_is_name_and_equals(
-              qpdf, qpdf_oh_get_array_item(qpdf, p_five, 0), "/Five"));
+               qpdf, qpdf_oh_get_array_item(qpdf, p_five, 0), "/Five"));
     assert(qpdf_oh_is_null(qpdf, p_null));
     assert(qpdf_oh_get_type_code(qpdf, p_null) == ot_null);
     assert(strcmp(qpdf_oh_get_type_name(qpdf, p_null), "null") == 0);

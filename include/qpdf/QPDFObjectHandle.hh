@@ -373,13 +373,13 @@ class QPDFObjectHandle
     // subtype, if any.
     QPDF_DLL
     bool isDictionaryOfType(std::string const& type,
-                          std::string const& subtype = "");
+                            std::string const& subtype = "");
 
     // True if the object is a stream of the specified type and
     // subtype, if any.
     QPDF_DLL
     bool isStreamOfType(std::string const& type,
-                          std::string const& subtype = "");
+                        std::string const& subtype = "");
 
     // Public factory methods
 

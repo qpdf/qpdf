@@ -3129,7 +3129,6 @@ static void test_82(QPDF& pdf, char const* arg2)
     assert(! pdf.getObjectByID(2,0).isStreamOfType("/Pages"));
 }
 
-
 void runtest(int n, char const* filename1, char const* arg2)
 {
     // Most tests here are crafted to work on specific files.  Look at

@@ -1159,7 +1159,7 @@ QPDF_BOOL qpdf_oh_is_name_and_equals(
 }
 
 QPDF_BOOL qpdf_oh_is_dictionary_of_type(
-        qpdf_data qpdf, qpdf_oh oh, char const* type, char const* subtype)
+    qpdf_data qpdf, qpdf_oh oh, char const* type, char const* subtype)
 {
     auto stype = (subtype == nullptr) ? "" : subtype;
     return do_with_oh<QPDF_BOOL>(
