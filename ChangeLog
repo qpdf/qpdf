@@ -1,3 +1,9 @@
+2022-01-22  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add convenience methods isNameAndEquals and isDictionaryOfType
+	to QPDFObjectHandle with corresponding functions added to the C
+	API. Thanks to m-holger for the contribution.
+
 2022-01-11  Jay Berkenbilt  <ejb@ql.org>
 
 	* Bug fix: add missing characters from PDF doc encoding.
