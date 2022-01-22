@@ -58,6 +58,7 @@ options:
       - copyright
       - json-help
       - show-crypto
+      - job-json-help
   - table: main
     positional: true
     bare:
@@ -120,6 +121,7 @@ options:
       encryption-file-password: password
       force-version: version
       ii-min-bytes: minimum
+      job-json-file: file
       json-object: trailer
       keep-files-open-threshold: count
       linearize-pass1: filename
@@ -219,6 +221,7 @@ options:
       password: password
 no-json:
   - preserve-unreferenced-resources
+  - job-json-file
 json:
   # The structure of this section defines what the json input to
   # QPDFJob looks like. If a key starts with underscore or has a value

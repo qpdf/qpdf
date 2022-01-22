@@ -35,6 +35,7 @@
 #include <map>
 #include <iostream>
 #include <functional>
+#include <memory>
 
 class QPDFWriter;
 
@@ -66,6 +67,10 @@ class QPDFJob
     QPDF_DLL
     void initializeFromArgv(int argc, char* argv[],
                             char const* progname_env = nullptr);
+
+    // QXXXQ
+    QPDF_DLL
+    void initializeFromJson(std::string const& json);
 
     // Set name that is used to prefix verbose messages, progress
     // messages, and other things that the library writes to output

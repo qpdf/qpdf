@@ -157,6 +157,18 @@ Related Options
    :file:`{infilename}.~qpdf-orig`. If there are errors, the input
    file is left untouched.
 
+.. qpdf:option:: --job-json-file=file
+
+   .. help: job JSON file
+
+      Specify the name of a file whose contents are expected to
+      contain a QPDFJob json file.
+
+   Specify the name of a file whose contents are expected to contain a
+   QPDFJob json file. QXXXQ ref.  This file is read and treated as if
+   the equivalent command-line arguments were supplied. It can be
+   mixed freely with other options.
+
 .. _exit-status:
 
 Exit Status
@@ -3146,6 +3158,14 @@ Related Options
    This option is repeatable. If given, only specified objects will
    be shown in the "``objects``" key of the JSON output. Otherwise, all
    objects will be shown.
+
+.. qpdf:option:: --job-json-help
+
+   .. help: show format of job json
+
+      Describe the format of the QPDFJob JSON input.
+
+   Describe the format of the QPDFJob JSON input. QXXXQ doc ref.
 
 .. _test-options:
 

@@ -27,6 +27,11 @@ with --pages.
 )");
 ap.addOptionHelp("--replace-input", "usage", "replace input with output", R"(Use in place of outfile to overwrite the input file with the output.
 )");
+ap.addOptionHelp("--job-json-file", "usage", "job JSON file", R"(--job-json-file=file
+
+Specify the name of a file whose contents are expected to
+contain a QPDFJob json file.
+)");
 ap.addHelpTopic("exit-status", "meanings of qpdf's exit codes", R"(Meaning of exit codes:
 
 0: no errors or warnings
@@ -78,14 +83,14 @@ performed.
 )");
 ap.addOptionHelp("--progress", "general", "show progress when writing", R"(Indicate progress when writing files.
 )");
+}
+static void add_help_2(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--no-warn", "general", "suppress printing warning messages", R"(Suppress printing warning messages. If warnings were
 encountered, qpdf still exits with exit status 3.
 Use --warning-exit-0 with --no-warn to completely ignore
 warnings.
 )");
-}
-static void add_help_2(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--deterministic-id", "general", "generate ID deterministically", R"(Generate a secure, random document ID only using static
 information, such as the page contents. Does not use the file's
 name or attributes or the current time.
@@ -164,15 +169,15 @@ chapter about it in the manual.
 ap.addOptionHelp("--no-original-object-ids", "transformation", "omit original object ID in qdf", R"(Omit comments in a QDF file indicating the object ID an object
 had in the original file.
 )");
+}
+static void add_help_3(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--compress-streams", "transformation", "compress uncompressed streams", R"(--compress-streams=[yn]
 
 Setting --compress-streams=n prevents qpdf from compressing
 uncompressed streams. This can be useful if you are leaving some
 streams uncompressed intentionally.
 )");
-}
-static void add_help_3(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--decode-level", "transformation", "control which streams to uncompress", R"(--decode-level=parameter
 
 When uncompressing streams, control which types of compression
@@ -280,15 +285,15 @@ ap.addOptionHelp("--pages", "modification", "begin page selection", R"(--pages f
 
 Run qpdf --help=page-selection for details.
 )");
+}
+static void add_help_4(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--collate", "modification", "collate with --pages", R"(--collate=n
 
 Collate rather than concatenate pages specified with --pages.
 With a numeric parameter, collate in groups of n. The default
 is 1. Run qpdf --help=page-selection for additional details.
 )");
-}
-static void add_help_4(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--split-pages", "modification", "write pages to separate files", R"(--split-pages=[n]
 
 This option causes qpdf to create separate output files for each
@@ -451,15 +456,15 @@ ap.addOptionHelp("--extract", "encryption", "restrict text/graphic extraction", 
 Enable/disable text/graphic extraction for purposes other than
 accessibility.
 )");
+}
+static void add_help_5(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--form", "encryption", "restrict form filling", R"(--form=[yn]
 
 Enable/disable whether filling form fields is allowed even if
 modification of annotations is disabled. This option is not
 available with 40-bit encryption.
 )");
-}
-static void add_help_5(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--modify-other", "encryption", "restrict other modifications", R"(--modify-other=[yn]
 
 Enable/disable modifications not controlled by --assemble,
@@ -625,15 +630,15 @@ ap.addOptionHelp("--remove-attachment", "attachments", "remove an embedded file"
 Remove an embedded file using its key. Get the key with
 --list-attachments.
 )");
+}
+static void add_help_6(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--copy-attachments-from", "attachments", "start copy attachment options", R"(--copy-attachments-from file options --
 
 The --copy-attachments-from flag and its options may be repeated
 to copy attachments from multiple files. Run
 qpdf --help=copy-attachments for details.
 )");
-}
-static void add_help_6(QPDFArgParser& ap)
-{
 ap.addHelpTopic("pdf-dates", "PDF date format", R"(When a date is required, the date should conform to the PDF date
 format specification, which is "D:yyyymmddhhmmssz" where "z" is
 either literally upper case "Z" for UTC or a timezone offset in
@@ -738,11 +743,11 @@ encryption key to be displayed.
 ap.addOptionHelp("--check-linearization", "inspection", "check linearization tables", R"(Check to see whether a file is linearized and, if so, whether
 the linearization hint tables are correct.
 )");
-ap.addOptionHelp("--show-linearization", "inspection", "show linearization hint tables", R"(Check and display all data in the linearization hint tables.
-)");
 }
 static void add_help_7(QPDFArgParser& ap)
 {
+ap.addOptionHelp("--show-linearization", "inspection", "show linearization hint tables", R"(Check and display all data in the linearization hint tables.
+)");
 ap.addOptionHelp("--show-xref", "inspection", "show cross reference data", R"(Show the contents of the cross-reference table or stream (object
 locations in the file) in a human-readable form. This is
 especially useful for files with cross-reference streams, which
@@ -792,6 +797,8 @@ ap.addOptionHelp("--json-object", "json", "restrict which objects are in JSON", 
 This option is repeatable. If given, only specified objects will
 be shown in the "objects" key of the JSON output. Otherwise, all
 objects will be shown.
+)");
+ap.addOptionHelp("--job-json-help", "json", "show format of job json", R"(Describe the format of the QPDFJob JSON input.
 )");
 ap.addHelpTopic("testing", "options for testing or debugging", R"(The options below are useful when writing automated test code that
 includes files created by qpdf or when testing qpdf itself.

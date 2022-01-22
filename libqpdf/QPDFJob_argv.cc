@@ -8,6 +8,7 @@
 #include <cstdio>
 #include <ctype.h>
 #include <memory>
+#include <sstream>
 
 #include <qpdf/QUtil.hh>
 #include <qpdf/QTC.hh>
@@ -15,6 +16,10 @@
 #include <qpdf/QPDFArgParser.hh>
 #include <qpdf/QPDFJob.hh>
 #include <qpdf/QIntC.hh>
+#include <qpdf/JSONHandler.hh>
+
+#include <qpdf/auto_job_schema.hh>
+static JSON JOB_SCHEMA = JSON::parse(JOB_SCHEMA_DATA);
 
 namespace
 {
@@ -1329,6 +1334,31 @@ ArgParser::argEndCopyAttachment()
 }
 
 void
+ArgParser::argJobJsonFile(char* parameter)
+{
+    PointerHolder<char> file_buf;
+    size_t size;
+    QUtil::read_file_into_memory(parameter, file_buf, size);
+    try
+    {
+        o.initializeFromJson(std::string(file_buf.getPointer(), size));
+    }
+    catch (std::exception& e)
+    {
+        throw std::runtime_error(
+            "error with job-json file " + std::string(parameter) + " " +
+            e.what() + "\nRun " + this->ap.getProgname() +
+            "--job-json-help for information on the file format.");
+    }
+}
+
+void
+ArgParser::argJobJsonHelp()
+{
+    std::cout << JOB_SCHEMA_DATA << std::endl;
+}
+
+void
 ArgParser::usage(std::string const& message)
 {
     this->ap.usage(message);
@@ -1533,4 +1563,94 @@ QPDFJob::initializeFromArgv(int argc, char* argv[], char const* progname_env)
     setMessagePrefix(qap.getProgname());
     ArgParser ap(qap, *this);
     ap.parseOptions();
+}
+
+void
+QPDFJob::initializeFromJson(std::string const& json)
+{
+    std::list<std::string> errors;
+    JSON j = JSON::parse(json);
+    if (! j.checkSchema(JOB_SCHEMA, JSON::f_optional, errors))
+    {
+        std::ostringstream msg;
+        msg << this->m->message_prefix
+            << ": job json has errors:";
+        for (auto const& error: errors)
+        {
+            msg << std::endl << "  " << error;
+        }
+        throw std::runtime_error(msg.str());
+    }
+
+    JSONHandler jh;
+    {
+        jh.addDictHandlers(
+            [](std::string const&){},
+            [](std::string const&){});
+
+        auto input = std::make_shared<JSONHandler>();
+        auto input_file = std::make_shared<JSONHandler>();
+        auto input_file_name = std::make_shared<JSONHandler>();
+        auto output = std::make_shared<JSONHandler>();
+        auto output_file = std::make_shared<JSONHandler>();
+        auto output_file_name = std::make_shared<JSONHandler>();
+        auto output_options = std::make_shared<JSONHandler>();
+        auto output_options_qdf = std::make_shared<JSONHandler>();
+
+        input->addDictHandlers(
+            [](std::string const&){},
+            [](std::string const&){});
+        input_file->addDictHandlers(
+            [](std::string const&){},
+            [](std::string const&){});
+        output->addDictHandlers(
+            [](std::string const&){},
+            [](std::string const&){});
+        output_file->addDictHandlers(
+            [](std::string const&){},
+            [](std::string const&){});
+        output_options->addDictHandlers(
+            [](std::string const&){},
+            [](std::string const&){});
+
+        jh.addDictKeyHandler("input", input);
+        input->addDictKeyHandler("file", input_file);
+        input_file->addDictKeyHandler("name", input_file_name);
+        jh.addDictKeyHandler("output", output);
+        output->addDictKeyHandler("file", output_file);
+        output_file->addDictKeyHandler("name", output_file_name);
+        output->addDictKeyHandler("options", output_options);
+        output_options->addDictKeyHandler("qdf", output_options_qdf);
+
+        input_file_name->addStringHandler(
+            [this](std::string const&, std::string const& v) {
+                this->infilename = QUtil::make_shared_cstr(v);
+            });
+        output_file_name->addStringHandler(
+            [this](std::string const&, std::string const& v) {
+                this->outfilename = QUtil::make_shared_cstr(v);
+            });
+        output_options_qdf->addBoolHandler(
+            [this](std::string const&, bool v) {
+                this->qdf_mode = v;
+            });
+    }
+
+    // {
+    //   "input": {
+    //     "file": {
+    //       "name": "/home/ejb/source/examples/pdf/minimal.pdf"
+    //     }
+    //   },
+    //   "output": {
+    //     "file": {
+    //       "name": "/tmp/a.pdf"
+    //     },
+    //     "options": {
+    //       "qdf": true
+    //     }
+    //   }
+    // }
+
+    jh.handle(".", j);
 }

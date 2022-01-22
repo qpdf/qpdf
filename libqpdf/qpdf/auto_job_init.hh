@@ -26,6 +26,7 @@ this->ap.addBare("version", b(&ArgParser::argVersion));
 this->ap.addBare("copyright", b(&ArgParser::argCopyright));
 this->ap.addBare("json-help", b(&ArgParser::argJsonHelp));
 this->ap.addBare("show-crypto", b(&ArgParser::argShowCrypto));
+this->ap.addBare("job-json-help", b(&ArgParser::argJobJsonHelp));
 this->ap.selectMainOptionTable();
 this->ap.addPositional(p(&ArgParser::argPositional));
 this->ap.addBare("add-attachment", b(&ArgParser::argAddAttachment));
@@ -85,6 +86,7 @@ this->ap.addRequiredParameter("copy-encryption", p(&ArgParser::argCopyEncryption
 this->ap.addRequiredParameter("encryption-file-password", p(&ArgParser::argEncryptionFilePassword), "password");
 this->ap.addRequiredParameter("force-version", p(&ArgParser::argForceVersion), "version");
 this->ap.addRequiredParameter("ii-min-bytes", p(&ArgParser::argIiMinBytes), "minimum");
+this->ap.addRequiredParameter("job-json-file", p(&ArgParser::argJobJsonFile), "file");
 this->ap.addRequiredParameter("json-object", p(&ArgParser::argJsonObject), "trailer");
 this->ap.addRequiredParameter("keep-files-open-threshold", p(&ArgParser::argKeepFilesOpenThreshold), "count");
 this->ap.addRequiredParameter("linearize-pass1", p(&ArgParser::argLinearizePass1), "filename");
