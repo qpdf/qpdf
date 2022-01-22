@@ -1,5 +1,9 @@
 2022-01-22  Jay Berkenbilt  <ejb@ql.org>
 
+	* JSON: for (qpdf-specific, not official) "schema" checking, add
+	the ability to treat missing fields as optional. Also ensure that
+	values in the schema are dictionary, array, or string.
+
 	* Add convenience methods isNameAndEquals and isDictionaryOfType
 	to QPDFObjectHandle with corresponding functions added to the C
 	API. Thanks to m-holger for the contribution.

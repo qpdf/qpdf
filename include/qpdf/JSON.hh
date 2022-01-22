@@ -107,20 +107,38 @@ class JSON
     //     single-element arrays, and strings only.
     //   * Recursively walk the schema
     //   * If the current value is a dictionary, this object must have
-    //     a dictionary in the same place with the same keys
+    //     a dictionary in the same place with the same keys. If flags
+    //     contains f_optional, a key in the schema does not have to
+    //     be present in the object. Otherwise, all keys have to be
+    //     present. Any key in the object must be present in the
+    //     schema.
     //   * If the current value is an array, this object must have an
     //     array in the same place. The schema's array must contain a
     //     single element, which is used as a schema to validate each
     //     element of this object's corresponding array.
-    //   * Otherwise, the value is ignored.
+    //   * Otherwise, the value must be a string whose value is a
+    //     description of the object's corresponding value, which may
+    //     have any type.
     //
     // QPDF's JSON output conforms to certain strict compatibility
     // rules as discussed in the manual. The idea is that a JSON
     // structure created manually in qpdf.cc doubles as both JSON help
     // information and a schema for validating the JSON that qpdf
     // generates. Any discrepancies are a bug in qpdf.
+    //
+    // Flags is a bitwise or of values from check_flags_e.
+    enum check_flags_e {
+        f_none = 0,
+        f_optional = 1 << 0,
+    };
+    QPDF_DLL
+    bool checkSchema(JSON schema, unsigned long flags,
+                     std::list<std::string>& errors);
+
+    // Same as passing 0 for flags
     QPDF_DLL
     bool checkSchema(JSON schema, std::list<std::string>& errors);
+
 
     // Create a JSON object from a string.
     QPDF_DLL
@@ -180,6 +198,7 @@ class JSON
 
     static bool
     checkSchemaInternal(JSON_value* this_v, JSON_value* sch_v,
+                        unsigned long flags,
                         std::list<std::string>& errors,
                         std::string prefix);
 

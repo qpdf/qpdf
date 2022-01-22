@@ -112,12 +112,12 @@ static void test_main()
     assert(dvalue == xdvalue);
 }
 
-static void check_schema(JSON& obj, JSON& schema, bool exp,
-                         std::string const& description)
+static void check_schema(JSON& obj, JSON& schema, unsigned long flags,
+                         bool exp, std::string const& description)
 {
     std::list<std::string> errors;
     std::cout << "--- " << description << std::endl;
-    assert(exp == obj.checkSchema(schema, errors));
+    assert(exp == obj.checkSchema(schema, flags, errors));
     for (std::list<std::string>::iterator iter = errors.begin();
          iter != errors.end(); ++iter)
     {
@@ -134,8 +134,7 @@ static void test_schema()
     "a": {
       "q": "queue",
       "r": {
-        "x": "ecks",
-        "y": "(bool) why"
+        "x": "ecks"
       },
       "s": [
         "esses"
@@ -151,14 +150,14 @@ static void test_schema()
   "three": {
     "<objid>": {
       "z": "ebra",
-      "o": "(optional, string) optional"
+      "o": "ptional"
     }
   }
 }
 )");
 
     JSON a = JSON::parse(R"(["not a", "dictionary"])");
-    check_schema(a, schema, false, "top-level type mismatch");
+    check_schema(a, schema, 0, false, "top-level type mismatch");
     JSON b = JSON::parse(R"(
 {
   "one": {
@@ -205,10 +204,42 @@ static void test_schema()
 }
 )");
 
-    check_schema(b, schema, false, "missing items");
-    check_schema(a, a, false, "top-level schema array error");
-    check_schema(b, b, false, "lower-level schema array error");
-    check_schema(schema, schema, true, "pass");
+    check_schema(b, schema, 0, false, "missing items");
+    check_schema(a, a, 0, false, "top-level schema array error");
+    check_schema(b, b, 0, false, "lower-level schema array error");
+
+    JSON bad_schema = JSON::parse(R"({"a": true, "b": "potato?"})");
+    check_schema(bad_schema, bad_schema, 0, false, "bad schema field type");
+
+    JSON good = JSON::parse(R"(
+{
+  "one": {
+    "a": {
+      "q": "potato",
+      "r": {
+        "x": [1, null]
+      },
+      "s": [
+        null,
+        "anything"
+      ]
+    }
+  },
+  "two": [
+    {
+      "glarp": "enspliel",
+      "goose": 3.14
+    }
+  ],
+  "three": {
+    "<objid>": {
+      "z": "ebra"
+    }
+  }
+}
+)");
+    check_schema(good, schema, 0, false, "not optional");
+    check_schema(good, schema, JSON::f_optional, true, "pass");
 }
 
 int main()

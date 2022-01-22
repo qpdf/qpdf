@@ -394,12 +394,21 @@ JSON::checkSchema(JSON schema, std::list<std::string>& errors)
 {
     return checkSchemaInternal(this->m->value.getPointer(),
                                schema.m->value.getPointer(),
-                               errors, "");
+                               0, errors, "");
 }
 
+bool
+JSON::checkSchema(JSON schema, unsigned long flags,
+                  std::list<std::string>& errors)
+{
+    return checkSchemaInternal(this->m->value.getPointer(),
+                               schema.m->value.getPointer(),
+                               flags, errors, "");
+}
 
 bool
 JSON::checkSchemaInternal(JSON_value* this_v, JSON_value* sch_v,
+                          unsigned long flags,
                           std::list<std::string>& errors,
                           std::string prefix)
 {
@@ -408,6 +417,8 @@ JSON::checkSchemaInternal(JSON_value* this_v, JSON_value* sch_v,
 
     JSON_array* sch_arr = dynamic_cast<JSON_array*>(sch_v);
     JSON_dictionary* sch_dict = dynamic_cast<JSON_dictionary*>(sch_v);
+
+    JSON_string* sch_str = dynamic_cast<JSON_string*>(sch_v);
 
     std::string err_prefix;
     if (prefix.empty())
@@ -446,34 +457,38 @@ JSON::checkSchemaInternal(JSON_value* this_v, JSON_value* sch_v,
         {
             std::string const& key = iter.first;
             checkSchemaInternal(
-                this_dict->members[key].getPointer(),
-                pattern_schema,
-                errors, prefix + "." + key);
+                this_dict->members[key].getPointer(), pattern_schema,
+                flags, errors, prefix + "." + key);
         }
     }
     else if (sch_dict)
     {
-        for (std::map<std::string, PointerHolder<JSON_value> >::iterator iter =
-                 sch_dict->members.begin();
-             iter != sch_dict->members.end(); ++iter)
+        for (auto& iter: sch_dict->members)
         {
-            std::string const& key = (*iter).first;
+            std::string const& key = iter.first;
             if (this_dict->members.count(key))
             {
                 checkSchemaInternal(
                     this_dict->members[key].getPointer(),
-                    (*iter).second.getPointer(),
-                    errors, prefix + "." + key);
+                    iter.second.getPointer(),
+                    flags, errors, prefix + "." + key);
             }
             else
             {
-                QTC::TC("libtests", "JSON key missing in object");
-                errors.push_back(
-                    err_prefix + ": key \"" + key +
-                    "\" is present in schema but missing in object");
+                if (flags & f_optional)
+                {
+                    QTC::TC("libtests", "JSON optional key");
+                }
+                else
+                {
+                    QTC::TC("libtests", "JSON key missing in object");
+                    errors.push_back(
+                        err_prefix + ": key \"" + key +
+                        "\" is present in schema but missing in object");
+                }
             }
         }
-        for (std::map<std::string, PointerHolder<JSON_value> >::iterator iter =
+        for (std::map<std::string, PointerHolder<JSON_value>>::iterator iter =
                  this_dict->members.begin();
              iter != this_dict->members.end(); ++iter)
         {
@@ -510,8 +525,15 @@ JSON::checkSchemaInternal(JSON_value* this_v, JSON_value* sch_v,
             checkSchemaInternal(
                 (*iter).getPointer(),
                 sch_arr->elements.at(0).getPointer(),
-                errors, prefix + "." + QUtil::int_to_string(i));
+                flags, errors, prefix + "." + QUtil::int_to_string(i));
         }
+    }
+    else if (! sch_str)
+    {
+        QTC::TC("libtests", "JSON schema other type");
+        errors.push_back(err_prefix +
+                         " schema value is not dictionary, array, or string");
+        return false;
     }
 
     return errors.empty();

@@ -21,6 +21,12 @@ top-level object schema array contains other than one item
 json key ".one.a.r" schema array contains other than one item
 json key ".two" schema array contains other than one item
 ---
+--- bad schema field type
+json key ".a" schema value is not dictionary, array, or string
+---
+--- not optional
+json key ".three.<objid>": key "o" is present in schema but missing in object
+---
 --- pass
 ---
 end of json tests
