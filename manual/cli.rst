@@ -13,6 +13,14 @@
    for additional help. Command line arguments can be referenced using
    :qpdf:ref:`--option`. They also appear in an index.
 
+   Note: 2022-01-22: because short help text is used in the "schema"
+   json object for QPDFJob json, we can't end short text with a ``)``
+   character since doing so would cause ``)"`` to appear in the string
+   literal. We use the R"(...)" syntax for these literals, and that
+   looks like an end delimiter. While the C++ spec allows
+   R"anything(...)anything" specifically for this purpose, the MSVC in
+   CI at the time of this writing did not support that construct.
+
    STYLE NOTES
 
    In this text, :samp:`...` and ``...`` are used somewhat
@@ -1643,7 +1651,7 @@ Related Options
 
 .. qpdf:option:: --remove-page-labels
 
-   .. help: remove page labels (numbers)
+   .. help: remove explicit page numbers
 
       Exclude page labels (explicit page numbers) from the output file.
 
@@ -2707,7 +2715,7 @@ These options are valid between :qpdf:ref:`--add-attachment` and ``--``.
 
 .. qpdf:option:: --mimetype=type/subtype
 
-   .. help: attachment mime type (e.g. application/pdf)
+   .. help: attachment mime type, e.g. application/pdf
 
       Specify the mime type for the attachment, such as text/plain,
       application/pdf, image/png, etc.

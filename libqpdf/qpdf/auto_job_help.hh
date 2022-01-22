@@ -366,7 +366,7 @@ Don't optimize images whose area in pixels is below the specified value.
 )");
 ap.addOptionHelp("--keep-inline-images", "modification", "exclude inline images from optimization", R"(Prevent inline images from being considered by --optimize-images.
 )");
-ap.addOptionHelp("--remove-page-labels", "modification", "remove page labels (numbers)", R"(Exclude page labels (explicit page numbers) from the output file.
+ap.addOptionHelp("--remove-page-labels", "modification", "remove explicit page numbers", R"(Exclude page labels (explicit page numbers) from the output file.
 )");
 ap.addHelpTopic("encryption", "create encrypted files", R"(Create encrypted files. Usage:
 
@@ -674,7 +674,7 @@ Specify the attachment's modification date in PDF format;
 defaults to the current time. Run qpdf --help=pdf-dates for
 information about the date format.
 )");
-ap.addOptionHelp("--mimetype", "add-attachment", "attachment mime type (e.g. application/pdf)", R"(--mimetype=type/subtype
+ap.addOptionHelp("--mimetype", "add-attachment", "attachment mime type, e.g. application/pdf", R"(--mimetype=type/subtype
 
 Specify the mime type for the attachment, such as text/plain,
 application/pdf, image/png, etc.
