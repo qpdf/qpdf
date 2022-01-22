@@ -347,7 +347,7 @@ ArgParser::argCopyEncryption(char* parameter)
 void
 ArgParser::argEncryptionFilePassword(char* parameter)
 {
-    o.encryption_file_password = parameter;
+    o.encryption_file_password = QUtil::make_shared_cstr(parameter);
 }
 
 void

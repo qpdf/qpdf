@@ -208,8 +208,8 @@ class QPDFJob
     bool suppress_warnings;
     bool warnings_exit_zero;
     bool copy_encryption;
-    char const* encryption_file;
-    char const* encryption_file_password;
+    std::string encryption_file;
+    std::shared_ptr<char> encryption_file_password;
     bool encrypt;
     bool password_is_hex_key;
     bool suppress_password_recovery;

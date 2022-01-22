@@ -327,7 +327,6 @@ QPDFJob::QPDFJob() :
     suppress_warnings(false),
     warnings_exit_zero(false),
     copy_encryption(false),
-    encryption_file(0),
     encryption_file_password(0),
     encrypt(false),
     password_is_hex_key(false),
@@ -2603,11 +2602,11 @@ QPDFJob::handlePageSpecs(
             // to the same underlying file with the same path to
             // achieve the same affect.
             char const* password = page_spec.password;
-            if (o.encryption_file && (password == 0) &&
+            if ((! o.encryption_file.empty()) && (password == 0) &&
                 (page_spec.filename == o.encryption_file))
             {
                 QTC::TC("qpdf", "qpdf pages encryption password");
-                password = o.encryption_file_password;
+                password = o.encryption_file_password.get();
             }
             o.doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
                 cout << prefix << ": processing "
@@ -3221,7 +3220,8 @@ QPDFJob::setWriterOptions(QPDF& pdf, QPDFWriter& w)
     if (o.copy_encryption)
     {
         std::shared_ptr<QPDF> encryption_pdf =
-            processFile(o.encryption_file, o.encryption_file_password);
+            processFile(o.encryption_file.c_str(),
+                        o.encryption_file_password.get());
         w.copyEncryptionParameters(*encryption_pdf);
     }
     if (o.encrypt)
