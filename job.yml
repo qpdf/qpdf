@@ -217,3 +217,161 @@ options:
     required_parameter:
       prefix: prefix
       password: password
+no-json:
+  - preserve-unreferenced-resources
+json:
+  # The structure of this section defines what the json input to
+  # QPDFJob looks like. If a key starts with underscore or has a value
+  # that is a string, it does not map to a command-line argument. If
+  # value is null, its properties and help come from other information
+  # known by generate_auto_job. This information is used to construct
+  # a "schema" (as in JSON.hh) for the json input to QPDFJob. The
+  # leading underscore is removed.
+  _input:
+    _file:
+      _name: "input filename"
+      main.password:
+      password-file:
+    empty:
+  _output:
+    _file:
+      _name: "output filename"
+    replace-input:
+    split-pages:
+    _options:
+      qdf:
+      preserve-unreferenced:
+      newline-before-endstream:
+      normalize-content:
+      stream-data:
+      compress-streams:
+      recompress-flate:
+      decode-level:
+      decrypt:
+      static-aes-iv:
+      static-id:
+      no-original-object-ids:
+      copy-encryption:
+      encryption-file-password:
+      linearize:
+      linearize-pass1:
+      object-streams:
+      min-version:
+      force-version:
+      progress:
+      encrypt:
+        user-password: "user password"
+        owner-password: "owner password"
+        key-length: "key length: 48, 128, 256"
+        _40-bit:
+          Enc40.annotate:
+          Enc40.extract:
+          Enc40.modify:
+          Enc40.print:
+        _128-bit:
+          Enc128.accessibility:
+          Enc128.annotate:
+          Enc128.assemble:
+          Enc128.cleartext-metadata:
+          Enc128.extract:
+          Enc128.form:
+          Enc128.modify-other:
+          Enc128.modify:
+          Enc128.print:
+          force-V4:
+          use-aes:
+        _256-bit:
+          Enc256.accessibility:
+          Enc256.annotate:
+          Enc256.assemble:
+          Enc256.cleartext-metadata:
+          Enc256.extract:
+          Enc256.form:
+          Enc256.modify-other:
+          Enc256.modify:
+          Enc256.print:
+          allow-insecure:
+          force-R5:
+  _options:
+    allow-weak-crypto:
+    deterministic-id:
+    keep-files-open:
+    keep-files-open-threshold:
+    no-warn:
+    verbose:
+    warning-exit-0:
+    ignore-xref-streams:
+    password-is-hex-key:
+    password-mode:
+    suppress-password-recovery:
+    suppress-recovery:
+  _inspect:
+    check:
+    check-linearization:
+    filtered-stream-data:
+    is-encrypted:
+    raw-stream-data:
+    requires-password:
+    show-encryption:
+    show-encryption-key:
+    show-linearization:
+    show-npages:
+    show-object:
+    show-pages:
+    show-xref:
+    with-images:
+    list-attachments:
+    show-attachment:
+    json:
+    json-key:
+      - null
+    json-object:
+      - null
+  _transform:
+    coalesce-contents:
+    compression-level:
+    externalize-inline-images:
+    ii-min-bytes:
+    remove-unreferenced-resources:
+  _modify:
+    add-attachment:
+      - file: "attachment to add"
+        creationdate:
+        description:
+        filename:
+        key:
+        mimetype:
+        moddate:
+        replace:
+    remove-attachment:
+    copy-attachments-from:
+      - file: "attachment source filename"
+        CopyAtt.password:
+        prefix:
+    collate:
+    flatten-annotations:
+    flatten-rotation:
+    generate-appearances:
+    keep-inline-images:
+    oi-min-area:
+    oi-min-height:
+    oi-min-width:
+    optimize-images:
+    pages:
+      - file: "source for for pages"
+        Pages.password:
+        range: "page range"
+    remove-page-labels:
+    rotate:
+    overlay:
+      file: "source file for overlay"
+      UO.password:
+      from:
+      repeat:
+      to:
+    underlay:
+      file: "source file for underlay"
+      UO.password:
+      from:
+      repeat:
+      to:

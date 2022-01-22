@@ -128,7 +128,10 @@ Command-line arguments are closely coupled with QPDFJob. To add a new
 command-line argument, add the option to the appropriate table in
 job.yml. This will automatically declare a method in the private
 ArgParser class in QPDFJob_argv.cc which you have to implement. The
-implementation should make calls to methods in QPDFJob.
+implementation should make calls to methods in QPDFJob. Then, add the
+same option to either the no-json section of job.yml if it is to be
+excluded from the job json structure, or add it under the json
+structure to the place where it should appear in the json structure.
 
 The build will fail until the new option is documented in
 manual/cli.rst. To do that, create documentation for the option by

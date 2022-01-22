@@ -5,6 +5,7 @@ import argparse
 import hashlib
 import re
 import yaml
+import json
 
 whoami = os.path.basename(sys.argv[0])
 BANNER = f'''//
@@ -29,6 +30,7 @@ class Main:
         'decl': 'libqpdf/qpdf/auto_job_decl.hh',
         'init': 'libqpdf/qpdf/auto_job_init.hh',
         'help': 'libqpdf/qpdf/auto_job_help.hh',
+        'schema': 'libqpdf/qpdf/auto_job_schema.hh',
     }
     SUMS = 'job.sums'
 
@@ -199,6 +201,9 @@ class Main:
                         raise Exception(
                             f'help for unknown option {option},'
                             f' lineno={lineno}')
+                    if option not in self.help_options:
+                        # QXXXQ also need to exclude help table
+                        self.jdata[option[2:]]['help'] = short_text
                     print(f'ap.addOptionHelp("{option}", "{topic}",'
                           f' "{short_text}", R"({long_text})");', file=f)
                     help_lines += 1
@@ -226,9 +231,12 @@ class Main:
         with open('job.yml', 'r') as f:
             data = yaml.safe_load(f.read())
         self.validate(data)
-        self.options_without_help = set(
+        # Add the built-in help options to tables that we populate as
+        # we read job.yml since we won't encounter these in job.yml
+        self.help_options = set(
             ['--completion-bash', '--completion-zsh', '--help']
         )
+        self.options_without_help = set(self.help_options)
         self.prepare(data)
         with open(self.DESTS['decl'], 'w') as f:
             print(BANNER, file=f)
@@ -242,6 +250,11 @@ class Main:
             with open('manual/cli.rst', 'r') as df:
                 print(BANNER, file=f)
                 self.generate_doc(df, f)
+        self.generate_schema(data)
+        with open(self.DESTS['schema'], 'w') as f:
+            print('static constexpr char const* JOB_SCHEMA_DATA = R"(' +
+                  json.dumps(self.schema, indent=2, separators=(',', ': ')) +
+                  ')";', file=f)
 
         # Update hashes last to ensure that this will be rerun in the
         # event of a failure.
@@ -251,6 +264,24 @@ class Main:
     def prepare(self, data):
         self.decls = []
         self.init = []
+        self.jdata = {
+            # option: {
+            #   tables: set(),
+            #   help: string,
+            #   QXXXQ something for registering handler
+            # }
+        }
+
+        def add_jdata(flag, table):
+            nonlocal self
+            if table == 'help':
+                self.help_options.add(f'--{flag}')
+            elif flag in self.jdata:
+                self.jdata[flag]['tables'].add(table)
+            else:
+                self.jdata[flag] = {
+                    'tables': set([table]),
+                }
 
         self.init.append('auto b = [this](void (ArgParser::*f)()) {')
         self.init.append('    return QPDFArgParser::bindBare(f, this);')
@@ -275,7 +306,7 @@ class Main:
         self.decls.append('')
         for o in data['options']:
             table = o['table']
-
+            table_prefix = o.get('prefix', table)
             if table == 'main':
                 self.init.append('this->ap.selectMainOptionTable();')
             elif table == 'help':
@@ -296,12 +327,14 @@ class Main:
                 self.decls.append(f'void {identifier}();')
                 self.init.append(f'this->ap.addBare("{i}", '
                                  f'b(&ArgParser::{identifier}));')
+                add_jdata(i, table_prefix)
             for i in o.get('optional_parameter', []):
                 self.options_without_help.add(f'--{i}')
                 identifier = self.to_identifier(i, prefix, False)
                 self.decls.append(f'void {identifier}(char *);')
                 self.init.append(f'this->ap.addOptionalParameter("{i}", '
                                  f'p(&ArgParser::{identifier}));')
+                add_jdata(i, table_prefix)
             for i, v in o.get('required_parameter', {}).items():
                 self.options_without_help.add(f'--{i}')
                 identifier = self.to_identifier(i, prefix, False)
@@ -309,6 +342,7 @@ class Main:
                 self.init.append(f'this->ap.addRequiredParameter("{i}", '
                                  f'p(&ArgParser::{identifier})'
                                  f', "{v}");')
+                add_jdata(i, table_prefix)
             for i, v in o.get('required_choices', {}).items():
                 self.options_without_help.add(f'--{i}')
                 identifier = self.to_identifier(i, prefix, False)
@@ -316,6 +350,7 @@ class Main:
                 self.init.append(f'this->ap.addChoices("{i}", '
                                  f'p(&ArgParser::{identifier})'
                                  f', true, {v}_choices);')
+                add_jdata(i, table_prefix)
             for i, v in o.get('optional_choices', {}).items():
                 self.options_without_help.add(f'--{i}')
                 identifier = self.to_identifier(i, prefix, False)
@@ -323,11 +358,13 @@ class Main:
                 self.init.append(f'this->ap.addChoices("{i}", '
                                  f'p(&ArgParser::{identifier})'
                                  f', false, {v}_choices);')
+                add_jdata(i, table_prefix)
             if table not in ('main', 'help'):
                 identifier = self.to_identifier(table, 'argEnd', False)
                 self.decls.append(f'void {identifier}();')
         for o in data['options']:
             table = o['table']
+            table_prefix = o.get('prefix', table)
             if 'from_table' not in o:
                 continue
             if table == 'main':
@@ -341,6 +378,79 @@ class Main:
             for j in ft['options']:
                 self.init.append('this->ap.copyFromOtherTable'
                                  f'("{j}", "{other_table}");')
+                add_jdata(j, table_prefix)
+
+    def generate_schema(self, data):
+        # XXX check data['json'] against what we know from jdata.
+        # Ultimately be able to generate a schema as well as
+        # JSONHandler and registering stuff.
+
+        # Check to make sure that every command-line option is
+        # represented either in data['json'] or data['no-json'].
+
+        # Build a list of options that we expect. If an option appears
+        # once, we just expect to see it once. If it appears in more
+        # than one options table, we need to see a separate version of
+        # it for each option table. It is represented prepended in
+        # job.yml with the table prefix. The table prefix is removed
+        # in the schema.
+        expected = {}
+        for k, v in self.jdata.items():
+            tables = v['tables']
+            if len(tables) == 1:
+                expected[k] = {**v}
+            else:
+                for t in sorted(tables):
+                    expected[f'{t}.{k}'] = {**v}
+        for _, v in expected.items():
+            del v['tables']
+        options_seen = set(data['no-json'])
+
+        self.schema = {}
+
+        def option_to_json_key(s):
+            return self.to_identifier(s, '', False)
+
+        # Walk through the json information building the schema as we
+        # go. This verifies consistency between command-line options
+        # and the json section of the data and builds up a schema by
+        # populating with help information as available.
+        def build_schema(j, s):
+            for k, v in j.items():
+                if not (k in expected or
+                        k.startswith('_') or
+                        isinstance(v, str)):
+                    raise Exception(f'json: unknown key {k}')
+                if k.startswith('_'):
+                    schema_key = k[1:]
+                else:
+                    schema_key = re.sub(r'[^\.]+\.', '', k)
+                schema_key = option_to_json_key(schema_key)
+                schema_value = v
+                if k in expected:
+                    options_seen.add(re.sub('^_', '', k))
+                    if v is None:
+                        schema_value = re.sub(
+                            r'--(\S+)',
+                            lambda x: option_to_json_key(x.group(1)),
+                            expected[k]['help'])
+                if (isinstance(v, dict)):
+                    schema_value = {}
+                    build_schema(v, schema_value)
+                elif (isinstance(v, list)):
+                    if len(v) != 1:
+                        raise Exception('json contains array with length != 1')
+                    if isinstance(v[0], dict):
+                        schema_value = [{}]
+                        build_schema(v[0], schema_value[0])
+                elif schema_value is None:
+                    raise Exception(f'unknown schema value for {k}')
+                s[schema_key] = schema_value
+
+        build_schema(data['json'], self.schema)
+        if options_seen != set(expected.keys()):
+            raise Exception('missing from json: ' +
+                            str(set(expected.keys()) - options_seen))
 
     def check_keys(self, what, d, exp):
         if not isinstance(d, dict):
@@ -351,7 +461,8 @@ class Main:
             exit(f'{what}: unknown keys = {extra}')
 
     def validate(self, data):
-        self.check_keys('top', data, set(['choices', 'options']))
+        self.check_keys('top', data, set(
+            ['choices', 'options', 'no-json', 'json']))
         for o in data['options']:
             self.check_keys('top', o, set(
                 ['table', 'prefix', 'bare', 'positional',
@@ -363,7 +474,10 @@ class Main:
         if const:
             identifier = f'{prefix}_{identifier.upper()}'
         else:
-            identifier = f'{prefix}_{identifier.lower()}'
+            if prefix:
+                identifier = f'{prefix}_{identifier.lower()}'
+            else:
+                identifier = identifier.lower()
             identifier = re.sub(r'_([a-z])',
                                 lambda x: x.group(1).upper(),
                                 identifier).replace('_', '')
