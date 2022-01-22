@@ -26,7 +26,6 @@
 #include <qpdf/Constants.h>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
-#include <qpdf/QPDFArgParser.hh>
 
 #include <memory>
 #include <string>
@@ -387,7 +386,6 @@ class QPDFJob
         std::ostream* cout;
         std::ostream* cerr;
         unsigned long encryption_status;
-        std::shared_ptr<QPDFArgParser> ap;
     };
     std::shared_ptr<Members> m;
 };

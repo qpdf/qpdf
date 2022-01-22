@@ -1529,11 +1529,8 @@ QPDFJob::initializeFromArgv(int argc, char* argv[], char const* progname_env)
     {
         progname_env = "QPDF_EXECUTABLE";
     }
-    // QPDFArgParser must stay in scope for the life of the QPDFJob
-    // object since it holds dynamic memory used for argv, which is
-    // pointed to by other member variables.
-    this->m->ap = std::make_shared<QPDFArgParser>(argc, argv, progname_env);
-    setMessagePrefix(this->m->ap->getProgname());
-    ArgParser ap(*this->m->ap, *this);
+    QPDFArgParser qap(argc, argv, progname_env);
+    setMessagePrefix(qap.getProgname());
+    ArgParser ap(qap, *this);
     ap.parseOptions();
 }

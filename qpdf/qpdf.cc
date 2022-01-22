@@ -1,6 +1,7 @@
 #include <qpdf/QPDFJob.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/QPDFArgParser.hh>
 
 #include <cstdio>
 #include <cstdlib>
