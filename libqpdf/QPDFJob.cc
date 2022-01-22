@@ -17,7 +17,6 @@
 #include <qpdf/Pl_DCT.hh>
 #include <qpdf/Pl_Count.hh>
 #include <qpdf/Pl_Flate.hh>
-#include <qpdf/PointerHolder.hh>
 
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFPageDocumentHelper.hh>
@@ -45,7 +44,7 @@ namespace
         }
         virtual void provideStreamData(int objid, int generation,
                                        Pipeline* pipeline);
-        PointerHolder<Pipeline> makePipeline(
+        std::shared_ptr<Pipeline> makePipeline(
             std::string const& description, Pipeline* next);
         bool evaluate(std::string const& description);
 
@@ -103,10 +102,10 @@ ImageOptimizer::ImageOptimizer(QPDFJob& o, QPDFObjectHandle& image) :
 {
 }
 
-PointerHolder<Pipeline>
+std::shared_ptr<Pipeline>
 ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
 {
-    PointerHolder<Pipeline> result;
+    std::shared_ptr<Pipeline> result;
     QPDFObjectHandle dict = image.getDict();
     QPDFObjectHandle w_obj = dict.getKey("/Width");
     QPDFObjectHandle h_obj = dict.getKey("/Height");
@@ -207,7 +206,7 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
         return result;
     }
 
-    result = new Pl_DCT("jpg", next, w, h, components, cs);
+    result = std::make_shared<Pl_DCT>("jpg", next, w, h, components, cs);
     return result;
 }
 
@@ -227,13 +226,13 @@ ImageOptimizer::evaluate(std::string const& description)
     }
     Pl_Discard d;
     Pl_Count c("count", &d);
-    PointerHolder<Pipeline> p = makePipeline(description, &c);
-    if (p.getPointer() == 0)
+    std::shared_ptr<Pipeline> p = makePipeline(description, &c);
+    if (p.get() == nullptr)
     {
         // message issued by makePipeline
         return false;
     }
-    if (! image.pipeStreamData(p.getPointer(), 0, qpdf_dl_specialized))
+    if (! image.pipeStreamData(p.get(), 0, qpdf_dl_specialized))
     {
         return false;
     }
@@ -260,8 +259,8 @@ ImageOptimizer::evaluate(std::string const& description)
 void
 ImageOptimizer::provideStreamData(int, int, Pipeline* pipeline)
 {
-    PointerHolder<Pipeline> p = makePipeline("", pipeline);
-    if (p.getPointer() == 0)
+    std::shared_ptr<Pipeline> p = makePipeline("", pipeline);
+    if (p.get() == nullptr)
     {
         // Should not be possible
         image.warnIfPossible("unable to create pipeline after previous"
@@ -269,7 +268,7 @@ ImageOptimizer::provideStreamData(int, int, Pipeline* pipeline)
         pipeline->finish();
         return;
     }
-    image.pipeStreamData(p.getPointer(), 0, qpdf_dl_specialized,
+    image.pipeStreamData(p.get(), 0, qpdf_dl_specialized,
                          false, false);
 }
 
@@ -450,7 +449,7 @@ void
 QPDFJob::run()
 {
     QPDFJob& o = *this; // QXXXQ
-    PointerHolder<QPDF> pdf_ph;
+    std::shared_ptr<QPDF> pdf_ph;
     try
     {
         pdf_ph = processFile(o.infilename, o.password);
@@ -480,7 +479,7 @@ QPDFJob::run()
         return;
     }
     bool other_warnings = false;
-    std::vector<PointerHolder<QPDF>> page_heap;
+    std::vector<std::shared_ptr<QPDF>> page_heap;
     if (! o.page_specs.empty())
     {
         handlePageSpecs(pdf, other_warnings, page_heap);
@@ -1793,12 +1792,12 @@ QPDFJob::doInspection(QPDF& pdf)
     }
 }
 
-PointerHolder<QPDF>
+std::shared_ptr<QPDF>
 QPDFJob::doProcessOnce(
     std::function<void(QPDF*, char const*)> fn,
     char const* password, bool empty)
 {
-    PointerHolder<QPDF> pdf = new QPDF;
+    auto pdf = std::make_shared<QPDF>();
     setQPDFOptions(*pdf);
     if (empty)
     {
@@ -1806,12 +1805,12 @@ QPDFJob::doProcessOnce(
     }
     else
     {
-        fn(pdf.getPointer(), password);
+        fn(pdf.get(), password);
     }
     return pdf;
 }
 
-PointerHolder<QPDF>
+std::shared_ptr<QPDF>
 QPDFJob::doProcess(
     std::function<void(QPDF*, char const*)> fn,
     char const* password, bool empty)
@@ -1904,7 +1903,7 @@ QPDFJob::doProcess(
     throw std::logic_error("do_process returned");
 }
 
-PointerHolder<QPDF>
+std::shared_ptr<QPDF>
 QPDFJob::processFile(char const* filename, char const* password)
 {
     auto f1 = std::mem_fn<void(char const*, char const*)>(&QPDF::processFile);
@@ -1913,7 +1912,7 @@ QPDFJob::processFile(char const* filename, char const* password)
     return doProcess(fn, password, strcmp(filename, "") == 0);
 }
 
-PointerHolder<QPDF>
+std::shared_ptr<QPDF>
 QPDFJob::processInputSource(
     PointerHolder<InputSource> is, char const* password)
 {
@@ -1969,15 +1968,15 @@ QPDFJob::validateUnderOverlay(QPDF& pdf, QPDFJob::UnderOverlay* uo)
 
 static QPDFAcroFormDocumentHelper* get_afdh_for_qpdf(
     std::map<unsigned long long,
-             PointerHolder<QPDFAcroFormDocumentHelper>>& afdh_map,
+             std::shared_ptr<QPDFAcroFormDocumentHelper>>& afdh_map,
     QPDF* q)
 {
     auto uid = q->getUniqueId();
     if (! afdh_map.count(uid))
     {
-        afdh_map[uid] = new QPDFAcroFormDocumentHelper(*q);
+        afdh_map[uid] = std::make_shared<QPDFAcroFormDocumentHelper>(*q);
     }
-    return afdh_map[uid].getPointer();
+    return afdh_map[uid].get();
 }
 
 void
@@ -1999,7 +1998,7 @@ QPDFJob::doUnderOverlayForPage(
     }
 
     std::map<unsigned long long,
-             PointerHolder<QPDFAcroFormDocumentHelper>> afdh;
+             std::shared_ptr<QPDFAcroFormDocumentHelper>> afdh;
     auto make_afdh = [&](QPDFPageObjectHelper& ph) {
         QPDF* q = ph.getObjectHandle().getOwningQPDF();
         return get_afdh_for_qpdf(afdh, q);
@@ -2098,8 +2097,8 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
     QPDFJob& o = *this; // QXXXQ
     validateUnderOverlay(pdf, &o.underlay);
     validateUnderOverlay(pdf, &o.overlay);
-    if ((0 == o.underlay.pdf.getPointer()) &&
-        (0 == o.overlay.pdf.getPointer()))
+    if ((nullptr == o.underlay.pdf.get()) &&
+        (nullptr == o.overlay.pdf.get()))
     {
         return;
     }
@@ -2110,12 +2109,12 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
     std::map<int, QPDFObjectHandle> underlay_fo;
     std::map<int, QPDFObjectHandle> overlay_fo;
     std::vector<QPDFPageObjectHelper> upages;
-    if (o.underlay.pdf.getPointer())
+    if (o.underlay.pdf.get())
     {
         upages = QPDFPageDocumentHelper(*(o.underlay.pdf)).getAllPages();
     }
     std::vector<QPDFPageObjectHelper> opages;
-    if (o.overlay.pdf.getPointer())
+    if (o.overlay.pdf.get())
     {
         opages = QPDFPageDocumentHelper(*(o.overlay.pdf)).getAllPages();
     }
@@ -2275,11 +2274,11 @@ QPDFJob::handleTransformations(QPDF& pdf)
 {
     QPDFJob& o = *this; // QXXXQ
     QPDFPageDocumentHelper dh(pdf);
-    PointerHolder<QPDFAcroFormDocumentHelper> afdh;
+    std::shared_ptr<QPDFAcroFormDocumentHelper> afdh;
     auto make_afdh = [&]() {
-        if (! afdh.getPointer())
+        if (! afdh.get())
         {
-            afdh = new QPDFAcroFormDocumentHelper(pdf);
+            afdh = std::make_shared<QPDFAcroFormDocumentHelper>(pdf);
         }
     };
     if (o.externalize_inline_images ||
@@ -2351,7 +2350,7 @@ QPDFJob::handleTransformations(QPDF& pdf)
         make_afdh();
         for (auto& page: dh.getAllPages())
         {
-            page.flattenRotation(afdh.getPointer());
+            page.flattenRotation(afdh.get());
         }
     }
     if (o.remove_page_labels)
@@ -2543,7 +2542,7 @@ static QPDFObjectHandle added_page(QPDF& pdf, QPDFPageObjectHelper page)
 void
 QPDFJob::handlePageSpecs(
     QPDF& pdf, bool& warnings,
-    std::vector<PointerHolder<QPDF>>& page_heap)
+    std::vector<std::shared_ptr<QPDF>>& page_heap)
 {
     QPDFJob& o = *this; // QXXXQ
     // Parse all page specifications and translate them into lists of
@@ -2594,7 +2593,7 @@ QPDFJob::handlePageSpecs(
         if (page_spec_qpdfs.count(page_spec.filename) == 0)
         {
             // Open the PDF file and store the QPDF object. Throw a
-            // PointerHolder to the qpdf into a heap so that it
+            // std::shared_ptr to the qpdf into a heap so that it
             // survives through copying to the output but gets cleaned up
             // automatically at the end. Do not canonicalize the file
             // name. Using two different paths to refer to the same
@@ -2630,9 +2629,9 @@ QPDFJob::handlePageSpecs(
                 is = fis;
                 fis->setFilename(page_spec.filename.c_str());
             }
-            PointerHolder<QPDF> qpdf_ph = processInputSource(is, password);
+            std::shared_ptr<QPDF> qpdf_ph = processInputSource(is, password);
             page_heap.push_back(qpdf_ph);
-            page_spec_qpdfs[page_spec.filename] = qpdf_ph.getPointer();
+            page_spec_qpdfs[page_spec.filename] = qpdf_ph.get();
             if (cis)
             {
                 cis->stayOpen(false);
@@ -2735,7 +2734,7 @@ QPDFJob::handlePageSpecs(
     bool any_page_labels = false;
     int out_pageno = 0;
     std::map<unsigned long long,
-             PointerHolder<QPDFAcroFormDocumentHelper>> afdh_map;
+             std::shared_ptr<QPDFAcroFormDocumentHelper>> afdh_map;
     auto this_afdh = get_afdh_for_qpdf(afdh_map, &pdf);
     std::set<QPDFObjGen> referenced_fields;
     for (std::vector<QPDFPageData>::iterator iter =
@@ -3147,8 +3146,8 @@ QPDFJob::setEncryptionOptions(QPDF& pdf, QPDFWriter& w)
 static void parse_version(std::string const& full_version_string,
                           std::string& version, int& extension_level)
 {
-    PointerHolder<char> vp(true, QUtil::copy_string(full_version_string));
-    char* v = vp.getPointer();
+    auto vp = QUtil::make_shared_cstr(full_version_string);
+    char* v = vp.get();
     char* p1 = strchr(v, '.');
     char* p2 = (p1 ? strchr(1 + p1, '.') : 0);
     if (p2 && *(p2 + 1))
@@ -3221,7 +3220,7 @@ QPDFJob::setWriterOptions(QPDF& pdf, QPDFWriter& w)
     }
     if (o.copy_encryption)
     {
-        PointerHolder<QPDF> encryption_pdf =
+        std::shared_ptr<QPDF> encryption_pdf =
             processFile(o.encryption_file, o.encryption_file_password);
         w.copyEncryptionParameters(*encryption_pdf);
     }
@@ -3313,10 +3312,10 @@ QPDFJob::doSplitPages(QPDF& pdf, bool& warnings)
         }
         QPDF outpdf;
         outpdf.emptyPDF();
-        PointerHolder<QPDFAcroFormDocumentHelper> out_afdh;
+        std::shared_ptr<QPDFAcroFormDocumentHelper> out_afdh;
         if (afdh.hasAcroForm())
         {
-            out_afdh = new QPDFAcroFormDocumentHelper(outpdf);
+            out_afdh = std::make_shared<QPDFAcroFormDocumentHelper>(outpdf);
         }
         if (o.suppress_warnings)
         {
@@ -3327,7 +3326,7 @@ QPDFJob::doSplitPages(QPDF& pdf, bool& warnings)
             QPDFObjectHandle page = pages.at(pageno - 1);
             outpdf.addPage(page, false);
             auto new_page = added_page(outpdf, page);
-            if (out_afdh.getPointer())
+            if (out_afdh.get())
             {
                 QTC::TC("qpdf", "qpdf copy form fields in split_pages");
                 try

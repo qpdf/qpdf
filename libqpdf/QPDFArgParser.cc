@@ -295,10 +295,8 @@ QPDFArgParser::handleArgFileArguments()
 {
     // Support reading arguments from files. Create a new argv. Ensure
     // that argv itself as well as all its contents are automatically
-    // deleted by using PointerHolder objects to back the pointers in
-    // argv.
-    this->m->new_argv.push_back(
-        PointerHolder<char>(true, QUtil::copy_string(this->m->argv[0])));
+    // deleted by using shared pointers to back the pointers in argv.
+    this->m->new_argv.push_back(QUtil::make_shared_cstr(this->m->argv[0]));
     for (int i = 1; i < this->m->argc; ++i)
     {
         char* argfile = 0;
@@ -321,16 +319,16 @@ QPDFArgParser::handleArgFileArguments()
         else
         {
             this->m->new_argv.push_back(
-                PointerHolder<char>(
-                    true, QUtil::copy_string(this->m->argv[i])));
+                QUtil::make_shared_cstr(this->m->argv[i]));
         }
     }
-    this->m->argv_ph =
-        PointerHolder<char*>(true, new char*[1 + this->m->new_argv.size()]);
-    this->m->argv = this->m->argv_ph.getPointer();
+    this->m->argv_ph = std::shared_ptr<char*>(
+        new char*[1 + this->m->new_argv.size()],
+        std::default_delete<char*[]>());
+    this->m->argv = this->m->argv_ph.get();
     for (size_t i = 0; i < this->m->new_argv.size(); ++i)
     {
-        this->m->argv[i] = this->m->new_argv.at(i).getPointer();
+        this->m->argv[i] = this->m->new_argv.at(i).get();
     }
     this->m->argc = QIntC::to_int(this->m->new_argv.size());
     this->m->argv[this->m->argc] = 0;
@@ -374,8 +372,7 @@ QPDFArgParser::handleBashArguments()
                     if (! arg.empty())
                     {
                         this->m->bash_argv.push_back(
-                            PointerHolder<char>(
-                                true, QUtil::copy_string(arg.c_str())));
+                            QUtil::make_shared_cstr(arg));
                         arg.clear();
                     }
                 }
@@ -426,17 +423,17 @@ QPDFArgParser::handleBashArguments()
         // This can't happen if properly invoked by bash, but ensure
         // we have a valid argv[0] regardless.
         this->m->bash_argv.push_back(
-            PointerHolder<char>(
-                true, QUtil::copy_string(this->m->argv[0])));
+            QUtil::make_shared_cstr(this->m->argv[0]));
     }
     // Explicitly discard any non-space-terminated word. The "current
     // word" is handled specially.
-    this->m->bash_argv_ph =
-        PointerHolder<char*>(true, new char*[1 + this->m->bash_argv.size()]);
-    this->m->argv = this->m->bash_argv_ph.getPointer();
+    this->m->bash_argv_ph = std::shared_ptr<char*>(
+        new char*[1 + this->m->bash_argv.size()],
+        std::default_delete<char*[]>());
+    this->m->argv = this->m->bash_argv_ph.get();
     for (size_t i = 0; i < this->m->bash_argv.size(); ++i)
     {
-        this->m->argv[i] = this->m->bash_argv.at(i).getPointer();
+        this->m->argv[i] = this->m->bash_argv.at(i).get();
     }
     this->m->argc = QIntC::to_int(this->m->bash_argv.size());
     this->m->argv[this->m->argc] = 0;
@@ -467,11 +464,9 @@ QPDFArgParser::readArgsFromFile(char const* filename)
         QTC::TC("libtests", "QPDFArgParser read args from file");
         lines = QUtil::read_lines_from_file(filename);
     }
-    for (std::list<std::string>::iterator iter = lines.begin();
-         iter != lines.end(); ++iter)
+    for (auto const& line: lines)
     {
-        this->m->new_argv.push_back(
-            PointerHolder<char>(true, QUtil::copy_string((*iter).c_str())));
+        this->m->new_argv.push_back(QUtil::make_shared_cstr(line));
     }
 }
 

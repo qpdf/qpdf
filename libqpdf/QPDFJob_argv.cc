@@ -198,9 +198,7 @@ ArgParser::argPasswordFile(char* parameter)
     if (lines.size() >= 1)
     {
         // Make sure the memory for this stays in scope.
-        o.password_alloc = std::shared_ptr<char>(
-            QUtil::copy_string(lines.front().c_str()),
-            std::default_delete<char[]>());
+        o.password_alloc = QUtil::make_shared_cstr(lines.front());
         o.password = o.password_alloc.get();
 
         if (lines.size() > 1)
@@ -1535,7 +1533,7 @@ QPDFJob::initializeFromArgv(int argc, char* argv[], char const* progname_env)
     // QPDFArgParser must stay in scope for the life of the QPDFJob
     // object since it holds dynamic memory used for argv, which is
     // pointed to by other member variables.
-    this->m->ap = new QPDFArgParser(argc, argv, progname_env);
+    this->m->ap = std::make_shared<QPDFArgParser>(argc, argv, progname_env);
     setMessagePrefix(this->m->ap->getProgname());
     ArgParser ap(*this->m->ap, *this);
     ap.parseOptions();

@@ -23,7 +23,7 @@
 #define QPDFARGPARSER_HH
 
 #include <qpdf/DLL.h>
-#include <qpdf/PointerHolder.hh>
+#include <memory>
 #include <string>
 #include <set>
 #include <map>
@@ -325,15 +325,15 @@ class QPDFArgParser
         option_table_t* option_table;
         std::string option_table_name;
         bare_arg_handler_t final_check_handler;
-        std::vector<PointerHolder<char>> new_argv;
-        std::vector<PointerHolder<char>> bash_argv;
-        PointerHolder<char*> argv_ph;
-        PointerHolder<char*> bash_argv_ph;
+        std::vector<std::shared_ptr<char>> new_argv;
+        std::vector<std::shared_ptr<char>> bash_argv;
+        std::shared_ptr<char*> argv_ph;
+        std::shared_ptr<char*> bash_argv_ph;
         std::map<std::string, HelpTopic> help_topics;
         std::map<std::string, HelpTopic> option_help;
         std::string help_footer;
     };
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // QPDFARGPARSER_HH

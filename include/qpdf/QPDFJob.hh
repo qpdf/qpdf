@@ -24,11 +24,11 @@
 
 #include <qpdf/DLL.h>
 #include <qpdf/Constants.h>
-#include <qpdf/PointerHolder.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QPDFArgParser.hh>
 
+#include <memory>
 #include <string>
 #include <list>
 #include <vector>
@@ -167,7 +167,7 @@ class QPDFJob
         char const* to_nr;
         char const* from_nr;
         char const* repeat_nr;
-        PointerHolder<QPDF> pdf;
+        std::shared_ptr<QPDF> pdf;
         std::vector<int> to_pagenos;
         std::vector<int> from_pagenos;
         std::vector<int> repeat_pagenos;
@@ -316,14 +316,14 @@ class QPDFJob
 
   private:
     // Basic file processing
-    PointerHolder<QPDF> processFile(
+    std::shared_ptr<QPDF> processFile(
         char const* filename, char const* password);
-    PointerHolder<QPDF> processInputSource(
+    std::shared_ptr<QPDF> processInputSource(
         PointerHolder<InputSource> is, char const* password);
-    PointerHolder<QPDF> doProcess(
+    std::shared_ptr<QPDF> doProcess(
         std::function<void(QPDF*, char const*)> fn,
         char const* password, bool empty);
-    PointerHolder<QPDF> doProcessOnce(
+    std::shared_ptr<QPDF> doProcessOnce(
         std::function<void(QPDF*, char const*)> fn,
         char const* password, bool empty);
 
@@ -331,7 +331,7 @@ class QPDFJob
     void setQPDFOptions(QPDF& pdf);
     void handlePageSpecs(
         QPDF& pdf, bool& warnings,
-        std::vector<PointerHolder<QPDF>>& page_heap);
+        std::vector<std::shared_ptr<QPDF>>& page_heap);
     bool shouldRemoveUnreferencedResources(QPDF& pdf);
     void handleRotations(QPDF& pdf);
     void handleUnderOverlay(QPDF& pdf);
@@ -395,9 +395,9 @@ class QPDFJob
         std::ostream* cout;
         std::ostream* cerr;
         unsigned long encryption_status;
-        PointerHolder<QPDFArgParser> ap;
+        std::shared_ptr<QPDFArgParser> ap;
     };
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // QPDFOBJECT_HH
