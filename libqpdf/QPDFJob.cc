@@ -1934,13 +1934,13 @@ QPDFJob::processInputSource(
 void
 QPDFJob::validateUnderOverlay(QPDF& pdf, QPDFJob::UnderOverlay* uo)
 {
-    if (0 == uo->filename)
+    if (uo->filename.empty())
     {
         return;
     }
     QPDFPageDocumentHelper main_pdh(pdf);
     int main_npages = QIntC::to_int(main_pdh.getAllPages().size());
-    uo->pdf = processFile(uo->filename, uo->password);
+    uo->pdf = processFile(uo->filename.c_str(), uo->password.get());
     QPDFPageDocumentHelper uo_pdh(*(uo->pdf));
     int uo_npages = QIntC::to_int(uo_pdh.getAllPages().size());
     try

@@ -148,8 +148,6 @@ class QPDFJob
     {
         UnderOverlay(char const* which) :
             which(which),
-            filename(0),
-            password(0),
             to_nr("1-z"),
             from_nr("1-z"),
             repeat_nr("")
@@ -157,8 +155,8 @@ class QPDFJob
         }
 
         std::string which;
-        char const* filename;
-        char const* password;
+        std::string filename;
+        std::shared_ptr<char> password;
         std::string to_nr;
         std::string from_nr;
         std::string repeat_nr;

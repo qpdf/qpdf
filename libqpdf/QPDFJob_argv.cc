@@ -1135,7 +1135,7 @@ ArgParser::argEnd256BitEncryption()
 void
 ArgParser::argUOPositional(char* arg)
 {
-    if (o.under_overlay->filename)
+    if (! o.under_overlay->filename.empty())
     {
         usage(o.under_overlay->which + " file already specified");
     }
@@ -1175,13 +1175,13 @@ ArgParser::argUORepeat(char* parameter)
 void
 ArgParser::argUOPassword(char* parameter)
 {
-    o.under_overlay->password = parameter;
+    o.under_overlay->password = QUtil::make_shared_cstr(parameter);
 }
 
 void
 ArgParser::argEndUnderlayOverlay()
 {
-    if (0 == o.under_overlay->filename)
+    if (o.under_overlay->filename.empty())
     {
         usage(o.under_overlay->which + " file not specified");
     }
