@@ -1945,7 +1945,7 @@ QPDFJob::validateUnderOverlay(QPDF& pdf, QPDFJob::UnderOverlay* uo)
     int uo_npages = QIntC::to_int(uo_pdh.getAllPages().size());
     try
     {
-        uo->to_pagenos = QUtil::parse_numrange(uo->to_nr, main_npages);
+        uo->to_pagenos = QUtil::parse_numrange(uo->to_nr.c_str(), main_npages);
     }
     catch (std::runtime_error& e)
     {
@@ -1955,16 +1955,17 @@ QPDFJob::validateUnderOverlay(QPDF& pdf, QPDFJob::UnderOverlay* uo)
     }
     try
     {
-        if (0 == strlen(uo->from_nr))
+        if (uo->from_nr.empty())
         {
             QTC::TC("qpdf", "qpdf from_nr from repeat_nr");
             uo->from_nr = uo->repeat_nr;
         }
-        uo->from_pagenos = QUtil::parse_numrange(uo->from_nr, uo_npages);
-        if (strlen(uo->repeat_nr))
+        uo->from_pagenos =
+            QUtil::parse_numrange(uo->from_nr.c_str(), uo_npages);
+        if (! uo->repeat_nr.empty())
         {
             uo->repeat_pagenos =
-                QUtil::parse_numrange(uo->repeat_nr, uo_npages);
+                QUtil::parse_numrange(uo->repeat_nr.c_str(), uo_npages);
         }
     }
     catch (std::runtime_error& e)

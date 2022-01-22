@@ -159,9 +159,9 @@ class QPDFJob
         std::string which;
         char const* filename;
         char const* password;
-        char const* to_nr;
-        char const* from_nr;
-        char const* repeat_nr;
+        std::string to_nr;
+        std::string from_nr;
+        std::string repeat_nr;
         std::shared_ptr<QPDF> pdf;
         std::vector<int> to_pagenos;
         std::vector<int> from_pagenos;
