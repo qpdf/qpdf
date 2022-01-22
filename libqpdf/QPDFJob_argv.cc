@@ -178,7 +178,7 @@ ArgParser::argShowCrypto()
 void
 ArgParser::argPassword(char* parameter)
 {
-    o.password = parameter;
+    o.password = QUtil::make_shared_cstr(parameter);
 }
 
 void
@@ -197,9 +197,7 @@ ArgParser::argPasswordFile(char* parameter)
     }
     if (lines.size() >= 1)
     {
-        // Make sure the memory for this stays in scope.
-        o.password_alloc = QUtil::make_shared_cstr(lines.front());
-        o.password = o.password_alloc.get();
+        o.password = QUtil::make_shared_cstr(lines.front());
 
         if (lines.size() > 1)
         {

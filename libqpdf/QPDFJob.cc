@@ -452,7 +452,7 @@ QPDFJob::run()
     std::shared_ptr<QPDF> pdf_ph;
     try
     {
-        pdf_ph = processFile(o.infilename, o.password);
+        pdf_ph = processFile(o.infilename, o.password.get());
     }
     catch (QPDFExc& e)
     {

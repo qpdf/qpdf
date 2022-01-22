@@ -199,8 +199,7 @@ class QPDFJob
 
     enum remove_unref_e { re_auto, re_yes, re_no };
 
-    char const* password;
-    std::shared_ptr<char> password_alloc;
+    std::shared_ptr<char> password;
     bool linearize;
     bool decrypt;
     int split_pages;
