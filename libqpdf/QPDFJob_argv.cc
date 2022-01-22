@@ -68,7 +68,7 @@ ArgParser::argPositional(char* arg)
 {
     if (o.infilename == 0)
     {
-        o.infilename = arg;
+        o.infilename = QUtil::make_shared_cstr(arg);
     }
     else if (o.outfilename == 0)
     {
@@ -211,7 +211,7 @@ ArgParser::argPasswordFile(char* parameter)
 void
 ArgParser::argEmpty()
 {
-    o.infilename = "";
+    o.infilename = QUtil::make_shared_cstr("");
 }
 
 void
@@ -1513,7 +1513,8 @@ ArgParser::doFinalChecks()
         }
     }
 
-    if ((! o.split_pages) && QUtil::same_file(o.infilename, o.outfilename))
+    if ((! o.split_pages) &&
+        QUtil::same_file(o.infilename.get(), o.outfilename))
     {
         QTC::TC("qpdf", "qpdf same file error");
         usage("input file and output file are the same;"

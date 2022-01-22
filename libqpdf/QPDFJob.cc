@@ -414,7 +414,6 @@ QPDFJob::QPDFJob() :
     replace_input(false),
     check_is_encrypted(false),
     check_requires_password(false),
-    infilename(0),
     outfilename(0),
     m(new Members())
 {
@@ -451,7 +450,7 @@ QPDFJob::run()
     std::shared_ptr<QPDF> pdf_ph;
     try
     {
-        pdf_ph = processFile(o.infilename, o.password.get());
+        pdf_ph = processFile(o.infilename.get(), o.password.get());
     }
     catch (QPDFExc& e)
     {
@@ -2554,7 +2553,7 @@ QPDFJob::handlePageSpecs(
         QPDFJob::PageSpec& page_spec = *iter;
         if (page_spec.filename == ".")
         {
-            page_spec.filename = o.infilename;
+            page_spec.filename = o.infilename.get();
         }
     }
 
@@ -2582,7 +2581,7 @@ QPDFJob::handlePageSpecs(
     // Create a QPDF object for each file that we may take pages from.
     std::map<std::string, QPDF*> page_spec_qpdfs;
     std::map<std::string, ClosedFileInputSource*> page_spec_cfis;
-    page_spec_qpdfs[o.infilename] = &pdf;
+    page_spec_qpdfs[o.infilename.get()] = &pdf;
     std::vector<QPDFPageData> parsed_specs;
     std::map<unsigned long long, std::set<QPDFObjGen> > copied_pages;
     for (std::vector<QPDFJob::PageSpec>::iterator iter = o.page_specs.begin();
@@ -3364,7 +3363,7 @@ QPDFJob::doSplitPages(QPDF& pdf, bool& warnings)
                 QUtil::uint_to_string(last, QIntC::to_int(pageno_len));
         }
         std::string outfile = before + page_range + after;
-        if (QUtil::same_file(o.infilename, outfile.c_str()))
+        if (QUtil::same_file(o.infilename.get(), outfile.c_str()))
         {
             throw std::runtime_error(
                 "split pages would overwrite input file with " + outfile);
@@ -3392,7 +3391,7 @@ QPDFJob::writeOutfile(QPDF& pdf)
         // Append but don't prepend to the path to generate a
         // temporary name. This saves us from having to split the path
         // by directory and non-directory.
-        temp_out = std::string(o.infilename) + ".~qpdf-temp#";
+        temp_out = std::string(o.infilename.get()) + ".~qpdf-temp#";
         // o.outfilename will be restored to 0 before temp_out
         // goes out of scope.
         o.outfilename = temp_out.c_str();
@@ -3421,14 +3420,14 @@ QPDFJob::writeOutfile(QPDF& pdf)
     {
         // We must close the input before we can rename files
         pdf.closeInputSource();
-        std::string backup = std::string(o.infilename) + ".~qpdf-orig";
+        std::string backup = std::string(o.infilename.get()) + ".~qpdf-orig";
         bool warnings = pdf.anyWarnings();
         if (! warnings)
         {
             backup.append(1, '#');
         }
-        QUtil::rename_file(o.infilename, backup.c_str());
-        QUtil::rename_file(temp_out.c_str(), o.infilename);
+        QUtil::rename_file(o.infilename.get(), backup.c_str());
+        QUtil::rename_file(temp_out.c_str(), o.infilename.get());
         if (warnings)
         {
             *(this->m->cerr)
