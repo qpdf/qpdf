@@ -64,7 +64,7 @@ namespace
     struct QPDFPageData
     {
         QPDFPageData(std::string const& filename,
-                     QPDF* qpdf, char const* range);
+                     QPDF* qpdf, std::string const& range);
         QPDFPageData(QPDFPageData const& other, int page);
 
         std::string filename;
@@ -272,9 +272,21 @@ ImageOptimizer::provideStreamData(int, int, Pipeline* pipeline)
                          false, false);
 }
 
+QPDFJob::PageSpec::PageSpec(std::string const& filename,
+                            char const* password,
+                            std::string const& range) :
+    filename(filename),
+    range(range)
+{
+    if (password)
+    {
+        this->password = QUtil::make_shared_cstr(password);
+    }
+}
+
 QPDFPageData::QPDFPageData(std::string const& filename,
                            QPDF* qpdf,
-                           char const* range) :
+                           std::string const& range) :
     filename(filename),
     qpdf(qpdf),
     orig_pages(qpdf->getAllPages())
@@ -282,7 +294,7 @@ QPDFPageData::QPDFPageData(std::string const& filename,
     try
     {
         this->selected_pages =
-            QUtil::parse_numrange(range,
+            QUtil::parse_numrange(range.c_str(),
                                   QIntC::to_int(this->orig_pages.size()));
     }
     catch (std::runtime_error& e)
@@ -2599,7 +2611,7 @@ QPDFJob::handlePageSpecs(
             // the API, you can just create two different QPDF objects
             // to the same underlying file with the same path to
             // achieve the same affect.
-            char const* password = page_spec.password;
+            char const* password = page_spec.password.get();
             if ((! o.encryption_file.empty()) && (password == 0) &&
                 (page_spec.filename == o.encryption_file))
             {

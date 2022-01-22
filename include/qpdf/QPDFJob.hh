@@ -123,16 +123,11 @@ class QPDFJob
     {
         PageSpec(std::string const& filename,
                  char const* password,
-                 char const* range) :
-            filename(filename),
-            password(password),
-            range(range)
-        {
-        }
+                 std::string const& range);
 
         std::string filename;
-        char const* password;
-        char const* range;
+        std::shared_ptr<char> password;
+        std::string range;
     };
 
     struct RotationSpec
