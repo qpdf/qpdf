@@ -72,7 +72,7 @@ ArgParser::argPositional(char* arg)
     }
     else if (o.outfilename == 0)
     {
-        o.outfilename = arg;
+        o.outfilename = QUtil::make_shared_cstr(arg);
     }
     else
     {
@@ -1494,7 +1494,7 @@ ArgParser::doFinalChecks()
     }
 
     if (o.require_outfile && o.outfilename &&
-        (strcmp(o.outfilename, "-") == 0))
+        (strcmp(o.outfilename.get(), "-") == 0))
     {
         if (o.split_pages)
         {
@@ -1514,7 +1514,7 @@ ArgParser::doFinalChecks()
     }
 
     if ((! o.split_pages) &&
-        QUtil::same_file(o.infilename.get(), o.outfilename))
+        QUtil::same_file(o.infilename.get(), o.outfilename.get()))
     {
         QTC::TC("qpdf", "qpdf same file error");
         usage("input file and output file are the same;"

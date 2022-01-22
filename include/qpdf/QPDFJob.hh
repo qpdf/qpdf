@@ -310,7 +310,7 @@ class QPDFJob
     bool check_is_encrypted;
     bool check_requires_password;
     std::shared_ptr<char> infilename;
-    char const* outfilename;
+    std::shared_ptr<char> outfilename;
     // QXXXQ END-PUBLIC
 
   private:

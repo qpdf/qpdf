@@ -414,7 +414,6 @@ QPDFJob::QPDFJob() :
     replace_input(false),
     check_is_encrypted(false),
     check_requires_password(false),
-    outfilename(0),
     m(new Members())
 {
 }
@@ -3257,7 +3256,8 @@ QPDFJob::setWriterOptions(QPDF& pdf, QPDFWriter& w)
     {
         w.registerProgressReporter(
             new ProgressReporter(
-                *(this->m->cout), this->m->message_prefix, o.outfilename));
+                *(this->m->cout), this->m->message_prefix,
+                o.outfilename.get()));
     }
 }
 
@@ -3268,27 +3268,27 @@ QPDFJob::doSplitPages(QPDF& pdf, bool& warnings)
     // Generate output file pattern
     std::string before;
     std::string after;
-    size_t len = strlen(o.outfilename);
-    char* num_spot = strstr(const_cast<char*>(o.outfilename), "%d");
+    size_t len = strlen(o.outfilename.get());
+    char* num_spot = strstr(const_cast<char*>(o.outfilename.get()), "%d");
     if (num_spot != 0)
     {
         QTC::TC("qpdf", "qpdf split-pages %d");
-        before = std::string(o.outfilename,
-                             QIntC::to_size(num_spot - o.outfilename));
+        before = std::string(o.outfilename.get(),
+                             QIntC::to_size(num_spot - o.outfilename.get()));
         after = num_spot + 2;
     }
     else if ((len >= 4) &&
              (QUtil::str_compare_nocase(
-                 o.outfilename + len - 4, ".pdf") == 0))
+                 o.outfilename.get() + len - 4, ".pdf") == 0))
     {
         QTC::TC("qpdf", "qpdf split-pages .pdf");
-        before = std::string(o.outfilename, len - 4) + "-";
-        after = o.outfilename + len - 4;
+        before = std::string(o.outfilename.get(), len - 4) + "-";
+        after = o.outfilename.get() + len - 4;
     }
     else
     {
         QTC::TC("qpdf", "qpdf split-pages other");
-        before = std::string(o.outfilename) + "-";
+        before = std::string(o.outfilename.get()) + "-";
     }
 
     if (shouldRemoveUnreferencedResources(pdf))
@@ -3385,24 +3385,25 @@ void
 QPDFJob::writeOutfile(QPDF& pdf)
 {
     QPDFJob& o = *this; // QXXXQ
-    std::string temp_out;
+    std::shared_ptr<char> temp_out;
     if (o.replace_input)
     {
         // Append but don't prepend to the path to generate a
         // temporary name. This saves us from having to split the path
         // by directory and non-directory.
-        temp_out = std::string(o.infilename.get()) + ".~qpdf-temp#";
+        temp_out = QUtil::make_shared_cstr(
+            std::string(o.infilename.get()) + ".~qpdf-temp#");
         // o.outfilename will be restored to 0 before temp_out
         // goes out of scope.
-        o.outfilename = temp_out.c_str();
+        o.outfilename = temp_out;
     }
-    else if (strcmp(o.outfilename, "-") == 0)
+    else if (strcmp(o.outfilename.get(), "-") == 0)
     {
         o.outfilename = 0;
     }
     {
         // Private scope so QPDFWriter will close the output file
-        QPDFWriter w(pdf, o.outfilename);
+        QPDFWriter w(pdf, o.outfilename.get());
         setWriterOptions(pdf, w);
         w.write();
     }
@@ -3427,7 +3428,7 @@ QPDFJob::writeOutfile(QPDF& pdf)
             backup.append(1, '#');
         }
         QUtil::rename_file(o.infilename.get(), backup.c_str());
-        QUtil::rename_file(temp_out.c_str(), o.infilename.get());
+        QUtil::rename_file(temp_out.get(), o.infilename.get());
         if (warnings)
         {
             *(this->m->cerr)
