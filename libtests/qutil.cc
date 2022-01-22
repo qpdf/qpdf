@@ -150,6 +150,16 @@ void string_conversion_test()
 	std::cout << "compare failed" << std::endl;
     }
     delete [] tmp;
+    // Also test with make_shared_cstr
+    auto tmp2 = QUtil::make_shared_cstr(embedded_null);
+    if (memcmp(tmp2.get(), embedded_null.c_str(), 7) == 0)
+    {
+	std::cout << "compare okay" << std::endl;
+    }
+    else
+    {
+	std::cout << "compare failed" << std::endl;
+    }
 
     std::string int_max_str = QUtil::int_to_string(INT_MAX);
     std::string int_min_str = QUtil::int_to_string(INT_MIN);
@@ -407,8 +417,8 @@ void transcoding_test()
 
 void print_whoami(char const* str)
 {
-    PointerHolder<char> dup(true, QUtil::copy_string(str));
-    std::cout << QUtil::getWhoami(dup.getPointer()) << std::endl;
+    auto dup = QUtil::make_shared_cstr(str);
+    std::cout << QUtil::getWhoami(dup.get()) << std::endl;
 }
 
 void get_whoami_test()

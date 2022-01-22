@@ -1915,9 +1915,8 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	    }
 	    else
 	    {
-		PointerHolder<char> tmp_ph =
-                    PointerHolder<char>(true, QUtil::copy_string(val));
-                char* tmp = tmp_ph.getPointer();
+		auto tmp_ph = QUtil::make_shared_cstr(val);
+                char* tmp = tmp_ph.get();
 		size_t vlen = val.length();
 		RC4 rc4(QUtil::unsigned_char_pointer(this->m->cur_data_key),
 			QIntC::to_int(this->m->cur_data_key.length()));

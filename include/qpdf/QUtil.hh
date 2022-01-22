@@ -30,6 +30,7 @@
 #include <vector>
 #include <stdexcept>
 #include <functional>
+#include <memory>
 #include <stdio.h>
 #include <time.h>
 
@@ -151,8 +152,14 @@ namespace QUtil
     QPDF_DLL
     std::string path_basename(std::string const& filename);
 
+    // Returns a dynamically allocated copy of a string that the
+    // caller has to delete with delete[].
     QPDF_DLL
     char* copy_string(std::string const&);
+
+    // Returns a shared_ptr<char> with the correct deleter.
+    QPDF_DLL
+    std::shared_ptr<char> make_shared_cstr(std::string const&);
 
     // Returns lower-case hex-encoded version of the string, treating
     // each character in the input string as unsigned.  The output

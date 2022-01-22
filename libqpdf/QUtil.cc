@@ -731,6 +731,18 @@ QUtil::copy_string(std::string const& str)
     return result;
 }
 
+std::shared_ptr<char>
+QUtil::make_shared_cstr(std::string const& str)
+{
+    auto result = std::shared_ptr<char>(
+        new char[str.length() + 1],
+        std::default_delete<char[]>());
+    // Use memcpy in case string contains nulls
+    result.get()[str.length()] = '\0';
+    memcpy(result.get(), str.c_str(), str.length());
+    return result;
+}
+
 std::string
 QUtil::hex_encode(std::string const& input)
 {
@@ -2625,7 +2637,7 @@ QUtil::call_main_from_wmain(int argc, wchar_t* argv[],
                              QIntC::to_uchar(codepoint & 0xff)));
         }
         std::string utf8 = QUtil::utf16_to_utf8(utf16);
-        utf8_argv.push_back(std::shared_ptr<char>(QUtil::copy_string(utf8.c_str()), std::default_delete<char[]>()));
+        utf8_argv.push_back(QUtil::make_shared_cstr(utf8));
     }
     auto utf8_argv_sp =
         std::shared_ptr<char*>(new char*[1+utf8_argv.size()], std::default_delete<char*[]>());

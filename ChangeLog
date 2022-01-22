@@ -1,5 +1,8 @@
 2022-01-22  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add QUtil::make_shared_cstr to return a std::shared_ptr<char>
+	instead of a char* like QUtil::copy_string
+
 	* JSON: for (qpdf-specific, not official) "schema" checking, add
 	the ability to treat missing fields as optional. Also ensure that
 	values in the schema are dictionary, array, or string.
