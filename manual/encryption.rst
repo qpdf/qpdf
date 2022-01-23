@@ -383,13 +383,13 @@ reader treats the password as the owner password, using it to recover
 the user password, and then uses the user password to retrieve the
 encryption key. This is why creating a file with the same user
 password and owner password with ``V`` < 5 results in a file that some
-readers will never allow you to open as the owner. Typically when a
-reader encounters a file with ``V`` < 5, it will first attempt to
-treat the empty string as a user password. If that works, the file is
-encrypted but not password-protected. If it doesn't work, then a
-password prompt is given. Creating a file with an empty owner password
-is like creating a file with the same owner and user password: there
-is no way to open the file as an owner.
+readers will never allow you to open as the owner. When an empty owner
+password is given at file creation, the user password is used as both
+the user and owner password. Typically when a reader encounters a file
+with ``V`` < 5, it will first attempt to treat the empty string as a
+user password. If that works, the file is encrypted but not
+password-protected. If it doesn't work, then a password prompt is
+given.
 
 For ``V`` ≥ 5, the main encryption key is independently encrypted
 using the user password and the owner password. There is no way to
