@@ -849,7 +849,7 @@ QPDFJob::doCheck(QPDF& pdf)
 
     if ((! pdf.getWarnings().empty()) || warnings)
     {
-        this->m->warnings = TRUE;
+        this->m->warnings = true;
     }
     else
     {
