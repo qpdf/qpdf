@@ -216,12 +216,14 @@ ArgParser::argPasswordFile(char* parameter)
 void
 ArgParser::argEmpty()
 {
+    // QXXXQ @TRIVIAL
     o.infilename = QUtil::make_shared_cstr("");
 }
 
 void
 ArgParser::argLinearize()
 {
+    // QXXXQ @TRIVIAL
     o.linearize = true;
 }
 
@@ -286,6 +288,7 @@ ArgParser::argEncPositional(char* arg)
 void
 ArgParser::argDecrypt()
 {
+    // QXXXQ @TRIVIAL
     o.decrypt = true;
     o.encrypt = false;
     o.copy_encryption = false;
@@ -294,12 +297,14 @@ ArgParser::argDecrypt()
 void
 ArgParser::argPasswordIsHexKey()
 {
+    // QXXXQ @TRIVIAL
     o.password_is_hex_key = true;
 }
 
 void
 ArgParser::argSuppressPasswordRecovery()
 {
+    // QXXXQ @TRIVIAL
     o.suppress_password_recovery = true;
 }
 
@@ -337,12 +342,14 @@ ArgParser::argEnc256AllowInsecure()
 void
 ArgParser::argAllowWeakCrypto()
 {
+    // QXXXQ @TRIVIAL
     o.allow_weak_crypto = true;
 }
 
 void
 ArgParser::argCopyEncryption(char* parameter)
 {
+    // QXXXQ @TRIVIAL
     o.encryption_file = parameter;
     o.copy_encryption = true;
     o.encrypt = false;
@@ -352,12 +359,14 @@ ArgParser::argCopyEncryption(char* parameter)
 void
 ArgParser::argEncryptionFilePassword(char* parameter)
 {
+    // QXXXQ @TRIVIAL
     o.encryption_file_password = QUtil::make_shared_cstr(parameter);
 }
 
 void
 ArgParser::argCollate(char* parameter)
 {
+    // QXXXQ @TRIVIAL
     auto n = ((parameter == 0) ? 1 :
               QUtil::string_to_uint(parameter));
     o.collate = QIntC::to_size(n);
@@ -503,12 +512,14 @@ ArgParser::argRotate(char* parameter)
 void
 ArgParser::argFlattenRotation()
 {
+    // QXXXQ @TRIVIAL
     o.flatten_rotation = true;
 }
 
 void
 ArgParser::argListAttachments()
 {
+    // QXXXQ @TRIVIAL
     o.list_attachments = true;
     o.require_outfile = false;
 }
@@ -516,6 +527,7 @@ ArgParser::argListAttachments()
 void
 ArgParser::argShowAttachment(char* parameter)
 {
+    // QXXXQ @TRIVIAL
     o.attachment_to_show = parameter;
     o.require_outfile = false;
 }
@@ -523,6 +535,7 @@ ArgParser::argShowAttachment(char* parameter)
 void
 ArgParser::argRemoveAttachment(char* parameter)
 {
+    // QXXXQ @TRIVIAL
     o.attachments_to_remove.push_back(parameter);
 }
 
@@ -567,6 +580,7 @@ ArgParser::argStreamData(char* parameter)
 void
 ArgParser::argCompressStreams(char* parameter)
 {
+    // QXXXQ @TRIVIAL
     o.compress_streams_set = true;
     o.compress_streams = (strcmp(parameter, "y") == 0);
 }
@@ -574,6 +588,7 @@ ArgParser::argCompressStreams(char* parameter)
 void
 ArgParser::argRecompressFlate()
 {
+    // QXXXQ @TRIVIAL
     o.recompress_flate_set = true;
     o.recompress_flate = true;
 }
@@ -581,6 +596,7 @@ ArgParser::argRecompressFlate()
 void
 ArgParser::argCompressionLevel(char* parameter)
 {
+    // QXXXQ @TRIVIAL
     o.compression_level = QUtil::string_to_int(parameter);
 }
 
@@ -615,6 +631,7 @@ ArgParser::argDecodeLevel(char* parameter)
 void
 ArgParser::argNormalizeContent(char* parameter)
 {
+    // QXXXQ @TRIVIAL
     o.normalize_set = true;
     o.normalize = (strcmp(parameter, "y") == 0);
 }
@@ -622,6 +639,7 @@ ArgParser::argNormalizeContent(char* parameter)
 void
 ArgParser::argSuppressRecovery()
 {
+    // QXXXQ @TRIVIAL
     o.suppress_recovery = true;
 }
 
@@ -652,24 +670,28 @@ ArgParser::argObjectStreams(char* parameter)
 void
 ArgParser::argIgnoreXrefStreams()
 {
+    // QXXXQ @TRIVIAL
     o.ignore_xref_streams = true;
 }
 
 void
 ArgParser::argQdf()
 {
+    // QXXXQ @TRIVIAL
     o.qdf_mode = true;
 }
 
 void
 ArgParser::argPreserveUnreferenced()
 {
+    // QXXXQ @TRIVIAL
     o.preserve_unreferenced_objects = true;
 }
 
 void
 ArgParser::argPreserveUnreferencedResources()
 {
+    // QXXXQ @TRIVIAL
     o.remove_unreferenced_page_resources = QPDFJob::re_no;
 }
 
@@ -699,6 +721,7 @@ ArgParser::argRemoveUnreferencedResources(char* parameter)
 void
 ArgParser::argKeepFilesOpen(char* parameter)
 {
+    // QXXXQ @TRIVIAL
     o.keep_files_open_set = true;
     o.keep_files_open = (strcmp(parameter, "y") == 0);
 }
@@ -706,30 +729,35 @@ ArgParser::argKeepFilesOpen(char* parameter)
 void
 ArgParser::argKeepFilesOpenThreshold(char* parameter)
 {
+    // QXXXQ @TRIVIAL
     o.keep_files_open_threshold = QUtil::string_to_uint(parameter);
 }
 
 void
 ArgParser::argNewlineBeforeEndstream()
 {
+    // QXXXQ @TRIVIAL
     o.newline_before_endstream = true;
 }
 
 void
 ArgParser::argLinearizePass1(char* parameter)
 {
+    // QXXXQ @TRIVIAL
     o.linearize_pass1 = parameter;
 }
 
 void
 ArgParser::argCoalesceContents()
 {
+    // QXXXQ @TRIVIAL
     o.coalesce_contents = true;
 }
 
 void
 ArgParser::argFlattenAnnotations(char* parameter)
 {
+    // QXXXQ @TRIVIAL
     o.flatten_annotations = true;
     if (strcmp(parameter, "screen") == 0)
     {
@@ -744,24 +772,28 @@ ArgParser::argFlattenAnnotations(char* parameter)
 void
 ArgParser::argGenerateAppearances()
 {
+    // QXXXQ @TRIVIAL
     o.generate_appearances = true;
 }
 
 void
 ArgParser::argMinVersion(char* parameter)
 {
+    // QXXXQ @TRIVIAL
     o.min_version = parameter;
 }
 
 void
 ArgParser::argForceVersion(char* parameter)
 {
+    // QXXXQ @TRIVIAL
     o.force_version = parameter;
 }
 
 void
 ArgParser::argSplitPages(char* parameter)
 {
+    // QXXXQ @TRIVIAL
     int n = ((parameter == 0) ? 1 :
              QUtil::string_to_int(parameter));
     o.split_pages = n;
@@ -770,54 +802,63 @@ ArgParser::argSplitPages(char* parameter)
 void
 ArgParser::argVerbose()
 {
+    // QXXXQ @TRIVIAL
     o.verbose = true;
 }
 
 void
 ArgParser::argProgress()
 {
+    // QXXXQ @TRIVIAL
     o.progress = true;
 }
 
 void
 ArgParser::argNoWarn()
 {
+    // QXXXQ @TRIVIAL
     o.suppress_warnings = true;
 }
 
 void
 ArgParser::argWarningExit0()
 {
+    // QXXXQ @TRIVIAL
     o.warnings_exit_zero = true;
 }
 
 void
 ArgParser::argDeterministicId()
 {
+    // QXXXQ @TRIVIAL
     o.deterministic_id = true;
 }
 
 void
 ArgParser::argStaticId()
 {
+    // QXXXQ @TRIVIAL
     o.static_id = true;
 }
 
 void
 ArgParser::argStaticAesIv()
 {
+    // QXXXQ @TRIVIAL
     o.static_aes_iv = true;
 }
 
 void
 ArgParser::argNoOriginalObjectIds()
 {
+    // QXXXQ @TRIVIAL
     o.suppress_original_object_id = true;
 }
 
 void
 ArgParser::argShowEncryption()
 {
+    // QXXXQ @TRIVIAL
     o.show_encryption = true;
     o.require_outfile = false;
 }
@@ -825,12 +866,14 @@ ArgParser::argShowEncryption()
 void
 ArgParser::argShowEncryptionKey()
 {
+    // QXXXQ @TRIVIAL
     o.show_encryption_key = true;
 }
 
 void
 ArgParser::argCheckLinearization()
 {
+    // QXXXQ @TRIVIAL
     o.check_linearization = true;
     o.require_outfile = false;
 }
@@ -838,6 +881,7 @@ ArgParser::argCheckLinearization()
 void
 ArgParser::argShowLinearization()
 {
+    // QXXXQ @TRIVIAL
     o.show_linearization = true;
     o.require_outfile = false;
 }
@@ -845,6 +889,7 @@ ArgParser::argShowLinearization()
 void
 ArgParser::argShowXref()
 {
+    // QXXXQ @TRIVIAL
     o.show_xref = true;
     o.require_outfile = false;
 }
@@ -859,18 +904,21 @@ ArgParser::argShowObject(char* parameter)
 void
 ArgParser::argRawStreamData()
 {
+    // QXXXQ @TRIVIAL
     o.show_raw_stream_data = true;
 }
 
 void
 ArgParser::argFilteredStreamData()
 {
+    // QXXXQ @TRIVIAL
     o.show_filtered_stream_data = true;
 }
 
 void
 ArgParser::argShowNpages()
 {
+    // QXXXQ @TRIVIAL
     o.show_npages = true;
     o.require_outfile = false;
 }
@@ -878,6 +926,7 @@ ArgParser::argShowNpages()
 void
 ArgParser::argShowPages()
 {
+    // QXXXQ @TRIVIAL
     o.show_pages = true;
     o.require_outfile = false;
 }
@@ -885,12 +934,14 @@ ArgParser::argShowPages()
 void
 ArgParser::argWithImages()
 {
+    // QXXXQ @TRIVIAL
     o.show_page_images = true;
 }
 
 void
 ArgParser::argJson()
 {
+    // QXXXQ @TRIVIAL
     o.json = true;
     o.require_outfile = false;
 }
@@ -898,18 +949,21 @@ ArgParser::argJson()
 void
 ArgParser::argJsonKey(char* parameter)
 {
+    // QXXXQ @TRIVIAL
     o.json_keys.insert(parameter);
 }
 
 void
 ArgParser::argJsonObject(char* parameter)
 {
+    // QXXXQ @TRIVIAL
     o.json_objects.insert(parameter);
 }
 
 void
 ArgParser::argCheck()
 {
+    // QXXXQ @TRIVIAL
     o.check = true;
     o.require_outfile = false;
 }
@@ -917,48 +971,56 @@ ArgParser::argCheck()
 void
 ArgParser::argOptimizeImages()
 {
+    // QXXXQ @TRIVIAL
     o.optimize_images = true;
 }
 
 void
 ArgParser::argExternalizeInlineImages()
 {
+    // QXXXQ @TRIVIAL
     o.externalize_inline_images = true;
 }
 
 void
 ArgParser::argKeepInlineImages()
 {
+    // QXXXQ @TRIVIAL
     o.keep_inline_images = true;
 }
 
 void
 ArgParser::argRemovePageLabels()
 {
+    // QXXXQ @TRIVIAL
     o.remove_page_labels = true;
 }
 
 void
 ArgParser::argOiMinWidth(char* parameter)
 {
+    // QXXXQ @TRIVIAL
     o.oi_min_width = QUtil::string_to_uint(parameter);
 }
 
 void
 ArgParser::argOiMinHeight(char* parameter)
 {
+    // QXXXQ @TRIVIAL
     o.oi_min_height = QUtil::string_to_uint(parameter);
 }
 
 void
 ArgParser::argOiMinArea(char* parameter)
 {
+    // QXXXQ @TRIVIAL
     o.oi_min_area = QUtil::string_to_uint(parameter);
 }
 
 void
 ArgParser::argIiMinBytes(char* parameter)
 {
+    // QXXXQ @TRIVIAL
     o.ii_min_bytes = QUtil::string_to_uint(parameter);
 }
 
@@ -1196,12 +1258,14 @@ ArgParser::argEndUnderlayOverlay()
 void
 ArgParser::argReplaceInput()
 {
+    // QXXXQ @TRIVIAL
     o.replace_input = true;
 }
 
 void
 ArgParser::argIsEncrypted()
 {
+    // QXXXQ @TRIVIAL
     o.check_is_encrypted = true;
     o.require_outfile = false;
 }
@@ -1209,6 +1273,7 @@ ArgParser::argIsEncrypted()
 void
 ArgParser::argRequiresPassword()
 {
+    // QXXXQ @TRIVIAL
     o.check_requires_password = true;
     o.require_outfile = false;
 }
