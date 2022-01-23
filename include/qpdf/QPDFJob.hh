@@ -45,6 +45,8 @@ class QPDFJob
     QPDF_DLL
     QPDFJob();
 
+    // SETUP FUNCTIONS
+
     // Initialize a QPDFJob object from argv. The progname_env
     // argument is the name of an environment variable which, if set,
     // overrides the name of the executable for purposes of generating
@@ -83,36 +85,45 @@ class QPDFJob
     QPDF_DLL
     void setOutputStreams(std::ostream* out_stream, std::ostream* err_stream);
 
+    // QXXXQ set options -- implemented in QPDFJob_options.cc
+
+    // QXXXQ these will not be in the final interface
+    QPDF_DLL
+    bool suppressWarnings();
+    QPDF_DLL
+    bool warningsExitZero();
+    QPDF_DLL
+    bool checkRequiresPassword();
+    QPDF_DLL
+    bool checkIsEncrypted();
+    // /QXXXQ
+
+    // Execute the job
+    QPDF_DLL
+    void run();
+
+    // CHECK STATUS -- these methods provide information known after
+    // run() is called.
+
+    QPDF_DLL
+    bool hasWarnings();
+
+    QPDF_DLL
+    bool createsOutput();       // QXXXQ need better name
+
+    // Return value is bitwise OR of values from qpdf_encryption_status_e
+    QPDF_DLL
+    unsigned long getEncryptionStatus();
+
+    // HELPER FUNCTIONS -- methods useful for calling in handlers that
+    // interact with QPDFJob during run or initialization.
+
     // If in verbose mode, call the given function, passing in the
     // output stream and message prefix.
     QPDF_DLL
     void doIfVerbose(
         std::function<void(std::ostream&, std::string const& prefix)> fn);
 
-    QPDF_DLL
-    void run();
-
-    QPDF_DLL
-    bool hasWarnings();
-
-    QPDF_DLL
-    bool createsOutput();
-
-    QPDF_DLL
-    bool suppressWarnings();
-
-    QPDF_DLL
-    bool warningsExitZero();
-
-    QPDF_DLL
-    bool checkRequiresPassword();
-
-    QPDF_DLL
-    bool checkIsEncrypted();
-
-    // Return value is bitwise OR of values from qpdf_encryption_status_e
-    QPDF_DLL
-    unsigned long getEncryptionStatus();
 
     // QXXXQ From here to END-PUBLIC should all be private or
     // different somehow
