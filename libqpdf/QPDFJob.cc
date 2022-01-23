@@ -530,6 +530,93 @@ QPDFJob::createsOutput() const
     return ((o.outfilename != nullptr) || o.replace_input);
 }
 
+void
+QPDFJob::checkConfiguration()
+{
+    auto usage = [](char const* msg){
+        throw std::runtime_error(msg);
+    };
+
+    QPDFJob& o = *this; // QXXXQ
+    // QXXXQ messages are CLI-centric
+    if (o.replace_input)
+    {
+        if (o.outfilename)
+        {
+            usage("--replace-input may not be used when"
+                  " an output file is specified");
+        }
+        else if (o.split_pages)
+        {
+            usage("--split-pages may not be used with --replace-input");
+        }
+    }
+    if (o.infilename == 0)
+    {
+        usage("an input file name is required");
+    }
+    else if (o.require_outfile && (o.outfilename == 0) && (! o.replace_input))
+    {
+        usage("an output file name is required; use - for standard output");
+    }
+    else if ((! o.require_outfile) &&
+             ((o.outfilename != 0) || o.replace_input))
+    {
+        usage("no output file may be given for this option");
+    }
+    if (o.check_requires_password && o.check_is_encrypted)
+    {
+        usage("--requires-password and --is-encrypted may not be given"
+              " together");
+    }
+
+    if (o.encrypt && (! o.allow_insecure) &&
+        (o.owner_password.empty() &&
+         (! o.user_password.empty()) &&
+         (o.keylen == 256)))
+    {
+        // Note that empty owner passwords for R < 5 are copied from
+        // the user password, so this lack of security is not an issue
+        // for those files. Also we are consider only the ability to
+        // open the file without a password to be insecure. We are not
+        // concerned about whether the viewer enforces security
+        // settings when the user and owner password match.
+        usage("A PDF with a non-empty user password and an empty owner"
+              " password encrypted with a 256-bit key is insecure as it"
+              " can be opened without a password. If you really want to"
+              " do this, you must also give the --allow-insecure option"
+              " before the -- that follows --encrypt.");
+    }
+
+    if (o.require_outfile && o.outfilename &&
+        (strcmp(o.outfilename.get(), "-") == 0))
+    {
+        if (o.split_pages)
+        {
+            usage("--split-pages may not be used when"
+                  " writing to standard output");
+        }
+        if (o.verbose)
+        {
+            usage("--verbose may not be used when"
+                  " writing to standard output");
+        }
+        if (o.progress)
+        {
+            usage("--progress may not be used when"
+                  " writing to standard output");
+        }
+    }
+
+    if ((! o.split_pages) &&
+        QUtil::same_file(o.infilename.get(), o.outfilename.get()))
+    {
+        QTC::TC("qpdf", "qpdf same file error");
+        usage("input file and output file are the same;"
+              " use --replace-input to intentionally overwrite the input file");
+    }
+}
+
 bool
 QPDFJob::suppressWarnings()
 {

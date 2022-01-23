@@ -85,6 +85,14 @@ class QPDFJob
     QPDF_DLL
     void setOutputStreams(std::ostream* out_stream, std::ostream* err_stream);
 
+    // Check to make sure no contradictory options have been
+    // specified. This is called automatically after initializing from
+    // argv or json and is also called by run, but you can call it
+    // manually as well. It throws a Usage exception if there are any
+    // errors.
+    QPDF_DLL
+    void checkConfiguration();
+
     // Returns true if output is created by the specified job.
     QPDF_DLL
     bool createsOutput() const;
