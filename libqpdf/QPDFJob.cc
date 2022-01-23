@@ -322,7 +322,6 @@ ProgressReporter::reportProgress(int percentage)
 QPDFJob::Members::Members() :
     message_prefix("qpdf"),
     warnings(false),
-    creates_output(false),
     cout(&std::cout),
     cerr(&std::cerr),
     encryption_status(0)
@@ -500,8 +499,7 @@ QPDFJob::run()
     handleUnderOverlay(pdf);
     handleTransformations(pdf);
 
-    this->m->creates_output = ((o.outfilename != nullptr) || o.replace_input);
-    if (! this->m->creates_output)
+    if (! createsOutput())
     {
         doInspection(pdf);
     }
@@ -526,9 +524,10 @@ QPDFJob::hasWarnings()
 }
 
 bool
-QPDFJob::createsOutput()
+QPDFJob::createsOutput() const
 {
-    return this->m->creates_output;
+    QPDFJob const& o = *this; // QXXXQ
+    return ((o.outfilename != nullptr) || o.replace_input);
 }
 
 bool

@@ -85,6 +85,10 @@ class QPDFJob
     QPDF_DLL
     void setOutputStreams(std::ostream* out_stream, std::ostream* err_stream);
 
+    // Returns true if output is created by the specified job.
+    QPDF_DLL
+    bool createsOutput() const;
+
     // QXXXQ set options -- implemented in QPDFJob_options.cc
 
     // QXXXQ these will not be in the final interface
@@ -107,9 +111,6 @@ class QPDFJob
 
     QPDF_DLL
     bool hasWarnings();
-
-    QPDF_DLL
-    bool createsOutput();       // QXXXQ need better name
 
     // Return value is bitwise OR of values from qpdf_encryption_status_e
     QPDF_DLL
@@ -398,7 +399,6 @@ class QPDFJob
 
         std::string message_prefix;
         bool warnings;
-        bool creates_output;
         std::ostream* cout;
         std::ostream* cerr;
         unsigned long encryption_status;
