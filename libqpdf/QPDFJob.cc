@@ -324,7 +324,8 @@ QPDFJob::Members::Members() :
     warnings(false),
     cout(&std::cout),
     cerr(&std::cerr),
-    encryption_status(0)
+    encryption_status(0),
+    verbose(false)
 {
 }
 
@@ -333,7 +334,6 @@ QPDFJob::QPDFJob() :
     linearize(false),
     decrypt(false),
     split_pages(0),
-    verbose(false),
     progress(false),
     suppress_warnings(false),
     warnings_exit_zero(false),
@@ -447,10 +447,16 @@ void
 QPDFJob::doIfVerbose(
     std::function<void(std::ostream&, std::string const& prefix)> fn)
 {
-    if (this->verbose && (this->m->cout != nullptr))
+    if (this->m->verbose && (this->m->cout != nullptr))
     {
         fn(*(this->m->cout), this->m->message_prefix);
     }
+}
+
+QPDFJob::Config
+QPDFJob::config()
+{
+    return Config(*this);
 }
 
 void
@@ -596,7 +602,7 @@ QPDFJob::checkConfiguration()
             usage("--split-pages may not be used when"
                   " writing to standard output");
         }
-        if (o.verbose)
+        if (this->m->verbose)
         {
             usage("--verbose may not be used when"
                   " writing to standard output");

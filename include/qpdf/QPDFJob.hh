@@ -97,6 +97,30 @@ class QPDFJob
     QPDF_DLL
     bool createsOutput() const;
 
+    // CONFIGURATION
+    // (implemented in QPDFJob_config.cc)
+
+    // Configuration is performed by calling methods XXX QXXXQ document
+    class Config
+    {
+        friend class QPDFJob;
+      public:
+        QPDF_DLL
+        Config& verbose(bool);
+
+      private:
+        Config() = delete;
+        Config(QPDFJob& job) :
+            o(job)
+        {
+        }
+        QPDFJob& o;
+    };
+    friend class Config;
+
+    QPDF_DLL
+    Config config();
+
     // QXXXQ set options -- implemented in QPDFJob_options.cc
 
     // QXXXQ these will not be in the final interface
@@ -220,7 +244,6 @@ class QPDFJob
     bool linearize;
     bool decrypt;
     int split_pages;
-    bool verbose;
     bool progress;
     bool suppress_warnings;
     bool warnings_exit_zero;
@@ -410,6 +433,7 @@ class QPDFJob
         std::ostream* cout;
         std::ostream* cerr;
         unsigned long encryption_status;
+        bool verbose;
     };
     std::shared_ptr<Members> m;
 };

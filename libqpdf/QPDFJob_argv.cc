@@ -26,7 +26,7 @@ namespace
     class ArgParser
     {
       public:
-        ArgParser(QPDFArgParser& ap, QPDFJob& o);
+        ArgParser(QPDFArgParser& ap, QPDFJob::Config& jc, QPDFJob& o);
         void parseOptions();
 
       private:
@@ -42,14 +42,16 @@ namespace
 
         QPDFArgParser ap;
         QPDFJob& o;
+        QPDFJob::Config& jc;
         std::vector<char*> accumulated_args; // points to member in ap
         char* pages_password;
     };
 }
 
-ArgParser::ArgParser(QPDFArgParser& ap, QPDFJob& o) :
+ArgParser::ArgParser(QPDFArgParser& ap, QPDFJob::Config& jc, QPDFJob& o) :
     ap(ap),
     o(o),
+    jc(jc),
     pages_password(nullptr)
 {
     initOptionTables();
@@ -803,7 +805,7 @@ void
 ArgParser::argVerbose()
 {
     // QXXXQ @TRIVIAL
-    o.verbose = true;
+    jc.verbose(true);
 }
 
 void
@@ -1558,7 +1560,8 @@ QPDFJob::initializeFromArgv(int argc, char* argv[], char const* progname_env)
     }
     QPDFArgParser qap(argc, argv, progname_env);
     setMessagePrefix(qap.getProgname());
-    ArgParser ap(qap, *this);
+    auto jc = config();
+    ArgParser ap(qap, jc, *this);
     ap.parseOptions();
 }
 
