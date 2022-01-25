@@ -203,6 +203,7 @@ options:
       repeat: page-range
       password: password
   - table: attachment
+    config: c_att
     prefix: Att
     positional: true
     bare:
@@ -340,7 +341,7 @@ json:
     remove-unreferenced-resources:
   _modify:
     add-attachment:
-      - file: "attachment to add"
+      - path: "attachment to add"
         creationdate:
         description:
         filename:
@@ -350,7 +351,7 @@ json:
         replace:
     remove-attachment:
     copy-attachments-from:
-      - file: "attachment source filename"
+      - path: "attachment source filename"
         CopyAtt.password:
         prefix:
     collate:

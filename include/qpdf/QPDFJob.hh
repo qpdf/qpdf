@@ -108,14 +108,49 @@ class QPDFJob
         std::string prefix;
     };
 
+    struct AddAttachment
+    {
+        AddAttachment() :
+            replace(false)
+        {
+        }
+
+        std::string path;
+        std::string key;
+        std::string filename;
+        std::string creationdate;
+        std::string moddate;
+        std::string mimetype;
+        std::string description;
+        bool replace;
+    };
+
   public:
     class Config;
+
+    class AttConfig
+    {
+        friend class QPDFJob;
+        friend class Config;
+      public:
+        QPDF_DLL AttConfig& path(char const* parameter);
+
+#       include <qpdf/auto_job_c_att.hh>
+
+      private:
+        AttConfig(Config&);
+        AttConfig(AttConfig const&) = delete;
+
+        Config& config;
+        AddAttachment att;
+    };
+
     class CopyAttConfig
     {
         friend class QPDFJob;
         friend class Config;
       public:
-        QPDF_DLL CopyAttConfig& filename(char const* parameter);
+        QPDF_DLL CopyAttConfig& path(char const* parameter);
 
 #       include <qpdf/auto_job_c_copy_att.hh>
 
@@ -134,6 +169,7 @@ class QPDFJob
       public:
         QPDF_DLL
         std::shared_ptr<CopyAttConfig> copyAttachmentsFrom();
+        std::shared_ptr<AttConfig> addAttachment();
 
 #       include <qpdf/auto_job_c_main.hh>
 
@@ -242,23 +278,6 @@ class QPDFJob
         std::vector<int> to_pagenos;
         std::vector<int> from_pagenos;
         std::vector<int> repeat_pagenos;
-    };
-
-    struct AddAttachment
-    {
-        AddAttachment() :
-            replace(false)
-        {
-        }
-
-        std::string path;
-        std::string key;
-        std::string filename;
-        std::string creationdate;
-        std::string moddate;
-        std::string mimetype;
-        std::string description;
-        bool replace;
     };
 
     enum remove_unref_e { re_auto, re_yes, re_no };

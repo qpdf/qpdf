@@ -45,6 +45,7 @@ namespace
         QPDFJob& o;
         std::shared_ptr<QPDFJob::Config> c_main;
         std::shared_ptr<QPDFJob::CopyAttConfig> c_copy_att;
+        std::shared_ptr<QPDFJob::AttConfig> c_att;
         std::vector<char*> accumulated_args; // points to member in ap
         char* pages_password;
     };
@@ -441,7 +442,7 @@ ArgParser::argRotate(char* parameter)
 void
 ArgParser::argAddAttachment()
 {
-    o.attachments_to_add.push_back(QPDFJob::AddAttachment());
+    this->c_att = c_main->addAttachment();
     this->ap.selectOptionTable(O_ATTACHMENT);
 }
 
@@ -792,100 +793,20 @@ ArgParser::argEndUnderlayOverlay()
 void
 ArgParser::argAttPositional(char* arg)
 {
-    o.attachments_to_add.back().path = arg;
-}
-
-void
-ArgParser::argAttKey(char* parameter)
-{
-    o.attachments_to_add.back().key = parameter;
-}
-
-void
-ArgParser::argAttFilename(char* parameter)
-{
-    o.attachments_to_add.back().filename = parameter;
-}
-
-void
-ArgParser::argAttCreationdate(char* parameter)
-{
-    if (! QUtil::pdf_time_to_qpdf_time(parameter))
-    {
-        usage(std::string(parameter) + " is not a valid PDF timestamp");
-    }
-    o.attachments_to_add.back().creationdate = parameter;
-}
-
-void
-ArgParser::argAttModdate(char* parameter)
-{
-    if (! QUtil::pdf_time_to_qpdf_time(parameter))
-    {
-        usage(std::string(parameter) + " is not a valid PDF timestamp");
-    }
-    o.attachments_to_add.back().moddate = parameter;
-}
-
-void
-ArgParser::argAttMimetype(char* parameter)
-{
-    if (strchr(parameter, '/') == nullptr)
-    {
-        usage("mime type should be specified as type/subtype");
-    }
-    o.attachments_to_add.back().mimetype = parameter;
-}
-
-void
-ArgParser::argAttDescription(char* parameter)
-{
-    o.attachments_to_add.back().description = parameter;
-}
-
-void
-ArgParser::argAttReplace()
-{
-    o.attachments_to_add.back().replace = true;
+    c_att->path(arg);
 }
 
 void
 ArgParser::argEndAttachment()
 {
-    static std::string now = QUtil::qpdf_time_to_pdf_time(
-        QUtil::get_current_qpdf_time());
-    auto& cur = o.attachments_to_add.back();
-    if (cur.path.empty())
-    {
-        usage("add attachment: no path specified");
-    }
-    std::string last_element = QUtil::path_basename(cur.path);
-    if (last_element.empty())
-    {
-        usage("path for --add-attachment may not be empty");
-    }
-    if (cur.filename.empty())
-    {
-        cur.filename = last_element;
-    }
-    if (cur.key.empty())
-    {
-        cur.key = last_element;
-    }
-    if (cur.creationdate.empty())
-    {
-        cur.creationdate = now;
-    }
-    if (cur.moddate.empty())
-    {
-        cur.moddate = now;
-    }
+    c_att->end();
+    c_att = nullptr;
 }
 
 void
 ArgParser::argCopyAttPositional(char* arg)
 {
-    c_copy_att->filename(arg);
+    c_copy_att->path(arg);
 }
 
 void

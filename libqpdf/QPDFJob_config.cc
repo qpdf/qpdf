@@ -509,7 +509,7 @@ QPDFJob::CopyAttConfig::CopyAttConfig(Config& c) :
 }
 
 QPDFJob::CopyAttConfig&
-QPDFJob::CopyAttConfig::filename(char const* parameter)
+QPDFJob::CopyAttConfig::path(char const* parameter)
 {
     this->caf.path = parameter;
     return *this;
@@ -539,5 +539,127 @@ QPDFJob::CopyAttConfig::end()
         throw std::runtime_error("copy attachments: no path specified");
     }
     this->config.o.attachments_to_copy.push_back(this->caf);
+    return this->config;
+}
+
+QPDFJob::AttConfig::AttConfig(Config& c) :
+    config(c)
+{
+}
+
+std::shared_ptr<QPDFJob::AttConfig>
+QPDFJob::Config::addAttachment()
+{
+    return std::shared_ptr<AttConfig>(new AttConfig(*this));
+}
+
+QPDFJob::AttConfig&
+QPDFJob::AttConfig::path(char const* parameter)
+{
+    this->att.path = parameter;
+    return *this;
+}
+
+QPDFJob::AttConfig&
+QPDFJob::AttConfig::key(char const* parameter)
+{
+    this->att.key = parameter;
+    return *this;
+}
+
+QPDFJob::AttConfig&
+QPDFJob::AttConfig::filename(char const* parameter)
+{
+    this->att.filename = parameter;
+    return *this;
+}
+
+QPDFJob::AttConfig&
+QPDFJob::AttConfig::creationdate(char const* parameter)
+{
+    if (! QUtil::pdf_time_to_qpdf_time(parameter))
+    {
+        // QXXXQ
+        throw std::runtime_error(
+            std::string(parameter) + " is not a valid PDF timestamp");
+    }
+    this->att.creationdate = parameter;
+    return *this;
+}
+
+QPDFJob::AttConfig&
+QPDFJob::AttConfig::moddate(char const* parameter)
+{
+    if (! QUtil::pdf_time_to_qpdf_time(parameter))
+    {
+        // QXXXQ
+        throw std::runtime_error(
+            std::string(parameter) + " is not a valid PDF timestamp");
+    }
+    this->att.moddate = parameter;
+    return *this;
+}
+
+QPDFJob::AttConfig&
+QPDFJob::AttConfig::mimetype(char const* parameter)
+{
+    if (strchr(parameter, '/') == nullptr)
+    {
+        // QXXXQ
+        throw std::runtime_error(
+            "mime type should be specified as type/subtype");
+    }
+    this->att.mimetype = parameter;
+    return *this;
+}
+
+QPDFJob::AttConfig&
+QPDFJob::AttConfig::description(char const* parameter)
+{
+    this->att.description = parameter;
+    return *this;
+}
+
+QPDFJob::AttConfig&
+QPDFJob::AttConfig::replace()
+{
+    this->att.replace = true;
+    return *this;
+}
+
+QPDFJob::Config&
+QPDFJob::AttConfig::end()
+{
+    // QXXXQ runtime_error
+
+    static std::string now = QUtil::qpdf_time_to_pdf_time(
+        QUtil::get_current_qpdf_time());
+    if (this->att.path.empty())
+    {
+        throw std::runtime_error("add attachment: no path specified");
+    }
+    std::string last_element = QUtil::path_basename(this->att.path);
+    if (last_element.empty())
+    {
+        throw std::runtime_error("path for --add-attachment may not be empty");
+    }
+    if (this->att.filename.empty())
+    {
+        this->att.filename = last_element;
+    }
+    if (this->att.key.empty())
+    {
+        this->att.key = last_element;
+    }
+    if (this->att.creationdate.empty())
+    {
+        this->att.creationdate = now;
+    }
+    if (this->att.moddate.empty())
+    {
+        this->att.moddate = now;
+    }
+
+    this->config.o.attachments_to_add.push_back(this->att);
     return this->config;
 }
