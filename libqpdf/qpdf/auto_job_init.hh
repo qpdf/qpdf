@@ -94,7 +94,7 @@ this->ap.addRequiredParameter("min-version", [this](char *x){c_main->minVersion(
 this->ap.addRequiredParameter("oi-min-area", [this](char *x){c_main->oiMinArea(x);}, "minimum");
 this->ap.addRequiredParameter("oi-min-height", [this](char *x){c_main->oiMinHeight(x);}, "minimum");
 this->ap.addRequiredParameter("oi-min-width", [this](char *x){c_main->oiMinWidth(x);}, "minimum");
-this->ap.addRequiredParameter("password", p(&ArgParser::argPassword), "password");
+this->ap.addRequiredParameter("password", [this](char *x){c_main->password(x);}, "password");
 this->ap.addRequiredParameter("password-file", p(&ArgParser::argPasswordFile), "password");
 this->ap.addRequiredParameter("remove-attachment", [this](char *x){c_main->removeAttachment(x);}, "attachment");
 this->ap.addRequiredParameter("rotate", p(&ArgParser::argRotate), "[+|-]angle");
@@ -153,7 +153,7 @@ this->ap.addRequiredParameter("description", p(&ArgParser::argAttDescription), "
 this->ap.registerOptionTable("copy attachment", b(&ArgParser::argEndCopyAttachment));
 this->ap.addPositional(p(&ArgParser::argCopyAttPositional));
 this->ap.addRequiredParameter("prefix", [this](char *x){c_copy_att->prefix(x);}, "prefix");
-this->ap.addRequiredParameter("password", p(&ArgParser::argCopyAttPassword), "password");
+this->ap.addRequiredParameter("password", [this](char *x){c_copy_att->password(x);}, "password");
 this->ap.selectOptionTable("256-bit encryption");
 this->ap.copyFromOtherTable("cleartext-metadata", "128-bit encryption");
 this->ap.copyFromOtherTable("accessibility", "128-bit encryption");

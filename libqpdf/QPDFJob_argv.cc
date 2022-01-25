@@ -186,12 +186,6 @@ ArgParser::argShowCrypto()
 }
 
 void
-ArgParser::argPassword(char* parameter)
-{
-    o.password = QUtil::make_shared_cstr(parameter);
-}
-
-void
 ArgParser::argPasswordFile(char* parameter)
 {
     std::list<std::string> lines;
@@ -892,13 +886,6 @@ void
 ArgParser::argCopyAttPositional(char* arg)
 {
     c_copy_att->filename(arg);
-}
-
-void
-ArgParser::argCopyAttPassword(char* parameter)
-{
-    // QXXXQ @TRIVIAL
-    c_copy_att->password(parameter);
 }
 
 void

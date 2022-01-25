@@ -299,6 +299,13 @@ QPDFJob::Config::optimizeImages()
 }
 
 QPDFJob::Config&
+QPDFJob::Config::password(char const* parameter)
+{
+    o.password = QUtil::make_shared_cstr(parameter);
+    return *this;
+}
+
+QPDFJob::Config&
 QPDFJob::Config::passwordIsHexKey()
 {
     o.password_is_hex_key = true;
@@ -527,6 +534,8 @@ QPDFJob::CopyAttConfig::end()
 {
     if (this->caf.path.empty())
     {
+        // QXXXQ usage, json, and config exceptions need to be unified
+        // in some fashion.
         throw std::runtime_error("copy attachments: no path specified");
     }
     this->config.o.attachments_to_copy.push_back(this->caf);

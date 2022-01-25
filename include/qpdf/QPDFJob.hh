@@ -178,6 +178,7 @@ class QPDFJob
         QPDF_DLL Config& oiMinHeight(char const* parameter);
         QPDF_DLL Config& oiMinWidth(char const* parameter);
         QPDF_DLL Config& optimizeImages();
+        QPDF_DLL Config& password(char const* parameter);
         QPDF_DLL Config& passwordIsHexKey();
         QPDF_DLL Config& preserveUnreferenced();
         QPDF_DLL Config& preserveUnreferencedResources();

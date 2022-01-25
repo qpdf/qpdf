@@ -68,7 +68,6 @@ not_yet = set([
     'modify',
     'modify-other',
     'object-streams',
-    'password',
     'password-file',
     'password-mode',
     'print',
