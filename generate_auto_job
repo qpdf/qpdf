@@ -71,7 +71,6 @@ not_yet = set([
     'password',
     'password-file',
     'password-mode',
-    'prefix',
     'print',
     'remove-unreferenced-resources',
     'repeat',
@@ -326,26 +325,26 @@ class Main:
         self.update_hashes()
         # DON'T ADD CODE TO generate AFTER update_hashes
 
-    def handle_trivial(self, i, identifier, config, kind, v):
+    def handle_trivial(self, i, identifier, cfg, kind, v):
         # QXXXQ could potentially generate declarations for config
         # methods separately by config object
         if kind == 'bare':
             self.init.append(f'this->ap.addBare("{i}", '
-                             f'[this](){{{config}.{identifier}();}});')
+                             f'[this](){{{cfg}->{identifier}();}});')
         elif kind == 'optional_parameter':
             self.init.append(f'this->ap.addOptionalParameter("{i}", '
-                             f'[this](char *x){{{config}.{identifier}(x);}});')
+                             f'[this](char *x){{{cfg}->{identifier}(x);}});')
         elif kind == 'required_parameter':
             self.init.append(f'this->ap.addRequiredParameter("{i}", '
-                             f'[this](char *x){{{config}.{identifier}(x);}}'
+                             f'[this](char *x){{{cfg}->{identifier}(x);}}'
                              f', "{v}");')
         elif kind == 'required_choices':
             self.init.append(f'this->ap.addChoices("{i}", '
-                             f'[this](char *x){{{config}.{identifier}(x);}}'
+                             f'[this](char *x){{{cfg}->{identifier}(x);}}'
                              f', true, {v}_choices);')
         elif kind == 'optional_choices':
             self.init.append(f'this->ap.addChoices("{i}", '
-                             f'[this](char *x){{{config}.{identifier}(x);}}'
+                             f'[this](char *x){{{cfg}->{identifier}(x);}}'
                              f', false, {v}_choices);')
 
     def handle_flag(self, i, identifier, kind, v):

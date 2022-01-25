@@ -489,3 +489,46 @@ QPDFJob::Config::withImages()
     o.show_page_images = true;
     return *this;
 }
+
+std::shared_ptr<QPDFJob::CopyAttConfig>
+QPDFJob::Config::copyAttachmentsFrom()
+{
+    return std::shared_ptr<CopyAttConfig>(new CopyAttConfig(*this));
+}
+
+QPDFJob::CopyAttConfig::CopyAttConfig(Config& c) :
+    config(c)
+{
+}
+
+QPDFJob::CopyAttConfig&
+QPDFJob::CopyAttConfig::filename(char const* parameter)
+{
+    this->caf.path = parameter;
+    return *this;
+}
+
+QPDFJob::CopyAttConfig&
+QPDFJob::CopyAttConfig::prefix(char const* parameter)
+{
+    this->caf.prefix = parameter;
+    return *this;
+}
+
+QPDFJob::CopyAttConfig&
+QPDFJob::CopyAttConfig::password(char const* parameter)
+{
+    this->caf.password = parameter;
+    return *this;
+}
+
+QPDFJob::Config&
+QPDFJob::CopyAttConfig::end()
+{
+    if (this->caf.path.empty())
+    {
+        throw std::runtime_error("copy attachments: no path specified");
+    }
+    this->config.o.attachments_to_copy.push_back(this->caf);
+    return this->config;
+}

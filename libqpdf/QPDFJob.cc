@@ -453,10 +453,10 @@ QPDFJob::doIfVerbose(
     }
 }
 
-QPDFJob::Config
+std::shared_ptr<QPDFJob::Config>
 QPDFJob::config()
 {
-    return Config(*this);
+    return std::shared_ptr<Config>(new Config(*this));
 }
 
 void

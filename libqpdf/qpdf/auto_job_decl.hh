@@ -75,6 +75,5 @@ void argAttMimetype(char *);
 void argAttDescription(char *);
 void argEndAttachment();
 void argCopyAttPositional(char*);
-void argCopyAttPrefix(char *);
 void argCopyAttPassword(char *);
 void argEndCopyAttachment();

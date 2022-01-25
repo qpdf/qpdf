@@ -60,7 +60,7 @@ options:
       - show-crypto
       - job-json-help
   - table: main
-    config: jc
+    config: c_main
     positional: true
     bare:
       - add-attachment
@@ -215,6 +215,7 @@ options:
       mimetype: mime/type
       description: description
   - table: copy attachment
+    config: c_copy_att
     prefix: CopyAtt
     positional: true
     required_parameter:

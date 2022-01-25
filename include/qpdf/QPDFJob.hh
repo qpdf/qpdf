@@ -100,11 +100,44 @@ class QPDFJob
     // CONFIGURATION
     // (implemented in QPDFJob_config.cc)
 
+  private:
+    struct CopyAttachmentFrom
+    {
+        std::string path;
+        std::string password;
+        std::string prefix;
+    };
+
+  public:
+    class Config;
+    class CopyAttConfig
+    {
+        friend class QPDFJob;
+        friend class Config;
+      public:
+        QPDF_DLL CopyAttConfig& filename(char const* parameter);
+        // QXXXQ auto
+        QPDF_DLL CopyAttConfig& prefix(char const* parameter);
+        QPDF_DLL CopyAttConfig& password(char const* parameter);
+        QPDF_DLL Config& end();
+        // /QXXXQ
+
+      private:
+        CopyAttConfig(Config&);
+        CopyAttConfig(CopyAttConfig const&) = delete;
+
+        Config& config;
+        CopyAttachmentFrom caf;
+    };
+
     // Configuration is performed by calling methods XXX QXXXQ document
     class Config
     {
         friend class QPDFJob;
       public:
+        QPDF_DLL
+        std::shared_ptr<CopyAttConfig> copyAttachmentsFrom();
+
         // QXXXQ could potentially generate these declarations
         QPDF_DLL Config& allowWeakCrypto();
         QPDF_DLL Config& check();
@@ -171,9 +204,11 @@ class QPDFJob
         QPDF_DLL Config& verbose();
         QPDF_DLL Config& warningExit0();
         QPDF_DLL Config& withImages();
+        // /QXXXQ
 
       private:
         Config() = delete;
+        Config(Config const&) = delete;
         Config(QPDFJob& job) :
             o(job)
         {
@@ -183,7 +218,7 @@ class QPDFJob
     friend class Config;
 
     QPDF_DLL
-    Config config();
+    std::shared_ptr<Config> config();
 
     // QXXXQ set options -- implemented in QPDFJob_options.cc
 
@@ -293,13 +328,6 @@ class QPDFJob
         std::string mimetype;
         std::string description;
         bool replace;
-    };
-
-    struct CopyAttachmentFrom
-    {
-        std::string path;
-        std::string password;
-        std::string prefix;
     };
 
     enum remove_unref_e { re_auto, re_yes, re_no };

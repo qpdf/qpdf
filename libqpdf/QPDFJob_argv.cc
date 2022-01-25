@@ -26,7 +26,8 @@ namespace
     class ArgParser
     {
       public:
-        ArgParser(QPDFArgParser& ap, QPDFJob::Config& jc, QPDFJob& o);
+        ArgParser(QPDFArgParser& ap,
+                  std::shared_ptr<QPDFJob::Config> c_main, QPDFJob& o);
         void parseOptions();
 
       private:
@@ -42,16 +43,18 @@ namespace
 
         QPDFArgParser ap;
         QPDFJob& o;
-        QPDFJob::Config& jc;
+        std::shared_ptr<QPDFJob::Config> c_main;
+        std::shared_ptr<QPDFJob::CopyAttConfig> c_copy_att;
         std::vector<char*> accumulated_args; // points to member in ap
         char* pages_password;
     };
 }
 
-ArgParser::ArgParser(QPDFArgParser& ap, QPDFJob::Config& jc, QPDFJob& o) :
+ArgParser::ArgParser(QPDFArgParser& ap,
+                     std::shared_ptr<QPDFJob::Config> c_main, QPDFJob& o) :
     ap(ap),
     o(o),
-    jc(jc),
+    c_main(c_main),
     pages_password(nullptr)
 {
     initOptionTables();
@@ -451,7 +454,7 @@ ArgParser::argAddAttachment()
 void
 ArgParser::argCopyAttachmentsFrom()
 {
-    o.attachments_to_copy.push_back(QPDFJob::CopyAttachmentFrom());
+    this->c_copy_att = c_main->copyAttachmentsFrom();
     this->ap.selectOptionTable(O_COPY_ATTACHMENT);
 }
 
@@ -888,28 +891,21 @@ ArgParser::argEndAttachment()
 void
 ArgParser::argCopyAttPositional(char* arg)
 {
-    o.attachments_to_copy.back().path = arg;
-}
-
-void
-ArgParser::argCopyAttPrefix(char* parameter)
-{
-    o.attachments_to_copy.back().prefix = parameter;
+    c_copy_att->filename(arg);
 }
 
 void
 ArgParser::argCopyAttPassword(char* parameter)
 {
-    o.attachments_to_copy.back().password = parameter;
+    // QXXXQ @TRIVIAL
+    c_copy_att->password(parameter);
 }
 
 void
 ArgParser::argEndCopyAttachment()
 {
-    if (o.attachments_to_copy.back().path.empty())
-    {
-        usage("copy attachments: no path specified");
-    }
+    c_copy_att->end();
+    c_copy_att = nullptr;
 }
 
 void
@@ -1072,8 +1068,7 @@ QPDFJob::initializeFromArgv(int argc, char* argv[], char const* progname_env)
     }
     QPDFArgParser qap(argc, argv, progname_env);
     setMessagePrefix(qap.getProgname());
-    auto jc = config();
-    ArgParser ap(qap, jc, *this);
+    ArgParser ap(qap, config(), *this);
     ap.parseOptions();
 }
 
