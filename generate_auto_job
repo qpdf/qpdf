@@ -94,6 +94,7 @@ class Main:
         'init': 'libqpdf/qpdf/auto_job_init.hh',
         'help': 'libqpdf/qpdf/auto_job_help.hh',
         'schema': 'libqpdf/qpdf/auto_job_schema.hh',
+        # Others are added in top
     }
     SUMS = 'job.sums'
 
@@ -116,12 +117,24 @@ class Main:
         return parser.parse_args(args)
 
     def top(self, options):
+        with open('job.yml', 'r') as f:
+            data = yaml.safe_load(f.read())
+        self.config_decls = {}
+        for o in data['options']:
+            table = o['table']
+            config = o.get('config', None)
+            if config is not None:
+                self.DESTS[config] = f'include/qpdf/auto_job_{config}.hh'
+                self.config_decls[config] = []
+                if table != 'main':
+                    self.config_decls[config].append('QPDF_DLL Config& end();')
+
         if self.check_hashes():
             exit(0)
         elif options.check:
             exit(f'{whoami}: auto job inputs have changed')
         elif options.generate:
-            self.generate()
+            self.generate(data)
         else:
             exit(f'{whoami} unknown mode')
 
@@ -289,10 +302,8 @@ class Main:
                 'Options without help: ' +
                 ', '.join(self.options_without_help))
 
-    def generate(self):
+    def generate(self, data):
         warn(f'{whoami}: regenerating auto job files')
-        with open('job.yml', 'r') as f:
-            data = yaml.safe_load(f.read())
         self.validate(data)
         # Add the built-in help options to tables that we populate as
         # we read job.yml since we won't encounter these in job.yml
@@ -318,16 +329,21 @@ class Main:
             print('static constexpr char const* JOB_SCHEMA_DATA = R"(' +
                   json.dumps(self.schema, indent=2, separators=(',', ': ')) +
                   ')";', file=f)
+        for k, v in self.config_decls.items():
+            with write_file(self.DESTS[k]) as f:
+                print(BANNER, file=f)
+                for i in v:
+                    print(i, file=f)
 
         # Update hashes last to ensure that this will be rerun in the
         # event of a failure.
         self.update_hashes()
         # DON'T ADD CODE TO generate AFTER update_hashes
 
-    def handle_trivial(self, i, identifier, cfg, kind, v):
-        # QXXXQ could potentially generate declarations for config
-        # methods separately by config object
+    def handle_trivial(self, i, identifier, cfg, prefix, kind, v):
+        decl_arg = 1
         if kind == 'bare':
+            decl_arg = 0
             self.init.append(f'this->ap.addBare("{i}", '
                              f'[this](){{{cfg}->{identifier}();}});')
         elif kind == 'optional_parameter':
@@ -345,6 +361,14 @@ class Main:
             self.init.append(f'this->ap.addChoices("{i}", '
                              f'[this](char *x){{{cfg}->{identifier}(x);}}'
                              f', false, {v}_choices);')
+        # Generate declarations for config methods separately by
+        # config object.
+        config_class = prefix + 'Config'
+        arg = ''
+        if decl_arg:
+            arg = 'char const* parameter'
+        self.config_decls[cfg].append(
+            f'QPDF_DLL {config_class}& {identifier}({arg});')
 
     def handle_flag(self, i, identifier, kind, v):
         if kind == 'bare':
@@ -417,7 +441,9 @@ class Main:
         for o in data['options']:
             table = o['table']
             config = o.get('config', None)
-            table_prefix = o.get('prefix', table)
+            table_prefix = o.get('prefix', '')
+            arg_prefix = 'arg' + table_prefix
+            jdata_prefix = table_prefix or table
             if table == 'main':
                 self.init.append('this->ap.selectMainOptionTable();')
             elif table == 'help':
@@ -426,12 +452,10 @@ class Main:
                 identifier = self.to_identifier(table, 'argEnd', False)
                 self.init.append(f'this->ap.registerOptionTable("{table}",'
                                  f' b(&ArgParser::{identifier}));')
-            prefix = 'arg' + o.get('prefix', '')
             if o.get('positional', False):
-                identifier = self.to_identifier(i, prefix, False)
-                self.decls.append(f'void {prefix}Positional(char*);')
+                self.decls.append(f'void {arg_prefix}Positional(char*);')
                 self.init.append('this->ap.addPositional('
-                                 f'p(&ArgParser::{prefix}Positional));')
+                                 f'p(&ArgParser::{arg_prefix}Positional));')
             flags = {}
 
             for i in o.get('bare', []):
@@ -448,21 +472,22 @@ class Main:
 
             for i, [kind, v] in flags.items():
                 self.options_without_help.add(f'--{i}')
-                add_jdata(i, table_prefix)
+                add_jdata(i, table_prefix or table)
                 # QXXXQ complex, not_yet
                 if i in complex or i in not_yet or config is None:
-                    identifier = self.to_identifier(i, prefix, False)
+                    identifier = self.to_identifier(i, arg_prefix, False)
                     self.handle_flag(i, identifier, kind, v)
                 else:
                     identifier = self.to_identifier(i, '', False)
-                    self.handle_trivial(i, identifier, config, kind, v)
+                    self.handle_trivial(
+                        i, identifier, config, table_prefix, kind, v)
 
             if table not in ('main', 'help'):
                 identifier = self.to_identifier(table, 'argEnd', False)
                 self.decls.append(f'void {identifier}();')
         for o in data['options']:
             table = o['table']
-            table_prefix = o.get('prefix', table)
+            jdata_prefix = o.get('prefix', table)
             if 'from_table' not in o:
                 continue
             if table == 'main':
@@ -476,7 +501,7 @@ class Main:
             for j in ft['options']:
                 self.init.append('this->ap.copyFromOtherTable'
                                  f'("{j}", "{other_table}");')
-                add_jdata(j, table_prefix)
+                add_jdata(j, jdata_prefix or table)
 
     def generate_schema(self, data):
         # XXX check data['json'] against what we know from jdata.
