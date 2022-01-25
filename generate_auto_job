@@ -6,6 +6,8 @@ import hashlib
 import re
 import yaml
 import json
+import filecmp
+from contextlib import contextmanager
 
 whoami = os.path.basename(sys.argv[0])
 BANNER = f'''//
@@ -17,6 +19,17 @@ BANNER = f'''//
 
 def warn(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
+
+
+@contextmanager
+def write_file(filename):
+    tmpfile = filename + '.tmp'
+    with open(tmpfile, 'w') as f:
+        yield f
+    if os.path.exists(filename) and filecmp.cmp(filename, tmpfile, False):
+        os.unlink(tmpfile)
+    else:
+        os.rename(tmpfile, filename)
 
 
 # QXXXQ
@@ -105,8 +118,10 @@ class Main:
         return parser.parse_args(args)
 
     def top(self, options):
-        if options.check:
-            self.check()
+        if self.check_hashes():
+            exit(0)
+        elif options.check:
+            exit(f'{whoami}: auto job inputs have changed')
         elif options.generate:
             self.generate()
         else:
@@ -124,7 +139,7 @@ class Main:
                 pass
         return hashes
 
-    def check(self):
+    def check_hashes(self):
         hashes = self.get_hashes()
         match = False
         try:
@@ -137,8 +152,7 @@ class Main:
             match = old_hashes == hashes
         except Exception:
             pass
-        if not match:
-            exit(f'{whoami}: auto job inputs have changed')
+        return match
 
     def update_hashes(self):
         hashes = self.get_hashes()
@@ -279,7 +293,6 @@ class Main:
 
     def generate(self):
         warn(f'{whoami}: regenerating auto job files')
-
         with open('job.yml', 'r') as f:
             data = yaml.safe_load(f.read())
         self.validate(data)
@@ -290,20 +303,20 @@ class Main:
         )
         self.options_without_help = set(self.help_options)
         self.prepare(data)
-        with open(self.DESTS['decl'], 'w') as f:
+        with write_file(self.DESTS['decl']) as f:
             print(BANNER, file=f)
             for i in self.decls:
                 print(i, file=f)
-        with open(self.DESTS['init'], 'w') as f:
+        with write_file(self.DESTS['init']) as f:
             print(BANNER, file=f)
             for i in self.init:
                 print(i, file=f)
-        with open(self.DESTS['help'], 'w') as f:
+        with write_file(self.DESTS['help']) as f:
             with open('manual/cli.rst', 'r') as df:
                 print(BANNER, file=f)
                 self.generate_doc(df, f)
         self.generate_schema(data)
-        with open(self.DESTS['schema'], 'w') as f:
+        with write_file(self.DESTS['schema']) as f:
             print('static constexpr char const* JOB_SCHEMA_DATA = R"(' +
                   json.dumps(self.schema, indent=2, separators=(',', ': ')) +
                   ')";', file=f)
