@@ -105,6 +105,7 @@ class QPDFJob
     {
         friend class QPDFJob;
       public:
+        // QXXXQ could potentially generate these declarations
         QPDF_DLL Config& allowWeakCrypto();
         QPDF_DLL Config& check();
         QPDF_DLL Config& checkLinearization();

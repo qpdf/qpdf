@@ -60,6 +60,7 @@ options:
       - show-crypto
       - job-json-help
   - table: main
+    config: jc
     positional: true
     bare:
       - add-attachment

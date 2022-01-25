@@ -216,20 +216,6 @@ ArgParser::argPasswordFile(char* parameter)
 }
 
 void
-ArgParser::argEmpty()
-{
-    // QXXXQ @TRIVIAL
-    jc.empty();
-}
-
-void
-ArgParser::argLinearize()
-{
-    // QXXXQ @TRIVIAL
-    jc.linearize();
-}
-
-void
 ArgParser::argEncrypt()
 {
     this->accumulated_args.clear();
@@ -288,27 +274,6 @@ ArgParser::argEncPositional(char* arg)
 }
 
 void
-ArgParser::argDecrypt()
-{
-    // QXXXQ @TRIVIAL
-    jc.decrypt();
-}
-
-void
-ArgParser::argPasswordIsHexKey()
-{
-    // QXXXQ @TRIVIAL
-    jc.passwordIsHexKey();
-}
-
-void
-ArgParser::argSuppressPasswordRecovery()
-{
-    // QXXXQ @TRIVIAL
-    jc.suppressPasswordRecovery();
-}
-
-void
 ArgParser::argPasswordMode(char* parameter)
 {
     if (strcmp(parameter, "bytes") == 0)
@@ -337,34 +302,6 @@ void
 ArgParser::argEnc256AllowInsecure()
 {
     o.allow_insecure = true;
-}
-
-void
-ArgParser::argAllowWeakCrypto()
-{
-    // QXXXQ @TRIVIAL
-    jc.allowWeakCrypto();
-}
-
-void
-ArgParser::argCopyEncryption(char* parameter)
-{
-    // QXXXQ @TRIVIAL
-    jc.copyEncryption(parameter);
-}
-
-void
-ArgParser::argEncryptionFilePassword(char* parameter)
-{
-    // QXXXQ @TRIVIAL
-    jc.encryptionFilePassword(parameter);
-}
-
-void
-ArgParser::argCollate(char* parameter)
-{
-    // QXXXQ @TRIVIAL
-    jc.collate(parameter);
 }
 
 void
@@ -505,34 +442,6 @@ ArgParser::argRotate(char* parameter)
 }
 
 void
-ArgParser::argFlattenRotation()
-{
-    // QXXXQ @TRIVIAL
-    jc.flattenRotation();
-}
-
-void
-ArgParser::argListAttachments()
-{
-    // QXXXQ @TRIVIAL
-    jc.listAttachments();
-}
-
-void
-ArgParser::argShowAttachment(char* parameter)
-{
-    // QXXXQ @TRIVIAL
-    jc.showAttachment(parameter);
-}
-
-void
-ArgParser::argRemoveAttachment(char* parameter)
-{
-    // QXXXQ @TRIVIAL
-    jc.removeAttachment(parameter);
-}
-
-void
 ArgParser::argAddAttachment()
 {
     o.attachments_to_add.push_back(QPDFJob::AddAttachment());
@@ -571,27 +480,6 @@ ArgParser::argStreamData(char* parameter)
 }
 
 void
-ArgParser::argCompressStreams(char* parameter)
-{
-    // QXXXQ @TRIVIAL
-    jc.compressStreams(parameter);
-}
-
-void
-ArgParser::argRecompressFlate()
-{
-    // QXXXQ @TRIVIAL
-    jc.recompressFlate();
-}
-
-void
-ArgParser::argCompressionLevel(char* parameter)
-{
-    // QXXXQ @TRIVIAL
-    jc.compressionLevel(parameter);
-}
-
-void
 ArgParser::argDecodeLevel(char* parameter)
 {
     o.decode_level_set = true;
@@ -620,20 +508,6 @@ ArgParser::argDecodeLevel(char* parameter)
 }
 
 void
-ArgParser::argNormalizeContent(char* parameter)
-{
-    // QXXXQ @TRIVIAL
-    jc.normalizeContent(parameter);
-}
-
-void
-ArgParser::argSuppressRecovery()
-{
-    // QXXXQ @TRIVIAL
-    jc.suppressRecovery();
-}
-
-void
 ArgParser::argObjectStreams(char* parameter)
 {
     o.object_stream_set = true;
@@ -655,34 +529,6 @@ ArgParser::argObjectStreams(char* parameter)
         // ArgParser::initOptionTable is wrong.
         usage("invalid object stream mode");
     }
-}
-
-void
-ArgParser::argIgnoreXrefStreams()
-{
-    // QXXXQ @TRIVIAL
-    jc.ignoreXrefStreams();
-}
-
-void
-ArgParser::argQdf()
-{
-    // QXXXQ @TRIVIAL
-    jc.qdf();
-}
-
-void
-ArgParser::argPreserveUnreferenced()
-{
-    // QXXXQ @TRIVIAL
-    jc.preserveUnreferenced();
-}
-
-void
-ArgParser::argPreserveUnreferencedResources()
-{
-    // QXXXQ @TRIVIAL
-    jc.preserveUnreferencedResources();
 }
 
 void
@@ -709,290 +555,10 @@ ArgParser::argRemoveUnreferencedResources(char* parameter)
 }
 
 void
-ArgParser::argKeepFilesOpen(char* parameter)
-{
-    // QXXXQ @TRIVIAL
-    jc.keepFilesOpen(parameter);
-}
-
-void
-ArgParser::argKeepFilesOpenThreshold(char* parameter)
-{
-    // QXXXQ @TRIVIAL
-    jc.keepFilesOpenThreshold(parameter);
-}
-
-void
-ArgParser::argNewlineBeforeEndstream()
-{
-    // QXXXQ @TRIVIAL
-    jc.newlineBeforeEndstream();
-}
-
-void
-ArgParser::argLinearizePass1(char* parameter)
-{
-    // QXXXQ @TRIVIAL
-    jc.linearizePass1(parameter);
-}
-
-void
-ArgParser::argCoalesceContents()
-{
-    // QXXXQ @TRIVIAL
-    jc.coalesceContents();
-}
-
-void
-ArgParser::argFlattenAnnotations(char* parameter)
-{
-    // QXXXQ @TRIVIAL
-    jc.flattenAnnotations(parameter);
-}
-
-void
-ArgParser::argGenerateAppearances()
-{
-    // QXXXQ @TRIVIAL
-    jc.generateAppearances();
-}
-
-void
-ArgParser::argMinVersion(char* parameter)
-{
-    // QXXXQ @TRIVIAL
-    jc.minVersion(parameter);
-}
-
-void
-ArgParser::argForceVersion(char* parameter)
-{
-    // QXXXQ @TRIVIAL
-    jc.forceVersion(parameter);
-}
-
-void
-ArgParser::argSplitPages(char* parameter)
-{
-    // QXXXQ @TRIVIAL
-    jc.splitPages(parameter);
-}
-
-void
-ArgParser::argVerbose()
-{
-    // QXXXQ @TRIVIAL
-    jc.verbose();
-}
-
-void
-ArgParser::argProgress()
-{
-    // QXXXQ @TRIVIAL
-    jc.progress();
-}
-
-void
-ArgParser::argNoWarn()
-{
-    // QXXXQ @TRIVIAL
-    jc.noWarn();
-}
-
-void
-ArgParser::argWarningExit0()
-{
-    // QXXXQ @TRIVIAL
-    jc.warningExit0();
-}
-
-void
-ArgParser::argDeterministicId()
-{
-    // QXXXQ @TRIVIAL
-    jc.deterministicId();
-}
-
-void
-ArgParser::argStaticId()
-{
-    // QXXXQ @TRIVIAL
-    jc.staticId();
-}
-
-void
-ArgParser::argStaticAesIv()
-{
-    // QXXXQ @TRIVIAL
-    jc.staticAesIv();
-}
-
-void
-ArgParser::argNoOriginalObjectIds()
-{
-    // QXXXQ @TRIVIAL
-    jc.noOriginalObjectIds();
-}
-
-void
-ArgParser::argShowEncryption()
-{
-    // QXXXQ @TRIVIAL
-    jc.showEncryption();
-}
-
-void
-ArgParser::argShowEncryptionKey()
-{
-    // QXXXQ @TRIVIAL
-    jc.showEncryptionKey();
-}
-
-void
-ArgParser::argCheckLinearization()
-{
-    // QXXXQ @TRIVIAL
-    jc.checkLinearization();
-}
-
-void
-ArgParser::argShowLinearization()
-{
-    // QXXXQ @TRIVIAL
-    jc.showLinearization();
-}
-
-void
-ArgParser::argShowXref()
-{
-    // QXXXQ @TRIVIAL
-    jc.showXref();
-}
-
-void
 ArgParser::argShowObject(char* parameter)
 {
     QPDFJob::parse_object_id(parameter, o.show_trailer, o.show_obj, o.show_gen);
     o.require_outfile = false;
-}
-
-void
-ArgParser::argRawStreamData()
-{
-    // QXXXQ @TRIVIAL
-    jc.rawStreamData();
-}
-
-void
-ArgParser::argFilteredStreamData()
-{
-    // QXXXQ @TRIVIAL
-    jc.filteredStreamData();
-}
-
-void
-ArgParser::argShowNpages()
-{
-    // QXXXQ @TRIVIAL
-    jc.showNpages();
-}
-
-void
-ArgParser::argShowPages()
-{
-    // QXXXQ @TRIVIAL
-    jc.showPages();
-}
-
-void
-ArgParser::argWithImages()
-{
-    // QXXXQ @TRIVIAL
-    jc.withImages();
-}
-
-void
-ArgParser::argJson()
-{
-    // QXXXQ @TRIVIAL
-    jc.json();
-}
-
-void
-ArgParser::argJsonKey(char* parameter)
-{
-    // QXXXQ @TRIVIAL
-    jc.jsonKey(parameter);
-}
-
-void
-ArgParser::argJsonObject(char* parameter)
-{
-    // QXXXQ @TRIVIAL
-    jc.jsonObject(parameter);
-}
-
-void
-ArgParser::argCheck()
-{
-    // QXXXQ @TRIVIAL
-    jc.check();
-}
-
-void
-ArgParser::argOptimizeImages()
-{
-    // QXXXQ @TRIVIAL
-    jc.optimizeImages();
-}
-
-void
-ArgParser::argExternalizeInlineImages()
-{
-    // QXXXQ @TRIVIAL
-    jc.externalizeInlineImages();
-}
-
-void
-ArgParser::argKeepInlineImages()
-{
-    // QXXXQ @TRIVIAL
-    jc.keepInlineImages();
-}
-
-void
-ArgParser::argRemovePageLabels()
-{
-    // QXXXQ @TRIVIAL
-    jc.removePageLabels();
-}
-
-void
-ArgParser::argOiMinWidth(char* parameter)
-{
-    // QXXXQ @TRIVIAL
-    jc.oiMinWidth(parameter);
-}
-
-void
-ArgParser::argOiMinHeight(char* parameter)
-{
-    // QXXXQ @TRIVIAL
-    jc.oiMinHeight(parameter);
-}
-
-void
-ArgParser::argOiMinArea(char* parameter)
-{
-    // QXXXQ @TRIVIAL
-    jc.oiMinArea(parameter);
-}
-
-void
-ArgParser::argIiMinBytes(char* parameter)
-{
-    // QXXXQ @TRIVIAL
-    jc.iiMinBytes(parameter);
 }
 
 void
@@ -1224,27 +790,6 @@ ArgParser::argEndUnderlayOverlay()
         usage(o.under_overlay->which + " file not specified");
     }
     o.under_overlay = 0;
-}
-
-void
-ArgParser::argReplaceInput()
-{
-    // QXXXQ @TRIVIAL
-    jc.replaceInput();
-}
-
-void
-ArgParser::argIsEncrypted()
-{
-    // QXXXQ @TRIVIAL
-    jc.isEncrypted();
-}
-
-void
-ArgParser::argRequiresPassword()
-{
-    // QXXXQ @TRIVIAL
-    jc.requiresPassword();
 }
 
 void

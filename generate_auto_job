@@ -19,6 +19,58 @@ def warn(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 
 
+# QXXXQ
+# These need manual handlers.
+complex = set([
+    'add-attachment',
+    'copy-attachments-from',
+    'encrypt',
+    'overlay',
+    'pages',
+    'underlay',
+])
+
+# QXXXQ
+# These are trivial but not in main and so need a different config
+# object. Some are in more than one table.
+not_yet = set([
+    'accessibility',
+    'allow-insecure',
+    'annotate',
+    'assemble',
+    'cleartext-metadata',
+    'creationdate',
+    'decode-level',
+    'description',
+    'extract',
+    'filename',
+    'force-R5',
+    'force-V4',
+    'form',
+    'from',
+    'job-json-file',
+    'key',
+    'mimetype',
+    'moddate',
+    'modify',
+    'modify-other',
+    'object-streams',
+    'password',
+    'password-file',
+    'password-mode',
+    'prefix',
+    'print',
+    'remove-unreferenced-resources',
+    'repeat',
+    'replace',
+    'rotate',
+    'show-object',
+    'stream-data',
+    'to',
+    'use-aes',
+])
+
+
 class Main:
     SOURCES = [
         whoami,
@@ -261,6 +313,53 @@ class Main:
         self.update_hashes()
         # DON'T ADD CODE TO generate AFTER update_hashes
 
+    def handle_trivial(self, i, identifier, config, kind, v):
+        # QXXXQ could potentially generate declarations for config
+        # methods separately by config object
+        if kind == 'bare':
+            self.init.append(f'this->ap.addBare("{i}", '
+                             f'[this](){{{config}.{identifier}();}});')
+        elif kind == 'optional_parameter':
+            self.init.append(f'this->ap.addOptionalParameter("{i}", '
+                             f'[this](char *x){{{config}.{identifier}(x);}});')
+        elif kind == 'required_parameter':
+            self.init.append(f'this->ap.addRequiredParameter("{i}", '
+                             f'[this](char *x){{{config}.{identifier}(x);}}'
+                             f', "{v}");')
+        elif kind == 'required_choices':
+            self.init.append(f'this->ap.addChoices("{i}", '
+                             f'[this](char *x){{{config}.{identifier}(x);}}'
+                             f', true, {v}_choices);')
+        elif kind == 'optional_choices':
+            self.init.append(f'this->ap.addChoices("{i}", '
+                             f'[this](char *x){{{config}.{identifier}(x);}}'
+                             f', false, {v}_choices);')
+
+    def handle_flag(self, i, identifier, kind, v):
+        if kind == 'bare':
+            self.decls.append(f'void {identifier}();')
+            self.init.append(f'this->ap.addBare("{i}", '
+                             f'b(&ArgParser::{identifier}));')
+        elif kind == 'optional_parameter':
+            self.decls.append(f'void {identifier}(char *);')
+            self.init.append(f'this->ap.addOptionalParameter("{i}", '
+                             f'p(&ArgParser::{identifier}));')
+        elif kind == 'required_parameter':
+            self.decls.append(f'void {identifier}(char *);')
+            self.init.append(f'this->ap.addRequiredParameter("{i}", '
+                             f'p(&ArgParser::{identifier})'
+                             f', "{v}");')
+        elif kind == 'required_choices':
+            self.decls.append(f'void {identifier}(char *);')
+            self.init.append(f'this->ap.addChoices("{i}", '
+                             f'p(&ArgParser::{identifier})'
+                             f', true, {v}_choices);')
+        elif kind == 'optional_choices':
+            self.decls.append(f'void {identifier}(char *);')
+            self.init.append(f'this->ap.addChoices("{i}", '
+                             f'p(&ArgParser::{identifier})'
+                             f', false, {v}_choices);')
+
     def prepare(self, data):
         self.decls = []
         self.init = []
@@ -306,6 +405,7 @@ class Main:
         self.decls.append('')
         for o in data['options']:
             table = o['table']
+            config = o.get('config', None)
             table_prefix = o.get('prefix', table)
             if table == 'main':
                 self.init.append('this->ap.selectMainOptionTable();')
@@ -321,44 +421,31 @@ class Main:
                 self.decls.append(f'void {prefix}Positional(char*);')
                 self.init.append('this->ap.addPositional('
                                  f'p(&ArgParser::{prefix}Positional));')
+            flags = {}
+
             for i in o.get('bare', []):
-                self.options_without_help.add(f'--{i}')
-                identifier = self.to_identifier(i, prefix, False)
-                self.decls.append(f'void {identifier}();')
-                self.init.append(f'this->ap.addBare("{i}", '
-                                 f'b(&ArgParser::{identifier}));')
-                add_jdata(i, table_prefix)
+                flags[i] = ['bare', None]
             for i in o.get('optional_parameter', []):
-                self.options_without_help.add(f'--{i}')
-                identifier = self.to_identifier(i, prefix, False)
-                self.decls.append(f'void {identifier}(char *);')
-                self.init.append(f'this->ap.addOptionalParameter("{i}", '
-                                 f'p(&ArgParser::{identifier}));')
-                add_jdata(i, table_prefix)
+                flags[i] = ['optional_parameter', None]
             for i, v in o.get('required_parameter', {}).items():
-                self.options_without_help.add(f'--{i}')
-                identifier = self.to_identifier(i, prefix, False)
-                self.decls.append(f'void {identifier}(char *);')
-                self.init.append(f'this->ap.addRequiredParameter("{i}", '
-                                 f'p(&ArgParser::{identifier})'
-                                 f', "{v}");')
-                add_jdata(i, table_prefix)
+                flags[i] = ['required_parameter', v]
             for i, v in o.get('required_choices', {}).items():
-                self.options_without_help.add(f'--{i}')
-                identifier = self.to_identifier(i, prefix, False)
-                self.decls.append(f'void {identifier}(char *);')
-                self.init.append(f'this->ap.addChoices("{i}", '
-                                 f'p(&ArgParser::{identifier})'
-                                 f', true, {v}_choices);')
-                add_jdata(i, table_prefix)
+                flags[i] = ['required_choices', v]
             for i, v in o.get('optional_choices', {}).items():
+                flags[i] = ['optional_choices', v]
                 self.options_without_help.add(f'--{i}')
-                identifier = self.to_identifier(i, prefix, False)
-                self.decls.append(f'void {identifier}(char *);')
-                self.init.append(f'this->ap.addChoices("{i}", '
-                                 f'p(&ArgParser::{identifier})'
-                                 f', false, {v}_choices);')
+
+            for i, [kind, v] in flags.items():
+                self.options_without_help.add(f'--{i}')
                 add_jdata(i, table_prefix)
+                # QXXXQ complex, not_yet
+                if i in complex or i in not_yet or config is None:
+                    identifier = self.to_identifier(i, prefix, False)
+                    self.handle_flag(i, identifier, kind, v)
+                else:
+                    identifier = self.to_identifier(i, '', False)
+                    self.handle_trivial(i, identifier, config, kind, v)
+
             if table not in ('main', 'help'):
                 identifier = self.to_identifier(table, 'argEnd', False)
                 self.decls.append(f'void {identifier}();')
@@ -465,7 +552,7 @@ class Main:
             ['choices', 'options', 'no-json', 'json']))
         for o in data['options']:
             self.check_keys('top', o, set(
-                ['table', 'prefix', 'bare', 'positional',
+                ['table', 'prefix', 'config', 'bare', 'positional',
                  'optional_parameter', 'required_parameter',
                  'required_choices', 'optional_choices', 'from_table']))
 
