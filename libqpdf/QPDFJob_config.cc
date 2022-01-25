@@ -534,9 +534,7 @@ QPDFJob::CopyAttConfig::end()
 {
     if (this->caf.path.empty())
     {
-        // QXXXQ usage, json, and config exceptions need to be unified
-        // in some fashion.
-        throw std::runtime_error("copy attachments: no path specified");
+        throw QPDFJob::ConfigError("copy attachments: no path specified");
     }
     this->config.o.attachments_to_copy.push_back(this->caf);
     return this->config;
@@ -579,8 +577,7 @@ QPDFJob::AttConfig::creationdate(char const* parameter)
 {
     if (! QUtil::pdf_time_to_qpdf_time(parameter))
     {
-        // QXXXQ
-        throw std::runtime_error(
+        throw QPDFJob::ConfigError(
             std::string(parameter) + " is not a valid PDF timestamp");
     }
     this->att.creationdate = parameter;
@@ -592,8 +589,7 @@ QPDFJob::AttConfig::moddate(char const* parameter)
 {
     if (! QUtil::pdf_time_to_qpdf_time(parameter))
     {
-        // QXXXQ
-        throw std::runtime_error(
+        throw QPDFJob::ConfigError(
             std::string(parameter) + " is not a valid PDF timestamp");
     }
     this->att.moddate = parameter;
@@ -605,8 +601,7 @@ QPDFJob::AttConfig::mimetype(char const* parameter)
 {
     if (strchr(parameter, '/') == nullptr)
     {
-        // QXXXQ
-        throw std::runtime_error(
+        throw QPDFJob::ConfigError(
             "mime type should be specified as type/subtype");
     }
     this->att.mimetype = parameter;
@@ -630,18 +625,17 @@ QPDFJob::AttConfig::replace()
 QPDFJob::Config&
 QPDFJob::AttConfig::end()
 {
-    // QXXXQ runtime_error
-
     static std::string now = QUtil::qpdf_time_to_pdf_time(
         QUtil::get_current_qpdf_time());
     if (this->att.path.empty())
     {
-        throw std::runtime_error("add attachment: no path specified");
+        throw QPDFJob::ConfigError("add attachment: no path specified");
     }
     std::string last_element = QUtil::path_basename(this->att.path);
     if (last_element.empty())
     {
-        throw std::runtime_error("path for --add-attachment may not be empty");
+        throw QPDFJob::ConfigError(
+            "path for --add-attachment may not be empty");
     }
     if (this->att.filename.empty())
     {

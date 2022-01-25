@@ -36,12 +36,22 @@
 #include <iostream>
 #include <functional>
 #include <memory>
+#include <stdexcept>
 
 class QPDFWriter;
 
 class QPDFJob
 {
   public:
+    // ConfigError exception is thrown if there are any usage-like
+    // errors when calling Config methods.
+    class QPDF_DLL_CLASS ConfigError: public std::runtime_error
+    {
+      public:
+        QPDF_DLL
+        ConfigError(std::string const&);
+    };
+
     QPDF_DLL
     QPDFJob();
 

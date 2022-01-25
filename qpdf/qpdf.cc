@@ -52,6 +52,10 @@ int realmain(int argc, char* argv[])
     {
         usageExit(e.what());
     }
+    catch (QPDFJob::ConfigError& e)
+    {
+        usageExit(e.what());
+    }
     catch (std::exception& e)
     {
 	std::cerr << whoami << ": " << e.what() << std::endl;

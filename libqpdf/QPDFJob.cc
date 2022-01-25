@@ -33,6 +33,11 @@
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QIntC.hh>
 
+QPDFJob::ConfigError::ConfigError(std::string const& msg) :
+    std::runtime_error(msg)
+{
+}
+
 namespace
 {
     class ImageOptimizer: public QPDFObjectHandle::StreamDataProvider
