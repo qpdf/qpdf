@@ -124,6 +124,12 @@ CODING RULES
 
 HOW TO ADD A COMMAND-LINE ARGUMENT
 
+QXXXQ update this to explain about all the automatic handlers, the
+difference between config, json, and argv, option tables, json
+dictionaries, etc. Make sure everthing that generate_auto_job does and
+its interaction with all the QPDFJob* source/header files is clearly
+explained.
+
 Command-line arguments are closely coupled with QPDFJob. To add a new
 command-line argument, add the option to the appropriate table in
 job.yml. This will automatically declare a method in the private
