@@ -567,8 +567,6 @@ NNTree erased last item in tree 0
 NNTree remove limits from root 0
 QPDFPageObjectHelper unresolved names 0
 QPDFPageObjectHelper resolving unresolved 0
-qpdf password stdin 0
-qpdf password file 0
 QPDFFileSpecObjectHelper empty compat_name 0
 QPDFFileSpecObjectHelper non-empty compat_name 0
 QPDFPageObjectHelper flatten inherit rotate 0
@@ -630,3 +628,5 @@ qpdf check encrypted not encrypted 0
 qpdf check password password incorrect 0
 qpdf check password password correct 0
 qpdf check password not encrypted 0
+QPDFJob_config password file 0
+QPDFJob_config password stdin 0
