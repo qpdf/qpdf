@@ -67,7 +67,6 @@ ArgParser::initOptions()
     ap.selectMainOptionTable();
     ap.addBare("sheep", [this](){ this->ap.selectOptionTable("sheep"); });
     ap.registerOptionTable("sheep", nullptr);
-    ap.copyFromOtherTable("ewe", "baaa");
 
     ap.addHelpFooter("For more help, read the manual.\n");
     ap.addHelpTopic(
@@ -189,12 +188,6 @@ ArgParser::test_exceptions()
     });
     err("unknown table", [this]() {
         ap.selectOptionTable("aardvark");
-    });
-    err("copy from unknown table", [this]() {
-        ap.copyFromOtherTable("one", "two");
-    });
-    err("copy unknown from other table", [this]() {
-        ap.copyFromOtherTable("two", "baaa");
     });
     err("add existing help topic", [this]() {
         ap.addHelpTopic("baaa", "potato", "salad");

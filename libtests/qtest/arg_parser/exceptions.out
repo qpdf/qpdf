@@ -2,8 +2,6 @@ duplicate handler: QPDFArgParser: adding a duplicate handler for option potato i
 duplicate handler: QPDFArgParser: adding a duplicate handler for option ram in baaa option table
 duplicate table: QPDFArgParser: registering already registered option table baaa
 unknown table: QPDFArgParser: selecting unregistered option table aardvark
-copy from unknown table: QPDFArgParser: attempt to copy from unknown table two
-copy unknown from other table: QPDFArgParser: attempt to copy unknown argument two from table baaa
 add existing help topic: QPDFArgParser: topic baaa has already been added
 add reserved help topic: QPDFArgParser: can't register reserved help topic all
 add to unknown topic: QPDFArgParser: unable to add option --new to unknown help topic oops

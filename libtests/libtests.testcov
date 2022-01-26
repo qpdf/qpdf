@@ -52,8 +52,6 @@ QPDFArgParser help option 0
 QPDFArgParser positional 0
 QPDFArgParser unrecognized 0
 QPDFArgParser complete choices 0
-QPDFArgParser copy from unknown 0
-QPDFArgParser copy unknown 0
 QPDFArgParser add reserved help topic 0
 QPDFArgParser add existing topic 0
 QPDFArgParser add to unknown topic 0

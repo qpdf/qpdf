@@ -79,7 +79,6 @@ my @arg_tests = (
     ['@quack-xyz --', 0],       # 15
     ['--salad', 2],             # 16
     ['--salad=spinach', 0],     # 17
-    ['--sheep --ewe --', 0],    # 18
     );
 
 for (my $i = 0; $i < scalar(@arg_tests); ++$i)
