@@ -6,8 +6,15 @@ Next
   be like QPDFObjectHandle::parse: `auto oh = "<< /a (b) >>"_qpdf;`
 * Add QPDF_MAJOR_VERSION, QPDF_MINOR_VERSION to some header, possibly
   dll.h since this is everywhere that there's API
+
 * Take a fresh look at PointerHolder with a good plan for being able
-  to have developers phase it in using macros or something.
+  to have developers phase it in using macros or something. Decide
+  about shared_ptr vs unique_ptr for each time make_shared_cstr is
+  called. For non-copiable classes, we can use unique_ptr instead of
+  shared_ptr as a replacement for PointerHolder. For performance
+  critical cases, we could potentially have a real pointer and a
+  shared pointer where the shared pointer's job is to clean up but we
+  use the real pointer for regular access.
 
 Consider in the context of #593, possibly with a different
 implementation
