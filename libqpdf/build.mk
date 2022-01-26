@@ -74,6 +74,7 @@ SRCS_libqpdf = \
 	libqpdf/QPDFJob.cc \
 	libqpdf/QPDFJob_argv.cc \
 	libqpdf/QPDFJob_config.cc \
+	libqpdf/QPDFJob_json.cc \
 	libqpdf/QPDFMatrix.cc \
 	libqpdf/QPDFNameTreeObjectHelper.cc \
 	libqpdf/QPDFNumberTreeObjectHelper.cc \

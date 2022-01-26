@@ -33,6 +33,8 @@
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QIntC.hh>
 
+#include <qpdf/auto_job_schema.hh> // JOB_SCHEMA_DATA
+
 QPDFJob::ConfigError::ConfigError(std::string const& msg) :
     std::runtime_error(msg)
 {
@@ -476,6 +478,12 @@ std::shared_ptr<QPDFJob::Config>
 QPDFJob::config()
 {
     return std::shared_ptr<Config>(new Config(*this));
+}
+
+std::string
+QPDFJob::json_job_schema_v1()
+{
+    return JOB_SCHEMA_DATA;
 }
 
 void

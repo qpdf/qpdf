@@ -80,7 +80,6 @@ class QPDFJob
     void initializeFromArgv(int argc, char* argv[],
                             char const* progname_env = nullptr);
 
-    // QXXXQ
     QPDF_DLL
     void initializeFromJson(std::string const& json);
 
@@ -322,6 +321,11 @@ class QPDFJob
     // qpdf-specific JSON object) for version 1 of the JSON output.
     QPDF_DLL
     static std::string json_out_schema_v1();
+
+    // Provide a string that is the help information for the version 1
+    // of JSON format for QPDFJob.
+    QPDF_DLL
+    static std::string json_job_schema_v1();
 
   private:
     struct RotationSpec
