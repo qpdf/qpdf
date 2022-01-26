@@ -1241,9 +1241,7 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
                 " another file.");
         }
 
-        if (this->m->qdf_mode &&
-            object.isStream() && object.getDict().getKey("/Type").isName() &&
-            (object.getDict().getKey("/Type").getName() == "/XRef"))
+        if (this->m->qdf_mode && object.isStreamOfType("/XRef"))
         {
             // As a special case, do not output any extraneous XRef
             // streams in QDF mode. Doing so will confuse fix-qdf,
@@ -1474,8 +1472,7 @@ QPDFWriter::willFilterStream(QPDFObjectHandle stream,
     QPDFObjGen old_og = stream.getObjGen();
     QPDFObjectHandle stream_dict = stream.getDict();
 
-    if (stream_dict.getKey("/Type").isName() &&
-        (stream_dict.getKey("/Type").getName() == "/Metadata"))
+    if (stream_dict.isDictionaryOfType("/Metadata"))
     {
         is_metadata = true;
     }
@@ -1691,11 +1688,8 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
             QTC::TC("qpdf", "QPDFWriter preserve Extensions");
             QPDFObjectHandle adbe = extensions.getKey("/ADBE");
             if (adbe.isDictionary() &&
-                adbe.hasKey("/BaseVersion") &&
-                adbe.getKey("/BaseVersion").isName() &&
-                (adbe.getKey("/BaseVersion").getName() ==
-                 "/" + this->m->final_pdf_version) &&
-                adbe.hasKey("/ExtensionLevel") &&
+                adbe.getKey("/BaseVersion").isNameAndEquals(
+                            "/" + this->m->final_pdf_version) &&
                 adbe.getKey("/ExtensionLevel").isInteger() &&
                 (adbe.getKey("/ExtensionLevel").getIntValue() ==
                  this->m->final_extension_level))
@@ -1764,7 +1758,7 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
                         for (int i = 0; i < filter.getArrayNItems(); ++i)
                         {
                             QPDFObjectHandle item = filter.getArrayItem(i);
-                            if (item.isName() && item.getName() == "/Crypt")
+                            if (item.isNameAndEquals("/Crypt"))
                             {
                                 idx = i;
                                 break;
@@ -1802,9 +1796,7 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	    writeString(QPDF_Name::normalizeName(key));
 	    writeString(" ");
 	    if (key == "/Contents" &&
-		object.hasKey("/Type") &&
-		object.getKey("/Type").isName() &&
-		object.getKey("/Type").getName() == "/Sig" &&
+		object.isDictionaryOfType("/Sig") &&
 		object.hasKey("/ByteRange"))
 	    {
                 QTC::TC("qpdf", "QPDFWriter no encryption sig contents");

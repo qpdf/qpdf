@@ -139,8 +139,7 @@ QPDF::getAllPagesInternal(QPDFObjectHandle cur_node,
 	result.push_back(cur_node);
     }
 
-    QPDFObjectHandle type_key = cur_node.getKey("/Type");
-    if (! (type_key.isName() && (type_key.getName() == wanted_type)))
+    if (! cur_node.isDictionaryOfType(wanted_type))
     {
         warn(QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
                      "page tree node",

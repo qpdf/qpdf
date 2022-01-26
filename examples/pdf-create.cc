@@ -290,15 +290,14 @@ static void check(char const* filename,
         QPDFObjectHandle color_space = image_dict.getKey("/ColorSpace");
         QPDFObjectHandle filter = image_dict.getKey("/Filter");
         bool this_errors = false;
-        if (! (filter.isName() && (filter.getName() == desired_filter)))
+        if (! filter.isNameAndEquals(desired_filter))
         {
             this_errors = errors = true;
             std::cout << "page " << pageno << ": expected filter "
                       << desired_filter << "; actual filter = "
                       << filter.unparse() << std::endl;
         }
-        if (! (color_space.isName() &&
-               (color_space.getName() == desired_color_space)))
+        if (! color_space.isNameAndEquals(desired_color_space))
         {
             this_errors = errors = true;
             std::cout << "page " << pageno << ": expected color space "

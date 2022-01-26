@@ -280,9 +280,7 @@ QPDFAcroFormDocumentHelper::getFieldForAnnotation(QPDFAnnotationObjectHelper h)
 {
     QPDFObjectHandle oh = h.getObjectHandle();
     QPDFFormFieldObjectHelper result(QPDFObjectHandle::newNull());
-    if (! (oh.isDictionary() &&
-           oh.getKey("/Subtype").isName() &&
-           (oh.getKey("/Subtype").getName() == "/Widget")))
+    if (! oh.isDictionaryOfType("", "/Widget"))
     {
         return result;
     }

@@ -382,17 +382,13 @@ QPDF::updateObjectMapsInternal(
 
     bool is_page_node = false;
 
-    if (oh.isDictionary() && oh.hasKey("/Type"))
+    if (oh.isDictionaryOfType("/Page"))
     {
-	std::string type = oh.getKey("/Type").getName();
-	if (type == "/Page")
-	{
-	    is_page_node = true;
-	    if (! top)
-	    {
-		return;
-	    }
-	}
+        is_page_node = true;
+        if (! top)
+        {
+            return;
+        }
     }
 
     if (oh.isIndirect())
