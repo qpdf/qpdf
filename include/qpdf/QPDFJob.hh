@@ -422,9 +422,17 @@ class QPDFJob
     bool check_requires_password;
     std::shared_ptr<char> infilename;
     std::shared_ptr<char> outfilename;
+
+    // Helper functions
+    void parseRotationParameter(std::string const&);
+    std::vector<int> parseNumrange(char const* range, int max,
+                                   bool throw_error = false);
+
+
     // QXXXQ END-PUBLIC
 
   private:
+
     // Basic file processing
     std::shared_ptr<QPDF> processFile(
         char const* filename, char const* password);

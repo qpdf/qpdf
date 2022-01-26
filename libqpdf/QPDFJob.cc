@@ -465,6 +465,94 @@ QPDFJob::config()
 }
 
 void
+QPDFJob::parseRotationParameter(std::string const& parameter)
+{
+    QPDFJob& o = *this; // QXXXQ
+    std::string angle_str;
+    std::string range;
+    size_t colon = parameter.find(':');
+    int relative = 0;
+    if (colon != std::string::npos)
+    {
+        if (colon > 0)
+        {
+            angle_str = parameter.substr(0, colon);
+        }
+        if (colon + 1 < parameter.length())
+        {
+            range = parameter.substr(colon + 1);
+        }
+    }
+    else
+    {
+        angle_str = parameter;
+    }
+    if (angle_str.length() > 0)
+    {
+        char first = angle_str.at(0);
+        if ((first == '+') || (first == '-'))
+        {
+            relative = ((first == '+') ? 1 : -1);
+            angle_str = angle_str.substr(1);
+        }
+        else if (! QUtil::is_digit(angle_str.at(0)))
+        {
+            angle_str = "";
+        }
+    }
+    if (range.empty())
+    {
+        range = "1-z";
+    }
+    bool range_valid = false;
+    try
+    {
+        parseNumrange(range.c_str(), 0, true);
+        range_valid = true;
+    }
+    catch (std::runtime_error const&)
+    {
+        // ignore
+    }
+    if (range_valid &&
+        ((angle_str == "0") ||(angle_str == "90") ||
+         (angle_str == "180") || (angle_str == "270")))
+    {
+        int angle = QUtil::string_to_int(angle_str.c_str());
+        if (relative == -1)
+        {
+            angle = -angle;
+        }
+        o.rotations[range] = RotationSpec(angle, (relative != 0));
+    }
+    else
+    {
+        throw ConfigError("invalid parameter to rotate: " + parameter);
+    }
+}
+
+std::vector<int>
+QPDFJob::parseNumrange(char const* range, int max, bool throw_error)
+{
+    try
+    {
+        return QUtil::parse_numrange(range, max);
+    }
+    catch (std::runtime_error& e)
+    {
+        if (throw_error)
+        {
+            throw(e);
+        }
+        else
+        {
+            throw ConfigError(e.what());
+        }
+    }
+    return std::vector<int>();
+}
+
+void
 QPDFJob::run()
 {
     QPDFJob& o = *this; // QXXXQ
@@ -1072,7 +1160,7 @@ QPDFJob::getWantedJSONObjects()
         bool trailer;
         int obj = 0;
         int gen = 0;
-        QPDFJob::parse_object_id(iter, trailer, obj, gen);
+        parse_object_id(iter, trailer, obj, gen);
         if (obj)
         {
             wanted_og.insert(QPDFObjGen(obj, gen));
@@ -1806,7 +1894,7 @@ QPDFJob::doJSON(QPDF& pdf)
 
     // Check against schema
 
-    JSON schema = QPDFJob::json_schema(&o.json_keys);
+    JSON schema = json_schema(&o.json_keys);
     std::list<std::string> errors;
     if (! j.checkSchema(schema, errors))
     {
@@ -2029,7 +2117,7 @@ QPDFJob::processInputSource(
 }
 
 void
-QPDFJob::validateUnderOverlay(QPDF& pdf, QPDFJob::UnderOverlay* uo)
+QPDFJob::validateUnderOverlay(QPDF& pdf, UnderOverlay* uo)
 {
     if (uo->filename.empty())
     {
@@ -2089,7 +2177,7 @@ static QPDFAcroFormDocumentHelper* get_afdh_for_qpdf(
 void
 QPDFJob::doUnderOverlayForPage(
     QPDF& pdf,
-    QPDFJob::UnderOverlay& uo,
+    UnderOverlay& uo,
     std::map<int, std::vector<int> >& pagenos,
     size_t page_idx,
     std::map<int, QPDFObjectHandle>& fo,

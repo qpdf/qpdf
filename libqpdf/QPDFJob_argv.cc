@@ -37,9 +37,6 @@ namespace
         void initOptionTables();
         void doFinalChecks();
         void parseUnderOverlayOptions(QPDFJob::UnderOverlay*);
-        void parseRotationParameter(std::string const&);
-        std::vector<int> parseNumrange(char const* range, int max,
-                                       bool throw_error = false);
 
         QPDFArgParser ap;
         QPDFJob& o;
@@ -324,7 +321,7 @@ ArgParser::argPagesPositional(char* arg)
     {
         try
         {
-            parseNumrange(range, 0, true);
+            o.parseNumrange(range, 0, true);
         }
         catch (std::runtime_error& e1)
         {
@@ -384,7 +381,7 @@ ArgParser::argOverlay()
 void
 ArgParser::argRotate(char* parameter)
 {
-    parseRotationParameter(parameter);
+    o.parseRotationParameter(parameter);
 }
 
 void
@@ -592,7 +589,7 @@ ArgParser::argUOPositional(char* arg)
 void
 ArgParser::argUOTo(char* parameter)
 {
-    parseNumrange(parameter, 0);
+    o.parseNumrange(parameter, 0);
     o.under_overlay->to_nr = parameter;
 }
 
@@ -601,7 +598,7 @@ ArgParser::argUOFrom(char* parameter)
 {
     if (strlen(parameter))
     {
-        parseNumrange(parameter, 0);
+        o.parseNumrange(parameter, 0);
     }
     o.under_overlay->from_nr = parameter;
 }
@@ -611,7 +608,7 @@ ArgParser::argUORepeat(char* parameter)
 {
     if (strlen(parameter))
     {
-        parseNumrange(parameter, 0);
+        o.parseNumrange(parameter, 0);
     }
     o.under_overlay->repeat_nr = parameter;
 }
@@ -670,98 +667,11 @@ ArgParser::usage(std::string const& message)
     this->ap.usage(message);
 }
 
-std::vector<int>
-ArgParser::parseNumrange(char const* range, int max, bool throw_error)
-{
-    try
-    {
-        return QUtil::parse_numrange(range, max);
-    }
-    catch (std::runtime_error& e)
-    {
-        if (throw_error)
-        {
-            throw(e);
-        }
-        else
-        {
-            usage(e.what());
-        }
-    }
-    return std::vector<int>();
-}
-
 void
 ArgParser::parseUnderOverlayOptions(QPDFJob::UnderOverlay* uo)
 {
     o.under_overlay = uo;
     this->ap.selectOptionTable(O_UNDERLAY_OVERLAY);
-}
-
-void
-ArgParser::parseRotationParameter(std::string const& parameter)
-{
-    std::string angle_str;
-    std::string range;
-    size_t colon = parameter.find(':');
-    int relative = 0;
-    if (colon != std::string::npos)
-    {
-        if (colon > 0)
-        {
-            angle_str = parameter.substr(0, colon);
-        }
-        if (colon + 1 < parameter.length())
-        {
-            range = parameter.substr(colon + 1);
-        }
-    }
-    else
-    {
-        angle_str = parameter;
-    }
-    if (angle_str.length() > 0)
-    {
-        char first = angle_str.at(0);
-        if ((first == '+') || (first == '-'))
-        {
-            relative = ((first == '+') ? 1 : -1);
-            angle_str = angle_str.substr(1);
-        }
-        else if (! QUtil::is_digit(angle_str.at(0)))
-        {
-            angle_str = "";
-        }
-    }
-    if (range.empty())
-    {
-        range = "1-z";
-    }
-    bool range_valid = false;
-    try
-    {
-        parseNumrange(range.c_str(), 0, true);
-        range_valid = true;
-    }
-    catch (std::runtime_error const&)
-    {
-        // ignore
-    }
-    if (range_valid &&
-        ((angle_str == "0") ||(angle_str == "90") ||
-         (angle_str == "180") || (angle_str == "270")))
-    {
-        int angle = QUtil::string_to_int(angle_str.c_str());
-        if (relative == -1)
-        {
-            angle = -angle;
-        }
-        o.rotations[range] = QPDFJob::RotationSpec(angle, (relative != 0));
-    }
-    else
-    {
-        usage("invalid parameter to rotate: " + parameter);
-    }
 }
 
 void
