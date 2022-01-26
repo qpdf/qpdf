@@ -321,11 +321,12 @@ class QPDFJob
         std::function<void(std::ostream&, std::string const& prefix)> fn);
 
 
-    // QXXXQ From here to END-PUBLIC should all be private or
-    // different somehow
-  public:
+  private:
+  public: // QXXXQ
     QPDF_DLL
     static JSON json_schema(std::set<std::string>* keys = 0);
+
+  private: // QXXXQ
     QPDF_DLL
     static void parse_object_id(
         std::string const& objspec, bool& trailer, int& obj, int& gen);
@@ -344,6 +345,7 @@ class QPDFJob
 
     enum password_mode_e { pm_bytes, pm_hex_bytes, pm_unicode, pm_auto };
 
+  public: // QXXXQ
     struct UnderOverlay
     {
         UnderOverlay(char const* which) :
@@ -365,6 +367,7 @@ class QPDFJob
         std::vector<int> from_pagenos;
         std::vector<int> repeat_pagenos;
     };
+  private: // QXXXQ
 
     enum remove_unref_e { re_auto, re_yes, re_no };
 
@@ -464,10 +467,12 @@ class QPDFJob
     bool externalize_inline_images;
     bool keep_inline_images;
     bool remove_page_labels;
+  public: // QXXXQ
     size_t oi_min_width;
     size_t oi_min_height;
     size_t oi_min_area;
     size_t ii_min_bytes;
+  private: // QXXXQ
     UnderOverlay underlay;
     UnderOverlay overlay;
     UnderOverlay* under_overlay;
