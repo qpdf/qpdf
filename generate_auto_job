@@ -348,13 +348,7 @@ class Main:
     def prepare(self, data):
         self.decls = []
         self.init = []
-        self.jdata = {
-            # option: {
-            #   tables: set(),
-            #   help: string,
-            #   QXXXQ something for registering handler
-            # }
-        }
+        self.jdata = {}
 
         def add_jdata(flag, table):
             nonlocal self

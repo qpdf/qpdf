@@ -106,10 +106,10 @@ class QPDFJob
     QPDF_DLL
     bool createsOutput() const;
 
-    // CONFIGURATION
-    // (implemented in QPDFJob_config.cc)
-
+    // SEE BELOW FOR MORE PUBLIC METHODS AND CLASSES
   private:
+    // These structures are private but we need to define them before
+    // the public Config classes.
     struct CopyAttachmentFrom
     {
         std::string path;
@@ -146,6 +146,34 @@ class QPDFJob
     };
 
   public:
+    // CONFIGURATION
+
+    // Configuration classes are implemented in QPDFJob_config.cc.
+
+    // The config() method returns a shared pointer to a Config
+    // object. The Config object contains methods that correspond with
+    // qpdf command-line arguments. You can use a fluent interface to
+    // configure a QPDFJob object that would do exactly the same thing
+    // as a specific qpdf command. The example pdf-job.cc contains an
+    // example of this usage. You can also use initializeFromJson or
+    // initializeFromArgv to initialize a QPDFJob object.
+
+    // Notes about the Config methods:
+    //
+    // * Most of the method declarations are automatically generated
+    //   in header files that are included within the class
+    //   definitions. They correspond in predictable ways to the
+    //   command-line arguments and are generated from the same code
+    //   that generates the command-line argument parsing code.
+    //
+    // * Methods return pointers, rather than references, to
+    //   configuration objects. References might feel more familiar to
+    //   users of fluent interfaces, so why do we use pointers? The
+    //   main methods that create them return smart pointers so that
+    //   users can initialize them when needed, which you can't do
+    //   with references. Returning pointers instead of references
+    //   makes for a more uniform interface.
+
     class Config;
 
     class AttConfig
@@ -247,7 +275,6 @@ class QPDFJob
         Config* config;
     };
 
-    // Configuration is performed by calling methods XXX QXXXQ document
     class Config
     {
         friend class QPDFJob;
@@ -290,6 +317,8 @@ class QPDFJob
     };
     friend class Config;
 
+    // Return a top-level configuration item. See CONFIGURATION above
+    // for details.
     QPDF_DLL
     std::shared_ptr<Config> config();
 
