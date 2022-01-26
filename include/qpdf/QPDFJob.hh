@@ -284,9 +284,8 @@ class QPDFJob
     QPDF_DLL
     std::shared_ptr<Config> config();
 
-    // QXXXQ set options -- implemented in QPDFJob_options.cc
-
-    // QXXXQ these will not be in the final interface
+    // Options for helping the qpdf CLI use the correct edit code and
+    // properly report warnings.
     QPDF_DLL
     bool suppressWarnings();
     QPDF_DLL
@@ -295,7 +294,6 @@ class QPDFJob
     bool checkRequiresPassword();
     QPDF_DLL
     bool checkIsEncrypted();
-    // /QXXXQ
 
     // Execute the job
     QPDF_DLL
@@ -320,17 +318,12 @@ class QPDFJob
     void doIfVerbose(
         std::function<void(std::ostream&, std::string const& prefix)> fn);
 
+    // Provide a string that is the help information ("schema" for the
+    // qpdf-specific JSON object) for version 1 of the JSON output.
+    QPDF_DLL
+    static std::string json_out_schema_v1();
 
   private:
-  public: // QXXXQ
-    QPDF_DLL
-    static JSON json_schema(std::set<std::string>* keys = 0);
-
-  private: // QXXXQ
-    QPDF_DLL
-    static void parse_object_id(
-        std::string const& objspec, bool& trailer, int& obj, int& gen);
-
     struct RotationSpec
     {
         RotationSpec(int angle = 0, bool relative = false) :
@@ -345,7 +338,6 @@ class QPDFJob
 
     enum password_mode_e { pm_bytes, pm_hex_bytes, pm_unicode, pm_auto };
 
-  public: // QXXXQ begin public
     struct UnderOverlay
     {
         UnderOverlay(char const* which) :
@@ -368,13 +360,10 @@ class QPDFJob
         std::vector<int> repeat_pagenos;
     };
 
-    size_t oi_min_width;
-    size_t oi_min_height;
-    size_t oi_min_area;
-    // QXXXQ END-PUBLIC
-
-  private:
     // Helper functions
+    static JSON json_schema(std::set<std::string>* keys = 0);
+    static void parse_object_id(
+        std::string const& objspec, bool& trailer, int& obj, int& gen);
     void parseRotationParameter(std::string const&);
     std::vector<int> parseNumrange(char const* range, int max);
 
@@ -397,17 +386,19 @@ class QPDFJob
         std::vector<std::shared_ptr<QPDF>>& page_heap);
     bool shouldRemoveUnreferencedResources(QPDF& pdf);
     void handleRotations(QPDF& pdf);
+    void getUOPagenos(UnderOverlay& uo,
+                      std::map<int, std::vector<int> >& pagenos);
     void handleUnderOverlay(QPDF& pdf);
     void doUnderOverlayForPage(
         QPDF& pdf,
-        QPDFJob::UnderOverlay& uo,
+        UnderOverlay& uo,
         std::map<int, std::vector<int> >& pagenos,
         size_t page_idx,
         std::map<int, QPDFObjectHandle>& fo,
         std::vector<QPDFPageObjectHelper>& pages,
         QPDFPageObjectHelper& dest_page,
         bool before);
-    void validateUnderOverlay(QPDF& pdf, QPDFJob::UnderOverlay* uo);
+    void validateUnderOverlay(QPDF& pdf, UnderOverlay* uo);
     void handleTransformations(QPDF& pdf);
     void addAttachments(QPDF& pdf);
     void copyAttachments(QPDF& pdf);
@@ -556,6 +547,9 @@ class QPDFJob
         bool externalize_inline_images;
         bool keep_inline_images;
         bool remove_page_labels;
+        size_t oi_min_width;
+        size_t oi_min_height;
+        size_t oi_min_area;
         size_t ii_min_bytes;
         UnderOverlay underlay;
         UnderOverlay overlay;

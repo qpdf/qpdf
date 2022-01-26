@@ -181,7 +181,7 @@ ArgParser::argJsonHelp()
         << std::endl
         << "be null, and others will have values that apply to unencrypted files."
         << std::endl
-        << QPDFJob::json_schema().unparse()
+        << QPDFJob::json_out_schema_v1()
         << std::endl;
 }
 

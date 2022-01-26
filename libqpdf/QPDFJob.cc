@@ -43,7 +43,11 @@ namespace
     class ImageOptimizer: public QPDFObjectHandle::StreamDataProvider
     {
       public:
-        ImageOptimizer(QPDFJob& o, QPDFObjectHandle& image);
+        ImageOptimizer(QPDFJob& o,
+                       size_t oi_min_width,
+                       size_t oi_min_height,
+                       size_t oi_min_area,
+                       QPDFObjectHandle& image);
         virtual ~ImageOptimizer()
         {
         }
@@ -55,6 +59,9 @@ namespace
 
       private:
         QPDFJob& o;
+        size_t oi_min_width;
+        size_t oi_min_height;
+        size_t oi_min_area;
         QPDFObjectHandle image;
     };
 
@@ -101,8 +108,15 @@ namespace
     };
 }
 
-ImageOptimizer::ImageOptimizer(QPDFJob& o, QPDFObjectHandle& image) :
+ImageOptimizer::ImageOptimizer(QPDFJob& o,
+                               size_t oi_min_width,
+                               size_t oi_min_height,
+                               size_t oi_min_area,
+                               QPDFObjectHandle& image) :
     o(o),
+    oi_min_width(oi_min_width),
+    oi_min_height(oi_min_height),
+    oi_min_area(oi_min_area),
     image(image)
 {
 }
@@ -194,9 +208,9 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
         }
         return result;
     }
-    if (((o.oi_min_width > 0) && (w <= o.oi_min_width)) ||
-        ((o.oi_min_height > 0) && (h <= o.oi_min_height)) ||
-        ((o.oi_min_area > 0) && ((w * h) <= o.oi_min_area)))
+    if (((this->oi_min_width > 0) && (w <= this->oi_min_width)) ||
+        ((this->oi_min_height > 0) && (h <= this->oi_min_height)) ||
+        ((this->oi_min_area > 0) && ((w * h) <= this->oi_min_area)))
     {
         QTC::TC("qpdf", "qpdf image optimize too small");
         if (! description.empty())
@@ -415,7 +429,10 @@ QPDFJob::Members::Members() :
     externalize_inline_images(false),
     keep_inline_images(false),
     remove_page_labels(false),
-    ii_min_bytes(1024),     // QXXXQ comment with oi_*
+    oi_min_width(128),      // Default values for these
+    oi_min_height(128),     // oi and ii flags are in --help
+    oi_min_area(16384),     // and in the manual.
+    ii_min_bytes(1024),     //
     underlay("underlay"),
     overlay("overlay"),
     under_overlay(0),
@@ -427,9 +444,6 @@ QPDFJob::Members::Members() :
 }
 
 QPDFJob::QPDFJob() :
-    oi_min_width(128),      // Default values for these
-    oi_min_height(128),     // oi flags are in --help
-    oi_min_area(16384),     // and in the manual.
     m(new Members())
 {
 }
@@ -1803,6 +1817,12 @@ QPDFJob::json_schema(std::set<std::string>* keys)
     return schema;
 }
 
+std::string
+QPDFJob::json_out_schema_v1()
+{
+    return json_schema().unparse();
+}
+
 void
 QPDFJob::doJSON(QPDF& pdf)
 {
@@ -2240,8 +2260,9 @@ QPDFJob::doUnderOverlayForPage(
     }
 }
 
-static void get_uo_pagenos(QPDFJob::UnderOverlay& uo,
-                           std::map<int, std::vector<int> >& pagenos)
+void
+QPDFJob::getUOPagenos(QPDFJob::UnderOverlay& uo,
+                      std::map<int, std::vector<int> >& pagenos)
 {
     size_t idx = 0;
     size_t from_size = uo.from_pagenos.size();
@@ -2272,9 +2293,9 @@ QPDFJob::handleUnderOverlay(QPDF& pdf)
         return;
     }
     std::map<int, std::vector<int> > underlay_pagenos;
-    get_uo_pagenos(m->underlay, underlay_pagenos);
+    getUOPagenos(m->underlay, underlay_pagenos);
     std::map<int, std::vector<int> > overlay_pagenos;
-    get_uo_pagenos(m->overlay, overlay_pagenos);
+    getUOPagenos(m->overlay, overlay_pagenos);
     std::map<int, QPDFObjectHandle> underlay_fo;
     std::map<int, QPDFObjectHandle> overlay_fo;
     std::vector<QPDFPageObjectHelper> upages;
@@ -2439,7 +2460,6 @@ QPDFJob::copyAttachments(QPDF& pdf)
 void
 QPDFJob::handleTransformations(QPDF& pdf)
 {
-    QPDFJob& o = *this; // QXXXQ
     QPDFPageDocumentHelper dh(pdf);
     std::shared_ptr<QPDFAcroFormDocumentHelper> afdh;
     auto make_afdh = [&]() {
@@ -2474,7 +2494,9 @@ QPDFJob::handleTransformations(QPDF& pdf)
             {
                 std::string name = iter2.first;
                 QPDFObjectHandle& image = iter2.second;
-                ImageOptimizer* io = new ImageOptimizer(o, image);
+                ImageOptimizer* io = new ImageOptimizer(
+                    *this, m->oi_min_width, m->oi_min_height,
+                    m->oi_min_area, image);
                 PointerHolder<QPDFObjectHandle::StreamDataProvider> sdp(io);
                 if (io->evaluate("image " + name + " on page " +
                                  QUtil::int_to_string(pageno)))

@@ -338,21 +338,21 @@ QPDFJob::Config::normalizeContent(char const* parameter)
 QPDFJob::Config&
 QPDFJob::Config::oiMinArea(char const* parameter)
 {
-    o.oi_min_area = QUtil::string_to_uint(parameter);
+    o.m->oi_min_area = QUtil::string_to_uint(parameter);
     return *this;
 }
 
 QPDFJob::Config&
 QPDFJob::Config::oiMinHeight(char const* parameter)
 {
-    o.oi_min_height = QUtil::string_to_uint(parameter);
+    o.m->oi_min_height = QUtil::string_to_uint(parameter);
     return *this;
 }
 
 QPDFJob::Config&
 QPDFJob::Config::oiMinWidth(char const* parameter)
 {
-    o.oi_min_width = QUtil::string_to_uint(parameter);
+    o.m->oi_min_width = QUtil::string_to_uint(parameter);
     return *this;
 }
 
