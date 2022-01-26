@@ -86,7 +86,7 @@ ap.addOptionHelp("--progress", "general", "show progress when writing", R"(Indic
 }
 static void add_help_2(QPDFArgParser& ap)
 {
-ap.addOptionHelp("--no-warn", "general", "suppress printing warning messages", R"(Suppress printing warning messages. If warnings were
+ap.addOptionHelp("--no-warn", "general", "suppress printing of warning messages", R"(Suppress printing of warning messages. If warnings were
 encountered, qpdf still exits with exit status 3.
 Use --warning-exit-0 with --no-warn to completely ignore
 warnings.
@@ -95,7 +95,7 @@ ap.addOptionHelp("--deterministic-id", "general", "generate ID deterministically
 information, such as the page contents. Does not use the file's
 name or attributes or the current time.
 )");
-ap.addOptionHelp("--allow-weak-crypto", "general", "allow insecure cryptographic algorithms", R"(All creation of files with weak cryptographic algorithms. This
+ap.addOptionHelp("--allow-weak-crypto", "general", "allow insecure cryptographic algorithms", R"(Allow creation of files with weak cryptographic algorithms. This
 option is necessary to create 40-bit files or 128-bit files that
 use RC4 encryption.
 )");
@@ -115,7 +115,7 @@ ap.addHelpTopic("advanced-control", "tweak qpdf's behavior", R"(Advanced control
 normally never be needed by a user but that may be useful to
 developers or people investigating problems with specific files.
 )");
-ap.addOptionHelp("--password-is-hex-key", "advanced-control", "provide hex-encoded encryption key", R"(Provide the underlying file encryption key has a hex-encoded
+ap.addOptionHelp("--password-is-hex-key", "advanced-control", "provide hex-encoded encryption key", R"(Provide the underlying file encryption key as a hex-encoded
 string rather than supplying a password. This is an expert
 option.
 )");
@@ -123,7 +123,7 @@ ap.addOptionHelp("--suppress-password-recovery", "advanced-control", "don't try 
 password that contains non-ASCII Unicode characters if the first
 attempt doesn't succeed.
 )");
-ap.addOptionHelp("--password-mode", "advanced-control", "tweak how qpdf encodes passwords", R"(--password-mode={mode}
+ap.addOptionHelp("--password-mode", "advanced-control", "tweak how qpdf encodes passwords", R"(--password-mode=mode
 
 Fine-tune how qpdf controls encoding of Unicode passwords. Valid
 options are auto, bytes, hex-bytes, and unicode.
@@ -139,7 +139,7 @@ the structure without changing the content.
 )");
 ap.addOptionHelp("--linearize", "transformation", "linearize (web-optimize) output", R"(Create linearized (web-optimized) output files.
 )");
-ap.addOptionHelp("--encrypt", "transformation", "start encryption options", R"(--encrypt user owner key-length [ options ] --
+ap.addOptionHelp("--encrypt", "transformation", "start encryption options", R"(--encrypt user-password owner-password key-length [ options ] --
 
 Run qpdf --help=encryption for details.
 )");
@@ -156,7 +156,7 @@ to specify the encryption file's password.
 ap.addOptionHelp("--encryption-file-password", "transformation", "supply password for --copy-encryption", R"(--encryption-file-password=password
 
 If the file named in --copy-encryption requires a password, use
-this option to specify the password.
+this option to supply the password.
 )");
 ap.addOptionHelp("--qdf", "transformation", "enable viewing PDF code in a text editor", R"(Create a PDF file suitable for viewing in a text editor and even
 editing. This is to edit the PDF code, not the page contents.
@@ -166,7 +166,7 @@ companion tool "fix-qdf" can be used to repair hand-edited QDF
 files. QDF is a feature specific to the qpdf tool. There is a
 chapter about it in the manual.
 )");
-ap.addOptionHelp("--no-original-object-ids", "transformation", "omit original object ID in qdf", R"(Omit comments in a QDF file indicating the object ID an object
+ap.addOptionHelp("--no-original-object-ids", "transformation", "omit original object IDs in qdf", R"(Omit comments in a QDF file indicating the object ID an object
 had in the original file.
 )");
 }
@@ -288,13 +288,13 @@ Run qpdf --help=page-selection for details.
 }
 static void add_help_4(QPDFArgParser& ap)
 {
-ap.addOptionHelp("--collate", "modification", "collate with --pages", R"(--collate=n
+ap.addOptionHelp("--collate", "modification", "collate with --pages", R"(--collate[=n]
 
 Collate rather than concatenate pages specified with --pages.
 With a numeric parameter, collate in groups of n. The default
 is 1. Run qpdf --help=page-selection for additional details.
 )");
-ap.addOptionHelp("--split-pages", "modification", "write pages to separate files", R"(--split-pages=[n]
+ap.addOptionHelp("--split-pages", "modification", "write pages to separate files", R"(--split-pages[=n]
 
 This option causes qpdf to create separate output files for each
 page or group of pages rather than a single output file.
@@ -532,7 +532,7 @@ the following:
 filename [ --password=password ] [ page-range ]
 
 Document-level information, such as outlines, tags, etc., is taken
-from in.pdf is preserved in out.pdf. You can use --empty in place
+from in.pdf and is preserved in out.pdf. You can use --empty in place
 of an input file to start from an empty file and just copy pages
 equally from all files. You can use "." as a shorthand for the
 primary input file (if not --empty). In the above example, "."
