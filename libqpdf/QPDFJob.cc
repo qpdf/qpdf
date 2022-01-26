@@ -547,6 +547,7 @@ QPDFJob::parseNumrange(char const* range, int max)
 void
 QPDFJob::run()
 {
+    checkConfiguration();
     std::shared_ptr<QPDF> pdf_ph;
     try
     {

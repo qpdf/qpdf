@@ -356,7 +356,7 @@ ArgParser::argPagesPositional(char* arg)
     {
         range = "1-z";
     }
-    this->c_pages->pageSpec(file, this->pages_password, range);
+    this->c_pages->pageSpec(file, range, this->pages_password);
     this->accumulated_args.clear();
     this->pages_password = nullptr;
     if (next_file != nullptr)

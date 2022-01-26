@@ -192,8 +192,8 @@ class QPDFJob
       public:
         QPDF_DLL
         PagesConfig& pageSpec(std::string const& filename,
-                              char const* password,
-                              std::string const& range);
+                              std::string const& range,
+                              char const* password = nullptr);
 
 #       include <qpdf/auto_job_c_pages.hh>
 

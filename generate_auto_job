@@ -230,7 +230,6 @@ class Main:
                             f'help for unknown option {option},'
                             f' lineno={lineno}')
                     if option not in self.help_options:
-                        # QXXXQ also need to exclude help table
                         self.jdata[option[2:]]['help'] = short_text
                     print(f'ap.addOptionHelp("{option}", "{topic}",'
                           f' "{short_text}", R"({long_text})");', file=f)
