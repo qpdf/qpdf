@@ -5,14 +5,13 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
       "password": "specify password",
       "passwordFile": "read password from a file"
     },
-    "empty": "empty input file"
+    "empty": "qxxxq empty"
   },
   "output": {
     "file": {
       "name": "output filename"
     },
-    "replaceInput": "replace input with output",
-    "splitPages": "write pages to separate files",
+    "replaceInput": "qxxxq replace input",
     "options": {
       "qdf": "enable viewing PDF code in a text editor",
       "preserveUnreferenced": "preserve unreferenced objects",
@@ -34,6 +33,7 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
       "minVersion": "set minimum PDF version",
       "forceVersion": "set output PDF version",
       "progress": "show progress when writing",
+      "splitPages": "write pages to separate files",
       "encrypt": {
         "keyLength": "key length: 48, 128, 256",
         "userPassword": "user password",

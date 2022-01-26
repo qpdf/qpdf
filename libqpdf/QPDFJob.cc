@@ -626,7 +626,7 @@ void
 QPDFJob::checkConfiguration()
 {
     auto usage = [](char const* msg){
-        throw std::runtime_error(msg);
+        throw QPDFJob::ConfigError(msg);
     };
 
     QPDFJob& o = *this; // QXXXQ

@@ -35,7 +35,6 @@ namespace
 
         void usage(std::string const& message);
         void initOptionTables();
-        void doFinalChecks();
 
         QPDFArgParser ap;
         QPDFJob& o;
@@ -67,8 +66,6 @@ ArgParser::initOptionTables()
 {
 
 #   include <qpdf/auto_job_init.hh>
-    this->ap.addFinalCheck(
-        QPDFArgParser::bindBare(&ArgParser::doFinalChecks, this));
     // add_help is defined in auto_job_help.hh
     add_help(this->ap);
 }
@@ -88,6 +85,18 @@ ArgParser::argPositional(char* arg)
     {
         usage(std::string("unknown argument ") + arg);
     }
+}
+
+void
+ArgParser::argEmpty()
+{
+    o.infilename = QUtil::make_shared_cstr("");
+}
+
+void
+ArgParser::argReplaceInput()
+{
+    o.replace_input = true;
 }
 
 void
@@ -247,10 +256,6 @@ ArgParser::argEncPositional(char* arg)
 void
 ArgParser::argPages()
 {
-    if (! o.page_specs.empty())
-    {
-        usage("the --pages may only be specified one time");
-    }
     this->accumulated_args.clear();
     this->c_pages = c_main->pages();
     this->ap.selectOptionTable(O_PAGES);
@@ -480,19 +485,6 @@ ArgParser::parseOptions()
 }
 
 void
-ArgParser::doFinalChecks()
-{
-    try
-    {
-        o.checkConfiguration();
-    }
-    catch (std::runtime_error& e)
-    {
-        usage(e.what());
-    }
-}
-
-void
 QPDFJob::initializeFromArgv(int argc, char* argv[], char const* progname_env)
 {
     if (progname_env == nullptr)
@@ -502,6 +494,8 @@ QPDFJob::initializeFromArgv(int argc, char* argv[], char const* progname_env)
     QPDFArgParser qap(argc, argv, progname_env);
     setMessagePrefix(qap.getProgname());
     ArgParser ap(qap, config(), *this);
+    qap.addFinalCheck(
+        QPDFArgParser::bindBare(&QPDFJob::checkConfiguration, this));
     ap.parseOptions();
 }
 

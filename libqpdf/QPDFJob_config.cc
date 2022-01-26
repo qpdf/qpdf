@@ -89,13 +89,6 @@ QPDFJob::Config::deterministicId()
 }
 
 QPDFJob::Config&
-QPDFJob::Config::empty()
-{
-    o.infilename = QUtil::make_shared_cstr("");
-    return *this;
-}
-
-QPDFJob::Config&
 QPDFJob::Config::encryptionFilePassword(char const* parameter)
 {
     o.encryption_file_password = QUtil::make_shared_cstr(parameter);
@@ -372,13 +365,6 @@ QPDFJob::Config&
 QPDFJob::Config::removePageLabels()
 {
     o.remove_page_labels = true;
-    return *this;
-}
-
-QPDFJob::Config&
-QPDFJob::Config::replaceInput()
-{
-    o.replace_input = true;
     return *this;
 }
 
@@ -860,6 +846,10 @@ QPDFJob::PagesConfig::PagesConfig(Config& c) :
 std::shared_ptr<QPDFJob::PagesConfig>
 QPDFJob::Config::pages()
 {
+    if (! o.page_specs.empty())
+    {
+        usage("--pages may only be specified one time");
+    }
     return std::shared_ptr<PagesConfig>(new PagesConfig(*this));
 }
 
