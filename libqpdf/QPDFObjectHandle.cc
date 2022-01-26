@@ -507,15 +507,9 @@ bool
 QPDFObjectHandle::isDictionaryOfType(std::string const& type,
                                      std::string const& subtype)
 {
-    if (isDictionary() && getKey("/Type").isNameAndEquals(type))
-    {
-        return (subtype == "") ||
-            (hasKey("/Subtype") && getKey("/Subtype").isNameAndEquals(subtype));
-    }
-    else
-    {
-        return false;
-    }
+    return isDictionary() &&
+           (type.empty() || getKey("/Type").isNameAndEquals(type)) &&
+           (subtype.empty() || getKey("/Subtype").isNameAndEquals(subtype));
 }
 
 bool

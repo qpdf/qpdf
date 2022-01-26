@@ -3110,11 +3110,12 @@ static void test_82(QPDF& pdf, char const* arg2)
     assert(dict.isDictionaryOfType( "/Test", ""));
     assert(dict.isDictionaryOfType("/Test"));
     assert(dict.isDictionaryOfType("/Test", "/Marvin"));
+    assert(dict.isDictionaryOfType("", "/Marvin"));
+    assert(dict.isDictionaryOfType("", ""));
     assert(! dict.isDictionaryOfType("/Test2", ""));
     assert(! dict.isDictionaryOfType("/Test2", "/Marvin"));
     assert(! dict.isDictionaryOfType("/Test", "/M"));
-    assert(! dict.isDictionaryOfType("", "/Marvin"));
-    assert(! dict.isDictionaryOfType("", ""));
+    assert(! name.isDictionaryOfType("", ""));
     dict = QPDFObjectHandle::parse("<</A 1 /Type null /Subtype /Marvin>>");
     assert(! dict.isDictionaryOfType("/Test"));
     dict = QPDFObjectHandle::parse("<</A 1 /Type (Test) /Subtype /Marvin>>");
