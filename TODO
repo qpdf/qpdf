@@ -26,6 +26,14 @@ implementation
   or crypt provider as long as this can be done in a thread-safe
   fashion.
 
+* Consider doing one big commit to reformat the entire codebase using
+  clang-format or a similar tool. Consider using blame.ignoreRevsFile
+  or similar (or otherwise study git blame to see how to minimize the
+  impact of such a change). A good time to do this would be before
+  10.6 since there is so much refactoring going on. In general, try to
+  make qpdf more contributor-friendly. Look
+  https://bestpractices.coreinfrastructure.org/en
+
 Documentation
 =============
 
