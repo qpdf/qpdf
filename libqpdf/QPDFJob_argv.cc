@@ -46,6 +46,7 @@ namespace
         std::shared_ptr<QPDFJob::Config> c_main;
         std::shared_ptr<QPDFJob::CopyAttConfig> c_copy_att;
         std::shared_ptr<QPDFJob::AttConfig> c_att;
+        std::shared_ptr<QPDFJob::PagesConfig> c_pages;
         std::vector<char*> accumulated_args; // points to member in ap
         char* pages_password;
     };
@@ -310,6 +311,7 @@ ArgParser::argPages()
         usage("the --pages may only be specified one time");
     }
     this->accumulated_args.clear();
+    this->c_pages = c_main->pages();
     this->ap.selectOptionTable(O_PAGES);
 }
 
@@ -402,7 +404,7 @@ ArgParser::argPagesPositional(char* arg)
     {
         range = "1-z";
     }
-    o.page_specs.push_back(QPDFJob::PageSpec(file, this->pages_password, range));
+    this->c_pages->pageSpec(file, this->pages_password, range);
     this->accumulated_args.clear();
     this->pages_password = nullptr;
     if (next_file != nullptr)
@@ -415,10 +417,8 @@ void
 ArgParser::argEndPages()
 {
     argPagesPositional(nullptr);
-    if (o.page_specs.empty())
-    {
-        usage("--pages: no page specifications given");
-    }
+    c_pages->end();
+    c_pages = nullptr;
 }
 
 void

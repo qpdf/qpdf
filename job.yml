@@ -61,6 +61,13 @@ options:
       - job-json-help
   - table: main
     config: c_main
+    manual:
+      - add-attachment
+      - copy-attachments-from
+      - encrypt
+      - overlay
+      - pages
+      - underlay
     positional: true
     bare:
       - add-attachment
@@ -148,8 +155,11 @@ options:
       remove-unreferenced-resources: remove_unref
       stream-data: stream_data
   - table: pages
+    config: c_pages
     prefix: Pages
     positional: true
+    manual:
+      - password
     required_parameter:
       password: password
   - table: encryption

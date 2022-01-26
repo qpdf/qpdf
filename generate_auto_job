@@ -33,17 +33,6 @@ def write_file(filename):
 
 
 # QXXXQ
-# These need manual handlers.
-complex = set([
-    'add-attachment',
-    'copy-attachments-from',
-    'encrypt',
-    'overlay',
-    'pages',
-    'underlay',
-])
-
-# QXXXQ
 # These are trivial but not in main and so need a different config
 # object. Some are in more than one table.
 not_yet = set([
@@ -466,8 +455,8 @@ class Main:
             for i, [kind, v] in flags.items():
                 self.options_without_help.add(f'--{i}')
                 add_jdata(i, table_prefix or table)
-                # QXXXQ complex, not_yet
-                if i in complex or i in not_yet or config is None:
+                # QXXXQ not_yet
+                if i in not_yet or config is None or i in o.get('manual', []):
                     identifier = self.to_identifier(i, arg_prefix, False)
                     self.handle_flag(i, identifier, kind, v)
                 else:
@@ -581,7 +570,7 @@ class Main:
             ['choices', 'options', 'no-json', 'json']))
         for o in data['options']:
             self.check_keys('top', o, set(
-                ['table', 'prefix', 'config', 'bare', 'positional',
+                ['table', 'prefix', 'config', 'manual', 'bare', 'positional',
                  'optional_parameter', 'required_parameter',
                  'required_choices', 'optional_choices', 'from_table']))
 

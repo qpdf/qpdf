@@ -657,3 +657,34 @@ QPDFJob::AttConfig::end()
     this->config.o.attachments_to_add.push_back(this->att);
     return this->config;
 }
+
+QPDFJob::PagesConfig::PagesConfig(Config& c) :
+    config(c)
+{
+}
+
+std::shared_ptr<QPDFJob::PagesConfig>
+QPDFJob::Config::pages()
+{
+    return std::shared_ptr<PagesConfig>(new PagesConfig(*this));
+}
+
+QPDFJob::Config&
+QPDFJob::PagesConfig::end()
+{
+    if (this->config.o.page_specs.empty())
+    {
+        throw QPDFJob::ConfigError("--pages: no page specifications given");
+    }
+    return this->config;
+}
+
+QPDFJob::PagesConfig&
+QPDFJob::PagesConfig::pageSpec(std::string const& filename,
+                               char const* password,
+                               std::string const& range)
+{
+    this->config.o.page_specs.push_back(
+        QPDFJob::PageSpec(filename, password, range));
+    return *this;
+}

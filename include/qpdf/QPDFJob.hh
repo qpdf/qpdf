@@ -135,6 +135,17 @@ class QPDFJob
         bool replace;
     };
 
+    struct PageSpec
+    {
+        PageSpec(std::string const& filename,
+                 char const* password,
+                 std::string const& range);
+
+        std::string filename;
+        std::shared_ptr<char> password;
+        std::string range;
+    };
+
   public:
     class Config;
 
@@ -172,6 +183,24 @@ class QPDFJob
         CopyAttachmentFrom caf;
     };
 
+    class PagesConfig
+    {
+        friend class QPDFJob;
+        friend class Config;
+      public:
+        PagesConfig& pageSpec(std::string const& filename,
+                              char const* password,
+                              std::string const& range);
+
+#       include <qpdf/auto_job_c_pages.hh>
+
+      private:
+        PagesConfig(Config&);
+        PagesConfig(PagesConfig const&) = delete;
+
+        Config& config;
+    };
+
     // Configuration is performed by calling methods XXX QXXXQ document
     class Config
     {
@@ -180,6 +209,7 @@ class QPDFJob
         QPDF_DLL
         std::shared_ptr<CopyAttConfig> copyAttachmentsFrom();
         std::shared_ptr<AttConfig> addAttachment();
+        std::shared_ptr<PagesConfig> pages();
 
 #       include <qpdf/auto_job_c_main.hh>
 
@@ -242,17 +272,6 @@ class QPDFJob
     QPDF_DLL
     static void parse_object_id(
         std::string const& objspec, bool& trailer, int& obj, int& gen);
-
-    struct PageSpec
-    {
-        PageSpec(std::string const& filename,
-                 char const* password,
-                 std::string const& range);
-
-        std::string filename;
-        std::shared_ptr<char> password;
-        std::string range;
-    };
 
     struct RotationSpec
     {
