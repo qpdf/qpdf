@@ -724,7 +724,7 @@ static void test25(char const* infile,
     assert(qpdf_oh_is_dictionary_of_type(qpdf, new_dict, "/Test", "/Marvin"));
     assert(! qpdf_oh_is_dictionary_of_type(qpdf, new_dict, "/Test2", ""));
     assert(! qpdf_oh_is_dictionary_of_type(qpdf, new_dict, "/Test", "/M"));
-    assert(! qpdf_oh_is_dictionary_of_type(qpdf, new_dict, "", ""));
+    assert(qpdf_oh_is_dictionary_of_type(qpdf, new_dict, "", ""));
     qpdf_oh new_array = qpdf_oh_new_array(qpdf);
     qpdf_oh_replace_or_remove_key(
         qpdf, new_dict, "/A", qpdf_oh_new_null(qpdf));
