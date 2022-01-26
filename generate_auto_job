@@ -315,7 +315,7 @@ class Main:
         arg = ''
         if decl_arg:
             arg = 'char const* parameter'
-        fn = f'{config_prefix}& {identifier}({arg})'
+        fn = f'{config_prefix}* {identifier}({arg})'
         if fn not in self.declared_configs:
             self.declared_configs.add(fn)
             self.config_decls[cfg].append(f'QPDF_DLL {fn};')

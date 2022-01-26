@@ -154,17 +154,17 @@ class QPDFJob
         friend class Config;
       public:
         QPDF_DLL
-        Config& endAddAttachment();
+        Config* endAddAttachment();
         QPDF_DLL
-        AttConfig& path(char const* parameter);
+        AttConfig* path(char const* parameter);
 
 #       include <qpdf/auto_job_c_att.hh>
 
       private:
-        AttConfig(Config&);
+        AttConfig(Config*);
         AttConfig(AttConfig const&) = delete;
 
-        Config& config;
+        Config* config;
         AddAttachment att;
     };
 
@@ -174,17 +174,17 @@ class QPDFJob
         friend class Config;
       public:
         QPDF_DLL
-        Config& endCopyAttachmentsFrom();
+        Config* endCopyAttachmentsFrom();
         QPDF_DLL
-        CopyAttConfig& path(char const* parameter);
+        CopyAttConfig* path(char const* parameter);
 
 #       include <qpdf/auto_job_c_copy_att.hh>
 
       private:
-        CopyAttConfig(Config&);
+        CopyAttConfig(Config*);
         CopyAttConfig(CopyAttConfig const&) = delete;
 
-        Config& config;
+        Config* config;
         CopyAttachmentFrom caf;
     };
 
@@ -194,19 +194,19 @@ class QPDFJob
         friend class Config;
       public:
         QPDF_DLL
-        Config& endPages();
+        Config* endPages();
         QPDF_DLL
-        PagesConfig& pageSpec(std::string const& filename,
+        PagesConfig* pageSpec(std::string const& filename,
                               std::string const& range,
                               char const* password = nullptr);
 
 #       include <qpdf/auto_job_c_pages.hh>
 
       private:
-        PagesConfig(Config&);
+        PagesConfig(Config*);
         PagesConfig(PagesConfig const&) = delete;
 
-        Config& config;
+        Config* config;
     };
 
     class UOConfig
@@ -215,17 +215,17 @@ class QPDFJob
         friend class Config;
       public:
         QPDF_DLL
-        Config& endUnderlayOverlay();
+        Config* endUnderlayOverlay();
         QPDF_DLL
-        UOConfig& path(char const* parameter);
+        UOConfig* path(char const* parameter);
 
 #       include <qpdf/auto_job_c_uo.hh>
 
       private:
-        UOConfig(Config&);
+        UOConfig(Config*);
         UOConfig(PagesConfig const&) = delete;
 
-        Config& config;
+        Config* config;
     };
 
     class EncConfig
@@ -234,17 +234,17 @@ class QPDFJob
         friend class Config;
       public:
         QPDF_DLL
-        Config& endEncrypt();
+        Config* endEncrypt();
         QPDF_DLL
-        EncConfig& path(char const* parameter);
+        EncConfig* path(char const* parameter);
 
 #       include <qpdf/auto_job_c_enc.hh>
 
       private:
-        EncConfig(Config&);
+        EncConfig(Config*);
         EncConfig(PagesConfig const&) = delete;
 
-        Config& config;
+        Config* config;
     };
 
     // Configuration is performed by calling methods XXX QXXXQ document
@@ -253,13 +253,13 @@ class QPDFJob
         friend class QPDFJob;
       public:
         QPDF_DLL
-        Config& inputFile(char const* filename);
+        Config* inputFile(char const* filename);
         QPDF_DLL
-        Config& emptyInput();
+        Config* emptyInput();
         QPDF_DLL
-        Config& outputFile(char const* filename);
+        Config* outputFile(char const* filename);
         QPDF_DLL
-        Config& replaceInput();
+        Config* replaceInput();
 
         QPDF_DLL
         std::shared_ptr<CopyAttConfig> copyAttachmentsFrom();
