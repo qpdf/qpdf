@@ -963,3 +963,198 @@ QPDFJob::UOConfig::password(char const* parameter)
     config.o.under_overlay->password = QUtil::make_shared_cstr(parameter);
     return *this;
 }
+
+std::shared_ptr<QPDFJob::EncConfig>
+QPDFJob::Config::encrypt(int keylen,
+                         std::string const& user_password,
+                         std::string const& owner_password)
+{
+    o.keylen = keylen;
+    if (keylen == 256)
+    {
+        o.use_aes = true;
+    }
+    o.user_password = user_password;
+    o.owner_password = owner_password;
+    return std::shared_ptr<EncConfig>(new EncConfig(*this));
+}
+
+QPDFJob::EncConfig::EncConfig(Config& c) :
+    config(c)
+{
+}
+
+QPDFJob::Config&
+QPDFJob::EncConfig::end()
+{
+    config.o.encrypt = true;
+    config.o.decrypt = false;
+    config.o.copy_encryption = false;
+    return this->config;
+}
+
+QPDFJob::EncConfig&
+QPDFJob::EncConfig::allowInsecure()
+{
+    config.o.allow_insecure = true;
+    return *this;
+}
+
+QPDFJob::EncConfig&
+QPDFJob::EncConfig::accessibility(char const* parameter)
+{
+    config.o.r3_accessibility = (strcmp(parameter, "y") == 0);
+    return *this;
+}
+
+QPDFJob::EncConfig&
+QPDFJob::EncConfig::extract(char const* parameter)
+{
+    if (config.o.keylen == 40)
+    {
+        config.o.r2_extract = (strcmp(parameter, "y") == 0);
+    }
+    else
+    {
+        config.o.r3_extract = (strcmp(parameter, "y") == 0);
+    }
+    return *this;
+}
+
+QPDFJob::EncConfig&
+QPDFJob::EncConfig::print(char const* parameter)
+{
+    if (config.o.keylen == 40)
+    {
+        config.o.r2_print = (strcmp(parameter, "y") == 0);
+    }
+    else if (strcmp(parameter, "full") == 0)
+    {
+        config.o.r3_print = qpdf_r3p_full;
+    }
+    else if (strcmp(parameter, "low") == 0)
+    {
+        config.o.r3_print = qpdf_r3p_low;
+    }
+    else if (strcmp(parameter, "none") == 0)
+    {
+        config.o.r3_print = qpdf_r3p_none;
+    }
+    else
+    {
+        usage("invalid print option");
+    }
+    return *this;
+}
+
+QPDFJob::EncConfig&
+QPDFJob::EncConfig::modify(char const* parameter)
+{
+    if (config.o.keylen == 40)
+    {
+        config.o.r2_modify = (strcmp(parameter, "y") == 0);
+    }
+    else if (strcmp(parameter, "all") == 0)
+    {
+        config.o.r3_assemble = true;
+        config.o.r3_annotate_and_form = true;
+        config.o.r3_form_filling = true;
+        config.o.r3_modify_other = true;
+    }
+    else if (strcmp(parameter, "annotate") == 0)
+    {
+        config.o.r3_assemble = true;
+        config.o.r3_annotate_and_form = true;
+        config.o.r3_form_filling = true;
+        config.o.r3_modify_other = false;
+    }
+    else if (strcmp(parameter, "form") == 0)
+    {
+        config.o.r3_assemble = true;
+        config.o.r3_annotate_and_form = false;
+        config.o.r3_form_filling = true;
+        config.o.r3_modify_other = false;
+    }
+    else if (strcmp(parameter, "assembly") == 0)
+    {
+        config.o.r3_assemble = true;
+        config.o.r3_annotate_and_form = false;
+        config.o.r3_form_filling = false;
+        config.o.r3_modify_other = false;
+    }
+    else if (strcmp(parameter, "none") == 0)
+    {
+        config.o.r3_assemble = false;
+        config.o.r3_annotate_and_form = false;
+        config.o.r3_form_filling = false;
+        config.o.r3_modify_other = false;
+    }
+    else
+    {
+        usage("invalid modify option");
+    }
+    return *this;
+}
+
+QPDFJob::EncConfig&
+QPDFJob::EncConfig::cleartextMetadata()
+{
+    config.o.cleartext_metadata = true;
+    return *this;
+}
+
+QPDFJob::EncConfig&
+QPDFJob::EncConfig::assemble(char const* parameter)
+{
+    config.o.r3_assemble = (strcmp(parameter, "y") == 0);
+    return *this;
+}
+
+QPDFJob::EncConfig&
+QPDFJob::EncConfig::annotate(char const* parameter)
+{
+    if (config.o.keylen == 40)
+    {
+        config.o.r2_annotate = (strcmp(parameter, "y") == 0);
+    }
+    else
+    {
+        config.o.r3_annotate_and_form = (strcmp(parameter, "y") == 0);
+    }
+    return *this;
+}
+
+QPDFJob::EncConfig&
+QPDFJob::EncConfig::form(char const* parameter)
+{
+    config.o.r3_form_filling = (strcmp(parameter, "y") == 0);
+    return *this;
+}
+
+QPDFJob::EncConfig&
+QPDFJob::EncConfig::modifyOther(char const* parameter)
+{
+    config.o.r3_modify_other = (strcmp(parameter, "y") == 0);
+    return *this;
+}
+
+QPDFJob::EncConfig&
+QPDFJob::EncConfig::useAes(char const* parameter)
+{
+    config.o.use_aes = (strcmp(parameter, "y") == 0);
+    return *this;
+}
+
+QPDFJob::EncConfig&
+QPDFJob::EncConfig::forceV4()
+{
+    config.o.force_V4 = true;
+    return *this;
+}
+
+QPDFJob::EncConfig&
+QPDFJob::EncConfig::forceR5()
+{
+    config.o.force_R5 = true;
+    return *this;
+}

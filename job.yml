@@ -166,6 +166,8 @@ options:
     prefix: Enc
     positional: true
   - table: 40-bit encryption
+    config: c_enc
+    config_class: Enc
     prefix: Enc40
     required_choices:
       extract: yn
@@ -173,6 +175,8 @@ options:
       print: yn
       modify: yn
   - table: 128-bit encryption
+    config: c_enc
+    config_class: Enc
     prefix: Enc128
     bare:
       - cleartext-metadata
@@ -188,22 +192,22 @@ options:
       modify: modify128
       use-aes: yn
   - table: 256-bit encryption
+    config: c_enc
+    config_class: Enc
     prefix: Enc256
-    from_table:
-      table: 128-bit encryption
-      options:
-        - cleartext-metadata
-        - accessibility
-        - extract
-        - print
-        - assemble
-        - annotate
-        - form
-        - modify-other
-        - modify
     bare:
+      - cleartext-metadata
       - force-R5
       - allow-insecure
+    required_choices:
+      accessibility: yn
+      extract: yn
+      print: print128
+      assemble: yn
+      annotate: yn
+      form: yn
+      modify-other: yn
+      modify: modify128
   - table: underlay/overlay
     config: c_uo
     prefix: UO
@@ -277,9 +281,9 @@ json:
       force-version:
       progress:
       encrypt:
+        key-length: "key length: 48, 128, 256"
         user-password: "user password"
         owner-password: "owner password"
-        key-length: "key length: 48, 128, 256"
         _40-bit:
           Enc40.annotate:
           Enc40.extract:

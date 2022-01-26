@@ -44,6 +44,7 @@ namespace
         std::shared_ptr<QPDFJob::AttConfig> c_att;
         std::shared_ptr<QPDFJob::PagesConfig> c_pages;
         std::shared_ptr<QPDFJob::UOConfig> c_uo;
+        std::shared_ptr<QPDFJob::EncConfig> c_enc;
         std::vector<char*> accumulated_args; // points to member in ap
         char* pages_password;
     };
@@ -217,35 +218,30 @@ ArgParser::argEncPositional(char* arg)
         }
         return;
     }
-    o.user_password = this->accumulated_args.at(0);
-    o.owner_password = this->accumulated_args.at(1);
+    std::string user_password = this->accumulated_args.at(0);
+    std::string owner_password = this->accumulated_args.at(1);
     std::string len_str = this->accumulated_args.at(2);
+    int keylen = 0;
     if (len_str == "40")
     {
-        o.keylen = 40;
+        keylen = 40;
         this->ap.selectOptionTable(O_40_BIT_ENCRYPTION);
     }
     else if (len_str == "128")
     {
-        o.keylen = 128;
+        keylen = 128;
         this->ap.selectOptionTable(O_128_BIT_ENCRYPTION);
     }
     else if (len_str == "256")
     {
-        o.keylen = 256;
-        o.use_aes = true;
+        keylen = 256;
         this->ap.selectOptionTable(O_256_BIT_ENCRYPTION);
     }
     else
     {
         usage("encryption key length must be 40, 128, or 256");
     }
-}
-
-void
-ArgParser::argEnc256AllowInsecure()
-{
-    o.allow_insecure = true;
+    this->c_enc = c_main->encrypt(keylen, user_password, owner_password);
 }
 
 void
@@ -395,160 +391,10 @@ ArgParser::argCopyAttachmentsFrom()
 }
 
 void
-ArgParser::argEnc40Print(char* parameter)
-{
-    o.r2_print = (strcmp(parameter, "y") == 0);
-}
-
-void
-ArgParser::argEnc40Modify(char* parameter)
-{
-    o.r2_modify = (strcmp(parameter, "y") == 0);
-}
-
-void
-ArgParser::argEnc40Extract(char* parameter)
-{
-    o.r2_extract = (strcmp(parameter, "y") == 0);
-}
-
-void
-ArgParser::argEnc40Annotate(char* parameter)
-{
-    o.r2_annotate = (strcmp(parameter, "y") == 0);
-}
-
-void
-ArgParser::argEnc128Accessibility(char* parameter)
-{
-    o.r3_accessibility = (strcmp(parameter, "y") == 0);
-}
-
-void
-ArgParser::argEnc128Extract(char* parameter)
-{
-    o.r3_extract = (strcmp(parameter, "y") == 0);
-}
-
-void
-ArgParser::argEnc128Print(char* parameter)
-{
-    if (strcmp(parameter, "full") == 0)
-    {
-        o.r3_print = qpdf_r3p_full;
-    }
-    else if (strcmp(parameter, "low") == 0)
-    {
-        o.r3_print = qpdf_r3p_low;
-    }
-    else if (strcmp(parameter, "none") == 0)
-    {
-        o.r3_print = qpdf_r3p_none;
-    }
-    else
-    {
-        usage("invalid print option");
-    }
-}
-
-void
-ArgParser::argEnc128Modify(char* parameter)
-{
-    if (strcmp(parameter, "all") == 0)
-    {
-        o.r3_assemble = true;
-        o.r3_annotate_and_form = true;
-        o.r3_form_filling = true;
-        o.r3_modify_other = true;
-    }
-    else if (strcmp(parameter, "annotate") == 0)
-    {
-        o.r3_assemble = true;
-        o.r3_annotate_and_form = true;
-        o.r3_form_filling = true;
-        o.r3_modify_other = false;
-    }
-    else if (strcmp(parameter, "form") == 0)
-    {
-        o.r3_assemble = true;
-        o.r3_annotate_and_form = false;
-        o.r3_form_filling = true;
-        o.r3_modify_other = false;
-    }
-    else if (strcmp(parameter, "assembly") == 0)
-    {
-        o.r3_assemble = true;
-        o.r3_annotate_and_form = false;
-        o.r3_form_filling = false;
-        o.r3_modify_other = false;
-    }
-    else if (strcmp(parameter, "none") == 0)
-    {
-        o.r3_assemble = false;
-        o.r3_annotate_and_form = false;
-        o.r3_form_filling = false;
-        o.r3_modify_other = false;
-    }
-    else
-    {
-        usage("invalid modify option");
-    }
-}
-
-void
-ArgParser::argEnc128CleartextMetadata()
-{
-    o.cleartext_metadata = true;
-}
-
-void
-ArgParser::argEnc128Assemble(char* parameter)
-{
-    o.r3_assemble = (strcmp(parameter, "y") == 0);
-}
-
-void
-ArgParser::argEnc128Annotate(char* parameter)
-{
-    o.r3_annotate_and_form = (strcmp(parameter, "y") == 0);
-}
-
-void
-ArgParser::argEnc128Form(char* parameter)
-{
-    o.r3_form_filling = (strcmp(parameter, "y") == 0);
-}
-
-void
-ArgParser::argEnc128ModifyOther(char* parameter)
-{
-    o.r3_modify_other = (strcmp(parameter, "y") == 0);
-}
-
-void
-ArgParser::argEnc128UseAes(char* parameter)
-{
-    o.use_aes = (strcmp(parameter, "y") == 0);
-}
-
-void
-ArgParser::argEnc128ForceV4()
-{
-    o.force_V4 = true;
-}
-
-void
-ArgParser::argEnc256ForceR5()
-{
-    o.force_R5 = true;
-}
-
-void
 ArgParser::argEndEncryption()
 {
-    o.encrypt = true;
-    o.decrypt = false;
-    o.copy_encryption = false;
+    c_enc->end();
+    c_enc = nullptr;
 }
 
 void

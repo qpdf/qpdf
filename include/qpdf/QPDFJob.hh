@@ -217,6 +217,22 @@ class QPDFJob
         Config& config;
     };
 
+    class EncConfig
+    {
+        friend class QPDFJob;
+        friend class Config;
+      public:
+        QPDF_DLL EncConfig& path(char const* parameter);
+
+#       include <qpdf/auto_job_c_enc.hh>
+
+      private:
+        EncConfig(Config&);
+        EncConfig(PagesConfig const&) = delete;
+
+        Config& config;
+    };
+
     // Configuration is performed by calling methods XXX QXXXQ document
     class Config
     {
@@ -228,6 +244,10 @@ class QPDFJob
         std::shared_ptr<PagesConfig> pages();
         std::shared_ptr<UOConfig> overlay();
         std::shared_ptr<UOConfig> underlay();
+        std::shared_ptr<EncConfig> encrypt(
+            int keylen,
+            std::string const& user_password,
+            std::string const& owner_password);
 
 #       include <qpdf/auto_job_c_main.hh>
 

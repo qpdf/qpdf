@@ -70,6 +70,7 @@ class Main:
         with open('job.yml', 'r') as f:
             data = yaml.safe_load(f.read())
         self.config_decls = {}
+        self.declared_configs = set()
         for o in data['options']:
             table = o['table']
             config = o.get('config', None)
@@ -311,14 +312,17 @@ class Main:
             self.init.append(f'this->ap.addChoices("{i}", '
                              f'[this](char *x){{{cfg}->{identifier}(x);}}'
                              f', false, {v}_choices);')
+
         # Generate declarations for config methods separately by
         # config object.
         config_class = prefix + 'Config'
         arg = ''
         if decl_arg:
             arg = 'char const* parameter'
-        self.config_decls[cfg].append(
-            f'QPDF_DLL {config_class}& {identifier}({arg});')
+        fn = f'{config_class}& {identifier}({arg})'
+        if fn not in self.declared_configs:
+            self.declared_configs.add(fn)
+            self.config_decls[cfg].append(f'QPDF_DLL {fn};')
 
     def handle_flag(self, i, identifier, kind, v):
         if kind == 'bare':
@@ -393,7 +397,6 @@ class Main:
             config = o.get('config', None)
             table_prefix = o.get('prefix', '')
             arg_prefix = 'arg' + table_prefix
-            jdata_prefix = table_prefix or table
             if table == 'main':
                 self.init.append('this->ap.selectMainOptionTable();')
             elif table == 'help':
@@ -428,29 +431,13 @@ class Main:
                     self.handle_flag(i, identifier, kind, v)
                 else:
                     identifier = self.to_identifier(i, '', False)
+                    prefix = o.get('config_class', table_prefix)
                     self.handle_trivial(
-                        i, identifier, config, table_prefix, kind, v)
+                        i, identifier, config, prefix, kind, v)
 
             if table not in ('main', 'help'):
                 identifier = self.to_identifier(table, 'argEnd', False)
                 self.decls.append(f'void {identifier}();')
-        for o in data['options']:
-            table = o['table']
-            jdata_prefix = o.get('prefix', table)
-            if 'from_table' not in o:
-                continue
-            if table == 'main':
-                self.init.append('this->ap.selectMainOptionTable();')
-            elif table == 'help':
-                self.init.append('this->ap.selectHelpOptionTable();')
-            else:
-                self.init.append(f'this->ap.selectOptionTable("{table}");')
-            ft = o['from_table']
-            other_table = ft['table']
-            for j in ft['options']:
-                self.init.append('this->ap.copyFromOtherTable'
-                                 f'("{j}", "{other_table}");')
-                add_jdata(j, jdata_prefix or table)
 
     def generate_schema(self, data):
         # XXX check data['json'] against what we know from jdata.
@@ -537,9 +524,10 @@ class Main:
             ['choices', 'options', 'no-json', 'json']))
         for o in data['options']:
             self.check_keys('top', o, set(
-                ['table', 'prefix', 'config', 'manual', 'bare', 'positional',
+                ['table', 'prefix', 'config', 'config_class',
+                 'manual', 'bare', 'positional',
                  'optional_parameter', 'required_parameter',
-                 'required_choices', 'optional_choices', 'from_table']))
+                 'required_choices', 'optional_choices']))
 
     def to_identifier(self, label, prefix, const):
         identifier = re.sub(r'[^a-zA-Z0-9]', '_', label)

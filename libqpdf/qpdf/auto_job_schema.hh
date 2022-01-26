@@ -35,9 +35,9 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
       "forceVersion": "set output PDF version",
       "progress": "show progress when writing",
       "encrypt": {
+        "keyLength": "key length: 48, 128, 256",
         "userPassword": "user password",
         "ownerPassword": "owner password",
-        "keyLength": "key length: 48, 128, 256",
         "40Bit": {
           "annotate": "restrict document annotation",
           "extract": "restrict text/graphic extraction",
