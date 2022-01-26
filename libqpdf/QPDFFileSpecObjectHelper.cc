@@ -15,8 +15,7 @@ QPDFFileSpecObjectHelper::QPDFFileSpecObjectHelper(
         oh.warnIfPossible("Embedded file object is not a dictionary");
         return;
     }
-    auto type = oh.getKey("/Type");
-    if (! (type.isName() && (type.getName() == "/Filespec")))
+    if (! oh.isDictionaryOfType("/Filespec"))
     {
         oh.warnIfPossible("Embedded file object's type is not /Filespec");
     }

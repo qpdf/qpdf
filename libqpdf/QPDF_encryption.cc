@@ -1262,9 +1262,7 @@ QPDF::decryptStream(PointerHolder<EncryptionParameters> encp,
             {
                 QPDFObjectHandle decode_parms =
                     stream_dict.getKey("/DecodeParms");
-                if (decode_parms.getKey("/Type").isName() &&
-                    (decode_parms.getKey("/Type").getName() ==
-                     "/CryptFilterDecodeParms"))
+                if (decode_parms.isDictionaryOfType("/CryptFilterDecodeParms"))
                 {
                     QTC::TC("qpdf", "QPDF_encryption stream crypt filter");
                     method = interpretCF(encp, decode_parms.getKey("/Name"));
@@ -1280,8 +1278,7 @@ QPDF::decryptStream(PointerHolder<EncryptionParameters> encp,
                 {
                     for (int i = 0; i < filter.getArrayNItems(); ++i)
                     {
-                        if (filter.getArrayItem(i).isName() &&
-                            (filter.getArrayItem(i).getName() == "/Crypt"))
+                        if (filter.getArrayItem(i).isNameAndEquals("/Crypt"))
                         {
                             QPDFObjectHandle crypt_params =
                                 decode.getArrayItem(i);

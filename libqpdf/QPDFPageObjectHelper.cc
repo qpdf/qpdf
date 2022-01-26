@@ -558,10 +558,7 @@ QPDFPageObjectHelper::getAnnotations(std::string const& only_subtype)
         for (int i = 0; i < nannots; ++i)
         {
             QPDFObjectHandle annot = annots.getArrayItem(i);
-            if (only_subtype.empty() ||
-                (annot.isDictionary() &&
-                 annot.getKey("/Subtype").isName() &&
-                 (only_subtype == annot.getKey("/Subtype").getName())))
+            if (annot.isDictionaryOfType("", only_subtype))
             {
                 result.push_back(QPDFAnnotationObjectHelper(annot));
             }

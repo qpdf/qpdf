@@ -1100,10 +1100,7 @@ QPDF::read_xrefStream(qpdf_offset_t xref_offset)
 	{
 	    // ignore -- report error below
 	}
-	if (xref_obj.isInitialized() &&
-	    xref_obj.isStream() &&
-	    xref_obj.getDict().getKey("/Type").isName() &&
-	    xref_obj.getDict().getKey("/Type").getName() == "/XRef")
+        if (xref_obj.isStreamOfType("/XRef"))
 	{
 	    QTC::TC("qpdf", "QPDF found xref stream");
 	    found = true;
@@ -2202,8 +2199,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
         this->m->obj_cache[stream_og].end_after_space;
 
     QPDFObjectHandle dict = obj_stream.getDict();
-    if (! (dict.getKey("/Type").isName() &&
-	   dict.getKey("/Type").getName() == "/ObjStm"))
+    if (! dict.isDictionaryOfType("/ObjStm"))
     {
 	QTC::TC("qpdf", "QPDF ERR object stream with wrong type");
 	warn(QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
@@ -2849,13 +2845,10 @@ QPDF::getCompressibleObjGens()
 	    {
 		QTC::TC("qpdf", "QPDF exclude encryption dictionary");
 	    }
-	    else if ((! obj.isStream()) &&
-		     (! (obj.isDictionary() &&
+            else if (! (obj.isStream() ||
+                        (obj.isDictionaryOfType("/Sig") &&
                          obj.hasKey("/ByteRange") &&
-                         obj.hasKey("/Contents") &&
-                         obj.hasKey("/Type") &&
-                         obj.getKey("/Type").isName() &&
-                         obj.getKey("/Type").getName() == "/Sig")))
+                         obj.hasKey("/Contents"))))
 	    {
 		result.push_back(og);
 	    }

@@ -1055,23 +1055,9 @@ QPDFObjectHandle::getDictAsMap()
 bool
 QPDFObjectHandle::isOrHasName(std::string const& value)
 {
-    if (isName() && (getName() == value))
-    {
-	return true;
-    }
-    else if (isArray())
-    {
-	int n = getArrayNItems();
-	for (int i = 0; i < n; ++i)
-	{
-	    QPDFObjectHandle item = getArrayItem(0);
-	    if (item.isName() && (item.getName() == value))
-	    {
-		return true;
-	    }
-	}
-    }
-    return false;
+    return isNameAndEquals(value) ||
+           (isArray() && (getArrayNItems() > 0) && 
+            getArrayItem(0).isNameAndEquals(value));
 }
 
 void
@@ -2520,8 +2506,7 @@ QPDFObjectHandle::parseInternal(PointerHolder<InputSource> input,
                 }
 		if (!contents_string.empty() &&
 		    dict.count("/Type") &&
-		    dict["/Type"].isName() &&
-		    dict["/Type"].getName() == "/Sig" &&
+                    dict["/Type"].isNameAndEquals("/Sig") &&
 		    dict.count("/ByteRange") &&
 		    dict.count("/Contents") &&
 		    dict["/Contents"].isString())
@@ -3237,7 +3222,7 @@ QPDFObjectHandle::isPageObject()
     if (this->hasKey("/Type"))
     {
         QPDFObjectHandle type = this->getKey("/Type");
-        if (type.isName() && (type.getName() == "/Page"))
+        if (type.isNameAndEquals("/Page"))
         {
             return true;
         }
@@ -3263,39 +3248,22 @@ QPDFObjectHandle::isPagesObject()
     }
     // getAllPages repairs /Type when traversing the page tree.
     getOwningQPDF()->getAllPages();
-    return (this->isDictionary() &&
-            this->hasKey("/Type") &&
-            this->getKey("/Type").isName() &&
-            this->getKey("/Type").getName() == "/Pages");
+    return isDictionaryOfType("/Pages");
 }
 
 bool
 QPDFObjectHandle::isFormXObject()
 {
-    if (! this->isStream())
-    {
-        return false;
-    }
-    QPDFObjectHandle dict = this->getDict();
-    return (dict.getKey("/Type").isName() &&
-            ("/XObject" == dict.getKey("/Type").getName()) &&
-            dict.getKey("/Subtype").isName() &&
-            ("/Form" == dict.getKey("/Subtype").getName()));
+    return isStreamOfType("/XObject", "/Form");
 }
 
 bool
 QPDFObjectHandle::isImage(bool exclude_imagemask)
 {
-    if (! this->isStream())
-    {
-        return false;
-    }
-    QPDFObjectHandle dict = this->getDict();
-    return (dict.hasKey("/Subtype") &&
-            (dict.getKey("/Subtype").getName() == "/Image") &&
+    return (isStreamOfType("", "/Image") &&
             ((! exclude_imagemask) ||
-             (! (dict.getKey("/ImageMask").isBool() &&
-                 dict.getKey("/ImageMask").getBoolValue()))));
+             (! (getDict().getKey("/ImageMask").isBool() &&
+                 getDict().getKey("/ImageMask").getBoolValue()))));
 }
 
 void
