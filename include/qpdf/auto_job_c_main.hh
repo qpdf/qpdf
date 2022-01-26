@@ -65,6 +65,7 @@ QPDF_DLL Config& oiMinWidth(char const* parameter);
 QPDF_DLL Config& password(char const* parameter);
 QPDF_DLL Config& passwordFile(char const* parameter);
 QPDF_DLL Config& removeAttachment(char const* parameter);
+QPDF_DLL Config& rotate(char const* parameter);
 QPDF_DLL Config& showAttachment(char const* parameter);
 QPDF_DLL Config& showObject(char const* parameter);
 QPDF_DLL Config& compressStreams(char const* parameter);

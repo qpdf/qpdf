@@ -688,6 +688,13 @@ QPDFJob::Config::jobJsonFile(char const* parameter)
     return *this;
 }
 
+QPDFJob::Config&
+QPDFJob::Config::rotate(char const* parameter)
+{
+    o.parseRotationParameter(parameter);
+    return *this;
+}
+
 std::shared_ptr<QPDFJob::CopyAttConfig>
 QPDFJob::Config::copyAttachmentsFrom()
 {
@@ -873,5 +880,86 @@ QPDFJob::PagesConfig::pageSpec(std::string const& filename,
 {
     this->config.o.page_specs.push_back(
         QPDFJob::PageSpec(filename, password, range));
+    return *this;
+}
+
+std::shared_ptr<QPDFJob::UOConfig>
+QPDFJob::Config::overlay()
+{
+    o.under_overlay = &o.overlay;
+    return std::shared_ptr<UOConfig>(new UOConfig(*this));
+}
+
+std::shared_ptr<QPDFJob::UOConfig>
+QPDFJob::Config::underlay()
+{
+    o.under_overlay = &o.underlay;
+    return std::shared_ptr<UOConfig>(new UOConfig(*this));
+}
+
+QPDFJob::UOConfig::UOConfig(Config& c) :
+    config(c)
+{
+}
+
+QPDFJob::Config&
+QPDFJob::UOConfig::end()
+{
+    if (config.o.under_overlay->filename.empty())
+    {
+        usage(config.o.under_overlay->which + " file not specified");
+    }
+    config.o.under_overlay = 0;
+    return this->config;
+}
+
+QPDFJob::UOConfig&
+QPDFJob::UOConfig::path(char const* parameter)
+{
+    if (! config.o.under_overlay->filename.empty())
+    {
+        usage(config.o.under_overlay->which + " file already specified");
+    }
+    else
+    {
+        config.o.under_overlay->filename = parameter;
+    }
+    return *this;
+}
+
+QPDFJob::UOConfig&
+QPDFJob::UOConfig::to(char const* parameter)
+{
+    config.o.parseNumrange(parameter, 0);
+    config.o.under_overlay->to_nr = parameter;
+    return *this;
+}
+
+QPDFJob::UOConfig&
+QPDFJob::UOConfig::from(char const* parameter)
+{
+    if (strlen(parameter))
+    {
+        config.o.parseNumrange(parameter, 0);
+    }
+    config.o.under_overlay->from_nr = parameter;
+    return *this;
+}
+
+QPDFJob::UOConfig&
+QPDFJob::UOConfig::repeat(char const* parameter)
+{
+    if (strlen(parameter))
+    {
+        config.o.parseNumrange(parameter, 0);
+    }
+    config.o.under_overlay->repeat_nr = parameter;
+    return *this;
+}
+
+QPDFJob::UOConfig&
+QPDFJob::UOConfig::password(char const* parameter)
+{
+    config.o.under_overlay->password = QUtil::make_shared_cstr(parameter);
     return *this;
 }

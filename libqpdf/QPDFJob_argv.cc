@@ -36,7 +36,6 @@ namespace
         void usage(std::string const& message);
         void initOptionTables();
         void doFinalChecks();
-        void parseUnderOverlayOptions(QPDFJob::UnderOverlay*);
 
         QPDFArgParser ap;
         QPDFJob& o;
@@ -44,6 +43,7 @@ namespace
         std::shared_ptr<QPDFJob::CopyAttConfig> c_copy_att;
         std::shared_ptr<QPDFJob::AttConfig> c_att;
         std::shared_ptr<QPDFJob::PagesConfig> c_pages;
+        std::shared_ptr<QPDFJob::UOConfig> c_uo;
         std::vector<char*> accumulated_args; // points to member in ap
         char* pages_password;
     };
@@ -321,7 +321,7 @@ ArgParser::argPagesPositional(char* arg)
     {
         try
         {
-            o.parseNumrange(range, 0, true);
+            QUtil::parse_numrange(range, 0);
         }
         catch (std::runtime_error& e1)
         {
@@ -369,19 +369,15 @@ ArgParser::argEndPages()
 void
 ArgParser::argUnderlay()
 {
-    parseUnderOverlayOptions(&o.underlay);
+    this->c_uo = c_main->underlay();
+    this->ap.selectOptionTable(O_UNDERLAY_OVERLAY);
 }
 
 void
 ArgParser::argOverlay()
 {
-    parseUnderOverlayOptions(&o.overlay);
-}
-
-void
-ArgParser::argRotate(char* parameter)
-{
-    o.parseRotationParameter(parameter);
+    this->c_uo = c_main->overlay();
+    this->ap.selectOptionTable(O_UNDERLAY_OVERLAY);
 }
 
 void
@@ -576,57 +572,14 @@ ArgParser::argEnd256BitEncryption()
 void
 ArgParser::argUOPositional(char* arg)
 {
-    if (! o.under_overlay->filename.empty())
-    {
-        usage(o.under_overlay->which + " file already specified");
-    }
-    else
-    {
-        o.under_overlay->filename = arg;
-    }
-}
-
-void
-ArgParser::argUOTo(char* parameter)
-{
-    o.parseNumrange(parameter, 0);
-    o.under_overlay->to_nr = parameter;
-}
-
-void
-ArgParser::argUOFrom(char* parameter)
-{
-    if (strlen(parameter))
-    {
-        o.parseNumrange(parameter, 0);
-    }
-    o.under_overlay->from_nr = parameter;
-}
-
-void
-ArgParser::argUORepeat(char* parameter)
-{
-    if (strlen(parameter))
-    {
-        o.parseNumrange(parameter, 0);
-    }
-    o.under_overlay->repeat_nr = parameter;
-}
-
-void
-ArgParser::argUOPassword(char* parameter)
-{
-    o.under_overlay->password = QUtil::make_shared_cstr(parameter);
+    c_uo->path(arg);
 }
 
 void
 ArgParser::argEndUnderlayOverlay()
 {
-    if (o.under_overlay->filename.empty())
-    {
-        usage(o.under_overlay->which + " file not specified");
-    }
-    o.under_overlay = 0;
+    c_uo->end();
+    c_uo = nullptr;
 }
 
 void
@@ -665,13 +618,6 @@ void
 ArgParser::usage(std::string const& message)
 {
     this->ap.usage(message);
-}
-
-void
-ArgParser::parseUnderOverlayOptions(QPDFJob::UnderOverlay* uo)
-{
-    o.under_overlay = uo;
-    this->ap.selectOptionTable(O_UNDERLAY_OVERLAY);
 }
 
 void

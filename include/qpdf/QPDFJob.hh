@@ -201,6 +201,22 @@ class QPDFJob
         Config& config;
     };
 
+    class UOConfig
+    {
+        friend class QPDFJob;
+        friend class Config;
+      public:
+        QPDF_DLL UOConfig& path(char const* parameter);
+
+#       include <qpdf/auto_job_c_uo.hh>
+
+      private:
+        UOConfig(Config&);
+        UOConfig(PagesConfig const&) = delete;
+
+        Config& config;
+    };
+
     // Configuration is performed by calling methods XXX QXXXQ document
     class Config
     {
@@ -210,6 +226,8 @@ class QPDFJob
         std::shared_ptr<CopyAttConfig> copyAttachmentsFrom();
         std::shared_ptr<AttConfig> addAttachment();
         std::shared_ptr<PagesConfig> pages();
+        std::shared_ptr<UOConfig> overlay();
+        std::shared_ptr<UOConfig> underlay();
 
 #       include <qpdf/auto_job_c_main.hh>
 
@@ -422,16 +440,12 @@ class QPDFJob
     bool check_requires_password;
     std::shared_ptr<char> infilename;
     std::shared_ptr<char> outfilename;
-
-    // Helper functions
-    void parseRotationParameter(std::string const&);
-    std::vector<int> parseNumrange(char const* range, int max,
-                                   bool throw_error = false);
-
-
     // QXXXQ END-PUBLIC
 
   private:
+    // Helper functions
+    void parseRotationParameter(std::string const&);
+    std::vector<int> parseNumrange(char const* range, int max);
 
     // Basic file processing
     std::shared_ptr<QPDF> processFile(

@@ -507,7 +507,7 @@ QPDFJob::parseRotationParameter(std::string const& parameter)
     bool range_valid = false;
     try
     {
-        parseNumrange(range.c_str(), 0, true);
+        QUtil::parse_numrange(range.c_str(), 0);
         range_valid = true;
     }
     catch (std::runtime_error const&)
@@ -532,7 +532,7 @@ QPDFJob::parseRotationParameter(std::string const& parameter)
 }
 
 std::vector<int>
-QPDFJob::parseNumrange(char const* range, int max, bool throw_error)
+QPDFJob::parseNumrange(char const* range, int max)
 {
     try
     {
@@ -540,14 +540,7 @@ QPDFJob::parseNumrange(char const* range, int max, bool throw_error)
     }
     catch (std::runtime_error& e)
     {
-        if (throw_error)
-        {
-            throw(e);
-        }
-        else
-        {
-            throw ConfigError(e.what());
-        }
+        throw ConfigError(e.what());
     }
     return std::vector<int>();
 }

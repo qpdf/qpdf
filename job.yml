@@ -205,6 +205,7 @@ options:
       - force-R5
       - allow-insecure
   - table: underlay/overlay
+    config: c_uo
     prefix: UO
     positional: true
     required_parameter:
