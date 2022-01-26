@@ -154,6 +154,8 @@ class QPDFJob
         friend class Config;
       public:
         QPDF_DLL
+        Config& endAddAttachment();
+        QPDF_DLL
         AttConfig& path(char const* parameter);
 
 #       include <qpdf/auto_job_c_att.hh>
@@ -172,6 +174,8 @@ class QPDFJob
         friend class Config;
       public:
         QPDF_DLL
+        Config& endCopyAttachmentsFrom();
+        QPDF_DLL
         CopyAttConfig& path(char const* parameter);
 
 #       include <qpdf/auto_job_c_copy_att.hh>
@@ -189,6 +193,8 @@ class QPDFJob
         friend class QPDFJob;
         friend class Config;
       public:
+        QPDF_DLL
+        Config& endPages();
         QPDF_DLL
         PagesConfig& pageSpec(std::string const& filename,
                               std::string const& range,
@@ -209,6 +215,8 @@ class QPDFJob
         friend class Config;
       public:
         QPDF_DLL
+        Config& endUnderlayOverlay();
+        QPDF_DLL
         UOConfig& path(char const* parameter);
 
 #       include <qpdf/auto_job_c_uo.hh>
@@ -225,6 +233,8 @@ class QPDFJob
         friend class QPDFJob;
         friend class Config;
       public:
+        QPDF_DLL
+        Config& endEncrypt();
         QPDF_DLL
         EncConfig& path(char const* parameter);
 

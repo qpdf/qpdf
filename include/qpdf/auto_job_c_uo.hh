@@ -3,7 +3,6 @@
 // Edits will be automatically overwritten if the build is
 // run in maintainer mode.
 //
-QPDF_DLL Config& end();
 QPDF_DLL UOConfig& to(char const* parameter);
 QPDF_DLL UOConfig& from(char const* parameter);
 QPDF_DLL UOConfig& repeat(char const* parameter);

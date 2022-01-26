@@ -72,13 +72,10 @@ class Main:
         self.config_decls = {}
         self.declared_configs = set()
         for o in data['options']:
-            table = o['table']
             config = o.get('config', None)
             if config is not None:
                 self.DESTS[config] = f'include/qpdf/auto_job_{config}.hh'
                 self.config_decls[config] = []
-                if table != 'main':
-                    self.config_decls[config].append('QPDF_DLL Config& end();')
 
         if self.check_hashes():
             exit(0)
@@ -314,11 +311,11 @@ class Main:
 
         # Generate declarations for config methods separately by
         # config object.
-        config_class = prefix + 'Config'
+        config_prefix = prefix + 'Config'
         arg = ''
         if decl_arg:
             arg = 'char const* parameter'
-        fn = f'{config_class}& {identifier}({arg})'
+        fn = f'{config_prefix}& {identifier}({arg})'
         if fn not in self.declared_configs:
             self.declared_configs.add(fn)
             self.config_decls[cfg].append(f'QPDF_DLL {fn};')
@@ -430,7 +427,7 @@ class Main:
                     self.handle_flag(i, identifier, kind, v)
                 else:
                     identifier = self.to_identifier(i, '', False)
-                    prefix = o.get('config_class', table_prefix)
+                    prefix = o.get('config_prefix', table_prefix)
                     self.handle_trivial(
                         i, identifier, config, prefix, kind, v)
 
@@ -523,7 +520,7 @@ class Main:
             ['choices', 'options', 'no-json', 'json']))
         for o in data['options']:
             self.check_keys('top', o, set(
-                ['table', 'prefix', 'config', 'config_class',
+                ['table', 'prefix', 'config', 'config_prefix',
                  'manual', 'bare', 'positional',
                  'optional_parameter', 'required_parameter',
                  'required_choices', 'optional_choices']))

@@ -169,7 +169,7 @@ options:
     positional: true
   - table: 40-bit encryption
     config: c_enc
-    config_class: Enc
+    config_prefix: Enc
     prefix: Enc40
     required_choices:
       extract: yn
@@ -178,7 +178,7 @@ options:
       modify: yn
   - table: 128-bit encryption
     config: c_enc
-    config_class: Enc
+    config_prefix: Enc
     prefix: Enc128
     bare:
       - cleartext-metadata
@@ -195,7 +195,7 @@ options:
       use-aes: yn
   - table: 256-bit encryption
     config: c_enc
-    config_class: Enc
+    config_prefix: Enc
     prefix: Enc256
     bare:
       - cleartext-metadata

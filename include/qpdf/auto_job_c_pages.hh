@@ -3,4 +3,3 @@
 // Edits will be automatically overwritten if the build is
 // run in maintainer mode.
 //
-QPDF_DLL Config& end();

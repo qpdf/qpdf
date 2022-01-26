@@ -3,7 +3,6 @@
 // Edits will be automatically overwritten if the build is
 // run in maintainer mode.
 //
-QPDF_DLL Config& end();
 QPDF_DLL AttConfig& replace();
 QPDF_DLL AttConfig& key(char const* parameter);
 QPDF_DLL AttConfig& filename(char const* parameter);

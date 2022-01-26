@@ -781,7 +781,7 @@ QPDFJob::CopyAttConfig::password(char const* parameter)
 }
 
 QPDFJob::Config&
-QPDFJob::CopyAttConfig::end()
+QPDFJob::CopyAttConfig::endCopyAttachmentsFrom()
 {
     if (this->caf.path.empty())
     {
@@ -871,7 +871,7 @@ QPDFJob::AttConfig::replace()
 }
 
 QPDFJob::Config&
-QPDFJob::AttConfig::end()
+QPDFJob::AttConfig::endAddAttachment()
 {
     static std::string now = QUtil::qpdf_time_to_pdf_time(
         QUtil::get_current_qpdf_time());
@@ -921,7 +921,7 @@ QPDFJob::Config::pages()
 }
 
 QPDFJob::Config&
-QPDFJob::PagesConfig::end()
+QPDFJob::PagesConfig::endPages()
 {
     if (this->config.o.m->page_specs.empty())
     {
@@ -960,7 +960,7 @@ QPDFJob::UOConfig::UOConfig(Config& c) :
 }
 
 QPDFJob::Config&
-QPDFJob::UOConfig::end()
+QPDFJob::UOConfig::endUnderlayOverlay()
 {
     if (config.o.m->under_overlay->filename.empty())
     {
@@ -1042,7 +1042,7 @@ QPDFJob::EncConfig::EncConfig(Config& c) :
 }
 
 QPDFJob::Config&
-QPDFJob::EncConfig::end()
+QPDFJob::EncConfig::endEncrypt()
 {
     config.o.m->encrypt = true;
     config.o.m->decrypt = false;

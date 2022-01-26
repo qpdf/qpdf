@@ -365,7 +365,7 @@ void
 ArgParser::argEndPages()
 {
     argPagesPositional(nullptr);
-    c_pages->end();
+    c_pages->endPages();
     c_pages = nullptr;
 }
 
@@ -400,7 +400,7 @@ ArgParser::argCopyAttachmentsFrom()
 void
 ArgParser::argEndEncryption()
 {
-    c_enc->end();
+    c_enc->endEncrypt();
     c_enc = nullptr;
 }
 
@@ -431,7 +431,7 @@ ArgParser::argUOPositional(char* arg)
 void
 ArgParser::argEndUnderlayOverlay()
 {
-    c_uo->end();
+    c_uo->endUnderlayOverlay();
     c_uo = nullptr;
 }
 
@@ -444,7 +444,7 @@ ArgParser::argAttPositional(char* arg)
 void
 ArgParser::argEndAttachment()
 {
-    c_att->end();
+    c_att->endAddAttachment();
     c_att = nullptr;
 }
 
@@ -457,7 +457,7 @@ ArgParser::argCopyAttPositional(char* arg)
 void
 ArgParser::argEndCopyAttachment()
 {
-    c_copy_att->end();
+    c_copy_att->endCopyAttachmentsFrom();
     c_copy_att = nullptr;
 }
 
