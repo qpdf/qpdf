@@ -564,15 +564,16 @@ QPDFJob::initializeFromJson(std::string const& json)
 
         input_file_name->addStringHandler(
             [this](std::string const&, std::string const& v) {
-                this->infilename = QUtil::make_shared_cstr(v);
+                config()->inputFile(v.c_str());
             });
         output_file_name->addStringHandler(
             [this](std::string const&, std::string const& v) {
-                this->outfilename = QUtil::make_shared_cstr(v);
+                config()->outputFile(v.c_str());
             });
         output_options_qdf->addBoolHandler(
             [this](std::string const&, bool v) {
-                this->qdf_mode = v;
+                // QXXXQ require v to be true
+                config()->qdf();
             });
     }
 
