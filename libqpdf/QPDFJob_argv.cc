@@ -37,7 +37,6 @@ namespace
         void initOptionTables();
 
         QPDFArgParser ap;
-        QPDFJob& o;
         std::shared_ptr<QPDFJob::Config> c_main;
         std::shared_ptr<QPDFJob::CopyAttConfig> c_copy_att;
         std::shared_ptr<QPDFJob::AttConfig> c_att;
@@ -46,15 +45,18 @@ namespace
         std::shared_ptr<QPDFJob::EncConfig> c_enc;
         std::vector<char*> accumulated_args; // points to member in ap
         char* pages_password;
+        bool gave_input;
+        bool gave_output;
     };
 }
 
 ArgParser::ArgParser(QPDFArgParser& ap,
                      std::shared_ptr<QPDFJob::Config> c_main, QPDFJob& o) :
     ap(ap),
-    o(o),
     c_main(c_main),
-    pages_password(nullptr)
+    pages_password(nullptr),
+    gave_input(false),
+    gave_output(false)
 {
     initOptionTables();
 }
@@ -73,13 +75,15 @@ ArgParser::initOptionTables()
 void
 ArgParser::argPositional(char* arg)
 {
-    if (o.infilename == 0)
+    if (! this->gave_input)
     {
-        o.infilename = QUtil::make_shared_cstr(arg);
+        c_main->inputFile(arg);
+        this->gave_input = true;
     }
-    else if (o.outfilename == 0)
+    else if (! this->gave_output)
     {
-        o.outfilename = QUtil::make_shared_cstr(arg);
+        c_main->outputFile(arg);
+        this->gave_output = true;
     }
     else
     {
@@ -90,13 +94,15 @@ ArgParser::argPositional(char* arg)
 void
 ArgParser::argEmpty()
 {
-    o.infilename = QUtil::make_shared_cstr("");
+    c_main->emptyInput();
+    this->gave_input = true;
 }
 
 void
 ArgParser::argReplaceInput()
 {
-    o.replace_input = true;
+    c_main->replaceInput();
+    this->gave_output = true;
 }
 
 void

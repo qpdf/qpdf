@@ -244,6 +244,15 @@ class QPDFJob
         friend class QPDFJob;
       public:
         QPDF_DLL
+        Config& inputFile(char const* filename);
+        QPDF_DLL
+        Config& emptyInput();
+        QPDF_DLL
+        Config& outputFile(char const* filename);
+        QPDF_DLL
+        Config& replaceInput();
+
+        QPDF_DLL
         std::shared_ptr<CopyAttConfig> copyAttachmentsFrom();
         QPDF_DLL
         std::shared_ptr<AttConfig> addAttachment();

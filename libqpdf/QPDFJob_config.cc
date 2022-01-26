@@ -9,6 +9,72 @@ static void usage(std::string const& msg)
 }
 
 QPDFJob::Config&
+QPDFJob::Config::inputFile(char const* filename)
+{
+    if (o.infilename == 0)
+    {
+        o.infilename = QUtil::make_shared_cstr(filename);
+    }
+    else
+    {
+        usage("input file has already been given");
+    }
+    return *this;
+}
+
+QPDFJob::Config&
+QPDFJob::Config::emptyInput()
+{
+    if (o.infilename == 0)
+    {
+        // QXXXQ decide whether to fix this or just leave the comment:
+        // Various places in QPDFJob.cc know that the empty string for
+        // infile means empty. This means that passing "" as the
+        // argument to inputFile, or equivalently using "" as a
+        // positional command-line argument would be the same as
+        // --empty. This probably isn't worth blocking or coding
+        // around, but it would be better if we had a tighter way of
+        // knowing that the input file is empty.
+        o.infilename = QUtil::make_shared_cstr("");
+    }
+    else
+    {
+        usage("empty input can't be used"
+              " since input file has already been given");
+    }
+    return *this;
+}
+
+QPDFJob::Config&
+QPDFJob::Config::outputFile(char const* filename)
+{
+    if ((o.outfilename == 0) && (! o.replace_input))
+    {
+        o.outfilename = QUtil::make_shared_cstr(filename);
+    }
+    else
+    {
+        usage("output file has already been given");
+    }
+    return *this;
+}
+
+QPDFJob::Config&
+QPDFJob::Config::replaceInput()
+{
+    if ((o.outfilename == 0) && (! o.replace_input))
+    {
+        o.replace_input = true;
+    }
+    else
+    {
+        usage("replace-input can't be used"
+              " since output file has already been given");
+    }
+    return *this;
+}
+
+QPDFJob::Config&
 QPDFJob::Config::allowWeakCrypto()
 {
     o.allow_weak_crypto = true;
