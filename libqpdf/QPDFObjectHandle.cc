@@ -1055,9 +1055,21 @@ QPDFObjectHandle::getDictAsMap()
 bool
 QPDFObjectHandle::isOrHasName(std::string const& value)
 {
-    return isNameAndEquals(value) ||
-           (isArray() && (getArrayNItems() > 0) && 
-            getArrayItem(0).isNameAndEquals(value));
+    if (isNameAndEquals(value))
+    {
+        return true;
+    }
+    else if (isArray())
+    {
+        for (auto& item: aitems())
+        {
+            if (item.isNameAndEquals(value))
+            {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 void
