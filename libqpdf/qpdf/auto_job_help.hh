@@ -54,8 +54,11 @@ ap.addOptionHelp("--completion-zsh", "completion", "enable zsh completion", R"(O
 ap.addHelpTopic("help", "information about qpdf", R"(Help options provide some information about qpdf itself. Help
 options are only valid as the first and only command-line argument.
 )");
-ap.addOptionHelp("--help", "help", "provide help", R"(Display help information. Run qpdf --help for information about
-how to get help on various topics.
+ap.addOptionHelp("--help", "help", "provide help", R"(--help[=--option|topic]
+
+--help: provide general information and a list of topics
+--help=--option: provide help on a specific option
+--help=topic: provide help on a topic
 )");
 ap.addOptionHelp("--version", "help", "show qpdf version", R"(Display the version of qpdf.
 )");
@@ -70,7 +73,7 @@ directly related to the operation it is performing.
 ap.addOptionHelp("--password", "general", "specify password", R"(--password=password
 
 Specify a password for an encrypted, password-protected file.
-Not needed for encrypted files with no password.
+Not needed for encrypted files without a password.
 )");
 ap.addOptionHelp("--password-file", "general", "read password from a file", R"(--password-file=filename
 
@@ -119,9 +122,9 @@ ap.addOptionHelp("--password-is-hex-key", "advanced-control", "provide hex-encod
 string rather than supplying a password. This is an expert
 option.
 )");
-ap.addOptionHelp("--suppress-password-recovery", "advanced-control", "don't try different password encodings", R"(Suppress qpdf's behavior of attempting different encodings of a
-password that contains non-ASCII Unicode characters if the first
-attempt doesn't succeed.
+ap.addOptionHelp("--suppress-password-recovery", "advanced-control", "don't try different password encodings", R"(Suppress qpdf's usual behavior of attempting different encodings
+of a password that contains non-ASCII Unicode characters if the
+first attempt doesn't succeed.
 )");
 ap.addOptionHelp("--password-mode", "advanced-control", "tweak how qpdf encodes passwords", R"(--password-mode=mode
 
@@ -139,7 +142,7 @@ the structure without changing the content.
 )");
 ap.addOptionHelp("--linearize", "transformation", "linearize (web-optimize) output", R"(Create linearized (web-optimized) output files.
 )");
-ap.addOptionHelp("--encrypt", "transformation", "start encryption options", R"(--encrypt user-password owner-password key-length [ options ] --
+ap.addOptionHelp("--encrypt", "transformation", "start encryption options", R"(--encrypt user-password owner-password key-length [options] --
 
 Run qpdf --help=encryption for details.
 )");
@@ -159,12 +162,12 @@ If the file named in --copy-encryption requires a password, use
 this option to supply the password.
 )");
 ap.addOptionHelp("--qdf", "transformation", "enable viewing PDF code in a text editor", R"(Create a PDF file suitable for viewing in a text editor and even
-editing. This is to edit the PDF code, not the page contents.
+editing. This is for editing the PDF code, not the page contents.
 All streams that can be uncompressed are uncompressed, and
 content streams are normalized, among other changes. The
 companion tool "fix-qdf" can be used to repair hand-edited QDF
-files. QDF is a feature specific to the qpdf tool. There is a
-chapter about it in the manual.
+files. QDF is a feature specific to the qpdf tool. Please see
+the "QDF Mode" chapter in the manual.
 )");
 ap.addOptionHelp("--no-original-object-ids", "transformation", "omit original object IDs in qdf", R"(Omit comments in a QDF file indicating the object ID an object
 had in the original file.
@@ -256,8 +259,11 @@ default is 1,024. Use 0 for no minimum.
 )");
 ap.addOptionHelp("--min-version", "transformation", "set minimum PDF version", R"(--min-version=version
 
-Force the PDF version of the output to be at least the
-specified version.
+Force the PDF version of the output to be at least the specified
+version. The version number format is
+"major.minor[.extension-level]", which sets the version header
+to "major.minor" and the extension level, if specified, to
+"extension-level".
 )");
 ap.addOptionHelp("--force-version", "transformation", "set output PDF version", R"(--force-version=version
 
@@ -281,7 +287,7 @@ from the resulting set, not based on the original page numbers.
 ap.addHelpTopic("modification", "change parts of the PDF", R"(Modification options make systematic changes to certain parts of
 the PDF, causing the PDF to render differently from the original.
 )");
-ap.addOptionHelp("--pages", "modification", "begin page selection", R"(--pages file [ --password=password ] [ page-range ] [ ... ] --
+ap.addOptionHelp("--pages", "modification", "begin page selection", R"(--pages file [--password=password] [page-range] [...] --
 
 Run qpdf --help=page-selection for details.
 )");
@@ -312,12 +318,12 @@ File names are generated from the specified output file as follows:
 Page ranges are single page numbers for single-page groups or first-last
 for multi-page groups.
 )");
-ap.addOptionHelp("--overlay", "modification", "begin overlay options", R"(--overlay file [ options ] --
+ap.addOptionHelp("--overlay", "modification", "begin overlay options", R"(--overlay file [options] --
 
 Overlay pages from another file on the output.
 Run qpdf --help=overlay-underlay for details.
 )");
-ap.addOptionHelp("--underlay", "modification", "begin underlay options", R"(--underlay file [ options ] --
+ap.addOptionHelp("--underlay", "modification", "begin underlay options", R"(--underlay file [options] --
 
 Underlay pages from another file on the output.
 Run qpdf --help=overlay-underlay for details.
@@ -375,7 +381,7 @@ ap.addOptionHelp("--remove-page-labels", "modification", "remove explicit page n
 )");
 ap.addHelpTopic("encryption", "create encrypted files", R"(Create encrypted files. Usage:
 
---encrypt user-password owner-password key-length [ options ] --
+--encrypt user-password owner-password key-length [options] --
 
 Either or both of user-password and owner-password may be empty
 strings. key-length may be 40, 128, or 256. Encryption options are
@@ -523,13 +529,13 @@ should not be used except for compatibility testing.
 )");
 ap.addHelpTopic("page-selection", "select pages from one or more files", R"(Use the --pages option to select pages from multiple files. Usage:
 
-qpdf in.pdf --pages input-file [ --password=password ] [ page-range ] \
-    [ ... ] -- out.pdf
+qpdf in.pdf --pages input-file [--password=password] [page-range] \
+    [...] -- out.pdf
 
 Between --pages and the -- that terminates pages option, repeat
 the following:
 
-filename [ --password=password ] [ page-range ]
+filename [--password=password] [page-range]
 
 Document-level information, such as outlines, tags, etc., is taken
 from in.pdf and is preserved in out.pdf. You can use --empty in place
@@ -571,10 +577,10 @@ the destination page and may obscure the page. Underlaid pages are
 drawn below the destination page. Usage:
 
 {--overlay | --underlay } file
-      [ --password=password ]
-      [ --to=page-range ]
-      [ --from=[page-range] ]
-      [ --repeat=page-range ]
+      [--password=password]
+      [--to=page-range]
+      [--from=[page-range]]
+      [--repeat=page-range]
       --
 
 Note the use of "--" by itself to terminate overlay/underlay options.

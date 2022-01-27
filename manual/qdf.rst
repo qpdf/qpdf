@@ -3,6 +3,8 @@
 QDF Mode
 ========
 
+.. Help text for --qdf refers to the name of this chapter.
+
 In QDF mode, qpdf creates PDF files in what we call *QDF
 form*. A PDF file in QDF form, sometimes called a QDF
 file, is a completely valid PDF file that has ``%QDF-1.0`` as its third

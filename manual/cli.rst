@@ -84,7 +84,7 @@ Basic Invocation
 
 ::
 
-   Usage: qpdf infile [ options ] [ outfile ]
+   Usage: qpdf infile [options] [outfile]
 
 The :command:`qpdf` command reads the PDF file :samp:`{infile}`,
 applies various transformations or modifications to the file in
@@ -294,14 +294,17 @@ are only valid as the first and only command-line argument.
 Related Options
 ~~~~~~~~~~~~~~~
 
-.. qpdf:option:: --help
+.. qpdf:option:: --help[=--option|topic]
 
    .. help: provide help
 
-      Display help information. Run qpdf --help for information about
-      how to get help on various topics.
+      --help: provide general information and a list of topics
+      --help=--option: provide help on a specific option
+      --help=topic: provide help on a topic
 
-   Display command-line invocation help.
+   Display command-line invocation help. Use :samp:`--help={--option}`
+   for help on a specific option and :samp:`--help={topic}` for help
+   on a help topic and also provides a list of available help topics.
 
 .. qpdf:option:: --version
 
@@ -357,7 +360,7 @@ Related Options
    .. help: specify password
 
       Specify a password for an encrypted, password-protected file.
-      Not needed for encrypted files with no password.
+      Not needed for encrypted files without a password.
 
    Specifies a password for accessing encrypted, password-protected
    files. To read the password from a file or standard input, you can
@@ -385,7 +388,8 @@ Related Options
    password for accessing encrypted files. :samp:`{filename}` may be
    ``-`` to read the password from standard input, but if you do that
    the password is echoed and there is no prompt, so use ``-`` with
-   caution.
+   caution. Note that leading and trailing spaces are not stripped
+   from the password.
 
 .. qpdf:option:: --verbose
 
@@ -407,9 +411,9 @@ Related Options
       Indicate progress when writing files.
 
    Indicate progress while writing output files. Progress indication
-   does not start until writing starts, so if complicated
-   transformations are being applied before the write process begins,
-   there may be a delay before progress indicators are seen.
+   does not start until writing starts, so there may be a delay before
+   progress indicators are seen if complicated transformations are
+   being applied before the write process begins.
 
 .. qpdf:option:: --no-warn
 
@@ -435,22 +439,24 @@ Related Options
       information, such as the page contents. Does not use the file's
       name or attributes or the current time.
 
-   Generate of a secure, random document ID using deterministic
-   values. This prevents use of timestamp and output file name
-   information in the ID generation. Instead, at some slight
-   additional runtime cost, the ID field is generated to include a
-   digest of the significant parts of the content of the output PDF
-   file. This means that a given qpdf operation should generate the
-   same ID each time it is run, which can be useful when caching
-   results or for generation of some test data. Use of this flag is
-   not compatible with creation of encrypted files.
-
-   Note that there is *no guarantee* that different versions of qpdf
-   will generate the same deterministic ID given the same generation
-   code and input. While care is taken to avoid gratuitous changes,
-   new versions of qpdf may include changes that affect the output.
-   This option can be useful for testing. See also
+   Generate a secure, random document ID using deterministic values.
+   This prevents use of timestamp and output file name information in
+   the ID generation. Instead, at some slight additional runtime cost,
+   the ID field is generated to include a digest of the significant
+   parts of the content of the output PDF file. This means that a
+   given qpdf operation should generate the same ID each time it is
+   run, which can be useful when caching results or for generation of
+   some test data. Use of this flag is not compatible with creation of
+   encrypted files. This option can be useful for testing. See also
    :qpdf:ref:`--static-id`.
+
+   While qpdf will generate the same deterministic ID given the same
+   output PDF, there is no guarantee that different versions of qpdf
+   will generate exactly the same PDF output for the same input and
+   options. While care is taken to avoid gratuitous changes to qpdf's
+   PDF generation, new versions of qpdf may include changes or bug
+   fixes that cause slightly different PDF code to be generated. Such
+   changes are noted in the release notes.
 
 .. qpdf:option:: --allow-weak-crypto
 
@@ -561,9 +567,9 @@ Related Options
 
    .. help: don't try different password encodings
 
-      Suppress qpdf's behavior of attempting different encodings of a
-      password that contains non-ASCII Unicode characters if the first
-      attempt doesn't succeed.
+      Suppress qpdf's usual behavior of attempting different encodings
+      of a password that contains non-ASCII Unicode characters if the
+      first attempt doesn't succeed.
 
    Ordinarily, qpdf attempts to automatically compensate for passwords
    encoded with the wrong character encoding. This option suppresses
@@ -666,8 +672,8 @@ The options discussed in this section tell qpdf to apply
 transformations that change the structure of a PDF file without
 changing its content. Examples include creating linearized
 (web-optimized) files, adding or removing encryption, restructuring
-files for older viewers, and rewriting files for human inspection,
-among others. See also :ref:`modification-options`.
+files for older viewers, and rewriting files for human inspection. See
+also :ref:`modification-options`.
 
 Related Options
 ~~~~~~~~~~~~~~~
@@ -685,17 +691,14 @@ Related Options
    important cross-reference information typically appears at the end
    of the file.
 
-.. qpdf:option:: --encrypt user-password owner-password key-length [ options ] --
+.. qpdf:option:: --encrypt user-password owner-password key-length [options] --
 
    .. help: start encryption options
 
       Run qpdf --help=encryption for details.
 
    This flag starts encryption options, used to create encrypted
-   files.
-
-   Please see :ref:`encryption-options` for details about creating
-   encrypted files.
+   files. Please see :ref:`encryption-options` for details.
 
 .. qpdf:option:: --decrypt
 
@@ -720,19 +723,19 @@ Related Options
       preserving the input file's encryption. Use --encryption-file-password
       to specify the encryption file's password.
 
-   Copy encryption parameters, including the user password, the owner
-   password, and all security restrictions, from the specified file
-   instead of preserving encryption details from the input file. This
-   works even if only one of the user password or owner password is
-   known. If the encryption file requires a password, use the
-   :qpdf:ref:`--encryption-file-password` option to set it. Note that
-   copying the encryption parameters from a file also copies the first
-   half of ``/ID`` from the file since this is part of the encryption
-   parameters. This option can be useful if you need to decrypt a file
-   to make manual changes to it or to change it outside of qpdf, and
-   then want to restore the original encryption on the file
-   without having to manual specify all the individual settings. See
-   also :qpdf:ref:`--decrypt`.
+   Copy all encryption parameters, including the user password, the
+   owner password, and all security restrictions, from the specified
+   file instead of preserving the encryption details from the input
+   file. This works even if only one of the user password or owner
+   password is known. If the encryption file requires a password, use
+   the :qpdf:ref:`--encryption-file-password` option to set it. Note
+   that copying the encryption parameters from a file also copies the
+   first half of ``/ID`` from the file since this is part of the
+   encryption parameters. This option can be useful if you need to
+   decrypt a file to make manual changes to it or to change it outside
+   of qpdf, and then want to restore the original encryption on the
+   file without having to manual specify all the individual settings.
+   See also :qpdf:ref:`--decrypt`.
 
 .. qpdf:option:: --encryption-file-password=password
 
@@ -752,12 +755,12 @@ Related Options
    .. help: enable viewing PDF code in a text editor
 
       Create a PDF file suitable for viewing in a text editor and even
-      editing. This is to edit the PDF code, not the page contents.
+      editing. This is for editing the PDF code, not the page contents.
       All streams that can be uncompressed are uncompressed, and
       content streams are normalized, among other changes. The
       companion tool "fix-qdf" can be used to repair hand-edited QDF
-      files. QDF is a feature specific to the qpdf tool. There is a
-      chapter about it in the manual.
+      files. QDF is a feature specific to the qpdf tool. Please see
+      the "QDF Mode" chapter in the manual.
 
    Create a PDF file suitable for viewing and editing in a text
    editor. This is to edit the PDF code, not the page contents. To
@@ -766,13 +769,13 @@ Related Options
    and content streams are normalized, among other changes. The
    companion tool :command:`fix-qdf` can be used to repair hand-edited
    QDF files. QDF is a feature specific to the qpdf tool. For
-   additional information about QDF mode, see :ref:`qdf`. Note that
+   additional information, see :ref:`qdf`. Note that
    :qpdf:ref:`--linearize` disables QDF mode.
 
    QDF mode has full support for object streams, but sometimes it's
    easier to locate a specific object if object streams are disabled.
    When trying to understand some PDF construct by inspecting an
-   existing file, it can often be useful to combine :samp:`--qdf` with
+   existing file, it can be useful to combine :samp:`--qdf` with
    :samp:`--object-streams=disable`.
 
    This flag changes some of the defaults of other options: stream
@@ -788,10 +791,10 @@ Related Options
 
    When normalizing content, if qpdf runs into any lexical errors, it
    will print a warning indicating that content may be damaged. If you
-   want to create QDF files without content normalization, can you run
-   with :samp:`--qdf --normalize-content=n`. You can also create a
-   non-QDF file with uncompressed streams using
-   :samp:`--stream-data=uncompress`. These will both uncompress all
+   want to create QDF files without content normalization, specify
+   :samp:`--qdf --normalize-content=n`. You can also create a non-QDF
+   file with uncompressed streams using
+   :samp:`--stream-data=uncompress`. Either option will uncompress all
    the streams but will not attempt to normalize content. Please note
    that if you are using content normalization or QDF mode for the
    purpose of manually inspecting files, you don't have to care about
@@ -872,15 +875,15 @@ Related Options
    These are left untouched regardless of the option. Future versions
    of qpdf may support additional filters.
 
-   Because the default value is ``generalized``, by default, when a stream
-   is encoded using non-lossy filters that qpdf understands and is not
-   already compressed using a good compression scheme, qpdf will
-   uncompress the stream. If ``--compress-streams=y`` is also in
-   effect, which is the default (see :qpdf:ref:`--compress-streams`),
-   the overall effect is that qpdf will recompress streams with
-   generalized filters using flate compression, effectively
-   eliminating LZW and ASCII-based filters. This is usually desirable
-   behavior but can be disabled with ``--decode-level=none``.
+   Because the default value is ``generalized``, qpdf's default
+   behavior is to uncompress any stream that is encoded using
+   non-lossy filters that qpdf understands. If
+   ``--compress-streams=y`` is also in effect, which is the default
+   (see :qpdf:ref:`--compress-streams`), the overall effect is that
+   qpdf will recompress streams with generalized filters using flate
+   compression, effectively eliminating LZW and ASCII-based filters.
+   This is usually desirable behavior but can be disabled with
+   ``--decode-level=none``.
 
    As a special case, streams already compressed with ``/FlateDecode``
    are not uncompressed and recompressed. You can change this behavior
@@ -956,7 +959,8 @@ Related Options
    already compressed streams, you should also specify
    :qpdf:ref:`--recompress-flate`. If your goal is to shrink the size
    of PDF files, you should also use
-   :samp:`--object-streams=generate`.
+   :samp:`--object-streams=generate`. If you omit this option, qpdf
+   defers to the compression library's default behavior.
 
 .. qpdf:option:: --normalize-content=[yn]
 
@@ -1002,10 +1006,10 @@ Related Options
         - create object streams, and compress objects when possible
 
    Object streams are PDF streams that contain other objects. Putting
-   objects in object streams allows the PDF objects themselves to be
+   objects into object streams allows the PDF objects themselves to be
    compressed, which can result in much smaller PDF files. Combining
    this option with :qpdf:ref:`--compression-level` and
-   :qpdf:ref:`--recompress-flate` can often result in creation of
+   :qpdf:ref:`--recompress-flate` can often result in the creation of
    smaller PDF files.
 
    Object streams, also known as compressed objects, were introduced
@@ -1014,7 +1018,7 @@ Related Options
    used to transform files with object streams into files without object
    streams or vice versa.
 
-   In :samp:`preserve` mode, the relationship to objects and the
+   In :samp:`preserve` mode, the relationship between objects and the
    streams that contain them is preserved from the original file. If
    the file has no object streams, qpdf will not add any. In
    :samp:`disable` mode, all objects are written as regular,
@@ -1040,7 +1044,7 @@ Related Options
    objects.
 
    This flag is ignored for linearized files and has the effect of
-   causing objects in the new file to be written in order by object ID
+   causing objects in the new file to be written ordered by object ID
    from the original file. This does not mean that object numbers will
    be the same since qpdf may create stream lengths as direct or
    indirect differently from the original file, and the original file
@@ -1157,8 +1161,11 @@ Related Options
 
    .. help: set minimum PDF version
 
-      Force the PDF version of the output to be at least the
-      specified version.
+      Force the PDF version of the output to be at least the specified
+      version. The version number format is
+      "major.minor[.extension-level]", which sets the version header
+      to "major.minor" and the extension level, if specified, to
+      "extension-level".
 
    Force the PDF version of the output file to be at least
    :samp:`{version}`. In other words, if the input file has a lower
@@ -1169,12 +1176,13 @@ Related Options
    when adding features that require newer PDF readers.
 
    The version number may be expressed in the form
-   :samp:`{major.minor.extension-level}`, in which case the version is
-   interpreted as :samp:`{major.minor}` at extension level
-   :samp:`{extension-level}`. For example, version ``1.7.8``
-   represents version 1.7 at extension level 8. Note that minimal
-   syntax checking is done on the command line. :command:`qpdf` does
-   not check whether the specified version is actually required.
+   :samp:`{major}.{minor}[.{extension-level}]`. If
+   :samp:`.{extension-level}`, is given, version is interpreted as
+   :samp:`{major.minor}` at extension level :samp:`{extension-level}`.
+   For example, version ``1.7.8`` represents version 1.7 at extension
+   level 8. Note that minimal syntax checking is done on the command
+   line. :command:`qpdf` does not check whether the specified version
+   is actually required.
 
 .. qpdf:option:: --force-version=version
 
@@ -1192,22 +1200,22 @@ Related Options
    version to be lower than that of the input file will cause qpdf to
    disable certain features of the document. Specifically, 256-bit
    keys are disabled if the version is less than 1.7 with extension
-   level 8 (except R5 is disabled if less than 1.7 with extension
-   level 3), AES encryption is disabled if the version is less than
-   1.6, cleartext metadata and object streams are disabled if less
-   than 1.5, 128-bit encryption keys are disabled if less than 1.4,
-   and all encryption is disabled if less than 1.3. Even with these
-   precautions, qpdf won't be able to do things like eliminate use of
-   newer image compression schemes, transparency groups, or other
-   features that may have been added in more recent versions of PDF.
+   level 8 (except the deprecated, unsupported "R5" format is allowed
+   with extension levels 3 through 7), AES encryption is disabled if
+   the version is less than 1.6, cleartext metadata and object streams
+   are disabled if less than 1.5, 128-bit encryption keys are disabled
+   if less than 1.4, and all encryption is disabled if less than 1.3.
+   Even with these precautions, qpdf won't be able to do things like
+   eliminate use of newer image compression schemes, transparency
+   groups, or other features that may have been added in more recent
+   versions of PDF.
 
    As a general rule, with the exception of big structural things like
    the use of object streams or AES encryption, PDF viewers are
-   supposed to ignore features in files that they don't support from
-   newer versions. This means that forcing the version to a lower
-   version may make it possible to open your PDF file with an older
-   version, though bear in mind that some of the original document's
-   functionality may be lost.
+   supposed to ignore features they don't support. This means that
+   forcing the version to a lower version may make it possible to open
+   your PDF file with an older version, though bear in mind that some
+   of the original document's functionality may be lost.
 
 .. _page-ranges:
 
@@ -1310,7 +1318,7 @@ PDF, causing the PDF to render differently from the original. See also
 Related Options
 ~~~~~~~~~~~~~~~
 
-.. qpdf:option:: --pages file [ --password=password ] [ page-range ] [ ... ] --
+.. qpdf:option:: --pages file [--password=password] [page-range] [...] --
 
    .. help: begin page selection
 
@@ -1405,7 +1413,7 @@ Related Options
    if you don't require the document-level data. A future version of
    qpdf may support preservation of some document-level information.
 
-.. qpdf:option:: --overlay file [ options ] --
+.. qpdf:option:: --overlay file [options] --
 
    .. help: begin overlay options
 
@@ -1416,7 +1424,7 @@ Related Options
 
    See :ref:`overlay-underlay` for details.
 
-.. qpdf:option:: --underlay file [ options ] --
+.. qpdf:option:: --underlay file [options] --
 
    .. help: begin underlay options
 
@@ -1674,7 +1682,7 @@ Encryption
 
    Create encrypted files. Usage:
 
-   --encrypt user-password owner-password key-length [ options ] --
+   --encrypt user-password owner-password key-length [options] --
 
    Either or both of user-password and owner-password may be empty
    strings. key-length may be 40, 128, or 256. Encryption options are
@@ -1741,7 +1749,7 @@ To create an encrypted file, use
 
 ::
 
-   --encrypt user-password owner-password key-length [ options ] --
+   --encrypt user-password owner-password key-length [options] --
 
 Either or both of :samp:`{user-password}` and :samp:`{owner-password}`
 may be empty strings. :samp:`{key-length}` may be ``40``, ``128``, or
@@ -1779,7 +1787,6 @@ encryption from the file entirely.
 
 Here is a summary of encryption options. Details are provided in the
 help for each option.
-
 
 .. list-table:: Options for 40-bit Encryption Only
    :widths: 30 70
@@ -2154,13 +2161,13 @@ Page Selection
 
    Use the --pages option to select pages from multiple files. Usage:
 
-   qpdf in.pdf --pages input-file [ --password=password ] [ page-range ] \
-       [ ... ] -- out.pdf
+   qpdf in.pdf --pages input-file [--password=password] [page-range] \
+       [...] -- out.pdf
 
    Between --pages and the -- that terminates pages option, repeat
    the following:
 
-   filename [ --password=password ] [ page-range ]
+   filename [--password=password] [page-range]
 
    Document-level information, such as outlines, tags, etc., is taken
    from in.pdf and is preserved in out.pdf. You can use --empty in place
@@ -2200,12 +2207,12 @@ Page Selection
 split and merge PDF files by selecting pages from one or more input
 files.
 
-Usage: :samp:`qpdf {in.pdf} --pages input-file [ --password={password} ] [ {page-range} ] [ ... ] -- {out.pdf}`
+Usage: :samp:`qpdf {in.pdf} --pages input-file [--password={password}] [{page-range}] [...] -- {out.pdf}`
 
 Between ``--pages`` and the ``--`` that terminates pages option,
 repeat the following:
 
-:samp:`{filename} [ --password={password} ] [ {page-range} ]`
+:samp:`{filename} [--password={password}] [{page-range}]`
 
 Notes:
   - The password option is needed only for password-protected files.
@@ -2424,10 +2431,10 @@ Overlay and Underlay
    drawn below the destination page. Usage:
 
    {--overlay | --underlay } file
-         [ --password=password ]
-         [ --to=page-range ]
-         [ --from=[page-range] ]
-         [ --repeat=page-range ]
+         [--password=password]
+         [--to=page-range]
+         [--from=[page-range]]
+         [--repeat=page-range]
          --
 
    Note the use of "--" by itself to terminate overlay/underlay options.
@@ -2447,7 +2454,7 @@ as follows:
 
 ::
 
-   { --overlay | --underlay } file [ options ] --
+   { --overlay | --underlay } file [options] --
 
 Overlay and underlay options are processed late, so they can be
 combined with other options like merging and will apply to the final

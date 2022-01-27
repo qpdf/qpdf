@@ -159,8 +159,11 @@ class Main:
                 if long_text == '':
                     raise Exception(f'missing long text for {topic}')
                 long_text += '\n'
-                for i in re.finditer(r'--help=([^\.\s]+)', long_text):
-                    self.referenced_topics.add(i.group(1))
+                if topic != '--help':
+                    # Help for --help itself has --help=... not
+                    # referring to specific options.
+                    for i in re.finditer(r'--help=([^\.\s]+)', long_text):
+                        self.referenced_topics.add(i.group(1))
                 return True
             return False
 
