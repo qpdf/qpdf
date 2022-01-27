@@ -3128,6 +3128,15 @@ static void test_82(QPDF& pdf, char const* arg2)
     assert(stream.isStreamOfType("/ObjStm"));
     assert(! stream.isStreamOfType("/Test"));
     assert(! pdf.getObjectByID(2,0).isStreamOfType("/Pages"));
+    auto array = QPDFObjectHandle::parse("[/Blah /Blaah /Blaaah]");
+    assert(array.isOrHasName("/Blah"));
+    assert(array.isOrHasName("/Blaaah"));
+    assert(! array.isOrHasName("/Blaaaah"));
+    assert(array.getArrayItem(0).isOrHasName("/Blah"));
+    assert(! array.getArrayItem(1).isOrHasName("/Blah"));
+    array = QPDFObjectHandle::parse("[]");
+    assert(! array.isOrHasName("/Blah"));
+    assert(! str.isOrHasName("/Marvin"));
 }
 
 void runtest(int n, char const* filename1, char const* arg2)
