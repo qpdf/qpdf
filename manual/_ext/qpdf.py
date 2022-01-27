@@ -21,7 +21,7 @@ class OptionDirective(ObjectDescription):
         return sig
 
     def add_target_and_index(self, name_cls, sig, signode):
-        m = re.match(r'^--([^= ]+)', sig)
+        m = re.match(r'^--([^\[= ]+)', sig)
         if not m:
             raise Exception('option must start with --')
         option_name = m.group(1)
@@ -42,7 +42,7 @@ class OptionIndex(Index):
 
         # name, subtype, docname, anchor, extra, qualifier, description
         for name, display_name, typ, docname, anchor, _ in options:
-            m = re.match(r'^(--([^= ]+))', display_name)
+            m = re.match(r'^(--([^\[= ]+))', display_name)
             if not m:
                 raise Exception(
                     'OptionIndex.generate: display name not as expected')

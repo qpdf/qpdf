@@ -184,7 +184,7 @@ class Main:
                     state = st_topic
                     continue
                 m = re.match(
-                    r'^(\s*\.\. )qpdf:option:: (([^=\s]+)([= ](.+))?)$',
+                    r'^(\s*\.\. )qpdf:option:: (([^=\[\s]+)([\[= ](.+))?)$',
                     line)
                 if m:
                     if topic is None:
