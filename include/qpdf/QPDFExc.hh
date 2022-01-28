@@ -39,7 +39,7 @@ class QPDF_DLL_CLASS QPDFExc: public std::runtime_error
 	    qpdf_offset_t offset,
 	    std::string const& message);
     QPDF_DLL
-    virtual ~QPDFExc() throw ()
+    virtual ~QPDFExc() noexcept
     {
     }
 

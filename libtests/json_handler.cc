@@ -1,5 +1,6 @@
 #include <qpdf/JSONHandler.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/QPDFUsage.hh>
 #include <iostream>
 #include <cassert>
 
@@ -120,7 +121,7 @@ static void test_errors()
             fn();
             assert(false);
         }
-        catch (JSONHandler::Error& e)
+        catch (QPDFUsage& e)
         {
             std::cout << msg << ": " << e.what() << std::endl;
         }

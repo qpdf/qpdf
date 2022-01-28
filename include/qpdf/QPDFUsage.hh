@@ -19,43 +19,21 @@
 // continue to consider qpdf to be licensed under those terms. Please
 // see the manual for additional information.
 
-#ifndef QPDFSYSTEMERROR_HH
-#define QPDFSYSTEMERROR_HH
+#ifndef QPDFUSAGE_HH
+#define QPDFUSAGE_HH
 
 #include <qpdf/DLL.h>
-#include <qpdf/Types.h>
-#include <qpdf/Constants.h>
 
 #include <string>
 #include <stdexcept>
 
-class QPDF_DLL_CLASS QPDFSystemError: public std::runtime_error
+class QPDF_DLL_CLASS QPDFUsage: public std::runtime_error
 {
   public:
     QPDF_DLL
-    QPDFSystemError(std::string const& description,
-                    int system_errno);
+    QPDFUsage(std::string const& msg);
     QPDF_DLL
-    virtual ~QPDFSystemError() noexcept;
-
-    // To get a complete error string, call what(), provided by
-    // std::exception.  The accessors below return the original values
-    // used to create the exception.
-
-    QPDF_DLL
-    std::string const& getDescription() const;
-    QPDF_DLL
-    int getErrno() const;
-
-  private:
-    static std::string createWhat(std::string const& description,
-				  int system_errno);
-
-    // This class does not use the Members pattern to avoid needless
-    // memory allocations during exception handling.
-
-    std::string description;
-    int system_errno;
+    virtual ~QPDFUsage() noexcept = default;
 };
 
-#endif // QPDFSYSTEMERROR_HH
+#endif // QPDFUSAGE_HH

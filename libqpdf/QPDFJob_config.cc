@@ -3,11 +3,6 @@
 #include <qpdf/QTC.hh>
 #include <cstring>
 
-static void usage(std::string const& msg)
-{
-    throw QPDFJob::ConfigError(msg);
-}
-
 QPDFJob::Config*
 QPDFJob::Config::inputFile(char const* filename)
 {

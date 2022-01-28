@@ -28,7 +28,6 @@
 #include <string>
 #include <map>
 #include <functional>
-#include <stdexcept>
 #include <memory>
 
 // This class allows a sax-like walk through a JSON object with
@@ -39,15 +38,8 @@
 class JSONHandler
 {
   public:
-    // Error exception is thrown if there are any errors validating
-    // the JSON object.
-    class QPDF_DLL_CLASS Error: public std::runtime_error
-    {
-      public:
-        QPDF_DLL
-        Error(std::string const&);
-    };
-
+    // A QPDFUsage exception is thrown if there are any errors
+    // validating the JSON object.
     QPDF_DLL
     JSONHandler();
 
@@ -55,10 +47,10 @@ class JSONHandler
     ~JSONHandler() = default;
 
     // Based on the type of handler, expect the object to be of a
-    // certain type. JSONHandler::Error is thrown otherwise. Multiple
-    // handlers may be registered, which allows the object to be of
-    // various types. If an anyHandler is added, no other handler will
-    // be called. There is no "final" handler -- if the top-level is a
+    // certain type. QPDFUsage is thrown otherwise. Multiple handlers
+    // may be registered, which allows the object to be of various
+    // types. If an anyHandler is added, no other handler will be
+    // called. There is no "final" handler -- if the top-level is a
     // dictionary or array, just use its end handler.
 
     typedef std::function<void(
@@ -105,6 +97,8 @@ class JSONHandler
 
   private:
     JSONHandler(JSONHandler const&) = delete;
+
+    static void usage(std::string const& msg);
 
     struct Handlers
     {

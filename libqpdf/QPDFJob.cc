@@ -25,20 +25,15 @@
 #include <qpdf/QPDFOutlineDocumentHelper.hh>
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
 #include <qpdf/QPDFExc.hh>
+#include <qpdf/QPDFUsage.hh>
 #include <qpdf/QPDFSystemError.hh>
 #include <qpdf/QPDFCryptoProvider.hh>
 #include <qpdf/QPDFEmbeddedFileDocumentHelper.hh>
 #include <qpdf/QPDFArgParser.hh>
-
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QIntC.hh>
 
 #include <qpdf/auto_job_schema.hh> // JOB_SCHEMA_DATA
-
-QPDFJob::ConfigError::ConfigError(std::string const& msg) :
-    std::runtime_error(msg)
-{
-}
 
 namespace
 {
@@ -452,6 +447,12 @@ QPDFJob::QPDFJob() :
 
 
 void
+QPDFJob::usage(std::string const& msg)
+{
+    throw QPDFUsage(msg);
+}
+
+void
 QPDFJob::setMessagePrefix(std::string const& message_prefix)
 {
     this->m->message_prefix = message_prefix;
@@ -548,7 +549,7 @@ QPDFJob::parseRotationParameter(std::string const& parameter)
     }
     else
     {
-        throw ConfigError("invalid parameter to rotate: " + parameter);
+        usage("invalid parameter to rotate: " + parameter);
     }
 }
 
@@ -561,7 +562,7 @@ QPDFJob::parseNumrange(char const* range, int max)
     }
     catch (std::runtime_error& e)
     {
-        throw ConfigError(e.what());
+        usage(e.what());
     }
     return std::vector<int>();
 }
@@ -645,10 +646,6 @@ QPDFJob::createsOutput() const
 void
 QPDFJob::checkConfiguration()
 {
-    auto usage = [](char const* msg){
-        throw QPDFJob::ConfigError(msg);
-    };
-
     // QXXXQ messages are CLI-centric
     if (m->replace_input)
     {

@@ -43,15 +43,8 @@ class QPDFWriter;
 class QPDFJob
 {
   public:
-    // ConfigError exception is thrown if there are any usage-like
-    // errors when calling Config methods.
-    class QPDF_DLL_CLASS ConfigError: public std::runtime_error
-    {
-      public:
-        QPDF_DLL
-        ConfigError(std::string const&);
-    };
-
+    // QPDFUsage is thrown if there are any usage-like errors when
+    // calling Config methods.
     QPDF_DLL
     QPDFJob();
 
@@ -318,7 +311,9 @@ class QPDFJob
     friend class Config;
 
     // Return a top-level configuration item. See CONFIGURATION above
-    // for details.
+    // for details. If an invalid configuration is created (such as
+    // supplying contradictory options, omitting an input file, etc.),
+    // QPDFUsage is thrown.
     QPDF_DLL
     std::shared_ptr<Config> config();
 
@@ -404,6 +399,7 @@ class QPDFJob
     };
 
     // Helper functions
+    static void usage(std::string const& msg);
     static JSON json_schema(std::set<std::string>* keys = 0);
     static void parse_object_id(
         std::string const& objspec, bool& trailer, int& obj, int& gen);

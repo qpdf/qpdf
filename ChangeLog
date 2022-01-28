@@ -1,3 +1,9 @@
+2022-01-28  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add QPDFUsage exception, which is thrown by JSONHandler,
+	QPDFArgParser, and QPDFJob to indicate command-line usage or job
+	configuration errors.
+
 2022-01-22  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add QUtil::make_shared_cstr to return a std::shared_ptr<char>

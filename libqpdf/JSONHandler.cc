@@ -1,11 +1,7 @@
 #include <qpdf/JSONHandler.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/QTC.hh>
-
-JSONHandler::Error::Error(std::string const& msg) :
-    std::runtime_error(msg)
-{
-}
+#include <qpdf/QPDFUsage.hh>
 
 JSONHandler::JSONHandler() :
     m(new Members())
@@ -14,6 +10,12 @@ JSONHandler::JSONHandler() :
 
 JSONHandler::Members::Members()
 {
+}
+
+void
+JSONHandler::usage(std::string const& msg)
+{
+    throw QPDFUsage(msg);
 }
 
 void
@@ -128,9 +130,8 @@ JSONHandler::handle(std::string const& path, JSON j)
                 else
                 {
                     QTC::TC("libtests", "JSONHandler unexpected key");
-                    throw Error(
-                        "JSON handler found unexpected key " + k +
-                        " in object at " + path);
+                    usage("JSON handler found unexpected key " + k +
+                          " in object at " + path);
                 }
             }
             else
@@ -163,7 +164,6 @@ JSONHandler::handle(std::string const& path, JSON j)
         // different if this code were trying to be part of a
         // general-purpose JSON package.
         QTC::TC("libtests", "JSONHandler unhandled value");
-        throw Error("JSON handler: value at " + path +
-                    " is not of expected type");
+        usage("JSON handler: value at " + path + " is not of expected type");
     }
 }

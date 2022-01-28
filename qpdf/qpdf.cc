@@ -1,7 +1,7 @@
 #include <qpdf/QPDFJob.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
-#include <qpdf/QPDFArgParser.hh>
+#include <qpdf/QPDFUsage.hh>
 
 #include <cstdio>
 #include <cstdlib>
@@ -48,11 +48,7 @@ int realmain(int argc, char* argv[])
         j.initializeFromArgv(argc, argv);
         j.run();
     }
-    catch (QPDFArgParser::Usage& e)
-    {
-        usageExit(e.what());
-    }
-    catch (QPDFJob::ConfigError& e)
+    catch (QPDFUsage& e)
     {
         usageExit(e.what());
     }

@@ -2,14 +2,10 @@
 #include <qpdf/QUtil.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QTC.hh>
+#include <qpdf/QPDFUsage.hh>
 #include <iostream>
 #include <cstring>
 #include <cstdlib>
-
-QPDFArgParser::Usage::Usage(std::string const& msg) :
-    std::runtime_error(msg)
-{
-}
 
 QPDFArgParser::Members::Members(
     int argc, char* argv[], char const* progname_env) :
@@ -424,7 +420,7 @@ QPDFArgParser::usage(std::string const& message)
         // This will cause bash to fall back to regular file completion.
         exit(0);
     }
-    throw Usage(message);
+    throw QPDFUsage(message);
 }
 
 void

@@ -480,7 +480,7 @@ ArgParser::parseOptions()
     {
         this->ap.parseArgs();
     }
-    catch (QPDFArgParser::Usage& e)
+    catch (std::runtime_error& e)
     {
         usage(e.what());
     }

@@ -10,7 +10,7 @@ QPDFSystemError::QPDFSystemError(std::string const& description,
 {
 }
 
-QPDFSystemError::~QPDFSystemError() throw ()
+QPDFSystemError::~QPDFSystemError() noexcept
 {
 }
 

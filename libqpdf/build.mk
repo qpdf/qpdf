@@ -89,6 +89,7 @@ SRCS_libqpdf = \
 	libqpdf/QPDFStreamFilter.cc \
 	libqpdf/QPDFSystemError.cc \
 	libqpdf/QPDFTokenizer.cc \
+	libqpdf/QPDFUsage.cc \
 	libqpdf/QPDFWriter.cc \
 	libqpdf/QPDFXRefEntry.cc \
 	libqpdf/QPDF_Array.cc \

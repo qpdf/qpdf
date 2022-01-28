@@ -1,5 +1,6 @@
 #include <qpdf/QPDFArgParser.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/QPDFUsage.hh>
 #include <iostream>
 #include <cstring>
 #include <cassert>
@@ -225,7 +226,7 @@ int main(int argc, char* argv[])
     {
         ap.parseArgs();
     }
-    catch (QPDFArgParser::Usage& e)
+    catch (QPDFUsage& e)
     {
         std::cerr << "usage: " << e.what() << std::endl;
         exit(2);

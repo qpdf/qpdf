@@ -29,7 +29,6 @@
 #include <map>
 #include <vector>
 #include <functional>
-#include <stdexcept>
 #include <sstream>
 
 // This is not a general-purpose argument parser. It is tightly
@@ -56,15 +55,6 @@
 class QPDFArgParser
 {
   public:
-    // Usage exception is thrown if there are any errors parsing
-    // arguments
-    class QPDF_DLL_CLASS Usage: public std::runtime_error
-    {
-      public:
-        QPDF_DLL
-        Usage(std::string const&);
-    };
-
     // progname_env is used to override argv[0] when figuring out the
     // name of the executable for setting up completion. This may be
     // needed if the program is invoked by a wrapper.
@@ -72,8 +62,8 @@ class QPDFArgParser
     QPDFArgParser(int argc, char* argv[], char const* progname_env);
 
     // Calls exit(0) if a help option is given or if in completion
-    // mode. If there are argument parsing errors,
-    // QPDFArgParser::Usage is thrown.
+    // mode. If there are argument parsing errors, QPDFUsage is
+    // thrown.
     QPDF_DLL
     void parseArgs();
 
