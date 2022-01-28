@@ -473,7 +473,7 @@ Related Options
    files with weak cryptography when this flag is not given. See
    :ref:`weak-crypto` for additional details.
 
-.. qpdf:option:: --keep-files-open=[yn]
+.. qpdf:option:: --keep-files-open=[y|n]
 
    .. help: manage keeping multiple files open
 
@@ -817,7 +817,7 @@ Related Options
    default because it makes it easier to trace objects back to the
    original file.
 
-.. qpdf:option:: --compress-streams=[yn]
+.. qpdf:option:: --compress-streams=[y|n]
 
    .. help: compress uncompressed streams
 
@@ -963,7 +963,7 @@ Related Options
    :samp:`--object-streams=generate`. If you omit this option, qpdf
    defers to the compression library's default behavior.
 
-.. qpdf:option:: --normalize-content=[yn]
+.. qpdf:option:: --normalize-content=[y|n]
 
    .. help: fix newlines in content streams
 
@@ -1703,24 +1703,24 @@ Encryption
    not a bug in qpdf.
 
    Options for 40-bit only:
-     --annotate=[yn]          restrict comments, filling forms, and signing
-     --extract=[yn]           restrict text/graphic extraction
-     --modify=[yn]            restrict document modification
-     --print=[yn]             restrict printing
+     --annotate=[y|n]         restrict comments, filling forms, and signing
+     --extract=[y|n]          restrict text/graphic extraction
+     --modify=[y|n]           restrict document modification
+     --print=[y|n]            restrict printing
 
    Options for 128-bit or 256-bit:
-     --accessibility=[yn]     restrict accessibility (usually ignored)
-     --annotate=[yn]          restrict commenting/filling form fields
-     --assemble=[yn]          restrict document assembly
-     --extract=[yn]           restrict text/graphic extraction
-     --form=[yn]              restrict filling form fields
-     --modify-other=[yn]      restrict other modifications
+     --accessibility=[y|n]    restrict accessibility (usually ignored)
+     --annotate=[y|n]         restrict commenting/filling form fields
+     --assemble=[y|n]         restrict document assembly
+     --extract=[y|n]          restrict text/graphic extraction
+     --form=[y|n]             restrict filling form fields
+     --modify-other=[y|n]     restrict other modifications
      --modify=modify-opt      control modify access by level
      --print=print-opt        control printing access
      --cleartext-metadata     prevent encryption of metadata
 
    For 128-bit only:
-     --use-aes=[yn]           indicates whether to use AES encryption
+     --use-aes=[y|n]          indicates whether to use AES encryption
      --force-V4               forces use of V=4 encryption handler
 
    For 256-bit only:
@@ -1792,38 +1792,38 @@ help for each option.
    :widths: 30 70
    :header-rows: 0
 
-   - - ``--annotate=[yn]``
+   - - ``--annotate=[y|n]``
      - restrict comments, filling forms, and signing
 
-   - - ``--extract=[yn]``
+   - - ``--extract=[y|n]``
      - restrict text/graphic extraction
 
-   - - ``--modify=[yn]``
+   - - ``--modify=[y|n]``
      - restrict document modification
 
-   - - ``--print=[yn]``
+   - - ``--print=[y|n]``
      - restrict printing
 
 .. list-table:: Options for 128-bit or 256-bit Encryption
    :widths: 30 70
    :header-rows: 0
 
-   - - ``--accessibility=[yn]``
+   - - ``--accessibility=[y|n]``
      - restrict accessibility (usually ignored)
 
-   - - ``--annotate=[yn]``
+   - - ``--annotate=[y|n]``
      - restrict commenting/filling form fields
 
-   - - ``--assemble=[yn]``
+   - - ``--assemble=[y|n]``
      - restrict document assembly
 
-   - - ``--extract=[yn]``
+   - - ``--extract=[y|n]``
      - restrict text/graphic extraction
 
-   - - ``--form=[yn]``
+   - - ``--form=[y|n]``
      - restrict filling form fields
 
-   - - ``--modify-other=[yn]``
+   - - ``--modify-other=[y|n]``
      - restrict other modifications
 
    - - ``--modify=modify-opt``
@@ -1836,10 +1836,10 @@ help for each option.
      - prevent encryption of metadata
 
 .. list-table:: Options for 128-bit Encryption Only
-   :widths: 30 70
+   :widths: 35 65
    :header-rows: 0
 
-   - - ``--use-aes=[yn]``
+   - - ``--use-aes=[y|n]``
      - indicates whether to use AES encryption
 
    - - ``--force-V4``
@@ -1891,7 +1891,7 @@ help for each option.
 Related Options
 ~~~~~~~~~~~~~~~
 
-.. qpdf:option:: --accessibility=[yn]
+.. qpdf:option:: --accessibility=[y|n]
 
    .. help: restrict document accessibility
 
@@ -1910,7 +1910,7 @@ Related Options
 
    This option is not available with 40-bit encryption.
 
-.. qpdf:option:: --annotate=[yn]
+.. qpdf:option:: --annotate=[y|n]
 
    .. help: restrict document annotation
 
@@ -1925,7 +1925,7 @@ Related Options
    creating, and deleting form fields unless :samp:`--modify-other=n`
    or :samp:`--modify=none` is also specified.
 
-.. qpdf:option:: --assemble=[yn]
+.. qpdf:option:: --assemble=[y|n]
 
    .. help: restrict document assembly
 
@@ -1937,7 +1937,7 @@ Related Options
 
    This option is not available with 40-bit encryption.
 
-.. qpdf:option:: --extract=[yn]
+.. qpdf:option:: --extract=[y|n]
 
    .. help: restrict text/graphic extraction
 
@@ -1947,7 +1947,7 @@ Related Options
    Enable/disable text/graphic extraction for purposes other than
    accessibility. The default is to be fully permissive.
 
-.. qpdf:option:: --form=[yn]
+.. qpdf:option:: --form=[y|n]
 
    .. help: restrict form filling
 
@@ -1961,7 +1961,7 @@ Related Options
 
    This option is not available with 40-bit encryption.
 
-.. qpdf:option:: --modify-other=[yn]
+.. qpdf:option:: --modify-other=[y|n]
 
    .. help: restrict other modifications
 
@@ -2094,7 +2094,7 @@ Related Options
 
    This option is not available with 40-bit encryption.
 
-.. qpdf:option:: --use-aes=[yn]
+.. qpdf:option:: --use-aes=[y|n]
 
    .. help: use AES with 128-bit encryption
 
@@ -2434,7 +2434,7 @@ Overlay and Underlay
    the destination page and may obscure the page. Underlaid pages are
    drawn below the destination page. Usage:
 
-   {--overlay | --underlay } file
+   {--overlay|--underlay} file
          [--password=password]
          [--to=page-range]
          [--from=[page-range]]
@@ -2458,7 +2458,7 @@ as follows:
 
 ::
 
-   { --overlay | --underlay } file [options] --
+   {--overlay|--underlay} file [options] --
 
 Overlay and underlay options are processed late, so they can be
 combined with other options like merging and will apply to the final

@@ -102,7 +102,7 @@ ap.addOptionHelp("--allow-weak-crypto", "general", "allow insecure cryptographic
 option is necessary to create 40-bit files or 128-bit files that
 use RC4 encryption.
 )");
-ap.addOptionHelp("--keep-files-open", "general", "manage keeping multiple files open", R"(--keep-files-open=[yn]
+ap.addOptionHelp("--keep-files-open", "general", "manage keeping multiple files open", R"(--keep-files-open=[y|n]
 
 When qpdf needs to work with many files, as when merging large
 numbers of files, explicitly indicate whether files should be
@@ -175,7 +175,7 @@ had in the original file.
 }
 static void add_help_3(QPDFArgParser& ap)
 {
-ap.addOptionHelp("--compress-streams", "transformation", "compress uncompressed streams", R"(--compress-streams=[yn]
+ap.addOptionHelp("--compress-streams", "transformation", "compress uncompressed streams", R"(--compress-streams=[y|n]
 
 Setting --compress-streams=n prevents qpdf from compressing
 uncompressed streams. This can be useful if you are leaving some
@@ -220,7 +220,7 @@ gzip), which is the default compression for most PDF files.
 You need --recompress-flate with this option if you want to
 change already compressed streams.
 )");
-ap.addOptionHelp("--normalize-content", "transformation", "fix newlines in content streams", R"(--normalize-content=[yn]
+ap.addOptionHelp("--normalize-content", "transformation", "fix newlines in content streams", R"(--normalize-content=[y|n]
 
 Normalize newlines to UNIX-style newlines in PDF content
 streams, which is useful for viewing them in a programmer's text
@@ -402,24 +402,24 @@ restrictions that differ from what you selected. This is probably
 not a bug in qpdf.
 
 Options for 40-bit only:
-  --annotate=[yn]          restrict comments, filling forms, and signing
-  --extract=[yn]           restrict text/graphic extraction
-  --modify=[yn]            restrict document modification
-  --print=[yn]             restrict printing
+  --annotate=[y|n]         restrict comments, filling forms, and signing
+  --extract=[y|n]          restrict text/graphic extraction
+  --modify=[y|n]           restrict document modification
+  --print=[y|n]            restrict printing
 
 Options for 128-bit or 256-bit:
-  --accessibility=[yn]     restrict accessibility (usually ignored)
-  --annotate=[yn]          restrict commenting/filling form fields
-  --assemble=[yn]          restrict document assembly
-  --extract=[yn]           restrict text/graphic extraction
-  --form=[yn]              restrict filling form fields
-  --modify-other=[yn]      restrict other modifications
+  --accessibility=[y|n]    restrict accessibility (usually ignored)
+  --annotate=[y|n]         restrict commenting/filling form fields
+  --assemble=[y|n]         restrict document assembly
+  --extract=[y|n]          restrict text/graphic extraction
+  --form=[y|n]             restrict filling form fields
+  --modify-other=[y|n]     restrict other modifications
   --modify=modify-opt      control modify access by level
   --print=print-opt        control printing access
   --cleartext-metadata     prevent encryption of metadata
 
 For 128-bit only:
-  --use-aes=[yn]           indicates whether to use AES encryption
+  --use-aes=[y|n]          indicates whether to use AES encryption
   --force-V4               forces use of V=4 encryption handler
 
 For 256-bit only:
@@ -438,26 +438,26 @@ Values for modify-opt:
   annotate                 form + commenting and modifying forms
   all                      allow full document modification
 )");
-ap.addOptionHelp("--accessibility", "encryption", "restrict document accessibility", R"(--accessibility=[yn]
+ap.addOptionHelp("--accessibility", "encryption", "restrict document accessibility", R"(--accessibility=[y|n]
 
 This option is ignored except with very old encryption formats.
 The current PDF specification does not allow restriction of
 document accessibility. This option is not available with 40-bit
 encryption.
 )");
-ap.addOptionHelp("--annotate", "encryption", "restrict document annotation", R"(--annotate=[yn]
+ap.addOptionHelp("--annotate", "encryption", "restrict document annotation", R"(--annotate=[y|n]
 
 Enable/disable modifying annotations including making comments
 and filling in form fields. For 128-bit and 256-bit encryption,
 this also enables editing, creating, and deleting form fields
 unless --modify-other=n or --modify=none is also specified.
 )");
-ap.addOptionHelp("--assemble", "encryption", "restrict document assembly", R"(--assemble=[yn]
+ap.addOptionHelp("--assemble", "encryption", "restrict document assembly", R"(--assemble=[y|n]
 
 Enable/disable document assembly (rotation and reordering of
 pages). This option is not available with 40-bit encryption.
 )");
-ap.addOptionHelp("--extract", "encryption", "restrict text/graphic extraction", R"(--extract=[yn]
+ap.addOptionHelp("--extract", "encryption", "restrict text/graphic extraction", R"(--extract=[y|n]
 
 Enable/disable text/graphic extraction for purposes other than
 accessibility.
@@ -465,13 +465,13 @@ accessibility.
 }
 static void add_help_5(QPDFArgParser& ap)
 {
-ap.addOptionHelp("--form", "encryption", "restrict form filling", R"(--form=[yn]
+ap.addOptionHelp("--form", "encryption", "restrict form filling", R"(--form=[y|n]
 
 Enable/disable whether filling form fields is allowed even if
 modification of annotations is disabled. This option is not
 available with 40-bit encryption.
 )");
-ap.addOptionHelp("--modify-other", "encryption", "restrict other modifications", R"(--modify-other=[yn]
+ap.addOptionHelp("--modify-other", "encryption", "restrict other modifications", R"(--modify-other=[y|n]
 
 Enable/disable modifications not controlled by --assemble,
 --annotate, or --form. --modify-other=n is implied by any of the
@@ -509,7 +509,7 @@ ap.addOptionHelp("--cleartext-metadata", "encryption", "don't encrypt metadata",
 encrypting the rest of the document. This option is not
 available with 40-bit encryption.
 )");
-ap.addOptionHelp("--use-aes", "encryption", "use AES with 128-bit encryption", R"(--use-aes=[yn]
+ap.addOptionHelp("--use-aes", "encryption", "use AES with 128-bit encryption", R"(--use-aes=[y|n]
 
 Enables/disables use of the more secure AES encryption with
 128-bit encryption. Specifying --use-aes=y forces the PDF
@@ -576,7 +576,7 @@ underlaid on the primary output. Overlaid pages are drawn on top of
 the destination page and may obscure the page. Underlaid pages are
 drawn below the destination page. Usage:
 
-{--overlay | --underlay } file
+{--overlay|--underlay} file
       [--password=password]
       [--to=page-range]
       [--from=[page-range]]
