@@ -159,7 +159,7 @@ class Main:
                 if long_text == '':
                     raise Exception(f'missing long text for {topic}')
                 long_text += '\n'
-                if topic != '--help':
+                if 'help' not in topic:
                     # Help for --help itself has --help=... not
                     # referring to specific options.
                     for i in re.finditer(r'--help=([^\.\s]+)', long_text):

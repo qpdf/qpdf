@@ -920,7 +920,7 @@ QPDFArgParser::getTopHelp(std::ostringstream& msg)
     msg << "Run \"" << this->m->whoami
         << " --help=topic\" for help on a topic." << std::endl
         << "Run \"" << this->m->whoami
-        << " --help=option\" for help on an option." << std::endl
+        << " --help=--option\" for help on an option." << std::endl
         << "Run \"" << this->m->whoami
         << " --help=all\" to see all available help." << std::endl
         << std::endl

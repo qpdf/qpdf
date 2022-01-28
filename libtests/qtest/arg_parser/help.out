@@ -1,5 +1,5 @@
 Run "arg_parser --help=topic" for help on a topic.
-Run "arg_parser --help=option" for help on an option.
+Run "arg_parser --help=--option" for help on an option.
 Run "arg_parser --help=all" to see all available help.
 
 Topics:

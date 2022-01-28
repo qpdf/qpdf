@@ -23,7 +23,15 @@ static void usageExit(std::string const& msg)
 	<< std::endl
 	<< whoami << ": " << msg << std::endl
 	<< std::endl
-	<< "For detailed help, run " << whoami << " --help" << std::endl
+	<< "For help:" << std::endl
+        << "  " << whoami << "--help=usage       usage information"
+        << std::endl
+        << "  " << whoami << "--help=topic       help on a topic"
+        << std::endl
+        << "  " << whoami << "--help=--option    help on an option"
+        << std::endl
+        << "  " << whoami << "--help             general help and a topic list"
+        << std::endl
 	<< std::endl;
     exit(EXIT_ERROR);
 }

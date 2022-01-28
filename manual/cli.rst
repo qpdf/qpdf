@@ -68,8 +68,8 @@ Basic Invocation
    Read a PDF file, apply transformations or modifications, and write
    a new PDF file.
 
-   Usage: qpdf infile [options] [outfile]
-      OR  qpdf help-option
+   Usage: qpdf [infile] [options] [outfile]
+      OR  qpdf --help[={topic|--option}]
 
    - infile, options, and outfile may be in any order as long as infile
      precedes outfile.
@@ -84,7 +84,7 @@ Basic Invocation
 
 ::
 
-   Usage: qpdf infile [options] [outfile]
+   Usage: qpdf [infile] [options] [outfile]
 
 The :command:`qpdf` command reads the PDF file :samp:`{infile}`,
 applies various transformations or modifications to the file in

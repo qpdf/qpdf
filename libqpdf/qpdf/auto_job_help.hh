@@ -8,8 +8,8 @@ static void add_help_1(QPDFArgParser& ap)
 ap.addHelpTopic("usage", "basic invocation", R"(Read a PDF file, apply transformations or modifications, and write
 a new PDF file.
 
-Usage: qpdf infile [options] [outfile]
-   OR  qpdf help-option
+Usage: qpdf [infile] [options] [outfile]
+   OR  qpdf --help[={topic|--option}]
 
 - infile, options, and outfile may be in any order as long as infile
   precedes outfile.
