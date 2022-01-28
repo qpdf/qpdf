@@ -29,6 +29,7 @@ static void test_main()
     assert(jstr2.getString(value));
     assert(value == "a\tb");
     assert(! jstr2.getNumber(value));
+    /* cSpell: ignore jbool xavalue dvalue xdvalue */
     JSON jint = JSON::makeInt(16059);
     JSON jdouble = JSON::makeReal(3.14159);
     JSON jexp = JSON::makeNumber("2.1e5");
@@ -128,6 +129,7 @@ static void check_schema(JSON& obj, JSON& schema, unsigned long flags,
 
 static void test_schema()
 {
+    /* cSpell: ignore ptional ebra */
     JSON schema = JSON::parse(R"(
 {
   "one": {

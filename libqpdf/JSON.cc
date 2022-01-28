@@ -880,6 +880,7 @@ void JSONParser::getToken()
             break;
 
           case ls_backslash:
+            /* cSpell: ignore bfnrt */
             if (strchr("\\\"bfnrt", *p))
             {
                 lex_state = ls_string;
@@ -972,7 +973,7 @@ JSONParser::handleToken()
     }
 
     // Git string value
-    std::string svalue;
+    std::string s_value;
     if (lex_state == ls_string)
     {
         // Token includes the quotation marks
@@ -980,7 +981,7 @@ JSONParser::handleToken()
         {
             throw std::logic_error("JSON string length < 2");
         }
-        svalue = decode_string(value);
+        s_value = decode_string(value);
     }
     // Based on the lexical state and value, figure out whether we are
     // looking at an item or a delimiter. It will always be exactly
@@ -1057,7 +1058,7 @@ JSONParser::handleToken()
         break;
 
       case ls_string:
-        item = new JSON(JSON::makeString(svalue));
+        item = new JSON(JSON::makeString(s_value));
         break;
 
       case ls_backslash:
@@ -1223,7 +1224,7 @@ JSONParser::handleToken()
         {
           case ps_dict_begin:
           case ps_dict_after_comma:
-            this->dict_key = svalue;
+            this->dict_key = s_value;
             item = nullptr;
             next_state = ps_dict_after_key;
             break;
@@ -1297,7 +1298,7 @@ JSONParser::parse(std::string const& s)
     }
     if (parser_state != ps_done)
     {
-        QTC::TC("libtests", "JSON parse preature EOF");
+        QTC::TC("libtests", "JSON parse premature EOF");
         throw std::runtime_error("JSON: premature end of input");
     }
     return stack.back();

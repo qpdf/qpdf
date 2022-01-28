@@ -328,9 +328,11 @@ ap.addOptionHelp("--underlay", "modification", "begin underlay options", R"(--un
 Underlay pages from another file on the output.
 Run qpdf --help=overlay-underlay for details.
 )");
-ap.addOptionHelp("--flatten-rotation", "modification", "remove rotation from page dictionary", R"(Rotate a page using content commands instead of page-level
-metadata. This can be useful if a broken PDF viewer fails to
-properly consider page rotation metadata.
+ap.addOptionHelp("--flatten-rotation", "modification", "remove rotation from page dictionary", R"(For each page that is rotated using the /Rotate key in the
+page's dictionary, remove the /Rotate key and implement the
+identical rotation semantics by modifying the page's contents.
+This can be useful if a broken PDF viewer fails to properly
+consider page rotation metadata.
 )");
 ap.addOptionHelp("--flatten-annotations", "modification", "push annotations into content", R"(--flatten-annotations=parameter
 
@@ -360,8 +362,6 @@ options:
   --oi-min-height
   --oi-min-area
   --keep-inline-images
-
-The --verbose flag is useful with this option.
 )");
 ap.addOptionHelp("--oi-min-width", "modification", "minimum width for --optimize-images", R"(--oi-min-width=width
 
@@ -616,34 +616,24 @@ for help with the page range syntax.
 ap.addHelpTopic("attachments", "work with embedded files", R"(It is possible to list, add, or delete embedded files (also known
 as attachments) and to copy attachments from other files. See help
 on individual options for details. Run qpdf --help=add-attachment
-for additional details about adding attachments.
+for additional details about adding attachments. See also
+--help=--list-attachments and --help=--show-attachment.
 )");
-ap.addOptionHelp("--list-attachments", "attachments", "list embedded files", R"(Show the key and stream number for each embedded file. Combine
-with --verbose for more detailed information.
-)");
-ap.addOptionHelp("--show-attachment", "attachments", "export an embedded file", R"(--show-attachment=key
-
-Write the contents of the specified attachment to standard
-output as binary data. Get the key with --list-attachments.
-)");
-ap.addOptionHelp("--add-attachment", "attachments", "start add attachment options", R"(--add-attachment file options --
+ap.addOptionHelp("--add-attachment", "attachments", "start add attachment options", R"(--add-attachment file [options] --
 
 The --add-attachment flag and its options may be repeated to add
 multiple attachments. Run qpdf --help=add-attachment for details.
+)");
+ap.addOptionHelp("--copy-attachments-from", "attachments", "start copy attachment options", R"(--copy-attachments-from file [options] --
+
+The --copy-attachments-from flag and its options may be repeated
+to copy attachments from multiple files. Run
+qpdf --help=copy-attachments for details.
 )");
 ap.addOptionHelp("--remove-attachment", "attachments", "remove an embedded file", R"(--remove-attachment=key
 
 Remove an embedded file using its key. Get the key with
 --list-attachments.
-)");
-}
-static void add_help_6(QPDFArgParser& ap)
-{
-ap.addOptionHelp("--copy-attachments-from", "attachments", "start copy attachment options", R"(--copy-attachments-from file options --
-
-The --copy-attachments-from flag and its options may be repeated
-to copy attachments from multiple files. Run
-qpdf --help=copy-attachments for details.
 )");
 ap.addHelpTopic("pdf-dates", "PDF date format", R"(When a date is required, the date should conform to the PDF date
 format specification, which is "D:yyyymmddhhmmssz" where "z" is
@@ -657,21 +647,24 @@ Examples:
 - D:20210207161528-05'00'   February 7, 2021 at 4:15:28 p.m.
 - D:20210207211528Z         February 7, 2021 at 21:15:28 UTC
 )");
+}
+static void add_help_6(QPDFArgParser& ap)
+{
 ap.addHelpTopic("add-attachment", "attach (embed) files", R"(The options listed below appear between --add-attachment and its
 terminating "--".
 )");
 ap.addOptionHelp("--key", "add-attachment", "specify attachment key", R"(--key=key
 
 Specify the key to use for the attachment in the embedded files
-table. It defaults to the last element of the attached file's
-filename.
+table. It defaults to the last element (basename) of the
+attached file's filename.
 )");
 ap.addOptionHelp("--filename", "add-attachment", "set attachment's displayed filename", R"(--filename=name
 
 Specify the filename to be used for the attachment. This is what
 is usually displayed to the user and is the name most graphical
 PDF viewers will use when saving a file. It defaults to the last
-element of the attached file's filename.
+element (basename) of the attached file's filename.
 )");
 ap.addOptionHelp("--creationdate", "add-attachment", "set attachment's creation date", R"(--creationdate=date
 
@@ -712,7 +705,7 @@ duplicate attachment keys. This affects the key only, not the
 file name.
 )");
 ap.addHelpTopic("inspection", "inspect PDF files", R"(These options provide tools for inspecting PDF files. When any of
-the options in this section are specified, no output file should be
+the options in this section are specified, no output file may be
 given.
 )");
 ap.addOptionHelp("--is-encrypted", "inspection", "silently test whether a file is encrypted", R"(Silently exit with a code indicating the file's encryption status:
@@ -743,15 +736,12 @@ user password if the owner password is given and the file was
 encrypted using older encryption formats that allow user
 password recovery.
 )");
-ap.addOptionHelp("--show-encryption-key", "inspection", "show key with --show-encryption", R"(When used with --show-encryption, causes the underlying
-encryption key to be displayed.
+ap.addOptionHelp("--show-encryption-key", "inspection", "show key with --show-encryption", R"(When used with --show-encryption or --check, causes the
+underlying encryption key to be displayed.
 )");
 ap.addOptionHelp("--check-linearization", "inspection", "check linearization tables", R"(Check to see whether a file is linearized and, if so, whether
 the linearization hint tables are correct.
 )");
-}
-static void add_help_7(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--show-linearization", "inspection", "show linearization hint tables", R"(Check and display all data in the linearization hint tables.
 )");
 ap.addOptionHelp("--show-xref", "inspection", "show cross reference data", R"(Show the contents of the cross-reference table or stream (object
@@ -759,7 +749,10 @@ locations in the file) in a human-readable form. This is
 especially useful for files with cross-reference streams, which
 are stored in a binary format.
 )");
-ap.addOptionHelp("--show-object", "inspection", "show contents of an object", R"(--show-object=trailer|obj[,gen]
+}
+static void add_help_7(QPDFArgParser& ap)
+{
+ap.addOptionHelp("--show-object", "inspection", "show contents of an object", R"(--show-object={trailer|obj[,gen]}
 
 Show the contents of the given object. This is especially useful
 for inspecting objects that are inside of object streams (also
@@ -784,6 +777,14 @@ object and for each content stream associated with the page.
 ap.addOptionHelp("--with-images", "inspection", "include image details with --show-pages", R"(When used with --show-pages, also shows the object and
 generation numbers for the image objects on each page.
 )");
+ap.addOptionHelp("--list-attachments", "inspection", "list embedded files", R"(Show the key and stream number for each embedded file. Combine
+with --verbose for more detailed information.
+)");
+ap.addOptionHelp("--show-attachment", "inspection", "export an embedded file", R"(--show-attachment=key
+
+Write the contents of the specified attachment to standard
+output as binary data. Get the key with --list-attachments.
+)");
 ap.addHelpTopic("json", "JSON output for PDF information", R"(Show information about the PDF file in JSON format. Please see the
 JSON chapter in the qpdf manual for details.
 )");
@@ -798,7 +799,7 @@ This option is repeatable. If given, only the specified
 top-level keys will be included in the JSON output. Otherwise,
 all keys will be included.
 )");
-ap.addOptionHelp("--json-object", "json", "restrict which objects are in JSON", R"(--json-object=trailer|obj[,gen]
+ap.addOptionHelp("--json-object", "json", "restrict which objects are in JSON", R"(--json-object={trailer|obj[,gen]}
 
 This option is repeatable. If given, only specified objects will
 be shown in the "objects" key of the JSON output. Otherwise, all

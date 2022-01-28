@@ -109,9 +109,10 @@ Password-protected files may be opened by specifying a password with
 :qpdf:ref:`--password`.
 
 All options other than help options (see :ref:`help-options`) require
-an input file. If inspection options (see :ref:`inspection-options`)
-or help options are given, an output file must not be given. Otherwise,
-an output file is required.
+an input file. If inspection or JSON options (see
+:ref:`inspection-options` and :ref:`json-options`) or help options are
+given, an output file must not be given. Otherwise, an output file is
+required.
 
 If :samp:`@filename` appears as a word anywhere in the command-line,
 it will be read line by line, and each line will be treated as a
@@ -246,9 +247,9 @@ Shell Completion
 You can enable bash completion with :command:`eval $(qpdf
 --completion-bash)` and zsh completion with :command:`eval $(qpdf
 --completion-zsh)`. If :command:`qpdf` is not in your path, you should
-invoke it above with an absolute path. If you invoke it with a
-relative path, it will warn you, and the completion won't work if
-you're in a different directory.
+use an absolute path to qpdf in the above invocation. If you invoke it
+with a relative path, it will warn you, and the completion won't work
+if you're in a different directory.
 
 :command:`qpdf` will use ``argv[0]`` to figure out where its
 executable is. This may produce unwanted results in some cases,
@@ -1439,9 +1440,11 @@ Related Options
 
    .. help: remove rotation from page dictionary
 
-      Rotate a page using content commands instead of page-level
-      metadata. This can be useful if a broken PDF viewer fails to
-      properly consider page rotation metadata.
+      For each page that is rotated using the /Rotate key in the
+      page's dictionary, remove the /Rotate key and implement the
+      identical rotation semantics by modifying the page's contents.
+      This can be useful if a broken PDF viewer fails to properly
+      consider page rotation metadata.
 
    For each page that is rotated using the ``/Rotate`` key in the
    page's dictionary, remove the ``/Rotate`` key and implement the
@@ -1564,7 +1567,7 @@ Related Options
    If a file contains interactive form fields and indicates that the
    appearances are out of date with the values of the form, this flag
    will regenerate appearances, subject to a few limitations. Note
-   that there is not usually a reason to do this, but it can be
+   that there is usually no reason to do this, but it can be
    necessary before using the :qpdf:ref:`--flatten-annotations`
    option. Here is a summary of the limitations.
 
@@ -1614,8 +1617,6 @@ Related Options
         --oi-min-area
         --keep-inline-images
 
-      The --verbose flag is useful with this option.
-
    This flag causes qpdf to recompress all images that are not
    compressed with DCT (JPEG) using DCT compression as long as doing
    so decreases the size in bytes of the image data and the image does
@@ -1661,9 +1662,8 @@ Related Options
 
       Prevent inline images from being considered by --optimize-images.
 
-   Prevent inline images from being included in image optimization.
-   This option has no effect when :qpdf:ref:`--optimize-images` is not
-   specified.
+   Prevent inline images from being included in image optimization
+   done by :qpdf:ref:`--optimize-images`.
 
 .. qpdf:option:: --remove-page-labels
 
@@ -1901,12 +1901,12 @@ Related Options
       encryption.
 
    Enable/disable extraction of text for accessibility to visually
-   impaired users. The qpdf library disregards this field when AES is used
-   with 128-bit encryption or when 256-bit encryption is used. You
-   should never disable accessibility unless you are explicitly doing
-   so for creating test files. The PDF spec says that conforming
-   readers should disregard this permission and always allow
-   accessibility.
+   impaired users. The default is to be fully permissive. The qpdf
+   library disregards this field when AES is used with 128-bit
+   encryption or when 256-bit encryption is used. You should never
+   disable accessibility unless you are explicitly doing so for
+   creating test files. The PDF spec says that conforming readers
+   should disregard this permission and always allow accessibility.
 
    This option is not available with 40-bit encryption.
 
@@ -1920,10 +1920,10 @@ Related Options
       unless --modify-other=n or --modify=none is also specified.
 
    Enable/disable modifying annotations including making comments and
-   filling in form fields. For 128-bit and 256-bit encryption, this
-   also enables editing, creating, and deleting form fields unless
-   :samp:`--modify-other=n` or :samp:`--modify=none` is also
-   specified.
+   filling in form fields. The default is to be fully permissive. For
+   128-bit and 256-bit encryption, this also enables editing,
+   creating, and deleting form fields unless :samp:`--modify-other=n`
+   or :samp:`--modify=none` is also specified.
 
 .. qpdf:option:: --assemble=[yn]
 
@@ -1933,7 +1933,7 @@ Related Options
       pages). This option is not available with 40-bit encryption.
 
    Enable/disable document assembly (rotation and reordering of
-   pages).
+   pages). The default is to be fully permissive.
 
    This option is not available with 40-bit encryption.
 
@@ -1945,7 +1945,7 @@ Related Options
       accessibility.
 
    Enable/disable text/graphic extraction for purposes other than
-   accessibility.
+   accessibility. The default is to be fully permissive.
 
 .. qpdf:option:: --form=[yn]
 
@@ -1956,7 +1956,8 @@ Related Options
       available with 40-bit encryption.
 
    Enable/disable whether filling form fields is allowed even if
-   modification of annotations is disabled.
+   modification of annotations is disabled. The default is to be fully
+   permissive.
 
    This option is not available with 40-bit encryption.
 
@@ -1972,7 +1973,8 @@ Related Options
    Enable/disable modifications not controlled by
    :qpdf:ref:`--assemble`, :qpdf:ref:`--annotate`, or
    :qpdf:ref:`--form`. ``--modify-other=n`` is implied by any of the
-   other :qpdf:ref:`--modify` options except for ``--modify=all``.
+   other :qpdf:ref:`--modify` options except for ``--modify=all``. The
+   default is to be fully permissive.
 
    This option is not available with 40-bit encryption.
 
@@ -1995,7 +1997,8 @@ Related Options
       none: --modify-other=n --annotate=n --form=n --assemble=n
 
    For 40-bit files, :samp:`{modify-opt}` may only be ``y`` or ``n``
-   and controls all aspects of document modification.
+   and controls all aspects of document modification. The default is
+   to be fully permissive.
 
    For 128-bit and 256-bit encryption, :samp:`{modify-opt}` values
    allow enabling and disabling levels of restriction in a manner
@@ -2058,10 +2061,11 @@ Related Options
       low: allow low-resolution printing only
       full: allow full printing (the default)
 
-   Control what kind of printing is allowed. For 40-bit encryption,
-   :samp:`{print-opt}` may only be ``y`` or ``n`` and enables or disables all
-   printing. For 128-bit and 256-bit encryption, :samp:`{print-opt}`
-   may have the following values:
+   Control what kind of printing is allowed. The default is to be
+   fully permissive. For 40-bit encryption, :samp:`{print-opt}` may
+   only be ``y`` or ``n`` and enables or disables all printing. For
+   128-bit and 256-bit encryption, :samp:`{print-opt}` may have the
+   following values:
 
    .. list-table:: :samp:`{print-opt}` Values
       :widths: 10 80
@@ -2118,9 +2122,9 @@ Related Options
    created in this way are insecure since they can be opened without a
    password, and restrictions will not be enforced. Users would
    ordinarily never want to create such files. If you are using qpdf
-   to intentionally created strange files for testing (a definite
-   valid use of qpdf!), this option allows you to create such insecure
-   files. This option is only available with 256-bit encryption.
+   to intentionally created strange files for testing (a valid use of
+   qpdf!), this option allows you to create such insecure files. This
+   option is only available with 256-bit encryption.
 
    See :ref:`pdf-passwords` for a more technical discussion of this
    issue.
@@ -2262,7 +2266,7 @@ Examples
 
      qpdf --empty --pages a.pdf b.pdf --password=x z-1 c.pdf 3,6
 
-- Scan a document with printing on both sides by scanning the fronts
+- Scan a document with double-sided printing by scanning the fronts
   into :file:`odd.pdf` and the backs into :file:`even.pdf`. Collate
   the results into :file:`all.pdf`. This takes the first page of
   :file:`odd.pdf`, the first page of :file:`even.pdf`, the second page
@@ -2462,7 +2466,8 @@ output. The ``--overlay`` and ``--underlay`` options work the same
 way, except underlay pages are drawn underneath the page to which they
 are applied, possibly obscured by the original page, and overlay files
 are drawn on top of the page to which they are applied, possibly
-obscuring the page. You can combine overlay and underlay.
+obscuring the page. You can combine overlay and underlay, but you can
+only specify each option at most one time.
 
 The default behavior of overlay and underlay is that pages are taken
 from the overlay/underlay file in sequence and applied to
@@ -2495,8 +2500,14 @@ and the ``--`` option. The following options are supported:
 
 Specify a page range that indicates which pages in the
 overlay/underlay file will be used for overlay or underlay. If not
-specified, all pages will be used. This can be left empty by omitting
-:samp:`{page-range}` if :qpdf:ref:`--repeat` is used.
+specified, all pages will be used. The "from" pages are used until
+they are exhausted, after which any pages specified with
+:qpdf:ref:`--repeat` are used. If you are using the
+:qpdf:ref:`--repeat` option, you can use ``--from=`` to provide an
+empty set of "from" pages.
+
+This Can be left empty by omitting
+:samp:`{page-range}` 
 
 .. qpdf:option:: --repeat=page-range
 
@@ -2549,40 +2560,17 @@ Embedded Files/Attachments
    It is possible to list, add, or delete embedded files (also known
    as attachments) and to copy attachments from other files. See help
    on individual options for details. Run qpdf --help=add-attachment
-   for additional details about adding attachments.
+   for additional details about adding attachments. See also
+   --help=--list-attachments and --help=--show-attachment.
 
 It is possible to list, add, or delete embedded files (also known as
-attachments) and to copy attachments from other files.
+attachments) and to copy attachments from other files. See also
+:qpdf:ref:`--list-attachments` and :qpdf:ref:`--show-attachment`.
 
 Related Options
 ~~~~~~~~~~~~~~~
 
-.. qpdf:option:: --list-attachments
-
-   .. help: list embedded files
-
-      Show the key and stream number for each embedded file. Combine
-      with --verbose for more detailed information.
-
-   Show the *key* and stream number for each embedded file. With
-   :qpdf:ref:`--verbose`, additional information, including preferred
-   file name, description, dates, and more are also displayed. The key
-   is usually but not always equal to the file name and is needed by
-   some of the other options.
-
-.. qpdf:option:: --show-attachment=key
-
-   .. help: export an embedded file
-
-      Write the contents of the specified attachment to standard
-      output as binary data. Get the key with --list-attachments.
-
-   Write the contents of the specified attachment to standard output
-   as binary data. The key should match one of the keys shown by
-   :qpdf:ref:`--list-attachments`. If this option is given more than
-   once, only the last attachment will be shown.
-
-.. qpdf:option:: --add-attachment file options --
+.. qpdf:option:: --add-attachment file [options] --
 
    .. help: start add attachment options
 
@@ -2595,6 +2583,21 @@ Related Options
    The ``--add-attachment`` flag and its options may be repeated to
    add multiple attachments. Please see :ref:`add-attachment` for
    additional details.
+
+.. qpdf:option:: --copy-attachments-from file [options] --
+
+   .. help: start copy attachment options
+
+      The --copy-attachments-from flag and its options may be repeated
+      to copy attachments from multiple files. Run
+      qpdf --help=copy-attachments for details.
+
+   This flag starts copy attachment options, which are used to copy
+   attachments from other files.
+
+   The ``--copy-attachments-from`` flag and its options may be
+   repeated to copy attachments from multiple files. Please see
+   :ref:`copy-attachments` for additional details.
 
 .. qpdf:option:: --remove-attachment=key
 
@@ -2611,21 +2614,6 @@ Related Options
    see status of the removal. Use :qpdf:ref:`--list-attachments` to find
    the attachment key. This option may be repeated to remove multiple
    attachments.
-
-.. qpdf:option:: --copy-attachments-from file options --
-
-   .. help: start copy attachment options
-
-      The --copy-attachments-from flag and its options may be repeated
-      to copy attachments from multiple files. Run
-      qpdf --help=copy-attachments for details.
-
-   This flag starts copy attachment options, which are used to copy
-   attachments from other files.
-
-   The ``--copy-attachments-from`` flag and its options may be
-   repeated to copy attachments from multiple files. Please see
-   :ref:`copy-attachments` for additional details.
 
 .. _pdf-dates:
 
@@ -2682,12 +2670,13 @@ These options are valid between :qpdf:ref:`--add-attachment` and ``--``.
    .. help: specify attachment key
 
       Specify the key to use for the attachment in the embedded files
-      table. It defaults to the last element of the attached file's
-      filename.
+      table. It defaults to the last element (basename) of the
+      attached file's filename.
 
    Specify the key to use for the attachment in the embedded files
    table. It defaults to the last element of the attached file's
-   filename.
+   filename. For example, if you say ``--add-attachment
+   /home/user/image.png``, the default key will be just ``image.png``.
 
 .. qpdf:option:: --filename=name
 
@@ -2696,12 +2685,14 @@ These options are valid between :qpdf:ref:`--add-attachment` and ``--``.
       Specify the filename to be used for the attachment. This is what
       is usually displayed to the user and is the name most graphical
       PDF viewers will use when saving a file. It defaults to the last
-      element of the attached file's filename.
+      element (basename) of the attached file's filename.
 
    Specify the filename to be used for the attachment. This is what is
    usually displayed to the user and is the name most graphical PDF
    viewers will use when saving a file. It defaults to the last
-   element of the attached file's filename.
+   element of the attached file's filename. For example, if you say
+   ``--add-attachment /home/user/image.png``, the default key will be
+   just ``image.png``.
 
 .. qpdf:option:: --creationdate=date
 
@@ -2807,11 +2798,11 @@ PDF Inspection
 .. help-topic inspection: inspect PDF files
 
    These options provide tools for inspecting PDF files. When any of
-   the options in this section are specified, no output file should be
+   the options in this section are specified, no output file may be
    given.
 
 These options provide tools for inspecting PDF files. When any of the
-options in this section are specified, no output file should be given.
+options in this section are specified, no output file may be given.
 
 Related Options
 ~~~~~~~~~~~~~~~
@@ -2898,12 +2889,12 @@ Related Options
    If a password is supplied with :qpdf:ref:`--password`, that
    password is used to open the file just as with any normal
    invocation of :command:`qpdf`. That means that using this option
-   with :qpdf:ref:`--password` option can be used to check the
-   correctness of the password. In that case, an exit status of ``3``
-   means the file works with the supplied password. This option is
-   mutually exclusive with :qpdf:ref:`--is-encrypted`. Both this
-   option and :qpdf:ref:`--is-encrypted` exit with status ``2`` for
-   non-encrypted files.
+   with :qpdf:ref:`--password` can be used to check the correctness of
+   the password. In that case, an exit status of ``3`` means the file
+   works with the supplied password. This option is mutually exclusive
+   with :qpdf:ref:`--is-encrypted`. Both this option and
+   :qpdf:ref:`--is-encrypted` exit with status ``2`` for non-encrypted
+   files.
 
 .. qpdf:option:: --check
 
@@ -2962,8 +2953,8 @@ Related Options
 
    .. help: show key with --show-encryption
 
-      When used with --show-encryption, causes the underlying
-      encryption key to be displayed.
+      When used with --show-encryption or --check, causes the
+      underlying encryption key to be displayed.
 
    When encryption information is being displayed, as when
    :qpdf:ref:`--check` or :qpdf:ref:`--show-encryption` is given, display the
@@ -3016,7 +3007,7 @@ Related Options
    reconstruction is performed, this option will show the information
    in the reconstructed table.
 
-.. qpdf:option:: --show-object=trailer|obj[,gen]
+.. qpdf:option:: --show-object={trailer|obj[,gen]}
 
    .. help: show contents of an object
 
@@ -3103,6 +3094,32 @@ Related Options
    When used with :qpdf:ref:`--show-pages`, also shows the object and
    generation numbers for the image objects on each page.
 
+.. qpdf:option:: --list-attachments
+
+   .. help: list embedded files
+
+      Show the key and stream number for each embedded file. Combine
+      with --verbose for more detailed information.
+
+   Show the *key* and stream number for each embedded file. With
+   :qpdf:ref:`--verbose`, additional information, including preferred
+   file name, description, dates, and more are also displayed. The key
+   is usually but not always equal to the file name and is needed by
+   some of the other options. See also :ref:`attachments`.
+
+.. qpdf:option:: --show-attachment=key
+
+   .. help: export an embedded file
+
+      Write the contents of the specified attachment to standard
+      output as binary data. Get the key with --list-attachments.
+
+   Write the contents of the specified attachment to standard output
+   as binary data. The key should match one of the keys shown by
+   :qpdf:ref:`--list-attachments`. If this option is given more than
+   once, only the last attachment will be shown. See also
+   :ref:`attachments`.
+
 .. _json-options:
 
 JSON Options
@@ -3149,7 +3166,7 @@ Related Options
    keys will be included in the JSON output. Otherwise, all keys will
    be included.
 
-.. qpdf:option:: --json-object=trailer|obj[,gen]
+.. qpdf:option:: --json-object={trailer|obj[,gen]}
 
    .. help: restrict which objects are in JSON
 

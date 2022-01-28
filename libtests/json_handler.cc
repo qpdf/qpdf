@@ -99,6 +99,7 @@ static void test_all()
 {
     std::cout << "-- all --" << std::endl;
     auto h = make_all_handler();
+    /* cSpell: ignore phour */
     JSON j = JSON::parse(R"({
    "one": "potato",
    "two": 3.14,

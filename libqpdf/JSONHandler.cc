@@ -88,20 +88,20 @@ JSONHandler::handle(std::string const& path, JSON j)
     }
     bool handled = false;
     bool bvalue = false;
-    std::string svalue;
+    std::string s_value;
     if (this->m->h.null_handler && j.isNull())
     {
         this->m->h.null_handler(path);
         handled = true;
     }
-    if (this->m->h.string_handler && j.getString(svalue))
+    if (this->m->h.string_handler && j.getString(s_value))
     {
-        this->m->h.string_handler(path, svalue);
+        this->m->h.string_handler(path, s_value);
         handled = true;
     }
-    if (this->m->h.number_handler && j.getNumber(svalue))
+    if (this->m->h.number_handler && j.getNumber(s_value))
     {
-        this->m->h.number_handler(path, svalue);
+        this->m->h.number_handler(path, s_value);
         handled = true;
     }
     if (this->m->h.bool_handler && j.getBool(bvalue))

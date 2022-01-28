@@ -3128,6 +3128,7 @@ static void test_82(QPDF& pdf, char const* arg2)
     assert(stream.isStreamOfType("/ObjStm"));
     assert(! stream.isStreamOfType("/Test"));
     assert(! pdf.getObjectByID(2,0).isStreamOfType("/Pages"));
+    /* cSpell: ignore Blaah Blaaah Blaaaah */
     auto array = QPDFObjectHandle::parse("[/Blah /Blaah /Blaaah]");
     assert(array.isOrHasName("/Blah"));
     assert(array.isOrHasName("/Blaaah"));

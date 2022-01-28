@@ -70,7 +70,7 @@ JSON parse unexpected } 0
 JSON parse unexpected ] 0
 JSON parse unexpected : 0
 JSON parse unexpected , 0
-JSON parse preature EOF 0
+JSON parse premature EOF 0
 JSON parse null character 0
 JSON parse bad character 0
 JSON parse point after e 0
