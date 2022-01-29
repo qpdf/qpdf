@@ -664,7 +664,7 @@ compute_U_UE_value_V5(std::string const& user_password,
     // Algorithm 3.8 from the PDF 1.7 extension level 3
     char k[16];
     QUtil::initializeWithRandomBytes(
-        QUtil::unsigned_char_pointer(k), sizeof(k));
+        reinterpret_cast<unsigned char*>(k), sizeof(k));
     std::string validation_salt(k, 8);
     std::string key_salt(k + 8, 8);
     U = hash_V5(user_password, validation_salt, "", data) +
@@ -683,7 +683,7 @@ compute_O_OE_value_V5(std::string const& owner_password,
     // Algorithm 3.9 from the PDF 1.7 extension level 3
     char k[16];
     QUtil::initializeWithRandomBytes(
-        QUtil::unsigned_char_pointer(k), sizeof(k));
+        reinterpret_cast<unsigned char*>(k), sizeof(k));
     std::string validation_salt(k, 8);
     std::string key_salt(k + 8, 8);
     O = hash_V5(owner_password, validation_salt, U, data) +
