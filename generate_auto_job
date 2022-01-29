@@ -364,16 +364,17 @@ class Main:
         self.json_decls = []
         self.json_init = []
         self.jdata = {}
+        self.by_table = {}
 
-        def add_jdata(flag, table):
+        def add_jdata(flag, table, details):
             nonlocal self
             if table == 'help':
                 self.help_options.add(f'--{flag}')
             elif flag in self.jdata:
-                self.jdata[flag]['tables'].add(table)
+                self.jdata[flag]['tables'][table] = details
             else:
                 self.jdata[flag] = {
-                    'tables': set([table]),
+                    'tables': {table: details},
                 }
 
         self.init.append('auto b = [this](void (ArgParser::*f)()) {')
@@ -384,11 +385,14 @@ class Main:
         self.init.append('};')
         self.init.append('')
         for k, v in data['choices'].items():
-            s = f'char const* {k}_choices[] = {{'
+            s = f'static char const* {k}_choices[] = {{'
             for i in v:
                 s += f'"{i}", '
-            self.init.append(s + '0};')
+            s += '0};'
+            self.init.append(s)
+            self.json_init.append(s)
         self.init.append('')
+        self.json_init.append('')
 
         for o in data['options']:
             table = o['table']
@@ -402,6 +406,13 @@ class Main:
             config = o.get('config', None)
             table_prefix = o.get('prefix', '')
             arg_prefix = 'arg' + table_prefix
+            config_prefix = o.get('config_prefix', table_prefix)
+            manual = o.get('manual', [])
+            json_prefix = table_prefix or table
+            self.by_table[json_prefix] = {
+                'config': config,
+                'manual': manual,
+            }
             if table == 'main':
                 self.init.append('this->ap.selectMainOptionTable();')
             elif table == 'help':
@@ -430,33 +441,58 @@ class Main:
 
             for i, [kind, v] in flags.items():
                 self.options_without_help.add(f'--{i}')
-                add_jdata(i, table_prefix or table)
-                if config is None or i in o.get('manual', []):
+                add_jdata(i, json_prefix, [kind, v])
+                if config is None or i in manual:
                     identifier = self.to_identifier(i, arg_prefix, False)
                     self.handle_flag(i, identifier, kind, v)
                 else:
                     identifier = self.to_identifier(i, '', False)
-                    prefix = o.get('config_prefix', table_prefix)
                     self.handle_trivial(
-                        i, identifier, config, prefix, kind, v)
+                        i, identifier, config, config_prefix, kind, v)
 
             if table not in ('main', 'help'):
                 identifier = self.to_identifier(table, 'argEnd', False)
                 self.decls.append(f'void {identifier}();')
 
-    def generate_schema(self, data):
-        # XXX check data['json'] against what we know from jdata.
-        # Ultimately be able to generate a schema as well as
-        # JSONHandler and registering stuff.
+    def handle_json_trivial(self, key, fdata):
+        config = None
+        for t, [kind, v] in fdata['tables'].items():
+            # We have determined that all tables, if multiple, have
+            # the same config.
+            tdata = self.by_table[t]
+            config = tdata['config']
+        if kind == 'bare':
+            self.json_init.append(
+                f'addBare("{key}", [this]() {{ {config}->{key}(); }});')
+        elif kind == 'optional_parameter' or kind == 'required_parameter':
+            # No optional parameters in json
+            self.json_init.append(
+                f'addParameter("{key}", [this](char const* p)'
+                f' {{ {config}->{key}(p); }});')
+        elif kind == 'optional_choices' or kind == 'required_choices':
+            # No optional choices in json
+            self.json_init.append(
+                f'addChoices("{key}", {v}_choices,'
+                f' [this](char const* p) {{ {config}->{key}(p); }});')
 
+    def handle_json_manual(self, key, path):
+        method = re.sub(r'\.([a-zA-Z0-9])',
+                        lambda x: x.group(1).upper(),
+                        f'setup{path}.{key}')
+        self.json_decls.append(
+            f'void {method}(std::string const&);')
+        self.json_init.append(
+            f'doSetup("{key}", bindSetup(&Handlers::{method}));')
+
+    def generate_schema(self, data):
         # Check to make sure that every command-line option is
         # represented either in data['json'] or data['no-json'].
 
         # Build a list of options that we expect. If an option appears
         # once, we just expect to see it once. If it appears in more
         # than one options table, we need to see a separate version of
-        # it for each option table. It is represented prepended in
-        # job.yml with the table prefix. The table prefix is removed
+        # it for each option table. It is represented in job.yml
+        # prepended with the table prefix. The table prefix is removed
         # in the schema.
         expected = {}
         for k, v in self.jdata.items():
@@ -466,8 +502,6 @@ class Main:
             else:
                 for t in sorted(tables):
                     expected[f'{t}.{k}'] = {**v}
-        for _, v in expected.items():
-            del v['tables']
         options_seen = set(data['no-json'])
 
         self.schema = {}
@@ -479,11 +513,29 @@ class Main:
         # go. This verifies consistency between command-line options
         # and the json section of the data and builds up a schema by
         # populating with help information as available.
-        def build_schema(j, s):
+        def build_schema(j, s, flag, path):
+            if flag:
+                identifier = self.to_identifier(path, '', False)
+                self.json_decls.append(f'void begin{identifier}();')
+                self.json_decls.append(f'void end{identifier}();')
+                self.json_init.append(
+                    f'beginDict("{flag}",'
+                    f' bindBare(&Handlers::begin{identifier}),'
+                    f' bindBare(&Handlers::end{identifier})); // {path}')
             for k, v in j.items():
-                if not (k in expected or
-                        k.startswith('_') or
-                        isinstance(v, str)):
+                is_trivial = False
+                if k in expected:
+                    is_trivial = True
+                    common_config = None
+                    for t in expected[k]['tables']:
+                        tdata = self.by_table[t]
+                        if k in tdata['manual']:
+                            is_trivial = False
+                        if common_config is None:
+                            common_config = tdata['config']
+                        elif common_config != tdata['config']:
+                            is_trivial = False
+                elif not (k.startswith('_') or isinstance(v, str)):
                     raise Exception(f'json: unknown key {k}')
                 if k.startswith('_'):
                     schema_key = k[1:]
@@ -491,6 +543,7 @@ class Main:
                     schema_key = re.sub(r'[^\.]+\.', '', k)
                 schema_key = option_to_json_key(schema_key)
                 schema_value = v
+                is_dict = False
                 if k in expected:
                     options_seen.add(re.sub('^_', '', k))
                     if v is None:
@@ -499,19 +552,30 @@ class Main:
                             lambda x: option_to_json_key(x.group(1)),
                             expected[k]['help'])
                 if (isinstance(v, dict)):
+                    is_dict = True
                     schema_value = {}
-                    build_schema(v, schema_value)
+                    build_schema(v, schema_value,
+                                 schema_key, f'{path}.{schema_key}')
                 elif (isinstance(v, list)):
                     if len(v) != 1:
                         raise Exception('json contains array with length != 1')
                     if isinstance(v[0], dict):
+                        is_dict = True
                         schema_value = [{}]
-                        build_schema(v[0], schema_value[0])
+                        build_schema(v[0], schema_value[0],
+                                     schema_key, f'{path}.{schema_key}')
                 elif schema_value is None:
                     raise Exception(f'unknown schema value for {k}')
                 s[schema_key] = schema_value
+                if not is_dict:
+                    if is_trivial:
+                        self.handle_json_trivial(schema_key, expected[k])
+                    else:
+                        self.handle_json_manual(schema_key, path)
+            if flag:
+                self.json_init.append(f'endDict(); // {path}')
 
-        build_schema(data['json'], self.schema)
+        build_schema(data['json'], self.schema, '', '')
         if options_seen != set(expected.keys()):
             raise Exception('missing from json: ' +
                             str(set(expected.keys()) - options_seen))
@@ -540,9 +604,7 @@ class Main:
             identifier = f'{prefix}_{identifier.upper()}'
         else:
             if prefix:
-                identifier = f'{prefix}_{identifier.lower()}'
-            else:
-                identifier = identifier.lower()
+                identifier = f'{prefix}_{identifier}'
             identifier = re.sub(r'_([a-z])',
                                 lambda x: x.group(1).upper(),
                                 identifier).replace('_', '')

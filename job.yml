@@ -253,16 +253,13 @@ json:
   # a "schema" (as in JSON.hh) for the json input to QPDFJob. The
   # leading underscore is removed.
   _input:
-    # QXXXQ need to figure out how to specify input and output
-    _file:
-      _name: "input filename"
-      main.password:
-      password-file:
-    _empty: "qxxxq empty"
+    _fileName: "input filename"
+    main.password:
+    password-file:
+    empty:
   _output:
-    _file:
-      _name: "output filename"
-    _replace-input: "qxxxq replace input"
+    _fileName: "output filename"
+    _replace-input: "set to true to replace input"
     _options:
       qdf:
       preserve-unreferenced:

@@ -1,17 +1,13 @@
 static constexpr char const* JOB_SCHEMA_DATA = R"({
   "input": {
-    "file": {
-      "name": "input filename",
-      "password": "specify password",
-      "passwordFile": "read password from a file"
-    },
-    "empty": "qxxxq empty"
+    "fileName": "input filename",
+    "password": "specify password",
+    "passwordFile": "read password from a file",
+    "empty": "empty input file"
   },
   "output": {
-    "file": {
-      "name": "output filename"
-    },
-    "replaceInput": "qxxxq replace input",
+    "fileName": "output filename",
+    "replaceInput": "set to true to replace input",
     "options": {
       "qdf": "enable viewing PDF code in a text editor",
       "preserveUnreferenced": "preserve unreferenced objects",

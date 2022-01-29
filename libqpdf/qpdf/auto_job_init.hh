@@ -10,16 +10,16 @@ auto p = [this](void (ArgParser::*f)(char *)) {
     return QPDFArgParser::bindParam(f, this);
 };
 
-char const* yn_choices[] = {"y", "n", 0};
-char const* password_mode_choices[] = {"bytes", "hex-bytes", "unicode", "auto", 0};
-char const* stream_data_choices[] = {"compress", "preserve", "uncompress", 0};
-char const* decode_level_choices[] = {"none", "generalized", "specialized", "all", 0};
-char const* object_streams_choices[] = {"disable", "preserve", "generate", 0};
-char const* remove_unref_choices[] = {"auto", "yes", "no", 0};
-char const* flatten_choices[] = {"all", "print", "screen", 0};
-char const* json_key_choices[] = {"acroform", "attachments", "encrypt", "objectinfo", "objects", "outlines", "pagelabels", "pages", 0};
-char const* print128_choices[] = {"full", "low", "none", 0};
-char const* modify128_choices[] = {"all", "annotate", "form", "assembly", "none", 0};
+static char const* yn_choices[] = {"y", "n", 0};
+static char const* password_mode_choices[] = {"bytes", "hex-bytes", "unicode", "auto", 0};
+static char const* stream_data_choices[] = {"compress", "preserve", "uncompress", 0};
+static char const* decode_level_choices[] = {"none", "generalized", "specialized", "all", 0};
+static char const* object_streams_choices[] = {"disable", "preserve", "generate", 0};
+static char const* remove_unref_choices[] = {"auto", "yes", "no", 0};
+static char const* flatten_choices[] = {"all", "print", "screen", 0};
+static char const* json_key_choices[] = {"acroform", "attachments", "encrypt", "objectinfo", "objects", "outlines", "pagelabels", "pages", 0};
+static char const* print128_choices[] = {"full", "low", "none", 0};
+static char const* modify128_choices[] = {"all", "annotate", "form", "assembly", "none", 0};
 
 this->ap.selectHelpOptionTable();
 this->ap.addBare("version", b(&ArgParser::argVersion));
