@@ -10,6 +10,18 @@ static bool tc_active(char const* const scope)
     return (QUtil::get_env("TC_SCOPE", &value) && (value == scope));
 }
 
+void QTC::TC(char const* const scope, char const* const ccase,
+             bool flag, bool flag2, bool flag3)
+{
+    static std::set<std::pair<std::string, int> > cache;
+
+    if (! tc_active(scope))
+    {
+        return;
+    }
+    TC(scope, ccase, (flag ? 1 : 0) | (flag2 ? 2 : 0) | (flag3 ? 4 : 0));
+}
+
 void QTC::TC(char const* const scope, char const* const ccase, int n)
 {
     static std::set<std::pair<std::string, int> > cache;

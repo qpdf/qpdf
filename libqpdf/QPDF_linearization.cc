@@ -464,7 +464,7 @@ QPDF::readHSharedObject(BitStream h)
     t.nbits_delta_group_length = h.getBitsInt(16);          // 7
 
     QTC::TC("qpdf", "QPDF lin nshared_total > nshared_first_page",
-	    (t.nshared_total > t.nshared_first_page) ? 1 : 0);
+            (t.nshared_total > t.nshared_first_page));
 
     std::vector<HSharedObjectEntry>& entries = t.entries;
     entries.clear();
@@ -1346,8 +1346,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
     QPDFObjectHandle root = getRoot();
     bool outlines_in_first_page = false;
     QPDFObjectHandle pagemode = root.getKey("/PageMode");
-    QTC::TC("qpdf", "QPDF categorize pagemode present",
-	    pagemode.isName() ? 1 : 0);
+    QTC::TC("qpdf", "QPDF categorize pagemode present", pagemode.isName());
     if (pagemode.isName())
     {
 	if (pagemode.getName() == "/UseOutlines")
@@ -1361,8 +1360,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 		QTC::TC("qpdf", "QPDF UseOutlines but no Outlines");
 	    }
 	}
-	QTC::TC("qpdf", "QPDF categorize pagemode outlines",
-		outlines_in_first_page ? 1 : 0);
+        QTC::TC("qpdf", "QPDF categorize pagemode outlines", outlines_in_first_page);
     }
 
     std::set<std::string> open_document_keys;
@@ -1813,7 +1811,7 @@ QPDF::calculateLinearizationData(std::map<int, int> const& object_stream_data)
 	obj_to_index[obj] = toI(shared.size());
 	shared.push_back(CHSharedObjectEntry(obj));
     }
-    QTC::TC("qpdf", "QPDF lin part 8 empty", this->m->part8.empty() ? 1 : 0);
+    QTC::TC("qpdf", "QPDF lin part 8 empty", this->m->part8.empty());
     if (! this->m->part8.empty())
     {
 	this->m->c_shared_object_data.first_shared_obj =
@@ -2219,7 +2217,7 @@ QPDF::writeHSharedObject(BitWriter& w)
     w.writeBitsInt(t.nbits_delta_group_length, 16);         // 7
 
     QTC::TC("qpdf", "QPDF lin write nshared_total > nshared_first_page",
-	    (t.nshared_total > t.nshared_first_page) ? 1 : 0);
+            (t.nshared_total > t.nshared_first_page));
 
     int nitems = t.nshared_total;
     std::vector<HSharedObjectEntry>& entries = t.entries;

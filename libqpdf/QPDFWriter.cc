@@ -263,7 +263,7 @@ QPDFWriter::setMinimumPDFVersion(std::string const& version,
 	if (compare > 0)
 	{
 	    QTC::TC("qpdf", "QPDFWriter increasing minimum version",
-                    extension_level == 0 ? 0 : 1);
+                    (extension_level == 0));
 	    set_version = true;
             set_extension_level = true;
 	}
@@ -741,10 +741,10 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
             // different values.
             this->m->encrypt_use_aes = true;
         }
-	QTC::TC("qpdf", "QPDFWriter copy encrypt metadata",
-		this->m->encrypt_metadata ? 0 : 1);
+        QTC::TC("qpdf", "QPDFWriter copy encrypt metadata",
+                this->m->encrypt_metadata);
         QTC::TC("qpdf", "QPDFWriter copy use_aes",
-                this->m->encrypt_use_aes ? 0 : 1);
+                this->m->encrypt_use_aes);
         std::string OE;
         std::string UE;
         std::string Perms;
@@ -1666,7 +1666,7 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
                     // We need Extensions and don't have it.  Create
                     // it here.
                     QTC::TC("qpdf", "QPDFWriter create Extensions",
-                            this->m->qdf_mode ? 0 : 1);
+                            this->m->qdf_mode);
                     extensions = QPDFObjectHandle::newDictionary();
                     object.replaceKey("/Extensions", extensions);
                 }
@@ -2377,7 +2377,7 @@ QPDFWriter::preserveObjectStreams()
         eligible = std::set<QPDFObjGen>(eligible_v.begin(), eligible_v.end());
     }
     QTC::TC("qpdf", "QPDFWriter preserve object streams",
-            this->m->preserve_unreferenced_objects ? 0 : 1);
+            this->m->preserve_unreferenced_objects);
     for (auto iter: omap)
     {
         QPDFObjGen og(iter.first, 0);
@@ -2498,7 +2498,7 @@ QPDFWriter::prepareFileForWrite()
                 if (adbe.isIndirect())
                 {
                     QTC::TC("qpdf", "QPDFWriter make ADBE direct",
-                            extensions_indirect ? 0 : 1);
+                            extensions_indirect);
                     adbe.makeDirect();
                     oh.replaceKey("/ADBE", adbe);
                 }
@@ -3461,7 +3461,7 @@ QPDFWriter::writeLinearized()
             if (this->m->deterministic_id)
             {
                 QTC::TC("qpdf", "QPDFWriter linearized deterministic ID",
-                        need_xref_stream ? 0 : 1);
+                        need_xref_stream);
                 computeDeterministicIDData();
                 pp_md5 = 0;
                 assert(this->m->md5_pipeline == 0);
@@ -3669,8 +3669,8 @@ QPDFWriter::writeStandard()
 
     if (this->m->deterministic_id)
     {
-	QTC::TC("qpdf", "QPDFWriter standard deterministic ID",
-                this->m->object_stream_to_objects.empty() ? 0 : 1);
+        QTC::TC("qpdf", "QPDFWriter standard deterministic ID",
+                this->m->object_stream_to_objects.empty());
         pp_md5 = 0;
         assert(this->m->md5_pipeline == 0);
     }

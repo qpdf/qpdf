@@ -1705,8 +1705,7 @@ QPDFObjectHandle::rotatePage(int angle, bool relative)
                 break;
             }
         }
-        QTC::TC("qpdf", "QPDFObjectHandle found old angle",
-                searched_parent ? 0 : 1);
+        QTC::TC("qpdf", "QPDFObjectHandle found old angle", searched_parent);
         if ((old_angle % 90) != 0)
         {
             old_angle = 0;
@@ -1902,8 +1901,7 @@ QPDFObjectHandle::pipeContentStreams(
         }
         lc.finish();
         need_newline = (lc.getLastChar() != static_cast<unsigned char>('\n'));
-        QTC::TC("qpdf", "QPDFObjectHandle need_newline",
-                need_newline ? 0 : 1);
+        QTC::TC("qpdf", "QPDFObjectHandle need_newline", need_newline);
     }
     std::unique_ptr<Buffer> b(buf.getBuffer());
     p->write(b->getBuffer(), b->getSize());

@@ -441,10 +441,8 @@ QPDFAcroFormDocumentHelper::traverseField(
         }
     }
 
-    QTC::TC("qpdf", "QPDFAcroFormDocumentHelper field found",
-            (depth == 0) ? 0 : 1);
-    QTC::TC("qpdf", "QPDFAcroFormDocumentHelper annotation found",
-            (is_field ? 0 : 1));
+    QTC::TC("qpdf", "QPDFAcroFormDocumentHelper field found", (depth == 0));
+    QTC::TC("qpdf", "QPDFAcroFormDocumentHelper annotation found", is_field);
 
     if (is_annotation)
     {
@@ -1213,11 +1211,11 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
         }
 
         QTC::TC("qpdf", "QPDFAcroFormDocumentHelper copy annotation",
-                (have_field ? 1 : 0) | (foreign ? 2 : 0));
+                have_field, foreign);
         if (have_field)
         {
             QTC::TC("qpdf", "QPDFAcroFormDocumentHelper field with parent",
-                    (have_parent ? 1 : 0) | (foreign ? 2 : 0));
+                    have_parent, foreign);
         }
         if (foreign)
         {

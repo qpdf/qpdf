@@ -1079,8 +1079,7 @@ QPDF::initializeEncryption()
         if (this->m->encp->user_password_matched &&
             this->m->encp->owner_password_matched)
         {
-            QTC::TC("qpdf", "QPDF_encryption same password",
-                    (V < 5) ? 0 : 1);
+            QTC::TC("qpdf", "QPDF_encryption same password", (V < 5));
         }
         if (! (this->m->encp->owner_password_matched ||
                this->m->encp->user_password_matched))

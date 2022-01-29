@@ -246,8 +246,8 @@ QPDF::pushInheritedAttributesToPageInternal(
 		// This is an inheritable resource
 		inheritable_keys.insert(key);
 		QPDFObjectHandle oh = cur_pages.getKey(key);
-		QTC::TC("qpdf", "QPDF opt direct pages resource",
-			oh.isIndirect() ? 0 : 1);
+                QTC::TC("qpdf", "QPDF opt direct pages resource",
+                        oh.isIndirect());
 		if (! oh.isIndirect())
 		{
 		    if (! oh.isScalar())

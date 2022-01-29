@@ -849,7 +849,7 @@ QPDF_ERROR_CODE qpdf_write(qpdf_data qpdf)
 {
     QPDF_ERROR_CODE status = QPDF_SUCCESS;
     status = trap_errors(qpdf, &call_write);
-    QTC::TC("qpdf", "qpdf-c called qpdf_write", (status == 0) ? 0 : 1);
+    QTC::TC("qpdf", "qpdf-c called qpdf_write", (status == 0));
     return status;
 }
 
@@ -877,7 +877,7 @@ static RET trap_oh_errors(
         if (! qpdf->silence_errors)
         {
             QTC::TC("qpdf", "qpdf-c warn about oh error",
-                    qpdf->oh_error_occurred ? 0 : 1);
+                    qpdf->oh_error_occurred);
             if (! qpdf->oh_error_occurred)
             {
                 qpdf->warnings.push_back(

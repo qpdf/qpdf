@@ -353,7 +353,7 @@ QPDFPageObjectHelper::getAttribute(std::string const& name,
     if (copy_if_shared && (inherited || result.isIndirect()))
     {
         QTC::TC("qpdf", "QPDFPageObjectHelper copy shared attribute",
-                is_form_xobject ? 0 : 1);
+                is_form_xobject);
         result = result.shallowCopy();
         dict.replaceKey(name, result);
     }
@@ -397,9 +397,7 @@ QPDFPageObjectHelper::forEachXObject(
     std::function<bool(QPDFObjectHandle)> selector)
 {
     QTC::TC("qpdf", "QPDFPageObjectHelper::forEachXObject",
-            recursive
-            ? (this->oh.isFormXObject() ? 0 : 1)
-            : (this->oh.isFormXObject() ? 2 : 3));
+            recursive, this->oh.isFormXObject());
     std::set<QPDFObjGen> seen;
     std::list<QPDFPageObjectHelper> queue;
     queue.push_back(*this);

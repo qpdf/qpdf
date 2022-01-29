@@ -209,8 +209,7 @@ static void test_0_1(QPDF& pdf, char const* arg2)
         std::cout << "/QTest is implicit" << std::endl;
     }
 
-    QTC::TC("qpdf", "main QTest indirect",
-            qtest.isIndirect() ? 1 : 0);
+    QTC::TC("qpdf", "main QTest indirect", qtest.isIndirect());
     std::cout << "/QTest is "
               << (qtest.isIndirect() ? "in" : "")
               << "direct and has type "
@@ -224,8 +223,7 @@ static void test_0_1(QPDF& pdf, char const* arg2)
     }
     else if (qtest.isBool())
     {
-        QTC::TC("qpdf", "main QTest bool",
-                qtest.getBoolValue() ? 1 : 0);
+        QTC::TC("qpdf", "main QTest bool", qtest.getBoolValue());
         std::cout << "/QTest is Boolean with value "
                   << (qtest.getBoolValue() ? "true" : "false")
                   << std::endl;
@@ -262,8 +260,7 @@ static void test_0_1(QPDF& pdf, char const* arg2)
         int i = 0;
         for (auto& iter: qtest.aitems())
         {
-            QTC::TC("qpdf", "main QTest array indirect",
-                    iter.isIndirect() ? 1 : 0);
+            QTC::TC("qpdf", "main QTest array indirect", iter.isIndirect());
             std::cout << "  item " << i << " is "
                       << (iter.isIndirect() ? "in" : "")
                       << "direct" << std::endl;
@@ -276,8 +273,7 @@ static void test_0_1(QPDF& pdf, char const* arg2)
         std::cout << "/QTest is a dictionary" << std::endl;
         for (auto& iter: qtest.ditems())
         {
-            QTC::TC("qpdf", "main QTest dictionary indirect",
-                    iter.second.isIndirect() ? 1 : 0);
+            QTC::TC("qpdf", "main QTest dictionary indirect", iter.second.isIndirect());
             std::cout << "  " << iter.first << " is "
                       << (iter.second.isIndirect() ? "in" : "")
                       << "direct" << std::endl;

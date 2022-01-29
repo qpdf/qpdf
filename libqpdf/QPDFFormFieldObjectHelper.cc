@@ -240,8 +240,7 @@ QPDFFormFieldObjectHelper::getDefaultAppearance()
     std::string result;
     if (value.isString())
     {
-        QTC::TC("qpdf", "QPDFFormFieldObjectHelper DA present",
-                looked_in_acroform ? 0 : 1);
+        QTC::TC("qpdf", "QPDFFormFieldObjectHelper DA present", looked_in_acroform);
         result = value.getUTF8Value();
     }
     return result;
@@ -261,7 +260,7 @@ QPDFFormFieldObjectHelper::getQuadding()
     if (fv.isInteger())
     {
         QTC::TC("qpdf", "QPDFFormFieldObjectHelper Q present",
-                looked_in_acroform ? 0 : 1);
+                looked_in_acroform);
         result = QIntC::to_int(fv.getIntValue());
     }
     return result;
