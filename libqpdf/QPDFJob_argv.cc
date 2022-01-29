@@ -23,7 +23,7 @@ namespace
     {
       public:
         ArgParser(QPDFArgParser& ap,
-                  std::shared_ptr<QPDFJob::Config> c_main, QPDFJob& o);
+                  std::shared_ptr<QPDFJob::Config> c_main);
         void parseOptions();
 
       private:
@@ -47,7 +47,7 @@ namespace
 }
 
 ArgParser::ArgParser(QPDFArgParser& ap,
-                     std::shared_ptr<QPDFJob::Config> c_main, QPDFJob& o) :
+                     std::shared_ptr<QPDFJob::Config> c_main) :
     ap(ap),
     c_main(c_main),
     pages_password(nullptr),
@@ -495,7 +495,7 @@ QPDFJob::initializeFromArgv(int argc, char* argv[], char const* progname_env)
     }
     QPDFArgParser qap(argc, argv, progname_env);
     setMessagePrefix(qap.getProgname());
-    ArgParser ap(qap, config(), *this);
+    ArgParser ap(qap, config());
     qap.addFinalCheck(
         QPDFArgParser::bindBare(&QPDFJob::checkConfiguration, this));
     ap.parseOptions();
