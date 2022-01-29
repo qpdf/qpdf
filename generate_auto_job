@@ -44,6 +44,8 @@ class Main:
         'init': 'libqpdf/qpdf/auto_job_init.hh',
         'help': 'libqpdf/qpdf/auto_job_help.hh',
         'schema': 'libqpdf/qpdf/auto_job_schema.hh',
+        'json_decl': 'libqpdf/qpdf/auto_job_json_decl.hh',
+        'json_init': 'libqpdf/qpdf/auto_job_json_init.hh',
         # Others are added in top
     }
     SUMS = 'job.sums'
@@ -284,6 +286,14 @@ class Main:
                 print(BANNER, file=f)
                 for i in v:
                     print(i, file=f)
+        with write_file(self.DESTS['json_decl']) as f:
+            print(BANNER, file=f)
+            for i in self.json_decls:
+                print(i, file=f)
+        with write_file(self.DESTS['json_init']) as f:
+            print(BANNER, file=f)
+            for i in self.json_init:
+                print(i, file=f)
 
         # Update hashes last to ensure that this will be rerun in the
         # event of a failure.
@@ -351,6 +361,8 @@ class Main:
     def prepare(self, data):
         self.decls = []
         self.init = []
+        self.json_decls = []
+        self.json_init = []
         self.jdata = {}
 
         def add_jdata(flag, table):

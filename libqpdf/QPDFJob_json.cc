@@ -16,7 +16,7 @@ namespace
         void handle(JSON&);
 
       private:
-//#       include <qpdf/auto_job_json_decl.hh>
+#       include <qpdf/auto_job_json_decl.hh>
 
         void usage(std::string const& message);
         void initHandlers();
@@ -40,7 +40,7 @@ Handlers::Handlers(std::shared_ptr<QPDFJob::Config> c_main) :
 void
 Handlers::initHandlers()
 {
-//#       include <qpdf/auto_job_json_init.hh>
+#   include <qpdf/auto_job_json_init.hh>
     jh.addDictHandlers(
         [](std::string const&){},
         [this](std::string const&){c_main->checkConfiguration();});
