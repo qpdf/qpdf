@@ -3,6 +3,12 @@
 #include <qpdf/QTC.hh>
 #include <cstring>
 
+void
+QPDFJob::Config::checkConfiguration()
+{
+    o.checkConfiguration();
+}
+
 QPDFJob::Config*
 QPDFJob::Config::inputFile(char const* filename)
 {

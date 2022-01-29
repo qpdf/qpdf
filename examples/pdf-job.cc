@@ -35,7 +35,8 @@ int main(int argc, char* argv[])
             ->pages()
             ->pageSpec(".", "1-z")
             ->endPages()
-            ->qdf();
+            ->qdf()
+            ->checkConfiguration();
         j.run();
     }
     catch (std::exception& e)

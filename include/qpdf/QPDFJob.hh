@@ -90,8 +90,9 @@ class QPDFJob
     // Check to make sure no contradictory options have been
     // specified. This is called automatically after initializing from
     // argv or json and is also called by run, but you can call it
-    // manually as well. It throws a Usage exception if there are any
-    // errors.
+    // manually as well. It throws a QPDFUsage exception if there are
+    // any errors. This Config object (see CONFIGURATION) also has a
+    // checkConfiguration method which calls this one.
     QPDF_DLL
     void checkConfiguration();
 
@@ -272,6 +273,10 @@ class QPDFJob
     {
         friend class QPDFJob;
       public:
+        // Proxy to QPDFJob::checkConfiguration()
+        QPDF_DLL
+        void checkConfiguration();
+
         QPDF_DLL
         Config* inputFile(char const* filename);
         QPDF_DLL

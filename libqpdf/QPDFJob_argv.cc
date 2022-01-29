@@ -64,6 +64,7 @@ ArgParser::initOptionTables()
 {
 
 #   include <qpdf/auto_job_init.hh>
+    this->ap.addFinalCheck([this](){c_main->checkConfiguration();});
     // add_help is defined in auto_job_help.hh
     add_help(this->ap);
 }
@@ -496,7 +497,5 @@ QPDFJob::initializeFromArgv(int argc, char* argv[], char const* progname_env)
     QPDFArgParser qap(argc, argv, progname_env);
     setMessagePrefix(qap.getProgname());
     ArgParser ap(qap, config());
-    qap.addFinalCheck(
-        QPDFArgParser::bindBare(&QPDFJob::checkConfiguration, this));
     ap.parseOptions();
 }

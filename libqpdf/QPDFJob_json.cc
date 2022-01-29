@@ -12,7 +12,7 @@ namespace
     class Handlers
     {
       public:
-        Handlers(JSONHandler& jh, std::shared_ptr<QPDFJob::Config> c_main);
+        Handlers(std::shared_ptr<QPDFJob::Config> c_main);
         void handle(JSON&);
 
       private:
@@ -21,7 +21,7 @@ namespace
         void usage(std::string const& message);
         void initHandlers();
 
-        JSONHandler& jh;
+        JSONHandler jh;
         std::shared_ptr<QPDFJob::Config> c_main;
         std::shared_ptr<QPDFJob::CopyAttConfig> c_copy_att;
         std::shared_ptr<QPDFJob::AttConfig> c_att;
@@ -31,8 +31,7 @@ namespace
     };
 }
 
-Handlers::Handlers(JSONHandler& jh, std::shared_ptr<QPDFJob::Config> c_main) :
-    jh(jh),
+Handlers::Handlers(std::shared_ptr<QPDFJob::Config> c_main) :
     c_main(c_main)
 {
     initHandlers();
@@ -44,7 +43,7 @@ Handlers::initHandlers()
 //#       include <qpdf/auto_job_json_init.hh>
     jh.addDictHandlers(
         [](std::string const&){},
-        [](std::string const&){});
+        [this](std::string const&){c_main->checkConfiguration();});
 
     auto input = std::make_shared<JSONHandler>();
     auto input_file = std::make_shared<JSONHandler>();
@@ -118,7 +117,5 @@ QPDFJob::initializeFromJson(std::string const& json)
         throw std::runtime_error(msg.str());
     }
 
-    JSONHandler jh;
-    Handlers h(jh, config());
-    h.handle(j);
+    Handlers(config()).handle(j);
 }
