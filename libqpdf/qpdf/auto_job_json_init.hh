@@ -87,9 +87,7 @@ beginDict("inspect", bindJSON(&Handlers::beginInspect), bindBare(&Handlers::endI
 addBare("check", [this]() { c_main->check(); });
 addBare("checkLinearization", [this]() { c_main->checkLinearization(); });
 addBare("filteredStreamData", [this]() { c_main->filteredStreamData(); });
-addBare("isEncrypted", [this]() { c_main->isEncrypted(); });
 addBare("rawStreamData", [this]() { c_main->rawStreamData(); });
-addBare("requiresPassword", [this]() { c_main->requiresPassword(); });
 addBare("showEncryption", [this]() { c_main->showEncryption(); });
 addBare("showEncryptionKey", [this]() { c_main->showEncryptionKey(); });
 addBare("showLinearization", [this]() { c_main->showLinearization(); });
@@ -111,7 +109,6 @@ addChoices("keepFilesOpen", yn_choices, [this](char const* p) { c_main->keepFile
 addParameter("keepFilesOpenThreshold", [this](char const* p) { c_main->keepFilesOpenThreshold(p); });
 addBare("noWarn", [this]() { c_main->noWarn(); });
 addBare("verbose", [this]() { c_main->verbose(); });
-addBare("warningExit0", [this]() { c_main->warningExit0(); });
 addBare("ignoreXrefStreams", [this]() { c_main->ignoreXrefStreams(); });
 addBare("passwordIsHexKey", [this]() { c_main->passwordIsHexKey(); });
 addChoices("passwordMode", password_mode_choices, [this](char const* p) { c_main->passwordMode(p); });

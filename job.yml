@@ -244,6 +244,9 @@ no-json:
   - job-json-file
   - empty
   - replace-input
+  - warning-exit-0
+  - requires-password
+  - is-encrypted
 json:
   # The structure of this section defines what the json input to
   # QPDFJob looks like. If a key starts with underscore or has a value
@@ -322,9 +325,7 @@ json:
     check:
     check-linearization:
     filtered-stream-data:
-    is-encrypted:
     raw-stream-data:
-    requires-password:
     show-encryption:
     show-encryption-key:
     show-linearization:
@@ -347,7 +348,6 @@ json:
     keep-files-open-threshold:
     no-warn:
     verbose:
-    warning-exit-0:
     ignore-xref-streams:
     password-is-hex-key:
     password-mode:
