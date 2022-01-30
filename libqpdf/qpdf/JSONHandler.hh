@@ -66,7 +66,7 @@ class JSONHandler
     void addFallbackDictHandler(std::shared_ptr<JSONHandler>);
 
     QPDF_DLL
-    void addArrayHandlers(void_handler_t start_fn,
+    void addArrayHandlers(json_handler_t start_fn,
                           void_handler_t end_fn,
                           std::shared_ptr<JSONHandler> item_handlers);
 
@@ -102,7 +102,7 @@ class JSONHandler
         bool_handler_t bool_handler;
         json_handler_t dict_start_handler;
         void_handler_t dict_end_handler;
-        void_handler_t array_start_handler;
+        json_handler_t array_start_handler;
         void_handler_t array_end_handler;
         void_handler_t final_handler;
         std::map<std::string, std::shared_ptr<JSONHandler>> dict_handlers;

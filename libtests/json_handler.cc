@@ -71,8 +71,7 @@ static std::shared_ptr<JSONHandler> make_all_handler()
     auto h5s = std::make_shared<JSONHandler>();
     h->addDictKeyHandler("five", h5s);
     h5s->addArrayHandlers(
-        make_print_message("array begin"),
-        make_print_message("array end"),
+        print_json, make_print_message("array end"),
         h5);
     auto h6 = std::make_shared<JSONHandler>();
     h6->addDictHandlers(

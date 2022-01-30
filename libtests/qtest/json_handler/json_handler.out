@@ -25,7 +25,13 @@
   "three": true,
   "two": 3.14
 }
-.five: json: array begin
+.five: json: [
+  "x",
+  false,
+  "y",
+  null,
+  true
+]
 .five[0]: string: x
 .five[1]: bool: false
 .five[2]: string: y

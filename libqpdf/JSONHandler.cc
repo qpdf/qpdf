@@ -69,7 +69,7 @@ JSONHandler::addFallbackDictHandler(std::shared_ptr<JSONHandler> fdh)
 }
 
 void
-JSONHandler::addArrayHandlers(void_handler_t start_fn,
+JSONHandler::addArrayHandlers(json_handler_t start_fn,
                               void_handler_t end_fn,
                               std::shared_ptr<JSONHandler> ah)
 {
@@ -144,7 +144,7 @@ JSONHandler::handle(std::string const& path, JSON j)
     }
     if (this->m->h.array_start_handler && j.isArray())
     {
-        this->m->h.array_start_handler(path);
+        this->m->h.array_start_handler(path, j);
         size_t i = 0;
         j.forEachArrayItem([&i, &path, this](JSON v) {
             this->m->h.array_item_handler->handle(
