@@ -1,12 +1,12 @@
 static constexpr char const* JOB_SCHEMA_DATA = R"({
   "input": {
-    "fileName": "input filename",
+    "filename": "input filename",
     "password": "specify password",
     "passwordFile": "read password from a file",
     "empty": "empty input file"
   },
   "output": {
-    "fileName": "output filename",
+    "filename": "output filename",
     "replaceInput": "set to true to replace input",
     "options": {
       "qdf": "enable viewing PDF code in a text editor",
@@ -31,16 +31,15 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
       "progress": "show progress when writing",
       "splitPages": "write pages to separate files",
       "encrypt": {
-        "keyLength": "key length: 48, 128, 256",
         "userPassword": "user password",
         "ownerPassword": "owner password",
-        "40Bit": {
+        "40bit": {
           "annotate": "restrict document annotation",
           "extract": "restrict text/graphic extraction",
           "modify": "restrict document modification",
           "print": "restrict printing"
         },
-        "128Bit": {
+        "128bit": {
           "accessibility": "restrict document accessibility",
           "annotate": "restrict document annotation",
           "assemble": "restrict document assembly",
@@ -53,7 +52,7 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
           "forceV4": "force V=4 in encryption dictionary",
           "useAes": "use AES with 128-bit encryption"
         },
-        "256Bit": {
+        "256bit": {
           "accessibility": "restrict document accessibility",
           "annotate": "restrict document annotation",
           "assemble": "restrict document assembly",

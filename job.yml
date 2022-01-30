@@ -249,16 +249,20 @@ json:
   # QPDFJob looks like. If a key starts with underscore or has a value
   # that is a string, it does not map to a command-line argument. If
   # value is null, its properties and help come from other information
-  # known by generate_auto_job. This information is used to construct
-  # a "schema" (as in JSON.hh) for the json input to QPDFJob. The
-  # leading underscore is removed.
+  # known by generate_auto_job. Otherwise, it has to match a
+  # command-line option. This information is used to construct a
+  # "schema" (as in JSON.hh) for the json input to QPDFJob. The
+  # leading underscore is removed. *NOTE*: all keys are converted to
+  # camelCase for the schema and must be appear that way in the
+  # user-supplied json. This makes it more convenient to populate JSON
+  # objects in some languages.
   _input:
-    _fileName: "input filename"
+    _filename: "input filename"
     main.password:
     password-file:
     empty:
   _output:
-    _fileName: "output filename"
+    _filename: "output filename"
     _replace-input: "set to true to replace input"
     _options:
       qdf:
@@ -283,15 +287,14 @@ json:
       progress:
       split-pages:
       encrypt:
-        key-length: "key length: 48, 128, 256"
         user-password: "user password"
         owner-password: "owner password"
-        _40-bit:
+        _40bit:
           Enc40.annotate:
           Enc40.extract:
           Enc40.modify:
           Enc40.print:
-        _128-bit:
+        _128bit:
           Enc128.accessibility:
           Enc128.annotate:
           Enc128.assemble:
@@ -303,7 +306,7 @@ json:
           Enc128.print:
           force-V4:
           use-aes:
-        _256-bit:
+        _256bit:
           Enc256.accessibility:
           Enc256.annotate:
           Enc256.assemble:

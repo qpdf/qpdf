@@ -1,6 +1,7 @@
 #include <qpdf/QPDFJob.hh>
 #include <qpdf/JSONHandler.hh>
 #include <qpdf/QPDFUsage.hh>
+#include <qpdf/QUtil.hh>
 
 #include <memory>
 #include <stdexcept>
@@ -25,6 +26,7 @@ namespace
 
         typedef std::function<void()> bare_handler_t;
         typedef std::function<void(char const*)> param_handler_t;
+        typedef std::function<void(JSON)> json_handler_t;
         typedef std::function<void(std::string const& key)> setup_handler_t;
 
         void addBare(std::string const& key, bare_handler_t);
@@ -33,11 +35,12 @@ namespace
                         param_handler_t);
         void doSetup(std::string const& key, setup_handler_t);
         void beginDict(std::string const& key,
-                       bare_handler_t start_fn,
+                       json_handler_t start_fn,
                        bare_handler_t end_fn);
         void endDict();
 
         bare_handler_t bindBare(void (Handlers::*f)());
+        json_handler_t bindJSON(void (Handlers::*f)(JSON));
         setup_handler_t bindSetup(void (Handlers::*f)(std::string const&));
 
         std::list<std::shared_ptr<JSONHandler>> json_handlers;
@@ -70,6 +73,12 @@ Handlers::bindBare(void (Handlers::*f)())
     return std::bind(std::mem_fn(f), this);
 }
 
+Handlers::json_handler_t
+Handlers::bindJSON(void (Handlers::*f)(JSON))
+{
+    return std::bind(std::mem_fn(f), this, std::placeholders::_1);
+}
+
 Handlers::setup_handler_t
 Handlers::bindSetup(void (Handlers::*f)(std::string const&))
 {
@@ -82,7 +91,7 @@ Handlers::initHandlers()
     this->json_handlers.push_back(std::make_shared<JSONHandler>());
     this->jh = this->json_handlers.back().get();
     jh->addDictHandlers(
-        [](std::string const&){},
+        [](std::string const&, JSON){},
         [this](std::string const&){c_main->checkConfiguration();});
 
 #   include <qpdf/auto_job_json_init.hh>
@@ -172,12 +181,12 @@ Handlers::doSetup(std::string const& key, setup_handler_t fn)
 
 void
 Handlers::beginDict(std::string const& key,
-                    bare_handler_t start_fn,
+                    json_handler_t start_fn,
                     bare_handler_t end_fn)
 {
     auto new_jh = std::make_shared<JSONHandler>();
     new_jh->addDictHandlers(
-        [start_fn](std::string const&){ start_fn(); },
+        [start_fn](std::string const&, JSON j){ start_fn(j); },
         [end_fn](std::string const&){ end_fn(); });
     this->jh->addDictKeyHandler(key, new_jh);
     this->json_handlers.push_back(new_jh);
@@ -198,7 +207,7 @@ Handlers::handle(JSON& j)
 }
 
 void
-Handlers::beginInput()
+Handlers::beginInput(JSON)
 {
     // nothing needed
 }
@@ -210,7 +219,7 @@ Handlers::endInput()
 }
 
 void
-Handlers::setupInputFileName(std::string const& key)
+Handlers::setupInputFilename(std::string const& key)
 {
     addParameter(key, [this](char const* p) {
         c_main->inputFile(p);
@@ -232,7 +241,7 @@ Handlers::setupInputEmpty(std::string const& key)
 }
 
 void
-Handlers::beginOutput()
+Handlers::beginOutput(JSON)
 {
     // nothing needed
 }
@@ -244,7 +253,7 @@ Handlers::endOutput()
 }
 
 void
-Handlers::setupOutputFileName(std::string const& key)
+Handlers::setupOutputFilename(std::string const& key)
 {
     addParameter(key, [this](char const* p) {
         c_main->outputFile(p);
@@ -260,7 +269,7 @@ Handlers::setupOutputReplaceInput(std::string const& key)
 }
 
 void
-Handlers::beginOutputOptions()
+Handlers::beginOutputOptions(JSON)
 {
     // nothing needed
 }
@@ -272,9 +281,15 @@ Handlers::endOutputOptions()
 }
 
 void
-Handlers::beginOutputOptionsEncrypt()
+Handlers::beginOutputOptionsEncrypt(JSON)
 {
     // QXXXQ
+//    if (this->keylen_seen == 0)
+//    {
+//        usage("exactly one of 40bit, 128bit, or 256bit must be given;"
+//              " an empty dictionary may be supplied for one of them"
+//              " to set the key length without imposing any restrictions");
+//    }
 }
 
 void
@@ -284,61 +299,55 @@ Handlers::endOutputOptionsEncrypt()
 }
 
 void
-Handlers::setupOutputOptionsEncryptKeyLength(std::string const& key)
-{
-    // QXXXQ
-}
-
-void
 Handlers::setupOutputOptionsEncryptUserPassword(std::string const& key)
 {
-    // QXXXQ
+    // Key handled in beginOutputOptionsEncrypt
 }
 
 void
 Handlers::setupOutputOptionsEncryptOwnerPassword(std::string const& key)
 {
-    // QXXXQ
+    // Key handled in beginOutputOptionsEncrypt
 }
 
 void
-Handlers::beginOutputOptionsEncrypt40Bit()
+Handlers::beginOutputOptionsEncrypt40bit(JSON)
 {
-    // QXXXQ
+    // nothing needed
 }
 
 void
-Handlers::endOutputOptionsEncrypt40Bit()
+Handlers::endOutputOptionsEncrypt40bit()
 {
-    // QXXXQ
+    // nothing needed
 }
 
 void
-Handlers::beginOutputOptionsEncrypt128Bit()
+Handlers::beginOutputOptionsEncrypt128bit(JSON)
 {
-    // QXXXQ
+    // nothing needed
 }
 
 void
-Handlers::endOutputOptionsEncrypt128Bit()
+Handlers::endOutputOptionsEncrypt128bit()
 {
-    // QXXXQ
+    // nothing needed
 }
 
 void
-Handlers::beginOutputOptionsEncrypt256Bit()
+Handlers::beginOutputOptionsEncrypt256bit(JSON)
 {
-    // QXXXQ
+    // nothing needed
 }
 
 void
-Handlers::endOutputOptionsEncrypt256Bit()
+Handlers::endOutputOptionsEncrypt256bit()
 {
-    // QXXXQ
+    // nothing needed
 }
 
 void
-Handlers::beginOptions()
+Handlers::beginOptions(JSON)
 {
     // nothing needed
 }
@@ -350,7 +359,7 @@ Handlers::endOptions()
 }
 
 void
-Handlers::beginInspect()
+Handlers::beginInspect(JSON)
 {
     // nothing needed
 }
@@ -362,7 +371,7 @@ Handlers::endInspect()
 }
 
 void
-Handlers::beginTransform()
+Handlers::beginTransform(JSON)
 {
     // nothing needed
 }
@@ -374,7 +383,7 @@ Handlers::endTransform()
 }
 
 void
-Handlers::beginModify()
+Handlers::beginModify(JSON)
 {
     // nothing needed
 }
@@ -386,7 +395,7 @@ Handlers::endModify()
 }
 
 void
-Handlers::beginModifyAddAttachment()
+Handlers::beginModifyAddAttachment(JSON)
 {
     // QXXXQ
 }
@@ -400,11 +409,11 @@ Handlers::endModifyAddAttachment()
 void
 Handlers::setupModifyAddAttachmentPath(std::string const& key)
 {
-    // QXXXQ
+    // QXXXQ setup
 }
 
 void
-Handlers::beginModifyCopyAttachmentsFrom()
+Handlers::beginModifyCopyAttachmentsFrom(JSON)
 {
     // QXXXQ
 }
@@ -418,17 +427,17 @@ Handlers::endModifyCopyAttachmentsFrom()
 void
 Handlers::setupModifyCopyAttachmentsFromPath(std::string const& key)
 {
-    // QXXXQ
+    // QXXXQ setup
 }
 
 void
 Handlers::setupModifyCopyAttachmentsFromPassword(std::string const& key)
 {
-    // QXXXQ
+    // QXXXQ setup
 }
 
 void
-Handlers::beginModifyPages()
+Handlers::beginModifyPages(JSON)
 {
     // QXXXQ
 }
@@ -442,23 +451,23 @@ Handlers::endModifyPages()
 void
 Handlers::setupModifyPagesFile(std::string const& key)
 {
-    // QXXXQ
+    // QXXXQ setup
 }
 
 void
 Handlers::setupModifyPagesPassword(std::string const& key)
 {
-    // QXXXQ
+    // QXXXQ setup
 }
 
 void
 Handlers::setupModifyPagesRange(std::string const& key)
 {
-    // QXXXQ
+    // QXXXQ setup
 }
 
 void
-Handlers::beginModifyOverlay()
+Handlers::beginModifyOverlay(JSON)
 {
     // QXXXQ
 }
@@ -472,17 +481,17 @@ Handlers::endModifyOverlay()
 void
 Handlers::setupModifyOverlayFile(std::string const& key)
 {
-    // QXXXQ
+    // QXXXQ setup
 }
 
 void
 Handlers::setupModifyOverlayPassword(std::string const& key)
 {
-    // QXXXQ
+    // QXXXQ setup
 }
 
 void
-Handlers::beginModifyUnderlay()
+Handlers::beginModifyUnderlay(JSON)
 {
     // QXXXQ
 }
@@ -496,13 +505,13 @@ Handlers::endModifyUnderlay()
 void
 Handlers::setupModifyUnderlayFile(std::string const& key)
 {
-    // QXXXQ
+    // QXXXQ setup
 }
 
 void
 Handlers::setupModifyUnderlayPassword(std::string const& key)
 {
-    // QXXXQ
+    // QXXXQ setup
 }
 
 void

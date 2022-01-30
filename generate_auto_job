@@ -516,11 +516,11 @@ class Main:
         def build_schema(j, s, flag, path):
             if flag:
                 identifier = self.to_identifier(path, '', False)
-                self.json_decls.append(f'void begin{identifier}();')
+                self.json_decls.append(f'void begin{identifier}(JSON);')
                 self.json_decls.append(f'void end{identifier}();')
                 self.json_init.append(
                     f'beginDict("{flag}",'
-                    f' bindBare(&Handlers::begin{identifier}),'
+                    f' bindJSON(&Handlers::begin{identifier}),'
                     f' bindBare(&Handlers::end{identifier})); // {path}')
             for k, v in j.items():
                 is_trivial = False
