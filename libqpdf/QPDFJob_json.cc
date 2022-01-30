@@ -426,13 +426,13 @@ Handlers::endInspect()
 void
 Handlers::beginOptionsAddAttachmentArray(JSON)
 {
-    // QXXXQ
+    // nothing needed
 }
 
 void
 Handlers::endOptionsAddAttachmentArray()
 {
-    // QXXXQ
+    // nothing needed
 }
 
 void
@@ -459,13 +459,13 @@ Handlers::setupOptionsAddAttachmentPath(std::string const& key)
 void
 Handlers::beginOptionsCopyAttachmentsFromArray(JSON)
 {
-    // QXXXQ
+    // nothing needed
 }
 
 void
 Handlers::endOptionsCopyAttachmentsFromArray()
 {
-    // QXXXQ
+    // nothing needed
 }
 
 void
@@ -500,25 +500,50 @@ Handlers::setupOptionsCopyAttachmentsFromPassword(std::string const& key)
 void
 Handlers::beginOptionsPagesArray(JSON)
 {
-    // QXXXQ
+    this->c_pages = c_main->pages();
 }
 
 void
 Handlers::endOptionsPagesArray()
 {
-    // QXXXQ
+    c_pages->endPages();
+    c_pages = nullptr;
 }
 
 void
-Handlers::beginOptionsPages(JSON)
+Handlers::beginOptionsPages(JSON j)
 {
-    // QXXXQ
+    std::string file;
+    std::string range("1-z");
+    std::string password;
+    bool file_seen = false;
+    bool password_seen = false;
+    j.forEachDictItem([&](std::string const& key, JSON value){
+        if (key == "file")
+        {
+            file_seen = value.getString(file);
+        }
+        else if (key == "range")
+        {
+            value.getString(range);
+        }
+        else if (key == "password")
+        {
+            password_seen = value.getString(password);
+        }
+    });
+    if (! file_seen)
+    {
+        usage("file is required in page specification");
+    }
+    this->c_pages->pageSpec(
+        file, range, password_seen ? password.c_str() : nullptr);
 }
 
 void
 Handlers::endOptionsPages()
 {
-    // QXXXQ
+    // nothing needed
 }
 
 void
