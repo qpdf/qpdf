@@ -777,12 +777,19 @@ class QPDFObjectHandle
     QPDF_DLL
     QPDFDictItems ditems();
 
+    // Return true if key is present.  Keys with null values are treated as if
+    // they are not present.  This is as per the PDF spec.
     QPDF_DLL
     bool hasKey(std::string const&);
+    // Return the value for the key.  If the key is not present, null is
+    // returned.
     QPDF_DLL
     QPDFObjectHandle getKey(std::string const&);
+    // Return all keys.  Keys with null values are treated as if
+    // they are not present.  This is as per the PDF spec.
     QPDF_DLL
     std::set<std::string> getKeys();
+    // Return dictionary as a map.  Entries with null values are included.
     QPDF_DLL
     std::map<std::string, QPDFObjectHandle> getDictAsMap();
 
