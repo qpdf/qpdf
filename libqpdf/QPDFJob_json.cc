@@ -15,7 +15,7 @@ namespace
     class Handlers
     {
       public:
-        Handlers(std::shared_ptr<QPDFJob::Config> c_main);
+        Handlers(bool partial, std::shared_ptr<QPDFJob::Config> c_main);
         void handle(JSON&);
 
       private:
@@ -47,6 +47,7 @@ namespace
         setup_handler_t bindSetup(void (Handlers::*f)(std::string const&));
 
         std::list<std::shared_ptr<JSONHandler>> json_handlers;
+        bool partial;
         JSONHandler* jh; // points to last of json_handlers
         std::shared_ptr<QPDFJob::Config> c_main;
         std::shared_ptr<QPDFJob::CopyAttConfig> c_copy_att;
@@ -57,7 +58,8 @@ namespace
     };
 }
 
-Handlers::Handlers(std::shared_ptr<QPDFJob::Config> c_main) :
+Handlers::Handlers(bool partial, std::shared_ptr<QPDFJob::Config> c_main) :
+    partial(partial),
     jh(nullptr),
     c_main(c_main)
 {
@@ -95,7 +97,12 @@ Handlers::initHandlers()
     this->jh = this->json_handlers.back().get();
     jh->addDictHandlers(
         [](std::string const&, JSON){},
-        [this](std::string const&){c_main->checkConfiguration();});
+        [this](std::string const&){
+            if (! this->partial)
+            {
+                c_main->checkConfiguration();
+            }
+        });
 
 #   include <qpdf/auto_job_json_init.hh>
 
@@ -623,7 +630,7 @@ Handlers::setupOptionsUnderlayPassword(std::string const& key)
 }
 
 void
-QPDFJob::initializeFromJson(std::string const& json)
+QPDFJob::initializeFromJson(std::string const& json, bool partial)
 {
     std::list<std::string> errors;
     JSON j = JSON::parse(json);
@@ -639,5 +646,5 @@ QPDFJob::initializeFromJson(std::string const& json)
         throw std::runtime_error(msg.str());
     }
 
-    Handlers(config()).handle(j);
+    Handlers(partial, config()).handle(j);
 }

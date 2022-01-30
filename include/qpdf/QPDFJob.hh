@@ -73,8 +73,20 @@ class QPDFJob
     void initializeFromArgv(int argc, char* argv[],
                             char const* progname_env = nullptr);
 
+    // Initialize a QPDFJob from json. Passing partial = true prevents
+    // this method from doing the final checks (calling
+    // checkConfiguration) after processing the json file. This makes
+    // it possible to initialze QPDFJob in stages using multiple json
+    // files or to have a json file that can be processed from the CLI
+    // with --job-json-file and be combined with other arguments. For
+    // example, you might include only encryption parameters, leaving
+    // it up to the rest of the command-line arguments to provide
+    // input and output files. initializeFromJson is called with
+    // partial = true when invoked from the command line. To make sure
+    // that the json file is fully valid on its own, just don't
+    // specify any other command-line flags.
     QPDF_DLL
-    void initializeFromJson(std::string const& json);
+    void initializeFromJson(std::string const& json, bool partial = false);
 
     // Set name that is used to prefix verbose messages, progress
     // messages, and other things that the library writes to output

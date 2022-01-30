@@ -730,7 +730,7 @@ QPDFJob::Config::jobJsonFile(char const* parameter)
     QUtil::read_file_into_memory(parameter, file_buf, size);
     try
     {
-        o.initializeFromJson(std::string(file_buf.getPointer(), size));
+        o.initializeFromJson(std::string(file_buf.getPointer(), size), true);
     }
     catch (std::exception& e)
     {
