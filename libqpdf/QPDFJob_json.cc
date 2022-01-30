@@ -229,7 +229,9 @@ Handlers::setupInputFilename(std::string const& key)
 void
 Handlers::setupInputPassword(std::string const& key)
 {
-    // QXXXQ
+    addParameter(key, [this](char const* p) {
+        c_main->password(p);
+    });
 }
 
 void
@@ -281,21 +283,53 @@ Handlers::endOutputOptions()
 }
 
 void
-Handlers::beginOutputOptionsEncrypt(JSON)
+Handlers::beginOutputOptionsEncrypt(JSON j)
 {
-    // QXXXQ
-//    if (this->keylen_seen == 0)
-//    {
-//        usage("exactly one of 40bit, 128bit, or 256bit must be given;"
-//              " an empty dictionary may be supplied for one of them"
-//              " to set the key length without imposing any restrictions");
-//    }
+    // This method is only called if the overall JSON structure
+    // matches the schema, so we already know that keys that are
+    // present have the right types.
+    int key_len = 0;
+    std::string user_password;
+    std::string owner_password;
+    bool user_password_seen = false;
+    bool owner_password_seen = false;
+    j.forEachDictItem([&](std::string const& key, JSON value){
+        if ((key == "40bit") || (key == "128bit") || (key == "256bit"))
+        {
+            if (key_len != 0)
+            {
+                usage("exactly one of 40bit, 128bit, or 256bit must be given");
+            }
+            key_len = QUtil::string_to_int(key.c_str());
+        }
+        else if (key == "userPassword")
+        {
+            user_password_seen = value.getString(user_password);
+        }
+        else if (key == "ownerPassword")
+        {
+            owner_password_seen = value.getString(owner_password);
+        }
+    });
+    if (key_len == 0)
+    {
+        usage("exactly one of 40bit, 128bit, or 256bit must be given;"
+              " an empty dictionary may be supplied for one of them"
+              " to set the key length without imposing any restrictions");
+    }
+    if (! (user_password_seen && owner_password_seen))
+    {
+        usage("the user and owner password are both required; use the empty"
+              " string for the user password if you don't want a password");
+    }
+    this->c_enc = c_main->encrypt(key_len, user_password, owner_password);
 }
 
 void
 Handlers::endOutputOptionsEncrypt()
 {
-    // QXXXQ
+    this->c_enc->endEncrypt();
+    this->c_enc = nullptr;
 }
 
 void
@@ -371,147 +405,141 @@ Handlers::endInspect()
 }
 
 void
-Handlers::beginTransform(JSON)
+Handlers::beginOptionsAddAttachment(JSON)
 {
-    // nothing needed
+    this->c_att = c_main->addAttachment();
 }
 
 void
-Handlers::endTransform()
+Handlers::endOptionsAddAttachment()
 {
-    // nothing needed
+    this->c_att->endAddAttachment();
+    this->c_att = nullptr;
 }
 
 void
-Handlers::beginModify(JSON)
+Handlers::setupOptionsAddAttachmentPath(std::string const& key)
 {
-    // nothing needed
+    addParameter(key, [this](char const* p) {
+        c_att->path(p);
+    });
 }
 
 void
-Handlers::endModify()
+Handlers::beginOptionsCopyAttachmentsFrom(JSON)
 {
-    // nothing needed
+    this->c_copy_att = c_main->copyAttachmentsFrom();
 }
 
 void
-Handlers::beginModifyAddAttachment(JSON)
+Handlers::endOptionsCopyAttachmentsFrom()
+{
+    this->c_copy_att->endCopyAttachmentsFrom();
+    this->c_copy_att = nullptr;
+}
+
+void
+Handlers::setupOptionsCopyAttachmentsFromPath(std::string const& key)
+{
+    addParameter(key, [this](char const* p) {
+        c_copy_att->path(p);
+    });
+}
+
+void
+Handlers::setupOptionsCopyAttachmentsFromPassword(std::string const& key)
+{
+    addParameter(key, [this](char const* p) {
+        c_copy_att->password(p);
+    });
+}
+
+void
+Handlers::beginOptionsPages(JSON)
 {
     // QXXXQ
 }
 
 void
-Handlers::endModifyAddAttachment()
+Handlers::endOptionsPages()
 {
     // QXXXQ
 }
 
 void
-Handlers::setupModifyAddAttachmentPath(std::string const& key)
+Handlers::setupOptionsPagesFile(std::string const& key)
 {
-    // QXXXQ setup
+    // handled in beginOptionsPages
 }
 
 void
-Handlers::beginModifyCopyAttachmentsFrom(JSON)
+Handlers::setupOptionsPagesPassword(std::string const& key)
 {
-    // QXXXQ
+    // handled in beginOptionsPages
 }
 
 void
-Handlers::endModifyCopyAttachmentsFrom()
+Handlers::setupOptionsPagesRange(std::string const& key)
 {
-    // QXXXQ
+    // handled in beginOptionsPages
 }
 
 void
-Handlers::setupModifyCopyAttachmentsFromPath(std::string const& key)
+Handlers::beginOptionsOverlay(JSON)
 {
-    // QXXXQ setup
+    this->c_uo = c_main->overlay();
 }
 
 void
-Handlers::setupModifyCopyAttachmentsFromPassword(std::string const& key)
+Handlers::endOptionsOverlay()
 {
-    // QXXXQ setup
+    c_uo->endUnderlayOverlay();
+    c_uo = nullptr;
 }
 
 void
-Handlers::beginModifyPages(JSON)
+Handlers::setupOptionsOverlayFile(std::string const& key)
 {
-    // QXXXQ
+    addParameter(key, [this](char const* p) {
+        c_uo->path(p);
+    });
 }
 
 void
-Handlers::endModifyPages()
+Handlers::setupOptionsOverlayPassword(std::string const& key)
 {
-    // QXXXQ
+    addParameter(key, [this](char const* p) {
+        c_uo->password(p);
+    });
 }
 
 void
-Handlers::setupModifyPagesFile(std::string const& key)
+Handlers::beginOptionsUnderlay(JSON)
 {
-    // QXXXQ setup
+    this->c_uo = c_main->underlay();
 }
 
 void
-Handlers::setupModifyPagesPassword(std::string const& key)
+Handlers::endOptionsUnderlay()
 {
-    // QXXXQ setup
+    c_uo->endUnderlayOverlay();
+    c_uo = nullptr;
 }
 
 void
-Handlers::setupModifyPagesRange(std::string const& key)
+Handlers::setupOptionsUnderlayFile(std::string const& key)
 {
-    // QXXXQ setup
+    addParameter(key, [this](char const* p) {
+        c_uo->path(p);
+    });
 }
 
 void
-Handlers::beginModifyOverlay(JSON)
+Handlers::setupOptionsUnderlayPassword(std::string const& key)
 {
-    // QXXXQ
-}
-
-void
-Handlers::endModifyOverlay()
-{
-    // QXXXQ
-}
-
-void
-Handlers::setupModifyOverlayFile(std::string const& key)
-{
-    // QXXXQ setup
-}
-
-void
-Handlers::setupModifyOverlayPassword(std::string const& key)
-{
-    // QXXXQ setup
-}
-
-void
-Handlers::beginModifyUnderlay(JSON)
-{
-    // QXXXQ
-}
-
-void
-Handlers::endModifyUnderlay()
-{
-    // QXXXQ
-}
-
-void
-Handlers::setupModifyUnderlayFile(std::string const& key)
-{
-    // QXXXQ setup
-}
-
-void
-Handlers::setupModifyUnderlayPassword(std::string const& key)
-{
-    // QXXXQ setup
+    addParameter(key, [this](char const* p) {
+        c_uo->password(p);
+    });
 }
 
 void

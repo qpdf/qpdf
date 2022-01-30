@@ -318,19 +318,6 @@ json:
           Enc256.print:
           allow-insecure:
           force-R5:
-  _options:
-    allow-weak-crypto:
-    deterministic-id:
-    keep-files-open:
-    keep-files-open-threshold:
-    no-warn:
-    verbose:
-    warning-exit-0:
-    ignore-xref-streams:
-    password-is-hex-key:
-    password-mode:
-    suppress-password-recovery:
-    suppress-recovery:
   _inspect:
     check:
     check-linearization:
@@ -353,13 +340,24 @@ json:
       - null
     json-object:
       - null
-  _transform:
+  _options:
+    allow-weak-crypto:
+    deterministic-id:
+    keep-files-open:
+    keep-files-open-threshold:
+    no-warn:
+    verbose:
+    warning-exit-0:
+    ignore-xref-streams:
+    password-is-hex-key:
+    password-mode:
+    suppress-password-recovery:
+    suppress-recovery:
     coalesce-contents:
     compression-level:
     externalize-inline-images:
     ii-min-bytes:
     remove-unreferenced-resources:
-  _modify:
     add-attachment:
       - path: "attachment to add"
         creationdate:

@@ -68,20 +68,6 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
       }
     }
   },
-  "options": {
-    "allowWeakCrypto": "allow insecure cryptographic algorithms",
-    "deterministicId": "generate ID deterministically",
-    "keepFilesOpen": "manage keeping multiple files open",
-    "keepFilesOpenThreshold": "set threshold for keepFilesOpen",
-    "noWarn": "suppress printing of warning messages",
-    "verbose": "print additional information",
-    "warningExit0": "exit 0 even with warnings",
-    "ignoreXrefStreams": "use xref tables rather than streams",
-    "passwordIsHexKey": "provide hex-encoded encryption key",
-    "passwordMode": "tweak how qpdf encodes passwords",
-    "suppressPasswordRecovery": "don't try different password encodings",
-    "suppressRecovery": "suppress error recovery"
-  },
   "inspect": {
     "check": "partially check whether PDF is valid",
     "checkLinearization": "check linearization tables",
@@ -107,14 +93,24 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
       null
     ]
   },
-  "transform": {
+  "options": {
+    "allowWeakCrypto": "allow insecure cryptographic algorithms",
+    "deterministicId": "generate ID deterministically",
+    "keepFilesOpen": "manage keeping multiple files open",
+    "keepFilesOpenThreshold": "set threshold for keepFilesOpen",
+    "noWarn": "suppress printing of warning messages",
+    "verbose": "print additional information",
+    "warningExit0": "exit 0 even with warnings",
+    "ignoreXrefStreams": "use xref tables rather than streams",
+    "passwordIsHexKey": "provide hex-encoded encryption key",
+    "passwordMode": "tweak how qpdf encodes passwords",
+    "suppressPasswordRecovery": "don't try different password encodings",
+    "suppressRecovery": "suppress error recovery",
     "coalesceContents": "combine content streams",
     "compressionLevel": "set compression level for flate",
     "externalizeInlineImages": "convert inline to regular images",
     "iiMinBytes": "set minimum size for externalizeInlineImages",
-    "removeUnreferencedResources": "remove unreferenced page resources"
-  },
-  "modify": {
+    "removeUnreferencedResources": "remove unreferenced page resources",
     "addAttachment": [
       {
         "path": "attachment to add",

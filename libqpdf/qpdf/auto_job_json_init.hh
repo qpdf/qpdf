@@ -83,20 +83,6 @@ endDict(); // .output.options.encrypt.256bit
 endDict(); // .output.options.encrypt
 endDict(); // .output.options
 endDict(); // .output
-beginDict("options", bindJSON(&Handlers::beginOptions), bindBare(&Handlers::endOptions)); // .options
-addBare("allowWeakCrypto", [this]() { c_main->allowWeakCrypto(); });
-addBare("deterministicId", [this]() { c_main->deterministicId(); });
-addChoices("keepFilesOpen", yn_choices, [this](char const* p) { c_main->keepFilesOpen(p); });
-addParameter("keepFilesOpenThreshold", [this](char const* p) { c_main->keepFilesOpenThreshold(p); });
-addBare("noWarn", [this]() { c_main->noWarn(); });
-addBare("verbose", [this]() { c_main->verbose(); });
-addBare("warningExit0", [this]() { c_main->warningExit0(); });
-addBare("ignoreXrefStreams", [this]() { c_main->ignoreXrefStreams(); });
-addBare("passwordIsHexKey", [this]() { c_main->passwordIsHexKey(); });
-addChoices("passwordMode", password_mode_choices, [this](char const* p) { c_main->passwordMode(p); });
-addBare("suppressPasswordRecovery", [this]() { c_main->suppressPasswordRecovery(); });
-addBare("suppressRecovery", [this]() { c_main->suppressRecovery(); });
-endDict(); // .options
 beginDict("inspect", bindJSON(&Handlers::beginInspect), bindBare(&Handlers::endInspect)); // .inspect
 addBare("check", [this]() { c_main->check(); });
 addBare("checkLinearization", [this]() { c_main->checkLinearization(); });
@@ -118,16 +104,26 @@ addBare("json", [this]() { c_main->json(); });
 addChoices("jsonKey", json_key_choices, [this](char const* p) { c_main->jsonKey(p); });
 addParameter("jsonObject", [this](char const* p) { c_main->jsonObject(p); });
 endDict(); // .inspect
-beginDict("transform", bindJSON(&Handlers::beginTransform), bindBare(&Handlers::endTransform)); // .transform
+beginDict("options", bindJSON(&Handlers::beginOptions), bindBare(&Handlers::endOptions)); // .options
+addBare("allowWeakCrypto", [this]() { c_main->allowWeakCrypto(); });
+addBare("deterministicId", [this]() { c_main->deterministicId(); });
+addChoices("keepFilesOpen", yn_choices, [this](char const* p) { c_main->keepFilesOpen(p); });
+addParameter("keepFilesOpenThreshold", [this](char const* p) { c_main->keepFilesOpenThreshold(p); });
+addBare("noWarn", [this]() { c_main->noWarn(); });
+addBare("verbose", [this]() { c_main->verbose(); });
+addBare("warningExit0", [this]() { c_main->warningExit0(); });
+addBare("ignoreXrefStreams", [this]() { c_main->ignoreXrefStreams(); });
+addBare("passwordIsHexKey", [this]() { c_main->passwordIsHexKey(); });
+addChoices("passwordMode", password_mode_choices, [this](char const* p) { c_main->passwordMode(p); });
+addBare("suppressPasswordRecovery", [this]() { c_main->suppressPasswordRecovery(); });
+addBare("suppressRecovery", [this]() { c_main->suppressRecovery(); });
 addBare("coalesceContents", [this]() { c_main->coalesceContents(); });
 addParameter("compressionLevel", [this](char const* p) { c_main->compressionLevel(p); });
 addBare("externalizeInlineImages", [this]() { c_main->externalizeInlineImages(); });
 addParameter("iiMinBytes", [this](char const* p) { c_main->iiMinBytes(p); });
 addChoices("removeUnreferencedResources", remove_unref_choices, [this](char const* p) { c_main->removeUnreferencedResources(p); });
-endDict(); // .transform
-beginDict("modify", bindJSON(&Handlers::beginModify), bindBare(&Handlers::endModify)); // .modify
-beginDict("addAttachment", bindJSON(&Handlers::beginModifyAddAttachment), bindBare(&Handlers::endModifyAddAttachment)); // .modify.addAttachment
-doSetup("path", bindSetup(&Handlers::setupModifyAddAttachmentPath));
+beginDict("addAttachment", bindJSON(&Handlers::beginOptionsAddAttachment), bindBare(&Handlers::endOptionsAddAttachment)); // .options.addAttachment
+doSetup("path", bindSetup(&Handlers::setupOptionsAddAttachmentPath));
 addParameter("creationdate", [this](char const* p) { c_att->creationdate(p); });
 addParameter("description", [this](char const* p) { c_att->description(p); });
 addParameter("filename", [this](char const* p) { c_att->filename(p); });
@@ -135,13 +131,13 @@ addParameter("key", [this](char const* p) { c_att->key(p); });
 addParameter("mimetype", [this](char const* p) { c_att->mimetype(p); });
 addParameter("moddate", [this](char const* p) { c_att->moddate(p); });
 addBare("replace", [this]() { c_att->replace(); });
-endDict(); // .modify.addAttachment
+endDict(); // .options.addAttachment
 addParameter("removeAttachment", [this](char const* p) { c_main->removeAttachment(p); });
-beginDict("copyAttachmentsFrom", bindJSON(&Handlers::beginModifyCopyAttachmentsFrom), bindBare(&Handlers::endModifyCopyAttachmentsFrom)); // .modify.copyAttachmentsFrom
-doSetup("path", bindSetup(&Handlers::setupModifyCopyAttachmentsFromPath));
-doSetup("password", bindSetup(&Handlers::setupModifyCopyAttachmentsFromPassword));
+beginDict("copyAttachmentsFrom", bindJSON(&Handlers::beginOptionsCopyAttachmentsFrom), bindBare(&Handlers::endOptionsCopyAttachmentsFrom)); // .options.copyAttachmentsFrom
+doSetup("path", bindSetup(&Handlers::setupOptionsCopyAttachmentsFromPath));
+doSetup("password", bindSetup(&Handlers::setupOptionsCopyAttachmentsFromPassword));
 addParameter("prefix", [this](char const* p) { c_copy_att->prefix(p); });
-endDict(); // .modify.copyAttachmentsFrom
+endDict(); // .options.copyAttachmentsFrom
 addParameter("collate", [this](char const* p) { c_main->collate(p); });
 addChoices("flattenAnnotations", flatten_choices, [this](char const* p) { c_main->flattenAnnotations(p); });
 addBare("flattenRotation", [this]() { c_main->flattenRotation(); });
@@ -151,25 +147,25 @@ addParameter("oiMinArea", [this](char const* p) { c_main->oiMinArea(p); });
 addParameter("oiMinHeight", [this](char const* p) { c_main->oiMinHeight(p); });
 addParameter("oiMinWidth", [this](char const* p) { c_main->oiMinWidth(p); });
 addBare("optimizeImages", [this]() { c_main->optimizeImages(); });
-beginDict("pages", bindJSON(&Handlers::beginModifyPages), bindBare(&Handlers::endModifyPages)); // .modify.pages
-doSetup("file", bindSetup(&Handlers::setupModifyPagesFile));
-doSetup("password", bindSetup(&Handlers::setupModifyPagesPassword));
-doSetup("range", bindSetup(&Handlers::setupModifyPagesRange));
-endDict(); // .modify.pages
+beginDict("pages", bindJSON(&Handlers::beginOptionsPages), bindBare(&Handlers::endOptionsPages)); // .options.pages
+doSetup("file", bindSetup(&Handlers::setupOptionsPagesFile));
+doSetup("password", bindSetup(&Handlers::setupOptionsPagesPassword));
+doSetup("range", bindSetup(&Handlers::setupOptionsPagesRange));
+endDict(); // .options.pages
 addBare("removePageLabels", [this]() { c_main->removePageLabels(); });
 addParameter("rotate", [this](char const* p) { c_main->rotate(p); });
-beginDict("overlay", bindJSON(&Handlers::beginModifyOverlay), bindBare(&Handlers::endModifyOverlay)); // .modify.overlay
-doSetup("file", bindSetup(&Handlers::setupModifyOverlayFile));
-doSetup("password", bindSetup(&Handlers::setupModifyOverlayPassword));
+beginDict("overlay", bindJSON(&Handlers::beginOptionsOverlay), bindBare(&Handlers::endOptionsOverlay)); // .options.overlay
+doSetup("file", bindSetup(&Handlers::setupOptionsOverlayFile));
+doSetup("password", bindSetup(&Handlers::setupOptionsOverlayPassword));
 addParameter("from", [this](char const* p) { c_uo->from(p); });
 addParameter("repeat", [this](char const* p) { c_uo->repeat(p); });
 addParameter("to", [this](char const* p) { c_uo->to(p); });
-endDict(); // .modify.overlay
-beginDict("underlay", bindJSON(&Handlers::beginModifyUnderlay), bindBare(&Handlers::endModifyUnderlay)); // .modify.underlay
-doSetup("file", bindSetup(&Handlers::setupModifyUnderlayFile));
-doSetup("password", bindSetup(&Handlers::setupModifyUnderlayPassword));
+endDict(); // .options.overlay
+beginDict("underlay", bindJSON(&Handlers::beginOptionsUnderlay), bindBare(&Handlers::endOptionsUnderlay)); // .options.underlay
+doSetup("file", bindSetup(&Handlers::setupOptionsUnderlayFile));
+doSetup("password", bindSetup(&Handlers::setupOptionsUnderlayPassword));
 addParameter("from", [this](char const* p) { c_uo->from(p); });
 addParameter("repeat", [this](char const* p) { c_uo->repeat(p); });
 addParameter("to", [this](char const* p) { c_uo->to(p); });
-endDict(); // .modify.underlay
-endDict(); // .modify
+endDict(); // .options.underlay
+endDict(); // .options
