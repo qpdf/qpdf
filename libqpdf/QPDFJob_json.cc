@@ -37,7 +37,10 @@ namespace
         void beginDict(std::string const& key,
                        json_handler_t start_fn,
                        bare_handler_t end_fn);
-        void endDict();
+        void beginArray(std::string const& key,
+                        json_handler_t start_fn,
+                        bare_handler_t end_fn);
+        void endContainer();
 
         bare_handler_t bindBare(void (Handlers::*f)());
         json_handler_t bindJSON(void (Handlers::*f)(JSON));
@@ -194,7 +197,23 @@ Handlers::beginDict(std::string const& key,
 }
 
 void
-Handlers::endDict()
+Handlers::beginArray(std::string const& key,
+                     json_handler_t start_fn,
+                     bare_handler_t end_fn)
+{
+    auto new_jh = std::make_shared<JSONHandler>();
+    auto item_jh = std::make_shared<JSONHandler>();
+    new_jh->addArrayHandlers(
+        [start_fn](std::string const&, JSON j){ start_fn(j); },
+        [end_fn](std::string const&){ end_fn(); },
+        item_jh);
+    this->jh->addDictKeyHandler(key, new_jh);
+    this->json_handlers.push_back(item_jh);
+    this->jh = item_jh.get();
+}
+
+void
+Handlers::endContainer()
 {
     this->json_handlers.pop_back();
     this->jh = this->json_handlers.back().get();
@@ -405,6 +424,18 @@ Handlers::endInspect()
 }
 
 void
+Handlers::beginOptionsAddAttachmentArray(JSON)
+{
+    // QXXXQ
+}
+
+void
+Handlers::endOptionsAddAttachmentArray()
+{
+    // QXXXQ
+}
+
+void
 Handlers::beginOptionsAddAttachment(JSON)
 {
     this->c_att = c_main->addAttachment();
@@ -423,6 +454,18 @@ Handlers::setupOptionsAddAttachmentPath(std::string const& key)
     addParameter(key, [this](char const* p) {
         c_att->path(p);
     });
+}
+
+void
+Handlers::beginOptionsCopyAttachmentsFromArray(JSON)
+{
+    // QXXXQ
+}
+
+void
+Handlers::endOptionsCopyAttachmentsFromArray()
+{
+    // QXXXQ
 }
 
 void
@@ -452,6 +495,18 @@ Handlers::setupOptionsCopyAttachmentsFromPassword(std::string const& key)
     addParameter(key, [this](char const* p) {
         c_copy_att->password(p);
     });
+}
+
+void
+Handlers::beginOptionsPagesArray(JSON)
+{
+    // QXXXQ
+}
+
+void
+Handlers::endOptionsPagesArray()
+{
+    // QXXXQ
 }
 
 void

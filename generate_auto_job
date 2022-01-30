@@ -562,8 +562,21 @@ class Main:
                     if isinstance(v[0], dict):
                         is_dict = True
                         schema_value = [{}]
+                        subpath = f'{path}.{schema_key}'
+                        identifier = self.to_identifier(subpath, '', False)
+                        self.json_decls.append(
+                            f'void begin{identifier}Array(JSON);')
+                        self.json_decls.append(
+                            f'void end{identifier}Array();')
+                        self.json_init.append(
+                            f'beginArray("{flag}",'
+                            f' bindJSON(&Handlers::begin{identifier}Array),'
+                            f' bindBare(&Handlers::end{identifier}Array));'
+                            f' // {subpath}[]')
                         build_schema(v[0], schema_value[0],
-                                     schema_key, f'{path}.{schema_key}')
+                                     schema_key, subpath)
+                        self.json_init.append(
+                            f'endContainer(); // {subpath}[]')
                 elif schema_value is None:
                     raise Exception(f'unknown schema value for {k}')
                 s[schema_key] = schema_value
@@ -573,7 +586,7 @@ class Main:
                     else:
                         self.handle_json_manual(schema_key, path)
             if flag:
-                self.json_init.append(f'endDict(); // {path}')
+                self.json_init.append(f'endContainer(); // {path}')
 
         build_schema(data['json'], self.schema, '', '')
         if options_seen != set(expected.keys()):
