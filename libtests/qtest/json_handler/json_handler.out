@@ -1,7 +1,30 @@
 -- scalar --
 .: string: potato
 -- all --
-.: json: dict begin
+.: json: {
+  "five": [
+    "x",
+    false,
+    "y",
+    null,
+    true
+  ],
+  "four": [
+    "a",
+    1
+  ],
+  "one": "potato",
+  "phour": null,
+  "six": {
+    "a": {
+      "Q": "baaa",
+      "b": "quack"
+    },
+    "b": "moo"
+  },
+  "three": true,
+  "two": 3.14
+}
 .five: json: array begin
 .five[0]: string: x
 .five[1]: bool: false
@@ -15,8 +38,17 @@
 ]
 .one: string: potato
 .phour: json: null
-.six: json: dict begin
-.six.a: json: dict begin
+.six: json: {
+  "a": {
+    "Q": "baaa",
+    "b": "quack"
+  },
+  "b": "moo"
+}
+.six.a: json: {
+  "Q": "baaa",
+  "b": "quack"
+}
 .six.a.Q: json: "baaa"
 .six.a.b: string: quack
 .six.a: json: dict end
@@ -27,5 +59,7 @@
 .: json: dict end
 -- errors --
 bad type at top: JSON handler: value at . is not of expected type
-.: json: dict begin
+.: json: {
+  "x": "y"
+}
 unexpected key: JSON handler found unexpected key x in object at .

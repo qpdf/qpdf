@@ -58,7 +58,7 @@ class JSONHandler
     void addBoolHandler(bool_handler_t fn);
 
     QPDF_DLL
-    void addDictHandlers(void_handler_t start_fn, void_handler_t end_fn);
+    void addDictHandlers(json_handler_t start_fn, void_handler_t end_fn);
     QPDF_DLL
     void addDictKeyHandler(
         std::string const& key, std::shared_ptr<JSONHandler>);
@@ -100,7 +100,7 @@ class JSONHandler
         string_handler_t string_handler;
         string_handler_t number_handler;
         bool_handler_t bool_handler;
-        void_handler_t dict_start_handler;
+        json_handler_t dict_start_handler;
         void_handler_t dict_end_handler;
         void_handler_t array_start_handler;
         void_handler_t array_end_handler;

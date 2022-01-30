@@ -49,7 +49,7 @@ JSONHandler::addBoolHandler(bool_handler_t fn)
 }
 
 void
-JSONHandler::addDictHandlers(void_handler_t start_fn, void_handler_t end_fn)
+JSONHandler::addDictHandlers(json_handler_t start_fn, void_handler_t end_fn)
 {
     this->m->h.dict_start_handler = start_fn;
     this->m->h.dict_end_handler = end_fn;
@@ -111,7 +111,7 @@ JSONHandler::handle(std::string const& path, JSON j)
     }
     if (this->m->h.dict_start_handler && j.isDictionary())
     {
-        this->m->h.dict_start_handler(path);
+        this->m->h.dict_start_handler(path, j);
         std::string path_base = path;
         if (path_base != ".")
         {

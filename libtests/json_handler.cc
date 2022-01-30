@@ -49,8 +49,7 @@ static std::shared_ptr<JSONHandler> make_all_handler()
 {
     auto h = std::make_shared<JSONHandler>();
     h->addDictHandlers(
-        make_print_message("dict begin"),
-        make_print_message("dict end"));
+        print_json, make_print_message("dict end"));
     auto h1 = std::make_shared<JSONHandler>();
     h1->addStringHandler(print_string);
     h->addDictKeyHandler("one", h1);
@@ -77,13 +76,11 @@ static std::shared_ptr<JSONHandler> make_all_handler()
         h5);
     auto h6 = std::make_shared<JSONHandler>();
     h6->addDictHandlers(
-        make_print_message("dict begin"),
-        make_print_message("dict end"));
+        print_json, make_print_message("dict end"));
     auto h6a = std::make_shared<JSONHandler>();
     h6->addDictKeyHandler("a", h6a);
     h6a->addDictHandlers(
-        make_print_message("dict begin"),
-        make_print_message("dict end"));
+        print_json, make_print_message("dict end"));
     auto h6ab = std::make_shared<JSONHandler>();
     h6a->addDictKeyHandler("b", h6ab);
     auto h6ax = std::make_shared<JSONHandler>();
