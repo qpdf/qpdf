@@ -1,0 +1,10 @@
+
+qpdf: error with job-json file bad-json-encrypt-no-key-length.json: exactly one of 40bit, 128bit, or 256bit must be given; an empty dictionary may be supplied for one of them to set the key length without imposing any restrictions
+Run qpdf--job-json-help for information on the file format.
+
+For help:
+  qpdf--help=usage       usage information
+  qpdf--help=topic       help on a topic
+  qpdf--help=--option    help on an option
+  qpdf--help             general help and a topic list
+

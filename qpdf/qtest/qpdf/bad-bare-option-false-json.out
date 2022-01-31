@@ -1,0 +1,10 @@
+
+qpdf: error with job-json file bad-json-bare-option-false.json: .output.options.qdf: value must be true
+Run qpdf--job-json-help for information on the file format.
+
+For help:
+  qpdf--help=usage       usage information
+  qpdf--help=topic       help on a topic
+  qpdf--help=--option    help on an option
+  qpdf--help             general help and a topic list
+

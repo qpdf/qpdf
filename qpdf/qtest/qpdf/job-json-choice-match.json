@@ -1,0 +1,12 @@
+{
+  "input": {
+    "file": "minimal.pdf"
+  },
+  "output": {
+    "file": "a.pdf",
+    "options": {
+      "deterministicId": true,
+      "objectStreams": "generate"
+    }
+  }
+}

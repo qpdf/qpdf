@@ -20,6 +20,8 @@
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QPDFSystemError.hh>
 #include <qpdf/QIntC.hh>
+#include <qpdf/QPDFJob.hh>
+#include <qpdf/QPDFUsage.hh>
 #include <iostream>
 #include <sstream>
 #include <algorithm>
@@ -3140,6 +3142,81 @@ static void test_82(QPDF& pdf, char const* arg2)
     assert(! str.isOrHasName("/Marvin"));
 }
 
+static void test_83(QPDF& pdf, char const* arg2)
+{
+    // Test QPDFJob json with partial = false. For testing with
+    // partial = true, we just use qpdf --job-json-file.
+
+    QPDFJob j;
+    PointerHolder<char> file_buf;
+    size_t size;
+    QUtil::read_file_into_memory(arg2, file_buf, size);
+    try
+    {
+        std::cout << "calling initializeFromJson" << std::endl;
+        j.initializeFromJson(std::string(file_buf.getPointer(), size));
+        std::cout << "called initializeFromJson" << std::endl;
+    }
+    catch (QPDFUsage& e)
+    {
+        std::cerr << "usage: " << e.what() << std::endl;
+    }
+    catch (std::exception& e)
+    {
+        std::cerr << "exception: " << e.what() << std::endl;
+    }
+}
+
+static void test_84(QPDF& pdf, char const* arg2)
+{
+    // Test QPDFJob API
+
+    std::cout << "normal" << std::endl;
+    {
+        QPDFJob j;
+        j.config()
+            ->inputFile("minimal.pdf")
+            ->outputFile("a.pdf")
+            ->qdf()
+            ->deterministicId()
+            ->objectStreams("preserve")
+            ->checkConfiguration();
+        j.run();
+    }
+
+    std::cout << "error caught by check" << std::endl;
+    try
+    {
+        QPDFJob j;
+        j.config()
+            ->outputFile("a.pdf")
+            ->qdf();
+        std::cout << "finished config" << std::endl;
+        j.checkConfiguration();
+        assert(false);
+    }
+    catch (QPDFUsage& e)
+    {
+        std::cout << "usage: " << e.what() << std::endl;
+    }
+
+    std::cout << "error caught by run" << std::endl;
+    try
+    {
+        QPDFJob j;
+        j.config()
+            ->outputFile("a.pdf")
+            ->qdf();
+        std::cout << "finished config" << std::endl;
+        j.run();
+        assert(false);
+    }
+    catch (QPDFUsage& e)
+    {
+        std::cout << "usage: " << e.what() << std::endl;
+    }
+}
+
 void runtest(int n, char const* filename1, char const* arg2)
 {
     // Most tests here are crafted to work on specific files.  Look at
@@ -3206,7 +3283,7 @@ void runtest(int n, char const* filename1, char const* arg2)
 	pdf.processMemoryFile((std::string(filename1) + ".pdf").c_str(),
                               p, size);
     }
-    else if ((n == 61) || (n == 81))
+    else if ((n == 61) || (n == 81) || (n == 83) || (n == 84))
     {
         // Ignore filename argument entirely
     }
@@ -3253,7 +3330,8 @@ void runtest(int n, char const* filename1, char const* arg2)
         {68, test_68}, {69, test_69}, {70, test_70}, {71, test_71},
         {72, test_72}, {73, test_73}, {74, test_74}, {75, test_75},
         {76, test_76}, {77, test_77}, {78, test_78}, {79, test_79},
-        {80, test_80}, {81, test_81}, {82, test_82},
+        {80, test_80}, {81, test_81}, {82, test_82}, {83, test_83},
+        {84, test_84},
     };
 
     auto fn = test_functions.find(n);

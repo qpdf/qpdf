@@ -1,0 +1,12 @@
+{
+  "output": {
+    "options": {
+      "encrypt": {
+        "userPassword": "",
+        "ownerPassword": "",
+        "256bit": {
+        }
+      }
+    }
+  }
+}

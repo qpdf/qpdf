@@ -1,0 +1,12 @@
+{
+  "input": {
+    "file": "a.pdf"
+  },
+  "output": {
+    "replaceInput": true,
+    "options": {
+      "staticId": true,
+      "objectStreams": "generate"
+    }
+  }
+}

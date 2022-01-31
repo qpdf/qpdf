@@ -1,0 +1,16 @@
+R = 6
+P = -2092
+User password = u
+Supplied password is user password
+extract for accessibility: allowed
+extract for any purpose: allowed
+print low resolution: allowed
+print high resolution: not allowed
+modify document assembly: allowed
+modify forms: allowed
+modify annotations: not allowed
+modify other: not allowed
+modify anything: not allowed
+stream encryption method: AESv3
+string encryption method: AESv3
+file encryption method: AESv3

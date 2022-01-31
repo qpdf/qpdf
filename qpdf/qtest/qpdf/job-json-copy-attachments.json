@@ -1,0 +1,26 @@
+{
+  "input": {
+    "file": "minimal.pdf"
+  },
+  "output": {
+    "file": "a.pdf",
+    "options": {
+      "staticId": true
+    }
+  },
+  "options": {
+    "copyAttachmentsFrom": [
+      {
+        "file": "job-json-add-attachments.pdf"
+      },
+      {
+        "file": "20-pages.pdf",
+        "password": "user"
+      },
+      {
+        "file": "job-json-add-attachments.pdf",
+        "prefix": "p-"
+      }
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "input": {
+    "empty": true
+  },
+  "output": {
+    "file": "a.pdf",
+    "options": {
+      "staticId": true
+    }
+  },
+  "options": {
+    "pages": [
+      {
+        "file": "minimal.pdf"
+      },
+      {
+        "file": "20-pages.pdf",
+        "password": "user",
+        "range": "1-5"
+      }
+    ]
+  }
+}

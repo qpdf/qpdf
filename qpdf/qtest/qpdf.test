@@ -372,6 +372,93 @@ foreach my $f (@dangling)
 }
 show_ntests();
 # ----------
+$td->notify("--- QPDFJob Tests ---");
+
+open(F, ">auto-txt") or die;
+print F "from file";
+close(F);
+
+my @bad_json = (
+    "bare-option-false",
+    "choice-mismatch",
+    "encrypt-duplicate-key-length",
+    "encrypt-missing-password",
+    "encrypt-no-key-length",
+    "pages-no-file",
+    "schema-error",
+    "json-error"
+    );
+my @good_json = (
+    "choice-match",
+    "input-file-password",
+    "empty-input",
+    "replace-input",
+    "encrypt-40",
+    "encrypt-128",
+    "encrypt-256-with-restrictions",
+    "add-attachments",
+    "copy-attachments",
+    "underlay-overlay",
+    "underlay-overlay-password",
+    "misc-options",
+    );
+$n_tests += 4 + scalar(@bad_json) + (2 * scalar(@good_json));
+
+
+foreach my $i (@bad_json)
+{
+    $td->runtest("QPDFJob bad json: $i",
+                 {$td->COMMAND => "qpdf --job-json-file=bad-json-$i.json"},
+                 {$td->FILE => "bad-$i-json.out", $td->EXIT_STATUS => 2},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+foreach my $i (@good_json)
+{
+    if ($i eq 'replace-input')
+    {
+        copy("minimal.pdf", 'a.pdf');
+    }
+    $td->runtest("QPDFJob good json: $i",
+                 {$td->COMMAND => "qpdf --job-json-file=job-json-$i.json"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0},
+                 $td->NORMALIZE_NEWLINES);
+    if ($i =~ m/encrypt-256/)
+    {
+        $td->runtest("check encryption $i",
+                     {$td->COMMAND =>
+                          "qpdf a.pdf --password=u" .
+                          " --job-json-file=job-show-encryption.json"},
+                     {$td->FILE => "job-json-$i.out", $td->EXIT_STATUS => 0},
+                     $td->NORMALIZE_NEWLINES);
+    }
+    else
+    {
+        $td->runtest("check good json $i output",
+                     {$td->FILE => "a.pdf"},
+                     {$td->FILE => "job-json-$i.pdf"});
+    }
+}
+
+
+$td->runtest("QPDFJob json partial",
+             {$td->COMMAND => "test_driver 83 - job-partial.json"},
+             {$td->FILE => "job-partial-json.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("QPDFJob API",
+             {$td->COMMAND => "test_driver 84 -"},
+             {$td->FILE => "job-api.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "test84.pdf"});
+$td->runtest("json output from job",
+             {$td->COMMAND => "qpdf --job-json-file=job-json-output.json"},
+             {$td->FILE => "job-json-output.out.json", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+show_ntests();
+# ----------
 $td->notify("--- Form Tests ---");
 
 my @form_tests = (

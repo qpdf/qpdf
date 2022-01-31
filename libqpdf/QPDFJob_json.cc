@@ -2,6 +2,7 @@
 #include <qpdf/JSONHandler.hh>
 #include <qpdf/QPDFUsage.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/QTC.hh>
 
 #include <memory>
 #include <stdexcept>
@@ -108,6 +109,7 @@ Handlers::addBare(bare_handler_t fn)
     jh->addBoolHandler([this, fn](std::string const& path, bool v){
         if (! v)
         {
+            QTC::TC("qpdf", "QPDFJob json bare not true");
             usage(path + ": value must be true");
         }
         else
@@ -140,12 +142,14 @@ Handlers::addChoices(char const** choices,
             {
                 if (strcmp(*i, p) == 0)
                 {
+                    QTC::TC("qpdf", "QPDFJob json choice match");
                     matches = true;
                     break;
                 }
             }
             if (! matches)
             {
+                QTC::TC("qpdf", "QPDFJob json choice mismatch");
                 std::ostringstream msg;
                 msg << path + ": unexpected value; expected one of ";
                 bool first = true;
@@ -307,6 +311,7 @@ Handlers::beginOutputOptionsEncrypt(JSON j)
         {
             if (key_len != 0)
             {
+                QTC::TC("qpdf", "QPDFJob json encrypt duplicate key length");
                 usage("exactly one of 40bit, 128bit, or 256bit must be given");
             }
             key_len = QUtil::string_to_int(key.c_str());
@@ -322,12 +327,14 @@ Handlers::beginOutputOptionsEncrypt(JSON j)
     });
     if (key_len == 0)
     {
+        QTC::TC("qpdf", "QPDFJob json encrypt no key length");
         usage("exactly one of 40bit, 128bit, or 256bit must be given;"
               " an empty dictionary may be supplied for one of them"
               " to set the key length without imposing any restrictions");
     }
     if (! (user_password_seen && owner_password_seen))
     {
+        QTC::TC("qpdf", "QPDFJob json encrypt missing password");
         usage("the user and owner password are both required; use the empty"
               " string for the user password if you don't want a password");
     }
@@ -550,6 +557,7 @@ Handlers::beginOptionsPages(JSON j)
     });
     if (! file_seen)
     {
+        QTC::TC("qpdf", "QPDFJob json pages no file");
         usage("file is required in page specification");
     }
     this->c_pages->pageSpec(

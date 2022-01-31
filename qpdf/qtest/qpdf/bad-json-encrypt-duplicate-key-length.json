@@ -1,0 +1,14 @@
+{
+  "output": {
+    "options": {
+      "encrypt": {
+        "userPassword": "",
+        "ownerPassword": "someOwnerThing",
+        "256bit": {
+        },
+        "128bit": {
+        }
+      }
+    }
+  }
+}

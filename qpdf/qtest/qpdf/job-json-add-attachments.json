@@ -1,0 +1,27 @@
+{
+  "input": {
+    "file": "minimal.pdf"
+  },
+  "output": {
+    "file": "a.pdf",
+    "options": {
+      "staticId": true
+    }
+  },
+  "options": {
+    "addAttachment": [
+      {
+        "file": "auto-txt",
+        "moddate": "D:20220131134246-05'00'",
+        "creationdate": "D:20220131134246-05'00'"
+      },
+      {
+        "file": "auto-txt",
+        "moddate": "D:20220131134246-05'00'",
+        "creationdate": "D:20220131134246-05'00'",
+        "filename": "auto2",
+        "key": "auto2-key"
+      }
+    ]
+  }
+}
