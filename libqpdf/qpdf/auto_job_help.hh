@@ -30,7 +30,8 @@ ap.addOptionHelp("--replace-input", "usage", "overwrite input with output", R"(U
 ap.addOptionHelp("--job-json-file", "usage", "job JSON file", R"(--job-json-file=file
 
 Specify the name of a file whose contents are expected to
-contain a QPDFJob json file.
+contain a QPDFJob JSON file. Run qpdf --job-json-help for a
+description of the JSON input file format.
 )");
 ap.addHelpTopic("exit-status", "meanings of qpdf's exit codes", R"(Meaning of exit codes:
 
@@ -788,15 +789,18 @@ output as binary data. Get the key with --list-attachments.
 ap.addHelpTopic("json", "JSON output for PDF information", R"(Show information about the PDF file in JSON format. Please see the
 JSON chapter in the qpdf manual for details.
 )");
-ap.addOptionHelp("--json", "json", "show file in json format", R"(--json[=version]
+ap.addOptionHelp("--json", "json", "show file in JSON format", R"(--json[=version]
 
 Generate a JSON representation of the file. This is described in
 depth in the JSON section of the manual. "version" may be a
-specific version or "latest".
+specific version or "latest". Run qpdf --json-help for a
+description of the generated JSON object.
 )");
-ap.addOptionHelp("--json-help", "json", "show format of json output", R"(Describe the format of the JSON output.
+ap.addOptionHelp("--json-help", "json", "show format of JSON output", R"(Describe the format of the JSON output by writing to standard
+output a JSON object with the same keys and with values
+containing descriptive text.
 )");
-ap.addOptionHelp("--json-key", "json", "limit which keys are in json output", R"(--json-key=key
+ap.addOptionHelp("--json-key", "json", "limit which keys are in JSON output", R"(--json-key=key
 
 This option is repeatable. If given, only the specified
 top-level keys will be included in the JSON output. Otherwise,
@@ -808,7 +812,7 @@ This option is repeatable. If given, only specified objects will
 be shown in the "objects" key of the JSON output. Otherwise, all
 objects will be shown.
 )");
-ap.addOptionHelp("--job-json-help", "json", "show format of job json", R"(Describe the format of the QPDFJob JSON input.
+ap.addOptionHelp("--job-json-help", "json", "show format of job JSON", R"(Describe the format of the QPDFJob JSON input.
 )");
 ap.addHelpTopic("testing", "options for testing or debugging", R"(The options below are useful when writing automated test code that
 includes files created by qpdf or when testing qpdf itself.

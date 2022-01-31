@@ -175,3 +175,7 @@ be aware of:
   shown as not filterable by default, but they will be shown as
   filterable if you run :command:`qpdf --json
   --decode-level=all`.
+
+- The ``encrypt`` key's values will be populated for non-encrypted
+  files. Some values will be null, and others will have values that
+  apply to unencrypted files.

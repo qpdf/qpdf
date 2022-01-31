@@ -77,9 +77,9 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
   "withImages": "include image details with showPages",
   "listAttachments": "list embedded files",
   "showAttachment": "export an embedded file",
-  "json": "show file in json format",
+  "json": "show file in JSON format",
   "jsonKey": [
-    "limit which keys are in json output"
+    "limit which keys are in JSON output"
   ],
   "jsonObject": [
     "limit which objects are in JSON"
