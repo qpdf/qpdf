@@ -426,7 +426,7 @@ ArgParser::argEnd256BitEncryption()
 void
 ArgParser::argUOPositional(char* arg)
 {
-    c_uo->path(arg);
+    c_uo->file(arg);
 }
 
 void
@@ -439,7 +439,7 @@ ArgParser::argEndUnderlayOverlay()
 void
 ArgParser::argAttPositional(char* arg)
 {
-    c_att->path(arg);
+    c_att->file(arg);
 }
 
 void
@@ -452,7 +452,7 @@ ArgParser::argEndAttachment()
 void
 ArgParser::argCopyAttPositional(char* arg)
 {
-    c_copy_att->path(arg);
+    c_copy_att->file(arg);
 }
 
 void

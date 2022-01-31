@@ -495,7 +495,11 @@ class Main:
     def build_schema(self, j, path, flag, expected, options_seen):
         if flag in expected:
             options_seen.add(flag)
-        elif not (flag == '' or flag.startswith('_') or isinstance(j, str)):
+        elif isinstance(j, str):
+            if not flag.startswith('_'):
+                raise Exception(f'json: {flag} has a description'
+                                ' but doesn\'t start with _')
+        elif not (flag == '' or flag.startswith('_')):
             raise Exception(f'json: unknown key {flag}')
 
         if isinstance(j, dict):

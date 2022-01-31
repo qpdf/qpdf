@@ -16,9 +16,9 @@ static char const* modify128_choices[] = {"all", "annotate", "form", "assembly",
 
 pushKey("input");
 beginDict(bindJSON(&Handlers::beginInput), bindBare(&Handlers::endInput)); // .input
-pushKey("filename");
-setupInputFilename();
-popHandler(); // key: filename
+pushKey("file");
+setupInputFile();
+popHandler(); // key: file
 pushKey("password");
 setupInputPassword();
 popHandler(); // key: password
@@ -31,9 +31,9 @@ popHandler(); // key: empty
 popHandler(); // key: input
 pushKey("output");
 beginDict(bindJSON(&Handlers::beginOutput), bindBare(&Handlers::endOutput)); // .output
-pushKey("filename");
-setupOutputFilename();
-popHandler(); // key: filename
+pushKey("file");
+setupOutputFile();
+popHandler(); // key: file
 pushKey("replaceInput");
 setupOutputReplaceInput();
 popHandler(); // key: replaceInput
@@ -311,9 +311,9 @@ popHandler(); // key: removeUnreferencedResources
 pushKey("addAttachment");
 beginArray(bindJSON(&Handlers::beginOptionsAddAttachmentArray), bindBare(&Handlers::endOptionsAddAttachmentArray)); // .options.addAttachment[]
 beginDict(bindJSON(&Handlers::beginOptionsAddAttachment), bindBare(&Handlers::endOptionsAddAttachment)); // .options.addAttachment
-pushKey("path");
-setupOptionsAddAttachmentPath();
-popHandler(); // key: path
+pushKey("file");
+setupOptionsAddAttachmentFile();
+popHandler(); // key: file
 pushKey("creationdate");
 addParameter([this](char const* p) { c_att->creationdate(p); });
 popHandler(); // key: creationdate
@@ -343,9 +343,9 @@ popHandler(); // key: removeAttachment
 pushKey("copyAttachmentsFrom");
 beginArray(bindJSON(&Handlers::beginOptionsCopyAttachmentsFromArray), bindBare(&Handlers::endOptionsCopyAttachmentsFromArray)); // .options.copyAttachmentsFrom[]
 beginDict(bindJSON(&Handlers::beginOptionsCopyAttachmentsFrom), bindBare(&Handlers::endOptionsCopyAttachmentsFrom)); // .options.copyAttachmentsFrom
-pushKey("path");
-setupOptionsCopyAttachmentsFromPath();
-popHandler(); // key: path
+pushKey("file");
+setupOptionsCopyAttachmentsFromFile();
+popHandler(); // key: file
 pushKey("password");
 setupOptionsCopyAttachmentsFromPassword();
 popHandler(); // key: password

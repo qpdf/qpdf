@@ -190,7 +190,7 @@ class QPDFJob
         QPDF_DLL
         Config* endAddAttachment();
         QPDF_DLL
-        AttConfig* path(char const* parameter);
+        AttConfig* file(char const* parameter);
 
 #       include <qpdf/auto_job_c_att.hh>
 
@@ -210,7 +210,7 @@ class QPDFJob
         QPDF_DLL
         Config* endCopyAttachmentsFrom();
         QPDF_DLL
-        CopyAttConfig* path(char const* parameter);
+        CopyAttConfig* file(char const* parameter);
 
 #       include <qpdf/auto_job_c_copy_att.hh>
 
@@ -251,7 +251,7 @@ class QPDFJob
         QPDF_DLL
         Config* endUnderlayOverlay();
         QPDF_DLL
-        UOConfig* path(char const* parameter);
+        UOConfig* file(char const* parameter);
 
 #       include <qpdf/auto_job_c_uo.hh>
 
@@ -270,7 +270,7 @@ class QPDFJob
         QPDF_DLL
         Config* endEncrypt();
         QPDF_DLL
-        EncConfig* path(char const* parameter);
+        EncConfig* file(char const* parameter);
 
 #       include <qpdf/auto_job_c_enc.hh>
 

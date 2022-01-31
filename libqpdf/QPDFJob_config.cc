@@ -761,7 +761,7 @@ QPDFJob::CopyAttConfig::CopyAttConfig(Config* c) :
 }
 
 QPDFJob::CopyAttConfig*
-QPDFJob::CopyAttConfig::path(char const* parameter)
+QPDFJob::CopyAttConfig::file(char const* parameter)
 {
     this->caf.path = parameter;
     return this;
@@ -786,7 +786,7 @@ QPDFJob::CopyAttConfig::endCopyAttachmentsFrom()
 {
     if (this->caf.path.empty())
     {
-        usage("copy attachments: no path specified");
+        usage("copy attachments: no file specified");
     }
     this->config->o.m->attachments_to_copy.push_back(this->caf);
     return this->config;
@@ -804,7 +804,7 @@ QPDFJob::Config::addAttachment()
 }
 
 QPDFJob::AttConfig*
-QPDFJob::AttConfig::path(char const* parameter)
+QPDFJob::AttConfig::file(char const* parameter)
 {
     this->att.path = parameter;
     return this;
@@ -878,12 +878,12 @@ QPDFJob::AttConfig::endAddAttachment()
         QUtil::get_current_qpdf_time());
     if (this->att.path.empty())
     {
-        usage("add attachment: no path specified");
+        usage("add attachment: no file specified");
     }
     std::string last_element = QUtil::path_basename(this->att.path);
     if (last_element.empty())
     {
-        usage("path for --add-attachment may not be empty");
+        usage("file for --add-attachment may not be empty");
     }
     if (this->att.filename.empty())
     {
@@ -972,7 +972,7 @@ QPDFJob::UOConfig::endUnderlayOverlay()
 }
 
 QPDFJob::UOConfig*
-QPDFJob::UOConfig::path(char const* parameter)
+QPDFJob::UOConfig::file(char const* parameter)
 {
     if (! config->o.m->under_overlay->filename.empty())
     {

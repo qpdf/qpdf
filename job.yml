@@ -249,23 +249,23 @@ no-json:
   - is-encrypted
 json:
   # The structure of this section defines what the json input to
-  # QPDFJob looks like. If a key starts with underscore or has a value
-  # that is a string, it does not map to a command-line argument. If
-  # value is null, its properties and help come from other information
-  # known by generate_auto_job. Otherwise, it has to match a
-  # command-line option. This information is used to construct a
-  # "schema" (as in JSON.hh) for the json input to QPDFJob. The
-  # leading underscore is removed. *NOTE*: all keys are converted to
-  # camelCase for the schema and must be appear that way in the
-  # user-supplied json. This makes it more convenient to populate JSON
-  # objects in some languages.
+  # QPDFJob looks like. If a key starts with underscore, it does not
+  # map to a command-line argument. If the value is a string, that is
+  # the help information. Otherwise, if the value is null, it has to
+  # match a command-line option, and its properties and help come from
+  # other information known by generate_auto_job. This information is
+  # used to construct a "schema" (as in JSON.hh) for the json input to
+  # QPDFJob. The leading underscore is removed. *NOTE*: all keys are
+  # converted to camelCase for the schema and must be appear that way
+  # in the user-supplied json. This makes it more convenient to
+  # populate JSON objects in some languages.
   _input:
-    _filename: "input filename"
+    _file: "input filename"
     main.password:
     password-file:
     empty:
   _output:
-    _filename: "output filename"
+    _file: "output filename"
     _replace-input: "set to true to replace input"
     _options:
       qdf:
@@ -291,8 +291,8 @@ json:
       progress:
       split-pages:
       encrypt:
-        user-password: "user password"
-        owner-password: "owner password"
+        _user-password: "user password"
+        _owner-password: "owner password"
         _40bit:
           Enc40.annotate:
           Enc40.extract:
@@ -359,7 +359,7 @@ json:
     ii-min-bytes:
     remove-unreferenced-resources:
     add-attachment:
-      - path: "attachment to add"
+      - _file: "attachment to add"
         creationdate:
         description:
         filename:
@@ -369,7 +369,7 @@ json:
         replace:
     remove-attachment:
     copy-attachments-from:
-      - path: "attachment source filename"
+      - _file: "attachment source filename"
         CopyAtt.password:
         prefix:
     collate:
@@ -382,19 +382,19 @@ json:
     oi-min-width:
     optimize-images:
     pages:
-      - file: "source for for pages"
+      - _file: "source for for pages"
         Pages.password:
-        range: "page range"
+        _range: "page range"
     remove-page-labels:
     rotate:
     overlay:
-      file: "source file for overlay"
+      _file: "source file for overlay"
       UO.password:
       from:
       repeat:
       to:
     underlay:
-      file: "source file for underlay"
+      _file: "source file for underlay"
       UO.password:
       from:
       repeat:

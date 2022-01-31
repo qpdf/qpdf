@@ -1,12 +1,12 @@
 static constexpr char const* JOB_SCHEMA_DATA = R"({
   "input": {
-    "filename": "input filename",
+    "file": "input filename",
     "password": "specify password",
     "passwordFile": "read password from a file",
     "empty": "empty input file"
   },
   "output": {
-    "filename": "output filename",
+    "file": "output filename",
     "replaceInput": "set to true to replace input",
     "options": {
       "qdf": "enable viewing PDF code in a text editor",
@@ -110,7 +110,7 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
     "removeUnreferencedResources": "remove unreferenced page resources",
     "addAttachment": [
       {
-        "path": "attachment to add",
+        "file": "attachment to add",
         "creationdate": "set attachment's creation date",
         "description": "set attachment's description",
         "filename": "set attachment's displayed filename",
@@ -123,7 +123,7 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
     "removeAttachment": "remove an embedded file",
     "copyAttachmentsFrom": [
       {
-        "path": "attachment source filename",
+        "file": "attachment source filename",
         "password": "specify password",
         "prefix": "key prefix for copying attachments"
       }

@@ -668,7 +668,7 @@ $td->runtest("add attachment: bad mod date",
 $td->runtest("add attachment: trailing slash",
 	     {$td->COMMAND => "qpdf minimal.pdf a.pdf" .
                   " --add-attachment --"},
-	     {$td->REGEXP => ".*add attachment: no path specified.*",
+	     {$td->REGEXP => ".*add attachment: no file specified.*",
                   $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 

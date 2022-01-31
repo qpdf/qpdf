@@ -228,7 +228,7 @@ Handlers::endInput()
 }
 
 void
-Handlers::setupInputFilename()
+Handlers::setupInputFile()
 {
     addParameter([this](char const* p) {
         c_main->inputFile(p);
@@ -264,7 +264,7 @@ Handlers::endOutput()
 }
 
 void
-Handlers::setupOutputFilename()
+Handlers::setupOutputFile()
 {
     addParameter([this](char const* p) {
         c_main->outputFile(p);
@@ -465,10 +465,10 @@ Handlers::endOptionsAddAttachment()
 }
 
 void
-Handlers::setupOptionsAddAttachmentPath()
+Handlers::setupOptionsAddAttachmentFile()
 {
     addParameter([this](char const* p) {
-        c_att->path(p);
+        c_att->file(p);
     });
 }
 
@@ -498,10 +498,10 @@ Handlers::endOptionsCopyAttachmentsFrom()
 }
 
 void
-Handlers::setupOptionsCopyAttachmentsFromPath()
+Handlers::setupOptionsCopyAttachmentsFromFile()
 {
     addParameter([this](char const* p) {
-        c_copy_att->path(p);
+        c_copy_att->file(p);
     });
 }
 
@@ -600,7 +600,7 @@ void
 Handlers::setupOptionsOverlayFile()
 {
     addParameter([this](char const* p) {
-        c_uo->path(p);
+        c_uo->file(p);
     });
 }
 
@@ -629,7 +629,7 @@ void
 Handlers::setupOptionsUnderlayFile()
 {
     addParameter([this](char const* p) {
-        c_uo->path(p);
+        c_uo->file(p);
     });
 }
 
