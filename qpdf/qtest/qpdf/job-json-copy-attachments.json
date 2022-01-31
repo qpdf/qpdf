@@ -1,7 +1,7 @@
 {
   "inputFile": "minimal.pdf",
   "outputFile": "a.pdf",
-  "staticId": true,
+  "staticId": "",
   "copyAttachmentsFrom": [
     {
       "file": "job-json-add-attachments.pdf"

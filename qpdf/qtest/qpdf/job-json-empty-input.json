@@ -1,7 +1,7 @@
 {
-  "empty": true,
+  "empty": "",
   "outputFile": "a.pdf",
-  "staticId": true,
+  "staticId": "",
   "pages": [
     {
       "file": "minimal.pdf"

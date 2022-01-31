@@ -1,8 +1,8 @@
 {
   "inputFile": "minimal.pdf",
   "outputFile": "a.pdf",
-  "staticId": true,
-  "staticAesIv": true,
+  "staticId": "",
+  "staticAesIv": "",
   "encrypt": {
     "userPassword": "u",
     "ownerPassword": "o",

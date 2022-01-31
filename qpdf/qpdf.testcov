@@ -630,7 +630,7 @@ qpdf check password password correct 0
 qpdf check password not encrypted 0
 QPDFJob_config password file 0
 QPDFJob_config password stdin 0
-QPDFJob json bare not true 0
+QPDFJob json bare not empty 0
 QPDFJob json choice mismatch 0
 QPDFJob json choice match 0
 QPDFJob json encrypt no key length 0

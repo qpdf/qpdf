@@ -1,6 +1,6 @@
 {
   "inputFile": "a.pdf",
-  "replaceInput": true,
-  "staticId": true,
+  "replaceInput": "",
+  "staticId": "",
   "objectStreams": "generate"
 }

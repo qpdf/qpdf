@@ -465,14 +465,19 @@ class Main:
             self.json_init.append(
                 f'addBare([this]() {{ {config}->{flag_key}(); }});')
         elif kind == 'optional_parameter' or kind == 'required_parameter':
-            # No optional parameters in json
+            # Optional parameters end up just being the empty string,
+            # so the handler has to deal with it. The empty string is
+            # also allowed for non-optional.
             self.json_init.append(
                 f'addParameter([this](char const* p)'
                 f' {{ {config}->{flag_key}(p); }});')
-        elif kind == 'optional_choices' or kind == 'required_choices':
-            # No optional choices in json
+        elif kind == 'optional_choices':
             self.json_init.append(
-                f'addChoices({v}_choices,'
+                f'addChoices({v}_choices, false,'
+                f' [this](char const* p) {{ {config}->{flag_key}(p); }});')
+        elif kind == 'required_choices':
+            self.json_init.append(
+                f'addChoices({v}_choices, true,'
                 f' [this](char const* p) {{ {config}->{flag_key}(p); }});')
 
     def handle_json_manual(self, path):

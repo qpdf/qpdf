@@ -31,7 +31,7 @@ namespace
 
         void addBare(bare_handler_t);
         void addParameter(param_handler_t);
-        void addChoices(char const** choices, param_handler_t);
+        void addChoices(char const** choices, bool required, param_handler_t);
         void pushKey(std::string const& key);
         void beginDict(json_handler_t start_fn,
                        bare_handler_t end_fn);
@@ -106,11 +106,12 @@ Handlers::initHandlers()
 void
 Handlers::addBare(bare_handler_t fn)
 {
-    jh->addBoolHandler([this, fn](std::string const& path, bool v){
-        if (! v)
+    jh->addStringHandler(
+        [this, fn](std::string const& path, std::string const& parameter){
+        if (! parameter.empty())
         {
-            QTC::TC("qpdf", "QPDFJob json bare not true");
-            usage(path + ": value must be true");
+            QTC::TC("qpdf", "QPDFJob json bare not empty");
+            usage(path + ": value must be the empty string");
         }
         else
         {
@@ -129,22 +130,28 @@ Handlers::addParameter(param_handler_t fn)
 }
 
 void
-Handlers::addChoices(char const** choices,
-                     param_handler_t fn)
+Handlers::addChoices(char const** choices, bool required, param_handler_t fn)
 {
     jh->addStringHandler(
-        [fn, choices, this](
+        [fn, choices, required, this](
             std::string const& path, std::string const& parameter){
 
             char const* p = parameter.c_str();
             bool matches = false;
-            for (char const** i = choices; *i; ++i)
+            if ((! required) && (parameter.empty()))
             {
-                if (strcmp(*i, p) == 0)
+                matches = true;
+            }
+            if (! matches)
+            {
+                for (char const** i = choices; *i; ++i)
                 {
-                    QTC::TC("qpdf", "QPDFJob json choice match");
-                    matches = true;
-                    break;
+                    if (strcmp(*i, p) == 0)
+                    {
+                        QTC::TC("qpdf", "QPDFJob json choice match");
+                        matches = true;
+                        break;
+                    }
                 }
             }
             if (! matches)

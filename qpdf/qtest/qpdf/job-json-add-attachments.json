@@ -1,7 +1,7 @@
 {
   "inputFile": "minimal.pdf",
   "outputFile": "a.pdf",
-  "staticId": true,
+  "staticId": "",
   "addAttachment": [
     {
       "file": "auto-txt",

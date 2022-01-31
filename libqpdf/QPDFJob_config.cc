@@ -108,7 +108,7 @@ QPDFJob::Config::coalesceContents()
 QPDFJob::Config*
 QPDFJob::Config::collate(char const* parameter)
 {
-    auto n = ((parameter == 0) ? 1 :
+    auto n = (((parameter == 0) || (strlen(parameter) == 0)) ? 1 :
               QUtil::string_to_uint(parameter));
     o.m->collate = QIntC::to_size(n);
     return this;
@@ -519,7 +519,7 @@ QPDFJob::Config::showXref()
 QPDFJob::Config*
 QPDFJob::Config::splitPages(char const* parameter)
 {
-    int n = ((parameter == 0) ? 1 :
+    int n = (((parameter == 0) || (strlen(parameter) == 0)) ? 1 :
              QUtil::string_to_int(parameter));
     o.m->split_pages = n;
     return this;
