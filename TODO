@@ -41,6 +41,9 @@ implementation
   make qpdf more contributor-friendly. Look
   https://bestpractices.coreinfrastructure.org/en
 
+* Completion: would be nice if --job-json-file=<TAB> would complete
+  files
+
 Documentation
 =============
 
