@@ -27,24 +27,20 @@ namespace
         typedef std::function<void()> bare_handler_t;
         typedef std::function<void(char const*)> param_handler_t;
         typedef std::function<void(JSON)> json_handler_t;
-        typedef std::function<void(std::string const& key)> setup_handler_t;
 
-        void addBare(std::string const& key, bare_handler_t);
-        void addParameter(std::string const& key, param_handler_t);
-        void addChoices(std::string const& key, char const** choices,
-                        param_handler_t);
-        void doSetup(std::string const& key, setup_handler_t);
-        void beginDict(std::string const& key,
-                       json_handler_t start_fn,
+        void addBare(bare_handler_t);
+        void addParameter(param_handler_t);
+        void addChoices(char const** choices, param_handler_t);
+        void pushKey(std::string const& key);
+        void beginDict(json_handler_t start_fn,
                        bare_handler_t end_fn);
-        void beginArray(std::string const& key,
-                        json_handler_t start_fn,
+        void beginArray(json_handler_t start_fn,
                         bare_handler_t end_fn);
-        void endContainer();
+        void ignoreItem();
+        void popHandler();
 
         bare_handler_t bindBare(void (Handlers::*f)());
         json_handler_t bindJSON(void (Handlers::*f)(JSON));
-        setup_handler_t bindSetup(void (Handlers::*f)(std::string const&));
 
         std::list<std::shared_ptr<JSONHandler>> json_handlers;
         bool partial;
@@ -84,12 +80,6 @@ Handlers::bindJSON(void (Handlers::*f)(JSON))
     return std::bind(std::mem_fn(f), this, std::placeholders::_1);
 }
 
-Handlers::setup_handler_t
-Handlers::bindSetup(void (Handlers::*f)(std::string const&))
-{
-    return std::bind(std::mem_fn(f), this, std::placeholders::_1);
-}
-
 void
 Handlers::initHandlers()
 {
@@ -113,10 +103,9 @@ Handlers::initHandlers()
 }
 
 void
-Handlers::addBare(std::string const& key, bare_handler_t fn)
+Handlers::addBare(bare_handler_t fn)
 {
-    auto h = std::make_shared<JSONHandler>();
-    h->addBoolHandler([this, fn](std::string const& path, bool v){
+    jh->addBoolHandler([this, fn](std::string const& path, bool v){
         if (! v)
         {
             usage(path + ": value must be true");
@@ -126,26 +115,22 @@ Handlers::addBare(std::string const& key, bare_handler_t fn)
             fn();
         }
     });
-    jh->addDictKeyHandler(key, h);
 }
 
 void
-Handlers::addParameter(std::string const& key, param_handler_t fn)
+Handlers::addParameter(param_handler_t fn)
 {
-    auto h = std::make_shared<JSONHandler>();
-    h->addStringHandler(
+    jh->addStringHandler(
         [fn](std::string const& path, std::string const& parameter){
             fn(parameter.c_str());
         });
-    jh->addDictKeyHandler(key, h);
 }
 
 void
-Handlers::addChoices(std::string const& key, char const** choices,
+Handlers::addChoices(char const** choices,
                      param_handler_t fn)
 {
-    auto h = std::make_shared<JSONHandler>();
-    h->addStringHandler(
+    jh->addStringHandler(
         [fn, choices, this](
             std::string const& path, std::string const& parameter){
 
@@ -180,47 +165,45 @@ Handlers::addChoices(std::string const& key, char const** choices,
             }
             fn(parameter.c_str());
         });
-    jh->addDictKeyHandler(key, h);
 }
 
 void
-Handlers::doSetup(std::string const& key, setup_handler_t fn)
-{
-    fn(key);
-}
-
-void
-Handlers::beginDict(std::string const& key,
-                    json_handler_t start_fn,
-                    bare_handler_t end_fn)
+Handlers::pushKey(std::string const& key)
 {
     auto new_jh = std::make_shared<JSONHandler>();
-    new_jh->addDictHandlers(
-        [start_fn](std::string const&, JSON j){ start_fn(j); },
-        [end_fn](std::string const&){ end_fn(); });
     this->jh->addDictKeyHandler(key, new_jh);
     this->json_handlers.push_back(new_jh);
     this->jh = new_jh.get();
 }
 
 void
-Handlers::beginArray(std::string const& key,
-                     json_handler_t start_fn,
-                     bare_handler_t end_fn)
+Handlers::beginDict(json_handler_t start_fn, bare_handler_t end_fn)
 {
-    auto new_jh = std::make_shared<JSONHandler>();
+    jh->addDictHandlers(
+        [start_fn](std::string const&, JSON j){ start_fn(j); },
+        [end_fn](std::string const&){ end_fn(); });
+}
+
+void
+Handlers::beginArray(json_handler_t start_fn, bare_handler_t end_fn)
+{
     auto item_jh = std::make_shared<JSONHandler>();
-    new_jh->addArrayHandlers(
+    jh->addArrayHandlers(
         [start_fn](std::string const&, JSON j){ start_fn(j); },
         [end_fn](std::string const&){ end_fn(); },
         item_jh);
-    this->jh->addDictKeyHandler(key, new_jh);
     this->json_handlers.push_back(item_jh);
     this->jh = item_jh.get();
 }
 
 void
-Handlers::endContainer()
+Handlers::ignoreItem()
+{
+    jh->addAnyHandler([](std::string const&, JSON){});
+}
+
+void
+Handlers::popHandler()
 {
     this->json_handlers.pop_back();
     this->jh = this->json_handlers.back().get();
@@ -245,25 +228,25 @@ Handlers::endInput()
 }
 
 void
-Handlers::setupInputFilename(std::string const& key)
+Handlers::setupInputFilename()
 {
-    addParameter(key, [this](char const* p) {
+    addParameter([this](char const* p) {
         c_main->inputFile(p);
     });
 }
 
 void
-Handlers::setupInputPassword(std::string const& key)
+Handlers::setupInputPassword()
 {
-    addParameter(key, [this](char const* p) {
+    addParameter([this](char const* p) {
         c_main->password(p);
     });
 }
 
 void
-Handlers::setupInputEmpty(std::string const& key)
+Handlers::setupInputEmpty()
 {
-    addBare(key, [this]() {
+    addBare([this]() {
         c_main->emptyInput();
     });
 }
@@ -281,17 +264,17 @@ Handlers::endOutput()
 }
 
 void
-Handlers::setupOutputFilename(std::string const& key)
+Handlers::setupOutputFilename()
 {
-    addParameter(key, [this](char const* p) {
+    addParameter([this](char const* p) {
         c_main->outputFile(p);
     });
 }
 
 void
-Handlers::setupOutputReplaceInput(std::string const& key)
+Handlers::setupOutputReplaceInput()
 {
-    addBare(key, [this]() {
+    addBare([this]() {
         c_main->replaceInput();
     });
 }
@@ -359,15 +342,17 @@ Handlers::endOutputOptionsEncrypt()
 }
 
 void
-Handlers::setupOutputOptionsEncryptUserPassword(std::string const& key)
+Handlers::setupOutputOptionsEncryptUserPassword()
 {
-    // Key handled in beginOutputOptionsEncrypt
+    // handled in beginOutputOptionsEncrypt
+    ignoreItem();
 }
 
 void
-Handlers::setupOutputOptionsEncryptOwnerPassword(std::string const& key)
+Handlers::setupOutputOptionsEncryptOwnerPassword()
 {
-    // Key handled in beginOutputOptionsEncrypt
+    // handled in beginOutputOptionsEncrypt
+    ignoreItem();
 }
 
 void
@@ -431,6 +416,30 @@ Handlers::endInspect()
 }
 
 void
+Handlers::beginInspectJsonKeyArray(JSON)
+{
+    // nothing needed
+}
+
+void
+Handlers::endInspectJsonKeyArray()
+{
+    // nothing needed
+}
+
+void
+Handlers::beginInspectJsonObjectArray(JSON)
+{
+    // nothing needed
+}
+
+void
+Handlers::endInspectJsonObjectArray()
+{
+    // nothing needed
+}
+
+void
 Handlers::beginOptionsAddAttachmentArray(JSON)
 {
     // nothing needed
@@ -456,9 +465,9 @@ Handlers::endOptionsAddAttachment()
 }
 
 void
-Handlers::setupOptionsAddAttachmentPath(std::string const& key)
+Handlers::setupOptionsAddAttachmentPath()
 {
-    addParameter(key, [this](char const* p) {
+    addParameter([this](char const* p) {
         c_att->path(p);
     });
 }
@@ -489,17 +498,17 @@ Handlers::endOptionsCopyAttachmentsFrom()
 }
 
 void
-Handlers::setupOptionsCopyAttachmentsFromPath(std::string const& key)
+Handlers::setupOptionsCopyAttachmentsFromPath()
 {
-    addParameter(key, [this](char const* p) {
+    addParameter([this](char const* p) {
         c_copy_att->path(p);
     });
 }
 
 void
-Handlers::setupOptionsCopyAttachmentsFromPassword(std::string const& key)
+Handlers::setupOptionsCopyAttachmentsFromPassword()
 {
-    addParameter(key, [this](char const* p) {
+    addParameter([this](char const* p) {
         c_copy_att->password(p);
     });
 }
@@ -554,21 +563,24 @@ Handlers::endOptionsPages()
 }
 
 void
-Handlers::setupOptionsPagesFile(std::string const& key)
+Handlers::setupOptionsPagesFile()
 {
     // handled in beginOptionsPages
+    ignoreItem();
 }
 
 void
-Handlers::setupOptionsPagesPassword(std::string const& key)
+Handlers::setupOptionsPagesPassword()
 {
     // handled in beginOptionsPages
+    ignoreItem();
 }
 
 void
-Handlers::setupOptionsPagesRange(std::string const& key)
+Handlers::setupOptionsPagesRange()
 {
     // handled in beginOptionsPages
+    ignoreItem();
 }
 
 void
@@ -585,17 +597,17 @@ Handlers::endOptionsOverlay()
 }
 
 void
-Handlers::setupOptionsOverlayFile(std::string const& key)
+Handlers::setupOptionsOverlayFile()
 {
-    addParameter(key, [this](char const* p) {
+    addParameter([this](char const* p) {
         c_uo->path(p);
     });
 }
 
 void
-Handlers::setupOptionsOverlayPassword(std::string const& key)
+Handlers::setupOptionsOverlayPassword()
 {
-    addParameter(key, [this](char const* p) {
+    addParameter([this](char const* p) {
         c_uo->password(p);
     });
 }
@@ -614,17 +626,17 @@ Handlers::endOptionsUnderlay()
 }
 
 void
-Handlers::setupOptionsUnderlayFile(std::string const& key)
+Handlers::setupOptionsUnderlayFile()
 {
-    addParameter(key, [this](char const* p) {
+    addParameter([this](char const* p) {
         c_uo->path(p);
     });
 }
 
 void
-Handlers::setupOptionsUnderlayPassword(std::string const& key)
+Handlers::setupOptionsUnderlayPassword()
 {
-    addParameter(key, [this](char const* p) {
+    addParameter([this](char const* p) {
         c_uo->password(p);
     });
 }

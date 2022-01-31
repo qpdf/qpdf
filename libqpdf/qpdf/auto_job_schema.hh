@@ -85,10 +85,10 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
     "showAttachment": "export an embedded file",
     "json": "show file in json format",
     "jsonKey": [
-      null
+      "restrict which keys are in json output"
     ],
     "jsonObject": [
-      null
+      "restrict which objects are in JSON"
     ]
   },
   "options": {

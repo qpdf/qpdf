@@ -454,7 +454,7 @@ class Main:
                 identifier = self.to_identifier(table, 'argEnd', False)
                 self.decls.append(f'void {identifier}();')
 
-    def handle_json_trivial(self, key, fdata):
+    def handle_json_trivial(self, flag_key, fdata):
         config = None
         for t, [kind, v] in fdata['tables'].items():
             # We have determined that all tables, if multiple, have
@@ -463,106 +463,98 @@ class Main:
             config = tdata['config']
         if kind == 'bare':
             self.json_init.append(
-                f'addBare("{key}", [this]() {{ {config}->{key}(); }});')
+                f'addBare([this]() {{ {config}->{flag_key}(); }});')
         elif kind == 'optional_parameter' or kind == 'required_parameter':
             # No optional parameters in json
             self.json_init.append(
-                f'addParameter("{key}", [this](char const* p)'
-                f' {{ {config}->{key}(p); }});')
+                f'addParameter([this](char const* p)'
+                f' {{ {config}->{flag_key}(p); }});')
         elif kind == 'optional_choices' or kind == 'required_choices':
             # No optional choices in json
             self.json_init.append(
-                f'addChoices("{key}", {v}_choices,'
-                f' [this](char const* p) {{ {config}->{key}(p); }});')
+                f'addChoices({v}_choices,'
+                f' [this](char const* p) {{ {config}->{flag_key}(p); }});')
 
-    def handle_json_manual(self, key, path):
+    def handle_json_manual(self, path):
         method = re.sub(r'\.([a-zA-Z0-9])',
                         lambda x: x.group(1).upper(),
-                        f'setup{path}.{key}')
-        self.json_decls.append(
-            f'void {method}(std::string const&);')
-        self.json_init.append(
-            f'doSetup("{key}", bindSetup(&Handlers::{method}));')
+                        f'setup{path}')
+        self.json_decls.append(f'void {method}();')
+        self.json_init.append(f'{method}();')
 
     def option_to_json_key(self, s):
         return self.to_identifier(s, '', False)
 
-    def build_schema(self, j, s, flag, path, expected, options_seen):
-        if flag:
+    def flag_to_schema_key(self, k):
+        if k.startswith('_'):
+            schema_key = k[1:]
+        else:
+            schema_key = re.sub(r'[^\.]+\.', '', k)
+        return self.option_to_json_key(schema_key)
+
+    def build_schema(self, j, path, flag, expected, options_seen):
+        if flag in expected:
+            options_seen.add(flag)
+        elif not (flag == '' or flag.startswith('_') or isinstance(j, str)):
+            raise Exception(f'json: unknown key {flag}')
+
+        if isinstance(j, dict):
+            schema_value = {}
+            if flag:
+                identifier = self.to_identifier(path, '', False)
+                self.json_decls.append(f'void begin{identifier}(JSON);')
+                self.json_decls.append(f'void end{identifier}();')
+                self.json_init.append(
+                    f'beginDict(bindJSON(&Handlers::begin{identifier}),'
+                    f' bindBare(&Handlers::end{identifier})); // {path}')
+            for k, v in j.items():
+                schema_key = self.flag_to_schema_key(k)
+                subpath = f'{path}.{schema_key}'
+                self.json_init.append(f'pushKey("{schema_key}");')
+                schema_value[schema_key] = self.build_schema(
+                    v, subpath, k, expected, options_seen)
+                self.json_init.append(f'popHandler(); // key: {schema_key}')
+        elif isinstance(j, list):
+            if len(j) != 1:
+                raise Exception('json contains array with length != 1')
             identifier = self.to_identifier(path, '', False)
-            self.json_decls.append(f'void begin{identifier}(JSON);')
-            self.json_decls.append(f'void end{identifier}();')
+            self.json_decls.append(f'void begin{identifier}Array(JSON);')
+            self.json_decls.append(f'void end{identifier}Array();')
             self.json_init.append(
-                f'beginDict("{flag}",'
-                f' bindJSON(&Handlers::begin{identifier}),'
-                f' bindBare(&Handlers::end{identifier})); // {path}')
-        for k, v in j.items():
+                f'beginArray(bindJSON(&Handlers::begin{identifier}Array),'
+                f' bindBare(&Handlers::end{identifier}Array));'
+                f' // {path}[]')
+            schema_value = [
+                self.build_schema(j[0], path, flag,
+                                  expected, options_seen)
+            ]
+            self.json_init.append(
+                f'popHandler(); // array: {path}[]')
+        else:
+            schema_value = j
+            if schema_value is None:
+                schema_value = re.sub(
+                    r'--(\S+)',
+                    lambda x: self.option_to_json_key(x.group(1)),
+                    expected[flag]['help'])
             is_trivial = False
-            if k in expected:
+            if flag in expected:
                 is_trivial = True
                 common_config = None
-                for t in expected[k]['tables']:
+                for t in expected[flag]['tables']:
                     tdata = self.by_table[t]
-                    if k in tdata['manual']:
+                    if flag in tdata['manual']:
                         is_trivial = False
                     if common_config is None:
                         common_config = tdata['config']
                     elif common_config != tdata['config']:
                         is_trivial = False
-            elif not (k.startswith('_') or isinstance(v, str)):
-                raise Exception(f'json: unknown key {k}')
-            if k.startswith('_'):
-                schema_key = k[1:]
+            config_key = self.flag_to_schema_key(flag)
+            if is_trivial:
+                self.handle_json_trivial(config_key, expected[flag])
             else:
-                schema_key = re.sub(r'[^\.]+\.', '', k)
-            schema_key = self.option_to_json_key(schema_key)
-            schema_value = v
-            is_dict = False
-            if k in expected:
-                options_seen.add(re.sub('^_', '', k))
-                if v is None:
-                    schema_value = re.sub(
-                        r'--(\S+)',
-                        lambda x: self.option_to_json_key(x.group(1)),
-                        expected[k]['help'])
-            if (isinstance(v, dict)):
-                is_dict = True
-                schema_value = {}
-                self.build_schema(v, schema_value,
-                                  schema_key, f'{path}.{schema_key}',
-                                  expected, options_seen)
-            elif (isinstance(v, list)):
-                if len(v) != 1:
-                    raise Exception('json contains array with length != 1')
-                if isinstance(v[0], dict):
-                    is_dict = True
-                    schema_value = [{}]
-                    subpath = f'{path}.{schema_key}'
-                    identifier = self.to_identifier(subpath, '', False)
-                    self.json_decls.append(
-                        f'void begin{identifier}Array(JSON);')
-                    self.json_decls.append(
-                        f'void end{identifier}Array();')
-                    self.json_init.append(
-                        f'beginArray("{flag}",'
-                        f' bindJSON(&Handlers::begin{identifier}Array),'
-                        f' bindBare(&Handlers::end{identifier}Array));'
-                        f' // {subpath}[]')
-                    self.build_schema(v[0], schema_value[0],
-                                      schema_key, subpath,
-                                      expected, options_seen)
-                    self.json_init.append(
-                        f'endContainer(); // {subpath}[]')
-            elif schema_value is None:
-                raise Exception(f'unknown schema value for {k}')
-            s[schema_key] = schema_value
-            if not is_dict:
-                if is_trivial:
-                    self.handle_json_trivial(schema_key, expected[k])
-                else:
-                    self.handle_json_manual(schema_key, path)
-        if flag:
-            self.json_init.append(f'endContainer(); // {path}')
+                self.handle_json_manual(path)
+        return schema_value
 
     def generate_schema(self, data):
         # Check to make sure that every command-line option is
@@ -588,9 +580,8 @@ class Main:
         # go. This verifies consistency between command-line options
         # and the json section of the data and builds up a schema by
         # populating with help information as available.
-        self.schema = {}
-        self.build_schema(data['json'], self.schema, '', '',
-                          expected, options_seen)
+        self.schema = self.build_schema(
+            data['json'], '', '', expected, options_seen)
         if options_seen != set(expected.keys()):
             raise Exception('missing from json: ' +
                             str(set(expected.keys()) - options_seen))
