@@ -482,7 +482,7 @@ QPDFJob::config()
 }
 
 std::string
-QPDFJob::json_job_schema_v1()
+QPDFJob::job_json_schema_v1()
 {
     return JOB_SCHEMA_DATA;
 }

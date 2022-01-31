@@ -465,7 +465,7 @@ ArgParser::argEndCopyAttachment()
 void
 ArgParser::argJobJsonHelp()
 {
-    std::cout << QPDFJob::json_job_schema_v1() << std::endl;
+    std::cout << QPDFJob::job_json_schema_v1() << std::endl;
 }
 
 void

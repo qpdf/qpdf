@@ -376,7 +376,7 @@ class QPDFJob
     // Provide a string that is the help information for the version 1
     // of JSON format for QPDFJob.
     QPDF_DLL
-    static std::string json_job_schema_v1();
+    static std::string job_json_schema_v1();
 
   private:
     struct RotationSpec
