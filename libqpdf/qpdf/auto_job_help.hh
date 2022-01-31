@@ -788,8 +788,11 @@ output as binary data. Get the key with --list-attachments.
 ap.addHelpTopic("json", "JSON output for PDF information", R"(Show information about the PDF file in JSON format. Please see the
 JSON chapter in the qpdf manual for details.
 )");
-ap.addOptionHelp("--json", "json", "show file in json format", R"(Generate a JSON representation of the file. This is described in
-depth in the JSON section of the manual.
+ap.addOptionHelp("--json", "json", "show file in json format", R"(--json[=version]
+
+Generate a JSON representation of the file. This is described in
+depth in the JSON section of the manual. "version" may be a
+specific version or "latest".
 )");
 ap.addOptionHelp("--json-help", "json", "show format of json output", R"(Describe the format of the JSON output.
 )");

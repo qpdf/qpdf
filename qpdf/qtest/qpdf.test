@@ -617,7 +617,7 @@ $td->runtest("list attachments verbose",
 	     {$td->FILE => "test76-list-verbose.out", $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("attachments json",
-	     {$td->COMMAND => "qpdf --json --json-key=attachments a.pdf"},
+	     {$td->COMMAND => "qpdf --json=1 --json-key=attachments a.pdf"},
 	     {$td->FILE => "test76-json.out", $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 $td->runtest("remove attachment (test_driver)",
@@ -2705,7 +2705,7 @@ $td->runtest("show direct pages",
 foreach my $f (qw(page_api_2 direct-pages))
 {
     $td->runtest("json for $f",
-                 {$td->COMMAND => "qpdf --json $f.pdf"},
+                 {$td->COMMAND => "qpdf --json=latest $f.pdf"},
                  {$td->FILE => "$f-json.out", $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
 }

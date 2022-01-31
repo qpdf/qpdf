@@ -3136,15 +3136,21 @@ See :ref:`json` for details about the qpdf JSON format.
 Related Options
 ~~~~~~~~~~~~~~~
 
-.. qpdf:option:: --json
+.. qpdf:option:: --json[=version]
 
    .. help: show file in json format
 
       Generate a JSON representation of the file. This is described in
-      depth in the JSON section of the manual.
+      depth in the JSON section of the manual. "version" may be a
+      specific version or "latest".
 
    Generate a JSON representation of the file. This is described in
-   depth in :ref:`json`.
+   depth in :ref:`json`. The version parameter can be used to specify
+   which json version should be output. The only supported value is
+   ``1``, but it's possible that a new json output version will be
+   added in a future version. You can also specify ``latest`` to use
+   the latest json version. For backward compatibility, the default
+   value is ``1``.
 
 .. qpdf:option:: --json-help
 

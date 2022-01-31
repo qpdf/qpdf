@@ -595,7 +595,7 @@ class QPDFJob
         std::list<std::string> attachments_to_remove;
         std::list<AddAttachment> attachments_to_add;
         std::list<CopyAttachmentFrom> attachments_to_copy;
-        bool json;
+        int json_version;
         std::set<std::string> json_keys;
         std::set<std::string> json_objects;
         bool check;

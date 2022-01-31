@@ -29,6 +29,9 @@ choices:
     - all
     - print
     - screen
+  json_version:
+    - 1
+    - latest
   json_key:
     # The list of selectable top-level keys id duplicated in the
     # following places: job.yml, QPDFJob::json_schema, and
@@ -88,7 +91,6 @@ options:
       - generate-appearances
       - ignore-xref-streams
       - is-encrypted
-      - json
       - keep-inline-images
       - linearize
       - list-attachments
@@ -156,6 +158,8 @@ options:
       password-mode: password_mode
       remove-unreferenced-resources: remove_unref
       stream-data: stream_data
+    optional_choices:
+      json: json_version
   - table: pages
     config: c_pages
     prefix: Pages

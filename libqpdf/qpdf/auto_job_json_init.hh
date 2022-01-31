@@ -10,6 +10,7 @@ static char const* decode_level_choices[] = {"none", "generalized", "specialized
 static char const* object_streams_choices[] = {"disable", "preserve", "generate", 0};
 static char const* remove_unref_choices[] = {"auto", "yes", "no", 0};
 static char const* flatten_choices[] = {"all", "print", "screen", 0};
+static char const* json_version_choices[] = {"1", "latest", 0};
 static char const* json_key_choices[] = {"acroform", "attachments", "encrypt", "objectinfo", "objects", "outlines", "pagelabels", "pages", 0};
 static char const* print128_choices[] = {"full", "low", "none", 0};
 static char const* modify128_choices[] = {"all", "annotate", "form", "assembly", "none", 0};
@@ -248,7 +249,7 @@ pushKey("showAttachment");
 addParameter([this](char const* p) { c_main->showAttachment(p); });
 popHandler(); // key: showAttachment
 pushKey("json");
-addBare([this]() { c_main->json(); });
+addChoices(json_version_choices, [this](char const* p) { c_main->json(p); });
 popHandler(); // key: json
 pushKey("jsonKey");
 beginArray(bindJSON(&Handlers::beginInspectJsonKeyArray), bindBare(&Handlers::endInspectJsonKeyArray)); // .inspect.jsonKey[]

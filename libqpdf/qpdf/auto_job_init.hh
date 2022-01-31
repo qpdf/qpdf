@@ -17,6 +17,7 @@ static char const* decode_level_choices[] = {"none", "generalized", "specialized
 static char const* object_streams_choices[] = {"disable", "preserve", "generate", 0};
 static char const* remove_unref_choices[] = {"auto", "yes", "no", 0};
 static char const* flatten_choices[] = {"all", "print", "screen", 0};
+static char const* json_version_choices[] = {"1", "latest", 0};
 static char const* json_key_choices[] = {"acroform", "attachments", "encrypt", "objectinfo", "objects", "outlines", "pagelabels", "pages", 0};
 static char const* print128_choices[] = {"full", "low", "none", 0};
 static char const* modify128_choices[] = {"all", "annotate", "form", "assembly", "none", 0};
@@ -45,7 +46,6 @@ this->ap.addBare("flatten-rotation", [this](){c_main->flattenRotation();});
 this->ap.addBare("generate-appearances", [this](){c_main->generateAppearances();});
 this->ap.addBare("ignore-xref-streams", [this](){c_main->ignoreXrefStreams();});
 this->ap.addBare("is-encrypted", [this](){c_main->isEncrypted();});
-this->ap.addBare("json", [this](){c_main->json();});
 this->ap.addBare("keep-inline-images", [this](){c_main->keepInlineImages();});
 this->ap.addBare("linearize", [this](){c_main->linearize();});
 this->ap.addBare("list-attachments", [this](){c_main->listAttachments();});
@@ -110,6 +110,7 @@ this->ap.addChoices("object-streams", [this](char *x){c_main->objectStreams(x);}
 this->ap.addChoices("password-mode", [this](char *x){c_main->passwordMode(x);}, true, password_mode_choices);
 this->ap.addChoices("remove-unreferenced-resources", [this](char *x){c_main->removeUnreferencedResources(x);}, true, remove_unref_choices);
 this->ap.addChoices("stream-data", [this](char *x){c_main->streamData(x);}, true, stream_data_choices);
+this->ap.addChoices("json", [this](char *x){c_main->json(x);}, false, json_version_choices);
 this->ap.registerOptionTable("pages", b(&ArgParser::argEndPages));
 this->ap.addPositional(p(&ArgParser::argPagesPositional));
 this->ap.addRequiredParameter("password", p(&ArgParser::argPagesPassword), "password");

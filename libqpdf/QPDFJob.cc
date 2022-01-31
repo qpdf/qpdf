@@ -420,7 +420,7 @@ QPDFJob::Members::Members() :
     collate(0),
     flatten_rotation(false),
     list_attachments(false),
-    json(false),
+    json_version(0),
     check(false),
     optimize_images(false),
     externalize_inline_images(false),
@@ -1924,7 +1924,7 @@ QPDFJob::doInspection(QPDF& pdf)
     {
         doCheck(pdf);
     }
-    if (m->json)
+    if (m->json_version)
     {
         doJSON(pdf);
     }

@@ -235,9 +235,27 @@ QPDFJob::Config::isEncrypted()
 }
 
 QPDFJob::Config*
-QPDFJob::Config::json()
+QPDFJob::Config::json(char const* parameter)
 {
-    o.m->json = true;
+    if (parameter)
+    {
+        if (strcmp(parameter, "latest") == 0)
+        {
+            o.m->json_version = 1;
+        }
+        else
+        {
+            o.m->json_version = QUtil::string_to_int(parameter);
+        }
+    }
+    else
+    {
+        o.m->json_version = 1;
+    }
+    if (o.m->json_version != 1)
+    {
+        usage(std::string("unsupported json version ") + parameter);
+    }
     o.m->require_outfile = false;
     return this;
 }
