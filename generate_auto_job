@@ -562,7 +562,7 @@ class Main:
 
     def generate_schema(self, data):
         # Check to make sure that every command-line option is
-        # represented either in data['json'] or data['no-json'].
+        # represented in data['json'].
 
         # Build a list of options that we expect. If an option appears
         # once, we just expect to see it once. If it appears in more
@@ -578,7 +578,7 @@ class Main:
             else:
                 for t in sorted(tables):
                     expected[f'{t}.{k}'] = {**v}
-        options_seen = set(data['no-json'])
+        options_seen = set()
 
         # Walk through the json information building the schema as we
         # go. This verifies consistency between command-line options
@@ -600,7 +600,7 @@ class Main:
 
     def validate(self, data):
         self.check_keys('top', data, set(
-            ['choices', 'options', 'no-json', 'json']))
+            ['choices', 'options', 'json']))
         for o in data['options']:
             self.check_keys('top', o, set(
                 ['table', 'prefix', 'config', 'config_prefix',

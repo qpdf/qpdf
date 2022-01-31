@@ -1,23 +1,15 @@
 {
-  "input": {
-    "empty": true
-  },
-  "output": {
-    "file": "a.pdf",
-    "options": {
-      "staticId": true
+  "empty": true,
+  "outputFile": "a.pdf",
+  "staticId": true,
+  "pages": [
+    {
+      "file": "minimal.pdf"
+    },
+    {
+      "file": "20-pages.pdf",
+      "password": "user",
+      "range": "1-5"
     }
-  },
-  "options": {
-    "pages": [
-      {
-        "file": "minimal.pdf"
-      },
-      {
-        "file": "20-pages.pdf",
-        "password": "user",
-        "range": "1-5"
-      }
-    ]
-  }
+  ]
 }

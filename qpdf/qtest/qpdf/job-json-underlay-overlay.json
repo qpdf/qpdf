@@ -1,23 +1,15 @@
 {
-  "input": {
-    "file": "20-pages.pdf",
-    "password": "owner"
+  "inputFile": "20-pages.pdf",
+  "password": "owner",
+  "outputFile": "a.pdf",
+  "staticId": true,
+  "decrypt": true,
+  "underlay": {
+    "file": "fxo-green.pdf"
   },
-  "output": {
-    "file": "a.pdf",
-    "options": {
-      "staticId": true,
-      "decrypt": true
-    }
-  },
-  "options": {
-    "underlay": {
-      "file": "fxo-green.pdf"
-    },
-    "overlay": {
-      "file": "fxo-red.pdf",
-      "from": "1,2",
-      "repeat": "3"
-    }
+  "overlay": {
+    "file": "fxo-red.pdf",
+    "from": "1,2",
+    "repeat": "3"
   }
 }

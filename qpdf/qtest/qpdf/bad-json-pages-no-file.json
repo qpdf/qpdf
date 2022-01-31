@@ -1,9 +1,7 @@
 {
-  "options": {
-    "pages": [
-      {
-        "range": "1-z"
-      }
-    ]
-  }
+  "pages": [
+    {
+      "range": "1-z"
+    }
+  ]
 }

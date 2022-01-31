@@ -1,7 +1,3 @@
 {
-  "output": {
-    "options": {
-      "qdf": false
-    }
-  }
+  "qdf": false
 }

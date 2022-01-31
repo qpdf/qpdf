@@ -220,18 +220,6 @@ Handlers::handle(JSON& j)
 }
 
 void
-Handlers::beginInput(JSON)
-{
-    // nothing needed
-}
-
-void
-Handlers::endInput()
-{
-    // nothing needed
-}
-
-void
 Handlers::setupInputFile()
 {
     addParameter([this](char const* p) {
@@ -240,7 +228,7 @@ Handlers::setupInputFile()
 }
 
 void
-Handlers::setupInputPassword()
+Handlers::setupPassword()
 {
     addParameter([this](char const* p) {
         c_main->password(p);
@@ -248,23 +236,11 @@ Handlers::setupInputPassword()
 }
 
 void
-Handlers::setupInputEmpty()
+Handlers::setupEmpty()
 {
     addBare([this]() {
         c_main->emptyInput();
     });
-}
-
-void
-Handlers::beginOutput(JSON)
-{
-    // nothing needed
-}
-
-void
-Handlers::endOutput()
-{
-    // nothing needed
 }
 
 void
@@ -276,7 +252,7 @@ Handlers::setupOutputFile()
 }
 
 void
-Handlers::setupOutputReplaceInput()
+Handlers::setupReplaceInput()
 {
     addBare([this]() {
         c_main->replaceInput();
@@ -284,19 +260,7 @@ Handlers::setupOutputReplaceInput()
 }
 
 void
-Handlers::beginOutputOptions(JSON)
-{
-    // nothing needed
-}
-
-void
-Handlers::endOutputOptions()
-{
-    // nothing needed
-}
-
-void
-Handlers::beginOutputOptionsEncrypt(JSON j)
+Handlers::beginEncrypt(JSON j)
 {
     // This method is only called if the overall JSON structure
     // matches the schema, so we already know that keys that are
@@ -342,137 +306,113 @@ Handlers::beginOutputOptionsEncrypt(JSON j)
 }
 
 void
-Handlers::endOutputOptionsEncrypt()
+Handlers::endEncrypt()
 {
     this->c_enc->endEncrypt();
     this->c_enc = nullptr;
 }
 
 void
-Handlers::setupOutputOptionsEncryptUserPassword()
+Handlers::setupEncryptUserPassword()
 {
-    // handled in beginOutputOptionsEncrypt
+    // handled in beginEncrypt
     ignoreItem();
 }
 
 void
-Handlers::setupOutputOptionsEncryptOwnerPassword()
+Handlers::setupEncryptOwnerPassword()
 {
-    // handled in beginOutputOptionsEncrypt
+    // handled in beginEncrypt
     ignoreItem();
 }
 
 void
-Handlers::beginOutputOptionsEncrypt40bit(JSON)
+Handlers::beginEncrypt40bit(JSON)
 {
     // nothing needed
 }
 
 void
-Handlers::endOutputOptionsEncrypt40bit()
+Handlers::endEncrypt40bit()
 {
     // nothing needed
 }
 
 void
-Handlers::beginOutputOptionsEncrypt128bit(JSON)
+Handlers::beginEncrypt128bit(JSON)
 {
     // nothing needed
 }
 
 void
-Handlers::endOutputOptionsEncrypt128bit()
+Handlers::endEncrypt128bit()
 {
     // nothing needed
 }
 
 void
-Handlers::beginOutputOptionsEncrypt256bit(JSON)
+Handlers::beginEncrypt256bit(JSON)
 {
     // nothing needed
 }
 
 void
-Handlers::endOutputOptionsEncrypt256bit()
+Handlers::endEncrypt256bit()
 {
     // nothing needed
 }
 
 void
-Handlers::beginOptions(JSON)
+Handlers::beginJsonKeyArray(JSON)
 {
     // nothing needed
 }
 
 void
-Handlers::endOptions()
+Handlers::endJsonKeyArray()
 {
     // nothing needed
 }
 
 void
-Handlers::beginInspect(JSON)
+Handlers::beginJsonObjectArray(JSON)
 {
     // nothing needed
 }
 
 void
-Handlers::endInspect()
+Handlers::endJsonObjectArray()
 {
     // nothing needed
 }
 
 void
-Handlers::beginInspectJsonKeyArray(JSON)
+Handlers::beginAddAttachmentArray(JSON)
 {
     // nothing needed
 }
 
 void
-Handlers::endInspectJsonKeyArray()
+Handlers::endAddAttachmentArray()
 {
     // nothing needed
 }
 
 void
-Handlers::beginInspectJsonObjectArray(JSON)
-{
-    // nothing needed
-}
-
-void
-Handlers::endInspectJsonObjectArray()
-{
-    // nothing needed
-}
-
-void
-Handlers::beginOptionsAddAttachmentArray(JSON)
-{
-    // nothing needed
-}
-
-void
-Handlers::endOptionsAddAttachmentArray()
-{
-    // nothing needed
-}
-
-void
-Handlers::beginOptionsAddAttachment(JSON)
+Handlers::beginAddAttachment(JSON)
 {
     this->c_att = c_main->addAttachment();
 }
 
 void
-Handlers::endOptionsAddAttachment()
+Handlers::endAddAttachment()
 {
     this->c_att->endAddAttachment();
     this->c_att = nullptr;
 }
 
 void
-Handlers::setupOptionsAddAttachmentFile()
+Handlers::setupAddAttachmentFile()
 {
     addParameter([this](char const* p) {
         c_att->file(p);
@@ -480,32 +420,32 @@ Handlers::setupOptionsAddAttachmentFile()
 }
 
 void
-Handlers::beginOptionsCopyAttachmentsFromArray(JSON)
+Handlers::beginCopyAttachmentsFromArray(JSON)
 {
     // nothing needed
 }
 
 void
-Handlers::endOptionsCopyAttachmentsFromArray()
+Handlers::endCopyAttachmentsFromArray()
 {
     // nothing needed
 }
 
 void
-Handlers::beginOptionsCopyAttachmentsFrom(JSON)
+Handlers::beginCopyAttachmentsFrom(JSON)
 {
     this->c_copy_att = c_main->copyAttachmentsFrom();
 }
 
 void
-Handlers::endOptionsCopyAttachmentsFrom()
+Handlers::endCopyAttachmentsFrom()
 {
     this->c_copy_att->endCopyAttachmentsFrom();
     this->c_copy_att = nullptr;
 }
 
 void
-Handlers::setupOptionsCopyAttachmentsFromFile()
+Handlers::setupCopyAttachmentsFromFile()
 {
     addParameter([this](char const* p) {
         c_copy_att->file(p);
@@ -513,7 +453,7 @@ Handlers::setupOptionsCopyAttachmentsFromFile()
 }
 
 void
-Handlers::setupOptionsCopyAttachmentsFromPassword()
+Handlers::setupCopyAttachmentsFromPassword()
 {
     addParameter([this](char const* p) {
         c_copy_att->password(p);
@@ -521,20 +461,20 @@ Handlers::setupOptionsCopyAttachmentsFromPassword()
 }
 
 void
-Handlers::beginOptionsPagesArray(JSON)
+Handlers::beginPagesArray(JSON)
 {
     this->c_pages = c_main->pages();
 }
 
 void
-Handlers::endOptionsPagesArray()
+Handlers::endPagesArray()
 {
     c_pages->endPages();
     c_pages = nullptr;
 }
 
 void
-Handlers::beginOptionsPages(JSON j)
+Handlers::beginPages(JSON j)
 {
     std::string file;
     std::string range("1-z");
@@ -565,47 +505,47 @@ Handlers::beginOptionsPages(JSON j)
 }
 
 void
-Handlers::endOptionsPages()
+Handlers::endPages()
 {
     // nothing needed
 }
 
 void
-Handlers::setupOptionsPagesFile()
+Handlers::setupPagesFile()
 {
-    // handled in beginOptionsPages
+    // handled in beginPages
     ignoreItem();
 }
 
 void
-Handlers::setupOptionsPagesPassword()
+Handlers::setupPagesPassword()
 {
-    // handled in beginOptionsPages
+    // handled in beginPages
     ignoreItem();
 }
 
 void
-Handlers::setupOptionsPagesRange()
+Handlers::setupPagesRange()
 {
-    // handled in beginOptionsPages
+    // handled in beginPages
     ignoreItem();
 }
 
 void
-Handlers::beginOptionsOverlay(JSON)
+Handlers::beginOverlay(JSON)
 {
     this->c_uo = c_main->overlay();
 }
 
 void
-Handlers::endOptionsOverlay()
+Handlers::endOverlay()
 {
     c_uo->endUnderlayOverlay();
     c_uo = nullptr;
 }
 
 void
-Handlers::setupOptionsOverlayFile()
+Handlers::setupOverlayFile()
 {
     addParameter([this](char const* p) {
         c_uo->file(p);
@@ -613,7 +553,7 @@ Handlers::setupOptionsOverlayFile()
 }
 
 void
-Handlers::setupOptionsOverlayPassword()
+Handlers::setupOverlayPassword()
 {
     addParameter([this](char const* p) {
         c_uo->password(p);
@@ -621,20 +561,20 @@ Handlers::setupOptionsOverlayPassword()
 }
 
 void
-Handlers::beginOptionsUnderlay(JSON)
+Handlers::beginUnderlay(JSON)
 {
     this->c_uo = c_main->underlay();
 }
 
 void
-Handlers::endOptionsUnderlay()
+Handlers::endUnderlay()
 {
     c_uo->endUnderlayOverlay();
     c_uo = nullptr;
 }
 
 void
-Handlers::setupOptionsUnderlayFile()
+Handlers::setupUnderlayFile()
 {
     addParameter([this](char const* p) {
         c_uo->file(p);
@@ -642,7 +582,7 @@ Handlers::setupOptionsUnderlayFile()
 }
 
 void
-Handlers::setupOptionsUnderlayPassword()
+Handlers::setupUnderlayPassword()
 {
     addParameter([this](char const* p) {
         c_uo->password(p);

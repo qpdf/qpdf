@@ -1,7 +1,3 @@
 {
-  "output": {
-    "options": {
-      "objectStreams": "potato"
-    }
-  }
+  "objectStreams": "potato"
 }

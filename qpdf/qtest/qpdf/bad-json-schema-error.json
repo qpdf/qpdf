@@ -1,12 +1,10 @@
 {
-  "output": {
-    "potato": {
-      "encrypt": {
-        "userPassword": "",
-        "ownerPassword": "someOwnerThing",
-        "256bit": {
-        }
-      }
+  "potato": {
+  },
+  "encrypt": {
+    "userPassword": "",
+    "ownerPassword": "someOwnerThing",
+    "256bit": {
     }
   }
 }

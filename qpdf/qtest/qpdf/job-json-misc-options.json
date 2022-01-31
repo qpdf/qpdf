@@ -1,13 +1,7 @@
 {
-  "input": {
-    "file": "minimal.pdf"
-  },
-  "output": {
-    "file": "a.pdf",
-    "options": {
-      "staticId": true,
-      "linearize": true,
-      "compressStreams": "n"
-    }
-  }
+  "inputFile": "minimal.pdf",
+  "outputFile": "a.pdf",
+  "staticId": true,
+  "linearize": true,
+  "compressStreams": "n"
 }

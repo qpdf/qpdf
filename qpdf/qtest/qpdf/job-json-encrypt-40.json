@@ -1,19 +1,11 @@
 {
-  "input": {
-    "file": "minimal.pdf"
+  "inputFile": "minimal.pdf",
+  "outputFile": "a.pdf",
+  "staticId": true,
+  "encrypt": {
+    "userPassword": "u",
+    "ownerPassword": "o",
+    "40bit": {}
   },
-  "output": {
-    "file": "a.pdf",
-    "options": {
-      "staticId": true,
-      "encrypt": {
-        "userPassword": "u",
-        "ownerPassword": "o",
-        "40bit": {}
-      }
-    }
-  },
-  "options": {
-    "allowWeakCrypto": true
-  }
+  "allowWeakCrypto": true
 }

@@ -1,5 +1,5 @@
 
-qpdf: error with job-json file bad-json-choice-mismatch.json: .output.options.objectStreams: unexpected value; expected one of disable, preserve, generate
+qpdf: error with job-json file bad-json-choice-mismatch.json: .objectStreams: unexpected value; expected one of disable, preserve, generate
 Run qpdf--job-json-help for information on the file format.
 
 For help:

@@ -1,16 +1,12 @@
 {
-  "input": {
-    "file": "minimal.pdf"
-  },
-  "inspect": {
-    "json": "1",
-    "jsonKey": [
-      "pages",
-      "objects"
-    ],
-    "jsonObject": [
-      "trailer",
-      "5"
-    ]
-  }
+  "inputFile": "minimal.pdf",
+  "json": "1",
+  "jsonKey": [
+    "pages",
+    "objects"
+  ],
+  "jsonObject": [
+    "trailer",
+    "5"
+  ]
 }

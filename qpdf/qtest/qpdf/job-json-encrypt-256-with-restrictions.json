@@ -1,20 +1,14 @@
 {
-  "input": {
-    "file": "minimal.pdf"
-  },
-  "output": {
-    "file": "a.pdf",
-    "options": {
-      "staticId": true,
-      "staticAesIv": true,
-      "encrypt": {
-        "userPassword": "u",
-        "ownerPassword": "o",
-        "256bit": {
-          "print": "low",
-          "modify": "form"
-        }
-      }
+  "inputFile": "minimal.pdf",
+  "outputFile": "a.pdf",
+  "staticId": true,
+  "staticAesIv": true,
+  "encrypt": {
+    "userPassword": "u",
+    "ownerPassword": "o",
+    "256bit": {
+      "print": "low",
+      "modify": "form"
     }
   }
 }
