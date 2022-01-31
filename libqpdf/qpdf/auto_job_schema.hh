@@ -18,6 +18,7 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
       "recompressFlate": "uncompress and recompress flate",
       "decodeLevel": "control which streams to uncompress",
       "decrypt": "remove encryption from input file",
+      "deterministicId": "generate ID deterministically",
       "staticAesIv": "use a fixed AES vector",
       "staticId": "use a fixed document ID",
       "noOriginalObjectIds": "omit original object IDs in qdf",
@@ -93,7 +94,6 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
   },
   "options": {
     "allowWeakCrypto": "allow insecure cryptographic algorithms",
-    "deterministicId": "generate ID deterministically",
     "keepFilesOpen": "manage keeping multiple files open",
     "keepFilesOpenThreshold": "set threshold for keepFilesOpen",
     "noWarn": "suppress printing of warning messages",

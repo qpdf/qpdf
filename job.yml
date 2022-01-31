@@ -277,6 +277,7 @@ json:
       recompress-flate:
       decode-level:
       decrypt:
+      deterministic-id:
       static-aes-iv:
       static-id:
       no-original-object-ids:
@@ -343,7 +344,6 @@ json:
       - null
   _options:
     allow-weak-crypto:
-    deterministic-id:
     keep-files-open:
     keep-files-open-threshold:
     no-warn:

@@ -66,6 +66,9 @@ popHandler(); // key: decodeLevel
 pushKey("decrypt");
 addBare([this]() { c_main->decrypt(); });
 popHandler(); // key: decrypt
+pushKey("deterministicId");
+addBare([this]() { c_main->deterministicId(); });
+popHandler(); // key: deterministicId
 pushKey("staticAesIv");
 addBare([this]() { c_main->staticAesIv(); });
 popHandler(); // key: staticAesIv
@@ -263,9 +266,6 @@ beginDict(bindJSON(&Handlers::beginOptions), bindBare(&Handlers::endOptions)); /
 pushKey("allowWeakCrypto");
 addBare([this]() { c_main->allowWeakCrypto(); });
 popHandler(); // key: allowWeakCrypto
-pushKey("deterministicId");
-addBare([this]() { c_main->deterministicId(); });
-popHandler(); // key: deterministicId
 pushKey("keepFilesOpen");
 addChoices(yn_choices, [this](char const* p) { c_main->keepFilesOpen(p); });
 popHandler(); // key: keepFilesOpen
