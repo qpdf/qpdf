@@ -134,7 +134,7 @@ Related Options
 
 .. qpdf:option:: --empty
 
-   .. help: empty input file
+   .. help: use empty file as input
 
       Use in place of infile for an empty input. Especially useful
       with --pages.
@@ -146,7 +146,7 @@ Related Options
 
 .. qpdf:option:: --replace-input
 
-   .. help: replace input with output
+   .. help: overwrite input with output
 
       Use in place of outfile to overwrite the input file with the output.
 
@@ -358,7 +358,7 @@ Related Options
 
 .. qpdf:option:: --password=password
 
-   .. help: specify password
+   .. help: password for encrypted file
 
       Specify a password for an encrypted, password-protected file.
       Not needed for encrypted files without a password.
@@ -3162,7 +3162,7 @@ Related Options
 
 .. qpdf:option:: --json-key=key
 
-   .. help: restrict which keys are in json output
+   .. help: limit which keys are in json output
 
       This option is repeatable. If given, only the specified
       top-level keys will be included in the JSON output. Otherwise,
@@ -3174,7 +3174,7 @@ Related Options
 
 .. qpdf:option:: --json-object={trailer|obj[,gen]}
 
-   .. help: restrict which objects are in JSON
+   .. help: limit which objects are in JSON
 
       This option is repeatable. If given, only specified objects will
       be shown in the "objects" key of the JSON output. Otherwise, all

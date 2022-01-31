@@ -1,10 +1,10 @@
 static constexpr char const* JOB_SCHEMA_DATA = R"({
   "inputFile": "input filename",
-  "password": "specify password",
+  "password": "password for encrypted file",
   "passwordFile": "read password from a file",
-  "empty": "empty input file",
+  "empty": "use empty file as input",
   "outputFile": "output filename",
-  "replaceInput": "replace input with output",
+  "replaceInput": "overwrite input with output",
   "qdf": "enable viewing PDF code in a text editor",
   "preserveUnreferenced": "preserve unreferenced objects",
   "newlineBeforeEndstream": "force a newline before endstream",
@@ -79,10 +79,10 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
   "showAttachment": "export an embedded file",
   "json": "show file in json format",
   "jsonKey": [
-    "restrict which keys are in json output"
+    "limit which keys are in json output"
   ],
   "jsonObject": [
-    "restrict which objects are in JSON"
+    "limit which objects are in JSON"
   ],
   "allowWeakCrypto": "allow insecure cryptographic algorithms",
   "keepFilesOpen": "manage keeping multiple files open",
@@ -101,7 +101,7 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
   "removeUnreferencedResources": "remove unreferenced page resources",
   "addAttachment": [
     {
-      "file": "attachment to add",
+      "file": "file to attach",
       "creationdate": "set attachment's creation date",
       "description": "set attachment's description",
       "filename": "set attachment's displayed filename",
@@ -114,8 +114,8 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
   "removeAttachment": "remove an embedded file",
   "copyAttachmentsFrom": [
     {
-      "file": "attachment source filename",
-      "password": "specify password",
+      "file": "file to copy attachments from",
+      "password": "password for encrypted file",
       "prefix": "key prefix for copying attachments"
     }
   ],
@@ -131,7 +131,7 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
   "pages": [
     {
       "file": "source for for pages",
-      "password": "specify password",
+      "password": "password for encrypted file",
       "range": "page range"
     }
   ],
@@ -139,21 +139,21 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
   "rotate": "rotate pages",
   "overlay": {
     "file": "source file for overlay",
-    "password": "specify password",
+    "password": "password for encrypted file",
     "from": "source pages for underlay/overlay",
     "repeat": "overlay/underlay pages to repeat",
     "to": "destination pages for underlay/overlay"
   },
   "underlay": {
     "file": "source file for underlay",
-    "password": "specify password",
+    "password": "password for encrypted file",
     "from": "source pages for underlay/overlay",
     "repeat": "overlay/underlay pages to repeat",
     "to": "destination pages for underlay/overlay"
   },
   "warningExit0": "exit 0 even with warnings",
   "jobJsonFile": "job JSON file",
-  "preserveUnreferencedResources": "use removeUnreferencedResourcesNo",
+  "preserveUnreferencedResources": "use removeUnreferencedResources=no",
   "requiresPassword": "silently test a file's password",
   "isEncrypted": "silently test whether a file is encrypted"
 })";

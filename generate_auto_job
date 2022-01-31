@@ -543,7 +543,7 @@ class Main:
             schema_value = j
             if schema_value is None:
                 schema_value = re.sub(
-                    r'--(\S+)',
+                    r'--([^\s=]+)',
                     lambda x: self.option_to_json_key(x.group(1)),
                     expected[flag]['help'])
             is_trivial = False

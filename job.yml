@@ -356,7 +356,7 @@ json:
   ii-min-bytes:
   remove-unreferenced-resources:
   add-attachment:
-    - _file: "attachment to add"
+    - _file: "file to attach"
       creationdate:
       description:
       filename:
@@ -366,7 +366,7 @@ json:
       replace:
   remove-attachment:
   copy-attachments-from:
-    - _file: "attachment source filename"
+    - _file: "file to copy attachments from"
       CopyAtt.password:
       prefix:
   collate:

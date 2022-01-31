@@ -22,10 +22,10 @@ Usage: qpdf [infile] [options] [outfile]
 - @- may be used to read arguments from stdin
 - Later options may override earlier options if contradictory
 )");
-ap.addOptionHelp("--empty", "usage", "empty input file", R"(Use in place of infile for an empty input. Especially useful
+ap.addOptionHelp("--empty", "usage", "use empty file as input", R"(Use in place of infile for an empty input. Especially useful
 with --pages.
 )");
-ap.addOptionHelp("--replace-input", "usage", "replace input with output", R"(Use in place of outfile to overwrite the input file with the output.
+ap.addOptionHelp("--replace-input", "usage", "overwrite input with output", R"(Use in place of outfile to overwrite the input file with the output.
 )");
 ap.addOptionHelp("--job-json-file", "usage", "job JSON file", R"(--job-json-file=file
 
@@ -70,7 +70,7 @@ default provider is shown first.
 ap.addHelpTopic("general", "general options", R"(General options control qpdf's behavior in ways that are not
 directly related to the operation it is performing.
 )");
-ap.addOptionHelp("--password", "general", "specify password", R"(--password=password
+ap.addOptionHelp("--password", "general", "password for encrypted file", R"(--password=password
 
 Specify a password for an encrypted, password-protected file.
 Not needed for encrypted files without a password.
@@ -796,13 +796,13 @@ specific version or "latest".
 )");
 ap.addOptionHelp("--json-help", "json", "show format of json output", R"(Describe the format of the JSON output.
 )");
-ap.addOptionHelp("--json-key", "json", "restrict which keys are in json output", R"(--json-key=key
+ap.addOptionHelp("--json-key", "json", "limit which keys are in json output", R"(--json-key=key
 
 This option is repeatable. If given, only the specified
 top-level keys will be included in the JSON output. Otherwise,
 all keys will be included.
 )");
-ap.addOptionHelp("--json-object", "json", "restrict which objects are in JSON", R"(--json-object={trailer|obj[,gen]}
+ap.addOptionHelp("--json-object", "json", "limit which objects are in JSON", R"(--json-object={trailer|obj[,gen]}
 
 This option is repeatable. If given, only specified objects will
 be shown in the "objects" key of the JSON output. Otherwise, all
