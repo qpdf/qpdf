@@ -628,8 +628,6 @@ QPDFJob::Config::streamData(char const* parameter)
     }
     else
     {
-        // If this happens, it means streamDataChoices in
-        // ArgParser::initOptionTable is wrong.
         usage("invalid stream-data option");
     }
     return this;
@@ -657,8 +655,6 @@ QPDFJob::Config::decodeLevel(char const* parameter)
     }
     else
     {
-        // If this happens, it means decodeLevelChoices in
-        // ArgParser::initOptionTable is wrong.
         usage("invalid option");
     }
     return this;
@@ -682,8 +678,6 @@ QPDFJob::Config::objectStreams(char const* parameter)
     }
     else
     {
-        // If this happens, it means objectStreamsChoices in
-        // ArgParser::initOptionTable is wrong.
         usage("invalid object stream mode");
     }
     return this;
@@ -706,8 +700,6 @@ QPDFJob::Config::removeUnreferencedResources(char const* parameter)
     }
     else
     {
-        // If this happens, it means remove_unref_choices in
-        // ArgParser::initOptionTable is wrong.
         usage("invalid value for --remove-unreferenced-page-resources");
     }
     return this;
