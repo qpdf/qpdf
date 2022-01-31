@@ -242,7 +242,6 @@ options:
 no-json:
   - preserve-unreferenced-resources
   - job-json-file
-  - empty
   - replace-input
   - warning-exit-0
   - requires-password
