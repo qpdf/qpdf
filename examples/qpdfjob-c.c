@@ -57,6 +57,6 @@ int main(int argc, char* argv[])
      * qpdfjob_run_from_json instead and pass the json string as a
      * single char const* argument.
      */
-    r = qpdfjob_run_from_argv(5, new_argv);
+    r = qpdfjob_run_from_argv(new_argv);
     return r;
 }

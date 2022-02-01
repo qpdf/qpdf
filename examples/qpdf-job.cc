@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
             nullptr
         };
         QPDFJob j;
-        j.initializeFromArgv(9, new_argv);
+        j.initializeFromArgv(new_argv);
         j.run();
         std::cout << "out2 status: " << j.getExitCode() << std::endl;
     }

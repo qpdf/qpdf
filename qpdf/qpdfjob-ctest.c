@@ -13,7 +13,7 @@ static void wide_test()
     argv[2] = L"a.pdf";
     argv[3] = L"--static-id";
     argv[4] = NULL;
-    assert(qpdfjob_run_from_wide_argv(4, argv) == 0);
+    assert(qpdfjob_run_from_wide_argv(argv) == 0);
     printf("wide test passed\n");
 }
 #endif // QPDF_NO_WCHAR_T
@@ -28,7 +28,7 @@ static void run_tests()
     argv[2] = "a.pdf";
     argv[3] = "--deterministic-id";
     argv[4] = NULL;
-    assert(qpdfjob_run_from_argv(4, argv) == 0);
+    assert(qpdfjob_run_from_argv(argv) == 0);
     printf("argv test passed\n");
 
     assert(qpdfjob_run_from_json("{\n\

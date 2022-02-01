@@ -465,12 +465,17 @@ ArgParser::parseOptions()
 }
 
 void
-QPDFJob::initializeFromArgv(int argc, char const* const argv[],
+QPDFJob::initializeFromArgv(char const* const argv[],
                             char const* progname_env)
 {
     if (progname_env == nullptr)
     {
         progname_env = "QPDF_EXECUTABLE";
+    }
+    int argc = 0;
+    for (auto k = argv; *k; ++k)
+    {
+        ++argc;
     }
     QPDFArgParser qap(argc, argv, progname_env);
     setMessagePrefix(qap.getProgname());

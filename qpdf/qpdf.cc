@@ -43,7 +43,7 @@ int realmain(int argc, char* argv[])
     try
     {
         // See "HOW TO ADD A COMMAND-LINE ARGUMENT" in README-maintainer.
-        j.initializeFromArgv(argc, argv);
+        j.initializeFromArgv(argv);
         j.run();
     }
     catch (QPDFUsage& e)

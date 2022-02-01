@@ -7,7 +7,7 @@
 #include <cstdio>
 #include <cstring>
 
-int qpdfjob_run_from_argv(int argc, char const* const argv[])
+int qpdfjob_run_from_argv(char const* const argv[])
 {
     auto whoami_p = QUtil::make_shared_cstr(argv[0]);
     auto whoami = QUtil::getWhoami(whoami_p.get());
@@ -16,7 +16,7 @@ int qpdfjob_run_from_argv(int argc, char const* const argv[])
     QPDFJob j;
     try
     {
-        j.initializeFromArgv(argc, argv);
+        j.initializeFromArgv(argv);
         j.run();
     }
     catch (std::exception& e)
@@ -28,9 +28,17 @@ int qpdfjob_run_from_argv(int argc, char const* const argv[])
 }
 
 #ifndef QPDF_NO_WCHAR_T
-int qpdfjob_run_from_wide_argv(int argc, wchar_t const* const argv[])
+int qpdfjob_run_from_wide_argv(wchar_t const* const argv[])
 {
-    return QUtil::call_main_from_wmain(argc, argv, qpdfjob_run_from_argv);
+    int argc = 0;
+    for (auto k = argv; *k; ++k)
+    {
+        ++argc;
+    }
+    return QUtil::call_main_from_wmain(
+        argc, argv, [](int, char const* const new_argv[]) {
+            return qpdfjob_run_from_argv(new_argv);
+        });
 }
 #endif // QPDF_NO_WCHAR_T
 
