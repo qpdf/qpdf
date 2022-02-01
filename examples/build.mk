@@ -17,7 +17,8 @@ BINS_examples = \
 	qpdf-job
 CBINS_examples = \
 	pdf-c-objects \
-	pdf-linearize
+	pdf-linearize \
+	qpdfjob-c
 
 TARGETS_examples = $(foreach B,$(BINS_examples) $(CBINS_examples),examples/$(OUTPUT_DIR)/$(call binname,$(B)))
 

@@ -39,7 +39,7 @@
 
 /*
  * This file provides a minimal wrapper around QPDFJob. See
- * examples/qpdf-job.c for an example of its use.
+ * examples/qpdfjob-c.c for an example of its use.
  */
 
 #ifdef __cplusplus
