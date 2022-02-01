@@ -812,7 +812,8 @@ This option is repeatable. If given, only specified objects will
 be shown in the "objects" key of the JSON output. Otherwise, all
 objects will be shown.
 )");
-ap.addOptionHelp("--job-json-help", "json", "show format of job JSON", R"(Describe the format of the QPDFJob JSON input.
+ap.addOptionHelp("--job-json-help", "json", "show format of job JSON", R"(Describe the format of the QPDFJob JSON input used by
+--job-json-file.
 )");
 ap.addHelpTopic("testing", "options for testing or debugging", R"(The options below are useful when writing automated test code that
 includes files created by qpdf or when testing qpdf itself.

@@ -2303,9 +2303,9 @@ For a detailed list of changes, please see the file
     been added to the :command:`qpdf` command-line
     tool. See :ref:`page-selection`.
 
-  - Options have been added to the :command:`qpdf`
-    command-line tool for copying encryption parameters from another
-    file. (QXXXQ Link)
+  - The :qpdf:ref:`--copy-encryption` option have been added to the
+    :command:`qpdf` command-line tool for copying encryption
+    parameters from another file.
 
   - New methods have been added to the ``QPDF`` object for adding and
     removing pages. See :ref:`adding-and-remove-pages`.

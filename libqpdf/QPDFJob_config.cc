@@ -28,7 +28,6 @@ QPDFJob::Config::emptyInput()
 {
     if (o.m->infilename == 0)
     {
-        // QXXXQ decide whether to fix this or just leave the comment:
         // Various places in QPDFJob.cc know that the empty string for
         // infile means empty. This means that passing "" as the
         // argument to inputFile, or equivalently using "" as a

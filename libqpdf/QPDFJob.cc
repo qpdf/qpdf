@@ -646,7 +646,6 @@ QPDFJob::createsOutput() const
 void
 QPDFJob::checkConfiguration()
 {
-    // QXXXQ messages are CLI-centric
     if (m->replace_input)
     {
         if (m->outfilename)
@@ -722,7 +721,8 @@ QPDFJob::checkConfiguration()
     {
         QTC::TC("qpdf", "qpdf same file error");
         usage("input file and output file are the same;"
-              " use --replace-input to intentionally overwrite the input file");
+              " use --replace-input to intentionally"
+              " overwrite the input file");
     }
 }
 

@@ -1,4 +1,11 @@
 # See "HOW TO ADD A COMMAND-LINE ARGUMENT" in README-maintainer.
+
+# REMEMBER: if you add an optional_choices or optional_parameter, you
+# have to explicitly remember to implement the overloaded config
+# method that takes no arguments. Since no generated code will call it
+# automatically, there is no automated reminder to do this. If you
+# forget, it will be a link error if someone tries to call it.
+
 choices:
   yn:
     - "y"

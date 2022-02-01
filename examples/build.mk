@@ -8,13 +8,13 @@ BINS_examples = \
 	pdf-filter-tokens \
 	pdf-invert-images \
 	pdf-mod-info \
-	pdf-job \
 	pdf-name-number-tree \
 	pdf-npages \
 	pdf-overlay-page \
 	pdf-parse-content \
 	pdf-set-form-values \
-	pdf-split-pages
+	pdf-split-pages \
+	qpdf-job
 CBINS_examples = \
 	pdf-c-objects \
 	pdf-linearize

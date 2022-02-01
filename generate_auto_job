@@ -9,6 +9,121 @@ import json
 import filecmp
 from contextlib import contextmanager
 
+# The purpose of this code is to automatically generate various parts
+# of the QPDFJob class. It is fairly complicated and extremely
+# bespoke, so understanding it is important if modifications are to be
+# made.
+
+# Documentation of QPDFJob is divided among three places:
+#
+# * "HOW TO ADD A COMMAND-LINE ARGUMENT" in README-maintainer provides
+#   a quick reminder for how to add a command-line argument
+#
+# * This file has a detailed explanation about how QPDFJob and
+#   generate_auto_job work together
+#
+# * The manual ("QPDFJob Design" in qpdf-job.rst) discusses the design
+#   approach, rationale, and evolution of QPDFJob.
+#
+# QPDFJob solved the problem of moving extensive functionality that
+# lived in qpdf.cc into the library. The QPDFJob class consists of
+# four major sections:
+#
+# * The run() method and its subsidiaries are responsible for
+#   performing the actual operations on PDF files. This is implemented
+#   in QPDFJob.cc
+#
+# * The nested Config class and the other classes it creates provide
+#   an API for setting up a QPDFJob instance and correspond to the
+#   command-line arguments of the qpdf executable. This is implemented
+#   in QPDFJob_config.cc
+#
+# * The argument parsing code reads an argv array and calls
+#   configuration methods. This is implemented in QPDFJob_argv.cc. The
+#   argument parsing logic itself is implemented in the QPDFArgParser
+#   class.
+#
+# * The job JSON handling code, which reads a QPDFJob JSON file and
+#   calls configuration methods. This is implemented in
+#   QPDFJob_json.cc. The JSON parsing code is in the JSON class. A
+#   sax-like JSON handler class that calls callbacks in response to
+#   items in the JSON is implemented in the JSONHandler class.
+#
+# This code has the job of ensuring that configuration, command-line
+# arguments, and JSON are all consistent and complete so that a
+# developer or user can freely move among those different ways of
+# interacting with QPDFJob in a predictable fashion. In addition, help
+# information for each option appears in manual/cli.rst, and that
+# information is used in creation of the job JSON schema and to supply
+# help text to QPDFArgParser. This code also ensures that there is an
+# exact match between options in job.yml and options in cli.rst.
+#
+# The job.yml file contains the data that drives this code. To
+# understand job.yml, here are some important concepts.
+#
+# QPDFArgParser option table. There is support for positional
+# arguments, options consisting of flags and optional parameters, and
+# subparsers that start with a regular parameterless flag, have their
+# own positional and option sections, and are terminated with -- by
+# itself. Examples of this include --encrypt and --pages. An "option
+# table" contains an optional positional argument handler and a list
+# of valid options with specifications about their parameters. There
+# are three kinds of option tables:
+#
+# * The built-in "help" option table contains help commands, like
+#   --help and --version, that are only valid when they appear as the
+#   single command-line argument.
+#
+# * The "main" option table contains the options that are valid
+#   starting at the beginning of argument parsing.
+#
+# * A named option table can be started manually by the argument
+#   parsing code to switch the argument parser's context. Switching
+#   the parser to a new option table is manual (via a call to
+#   selectOptionTable). Context reverts to the main option table
+#   automatically when -- is encountered.
+#
+# In QPDFJob.hh, there is a Config class for each option table except
+# help.
+#
+# Option type: bare, required/optional parameter, required/optional
+# choices. A bare argument is just a flag, like --qdf. A parameter
+# option takes an arbitrary parameter, like --password. A choices
+# option takes one of a fixed list of choices, like --object-streams.
+# If a parameter or choices option's parameter is option, the empty
+# string may be specified as an option, such as --collate (or
+# --collate=). For a bare option, --option= is always the same as just
+# --option. This makes it possible to switch an option from bare to
+# optional choice to optional parameter all without breaking
+# compatibility.
+#
+# JSON "schema". This is a qpdf-specific "schema" for JSON. It is not
+# related to any kind of standard JSON schema. It is described in
+# JSON.hh and in the manual. QPDFJob uses the JSON "schema" in a mode
+# in which keys in the schema are all optional in the JSON object.
+#
+# Here is the mapping between configuration, argv, and JSON.
+#
+# The help options table is implemented solely for argv processing and
+# has no counterpart in configuration or JSON.
+#
+# The config() method returns a shared pointer to a Config object.
+# Every command-line option in the main option table has a
+# corresponding method in Config whose name is the option converted to
+# camel case. For bare options and options with optional parameters, a
+# version exists that takes no arguments. For others, a version exists
+# that takes a char const*. For example, the --qdf flag implies a
+# qdf() method in Config, and the --object-streams flag implies an
+# objectStreams(char const*) method in Config. For flags in option
+# tables, the method is declared inside a config class specific to the
+# option table. The mapping between option tables and config classes
+# is explicit in job.yml. Positional arguments are handled
+# individually and manually -- see QPDFJob.hh in the CONFIGURATION
+# section for details. See examples/qpdf-job.cc for an example.
+#
+# To understand the rest, start at main and follow comments in the
+# code.
+
 whoami = os.path.basename(sys.argv[0])
 BANNER = f'''//
 // This file is automatically generated by {whoami}.
@@ -33,12 +148,18 @@ def write_file(filename):
 
 
 class Main:
+    # SOURCES is a list of source files whose contents are used by
+    # this program. If they change, we are out of date.
     SOURCES = [
         whoami,
         'manual/_ext/qpdf.py',
         'job.yml',
         'manual/cli.rst',
     ]
+    # DESTS is a map to the output files this code generates. These
+    # generated files, as well as those added to DESTS later in the
+    # code, are included in various places by QPDFJob.hh or any of the
+    # implementing QPDFJob*.cc files.
     DESTS = {
         'decl': 'libqpdf/qpdf/auto_job_decl.hh',
         'init': 'libqpdf/qpdf/auto_job_init.hh',
@@ -48,6 +169,11 @@ class Main:
         'json_init': 'libqpdf/qpdf/auto_job_json_init.hh',
         # Others are added in top
     }
+    # SUBS contains a checksum for each source and destination and is
+    # used to detect whether we're up to date without having to force
+    # recompilation all the time. This way the build can invoke this
+    # script unconditionally without causing stuff to rebuild every
+    # time.
     SUMS = 'job.sums'
 
     def main(self, args=sys.argv[1:], prog=whoami):
@@ -71,8 +197,17 @@ class Main:
     def top(self, options):
         with open('job.yml', 'r') as f:
             data = yaml.safe_load(f.read())
+        # config_decls maps a config key from an option in "options"
+        # (from job.yml) to a list of declarations. A declaration is
+        # generated for each config method for that option table.
         self.config_decls = {}
+        # Keep track of which configs we've declared since we can have
+        # option tables share a config class, as with the encryption
+        # tables.
         self.declared_configs = set()
+
+        # Update DESTS -- see above. This ensures that each config
+        # class's contents are included in job.sums.
         for o in data['options']:
             config = o.get('config', None)
             if config is not None:
@@ -257,12 +392,21 @@ class Main:
     def generate(self, data):
         warn(f'{whoami}: regenerating auto job files')
         self.validate(data)
-        # Add the built-in help options to tables that we populate as
-        # we read job.yml since we won't encounter these in job.yml
+
+        # Keep track of which options are help options since they are
+        # handled specially. Add the built-in help options to tables
+        # that we populate as we read job.yml since we won't encounter
+        # these in job.yml
         self.help_options = set(
             ['--completion-bash', '--completion-zsh', '--help']
         )
+        # Keep track of which options we have encountered but haven't
+        # seen help text for. This enables us to report if any option
+        # is missing help.
         self.options_without_help = set(self.help_options)
+
+        # Compute the information needed for generated files and write
+        # the files.
         self.prepare(data)
         with write_file(self.DESTS['decl']) as f:
             print(BANNER, file=f)
@@ -276,6 +420,11 @@ class Main:
             with open('manual/cli.rst', 'r') as df:
                 print(BANNER, file=f)
                 self.generate_doc(df, f)
+
+        # Compute the json files after the config and arg parsing
+        # files. We need to have full information about all the
+        # options before we can generate the schema. Generating the
+        # schema also generates the json header files.
         self.generate_schema(data)
         with write_file(self.DESTS['schema']) as f:
             print('static constexpr char const* JOB_SCHEMA_DATA = R"(' +
@@ -301,6 +450,9 @@ class Main:
         # DON'T ADD CODE TO generate AFTER update_hashes
 
     def handle_trivial(self, i, identifier, cfg, prefix, kind, v):
+        # A "trivial" option is one whose handler does nothing other
+        # than to call the config method with the same name (switched
+        # to camelCase).
         decl_arg = 1
         decl_arg_optional = False
         if kind == 'bare':
@@ -341,11 +493,18 @@ class Main:
                 # strategy enables us to change an option from bare to
                 # optional_parameter or optional_choices without
                 # breaking binary compatibility. The overloaded
-                # methods both have to be implemented manually.
+                # methods both have to be implemented manually. They
+                # are not automatically called, so if you forget,
+                # someone will get a link error if they try to call
+                # one.
                 self.config_decls[cfg].append(
                     f'QPDF_DLL {config_prefix}* {identifier}();')
 
     def handle_flag(self, i, identifier, kind, v):
+        # For flags that require manual handlers, declare the handler
+        # and register it. They have to be implemented manually in
+        # QPDFJob_argv.cc. You get compiler/linker errors for any
+        # missing methods.
         if kind == 'bare':
             self.decls.append(f'void {identifier}();')
             self.init.append(f'this->ap.addBare("{i}", '
@@ -371,14 +530,17 @@ class Main:
                              f', false, {v}_choices);')
 
     def prepare(self, data):
-        self.decls = []
-        self.init = []
-        self.json_decls = []
-        self.json_init = []
-        self.jdata = {}
-        self.by_table = {}
+        self.decls = []         # argv handler declarations
+        self.init = []          # initialize arg parsing code
+        self.json_decls = []    # json handler declarations
+        self.json_init = []     # initialize json handlers
+        self.jdata = {}         # running data used for json generate
+        self.by_table = {}      # table information by name for easy lookup
 
         def add_jdata(flag, table, details):
+            # Keep track of each flag and where it appears so we can
+            # check consistency between the json information and the
+            # options section.
             nonlocal self
             if table == 'help':
                 self.help_options.add(f'--{flag}')
@@ -389,6 +551,7 @@ class Main:
                     'tables': {table: details},
                 }
 
+        # helper functions
         self.init.append('auto b = [this](void (ArgParser::*f)()) {')
         self.init.append('    return QPDFArgParser::bindBare(f, this);')
         self.init.append('};')
@@ -396,6 +559,8 @@ class Main:
         self.init.append('    return QPDFArgParser::bindParam(f, this);')
         self.init.append('};')
         self.init.append('')
+
+        # static variables for each set of choices for choices options
         for k, v in data['choices'].items():
             s = f'static char const* {k}_choices[] = {{'
             for i in v:
@@ -406,6 +571,8 @@ class Main:
         self.init.append('')
         self.json_init.append('')
 
+        # constants for the table names to reduce hard-coding strings
+        # in the handlers
         for o in data['options']:
             table = o['table']
             if table in ('main', 'help'):
@@ -413,6 +580,20 @@ class Main:
             i = self.to_identifier(table, 'O', True)
             self.decls.append(f'static constexpr char const* {i} = "{table}";')
         self.decls.append('')
+
+        # Walk through all the options adding declarations for the
+        # option handlers and initialization code to register the
+        # handlers in QPDFArgParser. For "trivial" cases,
+        # QPDFArgParser will call the corresponding config method
+        # automatically. Otherwise, it will declare a handler that you
+        # have to explicitly implement.
+
+        # If you add a new option table, you have to set config to the
+        # name of a member variable that you declare in the ArgParser
+        # class in QPDFJob_argv.cc. Then there should be an option in
+        # the main table, also listed as manual in job.yml, that
+        # switches to it. See implementations of any of the existing
+        # options that do this for examples.
         for o in data['options']:
             table = o['table']
             config = o.get('config', None)
@@ -437,8 +618,8 @@ class Main:
                 self.decls.append(f'void {arg_prefix}Positional(char*);')
                 self.init.append('this->ap.addPositional('
                                  f'p(&ArgParser::{arg_prefix}Positional));')
-            flags = {}
 
+            flags = {}
             for i in o.get('bare', []):
                 flags[i] = ['bare', None]
             for i, v in o.get('required_parameter', {}).items():
@@ -462,6 +643,11 @@ class Main:
                     self.handle_trivial(
                         i, identifier, config, config_prefix, kind, v)
 
+            # Subsidiary options tables need end methods to do any
+            # final checking within the option table. Final checking
+            # for the main option table is handled by
+            # checkConfiguration, which is called explicitly in the
+            # QPDFJob code.
             if table not in ('main', 'help'):
                 identifier = self.to_identifier(table, 'argEnd', False)
                 self.decls.append(f'void {identifier}();')
@@ -510,6 +696,19 @@ class Main:
         return self.option_to_json_key(schema_key)
 
     def build_schema(self, j, path, flag, expected, options_seen):
+        # j: the part of data from "json" in job.yml as we traverse it
+        # path: a string representation of the path in the json
+        # flag: the command-line flag
+        # expected: a map of command-line options we expect to eventually see
+        # options_seen: which options we have seen so far
+
+        # As described in job.yml, the json can have keys that don't
+        # map to options. This includes keys whose values are
+        # dictionaries as well as keys that correspond to positional
+        # arguments. These start with _ and get their help from
+        # job.yml. Things that correspond to options get their help
+        # from the help text we gathered from cli.rst.
+
         if flag in expected:
             options_seen.add(flag)
         elif isinstance(j, str):
@@ -519,6 +718,19 @@ class Main:
         elif not (flag == '' or flag.startswith('_')):
             raise Exception(f'json: unknown key {flag}')
 
+        # The logic here is subtle and makes sense if you understand
+        # how our JSON schemas work. They are described in JSON.hh,
+        # but basically, if you see a dictionary, the schema should
+        # have a dictionary with the same keys whose values are
+        # descriptive. If you see an array, the array should have
+        # single member that describes each element of the array. See
+        # JSON.hh for details.
+
+        # See comments in QPDFJob_json.cc in the Handlers class
+        # declaration to understand how and why the methods called
+        # here work. The idea is that Handlers keeps a stack of
+        # JSONHandler shared pointers so that we can register our
+        # handlers in the right place as we go.
         if isinstance(j, dict):
             schema_value = {}
             if flag:
@@ -579,14 +791,20 @@ class Main:
 
     def generate_schema(self, data):
         # Check to make sure that every command-line option is
-        # represented in data['json'].
-
-        # Build a list of options that we expect. If an option appears
-        # once, we just expect to see it once. If it appears in more
-        # than one options table, we need to see a separate version of
-        # it for each option table. It is represented in job.yml
-        # prepended with the table prefix. The table prefix is removed
-        # in the schema.
+        # represented in data['json']. Build a list of options that we
+        # expect. If an option appears once, we just expect to see it
+        # once. If it appears in more than one options table, we need
+        # to see a separate version of it for each option table. It is
+        # represented in job.yml prepended with the table prefix. The
+        # table prefix is removed in the schema. Example: "password"
+        # appears multiple times, so the json section of job.yml has
+        # main.password, uo.password, etc. But most options appear
+        # only once, so we can just list them as they are. There is a
+        # nearly exact match between option tables and dictionary in
+        # the job json schema, but it's not perfect because of how
+        # positional arguments are handled, so we have to do this
+        # extra work. Information about which tables a particular
+        # option appeared in is gathered up in prepare().
         expected = {}
         for k, v in self.jdata.items():
             tables = v['tables']
@@ -600,7 +818,11 @@ class Main:
         # Walk through the json information building the schema as we
         # go. This verifies consistency between command-line options
         # and the json section of the data and builds up a schema by
-        # populating with help information as available.
+        # populating with help information as available. In addition
+        # to generating the schema, we declare and register json
+        # handlers that correspond with it. That way, we can first
+        # check a job JSON file against the schema, and if it matches,
+        # we have fewer error opportunities while calling handlers.
         self.schema = self.build_schema(
             data['json'], '', '', expected, options_seen)
         if options_seen != set(expected.keys()):

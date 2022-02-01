@@ -62,10 +62,10 @@ class QPDFJob
     // the regular API. This is exposed in the C API, which makes it
     // easier to get certain high-level qpdf functionality from other
     // languages. If there are any command-line errors, this method
-    // will throw QPDFArgParser::Usage which is derived from
-    // std::runtime_error. Other exceptions may be thrown in some
-    // cases. Note that argc, and argv should be UTF-8 encoded. If you
-    // are calling this from a Windows Unicode-aware main (wmain), see
+    // will throw QPDFUsage which is derived from std::runtime_error.
+    // Other exceptions may be thrown in some cases. Note that argc,
+    // and argv should be UTF-8 encoded. If you are calling this from
+    // a Windows Unicode-aware main (wmain), see
     // QUtil::call_main_from_wmain for information about converting
     // arguments to UTF-8. This method will mutate arguments that are
     // passed to it.
@@ -76,7 +76,7 @@ class QPDFJob
     // Initialize a QPDFJob from json. Passing partial = true prevents
     // this method from doing the final checks (calling
     // checkConfiguration) after processing the json file. This makes
-    // it possible to initialze QPDFJob in stages using multiple json
+    // it possible to initialize QPDFJob in stages using multiple json
     // files or to have a json file that can be processed from the CLI
     // with --job-json-file and be combined with other arguments. For
     // example, you might include only encryption parameters, leaving
@@ -84,7 +84,11 @@ class QPDFJob
     // input and output files. initializeFromJson is called with
     // partial = true when invoked from the command line. To make sure
     // that the json file is fully valid on its own, just don't
-    // specify any other command-line flags.
+    // specify any other command-line flags. If there are any
+    // configuration errors, QPDFUsage is thrown. Some error messages
+    // may be CLI-centric. If an an exception tells you to use the
+    // "--some-option" option, set the "someOption" key in the JSON
+    // object instead.
     QPDF_DLL
     void initializeFromJson(std::string const& json, bool partial = false);
 
@@ -160,7 +164,7 @@ class QPDFJob
     // object. The Config object contains methods that correspond with
     // qpdf command-line arguments. You can use a fluent interface to
     // configure a QPDFJob object that would do exactly the same thing
-    // as a specific qpdf command. The example pdf-job.cc contains an
+    // as a specific qpdf command. The example qpdf-job.cc contains an
     // example of this usage. You can also use initializeFromJson or
     // initializeFromArgv to initialize a QPDFJob object.
 
@@ -179,6 +183,10 @@ class QPDFJob
     //   users can initialize them when needed, which you can't do
     //   with references. Returning pointers instead of references
     //   makes for a more uniform interface.
+
+    // Maintainer documentation: see the section in README-maintainer
+    // called "HOW TO ADD A COMMAND-LINE ARGUMENT", which contains
+    // references to additional places in the documentation.
 
     class Config;
 
@@ -330,7 +338,10 @@ class QPDFJob
     // Return a top-level configuration item. See CONFIGURATION above
     // for details. If an invalid configuration is created (such as
     // supplying contradictory options, omitting an input file, etc.),
-    // QPDFUsage is thrown.
+    // QPDFUsage is thrown. Note that error messages are CLI-centric,
+    // but you can map them into config calls. For example, if an
+    // exception tells you to use the --some-option flag, you should
+    // call config()->someOption() instead.
     QPDF_DLL
     std::shared_ptr<Config> config();
 

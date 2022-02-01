@@ -167,9 +167,11 @@ Related Options
       description of the JSON input file format.
 
    Specify the name of a file whose contents are expected to contain a
-   QPDFJob JSON file. QXXXQ ref.  This file is read and treated as if
-   the equivalent command-line arguments were supplied. It can be
-   mixed freely with other options.
+   QPDFJob JSON file. This file is read and treated as if the
+   equivalent command-line arguments were supplied. It can be repeated
+   and mixed freely with other options. Run ``qpdf`` with
+   :qpdf:ref:`--job-json-help` for a description of the job JSON input
+   file format. For more information, see :ref:`qpdf-job`.
 
 .. _exit-status:
 
@@ -3200,9 +3202,12 @@ Related Options
 
    .. help: show format of job JSON
 
-      Describe the format of the QPDFJob JSON input.
+      Describe the format of the QPDFJob JSON input used by
+      --job-json-file.
 
-   Describe the format of the QPDFJob JSON input. QXXXQ doc ref.
+   Describe the format of the QPDFJob JSON input used by
+   :qpdf:ref:`--job-json-file`. For more information about QPDFJob,
+   see :ref:`qpdf-job`.
 
 .. _test-options:
 

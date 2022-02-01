@@ -124,14 +124,32 @@ CODING RULES
 
 HOW TO ADD A COMMAND-LINE ARGUMENT
 
+QPDFJob is documented in three places:
+
+* This section provides a quick reminder for how to add a command-line
+  argument
+
+* generate_auto_job has a detailed explanation about how QPDFJob and
+  generate_auto_job work together
+
+* The manual ("QPDFJob Design" in qpdf-job.rst) discusses the design
+  approach, rationale, and evolution of QPDFJob.
+
 Command-line arguments are closely coupled with QPDFJob. To add a new
 command-line argument, add the option to the appropriate table in
 job.yml. This will automatically declare a method in the private
 ArgParser class in QPDFJob_argv.cc which you have to implement. The
-implementation should make calls to methods in QPDFJob. Then, add the
-same option to either the no-json section of job.yml if it is to be
-excluded from the job json structure, or add it under the json
-structure to the place where it should appear in the json structure.
+implementation should make calls to methods in QPDFJob via its Config
+classes. Then, add the same option to either the no-json section of
+job.yml if it is to be excluded from the job json structure, or add it
+under the json structure to the place where it should appear in the
+json structure.
+
+In most cases, adding a new option will automatically declare and call
+the appropriate Config method, which you then have to implement. If
+you need a manual handler, you have to declare the option as manual in
+job.yml and implement the handler yourself, though the automatically
+generated code will declare it for you.
 
 The build will fail until the new option is documented in
 manual/cli.rst. To do that, create documentation for the option by
@@ -148,6 +166,10 @@ When done, the following should happen:
 * qpdf --help=topic should list --new-option for the correct topic
 * --new-option should appear in the manual
 * --new-option should be in the command-line option index in the manual
+* A Config method (in Config or one of the other Config classes in
+  QPDFJob) should exist that corresponds to the command-line flag
+* The job JSON file should have a new key in the schema corresponding
+  to the new option
 
 
 RELEASE PREPARATION
