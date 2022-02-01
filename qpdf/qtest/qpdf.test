@@ -402,7 +402,7 @@ my @good_json = (
     "underlay-overlay-password",
     "misc-options",
     );
-$n_tests += 4 + scalar(@bad_json) + (2 * scalar(@good_json));
+$n_tests += 10 + scalar(@bad_json) + (2 * scalar(@good_json));
 
 
 foreach my $i (@bad_json)
@@ -456,6 +456,34 @@ $td->runtest("json output from job",
              {$td->COMMAND => "qpdf --job-json-file=job-json-output.json"},
              {$td->FILE => "job-json-output.out.json", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
+
+$td->runtest("C job API",
+             {$td->COMMAND => "qpdfjob-ctest"},
+             {$td->FILE => "qpdfjob-ctest.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+foreach my $i (['a.pdf', 1], ['b.pdf', 2], ['c.pdf', 3])
+{
+    $td->runtest("check output",
+                 {$td->FILE => $i->[0]},
+                 {$td->FILE => "qpdfjob-ctest$i->[1].pdf"});
+}
+my $wide_out = `qpdfjob-ctest wide`;
+$td->runtest("qpdfjob-ctest wide",
+             {$td->STRING => "$?: $wide_out"},
+             {$td->REGEXP => "0: (wide test passed|skipped wide)\n"},
+             $td->NORMALIZE_NEWLINES);
+if ($wide_out =~ m/skipped/)
+{
+    $td->runtest("skipped wide",
+                 {$td->STRING => "yes"},
+                 {$td->STRING => "yes"});
+}
+else
+{
+    $td->runtest("check output",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => "qpdfjob-ctest-wide.pdf"});
+}
 
 show_ntests();
 # ----------

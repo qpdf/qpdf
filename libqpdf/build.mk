@@ -115,7 +115,8 @@ SRCS_libqpdf = \
 	libqpdf/SecureRandomDataProvider.cc \
 	libqpdf/SF_FlateLzwDecode.cc \
 	libqpdf/SparseOHArray.cc \
-	libqpdf/qpdf-c.cc
+	libqpdf/qpdf-c.cc \
+	libqpdf/qpdfjob-c.cc
 
 ifeq ($(USE_CRYPTO_NATIVE), 1)
 SRCS_libqpdf += $(CRYPTO_NATIVE)

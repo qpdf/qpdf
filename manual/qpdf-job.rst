@@ -14,7 +14,7 @@ executable is available from inside the C++ library using the
 
   - Use from the C++ API with ``QPDFJob::initializeFromArgv``
 
-  - Use from the C API with QXXXQ
+  - Use from the C API with ``qpdfjob_run_from_argv`` from :file:`qpdfjob-c.h`
 
 - The job JSON file format
 
@@ -22,7 +22,7 @@ executable is available from inside the C++ library using the
 
   - Use from the C++ API with ``QPDFJob::initializeFromJson``
 
-  - Use from the C API with QXXXQ
+  - Use from the C API with ``qpdfjob_run_from_json`` from :file:`qpdfjob-c.h`
 
 - The ``QPDFJob`` C++ API
 

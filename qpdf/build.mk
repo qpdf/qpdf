@@ -12,7 +12,9 @@ BINS_qpdf = \
     test_tokenizer \
     test_unicode_filenames \
     test_xref
-CBINS_qpdf = qpdf-ctest
+CBINS_qpdf = \
+    qpdf-ctest \
+    qpdfjob-ctest
 
 TARGETS_qpdf = $(foreach B,$(BINS_qpdf) $(CBINS_qpdf),qpdf/$(OUTPUT_DIR)/$(call binname,$(B)))
 
