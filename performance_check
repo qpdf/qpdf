@@ -129,7 +129,7 @@ print "\n";
 sub filter_args
 {
     my $args = shift;
-    my $help = `$executable --help`;
+    my $help = `$executable --help=all`;
     my $new_args = [];
     foreach my $arg (@$args)
     {
