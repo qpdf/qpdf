@@ -629,10 +629,28 @@ QPDFJob::run()
     {
         this->m->warnings = true;
     }
+    if (this->m->warnings && (! this->m->suppress_warnings))
+    {
+        if (createsOutput())
+        {
+            (*this->m->cerr)
+                << this->m->message_prefix
+                << ": operation succeeded with warnings;"
+                << " resulting file may have some problems"
+                << std::endl;
+        }
+        else
+        {
+            (*this->m->cerr)
+                << this->m->message_prefix
+                << ": operation succeeded with warnings"
+                << std::endl;
+        }
+    }
 }
 
 bool
-QPDFJob::hasWarnings()
+QPDFJob::hasWarnings() const
 {
     return this->m->warnings;
 }
@@ -641,6 +659,51 @@ bool
 QPDFJob::createsOutput() const
 {
     return ((m->outfilename != nullptr) || m->replace_input);
+}
+
+int
+QPDFJob::getExitCode() const
+{
+    if (this->m->check_is_encrypted)
+    {
+        if (this->m->encryption_status & qpdf_es_encrypted)
+        {
+            QTC::TC("qpdf", "qpdf check encrypted encrypted");
+            return 0;
+        }
+        else
+        {
+            QTC::TC("qpdf", "qpdf check encrypted not encrypted");
+            return EXIT_IS_NOT_ENCRYPTED;
+        }
+    }
+    else if (this->m->check_requires_password)
+    {
+        if (this->m->encryption_status & qpdf_es_encrypted)
+        {
+            if (this->m->encryption_status & qpdf_es_password_incorrect)
+            {
+                QTC::TC("qpdf", "qpdf check password password incorrect");
+                return 0;
+            }
+            else
+            {
+                QTC::TC("qpdf", "qpdf check password password correct");
+                return EXIT_CORRECT_PASSWORD;
+            }
+        }
+        else
+        {
+            QTC::TC("qpdf", "qpdf check password not encrypted");
+            return EXIT_IS_NOT_ENCRYPTED;
+        }
+    }
+
+    if (this->m->warnings && (! this->m->warnings_exit_zero))
+    {
+        return EXIT_WARNING;
+    }
+    return 0;
 }
 
 void
@@ -724,30 +787,6 @@ QPDFJob::checkConfiguration()
               " use --replace-input to intentionally"
               " overwrite the input file");
     }
-}
-
-bool
-QPDFJob::suppressWarnings()
-{
-    return this->m->suppress_warnings;
-}
-
-bool
-QPDFJob::warningsExitZero()
-{
-    return this->m->warnings_exit_zero;
-}
-
-bool
-QPDFJob::checkRequiresPassword()
-{
-    return this->m->check_requires_password;
-}
-
-bool
-QPDFJob::checkIsEncrypted()
-{
-    return this->m->check_is_encrypted;
 }
 
 unsigned long

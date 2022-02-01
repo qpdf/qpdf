@@ -1,5 +1,4 @@
 #include <qpdf/QPDFJob.hh>
-#include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/QPDFUsage.hh>
 
@@ -7,13 +6,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
-
-static int constexpr EXIT_ERROR = 2;
-static int constexpr EXIT_WARNING = 3;
-
-// For is-encrypted and requires-password
-static int constexpr EXIT_IS_NOT_ENCRYPTED = 2;
-static int constexpr EXIT_CORRECT_PASSWORD = 3;
 
 static char const* whoami = 0;
 
@@ -33,7 +25,7 @@ static void usageExit(std::string const& msg)
         << "  " << whoami << "--help             general help and a topic list"
         << std::endl
 	<< std::endl;
-    exit(EXIT_ERROR);
+    exit(QPDFJob::EXIT_ERROR);
 }
 
 int realmain(int argc, char* argv[])
@@ -48,8 +40,6 @@ int realmain(int argc, char* argv[])
     }
 
     QPDFJob j;
-
-    bool errors = false;
     try
     {
         // See "HOW TO ADD A COMMAND-LINE ARGUMENT" in README-maintainer.
@@ -63,74 +53,9 @@ int realmain(int argc, char* argv[])
     catch (std::exception& e)
     {
 	std::cerr << whoami << ": " << e.what() << std::endl;
-	errors = true;
+        return QPDFJob::EXIT_ERROR;
     }
-
-    bool warnings = j.hasWarnings();
-    if (warnings)
-    {
-        if (! j.suppressWarnings())
-        {
-            if (j.createsOutput())
-            {
-                std::cerr << whoami << ": operation succeeded with warnings;"
-                          << " resulting file may have some problems"
-                          << std::endl;
-            }
-            else
-            {
-                std::cerr << whoami << ": operation succeeded with warnings"
-                          << std::endl;
-            }
-        }
-        // Still return with warning code even if warnings were
-        // suppressed, so leave warnings == true unless we've been
-        // specifically instructed to do otherwise.
-        if (j.warningsExitZero())
-        {
-            warnings = false;
-        }
-    }
-
-    unsigned long encryption_status = j.getEncryptionStatus();
-    if (j.checkIsEncrypted())
-    {
-        if (encryption_status & qpdf_es_encrypted)
-        {
-            QTC::TC("qpdf", "qpdf check encrypted encrypted");
-            return 0;
-        }
-        else
-        {
-            QTC::TC("qpdf", "qpdf check encrypted not encrypted");
-            return EXIT_IS_NOT_ENCRYPTED;
-        }
-    }
-    else if (j.checkRequiresPassword())
-    {
-        if (encryption_status & qpdf_es_encrypted)
-        {
-            if (encryption_status & qpdf_es_password_incorrect)
-            {
-                QTC::TC("qpdf", "qpdf check password password incorrect");
-                return 0;
-            }
-            else
-            {
-                QTC::TC("qpdf", "qpdf check password password correct");
-                return EXIT_CORRECT_PASSWORD;
-            }
-        }
-        else
-        {
-            QTC::TC("qpdf", "qpdf check password not encrypted");
-            return EXIT_IS_NOT_ENCRYPTED;
-        }
-    }
-
-    return (errors ? EXIT_ERROR :
-            warnings ? EXIT_WARNING :
-            0);
+    return j.getExitCode();
 }
 
 #ifdef WINDOWS_WMAIN

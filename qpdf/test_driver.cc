@@ -3182,6 +3182,9 @@ static void test_84(QPDF& pdf, char const* arg2)
             ->objectStreams("preserve")
             ->checkConfiguration();
         j.run();
+        assert(j.getExitCode() == 0);
+        assert(! j.hasWarnings());
+        assert(j.getEncryptionStatus() == 0);
     }
 
     std::cout << "error caught by check" << std::endl;

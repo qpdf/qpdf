@@ -43,6 +43,13 @@ class QPDFWriter;
 class QPDFJob
 {
   public:
+    // Exit codes -- returned by getExitCode() after calling run()
+    static int constexpr EXIT_ERROR = 2;
+    static int constexpr EXIT_WARNING = 3;
+    // For is-encrypted and requires-password
+    static int constexpr EXIT_IS_NOT_ENCRYPTED = 2;
+    static int constexpr EXIT_CORRECT_PASSWORD = 3;
+
     // QPDFUsage is thrown if there are any usage-like errors when
     // calling Config methods.
     QPDF_DLL
@@ -345,17 +352,6 @@ class QPDFJob
     QPDF_DLL
     std::shared_ptr<Config> config();
 
-    // Options for helping the qpdf CLI use the correct edit code and
-    // properly report warnings.
-    QPDF_DLL
-    bool suppressWarnings();
-    QPDF_DLL
-    bool warningsExitZero();
-    QPDF_DLL
-    bool checkRequiresPassword();
-    QPDF_DLL
-    bool checkIsEncrypted();
-
     // Execute the job
     QPDF_DLL
     void run();
@@ -364,7 +360,17 @@ class QPDFJob
     // run() is called.
 
     QPDF_DLL
-    bool hasWarnings();
+    bool hasWarnings() const;
+
+    // Return one of the EXIT_* constants defined at the top of the
+    // class declaration. This may be called after run() when run()
+    // did not throw an exception. Takes into consideration whether
+    // isEncrypted or requiresPassword was called. Note that this
+    // function does not know whether run() threw an exception, so
+    // code that uses this to determine how to exit should explicitly
+    // use EXIT_ERROR if run() threw an exception.
+    QPDF_DLL
+    int getExitCode() const;
 
     // Return value is bitwise OR of values from qpdf_encryption_status_e
     QPDF_DLL
