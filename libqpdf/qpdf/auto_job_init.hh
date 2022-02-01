@@ -79,8 +79,6 @@ this->ap.addBare("underlay", b(&ArgParser::argUnderlay));
 this->ap.addBare("verbose", [this](){c_main->verbose();});
 this->ap.addBare("warning-exit-0", [this](){c_main->warningExit0();});
 this->ap.addBare("with-images", [this](){c_main->withImages();});
-this->ap.addOptionalParameter("collate", [this](char *x){c_main->collate(x);});
-this->ap.addOptionalParameter("split-pages", [this](char *x){c_main->splitPages(x);});
 this->ap.addRequiredParameter("compression-level", [this](char *x){c_main->compressionLevel(x);}, "level");
 this->ap.addRequiredParameter("copy-encryption", [this](char *x){c_main->copyEncryption(x);}, "file");
 this->ap.addRequiredParameter("encryption-file-password", [this](char *x){c_main->encryptionFilePassword(x);}, "password");
@@ -100,6 +98,8 @@ this->ap.addRequiredParameter("remove-attachment", [this](char *x){c_main->remov
 this->ap.addRequiredParameter("rotate", [this](char *x){c_main->rotate(x);}, "[+|-]angle");
 this->ap.addRequiredParameter("show-attachment", [this](char *x){c_main->showAttachment(x);}, "attachment");
 this->ap.addRequiredParameter("show-object", [this](char *x){c_main->showObject(x);}, "trailer");
+this->ap.addOptionalParameter("collate", [this](char *x){c_main->collate(x);});
+this->ap.addOptionalParameter("split-pages", [this](char *x){c_main->splitPages(x);});
 this->ap.addChoices("compress-streams", [this](char *x){c_main->compressStreams(x);}, true, yn_choices);
 this->ap.addChoices("decode-level", [this](char *x){c_main->decodeLevel(x);}, true, decode_level_choices);
 this->ap.addChoices("flatten-annotations", [this](char *x){c_main->flattenAnnotations(x);}, true, flatten_choices);

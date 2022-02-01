@@ -106,6 +106,12 @@ QPDFJob::Config::coalesceContents()
 }
 
 QPDFJob::Config*
+QPDFJob::Config::collate()
+{
+    return collate(nullptr);
+}
+
+QPDFJob::Config*
 QPDFJob::Config::collate(char const* parameter)
 {
     auto n = (((parameter == 0) || (strlen(parameter) == 0)) ? 1 :
@@ -235,9 +241,15 @@ QPDFJob::Config::isEncrypted()
 }
 
 QPDFJob::Config*
+QPDFJob::Config::json()
+{
+    return json(nullptr);
+}
+
+QPDFJob::Config*
 QPDFJob::Config::json(char const* parameter)
 {
-    if (parameter)
+    if (parameter && strlen(parameter))
     {
         if (strcmp(parameter, "latest") == 0)
         {
@@ -514,6 +526,12 @@ QPDFJob::Config::showXref()
     o.m->show_xref = true;
     o.m->require_outfile = false;
     return this;
+}
+
+QPDFJob::Config*
+QPDFJob::Config::splitPages()
+{
+    return splitPages(nullptr);
 }
 
 QPDFJob::Config*

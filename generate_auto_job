@@ -302,22 +302,25 @@ class Main:
 
     def handle_trivial(self, i, identifier, cfg, prefix, kind, v):
         decl_arg = 1
+        decl_arg_optional = False
         if kind == 'bare':
             decl_arg = 0
             self.init.append(f'this->ap.addBare("{i}", '
                              f'[this](){{{cfg}->{identifier}();}});')
-        elif kind == 'optional_parameter':
-            self.init.append(f'this->ap.addOptionalParameter("{i}", '
-                             f'[this](char *x){{{cfg}->{identifier}(x);}});')
         elif kind == 'required_parameter':
             self.init.append(f'this->ap.addRequiredParameter("{i}", '
                              f'[this](char *x){{{cfg}->{identifier}(x);}}'
                              f', "{v}");')
+        elif kind == 'optional_parameter':
+            decl_arg_optional = True
+            self.init.append(f'this->ap.addOptionalParameter("{i}", '
+                             f'[this](char *x){{{cfg}->{identifier}(x);}});')
         elif kind == 'required_choices':
             self.init.append(f'this->ap.addChoices("{i}", '
                              f'[this](char *x){{{cfg}->{identifier}(x);}}'
                              f', true, {v}_choices);')
         elif kind == 'optional_choices':
+            decl_arg_optional = True
             self.init.append(f'this->ap.addChoices("{i}", '
                              f'[this](char *x){{{cfg}->{identifier}(x);}}'
                              f', false, {v}_choices);')
@@ -332,21 +335,30 @@ class Main:
         if fn not in self.declared_configs:
             self.declared_configs.add(fn)
             self.config_decls[cfg].append(f'QPDF_DLL {fn};')
+            if decl_arg_optional:
+                # Rather than making the parameter optional, add an
+                # overloaded method that takes no arguments. This
+                # strategy enables us to change an option from bare to
+                # optional_parameter or optional_choices without
+                # breaking binary compatibility. The overloaded
+                # methods both have to be implemented manually.
+                self.config_decls[cfg].append(
+                    f'QPDF_DLL {config_prefix}* {identifier}();')
 
     def handle_flag(self, i, identifier, kind, v):
         if kind == 'bare':
             self.decls.append(f'void {identifier}();')
             self.init.append(f'this->ap.addBare("{i}", '
                              f'b(&ArgParser::{identifier}));')
-        elif kind == 'optional_parameter':
-            self.decls.append(f'void {identifier}(char *);')
-            self.init.append(f'this->ap.addOptionalParameter("{i}", '
-                             f'p(&ArgParser::{identifier}));')
         elif kind == 'required_parameter':
             self.decls.append(f'void {identifier}(char *);')
             self.init.append(f'this->ap.addRequiredParameter("{i}", '
                              f'p(&ArgParser::{identifier})'
                              f', "{v}");')
+        elif kind == 'optional_parameter':
+            self.decls.append(f'void {identifier}(char *);')
+            self.init.append(f'this->ap.addOptionalParameter("{i}", '
+                             f'p(&ArgParser::{identifier}));')
         elif kind == 'required_choices':
             self.decls.append(f'void {identifier}(char *);')
             self.init.append(f'this->ap.addChoices("{i}", '
@@ -429,10 +441,10 @@ class Main:
 
             for i in o.get('bare', []):
                 flags[i] = ['bare', None]
-            for i in o.get('optional_parameter', []):
-                flags[i] = ['optional_parameter', None]
             for i, v in o.get('required_parameter', {}).items():
                 flags[i] = ['required_parameter', v]
+            for i in o.get('optional_parameter', []):
+                flags[i] = ['optional_parameter', None]
             for i, v in o.get('required_choices', {}).items():
                 flags[i] = ['required_choices', v]
             for i, v in o.get('optional_choices', {}).items():
@@ -464,20 +476,20 @@ class Main:
         if kind == 'bare':
             self.json_init.append(
                 f'addBare([this]() {{ {config}->{flag_key}(); }});')
-        elif kind == 'optional_parameter' or kind == 'required_parameter':
+        elif kind == 'required_parameter' or kind == 'optional_parameter':
             # Optional parameters end up just being the empty string,
             # so the handler has to deal with it. The empty string is
             # also allowed for non-optional.
             self.json_init.append(
                 f'addParameter([this](char const* p)'
                 f' {{ {config}->{flag_key}(p); }});')
-        elif kind == 'optional_choices':
-            self.json_init.append(
-                f'addChoices({v}_choices, false,'
-                f' [this](char const* p) {{ {config}->{flag_key}(p); }});')
         elif kind == 'required_choices':
             self.json_init.append(
                 f'addChoices({v}_choices, true,'
+                f' [this](char const* p) {{ {config}->{flag_key}(p); }});')
+        elif kind == 'optional_choices':
+            self.json_init.append(
+                f'addChoices({v}_choices, false,'
                 f' [this](char const* p) {{ {config}->{flag_key}(p); }});')
 
     def handle_json_manual(self, path):
