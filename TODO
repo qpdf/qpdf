@@ -1,30 +1,13 @@
-Next
+10.6
 ====
 
-* Add user-defined initializer `QPDFObjectHandle operator ""_qpdf` to
-  be like QPDFObjectHandle::parse: `auto oh = "<< /a (b) >>"_qpdf;`
+* Close issue #556.
+
 * Add QPDF_MAJOR_VERSION, QPDF_MINOR_VERSION to some header, possibly
   dll.h since this is everywhere that there's API
 
-* Take a fresh look at PointerHolder with a good plan for being able
-  to have developers phase it in using macros or something. Decide
-  about shared_ptr vs unique_ptr for each time make_shared_cstr is
-  called. For non-copiable classes, we can use unique_ptr instead of
-  shared_ptr as a replacement for PointerHolder. For performance
-  critical cases, we could potentially have a real pointer and a
-  shared pointer where the shared pointer's job is to clean up but we
-  use the real pointer for regular access.
-
-Consider in the context of #593, possibly with a different
-implementation
-
-* replace mode: --replace-object, --replace-stream-raw,
-  --replace-stream-filtered
-  * update first paragraph of QPDF JSON in the manual to mention this
-  * object numbers are not preserved by write, so object ID lookup
-    has to be done separately for each invocation
-  * you don't have to specify length for streams
-  * you only have to specify filtering for streams if providing raw data
+* Add user-defined initializer `QPDFObjectHandle operator ""_qpdf` to
+  be like QPDFObjectHandle::parse: `auto oh = "<< /a (b) >>"_qpdf;`
 
 * See if this has been done or is trivial with C++11 local static
   initializers: Secure random number generation could be made more
@@ -42,6 +25,168 @@ implementation
 
 * Completion: would be nice if --job-json-file=<TAB> would complete
   files
+
+* Remember for release notes: starting in qpdf 11, the default value
+  for the --json keyword will be "latest". If you are depending on
+  version 1, change your code to specify --json=1, which works
+  starting with 10.6.0.
+
+* Try to put something in to ease future PointerHolder migration, such
+  as typedefs for containers of PointerHolders. Test to see whether
+  using auto or decltype in certain places may make containers of
+  pointerholders switch over cleanly. Clearly document the deprecation
+  stuff.
+
+
+Output JSON v2
+==============
+
+Output JSON v2 contain enough information to completely recreate a PDF
+file.
+
+This is not an ABI change as long as the default --json version is 1.
+
+If this is done, update --json option in cli.rst to mention v2. Also
+update QPDFJob::Config::json and of course other parts of the docs
+(json.rst).
+
+Fix the following problems:
+
+* Include the PDF version header somewhere.
+
+* Using "n n R" as a key in "objects" and "objectinfo" messes up
+  searching for things
+
+* Strings cannot be unambiguously encoded/decoded
+
+  * Can't tell string from name from indirect object
+
+  * Strings are treated as PDF doc encoding and output as UTF-8, which
+    doesn't work since multiple PDF doc code points are undefined
+
+* There is no representation of stream data
+
+* You can't tell a stream from a dictionary except by looking in both
+  "object" and "objectinfo". Fix this, and then remove "objectinfo".
+
+* There are differences between information shown in the json format
+  vs. information shown with options like --check, --list-attachments,
+  etc. The json format should be able to completely replace things
+  that write to stdout.
+
+* Consider using camelCase in multi-word key names to be consistent
+  with job JSON and with how JSON is often represented in languages
+  that use it more natively
+
+* Consider changing the contract to allow fields to be absent even
+  when present in the schema. It's reasonable for people to check for
+  presence of a key. Most languages make this easy to do.
+
+Most things that are informational can stay the same. We will have to
+go through every item to decide for sure.
+
+To address ambiguity, consider the following:
+
+Whenever a direct PDF object appears, disambiguate things represented
+in JSON as strings as follows:
+
+* "/Name" -- if it starts with /, it's a name
+* "n n R" -- if it is "n n R", it's an indirect object
+* "u:utf8-encoded" -- a utf8-encoded string
+* "b:<12ab34>" -- a binary string
+
+In "objects", the key is "obj:o,g", and the value is a dictionary with
+exactly one of "value" or "stream" as its single key.
+
+For non-streams, the value of "value" is as described above.
+
+{
+  "obj:o,g": {
+    "value": ...
+  }
+}
+
+For streams:
+
+{
+  "obj:o,g": {
+    "stream": {
+      "dict": { ... stream dictionary ... },
+      "filterable": bool,
+      "raw": "base64-encoded raw data",
+      "filtered": "base64-encoded filtered data"
+    }
+  }
+}
+
+Notes about stream data:
+
+* Always include "dict".
+
+* Always include "filterable" regardless of value of
+  --json-stream-data. The value of filterable is influenced by
+  --decode-level, which is already in parameters.
+
+* Add new flag --json-stream-data={raw,filtered,none}. At most one of
+  "raw" and "filtered" will appear for each stream.
+
+* Add to parameters: value of json-stream-data, default is none
+
+* If none, omit stream data entirely
+
+* If raw, include raw stream data as base64
+
+* If filtered, including the base64-encoded filtered stream data if we
+  can and should decode it based on decode-level. Otherwise, include
+  the base64-encoded raw data. See if we can honor
+  --normalize-content.
+
+Note that --json-stream-data=filtered is different from
+--filtered-stream-data in that --filtered-stream-data implies
+--decode-level=all while --json-stream-data=filtered does not. Make
+sure this is mentioned in the help for both options.
+
+QPDFJob
+=======
+
+Here are some ideas for QPDFJob that didn't make it into 10.6. Not all
+of these are necessarily good -- just things to consider.
+
+* replace mode: --replace-object, --replace-stream-raw,
+  --replace-stream-filtered
+  * update first paragraph of QPDF JSON in the manual to mention this
+  * object numbers are not preserved by write, so object ID lookup
+    has to be done separately for each invocation
+  * you don't have to specify length for streams
+  * you only have to specify filtering for streams if providing raw data
+
+* Allow users to supply a custom progress reporter for QPDFJob
+
+* Better interoperability with json output:
+
+  * Make sure all the things that print stuff to stdout have json
+    equivalents (check, showLinearizationData, etc.)
+  * There should be a way to get json output other than having it
+    print to stdout. It should be multi-language friendly and allow
+    for large amounts of data, such as providing a callback that qpdf
+    can write to (like a pipeline)
+  * See also JSON v2
+
+* How do we chain jobs? The idea would be that the input and/or output
+  of a QPDFJob could be a QPDF object rather than a file. For input,
+  it's pretty easy. For output, none of the output-specific options
+  (encrypt, compress-streams, objects-streams, etc.) would have any
+  affect, so we would have to treat this like inspect for error
+  checking. The QPDF object in the state where it's ready to be sent
+  off to QPDFWriter would be used as the input to the next QPDFJob.
+  For the job json, I think we can have the output be an identifier
+  that can be used as the input for another QPDFJob. For a json file,
+  we could the top level detect if it's an array with the convention
+  that exactly one has an output, or we could have a subkey with other
+  job definitions or something. Ideally, any input
+  (copy-attachments-from, pages, etc.) could use a QPDF object. It
+  wouldn't surprise me if this exposes bugs in qpdf around foreign
+  streams as this has been a relatively fragile area before.
 
 Documentation
 =============
@@ -210,6 +355,15 @@ This is a list of changes to make next time there is an ABI change.
 Comments appear in the code prefixed by "ABI"
 
 * Search for ABI to find items not listed here.
+* Switch default --json to latest
+* Take a fresh look at PointerHolder with a good plan for being able
+  to have developers phase it in using macros or something. Decide
+  about shared_ptr vs unique_ptr for each time make_shared_cstr is
+  called. For non-copiable classes, we can use unique_ptr instead of
+  shared_ptr as a replacement for PointerHolder. For performance
+  critical cases, we could potentially have a real pointer and a
+  shared pointer where the shared pointer's job is to clean up but we
+  use the real pointer for regular access.
 * See where anonymous namespaces can be used to keep things private to
   a source file. Search for `(class|struct)` in **/*.cc.
 * See if we can use constructor delegation instead of init() in
