@@ -1,3 +1,25 @@
+2022-02-01  Jay Berkenbilt  <ejb@ql.org>
+
+	* The --json flag now takes a version number as an optional
+	parameter. The default will remain version 1 for compatibility.
+	This enables future code to use --json=latest to always get the
+	latest version or to use a specific version. At this time, there's
+	only version 1, but a version 2 may appear in a future qpdf.
+
+	* Major refactor: all functionality from the qpdf CLI is now
+	available for library users using the QPDFJob class. See comments
+	in include/qpdf/QPDFJob.hh and a new chapter about QPDFJob in the
+	manual. QPDFJob provides fluent interfaces for setting options
+	that exactly map to command-line arguments. There are also methods
+	for initializing QPDFJob from an argv array and from a JSON
+	object.
+
+	* A light C API around basic QPDFJob functionality is in
+	include/qpdf/qpdf-job-c.h.p
+
+	* Add new functions version of QUtil::call_main_from_wmain that
+	takes a constant argv array.
+
 2022-01-31  Jay Berkenbilt  <ejb@ql.org>
 
 	* Have --json-help just output the JSON object, leaving a
@@ -8,9 +30,8 @@
 
 2022-01-28  Jay Berkenbilt  <ejb@ql.org>
 
-	* Add QPDFUsage exception, which is thrown by JSONHandler,
-	QPDFArgParser, and QPDFJob to indicate command-line usage or job
-	configuration errors.
+	* Add QPDFUsage exception, which is thrown by QPDFJob to indicate
+	command-line usage or job configuration errors.
 
 2022-01-22  Jay Berkenbilt  <ejb@ql.org>
 
@@ -25,11 +46,6 @@
 	to QPDFObjectHandle with corresponding functions added to the C
 	API. Thanks to m-holger for the contribution.
 
-2022-01-19  Jay Berkenbilt  <ejb@ql.org>
-
-	* Add a JSONHandler class that allows sax-like, recursive handling
-	of JSON objects.
-
 2022-01-17  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add JSON::parse. Now qpdf's JSON class implements a
@@ -42,6 +58,14 @@
 	* Add isDictionary and isArray to JSON
 
 2022-01-11  Jay Berkenbilt  <ejb@ql.org>
+
+	* Major overhaul of documentation and help for the qpdf
+	command-line tool. qpdf --help is now broken into topics rather
+	than being one great wall of text, and the command-line arguments
+	are indexed in the manual. The entire text of the "Running qpdf"
+	chapter has been reviewed thoroughly. Many thanks once again to
+	M. Holger for a detailed review and editorial assistance with the
+	manual.
 
 	* Bug fix: add missing characters from PDF doc encoding.
 	Fixes #606.
