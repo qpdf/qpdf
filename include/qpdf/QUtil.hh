@@ -435,8 +435,13 @@ namespace QUtil
     // invoked, convert all UTF-16 encoded strings to UTF-8, and call
     // another main.
     QPDF_DLL
-    int call_main_from_wmain(int argc, wchar_t* argv[],
-                             std::function<int(int, char*[])> realmain);
+    int call_main_from_wmain(
+        int argc, wchar_t* argv[],
+        std::function<int(int, char*[])> realmain);
+    QPDF_DLL
+    int call_main_from_wmain(
+        int argc, wchar_t const* const argv[],
+        std::function<int(int, char const* const[])> realmain);
 #endif // QPDF_NO_WCHAR_T
 };
 

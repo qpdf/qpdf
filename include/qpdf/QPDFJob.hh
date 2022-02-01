@@ -77,7 +77,7 @@ class QPDFJob
     // arguments to UTF-8. This method will mutate arguments that are
     // passed to it.
     QPDF_DLL
-    void initializeFromArgv(int argc, char* argv[],
+    void initializeFromArgv(int argc, char const* const argv[],
                             char const* progname_env = nullptr);
 
     // Initialize a QPDFJob from json. Passing partial = true prevents
@@ -205,7 +205,7 @@ class QPDFJob
         QPDF_DLL
         Config* endAddAttachment();
         QPDF_DLL
-        AttConfig* file(char const* parameter);
+        AttConfig* file(std::string const& parameter);
 
 #       include <qpdf/auto_job_c_att.hh>
 
@@ -225,7 +225,7 @@ class QPDFJob
         QPDF_DLL
         Config* endCopyAttachmentsFrom();
         QPDF_DLL
-        CopyAttConfig* file(char const* parameter);
+        CopyAttConfig* file(std::string const& parameter);
 
 #       include <qpdf/auto_job_c_copy_att.hh>
 
@@ -266,7 +266,7 @@ class QPDFJob
         QPDF_DLL
         Config* endUnderlayOverlay();
         QPDF_DLL
-        UOConfig* file(char const* parameter);
+        UOConfig* file(std::string const& parameter);
 
 #       include <qpdf/auto_job_c_uo.hh>
 
@@ -285,7 +285,7 @@ class QPDFJob
         QPDF_DLL
         Config* endEncrypt();
         QPDF_DLL
-        EncConfig* file(char const* parameter);
+        EncConfig* file(std::string const& parameter);
 
 #       include <qpdf/auto_job_c_enc.hh>
 
@@ -305,11 +305,11 @@ class QPDFJob
         void checkConfiguration();
 
         QPDF_DLL
-        Config* inputFile(char const* filename);
+        Config* inputFile(std::string const& filename);
         QPDF_DLL
         Config* emptyInput();
         QPDF_DLL
-        Config* outputFile(char const* filename);
+        Config* outputFile(std::string const& filename);
         QPDF_DLL
         Config* replaceInput();
 

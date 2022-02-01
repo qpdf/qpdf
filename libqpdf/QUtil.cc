@@ -2615,9 +2615,9 @@ QUtil::possible_repaired_encodings(std::string supplied)
 }
 
 #ifndef QPDF_NO_WCHAR_T
-int
-QUtil::call_main_from_wmain(int argc, wchar_t* argv[],
-                            std::function<int(int, char*[])> realmain)
+static int
+call_main_from_wmain(bool, int argc, wchar_t const* const argv[],
+                     std::function<int(int, char*[])> realmain)
 {
     // argv contains UTF-16-encoded strings with a 16-bit wchar_t.
     // Convert this to UTF-8-encoded strings for compatibility with
@@ -2640,7 +2640,8 @@ QUtil::call_main_from_wmain(int argc, wchar_t* argv[],
         utf8_argv.push_back(QUtil::make_shared_cstr(utf8));
     }
     auto utf8_argv_sp =
-        std::shared_ptr<char*>(new char*[1+utf8_argv.size()], std::default_delete<char*[]>());
+        std::shared_ptr<char*>(
+            new char*[1+utf8_argv.size()], std::default_delete<char*[]>());
     char** new_argv = utf8_argv_sp.get();
     for (size_t i = 0; i < utf8_argv.size(); ++i)
     {
@@ -2650,4 +2651,23 @@ QUtil::call_main_from_wmain(int argc, wchar_t* argv[],
     new_argv[argc] = 0;
     return realmain(argc, new_argv);
 }
+
+int
+QUtil::call_main_from_wmain(int argc, wchar_t* argv[],
+                            std::function<int(int, char*[])> realmain)
+{
+    return ::call_main_from_wmain(true, argc, argv, realmain);
+}
+
+int
+QUtil::call_main_from_wmain(
+    int argc, wchar_t const* const argv[],
+    std::function<int(int, char const* const[])> realmain)
+{
+    return ::call_main_from_wmain(
+        true, argc, argv, [realmain](int new_argc, char* new_argv[]) {
+            return realmain(new_argc, new_argv);
+        });
+}
+
 #endif // QPDF_NO_WCHAR_T

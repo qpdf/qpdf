@@ -3,7 +3,7 @@
 // Edits will be automatically overwritten if the build is
 // run in maintainer mode.
 //
-QPDF_DLL UOConfig* to(char const* parameter);
-QPDF_DLL UOConfig* from(char const* parameter);
-QPDF_DLL UOConfig* repeat(char const* parameter);
-QPDF_DLL UOConfig* password(char const* parameter);
+QPDF_DLL UOConfig* to(std::string const& parameter);
+QPDF_DLL UOConfig* from(std::string const& parameter);
+QPDF_DLL UOConfig* repeat(std::string const& parameter);
+QPDF_DLL UOConfig* password(std::string const& parameter);

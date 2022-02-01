@@ -111,13 +111,14 @@ from contextlib import contextmanager
 # Every command-line option in the main option table has a
 # corresponding method in Config whose name is the option converted to
 # camel case. For bare options and options with optional parameters, a
-# version exists that takes no arguments. For others, a version exists
-# that takes a char const*. For example, the --qdf flag implies a
-# qdf() method in Config, and the --object-streams flag implies an
-# objectStreams(char const*) method in Config. For flags in option
-# tables, the method is declared inside a config class specific to the
-# option table. The mapping between option tables and config classes
-# is explicit in job.yml. Positional arguments are handled
+# version exists that takes no arguments. For other than bare options,
+# a version exist, possibly in addition, that takes a std::string
+# const&. For example, the --qdf flag implies a qdf() method in
+# Config, and the --object-streams flag implies an
+# objectStreams(std::string const&) method in Config. For flags in
+# option tables, the method is declared inside a config class specific
+# to the option table. The mapping between option tables and config
+# classes is explicit in job.yml. Positional arguments are handled
 # individually and manually -- see QPDFJob.hh in the CONFIGURATION
 # section for details. See examples/qpdf-job.cc for an example.
 #
@@ -460,29 +461,33 @@ class Main:
             self.init.append(f'this->ap.addBare("{i}", '
                              f'[this](){{{cfg}->{identifier}();}});')
         elif kind == 'required_parameter':
-            self.init.append(f'this->ap.addRequiredParameter("{i}", '
-                             f'[this](char *x){{{cfg}->{identifier}(x);}}'
-                             f', "{v}");')
+            self.init.append(
+                f'this->ap.addRequiredParameter("{i}", '
+                f'[this](std::string const& x){{{cfg}->{identifier}(x);}}'
+                f', "{v}");')
         elif kind == 'optional_parameter':
             decl_arg_optional = True
-            self.init.append(f'this->ap.addOptionalParameter("{i}", '
-                             f'[this](char *x){{{cfg}->{identifier}(x);}});')
+            self.init.append(
+                f'this->ap.addOptionalParameter("{i}", '
+                f'[this](std::string const& x){{{cfg}->{identifier}(x);}});')
         elif kind == 'required_choices':
-            self.init.append(f'this->ap.addChoices("{i}", '
-                             f'[this](char *x){{{cfg}->{identifier}(x);}}'
-                             f', true, {v}_choices);')
+            self.init.append(
+                f'this->ap.addChoices("{i}", '
+                f'[this](std::string const& x){{{cfg}->{identifier}(x);}}'
+                f', true, {v}_choices);')
         elif kind == 'optional_choices':
             decl_arg_optional = True
-            self.init.append(f'this->ap.addChoices("{i}", '
-                             f'[this](char *x){{{cfg}->{identifier}(x);}}'
-                             f', false, {v}_choices);')
+            self.init.append(
+                f'this->ap.addChoices("{i}", '
+                f'[this](std::string const& x){{{cfg}->{identifier}(x);}}'
+                f', false, {v}_choices);')
 
         # Generate declarations for config methods separately by
         # config object.
         config_prefix = prefix + 'Config'
         arg = ''
         if decl_arg:
-            arg = 'char const* parameter'
+            arg = 'std::string const& parameter'
         fn = f'{config_prefix}* {identifier}({arg})'
         if fn not in self.declared_configs:
             self.declared_configs.add(fn)
@@ -510,21 +515,21 @@ class Main:
             self.init.append(f'this->ap.addBare("{i}", '
                              f'b(&ArgParser::{identifier}));')
         elif kind == 'required_parameter':
-            self.decls.append(f'void {identifier}(char *);')
+            self.decls.append(f'void {identifier}(std::string const&);')
             self.init.append(f'this->ap.addRequiredParameter("{i}", '
                              f'p(&ArgParser::{identifier})'
                              f', "{v}");')
         elif kind == 'optional_parameter':
-            self.decls.append(f'void {identifier}(char *);')
+            self.decls.append(f'void {identifier}(std::string const&);')
             self.init.append(f'this->ap.addOptionalParameter("{i}", '
                              f'p(&ArgParser::{identifier}));')
         elif kind == 'required_choices':
-            self.decls.append(f'void {identifier}(char *);')
+            self.decls.append(f'void {identifier}(std::string const&);')
             self.init.append(f'this->ap.addChoices("{i}", '
                              f'p(&ArgParser::{identifier})'
                              f', true, {v}_choices);')
         elif kind == 'optional_choices':
-            self.decls.append(f'void {identifier}(char *);')
+            self.decls.append(f'void {identifier}(std::string const&);')
             self.init.append(f'this->ap.addChoices("{i}", '
                              f'p(&ArgParser::{identifier})'
                              f', false, {v}_choices);')
@@ -555,7 +560,8 @@ class Main:
         self.init.append('auto b = [this](void (ArgParser::*f)()) {')
         self.init.append('    return QPDFArgParser::bindBare(f, this);')
         self.init.append('};')
-        self.init.append('auto p = [this](void (ArgParser::*f)(char *)) {')
+        self.init.append(
+            'auto p = [this](void (ArgParser::*f)(std::string const&)) {')
         self.init.append('    return QPDFArgParser::bindParam(f, this);')
         self.init.append('};')
         self.init.append('')
@@ -615,7 +621,8 @@ class Main:
                 self.init.append(f'this->ap.registerOptionTable("{table}",'
                                  f' b(&ArgParser::{identifier}));')
             if o.get('positional', False):
-                self.decls.append(f'void {arg_prefix}Positional(char*);')
+                self.decls.append(
+                    f'void {arg_prefix}Positional(std::string const&);')
                 self.init.append('this->ap.addPositional('
                                  f'p(&ArgParser::{arg_prefix}Positional));')
 
@@ -667,16 +674,18 @@ class Main:
             # so the handler has to deal with it. The empty string is
             # also allowed for non-optional.
             self.json_init.append(
-                f'addParameter([this](char const* p)'
+                f'addParameter([this](std::string const& p)'
                 f' {{ {config}->{flag_key}(p); }});')
         elif kind == 'required_choices':
             self.json_init.append(
                 f'addChoices({v}_choices, true,'
-                f' [this](char const* p) {{ {config}->{flag_key}(p); }});')
+                f' [this](std::string const& p)'
+                f' {{ {config}->{flag_key}(p); }});')
         elif kind == 'optional_choices':
             self.json_init.append(
                 f'addChoices({v}_choices, false,'
-                f' [this](char const* p) {{ {config}->{flag_key}(p); }});')
+                f' [this](std::string const& p)'
+                f' {{ {config}->{flag_key}(p); }});')
 
     def handle_json_manual(self, path):
         method = re.sub(r'\.([a-zA-Z0-9])',

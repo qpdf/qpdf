@@ -52,7 +52,7 @@ extern "C" {
      * qpdfjob_run_from_wide_argv instead.
      */
     QPDF_DLL
-    int qpdfjob_run_from_argv(int argc, char* argv[]);
+    int qpdfjob_run_from_argv(int argc, char const* const argv[]);
 
 #ifndef QPDF_NO_WCHAR_T
     /* This function is the same as qpdfjob_run_from_argv except argv
@@ -60,7 +60,7 @@ extern "C" {
      * calling from a Windows wmain function.
      */
     QPDF_DLL
-    int qpdfjob_run_from_wide_argv(int argc, wchar_t* argv[]);
+    int qpdfjob_run_from_wide_argv(int argc, wchar_t const* const argv[]);
 #endif /* QPDF_NO_WCHAR_T */
 
     /* This function runs QPDFJob from a job JSON file. See the "QPDF

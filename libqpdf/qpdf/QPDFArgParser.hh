@@ -21,16 +21,6 @@
 // done mostly by automatically-generated code (one-off code for
 // qpdf), though the handlers themselves are hand-coded. See
 // generate_auto_job at the top of the source tree for details.
-
-// Note about memory: there is code that expects argv to be a char*[],
-// meaning that arguments are writable. Several operations, including
-// reading arguments from a file or parsing a line for bash
-// completion, involve fabricating an argv array. To ensure that the
-// memory is valid and is cleaned up properly, we keep various vectors
-// of smart character pointers that argv points into. In order for
-// those pointers to remain valid, the QPDFArgParser instance must
-// remain in scope for the life of any code that may reference
-// anything from argv.
 class QPDFArgParser
 {
   public:
@@ -38,7 +28,7 @@ class QPDFArgParser
     // name of the executable for setting up completion. This may be
     // needed if the program is invoked by a wrapper.
     QPDF_DLL
-    QPDFArgParser(int argc, char* argv[], char const* progname_env);
+    QPDFArgParser(int argc, char const* const argv[], char const* progname_env);
 
     // Calls exit(0) if a help option is given or if in completion
     // mode. If there are argument parsing errors, QPDFUsage is
@@ -60,7 +50,7 @@ class QPDFArgParser
     // a series of options that end with `--`.
 
     typedef std::function<void()> bare_arg_handler_t;
-    typedef std::function<void(char*)> param_arg_handler_t;
+    typedef std::function<void(std::string const&)> param_arg_handler_t;
 
     QPDF_DLL
     void selectMainOptionTable();
@@ -163,7 +153,7 @@ class QPDFArgParser
     // unknown value returns a string directing the user to run the
     // top-level --help option.
     QPDF_DLL
-    std::string getHelp(char const* topic_or_option);
+    std::string getHelp(std::string const& topic_or_option);
 
     // Convenience methods for adding member functions of a class as
     // handlers.
@@ -173,7 +163,7 @@ class QPDFArgParser
         return std::bind(std::mem_fn(f), o);
     }
     template <class T>
-    static param_arg_handler_t bindParam(void (T::*f)(char *), T* o)
+    static param_arg_handler_t bindParam(void (T::*f)(std::string const&), T* o)
     {
         return std::bind(std::mem_fn(f), o, std::placeholders::_1);
     }
@@ -238,13 +228,13 @@ class QPDFArgParser
 
     void argCompletionBash();
     void argCompletionZsh();
-    void argHelp(char*);
-    void invalidHelpArg(char*);
+    void argHelp(std::string const&);
+    void invalidHelpArg(std::string const&);
 
     void checkCompletion();
     void handleArgFileArguments();
     void handleBashArguments();
-    void readArgsFromFile(char const* filename);
+    void readArgsFromFile(std::string const& filename);
     void doFinalChecks();
     void addOptionsToCompletions(option_table_t&);
     void addChoicesToCompletions(
@@ -267,12 +257,12 @@ class QPDFArgParser
         ~Members() = default;
 
       private:
-        Members(int argc, char* argv[], char const* progname_env);
+        Members(int argc, char const* const argv[], char const* progname_env);
         Members(Members const&) = delete;
 
         int argc;
-        char** argv;
-        char const* whoami;
+        char const* const* argv;
+        std::string whoami;
         std::string progname_env;
         int cur_arg;
         bool bash_completion;
@@ -287,10 +277,10 @@ class QPDFArgParser
         option_table_t* option_table;
         std::string option_table_name;
         bare_arg_handler_t final_check_handler;
-        std::vector<std::shared_ptr<char>> new_argv;
-        std::vector<std::shared_ptr<char>> bash_argv;
-        std::shared_ptr<char*> argv_ph;
-        std::shared_ptr<char*> bash_argv_ph;
+        std::vector<std::shared_ptr<char const>> new_argv;
+        std::vector<std::shared_ptr<char const>> bash_argv;
+        std::shared_ptr<char const*> argv_ph;
+        std::shared_ptr<char const*> bash_argv_ph;
         std::map<std::string, HelpTopic> help_topics;
         std::map<std::string, HelpTopic> option_help;
         std::string help_footer;

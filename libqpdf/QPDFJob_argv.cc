@@ -39,8 +39,8 @@ namespace
         std::shared_ptr<QPDFJob::PagesConfig> c_pages;
         std::shared_ptr<QPDFJob::UOConfig> c_uo;
         std::shared_ptr<QPDFJob::EncConfig> c_enc;
-        std::vector<char*> accumulated_args; // points to member in ap
-        char* pages_password;
+        std::vector<std::string> accumulated_args;
+        std::shared_ptr<char> pages_password;
         bool gave_input;
         bool gave_output;
     };
@@ -70,7 +70,7 @@ ArgParser::initOptionTables()
 }
 
 void
-ArgParser::argPositional(char* arg)
+ArgParser::argPositional(std::string const& arg)
 {
     if (! this->gave_input)
     {
@@ -84,7 +84,7 @@ ArgParser::argPositional(char* arg)
     }
     else
     {
-        usage(std::string("unknown argument ") + arg);
+        usage("unknown argument " + arg);
     }
 }
 
@@ -188,7 +188,7 @@ ArgParser::argEncrypt()
 }
 
 void
-ArgParser::argEncPositional(char* arg)
+ArgParser::argEncPositional(std::string const& arg)
 {
     this->accumulated_args.push_back(arg);
     size_t n_args = this->accumulated_args.size();
@@ -244,9 +244,9 @@ ArgParser::argPages()
 }
 
 void
-ArgParser::argPagesPassword(char* parameter)
+ArgParser::argPagesPassword(std::string const& parameter)
 {
-    if (this->pages_password != nullptr)
+    if (this->pages_password)
     {
         QTC::TC("qpdf", "QPDFJob duplicated pages password");
         usage("--password already specified for this file");
@@ -256,13 +256,13 @@ ArgParser::argPagesPassword(char* parameter)
         QTC::TC("qpdf", "QPDFJob misplaced pages password");
         usage("in --pages, --password must immediately follow a file name");
     }
-    this->pages_password = parameter;
+    this->pages_password = QUtil::make_shared_cstr(parameter);
 }
 
 void
-ArgParser::argPagesPositional(char* arg)
+ArgParser::argPagesPositional(std::string const& arg)
 {
-    if (arg == nullptr)
+    if (arg.empty())
     {
         if (this->accumulated_args.empty())
         {
@@ -274,25 +274,26 @@ ArgParser::argPagesPositional(char* arg)
         this->accumulated_args.push_back(arg);
     }
 
-    char const* file = this->accumulated_args.at(0);
-    char const* range = nullptr;
+    std::string file = this->accumulated_args.at(0);
+    char const* range_p = nullptr;
 
     size_t n_args = this->accumulated_args.size();
     if (n_args >= 2)
     {
-        range = this->accumulated_args.at(1);
+        // will be copied before accumulated_args is cleared
+        range_p = this->accumulated_args.at(1).c_str();
     }
 
     // See if the user omitted the range entirely, in which case we
     // assume "1-z".
-    char* next_file = nullptr;
-    if (range == nullptr)
+    std::string next_file;
+    if (range_p == nullptr)
     {
-        if (arg == nullptr)
+        if (arg.empty())
         {
             // The filename or password was the last argument
             QTC::TC("qpdf", "QPDFJob pages range omitted at end",
-                    this->pages_password == nullptr ? 0 : 1);
+                    this->pages_password ? 0 : 1);
         }
         else
         {
@@ -304,17 +305,17 @@ ArgParser::argPagesPositional(char* arg)
     {
         try
         {
-            QUtil::parse_numrange(range, 0);
+            QUtil::parse_numrange(range_p, 0);
         }
         catch (std::runtime_error& e1)
         {
             // The range is invalid.  Let's see if it's a file.
-            if (strcmp(range, ".") == 0)
+            if (strcmp(range_p, ".") == 0)
             {
                 // "." means the input file.
                 QTC::TC("qpdf", "QPDFJob pages range omitted with .");
             }
-            else if (QUtil::file_can_be_opened(range))
+            else if (QUtil::file_can_be_opened(range_p))
             {
                 QTC::TC("qpdf", "QPDFJob pages range omitted in middle");
                 // Yup, it's a file.
@@ -324,18 +325,15 @@ ArgParser::argPagesPositional(char* arg)
                 // Give the range error
                 usage(e1.what());
             }
-            next_file = const_cast<char*>(range);
-            range = nullptr;
+            next_file = range_p;
+            range_p = nullptr;
         }
     }
-    if (range == nullptr)
-    {
-        range = "1-z";
-    }
-    this->c_pages->pageSpec(file, range, this->pages_password);
+    std::string range(range_p ? range_p : "1-z");
+    this->c_pages->pageSpec(file, range, this->pages_password.get());
     this->accumulated_args.clear();
     this->pages_password = nullptr;
-    if (next_file != nullptr)
+    if (! next_file.empty())
     {
         this->accumulated_args.push_back(next_file);
     }
@@ -344,7 +342,7 @@ ArgParser::argPagesPositional(char* arg)
 void
 ArgParser::argEndPages()
 {
-    argPagesPositional(nullptr);
+    argPagesPositional("");
     c_pages->endPages();
     c_pages = nullptr;
 }
@@ -403,7 +401,7 @@ ArgParser::argEnd256BitEncryption()
 }
 
 void
-ArgParser::argUOPositional(char* arg)
+ArgParser::argUOPositional(std::string const& arg)
 {
     c_uo->file(arg);
 }
@@ -416,7 +414,7 @@ ArgParser::argEndUnderlayOverlay()
 }
 
 void
-ArgParser::argAttPositional(char* arg)
+ArgParser::argAttPositional(std::string const& arg)
 {
     c_att->file(arg);
 }
@@ -429,7 +427,7 @@ ArgParser::argEndAttachment()
 }
 
 void
-ArgParser::argCopyAttPositional(char* arg)
+ArgParser::argCopyAttPositional(std::string const& arg)
 {
     c_copy_att->file(arg);
 }
@@ -467,7 +465,8 @@ ArgParser::parseOptions()
 }
 
 void
-QPDFJob::initializeFromArgv(int argc, char* argv[], char const* progname_env)
+QPDFJob::initializeFromArgv(int argc, char const* const argv[],
+                            char const* progname_env)
 {
     if (progname_env == nullptr)
     {

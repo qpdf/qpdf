@@ -15,12 +15,12 @@ class ArgParser
 
   private:
     void handlePotato();
-    void handleSalad(char* p);
-    void handleMoo(char* p);
-    void handleOink(char* p);
-    void handleQuack(char* p);
+    void handleSalad(std::string const& p);
+    void handleMoo(std::string const& p);
+    void handleOink(std::string const& p);
+    void handleQuack(std::string const& p);
     void startQuack();
-    void getQuack(char* p);
+    void getQuack(std::string const& p);
     void endQuack();
     void finalChecks();
 
@@ -44,7 +44,7 @@ ArgParser::initOptions()
     auto b = [this](void (ArgParser::*f)()) {
         return QPDFArgParser::bindBare(f, this);
     };
-    auto p = [this](void (ArgParser::*f)(char *)) {
+    auto p = [this](void (ArgParser::*f)(std::string const&)) {
         return QPDFArgParser::bindParam(f, this);
     };
 
@@ -98,19 +98,19 @@ ArgParser::handlePotato()
 }
 
 void
-ArgParser::handleSalad(char* p)
+ArgParser::handleSalad(std::string const& p)
 {
     output(std::string("got salad=") + p);
 }
 
 void
-ArgParser::handleMoo(char* p)
+ArgParser::handleMoo(std::string const& p)
 {
-    output(std::string("got moo=") + (p ? p : "(none)"));
+    output(std::string("got moo=") + (p.empty() ? "(none)" : p));
 }
 
 void
-ArgParser::handleOink(char* p)
+ArgParser::handleOink(std::string const& p)
 {
     output(std::string("got oink=") + p);
 }
@@ -137,7 +137,7 @@ ArgParser::startQuack()
 }
 
 void
-ArgParser::getQuack(char* p)
+ArgParser::getQuack(std::string const& p)
 {
     ++this->quacks;
     if (this->ap.isCompleting() && (this->ap.argsLeft() == 0))
@@ -210,7 +210,7 @@ ArgParser::test_exceptions()
     });
     err("invalid choice handler to unknown", [this]() {
         ap.addInvalidChoiceHandler(
-            "elephant", [](char*){});
+            "elephant", [](std::string const&){});
     });
 }
 

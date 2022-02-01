@@ -8,11 +8,10 @@
 #include <cstdlib>
 
 QPDFArgParser::Members::Members(
-    int argc, char* argv[], char const* progname_env) :
+    int argc, char const* const argv[], char const* progname_env) :
 
     argc(argc),
     argv(argv),
-    whoami(QUtil::getWhoami(argv[0])),
     progname_env(progname_env),
     cur_arg(0),
     bash_completion(false),
@@ -20,14 +19,18 @@ QPDFArgParser::Members::Members(
     option_table(nullptr),
     final_check_handler(nullptr)
 {
+    auto tmp = QUtil::make_shared_cstr(argv[0]);
+    char* p = QUtil::getWhoami(tmp.get());
     // Remove prefix added by libtool for consistency during testing.
-    if (strncmp(whoami, "lt-", 3) == 0)
+    if (strncmp(p, "lt-", 3) == 0)
     {
-	whoami += 3;
+	p += 3;
     }
+    whoami = p;
 }
 
-QPDFArgParser::QPDFArgParser(int argc, char* argv[], char const* progname_env) :
+QPDFArgParser::QPDFArgParser(int argc, char const* const argv[],
+                             char const* progname_env) :
     m(new Members(argc, argv, progname_env))
 {
     selectHelpOptionTable();
@@ -250,17 +253,17 @@ QPDFArgParser::argCompletionZsh()
 }
 
 void
-QPDFArgParser::argHelp(char* p)
+QPDFArgParser::argHelp(std::string const& p)
 {
     std::cout << getHelp(p);
     exit(0);
 }
 
 void
-QPDFArgParser::invalidHelpArg(char* p)
+QPDFArgParser::invalidHelpArg(std::string const& p)
 {
     usage(std::string("unknown help option") +
-          (p ? (std::string(" ") + p) : ""));
+          (p.empty() ? "" : (" " + p)));
 }
 
 void
@@ -272,7 +275,7 @@ QPDFArgParser::handleArgFileArguments()
     this->m->new_argv.push_back(QUtil::make_shared_cstr(this->m->argv[0]));
     for (int i = 1; i < this->m->argc; ++i)
     {
-        char* argfile = 0;
+        char const* argfile = 0;
         if ((strlen(this->m->argv[i]) > 1) && (this->m->argv[i][0] == '@'))
         {
             argfile = 1 + this->m->argv[i];
@@ -295,16 +298,16 @@ QPDFArgParser::handleArgFileArguments()
                 QUtil::make_shared_cstr(this->m->argv[i]));
         }
     }
-    this->m->argv_ph = std::shared_ptr<char*>(
-        new char*[1 + this->m->new_argv.size()],
-        std::default_delete<char*[]>());
-    this->m->argv = this->m->argv_ph.get();
+    this->m->argv_ph = std::shared_ptr<char const*>(
+        new char const*[1 + this->m->new_argv.size()],
+        std::default_delete<char const*[]>());
     for (size_t i = 0; i < this->m->new_argv.size(); ++i)
     {
-        this->m->argv[i] = this->m->new_argv.at(i).get();
+        this->m->argv_ph.get()[i] = this->m->new_argv.at(i).get();
     }
     this->m->argc = QIntC::to_int(this->m->new_argv.size());
-    this->m->argv[this->m->argc] = 0;
+    this->m->argv_ph.get()[this->m->argc] = nullptr;
+    this->m->argv = this->m->argv_ph.get();
 }
 
 void
@@ -400,16 +403,16 @@ QPDFArgParser::handleBashArguments()
     }
     // Explicitly discard any non-space-terminated word. The "current
     // word" is handled specially.
-    this->m->bash_argv_ph = std::shared_ptr<char*>(
-        new char*[1 + this->m->bash_argv.size()],
-        std::default_delete<char*[]>());
-    this->m->argv = this->m->bash_argv_ph.get();
+    this->m->bash_argv_ph = std::shared_ptr<char const*>(
+        new char const*[1 + this->m->bash_argv.size()],
+        std::default_delete<char const*[]>());
     for (size_t i = 0; i < this->m->bash_argv.size(); ++i)
     {
-        this->m->argv[i] = this->m->bash_argv.at(i).get();
+        this->m->bash_argv_ph.get()[i] = this->m->bash_argv.at(i).get();
     }
     this->m->argc = QIntC::to_int(this->m->bash_argv.size());
-    this->m->argv[this->m->argc] = 0;
+    this->m->bash_argv_ph.get()[this->m->argc] = nullptr;
+    this->m->argv = this->m->bash_argv_ph.get();
 }
 
 void
@@ -424,10 +427,10 @@ QPDFArgParser::usage(std::string const& message)
 }
 
 void
-QPDFArgParser::readArgsFromFile(char const* filename)
+QPDFArgParser::readArgsFromFile(std::string const& filename)
 {
     std::list<std::string> lines;
-    if (strcmp(filename, "-") == 0)
+    if (filename == "-")
     {
         QTC::TC("libtests", "QPDFArgParser read args from stdin");
         lines = QUtil::read_lines_from_file(std::cin);
@@ -435,7 +438,7 @@ QPDFArgParser::readArgsFromFile(char const* filename)
     else
     {
         QTC::TC("libtests", "QPDFArgParser read args from file");
-        lines = QUtil::read_lines_from_file(filename);
+        lines = QUtil::read_lines_from_file(filename.c_str());
     }
     for (auto const& line: lines)
     {
@@ -547,8 +550,9 @@ QPDFArgParser::parseArgs()
         bool help_option = false;
         bool end_option = false;
         auto oep = this->m->option_table->end();
-        char* arg = this->m->argv[this->m->cur_arg];
-        char* parameter = nullptr;
+        char const* arg = this->m->argv[this->m->cur_arg];
+        std::string parameter;
+        bool have_parameter = false;
         std::string o_arg(arg);
         std::string arg_s(arg);
         if ((strcmp(arg, "--") == 0) &&
@@ -577,19 +581,24 @@ QPDFArgParser::parseArgs()
             {
                 QTC::TC("libtests", "QPDFArgParser single dash");
             }
-            if (strlen(arg) > 0)
-            {
-                // Prevent --=something from being treated as an empty
-                // arg since the empty string in the option table is
-                // for positional arguments.
-                parameter = const_cast<char*>(strchr(1 + arg, '='));
-            }
-            if (parameter)
-            {
-                *parameter++ = 0;
-            }
 
+            // Prevent --=something from being treated as an empty arg
+            // by searching for = from after the first character. We
+            // do this since the empty string in the option table is
+            // for positional arguments. Besides, it doesn't make
+            // sense to have an empty option.
             arg_s = arg;
+            size_t equal_pos = std::string::npos;
+            if (arg_s.length() > 0)
+            {
+                equal_pos = arg_s.find('=', 1);
+            }
+            if (equal_pos != std::string::npos)
+            {
+                have_parameter = true;
+                parameter = arg_s.substr(equal_pos + 1);
+                arg_s = arg_s.substr(0, equal_pos);
+            }
 
             if ((! this->m->bash_completion) &&
                 (this->m->argc == 2) && (this->m->cur_arg == 1) &&
@@ -629,8 +638,8 @@ QPDFArgParser::parseArgs()
         }
 
         OptionEntry& oe = oep->second;
-        if ((oe.parameter_needed && (nullptr == parameter)) ||
-            ((! oe.choices.empty() && (nullptr != parameter) &&
+        if ((oe.parameter_needed && (! have_parameter)) ||
+            ((! oe.choices.empty() && have_parameter &&
               (0 == oe.choices.count(parameter)))))
         {
             std::string message =
@@ -977,16 +986,15 @@ QPDFArgParser::getTopicHelp(std::string const& name,
 }
 
 std::string
-QPDFArgParser::getHelp(char const* topic_or_option)
+QPDFArgParser::getHelp(std::string const& arg)
 {
     std::ostringstream msg;
-    if ((topic_or_option == nullptr) || (strlen(topic_or_option) == 0))
+    if (arg.empty())
     {
         getTopHelp(msg);
     }
     else
     {
-        std::string arg(topic_or_option);
         if (arg == "all")
         {
             getAllHelp(msg);

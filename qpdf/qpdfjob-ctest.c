@@ -7,11 +7,11 @@
 #ifndef QPDF_NO_WCHAR_T
 static void wide_test()
 {
-    wchar_t* argv[5];
-    argv[0] = (wchar_t*)(L"qpdfjob");
-    argv[1] = (wchar_t*)(L"minimal.pdf");
-    argv[2] = (wchar_t*)(L"a.pdf");
-    argv[3] = (wchar_t*)(L"--static-id");
+    wchar_t const* argv[5];
+    argv[0] = L"qpdfjob";
+    argv[1] = L"minimal.pdf";
+    argv[2] = L"a.pdf";
+    argv[3] = L"--static-id";
     argv[4] = NULL;
     assert(qpdfjob_run_from_wide_argv(4, argv) == 0);
     printf("wide test passed\n");
@@ -22,11 +22,11 @@ static void run_tests()
 {
     /* Be sure to use a different output file for each test. */
 
-    char* argv[5];
-    argv[0] = (char*)("qpdfjob");
-    argv[1] = (char*)("minimal.pdf");
-    argv[2] = (char*)("a.pdf");
-    argv[3] = (char*)("--deterministic-id");
+    char const* argv[5];
+    argv[0] = "qpdfjob";
+    argv[1] = "minimal.pdf";
+    argv[2] = "a.pdf";
+    argv[3] = "--deterministic-id";
     argv[4] = NULL;
     assert(qpdfjob_run_from_argv(4, argv) == 0);
     printf("argv test passed\n");

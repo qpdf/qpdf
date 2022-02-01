@@ -22,7 +22,7 @@ pushKey("password");
 setupPassword();
 popHandler(); // key: password
 pushKey("passwordFile");
-addParameter([this](char const* p) { c_main->passwordFile(p); });
+addParameter([this](std::string const& p) { c_main->passwordFile(p); });
 popHandler(); // key: passwordFile
 pushKey("empty");
 setupEmpty();
@@ -43,19 +43,19 @@ pushKey("newlineBeforeEndstream");
 addBare([this]() { c_main->newlineBeforeEndstream(); });
 popHandler(); // key: newlineBeforeEndstream
 pushKey("normalizeContent");
-addChoices(yn_choices, true, [this](char const* p) { c_main->normalizeContent(p); });
+addChoices(yn_choices, true, [this](std::string const& p) { c_main->normalizeContent(p); });
 popHandler(); // key: normalizeContent
 pushKey("streamData");
-addChoices(stream_data_choices, true, [this](char const* p) { c_main->streamData(p); });
+addChoices(stream_data_choices, true, [this](std::string const& p) { c_main->streamData(p); });
 popHandler(); // key: streamData
 pushKey("compressStreams");
-addChoices(yn_choices, true, [this](char const* p) { c_main->compressStreams(p); });
+addChoices(yn_choices, true, [this](std::string const& p) { c_main->compressStreams(p); });
 popHandler(); // key: compressStreams
 pushKey("recompressFlate");
 addBare([this]() { c_main->recompressFlate(); });
 popHandler(); // key: recompressFlate
 pushKey("decodeLevel");
-addChoices(decode_level_choices, true, [this](char const* p) { c_main->decodeLevel(p); });
+addChoices(decode_level_choices, true, [this](std::string const& p) { c_main->decodeLevel(p); });
 popHandler(); // key: decodeLevel
 pushKey("decrypt");
 addBare([this]() { c_main->decrypt(); });
@@ -73,31 +73,31 @@ pushKey("noOriginalObjectIds");
 addBare([this]() { c_main->noOriginalObjectIds(); });
 popHandler(); // key: noOriginalObjectIds
 pushKey("copyEncryption");
-addParameter([this](char const* p) { c_main->copyEncryption(p); });
+addParameter([this](std::string const& p) { c_main->copyEncryption(p); });
 popHandler(); // key: copyEncryption
 pushKey("encryptionFilePassword");
-addParameter([this](char const* p) { c_main->encryptionFilePassword(p); });
+addParameter([this](std::string const& p) { c_main->encryptionFilePassword(p); });
 popHandler(); // key: encryptionFilePassword
 pushKey("linearize");
 addBare([this]() { c_main->linearize(); });
 popHandler(); // key: linearize
 pushKey("linearizePass1");
-addParameter([this](char const* p) { c_main->linearizePass1(p); });
+addParameter([this](std::string const& p) { c_main->linearizePass1(p); });
 popHandler(); // key: linearizePass1
 pushKey("objectStreams");
-addChoices(object_streams_choices, true, [this](char const* p) { c_main->objectStreams(p); });
+addChoices(object_streams_choices, true, [this](std::string const& p) { c_main->objectStreams(p); });
 popHandler(); // key: objectStreams
 pushKey("minVersion");
-addParameter([this](char const* p) { c_main->minVersion(p); });
+addParameter([this](std::string const& p) { c_main->minVersion(p); });
 popHandler(); // key: minVersion
 pushKey("forceVersion");
-addParameter([this](char const* p) { c_main->forceVersion(p); });
+addParameter([this](std::string const& p) { c_main->forceVersion(p); });
 popHandler(); // key: forceVersion
 pushKey("progress");
 addBare([this]() { c_main->progress(); });
 popHandler(); // key: progress
 pushKey("splitPages");
-addParameter([this](char const* p) { c_main->splitPages(p); });
+addParameter([this](std::string const& p) { c_main->splitPages(p); });
 popHandler(); // key: splitPages
 pushKey("encrypt");
 beginDict(bindJSON(&Handlers::beginEncrypt), bindBare(&Handlers::endEncrypt)); // .encrypt
@@ -110,82 +110,82 @@ popHandler(); // key: ownerPassword
 pushKey("40bit");
 beginDict(bindJSON(&Handlers::beginEncrypt40bit), bindBare(&Handlers::endEncrypt40bit)); // .encrypt.40bit
 pushKey("annotate");
-addChoices(yn_choices, true, [this](char const* p) { c_enc->annotate(p); });
+addChoices(yn_choices, true, [this](std::string const& p) { c_enc->annotate(p); });
 popHandler(); // key: annotate
 pushKey("extract");
-addChoices(yn_choices, true, [this](char const* p) { c_enc->extract(p); });
+addChoices(yn_choices, true, [this](std::string const& p) { c_enc->extract(p); });
 popHandler(); // key: extract
 pushKey("modify");
-addChoices(modify128_choices, true, [this](char const* p) { c_enc->modify(p); });
+addChoices(modify128_choices, true, [this](std::string const& p) { c_enc->modify(p); });
 popHandler(); // key: modify
 pushKey("print");
-addChoices(print128_choices, true, [this](char const* p) { c_enc->print(p); });
+addChoices(print128_choices, true, [this](std::string const& p) { c_enc->print(p); });
 popHandler(); // key: print
 popHandler(); // key: 40bit
 pushKey("128bit");
 beginDict(bindJSON(&Handlers::beginEncrypt128bit), bindBare(&Handlers::endEncrypt128bit)); // .encrypt.128bit
 pushKey("accessibility");
-addChoices(yn_choices, true, [this](char const* p) { c_enc->accessibility(p); });
+addChoices(yn_choices, true, [this](std::string const& p) { c_enc->accessibility(p); });
 popHandler(); // key: accessibility
 pushKey("annotate");
-addChoices(yn_choices, true, [this](char const* p) { c_enc->annotate(p); });
+addChoices(yn_choices, true, [this](std::string const& p) { c_enc->annotate(p); });
 popHandler(); // key: annotate
 pushKey("assemble");
-addChoices(yn_choices, true, [this](char const* p) { c_enc->assemble(p); });
+addChoices(yn_choices, true, [this](std::string const& p) { c_enc->assemble(p); });
 popHandler(); // key: assemble
 pushKey("cleartextMetadata");
 addBare([this]() { c_enc->cleartextMetadata(); });
 popHandler(); // key: cleartextMetadata
 pushKey("extract");
-addChoices(yn_choices, true, [this](char const* p) { c_enc->extract(p); });
+addChoices(yn_choices, true, [this](std::string const& p) { c_enc->extract(p); });
 popHandler(); // key: extract
 pushKey("form");
-addChoices(yn_choices, true, [this](char const* p) { c_enc->form(p); });
+addChoices(yn_choices, true, [this](std::string const& p) { c_enc->form(p); });
 popHandler(); // key: form
 pushKey("modifyOther");
-addChoices(yn_choices, true, [this](char const* p) { c_enc->modifyOther(p); });
+addChoices(yn_choices, true, [this](std::string const& p) { c_enc->modifyOther(p); });
 popHandler(); // key: modifyOther
 pushKey("modify");
-addChoices(modify128_choices, true, [this](char const* p) { c_enc->modify(p); });
+addChoices(modify128_choices, true, [this](std::string const& p) { c_enc->modify(p); });
 popHandler(); // key: modify
 pushKey("print");
-addChoices(print128_choices, true, [this](char const* p) { c_enc->print(p); });
+addChoices(print128_choices, true, [this](std::string const& p) { c_enc->print(p); });
 popHandler(); // key: print
 pushKey("forceV4");
 addBare([this]() { c_enc->forceV4(); });
 popHandler(); // key: forceV4
 pushKey("useAes");
-addChoices(yn_choices, true, [this](char const* p) { c_enc->useAes(p); });
+addChoices(yn_choices, true, [this](std::string const& p) { c_enc->useAes(p); });
 popHandler(); // key: useAes
 popHandler(); // key: 128bit
 pushKey("256bit");
 beginDict(bindJSON(&Handlers::beginEncrypt256bit), bindBare(&Handlers::endEncrypt256bit)); // .encrypt.256bit
 pushKey("accessibility");
-addChoices(yn_choices, true, [this](char const* p) { c_enc->accessibility(p); });
+addChoices(yn_choices, true, [this](std::string const& p) { c_enc->accessibility(p); });
 popHandler(); // key: accessibility
 pushKey("annotate");
-addChoices(yn_choices, true, [this](char const* p) { c_enc->annotate(p); });
+addChoices(yn_choices, true, [this](std::string const& p) { c_enc->annotate(p); });
 popHandler(); // key: annotate
 pushKey("assemble");
-addChoices(yn_choices, true, [this](char const* p) { c_enc->assemble(p); });
+addChoices(yn_choices, true, [this](std::string const& p) { c_enc->assemble(p); });
 popHandler(); // key: assemble
 pushKey("cleartextMetadata");
 addBare([this]() { c_enc->cleartextMetadata(); });
 popHandler(); // key: cleartextMetadata
 pushKey("extract");
-addChoices(yn_choices, true, [this](char const* p) { c_enc->extract(p); });
+addChoices(yn_choices, true, [this](std::string const& p) { c_enc->extract(p); });
 popHandler(); // key: extract
 pushKey("form");
-addChoices(yn_choices, true, [this](char const* p) { c_enc->form(p); });
+addChoices(yn_choices, true, [this](std::string const& p) { c_enc->form(p); });
 popHandler(); // key: form
 pushKey("modifyOther");
-addChoices(yn_choices, true, [this](char const* p) { c_enc->modifyOther(p); });
+addChoices(yn_choices, true, [this](std::string const& p) { c_enc->modifyOther(p); });
 popHandler(); // key: modifyOther
 pushKey("modify");
-addChoices(modify128_choices, true, [this](char const* p) { c_enc->modify(p); });
+addChoices(modify128_choices, true, [this](std::string const& p) { c_enc->modify(p); });
 popHandler(); // key: modify
 pushKey("print");
-addChoices(print128_choices, true, [this](char const* p) { c_enc->print(p); });
+addChoices(print128_choices, true, [this](std::string const& p) { c_enc->print(p); });
 popHandler(); // key: print
 pushKey("allowInsecure");
 addBare([this]() { c_enc->allowInsecure(); });
@@ -220,7 +220,7 @@ pushKey("showNpages");
 addBare([this]() { c_main->showNpages(); });
 popHandler(); // key: showNpages
 pushKey("showObject");
-addParameter([this](char const* p) { c_main->showObject(p); });
+addParameter([this](std::string const& p) { c_main->showObject(p); });
 popHandler(); // key: showObject
 pushKey("showPages");
 addBare([this]() { c_main->showPages(); });
@@ -235,29 +235,29 @@ pushKey("listAttachments");
 addBare([this]() { c_main->listAttachments(); });
 popHandler(); // key: listAttachments
 pushKey("showAttachment");
-addParameter([this](char const* p) { c_main->showAttachment(p); });
+addParameter([this](std::string const& p) { c_main->showAttachment(p); });
 popHandler(); // key: showAttachment
 pushKey("json");
-addChoices(json_version_choices, false, [this](char const* p) { c_main->json(p); });
+addChoices(json_version_choices, false, [this](std::string const& p) { c_main->json(p); });
 popHandler(); // key: json
 pushKey("jsonKey");
 beginArray(bindJSON(&Handlers::beginJsonKeyArray), bindBare(&Handlers::endJsonKeyArray)); // .jsonKey[]
-addChoices(json_key_choices, true, [this](char const* p) { c_main->jsonKey(p); });
+addChoices(json_key_choices, true, [this](std::string const& p) { c_main->jsonKey(p); });
 popHandler(); // array: .jsonKey[]
 popHandler(); // key: jsonKey
 pushKey("jsonObject");
 beginArray(bindJSON(&Handlers::beginJsonObjectArray), bindBare(&Handlers::endJsonObjectArray)); // .jsonObject[]
-addParameter([this](char const* p) { c_main->jsonObject(p); });
+addParameter([this](std::string const& p) { c_main->jsonObject(p); });
 popHandler(); // array: .jsonObject[]
 popHandler(); // key: jsonObject
 pushKey("allowWeakCrypto");
 addBare([this]() { c_main->allowWeakCrypto(); });
 popHandler(); // key: allowWeakCrypto
 pushKey("keepFilesOpen");
-addChoices(yn_choices, true, [this](char const* p) { c_main->keepFilesOpen(p); });
+addChoices(yn_choices, true, [this](std::string const& p) { c_main->keepFilesOpen(p); });
 popHandler(); // key: keepFilesOpen
 pushKey("keepFilesOpenThreshold");
-addParameter([this](char const* p) { c_main->keepFilesOpenThreshold(p); });
+addParameter([this](std::string const& p) { c_main->keepFilesOpenThreshold(p); });
 popHandler(); // key: keepFilesOpenThreshold
 pushKey("noWarn");
 addBare([this]() { c_main->noWarn(); });
@@ -272,7 +272,7 @@ pushKey("passwordIsHexKey");
 addBare([this]() { c_main->passwordIsHexKey(); });
 popHandler(); // key: passwordIsHexKey
 pushKey("passwordMode");
-addChoices(password_mode_choices, true, [this](char const* p) { c_main->passwordMode(p); });
+addChoices(password_mode_choices, true, [this](std::string const& p) { c_main->passwordMode(p); });
 popHandler(); // key: passwordMode
 pushKey("suppressPasswordRecovery");
 addBare([this]() { c_main->suppressPasswordRecovery(); });
@@ -284,16 +284,16 @@ pushKey("coalesceContents");
 addBare([this]() { c_main->coalesceContents(); });
 popHandler(); // key: coalesceContents
 pushKey("compressionLevel");
-addParameter([this](char const* p) { c_main->compressionLevel(p); });
+addParameter([this](std::string const& p) { c_main->compressionLevel(p); });
 popHandler(); // key: compressionLevel
 pushKey("externalizeInlineImages");
 addBare([this]() { c_main->externalizeInlineImages(); });
 popHandler(); // key: externalizeInlineImages
 pushKey("iiMinBytes");
-addParameter([this](char const* p) { c_main->iiMinBytes(p); });
+addParameter([this](std::string const& p) { c_main->iiMinBytes(p); });
 popHandler(); // key: iiMinBytes
 pushKey("removeUnreferencedResources");
-addChoices(remove_unref_choices, true, [this](char const* p) { c_main->removeUnreferencedResources(p); });
+addChoices(remove_unref_choices, true, [this](std::string const& p) { c_main->removeUnreferencedResources(p); });
 popHandler(); // key: removeUnreferencedResources
 pushKey("addAttachment");
 beginArray(bindJSON(&Handlers::beginAddAttachmentArray), bindBare(&Handlers::endAddAttachmentArray)); // .addAttachment[]
@@ -302,22 +302,22 @@ pushKey("file");
 setupAddAttachmentFile();
 popHandler(); // key: file
 pushKey("creationdate");
-addParameter([this](char const* p) { c_att->creationdate(p); });
+addParameter([this](std::string const& p) { c_att->creationdate(p); });
 popHandler(); // key: creationdate
 pushKey("description");
-addParameter([this](char const* p) { c_att->description(p); });
+addParameter([this](std::string const& p) { c_att->description(p); });
 popHandler(); // key: description
 pushKey("filename");
-addParameter([this](char const* p) { c_att->filename(p); });
+addParameter([this](std::string const& p) { c_att->filename(p); });
 popHandler(); // key: filename
 pushKey("key");
-addParameter([this](char const* p) { c_att->key(p); });
+addParameter([this](std::string const& p) { c_att->key(p); });
 popHandler(); // key: key
 pushKey("mimetype");
-addParameter([this](char const* p) { c_att->mimetype(p); });
+addParameter([this](std::string const& p) { c_att->mimetype(p); });
 popHandler(); // key: mimetype
 pushKey("moddate");
-addParameter([this](char const* p) { c_att->moddate(p); });
+addParameter([this](std::string const& p) { c_att->moddate(p); });
 popHandler(); // key: moddate
 pushKey("replace");
 addBare([this]() { c_att->replace(); });
@@ -325,7 +325,7 @@ popHandler(); // key: replace
 popHandler(); // array: .addAttachment[]
 popHandler(); // key: addAttachment
 pushKey("removeAttachment");
-addParameter([this](char const* p) { c_main->removeAttachment(p); });
+addParameter([this](std::string const& p) { c_main->removeAttachment(p); });
 popHandler(); // key: removeAttachment
 pushKey("copyAttachmentsFrom");
 beginArray(bindJSON(&Handlers::beginCopyAttachmentsFromArray), bindBare(&Handlers::endCopyAttachmentsFromArray)); // .copyAttachmentsFrom[]
@@ -337,15 +337,15 @@ pushKey("password");
 setupCopyAttachmentsFromPassword();
 popHandler(); // key: password
 pushKey("prefix");
-addParameter([this](char const* p) { c_copy_att->prefix(p); });
+addParameter([this](std::string const& p) { c_copy_att->prefix(p); });
 popHandler(); // key: prefix
 popHandler(); // array: .copyAttachmentsFrom[]
 popHandler(); // key: copyAttachmentsFrom
 pushKey("collate");
-addParameter([this](char const* p) { c_main->collate(p); });
+addParameter([this](std::string const& p) { c_main->collate(p); });
 popHandler(); // key: collate
 pushKey("flattenAnnotations");
-addChoices(flatten_choices, true, [this](char const* p) { c_main->flattenAnnotations(p); });
+addChoices(flatten_choices, true, [this](std::string const& p) { c_main->flattenAnnotations(p); });
 popHandler(); // key: flattenAnnotations
 pushKey("flattenRotation");
 addBare([this]() { c_main->flattenRotation(); });
@@ -357,13 +357,13 @@ pushKey("keepInlineImages");
 addBare([this]() { c_main->keepInlineImages(); });
 popHandler(); // key: keepInlineImages
 pushKey("oiMinArea");
-addParameter([this](char const* p) { c_main->oiMinArea(p); });
+addParameter([this](std::string const& p) { c_main->oiMinArea(p); });
 popHandler(); // key: oiMinArea
 pushKey("oiMinHeight");
-addParameter([this](char const* p) { c_main->oiMinHeight(p); });
+addParameter([this](std::string const& p) { c_main->oiMinHeight(p); });
 popHandler(); // key: oiMinHeight
 pushKey("oiMinWidth");
-addParameter([this](char const* p) { c_main->oiMinWidth(p); });
+addParameter([this](std::string const& p) { c_main->oiMinWidth(p); });
 popHandler(); // key: oiMinWidth
 pushKey("optimizeImages");
 addBare([this]() { c_main->optimizeImages(); });
@@ -386,7 +386,7 @@ pushKey("removePageLabels");
 addBare([this]() { c_main->removePageLabels(); });
 popHandler(); // key: removePageLabels
 pushKey("rotate");
-addParameter([this](char const* p) { c_main->rotate(p); });
+addParameter([this](std::string const& p) { c_main->rotate(p); });
 popHandler(); // key: rotate
 pushKey("overlay");
 beginDict(bindJSON(&Handlers::beginOverlay), bindBare(&Handlers::endOverlay)); // .overlay
@@ -397,13 +397,13 @@ pushKey("password");
 setupOverlayPassword();
 popHandler(); // key: password
 pushKey("from");
-addParameter([this](char const* p) { c_uo->from(p); });
+addParameter([this](std::string const& p) { c_uo->from(p); });
 popHandler(); // key: from
 pushKey("repeat");
-addParameter([this](char const* p) { c_uo->repeat(p); });
+addParameter([this](std::string const& p) { c_uo->repeat(p); });
 popHandler(); // key: repeat
 pushKey("to");
-addParameter([this](char const* p) { c_uo->to(p); });
+addParameter([this](std::string const& p) { c_uo->to(p); });
 popHandler(); // key: to
 popHandler(); // key: overlay
 pushKey("underlay");
@@ -415,20 +415,20 @@ pushKey("password");
 setupUnderlayPassword();
 popHandler(); // key: password
 pushKey("from");
-addParameter([this](char const* p) { c_uo->from(p); });
+addParameter([this](std::string const& p) { c_uo->from(p); });
 popHandler(); // key: from
 pushKey("repeat");
-addParameter([this](char const* p) { c_uo->repeat(p); });
+addParameter([this](std::string const& p) { c_uo->repeat(p); });
 popHandler(); // key: repeat
 pushKey("to");
-addParameter([this](char const* p) { c_uo->to(p); });
+addParameter([this](std::string const& p) { c_uo->to(p); });
 popHandler(); // key: to
 popHandler(); // key: underlay
 pushKey("warningExit0");
 addBare([this]() { c_main->warningExit0(); });
 popHandler(); // key: warningExit0
 pushKey("jobJsonFile");
-addParameter([this](char const* p) { c_main->jobJsonFile(p); });
+addParameter([this](std::string const& p) { c_main->jobJsonFile(p); });
 popHandler(); // key: jobJsonFile
 pushKey("preserveUnreferencedResources");
 addBare([this]() { c_main->preserveUnreferencedResources(); });

@@ -7,9 +7,10 @@
 #include <cstdio>
 #include <cstring>
 
-int qpdfjob_run_from_argv(int argc, char* argv[])
+int qpdfjob_run_from_argv(int argc, char const* const argv[])
 {
-    auto whoami = QUtil::getWhoami(argv[0]);
+    auto whoami_p = QUtil::make_shared_cstr(argv[0]);
+    auto whoami = QUtil::getWhoami(whoami_p.get());
     QUtil::setLineBuf(stdout);
 
     QPDFJob j;
@@ -27,7 +28,7 @@ int qpdfjob_run_from_argv(int argc, char* argv[])
 }
 
 #ifndef QPDF_NO_WCHAR_T
-int qpdfjob_run_from_wide_argv(int argc, wchar_t* argv[])
+int qpdfjob_run_from_wide_argv(int argc, wchar_t const* const argv[])
 {
     return QUtil::call_main_from_wmain(argc, argv, qpdfjob_run_from_argv);
 }

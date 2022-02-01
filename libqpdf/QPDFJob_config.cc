@@ -1,7 +1,6 @@
 #include <qpdf/QPDFJob.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/QTC.hh>
-#include <cstring>
 
 void
 QPDFJob::Config::checkConfiguration()
@@ -10,7 +9,7 @@ QPDFJob::Config::checkConfiguration()
 }
 
 QPDFJob::Config*
-QPDFJob::Config::inputFile(char const* filename)
+QPDFJob::Config::inputFile(std::string const& filename)
 {
     if (o.m->infilename == 0)
     {
@@ -46,7 +45,7 @@ QPDFJob::Config::emptyInput()
 }
 
 QPDFJob::Config*
-QPDFJob::Config::outputFile(char const* filename)
+QPDFJob::Config::outputFile(std::string const& filename)
 {
     if ((o.m->outfilename == 0) && (! o.m->replace_input))
     {
@@ -107,35 +106,34 @@ QPDFJob::Config::coalesceContents()
 QPDFJob::Config*
 QPDFJob::Config::collate()
 {
-    return collate(nullptr);
+    return collate("");
 }
 
 QPDFJob::Config*
-QPDFJob::Config::collate(char const* parameter)
+QPDFJob::Config::collate(std::string const& parameter)
 {
-    auto n = (((parameter == 0) || (strlen(parameter) == 0)) ? 1 :
-              QUtil::string_to_uint(parameter));
+    auto n = (parameter.empty() ? 1 : QUtil::string_to_uint(parameter.c_str()));
     o.m->collate = QIntC::to_size(n);
     return this;
 }
 
 QPDFJob::Config*
-QPDFJob::Config::compressStreams(char const* parameter)
+QPDFJob::Config::compressStreams(std::string const& parameter)
 {
     o.m->compress_streams_set = true;
-    o.m->compress_streams = (strcmp(parameter, "y") == 0);
+    o.m->compress_streams = (parameter == "y");
     return this;
 }
 
 QPDFJob::Config*
-QPDFJob::Config::compressionLevel(char const* parameter)
+QPDFJob::Config::compressionLevel(std::string const& parameter)
 {
-    o.m->compression_level = QUtil::string_to_int(parameter);
+    o.m->compression_level = QUtil::string_to_int(parameter.c_str());
     return this;
 }
 
 QPDFJob::Config*
-QPDFJob::Config::copyEncryption(char const* parameter)
+QPDFJob::Config::copyEncryption(std::string const& parameter)
 {
     o.m->encryption_file = parameter;
     o.m->copy_encryption = true;
@@ -161,7 +159,7 @@ QPDFJob::Config::deterministicId()
 }
 
 QPDFJob::Config*
-QPDFJob::Config::encryptionFilePassword(char const* parameter)
+QPDFJob::Config::encryptionFilePassword(std::string const& parameter)
 {
     o.m->encryption_file_password = QUtil::make_shared_cstr(parameter);
     return this;
@@ -182,16 +180,20 @@ QPDFJob::Config::filteredStreamData()
 }
 
 QPDFJob::Config*
-QPDFJob::Config::flattenAnnotations(char const* parameter)
+QPDFJob::Config::flattenAnnotations(std::string const& parameter)
 {
     o.m->flatten_annotations = true;
-    if (strcmp(parameter, "screen") == 0)
+    if (parameter == "screen")
     {
         o.m->flatten_annotations_forbidden |= an_no_view;
     }
-    else if (strcmp(parameter, "print") == 0)
+    else if (parameter == "print")
     {
         o.m->flatten_annotations_required |= an_print;
+    }
+    else if (parameter != "all")
+    {
+        usage("invalid flatten-annotations option");
     }
     return this;
 }
@@ -204,7 +206,7 @@ QPDFJob::Config::flattenRotation()
 }
 
 QPDFJob::Config*
-QPDFJob::Config::forceVersion(char const* parameter)
+QPDFJob::Config::forceVersion(std::string const& parameter)
 {
     o.m->force_version = parameter;
     return this;
@@ -225,9 +227,9 @@ QPDFJob::Config::ignoreXrefStreams()
 }
 
 QPDFJob::Config*
-QPDFJob::Config::iiMinBytes(char const* parameter)
+QPDFJob::Config::iiMinBytes(std::string const& parameter)
 {
-    o.m->ii_min_bytes = QUtil::string_to_uint(parameter);
+    o.m->ii_min_bytes = QUtil::string_to_uint(parameter.c_str());
     return this;
 }
 
@@ -242,26 +244,24 @@ QPDFJob::Config::isEncrypted()
 QPDFJob::Config*
 QPDFJob::Config::json()
 {
-    return json(nullptr);
+    return json("");
 }
 
 QPDFJob::Config*
-QPDFJob::Config::json(char const* parameter)
+QPDFJob::Config::json(std::string const& parameter)
 {
-    if (parameter && strlen(parameter))
+    if (parameter.empty())
     {
-        if (strcmp(parameter, "latest") == 0)
-        {
-            o.m->json_version = 1;
-        }
-        else
-        {
-            o.m->json_version = QUtil::string_to_int(parameter);
-        }
+        // The default value is 1 for backward compatibility.
+        o.m->json_version = 1;
+    }
+    else if (parameter == "latest")
+    {
+        o.m->json_version = 1;
     }
     else
     {
-        o.m->json_version = 1;
+        o.m->json_version = QUtil::string_to_int(parameter.c_str());
     }
     if (o.m->json_version != 1)
     {
@@ -272,31 +272,31 @@ QPDFJob::Config::json(char const* parameter)
 }
 
 QPDFJob::Config*
-QPDFJob::Config::jsonKey(char const* parameter)
+QPDFJob::Config::jsonKey(std::string const& parameter)
 {
     o.m->json_keys.insert(parameter);
     return this;
 }
 
 QPDFJob::Config*
-QPDFJob::Config::jsonObject(char const* parameter)
+QPDFJob::Config::jsonObject(std::string const& parameter)
 {
     o.m->json_objects.insert(parameter);
     return this;
 }
 
 QPDFJob::Config*
-QPDFJob::Config::keepFilesOpen(char const* parameter)
+QPDFJob::Config::keepFilesOpen(std::string const& parameter)
 {
     o.m->keep_files_open_set = true;
-    o.m->keep_files_open = (strcmp(parameter, "y") == 0);
+    o.m->keep_files_open = (parameter == "y");
     return this;
 }
 
 QPDFJob::Config*
-QPDFJob::Config::keepFilesOpenThreshold(char const* parameter)
+QPDFJob::Config::keepFilesOpenThreshold(std::string const& parameter)
 {
-    o.m->keep_files_open_threshold = QUtil::string_to_uint(parameter);
+    o.m->keep_files_open_threshold = QUtil::string_to_uint(parameter.c_str());
     return this;
 }
 
@@ -315,7 +315,7 @@ QPDFJob::Config::linearize()
 }
 
 QPDFJob::Config*
-QPDFJob::Config::linearizePass1(char const* parameter)
+QPDFJob::Config::linearizePass1(std::string const& parameter)
 {
     o.m->linearize_pass1 = parameter;
     return this;
@@ -330,7 +330,7 @@ QPDFJob::Config::listAttachments()
 }
 
 QPDFJob::Config*
-QPDFJob::Config::minVersion(char const* parameter)
+QPDFJob::Config::minVersion(std::string const& parameter)
 {
     o.m->min_version = parameter;
     return this;
@@ -358,31 +358,31 @@ QPDFJob::Config::noWarn()
 }
 
 QPDFJob::Config*
-QPDFJob::Config::normalizeContent(char const* parameter)
+QPDFJob::Config::normalizeContent(std::string const& parameter)
 {
     o.m->normalize_set = true;
-    o.m->normalize = (strcmp(parameter, "y") == 0);
+    o.m->normalize = (parameter == "y");
     return this;
 }
 
 QPDFJob::Config*
-QPDFJob::Config::oiMinArea(char const* parameter)
+QPDFJob::Config::oiMinArea(std::string const& parameter)
 {
-    o.m->oi_min_area = QUtil::string_to_uint(parameter);
+    o.m->oi_min_area = QUtil::string_to_uint(parameter.c_str());
     return this;
 }
 
 QPDFJob::Config*
-QPDFJob::Config::oiMinHeight(char const* parameter)
+QPDFJob::Config::oiMinHeight(std::string const& parameter)
 {
-    o.m->oi_min_height = QUtil::string_to_uint(parameter);
+    o.m->oi_min_height = QUtil::string_to_uint(parameter.c_str());
     return this;
 }
 
 QPDFJob::Config*
-QPDFJob::Config::oiMinWidth(char const* parameter)
+QPDFJob::Config::oiMinWidth(std::string const& parameter)
 {
-    o.m->oi_min_width = QUtil::string_to_uint(parameter);
+    o.m->oi_min_width = QUtil::string_to_uint(parameter.c_str());
     return this;
 }
 
@@ -394,7 +394,7 @@ QPDFJob::Config::optimizeImages()
 }
 
 QPDFJob::Config*
-QPDFJob::Config::password(char const* parameter)
+QPDFJob::Config::password(std::string const& parameter)
 {
     o.m->password = QUtil::make_shared_cstr(parameter);
     return this;
@@ -451,7 +451,7 @@ QPDFJob::Config::recompressFlate()
 }
 
 QPDFJob::Config*
-QPDFJob::Config::removeAttachment(char const* parameter)
+QPDFJob::Config::removeAttachment(std::string const& parameter)
 {
     o.m->attachments_to_remove.push_back(parameter);
     return this;
@@ -473,7 +473,7 @@ QPDFJob::Config::requiresPassword()
 }
 
 QPDFJob::Config*
-QPDFJob::Config::showAttachment(char const* parameter)
+QPDFJob::Config::showAttachment(std::string const& parameter)
 {
     o.m->attachment_to_show = parameter;
     o.m->require_outfile = false;
@@ -530,14 +530,13 @@ QPDFJob::Config::showXref()
 QPDFJob::Config*
 QPDFJob::Config::splitPages()
 {
-    return splitPages(nullptr);
+    return splitPages("");
 }
 
 QPDFJob::Config*
-QPDFJob::Config::splitPages(char const* parameter)
+QPDFJob::Config::splitPages(std::string const& parameter)
 {
-    int n = (((parameter == 0) || (strlen(parameter) == 0)) ? 1 :
-             QUtil::string_to_int(parameter));
+    int n = (parameter.empty() ? 1 : QUtil::string_to_int(parameter.c_str()));
     o.m->split_pages = n;
     return this;
 }
@@ -592,10 +591,10 @@ QPDFJob::Config::withImages()
 }
 
 QPDFJob::Config*
-QPDFJob::Config::passwordFile(char const* parameter)
+QPDFJob::Config::passwordFile(std::string const& parameter)
 {
     std::list<std::string> lines;
-    if (strcmp(parameter, "-") == 0)
+    if (parameter == "-")
     {
         QTC::TC("qpdf", "QPDFJob_config password stdin");
         lines = QUtil::read_lines_from_file(std::cin);
@@ -603,7 +602,7 @@ QPDFJob::Config::passwordFile(char const* parameter)
     else
     {
         QTC::TC("qpdf", "QPDFJob_config password file");
-        lines = QUtil::read_lines_from_file(parameter);
+        lines = QUtil::read_lines_from_file(parameter.c_str());
     }
     if (lines.size() >= 1)
     {
@@ -620,21 +619,21 @@ QPDFJob::Config::passwordFile(char const* parameter)
 }
 
 QPDFJob::Config*
-QPDFJob::Config::passwordMode(char const* parameter)
+QPDFJob::Config::passwordMode(std::string const& parameter)
 {
-    if (strcmp(parameter, "bytes") == 0)
+    if (parameter == "bytes")
     {
         o.m->password_mode = QPDFJob::pm_bytes;
     }
-    else if (strcmp(parameter, "hex-bytes") == 0)
+    else if (parameter == "hex-bytes")
     {
         o.m->password_mode = QPDFJob::pm_hex_bytes;
     }
-    else if (strcmp(parameter, "unicode") == 0)
+    else if (parameter == "unicode")
     {
         o.m->password_mode = QPDFJob::pm_unicode;
     }
-    else if (strcmp(parameter, "auto") == 0)
+    else if (parameter == "auto")
     {
         o.m->password_mode = QPDFJob::pm_auto;
     }
@@ -646,18 +645,18 @@ QPDFJob::Config::passwordMode(char const* parameter)
 }
 
 QPDFJob::Config*
-QPDFJob::Config::streamData(char const* parameter)
+QPDFJob::Config::streamData(std::string const& parameter)
 {
     o.m->stream_data_set = true;
-    if (strcmp(parameter, "compress") == 0)
+    if (parameter == "compress")
     {
         o.m->stream_data_mode = qpdf_s_compress;
     }
-    else if (strcmp(parameter, "preserve") == 0)
+    else if (parameter == "preserve")
     {
         o.m->stream_data_mode = qpdf_s_preserve;
     }
-    else if (strcmp(parameter, "uncompress") == 0)
+    else if (parameter == "uncompress")
     {
         o.m->stream_data_mode = qpdf_s_uncompress;
     }
@@ -669,22 +668,22 @@ QPDFJob::Config::streamData(char const* parameter)
 }
 
 QPDFJob::Config*
-QPDFJob::Config::decodeLevel(char const* parameter)
+QPDFJob::Config::decodeLevel(std::string const& parameter)
 {
     o.m->decode_level_set = true;
-    if (strcmp(parameter, "none") == 0)
+    if (parameter == "none")
     {
         o.m->decode_level = qpdf_dl_none;
     }
-    else if (strcmp(parameter, "generalized") == 0)
+    else if (parameter == "generalized")
     {
         o.m->decode_level = qpdf_dl_generalized;
     }
-    else if (strcmp(parameter, "specialized") == 0)
+    else if (parameter == "specialized")
     {
         o.m->decode_level = qpdf_dl_specialized;
     }
-    else if (strcmp(parameter, "all") == 0)
+    else if (parameter == "all")
     {
         o.m->decode_level = qpdf_dl_all;
     }
@@ -696,18 +695,18 @@ QPDFJob::Config::decodeLevel(char const* parameter)
 }
 
 QPDFJob::Config*
-QPDFJob::Config::objectStreams(char const* parameter)
+QPDFJob::Config::objectStreams(std::string const& parameter)
 {
     o.m->object_stream_set = true;
-    if (strcmp(parameter, "disable") == 0)
+    if (parameter == "disable")
     {
         o.m->object_stream_mode = qpdf_o_disable;
     }
-    else if (strcmp(parameter, "preserve") == 0)
+    else if (parameter == "preserve")
     {
         o.m->object_stream_mode = qpdf_o_preserve;
     }
-    else if (strcmp(parameter, "generate") == 0)
+    else if (parameter == "generate")
     {
         o.m->object_stream_mode = qpdf_o_generate;
     }
@@ -719,17 +718,17 @@ QPDFJob::Config::objectStreams(char const* parameter)
 }
 
 QPDFJob::Config*
-QPDFJob::Config::removeUnreferencedResources(char const* parameter)
+QPDFJob::Config::removeUnreferencedResources(std::string const& parameter)
 {
-    if (strcmp(parameter, "auto") == 0)
+    if (parameter == "auto")
     {
         o.m->remove_unreferenced_page_resources = QPDFJob::re_auto;
     }
-    else if (strcmp(parameter, "yes") == 0)
+    else if (parameter == "yes")
     {
         o.m->remove_unreferenced_page_resources = QPDFJob::re_yes;
     }
-    else if (strcmp(parameter, "no") == 0)
+    else if (parameter == "no")
     {
         o.m->remove_unreferenced_page_resources = QPDFJob::re_no;
     }
@@ -741,7 +740,7 @@ QPDFJob::Config::removeUnreferencedResources(char const* parameter)
 }
 
 QPDFJob::Config*
-QPDFJob::Config::showObject(char const* parameter)
+QPDFJob::Config::showObject(std::string const& parameter)
 {
     QPDFJob::parse_object_id(
         parameter, o.m->show_trailer, o.m->show_obj, o.m->show_gen);
@@ -750,11 +749,11 @@ QPDFJob::Config::showObject(char const* parameter)
 }
 
 QPDFJob::Config*
-QPDFJob::Config::jobJsonFile(char const* parameter)
+QPDFJob::Config::jobJsonFile(std::string const& parameter)
 {
     PointerHolder<char> file_buf;
     size_t size;
-    QUtil::read_file_into_memory(parameter, file_buf, size);
+    QUtil::read_file_into_memory(parameter.c_str(), file_buf, size);
     try
     {
         o.initializeFromJson(std::string(file_buf.getPointer(), size), true);
@@ -770,7 +769,7 @@ QPDFJob::Config::jobJsonFile(char const* parameter)
 }
 
 QPDFJob::Config*
-QPDFJob::Config::rotate(char const* parameter)
+QPDFJob::Config::rotate(std::string const& parameter)
 {
     o.parseRotationParameter(parameter);
     return this;
@@ -788,21 +787,21 @@ QPDFJob::CopyAttConfig::CopyAttConfig(Config* c) :
 }
 
 QPDFJob::CopyAttConfig*
-QPDFJob::CopyAttConfig::file(char const* parameter)
+QPDFJob::CopyAttConfig::file(std::string const& parameter)
 {
     this->caf.path = parameter;
     return this;
 }
 
 QPDFJob::CopyAttConfig*
-QPDFJob::CopyAttConfig::prefix(char const* parameter)
+QPDFJob::CopyAttConfig::prefix(std::string const& parameter)
 {
     this->caf.prefix = parameter;
     return this;
 }
 
 QPDFJob::CopyAttConfig*
-QPDFJob::CopyAttConfig::password(char const* parameter)
+QPDFJob::CopyAttConfig::password(std::string const& parameter)
 {
     this->caf.password = parameter;
     return this;
@@ -831,28 +830,28 @@ QPDFJob::Config::addAttachment()
 }
 
 QPDFJob::AttConfig*
-QPDFJob::AttConfig::file(char const* parameter)
+QPDFJob::AttConfig::file(std::string const& parameter)
 {
     this->att.path = parameter;
     return this;
 }
 
 QPDFJob::AttConfig*
-QPDFJob::AttConfig::key(char const* parameter)
+QPDFJob::AttConfig::key(std::string const& parameter)
 {
     this->att.key = parameter;
     return this;
 }
 
 QPDFJob::AttConfig*
-QPDFJob::AttConfig::filename(char const* parameter)
+QPDFJob::AttConfig::filename(std::string const& parameter)
 {
     this->att.filename = parameter;
     return this;
 }
 
 QPDFJob::AttConfig*
-QPDFJob::AttConfig::creationdate(char const* parameter)
+QPDFJob::AttConfig::creationdate(std::string const& parameter)
 {
     if (! QUtil::pdf_time_to_qpdf_time(parameter))
     {
@@ -863,7 +862,7 @@ QPDFJob::AttConfig::creationdate(char const* parameter)
 }
 
 QPDFJob::AttConfig*
-QPDFJob::AttConfig::moddate(char const* parameter)
+QPDFJob::AttConfig::moddate(std::string const& parameter)
 {
     if (! QUtil::pdf_time_to_qpdf_time(parameter))
     {
@@ -874,9 +873,9 @@ QPDFJob::AttConfig::moddate(char const* parameter)
 }
 
 QPDFJob::AttConfig*
-QPDFJob::AttConfig::mimetype(char const* parameter)
+QPDFJob::AttConfig::mimetype(std::string const& parameter)
 {
-    if (strchr(parameter, '/') == nullptr)
+    if (parameter.find('/') == std::string::npos)
     {
         usage("mime type should be specified as type/subtype");
     }
@@ -885,7 +884,7 @@ QPDFJob::AttConfig::mimetype(char const* parameter)
 }
 
 QPDFJob::AttConfig*
-QPDFJob::AttConfig::description(char const* parameter)
+QPDFJob::AttConfig::description(std::string const& parameter)
 {
     this->att.description = parameter;
     return this;
@@ -999,7 +998,7 @@ QPDFJob::UOConfig::endUnderlayOverlay()
 }
 
 QPDFJob::UOConfig*
-QPDFJob::UOConfig::file(char const* parameter)
+QPDFJob::UOConfig::file(std::string const& parameter)
 {
     if (! config->o.m->under_overlay->filename.empty())
     {
@@ -1013,37 +1012,37 @@ QPDFJob::UOConfig::file(char const* parameter)
 }
 
 QPDFJob::UOConfig*
-QPDFJob::UOConfig::to(char const* parameter)
+QPDFJob::UOConfig::to(std::string const& parameter)
 {
-    config->o.parseNumrange(parameter, 0);
+    config->o.parseNumrange(parameter.c_str(), 0);
     config->o.m->under_overlay->to_nr = parameter;
     return this;
 }
 
 QPDFJob::UOConfig*
-QPDFJob::UOConfig::from(char const* parameter)
+QPDFJob::UOConfig::from(std::string const& parameter)
 {
-    if (strlen(parameter))
+    if (! parameter.empty())
     {
-        config->o.parseNumrange(parameter, 0);
+        config->o.parseNumrange(parameter.c_str(), 0);
     }
     config->o.m->under_overlay->from_nr = parameter;
     return this;
 }
 
 QPDFJob::UOConfig*
-QPDFJob::UOConfig::repeat(char const* parameter)
+QPDFJob::UOConfig::repeat(std::string const& parameter)
 {
-    if (strlen(parameter))
+    if (! parameter.empty())
     {
-        config->o.parseNumrange(parameter, 0);
+        config->o.parseNumrange(parameter.c_str(), 0);
     }
     config->o.m->under_overlay->repeat_nr = parameter;
     return this;
 }
 
 QPDFJob::UOConfig*
-QPDFJob::UOConfig::password(char const* parameter)
+QPDFJob::UOConfig::password(std::string const& parameter)
 {
     config->o.m->under_overlay->password = QUtil::make_shared_cstr(parameter);
     return this;
@@ -1086,42 +1085,42 @@ QPDFJob::EncConfig::allowInsecure()
 }
 
 QPDFJob::EncConfig*
-QPDFJob::EncConfig::accessibility(char const* parameter)
+QPDFJob::EncConfig::accessibility(std::string const& parameter)
 {
-    config->o.m->r3_accessibility = (strcmp(parameter, "y") == 0);
+    config->o.m->r3_accessibility = (parameter == "y");
     return this;
 }
 
 QPDFJob::EncConfig*
-QPDFJob::EncConfig::extract(char const* parameter)
+QPDFJob::EncConfig::extract(std::string const& parameter)
 {
     if (config->o.m->keylen == 40)
     {
-        config->o.m->r2_extract = (strcmp(parameter, "y") == 0);
+        config->o.m->r2_extract = (parameter == "y");
     }
     else
     {
-        config->o.m->r3_extract = (strcmp(parameter, "y") == 0);
+        config->o.m->r3_extract = (parameter == "y");
     }
     return this;
 }
 
 QPDFJob::EncConfig*
-QPDFJob::EncConfig::print(char const* parameter)
+QPDFJob::EncConfig::print(std::string const& parameter)
 {
     if (config->o.m->keylen == 40)
     {
-        config->o.m->r2_print = (strcmp(parameter, "y") == 0);
+        config->o.m->r2_print = (parameter == "y");
     }
-    else if (strcmp(parameter, "full") == 0)
+    else if (parameter == "full")
     {
         config->o.m->r3_print = qpdf_r3p_full;
     }
-    else if (strcmp(parameter, "low") == 0)
+    else if (parameter == "low")
     {
         config->o.m->r3_print = qpdf_r3p_low;
     }
-    else if (strcmp(parameter, "none") == 0)
+    else if (parameter == "none")
     {
         config->o.m->r3_print = qpdf_r3p_none;
     }
@@ -1133,41 +1132,41 @@ QPDFJob::EncConfig::print(char const* parameter)
 }
 
 QPDFJob::EncConfig*
-QPDFJob::EncConfig::modify(char const* parameter)
+QPDFJob::EncConfig::modify(std::string const& parameter)
 {
     if (config->o.m->keylen == 40)
     {
-        config->o.m->r2_modify = (strcmp(parameter, "y") == 0);
+        config->o.m->r2_modify = (parameter == "y");
     }
-    else if (strcmp(parameter, "all") == 0)
+    else if (parameter == "all")
     {
         config->o.m->r3_assemble = true;
         config->o.m->r3_annotate_and_form = true;
         config->o.m->r3_form_filling = true;
         config->o.m->r3_modify_other = true;
     }
-    else if (strcmp(parameter, "annotate") == 0)
+    else if (parameter == "annotate")
     {
         config->o.m->r3_assemble = true;
         config->o.m->r3_annotate_and_form = true;
         config->o.m->r3_form_filling = true;
         config->o.m->r3_modify_other = false;
     }
-    else if (strcmp(parameter, "form") == 0)
+    else if (parameter == "form")
     {
         config->o.m->r3_assemble = true;
         config->o.m->r3_annotate_and_form = false;
         config->o.m->r3_form_filling = true;
         config->o.m->r3_modify_other = false;
     }
-    else if (strcmp(parameter, "assembly") == 0)
+    else if (parameter == "assembly")
     {
         config->o.m->r3_assemble = true;
         config->o.m->r3_annotate_and_form = false;
         config->o.m->r3_form_filling = false;
         config->o.m->r3_modify_other = false;
     }
-    else if (strcmp(parameter, "none") == 0)
+    else if (parameter == "none")
     {
         config->o.m->r3_assemble = false;
         config->o.m->r3_annotate_and_form = false;
@@ -1189,44 +1188,44 @@ QPDFJob::EncConfig::cleartextMetadata()
 }
 
 QPDFJob::EncConfig*
-QPDFJob::EncConfig::assemble(char const* parameter)
+QPDFJob::EncConfig::assemble(std::string const& parameter)
 {
-    config->o.m->r3_assemble = (strcmp(parameter, "y") == 0);
+    config->o.m->r3_assemble = (parameter == "y");
     return this;
 }
 
 QPDFJob::EncConfig*
-QPDFJob::EncConfig::annotate(char const* parameter)
+QPDFJob::EncConfig::annotate(std::string const& parameter)
 {
     if (config->o.m->keylen == 40)
     {
-        config->o.m->r2_annotate = (strcmp(parameter, "y") == 0);
+        config->o.m->r2_annotate = (parameter == "y");
     }
     else
     {
-        config->o.m->r3_annotate_and_form = (strcmp(parameter, "y") == 0);
+        config->o.m->r3_annotate_and_form = (parameter == "y");
     }
     return this;
 }
 
 QPDFJob::EncConfig*
-QPDFJob::EncConfig::form(char const* parameter)
+QPDFJob::EncConfig::form(std::string const& parameter)
 {
-    config->o.m->r3_form_filling = (strcmp(parameter, "y") == 0);
+    config->o.m->r3_form_filling = (parameter == "y");
     return this;
 }
 
 QPDFJob::EncConfig*
-QPDFJob::EncConfig::modifyOther(char const* parameter)
+QPDFJob::EncConfig::modifyOther(std::string const& parameter)
 {
-    config->o.m->r3_modify_other = (strcmp(parameter, "y") == 0);
+    config->o.m->r3_modify_other = (parameter == "y");
     return this;
 }
 
 QPDFJob::EncConfig*
-QPDFJob::EncConfig::useAes(char const* parameter)
+QPDFJob::EncConfig::useAes(std::string const& parameter)
 {
-    config->o.m->use_aes = (strcmp(parameter, "y") == 0);
+    config->o.m->use_aes = (parameter == "y");
     return this;
 }
 
