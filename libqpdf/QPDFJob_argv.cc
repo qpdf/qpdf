@@ -248,12 +248,12 @@ ArgParser::argPagesPassword(char* parameter)
 {
     if (this->pages_password != nullptr)
     {
-        QTC::TC("qpdf", "qpdf duplicated pages password");
+        QTC::TC("qpdf", "QPDFJob duplicated pages password");
         usage("--password already specified for this file");
     }
     if (this->accumulated_args.size() != 1)
     {
-        QTC::TC("qpdf", "qpdf misplaced pages password");
+        QTC::TC("qpdf", "QPDFJob misplaced pages password");
         usage("in --pages, --password must immediately follow a file name");
     }
     this->pages_password = parameter;
@@ -291,7 +291,7 @@ ArgParser::argPagesPositional(char* arg)
         if (arg == nullptr)
         {
             // The filename or password was the last argument
-            QTC::TC("qpdf", "qpdf pages range omitted at end",
+            QTC::TC("qpdf", "QPDFJob pages range omitted at end",
                     this->pages_password == nullptr ? 0 : 1);
         }
         else
@@ -312,11 +312,11 @@ ArgParser::argPagesPositional(char* arg)
             if (strcmp(range, ".") == 0)
             {
                 // "." means the input file.
-                QTC::TC("qpdf", "qpdf pages range omitted with .");
+                QTC::TC("qpdf", "QPDFJob pages range omitted with .");
             }
             else if (QUtil::file_can_be_opened(range))
             {
-                QTC::TC("qpdf", "qpdf pages range omitted in middle");
+                QTC::TC("qpdf", "QPDFJob pages range omitted in middle");
                 // Yup, it's a file.
             }
             else

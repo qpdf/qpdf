@@ -105,7 +105,7 @@ QPDF found wrong endstream in recovery 0
 QPDF_Stream pipeStreamData with null pipeline 0
 QPDFWriter not recompressing /FlateDecode 0
 QPDF_encryption xref stream from encrypted file 0
-qpdf unable to filter 0
+QPDFJob unable to filter 0
 QUtil non-trivial UTF-16 0
 QPDF xref overwrite object 0
 QPDF decoding error warning 0
@@ -226,7 +226,7 @@ QPDFWriter foreign object 0
 QPDFWriter copy use_aes 1
 QPDFObjectHandle indirect without context 0
 QPDFObjectHandle trailing data in parse 0
-qpdf pages encryption password 0
+QPDFJob pages encryption password 0
 QPDFTokenizer EOF reading token 0
 QPDFTokenizer EOF reading appendable token 0
 QPDFWriter extra header text no newline 0
@@ -255,9 +255,9 @@ QPDF not caching overridden objstm object 0
 QPDFWriter original obj non-zero gen 0
 QPDF_optimization indirect outlines 0
 QPDF xref space 2
-qpdf pages range omitted at end 1
-qpdf pages range omitted in middle 0
-qpdf npages 0
+QPDFJob pages range omitted at end 1
+QPDFJob pages range omitted in middle 0
+QPDFJob npages 0
 QPDF already reserved object 0
 QPDFWriter standard deterministic ID 1
 QPDFWriter linearized deterministic ID 1
@@ -272,10 +272,10 @@ QPDFObjectHandle no val for last key 0
 QPDF resolve failure to null 0
 QPDFWriter preserve unreferenced standard 0
 QPDFObjectHandle errors in parsecontent 0
-qpdf same file error 0
-qpdf split-pages %d 0
-qpdf split-pages .pdf 0
-qpdf split-pages other 0
+QPDFJob same file error 0
+QPDFJob split-pages %d 0
+QPDFJob split-pages .pdf 0
+QPDFJob split-pages other 0
 QPDFTokenizer allowing bad token 0
 QPDF ignore first space in xref entry 0
 QPDF ignore first extra space in xref entry 0
@@ -349,9 +349,9 @@ QPDFAcroFormDocumentHelper non-dictionary field 0
 QPDFAcroFormDocumentHelper loop 0
 QPDFAcroFormDocumentHelper field found 1
 QPDFAcroFormDocumentHelper annotation found 1
-qpdf keep files open n 0
-qpdf keep files open y 0
-qpdf automatically set keep files open 1
+QPDFJob keep files open n 0
+QPDFJob keep files open y 0
+QPDFJob automatically set keep files open 1
 QPDFPageLabelDocumentHelper skip first 0
 QPDFOutlineObjectHelper direct dest 0
 QPDFOutlineObjectHelper action dest 0
@@ -392,24 +392,24 @@ QPDFFormFieldObjectHelper list found 0
 QPDFFormFieldObjectHelper list first too low 0
 QPDFFormFieldObjectHelper list last too high 0
 QPDF detected dangling ref 0
-qpdf image optimize no pipeline 0
-qpdf image optimize no shrink 0
-qpdf image optimize too small 0
+QPDFJob image optimize no pipeline 0
+QPDFJob image optimize no shrink 0
+QPDFJob image optimize too small 0
 QPDFFormFieldObjectHelper WinAnsi 0
 QPDF pipe foreign encrypted stream 0
 QPDF copy foreign stream with provider 0
 QPDF copy foreign stream with buffer 0
 QPDF immediate copy stream data 0
-qpdf copy same page more than once 1
+QPDFJob copy same page more than once 1
 QPDFPageObjectHelper bad token finding names 0
-qpdf password mode bytes 0
-qpdf password mode hex-bytes 0
-qpdf password not unicode 0
-qpdf password not encodable 0
-qpdf auto-encode password 0
-qpdf bytes fallback warning 0
-qpdf invalid utf-8 in auto 0
-qpdf input password hex-bytes 0
+QPDFJob password mode bytes 0
+QPDFJob password mode hex-bytes 0
+QPDFJob password not unicode 0
+QPDFJob password not encodable 0
+QPDFJob auto-encode password 0
+QPDFJob bytes fallback warning 0
+QPDFJob invalid utf-8 in auto 0
+QPDFJob input password hex-bytes 0
 QPDFPageDocumentHelper ignore annotation with no appearance 0
 QPDFFormFieldObjectHelper create AS from scratch 0
 QPDFFormFieldObjectHelper create AP from scratch 0
@@ -417,7 +417,7 @@ QPDFFormFieldObjectHelper replaced BMC at EOF 0
 QPDFFormFieldObjectHelper fallback Tf 0
 QPDFPageObjectHelper non-trivial inheritance 0
 QPDFPageObjectHelper copy shared attribute 1
-qpdf from_nr from repeat_nr 0
+QPDFJob from_nr from repeat_nr 0
 QPDF resolve duplicated page object 0
 QPDF handle direct page object 0
 QPDFTokenizer finder found wrong word 0
@@ -425,8 +425,8 @@ QPDFTokenizer found EI by byte count 0
 QPDFTokenizer found EI after more than one try 0
 QPDFPageObjectHelper externalize inline image 0
 QPDFPageObjectHelper keep inline image 0
-qpdf image optimize colorspace 0
-qpdf image optimize bits per component 0
+QPDFJob image optimize colorspace 0
+QPDFJob image optimize bits per component 0
 QPDFWriter remove empty DecodeParms 0
 QPDFObjectHandle uint returning 0 0
 QPDFObjectHandle int returning INT_MIN 0
@@ -443,13 +443,13 @@ QPDFWriter no encryption sig contents 0
 QPDFPageObjectHelper colorspace lookup 0
 QPDFWriter ignore XRef in qdf mode 0
 QPDFPageObjectHelper filter form xobject 0
-qpdf found resources in non-leaf 0
-qpdf found shared resources in leaf 0
-qpdf found shared xobject in leaf 0
+QPDFJob found resources in non-leaf 0
+QPDFJob found shared resources in leaf 0
+QPDFJob found shared xobject in leaf 0
 QPDF copy foreign with data 1
 QPDF copy foreign with foreign_stream 1
 QPDFObjectHandle need_newline 1
-qpdf pages range omitted with . 0
+QPDFJob pages range omitted with . 0
 qpdf-c invalid object handle 0
 qpdf-c called qpdf_oh_release 0
 qpdf-c called qpdf_oh_release_all 0
@@ -573,10 +573,10 @@ QPDFPageObjectHelper flatten inherit rotate 0
 QPDFAcroFormDocumentHelper copy annotation 3
 QPDFAcroFormDocumentHelper field with parent 3
 QPDFAcroFormDocumentHelper modify ap matrix 0
-qpdf copy form fields in split_pages 0
-qpdf keep some fields in pages 0
-qpdf pages keeping field from original 0
-qpdf no more fields in pages 0
+QPDFJob copy form fields in split_pages 0
+QPDFJob keep some fields in pages 0
+QPDFJob pages keeping field from original 0
+QPDFJob no more fields in pages 0
 QPDFObjectHandle merge reuse 0
 QPDFObjectHandle merge generate 0
 QPDFFormFieldObjectHelper get font from /DR 0
@@ -587,15 +587,15 @@ QPDFAcroFormDocumentHelper ap conflict 0
 QPDFAcroFormDocumentHelper ap rename 0
 QPDFAcroFormDocumentHelper /DA parse error 0
 QPDFAcroFormDocumentHelper AP parse error 0
-qpdf copy fields not this file 0
-qpdf copy fields non-first from orig 0
+QPDFJob copy fields not this file 0
+QPDFJob copy fields non-first from orig 0
 QPDF resolve duplicated page in insert 0
 QPDFWriter preserve object streams 1
 QPDFWriter exclude from object stream 0
 QPDF_pages findPage not found 0
-qpdf overlay page with no resources 0
+QPDFJob overlay page with no resources 0
 QPDFObjectHandle check ownership 0
-qpdf weak crypto warning 0
+QPDFJob weak crypto warning 0
 qpdf-c called qpdf_oh_is_initialized 0
 qpdf-c registered progress reporter 0
 qpdf-c called qpdf_oh_new_uninitialized 0
@@ -621,13 +621,13 @@ qpdf-c called qpdf_oh_replace_stream_data 0
 qpdf-c silence oh errors 0
 qpdf-c called qpdf_oh_get_binary_string_value 0
 qpdf-c called qpdf_oh_new_binary_string 0
-qpdf duplicated pages password 0
-qpdf misplaced pages password 0
-qpdf check encrypted encrypted 0
-qpdf check encrypted not encrypted 0
-qpdf check password password incorrect 0
-qpdf check password password correct 0
-qpdf check password not encrypted 0
+QPDFJob duplicated pages password 0
+QPDFJob misplaced pages password 0
+QPDFJob check encrypted encrypted 0
+QPDFJob check encrypted not encrypted 0
+QPDFJob check password password incorrect 0
+QPDFJob check password password correct 0
+QPDFJob check password not encrypted 0
 QPDFJob_config password file 0
 QPDFJob_config password stdin 0
 QPDFJob json bare not empty 0

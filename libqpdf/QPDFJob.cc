@@ -141,7 +141,7 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
     QPDFObjectHandle components_obj = dict.getKey("/BitsPerComponent");
     if (! (components_obj.isInteger() && (components_obj.getIntValue() == 8)))
     {
-        QTC::TC("qpdf", "qpdf image optimize bits per component");
+        QTC::TC("qpdf", "QPDFJob image optimize bits per component");
         if (! description.empty())
         {
             o.doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
@@ -194,7 +194,7 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
     }
     else
     {
-        QTC::TC("qpdf", "qpdf image optimize colorspace");
+        QTC::TC("qpdf", "QPDFJob image optimize colorspace");
         if (! description.empty())
         {
             o.doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
@@ -209,7 +209,7 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
         ((this->oi_min_height > 0) && (h <= this->oi_min_height)) ||
         ((this->oi_min_area > 0) && ((w * h) <= this->oi_min_area)))
     {
-        QTC::TC("qpdf", "qpdf image optimize too small");
+        QTC::TC("qpdf", "QPDFJob image optimize too small");
         if (! description.empty())
         {
             o.doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
@@ -231,7 +231,7 @@ ImageOptimizer::evaluate(std::string const& description)
 {
     if (! image.pipeStreamData(0, 0, qpdf_dl_specialized, true))
     {
-        QTC::TC("qpdf", "qpdf image optimize no pipeline");
+        QTC::TC("qpdf", "QPDFJob image optimize no pipeline");
         o.doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
             cout << prefix << ": " << description
                  << ": not optimizing because unable to decode data"
@@ -255,7 +255,7 @@ ImageOptimizer::evaluate(std::string const& description)
     long long orig_length = image.getDict().getKey("/Length").getIntValue();
     if (c.getCount() >= orig_length)
     {
-        QTC::TC("qpdf", "qpdf image optimize no shrink");
+        QTC::TC("qpdf", "QPDFJob image optimize no shrink");
         o.doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
             cout << prefix << ": " << description
                  << ": not optimizing because DCT compression does not"
@@ -668,12 +668,12 @@ QPDFJob::getExitCode() const
     {
         if (this->m->encryption_status & qpdf_es_encrypted)
         {
-            QTC::TC("qpdf", "qpdf check encrypted encrypted");
+            QTC::TC("qpdf", "QPDFJob check encrypted encrypted");
             return 0;
         }
         else
         {
-            QTC::TC("qpdf", "qpdf check encrypted not encrypted");
+            QTC::TC("qpdf", "QPDFJob check encrypted not encrypted");
             return EXIT_IS_NOT_ENCRYPTED;
         }
     }
@@ -683,18 +683,18 @@ QPDFJob::getExitCode() const
         {
             if (this->m->encryption_status & qpdf_es_password_incorrect)
             {
-                QTC::TC("qpdf", "qpdf check password password incorrect");
+                QTC::TC("qpdf", "QPDFJob check password password incorrect");
                 return 0;
             }
             else
             {
-                QTC::TC("qpdf", "qpdf check password password correct");
+                QTC::TC("qpdf", "QPDFJob check password password correct");
                 return EXIT_CORRECT_PASSWORD;
             }
         }
         else
         {
-            QTC::TC("qpdf", "qpdf check password not encrypted");
+            QTC::TC("qpdf", "QPDFJob check password not encrypted");
             return EXIT_IS_NOT_ENCRYPTED;
         }
     }
@@ -782,7 +782,7 @@ QPDFJob::checkConfiguration()
     if ((! m->split_pages) &&
         QUtil::same_file(m->infilename.get(), m->outfilename.get()))
     {
-        QTC::TC("qpdf", "qpdf same file error");
+        QTC::TC("qpdf", "QPDFJob same file error");
         usage("input file and output file are the same;"
               " use --replace-input to intentionally"
               " overwrite the input file");
@@ -1028,7 +1028,7 @@ QPDFJob::doShowObj(QPDF& pdf)
             if (filter &&
                 (! obj.pipeStreamData(0, 0, qpdf_dl_all)))
             {
-                QTC::TC("qpdf", "qpdf unable to filter");
+                QTC::TC("qpdf", "QPDFJob unable to filter");
                 obj.warnIfPossible("unable to filter stream data");
                 error = true;
             }
@@ -1969,7 +1969,7 @@ QPDFJob::doInspection(QPDF& pdf)
     }
     if (m->show_npages)
     {
-        QTC::TC("qpdf", "qpdf npages");
+        QTC::TC("qpdf", "QPDFJob npages");
         *(this->m->cout) << pdf.getRoot().getKey("/Pages").
             getKey("/Count").getIntValue() << std::endl;
     }
@@ -2067,7 +2067,7 @@ QPDFJob::doProcess(
         {
             // Special case: handle --password-mode=hex-bytes for input
             // password as well as output password
-            QTC::TC("qpdf", "qpdf input password hex-bytes");
+            QTC::TC("qpdf", "QPDFJob input password hex-bytes");
             ptemp = QUtil::hex_decode(password);
             password = ptemp.c_str();
         }
@@ -2182,7 +2182,7 @@ QPDFJob::validateUnderOverlay(QPDF& pdf, UnderOverlay* uo)
     {
         if (uo->from_nr.empty())
         {
-            QTC::TC("qpdf", "qpdf from_nr from repeat_nr");
+            QTC::TC("qpdf", "QPDFJob from_nr from repeat_nr");
             uo->from_nr = uo->repeat_nr;
         }
         uo->from_pagenos =
@@ -2244,7 +2244,7 @@ QPDFJob::doUnderOverlayForPage(
     QPDFObjectHandle resources = dest_page.getAttribute("/Resources", true);
     if (! resources.isDictionary())
     {
-        QTC::TC("qpdf", "qpdf overlay page with no resources");
+        QTC::TC("qpdf", "QPDFJob overlay page with no resources");
         resources = QPDFObjectHandle::newDictionary();
         dest_page.getObjectHandle().replaceKey("/Resources", resources);
     }
@@ -2668,7 +2668,7 @@ QPDFJob::shouldRemoveUnreferencedResources(QPDF& pdf)
             // This is a non-leaf node.
             if (dict.hasKey("/Resources"))
             {
-                QTC::TC("qpdf", "qpdf found resources in non-leaf");
+                QTC::TC("qpdf", "QPDFJob found resources in non-leaf");
                 doIfVerbose([&](std::ostream& cout,
                                 std::string const& prefix) {
                     cout << "  found resources in non-leaf page node "
@@ -2692,7 +2692,7 @@ QPDFJob::shouldRemoveUnreferencedResources(QPDF& pdf)
                 QPDFObjGen resources_og = resources.getObjGen();
                 if (resources_seen.count(resources_og))
                 {
-                    QTC::TC("qpdf", "qpdf found shared resources in leaf");
+                    QTC::TC("qpdf", "QPDFJob found shared resources in leaf");
                     doIfVerbose([&](std::ostream& cout,
                                     std::string const& prefix) {
                         cout << "  found shared resources in leaf node "
@@ -2714,7 +2714,7 @@ QPDFJob::shouldRemoveUnreferencedResources(QPDF& pdf)
                 QPDFObjGen xobject_og = xobject.getObjGen();
                 if (resources_seen.count(xobject_og))
                 {
-                    QTC::TC("qpdf", "qpdf found shared xobject in leaf");
+                    QTC::TC("qpdf", "QPDFJob found shared xobject in leaf");
                     doIfVerbose([&](std::ostream& cout,
                                     std::string const& prefix) {
                         cout << "  found shared xobject in leaf node "
@@ -2802,7 +2802,7 @@ QPDFJob::handlePageSpecs(
             filenames.insert(page_spec.filename);
         }
         m->keep_files_open = (filenames.size() <= m->keep_files_open_threshold);
-        QTC::TC("qpdf", "qpdf automatically set keep files open",
+        QTC::TC("qpdf", "QPDFJob automatically set keep files open",
                 m->keep_files_open ? 0 : 1);
         doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
             cout << prefix << ": selecting --keep-open-files="
@@ -2837,7 +2837,7 @@ QPDFJob::handlePageSpecs(
             if ((! m->encryption_file.empty()) && (password == 0) &&
                 (page_spec.filename == m->encryption_file))
             {
-                QTC::TC("qpdf", "qpdf pages encryption password");
+                QTC::TC("qpdf", "QPDFJob pages encryption password");
                 password = m->encryption_file_password.get();
             }
             doIfVerbose([&](std::ostream& cout, std::string const& prefix) {
@@ -2848,14 +2848,14 @@ QPDFJob::handlePageSpecs(
             ClosedFileInputSource* cis = 0;
             if (! m->keep_files_open)
             {
-                QTC::TC("qpdf", "qpdf keep files open n");
+                QTC::TC("qpdf", "QPDFJob keep files open n");
                 cis = new ClosedFileInputSource(page_spec.filename.c_str());
                 is = cis;
                 cis->stayOpen(true);
             }
             else
             {
-                QTC::TC("qpdf", "qpdf keep files open y");
+                QTC::TC("qpdf", "QPDFJob keep files open y");
                 FileInputSource* fis = new FileInputSource();
                 is = fis;
                 fis->setFilename(page_spec.filename.c_str());
@@ -3005,7 +3005,7 @@ QPDFJob::handlePageSpecs(
             unsigned long long from_uuid = page_data.qpdf->getUniqueId();
             if (copied_pages[from_uuid].count(to_copy_og))
             {
-                QTC::TC("qpdf", "qpdf copy same page more than once",
+                QTC::TC("qpdf", "QPDFJob copy same page more than once",
                         (page_data.qpdf == &pdf) ? 0 : 1);
                 to_copy = to_copy.shallowCopyPage();
             }
@@ -3043,11 +3043,11 @@ QPDFJob::handlePageSpecs(
             {
                 if (! this_file)
                 {
-                    QTC::TC("qpdf", "qpdf copy fields not this file");
+                    QTC::TC("qpdf", "QPDFJob copy fields not this file");
                 }
                 else if (! first_copy_from_orig)
                 {
-                    QTC::TC("qpdf", "qpdf copy fields non-first from orig");
+                    QTC::TC("qpdf", "QPDFJob copy fields non-first from orig");
                 }
                 try
                 {
@@ -3094,7 +3094,7 @@ QPDFJob::handlePageSpecs(
         {
             for (auto field: this_afdh->getFormFieldsForPage(page))
             {
-                QTC::TC("qpdf", "qpdf pages keeping field from original");
+                QTC::TC("qpdf", "QPDFJob pages keeping field from original");
                 referenced_fields.insert(field.getObjectHandle().getObjGen());
             }
         }
@@ -3126,12 +3126,12 @@ QPDFJob::handlePageSpecs(
             }
             if (new_fields.getArrayNItems() > 0)
             {
-                QTC::TC("qpdf", "qpdf keep some fields in pages");
+                QTC::TC("qpdf", "QPDFJob keep some fields in pages");
                 acroform.replaceKey("/Fields", new_fields);
             }
             else
             {
-                QTC::TC("qpdf", "qpdf no more fields in pages");
+                QTC::TC("qpdf", "QPDFJob no more fields in pages");
                 pdf.getRoot().removeKey("/AcroForm");
             }
         }
@@ -3172,11 +3172,11 @@ QPDFJob::maybeFixWritePassword(int R, std::string& password)
     switch (m->password_mode)
     {
       case QPDFJob::pm_bytes:
-        QTC::TC("qpdf", "qpdf password mode bytes");
+        QTC::TC("qpdf", "QPDFJob password mode bytes");
         break;
 
       case QPDFJob::pm_hex_bytes:
-        QTC::TC("qpdf", "qpdf password mode hex-bytes");
+        QTC::TC("qpdf", "QPDFJob password mode hex-bytes");
         password = QUtil::hex_decode(password);
         break;
 
@@ -3198,7 +3198,7 @@ QPDFJob::maybeFixWritePassword(int R, std::string& password)
             {
                 if (! is_valid_utf8)
                 {
-                    QTC::TC("qpdf", "qpdf password not unicode");
+                    QTC::TC("qpdf", "QPDFJob password not unicode");
                     throw std::runtime_error(
                         "supplied password is not valid UTF-8");
                 }
@@ -3207,7 +3207,7 @@ QPDFJob::maybeFixWritePassword(int R, std::string& password)
                     std::string encoded;
                     if (! QUtil::utf8_to_pdf_doc(password, encoded))
                     {
-                        QTC::TC("qpdf", "qpdf password not encodable");
+                        QTC::TC("qpdf", "QPDFJob password not encodable");
                         throw std::runtime_error(
                             "supplied password cannot be encoded for"
                             " 40-bit or 128-bit encryption formats");
@@ -3222,7 +3222,7 @@ QPDFJob::maybeFixWritePassword(int R, std::string& password)
                     std::string encoded;
                     if (QUtil::utf8_to_pdf_doc(password, encoded))
                     {
-                        QTC::TC("qpdf", "qpdf auto-encode password");
+                        QTC::TC("qpdf", "QPDFJob auto-encode password");
                         doIfVerbose([&](std::ostream& cout,
                                         std::string const& prefix) {
                             cout
@@ -3236,7 +3236,7 @@ QPDFJob::maybeFixWritePassword(int R, std::string& password)
                     }
                     else
                     {
-                        QTC::TC("qpdf", "qpdf bytes fallback warning");
+                        QTC::TC("qpdf", "QPDFJob bytes fallback warning");
                         *(this->m->cerr)
                             << this->m->message_prefix << ": WARNING: "
                             << "supplied password looks like a Unicode"
@@ -3251,7 +3251,7 @@ QPDFJob::maybeFixWritePassword(int R, std::string& password)
                 }
                 else if ((R >= 5) && (! is_valid_utf8))
                 {
-                    QTC::TC("qpdf", "qpdf invalid utf-8 in auto");
+                    QTC::TC("qpdf", "QPDFJob invalid utf-8 in auto");
                     throw std::runtime_error(
                         "supplied password is not a valid Unicode password,"
                         " which is required for 256-bit encryption; to"
@@ -3313,7 +3313,7 @@ QPDFJob::setEncryptionOptions(QPDF& pdf, QPDFWriter& w)
         {
             // Do not set warnings = true for this case as this does
             // not reflect a potential problem with the input file.
-            QTC::TC("qpdf", "qpdf weak crypto warning");
+            QTC::TC("qpdf", "QPDFJob weak crypto warning");
             *(this->m->cerr)
                 << this->m->message_prefix
                 << ": writing a file with RC4, a weak cryptographic algorithm"
@@ -3501,7 +3501,7 @@ QPDFJob::doSplitPages(QPDF& pdf, bool& warnings)
     char* num_spot = strstr(const_cast<char*>(m->outfilename.get()), "%d");
     if (num_spot != 0)
     {
-        QTC::TC("qpdf", "qpdf split-pages %d");
+        QTC::TC("qpdf", "QPDFJob split-pages %d");
         before = std::string(m->outfilename.get(),
                              QIntC::to_size(num_spot - m->outfilename.get()));
         after = num_spot + 2;
@@ -3510,13 +3510,13 @@ QPDFJob::doSplitPages(QPDF& pdf, bool& warnings)
              (QUtil::str_compare_nocase(
                  m->outfilename.get() + len - 4, ".pdf") == 0))
     {
-        QTC::TC("qpdf", "qpdf split-pages .pdf");
+        QTC::TC("qpdf", "QPDFJob split-pages .pdf");
         before = std::string(m->outfilename.get(), len - 4) + "-";
         after = m->outfilename.get() + len - 4;
     }
     else
     {
-        QTC::TC("qpdf", "qpdf split-pages other");
+        QTC::TC("qpdf", "QPDFJob split-pages other");
         before = std::string(m->outfilename.get()) + "-";
     }
 
@@ -3556,7 +3556,7 @@ QPDFJob::doSplitPages(QPDF& pdf, bool& warnings)
             auto new_page = added_page(outpdf, page);
             if (out_afdh.get())
             {
-                QTC::TC("qpdf", "qpdf copy form fields in split_pages");
+                QTC::TC("qpdf", "QPDFJob copy form fields in split_pages");
                 try
                 {
                     out_afdh->fixCopiedAnnotations(new_page, page, afdh);
