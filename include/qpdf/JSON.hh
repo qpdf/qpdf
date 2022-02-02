@@ -25,12 +25,12 @@
 // This is a simple JSON serializer and parser, primarily designed for
 // serializing QPDF Objects as JSON. While it may work as a
 // general-purpose JSON parser/serializer, there are better options.
-// JSON objects contain their data as smart pointers. One JSON object
+// JSON objects contain their data as smart pointers. When one JSON object
 // is added to another, this pointer is copied. This means you can
 // create temporary JSON objects on the stack, add them to other
 // objects, and let them go out of scope safely. It also means that if
-// the json JSON object is added in more than one place, all copies
-// share underlying data. This makes them similar in structure and
+// a JSON object is added in more than one place, all copies
+// share the underlying data. This makes them similar in structure and
 // behavior to QPDFObjectHandle and may feel natural within the QPDF
 // codebase, but it is also a good reason not to use this as a
 // general-purpose JSON package.
@@ -105,7 +105,7 @@ class JSON
     //
     //   * The schema is a nested structure containing dictionaries,
     //     single-element arrays, and strings only.
-    //   * Recursively walk the schema
+    //   * Recursively walk the schema.
     //   * If the current value is a dictionary, this object must have
     //     a dictionary in the same place with the same keys. If flags
     //     contains f_optional, a key in the schema does not have to

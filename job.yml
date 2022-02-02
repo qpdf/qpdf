@@ -259,7 +259,7 @@ json:
   # other information known by generate_auto_job. This information is
   # used to construct a "schema" (as in JSON.hh) for the json input to
   # QPDFJob. The leading underscore is removed. *NOTE*: all keys are
-  # converted to camelCase for the schema and must be appear that way
+  # converted to camelCase for the schema and must appear that way
   # in the user-supplied json. This makes it more convenient to
   # populate JSON objects in some languages.
 
