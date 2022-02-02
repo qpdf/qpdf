@@ -849,7 +849,7 @@ QPDF::initializeEncryption()
     if (! (encryption_dict.getKey("/Filter").isName() &&
 	   (encryption_dict.getKey("/Filter").getName() == "/Standard")))
     {
-	throw QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
+        throw QPDFExc(qpdf_e_unsupported, this->m->file->getName(),
 		      "encryption dictionary", this->m->file->getLastOffset(),
 		      "unsupported encryption filter");
     }
