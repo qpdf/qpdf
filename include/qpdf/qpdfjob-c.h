@@ -56,7 +56,7 @@ extern "C" {
 
 #ifndef QPDF_NO_WCHAR_T
     /* This function is the same as qpdfjob_run_from_argv except argv
-     * is encoded with wide characters. This would suitable for
+     * is encoded with wide characters. This would be suitable for
      * calling from a Windows wmain function.
      */
     QPDF_DLL

@@ -14,7 +14,7 @@
 // uses the pattern of having the stream data provider class use a
 // second QPDF instance with copies of streams from the original QPDF
 // so that the stream data provider can access the original stream
-// data. This is implement very efficiently inside the qpdf library as
+// data. This is implemented very efficiently inside the qpdf library as
 // the second QPDF instance knows how to read the stream data from the
 // original input file, so no extra copies of the original stream data
 // are made.
@@ -196,7 +196,7 @@ class StreamReplacer: public QPDFObjectHandle::StreamDataProvider
     //   pipeline and passes nullptr to dict_updates. In this mode,
     //   the stream dictionary has already been altered, and the
     //   original stream data is no longer directly accessible. Trying
-    //   to retrieve the stream data would be an infinite loop because
+    //   to retrieve the stream data would cause an infinite loop because
     //   it would just end up calling provideStreamData again. This is
     //   why maybeReplace uses a stashed copy of the original stream.
 

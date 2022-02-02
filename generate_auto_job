@@ -54,7 +54,7 @@ from contextlib import contextmanager
 # developer or user can freely move among those different ways of
 # interacting with QPDFJob in a predictable fashion. In addition, help
 # information for each option appears in manual/cli.rst, and that
-# information is used in creation of the job JSON schema and to supply
+# information is used in the creation of the job JSON schema and to supply
 # help text to QPDFArgParser. This code also ensures that there is an
 # exact match between options in job.yml and options in cli.rst.
 #
@@ -170,7 +170,7 @@ class Main:
         'json_init': 'libqpdf/qpdf/auto_job_json_init.hh',
         # Others are added in top
     }
-    # SUBS contains a checksum for each source and destination and is
+    # SUMS contains a checksum for each source and destination and is
     # used to detect whether we're up to date without having to force
     # recompilation all the time. This way the build can invoke this
     # script unconditionally without causing stuff to rebuild every
