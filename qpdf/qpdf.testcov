@@ -620,7 +620,9 @@ qpdf-c called qpdf_oh_get_page_content_data 0
 qpdf-c called qpdf_oh_replace_stream_data 0
 qpdf-c silence oh errors 0
 qpdf-c called qpdf_oh_get_binary_string_value 0
+qpdf-c called qpdf_oh_get_binary_utf8_value 0
 qpdf-c called qpdf_oh_new_binary_string 0
+qpdf-c called qpdf_oh_new_binary_unicode_string 0
 QPDFJob duplicated pages password 0
 QPDFJob misplaced pages password 0
 QPDFJob check encrypted encrypted 0

@@ -742,6 +742,9 @@ extern "C" {
     QPDF_DLL
     char const* qpdf_oh_get_binary_string_value(
         qpdf_data qpdf, qpdf_oh oh, size_t* length);
+    QPDF_DLL
+    char const* qpdf_oh_get_binary_utf8_value(
+        qpdf_data qpdf, qpdf_oh oh, size_t* length);
 
     QPDF_DLL
     int qpdf_oh_get_array_n_items(qpdf_data qpdf, qpdf_oh oh);
@@ -799,6 +802,9 @@ extern "C" {
      */
     QPDF_DLL
     qpdf_oh qpdf_oh_new_binary_string(
+        qpdf_data qpdf, char const* str, size_t length);
+     QPDF_DLL
+    qpdf_oh qpdf_oh_new_binary_unicode_string(
         qpdf_data qpdf, char const* str, size_t length);
     QPDF_DLL
     qpdf_oh qpdf_oh_new_array(qpdf_data qpdf);
