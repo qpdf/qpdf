@@ -96,6 +96,8 @@ int main(int argc, char* argv[])
     (*ol1.front()).hello();
     callHello(ol1.front());
     ol1.pop_front();
+    std::cout << "array" << std::endl;
+    PointerHolder<Object> oarr1_ph(true, new Object[2]);
     std::cout << "goodbye" << std::endl;
     return 0;
 }

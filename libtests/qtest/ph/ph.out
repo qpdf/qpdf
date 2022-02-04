@@ -16,6 +16,11 @@ calling Object::hello for 1
 calling Object::hello const for 1
 calling Object::hello const for 1
 calling Object::hello const for 1
+array
+created Object, id 4
+created Object, id 5
 goodbye
+destroyed Object, id 5
+destroyed Object, id 4
 destroyed Object, id 3
 destroyed Object, id 1
