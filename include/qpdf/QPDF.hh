@@ -1024,7 +1024,7 @@ class QPDF
         QPDF& qpdf_for_warning, Pipeline*& pipeline,
         int objid, int generation,
 	QPDFObjectHandle& stream_dict,
-	std::vector<PointerHolder<Pipeline> >& heap);
+	std::vector<std::shared_ptr<Pipeline>>& heap);
 
     // Methods to support object copying
     void reserveObjects(QPDFObjectHandle foreign, ObjCopier& obj_copier,

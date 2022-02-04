@@ -35,6 +35,7 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <memory>
 
 #include <qpdf/Constants.h>
 
@@ -684,7 +685,7 @@ class QPDFWriter
         std::string extra_header_text;
         int encryption_dict_objid;
         std::string cur_data_key;
-        std::list<PointerHolder<Pipeline> > to_delete;
+        std::list<std::shared_ptr<Pipeline>> to_delete;
         Pl_Count* pipeline;
         std::list<QPDFObjectHandle> object_queue;
         std::map<QPDFObjGen, int> obj_renumber;

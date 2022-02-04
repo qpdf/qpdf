@@ -16,6 +16,7 @@
 #include <qpdf/Pl_DCT.hh>
 #include <qpdf/QIntC.hh>
 #include <iostream>
+#include <memory>
 #include <string.h>
 #include <stdlib.h>
 
@@ -105,22 +106,25 @@ void
 ImageProvider::provideStreamData(int objid, int generation,
                                  Pipeline* pipeline)
 {
-    std::vector<PointerHolder<Pipeline> > to_delete;
+    std::vector<std::shared_ptr<Pipeline>> to_delete;
     Pipeline* p = pipeline;
+    std::shared_ptr<Pipeline> p_new;
 
     if (filter == "/DCTDecode")
     {
-        p = new Pl_DCT(
+        p_new = std::make_shared<Pl_DCT>(
             "image encoder", pipeline,
             QIntC::to_uint(width), QIntC::to_uint(getHeight()),
             QIntC::to_int(stripes[0].length()), j_color_space);
-        to_delete.push_back(p);
+        to_delete.push_back(p_new);
+        p = p_new.get();
     }
     else if (filter == "/RunLengthDecode")
     {
-        p = new Pl_RunLength(
+        p_new = std::make_shared<Pl_RunLength>(
             "image encoder", pipeline, Pl_RunLength::a_encode);
-        to_delete.push_back(p);
+        to_delete.push_back(p_new);
+        p = p_new.get();
     }
 
     for (size_t i = 0; i < n_stripes; ++i)

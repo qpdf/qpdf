@@ -1238,7 +1238,7 @@ QPDF::decryptStream(PointerHolder<EncryptionParameters> encp,
                     QPDF& qpdf_for_warning, Pipeline*& pipeline,
                     int objid, int generation,
 		    QPDFObjectHandle& stream_dict,
-		    std::vector<PointerHolder<Pipeline> >& heap)
+		    std::vector<std::shared_ptr<Pipeline>>& heap)
 {
     std::string type;
     if (stream_dict.getKey("/Type").isName())
@@ -1343,21 +1343,25 @@ QPDF::decryptStream(PointerHolder<EncryptionParameters> encp,
 	}
     }
     std::string key = getKeyForObject(encp, objid, generation, use_aes);
+    std::shared_ptr<Pipeline> new_pipeline;
     if (use_aes)
     {
 	QTC::TC("qpdf", "QPDF_encryption aes decode stream");
-	pipeline = new Pl_AES_PDF("AES stream decryption", pipeline,
-				  false, QUtil::unsigned_char_pointer(key),
-                                  key.length());
+	new_pipeline = std::make_shared<Pl_AES_PDF>(
+            "AES stream decryption", pipeline,
+            false, QUtil::unsigned_char_pointer(key),
+            key.length());
     }
     else
     {
 	QTC::TC("qpdf", "QPDF_encryption rc4 decode stream");
-	pipeline = new Pl_RC4("RC4 stream decryption", pipeline,
-			      QUtil::unsigned_char_pointer(key),
-                              toI(key.length()));
+	new_pipeline = std::make_shared<Pl_RC4>(
+            "RC4 stream decryption", pipeline,
+            QUtil::unsigned_char_pointer(key),
+            toI(key.length()));
     }
-    heap.push_back(pipeline);
+    pipeline = new_pipeline.get();
+    heap.push_back(new_pipeline);
 }
 
 void

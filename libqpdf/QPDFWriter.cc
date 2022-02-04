@@ -132,9 +132,10 @@ QPDFWriter::setOutputFile(char const* description, FILE* file, bool close_file)
     this->m->filename = description;
     this->m->file = file;
     this->m->close_file = close_file;
-    Pipeline* p = new Pl_StdioFile("qpdf output", file);
+    std::shared_ptr<Pipeline> p = std::make_shared<Pl_StdioFile>(
+        "qpdf output", file);
     this->m->to_delete.push_back(p);
-    initializePipelineStack(p);
+    initializePipelineStack(p.get());
 }
 
 void
@@ -142,7 +143,8 @@ QPDFWriter::setOutputMemory()
 {
     this->m->filename = "memory buffer";
     this->m->buffer_pipeline = new Pl_Buffer("qpdf output");
-    this->m->to_delete.push_back(this->m->buffer_pipeline);
+    this->m->to_delete.push_back(
+        std::shared_ptr<Pipeline>(this->m->buffer_pipeline));
     initializePipelineStack(this->m->buffer_pipeline);
 }
 
@@ -1051,7 +1053,8 @@ void
 QPDFWriter::initializePipelineStack(Pipeline *p)
 {
     this->m->pipeline = new Pl_Count("pipeline stack base", p);
-    this->m->to_delete.push_back(this->m->pipeline);
+    this->m->to_delete.push_back(
+        std::shared_ptr<Pipeline>(this->m->pipeline));
     this->m->pipeline_stack.push_back(this->m->pipeline);
 }
 

@@ -463,34 +463,36 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline, bool* filterp,
     // create to be deleted when this function finishes. Pipelines
     // created by QPDFStreamFilter objects will be deleted by those
     // objects.
-    std::vector<PointerHolder<Pipeline>> to_delete;
+    std::vector<std::shared_ptr<Pipeline>> to_delete;
 
     PointerHolder<ContentNormalizer> normalizer;
+    std::shared_ptr<Pipeline> new_pipeline;
     if (filter)
     {
 	if (encode_flags & qpdf_ef_compress)
 	{
-	    pipeline = new Pl_Flate("compress stream", pipeline,
-				    Pl_Flate::a_deflate);
-	    to_delete.push_back(pipeline);
+	    new_pipeline = std::make_shared<Pl_Flate>(
+                "compress stream", pipeline, Pl_Flate::a_deflate);
+	    to_delete.push_back(new_pipeline);
+            pipeline = new_pipeline.get();
 	}
 
 	if (encode_flags & qpdf_ef_normalize)
 	{
             normalizer = new ContentNormalizer();
-	    pipeline = new Pl_QPDFTokenizer(
+	    new_pipeline = std::make_shared<Pl_QPDFTokenizer>(
                 "normalizer", normalizer.get(), pipeline);
-	    to_delete.push_back(pipeline);
+	    to_delete.push_back(new_pipeline);
+            pipeline = new_pipeline.get();
 	}
 
-        for (std::vector<PointerHolder<
-                 QPDFObjectHandle::TokenFilter> >::reverse_iterator iter =
-                 this->token_filters.rbegin();
+        for (auto iter = this->token_filters.rbegin();
              iter != this->token_filters.rend(); ++iter)
         {
-            pipeline = new Pl_QPDFTokenizer(
+            new_pipeline = std::make_shared<Pl_QPDFTokenizer>(
                 "token filter", (*iter).get(), pipeline);
-            to_delete.push_back(pipeline);
+            to_delete.push_back(new_pipeline);
+            pipeline = new_pipeline.get();
         }
 
 	for (auto f_iter = filters.rbegin();
