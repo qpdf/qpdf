@@ -20,20 +20,14 @@
   or crypt provider as long as this can be done in a thread-safe
   fashion.
 
-* Completion: would be nice if --job-json-file=<TAB> would complete
-  files
-
 * Remember for release notes: starting in qpdf 11, the default value
   for the --json keyword will be "latest". If you are depending on
   version 1, change your code to specify --json=1, which works
   starting with 10.6.0.
 
-* Try to put something in to ease future PointerHolder migration, such
-  as typedefs for containers of PointerHolders. Test to see whether
-  using auto or decltype in certain places may make containers of
-  pointerholders switch over cleanly. Clearly document the deprecation
-  stuff.
-
+* Write up something about preparing for the PointerHolder to
+  shared_ptr migration. Clearly document the deprecations and how to
+  deal with them.
 
 Output JSON v2
 ==============
@@ -345,6 +339,79 @@ Other notes:
   way that works for the qpdf/qpdf repository as well since they are
   very similar.
 
+
+PointerHolder to std::shared_ptr
+================================
+
+Once all deprecation warnings are cleared up (changing getPointer() to
+get() and getRefcout() to use_count()), the only real issues are that
+implicit assignment of a pointer to a shared_ptr doesn't work while it
+does for PointerHolder and containers are different. Using auto takes
+care of containers.
+
+PointerHolder<X> x = new X() -->
+auto x = std::make_shared<X>()
+
+PointerHolder<Base> x = new Derived() -->
+auto x = std::shared_ptr<Base>(new Derived())
+
+PointerHolder x(true, new T[5]) -->
+auto x = std::shared_ptr(new T[5], std::default_delete<T[]>())
+
+X* x = new X(); PointerHolder<X> x_ph(x) -->
+auto x_ph = std::make_shared<X>(); X* x = x_ph.get();
+
+Derived* x = new Derived(); PointerHolder<Base> x_ph(x) -->
+Derived* x = new Derived(); auto x_ph = std::shared_pointer<Base>(x);
+
+PointerHolder in public API:
+
+  QUtil::read_file_into_memory(
+    char const*, PointerHolder<char>&, unsigned long&)
+  QPDFObjectHandle::addContentTokenFilter(
+    PointerHolder<QPDFObjectHandle::TokenFilter>)
+  QPDFObjectHandle::addTokenFilter(
+    PointerHolder<QPDFObjectHandle::TokenFilter>)
+  QPDFObjectHandle::newStream(
+    QPDF*, PointerHolder<Buffer>)
+  QPDFObjectHandle::parse(
+    PointerHolder<InputSource>, std::string const&,
+    QPDFTokenizer&, bool&, QPDFObjectHandle::StringDecrypter*, QPDF*)
+  QPDFObjectHandle::replaceStreamData(
+    PointerHolder<Buffer>, QPDFObjectHandle const&,
+    QPDFObjectHandle const&)
+  QPDFObjectHandle::replaceStreamData(
+    PointerHolder<QPDFObjectHandle::StreamDataProvider>,
+    QPDFObjectHandle const&, QPDFObjectHandle const&)
+  QPDFTokenizer::expectInlineImage(
+    PointerHolder<InputSource>)
+  QPDFTokenizer::readToken(
+    PointerHolder<InputSource>, std::string const&,
+    bool, unsigned long)
+  QPDF::processInputSource(
+    PointerHolder<InputSource>, char const*)
+  QPDFWriter::registerProgressReporter(
+    PointerHolder<QPDFWriter::ProgressReporter>)
+  QPDFEFStreamObjectHelper::createEFStream(
+    QPDF&, PointerHolder<Buffer>)
+  QPDFPageObjectHelper::addContentTokenFilter(
+    PointerHolder<QPDFObjectHandle::TokenFilter>)
+
+Strategy:
+* Start with pointerholder branch
+* Replace each public API one at a time
+* Replace remaining internal uses; sometimes unique_ptr may be good,
+  particularly for temporary strings that are deleted in the same
+  scope and Members for non-copiable classes
+* std::shared_ptr<Members> m can be replaced with
+  std::shared_ptr<Members> m_ph and Members* m if performance is critical
+* Remove #include <PointerHolder.hh> from all headers
+
+At that point, we're in a good state to make that compatibility
+basically works. Then we can proceed to remove PointerHolder from
+everything else.
+
+
 ABI Changes
 ===========
 
@@ -353,14 +420,7 @@ Comments appear in the code prefixed by "ABI"
 
 * Search for ABI to find items not listed here.
 * Switch default --json to latest
-* Take a fresh look at PointerHolder with a good plan for being able
-  to have developers phase it in using macros or something. Decide
-  about shared_ptr vs unique_ptr for each time make_shared_cstr is
-  called. For non-copiable classes, we can use unique_ptr instead of
-  shared_ptr as a replacement for PointerHolder. For performance
-  critical cases, we could potentially have a real pointer and a
-  shared pointer where the shared pointer's job is to clean up but we
-  use the real pointer for regular access.
+* See PointerHolder to std::shared_ptr above.
 * See where anonymous namespaces can be used to keep things private to
   a source file. Search for `(class|struct)` in **/*.cc.
 * See if we can use constructor delegation instead of init() in
