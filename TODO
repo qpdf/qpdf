@@ -1,7 +1,15 @@
 10.6
 ====
 
-* Close issue #556.
+* Consider doing one big commit to reformat the entire codebase using
+  clang-format or a similar tool. Consider using blame.ignoreRevsFile
+  or similar (or otherwise study git blame to see how to minimize the
+  impact of such a change). A good time to do this would be before
+  10.6 since there is so much refactoring going on. In general, try to
+  make qpdf more contributor-friendly. Look
+  https://bestpractices.coreinfrastructure.org/en
+
+* QPDFObjectHandle: getValueAsX methods, getKeyIfDict. Plus C API.
 
 * Add user-defined initializer `QPDFObjectHandle operator ""_qpdf` to
   be like QPDFObjectHandle::parse: `auto oh = "<< /a (b) >>"_qpdf;`
@@ -11,14 +19,6 @@
   efficient by using a local static to ensure a single random device
   or crypt provider as long as this can be done in a thread-safe
   fashion.
-
-* Consider doing one big commit to reformat the entire codebase using
-  clang-format or a similar tool. Consider using blame.ignoreRevsFile
-  or similar (or otherwise study git blame to see how to minimize the
-  impact of such a change). A good time to do this would be before
-  10.6 since there is so much refactoring going on. In general, try to
-  make qpdf more contributor-friendly. Look
-  https://bestpractices.coreinfrastructure.org/en
 
 * Completion: would be nice if --job-json-file=<TAB> would complete
   files
