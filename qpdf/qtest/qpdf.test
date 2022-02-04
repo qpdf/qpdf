@@ -4486,6 +4486,15 @@ $td->runtest("check linearization",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+# Test --check-linearization of non-linearized file
+$n_tests += 1;
+$td->runtest("check linearization of non-linearized file",
+	     {$td->COMMAND => "qpdf --check-linearization minimal.pdf"},
+	     {$td->STRING => "minimal.pdf is not linearized\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+
 # Test AES encryption in various ways.
 $n_tests += 18;
 $td->runtest("encrypt with AES",
