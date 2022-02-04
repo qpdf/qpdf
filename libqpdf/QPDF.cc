@@ -126,7 +126,7 @@ QPDF::CopiedStreamDataProvider::provideStreamData(
     PointerHolder<ForeignStreamData> foreign_data =
         this->foreign_stream_data[QPDFObjGen(objid, generation)];
     bool result = false;
-    if (foreign_data.getPointer())
+    if (foreign_data.get())
     {
         result = destination_qpdf.pipeForeignStreamData(
             foreign_data, pipeline, suppress_warnings, will_retry);
@@ -256,7 +256,7 @@ QPDF::~QPDF()
 	 iter != this->m->obj_cache.end(); ++iter)
     {
 	QPDFObject::ObjAccessor::releaseResolved(
-	    (*iter).second.object.getPointer());
+	    (*iter).second.object.get());
     }
 }
 
@@ -1507,7 +1507,7 @@ QPDF::fixDanglingReferences(bool force)
         {
             QPDF_Array* arr =
                 dynamic_cast<QPDF_Array*>(
-                    QPDFObjectHandle::ObjAccessor::getObject(obj).getPointer());
+                    QPDFObjectHandle::ObjAccessor::getObject(obj).get());
             arr->addExplicitElementsToList(to_check);
         }
         for (std::list<QPDFObjectHandle>::iterator iter = to_check.begin();
@@ -1604,7 +1604,7 @@ QPDF::readObject(PointerHolder<InputSource> input,
     if (this->m->encp->encrypted && (! in_object_stream))
     {
         decrypter_ph = new StringDecrypter(this, objid, generation);
-        decrypter = decrypter_ph.getPointer();
+        decrypter = decrypter_ph.get();
     }
     QPDFObjectHandle object = QPDFObjectHandle::parse(
         input, this->m->last_object_description,
@@ -2080,7 +2080,7 @@ QPDF::objectChanged(QPDFObjGen const& og, PointerHolder<QPDFObject>& oph)
     {
         return true;
     }
-    return (c->second.object.getPointer() != oph.getPointer());
+    return (c->second.object.get() != oph.get());
 }
 
 PointerHolder<QPDFObject>
@@ -2230,7 +2230,7 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
     PointerHolder<InputSource> input = new BufferInputSource(
         this->m->file->getName() +
         " object stream " + QUtil::int_to_string(obj_stream_number),
-	bp.getPointer());
+	bp.get());
 
     for (int i = 0; i < n; ++i)
     {
@@ -2640,7 +2640,7 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
     QPDF_Stream* stream =
         dynamic_cast<QPDF_Stream*>(
             QPDFObjectHandle::ObjAccessor::getObject(
-                foreign).getPointer());
+                foreign).get());
     if (! stream)
     {
         throw std::logic_error("unable to retrieve underlying"
@@ -2649,7 +2649,7 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
     PointerHolder<Buffer> stream_buffer =
         stream->getStreamDataBuffer();
     if ((foreign_stream_qpdf->m->immediate_copy_from) &&
-        (stream_buffer.getPointer() == 0))
+        (stream_buffer.get() == 0))
     {
         // Pull the stream data into a buffer before attempting
         // the copy operation. Do it on the source stream so that
@@ -2663,14 +2663,14 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
     }
     PointerHolder<QPDFObjectHandle::StreamDataProvider> stream_provider =
         stream->getStreamDataProvider();
-    if (stream_buffer.getPointer())
+    if (stream_buffer.get())
     {
         QTC::TC("qpdf", "QPDF copy foreign stream with buffer");
         result.replaceStreamData(stream_buffer,
                                  dict.getKey("/Filter"),
                                  dict.getKey("/DecodeParms"));
     }
-    else if (stream_provider.getPointer())
+    else if (stream_provider.get())
     {
         // In this case, the remote stream's QPDF must stay in scope.
         QTC::TC("qpdf", "QPDF copy foreign stream with provider");

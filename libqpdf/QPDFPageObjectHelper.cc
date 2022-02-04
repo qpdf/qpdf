@@ -1222,7 +1222,7 @@ QPDFPageObjectHelper::flattenRotation(QPDFAcroFormDocumentHelper* afdh)
         if (! afdh)
         {
             afdhph = new QPDFAcroFormDocumentHelper(*qpdf);
-            afdh = afdhph.getPointer();
+            afdh = afdhph.get();
         }
         afdh->transformAnnotations(
             annots, new_annots, new_fields, old_fields, cm);
@@ -1270,7 +1270,7 @@ QPDFPageObjectHelper::copyAnnotations(
     if (! afdh)
     {
         afdhph = new QPDFAcroFormDocumentHelper(*this_qpdf);
-        afdh = afdhph.getPointer();
+        afdh = afdhph.get();
     }
     if (this_qpdf == from_qpdf)
     {
@@ -1288,7 +1288,7 @@ QPDFPageObjectHelper::copyAnnotations(
     else
     {
         from_afdhph = new QPDFAcroFormDocumentHelper(*from_qpdf);
-        from_afdh = from_afdhph.getPointer();
+        from_afdh = from_afdhph.get();
     }
 
     afdh->transformAnnotations(

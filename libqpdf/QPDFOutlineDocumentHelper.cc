@@ -104,7 +104,7 @@ QPDFOutlineDocumentHelper::resolveNamedDest(QPDFObjectHandle name)
     }
     else if (name.isString())
     {
-        if (0 == this->m->names_dest.getPointer())
+        if (0 == this->m->names_dest.get())
         {
             QPDFObjectHandle names = this->qpdf.getRoot().getKey("/Names");
             if (names.isDictionary())
@@ -117,7 +117,7 @@ QPDFOutlineDocumentHelper::resolveNamedDest(QPDFObjectHandle name)
                 }
             }
         }
-        if (this->m->names_dest.getPointer())
+        if (this->m->names_dest.get())
         {
             if (this->m->names_dest->findObject(name.getUTF8Value(), result))
             {

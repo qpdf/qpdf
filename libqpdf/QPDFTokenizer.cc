@@ -652,7 +652,7 @@ QPDFTokenizer::expectInlineImage(PointerHolder<InputSource> input)
 void
 QPDFTokenizer::findEI(PointerHolder<InputSource> input)
 {
-    if (! input.getPointer())
+    if (! input.get())
     {
         return;
     }

@@ -222,7 +222,7 @@ static void process(char const* filename, bool include_ignorable,
         (*iter).pipeContents(&plb);
         PointerHolder<Buffer> content_data = plb.getBuffer();
         BufferInputSource* bis = new BufferInputSource(
-            "content data", content_data.getPointer());
+            "content data", content_data.get());
         is = bis;
         dump_tokens(is, "PAGE " + QUtil::int_to_string(pageno),
                     max_len, include_ignorable, false, true);
@@ -240,7 +240,7 @@ static void process(char const* filename, bool include_ignorable,
             PointerHolder<Buffer> b =
                 (*iter).getStreamData(qpdf_dl_specialized);
             BufferInputSource* bis = new BufferInputSource(
-                "object stream data", b.getPointer());
+                "object stream data", b.get());
             is = bis;
             dump_tokens(is, "OBJECT STREAM " +
                         QUtil::int_to_string((*iter).getObjectID()),

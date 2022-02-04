@@ -528,7 +528,7 @@ void read_from_file_test()
     size_t size = 0;
     QUtil::read_file_into_memory("other-file", buf, size);
     std::cout << "read " << size << " bytes" << std::endl;
-    char const* p = buf.getPointer();
+    char const* p = buf.get();
     assert(size == 24652);
     assert(memcmp(p, "This file is used for qutil testing.", 36) == 0);
     assert(p[59] == static_cast<char>(13));
@@ -609,11 +609,11 @@ void rename_delete_test()
     fprintf(f1, "one");
     fclose(f1);
     QUtil::read_file_into_memory("old\xcf\x80", buf, size);
-    assert(memcmp(buf.getPointer(), "one", 3) == 0);
+    assert(memcmp(buf.get(), "one", 3) == 0);
     std::cout << "rename file" << std::endl;;
     QUtil::rename_file("old\xcf\x80", "old\xcf\x80.~tmp");
     QUtil::read_file_into_memory("old\xcf\x80.~tmp", buf, size);
-    assert(memcmp(buf.getPointer(), "one", 3) == 0);
+    assert(memcmp(buf.get(), "one", 3) == 0);
     assert_no_file("old\xcf\x80");
     std::cout << "create file" << std::endl;;
     f1 = QUtil::safe_fopen("old\xcf\x80", "w");
@@ -622,7 +622,7 @@ void rename_delete_test()
     std::cout << "rename over existing" << std::endl;;
     QUtil::rename_file("old\xcf\x80", "old\xcf\x80.~tmp");
     QUtil::read_file_into_memory("old\xcf\x80.~tmp", buf, size);
-    assert(memcmp(buf.getPointer(), "two", 3) == 0);
+    assert(memcmp(buf.get(), "two", 3) == 0);
     assert_no_file("old\xcf\x80");
     std::cout << "delete file" << std::endl;;
     QUtil::remove_file("old\xcf\x80.~tmp");

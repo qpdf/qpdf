@@ -154,7 +154,7 @@ std::string JSON::JSON_null::unparse(size_t) const
 std::string
 JSON::unparse() const
 {
-    if (0 == this->m->value.getPointer())
+    if (0 == this->m->value.get())
     {
         return "null";
     }
@@ -219,13 +219,13 @@ JSON
 JSON::addDictionaryMember(std::string const& key, JSON const& val)
 {
     JSON_dictionary* obj = dynamic_cast<JSON_dictionary*>(
-        this->m->value.getPointer());
+        this->m->value.get());
     if (0 == obj)
     {
         throw std::runtime_error(
             "JSON::addDictionaryMember called on non-dictionary");
     }
-    if (val.m->value.getPointer())
+    if (val.m->value.get())
     {
         obj->members[encode_string(key)] = val.m->value;
     }
@@ -246,12 +246,12 @@ JSON
 JSON::addArrayElement(JSON const& val)
 {
     JSON_array* arr = dynamic_cast<JSON_array*>(
-        this->m->value.getPointer());
+        this->m->value.get());
     if (0 == arr)
     {
         throw std::runtime_error("JSON::addArrayElement called on non-array");
     }
-    if (val.m->value.getPointer())
+    if (val.m->value.get())
     {
         arr->elements.push_back(val.m->value);
     }
@@ -302,20 +302,20 @@ bool
 JSON::isArray() const
 {
     return nullptr != dynamic_cast<JSON_array const*>(
-        this->m->value.getPointer());
+        this->m->value.get());
 }
 
 bool
 JSON::isDictionary() const
 {
     return nullptr != dynamic_cast<JSON_dictionary const*>(
-        this->m->value.getPointer());
+        this->m->value.get());
 }
 
 bool
 JSON::getString(std::string& utf8) const
 {
-    auto v = dynamic_cast<JSON_string const*>(this->m->value.getPointer());
+    auto v = dynamic_cast<JSON_string const*>(this->m->value.get());
     if (v == nullptr)
     {
         return false;
@@ -327,7 +327,7 @@ JSON::getString(std::string& utf8) const
 bool
 JSON::getNumber(std::string& value) const
 {
-    auto v = dynamic_cast<JSON_number const*>(this->m->value.getPointer());
+    auto v = dynamic_cast<JSON_number const*>(this->m->value.get());
     if (v == nullptr)
     {
         return false;
@@ -339,7 +339,7 @@ JSON::getNumber(std::string& value) const
 bool
 JSON::getBool(bool& value) const
 {
-    auto v = dynamic_cast<JSON_bool const*>(this->m->value.getPointer());
+    auto v = dynamic_cast<JSON_bool const*>(this->m->value.get());
     if (v == nullptr)
     {
         return false;
@@ -351,7 +351,7 @@ JSON::getBool(bool& value) const
 bool
 JSON::isNull() const
 {
-    if (dynamic_cast<JSON_null const*>(this->m->value.getPointer()))
+    if (dynamic_cast<JSON_null const*>(this->m->value.get()))
     {
         return true;
     }
@@ -362,7 +362,7 @@ bool
 JSON::forEachDictItem(
     std::function<void(std::string const& key, JSON value)> fn) const
 {
-    auto v = dynamic_cast<JSON_dictionary const*>(this->m->value.getPointer());
+    auto v = dynamic_cast<JSON_dictionary const*>(this->m->value.get());
     if (v == nullptr)
     {
         return false;
@@ -377,7 +377,7 @@ JSON::forEachDictItem(
 bool
 JSON::forEachArrayItem(std::function<void(JSON value)> fn) const
 {
-    auto v = dynamic_cast<JSON_array const*>(this->m->value.getPointer());
+    auto v = dynamic_cast<JSON_array const*>(this->m->value.get());
     if (v == nullptr)
     {
         return false;
@@ -392,8 +392,8 @@ JSON::forEachArrayItem(std::function<void(JSON value)> fn) const
 bool
 JSON::checkSchema(JSON schema, std::list<std::string>& errors)
 {
-    return checkSchemaInternal(this->m->value.getPointer(),
-                               schema.m->value.getPointer(),
+    return checkSchemaInternal(this->m->value.get(),
+                               schema.m->value.get(),
                                0, errors, "");
 }
 
@@ -401,8 +401,8 @@ bool
 JSON::checkSchema(JSON schema, unsigned long flags,
                   std::list<std::string>& errors)
 {
-    return checkSchemaInternal(this->m->value.getPointer(),
-                               schema.m->value.getPointer(),
+    return checkSchemaInternal(this->m->value.get(),
+                               schema.m->value.get(),
                                flags, errors, "");
 }
 
@@ -452,12 +452,12 @@ JSON::checkSchemaInternal(JSON_value* this_v, JSON_value* sch_v,
 
     if (sch_dict && (! pattern_key.empty()))
     {
-        auto pattern_schema = sch_dict->members[pattern_key].getPointer();
+        auto pattern_schema = sch_dict->members[pattern_key].get();
         for (auto const& iter: this_dict->members)
         {
             std::string const& key = iter.first;
             checkSchemaInternal(
-                this_dict->members[key].getPointer(), pattern_schema,
+                this_dict->members[key].get(), pattern_schema,
                 flags, errors, prefix + "." + key);
         }
     }
@@ -469,8 +469,8 @@ JSON::checkSchemaInternal(JSON_value* this_v, JSON_value* sch_v,
             if (this_dict->members.count(key))
             {
                 checkSchemaInternal(
-                    this_dict->members[key].getPointer(),
-                    iter.second.getPointer(),
+                    this_dict->members[key].get(),
+                    iter.second.get(),
                     flags, errors, prefix + "." + key);
             }
             else
@@ -523,8 +523,8 @@ JSON::checkSchemaInternal(JSON_value* this_v, JSON_value* sch_v,
              iter != this_arr->elements.end(); ++iter, ++i)
         {
             checkSchemaInternal(
-                (*iter).getPointer(),
-                sch_arr->elements.at(0).getPointer(),
+                (*iter).get(),
+                sch_arr->elements.at(0).get(),
                 flags, errors, prefix + "." + QUtil::int_to_string(i));
         }
     }
@@ -1067,7 +1067,7 @@ JSONParser::handleToken()
         break;
     }
 
-    if ((item.getPointer() == nullptr) == (delimiter == '\0'))
+    if ((item.get() == nullptr) == (delimiter == '\0'))
     {
         throw std::logic_error(
             "JSONParser::handleToken: logic error: exactly one of item"
@@ -1076,7 +1076,7 @@ JSONParser::handleToken()
 
     // See whether what we have is allowed at this point.
 
-    if (item.getPointer())
+    if (item.get())
     {
         switch (parser_state)
         {
@@ -1213,7 +1213,7 @@ JSONParser::handleToken()
         throw std::logic_error(
             "JSONParser::handleToken: unexpected delimiter in transition");
     }
-    else if (item.getPointer())
+    else if (item.get())
     {
         PointerHolder<JSON> tos;
         if (! stack.empty())
@@ -1259,7 +1259,7 @@ JSONParser::handleToken()
     }
 
     // Prepare for next token
-    if (item.getPointer())
+    if (item.get())
     {
         if (item->isDictionary())
         {

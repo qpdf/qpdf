@@ -295,7 +295,7 @@ static void test_0_1(QPDF& pdf, char const* arg2)
         std::cout.flush();
         QUtil::binary_stdout();
         PointerHolder<Pl_StdioFile> out = new Pl_StdioFile("raw", stdout);
-        qtest.pipeStreamData(out.getPointer(), 0, qpdf_dl_none);
+        qtest.pipeStreamData(out.get(), 0, qpdf_dl_none);
 
         std::cout << std::endl << "Uncompressed stream data:" << std::endl;
         if (qtest.pipeStreamData(0, 0, qpdf_dl_all))
@@ -303,7 +303,7 @@ static void test_0_1(QPDF& pdf, char const* arg2)
             std::cout.flush();
             QUtil::binary_stdout();
             out = new Pl_StdioFile("filtered", stdout);
-            qtest.pipeStreamData(out.getPointer(), 0, qpdf_dl_all);
+            qtest.pipeStreamData(out.get(), 0, qpdf_dl_all);
             std::cout << std::endl << "End of stream data" << std::endl;
         }
         else
@@ -344,7 +344,7 @@ static void test_2(QPDF& pdf, char const* arg2)
     QPDFObjectHandle contents = page.getKey("/Contents");
     QUtil::binary_stdout();
     PointerHolder<Pl_StdioFile> out = new Pl_StdioFile("filtered", stdout);
-    contents.pipeStreamData(out.getPointer(), 0, qpdf_dl_generalized);
+    contents.pipeStreamData(out.get(), 0, qpdf_dl_generalized);
 }
 
 static void test_3(QPDF& pdf, char const* arg2)
@@ -358,7 +358,7 @@ static void test_3(QPDF& pdf, char const* arg2)
         QUtil::binary_stdout();
         PointerHolder<Pl_StdioFile> out =
             new Pl_StdioFile("tokenized stream", stdout);
-        stream.pipeStreamData(out.getPointer(),
+        stream.pipeStreamData(out.get(),
                               qpdf_ef_normalize, qpdf_dl_generalized);
     }
 }
@@ -3154,7 +3154,7 @@ static void test_83(QPDF& pdf, char const* arg2)
     try
     {
         std::cout << "calling initializeFromJson" << std::endl;
-        j.initializeFromJson(std::string(file_buf.getPointer(), size));
+        j.initializeFromJson(std::string(file_buf.get(), size));
         std::cout << "called initializeFromJson" << std::endl;
     }
     catch (QPDFUsage& e)
@@ -3278,7 +3278,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         std::string filename(std::string(filename1) + ".obfuscated");
         size_t size = 0;
         QUtil::read_file_into_memory(filename.c_str(), file_buf, size);
-        char* p = file_buf.getPointer();
+        char* p = file_buf.get();
         for (size_t i = 0; i < size; ++i)
         {
             p[i] = static_cast<char>(p[i] ^ 0xcc);
@@ -3309,7 +3309,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         QTC::TC("qpdf", "exercise processMemoryFile");
         size_t size = 0;
         QUtil::read_file_into_memory(filename1, file_buf, size);
-	pdf.processMemoryFile(filename1, file_buf.getPointer(), size);
+	pdf.processMemoryFile(filename1, file_buf.get(), size);
     }
 
     std::map<int, void (*)(QPDF&, char const*)> test_functions = {

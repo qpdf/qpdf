@@ -3581,7 +3581,7 @@ QPDFWriter::indicateProgress(bool decrement, bool finished)
 
     ++this->m->events_seen;
 
-    if (! this->m->progress_reporter.getPointer())
+    if (! this->m->progress_reporter.get())
     {
         return;
     }

@@ -19,7 +19,7 @@ Pl_RC4::~Pl_RC4()
 void
 Pl_RC4::write(unsigned char* data, size_t len)
 {
-    if (this->outbuf.getPointer() == 0)
+    if (this->outbuf.get() == 0)
     {
 	throw std::logic_error(
 	    this->identifier +
@@ -35,9 +35,9 @@ Pl_RC4::write(unsigned char* data, size_t len)
             (bytes_left < this->out_bufsize ? bytes_left : out_bufsize);
 	bytes_left -= bytes;
         // lgtm[cpp/weak-cryptographic-algorithm]
-	rc4.process(p, bytes, outbuf.getPointer());
+	rc4.process(p, bytes, outbuf.get());
 	p += bytes;
-	getNext()->write(outbuf.getPointer(), bytes);
+	getNext()->write(outbuf.get(), bytes);
     }
 }
 

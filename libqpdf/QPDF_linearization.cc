@@ -314,7 +314,7 @@ QPDF::readLinearizationData()
     QPDFObjectHandle HO = H0.getKey("/O"); // outline
 
     PointerHolder<Buffer> hbp = pb.getBuffer();
-    Buffer* hb = hbp.getPointer();
+    Buffer* hb = hbp.get();
     unsigned char const* h_buf = hb->getBuffer();
     size_t h_size = hb->getSize();
 

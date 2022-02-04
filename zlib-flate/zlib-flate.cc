@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
     QUtil::binary_stdin();
     PointerHolder<Pl_StdioFile> out = new Pl_StdioFile("stdout", stdout);
     PointerHolder<Pl_Flate> flate =
-        new Pl_Flate("flate", out.getPointer(), action);
+        new Pl_Flate("flate", out.get(), action);
     bool warn = false;
     flate->setWarnCallback([&warn](char const* msg, int code) {
         warn = true;

@@ -28,7 +28,7 @@ Pl_Buffer::~Pl_Buffer()
 void
 Pl_Buffer::write(unsigned char* buf, size_t len)
 {
-    if (this->m->data.getPointer() == 0)
+    if (this->m->data.get() == 0)
     {
         this->m->data = new Buffer(len);
     }

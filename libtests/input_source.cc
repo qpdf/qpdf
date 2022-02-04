@@ -66,7 +66,7 @@ int main()
     // of the next match
     memcpy(b + 2037, "potato potato salad ", 20);
     PointerHolder<InputSource> is =
-        new BufferInputSource("test buffer input source", b1.getPointer());
+        new BufferInputSource("test buffer input source", b1.get());
     Finder f1(is, "salad");
     check("find potato salad", true,
           is->findFirst("potato", 0, 0, f1));

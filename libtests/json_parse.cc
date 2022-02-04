@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
         PointerHolder<char> buf;
         size_t size;
         QUtil::read_file_into_memory(filename, buf, size);
-        std::string s(buf.getPointer(), size);
+        std::string s(buf.get(), size);
         std::cout << JSON::parse(s).unparse() << std::endl;
     }
     catch (std::exception& e)

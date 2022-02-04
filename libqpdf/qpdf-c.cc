@@ -175,7 +175,7 @@ void qpdf_cleanup(qpdf_data* qpdf)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_cleanup");
     qpdf_oh_release_all(*qpdf);
-    if ((*qpdf)->error.getPointer())
+    if ((*qpdf)->error.get())
     {
         QTC::TC("qpdf", "qpdf-c cleanup warned about unhandled error");
         std::cerr << "WARNING: application did not handle error: "
@@ -216,12 +216,12 @@ QPDF_BOOL qpdf_more_warnings(qpdf_data qpdf)
 QPDF_BOOL qpdf_has_error(qpdf_data qpdf)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_has_error");
-    return (qpdf->error.getPointer() ? QPDF_TRUE : QPDF_FALSE);
+    return (qpdf->error.get() ? QPDF_TRUE : QPDF_FALSE);
 }
 
 qpdf_error qpdf_get_error(qpdf_data qpdf)
 {
-    if (qpdf->error.getPointer())
+    if (qpdf->error.get())
     {
 	qpdf->tmp_error.exc = qpdf->error;
 	qpdf->error = 0;
@@ -498,11 +498,11 @@ QPDF_BOOL qpdf_allow_modify_all(qpdf_data qpdf)
 
 static void qpdf_init_write_internal(qpdf_data qpdf)
 {
-    if (qpdf->qpdf_writer.getPointer())
+    if (qpdf->qpdf_writer.get())
     {
 	QTC::TC("qpdf", "qpdf-c called qpdf_init_write multiple times");
 	qpdf->qpdf_writer = 0;
-	if (qpdf->output_buffer.getPointer())
+	if (qpdf->output_buffer.get())
 	{
 	    qpdf->output_buffer = 0;
 	    qpdf->write_memory = false;
@@ -541,7 +541,7 @@ size_t qpdf_get_buffer_length(qpdf_data qpdf)
 {
     qpdf_get_buffer_internal(qpdf);
     size_t result = 0;
-    if (qpdf->output_buffer.getPointer())
+    if (qpdf->output_buffer.get())
     {
 	result = qpdf->output_buffer->getSize();
     }
@@ -552,7 +552,7 @@ unsigned char const* qpdf_get_buffer(qpdf_data qpdf)
 {
     unsigned char const* result = 0;
     qpdf_get_buffer_internal(qpdf);
-    if (qpdf->output_buffer.getPointer())
+    if (qpdf->output_buffer.get())
     {
 	result = qpdf->output_buffer->getBuffer();
     }
@@ -978,7 +978,7 @@ static RET do_with_oh(
         qpdf, fallback, [fn, oh](qpdf_data q) {
             auto i = q->oh_cache.find(oh);
             bool result = ((i != q->oh_cache.end()) &&
-                           (i->second).getPointer());
+                           (i->second).get());
             if (! result)
             {
                 QTC::TC("qpdf", "qpdf-c invalid object handle");
@@ -1506,7 +1506,7 @@ qpdf_oh qpdf_oh_new_stream(qpdf_data qpdf)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_oh_new_stream");
     return new_object(
-        qpdf, QPDFObjectHandle::newStream(qpdf->qpdf.getPointer()));
+        qpdf, QPDFObjectHandle::newStream(qpdf->qpdf.get()));
 }
 
 void qpdf_oh_make_direct(qpdf_data qpdf, qpdf_oh oh)

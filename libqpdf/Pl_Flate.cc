@@ -37,7 +37,7 @@ Pl_Flate::Members::Members(size_t out_bufsize,
     zstream.opaque = 0;
     zstream.next_in = 0;
     zstream.avail_in = 0;
-    zstream.next_out = this->outbuf.getPointer();
+    zstream.next_out = this->outbuf.get();
     zstream.avail_out = QIntC::to_uint(out_bufsize);
 }
 
@@ -89,7 +89,7 @@ Pl_Flate::warn(char const* msg, int code)
 void
 Pl_Flate::write(unsigned char* data, size_t len)
 {
-    if (this->m->outbuf.getPointer() == 0)
+    if (this->m->outbuf.get() == 0)
     {
 	throw std::logic_error(
 	    this->identifier +
@@ -208,8 +208,8 @@ Pl_Flate::handleData(unsigned char* data, size_t len, int flush)
                     QIntC::to_ulong(this->m->out_bufsize - zstream.avail_out);
 		if (ready > 0)
 		{
-		    this->getNext()->write(this->m->outbuf.getPointer(), ready);
-		    zstream.next_out = this->m->outbuf.getPointer();
+		    this->getNext()->write(this->m->outbuf.get(), ready);
+		    zstream.next_out = this->m->outbuf.get();
 		    zstream.avail_out = QIntC::to_uint(this->m->out_bufsize);
 		}
 	    }
@@ -227,7 +227,7 @@ Pl_Flate::finish()
 {
     try
     {
-        if (this->m->outbuf.getPointer())
+        if (this->m->outbuf.get())
         {
             if (this->m->initialized)
             {

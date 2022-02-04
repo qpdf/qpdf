@@ -479,7 +479,7 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline, bool* filterp,
 	{
             normalizer = new ContentNormalizer();
 	    pipeline = new Pl_QPDFTokenizer(
-                "normalizer", normalizer.getPointer(), pipeline);
+                "normalizer", normalizer.get(), pipeline);
 	    to_delete.push_back(pipeline);
 	}
 
@@ -489,7 +489,7 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline, bool* filterp,
              iter != this->token_filters.rend(); ++iter)
         {
             pipeline = new Pl_QPDFTokenizer(
-                "token filter", (*iter).getPointer(), pipeline);
+                "token filter", (*iter).get(), pipeline);
             to_delete.push_back(pipeline);
         }
 
@@ -512,14 +512,14 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline, bool* filterp,
 	}
     }
 
-    if (this->stream_data.getPointer())
+    if (this->stream_data.get())
     {
 	QTC::TC("qpdf", "QPDF_Stream pipe replaced stream data");
 	pipeline->write(this->stream_data->getBuffer(),
 			this->stream_data->getSize());
 	pipeline->finish();
     }
-    else if (this->stream_provider.getPointer())
+    else if (this->stream_provider.get())
     {
 	Pl_Count count("stream provider count", pipeline);
         if (this->stream_provider->supportsRetry())
@@ -590,7 +590,7 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline, bool* filterp,
 
     if (filter &&
         (! suppress_warnings) &&
-        normalizer.getPointer() &&
+        normalizer.get() &&
         normalizer->anyBadTokens())
     {
         warn(QPDFExc(qpdf_e_damaged_pdf, qpdf->getFilename(),

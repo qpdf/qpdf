@@ -135,14 +135,23 @@ class PointerHolder
 
     // NOTE: The pointer returned by getPointer turns into a pumpkin
     // when the last PointerHolder that contains it disappears.
+#ifndef NO_POINTERHOLDER_DEPRECATION
+    [[deprecated("use PointerHolder<T>::get() instead of getPointer()")]]
+#endif
     T* getPointer()
 	{
 	    return this->data->pointer;
 	}
+#ifndef NO_POINTERHOLDER_DEPRECATION
+    [[deprecated("use PointerHolder<T>::get() instead of getPointer()")]]
+#endif
     T const* getPointer() const
 	{
 	    return this->data->pointer;
 	}
+#ifndef NO_POINTERHOLDER_DEPRECATION
+    [[deprecated("use use_count() instead of getRefcount()")]]
+#endif
     int getRefcount() const
 	{
 	    return this->data->refcount;

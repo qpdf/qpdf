@@ -470,7 +470,7 @@ win_convert_filename(char const* filename)
     size_t len = u16.length();
     size_t wlen = (len / 2) - 1;
     PointerHolder<wchar_t> wfilenamep(true, new wchar_t[wlen + 1]);
-    wchar_t* wfilename = wfilenamep.getPointer();
+    wchar_t* wfilename = wfilenamep.get();
     wfilename[wlen] = 0;
     for (unsigned int i = 2; i < len; i += 2)
     {
@@ -489,9 +489,9 @@ QUtil::safe_fopen(char const* filename, char const* mode)
     FILE* f = 0;
 #ifdef _WIN32
     PointerHolder<wchar_t> wfilenamep = win_convert_filename(filename);
-    wchar_t* wfilename = wfilenamep.getPointer();
+    wchar_t* wfilename = wfilenamep.get();
     PointerHolder<wchar_t> wmodep(true, new wchar_t[strlen(mode) + 1]);
-    wchar_t* wmode = wmodep.getPointer();
+    wchar_t* wmode = wmodep.get();
     wmode[strlen(mode)] = 0;
     for (size_t i = 0; i < strlen(mode); ++i)
     {
@@ -633,7 +633,7 @@ QUtil::remove_file(char const* path)
 {
 #ifdef _WIN32
     PointerHolder<wchar_t> wpath = win_convert_filename(path);
-    os_wrapper(std::string("remove ") + path, _wunlink(wpath.getPointer()));
+    os_wrapper(std::string("remove ") + path, _wunlink(wpath.get()));
 #else
     os_wrapper(std::string("remove ") + path, unlink(path));
 #endif
@@ -654,7 +654,7 @@ QUtil::rename_file(char const* oldname, char const* newname)
     PointerHolder<wchar_t> wold = win_convert_filename(oldname);
     PointerHolder<wchar_t> wnew = win_convert_filename(newname);
     os_wrapper(std::string("rename ") + oldname + " " + newname,
-               _wrename(wold.getPointer(), wnew.getPointer()));
+               _wrename(wold.get(), wnew.get()));
 #else
     os_wrapper(std::string("rename ") + oldname + " " + newname,
                rename(oldname, newname));
@@ -867,8 +867,8 @@ QUtil::get_env(std::string const& var, std::string* value)
     if (value)
     {
 	PointerHolder<char> t = PointerHolder<char>(true, new char[len + 1]);
-        ::GetEnvironmentVariable(var.c_str(), t.getPointer(), len);
-	*value = t.getPointer();
+        ::GetEnvironmentVariable(var.c_str(), t.get(), len);
+	*value = t.get();
     }
 
     return true;
@@ -1261,7 +1261,7 @@ QUtil::read_file_into_memory(
     size = QIntC::to_size(QUtil::tell(f));
     fseek(f, 0, SEEK_SET);
     file_buf = PointerHolder<char>(true, new char[size]);
-    char* buf_p = file_buf.getPointer();
+    char* buf_p = file_buf.get();
     size_t bytes_read = 0;
     size_t len = 0;
     while ((len = fread(buf_p + bytes_read, 1, size - bytes_read, f)) > 0)

@@ -903,7 +903,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
     else if ((from_qpdf != &this->qpdf) && (! from_afdh))
     {
         afdhph = new QPDFAcroFormDocumentHelper(*from_qpdf);
-        from_afdh = afdhph.getPointer();
+        from_afdh = afdhph.get();
     }
     bool foreign = (from_qpdf != &this->qpdf);
 

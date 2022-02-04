@@ -285,7 +285,7 @@ Pl_DCT::compress(void* cinfo_p, Buffer* b)
     static int const BUF_SIZE = 65536;
     PointerHolder<unsigned char> outbuffer_ph(
         true, new unsigned char[BUF_SIZE]);
-    unsigned char* outbuffer = outbuffer_ph.getPointer();
+    unsigned char* outbuffer = outbuffer_ph.get();
     jpeg_pipeline_dest(cinfo, outbuffer, BUF_SIZE, this->getNext());
 
     cinfo->image_width = this->m->image_width;
