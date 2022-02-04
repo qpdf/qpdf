@@ -740,10 +740,13 @@ static void test25(char const* infile,
     qpdf_oh_append_item(
         qpdf, new_array,
         qpdf_oh_new_unicode_string(qpdf, "qww\xc3\xb7\xcf\x80"));
+    qpdf_oh_append_item(
+        qpdf, new_array,
+        qpdf_oh_new_binary_unicode_string(qpdf, "qw\x00w\xc3\xb7\xcf\x80", 8));
     qpdf_oh_append_item(qpdf, new_array, qpdf_oh_new_null(qpdf)); /* 2 */
     qpdf_oh_append_item(qpdf, new_array, qpdf_oh_new_null(qpdf)); /* 3 */
     qpdf_oh_set_array_item(
-        qpdf, new_array, 2,
+        qpdf, new_array, 3,
         qpdf_oh_new_name(qpdf, "/Quack"));
     qpdf_oh_append_item(
         qpdf, new_array,
@@ -803,6 +806,24 @@ static void test27(char const* infile,
                   "potato\000salad", 13) == 0);
     assert(qpdf_get_last_string_length(qpdf) == 12);
     assert(length == 12);
+    /* repeat for UTF8 string */
+    qpdf_oh p_utf8_string_with_null = qpdf_oh_parse(qpdf, 
+                                          "<feff007100770000007700f703c0>");
+    assert(qpdf_oh_is_string(qpdf, p_utf8_string_with_null));
+    assert(strcmp(qpdf_oh_get_utf8_value(qpdf, p_utf8_string_with_null),
+                  "qw\x00w\xc3\xb7\xcf\x80") == 0);
+    assert(qpdf_get_last_string_length(qpdf) == 8);
+    /* memcmp adds a character to verify the trailing null */
+    assert(memcmp(qpdf_oh_get_utf8_value(qpdf, p_utf8_string_with_null),
+                  "qw\x00w\xc3\xb7\xcf\x80", 8) == 0);
+    p_utf8_string_with_null = qpdf_oh_new_binary_unicode_string(
+                                  qpdf, "qw\x00w\xc3\xb7\xcf\x80", 8);
+    /* memcmp adds a character to verify the trailing null */
+    assert(memcmp(qpdf_oh_get_binary_utf8_value(
+                      qpdf, p_utf8_string_with_null, &length),
+                  "qw\x00w\xc3\xb7\xcf\x80", 9) == 0);
+    assert(qpdf_get_last_string_length(qpdf) == 8);
+    assert(length == 8);
 }
 
 static void test28(char const* infile,
