@@ -42,6 +42,7 @@
 #include <vector>
 #include <list>
 #include <functional>
+#include <memory>
 
 class JSON
 {
@@ -156,13 +157,13 @@ class JSON
     {
         virtual ~JSON_dictionary();
         virtual std::string unparse(size_t depth) const;
-        std::map<std::string, PointerHolder<JSON_value> > members;
+        std::map<std::string, std::shared_ptr<JSON_value>> members;
     };
     struct JSON_array: public JSON_value
     {
         virtual ~JSON_array();
         virtual std::string unparse(size_t depth) const;
-        std::vector<PointerHolder<JSON_value> > elements;
+        std::vector<std::shared_ptr<JSON_value>> elements;
     };
     struct JSON_string: public JSON_value
     {
@@ -194,7 +195,7 @@ class JSON
         virtual std::string unparse(size_t depth) const;
     };
 
-    JSON(PointerHolder<JSON_value>);
+    JSON(std::shared_ptr<JSON_value>);
 
     static bool
     checkSchemaInternal(JSON_value* this_v, JSON_value* sch_v,
@@ -211,10 +212,10 @@ class JSON
         ~Members();
 
       private:
-        Members(PointerHolder<JSON_value>);
+        Members(std::shared_ptr<JSON_value>);
         Members(Members const&);
 
-        PointerHolder<JSON_value> value;
+        std::shared_ptr<JSON_value> value;
     };
 
     PointerHolder<Members> m;

@@ -8,12 +8,12 @@ JSON::Members::~Members()
 {
 }
 
-JSON::Members::Members(PointerHolder<JSON_value> value) :
+JSON::Members::Members(std::shared_ptr<JSON_value> value) :
     value(value)
 {
 }
 
-JSON::JSON(PointerHolder<JSON_value> value) :
+JSON::JSON(std::shared_ptr<JSON_value> value) :
     m(new Members(value))
 {
 }
@@ -30,9 +30,7 @@ std::string JSON::JSON_dictionary::unparse(size_t depth) const
 {
     std::string result = "{";
     bool first = true;
-    for (std::map<std::string, PointerHolder<JSON_value> >::const_iterator
-             iter = members.begin();
-         iter != members.end(); ++iter)
+    for (auto const& iter: members)
     {
         if (first)
         {
@@ -44,8 +42,8 @@ std::string JSON::JSON_dictionary::unparse(size_t depth) const
         }
         result.append(1, '\n');
         result.append(2 * (1 + depth), ' ');
-        result += ("\"" + (*iter).first + "\": " +
-                   (*iter).second->unparse(1 + depth));
+        result += ("\"" + iter.first + "\": " +
+                   iter.second->unparse(1 + depth));
     }
     if (! first)
     {
@@ -64,9 +62,7 @@ std::string JSON::JSON_array::unparse(size_t depth) const
 {
     std::string result = "[";
     bool first = true;
-    for (std::vector<PointerHolder<JSON_value> >::const_iterator iter =
-             elements.begin();
-         iter != elements.end(); ++iter)
+    for (auto const& element: elements)
     {
         if (first)
         {
@@ -78,7 +74,7 @@ std::string JSON::JSON_array::unparse(size_t depth) const
         }
         result.append(1, '\n');
         result.append(2 * (1 + depth), ' ');
-        result += (*iter)->unparse(1 + depth);
+        result += element->unparse(1 + depth);
     }
     if (! first)
     {
@@ -212,7 +208,7 @@ JSON::encode_string(std::string const& str)
 JSON
 JSON::makeDictionary()
 {
-    return JSON(new JSON_dictionary());
+    return JSON(std::make_shared<JSON_dictionary>());
 }
 
 JSON
@@ -231,7 +227,7 @@ JSON::addDictionaryMember(std::string const& key, JSON const& val)
     }
     else
     {
-        obj->members[encode_string(key)] = new JSON_null();
+        obj->members[encode_string(key)] = std::make_shared<JSON_null>();
     }
     return obj->members[encode_string(key)];
 }
@@ -239,7 +235,7 @@ JSON::addDictionaryMember(std::string const& key, JSON const& val)
 JSON
 JSON::makeArray()
 {
-    return JSON(new JSON_array());
+    return JSON(std::make_shared<JSON_array>());
 }
 
 JSON
@@ -257,7 +253,7 @@ JSON::addArrayElement(JSON const& val)
     }
     else
     {
-        arr->elements.push_back(new JSON_null());
+        arr->elements.push_back(std::make_shared<JSON_null>());
     }
     return arr->elements.back();
 }
@@ -265,37 +261,37 @@ JSON::addArrayElement(JSON const& val)
 JSON
 JSON::makeString(std::string const& utf8)
 {
-    return JSON(new JSON_string(utf8));
+    return JSON(std::make_shared<JSON_string>(utf8));
 }
 
 JSON
 JSON::makeInt(long long int value)
 {
-    return JSON(new JSON_number(value));
+    return JSON(std::make_shared<JSON_number>(value));
 }
 
 JSON
 JSON::makeReal(double value)
 {
-    return JSON(new JSON_number(value));
+    return JSON(std::make_shared<JSON_number>(value));
 }
 
 JSON
 JSON::makeNumber(std::string const& encoded)
 {
-    return JSON(new JSON_number(encoded));
+    return JSON(std::make_shared<JSON_number>(encoded));
 }
 
 JSON
 JSON::makeBool(bool value)
 {
-    return JSON(new JSON_bool(value));
+    return JSON(std::make_shared<JSON_bool>(value));
 }
 
 JSON
 JSON::makeNull()
 {
-    return JSON(new JSON_null());
+    return JSON(std::make_shared<JSON_null>());
 }
 
 bool
@@ -488,11 +484,9 @@ JSON::checkSchemaInternal(JSON_value* this_v, JSON_value* sch_v,
                 }
             }
         }
-        for (std::map<std::string, PointerHolder<JSON_value>>::iterator iter =
-                 this_dict->members.begin();
-             iter != this_dict->members.end(); ++iter)
+        for (auto const& iter: this_dict->members)
         {
-            std::string const& key = (*iter).first;
+            std::string const& key = iter.first;
             if (sch_dict->members.count(key) == 0)
             {
                 QTC::TC("libtests", "JSON key extra in object");
@@ -518,14 +512,13 @@ JSON::checkSchemaInternal(JSON_value* this_v, JSON_value* sch_v,
             return false;
         }
         int i = 0;
-        for (std::vector<PointerHolder<JSON_value> >::iterator iter =
-                 this_arr->elements.begin();
-             iter != this_arr->elements.end(); ++iter, ++i)
+        for (auto const& element: this_arr->elements)
         {
             checkSchemaInternal(
-                (*iter).get(),
+                element.get(),
                 sch_arr->elements.at(0).get(),
                 flags, errors, prefix + "." + QUtil::int_to_string(i));
+            ++i;
         }
     }
     else if (! sch_str)
@@ -559,7 +552,7 @@ namespace {
         {
         }
 
-        PointerHolder<JSON> parse(std::string const& s);
+        std::shared_ptr<JSON> parse(std::string const& s);
 
       private:
         void getToken();
@@ -599,7 +592,7 @@ namespace {
         char const* tok_end;
         char const* p;
         parser_state_e parser_state;
-        std::vector<PointerHolder<JSON>> stack;
+        std::vector<std::shared_ptr<JSON>> stack;
         std::vector<parser_state_e> ps_stack;
         std::string dict_key;
     };
@@ -987,7 +980,7 @@ JSONParser::handleToken()
     // looking at an item or a delimiter. It will always be exactly
     // one of those two or an error condition.
 
-    PointerHolder<JSON> item;
+    std::shared_ptr<JSON> item;
     char delimiter = '\0';
     switch (lex_state)
     {
@@ -995,11 +988,11 @@ JSONParser::handleToken()
         switch (*tok_start)
         {
           case '{':
-            item = new JSON(JSON::makeDictionary());
+            item = std::make_shared<JSON>(JSON::makeDictionary());
             break;
 
           case '[':
-            item = new JSON(JSON::makeArray());
+            item = std::make_shared<JSON>(JSON::makeArray());
             break;
 
           default:
@@ -1032,21 +1025,21 @@ JSONParser::handleToken()
                 "JSON: offset " + QUtil::int_to_string(p - cstr) +
                 ": number with no digits");
         }
-        item = new JSON(JSON::makeNumber(value));
+        item = std::make_shared<JSON>(JSON::makeNumber(value));
         break;
 
       case ls_alpha:
         if (value == "true")
         {
-            item = new JSON(JSON::makeBool(true));
+            item = std::make_shared<JSON>(JSON::makeBool(true));
         }
         else if (value == "false")
         {
-            item = new JSON(JSON::makeBool(false));
+            item = std::make_shared<JSON>(JSON::makeBool(false));
         }
         else if (value == "null")
         {
-            item = new JSON(JSON::makeNull());
+            item = std::make_shared<JSON>(JSON::makeNull());
         }
         else
         {
@@ -1058,7 +1051,7 @@ JSONParser::handleToken()
         break;
 
       case ls_string:
-        item = new JSON(JSON::makeString(s_value));
+        item = std::make_shared<JSON>(JSON::makeString(s_value));
         break;
 
       case ls_backslash:
@@ -1215,7 +1208,7 @@ JSONParser::handleToken()
     }
     else if (item.get())
     {
-        PointerHolder<JSON> tos;
+        std::shared_ptr<JSON> tos;
         if (! stack.empty())
         {
             tos = stack.back();
@@ -1284,7 +1277,7 @@ JSONParser::handleToken()
     lex_state = ls_top;
 }
 
-PointerHolder<JSON>
+std::shared_ptr<JSON>
 JSONParser::parse(std::string const& s)
 {
     cstr = s.c_str();
