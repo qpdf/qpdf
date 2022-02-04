@@ -123,7 +123,7 @@ ArgParser::argCopyright()
         << this->ap.getProgname()
         << " version " << QPDF::QPDFVersion() << std::endl
         << std::endl
-        << "Copyright (c) 2005-2021 Jay Berkenbilt"
+        << "Copyright (c) 2005-2022 Jay Berkenbilt"
         << std::endl
         << "QPDF is licensed under the Apache License, Version 2.0 (the \"License\");"
         << std::endl
