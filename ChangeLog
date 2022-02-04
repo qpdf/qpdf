@@ -1,5 +1,14 @@
 2022-02-04  Jay Berkenbilt  <ejb@ql.org>
 
+	* New preprocessor symbols QPDF_MAJOR_VERSION, QPDF_MINOR_VERSION,
+	QPDF_PATCH_VERSION as numbers and QPDF_VERSION as a string. These
+	can be used for feature testing in code. These are in qpdf/DLL.h,
+	which is included by every header that adds to the public API.
+	Since these constants are introduced in version 10.6, it's
+	important for them to be in a header that everyone already
+	includes so you don't have to try to include a header that won't
+	be there.
+
 	* PointerHolder: deprecate getPointer() and getRefcount(). If you
 	don't want to disable deprecation warnings in general but are not
 	ready to tackle this change yet, you can define

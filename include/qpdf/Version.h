@@ -20,24 +20,15 @@
  * see the manual for additional information.
  */
 
-#ifndef QPDF_DLL_HH
-#define QPDF_DLL_HH
+#ifndef QPDF_VERSION_H
+#define QPDF_VERSION_H
 
-/* The first version of qpdf to include the version constants is 10.6.0. */
-#define QPDF_MAJOR_VERSION 10
-#define QPDF_MINOR_VERSION 5
-#define QPDF_PATCH_VERSION 0
-#define QPDF_VERSION "10.5.0"
+/* The first version of qpdf to have these constants was 10.6.0. This
+ * file is included by qpdf/DLL.h, which is included by everything
+ * that adds to the public API, so you can test for these values
+ * without explicitly including this file in code that has to work
+ * with older qpdf than 10.6.0.
+ */
 
-#if (defined _WIN32 || defined __CYGWIN__) && defined(DLL_EXPORT)
-# define QPDF_DLL __declspec(dllexport)
-# define QPDF_DLL_CLASS
-#elif __GNUC__ >= 4
-# define QPDF_DLL __attribute__ ((visibility ("default")))
-# define QPDF_DLL_CLASS __attribute__ ((visibility ("default")))
-#else
-# define QPDF_DLL
-# define QPDF_DLL_CLASS
-#endif
 
-#endif /* QPDF_DLL_HH */
+#endif /* QPDF_VERSION_H */

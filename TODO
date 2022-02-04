@@ -3,9 +3,6 @@
 
 * Close issue #556.
 
-* Add QPDF_MAJOR_VERSION, QPDF_MINOR_VERSION to some header, possibly
-  dll.h since this is everywhere that there's API
-
 * Add user-defined initializer `QPDFObjectHandle operator ""_qpdf` to
   be like QPDFObjectHandle::parse: `auto oh = "<< /a (b) >>"_qpdf;`
 

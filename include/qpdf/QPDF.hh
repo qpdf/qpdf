@@ -52,7 +52,8 @@ class BitWriter;
 class QPDF
 {
   public:
-    // Get the current version of the QPDF software
+    // Get the current version of the QPDF software. See also
+    // qpdf/Version.h
     QPDF_DLL
     static std::string const& QPDFVersion();
 
