@@ -1,11 +1,5 @@
 2022-02-01  Jay Berkenbilt  <ejb@ql.org>
 
-	* The --json flag now takes a version number as an optional
-	parameter. The default will remain version 1 for compatibility.
-	This enables future code to use --json=latest to always get the
-	latest version or to use a specific version. At this time, there's
-	only version 1, but a version 2 may appear in a future qpdf.
-
 	* Major refactor: all functionality from the qpdf CLI is now
 	available for library users using the QPDFJob class. See comments
 	in include/qpdf/QPDFJob.hh and a new chapter about QPDFJob in the
@@ -25,8 +19,11 @@
 	* Have --json-help just output the JSON object, leaving a
 	description to --help and the manual.
 
-	* Allow optional version number or "latest" as parameter to
-	--json, allowing for future specification of json version.
+	* The --json flag now takes a version number as an optional
+	parameter. The default will remain version 1 for compatibility.
+	This enables future code to use --json=latest to always get the
+	latest version or to use a specific version. At this time, there's
+	only version 1, but a version 2 may appear in a future qpdf.
 
 2022-01-28  Jay Berkenbilt  <ejb@ql.org>
 
