@@ -22,6 +22,14 @@
 #ifndef POINTERHOLDER_HH
 #define POINTERHOLDER_HH
 
+// In qpdf 11, PointerHolder will be derived from std::shared_ptr and
+// will also include a fix to incorrect semantics of const
+// PointerHolder objects. PointerHolder only allows a const
+// PointerHolder to return a const pointer. This is wrong. Use a
+// PointerHolder<const T> for that. A const PointerHolder should just
+// not allow you to change what it points to. This is consistent with
+// how regular pointers and standard library shared pointers work.
+
 // This class is basically std::shared_ptr but predates that by
 // several years.
 
@@ -119,6 +127,12 @@ class PointerHolder
 	return this->data->pointer < rhs.data->pointer;
     }
 
+    // get() is for interface compatibility with std::shared_ptr
+    T* get() const
+    {
+        return this->data->pointer;
+    }
+
     // NOTE: The pointer returned by getPointer turns into a pumpkin
     // when the last PointerHolder that contains it disappears.
     T* getPointer()
@@ -133,6 +147,12 @@ class PointerHolder
 	{
 	    return this->data->refcount;
 	}
+
+    // use_count() is for compatibility with std::shared_ptr
+    long use_count()
+        {
+            return static_cast<long>(this->data->refcount);
+        }
 
     T const& operator*() const
     {

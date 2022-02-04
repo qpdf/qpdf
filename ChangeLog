@@ -1,3 +1,20 @@
+2022-02-04  Jay Berkenbilt  <ejb@ql.org>
+
+	* PointerHolder: add a get() method and a use_count() method for
+	compatibility with std::shared_ptr. In qpdf 11, qpdf's APIs will
+	switch to using std::shared_ptr instead of PointerHolder, though
+	there will be a PointerHolder class with a backward-compatible
+	API. To ease the transition, we are adding get() now with the same
+	semantics as std::shared_ptr's get. Note that there is a
+	difference in behavior: const PointerHolder has always behaved
+	incorrectly. const PointerHolder objects only returned const
+	pointers. This is wrong. If you want a const pointer, use
+	PointerHolder<T const>. A const PointerHolder just shouldn't allow
+	its pointer to be reassigned. The new get() method behaves
+	correctly in that calling get() on a const PointerHolder to a
+	non-const pointer returns a non-const pointer. This is the way
+	regular pointers behave.
+
 2022-02-01  Jay Berkenbilt  <ejb@ql.org>
 
 	* Major refactor: all functionality from the qpdf CLI is now

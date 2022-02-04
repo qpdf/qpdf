@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include <list>
 
-#include <qpdf/QUtil.hh>
-
 class Object
 {
   public:
@@ -47,9 +45,16 @@ Object::hello() const
 
 typedef PointerHolder<Object> ObjectHolder;
 
-void callHello(ObjectHolder const& oh)
+void callHello(ObjectHolder& oh)
 {
     oh.getPointer()->hello();
+    oh->hello();
+    (*oh).hello();
+}
+
+void callHelloWithGet(ObjectHolder const& oh)
+{
+    oh.get()->hello();
     oh->hello();
     (*oh).hello();
 }
@@ -66,7 +71,7 @@ int main(int argc, char* argv[])
         std::cout << "oh1 refcount = " << oh1.getRefcount() << std::endl;
 	ObjectHolder oh2(oh1);
         std::cout << "oh1 refcount = " << oh1.getRefcount() << std::endl;
-        std::cout << "oh2 refcount = " << oh2.getRefcount() << std::endl;
+        std::cout << "oh2 refcount = " << oh2.use_count() << std::endl;
 	ObjectHolder oh3(new Object);
 	ObjectHolder oh4;
 	ObjectHolder oh5;
@@ -89,12 +94,15 @@ int main(int argc, char* argv[])
 	ol1.push_back(oh3);
 	Object* o3 = new Object;
 	oh0 = o3;
+        PointerHolder<Object const> oh6(new Object());
+        oh6->hello();
     }
 
     ol1.front().getPointer()->hello();
     ol1.front()->hello();
     (*ol1.front()).hello();
     callHello(ol1.front());
+    callHelloWithGet(ol1.front());
     ol1.pop_front();
     std::cout << "array" << std::endl;
     PointerHolder<Object> oarr1_ph(true, new Object[2]);
