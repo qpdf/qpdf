@@ -1,4 +1,5 @@
 #include <qpdf/BufferInputSource.hh>
+
 #include <qpdf/QIntC.hh>
 #include <string.h>
 #include <stdexcept>

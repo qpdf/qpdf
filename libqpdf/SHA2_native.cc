@@ -1,4 +1,5 @@
 #include <qpdf/SHA2_native.hh>
+
 #include <stdexcept>
 #include <cstdio>
 #include <qpdf/PointerHolder.hh>

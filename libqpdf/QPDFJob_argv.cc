@@ -115,6 +115,7 @@ ArgParser::argVersion()
 void
 ArgParser::argCopyright()
 {
+    // clang-format off
     // Make sure the output looks right on an 80-column display.
     //               1         2         3         4         5         6         7         8
     //      12345678901234567890123456789012345678901234567890123456789012345678901234567890
@@ -153,6 +154,7 @@ ArgParser::argCopyright()
         << std::endl
         << "see the manual for additional information."
         << std::endl;
+    // clang-format on
 }
 
 void

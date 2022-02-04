@@ -1,4 +1,5 @@
 #include <qpdf/Pl_MD5.hh>
+
 #include <stdexcept>
 
 Pl_MD5::Pl_MD5(char const* identifier, Pipeline* next) :

@@ -1,4 +1,5 @@
 #include <qpdf/ContentNormalizer.hh>
+
 #include <qpdf/QUtil.hh>
 
 ContentNormalizer::ContentNormalizer() :

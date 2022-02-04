@@ -28,6 +28,7 @@
 /////////////////////////////////////////////////////////////////////////
 
 #include <qpdf/MD5_native.hh>
+
 #include <qpdf/QUtil.hh>
 #include <qpdf/QIntC.hh>
 

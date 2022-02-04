@@ -1,4 +1,5 @@
 #include <qpdf/QPDF_Reserved.hh>
+
 #include <stdexcept>
 
 QPDF_Reserved::~QPDF_Reserved()

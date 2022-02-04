@@ -1,4 +1,5 @@
 #include <qpdf/ClosedFileInputSource.hh>
+
 #include <qpdf/FileInputSource.hh>
 
 ClosedFileInputSource::Members::Members(char const* filename) :

@@ -1,4 +1,5 @@
 #include <qpdf/BitStream.hh>
+
 #include <qpdf/QIntC.hh>
 
 // See comments in bits.cc

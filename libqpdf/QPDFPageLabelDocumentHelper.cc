@@ -1,4 +1,5 @@
 #include <qpdf/QPDFPageLabelDocumentHelper.hh>
+
 #include <qpdf/QTC.hh>
 
 QPDFPageLabelDocumentHelper::Members::~Members()

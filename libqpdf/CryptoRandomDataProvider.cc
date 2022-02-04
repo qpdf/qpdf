@@ -1,4 +1,5 @@
 #include <qpdf/CryptoRandomDataProvider.hh>
+
 #include <qpdf/QPDFCryptoProvider.hh>
 
 CryptoRandomDataProvider::CryptoRandomDataProvider()

@@ -86,6 +86,15 @@ GOOGLE OSS-FUZZ
 
 CODING RULES
 
+* In a source file, include the header file that declares the source
+  class first followed by a blank line. If a config file is needed
+  first, put a blank line between that and the header followed by
+  another blank line. This assures that each header file is included
+  first at least once, thereby ensuring that it explicitly includes
+  all the headers it needs, which in turn alleviates lots of header
+  ordering problems. The blank line ensures that formatters don't
+  messt his up by resorting the headers.
+
 * Avoid atoi. Use QUtil::string_to_int instead. It does
   overflow/underflow checking.
 

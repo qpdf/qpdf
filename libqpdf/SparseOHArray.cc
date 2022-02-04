@@ -1,4 +1,5 @@
 #include <qpdf/SparseOHArray.hh>
+
 #include <stdexcept>
 
 SparseOHArray::SparseOHArray() :

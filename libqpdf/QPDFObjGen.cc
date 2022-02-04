@@ -1,4 +1,5 @@
 #include <qpdf/QPDFObjGen.hh>
+
 #include <qpdf/QUtil.hh>
 
 QPDFObjGen::QPDFObjGen() :

@@ -1,4 +1,5 @@
 #include <qpdf/QPDFOutlineDocumentHelper.hh>
+
 #include <qpdf/QTC.hh>
 
 QPDFOutlineDocumentHelper::Members::~Members()

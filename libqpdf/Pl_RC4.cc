@@ -1,4 +1,5 @@
 #include <qpdf/Pl_RC4.hh>
+
 #include <qpdf/QUtil.hh>
 
 Pl_RC4::Pl_RC4(char const* identifier, Pipeline* next,

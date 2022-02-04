@@ -1,4 +1,5 @@
 #include <qpdf/QPDFExc.hh>
+
 #include <qpdf/QUtil.hh>
 
 QPDFExc::QPDFExc(qpdf_error_code_e error_code,

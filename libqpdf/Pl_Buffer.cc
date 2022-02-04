@@ -1,4 +1,5 @@
 #include <qpdf/Pl_Buffer.hh>
+
 #include <stdexcept>
 #include <algorithm>
 #include <assert.h>

@@ -1,4 +1,5 @@
 #include <qpdf/QPDFNameTreeObjectHelper.hh>
+
 #include <qpdf/NNTree.hh>
 
 class NameTreeDetails: public NNTreeDetails

@@ -2,6 +2,7 @@
 #include <qpdf/qpdf-config.h>
 
 #include <qpdf/QUtil.hh>
+
 #include <qpdf/PointerHolder.hh>
 #include <qpdf/CryptoRandomDataProvider.hh>
 #include <qpdf/QPDFSystemError.hh>

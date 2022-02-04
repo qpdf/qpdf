@@ -1,4 +1,5 @@
 #include <qpdf/QPDFXRefEntry.hh>
+
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/QIntC.hh>
