@@ -1979,7 +1979,12 @@ QPDFJob::doInspection(QPDF& pdf)
     }
     if (m->check_linearization)
     {
-        if (pdf.checkLinearization())
+        if (! pdf.isLinearized())
+        {
+            *(this->m->cout)
+                << m->infilename << " is not linearized" << std::endl;
+        }
+        else if (pdf.checkLinearization())
         {
             *(this->m->cout)
                 << m->infilename << ": no linearization errors" << std::endl;
