@@ -1,9 +1,6 @@
 10.6
 ====
 
-* Expose emptyPDF to the C API. Ensure that qpdf_get_qpdf_version is
-  always static.
-
 * Consider doing one big commit to reformat the entire codebase using
   clang-format or a similar tool. Consider using blame.ignoreRevsFile
   or similar (or otherwise study git blame to see how to minimize the

@@ -1,5 +1,7 @@
 2022-02-05  Jay Berkenbilt  <ejb@ql.org>
 
+	* Expose QPDF::emptyPDF to the C API as qpdf_empty_pdf()
+
 	* Add comments letting people know that the version string
 	returned by QPDF::QPDFVersion and qpdf_get_qpdf_version is static.
 

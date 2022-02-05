@@ -3553,7 +3553,7 @@ my @capi = (
     [8, 'no original object ids'],
     [9, 'uncompressed streams'],
     );
-$n_tests += (2 * @capi) + 3;
+$n_tests += (2 * @capi) + 5;
 foreach my $d (@capi)
 {
     my ($n, $description) = @$d;
@@ -3589,6 +3589,14 @@ $td->runtest("write damaged",
 	     {$td->FILE => "c-write-damaged.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("empty PDF",
+	     {$td->COMMAND => "qpdf-ctest 41 - '' a.pdf"},
+	     {$td->STRING => "C test 41 done\n", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+	     {$td->FILE => "a.pdf"},
+	     {$td->FILE => "c-empty.pdf"});
 
 show_ntests();
 # ----------

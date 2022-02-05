@@ -178,9 +178,9 @@ extern "C" {
     char const* qpdf_get_qpdf_version();
 
     /* Returns dynamically allocated qpdf_data pointer; must be freed
-     * by calling qpdf_cleanup. You must call qpdf_read or one of the
-     * other qpdf_read_* functions before calling any function that
-     * would need to operate on the PDF file.
+     * by calling qpdf_cleanup. You must call qpdf_read, one of the
+     * other qpdf_read_* functions, or qpdf_empty_pdf before calling
+     * any function that would need to operate on the PDF file.
      */
     QPDF_DLL
     qpdf_data qpdf_init();
@@ -288,6 +288,13 @@ extern "C" {
 				     char const* buffer,
 				     unsigned long long size,
 				     char const* password);
+
+    /* Calling qpdf_empty_pdf initializes this qpdf object with an
+     * empty PDF, making it possible to create a PDF from scratch
+     * using the C API. Added in 10.6.
+     */
+    QPDF_DLL
+    QPDF_ERROR_CODE qpdf_empty_pdf(qpdf_data qpdf);
 
     /* Read functions below must be called after qpdf_read or
      * qpdf_read_memory. */

@@ -356,6 +356,14 @@ QPDF_ERROR_CODE qpdf_read_memory(qpdf_data qpdf,
     return status;
 }
 
+QPDF_ERROR_CODE qpdf_empty_pdf(qpdf_data qpdf)
+{
+    qpdf->filename = "empty PDF";
+    qpdf->qpdf->emptyPDF();
+    QTC::TC("qpdf", "qpdf-c called qpdf_empty_pdf");
+    return QPDF_SUCCESS;
+}
+
 char const* qpdf_get_pdf_version(qpdf_data qpdf)
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_get_pdf_version");

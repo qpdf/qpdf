@@ -1242,6 +1242,19 @@ static void test40(char const* infile,
     report_errors();
 }
 
+static void test41(char const* infile,
+		   char const* password,
+		   char const* outfile,
+		   char const* xarg)
+{
+    /* Empty PDF -- infile is ignored*/
+    assert(qpdf_empty_pdf(qpdf) == 0);
+    qpdf_init_write(qpdf, outfile);
+    qpdf_set_static_ID(qpdf, QPDF_TRUE);
+    qpdf_write(qpdf);
+    report_errors();
+}
+
 int main(int argc, char* argv[])
 {
     char* p = 0;
@@ -1322,6 +1335,7 @@ int main(int argc, char* argv[])
 	  (n == 38) ? test38 :
 	  (n == 39) ? test39 :
 	  (n == 40) ? test40 :
+	  (n == 41) ? test41 :
 	  0);
 
     if (fn == 0)
