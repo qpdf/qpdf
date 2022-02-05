@@ -477,16 +477,26 @@ qpdf-c array to wrap_in_array 0
 qpdf-c non-array to wrap_in_array 0
 qpdf-c called qpdf_oh_parse 0
 qpdf-c called qpdf_oh_get_bool_value 0
+qpdf-c called qpdf_oh_get_value_as_bool 0
 qpdf-c called qpdf_oh_get_int_value 0
+qpdf-c called qpdf_oh_get_value_as_longlong 0
 qpdf-c called qpdf_oh_get_int_value_as_int 0
+qpdf-c called qpdf_oh_get_value_as_int 0
 qpdf-c called qpdf_oh_get_uint_value 0
+qpdf-c called qpdf_oh_get_value_as_ulonglong 0
 qpdf-c called qpdf_oh_get_uint_value_as_uint 0
+qpdf-c called qpdf_oh_get_value_as_uint 0
 qpdf-c called qpdf_oh_get_real_value 0
+qpdf-c called qpdf_oh_get_value_as_real 0
 qpdf-c called qpdf_oh_is_number 0
+qpdf-c called qpdf_oh_get_value_as_number 0
 qpdf-c called qpdf_oh_get_numeric_value 0
 qpdf-c called qpdf_oh_get_name 0
+qpdf-c called qpdf_oh_get_value_as_name 0
 qpdf-c called qpdf_oh_get_string_value 0
+qpdf-c called qpdf_oh_get_value_as_string 0
 qpdf-c called qpdf_oh_get_utf8_value 0
+qpdf-c called qpdf_oh_get_value_as_utf8 0
 qpdf-c called qpdf_oh_get_array_n_items 0
 qpdf-c called qpdf_oh_get_array_item 0
 qpdf-c called qpdf_oh_begin_dict_key_iter 0

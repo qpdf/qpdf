@@ -673,26 +673,78 @@ static void test25(char const* infile,
 
     /* Parse objects from a string */
     qpdf_oh parsed = qpdf_oh_parse(
-        qpdf, "[ 1 2.0 (3\xf7) << /Four [/Five] >> null true ]");
+        qpdf, "[ 1 2.0 (3\xf7) << /Four [/Five] >> null true false /Six]");
     qpdf_oh p_int = qpdf_oh_get_array_item(qpdf, parsed, 0);
     qpdf_oh p_real = qpdf_oh_get_array_item(qpdf, parsed, 1);
     qpdf_oh p_string = qpdf_oh_get_array_item(qpdf, parsed, 2);
     qpdf_oh p_dict = qpdf_oh_get_array_item(qpdf, parsed, 3);
     qpdf_oh p_null = qpdf_oh_get_array_item(qpdf, parsed, 4);
     qpdf_oh p_bool = qpdf_oh_get_array_item(qpdf, parsed, 5);
+    qpdf_oh p_bool_f = qpdf_oh_get_array_item(qpdf, parsed, 6);
+    qpdf_oh p_name = qpdf_oh_get_array_item(qpdf, parsed, 7);
     assert(qpdf_oh_is_integer(qpdf, p_int) &&
            qpdf_oh_get_int_value_as_int(qpdf, p_int) == 1);
+    long long l = 0;
+    assert(qpdf_oh_get_value_as_longlong(qpdf, p_bool, &l) == QPDF_FALSE);
+    assert((qpdf_oh_get_value_as_longlong(qpdf, p_int, &l) == QPDF_TRUE) &&
+            (l == 1));
+    int i = 0;
+    assert(qpdf_oh_get_value_as_int(qpdf, p_bool, &i) == QPDF_FALSE);
+    assert((qpdf_oh_get_value_as_int(qpdf, p_int, &i) == QPDF_TRUE) &&
+            (i == 1));
+    unsigned long long ul = 0u;
+    assert(qpdf_oh_get_value_as_ulonglong(qpdf, p_bool, &ul) == QPDF_FALSE);
+    assert((qpdf_oh_get_value_as_ulonglong(qpdf, p_int, &ul) == QPDF_TRUE) &&
+            (ul == 1u));
+    unsigned int u = 0u;
+    assert(qpdf_oh_get_value_as_uint(qpdf, p_bool, &u) == QPDF_FALSE);
+    assert((qpdf_oh_get_value_as_uint(qpdf, p_int, &u) == QPDF_TRUE) &&
+            (u == 1u));
+    double d = 0.0;
+    assert(qpdf_oh_get_value_as_number(qpdf, p_bool, &d) == QPDF_FALSE);
+    assert((qpdf_oh_get_value_as_number(qpdf, p_int, &d) == QPDF_TRUE) &&
+            (((d - 1.0) * (d - 1.0)) < 1e-100));
     assert(qpdf_oh_get_type_code(qpdf, p_int) == ot_integer);
     assert(strcmp(qpdf_oh_get_type_name(qpdf, p_int), "integer") == 0);
     assert(qpdf_oh_is_real(qpdf, p_real) &&
            (strcmp(qpdf_oh_get_real_value(qpdf, p_real), "2.0") == 0) &&
            qpdf_oh_get_numeric_value(qpdf, p_real) == 2.0);
+    const char* r = "";
+    size_t length = 0;
+    assert((qpdf_oh_get_value_as_real(qpdf, p_name, &r, &length) ==
+                                      QPDF_FALSE) &&
+            (strcmp(r, "") == 0) &&
+            (length == 0));
+    assert((qpdf_oh_get_value_as_real(qpdf, p_real, &r, &length) ==
+                                      QPDF_TRUE) &&
+            (strcmp(r, "2.0") == 0) &&
+            (length == 3));
     assert(qpdf_oh_get_type_code(qpdf, p_real) == ot_real);
     assert(strcmp(qpdf_oh_get_type_name(qpdf, p_real), "real") == 0);
     assert(qpdf_oh_is_string(qpdf, p_string) &&
            (strcmp(qpdf_oh_get_string_value(qpdf, p_string), "3\xf7") == 0) &&
            (strcmp(qpdf_oh_get_utf8_value(qpdf, p_string), "3\xc3\xb7") == 0) &&
            (strcmp(qpdf_oh_unparse_binary(qpdf, p_string), "<33f7>") == 0));
+    const char* str = "";
+    length = 0;
+    assert((qpdf_oh_get_value_as_string(qpdf, p_name, &str, &length) ==
+                                        QPDF_FALSE) &&
+            (strcmp(str, "") == 0) &&
+            (length == 0));
+    assert((qpdf_oh_get_value_as_string(qpdf, p_string, &str, &length) ==
+                                        QPDF_TRUE) &&
+            (strcmp(str, "3\xf7") == 0) &&
+            (length == 2));
+    const char* utf8 = "";
+    length = 0;
+    assert((qpdf_oh_get_value_as_utf8(qpdf, p_name, &utf8, &length) ==
+                                      QPDF_FALSE) &&
+            (strcmp(utf8, "") == 0) &&
+            (length == 0));
+    assert((qpdf_oh_get_value_as_utf8(qpdf, p_string, &utf8, &length) ==
+                                      QPDF_TRUE) &&
+            (strcmp(utf8, "3\xc3\xb7") == 0) &&
+            (length == 3));
     assert(qpdf_oh_get_type_code(qpdf, p_string) == ot_string);
     assert(! qpdf_oh_is_name_and_equals(qpdf, p_string, "3\xf7"));
     assert(strcmp(qpdf_oh_get_type_name(qpdf, p_string), "string") == 0);
@@ -709,8 +761,25 @@ static void test25(char const* infile,
     assert(strcmp(qpdf_oh_get_type_name(qpdf, p_null), "null") == 0);
     assert(qpdf_oh_is_bool(qpdf, p_bool) &&
            (qpdf_oh_get_bool_value(qpdf, p_bool) == QPDF_TRUE));
+    QPDF_BOOL b = QPDF_FALSE;
+    assert((qpdf_oh_get_value_as_bool(qpdf, p_int, &b) == QPDF_FALSE) &&
+            b == QPDF_FALSE);
+    assert((qpdf_oh_get_value_as_bool(qpdf, p_bool, &b) == QPDF_TRUE) &&
+            b == QPDF_TRUE);
+    assert((qpdf_oh_get_value_as_bool(qpdf, p_bool_f, &b) == QPDF_TRUE) &&
+            b == QPDF_FALSE);
     assert(qpdf_oh_get_type_code(qpdf, p_bool) == ot_boolean);
     assert(strcmp(qpdf_oh_get_type_name(qpdf, p_bool), "boolean") == 0);
+    const char* n = "";
+    length = 0;
+    assert((qpdf_oh_get_value_as_name(qpdf, p_string, &n, &length) ==
+                                      QPDF_FALSE) &&
+            (strcmp(n, "") == 0) &&
+            (length == 0));
+    assert((qpdf_oh_get_value_as_name(qpdf, p_name, &n, &length) ==
+                                      QPDF_TRUE) &&
+            (strcmp(n, "/Six") == 0) &&
+            (length == 4));
     qpdf_oh_erase_item(qpdf, parsed, 4);
     qpdf_oh_insert_item(
         qpdf, parsed, 2,

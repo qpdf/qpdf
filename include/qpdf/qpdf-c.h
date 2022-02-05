@@ -707,26 +707,50 @@ extern "C" {
 
     QPDF_DLL
     QPDF_BOOL qpdf_oh_get_bool_value(qpdf_data qpdf, qpdf_oh oh);
+    QPDF_DLL
+    QPDF_BOOL qpdf_oh_get_value_as_bool(
+        qpdf_data qpdf, qpdf_oh oh, QPDF_BOOL* value);
 
     QPDF_DLL
     long long qpdf_oh_get_int_value(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
+    QPDF_BOOL qpdf_oh_get_value_as_longlong(
+        qpdf_data qpdf, qpdf_oh oh, long long* value);
+    QPDF_DLL
     int qpdf_oh_get_int_value_as_int(qpdf_data qpdf, qpdf_oh oh);
+    QPDF_DLL
+    QPDF_BOOL qpdf_oh_get_value_as_int(
+        qpdf_data qpdf, qpdf_oh oh, int* value);
     QPDF_DLL
     unsigned long long qpdf_oh_get_uint_value(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
+    QPDF_BOOL qpdf_oh_get_value_as_ulonglong(
+        qpdf_data qpdf, qpdf_oh oh, unsigned long long* value);
+    QPDF_DLL
     unsigned int qpdf_oh_get_uint_value_as_uint(qpdf_data qpdf, qpdf_oh oh);
+    QPDF_DLL
+    QPDF_BOOL qpdf_oh_get_value_as_uint(
+        qpdf_data qpdf, qpdf_oh oh, unsigned int* value);
 
     QPDF_DLL
     char const* qpdf_oh_get_real_value(qpdf_data qpdf, qpdf_oh oh);
+    QPDF_DLL
+    QPDF_BOOL qpdf_oh_get_value_as_real(
+        qpdf_data qpdf, qpdf_oh oh, char const** value, size_t* length);
 
     QPDF_DLL
     QPDF_BOOL qpdf_oh_is_number(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
     double qpdf_oh_get_numeric_value(qpdf_data qpdf, qpdf_oh oh);
+    QPDF_DLL
+    QPDF_BOOL qpdf_oh_get_value_as_number(
+        qpdf_data qpdf, qpdf_oh oh, double* value);
 
     QPDF_DLL
     char const* qpdf_oh_get_name(qpdf_data qpdf, qpdf_oh oh);
+    QPDF_DLL
+    QPDF_BOOL qpdf_oh_get_value_as_name(
+        qpdf_data qpdf, qpdf_oh oh, char const** value, size_t* length);
 
     /* Return the length of the last string returned. This enables you
      * to retrieve the entire string for cases in which a char*
@@ -747,7 +771,13 @@ extern "C" {
     QPDF_DLL
     char const* qpdf_oh_get_string_value(qpdf_data qpdf, qpdf_oh oh);
     QPDF_DLL
+    QPDF_BOOL qpdf_oh_get_value_as_string(
+        qpdf_data qpdf, qpdf_oh oh, char const** value, size_t* length);
+    QPDF_DLL
     char const* qpdf_oh_get_utf8_value(qpdf_data qpdf, qpdf_oh oh);
+    QPDF_DLL
+    QPDF_BOOL qpdf_oh_get_value_as_utf8(
+        qpdf_data qpdf, qpdf_oh oh, char const** value, size_t* length);
     QPDF_DLL
     char const* qpdf_oh_get_binary_string_value(
         qpdf_data qpdf, qpdf_oh oh, size_t* length);
