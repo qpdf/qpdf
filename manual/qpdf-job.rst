@@ -14,7 +14,10 @@ executable is available from inside the C++ library using the
 
   - Use from the C++ API with ``QPDFJob::initializeFromArgv``
 
-  - Use from the C API with ``qpdfjob_run_from_argv`` from :file:`qpdfjob-c.h`
+  - Use from the C API with ``qpdfjob_run_from_argv`` from
+    :file:`qpdfjob-c.h`. If you are calling from a Windows-style main
+    and have an argv array of ``wchar_t``, you can use
+    ``qpdfjob_run_from_wide_argv``.
 
 - The job JSON file format
 
@@ -134,6 +137,13 @@ C++ code:
           }
           return 0;
       }
+
+Note the ``QPDFUsage`` exception above. This is thrown whenever a
+configuration error occurs. These exactly correspond to usage messages
+issued by the :command:`qpdf` CLI for things like omitting an output
+file, specifying `--pages` multiple times, or other invalid
+combinations of options. ``QPDFUsage`` is thrown by the argv and JSON
+interfaces as well as the native ``QPDFJob`` interface.
 
 It is also possible to mix and match command-line options and JSON
 from the CLI. For example, you could create a file called

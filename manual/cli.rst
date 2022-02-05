@@ -3154,7 +3154,10 @@ Related Options
    supported value is ``1``, but it's possible that a new JSON output
    version will be added in a future version. You can also specify
    ``latest`` to use the latest JSON version. For backward
-   compatibility, the default value is ``1``. Use the
+   compatibility, the default value will remain ``1`` until qpdf
+   version 11, after which point it will become ``latest``. In all
+   case, you can tell what version of the JSON output you have from
+   the ``"version"`` key in the output. Use the
    :qpdf:ref:`--json-help` option to get a description of the JSON
    object.
 

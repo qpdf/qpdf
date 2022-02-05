@@ -74,6 +74,7 @@
     "cxxflags",
     "cygwin",
     "dctdecode",
+    "decltype",
     "decrypter",
     "deduplicating",
     "deps",

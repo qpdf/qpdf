@@ -68,7 +68,7 @@
 	object.
 
 	* A light C API around basic QPDFJob functionality is in
-	include/qpdf/qpdf-job-c.h.p
+	include/qpdf/qpdfjob-c.h.p
 
 	* Add new functions version of QUtil::call_main_from_wmain that
 	takes a constant argv array.
@@ -79,10 +79,10 @@
 	description to --help and the manual.
 
 	* The --json flag now takes a version number as an optional
-	parameter. The default will remain version 1 for compatibility.
-	This enables future code to use --json=latest to always get the
-	latest version or to use a specific version. At this time, there's
-	only version 1, but a version 2 may appear in a future qpdf.
+	parameter. The default will remain version 1 for compatibility
+	until the release of qpdf 11, after which it will become "latest".
+	At this time, there's only version 1, but a version 2 may appear
+	in a future qpdf.
 
 2022-01-28  Jay Berkenbilt  <ejb@ql.org>
 

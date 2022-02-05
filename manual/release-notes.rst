@@ -6,6 +6,187 @@ Release Notes
 For a detailed list of changes, please see the file
 :file:`ChangeLog` in the source distribution.
 
+10.6.0: XXX
+  - Deprecations/future replacement of ``PointerHolder``
+
+    The next major release of qpdf will replace ``PointerHolder`` with
+    ``std::shared_ptr`` across all of qpdf's public API. In
+    preparation for this change, the following ``PointerHolder``
+    methods have been deprecated in favor of interfaces that more
+    closely match ``std::shared_ptr``:
+
+    - ``getPointer()`` -- use ``get()`` instead; this also fixes
+      ``const`` semantics as discussed in
+      :file:`include/qpdf/PointerHolder.hh`.
+
+    - ``getRefcount()`` -- use ``use_count()`` instead
+
+    If you build your code with deprecation warnings enabled and you
+    want to suppress these deprecation warnings for now, you can
+    ``#define NO_POINTERHOLDER_DEPRECATION`` before including any qpdf
+    header files. Code that does this will *require no changes* prior
+    to qpdf 11 and may or may not require changes after qpdf 11.
+
+    For a detailed discussion of this change and how to prepare for
+    it, see :ref:`smart-pointers`.
+
+  - Preparation for a new JSON output version
+
+    - The :qpdf:ref:`--json` option takes an optional parameter
+      indicating the version of the JSON output. At present, there is
+      only one JSON version (``1``), but there are plans for an
+      updated version in a coming release. Until the release of qpdf
+      11, the default value of ``--json`` is ``1`` for compatibility.
+      Once qpdf 11 is out, the default version will be ``latest``. If
+      you are depending on the exact format of ``--json`` for code,
+      you should start using ``--json=1`` in preparation.
+
+  - New QPDFJob API exposes CLI functionality
+
+    Prior to qpdf 10.6, a lot of the functionality implemented by the
+    qpdf CLI executable was built into the executable itself and not
+    available from the library. qpdf 10.6 introduces a new object,
+    ``QPDFJob``, that exposes all of the command-line functionality.
+    This includes a native ``QPDFJob`` API with fluent interfaces that
+    mirror the command-line syntax, a JSON syntax for specifying the
+    equivalent of a command-line invocation, and the ability to run a
+    qpdf "job" by passing a null-terminated array of qpdf command-line
+    options. The command-line argument array and JSON methods of
+    invoking ``QPDFJob`` are also exposed to the C API. For details,
+    see :ref:`qpdf-job`.
+
+  - Other Library Enhancements
+
+    - New ``QPDFObjectHandle`` literal syntax using C++'s user-defined
+      literal syntax. You can use
+
+      .. code-block:: c++
+
+         auto oh = "<</Some (valid) /PDF (object)>>"_qpdf;
+
+      to create a QPDFObjectHandle. It is a shorthand for
+      ``QPDFObjectHandle::parse``.
+
+    - Preprocessor symbols ``QPDF_MAJOR_VERSION``,
+      ``QPDF_MINOR_VERSION``, and ``QPDF_PATCH_VERSION`` are now
+      available and can be used to make it easier to write code that
+      supports multiple versions of qpdf. You don't have to include
+      any new header files to get these, which makes it possible to
+      write code like this:
+
+      .. code-block:: c++
+
+         #if !defined(QPDF_MAJOR_VERSION) || QPDF_MAJOR_VERSION < 11
+             // do something using qpdf 10 or older API
+         #else
+             // do something using qpdf 11 or newer API
+         #endif
+
+      Since this was introduced only in qpdf version 10.6.0, testing
+      for an undefined value of ``QPDF_MAJOR_VERSION`` is equivalent
+      to detecting a version prior to 10.6.0.
+
+      The symbol ``QPDF_VERSION`` is also defined as a string
+      containing the same version number that is returned by
+      ``QPDF::QPDFVersion``. Note that ``QPDF_VERSION`` may differ
+      from ``QPDF::QPDFVersion()`` if your header files and library
+      are out of sync with each other.
+
+    - The method ``QPDF::QPDFVersion`` and corresponding C API call
+      ``qpdf_get_qpdf_version`` are now both guaranteed to return a
+      reference (or pointer) to a static string, so you don't have to
+      copy these if you are using them in your software. They have
+      always returned static values. Now the fact that they return
+      static values is part of the API contract and can be safely
+      relied upon.
+
+    - New accessor methods for ``QPDFObjectHandle``. In addition to
+      the traditional ones, such as ``getIntValue``, ``getName``,
+      etc., there are a family of new accessors whose names are of the
+      form ``getValueAsX``. The difference in behavior is as follows:
+
+      - The older accessor methods, which will continue to be
+        supported, return the value of the object if it is the
+        expected type. Otherwise, they return a fallback value and
+        issue a warning.
+
+      - The newer accessor methods return a boolean indicating whether
+        or not the object is of the expected type. If it is, a
+        reference of the correct type is returned.
+
+      In many cases, the new interfaces will enable more compact code
+      and will also never generate type warnings. Thanks to M. Holger
+      for contributing these accessors. Search for ``getValueAs`` in
+      :file:`include/qpdf/QPDFObjectHandle.hh` for a complete list.
+
+      These are also exposed in the C API in functions whose names
+      start with ``qpdf_oh_get_value_as``.
+
+    - New convenience methods in ``QPDFObjectHandle``:
+      ``isDictionaryOfType``, ``isStreamOfType``, and
+      ``isNameAndEquals`` allow more compact querying of dictionaries.
+      Also added to the C API: ``qpdf_oh_is_dictionary_of_type`` and
+      ``qpdf_oh_is_name_and_equals``. Thanks to M. Holger for the
+      contribution.
+
+    - New functions added to ``QUtil``: ``make_shared_cstr`` and
+      ``make_unique_cstr`` copy ``std::string`` to
+      ``std::shared_ptr<char>`` and ``std::unique_ptr<char[]>``. These
+      are alternatives to the existing ``QUtil::copy_string`` function
+      which offer other ways to get a C string with safer memory
+      management.
+
+    - New function ``QUtil::file_can_be_opened`` tests to see whether
+      a file can actually be opened by attempting to open it and close
+      it again.
+
+    - There is a new version of ``QUtil::call_main_from_wmain`` that
+      takes a ``const`` argv array and calls a main that takes a
+      ``const`` argv array.
+
+    - ``QPDF::emptyPDF`` has been exposed to the C API as
+      ``qpdf_empty_pdf``. This makes it possible to create PDF from
+      scratch with the C API.
+
+    - New C API functions ``qpdf_oh_get_binary_utf8_value`` and
+      ``qpdf_oh_new_binary_unicode_string`` take length parameters,
+      which makes it possible to handle UTF-8-encoded C strings with
+      embedded NUL characters. Thanks to M. Holger for the
+      contribution.
+
+    - The ``JSON`` object in the qpdf library has been enhanced to
+      include a parser and the ability to get values out of the
+      ``JSON`` object. Previously it was a write-only interface. Even
+      so, qpdf's ``JSON`` object is not intended to be a
+      general-purpose JSON implementation as discussed in
+      :file:`include/qpdf/JSON.hh`.
+
+    - The ``JSON`` object's "schema" checking functionality now allows
+      for optional keys. Note that this "schema" functionality doesn't
+      conform to any type of standard. It's just there to help with
+      error reporting with qpdf's own JSON support.
+
+  - Documentation Enhancements
+
+    - Documentation for the command-line tool has been completely
+      rewritten. This includes a top-to-bottom rewrite of :ref:`using`
+      in the manual. Command-line arguments are now indexed, and
+      internal links can appear to them within the documentation.
+
+    - The output of ``qpdf --help`` is generated from the manual and
+      is divided into help topics that parallel the sections of the
+      manual. When you run ``qpdf --help``, instead of getting a Great
+      Wall of Text, you are given basic usage information and a list
+      of help topics. It is possible to request help for any
+      individual topic or any specific command-line option, or you can
+      get a dump of all available help text. The manual continues to
+      contain a greater level of detail and more examples.
+
+  - Bug Fixes
+
+    - Some characters were not correctly translated from PDF doc
+      encoding to Unicode.
+
 10.5.0: December 21, 2021
   - Packaging changes
 

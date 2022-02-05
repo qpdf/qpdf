@@ -9,15 +9,6 @@
   make qpdf more contributor-friendly. Look
   https://bestpractices.coreinfrastructure.org/en
 
-* Remember for release notes: starting in qpdf 11, the default value
-  for the --json keyword will be "latest". If you are depending on
-  version 1, change your code to specify --json=1, which works
-  starting with 10.6.0.
-
-* Write up something about preparing for the PointerHolder to
-  shared_ptr migration. Clearly document the deprecations and how to
-  deal with them.
-
 Output JSON v2
 ==============
 
@@ -331,6 +322,9 @@ Other notes:
 
 PointerHolder to std::shared_ptr
 ================================
+
+Remember to update the smart-pointers section of the manual in
+design.rst.
 
 Once all deprecation warnings are cleared up (changing getPointer() to
 get() and getRefcount() to use_count()), the only real issues are that
