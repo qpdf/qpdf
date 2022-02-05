@@ -1238,12 +1238,38 @@ QPDF_BOOL qpdf_oh_get_bool_value(qpdf_data qpdf, qpdf_oh oh)
         });
 }
 
+QPDF_BOOL qpdf_oh_get_value_as_bool(
+    qpdf_data qpdf, qpdf_oh oh, QPDF_BOOL* value)
+{
+    return do_with_oh<QPDF_BOOL>(
+        qpdf, oh, return_false, [value](QPDFObjectHandle& o) {
+            QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_value_as_bool");
+            bool v = *value;
+            QPDF_BOOL result = o.getValueAsBool(v);
+            if (result)
+            {
+                *value = v;
+            }
+            return result;
+        });
+}
+
 long long qpdf_oh_get_int_value(qpdf_data qpdf, qpdf_oh oh)
 {
     return do_with_oh<long long>(
         qpdf, oh, return_T<long long>(0LL), [](QPDFObjectHandle& o) {
             QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_int_value");
             return o.getIntValue();
+        });
+}
+
+QPDF_BOOL qpdf_oh_get_value_as_longlong(
+    qpdf_data qpdf, qpdf_oh oh, long long* value)
+{
+    return do_with_oh<QPDF_BOOL>(
+        qpdf, oh, return_false, [value](QPDFObjectHandle& o) {
+            QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_value_as_longlong");
+            return o.getValueAsInt(*value);
         });
 }
 
@@ -1256,6 +1282,16 @@ int qpdf_oh_get_int_value_as_int(qpdf_data qpdf, qpdf_oh oh)
         });
 }
 
+QPDF_BOOL qpdf_oh_get_value_as_int(
+    qpdf_data qpdf, qpdf_oh oh, int* value)
+{
+    return do_with_oh<QPDF_BOOL>(
+        qpdf, oh, return_false, [value](QPDFObjectHandle& o) {
+            QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_value_as_int");
+            return o.getValueAsInt(*value);
+        });
+}
+
 unsigned long long qpdf_oh_get_uint_value(qpdf_data qpdf, qpdf_oh oh)
 {
     return do_with_oh<unsigned long long>(
@@ -1265,12 +1301,32 @@ unsigned long long qpdf_oh_get_uint_value(qpdf_data qpdf, qpdf_oh oh)
         });
 }
 
+QPDF_BOOL qpdf_oh_get_value_as_ulonglong(
+    qpdf_data qpdf, qpdf_oh oh, unsigned long long* value)
+{
+    return do_with_oh<QPDF_BOOL>(
+        qpdf, oh, return_false, [value](QPDFObjectHandle& o) {
+            QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_value_as_ulonglong");
+            return o.getValueAsUInt(*value);
+        });
+}
+
 unsigned int qpdf_oh_get_uint_value_as_uint(qpdf_data qpdf, qpdf_oh oh)
 {
     return do_with_oh<unsigned int>(
         qpdf, oh, return_T<unsigned int>(0U), [](QPDFObjectHandle& o) {
             QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_uint_value_as_uint");
             return o.getUIntValueAsUInt();
+        });
+}
+
+QPDF_BOOL qpdf_oh_get_value_as_uint(
+    qpdf_data qpdf, qpdf_oh oh, unsigned int* value)
+{
+    return do_with_oh<QPDF_BOOL>(
+        qpdf, oh, return_false, [value](QPDFObjectHandle& o) {
+            QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_value_as_uint");
+            return o.getValueAsUInt(*value);
         });
 }
 
@@ -1284,12 +1340,38 @@ char const* qpdf_oh_get_real_value(qpdf_data qpdf, qpdf_oh oh)
         });
 }
 
+QPDF_BOOL qpdf_oh_get_value_as_real(
+    qpdf_data qpdf, qpdf_oh oh, char const** value, size_t* length)
+{
+    return do_with_oh<QPDF_BOOL>(
+        qpdf, oh, return_false, [qpdf, value, length](QPDFObjectHandle& o) {
+            QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_value_as_real");
+            auto result = o.getValueAsReal(qpdf->tmp_string);
+            if (result)
+            {
+                *value = qpdf->tmp_string.c_str();
+                *length = qpdf->tmp_string.length();
+            }
+            return result;
+        });
+}
+
 double qpdf_oh_get_numeric_value(qpdf_data qpdf, qpdf_oh oh)
 {
     return do_with_oh<double>(
         qpdf, oh, return_T<double>(0.0), [](QPDFObjectHandle& o) {
             QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_numeric_value");
             return o.getNumericValue();
+        });
+}
+
+QPDF_BOOL qpdf_oh_get_value_as_number(
+    qpdf_data qpdf, qpdf_oh oh, double* value)
+{
+    return do_with_oh<QPDF_BOOL>(
+        qpdf, oh, return_false, [value](QPDFObjectHandle& o) {
+            QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_value_as_number");
+            return o.getValueAsNumber(*value);
         });
 }
 
@@ -1303,6 +1385,22 @@ char const* qpdf_oh_get_name(qpdf_data qpdf, qpdf_oh oh)
         });
 }
 
+QPDF_BOOL qpdf_oh_get_value_as_name(
+    qpdf_data qpdf, qpdf_oh oh, char const** value, size_t* length)
+{
+    return do_with_oh<QPDF_BOOL>(
+        qpdf, oh, return_false, [qpdf, value, length](QPDFObjectHandle& o) {
+            QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_value_as_name");
+            auto result = o.getValueAsName(qpdf->tmp_string);
+            if (result)
+            {
+                *value = qpdf->tmp_string.c_str();
+                *length = qpdf->tmp_string.length();
+            }
+            return result;
+        });
+}
+
 char const* qpdf_oh_get_string_value(qpdf_data qpdf, qpdf_oh oh)
 {
     return do_with_oh<char const*>(
@@ -1313,6 +1411,22 @@ char const* qpdf_oh_get_string_value(qpdf_data qpdf, qpdf_oh oh)
         });
 }
 
+QPDF_BOOL qpdf_oh_get_value_as_string(
+    qpdf_data qpdf, qpdf_oh oh, char const** value, size_t* length)
+{
+    return do_with_oh<QPDF_BOOL>(
+        qpdf, oh, return_false, [qpdf, value, length](QPDFObjectHandle& o) {
+            QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_value_as_string");
+            auto result = o.getValueAsString(qpdf->tmp_string);
+            if (result)
+            {
+                *value = qpdf->tmp_string.c_str();
+                *length = qpdf->tmp_string.length();
+            }
+            return result;
+        });
+}
+
 char const* qpdf_oh_get_utf8_value(qpdf_data qpdf, qpdf_oh oh)
 {
     return do_with_oh<char const*>(
@@ -1320,6 +1434,22 @@ char const* qpdf_oh_get_utf8_value(qpdf_data qpdf, qpdf_oh oh)
             QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_utf8_value");
             qpdf->tmp_string = o.getUTF8Value();
             return qpdf->tmp_string.c_str();
+        });
+}
+
+QPDF_BOOL qpdf_oh_get_value_as_utf8(
+    qpdf_data qpdf, qpdf_oh oh, char const** value, size_t* length)
+{
+    return do_with_oh<QPDF_BOOL>(
+        qpdf, oh, return_false, [qpdf, value, length](QPDFObjectHandle& o) {
+            QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_value_as_utf8");
+            auto result = o.getValueAsUTF8(qpdf->tmp_string);
+            if (result)
+            {
+                *value = qpdf->tmp_string.c_str();
+                *length = qpdf->tmp_string.length();
+            }
+            return result;
         });
 }
 
