@@ -773,7 +773,7 @@ class QPDF
     friend class Pipe;
 
   private:
-    static std::string qpdf_version;
+    static std::string const qpdf_version;
 
     class ObjCache
     {

@@ -171,7 +171,9 @@ extern "C" {
     QPDF_DLL
     void qpdf_silence_errors(qpdf_data qpdf);
 
-    /* Returns the version of the qpdf software */
+    /* Returns the version of the qpdf software. This is guaranteed to
+     * be a static value.
+     */
     QPDF_DLL
     char const* qpdf_get_qpdf_version();
 

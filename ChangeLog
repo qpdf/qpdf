@@ -1,5 +1,8 @@
 2022-02-05  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add comments letting people know that the version string
+	returned by QPDF::QPDFVersion and qpdf_get_qpdf_version is static.
+
 	* Add QUtil::make_unique_cstr to return a std::unique_ptr<char[]>
 	as an alternative to QUtil::copy_string and
 	QUtil::make_shared_cstr.

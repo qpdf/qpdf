@@ -161,6 +161,7 @@ static QPDF_ERROR_CODE trap_errors(
 char const* qpdf_get_qpdf_version()
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_get_qpdf_version");
+    // The API guarantees that this is a static value.
     return QPDF::QPDFVersion().c_str();
 }
 

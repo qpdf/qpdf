@@ -26,7 +26,9 @@
 #include <qpdf/QPDF_Stream.hh>
 #include <qpdf/QPDF_Array.hh>
 
-std::string QPDF::qpdf_version(QPDF_VERSION);
+// This must be a fixed value. This API returns a const reference to
+// it, and the C API relies on its being static as well.
+std::string const QPDF::qpdf_version(QPDF_VERSION);
 
 static char const* EMPTY_PDF =
     "%PDF-1.3\n"
@@ -178,6 +180,7 @@ QPDF::StringDecrypter::decryptString(std::string& val)
 std::string const&
 QPDF::QPDFVersion()
 {
+    // The C API relies on this being a static value.
     return QPDF::qpdf_version;
 }
 
