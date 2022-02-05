@@ -678,6 +678,8 @@ class QPDFObjectHandle
     // Methods for bool objects
     QPDF_DLL
     bool getBoolValue();
+    QPDF_DLL
+    bool getValueAsBool(bool&);
 
     // Methods for integer objects. Note: if an integer value is too
     // big (too far away from zero in either direction) to fit in the
@@ -688,29 +690,46 @@ class QPDFObjectHandle
     QPDF_DLL
     long long getIntValue();
     QPDF_DLL
+    bool getValueAsInt(long long&);
+    QPDF_DLL
     int getIntValueAsInt();
+    QPDF_DLL
+    bool getValueAsInt(int&);
     QPDF_DLL
     unsigned long long getUIntValue();
     QPDF_DLL
+    bool getValueAsUInt(unsigned long long&);
+    QPDF_DLL
     unsigned int getUIntValueAsUInt();
+    QPDF_DLL
+    bool getValueAsUInt(unsigned int&);
 
     // Methods for real objects
     QPDF_DLL
     std::string getRealValue();
+    QPDF_DLL
+    bool getValueAsReal(std::string&);
 
     // Methods that work for both integer and real objects
     QPDF_DLL
     bool isNumber();
     QPDF_DLL
     double getNumericValue();
+    QPDF_DLL
+    bool getValueAsNumber(double&);
 
     // Methods for name objects; see also name and array objects
     QPDF_DLL
     std::string getName();
+    QPDF_DLL
+    bool getValueAsName(std::string&);
 
     // Methods for string objects
     QPDF_DLL
     std::string getStringValue();
+    QPDF_DLL
+    bool getValueAsString(std::string&);
+
     // If a string starts with the UTF-16 marker, it is converted from
     // UTF-16 to UTF-8. Otherwise, it is treated as a string encoded
     // with PDF Doc Encoding. PDF Doc Encoding is identical to
@@ -720,12 +739,18 @@ class QPDFObjectHandle
     // unmapped.
     QPDF_DLL
     std::string getUTF8Value();
+    QPDF_DLL
+    bool getValueAsUTF8(std::string&);
 
     // Methods for content stream objects
     QPDF_DLL
     std::string getOperatorValue();
     QPDF_DLL
+    bool getValueAsOperator(std::string&);
+    QPDF_DLL
     std::string getInlineImageValue();
+    QPDF_DLL
+    bool getValueAsInlineImage(std::string&);
 
     // Methods for array objects; see also name and array objects.
 
