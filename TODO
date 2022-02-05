@@ -1,13 +1,79 @@
 10.6
 ====
 
-* Consider doing one big commit to reformat the entire codebase using
-  clang-format or a similar tool. Consider using blame.ignoreRevsFile
-  or similar (or otherwise study git blame to see how to minimize the
-  impact of such a change). A good time to do this would be before
-  10.6 since there is so much refactoring going on. In general, try to
-  make qpdf more contributor-friendly. Look
-  https://bestpractices.coreinfrastructure.org/en
+* https://github.com/qpdf/qpdf/issues/610
+
+Next
+====
+
+Priorities (could be for 10.x)
+* code formatting
+* json v2
+
+Priorities for 11:
+* PointerHolder -> shared_ptr
+* ABI
+
+Soon: Break ground on "Document-level work"
+
+Code Formatting
+===============
+
+It would be good to have automatic code formatting to make the code
+more consistent and to make it easier for contributors. We would do a
+big commit to bring everything up to spec. Things to keep in mind:
+
+* clang-format looks promising but is a bit of a moving target; need
+  to see if its output has been stable over the past few releases
+  since the first one that can produce code the way I like it
+
+* Try to match closely to what I have. At a minimum:
+
+  * 80 columns
+
+  * 4-space indent (no tabs)
+
+  * Probably want to stick with braces on separate lines to minimize
+    impact, but might consider braces on separate lines for classes
+    and functions with compact braces for flow control and exception
+    handling since that seems to be more popular these days
+
+  * No "bin packing" -- if arguments (constructor initializers,
+    function arguments, etc.) don't fit on one line, do one argument
+    per line
+
+  * With the exception of short lambdas, no block constructs can be
+    collapsed to a single line.
+
+  * Braces are mandatory for all control constructs (no if, while,
+    etc. without braces)
+
+  * Space after control constructs
+
+* Try to get emacs c-style to match as closely as possible
+
+* Consider blame.ignoreRevsFile if it seems to help
+
+* See also https://bestpractices.coreinfrastructure.org/en
+
+* QTC::TC first two arguments have to be lexically on one line. If the
+  code formatter breaks this, some QTC calls may have to be surrounded by
+
+  // clang-format off
+  // clang-format on
+
+  or qtest may have to be made more flexible unless the formatter has
+  some rules about some places where lines shouldn't be broken.
+
+* auto_* files from generate_auto_job should be exempt from
+  formatting.
+
+Ideally it should be possible to run formatting in CI so that pull
+requests have to be properly formatting, but if not, there needs to be
+a `make format` similar to `make spell` that I could apply after
+merging contributions and from time to time.
+
+A .clang-format file can be created at the top of the repository.
 
 Output JSON v2
 ==============
@@ -319,7 +385,6 @@ Other notes:
   way that works for the qpdf/qpdf repository as well since they are
   very similar.
 
-
 PointerHolder to std::shared_ptr
 ================================
 
@@ -352,7 +417,6 @@ Also remember
 auto x = std::shared_ptr(new T[5], std::default_delete<T[]>())
 vs.
 auto x = std::make_unique<T[]>(5)
-
 
 PointerHolder in public API:
 
@@ -400,7 +464,6 @@ Strategy:
 At that point, we're in a good state to make that compatibility
 basically works. Then we can proceed to remove PointerHolder from
 everything else.
-
 
 ABI Changes
 ===========
