@@ -1479,12 +1479,17 @@ class QPDFObjectHandle::QPDFDictItems
     QPDF_DLL
     QPDFDictItems(QPDFObjectHandle const& oh);
 
-    class iterator: public std::iterator<
-        std::bidirectional_iterator_tag,
-        std::pair<std::string, QPDFObjectHandle>>
+    class iterator
     {
         friend class QPDFDictItems;
       public:
+        typedef std::pair<std::string, QPDFObjectHandle> T;
+        using iterator_category = std::bidirectional_iterator_tag;
+        using value_type = T;
+        using difference_type = long;
+        using pointer = T*;
+        using reference = T&;
+
         QPDF_DLL
         virtual ~iterator() = default;
         QPDF_DLL
@@ -1569,12 +1574,17 @@ class QPDFObjectHandle::QPDFArrayItems
     QPDF_DLL
     QPDFArrayItems(QPDFObjectHandle const& oh);
 
-    class iterator: public std::iterator<
-        std::bidirectional_iterator_tag,
-        QPDFObjectHandle>
+    class iterator
     {
         friend class QPDFArrayItems;
       public:
+        typedef QPDFObjectHandle T;
+        using iterator_category = std::bidirectional_iterator_tag;
+        using value_type = T;
+        using difference_type = long;
+        using pointer = T*;
+        using reference = T&;
+
         QPDF_DLL
         virtual ~iterator() = default;
         QPDF_DLL

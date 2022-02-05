@@ -96,12 +96,17 @@ class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
     bool findObjectAtOrBelow(numtree_number idx, QPDFObjectHandle& oh,
                              numtree_number& offset);
 
-    class iterator: public std::iterator<
-        std::bidirectional_iterator_tag,
-        std::pair<numtree_number, QPDFObjectHandle>>
+    class iterator
     {
         friend class QPDFNumberTreeObjectHelper;
       public:
+        typedef std::pair<numtree_number, QPDFObjectHandle> T;
+        using iterator_category = std::bidirectional_iterator_tag;
+        using value_type = T;
+        using difference_type = long;
+        using pointer = T*;
+        using reference = T&;
+
         virtual ~iterator() = default;
         QPDF_DLL
         bool valid() const;

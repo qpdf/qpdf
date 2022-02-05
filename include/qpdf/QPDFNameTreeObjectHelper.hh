@@ -77,12 +77,17 @@ class QPDFNameTreeObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     bool findObject(std::string const& utf8, QPDFObjectHandle& oh);
 
-    class iterator: public std::iterator<
-        std::bidirectional_iterator_tag,
-        std::pair<std::string, QPDFObjectHandle>>
+    class iterator
     {
         friend class QPDFNameTreeObjectHelper;
       public:
+        typedef std::pair<std::string, QPDFObjectHandle> T;
+        using iterator_category = std::bidirectional_iterator_tag;
+        using value_type = T;
+        using difference_type = long;
+        using pointer = T*;
+        using reference = T&;
+
         virtual ~iterator() = default;
         QPDF_DLL
         bool valid() const;

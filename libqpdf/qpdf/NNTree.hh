@@ -17,12 +17,17 @@ class NNTreeDetails
 };
 
 class NNTreeImpl;
-class NNTreeIterator: public std::iterator<
-    std::bidirectional_iterator_tag,
-    std::pair<QPDFObjectHandle, QPDFObjectHandle>>
+class NNTreeIterator
 {
     friend class NNTreeImpl;
   public:
+    typedef std::pair<QPDFObjectHandle, QPDFObjectHandle> T;
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = T;
+    using difference_type = long;
+    using pointer = T*;
+    using reference = T&;
+
     virtual ~NNTreeIterator() = default;
     bool valid() const;
     NNTreeIterator& operator++();
