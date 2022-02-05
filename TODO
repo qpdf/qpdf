@@ -11,9 +11,6 @@
 
 * QPDFObjectHandle: getValueAsX methods, getKeyIfDict. Plus C API.
 
-* Add user-defined initializer `QPDFObjectHandle operator ""_qpdf` to
-  be like QPDFObjectHandle::parse: `auto oh = "<< /a (b) >>"_qpdf;`
-
 * See if this has been done or is trivial with C++11 local static
   initializers: Secure random number generation could be made more
   efficient by using a local static to ensure a single random device

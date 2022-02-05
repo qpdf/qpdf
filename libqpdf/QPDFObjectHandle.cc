@@ -3666,3 +3666,10 @@ QPDFObjectHandle::QPDFArrayItems::end()
 {
     return iterator(oh, false);
 }
+
+QPDFObjectHandle
+operator ""_qpdf(char const* v, size_t len)
+{
+    return QPDFObjectHandle::parse(
+        std::string(v, len), "QPDFObjectHandle literal");
+}

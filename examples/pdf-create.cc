@@ -182,12 +182,11 @@ void add_page(QPDFPageDocumentHelper& dh, QPDFObjectHandle font,
     size_t width = p->getWidth();
     size_t height = p->getHeight();
     QPDFObjectHandle image = QPDFObjectHandle::newStream(&pdf);
-    image.replaceDict(QPDFObjectHandle::parse(
-                          "<<"
-                          " /Type /XObject"
-                          " /Subtype /Image"
-                          " /BitsPerComponent 8"
-                          ">>"));
+    image.replaceDict("<<"
+                      " /Type /XObject"
+                      " /Subtype /Image"
+                      " /BitsPerComponent 8"
+                      ">>"_qpdf);
     QPDFObjectHandle image_dict = image.getDict();
     image_dict.replaceKey("/ColorSpace", newName(color_space));
     image_dict.replaceKey("/Width", newInteger(width));
@@ -199,8 +198,7 @@ void add_page(QPDFPageDocumentHelper& dh, QPDFObjectHandle font,
                             QPDFObjectHandle::newNull());
 
     // Create direct objects as needed by the page dictionary.
-    QPDFObjectHandle procset = QPDFObjectHandle::parse(
-        "[/PDF /Text /ImageC]");
+    QPDFObjectHandle procset = "[/PDF /Text /ImageC]"_qpdf;
 
     QPDFObjectHandle rfont = QPDFObjectHandle::newDictionary();
     rfont.replaceKey("/F1", font);
@@ -384,14 +382,13 @@ static void create_pdf(char const* filename)
     // Add an indirect object to contain a font descriptor for the
     // built-in Helvetica font.
     QPDFObjectHandle font = pdf.makeIndirectObject(
-        QPDFObjectHandle::parse(
-            "<<"
-            " /Type /Font"
-            " /Subtype /Type1"
-            " /Name /F1"
-            " /BaseFont /Helvetica"
-            " /Encoding /WinAnsiEncoding"
-            ">>"));
+        "<<"
+        " /Type /Font"
+        " /Subtype /Type1"
+        " /Name /F1"
+        " /BaseFont /Helvetica"
+        " /Encoding /WinAnsiEncoding"
+        ">>"_qpdf);
 
     std::vector<std::string> color_spaces;
     color_spaces.push_back("/DeviceCMYK");

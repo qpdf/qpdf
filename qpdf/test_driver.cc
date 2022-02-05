@@ -1255,10 +1255,8 @@ static void test_31(QPDF& pdf, char const* arg2)
 {
     // Test object parsing from a string.  The input file is not used.
 
-    QPDFObjectHandle o1 =
-        QPDFObjectHandle::parse(
-            "[/name 16059 3.14159 false\n"
-            " << /key true /other [ (string1) (string2) ] >> null]");
+    auto o1 = "[/name 16059 3.14159 false\n"
+        " << /key true /other [ (string1) (string2) ] >> null]"_qpdf;
     std::cout << o1.unparse() << std::endl;
     QPDFObjectHandle o2 = QPDFObjectHandle::parse("   12345 \f  ");
     assert(o2.isInteger() && (o2.getIntValue() == 12345));

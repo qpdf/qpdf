@@ -161,8 +161,7 @@ QPDFPageDocumentHelper::flattenAnnotationsForPage(
                 name, rotate, required_flags, forbidden_flags);
             if (! content.empty())
             {
-                resources.mergeResources(
-                    QPDFObjectHandle::parse("<< /XObject << >> >>"));
+                resources.mergeResources("<< /XObject << >> >>"_qpdf);
                 resources.getKey("/XObject").replaceKey(name, as);
                 ++next_fx;
             }

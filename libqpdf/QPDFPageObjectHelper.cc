@@ -500,8 +500,7 @@ QPDFPageObjectHelper::externalizeInlineImages(size_t min_size, bool shallow)
         QPDFObjectHandle resources = getAttribute("/Resources", true);
         // Calling mergeResources also ensures that /XObject becomes
         // direct and is not shared with other pages.
-        resources.mergeResources(
-            QPDFObjectHandle::parse("<< /XObject << >> >>"));
+        resources.mergeResources("<< /XObject << >> >>"_qpdf);
         InlineImageTracker iit(this->oh.getOwningQPDF(), min_size, resources);
         Pl_Buffer b("new page content");
         bool filtered = false;

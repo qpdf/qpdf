@@ -395,7 +395,7 @@ class QPDFObjectHandle
     // object syntax (obj gen R) will cause a logic_error exception to
     // be thrown.  If object_description is provided, it will appear
     // in the message of any QPDFExc exception thrown for invalid
-    // syntax.
+    // syntax. See also the global `operator ""_qpdf` defined below.
     QPDF_DLL
     static QPDFObjectHandle parse(std::string const& object_str,
                                   std::string const& object_description = "");
@@ -1449,6 +1449,17 @@ class QPDFObjectHandle
     PointerHolder<QPDFObject> obj;
     bool reserved;
 };
+
+#ifndef QPDF_NO_QPDF_STRING
+// This is short for QPDFObjectHandle::parse, so you can do
+
+// auto oh = "<< /Key (value) >>"_qpdf;
+
+// If this is causing problems in your code, define
+// QPDF_NO_QPDF_STRING to prevent the declaration from being here.
+QPDF_DLL
+QPDFObjectHandle operator ""_qpdf(char const* v, size_t len);
+#endif // QPDF_NO_QPDF_STRING
 
 class QPDFObjectHandle::QPDFDictItems
 {

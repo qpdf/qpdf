@@ -58,8 +58,7 @@ QPDFNumberTreeObjectHelper
 QPDFNumberTreeObjectHelper::newEmpty(QPDF& qpdf, bool auto_repair)
 {
     return QPDFNumberTreeObjectHelper(
-        qpdf.makeIndirectObject(
-            QPDFObjectHandle::parse("<< /Nums [] >>")), qpdf, auto_repair);
+        qpdf.makeIndirectObject("<< /Nums [] >>"_qpdf), qpdf, auto_repair);
 }
 
 QPDFNumberTreeObjectHelper::iterator::iterator(

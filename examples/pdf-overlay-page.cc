@@ -65,8 +65,7 @@ static void stamp_page(char const* infile,
             // Append the content to the page's content. Surround the
             // original content with q...Q to the new content from the
             // page's original content.
-            resources.mergeResources(
-                QPDFObjectHandle::parse("<< /XObject << >> >>"));
+            resources.mergeResources("<< /XObject << >> >>"_qpdf);
             resources.getKey("/XObject").replaceKey(name, stamp_fo);
             ph.addPageContents(
                 QPDFObjectHandle::newStream(&inpdf, "q\n"), true);

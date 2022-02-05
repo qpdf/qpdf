@@ -1,5 +1,11 @@
 2022-02-05  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add a global user-defined string literal "_qpdf" as a shorthand
+	for QPDFObjectHandle::parse, allowing you to create
+	QPDFObjectHandle objects with
+
+	QPDFObjectHandle oh = "<</Some (PDF)>>"_qpdf;
+
 	* Expose QPDF::emptyPDF to the C API as qpdf_empty_pdf()
 
 	* Add comments letting people know that the version string

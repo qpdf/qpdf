@@ -2281,8 +2281,7 @@ QPDFJob::doUnderOverlayForPage(
             from_page, cm, dest_afdh, make_afdh(from_page));
         if (! new_content.empty())
         {
-            resources.mergeResources(
-                QPDFObjectHandle::parse("<< /XObject << >> >>"));
+            resources.mergeResources("<< /XObject << >> >>"_qpdf);
             auto xobject = resources.getKey("/XObject");
             if (xobject.isDictionary())
             {
