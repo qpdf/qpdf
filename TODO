@@ -344,7 +344,7 @@ PointerHolder to std::shared_ptr
 ================================
 
 Once all deprecation warnings are cleared up (changing getPointer() to
-get() and getRefcout() to use_count()), the only real issues are that
+get() and getRefcount() to use_count()), the only real issues are that
 implicit assignment of a pointer to a shared_ptr doesn't work while it
 does for PointerHolder and containers are different. Using auto takes
 care of containers.
@@ -402,7 +402,7 @@ Strategy:
 * Replace each public API one at a time
 * Replace remaining internal uses; sometimes unique_ptr may be good,
   particularly for temporary strings that are deleted in the same
-  scope and Members for non-copiable classes
+  scope and Members for non-copyable classes
 * std::shared_ptr<Members> m can be replaced with
   std::shared_ptr<Members> m_ph and Members* m if performance is critical
 * Remove #include <PointerHolder.hh> from all headers
