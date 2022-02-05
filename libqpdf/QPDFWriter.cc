@@ -1919,7 +1919,7 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
 	    }
 	    else
 	    {
-		auto tmp_ph = QUtil::make_shared_cstr(val);
+		auto tmp_ph = QUtil::make_unique_cstr(val);
                 char* tmp = tmp_ph.get();
 		size_t vlen = val.length();
 		RC4 rc4(QUtil::unsigned_char_pointer(this->m->cur_data_key),

@@ -23,6 +23,7 @@ one
 7
 compare okay
 compare okay
+compare okay
 -2147483648 to int: PASSED
 2147483647 to int: PASSED
 2147483648 to int threw (integer out of range converting 2147483648 from a 8-byte signed type to a 4-byte signed type): PASSED

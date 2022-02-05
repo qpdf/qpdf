@@ -150,9 +150,18 @@ void string_conversion_test()
 	std::cout << "compare failed" << std::endl;
     }
     delete [] tmp;
-    // Also test with make_shared_cstr
+    // Also test with make_shared_cstr and make_unique_cstr
     auto tmp2 = QUtil::make_shared_cstr(embedded_null);
     if (memcmp(tmp2.get(), embedded_null.c_str(), 7) == 0)
+    {
+	std::cout << "compare okay" << std::endl;
+    }
+    else
+    {
+	std::cout << "compare failed" << std::endl;
+    }
+    auto tmp3 = QUtil::make_unique_cstr(embedded_null);
+    if (memcmp(tmp3.get(), embedded_null.c_str(), 7) == 0)
     {
 	std::cout << "compare okay" << std::endl;
     }
@@ -417,7 +426,7 @@ void transcoding_test()
 
 void print_whoami(char const* str)
 {
-    auto dup = QUtil::make_shared_cstr(str);
+    auto dup = QUtil::make_unique_cstr(str);
     std::cout << QUtil::getWhoami(dup.get()) << std::endl;
 }
 

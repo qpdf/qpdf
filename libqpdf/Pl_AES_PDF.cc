@@ -25,9 +25,7 @@ Pl_AES_PDF::Pl_AES_PDF(char const* identifier, Pipeline* next,
     use_specified_iv(false),
     disable_padding(false)
 {
-    this->key = std::unique_ptr<unsigned char[]>(
-        new unsigned char[key_bytes],
-        std::default_delete<unsigned char[]>());
+    this->key = std::make_unique<unsigned char[]>(key_bytes);
     std::memcpy(this->key.get(), key, key_bytes);
     std::memset(this->inbuf, 0, this->buf_size);
     std::memset(this->outbuf, 0, this->buf_size);

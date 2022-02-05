@@ -20,7 +20,7 @@ QPDFArgParser::Members::Members(
     option_table(nullptr),
     final_check_handler(nullptr)
 {
-    auto tmp = QUtil::make_shared_cstr(argv[0]);
+    auto tmp = QUtil::make_unique_cstr(argv[0]);
     char* p = QUtil::getWhoami(tmp.get());
     // Remove prefix added by libtool for consistency during testing.
     if (strncmp(p, "lt-", 3) == 0)

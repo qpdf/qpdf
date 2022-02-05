@@ -19,12 +19,8 @@ AES_PDF_native::AES_PDF_native(bool encrypt, unsigned char const* key,
     nrounds(0)
 {
     size_t keybits = 8 * key_bytes;
-    this->key = std::unique_ptr<unsigned char[]>(
-        new unsigned char[key_bytes],
-        std::default_delete<unsigned char[]>());
-    this->rk = std::unique_ptr<uint32_t[]>(
-        new uint32_t[RKLENGTH(keybits)],
-        std::default_delete<uint32_t[]>());
+    this->key = std::make_unique<unsigned char[]>(key_bytes);
+    this->rk = std::make_unique<uint32_t[]>(RKLENGTH(keybits));
     size_t rk_bytes = RKLENGTH(keybits) * sizeof(uint32_t);
     std::memcpy(this->key.get(), key, key_bytes);
     std::memset(this->rk.get(), 0, rk_bytes);

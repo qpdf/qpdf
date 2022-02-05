@@ -1,6 +1,9 @@
 10.6
 ====
 
+* Expose emptyPDF to the C API. Ensure that qpdf_get_qpdf_version is
+  always static.
+
 * Consider doing one big commit to reformat the entire codebase using
   clang-format or a similar tool. Consider using blame.ignoreRevsFile
   or similar (or otherwise study git blame to see how to minimize the
@@ -363,6 +366,13 @@ auto x_ph = std::make_shared<X>(); X* x = x_ph.get();
 
 Derived* x = new Derived(); PointerHolder<Base> x_ph(x) -->
 Derived* x = new Derived(); auto x_ph = std::shared_pointer<Base>(x);
+
+Also remember
+
+auto x = std::shared_ptr(new T[5], std::default_delete<T[]>())
+vs.
+auto x = std::make_unique<T[]>(5)
+
 
 PointerHolder in public API:
 

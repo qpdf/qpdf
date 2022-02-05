@@ -161,6 +161,10 @@ namespace QUtil
     QPDF_DLL
     std::shared_ptr<char> make_shared_cstr(std::string const&);
 
+    // Copy string as a unique_ptr to an array.
+    QPDF_DLL
+    std::unique_ptr<char[]> make_unique_cstr(std::string const&);
+
     // Returns lower-case hex-encoded version of the string, treating
     // each character in the input string as unsigned.  The output
     // string will be twice as long as the input string.

@@ -744,6 +744,16 @@ QUtil::make_shared_cstr(std::string const& str)
     return result;
 }
 
+std::unique_ptr<char[]>
+QUtil::make_unique_cstr(std::string const& str)
+{
+    auto result = std::make_unique<char[]>(str.length() + 1);
+    // Use memcpy in case string contains nulls
+    result.get()[str.length()] = '\0';
+    memcpy(result.get(), str.c_str(), str.length());
+    return result;
+}
+
 std::string
 QUtil::hex_encode(std::string const& input)
 {
@@ -2625,7 +2635,7 @@ call_main_from_wmain(bool, int argc, wchar_t const* const argv[],
     // other systems. That way the rest of qpdf.cc can just act like
     // arguments are UTF-8.
 
-    std::vector<std::shared_ptr<char>> utf8_argv;
+    std::vector<std::unique_ptr<char[]>> utf8_argv;
     for (int i = 0; i < argc; ++i)
     {
         std::string utf16;
@@ -2638,11 +2648,9 @@ call_main_from_wmain(bool, int argc, wchar_t const* const argv[],
                              QIntC::to_uchar(codepoint & 0xff)));
         }
         std::string utf8 = QUtil::utf16_to_utf8(utf16);
-        utf8_argv.push_back(QUtil::make_shared_cstr(utf8));
+        utf8_argv.push_back(QUtil::make_unique_cstr(utf8));
     }
-    auto utf8_argv_sp =
-        std::shared_ptr<char*>(
-            new char*[1+utf8_argv.size()], std::default_delete<char*[]>());
+    auto utf8_argv_sp = std::make_unique<char*[]>(1+utf8_argv.size());
     char** new_argv = utf8_argv_sp.get();
     for (size_t i = 0; i < utf8_argv.size(); ++i)
     {

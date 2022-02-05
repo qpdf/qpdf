@@ -9,7 +9,7 @@
 
 int qpdfjob_run_from_argv(char const* const argv[])
 {
-    auto whoami_p = QUtil::make_shared_cstr(argv[0]);
+    auto whoami_p = QUtil::make_unique_cstr(argv[0]);
     auto whoami = QUtil::getWhoami(whoami_p.get());
     QUtil::setLineBuf(stdout);
 

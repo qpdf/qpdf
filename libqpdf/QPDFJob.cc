@@ -3379,7 +3379,7 @@ QPDFJob::setEncryptionOptions(QPDF& pdf, QPDFWriter& w)
 static void parse_version(std::string const& full_version_string,
                           std::string& version, int& extension_level)
 {
-    auto vp = QUtil::make_shared_cstr(full_version_string);
+    auto vp = QUtil::make_unique_cstr(full_version_string);
     char* v = vp.get();
     char* p1 = strchr(v, '.');
     char* p2 = (p1 ? strchr(1 + p1, '.') : 0);

@@ -1,3 +1,9 @@
+2022-02-05  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add QUtil::make_unique_cstr to return a std::unique_ptr<char[]>
+	as an alternative to QUtil::copy_string and
+	QUtil::make_shared_cstr.
+
 2022-02-04  Jay Berkenbilt  <ejb@ql.org>
 
 	* New preprocessor symbols QPDF_MAJOR_VERSION, QPDF_MINOR_VERSION,

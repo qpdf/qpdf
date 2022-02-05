@@ -1211,7 +1211,7 @@ QPDF::decryptString(std::string& str, int objid, int generation)
 	    size_t vlen = str.length();
 	    // Using PointerHolder guarantees that tmp will
 	    // be freed even if rc4.process throws an exception.
-	    auto tmp = QUtil::make_shared_cstr(str);
+	    auto tmp = QUtil::make_unique_cstr(str);
 	    RC4 rc4(QUtil::unsigned_char_pointer(key), toI(key.length()));
 	    rc4.process(QUtil::unsigned_char_pointer(tmp.get()), vlen);
 	    str = std::string(tmp.get(), vlen);
