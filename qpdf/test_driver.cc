@@ -3220,6 +3220,99 @@ static void test_84(QPDF& pdf, char const* arg2)
     }
 }
 
+static void test_85(QPDF& pdf, char const* arg2)
+{
+    // Test QPDFObjectHandle::getValueAs... accessors
+
+    auto oh_b = QPDFObjectHandle::newBool(false);
+    auto oh_i = QPDFObjectHandle::newInteger(1);
+    auto oh_i_maxplus =
+        QPDFObjectHandle::newInteger(QIntC::to_longlong(INT_MAX) + 1LL);
+    auto oh_i_umaxplus =
+        QPDFObjectHandle::newInteger(QIntC::to_longlong(UINT_MAX) + 1LL);
+    auto oh_i_minminus =
+        QPDFObjectHandle::newInteger(QIntC::to_longlong(INT_MIN) - 1LL);
+    auto oh_i_neg = QPDFObjectHandle::newInteger(-1);
+    auto oh_r = QPDFObjectHandle::newReal("42.0");
+    auto oh_n = QPDFObjectHandle::newName("/Test");
+    auto oh_s = QPDFObjectHandle::newString("/Test");
+    auto oh_o = QPDFObjectHandle::newOperator("/Test");
+    auto oh_ii = QPDFObjectHandle::newInlineImage("/Test");
+
+    bool b = true;
+    assert(oh_b.getValueAsBool(b));
+    assert(! b);
+    assert(! oh_i.getValueAsBool(b));
+    assert(! b);
+    long long li = 0LL;
+    assert(oh_i.getValueAsInt(li));
+    assert(li == 1LL);
+    assert(! oh_b.getValueAsInt(li));
+    assert(li == 1LL);
+    int i = 0;
+    assert(oh_i.getValueAsInt(i));
+    assert(i == 1);
+    assert(! oh_b.getValueAsInt(i));
+    assert(i == 1);
+    assert(oh_i_maxplus.getValueAsInt(i));
+    assert(i == INT_MAX);
+    assert(oh_i_minminus.getValueAsInt(i));
+    assert(i == INT_MIN);
+    unsigned long long uli = 0U;
+    assert(oh_i.getValueAsUInt(uli));
+    assert(uli == 1u);
+    assert(! oh_b.getValueAsUInt(uli));
+    assert(uli == 1u);
+    assert(oh_i_neg.getValueAsUInt(uli));
+    assert(uli == 0u);
+    unsigned int ui = 0U;
+    assert(oh_i.getValueAsUInt(ui));
+    assert(ui == 1u);
+    assert(! oh_b.getValueAsUInt(ui));
+    assert(ui == 1u);
+    assert(oh_i_neg.getValueAsUInt(ui));
+    assert(ui == 0u);
+    assert(oh_i_umaxplus.getValueAsUInt(ui));
+    assert(ui == UINT_MAX);
+    std::string s = "0";
+    assert(oh_r.getValueAsReal(s));
+    assert(s == "42.0");
+    assert(! oh_i.getValueAsReal(s));
+    assert(s == "42.0");
+    double num = 0.0;
+    assert(oh_i.getValueAsNumber(num));
+    assert(abs(num - 1.0) < 1e-100);
+    assert(oh_r.getValueAsNumber(num));
+    assert(abs(num - 42.0) < 1e-100);
+    assert(! oh_b.getValueAsNumber(num));
+    assert(abs(num - 42.0) < 1e-100);
+    s = "";
+    assert(oh_n.getValueAsName(s));
+    assert(s == "/Test") ;
+    assert(! oh_r.getValueAsName(s));
+    assert(s == "/Test");
+    s = "";
+    assert(oh_s.getValueAsUTF8(s));
+    assert(s == "/Test");
+    assert(! oh_r.getValueAsUTF8(s));
+    assert(s == "/Test");
+    s = "";
+    assert(oh_s.getValueAsUTF8(s));
+    assert(s == "/Test");
+    assert(! oh_r.getValueAsUTF8(s));
+    assert(s == "/Test");
+    s = "";
+    assert(oh_o.getValueAsOperator(s));
+    assert(s == "/Test");
+    assert(! oh_r.getValueAsOperator(s));
+    assert(s == "/Test");
+    s = "";
+    assert(oh_ii.getValueAsInlineImage(s));
+    assert(s == "/Test");
+    assert(! oh_r.getValueAsInlineImage(s));
+    assert(s == "/Test");
+}
+
 void runtest(int n, char const* filename1, char const* arg2)
 {
     // Most tests here are crafted to work on specific files.  Look at
@@ -3286,7 +3379,7 @@ void runtest(int n, char const* filename1, char const* arg2)
 	pdf.processMemoryFile((std::string(filename1) + ".pdf").c_str(),
                               p, size);
     }
-    else if ((n == 61) || (n == 81) || (n == 83) || (n == 84))
+    else if ((n == 61) || (n == 81) || (n == 83) || (n == 84) || (n == 85))
     {
         // Ignore filename argument entirely
     }
@@ -3334,7 +3427,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         {72, test_72}, {73, test_73}, {74, test_74}, {75, test_75},
         {76, test_76}, {77, test_77}, {78, test_78}, {79, test_79},
         {80, test_80}, {81, test_81}, {82, test_82}, {83, test_83},
-        {84, test_84},
+        {84, test_84}, {85, test_85},
     };
 
     auto fn = test_functions.find(n);

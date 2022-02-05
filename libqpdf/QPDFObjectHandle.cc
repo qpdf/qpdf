@@ -392,6 +392,17 @@ QPDFObjectHandle::getNumericValue()
 }
 
 bool
+QPDFObjectHandle::getValueAsNumber(double& value)
+{
+    if (! isNumber())
+    {
+        return false;
+    }
+    value = getNumericValue();
+    return true;
+}
+
+bool
 QPDFObjectHandle::isName()
 {
     if (! this->initialized)
@@ -536,6 +547,17 @@ QPDFObjectHandle::getBoolValue()
     }
 }
 
+bool
+QPDFObjectHandle::getValueAsBool(bool& value)
+{
+    if (! isBool())
+    {
+        return false;
+    }
+    value = dynamic_cast<QPDF_Bool*>(obj.get())->getVal();
+    return true;
+}
+
 // Integer accessors
 
 long long
@@ -551,6 +573,17 @@ QPDFObjectHandle::getIntValue()
         QTC::TC("qpdf", "QPDFObjectHandle integer returning 0");
         return 0;
     }
+}
+
+bool
+QPDFObjectHandle::getValueAsInt(long long& value)
+{
+    if (! isInteger())
+    {
+        return false;
+    }
+    value = dynamic_cast<QPDF_Integer*>(obj.get())->getVal();
+    return true;
 }
 
 int
@@ -581,6 +614,17 @@ QPDFObjectHandle::getIntValueAsInt()
     return result;
 }
 
+bool
+QPDFObjectHandle::getValueAsInt(int& value)
+{
+    if (! isInteger())
+    {
+        return false;
+    }
+    value = getIntValueAsInt();
+    return true;
+}
+
 unsigned long long
 QPDFObjectHandle::getUIntValue()
 {
@@ -598,6 +642,17 @@ QPDFObjectHandle::getUIntValue()
         result = static_cast<unsigned long long>(v);
     }
     return result;
+}
+
+bool
+QPDFObjectHandle::getValueAsUInt(unsigned long long& value)
+{
+    if (! isInteger())
+    {
+        return false;
+    }
+    value = getUIntValue();
+    return true;
 }
 
 unsigned int
@@ -629,6 +684,17 @@ QPDFObjectHandle::getUIntValueAsUInt()
     return result;
 }
 
+bool
+QPDFObjectHandle::getValueAsUInt(unsigned int& value)
+{
+    if (! isInteger())
+    {
+        return false;
+    }
+    value = getUIntValueAsUInt();
+    return true;
+}
+
 // Real accessors
 
 std::string
@@ -644,6 +710,17 @@ QPDFObjectHandle::getRealValue()
         QTC::TC("qpdf", "QPDFObjectHandle real returning 0.0");
         return "0.0";
     }
+}
+
+bool
+QPDFObjectHandle::getValueAsReal(std::string& value)
+{
+    if (! isReal())
+    {
+        return false;
+    }
+    value = dynamic_cast<QPDF_Real*>(obj.get())->getVal();
+    return true;
 }
 
 // Name accessors
@@ -663,6 +740,17 @@ QPDFObjectHandle::getName()
     }
 }
 
+bool
+QPDFObjectHandle::getValueAsName(std::string& value)
+{
+    if (! isName())
+    {
+        return false;
+    }
+    value = dynamic_cast<QPDF_Name*>(obj.get())->getName();
+    return true;
+}
+
 // String accessors
 
 std::string
@@ -680,6 +768,17 @@ QPDFObjectHandle::getStringValue()
     }
 }
 
+bool
+QPDFObjectHandle::getValueAsString(std::string& value)
+{
+    if (! isString())
+    {
+        return false;
+    }
+    value = dynamic_cast<QPDF_String*>(obj.get())->getVal();
+    return true;
+}
+
 std::string
 QPDFObjectHandle::getUTF8Value()
 {
@@ -693,6 +792,17 @@ QPDFObjectHandle::getUTF8Value()
         QTC::TC("qpdf", "QPDFObjectHandle string returning empty utf8");
         return "";
     }
+}
+
+bool
+QPDFObjectHandle::getValueAsUTF8(std::string& value)
+{
+    if (! isString())
+    {
+        return false;
+    }
+    value = dynamic_cast<QPDF_String*>(obj.get())->getUTF8Val();
+    return true;
 }
 
 // Operator and Inline Image accessors
@@ -712,6 +822,17 @@ QPDFObjectHandle::getOperatorValue()
     }
 }
 
+bool
+QPDFObjectHandle::getValueAsOperator(std::string& value)
+{
+    if (! isOperator())
+    {
+        return false;
+    }
+    value = dynamic_cast<QPDF_Operator*>(obj.get())->getVal();
+    return true;
+}
+
 std::string
 QPDFObjectHandle::getInlineImageValue()
 {
@@ -725,6 +846,17 @@ QPDFObjectHandle::getInlineImageValue()
         QTC::TC("qpdf", "QPDFObjectHandle inlineimage returning empty data");
         return "";
     }
+}
+
+bool
+QPDFObjectHandle::getValueAsInlineImage(std::string& value)
+{
+    if (! isInlineImage())
+    {
+        return false;
+    }
+    value = dynamic_cast<QPDF_InlineImage*>(obj.get())->getVal();
+    return true;
 }
 
 // Array accessors

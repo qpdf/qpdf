@@ -3285,7 +3285,7 @@ my @badfiles = ("not a PDF file", 			# 1
                 "startxref to space then eof",          # 38
 		);
 
-$n_tests += @badfiles + 7;
+$n_tests += @badfiles + 8;
 
 # Test 6 contains errors in the free table consistency, but we no
 # longer have any consistency check for this since it is not important
@@ -3340,6 +3340,10 @@ $td->runtest("C API: no recovery",
 $td->runtest("integer type checks",
              {$td->COMMAND => "test_driver 62 minimal.pdf"},
              {$td->STRING => "test 62 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("getValueAs... accessor checks",
+             {$td->COMMAND => "test_driver 85 -"},
+             {$td->STRING => "test 85 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 show_ntests();
