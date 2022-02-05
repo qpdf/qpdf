@@ -9,8 +9,6 @@
   make qpdf more contributor-friendly. Look
   https://bestpractices.coreinfrastructure.org/en
 
-* QPDFObjectHandle: getValueAsX methods, getKeyIfDict. Plus C API.
-
 * Remember for release notes: starting in qpdf 11, the default value
   for the --json keyword will be "latest". If you are depending on
   version 1, change your code to specify --json=1, which works

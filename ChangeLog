@@ -1,5 +1,16 @@
 2022-02-05  Jay Berkenbilt  <ejb@ql.org>
 
+	* Add several new accessors to QPDFObjectHandle: the bool
+	getValueAsX(X&) accessors allow an alternative way to retrieve
+	values from QPDFObjectHandle objects and can result in more
+	concise code in many situations. Thanks to m-holger for the
+	contribution.
+
+	* Add qpdf_oh_new_binary_unicode_string and
+	qpdf_oh_get_binary_utf8_value to the C API. This makes it possible
+	to handle UTF-8-encoded strings with embedded NUL characters. Thanks
+	to m-holger for the contribution.
+
 	* Add a global user-defined string literal "_qpdf" as a shorthand
 	for QPDFObjectHandle::parse, allowing you to create
 	QPDFObjectHandle objects with
