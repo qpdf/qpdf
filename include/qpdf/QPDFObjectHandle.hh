@@ -810,6 +810,9 @@ class QPDFObjectHandle
     // returned.
     QPDF_DLL
     QPDFObjectHandle getKey(std::string const&);
+    // If the object is null, return null. Otherwise, call getKey().
+    // This makes it easier to access lower-level dictionaries, as in
+    // auto font = page.getKeyIfDict("/Resources").getKeyIfDict("/Font");
     QPDF_DLL
     QPDFObjectHandle getKeyIfDict(std::string const&);
     // Return all keys.  Keys with null values are treated as if

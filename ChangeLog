@@ -1,3 +1,9 @@
+2022-02-06  Jay Berkenbilt  <ejb@ql.org>
+
+	* From m-holger: add getKeyIfDict(), which calls getKey for
+	dictionaries and returns null if called on null. This is for
+	easier access to optional, lower-level dictionaries.
+
 2022-02-05  Jay Berkenbilt  <ejb@ql.org>
 
 	* Add several new accessors to QPDFObjectHandle: the bool

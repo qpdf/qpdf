@@ -129,6 +129,13 @@ For a detailed list of changes, please see the file
       ``qpdf_oh_is_name_and_equals``. Thanks to M. Holger for the
       contribution.
 
+    - New convenience method in ``QPDFObjectHandle``: ``getKeyIfDict``
+      returns null when called on null and otherwise calls ``getKey``.
+      This makes it easier to access optional, lower-level
+      dictionaries. It is exposed in the C API
+      ``qpdf_oh_get_key_if_dict``. Thanks to M. Holger for the
+      contribution.
+
     - New functions added to ``QUtil``: ``make_shared_cstr`` and
       ``make_unique_cstr`` copy ``std::string`` to
       ``std::shared_ptr<char>`` and ``std::unique_ptr<char[]>``. These
