@@ -592,6 +592,17 @@ static void test24(char const* infile,
         "/Encoding");
     assert(strcmp(qpdf_oh_get_name(qpdf, encoding), "/WinAnsiEncoding") == 0);
 
+    qpdf_oh res = qpdf_oh_get_key_if_dict(qpdf, page1, "/Resources");
+    assert(qpdf_oh_has_key(qpdf, res, "/Font"));
+    /* check no warning when called with null */
+    while (qpdf_more_warnings(qpdf))
+    {
+        qpdf_next_warning(qpdf);
+    }
+    res = qpdf_oh_get_key_if_dict(
+        qpdf, qpdf_oh_get_key_if_dict(qpdf, page1, "/Missing"), "/Font");
+    assert(! qpdf_more_warnings(qpdf));
+
     /* Look at page contents to exercise stream functions */
     qpdf_oh contents = qpdf_oh_get_key(qpdf, page1, "/Contents");
     assert(qpdf_oh_is_stream(qpdf, contents));

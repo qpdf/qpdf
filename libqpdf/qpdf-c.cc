@@ -1550,6 +1550,15 @@ qpdf_oh qpdf_oh_get_key(qpdf_data qpdf, qpdf_oh oh, char const* key)
         });
 }
 
+qpdf_oh qpdf_oh_get_key_if_dict(qpdf_data qpdf, qpdf_oh oh, char const* key)
+{
+    return do_with_oh<qpdf_oh>(
+        qpdf, oh, return_null(qpdf), [qpdf, key](QPDFObjectHandle& o) {
+            QTC::TC("qpdf", "qpdf-c called qpdf_oh_get_key_if_dict");
+            return new_object(qpdf, o.getKeyIfDict(key));
+        });
+}
+
 QPDF_BOOL qpdf_oh_is_or_has_name(qpdf_data qpdf, qpdf_oh oh, char const* key)
 {
     return do_with_oh<QPDF_BOOL>(
