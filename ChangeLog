@@ -1,5 +1,9 @@
 2022-02-06  Jay Berkenbilt  <ejb@ql.org>
 
+	* Pl_Buffer and QPDFWriter: add getBufferSharedPointer(), which
+	turns a PointerHolder<Buffer> but will return a
+	std::shared_ptr<Buffer> in qpdf 11.
+
 	* From m-holger: add getKeyIfDict(), which calls getKey for
 	dictionaries and returns null if called on null. This is for
 	easier access to optional, lower-level dictionaries.

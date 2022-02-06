@@ -51,9 +51,13 @@ class Pl_Buffer: public Pipeline
 
     // Each call to getBuffer() resets this object -- see notes above.
     // The caller is responsible for deleting the returned Buffer
-    // object.
+    // object. See also getBufferSharedPointer() and getMallocBuffer().
     QPDF_DLL
     Buffer* getBuffer();
+
+    // Same as getBuffer but wraps the result in a shared pointer.
+    QPDF_DLL
+    PointerHolder<Buffer> getBufferSharedPointer();
 
     // getMallocBuffer behaves in the same was as getBuffer except the
     // buffer is allocated with malloc(), making it suitable for use

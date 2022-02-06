@@ -118,12 +118,17 @@ class QPDFWriter
     QPDF_DLL
     void setOutputMemory();
 
-    // Return the buffer object containing the PDF file.  If
+    // Return the buffer object containing the PDF file. If
     // setOutputMemory() has been called, this method may be called
-    // exactly one time after write() has returned.  The caller is
-    // responsible for deleting the buffer when done.
+    // exactly one time after write() has returned. The caller is
+    // responsible for deleting the buffer when done. See also
+    // getBufferSharedPointer().
     QPDF_DLL
     Buffer* getBuffer();
+
+    // Return getBuffer() in a shared pointer.
+    QPDF_DLL
+    PointerHolder<Buffer> getBufferSharedPointer();
 
     // Supply your own pipeline object.  Output will be written to
     // this pipeline, and QPDFWriter will call finish() on the

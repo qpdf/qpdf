@@ -420,6 +420,8 @@ auto x = std::make_unique<T[]>(5)
 
 PointerHolder in public API:
 
+  PointerHolder<Buffer> Pl_Buffer::getBufferSharedPointer();
+  PointerHolder<Buffer> QPDFWriter::getBufferSharedPointer();
   QUtil::read_file_into_memory(
     char const*, PointerHolder<char>&, unsigned long&)
   QPDFObjectHandle::addContentTokenFilter(

@@ -157,6 +157,12 @@ QPDFWriter::getBuffer()
     return result;
 }
 
+PointerHolder<Buffer>
+QPDFWriter::getBufferSharedPointer()
+{
+    return PointerHolder<Buffer>(getBuffer());
+}
+
 void
 QPDFWriter::setOutputPipeline(Pipeline* p)
 {

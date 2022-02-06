@@ -79,8 +79,14 @@ Pl_Buffer::getBuffer()
         unsigned char* p = b->getBuffer();
         memcpy(p, this->m->data->getBuffer(), this->m->total_size);
     }
-    this->m = new Members();
+    this->m = PointerHolder<Members>(new Members());
     return b;
+}
+
+PointerHolder<Buffer>
+Pl_Buffer::getBufferSharedPointer()
+{
+    return PointerHolder<Buffer>(getBuffer());
 }
 
 void
