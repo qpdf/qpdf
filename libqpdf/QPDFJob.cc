@@ -2854,14 +2854,14 @@ QPDFJob::handlePageSpecs(
             {
                 QTC::TC("qpdf", "QPDFJob keep files open n");
                 cis = new ClosedFileInputSource(page_spec.filename.c_str());
-                is = cis;
+                is = PointerHolder<InputSource>(cis);
                 cis->stayOpen(true);
             }
             else
             {
                 QTC::TC("qpdf", "QPDFJob keep files open y");
                 FileInputSource* fis = new FileInputSource();
-                is = fis;
+                is = PointerHolder<InputSource>(fis);
                 fis->setFilename(page_spec.filename.c_str());
             }
             std::shared_ptr<QPDF> qpdf_ph = processInputSource(is, password);
@@ -3489,9 +3489,10 @@ QPDFJob::setWriterOptions(QPDF& pdf, QPDFWriter& w)
     if (m->progress && m->outfilename)
     {
         w.registerProgressReporter(
-            new ProgressReporter(
-                *(this->m->cout), this->m->message_prefix,
-                m->outfilename.get()));
+            PointerHolder<QPDFWriter::ProgressReporter>(
+                new ProgressReporter(
+                    *(this->m->cout), this->m->message_prefix,
+                    m->outfilename.get())));
     }
 }
 

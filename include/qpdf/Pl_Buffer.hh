@@ -37,6 +37,8 @@
 #include <qpdf/PointerHolder.hh>
 #include <qpdf/Buffer.hh>
 
+#include <memory>
+
 class Pl_Buffer: public Pipeline
 {
   public:

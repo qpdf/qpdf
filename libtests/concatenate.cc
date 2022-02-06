@@ -20,12 +20,12 @@ int main(int argc, char* argv[])
     pipeStringAndFinish(&concat, "-two-");
     concat.manualFinish();
 
-    PointerHolder<Buffer> b1_buf = b1.getBuffer();
+    auto b1_buf = b1.getBufferSharedPointer();
     Pl_Buffer b2("uncompressed");
     Pl_Flate inflate("uncompress", &b2, Pl_Flate::a_inflate);
     inflate.write(b1_buf->getBuffer(), b1_buf->getSize());
     inflate.finish();
-    PointerHolder<Buffer> b2_buf = b2.getBuffer();
+    auto b2_buf = b2.getBufferSharedPointer();
     std::string result(reinterpret_cast<char*>(b2_buf->getBuffer()),
                        b2_buf->getSize());
     if (result == "-one--two-")

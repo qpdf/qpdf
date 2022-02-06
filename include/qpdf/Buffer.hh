@@ -24,7 +24,9 @@
 
 #include <qpdf/DLL.h>
 #include <qpdf/PointerHolder.hh>
+
 #include <stddef.h>
+#include <memory>
 
 class Buffer
 {

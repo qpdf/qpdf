@@ -300,7 +300,7 @@ int main(int argc, char *argv[])
 
         std::map<QPDFObjGen, QPDFXRefEntry> xrefs_w
             = w.getWrittenXRefTable();
-        PointerHolder<Buffer> buf = w.getBuffer();
+        auto buf = w.getBufferSharedPointer();
 
         QPDF qpdf_ren;
         qpdf_ren.processMemoryFile("renumbered",

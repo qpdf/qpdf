@@ -31,14 +31,14 @@ Pl_Buffer::write(unsigned char* buf, size_t len)
 {
     if (this->m->data.get() == 0)
     {
-        this->m->data = new Buffer(len);
+        this->m->data = make_pointer_holder<Buffer>(len);
     }
     size_t cur_size = this->m->data->getSize();
     size_t left = cur_size - this->m->total_size;
     if (left < len)
     {
         size_t new_size = std::max(this->m->total_size + len, 2 * cur_size);
-        PointerHolder<Buffer> b = new Buffer(new_size);
+        auto b = make_pointer_holder<Buffer>(new_size);
         memcpy(b->getBuffer(), this->m->data->getBuffer(), this->m->total_size);
         this->m->data = b;
     }
@@ -108,5 +108,5 @@ Pl_Buffer::getMallocBuffer(unsigned char **buf, size_t* len)
     {
         *buf = nullptr;
     }
-    this->m = new Members();
+    this->m = PointerHolder<Members>(new Members());
 }

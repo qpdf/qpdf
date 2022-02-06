@@ -245,7 +245,7 @@ process_with_aes(std::string const& key,
         aes.write(QUtil::unsigned_char_pointer(data), data.length());
     }
     aes.finish();
-    PointerHolder<Buffer> bufp = buffer.getBuffer();
+    auto bufp = buffer.getBufferSharedPointer();
     if (outlength == 0)
     {
         outlength = bufp->getSize();
@@ -1200,7 +1200,7 @@ QPDF::decryptString(std::string& str, int objid, int generation)
                           key.length());
 	    pl.write(QUtil::unsigned_char_pointer(str), str.length());
 	    pl.finish();
-	    PointerHolder<Buffer> buf = bufpl.getBuffer();
+	    auto buf = bufpl.getBufferSharedPointer();
 	    str = std::string(reinterpret_cast<char*>(buf->getBuffer()),
                               buf->getSize());
 	}

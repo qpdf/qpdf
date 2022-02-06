@@ -139,7 +139,7 @@ int main(int argc, char* argv[])
 	qpdf.processFile(infilename, password);
 
 	ImageInverter* inv = new ImageInverter;
-	PointerHolder<QPDFObjectHandle::StreamDataProvider> p = inv;
+	auto p = PointerHolder<QPDFObjectHandle::StreamDataProvider>(inv);
 
 	// For each page...
 	std::vector<QPDFPageObjectHelper> pages =

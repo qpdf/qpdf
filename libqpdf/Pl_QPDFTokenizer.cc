@@ -43,10 +43,10 @@ void
 Pl_QPDFTokenizer::finish()
 {
     this->m->buf.finish();
-    PointerHolder<InputSource> input =
+    auto input = PointerHolder<InputSource>(
         new BufferInputSource("tokenizer data",
-                              this->m->buf.getBuffer(), true);
-
+                              this->m->buf.getBuffer(), true));
+    
     while (true)
     {
         QPDFTokenizer::Token token = this->m->tokenizer.readToken(
