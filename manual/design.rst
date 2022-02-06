@@ -784,7 +784,7 @@ supporting older versions of qpdf without conditional compilation.
 
 ``PointerHolder`` has had a long-standing bug: a ``const
 PointerHolder<T>`` would only provide a ``T const*`` with its
-``getPointer`` method. This is incorrect and is now how standard C++
+``getPointer`` method. This is incorrect and is not how standard C++
 smart pointers or regular pointers behave. The correct semantics
 would be that a ``const PointerHolder<T>`` would not accept a new
 pointer after being created but would still allow you to modify the
