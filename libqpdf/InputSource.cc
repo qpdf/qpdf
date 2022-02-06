@@ -37,8 +37,8 @@ InputSource::readLine(size_t max_line_length)
     // point to position the file had when this method was called.
 
     qpdf_offset_t offset = this->tell();
-    char* buf = new char[max_line_length + 1];
-    PointerHolder<char> bp(true, buf);
+    auto bp = std::make_unique<char[]>(max_line_length + 1);
+    char* buf = bp.get();
     memset(buf, '\0', max_line_length + 1);
     this->read(buf, max_line_length);
     this->seek(offset, SEEK_SET);

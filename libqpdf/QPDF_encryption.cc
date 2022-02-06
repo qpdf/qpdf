@@ -204,8 +204,7 @@ iterate_rc4(unsigned char* data, size_t data_len,
 	    unsigned char* okey, int key_len,
 	    int iterations, bool reverse)
 {
-    PointerHolder<unsigned char> key_ph = PointerHolder<unsigned char>(
-        true, new unsigned char[QIntC::to_size(key_len)]);
+    auto key_ph = std::make_unique<unsigned char[]>(QIntC::to_size(key_len));
     unsigned char* key = key_ph.get();
     for (int i = 0; i < iterations; ++i)
     {

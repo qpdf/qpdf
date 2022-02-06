@@ -16,8 +16,7 @@ Pl_Flate::Members::Members(size_t out_bufsize,
     initialized(false),
     zdata(0)
 {
-    this->outbuf = PointerHolder<unsigned char>(
-        true, new unsigned char[out_bufsize]);
+    this->outbuf = QUtil::make_shared_array<unsigned char>(out_bufsize);
     // Indirect through zdata to reach the z_stream so we don't have
     // to include zlib.h in Pl_Flate.hh.  This means people using
     // shared library versions of qpdf don't have to have zlib
