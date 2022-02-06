@@ -7,28 +7,15 @@ For a detailed list of changes, please see the file
 :file:`ChangeLog` in the source distribution.
 
 10.6.0: XXX
-  - Deprecations/future replacement of ``PointerHolder``
+  - Preparation for replacement of ``PointerHolder``
 
     The next major release of qpdf will replace ``PointerHolder`` with
-    ``std::shared_ptr`` across all of qpdf's public API. In
-    preparation for this change, the following ``PointerHolder``
-    methods have been deprecated in favor of interfaces that more
-    closely match ``std::shared_ptr``:
-
-    - ``getPointer()`` -- use ``get()`` instead; this also fixes
-      ``const`` semantics as discussed in
-      :file:`include/qpdf/PointerHolder.hh`.
-
-    - ``getRefcount()`` -- use ``use_count()`` instead
-
-    If you build your code with deprecation warnings enabled and you
-    want to suppress these deprecation warnings for now, you can
-    ``#define NO_POINTERHOLDER_DEPRECATION`` before including any qpdf
-    header files. Code that does this will *require no changes* prior
-    to qpdf 11 and may or may not require changes after qpdf 11.
-
-    For a detailed discussion of this change and how to prepare for
-    it, see :ref:`smart-pointers`.
+    ``std::shared_ptr`` across all of qpdf's public API. No action is
+    required at this time, but if you'd like to prepare, read the
+    comments :file:`include/qpdf/PointerHolder.hh` and see
+    :ref:`smart-pointers` for details on what you can do now to create
+    code that will continue to work with older versions of qpdf and be
+    easier to switch over to qpdf 11 when it comes out.
 
   - Preparation for a new JSON output version
 

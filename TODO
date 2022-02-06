@@ -388,35 +388,65 @@ Other notes:
 PointerHolder to std::shared_ptr
 ================================
 
-Remember to update the smart-pointers section of the manual in
-design.rst.
+To perform update:
 
-Once all deprecation warnings are cleared up (changing getPointer() to
-get() and getRefcount() to use_count()), the only real issues are that
-implicit assignment of a pointer to a shared_ptr doesn't work while it
-does for PointerHolder and containers are different. Using auto takes
-care of containers.
+Cherry-pick pointerholder branch commit
 
-PointerHolder<X> x = new X() -->
-auto x = std::make_shared<X>()
+Upgrade just the library. This is not necessary, but it's an added
+check that the compatibility code works since it will show that tests,
+examples, and CLI will work properly with the upgraded APIs, which
+provides some assurance that other people will have a smooth time with
+their code.
 
-PointerHolder<Base> x = new Derived() -->
-auto x = std::shared_ptr<Base>(new Derived())
+patrepl s/PointerHolder/std::shared_ptr/g {include,libqpdf}/qpdf/*.hh
+patrepl s/PointerHolder/std::shared_ptr/g libqpdf/*.cc
+patrepl s/make_pointer_holder/std::make_shared/g libqpdf/*.cc
+patrepl s/make_array_pointer_holder/QUtil::make_shared_array/g libqpdf/*.cc
+patrepl s,qpdf/std::shared_ptr,qpdf/PointerHolder, **/*.cc **/*.hh
+git restore include/qpdf/PointerHolder.hh
+cleanpatch
 
-PointerHolder x(true, new T[5]) -->
-auto x = std::shared_ptr(new T[5], std::default_delete<T[]>())
+Increase to POINTERHOLDER_TRANSITION=3
 
-X* x = new X(); PointerHolder<X> x_ph(x) -->
-auto x_ph = std::make_shared<X>(); X* x = x_ph.get();
+make build_libqpdf -- no errors
 
-Derived* x = new Derived(); PointerHolder<Base> x_ph(x) -->
-Derived* x = new Derived(); auto x_ph = std::shared_pointer<Base>(x);
+Drop back to POINTERHOLDER_TRANSITION=2
 
-Also remember
+make check -- everything passes
 
-auto x = std::shared_ptr(new T[5], std::default_delete<T[]>())
-vs.
-auto x = std::make_unique<T[]>(5)
+Then upgrade everything else. It would work to just start here.
+
+Increase to POINTERHOLDER_TRANSITION=3
+
+patrepl s/PointerHolder/std::shared_ptr/g **/*.cc **/*.hh
+patrepl s/make_pointer_holder/std::make_shared/g **/*.cc
+patrepl s/make_array_pointer_holder/QUtil::make_shared_array/g **/*.cc
+patrepl s,qpdf/std::shared_ptr,qpdf/PointerHolder, **/*.cc **/*.hh
+git restore include/qpdf/PointerHolder.hh
+git restore libtests/pointer_holder.cc
+cleanpatch
+
+Remove all references to PointerHolder.hh from everything except
+public headers and pointer_holder.cc.
+
+make check -- everything passes
+
+Increase to POINTERHOLDER_TRANSITION=4
+
+Do a clean build and make check -- everything passes
+
+Final steps:
+
+* Change to POINTERHOLDER_TRANSITION=4 in autoconf.mk.in.
+* Check code formatting
+* std::shared_ptr<Members> m can be replaced with
+  std::shared_ptr<Members> m_ph and Members* m if performance is critical
+* Could try Members indirection with Members* for QPDFObjectHandle
+
+When done:
+
+* Update the smart-pointers section of the manual in design.rst
+* Update comments in PointerHolder.hh
 
 PointerHolder in public API:
 
@@ -452,20 +482,6 @@ PointerHolder in public API:
     QPDF&, PointerHolder<Buffer>)
   QPDFPageObjectHelper::addContentTokenFilter(
     PointerHolder<QPDFObjectHandle::TokenFilter>)
-
-Strategy:
-* Start with pointerholder branch
-* Replace each public API one at a time
-* Replace remaining internal uses; sometimes unique_ptr may be good,
-  particularly for temporary strings that are deleted in the same
-  scope and Members for non-copyable classes
-* std::shared_ptr<Members> m can be replaced with
-  std::shared_ptr<Members> m_ph and Members* m if performance is critical
-* Remove #include <PointerHolder.hh> from all headers
-
-At that point, we're in a good state to make that compatibility
-basically works. Then we can proceed to remove PointerHolder from
-everything else.
 
 ABI Changes
 ===========
