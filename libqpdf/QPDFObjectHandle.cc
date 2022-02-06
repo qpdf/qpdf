@@ -1150,6 +1150,12 @@ QPDFObjectHandle::getKey(std::string const& key)
     return result;
 }
 
+QPDFObjectHandle
+QPDFObjectHandle::getKeyIfDict(std::string const& key)
+{
+    return isNull() ? newNull() : getKey(key);
+}
+
 std::set<std::string>
 QPDFObjectHandle::getKeys()
 {

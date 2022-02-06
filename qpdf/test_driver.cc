@@ -1568,6 +1568,8 @@ static void test_42(QPDF& pdf, char const* arg2)
     integer.replaceOrRemoveKey("/Potato", null);
     integer.replaceOrRemoveKey("/Potato", QPDFObjectHandle::newInteger(1));
     integer.replaceKey("/Potato", QPDFObjectHandle::newInteger(1));
+    null.getKeyIfDict("/Integer").getKeyIfDict("/Potato").assertNull();
+    qtest.getKey("/Integer").getKeyIfDict("/Potato");
     qtest.getKey("/Integer").getKey("/Potato");
     assert(integer.getInlineImageValue().empty());
     assert(0 == dictionary.getIntValue());
@@ -1582,6 +1584,7 @@ static void test_42(QPDF& pdf, char const* arg2)
     assert(array.getArrayItem(0).getStringValue().empty());
     std::cerr << "One error\n";
     assert(dictionary.getKey("/Quack").getStringValue().empty());
+    assert(dictionary.getKeyIfDict("/Quack").getStringValue().empty());
     assert(array.getArrayItem(1).isDictionary());
     assert(array.getArrayItem(1).getKey("/K").isArray());
     assert(array.getArrayItem(1).getKey("/K").getArrayItem(0).isName());
