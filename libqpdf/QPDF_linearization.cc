@@ -97,9 +97,9 @@ QPDF::isLinearized()
     // Add a byte for a null terminator.
     static int const tbuf_size = 1025;
 
-    char* buf = new char[tbuf_size];
+    auto b = std::make_unique<char[]>(tbuf_size);
+    char* buf = b.get();
     this->m->file->seek(0, SEEK_SET);
-    PointerHolder<char> b(true, buf);
     memset(buf, '\0', tbuf_size);
     this->m->file->read(buf, tbuf_size - 1);
 

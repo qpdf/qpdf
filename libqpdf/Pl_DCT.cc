@@ -283,8 +283,7 @@ Pl_DCT::compress(void* cinfo_p, Buffer* b)
 #       pragma GCC diagnostic pop
 #endif
     static int const BUF_SIZE = 65536;
-    PointerHolder<unsigned char> outbuffer_ph(
-        true, new unsigned char[BUF_SIZE]);
+    auto outbuffer_ph = std::make_unique<unsigned char[]>(BUF_SIZE);
     unsigned char* outbuffer = outbuffer_ph.get();
     jpeg_pipeline_dest(cinfo, outbuffer, BUF_SIZE, this->getNext());
 
