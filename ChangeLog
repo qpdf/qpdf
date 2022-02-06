@@ -47,11 +47,6 @@
 	includes so you don't have to try to include a header that won't
 	be there.
 
-	* PointerHolder: deprecate getPointer() and getRefcount(). If you
-	don't want to disable deprecation warnings in general but are not
-	ready to tackle this change yet, you can define
-	NO_POINTERHOLDER_DEPRECATION to suppress those.
-
 	* PointerHolder: add a get() method and a use_count() method for
 	compatibility with std::shared_ptr. In qpdf 11, qpdf's APIs will
 	switch to using std::shared_ptr instead of PointerHolder, though

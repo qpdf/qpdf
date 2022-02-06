@@ -1,4 +1,8 @@
-#define NO_POINTERHOLDER_DEPRECATION // we need to test the deprecated API
+// We need to test the deprecated API
+#ifdef POINTERHOLDER_TRANSITION
+# undef POINTERHOLDER_TRANSITION
+#endif
+#define POINTERHOLDER_TRANSITION 0
 #include <qpdf/PointerHolder.hh>
 
 #include <iostream>
