@@ -812,6 +812,8 @@ extern "C" {
     QPDF_BOOL qpdf_oh_has_key(qpdf_data qpdf, qpdf_oh oh, char const* key);
     QPDF_DLL
     qpdf_oh qpdf_oh_get_key(qpdf_data qpdf, qpdf_oh oh, char const* key);
+    QPDF_DLL
+    qpdf_oh qpdf_oh_get_key_if_dict(qpdf_data qpdf, qpdf_oh oh, char const* key);
 
     QPDF_DLL
     QPDF_BOOL qpdf_oh_is_or_has_name(

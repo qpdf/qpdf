@@ -504,6 +504,7 @@ qpdf-c called qpdf_oh_dict_more_keys 0
 qpdf-c called qpdf_oh_dict_next_key 0
 qpdf-c called qpdf_oh_has_key 0
 qpdf-c called qpdf_oh_get_key 0
+qpdf-c called qpdf_oh_get_key_if_dict 0
 qpdf-c called qpdf_oh_is_or_has_name 0
 qpdf-c called qpdf_oh_new_null 0
 qpdf-c called qpdf_oh_new_bool 0
