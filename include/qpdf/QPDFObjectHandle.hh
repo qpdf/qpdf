@@ -31,6 +31,7 @@
 #include <set>
 #include <map>
 #include <functional>
+#include <memory>
 
 #include <qpdf/QPDFObjGen.hh>
 #include <qpdf/PointerHolder.hh>

@@ -27,7 +27,7 @@ FileInputSource::FileInputSource() :
 void
 FileInputSource::setFilename(char const* filename)
 {
-    this->m = new Members(true);
+    this->m = PointerHolder<Members>(new Members(true));
     this->m->filename = filename;
     this->m->file = QUtil::safe_fopen(filename, "rb");
 }
@@ -36,7 +36,7 @@ void
 FileInputSource::setFile(
     char const* description, FILE* filep, bool close_file)
 {
-    this->m = new Members(close_file);
+    this->m = PointerHolder<Members>(new Members(close_file));
     this->m->filename = description;
     this->m->file = filep;
     this->seek(0, SEEK_SET);

@@ -34,7 +34,7 @@ QPDFOutlineObjectHelper::QPDFOutlineObjectHelper(
     while (! cur.isNull())
     {
         QPDFOutlineObjectHelper new_ooh(cur, dh, 1 + depth);
-        new_ooh.m->parent = new QPDFOutlineObjectHelper(*this);
+        new_ooh.m->parent = make_pointer_holder<QPDFOutlineObjectHelper>(*this);
         this->m->kids.push_back(new_ooh);
         cur = cur.getKey("/Next");
     }

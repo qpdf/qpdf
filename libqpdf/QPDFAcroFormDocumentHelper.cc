@@ -768,7 +768,7 @@ QPDFAcroFormDocumentHelper::adjustDefaultAppearances(
     ResourceReplacer rr(dr_map, rf.getNamesByResourceType());
     Pl_Buffer buf_pl("filtered DA");
     da_stream.filterAsContents(&rr, &buf_pl);
-    PointerHolder<Buffer> buf = buf_pl.getBuffer();
+    auto buf = buf_pl.getBufferSharedPointer();
     std::string new_da(
         reinterpret_cast<char*>(buf->getBuffer()), buf->getSize());
     obj.replaceKey("/DA", QPDFObjectHandle::newString(new_da));
@@ -871,7 +871,7 @@ QPDFAcroFormDocumentHelper::adjustAppearanceStream(
             QTC::TC("qpdf", "QPDFAcroFormDocumentHelper AP parse error");
         }
         auto rr = new ResourceReplacer(dr_map, rf.getNamesByResourceType());
-        PointerHolder<QPDFObjectHandle::TokenFilter> tf = rr;
+        auto tf = PointerHolder<QPDFObjectHandle::TokenFilter>(rr);
         stream.addTokenFilter(tf);
     }
     catch (std::exception& e)
@@ -902,7 +902,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
     }
     else if ((from_qpdf != &this->qpdf) && (! from_afdh))
     {
-        afdhph = new QPDFAcroFormDocumentHelper(*from_qpdf);
+        afdhph = make_pointer_holder<QPDFAcroFormDocumentHelper>(*from_qpdf);
         from_afdh = afdhph.get();
     }
     bool foreign = (from_qpdf != &this->qpdf);

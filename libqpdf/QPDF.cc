@@ -269,7 +269,7 @@ QPDF::processFile(char const* filename, char const* password)
 {
     FileInputSource* fi = new FileInputSource();
     fi->setFilename(filename);
-    processInputSource(fi, password);
+    processInputSource(PointerHolder<InputSource>(fi), password);
 }
 
 void
@@ -278,7 +278,7 @@ QPDF::processFile(char const* description, FILE* filep,
 {
     FileInputSource* fi = new FileInputSource();
     fi->setFile(description, filep, close_file);
-    processInputSource(fi, password);
+    processInputSource(PointerHolder<InputSource>(fi), password);
 }
 
 void
@@ -287,10 +287,11 @@ QPDF::processMemoryFile(char const* description,
 			char const* password)
 {
     processInputSource(
-	new BufferInputSource(
-            description,
-            new Buffer(QUtil::unsigned_char_pointer(buf), length),
-            true),
+	PointerHolder<InputSource>(
+            new BufferInputSource(
+                description,
+                new Buffer(QUtil::unsigned_char_pointer(buf), length),
+                true)),
         password);
 }
 
@@ -305,7 +306,7 @@ QPDF::processInputSource(PointerHolder<InputSource> source,
 void
 QPDF::closeInputSource()
 {
-    this->m->file = new InvalidInputSource();
+    this->m->file = PointerHolder<InputSource>(new InvalidInputSource());
 }
 
 void
@@ -425,7 +426,8 @@ QPDF::findHeader()
             // offsets in the file are such that 0 points to the
             // beginning of the header.
             QTC::TC("qpdf", "QPDF global offset");
-            this->m->file = new OffsetInputSource(this->m->file, global_offset);
+            this->m->file = PointerHolder<InputSource>(
+                new OffsetInputSource(this->m->file, global_offset));
         }
     }
     return valid;
@@ -1607,7 +1609,8 @@ QPDF::readObject(PointerHolder<InputSource> input,
     StringDecrypter* decrypter = 0;
     if (this->m->encp->encrypted && (! in_object_stream))
     {
-        decrypter_ph = new StringDecrypter(this, objid, generation);
+        decrypter_ph = make_pointer_holder<StringDecrypter>(
+            this, objid, generation);
         decrypter = decrypter_ph.get();
     }
     QPDFObjectHandle object = QPDFObjectHandle::parse(
@@ -2105,7 +2108,7 @@ QPDF::resolve(int objid, int generation)
 		     "loop detected resolving object " +
 		     QUtil::int_to_string(objid) + " " +
 		     QUtil::int_to_string(generation)));
-        return new QPDF_Null;
+        return PointerHolder<QPDFObject>(new QPDF_Null);
     }
     ResolveRecorder rr(this, og);
 
@@ -2231,10 +2234,11 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
     std::map<int, int> offsets;
 
     PointerHolder<Buffer> bp = obj_stream.getStreamData(qpdf_dl_specialized);
-    PointerHolder<InputSource> input = new BufferInputSource(
-        this->m->file->getName() +
-        " object stream " + QUtil::int_to_string(obj_stream_number),
-	bp.get());
+    auto input = PointerHolder<InputSource>(
+        new BufferInputSource(
+            this->m->file->getName() +
+            " object stream " + QUtil::int_to_string(obj_stream_number),
+            bp.get()));
 
     for (int i = 0; i < n; ++i)
     {
@@ -2630,7 +2634,9 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
     {
         this->m->copied_stream_data_provider =
             new CopiedStreamDataProvider(*this);
-        this->m->copied_streams = this->m->copied_stream_data_provider;
+        this->m->copied_streams =
+            PointerHolder<QPDFObjectHandle::StreamDataProvider>(
+                this->m->copied_stream_data_provider);
     }
     QPDFObjGen local_og(result.getObjGen());
     // Copy information from the foreign stream so we can pipe its
@@ -2686,8 +2692,8 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
     }
     else
     {
-        PointerHolder<ForeignStreamData> foreign_stream_data =
-            new ForeignStreamData(
+        auto foreign_stream_data =
+            make_pointer_holder<ForeignStreamData>(
                 foreign_stream_qpdf->m->encp,
                 foreign_stream_qpdf->m->file,
                 foreign.getObjectID(),

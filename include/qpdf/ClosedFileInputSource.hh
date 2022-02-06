@@ -31,6 +31,8 @@
 #include <qpdf/InputSource.hh>
 #include <qpdf/PointerHolder.hh>
 
+#include <memory>
+
 class FileInputSource;
 
 class ClosedFileInputSource: public InputSource

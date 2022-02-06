@@ -25,8 +25,10 @@
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
 #include <qpdf/PointerHolder.hh>
+
 #include <stdio.h>
 #include <string>
+#include <memory>
 
 class QPDF_DLL_CLASS InputSource
 {

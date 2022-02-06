@@ -57,7 +57,7 @@ Buffer::copy(Buffer const& rhs)
 {
     if (this != &rhs)
     {
-        this->m = new Members(rhs.m->size, 0, true);
+        this->m = PointerHolder<Members>(new Members(rhs.m->size, 0, true));
 	if (this->m->size)
 	{
 	    memcpy(this->m->buf, rhs.m->buf, this->m->size);

@@ -26,8 +26,10 @@
 
 #include <qpdf/InputSource.hh>
 #include <qpdf/PointerHolder.hh>
+
 #include <string>
 #include <stdio.h>
+#include <memory>
 
 class QPDFTokenizer
 {

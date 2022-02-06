@@ -220,8 +220,11 @@ int main(int argc, char* argv[])
             // applied. See comments on the filters for additional
             // details.
             QPDFPageObjectHelper& page(*iter);
-            page.addContentTokenFilter(new StringReverser);
-            page.addContentTokenFilter(new ColorToGray);
+            page.addContentTokenFilter(
+                PointerHolder<QPDFObjectHandle::TokenFilter>(
+                    new StringReverser));
+            page.addContentTokenFilter(
+                PointerHolder<QPDFObjectHandle::TokenFilter>(new ColorToGray));
         }
 
         QPDFWriter w(pdf, outfilename);

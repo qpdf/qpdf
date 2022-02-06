@@ -294,7 +294,7 @@ static void test_0_1(QPDF& pdf, char const* arg2)
         std::cout << "Raw stream data:" << std::endl;
         std::cout.flush();
         QUtil::binary_stdout();
-        PointerHolder<Pl_StdioFile> out = new Pl_StdioFile("raw", stdout);
+        auto out = make_pointer_holder<Pl_StdioFile>("raw", stdout);
         qtest.pipeStreamData(out.get(), 0, qpdf_dl_none);
 
         std::cout << std::endl << "Uncompressed stream data:" << std::endl;
@@ -302,7 +302,7 @@ static void test_0_1(QPDF& pdf, char const* arg2)
         {
             std::cout.flush();
             QUtil::binary_stdout();
-            out = new Pl_StdioFile("filtered", stdout);
+            out = make_pointer_holder<Pl_StdioFile>("filtered", stdout);
             qtest.pipeStreamData(out.get(), 0, qpdf_dl_all);
             std::cout << std::endl << "End of stream data" << std::endl;
         }
@@ -343,7 +343,7 @@ static void test_2(QPDF& pdf, char const* arg2)
     QPDFObjectHandle page = kids.getArrayItem(1); // second page
     QPDFObjectHandle contents = page.getKey("/Contents");
     QUtil::binary_stdout();
-    PointerHolder<Pl_StdioFile> out = new Pl_StdioFile("filtered", stdout);
+    auto out = make_pointer_holder<Pl_StdioFile>("filtered", stdout);
     contents.pipeStreamData(out.get(), 0, qpdf_dl_generalized);
 }
 
@@ -356,8 +356,8 @@ static void test_3(QPDF& pdf, char const* arg2)
         std::cout << "-- stream " << i << " --" << std::endl;
         std::cout.flush();
         QUtil::binary_stdout();
-        PointerHolder<Pl_StdioFile> out =
-            new Pl_StdioFile("tokenized stream", stdout);
+        auto out = make_pointer_holder<Pl_StdioFile>(
+            "tokenized stream", stdout);
         stream.pipeStreamData(out.get(),
                               qpdf_ef_normalize, qpdf_dl_generalized);
     }
@@ -538,11 +538,11 @@ static void test_8(QPDF& pdf, char const* arg2)
     p2.write(QUtil::unsigned_char_pointer("new data for stream\n"),
              20); // no null!
     p2.finish();
-    PointerHolder<Buffer> b = p1.getBuffer();
+    auto b = p1.getBufferSharedPointer();
     // This is a bogus way to use StreamDataProvider, but it does
     // adequately test its functionality.
     Provider* provider = new Provider(b);
-    PointerHolder<QPDFObjectHandle::StreamDataProvider> p = provider;
+    auto p = PointerHolder<QPDFObjectHandle::StreamDataProvider>(provider);
     qstream.replaceStreamData(
         p, QPDFObjectHandle::newName("/FlateDecode"),
         QPDFObjectHandle::newNull());
@@ -572,7 +572,7 @@ static void test_9(QPDF& pdf, char const* arg2)
 {
     QPDFObjectHandle root = pdf.getRoot();
     // Explicitly exercise the Buffer version of newStream
-    PointerHolder<Buffer> buf = new Buffer(20);
+    auto buf = make_pointer_holder<Buffer>(20U);
     unsigned char* bp = buf->getBuffer();
     memcpy(bp, "data for new stream\n", 20); // no null!
     QPDFObjectHandle qstream = QPDFObjectHandle::newStream(
@@ -1100,9 +1100,9 @@ static void test_27(QPDF& pdf, char const* arg2)
         pl.write(QUtil::unsigned_char_pointer("new data for stream\n"),
                  20); // no null!
         pl.finish();
-        PointerHolder<Buffer> b = pl.getBuffer();
+        auto b = pl.getBufferSharedPointer();
         Provider* provider = new Provider(b);
-        p1 = provider;
+        p1 = decltype(p1)(provider);
     }
     // Create a stream that uses a provider in empty1 and copy it
     // to empty2. It is copied from empty2 to the final pdf.
@@ -1129,9 +1129,9 @@ static void test_27(QPDF& pdf, char const* arg2)
                          "more data for stream\n"),
                      21); // no null!
             pl.finish();
-            PointerHolder<Buffer> b = pl.getBuffer();
+            auto b = pl.getBufferSharedPointer();
             Provider* provider = new Provider(b);
-            p2 = provider;
+            p2 = decltype(p2)(provider);
         }
         QPDF empty3;
         empty3.emptyPDF();
@@ -1315,7 +1315,7 @@ static void test_33(QPDF& pdf, char const* arg2)
     w.setStaticID(true);
     w.setOutputPipeline(&p);
     w.write();
-    PointerHolder<Buffer> b = p.getBuffer();
+    auto b = p.getBufferSharedPointer();
     FILE* f = QUtil::safe_fopen("a.pdf", "wb");
     fwrite(b->getBuffer(), b->getSize(), 1, f);
     fclose(f);
@@ -1414,7 +1414,7 @@ static void test_36(QPDF& pdf, char const* arg2)
             Pl_Buffer p1("buffer");
             Pl_Flate p2("compress", &p1, Pl_Flate::a_inflate);
             stream.pipeStreamData(&p2, 0, qpdf_dl_none);
-            PointerHolder<Buffer> buf = p1.getBuffer();
+            auto buf = p1.getBufferSharedPointer();
             std::string data = std::string(
                 reinterpret_cast<char const*>(buf->getBuffer()),
                 buf->getSize());
@@ -1497,7 +1497,8 @@ static void test_41(QPDF& pdf, char const* arg2)
              pages.begin();
          iter != pages.end(); ++iter)
     {
-        (*iter).addContentTokenFilter(new TokenFilter);
+        (*iter).addContentTokenFilter(
+            PointerHolder<QPDFObjectHandle::TokenFilter>(new TokenFilter()));
     }
     QPDFWriter w(pdf, "a.pdf");
     w.setQDFMode(true);
@@ -2727,11 +2728,15 @@ static void test_72(QPDF& pdf, char const* arg2)
         Pl_Buffer b("buffer");
         if (i == 0)
         {
-            fx1.addContentTokenFilter(new TokenFilter);
+            fx1.addContentTokenFilter(
+                PointerHolder<QPDFObjectHandle::TokenFilter>(
+                    new TokenFilter()));
         }
         else
         {
-            fx1.getObjectHandle().addTokenFilter(new TokenFilter);
+            fx1.getObjectHandle().addTokenFilter(
+                PointerHolder<QPDFObjectHandle::TokenFilter>(
+                    new TokenFilter()));
         }
         fx1.pipeContents(&b);
         std::unique_ptr<Buffer> buf(b.getBuffer());
@@ -2890,7 +2895,7 @@ static void test_76(QPDF& pdf, char const* arg2)
     p.write(QUtil::unsigned_char_pointer("from buffer"), 11);
     p.finish();
     auto efs3 = QPDFEFStreamObjectHelper::createEFStream(
-        pdf, p.getBuffer());
+        pdf, p.getBufferSharedPointer());
     efs3.setSubtype("text/plain");
     efdh.replaceEmbeddedFile(
         "att2", QPDFFileSpecObjectHelper::createFileSpec(
@@ -3007,7 +3012,7 @@ static void test_79(QPDF& pdf, char const* arg2)
     Pl_Buffer b("buffer");
     b.write(QUtil::unsigned_char_pointer("from buffer"), 11);
     b.finish();
-    PointerHolder<Buffer> bp = b.getBuffer();
+    auto bp = b.getBufferSharedPointer();
     auto s3 = QPDFObjectHandle::newStream(&pdf, bp);
 
     std::vector<QPDFObjectHandle> streams = {s1, s2, s3};

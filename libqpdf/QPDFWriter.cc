@@ -1108,7 +1108,7 @@ QPDFWriter::PipelinePopper::~PipelinePopper()
 	Pl_Buffer* buf = dynamic_cast<Pl_Buffer*>(p);
 	if (bp && buf)
 	{
-	    *bp = buf->getBuffer();
+	    *bp = buf->getBufferSharedPointer();
 	}
 	delete p;
     }
@@ -1918,7 +1918,7 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
                     this->m->cur_data_key.length());
 		pl.write(QUtil::unsigned_char_pointer(val), val.length());
 		pl.finish();
-		PointerHolder<Buffer> buf = bufpl.getBuffer();
+		auto buf = bufpl.getBufferSharedPointer();
 		val = QPDF_String(
 		    std::string(reinterpret_cast<char*>(buf->getBuffer()),
 				buf->getSize())).unparse(true);
@@ -3231,8 +3231,8 @@ QPDFWriter::writeLinearized()
     // Write file in two passes.  Part numbers refer to PDF spec 1.4.
 
     FILE* lin_pass1_file = 0;
-    PointerHolder<PipelinePopper> pp_pass1 = new PipelinePopper(this);
-    PointerHolder<PipelinePopper> pp_md5 = new PipelinePopper(this);
+    auto pp_pass1 = make_pointer_holder<PipelinePopper>(this);
+    auto pp_md5 = make_pointer_holder<PipelinePopper>(this);
     for (int pass = 1; pass <= 2; ++pass)
     {
 	if (pass == 1)
@@ -3623,7 +3623,7 @@ QPDFWriter::registerProgressReporter(PointerHolder<ProgressReporter> pr)
 void
 QPDFWriter::writeStandard()
 {
-    PointerHolder<PipelinePopper> pp_md5 = new PipelinePopper(this);
+    auto pp_md5 = make_pointer_holder<PipelinePopper>(this);
     if (this->m->deterministic_id)
     {
         pushMD5Pipeline(*pp_md5);

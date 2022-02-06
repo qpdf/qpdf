@@ -27,7 +27,7 @@ ClosedFileInputSource::before()
 {
     if (0 == this->m->fis.get())
     {
-        this->m->fis = new FileInputSource();
+        this->m->fis = make_pointer_holder<FileInputSource>();
         this->m->fis->setFilename(this->m->filename.c_str());
         this->m->fis->seek(this->m->offset, SEEK_SET);
         this->m->fis->setLastOffset(this->last_offset);

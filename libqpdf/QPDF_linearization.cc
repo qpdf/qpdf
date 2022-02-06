@@ -313,7 +313,7 @@ QPDF::readLinearizationData()
     QPDFObjectHandle HS = H0.getKey("/S"); // shared object
     QPDFObjectHandle HO = H0.getKey("/O"); // outline
 
-    PointerHolder<Buffer> hbp = pb.getBuffer();
+    auto hbp = pb.getBufferSharedPointer();
     Buffer* hb = hbp.get();
     unsigned char const* h_buf = hb->getBuffer();
     size_t h_size = hb->getSize();
@@ -2282,5 +2282,5 @@ QPDF::generateHintStream(std::map<int, QPDFXRefEntry> const& xref,
     }
     c.finish();
 
-    hint_buffer = hint_stream.getBuffer();
+    hint_buffer = hint_stream.getBufferSharedPointer();
 }

@@ -104,12 +104,13 @@ static void call_read_memory(qpdf_data qpdf)
 // must set qpdf->filename
 static void call_init_write(qpdf_data qpdf)
 {
-    qpdf->qpdf_writer = new QPDFWriter(*(qpdf->qpdf), qpdf->filename);
+    qpdf->qpdf_writer = make_pointer_holder<QPDFWriter>(
+        *(qpdf->qpdf), qpdf->filename);
 }
 
 static void call_init_write_memory(qpdf_data qpdf)
 {
-    qpdf->qpdf_writer = new QPDFWriter(*(qpdf->qpdf));
+    qpdf->qpdf_writer = make_pointer_holder<QPDFWriter>(*(qpdf->qpdf));
     qpdf->qpdf_writer->setOutputMemory();
 }
 
@@ -137,17 +138,19 @@ static QPDF_ERROR_CODE trap_errors(
     }
     catch (QPDFExc& e)
     {
-	qpdf->error = new QPDFExc(e);
+	qpdf->error = make_pointer_holder<QPDFExc>(e);
 	status |= QPDF_ERRORS;
     }
     catch (std::runtime_error& e)
     {
-	qpdf->error = new QPDFExc(qpdf_e_system, "", "", 0, e.what());
+	qpdf->error = make_pointer_holder<QPDFExc>(
+            qpdf_e_system, "", "", 0, e.what());
 	status |= QPDF_ERRORS;
     }
     catch (std::exception& e)
     {
-	qpdf->error = new QPDFExc(qpdf_e_internal, "", "", 0, e.what());
+	qpdf->error = make_pointer_holder<QPDFExc>(
+            qpdf_e_internal, "", "", 0, e.what());
 	status |= QPDF_ERRORS;
     }
 
@@ -169,7 +172,7 @@ qpdf_data qpdf_init()
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_init");
     qpdf_data qpdf = new _qpdf_data();
-    qpdf->qpdf = new QPDF();
+    qpdf->qpdf = make_pointer_holder<QPDF>();
     return qpdf;
 }
 
@@ -240,7 +243,8 @@ qpdf_error qpdf_next_warning(qpdf_data qpdf)
 {
     if (qpdf_more_warnings(qpdf))
     {
-	qpdf->tmp_error.exc = new QPDFExc(qpdf->warnings.front());
+	qpdf->tmp_error.exc = make_pointer_holder<QPDFExc>(
+            qpdf->warnings.front());
 	qpdf->warnings.pop_front();
 	QTC::TC("qpdf", "qpdf-c qpdf_next_warning returned warning");
 	return &qpdf->tmp_error;
@@ -543,7 +547,7 @@ static void qpdf_get_buffer_internal(qpdf_data qpdf)
 {
     if (qpdf->write_memory && (qpdf->output_buffer == 0))
     {
-	qpdf->output_buffer = qpdf->qpdf_writer->getBuffer();
+	qpdf->output_buffer = qpdf->qpdf_writer->getBufferSharedPointer();
     }
 }
 
@@ -852,7 +856,8 @@ void qpdf_register_progress_reporter(
 {
     QTC::TC("qpdf", "qpdf-c registered progress reporter");
     qpdf->qpdf_writer->registerProgressReporter(
-        new ProgressReporter(report_progress, data));
+        PointerHolder<QPDFWriter::ProgressReporter>(
+            new ProgressReporter(report_progress, data)));
 }
 
 QPDF_ERROR_CODE qpdf_write(qpdf_data qpdf)
@@ -911,7 +916,7 @@ static qpdf_oh
 new_object(qpdf_data qpdf, QPDFObjectHandle const& qoh)
 {
     qpdf_oh oh = ++qpdf->next_oh; // never return 0
-    qpdf->oh_cache[oh] = new QPDFObjectHandle(qoh);
+    qpdf->oh_cache[oh] = make_pointer_holder<QPDFObjectHandle>(qoh);
     return oh;
 }
 

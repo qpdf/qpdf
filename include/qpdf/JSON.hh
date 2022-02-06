@@ -37,6 +37,7 @@
 
 #include <qpdf/DLL.h>
 #include <qpdf/PointerHolder.hh>
+
 #include <string>
 #include <map>
 #include <vector>

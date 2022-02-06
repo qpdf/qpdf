@@ -251,7 +251,7 @@ QPDF_Stream::getStreamData(qpdf_stream_decode_level_e decode_level)
                       "getStreamData called on unfilterable stream");
     }
     QTC::TC("qpdf", "QPDF_Stream getStreamData");
-    return buf.getBuffer();
+    return buf.getBufferSharedPointer();
 }
 
 PointerHolder<Buffer>
@@ -265,7 +265,7 @@ QPDF_Stream::getRawStreamData()
                       "error getting raw stream data");
     }
     QTC::TC("qpdf", "QPDF_Stream getRawStreamData");
-    return buf.getBuffer();
+    return buf.getBufferSharedPointer();
 }
 
 bool
@@ -479,7 +479,7 @@ QPDF_Stream::pipeStreamData(Pipeline* pipeline, bool* filterp,
 
 	if (encode_flags & qpdf_ef_normalize)
 	{
-            normalizer = new ContentNormalizer();
+            normalizer = make_pointer_holder<ContentNormalizer>();
 	    new_pipeline = std::make_shared<Pl_QPDFTokenizer>(
                 "normalizer", normalizer.get(), pipeline);
 	    to_delete.push_back(new_pipeline);

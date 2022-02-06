@@ -205,7 +205,7 @@ static void process(char const* filename, bool include_ignorable,
     // Tokenize file, skipping streams
     FileInputSource* fis = new FileInputSource();
     fis->setFilename(filename);
-    is = fis;
+    is = PointerHolder<InputSource>(fis);
     dump_tokens(is, "FILE", max_len, include_ignorable, true, false);
 
     // Tokenize content streams, skipping inline images
@@ -220,10 +220,10 @@ static void process(char const* filename, bool include_ignorable,
         ++pageno;
         Pl_Buffer plb("buffer");
         (*iter).pipeContents(&plb);
-        PointerHolder<Buffer> content_data = plb.getBuffer();
+        auto content_data = plb.getBufferSharedPointer();
         BufferInputSource* bis = new BufferInputSource(
             "content data", content_data.get());
-        is = bis;
+        is = PointerHolder<InputSource>(bis);
         dump_tokens(is, "PAGE " + QUtil::int_to_string(pageno),
                     max_len, include_ignorable, false, true);
     }
@@ -241,7 +241,7 @@ static void process(char const* filename, bool include_ignorable,
                 (*iter).getStreamData(qpdf_dl_specialized);
             BufferInputSource* bis = new BufferInputSource(
                 "object stream data", b.get());
-            is = bis;
+            is = PointerHolder<InputSource>(bis);
             dump_tokens(is, "OBJECT STREAM " +
                         QUtil::int_to_string((*iter).getObjectID()),
                         max_len, include_ignorable, false, false);

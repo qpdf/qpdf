@@ -47,9 +47,9 @@ FuzzHelper::FuzzHelper(unsigned char const* data, size_t size) :
 PointerHolder<QPDF>
 FuzzHelper::getQpdf()
 {
-    PointerHolder<InputSource> is =
-        new BufferInputSource("fuzz input", &this->input_buffer);
-    PointerHolder<QPDF> qpdf = new QPDF();
+    auto is = PointerHolder<InputSource>(
+        new BufferInputSource("fuzz input", &this->input_buffer));
+    auto qpdf = make_pointer_holder<QPDF>();
     qpdf->processInputSource(is);
     return qpdf;
 }
@@ -57,7 +57,7 @@ FuzzHelper::getQpdf()
 PointerHolder<QPDFWriter>
 FuzzHelper::getWriter(PointerHolder<QPDF> qpdf)
 {
-    PointerHolder<QPDFWriter> w = new QPDFWriter(*qpdf);
+    auto w = make_pointer_holder<QPDFWriter>(*qpdf);
     w->setOutputPipeline(&this->discard);
     w->setDecodeLevel(qpdf_dl_all);
     return w;
