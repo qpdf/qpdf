@@ -810,6 +810,8 @@ class QPDFObjectHandle
     // returned.
     QPDF_DLL
     QPDFObjectHandle getKey(std::string const&);
+    QPDF_DLL
+    QPDFObjectHandle getKeyIfDict(std::string const&);
     // Return all keys.  Keys with null values are treated as if
     // they are not present.  This is as per the PDF spec.
     QPDF_DLL
