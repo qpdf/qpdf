@@ -3,6 +3,8 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/BitStream.hh>
 #include <qpdf/BitWriter.hh>
+#include <qpdf/QUtil.hh>
+
 #include <stdexcept>
 #include <vector>
 #include <string.h>
@@ -38,8 +40,8 @@ Pl_TIFFPredictor::Pl_TIFFPredictor(char const* identifier, Pipeline* next,
             "TIFFPredictor created with invalid columns value");
     }
     this->bytes_per_row = bpr & UINT_MAX;
-    this->cur_row = PointerHolder<unsigned char>(
-        true, new unsigned char[this->bytes_per_row]);
+    this->cur_row = make_array_pointer_holder<unsigned char>(
+        this->bytes_per_row);
     memset(this->cur_row.get(), 0, this->bytes_per_row);
 }
 

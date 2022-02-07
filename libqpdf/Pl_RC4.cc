@@ -9,8 +9,7 @@ Pl_RC4::Pl_RC4(char const* identifier, Pipeline* next,
     out_bufsize(out_bufsize),
     rc4(key_data, key_len)
 {
-    this->outbuf = PointerHolder<unsigned char>(
-        true, new unsigned char[out_bufsize]);
+    this->outbuf = make_array_pointer_holder<unsigned char>(out_bufsize);
 }
 
 Pl_RC4::~Pl_RC4()
