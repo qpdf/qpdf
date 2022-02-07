@@ -1269,7 +1269,7 @@ QUtil::read_file_into_memory(
     fseek(f, 0, SEEK_END);
     size = QIntC::to_size(QUtil::tell(f));
     fseek(f, 0, SEEK_SET);
-    file_buf = PointerHolder<char>(true, new char[size]);
+    file_buf = make_array_pointer_holder<char>(size);
     char* buf_p = file_buf.get();
     size_t bytes_read = 0;
     size_t len = 0;

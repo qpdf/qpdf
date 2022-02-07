@@ -1,6 +1,8 @@
 #include <qpdf/Pl_PNGFilter.hh>
 
 #include <qpdf/QTC.hh>
+#include <qpdf/QUtil.hh>
+
 #include <stdexcept>
 #include <string.h>
 #include <limits.h>
@@ -46,10 +48,10 @@ Pl_PNGFilter::Pl_PNGFilter(char const* identifier, Pipeline* next,
             "PNGFilter created with invalid columns value");
     }
     this->bytes_per_row = bpr & UINT_MAX;
-    this->buf1 = PointerHolder<unsigned char>(
-        true, new unsigned char[this->bytes_per_row + 1]);
-    this->buf2 = PointerHolder<unsigned char>(
-        true, new unsigned char[this->bytes_per_row + 1]);
+    this->buf1 = make_array_pointer_holder<unsigned char>(
+        this->bytes_per_row + 1);
+    this->buf2 = make_array_pointer_holder<unsigned char>(
+        this->bytes_per_row + 1);
     memset(this->buf1.get(), 0, this->bytes_per_row + 1);
     memset(this->buf2.get(), 0, this->bytes_per_row + 1);
     this->cur_row = this->buf1.get();
