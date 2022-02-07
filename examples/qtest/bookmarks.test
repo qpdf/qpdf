@@ -9,9 +9,9 @@ require TestDriver;
 
 my $td = new TestDriver('pdf-bookmarks');
 
-foreach my $show ("", " -show-open")
+foreach my $show ("", " --show-open")
 {
-    foreach my $style ("", " -lines", " -numbers")
+    foreach my $style ("", " --lines", " --numbers")
     {
         my $xshow = $show ? $show : "x";
         my $xstyle = $style ? $style : "x";
@@ -37,7 +37,7 @@ $td->runtest("bad",
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("encrypted, targets",
-	     {$td->COMMAND => "pdf-bookmarks -show-targets 4.pdf user"},
+	     {$td->COMMAND => "pdf-bookmarks --show-targets 4.pdf user"},
 	     {$td->FILE => "encrypted.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
