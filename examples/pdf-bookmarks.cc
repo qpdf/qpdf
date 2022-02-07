@@ -22,13 +22,13 @@ void usage()
     std::cerr << "Usage: " << whoami << " [options] file.pdf [password]"
 	      << std::endl
 	      << "Options:" << std::endl
-	      << "  -numbers        give bookmarks outline-style numbers"
+	      << "  --numbers        give bookmarks outline-style numbers"
 	      << std::endl
-	      << "  -lines          draw lines to show bookmark hierarchy"
+	      << "  --lines          draw lines to show bookmark hierarchy"
 	      << std::endl
-	      << "  -show-open      indicate whether a bookmark is initially open"
+	      << "  --show-open      indicate whether a bookmark is initially open"
 	      << std::endl
-	      << "  -show-targets   show target if possible"
+	      << "  --show-targets   show target if possible"
 	      << std::endl;
     exit(2);
 }
@@ -177,19 +177,19 @@ int main(int argc, char* argv[])
     {
 	if (argv[arg][0] == '-')
 	{
-	    if (strcmp(argv[arg], "-numbers") == 0)
+	    if (strcmp(argv[arg], "--numbers") == 0)
 	    {
 		style = st_numbers;
 	    }
-	    else if (strcmp(argv[arg], "-lines") == 0)
+	    else if (strcmp(argv[arg], "--lines") == 0)
 	    {
 		style = st_lines;
 	    }
-	    else if (strcmp(argv[arg], "-show-open") == 0)
+	    else if (strcmp(argv[arg], "--show-open") == 0)
 	    {
 		show_open = true;
 	    }
-	    else if (strcmp(argv[arg], "-show-targets") == 0)
+	    else if (strcmp(argv[arg], "--show-targets") == 0)
 	    {
 		show_targets = true;
 	    }

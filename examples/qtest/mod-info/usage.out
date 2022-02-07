@@ -1,4 +1,4 @@
-Usage: pdf-mod-info -in in_file [-out out_file] [-key key [-val val]?]+
+Usage: pdf-mod-info --in in_file [--out out_file] [--key key [--val val]?]+
 Modifies/Adds/Removes PDF /Info entries in the in_file
 and stores the result in out_file
 Special mode: pdf-mod-info --dump file

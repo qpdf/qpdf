@@ -16,64 +16,64 @@ my $qpdf = $ENV{'QPDF_BIN'} or die;
 cleanup();
 
 $td->runtest("usage #1",
-	     {$td->COMMAND => "$prg -in target.pdf"},
+	     {$td->COMMAND => "$prg --in target.pdf"},
 	     {$td->FILE => "usage.out",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("usage #2",
-	     {$td->COMMAND => "$prg -key abc -val def"},
+	     {$td->COMMAND => "$prg --key abc --val def"},
 	     {$td->FILE => "usage.out",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("usage #3",
-	     {$td->COMMAND => "$prg -key abc -val def abc"},
+	     {$td->COMMAND => "$prg --key abc --val def abc"},
 	     {$td->FILE => "usage.out",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("usage #4",
-	     {$td->COMMAND => "$prg -in source1.pdf -key date -val 01/01/01 -val 12/12/12"},
+	     {$td->COMMAND => "$prg --in source1.pdf --key date --val 01/01/01 --val 12/12/12"},
 	     {$td->FILE => "usage.out",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("dump #1",
-	     {$td->COMMAND => "$prg --dump -in files/source1.pdf"},
+	     {$td->COMMAND => "$prg --dump files/source1.pdf"},
 	     {$td->FILE => "dump.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("dump #2",
-	     {$td->COMMAND => "$prg --dump -in files/no-info.pdf"},
+	     {$td->COMMAND => "$prg --dump files/no-info.pdf"},
 	     {$td->STRING => "",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("dump #3",
-	     {$td->COMMAND => "$prg --dump -in files/empty-info.pdf"},
+	     {$td->COMMAND => "$prg --dump files/empty-info.pdf"},
 	     {$td->STRING => "",
 	      $td->EXIT_STATUS => 0});
 
 run_and_cmp("modify Subject",
-	    "$prg -in files/source1.pdf -out out.pdf -key Subject " .
-	    "-val \"Export Business\"",
+	    "$prg --in files/source1.pdf --out out.pdf --key Subject " .
+	    "--val \"Export Business\"",
 	    "", "out.pdf", "files/1.qdf");
 
 run_and_cmp("add Subject, remove Producer, modify CreationDate",
-	    "$prg -in files/source2.pdf -out out.pdf -key Subject " .
-	    "-val \"Tammlin\" -key Producer -key CreationDate -val 12/12",
+	    "$prg --in files/source2.pdf --out out.pdf --key Subject " .
+	    "--val \"Tammlin\" --key Producer --key CreationDate --val 12/12",
 	    "", "out.pdf", "files/2.qdf");
 
 run_and_cmp("add Subject (empty-info file)",
-	    "$prg -in files/empty-info.pdf -out out.pdf -key Subject " .
-	    "-val Tammlin",
+	    "$prg --in files/empty-info.pdf --out out.pdf --key Subject " .
+	    "--val Tammlin",
 	    "", "out.pdf", "files/3.qdf");
 
 copy("files/no-info.pdf", "no-info.pdf") or die "can't copy no-info: $!";
 run_and_cmp("in-place Producer added (no-info file)",
-	    "$prg -in no-info.pdf -key Producer -val \"Obivan Kinobi\"",
+	    "$prg --in no-info.pdf --key Producer --val \"Obivan Kinobi\"",
 	    "", "no-info.pdf", "files/4.qdf");
 
 cleanup();

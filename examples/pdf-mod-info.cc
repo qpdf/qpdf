@@ -17,7 +17,7 @@ void usage()
 {
     std::cerr
 	<< "Usage: " << whoami
-	<< " -in in_file [-out out_file] [-key key [-val val]?]+\n"
+	<< " --in in_file [--out out_file] [--key key [--val val]?]+\n"
 	<< "Modifies/Adds/Removes PDF /Info entries in the in_file\n"
 	<< "and stores the result in out_file\n"
 	<< "Special mode: " << whoami << " --dump file\n"
@@ -86,11 +86,10 @@ int main(int argc, char* argv[])
 	std::cout << whoami << " version " << version << std::endl;
 	exit(0);
     }
-    if ((argc == 4) && (! strcmp(argv[1], "--dump")) &&
-	(strcmp(argv[2], "-in") == 0) )
+    if ((argc == 3) && (! strcmp(argv[1], "--dump")))
     {
 	QTC::TC("examples", "pdf-mod-info --dump");
-	pdfDumpInfoDict(argv[3]);
+	pdfDumpInfoDict(argv[2]);
 	exit(0);
     }
 
@@ -100,11 +99,11 @@ int main(int argc, char* argv[])
 
     for (int i = 1; i < argc; ++i)
     {
-	if ((! strcmp(argv[i], "-in")) && (++i < argc))
+	if ((! strcmp(argv[i], "--in")) && (++i < argc))
 	{
 	    fl_in = argv[i];
 	}
-	else if ((! strcmp(argv[i], "-out")) && (++i < argc))
+	else if ((! strcmp(argv[i], "--out")) && (++i < argc))
 	{
 	    fl_out = argv[i];
 	}
@@ -112,7 +111,7 @@ int main(int argc, char* argv[])
 	{
 	    static_id = true; // this should be used in test suites only
 	}
-	else if ((! strcmp(argv[i], "-key")) && (++i < argc))
+	else if ((! strcmp(argv[i], "--key")) && (++i < argc))
 	{
 	    QTC::TC("examples", "pdf-mod-info -key");
 	    cur_key = argv[i];
@@ -122,7 +121,7 @@ int main(int argc, char* argv[])
 	    }
 	    Keys[cur_key] = "";
 	}
-	else if ((! strcmp(argv[i], "-val")) && (++i < argc))
+	else if ((! strcmp(argv[i], "--val")) && (++i < argc))
 	{
 	    if (cur_key.empty())
 	    {

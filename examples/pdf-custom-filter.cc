@@ -461,7 +461,7 @@ static void usage()
 {
     std::cerr
         << "\n"
-        << "Usage: " << whoami << " [ --decode-specialized ] infile outfile\n"
+        << "Usage: " << whoami << " [--decode-specialized] infile outfile\n"
         << std::endl;
     exit(2);
 }
