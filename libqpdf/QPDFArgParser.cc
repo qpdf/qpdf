@@ -299,9 +299,8 @@ QPDFArgParser::handleArgFileArguments()
                 QUtil::make_shared_cstr(this->m->argv[i]));
         }
     }
-    this->m->argv_ph = std::shared_ptr<char const*>(
-        new char const*[1 + this->m->new_argv.size()],
-        std::default_delete<char const*[]>());
+    this->m->argv_ph = QUtil::make_shared_array<char const*>(
+        1 + this->m->new_argv.size());
     for (size_t i = 0; i < this->m->new_argv.size(); ++i)
     {
         this->m->argv_ph.get()[i] = this->m->new_argv.at(i).get();
@@ -404,9 +403,8 @@ QPDFArgParser::handleBashArguments()
     }
     // Explicitly discard any non-space-terminated word. The "current
     // word" is handled specially.
-    this->m->bash_argv_ph = std::shared_ptr<char const*>(
-        new char const*[1 + this->m->bash_argv.size()],
-        std::default_delete<char const*[]>());
+    this->m->bash_argv_ph = QUtil::make_shared_array<char const*>(
+        1 + this->m->bash_argv.size());
     for (size_t i = 0; i < this->m->bash_argv.size(); ++i)
     {
         this->m->bash_argv_ph.get()[i] = this->m->bash_argv.at(i).get();

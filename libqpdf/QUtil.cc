@@ -735,9 +735,7 @@ QUtil::copy_string(std::string const& str)
 std::shared_ptr<char>
 QUtil::make_shared_cstr(std::string const& str)
 {
-    auto result = std::shared_ptr<char>(
-        new char[str.length() + 1],
-        std::default_delete<char[]>());
+    auto result = QUtil::make_shared_array<char>(str.length() + 1);
     // Use memcpy in case string contains nulls
     result.get()[str.length()] = '\0';
     memcpy(result.get(), str.c_str(), str.length());

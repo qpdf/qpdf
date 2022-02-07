@@ -165,6 +165,15 @@ namespace QUtil
     QPDF_DLL
     std::unique_ptr<char[]> make_unique_cstr(std::string const&);
 
+    // Create a shared pointer to an array. From c++20,
+    // std::make_shared<T[]>(n) does this.
+    template <typename T>
+    std::shared_ptr<T>
+    make_shared_array(size_t n)
+    {
+        return std::shared_ptr<T>(new T[n], std::default_delete<T[]>());
+    }
+
     // Returns lower-case hex-encoded version of the string, treating
     // each character in the input string as unsigned.  The output
     // string will be twice as long as the input string.
