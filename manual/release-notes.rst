@@ -99,7 +99,7 @@ For a detailed list of changes, please see the file
 
       - The newer accessor methods return a boolean indicating whether
         or not the object is of the expected type. If it is, a
-        reference of the correct type is returned.
+        reference to a variable of the correct type is initialized.
 
       In many cases, the new interfaces will enable more compact code
       and will also never generate type warnings. Thanks to M. Holger

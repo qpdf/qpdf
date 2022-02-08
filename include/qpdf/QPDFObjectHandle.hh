@@ -657,13 +657,25 @@ class QPDFObjectHandle
     //
     // In PDF files, objects have specific types, but there is nothing
     // that prevents PDF files from containing objects of types that
-    // aren't expected by the specification. Many of the accessors
-    // here expect objects of a particular type. Prior to qpdf 8,
-    // calling an accessor on a method of the wrong type, such as
-    // trying to get a dictionary key from an array, trying to get the
-    // string value of a number, etc., would throw an exception, but
-    // since qpdf 8, qpdf issues a warning and recovers using the
-    // following behavior:
+    // aren't expected by the specification.
+    //
+    // There are two flavors of accessor methods:
+    //
+    // * getSomethingValue() returns the value and issues a type
+    //   warning if the type is incorrect.
+    //
+    // * getValueAsSomething() returns false if the value is the wrong
+    //   type. Otherwise, it returns true and initializes a reference
+    //   of the appropriate type. These methods never issue type
+    //   warnings.
+    //
+    // The getSomethingValue() accessors and some of the other methods
+    // expect objects of a particular type. Prior to qpdf 8, calling
+    // an accessor on a method of the wrong type, such as trying to
+    // get a dictionary key from an array, trying to get the string
+    // value of a number, etc., would throw an exception, but since
+    // qpdf 8, qpdf issues a warning and recovers using the following
+    // behavior:
     //
     // * Requesting a value of the wrong type (int value from string,
     //   array item from a scalar or dictionary, etc.) will return a

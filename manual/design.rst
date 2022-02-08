@@ -746,6 +746,15 @@ and set return values in passed-in pointers, but this would complicate
 both the implementation and the use of the library for a case that is
 actually quite rare and largely avoidable.
 
+*How can I avoid type warnings altogether?* For each
+``getSomethingValue`` accessor that returns a value of the requested
+type and issues a warning for objects of the wrong type, there is also
+a ``getValueAsSomething`` method (since qpdf 10.6) that returns false
+for objects of the wrong type and otherwise returns true and
+initializes a reference. These methods never generate type warnings
+and provide an alternative to explicitly checking the type of an
+object before calling an accessor method.
+
 .. _smart-pointers:
 
 Smart Pointers
