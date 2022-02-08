@@ -318,7 +318,8 @@ git clone git@github.com:pikepdf/pikepdf
 virtualenv v
 source v/bin/activate
 cd pikepdf
-pip3 install -r requirements/test.txt
+pip3 install --upgrade pip
+pip3 install '.[test]'
 rehash
 pip3 install .
 pytest -n auto
