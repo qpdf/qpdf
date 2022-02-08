@@ -118,7 +118,7 @@
 
 // POINTERHOLDER_TRANSITION = 3
 //
-// Warn for all use of PointerHolder<T>. This help you remove all use
+// Warn for all use of PointerHolder<T>. This helps you remove all use
 // of PointerHolder from your code and use std::shared_ptr instead.
 // You will also have to transition any containers of PointerHolder in
 // your code.

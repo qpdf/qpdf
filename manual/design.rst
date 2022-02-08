@@ -130,7 +130,7 @@ classes are intended to contain higher level APIs that allow developers
 to work with certain document constructs at an abstraction level above
 that of ``QPDFObjectHandle`` while staying true to qpdf's philosophy of
 not hiding document structure from the developer. As with qpdf in
-general, the goal is take away some of the more tedious bookkeeping
+general, the goal is to take away some of the more tedious bookkeeping
 aspects of working with PDF files, not to remove the need for the
 developer to understand how the PDF construction in question works. The
 driving factor behind the creation of helper classes was to allow the
@@ -751,7 +751,7 @@ actually quite rare and largely avoidable.
 Smart Pointers
 --------------
 
-This section describes changes to the use of smart pointers there were
+This section describes changes to the use of smart pointers that were
 made in qpdf 10.6.0 as well as some planned for 11.0.0.
 
 Starting in qpdf 11, ``PointerHolder`` will be replaced with
@@ -886,7 +886,7 @@ switching from ``PointerHolder`` to ``std::shared_ptr``:
 To use ``POINTERHOLDER_TRANSITION``, you will need to ``#define`` it
 before including any qpdf header files or specify its value as part of
 your build. The table below describes the values of
-``POINTERHOLDER_TRANSITION``. This informatoin is also summarized in
+``POINTERHOLDER_TRANSITION``. This information is also summarized in
 :file:`include/qpdf/PointerHolder.hh`, so you will have it handy
 without consulting this manual.
 
@@ -898,10 +898,10 @@ without consulting this manual.
      - meaning
 
    - - undefined
-     - same as ``0``, but start with qpdf 11.0, issues a warning
+     - Same as ``0``, but starting with qpdf 11.0, issues a warning
 
    - - ``0``
-     - provide a backward compatible ``PointerHolder`` and suppress
+     - Provide a backward compatible ``PointerHolder`` and suppress
        all deprecation warnings
 
    - - ``1``
@@ -911,10 +911,10 @@ without consulting this manual.
      - Deprecate ``getPointer()`` and ``getRefcount()``
 
    - - ``3``
-     - Starting in qpdf 11, deprecate all uses of ``PointerHolder``
+     - Starting with qpdf 11.0, deprecate all uses of ``PointerHolder``
 
    - - ``4``
-     - Starting in qpdf 11, disable all functionality from
+     - Starting with qpdf 11.0, disable all functionality from
        ``qpdf/PointerHolder.hh`` so that ``#include``-ing it has no
        effect.
 
@@ -1012,7 +1012,7 @@ After qpdf 11 is out
 In the 10.6 manual, this section represents a plan and is subject to
 change. However, it has been tested in practice using a version of the
 qpdf 11 ``PointerHolder`` on a branch, so it is likely to be accurate.
-In the meantime, think of this is a preview.
+In the meantime, think of this as a preview.
 
 First, make sure you have done the steps in the 10.6 section. (Note:
 once qpdf 11 comes out, the goal is to not have to migrate to 10.6
@@ -1090,8 +1090,8 @@ symbol. Here are the remaining changes.
 
 - Build and test. Fix any remaining issues.
 
-- If not supporting older qpdf, remove all references to
-  ``<qpdf/PointerHolder.hh>``. Otherwise, you wil still need to
+- If not supporting older versions of qpdf, remove all references to
+  ``<qpdf/PointerHolder.hh>``. Otherwise, you will still need to
   include it but can ``#define POINTERHOLDER_TRANSITION 4`` to prevent
   ``PointerHolder`` from being defined. The
   ``POINTERHOLDER_IS_SHARED_POINTER`` symbol will still be defined.
@@ -1102,6 +1102,6 @@ Historical Background
 Since its inception, the qpdf library used its own smart pointer
 class, ``PointerHolder``. The ``PointerHolder`` class was originally
 created long before ``std::shared_ptr`` existed, and qpdf itself
-didn't start requiring a C++11 compiler version 9.1.0 released in
-late 2019. With current C++ versions, is no longer desirable for qpdf
+didn't start requiring a C++11 compiler until version 9.1.0 released in
+late 2019. With current C++ versions, it is no longer desirable for qpdf
 to have its own smart pointer class.

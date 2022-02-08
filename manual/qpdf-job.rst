@@ -184,10 +184,10 @@ This section describes some of the design rationale and history behind
 Documentation of ``QPDFJob`` is divided among three places:
 
 - "HOW TO ADD A COMMAND-LINE ARGUMENT" in :file:`README-maintainer`
-  provides a quick reminder of how to add a command-line argument
+  provides a quick reminder of how to add a command-line argument.
 
 - The source file :file:`generate_auto_job` has a detailed explanation
-  about how ``QPDFJob`` and ``generate_auto_job`` work together
+  about how ``QPDFJob`` and ``generate_auto_job`` work together.
 
 - This chapter of the manual has other details.
 
@@ -207,7 +207,7 @@ such. This created a number of problems:
 
 - Users of other languages who just wanted an interface to do things
   that the CLI could do didn't have a good way to do it, such as just
-  handling a library call a set of command-line options or an
+  handing a library call a set of command-line options or an
   equivalent JSON object that could be passed in as a string.
 
 - The qpdf CLI itself was almost 8,000 lines of code. It needed to be
