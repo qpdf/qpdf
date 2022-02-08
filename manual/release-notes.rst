@@ -6,7 +6,7 @@ Release Notes
 For a detailed list of changes, please see the file
 :file:`ChangeLog` in the source distribution.
 
-10.6.0: XXX
+10.6.0: February 8, 2022
   - Preparation for replacement of ``PointerHolder``
 
     The next major release of qpdf will replace ``PointerHolder`` with
@@ -148,13 +148,13 @@ For a detailed list of changes, please see the file
       embedded NUL characters. Thanks to M. Holger for the
       contribution.
 
-    - New ``PDFVersion`` class for representing a PDF version number
-      with the ability to compare and order PDF versions. Methods
-      ``QPDF::getVersionAsPDFVersion`` and a new version of
-      ``QPDFWriter::setMinimumPDFVersion`` use it. This makes it
-      easier to create an output file whose PDF version is the maximum
-      of the versions across all the input files that contributed to
-      it.
+    - There is a new ``PDFVersion`` class for representing a PDF
+      version number with the ability to compare and order PDF
+      versions. Methods ``QPDF::getVersionAsPDFVersion`` and a new
+      version of ``QPDFWriter::setMinimumPDFVersion`` use it. This
+      makes it easier to create an output file whose PDF version is
+      the maximum of the versions across all the input files that
+      contributed to it.
 
     - The ``JSON`` object in the qpdf library has been enhanced to
       include a parser and the ability to get values out of the

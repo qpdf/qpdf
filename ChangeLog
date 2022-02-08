@@ -1,5 +1,7 @@
 2022-02-08  Jay Berkenbilt  <ejb@ql.org>
 
+	* 10.6.0: release
+
 	* Bug fix: when splitting pages with --split-pages or selecting
 	pages with --pages, set the output PDF version to the maximum of
 	all the input PDF versions. This is a fix to QPDFJob. If you are

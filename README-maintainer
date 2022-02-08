@@ -278,7 +278,7 @@ RELEASE PREPARATION
 
   * Make sure version numbers are consistent in the following locations:
     * configure.ac
-    * libqpdf/QPDF.cc
+    * include/qpdf/DLL.h
     * manual/conf.py
     `make_dist` verifies this consistency.
 
