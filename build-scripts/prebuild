@@ -1,4 +1,21 @@
 #!/bin/bash
+set -e
 cd $(dirname $0)/..
+if ! ./generate_auto_job --check; then
+   cat 1>&2 <<EOF
+
+******************************
+
+An input or output file of generate_auto_job was modified without
+rerunning ./generate_auto_job. If you are seeing this in your pull
+request, you should pass --enable-maintainer-mode to ./configure if
+possible, or if not, run "./generate_auto_job --generate" and include
+any changed files in your commit.
+
+******************************
+
+EOF
+   exit 2
+fi
 build-scripts/build-doc
 build-scripts/download-external-libs

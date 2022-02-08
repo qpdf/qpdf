@@ -247,6 +247,21 @@ class Main:
                     if m:
                         old_hashes[m.group(1)] = m.group(2)
             match = old_hashes == hashes
+            if not match:
+                # Write to stdout, not stderr. What we write to stderr
+                # is visible in a normal build. Writing to stdout will
+                # hide it in that case but expose it if you directly
+                # run ./generate_auto_job --check as in CI.
+                print(f'*** {whoami} hash mismatches ***')
+                match = False
+                for k, v in hashes.items():
+                    if k not in old_hashes:
+                        print(f'  {k} is not in job.sums')
+                    elif v != old_hashes[k]:
+                        print(f'  {k} was modified')
+                for k in old_hashes:
+                    if k not in hashes:
+                        print(f'  {k} disappeared')
         except Exception:
             pass
         return match
