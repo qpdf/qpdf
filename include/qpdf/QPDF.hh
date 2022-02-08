@@ -44,6 +44,7 @@
 #include <qpdf/QPDFStreamFilter.hh>
 #include <qpdf/Buffer.hh>
 #include <qpdf/InputSource.hh>
+#include <qpdf/PDFVersion.hh>
 
 class QPDF_Stream;
 class BitStream;
@@ -260,6 +261,10 @@ class QPDF
 
     QPDF_DLL
     std::string getFilename() const;
+    // Return PDF Version and extension level together as a PDFVersion object
+    QPDF_DLL
+    PDFVersion getVersionAsPDFVersion();
+    // Return just the PDF version from the file
     QPDF_DLL
     std::string getPDFVersion() const;
     QPDF_DLL

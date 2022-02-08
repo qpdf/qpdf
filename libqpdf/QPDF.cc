@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <memory.h>
+#include <regex>
 
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
@@ -2740,6 +2741,24 @@ std::string
 QPDF::getFilename() const
 {
     return this->m->file->getName();
+}
+
+PDFVersion
+QPDF::getVersionAsPDFVersion()
+{
+    int major = 1;
+    int minor = 3;
+    int extension_level = getExtensionLevel();
+
+    std::regex v("^[[:space:]]*([0-9]+)\\.([0-9]+)");
+    std::smatch m;
+    if (std::regex_search(this->m->pdf_version, m, v))
+    {
+        major = QUtil::string_to_int(m[1].str().c_str());
+        minor = QUtil::string_to_int(m[2].str().c_str());
+    }
+
+    return PDFVersion(major, minor, extension_level);
 }
 
 std::string

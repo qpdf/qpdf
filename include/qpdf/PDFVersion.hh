@@ -65,9 +65,9 @@ class PDFVersion
     int getExtensionLevel() const;
 
   private:
-    int major;
-    int minor;
-    int extension;
+    int major_version;
+    int minor_version;
+    int extension_level;
 };
 
 #endif // PDFVERSION_HH

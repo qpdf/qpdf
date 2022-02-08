@@ -1327,6 +1327,12 @@ static void test_34(QPDF& pdf, char const* arg2)
     std::cout << "version: " << pdf.getPDFVersion() << std::endl
               << "extension level: " << pdf.getExtensionLevel() << std::endl
               << pdf.getRoot().getKey("/Extensions").unparse() << std::endl;
+    auto v = pdf.getVersionAsPDFVersion();
+    std::string v_string;
+    int extension_level;
+    v.getVersion(v_string, extension_level);
+    std::cout << "As PDFVersion: " << v_string << "/" << extension_level
+              << std::endl;
 }
 
 static void test_35(QPDF& pdf, char const* arg2)

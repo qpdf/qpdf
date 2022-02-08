@@ -3,6 +3,9 @@
 	* Add new class PDFVersion for more convenient comparison of PDF
 	version numbers from the %!PDF header.
 
+	* Add QPDF::getVersionAsPDFVersion() to return the PDF version and
+	extension together as a PDFVersion object instead of a string.
+
 2022-02-06  Jay Berkenbilt  <ejb@ql.org>
 
 	* Pl_Buffer and QPDFWriter: add getBufferSharedPointer(), which
