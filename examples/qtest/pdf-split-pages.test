@@ -12,16 +12,16 @@ my $td = new TestDriver('pdf-split-pages');
 cleanup();
 
 $td->runtest("split",
-	     {$td->COMMAND => "pdf-split-pages ' --static-id' in.pdf out"},
-	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+             {$td->COMMAND => "pdf-split-pages ' --static-id' in.pdf out"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
 
 $td->runtest("check page 1",
-	     {$td->FILE => "out1.pdf"},
-	     {$td->FILE => "exp1.pdf"});
+             {$td->FILE => "out1.pdf"},
+             {$td->FILE => "exp1.pdf"});
 
 $td->runtest("check page 2",
-	     {$td->FILE => "out2.pdf"},
-	     {$td->FILE => "exp2.pdf"});
+             {$td->FILE => "out2.pdf"},
+             {$td->FILE => "exp2.pdf"});
 
 cleanup();
 

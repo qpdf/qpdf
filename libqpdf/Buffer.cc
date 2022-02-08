@@ -9,11 +9,11 @@ Buffer::Members::Members(size_t size, unsigned char* buf, bool own_memory) :
 {
     if (own_memory)
     {
-	this->buf = (size ? new unsigned char[size] : 0);
+        this->buf = (size ? new unsigned char[size] : 0);
     }
     else
     {
-	this->buf = buf;
+        this->buf = buf;
     }
 }
 
@@ -21,7 +21,7 @@ Buffer::Members::~Members()
 {
     if (this->own_memory)
     {
-	delete [] this->buf;
+        delete [] this->buf;
     }
 }
 
@@ -58,10 +58,10 @@ Buffer::copy(Buffer const& rhs)
     if (this != &rhs)
     {
         this->m = PointerHolder<Members>(new Members(rhs.m->size, 0, true));
-	if (this->m->size)
-	{
-	    memcpy(this->m->buf, rhs.m->buf, this->m->size);
-	}
+        if (this->m->size)
+        {
+            memcpy(this->m->buf, rhs.m->buf, this->m->size);
+        }
     }
 }
 

@@ -42,24 +42,24 @@ void run(char const* filename, char const* filter,
     size_t len;
     while (true)
     {
-	len = fread(buf, 1, (2 * columns) + 1, in);
-	if (len == 0)
-	{
-	    break;
-	}
-	pl->write(buf, len);
-	len = fread(buf, 1, 1, in);
-	if (len == 0)
-	{
-	    break;
-	}
-	pl->write(buf, len);
-	len = fread(buf, 1, 1, in);
-	if (len == 0)
-	{
-	    break;
-	}
-	pl->write(buf, len);
+        len = fread(buf, 1, (2 * columns) + 1, in);
+        if (len == 0)
+        {
+            break;
+        }
+        pl->write(buf, len);
+        len = fread(buf, 1, 1, in);
+        if (len == 0)
+        {
+            break;
+        }
+        pl->write(buf, len);
+        len = fread(buf, 1, 1, in);
+        if (len == 0)
+        {
+            break;
+        }
+        pl->write(buf, len);
     }
 
     pl->finish();
@@ -75,10 +75,10 @@ int main(int argc, char* argv[])
 {
     if (argc != 7)
     {
-	std::cerr << "Usage: predictor {png|tiff} {en,de}code filename"
+        std::cerr << "Usage: predictor {png|tiff} {en,de}code filename"
                   << " columns samples-per-pixel bits-per-sample"
                   << std::endl;
-	exit(2);
+        exit(2);
     }
     char* filter = argv[1];
     bool encode = (strcmp(argv[2], "encode") == 0);
@@ -89,14 +89,14 @@ int main(int argc, char* argv[])
 
     try
     {
-	run(filename, filter, encode,
+        run(filename, filter, encode,
             QIntC::to_uint(columns),
             QIntC::to_uint(bits_per_sample),
             QIntC::to_uint(samples_per_pixel));
     }
     catch (std::exception& e)
     {
-	std::cout << e.what() << std::endl;
+        std::cout << e.what() << std::endl;
     }
     return 0;
 }

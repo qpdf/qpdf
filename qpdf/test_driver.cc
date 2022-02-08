@@ -45,27 +45,27 @@ class Provider: public QPDFObjectHandle::StreamDataProvider
 {
   public:
     Provider(PointerHolder<Buffer> b) :
-	b(b),
-	bad_length(false)
+        b(b),
+        bad_length(false)
     {
     }
     virtual ~Provider()
     {
     }
     virtual void provideStreamData(int objid, int generation,
-				   Pipeline* p)
+                                   Pipeline* p)
     {
-	p->write(b->getBuffer(), b->getSize());
-	if (this->bad_length)
-	{
-	    unsigned char ch = ' ';
-	    p->write(&ch, 1);
-	}
-	p->finish();
+        p->write(b->getBuffer(), b->getSize());
+        if (this->bad_length)
+        {
+            unsigned char ch = ' ';
+            p->write(&ch, 1);
+        }
+        p->finish();
     }
     void badLength(bool v)
     {
-	this->bad_length = v;
+        this->bad_length = v;
     }
 
   private:
@@ -3351,12 +3351,12 @@ void runtest(int n, char const* filename1, char const* arg2)
     FILE* filep = 0;
     if (n == 0)
     {
-	pdf.setAttemptRecovery(false);
+        pdf.setAttemptRecovery(false);
     }
     if (((n == 35) || (n == 36)) && (arg2 != 0))
     {
         // arg2 is password
-	pdf.processFile(filename1, arg2);
+        pdf.processFile(filename1, arg2);
     }
     else if (n == 45)
     {
@@ -3382,7 +3382,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         {
             p[i] = static_cast<char>(p[i] ^ 0xcc);
         }
-	pdf.processMemoryFile((std::string(filename1) + ".pdf").c_str(),
+        pdf.processMemoryFile((std::string(filename1) + ".pdf").c_str(),
                               p, size);
     }
     else if ((n == 61) || (n == 81) || (n == 83) || (n == 84) || (n == 85))
@@ -3393,12 +3393,12 @@ void runtest(int n, char const* filename1, char const* arg2)
     {
         if (n % 4 == 0)
         {
-	    QTC::TC("qpdf", "exercise processFile(name)");
+            QTC::TC("qpdf", "exercise processFile(name)");
             pdf.processFile(filename1);
         }
         else
         {
-	    QTC::TC("qpdf", "exercise processFile(FILE*)");
+            QTC::TC("qpdf", "exercise processFile(FILE*)");
             filep = QUtil::safe_fopen(filename1, "rb");
             pdf.processFile(filename1, filep, false);
         }
@@ -3408,7 +3408,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         QTC::TC("qpdf", "exercise processMemoryFile");
         size_t size = 0;
         QUtil::read_file_into_memory(filename1, file_buf, size);
-	pdf.processMemoryFile(filename1, file_buf.get(), size);
+        pdf.processMemoryFile(filename1, file_buf.get(), size);
     }
 
     std::map<int, void (*)(QPDF&, char const*)> test_functions = {
@@ -3439,8 +3439,8 @@ void runtest(int n, char const* filename1, char const* arg2)
     auto fn = test_functions.find(n);
     if (fn == test_functions.end())
     {
-	throw std::runtime_error(std::string("invalid test ") +
-				 QUtil::int_to_string(n));
+        throw std::runtime_error(std::string("invalid test ") +
+                                 QUtil::int_to_string(n));
     }
     (fn->second)(pdf, arg2);
 
@@ -3456,34 +3456,34 @@ int main(int argc, char* argv[])
     QUtil::setLineBuf(stdout);
     if ((whoami = strrchr(argv[0], '/')) == NULL)
     {
-	whoami = argv[0];
+        whoami = argv[0];
     }
     else
     {
-	++whoami;
+        ++whoami;
     }
     // For libtool's sake....
     if (strncmp(whoami, "lt-", 3) == 0)
     {
-	whoami += 3;
+        whoami += 3;
     }
 
     if ((argc < 3) || (argc > 4))
     {
-	usage();
+        usage();
     }
 
     try
     {
-	int n = QUtil::string_to_int(argv[1]);
-	char const* filename1 = argv[2];
+        int n = QUtil::string_to_int(argv[1]);
+        char const* filename1 = argv[2];
         char const* arg2 = argv[3];
-	runtest(n, filename1, arg2);
+        runtest(n, filename1, arg2);
     }
     catch (std::exception& e)
     {
-	std::cerr << e.what() << std::endl;
-	exit(2);
+        std::cerr << e.what() << std::endl;
+        exit(2);
     }
 
     return 0;

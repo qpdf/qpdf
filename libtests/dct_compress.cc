@@ -76,15 +76,15 @@ int main(int argc, char* argv[])
     Pl_DCT dct("dct", &out, width, height, components, cs, &callback);
     while (! done)
     {
-	size_t len = fread(buf, 1, sizeof(buf), infile);
-	if (len <= 0)
-	{
-	    done = true;
-	}
-	else
-	{
-	    dct.write(buf, len);
-	}
+        size_t len = fread(buf, 1, sizeof(buf), infile);
+        if (len <= 0)
+        {
+            done = true;
+        }
+        else
+        {
+            dct.write(buf, len);
+        }
     }
     dct.finish();
     if (! callback.called)

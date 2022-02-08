@@ -207,7 +207,7 @@ class StreamReplacer: public QPDFObjectHandle::StreamDataProvider
     StreamReplacer(QPDF* pdf);
     virtual ~StreamReplacer() = default;
     virtual void provideStreamData(int objid, int generation,
-				   Pipeline* pipeline) override;
+                                   Pipeline* pipeline) override;
 
     void registerStream(
         QPDFObjectHandle stream,
@@ -473,7 +473,7 @@ int main(int argc, char* argv[])
     // For libtool's sake....
     if (strncmp(whoami, "lt-", 3) == 0)
     {
-	whoami += 3;
+        whoami += 3;
     }
 
     char const* infilename = 0;
@@ -517,7 +517,7 @@ int main(int argc, char* argv[])
     catch (std::exception &e)
     {
         std::cerr << whoami << ": exception: " << e.what() << std::endl;
-	exit(2);
+        exit(2);
     }
 
     return 0;

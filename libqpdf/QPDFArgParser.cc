@@ -25,7 +25,7 @@ QPDFArgParser::Members::Members(
     // Remove prefix added by libtool for consistency during testing.
     if (strncmp(p, "lt-", 3) == 0)
     {
-	p += 3;
+        p += 3;
     }
     whoami = p;
 }

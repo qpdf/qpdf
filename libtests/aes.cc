@@ -96,13 +96,13 @@ int main(int argc, char* argv[])
     unsigned char* key = new unsigned char[keylen];
     for (unsigned int i = 0; i < strlen(hexkey); i += 2)
     {
-	char t[3];
-	t[0] = hexkey[i];
-	t[1] = hexkey[i + 1];
-	t[2] = '\0';
+        char t[3];
+        t[0] = hexkey[i];
+        t[1] = hexkey[i + 1];
+        t[2] = '\0';
 
-	long val = strtol(t, 0, 16);
-	key[i/2] = static_cast<unsigned char>(val);
+        long val = strtol(t, 0, 16);
+        key[i/2] = static_cast<unsigned char>(val);
     }
 
     Pl_StdioFile* out = new Pl_StdioFile("stdout", outfile);
@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
     key = 0;
     if (! cbc_mode)
     {
-	aes->disableCBC();
+        aes->disableCBC();
     }
     if (zero_iv)
     {
@@ -131,15 +131,15 @@ int main(int argc, char* argv[])
     bool done = false;
     while (! done)
     {
-	size_t len = fread(buf, 1, sizeof(buf), infile);
-	if (len <= 0)
-	{
-	    done = true;
-	}
-	else
-	{
-	    aes->write(buf, len);
-	}
+        size_t len = fread(buf, 1, sizeof(buf), infile);
+        if (len <= 0)
+        {
+            done = true;
+        }
+        else
+        {
+            aes->write(buf, len);
+        }
     }
     aes->finish();
     delete aes;

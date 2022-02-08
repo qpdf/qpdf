@@ -10,10 +10,10 @@ require TestDriver;
 my $td = new TestDriver('qutil');
 
 $td->runtest("QUtil",
-	     {$td->COMMAND => "qutil"},
-	     {$td->FILE => "qutil.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES | $td->RM_WS_ONLY_LINES);
+             {$td->COMMAND => "qutil"},
+             {$td->FILE => "qutil.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES | $td->RM_WS_ONLY_LINES);
 
 my $mfw = `main_from_wmain`;
 if ($mfw eq '')

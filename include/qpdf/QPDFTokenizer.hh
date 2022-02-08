@@ -40,20 +40,20 @@ class QPDFTokenizer
     // version 8.
     enum token_type_e
     {
-	tt_bad,
-	tt_array_close,
-	tt_array_open,
-	tt_brace_close,
-	tt_brace_open,
-	tt_dict_close,
-	tt_dict_open,
-	tt_integer,
-	tt_name,
-	tt_real,
-	tt_string,
-	tt_null,
-	tt_bool,
-	tt_word,
+        tt_bad,
+        tt_array_close,
+        tt_array_open,
+        tt_brace_close,
+        tt_brace_open,
+        tt_dict_close,
+        tt_dict_open,
+        tt_integer,
+        tt_name,
+        tt_real,
+        tt_string,
+        tt_null,
+        tt_bool,
+        tt_word,
         tt_eof,
         tt_space,
         tt_comment,
@@ -63,46 +63,46 @@ class QPDFTokenizer
     class Token
     {
       public:
-	Token() : type(tt_bad) {}
+        Token() : type(tt_bad) {}
         QPDF_DLL
-	Token(token_type_e type, std::string const& value);
-	Token(token_type_e type, std::string const& value,
-	      std::string raw_value, std::string error_message) :
-	    type(type),
-	    value(value),
-	    raw_value(raw_value),
-	    error_message(error_message)
-	{
-	}
-	token_type_e getType() const
-	{
-	    return this->type;
-	}
-	std::string const& getValue() const
-	{
-	    return this->value;
-	}
-	std::string const& getRawValue() const
-	{
-	    return this->raw_value;
-	}
-	std::string const& getErrorMessage() const
-	{
-	    return this->error_message;
-	}
-	bool operator==(Token const& rhs) const
-	{
-	    // Ignore fields other than type and value
-	    return ((this->type != tt_bad) &&
-		    (this->type == rhs.type) &&
-		    (this->value == rhs.value));
-	}
+        Token(token_type_e type, std::string const& value);
+        Token(token_type_e type, std::string const& value,
+              std::string raw_value, std::string error_message) :
+            type(type),
+            value(value),
+            raw_value(raw_value),
+            error_message(error_message)
+        {
+        }
+        token_type_e getType() const
+        {
+            return this->type;
+        }
+        std::string const& getValue() const
+        {
+            return this->value;
+        }
+        std::string const& getRawValue() const
+        {
+            return this->raw_value;
+        }
+        std::string const& getErrorMessage() const
+        {
+            return this->error_message;
+        }
+        bool operator==(Token const& rhs) const
+        {
+            // Ignore fields other than type and value
+            return ((this->type != tt_bad) &&
+                    (this->type == rhs.type) &&
+                    (this->value == rhs.value));
+        }
 
       private:
-	token_type_e type;
-	std::string value;
-	std::string raw_value;
-	std::string error_message;
+        token_type_e type;
+        std::string value;
+        std::string raw_value;
+        std::string error_message;
     };
 
     QPDF_DLL

@@ -31,8 +31,8 @@ QPDF_Array::unparse()
     size_t size = this->elements.size();
     for (size_t i = 0; i < size; ++i)
     {
-	result += this->elements.at(i).unparse();
-	result += " ";
+        result += this->elements.at(i).unparse();
+        result += " ";
     }
     result += "]";
     return result;
@@ -81,8 +81,8 @@ QPDF_Array::getItem(int n) const
 {
     if ((n < 0) || (n >= QIntC::to_int(elements.size())))
     {
-	throw std::logic_error(
-	    "INTERNAL ERROR: bounds error accessing QPDF_Array element");
+        throw std::logic_error(
+            "INTERNAL ERROR: bounds error accessing QPDF_Array element");
     }
     return this->elements.at(QIntC::to_size(n));
 }
@@ -120,8 +120,8 @@ QPDF_Array::insertItem(int at, QPDFObjectHandle const& item)
     // As special case, also allow insert beyond the end
     if ((at < 0) || (at > QIntC::to_int(this->elements.size())))
     {
-	throw std::logic_error(
-	    "INTERNAL ERROR: bounds error accessing QPDF_Array element");
+        throw std::logic_error(
+            "INTERNAL ERROR: bounds error accessing QPDF_Array element");
     }
     this->elements.insert(QIntC::to_size(at), item);
 }

@@ -14,7 +14,7 @@ static char const* whoami = 0;
 void usage()
 {
     std::cerr << "Usage: " << whoami << " { -uncompress | -compress[=n] }"
-	      << std::endl
+              << std::endl
               << "If n is specified with -compress, it is a"
               << " zlib compression level from" << std::endl
               << "1 to 9 where lower numbers are faster and"
@@ -28,49 +28,49 @@ int main(int argc, char* argv[])
 {
     if ((whoami = strrchr(argv[0], '/')) == NULL)
     {
-	whoami = argv[0];
+        whoami = argv[0];
     }
     else
     {
-	++whoami;
+        ++whoami;
     }
     // For libtool's sake....
     if (strncmp(whoami, "lt-", 3) == 0)
     {
-	whoami += 3;
+        whoami += 3;
     }
 
     if ((argc == 2) && (strcmp(argv[1], "--version") == 0))
     {
         std::cout << whoami << " from qpdf version "
                   << QPDF::QPDFVersion() << std::endl;
-	exit(0);
+        exit(0);
     }
 
     if (argc != 2)
     {
-	usage();
+        usage();
     }
 
     Pl_Flate::action_e action = Pl_Flate::a_inflate;
 
     if ((strcmp(argv[1], "-uncompress") == 0))
     {
-	// okay
+        // okay
     }
     else if ((strcmp(argv[1], "-compress") == 0))
     {
-	action = Pl_Flate::a_deflate;
+        action = Pl_Flate::a_deflate;
     }
     else if ((strncmp(argv[1], "-compress=", 10) == 0))
     {
-	action = Pl_Flate::a_deflate;
+        action = Pl_Flate::a_deflate;
         int level = QUtil::string_to_int(argv[1] + 10);
         Pl_Flate::setCompressionLevel(level);
     }
     else
     {
-	usage();
+        usage();
     }
 
     QUtil::binary_stdout();
@@ -86,26 +86,26 @@ int main(int argc, char* argv[])
 
     try
     {
-	unsigned char buf[10000];
-	bool done = false;
-	while (! done)
-	{
-	    size_t len = fread(buf, 1, sizeof(buf), stdin);
-	    if (len <= 0)
-	    {
-		done = true;
-	    }
-	    else
-	    {
-		flate->write(buf, len);
-	    }
-	}
-	flate->finish();
+        unsigned char buf[10000];
+        bool done = false;
+        while (! done)
+        {
+            size_t len = fread(buf, 1, sizeof(buf), stdin);
+            if (len <= 0)
+            {
+                done = true;
+            }
+            else
+            {
+                flate->write(buf, len);
+            }
+        }
+        flate->finish();
     }
     catch (std::exception& e)
     {
-	std::cerr << whoami << ": " << e.what() << std::endl;
-	exit(2);
+        std::cerr << whoami << ": " << e.what() << std::endl;
+        exit(2);
     }
 
     if (warn)

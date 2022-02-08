@@ -20,16 +20,16 @@ static std::map<QPDFObjGen, int> page_map;
 void usage()
 {
     std::cerr << "Usage: " << whoami << " [options] file.pdf [password]"
-	      << std::endl
-	      << "Options:" << std::endl
-	      << "  --numbers        give bookmarks outline-style numbers"
-	      << std::endl
-	      << "  --lines          draw lines to show bookmark hierarchy"
-	      << std::endl
-	      << "  --show-open      indicate whether a bookmark is initially open"
-	      << std::endl
-	      << "  --show-targets   show target if possible"
-	      << std::endl;
+              << std::endl
+              << "Options:" << std::endl
+              << "  --numbers        give bookmarks outline-style numbers"
+              << std::endl
+              << "  --lines          draw lines to show bookmark hierarchy"
+              << std::endl
+              << "  --show-open      indicate whether a bookmark is initially open"
+              << std::endl
+              << "  --show-targets   show target if possible"
+              << std::endl;
     exit(2);
 }
 
@@ -37,14 +37,14 @@ void print_lines(std::vector<int>& numbers)
 {
     for (unsigned int i = 0; i < numbers.size() - 1; ++i)
     {
-	if (numbers.at(i))
-	{
-	    std::cout << "| ";
-	}
-	else
-	{
-	    std::cout << "  ";
-	}
+        if (numbers.at(i))
+        {
+            std::cout << "| ";
+        }
+        else
+        {
+            std::cout << "  ";
+        }
     }
 }
 
@@ -54,10 +54,10 @@ void generate_page_map(QPDF& qpdf)
     std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
     int n = 0;
     for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-	 iter != pages.end(); ++iter)
+         iter != pages.end(); ++iter)
     {
-	QPDFObjectHandle oh = (*iter).getObjectHandle();
-	page_map[oh.getObjGen()] = ++n;
+        QPDFObjectHandle oh = (*iter).getObjectHandle();
+        page_map[oh.getObjGen()] = ++n;
     }
 }
 
@@ -163,50 +163,50 @@ int main(int argc, char* argv[])
     // For libtool's sake....
     if (strncmp(whoami, "lt-", 3) == 0)
     {
-	whoami += 3;
+        whoami += 3;
     }
 
     if ((argc == 2) && (strcmp(argv[1], "--version") == 0))
     {
-	std::cout << whoami << " version 1.5" << std::endl;
-	exit(0);
+        std::cout << whoami << " version 1.5" << std::endl;
+        exit(0);
     }
 
     int arg;
     for (arg = 1; arg < argc; ++arg)
     {
-	if (argv[arg][0] == '-')
-	{
-	    if (strcmp(argv[arg], "--numbers") == 0)
-	    {
-		style = st_numbers;
-	    }
-	    else if (strcmp(argv[arg], "--lines") == 0)
-	    {
-		style = st_lines;
-	    }
-	    else if (strcmp(argv[arg], "--show-open") == 0)
-	    {
-		show_open = true;
-	    }
-	    else if (strcmp(argv[arg], "--show-targets") == 0)
-	    {
-		show_targets = true;
-	    }
-	    else
-	    {
-		usage();
-	    }
-	}
-	else
-	{
-	    break;
-	}
+        if (argv[arg][0] == '-')
+        {
+            if (strcmp(argv[arg], "--numbers") == 0)
+            {
+                style = st_numbers;
+            }
+            else if (strcmp(argv[arg], "--lines") == 0)
+            {
+                style = st_lines;
+            }
+            else if (strcmp(argv[arg], "--show-open") == 0)
+            {
+                show_open = true;
+            }
+            else if (strcmp(argv[arg], "--show-targets") == 0)
+            {
+                show_targets = true;
+            }
+            else
+            {
+                usage();
+            }
+        }
+        else
+        {
+            break;
+        }
     }
 
     if (arg >= argc)
     {
-	usage();
+        usage();
     }
 
     char const* filename = argv[arg++];
@@ -214,38 +214,38 @@ int main(int argc, char* argv[])
 
     if (arg < argc)
     {
-	password = argv[arg++];
+        password = argv[arg++];
     }
     if (arg != argc)
     {
-	usage();
+        usage();
     }
 
     try
     {
-	QPDF qpdf;
-	qpdf.processFile(filename, password);
+        QPDF qpdf;
+        qpdf.processFile(filename, password);
 
         QPDFOutlineDocumentHelper odh(qpdf);
-	if (odh.hasOutlines())
-	{
-	    std::vector<int> numbers;
-	    if (show_targets)
-	    {
-		generate_page_map(qpdf);
-	    }
-	    extract_bookmarks(odh.getTopLevelOutlines(), numbers);
-	}
-	else
-	{
-	    std::cout << filename << " has no bookmarks" << std::endl;
-	}
+        if (odh.hasOutlines())
+        {
+            std::vector<int> numbers;
+            if (show_targets)
+            {
+                generate_page_map(qpdf);
+            }
+            extract_bookmarks(odh.getTopLevelOutlines(), numbers);
+        }
+        else
+        {
+            std::cout << filename << " has no bookmarks" << std::endl;
+        }
     }
     catch (std::exception &e)
     {
-	std::cerr << whoami << " processing file " << filename << ": "
-		  << e.what() << std::endl;
-	exit(2);
+        std::cerr << whoami << " processing file " << filename << ": "
+                  << e.what() << std::endl;
+        exit(2);
     }
 
     return 0;

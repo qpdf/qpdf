@@ -26,20 +26,20 @@ int main(int argc, char* argv[])
 
     if ((p = strrchr(argv[0], '/')) != NULL)
     {
-	whoami = p + 1;
+        whoami = p + 1;
     }
     else if ((p = strrchr(argv[0], '\\')) != NULL)
     {
-	whoami = p + 1;
+        whoami = p + 1;
     }
     else
     {
-	whoami = argv[0];
+        whoami = argv[0];
     }
 
     if (argc != 3)
     {
-	usage();
+        usage();
     }
 
     infile = argv[1];

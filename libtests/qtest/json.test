@@ -10,8 +10,8 @@ require TestDriver;
 my $td = new TestDriver('json');
 
 $td->runtest("json",
-	     {$td->COMMAND => "json"},
-	     {$td->FILE => "json.out", $td->EXIT_STATUS => 0},
+             {$td->COMMAND => "json"},
+             {$td->FILE => "json.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 $td->report(1);

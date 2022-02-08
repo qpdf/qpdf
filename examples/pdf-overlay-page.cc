@@ -17,10 +17,10 @@ static char const* whoami = 0;
 void usage()
 {
     std::cerr << "Usage: " << whoami << " infile pagefile outfile"
-	      << std::endl
-	      << "Stamp page 1 of pagefile on every page of infile,"
+              << std::endl
+              << "Stamp page 1 of pagefile on every page of infile,"
               << " writing to outfile"
-	      << std::endl;
+              << std::endl;
     exit(2);
 }
 
@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
     // For libtool's sake....
     if (strncmp(whoami, "lt-", 3) == 0)
     {
-	whoami += 3;
+        whoami += 3;
     }
 
     if (argc != 4)
@@ -108,8 +108,8 @@ int main(int argc, char* argv[])
     }
     catch (std::exception &e)
     {
-	std::cerr << whoami << ": " << e.what() << std::endl;
-	exit(2);
+        std::cerr << whoami << ": " << e.what() << std::endl;
+        exit(2);
     }
     return 0;
 }

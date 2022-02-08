@@ -14,7 +14,7 @@ class Pl_AES_PDF: public Pipeline
     QPDF_DLL
     // key should be a pointer to key_bytes bytes of data
     Pl_AES_PDF(char const* identifier, Pipeline* next,
-	       bool encrypt, unsigned char const* key,
+               bool encrypt, unsigned char const* key,
                size_t key_bytes);
     QPDF_DLL
     virtual ~Pl_AES_PDF();

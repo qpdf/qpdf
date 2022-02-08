@@ -12,9 +12,9 @@ my $td = new TestDriver('InputSource');
 cleanup();
 
 $td->runtest("input source tests",
-	     {$td->COMMAND => "input_source"},
-	     {$td->FILE => "input_source.out",
-	      $td->EXIT_STATUS => 0},
+             {$td->COMMAND => "input_source"},
+             {$td->FILE => "input_source.out",
+              $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 cleanup();

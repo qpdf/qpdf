@@ -51,13 +51,13 @@ class MD5
     static std::string getDataChecksum(char const* buf, size_t len);
     QPDF_DLL
     static std::string getFileChecksum(char const* filename,
-				       qpdf_offset_t up_to_offset = -1);
+                                       qpdf_offset_t up_to_offset = -1);
     QPDF_DLL
     static bool checkDataChecksum(char const* const checksum,
-				  char const* buf, size_t len);
+                                  char const* buf, size_t len);
     QPDF_DLL
     static bool checkFileChecksum(char const* const checksum,
-				  char const* filename,
+                                  char const* filename,
                                   qpdf_offset_t up_to_offset = -1);
 
   private:

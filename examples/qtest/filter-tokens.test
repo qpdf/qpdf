@@ -12,12 +12,12 @@ my $td = new TestDriver('pdf-filter-tokens');
 cleanup();
 
 $td->runtest("filter tokens",
-	     {$td->COMMAND => "pdf-filter-tokens in.pdf a.pdf"},
-	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+             {$td->COMMAND => "pdf-filter-tokens in.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
 
 $td->runtest("check output",
-	     {$td->FILE => "a.pdf"},
-	     {$td->FILE => "out.pdf"});
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "out.pdf"});
 
 cleanup();
 

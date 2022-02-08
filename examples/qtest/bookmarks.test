@@ -15,38 +15,38 @@ foreach my $show ("", " --show-open")
     {
         my $xshow = $show ? $show : "x";
         my $xstyle = $style ? $style : "x";
-	my $out = "test.$xshow.$xstyle.out";
-	$out =~ s/ //g;
-	$td->runtest("show:$show, style:$style",
-		     {$td->COMMAND => "pdf-bookmarks $show $style 1.pdf"},
-		     {$td->FILE => $out, $td->EXIT_STATUS => 0},
-		     $td->NORMALIZE_NEWLINES);
+        my $out = "test.$xshow.$xstyle.out";
+        $out =~ s/ //g;
+        $td->runtest("show:$show, style:$style",
+                     {$td->COMMAND => "pdf-bookmarks $show $style 1.pdf"},
+                     {$td->FILE => $out, $td->EXIT_STATUS => 0},
+                     $td->NORMALIZE_NEWLINES);
     }
 }
 $td->runtest("no bookmarks",
-	     {$td->COMMAND => "pdf-bookmarks 2.pdf"},
-	     {$td->STRING => "2.pdf has no bookmarks\n",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
+             {$td->COMMAND => "pdf-bookmarks 2.pdf"},
+             {$td->STRING => "2.pdf has no bookmarks\n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 $td->runtest("bad",
-	     {$td->COMMAND => "pdf-bookmarks 3.pdf"},
-	     {$td->REGEXP => "pdf-bookmarks processing file 3.pdf: " .
-		  ".*unable to find trailer.*",
-		  $td->EXIT_STATUS => 2},
-	     $td->NORMALIZE_NEWLINES);
+             {$td->COMMAND => "pdf-bookmarks 3.pdf"},
+             {$td->REGEXP => "pdf-bookmarks processing file 3.pdf: " .
+                  ".*unable to find trailer.*",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
 
 $td->runtest("encrypted, targets",
-	     {$td->COMMAND => "pdf-bookmarks --show-targets 4.pdf user"},
-	     {$td->FILE => "encrypted.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
+             {$td->COMMAND => "pdf-bookmarks --show-targets 4.pdf user"},
+             {$td->FILE => "encrypted.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 $td->runtest("bookmarks deleted",
-	     {$td->COMMAND => "pdf-bookmarks 5.pdf user"},
-	     {$td->STRING => "5.pdf has no bookmarks\n",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
+             {$td->COMMAND => "pdf-bookmarks 5.pdf user"},
+             {$td->STRING => "5.pdf has no bookmarks\n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 $td->runtest("non-trivial pdf doc to unicode",
              {$td->COMMAND => "pdf-bookmarks issue-179.pdf"},

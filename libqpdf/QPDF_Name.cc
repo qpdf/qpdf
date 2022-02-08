@@ -18,28 +18,28 @@ QPDF_Name::normalizeName(std::string const& name)
 {
     if (name.empty())
     {
-	return name;
+        return name;
     }
     std::string result;
     result += name.at(0);
     for (size_t i = 1; i < name.length(); ++i)
     {
-	char ch = name.at(i);
-	// Don't use locale/ctype here; follow PDF spec guidelines.
+        char ch = name.at(i);
+        // Don't use locale/ctype here; follow PDF spec guidelines.
         if (ch == '\0')
         {
             // QPDFTokenizer embeds a null character to encode an
             // invalid #.
             result += "#";
         }
-	else if (strchr("#()<>[]{}/%", ch) || (ch < 33) || (ch > 126))
-	{
+        else if (strchr("#()<>[]{}/%", ch) || (ch < 33) || (ch > 126))
+        {
             result += "#" + QUtil::hex_encode(std::string(&ch, 1));
-	}
-	else
-	{
-	    result += ch;
-	}
+        }
+        else
+        {
+            result += ch;
+        }
     }
     return result;
 }

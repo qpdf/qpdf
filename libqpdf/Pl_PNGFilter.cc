@@ -13,7 +13,7 @@ static int abs_diff(int a, int b)
 }
 
 Pl_PNGFilter::Pl_PNGFilter(char const* identifier, Pipeline* next,
-			   action_e action, unsigned int columns,
+                           action_e action, unsigned int columns,
                            unsigned int samples_per_pixel,
                            unsigned int bits_per_sample) :
     Pipeline(identifier, next),
@@ -74,24 +74,24 @@ Pl_PNGFilter::write(unsigned char* data, size_t len)
     size_t offset = 0;
     while (len >= left)
     {
-	// finish off current row
-	memcpy(this->cur_row + this->pos, data + offset, left);
-	offset += left;
-	len -= left;
+        // finish off current row
+        memcpy(this->cur_row + this->pos, data + offset, left);
+        offset += left;
+        len -= left;
 
-	processRow();
+        processRow();
 
-	// Swap rows
-	unsigned char* t = this->prev_row;
-	this->prev_row = this->cur_row;
-	this->cur_row = t ? t : this->buf2.get();
-	memset(this->cur_row, 0, this->bytes_per_row + 1);
-	left = this->incoming;
-	this->pos = 0;
+        // Swap rows
+        unsigned char* t = this->prev_row;
+        this->prev_row = this->cur_row;
+        this->cur_row = t ? t : this->buf2.get();
+        memset(this->cur_row, 0, this->bytes_per_row + 1);
+        left = this->incoming;
+        this->pos = 0;
     }
     if (len)
     {
-	memcpy(this->cur_row + this->pos, data + offset, len);
+        memcpy(this->cur_row + this->pos, data + offset, len);
     }
     this->pos += len;
 }
@@ -101,11 +101,11 @@ Pl_PNGFilter::processRow()
 {
     if (this->action == a_encode)
     {
-	encodeRow();
+        encodeRow();
     }
     else
     {
-	decodeRow();
+        decodeRow();
     }
 }
 
@@ -250,16 +250,16 @@ Pl_PNGFilter::encodeRow()
     getNext()->write(&ch, 1);
     if (this->prev_row)
     {
-	for (unsigned int i = 0; i < this->bytes_per_row; ++i)
-	{
-	    ch = static_cast<unsigned char>(
+        for (unsigned int i = 0; i < this->bytes_per_row; ++i)
+        {
+            ch = static_cast<unsigned char>(
                 this->cur_row[i] - this->prev_row[i]);
-	    getNext()->write(&ch, 1);
-	}
+            getNext()->write(&ch, 1);
+        }
     }
     else
     {
-	getNext()->write(this->cur_row, this->bytes_per_row);
+        getNext()->write(this->cur_row, this->bytes_per_row);
     }
 }
 
@@ -268,8 +268,8 @@ Pl_PNGFilter::finish()
 {
     if (this->pos)
     {
-	// write partial row
-	processRow();
+        // write partial row
+        processRow();
     }
     this->prev_row = 0;
     this->cur_row = buf1.get();

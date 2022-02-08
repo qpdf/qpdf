@@ -11,9 +11,9 @@ int main(int argc, char* argv[])
 {
     if (argc != 3)
     {
-	std::cerr << "Usage: dct_uncompress infile outfile"
+        std::cerr << "Usage: dct_uncompress infile outfile"
                   << std::endl;
-	exit(2);
+        exit(2);
     }
 
     char* infilename = argv[1];
@@ -27,15 +27,15 @@ int main(int argc, char* argv[])
     Pl_DCT dct("dct", &out);
     while (! done)
     {
-	size_t len = fread(buf, 1, sizeof(buf), infile);
-	if (len <= 0)
-	{
-	    done = true;
-	}
-	else
-	{
-	    dct.write(buf, len);
-	}
+        size_t len = fread(buf, 1, sizeof(buf), infile);
+        if (len <= 0)
+        {
+            done = true;
+        }
+        else
+        {
+            dct.write(buf, len);
+        }
     }
     dct.finish();
     fclose(infile);

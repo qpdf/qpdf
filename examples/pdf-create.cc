@@ -31,7 +31,7 @@ class ImageProvider: public QPDFObjectHandle::StreamDataProvider
                   std::string const& filter);
     virtual ~ImageProvider();
     virtual void provideStreamData(int objid, int generation,
-				   Pipeline* pipeline);
+                                   Pipeline* pipeline);
     size_t getWidth() const;
     size_t getHeight() const;
 
@@ -142,7 +142,7 @@ ImageProvider::provideStreamData(int objid, int generation,
 void usage()
 {
     std::cerr << "Usage: " << whoami << " filename" << std::endl
-	      << "Creates a simple PDF and writes it to filename" << std::endl;
+              << "Creates a simple PDF and writes it to filename" << std::endl;
     exit(2);
 }
 
@@ -424,22 +424,22 @@ int main(int argc, char* argv[])
     // For libtool's sake....
     if (strncmp(whoami, "lt-", 3) == 0)
     {
-	whoami += 3;
+        whoami += 3;
     }
     if (argc != 2)
     {
-	usage();
+        usage();
     }
     char const* filename = argv[1];
 
     try
     {
-	create_pdf(filename);
+        create_pdf(filename);
     }
     catch (std::exception& e)
     {
-	std::cerr << e.what() << std::endl;
-	exit(2);
+        std::cerr << e.what() << std::endl;
+        exit(2);
     }
 
     return 0;

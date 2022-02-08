@@ -12,13 +12,13 @@ my $td = new TestDriver('name-number-tree');
 cleanup();
 
 $td->runtest("name/number tree",
-	     {$td->COMMAND => 'pdf-name-number-tree a.pdf'},
-	     {$td->FILE => 'nn.out', $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
+             {$td->COMMAND => 'pdf-name-number-tree a.pdf'},
+             {$td->FILE => 'nn.out', $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 $td->runtest("check output",
-	     {$td->FILE => "a.pdf"},
-	     {$td->FILE => "out.pdf"});
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "out.pdf"});
 
 cleanup();
 

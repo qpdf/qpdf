@@ -20,11 +20,11 @@ QPDFCrypto_gnutls::~QPDFCrypto_gnutls()
 {
     if (this->hash_ctx)
     {
-	gnutls_hash_deinit(this->hash_ctx, digest);
+        gnutls_hash_deinit(this->hash_ctx, digest);
     }
     if (cipher_ctx)
     {
-	gnutls_cipher_deinit(this->cipher_ctx);
+        gnutls_cipher_deinit(this->cipher_ctx);
     }
     this->aes_key_data = nullptr;
     this->aes_key_len = 0;
@@ -36,8 +36,8 @@ QPDFCrypto_gnutls::provideRandomData(unsigned char* data, size_t len)
     int code = gnutls_rnd (GNUTLS_RND_KEY, data, len);
     if (code < 0)
     {
-	throw std::runtime_error(
-	    std::string("gnutls: random number generation error: ") +
+        throw std::runtime_error(
+            std::string("gnutls: random number generation error: ") +
             std::string(gnutls_strerror(code)));
     }
 }
@@ -50,8 +50,8 @@ QPDFCrypto_gnutls::MD5_init()
     if (code < 0)
     {
         this->hash_ctx = nullptr;
-	throw std::runtime_error(
-	    std::string("gnutls: MD5 error: ") +
+        throw std::runtime_error(
+            std::string("gnutls: MD5 error: ") +
             std::string(gnutls_strerror(code)));
     }
 }
@@ -84,7 +84,7 @@ QPDFCrypto_gnutls::RC4_init(unsigned char const* key_data, int key_len)
     RC4_finalize();
     if (key_len == -1)
     {
-	key_len = QIntC::to_int(
+        key_len = QIntC::to_int(
             strlen(reinterpret_cast<char const*>(key_data)));
     }
     gnutls_datum_t key;
@@ -96,8 +96,8 @@ QPDFCrypto_gnutls::RC4_init(unsigned char const* key_data, int key_len)
     if (code < 0)
     {
         this->cipher_ctx = nullptr;
-	throw std::runtime_error(
-	    std::string("gnutls: RC4 error: ") +
+        throw std::runtime_error(
+            std::string("gnutls: RC4 error: ") +
             std::string(gnutls_strerror(code)));
     }
 }
@@ -118,8 +118,8 @@ QPDFCrypto_gnutls::RC4_finalize()
 {
     if (this->cipher_ctx)
     {
-	gnutls_cipher_deinit(this->cipher_ctx);
-	this->cipher_ctx = nullptr;
+        gnutls_cipher_deinit(this->cipher_ctx);
+        this->cipher_ctx = nullptr;
     }
 }
 
@@ -148,8 +148,8 @@ QPDFCrypto_gnutls::SHA2_init(int bits)
     if (code < 0)
     {
         this->hash_ctx = nullptr;
-	throw std::runtime_error(
-	    std::string("gnutls: SHA") + QUtil::int_to_string(bits) +
+        throw std::runtime_error(
+            std::string("gnutls: SHA") + QUtil::int_to_string(bits) +
             " error: " + std::string(gnutls_strerror(code)));
     }
 }
@@ -278,8 +278,8 @@ QPDFCrypto_gnutls::rijndael_finalize()
 {
     if (this->cipher_ctx)
     {
-	gnutls_cipher_deinit(this->cipher_ctx);
-	this->cipher_ctx = nullptr;
+        gnutls_cipher_deinit(this->cipher_ctx);
+        this->cipher_ctx = nullptr;
     }
 }
 

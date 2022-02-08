@@ -12,16 +12,16 @@ my $td = new TestDriver('invert-images');
 cleanup();
 
 $td->runtest("invert images",
-	     {$td->COMMAND => ['pdf-invert-images', ' --static-id',
+             {$td->COMMAND => ['pdf-invert-images', ' --static-id',
                                'in.pdf', 'a.pdf']},
-	     {$td->STRING =>
-		  "pdf-invert-images: new file written to a.pdf\n",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
+             {$td->STRING =>
+                  "pdf-invert-images: new file written to a.pdf\n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 $td->runtest("check output",
-	     {$td->FILE => "a.pdf"},
-	     {$td->FILE => "out.pdf"});
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "out.pdf"});
 
 cleanup();
 

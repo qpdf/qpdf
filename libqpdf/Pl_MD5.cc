@@ -70,8 +70,8 @@ Pl_MD5::getHexDigest()
 {
     if (! this->enabled)
     {
-	throw std::logic_error(
-	    "digest requested for a disabled MD5 Pipeline");
+        throw std::logic_error(
+            "digest requested for a disabled MD5 Pipeline");
     }
     this->in_progress = false;
     return this->md5.unparse();

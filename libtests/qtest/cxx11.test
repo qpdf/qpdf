@@ -8,9 +8,9 @@ require TestDriver;
 my $td = new TestDriver('c++-11');
 
 $td->runtest("C++-11",
-	     {$td->COMMAND => "cxx11"},
-	     {$td->STRING => "assertions passed\n",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
+             {$td->COMMAND => "cxx11"},
+             {$td->STRING => "assertions passed\n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 $td->report(1);

@@ -112,7 +112,7 @@ class ImageProvider: public QPDFObjectHandle::StreamDataProvider
     ImageProvider(size_t n);
     virtual ~ImageProvider();
     virtual void provideStreamData(int objid, int generation,
-				   Pipeline* pipeline);
+                                   Pipeline* pipeline);
 
   private:
     size_t n;
@@ -304,11 +304,11 @@ int main(int argc, char* argv[])
     // For libtool's sake....
     if (strncmp(whoami, "lt-", 3) == 0)
     {
-	whoami += 3;
+        whoami += 3;
     }
     if (argc != 4)
     {
-	usage();
+        usage();
     }
     char const* operation = argv[1];
     char const* size = argv[2];
@@ -358,8 +358,8 @@ int main(int argc, char* argv[])
     }
     catch (std::exception& e)
     {
-	std::cerr << e.what() << std::endl;
-	exit(2);
+        std::cerr << e.what() << std::endl;
+        exit(2);
     }
 
     delete [] buf;

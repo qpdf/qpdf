@@ -61,7 +61,7 @@ Pl_Flate::Members::~Members()
 }
 
 Pl_Flate::Pl_Flate(char const* identifier, Pipeline* next,
-		   action_e action, unsigned int out_bufsize_int) :
+                   action_e action, unsigned int out_bufsize_int) :
     Pipeline(identifier, next),
     m(new Members(QIntC::to_size(out_bufsize_int), action))
 {
@@ -91,9 +91,9 @@ Pl_Flate::write(unsigned char* data, size_t len)
 {
     if (this->m->outbuf.get() == 0)
     {
-	throw std::logic_error(
-	    this->identifier +
-	    ": Pl_Flate: write() called after finish() called");
+        throw std::logic_error(
+            this->identifier +
+            ": Pl_Flate: write() called after finish() called");
     }
 
     // Write in chunks in case len is too big to fit in an int.
@@ -103,10 +103,10 @@ Pl_Flate::write(unsigned char* data, size_t len)
     unsigned char* buf = data;
     while (bytes_left > 0)
     {
-	size_t bytes = (bytes_left >= max_bytes ? max_bytes : bytes_left);
+        size_t bytes = (bytes_left >= max_bytes ? max_bytes : bytes_left);
         handleData(buf, bytes,
                    (this->m->action == a_inflate ? Z_SYNC_FLUSH : Z_NO_FLUSH));
-	bytes_left -= bytes;
+        bytes_left -= bytes;
         buf += bytes;
     }
 }
@@ -126,7 +126,7 @@ Pl_Flate::handleData(unsigned char* data, size_t len, int flush)
 
     if (! this->m->initialized)
     {
-	int err = Z_OK;
+        int err = Z_OK;
 
         // deflateInit and inflateInit are macros that use old-style
         // casts.
@@ -135,21 +135,21 @@ Pl_Flate::handleData(unsigned char* data, size_t len, int flush)
 #       pragma GCC diagnostic push
 #       pragma GCC diagnostic ignored "-Wold-style-cast"
 #endif
-	if (this->m->action == a_deflate)
-	{
-	    err = deflateInit(&zstream, compression_level);
-	}
-	else
-	{
-	    err = inflateInit(&zstream);
-	}
+        if (this->m->action == a_deflate)
+        {
+            err = deflateInit(&zstream, compression_level);
+        }
+        else
+        {
+            err = inflateInit(&zstream);
+        }
 #if ((defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
      defined(__clang__))
 #       pragma GCC diagnostic pop
 #endif
 
-	checkError("Init", err);
-	this->m->initialized = true;
+        checkError("Init", err);
+        this->m->initialized = true;
     }
 
     int err = Z_OK;
@@ -157,14 +157,14 @@ Pl_Flate::handleData(unsigned char* data, size_t len, int flush)
     bool done = false;
     while (! done)
     {
-	if (this->m->action == a_deflate)
-	{
-	    err = deflate(&zstream, flush);
-	}
-	else
-	{
-	    err = inflate(&zstream, flush);
-	}
+        if (this->m->action == a_deflate)
+        {
+            err = deflate(&zstream, flush);
+        }
+        else
+        {
+            err = inflate(&zstream, flush);
+        }
         if ((this->m->action == a_inflate) && (err != Z_OK) && zstream.msg &&
             (strcmp(zstream.msg, "incorrect data check") == 0))
         {
@@ -173,52 +173,52 @@ Pl_Flate::handleData(unsigned char* data, size_t len, int flush)
             // broken zlib streams without losing data.
             err = Z_STREAM_END;
         }
-	switch (err)
-	{
-	  case Z_BUF_ERROR:
-	    // Probably shouldn't be able to happen, but possible as a
-	    // boundary condition: if the last call to inflate exactly
-	    // filled the output buffer, it's possible that the next
-	    // call to inflate could have nothing to do. There are PDF
-	    // files in the wild that have this error (including at
-	    // least one in qpdf's test suite). In some cases, we want
-	    // to know about this, because it indicates incorrect
-	    // compression, so call a callback if provided.
+        switch (err)
+        {
+          case Z_BUF_ERROR:
+            // Probably shouldn't be able to happen, but possible as a
+            // boundary condition: if the last call to inflate exactly
+            // filled the output buffer, it's possible that the next
+            // call to inflate could have nothing to do. There are PDF
+            // files in the wild that have this error (including at
+            // least one in qpdf's test suite). In some cases, we want
+            // to know about this, because it indicates incorrect
+            // compression, so call a callback if provided.
             this->warn(
                 "input stream is complete but output may still be valid",
                 err);
-	    done = true;
-	    break;
+            done = true;
+            break;
 
-	  case Z_STREAM_END:
-	    done = true;
-	    // fall through
+          case Z_STREAM_END:
+            done = true;
+            // fall through
 
-	  case Z_OK:
-	    {
-		if ((zstream.avail_in == 0) &&
-		    (zstream.avail_out > 0))
-		{
-		    // There is nothing left to read, and there was
-		    // sufficient buffer space to write everything we
-		    // needed, so we're done for now.
-		    done = true;
-		}
-		uLong ready =
+          case Z_OK:
+            {
+                if ((zstream.avail_in == 0) &&
+                    (zstream.avail_out > 0))
+                {
+                    // There is nothing left to read, and there was
+                    // sufficient buffer space to write everything we
+                    // needed, so we're done for now.
+                    done = true;
+                }
+                uLong ready =
                     QIntC::to_ulong(this->m->out_bufsize - zstream.avail_out);
-		if (ready > 0)
-		{
-		    this->getNext()->write(this->m->outbuf.get(), ready);
-		    zstream.next_out = this->m->outbuf.get();
-		    zstream.avail_out = QIntC::to_uint(this->m->out_bufsize);
-		}
-	    }
-	    break;
+                if (ready > 0)
+                {
+                    this->getNext()->write(this->m->outbuf.get(), ready);
+                    zstream.next_out = this->m->outbuf.get();
+                    zstream.avail_out = QIntC::to_uint(this->m->out_bufsize);
+                }
+            }
+            break;
 
-	  default:
-	    this->checkError("data", err);
-	    break;
-	}
+          default:
+            this->checkError("data", err);
+            break;
+        }
     }
 }
 
@@ -278,50 +278,50 @@ Pl_Flate::checkError(char const* prefix, int error_code)
     z_stream& zstream = *(static_cast<z_stream*>(this->m->zdata));
     if (error_code != Z_OK)
     {
-	char const* action_str =
+        char const* action_str =
             (this->m->action == a_deflate ? "deflate" : "inflate");
-	std::string msg =
-	    this->identifier + ": " + action_str + ": " + prefix + ": ";
+        std::string msg =
+            this->identifier + ": " + action_str + ": " + prefix + ": ";
 
-	if (zstream.msg)
-	{
-	    msg += zstream.msg;
-	}
-	else
-	{
-	    switch (error_code)
-	    {
-	      case Z_ERRNO:
-		msg += "zlib system error";
-		break;
+        if (zstream.msg)
+        {
+            msg += zstream.msg;
+        }
+        else
+        {
+            switch (error_code)
+            {
+              case Z_ERRNO:
+                msg += "zlib system error";
+                break;
 
-	      case Z_STREAM_ERROR:
-		msg += "zlib stream error";
-		break;
+              case Z_STREAM_ERROR:
+                msg += "zlib stream error";
+                break;
 
-	      case Z_DATA_ERROR:
-		msg += "zlib data error";
-		break;
+              case Z_DATA_ERROR:
+                msg += "zlib data error";
+                break;
 
-	      case Z_MEM_ERROR:
-		msg += "zlib memory error";
-		break;
+              case Z_MEM_ERROR:
+                msg += "zlib memory error";
+                break;
 
-	      case Z_BUF_ERROR:
-		msg += "zlib buffer error";
-		break;
+              case Z_BUF_ERROR:
+                msg += "zlib buffer error";
+                break;
 
-	      case Z_VERSION_ERROR:
-		msg += "zlib version error";
-		break;
+              case Z_VERSION_ERROR:
+                msg += "zlib version error";
+                break;
 
-	      default:
-		msg += std::string("zlib unknown error (") +
-		    QUtil::int_to_string(error_code) + ")";
-		break;
-	    }
-	}
+              default:
+                msg += std::string("zlib unknown error (") +
+                    QUtil::int_to_string(error_code) + ")";
+                break;
+            }
+        }
 
-	throw std::runtime_error(msg);
+        throw std::runtime_error(msg);
     }
 }

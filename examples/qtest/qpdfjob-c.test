@@ -12,12 +12,12 @@ cleanup();
 my $td = new TestDriver('qpdfjob-c');
 
 $td->runtest("qpdfjob-c",
-	     {$td->COMMAND => "qpdfjob-c in.pdf a.pdf"},
-	     {$td->STRING => "", $td->EXIT_STATUS => 0},
+             {$td->COMMAND => "qpdfjob-c in.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
-	     {$td->FILE => "a.pdf"},
-	     {$td->FILE => "out.pdf"});
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "out.pdf"});
 
 cleanup();
 

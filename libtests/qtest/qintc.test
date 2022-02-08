@@ -10,9 +10,9 @@ require TestDriver;
 my $td = new TestDriver('qintc');
 
 $td->runtest("QINTC",
-	     {$td->COMMAND => "qintc"},
-	     {$td->FILE => "qintc.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES | $td->RM_WS_ONLY_LINES);
+             {$td->COMMAND => "qintc"},
+             {$td->FILE => "qintc.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES | $td->RM_WS_ONLY_LINES);
 
 $td->report(1);

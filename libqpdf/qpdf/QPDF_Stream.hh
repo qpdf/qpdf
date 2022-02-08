@@ -17,8 +17,8 @@ class QPDF_Stream: public QPDFObject
 {
   public:
     QPDF_Stream(QPDF*, int objid, int generation,
-		QPDFObjectHandle stream_dict,
-		qpdf_offset_t offset, size_t length);
+                QPDFObjectHandle stream_dict,
+                qpdf_offset_t offset, size_t length);
     virtual ~QPDF_Stream();
     virtual std::string unparse();
     virtual JSON getJSON();
@@ -44,12 +44,12 @@ class QPDF_Stream: public QPDFObject
     PointerHolder<Buffer> getStreamData(qpdf_stream_decode_level_e);
     PointerHolder<Buffer> getRawStreamData();
     void replaceStreamData(PointerHolder<Buffer> data,
-			   QPDFObjectHandle const& filter,
-			   QPDFObjectHandle const& decode_parms);
+                           QPDFObjectHandle const& filter,
+                           QPDFObjectHandle const& decode_parms);
     void replaceStreamData(
-	PointerHolder<QPDFObjectHandle::StreamDataProvider> provider,
-	QPDFObjectHandle const& filter,
-	QPDFObjectHandle const& decode_parms);
+        PointerHolder<QPDFObjectHandle::StreamDataProvider> provider,
+        QPDFObjectHandle const& filter,
+        QPDFObjectHandle const& decode_parms);
     void addTokenFilter(
         PointerHolder<QPDFObjectHandle::TokenFilter> token_filter);
 
@@ -74,8 +74,8 @@ class QPDF_Stream: public QPDFObject
         std::function<std::shared_ptr<QPDFStreamFilter>()>> filter_factories;
 
     void replaceFilterData(QPDFObjectHandle const& filter,
-			   QPDFObjectHandle const& decode_parms,
-			   size_t length);
+                           QPDFObjectHandle const& decode_parms,
+                           size_t length);
     bool filterable(std::vector<std::shared_ptr<QPDFStreamFilter>>& filters,
                     bool& specialized_compression, bool& lossy_compression);
     void warn(QPDFExc const& e);

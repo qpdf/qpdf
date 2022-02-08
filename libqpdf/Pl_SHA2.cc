@@ -25,7 +25,7 @@ Pl_SHA2::write(unsigned char* buf, size_t len)
 {
     if (! this->in_progress)
     {
-	this->in_progress = true;
+        this->in_progress = true;
     }
 
     // Write in chunks in case len is too big to fit in an int.
@@ -35,9 +35,9 @@ Pl_SHA2::write(unsigned char* buf, size_t len)
     unsigned char* data = buf;
     while (bytes_left > 0)
     {
-	size_t bytes = (bytes_left >= max_bytes ? max_bytes : bytes_left);
+        size_t bytes = (bytes_left >= max_bytes ? max_bytes : bytes_left);
         this->crypto->SHA2_update(data, bytes);
-	bytes_left -= bytes;
+        bytes_left -= bytes;
         data += bytes;
     }
 
@@ -63,8 +63,8 @@ Pl_SHA2::resetBits(int bits)
 {
     if (this->in_progress)
     {
-	throw std::logic_error(
-	    "bit reset requested for in-progress SHA2 Pipeline");
+        throw std::logic_error(
+            "bit reset requested for in-progress SHA2 Pipeline");
     }
     this->crypto = QPDFCryptoProvider::getImpl();
     this->crypto->SHA2_init(bits);
@@ -75,8 +75,8 @@ Pl_SHA2::getRawDigest()
 {
     if (this->in_progress)
     {
-	throw std::logic_error(
-	    "digest requested for in-progress SHA2 Pipeline");
+        throw std::logic_error(
+            "digest requested for in-progress SHA2 Pipeline");
     }
     return this->crypto->SHA2_digest();
 }
@@ -86,8 +86,8 @@ Pl_SHA2::getHexDigest()
 {
     if (this->in_progress)
     {
-	throw std::logic_error(
-	    "digest requested for in-progress SHA2 Pipeline");
+        throw std::logic_error(
+            "digest requested for in-progress SHA2 Pipeline");
     }
     return QUtil::hex_encode(getRawDigest());
 }

@@ -10,9 +10,9 @@ require TestDriver;
 my $td = new TestDriver('bits');
 
 $td->runtest("bits",
-	     {$td->COMMAND => "bits"},
-	     {$td->FILE => "bits.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
+             {$td->COMMAND => "bits"},
+             {$td->FILE => "bits.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 $td->report(1);

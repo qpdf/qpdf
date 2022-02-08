@@ -13,8 +13,8 @@ static char const* whoami = 0;
 void usage()
 {
     std::cerr << "Usage: " << whoami << " infile.pdf outfile.pdf value"
-	      << std::endl
-	      << "Set the value of all text fields to a specified value"
+              << std::endl
+              << "Set the value of all text fields to a specified value"
               << std::endl;
     exit(2);
 }
@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
     // For libtool's sake....
     if (strncmp(whoami, "lt-", 3) == 0)
     {
-	whoami += 3;
+        whoami += 3;
     }
 
     if (argc != 4)
@@ -47,8 +47,8 @@ int main(int argc, char* argv[])
 
     try
     {
-	QPDF qpdf;
-	qpdf.processFile(infilename);
+        QPDF qpdf;
+        qpdf.processFile(infilename);
 
         // We will iterate through form fields by starting at the page
         // level and looking at each field for each page. We could
@@ -94,16 +94,16 @@ int main(int argc, char* argv[])
             }
         }
 
-	// Write out a new file
-	QPDFWriter w(qpdf, outfilename);
+        // Write out a new file
+        QPDFWriter w(qpdf, outfilename);
         w.setStaticID(true); // for testing only
-	w.write();
+        w.write();
     }
     catch (std::exception &e)
     {
-	std::cerr << whoami << " processing file " << infilename << ": "
-		  << e.what() << std::endl;
-	exit(2);
+        std::cerr << whoami << " processing file " << infilename << ": "
+                  << e.what() << std::endl;
+        exit(2);
     }
 
     return 0;

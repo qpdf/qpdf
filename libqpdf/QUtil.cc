@@ -300,12 +300,12 @@ int_to_string_base_internal(T num, int base, int length)
     int str_length = QIntC::to_int(cvt.length());
     if ((length > 0) && (str_length < length))
     {
-	result.append(QIntC::to_size(length - str_length), '0');
+        result.append(QIntC::to_size(length - str_length), '0');
     }
     result += cvt;
     if ((length < 0) && (str_length < -length))
     {
-	result.append(QIntC::to_size(-length - str_length), ' ');
+        result.append(QIntC::to_size(-length - str_length), ' ');
     }
     return result;
 }
@@ -455,7 +455,7 @@ QUtil::os_wrapper(std::string const& description, int status)
 {
     if (status == -1)
     {
-	throw_system_error(description);
+        throw_system_error(description);
     }
     return status;
 }
@@ -523,7 +523,7 @@ QUtil::fopen_wrapper(std::string const& description, FILE* f)
 {
     if (f == 0)
     {
-	throw_system_error(description);
+        throw_system_error(description);
     }
     return f;
 }
@@ -841,17 +841,17 @@ QUtil::getWhoami(char* argv0)
     if (((whoami = strrchr(argv0, '/')) == NULL) &&
         ((whoami = strrchr(argv0, '\\')) == NULL))
     {
-	whoami = argv0;
+        whoami = argv0;
     }
     else
     {
-	++whoami;
+        ++whoami;
     }
 
     if ((strlen(whoami) > 4) &&
-	(strcmp(whoami + strlen(whoami) - 4, ".exe") == 0))
+        (strcmp(whoami + strlen(whoami) - 4, ".exe") == 0))
     {
-	whoami[strlen(whoami) - 4] = '\0';
+        whoami[strlen(whoami) - 4] = '\0';
     }
 
     return whoami;
@@ -875,9 +875,9 @@ QUtil::get_env(std::string const& var, std::string* value)
 
     if (value)
     {
-	PointerHolder<char> t = PointerHolder<char>(true, new char[len + 1]);
+        PointerHolder<char> t = PointerHolder<char>(true, new char[len + 1]);
         ::GetEnvironmentVariable(var.c_str(), t.get(), len);
-	*value = t.get();
+        *value = t.get();
     }
 
     return true;
@@ -1057,42 +1057,42 @@ QUtil::toUTF8(unsigned long uval)
 
     if (uval > 0x7fffffff)
     {
-	throw std::runtime_error("bounds error in QUtil::toUTF8");
+        throw std::runtime_error("bounds error in QUtil::toUTF8");
     }
     else if (uval < 128)
     {
-	result += static_cast<char>(uval);
+        result += static_cast<char>(uval);
     }
     else
     {
-	unsigned char bytes[7];
-	bytes[6] = '\0';
-	unsigned char* cur_byte = &bytes[5];
+        unsigned char bytes[7];
+        bytes[6] = '\0';
+        unsigned char* cur_byte = &bytes[5];
 
-	// maximum value that will fit in the current number of bytes
-	unsigned char maxval = 0x3f; // six bits
+        // maximum value that will fit in the current number of bytes
+        unsigned char maxval = 0x3f; // six bits
 
-	while (uval > QIntC::to_ulong(maxval))
-	{
-	    // Assign low six bits plus 10000000 to lowest unused
-	    // byte position, then shift
-	    *cur_byte = static_cast<unsigned char>(0x80 + (uval & 0x3f));
-	    uval >>= 6;
-	    // Maximum that will fit in high byte now shrinks by one bit
-	    maxval = static_cast<unsigned char>(maxval >> 1);
-	    // Slide to the left one byte
-	    if (cur_byte <= bytes)
-	    {
-		throw std::logic_error("QUtil::toUTF8: overflow error");
-	    }
-	    --cur_byte;
-	}
-	// If maxval is k bits long, the high (7 - k) bits of the
-	// resulting byte must be high.
-	*cur_byte = static_cast<unsigned char>(
+        while (uval > QIntC::to_ulong(maxval))
+        {
+            // Assign low six bits plus 10000000 to lowest unused
+            // byte position, then shift
+            *cur_byte = static_cast<unsigned char>(0x80 + (uval & 0x3f));
+            uval >>= 6;
+            // Maximum that will fit in high byte now shrinks by one bit
+            maxval = static_cast<unsigned char>(maxval >> 1);
+            // Slide to the left one byte
+            if (cur_byte <= bytes)
+            {
+                throw std::logic_error("QUtil::toUTF8: overflow error");
+            }
+            --cur_byte;
+        }
+        // If maxval is k bits long, the high (7 - k) bits of the
+        // resulting byte must be high.
+        *cur_byte = static_cast<unsigned char>(
             QIntC::to_ulong(0xff - (1 + (maxval << 1))) + uval);
 
-	result += reinterpret_cast<char*>(cur_byte);
+        result += reinterpret_cast<char*>(cur_byte);
     }
 
     return result;
@@ -1350,19 +1350,19 @@ QUtil::read_lines_from_file(std::function<bool(char&)> next_char,
     char c;
     while (next_char(c))
     {
-	if (buf == 0)
-	{
-	    lines.push_back("");
-	    buf = &(lines.back());
-	    buf->reserve(80);
-	}
+        if (buf == 0)
+        {
+            lines.push_back("");
+            buf = &(lines.back());
+            buf->reserve(80);
+        }
 
-	if (buf->capacity() == buf->size())
-	{
-	    buf->reserve(buf->capacity() * 2);
-	}
-	if (c == '\n')
-	{
+        if (buf->capacity() == buf->size())
+        {
+            buf->reserve(buf->capacity() * 2);
+        }
+        if (c == '\n')
+        {
             if (preserve_eol)
             {
                 buf->append(1, c);
@@ -1376,12 +1376,12 @@ QUtil::read_lines_from_file(std::function<bool(char&)> next_char,
                     buf->erase(buf->length() - 1);
                 }
             }
-	    buf = 0;
-	}
-	else
-	{
-	    buf->append(1, c);
-	}
+            buf = 0;
+        }
+        else
+        {
+            buf->append(1, c);
+        }
     }
 }
 

@@ -147,7 +147,7 @@ QPDF::trim_user_password(std::string& user_password)
     size_t len = user_password.length();
     if (len < key_bytes)
     {
-	return;
+        return;
     }
 
     char const* p1 = cstr;
@@ -155,11 +155,11 @@ QPDF::trim_user_password(std::string& user_password)
     while ((p2 = strchr(p1, '\x28')) != 0)
     {
         size_t idx = toS(p2 - cstr);
-	if (memcmp(p2, padding_string, len - idx) == 0)
-	{
-	    user_password = user_password.substr(0, idx);
-	    return;
-	}
+        if (memcmp(p2, padding_string, len - idx) == 0)
+        {
+            user_password = user_password.substr(0, idx);
+            return;
+        }
         else
         {
             QTC::TC("qpdf", "QPDF_encryption skip 0x28");
@@ -191,30 +191,30 @@ iterate_md5_digest(MD5& md5, MD5::Digest& digest,
 
     for (int i = 0; i < iterations; ++i)
     {
-	MD5 m;
-	m.encodeDataIncrementally(reinterpret_cast<char*>(digest),
+        MD5 m;
+        m.encodeDataIncrementally(reinterpret_cast<char*>(digest),
                                   QIntC::to_size(key_len));
-	m.digest(digest);
+        m.digest(digest);
     }
 }
 
 
 static void
 iterate_rc4(unsigned char* data, size_t data_len,
-	    unsigned char* okey, int key_len,
-	    int iterations, bool reverse)
+            unsigned char* okey, int key_len,
+            int iterations, bool reverse)
 {
     auto key_ph = std::make_unique<unsigned char[]>(QIntC::to_size(key_len));
     unsigned char* key = key_ph.get();
     for (int i = 0; i < iterations; ++i)
     {
-	int const xor_value = (reverse ? iterations - 1 - i : i);
-	for (int j = 0; j < key_len; ++j)
-	{
-	    key[j] = static_cast<unsigned char>(okey[j] ^ xor_value);
-	}
-	RC4 rc4(key, QIntC::to_int(key_len));
-	rc4.process(data, data_len);
+        int const xor_value = (reverse ? iterations - 1 - i : i);
+        for (int j = 0; j < key_len; ++j)
+        {
+            key[j] = static_cast<unsigned char>(okey[j] ^ xor_value);
+        }
+        RC4 rc4(key, QIntC::to_int(key_len));
+        rc4.process(data, data_len);
     }
 }
 
@@ -354,7 +354,7 @@ void pad_short_parameter(std::string& param, size_t max_len)
 
 std::string
 QPDF::compute_data_key(std::string const& encryption_key,
-		       int objid, int generation, bool use_aes,
+                       int objid, int generation, bool use_aes,
                        int encryption_V, int encryption_R)
 {
     // Algorithm 3.1 from the PDF 1.7 Reference Manual
@@ -376,7 +376,7 @@ QPDF::compute_data_key(std::string const& encryption_key,
     result.append(1, static_cast<char>((generation >> 8) & 0xff));
     if (use_aes)
     {
-	result += "sAlT";
+        result += "sAlT";
     }
 
     MD5 md5;
@@ -384,7 +384,7 @@ QPDF::compute_data_key(std::string const& encryption_key,
     MD5::Digest digest;
     md5.digest(digest);
     return std::string(reinterpret_cast<char*>(digest),
-		       std::min(result.length(), toS(16)));
+                       std::min(result.length(), toS(16)));
 }
 
 std::string
@@ -421,7 +421,7 @@ QPDF::compute_encryption_key_from_password(
 
     MD5 md5;
     md5.encodeDataIncrementally(
-	pad_or_truncate_password_V4(password).c_str(), key_bytes);
+        pad_or_truncate_password_V4(password).c_str(), key_bytes);
     md5.encodeDataIncrementally(data.getO().c_str(), key_bytes);
     char pbytes[4];
     int P = data.getP();
@@ -434,9 +434,9 @@ QPDF::compute_encryption_key_from_password(
                                 data.getId1().length());
     if ((data.getR() >= 4) && (! data.getEncryptMetadata()))
     {
-	char bytes[4];
-	memset(bytes, 0xff, 4);
-	md5.encodeDataIncrementally(bytes, 4);
+        char bytes[4];
+        memset(bytes, 0xff, 4);
+        md5.encodeDataIncrementally(bytes, 4);
     }
     MD5::Digest digest;
     int key_len =
@@ -448,23 +448,23 @@ QPDF::compute_encryption_key_from_password(
 
 static void
 compute_O_rc4_key(std::string const& user_password,
-		  std::string const& owner_password,
-		  QPDF::EncryptionData const& data,
-		  unsigned char key[OU_key_bytes_V4])
+                  std::string const& owner_password,
+                  QPDF::EncryptionData const& data,
+                  unsigned char key[OU_key_bytes_V4])
 {
     if (data.getV() >= 5)
     {
-	throw std::logic_error(
-	    "compute_O_rc4_key called for file with V >= 5");
+        throw std::logic_error(
+            "compute_O_rc4_key called for file with V >= 5");
     }
     std::string password = owner_password;
     if (password.empty())
     {
-	password = user_password;
+        password = user_password;
     }
     MD5 md5;
     md5.encodeDataIncrementally(
-	pad_or_truncate_password_V4(password).c_str(), key_bytes);
+        pad_or_truncate_password_V4(password).c_str(), key_bytes);
     MD5::Digest digest;
     int key_len = std::min(QIntC::to_int(sizeof(digest)),
                            data.getLengthBytes());
@@ -474,8 +474,8 @@ compute_O_rc4_key(std::string const& user_password,
 
 static std::string
 compute_O_value(std::string const& user_password,
-		std::string const& owner_password,
-		QPDF::EncryptionData const& data)
+                std::string const& owner_password,
+                QPDF::EncryptionData const& data)
 {
     // Algorithm 3.3 from the PDF 1.7 Reference Manual
 
@@ -487,7 +487,7 @@ compute_O_value(std::string const& user_password,
     std::string k1(reinterpret_cast<char*>(O_key), OU_key_bytes_V4);
     pad_short_parameter(k1, QIntC::to_size(data.getLengthBytes()));
     iterate_rc4(QUtil::unsigned_char_pointer(upass), key_bytes,
-		O_key, data.getLengthBytes(),
+                O_key, data.getLengthBytes(),
                 (data.getR() >= 3) ? 20 : 1, false);
     return std::string(upass, key_bytes);
 }
@@ -495,7 +495,7 @@ compute_O_value(std::string const& user_password,
 static
 std::string
 compute_U_value_R2(std::string const& user_password,
-		   QPDF::EncryptionData const& data)
+                   QPDF::EncryptionData const& data)
 {
     // Algorithm 3.4 from the PDF 1.7 Reference Manual
 
@@ -504,7 +504,7 @@ compute_U_value_R2(std::string const& user_password,
     pad_or_truncate_password_V4("", udata);
     pad_short_parameter(k1, QIntC::to_size(data.getLengthBytes()));
     iterate_rc4(QUtil::unsigned_char_pointer(udata), key_bytes,
-		QUtil::unsigned_char_pointer(k1),
+                QUtil::unsigned_char_pointer(k1),
                 data.getLengthBytes(), 1, false);
     return std::string(udata, key_bytes);
 }
@@ -512,21 +512,21 @@ compute_U_value_R2(std::string const& user_password,
 static
 std::string
 compute_U_value_R3(std::string const& user_password,
-		   QPDF::EncryptionData const& data)
+                   QPDF::EncryptionData const& data)
 {
     // Algorithm 3.5 from the PDF 1.7 Reference Manual
 
     std::string k1 = QPDF::compute_encryption_key(user_password, data);
     MD5 md5;
     md5.encodeDataIncrementally(
-	pad_or_truncate_password_V4("").c_str(), key_bytes);
+        pad_or_truncate_password_V4("").c_str(), key_bytes);
     md5.encodeDataIncrementally(data.getId1().c_str(),
                                 data.getId1().length());
     MD5::Digest digest;
     md5.digest(digest);
     pad_short_parameter(k1, QIntC::to_size(data.getLengthBytes()));
     iterate_rc4(digest, sizeof(MD5::Digest),
-		QUtil::unsigned_char_pointer(k1),
+                QUtil::unsigned_char_pointer(k1),
                 data.getLengthBytes(), 20, false);
     char result[key_bytes];
     memcpy(result, digest, sizeof(MD5::Digest));
@@ -534,18 +534,18 @@ compute_U_value_R3(std::string const& user_password,
     // testing
     for (unsigned int i = sizeof(MD5::Digest); i < key_bytes; ++i)
     {
-	result[i] = static_cast<char>((i * i) % 0xff);
+        result[i] = static_cast<char>((i * i) % 0xff);
     }
     return std::string(result, key_bytes);
 }
 
 static std::string
 compute_U_value(std::string const& user_password,
-		QPDF::EncryptionData const& data)
+                QPDF::EncryptionData const& data)
 {
     if (data.getR() >= 3)
     {
-	return compute_U_value_R3(user_password, data);
+        return compute_U_value_R3(user_password, data);
     }
 
     return compute_U_value_R2(user_password, data);
@@ -577,7 +577,7 @@ check_user_password_V5(std::string const& user_password,
 
 static bool
 check_user_password(std::string const& user_password,
-		    QPDF::EncryptionData const& data)
+                    QPDF::EncryptionData const& data)
 {
     if (data.getV() < 5)
     {
@@ -632,8 +632,8 @@ check_owner_password_V5(std::string const& owner_password,
 
 static bool
 check_owner_password(std::string& user_password,
-		     std::string const& owner_password,
-		     QPDF::EncryptionData const& data)
+                     std::string const& owner_password,
+                     QPDF::EncryptionData const& data)
 {
     if (data.getV() < 5)
     {
@@ -773,24 +773,24 @@ QPDF::interpretCF(
 {
     if (cf.isName())
     {
-	std::string filter = cf.getName();
-	if (encp->crypt_filters.count(filter) != 0)
-	{
-	    return encp->crypt_filters[filter];
-	}
-	else if (filter == "/Identity")
-	{
-	    return e_none;
-	}
-	else
-	{
-	    return e_unknown;
-	}
+        std::string filter = cf.getName();
+        if (encp->crypt_filters.count(filter) != 0)
+        {
+            return encp->crypt_filters[filter];
+        }
+        else if (filter == "/Identity")
+        {
+            return e_none;
+        }
+        else
+        {
+            return e_unknown;
+        }
     }
     else
     {
-	// Default: /Identity
-	return e_none;
+        // Default: /Identity
+        return e_none;
     }
 }
 
@@ -799,7 +799,7 @@ QPDF::initializeEncryption()
 {
     if (this->m->encp->encryption_initialized)
     {
-	return;
+        return;
     }
     this->m->encp->encryption_initialized = true;
 
@@ -810,7 +810,7 @@ QPDF::initializeEncryption()
 
     if (! this->m->trailer.hasKey("/Encrypt"))
     {
-	return;
+        return;
     }
 
     // Go ahead and set this->m->encrypted here.  That way, isEncrypted
@@ -831,7 +831,7 @@ QPDF::initializeEncryption()
         // Treating a missing ID as the empty string enables qpdf to
         // decrypt some invalid encrypted files with no /ID that
         // poppler can read but Adobe Reader can't.
-	warn(QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
+        warn(QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
                      "trailer", this->m->file->getLastOffset(),
                      "invalid /ID in trailer dictionary"));
     }
@@ -839,37 +839,37 @@ QPDF::initializeEncryption()
     QPDFObjectHandle encryption_dict = this->m->trailer.getKey("/Encrypt");
     if (! encryption_dict.isDictionary())
     {
-	throw QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
-		      this->m->last_object_description,
-		      this->m->file->getLastOffset(),
-		      "/Encrypt in trailer dictionary is not a dictionary");
+        throw QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
+                      this->m->last_object_description,
+                      this->m->file->getLastOffset(),
+                      "/Encrypt in trailer dictionary is not a dictionary");
     }
 
     if (! (encryption_dict.getKey("/Filter").isName() &&
-	   (encryption_dict.getKey("/Filter").getName() == "/Standard")))
+           (encryption_dict.getKey("/Filter").getName() == "/Standard")))
     {
         throw QPDFExc(qpdf_e_unsupported, this->m->file->getName(),
-		      "encryption dictionary", this->m->file->getLastOffset(),
-		      "unsupported encryption filter");
+                      "encryption dictionary", this->m->file->getLastOffset(),
+                      "unsupported encryption filter");
     }
     if (! encryption_dict.getKey("/SubFilter").isNull())
     {
-	warn(QPDFExc(qpdf_e_unsupported, this->m->file->getName(),
-		     "encryption dictionary", this->m->file->getLastOffset(),
-		     "file uses encryption SubFilters,"
-		     " which qpdf does not support"));
+        warn(QPDFExc(qpdf_e_unsupported, this->m->file->getName(),
+                     "encryption dictionary", this->m->file->getLastOffset(),
+                     "file uses encryption SubFilters,"
+                     " which qpdf does not support"));
     }
 
     if (! (encryption_dict.getKey("/V").isInteger() &&
-	   encryption_dict.getKey("/R").isInteger() &&
-	   encryption_dict.getKey("/O").isString() &&
-	   encryption_dict.getKey("/U").isString() &&
-	   encryption_dict.getKey("/P").isInteger()))
+           encryption_dict.getKey("/R").isInteger() &&
+           encryption_dict.getKey("/O").isString() &&
+           encryption_dict.getKey("/U").isString() &&
+           encryption_dict.getKey("/P").isInteger()))
     {
-	throw QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
-		      "encryption dictionary", this->m->file->getLastOffset(),
-		      "some encryption dictionary parameters are missing "
-		      "or the wrong type");
+        throw QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
+                      "encryption dictionary", this->m->file->getLastOffset(),
+                      "some encryption dictionary parameters are missing "
+                      "or the wrong type");
     }
 
     int V = encryption_dict.getKey("/V").getIntValueAsInt();
@@ -881,11 +881,11 @@ QPDF::initializeEncryption()
     // If supporting new encryption R/V values, remember to update
     // error message inside this if statement.
     if (! (((R >= 2) && (R <= 6)) &&
-	   ((V == 1) || (V == 2) || (V == 4) || (V == 5))))
+           ((V == 1) || (V == 2) || (V == 4) || (V == 5))))
     {
-	throw QPDFExc(qpdf_e_unsupported, this->m->file->getName(),
-		      "encryption dictionary", this->m->file->getLastOffset(),
-		      "Unsupported /R or /V in encryption dictionary; R = " +
+        throw QPDFExc(qpdf_e_unsupported, this->m->file->getName(),
+                      "encryption dictionary", this->m->file->getLastOffset(),
+                      "Unsupported /R or /V in encryption dictionary; R = " +
                       QUtil::int_to_string(R) + " (max 6), V = " +
                       QUtil::int_to_string(V) + " (max 5)");
     }
@@ -969,58 +969,58 @@ QPDF::initializeEncryption()
     this->m->encp->encrypt_metadata = true;
     if ((V >= 4) && (encryption_dict.getKey("/EncryptMetadata").isBool()))
     {
-	this->m->encp->encrypt_metadata =
-	    encryption_dict.getKey("/EncryptMetadata").getBoolValue();
+        this->m->encp->encrypt_metadata =
+            encryption_dict.getKey("/EncryptMetadata").getBoolValue();
     }
 
     if ((V == 4) || (V == 5))
     {
-	QPDFObjectHandle CF = encryption_dict.getKey("/CF");
-	std::set<std::string> keys = CF.getKeys();
-	for (std::set<std::string>::iterator iter = keys.begin();
-	     iter != keys.end(); ++iter)
-	{
-	    std::string const& filter = *iter;
-	    QPDFObjectHandle cdict = CF.getKey(filter);
-	    if (cdict.isDictionary())
-	    {
-		encryption_method_e method = e_none;
-		if (cdict.getKey("/CFM").isName())
-		{
-		    std::string method_name = cdict.getKey("/CFM").getName();
-		    if (method_name == "/V2")
-		    {
-			QTC::TC("qpdf", "QPDF_encryption CFM V2");
-			method = e_rc4;
-		    }
-		    else if (method_name == "/AESV2")
-		    {
-			QTC::TC("qpdf", "QPDF_encryption CFM AESV2");
-			method = e_aes;
-		    }
-		    else if (method_name == "/AESV3")
-		    {
-			QTC::TC("qpdf", "QPDF_encryption CFM AESV3");
-			method = e_aesv3;
-		    }
-		    else
-		    {
-			// Don't complain now -- maybe we won't need
-			// to reference this type.
-			method = e_unknown;
-		    }
-		}
-		this->m->encp->crypt_filters[filter] = method;
-	    }
-	}
+        QPDFObjectHandle CF = encryption_dict.getKey("/CF");
+        std::set<std::string> keys = CF.getKeys();
+        for (std::set<std::string>::iterator iter = keys.begin();
+             iter != keys.end(); ++iter)
+        {
+            std::string const& filter = *iter;
+            QPDFObjectHandle cdict = CF.getKey(filter);
+            if (cdict.isDictionary())
+            {
+                encryption_method_e method = e_none;
+                if (cdict.getKey("/CFM").isName())
+                {
+                    std::string method_name = cdict.getKey("/CFM").getName();
+                    if (method_name == "/V2")
+                    {
+                        QTC::TC("qpdf", "QPDF_encryption CFM V2");
+                        method = e_rc4;
+                    }
+                    else if (method_name == "/AESV2")
+                    {
+                        QTC::TC("qpdf", "QPDF_encryption CFM AESV2");
+                        method = e_aes;
+                    }
+                    else if (method_name == "/AESV3")
+                    {
+                        QTC::TC("qpdf", "QPDF_encryption CFM AESV3");
+                        method = e_aesv3;
+                    }
+                    else
+                    {
+                        // Don't complain now -- maybe we won't need
+                        // to reference this type.
+                        method = e_unknown;
+                    }
+                }
+                this->m->encp->crypt_filters[filter] = method;
+            }
+        }
 
-	QPDFObjectHandle StmF = encryption_dict.getKey("/StmF");
-	QPDFObjectHandle StrF = encryption_dict.getKey("/StrF");
-	QPDFObjectHandle EFF = encryption_dict.getKey("/EFF");
-	this->m->encp->cf_stream = interpretCF(this->m->encp, StmF);
-	this->m->encp->cf_string = interpretCF(this->m->encp, StrF);
-	if (EFF.isName())
-	{
+        QPDFObjectHandle StmF = encryption_dict.getKey("/StmF");
+        QPDFObjectHandle StrF = encryption_dict.getKey("/StrF");
+        QPDFObjectHandle EFF = encryption_dict.getKey("/EFF");
+        this->m->encp->cf_stream = interpretCF(this->m->encp, StmF);
+        this->m->encp->cf_string = interpretCF(this->m->encp, StrF);
+        if (EFF.isName())
+        {
             // qpdf does not use this for anything other than
             // informational purposes. This is intended to instruct
             // conforming writers on which crypt filter should be used
@@ -1035,12 +1035,12 @@ QPDF::initializeEncryption()
             // at a file generated by something else, such as Acrobat
             // when specifying that only attachments should be
             // encrypted.
-	    this->m->encp->cf_file = interpretCF(this->m->encp, EFF);
-	}
-	else
-	{
-	    this->m->encp->cf_file = this->m->encp->cf_stream;
-	}
+            this->m->encp->cf_file = interpretCF(this->m->encp, EFF);
+        }
+        else
+        {
+            this->m->encp->cf_file = this->m->encp->cf_stream;
+        }
     }
 
     EncryptionData data(V, R, Length / 8,
@@ -1128,19 +1128,19 @@ QPDF::getKeyForObject(
 {
     if (! encp->encrypted)
     {
-	throw std::logic_error(
-	    "request for encryption key in non-encrypted PDF");
+        throw std::logic_error(
+            "request for encryption key in non-encrypted PDF");
     }
 
     if (! ((objid == encp->cached_key_objid) &&
-	   (generation == encp->cached_key_generation)))
+           (generation == encp->cached_key_generation)))
     {
-	encp->cached_object_encryption_key =
-	    compute_data_key(encp->encryption_key, objid, generation,
+        encp->cached_object_encryption_key =
+            compute_data_key(encp->encryption_key, objid, generation,
                              use_aes, encp->encryption_V,
                              encp->encryption_R);
-	encp->cached_key_objid = objid;
-	encp->cached_key_generation = generation;
+        encp->cached_key_objid = objid;
+        encp->cached_key_generation = generation;
     }
 
     return encp->cached_object_encryption_key;
@@ -1151,83 +1151,83 @@ QPDF::decryptString(std::string& str, int objid, int generation)
 {
     if (objid == 0)
     {
-	return;
+        return;
     }
     bool use_aes = false;
     if (this->m->encp->encryption_V >= 4)
     {
-	switch (this->m->encp->cf_string)
-	{
-	  case e_none:
-	    return;
+        switch (this->m->encp->cf_string)
+        {
+          case e_none:
+            return;
 
-	  case e_aes:
-	    use_aes = true;
-	    break;
-
-	  case e_aesv3:
-	    use_aes = true;
-	    break;
-
-	  case e_rc4:
-	    break;
-
-	  default:
-	    warn(QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
-			 this->m->last_object_description,
-			 this->m->file->getLastOffset(),
-			 "unknown encryption filter for strings"
-			 " (check /StrF in /Encrypt dictionary);"
-			 " strings may be decrypted improperly"));
-	    // To avoid repeated warnings, reset cf_string.  Assume
-	    // we'd want to use AES if V == 4.
-	    this->m->encp->cf_string = e_aes;
+          case e_aes:
             use_aes = true;
-	    break;
-	}
+            break;
+
+          case e_aesv3:
+            use_aes = true;
+            break;
+
+          case e_rc4:
+            break;
+
+          default:
+            warn(QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
+                         this->m->last_object_description,
+                         this->m->file->getLastOffset(),
+                         "unknown encryption filter for strings"
+                         " (check /StrF in /Encrypt dictionary);"
+                         " strings may be decrypted improperly"));
+            // To avoid repeated warnings, reset cf_string.  Assume
+            // we'd want to use AES if V == 4.
+            this->m->encp->cf_string = e_aes;
+            use_aes = true;
+            break;
+        }
     }
 
     std::string key = getKeyForObject(
         this->m->encp, objid, generation, use_aes);
     try
     {
-	if (use_aes)
-	{
-	    QTC::TC("qpdf", "QPDF_encryption aes decode string");
-	    Pl_Buffer bufpl("decrypted string");
-	    Pl_AES_PDF pl("aes decrypt string", &bufpl, false,
-			  QUtil::unsigned_char_pointer(key),
+        if (use_aes)
+        {
+            QTC::TC("qpdf", "QPDF_encryption aes decode string");
+            Pl_Buffer bufpl("decrypted string");
+            Pl_AES_PDF pl("aes decrypt string", &bufpl, false,
+                          QUtil::unsigned_char_pointer(key),
                           key.length());
-	    pl.write(QUtil::unsigned_char_pointer(str), str.length());
-	    pl.finish();
-	    auto buf = bufpl.getBufferSharedPointer();
-	    str = std::string(reinterpret_cast<char*>(buf->getBuffer()),
+            pl.write(QUtil::unsigned_char_pointer(str), str.length());
+            pl.finish();
+            auto buf = bufpl.getBufferSharedPointer();
+            str = std::string(reinterpret_cast<char*>(buf->getBuffer()),
                               buf->getSize());
-	}
-	else
-	{
-	    QTC::TC("qpdf", "QPDF_encryption rc4 decode string");
-	    size_t vlen = str.length();
-	    // Using PointerHolder guarantees that tmp will
-	    // be freed even if rc4.process throws an exception.
-	    auto tmp = QUtil::make_unique_cstr(str);
-	    RC4 rc4(QUtil::unsigned_char_pointer(key), toI(key.length()));
-	    rc4.process(QUtil::unsigned_char_pointer(tmp.get()), vlen);
-	    str = std::string(tmp.get(), vlen);
-	}
+        }
+        else
+        {
+            QTC::TC("qpdf", "QPDF_encryption rc4 decode string");
+            size_t vlen = str.length();
+            // Using PointerHolder guarantees that tmp will
+            // be freed even if rc4.process throws an exception.
+            auto tmp = QUtil::make_unique_cstr(str);
+            RC4 rc4(QUtil::unsigned_char_pointer(key), toI(key.length()));
+            rc4.process(QUtil::unsigned_char_pointer(tmp.get()), vlen);
+            str = std::string(tmp.get(), vlen);
+        }
     }
     catch (QPDFExc&)
     {
-	throw;
+        throw;
     }
     catch (std::runtime_error& e)
     {
-	throw QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
-		      this->m->last_object_description,
-		      this->m->file->getLastOffset(),
-		      "error decrypting string for object " +
-		      QUtil::int_to_string(objid) + " " +
-		      QUtil::int_to_string(generation) + ": " + e.what());
+        throw QPDFExc(qpdf_e_damaged_pdf, this->m->file->getName(),
+                      this->m->last_object_description,
+                      this->m->file->getLastOffset(),
+                      "error decrypting string for object " +
+                      QUtil::int_to_string(objid) + " " +
+                      QUtil::int_to_string(generation) + ": " + e.what());
     }
 }
 
@@ -1236,26 +1236,26 @@ QPDF::decryptStream(PointerHolder<EncryptionParameters> encp,
                     PointerHolder<InputSource> file,
                     QPDF& qpdf_for_warning, Pipeline*& pipeline,
                     int objid, int generation,
-		    QPDFObjectHandle& stream_dict,
-		    std::vector<std::shared_ptr<Pipeline>>& heap)
+                    QPDFObjectHandle& stream_dict,
+                    std::vector<std::shared_ptr<Pipeline>>& heap)
 {
     std::string type;
     if (stream_dict.getKey("/Type").isName())
     {
-	type = stream_dict.getKey("/Type").getName();
+        type = stream_dict.getKey("/Type").getName();
     }
     if (type == "/XRef")
     {
-	QTC::TC("qpdf", "QPDF_encryption xref stream from encrypted file");
-	return;
+        QTC::TC("qpdf", "QPDF_encryption xref stream from encrypted file");
+        return;
     }
     bool use_aes = false;
     if (encp->encryption_V >= 4)
     {
-	encryption_method_e method = e_unknown;
-	std::string method_source = "/StmF from /Encrypt dictionary";
+        encryption_method_e method = e_unknown;
+        std::string method_source = "/StmF from /Encrypt dictionary";
 
-	if (stream_dict.getKey("/Filter").isOrHasName("/Crypt"))
+        if (stream_dict.getKey("/Filter").isOrHasName("/Crypt"))
         {
             if (stream_dict.getKey("/DecodeParms").isDictionary())
             {
@@ -1294,67 +1294,67 @@ QPDF::decryptStream(PointerHolder<EncryptionParameters> encp,
                     }
                 }
             }
-	}
+        }
 
-	if (method == e_unknown)
-	{
-	    if ((! encp->encrypt_metadata) && (type == "/Metadata"))
-	    {
-		QTC::TC("qpdf", "QPDF_encryption cleartext metadata");
-		method = e_none;
-	    }
-	    else
-	    {
+        if (method == e_unknown)
+        {
+            if ((! encp->encrypt_metadata) && (type == "/Metadata"))
+            {
+                QTC::TC("qpdf", "QPDF_encryption cleartext metadata");
+                method = e_none;
+            }
+            else
+            {
                 method = encp->cf_stream;
-	    }
-	}
-	use_aes = false;
-	switch (method)
-	{
-	  case e_none:
-	    return;
-	    break;
+            }
+        }
+        use_aes = false;
+        switch (method)
+        {
+          case e_none:
+            return;
+            break;
 
-	  case e_aes:
-	    use_aes = true;
-	    break;
+          case e_aes:
+            use_aes = true;
+            break;
 
-	  case e_aesv3:
-	    use_aes = true;
-	    break;
+          case e_aesv3:
+            use_aes = true;
+            break;
 
-	  case e_rc4:
-	    break;
+          case e_rc4:
+            break;
 
-	  default:
-	    // filter local to this stream.
-	    qpdf_for_warning.warn(
+          default:
+            // filter local to this stream.
+            qpdf_for_warning.warn(
                 QPDFExc(qpdf_e_damaged_pdf, file->getName(),
                         "", file->getLastOffset(),
                         "unknown encryption filter for streams"
                         " (check " + method_source + ");"
                         " streams may be decrypted improperly"));
-	    // To avoid repeated warnings, reset cf_stream.  Assume
-	    // we'd want to use AES if V == 4.
-	    encp->cf_stream = e_aes;
+            // To avoid repeated warnings, reset cf_stream.  Assume
+            // we'd want to use AES if V == 4.
+            encp->cf_stream = e_aes;
             use_aes = true;
-	    break;
-	}
+            break;
+        }
     }
     std::string key = getKeyForObject(encp, objid, generation, use_aes);
     std::shared_ptr<Pipeline> new_pipeline;
     if (use_aes)
     {
-	QTC::TC("qpdf", "QPDF_encryption aes decode stream");
-	new_pipeline = std::make_shared<Pl_AES_PDF>(
+        QTC::TC("qpdf", "QPDF_encryption aes decode stream");
+        new_pipeline = std::make_shared<Pl_AES_PDF>(
             "AES stream decryption", pipeline,
             false, QUtil::unsigned_char_pointer(key),
             key.length());
     }
     else
     {
-	QTC::TC("qpdf", "QPDF_encryption rc4 decode stream");
-	new_pipeline = std::make_shared<Pl_RC4>(
+        QTC::TC("qpdf", "QPDF_encryption rc4 decode stream");
+        new_pipeline = std::make_shared<Pl_RC4>(
             "RC4 stream decryption", pipeline,
             QUtil::unsigned_char_pointer(key),
             toI(key.length()));
@@ -1371,8 +1371,8 @@ QPDF::compute_encryption_O_U(
 {
     if (V >= 5)
     {
-	throw std::logic_error(
-	    "compute_encryption_O_U called for file with V >= 5");
+        throw std::logic_error(
+            "compute_encryption_O_U called for file with V >= 5");
     }
     EncryptionData data(V, R, key_len, P, "", "", "", "", "",
                         id1, encrypt_metadata);
@@ -1444,22 +1444,22 @@ QPDF::isEncrypted(int& R, int& P, int& V,
 {
     if (this->m->encp->encrypted)
     {
-	QPDFObjectHandle trailer = getTrailer();
-	QPDFObjectHandle encrypt = trailer.getKey("/Encrypt");
-	QPDFObjectHandle Pkey = encrypt.getKey("/P");
-	QPDFObjectHandle Rkey = encrypt.getKey("/R");
+        QPDFObjectHandle trailer = getTrailer();
+        QPDFObjectHandle encrypt = trailer.getKey("/Encrypt");
+        QPDFObjectHandle Pkey = encrypt.getKey("/P");
+        QPDFObjectHandle Rkey = encrypt.getKey("/R");
         QPDFObjectHandle Vkey = encrypt.getKey("/V");
-	P = static_cast<int>(Pkey.getIntValue());
-	R = Rkey.getIntValueAsInt();
+        P = static_cast<int>(Pkey.getIntValue());
+        R = Rkey.getIntValueAsInt();
         V = Vkey.getIntValueAsInt();
         stream_method = this->m->encp->cf_stream;
         string_method = this->m->encp->cf_string;
         file_method = this->m->encp->cf_file;
-	return true;
+        return true;
     }
     else
     {
-	return false;
+        return false;
     }
 }
 
@@ -1490,14 +1490,14 @@ QPDF::allowAccessibility()
     bool status = true;
     if (isEncrypted(R, P))
     {
-	if (R < 3)
-	{
-	    status = is_bit_set(P, 5);
-	}
-	else
-	{
-	    status = is_bit_set(P, 10);
-	}
+        if (R < 3)
+        {
+            status = is_bit_set(P, 5);
+        }
+        else
+        {
+            status = is_bit_set(P, 10);
+        }
     }
     return status;
 }
@@ -1510,7 +1510,7 @@ QPDF::allowExtractAll()
     bool status = true;
     if (isEncrypted(R, P))
     {
-	status = is_bit_set(P, 5);
+        status = is_bit_set(P, 5);
     }
     return status;
 }
@@ -1523,7 +1523,7 @@ QPDF::allowPrintLowRes()
     bool status = true;
     if (isEncrypted(R, P))
     {
-	status = is_bit_set(P, 3);
+        status = is_bit_set(P, 3);
     }
     return status;
 }
@@ -1536,11 +1536,11 @@ QPDF::allowPrintHighRes()
     bool status = true;
     if (isEncrypted(R, P))
     {
-	status = is_bit_set(P, 3);
-	if ((R >= 3) && (! is_bit_set(P, 12)))
-	{
-	    status = false;
-	}
+        status = is_bit_set(P, 3);
+        if ((R >= 3) && (! is_bit_set(P, 12)))
+        {
+            status = false;
+        }
     }
     return status;
 }
@@ -1553,14 +1553,14 @@ QPDF::allowModifyAssembly()
     bool status = true;
     if (isEncrypted(R, P))
     {
-	if (R < 3)
-	{
-	    status = is_bit_set(P, 4);
-	}
-	else
-	{
-	    status = is_bit_set(P, 11);
-	}
+        if (R < 3)
+        {
+            status = is_bit_set(P, 4);
+        }
+        else
+        {
+            status = is_bit_set(P, 11);
+        }
     }
     return status;
 }
@@ -1573,14 +1573,14 @@ QPDF::allowModifyForm()
     bool status = true;
     if (isEncrypted(R, P))
     {
-	if (R < 3)
-	{
-	    status = is_bit_set(P, 6);
-	}
-	else
-	{
-	    status = is_bit_set(P, 9);
-	}
+        if (R < 3)
+        {
+            status = is_bit_set(P, 6);
+        }
+        else
+        {
+            status = is_bit_set(P, 9);
+        }
     }
     return status;
 }
@@ -1593,7 +1593,7 @@ QPDF::allowModifyAnnotation()
     bool status = true;
     if (isEncrypted(R, P))
     {
-	status = is_bit_set(P, 6);
+        status = is_bit_set(P, 6);
     }
     return status;
 }
@@ -1606,7 +1606,7 @@ QPDF::allowModifyOther()
     bool status = true;
     if (isEncrypted(R, P))
     {
-	status = is_bit_set(P, 4);
+        status = is_bit_set(P, 4);
     }
     return status;
 }
@@ -1619,11 +1619,11 @@ QPDF::allowModifyAll()
     bool status = true;
     if (isEncrypted(R, P))
     {
-	status = (is_bit_set(P, 4) && is_bit_set(P, 6));
-	if (R >= 3)
-	{
-	    status = status && (is_bit_set(P, 9) && is_bit_set(P, 11));
-	}
+        status = (is_bit_set(P, 4) && is_bit_set(P, 6));
+        if (R >= 3)
+        {
+            status = status && (is_bit_set(P, 9) && is_bit_set(P, 11));
+        }
     }
     return status;
 }

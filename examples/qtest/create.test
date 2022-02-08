@@ -12,8 +12,8 @@ cleanup();
 my $td = new TestDriver('create');
 
 $td->runtest("create a simple PDF",
-	     {$td->COMMAND => "pdf-create a.pdf"},
-	     {$td->FILE => "create.out", $td->EXIT_STATUS => 0},
+             {$td->COMMAND => "pdf-create a.pdf"},
+             {$td->FILE => "create.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 cleanup();

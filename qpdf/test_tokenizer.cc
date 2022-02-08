@@ -254,16 +254,16 @@ int main(int argc, char* argv[])
     QUtil::setLineBuf(stdout);
     if ((whoami = strrchr(argv[0], '/')) == NULL)
     {
-	whoami = argv[0];
+        whoami = argv[0];
     }
     else
     {
-	++whoami;
+        ++whoami;
     }
     // For libtool's sake....
     if (strncmp(whoami, "lt-", 3) == 0)
     {
-	whoami += 3;
+        whoami += 3;
     }
 
     char const* filename = 0;

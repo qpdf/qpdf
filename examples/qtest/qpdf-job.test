@@ -12,8 +12,8 @@ cleanup();
 my $td = new TestDriver('qpdf-job');
 
 $td->runtest("qpdf-job",
-	     {$td->COMMAND => "qpdf-job"},
-	     {$td->FILE => "out", $td->EXIT_STATUS => 0},
+             {$td->COMMAND => "qpdf-job"},
+             {$td->FILE => "out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 for (my $i = 1; $i <= 3; ++$i)
 {

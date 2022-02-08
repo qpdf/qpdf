@@ -14,44 +14,44 @@ my $td = new TestDriver('predictors');
 cleanup();
 
 $td->runtest("decode columns = 4",
-	     {$td->COMMAND => "predictors png decode in1 4 1 8"},
-	     {$td->STRING => "done\n",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
+             {$td->COMMAND => "predictors png decode in1 4 1 8"},
+             {$td->STRING => "done\n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 $td->runtest("check output",
-	     {$td->FILE => "out"},
-	     {$td->FILE => "out1"});
+             {$td->FILE => "out"},
+             {$td->FILE => "out1"});
 
 $td->runtest("decode columns = 5",
-	     {$td->COMMAND => "predictors png decode in2 5 1 8"},
-	     {$td->STRING => "done\n",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
+             {$td->COMMAND => "predictors png decode in2 5 1 8"},
+             {$td->STRING => "done\n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 $td->runtest("check output",
-	     {$td->FILE => "out"},
-	     {$td->FILE => "out2"});
+             {$td->FILE => "out"},
+             {$td->FILE => "out2"});
 
 $td->runtest("encode columns = 4",
-	     {$td->COMMAND => "predictors png encode out1 4 1 8"},
-	     {$td->STRING => "done\n",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
+             {$td->COMMAND => "predictors png encode out1 4 1 8"},
+             {$td->STRING => "done\n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 $td->runtest("check output",
-	     {$td->FILE => "out"},
-	     {$td->FILE => "in1"});
+             {$td->FILE => "out"},
+             {$td->FILE => "in1"});
 
 $td->runtest("encode columns = 5",
-	     {$td->COMMAND => "predictors png encode out2 5 1 8"},
-	     {$td->STRING => "done\n",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
+             {$td->COMMAND => "predictors png encode out2 5 1 8"},
+             {$td->STRING => "done\n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 $td->runtest("check output",
-	     {$td->FILE => "out"},
-	     {$td->FILE => "in2"});
+             {$td->FILE => "out"},
+             {$td->FILE => "in2"});
 
 my @other_png = (
     '01--32-3-16',

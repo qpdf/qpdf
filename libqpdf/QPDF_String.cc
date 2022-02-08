@@ -70,102 +70,102 @@ QPDF_String::unparse(bool force_binary)
     bool use_hexstring = force_binary;
     if (! use_hexstring)
     {
-	unsigned int nonprintable = 0;
-	int consecutive_printable = 0;
-	for (unsigned int i = 0; i < this->val.length(); ++i)
-	{
-	    char ch = this->val.at(i);
-	    // Note: do not use locale to determine printability.  The
-	    // PDF specification accepts arbitrary binary data.  Some
-	    // locales imply multibyte characters.  We'll consider
-	    // something printable if it is printable in 7-bit ASCII.
-	    // We'll code this manually rather than being rude and
-	    // setting locale.
-	    if ((ch == 0) || (! (is_ascii_printable(ch) ||
-				 strchr("\n\r\t\b\f", ch))))
-	    {
-		++nonprintable;
-		consecutive_printable = 0;
-	    }
-	    else
-	    {
-		if (++consecutive_printable > 5)
-		{
-		    // If there are more than 5 consecutive printable
-		    // characters, I want to see them as such.
-		    nonprintable = 0;
-		    break;
-		}
-	    }
-	}
+        unsigned int nonprintable = 0;
+        int consecutive_printable = 0;
+        for (unsigned int i = 0; i < this->val.length(); ++i)
+        {
+            char ch = this->val.at(i);
+            // Note: do not use locale to determine printability.  The
+            // PDF specification accepts arbitrary binary data.  Some
+            // locales imply multibyte characters.  We'll consider
+            // something printable if it is printable in 7-bit ASCII.
+            // We'll code this manually rather than being rude and
+            // setting locale.
+            if ((ch == 0) || (! (is_ascii_printable(ch) ||
+                                 strchr("\n\r\t\b\f", ch))))
+            {
+                ++nonprintable;
+                consecutive_printable = 0;
+            }
+            else
+            {
+                if (++consecutive_printable > 5)
+                {
+                    // If there are more than 5 consecutive printable
+                    // characters, I want to see them as such.
+                    nonprintable = 0;
+                    break;
+                }
+            }
+        }
 
-	// Use hex notation if more than 20% of the characters are not
-	// printable in plain ASCII.
-	if (5 * nonprintable > val.length())
-	{
-	    use_hexstring = true;
-	}
+        // Use hex notation if more than 20% of the characters are not
+        // printable in plain ASCII.
+        if (5 * nonprintable > val.length())
+        {
+            use_hexstring = true;
+        }
     }
     std::string result;
     if (use_hexstring)
     {
-	result += "<" + QUtil::hex_encode(this->val) + ">";
+        result += "<" + QUtil::hex_encode(this->val) + ">";
     }
     else
     {
-	result += "(";
-	for (unsigned int i = 0; i < this->val.length(); ++i)
-	{
-	    char ch = this->val.at(i);
-	    switch (ch)
-	    {
-	      case '\n':
-		result += "\\n";
-		break;
+        result += "(";
+        for (unsigned int i = 0; i < this->val.length(); ++i)
+        {
+            char ch = this->val.at(i);
+            switch (ch)
+            {
+              case '\n':
+                result += "\\n";
+                break;
 
-	      case '\r':
-		result += "\\r";
-		break;
+              case '\r':
+                result += "\\r";
+                break;
 
-	      case '\t':
-		result += "\\t";
-		break;
+              case '\t':
+                result += "\\t";
+                break;
 
-	      case '\b':
-		result += "\\b";
-		break;
+              case '\b':
+                result += "\\b";
+                break;
 
-	      case '\f':
-		result += "\\f";
-		break;
+              case '\f':
+                result += "\\f";
+                break;
 
-	      case '(':
-		result += "\\(";
-		break;
+              case '(':
+                result += "\\(";
+                break;
 
-	      case ')':
-		result += "\\)";
-		break;
+              case ')':
+                result += "\\)";
+                break;
 
-	      case '\\':
-		result += "\\\\";
-		break;
+              case '\\':
+                result += "\\\\";
+                break;
 
-	      default:
-		if (is_iso_latin1_printable(ch))
-		{
-		    result += this->val.at(i);
-		}
-		else
-		{
-		    result += "\\" + QUtil::int_to_string_base(
+              default:
+                if (is_iso_latin1_printable(ch))
+                {
+                    result += this->val.at(i);
+                }
+                else
+                {
+                    result += "\\" + QUtil::int_to_string_base(
                         static_cast<int>(static_cast<unsigned char>(ch)),
                         8, 3);
-		}
-		break;
-	    }
-	}
-	result += ")";
+                }
+                break;
+            }
+        }
+        result += ")";
     }
 
     return result;

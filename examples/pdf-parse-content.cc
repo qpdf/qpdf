@@ -13,7 +13,7 @@ static char const* whoami = 0;
 void usage()
 {
     std::cerr << "Usage: " << whoami << " filename page-number" << std::endl
-	      << "Prints a dump of the objects in the content streams"
+              << "Prints a dump of the objects in the content streams"
               << " of the given page." << std::endl
               << "Pages are numbered from 1." << std::endl;
     exit(2);
@@ -66,20 +66,20 @@ int main(int argc, char* argv[])
     // For libtool's sake....
     if (strncmp(whoami, "lt-", 3) == 0)
     {
-	whoami += 3;
+        whoami += 3;
     }
 
     if (argc != 3)
     {
-	usage();
+        usage();
     }
     char const* filename = argv[1];
     int pageno = QUtil::string_to_int(argv[2]);
 
     try
     {
-	QPDF pdf;
-	pdf.processFile(filename);
+        QPDF pdf;
+        pdf.processFile(filename);
         std::vector<QPDFPageObjectHelper> pages =
             QPDFPageDocumentHelper(pdf).getAllPages();
         if ((pageno < 1) || (QIntC::to_size(pageno) > pages.size()))
@@ -93,8 +93,8 @@ int main(int argc, char* argv[])
     }
     catch (std::exception& e)
     {
-	std::cerr << whoami << ": " << e.what() << std::endl;
-	exit(2);
+        std::cerr << whoami << ": " << e.what() << std::endl;
+        exit(2);
     }
 
     return 0;
