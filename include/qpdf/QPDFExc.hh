@@ -34,10 +34,10 @@ class QPDF_DLL_CLASS QPDFExc: public std::runtime_error
   public:
     QPDF_DLL
     QPDFExc(qpdf_error_code_e error_code,
-	    std::string const& filename,
-	    std::string const& object,
-	    qpdf_offset_t offset,
-	    std::string const& message);
+            std::string const& filename,
+            std::string const& object,
+            qpdf_offset_t offset,
+            std::string const& message);
     QPDF_DLL
     virtual ~QPDFExc() noexcept
     {
@@ -66,9 +66,9 @@ class QPDF_DLL_CLASS QPDFExc: public std::runtime_error
 
   private:
     static std::string createWhat(std::string const& filename,
-				  std::string const& object,
-				  qpdf_offset_t offset,
-				  std::string const& message);
+                                  std::string const& object,
+                                  qpdf_offset_t offset,
+                                  std::string const& message);
 
     // This class does not use the Members pattern to avoid needless
     // memory allocations during exception handling.

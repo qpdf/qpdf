@@ -10,14 +10,14 @@ require TestDriver;
 my $td = new TestDriver('ascii85');
 
 $td->runtest("decode",
-	     {$td->COMMAND => "ascii85 < base85.in"},
-	     {$td->FILE => "binary.out",
-	      $td->EXIT_STATUS => 0});
+             {$td->COMMAND => "ascii85 < base85.in"},
+             {$td->FILE => "binary.out",
+              $td->EXIT_STATUS => 0});
 
 $td->runtest("partial decode",
-	     {$td->COMMAND => "echo '\@<5skEHbu7\$3~>' | ascii85"},
-	     {$td->STRING => "asdfqwer\n",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
+             {$td->COMMAND => "echo '\@<5skEHbu7\$3~>' | ascii85"},
+             {$td->STRING => "asdfqwer\n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 $td->report(2);

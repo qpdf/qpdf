@@ -11,26 +11,26 @@ int main()
 
     try
     {
-	unsigned char buf[10000];
-	bool done = false;
-	while (! done)
-	{
-	    size_t len = fread(buf, 1, sizeof(buf), stdin);
-	    if (len <= 0)
-	    {
-		done = true;
-	    }
-	    else
-	    {
-		decode.write(buf, len);
-	    }
-	}
-	decode.finish();
+        unsigned char buf[10000];
+        bool done = false;
+        while (! done)
+        {
+            size_t len = fread(buf, 1, sizeof(buf), stdin);
+            if (len <= 0)
+            {
+                done = true;
+            }
+            else
+            {
+                decode.write(buf, len);
+            }
+        }
+        decode.finish();
     }
     catch (std::exception& e)
     {
-	std::cerr << e.what() << std::endl;
-	 exit(2);
+        std::cerr << e.what() << std::endl;
+         exit(2);
     }
 
     return 0;

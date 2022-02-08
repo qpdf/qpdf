@@ -20,7 +20,7 @@ BitStream::reset()
     bit_offset = 7;
     if (QIntC::to_uint(nbytes) > static_cast<unsigned int>(-1) / 8)
     {
-	throw std::runtime_error("array too large for bitstream");
+        throw std::runtime_error("array too large for bitstream");
     }
     bits_available = 8 * nbytes;
 }
@@ -29,7 +29,7 @@ unsigned long long
 BitStream::getBits(size_t nbits)
 {
     return read_bits(this->p, this->bit_offset,
-		     this->bits_available, nbits);
+                     this->bits_available, nbits);
 }
 
 long long
@@ -63,14 +63,14 @@ BitStream::skipToNextByte()
 {
     if (bit_offset != 7)
     {
-	size_t bits_to_skip = bit_offset + 1;
-	if (bits_available < bits_to_skip)
-	{
-	    throw std::logic_error(
-		"INTERNAL ERROR: overflow skipping to next byte in bitstream");
-	}
-	bit_offset = 7;
-	++p;
-	bits_available -= bits_to_skip;
+        size_t bits_to_skip = bit_offset + 1;
+        if (bits_available < bits_to_skip)
+        {
+            throw std::logic_error(
+                "INTERNAL ERROR: overflow skipping to next byte in bitstream");
+        }
+        bit_offset = 7;
+        ++p;
+        bits_available -= bits_to_skip;
     }
 }

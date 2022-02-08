@@ -11,9 +11,9 @@ static char const* whoami = 0;
 void usage()
 {
     std::cerr << "Usage: " << whoami << " outfile.pdf"
-	      << std::endl
-	      << "Create some name/number trees and write to a file"
-	      << std::endl;
+              << std::endl
+              << "Create some name/number trees and write to a file"
+              << std::endl;
     exit(2);
 }
 
@@ -24,12 +24,12 @@ int main(int argc, char* argv[])
     // For libtool's sake....
     if (strncmp(whoami, "lt-", 3) == 0)
     {
-	whoami += 3;
+        whoami += 3;
     }
 
     if (argc != 2)
     {
-	usage();
+        usage();
     }
 
     char const* outfilename = argv[1];

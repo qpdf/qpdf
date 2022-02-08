@@ -12,18 +12,18 @@ my $td = new TestDriver('overlay-page');
 cleanup();
 
 $td->runtest("overlay-page",
-	     {$td->COMMAND => "pdf-overlay-page in.pdf stamp.pdf a.pdf"},
-	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+             {$td->COMMAND => "pdf-overlay-page in.pdf stamp.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("compare files",
-	     {$td->FILE => "a.pdf"},
-	     {$td->FILE => "out.pdf"});
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "out.pdf"});
 
 $td->runtest("overlay-page with fields/ annotations",
-	     {$td->COMMAND => "pdf-overlay-page in.pdf annotations.pdf a.pdf"},
-	     {$td->STRING => "", $td->EXIT_STATUS => 0});
+             {$td->COMMAND => "pdf-overlay-page in.pdf annotations.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
 $td->runtest("compare files",
-	     {$td->FILE => "a.pdf"},
-	     {$td->FILE => "annotations-out.pdf"});
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "annotations-out.pdf"});
 
 cleanup();
 

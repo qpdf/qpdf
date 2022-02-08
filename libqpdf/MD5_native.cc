@@ -117,7 +117,7 @@ void MD5_native::init()
 // context.
 
 void MD5_native::update(unsigned char *input,
-		 size_t inputLen)
+                 size_t inputLen)
 {
     unsigned int i, index, partLen;
 
@@ -127,7 +127,7 @@ void MD5_native::update(unsigned char *input,
     // Update number of bits
     if ((count[0] += (static_cast<uint32_t>(inputLen) << 3)) <
         (static_cast<uint32_t>(inputLen) << 3))
-	count[1]++;
+        count[1]++;
     count[1] += (static_cast<uint32_t>(inputLen) >> 29);
 
     partLen = 64 - index;
@@ -135,16 +135,16 @@ void MD5_native::update(unsigned char *input,
     // Transform as many times as possible.
 
     if (inputLen >= partLen) {
-	memcpy(&buffer[index], input, partLen);
-	transform(state, buffer);
+        memcpy(&buffer[index], input, partLen);
+        transform(state, buffer);
 
-	for (i = partLen; i + 63 < inputLen; i += 64)
-	    transform(state, &input[i]);
+        for (i = partLen; i + 63 < inputLen; i += 64)
+            transform(state, &input[i]);
 
-	index = 0;
+        index = 0;
     }
     else
-	i = 0;
+        i = 0;
 
     // Buffer remaining input
     memcpy(&buffer[index], &input[i], inputLen-i);
@@ -156,7 +156,7 @@ void MD5_native::finalize()
 {
     if (finalized)
     {
-	return;
+        return;
     }
 
     unsigned char bits[8];
@@ -286,10 +286,10 @@ void MD5_native::encode(unsigned char *output, uint32_t *input, size_t len)
     unsigned int i, j;
 
     for (i = 0, j = 0; j < len; i++, j += 4) {
-	output[j] = static_cast<unsigned char>(input[i] & 0xff);
-	output[j+1] = static_cast<unsigned char>((input[i] >> 8) & 0xff);
-	output[j+2] = static_cast<unsigned char>((input[i] >> 16) & 0xff);
-	output[j+3] = static_cast<unsigned char>((input[i] >> 24) & 0xff);
+        output[j] = static_cast<unsigned char>(input[i] & 0xff);
+        output[j+1] = static_cast<unsigned char>((input[i] >> 8) & 0xff);
+        output[j+2] = static_cast<unsigned char>((input[i] >> 16) & 0xff);
+        output[j+3] = static_cast<unsigned char>((input[i] >> 24) & 0xff);
     }
 }
 
@@ -300,9 +300,9 @@ void MD5_native::decode(uint32_t *output, unsigned char *input, size_t len)
     unsigned int i, j;
 
     for (i = 0, j = 0; j < len; i++, j += 4)
-	output[i] =
+        output[i] =
             static_cast<uint32_t>(input[j]) |
             (static_cast<uint32_t>(input[j+1]) << 8) |
-	    (static_cast<uint32_t>(input[j+2]) << 16) |
+            (static_cast<uint32_t>(input[j+2]) << 16) |
             (static_cast<uint32_t>(input[j+3]) << 24);
 }

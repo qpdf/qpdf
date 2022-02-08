@@ -17,9 +17,9 @@ Pipeline::getNext(bool allow_null)
 {
     if ((this->next == 0) && (! allow_null))
     {
-	throw std::logic_error(
-	    this->identifier +
-	    ": Pipeline::getNext() called on pipeline with no next");
+        throw std::logic_error(
+            this->identifier +
+            ": Pipeline::getNext() called on pipeline with no next");
     }
     return this->next;
 }

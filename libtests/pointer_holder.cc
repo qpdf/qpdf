@@ -70,35 +70,35 @@ int main(int argc, char* argv[])
 
     ObjectHolder oh0;
     {
-	std::cout << "hello" << std::endl;
-	Object* o1 = new Object;
-	ObjectHolder oh1(o1);
+        std::cout << "hello" << std::endl;
+        Object* o1 = new Object;
+        ObjectHolder oh1(o1);
         std::cout << "oh1 refcount = " << oh1.getRefcount() << std::endl;
-	ObjectHolder oh2(oh1);
+        ObjectHolder oh2(oh1);
         std::cout << "oh1 refcount = " << oh1.getRefcount() << std::endl;
         std::cout << "oh2 refcount = " << oh2.use_count() << std::endl;
-	ObjectHolder oh3(new Object);
-	ObjectHolder oh4;
-	ObjectHolder oh5;
+        ObjectHolder oh3(new Object);
+        ObjectHolder oh4;
+        ObjectHolder oh5;
         std::cout << "oh5 refcount = " << oh5.getRefcount() << std::endl;
-	if (oh4 == oh5)
-	{
-	    std::cout << "nulls equal" << std::endl;
-	}
-	oh3 = oh1;
-	oh4 = oh2;
-	if (oh3 == oh4)
-	{
-	    std::cout << "equal okay" << std::endl;
-	}
-	if ((! (oh3 < oh4)) && (! (oh4 < oh3)))
-	{
-	    std::cout << "less than okay" << std::endl;
-	}
-	ol1.push_back(oh3);
-	ol1.push_back(oh3);
-	Object* o3 = new Object;
-	oh0 = o3;
+        if (oh4 == oh5)
+        {
+            std::cout << "nulls equal" << std::endl;
+        }
+        oh3 = oh1;
+        oh4 = oh2;
+        if (oh3 == oh4)
+        {
+            std::cout << "equal okay" << std::endl;
+        }
+        if ((! (oh3 < oh4)) && (! (oh4 < oh3)))
+        {
+            std::cout << "less than okay" << std::endl;
+        }
+        ol1.push_back(oh3);
+        ol1.push_back(oh3);
+        Object* o3 = new Object;
+        oh0 = o3;
         PointerHolder<Object const> oh6(new Object());
         oh6->hello();
     }

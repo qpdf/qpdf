@@ -8,8 +8,8 @@ require TestDriver;
 my $td = new TestDriver('matrix');
 
 $td->runtest("matrix",
-	     {$td->COMMAND => "matrix"},
-	     {$td->STRING => "matrix tests done\n", $td->EXIT_STATUS => 0},
+             {$td->COMMAND => "matrix"},
+             {$td->STRING => "matrix tests done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 $td->report(1);

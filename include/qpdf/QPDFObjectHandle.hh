@@ -63,27 +63,27 @@ class QPDFObjectHandle
         QPDF_DLL
         StreamDataProvider(bool supports_retry = false);
 
-	QPDF_DLL
-	virtual ~StreamDataProvider()
-	{
-	}
-	// The implementation of this function must write stream data
-	// to the given pipeline. The stream data must conform to
-	// whatever filters are explicitly associated with the stream.
-	// QPDFWriter may, in some cases, add compression, but if it
-	// does, it will update the filters as needed. Every call to
-	// provideStreamData for a given stream must write the same
-	// data. Note that, when writing linearized files, qpdf will
-	// call your provideStreamData twice, and if it generates
-	// different output, you risk generating invalid output or
-	// having qpdf throw an exception. The object ID and
-	// generation passed to this method are those that belong to
-	// the stream on behalf of which the provider is called. They
-	// may be ignored or used by the implementation for indexing
-	// or other purposes. This information is made available just
-	// to make it more convenient to use a single
-	// StreamDataProvider object to provide data for multiple
-	// streams.
+        QPDF_DLL
+        virtual ~StreamDataProvider()
+        {
+        }
+        // The implementation of this function must write stream data
+        // to the given pipeline. The stream data must conform to
+        // whatever filters are explicitly associated with the stream.
+        // QPDFWriter may, in some cases, add compression, but if it
+        // does, it will update the filters as needed. Every call to
+        // provideStreamData for a given stream must write the same
+        // data. Note that, when writing linearized files, qpdf will
+        // call your provideStreamData twice, and if it generates
+        // different output, you risk generating invalid output or
+        // having qpdf throw an exception. The object ID and
+        // generation passed to this method are those that belong to
+        // the stream on behalf of which the provider is called. They
+        // may be ignored or used by the implementation for indexing
+        // or other purposes. This information is made available just
+        // to make it more convenient to use a single
+        // StreamDataProvider object to provide data for multiple
+        // streams.
 
         // A few things to keep in mind:
         //
@@ -117,14 +117,14 @@ class QPDFObjectHandle
         // version of the method, which should also return a boolean
         // indicating whether it ran without errors.
         QPDF_DLL
-	virtual void provideStreamData(int objid, int generation,
-				       Pipeline* pipeline);
+        virtual void provideStreamData(int objid, int generation,
+                                       Pipeline* pipeline);
         QPDF_DLL
-	virtual bool provideStreamData(
+        virtual bool provideStreamData(
             int objid, int generation, Pipeline* pipeline,
             bool suppress_warnings, bool will_retry);
         QPDF_DLL
-	bool supportsRetry();
+        bool supportsRetry();
 
       private:
         bool supports_retry;
@@ -563,7 +563,7 @@ class QPDFObjectHandle
     static QPDFObjectHandle newArray();
     QPDF_DLL
     static QPDFObjectHandle newArray(
-	std::vector<QPDFObjectHandle> const& items);
+        std::vector<QPDFObjectHandle> const& items);
     QPDF_DLL
     static QPDFObjectHandle newArray(Rectangle const&);
     QPDF_DLL
@@ -574,7 +574,7 @@ class QPDFObjectHandle
     static QPDFObjectHandle newDictionary();
     QPDF_DLL
     static QPDFObjectHandle newDictionary(
-	std::map<std::string, QPDFObjectHandle> const& items);
+        std::map<std::string, QPDFObjectHandle> const& items);
 
     // Create an array from a rectangle. Equivalent to the rectangle
     // form of newArray.
@@ -1159,7 +1159,7 @@ class QPDFObjectHandle
     // Return value is whether filtering was attempted.
     QPDF_DLL
     bool pipeStreamData(Pipeline*, bool filter,
-			bool normalize, bool compress);
+                        bool normalize, bool compress);
 
     // Replace a stream's dictionary.  The new dictionary must be
     // consistent with the stream's data.  This is most appropriately
@@ -1179,8 +1179,8 @@ class QPDFObjectHandle
     // decryption filters have been applied, is as presented.
     QPDF_DLL
     void replaceStreamData(PointerHolder<Buffer> data,
-			   QPDFObjectHandle const& filter,
-			   QPDFObjectHandle const& decode_parms);
+                           QPDFObjectHandle const& filter,
+                           QPDFObjectHandle const& decode_parms);
 
     // Replace the stream's stream data with the given string.
     // This method will create a copy of the data rather than using
@@ -1188,8 +1188,8 @@ class QPDFObjectHandle
     // of replaceStreamData.
     QPDF_DLL
     void replaceStreamData(std::string const& data,
-			   QPDFObjectHandle const& filter,
-			   QPDFObjectHandle const& decode_parms);
+                           QPDFObjectHandle const& filter,
+                           QPDFObjectHandle const& decode_parms);
 
     // As above, replace this stream's stream data.  Instead of
     // directly providing a buffer with the stream data, call the
@@ -1218,8 +1218,8 @@ class QPDFObjectHandle
     // compute the length in advance.
     QPDF_DLL
     void replaceStreamData(PointerHolder<StreamDataProvider> provider,
-			   QPDFObjectHandle const& filter,
-			   QPDFObjectHandle const& decode_parms);
+                           QPDFObjectHandle const& filter,
+                           QPDFObjectHandle const& decode_parms);
 
     // Starting in qpdf 10.2, you can use C++-11 function objects
     // instead of StreamDataProvider.
@@ -1229,8 +1229,8 @@ class QPDFObjectHandle
     // pass QUtil::file_provider(filename) as provider.
     QPDF_DLL
     void replaceStreamData(std::function<void(Pipeline*)> provider,
-			   QPDFObjectHandle const& filter,
-			   QPDFObjectHandle const& decode_parms);
+                           QPDFObjectHandle const& filter,
+                           QPDFObjectHandle const& decode_parms);
     // The provider should write the stream data to the pipeline,
     // returning true if it succeeded without errors.
     QPDF_DLL
@@ -1317,21 +1317,21 @@ class QPDFObjectHandle
     // making it a friend of the whole QPDFObjectHandle class.
     class Factory
     {
-	friend class QPDF;
+        friend class QPDF;
       private:
-	static QPDFObjectHandle newIndirect(QPDF* qpdf,
-					    int objid, int generation)
-	{
-	    return QPDFObjectHandle::newIndirect(qpdf, objid, generation);
-	}
-	// object must be dictionary object
-	static QPDFObjectHandle newStream(
-	    QPDF* qpdf, int objid, int generation,
-	    QPDFObjectHandle stream_dict, qpdf_offset_t offset, size_t length)
-	{
-	    return QPDFObjectHandle::newStream(
-		qpdf, objid, generation, stream_dict, offset, length);
-	}
+        static QPDFObjectHandle newIndirect(QPDF* qpdf,
+                                            int objid, int generation)
+        {
+            return QPDFObjectHandle::newIndirect(qpdf, objid, generation);
+        }
+        // object must be dictionary object
+        static QPDFObjectHandle newStream(
+            QPDF* qpdf, int objid, int generation,
+            QPDFObjectHandle stream_dict, qpdf_offset_t offset, size_t length)
+        {
+            return QPDFObjectHandle::newStream(
+                qpdf, objid, generation, stream_dict, offset, length);
+        }
     };
     friend class Factory;
 
@@ -1339,13 +1339,13 @@ class QPDFObjectHandle
     // call this.
     class ObjAccessor
     {
-	friend class QPDF;
+        friend class QPDF;
       private:
-	static PointerHolder<QPDFObject> getObject(QPDFObjectHandle& o)
-	{
-	    o.dereference();
-	    return o.obj;
-	}
+        static PointerHolder<QPDFObject> getObject(QPDFObjectHandle& o)
+        {
+            o.dereference();
+            return o.obj;
+        }
     };
     friend class ObjAccessor;
 
@@ -1353,14 +1353,14 @@ class QPDFObjectHandle
     // releaseResolved().
     class ReleaseResolver
     {
-	friend class QPDF_Dictionary;
+        friend class QPDF_Dictionary;
         friend class QPDF_Stream;
         friend class SparseOHArray;
       private:
-	static void releaseResolved(QPDFObjectHandle& o)
-	{
-	    o.releaseResolved();
-	}
+        static void releaseResolved(QPDFObjectHandle& o)
+        {
+            o.releaseResolved();
+        }
     };
     friend class ReleaseResolver;
 
@@ -1440,8 +1440,8 @@ class QPDFObjectHandle
     // Private object factory methods
     static QPDFObjectHandle newIndirect(QPDF*, int objid, int generation);
     static QPDFObjectHandle newStream(
-	QPDF* qpdf, int objid, int generation,
-	QPDFObjectHandle stream_dict, qpdf_offset_t offset, size_t length);
+        QPDF* qpdf, int objid, int generation,
+        QPDFObjectHandle stream_dict, qpdf_offset_t offset, size_t length);
 
     void typeWarning(char const* expected_type,
                      std::string const& warning);
@@ -1481,7 +1481,7 @@ class QPDFObjectHandle
     // a substantial performance penalty since QPDFObjectHandle
     // objects are copied around so frequently.
     QPDF* qpdf;
-    int objid;			// 0 for direct object
+    int objid;                  // 0 for direct object
     int generation;
     PointerHolder<QPDFObject> obj;
     bool reserved;

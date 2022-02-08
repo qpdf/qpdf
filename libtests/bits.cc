@@ -15,29 +15,29 @@
 
 static void
 print_values(long long byte_offset, size_t bit_offset,
-	     size_t bits_available)
+             size_t bits_available)
 {
     std::cout << "byte offset = " << byte_offset << ", "
-	      << "bit offset = " << bit_offset << ", "
-	      << "bits available = " << bits_available << std::endl;
+              << "bit offset = " << bit_offset << ", "
+              << "bits available = " << bits_available << std::endl;
 }
 
 static void
 test_read_bits(unsigned char const* buf,
-	       unsigned char const*& p, size_t& bit_offset,
-	       size_t& bits_available, size_t bits_wanted)
+               unsigned char const*& p, size_t& bit_offset,
+               size_t& bits_available, size_t bits_wanted)
 {
     unsigned long result =
-	QIntC::to_ulong(read_bits(p, bit_offset, bits_available, bits_wanted));
+        QIntC::to_ulong(read_bits(p, bit_offset, bits_available, bits_wanted));
 
     std::cout << "bits read: " << bits_wanted << ", result = " << result
-	      << std::endl;
+              << std::endl;
     print_values(p - buf, bit_offset, bits_available);
 }
 
 static void
 test_write_bits(unsigned char& ch, size_t& bit_offset, unsigned long val,
-		size_t bits, Pl_Buffer* bp)
+                size_t bits, Pl_Buffer* bp)
 {
     write_bits(ch, bit_offset, val, bits, bp);
     std::cout << "ch = " << QUtil::uint_to_string_base(ch, 16, 2)
@@ -69,7 +69,7 @@ test()
     // Read tests
 
     static unsigned char const buf[] = {
-	0xF5, 0x15, 0x65, 0x79, 0x12, 0x89, 0x75, 0x4B
+        0xF5, 0x15, 0x65, 0x79, 0x12, 0x89, 0x75, 0x4B
     };
 
     unsigned char const* p = buf;
@@ -91,12 +91,12 @@ test()
 
     try
     {
-	test_read_bits(buf, p, bit_offset, bits_available, 4);
+        test_read_bits(buf, p, bit_offset, bits_available, 4);
     }
     catch (std::exception& e)
     {
-	std::cout << "exception: " << e.what() << std::endl;
-	print_values(p - buf, bit_offset, bits_available);
+        std::cout << "exception: " << e.what() << std::endl;
+        print_values(p - buf, bit_offset, bits_available);
     }
 
     test_read_bits(buf, p, bit_offset, bits_available, 3);
@@ -183,12 +183,12 @@ int main()
 {
     try
     {
-	test();
+        test();
     }
     catch (std::exception& e)
     {
-	std::cout << "unexpected exception: " << e.what() << std::endl;
-	exit(2);
+        std::cout << "unexpected exception: " << e.what() << std::endl;
+        exit(2);
     }
     std::cout << "done" << std::endl;
     return 0;

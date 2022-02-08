@@ -42,7 +42,7 @@ BufferInputSource::~BufferInputSource()
 {
     if (this->m->own_memory)
     {
-	delete this->m->buf;
+        delete this->m->buf;
     }
 }
 
@@ -56,9 +56,9 @@ BufferInputSource::findAndSkipNextEOL()
     qpdf_offset_t end_pos = this->m->max_offset;
     if (this->m->cur_offset >= end_pos)
     {
-	this->last_offset = end_pos;
+        this->last_offset = end_pos;
         this->m->cur_offset = end_pos;
-	return end_pos;
+        return end_pos;
     }
 
     qpdf_offset_t result = 0;
@@ -108,23 +108,23 @@ BufferInputSource::seek(qpdf_offset_t offset, int whence)
     switch (whence)
     {
       case SEEK_SET:
-	this->m->cur_offset = offset;
-	break;
+        this->m->cur_offset = offset;
+        break;
 
       case SEEK_END:
         QIntC::range_check(this->m->max_offset, offset);
-	this->m->cur_offset = this->m->max_offset + offset;
-	break;
+        this->m->cur_offset = this->m->max_offset + offset;
+        break;
 
       case SEEK_CUR:
         QIntC::range_check(this->m->cur_offset, offset);
-	this->m->cur_offset += offset;
-	break;
+        this->m->cur_offset += offset;
+        break;
 
       default:
-	throw std::logic_error(
-	    "INTERNAL ERROR: invalid argument to BufferInputSource::seek");
-	break;
+        throw std::logic_error(
+            "INTERNAL ERROR: invalid argument to BufferInputSource::seek");
+        break;
     }
 
     if (this->m->cur_offset < 0)
@@ -150,8 +150,8 @@ BufferInputSource::read(char* buffer, size_t length)
     qpdf_offset_t end_pos = this->m->max_offset;
     if (this->m->cur_offset >= end_pos)
     {
-	this->last_offset = end_pos;
-	return 0;
+        this->last_offset = end_pos;
+        return 0;
     }
 
     this->last_offset = this->m->cur_offset;
@@ -167,6 +167,6 @@ BufferInputSource::unreadCh(char ch)
 {
     if (this->m->cur_offset > 0)
     {
-	--this->m->cur_offset;
+        --this->m->cur_offset;
     }
 }

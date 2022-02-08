@@ -51,7 +51,7 @@ Pl_Buffer::write(unsigned char* buf, size_t len)
 
     if (getNext(true))
     {
-	getNext()->write(buf, len);
+        getNext()->write(buf, len);
     }
 }
 
@@ -61,7 +61,7 @@ Pl_Buffer::finish()
     this->m->ready = true;
     if (getNext(true))
     {
-	getNext()->finish();
+        getNext()->finish();
     }
 }
 
@@ -70,7 +70,7 @@ Pl_Buffer::getBuffer()
 {
     if (! this->m->ready)
     {
-	throw std::logic_error("Pl_Buffer::getBuffer() called when not ready");
+        throw std::logic_error("Pl_Buffer::getBuffer() called when not ready");
     }
 
     Buffer* b = new Buffer(this->m->total_size);
@@ -94,7 +94,7 @@ Pl_Buffer::getMallocBuffer(unsigned char **buf, size_t* len)
 {
     if (! this->m->ready)
     {
-	throw std::logic_error(
+        throw std::logic_error(
             "Pl_Buffer::getMallocBuffer() called when not ready");
     }
 

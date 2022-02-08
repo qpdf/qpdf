@@ -42,12 +42,12 @@ int main(int argc, char* argv[])
 #ifndef QPDF_NO_WCHAR_T
     try
     {
-	wmain_test();
-	cwmain_test();
+        wmain_test();
+        cwmain_test();
     }
     catch (std::exception& e)
     {
-	std::cout << "unexpected exception: " << e.what() << std::endl;
+        std::cout << "unexpected exception: " << e.what() << std::endl;
     }
 #endif // QPDF_NO_WCHAR_T
 

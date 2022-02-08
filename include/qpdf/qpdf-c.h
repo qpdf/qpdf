@@ -274,7 +274,7 @@ extern "C" {
      */
     QPDF_DLL
     QPDF_ERROR_CODE qpdf_read(qpdf_data qpdf, char const* filename,
-			      char const* password);
+                              char const* password);
 
     /* Calling qpdf_read_memory causes processMemoryFile to be called
      * in the C++ API.  Otherwise, it behaves in the same way as
@@ -284,10 +284,10 @@ extern "C" {
      */
     QPDF_DLL
     QPDF_ERROR_CODE qpdf_read_memory(qpdf_data qpdf,
-				     char const* description,
-				     char const* buffer,
-				     unsigned long long size,
-				     char const* password);
+                                     char const* description,
+                                     char const* buffer,
+                                     unsigned long long size,
+                                     char const* password);
 
     /* Calling qpdf_empty_pdf initializes this qpdf object with an
      * empty PDF, making it possible to create a PDF from scratch
@@ -410,11 +410,11 @@ extern "C" {
 
     QPDF_DLL
     void qpdf_set_object_stream_mode(qpdf_data qpdf,
-				     enum qpdf_object_stream_e mode);
+                                     enum qpdf_object_stream_e mode);
 
     QPDF_DLL
     void qpdf_set_stream_data_mode(qpdf_data qpdf,
-				   enum qpdf_stream_data_e mode);
+                                   enum qpdf_stream_data_e mode);
 
     QPDF_DLL
     void qpdf_set_compress_streams(qpdf_data qpdf, QPDF_BOOL value);
@@ -454,77 +454,77 @@ extern "C" {
 
     QPDF_DLL
     void qpdf_set_suppress_original_object_IDs(
-	qpdf_data qpdf, QPDF_BOOL value);
+        qpdf_data qpdf, QPDF_BOOL value);
 
     QPDF_DLL
     void qpdf_set_preserve_encryption(qpdf_data qpdf, QPDF_BOOL value);
 
     QPDF_DLL
     void qpdf_set_r2_encryption_parameters(
-	qpdf_data qpdf, char const* user_password, char const* owner_password,
-	QPDF_BOOL allow_print, QPDF_BOOL allow_modify,
-	QPDF_BOOL allow_extract, QPDF_BOOL allow_annotate);
+        qpdf_data qpdf, char const* user_password, char const* owner_password,
+        QPDF_BOOL allow_print, QPDF_BOOL allow_modify,
+        QPDF_BOOL allow_extract, QPDF_BOOL allow_annotate);
 
     QPDF_DLL
     void qpdf_set_r3_encryption_parameters2(
-	qpdf_data qpdf, char const* user_password, char const* owner_password,
-	QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
+        qpdf_data qpdf, char const* user_password, char const* owner_password,
+        QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
         QPDF_BOOL allow_assemble, QPDF_BOOL allow_annotate_and_form,
         QPDF_BOOL allow_form_filling, QPDF_BOOL allow_modify_other,
-	enum qpdf_r3_print_e print);
+        enum qpdf_r3_print_e print);
 
     QPDF_DLL
     void qpdf_set_r4_encryption_parameters2(
-	qpdf_data qpdf, char const* user_password, char const* owner_password,
-	QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
+        qpdf_data qpdf, char const* user_password, char const* owner_password,
+        QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
         QPDF_BOOL allow_assemble, QPDF_BOOL allow_annotate_and_form,
         QPDF_BOOL allow_form_filling, QPDF_BOOL allow_modify_other,
-	enum qpdf_r3_print_e print,
+        enum qpdf_r3_print_e print,
         QPDF_BOOL encrypt_metadata, QPDF_BOOL use_aes);
 
     QPDF_DLL
     void qpdf_set_r5_encryption_parameters2(
-	qpdf_data qpdf, char const* user_password, char const* owner_password,
-	QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
+        qpdf_data qpdf, char const* user_password, char const* owner_password,
+        QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
         QPDF_BOOL allow_assemble, QPDF_BOOL allow_annotate_and_form,
         QPDF_BOOL allow_form_filling, QPDF_BOOL allow_modify_other,
-	enum qpdf_r3_print_e print, QPDF_BOOL encrypt_metadata);
+        enum qpdf_r3_print_e print, QPDF_BOOL encrypt_metadata);
 
     QPDF_DLL
     void qpdf_set_r6_encryption_parameters2(
-	qpdf_data qpdf, char const* user_password, char const* owner_password,
-	QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
+        qpdf_data qpdf, char const* user_password, char const* owner_password,
+        QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
         QPDF_BOOL allow_assemble, QPDF_BOOL allow_annotate_and_form,
         QPDF_BOOL allow_form_filling, QPDF_BOOL allow_modify_other,
-	enum qpdf_r3_print_e print, QPDF_BOOL encrypt_metadata);
+        enum qpdf_r3_print_e print, QPDF_BOOL encrypt_metadata);
 
     /* Pre 8.4.0 encryption API */
     QPDF_DLL
     void qpdf_set_r3_encryption_parameters(
-	qpdf_data qpdf, char const* user_password, char const* owner_password,
-	QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
-	enum qpdf_r3_print_e print, enum qpdf_r3_modify_e modify);
+        qpdf_data qpdf, char const* user_password, char const* owner_password,
+        QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
+        enum qpdf_r3_print_e print, enum qpdf_r3_modify_e modify);
 
     QPDF_DLL
     void qpdf_set_r4_encryption_parameters(
-	qpdf_data qpdf, char const* user_password, char const* owner_password,
-	QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
-	enum qpdf_r3_print_e print, enum qpdf_r3_modify_e modify,
-	QPDF_BOOL encrypt_metadata, QPDF_BOOL use_aes);
+        qpdf_data qpdf, char const* user_password, char const* owner_password,
+        QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
+        enum qpdf_r3_print_e print, enum qpdf_r3_modify_e modify,
+        QPDF_BOOL encrypt_metadata, QPDF_BOOL use_aes);
 
     QPDF_DLL
     void qpdf_set_r5_encryption_parameters(
-	qpdf_data qpdf, char const* user_password, char const* owner_password,
-	QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
-	enum qpdf_r3_print_e print, enum qpdf_r3_modify_e modify,
-	QPDF_BOOL encrypt_metadata);
+        qpdf_data qpdf, char const* user_password, char const* owner_password,
+        QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
+        enum qpdf_r3_print_e print, enum qpdf_r3_modify_e modify,
+        QPDF_BOOL encrypt_metadata);
 
     QPDF_DLL
     void qpdf_set_r6_encryption_parameters(
-	qpdf_data qpdf, char const* user_password, char const* owner_password,
-	QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
-	enum qpdf_r3_print_e print, enum qpdf_r3_modify_e modify,
-	QPDF_BOOL encrypt_metadata);
+        qpdf_data qpdf, char const* user_password, char const* owner_password,
+        QPDF_BOOL allow_accessibility, QPDF_BOOL allow_extract,
+        enum qpdf_r3_print_e print, enum qpdf_r3_modify_e modify,
+        QPDF_BOOL encrypt_metadata);
 
     QPDF_DLL
     void qpdf_set_linearization(qpdf_data qpdf, QPDF_BOOL value);

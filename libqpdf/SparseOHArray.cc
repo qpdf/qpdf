@@ -28,8 +28,8 @@ SparseOHArray::at(size_t idx) const
 {
     if (idx >= this->n_elements)
     {
-	throw std::logic_error(
-	    "INTERNAL ERROR: bounds error accessing SparseOHArray element");
+        throw std::logic_error(
+            "INTERNAL ERROR: bounds error accessing SparseOHArray element");
     }
     auto const& iter = this->elements.find(idx);
     if (iter == this->elements.end())
@@ -47,8 +47,8 @@ SparseOHArray::remove_last()
 {
     if (this->n_elements == 0)
     {
-	throw std::logic_error(
-	    "INTERNAL ERROR: attempt to remove"
+        throw std::logic_error(
+            "INTERNAL ERROR: attempt to remove"
             " last item from empty SparseOHArray");
     }
     --this->n_elements;
@@ -60,7 +60,7 @@ SparseOHArray::releaseResolved()
 {
     for (auto& iter: this->elements)
     {
-	QPDFObjectHandle::ReleaseResolver::releaseResolved(iter.second);
+        QPDFObjectHandle::ReleaseResolver::releaseResolved(iter.second);
     }
 }
 
@@ -69,7 +69,7 @@ SparseOHArray::setAt(size_t idx, QPDFObjectHandle oh)
 {
     if (idx >= this->n_elements)
     {
-	throw std::logic_error("bounds error setting item in SparseOHArray");
+        throw std::logic_error("bounds error setting item in SparseOHArray");
     }
     if (oh.isDirectNull())
     {
@@ -86,7 +86,7 @@ SparseOHArray::erase(size_t idx)
 {
     if (idx >= this->n_elements)
     {
-	throw std::logic_error("bounds error erasing item from SparseOHArray");
+        throw std::logic_error("bounds error erasing item from SparseOHArray");
     }
     decltype(this->elements) dest;
     for (auto const& iter: this->elements)

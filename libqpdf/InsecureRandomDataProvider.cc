@@ -27,9 +27,9 @@ InsecureRandomDataProvider::random()
 {
     if (! this->seeded_random)
     {
-	// Seed the random number generator with something simple, but
-	// just to be interesting, don't use the unmodified current
-	// time.  It would be better if this were a more secure seed.
+        // Seed the random number generator with something simple, but
+        // just to be interesting, don't use the unmodified current
+        // time.  It would be better if this were a more secure seed.
         unsigned int seed = static_cast<unsigned int>(
             QUtil::get_current_time() ^ 0xcccc);
 #ifdef HAVE_RANDOM
@@ -37,7 +37,7 @@ InsecureRandomDataProvider::random()
 #else
         srand(seed);
 #endif
-	this->seeded_random = true;
+        this->seeded_random = true;
     }
 
 #  ifdef HAVE_RANDOM

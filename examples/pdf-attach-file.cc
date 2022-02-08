@@ -150,7 +150,7 @@ int main(int argc, char* argv[])
     // For libtool's sake....
     if (strncmp(whoami, "lt-", 3) == 0)
     {
-	whoami += 3;
+        whoami += 3;
     }
 
     char const* infilename = 0;
@@ -216,9 +216,9 @@ int main(int argc, char* argv[])
     }
     catch (std::exception &e)
     {
-	std::cerr << whoami << " exception: "
-		  << e.what() << std::endl;
-	exit(2);
+        std::cerr << whoami << " exception: "
+                  << e.what() << std::endl;
+        exit(2);
     }
 
     return 0;

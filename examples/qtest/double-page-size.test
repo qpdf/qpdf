@@ -12,16 +12,16 @@ my $td = new TestDriver('double-page-size');
 cleanup();
 
 $td->runtest("double page size",
-	     {$td->COMMAND => ['pdf-double-page-size', ' --static-id',
+             {$td->COMMAND => ['pdf-double-page-size', ' --static-id',
                                'in.pdf', 'a.pdf']},
-	     {$td->STRING =>
-		  "pdf-double-page-size: new file written to a.pdf\n",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
+             {$td->STRING =>
+                  "pdf-double-page-size: new file written to a.pdf\n",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 $td->runtest("check output",
-	     {$td->FILE => "a.pdf"},
-	     {$td->FILE => "out.pdf"});
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "out.pdf"});
 
 cleanup();
 

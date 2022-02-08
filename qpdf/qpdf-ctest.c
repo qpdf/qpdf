@@ -19,17 +19,17 @@ static FILE* safe_fopen(char const* filename, char const* mode)
     {
         char buf[94];
         strerror_s(buf, sizeof(buf), errno);
-	fprintf(stderr, "%s: unable to open %s: %s\n",
-		whoami, filename, buf);
-	exit(2);
+        fprintf(stderr, "%s: unable to open %s: %s\n",
+                whoami, filename, buf);
+        exit(2);
     }
 #else
     f = fopen(filename, mode);
     if (f == NULL)
     {
-	fprintf(stderr, "%s: unable to open %s: %s\n",
-		whoami, filename, strerror(errno));
-	exit(2);
+        fprintf(stderr, "%s: unable to open %s: %s\n",
+                whoami, filename, strerror(errno));
+        exit(2);
     }
 #endif
     return f;
@@ -50,26 +50,26 @@ static void report_errors()
     qpdf_error e = 0;
     while (qpdf_more_warnings(qpdf))
     {
-	e = qpdf_next_warning(qpdf);
+        e = qpdf_next_warning(qpdf);
         print_error("warning", qpdf, e);
     }
     if (qpdf_has_error(qpdf))
     {
-	e = qpdf_get_error(qpdf);
-	assert(qpdf_has_error(qpdf) == QPDF_FALSE);
+        e = qpdf_get_error(qpdf);
+        assert(qpdf_has_error(qpdf) == QPDF_FALSE);
         print_error("error", qpdf, e);
     }
     else
     {
-	e = qpdf_get_error(qpdf);
-	assert(e == 0);
-	assert(qpdf_get_error_code(qpdf, e) == qpdf_e_success);
-	// Call these to ensure that they can be called on a null
-	// error pointer.
-	(void)qpdf_get_error_full_text(qpdf, e);
-	(void)qpdf_get_error_filename(qpdf, e);
-	(void)qpdf_get_error_file_position(qpdf, e);
-	(void)qpdf_get_error_message_detail(qpdf, e);
+        e = qpdf_get_error(qpdf);
+        assert(e == 0);
+        assert(qpdf_get_error_code(qpdf, e) == qpdf_e_success);
+        // Call these to ensure that they can be called on a null
+        // error pointer.
+        (void)qpdf_get_error_full_text(qpdf, e);
+        (void)qpdf_get_error_filename(qpdf, e);
+        (void)qpdf_get_error_file_position(qpdf, e);
+        (void)qpdf_get_error_message_detail(qpdf, e);
     }
 }
 
@@ -82,7 +82,7 @@ static void handle_oh_error(qpdf_data q, char const* label)
 }
 
 static void read_file_into_memory(char const* filename,
-				  char** buf, unsigned long* size)
+                                  char** buf, unsigned long* size)
 {
     char* buf_p = 0;
     FILE* f = NULL;
@@ -96,32 +96,32 @@ static void read_file_into_memory(char const* filename,
     *buf = malloc(*size);
     if (*buf == NULL)
     {
-	fprintf(stderr, "%s: unable to allocate %lu bytes\n",
-		whoami, *size);
-	exit(2);
+        fprintf(stderr, "%s: unable to allocate %lu bytes\n",
+                whoami, *size);
+        exit(2);
     }
     buf_p = *buf;
     bytes_read = 0;
     len = 0;
     while ((len = fread(buf_p + bytes_read, 1, *size - bytes_read, f)) > 0)
     {
-	bytes_read += len;
+        bytes_read += len;
     }
     if (bytes_read != *size)
     {
-	if (ferror(f))
-	{
-	    fprintf(stderr, "%s: failure reading file %s into memory:",
-		    whoami, filename);
-	}
-	else
-	{
-	    fprintf(stderr, "%s: premature EOF reading file %s:",
-		    whoami, filename);
-	}
-	fprintf(stderr, " read %lu, wanted %lu\n",
-		(unsigned long) bytes_read, (unsigned long) *size);
-	exit(2);
+        if (ferror(f))
+        {
+            fprintf(stderr, "%s: failure reading file %s into memory:",
+                    whoami, filename);
+        }
+        else
+        {
+            fprintf(stderr, "%s: premature EOF reading file %s:",
+                    whoami, filename);
+        }
+        fprintf(stderr, " read %lu, wanted %lu\n",
+                (unsigned long) bytes_read, (unsigned long) *size);
+        exit(2);
     }
     fclose(f);
 }
@@ -132,9 +132,9 @@ static void count_progress(int percent, void* data)
 }
 
 static void test01(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     qpdf_read(qpdf, infile, password);
     printf("version: %s\n", qpdf_get_pdf_version(qpdf));
@@ -146,48 +146,48 @@ static void test01(char const* infile,
     printf("encrypted: %d\n", qpdf_is_encrypted(qpdf));
     if (qpdf_is_encrypted(qpdf))
     {
-	printf("user password: %s\n", qpdf_get_user_password(qpdf));
-	printf("extract for accessibility: %d\n",
-	       qpdf_allow_accessibility(qpdf));
-	printf("extract for any purpose: %d\n",
-	       qpdf_allow_extract_all(qpdf));
-	printf("print low resolution: %d\n",
-	       qpdf_allow_print_low_res(qpdf));
-	printf("print high resolution: %d\n",
-	       qpdf_allow_print_high_res(qpdf));
-	printf("modify document assembly: %d\n",
-	       qpdf_allow_modify_assembly(qpdf));
-	printf("modify forms: %d\n",
-	       qpdf_allow_modify_form(qpdf));
-	printf("modify annotations: %d\n",
-	       qpdf_allow_modify_annotation(qpdf));
-	printf("modify other: %d\n",
-	       qpdf_allow_modify_other(qpdf));
-	printf("modify anything: %d\n",
-	       qpdf_allow_modify_all(qpdf));
+        printf("user password: %s\n", qpdf_get_user_password(qpdf));
+        printf("extract for accessibility: %d\n",
+               qpdf_allow_accessibility(qpdf));
+        printf("extract for any purpose: %d\n",
+               qpdf_allow_extract_all(qpdf));
+        printf("print low resolution: %d\n",
+               qpdf_allow_print_low_res(qpdf));
+        printf("print high resolution: %d\n",
+               qpdf_allow_print_high_res(qpdf));
+        printf("modify document assembly: %d\n",
+               qpdf_allow_modify_assembly(qpdf));
+        printf("modify forms: %d\n",
+               qpdf_allow_modify_form(qpdf));
+        printf("modify annotations: %d\n",
+               qpdf_allow_modify_annotation(qpdf));
+        printf("modify other: %d\n",
+               qpdf_allow_modify_other(qpdf));
+        printf("modify anything: %d\n",
+               qpdf_allow_modify_all(qpdf));
     }
     report_errors();
 }
 
 static void test02(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     qpdf_set_suppress_warnings(qpdf, QPDF_TRUE);
     if (((qpdf_read(qpdf, infile, password) & QPDF_ERRORS) == 0) &&
-	((qpdf_init_write(qpdf, outfile) & QPDF_ERRORS) == 0))
+        ((qpdf_init_write(qpdf, outfile) & QPDF_ERRORS) == 0))
     {
-	qpdf_set_static_ID(qpdf, QPDF_TRUE);
-	qpdf_write(qpdf);
+        qpdf_set_static_ID(qpdf, QPDF_TRUE);
+        qpdf_write(qpdf);
     }
     report_errors();
 }
 
 static void test03(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     qpdf_read(qpdf, infile, password);
     qpdf_init_write(qpdf, outfile);
@@ -198,9 +198,9 @@ static void test03(char const* infile,
 }
 
 static void test04(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     qpdf_set_ignore_xref_streams(qpdf, QPDF_TRUE);
     qpdf_read(qpdf, infile, password);
@@ -211,9 +211,9 @@ static void test04(char const* infile,
 }
 
 static void test05(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     int count = 0;
     qpdf_read(qpdf, infile, password);
@@ -228,9 +228,9 @@ static void test05(char const* infile,
 }
 
 static void test06(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     char* buf = NULL;
     unsigned long size = 0;
@@ -245,9 +245,9 @@ static void test06(char const* infile,
 }
 
 static void test07(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     qpdf_read(qpdf, infile, password);
     qpdf_init_write(qpdf, outfile);
@@ -258,9 +258,9 @@ static void test07(char const* infile,
 }
 
 static void test08(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     qpdf_read(qpdf, infile, password);
     qpdf_init_write(qpdf, outfile);
@@ -272,9 +272,9 @@ static void test08(char const* infile,
 }
 
 static void test09(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     qpdf_read(qpdf, infile, password);
     qpdf_init_write(qpdf, outfile);
@@ -285,9 +285,9 @@ static void test09(char const* infile,
 }
 
 static void test10(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     qpdf_set_attempt_recovery(qpdf, QPDF_FALSE);
     qpdf_read(qpdf, infile, password);
@@ -295,39 +295,39 @@ static void test10(char const* infile,
 }
 
 static void test11(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     qpdf_read(qpdf, infile, password);
     qpdf_init_write(qpdf, outfile);
     qpdf_set_static_ID(qpdf, QPDF_TRUE);
     qpdf_set_r2_encryption_parameters(
-	qpdf, "user1", "owner1", QPDF_FALSE, QPDF_TRUE, QPDF_TRUE, QPDF_TRUE);
+        qpdf, "user1", "owner1", QPDF_FALSE, QPDF_TRUE, QPDF_TRUE, QPDF_TRUE);
     qpdf_write(qpdf);
     report_errors();
 }
 
 static void test12(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     qpdf_read(qpdf, infile, password);
     qpdf_init_write(qpdf, outfile);
     qpdf_set_static_ID(qpdf, QPDF_TRUE);
     qpdf_set_r3_encryption_parameters2(
-	qpdf, "user2", "owner2", QPDF_TRUE, QPDF_TRUE,
+        qpdf, "user2", "owner2", QPDF_TRUE, QPDF_TRUE,
         QPDF_TRUE, QPDF_TRUE, QPDF_TRUE, QPDF_TRUE,
-	qpdf_r3p_low);
+        qpdf_r3p_low);
     qpdf_write(qpdf);
     report_errors();
 }
 
 static void test13(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     qpdf_read(qpdf, infile, password);
     printf("user password: %s\n", qpdf_get_user_password(qpdf));
@@ -339,9 +339,9 @@ static void test13(char const* infile,
 }
 
 static void test14(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     qpdf_read(qpdf, infile, password);
     qpdf_init_write(qpdf, outfile);
@@ -356,18 +356,18 @@ static void test14(char const* infile,
 }
 
 static void test15(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     qpdf_read(qpdf, infile, password);
     qpdf_init_write(qpdf, outfile);
     qpdf_set_static_ID(qpdf, QPDF_TRUE);
     qpdf_set_static_aes_IV(qpdf, QPDF_TRUE);
     qpdf_set_r4_encryption_parameters2(
-	qpdf, "user2", "owner2", QPDF_TRUE, QPDF_TRUE,
+        qpdf, "user2", "owner2", QPDF_TRUE, QPDF_TRUE,
         QPDF_TRUE, QPDF_TRUE, QPDF_TRUE, QPDF_TRUE,
-	qpdf_r3p_low, QPDF_TRUE, QPDF_TRUE);
+        qpdf_r3p_low, QPDF_TRUE, QPDF_TRUE);
     qpdf_write(qpdf);
     report_errors();
 }
@@ -376,13 +376,13 @@ static void print_info(char const* key)
 {
     char const* value = qpdf_get_info_key(qpdf, key);
     printf("Info key %s: %s\n",
-	   key, (value ? value : "(null)"));
+           key, (value ? value : "(null)"));
 }
 
 static void test16(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     unsigned long buflen = 0L;
     unsigned char const* buf = 0;
@@ -412,43 +412,43 @@ static void test16(char const* infile,
 }
 
 static void test17(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     qpdf_read(qpdf, infile, password);
     qpdf_init_write(qpdf, outfile);
     qpdf_set_static_ID(qpdf, QPDF_TRUE);
     qpdf_set_static_aes_IV(qpdf, QPDF_TRUE);
     qpdf_set_r5_encryption_parameters2(
-	qpdf, "user3", "owner3", QPDF_TRUE, QPDF_TRUE,
+        qpdf, "user3", "owner3", QPDF_TRUE, QPDF_TRUE,
         QPDF_TRUE, QPDF_TRUE, QPDF_TRUE, QPDF_TRUE,
-	qpdf_r3p_low, QPDF_TRUE);
+        qpdf_r3p_low, QPDF_TRUE);
     qpdf_write(qpdf);
     report_errors();
 }
 
 static void test18(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     qpdf_read(qpdf, infile, password);
     qpdf_init_write(qpdf, outfile);
     qpdf_set_static_ID(qpdf, QPDF_TRUE);
     qpdf_set_static_aes_IV(qpdf, QPDF_TRUE);
     qpdf_set_r6_encryption_parameters2(
-	qpdf, "user4", "owner4", QPDF_TRUE, QPDF_TRUE,
+        qpdf, "user4", "owner4", QPDF_TRUE, QPDF_TRUE,
         QPDF_TRUE, QPDF_TRUE, QPDF_TRUE, QPDF_TRUE,
-	qpdf_r3p_low, QPDF_TRUE);
+        qpdf_r3p_low, QPDF_TRUE);
     qpdf_write(qpdf);
     report_errors();
 }
 
 static void test19(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     qpdf_read(qpdf, infile, password);
     qpdf_init_write(qpdf, outfile);
@@ -458,9 +458,9 @@ static void test19(char const* infile,
 }
 
 static void test20(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     qpdf_read(qpdf, infile, password);
     qpdf_init_write(qpdf, outfile);
@@ -473,9 +473,9 @@ static void test20(char const* infile,
 }
 
 static void test21(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     qpdf_read(qpdf, infile, password);
     qpdf_init_write(qpdf, outfile);
@@ -487,9 +487,9 @@ static void test21(char const* infile,
 }
 
 static void test22(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     qpdf_read(qpdf, infile, password);
     qpdf_init_write(qpdf, outfile);
@@ -502,9 +502,9 @@ static void test22(char const* infile,
 }
 
 static void test23(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     QPDF_ERROR_CODE status = 0;
     qpdf_read(qpdf, infile, password);
@@ -514,9 +514,9 @@ static void test23(char const* infile,
 }
 
 static void test24(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     /* This test case is designed for minimal.pdf. Pull objects out of
      * minimal.pdf to make sure all our accessors work as expected.
@@ -674,9 +674,9 @@ static void test24(char const* infile,
 }
 
 static void test25(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     /* This test case is designed for minimal.pdf. */
     qpdf_read(qpdf, infile, password);
@@ -849,9 +849,9 @@ static void test25(char const* infile,
     report_errors();
 }
 static void test26(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     /* Make sure we detect uninitialized objects */
     qpdf_data qpdf2 = qpdf_init();
@@ -862,9 +862,9 @@ static void test26(char const* infile,
 }
 
 static void test27(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     /* Exercise a string with a null. Since the regular methods return
      * char*, we can't see past the null character without looking
@@ -907,9 +907,9 @@ static void test27(char const* infile,
 }
 
 static void test28(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     /* This test case is designed for minimal.pdf. */
 
@@ -948,9 +948,9 @@ static void test28(char const* infile,
 }
 
 static void test29(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     /* Trap exceptions thrown by object accessors. Type mismatches are
      * errors rather than warnings when they don't have an owning QPDF
@@ -999,18 +999,18 @@ static void test29(char const* infile,
 }
 
 static void test30(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     assert(qpdf_read(qpdf, infile, password) & QPDF_ERRORS);
     /* Fail to handle error */
 }
 
 static void test31(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     /* Make sure type warnings have a specific error code. This test
      * case is designed for minimal.pdf.
@@ -1026,9 +1026,9 @@ static void test31(char const* infile,
 }
 
 static void test32(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     /* This test case is designed for minimal.pdf. */
     assert(qpdf_read(qpdf, infile, password) == 0);
@@ -1039,9 +1039,9 @@ static void test32(char const* infile,
 }
 
 static void test33(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     /* This test case is designed for minimal.pdf. */
 
@@ -1076,9 +1076,9 @@ static void test33(char const* infile,
 }
 
 static void test34(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     /* This test expects 11-pages.pdf as file1 and minimal.pdf as xarg. */
 
@@ -1120,9 +1120,9 @@ static void test34(char const* infile,
 }
 
 static void test35(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     /* This test uses 11-pages.pdf */
 
@@ -1168,9 +1168,9 @@ static void test35(char const* infile,
 }
 
 static void test36(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     /* This test uses inherited-rotate.pdf */
 
@@ -1192,9 +1192,9 @@ static void test36(char const* infile,
 }
 
 static void test37(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     /* This test uses 11-pages.pdf */
 
@@ -1211,9 +1211,9 @@ static void test37(char const* infile,
 }
 
 static void test38(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     /* This test expects 11-pages.pdf. */
 
@@ -1270,9 +1270,9 @@ static void test38(char const* infile,
 }
 
 static void test39(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     /* This test expects 11-pages.pdf as file1 and minimal.pdf as xarg. */
 
@@ -1297,9 +1297,9 @@ static void test39(char const* infile,
 }
 
 static void test40(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     /* This test expects minimal.pdf. */
 
@@ -1323,9 +1323,9 @@ static void test40(char const* infile,
 }
 
 static void test41(char const* infile,
-		   char const* password,
-		   char const* outfile,
-		   char const* xarg)
+                   char const* password,
+                   char const* outfile,
+                   char const* xarg)
 {
     /* Empty PDF -- infile is ignored*/
     assert(qpdf_empty_pdf(qpdf) == 0);
@@ -1347,26 +1347,26 @@ int main(int argc, char* argv[])
 
     if ((p = strrchr(argv[0], '/')) != NULL)
     {
-	whoami = p + 1;
+        whoami = p + 1;
     }
     else if ((p = strrchr(argv[0], '\\')) != NULL)
     {
-	whoami = p + 1;
+        whoami = p + 1;
     }
     else
     {
-	whoami = argv[0];
+        whoami = argv[0];
     }
     if ((argc == 2) && (strcmp(argv[1], "--version") == 0))
     {
-	printf("qpdf-ctest version %s\n", qpdf_get_qpdf_version());
-	return 0;
+        printf("qpdf-ctest version %s\n", qpdf_get_qpdf_version());
+        return 0;
     }
 
     if (argc < 5)
     {
-	fprintf(stderr, "usage: %s n infile password outfile\n", whoami);
-	exit(2);
+        fprintf(stderr, "usage: %s n infile password outfile\n", whoami);
+        exit(2);
     }
 
     n = atoi(argv[1]);
@@ -1376,52 +1376,52 @@ int main(int argc, char* argv[])
     xarg = (argc > 5 ? argv[5] : 0);
 
     fn = ((n == 1) ? test01 :
-	  (n == 2) ? test02 :
-	  (n == 3) ? test03 :
-	  (n == 4) ? test04 :
-	  (n == 5) ? test05 :
-	  (n == 6) ? test06 :
-	  (n == 7) ? test07 :
-	  (n == 8) ? test08 :
-	  (n == 9) ? test09 :
-	  (n == 10) ? test10 :
-	  (n == 11) ? test11 :
-	  (n == 12) ? test12 :
-	  (n == 13) ? test13 :
-	  (n == 14) ? test14 :
-	  (n == 15) ? test15 :
-	  (n == 16) ? test16 :
-	  (n == 17) ? test17 :
-	  (n == 18) ? test18 :
-	  (n == 19) ? test19 :
-	  (n == 20) ? test20 :
-	  (n == 21) ? test21 :
-	  (n == 22) ? test22 :
-	  (n == 23) ? test23 :
-	  (n == 24) ? test24 :
-	  (n == 25) ? test25 :
-	  (n == 26) ? test26 :
-	  (n == 27) ? test27 :
-	  (n == 28) ? test28 :
-	  (n == 29) ? test29 :
-	  (n == 30) ? test30 :
-	  (n == 31) ? test31 :
-	  (n == 32) ? test32 :
-	  (n == 33) ? test33 :
-	  (n == 34) ? test34 :
-	  (n == 35) ? test35 :
-	  (n == 36) ? test36 :
-	  (n == 37) ? test37 :
-	  (n == 38) ? test38 :
-	  (n == 39) ? test39 :
-	  (n == 40) ? test40 :
-	  (n == 41) ? test41 :
-	  0);
+          (n == 2) ? test02 :
+          (n == 3) ? test03 :
+          (n == 4) ? test04 :
+          (n == 5) ? test05 :
+          (n == 6) ? test06 :
+          (n == 7) ? test07 :
+          (n == 8) ? test08 :
+          (n == 9) ? test09 :
+          (n == 10) ? test10 :
+          (n == 11) ? test11 :
+          (n == 12) ? test12 :
+          (n == 13) ? test13 :
+          (n == 14) ? test14 :
+          (n == 15) ? test15 :
+          (n == 16) ? test16 :
+          (n == 17) ? test17 :
+          (n == 18) ? test18 :
+          (n == 19) ? test19 :
+          (n == 20) ? test20 :
+          (n == 21) ? test21 :
+          (n == 22) ? test22 :
+          (n == 23) ? test23 :
+          (n == 24) ? test24 :
+          (n == 25) ? test25 :
+          (n == 26) ? test26 :
+          (n == 27) ? test27 :
+          (n == 28) ? test28 :
+          (n == 29) ? test29 :
+          (n == 30) ? test30 :
+          (n == 31) ? test31 :
+          (n == 32) ? test32 :
+          (n == 33) ? test33 :
+          (n == 34) ? test34 :
+          (n == 35) ? test35 :
+          (n == 36) ? test36 :
+          (n == 37) ? test37 :
+          (n == 38) ? test38 :
+          (n == 39) ? test39 :
+          (n == 40) ? test40 :
+          (n == 41) ? test41 :
+          0);
 
     if (fn == 0)
     {
-	fprintf(stderr, "%s: invalid test number %d\n", whoami, n);
-	exit(2);
+        fprintf(stderr, "%s: invalid test number %d\n", whoami, n);
+        exit(2);
     }
 
     qpdf = qpdf_init();

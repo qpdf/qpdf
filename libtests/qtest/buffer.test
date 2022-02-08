@@ -10,9 +10,9 @@ require TestDriver;
 my $td = new TestDriver('buffer');
 
 $td->runtest("buffer",
-	     {$td->COMMAND => "buffer"},
-	     {$td->FILE => "buffer.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
+             {$td->COMMAND => "buffer"},
+             {$td->FILE => "buffer.out",
+              $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 $td->report(1);

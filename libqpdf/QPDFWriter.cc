@@ -78,7 +78,7 @@ QPDFWriter::Members::~Members()
 {
     if (file && close_file)
     {
-	fclose(file);
+        fclose(file);
     }
     delete output_buffer;
 }
@@ -113,16 +113,16 @@ QPDFWriter::setOutputFilename(char const* filename)
     bool close_file = false;
     if (filename == 0)
     {
-	description = "standard output";
-	QTC::TC("qpdf", "QPDFWriter write to stdout");
-	f = stdout;
-	QUtil::binary_stdout();
+        description = "standard output";
+        QTC::TC("qpdf", "QPDFWriter write to stdout");
+        f = stdout;
+        QUtil::binary_stdout();
     }
     else
     {
-	QTC::TC("qpdf", "QPDFWriter write to file");
-	f = QUtil::safe_fopen(filename, "wb+");
-	close_file = true;
+        QTC::TC("qpdf", "QPDFWriter write to file");
+        f = QUtil::safe_fopen(filename, "wb+");
+        close_file = true;
     }
     setOutputFile(description, f, close_file);
 }
@@ -256,26 +256,26 @@ QPDFWriter::setMinimumPDFVersion(std::string const& version,
     bool set_extension_level = false;
     if (this->m->min_pdf_version.empty())
     {
-	set_version = true;
+        set_version = true;
         set_extension_level = true;
     }
     else
     {
-	int old_major = 0;
-	int old_minor = 0;
-	int min_major = 0;
-	int min_minor = 0;
-	parseVersion(version, old_major, old_minor);
-	parseVersion(this->m->min_pdf_version, min_major, min_minor);
+        int old_major = 0;
+        int old_minor = 0;
+        int min_major = 0;
+        int min_minor = 0;
+        parseVersion(version, old_major, old_minor);
+        parseVersion(this->m->min_pdf_version, min_major, min_minor);
         int compare = compareVersions(
             old_major, old_minor, min_major, min_minor);
-	if (compare > 0)
-	{
-	    QTC::TC("qpdf", "QPDFWriter increasing minimum version",
+        if (compare > 0)
+        {
+            QTC::TC("qpdf", "QPDFWriter increasing minimum version",
                     extension_level == 0 ? 0 : 1);
-	    set_version = true;
+            set_version = true;
             set_extension_level = true;
-	}
+        }
         else if (compare == 0)
         {
             if (extension_level > this->m->min_extension_level)
@@ -283,12 +283,12 @@ QPDFWriter::setMinimumPDFVersion(std::string const& version,
                 QTC::TC("qpdf", "QPDFWriter increasing extension level");
                 set_extension_level = true;
             }
-	}
+        }
     }
 
     if (set_version)
     {
-	this->m->min_pdf_version = version;
+        this->m->min_pdf_version = version;
     }
     if (set_extension_level)
     {
@@ -337,7 +337,7 @@ QPDFWriter::setStaticAesIV(bool val)
 {
     if (val)
     {
-	Pl_AES_PDF::useStaticIV();
+        Pl_AES_PDF::useStaticIV();
     }
 }
 
@@ -388,19 +388,19 @@ QPDFWriter::setR2EncryptionParameters(
     std::set<int> clear;
     if (! allow_print)
     {
-	clear.insert(3);
+        clear.insert(3);
     }
     if (! allow_modify)
     {
-	clear.insert(4);
+        clear.insert(4);
     }
     if (! allow_extract)
     {
-	clear.insert(5);
+        clear.insert(5);
     }
     if (! allow_annotate)
     {
-	clear.insert(6);
+        clear.insert(6);
     }
 
     setEncryptionParameters(user_password, owner_password, 1, 2, 5, clear);
@@ -414,8 +414,8 @@ QPDFWriter::setR3EncryptionParameters(
 {
     std::set<int> clear;
     interpretR3EncryptionParameters(
-	clear, user_password, owner_password,
-	allow_accessibility, allow_extract,
+        clear, user_password, owner_password,
+        allow_accessibility, allow_extract,
         true, true, true, true, print, modify);
     setEncryptionParameters(user_password, owner_password, 2, 3, 16, clear);
 }
@@ -430,8 +430,8 @@ QPDFWriter::setR3EncryptionParameters(
 {
     std::set<int> clear;
     interpretR3EncryptionParameters(
-	clear, user_password, owner_password,
-	allow_accessibility, allow_extract,
+        clear, user_password, owner_password,
+        allow_accessibility, allow_extract,
         allow_assemble, allow_annotate_and_form,
         allow_form_filling, allow_modify_other,
         print, qpdf_r3m_all);
@@ -447,8 +447,8 @@ QPDFWriter::setR4EncryptionParameters(
 {
     std::set<int> clear;
     interpretR3EncryptionParameters(
-	clear, user_password, owner_password,
-	allow_accessibility, allow_extract,
+        clear, user_password, owner_password,
+        allow_accessibility, allow_extract,
         true, true, true, true, print, modify);
     this->m->encrypt_use_aes = use_aes;
     this->m->encrypt_metadata = encrypt_metadata;
@@ -466,8 +466,8 @@ QPDFWriter::setR4EncryptionParameters(
 {
     std::set<int> clear;
     interpretR3EncryptionParameters(
-	clear, user_password, owner_password,
-	allow_accessibility, allow_extract,
+        clear, user_password, owner_password,
+        allow_accessibility, allow_extract,
         allow_assemble, allow_annotate_and_form,
         allow_form_filling, allow_modify_other,
         print, qpdf_r3m_all);
@@ -485,8 +485,8 @@ QPDFWriter::setR5EncryptionParameters(
 {
     std::set<int> clear;
     interpretR3EncryptionParameters(
-	clear, user_password, owner_password,
-	allow_accessibility, allow_extract,
+        clear, user_password, owner_password,
+        allow_accessibility, allow_extract,
         true, true, true, true, print, modify);
     this->m->encrypt_use_aes = true;
     this->m->encrypt_metadata = encrypt_metadata;
@@ -504,8 +504,8 @@ QPDFWriter::setR5EncryptionParameters(
 {
     std::set<int> clear;
     interpretR3EncryptionParameters(
-	clear, user_password, owner_password,
-	allow_accessibility, allow_extract,
+        clear, user_password, owner_password,
+        allow_accessibility, allow_extract,
         allow_assemble, allow_annotate_and_form,
         allow_form_filling, allow_modify_other,
         print, qpdf_r3m_all);
@@ -523,8 +523,8 @@ QPDFWriter::setR6EncryptionParameters(
 {
     std::set<int> clear;
     interpretR3EncryptionParameters(
-	clear, user_password, owner_password,
-	allow_accessibility, allow_extract,
+        clear, user_password, owner_password,
+        allow_accessibility, allow_extract,
         true, true, true, true, print, modify);
     this->m->encrypt_use_aes = true;
     this->m->encrypt_metadata = encrypt_metadata;
@@ -542,8 +542,8 @@ QPDFWriter::setR6EncryptionParameters(
 {
     std::set<int> clear;
     interpretR3EncryptionParameters(
-	clear, user_password, owner_password,
-	allow_accessibility, allow_extract,
+        clear, user_password, owner_password,
+        allow_accessibility, allow_extract,
         allow_assemble, allow_annotate_and_form,
         allow_form_filling, allow_modify_other,
         print, qpdf_r3m_all);
@@ -594,11 +594,11 @@ QPDFWriter::interpretR3EncryptionParameters(
     if (! allow_accessibility)
     {
         // setEncryptionParameters sets this if R > 3
-	clear.insert(10);
+        clear.insert(10);
     }
     if (! allow_extract)
     {
-	clear.insert(5);
+        clear.insert(5);
     }
 
     // Note: these switch statements all "fall through" (no break
@@ -606,15 +606,15 @@ QPDFWriter::interpretR3EncryptionParameters(
     switch (print)
     {
       case qpdf_r3p_none:
-	clear.insert(3);	// any printing
+        clear.insert(3);        // any printing
 
       case qpdf_r3p_low:
-	clear.insert(12);	// high resolution printing
+        clear.insert(12);       // high resolution printing
 
       case qpdf_r3p_full:
-	break;
+        break;
 
-	// no default so gcc warns for missing cases
+        // no default so gcc warns for missing cases
     }
 
     // Modify options. The qpdf_r3_modify_e options control groups of
@@ -627,21 +627,21 @@ QPDFWriter::interpretR3EncryptionParameters(
     switch (modify)
     {
       case qpdf_r3m_none:
-	clear.insert(11);	// document assembly
+        clear.insert(11);       // document assembly
 
       case qpdf_r3m_assembly:
-	clear.insert(9);	// filling in form fields
+        clear.insert(9);        // filling in form fields
 
       case qpdf_r3m_form:
-	clear.insert(6);	// modify annotations, fill in form fields
+        clear.insert(6);        // modify annotations, fill in form fields
 
       case qpdf_r3m_annotate:
-	clear.insert(4);	// other modifications
+        clear.insert(4);        // other modifications
 
       case qpdf_r3m_all:
-	break;
+        break;
 
-	// no default so gcc warns for missing cases
+        // no default so gcc warns for missing cases
     }
     // END NOT EXERCISED IN TEST SUITE
 
@@ -686,9 +686,9 @@ QPDFWriter::setEncryptionParameters(
     int P = 0;
     // Create the complement of P, then invert.
     for (std::set<int>::iterator iter = bits_to_clear.begin();
-	 iter != bits_to_clear.end(); ++iter)
+         iter != bits_to_clear.end(); ++iter)
     {
-	P |= (1 << ((*iter) - 1));
+        P |= (1 << ((*iter) - 1));
     }
     P = ~P;
 
@@ -713,7 +713,7 @@ QPDFWriter::setEncryptionParameters(
             encryption_key, O, U, OE, UE, Perms);
     }
     setEncryptionParametersInternal(
-	V, R, key_len, P, O, U, OE, UE, Perms,
+        V, R, key_len, P, O, U, OE, UE, Perms,
         this->m->id1, user_password, encryption_key);
 }
 
@@ -727,19 +727,19 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
         generateID();
         this->m->id1 =
             trailer.getKey("/ID").getArrayItem(0).getStringValue();
-	QPDFObjectHandle encrypt = trailer.getKey("/Encrypt");
-	int V = encrypt.getKey("/V").getIntValueAsInt();
-	int key_len = 5;
-	if (V > 1)
-	{
-	    key_len = encrypt.getKey("/Length").getIntValueAsInt() / 8;
-	}
-	if (encrypt.hasKey("/EncryptMetadata") &&
-	    encrypt.getKey("/EncryptMetadata").isBool())
-	{
-	    this->m->encrypt_metadata =
-		encrypt.getKey("/EncryptMetadata").getBoolValue();
-	}
+        QPDFObjectHandle encrypt = trailer.getKey("/Encrypt");
+        int V = encrypt.getKey("/V").getIntValueAsInt();
+        int key_len = 5;
+        if (V > 1)
+        {
+            key_len = encrypt.getKey("/Length").getIntValueAsInt() / 8;
+        }
+        if (encrypt.hasKey("/EncryptMetadata") &&
+            encrypt.getKey("/EncryptMetadata").isBool())
+        {
+            this->m->encrypt_metadata =
+                encrypt.getKey("/EncryptMetadata").getBoolValue();
+        }
         if (V >= 4)
         {
             // When copying encryption parameters, use AES even if the
@@ -750,8 +750,8 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
             // different values.
             this->m->encrypt_use_aes = true;
         }
-	QTC::TC("qpdf", "QPDFWriter copy encrypt metadata",
-		this->m->encrypt_metadata ? 0 : 1);
+        QTC::TC("qpdf", "QPDFWriter copy encrypt metadata",
+                this->m->encrypt_metadata ? 0 : 1);
         QTC::TC("qpdf", "QPDFWriter copy use_aes",
                 this->m->encrypt_use_aes ? 0 : 1);
         std::string OE;
@@ -761,24 +761,24 @@ QPDFWriter::copyEncryptionParameters(QPDF& qpdf)
         if (V >= 5)
         {
             QTC::TC("qpdf", "QPDFWriter copy V5");
-	    OE = encrypt.getKey("/OE").getStringValue();
+            OE = encrypt.getKey("/OE").getStringValue();
             UE = encrypt.getKey("/UE").getStringValue();
-	    Perms = encrypt.getKey("/Perms").getStringValue();
+            Perms = encrypt.getKey("/Perms").getStringValue();
             encryption_key = qpdf.getEncryptionKey();
         }
 
-	setEncryptionParametersInternal(
-	    V,
-	    encrypt.getKey("/R").getIntValueAsInt(),
-    	    key_len,
-	    static_cast<int>(encrypt.getKey("/P").getIntValue()),
-	    encrypt.getKey("/O").getStringValue(),
-	    encrypt.getKey("/U").getStringValue(),
+        setEncryptionParametersInternal(
+            V,
+            encrypt.getKey("/R").getIntValueAsInt(),
+            key_len,
+            static_cast<int>(encrypt.getKey("/P").getIntValue()),
+            encrypt.getKey("/O").getStringValue(),
+            encrypt.getKey("/U").getStringValue(),
             OE,
             UE,
             Perms,
-	    this->m->id1,		// this->m->id1 == the other file's id1
-	    qpdf.getPaddedUserPassword(),
+            this->m->id1,               // this->m->id1 == the other file's id1
+            qpdf.getPaddedUserPassword(),
             encryption_key);
     }
 }
@@ -789,41 +789,41 @@ QPDFWriter::disableIncompatibleEncryption(int major, int minor,
 {
     if (! this->m->encrypted)
     {
-	return;
+        return;
     }
 
     bool disable = false;
     if (compareVersions(major, minor, 1, 3) < 0)
     {
-	disable = true;
+        disable = true;
     }
     else
     {
-	int V = QUtil::string_to_int(
+        int V = QUtil::string_to_int(
             this->m->encryption_dictionary["/V"].c_str());
-	int R = QUtil::string_to_int(
+        int R = QUtil::string_to_int(
             this->m->encryption_dictionary["/R"].c_str());
-	if (compareVersions(major, minor, 1, 4) < 0)
-	{
-	    if ((V > 1) || (R > 2))
-	    {
-		disable = true;
-	    }
-	}
-	else if (compareVersions(major, minor, 1, 5) < 0)
-	{
-	    if ((V > 2) || (R > 3))
-	    {
-		disable = true;
-	    }
-	}
-	else if (compareVersions(major, minor, 1, 6) < 0)
-	{
-	    if (this->m->encrypt_use_aes)
-	    {
-		disable = true;
-	    }
-	}
+        if (compareVersions(major, minor, 1, 4) < 0)
+        {
+            if ((V > 1) || (R > 2))
+            {
+                disable = true;
+            }
+        }
+        else if (compareVersions(major, minor, 1, 5) < 0)
+        {
+            if ((V > 2) || (R > 3))
+            {
+                disable = true;
+            }
+        }
+        else if (compareVersions(major, minor, 1, 6) < 0)
+        {
+            if (this->m->encrypt_use_aes)
+            {
+                disable = true;
+            }
+        }
         else if ((compareVersions(major, minor, 1, 7) < 0) ||
                  ((compareVersions(major, minor, 1, 7) == 0) &&
                   extension_level < 3))
@@ -836,24 +836,24 @@ QPDFWriter::disableIncompatibleEncryption(int major, int minor,
     }
     if (disable)
     {
-	QTC::TC("qpdf", "QPDFWriter forced version disabled encryption");
-	this->m->encrypted = false;
+        QTC::TC("qpdf", "QPDFWriter forced version disabled encryption");
+        this->m->encrypted = false;
     }
 }
 
 void
 QPDFWriter::parseVersion(std::string const& version,
-			 int& major, int& minor) const
+                         int& major, int& minor) const
 {
     major = QUtil::string_to_int(version.c_str());
     minor = 0;
     size_t p = version.find('.');
     if ((p != std::string::npos) && (version.length() > p))
     {
-	minor = QUtil::string_to_int(version.substr(p + 1).c_str());
+        minor = QUtil::string_to_int(version.substr(p + 1).c_str());
     }
     std::string tmp = QUtil::int_to_string(major) + "." +
-	QUtil::int_to_string(minor);
+        QUtil::int_to_string(minor);
     if (tmp != version)
     {
         // The version number in the input is probably invalid. This
@@ -866,27 +866,27 @@ QPDFWriter::parseVersion(std::string const& version,
 
 int
 QPDFWriter::compareVersions(int major1, int minor1,
-			    int major2, int minor2) const
+                            int major2, int minor2) const
 {
     if (major1 < major2)
     {
-	return -1;
+        return -1;
     }
     else if (major1 > major2)
     {
-	return 1;
+        return 1;
     }
     else if (minor1 < minor2)
     {
-	return -1;
+        return -1;
     }
     else if (minor1 > minor2)
     {
-	return 1;
+        return 1;
     }
     else
     {
-	return 0;
+        return 0;
     }
 }
 
@@ -938,29 +938,29 @@ QPDFWriter::setEncryptionParametersInternal(
 
     if ((R >= 4) && (! this->m->encrypt_metadata))
     {
-	this->m->encryption_dictionary["/EncryptMetadata"] = "false";
+        this->m->encryption_dictionary["/EncryptMetadata"] = "false";
     }
     if ((V == 4) || (V == 5))
     {
-	// The spec says the value for the crypt filter key can be
-	// anything, and xpdf seems to agree.  However, Adobe Reader
-	// won't open our files unless we use /StdCF.
-	this->m->encryption_dictionary["/StmF"] = "/StdCF";
-	this->m->encryption_dictionary["/StrF"] = "/StdCF";
-	std::string method = (this->m->encrypt_use_aes
+        // The spec says the value for the crypt filter key can be
+        // anything, and xpdf seems to agree.  However, Adobe Reader
+        // won't open our files unless we use /StdCF.
+        this->m->encryption_dictionary["/StmF"] = "/StdCF";
+        this->m->encryption_dictionary["/StrF"] = "/StdCF";
+        std::string method = (this->m->encrypt_use_aes
                               ? ((V < 5) ? "/AESV2" : "/AESV3")
                               : "/V2");
         // The PDF spec says the /Length key is optional, but the PDF
         // previewer on some versions of MacOS won't open encrypted
         // files without it.
-	this->m->encryption_dictionary["/CF"] =
-	    "<< /StdCF << /AuthEvent /DocOpen /CFM " + method +
+        this->m->encryption_dictionary["/CF"] =
+            "<< /StdCF << /AuthEvent /DocOpen /CFM " + method +
             " /Length " + std::string((V < 5) ? "16" : "32") + " >> >>";
     }
 
     this->m->encrypted = true;
     QPDF::EncryptionData encryption_data(
-	V, R, key_len, P, O, U, OE, UE, Perms, id1, this->m->encrypt_metadata);
+        V, R, key_len, P, O, U, OE, UE, Perms, id1, this->m->encrypt_metadata);
     if (V < 5)
     {
         this->m->encryption_key = QPDF::compute_encryption_key(
@@ -976,7 +976,7 @@ void
 QPDFWriter::setDataKey(int objid)
 {
     this->m->cur_data_key = QPDF::compute_data_key(
-	this->m->encryption_key, objid, 0,
+        this->m->encryption_key, objid, 0,
         this->m->encrypt_use_aes, this->m->encryption_V, this->m->encryption_R);
 }
 
@@ -986,8 +986,8 @@ QPDFWriter::bytesNeeded(long long n)
     unsigned int bytes = 0;
     while (n)
     {
-	++bytes;
-	n >>= 8;
+        ++bytes;
+        n >>= 8;
     }
     return bytes;
 }
@@ -1003,8 +1003,8 @@ QPDFWriter::writeBinary(unsigned long long val, unsigned int bytes)
     unsigned char data[sizeof(unsigned long long)];
     for (unsigned int i = 0; i < bytes; ++i)
     {
-	data[bytes - i - 1] = static_cast<unsigned char>(val & 0xff);
-	val >>= 8;
+        data[bytes - i - 1] = static_cast<unsigned char>(val & 0xff);
+        val >>= 8;
     }
     this->m->pipeline->write(data, bytes);
 }
@@ -1026,7 +1026,7 @@ QPDFWriter::writeStringQDF(std::string const& str)
 {
     if (this->m->qdf_mode)
     {
-	writeString(str);
+        writeString(str);
     }
 }
 
@@ -1035,7 +1035,7 @@ QPDFWriter::writeStringNoQDF(std::string const& str)
 {
     if (! this->m->qdf_mode)
     {
-	writeString(str);
+        writeString(str);
     }
 }
 
@@ -1044,7 +1044,7 @@ QPDFWriter::writePad(int nspaces)
 {
     for (int i = 0; i < nspaces; ++i)
     {
-	writeString(" ");
+        writeString(" ");
     }
 }
 
@@ -1087,7 +1087,7 @@ QPDFWriter::PipelinePopper::~PipelinePopper()
     assert(qw->m->pipeline_stack.size() >= 2);
     qw->m->pipeline->finish();
     assert(dynamic_cast<Pl_Count*>(qw->m->pipeline_stack.back()) ==
-	   qw->m->pipeline);
+           qw->m->pipeline);
     // It might be possible for this assertion to fail if
     // writeLinearized exits by exception when deterministic ID, but I
     // don't think so. As of this writing, this is the only case in
@@ -1099,18 +1099,18 @@ QPDFWriter::PipelinePopper::~PipelinePopper()
     qw->m->pipeline_stack.pop_back();
     while (dynamic_cast<Pl_Count*>(qw->m->pipeline_stack.back()) == 0)
     {
-	Pipeline* p = qw->m->pipeline_stack.back();
+        Pipeline* p = qw->m->pipeline_stack.back();
         if (dynamic_cast<Pl_MD5*>(p) == qw->m->md5_pipeline)
         {
             qw->m->md5_pipeline = 0;
         }
-	qw->m->pipeline_stack.pop_back();
-	Pl_Buffer* buf = dynamic_cast<Pl_Buffer*>(p);
-	if (bp && buf)
-	{
-	    *bp = buf->getBufferSharedPointer();
-	}
-	delete p;
+        qw->m->pipeline_stack.pop_back();
+        Pl_Buffer* buf = dynamic_cast<Pl_Buffer*>(p);
+        if (bp && buf)
+        {
+            *bp = buf->getBufferSharedPointer();
+        }
+        delete p;
     }
     qw->m->pipeline = dynamic_cast<Pl_Count*>(qw->m->pipeline_stack.back());
 }
@@ -1119,12 +1119,12 @@ void
 QPDFWriter::adjustAESStreamLength(size_t& length)
 {
     if (this->m->encrypted && (! this->m->cur_data_key.empty()) &&
-	this->m->encrypt_use_aes)
+        this->m->encrypt_use_aes)
     {
-	// Stream length will be padded with 1 to 16 bytes to end up
-	// as a multiple of 16.  It will also be prepended by 16 bits
-	// of random data.
-	length += 32 - (length & 0xf);
+        // Stream length will be padded with 1 to 16 bytes to end up
+        // as a multiple of 16.  It will also be prepended by 16 bits
+        // of random data.
+        length += 32 - (length & 0xf);
     }
 }
 
@@ -1133,21 +1133,21 @@ QPDFWriter::pushEncryptionFilter(PipelinePopper& pp)
 {
     if (this->m->encrypted && (! this->m->cur_data_key.empty()))
     {
-	Pipeline* p = 0;
-	if (this->m->encrypt_use_aes)
-	{
-	    p = new Pl_AES_PDF(
-		"aes stream encryption", this->m->pipeline, true,
-		QUtil::unsigned_char_pointer(this->m->cur_data_key),
+        Pipeline* p = 0;
+        if (this->m->encrypt_use_aes)
+        {
+            p = new Pl_AES_PDF(
+                "aes stream encryption", this->m->pipeline, true,
+                QUtil::unsigned_char_pointer(this->m->cur_data_key),
                 this->m->cur_data_key.length());
-	}
-	else
-	{
-	    p = new Pl_RC4("rc4 stream encryption", this->m->pipeline,
-			   QUtil::unsigned_char_pointer(this->m->cur_data_key),
-			   QIntC::to_int(this->m->cur_data_key.length()));
-	}
-	pushPipeline(p);
+        }
+        else
+        {
+            p = new Pl_RC4("rc4 stream encryption", this->m->pipeline,
+                           QUtil::unsigned_char_pointer(this->m->cur_data_key),
+                           QIntC::to_int(this->m->cur_data_key.length()));
+        }
+        pushPipeline(p);
     }
     // Must call this unconditionally so we can call popPipelineStack
     // to balance pushEncryptionFilter().
@@ -1196,7 +1196,7 @@ QPDFWriter::openObject(int objid)
 {
     if (objid == 0)
     {
-	objid = this->m->next_objid++;
+        objid = this->m->next_objid++;
     }
     this->m->xref[objid] = QPDFXRefEntry(1, this->m->pipeline->getCount(), 0);
     writeString(QUtil::int_to_string(objid));
@@ -1223,17 +1223,17 @@ QPDFWriter::assignCompressedObjectNumbers(QPDFObjGen const& og)
         (this->m->object_stream_to_objects.count(objid) == 0))
     {
         // This is not an object stream.
-	return;
+        return;
     }
 
     // Reserve numbers for the objects that belong to this object
     // stream.
     for (std::set<QPDFObjGen>::iterator iter =
-	     this->m->object_stream_to_objects[objid].begin();
-	 iter != this->m->object_stream_to_objects[objid].end();
-	 ++iter)
+             this->m->object_stream_to_objects[objid].begin();
+         iter != this->m->object_stream_to_objects[objid].end();
+         ++iter)
     {
-	this->m->obj_renumber[*iter] = this->m->next_objid++;
+        this->m->obj_renumber[*iter] = this->m->next_objid++;
     }
 }
 
@@ -1264,45 +1264,45 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
             return;
         }
 
-	QPDFObjGen og = object.getObjGen();
+        QPDFObjGen og = object.getObjGen();
 
-	if (this->m->obj_renumber.count(og) == 0)
-	{
-	    if (this->m->object_to_object_stream.count(og))
-	    {
-		// This is in an object stream.  Don't process it
-		// here.  Instead, enqueue the object stream.  Object
-		// streams always have generation 0.
-		int stream_id = this->m->object_to_object_stream[og];
+        if (this->m->obj_renumber.count(og) == 0)
+        {
+            if (this->m->object_to_object_stream.count(og))
+            {
+                // This is in an object stream.  Don't process it
+                // here.  Instead, enqueue the object stream.  Object
+                // streams always have generation 0.
+                int stream_id = this->m->object_to_object_stream[og];
                 // Detect loops by storing invalid object ID 0, which
                 // will get overwritten later.
                 this->m->obj_renumber[og] = 0;
-		enqueueObject(this->m->pdf.getObjectByID(stream_id, 0));
-	    }
-	    else
-	    {
-		this->m->object_queue.push_back(object);
-		this->m->obj_renumber[og] = this->m->next_objid++;
+                enqueueObject(this->m->pdf.getObjectByID(stream_id, 0));
+            }
+            else
+            {
+                this->m->object_queue.push_back(object);
+                this->m->obj_renumber[og] = this->m->next_objid++;
 
-		if ((og.getGen() == 0) &&
+                if ((og.getGen() == 0) &&
                     this->m->object_stream_to_objects.count(og.getObj()))
-		{
-		    // For linearized files, uncompressed objects go
-		    // at end, and we take care of assigning numbers
-		    // to them elsewhere.
-		    if (! this->m->linearized)
-		    {
-			assignCompressedObjectNumbers(og);
-		    }
-		}
-		else if ((! this->m->direct_stream_lengths) &&
+                {
+                    // For linearized files, uncompressed objects go
+                    // at end, and we take care of assigning numbers
+                    // to them elsewhere.
+                    if (! this->m->linearized)
+                    {
+                        assignCompressedObjectNumbers(og);
+                    }
+                }
+                else if ((! this->m->direct_stream_lengths) &&
                          object.isStream())
-		{
-		    // reserve next object ID for length
-		    ++this->m->next_objid;
-		}
-	    }
-	}
+                {
+                    // reserve next object ID for length
+                    ++this->m->next_objid;
+                }
+            }
+        }
         else if (this->m->obj_renumber[og] == 0)
         {
             // This can happen if a specially constructed file
@@ -1312,30 +1312,30 @@ QPDFWriter::enqueueObject(QPDFObjectHandle object)
     }
     else if (object.isArray())
     {
-	int n = object.getArrayNItems();
-	for (int i = 0; i < n; ++i)
-	{
-	    if (! this->m->linearized)
-	    {
-		enqueueObject(object.getArrayItem(i));
-	    }
-	}
+        int n = object.getArrayNItems();
+        for (int i = 0; i < n; ++i)
+        {
+            if (! this->m->linearized)
+            {
+                enqueueObject(object.getArrayItem(i));
+            }
+        }
     }
     else if (object.isDictionary())
     {
-	std::set<std::string> keys = object.getKeys();
-	for (std::set<std::string>::iterator iter = keys.begin();
-	     iter != keys.end(); ++iter)
-	{
-	    if (! this->m->linearized)
-	    {
-		enqueueObject(object.getKey(*iter));
-	    }
-	}
+        std::set<std::string> keys = object.getKeys();
+        for (std::set<std::string>::iterator iter = keys.begin();
+             iter != keys.end(); ++iter)
+        {
+            if (! this->m->linearized)
+            {
+                enqueueObject(object.getKey(*iter));
+            }
+        }
     }
     else
     {
-	// ignore
+        // ignore
     }
 }
 
@@ -1344,18 +1344,18 @@ QPDFWriter::unparseChild(QPDFObjectHandle child, int level, int flags)
 {
     if (! this->m->linearized)
     {
-	enqueueObject(child);
+        enqueueObject(child);
     }
     if (child.isIndirect())
     {
-	QPDFObjGen old_og = child.getObjGen();
-	int new_id = this->m->obj_renumber[old_og];
-	writeString(QUtil::int_to_string(new_id));
-	writeString(" 0 R");
+        QPDFObjGen old_og = child.getObjGen();
+        int new_id = this->m->obj_renumber[old_og];
+        writeString(QUtil::int_to_string(new_id));
+        writeString(" 0 R");
     }
     else
     {
-	unparseObject(child, level, flags);
+        unparseObject(child, level, flags);
     }
 }
 
@@ -1370,49 +1370,49 @@ QPDFWriter::writeTrailer(trailer_e which, int size, bool xref_stream,
     }
     else
     {
-	writeString("trailer <<");
+        writeString("trailer <<");
     }
     writeStringQDF("\n");
     if (which == t_lin_second)
     {
-	writeString(" /Size ");
-	writeString(QUtil::int_to_string(size));
+        writeString(" /Size ");
+        writeString(QUtil::int_to_string(size));
     }
     else
     {
-	std::set<std::string> keys = trailer.getKeys();
-	for (std::set<std::string>::iterator iter = keys.begin();
-	     iter != keys.end(); ++iter)
-	{
-	    std::string const& key = *iter;
-	    writeStringQDF("  ");
-	    writeStringNoQDF(" ");
-	    writeString(QPDF_Name::normalizeName(key));
-	    writeString(" ");
-	    if (key == "/Size")
-	    {
-		writeString(QUtil::int_to_string(size));
-		if (which == t_lin_first)
-		{
-		    writeString(" /Prev ");
-		    qpdf_offset_t pos = this->m->pipeline->getCount();
-		    writeString(QUtil::int_to_string(prev));
-		    int nspaces =
+        std::set<std::string> keys = trailer.getKeys();
+        for (std::set<std::string>::iterator iter = keys.begin();
+             iter != keys.end(); ++iter)
+        {
+            std::string const& key = *iter;
+            writeStringQDF("  ");
+            writeStringNoQDF(" ");
+            writeString(QPDF_Name::normalizeName(key));
+            writeString(" ");
+            if (key == "/Size")
+            {
+                writeString(QUtil::int_to_string(size));
+                if (which == t_lin_first)
+                {
+                    writeString(" /Prev ");
+                    qpdf_offset_t pos = this->m->pipeline->getCount();
+                    writeString(QUtil::int_to_string(prev));
+                    int nspaces =
                         QIntC::to_int(pos - this->m->pipeline->getCount() + 21);
-		    if (nspaces < 0)
+                    if (nspaces < 0)
                     {
                         throw std::logic_error(
                             "QPDFWriter: no padding required in trailer");
                     }
-		    writePad(nspaces);
-		}
-	    }
-	    else
-	    {
-		unparseChild(trailer.getKey(key), 1, 0);
-	    }
-	    writeStringQDF("\n");
-	}
+                    writePad(nspaces);
+                }
+            }
+            else
+            {
+                unparseChild(trailer.getKey(key), 1, 0);
+            }
+            writeStringQDF("\n");
+        }
     }
 
     // Write ID
@@ -1420,7 +1420,7 @@ QPDFWriter::writeTrailer(trailer_e which, int size, bool xref_stream,
     writeString(" /ID [");
     if (linearization_pass == 1)
     {
-	std::string original_id1 = getOriginalID1();
+        std::string original_id1 = getOriginalID1();
         if (original_id1.empty())
         {
             writeString("<00000000000000000000000000000000>");
@@ -1457,13 +1457,13 @@ QPDFWriter::writeTrailer(trailer_e which, int size, bool xref_stream,
 
     if (which != t_lin_second)
     {
-	// Write reference to encryption dictionary
-	if (this->m->encrypted)
-	{
-	    writeString(" /Encrypt ");
-	    writeString(QUtil::int_to_string(this->m->encryption_dict_objid));
-	    writeString(" 0 R");
-	}
+        // Write reference to encryption dictionary
+        if (this->m->encrypted)
+        {
+            writeString(" /Encrypt ");
+            writeString(QUtil::int_to_string(this->m->encryption_dict_objid));
+            writeString(" 0 R");
+        }
     }
 
     writeStringQDF("\n");
@@ -1569,7 +1569,7 @@ QPDFWriter::willFilterStream(QPDFObjectHandle stream,
 
 void
 QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
-			  int flags, size_t stream_length,
+                          int flags, size_t stream_length,
                           bool compress)
 {
     QPDFObjGen old_og = object.getObjGen();
@@ -1578,30 +1578,30 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
     std::string indent;
     for (int i = 0; i < level; ++i)
     {
-	indent += "  ";
+        indent += "  ";
     }
 
     if (object.isArray())
     {
-	// Note: PDF spec 1.4 implementation note 121 states that
-	// Acrobat requires a space after the [ in the /H key of the
-	// linearization parameter dictionary.  We'll do this
-	// unconditionally for all arrays because it looks nicer and
-	// doesn't make the files that much bigger.
-	writeString("[");
-	writeStringQDF("\n");
-	int n = object.getArrayNItems();
-	for (int i = 0; i < n; ++i)
-	{
-	    writeStringQDF(indent);
-	    writeStringQDF("  ");
-	    writeStringNoQDF(" ");
-	    unparseChild(object.getArrayItem(i), level + 1, child_flags);
-	    writeStringQDF("\n");
-	}
-	writeStringQDF(indent);
-	writeStringNoQDF(" ");
-	writeString("]");
+        // Note: PDF spec 1.4 implementation note 121 states that
+        // Acrobat requires a space after the [ in the /H key of the
+        // linearization parameter dictionary.  We'll do this
+        // unconditionally for all arrays because it looks nicer and
+        // doesn't make the files that much bigger.
+        writeString("[");
+        writeStringQDF("\n");
+        int n = object.getArrayNItems();
+        for (int i = 0; i < n; ++i)
+        {
+            writeStringQDF(indent);
+            writeStringQDF("  ");
+            writeStringNoQDF(" ");
+            unparseChild(object.getArrayItem(i), level + 1, child_flags);
+            writeStringQDF("\n");
+        }
+        writeStringQDF(indent);
+        writeStringNoQDF(" ");
+        writeString("]");
     }
     else if (object.isDictionary())
     {
@@ -1742,7 +1742,7 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
                 object.removeKey("/DecodeParms");
             }
 
-	    if (flags & f_filtered)
+            if (flags & f_filtered)
             {
                 // We will supply our own filter and decode
                 // parameters.
@@ -1791,96 +1791,96 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
             }
         }
 
-	writeString("<<");
-	writeStringQDF("\n");
+        writeString("<<");
+        writeStringQDF("\n");
 
-	std::set<std::string> keys = object.getKeys();
-	for (std::set<std::string>::iterator iter = keys.begin();
-	     iter != keys.end(); ++iter)
-	{
-	    std::string const& key = *iter;
+        std::set<std::string> keys = object.getKeys();
+        for (std::set<std::string>::iterator iter = keys.begin();
+             iter != keys.end(); ++iter)
+        {
+            std::string const& key = *iter;
 
-	    writeStringQDF(indent);
-	    writeStringQDF("  ");
-	    writeStringNoQDF(" ");
-	    writeString(QPDF_Name::normalizeName(key));
-	    writeString(" ");
-	    if (key == "/Contents" &&
-		object.isDictionaryOfType("/Sig") &&
-		object.hasKey("/ByteRange"))
-	    {
+            writeStringQDF(indent);
+            writeStringQDF("  ");
+            writeStringNoQDF(" ");
+            writeString(QPDF_Name::normalizeName(key));
+            writeString(" ");
+            if (key == "/Contents" &&
+                object.isDictionaryOfType("/Sig") &&
+                object.hasKey("/ByteRange"))
+            {
                 QTC::TC("qpdf", "QPDFWriter no encryption sig contents");
-		unparseChild(object.getKey(key), level + 1,
-			     child_flags | f_hex_string | f_no_encryption);
-	    }
-	    else
-	    {
-		unparseChild(object.getKey(key), level + 1, child_flags);
-	    }
-	    writeStringQDF("\n");
-	}
+                unparseChild(object.getKey(key), level + 1,
+                             child_flags | f_hex_string | f_no_encryption);
+            }
+            else
+            {
+                unparseChild(object.getKey(key), level + 1, child_flags);
+            }
+            writeStringQDF("\n");
+        }
 
-	if (flags & f_stream)
-	{
-	    writeStringQDF(indent);
-	    writeStringQDF(" ");
-	    writeString(" /Length ");
+        if (flags & f_stream)
+        {
+            writeStringQDF(indent);
+            writeStringQDF(" ");
+            writeString(" /Length ");
 
-	    if (this->m->direct_stream_lengths)
-	    {
-		writeString(QUtil::uint_to_string(stream_length));
-	    }
-	    else
-	    {
-		writeString(
-		    QUtil::int_to_string(this->m->cur_stream_length_id));
-		writeString(" 0 R");
-	    }
-	    writeStringQDF("\n");
-	    if (compress && (flags & f_filtered))
-	    {
-		writeStringQDF(indent);
-		writeStringQDF(" ");
-		writeString(" /Filter /FlateDecode");
-		writeStringQDF("\n");
-	    }
-	}
+            if (this->m->direct_stream_lengths)
+            {
+                writeString(QUtil::uint_to_string(stream_length));
+            }
+            else
+            {
+                writeString(
+                    QUtil::int_to_string(this->m->cur_stream_length_id));
+                writeString(" 0 R");
+            }
+            writeStringQDF("\n");
+            if (compress && (flags & f_filtered))
+            {
+                writeStringQDF(indent);
+                writeStringQDF(" ");
+                writeString(" /Filter /FlateDecode");
+                writeStringQDF("\n");
+            }
+        }
 
-	writeStringQDF(indent);
-	writeStringNoQDF(" ");
-	writeString(">>");
+        writeStringQDF(indent);
+        writeStringNoQDF(" ");
+        writeString(">>");
     }
     else if (object.isStream())
     {
-	// Write stream data to a buffer.
-	int new_id = this->m->obj_renumber[old_og];
-	if (! this->m->direct_stream_lengths)
-	{
-	    this->m->cur_stream_length_id = new_id + 1;
-	}
+        // Write stream data to a buffer.
+        int new_id = this->m->obj_renumber[old_og];
+        if (! this->m->direct_stream_lengths)
+        {
+            this->m->cur_stream_length_id = new_id + 1;
+        }
 
-	flags |= f_stream;
-	bool compress_stream = false;
+        flags |= f_stream;
+        bool compress_stream = false;
         bool is_metadata = false;
         PointerHolder<Buffer> stream_data;
         if (willFilterStream(object, compress_stream,
                              is_metadata, &stream_data))
-	{
-	    flags |= f_filtered;
-	}
+        {
+            flags |= f_filtered;
+        }
         QPDFObjectHandle stream_dict = object.getDict();
 
-	this->m->cur_stream_length = stream_data->getSize();
-	if (is_metadata && this->m->encrypted && (! this->m->encrypt_metadata))
-	{
-	    // Don't encrypt stream data for the metadata stream
-	    this->m->cur_data_key.clear();
-	}
-	adjustAESStreamLength(this->m->cur_stream_length);
-	unparseObject(stream_dict, 0, flags,
+        this->m->cur_stream_length = stream_data->getSize();
+        if (is_metadata && this->m->encrypted && (! this->m->encrypt_metadata))
+        {
+            // Don't encrypt stream data for the metadata stream
+            this->m->cur_data_key.clear();
+        }
+        adjustAESStreamLength(this->m->cur_stream_length);
+        unparseObject(stream_dict, 0, flags,
                       this->m->cur_stream_length, compress_stream);
-	unsigned char last_char = '\0';
-	writeString("\nstream\n");
+        unsigned char last_char = '\0';
+        writeString("\nstream\n");
         {
             PipelinePopper pp_enc(this);
             pushEncryptionFilter(pp_enc);
@@ -1898,72 +1898,72 @@ QPDFWriter::unparseObject(QPDFObjectHandle object, int level,
         {
             this->m->added_newline = false;
         }
-	writeString("endstream");
+        writeString("endstream");
     }
     else if (object.isString())
     {
-	std::string val;
-	if (this->m->encrypted &&
-	    (! (flags & f_in_ostream)) &&
-	    (! (flags & f_no_encryption)) &&
-	    (! this->m->cur_data_key.empty()))
-	{
-	    val = object.getStringValue();
-	    if (this->m->encrypt_use_aes)
-	    {
-		Pl_Buffer bufpl("encrypted string");
-		Pl_AES_PDF pl(
+        std::string val;
+        if (this->m->encrypted &&
+            (! (flags & f_in_ostream)) &&
+            (! (flags & f_no_encryption)) &&
+            (! this->m->cur_data_key.empty()))
+        {
+            val = object.getStringValue();
+            if (this->m->encrypt_use_aes)
+            {
+                Pl_Buffer bufpl("encrypted string");
+                Pl_AES_PDF pl(
                     "aes encrypt string", &bufpl, true,
                     QUtil::unsigned_char_pointer(this->m->cur_data_key),
                     this->m->cur_data_key.length());
-		pl.write(QUtil::unsigned_char_pointer(val), val.length());
-		pl.finish();
-		auto buf = bufpl.getBufferSharedPointer();
-		val = QPDF_String(
-		    std::string(reinterpret_cast<char*>(buf->getBuffer()),
-				buf->getSize())).unparse(true);
-	    }
-	    else
-	    {
-		auto tmp_ph = QUtil::make_unique_cstr(val);
+                pl.write(QUtil::unsigned_char_pointer(val), val.length());
+                pl.finish();
+                auto buf = bufpl.getBufferSharedPointer();
+                val = QPDF_String(
+                    std::string(reinterpret_cast<char*>(buf->getBuffer()),
+                                buf->getSize())).unparse(true);
+            }
+            else
+            {
+                auto tmp_ph = QUtil::make_unique_cstr(val);
                 char* tmp = tmp_ph.get();
-		size_t vlen = val.length();
-		RC4 rc4(QUtil::unsigned_char_pointer(this->m->cur_data_key),
-			QIntC::to_int(this->m->cur_data_key.length()));
-		rc4.process(QUtil::unsigned_char_pointer(tmp), vlen);
-		val = QPDF_String(std::string(tmp, vlen)).unparse();
-	    }
-	}
-	else if (flags & f_hex_string)
-	{
-	    val = QPDF_String(object.getStringValue()).unparse(true);
-	}
-	else
-	{
-	    val = object.unparseResolved();
-	}
-	writeString(val);
+                size_t vlen = val.length();
+                RC4 rc4(QUtil::unsigned_char_pointer(this->m->cur_data_key),
+                        QIntC::to_int(this->m->cur_data_key.length()));
+                rc4.process(QUtil::unsigned_char_pointer(tmp), vlen);
+                val = QPDF_String(std::string(tmp, vlen)).unparse();
+            }
+        }
+        else if (flags & f_hex_string)
+        {
+            val = QPDF_String(object.getStringValue()).unparse(true);
+        }
+        else
+        {
+            val = object.unparseResolved();
+        }
+        writeString(val);
     }
     else
     {
-	writeString(object.unparseResolved());
+        writeString(object.unparseResolved());
     }
 }
 
 void
 QPDFWriter::writeObjectStreamOffsets(std::vector<qpdf_offset_t>& offsets,
-				     int first_obj)
+                                     int first_obj)
 {
     for (size_t i = 0; i < offsets.size(); ++i)
     {
-	if (i != 0)
-	{
-	    writeStringQDF("\n");
-	    writeStringNoQDF(" ");
-	}
-	writeString(QUtil::uint_to_string(i + QIntC::to_size(first_obj)));
-	writeString(" ");
-	writeString(QUtil::int_to_string(offsets.at(i)));
+        if (i != 0)
+        {
+            writeStringQDF("\n");
+            writeStringNoQDF(" ");
+        }
+        writeString(QUtil::uint_to_string(i + QIntC::to_size(first_obj)));
+        writeString(" ");
+        writeString(QUtil::int_to_string(offsets.at(i)));
     }
     writeString("\n");
 }
@@ -1989,25 +1989,25 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
     bool compressed = false;
     for (int pass = 1; pass <= 2; ++pass)
     {
-	// stream_buffer will be initialized only for pass 2
+        // stream_buffer will be initialized only for pass 2
         PipelinePopper pp_ostream(this, &stream_buffer);
-	if (pass == 1)
-	{
-	    pushDiscardFilter(pp_ostream);
-	}
-	else
-	{
-	    // Adjust offsets to skip over comment before first object
+        if (pass == 1)
+        {
+            pushDiscardFilter(pp_ostream);
+        }
+        else
+        {
+            // Adjust offsets to skip over comment before first object
 
-	    first = offsets.at(0);
-	    for (std::vector<qpdf_offset_t>::iterator iter = offsets.begin();
-		 iter != offsets.end(); ++iter)
-	    {
-		*iter -= first;
-	    }
+            first = offsets.at(0);
+            for (std::vector<qpdf_offset_t>::iterator iter = offsets.begin();
+                 iter != offsets.end(); ++iter)
+            {
+                *iter -= first;
+            }
 
-	    // Take one pass at writing pairs of numbers so we can get
-	    // their size information
+            // Take one pass at writing pairs of numbers so we can get
+            // their size information
             {
                 PipelinePopper pp_discard(this);
                 pushDiscardFilter(pp_discard);
@@ -2015,42 +2015,42 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
                 first += this->m->pipeline->getCount();
             }
 
-	    // Set up a stream to write the stream data into a buffer.
-	    Pipeline* next = pushPipeline(new Pl_Buffer("object stream"));
+            // Set up a stream to write the stream data into a buffer.
+            Pipeline* next = pushPipeline(new Pl_Buffer("object stream"));
             if ((this->m->compress_streams ||
                  (this->m->stream_decode_level == qpdf_dl_none)) &&
                 (! this->m->qdf_mode))
-	    {
-		compressed = true;
-		next = pushPipeline(
-		    new Pl_Flate("compress object stream", next,
-				 Pl_Flate::a_deflate));
-	    }
-	    activatePipelineStack(pp_ostream);
-	    writeObjectStreamOffsets(offsets, first_obj);
-	}
+            {
+                compressed = true;
+                next = pushPipeline(
+                    new Pl_Flate("compress object stream", next,
+                                 Pl_Flate::a_deflate));
+            }
+            activatePipelineStack(pp_ostream);
+            writeObjectStreamOffsets(offsets, first_obj);
+        }
 
-	int count = 0;
-	for (std::set<QPDFObjGen>::iterator iter =
-		 this->m->object_stream_to_objects[old_id].begin();
-	     iter != this->m->object_stream_to_objects[old_id].end();
-	     ++iter, ++count)
-	{
-	    QPDFObjGen obj = *iter;
-	    int new_obj = this->m->obj_renumber[obj];
-	    if (first_obj == -1)
-	    {
-		first_obj = new_obj;
-	    }
-	    if (this->m->qdf_mode)
-	    {
-		writeString("%% Object stream: object " +
-			    QUtil::int_to_string(new_obj) + ", index " +
-			    QUtil::int_to_string(count));
-		if (! this->m->suppress_original_object_ids)
-		{
-		    writeString("; original object ID: " +
-				QUtil::int_to_string(obj.getObj()));
+        int count = 0;
+        for (std::set<QPDFObjGen>::iterator iter =
+                 this->m->object_stream_to_objects[old_id].begin();
+             iter != this->m->object_stream_to_objects[old_id].end();
+             ++iter, ++count)
+        {
+            QPDFObjGen obj = *iter;
+            int new_obj = this->m->obj_renumber[obj];
+            if (first_obj == -1)
+            {
+                first_obj = new_obj;
+            }
+            if (this->m->qdf_mode)
+            {
+                writeString("%% Object stream: object " +
+                            QUtil::int_to_string(new_obj) + ", index " +
+                            QUtil::int_to_string(count));
+                if (! this->m->suppress_original_object_ids)
+                {
+                    writeString("; original object ID: " +
+                                QUtil::int_to_string(obj.getObj()));
                     // For compatibility, only write the generation if
                     // non-zero.  While object streams only allow
                     // objects with generation 0, if we are generating
@@ -2061,17 +2061,17 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
                         QTC::TC("qpdf", "QPDFWriter original obj non-zero gen");
                         writeString(" " + QUtil::int_to_string(obj.getGen()));
                     }
-		}
-		writeString("\n");
-	    }
-	    if (pass == 1)
-	    {
-		offsets.push_back(this->m->pipeline->getCount());
+                }
+                writeString("\n");
+            }
+            if (pass == 1)
+            {
+                offsets.push_back(this->m->pipeline->getCount());
                 // To avoid double-counting objects being written in
                 // object streams for progress reporting, decrement in
                 // pass 1.
                 indicateProgress(true, false);
-	    }
+            }
             QPDFObjectHandle obj_to_write =
                 this->m->pdf.getObjectByObjGen(obj);
             if (obj_to_write.isStream())
@@ -2084,10 +2084,10 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
                     "stream found inside object stream; treating as null");
                 obj_to_write = QPDFObjectHandle::newNull();
             }
-	    writeObject(obj_to_write, count);
+            writeObject(obj_to_write, count);
 
-	    this->m->xref[new_obj] = QPDFXRefEntry(2, new_id, count);
-	}
+            this->m->xref[new_obj] = QPDFXRefEntry(2, new_id, count);
+        }
     }
 
     // Write the object
@@ -2103,30 +2103,30 @@ QPDFWriter::writeObjectStream(QPDFObjectHandle object)
     writeStringQDF("\n ");
     if (compressed)
     {
-	writeString(" /Filter /FlateDecode");
+        writeString(" /Filter /FlateDecode");
     }
     writeString(" /N " + QUtil::uint_to_string(offsets.size()));
     writeStringQDF("\n ");
     writeString(" /First " + QUtil::int_to_string(first));
     if (! object.isNull())
     {
-	// If the original object has an /Extends key, preserve it.
-	QPDFObjectHandle dict = object.getDict();
-	QPDFObjectHandle extends = dict.getKey("/Extends");
-	if (extends.isIndirect())
-	{
-	    QTC::TC("qpdf", "QPDFWriter copy Extends");
-	    writeStringQDF("\n ");
-	    writeString(" /Extends ");
-	    unparseChild(extends, 1, f_in_ostream);
-	}
+        // If the original object has an /Extends key, preserve it.
+        QPDFObjectHandle dict = object.getDict();
+        QPDFObjectHandle extends = dict.getKey("/Extends");
+        if (extends.isIndirect())
+        {
+            QTC::TC("qpdf", "QPDFWriter copy Extends");
+            writeStringQDF("\n ");
+            writeString(" /Extends ");
+            unparseChild(extends, 1, f_in_ostream);
+        }
     }
     writeStringQDF("\n");
     writeStringNoQDF(" ");
     writeString(">>\nstream\n");
     if (this->m->encrypted)
     {
-	QTC::TC("qpdf", "QPDFWriter encrypt object stream");
+        QTC::TC("qpdf", "QPDFWriter encrypt object stream");
     }
     {
         PipelinePopper pp_enc(this);
@@ -2149,65 +2149,65 @@ QPDFWriter::writeObject(QPDFObjectHandle object, int object_stream_index)
 
     if ((object_stream_index == -1) &&
         (old_og.getGen() == 0) &&
-	(this->m->object_stream_to_objects.count(old_og.getObj())))
+        (this->m->object_stream_to_objects.count(old_og.getObj())))
     {
-	writeObjectStream(object);
-	return;
+        writeObjectStream(object);
+        return;
     }
 
     indicateProgress(false, false);
     int new_id = this->m->obj_renumber[old_og];
     if (this->m->qdf_mode)
     {
-	if (this->m->page_object_to_seq.count(old_og))
-	{
-	    writeString("%% Page ");
-	    writeString(
-		QUtil::int_to_string(
-		    this->m->page_object_to_seq[old_og]));
-	    writeString("\n");
-	}
-	if (this->m->contents_to_page_seq.count(old_og))
-	{
-	    writeString("%% Contents for page ");
-	    writeString(
-		QUtil::int_to_string(
-		    this->m->contents_to_page_seq[old_og]));
-	    writeString("\n");
-	}
+        if (this->m->page_object_to_seq.count(old_og))
+        {
+            writeString("%% Page ");
+            writeString(
+                QUtil::int_to_string(
+                    this->m->page_object_to_seq[old_og]));
+            writeString("\n");
+        }
+        if (this->m->contents_to_page_seq.count(old_og))
+        {
+            writeString("%% Contents for page ");
+            writeString(
+                QUtil::int_to_string(
+                    this->m->contents_to_page_seq[old_og]));
+            writeString("\n");
+        }
     }
     if (object_stream_index == -1)
     {
-	if (this->m->qdf_mode && (! this->m->suppress_original_object_ids))
-	{
-	    writeString("%% Original object ID: " +
-			QUtil::int_to_string(object.getObjectID()) + " " +
-			QUtil::int_to_string(object.getGeneration()) + "\n");
-	}
-	openObject(new_id);
-	setDataKey(new_id);
-	unparseObject(object, 0, 0);
-	this->m->cur_data_key.clear();
-	closeObject(new_id);
+        if (this->m->qdf_mode && (! this->m->suppress_original_object_ids))
+        {
+            writeString("%% Original object ID: " +
+                        QUtil::int_to_string(object.getObjectID()) + " " +
+                        QUtil::int_to_string(object.getGeneration()) + "\n");
+        }
+        openObject(new_id);
+        setDataKey(new_id);
+        unparseObject(object, 0, 0);
+        this->m->cur_data_key.clear();
+        closeObject(new_id);
     }
     else
     {
-	unparseObject(object, 0, f_in_ostream);
-	writeString("\n");
+        unparseObject(object, 0, f_in_ostream);
+        writeString("\n");
     }
 
     if ((! this->m->direct_stream_lengths) && object.isStream())
     {
-	if (this->m->qdf_mode)
-	{
-	    if (this->m->added_newline)
-	    {
-		writeString("%QDF: ignore_newline\n");
-	    }
-	}
-	openObject(new_id + 1);
-	writeString(QUtil::uint_to_string(this->m->cur_stream_length));
-	closeObject(new_id + 1);
+        if (this->m->qdf_mode)
+        {
+            if (this->m->added_newline)
+            {
+                writeString("%QDF: ignore_newline\n");
+            }
+        }
+        openObject(new_id + 1);
+        writeString(QUtil::uint_to_string(this->m->cur_stream_length));
+        closeObject(new_id + 1);
     }
 }
 
@@ -2233,7 +2233,7 @@ QPDFWriter::generateID()
 
     if (! this->m->id2.empty())
     {
-	return;
+        return;
     }
 
     QPDFObjectHandle trailer = this->m->pdf.getTrailer();
@@ -2242,30 +2242,30 @@ QPDFWriter::generateID()
 
     if (this->m->static_id)
     {
-	// For test suite use only...
-	static unsigned char tmp[] = {0x31, 0x41, 0x59, 0x26,
+        // For test suite use only...
+        static unsigned char tmp[] = {0x31, 0x41, 0x59, 0x26,
                                       0x53, 0x58, 0x97, 0x93,
                                       0x23, 0x84, 0x62, 0x64,
                                       0x33, 0x83, 0x27, 0x95,
                                       0x00};
-	result = reinterpret_cast<char*>(tmp);
+        result = reinterpret_cast<char*>(tmp);
     }
     else
     {
-	// The PDF specification has guidelines for creating IDs, but
-	// it states clearly that the only thing that's really
-	// important is that it is very likely to be unique.  We can't
-	// really follow the guidelines in the spec exactly because we
-	// haven't written the file yet.  This scheme should be fine
-	// though.  The deterministic ID case uses a digest of a
-	// sufficient portion of the file's contents such no two
-	// non-matching files would match in the subsets used for this
-	// computation.  Note that we explicitly omit the filename from
-	// the digest calculation for deterministic ID so that the same
-	// file converted with qpdf, in that case, would have the same
-	// ID regardless of the output file's name.
+        // The PDF specification has guidelines for creating IDs, but
+        // it states clearly that the only thing that's really
+        // important is that it is very likely to be unique.  We can't
+        // really follow the guidelines in the spec exactly because we
+        // haven't written the file yet.  This scheme should be fine
+        // though.  The deterministic ID case uses a digest of a
+        // sufficient portion of the file's contents such no two
+        // non-matching files would match in the subsets used for this
+        // computation.  Note that we explicitly omit the filename from
+        // the digest calculation for deterministic ID so that the same
+        // file converted with qpdf, in that case, would have the same
+        // ID regardless of the output file's name.
 
-	std::string seed;
+        std::string seed;
         if (this->m->deterministic_id)
         {
             if (this->m->deterministic_id_data.empty())
@@ -2285,28 +2285,28 @@ QPDFWriter::generateID()
             seed += this->m->filename;
             seed += " ";
         }
-	seed += " QPDF ";
-	if (trailer.hasKey("/Info"))
-	{
+        seed += " QPDF ";
+        if (trailer.hasKey("/Info"))
+        {
             QPDFObjectHandle info = trailer.getKey("/Info");
-	    std::set<std::string> keys = info.getKeys();
-	    for (std::set<std::string>::iterator iter = keys.begin();
-		 iter != keys.end(); ++iter)
-	    {
-		QPDFObjectHandle obj = info.getKey(*iter);
-		if (obj.isString())
-		{
-		    seed += " ";
-		    seed += obj.getStringValue();
-		}
-	    }
-	}
+            std::set<std::string> keys = info.getKeys();
+            for (std::set<std::string>::iterator iter = keys.begin();
+                 iter != keys.end(); ++iter)
+            {
+                QPDFObjectHandle obj = info.getKey(*iter);
+                if (obj.isString())
+                {
+                    seed += " ";
+                    seed += obj.getStringValue();
+                }
+            }
+        }
 
-	MD5 m;
-	m.encodeString(seed.c_str());
-	MD5::Digest digest;
-	m.digest(digest);
-	result = std::string(reinterpret_cast<char*>(digest),
+        MD5 m;
+        m.encodeString(seed.c_str());
+        MD5::Digest digest;
+        m.digest(digest);
+        result = std::string(reinterpret_cast<char*>(digest),
                              sizeof(MD5::Digest));
     }
 
@@ -2319,7 +2319,7 @@ QPDFWriter::generateID()
     this->m->id1 = getOriginalID1();
     if (this->m->id1.empty())
     {
-	this->m->id1 = this->m->id2;
+        this->m->id1 = this->m->id2;
     }
 }
 
@@ -2331,31 +2331,31 @@ QPDFWriter::initializeSpecialStreams()
     std::vector<QPDFObjectHandle> pages = this->m->pdf.getAllPages();
     int num = 0;
     for (std::vector<QPDFObjectHandle>::iterator iter = pages.begin();
-	 iter != pages.end(); ++iter)
+         iter != pages.end(); ++iter)
     {
-	QPDFObjectHandle& page = *iter;
-	this->m->page_object_to_seq[page.getObjGen()] = ++num;
-	QPDFObjectHandle contents = page.getKey("/Contents");
-	std::vector<QPDFObjGen> contents_objects;
-	if (contents.isArray())
-	{
-	    int n = contents.getArrayNItems();
-	    for (int i = 0; i < n; ++i)
-	    {
-		contents_objects.push_back(
-		    contents.getArrayItem(i).getObjGen());
-	    }
-	}
-	else if (contents.isStream())
-	{
-	    contents_objects.push_back(contents.getObjGen());
-	}
+        QPDFObjectHandle& page = *iter;
+        this->m->page_object_to_seq[page.getObjGen()] = ++num;
+        QPDFObjectHandle contents = page.getKey("/Contents");
+        std::vector<QPDFObjGen> contents_objects;
+        if (contents.isArray())
+        {
+            int n = contents.getArrayNItems();
+            for (int i = 0; i < n; ++i)
+            {
+                contents_objects.push_back(
+                    contents.getArrayItem(i).getObjGen());
+            }
+        }
+        else if (contents.isStream())
+        {
+            contents_objects.push_back(contents.getObjGen());
+        }
 
-	for (auto const& c: contents_objects)
-	{
-	    this->m->contents_to_page_seq[c] = num;
-	    this->m->normalized_streams.insert(c);
-	}
+        for (auto const& c: contents_objects)
+        {
+            this->m->contents_to_page_seq[c] = num;
+            this->m->normalized_streams.insert(c);
+        }
     }
 }
 
@@ -2424,31 +2424,31 @@ QPDFWriter::generateObjectStreams()
     size_t n_per = eligible.size() / n_object_streams;
     if (n_per * n_object_streams < eligible.size())
     {
-	++n_per;
+        ++n_per;
     }
     unsigned int n = 0;
     int cur_ostream = 0;
     for (std::vector<QPDFObjGen>::const_iterator iter = eligible.begin();
-	 iter != eligible.end(); ++iter)
+         iter != eligible.end(); ++iter)
     {
-	if ((n % n_per) == 0)
-	{
-	    if (n > 0)
-	    {
-		QTC::TC("qpdf", "QPDFWriter generate >1 ostream");
-	    }
-	    n = 0;
-	}
-	if (n == 0)
-	{
-	    // Construct a new null object as the "original" object
-	    // stream.  The rest of the code knows that this means
-	    // we're creating the object stream from scratch.
-	    cur_ostream = this->m->pdf.makeIndirectObject(
-		QPDFObjectHandle::newNull()).getObjectID();
-	}
-	this->m->object_to_object_stream[*iter] = cur_ostream;
-	++n;
+        if ((n % n_per) == 0)
+        {
+            if (n > 0)
+            {
+                QTC::TC("qpdf", "QPDFWriter generate >1 ostream");
+            }
+            n = 0;
+        }
+        if (n == 0)
+        {
+            // Construct a new null object as the "original" object
+            // stream.  The rest of the code knows that this means
+            // we're creating the object stream from scratch.
+            cur_ostream = this->m->pdf.makeIndirectObject(
+                QPDFObjectHandle::newNull()).getObjectID();
+        }
+        this->m->object_to_object_stream[*iter] = cur_ostream;
+        ++n;
     }
 }
 
@@ -2529,7 +2529,7 @@ QPDFWriter::doWriteSetup()
 
     if (this->m->linearized)
     {
-	this->m->qdf_mode = false;
+        this->m->qdf_mode = false;
     }
 
     if (this->m->pclm)
@@ -2541,14 +2541,14 @@ QPDFWriter::doWriteSetup()
 
     if (this->m->qdf_mode)
     {
-	if (! this->m->normalize_content_set)
-	{
-	    this->m->normalize_content = true;
-	}
-	if (! this->m->compress_streams_set)
-	{
-	    this->m->compress_streams = false;
-	}
+        if (! this->m->normalize_content_set)
+        {
+            this->m->normalize_content = true;
+        }
+        if (! this->m->compress_streams_set)
+        {
+            this->m->compress_streams = false;
+        }
         if (! this->m->stream_decode_level_set)
         {
             this->m->stream_decode_level = qpdf_dl_generalized;
@@ -2557,119 +2557,119 @@ QPDFWriter::doWriteSetup()
 
     if (this->m->encrypted)
     {
-	// Encryption has been explicitly set
-	this->m->preserve_encryption = false;
+        // Encryption has been explicitly set
+        this->m->preserve_encryption = false;
     }
     else if (this->m->normalize_content ||
-	     this->m->stream_decode_level ||
+             this->m->stream_decode_level ||
              this->m->pclm ||
-	     this->m->qdf_mode)
+             this->m->qdf_mode)
     {
-	// Encryption makes looking at contents pretty useless.  If
-	// the user explicitly encrypted though, we still obey that.
-	this->m->preserve_encryption = false;
+        // Encryption makes looking at contents pretty useless.  If
+        // the user explicitly encrypted though, we still obey that.
+        this->m->preserve_encryption = false;
     }
 
     if (this->m->preserve_encryption)
     {
-	copyEncryptionParameters(this->m->pdf);
+        copyEncryptionParameters(this->m->pdf);
     }
 
     if (! this->m->forced_pdf_version.empty())
     {
-	int major = 0;
-	int minor = 0;
-	parseVersion(this->m->forced_pdf_version, major, minor);
-	disableIncompatibleEncryption(major, minor,
+        int major = 0;
+        int minor = 0;
+        parseVersion(this->m->forced_pdf_version, major, minor);
+        disableIncompatibleEncryption(major, minor,
                                       this->m->forced_extension_level);
-	if (compareVersions(major, minor, 1, 5) < 0)
-	{
-	    QTC::TC("qpdf", "QPDFWriter forcing object stream disable");
-	    this->m->object_stream_mode = qpdf_o_disable;
-	}
+        if (compareVersions(major, minor, 1, 5) < 0)
+        {
+            QTC::TC("qpdf", "QPDFWriter forcing object stream disable");
+            this->m->object_stream_mode = qpdf_o_disable;
+        }
     }
 
     if (this->m->qdf_mode || this->m->normalize_content ||
         this->m->stream_decode_level)
     {
-	initializeSpecialStreams();
+        initializeSpecialStreams();
     }
 
     if (this->m->qdf_mode)
     {
-	// Generate indirect stream lengths for qdf mode since fix-qdf
-	// uses them for storing recomputed stream length data.
-	// Certain streams such as object streams, xref streams, and
-	// hint streams always get direct stream lengths.
-	this->m->direct_stream_lengths = false;
+        // Generate indirect stream lengths for qdf mode since fix-qdf
+        // uses them for storing recomputed stream length data.
+        // Certain streams such as object streams, xref streams, and
+        // hint streams always get direct stream lengths.
+        this->m->direct_stream_lengths = false;
     }
 
     switch (this->m->object_stream_mode)
     {
       case qpdf_o_disable:
-	// no action required
-	break;
+        // no action required
+        break;
 
       case qpdf_o_preserve:
-	preserveObjectStreams();
-	break;
+        preserveObjectStreams();
+        break;
 
       case qpdf_o_generate:
-	generateObjectStreams();
-	break;
+        generateObjectStreams();
+        break;
 
-	// no default so gcc will warn for missing case tag
+        // no default so gcc will warn for missing case tag
     }
 
     if (this->m->linearized)
     {
-	// Page dictionaries are not allowed to be compressed objects.
-	std::vector<QPDFObjectHandle> pages = this->m->pdf.getAllPages();
-	for (std::vector<QPDFObjectHandle>::iterator iter = pages.begin();
-	     iter != pages.end(); ++iter)
-	{
-	    QPDFObjectHandle& page = *iter;
-	    QPDFObjGen og = page.getObjGen();
-	    if (this->m->object_to_object_stream.count(og))
-	    {
-		QTC::TC("qpdf", "QPDFWriter uncompressing page dictionary");
-		this->m->object_to_object_stream.erase(og);
-	    }
-	}
+        // Page dictionaries are not allowed to be compressed objects.
+        std::vector<QPDFObjectHandle> pages = this->m->pdf.getAllPages();
+        for (std::vector<QPDFObjectHandle>::iterator iter = pages.begin();
+             iter != pages.end(); ++iter)
+        {
+            QPDFObjectHandle& page = *iter;
+            QPDFObjGen og = page.getObjGen();
+            if (this->m->object_to_object_stream.count(og))
+            {
+                QTC::TC("qpdf", "QPDFWriter uncompressing page dictionary");
+                this->m->object_to_object_stream.erase(og);
+            }
+        }
     }
 
     if (this->m->linearized || this->m->encrypted)
     {
-    	// The document catalog is not allowed to be compressed in
-    	// linearized files either.  It also appears that Adobe Reader
-    	// 8.0.0 has a bug that prevents it from being able to handle
-    	// encrypted files with compressed document catalogs, so we
-    	// disable them in that case as well.
-	QPDFObjGen og = this->m->pdf.getRoot().getObjGen();
-	if (this->m->object_to_object_stream.count(og))
-	{
-	    QTC::TC("qpdf", "QPDFWriter uncompressing root");
-	    this->m->object_to_object_stream.erase(og);
-	}
+        // The document catalog is not allowed to be compressed in
+        // linearized files either.  It also appears that Adobe Reader
+        // 8.0.0 has a bug that prevents it from being able to handle
+        // encrypted files with compressed document catalogs, so we
+        // disable them in that case as well.
+        QPDFObjGen og = this->m->pdf.getRoot().getObjGen();
+        if (this->m->object_to_object_stream.count(og))
+        {
+            QTC::TC("qpdf", "QPDFWriter uncompressing root");
+            this->m->object_to_object_stream.erase(og);
+        }
     }
 
     // Generate reverse mapping from object stream to objects
     for (std::map<QPDFObjGen, int>::iterator iter =
-	     this->m->object_to_object_stream.begin();
-	 iter != this->m->object_to_object_stream.end(); ++iter)
+             this->m->object_to_object_stream.begin();
+         iter != this->m->object_to_object_stream.end(); ++iter)
     {
-	QPDFObjGen obj = (*iter).first;
-	int stream = (*iter).second;
-	this->m->object_stream_to_objects[stream].insert(obj);
-	this->m->max_ostream_index =
-	    std::max(this->m->max_ostream_index,
-		     QIntC::to_int(
+        QPDFObjGen obj = (*iter).first;
+        int stream = (*iter).second;
+        this->m->object_stream_to_objects[stream].insert(obj);
+        this->m->max_ostream_index =
+            std::max(this->m->max_ostream_index,
+                     QIntC::to_int(
                          this->m->object_stream_to_objects[stream].size()) - 1);
     }
 
     if (! this->m->object_stream_to_objects.empty())
     {
-	setMinimumPDFVersion("1.5");
+        setMinimumPDFVersion("1.5");
     }
 
     setMinimumPDFVersion(this->m->pdf.getPDFVersion(),
@@ -2678,8 +2678,8 @@ QPDFWriter::doWriteSetup()
     this->m->final_extension_level = this->m->min_extension_level;
     if (! this->m->forced_pdf_version.empty())
     {
-	QTC::TC("qpdf", "QPDFWriter using forced PDF version");
-	this->m->final_pdf_version = this->m->forced_pdf_version;
+        QTC::TC("qpdf", "QPDFWriter using forced PDF version");
+        this->m->final_pdf_version = this->m->forced_pdf_version;
         this->m->final_extension_level = this->m->forced_extension_level;
     }
 }
@@ -2699,23 +2699,23 @@ QPDFWriter::write()
 
     if (this->m->linearized)
     {
-	writeLinearized();
+        writeLinearized();
     }
     else
     {
-	writeStandard();
+        writeStandard();
     }
 
     this->m->pipeline->finish();
     if (this->m->close_file)
     {
-	fclose(this->m->file);
+        fclose(this->m->file);
     }
     this->m->file = 0;
     if (this->m->buffer_pipeline)
     {
-	this->m->output_buffer = this->m->buffer_pipeline->getBuffer();
-	this->m->buffer_pipeline = 0;
+        this->m->output_buffer = this->m->buffer_pipeline->getBuffer();
+        this->m->buffer_pipeline = 0;
     }
     indicateProgress(false, true);
 }
@@ -2747,9 +2747,9 @@ void
 QPDFWriter::enqueuePart(std::vector<QPDFObjectHandle>& part)
 {
     for (std::vector<QPDFObjectHandle>::iterator iter = part.begin();
-	 iter != part.end(); ++iter)
+         iter != part.end(); ++iter)
     {
-	enqueueObject(*iter);
+        enqueueObject(*iter);
     }
 }
 
@@ -2759,13 +2759,13 @@ QPDFWriter::writeEncryptionDictionary()
     this->m->encryption_dict_objid = openObject(this->m->encryption_dict_objid);
     writeString("<<");
     for (std::map<std::string, std::string>::iterator iter =
-	     this->m->encryption_dictionary.begin();
-	 iter != this->m->encryption_dictionary.end(); ++iter)
+             this->m->encryption_dictionary.begin();
+         iter != this->m->encryption_dictionary.end(); ++iter)
     {
-	writeString(" ");
-	writeString((*iter).first);
-	writeString(" ");
-	writeString((*iter).second);
+        writeString(" ");
+        writeString((*iter).first);
+        writeString(" ");
+        writeString((*iter).second);
     }
     writeString(" >>");
     closeObject(this->m->encryption_dict_objid);
@@ -2823,8 +2823,8 @@ QPDFWriter::writeHintStream(int hint_id)
     writeString(QUtil::int_to_string(S));
     if (O)
     {
-	writeString(" /O ");
-	writeString(QUtil::int_to_string(O));
+        writeString(" /O ");
+        writeString(QUtil::int_to_string(O));
     }
     writeString(" /Length ");
     adjustAESStreamLength(hlen);
@@ -2833,7 +2833,7 @@ QPDFWriter::writeHintStream(int hint_id)
 
     if (this->m->encrypted)
     {
-	QTC::TC("qpdf", "QPDFWriter encrypted hint stream");
+        QTC::TC("qpdf", "QPDFWriter encrypted hint stream");
     }
     unsigned char last_char = '\0';
     {
@@ -2845,7 +2845,7 @@ QPDFWriter::writeHintStream(int hint_id)
 
     if (last_char != '\n')
     {
-	writeString("\n");
+        writeString("\n");
     }
     writeString("endstream");
     closeObject(hint_id);
@@ -2862,8 +2862,8 @@ QPDFWriter::writeXRefTable(trailer_e which, int first, int last, int size)
 
 qpdf_offset_t
 QPDFWriter::writeXRefTable(trailer_e which, int first, int last, int size,
-			   qpdf_offset_t prev, bool suppress_offsets,
-			   int hint_id, qpdf_offset_t hint_offset,
+                           qpdf_offset_t prev, bool suppress_offsets,
+                           int hint_id, qpdf_offset_t hint_offset,
                            qpdf_offset_t hint_length, int linearization_pass)
 {
     writeString("xref\n");
@@ -2874,26 +2874,26 @@ QPDFWriter::writeXRefTable(trailer_e which, int first, int last, int size,
     writeString("\n");
     for (int i = first; i <= last; ++i)
     {
-	if (i == 0)
-	{
-	    writeString("0000000000 65535 f \n");
-	}
-	else
-	{
-	    qpdf_offset_t offset = 0;
-	    if (! suppress_offsets)
-	    {
-		offset = this->m->xref[i].getOffset();
-		if ((hint_id != 0) &&
-		    (i != hint_id) &&
-		    (offset >= hint_offset))
-		{
-		    offset += hint_length;
-		}
-	    }
-	    writeString(QUtil::int_to_string(offset, 10));
-	    writeString(" 00000 n \n");
-	}
+        if (i == 0)
+        {
+            writeString("0000000000 65535 f \n");
+        }
+        else
+        {
+            qpdf_offset_t offset = 0;
+            if (! suppress_offsets)
+            {
+                offset = this->m->xref[i].getOffset();
+                if ((hint_id != 0) &&
+                    (i != hint_id) &&
+                    (offset >= hint_offset))
+                {
+                    offset += hint_length;
+                }
+            }
+            writeString(QUtil::int_to_string(offset, 10));
+            writeString(" 00000 n \n");
+        }
     }
     writeTrailer(which, size, false, prev, linearization_pass);
     writeString("\n");
@@ -2902,22 +2902,22 @@ QPDFWriter::writeXRefTable(trailer_e which, int first, int last, int size,
 
 qpdf_offset_t
 QPDFWriter::writeXRefStream(int objid, int max_id, qpdf_offset_t max_offset,
-			    trailer_e which, int first, int last, int size)
+                            trailer_e which, int first, int last, int size)
 {
     // There are too many extra arguments to replace overloaded
     // function with defaults in the header file...too much risk of
     // leaving something off.
     return writeXRefStream(objid, max_id, max_offset,
-			   which, first, last, size, 0, 0, 0, 0, false, 0);
+                           which, first, last, size, 0, 0, 0, 0, false, 0);
 }
 
 qpdf_offset_t
 QPDFWriter::writeXRefStream(int xref_id, int max_id, qpdf_offset_t max_offset,
-			    trailer_e which, int first, int last, int size,
-			    qpdf_offset_t prev, int hint_id,
-			    qpdf_offset_t hint_offset,
+                            trailer_e which, int first, int last, int size,
+                            qpdf_offset_t prev, int hint_id,
+                            qpdf_offset_t hint_offset,
                             qpdf_offset_t hint_length,
-			    bool skip_compression,
+                            bool skip_compression,
                             int linearization_pass)
 {
     qpdf_offset_t xref_offset = this->m->pipeline->getCount();
@@ -2942,18 +2942,18 @@ QPDFWriter::writeXRefStream(int xref_id, int max_id, qpdf_offset_t max_offset,
          (this->m->stream_decode_level == qpdf_dl_none)) &&
         (! this->m->qdf_mode))
     {
-	compressed = true;
-	if (! skip_compression)
-	{
-	    // Write the stream dictionary for compression but don't
-	    // actually compress.  This helps us with computation of
-	    // padding for pass 1 of linearization.
-	    p = pushPipeline(
-		new Pl_Flate("compress xref", p, Pl_Flate::a_deflate));
-	}
-	p = pushPipeline(
-	    new Pl_PNGFilter(
-		"pngify xref", p, Pl_PNGFilter::a_encode, esize));
+        compressed = true;
+        if (! skip_compression)
+        {
+            // Write the stream dictionary for compression but don't
+            // actually compress.  This helps us with computation of
+            // padding for pass 1 of linearization.
+            p = pushPipeline(
+                new Pl_Flate("compress xref", p, Pl_Flate::a_deflate));
+        }
+        p = pushPipeline(
+            new Pl_PNGFilter(
+                "pngify xref", p, Pl_PNGFilter::a_encode, esize));
     }
     PointerHolder<Buffer> xref_data;
     {
@@ -3006,21 +3006,21 @@ QPDFWriter::writeXRefStream(int xref_id, int max_id, qpdf_offset_t max_offset,
     writeString(" /Length " + QUtil::uint_to_string(xref_data->getSize()));
     if (compressed)
     {
-	writeStringQDF("\n ");
-	writeString(" /Filter /FlateDecode");
-	writeStringQDF("\n ");
-	writeString(" /DecodeParms << /Columns " +
-		    QUtil::int_to_string(esize) + " /Predictor 12 >>");
+        writeStringQDF("\n ");
+        writeString(" /Filter /FlateDecode");
+        writeStringQDF("\n ");
+        writeString(" /DecodeParms << /Columns " +
+                    QUtil::int_to_string(esize) + " /Predictor 12 >>");
     }
     writeStringQDF("\n ");
     writeString(" /W [ 1 " +
-		QUtil::int_to_string(f1_size) + " " +
-		QUtil::int_to_string(f2_size) + " ]");
+                QUtil::int_to_string(f1_size) + " " +
+                QUtil::int_to_string(f2_size) + " ]");
     if (! ((first == 0) && (last == size - 1)))
     {
-	writeString(" /Index [ " +
-		    QUtil::int_to_string(first) + " " +
-		    QUtil::int_to_string(last - first + 1) + " ]");
+        writeString(" /Index [ " +
+                    QUtil::int_to_string(first) + " " +
+                    QUtil::int_to_string(last - first + 1) + " ]");
     }
     writeTrailer(which, size, true, prev, linearization_pass);
     writeString("\nstream\n");
@@ -3138,17 +3138,17 @@ QPDFWriter::writeLinearized()
     bool need_xref_stream = (! this->m->object_to_object_stream.empty());
     if (need_xref_stream)
     {
-	second_half_xref = this->m->next_objid++;
+        second_half_xref = this->m->next_objid++;
     }
     // Assign numbers to all compressed objects in the second half.
     std::vector<QPDFObjectHandle>* vecs2[] = {&part7, &part8, &part9};
     for (int i = 0; i < 3; ++i)
     {
-	for (std::vector<QPDFObjectHandle>::iterator iter = (*vecs2[i]).begin();
-	     iter != (*vecs2[i]).end(); ++iter)
-	{
-	    assignCompressedObjectNumbers((*iter).getObjGen());
-	}
+        for (std::vector<QPDFObjectHandle>::iterator iter = (*vecs2[i]).begin();
+             iter != (*vecs2[i]).end(); ++iter)
+        {
+            assignCompressedObjectNumbers((*iter).getObjGen());
+        }
     }
     int second_half_end = this->m->next_objid - 1;
     int second_trailer_size = this->m->next_objid;
@@ -3159,14 +3159,14 @@ QPDFWriter::writeLinearized()
     int first_half_xref = 0;
     if (need_xref_stream)
     {
-	first_half_xref = this->m->next_objid++;
+        first_half_xref = this->m->next_objid++;
     }
     int part4_first_obj = this->m->next_objid;
     this->m->next_objid += QIntC::to_int(part4.size());
     int after_part4 = this->m->next_objid;
     if (this->m->encrypted)
     {
-	this->m->encryption_dict_objid = this->m->next_objid++;
+        this->m->encryption_dict_objid = this->m->next_objid++;
     }
     int hint_id = this->m->next_objid++;
     int part6_first_obj = this->m->next_objid;
@@ -3176,11 +3176,11 @@ QPDFWriter::writeLinearized()
     std::vector<QPDFObjectHandle>* vecs1[] = {&part4, &part6};
     for (int i = 0; i < 2; ++i)
     {
-	for (std::vector<QPDFObjectHandle>::iterator iter = (*vecs1[i]).begin();
-	     iter != (*vecs1[i]).end(); ++iter)
-	{
-	    assignCompressedObjectNumbers((*iter).getObjGen());
-	}
+        for (std::vector<QPDFObjectHandle>::iterator iter = (*vecs1[i]).begin();
+             iter != (*vecs1[i]).end(); ++iter)
+        {
+            assignCompressedObjectNumbers((*iter).getObjGen());
+        }
     }
     int first_half_end = this->m->next_objid - 1;
     int first_trailer_size = this->m->next_objid;
@@ -3235,8 +3235,8 @@ QPDFWriter::writeLinearized()
     auto pp_md5 = make_pointer_holder<PipelinePopper>(this);
     for (int pass = 1; pass <= 2; ++pass)
     {
-	if (pass == 1)
-	{
+        if (pass == 1)
+        {
             if (! this->m->lin_pass1_filename.empty())
             {
                 lin_pass1_file =
@@ -3254,107 +3254,107 @@ QPDFWriter::writeLinearized()
             {
                 pushMD5Pipeline(*pp_md5);
             }
-	}
+        }
 
-	// Part 1: header
+        // Part 1: header
 
-	writeHeader();
+        writeHeader();
 
-	// Part 2: linearization parameter dictionary.  Save enough
-	// space to write real dictionary.  200 characters is enough
-	// space if all numerical values in the parameter dictionary
-	// that contain offsets are 20 digits long plus a few extra
-	// characters for safety.  The entire linearization parameter
-	// dictionary must appear within the first 1024 characters of
-	// the file.
+        // Part 2: linearization parameter dictionary.  Save enough
+        // space to write real dictionary.  200 characters is enough
+        // space if all numerical values in the parameter dictionary
+        // that contain offsets are 20 digits long plus a few extra
+        // characters for safety.  The entire linearization parameter
+        // dictionary must appear within the first 1024 characters of
+        // the file.
 
-	qpdf_offset_t pos = this->m->pipeline->getCount();
-	openObject(lindict_id);
-	writeString("<<");
-	if (pass == 2)
-	{
-	    std::vector<QPDFObjectHandle> const& pages =
+        qpdf_offset_t pos = this->m->pipeline->getCount();
+        openObject(lindict_id);
+        writeString("<<");
+        if (pass == 2)
+        {
+            std::vector<QPDFObjectHandle> const& pages =
                 this->m->pdf.getAllPages();
-	    int first_page_object =
+            int first_page_object =
                 this->m->obj_renumber[pages.at(0).getObjGen()];
-	    int npages = QIntC::to_int(pages.size());
+            int npages = QIntC::to_int(pages.size());
 
-	    writeString(" /Linearized 1 /L ");
-	    writeString(QUtil::int_to_string(file_size + hint_length));
-	    // Implementation note 121 states that a space is
-	    // mandatory after this open bracket.
-	    writeString(" /H [ ");
-	    writeString(QUtil::int_to_string(
+            writeString(" /Linearized 1 /L ");
+            writeString(QUtil::int_to_string(file_size + hint_length));
+            // Implementation note 121 states that a space is
+            // mandatory after this open bracket.
+            writeString(" /H [ ");
+            writeString(QUtil::int_to_string(
                             this->m->xref[hint_id].getOffset()));
-	    writeString(" ");
-	    writeString(QUtil::int_to_string(hint_length));
-	    writeString(" ] /O ");
-	    writeString(QUtil::int_to_string(first_page_object));
-	    writeString(" /E ");
-	    writeString(QUtil::int_to_string(part6_end_offset + hint_length));
-	    writeString(" /N ");
-	    writeString(QUtil::int_to_string(npages));
-	    writeString(" /T ");
-	    writeString(QUtil::int_to_string(space_before_zero + hint_length));
-	}
-	writeString(" >>");
-	closeObject(lindict_id);
-	static int const pad = 200;
-	int spaces = QIntC::to_int(pos - this->m->pipeline->getCount() + pad);
-	assert(spaces >= 0);
-	writePad(spaces);
-	writeString("\n");
+            writeString(" ");
+            writeString(QUtil::int_to_string(hint_length));
+            writeString(" ] /O ");
+            writeString(QUtil::int_to_string(first_page_object));
+            writeString(" /E ");
+            writeString(QUtil::int_to_string(part6_end_offset + hint_length));
+            writeString(" /N ");
+            writeString(QUtil::int_to_string(npages));
+            writeString(" /T ");
+            writeString(QUtil::int_to_string(space_before_zero + hint_length));
+        }
+        writeString(" >>");
+        closeObject(lindict_id);
+        static int const pad = 200;
+        int spaces = QIntC::to_int(pos - this->m->pipeline->getCount() + pad);
+        assert(spaces >= 0);
+        writePad(spaces);
+        writeString("\n");
 
         // If the user supplied any additional header text, write it
         // here after the linearization parameter dictionary.
         writeString(this->m->extra_header_text);
 
-	// Part 3: first page cross reference table and trailer.
+        // Part 3: first page cross reference table and trailer.
 
-	qpdf_offset_t first_xref_offset = this->m->pipeline->getCount();
-	qpdf_offset_t hint_offset = 0;
-	if (pass == 2)
-	{
-	    hint_offset = this->m->xref[hint_id].getOffset();
-	}
-	if (need_xref_stream)
-	{
-	    // Must pad here too.
-	    if (pass == 1)
-	    {
-		// Set first_half_max_obj_offset to a value large
-		// enough to force four bytes to be reserved for each
-		// file offset.  This would provide adequate space for
-		// the xref stream as long as the last object in page
-		// 1 starts with in the first 4 GB of the file, which
-		// is extremely likely.  In the second pass, we will
-		// know the actual value for this, but it's okay if
-		// it's smaller.
-		first_half_max_obj_offset = 1 << 25;
-	    }
-	    pos = this->m->pipeline->getCount();
-	    writeXRefStream(first_half_xref, first_half_end,
-			    first_half_max_obj_offset,
-			    t_lin_first, first_half_start, first_half_end,
-			    first_trailer_size,
-			    hint_length + second_xref_offset,
-			    hint_id, hint_offset, hint_length,
-			    (pass == 1), pass);
-	    qpdf_offset_t endpos = this->m->pipeline->getCount();
-	    if (pass == 1)
-	    {
-		// Pad so we have enough room for the real xref
-		// stream.
-		writePad(calculateXrefStreamPadding(endpos - pos));
-		first_xref_end = this->m->pipeline->getCount();
-	    }
-	    else
-	    {
-		// Pad so that the next object starts at the same
-		// place as in pass 1.
-		writePad(QIntC::to_int(first_xref_end - endpos));
+        qpdf_offset_t first_xref_offset = this->m->pipeline->getCount();
+        qpdf_offset_t hint_offset = 0;
+        if (pass == 2)
+        {
+            hint_offset = this->m->xref[hint_id].getOffset();
+        }
+        if (need_xref_stream)
+        {
+            // Must pad here too.
+            if (pass == 1)
+            {
+                // Set first_half_max_obj_offset to a value large
+                // enough to force four bytes to be reserved for each
+                // file offset.  This would provide adequate space for
+                // the xref stream as long as the last object in page
+                // 1 starts with in the first 4 GB of the file, which
+                // is extremely likely.  In the second pass, we will
+                // know the actual value for this, but it's okay if
+                // it's smaller.
+                first_half_max_obj_offset = 1 << 25;
+            }
+            pos = this->m->pipeline->getCount();
+            writeXRefStream(first_half_xref, first_half_end,
+                            first_half_max_obj_offset,
+                            t_lin_first, first_half_start, first_half_end,
+                            first_trailer_size,
+                            hint_length + second_xref_offset,
+                            hint_id, hint_offset, hint_length,
+                            (pass == 1), pass);
+            qpdf_offset_t endpos = this->m->pipeline->getCount();
+            if (pass == 1)
+            {
+                // Pad so we have enough room for the real xref
+                // stream.
+                writePad(calculateXrefStreamPadding(endpos - pos));
+                first_xref_end = this->m->pipeline->getCount();
+            }
+            else
+            {
+                // Pad so that the next object starts at the same
+                // place as in pass 1.
+                writePad(QIntC::to_int(first_xref_end - endpos));
 
-		if (this->m->pipeline->getCount() != first_xref_end)
+                if (this->m->pipeline->getCount() != first_xref_end)
                 {
                     throw std::logic_error(
                         "insufficient padding for first pass xref stream; "
@@ -3362,111 +3362,111 @@ QPDFWriter::writeLinearized()
                         QUtil::int_to_string(first_xref_end) +
                         "; endpos=" + QUtil::int_to_string(endpos));
                 }
-	    }
-	    writeString("\n");
-	}
-	else
-	{
-	    writeXRefTable(t_lin_first, first_half_start, first_half_end,
-			   first_trailer_size, hint_length + second_xref_offset,
-			   (pass == 1), hint_id, hint_offset, hint_length,
+            }
+            writeString("\n");
+        }
+        else
+        {
+            writeXRefTable(t_lin_first, first_half_start, first_half_end,
+                           first_trailer_size, hint_length + second_xref_offset,
+                           (pass == 1), hint_id, hint_offset, hint_length,
                            pass);
-	    writeString("startxref\n0\n%%EOF\n");
-	}
+            writeString("startxref\n0\n%%EOF\n");
+        }
 
-	// Parts 4 through 9
+        // Parts 4 through 9
 
-	for (std::list<QPDFObjectHandle>::iterator iter =
-		 this->m->object_queue.begin();
-	     iter != this->m->object_queue.end(); ++iter)
-	{
-	    QPDFObjectHandle cur_object = (*iter);
-	    if (cur_object.getObjectID() == part6_end_marker)
-	    {
-		first_half_max_obj_offset = this->m->pipeline->getCount();
-	    }
-	    writeObject(cur_object);
-	    if (cur_object.getObjectID() == part4_end_marker)
-	    {
-		if (this->m->encrypted)
-		{
-		    writeEncryptionDictionary();
-		}
-		if (pass == 1)
-		{
-		    this->m->xref[hint_id] =
-			QPDFXRefEntry(1, this->m->pipeline->getCount(), 0);
-		}
-		else
-		{
-		    // Part 5: hint stream
-		    writeBuffer(hint_buffer);
-		}
-	    }
-	    if (cur_object.getObjectID() == part6_end_marker)
-	    {
-		part6_end_offset = this->m->pipeline->getCount();
-	    }
-	}
+        for (std::list<QPDFObjectHandle>::iterator iter =
+                 this->m->object_queue.begin();
+             iter != this->m->object_queue.end(); ++iter)
+        {
+            QPDFObjectHandle cur_object = (*iter);
+            if (cur_object.getObjectID() == part6_end_marker)
+            {
+                first_half_max_obj_offset = this->m->pipeline->getCount();
+            }
+            writeObject(cur_object);
+            if (cur_object.getObjectID() == part4_end_marker)
+            {
+                if (this->m->encrypted)
+                {
+                    writeEncryptionDictionary();
+                }
+                if (pass == 1)
+                {
+                    this->m->xref[hint_id] =
+                        QPDFXRefEntry(1, this->m->pipeline->getCount(), 0);
+                }
+                else
+                {
+                    // Part 5: hint stream
+                    writeBuffer(hint_buffer);
+                }
+            }
+            if (cur_object.getObjectID() == part6_end_marker)
+            {
+                part6_end_offset = this->m->pipeline->getCount();
+            }
+        }
 
-	// Part 10: overflow hint stream -- not used
+        // Part 10: overflow hint stream -- not used
 
-	// Part 11: main cross reference table and trailer
+        // Part 11: main cross reference table and trailer
 
-	second_xref_offset = this->m->pipeline->getCount();
-	if (need_xref_stream)
-	{
-	    pos = this->m->pipeline->getCount();
-	    space_before_zero =
-		writeXRefStream(second_half_xref,
-				second_half_end, second_xref_offset,
-				t_lin_second, 0, second_half_end,
-				second_trailer_size,
-				0, 0, 0, 0, (pass == 1), pass);
-	    qpdf_offset_t endpos = this->m->pipeline->getCount();
+        second_xref_offset = this->m->pipeline->getCount();
+        if (need_xref_stream)
+        {
+            pos = this->m->pipeline->getCount();
+            space_before_zero =
+                writeXRefStream(second_half_xref,
+                                second_half_end, second_xref_offset,
+                                t_lin_second, 0, second_half_end,
+                                second_trailer_size,
+                                0, 0, 0, 0, (pass == 1), pass);
+            qpdf_offset_t endpos = this->m->pipeline->getCount();
 
-	    if (pass == 1)
-	    {
-		// Pad so we have enough room for the real xref
-		// stream.  See comments for previous xref stream on
-		// how we calculate the padding.
-		writePad(calculateXrefStreamPadding(endpos - pos));
-		writeString("\n");
-		second_xref_end = this->m->pipeline->getCount();
-	    }
-	    else
-	    {
-		// Make the file size the same.
-		writePad(
+            if (pass == 1)
+            {
+                // Pad so we have enough room for the real xref
+                // stream.  See comments for previous xref stream on
+                // how we calculate the padding.
+                writePad(calculateXrefStreamPadding(endpos - pos));
+                writeString("\n");
+                second_xref_end = this->m->pipeline->getCount();
+            }
+            else
+            {
+                // Make the file size the same.
+                writePad(
                     QIntC::to_int(second_xref_end + hint_length -
                                   1 - this->m->pipeline->getCount()));
-		writeString("\n");
+                writeString("\n");
 
-		// If this assertion fails, maybe we didn't have
-		// enough padding above.
-		if (this->m->pipeline->getCount() !=
+                // If this assertion fails, maybe we didn't have
+                // enough padding above.
+                if (this->m->pipeline->getCount() !=
                     second_xref_end + hint_length)
                 {
                     throw std::logic_error(
                         "count mismatch after xref stream;"
                         " possible insufficient padding?");
                 }
-	    }
-	}
-	else
-	{
-	    space_before_zero =
-		writeXRefTable(t_lin_second, 0, second_half_end,
-			       second_trailer_size, 0, false, 0, 0, 0, pass);
-	}
-	writeString("startxref\n");
-	writeString(QUtil::int_to_string(first_xref_offset));
-	writeString("\n%%EOF\n");
+            }
+        }
+        else
+        {
+            space_before_zero =
+                writeXRefTable(t_lin_second, 0, second_half_end,
+                               second_trailer_size, 0, false, 0, 0, 0, pass);
+        }
+        writeString("startxref\n");
+        writeString(QUtil::int_to_string(first_xref_offset));
+        writeString("\n%%EOF\n");
 
         discardGeneration(this->m->obj_renumber, this->m->obj_renumber_no_gen);
 
-	if (pass == 1)
-	{
+        if (pass == 1)
+        {
             if (this->m->deterministic_id)
             {
                 QTC::TC("qpdf", "QPDFWriter linearized deterministic ID",
@@ -3476,25 +3476,25 @@ QPDFWriter::writeLinearized()
                 assert(this->m->md5_pipeline == 0);
             }
 
-	    // Close first pass pipeline
-	    file_size = this->m->pipeline->getCount();
-	    pp_pass1 = 0;
+            // Close first pass pipeline
+            file_size = this->m->pipeline->getCount();
+            pp_pass1 = 0;
 
-	    // Save hint offset since it will be set to zero by
-	    // calling openObject.
-	    qpdf_offset_t hint_offset1 = this->m->xref[hint_id].getOffset();
+            // Save hint offset since it will be set to zero by
+            // calling openObject.
+            qpdf_offset_t hint_offset1 = this->m->xref[hint_id].getOffset();
 
-	    // Write hint stream to a buffer
+            // Write hint stream to a buffer
             {
                 pushPipeline(new Pl_Buffer("hint buffer"));
                 PipelinePopper pp_hint(this, &hint_buffer);
                 activatePipelineStack(pp_hint);
                 writeHintStream(hint_id);
             }
-	    hint_length = QIntC::to_offset(hint_buffer->getSize());
+            hint_length = QIntC::to_offset(hint_buffer->getSize());
 
-	    // Restore hint offset
-	    this->m->xref[hint_id] = QPDFXRefEntry(1, hint_offset1, 0);
+            // Restore hint offset
+            this->m->xref[hint_id] = QPDFXRefEntry(1, hint_offset1, 0);
             if (lin_pass1_file)
             {
                 // Write some debugging information
@@ -3509,7 +3509,7 @@ QPDFWriter::writeLinearized()
                 fclose(lin_pass1_file);
                 lin_pass1_file = 0;
             }
-	}
+        }
     }
 }
 
@@ -3537,9 +3537,9 @@ QPDFWriter::enqueueObjectsStandard()
     // no-op.
     std::set<std::string> keys = trailer.getKeys();
     for (std::set<std::string>::iterator iter = keys.begin();
-	 iter != keys.end(); ++iter)
+         iter != keys.end(); ++iter)
     {
-	enqueueObject(trailer.getKey(*iter));
+        enqueueObject(trailer.getKey(*iter));
     }
 }
 
@@ -3646,31 +3646,31 @@ QPDFWriter::writeStandard()
     // Now start walking queue, outputting each object.
     while (this->m->object_queue.size())
     {
-	QPDFObjectHandle cur_object = this->m->object_queue.front();
-	this->m->object_queue.pop_front();
-	writeObject(cur_object);
+        QPDFObjectHandle cur_object = this->m->object_queue.front();
+        this->m->object_queue.pop_front();
+        writeObject(cur_object);
     }
 
     // Write out the encryption dictionary, if any
     if (this->m->encrypted)
     {
-	writeEncryptionDictionary();
+        writeEncryptionDictionary();
     }
 
     // Now write out xref.  next_objid is now the number of objects.
     qpdf_offset_t xref_offset = this->m->pipeline->getCount();
     if (this->m->object_stream_to_objects.empty())
     {
-	// Write regular cross-reference table
-	writeXRefTable(t_normal, 0, this->m->next_objid - 1,
+        // Write regular cross-reference table
+        writeXRefTable(t_normal, 0, this->m->next_objid - 1,
                        this->m->next_objid);
     }
     else
     {
-	// Write cross-reference stream.
-	int xref_id = this->m->next_objid++;
-	writeXRefStream(xref_id, xref_id, xref_offset, t_normal,
-			0, this->m->next_objid - 1, this->m->next_objid);
+        // Write cross-reference stream.
+        int xref_id = this->m->next_objid++;
+        writeXRefStream(xref_id, xref_id, xref_offset, t_normal,
+                        0, this->m->next_objid - 1, this->m->next_objid);
     }
     writeString("startxref\n");
     writeString(QUtil::int_to_string(xref_offset));
@@ -3678,7 +3678,7 @@ QPDFWriter::writeStandard()
 
     if (this->m->deterministic_id)
     {
-	QTC::TC("qpdf", "QPDFWriter standard deterministic ID",
+        QTC::TC("qpdf", "QPDFWriter standard deterministic ID",
                 this->m->object_stream_to_objects.empty() ? 0 : 1);
         pp_md5 = 0;
         assert(this->m->md5_pipeline == 0);

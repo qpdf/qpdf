@@ -40,11 +40,11 @@ void run(char const* filename)
     size_t len;
     while ((len = fread(buf, 1, sizeof(buf), in1)) > 0)
     {
-	// Write to the compression pipeline
-	def1->write(buf, len);
+        // Write to the compression pipeline
+        def1->write(buf, len);
 
-	// Write to the both pipeline
-	def3->write(buf, len);
+        // Write to the both pipeline
+        def3->write(buf, len);
     }
     fclose(in1);
 
@@ -68,7 +68,7 @@ void run(char const* filename)
     FILE* in2 = QUtil::safe_fopen(n1.c_str(), "rb");
     while ((len = fread(buf, 1, sizeof(buf), in2)) > 0)
     {
-	inf2->write(buf, len);
+        inf2->write(buf, len);
     }
     fclose(in2);
 
@@ -87,18 +87,18 @@ int main(int argc, char* argv[])
 {
     if (argc != 2)
     {
-	std::cerr << "Usage: pipeline filename" << std::endl;
-	exit(2);
+        std::cerr << "Usage: pipeline filename" << std::endl;
+        exit(2);
     }
     char* filename = argv[1];
 
     try
     {
-	run(filename);
+        run(filename);
     }
     catch (std::exception& e)
     {
-	std::cout << e.what() << std::endl;
+        std::cout << e.what() << std::endl;
     }
     return 0;
 }

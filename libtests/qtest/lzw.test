@@ -12,22 +12,22 @@ my $td = new TestDriver('lzw');
 cleanup();
 
 $td->runtest("decode: early code change",
-	     {$td->COMMAND => "lzw lzw1.in tmp"},
-	     {$td->STRING => "",
-	      $td->EXIT_STATUS => 0});
+             {$td->COMMAND => "lzw lzw1.in tmp"},
+             {$td->STRING => "",
+              $td->EXIT_STATUS => 0});
 
 $td->runtest("check output",
-	     {$td->FILE => "tmp"},
-	     {$td->FILE => "lzw1.out"});
+             {$td->FILE => "tmp"},
+             {$td->FILE => "lzw1.out"});
 
 $td->runtest("decode: no early code change",
-	     {$td->COMMAND => "lzw lzw2.in tmp --no-early-code-change"},
-	     {$td->STRING => "",
-	      $td->EXIT_STATUS => 0});
+             {$td->COMMAND => "lzw lzw2.in tmp --no-early-code-change"},
+             {$td->STRING => "",
+              $td->EXIT_STATUS => 0});
 
 $td->runtest("check output",
-	     {$td->FILE => "tmp"},
-	     {$td->FILE => "lzw2.out"});
+             {$td->FILE => "tmp"},
+             {$td->FILE => "lzw2.out"});
 
 cleanup();
 

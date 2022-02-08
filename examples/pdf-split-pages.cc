@@ -38,13 +38,13 @@ static void process(char const* whoami,
         outpdf.emptyPDF();
         QPDFPageDocumentHelper(outpdf).addPage(page, false);
         QPDFWriter outpdfw(outpdf, outfile.c_str());
-	if (static_id)
-	{
-	    // For the test suite, uncompress streams and use static
-	    // IDs.
-	    outpdfw.setStaticID(true); // for testing only
-	    outpdfw.setStreamDataMode(qpdf_s_uncompress);
-	}
+        if (static_id)
+        {
+            // For the test suite, uncompress streams and use static
+            // IDs.
+            outpdfw.setStaticID(true); // for testing only
+            outpdfw.setStreamDataMode(qpdf_s_uncompress);
+        }
         outpdfw.write();
     }
 }
@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
     // For libtool's sake....
     if (strncmp(whoami, "lt-", 3) == 0)
     {
-	whoami += 3;
+        whoami += 3;
     }
     // For test suite
     if ((argc > 1) && (strcmp(argv[1], " --static-id") == 0))

@@ -15,7 +15,7 @@ FileInputSource::Members::~Members()
 {
     if (this->file && this->close_file)
     {
-	fclose(this->file);
+        fclose(this->file);
     }
 }
 
@@ -108,9 +108,9 @@ FileInputSource::seek(qpdf_offset_t offset, int whence)
 {
     QUtil::os_wrapper(std::string("seek to ") +
                       this->m->filename + ", offset " +
-		      QUtil::int_to_string(offset) + " (" +
-		      QUtil::int_to_string(whence) + ")",
-		      QUtil::seek(this->m->file, offset, whence));
+                      QUtil::int_to_string(offset) + " (" +
+                      QUtil::int_to_string(whence) + ")",
+                      QUtil::seek(this->m->file, offset, whence));
 }
 
 void
@@ -147,5 +147,5 @@ void
 FileInputSource::unreadCh(char ch)
 {
     QUtil::os_wrapper(this->m->filename + ": unread character",
-		      ungetc(static_cast<unsigned char>(ch), this->m->file));
+                      ungetc(static_cast<unsigned char>(ch), this->m->file));
 }

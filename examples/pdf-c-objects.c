@@ -58,20 +58,20 @@ int main(int argc, char* argv[])
 
     if ((p = strrchr(argv[0], '/')) != NULL)
     {
-	whoami = p + 1;
+        whoami = p + 1;
     }
     else if ((p = strrchr(argv[0], '\\')) != NULL)
     {
-	whoami = p + 1;
+        whoami = p + 1;
     }
     else
     {
-	whoami = argv[0];
+        whoami = argv[0];
     }
 
     if (argc != 4)
     {
-	usage();
+        usage();
     }
 
     infile = argv[1];
@@ -80,34 +80,34 @@ int main(int argc, char* argv[])
 
     if (((qpdf_read(qpdf, infile, password) & QPDF_ERRORS) == 0) &&
         modify_file(qpdf) &&
-	((qpdf_init_write(qpdf, outfile) & QPDF_ERRORS) == 0))
+        ((qpdf_init_write(qpdf, outfile) & QPDF_ERRORS) == 0))
     {
         /* Use static ID for testing only. For production, a
          * non-static ID is used. See also
          * qpdf_set_deterministic_ID. */
-	qpdf_set_static_ID(qpdf, QPDF_TRUE); /* for testing only */
-	qpdf_write(qpdf);
+        qpdf_set_static_ID(qpdf, QPDF_TRUE); /* for testing only */
+        qpdf_write(qpdf);
     }
     while (qpdf_more_warnings(qpdf))
     {
-	warnings = 1;
-	printf("warning: %s\n",
-	       qpdf_get_error_full_text(qpdf, qpdf_next_warning(qpdf)));
+        warnings = 1;
+        printf("warning: %s\n",
+               qpdf_get_error_full_text(qpdf, qpdf_next_warning(qpdf)));
     }
     if (qpdf_has_error(qpdf))
     {
-	errors = 1;
-	printf("error: %s\n",
-	       qpdf_get_error_full_text(qpdf, qpdf_get_error(qpdf)));
+        errors = 1;
+        printf("error: %s\n",
+               qpdf_get_error_full_text(qpdf, qpdf_get_error(qpdf)));
     }
     qpdf_cleanup(&qpdf);
     if (errors)
     {
-	return 2;
+        return 2;
     }
     else if (warnings)
     {
-	return 3;
+        return 3;
     }
 
     return 0;

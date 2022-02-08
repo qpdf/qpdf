@@ -369,7 +369,7 @@ QdfFixer::checkObjId(std::string const& cur_obj_str)
     int cur_obj = QUtil::string_to_int(cur_obj_str.c_str());
     if (cur_obj != last_obj + 1)
     {
-	fatal(filename + ":" + QUtil::uint_to_string(lineno) +
+        fatal(filename + ":" + QUtil::uint_to_string(lineno) +
               ": expected object " + QUtil::int_to_string(last_obj + 1));
     }
     last_obj = cur_obj;
@@ -392,9 +392,9 @@ QdfFixer::writeOstream()
     auto n = ostream_offsets.size();
     for (auto iter: ostream_offsets)
     {
-	iter -= QIntC::to_offset(first);
-	++onum;
-	offsets += QUtil::int_to_string(onum) + " " +
+        iter -= QIntC::to_offset(first);
+        ++onum;
+        offsets += QUtil::int_to_string(onum) + " " +
             QUtil::int_to_string(iter) + "\n";
     }
     auto offset_adjust = QIntC::to_offset(offsets.size());
@@ -406,7 +406,7 @@ QdfFixer::writeOstream()
     dict_data += "  /First " + QUtil::int_to_string(first) + "\n";
     if (! ostream_extends.empty())
     {
-	dict_data += "  /Extends " + ostream_extends + "\n";
+        dict_data += "  /Extends " + ostream_extends + "\n";
     }
     dict_data += ">>\n";
     offset_adjust += QIntC::to_offset(dict_data.length());
@@ -415,12 +415,12 @@ QdfFixer::writeOstream()
               << offsets;
     for (auto const& o: ostream)
     {
-	std::cout << o;
+        std::cout << o;
     }
 
     for (auto const& o: ostream_discarded)
     {
-	offset -= QIntC::to_offset(o.length());
+        offset -= QIntC::to_offset(o.length());
     }
     offset += offset_adjust;
 
@@ -448,9 +448,9 @@ QdfFixer::writeBinary(unsigned long long val, size_t bytes)
     }
     for (size_t i = 0; i < bytes; ++i)
     {
-	data.at(bytes - i - 1) =
+        data.at(bytes - i - 1) =
             static_cast<char>(QIntC::to_uchar(val & 0xff));
-	val >>= 8;
+        val >>= 8;
     }
     std::cout << data;
 }

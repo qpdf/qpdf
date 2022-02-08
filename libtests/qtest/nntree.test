@@ -10,8 +10,8 @@ require TestDriver;
 my $td = new TestDriver('nntree');
 
 $td->runtest("nntree",
-	     {$td->COMMAND => "nntree"},
-	     {$td->FILE => "nntree.out", $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
+             {$td->COMMAND => "nntree"},
+             {$td->FILE => "nntree.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 $td->report(1);

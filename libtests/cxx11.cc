@@ -344,7 +344,7 @@ void do_regex()
     s.clear();
     for (std::sregex_iterator iter = m1; iter != m2; ++iter)
     {
-	std::smatch const& match2 = *iter;
+        std::smatch const& match2 = *iter;
         s += match2[0].str() + "|";
     }
     assert("234|9453|423|" == s);

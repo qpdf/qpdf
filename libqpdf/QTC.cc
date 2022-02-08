@@ -16,7 +16,7 @@ void QTC::TC(char const* const scope, char const* const ccase, int n)
 
     if (! tc_active(scope))
     {
-	return;
+        return;
     }
 
     std::string filename;
@@ -27,13 +27,13 @@ void QTC::TC(char const* const scope, char const* const ccase, int n)
 #endif
     if (! QUtil::get_env(TC_ENV, &filename))
     {
-	return;
+        return;
     }
 #undef TC_ENV
 
     if (cache.count(std::make_pair(ccase, n)))
     {
-	return;
+        return;
     }
     cache.insert(std::make_pair(ccase, n));
 

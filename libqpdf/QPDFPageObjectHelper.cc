@@ -430,7 +430,7 @@ QPDFPageObjectHelper::forEachXObject(
                     queue.push_back(QPDFPageObjectHelper(obj));
                 }
             }
-	}
+        }
     }
 }
 

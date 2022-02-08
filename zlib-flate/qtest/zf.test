@@ -24,16 +24,16 @@ foreach my $level ('', '=1', '=9')
 }
 
 $td->runtest("error",
-	     {$td->COMMAND => "zlib-flate -uncompress < 1.uncompressed"},
-	     {$td->REGEXP => "flate: inflate: data: .*\n",
-	      $td->EXIT_STATUS => 2},
-	     $td->NORMALIZE_NEWLINES);
+             {$td->COMMAND => "zlib-flate -uncompress < 1.uncompressed"},
+             {$td->REGEXP => "flate: inflate: data: .*\n",
+              $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
 
 $td->runtest("corrupted input",
-	     {$td->COMMAND => "zlib-flate -uncompress < missing-z-finish.in"},
-	     {$td->REGEXP =>
+             {$td->COMMAND => "zlib-flate -uncompress < missing-z-finish.in"},
+             {$td->REGEXP =>
                   "input stream is complete but output may still be valid",
                   $td->EXIT_STATUS => 3},
-	     $td->NORMALIZE_NEWLINES);
+             $td->NORMALIZE_NEWLINES);
 
 $td->report(8);

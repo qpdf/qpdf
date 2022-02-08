@@ -36,7 +36,7 @@ class Pl_Flate: public Pipeline
 
     QPDF_DLL
     Pl_Flate(char const* identifier, Pipeline* next,
-	     action_e action, unsigned int out_bufsize = def_bufsize);
+             action_e action, unsigned int out_bufsize = def_bufsize);
     QPDF_DLL
     virtual ~Pl_Flate();
 

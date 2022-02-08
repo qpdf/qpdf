@@ -10,8 +10,8 @@ require TestDriver;
 my $td = new TestDriver('pdf-count-strings');
 
 $td->runtest("filter tokens",
-	     {$td->COMMAND => "pdf-count-strings in.pdf"},
-	     {$td->FILE => "out", $td->EXIT_STATUS => 0},
+             {$td->COMMAND => "pdf-count-strings in.pdf"},
+             {$td->FILE => "out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 $td->report(1);

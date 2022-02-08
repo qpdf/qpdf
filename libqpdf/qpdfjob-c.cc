@@ -21,7 +21,7 @@ int qpdfjob_run_from_argv(char const* const argv[])
     }
     catch (std::exception& e)
     {
-	std::cerr << whoami << ": " << e.what() << std::endl;
+        std::cerr << whoami << ": " << e.what() << std::endl;
         return QPDFJob::EXIT_ERROR;
     }
     return j.getExitCode();
@@ -52,7 +52,7 @@ int qpdfjob_run_from_json(char const* json)
     }
     catch (std::exception& e)
     {
-	std::cerr << "qpdfjob json: " << e.what() << std::endl;
+        std::cerr << "qpdfjob json: " << e.what() << std::endl;
         return QPDFJob::EXIT_ERROR;
     }
     return j.getExitCode();

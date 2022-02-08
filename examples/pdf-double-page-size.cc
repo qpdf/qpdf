@@ -13,9 +13,9 @@ static char const* whoami = 0;
 void usage()
 {
     std::cerr << "Usage: " << whoami << " infile.pdf outfile.pdf [in-password]"
-	      << std::endl
-	      << "Double size of all pages in infile.pdf;"
-	      << " write output to outfile.pdf" << std::endl;
+              << std::endl
+              << "Double size of all pages in infile.pdf;"
+              << " write output to outfile.pdf" << std::endl;
     exit(2);
 }
 
@@ -26,18 +26,18 @@ static void doubleBoxSize(QPDFObjectHandle& page, char const* box_name)
     QPDFObjectHandle box = page.getKey(box_name);
     if (box.isNull())
     {
-	return;
+        return;
     }
     if (! (box.isArray() && (box.getArrayNItems() == 4)))
     {
-	throw std::runtime_error(std::string("box ") + box_name +
-				 " is not an array of four elements");
+        throw std::runtime_error(std::string("box ") + box_name +
+                                 " is not an array of four elements");
     }
     std::vector<QPDFObjectHandle> doubled;
     for (int i = 0; i < 4; ++i)
     {
-	doubled.push_back(
-	    QPDFObjectHandle::newReal(
+        doubled.push_back(
+            QPDFObjectHandle::newReal(
                 box.getArrayItem(i).getNumericValue() * 2.0, 2));
     }
     page.replaceKey(box_name, QPDFObjectHandle::newArray(doubled));
@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
     // For libtool's sake....
     if (strncmp(whoami, "lt-", 3) == 0)
     {
-	whoami += 3;
+        whoami += 3;
     }
 
     // For test suite
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
 
     if (! ((argc == 3) || (argc == 4)))
     {
-	usage();
+        usage();
     }
 
     char const* infilename = argv[1];
@@ -76,48 +76,48 @@ int main(int argc, char* argv[])
 
     try
     {
-	QPDF qpdf;
-	qpdf.processFile(infilename, password);
+        QPDF qpdf;
+        qpdf.processFile(infilename, password);
 
-	std::vector<QPDFPageObjectHelper> pages =
+        std::vector<QPDFPageObjectHelper> pages =
             QPDFPageDocumentHelper(qpdf).getAllPages();
-	for (std::vector<QPDFPageObjectHelper>::iterator iter =
+        for (std::vector<QPDFPageObjectHelper>::iterator iter =
                  pages.begin();
-	     iter != pages.end(); ++iter)
-	{
+             iter != pages.end(); ++iter)
+        {
             QPDFPageObjectHelper& ph(*iter);
-	    QPDFObjectHandle page = ph.getObjectHandle();
+            QPDFObjectHandle page = ph.getObjectHandle();
 
-	    // Prepend the buffer to the page's contents
-	    ph.addPageContents(
+            // Prepend the buffer to the page's contents
+            ph.addPageContents(
                 QPDFObjectHandle::newStream(&qpdf, content), true);
 
-	    // Double the size of each of the content boxes
-	    doubleBoxSize(page, "/MediaBox");
-	    doubleBoxSize(page, "/CropBox");
-	    doubleBoxSize(page, "/BleedBox");
-	    doubleBoxSize(page, "/TrimBox");
-	    doubleBoxSize(page, "/ArtBox");
-	}
+            // Double the size of each of the content boxes
+            doubleBoxSize(page, "/MediaBox");
+            doubleBoxSize(page, "/CropBox");
+            doubleBoxSize(page, "/BleedBox");
+            doubleBoxSize(page, "/TrimBox");
+            doubleBoxSize(page, "/ArtBox");
+        }
 
-	// Write out a new file
-	QPDFWriter w(qpdf, outfilename);
-	if (static_id)
-	{
-	    // For the test suite, uncompress streams and use static
-	    // IDs.
-	    w.setStaticID(true); // for testing only
-	    w.setStreamDataMode(qpdf_s_uncompress);
-	}
-	w.write();
-	std::cout << whoami << ": new file written to " << outfilename
-		  << std::endl;
+        // Write out a new file
+        QPDFWriter w(qpdf, outfilename);
+        if (static_id)
+        {
+            // For the test suite, uncompress streams and use static
+            // IDs.
+            w.setStaticID(true); // for testing only
+            w.setStreamDataMode(qpdf_s_uncompress);
+        }
+        w.write();
+        std::cout << whoami << ": new file written to " << outfilename
+                  << std::endl;
     }
     catch (std::exception &e)
     {
-	std::cerr << whoami << " processing file " << infilename << ": "
-		  << e.what() << std::endl;
-	exit(2);
+        std::cerr << whoami << " processing file " << infilename << ": "
+                  << e.what() << std::endl;
+        exit(2);
     }
 
     return 0;

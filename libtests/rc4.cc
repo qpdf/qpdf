@@ -31,8 +31,8 @@ int main(int argc, char* argv[])
 
     if (argc != 4)
     {
-	std::cerr << "Usage: rc4 hex-key infile outfile" << std::endl;
-	exit(2);
+        std::cerr << "Usage: rc4 hex-key infile outfile" << std::endl;
+        exit(2);
     }
 
     char* hexkey = argv[1];
@@ -46,13 +46,13 @@ int main(int argc, char* argv[])
     FILE* infile = QUtil::safe_fopen(infilename, "rb");
     for (unsigned int i = 0; i < strlen(hexkey); i += 2)
     {
-	char t[3];
-	t[0] = hexkey[i];
-	t[1] = hexkey[i + 1];
-	t[2] = '\0';
+        char t[3];
+        t[0] = hexkey[i];
+        t[1] = hexkey[i + 1];
+        t[2] = '\0';
 
-	long val = strtol(t, 0, 16);
-	key[i/2] = static_cast<unsigned char>(val);
+        long val = strtol(t, 0, 16);
+        key[i/2] = static_cast<unsigned char>(val);
     }
 
     FILE* outfile = QUtil::safe_fopen(outfilename, "wb");
@@ -66,15 +66,15 @@ int main(int argc, char* argv[])
     bool done = false;
     while (! done)
     {
-	size_t len = fread(buf, 1, sizeof(buf), infile);
-	if (len <= 0)
-	{
-	    done = true;
-	}
-	else
-	{
-	    rc4->write(buf, len);
-	}
+        size_t len = fread(buf, 1, sizeof(buf), infile);
+        if (len <= 0)
+        {
+            done = true;
+        }
+        else
+        {
+            rc4->write(buf, len);
+        }
     }
     rc4->finish();
     delete rc4;

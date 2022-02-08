@@ -12,10 +12,10 @@ static char const* whoami = 0;
 static void usageExit(std::string const& msg)
 {
     std::cerr
-	<< std::endl
-	<< whoami << ": " << msg << std::endl
-	<< std::endl
-	<< "For help:" << std::endl
+        << std::endl
+        << whoami << ": " << msg << std::endl
+        << std::endl
+        << "For help:" << std::endl
         << "  " << whoami << "--help=usage       usage information"
         << std::endl
         << "  " << whoami << "--help=topic       help on a topic"
@@ -24,7 +24,7 @@ static void usageExit(std::string const& msg)
         << std::endl
         << "  " << whoami << "--help             general help and a topic list"
         << std::endl
-	<< std::endl;
+        << std::endl;
     exit(QPDFJob::EXIT_ERROR);
 }
 
@@ -36,7 +36,7 @@ int realmain(int argc, char* argv[])
     // Remove prefix added by libtool for consistency during testing.
     if (strncmp(whoami, "lt-", 3) == 0)
     {
-	whoami += 3;
+        whoami += 3;
     }
 
     QPDFJob j;
@@ -52,7 +52,7 @@ int realmain(int argc, char* argv[])
     }
     catch (std::exception& e)
     {
-	std::cerr << whoami << ": " << e.what() << std::endl;
+        std::cerr << whoami << ": " << e.what() << std::endl;
         return QPDFJob::EXIT_ERROR;
     }
     return j.getExitCode();

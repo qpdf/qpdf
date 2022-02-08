@@ -17,7 +17,7 @@ class Pl_PNGFilter: public Pipeline
 
     QPDF_DLL
     Pl_PNGFilter(char const* identifier, Pipeline* next,
-		 action_e action, unsigned int columns,
+                 action_e action, unsigned int columns,
                  unsigned int samples_per_pixel = 1,
                  unsigned int bits_per_sample = 8);
     QPDF_DLL

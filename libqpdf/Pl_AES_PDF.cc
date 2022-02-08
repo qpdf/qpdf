@@ -12,7 +12,7 @@
 bool Pl_AES_PDF::use_static_iv = false;
 
 Pl_AES_PDF::Pl_AES_PDF(char const* identifier, Pipeline* next,
-		       bool encrypt, unsigned char const* key,
+                       bool encrypt, unsigned char const* key,
                        size_t key_bytes) :
     Pipeline(identifier, next),
     crypto(QPDFCryptoProvider::getImpl()),
@@ -81,17 +81,17 @@ Pl_AES_PDF::write(unsigned char* data, size_t len)
 
     while (bytes_left > 0)
     {
-	if (this->offset == this->buf_size)
-	{
-	    flush(false);
-	}
+        if (this->offset == this->buf_size)
+        {
+            flush(false);
+        }
 
-	size_t available = this->buf_size - this->offset;
-	size_t bytes = (bytes_left < available ? bytes_left : available);
-	bytes_left -= bytes;
-	std::memcpy(this->inbuf + this->offset, p, bytes);
-	this->offset += bytes;
-	p += bytes;
+        size_t available = this->buf_size - this->offset;
+        size_t bytes = (bytes_left < available ? bytes_left : available);
+        bytes_left -= bytes;
+        std::memcpy(this->inbuf + this->offset, p, bytes);
+        this->offset += bytes;
+        p += bytes;
     }
 }
 
@@ -100,10 +100,10 @@ Pl_AES_PDF::finish()
 {
     if (this->encrypt)
     {
-	if (this->offset == this->buf_size)
-	{
-	    flush(false);
-	}
+        if (this->offset == this->buf_size)
+        {
+            flush(false);
+        }
         if (! this->disable_padding)
         {
             // Pad as described in section 3.5.1 of version 1.7 of the PDF
@@ -118,19 +118,19 @@ Pl_AES_PDF::finish()
     }
     else
     {
-	if (this->offset != this->buf_size)
-	{
-	    // This is never supposed to happen as the output is
-	    // always supposed to be padded.  However, we have
-	    // encountered files for which the output is not a
-	    // multiple of the block size.  In this case, pad with
-	    // zeroes and hope for the best.
-	    assert(this->buf_size > this->offset);
-	    std::memset(this->inbuf + this->offset, 0,
-			this->buf_size - this->offset);
-	    this->offset = this->buf_size;
-	}
-	flush(! this->disable_padding);
+        if (this->offset != this->buf_size)
+        {
+            // This is never supposed to happen as the output is
+            // always supposed to be padded.  However, we have
+            // encountered files for which the output is not a
+            // multiple of the block size.  In this case, pad with
+            // zeroes and hope for the best.
+            assert(this->buf_size > this->offset);
+            std::memset(this->inbuf + this->offset, 0,
+                        this->buf_size - this->offset);
+            this->offset = this->buf_size;
+        }
+        flush(! this->disable_padding);
     }
     this->crypto->rijndael_finalize();
     getNext()->finish();
@@ -141,10 +141,10 @@ Pl_AES_PDF::initializeVector()
 {
     if (use_zero_iv)
     {
-	for (unsigned int i = 0; i < this->buf_size; ++i)
-	{
-	    this->cbc_block[i] = 0;
-	}
+        for (unsigned int i = 0; i < this->buf_size; ++i)
+        {
+            this->cbc_block[i] = 0;
+        }
     }
     else if (use_specified_iv)
     {
@@ -152,10 +152,10 @@ Pl_AES_PDF::initializeVector()
     }
     else if (use_static_iv)
     {
-	for (unsigned int i = 0; i < this->buf_size; ++i)
-	{
-	    this->cbc_block[i] = static_cast<unsigned char>(14U * (1U + i));
-	}
+        for (unsigned int i = 0; i < this->buf_size; ++i)
+        {
+            this->cbc_block[i] = static_cast<unsigned char>(14U * (1U + i));
+        }
     }
     else
     {
@@ -170,35 +170,35 @@ Pl_AES_PDF::flush(bool strip_padding)
 
     if (first)
     {
-	first = false;
+        first = false;
         bool return_after_init = false;
-	if (this->cbc_mode)
-	{
-	    if (encrypt)
-	    {
-		// Set cbc_block to the initialization vector, and if
-		// not zero, write it to the output stream.
-		initializeVector();
+        if (this->cbc_mode)
+        {
+            if (encrypt)
+            {
+                // Set cbc_block to the initialization vector, and if
+                // not zero, write it to the output stream.
+                initializeVector();
                 if (! (this->use_zero_iv || this->use_specified_iv))
                 {
                     getNext()->write(this->cbc_block, this->buf_size);
                 }
-	    }
-	    else if (this->use_zero_iv || this->use_specified_iv)
+            }
+            else if (this->use_zero_iv || this->use_specified_iv)
             {
                 // Initialize vector with zeroes; zero vector was not
                 // written to the beginning of the input file.
                 initializeVector();
             }
             else
-	    {
-		// Take the first block of input as the initialization
-		// vector.  There's nothing to write at this time.
-		memcpy(this->cbc_block, this->inbuf, this->buf_size);
-		this->offset = 0;
+            {
+                // Take the first block of input as the initialization
+                // vector.  There's nothing to write at this time.
+                memcpy(this->cbc_block, this->inbuf, this->buf_size);
+                this->offset = 0;
                 return_after_init = true;
-	    }
-	}
+            }
+        }
         this->crypto->rijndael_init(
             encrypt, this->key.get(), key_bytes,
             this->cbc_mode, this->cbc_block);
@@ -212,23 +212,23 @@ Pl_AES_PDF::flush(bool strip_padding)
     unsigned int bytes = this->buf_size;
     if (strip_padding)
     {
-	unsigned char last = this->outbuf[this->buf_size - 1];
-	if (last <= this->buf_size)
-	{
-	    bool strip = true;
-	    for (unsigned int i = 1; i <= last; ++i)
-	    {
-		if (this->outbuf[this->buf_size - i] != last)
-		{
-		    strip = false;
-		    break;
-		}
-	    }
-	    if (strip)
-	    {
-		bytes -= last;
-	    }
-	}
+        unsigned char last = this->outbuf[this->buf_size - 1];
+        if (last <= this->buf_size)
+        {
+            bool strip = true;
+            for (unsigned int i = 1; i <= last; ++i)
+            {
+                if (this->outbuf[this->buf_size - i] != last)
+                {
+                    strip = false;
+                    break;
+                }
+            }
+            if (strip)
+            {
+                bytes -= last;
+            }
+        }
     }
     this->offset = 0;
     getNext()->write(this->outbuf, bytes);

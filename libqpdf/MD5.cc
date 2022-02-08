@@ -66,28 +66,28 @@ void MD5::encodeFile(char const *filename, qpdf_offset_t up_to_offset)
     }
     do
     {
-	if ((up_to_offset >= 0) && ((so_far + to_try) > up_to_size))
-	{
-	    to_try = up_to_size - so_far;
-	}
-	len = fread(buffer, 1, to_try, file);
-	if (len > 0)
-	{
-	    encodeDataIncrementally(buffer, len);
-	    so_far += len;
-	    if ((up_to_offset >= 0) && (so_far >= up_to_size))
-	    {
-		break;
-	    }
-	}
+        if ((up_to_offset >= 0) && ((so_far + to_try) > up_to_size))
+        {
+            to_try = up_to_size - so_far;
+        }
+        len = fread(buffer, 1, to_try, file);
+        if (len > 0)
+        {
+            encodeDataIncrementally(buffer, len);
+            so_far += len;
+            if ((up_to_offset >= 0) && (so_far >= up_to_size))
+            {
+                break;
+            }
+        }
     } while (len > 0);
     if (ferror(file))
     {
-	// Assume, perhaps incorrectly, that errno was set by the
-	// underlying call to read....
-	(void) fclose(file);
-	QUtil::throw_system_error(
-	    std::string("MD5: read error on ") + filename);
+        // Assume, perhaps incorrectly, that errno was set by the
+        // underlying call to read....
+        (void) fclose(file);
+        QUtil::throw_system_error(
+            std::string("MD5: read error on ") + filename);
     }
     (void) fclose(file);
 
@@ -108,7 +108,7 @@ void MD5::print()
     unsigned int i;
     for (i = 0; i < 16; ++i)
     {
-	printf("%02x", digest_val[i]);
+        printf("%02x", digest_val[i]);
     }
     printf("\n");
 }
@@ -140,7 +140,7 @@ MD5::getFileChecksum(char const* filename, qpdf_offset_t up_to_offset)
 
 bool
 MD5::checkDataChecksum(char const* const checksum,
-		       char const* buf, size_t len)
+                       char const* buf, size_t len)
 {
     std::string actual_checksum = getDataChecksum(buf, len);
     return (checksum == actual_checksum);
@@ -148,17 +148,17 @@ MD5::checkDataChecksum(char const* const checksum,
 
 bool
 MD5::checkFileChecksum(char const* const checksum,
-		       char const* filename, qpdf_offset_t up_to_offset)
+                       char const* filename, qpdf_offset_t up_to_offset)
 {
     bool result = false;
     try
     {
-	std::string actual_checksum = getFileChecksum(filename, up_to_offset);
-	result = (checksum == actual_checksum);
+        std::string actual_checksum = getFileChecksum(filename, up_to_offset);
+        result = (checksum == actual_checksum);
     }
     catch (std::runtime_error const&)
     {
-	// Ignore -- return false
+        // Ignore -- return false
     }
     return result;
 }

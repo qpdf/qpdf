@@ -11,9 +11,9 @@ int main(int argc, char* argv[])
 {
     if (argc != 4)
     {
-	std::cerr << "Usage: runlength {-encode|-decode} infile outfile"
+        std::cerr << "Usage: runlength {-encode|-decode} infile outfile"
                   << std::endl;
-	exit(2);
+        exit(2);
     }
 
     bool encode = (strcmp("-encode", argv[1]) == 0);
@@ -30,15 +30,15 @@ int main(int argc, char* argv[])
         (encode ? Pl_RunLength::a_encode : Pl_RunLength::a_decode));
     while (! done)
     {
-	size_t len = fread(buf, 1, sizeof(buf), infile);
-	if (len <= 0)
-	{
-	    done = true;
-	}
-	else
-	{
-	    rl.write(buf, len);
-	}
+        size_t len = fread(buf, 1, sizeof(buf), infile);
+        if (len <= 0)
+        {
+            done = true;
+        }
+        else
+        {
+            rl.write(buf, len);
+        }
     }
     rl.finish();
     fclose(infile);

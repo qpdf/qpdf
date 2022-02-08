@@ -92,7 +92,7 @@ SF_FlateLzwDecode::setDecodeParms(QPDFObjectHandle decode_parms)
 
     if ((this->predictor > 1) && (this->columns == 0))
     {
-	filterable = false;
+        filterable = false;
     }
 
     return filterable;

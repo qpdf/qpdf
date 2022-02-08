@@ -23,7 +23,7 @@ static char const* whoami = 0;
 void usage()
 {
     std::cerr << "Usage: " << whoami << " infile outfile" << std::endl
-	      << "Applies token filters to infile and writes outfile"
+              << "Applies token filters to infile and writes outfile"
               << std::endl;
     exit(2);
 }
@@ -195,20 +195,20 @@ int main(int argc, char* argv[])
     // For libtool's sake....
     if (strncmp(whoami, "lt-", 3) == 0)
     {
-	whoami += 3;
+        whoami += 3;
     }
 
     if (argc != 3)
     {
-	usage();
+        usage();
     }
     char const* infilename = argv[1];
     char const* outfilename = argv[2];
 
     try
     {
-	QPDF pdf;
-	pdf.processFile(infilename);
+        QPDF pdf;
+        pdf.processFile(infilename);
         std::vector<QPDFPageObjectHelper> pages =
             QPDFPageDocumentHelper(pdf).getAllPages();
         for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
@@ -233,8 +233,8 @@ int main(int argc, char* argv[])
     }
     catch (std::exception& e)
     {
-	std::cerr << whoami << ": " << e.what() << std::endl;
-	exit(2);
+        std::cerr << whoami << ": " << e.what() << std::endl;
+        exit(2);
     }
 
     return 0;

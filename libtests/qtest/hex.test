@@ -10,13 +10,13 @@ require TestDriver;
 my $td = new TestDriver('hex');
 
 $td->runtest("decode",
-	     {$td->COMMAND => "hex < hex.in"},
-	     {$td->FILE => "binary.out",
-	      $td->EXIT_STATUS => 0});
+             {$td->COMMAND => "hex < hex.in"},
+             {$td->FILE => "binary.out",
+              $td->EXIT_STATUS => 0});
 
 $td->runtest("partial decode",
-	     {$td->COMMAND => "echo '7a65726F203D203>' | hex"},
-	     {$td->STRING => "zero = 0",
-	      $td->EXIT_STATUS => 0});
+             {$td->COMMAND => "echo '7a65726F203D203>' | hex"},
+             {$td->STRING => "zero = 0",
+              $td->EXIT_STATUS => 0});
 
 $td->report(2);

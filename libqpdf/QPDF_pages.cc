@@ -86,7 +86,7 @@ QPDF::getAllPages()
             getRoot().replaceKey("/Pages", pages);
         }
         seen.clear();
-	getAllPagesInternal(pages, this->m->all_pages, visited, seen);
+        getAllPagesInternal(pages, this->m->all_pages, visited, seen);
     }
     return this->m->all_pages;
 }
@@ -110,10 +110,10 @@ QPDF::getAllPagesInternal(QPDFObjectHandle cur_node,
     if (cur_node.hasKey("/Kids"))
     {
         wanted_type = "/Pages";
-	QPDFObjectHandle kids = cur_node.getKey("/Kids");
-	int n = kids.getArrayNItems();
-	for (int i = 0; i < n; ++i)
-	{
+        QPDFObjectHandle kids = cur_node.getKey("/Kids");
+        int n = kids.getArrayNItems();
+        for (int i = 0; i < n; ++i)
+        {
             QPDFObjectHandle kid = kids.getArrayItem(i);
             if (! kid.isIndirect())
             {
@@ -129,14 +129,14 @@ QPDF::getAllPagesInternal(QPDFObjectHandle cur_node,
                 kid = makeIndirectObject(QPDFObjectHandle(kid).shallowCopy());
                 kids.setArrayItem(i, kid);
             }
-	    getAllPagesInternal(kid, result, visited, seen);
-	}
+            getAllPagesInternal(kid, result, visited, seen);
+        }
     }
     else
     {
         wanted_type = "/Page";
         seen.insert(this_og);
-	result.push_back(cur_node);
+        result.push_back(cur_node);
     }
 
     if (! cur_node.isDictionaryOfType(wanted_type))

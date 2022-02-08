@@ -8,8 +8,8 @@ require TestDriver;
 my $td = new TestDriver('sparse array');
 
 $td->runtest("sparse_array",
-	     {$td->COMMAND => "sparse_array"},
-	     {$td->STRING => "sparse array tests done\n",
+             {$td->COMMAND => "sparse_array"},
+             {$td->STRING => "sparse array tests done\n",
                   $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 

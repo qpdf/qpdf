@@ -56,21 +56,21 @@ Pl_TIFFPredictor::write(unsigned char* data, size_t len)
     size_t offset = 0;
     while (len >= left)
     {
-	// finish off current row
-	memcpy(this->cur_row.get() + this->pos, data + offset, left);
-	offset += left;
-	len -= left;
+        // finish off current row
+        memcpy(this->cur_row.get() + this->pos, data + offset, left);
+        offset += left;
+        len -= left;
 
-	processRow();
+        processRow();
 
-	// Prepare for next row
-	memset(this->cur_row.get(), 0, this->bytes_per_row);
-	left = this->bytes_per_row;
-	this->pos = 0;
+        // Prepare for next row
+        memset(this->cur_row.get(), 0, this->bytes_per_row);
+        left = this->bytes_per_row;
+        this->pos = 0;
     }
     if (len)
     {
-	memcpy(this->cur_row.get() + this->pos, data + offset, len);
+        memcpy(this->cur_row.get() + this->pos, data + offset, len);
     }
     this->pos += len;
 }
@@ -116,8 +116,8 @@ Pl_TIFFPredictor::finish()
 {
     if (this->pos)
     {
-	// write partial row
-	processRow();
+        // write partial row
+        processRow();
     }
     this->pos = 0;
     memset(this->cur_row.get(), 0, this->bytes_per_row);

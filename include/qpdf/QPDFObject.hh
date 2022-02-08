@@ -76,16 +76,16 @@ class QPDF_DLL_CLASS QPDFObject
     // Accessor to give specific access to non-public methods
     class ObjAccessor
     {
-	friend class QPDF;
-	friend class QPDFObjectHandle;
+        friend class QPDF;
+        friend class QPDFObjectHandle;
       private:
-	static void releaseResolved(QPDFObject* o)
-	{
-	    if (o)
-	    {
-		o->releaseResolved();
-	    }
-	}
+        static void releaseResolved(QPDFObject* o)
+        {
+            if (o)
+            {
+                o->releaseResolved();
+            }
+        }
     };
     friend class ObjAccessor;
 
