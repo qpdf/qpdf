@@ -12,7 +12,7 @@ For a detailed list of changes, please see the file
     The next major release of qpdf will replace ``PointerHolder`` with
     ``std::shared_ptr`` across all of qpdf's public API. No action is
     required at this time, but if you'd like to prepare, read the
-    comments :file:`include/qpdf/PointerHolder.hh` and see
+    comments in :file:`include/qpdf/PointerHolder.hh` and see
     :ref:`smart-pointers` for details on what you can do now to create
     code that will continue to work with older versions of qpdf and be
     easier to switch over to qpdf 11 when it comes out.
@@ -139,7 +139,7 @@ For a detailed list of changes, please see the file
       ``const`` argv array.
 
     - ``QPDF::emptyPDF`` has been exposed to the C API as
-      ``qpdf_empty_pdf``. This makes it possible to create PDF from
+      ``qpdf_empty_pdf``. This makes it possible to create a PDF from
       scratch with the C API.
 
     - New C API functions ``qpdf_oh_get_binary_utf8_value`` and

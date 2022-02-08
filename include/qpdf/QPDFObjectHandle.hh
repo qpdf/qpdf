@@ -149,7 +149,7 @@ class QPDFObjectHandle
     // representation of the token. For a string, this means that
     // there are no delimiters, and for a name, it means that all
     // escaping (# followed by two hex digits) has been resolved.
-    // qpdf's internal representation of name includes the leading
+    // qpdf's internal representation of a name includes the leading
     // slash. As such, you can't write the value of token.getValue()
     // directly to output that is supposed to be valid PDF syntax. If
     // you want to do that, you need to call writeToken() instead, or
@@ -163,8 +163,8 @@ class QPDFObjectHandle
     // writeToken(). Example:
     // writeToken(QPDFTokenizer::Token(QPDFTokenizer::tt_name, "/text/plain"))
     // would write `/text#2fplain`, and
-    // writeToken(QPDFTokenizer::Token(QPDFTokenizer::tt_string, "a\\(b"))
-    // would write `(a\(b)`
+    // writeToken(QPDFTokenizer::Token(QPDFTokenizer::tt_string, "a\\(b)")
+    // would write `(a\(b)`.
     class QPDF_DLL_CLASS TokenFilter
     {
       public:
@@ -531,7 +531,7 @@ class QPDFObjectHandle
     // PDF name is a sequence of bytes, excluding the NUL character,
     // and starting with a slash. Name objects as represented in the
     // PDF specification can contain characters escaped with #, but
-    // such escaping is not of concern calling QPDFObjectHandle
+    // such escaping is not of concern when calling QPDFObjectHandle
     // methods not directly relating to parsing. For example,
     // newName("/text/plain").getName() and
     // parse("/text#2fplain").getName() both return "/text/plain",
@@ -955,7 +955,7 @@ class QPDFObjectHandle
     QPDF_DLL
     QPDF* getOwningQPDF();
 
-    // Create a shallow of an object as a direct object, but do not
+    // Create a shallow copy of an object as a direct object, but do not
     // traverse across indirect object boundaries. That means that,
     // for dictionaries and arrays, any keys or items that were
     // indirect objects will still be indirect objects that point to
