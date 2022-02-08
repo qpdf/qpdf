@@ -50,6 +50,12 @@ doc-dist: build_manual
 	else \
 	    mkdir -p $(DOC_DEST); \
 	fi
-	cp -r $(DOC_OUT)/html $(DOC_DEST)
-	cp -r $(DOC_OUT)/singlehtml $(DOC_DEST)
-	cp $(PDF_TARGET) $(DOC_DEST)/qpdf-manual.pdf
+	if [ -d $(DOC_OUT)/html ]; then \
+	    cp -r $(DOC_OUT)/html $(DOC_DEST); \
+	fi
+	if [ -d $(DOC_OUT)/singlehtml ]; then \
+	    cp -r $(DOC_OUT)/singlehtml $(DOC_DEST); \
+	fi
+	if [ -f $(PDF_TARGET) ]; then \
+	    cp $(PDF_TARGET) $(DOC_DEST)/qpdf-manual.pdf; \
+	fi
