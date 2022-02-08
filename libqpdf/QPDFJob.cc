@@ -2047,6 +2047,7 @@ QPDFJob::doProcessOnce(
     {
         fn(pdf.get(), password);
     }
+    this->m->max_input_version.updateIfGreater(pdf->getVersionAsPDFVersion());
     return pdf;
 }
 
@@ -3472,6 +3473,7 @@ QPDFJob::setWriterOptions(QPDF& pdf, QPDFWriter& w)
     {
         w.setObjectStreamMode(m->object_stream_mode);
     }
+    w.setMinimumPDFVersion(this->m->max_input_version);
     if (! m->min_version.empty())
     {
         std::string version;

@@ -42,11 +42,11 @@
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFObjGen.hh>
 #include <qpdf/QPDFXRefEntry.hh>
-
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/PointerHolder.hh>
 #include <qpdf/Pipeline.hh>
 #include <qpdf/Buffer.hh>
+#include <qpdf/PDFVersion.hh>
 
 class QPDF;
 class Pl_Count;
@@ -265,6 +265,8 @@ class QPDFWriter
     // streams are used.
     QPDF_DLL
     void setMinimumPDFVersion(std::string const&, int extension_level = 0);
+    QPDF_DLL
+    void setMinimumPDFVersion(PDFVersion const&);
 
     // Force the PDF version of the output file to be a given version.
     // Use of this function may create PDF files that will not work

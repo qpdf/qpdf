@@ -297,6 +297,15 @@ QPDFWriter::setMinimumPDFVersion(std::string const& version,
 }
 
 void
+QPDFWriter::setMinimumPDFVersion(PDFVersion const& v)
+{
+    std::string version;
+    int extension_level;
+    v.getVersion(version, extension_level);
+    setMinimumPDFVersion(version, extension_level);
+}
+
+void
 QPDFWriter::forcePDFVersion(std::string const& version,
                             int extension_level)
 {

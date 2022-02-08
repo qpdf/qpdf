@@ -1,10 +1,21 @@
 2022-02-08  Jay Berkenbilt  <ejb@ql.org>
 
+	* Bug fix: when splitting pages with --split-pages or selecting
+	pages with --pages, set the output PDF version to the maximum of
+	all the input PDF versions. This is a fix to QPDFJob. If you are
+	creating output PDF files yourself from multiple inputs, you will
+	need to code the same thing. The new PDFVersion object, its
+	updateIfGreater() method, and the new QPDF and QPDFWriter methods
+	described below make this very easy to do. Fixes #610.
+
 	* Add new class PDFVersion for more convenient comparison of PDF
 	version numbers from the %!PDF header.
 
 	* Add QPDF::getVersionAsPDFVersion() to return the PDF version and
 	extension together as a PDFVersion object instead of a string.
+
+	* Add a QPDFWriter::setMinimumPDFVersion() that takes a PDFVersion
+	object.
 
 2022-02-06  Jay Berkenbilt  <ejb@ql.org>
 

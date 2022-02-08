@@ -148,6 +148,14 @@ For a detailed list of changes, please see the file
       embedded NUL characters. Thanks to M. Holger for the
       contribution.
 
+    - New ``PDFVersion`` class for representing a PDF version number
+      with the ability to compare and order PDF versions. Methods
+      ``QPDF::getVersionAsPDFVersion`` and a new version of
+      ``QPDFWriter::setMinimumPDFVersion`` use it. This makes it
+      easier to create an output file whose PDF version is the maximum
+      of the versions across all the input files that contributed to
+      it.
+
     - The ``JSON`` object in the qpdf library has been enhanced to
       include a parser and the ability to get values out of the
       ``JSON`` object. Previously it was a write-only interface. Even
@@ -180,6 +188,10 @@ For a detailed list of changes, please see the file
 
     - Some characters were not correctly translated from PDF doc
       encoding to Unicode.
+
+    - When splitting or combining pages, ensure that all output files
+      have a PDF version greater than or equal to the maximum version
+      of all the input files.
 
 10.5.0: December 21, 2021
   - Packaging changes

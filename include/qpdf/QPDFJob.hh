@@ -26,6 +26,7 @@
 #include <qpdf/Constants.h>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
+#include <qpdf/PDFVersion.hh>
 
 #include <memory>
 #include <string>
@@ -587,6 +588,7 @@ class QPDFJob
         int flatten_annotations_required;
         int flatten_annotations_forbidden;
         bool generate_appearances;
+        PDFVersion max_input_version;
         std::string min_version;
         std::string force_version;
         bool show_npages;
