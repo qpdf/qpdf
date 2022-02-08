@@ -654,7 +654,10 @@ extern "C" {
     /* Wrappers around QPDFObjectHandle methods. Be sure to read
      * corresponding comments in QPDFObjectHandle.hh to understand
      * what each function does and what kinds of objects it applies
-     * to.
+     * to. Note that names are to appear in a canonicalized form
+     * starting with a leading slash and with all PDF escaping
+     * resolved. See comments for getName() in QPDFObjectHandle.hh for
+     * details.
      */
 
     QPDF_DLL
@@ -790,6 +793,12 @@ extern "C" {
     QPDF_DLL
     qpdf_oh qpdf_oh_get_array_item(qpdf_data qpdf, qpdf_oh oh, int n);
 
+    /* In all dictionary APIs, keys are specified/represented as
+     * canonicalized name strings starting with / and with all PDF
+     * escaping resolved. See comments for getName() in
+     * QPDFObjectHandle for details.
+     */
+
     /* "C"-specific dictionary key iteration */
 
     /* Iteration is allowed on only one dictionary at a time. */
@@ -813,7 +822,8 @@ extern "C" {
     QPDF_DLL
     qpdf_oh qpdf_oh_get_key(qpdf_data qpdf, qpdf_oh oh, char const* key);
     QPDF_DLL
-    qpdf_oh qpdf_oh_get_key_if_dict(qpdf_data qpdf, qpdf_oh oh, char const* key);
+    qpdf_oh qpdf_oh_get_key_if_dict(
+        qpdf_data qpdf, qpdf_oh oh, char const* key);
 
     QPDF_DLL
     QPDF_BOOL qpdf_oh_is_or_has_name(

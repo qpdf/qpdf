@@ -145,18 +145,26 @@ class QPDFObjectHandle
     // TokenFilters.
     //
     // Please note that when you call token.getValue() on a token of
-    // type tt_string, you get the string value without any
-    // delimiters. token.getRawValue() will return something suitable
-    // for being written to output, or calling writeToken with a
-    // string token will also work. The correct way to construct a
-    // string token that would write the literal value (str) is
-    // QPDFTokenizer::Token(QPDFTokenizer::tt_string, "str"). A
-    // similar situation exists with tt_name. token.getValue() returns
-    // a normalized name with # codes resolved into characters, and
-    // may not be suitable for writing. You can pass it to
-    // QPDF_Name::normalizeName first, or you can use writeToken with
-    // a name token. The correct way to create a name token is
-    // QPDFTokenizer::Token(QPDFTokenizer::tt_name, "/Name").
+    // type tt_string or tt_name, you get the canonical, "parsed"
+    // representation of the token. For a string, this means that
+    // there are no delimiters, and for a name, it means that all
+    // escaping (# followed by two hex digits) has been resolved.
+    // qpdf's internal representation of name includes the leading
+    // slash. As such, you can't write the value of token.getValue()
+    // directly to output that is supposed to be valid PDF syntax. If
+    // you want to do that, you need to call writeToken() instead, or
+    // you can retrieve the token as it appeared in the input with
+    // token.getRawValue(). To construct a new string or name token
+    // from a canonical representation, use
+    // QPDFTokenizer::Token(QPDFTokenizer::tt_string, "parsed-str") or
+    // QPDFTokenizer::Token(QPDFTokenizer::tt_name,
+    // "/Canonical-Name"). Tokens created this way won't have a
+    // PDF-syntax raw value, but you can still write them with
+    // writeToken(). Example:
+    // writeToken(QPDFTokenizer::Token(QPDFTokenizer::tt_name, "/text/plain"))
+    // would write `/text#2fplain`, and
+    // writeToken(QPDFTokenizer::Token(QPDFTokenizer::tt_string, "a\\(b"))
+    // would write `(a\(b)`
     class QPDF_DLL_CLASS TokenFilter
     {
       public:
@@ -519,6 +527,22 @@ class QPDFObjectHandle
     QPDF_DLL
     static QPDFObjectHandle newReal(double value, int decimal_places,
                                     bool trim_trailing_zeroes);
+    // Note about name objects: qpdf's internal representation of a
+    // PDF name is a sequence of bytes, excluding the NUL character,
+    // and starting with a slash. Name objects as represented in the
+    // PDF specification can contain characters escaped with #, but
+    // such escaping is not of concern calling QPDFObjectHandle
+    // methods not directly relating to parsing. For example,
+    // newName("/text/plain").getName() and
+    // parse("/text#2fplain").getName() both return "/text/plain",
+    // while newName("/text/plain").unparse() and
+    // parse("/text#2fplain").unparse() both return "/text#2fplain".
+    // When working with the qpdf API for creating, retrieving, and
+    // modifying objects, you want to work with the internal,
+    // canonical representation. For names containing alphanumeric
+    // characters, dashes, and underscores, there is no difference
+    // between the two representations. For a lengthy discussion, see
+    // https://github.com/qpdf/qpdf/discussions/625.
     QPDF_DLL
     static QPDFObjectHandle newName(std::string const& name);
     QPDF_DLL
@@ -719,7 +743,9 @@ class QPDFObjectHandle
     QPDF_DLL
     bool getValueAsNumber(double&);
 
-    // Methods for name objects; see also name and array objects
+    // Methods for name objects. The returned name value is in qpdf's
+    // canonical form with all escaping resolved. See comments for
+    // newName() for details.
     QPDF_DLL
     std::string getName();
     QPDF_DLL
@@ -789,7 +815,10 @@ class QPDFObjectHandle
     QPDF_DLL
     Matrix getArrayAsMatrix();
 
-    // Methods for dictionary objects.
+    // Methods for dictionary objects. In all dictionary methods, keys
+    // are specified/represented as canonical name strings starting
+    // with a leading slash and not containing any PDF syntax
+    // escaping. See comments for getName() for details.
 
     // Return an object that enables iteration over members. You can
     // do
@@ -824,7 +853,9 @@ class QPDFObjectHandle
     QPDF_DLL
     std::map<std::string, QPDFObjectHandle> getDictAsMap();
 
-    // Methods for name and array objects
+    // Methods for name and array objects. The name value is in qpdf's
+    // canonical form with all escaping resolved. See comments for
+    // newName() for details.
     QPDF_DLL
     bool isOrHasName(std::string const&);
 
@@ -1237,8 +1268,8 @@ class QPDFObjectHandle
 
     // Return encoded as JSON. For most object types, there is an
     // obvious mapping. The JSON is generated as follows:
-    // * Names are encoded as strings representing the normalized value of
-    //   getName()
+    // * Names are encoded as strings representing the normalized name
+    //   in PDF syntax as returned by unparse()
     // * Indirect references are encoded as strings containing "obj gen R"
     // * Strings are encoded as UTF-8 strings with unrepresentable binary
     //   characters encoded as \uHHHH
