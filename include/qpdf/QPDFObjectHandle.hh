@@ -163,7 +163,7 @@ class QPDFObjectHandle
     // writeToken(). Example:
     // writeToken(QPDFTokenizer::Token(QPDFTokenizer::tt_name, "/text/plain"))
     // would write `/text#2fplain`, and
-    // writeToken(QPDFTokenizer::Token(QPDFTokenizer::tt_string, "a\\(b)")
+    // writeToken(QPDFTokenizer::Token(QPDFTokenizer::tt_string, "a\\(b"))
     // would write `(a\(b)`.
     class QPDF_DLL_CLASS TokenFilter
     {
