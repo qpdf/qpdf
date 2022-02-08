@@ -21,6 +21,7 @@ BINS_libtests = \
 	md5 \
 	nntree \
 	numrange \
+	pdf_version \
 	pointer_holder \
 	predictors \
 	qintc \

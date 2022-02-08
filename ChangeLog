@@ -1,3 +1,8 @@
+2022-02-08  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add new class PDFVersion for more convenient comparison of PDF
+	version numbers from the %!PDF header.
+
 2022-02-06  Jay Berkenbilt  <ejb@ql.org>
 
 	* Pl_Buffer and QPDFWriter: add getBufferSharedPointer(), which

@@ -42,6 +42,7 @@ SRCS_libqpdf = \
 	libqpdf/MD5.cc \
 	libqpdf/NNTree.cc \
 	libqpdf/OffsetInputSource.cc \
+	libqpdf/PDFVersion.cc \
 	libqpdf/Pipeline.cc \
 	libqpdf/Pl_AES_PDF.cc \
 	libqpdf/Pl_ASCII85Decoder.cc \
