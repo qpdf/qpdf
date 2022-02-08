@@ -444,15 +444,17 @@ class QPDFJob
 
     // Basic file processing
     std::shared_ptr<QPDF> processFile(
-        char const* filename, char const* password);
+        char const* filename, char const* password,
+        bool used_for_input);
     std::shared_ptr<QPDF> processInputSource(
-        PointerHolder<InputSource> is, char const* password);
+        PointerHolder<InputSource> is, char const* password,
+        bool used_for_input);
     std::shared_ptr<QPDF> doProcess(
         std::function<void(QPDF*, char const*)> fn,
-        char const* password, bool empty);
+        char const* password, bool empty, bool used_for_input);
     std::shared_ptr<QPDF> doProcessOnce(
         std::function<void(QPDF*, char const*)> fn,
-        char const* password, bool empty);
+        char const* password, bool empty, bool used_for_input);
 
     // Transformations
     void setQPDFOptions(QPDF& pdf);
