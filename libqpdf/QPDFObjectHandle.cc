@@ -3406,7 +3406,7 @@ QPDFObjectHandle::isPagesObject()
 bool
 QPDFObjectHandle::isFormXObject()
 {
-    return isStreamOfType("/XObject", "/Form");
+    return isStreamOfType("", "/Form");
 }
 
 bool
