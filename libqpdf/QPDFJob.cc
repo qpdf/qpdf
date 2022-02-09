@@ -2743,13 +2743,7 @@ QPDFJob::shouldRemoveUnreferencedResources(QPDF& pdf)
                 for (auto const& k: xobject.getKeys())
                 {
                     QPDFObjectHandle xobj = xobject.getKey(k);
-                    if (xobj.isStream() &&
-                        xobj.getDict().getKey("/Type").isName() &&
-                        ("/XObject" ==
-                         xobj.getDict().getKey("/Type").getName()) &&
-                        xobj.getDict().getKey("/Subtype").isName() &&
-                        ("/Form" ==
-                         xobj.getDict().getKey("/Subtype").getName()))
+                    if (xobj.isFormXObject())
                     {
                         queue.push_back(xobj);
                     }
