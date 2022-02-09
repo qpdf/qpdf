@@ -2492,6 +2492,10 @@ QUtil::pdf_doc_to_utf8(std::string const& val)
         {
             ch_short = pdf_doc_low_to_unicode[ch - 24];
         }
+        else if (ch == 173)
+        {
+            ch_short = 0xfffd;
+        }
         result += QUtil::toUTF8(ch_short);
     }
     return result;

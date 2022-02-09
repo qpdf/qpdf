@@ -418,10 +418,10 @@ void transcoding_test()
     print_alternatives(utf8);
     print_alternatives("quack");
     std::cout << "done alternatives" << std::endl;
-    std::string low = QUtil::pdf_doc_to_utf8(
-        "w\030w\031w\032w\033w\034w\035w\036w\037w\177w");
-    std::cout << low << std::endl;
-    std::cout << "done low characters" << std::endl;
+    std::string other = QUtil::pdf_doc_to_utf8(
+        "w\030w\031w\032w\033w\034w\035w\036w\037w\177w\255w");
+    std::cout << other << std::endl;
+    std::cout << "done other characters" << std::endl;
 }
 
 void print_whoami(char const* str)

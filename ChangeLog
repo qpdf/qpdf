@@ -1,6 +1,11 @@
-2022-02-08  Jay Berkenbilt  <ejb@ql.org>
+2022-02-09  Jay Berkenbilt  <ejb@ql.org>
 
 	* 10.6.0: release
+
+	* Fix one more PDF doc encoding omission: 0xAD is also undefined.
+	Fixes #637.
+
+2022-02-08  Jay Berkenbilt  <ejb@ql.org>
 
 	* Bug fix: when splitting pages with --split-pages or selecting
 	pages with --pages, set the output PDF version to the maximum of
