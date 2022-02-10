@@ -5,11 +5,14 @@
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFOutlineDocumentHelper.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/QIntC.hh>
 #include <qpdf/QTC.hh>
 
 // This program demonstrates extraction of bookmarks using the qpdf
 // outlines API. Note that all the information shown by this program
 // can also be obtained from a PDF file using qpdf's --json option.
+//
+// Ignore calls to QTC::TC - they are for qpdf CI testing only.
 
 static char const* whoami = 0;
 static enum { st_none, st_numbers, st_lines } style = st_none;
@@ -51,13 +54,10 @@ void print_lines(std::vector<int>& numbers)
 void generate_page_map(QPDF& qpdf)
 {
     QPDFPageDocumentHelper dh(qpdf);
-    std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
     int n = 0;
-    for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-         iter != pages.end(); ++iter)
+    for (auto const& page : dh.getAllPages())
     {
-        QPDFObjectHandle oh = (*iter).getObjectHandle();
-        page_map[oh.getObjGen()] = ++n;
+        page_map[page.getObjectHandle().getObjGen()] = ++n;
     }
 }
 
@@ -73,10 +73,9 @@ void show_bookmark_details(QPDFOutlineObjectHelper outline,
 
       case st_numbers:
         QTC::TC("examples", "pdf-bookmarks numbers");
-        for (std::vector<int>::iterator iter = numbers.begin();
-             iter != numbers.end(); ++iter)
+        for (auto const& number : numbers)
         {
-            std::cout << *iter << ".";
+            std::cout << number << ".";
         }
         std::cout << " ";
         break;
@@ -138,20 +137,18 @@ void show_bookmark_details(QPDFOutlineObjectHelper outline,
 void extract_bookmarks(std::vector<QPDFOutlineObjectHelper> outlines,
                        std::vector<int>& numbers)
 {
-    numbers.push_back(0);
-    for (std::vector<QPDFOutlineObjectHelper>::iterator iter = outlines.begin();
-         iter != outlines.end(); ++iter)
+    // For style == st_numbers, numbers.at(n) contains the numerical
+    // label for the outline, so we count up from 1.
+    // For style == st_lines, numbers.at(n) == 0 indicates the last
+    // outline at level n, and we don't otherwise care what the value
+    // is, so we count up to zero.
+    numbers.push_back(
+        (style == st_lines) ? -QIntC::to_int(outlines.size()) : 0);
+    for (auto& outline : outlines)
     {
         ++(numbers.back());
-        show_bookmark_details(*iter, numbers);
-        std::vector<QPDFOutlineObjectHelper>::iterator next = iter;
-        ++next;
-        bool has_next = (next != outlines.end());
-        if ((style == st_lines) && (! has_next))
-        {
-            numbers.back() = 0;
-        }
-        extract_bookmarks((*iter).getKids(), numbers);
+        show_bookmark_details(outline, numbers);
+        extract_bookmarks(outline.getKids(), numbers);
     }
     numbers.pop_back();
 }
