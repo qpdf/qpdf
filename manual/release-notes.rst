@@ -6,6 +6,9 @@ Release Notes
 For a detailed list of changes, please see the file
 :file:`ChangeLog` in the source distribution.
 
+10.6.1: February 11, 2022
+  - Fix compilation errors on some platforms
+
 10.6.0: February 9, 2022
   - Preparation for replacement of ``PointerHolder``
 
