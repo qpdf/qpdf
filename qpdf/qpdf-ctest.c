@@ -714,7 +714,7 @@ static void test25(char const* infile,
     double d = 0.0;
     assert(qpdf_oh_get_value_as_number(qpdf, p_bool, &d) == QPDF_FALSE);
     assert((qpdf_oh_get_value_as_number(qpdf, p_int, &d) == QPDF_TRUE) &&
-            (((d - 1.0) * (d - 1.0)) < 1e-100));
+           ((d - 1.0) < 1e-6) && ((d - 1.0) > -1e-6));
     assert(qpdf_oh_get_type_code(qpdf, p_int) == ot_integer);
     assert(strcmp(qpdf_oh_get_type_name(qpdf, p_int), "integer") == 0);
     assert(qpdf_oh_is_real(qpdf, p_real) &&

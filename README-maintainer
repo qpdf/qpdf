@@ -98,6 +98,11 @@ CODING RULES
 * Avoid atoi. Use QUtil::string_to_int instead. It does
   overflow/underflow checking.
 
+* Avoid certain functions that tend to be macros or create compilation
+  errors on some platforms. Known cases: strcasecmp, abs. Avoid min
+  and max. If needed, std::min and std::max are okay to use in C++
+  code with <algorithm> included.
+
 * Remember to avoid using `operator[]` with `std::string` or
   `std::vector`. Instead, use `at()`. See README-hardening.md for
   details.
