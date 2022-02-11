@@ -31,6 +31,7 @@
 #include <assert.h>
 #include <limits.h>
 #include <map>
+#include <math.h>
 
 static char const* whoami = 0;
 
