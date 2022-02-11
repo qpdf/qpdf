@@ -30,8 +30,8 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <limits.h>
-#include <math.h>
 #include <map>
+#include <cmath>
 
 static char const* whoami = 0;
 
@@ -3294,11 +3294,11 @@ static void test_85(QPDF& pdf, char const* arg2)
     assert(s == "42.0");
     double num = 0.0;
     assert(oh_i.getValueAsNumber(num));
-    assert(fabs(num - 1.0) < 1e-100);
+    assert(std::abs(num - 1.0) < 1e-100);
     assert(oh_r.getValueAsNumber(num));
-    assert(fabs(num - 42.0) < 1e-100);
+    assert(std::abs(num - 42.0) < 1e-100);
     assert(! oh_b.getValueAsNumber(num));
-    assert(fabs(num - 42.0) < 1e-100);
+    assert(std::abs(num - 42.0) < 1e-100);
     s = "";
     assert(oh_n.getValueAsName(s));
     assert(s == "/Test") ;
