@@ -1,5 +1,9 @@
 2022-02-15  Jay Berkenbilt  <ejb@ql.org>
 
+	* When analyzing PDF strings, recognize UTF-16LE as UTF-16. The
+	PDF spec only allows UTF-16BE, but most readers seem to allow
+	both. Fixes #649.
+
 	* Bug fix: 10.6.0 inadvertently removed an unknown/undocumented
 	CLI parsing feature, which has been restored in 10.6.2. Fixes #652.
 

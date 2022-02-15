@@ -267,8 +267,11 @@ namespace QUtil
     QPDF_DLL
     std::string toUTF16(unsigned long uval);
 
-    // Test whether this is a UTF-16 big-endian string. This is
-    // indicated by first two bytes being 0xFE 0xFF.
+    // Test whether this is a UTF-16 string. This is indicated by
+    // first two bytes being 0xFE 0xFF (big-endian) or 0xFF 0xFE
+    // (little-endian). Starting in qpdf 10.6.2, this detects
+    // little-endian as well as big-endian. Even though the PDF spec
+    // doesn't allow little-endian, most readers seem to accept it.
     QPDF_DLL
     bool is_utf16(std::string const&);
 
@@ -309,8 +312,8 @@ namespace QUtil
     bool utf8_to_pdf_doc(
         std::string const& utf8, std::string& pdfdoc, char unknown_char = '?');
 
-    // Convert a UTF-16 big-endian encoded string to UTF-8.
-    // Unrepresentable code points are converted to U+FFFD.
+    // Convert a UTF-16 encoded string to UTF-8. Unrepresentable code
+    // points are converted to U+FFFD.
     QPDF_DLL
     std::string utf16_to_utf8(std::string const& utf16);
 
@@ -331,7 +334,9 @@ namespace QUtil
     // help us guess. If there are no characters with the high bit
     // set, has_8bit_chars is false, and the other values are also
     // false, even though ASCII strings are valid UTF-8. is_valid_utf8
-    // means that the string is non-trivially valid UTF-8.
+    // means that the string is non-trivially valid UTF-8. Although
+    // the PDF spec requires UTF-16 to be UTF-16BE, qpdf (and just
+    // about everything else) accepts UTF-16LE (as of 10.6.2).
     QPDF_DLL
     void analyze_encoding(std::string const& str,
                           bool& has_8bit_chars,

@@ -303,6 +303,7 @@ void to_utf16_test()
     std::string s(QUtil::utf8_to_utf16("\xcf\x80"));
     std::cout << QUtil::utf16_to_utf8(s) << std::endl;
     std::cout << QUtil::utf16_to_utf8(s + ".") << std::endl;
+    std::cout << "LE: " << QUtil::utf16_to_utf8("\xff\xfe\xc0\x03") << std::endl;
 }
 
 void utf8_to_ascii_test()
@@ -388,7 +389,8 @@ void transcoding_test()
     check_analyze("pi = \317\200", true, true, false);
     check_analyze("pi != \317", true, false, false);
     check_analyze("pi != 22/7", false, false, false);
-    check_analyze(std::string("\xfe\xff\00\x51", 4), true, false, true);
+    check_analyze(std::string("\xfe\xff\x00\x51", 4), true, false, true);
+    check_analyze(std::string("\xff\xfe\x51\x00", 4), true, false, true);
     std::cout << "analysis done" << std::endl;
     std::string input1("a\302\277b");
     std::string input2("a\317\200b");

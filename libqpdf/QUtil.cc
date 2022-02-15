@@ -2400,7 +2400,8 @@ bool
 QUtil::is_utf16(std::string const& val)
 {
     return ((val.length() >= 2) &&
-            (val.at(0) == '\xfe') && (val.at(1) == '\xff'));
+            (((val.at(0) == '\xfe') && (val.at(1) == '\xff')) ||
+             ((val.at(0) == '\xff') && (val.at(1) == '\xfe'))));
 }
 
 std::string
@@ -2414,8 +2415,13 @@ QUtil::utf16_to_utf8(std::string const& val)
     unsigned long codepoint = 0L;
     size_t len = val.length();
     size_t start = 0;
+    bool is_le = false;
     if (is_utf16(val))
     {
+        if (static_cast<unsigned char>(val.at(0)) == 0xff)
+        {
+            is_le = true;
+        }
         start += 2;
     }
     // If the string has an odd number of bytes, the last byte is
@@ -2428,10 +2434,12 @@ QUtil::utf16_to_utf8(std::string const& val)
         // codepoint not followed by a low codepoint will be
         // discarded, and a low codepoint not preceded by a high
         // codepoint will just get its low 10 bits output.
+        auto msb = is_le ? i+1 : i;
+        auto lsb = is_le ? i : i+1;
         unsigned short bits =
             QIntC::to_ushort(
-                (static_cast<unsigned char>(val.at(i)) << 8) +
-                static_cast<unsigned char>(val.at(i+1)));
+                (static_cast<unsigned char>(val.at(msb)) << 8) +
+                static_cast<unsigned char>(val.at(lsb)));
         if ((bits & 0xFC00) == 0xD800)
         {
             codepoint = 0x10000U + ((bits & 0x3FFU) << 10U);

@@ -73,7 +73,7 @@ flush_tiff_cache();
 show_ntests();
 # ----------
 $td->notify("--- Character Encoding ---");
-$n_tests += 3;
+$n_tests += 4;
 
 $td->runtest("PDF doc encoding to Unicode",
              {$td->COMMAND => "test_pdf_doc_encoding pdf-doc-to-utf8.in"},
@@ -86,6 +86,13 @@ $td->runtest("UTF-16 encoding",
 $td->runtest("UTF-16 encoding errors",
              {$td->COMMAND => "test_pdf_unicode unicode-errors.in"},
              {$td->FILE => "unicode-errors.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+# UTF-16LE is not allowed by the PDF spec, but it seems that most
+# readers accept it.
+$td->runtest("UTF-16LE strings",
+             {$td->COMMAND => "qpdf --list-attachments --verbose utf16le.pdf"},
+             {$td->FILE => "utf16le-attachments.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 # Tests to exercise QPDFArgParser belong in arg_parser.test in
