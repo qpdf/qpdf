@@ -54,7 +54,7 @@ jobs:
           name: distribution
           path: distribution
   Windows:
-    runs-on: windows-latest
+    runs-on: windows-2019
     needs: Prebuild
     strategy:
       fail-fast: false
