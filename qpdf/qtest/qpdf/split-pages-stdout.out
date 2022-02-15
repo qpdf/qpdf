@@ -2,8 +2,8 @@
 qpdf: --split-pages may not be used when writing to standard output
 
 For help:
-  qpdf--help=usage       usage information
-  qpdf--help=topic       help on a topic
-  qpdf--help=--option    help on an option
-  qpdf--help             general help and a topic list
+  qpdf --help=usage       usage information
+  qpdf --help=topic       help on a topic
+  qpdf --help=--option    help on an option
+  qpdf --help             general help and a topic list
 

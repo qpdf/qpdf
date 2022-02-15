@@ -3,8 +3,8 @@ qpdf: error with job-json file bad-json-choice-mismatch.json: .objectStreams: un
 Run qpdf--job-json-help for information on the file format.
 
 For help:
-  qpdf--help=usage       usage information
-  qpdf--help=topic       help on a topic
-  qpdf--help=--option    help on an option
-  qpdf--help             general help and a topic list
+  qpdf --help=usage       usage information
+  qpdf --help=topic       help on a topic
+  qpdf --help=--option    help on an option
+  qpdf --help             general help and a topic list
 
