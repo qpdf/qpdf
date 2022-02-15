@@ -6,6 +6,18 @@ Release Notes
 For a detailed list of changes, please see the file
 :file:`ChangeLog` in the source distribution.
 
+10.6.2: February XXX, 2022
+  - Bug fixes:
+
+    - Recognize strings encoded as UTF-16LE as Unicode. The PDF spec
+      only allows UTF-16BE, but most readers accept UTF16-LE as well.
+
+    - Fix a regression in command-line argument parsing to restore a
+      previously undocumented behavior that some people were relying
+      on.
+
+    - Fix one more problem with mapping Unicode to PDF doc encoding
+
 10.6.1: February 11, 2022
   - Fix compilation errors on some platforms
 
