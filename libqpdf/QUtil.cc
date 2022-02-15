@@ -2272,6 +2272,16 @@ transcode_utf8(std::string const& utf8_val, std::string& result,
             {
                 result += QUtil::toUTF16(QIntC::to_ulong(ch));
             }
+            else if ((encoding == e_pdfdoc) &&
+                     (((ch >= 0x18) && (ch <= 0x1f)) || (ch == 127)))
+            {
+                // PDFDocEncoding maps some low characters to Unicode,
+                // so if we encounter those invalid UTF-8 code points,
+                // map them to unknown so reversing the mapping
+                // doesn't change them into other characters.
+                okay = false;
+                result.append(1, unknown);
+            }
             else
             {
                 result.append(1, ch);
@@ -2280,6 +2290,13 @@ transcode_utf8(std::string const& utf8_val, std::string& result,
         else if (encoding == e_utf16)
         {
             result += QUtil::toUTF16(codepoint);
+        }
+        else if ((codepoint == 0xad) && (encoding == e_pdfdoc))
+        {
+            // PDFDocEncoding omits 0x00ad (soft hyphen), but rather
+            // than treating it as undefined, map it to a regular
+            // hyphen.
+            result.append(1, '-');
         }
         else if ((codepoint > 160) && (codepoint < 256) &&
                  ((encoding == e_winansi) || (encoding == e_pdfdoc)))

@@ -1,3 +1,9 @@
+2022-02-15  Jay Berkenbilt  <ejb@ql.org>
+
+	* Don't map 0x18 through 0x1f, 0x7f, 0x9f, or 0xad as fixed points
+	when transcoding UTF-8 to PDFDoc. These codepoints have different
+	meanings in those two encoding systems. Fixes #650.
+
 2022-02-11  Jay Berkenbilt  <ejb@ql.org>
 
 	* 10.6.1: release

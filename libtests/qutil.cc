@@ -418,9 +418,16 @@ void transcoding_test()
     print_alternatives(utf8);
     print_alternatives("quack");
     std::cout << "done alternatives" << std::endl;
-    std::string other = QUtil::pdf_doc_to_utf8(
-        "w\030w\031w\032w\033w\034w\035w\036w\037w\177w\255w");
-    std::cout << other << std::endl;
+    // These are characters are either valid in PDFDoc and invalid in
+    // UTF-8 or the other way around.
+    std::string other("w\x18w\x19w\x1aw\x1bw\x1cw\x1dw\x1ew\x1fw\x7fw");
+    std::string other_doc = other + "\x9fw\xadw";
+    std::cout << QUtil::pdf_doc_to_utf8(other_doc) << std::endl;
+    std::string other_utf8 =
+        other + QUtil::toUTF8(0x9f) + "w" + QUtil::toUTF8(0xad) + "w";
+    std::string other_to_utf8;
+    assert(! QUtil::utf8_to_pdf_doc(other_utf8, other_to_utf8));
+    std::cout << other_to_utf8 << std::endl;
     std::cout << "done other characters" << std::endl;
 }
 
