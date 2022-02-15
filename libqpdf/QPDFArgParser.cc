@@ -554,8 +554,7 @@ QPDFArgParser::parseArgs()
         bool have_parameter = false;
         std::string o_arg(arg);
         std::string arg_s(arg);
-        if ((strcmp(arg, "--") == 0) &&
-            (this->m->option_table != &this->m->main_option_table))
+        if (strcmp(arg, "--") == 0)
         {
             // Special case for -- option, which is used to break out
             // of subparsers.

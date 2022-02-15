@@ -149,7 +149,7 @@ foreach my $c (@completion_tests)
 show_ntests();
 # ----------
 $td->notify("--- Argument Parsing ---");
-$n_tests += 12;
+$n_tests += 13;
 
 $td->runtest("required argument",
              {$td->COMMAND => "qpdf --password minimal.pdf"},
@@ -210,6 +210,14 @@ $td->runtest("duplicated pages password",
              {$td->COMMAND => "qpdf --pages . --password=z --password=z --"},
              {$td->REGEXP => ".*password already specified.*",
                   $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+# Ignoring -- at the top level was never intended but turned out to
+# have been there for a long time so that people relied on it. It is
+# intentionally not documented.
+$td->runtest("ignore -- at top level",
+             {$td->COMMAND => "qpdf -- --check -- minimal.pdf --"},
+             {$td->REGEXP => ".*No syntax or stream encoding errors found.*",
+                  $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 show_ntests();

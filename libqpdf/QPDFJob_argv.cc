@@ -67,6 +67,11 @@ ArgParser::initOptionTables()
     this->ap.addFinalCheck([this](){c_main->checkConfiguration();});
     // add_help is defined in auto_job_help.hh
     add_help(this->ap);
+    // Special case: ignore -- at the top level. This undocumented
+    // behavior is for backward compatibility; it was unintentionally
+    // the case prior to 10.6, and some users were relying on it.
+    this->ap.selectMainOptionTable();
+    this->ap.addBare("--", [](){});
 }
 
 void

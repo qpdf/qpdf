@@ -1,5 +1,8 @@
 2022-02-15  Jay Berkenbilt  <ejb@ql.org>
 
+	* Bug fix: 10.6.0 inadvertently removed an unknown/undocumented
+	CLI parsing feature, which has been restored in 10.6.2. Fixes #652.
+
 	* Don't map 0x18 through 0x1f, 0x7f, 0x9f, or 0xad as fixed points
 	when transcoding UTF-8 to PDFDoc. These codepoints have different
 	meanings in those two encoding systems. Fixes #650.
