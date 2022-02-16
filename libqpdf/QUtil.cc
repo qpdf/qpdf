@@ -2293,10 +2293,9 @@ transcode_utf8(std::string const& utf8_val, std::string& result,
         }
         else if ((codepoint == 0xad) && (encoding == e_pdfdoc))
         {
-            // PDFDocEncoding omits 0x00ad (soft hyphen), but rather
-            // than treating it as undefined, map it to a regular
-            // hyphen.
-            result.append(1, '-');
+            // PDFDocEncoding omits 0x00ad (soft hyphen).
+            okay = false;
+            result.append(1, unknown);
         }
         else if ((codepoint > 160) && (codepoint < 256) &&
                  ((encoding == e_winansi) || (encoding == e_pdfdoc)))

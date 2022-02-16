@@ -3335,14 +3335,14 @@ static void test_86(QPDF& pdf, char const* arg2)
     std::string utf16_val("\xfe\xff\x00\x1f", 4);
     std::string result;
     assert(QUtil::utf8_to_ascii(utf8_val, result, '?'));
-    assert(result == "\x1f");
+    assert(result == utf8_val);
     assert(! QUtil::utf8_to_pdf_doc(utf8_val, result, '?'));
     assert(result == "?");
     assert(QUtil::utf8_to_utf16(utf8_val) == utf16_val);
     assert(QUtil::utf16_to_utf8(utf16_val) == utf8_val);
-    auto h = QPDFObjectHandle::newUnicodeString("\x1f");
-    assert(h.getStringValue() == std::string("\xfe\xff\x00\x1f", 4));
-    assert(h.getUTF8Value() == "\x1f");
+    auto h = QPDFObjectHandle::newUnicodeString(utf8_val);
+    assert(h.getStringValue() == utf16_val);
+    assert(h.getUTF8Value() == utf8_val);
 }
 
 void runtest(int n, char const* filename1, char const* arg2)
