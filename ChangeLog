@@ -1,5 +1,10 @@
 2022-02-15  Jay Berkenbilt  <ejb@ql.org>
 
+	* Fix asymmetrical logic between
+	QPDFObjectHandle::newUnicodeString() and
+	QPDFObjectHandle::getUTF8Val(). The asymmetrical logic didn't
+	matter before fixing the PDF Doc transcoding bugs.
+
 	* When analyzing PDF strings, recognize UTF-16LE as UTF-16. The
 	PDF spec only allows UTF-16BE, but most readers seem to allow
 	both. Fixes #649.

@@ -32,8 +32,7 @@ QPDF_String*
 QPDF_String::new_utf16(std::string const& utf8_val)
 {
     std::string result;
-    if (! (QUtil::utf8_to_ascii(utf8_val, result, '?') ||
-           QUtil::utf8_to_pdf_doc(utf8_val, result, '?')))
+    if (! QUtil::utf8_to_pdf_doc(utf8_val, result, '?'))
     {
         result = QUtil::utf8_to_utf16(utf8_val);
     }

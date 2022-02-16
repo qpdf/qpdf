@@ -3325,11 +3325,33 @@ static void test_85(QPDF& pdf, char const* arg2)
     assert(s == "/Test");
 }
 
+static void test_86(QPDF& pdf, char const* arg2)
+{
+    // Test symmetry between newUnicodeString and getUTF8Value for
+    // strings that can't be encoded as PDFDoc but don't contain any
+    // high code points.
+
+    std::string utf8_val("\x1f");
+    std::string utf16_val("\xfe\xff\x00\x1f", 4);
+    std::string result;
+    assert(QUtil::utf8_to_ascii(utf8_val, result, '?'));
+    assert(result == "\x1f");
+    assert(! QUtil::utf8_to_pdf_doc(utf8_val, result, '?'));
+    assert(result == "?");
+    assert(QUtil::utf8_to_utf16(utf8_val) == utf16_val);
+    assert(QUtil::utf16_to_utf8(utf16_val) == utf8_val);
+    auto h = QPDFObjectHandle::newUnicodeString("\x1f");
+    assert(h.getStringValue() == std::string("\xfe\xff\x00\x1f", 4));
+    assert(h.getUTF8Value() == "\x1f");
+}
+
 void runtest(int n, char const* filename1, char const* arg2)
 {
     // Most tests here are crafted to work on specific files.  Look at
     // the test suite to see how the test is invoked to find the file
     // that the test is supposed to operate on.
+
+    std::set<int> ignore_filename = {61, 81, 83, 84, 85, 86};
 
     if (n == 0)
     {
@@ -3391,7 +3413,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         pdf.processMemoryFile((std::string(filename1) + ".pdf").c_str(),
                               p, size);
     }
-    else if ((n == 61) || (n == 81) || (n == 83) || (n == 84) || (n == 85))
+    else if (ignore_filename.count(n))
     {
         // Ignore filename argument entirely
     }
@@ -3439,7 +3461,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         {72, test_72}, {73, test_73}, {74, test_74}, {75, test_75},
         {76, test_76}, {77, test_77}, {78, test_78}, {79, test_79},
         {80, test_80}, {81, test_81}, {82, test_82}, {83, test_83},
-        {84, test_84}, {85, test_85},
+        {84, test_84}, {85, test_85}, {86, test_86},
     };
 
     auto fn = test_functions.find(n);
