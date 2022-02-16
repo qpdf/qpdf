@@ -6,7 +6,7 @@ Release Notes
 For a detailed list of changes, please see the file
 :file:`ChangeLog` in the source distribution.
 
-10.6.2: February XXX, 2022
+10.6.2: February 16, 2022
   - Bug fixes:
 
     - Recognize strings encoded as UTF-16LE as Unicode. The PDF spec

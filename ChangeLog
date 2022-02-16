@@ -1,3 +1,7 @@
+2022-02-16  Jay Berkenbilt  <ejb@ql.org>
+
+	* 10.6.2: release
+
 2022-02-15  Jay Berkenbilt  <ejb@ql.org>
 
 	* Fix asymmetrical logic between
