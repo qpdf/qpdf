@@ -41,6 +41,8 @@ class PDFVersion
     QPDF_DLL
     PDFVersion(PDFVersion const&) = default;
     QPDF_DLL
+    PDFVersion& operator=(PDFVersion const&) = default;
+    QPDF_DLL
     PDFVersion(int major, int minor, int extension = 0);
     QPDF_DLL
     bool operator<(PDFVersion const& rhs) const;
