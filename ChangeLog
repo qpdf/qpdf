@@ -13,7 +13,7 @@
 	CLI parsing feature, which has been restored in 10.6.2. Fixes #652.
 
 	* Don't map 0x18 through 0x1f, 0x7f, 0x9f, or 0xad as fixed points
-	when transcoding UTF-8 to PDFDoc. These codepoints have different
+	when transcoding UTF-8 to PDFDoc. These code points have different
 	meanings in those two encoding systems. Fixes #650.
 
 2022-02-11  Jay Berkenbilt  <ejb@ql.org>
