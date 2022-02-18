@@ -1,3 +1,9 @@
+2022-02-18  Jay Berkenbilt  <ejb@ql.org>
+
+	* Bug fix: when generating appearance streams, the font size was
+	substituted incorrectly from /DA if Tf was absent or the number
+	preceding Tf was out of range. Fixes #655.
+
 2022-02-16  Jay Berkenbilt  <ejb@ql.org>
 
 	* 10.6.2: release

@@ -798,19 +798,19 @@ class TfFinder: public QPDFObjectHandle::TokenFilter
 
   private:
     double tf;
-    size_t tf_idx;
+    int tf_idx;
     std::string font_name;
     double last_num;
-    size_t last_num_idx;
+    int last_num_idx;
     std::string last_name;
     std::vector<std::string> DA;
 };
 
 TfFinder::TfFinder() :
     tf(11.0),
-    tf_idx(0),
+    tf_idx(-1),
     last_num(0.0),
-    last_num_idx(0)
+    last_num_idx(-1)
 {
 }
 
@@ -825,7 +825,7 @@ TfFinder::handleToken(QPDFTokenizer::Token const& token)
       case QPDFTokenizer::tt_integer:
       case QPDFTokenizer::tt_real:
         last_num = strtod(value.c_str(), 0);
-        last_num_idx = DA.size() - 1;
+        last_num_idx = QIntC::to_int(DA.size() - 1);
         break;
 
       case QPDFTokenizer::tt_name:
@@ -833,16 +833,17 @@ TfFinder::handleToken(QPDFTokenizer::Token const& token)
         break;
 
       case QPDFTokenizer::tt_word:
-        if ((value == "Tf") &&
-            (last_num > 1.0) &&
-            (last_num < 1000.0))
+        if (value == "Tf")
         {
-            // These ranges are arbitrary but keep us from doing
-            // insane things or suffering from over/underflow
-            tf = last_num;
+            if ((last_num > 1.0) && (last_num < 1000.0))
+            {
+                // These ranges are arbitrary but keep us from doing
+                // insane things or suffering from over/underflow
+                tf = last_num;
+            }
+            tf_idx = last_num_idx;
+            font_name = last_name;
         }
-        tf_idx = last_num_idx;
-        font_name = last_name;
         break;
 
       default:
@@ -864,7 +865,7 @@ TfFinder::getDA()
     for (size_t i = 0; i < n; ++i)
     {
         std::string cur = this->DA.at(i);
-        if (i == tf_idx)
+        if (QIntC::to_int(i) == tf_idx)
         {
             double delta = strtod(cur.c_str(), 0) - this->tf;
             if ((delta > 0.001) || (delta < -0.001))

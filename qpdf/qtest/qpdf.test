@@ -563,11 +563,12 @@ $td->runtest("compare files",
 show_ntests();
 # ----------
 $td->notify("--- Appearance Streams ---");
-$n_tests += 10;
+$n_tests += 12;
 
 foreach my $f ('need-appearances',
                'need-appearances-more',
-               'need-appearances-more2')
+               'need-appearances-more2',
+               'need-appearances-more3')
 {
     $td->runtest("generate appearances and flatten ($f)",
                  {$td->COMMAND =>
