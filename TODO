@@ -6,6 +6,7 @@ Priorities (could be for 10.x)
 * json v2
 
 Priorities for 11:
+* cmake
 * PointerHolder -> shared_ptr
 * ABI
 
