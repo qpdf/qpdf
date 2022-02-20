@@ -11,7 +11,8 @@
 // This example attaches a file to an input file, adds a page to the
 // beginning of the file that includes a file attachment annotation,
 // and writes the result to an output file. It also illustrates a
-// number of new API calls that were added in qpdf 10.2.
+// number of new API calls that were added in qpdf 10.2 as well as
+// the use of the qpdf literal syntax introduced in qpdf 10.6.
 //
 
 static char const* whoami = 0;
@@ -24,8 +25,8 @@ static void usage(std::string const& msg)
               << " --infile infile.pdf" << std::endl
               << " --outfile outfile.pdf" << std::endl
               << " --attachment attachment" << std::endl
-              << " [ --password infile-password ]" << std::endl
-              << " [ --mimetype attachment mime type ]" << std::endl;
+              << " [--password infile-password]" << std::endl
+              << " [--mimetype attachment mime type]" << std::endl;
     exit(2);
 }
 
@@ -90,9 +91,16 @@ static void process(char const* infilename, char const* password,
         "0 0 20 20 re\n"
         "S\n");
     auto apdict = ap.getDict();
-    apdict.replaceKey("/Resources", QPDFObjectHandle::newDictionary());
-    apdict.replaceKey("/Type", QPDFObjectHandle::newName("/XObject"));
-    apdict.replaceKey("/Subtype", QPDFObjectHandle::newName("/Form"));
+
+    // The following four lines demonstrate the use of the qpdf literal syntax
+    // introduced in qpdf 10.6. They could have been written as:
+    // apdict.replaceKey("/Resources", QPDFObjectHandle::newDictionary());
+    // apdict.replaceKey("/Type", QPDFObjectHandle::newName("/XObject"));
+    // apdict.replaceKey("/Subtype", QPDFObjectHandle::newName("/Form"));
+    // apdict.replaceKey("/BBox", QPDFObjectHandle::parse("[ 0 0 20 20 ]"));
+    apdict.replaceKey("/Resources", "<< >>"_qpdf"");
+    apdict.replaceKey("/Type", "/XObject"_qpdf);
+    apdict.replaceKey("/Subtype", "/Form"_qpdf);
     apdict.replaceKey("/BBox", "[ 0 0 20 20 ]"_qpdf);
     auto annot = q.makeIndirectObject(
         QPDFObjectHandle::parse(
