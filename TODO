@@ -10,6 +10,14 @@ Priorities for 11:
 * PointerHolder -> shared_ptr
 * ABI
 
+Misc
+* Get rid of "ugly switch statements" in QUtil.cc -- replace with
+  static map initializers. (Search for "ugly switch statements" below
+  as well.)
+* Consider exposing get_next_utf8_codepoint in QUtil
+* Add QUtil::is_explicit_utf8 that does what QPDF_String::getUTF8Val
+  does to detect UTF-8 encoded strings per PDF 2.0 spec.
+
 Soon: Break ground on "Document-level work"
 
 Code Formatting

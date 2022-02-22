@@ -183,6 +183,15 @@ QPDF_String::getUTF8Val() const
     {
         return QUtil::utf16_to_utf8(this->val);
     }
+    else if ((val.length() >= 3) &&
+             (val[0] == '\xEF') &&
+             (val[1] == '\xBB') &&
+             (val[2] == '\xBF'))
+    {
+        // PDF 2.0 allows UTF-8 strings when explicitly prefixed with
+        // the above bytes, which is just UTF-8 encoding of U+FEFF.
+        return this->val.substr(3);
+    }
     else
     {
         return QUtil::pdf_doc_to_utf8(this->val);

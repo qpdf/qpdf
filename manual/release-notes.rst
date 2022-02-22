@@ -9,6 +9,9 @@ For a detailed list of changes, please see the file
 10.6.3: XXX
   - Bug fixes:
 
+    - Recognize strings explicitly encoded as UTF-8 as allowed by the
+      PDF 2.0 spec.
+
     - Fix edge cases with appearance stream generation for form fields
       whose ``/DA`` field lacks proper font size specification or that
       specifies auto sizing. At this time, qpdf does not support auto

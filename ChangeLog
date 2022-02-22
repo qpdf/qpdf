@@ -1,3 +1,8 @@
+2022-02-22  Jay Berkenbilt  <ejb@ql.org>
+
+	* Recognize PDF strings explicitly marked as UTF-8 as allowed by
+	the PDF 2.0 spec. Fixes #654.
+
 2022-02-18  Jay Berkenbilt  <ejb@ql.org>
 
 	* Bug fix: when generating appearance streams, the font size was
