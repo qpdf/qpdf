@@ -315,6 +315,10 @@ we might do about it.
   misc/character-encoding/ (not on github) and font metric information
   for the 14 standard fonts in my local pdf-spec directory.
 
+* Once we know about character widths, we can correctly support
+  auto-sized variable text fields (0 Tf). If this is fixed, search for
+  "auto-sized" in cli.rst.
+
 Fuzz Errors
 ===========
 

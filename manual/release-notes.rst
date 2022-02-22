@@ -6,6 +6,14 @@ Release Notes
 For a detailed list of changes, please see the file
 :file:`ChangeLog` in the source distribution.
 
+10.6.3: XXX
+  - Bug fixes:
+
+    - Fix edge cases with appearance stream generation for form fields
+      whose ``/DA`` field lacks proper font size specification or that
+      specifies auto sizing. At this time, qpdf does not support auto
+      sizing.
+
 10.6.2: February 16, 2022
   - Bug fixes:
 

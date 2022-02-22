@@ -1587,6 +1587,10 @@ Related Options
      :command:`qpdf` does not know enough about fonts and encodings to
      correctly represent characters that fall outside of this range.
 
+   - For variable text fields where the default appearance stream
+     specifies that the font should be auto-sized, a fixed font size
+     is used rather than calculating the font size.
+
    - Quadding is ignored. Quadding is used to specify whether the
      contents of a field should be left, center, or right aligned with
      the field.
