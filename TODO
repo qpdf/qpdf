@@ -1,3 +1,4 @@
+
 Next
 ====
 
@@ -9,6 +10,7 @@ Priorities for 11:
 * cmake
 * PointerHolder -> shared_ptr
 * ABI
+* --json default is latest
 
 Misc
 * Get rid of "ugly switch statements" in QUtil.cc -- replace with
@@ -17,6 +19,16 @@ Misc
 * Consider exposing get_next_utf8_codepoint in QUtil
 * Add QUtil::is_explicit_utf8 that does what QPDF_String::getUTF8Val
   does to detect UTF-8 encoded strings per PDF 2.0 spec.
+* Add an option --ignore-encryption to ignore encryption information
+  and treat encrypted files as if they weren't encrypted. This should
+  make it possible to solve #598 (--show-encryption without a
+  password). We'll need to make sure we don't try to filter any
+  streams in this mode. Ideally we should be able to combine this with
+  --json so we can look at the raw encrypted strings and streams if we
+  want to. Since providing the password may reveal additional details,
+  --show-encryption could potentially retry with this option if the
+  first time doesn't work. Then, with the file open, we can read the
+  encryption dictionary normally.
 
 Soon: Break ground on "Document-level work"
 
@@ -82,21 +94,17 @@ A .clang-format file can be created at the top of the repository.
 Output JSON v2
 ==============
 
-Output JSON v2 contain enough information to completely recreate a PDF
-file.
-
-This is not an ABI change as long as the default --json version is 1.
+Output JSON v2 will contain enough information to completely recreate
+a PDF file. In other words, qpdf will have full, bidirectional,
+lossless json serialization/deserialization of PDF.
 
 If this is done, update --json option in cli.rst to mention v2. Also
 update QPDFJob::Config::json and of course other parts of the docs
 (json.rst).
 
-Fix the following problems:
+You can't create a PDF from v1 json because
 
-* Include the PDF version header somewhere.
-
-* Using "n n R" as a key in "objects" and "objectinfo" messes up
-  searching for things
+* The PDF version header is not recorded
 
 * Strings cannot be unambiguously encoded/decoded
 
@@ -110,36 +118,83 @@ Fix the following problems:
 * You can't tell a stream from a dictionary except by looking in both
   "object" and "objectinfo". Fix this, and then remove "objectinfo".
 
-* There are differences between information shown in the json format
-  vs. information shown with options like --check, --list-attachments,
+Additionally, using "n n R" as a key in "objects" and "objectinfo"
+messes up searching for things.
+
+For json v2:
+
+* Make sure it is possible to serialize and deserializes a PDF to JSON
+  without loading the whole thing into memory. This is substantial. It
+  means we need sax-style parsing and handling so we can
+  handle/generate objects as we go. We'll have to be able to keep
+  track of keys for dictionary error checking. May want to add json to
+  large file tests.
+
+* Resolve differences between information shown in the json format vs.
+  information shown with options like --check, --list-attachments,
   etc. The json format should be able to completely replace things
-  that write to stdout.
+  that write to stdout. Be sure getAllPages() and other top-level
+  convenience routines are there so people don't need to parse the
+  pages tree themselves. For many workflows, it should be possible for
+  someone to work in the json file based on json metadata rather than
+  calling the QPDF API. (Of course, you still need the QPDF API for
+  higher level helper objects.)
 
 * Consider using camelCase in multi-word key names to be consistent
   with job JSON and with how JSON is often represented in languages
-  that use it more natively
+  that use it more natively.
 
 * Consider changing the contract to allow fields to be absent even
   when present in the schema. It's reasonable for people to check for
   presence of a key. Most languages make this easy to do.
 
+* If we allow --json to be mixed with --ignore-encryption, we must
+  emphasize that the resulting json can't be turned back into a valid
+  PDF.
+
 Most things that are informational can stay the same. We will have to
-go through every item to decide for sure.
+go through every item to decide for sure, especially when camelCase is
+taken into consideration.
 
-To address ambiguity, consider the following:
+New APIs:
 
-Whenever a direct PDF object appears, disambiguate things represented
-in JSON as strings as follows:
+QPDFObjectHandle::parseJSON(QPDF* context, JSON);
+QPDFObjectHandle::parseJSON(QPDF* context, std::string const&);
+operator ""_qpdf_json
+C API to create a QPDFObjectHandle from a json string
 
-* "/Name" -- if it starts with /, it's a name
-* "n n R" -- if it is "n n R", it's an indirect object
-* "u:utf8-encoded" -- a utf8-encoded string
-* "b:<12ab34>" -- a binary string
+JSON::parseFile
+QPDF::parseJSON(JSON) (like parseFile, etc. -- deserializes json)
+QPDF::updateFromJSON(JSON)
 
-In "objects", the key is "obj:o,g", and the value is a dictionary with
-exactly one of "value" or "stream" as its single key.
+CLI: --infile-is-json -- indicate that the input is a qpdf json file
+rather than a PDF file
+CLI: --update-from-json=file.json
 
-For non-streams, the value of "value" is as described above.
+Have a "qpdf" key in the output that contains "jsonVersion",
+"pdfVersion", and "objects". This replaces the "objects" field at the
+top level. "objects" and "objectinfo" disappear from the top-level.
+".version" and ".qpdf.jsonVersion" will match. The input to parseJSON
+and updateFromJSON will have to have the "qpdf" key in it. All other
+keys are ignored.
+
+When creating from a JSON file, the JSON must be complete with data
+for all streams, a trailer, and a pdfVersion. When updating from a
+JSON:
+
+* Any object whose value is null (not "value": null, but just null) is
+  deleted.
+* For any stream that appears without stream data, the stream data is
+  left alone.
+* Otherwise, the object from the JSON completely replaces the input
+  object. No dictionary merges or anything like that are performed.
+  It will call replaceObject.
+
+Within .qpdf.objects, the key is "obj:o,g" or "obj:trailer", and the
+value is a dictionary with exactly one of "value" or "stream" as its
+single key.
+
+For non-streams:
 
 {
   "obj:o,g": {
@@ -149,7 +204,6 @@ For non-streams, the value of "value" is as described above.
 
 For streams:
 
-{
   "obj:o,g": {
     "stream": {
       "dict": { ... stream dictionary ... },
@@ -160,27 +214,89 @@ For streams:
   }
 }
 
-Notes about stream data:
+Wherever a PDF object appears in the JSON output, including "value"
+and "stream"."dict" above as well as other places where they might
+appear, objects are represented as follows:
 
-* Always include "dict".
+* Arrays, dictionaries, booleans, nulls, integers, and real numbers
+  with no more than six decimal places are represented as their native
+  JSON type.
+* Real numbers with more than six decimal places are represented as
+  "r:{real-value}".
+* Names: "/Name" -- internal/canonical representation (e.g.
+  "/Text/Plain", not #xx quoted)
+* Indirect objects: "n n R"
+* Strings: one of
+  "s:json string treated as Unicode"
+  "b:json string treated as bytes; character > \u00ff is an error"
+  "e:base64-encoded bytes"
+
+Test cases: these are the same:
+* "b:\u00c8\u0080", "s:π", "s:\u03c0", and "e:z4A="
+* "b:\u00d8\u003e\u00dd\u0054", "s:🥔", "s:\ud83e\udd54", and "e:8J+llA=="
+
+When creating output from a string:
+* If the string is explicitly unicode (UTF-8 or UTF-16), encode as
+  "s:" without the leading U+FEFF
+* Else if the string can be bidirectionally mapped between pdf-doc and
+  unicode, transcode to unicode and encode as "s:"
+* Else if the string would be decoded as binary, encode as "e:"
+* Else encode as "b:"
+
+When reading a string, any string that doesn't follow the above rules
+is an error. This includes "r:" strings not paresable as a real
+number, "/Name" strings containing a NUL character, "s:" or "b:"
+strings that are not valid JSON strings, "b:" strings containing
+character values > 0xff, or "e:" values that are not valid base64.
+Once the string is read in, if the "s:" string can be bidirectionally
+mapped between pdf-doc and unicode, store as PDFDoc. Otherwise store
+as UTF-16BE. "b:" strings are stored as bytes, and "e:" are decoded
+and stored as bytes.
+
+Implementing this will require some refactoring of things between
+QUtil and QPDF_String, plus we will need to implement a base64
+encoder/decoder.
+
+This enables a workflow like this:
+
+* qpdf --json=latest infile.pdf > pdf.json
+* modify pdf.json
+* qpdf infile.pdf --update-from=pdf.json out.pdf
+
+or
+
+* qpdf --json=latest --json-stream-data=raw|filtered infile.pdf > pdf.json
+* modify pdf.json
+* qpdf pdf.json --infile-is-json out.pdf
+
+Notes about streams and stream data:
+
+* Always include "dict". "/Length" is removed from the stream
+  dictionary.
+
+* Add new flag --json-stream-data={raw,filtered,none}. At most one of
+  "raw" and "filtered" will appear for each stream. If "filtered"
+  appears, "/Filter" and "/DecodeParms" are removed from the stream
+  dictionary. This makes the stream data and dictionary match for when
+  the file is read back in.
 
 * Always include "filterable" regardless of value of
   --json-stream-data. The value of filterable is influenced by
   --decode-level, which is already in parameters.
 
-* Add new flag --json-stream-data={raw,filtered,none}. At most one of
-  "raw" and "filtered" will appear for each stream.
-
 * Add to parameters: value of json-stream-data, default is none
 
-* If none, omit stream data entirely
+* If --json-stream-data=none, omit stream data entirely
 
-* If raw, include raw stream data as base64
+* If --json-stream-data=raw, include raw stream data as base64. Show
+  the data even for unfiltered streams in "raw".
 
-* If filtered, including the base64-encoded filtered stream data if we
-  can and should decode it based on decode-level. Otherwise, include
-  the base64-encoded raw data. See if we can honor
-  --normalize-content.
+* If --json-stream-data=filtered, include the base64-encoded filtered
+  stream data if we can and should decode it based on decode-level.
+  Otherwise, include the base64-encoded raw data. See if we can honor
+  --normalize-content. If a stream appears unfiltered in the input,
+  still show it as filtered. Remove /DecodeParms and /Filter if
+  filtering.
 
 Note that --json-stream-data=filtered is different from
 --filtered-stream-data in that --filtered-stream-data implies
