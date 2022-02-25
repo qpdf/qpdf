@@ -103,7 +103,7 @@ QPDF is known to build and pass its test suite with mingw (latest version tested
 
 # Building Documentation
 
-The QPDF manual is written in reStructured Text format and is build with [sphinx](https://www.sphinx-doc.org). The sources to the user manual can be found in the `manual` directory. For more detailed information, consult the [Building and Installing QPDF section of the manual](manual/installation.rst) or consult the [build-doc script used in CI](build-scripts/build-doc).
+The QPDF manual is written in reStructured Text format and is build with [sphinx](https://www.sphinx-doc.org). The sources to the user manual can be found in the `manual` directory. For more detailed information, consult the [Building and Installing QPDF section of the manual](manual/installation.rst) or consult the [build-doc script](build-scripts/build-doc).
 
 # Additional Notes on Build
 

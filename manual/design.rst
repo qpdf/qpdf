@@ -375,9 +375,10 @@ packed together in some integer type. Also note that ``size_t`` and
 so sometimes an explicit cast may not be needed to avoid warnings on one
 platform but may be needed on another. A conversion with ``QIntC``
 should always be used when the types are different even if the
-underlying size is the same. QPDF's CI build builds on 32-bit and 64-bit
-platforms, and the test suite is very thorough, so it is hard to make
-any of the potential errors here without being caught in build or test.
+underlying size is the same. QPDF's automatic build builds on 32-bit
+and 64-bit platforms, and the test suite is very thorough, so it is
+hard to make any of the potential errors here without being caught in
+build or test.
 
 Non-const ``unsigned char*`` is used in the ``Pipeline`` interface. The
 pipeline interface has a ``write`` call that uses ``unsigned char*``
