@@ -1,3 +1,8 @@
+2022-02-25  Jay Berkenbilt  <ejb@ql.org>
+
+	* Bug fix in JSON parser: accept \/ in a string as valid input per
+	JSON spec even though we don't translate / to \/ on output.
+
 2022-02-22  Jay Berkenbilt  <ejb@ql.org>
 
 	* Recognize PDF strings explicitly marked as UTF-8 as allowed by

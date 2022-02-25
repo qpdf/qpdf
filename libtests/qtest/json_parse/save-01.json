@@ -12,6 +12,7 @@
     },
     null,
     true,
-    false
+    false,
+    "a\b\f\n\r\t\\\"/z"
   ]
 }

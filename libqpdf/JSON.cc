@@ -629,6 +629,9 @@ JSONParser::decode_string(std::string const& str)
             {
               case '\\':
               case '\"':
+              case '/':
+                // \/ is allowed in json input, but so is /, so we
+                // don't map / to \/ in output.
                 result.append(1, ch);
                 break;
               case 'b':
@@ -875,7 +878,7 @@ void JSONParser::getToken()
 
           case ls_backslash:
             /* cSpell: ignore bfnrt */
-            if (strchr("\\\"bfnrt", *p))
+            if (strchr("\\\"/bfnrt", *p))
             {
                 lex_state = ls_string;
             }
