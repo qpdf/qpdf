@@ -23,7 +23,12 @@
 #define PL_DCT_HH
 
 #include <qpdf/Pipeline.hh>
+
 #include <qpdf/Pl_Buffer.hh>
+#include <cstddef>
+
+// jpeglib.h must be included after cstddef or else it messes up the
+// definition of size_t.
 #include <jpeglib.h>
 
 class Pl_DCT: public Pipeline
