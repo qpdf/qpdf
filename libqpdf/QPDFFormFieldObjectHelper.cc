@@ -479,7 +479,7 @@ QPDFFormFieldObjectHelper::setRadioButtonValue(QPDFObjectHandle name)
                     AP = grandkid.getKey("/AP");
                     if (! AP.isNull())
                     {
-                        QTC::TC("qpdf", "QPDFFormFieldObjectHelper radio button grandkid widget");
+                        QTC::TC("qpdf", "QPDFFormFieldObjectHelper radio button grandkid");
                         annot = grandkid;
                         break;
                     }
