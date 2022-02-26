@@ -7,11 +7,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// See comments in bits.cc
+// See comments in bits_include.cc
 #define BITS_TESTING 1
 #define BITS_READ 1
 #define BITS_WRITE 1
-#include "../libqpdf/bits.icc"
+#include "../libqpdf/bits_include.cc"
 
 static void
 print_values(long long byte_offset, size_t bit_offset,

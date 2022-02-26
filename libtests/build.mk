@@ -38,8 +38,7 @@ $(TARGETS_libtests): $(TARGETS_libqpdf) $(TARGETS_qpdf)
 
 INCLUDES_libtests = include libqpdf
 
-TC_SRCS_libtests = $(wildcard libqpdf/*.cc) $(wildcard libtests/*.cc) \
-	libqpdf/bits.icc
+TC_SRCS_libtests = $(wildcard libqpdf/*.cc) $(wildcard libtests/*.cc)
 
 # -----
 
