@@ -182,15 +182,15 @@ void add_page(QPDFPageDocumentHelper& dh, QPDFObjectHandle font,
     size_t width = p->getWidth();
     size_t height = p->getHeight();
     QPDFObjectHandle image = QPDFObjectHandle::newStream(&pdf);
-    image.replaceDict("<<"
+    auto image_dict = "<<"
                       " /Type /XObject"
                       " /Subtype /Image"
                       " /BitsPerComponent 8"
-                      ">>"_qpdf);
-    QPDFObjectHandle image_dict = image.getDict();
+                      ">>"_qpdf;
     image_dict.replaceKey("/ColorSpace", newName(color_space));
     image_dict.replaceKey("/Width", newInteger(width));
     image_dict.replaceKey("/Height", newInteger(height));
+    image.replaceDict(image_dict);
 
     // Provide the stream data.
     image.replaceStreamData(provider,
@@ -211,21 +211,16 @@ void add_page(QPDFPageDocumentHelper& dh, QPDFObjectHandle font,
     resources.replaceKey("/Font", rfont);
     resources.replaceKey("/XObject", xobject);
 
-    QPDFObjectHandle mediabox = QPDFObjectHandle::newArray();
-    mediabox.appendItem(newInteger(0));
-    mediabox.appendItem(newInteger(0));
-    mediabox.appendItem(newInteger(612));
-    mediabox.appendItem(newInteger(392));
-
     // Create the page content stream
     QPDFObjectHandle contents = createPageContents(
         pdf, color_space + " with filter " + filter);
 
     // Create the page dictionary
     QPDFObjectHandle page = pdf.makeIndirectObject(
-        QPDFObjectHandle::newDictionary());
-    page.replaceKey("/Type", newName("/Page"));
-    page.replaceKey("/MediaBox", mediabox);
+        "<<"
+        " /Type /Page"
+        " /MediaBox [0 0 612 392]"
+        ">>"_qpdf);
     page.replaceKey("/Contents", contents);
     page.replaceKey("/Resources", resources);
 
@@ -257,20 +252,16 @@ static void check(char const* filename,
 
     QPDF pdf;
     pdf.processFile(filename);
-    QPDFPageDocumentHelper dh(pdf);
-    std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
+    auto pages = QPDFPageDocumentHelper(pdf).getAllPages();
     if (n_color_spaces * n_filters != pages.size())
     {
         throw std::logic_error("incorrect number of pages");
     }
     size_t pageno = 1;
     bool errors = false;
-    for (std::vector<QPDFPageObjectHelper>::iterator page_iter =
-             pages.begin();
-         page_iter != pages.end(); ++page_iter)
+    for (auto& page : pages)
     {
-        QPDFPageObjectHelper& page(*page_iter);
-        std::map<std::string, QPDFObjectHandle> images = page.getImages();
+        auto images = page.getImages();
         if (images.size() != 1)
         {
             throw std::logic_error("incorrect number of images on page");
@@ -279,8 +270,7 @@ static void check(char const* filename,
         // Check filter and color space.
         std::string desired_color_space =
             color_spaces[(pageno - 1) / n_color_spaces];
-        std::string desired_filter =
-            filters[(pageno - 1) % n_filters];
+        std::string desired_filter = filters[(pageno - 1) % n_filters];
         // In the default mode, QPDFWriter will compress with
         // /FlateDecode if no filters are provided.
         if (desired_filter == "null")
@@ -310,7 +300,7 @@ static void check(char const* filename,
         if (! this_errors)
         {
             // Check image data
-            PointerHolder<Buffer> actual_data =
+            auto actual_data =
                 image.getStreamData(qpdf_dl_all);
             ImageProvider* p = new ImageProvider(desired_color_space, "null");
             PointerHolder<QPDFObjectHandle::StreamDataProvider> provider(p);
@@ -399,13 +389,11 @@ static void create_pdf(char const* filename)
     filters.push_back("/DCTDecode");
     filters.push_back("/RunLengthDecode");
     QPDFPageDocumentHelper dh(pdf);
-    for (std::vector<std::string>::iterator c_iter = color_spaces.begin();
-         c_iter != color_spaces.end(); ++c_iter)
+    for (auto const& color_space : color_spaces)
     {
-        for (std::vector<std::string>::iterator f_iter = filters.begin();
-             f_iter != filters.end(); ++f_iter)
+        for (auto const& filter : filters)
         {
-            add_page(dh, font, *c_iter, *f_iter);
+            add_page(dh, font, color_space, filter);
         }
     }
 
