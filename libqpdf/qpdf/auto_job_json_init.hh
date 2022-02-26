@@ -3,6 +3,8 @@
 // Edits will be automatically overwritten if the build is
 // run in maintainer mode.
 //
+// clang-format off
+//
 static char const* yn_choices[] = {"y", "n", 0};
 static char const* password_mode_choices[] = {"bytes", "hex-bytes", "unicode", "auto", 0};
 static char const* stream_data_choices[] = {"compress", "preserve", "uncompress", 0};

@@ -3,5 +3,7 @@
 // Edits will be automatically overwritten if the build is
 // run in maintainer mode.
 //
+// clang-format off
+//
 QPDF_DLL CopyAttConfig* prefix(std::string const& parameter);
 QPDF_DLL CopyAttConfig* password(std::string const& parameter);

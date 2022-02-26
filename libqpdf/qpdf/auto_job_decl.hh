@@ -3,6 +3,8 @@
 // Edits will be automatically overwritten if the build is
 // run in maintainer mode.
 //
+// clang-format off
+//
 static constexpr char const* O_PAGES = "pages";
 static constexpr char const* O_ENCRYPTION = "encryption";
 static constexpr char const* O_40_BIT_ENCRYPTION = "40-bit encryption";

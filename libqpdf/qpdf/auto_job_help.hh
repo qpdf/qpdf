@@ -3,6 +3,8 @@
 // Edits will be automatically overwritten if the build is
 // run in maintainer mode.
 //
+// clang-format off
+//
 static void add_help_1(QPDFArgParser& ap)
 {
 ap.addHelpTopic("usage", "basic invocation", R"(Read a PDF file, apply transformations or modifications, and write

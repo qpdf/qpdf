@@ -3,6 +3,8 @@
 // Edits will be automatically overwritten if the build is
 // run in maintainer mode.
 //
+// clang-format off
+//
 QPDF_DLL EncConfig* extract(std::string const& parameter);
 QPDF_DLL EncConfig* annotate(std::string const& parameter);
 QPDF_DLL EncConfig* print(std::string const& parameter);

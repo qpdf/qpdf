@@ -3,6 +3,8 @@
 // Edits will be automatically overwritten if the build is
 // run in maintainer mode.
 //
+// clang-format off
+//
 QPDF_DLL AttConfig* replace();
 QPDF_DLL AttConfig* key(std::string const& parameter);
 QPDF_DLL AttConfig* filename(std::string const& parameter);

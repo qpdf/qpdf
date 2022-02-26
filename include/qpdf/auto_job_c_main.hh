@@ -3,6 +3,8 @@
 // Edits will be automatically overwritten if the build is
 // run in maintainer mode.
 //
+// clang-format off
+//
 QPDF_DLL Config* allowWeakCrypto();
 QPDF_DLL Config* check();
 QPDF_DLL Config* checkLinearization();

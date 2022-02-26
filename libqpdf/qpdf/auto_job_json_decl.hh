@@ -3,6 +3,8 @@
 // Edits will be automatically overwritten if the build is
 // run in maintainer mode.
 //
+// clang-format off
+//
 void setupInputFile();
 void setupPassword();
 void setupEmpty();
