@@ -22,8 +22,10 @@ WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operatio
 WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for dictionary attempted on object of type integer: returning null for attempted key retrieval
 WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for dictionary attempted on object of type integer: returning null for attempted key retrieval
 WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for inlineimage attempted on object of type integer: returning empty data
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for inlineimage attempted on object of type integer: returning empty data
 WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 362: operation for integer attempted on object of type dictionary: returning 0
 WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for name attempted on object of type integer: returning dummy name
+WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for operator attempted on object of type integer: returning fake value
 WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for operator attempted on object of type integer: returning fake value
 WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 362: operation for real attempted on object of type dictionary: returning 0.0
 WARNING: object-types-os.pdf object stream 1, object 7 0 at offset 429: operation for string attempted on object of type integer: returning empty string

@@ -22,8 +22,10 @@ WARNING: object-types.pdf, object 8 0 at offset 669: operation for dictionary at
 WARNING: object-types.pdf, object 8 0 at offset 669: operation for dictionary attempted on object of type integer: returning null for attempted key retrieval
 WARNING: object-types.pdf, object 8 0 at offset 669: operation for dictionary attempted on object of type integer: returning null for attempted key retrieval
 WARNING: object-types.pdf, object 8 0 at offset 669: operation for inlineimage attempted on object of type integer: returning empty data
+WARNING: object-types.pdf, object 8 0 at offset 669: operation for inlineimage attempted on object of type integer: returning empty data
 WARNING: object-types.pdf, object 8 0 at offset 687: operation for integer attempted on object of type dictionary: returning 0
 WARNING: object-types.pdf, object 8 0 at offset 669: operation for name attempted on object of type integer: returning dummy name
+WARNING: object-types.pdf, object 8 0 at offset 669: operation for operator attempted on object of type integer: returning fake value
 WARNING: object-types.pdf, object 8 0 at offset 669: operation for operator attempted on object of type integer: returning fake value
 WARNING: object-types.pdf, object 8 0 at offset 687: operation for real attempted on object of type dictionary: returning 0.0
 WARNING: object-types.pdf, object 8 0 at offset 669: operation for string attempted on object of type integer: returning empty string

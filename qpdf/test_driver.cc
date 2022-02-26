@@ -228,6 +228,7 @@ static void test_0_1(QPDF& pdf, char const* arg2)
     {
         QTC::TC("qpdf", "main QTest bool",
                 qtest.getBoolValue() ? 1 : 0);
+        assert(qtest.getBoolValue() == qtest.getBoolValue(false));
         std::cout << "/QTest is Boolean with value "
                   << (qtest.getBoolValue() ? "true" : "false")
                   << std::endl;
@@ -235,24 +236,36 @@ static void test_0_1(QPDF& pdf, char const* arg2)
     else if (qtest.isInteger())
     {
         QTC::TC("qpdf", "main QTest int");
+        assert(qtest.getIntValue() == qtest.getIntValue(0));
+        assert(qtest.getIntValueAsInt() == qtest.getIntValueAsInt(0));
+        if (qtest.getIntValue() >= 0)
+        {
+            assert(qtest.getUIntValue() == qtest.getUIntValue(0));
+            assert(qtest.getUIntValueAsUInt() == qtest.getUIntValueAsUInt(0));
+        }
         std::cout << "/QTest is an integer with value "
                   << qtest.getIntValue() << std::endl;
     }
     else if (qtest.isReal())
     {
         QTC::TC("qpdf", "main QTest real");
+        assert(qtest.getRealValue() == qtest.getRealValue("0.0"));
+        assert(qtest.getNumericValue() == qtest.getNumericValue(0.0));
         std::cout << "/QTest is a real number with value "
                   << qtest.getRealValue() << std::endl;
     }
     else if (qtest.isName())
     {
         QTC::TC("qpdf", "main QTest name");
+        assert(qtest.getName() == qtest.getName("/QPDFFakeName"));
         std::cout << "/QTest is a name with value "
                   << qtest.getName() << std::endl;
     }
     else if (qtest.isString())
     {
         QTC::TC("qpdf", "main QTest string");
+        assert(qtest.getStringValue() == qtest.getStringValue(""));
+        assert(qtest.getUTF8Value() == qtest.getUTF8Value(""));
         std::cout << "/QTest is a string with value "
                   << qtest.getStringValue() << std::endl;
     }
@@ -1579,9 +1592,11 @@ static void test_42(QPDF& pdf, char const* arg2)
     qtest.getKey("/Integer").getKeyIfDict("/Potato");
     qtest.getKey("/Integer").getKey("/Potato");
     assert(integer.getInlineImageValue().empty());
+    assert(integer.getInlineImageValue("42").empty());
     assert(0 == dictionary.getIntValue());
     assert("/QPDFFakeName" == integer.getName());
     assert("QPDFFAKE" == integer.getOperatorValue());
+    assert("QPDFFAKE" == integer.getOperatorValue(""));
     assert("0.0" == dictionary.getRealValue());
     assert(integer.getStringValue().empty());
     assert(integer.getUTF8Value().empty());
@@ -1620,6 +1635,19 @@ static void test_42(QPDF& pdf, char const* arg2)
     assert(! uninitialized.isInitialized());
     assert(! uninitialized.isInteger());
     assert(! uninitialized.isDictionary());
+    // Ensure specified default values are returned for null objects
+    assert(null.getBoolValue(true));
+    assert(null.getIntValue(1) == 1);
+    assert(null.getIntValueAsInt(1) == 1);
+    assert(null.getUIntValue(1) == 1);
+    assert(null.getUIntValueAsUInt(1) == 1);
+    assert(null.getRealValue("1") == "1");
+    assert(null.getNumericValue(1.0) < 1.01);
+    assert(null.getNumericValue(1.0) > 0.99);
+    assert(null.getName("1") == "1");
+    assert(null.getStringValue("1") == "1");
+    assert(null.getOperatorValue("1") == "1");
+    assert(null.getInlineImageValue("1") == "1");
 }
 
 static void test_43(QPDF& pdf, char const* arg2)

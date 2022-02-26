@@ -391,6 +391,12 @@ QPDFObjectHandle::getNumericValue()
     return result;
 }
 
+double
+QPDFObjectHandle::getNumericValue(double default_value)
+{
+    return isNull() ? default_value : getNumericValue();
+}
+
 bool
 QPDFObjectHandle::getValueAsNumber(double& value)
 {
@@ -548,6 +554,12 @@ QPDFObjectHandle::getBoolValue()
 }
 
 bool
+QPDFObjectHandle::getBoolValue(bool default_value)
+{
+    return isNull() ? default_value : getBoolValue();
+}
+
+bool
 QPDFObjectHandle::getValueAsBool(bool& value)
 {
     if (! isBool())
@@ -573,6 +585,12 @@ QPDFObjectHandle::getIntValue()
         QTC::TC("qpdf", "QPDFObjectHandle integer returning 0");
         return 0;
     }
+}
+
+long long
+QPDFObjectHandle::getIntValue(long long default_value)
+{
+    return isNull() ? default_value : getIntValue();
 }
 
 bool
@@ -614,6 +632,12 @@ QPDFObjectHandle::getIntValueAsInt()
     return result;
 }
 
+int
+QPDFObjectHandle::getIntValueAsInt(int default_value)
+{
+    return isNull() ? default_value : getIntValueAsInt();
+}
+
 bool
 QPDFObjectHandle::getValueAsInt(int& value)
 {
@@ -642,6 +666,12 @@ QPDFObjectHandle::getUIntValue()
         result = static_cast<unsigned long long>(v);
     }
     return result;
+}
+
+unsigned long long
+QPDFObjectHandle::getUIntValue(unsigned long long default_value)
+{
+    return isNull() ? default_value : getUIntValue();
 }
 
 bool
@@ -684,6 +714,12 @@ QPDFObjectHandle::getUIntValueAsUInt()
     return result;
 }
 
+unsigned int
+QPDFObjectHandle::getUIntValueAsUInt(unsigned int default_value)
+{
+    return isNull() ? default_value : getUIntValueAsUInt();
+}
+
 bool
 QPDFObjectHandle::getValueAsUInt(unsigned int& value)
 {
@@ -710,6 +746,12 @@ QPDFObjectHandle::getRealValue()
         QTC::TC("qpdf", "QPDFObjectHandle real returning 0.0");
         return "0.0";
     }
+}
+
+std::string
+QPDFObjectHandle::getRealValue(std::string default_value)
+{
+    return isNull() ? default_value : getRealValue();
 }
 
 bool
@@ -740,6 +782,12 @@ QPDFObjectHandle::getName()
     }
 }
 
+std::string
+QPDFObjectHandle::getName(std::string default_value)
+{
+    return isNull() ? default_value : getName();
+}
+
 bool
 QPDFObjectHandle::getValueAsName(std::string& value)
 {
@@ -768,6 +816,12 @@ QPDFObjectHandle::getStringValue()
     }
 }
 
+std::string
+QPDFObjectHandle::getStringValue(std::string default_value)
+{
+    return isNull() ? default_value : getStringValue();
+}
+
 bool
 QPDFObjectHandle::getValueAsString(std::string& value)
 {
@@ -792,6 +846,12 @@ QPDFObjectHandle::getUTF8Value()
         QTC::TC("qpdf", "QPDFObjectHandle string returning empty utf8");
         return "";
     }
+}
+
+std::string
+QPDFObjectHandle::getUTF8Value(std::string default_value)
+{
+    return isNull() ? default_value : getUTF8Value();
 }
 
 bool
@@ -822,6 +882,12 @@ QPDFObjectHandle::getOperatorValue()
     }
 }
 
+std::string
+QPDFObjectHandle::getOperatorValue(std::string default_value)
+{
+    return isNull() ? default_value : getOperatorValue();
+}
+
 bool
 QPDFObjectHandle::getValueAsOperator(std::string& value)
 {
@@ -846,6 +912,12 @@ QPDFObjectHandle::getInlineImageValue()
         QTC::TC("qpdf", "QPDFObjectHandle inlineimage returning empty data");
         return "";
     }
+}
+
+std::string
+QPDFObjectHandle::getInlineImageValue(std::string default_value)
+{
+    return isNull() ? default_value : getInlineImageValue();
 }
 
 bool
