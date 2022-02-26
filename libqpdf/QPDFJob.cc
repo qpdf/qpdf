@@ -335,6 +335,13 @@ ProgressReporter::reportProgress(int percentage)
                << percentage << "%" << std::endl;
 }
 
+// These default values are duplicated in help and docs.
+static int constexpr DEFAULT_KEEP_FILES_OPEN_THRESHOLD = 200;
+static int constexpr DEFAULT_OI_MIN_WIDTH = 128;
+static int constexpr DEFAULT_OI_MIN_HEIGHT = 128;
+static int constexpr DEFAULT_OI_MIN_AREA = 16384;
+static int constexpr DEFAULT_II_MIN_BYTES = 1024;
+
 QPDFJob::Members::Members() :
     message_prefix("qpdf"),
     warnings(false),
@@ -393,7 +400,7 @@ QPDFJob::Members::Members() :
     remove_unreferenced_page_resources(re_auto),
     keep_files_open(true),
     keep_files_open_set(false),
-    keep_files_open_threshold(200), // default known in help and docs
+    keep_files_open_threshold(DEFAULT_KEEP_FILES_OPEN_THRESHOLD),
     newline_before_endstream(false),
     coalesce_contents(false),
     flatten_annotations(false),
@@ -426,10 +433,10 @@ QPDFJob::Members::Members() :
     externalize_inline_images(false),
     keep_inline_images(false),
     remove_page_labels(false),
-    oi_min_width(128),      // Default values for these
-    oi_min_height(128),     // oi and ii flags are in --help
-    oi_min_area(16384),     // and in the manual.
-    ii_min_bytes(1024),     //
+    oi_min_width(DEFAULT_OI_MIN_WIDTH),
+    oi_min_height(DEFAULT_OI_MIN_HEIGHT),
+    oi_min_area(DEFAULT_OI_MIN_AREA),
+    ii_min_bytes(DEFAULT_II_MIN_BYTES),
     underlay("underlay"),
     overlay("overlay"),
     under_overlay(0),
