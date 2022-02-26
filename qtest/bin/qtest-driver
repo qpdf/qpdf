@@ -33,7 +33,7 @@ require TestDriver;
 
 if ((@ARGV == 1) && ($ARGV[0] eq '--version'))
 {
-    print "$whoami version 1.7\n";
+    print "$whoami version 1.8\n";
     exit 0;
 }
 if ((@ARGV == 1) && ($ARGV[0] eq '--print-path'))
@@ -538,41 +538,45 @@ sub tc_do_initial_checks
     my %seen_cases = ();
     foreach my $src (@tc_srcs)
     {
-	my $s = new IO::File("<$src") or die "$whoami: open $src: $!\n";
-	binmode $s;
-	while (<$s>)
-	{
-	    # Look for coverage calls in the source subject to certain
-	    # lexical constraints
-	    my ($lscope, $case);
-	    if (m/^\s*\&?(?:QTC|qtc)(?:::|\.)TC\(\"([^\"]+)\",\s*\"([^\"]+)\"/)
-	    {
-		# C++, Java, Perl, etc.
-		($lscope, $case) = ($1, $2);
-	    }
-	    elsif (m/^[^\#]*\$\(call QTC.TC,([^,]+),([^,\)]+)/)
-	    {
-		# make
-		($lscope, $case) = ($1, $2);
-	    }
-	    if ((defined $lscope) && (defined $case))
-	    {
-		if ($lscope eq $tc_scope)
-		{
-		    push(@{$seen_cases{$case}}, [$src, $.]);
-		}
-		elsif (exists $tc_ignored_scopes{$lscope})
-		{
-		    &QTC::TC("testdriver", "driver ignored scope");
-		}
-		else
-		{
-		    &QTC::TC("testdriver", "driver out-of-scope case");
-		    error("$src:$.: out-of-scope coverage case");
-		}
-	    }
-	}
-	$s->close();
+        local $/ = undef;
+        my $s = new IO::File("<$src") or die "$whoami: open $src: $!\n";
+        binmode $s;
+        my $content = <$s>;
+        $s->close();
+        my @found = ();
+        # Look for coverage calls in the source subject to certain lexical
+        # constraints. Count newlines in $` to get the line number.
+        while ($content =~
+               m/^\s*\&?(?:QTC|qtc)(?:::|\.)(?:TC|tc)\(\s*\"([^\"]+)\",\s*\"([^\"]+)\"/mg)
+        {
+            # C++, Java, Perl, etc.
+            push(@found, [$1, $2, 1+scalar(split('\n', $`))]);
+        }
+        while ($content =~ m/^[^\#\n]*\$\(call QTC.TC,([^,]+),([^,\)]+)/mg)
+        {
+            # make
+            push(@found, [$1, $2, 1+scalar(split('\n', $`))]);
+        }
+        foreach my $i (@found)
+        {
+            my ($lscope, $case, $line) = @$i;
+            if ((defined $lscope) && (defined $case))
+            {
+                if ($lscope eq $tc_scope)
+                {
+                    push(@{$seen_cases{$case}}, [$src, $line]);
+                }
+                elsif (exists $tc_ignored_scopes{$lscope})
+                {
+                    &QTC::TC("testdriver", "driver ignored scope");
+                }
+                else
+                {
+                    &QTC::TC("testdriver", "driver out-of-scope case");
+                    error("$src:$line: out-of-scope coverage case");
+                }
+            }
+        }
     }
 
     my %wanted_cases = %tc_cases;
