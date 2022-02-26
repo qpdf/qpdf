@@ -3,8 +3,9 @@ Next
 ====
 
 In order:
-* PointerHolder -> shared_ptr
+* PR #661 (overloaded getters from m-holger)
 * code formatting
+* PointerHolder -> shared_ptr
 * cmake
 * ABI including --json default is latest
 * json v2
@@ -34,62 +35,69 @@ Soon: Break ground on "Document-level work"
 Code Formatting
 ===============
 
-It would be good to have automatic code formatting to make the code
-more consistent and to make it easier for contributors. We would do a
-big commit to bring everything up to spec. Things to keep in mind:
+Use clang-format-15.
 
-* clang-format looks promising but is a bit of a moving target; need
-  to see if its output has been stable over the past few releases
-  since the first one that can produce code the way I like it. I may
-  have to require a minimum clang-format version.
+* Put a .clang-format at the top of the repository -- see below for content.
+* Reformat all files:
 
-* Ideas here aim for something similar to rust's defaults but with
-  adjustments to meet my existing style and preferences:
+  for i in  **/*.cc **/*.c **/*.h **/*.hh; do
+     clang-format < $i >| $i.new && mv $i.new $i
+  done
 
-  * 80 columns
+* Carefully inspect the diff. There are some places where a comment to
+  force a line break might be in order.
 
-  * 4-space indent (no tabs)
-
-  * Compact braces. While this is a big departure from the past and
-    will create many changes, I have become accustomed to this style
-    and use it across my projects in other languages these days.
-
-  * No "bin packing" -- if arguments (constructor initializers,
-    function arguments, etc.) don't fit on one line, do one argument
-    per line
-
-  * With the exception of short lambdas, no block constructs can be
-    collapsed to a single line.
-
-  * Braces are mandatory for all control constructs (no if, while,
-    etc. without braces)
-
-  * Space after control constructs
-
-* Try to get emacs c-style to match as closely as possible
-
-* Consider blame.ignoreRevsFile if it seems to help
-
-* See also https://bestpractices.coreinfrastructure.org/en
-
-* QTC::TC first two arguments have to be lexically on one line. If the
-  code formatter breaks this, some QTC calls may have to be surrounded by
+* Update README-maintainer about formatting. Mention
 
   // clang-format off
   // clang-format on
 
-  or qtest may have to be made more flexible unless the formatter has
-  some rules about some places where lines shouldn't be broken.
+  as well as the use of a comment to force a line break.
 
-* auto_* files from generate_auto_job should be exempt from
-  formatting.
+Tentative .clang-format:
 
-Ideally it should be possible to run formatting in CI so that pull
-requests have to be properly formatting, but if not, there needs to be
-a `make format` similar to `make spell` that I could apply after
-merging contributions and from time to time.
+```
+---
+Language:        Cpp
+BasedOnStyle:  LLVM
+AlignAfterOpenBracket: AlwaysBreak
+AlignEscapedNewlines: DontAlign
+AllowShortFunctionsOnASingleLine: None
+BinPackArguments: false
+BinPackParameters: false
+BreakConstructorInitializers: BeforeComma
+DeriveLineEnding: false
+PackConstructorInitializers: Never
+IncludeCategories:
+  - Regex:           '^["<](qpdf)/'
+    Priority:        1
+    SortPriority:    0
+    CaseSensitive:   false
+  - Regex:           '.*'
+    Priority:        2
+    SortPriority:    0
+    CaseSensitive:   false
+  - Regex:           '.*'
+    Priority:        1
+    SortPriority:    0
+    CaseSensitive:   false
+IndentCaseBlocks: true
+IndentWidth:     4
+InsertTrailingCommas: Wrapped
+KeepEmptyLinesAtTheStartOfBlocks: false
+PointerAlignment: Left
+```
 
-A .clang-format file can be created at the top of the repository.
+Remaining work:
+
+* Try to get emacs c-style to match as closely as possible
+* Consider blame.ignoreRevsFile if it seems to help
+* Add a `make format` similar to `make spell` (or whatever this ends
+  up being with cmake)
+* Consider a github action to check formatting. I don't want
+  formatting failures to prevent all the tests from being run.
+  Alternatively, add running `make format` as a release preparation
+  check like `make spell`.
 
 Output JSON v2
 ==============
@@ -781,6 +789,8 @@ NOTE: Some items in this list refer to files in my personal home
 directory or that are otherwise not publicly accessible. This includes
 things sent to me by email that are specifically not public. Even so,
 I find it useful to make reference to them in this list.
+
+ * Look at https://bestpractices.coreinfrastructure.org/en
 
  * Get rid of remaining assert() calls from non-test code.
 

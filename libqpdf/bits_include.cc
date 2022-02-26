@@ -1,3 +1,4 @@
+// This file is #included in other source files.
 
 #ifndef __BITS_CC__
 #define __BITS_CC__
