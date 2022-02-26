@@ -2,15 +2,14 @@
 Next
 ====
 
-Priorities (could be for 10.x)
+In order:
+* PointerHolder -> shared_ptr
 * code formatting
+* cmake
+* ABI including --json default is latest
 * json v2
 
-Priorities for 11:
-* cmake
-* PointerHolder -> shared_ptr
-* ABI
-* --json default is latest
+Other (do in any order):
 
 Misc
 * Get rid of "ugly switch statements" in QUtil.cc -- replace with
@@ -41,18 +40,19 @@ big commit to bring everything up to spec. Things to keep in mind:
 
 * clang-format looks promising but is a bit of a moving target; need
   to see if its output has been stable over the past few releases
-  since the first one that can produce code the way I like it
+  since the first one that can produce code the way I like it. I may
+  have to require a minimum clang-format version.
 
-* Try to match closely to what I have. At a minimum:
+* Ideas here aim for something similar to rust's defaults but with
+  adjustments to meet my existing style and preferences:
 
   * 80 columns
 
   * 4-space indent (no tabs)
 
-  * Probably want to stick with braces on separate lines to minimize
-    impact, but might consider braces on separate lines for classes
-    and functions with compact braces for flow control and exception
-    handling since that seems to be more popular these days
+  * Compact braces. While this is a big departure from the past and
+    will create many changes, I have become accustomed to this style
+    and use it across my projects in other languages these days.
 
   * No "bin packing" -- if arguments (constructor initializers,
     function arguments, etc.) don't fit on one line, do one argument
@@ -124,11 +124,27 @@ messes up searching for things.
 For json v2:
 
 * Make sure it is possible to serialize and deserializes a PDF to JSON
-  without loading the whole thing into memory. This is substantial. It
-  means we need sax-style parsing and handling so we can
-  handle/generate objects as we go. We'll have to be able to keep
-  track of keys for dictionary error checking. May want to add json to
-  large file tests.
+  without loading the whole thing into memory.
+
+  * As with a regular PDF, we can load everything into memory at once
+    except stream data.
+
+  * I think we can do this by having the concept of generated values,
+    which we can make just be strings. We would have a JSON subclass
+    whose value is a lambda that gets called to generate output. When
+    we construct the JSON the stream values would be lambda functions
+    that generate the stream data.
+
+  * When we parse the file, we'll have to have a way for the parser to
+    know that it should create a lambda that reads the data from the
+    file. I think this means we want something that parses JSON from
+    an input source. It would have to keep track of the offset and
+    length of a value from the input source and have a (probably a
+    lambda that it can call with a path) that would indicate whether
+    to store the value or whether to create a lambda that retrieves
+    it. We would have to keep a std::shared_ptr<InputSource> around.
+
+  * Add json to the large file tests.
 
 * Resolve differences between information shown in the json format vs.
   information shown with options like --check, --list-attachments,
