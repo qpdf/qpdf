@@ -27,6 +27,31 @@ Memory checks:
    --enable-werror --disable-shared --enable-maintainer-mode
 
 
+VERSIONS
+
+* The version number on the main branch is whatever the version would
+  be if the top of the branch were released. If the most recent
+  release is version a.b.c, then
+
+  * If there are any ABI-breaking changes since the last release,
+    main's version is a+1.0.0
+  * Else if there is any new public API, main's version is a.b+1.0
+  * Else if there are any code changes, main's version is a.b.c+1
+
+* Whenever we bump the version number, bump shared library versions as
+  well.
+
+* Every released major/minor version has an a.b branch which is used
+  primarily for documentation but could potentially be used to create
+  a new patch release after main has moved on. We don't do that as a
+  rule, but there's no reason we couldn't do it if main had unreleased
+  ABI/API changes that were still in flux and an important bug fix was
+  needed on the most recent release. In that case, a release can be
+  cut from a release branch and then either main can be rebased from
+  there or the changes can be merged back, depending on the amount of
+  drift.
+
+
 CHECKING DOCS ON readthedocs
 
 To check docs on readthedocs.io without running all of CI, push to the
@@ -276,7 +301,8 @@ RELEASE PREPARATION
   ensure that any exceptions thrown by the library are caught and
   converted. See `trap_errors` in qpdf-c.cc.
 
-* Update versions and shared library details
+* Double check versions and shared library details. They should
+  already be up to date in the code.
 
   * Increment shared library version information as needed
     (`LT_CURRENT` in `configure.ac`)
@@ -287,14 +313,14 @@ RELEASE PREPARATION
     * manual/conf.py
     `make_dist` verifies this consistency.
 
-  * Update release notes in manual. Look at diffs and ChangeLog.
-    Update release date in `manual/release-notes.rst`.
-
-  * Add a release entry to ChangeLog: "x.y.z: release"
-
   * Run ./autogen.sh
 
-  * Commit title: "Prepare x.y.z release"
+* Update release notes in manual. Look at diffs and ChangeLog.
+  Update release date in `manual/release-notes.rst`.
+
+* Add a release entry to ChangeLog: "x.y.z: release"
+
+* Commit title: "Prepare x.y.z release"
 
 * Performance test is included with binary compatibility steps. Even
   if releasing a new major release and not doing binary compatibility
