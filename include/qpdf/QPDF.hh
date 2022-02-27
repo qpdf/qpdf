@@ -54,7 +54,7 @@ class QPDF
 {
   public:
     // Get the current version of the QPDF software. See also
-    // qpdf/Version.h
+    // qpdf/DLL.h
     QPDF_DLL
     static std::string const& QPDFVersion();
 
