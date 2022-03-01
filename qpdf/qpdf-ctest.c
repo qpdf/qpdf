@@ -4,7 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include "../libqpdf/qpdf/qpdf-config.h" // for LL_FMT
+
+#include <qpdf/qpdf-config.h> // for LL_FMT -- special case in build
 
 static char* whoami = 0;
 static qpdf_data qpdf = 0;

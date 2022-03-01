@@ -26,6 +26,8 @@ TC_SRCS_qpdf = $(wildcard libqpdf/*.cc) $(wildcard qpdf/*.cc)
 
 # -----
 
+XCFLAGS_qpdf_qpdf-ctest := -Ilibqpdf
+
 define use_wmain
   XCXXFLAGS_qpdf_$(1) := $(WINDOWS_WMAIN_COMPILE)
   XLDFLAGS_qpdf_$(1) := $(WINDOWS_WMAIN_LINK)
