@@ -5471,6 +5471,19 @@ $td->runtest("parsed offset with object streams",
 
 show_ntests();
 # ----------
+$td->notify("--- PageObjectHelper ---");
+$n_tests += 2;
+
+$td->runtest("modify shared Boxes",
+             {$td->COMMAND => "test_driver 87 minimal-inherit.pdf"},
+             {$td->STRING => "test 87 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("compare files",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "minimal-inherit-out.pdf"});
+
+show_ntests();
+# ----------
 $td->notify("--- Large File Tests ---");
 my $nlarge = 1;
 if (defined $large_file_test_path)

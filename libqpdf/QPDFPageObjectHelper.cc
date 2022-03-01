@@ -367,7 +367,13 @@ QPDFPageObjectHelper::getTrimBox(bool copy_if_shared)
     QPDFObjectHandle result = getAttribute("/TrimBox", copy_if_shared);
     if (result.isNull())
     {
-        result = getCropBox(copy_if_shared);
+        QTC::TC("qpdf", "QPDFPageObjectHelper getTrimBox");
+        result = getCropBox();
+        if (copy_if_shared)
+        {
+            result = result.shallowCopy();
+            this->oh.replaceKey("/TrimBox", result);
+        }
     }
     return result;
 }
@@ -378,7 +384,13 @@ QPDFPageObjectHelper::getCropBox(bool copy_if_shared)
     QPDFObjectHandle result = getAttribute("/CropBox", copy_if_shared);
     if (result.isNull())
     {
+        QTC::TC("qpdf", "QPDFPageObjectHelper getCropBox");
         result = getMediaBox();
+        if (copy_if_shared)
+        {
+            result = result.shallowCopy();
+            this->oh.replaceKey("/CropBox", result);
+        }
     }
     return result;
 }

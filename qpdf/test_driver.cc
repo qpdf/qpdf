@@ -3345,6 +3345,25 @@ static void test_86(QPDF& pdf, char const* arg2)
     assert(h.getUTF8Value() == utf8_val);
 }
 
+static void test_87(QPDF& pdf, char const* arg2)
+{
+    // Test QPDFPageObjectHelper::get[Media|Trim|Crop]Box
+
+    auto pdh = QPDFPageDocumentHelper(pdf);
+    auto p = pdh.getAllPages().at(0);
+    p.getTrimBox().setArrayItem(0, "13"_qpdf);
+    p.getCropBox().setArrayItem(1, "42"_qpdf);
+    p.getMediaBox().setArrayItem(2, "642"_qpdf);
+    p.getTrimBox(true).setArrayItem(0, "7"_qpdf);
+    p.getMediaBox(true).setArrayItem(3, "780"_qpdf);
+    p.getCropBox(true).setArrayItem(1, "26"_qpdf);
+
+    QPDFWriter w(pdf, "a.pdf");
+    w.setQDFMode(true);
+    w.setStaticID(true);
+    w.write();
+}
+
 void runtest(int n, char const* filename1, char const* arg2)
 {
     // Most tests here are crafted to work on specific files.  Look at
@@ -3461,7 +3480,7 @@ void runtest(int n, char const* filename1, char const* arg2)
         {72, test_72}, {73, test_73}, {74, test_74}, {75, test_75},
         {76, test_76}, {77, test_77}, {78, test_78}, {79, test_79},
         {80, test_80}, {81, test_81}, {82, test_82}, {83, test_83},
-        {84, test_84}, {85, test_85}, {86, test_86},
+        {84, test_84}, {85, test_85}, {86, test_86}, {87, test_87},
     };
 
     auto fn = test_functions.find(n);
