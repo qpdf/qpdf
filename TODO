@@ -99,6 +99,21 @@ Remaining work:
   Alternatively, add running `make format` as a release preparation
   check like `make spell`.
 
+cmake
+=====
+
+* Cherry pick cmake branch.
+* Change name of DLL_EXPORT preprocessor symbol passed into the build.
+  Be sure to call attention to this in the release notes. There should
+  be a "migrating to cmake" in the manual, and ./configure should draw
+  attention to it.
+* Remove DLL.h and QPDF_DLL from all private library classes.
+* Nice to have:
+  * Split qpdf.test into multiple tests
+  * Rework tests so that nothing is written into the source directory.
+  * Ideally then the entire build could be done with a read-only
+    source tree.
+
 Output JSON v2
 ==============
 
