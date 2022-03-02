@@ -19,28 +19,30 @@ void usage()
     exit(2);
 }
 
-static void doubleBoxSize(QPDFObjectHandle& page, char const* box_name)
+// If there is a box of name box_name, replace it with a new box whose
+// elements are double the values of the original box.
+static void doubleBoxSize(QPDFPageObjectHelper& page, char const* box_name)
 {
-    // If there is a box of this name, replace it with a new box whose
-    // elements are double the values of the original box.
-    QPDFObjectHandle box = page.getKey(box_name);
+    // We need to use getAttribute rather than getKey as some boxes could
+    // be inherited.
+    auto box = page.getAttribute(box_name, true);
     if (box.isNull())
     {
         return;
     }
-    if (! (box.isArray() && (box.getArrayNItems() == 4)))
+    if (! box.isRectangle())
     {
         throw std::runtime_error(std::string("box ") + box_name +
                                  " is not an array of four elements");
     }
     std::vector<QPDFObjectHandle> doubled;
-    for (int i = 0; i < 4; ++i)
+    for (auto& item : box.aitems())
     {
         doubled.push_back(
-            QPDFObjectHandle::newReal(
-                box.getArrayItem(i).getNumericValue() * 2.0, 2));
+            QPDFObjectHandle::newReal(item.getNumericValue() * 2.0, 2));
     }
-    page.replaceKey(box_name, QPDFObjectHandle::newArray(doubled));
+    page.getObjectHandle()
+        .replaceKey(box_name, QPDFObjectHandle::newArray(doubled));
 }
 
 int main(int argc, char* argv[])
@@ -79,17 +81,10 @@ int main(int argc, char* argv[])
         QPDF qpdf;
         qpdf.processFile(infilename, password);
 
-        std::vector<QPDFPageObjectHelper> pages =
-            QPDFPageDocumentHelper(qpdf).getAllPages();
-        for (std::vector<QPDFPageObjectHelper>::iterator iter =
-                 pages.begin();
-             iter != pages.end(); ++iter)
+        for (auto& page : QPDFPageDocumentHelper(qpdf).getAllPages())
         {
-            QPDFPageObjectHelper& ph(*iter);
-            QPDFObjectHandle page = ph.getObjectHandle();
-
             // Prepend the buffer to the page's contents
-            ph.addPageContents(
+            page.addPageContents(
                 QPDFObjectHandle::newStream(&qpdf, content), true);
 
             // Double the size of each of the content boxes
@@ -104,8 +99,7 @@ int main(int argc, char* argv[])
         QPDFWriter w(qpdf, outfilename);
         if (static_id)
         {
-            // For the test suite, uncompress streams and use static
-            // IDs.
+            // For the test suite, uncompress streams and use static IDs.
             w.setStaticID(true); // for testing only
             w.setStreamDataMode(qpdf_s_uncompress);
         }

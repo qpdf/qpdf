@@ -98,7 +98,7 @@ static void process(char const* infilename, char const* password,
     // apdict.replaceKey("/Type", QPDFObjectHandle::newName("/XObject"));
     // apdict.replaceKey("/Subtype", QPDFObjectHandle::newName("/Form"));
     // apdict.replaceKey("/BBox", QPDFObjectHandle::parse("[ 0 0 20 20 ]"));
-    apdict.replaceKey("/Resources", "<< >>"_qpdf"");
+    apdict.replaceKey("/Resources", "<< >>"_qpdf);
     apdict.replaceKey("/Type", "/XObject"_qpdf);
     apdict.replaceKey("/Subtype", "/Form"_qpdf);
     apdict.replaceKey("/BBox", "[ 0 0 20 20 ]"_qpdf);
