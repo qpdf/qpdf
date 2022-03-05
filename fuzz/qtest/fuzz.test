@@ -9,10 +9,7 @@ require TestDriver;
 
 my $td = new TestDriver('fuzz');
 
-my $qpdf_n_test_files = 31;
-my @extra = glob("../qpdf_extra/*.fuzz");
-my $qpdf_n_extra_files = scalar(@extra);
-my $qpdf_n_files = ($qpdf_n_test_files + $qpdf_n_extra_files);
+my $qpdf_corpus = $ENV{'QPDF_FUZZ_CORPUS'} || die "must set QPDF_FUZZ_CORPUS";
 
 my @fuzzers = (
     ['ascii85' => 1],
@@ -23,7 +20,7 @@ my @fuzzers = (
     ['pngpredictor' => 1],
     ['runlength' => 6],
     ['tiffpredictor' => 1],
-    ['qpdf' => $qpdf_n_files],
+    ['qpdf' => 52],             # increment when adding new files
     );
 
 my $n_tests = 0;
@@ -40,7 +37,7 @@ foreach my $d (@fuzzers)
     my $dir = "../${k}_fuzzer_seed_corpus";
     if (! -d $dir)
     {
-        $dir = "../build/${k}_fuzzer_seed_corpus";
+        $dir = $qpdf_corpus;
     }
     my @files = glob("$dir/*");
     $td->runtest("file count for $dir",
