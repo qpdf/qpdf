@@ -66,9 +66,10 @@ GOOGLE OSS-FUZZ
 * qpdf project: https://github.com/google/oss-fuzz/tree/master/projects/qpdf
 
 * Adding new test cases: download the file from oss-fuzz and drop it
-  in fuzz/qpdf_extra/issue-number.fuzz. If not ready to include, it
-  can be stored anywhere, and the absolute path can be passed to the
-  reproduction code as described below.
+  in fuzz/qpdf_extra/issue-number.fuzz. When ready to include it, add
+  to fuzz/CMakeLists.txt. Until ready to use, the file can be stored
+  anywhere, and the absolute path can be passed to the reproduction
+  code as described below.
 
 * To test locally, see https://github.com/google/oss-fuzz/tree/master/docs/,
   especially new_project_guide.md. Summary:
