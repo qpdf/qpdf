@@ -1,6 +1,4 @@
-.\" This file is not processed by autoconf, but rather by build.mk in
-.\" the manual directory.
-.TH QPDF "1" "" "qpdf version @PACKAGE_VERSION@" "User Commands"
+.TH QPDF "1" "" "qpdf version @PROJECT_VERSION@" "User Commands"
 .SH NAME
 qpdf \- PDF transformation software
 .SH SYNOPSIS

@@ -1,6 +1,4 @@
-\" This file is not processed by autoconf, but rather by build.mk in
-\" the manual directory.
-.TH FIX-QDF "1" "" "fix-qdf version @PACKAGE_VERSION@" "User Commands"
+.TH FIX-QDF "1" "" "fix-qdf version @PROJECT_VERSION@" "User Commands"
 .SH NAME
 fix-qdf \- repair PDF files in QDF form after editing
 .SH SYNOPSIS
