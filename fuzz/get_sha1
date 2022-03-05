@@ -6,4 +6,4 @@ use Digest::SHA;
 
 binmode STDIN;
 my $digest = Digest::SHA->new('sha1')->addfile(*STDIN)->hexdigest;
-print "$digest\n";
+print "$digest";
