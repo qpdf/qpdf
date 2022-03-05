@@ -1,0 +1,132 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+use Cwd 'abs_path';
+use File::Basename;
+use File::Spec;
+
+my $whoami = basename($0);
+
+my $top = undef;
+my $code = undef;
+my @bin = ();
+my $color = undef;
+my $show_on_failure = 0;
+my @tc = ();
+
+if ($^O =~ m/^MSWin32|msys$/)
+{
+    for (@ARGV)
+    {
+        s,^([A-Z]):/,/\L$1\E/,;
+    }
+}
+
+while (@ARGV)
+{
+    my $arg = shift(@ARGV);
+    if ($arg eq '--top')
+    {
+        usage() unless @ARGV;
+        $top = shift(@ARGV);
+    }
+    elsif ($arg eq '--code')
+    {
+        usage() unless @ARGV;
+        $code = shift(@ARGV);
+    }
+    elsif ($arg eq '--bin')
+    {
+        usage() unless @ARGV;
+        push(@bin, shift(@ARGV));
+    }
+    elsif ($arg eq '--color')
+    {
+        usage() unless @ARGV;
+        $color = cmake_bool(shift(@ARGV));
+    }
+    elsif ($arg eq '--show-on-failure')
+    {
+        usage() unless @ARGV;
+        $show_on_failure = cmake_bool(shift(@ARGV));
+    }
+    elsif ($arg eq '--tc')
+    {
+        usage() unless @ARGV;
+        while (@ARGV && ($ARGV[0] !~ m/^--/))
+        {
+            # On Windows, a literal glob in quotes is expanded by the
+            # shell, so we have to handle globs when expanded by the
+            # shell.
+            push(@tc, shift(@ARGV));
+        }
+    }
+    elsif ($arg eq '--env')
+    {
+        usage() unless @ARGV;
+        my $var = shift(@ARGV);
+        usage() unless $var =~ m/^([^=]+)=(.*)$/;
+        $ENV{$1} = $2;
+    }
+    else
+    {
+        usage();
+    }
+}
+usage() unless (defined $top && defined $code && scalar(@bin));
+
+my @cmd = ("$top/qtest/bin/qtest-driver");
+if (defined $color)
+{
+    push(@cmd, "-stdout-tty=$color");
+}
+push(@cmd,
+     "-bindirs", join(':', @bin),
+     "-datadir", "$code/qtest",
+     "-junit-suffix", basename($code));
+
+if (scalar(@tc))
+{
+    my @tc_srcs = map {
+        File::Spec->abs2rel(abs_path($_))
+    } map {
+        # On non-Windows, a literal glob in quotes is not expanded by
+        # the shell, so we have to handle globs explicitly.
+        glob($_)
+    } @tc;
+
+    $ENV{'TC_SRCS'} = join(' ', @tc_srcs);
+    push(@cmd, "-covdir", $code);
+}
+
+my $r = system(@cmd);
+if (($r != 0) && $show_on_failure && open(R, "<qtest.log"))
+{
+    binmode R;
+    while (<R>)
+    {
+        print;
+    }
+    close(R);
+}
+exit($r == 0 ? 0 : 2);
+
+sub cmake_bool
+{
+    my $arg = shift;
+    ($arg =~ m/^(1|on|true|y(es)?)$/i) ? 1 : 0;
+}
+
+sub usage
+{
+    die "
+Usage: $whoami options
+  --top source-tree
+  --code code-subdir
+  --bin bindir ...
+  [--color [01]]
+  [--show-on-failure [01]]
+  [--tc \"../a/*.cc\" ...]
+";
+}
