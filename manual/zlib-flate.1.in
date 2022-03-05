@@ -1,6 +1,4 @@
-\" This file is not processed by autoconf, but rather by build.mk in
-\" the manual directory.
-.TH ZLIB-FLATE "1" "" "zlib-flate from qpdf version @PACKAGE_VERSION@" "User Commands"
+.TH ZLIB-FLATE "1" "" "zlib-flate from qpdf version @PROJECT_VERSION@" "User Commands"
 .SH NAME
 zlib-flate \- raw zlib compression program
 .SH SYNOPSIS
