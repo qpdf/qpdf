@@ -1,123 +1,32 @@
-/* libqpdf/qpdf/qpdf-config.h.in.  Generated from configure.ac by autoheader.  */
+/* options */
+#cmakedefine AVOID_WINDOWS_HANDLE 1
+#cmakedefine DEFAULT_CRYPTO "${DEFAULT_CRYPTO}"
+#cmakedefine USE_CRYPTO_GNUTLS 1
+#cmakedefine USE_CRYPTO_NATIVE 1
+#cmakedefine USE_CRYPTO_OPENSSL 1
+#cmakedefine USE_INSECURE_RANDOM 1
+#cmakedefine SKIP_OS_SECURE_RANDOM 1
 
-/* Whether to avoid use of HANDLE in Windows */
-#undef AVOID_WINDOWS_HANDLE
+/* large file support -- may be needed for 32-bit systems */
+#cmakedefine _FILE_OFFSET_BITS ${_FILE_OFFSET_BITS}
 
-/* Default crypto provider */
-#undef DEFAULT_CRYPTO
+/* headers files */
+#cmakedefine HAVE_INTTYPES_H 1
+#cmakedefine HAVE_STDINT_H 1
 
-/* define if the compiler supports basic C++14 syntax */
-#undef HAVE_CXX14
-
-/* Define to 1 if you have the <dlfcn.h> header file. */
-#undef HAVE_DLFCN_H
-
-/* Whether extern long timezone is available */
-#undef HAVE_EXTERN_LONG_TIMEZONE
-
-/* Define to 1 if fseeko (and presumably ftello) exists and is declared. */
-#undef HAVE_FSEEKO
-
-/* Define to 1 if you have the `fseeko64' function. */
-#undef HAVE_FSEEKO64
-
-/* Define to 1 if you have the <inttypes.h> header file. */
-#undef HAVE_INTTYPES_H
-
-/* Define to 1 if you have the `localtime_r' function. */
-#undef HAVE_LOCALTIME_R
-
-/* Define to 1 if you have the <memory.h> header file. */
-#undef HAVE_MEMORY_H
-
-/* Define to 1 if you have the `random' function. */
-#undef HAVE_RANDOM
-
-/* Define to 1 (and set RANDOM_DEVICE) if a random device is available */
-#undef HAVE_RANDOM_DEVICE
-
-/* Define to 1 if you have the <stdint.h> header file. */
-#undef HAVE_STDINT_H
-
-/* Define to 1 if you have the <stdlib.h> header file. */
-#undef HAVE_STDLIB_H
-
-/* Define to 1 if you have the <strings.h> header file. */
-#undef HAVE_STRINGS_H
-
-/* Define to 1 if you have the <string.h> header file. */
-#undef HAVE_STRING_H
-
-/* Define to 1 if you have the <sys/stat.h> header file. */
-#undef HAVE_SYS_STAT_H
-
-/* Define to 1 if you have the <sys/types.h> header file. */
-#undef HAVE_SYS_TYPES_H
-
-/* Whether struct tm has tm_gmtoff */
-#undef HAVE_TM_GMTOFF
-
-/* Define to 1 if you have the <unistd.h> header file. */
-#undef HAVE_UNISTD_H
+/* OS functions and symbols */
+#cmakedefine HAVE_EXTERN_LONG_TIMEZONE 1
+#cmakedefine HAVE_FSEEKO 1
+#cmakedefine HAVE_FSEEKO64 1
+#cmakedefine HAVE_LOCALTIME_R 1
+#cmakedefine HAVE_RANDOM 1
+#cmakedefine HAVE_TM_GMTOFF 1
 
 /* printf format for long long */
-#undef LL_FMT
+#cmakedefine LL_FMT "${LL_FMT}"
 
-/* Define to the sub-directory where libtool stores uninstalled libraries. */
-#undef LT_OBJDIR
+/* system random device (e.g. /dev/random) if any */
+#cmakedefine RANDOM_DEVICE "${RANDOM_DEVICE}"
 
-/* Define to the address where bug reports for this package should be sent. */
-#undef PACKAGE_BUGREPORT
-
-/* Define to the full name of this package. */
-#undef PACKAGE_NAME
-
-/* Define to the full name and version of this package. */
-#undef PACKAGE_STRING
-
-/* Define to the one symbol short name of this package. */
-#undef PACKAGE_TARNAME
-
-/* Define to the home page for this package. */
-#undef PACKAGE_URL
-
-/* Define to the version of this package. */
-#undef PACKAGE_VERSION
-
-/* Define to the filename of the random device (and set HAVE_RANDOM_DEVICE) */
-#undef RANDOM_DEVICE
-
-/* The size of `size_t', as computed by sizeof. */
-#undef SIZEOF_SIZE_T
-
-/* Whether to suppress use of OS-provided secure random numbers */
-#undef SKIP_OS_SECURE_RANDOM
-
-/* Define to 1 if you have the ANSI C header files. */
-#undef STDC_HEADERS
-
-/* Whether to use the gnutls crypto provider */
-#undef USE_CRYPTO_GNUTLS
-
-/* Whether to use the native crypto provider */
-#undef USE_CRYPTO_NATIVE
-
-/* Whether to use the openssl crypto provider */
-#undef USE_CRYPTO_OPENSSL
-
-/* Whether to use insecure random numbers */
-#undef USE_INSECURE_RANDOM
-
-/* Enable large inode numbers on Mac OS X 10.5.  */
-#ifndef _DARWIN_USE_64_BIT_INODE
-# define _DARWIN_USE_64_BIT_INODE 1
-#endif
-
-/* Number of bits in a file offset, on hosts where this is settable. */
-#undef _FILE_OFFSET_BITS
-
-/* Define to 1 to make fseeko visible on some hosts (e.g. glibc 2.2). */
-#undef _LARGEFILE_SOURCE
-
-/* Define for large files, on AIX-style hosts. */
-#undef _LARGE_FILES
+/* bytes in the size_t type */
+#cmakedefine SIZEOF_SIZE_T ${SIZEOF_SIZE_T}
