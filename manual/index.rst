@@ -13,6 +13,9 @@ Welcome to the QPDF documentation! For the latest version of this
 documentation, please visit `https://qpdf.readthedocs.io
 <https://qpdf.readthedocs.io>`__.
 
+..
+  **REMEMBER** -- update CMakeLists.txt when new files are added.
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
