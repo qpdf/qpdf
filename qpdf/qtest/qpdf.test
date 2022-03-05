@@ -20,11 +20,11 @@ cleanup();
 my $devNull = File::Spec->devnull();
 my $td = new TestDriver('qpdf');
 
-my $compare_images = 1;
-if ((exists $ENV{'QPDF_SKIP_TEST_COMPARE_IMAGES'}) &&
-    ($ENV{'QPDF_SKIP_TEST_COMPARE_IMAGES'} eq '1'))
+my $compare_images = 0;
+if ((exists $ENV{'QPDF_TEST_COMPARE_IMAGES'}) &&
+    ($ENV{'QPDF_TEST_COMPARE_IMAGES'} eq '1'))
 {
-    $compare_images = 0;
+    $compare_images = 1;
 }
 my $large_file_test_path = $ENV{'QPDF_LARGE_FILE_TEST_PATH'} || undef;
 if (defined($large_file_test_path))
