@@ -11,7 +11,6 @@ require TestDriver;
 my $td = new TestDriver('pdf-mod-info');
 
 my $prg = "pdf-mod-info";
-my $qpdf = $ENV{'QPDF_BIN'} or die;
 
 cleanup();
 
@@ -93,7 +92,7 @@ sub run_and_cmp
                  {$td->STRING => $out,
                   $td->EXIT_STATUS => 0});
     $td->runtest("$dsc output",
-                 {$td->COMMAND => "$qpdf --static-id" .
+                 {$td->COMMAND => "qpdf --static-id" .
                       " --no-original-object-ids -qdf $fout -"},
                  {$td->FILE => $fexp,
                   $td->EXIT_STATUS => 0});

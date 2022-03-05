@@ -11,8 +11,6 @@ cleanup();
 
 my $td = new TestDriver('c-objects');
 
-my $qpdf = $ENV{'QPDF_BIN'} or die;
-
 foreach my $i (qw(1 2))
 {
     $td->runtest("c-objects ($i)",

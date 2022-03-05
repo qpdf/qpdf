@@ -11,15 +11,13 @@ cleanup();
 
 my $td = new TestDriver('linearize');
 
-my $qpdf = $ENV{'QPDF_BIN'} or die;
-
 $td->runtest("linearize",
              {$td->COMMAND => "pdf-linearize input.pdf '' a.pdf"},
              {$td->REGEXP => '(?s).*input\.pdf progress: \d+\%.*',
                   $td->EXIT_STATUS => 0});
 
 $td->runtest("check",
-             {$td->COMMAND => "$qpdf --check a.pdf"},
+             {$td->COMMAND => "qpdf --check a.pdf"},
              {$td->FILE => "check.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
