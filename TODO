@@ -4,9 +4,9 @@ Next
 
 In order:
 * PR #661 (overloaded getters from m-holger)
+* cmake
 * code formatting
 * PointerHolder -> shared_ptr
-* cmake
 * ABI including --json default is latest
 * json v2
 
@@ -102,7 +102,8 @@ Remaining work:
 cmake
 =====
 
-* Cherry pick cmake branch.
+* Rebase the cmake branch onto main and fast-forward over it.
+* Remove all "lt-" workarounds.
 * Change name of DLL_EXPORT preprocessor symbol passed into the build.
   Be sure to call attention to this in the release notes. There should
   be a "migrating to cmake" in the manual, and ./configure should draw
@@ -600,7 +601,7 @@ Do a clean build and make check -- everything passes
 
 Final steps:
 
-* Change to POINTERHOLDER_TRANSITION=4 in autoconf.mk.in.
+* Change to POINTERHOLDER_TRANSITION=4
 * Check code formatting
 * std::shared_ptr<Members> m can be replaced with
   std::shared_ptr<Members> m_ph and Members* m if performance is critical
