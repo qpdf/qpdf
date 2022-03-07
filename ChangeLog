@@ -1,3 +1,7 @@
+2022-03-08  Jay Berkenbilt  <ejb@ql.org>
+
+	* 10.6.3: release
+
 2022-03-07  Jay Berkenbilt  <ejb@ql.org>
 
 	* Minor internal changes to assist with building in other
