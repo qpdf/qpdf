@@ -2,9 +2,9 @@
 
 #include <qpdf/QIntC.hh>
 
-// See comments in bits_include.cc
+// See comments in bits_functions.hh
 #define BITS_READ 1
-#include "bits_include.cc"
+#include <qpdf/bits_functions.hh>
 
 BitStream::BitStream(unsigned char const* p, size_t nbytes) :
     start(p),

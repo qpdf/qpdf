@@ -1,7 +1,5 @@
-// This file is #included in other source files.
-
-#ifndef __BITS_CC__
-#define __BITS_CC__
+#ifndef __BITS_FUNCTIONS_HH__
+#define __BITS_FUNCTIONS_HH__
 
 #include <algorithm>
 #include <stdexcept>
@@ -9,12 +7,13 @@
 #include <qpdf/Pipeline.hh>
 #include <qpdf/QUtil.hh>
 
-// These functions may be run at places where the function call
-// overhead from test coverage testing would be too high.  Therefore,
-// we make the test coverage cases conditional upon a preprocessor
-// symbol.  BitStream.cc includes this file without defining the
-// symbol, and the specially designed test code that fully exercises
-// this code includes with the symbol defined.
+// This file is #included by specific source files, which must define
+// certain preprocessor symbols. These functions may be run at places
+// where the function call overhead from test coverage testing would
+// be too high. Therefore, we make the test coverage cases conditional
+// upon a preprocessor symbol. Library code includes this file without
+// BITS_TESTING, and the specially designed test code that fully
+// exercises this code includes with the symbol defined.
 
 #ifdef BITS_READ
 static unsigned long long
@@ -151,5 +150,4 @@ write_bits(unsigned char& ch, size_t& bit_offset,
 }
 #endif
 
-
-#endif // __BITS_CC__
+#endif // __BITS_FUNCTIONS_HH__
