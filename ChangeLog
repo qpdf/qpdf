@@ -1,3 +1,16 @@
+2022-03-07  Jay Berkenbilt  <ejb@ql.org>
+
+	* Minor internal changes to assist with building in other
+	environments: rename internal bits.icc to qpdf/bits_functions.hh
+	(not part of public API), enforce reordering of header files to
+	prevent jpeglib.h from interfering with other headers, remove an
+	unused header that was accidentally added in 10.6.0 but never
+	referenced by any code.
+
+	* Make build work and tests work when NDEBUG is defined. This
+	involved a few changes to some test files but no changes to any
+	library code.
+
 2022-02-25  Jay Berkenbilt  <ejb@ql.org>
 
 	* Bug fix in JSON parser: accept \/ in a string as valid input per

@@ -6,7 +6,12 @@ Release Notes
 For a detailed list of changes, please see the file
 :file:`ChangeLog` in the source distribution.
 
-10.6.3: XXX
+10.6.3: March 8, 2022
+  - Announcement of upcoming change:
+
+    - qpdf 11 will be built with cmake. The qpdf 11 documentation will
+      include detailed migration instructions.
+
   - Bug fixes:
 
     - Recognize strings explicitly encoded as UTF-8 as allowed by the
@@ -16,6 +21,10 @@ For a detailed list of changes, please see the file
       whose ``/DA`` field lacks proper font size specification or that
       specifies auto sizing. At this time, qpdf does not support auto
       sizing.
+
+    - Minor, non-functional changes to build and documentation to
+      accommodate a wider range of compilation environments in
+      preparation for migration to cmake.
 
 10.6.2: February 16, 2022
   - Bug fixes:

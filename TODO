@@ -3,7 +3,6 @@ Next
 ====
 
 In order:
-* PR #661 (overloaded getters from m-holger)
 * cmake
 * code formatting
 * PointerHolder -> shared_ptr
@@ -284,7 +283,7 @@ When creating output from a string:
 * Else encode as "b:"
 
 When reading a string, any string that doesn't follow the above rules
-is an error. This includes "r:" strings not paresable as a real
+is an error. This includes "r:" strings not parseable as a real
 number, "/Name" strings containing a NUL character, "s:" or "b:"
 strings that are not valid JSON strings, "b:" strings containing
 character values > 0xff, or "e:" values that are not valid base64.
