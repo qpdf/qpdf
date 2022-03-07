@@ -1,7 +1,12 @@
 #include <qpdf/QPDFMatrix.hh>
 #include <qpdf/QUtil.hh>
-#include <assert.h>
 #include <iostream>
+
+#ifdef NDEBUG
+// We need assert even in a release build for test code.
+# undef NDEBUG
+#endif
+#include <cassert>
 
 static void check(QPDFMatrix const& m, std::string const& exp)
 {

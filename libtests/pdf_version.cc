@@ -1,7 +1,12 @@
 #include <qpdf/PDFVersion.hh>
 
-#include <cassert>
 #include <iostream>
+
+#ifdef NDEBUG
+// We need assert even in a release build for test code.
+# undef NDEBUG
+#endif
+#include <cassert>
 
 int main()
 {

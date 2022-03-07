@@ -7,6 +7,11 @@
 #include <string.h>
 #include <iostream>
 #include <stdlib.h>
+
+#ifdef NDEBUG
+// We need assert even in a release build for test code.
+# undef NDEBUG
+#endif
 #include <cassert>
 
 static void other_tests()

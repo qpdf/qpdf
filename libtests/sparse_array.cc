@@ -1,6 +1,11 @@
 #include <qpdf/SparseOHArray.hh>
-#include <assert.h>
 #include <iostream>
+
+#ifdef NDEBUG
+// We need assert even in a release build for test code.
+# undef NDEBUG
+#endif
+#include <cassert>
 
 int main()
 {

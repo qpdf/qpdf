@@ -1,5 +1,4 @@
 #include <iostream>
-#include <cassert>
 #include <cstring>
 #include <cstdlib>
 #include <functional>
@@ -9,6 +8,12 @@
 #include <map>
 #include <memory>
 #include <regex>
+
+#ifdef NDEBUG
+// We need assert even in a release build for test code.
+# undef NDEBUG
+#endif
+#include <cassert>
 
 // Functional programming
 

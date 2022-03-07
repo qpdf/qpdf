@@ -1,11 +1,16 @@
 #include <qpdf/qpdf-c.h>
 #include <stdio.h>
-#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 
 #include <qpdf/qpdf-config.h> // for LL_FMT -- special case in build
+
+#ifdef NDEBUG
+/* We need assert even in a release build for test code. */
+# undef NDEBUG
+#endif
+#include <assert.h>
 
 static char* whoami = 0;
 static qpdf_data qpdf = 0;

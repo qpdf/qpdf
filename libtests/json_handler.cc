@@ -2,6 +2,11 @@
 #include <qpdf/QUtil.hh>
 #include <qpdf/QPDFUsage.hh>
 #include <iostream>
+
+#ifdef NDEBUG
+// We need assert even in a release build for test code.
+# undef NDEBUG
+#endif
 #include <cassert>
 
 static void print_null(std::string const& path)

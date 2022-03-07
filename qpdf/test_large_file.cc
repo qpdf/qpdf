@@ -13,7 +13,12 @@
 #include <iostream>
 #include <string.h>
 #include <stdlib.h>
-#include <assert.h>
+
+#ifdef NDEBUG
+// We need assert even in a release build for test code.
+# undef NDEBUG
+#endif
+#include <cassert>
 
 // Run "test_large_file write small a.pdf" to get a PDF file that you
 // can look at in a reader.

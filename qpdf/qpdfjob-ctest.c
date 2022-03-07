@@ -1,8 +1,13 @@
 #include <qpdf/qpdfjob-c.h>
 #include <stdio.h>
-#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef NDEBUG
+/* We need assert even in a release build for test code. */
+# undef NDEBUG
+#endif
+#include <assert.h>
 
 #ifndef QPDF_NO_WCHAR_T
 static void wide_test()

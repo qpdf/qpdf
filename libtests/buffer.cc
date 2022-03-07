@@ -5,8 +5,13 @@
 #include <stdlib.h>
 #include <stdexcept>
 #include <iostream>
-#include <cassert>
 #include <cstring>
+
+#ifdef NDEBUG
+// We need assert even in a release build for test code.
+# undef NDEBUG
+#endif
+#include <cassert>
 
 static unsigned char* uc(char const* s)
 {

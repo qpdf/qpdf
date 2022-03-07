@@ -6,9 +6,14 @@
 
 #include <iostream>
 #include <errno.h>
-#include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+
+#ifdef NDEBUG
+// We need assert even in a release build for test code.
+# undef NDEBUG
+#endif
+#include <cassert>
 
 void run(char const* filename, char const* filter,
          bool encode, unsigned int columns,

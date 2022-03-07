@@ -9,7 +9,6 @@
 #include <qpdf/Pl_Buffer.hh>
 #include <string.h>
 #include <limits.h>
-#include <assert.h>
 #include <fstream>
 #include <locale>
 
@@ -18,6 +17,12 @@
 #else
 # include <unistd.h>
 #endif
+
+#ifdef NDEBUG
+// We need assert even in a release build for test code.
+# undef NDEBUG
+#endif
+#include <cassert>
 
 template <class int_T>
 void test_to_number(char const* str, int_T wanted, bool error,
