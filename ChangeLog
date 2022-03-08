@@ -2,6 +2,11 @@
 
 	* 10.6.3: release
 
+	* Use Windows 2022 github runners and therefore Visual Studio 2022
+	to create Windows distributions
+
+	* Fix DLL export issue with mingw (Windows)
+
 2022-03-07  Jay Berkenbilt  <ejb@ql.org>
 
 	* Minor internal changes to assist with building in other

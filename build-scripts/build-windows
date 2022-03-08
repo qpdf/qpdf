@@ -6,16 +6,14 @@ tool=$2
 
 if [[ $tool == mingw ]]; then
     pacman -Sy --noconfirm make base-devel tar zip unzip
-    if [ -d /c/msys64 ]; then
-        PATH="/c/msys64/mingw$wordsize/bin:$PATH"
-    else
+    if [ ! -x /c/msys64/mingw$wordsize/bin/g++.exe ]; then
         if [[ $wordsize == 64 ]]; then
             pacman -Sy --noconfirm mingw-w64-x86_64-toolchain
         else
             pacman -Sy --noconfirm mingw-w64-i686-toolchain
         fi
-        PATH="/c/tools/msys64/mingw$wordsize/bin:$PATH"
     fi
+    PATH="/c/msys64/mingw$wordsize/bin:$PATH"
     g++ -v
 elif [[ $tool == msvc ]]; then
     cl
