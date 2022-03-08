@@ -103,11 +103,17 @@ cmake
 
 * Rebase the cmake branch onto main and fast-forward over it.
 * Remove all "lt-" workarounds.
-* Change name of DLL_EXPORT preprocessor symbol passed into the build.
-  Be sure to call attention to this in the release notes. There should
-  be a "migrating to cmake" in the manual, and ./configure should draw
-  attention to it.
-* Remove DLL.h and QPDF_DLL from all private library classes.
+* DLL.h
+  * Remove DLL.h and QPDF_DLL* from all private library classes.
+  * Change DLL_EXPORT to QPDF_EXPORT. Be sure to call attention to
+    this in the release notes. There should be a "migrating to cmake"
+    in the manual, and ./configure should draw attention to it.
+  * Remove the definition of QPDF_DLL_CLASS from DLL.h and change all
+    occurrences of QPDF_DLL_CLASS to QPDF_DLL. This will require
+    removing QPDF_DLL from methods inside classes that are declared
+    with QPDF_DLL. If we want to explicit exclude private methods, we
+    will need to mark them as not exported. See
+    https://gcc.gnu.org/wiki/Visibility
 * Nice to have:
   * Split qpdf.test into multiple tests
   * Rework tests so that nothing is written into the source directory.
