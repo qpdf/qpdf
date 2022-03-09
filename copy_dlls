@@ -1,14 +1,15 @@
 #!/usr/bin/env perl
 
 require 5.008;
-BEGIN { $^W = 1; }
+use warnings;
 use strict;
 use File::Basename;
+use File::Path qw(make_path);
 
 my $whoami = basename($0);
 
-usage() unless @ARGV == 4;
-my ($file, $destdir, $objdump, $windows_wordsize) = @ARGV;
+usage() unless @ARGV == 3;
+my ($file, $libqpdf, $destdir) = @ARGV;
 my $filedir = dirname($file);
 
 my $sep = ($^O eq 'MSWin32' ? ';' : ':');
@@ -19,28 +20,6 @@ foreach my $var (qw(LIB))
     {
         push(@path, split($sep, $ENV{$var}));
     }
-}
-my $redist_suffix = (($windows_wordsize eq '64') ? "x64" : "x86");
-if (exists $ENV{'VCINSTALLDIR'})
-{
-    my $redist = $ENV{'VCINSTALLDIR'} . "/Redist/$redist_suffix";
-    if (opendir(D, $redist))
-    {
-        my @entries = readdir(D);
-        closedir(D);
-        foreach my $e (@entries)
-        {
-            if ($e =~ m/\.CRT$/i)
-            {
-                unshift(@path, "$redist/$e");
-            }
-        }
-    }
-}
-if (exists $ENV{'UniversalCRTSdkDir'})
-{
-    my $redist = $ENV{'UniversalCRTSdkDir'} . "/Redist/ucrt/DLLs/$redist_suffix";
-    unshift(@path, $redist);
 }
 
 my $format = undef;
@@ -53,13 +32,16 @@ while (@to_find)
 {
     my $dll = shift(@to_find);
     my $found = 0;
-    foreach my $dir (@path)
+    foreach my $dir ($libqpdf, @path)
     {
         if ((-f "$dir/$dll") && is_format("$dir/$dll", $format))
         {
             if (! exists $final{$dll})
             {
-                $final{$dll} = "$dir/$dll";
+                if ($dir ne $libqpdf)
+                {
+                    $final{$dll} = "$dir/$dll";
+                }
                 push(@to_find, get_dlls("$dir/$dll"));
             }
             $found = 1;
@@ -77,6 +59,7 @@ if (@notfound)
 	join(', ', @notfound), "\n";
 }
 
+make_path($destdir);
 foreach my $dll (sort keys (%final))
 {
     my $f = $final{$dll};
@@ -90,7 +73,7 @@ sub get_dlls
 {
     my @result = ();
     my $exe = shift;
-    open(O, "$objdump -p \"$exe\"|") or die "$whoami: can't run objdump\n";
+    open(O, "objdump -p \"$exe\"|") or die "$whoami: can't run objdump\n";
     while (<O>)
     {
         if (m/^\s+DLL Name:\s+(.+\.dll)/i)
@@ -141,5 +124,5 @@ sub is_format
 
 sub usage
 {
-    die "Usage: $whoami {exe|dll} destdir\n";
+    die "Usage: $whoami {exe|dll} libqpdf-dir destdir\n";
 }
