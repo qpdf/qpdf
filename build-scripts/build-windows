@@ -28,10 +28,9 @@ fi
 unzip doc.zip
 unzip qpdf-external-libs-bin.zip
 cwd=`pwd`
-PATH=$cwd/libqpdf/build:$PATH
 
-mkdir build
-cd build distribution
+mkdir build distribution
+cd build
 ../cmake-win $tool ci
 cmake --build . -j$(nproc) "${cmake_xargs[@]}" -- -k
 ctest --verbose "${ctest_xargs[@]}"
