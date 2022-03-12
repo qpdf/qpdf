@@ -10,5 +10,5 @@ sudo make install
 cd ..
 cmake -S . -B build -DCI_MODE=1 -DCMAKE_BUILD_TYPE=Release
 # no nproc on github actions mac runner (2022)
-cmake --build build -j4 -- -k
+cmake --build build --verbose -j4 -- -k
 (cd build; ctest --verbose)
