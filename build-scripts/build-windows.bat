@@ -10,11 +10,6 @@ if %2 == msvc (
     choco install zip
     bash ./build-scripts/build-windows %1 %2
 ) else (
-    if exist C:\msys64 (
-       set MSYS=C:\msys64
-    ) else (
-       choco install msys2
-       set MSYS=C:\tools\msys64
-    )
-    !MSYS!\usr\bin\env.exe MSYSTEM=MINGW64 /bin/bash -l %CD%/build-scripts/build-windows %1 %2
+    set MSYS=C:\msys64
+    !MSYS!\usr\bin\env.exe MSYSTEM=MINGW64 MSYS2_PATH_TYPE=inherit /bin/bash -l %CD%/build-scripts/build-windows %1 %2
 )
