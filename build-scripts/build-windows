@@ -17,6 +17,7 @@ if [[ $tool == mingw ]]; then
     fi
     PATH="/c/msys64/mingw$wordsize/bin:$PATH"
     config=RelWithDebInfo
+    cmake_xargs=(-- -k)
     g++ -v
 elif [[ $tool == msvc ]]; then
     cl
@@ -31,7 +32,7 @@ unzip qpdf-external-libs-bin.zip
 
 cd build
 ../cmake-win $tool ci
-cmake --build . -j$(nproc) "${cmake_xargs[@]}" -- -k
+cmake --build . -j$(nproc) "${cmake_xargs[@]}"
 ctest --verbose "${ctest_xargs[@]}"
 cpack -G NSIS -C $config
 cpack -G ZIP -C $config

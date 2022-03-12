@@ -11,5 +11,5 @@ if %2 == msvc (
     bash ./build-scripts/build-windows %1 %2
 ) else (
     set MSYS=C:\msys64
-    !MSYS!\usr\bin\env.exe MSYSTEM=MINGW64 /bin/bash -l %CD%/build-scripts/build-windows %1 %2
+    !MSYS!\usr\bin\env.exe MSYSTEM=MINGW64 MSYS2_PATH_TYPE=inherit /bin/bash -l %CD%/build-scripts/build-windows %1 %2
 )
