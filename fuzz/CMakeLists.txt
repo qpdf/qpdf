@@ -14,21 +14,18 @@ set(FUZZERS
   runlength_fuzzer
   tiffpredictor_fuzzer)
 
+if(NOT LIB_FUZZING_ENGINE)
+  # When running from oss-fuzz, LIB_FUZZING_ENGINE points to a
+  # static library that contains main.
+  add_library(standalone_fuzzer STATIC standalone_fuzz_target_runner.cc)
+  set(LIB_FUZZING_ENGINE standalone_fuzzer)
+endif()
+
 foreach(PROG ${FUZZERS})
   add_executable(${PROG} ${PROG}.cc)
-  if(LIB_FUZZING_ENGINE)
-    # When running from oss-fuzz, LIB_FUZZING_ENGINE points to a
-    # static library that contains main.
-    target_link_libraries(${PROG} ${LIB_FUZZING_ENGINE})
-  else()
-    # When not running from oss-fuzz, supply our own main.
-    target_sources(${PROG} standalone_fuzz_target_runner.cc)
-  endif()
+  target_link_libraries(${PROG} ${LIB_FUZZING_ENGINE})
   target_link_libraries(${PROG} libqpdf_object)
-  if(OSS_FUZZ)
-    # oss-fuzz wants static executables
-    target_link_options(${PROG} -static)
-  endif()
+  # XXX link statically with jpeg...
 endforeach()
 
 # Files from the test suite that are good for seeding the fuzzer.
@@ -131,9 +128,23 @@ add_test(
 
 if(NOT OUT)
   # oss-fuzz sets OUT
-  set(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/fuzz-install)
+  set(OUT ${CMAKE_CURRENT_BINARY_DIR}/fuzz-install)
 endif()
 if(OSS_FUZZ)
+  list(APPEND SEED_CORPUS_ZIPS)
+  foreach(F ${FUZZERS})
+    if(F STREQUAL qpdf_fuzzer)
+      set(SEED_DIR ${CORPUS_DIR})
+    else()
+      set(SEED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${F}_seed_corpus)
+    endif()
+    set(SEED_ZIP ${CMAKE_CURRENT_BINARY_DIR}/${F}_seed_corpus.zip)
+    add_custom_command(OUTPUT ${SEED_ZIP}
+      COMMAND zip -q -r ${SEED_ZIP} .
+      WORKING_DIRECTORY ${SEED_DIR})
+    list(APPEND SEED_CORPUS_ZIPS ${SEED_ZIP})
+  endforeach()
+  add_custom_target(seed_corpus_zips ALL DEPENDS ${SEED_CORPUS_ZIPS})
   install(
     TARGETS ${FUZZERS}
     DESTINATION ${OUT}
@@ -143,14 +154,8 @@ if(OSS_FUZZ)
     FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/pdf.dict
     ${CMAKE_CURRENT_SOURCE_DIR}/qpdf_fuzzer.options
+    ${SEED_CORPUS_ZIPS}
     DESTINATION ${OUT}
     EXCLUDE_FROM_ALL
     COMPONENT fuzz)
 endif()
-
-## 	  if test -d fuzz/$(OUTPUT_DIR)/$${B}_seed_corpus; then \
-## 	    (cd fuzz/$(OUTPUT_DIR)/$${B}_seed_corpus; zip -q -r $(OUT)/$${B}_seed_corpus.zip .); \
-## 	  elif test -d fuzz/$${B}_seed_corpus; then \
-## 	    (cd fuzz/$${B}_seed_corpus; zip -q -r $(OUT)/$${B}_seed_corpus.zip .); \
-## 	  fi; \
-## 	done

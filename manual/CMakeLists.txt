@@ -99,7 +99,7 @@ if(BUILD_DOC)
       COMMAND cp -r html ${DOC_DIST_HTML}
       COMMAND cp -r singlehtml ${DOC_DIST_SINGLEHTML}
       COMMAND cp -r ${DOC_PDF_OUTPUT} ${DOC_DIST_PDF}
-      DEPENDS ${DOC_HTML_OUTPUT} ${DOC_PDF_OUTPUT} ${DOC_DIST_PDF})
+      DEPENDS ${DOC_HTML_OUTPUT} ${DOC_SINGLEHTML_OUTPUT} ${DOC_PDF_OUTPUT})
     add_custom_target(doc_dist ALL
       DEPENDS ${DOC_DIST_HTML} ${DOC_DIST_SINGLEHTML} ${DOC_DIST_PDF})
     add_dependencies(doc_dist doc)
