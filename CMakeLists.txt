@@ -225,6 +225,11 @@ else()
   qpdf_maybe_add_flag(C -Wshadow=local flag_shadow_local)
   qpdf_maybe_add_flag(CXX -Wold-style-cast flag_old-style-cast)
 endif()
+if(APPLE)
+  # 2022: stdio.h has lots of nullability completeness warnings on
+  # MacOS 11.
+  qpdf_maybe_add_flag(C -Wno-nullability-completeness flag_nullability)
+endif()
 
 # We don't include the jpeg library's include path in the PUBLIC
 # interface for libqpdf since only Pl_DCT.hh requires it. This is
@@ -290,6 +295,15 @@ message(STATUS "  build static libraries: ${BUILD_STATIC_LIBS}")
 message(STATUS "  build manual: ${BUILD_DOC}")
 message(STATUS "  compiler warnings are errors: ${WERROR}")
 message(STATUS "  system: ${CPACK_SYSTEM_NAME}")
+message(STATUS "")
+message(STATUS "*** Options Summary ***")
+foreach(PROP COMPILE_OPTIONS COMPILE_DEFINITIONS LINK_OPTIONS)
+  get_target_property(VAL qpdf ${PROP})
+  if(NOT ("${VAL}" STREQUAL "VAL-NOTFOUND"))
+    message(STATUS "  ${PROP}: ${VAL}")
+  endif()
+endforeach()
+message(STATUS "")
 message(STATUS "See above for crypto summary.")
 message(STATUS "")
 if(NOT (MULTI_CONFIG OR CMAKE_BUILD_TYPE))
