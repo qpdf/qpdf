@@ -21,15 +21,9 @@ if [[ $GITHUB_FORK != "" ]]; then
     fi
 fi
 
-./configure \
-  --enable-oss-fuzz \
-  --enable-static \
-  --disable-shared \
-  --enable-crypto-native \
-  --disable-implicit-crypto \
-  --prefix="$WORK" \
-  LDFLAGS="-L$WORK/lib" \
-  CPPFLAGS="-I$WORK/include" \
-  LIBS="-pthread"
-make -j$(nproc) install
-make install_fuzz
+env CMAKE_PREFIX_PATH=$WORK LDFLAGS="-L$WORK/lib -lpthread" \
+    cmake -S . -B build \
+    -DOSS_FUZZ=1 -DBUILD_SHARED_LIBS=0 -DCMAKE_BUILD_TYPE=Debug \
+    -DUSE_IMPLICIT_CRYPTO=0 -DREQUIRE_CRYPTO_NATIVE=1
+cmake --build build -j$(nproc) --target fuzzers
+cmake --install build --component fuzz

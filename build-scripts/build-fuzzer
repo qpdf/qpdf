@@ -4,8 +4,12 @@ export WORK=$PWD/work
 export OUT=$PWD/out
 mkdir -p $WORK $OUT
 sudo apt-get update
-sudo apt-get -y install \
-   autoconf build-essential zlib1g-dev libjpeg-dev
+sudo apt-get -y install build-essential cmake zlib1g-dev libjpeg-dev
 ./fuzz/oss-fuzz-build
-ls -l out/qpdf*fuzzer
+ls -l out/qpdf_fuzzer
 ls -l out/
+if ldd out/qpdf_fuzzer | egrep 'libjpeg|libz|libqpdf'; then
+    echo 1>&2 "*** Fuzzers linked dynamically with some dependent libraries."
+    ldd out/qpdf_fuzzer
+    exit 2
+fi
