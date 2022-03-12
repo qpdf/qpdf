@@ -1,24 +1,14 @@
 #!/bin/bash
 set -ex
 
-# dpkg --add-architecture not needed for Ubuntu 18.04
 sudo dpkg --add-architecture i386
-
 sudo apt-get update
-
-# For Ubuntu 18.04:
-#
-# sudo apt-get -y install \
-#    autoconf build-essential zlib1g-dev:i386 libjpeg-dev:i386 \
-#    g++-multilib-i686-linux-gnu
-# ./configure --enable-werror --enable-show-failed-test-output \
-#     CC=i686-linux-gnu-gcc CXX=i686-linux-gnu-g++
-
 sudo apt-get -y install \
-   autoconf build-essential zlib1g-dev:i386 libjpeg-dev:i386 \
-   libssl-dev:i386 g++-multilib
-./configure --enable-werror --enable-show-failed-test-output \
-    CFLAGS=-m32 CXXFLAGS=-m32 LDFLAGS=-m32
-
-make -j$(nproc) -k
-make -k check
+     build-essential cmake zlib1g-dev:i386 libjpeg-dev:i386 \
+     libssl-dev:i386 g++-multilib
+CFLAGS=-m32 CXXFLAGS=-m32 LDFLAGS=-m32 \
+      cmake -S . -B build -DCI_MODE=1 -DCMAKE_BUILD_TYPE=Release \
+      -DUSE_IMPLICIT_CRYPTO=0 -DBUILD_STATIC_LIBS=0 \
+      -DREQUIRE_CRYPTO_NATIVE=1
+cmake --build build -j$(nproc) -- -k
+(cd build; ctest --verbose)
