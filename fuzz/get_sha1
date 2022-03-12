@@ -1,9 +1,0 @@
-#!/usr/bin/env perl
-require 5.008;
-use warnings;
-use strict;
-use Digest::SHA;
-
-binmode STDIN;
-my $digest = Digest::SHA->new('sha1')->addfile(*STDIN)->hexdigest;
-print "$digest";

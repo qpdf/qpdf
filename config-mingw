@@ -1,9 +1,0 @@
-#!/bin/sh
-set -e
-set -x
-if g++ -v 2>&1 | grep Target: | grep -q x86_64; then
-    wordsize=64
-else
-    wordsize=32
-fi
-./configure --disable-test-compare-images --enable-external-libs --enable-werror --with-buildrules=mingw ${1+"$@"} --enable-crypto-openssl --disable-crypto-gnutls

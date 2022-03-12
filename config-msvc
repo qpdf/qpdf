@@ -1,9 +1,0 @@
-#!/bin/sh
-set -e
-set -x
-if cl 2>&1 | grep -q 'for x64'; then
-    wordsize=64
-else
-    wordsize=32
-fi
-CC=cl CXX="cl -TP -GR" ./configure --disable-test-compare-images --enable-external-libs --enable-werror --with-buildrules=msvc ${1+"$@"} --enable-crypto-openssl --disable-crypto-gnutls
