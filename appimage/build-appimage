@@ -82,31 +82,34 @@ appdir=$here/build/appdir
 rm -rf $here/build
 
 # Prepare build of QPDF from sources:
-./configure --prefix=/usr --enable-werror \
-            --enable-crypto-gnutls --disable-implicit-crypto \
-            --enable-show-failed-test-output \
-            --enable-html-doc --enable-pdf-doc "$CUSTOM_CONFIGURE"
+rm -rf build.appimage
+mkdir build.appimage
+cd build.appimage
+cmake -DWERROR=1 -DBUILD_DOC=1 -DCMAKE_BUILD_TYPE=Release \
+      -DBUILD_DOC_DIST=1 -DINSTALL_MANUAL=1 \
+      -DREQUIRE_CRYPTO_GNUTLS=1 -DUSE_IMPLICIT_CRYPTO=0 \
+      -DSHOW_FAILED_TEST_OUTPUT=1 -DBUILD_STATIC_LIBRARIES=0 \
+      "$CUSTOM_CONFIGURE" ..
 
 # Build!
-make -j$(nproc)
+cmake --build . -j$(nproc)
 
 if [ "$SKIP_TESTS" = "" ]; then
     # Run built-in QPDF checks:
-    make -k check
+    ctest --verbose
 fi
 
 # Prepare AppDir which is the basis for the AppImage:
 mkdir -p $appdir
 
 # Install build result into AppDir:
-make install DESTDIR=$appdir; find $appdir
-make doc-dist DOC_DEST=appdir/usr/share/doc/qpdf
+for i in lib cli doc; do
+    DESTDIR=$appdir cmake --install . --prefix /usr --component $i
+done
+find $appdir
 
 # Change into build directory:
 cd $here/build
-
-# Don't bundle developer stuff
-rm -rf appdir/usr/include appdir/usr/lib/pkgconfig appdir/usr/lib/*.{a,la,so}
 
 # Copy icon which is needed for desktop integration into place:
 for width in 64 128 256 512; do

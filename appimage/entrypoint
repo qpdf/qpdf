@@ -1,8 +1,5 @@
 #!/bin/bash
 set -e
-if [ "$SKIP_TESTS" = "1" ]; then
-    touch /tmp/skip-tests
-fi
 if [ $(id -u) = 0 ]; then
     if [ ! -d /tmp/build ]; then
         echo "/tmp/build must exist"
@@ -10,6 +7,10 @@ if [ $(id -u) = 0 ]; then
     fi
     id=$(stat -c %u /tmp/build)
     adduser --home /tmp/build --no-create-home --uid $id --disabled-password --gecos build build
+    touch /tmp/.env
+    echo "export SKIP_TESTS=$SKIP_TESTS" >> /tmp/.env
+    echo "export RUN_SHELL=$RUN_SHELL" >> /tmp/.env
+    chown build /tmp/.env
     exec sudo -iu build $0 "$@"
 fi
 
@@ -22,7 +23,9 @@ if [ ! -d qpdf ]; then
     git clone "$@" qpdf
 fi
 cd qpdf
-if [ -f /tmp/skip-tests ]; then
-    export SKIP_TESTS=1
+source /tmp/.env
+if [ "$RUN_SHELL" = "1" ]; then
+    bash
+else
+    ./appimage/build-appimage
 fi
-./appimage/build-appimage
