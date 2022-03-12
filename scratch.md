@@ -73,6 +73,7 @@ Remaining work:
 * include **/CMakeLists.txt in spell check
 * Build documentation: manual/installation.rst. Mention relevant options and reference CMakeLists.txt's comment.
 * README-windows-install.txt is no longer used
+* Can we print flags from cmake?
 
 Notes:
 * `cmake --build . -U pattern` -- remove from cache
