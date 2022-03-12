@@ -1,8 +1,6 @@
 # This directory contains support for Google's oss-fuzz project. See
 # https://github.com/google/oss-fuzz/tree/master/projects/qpdf
 
-# XXX Update oss-fuzz to handle cmake
-
 set(FUZZERS
   qpdf_fuzzer
   ascii85_fuzzer
@@ -32,7 +30,6 @@ foreach(PROG ${FUZZERS})
   add_executable(${PROG} ${PROG}.cc)
   target_link_libraries(${PROG} ${LIB_FUZZING_ENGINE})
   target_link_libraries(${PROG} libqpdf_object)
-  # XXX link statically with jpeg...
 endforeach()
 
 # Files from the test suite that are good for seeding the fuzzer.
