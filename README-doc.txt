@@ -11,8 +11,8 @@ https://github.com/qpdf/qpdf/releases
 Offline documentation contains the following:
 
 * PDF: qpdf-manual.pdf
-* HTML: html/index.html
-* SINGLE-PAGE HTML: singlehtml/index.html
+* HTML: manual-html/index.html
+* SINGLE-PAGE HTML: manual-single-page-html/index.html
 
 If you are reading this file from the source distribution, you can
 find the documentation sources in the "manual" directory. There is
