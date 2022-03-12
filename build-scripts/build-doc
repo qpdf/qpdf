@@ -7,7 +7,6 @@ sudo apt-get -y install \
    autoconf build-essential cmake zlib1g-dev libjpeg-dev \
    python3-pip texlive-latex-extra latexmk
 pip3 install sphinx sphinx_rtd_theme
-mkdir build
 cmake -S . -B build -DBUILD_DOC=1
 cmake --build build --target doc_dist
 zip -r doc.zip build/manual/doc-dist
