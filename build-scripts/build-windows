@@ -6,9 +6,8 @@ tool=$2
 
 declare -a cmake_xargs
 declare -a ctest_xargs
-pacman -Sy --noconfirm tar zip unzip
 if [[ $tool == mingw ]]; then
-    pacman -Sy --noconfirm make base-devel
+    pacman -Sy --noconfirm make base-devel tar zip unzip
     if [ ! -x /c/msys64/mingw$wordsize/bin/g++.exe ]; then
         if [[ $wordsize == 64 ]]; then
             pacman -Sy --noconfirm mingw-w64-x86_64-toolchain
