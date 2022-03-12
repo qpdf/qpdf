@@ -5529,7 +5529,7 @@ for (my $large = 0; $large < $nlarge; ++$large)
                               " --object-streams=$omode" .
                               " $lin '$file' '$newfile'"},
                          {$td->STRING => "", $td->EXIT_STATUS => 0});
-            $td->runtest("read test file",
+            $td->runtest("read: ostream=$ostream, linearize=$linearize",
                          {$td->COMMAND =>
                               "test_large_file read $size '$newfile'"},
                          {$td->FILE => "large_file.out", $td->EXIT_STATUS => 0},
