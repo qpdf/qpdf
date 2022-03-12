@@ -4,13 +4,15 @@ Windows Binaries
 
 You can download Windows binaries that are statically linked with qpdf's external dependencies and use the OpenSSL crypto provider. There are several options:
 
-* `qpdf-<version>-bin-mingw32.zip` - 32-bit executables that should work on basically any Windows system, including 64-bit systems. The 32-bit executables are capable of handling files larger than 2 GB. If you just want to use the qpdf command line program or use the qpdf DLL's C-language interface, you can download this file.  You can also download this version if you are using MINGW's gcc and want to program using the C++ interface.
+* For Windows installers, you can download the `.exe` file for a traditional installer that allows relocation, or you can download the `.zip` file which you can unzip to any location.
 
-* `qpdf-<version>-bin-mingw64.zip` - A 64-bit version built with mingw.  Use this for 64-bit Windows systems.  The 32-bit version will also work on Windows 64-bit. Both the 32-bit and the 64-bit version support files over 2 GB in size, but you may find it easier to integrate this with your own software if you use the 64-bit version.
+* `qpdf-<version>-bin-mingw32.exe` - 32-bit executables that should work on basically any Windows system, including 64-bit systems. The 32-bit executables are capable of handling files larger than 2 GB. If you just want to use the qpdf command line program or use the qpdf DLL's C-language interface, you can download this file.  You can also download this version if you are using MINGW's gcc and want to program using the C++ interface.
 
-* `qpdf-<version>-bin-msvc32.zip` - If you want to program using qpdf's C++ interface and you are using a recent version of Microsoft Visual C++ in 32-bit mode, you can download this file.
+* `qpdf-<version>-bin-mingw64.exe` - A 64-bit version built with mingw.  Use this for 64-bit Windows systems.  The 32-bit version will also work on Windows 64-bit. Both the 32-bit and the 64-bit version support files over 2 GB in size, but you may find it easier to integrate this with your own software if you use the 64-bit version.
 
-* `qpdf-<version>-bin-msvc64.zip` - If you want to program using qpdf's C++ interface and you are using a recent version of Microsoft Visual C++ in 64-bit mode, you can download this file.
+* `qpdf-<version>-bin-msvc32.exe` - If you want to program using qpdf's C++ interface and you are using a recent version of Microsoft Visual C++ in 32-bit mode, you can download this file.
+
+* `qpdf-<version>-bin-msvc64.exe` - If you want to program using qpdf's C++ interface and you are using a recent version of Microsoft Visual C++ in 64-bit mode, you can download this file.
 
 Linux Binaries
 
@@ -22,7 +24,7 @@ Virtually all Linux distributions include packages for qpdf. There is also a PPA
 
 Windows Build Support
 
-If you are building on Windows and want to use pre-built external static libraries, you should obtain current versions from https://github.com/qpdf/external-libs/releases. The `external-libs` directory contains older versions that will not work with qpdf versions >= 10.0.2. Please see README-windows.md in the qpdf source distribution.
+If you are building on Windows and want to use pre-built external static libraries, you should obtain current versions from https://github.com/qpdf/external-libs/releases. The `external-libs` directory contains older versions that will not work with qpdf versions >= 10.0.2. Please see README-windows.md in the qpdf source distribution. The libraries from this distribution will not work with a Debug build with MSVC.
 
 Documentation
 

@@ -28,6 +28,9 @@ Misc
   --show-encryption could potentially retry with this option if the
   first time doesn't work. Then, with the file open, we can read the
   encryption dictionary normally.
+* Go through README-maintainer "CODING RULES" and update --
+  PointerHolder and other changes will make some of the rules
+  obsolete.
 
 Soon: Break ground on "Document-level work"
 
@@ -1031,12 +1034,6 @@ Rejected Ideas
 
 * Investigate whether there is a way to automate the memory checker
   tests for Windows.
-
-* Consider adding "uninstall" target to makefile. It should only
-  uninstall what it installed, which means that you must run
-  uninstall from the version you ran install with. It would only be
-  supported for the toolchains that support the install target
-  (libtool).
 
 * Provide support in QPDFWriter for writing incremental updates.
   Provide support in qpdf for preserving incremental updates.  The
