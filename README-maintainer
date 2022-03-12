@@ -27,6 +27,10 @@ CFLAGS="-fsanitize=address -fsanitize=undefined" \
    CC=clang CXX=clang++ \
    cmake -DMAINTAINER_MODE=1 -DBUILD_SHARED_LIBS=0 -DCMAKE_BUILD_TYPE=Debug ..
 
+Windows:
+
+../cmake-win {mingw|msvc} maint
+
 VERSIONS
 
 * The version number on the main branch is whatever the version would
