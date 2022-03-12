@@ -80,11 +80,8 @@ GOOGLE OSS-FUZZ
 
   Clone the oss-fuzz project. From the root directory of the repository:
 
-  Add `-e GITHUB_FORK=fork -e GITHUB_BRANCH=branch` to build_fuzzers
-  from a qpdf fork/branch rather than qpdf/main.
-
   python3 infra/helper.py build_image --pull qpdf
-  python3 infra/helper.py build_fuzzers [ --sanitizer memory|undefined|address ] qpdf
+  python3 infra/helper.py build_fuzzers [ --sanitizer memory|undefined|address ] qpdf [path-to-qpdf-source]
   python3 infra/helper.py check_build qpdf
   python3 infra/helper.py build_fuzzers --sanitizer coverage qpdf
   python3 infra/helper.py coverage qpdf
