@@ -23,10 +23,20 @@ All header files are installed in the
 you use ``#include <qpdf/QPDF.hh>`` rather than adding
 :file:`include/qpdf` to your include path.
 
-When linking against the qpdf static library, you may also need to
-specify ``-lz -ljpeg`` on your link command. If your system understands
-how to read libtool :file:`.la` files, this may not
-be necessary.
+qpdf installs a ``pkg-config`` configuration with package name
+``libqpdf`` and a ``cmake`` configuration with package name ``qpdf``.
+The ``libqpdf`` target is exported in the ``qpdf::`` namespace. The
+following is an example of a :file:`CMakeLists.txt` file for a
+single-file executable that links with qpdf:
+
+.. code-block:: cmake
+
+   cmake_minimum_required(VERSION 3.16)
+   project(some-application LANGUAGES CXX)
+   find_package(qpdf)
+   add_executable(some-application some-application.cc)
+   target_link_libraries(some-application qpdf::libqpdf)
+
 
 The qpdf library is safe to use in a multithreaded program, but no
 individual ``QPDF`` object instance (including ``QPDF``,

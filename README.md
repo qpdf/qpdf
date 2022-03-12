@@ -9,9 +9,7 @@
 
 QPDF is a command-line tool and C++ library that performs content-preserving transformations on PDF files. It supports linearization, encryption, and numerous other features. It can also be used for splitting and merging files, creating PDF files (but you have to supply all the content yourself), and inspecting files for study or analysis. QPDF does not render PDFs or perform text extraction, and it does not contain higher-level interfaces for working with page contents. It is a low-level tool for working with the structure of PDF files and can be a valuable tool for anyone who wants to do programmatic or command-line-based manipulation of PDF files.
 
-The [QPDF Manual](https://qpdf.readthedocs.io) is hosted online at https://qpdf.readthedocs.io.
-
-Additional information about it can be found at https://qpdf.sourceforge.io.  The source code repository is hosted at GitHub: https://github.com/qpdf/qpdf.
+The [QPDF Manual](https://qpdf.readthedocs.io) is hosted online at https://qpdf.readthedocs.io. The project website is https://qpdf.sourceforge.io. The source code repository is hosted at GitHub: https://github.com/qpdf/qpdf.
 
 # Verifying Distributions
 
@@ -35,9 +33,21 @@ Versions of qpdf prior to version 7 were released under the terms of version 2.0
 
 QPDF requires a C++ compiler that supports C++-14.
 
+To compile and link something with qpdf, you can use `pkg-config` with package name `libqpdf` or `cmake` with package name `qpdf`. Here's an example of a `CMakeLists.txt` file that builds a program with the qpdf library:
+
+```
+cmake_minimum_required(VERSION 3.16)
+project(some-application LANGUAGES CXX)
+find_package(qpdf)
+add_executable(some-application some-application.cc)
+target_link_libraries(some-application qpdf::libqpdf)
+```
+
 QPDF depends on the external libraries [zlib](https://www.zlib.net/) and [jpeg](https://www.ijg.org/files/). The [libjpeg-turbo](https://libjpeg-turbo.org/) library is also known to work since it is compatible with the regular jpeg library, and QPDF doesn't use any interfaces that aren't present in the straight jpeg8 API. These are part of every Linux distribution and are readily available. Download information appears in the documentation. For Windows, you can download pre-built binary versions of these libraries for some compilers; see [README-windows.md](README-windows.md) for additional details.
 
 Depending on which crypto providers are enabled, then [GnuTLS](https://www.gnutls.org/) and [OpenSSL](https://openssl.org) may also be required. This is discussed more in `Crypto providers` below.
+
+Detailed information appears in the [manual](https://qpdf.readthedocs.io/en/latest/installation.html).
 
 # Licensing terms of embedded software
 
@@ -47,23 +57,14 @@ Please see the [NOTICE](NOTICE.md) file for information on licenses of embedded 
 
 # Crypto providers
 
-As of version 9.1.0, qpdf can use different crypto implementations. These can be selected at compile time or at runtime. The native crypto implementations that were used in all versions prior to 9.1.0 are still present and enabled by default.
+qpdf can use different crypto implementations. These can be selected at compile time or at runtime. The native crypto implementations that were used in all versions prior to 9.1.0 are still present, but they are not built into qpdf by default if any external providers are available at build time.
 
-Initially, the following providers are available:
-* `native`: a native implementation where all the source is embedded in qpdf and no external dependencies are required
-* `openssl`: an implementation that can use the OpenSSL (or BoringSSL) libraries to provide crypto; causes libqpdf to link with the OpenSSL library
+The following providers are available:
 * `gnutls`: an implementation that uses the GnuTLS library to provide crypto; causes libqpdf to link with the GnuTLS library
+* `openssl`: an implementation that can use the OpenSSL (or BoringSSL) libraries to provide crypto; causes libqpdf to link with the OpenSSL library
+* `native`: a native implementation where all the source is embedded in qpdf and no external dependencies are required
 
-The default behavior is for ./configure to discover which other crypto providers can be supported based on available external libraries, to build all available crypto providers, and to use an external provider as the default over the native one. This behavior can be changed with the following flags to ./configure:
-
-* `--enable-crypto-x` -- (where `x` is a supported crypto provider): enable the `x` crypto provider, requiring any external dependencies it needs
-* `--disable-crypto-x` -- disable the `x` provider, and do not link against its dependencies even if they are available
-* `--with-default-crypto=x` -- make `x` the default provider even if a higher priority one is available
-* `--disable-implicit-crypto` -- only build crypto providers that are explicitly requested with an `--enable-crypto-x` option
-
-For example, if you want to guarantee that the GnuTLS crypto provider is used, you could run ./configure with `--enable-crypto-gnutls --disable-implicit-crypto`.
-
-Please see the section on crypto providers in the manual for more details.
+The default behavior is for cmake to discover which other crypto providers can be supported based on available external libraries, to build all available external crypto providers, and to use an external provider as the default over the native one. By default, the native crypto provider will be used only if no external providers are available. This behavior can be changed with various cmake options as [described in the manual](https://qpdf.readthedocs.io/en/latest/installation.html#build-time-crypto-selection).
 
 ## Note about weak cryptographic algorithms
 
@@ -71,62 +72,58 @@ The PDF file format used to rely on RC4 for encryption. Using 256-bit keys alway
 
 # Building from source distribution on UNIX/Linux
 
-For UNIX and UNIX-like systems, you can usually get by with just
+Starting with version 11, qpdf builds with cmake. The default configuration with cmake works on most systems. On Windows, you can build qpdf with Visual Studio using cmake without having any additional tools installed. However, to run the test suite, you need MSYS2, and you also need MSYS2 to build with mingw.
 
+Example UNIX/Linux build:
 ```
-./configure
-make
-make install
+cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
+cmake --build build
 ```
 
-Packagers may set DESTDIR, in which case make install will install inside of DESTDIR, as is customary with many packages.  Please also see the "Notes for Packagers" section of the manual.
+Example mingw build from an MSYS2 mingw shell:
+```
+cmake -S . -B build -G 'MSYS Makefiles' -DCMAKE_BUILD_TYPE=RelWithDebInfo
+cmake --build build
+```
 
-For more detailed general information, see the "INSTALL" file in this directory. If you are already accustomed to building and installing software that uses autoconf, there's nothing new for you in the INSTALL file. Note that qpdf uses `autoconf` but not `automake`. We have our own system of Makefiles that allows cross-directory dependencies, doesn't use recursive make, and works better on non-UNIX platforms.
+Example MSVC build from an MSYS shell or from a Windows command shell with Visual Studio command-line tools in the path:
+```
+cmake -S . -B build
+cmake --build build --config Release
+```
 
-# Building without wchar_t
+Installation can be done with `cmake --install`. Packages can be made with `cpack`.
 
-Executive summary: manually define -DQPDF_NO_WCHAR_T in your build if you are building on a system without wchar_t. For details, read the rest of this section.
+The tests use `qtest`, and the test driver is invoked by `ctest`. To see the real underlying tests, run `ctest --verbose` so that you can see `qtest`'s output. If you need to turn off qtest's color output, pass `-DQTEST_COLOR=0` to cmake.
 
-While wchar_t is part of the C++ standard library and should be present on virtually every system, there are some stripped down systems, such as those targeting certain embedded environments, that lack wchar_t. Internally, qpdf uses UTF-8 encoding for everything, so there is nothing important in qpdf's API that uses wchar_t. However, there is a helper method for converting between wchar_t* and char* that uses wchar_t.
-
-If you are building in an environment that does not support wchar_t, you can define the preprocessor symbol QPDF_NO_WCHAR_T in your build. This will work whether you are building qpdf and need to avoid compiling the code that uses wchar_t or whether you are building client code that uses qpdf.
-
-For example, to build qpdf on a system without wchar_t, be sure that -DQPDF_NO_WCHAR_T is part of your CXXFLAGS. Similar techniques will work in other places.
-
-Note that, when you build code with libqpdf, it is *not necessary* to have the definition of QPDF_NO_WCHAR_T in your build match what was defined when the library was built as long as you are not calling QUtil::call_main_from_wmain in your code. In other words, if your qpdf library was built on a system without wchar_t and you are using that system to build at some later time after wchar_t was available, as long as you don't call the function that uses it, you can just build normally.
-
-Note qpdf will never define QPDF_NO_WCHAR_T using autoconf or any other automated method in spite of the fact that it would be easy to do so. That is because there is a hard rule in qpdf that values determined by autoconf are not available in the public API. This is because there is never a guarantee or even expectation that those values will match between the system on which qpdf was build and the system on which a user is building code with libqpdf, and qpdf's include directory should look the same across all systems.
+For additional information, please refer to the [manual](https://qpdf.readthedocs.io/en/latest/installation.html).
 
 # Building on Windows
 
-QPDF is known to build and pass its test suite with mingw (latest version tested: gcc 7.2.0), mingw64 (latest version tested: 7.2.0) and Microsoft Visual C++ 2015, both 32-bit and 64-bit versions.  MSYS2 is required to build as well in order to get make and other related tools.  See [README-windows.md](README-windows.md) for details on how to build under Windows.
+qpdf is known to build and pass its test suite with mingw and Microsoft Visual C++. Both 32-bit and 64-bit versions work. In addition to the manual, see [README-windows.md](README-windows.md) for more details on how to build under Windows.
 
 # Building Documentation
 
-The QPDF manual is written in reStructured Text format and is build with [sphinx](https://www.sphinx-doc.org). The sources to the user manual can be found in the `manual` directory. For more detailed information, consult the [Building and Installing QPDF section of the manual](manual/installation.rst) or consult the [build-doc script](build-scripts/build-doc).
+The QPDF manual is written in reStructured Text format and is build with [sphinx](https://www.sphinx-doc.org). The sources to the user manual can be found in the `manual` directory. For more detailed information, consult the [Building and Installing QPDF section of the manual](https://qpdf.readthedocs.io/en/latest/installation.html) or consult the [build-doc script](build-scripts/build-doc).
 
 # Additional Notes on Build
 
-QPDF's build system can optionally use its own built-in rules rather than using libtool and obeying the compiler specified with configure.  This can be enabled by passing `--with-buildrules=buildrules` where buildrules corresponds to one of the `.mk` files (other than `rules.mk`) in the make directory. This should never be necessary on a UNIX system, but may be necessary on a Windows system.  See [README-windows.md](README-windows.md) for details.
+qpdf provides cmake configuration files and pkg-config files. They support static and dynamic linking. In general, you do not need the header files from qpdf's dependencies to be available to builds that _use_ qpdf. The only exception to this is that, if you include `Pl_DCT.hh`, you need header files from `libjpeg`. Since this is a rare case, qpdf's cmake and pkg-config files do not automatically add a JPEG include path to the build. If you are using `Pl_DCT` explicitly, you probably already have that configured in your build.
 
-The software library is just `libqpdf`, and all the header files are in the `qpdf` subdirectories of `include` and `libqpdf`. If you link statically with `-lqpdf`, then you will also need to link with `-lz` and `-ljpeg`. The shared qpdf library is linked with `-lz` and `-ljpeg`, none of qpdf's public header files directly include files from `libz`, and only `Pl_DCT.hh` includes files from `libjpeg`, so for most cases, qpdf's development files are self contained. If you need to use `Pl_DCT` in your application code, you will need to have the header files for some libjpeg distribution in your include path.
-
-To learn about using the library, please read comments in the header files in `include/qpdf`, especially `QPDF.hh`, `QPDFObjectHandle.hh`, and
-`QPDFWriter.hh`. These are the best sources of documentation on the API.  You can also study the code of `qpdf/qpdf.cc`, which exercises most of the public interface.  There are additional example programs in the examples directory.  Reading all the source files in the `qpdf` directory (including the qpdf command-line tool and some test drivers) along with the code in the examples directory will give you a complete picture of every aspect of the public interface.
+To learn about using the library, please read comments in the header files in [include/qpdf](include/qpdf/), especially [QPDF.hh](include/qpdf/QPDF.hh), [QPDFObjectHandle.hh](include/qpdf/QPDFObjectHandle.hh), and
+[QPDFWriter.hh](include/qpdf/QPDFWriter.hh). These are the best sources of documentation on the API.  You can also study the code of [QPDFJob.cc](libqpdf/QPDFJob.cc), which exercises most of the public interface.  There are additional example programs in the [examples](examples/) directory.
 
 # Additional Notes on Test Suite
 
-By default, slow tests and tests that require dependencies beyond those needed to build qpdf are disabled.  Slow tests include image comparison tests and large file tests.  Image comparison tests can be enabled by passing `--enable-test-compare-images` to ./configure.  This was on by default in qpdf versions prior to 3.0, but is now off by default.  Large file tests can be enabled by passing `--with-large-file-test-path=path` to `./configure` or by setting the `QPDF_LARGE_FILE_TEST_PATH` environment variable.  On Windows, this should be a Windows path.  Run `./configure --help` for additional options.  The test suite provides nearly full coverage even without these tests.  Unless you are making deep changes to the library that would impact the contents of the generated PDF files or testing this on a new platform for the first time, there is no real reason to run these tests.  If you're just running the test suite to make sure that qpdf works for your build, the default tests are adequate.  The configure rules for these tests do nothing other than setting variables in `autoconf.mk`, so you can feel free to turn these on and off directly in `autoconf.mk` rather than rerunning configure.
+By default, slow tests and tests that require dependencies beyond those needed to build qpdf are disabled.  Slow tests include image comparison tests and large file tests.  Image comparison tests can be enabled by setting the `QPDF_TEST_COMPARE_IMAGES` environment variable to `1`. Large file tests can be enabled setting the `QPDF_LARGE_FILE_TEST_PATH` environment variable to the absolute path of a directory with at least 11 GB of free space that can handle files over 4 GB in size.  On Windows, this should be a Windows path (e.g. `C:\LargeFileTemp` even if the build is being run from an MSYS2 environment.  The test suite provides nearly full coverage even without these tests.  Unless you are making deep changes to the library that would impact the contents of the generated PDF files or testing this on a new platform for the first time, there is no real reason to run these tests.  If you're just running the test suite to make sure that qpdf works for your build, the default tests are adequate.
 
-If you are packaging qpdf for a distribution and preparing a build that is run by an autobuilder, you may want to add the `--enable-show-failed-test-output` to configure options.  This way, if the test suite fails, test failure detail will be included in the build output.  Otherwise, you will have to have access to the `qtest.log` file from the build to view test failures.  The Debian packages for qpdf enable this option.
+If you are packaging qpdf for a distribution and preparing a build that is run by an autobuilder, you may want to pass `-DSHOW_FAILED_TEST_OUTPUT=1` to `cmake` and run `ctest` with the `--verbose` or `--output-on-failure` option.  This way, if the test suite fails, test failure detail will be included in the build output.  Otherwise, you will have to have access to the `qtest.log` file from the build to view test failures.  The Debian packages for qpdf enable this option. More notes for packagers can be found in [the manual](https://qpdf.readthedocs.io/en/latest/packaging.html).
 
 # Random Number Generation
 
 By default, qpdf uses the crypto provider for generating random numbers. The rest of this applies only if you are using the native crypto provider.
 
 If the native crypto provider is in use, then, when `qpdf` detects either the Windows cryptography API or the existence of `/dev/urandom`, `/dev/arandom`, or `/dev/random`, it uses them to generate cryptographically secure random numbers.  If none of these conditions are true, the build will fail with an error.  This behavior can be modified in several ways:
-* If you configure with `--disable-os-secure-random` or define `SKIP_OS_SECURE_RANDOM`, qpdf will not attempt to use Windows cryptography or the random device.  You must either supply your own random data provider or allow use of insecure random numbers.
-* If you configure qpdf with the `--enable-insecure-random` option or define `USE_INSECURE_RANDOM`, qpdf will try insecure random numbers if OS-provided secure random numbers are disabled.  This is not a fallback.  In order for insecure random numbers to be used, you must also disable OS secure random numbers since, otherwise, failure to find OS secure random numbers is a compile error.  The insecure random number source is stdlib's `random()` or `rand()` calls. These random numbers are not cryptography secure, but the qpdf library is fully functional using them.  Using non-secure random numbers means that it's easier in some cases to guess encryption keys.  If you're not generating encrypted files, there's no advantage to using secure random numbers.
+* If you use the cmake option `SKIP_OS_SECURE_RANDOM` or define the `SKIP_OS_SECURE_RANDOM` preprocessor symbol, qpdf will not attempt to use Windows cryptography or the random device.  You must either supply your own random data provider or allow use of insecure random numbers.
+* If you turn on the cmake option `USE_INSECURE_RANDOM` or define the `USE_INSECURE_RANDOM` preprocessor symbol, qpdf will try insecure random numbers if OS-provided secure random numbers are disabled.  This is not a fallback.  In order for insecure random numbers to be used, you must also disable OS secure random numbers since, otherwise, failure to find OS secure random numbers is a compile error.  The insecure random number source is stdlib's `random()` or `rand()` calls. These random numbers are not cryptography secure, but the qpdf library is fully functional using them.  Using non-secure random numbers means that it's easier in some cases to guess encryption keys.
 * In all cases, you may supply your own random data provider.  To do this, derive a class from `qpdf/RandomDataProvider` (since version 5.1.0) and call `QUtil::setRandomDataProvider` before you create any `QPDF` objects.  If you supply your own random data provider, it will always be used even if support for one of the other random data providers is compiled in.  If you wish to avoid any possibility of your build of qpdf from using anything but a user-supplied random data provider, you can define `SKIP_OS_SECURE_RANDOM` and not `USE_INSECURE_RANDOM`.  In this case, qpdf will throw a runtime error if any attempt is made to generate random numbers and no random data provider has been supplied.
-
-If you are building qpdf on a platform that qpdf doesn't know how to generate secure random numbers on, a patch would be welcome.

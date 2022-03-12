@@ -15,7 +15,8 @@ cmake -DMAINTAINER_MODE=1 -DBUILD_SHARED_LIBS=0 \
 Profiling:
 
 CFLAGS=-pg LDFLAGS=-pg \
-   cmake -DMAINTAINER_MODE=1 -DBUILD_SHARED_LIBS=0 -DCMAKE_BUILD_TYPE=Debug ..
+   cmake -DMAINTAINER_MODE=1 -DBUILD_SHARED_LIBS=0 \
+   -DCMAKE_BUILD_TYPE=Debug ..
 
 Then run `gprof gmon.out`. Note that gmon.out is not cumulative.
 
@@ -25,11 +26,16 @@ CFLAGS="-fsanitize=address -fsanitize=undefined" \
    CXXFLAGS="-fsanitize=address -fsanitize=undefined" \
    LDFLAGS="-fsanitize=address -fsanitize=undefined" \
    CC=clang CXX=clang++ \
-   cmake -DMAINTAINER_MODE=1 -DBUILD_SHARED_LIBS=0 -DCMAKE_BUILD_TYPE=Debug ..
+   cmake -DMAINTAINER_MODE=1 -DBUILD_SHARED_LIBS=0 \
+   -DCMAKE_BUILD_TYPE=Debug ..
 
 Windows:
 
 ../cmake-win {mingw|msvc} maint
+
+See ./build-scripts for other ways to run the build for different
+configurations.
+
 
 VERSIONS
 
@@ -249,52 +255,19 @@ RELEASE PREPARATION
 * Run a spelling checker over the source code to catch errors in
   variable names, strings, and comments.
 
-  make spell CLEAN=1
+  ./spell-check
 
   This uses cspell. Install with `npm install -g cspell`. The output
   of cspell is suitable for use with `M-x grep` in emacs. Add
   exceptions to cSpell.json.
 
-* If needed, run large file and image comparison tests. Configure
-  options:
+* If needed, run large file and image comparison tests by setting
+  these environment variables:
 
---enable-test-compare-images --with-large-file-test-path=/path
+  QPDF_LARGE_FILE_TEST_PATH=/full/path
+  QPDF_TEST_COMPARE_IMAGES=1
 
   For Windows, use a Windows style path, not an MSYS path for large files.
-
-* Test with clang. Pass `CC=clang CXX=clang++` to `./configure`. (Done
-  in CI).
-
-* Test with newer version of gcc if available.
-
-* Test 32-bit. Pass `CC=i686-linux-gnu-gcc CXX=i686-linux-gnu-g++` to
-  `./configure`. (Done in CI.)
-
-* Test build on a mac. (Done in CI.)
-
-* Test with address sanitizer as described above. (Done in CI.)
-
-* A small handful of additional files have been taken from autotools
-  programs. These should probably be updated from time to time.
-
-  * `config.guess`, `config.sub`, `ltmain.sh`, and the `m4` directory:
-    these were created by running `libtoolize -c`. To update, run
-    `libtoolize -f -c` or remove the files and rerun `libtoolize`. For
-    `config.guess` and `config.sub`, search for "latest" in the files,
-    and follow directions for updating them.
-
-  * Other files copied as indicated:
-    ```
-    cp /usr/share/automake-1.16/install-sh .
-    cp /usr/share/automake-1.16/mkinstalldirs .
-    cp /usr/share/aclocal/pkg.m4 m4
-    ```
-
-  The entire contents of the `m4` directory came from `libtool.m4`. If
-  we had some additional local parts, we could also add those to the
-  `m4` directory. In order for this to work, it is necessary to run
-  `aclocal -I m4` before running `autoheader` and `autoconf`. The
-  `autogen.sh` script handles this.
 
 * If any interfaces were added or changed, check C API to see whether
   changes are appropriate there as well. If necessary, review the
@@ -306,16 +279,11 @@ RELEASE PREPARATION
 * Double check versions and shared library details. They should
   already be up to date in the code.
 
-  * Increment shared library version information as needed
-    (`LT_CURRENT` in `configure.ac`)
-
   * Make sure version numbers are consistent in the following locations:
-    * configure.ac
+    * CMakeLists.txt
     * include/qpdf/DLL.h
     * manual/conf.py
     `make_dist` verifies this consistency.
-
-  * Run ./autogen.sh
 
 * Update release notes in manual. Look at diffs and ChangeLog.
   Update release date in `manual/release-notes.rst`.
@@ -330,15 +298,24 @@ RELEASE PREPARATION
 
 * Test for performance and binary compatibility:
   * Check out the last release
-  * ./configure --enable-werror && make -j$(nproc)
+  * cmake -S . -B build \
+    -DMAINTAINER_MODE=1 -DBUILD_STATIC_LIBS=0 -DBUILD_DOC=0 \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo
+  * cmake --build build -j$(nproc)
   * Check out the current version
   * ./performance_check | tee -a /tmp/perf
-  * ./configure --enable-werror && make -j$(nproc) build_libqpdf
+  * cmake -S . -B build \
+    -DMAINTAINER_MODE=1 -DBUILD_STATIC_LIBS=0 -DBUILD_DOC=0 \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo
+  * cmake --build build -j$(nproc) --target libqpdf
   * Checkout the last release
-  * make -k check NO_REBUILD=1 (some failures are normal -- looking
-    for binary compatibility)
+  * (cd build; ctest --verbose)
+  * (some failures are normal -- looking for binary compatibility)
   * Check out the current version
-  * make -j$(nproc)
+  * cmake -S . -B build \
+    -DMAINTAINER_MODE=1 -DBUILD_STATIC_LIBS=0 -DBUILD_DOC=0 \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo
+  * cmake --build build -j$(nproc)
   * ./performance_check | tee -a /tmp/perf
 
 * Run pikepdf's test suite. Do this in a separate shell.
@@ -363,7 +340,7 @@ CREATING A RELEASE
 * Push to main. This will create an artifact called distribution
   which will contain all the distribution files. Download these,
   verify the checksums from the job output, rename to remove -ci from
-  the names, and copy to the release archive area.
+  the names, and extract to the release archive area.
 
 * Sign the source distribution:
 
@@ -375,9 +352,7 @@ gpg --detach-sign --armor qpdf-$version.tar.gz
 * Add a calendar reminder to check the status of the debian package to
   make sure it is transitioning properly and to resolve any issues.
 
-* Sign the releases. The release archive area should contain the
-  Windows binaries, the AppImage, the source tarball, and the source
-  tarball signature.
+* From the release archive area, sign the releases.
 
 \rm -f *.sha256
 files=(*)
@@ -467,40 +442,25 @@ Use -e SKIP_TESTS=1 to skip the test suite.
 Use -ti -e RUN_SHELL=1 to run a shell instead of the build script.
 
 
-GENERAL BUILD STUFF
-
-QPDF uses autoconf and libtool but does not use automake. The only
-files distributed with the qpdf source distribution that are not
-controlled are `configure`, `libqpdf/qpdf/qpdf-config.h.in`,
-`aclocal.m4`, and some documentation. See above for the steps required
-to prepare a source distribution.
-
-If building or editing documentation, configure with
-`--enable-doc-maintenance`. This will ensure that all tools or files
-required to validate and build documentation are available.
-
-If you want to run `make maintainer-clean` or `make distclean` and you
-haven't run `./configure`, you can pass `CLEAN=1` to make on the
-command line to prevent it from complaining about configure not having
-been run.
-
-If you want to run checks without rerunning the build, pass
-`NO_REBUILD=1` to make. This can be useful for special testing
-scenarios such as validation of memory fixes or binary compatibility.
-
-
 LOCAL WINDOWS TESTING PROCEDURE
 
 This is what I do for routine testing on Windows.
 
-From Windows, git clone from my Linux clone, and unzip
-`external-libs`.
+* From Windows, git clone from my Linux clone, and unzip
+  `external-libs`.
 
-Look at `make_windows_releases`. Set up path the same way and run
-whichever `./config-*` is appropriate for whichever compiler I need to
-test with. Start one of the Visual Studio native compiler shells, and
-from there, run one of the msys shells. The Visual Studio step is not
-necessary if just building with mingw.
+* Start a command-line shell for x86_64 and x86 tools from Visual
+  studio. From there, start C:\msys64\mingw64 twice and
+  C:\msys64\mingw32 twice.
+
+* Create a build directory for each of the four permutations. Then, in
+  each build directory, run `../cmake-win <tool> maint`.
+
+* Run `cmake --build . -j4`. For MSVC, add `--config Release`
+
+* Test with with msvc: `ctest --verbose -C Release`
+
+* Test with mingw:  `ctest --verbose -C RelWithDebInfo`
 
 
 DOCS ON readthedocs.org
@@ -529,3 +489,25 @@ following branching strategy to support docs:
 
 The release process includes updating the approach branches and
 activating versions.
+
+
+CMAKE notes
+
+To verify the various cmake options and their interactions, several
+manual tests were done:
+
+* Break installed qpdf executables (qpdf, fix-qdf, zlib-flate), the
+  shared library, and DLL.h to ensure that other qpdf installations do
+  not interfere with building from source
+
+* Build static only and shared only
+
+* Install separate components separately
+
+* Build only HTML docs and only PDF docs
+
+* Try MAINTAINER_MODE without BUILD_DOC
+
+We are using RelWithDebInfo for mingw and other non-Windows builds but
+Release for MSVC. There are linker warnings if MSVC is built with
+RelWithDebInfo when using external-libs.
