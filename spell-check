@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# Use comments starting with cSpell:ignore to ignore certain words for
+# the entire file. For source files, you can put these anywhere. For
+# markdown files, to keep them out of the way, we keep them at the
+# bottom of the file in a list. See README-maintainer as an example.
+
+# Global exceptions should be added to cSpell.json. Keep the words in
+# that file sorted.
+
+# cspell can be installed with `npm install -g cspell`.
+cspell **/*.hh include/qpdf/*.h **/*.cc \
+       manual/*.rst manual/*.in manual/_ext/*.py \
+       **/CMakeLists.txt ChangeLog README* TODO
