@@ -21,11 +21,7 @@ my $ci_mode = 0;
 my $version = undef;
 foreach my $arg (@ARGV)
 {
-    if ($arg eq '--no-tests')
-    {
-        # ignore for compatibility
-    }
-    elsif ($arg eq '--keep-tmp')
+    if ($arg eq '--keep-tmp')
     {
         $keep_tmp = 1;
     }
@@ -45,7 +41,7 @@ foreach my $arg (@ARGV)
 
 if ($ci_mode && (! defined $version))
 {
-    $version = get_version_from_configure();
+    $version = get_version_from_cmake();
 }
 
 usage() unless defined $version;
@@ -61,14 +57,14 @@ run("git archive --prefix=qpdf-$version/ HEAD . | (cd $tmp; tar xf -)");
 cd($tmpdir);
 
 # Check versions
-my $config_version = get_version_from_configure();
+my $cmakeversion = get_version_from_cmake();
 my $code_version = get_version_from_source();
 my $doc_version = get_version_from_manual();
 
 my $version_error = 0;
-if ($version ne $config_version)
+if ($version ne $cmakeversion)
 {
-    print "$whoami: configure.ac version = $config_version\n";
+    print "$whoami: cmake version = $cmakeversion\n";
     $version_error = 1;
 }
 if ($version ne $code_version)
@@ -103,20 +99,26 @@ make a backup of the release tar file.
 
 ";
 
-sub get_version_from_configure
+sub get_version_from_cmake
 {
-    my $fh = safe_open("configure.ac");
-    my $config_version = 'unknown';
+    my $fh = safe_open("CMakeLists.txt");
+    my $cmake_version = 'unknown';
+    my $saw_project = 0;
     while (<$fh>)
     {
-        if (m/^AC_INIT\(\[qpdf\],\[([^\)]+)\]\)/)
+        print;
+        if (m/project\(qpdf/)
         {
-            $config_version = $1;
+            $saw_project = 1;
+        }
+        elsif ($saw_project && m/VERSION (\S+)$/)
+        {
+            $cmake_version = $1;
             last;
         }
     }
     $fh->close();
-    $config_version;
+    $cmake_version;
 }
 
 sub get_version_from_source
@@ -194,10 +196,7 @@ sub cd
 sub usage
 {
     die "
-Usage: $whoami [ --no-tests --keep-tmp ] version
-
-Use of --no-tests can be used for internally testing releases, but do
-not use it for a real release.
+Usage: $whoami [--keep-tmp] {--ci|version}
 
 $whoami creates ${tmp}/qpdf-<version> and deletes it when done. With
 --keep-tmp, the directory is kept. This can be useful for debugging
