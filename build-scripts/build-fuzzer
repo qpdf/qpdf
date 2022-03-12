@@ -5,7 +5,7 @@ export OUT=$PWD/out
 mkdir -p $WORK $OUT
 sudo apt-get update
 sudo apt-get -y install \
-   autoconf build-essential zlib1g-dev libjpeg-dev
+   autoconf build-essential cmake zlib1g-dev libjpeg-dev
 ./fuzz/oss-fuzz-build
 ls -l out/qpdf*fuzzer
 ls -l out/
