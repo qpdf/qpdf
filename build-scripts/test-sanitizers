@@ -14,7 +14,7 @@ env CFLAGS="-fsanitize=address -fsanitize=undefined" \
 cmake --build build -j$(nproc) -- -k
 cd build
 # libtests automatically runs with all crypto providers.
-env QPDF_TEST_COMPARE_IMAGES=1 ctest --verbose
+ctest --verbose
 # Run just qpdf tests with remaining crypto providers.
 for i in $(./qpdf/qpdf --show-crypto | tail -n +2); do
     echo "*** Running qpdf tests with crypto provider $i"
