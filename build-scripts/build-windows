@@ -4,8 +4,11 @@ cd $(dirname $0)/..
 wordsize=$1
 tool=$2
 
+declare -a cmake_xargs
+declare -a ctest_xargs
+pacman -Sy --noconfirm tar zip unzip
 if [[ $tool == mingw ]]; then
-    pacman -Sy --noconfirm make base-devel tar zip unzip
+    pacman -Sy --noconfirm make base-devel
     if [ ! -x /c/msys64/mingw$wordsize/bin/g++.exe ]; then
         if [[ $wordsize == 64 ]]; then
             pacman -Sy --noconfirm mingw-w64-x86_64-toolchain
@@ -14,24 +17,25 @@ if [[ $tool == mingw ]]; then
         fi
     fi
     PATH="/c/msys64/mingw$wordsize/bin:$PATH"
+    config=RelWithDebInfo
     g++ -v
 elif [[ $tool == msvc ]]; then
     cl
+    config=Release
+    cmake_xargs=(--config $config)
+    ctest_xargs=(-C $config)
 fi
 unzip doc.zip
 unzip qpdf-external-libs-bin.zip
 cwd=`pwd`
 PATH=$cwd/libqpdf/build:$PATH
 
-installdir=install-$tool$wordsize
-rm -rf $installdir
-./config-$tool --enable-show-failed-test-output
-make -j$(nproc) -k
-make -k check
-make install
-
-v=`(cd $installdir; ls -d qpdf-*)`
-cp -p README-windows-install.txt $installdir/$v/README.txt
-mkdir distribution
-(cd $installdir; zip -r ../distribution/$v-bin-$tool$wordsize-ci.zip $v)
+mkdir build
+cd build distribution
+../cmake-win $tool ci
+cmake --build . -j$(nproc) "${cmake_xargs[@]}" -- -k
+ctest --verbose "${ctest_xargs[@]}"
+cpack -G NSIS -C $config
+cpack -G ZIP -C $config
+mv qpdf-*.exe qpdf-*.zip ../distribution
 sha256sum distribution/*
