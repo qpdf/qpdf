@@ -54,15 +54,12 @@ ctest -V -C Release
 Use ctest --output-on-failure or --verbose combined with -DSHOW_FAILED_TEST_OUTPUT=1 in CI (--verbose is better)
 
 Remaining work:
-* Go through build-scripts/*, CI and make sure we have full parity
 * msvc LIBCMT warning...why, and can I use /NODEFAULTLIB:library?
 * Go through README*.md and the manual for build and test information
-* make_dist
 * Document tests that were run manually to verify the build including handling non-standard install locations of third-party libraries
   * Break libqpdf.a, libqpdf.so*, qpdf, fix-qdf, zlib-flate, and DLL.h in the installed qpdf and make sure build and test work
   * build static only, build shared only
   * installation of separate components
-* XXX comments in build files
 * Remove old build files
 * Document direct use of QPDF_TEST_COMPARE_IMAGES and QPDF_LARGE_FILE_TEST_PATH rather than configure options. Tests files > 4GB. Need 11 GB free.
 * Mention reversing sense of QPDF_TEST_COMPARE_IMAGES (used to be QPDF_SKIP_TEST_COMPARE_IMAGES).
@@ -73,7 +70,6 @@ Remaining work:
 * include **/CMakeLists.txt in spell check
 * Build documentation: manual/installation.rst. Mention relevant options and reference CMakeLists.txt's comment.
 * README-windows-install.txt is no longer used
-* Can we print flags from cmake?
 
 Notes:
 * `cmake --build . -U pattern` -- remove from cache
@@ -81,7 +77,3 @@ Notes:
 * Document that building fuzz requires perl
 * Document QTEST_COLOR
 * Large file tests fail with linux32 before and after cmake
-
-Useful references (varying degrees of usefulness, at least worth looking at)
-* https://cliutils.gitlab.io/modern-cmake/
-* https://github.com/open-source-parsers/jsoncpp -- used as early example
