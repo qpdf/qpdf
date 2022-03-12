@@ -105,7 +105,7 @@ and then reads the cross reference tables and trailer dictionaries. The
 read all of them so it can check the ``/Prev`` key. ``QPDF`` class users
 may request the root object and the trailer dictionary specifically. The
 cross reference table is kept private. Objects may then be requested by
-number of by walking the object tree.
+number or by walking the object tree.
 
 When a PDF file has a cross-reference stream instead of a
 cross-reference table and trailer, requesting the document's trailer
@@ -254,7 +254,7 @@ resulting ``QPDFObjectHandle``. The calling object handle then replaces
 its ``PointerHolder<QDFObject>`` with the one from the newly returned
 ``QPDFObjectHandle``. In this way, only a single copy of any direct
 object need exist and clients can access objects transparently without
-knowing caring whether they are direct or indirect objects.
+knowing or caring whether they are direct or indirect objects.
 Additionally, no object is ever read from the file more than once. That
 means that only the portions of the PDF file that are actually needed
 are ever read from the input file, thus allowing the qpdf package to
@@ -264,7 +264,7 @@ If the requested object is inside of an object stream, the object stream
 itself is first read into memory. Then the tokenizer reads objects from
 the memory stream based on the offset information stored in the stream.
 Those individual objects are cached, after which the temporary buffer
-holding the object stream contents are discarded. In this way, the first
+holding the object stream contents is discarded. In this way, the first
 time an object in an object stream is requested, all objects in the
 stream are cached.
 
