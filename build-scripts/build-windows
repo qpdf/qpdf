@@ -24,11 +24,11 @@ elif [[ $tool == msvc ]]; then
     cmake_xargs=(--config $config)
     ctest_xargs=(-C $config)
 fi
-unzip doc.zip
-unzip qpdf-external-libs-bin.zip
-cwd=`pwd`
 
 mkdir build distribution
+unzip doc.zip
+unzip qpdf-external-libs-bin.zip
+
 cd build
 ../cmake-win $tool ci
 cmake --build . -j$(nproc) "${cmake_xargs[@]}" -- -k
@@ -36,4 +36,5 @@ ctest --verbose "${ctest_xargs[@]}"
 cpack -G NSIS -C $config
 cpack -G ZIP -C $config
 mv qpdf-*.exe qpdf-*.zip ../distribution
+cd ..
 sha256sum distribution/*
