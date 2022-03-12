@@ -4,28 +4,28 @@ ROUTINE DEVELOPMENT
 
 Default:
 
-./configure CXX="g++ --std=c++14" --enable-werror --enable-maintainer-mode
+cmake -DMAINTAINER_MODE=1 -DBUILD_STATIC_LIBS=0 \
+   -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
 
 Debugging:
 
-./configure CXX="g++ --std=c++14" CFLAGS="-g" CXXFLAGS="-g" \
-   --enable-werror --disable-shared --enable-maintainer-mode
+cmake -DMAINTAINER_MODE=1 -DBUILD_SHARED_LIBS=0 \
+   -DCMAKE_BUILD_TYPE=Debug ..
 
 Profiling:
 
-./configure CXX="g++ --std=c++14" CFLAGS="-g -pg" CXXFLAGS="-g -pg" \
-   LDFLAGS="-pg" --enable-werror --disable-shared --enable-maintainer-mode
+CFLAGS=-pg LDFLAGS=-pg \
+   cmake -DMAINTAINER_MODE=1 -DBUILD_SHARED_LIBS=0 -DCMAKE_BUILD_TYPE=Debug ..
 
 Then run `gprof gmon.out`. Note that gmon.out is not cumulative.
 
 Memory checks:
 
-./configure CFLAGS="-fsanitize=address -fsanitize=undefined -g" \
-   CXXFLAGS="-fsanitize=address -fsanitize=undefined -g" \
+CFLAGS="-fsanitize=address -fsanitize=undefined" \
+   CXXFLAGS="-fsanitize=address -fsanitize=undefined" \
    LDFLAGS="-fsanitize=address -fsanitize=undefined" \
-   CC=clang CXX="clang++ --std=c++14" \
-   --enable-werror --disable-shared --enable-maintainer-mode
-
+   CC=clang CXX=clang++ \
+   cmake -DMAINTAINER_MODE=1 -DBUILD_SHARED_LIBS=0 -DCMAKE_BUILD_TYPE=Debug ..
 
 VERSIONS
 
