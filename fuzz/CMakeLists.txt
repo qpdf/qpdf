@@ -28,10 +28,25 @@ if(NOT FUZZ_OUT)
   set(FUZZ_OUT ${CMAKE_CURRENT_BINARY_DIR}/fuzz-install)
 endif()
 
+if(OSS_FUZZ)
+  # We need to link jpeg and zlib statically for oss-fuzz. Construct
+  # our own object library without the external dependencies and add
+  # what we need.
+  add_library(libqpdf_fuzz STATIC $<TARGET_OBJECTS:libqpdf_object>)
+  target_link_libraries(libqpdf_fuzz INTERFACE libjpeg.a libz.a)
+  target_include_directories(libqpdf_fuzz
+    PUBLIC
+    ${JPEG_INCLUDE}
+    ${qpdf_SOURCE_DIR}/include
+    ${qpdf_SOURCE_DIR}/libqpdf)
+else()
+  add_library(libqpdf_fuzz ALIAS libqpdf_object)
+endif()
+
 foreach(PROG ${FUZZERS})
   add_executable(${PROG} ${PROG}.cc)
   target_link_libraries(${PROG} ${LIB_FUZZING_ENGINE})
-  target_link_libraries(${PROG} libqpdf_object)
+  target_link_libraries(${PROG} libqpdf_fuzz)
 endforeach()
 
 # Files from the test suite that are good for seeding the fuzzer.
