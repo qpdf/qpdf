@@ -2,16 +2,20 @@
 set -ex
 sudo apt-get update
 sudo apt-get -y install \
-   autoconf build-essential zlib1g-dev libjpeg-dev libgnutls28-dev \
+   autoconf build-essential cmake zlib1g-dev libjpeg-dev libgnutls28-dev \
    libssl-dev libtiff-tools ghostscript
-./configure --enable-werror \
-    --enable-crypto-native --enable-crypto-openssl --enable-crypto-gnutls \
-    --enable-show-failed-test-output --enable-test-compare-images
-make -j$(nproc) -k
-for i in $(./qpdf/build/qpdf --show-crypto); do
-    echo "*** Running tests with crypto provider $i"
-    env QPDF_CRYPTO_PROVIDER=$i make -k check
+cmake -S . -B build -DCI_MODE=1 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+      -DREQUIRE_CRYPTO_OPENSSL=1 -DREQUIRE_CRYPTO_GNUTLS=1
+cmake --build build -j$(nproc) -- -k
+cd build
+# libtests automatically runs with all crypto providers.
+env QPDF_TEST_COMPARE_IMAGES=1 ctest --verbose
+# Run just qpdf tests with remaining crypto providers.
+for i in $(./qpdf/qpdf --show-crypto | tail -n +2); do
+    echo "*** Running qpdf tests with crypto provider $i"
+    env QPDF_CRYPTO_PROVIDER=$i ctest --verbose -R '^qpdf$'
 done
+cd ..
 export TMPDIR=$PWD/dist-tmp
 rm -rf $TMPDIR
 ./make_dist --ci
