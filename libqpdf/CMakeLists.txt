@@ -187,7 +187,10 @@ endif()
 # Update JPEG_INCLUDE in PARENT_SCOPE after we have finished setting it.
 set(JPEG_INCLUDE ${JPEG_INCLUDE} PARENT_SCOPE)
 
-# Crypto provider selection
+# Crypto provider selection. Prefer external crypto providers. If
+# implicit selection is allowed, use native only when no other options
+# are available or when explicitly requested. Allowing native as a
+# fallback can be disabled using the ALLOW_CRYPTO_NATIVE option.
 list(APPEND CRYPTO_PKG)
 
 set(USE_CRYPTO_GNUTLS OFF)
@@ -221,9 +224,14 @@ if(USE_IMPLICIT_CRYPTO OR REQUIRE_CRYPTO_GNUTLS)
     set(ANYTHING_MISSING 1)
   endif()
 endif()
-if(ALLOW_NATIVE_CRYPTO)
+if(REQUIRE_CRYPTO_NATIVE)
   set(USE_CRYPTO_NATIVE ON)
   set(FOUND_CRYPTO ON)
+elseif(USE_IMPLICIT_CRYPTO)
+  if(ALLOW_CRYPTO_NATIVE AND (NOT FOUND_CRYPTO))
+    set(USE_CRYPTO_NATIVE ON)
+    set(FOUND_CRYPTO ON)
+  endif()
 endif()
 if(FOUND_CRYPTO)
   if(NOT DEFAULT_CRYPTO)

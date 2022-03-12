@@ -75,7 +75,12 @@ CMAKE_DEPENDENT_OPTION(
   "BUILD_FUZZ" OFF)
 
 option(USE_IMPLICIT_CRYPTO "Enable any available external crypto provider" ON)
-option(ALLOW_NATIVE_CRYPTO "Allow native crypto" ON)
+CMAKE_DEPENDENT_OPTION(
+  ALLOW_CRYPTO_NATIVE "Allow native crypto as as fallback" ON
+  "USE_IMPLICIT_CRYPTO" OFF)
+CMAKE_DEPENDENT_OPTION(
+  REQUIRE_CRYPTO_NATIVE "Require native crypto provider" OFF
+  "NOT MAINTAINER_MODE; NOT CI_MODE" ON)
 option(REQUIRE_CRYPTO_OPENSSL "Require openssl crypto" OFF)
 option(REQUIRE_CRYPTO_GNUTLS "Require gnutls crypto" OFF)
 set(DEFAULT_CRYPTO CACHE STRING "")
@@ -155,12 +160,6 @@ int main() {
   endif()
 endfunction()
 check_atomic()
-
-
-
-
-
-
 
 set(WINDOWS_WMAIN_COMPILE "")
 set(WINDOWS_WMAIN_LINK "")
