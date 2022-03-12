@@ -462,10 +462,12 @@ rsync -vrlcO ./ jay_berkenbilt,qpdf@frs.sourceforge.net:/home/frs/project/q/qp/q
 OTHER NOTES
 
 For local iteration on the AppImage generation, it works to just
-./build-scripts/build-appimage and get the resulting AppImage from
-the distribution directory. You can also pass -e SKIP_TESTS=1
-build-appimage, which passes it along to to docker, to skip the test
-suite, which useful for rapid iteration.
+./build-scripts/build-appimage and get the resulting AppImage from the
+distribution directory. You can pass additional arguments to
+build-appimage, which passes them along to to docker.
+
+Use -e SKIP_TESTS=1 to skip the test suite.
+Use -ti -e RUN_SHELL=1 to run a shell instead of the build script.
 
 
 GENERAL BUILD STUFF
