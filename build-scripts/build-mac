@@ -8,6 +8,6 @@ cd jpeg-*
 make -k
 sudo make install
 cd ..
-./configure --enable-werror --enable-show-failed-test-output
-make -j$(nproc) -k
-make -k check
+cmake -S . -B build -DCI_MODE=1 -DCMAKE_BUILD_TYPE=Release
+cmake --build build -j$(sysctl -n hw.ncpu) -- -k
+(cd build; ctest --verbose)
