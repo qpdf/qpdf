@@ -220,15 +220,18 @@ if(MSVC)
   add_compile_options(/W3)    # warning level 3
 else()
   qpdf_maybe_add_flag(C -Wall flag_wall)
-  qpdf_maybe_add_flag(C -Wconversion flag_conversion)
-  qpdf_maybe_add_flag(C -Wsign-conversion flag_sign-conversion)
-  qpdf_maybe_add_flag(C -Wshadow=local flag_shadow_local)
-  qpdf_maybe_add_flag(CXX -Wold-style-cast flag_old-style-cast)
-endif()
-if(APPLE)
-  # 2022: stdio.h has lots of nullability completeness warnings on
-  # MacOS 11.
-  qpdf_maybe_add_flag(C -Wno-nullability-completeness flag_nullability)
+  if(APPLE)
+    # XXX 2022: stdio.h has lots of nullability completeness warnings
+    # and other warnings on MacOS 11 with cmake in github actions
+    # runner. My old build on the same system doesn't have warnings
+    # with these options.
+    qpdf_maybe_add_flag(C -Wno-nullability-completeness flag_nullability)
+  else()
+    qpdf_maybe_add_flag(C -Wconversion flag_conversion)
+    qpdf_maybe_add_flag(C -Wsign-conversion flag_sign-conversion)
+    qpdf_maybe_add_flag(C -Wshadow=local flag_shadow_local)
+    qpdf_maybe_add_flag(CXX -Wold-style-cast flag_old-style-cast)
+  endif()
 endif()
 
 # We don't include the jpeg library's include path in the PUBLIC
