@@ -4,14 +4,14 @@ cd $(dirname $0)/..
 set -ex
 sudo apt-get update
 sudo apt-get -y install \
-   autoconf build-essential zlib1g-dev libjpeg-dev \
+   autoconf build-essential cmake zlib1g-dev libjpeg-dev \
    python3-pip texlive-latex-extra latexmk
 pip3 install sphinx sphinx_rtd_theme
-./configure --enable-doc-maintenance
-make -j$(nproc) doc-dist DOC_DEST=doc
-zip -r doc.zip doc
+cmake -S . -B build -DBUILD_DOC=1
+cmake --build build --target doc_dist
+zip -r doc.zip build/manual/doc-dist
 version=$(egrep '^release' manual/conf.py | cut -d"'" -f 2)
-mv doc qpdf-${version}-doc
+mv build/manual/doc-dist qpdf-${version}-doc
 mkdir distribution
-zip -r distribution/qpdf-${version}-doc.zip qpdf-${version}-doc
+zip -r distribution/qpdf-${version}-doc-ci.zip qpdf-${version}-doc
 sha256sum distribution/*
