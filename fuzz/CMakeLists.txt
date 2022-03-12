@@ -19,6 +19,8 @@ if(NOT LIB_FUZZING_ENGINE)
   # When running from oss-fuzz, LIB_FUZZING_ENGINE points to a
   # static library that contains main.
   add_library(standalone_fuzzer STATIC standalone_fuzz_target_runner.cc)
+  target_include_directories(
+    standalone_fuzzer PRIVATE ${qpdf_SOURCE_DIR}/include)
   set(LIB_FUZZING_ENGINE standalone_fuzzer)
 endif()
 set(FUZZ_OUT $ENV{OUT})
