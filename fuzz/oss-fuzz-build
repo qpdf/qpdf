@@ -21,7 +21,7 @@ if [[ $GITHUB_FORK != "" ]]; then
     fi
 fi
 
-env INCLUDE_DIRECTORIES=$WORK/include LDFLAGS="-L$WORK/lib -lpthread" \
+env CMAKE_PREFIX_PATH=$WORK LDFLAGS="-L$WORK/lib -lpthread" \
     cmake -S . -B build \
     -DBUILD_FUZZ=1 -DOSS_FUZZ=1 -DBUILD_SHARED_LIBS=0 -DCMAKE_BUILD_TYPE=Debug \
     -DUSE_IMPLICIT_CRYPTO=0 -DREQUIRE_CRYPTO_NATIVE=1
