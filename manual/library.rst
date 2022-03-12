@@ -10,7 +10,7 @@ Using QPDF from C++
 
 The source tree for the qpdf package has an
 :file:`examples` directory that contains a few
-example programs. The :file:`qpdf/qpdf.cc` source
+example programs. The :file:`libqpdf/QPDFJob.cc` source
 file also serves as a useful example since it exercises almost all of
 the qpdf library's public interface. The best source of documentation on
 the library itself is reading comments in
@@ -86,6 +86,6 @@ converted to ``wchar_t*``, and Unicode-aware Windows APIs are used. As
 such, qpdf will generally operate properly on files with non-ASCII
 characters in their names as long as the filenames are UTF-8 encoded for
 passing into the qpdf library API, but there are still some rough edges,
-such as the encoding of the filenames in error messages our CLI output
+such as the encoding of the filenames in error messages or CLI output
 messages. Patches or bug reports are welcome for any continuing issues
 with Unicode file names in Windows.
