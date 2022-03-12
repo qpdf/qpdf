@@ -14,11 +14,18 @@ set(FUZZERS
   runlength_fuzzer
   tiffpredictor_fuzzer)
 
+# The oss-fuzz project provides LIB_FUZZING_ENGINE and OUT environment
+# variables. For local testing, provide values if not set.
+set(LIB_FUZZING_ENGINE $ENV{LIB_FUZZING_ENGINE})
 if(NOT LIB_FUZZING_ENGINE)
   # When running from oss-fuzz, LIB_FUZZING_ENGINE points to a
   # static library that contains main.
   add_library(standalone_fuzzer STATIC standalone_fuzz_target_runner.cc)
   set(LIB_FUZZING_ENGINE standalone_fuzzer)
+endif()
+set(FUZZ_OUT $ENV{OUT})
+if(NOT FUZZ_OUT)
+  set(FUZZ_OUT ${CMAKE_CURRENT_BINARY_DIR}/fuzz-install)
 endif()
 
 foreach(PROG ${FUZZERS})
@@ -112,7 +119,7 @@ foreach(F ${CORPUS_OTHER})
   copy_fuzz(${CMAKE_CURRENT_SOURCE_DIR}/qpdf_extra/${F})
   list(APPEND CORPUS_FILES ${CORPUS_FILE})
 endforeach()
-add_custom_target(fuzz_corpus ALL true
+add_custom_target(qpdf_corpus ALL true
   DEPENDS ${CORPUS_FILES})
 
 add_test(
@@ -126,10 +133,6 @@ add_test(
   --color ${QTEST_COLOR}
   --show-on-failure ${SHOW_FAILED_TEST_OUTPUT})
 
-if(NOT OUT)
-  # oss-fuzz sets OUT
-  set(OUT ${CMAKE_CURRENT_BINARY_DIR}/fuzz-install)
-endif()
 if(OSS_FUZZ)
   list(APPEND SEED_CORPUS_ZIPS)
   foreach(F ${FUZZERS})
@@ -145,9 +148,12 @@ if(OSS_FUZZ)
     list(APPEND SEED_CORPUS_ZIPS ${SEED_ZIP})
   endforeach()
   add_custom_target(seed_corpus_zips ALL DEPENDS ${SEED_CORPUS_ZIPS})
+  add_dependencies(seed_corpus_zips qpdf_corpus)
+  add_custom_target(fuzzers)
+  add_dependencies(fuzzers ${FUZZERS} seed_corpus_zips)
   install(
     TARGETS ${FUZZERS}
-    DESTINATION ${OUT}
+    DESTINATION ${FUZZ_OUT}
     EXCLUDE_FROM_ALL
     COMPONENT fuzz)
   install(
@@ -155,7 +161,7 @@ if(OSS_FUZZ)
     ${CMAKE_CURRENT_SOURCE_DIR}/pdf.dict
     ${CMAKE_CURRENT_SOURCE_DIR}/qpdf_fuzzer.options
     ${SEED_CORPUS_ZIPS}
-    DESTINATION ${OUT}
+    DESTINATION ${FUZZ_OUT}
     EXCLUDE_FROM_ALL
     COMPONENT fuzz)
 endif()
