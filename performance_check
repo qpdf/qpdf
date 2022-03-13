@@ -35,10 +35,10 @@ my $test_file = undef;
 my $workdir = undef;
 my $maxtime = undef;
 
-my $default_executable = 'qpdf/build/qpdf';
+my $default_executable = 'build/qpdf/qpdf';
 my $default_test_dir = '../performance-test-files';
 my $default_test_file = undef;
-my $default_workdir = 'qpdf/build/perf';
+my $default_workdir = 'build/perf';
 my $default_maxtime = 20;
 
 sub usage
