@@ -104,24 +104,31 @@ Remaining work:
 cmake
 =====
 
-* Rebase the cmake branch onto main and fast-forward over it.
-* Remove all "lt-" workarounds.
 * DLL.h
   * Remove DLL.h and QPDF_DLL* from all private library classes.
   * Change DLL_EXPORT to QPDF_EXPORT. Be sure to call attention to
     this in the release notes. There should be a "migrating to cmake"
     in the manual, and ./configure should draw attention to it.
-  * Remove the definition of QPDF_DLL_CLASS from DLL.h and change all
-    occurrences of QPDF_DLL_CLASS to QPDF_DLL. This will require
-    removing QPDF_DLL from methods inside classes that are declared
-    with QPDF_DLL. If we want to explicit exclude private methods, we
-    will need to mark them as not exported. See
-    https://gcc.gnu.org/wiki/Visibility
+  * The effect of QPDF_DLL_CLASS is to export everything in the class,
+    not just the vtable. On MSVC, we don't need this as the vtable
+    gets exported automatically when needed. With gcc, we need it to
+    export typeinfo and vtable. Whenever QPDF_DLL_CLASS is defined,
+    also define QPDF_DLL_LOCAL to __attribute__
+    ((visibility("hidden"))). Then add QPDF_DLL_LOCAL to everything in
+    QPDF_DLL_CLASS that is not marked with QPDF_DLL. The effect is
+    that, with MSVC, only methods are marked QPDF_DLL are public
+    because QPDF_DLL_CLASS is empty. For gcc, only methods marked
+    QPDF_DLL are public because QPDF_DLL_LOCAL makes the other things
+    private. See https://gcc.gnu.org/wiki/Visibility. Make sure this
+    is documented.
 * Nice to have:
   * Split qpdf.test into multiple tests
   * Rework tests so that nothing is written into the source directory.
   * Ideally then the entire build could be done with a read-only
     source tree.
+* pikepdf
+  * https://github.com/pikepdf/pikepdf/pull/315 -- setup.py + docs
+  * https://github.com/pikepdf/pikepdf/pull/316 -- setup.py only
 
 Output JSON v2
 ==============
