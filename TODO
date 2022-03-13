@@ -818,6 +818,9 @@ I find it useful to make reference to them in this list.
 
  * Get rid of remaining assert() calls from non-test code.
 
+ * Large file tests fail with linux32 before and after cmake. This was
+   first noticed after 10.6.3. I don't think it's worth fixing.
+
  * Consider updating the fuzzer with code that exercises
    copyAnnotations, file attachments, and name and number trees. Check
    fuzzer coverage.
