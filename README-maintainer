@@ -322,7 +322,8 @@ RELEASE PREPARATION
 
 cd ...qpdf-source-tree...
 export QPDF_SOURCE_TREE=$PWD
-export LD_LIBRARY_PATH=$QPDF_SOURCE_TREE/libqpdf/build/.libs
+export QPDF_BUILD_LIBDIR=$QPDF_SOURCE_TREE/build/libqpdf
+export LD_LIBRARY_PATH=$QPDF_BUILD_LIBDIR
 cd /tmp/z
 git clone git@github.com:pikepdf/pikepdf
 virtualenv v
