@@ -1,0 +1,213 @@
+#!/usr/bin/env python3
+import os
+import sys
+import argparse
+import subprocess
+import re
+
+whoami = os.path.basename(sys.argv[0])
+whereami = os.path.dirname(os.path.realpath(__file__))
+
+
+def warn(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+
+
+class Main:
+    def main(self, args=sys.argv[1:], prog=whoami):
+        options = self.parse_args(args, prog)
+        if options.action == 'dump':
+            self.dump(options)
+        elif options.action == 'check-sizes':
+            self.check_sizes(options)
+        elif options.action == 'compare':
+            self.compare(options)
+        else:
+            exit(f'{whoami}: unknown action')
+
+    def parse_args(self, args, prog):
+        parser = argparse.ArgumentParser(
+            prog=prog,
+            # formatter_class=argparse.RawDescriptionHelpFormatter,
+            description='Check ABI for changes',
+        )
+
+        subparsers = parser.add_subparsers(
+            dest='action',
+            help='specify subcommand; run action with --help for details',
+            required=True)
+        lib_arg = ('--lib', {'help': 'library file', 'required': True})
+
+        p_dump = subparsers.add_parser(
+            'dump',
+            help='dump qpdf symbols in a library')
+        p_dump.add_argument(lib_arg[0], **lib_arg[1])
+
+        p_check_sizes = subparsers.add_parser(
+            'check-sizes',
+            help='check consistency between library and sizes.cc')
+        p_check_sizes.add_argument(lib_arg[0], **lib_arg[1])
+
+        p_compare = subparsers.add_parser(
+            'compare',
+            help='compare libraries and sizes')
+        p_compare.add_argument('--new-lib',
+                               help='new library file',
+                               required=True)
+        p_compare.add_argument('--old-lib',
+                               help='old library file',
+                               required=True)
+        p_compare.add_argument('--old-sizes',
+                               help='output of old sizes',
+                               required=True)
+        p_compare.add_argument('--new-sizes',
+                               help='output of new sizes',
+                               required=True)
+        return parser.parse_args(args)
+
+    def get_versions(self, path):
+        p = os.path.basename(os.path.realpath(path))
+        m = re.match(r'^libqpdf.so.(\d+).(\d+).(\d+)$', p)
+        if not m:
+            exit(f'{whoami}: {path} does end with libqpdf.so.x.y.z')
+        major = int(m.group(1))
+        minor = int(m.group(2))
+        patch = int(m.group(3))
+        return (major, minor, patch)
+
+    def get_symbols(self, path):
+        symbols = set()
+        p = subprocess.run(
+            ['nm', '-D', '--demangle', '--with-symbol-versions', path],
+            stdout=subprocess.PIPE)
+        if p.returncode:
+            exit(f'{whoami}: failed to get symbols from {path}')
+        for line in p.stdout.decode().split('\n'):
+            # The LIBQPDF_\d+ comes from the version tag in
+            # libqpdf.map.in.
+            m = re.match(r'^[0-9a-f]+ (.) (.+)@@LIBQPDF_\d+\s*$', line)
+            if not m:
+                continue
+            symbols.add(m.group(2))
+        return symbols
+
+    def dump(self, options):
+        # This is just for manual use to investigate surprises.
+        for i in sorted(self.get_symbols(options.lib)):
+            print(i)
+
+    def check_sizes(self, options):
+        # Make sure that every class with methods in the public API
+        # appears in sizes.cc either explicitly ignored or in a
+        # print_size call. This enables us to reliably test whether
+        # any object changed size by following the ABI checking
+        # procedures outlined in README-maintainer.
+
+        # To keep things up to date, whenever we add or remove
+        # objects, we have to update sizes.cc. The check-sizes option
+        # can be run at any time on an up-to-date build.
+
+        lib = self.get_symbols(options.lib)
+        classes = set()
+        for i in sorted(lib):
+            # Find a symbol that looks like a class method.
+            m = re.match(r'(((?:^\S*?::)?(?:[^:\s]+))::([^:\s]+))\(', i)
+            if m:
+                full = m.group(1)
+                clas = m.group(2)
+                method = m.group(3)
+                if full.startswith('std::') or method.startswith('~'):
+                    # Sometimes std:: template instantiations make it
+                    # into the library. Ignore those. Also ignore
+                    # classes whose only exported method is a
+                    # destructor.
+                    continue
+                # Otherwise, if the class exports a method, we
+                # potentially care about changes to its size, so add
+                # it.
+                classes.add(clas)
+        in_sizes = set()
+        # Read the sizes.cc to make sure everything's there.
+        with open(os.path.join(whereami, 'qpdf/sizes.cc'), 'r') as f:
+            for line in f.readlines():
+                m = re.search(r'^\s*(?:ignore_class|print_size)\((.*?)\)',
+                              line)
+                if m:
+                    in_sizes.add(m.group(1))
+        sizes_only = in_sizes - classes
+        classes_only = classes - in_sizes
+        if sizes_only or classes_only:
+            if sizes_only:
+                print("classes in sizes.cc but not in the library:")
+                for i in sorted(sizes_only):
+                    print(' ', i)
+            if classes_only:
+                print("classes in the library but not in sizes.cc:")
+                for i in sorted(classes_only):
+                    print(' ', i)
+            exit(f'{whoami}: mismatch between library and sizes.cc')
+        else:
+            print(f'{whoami}: sizes.cc is consistent with the library')
+
+    def read_sizes(self, filename):
+        sizes = {}
+        with open(filename, 'r') as f:
+            for line in f.readlines():
+                line = line.strip()
+                m = re.match(r'^(.*) (\d+)$', line)
+                if not m:
+                    exit(f'{filename}: bad sizes line: {line}')
+                sizes[m.group(1)] = m.group(2)
+        return sizes
+
+    def compare(self, options):
+        old_version = self.get_versions(options.old_lib)
+        new_version = self.get_versions(options.new_lib)
+        old = self.get_symbols(options.old_lib)
+        new = self.get_symbols(options.new_lib)
+        if old_version > new_version:
+            exit(f'{whoami}: old version is newer than new version')
+        allow_abi_change = new_version[0] > old_version[0]
+        allow_added = allow_abi_change or (new_version[1] > old_version[1])
+        removed = sorted(old - new)
+        added = sorted(new - old)
+        if removed:
+            print('INTERFACES REMOVED:')
+            for i in removed:
+                print(' ', i)
+        else:
+            print('No interfaces were removed')
+        if added:
+            print('INTERFACES ADDED')
+            for i in added:
+                print(' ', i)
+        else:
+            print('No interfaces were added')
+
+        if removed and not allow_abi_change:
+            exit(f'{whoami}: **ERROR**: major version must be bumped')
+        elif added and not allow_added:
+            exit(f'{whoami}: **ERROR**: minor version must be bumped')
+        else:
+            print(f'{whoami}: ABI check passed.')
+
+        old_sizes = self.read_sizes(options.old_sizes)
+        new_sizes = self.read_sizes(options.new_sizes)
+        size_errors = False
+        for k, v in old_sizes.items():
+            if k in new_sizes and v != new_sizes[k]:
+                size_errors = True
+                print(f'{k} changed size from {v} to {new_sizes[k]}')
+        if size_errors:
+            if not allow_abi_change:
+                exit(f'{whoami}:'
+                     'size changes detected; this is an ABI change.')
+        else:
+            print(f'{whoami}: no size changes detected')
+
+
+if __name__ == '__main__':
+    try:
+        Main().main()
+    except KeyboardInterrupt:
+        exit(130)

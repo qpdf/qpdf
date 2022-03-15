@@ -297,26 +297,17 @@ RELEASE PREPARATION
   testing, do performance testing.
 
 * Test for performance and binary compatibility:
-  * Check out the last release
-  * cmake -S . -B build \
-    -DMAINTAINER_MODE=1 -DBUILD_STATIC_LIBS=0 -DBUILD_DOC=0 \
-    -DCMAKE_BUILD_TYPE=RelWithDebInfo
-  * cmake --build build -j$(nproc)
-  * Check out the current version
-  * ./performance_check | tee -a /tmp/perf
-  * cmake -S . -B build \
-    -DMAINTAINER_MODE=1 -DBUILD_STATIC_LIBS=0 -DBUILD_DOC=0 \
-    -DCMAKE_BUILD_TYPE=RelWithDebInfo
-  * cmake --build build -j$(nproc) --target libqpdf
-  * Checkout the last release
-  * (cd build; ctest --verbose)
-  * (some failures are normal -- looking for binary compatibility)
-  * Check out the current version
-  * cmake -S . -B build \
-    -DMAINTAINER_MODE=1 -DBUILD_STATIC_LIBS=0 -DBUILD_DOC=0 \
-    -DCMAKE_BUILD_TYPE=RelWithDebInfo
-  * cmake --build build -j$(nproc)
-  * ./performance_check | tee -a /tmp/perf
+
+  ./abi-perf-test release-<old> @
+
+  Prefix with SKIP_PERF=1 to skip performance test.
+  Prefix with SKIP_TESTS=1 to skip test suite run.
+
+  See "ABI checks" for details about the process.
+  End state:
+  * /tmp/check-abi/old contains old sizes and library
+  * /tmp/check-abi/new contains new sizes and library
+  * run check_abi manually to compare
 
 * Run pikepdf's test suite. Do this in a separate shell.
 
@@ -512,3 +503,39 @@ manual tests were done:
 We are using RelWithDebInfo for mingw and other non-Windows builds but
 Release for MSVC. There are linker warnings if MSVC is built with
 RelWithDebInfo when using external-libs.
+
+
+ABI checks
+
+Until the conversion of the build to cmake, we relied on running the
+test suite with old executables and a new library. When QPDFJob was
+introduced, this method got much less reliable since a lot of public
+API doesn't cross the shared library boundary. Also, when switching to
+cmake, we wanted a stronger check that the library had the expected
+ABI.
+
+Our ABI check now consists of three parts:
+
+* The same check as before: run the test suite with old executables
+  and a new library
+
+* Do a literal comparison of the symbols in the old and new shared
+  libraries -- this is a strong test of ABI change
+
+* Do a check to ensure that object sizes didn't change -- even with no
+  changes to the API of exported functions, size changes break API
+
+The combination of these checks is pretty strong, though there are
+still things that could potentially break ABI, such as
+
+* Changes to the types of public or protected data members without
+  changing the size
+
+* Changes to the meanings of parameters with changing the signature
+
+Not breaking ABI/API still requires care.
+
+The check_abi script is responsible for performing many of these
+steps. See comments in check_abi for additional notes. Running
+"check_abi check-sizes" is run by ctest on Linux when CHECK_SIZES is
+on.
