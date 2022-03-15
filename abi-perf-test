@@ -1,0 +1,123 @@
+#!/usr/bin/env bash
+set -eo pipefail
+cd $(dirname $0)
+whoami=$(basename $0)
+
+if [[ $(git status -s | egrep -v abi-perf-test | wc -l) != 0 ]]; then
+    echo 1>&2 "${whoami}: git is not clean. (abi-perf-test changes ignored)"
+    git status -s
+    exit 2
+fi
+
+old_rev=${1-bad}
+new_rev=${2-bad}
+
+if [ "$new_rev" = "bad" ]; then
+    echo 1>&2 "Usage: $whoami old-rev new-rev"
+    exit 2
+fi
+
+old_rev_hash=$(git rev-parse $old_rev)
+new_rev_hash=$(git rev-parse $new_rev)
+
+cat <<EOF
+
+Checking ABI:
+* old revision: $old_rev = $old_rev_hash
+* new revision: $new_rev = $new_rev_hash
+
+EOF
+
+work=/tmp/check-abi
+if [ -d $work ]; then
+   if [ ! -f $work/.abi ]; then
+       echo 1>&2 "$work exists and is not ours"
+       exit 2
+   else
+       rm -rf $work
+   fi
+fi
+mkdir -p $work/{old,new}
+touch $work/.abi
+
+source=$PWD
+repo=file://$source/.git
+cd $work
+git clone $repo qpdf
+cd qpdf
+
+git tag abi-old $old_rev_hash
+git tag abi-new $new_rev_hash
+
+echo "** building old version **"
+
+git checkout abi-old
+cmake -S . -B build \
+  -DMAINTAINER_MODE=1 -DBUILD_STATIC_LIBS=0 -DBUILD_DOC=0 \
+  -DCMAKE_BUILD_TYPE=RelWithDebInfo
+cmake --build build -j$(nproc)
+
+echo "** saving old library and size information **"
+
+$source/check_abi check-sizes --lib build/libqpdf/libqpdf.so
+./build/qpdf/sizes >| $work/old/sizes
+cp build/libqpdf/libqpdf.so.*.* $work/old
+
+if [ "$SKIP_PERF" != "1" ]; then
+    echo "** writing performance details for old revision to $work/perf **"
+    $source/performance_check --dir $source/../performance-test-files | \
+        tee -a $work/perf
+fi
+
+echo "** building new version's library and sizes **"
+
+git checkout abi-new
+cmake -S . -B build \
+  -DMAINTAINER_MODE=1 -DBUILD_STATIC_LIBS=0 -DBUILD_DOC=0 \
+  -DCMAKE_BUILD_TYPE=RelWithDebInfo
+cmake --build build -j$(nproc) --target sizes
+
+echo "** saving new library and size information **"
+
+$source/check_abi check-sizes --lib build/libqpdf/libqpdf.so
+./build/qpdf/sizes >| $work/new/sizes
+cp build/libqpdf/libqpdf.so.*.* $work/new
+
+echo "** running ABI comparison **"
+
+$source/check_abi compare --old-lib $work/old/libqpdf.so.*.* \
+  --new-lib build/libqpdf/libqpdf.so \
+  --old-sizes $work/old/sizes --new-sizes $work/new/sizes
+
+if [ "$SKIP_TESTS" != "1" ]; then
+    # Switch back to the previous release and run tests. There may be
+    # some failures based on functionality change. We are looking for
+    # ABI breakage.
+    git checkout abi-old
+    set +e
+    (cd build; ctest --verbose)
+    if [ $? != 0 ]; then
+        cat <<EOF
+
+**********************************************************************
+There were some test failures; inspect to determine whether they are
+ABI-related.
+**********************************************************************
+
+EOF
+    fi
+    set -e
+fi
+
+git checkout abi-new
+
+if [ "$SKIP_PERF" != "1" ]; then
+    echo "** writing performance details for new revision to $work/perf **"
+
+    cmake -S . -B build \
+      -DMAINTAINER_MODE=1 -DBUILD_STATIC_LIBS=0 -DBUILD_DOC=0 \
+      -DCMAKE_BUILD_TYPE=RelWithDebInfo
+    cmake --build build -j$(nproc)
+    $source/performance_check --dir $source/../performance-test-files | \
+        tee -a $work/perf
+fi

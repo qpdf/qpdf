@@ -239,6 +239,14 @@ QTEST_COLOR
 Options for Working on qpdf
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+CHECK_SIZES
+  The source file :file:`qpdf/sizes.cc` is used to display the sizes
+  of all objects in the public API. Consistency of its output between
+  releases is used as part of the check against accidental breakage of
+  the binary interface (ABI). Turning this on causes a test to be run
+  that ensures an exact match between classes in ``sizes.cc`` and
+  classes in the library's public API. This option requires Python 3.
+
 GENERATE_AUTO_JOB
   Some qpdf source files are automatically generated from
   :file:`job.yml` and the CLI documentation. If you are adding new
@@ -276,6 +284,8 @@ MAINTAINER_MODE
   maintaining qpdf. In turns on the following:
 
   - ``BUILD_DOC``
+
+  - ``CHECK_SIZES``
 
   - ``GENERATE_AUTO_JOB``
 

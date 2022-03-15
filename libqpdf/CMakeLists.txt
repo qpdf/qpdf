@@ -579,3 +579,13 @@ if(INSTALL_CMAKE_PACKAGE)
     ${CMAKE_CURRENT_BINARY_DIR}/qpdfConfig.cmake
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/qpdf)
 endif()
+
+if(CHECK_SIZES AND BUILD_SHARED_LIBS AND (CMAKE_SYSTEM_NAME STREQUAL "Linux"))
+  # We can only do this check on a system with ELF shared libraries.
+  # Since this is a maintainer-only option, testing for Linux is a
+  # close enough approximation.
+  add_test(
+    NAME check-sizes
+    COMMAND ${qpdf_SOURCE_DIR}/check_abi check-sizes
+    --lib $<TARGET_FILE:libqpdf>)
+endif()

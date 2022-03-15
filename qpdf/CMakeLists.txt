@@ -2,6 +2,7 @@ set(MAIN_CXX_PROGRAMS
   qpdf
   fix-qdf
   pdf_from_scratch
+  sizes
   test_driver
   test_large_file
   test_parsedoffset
@@ -26,6 +27,7 @@ foreach(PROG ${MAIN_C_PROGRAMS})
   set_property(TARGET ${PROG} PROPERTY LINKER_LANGUAGE CXX)
 endforeach()
 target_include_directories(qpdf-ctest PRIVATE ${CMAKE_BINARY_DIR}/libqpdf)
+target_include_directories(sizes PRIVATE ${JPEG_INCLUDE})
 
 foreach(B qpdf test_unicode_filenames fix-qdf test_shell_glob)
   if(WINDOWS_WMAIN_COMPILE)
