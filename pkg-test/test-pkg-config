@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# Test that the installed qpdf development packages enable a qpdf
+# application to be build with cmake using qpdf's cmake package
+# information. Requires cmake as well as libqpdf development
+# dependencies.
+#
+set -ex
+
+TMP=$1
+if [ ! -d "$TMP" ]; then
+    echo 1>&2 "Usage: $0 tmp-dir"
+    exit 2
+fi
+
+cp pkg-test/qpdf-version.cc $TMP
+cd $TMP
+g++ qpdf-version.cc -o qpdf-version \
+    $(pkg-config libqpdf --cflags) \
+    $(pkg-config libqpdf --libs)
+./qpdf-version

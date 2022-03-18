@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -e
+
+cd $(dirname $0)/..
+
+CUR_TEMP=
+function clean_temp() {
+    if [[ $CUR_TEMP =~ .*\.qpdf-test$ && -d $CUR_TEMP ]]; then
+        rm -rf $CUR_TEMP
+    fi
+}
+
+trap clean_temp EXIT
+
+declare -a any_failed
+for i in pkg-test/test-*; do
+    if [[ $i =~ .*~ ]]; then
+        continue
+    fi
+    CUR_TEMP=$(mktemp --suffix=.qpdf-test -d)
+    printf "\n\n\e[40m\e[1;35m*** RUNNING $i ***\e[0m\n\n\n"
+    if ! $i $CUR_TEMP; then
+        any_failed=(${any_failed[*]} $i)
+    fi
+    clean_temp
+done
+
+if [[ ${#any_failed} != 0 ]]; then
+    for i in ${any_failed[*]}; do
+        echo 1>&2 "FAILED: $i"
+    done
+    exit 2
+fi
+printf "\n\n\e[40m\e[1;35m*** ALL TESTS PASSED ***\e[0m\n"
