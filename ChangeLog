@@ -1,3 +1,15 @@
+2022-03-19  Jay Berkenbilt  <ejb@ql.org>
+
+	* 10.6.3.0cmake1: unofficial release
+
+	* Conversion of build system to cmake. This change doesn't include
+	any user-visible functional changes to the library API or CLI but
+	completely replaces the build system. Details can be found in the
+	manual in the "Building and Installing QPDF" and "Notes for
+	Packagers" sections, especially "Converting From autoconf to
+	cmake" in "Building and Installing QPDF". Highlights of the
+	changes can be found in the release notes.
+
 2022-03-08  Jay Berkenbilt  <ejb@ql.org>
 
 	* 10.6.3: release
