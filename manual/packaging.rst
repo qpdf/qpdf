@@ -38,6 +38,18 @@ particularly useful to packagers.
   11, this was a recommendation for packagers but was not done
   automatically.
 
+.. _package-tests:
+
+Package Tests
+-------------
+
+The :file:`pkg-test` directory contains very small test shell scripts
+that are designed to help smoke-test an installation of qpdf. They
+were designed to be used with debian's `autopkgtest
+<https://wiki.debian.org/ContinuousIntegration/autopkgtest>`__
+framework but can be used by others. Please see
+:file:`pkg-test/README.md` in the source distribution for details.
+
 .. _packaging-doc:
 
 Packaging Documentation

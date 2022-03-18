@@ -326,6 +326,15 @@ rehash
 pip3 install .
 pytest -n auto
 
+* Run package tests:
+
+cmake -S . -B build.tmp -DCMAKE_BUILD_TYPE=RelWithDebInfo
+cmake --build build.tmp -j$(nproc)
+DESTDIR=/tmp/inst cmake --install build.tmp
+env PKG_CONFIG_PATH=/tmp/inst/usr/local/lib/pkgconfig \
+    CMAKE_PREFIX_PATH=/tmp/inst/usr/local \
+   ./pkg-test/run-all
+
 
 CREATING A RELEASE
 
@@ -339,7 +348,7 @@ CREATING A RELEASE
 version=x.y.z
 gpg --detach-sign --armor qpdf-$version.tar.gz
 
-* Build and test the debian package
+* Build and test the debian package. This includes running autopkgtest.
 
 * Add a calendar reminder to check the status of the debian package to
   make sure it is transitioning properly and to resolve any issues.
