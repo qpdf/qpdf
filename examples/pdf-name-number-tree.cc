@@ -21,12 +21,6 @@ int main(int argc, char* argv[])
 {
     whoami = QUtil::getWhoami(argv[0]);
 
-    // For libtool's sake....
-    if (strncmp(whoami, "lt-", 3) == 0)
-    {
-        whoami += 3;
-    }
-
     if (argc != 2)
     {
         usage();

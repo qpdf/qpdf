@@ -470,12 +470,6 @@ int main(int argc, char* argv[])
 {
     whoami = QUtil::getWhoami(argv[0]);
 
-    // For libtool's sake....
-    if (strncmp(whoami, "lt-", 3) == 0)
-    {
-        whoami += 3;
-    }
-
     char const* infilename = 0;
     char const* outfilename = 0;
     bool decode_specialized = false;

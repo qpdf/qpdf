@@ -109,12 +109,6 @@ int main(int argc, char* argv[])
 {
     whoami = QUtil::getWhoami(argv[0]);
 
-    // For libtool's sake....
-    if (strncmp(whoami, "lt-", 3) == 0)
-    {
-        whoami += 3;
-    }
-
     // For test suite
     bool static_id = false;
     if ((argc > 1) && (strcmp(argv[1], " --static-id") == 0))

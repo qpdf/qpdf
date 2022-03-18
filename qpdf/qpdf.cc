@@ -33,12 +33,6 @@ int realmain(int argc, char* argv[])
     whoami = QUtil::getWhoami(argv[0]);
     QUtil::setLineBuf(stdout);
 
-    // Remove prefix added by libtool for consistency during testing.
-    if (strncmp(whoami, "lt-", 3) == 0)
-    {
-        whoami += 3;
-    }
-
     QPDFJob j;
     try
     {

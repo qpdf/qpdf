@@ -260,11 +260,6 @@ int main(int argc, char* argv[])
     {
         ++whoami;
     }
-    // For libtool's sake....
-    if (strncmp(whoami, "lt-", 3) == 0)
-    {
-        whoami += 3;
-    }
 
     char const* filename = 0;
     size_t max_len = 0;
