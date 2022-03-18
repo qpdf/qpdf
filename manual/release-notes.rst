@@ -6,6 +6,48 @@ Release Notes
 For a detailed list of changes, please see the file
 :file:`ChangeLog` in the source distribution.
 
+10.6.3 + cmake: March 19, 2022
+  - This is an unofficial release and is marked as "pre-release" at
+    github. It is intended for developers and packagers who want to
+    test out the new build system.
+
+  - The old autoconf-based build has been replaced with CMake. Version
+    3.16 or newer is required. For all the details, please read
+    :ref:`installing` and, if you package qpdf for a distribution,
+    :ref:`packaging`.
+
+  - For the most part, other than being familiar with generally how to
+    build things with cmake, what you need to know to convert your
+    build over is described in :ref:`autoconf-to-cmake`. Here are a
+    few changes in behavior to be aware of:
+
+    - Example sources are installed by default in the documentation
+      directory.
+
+    - The configure options to enable image comparison and large file
+      tests have been replaced by environment variables. The old
+      options set environment variables behind the scenes. Before, to
+      skip image tests, you had to set
+      ``QPDF_SKIP_TEST_COMPARE_IMAGES=1``, which was done by default.
+      Now these are off by default, and you have to set
+      ``QPDF_TEST_COMPARE_IMAGES=1`` to enable them.
+
+    - In the default configuration, the native crypto provider is only
+      selected when explicitly requested or when there are no other
+      options. See :ref:`crypto.build` for a detailed discussion.
+
+    - Windows external libraries are detected by default if the
+      :file:`external-libraries` directory is found. Static libraries
+      for zlib, libjpeg, and openssl are provided as described in
+      :file:`README-windows.md`. They are only compatible with
+      non-debug builds.
+
+    - A new directory called ``pkg-tests`` has been added which
+      contains short shell scripts that can be used to smoke test an
+      installed qpdf package. These are used by the debian
+      ``autopkgtest`` framework but can be used by others. See
+      :file:`pkg-test/README.md` for details.
+
 10.6.3: March 8, 2022
   - Announcement of upcoming change:
 
