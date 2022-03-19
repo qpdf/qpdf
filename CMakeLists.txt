@@ -154,6 +154,7 @@ if(WIN32 AND NOT SKIP_OS_SECURE_RANDOM)
 endif()
 
 include(CheckCXXSourceCompiles)
+set(ATOMIC_LIBRARY)
 function(check_atomic)
   foreach(I 0 1)
     if(I)
@@ -162,8 +163,8 @@ function(check_atomic)
     check_cxx_source_compiles(
       "#include <atomic>
 int main() {
-    static std::atomic<int> a{0};
-    a = a.fetch_add(1);
+    static std::atomic<unsigned long long> a{0};
+    a = a.fetch_add(1LL);
     return 0;
 }"
       ATOMIC_WORKED${I})
@@ -172,7 +173,7 @@ int main() {
     endif()
   endforeach()
   if(ATOMIC_WORKED1)
-    list(APPEND CMAKE_REQUIRED_LIBRARIES atomic)
+    set(ATOMIC_WORKED1 atomic PARENT_SCOPE)
   endif()
 endfunction()
 check_atomic()
