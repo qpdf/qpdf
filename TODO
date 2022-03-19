@@ -2,6 +2,8 @@
 Next
 ====
 
+* At next release, hide release-qpdf-10.6.3.0cmake* versions at readthedocs
+
 In order:
 * cmake
 * code formatting

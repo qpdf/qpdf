@@ -373,8 +373,8 @@ chmod 555 *.AppImage
   HEAD pointing to the tip of main.
 
 git rev-parse qpdf/main @
-git tag -s release-qpdf-$version @ -m"qpdf $version"
-git push qpdf release-qpdf-$version
+git tag -s v$version @ -m"qpdf $version"
+git push qpdf v$version
 
 * Update documentation branches
 
@@ -391,7 +391,8 @@ git push qpdf @:stable
 # Create release
 GITHUB_TOKEN=$(qdata-show cred github-token)
 function gcurl() { curl -H "Authorization: token $GITHUB_TOKEN" ${1+"$@"}; }
-url=$(gcurl -s -XPOST https://api.github.com/repos/qpdf/qpdf/releases -d'{"tag_name": "release-qpdf-'$version'", "name": "qpdf '$version'", "draft": true}' | jq -r '.url')
+
+url=$(gcurl -s -XPOST https://api.github.com/repos/qpdf/qpdf/releases -d'{"tag_name": "v'$version'", "name": "qpdf '$version'", "draft": true}' | jq -r '.url')
 
 # Get upload url
 upload_url=$(gcurl -s $url | jq -r '.upload_url' | sed -E -e 's/\{.*\}//')
