@@ -173,7 +173,7 @@ int main() {
     endif()
   endforeach()
   if(ATOMIC_WORKED1)
-    set(ATOMIC_WORKED1 atomic PARENT_SCOPE)
+    set(ATOMIC_LIBRARY atomic PARENT_SCOPE)
   endif()
 endfunction()
 check_atomic()
