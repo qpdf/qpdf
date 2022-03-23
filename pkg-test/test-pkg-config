@@ -15,6 +15,8 @@ fi
 
 cp pkg-test/qpdf-version.cc $TMP
 cd $TMP
+pkg-config libqpdf --modversion
+pkg-config libqpdf --libs --static
 g++ qpdf-version.cc -o qpdf-version \
     $(pkg-config libqpdf --cflags) \
     $(pkg-config libqpdf --libs)
