@@ -1,16 +1,17 @@
-#include <stdio.h>
-#include <string.h>
-#include <iostream>
-#include <stdlib.h>
 #include <qpdf/QPDF.hh>
-#include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
+#include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QUtil.hh>
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 static char const* whoami = 0;
 
-void usage()
+void
+usage()
 {
     std::cerr << "Usage: " << whoami << " infile.pdf outfile.pdf value"
               << std::endl
@@ -19,13 +20,12 @@ void usage()
     exit(2);
 }
 
-
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     whoami = QUtil::getWhoami(argv[0]);
 
-    if (argc != 4)
-    {
+    if (argc != 4) {
         usage();
     }
 
@@ -39,8 +39,7 @@ int main(int argc, char* argv[])
     // to illustrate use of the helper classes around interactive
     // forms.
 
-    try
-    {
+    try {
         QPDF qpdf;
         qpdf.processFile(infilename);
 
@@ -55,8 +54,8 @@ int main(int argc, char* argv[])
         std::vector<QPDFPageObjectHelper> pages = pdh.getAllPages();
         for (std::vector<QPDFPageObjectHelper>::iterator page_iter =
                  pages.begin();
-             page_iter != pages.end(); ++page_iter)
-        {
+             page_iter != pages.end();
+             ++page_iter) {
             // Get all widget annotations for each page. Widget
             // annotations are the ones that contain the details of
             // what's in a form field.
@@ -64,14 +63,13 @@ int main(int argc, char* argv[])
                 afdh.getWidgetAnnotationsForPage(*page_iter);
             for (std::vector<QPDFAnnotationObjectHelper>::iterator annot_iter =
                      annotations.begin();
-                 annot_iter != annotations.end(); ++annot_iter)
-            {
+                 annot_iter != annotations.end();
+                 ++annot_iter) {
                 // For each annotation, find its associated field. If
                 // it's a text field, set its value.
                 QPDFFormFieldObjectHelper ffh =
                     afdh.getFieldForAnnotation(*annot_iter);
-                if (ffh.getFieldType() == "/Tx")
-                {
+                if (ffh.getFieldType() == "/Tx") {
                     // Set the value. Passing false as the second
                     // value prevents qpdf from setting
                     // /NeedAppearances to true (but will not turn it
@@ -92,9 +90,7 @@ int main(int argc, char* argv[])
         QPDFWriter w(qpdf, outfilename);
         w.setStaticID(true); // for testing only
         w.write();
-    }
-    catch (std::exception &e)
-    {
+    } catch (std::exception& e) {
         std::cerr << whoami << " processing file " << infilename << ": "
                   << e.what() << std::endl;
         exit(2);

@@ -13,8 +13,8 @@ QPDFMatrix::QPDFMatrix() :
 {
 }
 
-QPDFMatrix::QPDFMatrix(double a, double b, double c,
-                       double d, double e, double f) :
+QPDFMatrix::QPDFMatrix(
+    double a, double b, double c, double d, double e, double f) :
     a(a),
     b(b),
     c(c),
@@ -34,10 +34,10 @@ QPDFMatrix::QPDFMatrix(QPDFObjectHandle::Matrix const& m) :
 {
 }
 
-static double fix_rounding(double d)
+static double
+fix_rounding(double d)
 {
-    if ((d > -0.00001) && (d < 0.00001))
-    {
+    if ((d > -0.00001) && (d < 0.00001)) {
         d = 0.0;
     }
     return d;
@@ -46,12 +46,13 @@ static double fix_rounding(double d)
 std::string
 QPDFMatrix::unparse() const
 {
-    return (QUtil::double_to_string(fix_rounding(a), 5) + " " +
-            QUtil::double_to_string(fix_rounding(b), 5) + " " +
-            QUtil::double_to_string(fix_rounding(c), 5) + " " +
-            QUtil::double_to_string(fix_rounding(d), 5) + " " +
-            QUtil::double_to_string(fix_rounding(e), 5) + " " +
-            QUtil::double_to_string(fix_rounding(f), 5));
+    return (
+        QUtil::double_to_string(fix_rounding(a), 5) + " " +
+        QUtil::double_to_string(fix_rounding(b), 5) + " " +
+        QUtil::double_to_string(fix_rounding(c), 5) + " " +
+        QUtil::double_to_string(fix_rounding(d), 5) + " " +
+        QUtil::double_to_string(fix_rounding(e), 5) + " " +
+        QUtil::double_to_string(fix_rounding(f), 5));
 }
 
 QPDFObjectHandle::Matrix
@@ -69,12 +70,12 @@ QPDFMatrix::concat(QPDFMatrix const& other)
     double dp = (this->b * other.c) + (this->d * other.d);
     double ep = (this->a * other.e) + (this->c * other.f) + this->e;
     double fp = (this->b * other.e) + (this->d * other.f) + this->f;
-    this-> a = ap;
-    this-> b = bp;
-    this-> c = cp;
-    this-> d = dp;
-    this-> e = ep;
-    this-> f = fp;
+    this->a = ap;
+    this->b = bp;
+    this->c = cp;
+    this->d = dp;
+    this->e = ep;
+    this->f = fp;
 }
 
 void
@@ -92,18 +93,17 @@ QPDFMatrix::translate(double tx, double ty)
 void
 QPDFMatrix::rotatex90(int angle)
 {
-    switch (angle)
-    {
-      case 90:
+    switch (angle) {
+    case 90:
         concat(QPDFMatrix(0, 1, -1, 0, 0, 0));
         break;
-      case 180:
+    case 180:
         concat(QPDFMatrix(-1, 0, 0, -1, 0, 0));
         break;
-      case 270:
+    case 270:
         concat(QPDFMatrix(0, -1, 1, 0, 0, 0));
         break;
-      default:
+    default:
         // ignore
         break;
     }
@@ -147,10 +147,7 @@ QPDFMatrix::transformRectangle(QPDFObjectHandle::Rectangle r) const
 bool
 QPDFMatrix::operator==(QPDFMatrix const& rhs) const
 {
-    return ((this->a == rhs.a) &&
-            (this->b == rhs.b) &&
-            (this->c == rhs.c) &&
-            (this->d == rhs.d) &&
-            (this->e == rhs.e) &&
-            (this->f == rhs.f));
+    return (
+        (this->a == rhs.a) && (this->b == rhs.b) && (this->c == rhs.c) &&
+        (this->d == rhs.d) && (this->e == rhs.e) && (this->f == rhs.f));
 }

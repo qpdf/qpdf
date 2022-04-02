@@ -1,10 +1,10 @@
 #include <qpdf/QPDFAcroFormDocumentHelper.hh>
 
-#include <qpdf/QTC.hh>
-#include <qpdf/QPDFPageDocumentHelper.hh>
-#include <qpdf/ResourceFinder.hh>
 #include <qpdf/Pl_Buffer.hh>
+#include <qpdf/QPDFPageDocumentHelper.hh>
+#include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/ResourceFinder.hh>
 
 QPDFAcroFormDocumentHelper::Members::~Members()
 {
@@ -43,10 +43,9 @@ QPDFObjectHandle
 QPDFAcroFormDocumentHelper::getOrCreateAcroForm()
 {
     auto acroform = this->qpdf.getRoot().getKey("/AcroForm");
-    if (! acroform.isDictionary())
-    {
-        acroform = this->qpdf.makeIndirectObject(
-            QPDFObjectHandle::newDictionary());
+    if (!acroform.isDictionary()) {
+        acroform =
+            this->qpdf.makeIndirectObject(QPDFObjectHandle::newDictionary());
         this->qpdf.getRoot().replaceKey("/AcroForm", acroform);
     }
     return acroform;
@@ -57,8 +56,7 @@ QPDFAcroFormDocumentHelper::addFormField(QPDFFormFieldObjectHelper ff)
 {
     auto acroform = getOrCreateAcroForm();
     auto fields = acroform.getKey("/Fields");
-    if (! fields.isArray())
-    {
+    if (!fields.isArray()) {
         fields = QPDFObjectHandle::newArray();
         acroform.replaceKey("/Fields", fields);
     }
@@ -77,28 +75,23 @@ QPDFAcroFormDocumentHelper::addAndRenameFormFields(
     std::list<QPDFObjectHandle> queue;
     queue.insert(queue.begin(), fields.begin(), fields.end());
     std::set<QPDFObjGen> seen;
-    while (! queue.empty())
-    {
+    while (!queue.empty()) {
         QPDFObjectHandle obj = queue.front();
         queue.pop_front();
         auto og = obj.getObjGen();
-        if (seen.count(og))
-        {
+        if (seen.count(og)) {
             // loop
             continue;
         }
         seen.insert(og);
         auto kids = obj.getKey("/Kids");
-        if (kids.isArray())
-        {
-            for (auto kid: kids.aitems())
-            {
+        if (kids.isArray()) {
+            for (auto kid : kids.aitems()) {
                 queue.push_back(kid);
             }
         }
 
-        if (obj.hasKey("/T"))
-        {
+        if (obj.hasKey("/T")) {
             // Find something we can append to the partial name that
             // makes the fully qualified name unique. When we find
             // something, reuse the same suffix for all fields in this
@@ -109,13 +102,11 @@ QPDFAcroFormDocumentHelper::addAndRenameFormFields(
             // qualified name.
             std::string old_name =
                 QPDFFormFieldObjectHelper(obj).getFullyQualifiedName();
-            if (renames.count(old_name) == 0)
-            {
+            if (renames.count(old_name) == 0) {
                 std::string new_name = old_name;
                 int suffix = 0;
                 std::string append;
-                while (! getFieldsWithQualifiedName(new_name).empty())
-                {
+                while (!getFieldsWithQualifiedName(new_name).empty()) {
                     ++suffix;
                     append = "+" + QUtil::int_to_string(suffix);
                     new_name = old_name + append;
@@ -123,17 +114,16 @@ QPDFAcroFormDocumentHelper::addAndRenameFormFields(
                 renames[old_name] = append;
             }
             std::string append = renames[old_name];
-            if (! append.empty())
-            {
+            if (!append.empty()) {
                 obj.replaceKey(
-                    "/T", QPDFObjectHandle::newUnicodeString(
+                    "/T",
+                    QPDFObjectHandle::newUnicodeString(
                         obj.getKey("/T").getUTF8Value() + append));
             }
         }
     }
 
-    for (auto i: fields)
-    {
+    for (auto i : fields) {
         addFormField(i);
     }
 }
@@ -143,34 +133,27 @@ QPDFAcroFormDocumentHelper::removeFormFields(
     std::set<QPDFObjGen> const& to_remove)
 {
     auto acroform = this->qpdf.getRoot().getKey("/AcroForm");
-    if (! acroform.isDictionary())
-    {
+    if (!acroform.isDictionary()) {
         return;
     }
     auto fields = acroform.getKey("/Fields");
-    if (! fields.isArray())
-    {
+    if (!fields.isArray()) {
         return;
     }
 
-    for (auto const& og: to_remove)
-    {
+    for (auto const& og : to_remove) {
         auto annotations = this->m->field_to_annotations.find(og);
-        if (annotations != this->m->field_to_annotations.end())
-        {
-            for (auto aoh: annotations->second)
-            {
+        if (annotations != this->m->field_to_annotations.end()) {
+            for (auto aoh : annotations->second) {
                 this->m->annotation_to_field.erase(
                     aoh.getObjectHandle().getObjGen());
             }
             this->m->field_to_annotations.erase(og);
         }
         auto name = this->m->field_to_name.find(og);
-        if (name != this->m->field_to_name.end())
-        {
+        if (name != this->m->field_to_name.end()) {
             this->m->name_to_fields[name->second].erase(og);
-            if (this->m->name_to_fields[name->second].empty())
-            {
+            if (this->m->name_to_fields[name->second].empty()) {
                 this->m->name_to_fields.erase(name->second);
             }
             this->m->field_to_name.erase(og);
@@ -178,15 +161,11 @@ QPDFAcroFormDocumentHelper::removeFormFields(
     }
 
     int i = 0;
-    while (i < fields.getArrayNItems())
-    {
+    while (i < fields.getArrayNItems()) {
         auto field = fields.getArrayItem(i);
-        if (to_remove.count(field.getObjGen()))
-        {
+        if (to_remove.count(field.getObjGen())) {
             fields.eraseItem(i);
-        }
-        else
-        {
+        } else {
             ++i;
         }
     }
@@ -207,26 +186,23 @@ QPDFAcroFormDocumentHelper::getFormFields()
 {
     analyze();
     std::vector<QPDFFormFieldObjectHelper> result;
-    for (std::map<QPDFObjGen,
-             std::vector<QPDFAnnotationObjectHelper> >::iterator iter =
-             this->m->field_to_annotations.begin();
-         iter != this->m->field_to_annotations.end(); ++iter)
-    {
+    for (std::map<QPDFObjGen, std::vector<QPDFAnnotationObjectHelper>>::iterator
+             iter = this->m->field_to_annotations.begin();
+         iter != this->m->field_to_annotations.end();
+         ++iter) {
         result.push_back(this->qpdf.getObjectByObjGen((*iter).first));
     }
     return result;
 }
 
 std::set<QPDFObjGen>
-QPDFAcroFormDocumentHelper::getFieldsWithQualifiedName(
-    std::string const& name)
+QPDFAcroFormDocumentHelper::getFieldsWithQualifiedName(std::string const& name)
 {
     analyze();
     // Keep from creating an empty entry
     std::set<QPDFObjGen> result;
     auto iter = this->m->name_to_fields.find(name);
-    if (iter != this->m->name_to_fields.end())
-    {
+    if (iter != this->m->name_to_fields.end()) {
         result = iter->second;
     }
     return result;
@@ -238,8 +214,7 @@ QPDFAcroFormDocumentHelper::getAnnotationsForField(QPDFFormFieldObjectHelper h)
     analyze();
     std::vector<QPDFAnnotationObjectHelper> result;
     QPDFObjGen og(h.getObjectHandle().getObjGen());
-    if (this->m->field_to_annotations.count(og))
-    {
+    if (this->m->field_to_annotations.count(og)) {
         result = this->m->field_to_annotations[og];
     }
     return result;
@@ -258,16 +233,13 @@ QPDFAcroFormDocumentHelper::getFormFieldsForPage(QPDFPageObjectHelper ph)
     std::set<QPDFObjGen> added;
     std::vector<QPDFFormFieldObjectHelper> result;
     auto widget_annotations = getWidgetAnnotationsForPage(ph);
-    for (auto annot: widget_annotations)
-    {
+    for (auto annot : widget_annotations) {
         auto field = getFieldForAnnotation(annot);
         field = field.getTopLevelField();
         auto og = field.getObjectHandle().getObjGen();
-        if (! added.count(og))
-        {
+        if (!added.count(og)) {
             added.insert(og);
-            if (field.getObjectHandle().isDictionary())
-            {
+            if (field.getObjectHandle().isDictionary()) {
                 result.push_back(field);
             }
         }
@@ -280,14 +252,12 @@ QPDFAcroFormDocumentHelper::getFieldForAnnotation(QPDFAnnotationObjectHelper h)
 {
     QPDFObjectHandle oh = h.getObjectHandle();
     QPDFFormFieldObjectHelper result(QPDFObjectHandle::newNull());
-    if (! oh.isDictionaryOfType("", "/Widget"))
-    {
+    if (!oh.isDictionaryOfType("", "/Widget")) {
         return result;
     }
     analyze();
     QPDFObjGen og(oh.getObjGen());
-    if (this->m->annotation_to_field.count(og))
-    {
+    if (this->m->annotation_to_field.count(og)) {
         result = this->m->annotation_to_field[og];
     }
     return result;
@@ -296,19 +266,16 @@ QPDFAcroFormDocumentHelper::getFieldForAnnotation(QPDFAnnotationObjectHelper h)
 void
 QPDFAcroFormDocumentHelper::analyze()
 {
-    if (this->m->cache_valid)
-    {
+    if (this->m->cache_valid) {
         return;
     }
     this->m->cache_valid = true;
     QPDFObjectHandle acroform = this->qpdf.getRoot().getKey("/AcroForm");
-    if (! (acroform.isDictionary() && acroform.hasKey("/Fields")))
-    {
+    if (!(acroform.isDictionary() && acroform.hasKey("/Fields"))) {
         return;
     }
     QPDFObjectHandle fields = acroform.getKey("/Fields");
-    if (! fields.isArray())
-    {
+    if (!fields.isArray()) {
         QTC::TC("qpdf", "QPDFAcroFormDocumentHelper fields not array");
         acroform.warnIfPossible(
             "/Fields key of /AcroForm dictionary is not an array; ignoring");
@@ -321,8 +288,7 @@ QPDFAcroFormDocumentHelper::analyze()
     std::set<QPDFObjGen> visited;
     int nfields = fields.getArrayNItems();
     QPDFObjectHandle null(QPDFObjectHandle::newNull());
-    for (int i = 0; i < nfields; ++i)
-    {
+    for (int i = 0; i < nfields; ++i) {
         traverseField(fields.getArrayItem(i), null, 0, visited);
     }
 
@@ -338,19 +304,18 @@ QPDFAcroFormDocumentHelper::analyze()
     QPDFPageDocumentHelper dh(this->qpdf);
     std::vector<QPDFPageObjectHelper> pages = dh.getAllPages();
     for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-         iter != pages.end(); ++iter)
-    {
+         iter != pages.end();
+         ++iter) {
         QPDFPageObjectHelper ph(*iter);
         std::vector<QPDFAnnotationObjectHelper> annots =
             getWidgetAnnotationsForPage(ph);
         for (std::vector<QPDFAnnotationObjectHelper>::iterator i2 =
                  annots.begin();
-             i2 != annots.end(); ++i2)
-        {
+             i2 != annots.end();
+             ++i2) {
             QPDFObjectHandle annot((*i2).getObjectHandle());
             QPDFObjGen og(annot.getObjGen());
-            if (this->m->annotation_to_field.count(og) == 0)
-            {
+            if (this->m->annotation_to_field.count(og) == 0) {
                 QTC::TC("qpdf", "QPDFAcroFormDocumentHelper orphaned widget");
                 // This is not supposed to happen, but it's easy
                 // enough for us to handle this case. Treat the
@@ -373,25 +338,24 @@ QPDFAcroFormDocumentHelper::analyze()
 
 void
 QPDFAcroFormDocumentHelper::traverseField(
-    QPDFObjectHandle field, QPDFObjectHandle parent, int depth,
+    QPDFObjectHandle field,
+    QPDFObjectHandle parent,
+    int depth,
     std::set<QPDFObjGen>& visited)
 {
-    if (depth > 100)
-    {
+    if (depth > 100) {
         // Arbitrarily cut off recursion at a fixed depth to avoid
         // specially crafted files that could cause stack overflow.
         return;
     }
-    if (! field.isIndirect())
-    {
+    if (!field.isIndirect()) {
         QTC::TC("qpdf", "QPDFAcroFormDocumentHelper direct field");
         field.warnIfPossible(
             "encountered a direct object as a field or annotation while"
             " traversing /AcroForm; ignoring field or annotation");
         return;
     }
-    if (! field.isDictionary())
-    {
+    if (!field.isDictionary()) {
         QTC::TC("qpdf", "QPDFAcroFormDocumentHelper non-dictionary field");
         field.warnIfPossible(
             "encountered a non-dictionary as a field or annotation while"
@@ -399,8 +363,7 @@ QPDFAcroFormDocumentHelper::traverseField(
         return;
     }
     QPDFObjGen og(field.getObjGen());
-    if (visited.count(og) != 0)
-    {
+    if (visited.count(og) != 0) {
         QTC::TC("qpdf", "QPDFAcroFormDocumentHelper loop");
         field.warnIfPossible("loop detected while traversing /AcroForm");
         return;
@@ -418,51 +381,42 @@ QPDFAcroFormDocumentHelper::traverseField(
     bool is_annotation = false;
     bool is_field = (0 == depth);
     QPDFObjectHandle kids = field.getKey("/Kids");
-    if (kids.isArray())
-    {
+    if (kids.isArray()) {
         is_field = true;
         int nkids = kids.getArrayNItems();
-        for (int k = 0; k < nkids; ++k)
-        {
+        for (int k = 0; k < nkids; ++k) {
             traverseField(kids.getArrayItem(k), field, 1 + depth, visited);
         }
-    }
-    else
-    {
-        if (field.hasKey("/Parent"))
-        {
+    } else {
+        if (field.hasKey("/Parent")) {
             is_field = true;
         }
-        if (field.hasKey("/Subtype") ||
-            field.hasKey("/Rect") ||
-            field.hasKey("/AP"))
-        {
+        if (field.hasKey("/Subtype") || field.hasKey("/Rect") ||
+            field.hasKey("/AP")) {
             is_annotation = true;
         }
     }
 
-    QTC::TC("qpdf", "QPDFAcroFormDocumentHelper field found",
-            (depth == 0) ? 0 : 1);
-    QTC::TC("qpdf", "QPDFAcroFormDocumentHelper annotation found",
-            (is_field ? 0 : 1));
+    QTC::TC(
+        "qpdf", "QPDFAcroFormDocumentHelper field found", (depth == 0) ? 0 : 1);
+    QTC::TC(
+        "qpdf",
+        "QPDFAcroFormDocumentHelper annotation found",
+        (is_field ? 0 : 1));
 
-    if (is_annotation)
-    {
+    if (is_annotation) {
         QPDFObjectHandle our_field = (is_field ? field : parent);
         this->m->field_to_annotations[our_field.getObjGen()].push_back(
             QPDFAnnotationObjectHelper(field));
-        this->m->annotation_to_field[og] =
-            QPDFFormFieldObjectHelper(our_field);
+        this->m->annotation_to_field[og] = QPDFFormFieldObjectHelper(our_field);
     }
 
-    if (is_field && (field.hasKey("/T")))
-    {
+    if (is_field && (field.hasKey("/T"))) {
         QPDFFormFieldObjectHelper foh(field);
         auto f_og = field.getObjGen();
         std::string name = foh.getFullyQualifiedName();
         auto old = this->m->field_to_name.find(f_og);
-        if (old != this->m->field_to_name.end())
-        {
+        if (old != this->m->field_to_name.end()) {
             // We might be updating after a name change, so remove any
             // old information
             std::string old_name = old->second;
@@ -479,8 +433,7 @@ QPDFAcroFormDocumentHelper::getNeedAppearances()
     bool result = false;
     QPDFObjectHandle acroform = this->qpdf.getRoot().getKey("/AcroForm");
     if (acroform.isDictionary() &&
-        acroform.getKey("/NeedAppearances").isBool())
-    {
+        acroform.getKey("/NeedAppearances").isBool()) {
         result = acroform.getKey("/NeedAppearances").getBoolValue();
     }
     return result;
@@ -490,20 +443,16 @@ void
 QPDFAcroFormDocumentHelper::setNeedAppearances(bool val)
 {
     QPDFObjectHandle acroform = this->qpdf.getRoot().getKey("/AcroForm");
-    if (! acroform.isDictionary())
-    {
+    if (!acroform.isDictionary()) {
         this->qpdf.getRoot().warnIfPossible(
             "ignoring call to QPDFAcroFormDocumentHelper::setNeedAppearances"
             " on a file that lacks an /AcroForm dictionary");
         return;
     }
-    if (val)
-    {
-        acroform.replaceKey("/NeedAppearances",
-                            QPDFObjectHandle::newBool(true));
-    }
-    else
-    {
+    if (val) {
+        acroform.replaceKey(
+            "/NeedAppearances", QPDFObjectHandle::newBool(true));
+    } else {
         acroform.removeKey("/NeedAppearances");
     }
 }
@@ -511,41 +460,34 @@ QPDFAcroFormDocumentHelper::setNeedAppearances(bool val)
 void
 QPDFAcroFormDocumentHelper::generateAppearancesIfNeeded()
 {
-    if (! getNeedAppearances())
-    {
+    if (!getNeedAppearances()) {
         return;
     }
 
     QPDFPageDocumentHelper pdh(this->qpdf);
     std::vector<QPDFPageObjectHelper> pages = pdh.getAllPages();
-    for (std::vector<QPDFPageObjectHelper>::iterator page_iter =
-             pages.begin();
-         page_iter != pages.end(); ++page_iter)
-    {
+    for (std::vector<QPDFPageObjectHelper>::iterator page_iter = pages.begin();
+         page_iter != pages.end();
+         ++page_iter) {
         std::vector<QPDFAnnotationObjectHelper> annotations =
             getWidgetAnnotationsForPage(*page_iter);
         for (std::vector<QPDFAnnotationObjectHelper>::iterator annot_iter =
                  annotations.begin();
-             annot_iter != annotations.end(); ++annot_iter)
-        {
+             annot_iter != annotations.end();
+             ++annot_iter) {
             QPDFAnnotationObjectHelper& aoh = *annot_iter;
-            QPDFFormFieldObjectHelper ffh =
-                getFieldForAnnotation(aoh);
-            if (ffh.getFieldType() == "/Btn")
-            {
+            QPDFFormFieldObjectHelper ffh = getFieldForAnnotation(aoh);
+            if (ffh.getFieldType() == "/Btn") {
                 // Rather than generating appearances for button
                 // fields, rely on what's already there. Just make
                 // sure /AS is consistent with /V, which we can do by
                 // resetting the value of the field back to itself.
                 // This code is referenced in a comment in
                 // QPDFFormFieldObjectHelper::generateAppearance.
-                if (ffh.isRadioButton() || ffh.isCheckbox())
-                {
+                if (ffh.isRadioButton() || ffh.isCheckbox()) {
                     ffh.setV(ffh.getValue());
                 }
-            }
-            else
-            {
+            } else {
                 ffh.generateAppearance(aoh);
             }
         }
@@ -556,8 +498,10 @@ QPDFAcroFormDocumentHelper::generateAppearancesIfNeeded()
 void
 QPDFAcroFormDocumentHelper::adjustInheritedFields(
     QPDFObjectHandle obj,
-    bool override_da, std::string const& from_default_da,
-    bool override_q, int from_default_q)
+    bool override_da,
+    std::string const& from_default_da,
+    bool override_q,
+    int from_default_q)
 {
     // Override /Q or /DA if needed. If this object has a field type,
     // directly or inherited, it is a field and not just an
@@ -572,42 +516,32 @@ QPDFAcroFormDocumentHelper::adjustInheritedFields(
 
     auto has_explicit = [](QPDFFormFieldObjectHelper& field,
                            std::string const& key) {
-        if (field.getObjectHandle().hasKey(key))
-        {
+        if (field.getObjectHandle().hasKey(key)) {
             return true;
         }
         auto oh = field.getInheritableFieldValue(key);
-        if (! oh.isNull())
-        {
+        if (!oh.isNull()) {
             return true;
         }
         return false;
     };
 
-    if (override_da || override_q)
-    {
+    if (override_da || override_q) {
         QPDFFormFieldObjectHelper cur_field(obj);
-        if (override_da && (! has_explicit(cur_field, "/DA")))
-        {
+        if (override_da && (!has_explicit(cur_field, "/DA"))) {
             std::string da = cur_field.getDefaultAppearance();
-            if (da != from_default_da)
-            {
+            if (da != from_default_da) {
                 QTC::TC("qpdf", "QPDFAcroFormDocumentHelper override da");
                 obj.replaceKey(
-                    "/DA",
-                    QPDFObjectHandle::newUnicodeString(
-                        from_default_da));
+                    "/DA", QPDFObjectHandle::newUnicodeString(from_default_da));
             }
         }
-        if (override_q && (! has_explicit(cur_field, "/Q")))
-        {
+        if (override_q && (!has_explicit(cur_field, "/Q"))) {
             int q = cur_field.getQuadding();
-            if (q != from_default_q)
-            {
+            if (q != from_default_q) {
                 QTC::TC("qpdf", "QPDFAcroFormDocumentHelper override q");
                 obj.replaceKey(
-                    "/Q",
-                    QPDFObjectHandle::newInteger(from_default_q));
+                    "/Q", QPDFObjectHandle::newInteger(from_default_q));
             }
         }
     }
@@ -617,12 +551,9 @@ class ResourceReplacer: public QPDFObjectHandle::TokenFilter
 {
   public:
     ResourceReplacer(
-        std::map<std::string,
-                 std::map<std::string,
-                          std::string>> const& dr_map,
-        std::map<std::string,
-                 std::map<std::string,
-                          std::set<size_t>>> const& rnames);
+        std::map<std::string, std::map<std::string, std::string>> const& dr_map,
+        std::map<std::string, std::map<std::string, std::set<size_t>>> const&
+            rnames);
     virtual ~ResourceReplacer() = default;
     virtual void handleToken(QPDFTokenizer::Token const&) override;
 
@@ -632,11 +563,9 @@ class ResourceReplacer: public QPDFObjectHandle::TokenFilter
 };
 
 ResourceReplacer::ResourceReplacer(
-    std::map<std::string,
-             std::map<std::string, std::string>> const& dr_map,
-    std::map<std::string,
-             std::map<std::string, std::set<size_t>>> const& rnames)
-    :
+    std::map<std::string, std::map<std::string, std::string>> const& dr_map,
+    std::map<std::string, std::map<std::string, std::set<size_t>>> const&
+        rnames) :
     offset(0)
 {
     // We have:
@@ -646,26 +575,21 @@ ResourceReplacer::ResourceReplacer(
     // We want:
     // * to_replace[key][offset] = new_key
 
-    for (auto const& rn_iter: rnames)
-    {
+    for (auto const& rn_iter : rnames) {
         std::string const& rtype = rn_iter.first;
         auto dr_map_rtype = dr_map.find(rtype);
-        if (dr_map_rtype == dr_map.end())
-        {
+        if (dr_map_rtype == dr_map.end()) {
             continue;
         }
         auto const& key_offsets = rn_iter.second;
-        for (auto const& ko_iter: key_offsets)
-        {
+        for (auto const& ko_iter : key_offsets) {
             std::string const& old_key = ko_iter.first;
             auto dr_map_rtype_old = dr_map_rtype->second.find(old_key);
-            if (dr_map_rtype_old == dr_map_rtype->second.end())
-            {
+            if (dr_map_rtype_old == dr_map_rtype->second.end()) {
                 continue;
             }
             auto const& offsets = ko_iter.second;
-            for (auto const& o_iter: offsets)
-            {
+            for (auto const& o_iter : offsets) {
                 to_replace[old_key][o_iter] = dr_map_rtype_old->second;
             }
         }
@@ -676,21 +600,17 @@ void
 ResourceReplacer::handleToken(QPDFTokenizer::Token const& token)
 {
     bool wrote = false;
-    if (token.getType() == QPDFTokenizer::tt_name)
-    {
+    if (token.getType() == QPDFTokenizer::tt_name) {
         std::string name =
             QPDFObjectHandle::newName(token.getValue()).getName();
-        if (to_replace.count(name) &&
-            to_replace[name].count(offset))
-        {
+        if (to_replace.count(name) && to_replace[name].count(offset)) {
             QTC::TC("qpdf", "QPDFAcroFormDocumentHelper replaced DA token");
             write(to_replace[name][offset]);
             wrote = true;
         }
     }
     this->offset += token.getRawValue().length();
-    if (! wrote)
-    {
+    if (!wrote) {
         writeToken(token);
     }
 }
@@ -698,8 +618,7 @@ ResourceReplacer::handleToken(QPDFTokenizer::Token const& token)
 void
 QPDFAcroFormDocumentHelper::adjustDefaultAppearances(
     QPDFObjectHandle obj,
-    std::map<std::string,
-             std::map<std::string, std::string>> const& dr_map)
+    std::map<std::string, std::map<std::string, std::string>> const& dr_map)
 {
     // This method is called on a field that has been copied from
     // another file but whose /DA still refers to resources in the
@@ -733,8 +652,7 @@ QPDFAcroFormDocumentHelper::adjustDefaultAppearances(
     //   done in adjustInheritedFields.
 
     auto DA = obj.getKey("/DA");
-    if (! DA.isString())
-    {
+    if (!DA.isString()) {
         return;
     }
 
@@ -743,19 +661,15 @@ QPDFAcroFormDocumentHelper::adjustDefaultAppearances(
     // then filter it. We don't attach the stream to anything, so it
     // will get discarded.
     ResourceFinder rf;
-    auto da_stream = QPDFObjectHandle::newStream(
-        &this->qpdf, DA.getUTF8Value());
-    try
-    {
+    auto da_stream =
+        QPDFObjectHandle::newStream(&this->qpdf, DA.getUTF8Value());
+    try {
         auto nwarnings = this->qpdf.numWarnings();
         da_stream.parseAsContents(&rf);
-        if (this->qpdf.numWarnings() > nwarnings)
-        {
+        if (this->qpdf.numWarnings() > nwarnings) {
             QTC::TC("qpdf", "QPDFAcroFormDocumentHelper /DA parse error");
         }
-    }
-    catch (std::exception& e)
-    {
+    } catch (std::exception& e) {
         // No way to reproduce in test suite right now since error
         // conditions are converted to warnings.
         obj.warnIfPossible(
@@ -795,8 +709,7 @@ QPDFAcroFormDocumentHelper::adjustAppearanceStream(
     // Make sure this stream has its own private resource dictionary.
     bool was_indirect = resources.isIndirect();
     resources = resources.shallowCopy();
-    if (was_indirect)
-    {
+    if (was_indirect) {
         resources = this->qpdf.makeIndirectObject(resources);
     }
     dict.replaceKey("/Resources", resources);
@@ -805,29 +718,23 @@ QPDFAcroFormDocumentHelper::adjustAppearanceStream(
     // this to resolve conflicts that may already be in the resource
     // dictionary.
     auto merge_with = QPDFObjectHandle::newDictionary();
-    for (auto const& top_key: dr_map)
-    {
-        merge_with.replaceKey(
-            top_key.first, QPDFObjectHandle::newDictionary());
+    for (auto const& top_key : dr_map) {
+        merge_with.replaceKey(top_key.first, QPDFObjectHandle::newDictionary());
     }
     resources.mergeResources(merge_with);
     // Rename any keys in the resource dictionary that we
     // remapped.
-    for (auto const& i1: dr_map)
-    {
+    for (auto const& i1 : dr_map) {
         std::string const& top_key = i1.first;
         auto subdict = resources.getKey(top_key);
-        if (! subdict.isDictionary())
-        {
+        if (!subdict.isDictionary()) {
             continue;
         }
-        for (auto const& i2: i1.second)
-        {
+        for (auto const& i2 : i1.second) {
             std::string const& old_key = i2.first;
             std::string const& new_key = i2.second;
             auto existing_new = subdict.getKey(new_key);
-            if (! existing_new.isNull())
-            {
+            if (!existing_new.isNull()) {
                 // The resource dictionary already has a key in it
                 // matching what we remapped an old key to, so we'll
                 // have to move it out of the way. Stick it in
@@ -838,8 +745,7 @@ QPDFAcroFormDocumentHelper::adjustAppearanceStream(
                 merge_with.getKey(top_key).replaceKey(new_key, existing_new);
             }
             auto existing_old = subdict.getKey(old_key);
-            if (! existing_old.isNull())
-            {
+            if (!existing_old.isNull()) {
                 QTC::TC("qpdf", "QPDFAcroFormDocumentHelper ap rename");
                 subdict.replaceKey(new_key, existing_old);
                 subdict.removeKey(old_key);
@@ -851,31 +757,24 @@ QPDFAcroFormDocumentHelper::adjustAppearanceStream(
     // the stream contents.
     resources.mergeResources(merge_with, &dr_map);
     // Remove empty subdictionaries
-    for (auto iter: resources.ditems())
-    {
-        if (iter.second.isDictionary() &&
-            (iter.second.getKeys().size() == 0))
-        {
+    for (auto iter : resources.ditems()) {
+        if (iter.second.isDictionary() && (iter.second.getKeys().size() == 0)) {
             resources.removeKey(iter.first);
         }
     }
 
     // Now attach a token filter to replace the actual resources.
     ResourceFinder rf;
-    try
-    {
+    try {
         auto nwarnings = this->qpdf.numWarnings();
         stream.parseAsContents(&rf);
-        if (this->qpdf.numWarnings() > nwarnings)
-        {
+        if (this->qpdf.numWarnings() > nwarnings) {
             QTC::TC("qpdf", "QPDFAcroFormDocumentHelper AP parse error");
         }
         auto rr = new ResourceReplacer(dr_map, rf.getNamesByResourceType());
         auto tf = PointerHolder<QPDFObjectHandle::TokenFilter>(rr);
         stream.addTokenFilter(tf);
-    }
-    catch (std::exception& e)
-    {
+    } catch (std::exception& e) {
         // No way to reproduce in test suite right now since error
         // conditions are converted to warnings.
         stream.warnIfPossible(
@@ -894,14 +793,11 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
     QPDFAcroFormDocumentHelper* from_afdh)
 {
     PointerHolder<QPDFAcroFormDocumentHelper> afdhph;
-    if (! from_qpdf)
-    {
+    if (!from_qpdf) {
         // Assume these are from the same QPDF.
         from_qpdf = &this->qpdf;
         from_afdh = this;
-    }
-    else if ((from_qpdf != &this->qpdf) && (! from_afdh))
-    {
+    } else if ((from_qpdf != &this->qpdf) && (!from_afdh)) {
         afdhph = make_pointer_holder<QPDFAcroFormDocumentHelper>(*from_qpdf);
         from_afdh = afdhph.get();
     }
@@ -926,47 +822,36 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
     // If we copy any form fields, we will need to merge the source
     // document's /DR into this document's /DR.
     QPDFObjectHandle from_dr = QPDFObjectHandle::newNull();
-    if (foreign)
-    {
+    if (foreign) {
         std::string default_da;
         int default_q = 0;
-        if (acroform.isDictionary())
-        {
-            if (acroform.getKey("/DA").isString())
-            {
+        if (acroform.isDictionary()) {
+            if (acroform.getKey("/DA").isString()) {
                 default_da = acroform.getKey("/DA").getUTF8Value();
             }
-            if (acroform.getKey("/Q").isInteger())
-            {
+            if (acroform.getKey("/Q").isInteger()) {
                 default_q = acroform.getKey("/Q").getIntValueAsInt();
             }
         }
-        if (from_acroform.isDictionary())
-        {
-            if (from_acroform.getKey("/DR").isDictionary())
-            {
+        if (from_acroform.isDictionary()) {
+            if (from_acroform.getKey("/DR").isDictionary()) {
                 from_dr = from_acroform.getKey("/DR");
-                if (! from_dr.isIndirect())
-                {
+                if (!from_dr.isIndirect()) {
                     from_dr = from_qpdf->makeIndirectObject(from_dr);
                 }
                 from_dr = this->qpdf.copyForeignObject(from_dr);
             }
-            if (from_acroform.getKey("/DA").isString())
-            {
+            if (from_acroform.getKey("/DA").isString()) {
                 from_default_da = from_acroform.getKey("/DA").getUTF8Value();
             }
-            if (from_acroform.getKey("/Q").isInteger())
-            {
+            if (from_acroform.getKey("/Q").isInteger()) {
                 from_default_q = from_acroform.getKey("/Q").getIntValueAsInt();
             }
         }
-        if (from_default_da != default_da)
-        {
+        if (from_default_da != default_da) {
             override_da = true;
         }
-        if (from_default_q != default_q)
-        {
+        if (from_default_q != default_q) {
             override_q = true;
         }
     }
@@ -978,23 +863,19 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
     bool initialized_dr_map = false;
     QPDFObjectHandle dr = QPDFObjectHandle::newNull();
     auto init_dr_map = [&]() {
-        if (! initialized_dr_map)
-        {
+        if (!initialized_dr_map) {
             initialized_dr_map = true;
             // Ensure that we have a /DR that is an indirect
             // dictionary object.
-            if (! acroform.isDictionary())
-            {
+            if (!acroform.isDictionary()) {
                 acroform = getOrCreateAcroForm();
             }
             dr = acroform.getKey("/DR");
-            if (! dr.isDictionary())
-            {
+            if (!dr.isDictionary()) {
                 dr = QPDFObjectHandle::newDictionary();
             }
             dr.makeResourcesIndirect(this->qpdf);
-            if (! dr.isIndirect())
-            {
+            if (!dr.isIndirect()) {
                 dr = this->qpdf.makeIndirectObject(dr);
                 acroform.replaceKey("/DR", dr);
             }
@@ -1006,8 +887,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
             from_dr.makeResourcesIndirect(this->qpdf);
             dr.mergeResources(from_dr, &dr_map);
 
-            if (from_afdh->getNeedAppearances())
-            {
+            if (from_afdh->getNeedAppearances()) {
                 setNeedAppearances(true);
             }
         }
@@ -1018,13 +898,10 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
     std::map<QPDFObjGen, QPDFObjectHandle> orig_to_copy;
     auto maybe_copy_object = [&](QPDFObjectHandle& to_copy) {
         auto og = to_copy.getObjGen();
-        if (orig_to_copy.count(og))
-        {
+        if (orig_to_copy.count(og)) {
             to_copy = orig_to_copy[og];
             return false;
-        }
-        else
-        {
+        } else {
             to_copy = this->qpdf.makeIndirectObject(to_copy.shallowCopy());
             orig_to_copy[og] = to_copy;
             return true;
@@ -1034,10 +911,8 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
     // Now do the actual copies.
 
     std::set<QPDFObjGen> added_new_fields;
-    for (auto annot: old_annots.aitems())
-    {
-        if (annot.isStream())
-        {
+    for (auto annot : old_annots.aitems()) {
+        if (annot.isStream()) {
             annot.warnIfPossible("ignoring annotation that's a stream");
             continue;
         }
@@ -1081,25 +956,18 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
         QPDFObjectHandle top_field;
         bool have_field = false;
         bool have_parent = false;
-        if (ffield_oh.isStream())
-        {
+        if (ffield_oh.isStream()) {
             ffield_oh.warnIfPossible("ignoring form field that's a stream");
-        }
-        else if ((! ffield_oh.isNull()) && (! ffield_oh.isIndirect()))
-        {
+        } else if ((!ffield_oh.isNull()) && (!ffield_oh.isIndirect())) {
             ffield_oh.warnIfPossible("ignoring form field not indirect");
-        }
-        else if (! ffield_oh.isNull())
-        {
+        } else if (!ffield_oh.isNull()) {
             // A field and its associated annotation can be the same
             // object. This matters because we don't want to clone the
             // annotation and field separately in this case.
             have_field = true;
             // Find the top-level field. It may be the field itself.
-            top_field = ffield.getTopLevelField(
-                &have_parent).getObjectHandle();
-            if (foreign)
-            {
+            top_field = ffield.getTopLevelField(&have_parent).getObjectHandle();
+            if (foreign) {
                 // copyForeignObject returns the same value if called
                 // multiple times with the same field. Create/retrieve
                 // the local copy of the original field. This pulls
@@ -1112,9 +980,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
                 // top_field and ffield_oh are known to be indirect.
                 top_field = this->qpdf.copyForeignObject(top_field);
                 ffield_oh = this->qpdf.copyForeignObject(ffield_oh);
-            }
-            else
-            {
+            } else {
                 // We don't need to add top_field to old_fields if
                 // it's foreign because the new copy of the foreign
                 // field won't be referenced anywhere. It's just the
@@ -1126,62 +992,53 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
             // Traverse the field, copying kids, and preserving
             // integrity.
             std::list<QPDFObjectHandle> queue;
-            if (maybe_copy_object(top_field))
-            {
+            if (maybe_copy_object(top_field)) {
                 queue.push_back(top_field);
             }
             std::set<QPDFObjGen> seen;
-            while (! queue.empty())
-            {
+            while (!queue.empty()) {
                 QPDFObjectHandle obj = queue.front();
                 queue.pop_front();
                 auto orig_og = obj.getObjGen();
-                if (seen.count(orig_og))
-                {
+                if (seen.count(orig_og)) {
                     // loop
                     break;
                 }
                 seen.insert(orig_og);
                 auto parent = obj.getKey("/Parent");
-                if (parent.isIndirect())
-                {
+                if (parent.isIndirect()) {
                     auto parent_og = parent.getObjGen();
-                    if (orig_to_copy.count(parent_og))
-                    {
+                    if (orig_to_copy.count(parent_og)) {
                         obj.replaceKey("/Parent", orig_to_copy[parent_og]);
-                    }
-                    else
-                    {
+                    } else {
                         parent.warnIfPossible(
                             "while traversing field " +
-                            obj.getObjGen().unparse() +
-                            ", found parent (" + parent_og.unparse() +
+                            obj.getObjGen().unparse() + ", found parent (" +
+                            parent_og.unparse() +
                             ") that had not been seen, indicating likely"
                             " invalid field structure");
                     }
                 }
                 auto kids = obj.getKey("/Kids");
-                if (kids.isArray())
-                {
-                    for (int i = 0; i < kids.getArrayNItems(); ++i)
-                    {
+                if (kids.isArray()) {
+                    for (int i = 0; i < kids.getArrayNItems(); ++i) {
                         auto kid = kids.getArrayItem(i);
-                        if (maybe_copy_object(kid))
-                        {
+                        if (maybe_copy_object(kid)) {
                             kids.setArrayItem(i, kid);
                             queue.push_back(kid);
                         }
                     }
                 }
 
-                if (override_da || override_q)
-                {
+                if (override_da || override_q) {
                     adjustInheritedFields(
-                        obj, override_da, from_default_da,
-                        override_q, from_default_q);
+                        obj,
+                        override_da,
+                        from_default_da,
+                        override_q,
+                        from_default_q);
                 }
-                if (foreign)
-                {
+                if (foreign) {
                     // Lazily initialize our /DR and the conflict map.
                     init_dr_map();
                     // The spec doesn't say anything about /DR on the
@@ -1195,14 +1052,12 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
                     // the mac Preview application, and several of the
                     // free readers on Linux all ignore /DR at the
                     // field level.
-                    if (obj.hasKey("/DR"))
-                    {
+                    if (obj.hasKey("/DR")) {
                         obj.replaceKey("/DR", dr);
                     }
                 }
                 if (foreign && obj.getKey("/DA").isString() &&
-                    (! dr_map.empty()))
-                {
+                    (!dr_map.empty())) {
                     adjustDefaultAppearances(obj, dr_map);
                 }
             }
@@ -1212,17 +1067,18 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
             ffield = QPDFFormFieldObjectHelper(ffield_oh);
         }
 
-        QTC::TC("qpdf", "QPDFAcroFormDocumentHelper copy annotation",
-                (have_field ? 1 : 0) | (foreign ? 2 : 0));
-        if (have_field)
-        {
-            QTC::TC("qpdf", "QPDFAcroFormDocumentHelper field with parent",
-                    (have_parent ? 1 : 0) | (foreign ? 2 : 0));
+        QTC::TC(
+            "qpdf",
+            "QPDFAcroFormDocumentHelper copy annotation",
+            (have_field ? 1 : 0) | (foreign ? 2 : 0));
+        if (have_field) {
+            QTC::TC(
+                "qpdf",
+                "QPDFAcroFormDocumentHelper field with parent",
+                (have_parent ? 1 : 0) | (foreign ? 2 : 0));
         }
-        if (foreign)
-        {
-            if (! annot.isIndirect())
-            {
+        if (foreign) {
+            if (!annot.isIndirect()) {
                 annot = from_qpdf->makeIndirectObject(annot);
             }
             annot = this->qpdf.copyForeignObject(annot);
@@ -1230,8 +1086,7 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
         maybe_copy_object(annot);
 
         // Now we have copies, so we can safely mutate.
-        if (have_field && ! added_new_fields.count(top_field.getObjGen()))
-        {
+        if (have_field && !added_new_fields.count(top_field.getObjGen())) {
             new_fields.push_back(top_field);
             added_new_fields.insert(top_field.getObjGen());
         }
@@ -1247,24 +1102,16 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
             dict.replaceKey(key, new_stream);
             return new_stream;
         };
-        if (apdict.isDictionary())
-        {
-            for (auto& ap: apdict.ditems())
-            {
-                if (ap.second.isStream())
-                {
+        if (apdict.isDictionary()) {
+            for (auto& ap : apdict.ditems()) {
+                if (ap.second.isStream()) {
                     streams.push_back(
                         replace_stream(apdict, ap.first, ap.second));
-                }
-                else if (ap.second.isDictionary())
-                {
-                    for (auto& ap2: ap.second.ditems())
-                    {
-                        if (ap2.second.isStream())
-                        {
-                            streams.push_back(
-                                replace_stream(
-                                    ap.second, ap2.first, ap2.second));
+                } else if (ap.second.isDictionary()) {
+                    for (auto& ap2 : ap.second.ditems()) {
+                        if (ap2.second.isStream()) {
+                            streams.push_back(replace_stream(
+                                ap.second, ap2.first, ap2.second));
                         }
                     }
                 }
@@ -1273,33 +1120,28 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
 
         // Now we can safely mutate the annotation and its appearance
         // streams.
-        for (auto& stream: streams)
-        {
+        for (auto& stream : streams) {
             auto dict = stream.getDict();
             auto omatrix = dict.getKey("/Matrix");
             QPDFMatrix apcm;
-            if (omatrix.isArray())
-            {
+            if (omatrix.isArray()) {
                 QTC::TC("qpdf", "QPDFAcroFormDocumentHelper modify ap matrix");
                 auto m1 = omatrix.getArrayAsMatrix();
                 apcm = QPDFMatrix(m1);
             }
             apcm.concat(cm);
             auto new_matrix = QPDFObjectHandle::newFromMatrix(apcm);
-            if (omatrix.isArray() || (apcm != QPDFMatrix()))
-            {
+            if (omatrix.isArray() || (apcm != QPDFMatrix())) {
                 dict.replaceKey("/Matrix", new_matrix);
             }
             auto resources = dict.getKey("/Resources");
-            if ((! dr_map.empty()) && resources.isDictionary())
-            {
+            if ((!dr_map.empty()) && resources.isDictionary()) {
                 adjustAppearanceStream(stream, dr_map);
             }
         }
-        auto rect = cm.transformRectangle(
-            annot.getKey("/Rect").getArrayAsRectangle());
-        annot.replaceKey(
-            "/Rect", QPDFObjectHandle::newFromRectangle(rect));
+        auto rect =
+            cm.transformRectangle(annot.getKey("/Rect").getArrayAsRectangle());
+        annot.replaceKey("/Rect", QPDFObjectHandle::newFromRectangle(rect));
     }
 }
 
@@ -1309,10 +1151,13 @@ QPDFAcroFormDocumentHelper::copyFieldsFromForeignPage(
     QPDFAcroFormDocumentHelper& foreign_afdh,
     std::vector<QPDFObjectHandle>* copied_fields)
 {
-    this->qpdf.warn(
-        QPDFExc(qpdf_e_unsupported, "", "", 0,
-                "Non-working version of copyFieldsFromForeignPage"
-                " from qpdf 10.2 called; application requires updating"));
+    this->qpdf.warn(QPDFExc(
+        qpdf_e_unsupported,
+        "",
+        "",
+        0,
+        "Non-working version of copyFieldsFromForeignPage"
+        " from qpdf 10.2 called; application requires updating"));
 }
 
 void
@@ -1323,24 +1168,26 @@ QPDFAcroFormDocumentHelper::fixCopiedAnnotations(
     std::set<QPDFObjGen>* added_fields)
 {
     auto old_annots = from_page.getKey("/Annots");
-    if ((! old_annots.isArray()) || (old_annots.getArrayNItems() == 0))
-    {
+    if ((!old_annots.isArray()) || (old_annots.getArrayNItems() == 0)) {
         return;
     }
 
     std::vector<QPDFObjectHandle> new_annots;
     std::vector<QPDFObjectHandle> new_fields;
     std::set<QPDFObjGen> old_fields;
-    transformAnnotations(old_annots, new_annots, new_fields, old_fields,
-                         QPDFMatrix(), &(from_afdh.getQPDF()),
-                         &from_afdh);
+    transformAnnotations(
+        old_annots,
+        new_annots,
+        new_fields,
+        old_fields,
+        QPDFMatrix(),
+        &(from_afdh.getQPDF()),
+        &from_afdh);
 
     to_page.replaceKey("/Annots", QPDFObjectHandle::newArray(new_annots));
     addAndRenameFormFields(new_fields);
-    if (added_fields)
-    {
-        for (auto f: new_fields)
-        {
+    if (added_fields) {
+        for (auto f : new_fields) {
             added_fields->insert(f.getObjGen());
         }
     }

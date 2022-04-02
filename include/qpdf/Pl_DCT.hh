@@ -52,12 +52,14 @@ class Pl_DCT: public Pipeline
 
     // Constructor for compressing image data
     QPDF_DLL
-    Pl_DCT(char const* identifier, Pipeline* next,
-           JDIMENSION image_width,
-           JDIMENSION image_height,
-           int components,
-           J_COLOR_SPACE color_space,
-           CompressConfig* config_callback = 0);
+    Pl_DCT(
+        char const* identifier,
+        Pipeline* next,
+        JDIMENSION image_width,
+        JDIMENSION image_height,
+        int components,
+        J_COLOR_SPACE color_space,
+        CompressConfig* config_callback = 0);
 
     QPDF_DLL
     virtual ~Pl_DCT();
@@ -82,13 +84,14 @@ class Pl_DCT: public Pipeline
         ~Members();
 
       private:
-        Members(action_e action,
-                char const* buf_description,
-                JDIMENSION image_width = 0,
-                JDIMENSION image_height = 0,
-                int components = 1,
-                J_COLOR_SPACE color_space = JCS_GRAYSCALE,
-                CompressConfig* config_callback = 0);
+        Members(
+            action_e action,
+            char const* buf_description,
+            JDIMENSION image_width = 0,
+            JDIMENSION image_height = 0,
+            int components = 1,
+            J_COLOR_SPACE color_space = JCS_GRAYSCALE,
+            CompressConfig* config_callback = 0);
         Members(Members const&);
 
         action_e action;

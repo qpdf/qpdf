@@ -1,18 +1,20 @@
 #include <qpdf/MD5.hh>
-#include <qpdf/Pl_MD5.hh>
 #include <qpdf/Pl_Discard.hh>
+#include <qpdf/Pl_MD5.hh>
 #include <qpdf/QUtil.hh>
 #include <iostream>
 #include <stdio.h>
 
-static void test_string(char const* str)
+static void
+test_string(char const* str)
 {
     MD5 a;
     a.encodeString(str);
     a.print();
 }
 
-int main(int, char*[])
+int
+main(int, char*[])
 {
     test_string("");
     test_string("a");
@@ -42,7 +44,6 @@ int main(int, char*[])
         << MD5::checkFileChecksum("6f4b4321873433daae578f85c72f9e74", "glerbl")
         << std::endl;
 
-
     Pl_Discard d;
     Pl_MD5 p("MD5", &d);
     // Create a second pipeline, protect against finish, and call
@@ -52,25 +53,19 @@ int main(int, char*[])
     // calling finalize.
     Pl_MD5 p2("MD5", &d);
     p2.persistAcrossFinish(true);
-    for (int i = 0; i < 2; ++i)
-    {
+    for (int i = 0; i < 2; ++i) {
         FILE* f = QUtil::safe_fopen("md5.in", "rb");
         // buffer size < size of md5.in
         unsigned char buf[50];
         bool done = false;
-        while (! done)
-        {
+        while (!done) {
             size_t len = fread(buf, 1, sizeof(buf), f);
-            if (len <= 0)
-            {
+            if (len <= 0) {
                 done = true;
-            }
-            else
-            {
+            } else {
                 p.write(buf, len);
                 p2.write(buf, len);
-                if (i == 1)
-                {
+                if (i == 1) {
                     // Partial digest -- resets after each call to write
                     std::cout << p.getHexDigest() << std::endl;
                 }

@@ -1,6 +1,6 @@
 #include <qpdf/JSONHandler.hh>
-#include <qpdf/QUtil.hh>
 #include <qpdf/QPDFUsage.hh>
+#include <qpdf/QUtil.hh>
 #include <iostream>
 
 #ifdef NDEBUG
@@ -9,39 +9,46 @@
 #endif
 #include <cassert>
 
-static void print_null(std::string const& path)
+static void
+print_null(std::string const& path)
 {
     std::cout << path << ": null" << std::endl;
 }
 
-static void print_string(std::string const& path, std::string const& value)
+static void
+print_string(std::string const& path, std::string const& value)
 {
     std::cout << path << ": string: " << value << std::endl;
 }
 
-static void print_number(std::string const& path, std::string const& value)
+static void
+print_number(std::string const& path, std::string const& value)
 {
     std::cout << path << ": number: " << value << std::endl;
 }
 
-static void print_bool(std::string const& path, bool value)
+static void
+print_bool(std::string const& path, bool value)
 {
     std::cout << path << ": bool: " << (value ? "true" : "false") << std::endl;
 }
 
-static void print_json(std::string const& path, JSON value)
+static void
+print_json(std::string const& path, JSON value)
 {
     std::cout << path << ": json: " << value.unparse() << std::endl;
 }
 
-static JSONHandler::void_handler_t make_print_message(std::string msg)
+static JSONHandler::void_handler_t
+make_print_message(std::string msg)
 {
     return [msg](std::string const& path) {
         std::cout << path << ": json: " << msg << std::endl;
     };
 }
 
-static void test_scalar()
+static void
+test_scalar()
 {
     std::cout << "-- scalar --" << std::endl;
     JSONHandler h;
@@ -50,11 +57,11 @@ static void test_scalar()
     h.handle(".", j);
 }
 
-static std::shared_ptr<JSONHandler> make_all_handler()
+static std::shared_ptr<JSONHandler>
+make_all_handler()
 {
     auto h = std::make_shared<JSONHandler>();
-    h->addDictHandlers(
-        print_json, make_print_message("dict end"));
+    h->addDictHandlers(print_json, make_print_message("dict end"));
     auto h1 = std::make_shared<JSONHandler>();
     h1->addStringHandler(print_string);
     h->addDictKeyHandler("one", h1);
@@ -75,16 +82,12 @@ static std::shared_ptr<JSONHandler> make_all_handler()
     h5->addNullHandler(print_null);
     auto h5s = std::make_shared<JSONHandler>();
     h->addDictKeyHandler("five", h5s);
-    h5s->addArrayHandlers(
-        print_json, make_print_message("array end"),
-        h5);
+    h5s->addArrayHandlers(print_json, make_print_message("array end"), h5);
     auto h6 = std::make_shared<JSONHandler>();
-    h6->addDictHandlers(
-        print_json, make_print_message("dict end"));
+    h6->addDictHandlers(print_json, make_print_message("dict end"));
     auto h6a = std::make_shared<JSONHandler>();
     h6->addDictKeyHandler("a", h6a);
-    h6a->addDictHandlers(
-        print_json, make_print_message("dict end"));
+    h6a->addDictHandlers(print_json, make_print_message("dict end"));
     auto h6ab = std::make_shared<JSONHandler>();
     h6a->addDictKeyHandler("b", h6ab);
     auto h6ax = std::make_shared<JSONHandler>();
@@ -96,7 +99,8 @@ static std::shared_ptr<JSONHandler> make_all_handler()
     return h;
 }
 
-static void test_all()
+static void
+test_all()
 {
     std::cout << "-- all --" << std::endl;
     auto h = make_all_handler();
@@ -113,32 +117,29 @@ static void test_all()
     h->handle(".", j);
 }
 
-static void test_errors()
+static void
+test_errors()
 {
     std::cout << "-- errors --" << std::endl;
     auto h = make_all_handler();
     auto t = [h](std::string const& msg, std::function<void()> fn) {
-        try
-        {
+        try {
             fn();
             assert(false);
-        }
-        catch (QPDFUsage& e)
-        {
+        } catch (QPDFUsage& e) {
             std::cout << msg << ": " << e.what() << std::endl;
         }
     };
 
-    t("bad type at top", [&h](){
-        h->handle(".", JSON::makeString("oops"));
-    });
-    t("unexpected key", [&h](){
+    t("bad type at top", [&h]() { h->handle(".", JSON::makeString("oops")); });
+    t("unexpected key", [&h]() {
         JSON j = JSON::parse(R"({"x": "y"})");
         h->handle(".", j);
     });
 }
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     test_scalar();
     test_all();

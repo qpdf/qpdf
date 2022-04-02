@@ -8,7 +8,8 @@
 #endif
 #include <cassert>
 
-int main()
+int
+main()
 {
     PDFVersion v1;
     assert(v1.getMajor() == 0);
@@ -32,8 +33,8 @@ int main()
     assert(v3 == v1);
     v1.updateIfGreater(v2);
     assert(v3 == v1);
-    assert(! (v3 == v2));
-    assert(! (v2 == v1));
+    assert(!(v3 == v2));
+    assert(!(v2 == v1));
     v2.updateIfGreater(v1);
     assert(v2 == v1);
     v2.getVersion(version, extension_level);
@@ -42,12 +43,12 @@ int main()
     assert(PDFVersion(1, 2) < PDFVersion(1, 3));
     assert(PDFVersion(1, 2) < PDFVersion(1, 2, 1));
     assert(PDFVersion(1, 2, 1) < PDFVersion(1, 2, 2));
-    assert(! (PDFVersion(1, 2, 2) < PDFVersion(1, 2, 2)));
-    assert(! (PDFVersion(1, 2, 3) < PDFVersion(1, 2, 2)));
+    assert(!(PDFVersion(1, 2, 2) < PDFVersion(1, 2, 2)));
+    assert(!(PDFVersion(1, 2, 3) < PDFVersion(1, 2, 2)));
     assert(PDFVersion(1, 1) < PDFVersion(1, 2, 2));
-    assert(! (PDFVersion(1, 3) < PDFVersion(1, 2, 2)));
-    assert(! (PDFVersion(2, 0) < PDFVersion(1, 9, 9)));
-    assert(! (PDFVersion(2, 0) < PDFVersion(2, 0)));
+    assert(!(PDFVersion(1, 3) < PDFVersion(1, 2, 2)));
+    assert(!(PDFVersion(2, 0) < PDFVersion(1, 9, 9)));
+    assert(!(PDFVersion(2, 0) < PDFVersion(2, 0)));
     assert(PDFVersion(2, 0) == PDFVersion(2, 0));
     assert(PDFVersion(2, 0, 1) == PDFVersion(2, 0, 1));
 

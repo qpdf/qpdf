@@ -24,11 +24,11 @@
 
 #include <qpdf/DLL.h>
 #include <qpdf/QPDFCryptoImpl.hh>
-#include <string>
-#include <map>
-#include <set>
-#include <memory>
 #include <functional>
+#include <map>
+#include <memory>
+#include <set>
+#include <string>
 
 // This class is part of qpdf's pluggable crypto provider support.
 // Most users won't need to know or care about this class, but you can
@@ -38,7 +38,6 @@
 class QPDFCryptoProvider
 {
   public:
-
     // Methods for getting and registering crypto implementations.
     // These methods are not thread-safe.
 
@@ -50,15 +49,13 @@ class QPDFCryptoProvider
     // Return an instance of the crypto provider registered using the
     // given name.
     QPDF_DLL
-    static std::shared_ptr<QPDFCryptoImpl>
-    getImpl(std::string const& name);
+    static std::shared_ptr<QPDFCryptoImpl> getImpl(std::string const& name);
 
     // Register the given type (T) as a crypto implementation. T must
     // be derived from QPDFCryptoImpl and must have a constructor that
     // takes no arguments.
-    template<typename T>
-    QPDF_DLL
-    static void registerImpl(std::string const& name);
+    template <typename T>
+    QPDF_DLL static void registerImpl(std::string const& name);
 
     // Set the crypto provider registered with the given name as the
     // default crypto implementation.
@@ -83,7 +80,7 @@ class QPDFCryptoProvider
 
     std::shared_ptr<QPDFCryptoImpl>
     getImpl_internal(std::string const& name) const;
-    template<typename T>
+    template <typename T>
     void registerImpl_internal(std::string const& name);
     void setDefaultProvider_internal(std::string const& name);
 
@@ -100,7 +97,7 @@ class QPDFCryptoProvider
         Members(Members const&) = delete;
         Members& operator=(Members const&) = delete;
 
-        typedef std::function<std::shared_ptr<QPDFCryptoImpl> ()> provider_fn;
+        typedef std::function<std::shared_ptr<QPDFCryptoImpl>()> provider_fn;
         std::string default_provider;
         std::map<std::string, provider_fn> providers;
     };

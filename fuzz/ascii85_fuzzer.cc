@@ -1,5 +1,5 @@
-#include <qpdf/Pl_Discard.hh>
 #include <qpdf/Pl_ASCII85Decoder.hh>
+#include <qpdf/Pl_Discard.hh>
 #include <iostream>
 #include <stdexcept>
 
@@ -34,17 +34,15 @@ FuzzHelper::doChecks()
 void
 FuzzHelper::run()
 {
-    try
-    {
+    try {
         doChecks();
-    }
-    catch (std::runtime_error const& e)
-    {
+    } catch (std::runtime_error const& e) {
         std::cerr << "runtime_error: " << e.what() << std::endl;
     }
 }
 
-extern "C" int LLVMFuzzerTestOneInput(unsigned char const* data, size_t size)
+extern "C" int
+LLVMFuzzerTestOneInput(unsigned char const* data, size_t size)
 {
     FuzzHelper f(data, size);
     f.run();

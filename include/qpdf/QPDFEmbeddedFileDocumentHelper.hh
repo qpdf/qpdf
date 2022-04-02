@@ -24,13 +24,13 @@
 
 #include <qpdf/QPDFDocumentHelper.hh>
 
-#include <qpdf/QPDF.hh>
-#include <qpdf/QPDFNameTreeObjectHelper.hh>
-#include <qpdf/QPDFFileSpecObjectHelper.hh>
 #include <qpdf/DLL.h>
+#include <qpdf/QPDF.hh>
+#include <qpdf/QPDFFileSpecObjectHelper.hh>
+#include <qpdf/QPDFNameTreeObjectHelper.hh>
 
-#include <memory>
 #include <map>
+#include <memory>
 
 // This class provides a higher level interface around document-level
 // file attachments, also known as embedded files. These are discussed
@@ -48,8 +48,8 @@ class QPDFEmbeddedFileDocumentHelper: public QPDFDocumentHelper
     bool hasEmbeddedFiles() const;
 
     QPDF_DLL
-    std::map<std::string,
-             std::shared_ptr<QPDFFileSpecObjectHelper>> getEmbeddedFiles();
+    std::map<std::string, std::shared_ptr<QPDFFileSpecObjectHelper>>
+    getEmbeddedFiles();
 
     // If an embedded file with the given name exists, return a
     // (shared) pointer to it. Otherwise, return nullptr.

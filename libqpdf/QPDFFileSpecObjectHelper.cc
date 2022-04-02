@@ -1,23 +1,20 @@
 #include <qpdf/QPDFFileSpecObjectHelper.hh>
 
-#include <qpdf/QTC.hh>
 #include <qpdf/QPDF.hh>
+#include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
-#include <vector>
 #include <string>
+#include <vector>
 
-QPDFFileSpecObjectHelper::QPDFFileSpecObjectHelper(
-    QPDFObjectHandle oh) :
+QPDFFileSpecObjectHelper::QPDFFileSpecObjectHelper(QPDFObjectHandle oh) :
     QPDFObjectHelper(oh)
 {
-    if (! oh.isDictionary())
-    {
+    if (!oh.isDictionary()) {
         oh.warnIfPossible("Embedded file object is not a dictionary");
         return;
     }
-    if (! oh.isDictionaryOfType("/Filespec"))
-    {
+    if (!oh.isDictionaryOfType("/Filespec")) {
         oh.warnIfPossible("Embedded file object's type is not /Filespec");
     }
 }
@@ -34,8 +31,7 @@ QPDFFileSpecObjectHelper::getDescription()
 {
     std::string result;
     auto desc = this->oh.getKey("/Desc");
-    if (desc.isString())
-    {
+    if (desc.isString()) {
         result = desc.getUTF8Value();
     }
     return result;
@@ -44,11 +40,9 @@ QPDFFileSpecObjectHelper::getDescription()
 std::string
 QPDFFileSpecObjectHelper::getFilename()
 {
-    for (auto const& i: name_keys)
-    {
+    for (auto const& i : name_keys) {
         auto k = this->oh.getKey(i);
-        if (k.isString())
-        {
+        if (k.isString()) {
             return k.getUTF8Value();
         }
     }
@@ -59,11 +53,9 @@ std::map<std::string, std::string>
 QPDFFileSpecObjectHelper::getFilenames()
 {
     std::map<std::string, std::string> result;
-    for (auto const& i: name_keys)
-    {
+    for (auto const& i : name_keys) {
         auto k = this->oh.getKey(i);
-        if (k.isString())
-        {
+        if (k.isString()) {
             result[i] = k.getUTF8Value();
         }
     }
@@ -74,19 +66,15 @@ QPDFObjectHandle
 QPDFFileSpecObjectHelper::getEmbeddedFileStream(std::string const& key)
 {
     auto ef = this->oh.getKey("/EF");
-    if (! ef.isDictionary())
-    {
+    if (!ef.isDictionary()) {
         return QPDFObjectHandle::newNull();
     }
-    if (! key.empty())
-    {
+    if (!key.empty()) {
         return ef.getKey(key);
     }
-    for (auto const& i: name_keys)
-    {
+    for (auto const& i : name_keys) {
         auto k = ef.getKey(i);
-        if (k.isStream())
-        {
+        if (k.isStream()) {
             return k;
         }
     }
@@ -101,22 +89,18 @@ QPDFFileSpecObjectHelper::getEmbeddedFileStreams()
 
 QPDFFileSpecObjectHelper
 QPDFFileSpecObjectHelper::createFileSpec(
-    QPDF& qpdf,
-    std::string const& filename,
-    std::string const& fullpath)
+    QPDF& qpdf, std::string const& filename, std::string const& fullpath)
 {
     return createFileSpec(
-        qpdf, filename,
+        qpdf,
+        filename,
         QPDFEFStreamObjectHelper::createEFStream(
-            qpdf,
-            QUtil::file_provider(fullpath)));
+            qpdf, QUtil::file_provider(fullpath)));
 }
 
 QPDFFileSpecObjectHelper
 QPDFFileSpecObjectHelper::createFileSpec(
-    QPDF& qpdf,
-    std::string const& filename,
-    QPDFEFStreamObjectHelper efsoh)
+    QPDF& qpdf, std::string const& filename, QPDFEFStreamObjectHelper efsoh)
 {
     auto oh = qpdf.makeIndirectObject(QPDFObjectHandle::newDictionary());
     oh.replaceKey("/Type", QPDFObjectHandle::newName("/Filespec"));
@@ -138,18 +122,14 @@ QPDFFileSpecObjectHelper::setDescription(std::string const& desc)
 
 QPDFFileSpecObjectHelper&
 QPDFFileSpecObjectHelper::setFilename(
-    std::string const& unicode_name,
-    std::string const& compat_name)
+    std::string const& unicode_name, std::string const& compat_name)
 {
     auto uf = QPDFObjectHandle::newUnicodeString(unicode_name);
     this->oh.replaceKey("/UF", uf);
-    if (compat_name.empty())
-    {
+    if (compat_name.empty()) {
         QTC::TC("qpdf", "QPDFFileSpecObjectHelper empty compat_name");
         this->oh.replaceKey("/F", uf);
-    }
-    else
-    {
+    } else {
         QTC::TC("qpdf", "QPDFFileSpecObjectHelper non-empty compat_name");
         this->oh.replaceKey("/F", QPDFObjectHandle::newString(compat_name));
     }

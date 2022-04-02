@@ -29,24 +29,24 @@
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
 
-#include <stdio.h>
-#include <string>
 #include <list>
-#include <vector>
-#include <set>
 #include <map>
 #include <memory>
+#include <set>
+#include <stdio.h>
+#include <string>
+#include <vector>
 
 #include <qpdf/Constants.h>
 
-#include <qpdf/QPDFObjectHandle.hh>
-#include <qpdf/QPDFObjGen.hh>
-#include <qpdf/QPDFXRefEntry.hh>
-#include <qpdf/Pl_Buffer.hh>
-#include <qpdf/PointerHolder.hh>
-#include <qpdf/Pipeline.hh>
 #include <qpdf/Buffer.hh>
 #include <qpdf/PDFVersion.hh>
+#include <qpdf/Pipeline.hh>
+#include <qpdf/Pl_Buffer.hh>
+#include <qpdf/PointerHolder.hh>
+#include <qpdf/QPDFObjGen.hh>
+#include <qpdf/QPDFObjectHandle.hh>
+#include <qpdf/QPDFXRefEntry.hh>
 
 class QPDF;
 class Pl_Count;
@@ -372,72 +372,104 @@ class QPDFWriter
     // it unless you have to.
     QPDF_DLL
     void setR2EncryptionParameters(
-        char const* user_password, char const* owner_password,
-        bool allow_print, bool allow_modify,
-        bool allow_extract, bool allow_annotate);
+        char const* user_password,
+        char const* owner_password,
+        bool allow_print,
+        bool allow_modify,
+        bool allow_extract,
+        bool allow_annotate);
     // R3 uses RC4, which is a weak cryptographic algorithm. Don't use
     // it unless you have to.
     QPDF_DLL
     void setR3EncryptionParameters(
-        char const* user_password, char const* owner_password,
-        bool allow_accessibility, bool allow_extract,
-        bool allow_assemble, bool allow_annotate_and_form,
-        bool allow_form_filling, bool allow_modify_other,
+        char const* user_password,
+        char const* owner_password,
+        bool allow_accessibility,
+        bool allow_extract,
+        bool allow_assemble,
+        bool allow_annotate_and_form,
+        bool allow_form_filling,
+        bool allow_modify_other,
         qpdf_r3_print_e print);
     // R4 uses RC4, which is a weak cryptographic algorithm, when
     // use_aes=false. Don't use it unless you have to.
     QPDF_DLL
     void setR4EncryptionParameters(
-        char const* user_password, char const* owner_password,
-        bool allow_accessibility, bool allow_extract,
-        bool allow_assemble, bool allow_annotate_and_form,
-        bool allow_form_filling, bool allow_modify_other,
-        qpdf_r3_print_e print, bool encrypt_metadata, bool use_aes);
+        char const* user_password,
+        char const* owner_password,
+        bool allow_accessibility,
+        bool allow_extract,
+        bool allow_assemble,
+        bool allow_annotate_and_form,
+        bool allow_form_filling,
+        bool allow_modify_other,
+        qpdf_r3_print_e print,
+        bool encrypt_metadata,
+        bool use_aes);
     // R5 is deprecated.  Do not use it for production use.  Writing
     // R5 is supported by qpdf primarily to generate test files for
     // applications that may need to test R5 support.
     QPDF_DLL
     void setR5EncryptionParameters(
-        char const* user_password, char const* owner_password,
-        bool allow_accessibility, bool allow_extract,
-        bool allow_assemble, bool allow_annotate_and_form,
-        bool allow_form_filling, bool allow_modify_other,
-        qpdf_r3_print_e print, bool encrypt_metadata);
+        char const* user_password,
+        char const* owner_password,
+        bool allow_accessibility,
+        bool allow_extract,
+        bool allow_assemble,
+        bool allow_annotate_and_form,
+        bool allow_form_filling,
+        bool allow_modify_other,
+        qpdf_r3_print_e print,
+        bool encrypt_metadata);
     QPDF_DLL
     void setR6EncryptionParameters(
-        char const* user_password, char const* owner_password,
-        bool allow_accessibility, bool allow_extract,
-        bool allow_assemble, bool allow_annotate_and_form,
-        bool allow_form_filling, bool allow_modify_other,
-        qpdf_r3_print_e print, bool encrypt_metadata_aes);
+        char const* user_password,
+        char const* owner_password,
+        bool allow_accessibility,
+        bool allow_extract,
+        bool allow_assemble,
+        bool allow_annotate_and_form,
+        bool allow_form_filling,
+        bool allow_modify_other,
+        qpdf_r3_print_e print,
+        bool encrypt_metadata_aes);
 
     // Pre qpdf 8.4.0 API
-    [[deprecated("see newer API above")]]
-    QPDF_DLL
-    void setR3EncryptionParameters(
-        char const* user_password, char const* owner_password,
-        bool allow_accessibility, bool allow_extract,
-        qpdf_r3_print_e print, qpdf_r3_modify_e modify);
-    [[deprecated("see newer API above")]]
-    QPDF_DLL
-    void setR4EncryptionParameters(
-        char const* user_password, char const* owner_password,
-        bool allow_accessibility, bool allow_extract,
-        qpdf_r3_print_e print, qpdf_r3_modify_e modify,
-        bool encrypt_metadata, bool use_aes);
-    [[deprecated("see newer API above")]]
-    QPDF_DLL
-    void setR5EncryptionParameters(
-        char const* user_password, char const* owner_password,
-        bool allow_accessibility, bool allow_extract,
-        qpdf_r3_print_e print, qpdf_r3_modify_e modify,
+    [[deprecated("see newer API above")]] QPDF_DLL void
+    setR3EncryptionParameters(
+        char const* user_password,
+        char const* owner_password,
+        bool allow_accessibility,
+        bool allow_extract,
+        qpdf_r3_print_e print,
+        qpdf_r3_modify_e modify);
+    [[deprecated("see newer API above")]] QPDF_DLL void
+    setR4EncryptionParameters(
+        char const* user_password,
+        char const* owner_password,
+        bool allow_accessibility,
+        bool allow_extract,
+        qpdf_r3_print_e print,
+        qpdf_r3_modify_e modify,
+        bool encrypt_metadata,
+        bool use_aes);
+    [[deprecated("see newer API above")]] QPDF_DLL void
+    setR5EncryptionParameters(
+        char const* user_password,
+        char const* owner_password,
+        bool allow_accessibility,
+        bool allow_extract,
+        qpdf_r3_print_e print,
+        qpdf_r3_modify_e modify,
         bool encrypt_metadata);
-    [[deprecated("see newer API above")]]
-    QPDF_DLL
-    void setR6EncryptionParameters(
-        char const* user_password, char const* owner_password,
-        bool allow_accessibility, bool allow_extract,
-        qpdf_r3_print_e print, qpdf_r3_modify_e modify,
+    [[deprecated("see newer API above")]] QPDF_DLL void
+    setR6EncryptionParameters(
+        char const* user_password,
+        char const* owner_password,
+        bool allow_accessibility,
+        bool allow_extract,
+        qpdf_r3_print_e print,
+        qpdf_r3_modify_e modify,
         bool encrypt_metadata_aes);
 
     // Create linearized output.  Disables qdf mode, content
@@ -496,11 +528,11 @@ class QPDFWriter
 
   private:
     // flags used by unparseObject
-    static int const f_stream =         1 << 0;
-    static int const f_filtered =       1 << 1;
-    static int const f_in_ostream =     1 << 2;
-    static int const f_hex_string =     1 << 3;
-    static int const f_no_encryption =  1 << 4;
+    static int const f_stream = 1 << 0;
+    static int const f_filtered = 1 << 1;
+    static int const f_in_ostream = 1 << 2;
+    static int const f_hex_string = 1 << 3;
+    static int const f_no_encryption = 1 << 4;
 
     enum trailer_e { t_normal, t_lin_first, t_lin_second };
 
@@ -516,9 +548,9 @@ class QPDFWriter
     class PipelinePopper
     {
         friend class QPDFWriter;
+
       public:
-        PipelinePopper(QPDFWriter* qw,
-                       PointerHolder<Buffer>* bp = 0) :
+        PipelinePopper(QPDFWriter* qw, PointerHolder<Buffer>* bp = 0) :
             qw(qw),
             bp(bp)
         {
@@ -545,15 +577,24 @@ class QPDFWriter
         std::vector<qpdf_offset_t>& offsets, int first_obj);
     void writeObjectStream(QPDFObjectHandle object);
     void writeObject(QPDFObjectHandle object, int object_stream_index = -1);
-    void writeTrailer(trailer_e which, int size,
-                      bool xref_stream, qpdf_offset_t prev,
-                      int linearization_pass);
-    bool willFilterStream(QPDFObjectHandle stream,
-                          bool& compress_stream, bool& is_metadata,
-                          PointerHolder<Buffer>* stream_data);
-    void unparseObject(QPDFObjectHandle object, int level, int flags,
-                       // for stream dictionaries
-                       size_t stream_length = 0, bool compress = false);
+    void writeTrailer(
+        trailer_e which,
+        int size,
+        bool xref_stream,
+        qpdf_offset_t prev,
+        int linearization_pass);
+    bool willFilterStream(
+        QPDFObjectHandle stream,
+        bool& compress_stream,
+        bool& is_metadata,
+        PointerHolder<Buffer>* stream_data);
+    void unparseObject(
+        QPDFObjectHandle object,
+        int level,
+        int flags,
+        // for stream dictionaries
+        size_t stream_length = 0,
+        bool compress = false);
     void unparseChild(QPDFObjectHandle child, int level, int flags);
     void initializeSpecialStreams();
     void preserveObjectStreams();
@@ -562,23 +603,39 @@ class QPDFWriter
     void generateID();
     void interpretR3EncryptionParameters(
         std::set<int>& bits_to_clear,
-        char const* user_password, char const* owner_password,
-        bool allow_accessibility, bool allow_extract,
-        bool allow_assemble, bool allow_annotate_and_form,
-        bool allow_form_filling, bool allow_modify_other,
-        qpdf_r3_print_e print, qpdf_r3_modify_e modify);
-    void disableIncompatibleEncryption(int major, int minor,
-                                       int extension_level);
+        char const* user_password,
+        char const* owner_password,
+        bool allow_accessibility,
+        bool allow_extract,
+        bool allow_assemble,
+        bool allow_annotate_and_form,
+        bool allow_form_filling,
+        bool allow_modify_other,
+        qpdf_r3_print_e print,
+        qpdf_r3_modify_e modify);
+    void
+    disableIncompatibleEncryption(int major, int minor, int extension_level);
     void parseVersion(std::string const& version, int& major, int& minor) const;
     int compareVersions(int major1, int minor1, int major2, int minor2) const;
     void setEncryptionParameters(
-        char const* user_password, char const* owner_password,
-        int V, int R, int key_len, std::set<int>& bits_to_clear);
+        char const* user_password,
+        char const* owner_password,
+        int V,
+        int R,
+        int key_len,
+        std::set<int>& bits_to_clear);
     void setEncryptionParametersInternal(
-        int V, int R, int key_len, int P,
-        std::string const& O, std::string const& U,
-        std::string const& OE, std::string const& UE, std::string const& Perms,
-        std::string const& id1, std::string const& user_password,
+        int V,
+        int R,
+        int key_len,
+        int P,
+        std::string const& O,
+        std::string const& U,
+        std::string const& OE,
+        std::string const& UE,
+        std::string const& Perms,
+        std::string const& id1,
+        std::string const& user_password,
         std::string const& encryption_key);
     void setDataKey(int objid);
     int openObject(int objid = 0);
@@ -595,10 +652,13 @@ class QPDFWriter
     void doWriteSetup();
     void writeHeader();
     void writeHintStream(int hint_id);
+    qpdf_offset_t
+    writeXRefTable(trailer_e which, int first, int last, int size);
     qpdf_offset_t writeXRefTable(
-        trailer_e which, int first, int last, int size);
-    qpdf_offset_t writeXRefTable(
-        trailer_e which, int first, int last, int size,
+        trailer_e which,
+        int first,
+        int last,
+        int size,
         // for linearization
         qpdf_offset_t prev,
         bool suppress_offsets,
@@ -607,11 +667,21 @@ class QPDFWriter
         qpdf_offset_t hint_length,
         int linearization_pass);
     qpdf_offset_t writeXRefStream(
-        int objid, int max_id, qpdf_offset_t max_offset,
-        trailer_e which, int first, int last, int size);
+        int objid,
+        int max_id,
+        qpdf_offset_t max_offset,
+        trailer_e which,
+        int first,
+        int last,
+        int size);
     qpdf_offset_t writeXRefStream(
-        int objid, int max_id, qpdf_offset_t max_offset,
-        trailer_e which, int first, int last, int size,
+        int objid,
+        int max_id,
+        qpdf_offset_t max_offset,
+        trailer_e which,
+        int first,
+        int last,
+        int size,
         // for linearization
         qpdf_offset_t prev,
         int hint_id,
@@ -627,7 +697,7 @@ class QPDFWriter
     // popped.
     Pipeline* pushPipeline(Pipeline*);
     void activatePipelineStack(PipelinePopper&);
-    void initializePipelineStack(Pipeline *);
+    void initializePipelineStack(Pipeline*);
 
     void adjustAESStreamLength(size_t& length);
     void pushEncryptionFilter(PipelinePopper&);
@@ -635,8 +705,8 @@ class QPDFWriter
     void pushMD5Pipeline(PipelinePopper&);
     void computeDeterministicIDData();
 
-    void discardGeneration(std::map<QPDFObjGen, int> const& in,
-                           std::map<int, int>& out);
+    void discardGeneration(
+        std::map<QPDFObjGen, int> const& in, std::map<int, int>& out);
 
     class Members
     {
@@ -681,8 +751,8 @@ class QPDFWriter
         int encryption_V;
         int encryption_R;
 
-        std::string id1;                // for /ID key of
-        std::string id2;                // trailer dictionary
+        std::string id1; // for /ID key of
+        std::string id2; // trailer dictionary
         std::string final_pdf_version;
         int final_extension_level;
         std::string min_pdf_version;
@@ -707,7 +777,7 @@ class QPDFWriter
         std::map<QPDFObjGen, int> page_object_to_seq;
         std::map<QPDFObjGen, int> contents_to_page_seq;
         std::map<QPDFObjGen, int> object_to_object_stream;
-        std::map<int, std::set<QPDFObjGen> > object_stream_to_objects;
+        std::map<int, std::set<QPDFObjGen>> object_stream_to_objects;
         std::list<Pipeline*> pipeline_stack;
         unsigned long long next_stack_id;
         bool deterministic_id;

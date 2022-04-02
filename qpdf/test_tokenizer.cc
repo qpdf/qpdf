@@ -1,24 +1,24 @@
-#include <qpdf/QPDFTokenizer.hh>
-#include <qpdf/QPDFPageDocumentHelper.hh>
-#include <qpdf/QPDFPageObjectHelper.hh>
-#include <qpdf/QUtil.hh>
-#include <qpdf/FileInputSource.hh>
 #include <qpdf/BufferInputSource.hh>
-#include <qpdf/QPDF.hh>
+#include <qpdf/FileInputSource.hh>
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/QIntC.hh>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include <qpdf/QPDF.hh>
+#include <qpdf/QPDFPageDocumentHelper.hh>
+#include <qpdf/QPDFPageObjectHelper.hh>
+#include <qpdf/QPDFTokenizer.hh>
+#include <qpdf/QUtil.hh>
 #include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 static char const* whoami = 0;
 
-void usage()
+void
+usage()
 {
     std::cerr << "Usage: " << whoami
-              << " [-maxlen len | -no-ignorable] filename"
-              << std::endl;
+              << " [-maxlen len | -no-ignorable] filename" << std::endl;
     exit(2);
 }
 
@@ -51,47 +51,47 @@ Finder::check()
     return result;
 }
 
-static char const* tokenTypeName(QPDFTokenizer::token_type_e ttype)
+static char const*
+tokenTypeName(QPDFTokenizer::token_type_e ttype)
 {
     // Do this is a case statement instead of a lookup so the compiler
     // will warn if we miss any.
-    switch (ttype)
-    {
-      case QPDFTokenizer::tt_bad:
+    switch (ttype) {
+    case QPDFTokenizer::tt_bad:
         return "bad";
-      case QPDFTokenizer::tt_array_close:
+    case QPDFTokenizer::tt_array_close:
         return "array_close";
-      case QPDFTokenizer::tt_array_open:
+    case QPDFTokenizer::tt_array_open:
         return "array_open";
-      case QPDFTokenizer::tt_brace_close:
+    case QPDFTokenizer::tt_brace_close:
         return "brace_close";
-      case QPDFTokenizer::tt_brace_open:
+    case QPDFTokenizer::tt_brace_open:
         return "brace_open";
-      case QPDFTokenizer::tt_dict_close:
+    case QPDFTokenizer::tt_dict_close:
         return "dict_close";
-      case QPDFTokenizer::tt_dict_open:
+    case QPDFTokenizer::tt_dict_open:
         return "dict_open";
-      case QPDFTokenizer::tt_integer:
+    case QPDFTokenizer::tt_integer:
         return "integer";
-      case QPDFTokenizer::tt_name:
+    case QPDFTokenizer::tt_name:
         return "name";
-      case QPDFTokenizer::tt_real:
+    case QPDFTokenizer::tt_real:
         return "real";
-      case QPDFTokenizer::tt_string:
+    case QPDFTokenizer::tt_string:
         return "string";
-      case QPDFTokenizer::tt_null:
+    case QPDFTokenizer::tt_null:
         return "null";
-      case QPDFTokenizer::tt_bool:
+    case QPDFTokenizer::tt_bool:
         return "bool";
-      case QPDFTokenizer::tt_word:
+    case QPDFTokenizer::tt_word:
         return "word";
-      case QPDFTokenizer::tt_eof:
+    case QPDFTokenizer::tt_eof:
         return "eof";
-      case QPDFTokenizer::tt_space:
+    case QPDFTokenizer::tt_space:
         return "space";
-      case QPDFTokenizer::tt_comment:
+    case QPDFTokenizer::tt_comment:
         return "comment";
-      case QPDFTokenizer::tt_inline_image:
+    case QPDFTokenizer::tt_inline_image:
         return "inline-image";
     }
     return 0;
@@ -102,56 +102,56 @@ sanitize(std::string const& value)
 {
     std::string result;
     for (std::string::const_iterator iter = value.begin(); iter != value.end();
-         ++iter)
-    {
-        if ((*iter >= 32) && (*iter <= 126))
-        {
+         ++iter) {
+        if ((*iter >= 32) && (*iter <= 126)) {
             result.append(1, *iter);
-        }
-        else
-        {
-            result += "\\x" + QUtil::int_to_string_base(
-                static_cast<unsigned char>(*iter), 16, 2);
+        } else {
+            result += "\\x" +
+                QUtil::int_to_string_base(
+                          static_cast<unsigned char>(*iter), 16, 2);
         }
     }
     return result;
 }
 
 static void
-try_skipping(QPDFTokenizer& tokenizer, PointerHolder<InputSource> is,
-             size_t max_len, char const* what, Finder& f)
+try_skipping(
+    QPDFTokenizer& tokenizer,
+    PointerHolder<InputSource> is,
+    size_t max_len,
+    char const* what,
+    Finder& f)
 {
     std::cout << "skipping to " << what << std::endl;
     qpdf_offset_t offset = is->tell();
-    if (! is->findFirst(what, offset, 0, f))
-    {
+    if (!is->findFirst(what, offset, 0, f)) {
         std::cout << what << " not found" << std::endl;
         is->seek(offset, SEEK_SET);
     }
 }
 
 static void
-dump_tokens(PointerHolder<InputSource> is, std::string const& label,
-            size_t max_len, bool include_ignorable,
-            bool skip_streams, bool skip_inline_images)
+dump_tokens(
+    PointerHolder<InputSource> is,
+    std::string const& label,
+    size_t max_len,
+    bool include_ignorable,
+    bool skip_streams,
+    bool skip_inline_images)
 {
     Finder f1(is, "endstream");
     std::cout << "--- BEGIN " << label << " ---" << std::endl;
     bool done = false;
     QPDFTokenizer tokenizer;
     tokenizer.allowEOF();
-    if (include_ignorable)
-    {
+    if (include_ignorable) {
         tokenizer.includeIgnorable();
     }
     qpdf_offset_t inline_image_offset = 0;
-    while (! done)
-    {
-        QPDFTokenizer::Token token =
-            tokenizer.readToken(is, "test", true,
-                                inline_image_offset ? 0 : max_len);
-        if (inline_image_offset && (token.getType() == QPDFTokenizer::tt_bad))
-        {
+    while (!done) {
+        QPDFTokenizer::Token token = tokenizer.readToken(
+            is, "test", true, inline_image_offset ? 0 : max_len);
+        if (inline_image_offset && (token.getType() == QPDFTokenizer::tt_bad)) {
             std::cout << "EI not found; resuming normal scanning" << std::endl;
             is->seek(inline_image_offset, SEEK_SET);
             inline_image_offset = 0;
@@ -160,45 +160,36 @@ dump_tokens(PointerHolder<InputSource> is, std::string const& label,
         inline_image_offset = 0;
 
         qpdf_offset_t offset = is->getLastOffset();
-        std::cout << offset << ": "
-                  << tokenTypeName(token.getType());
-        if (token.getType() != QPDFTokenizer::tt_eof)
-        {
-            std::cout << ": "
-                      << sanitize(token.getValue());
-            if (token.getValue() != token.getRawValue())
-            {
+        std::cout << offset << ": " << tokenTypeName(token.getType());
+        if (token.getType() != QPDFTokenizer::tt_eof) {
+            std::cout << ": " << sanitize(token.getValue());
+            if (token.getValue() != token.getRawValue()) {
                 std::cout << " (raw: " << sanitize(token.getRawValue()) << ")";
             }
         }
-        if (! token.getErrorMessage().empty())
-        {
+        if (!token.getErrorMessage().empty()) {
             std::cout << " (" << token.getErrorMessage() << ")";
         }
         std::cout << std::endl;
         if (skip_streams &&
-            (token == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "stream")))
-        {
+            (token == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "stream"))) {
             try_skipping(tokenizer, is, max_len, "endstream", f1);
-        }
-        else if (skip_inline_images &&
-                 (token == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "ID")))
-        {
+        } else if (
+            skip_inline_images &&
+            (token == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "ID"))) {
             char ch;
             is->read(&ch, 1);
             tokenizer.expectInlineImage(is);
             inline_image_offset = is->tell();
-        }
-        else if (token.getType() == QPDFTokenizer::tt_eof)
-        {
+        } else if (token.getType() == QPDFTokenizer::tt_eof) {
             done = true;
         }
     }
     std::cout << "--- END " << label << " ---" << std::endl;
 }
 
-static void process(char const* filename, bool include_ignorable,
-                    size_t max_len)
+static void
+process(char const* filename, bool include_ignorable, size_t max_len)
 {
     PointerHolder<InputSource> is;
 
@@ -215,96 +206,85 @@ static void process(char const* filename, bool include_ignorable,
         QPDFPageDocumentHelper(qpdf).getAllPages();
     int pageno = 0;
     for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-         iter != pages.end(); ++iter)
-    {
+         iter != pages.end();
+         ++iter) {
         ++pageno;
         Pl_Buffer plb("buffer");
         (*iter).pipeContents(&plb);
         auto content_data = plb.getBufferSharedPointer();
-        BufferInputSource* bis = new BufferInputSource(
-            "content data", content_data.get());
+        BufferInputSource* bis =
+            new BufferInputSource("content data", content_data.get());
         is = PointerHolder<InputSource>(bis);
-        dump_tokens(is, "PAGE " + QUtil::int_to_string(pageno),
-                    max_len, include_ignorable, false, true);
+        dump_tokens(
+            is,
+            "PAGE " + QUtil::int_to_string(pageno),
+            max_len,
+            include_ignorable,
+            false,
+            true);
     }
 
     // Tokenize object streams
     std::vector<QPDFObjectHandle> all = qpdf.getAllObjects();
     for (std::vector<QPDFObjectHandle>::iterator iter = all.begin();
-         iter != all.end(); ++iter)
-    {
-        if ((*iter).isStream() &&
-            (*iter).getDict().getKey("/Type").isName() &&
-            (*iter).getDict().getKey("/Type").getName() == "/ObjStm")
-        {
+         iter != all.end();
+         ++iter) {
+        if ((*iter).isStream() && (*iter).getDict().getKey("/Type").isName() &&
+            (*iter).getDict().getKey("/Type").getName() == "/ObjStm") {
             PointerHolder<Buffer> b =
                 (*iter).getStreamData(qpdf_dl_specialized);
-            BufferInputSource* bis = new BufferInputSource(
-                "object stream data", b.get());
+            BufferInputSource* bis =
+                new BufferInputSource("object stream data", b.get());
             is = PointerHolder<InputSource>(bis);
-            dump_tokens(is, "OBJECT STREAM " +
-                        QUtil::int_to_string((*iter).getObjectID()),
-                        max_len, include_ignorable, false, false);
+            dump_tokens(
+                is,
+                "OBJECT STREAM " + QUtil::int_to_string((*iter).getObjectID()),
+                max_len,
+                include_ignorable,
+                false,
+                false);
         }
     }
 }
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     QUtil::setLineBuf(stdout);
-    if ((whoami = strrchr(argv[0], '/')) == NULL)
-    {
+    if ((whoami = strrchr(argv[0], '/')) == NULL) {
         whoami = argv[0];
-    }
-    else
-    {
+    } else {
         ++whoami;
     }
 
     char const* filename = 0;
     size_t max_len = 0;
     bool include_ignorable = true;
-    for (int i = 1; i < argc; ++i)
-    {
-        if (argv[i][0] == '-')
-        {
-            if (strcmp(argv[i], "-maxlen") == 0)
-            {
-                if (++i >= argc)
-                {
+    for (int i = 1; i < argc; ++i) {
+        if (argv[i][0] == '-') {
+            if (strcmp(argv[i], "-maxlen") == 0) {
+                if (++i >= argc) {
                     usage();
                 }
                 max_len = QUtil::string_to_uint(argv[i]);
-            }
-            else if (strcmp(argv[i], "-no-ignorable") == 0)
-            {
+            } else if (strcmp(argv[i], "-no-ignorable") == 0) {
                 include_ignorable = false;
-            }
-            else
-            {
+            } else {
                 usage();
             }
-        }
-        else if (filename)
-        {
+        } else if (filename) {
             usage();
-        }
-        else
-        {
+        } else {
             filename = argv[i];
         }
     }
-    if (filename == 0)
-    {
+    if (filename == 0) {
         usage();
     }
 
-    try
-    {
+    try {
         process(filename, include_ignorable, max_len);
-    }
-    catch (std::exception& e)
-    {
+    } catch (std::exception& e) {
         std::cerr << whoami << ": exception: " << e.what();
         exit(2);
     }

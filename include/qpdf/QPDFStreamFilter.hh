@@ -23,8 +23,8 @@
 #define QPDFSTREAMFILTER_HH
 
 #include <qpdf/DLL.h>
-#include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/Pipeline.hh>
+#include <qpdf/QPDFObjectHandle.hh>
 
 class QPDF_DLL_CLASS QPDFStreamFilter
 {

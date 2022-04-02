@@ -32,7 +32,7 @@
 #if (defined _WIN32 || defined __CYGWIN__) && defined(DLL_EXPORT)
 # define QPDF_DLL __declspec(dllexport)
 #elif defined __GNUC__
-# define QPDF_DLL __attribute__ ((visibility ("default")))
+# define QPDF_DLL __attribute__((visibility("default")))
 #else
 # define QPDF_DLL
 #endif

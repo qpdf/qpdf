@@ -1,14 +1,14 @@
 #include <qpdf/Pl_DCT.hh>
 
-#include <qpdf/QUtil.hh>
-#include <qpdf/QTC.hh>
 #include <qpdf/QIntC.hh>
+#include <qpdf/QTC.hh>
+#include <qpdf/QUtil.hh>
 
+#include <cstring>
 #include <setjmp.h>
 #include <stdexcept>
 #include <stdlib.h>
 #include <string>
-#include <cstring>
 
 #if BITS_IN_JSAMPLE != 8
 # error "qpdf does not support libjpeg built with BITS_IN_JSAMPLE != 8"
@@ -32,13 +32,14 @@ error_handler(j_common_ptr cinfo)
     longjmp(jerr->jmpbuf, 1);
 }
 
-Pl_DCT::Members::Members(action_e action,
-                         char const* buf_description,
-                         JDIMENSION image_width,
-                         JDIMENSION image_height,
-                         int components,
-                         J_COLOR_SPACE color_space,
-                         CompressConfig* config_callback) :
+Pl_DCT::Members::Members(
+    action_e action,
+    char const* buf_description,
+    JDIMENSION image_width,
+    JDIMENSION image_height,
+    int components,
+    J_COLOR_SPACE color_space,
+    CompressConfig* config_callback) :
     action(action),
     buf(buf_description),
     image_width(image_width),
@@ -59,15 +60,23 @@ Pl_DCT::Pl_DCT(char const* identifier, Pipeline* next) :
 {
 }
 
-Pl_DCT::Pl_DCT(char const* identifier, Pipeline* next,
-               JDIMENSION image_width,
-               JDIMENSION image_height,
-               int components,
-               J_COLOR_SPACE color_space,
-               CompressConfig* config_callback) :
+Pl_DCT::Pl_DCT(
+    char const* identifier,
+    Pipeline* next,
+    JDIMENSION image_width,
+    JDIMENSION image_height,
+    int components,
+    J_COLOR_SPACE color_space,
+    CompressConfig* config_callback) :
     Pipeline(identifier, next),
-    m(new Members(a_compress, "DCT uncompressed image",
-      image_width, image_height, components, color_space, config_callback))
+    m(new Members(
+        a_compress,
+        "DCT uncompressed image",
+        image_width,
+        image_height,
+        components,
+        color_space,
+        config_callback))
 {
 }
 
@@ -90,8 +99,7 @@ Pl_DCT::finish()
     // and decompress causes a memory leak with setjmp/longjmp. Just
     // use a pointer and delete it.
     Buffer* b = this->m->buf.getBuffer();
-    if (b->getSize() == 0)
-    {
+    if (b->getSize() == 0) {
         // Special case: empty data will never succeed and probably
         // means we're calling finish a second time from an exception
         // handler.
@@ -111,44 +119,32 @@ Pl_DCT::finish()
     bool error = false;
     // The jpeg library is a "C" library, so we use setjmp and longjmp
     // for exception handling.
-    if (setjmp(jerr.jmpbuf) == 0)
-    {
-        try
-        {
-            if (this->m->action == a_compress)
-            {
+    if (setjmp(jerr.jmpbuf) == 0) {
+        try {
+            if (this->m->action == a_compress) {
                 compress(reinterpret_cast<void*>(&cinfo_compress), b);
-            }
-            else
-            {
+            } else {
                 decompress(reinterpret_cast<void*>(&cinfo_decompress), b);
             }
-        }
-        catch (std::exception& e)
-        {
+        } catch (std::exception& e) {
             // Convert an exception back to a longjmp so we can ensure
             // that the right cleanup happens. This will get converted
             // back to an exception.
             jerr.msg = e.what();
             longjmp(jerr.jmpbuf, 1);
         }
-    }
-    else
-    {
+    } else {
         error = true;
     }
     delete b;
 
-    if (this->m->action == a_compress)
-    {
+    if (this->m->action == a_compress) {
         jpeg_destroy_compress(&cinfo_compress);
     }
-    if (this->m->action == a_decompress)
-    {
+    if (this->m->action == a_decompress) {
         jpeg_destroy_decompress(&cinfo_decompress);
     }
-    if (error)
-    {
+    if (error) {
         throw std::runtime_error(jerr.msg);
     }
 }
@@ -170,8 +166,7 @@ static boolean
 empty_pipeline_output_buffer(j_compress_ptr cinfo)
 {
     QTC::TC("libtests", "Pl_DCT empty_pipeline_output_buffer");
-    dct_pipeline_dest* dest =
-        reinterpret_cast<dct_pipeline_dest*>(cinfo->dest);
+    dct_pipeline_dest* dest = reinterpret_cast<dct_pipeline_dest*>(cinfo->dest);
     dest->next->write(dest->buffer, dest->size);
     dest->pub.next_output_byte = dest->buffer;
     dest->pub.free_in_buffer = dest->size;
@@ -182,22 +177,20 @@ static void
 term_pipeline_destination(j_compress_ptr cinfo)
 {
     QTC::TC("libtests", "Pl_DCT term_pipeline_destination");
-    dct_pipeline_dest* dest =
-        reinterpret_cast<dct_pipeline_dest*>(cinfo->dest);
+    dct_pipeline_dest* dest = reinterpret_cast<dct_pipeline_dest*>(cinfo->dest);
     dest->next->write(dest->buffer, dest->size - dest->pub.free_in_buffer);
 }
 
 static void
-jpeg_pipeline_dest(j_compress_ptr cinfo,
-                   unsigned char* outbuffer, size_t size,
-                   Pipeline* next)
+jpeg_pipeline_dest(
+    j_compress_ptr cinfo, unsigned char* outbuffer, size_t size, Pipeline* next)
 {
-    cinfo->dest = static_cast<struct jpeg_destination_mgr *>(
-        (*cinfo->mem->alloc_small)(reinterpret_cast<j_common_ptr>(cinfo),
-                                   JPOOL_PERMANENT,
-                                   sizeof(dct_pipeline_dest)));
-    dct_pipeline_dest* dest =
-        reinterpret_cast<dct_pipeline_dest*>(cinfo->dest);
+    cinfo->dest =
+        static_cast<struct jpeg_destination_mgr*>((*cinfo->mem->alloc_small)(
+            reinterpret_cast<j_common_ptr>(cinfo),
+            JPOOL_PERMANENT,
+            sizeof(dct_pipeline_dest)));
+    dct_pipeline_dest* dest = reinterpret_cast<dct_pipeline_dest*>(cinfo->dest);
     dest->pub.init_destination = init_pipeline_destination;
     dest->pub.empty_output_buffer = empty_pipeline_output_buffer;
     dest->pub.term_destination = term_pipeline_destination;
@@ -224,20 +217,15 @@ fill_buffer_input_buffer(j_decompress_ptr)
 static void
 skip_buffer_input_data(j_decompress_ptr cinfo, long num_bytes)
 {
-    if (num_bytes < 0)
-    {
-        throw std::runtime_error(
-            "reading jpeg: jpeg library requested"
-            " skipping a negative number of bytes");
+    if (num_bytes < 0) {
+        throw std::runtime_error("reading jpeg: jpeg library requested"
+                                 " skipping a negative number of bytes");
     }
     size_t to_skip = QIntC::to_size(num_bytes);
-    if ((to_skip > 0) && (to_skip <= cinfo->src->bytes_in_buffer))
-    {
+    if ((to_skip > 0) && (to_skip <= cinfo->src->bytes_in_buffer)) {
         cinfo->src->next_input_byte += to_skip;
         cinfo->src->bytes_in_buffer -= to_skip;
-    }
-    else if (to_skip != 0)
-    {
+    } else if (to_skip != 0) {
         cinfo->src->next_input_byte += cinfo->src->bytes_in_buffer;
         cinfo->src->bytes_in_buffer = 0;
     }
@@ -251,10 +239,10 @@ term_buffer_source(j_decompress_ptr)
 static void
 jpeg_buffer_src(j_decompress_ptr cinfo, Buffer* buffer)
 {
-    cinfo->src = reinterpret_cast<jpeg_source_mgr *>(
-        (*cinfo->mem->alloc_small)(reinterpret_cast<j_common_ptr>(cinfo),
-                                   JPOOL_PERMANENT,
-                                   sizeof(jpeg_source_mgr)));
+    cinfo->src = reinterpret_cast<jpeg_source_mgr*>((*cinfo->mem->alloc_small)(
+        reinterpret_cast<j_common_ptr>(cinfo),
+        JPOOL_PERMANENT,
+        sizeof(jpeg_source_mgr)));
 
     jpeg_source_mgr* src = cinfo->src;
     src->init_source = init_buffer_source;
@@ -272,15 +260,17 @@ Pl_DCT::compress(void* cinfo_p, Buffer* b)
     struct jpeg_compress_struct* cinfo =
         reinterpret_cast<jpeg_compress_struct*>(cinfo_p);
 
-#if ((defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
-     defined(__clang__))
-#       pragma GCC diagnostic push
-#       pragma GCC diagnostic ignored "-Wold-style-cast"
+#if ( \
+    (defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
+    defined(__clang__))
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wold-style-cast"
 #endif
     jpeg_create_compress(cinfo);
-#if ((defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
-     defined(__clang__))
-#       pragma GCC diagnostic pop
+#if ( \
+    (defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
+    defined(__clang__))
+# pragma GCC diagnostic pop
 #endif
     static int const BUF_SIZE = 65536;
     auto outbuffer_ph = std::make_unique<unsigned char[]>(BUF_SIZE);
@@ -292,33 +282,29 @@ Pl_DCT::compress(void* cinfo_p, Buffer* b)
     cinfo->input_components = this->m->components;
     cinfo->in_color_space = this->m->color_space;
     jpeg_set_defaults(cinfo);
-    if (this->m->config_callback)
-    {
+    if (this->m->config_callback) {
         this->m->config_callback->apply(cinfo);
     }
 
     jpeg_start_compress(cinfo, TRUE);
 
-    unsigned int width = cinfo->image_width *
-        QIntC::to_uint(cinfo->input_components);
-    size_t expected_size =
-        QIntC::to_size(cinfo->image_height) *
+    unsigned int width =
+        cinfo->image_width * QIntC::to_uint(cinfo->input_components);
+    size_t expected_size = QIntC::to_size(cinfo->image_height) *
         QIntC::to_size(cinfo->image_width) *
         QIntC::to_size(cinfo->input_components);
-    if (b->getSize() != expected_size)
-    {
+    if (b->getSize() != expected_size) {
         throw std::runtime_error(
             "Pl_DCT: image buffer size = " +
-            QUtil::uint_to_string(b->getSize()) + "; expected size = " +
-            QUtil::uint_to_string(expected_size));
+            QUtil::uint_to_string(b->getSize()) +
+            "; expected size = " + QUtil::uint_to_string(expected_size));
     }
     JSAMPROW row_pointer[1];
     unsigned char* buffer = b->getBuffer();
-    while (cinfo->next_scanline < cinfo->image_height)
-    {
+    while (cinfo->next_scanline < cinfo->image_height) {
         // We already verified that the buffer is big enough.
         row_pointer[0] = &buffer[cinfo->next_scanline * width];
-        (void) jpeg_write_scanlines(cinfo, row_pointer, 1);
+        (void)jpeg_write_scanlines(cinfo, row_pointer, 1);
     }
     jpeg_finish_compress(cinfo);
     this->getNext()->finish();
@@ -330,33 +316,35 @@ Pl_DCT::decompress(void* cinfo_p, Buffer* b)
     struct jpeg_decompress_struct* cinfo =
         reinterpret_cast<jpeg_decompress_struct*>(cinfo_p);
 
-#if ((defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
-     defined(__clang__))
-#       pragma GCC diagnostic push
-#       pragma GCC diagnostic ignored "-Wold-style-cast"
+#if ( \
+    (defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
+    defined(__clang__))
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wold-style-cast"
 #endif
     jpeg_create_decompress(cinfo);
-#if ((defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
-     defined(__clang__))
-#       pragma GCC diagnostic pop
+#if ( \
+    (defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
+    defined(__clang__))
+# pragma GCC diagnostic pop
 #endif
     jpeg_buffer_src(cinfo, b);
 
-    (void) jpeg_read_header(cinfo, TRUE);
-    (void) jpeg_calc_output_dimensions(cinfo);
+    (void)jpeg_read_header(cinfo, TRUE);
+    (void)jpeg_calc_output_dimensions(cinfo);
 
-    unsigned int width = cinfo->output_width *
-        QIntC::to_uint(cinfo->output_components);
-    JSAMPARRAY buffer = (*cinfo->mem->alloc_sarray)
-        (reinterpret_cast<j_common_ptr>(cinfo), JPOOL_IMAGE, width, 1);
+    unsigned int width =
+        cinfo->output_width * QIntC::to_uint(cinfo->output_components);
+    JSAMPARRAY buffer = (*cinfo->mem->alloc_sarray)(
+        reinterpret_cast<j_common_ptr>(cinfo), JPOOL_IMAGE, width, 1);
 
-    (void) jpeg_start_decompress(cinfo);
-    while (cinfo->output_scanline < cinfo->output_height)
-    {
-        (void) jpeg_read_scanlines(cinfo, buffer, 1);
-        this->getNext()->write(reinterpret_cast<unsigned char*>(buffer[0]),
-                               width * sizeof(buffer[0][0]));
+    (void)jpeg_start_decompress(cinfo);
+    while (cinfo->output_scanline < cinfo->output_height) {
+        (void)jpeg_read_scanlines(cinfo, buffer, 1);
+        this->getNext()->write(
+            reinterpret_cast<unsigned char*>(buffer[0]),
+            width * sizeof(buffer[0][0]));
     }
-    (void) jpeg_finish_decompress(cinfo);
+    (void)jpeg_finish_decompress(cinfo);
     this->getNext()->finish();
 }

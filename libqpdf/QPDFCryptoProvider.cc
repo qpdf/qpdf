@@ -1,7 +1,7 @@
 #include <qpdf/QPDFCryptoProvider.hh>
 
-#include <qpdf/qpdf-config.h>
 #include <qpdf/QUtil.hh>
+#include <qpdf/qpdf-config.h>
 #include <stdexcept>
 
 #ifdef USE_CRYPTO_NATIVE
@@ -18,8 +18,7 @@ std::shared_ptr<QPDFCryptoImpl>
 QPDFCryptoProvider::getImpl()
 {
     QPDFCryptoProvider& p = getInstance();
-    if (p.m->default_provider.empty())
-    {
+    if (p.m->default_provider.empty()) {
         throw std::logic_error(
             "QPDFCryptoProvider::getImpl called with no default provider.");
     }
@@ -32,7 +31,7 @@ QPDFCryptoProvider::getImpl(std::string const& name)
     return getInstance().getImpl_internal(name);
 }
 
-template<typename T>
+template <typename T>
 void
 QPDFCryptoProvider::registerImpl(std::string const& name)
 {
@@ -58,8 +57,7 @@ QPDFCryptoProvider::QPDFCryptoProvider() :
     registerImpl_internal<QPDFCrypto_openssl>("openssl");
 #endif
     std::string default_crypto;
-    if (! QUtil::get_env("QPDF_CRYPTO_PROVIDER", &default_crypto))
-    {
+    if (!QUtil::get_env("QPDF_CRYPTO_PROVIDER", &default_crypto)) {
         default_crypto = DEFAULT_CRYPTO;
     }
     setDefaultProvider_internal(default_crypto);
@@ -76,28 +74,25 @@ std::shared_ptr<QPDFCryptoImpl>
 QPDFCryptoProvider::getImpl_internal(std::string const& name) const
 {
     auto iter = this->m->providers.find(name);
-    if (iter == this->m->providers.end())
-    {
+    if (iter == this->m->providers.end()) {
         throw std::logic_error(
-            "QPDFCryptoProvider requested unknown implementation \"" +
-            name + "\"");
+            "QPDFCryptoProvider requested unknown implementation \"" + name +
+            "\"");
     }
     return this->m->providers[name]();
 }
 
-template<typename T>
+template <typename T>
 void
 QPDFCryptoProvider::registerImpl_internal(std::string const& name)
 {
     this->m->providers[name] = std::make_shared<T>;
-
 }
 
 void
 QPDFCryptoProvider::setDefaultProvider_internal(std::string const& name)
 {
-    if (! this->m->providers.count(name))
-    {
+    if (!this->m->providers.count(name)) {
         throw std::logic_error(
             "QPDFCryptoProvider: request to set default"
             " provider to unknown implementation \"" +
@@ -111,8 +106,7 @@ QPDFCryptoProvider::getRegisteredImpls()
 {
     std::set<std::string> result;
     QPDFCryptoProvider& p = getInstance();
-    for (auto const& iter: p.m->providers)
-    {
+    for (auto const& iter : p.m->providers) {
         result.insert(iter.first);
     }
     return result;

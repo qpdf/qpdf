@@ -27,9 +27,9 @@
 #include <qpdf/InputSource.hh>
 #include <qpdf/PointerHolder.hh>
 
-#include <string>
-#include <stdio.h>
 #include <memory>
+#include <stdio.h>
+#include <string>
 
 class QPDFTokenizer
 {
@@ -38,8 +38,7 @@ class QPDFTokenizer
     // the tokenizer. tt_eof was introduced in QPDF version 4.1.
     // tt_space, tt_comment, and tt_inline_image were added in QPDF
     // version 8.
-    enum token_type_e
-    {
+    enum token_type_e {
         tt_bad,
         tt_array_close,
         tt_array_open,
@@ -63,39 +62,50 @@ class QPDFTokenizer
     class Token
     {
       public:
-        Token() : type(tt_bad) {}
+        Token() :
+            type(tt_bad)
+        {
+        }
         QPDF_DLL
         Token(token_type_e type, std::string const& value);
-        Token(token_type_e type, std::string const& value,
-              std::string raw_value, std::string error_message) :
+        Token(
+            token_type_e type,
+            std::string const& value,
+            std::string raw_value,
+            std::string error_message) :
             type(type),
             value(value),
             raw_value(raw_value),
             error_message(error_message)
         {
         }
-        token_type_e getType() const
+        token_type_e
+        getType() const
         {
             return this->type;
         }
-        std::string const& getValue() const
+        std::string const&
+        getValue() const
         {
             return this->value;
         }
-        std::string const& getRawValue() const
+        std::string const&
+        getRawValue() const
         {
             return this->raw_value;
         }
-        std::string const& getErrorMessage() const
+        std::string const&
+        getErrorMessage() const
         {
             return this->error_message;
         }
-        bool operator==(Token const& rhs) const
+        bool
+        operator==(Token const& rhs) const
         {
             // Ignore fields other than type and value
-            return ((this->type != tt_bad) &&
-                    (this->type == rhs.type) &&
-                    (this->value == rhs.value));
+            return (
+                (this->type != tt_bad) && (this->type == rhs.type) &&
+                (this->value == rhs.value));
         }
 
       private:
@@ -162,10 +172,11 @@ class QPDFTokenizer
     // offset" as returned by input->getLastOffset() points to the
     // beginning of the token.
     QPDF_DLL
-    Token readToken(PointerHolder<InputSource> input,
-                    std::string const& context,
-                    bool allow_bad = false,
-                    size_t max_len = 0);
+    Token readToken(
+        PointerHolder<InputSource> input,
+        std::string const& context,
+        bool allow_bad = false,
+        size_t max_len = 0);
 
     // Calling this method puts the tokenizer in a state for reading
     // inline images. You should call this method after reading the
@@ -188,8 +199,16 @@ class QPDFTokenizer
     void findEI(PointerHolder<InputSource> input);
 
     enum state_e {
-        st_top, st_in_space, st_in_comment, st_in_string, st_lt, st_gt,
-        st_literal, st_in_hexstring, st_inline_image, st_token_ready
+        st_top,
+        st_in_space,
+        st_in_comment,
+        st_in_string,
+        st_lt,
+        st_gt,
+        st_literal,
+        st_in_hexstring,
+        st_inline_image,
+        st_token_ready
     };
 
     class Members

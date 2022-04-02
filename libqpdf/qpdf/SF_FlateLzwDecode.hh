@@ -3,7 +3,7 @@
 #include <vector>
 
 #ifndef SF_FLATELZWDECODE_HH
-#define SF_FLATELZWDECODE_HH
+# define SF_FLATELZWDECODE_HH
 
 class SF_FlateLzwDecode: public QPDFStreamFilter
 {

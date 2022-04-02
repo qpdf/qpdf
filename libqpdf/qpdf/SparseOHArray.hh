@@ -26,7 +26,8 @@ class SparseOHArray
     QPDF_DLL
     void insert(size_t idx, QPDFObjectHandle oh);
 
-    typedef std::unordered_map<size_t, QPDFObjectHandle>::const_iterator const_iterator;
+    typedef std::unordered_map<size_t, QPDFObjectHandle>::const_iterator
+        const_iterator;
     QPDF_DLL
     const_iterator begin() const;
     QPDF_DLL

@@ -22,22 +22,21 @@
 #ifndef QPDFJOB_HH
 #define QPDFJOB_HH
 
-#include <qpdf/DLL.h>
 #include <qpdf/Constants.h>
+#include <qpdf/DLL.h>
+#include <qpdf/PDFVersion.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
-#include <qpdf/PDFVersion.hh>
 
-#include <memory>
-#include <string>
-#include <list>
-#include <vector>
-#include <set>
-#include <map>
-#include <iostream>
 #include <functional>
+#include <iostream>
+#include <list>
+#include <map>
 #include <memory>
+#include <set>
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 class QPDFWriter;
 
@@ -79,8 +78,8 @@ class QPDFJob
     // about converting arguments to UTF-8. This method will mutate
     // arguments that are passed to it.
     QPDF_DLL
-    void initializeFromArgv(char const* const argv[],
-                            char const* progname_env = nullptr);
+    void initializeFromArgv(
+        char const* const argv[], char const* progname_env = nullptr);
 
     // Initialize a QPDFJob from json. Passing partial = true prevents
     // this method from doing the final checks (calling
@@ -155,9 +154,10 @@ class QPDFJob
 
     struct PageSpec
     {
-        PageSpec(std::string const& filename,
-                 char const* password,
-                 std::string const& range);
+        PageSpec(
+            std::string const& filename,
+            char const* password,
+            std::string const& range);
 
         std::string filename;
         std::shared_ptr<char> password;
@@ -203,13 +203,14 @@ class QPDFJob
     {
         friend class QPDFJob;
         friend class Config;
+
       public:
         QPDF_DLL
         Config* endAddAttachment();
         QPDF_DLL
         AttConfig* file(std::string const& parameter);
 
-#       include <qpdf/auto_job_c_att.hh>
+#include <qpdf/auto_job_c_att.hh>
 
       private:
         AttConfig(Config*);
@@ -223,13 +224,14 @@ class QPDFJob
     {
         friend class QPDFJob;
         friend class Config;
+
       public:
         QPDF_DLL
         Config* endCopyAttachmentsFrom();
         QPDF_DLL
         CopyAttConfig* file(std::string const& parameter);
 
-#       include <qpdf/auto_job_c_copy_att.hh>
+#include <qpdf/auto_job_c_copy_att.hh>
 
       private:
         CopyAttConfig(Config*);
@@ -243,15 +245,17 @@ class QPDFJob
     {
         friend class QPDFJob;
         friend class Config;
+
       public:
         QPDF_DLL
         Config* endPages();
         QPDF_DLL
-        PagesConfig* pageSpec(std::string const& filename,
-                              std::string const& range,
-                              char const* password = nullptr);
+        PagesConfig* pageSpec(
+            std::string const& filename,
+            std::string const& range,
+            char const* password = nullptr);
 
-#       include <qpdf/auto_job_c_pages.hh>
+#include <qpdf/auto_job_c_pages.hh>
 
       private:
         PagesConfig(Config*);
@@ -264,13 +268,14 @@ class QPDFJob
     {
         friend class QPDFJob;
         friend class Config;
+
       public:
         QPDF_DLL
         Config* endUnderlayOverlay();
         QPDF_DLL
         UOConfig* file(std::string const& parameter);
 
-#       include <qpdf/auto_job_c_uo.hh>
+#include <qpdf/auto_job_c_uo.hh>
 
       private:
         UOConfig(Config*);
@@ -283,13 +288,14 @@ class QPDFJob
     {
         friend class QPDFJob;
         friend class Config;
+
       public:
         QPDF_DLL
         Config* endEncrypt();
         QPDF_DLL
         EncConfig* file(std::string const& parameter);
 
-#       include <qpdf/auto_job_c_enc.hh>
+#include <qpdf/auto_job_c_enc.hh>
 
       private:
         EncConfig(Config*);
@@ -301,6 +307,7 @@ class QPDFJob
     class Config
     {
         friend class QPDFJob;
+
       public:
         // Proxy to QPDFJob::checkConfiguration()
         QPDF_DLL
@@ -331,7 +338,7 @@ class QPDFJob
             std::string const& user_password,
             std::string const& owner_password);
 
-#       include <qpdf/auto_job_c_main.hh>
+#include <qpdf/auto_job_c_main.hh>
 
       private:
         Config() = delete;
@@ -444,32 +451,37 @@ class QPDFJob
 
     // Basic file processing
     std::shared_ptr<QPDF> processFile(
-        char const* filename, char const* password,
-        bool used_for_input);
+        char const* filename, char const* password, bool used_for_input);
     std::shared_ptr<QPDF> processInputSource(
-        PointerHolder<InputSource> is, char const* password,
+        PointerHolder<InputSource> is,
+        char const* password,
         bool used_for_input);
     std::shared_ptr<QPDF> doProcess(
         std::function<void(QPDF*, char const*)> fn,
-        char const* password, bool empty, bool used_for_input);
+        char const* password,
+        bool empty,
+        bool used_for_input);
     std::shared_ptr<QPDF> doProcessOnce(
         std::function<void(QPDF*, char const*)> fn,
-        char const* password, bool empty, bool used_for_input);
+        char const* password,
+        bool empty,
+        bool used_for_input);
 
     // Transformations
     void setQPDFOptions(QPDF& pdf);
     void handlePageSpecs(
-        QPDF& pdf, bool& warnings,
+        QPDF& pdf,
+        bool& warnings,
         std::vector<std::shared_ptr<QPDF>>& page_heap);
     bool shouldRemoveUnreferencedResources(QPDF& pdf);
     void handleRotations(QPDF& pdf);
-    void getUOPagenos(UnderOverlay& uo,
-                      std::map<int, std::vector<int> >& pagenos);
+    void
+    getUOPagenos(UnderOverlay& uo, std::map<int, std::vector<int>>& pagenos);
     void handleUnderOverlay(QPDF& pdf);
     void doUnderOverlayForPage(
         QPDF& pdf,
         UnderOverlay& uo,
-        std::map<int, std::vector<int> >& pagenos,
+        std::map<int, std::vector<int>>& pagenos,
         size_t page_idx,
         std::map<int, QPDFObjectHandle>& fo,
         std::vector<QPDFPageObjectHelper>& pages,

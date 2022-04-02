@@ -1,16 +1,17 @@
-#include <iostream>
-#include <string.h>
-#include <stdlib.h>
+#include <qpdf/Buffer.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
-#include <qpdf/QUtil.hh>
-#include <qpdf/Buffer.hh>
 #include <qpdf/QPDFWriter.hh>
+#include <qpdf/QUtil.hh>
+#include <iostream>
+#include <stdlib.h>
+#include <string.h>
 
 static char const* whoami = 0;
 
-void usage()
+void
+usage()
 {
     std::cerr << "Usage: " << whoami << " infile.pdf outfile.pdf [in-password]"
               << std::endl
@@ -21,45 +22,43 @@ void usage()
 
 // If there is a box of name box_name, replace it with a new box whose
 // elements are double the values of the original box.
-static void doubleBoxSize(QPDFPageObjectHelper& page, char const* box_name)
+static void
+doubleBoxSize(QPDFPageObjectHelper& page, char const* box_name)
 {
     // We need to use getAttribute rather than getKey as some boxes could
     // be inherited.
     auto box = page.getAttribute(box_name, true);
-    if (box.isNull())
-    {
+    if (box.isNull()) {
         return;
     }
-    if (! box.isRectangle())
-    {
-        throw std::runtime_error(std::string("box ") + box_name +
-                                 " is not an array of four elements");
+    if (!box.isRectangle()) {
+        throw std::runtime_error(
+            std::string("box ") + box_name +
+            " is not an array of four elements");
     }
     std::vector<QPDFObjectHandle> doubled;
-    for (auto& item : box.aitems())
-    {
+    for (auto& item : box.aitems()) {
         doubled.push_back(
             QPDFObjectHandle::newReal(item.getNumericValue() * 2.0, 2));
     }
-    page.getObjectHandle()
-        .replaceKey(box_name, QPDFObjectHandle::newArray(doubled));
+    page.getObjectHandle().replaceKey(
+        box_name, QPDFObjectHandle::newArray(doubled));
 }
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     whoami = QUtil::getWhoami(argv[0]);
 
     // For test suite
     bool static_id = false;
-    if ((argc > 1) && (strcmp(argv[1], " --static-id") == 0))
-    {
+    if ((argc > 1) && (strcmp(argv[1], " --static-id") == 0)) {
         static_id = true;
         --argc;
         ++argv;
     }
 
-    if (! ((argc == 3) || (argc == 4)))
-    {
+    if (!((argc == 3) || (argc == 4))) {
         usage();
     }
 
@@ -70,13 +69,11 @@ int main(int argc, char* argv[])
     // Text to prepend to each page's contents
     std::string content = "2 0 0 2 0 0 cm\n";
 
-    try
-    {
+    try {
         QPDF qpdf;
         qpdf.processFile(infilename, password);
 
-        for (auto& page : QPDFPageDocumentHelper(qpdf).getAllPages())
-        {
+        for (auto& page : QPDFPageDocumentHelper(qpdf).getAllPages()) {
             // Prepend the buffer to the page's contents
             page.addPageContents(
                 QPDFObjectHandle::newStream(&qpdf, content), true);
@@ -91,8 +88,7 @@ int main(int argc, char* argv[])
 
         // Write out a new file
         QPDFWriter w(qpdf, outfilename);
-        if (static_id)
-        {
+        if (static_id) {
             // For the test suite, uncompress streams and use static IDs.
             w.setStaticID(true); // for testing only
             w.setStreamDataMode(qpdf_s_uncompress);
@@ -100,9 +96,7 @@ int main(int argc, char* argv[])
         w.write();
         std::cout << whoami << ": new file written to " << outfilename
                   << std::endl;
-    }
-    catch (std::exception &e)
-    {
+    } catch (std::exception& e) {
         std::cerr << whoami << " processing file " << infilename << ": "
                   << e.what() << std::endl;
         exit(2);

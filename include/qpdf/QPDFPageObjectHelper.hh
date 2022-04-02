@@ -22,9 +22,9 @@
 #ifndef QPDFPAGEOBJECTHELPER_HH
 #define QPDFPAGEOBJECTHELPER_HH
 
-#include <qpdf/QPDFObjectHelper.hh>
 #include <qpdf/QPDFAnnotationObjectHelper.hh>
 #include <qpdf/QPDFMatrix.hh>
+#include <qpdf/QPDFObjectHelper.hh>
 
 #include <qpdf/DLL.h>
 
@@ -57,23 +57,19 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     // going to modify the returned object and want the modifications
     // to apply to the current page/form XObject only.
     QPDF_DLL
-    QPDFObjectHandle
-    getAttribute(std::string const& name, bool copy_if_shared);
+    QPDFObjectHandle getAttribute(std::string const& name, bool copy_if_shared);
 
     // Return the TrimBox. If not defined, fall back to CropBox
     QPDF_DLL
-    QPDFObjectHandle
-    getTrimBox(bool copy_if_shared = false);
+    QPDFObjectHandle getTrimBox(bool copy_if_shared = false);
 
     // Return the CropBox. If not defined, fall back to MediaBox
     QPDF_DLL
-    QPDFObjectHandle
-    getCropBox(bool copy_if_shared = false);
+    QPDFObjectHandle getCropBox(bool copy_if_shared = false);
 
     // Return the MediaBox
     QPDF_DLL
-    QPDFObjectHandle
-    getMediaBox(bool copy_if_shared = false);
+    QPDFObjectHandle getMediaBox(bool copy_if_shared = false);
 
     // Iterate through XObjects, possibly recursing into form
     // XObjects. This works with pages or form XObjects. Call action
@@ -86,24 +82,27 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     void forEachXObject(
         bool recursive,
-        std::function<void(QPDFObjectHandle& obj,
-                           QPDFObjectHandle& xobj_dict,
-                           std::string const& key)> action,
-        std::function<bool(QPDFObjectHandle)> selector=nullptr);
+        std::function<void(
+            QPDFObjectHandle& obj,
+            QPDFObjectHandle& xobj_dict,
+            std::string const& key)> action,
+        std::function<bool(QPDFObjectHandle)> selector = nullptr);
     // Only call action for images
     QPDF_DLL
     void forEachImage(
         bool recursive,
-        std::function<void(QPDFObjectHandle& obj,
-                           QPDFObjectHandle& xobj_dict,
-                           std::string const& key)> action);
+        std::function<void(
+            QPDFObjectHandle& obj,
+            QPDFObjectHandle& xobj_dict,
+            std::string const& key)> action);
     // Only call action for form XObjects
     QPDF_DLL
     void forEachFormXObject(
         bool recursive,
-        std::function<void(QPDFObjectHandle& obj,
-                           QPDFObjectHandle& xobj_dict,
-                           std::string const& key)> action);
+        std::function<void(
+            QPDFObjectHandle& obj,
+            QPDFObjectHandle& xobj_dict,
+            std::string const& key)> action);
 
     // Returns an empty map if there are no images or no resources.
     // Prior to qpdf 8.4.0, this function did not support inherited
@@ -142,8 +141,8 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     // only_subtype is non-empty, only include annotations of the
     // given subtype.
     QPDF_DLL
-    std::vector<QPDFAnnotationObjectHelper> getAnnotations(
-        std::string const& only_subtype = "");
+    std::vector<QPDFAnnotationObjectHelper>
+    getAnnotations(std::string const& only_subtype = "");
 
     // Returns a vector of stream objects representing the content
     // streams for the given page.  This routine allows the caller to
@@ -203,13 +202,13 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     // contents, as happens with addContentTokenFilter. See
     // examples/pdf-count-strings.cc for an example.
     QPDF_DLL
-    void filterContents(QPDFObjectHandle::TokenFilter* filter,
-                        Pipeline* next = 0);
+    void
+    filterContents(QPDFObjectHandle::TokenFilter* filter, Pipeline* next = 0);
 
     // Old name -- calls filterContents()
     QPDF_DLL
-    void filterPageContents(QPDFObjectHandle::TokenFilter* filter,
-                            Pipeline* next = 0);
+    void filterPageContents(
+        QPDFObjectHandle::TokenFilter* filter, Pipeline* next = 0);
 
     // Pipe a page's contents through the given pipeline. This method
     // works whether the contents are a single stream or an array of
@@ -303,7 +302,8 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     // behavior.
     QPDF_DLL
     std::string placeFormXObject(
-        QPDFObjectHandle fo, std::string const& name,
+        QPDFObjectHandle fo,
+        std::string const& name,
         QPDFObjectHandle::Rectangle rect,
         bool invert_transformations = true,
         bool allow_shrink = true,
@@ -313,7 +313,8 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     // matrix that was used.
     QPDF_DLL
     std::string placeFormXObject(
-        QPDFObjectHandle fo, std::string const& name,
+        QPDFObjectHandle fo,
+        std::string const& name,
         QPDFObjectHandle::Rectangle rect,
         QPDFMatrix& cm,
         bool invert_transformations = true,
@@ -326,9 +327,11 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     // placeFormXObject.
     QPDF_DLL
     QPDFMatrix getMatrixForFormXObjectPlacement(
-        QPDFObjectHandle fo, QPDFObjectHandle::Rectangle rect,
+        QPDFObjectHandle fo,
+        QPDFObjectHandle::Rectangle rect,
         bool invert_transformations = true,
-        bool allow_shrink = true, bool allow_expand = false);
+        bool allow_shrink = true,
+        bool allow_expand = false);
 
     // If a page is rotated using /Rotate in the page's dictionary,
     // instead rotate the page by the same amount by altering the
@@ -372,13 +375,13 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     // these outside and pass them in.
     QPDF_DLL
     void copyAnnotations(
-        QPDFPageObjectHelper from_page, QPDFMatrix const& cm = QPDFMatrix(),
+        QPDFPageObjectHelper from_page,
+        QPDFMatrix const& cm = QPDFMatrix(),
         QPDFAcroFormDocumentHelper* afdh = nullptr,
         QPDFAcroFormDocumentHelper* from_afdh = nullptr);
 
   private:
-    static bool
-    removeUnreferencedResourcesHelper(
+    static bool removeUnreferencedResourcesHelper(
         QPDFPageObjectHelper ph, std::set<std::string>& unresolved);
 
     class Members

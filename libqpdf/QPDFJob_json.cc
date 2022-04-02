@@ -2,13 +2,13 @@
 
 #include <qpdf/JSONHandler.hh>
 #include <qpdf/QPDFUsage.hh>
-#include <qpdf/QUtil.hh>
 #include <qpdf/QTC.hh>
+#include <qpdf/QUtil.hh>
 
-#include <memory>
-#include <stdexcept>
-#include <sstream>
 #include <cstring>
+#include <memory>
+#include <sstream>
+#include <stdexcept>
 
 static JSON JOB_SCHEMA = JSON::parse(QPDFJob::job_json_schema_v1().c_str());
 
@@ -21,7 +21,7 @@ namespace
         void handle(JSON&);
 
       private:
-#       include <qpdf/auto_job_json_decl.hh>
+#include <qpdf/auto_job_json_decl.hh>
 
         void usage(std::string const& message);
         void initHandlers();
@@ -56,10 +56,8 @@ namespace
         void addParameter(param_handler_t);
         void addChoices(char const** choices, bool required, param_handler_t);
         void pushKey(std::string const& key);
-        void beginDict(json_handler_t start_fn,
-                       bare_handler_t end_fn);
-        void beginArray(json_handler_t start_fn,
-                        bare_handler_t end_fn);
+        void beginDict(json_handler_t start_fn, bare_handler_t end_fn);
+        void beginArray(json_handler_t start_fn, bare_handler_t end_fn);
         void ignoreItem();
         void popHandler();
 
@@ -76,7 +74,7 @@ namespace
         std::shared_ptr<QPDFJob::UOConfig> c_uo;
         std::shared_ptr<QPDFJob::EncConfig> c_enc;
     };
-}
+} // namespace
 
 Handlers::Handlers(bool partial, std::shared_ptr<QPDFJob::Config> c_main) :
     partial(partial),
@@ -110,18 +108,16 @@ Handlers::initHandlers()
     this->json_handlers.push_back(std::make_shared<JSONHandler>());
     this->jh = this->json_handlers.back().get();
     jh->addDictHandlers(
-        [](std::string const&, JSON){},
-        [this](std::string const&){
-            if (! this->partial)
-            {
+        [](std::string const&, JSON) {},
+        [this](std::string const&) {
+            if (!this->partial) {
                 c_main->checkConfiguration();
             }
         });
 
-#   include <qpdf/auto_job_json_init.hh>
+#include <qpdf/auto_job_json_init.hh>
 
-    if (this->json_handlers.size() != 1)
-    {
+    if (this->json_handlers.size() != 1) {
         throw std::logic_error("QPDFJob_json: json_handlers size != 1 at end");
     }
 }
@@ -130,24 +126,21 @@ void
 Handlers::addBare(bare_handler_t fn)
 {
     jh->addStringHandler(
-        [this, fn](std::string const& path, std::string const& parameter){
-        if (! parameter.empty())
-        {
-            QTC::TC("qpdf", "QPDFJob json bare not empty");
-            usage(path + ": value must be the empty string");
-        }
-        else
-        {
-            fn();
-        }
-    });
+        [this, fn](std::string const& path, std::string const& parameter) {
+            if (!parameter.empty()) {
+                QTC::TC("qpdf", "QPDFJob json bare not empty");
+                usage(path + ": value must be the empty string");
+            } else {
+                fn();
+            }
+        });
 }
 
 void
 Handlers::addParameter(param_handler_t fn)
 {
     jh->addStringHandler(
-        [fn](std::string const& path, std::string const& parameter){
+        [fn](std::string const& path, std::string const& parameter) {
             fn(parameter.c_str());
         });
 }
@@ -157,40 +150,30 @@ Handlers::addChoices(char const** choices, bool required, param_handler_t fn)
 {
     jh->addStringHandler(
         [fn, choices, required, this](
-            std::string const& path, std::string const& parameter){
-
+            std::string const& path, std::string const& parameter) {
             char const* p = parameter.c_str();
             bool matches = false;
-            if ((! required) && (parameter.empty()))
-            {
+            if ((!required) && (parameter.empty())) {
                 matches = true;
             }
-            if (! matches)
-            {
-                for (char const** i = choices; *i; ++i)
-                {
-                    if (strcmp(*i, p) == 0)
-                    {
+            if (!matches) {
+                for (char const** i = choices; *i; ++i) {
+                    if (strcmp(*i, p) == 0) {
                         QTC::TC("qpdf", "QPDFJob json choice match");
                         matches = true;
                         break;
                     }
                 }
             }
-            if (! matches)
-            {
+            if (!matches) {
                 QTC::TC("qpdf", "QPDFJob json choice mismatch");
                 std::ostringstream msg;
                 msg << path + ": unexpected value; expected one of ";
                 bool first = true;
-                for (char const** i = choices; *i; ++i)
-                {
-                    if (first)
-                    {
+                for (char const** i = choices; *i; ++i) {
+                    if (first) {
                         first = false;
-                    }
-                    else
-                    {
+                    } else {
                         msg << ", ";
                     }
                     msg << *i;
@@ -214,8 +197,8 @@ void
 Handlers::beginDict(json_handler_t start_fn, bare_handler_t end_fn)
 {
     jh->addDictHandlers(
-        [start_fn](std::string const&, JSON j){ start_fn(j); },
-        [end_fn](std::string const&){ end_fn(); });
+        [start_fn](std::string const&, JSON j) { start_fn(j); },
+        [end_fn](std::string const&) { end_fn(); });
 }
 
 void
@@ -223,8 +206,8 @@ Handlers::beginArray(json_handler_t start_fn, bare_handler_t end_fn)
 {
     auto item_jh = std::make_shared<JSONHandler>();
     jh->addArrayHandlers(
-        [start_fn](std::string const&, JSON j){ start_fn(j); },
-        [end_fn](std::string const&){ end_fn(); },
+        [start_fn](std::string const&, JSON j) { start_fn(j); },
+        [end_fn](std::string const&) { end_fn(); },
         item_jh);
     this->json_handlers.push_back(item_jh);
     this->jh = item_jh.get();
@@ -233,7 +216,7 @@ Handlers::beginArray(json_handler_t start_fn, bare_handler_t end_fn)
 void
 Handlers::ignoreItem()
 {
-    jh->addAnyHandler([](std::string const&, JSON){});
+    jh->addAnyHandler([](std::string const&, JSON) {});
 }
 
 void
@@ -252,41 +235,31 @@ Handlers::handle(JSON& j)
 void
 Handlers::setupInputFile()
 {
-    addParameter([this](char const* p) {
-        c_main->inputFile(p);
-    });
+    addParameter([this](char const* p) { c_main->inputFile(p); });
 }
 
 void
 Handlers::setupPassword()
 {
-    addParameter([this](char const* p) {
-        c_main->password(p);
-    });
+    addParameter([this](char const* p) { c_main->password(p); });
 }
 
 void
 Handlers::setupEmpty()
 {
-    addBare([this]() {
-        c_main->emptyInput();
-    });
+    addBare([this]() { c_main->emptyInput(); });
 }
 
 void
 Handlers::setupOutputFile()
 {
-    addParameter([this](char const* p) {
-        c_main->outputFile(p);
-    });
+    addParameter([this](char const* p) { c_main->outputFile(p); });
 }
 
 void
 Handlers::setupReplaceInput()
 {
-    addBare([this]() {
-        c_main->replaceInput();
-    });
+    addBare([this]() { c_main->replaceInput(); });
 }
 
 void
@@ -300,34 +273,26 @@ Handlers::beginEncrypt(JSON j)
     std::string owner_password;
     bool user_password_seen = false;
     bool owner_password_seen = false;
-    j.forEachDictItem([&](std::string const& key, JSON value){
-        if ((key == "40bit") || (key == "128bit") || (key == "256bit"))
-        {
-            if (key_len != 0)
-            {
+    j.forEachDictItem([&](std::string const& key, JSON value) {
+        if ((key == "40bit") || (key == "128bit") || (key == "256bit")) {
+            if (key_len != 0) {
                 QTC::TC("qpdf", "QPDFJob json encrypt duplicate key length");
                 usage("exactly one of 40bit, 128bit, or 256bit must be given");
             }
             key_len = QUtil::string_to_int(key.c_str());
-        }
-        else if (key == "userPassword")
-        {
+        } else if (key == "userPassword") {
             user_password_seen = value.getString(user_password);
-        }
-        else if (key == "ownerPassword")
-        {
+        } else if (key == "ownerPassword") {
             owner_password_seen = value.getString(owner_password);
         }
     });
-    if (key_len == 0)
-    {
+    if (key_len == 0) {
         QTC::TC("qpdf", "QPDFJob json encrypt no key length");
         usage("exactly one of 40bit, 128bit, or 256bit must be given;"
               " an empty dictionary may be supplied for one of them"
               " to set the key length without imposing any restrictions");
     }
-    if (! (user_password_seen && owner_password_seen))
-    {
+    if (!(user_password_seen && owner_password_seen)) {
         QTC::TC("qpdf", "QPDFJob json encrypt missing password");
         usage("the user and owner password are both required; use the empty"
               " string for the user password if you don't want a password");
@@ -444,9 +409,7 @@ Handlers::endAddAttachment()
 void
 Handlers::setupAddAttachmentFile()
 {
-    addParameter([this](char const* p) {
-        c_att->file(p);
-    });
+    addParameter([this](char const* p) { c_att->file(p); });
 }
 
 void
@@ -477,17 +440,13 @@ Handlers::endCopyAttachmentsFrom()
 void
 Handlers::setupCopyAttachmentsFromFile()
 {
-    addParameter([this](char const* p) {
-        c_copy_att->file(p);
-    });
+    addParameter([this](char const* p) { c_copy_att->file(p); });
 }
 
 void
 Handlers::setupCopyAttachmentsFromPassword()
 {
-    addParameter([this](char const* p) {
-        c_copy_att->password(p);
-    });
+    addParameter([this](char const* p) { c_copy_att->password(p); });
 }
 
 void
@@ -511,22 +470,16 @@ Handlers::beginPages(JSON j)
     std::string password;
     bool file_seen = false;
     bool password_seen = false;
-    j.forEachDictItem([&](std::string const& key, JSON value){
-        if (key == "file")
-        {
+    j.forEachDictItem([&](std::string const& key, JSON value) {
+        if (key == "file") {
             file_seen = value.getString(file);
-        }
-        else if (key == "range")
-        {
+        } else if (key == "range") {
             value.getString(range);
-        }
-        else if (key == "password")
-        {
+        } else if (key == "password") {
             password_seen = value.getString(password);
         }
     });
-    if (! file_seen)
-    {
+    if (!file_seen) {
         QTC::TC("qpdf", "QPDFJob json pages no file");
         usage("file is required in page specification");
     }
@@ -577,17 +530,13 @@ Handlers::endOverlay()
 void
 Handlers::setupOverlayFile()
 {
-    addParameter([this](char const* p) {
-        c_uo->file(p);
-    });
+    addParameter([this](char const* p) { c_uo->file(p); });
 }
 
 void
 Handlers::setupOverlayPassword()
 {
-    addParameter([this](char const* p) {
-        c_uo->password(p);
-    });
+    addParameter([this](char const* p) { c_uo->password(p); });
 }
 
 void
@@ -606,17 +555,13 @@ Handlers::endUnderlay()
 void
 Handlers::setupUnderlayFile()
 {
-    addParameter([this](char const* p) {
-        c_uo->file(p);
-    });
+    addParameter([this](char const* p) { c_uo->file(p); });
 }
 
 void
 Handlers::setupUnderlayPassword()
 {
-    addParameter([this](char const* p) {
-        c_uo->password(p);
-    });
+    addParameter([this](char const* p) { c_uo->password(p); });
 }
 
 void
@@ -624,13 +569,10 @@ QPDFJob::initializeFromJson(std::string const& json, bool partial)
 {
     std::list<std::string> errors;
     JSON j = JSON::parse(json);
-    if (! j.checkSchema(JOB_SCHEMA, JSON::f_optional, errors))
-    {
+    if (!j.checkSchema(JOB_SCHEMA, JSON::f_optional, errors)) {
         std::ostringstream msg;
-        msg << this->m->message_prefix
-            << ": job json has errors:";
-        for (auto const& error: errors)
-        {
+        msg << this->m->message_prefix << ": job json has errors:";
+        for (auto const& error : errors) {
             msg << std::endl << "  " << error;
         }
         throw std::runtime_error(msg.str());

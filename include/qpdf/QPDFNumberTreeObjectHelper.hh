@@ -22,8 +22,8 @@
 #ifndef QPDFNUMBERTREEOBJECTHELPER_HH
 #define QPDFNUMBERTREEOBJECTHELPER_HH
 
-#include <qpdf/QPDFObjectHelper.hh>
 #include <qpdf/QPDFObjGen.hh>
+#include <qpdf/QPDFObjectHelper.hh>
 #include <map>
 #include <memory>
 
@@ -45,16 +45,15 @@ class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
     // The qpdf object is required so that this class can issue
     // warnings, attempt repairs, and add indirect objects.
     QPDF_DLL
-    QPDFNumberTreeObjectHelper(QPDFObjectHandle, QPDF&,
-                               bool auto_repair = true);
+    QPDFNumberTreeObjectHelper(
+        QPDFObjectHandle, QPDF&, bool auto_repair = true);
 
     // ABI: Legacy Constructor will be removed in QPDF 11. A
     // QPDFNumberTreeObjectHelper constructed in this way can't be
     // modified or repaired and will silently ignore problems in the
     // structure.
-    [[deprecated("use constructor that takes QPDF&")]]
-    QPDF_DLL
-    QPDFNumberTreeObjectHelper(QPDFObjectHandle);
+    [[deprecated("use constructor that takes QPDF&")]] QPDF_DLL
+        QPDFNumberTreeObjectHelper(QPDFObjectHandle);
 
     // ABI: = default
     QPDF_DLL
@@ -93,12 +92,13 @@ class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
     // oh to the value with index 3, and set offset to 2 (5 - 3). See
     // also find().
     QPDF_DLL
-    bool findObjectAtOrBelow(numtree_number idx, QPDFObjectHandle& oh,
-                             numtree_number& offset);
+    bool findObjectAtOrBelow(
+        numtree_number idx, QPDFObjectHandle& oh, numtree_number& offset);
 
     class iterator
     {
         friend class QPDFNumberTreeObjectHelper;
+
       public:
         typedef std::pair<numtree_number, QPDFObjectHandle> T;
         using iterator_category = std::bidirectional_iterator_tag;
@@ -113,7 +113,8 @@ class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
         QPDF_DLL
         iterator& operator++();
         QPDF_DLL
-        iterator operator++(int)
+        iterator
+        operator++(int)
         {
             iterator t = *this;
             ++(*this);
@@ -122,7 +123,8 @@ class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
         QPDF_DLL
         iterator& operator--();
         QPDF_DLL
-        iterator operator--(int)
+        iterator
+        operator--(int)
         {
             iterator t = *this;
             --(*this);
@@ -135,9 +137,10 @@ class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
         QPDF_DLL
         bool operator==(iterator const& other) const;
         QPDF_DLL
-        bool operator!=(iterator const& other) const
+        bool
+        operator!=(iterator const& other) const
         {
-            return ! operator==(other);
+            return !operator==(other);
         }
 
         // DANGER: this method can create inconsistent trees if not

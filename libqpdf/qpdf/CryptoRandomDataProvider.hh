@@ -1,8 +1,8 @@
 #ifndef CRYPTORANDOMDATAPROVIDER_HH
 #define CRYPTORANDOMDATAPROVIDER_HH
 
-#include <qpdf/RandomDataProvider.hh>
 #include <qpdf/DLL.h>
+#include <qpdf/RandomDataProvider.hh>
 
 class CryptoRandomDataProvider: public RandomDataProvider
 {

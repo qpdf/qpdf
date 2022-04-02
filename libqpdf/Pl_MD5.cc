@@ -17,10 +17,8 @@ Pl_MD5::~Pl_MD5()
 void
 Pl_MD5::write(unsigned char* buf, size_t len)
 {
-    if (this->enabled)
-    {
-        if (! this->in_progress)
-        {
+    if (this->enabled) {
+        if (!this->in_progress) {
             this->md5.reset();
             this->in_progress = true;
         }
@@ -30,8 +28,7 @@ Pl_MD5::write(unsigned char* buf, size_t len)
         static size_t const max_bytes = 1 << 30;
         size_t bytes_left = len;
         unsigned char* data = buf;
-        while (bytes_left > 0)
-        {
+        while (bytes_left > 0) {
             size_t bytes = (bytes_left >= max_bytes ? max_bytes : bytes_left);
             this->md5.encodeDataIncrementally(
                 reinterpret_cast<char*>(data), bytes);
@@ -47,8 +44,7 @@ void
 Pl_MD5::finish()
 {
     this->getNext()->finish();
-    if (! this->persist_across_finish)
-    {
+    if (!this->persist_across_finish) {
         this->in_progress = false;
     }
 }
@@ -68,10 +64,8 @@ Pl_MD5::persistAcrossFinish(bool persist)
 std::string
 Pl_MD5::getHexDigest()
 {
-    if (! this->enabled)
-    {
-        throw std::logic_error(
-            "digest requested for a disabled MD5 Pipeline");
+    if (!this->enabled) {
+        throw std::logic_error("digest requested for a disabled MD5 Pipeline");
     }
     this->in_progress = false;
     return this->md5.unparse();

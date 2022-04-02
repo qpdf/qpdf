@@ -1,7 +1,7 @@
 #include <qpdf/QPDF_Array.hh>
 
-#include <qpdf/QUtil.hh>
 #include <qpdf/QIntC.hh>
+#include <qpdf/QUtil.hh>
 #include <stdexcept>
 
 QPDF_Array::QPDF_Array(std::vector<QPDFObjectHandle> const& v)
@@ -29,8 +29,7 @@ QPDF_Array::unparse()
 {
     std::string result = "[ ";
     size_t size = this->elements.size();
-    for (size_t i = 0; i < size; ++i)
-    {
+    for (size_t i = 0; i < size; ++i) {
         result += this->elements.at(i).unparse();
         result += " ";
     }
@@ -43,8 +42,7 @@ QPDF_Array::getJSON()
 {
     JSON j = JSON::makeArray();
     size_t size = this->elements.size();
-    for (size_t i = 0; i < size; ++i)
-    {
+    for (size_t i = 0; i < size; ++i) {
         j.addArrayElement(this->elements.at(i).getJSON());
     }
     return j;
@@ -79,8 +77,7 @@ QPDF_Array::getNItems() const
 QPDFObjectHandle
 QPDF_Array::getItem(int n) const
 {
-    if ((n < 0) || (n >= QIntC::to_int(elements.size())))
-    {
+    if ((n < 0) || (n >= QIntC::to_int(elements.size()))) {
         throw std::logic_error(
             "INTERNAL ERROR: bounds error accessing QPDF_Array element");
     }
@@ -91,8 +88,7 @@ void
 QPDF_Array::getAsVector(std::vector<QPDFObjectHandle>& v) const
 {
     size_t size = this->elements.size();
-    for (size_t i = 0; i < size; ++i)
-    {
+    for (size_t i = 0; i < size; ++i) {
         v.push_back(this->elements.at(i));
     }
 }
@@ -108,8 +104,8 @@ QPDF_Array::setFromVector(std::vector<QPDFObjectHandle> const& v)
 {
     this->elements = SparseOHArray();
     for (std::vector<QPDFObjectHandle>::const_iterator iter = v.begin();
-         iter != v.end(); ++iter)
-    {
+         iter != v.end();
+         ++iter) {
         this->elements.append(*iter);
     }
 }
@@ -118,8 +114,7 @@ void
 QPDF_Array::insertItem(int at, QPDFObjectHandle const& item)
 {
     // As special case, also allow insert beyond the end
-    if ((at < 0) || (at > QIntC::to_int(this->elements.size())))
-    {
+    if ((at < 0) || (at > QIntC::to_int(this->elements.size()))) {
         throw std::logic_error(
             "INTERNAL ERROR: bounds error accessing QPDF_Array element");
     }
@@ -147,8 +142,7 @@ QPDF_Array::getElementsForShallowCopy() const
 void
 QPDF_Array::addExplicitElementsToList(std::list<QPDFObjectHandle>& l) const
 {
-    for (auto const& iter: this->elements)
-    {
+    for (auto const& iter : this->elements) {
         l.push_back(iter.second);
     }
 }

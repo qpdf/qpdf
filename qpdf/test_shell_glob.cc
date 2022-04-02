@@ -1,8 +1,9 @@
-#include <iostream>
-#include <cstring>
 #include <qpdf/QUtil.hh>
+#include <cstring>
+#include <iostream>
 
-int realmain(int argc, char* argv[])
+int
+realmain(int argc, char* argv[])
 {
     // In Windows, shell globbing is handled by the runtime, so
     // passing '*' as argument results in wildcard expansion. In
@@ -17,46 +18,40 @@ int realmain(int argc, char* argv[])
     // msvc and seeing that the test fails under that condition.
 
     bool found_star = false;
-    for (int i = 1; i < argc; ++i)
-    {
-        if (strchr(argv[i], '*') != nullptr)
-        {
+    for (int i = 1; i < argc; ++i) {
+        if (strchr(argv[i], '*') != nullptr) {
             found_star = true;
             break;
         }
     }
 #ifdef _WIN32
-    bool passed = ((! found_star) && (argc > 2));
+    bool passed = ((!found_star) && (argc > 2));
 #else
     bool passed = (found_star && (argc == 2));
 #endif
-    if (passed)
-    {
+    if (passed) {
         std::cout << "PASSED" << std::endl;
-    }
-    else
-    {
+    } else {
         std::cout << "FAILED" << std::endl;
-        for (int i = 1; i < argc; ++i)
-        {
+        for (int i = 1; i < argc; ++i) {
             std::cout << argv[i] << std::endl;
         }
     }
     return 0;
 }
 
-
 #ifdef WINDOWS_WMAIN
 
-extern "C"
-int wmain(int argc, wchar_t* argv[])
+extern "C" int
+wmain(int argc, wchar_t* argv[])
 {
     return QUtil::call_main_from_wmain(argc, argv, realmain);
 }
 
 #else
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     return realmain(argc, argv);
 }

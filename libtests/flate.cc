@@ -1,15 +1,16 @@
 
+#include <qpdf/Pl_Count.hh>
 #include <qpdf/Pl_Flate.hh>
 #include <qpdf/Pl_StdioFile.hh>
-#include <qpdf/Pl_Count.hh>
 #include <qpdf/QUtil.hh>
 
-#include <iostream>
 #include <errno.h>
-#include <string.h>
+#include <iostream>
 #include <stdlib.h>
+#include <string.h>
 
-void run(char const* filename)
+void
+run(char const* filename)
 {
     std::string n1 = std::string(filename) + ".1";
     std::string n2 = std::string(filename) + ".2";
@@ -38,8 +39,7 @@ void run(char const* filename)
     FILE* in1 = QUtil::safe_fopen(filename, "rb");
     unsigned char buf[1024];
     size_t len;
-    while ((len = fread(buf, 1, sizeof(buf), in1)) > 0)
-    {
+    while ((len = fread(buf, 1, sizeof(buf), in1)) > 0) {
         // Write to the compression pipeline
         def1->write(buf, len);
 
@@ -57,7 +57,6 @@ void run(char const* filename)
 
     std::cout << "bytes written to o3: " << count3->getCount() << std::endl;
 
-
     delete def3;
     delete inf3;
     delete count3;
@@ -66,8 +65,7 @@ void run(char const* filename)
 
     // Now read the compressed data and write to the output uncompress pipeline
     FILE* in2 = QUtil::safe_fopen(n1.c_str(), "rb");
-    while ((len = fread(buf, 1, sizeof(buf), in2)) > 0)
-    {
+    while ((len = fread(buf, 1, sizeof(buf), in2)) > 0) {
         inf2->write(buf, len);
     }
     fclose(in2);
@@ -83,21 +81,18 @@ void run(char const* filename)
     std::cout << "done" << std::endl;
 }
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
-    if (argc != 2)
-    {
+    if (argc != 2) {
         std::cerr << "Usage: pipeline filename" << std::endl;
         exit(2);
     }
     char* filename = argv[1];
 
-    try
-    {
+    try {
         run(filename);
-    }
-    catch (std::exception& e)
-    {
+    } catch (std::exception& e) {
         std::cout << e.what() << std::endl;
     }
     return 0;

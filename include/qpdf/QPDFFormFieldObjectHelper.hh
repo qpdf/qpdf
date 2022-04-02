@@ -185,8 +185,8 @@ class QPDFFormFieldObjectHelper: public QPDFObjectHelper
     // of a field, use QPDFAcroFormDocumentHelper::setFormFieldName
     // instead.
     QPDF_DLL
-    void setFieldAttribute(std::string const& key,
-                           std::string const& utf8_value);
+    void
+    setFieldAttribute(std::string const& key, std::string const& utf8_value);
 
     // Set /V (field value) to the given value. If need_appearances is
     // true and the field type is either /Tx (text) or /Ch (choice),

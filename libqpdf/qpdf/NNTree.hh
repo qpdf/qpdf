@@ -20,6 +20,7 @@ class NNTreeImpl;
 class NNTreeIterator
 {
     friend class NNTreeImpl;
+
   public:
     typedef std::pair<QPDFObjectHandle, QPDFObjectHandle> T;
     using iterator_category = std::bidirectional_iterator_tag;
@@ -31,14 +32,16 @@ class NNTreeIterator
     virtual ~NNTreeIterator() = default;
     bool valid() const;
     NNTreeIterator& operator++();
-    NNTreeIterator operator++(int)
+    NNTreeIterator
+    operator++(int)
     {
         NNTreeIterator t = *this;
         ++(*this);
         return t;
     }
     NNTreeIterator& operator--();
-    NNTreeIterator operator--(int)
+    NNTreeIterator
+    operator--(int)
     {
         NNTreeIterator t = *this;
         --(*this);
@@ -47,13 +50,13 @@ class NNTreeIterator
     reference operator*();
     pointer operator->();
     bool operator==(NNTreeIterator const& other) const;
-    bool operator!=(NNTreeIterator const& other) const
+    bool
+    operator!=(NNTreeIterator const& other) const
     {
-        return ! operator==(other);
+        return !operator==(other);
     }
 
-    void insertAfter(
-        QPDFObjectHandle key, QPDFObjectHandle value);
+    void insertAfter(QPDFObjectHandle key, QPDFObjectHandle value);
     void remove();
 
   private:
@@ -73,11 +76,11 @@ class NNTreeIterator
     void addPathElement(QPDFObjectHandle const& node, int kid_number);
     QPDFObjectHandle getNextKid(PathElement& element, bool backward);
     void increment(bool backward);
-    void resetLimits(QPDFObjectHandle node,
-                     std::list<PathElement>::iterator parent);
+    void
+    resetLimits(QPDFObjectHandle node, std::list<PathElement>::iterator parent);
 
-    void split(QPDFObjectHandle to_split,
-               std::list<PathElement>::iterator parent);
+    void
+    split(QPDFObjectHandle to_split, std::list<PathElement>::iterator parent);
     std::list<PathElement>::iterator lastPathElement();
 
     NNTreeImpl& impl;
@@ -90,12 +93,16 @@ class NNTreeIterator
 class NNTreeImpl
 {
     friend class NNTreeIterator;
+
   public:
     typedef NNTreeIterator iterator;
 
     // ABI: for qpdf 11, make qpdf a reference
-    NNTreeImpl(NNTreeDetails const&, QPDF*, QPDFObjectHandle&,
-               bool auto_repair = true);
+    NNTreeImpl(
+        NNTreeDetails const&,
+        QPDF*,
+        QPDFObjectHandle&,
+        bool auto_repair = true);
     iterator begin();
     iterator end();
     iterator last();
@@ -111,19 +118,18 @@ class NNTreeImpl
 
   private:
     void repair();
-    iterator findInternal(
-        QPDFObjectHandle key, bool return_prev_if_not_found = false);
+    iterator
+    findInternal(QPDFObjectHandle key, bool return_prev_if_not_found = false);
     int withinLimits(QPDFObjectHandle key, QPDFObjectHandle node);
     int binarySearch(
-        QPDFObjectHandle key, QPDFObjectHandle items,
-        int num_items, bool return_prev_if_not_found,
-        int (NNTreeImpl::*compare)(QPDFObjectHandle& key,
-                                 QPDFObjectHandle& arr,
-                                 int item));
-    int compareKeyItem(
-        QPDFObjectHandle& key, QPDFObjectHandle& items, int idx);
-    int compareKeyKid(
-        QPDFObjectHandle& key, QPDFObjectHandle& items, int idx);
+        QPDFObjectHandle key,
+        QPDFObjectHandle items,
+        int num_items,
+        bool return_prev_if_not_found,
+        int (NNTreeImpl::*compare)(
+            QPDFObjectHandle& key, QPDFObjectHandle& arr, int item));
+    int compareKeyItem(QPDFObjectHandle& key, QPDFObjectHandle& items, int idx);
+    int compareKeyKid(QPDFObjectHandle& key, QPDFObjectHandle& items, int idx);
 
     NNTreeDetails const& details;
     QPDF* qpdf;

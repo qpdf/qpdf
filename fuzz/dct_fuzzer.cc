@@ -1,8 +1,8 @@
-#include <qpdf/Pl_Discard.hh>
 #include <qpdf/Pl_DCT.hh>
+#include <qpdf/Pl_Discard.hh>
+#include <cstdlib>
 #include <iostream>
 #include <stdexcept>
-#include <cstdlib>
 
 class FuzzHelper
 {
@@ -35,17 +35,15 @@ FuzzHelper::doChecks()
 void
 FuzzHelper::run()
 {
-    try
-    {
+    try {
         doChecks();
-    }
-    catch (std::runtime_error const& e)
-    {
+    } catch (std::runtime_error const& e) {
         std::cerr << "runtime_error: " << e.what() << std::endl;
     }
 }
 
-extern "C" int LLVMFuzzerTestOneInput(unsigned char const* data, size_t size)
+extern "C" int
+LLVMFuzzerTestOneInput(unsigned char const* data, size_t size)
 {
 #ifndef _WIN32
     // Used by jpeg library to work around false positives in memory

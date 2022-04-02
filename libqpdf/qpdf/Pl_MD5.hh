@@ -9,8 +9,8 @@
 // calling finish().  The first call to write() after a call to
 // finish() initializes a new MD5 object.
 
-#include <qpdf/Pipeline.hh>
 #include <qpdf/MD5.hh>
+#include <qpdf/Pipeline.hh>
 
 class Pl_MD5: public Pipeline
 {

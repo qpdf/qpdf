@@ -23,12 +23,12 @@
 #define QPDF_INPUTSOURCE_HH
 
 #include <qpdf/DLL.h>
-#include <qpdf/Types.h>
 #include <qpdf/PointerHolder.hh>
+#include <qpdf/Types.h>
 
+#include <memory>
 #include <stdio.h>
 #include <string>
-#include <memory>
 
 class QPDF_DLL_CLASS InputSource
 {
@@ -71,13 +71,17 @@ class QPDF_DLL_CLASS InputSource
     // methods return true and leave the input source positioned
     // wherever check() left it at the end of the matching pattern.
     QPDF_DLL
-    bool findFirst(char const* start_chars,
-                   qpdf_offset_t offset, size_t len,
-                   Finder& finder);
+    bool findFirst(
+        char const* start_chars,
+        qpdf_offset_t offset,
+        size_t len,
+        Finder& finder);
     QPDF_DLL
-    bool findLast(char const* start_chars,
-                  qpdf_offset_t offset, size_t len,
-                  Finder& finder);
+    bool findLast(
+        char const* start_chars,
+        qpdf_offset_t offset,
+        size_t len,
+        Finder& finder);
 
     virtual qpdf_offset_t findAndSkipNextEOL() = 0;
     virtual std::string const& getName() const = 0;

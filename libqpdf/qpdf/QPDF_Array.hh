@@ -3,9 +3,9 @@
 
 #include <qpdf/QPDFObject.hh>
 
-#include <vector>
-#include <list>
 #include <qpdf/SparseOHArray.hh>
+#include <list>
+#include <vector>
 
 class QPDF_Array: public QPDFObject
 {

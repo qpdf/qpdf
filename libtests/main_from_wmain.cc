@@ -2,13 +2,15 @@
 #include <iostream>
 
 #ifndef QPDF_NO_WCHAR_T
-void wmain_test()
+void
+wmain_test()
 {
     // writable args and function args
     auto realmain = [](int argc, char* argv[]) {
         for (int i = 0; i < argc; ++i) {
             std::cout << argv[i] << std::endl;
-        } return 0;
+        }
+        return 0;
     };
     wchar_t* argv[3];
     // This works because call_main_from_wmain doesn't actually write
@@ -20,13 +22,15 @@ void wmain_test()
     QUtil::call_main_from_wmain(3, argv, realmain);
 }
 
-void cwmain_test()
+void
+cwmain_test()
 {
     // const args and function args
     auto realmain = [](int argc, char const* const argv[]) {
         for (int i = 0; i < argc; ++i) {
             std::cout << "const " << argv[i] << std::endl;
-        } return 0;
+        }
+        return 0;
     };
     wchar_t const* argv[3] = {
         L"ascii",
@@ -37,16 +41,14 @@ void cwmain_test()
 }
 #endif // QPDF_NO_WCHAR_T
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
 #ifndef QPDF_NO_WCHAR_T
-    try
-    {
+    try {
         wmain_test();
         cwmain_test();
-    }
-    catch (std::exception& e)
-    {
+    } catch (std::exception& e) {
         std::cout << "unexpected exception: " << e.what() << std::endl;
     }
 #endif // QPDF_NO_WCHAR_T

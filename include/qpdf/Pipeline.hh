@@ -47,8 +47,8 @@
 #include <qpdf/DLL.h>
 #include <qpdf/PointerHolder.hh>
 
-#include <string>
 #include <memory>
+#include <string>
 
 class QPDF_DLL_CLASS Pipeline
 {

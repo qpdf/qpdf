@@ -1,17 +1,18 @@
-#include <iostream>
-#include <string.h>
-#include <stdlib.h>
+#include <qpdf/Buffer.hh>
+#include <qpdf/QIntC.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
-#include <qpdf/QUtil.hh>
-#include <qpdf/Buffer.hh>
 #include <qpdf/QPDFWriter.hh>
-#include <qpdf/QIntC.hh>
+#include <qpdf/QUtil.hh>
+#include <iostream>
+#include <stdlib.h>
+#include <string.h>
 
 static char const* whoami = 0;
 
-void usage()
+void
+usage()
 {
     std::cerr << "Usage: " << whoami << " infile.pdf outfile.pdf [in-password]"
               << std::endl
@@ -35,8 +36,8 @@ class ImageInverter: public QPDFObjectHandle::StreamDataProvider
     virtual ~ImageInverter()
     {
     }
-    virtual void provideStreamData(int objid, int generation,
-                                   Pipeline* pipeline) override;
+    virtual void
+    provideStreamData(int objid, int generation, Pipeline* pipeline) override;
 
     void registerImage(
         QPDFObjectHandle image,
@@ -64,8 +65,7 @@ ImageInverter::registerImage(
     // generation number. Recall that a single image object may be
     // used more than once, so no need to update the same stream
     // multiple times.
-    if (this->copied_images.count(og) > 0)
-    {
+    if (this->copied_images.count(og) > 0) {
         return;
     }
     this->copied_images[og] = image.copyStream();
@@ -79,14 +79,12 @@ ImageInverter::registerImage(
     // filterable in the input QPDF object, so we don't have to deal
     // with it explicitly here. We could explicitly use /DCTDecode and
     // write through a DCT filter if we wanted.
-    image.replaceStreamData(self,
-                            QPDFObjectHandle::newNull(),
-                            QPDFObjectHandle::newNull());
+    image.replaceStreamData(
+        self, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
 }
 
 void
-ImageInverter::provideStreamData(int objid, int generation,
-                                 Pipeline* pipeline)
+ImageInverter::provideStreamData(int objid, int generation, Pipeline* pipeline)
 {
     // Use the object and generation number supplied to look up the
     // image data.  Then invert the image data and write the inverted
@@ -97,29 +95,27 @@ ImageInverter::provideStreamData(int objid, int generation,
     size_t size = data->getSize();
     unsigned char* buf = data->getBuffer();
     unsigned char ch;
-    for (size_t i = 0; i < size; ++i)
-    {
+    for (size_t i = 0; i < size; ++i) {
         ch = QIntC::to_uchar(0xff - buf[i]);
         pipeline->write(&ch, 1);
     }
     pipeline->finish();
 }
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     whoami = QUtil::getWhoami(argv[0]);
 
     // For test suite
     bool static_id = false;
-    if ((argc > 1) && (strcmp(argv[1], " --static-id") == 0))
-    {
+    if ((argc > 1) && (strcmp(argv[1], " --static-id") == 0)) {
         static_id = true;
         --argc;
         ++argv;
     }
 
-    if (! ((argc == 3) || (argc == 4)))
-    {
+    if (!((argc == 3) || (argc == 4))) {
         usage();
     }
 
@@ -127,8 +123,7 @@ int main(int argc, char* argv[])
     char const* outfilename = argv[2];
     char const* password = (argc == 4) ? argv[3] : "";
 
-    try
-    {
+    try {
         QPDF qpdf;
         qpdf.processFile(infilename, password);
 
@@ -139,18 +134,15 @@ int main(int argc, char* argv[])
         std::vector<QPDFPageObjectHelper> pages =
             QPDFPageDocumentHelper(qpdf).getAllPages();
         for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-             iter != pages.end(); ++iter)
-        {
+             iter != pages.end();
+             ++iter) {
             QPDFPageObjectHelper& page(*iter);
             // Get all images on the page.
-            std::map<std::string, QPDFObjectHandle> images =
-                page.getImages();
-            for (auto& iter2: images)
-            {
+            std::map<std::string, QPDFObjectHandle> images = page.getImages();
+            for (auto& iter2 : images) {
                 QPDFObjectHandle& image = iter2.second;
                 QPDFObjectHandle image_dict = image.getDict();
-                QPDFObjectHandle color_space =
-                    image_dict.getKey("/ColorSpace");
+                QPDFObjectHandle color_space = image_dict.getKey("/ColorSpace");
                 QPDFObjectHandle bits_per_component =
                     image_dict.getKey("/BitsPerComponent");
 
@@ -159,12 +151,10 @@ int main(int argc, char* argv[])
                 // pipeStreamData with a null pipeline to determine
                 // whether the image is filterable.  Directly inspect
                 // keys to determine the image type.
-                if (image.pipeStreamData(0, qpdf_ef_compress,
-                                         qpdf_dl_all) &&
+                if (image.pipeStreamData(0, qpdf_ef_compress, qpdf_dl_all) &&
                     color_space.isNameAndEquals("/DeviceGray") &&
                     bits_per_component.isInteger() &&
-                    (bits_per_component.getIntValue() == 8))
-                {
+                    (bits_per_component.getIntValue() == 8)) {
                     inv->registerImage(image, p);
                 }
             }
@@ -172,8 +162,7 @@ int main(int argc, char* argv[])
 
         // Write out a new file
         QPDFWriter w(qpdf, outfilename);
-        if (static_id)
-        {
+        if (static_id) {
             // For the test suite, uncompress streams and use static
             // IDs.
             w.setStaticID(true); // for testing only
@@ -181,9 +170,7 @@ int main(int argc, char* argv[])
         w.write();
         std::cout << whoami << ": new file written to " << outfilename
                   << std::endl;
-    }
-    catch (std::exception &e)
-    {
+    } catch (std::exception& e) {
         std::cerr << whoami << " processing file " << infilename << ": "
                   << e.what() << std::endl;
         exit(2);

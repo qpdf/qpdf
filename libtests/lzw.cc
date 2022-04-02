@@ -6,23 +6,21 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     bool early_code_change = true;
-    if ((argc == 4) && (strcmp(argv[3], "--no-early-code-change") == 0))
-    {
+    if ((argc == 4) && (strcmp(argv[3], "--no-early-code-change") == 0)) {
         early_code_change = false;
     }
 
-    if (argc < 3)
-    {
+    if (argc < 3) {
         std::cerr << "Usage: lzw infile outfile [ --no-early-code-change ]"
                   << std::endl;
         exit(2);
     }
 
-    try
-    {
+    try {
         char* infilename = argv[1];
         char* outfilename = argv[2];
 
@@ -34,22 +32,16 @@ int main(int argc, char* argv[])
 
         unsigned char buf[10000];
         bool done = false;
-        while (! done)
-        {
+        while (!done) {
             size_t len = fread(buf, 1, sizeof(buf), infile);
-            if (len <= 0)
-            {
+            if (len <= 0) {
                 done = true;
-            }
-            else
-            {
+            } else {
                 decode.write(buf, len);
             }
         }
         decode.finish();
-    }
-    catch (std::exception& e)
-    {
+    } catch (std::exception& e) {
         std::cerr << e.what() << std::endl;
         exit(2);
     }

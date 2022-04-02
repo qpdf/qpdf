@@ -1,10 +1,10 @@
 #include <qpdf/QPDFAnnotationObjectHelper.hh>
 
-#include <qpdf/QTC.hh>
-#include <qpdf/QPDFMatrix.hh>
-#include <qpdf/QUtil.hh>
 #include <qpdf/QPDF.hh>
+#include <qpdf/QPDFMatrix.hh>
 #include <qpdf/QPDFNameTreeObjectHelper.hh>
+#include <qpdf/QTC.hh>
+#include <qpdf/QUtil.hh>
 
 QPDFAnnotationObjectHelper::Members::~Members()
 {
@@ -40,8 +40,7 @@ QPDFAnnotationObjectHelper::getAppearanceDictionary()
 std::string
 QPDFAnnotationObjectHelper::getAppearanceState()
 {
-    if (this->oh.getKey("/AS").isName())
-    {
+    if (this->oh.getKey("/AS").isName()) {
         QTC::TC("qpdf", "QPDFAnnotationObjectHelper AS present");
         return this->oh.getKey("/AS").getName();
     }
@@ -58,25 +57,20 @@ QPDFAnnotationObjectHelper::getFlags()
 
 QPDFObjectHandle
 QPDFAnnotationObjectHelper::getAppearanceStream(
-    std::string const& which,
-    std::string const& state)
+    std::string const& which, std::string const& state)
 {
     QPDFObjectHandle ap = getAppearanceDictionary();
     std::string desired_state = state.empty() ? getAppearanceState() : state;
-    if (ap.isDictionary())
-    {
+    if (ap.isDictionary()) {
         QPDFObjectHandle ap_sub = ap.getKey(which);
-        if (ap_sub.isStream() && desired_state.empty())
-        {
+        if (ap_sub.isStream() && desired_state.empty()) {
             QTC::TC("qpdf", "QPDFAnnotationObjectHelper AP stream");
             return ap_sub;
         }
-        if (ap_sub.isDictionary() && (! desired_state.empty()))
-        {
+        if (ap_sub.isDictionary() && (!desired_state.empty())) {
             QTC::TC("qpdf", "QPDFAnnotationObjectHelper AP dictionary");
             QPDFObjectHandle ap_sub_val = ap_sub.getKey(desired_state);
-            if (ap_sub_val.isStream())
-            {
+            if (ap_sub_val.isStream()) {
                 QTC::TC("qpdf", "QPDFAnnotationObjectHelper AP sub stream");
                 return ap_sub_val;
             }
@@ -88,11 +82,12 @@ QPDFAnnotationObjectHelper::getAppearanceStream(
 
 std::string
 QPDFAnnotationObjectHelper::getPageContentForAppearance(
-    std::string const& name, int rotate,
-    int required_flags, int forbidden_flags)
+    std::string const& name,
+    int rotate,
+    int required_flags,
+    int forbidden_flags)
 {
-    if (! getAppearanceStream("/N").isStream())
-    {
+    if (!getAppearanceStream("/N").isStream()) {
         return "";
     }
 
@@ -181,35 +176,28 @@ QPDFAnnotationObjectHelper::getPageContentForAppearance(
     QPDFObjectHandle matrix_obj = as.getKey("/Matrix");
 
     int flags = getFlags();
-    if (flags & forbidden_flags)
-    {
+    if (flags & forbidden_flags) {
         QTC::TC("qpdf", "QPDFAnnotationObjectHelper forbidden flags");
         return "";
     }
-    if ((flags & required_flags) != required_flags)
-    {
+    if ((flags & required_flags) != required_flags) {
         QTC::TC("qpdf", "QPDFAnnotationObjectHelper missing required flags");
         return "";
     }
 
-    if (! (bbox_obj.isRectangle() && rect_obj.isRectangle()))
-    {
+    if (!(bbox_obj.isRectangle() && rect_obj.isRectangle())) {
         return "";
     }
     QPDFMatrix matrix;
-    if (matrix_obj.isMatrix())
-    {
+    if (matrix_obj.isMatrix()) {
         QTC::TC("qpdf", "QPDFAnnotationObjectHelper explicit matrix");
         matrix = QPDFMatrix(matrix_obj.getArrayAsMatrix());
-    }
-    else
-    {
+    } else {
         QTC::TC("qpdf", "QPDFAnnotationObjectHelper default matrix");
     }
     QPDFObjectHandle::Rectangle rect = rect_obj.getArrayAsRectangle();
     bool do_rotate = (rotate && (flags & an_no_rotate));
-    if (do_rotate)
-    {
+    if (do_rotate) {
         // If the the annotation flags include the NoRotate bit and
         // the page is rotated, we have to rotate the annotation about
         // its upper left corner by the same amount in the opposite
@@ -224,33 +212,23 @@ QPDFAnnotationObjectHelper::getPageContentForAppearance(
         matrix = mr;
         double rect_w = rect.urx - rect.llx;
         double rect_h = rect.ury - rect.lly;
-        switch (rotate)
-        {
-          case 90:
+        switch (rotate) {
+        case 90:
             QTC::TC("qpdf", "QPDFAnnotationObjectHelper rotate 90");
             rect = QPDFObjectHandle::Rectangle(
-                rect.llx,
-                rect.ury,
-                rect.llx + rect_h,
-                rect.ury + rect_w);
+                rect.llx, rect.ury, rect.llx + rect_h, rect.ury + rect_w);
             break;
-          case 180:
+        case 180:
             QTC::TC("qpdf", "QPDFAnnotationObjectHelper rotate 180");
             rect = QPDFObjectHandle::Rectangle(
-                rect.llx - rect_w,
-                rect.ury,
-                rect.llx,
-                rect.ury + rect_h);
+                rect.llx - rect_w, rect.ury, rect.llx, rect.ury + rect_h);
             break;
-          case 270:
+        case 270:
             QTC::TC("qpdf", "QPDFAnnotationObjectHelper rotate 270");
             rect = QPDFObjectHandle::Rectangle(
-                rect.llx - rect_h,
-                rect.ury - rect_w,
-                rect.llx,
-                rect.ury);
+                rect.llx - rect_h, rect.ury - rect_w, rect.llx, rect.ury);
             break;
-          default:
+        default:
             // ignore
             break;
         }
@@ -259,26 +237,21 @@ QPDFAnnotationObjectHelper::getPageContentForAppearance(
     // Transform bounding box by matrix to get T
     QPDFObjectHandle::Rectangle bbox = bbox_obj.getArrayAsRectangle();
     QPDFObjectHandle::Rectangle T = matrix.transformRectangle(bbox);
-    if ((T.urx == T.llx) || (T.ury == T.lly))
-    {
+    if ((T.urx == T.llx) || (T.ury == T.lly)) {
         // avoid division by zero
         return "";
     }
     // Compute a matrix to transform the appearance box to the rectangle
     QPDFMatrix AA;
     AA.translate(rect.llx, rect.lly);
-    AA.scale((rect.urx - rect.llx) / (T.urx - T.llx),
-             (rect.ury - rect.lly) / (T.ury - T.lly));
+    AA.scale(
+        (rect.urx - rect.llx) / (T.urx - T.llx),
+        (rect.ury - rect.lly) / (T.ury - T.lly));
     AA.translate(-T.llx, -T.lly);
-    if (do_rotate)
-    {
+    if (do_rotate) {
         AA.rotatex90(rotate);
     }
 
     as.replaceKey("/Subtype", QPDFObjectHandle::newName("/Form"));
-    return (
-        "q\n" +
-        AA.unparse() + " cm\n" +
-        name + " Do\n" +
-        "Q\n");
+    return ("q\n" + AA.unparse() + " cm\n" + name + " Do\n" + "Q\n");
 }

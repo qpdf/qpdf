@@ -25,8 +25,7 @@ ClosedFileInputSource::~ClosedFileInputSource()
 void
 ClosedFileInputSource::before()
 {
-    if (0 == this->m->fis.get())
-    {
+    if (0 == this->m->fis.get()) {
         this->m->fis = make_pointer_holder<FileInputSource>();
         this->m->fis->setFilename(this->m->filename.c_str());
         this->m->fis->seek(this->m->offset, SEEK_SET);
@@ -39,8 +38,7 @@ ClosedFileInputSource::after()
 {
     this->last_offset = this->m->fis->getLastOffset();
     this->m->offset = this->m->fis->tell();
-    if (this->m->stay_open)
-    {
+    if (this->m->stay_open) {
         return;
     }
     this->m->fis = 0;
@@ -82,8 +80,7 @@ void
 ClosedFileInputSource::rewind()
 {
     this->m->offset = 0;
-    if (this->m->fis.get())
-    {
+    if (this->m->fis.get()) {
         this->m->fis->rewind();
     }
 }
@@ -110,8 +107,7 @@ void
 ClosedFileInputSource::stayOpen(bool val)
 {
     this->m->stay_open = val;
-    if ((! val) && this->m->fis.get())
-    {
+    if ((!val) && this->m->fis.get()) {
         after();
     }
 }

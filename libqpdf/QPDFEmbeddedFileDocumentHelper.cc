@@ -37,11 +37,9 @@ QPDFEmbeddedFileDocumentHelper::QPDFEmbeddedFileDocumentHelper(QPDF& qpdf) :
 {
     auto root = qpdf.getRoot();
     auto names = root.getKey("/Names");
-    if (names.isDictionary())
-    {
+    if (names.isDictionary()) {
         auto embedded_files = names.getKey("/EmbeddedFiles");
-        if (embedded_files.isDictionary())
-        {
+        if (embedded_files.isDictionary()) {
             this->m->embedded_files =
                 std::make_shared<QPDFNameTreeObjectHelper>(
                     embedded_files, qpdf);
@@ -62,20 +60,17 @@ QPDFEmbeddedFileDocumentHelper::hasEmbeddedFiles() const
 void
 QPDFEmbeddedFileDocumentHelper::initEmbeddedFiles()
 {
-    if (hasEmbeddedFiles())
-    {
+    if (hasEmbeddedFiles()) {
         return;
     }
     auto root = qpdf.getRoot();
     auto names = root.getKey("/Names");
-    if (! names.isDictionary())
-    {
+    if (!names.isDictionary()) {
         names = QPDFObjectHandle::newDictionary();
         root.replaceKey("/Names", names);
     }
     auto embedded_files = names.getKey("/EmbeddedFiles");
-    if (! embedded_files.isDictionary())
-    {
+    if (!embedded_files.isDictionary()) {
         auto nth = QPDFNameTreeObjectHelper::newEmpty(this->qpdf);
         names.replaceKey("/EmbeddedFiles", nth.getObjectHandle());
         this->m->embedded_files =
@@ -87,11 +82,9 @@ std::shared_ptr<QPDFFileSpecObjectHelper>
 QPDFEmbeddedFileDocumentHelper::getEmbeddedFile(std::string const& name)
 {
     std::shared_ptr<QPDFFileSpecObjectHelper> result;
-    if (this->m->embedded_files)
-    {
+    if (this->m->embedded_files) {
         auto i = this->m->embedded_files->find(name);
-        if (i != this->m->embedded_files->end())
-        {
+        if (i != this->m->embedded_files->end()) {
             result = std::make_shared<QPDFFileSpecObjectHelper>(i->second);
         }
     }
@@ -101,14 +94,11 @@ QPDFEmbeddedFileDocumentHelper::getEmbeddedFile(std::string const& name)
 std::map<std::string, std::shared_ptr<QPDFFileSpecObjectHelper>>
 QPDFEmbeddedFileDocumentHelper::getEmbeddedFiles()
 {
-    std::map<std::string,
-             std::shared_ptr<QPDFFileSpecObjectHelper>> result;
-    if (this->m->embedded_files)
-    {
-        for (auto const& i: *(this->m->embedded_files))
-        {
-            result[i.first] = std::make_shared<QPDFFileSpecObjectHelper>(
-                i.second);
+    std::map<std::string, std::shared_ptr<QPDFFileSpecObjectHelper>> result;
+    if (this->m->embedded_files) {
+        for (auto const& i : *(this->m->embedded_files)) {
+            result[i.first] =
+                std::make_shared<QPDFFileSpecObjectHelper>(i.second);
         }
     }
     return result;
@@ -119,26 +109,22 @@ QPDFEmbeddedFileDocumentHelper::replaceEmbeddedFile(
     std::string const& name, QPDFFileSpecObjectHelper const& fs)
 {
     initEmbeddedFiles();
-    this->m->embedded_files->insert(
-        name, fs.getObjectHandle());
+    this->m->embedded_files->insert(name, fs.getObjectHandle());
 }
 
 bool
 QPDFEmbeddedFileDocumentHelper::removeEmbeddedFile(std::string const& name)
 {
-    if (! hasEmbeddedFiles())
-    {
+    if (!hasEmbeddedFiles()) {
         return false;
     }
     auto iter = this->m->embedded_files->find(name);
-    if (iter == this->m->embedded_files->end())
-    {
+    if (iter == this->m->embedded_files->end()) {
         return false;
     }
     auto oh = iter->second;
     iter.remove();
-    if (oh.isIndirect())
-    {
+    if (oh.isIndirect()) {
         this->qpdf.replaceObject(oh.getObjGen(), QPDFObjectHandle::newNull());
     }
 

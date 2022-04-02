@@ -2,15 +2,15 @@
 #include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/QUtil.hh>
 
-#include <stdio.h>
-#include <string.h>
 #include <iostream>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
-    if (argc != 4)
-    {
+    if (argc != 4) {
         std::cerr << "Usage: runlength {-encode|-decode} infile outfile"
                   << std::endl;
         exit(2);
@@ -26,17 +26,14 @@ int main(int argc, char* argv[])
     unsigned char buf[100];
     bool done = false;
     Pl_RunLength rl(
-        "runlength", &out,
+        "runlength",
+        &out,
         (encode ? Pl_RunLength::a_encode : Pl_RunLength::a_decode));
-    while (! done)
-    {
+    while (!done) {
         size_t len = fread(buf, 1, sizeof(buf), infile);
-        if (len <= 0)
-        {
+        if (len <= 0) {
             done = true;
-        }
-        else
-        {
+        } else {
             rl.write(buf, len);
         }
     }

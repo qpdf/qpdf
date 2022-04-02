@@ -23,16 +23,16 @@
 #define QUTIL_HH
 
 #include <qpdf/DLL.h>
-#include <qpdf/Types.h>
 #include <qpdf/PointerHolder.hh>
-#include <string>
-#include <list>
-#include <vector>
-#include <stdexcept>
+#include <qpdf/Types.h>
 #include <functional>
+#include <list>
 #include <memory>
+#include <stdexcept>
 #include <stdio.h>
+#include <string>
 #include <time.h>
+#include <vector>
 
 class RandomDataProvider;
 class Pipeline;
@@ -48,16 +48,16 @@ namespace QUtil
     QPDF_DLL
     std::string int_to_string_base(long long, int base, int length = 0);
     QPDF_DLL
-    std::string uint_to_string_base(unsigned long long, int base,
-                                    int length = 0);
+    std::string
+    uint_to_string_base(unsigned long long, int base, int length = 0);
     QPDF_DLL
     std::string double_to_string(double, int decimal_places = 0);
     // ABI: combine with other double_to_string by adding
     // trim_trailing_zeroes above as an optional parameter with a
     // default of true.
     QPDF_DLL
-    std::string double_to_string(double, int decimal_places,
-                                 bool trim_trailing_zeroes);
+    std::string
+    double_to_string(double, int decimal_places, bool trim_trailing_zeroes);
 
     // These string to number methods throw std::runtime_error on
     // underflow/overflow.
@@ -217,8 +217,14 @@ namespace QUtil
         QPDFTime() = default;
         QPDFTime(QPDFTime const&) = default;
         QPDFTime& operator=(QPDFTime const&) = default;
-        QPDFTime(int year, int month, int day, int hour,
-                 int minute, int second, int tz_delta) :
+        QPDFTime(
+            int year,
+            int month,
+            int day,
+            int hour,
+            int minute,
+            int second,
+            int tz_delta) :
             year(year),
             month(month),
             day(day),
@@ -228,13 +234,13 @@ namespace QUtil
             tz_delta(tz_delta)
         {
         }
-        int year;               // actual year, no 1900 stuff
-        int month;              // 1--12
-        int day;                // 1--31
+        int year;  // actual year, no 1900 stuff
+        int month; // 1--12
+        int day;   // 1--31
         int hour;
         int minute;
         int second;
-        int tz_delta;           // minutes before UTC
+        int tz_delta; // minutes before UTC
     };
 
     QPDF_DLL
@@ -284,17 +290,16 @@ namespace QUtil
     // encoding system by replacing all unsupported characters with
     // the given unknown_char.
     QPDF_DLL
-    std::string utf8_to_ascii(
-        std::string const& utf8, char unknown_char = '?');
+    std::string utf8_to_ascii(std::string const& utf8, char unknown_char = '?');
     QPDF_DLL
-    std::string utf8_to_win_ansi(
-        std::string const& utf8, char unknown_char = '?');
+    std::string
+    utf8_to_win_ansi(std::string const& utf8, char unknown_char = '?');
     QPDF_DLL
-    std::string utf8_to_mac_roman(
-        std::string const& utf8, char unknown_char = '?');
+    std::string
+    utf8_to_mac_roman(std::string const& utf8, char unknown_char = '?');
     QPDF_DLL
-    std::string utf8_to_pdf_doc(
-        std::string const& utf8, char unknown_char = '?');
+    std::string
+    utf8_to_pdf_doc(std::string const& utf8, char unknown_char = '?');
 
     // These versions return true if the conversion was successful and
     // false if any unrepresentable characters were found and had to
@@ -338,10 +343,11 @@ namespace QUtil
     // the PDF spec requires UTF-16 to be UTF-16BE, qpdf (and just
     // about everything else) accepts UTF-16LE (as of 10.6.2).
     QPDF_DLL
-    void analyze_encoding(std::string const& str,
-                          bool& has_8bit_chars,
-                          bool& is_valid_utf8,
-                          bool& is_utf16);
+    void analyze_encoding(
+        std::string const& str,
+        bool& has_8bit_chars,
+        bool& is_valid_utf8,
+        bool& is_utf16);
 
     // Try to compensate for previously incorrectly encoded strings.
     // We want to compensate for the following errors:
@@ -398,14 +404,14 @@ namespace QUtil
     // Filename is UTF-8 encoded, even on Windows, as described in the
     // comments for safe_fopen.
     QPDF_DLL
-    std::list<std::string> read_lines_from_file(
-        char const* filename, bool preserve_eol = false);
+    std::list<std::string>
+    read_lines_from_file(char const* filename, bool preserve_eol = false);
     QPDF_DLL
-    std::list<std::string> read_lines_from_file(
-        std::istream&, bool preserve_eol = false);
+    std::list<std::string>
+    read_lines_from_file(std::istream&, bool preserve_eol = false);
     QPDF_DLL
-    std::list<std::string> read_lines_from_file(
-        FILE*, bool preserve_eol = false);
+    std::list<std::string>
+    read_lines_from_file(FILE*, bool preserve_eol = false);
     QPDF_DLL
     void read_lines_from_file(
         std::function<bool(char&)> next_char,
@@ -420,7 +426,7 @@ namespace QUtil
     // platforms, so we have to give it a name that is not likely to
     // be a macro anywhere.
     QPDF_DLL
-    int str_compare_nocase(char const *, char const *);
+    int str_compare_nocase(char const*, char const*);
 
     // These routines help the tokenizer recognize certain character
     // classes without using ctype, which we avoid because of locale
@@ -454,13 +460,13 @@ namespace QUtil
     // another main.
     QPDF_DLL
     int call_main_from_wmain(
-        int argc, wchar_t* argv[],
-        std::function<int(int, char*[])> realmain);
+        int argc, wchar_t* argv[], std::function<int(int, char*[])> realmain);
     QPDF_DLL
     int call_main_from_wmain(
-        int argc, wchar_t const* const argv[],
+        int argc,
+        wchar_t const* const argv[],
         std::function<int(int, char const* const[])> realmain);
 #endif // QPDF_NO_WCHAR_T
-};
+};     // namespace QUtil
 
 #endif // QUTIL_HH

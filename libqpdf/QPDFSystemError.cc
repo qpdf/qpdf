@@ -3,8 +3,8 @@
 #include <qpdf/QUtil.hh>
 #include <string.h>
 
-QPDFSystemError::QPDFSystemError(std::string const& description,
-                                 int system_errno) :
+QPDFSystemError::QPDFSystemError(
+    std::string const& description, int system_errno) :
     std::runtime_error(createWhat(description, system_errno)),
     description(description),
     system_errno(system_errno)
@@ -16,8 +16,7 @@ QPDFSystemError::~QPDFSystemError() noexcept
 }
 
 std::string
-QPDFSystemError::createWhat(std::string const& description,
-                            int system_errno)
+QPDFSystemError::createWhat(std::string const& description, int system_errno)
 {
     std::string message;
 #ifdef _MSC_VER
@@ -25,12 +24,9 @@ QPDFSystemError::createWhat(std::string const& description,
     // message is longer.  strerror_s is a templated function that
     // knows the size of buf and truncates.
     char buf[94];
-    if (strerror_s(buf, system_errno) != 0)
-    {
+    if (strerror_s(buf, system_errno) != 0) {
         message = description + ": failed with an unknown error";
-    }
-    else
-    {
+    } else {
         message = description + ": " + buf;
     }
 #else

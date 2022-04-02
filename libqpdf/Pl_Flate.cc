@@ -1,16 +1,15 @@
 #include <qpdf/Pl_Flate.hh>
 
-#include <zlib.h>
-#include <string.h>
 #include <limits.h>
+#include <string.h>
+#include <zlib.h>
 
-#include <qpdf/QUtil.hh>
 #include <qpdf/QIntC.hh>
+#include <qpdf/QUtil.hh>
 
 int Pl_Flate::compression_level = Z_DEFAULT_COMPRESSION;
 
-Pl_Flate::Members::Members(size_t out_bufsize,
-                           action_e action) :
+Pl_Flate::Members::Members(size_t out_bufsize, action_e action) :
     out_bufsize(out_bufsize),
     action(action),
     initialized(false),
@@ -24,11 +23,9 @@ Pl_Flate::Members::Members(size_t out_bufsize,
     // Windows environment.
     this->zdata = new z_stream;
 
-    if (out_bufsize > UINT_MAX)
-    {
-        throw std::runtime_error(
-            "Pl_Flate: zlib doesn't support buffer"
-            " sizes larger than unsigned int");
+    if (out_bufsize > UINT_MAX) {
+        throw std::runtime_error("Pl_Flate: zlib doesn't support buffer"
+                                 " sizes larger than unsigned int");
     }
 
     z_stream& zstream = *(static_cast<z_stream*>(this->zdata));
@@ -43,15 +40,11 @@ Pl_Flate::Members::Members(size_t out_bufsize,
 
 Pl_Flate::Members::~Members()
 {
-    if (this->initialized)
-    {
+    if (this->initialized) {
         z_stream& zstream = *(static_cast<z_stream*>(this->zdata));
-        if (action == a_deflate)
-        {
+        if (action == a_deflate) {
             deflateEnd(&zstream);
-        }
-        else
-        {
+        } else {
             inflateEnd(&zstream);
         }
     }
@@ -60,8 +53,11 @@ Pl_Flate::Members::~Members()
     this->zdata = 0;
 }
 
-Pl_Flate::Pl_Flate(char const* identifier, Pipeline* next,
-                   action_e action, unsigned int out_bufsize_int) :
+Pl_Flate::Pl_Flate(
+    char const* identifier,
+    Pipeline* next,
+    action_e action,
+    unsigned int out_bufsize_int) :
     Pipeline(identifier, next),
     m(new Members(QIntC::to_size(out_bufsize_int), action))
 {
@@ -80,8 +76,7 @@ Pl_Flate::setWarnCallback(std::function<void(char const*, int)> callback)
 void
 Pl_Flate::warn(char const* msg, int code)
 {
-    if (this->m->callback != nullptr)
-    {
+    if (this->m->callback != nullptr) {
         this->m->callback(msg, code);
     }
 }
@@ -89,8 +84,7 @@ Pl_Flate::warn(char const* msg, int code)
 void
 Pl_Flate::write(unsigned char* data, size_t len)
 {
-    if (this->m->outbuf.get() == 0)
-    {
+    if (this->m->outbuf.get() == 0) {
         throw std::logic_error(
             this->identifier +
             ": Pl_Flate: write() called after finish() called");
@@ -101,11 +95,12 @@ Pl_Flate::write(unsigned char* data, size_t len)
     static size_t const max_bytes = 1 << 30;
     size_t bytes_left = len;
     unsigned char* buf = data;
-    while (bytes_left > 0)
-    {
+    while (bytes_left > 0) {
         size_t bytes = (bytes_left >= max_bytes ? max_bytes : bytes_left);
-        handleData(buf, bytes,
-                   (this->m->action == a_inflate ? Z_SYNC_FLUSH : Z_NO_FLUSH));
+        handleData(
+            buf,
+            bytes,
+            (this->m->action == a_inflate ? Z_SYNC_FLUSH : Z_NO_FLUSH));
         bytes_left -= bytes;
         buf += bytes;
     }
@@ -114,38 +109,34 @@ Pl_Flate::write(unsigned char* data, size_t len)
 void
 Pl_Flate::handleData(unsigned char* data, size_t len, int flush)
 {
-    if (len > UINT_MAX)
-    {
-        throw std::runtime_error(
-            "Pl_Flate: zlib doesn't support data"
-            " blocks larger than int");
+    if (len > UINT_MAX) {
+        throw std::runtime_error("Pl_Flate: zlib doesn't support data"
+                                 " blocks larger than int");
     }
     z_stream& zstream = *(static_cast<z_stream*>(this->m->zdata));
     zstream.next_in = data;
     zstream.avail_in = QIntC::to_uint(len);
 
-    if (! this->m->initialized)
-    {
+    if (!this->m->initialized) {
         int err = Z_OK;
 
         // deflateInit and inflateInit are macros that use old-style
         // casts.
-#if ((defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
-     defined(__clang__))
-#       pragma GCC diagnostic push
-#       pragma GCC diagnostic ignored "-Wold-style-cast"
+#if ( \
+    (defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
+    defined(__clang__))
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wold-style-cast"
 #endif
-        if (this->m->action == a_deflate)
-        {
+        if (this->m->action == a_deflate) {
             err = deflateInit(&zstream, compression_level);
-        }
-        else
-        {
+        } else {
             err = inflateInit(&zstream);
         }
-#if ((defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
-     defined(__clang__))
-#       pragma GCC diagnostic pop
+#if ( \
+    (defined(__GNUC__) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406) || \
+    defined(__clang__))
+# pragma GCC diagnostic pop
 #endif
 
         checkError("Init", err);
@@ -155,27 +146,21 @@ Pl_Flate::handleData(unsigned char* data, size_t len, int flush)
     int err = Z_OK;
 
     bool done = false;
-    while (! done)
-    {
-        if (this->m->action == a_deflate)
-        {
+    while (!done) {
+        if (this->m->action == a_deflate) {
             err = deflate(&zstream, flush);
-        }
-        else
-        {
+        } else {
             err = inflate(&zstream, flush);
         }
         if ((this->m->action == a_inflate) && (err != Z_OK) && zstream.msg &&
-            (strcmp(zstream.msg, "incorrect data check") == 0))
-        {
+            (strcmp(zstream.msg, "incorrect data check") == 0)) {
             // Other PDF readers ignore this specific error. Combining
             // this with Z_SYNC_FLUSH enables qpdf to handle some
             // broken zlib streams without losing data.
             err = Z_STREAM_END;
         }
-        switch (err)
-        {
-          case Z_BUF_ERROR:
+        switch (err) {
+        case Z_BUF_ERROR:
             // Probably shouldn't be able to happen, but possible as a
             // boundary condition: if the last call to inflate exactly
             // filled the output buffer, it's possible that the next
@@ -185,20 +170,17 @@ Pl_Flate::handleData(unsigned char* data, size_t len, int flush)
             // to know about this, because it indicates incorrect
             // compression, so call a callback if provided.
             this->warn(
-                "input stream is complete but output may still be valid",
-                err);
+                "input stream is complete but output may still be valid", err);
             done = true;
             break;
 
-          case Z_STREAM_END:
+        case Z_STREAM_END:
             done = true;
             // fall through
 
-          case Z_OK:
+        case Z_OK:
             {
-                if ((zstream.avail_in == 0) &&
-                    (zstream.avail_out > 0))
-                {
+                if ((zstream.avail_in == 0) && (zstream.avail_out > 0)) {
                     // There is nothing left to read, and there was
                     // sufficient buffer space to write everything we
                     // needed, so we're done for now.
@@ -206,8 +188,7 @@ Pl_Flate::handleData(unsigned char* data, size_t len, int flush)
                 }
                 uLong ready =
                     QIntC::to_ulong(this->m->out_bufsize - zstream.avail_out);
-                if (ready > 0)
-                {
+                if (ready > 0) {
                     this->getNext()->write(this->m->outbuf.get(), ready);
                     zstream.next_out = this->m->outbuf.get();
                     zstream.avail_out = QIntC::to_uint(this->m->out_bufsize);
@@ -215,7 +196,7 @@ Pl_Flate::handleData(unsigned char* data, size_t len, int flush)
             }
             break;
 
-          default:
+        default:
             this->checkError("data", err);
             break;
         }
@@ -225,23 +206,17 @@ Pl_Flate::handleData(unsigned char* data, size_t len, int flush)
 void
 Pl_Flate::finish()
 {
-    try
-    {
-        if (this->m->outbuf.get())
-        {
-            if (this->m->initialized)
-            {
+    try {
+        if (this->m->outbuf.get()) {
+            if (this->m->initialized) {
                 z_stream& zstream = *(static_cast<z_stream*>(this->m->zdata));
                 unsigned char buf[1];
                 buf[0] = '\0';
                 handleData(buf, 0, Z_FINISH);
                 int err = Z_OK;
-                if (this->m->action == a_deflate)
-                {
+                if (this->m->action == a_deflate) {
                     err = deflateEnd(&zstream);
-                }
-                else
-                {
+                } else {
                     err = inflateEnd(&zstream);
                 }
                 this->m->initialized = false;
@@ -250,15 +225,10 @@ Pl_Flate::finish()
 
             this->m->outbuf = 0;
         }
-    }
-    catch (std::exception& e)
-    {
-        try
-        {
+    } catch (std::exception& e) {
+        try {
             this->getNext()->finish();
-        }
-        catch (...)
-        {
+        } catch (...) {
             // ignore secondary exception
         }
         throw std::runtime_error(e.what());
@@ -276,46 +246,41 @@ void
 Pl_Flate::checkError(char const* prefix, int error_code)
 {
     z_stream& zstream = *(static_cast<z_stream*>(this->m->zdata));
-    if (error_code != Z_OK)
-    {
+    if (error_code != Z_OK) {
         char const* action_str =
             (this->m->action == a_deflate ? "deflate" : "inflate");
         std::string msg =
             this->identifier + ": " + action_str + ": " + prefix + ": ";
 
-        if (zstream.msg)
-        {
+        if (zstream.msg) {
             msg += zstream.msg;
-        }
-        else
-        {
-            switch (error_code)
-            {
-              case Z_ERRNO:
+        } else {
+            switch (error_code) {
+            case Z_ERRNO:
                 msg += "zlib system error";
                 break;
 
-              case Z_STREAM_ERROR:
+            case Z_STREAM_ERROR:
                 msg += "zlib stream error";
                 break;
 
-              case Z_DATA_ERROR:
+            case Z_DATA_ERROR:
                 msg += "zlib data error";
                 break;
 
-              case Z_MEM_ERROR:
+            case Z_MEM_ERROR:
                 msg += "zlib memory error";
                 break;
 
-              case Z_BUF_ERROR:
+            case Z_BUF_ERROR:
                 msg += "zlib buffer error";
                 break;
 
-              case Z_VERSION_ERROR:
+            case Z_VERSION_ERROR:
                 msg += "zlib version error";
                 break;
 
-              default:
+            default:
                 msg += std::string("zlib unknown error (") +
                     QUtil::int_to_string(error_code) + ")";
                 break;

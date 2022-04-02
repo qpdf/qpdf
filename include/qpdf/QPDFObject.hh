@@ -22,10 +22,10 @@
 #ifndef QPDFOBJECT_HH
 #define QPDFOBJECT_HH
 
-#include <qpdf/DLL.h>
-#include <qpdf/Types.h>
-#include <qpdf/JSON.hh>
 #include <qpdf/Constants.h>
+#include <qpdf/DLL.h>
+#include <qpdf/JSON.hh>
+#include <qpdf/Types.h>
 
 #include <string>
 
@@ -62,7 +62,9 @@ class QPDF_DLL_CLASS QPDFObject
     static constexpr object_type_e ot_operator = ::ot_operator;
     static constexpr object_type_e ot_inlineimage = ::ot_inlineimage;
 
-    virtual ~QPDFObject() {}
+    virtual ~QPDFObject()
+    {
+    }
     virtual std::string unparse() = 0;
     virtual JSON getJSON() = 0;
 
@@ -78,11 +80,12 @@ class QPDF_DLL_CLASS QPDFObject
     {
         friend class QPDF;
         friend class QPDFObjectHandle;
+
       private:
-        static void releaseResolved(QPDFObject* o)
+        static void
+        releaseResolved(QPDFObject* o)
         {
-            if (o)
-            {
+            if (o) {
                 o->releaseResolved();
             }
         }
@@ -97,7 +100,10 @@ class QPDF_DLL_CLASS QPDFObject
     qpdf_offset_t getParsedOffset();
 
   protected:
-    virtual void releaseResolved() {}
+    virtual void
+    releaseResolved()
+    {
+    }
 
   private:
     QPDFObject(QPDFObject const&) = delete;

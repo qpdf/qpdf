@@ -33,9 +33,9 @@
 // For this pipeline, "next" may be null.  If a next pointer is
 // provided, this pipeline will also pass the data through to it.
 
+#include <qpdf/Buffer.hh>
 #include <qpdf/Pipeline.hh>
 #include <qpdf/PointerHolder.hh>
-#include <qpdf/Buffer.hh>
 
 #include <memory>
 
@@ -68,7 +68,7 @@ class Pl_Buffer: public Pipeline
     // a buffer of size *len allocated with malloc(). It is the
     // caller's responsibility to call free() on the buffer.
     QPDF_DLL
-    void getMallocBuffer(unsigned char **buf, size_t* len);
+    void getMallocBuffer(unsigned char** buf, size_t* len);
 
   private:
     class Members

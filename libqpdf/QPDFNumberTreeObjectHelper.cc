@@ -6,20 +6,21 @@
 class NumberTreeDetails: public NNTreeDetails
 {
   public:
-    virtual std::string const& itemsKey() const override
+    virtual std::string const&
+    itemsKey() const override
     {
         static std::string k("/Nums");
         return k;
     }
-    virtual bool keyValid(QPDFObjectHandle oh) const override
+    virtual bool
+    keyValid(QPDFObjectHandle oh) const override
     {
         return oh.isInteger();
     }
-    virtual int compareKeys(
-        QPDFObjectHandle a, QPDFObjectHandle b) const override
+    virtual int
+    compareKeys(QPDFObjectHandle a, QPDFObjectHandle b) const override
     {
-        if (! (keyValid(a) && keyValid(b)))
-        {
+        if (!(keyValid(a) && keyValid(b))) {
             // We don't call this without calling keyValid first
             throw std::logic_error("comparing invalid keys");
         }
@@ -92,14 +93,11 @@ QPDFNumberTreeObjectHelper::iterator::operator--()
 void
 QPDFNumberTreeObjectHelper::iterator::updateIValue()
 {
-    if (impl->valid())
-    {
+    if (impl->valid()) {
         auto p = *impl;
         this->ivalue.first = p->first.getIntValue();
         this->ivalue.second = p->second;
-    }
-    else
-    {
+    } else {
         this->ivalue.first = 0;
         this->ivalue.second = QPDFObjectHandle();
     }
@@ -159,36 +157,32 @@ QPDFNumberTreeObjectHelper::last() const
 }
 
 QPDFNumberTreeObjectHelper::iterator
-QPDFNumberTreeObjectHelper::find(numtree_number key,
-                                 bool return_prev_if_not_found)
+QPDFNumberTreeObjectHelper::find(
+    numtree_number key, bool return_prev_if_not_found)
 {
-    auto i = this->m->impl->find(QPDFObjectHandle::newInteger(key),
-                                 return_prev_if_not_found);
+    auto i = this->m->impl->find(
+        QPDFObjectHandle::newInteger(key), return_prev_if_not_found);
     return iterator(std::make_shared<NNTreeIterator>(i));
 }
 
 QPDFNumberTreeObjectHelper::iterator
 QPDFNumberTreeObjectHelper::insert(numtree_number key, QPDFObjectHandle value)
 {
-    auto i = this->m->impl->insert(
-        QPDFObjectHandle::newInteger(key), value);
+    auto i = this->m->impl->insert(QPDFObjectHandle::newInteger(key), value);
     return iterator(std::make_shared<NNTreeIterator>(i));
 }
 
 bool
-QPDFNumberTreeObjectHelper::remove(numtree_number key,
-                                   QPDFObjectHandle* value)
+QPDFNumberTreeObjectHelper::remove(numtree_number key, QPDFObjectHandle* value)
 {
-    return this->m->impl->remove(
-        QPDFObjectHandle::newInteger(key), value);
+    return this->m->impl->remove(QPDFObjectHandle::newInteger(key), value);
 }
 
 QPDFNumberTreeObjectHelper::numtree_number
 QPDFNumberTreeObjectHelper::getMin()
 {
     auto i = begin();
-    if (i == end())
-    {
+    if (i == end()) {
         return 0;
     }
     return i->first;
@@ -198,8 +192,7 @@ QPDFNumberTreeObjectHelper::numtree_number
 QPDFNumberTreeObjectHelper::getMax()
 {
     auto i = last();
-    if (i == end())
-    {
+    if (i == end()) {
         return 0;
     }
     return i->first;
@@ -213,12 +206,10 @@ QPDFNumberTreeObjectHelper::hasIndex(numtree_number idx)
 }
 
 bool
-QPDFNumberTreeObjectHelper::findObject(
-    numtree_number idx, QPDFObjectHandle& oh)
+QPDFNumberTreeObjectHelper::findObject(numtree_number idx, QPDFObjectHandle& oh)
 {
     auto i = find(idx);
-    if (i == end())
-    {
+    if (i == end()) {
         return false;
     }
     oh = i->second;
@@ -227,12 +218,10 @@ QPDFNumberTreeObjectHelper::findObject(
 
 bool
 QPDFNumberTreeObjectHelper::findObjectAtOrBelow(
-    numtree_number idx, QPDFObjectHandle& oh,
-    numtree_number& offset)
+    numtree_number idx, QPDFObjectHandle& oh, numtree_number& offset)
 {
     auto i = find(idx, true);
-    if (i == end())
-    {
+    if (i == end()) {
         return false;
     }
     oh = i->second;

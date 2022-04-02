@@ -1,7 +1,7 @@
 #include <qpdf/QPDF_Dictionary.hh>
 
-#include <qpdf/QPDF_Null.hh>
 #include <qpdf/QPDF_Name.hh>
+#include <qpdf/QPDF_Null.hh>
 
 QPDF_Dictionary::QPDF_Dictionary(
     std::map<std::string, QPDFObjectHandle> const& items) :
@@ -18,8 +18,8 @@ QPDF_Dictionary::releaseResolved()
 {
     for (std::map<std::string, QPDFObjectHandle>::iterator iter =
              this->items.begin();
-         iter != this->items.end(); ++iter)
-    {
+         iter != this->items.end();
+         ++iter) {
         QPDFObjectHandle::ReleaseResolver::releaseResolved((*iter).second);
     }
 }
@@ -30,10 +30,10 @@ QPDF_Dictionary::unparse()
     std::string result = "<< ";
     for (std::map<std::string, QPDFObjectHandle>::iterator iter =
              this->items.begin();
-         iter != this->items.end(); ++iter)
-    {
-        result += QPDF_Name::normalizeName((*iter).first) +
-            " " + (*iter).second.unparse() + " ";
+         iter != this->items.end();
+         ++iter) {
+        result += QPDF_Name::normalizeName((*iter).first) + " " +
+            (*iter).second.unparse() + " ";
     }
     result += ">>";
     return result;
@@ -45,10 +45,10 @@ QPDF_Dictionary::getJSON()
     JSON j = JSON::makeDictionary();
     for (std::map<std::string, QPDFObjectHandle>::iterator iter =
              this->items.begin();
-         iter != this->items.end(); ++iter)
-    {
-        j.addDictionaryMember(QPDF_Name::normalizeName((*iter).first),
-                              (*iter).second.getJSON());
+         iter != this->items.end();
+         ++iter) {
+        j.addDictionaryMember(
+            QPDF_Name::normalizeName((*iter).first), (*iter).second.getJSON());
     }
     return j;
 }
@@ -74,8 +74,7 @@ QPDF_Dictionary::setDescription(QPDF* qpdf, std::string const& description)
 bool
 QPDF_Dictionary::hasKey(std::string const& key)
 {
-    return ((this->items.count(key) > 0) &&
-            (! this->items[key].isNull()));
+    return ((this->items.count(key) > 0) && (!this->items[key].isNull()));
 }
 
 QPDFObjectHandle
@@ -83,18 +82,14 @@ QPDF_Dictionary::getKey(std::string const& key)
 {
     // PDF spec says fetching a non-existent key from a dictionary
     // returns the null object.
-    if (this->items.count(key))
-    {
+    if (this->items.count(key)) {
         // May be a null object
         return (*(this->items.find(key))).second;
-    }
-    else
-    {
+    } else {
         QPDFObjectHandle null = QPDFObjectHandle::newNull();
         QPDF* qpdf = 0;
         std::string description;
-        if (getDescription(qpdf, description))
-        {
+        if (getDescription(qpdf, description)) {
             null.setObjectDescription(
                 qpdf, description + " -> dictionary key " + key);
         }
@@ -108,10 +103,9 @@ QPDF_Dictionary::getKeys()
     std::set<std::string> result;
     for (std::map<std::string, QPDFObjectHandle>::const_iterator iter =
              this->items.begin();
-         iter != this->items.end(); ++iter)
-    {
-        if (hasKey((*iter).first))
-        {
+         iter != this->items.end();
+         ++iter) {
+        if (hasKey((*iter).first)) {
             result.insert((*iter).first);
         }
     }
@@ -125,8 +119,7 @@ QPDF_Dictionary::getAsMap() const
 }
 
 void
-QPDF_Dictionary::replaceKey(std::string const& key,
-                            QPDFObjectHandle value)
+QPDF_Dictionary::replaceKey(std::string const& key, QPDFObjectHandle value)
 {
     // add or replace value
     this->items[key] = value;
@@ -140,15 +133,12 @@ QPDF_Dictionary::removeKey(std::string const& key)
 }
 
 void
-QPDF_Dictionary::replaceOrRemoveKey(std::string const& key,
-                                    QPDFObjectHandle value)
+QPDF_Dictionary::replaceOrRemoveKey(
+    std::string const& key, QPDFObjectHandle value)
 {
-    if (value.isNull())
-    {
+    if (value.isNull()) {
         removeKey(key);
-    }
-    else
-    {
+    } else {
         replaceKey(key, value);
     }
 }

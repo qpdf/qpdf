@@ -10,7 +10,8 @@
 
 static char const* whoami = 0;
 
-static void usage()
+static void
+usage()
 {
     fprintf(stderr, "Usage: %s infile infile-password outfile\n", whoami);
     exit(2);
@@ -33,12 +34,9 @@ modify_file(qpdf_data qpdf)
     /* 0 is never a valid qpdf_oh */
     qpdf_oh pagemode = 0;
     if (qpdf_oh_is_dictionary(
-            qpdf, qpdf_oh_get_key(qpdf, root, "/PageLabels")))
-    {
+            qpdf, qpdf_oh_get_key(qpdf, root, "/PageLabels"))) {
         pagemode = qpdf_oh_new_name(qpdf, "/UseOutlines");
-    }
-    else
-    {
+    } else {
         pagemode = qpdf_oh_new_null(qpdf);
     }
     qpdf_oh_replace_or_remove_key(qpdf, root, "/PageMode", pagemode);
@@ -46,7 +44,8 @@ modify_file(qpdf_data qpdf)
     return QPDF_TRUE;
 }
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     char* infile = NULL;
     char* password = NULL;
@@ -56,21 +55,15 @@ int main(int argc, char* argv[])
     int errors = 0;
     char* p = 0;
 
-    if ((p = strrchr(argv[0], '/')) != NULL)
-    {
+    if ((p = strrchr(argv[0], '/')) != NULL) {
         whoami = p + 1;
-    }
-    else if ((p = strrchr(argv[0], '\\')) != NULL)
-    {
+    } else if ((p = strrchr(argv[0], '\\')) != NULL) {
         whoami = p + 1;
-    }
-    else
-    {
+    } else {
         whoami = argv[0];
     }
 
-    if (argc != 4)
-    {
+    if (argc != 4) {
         usage();
     }
 
@@ -80,33 +73,29 @@ int main(int argc, char* argv[])
 
     if (((qpdf_read(qpdf, infile, password) & QPDF_ERRORS) == 0) &&
         modify_file(qpdf) &&
-        ((qpdf_init_write(qpdf, outfile) & QPDF_ERRORS) == 0))
-    {
+        ((qpdf_init_write(qpdf, outfile) & QPDF_ERRORS) == 0)) {
         /* Use static ID for testing only. For production, a
          * non-static ID is used. See also
          * qpdf_set_deterministic_ID. */
         qpdf_set_static_ID(qpdf, QPDF_TRUE); /* for testing only */
         qpdf_write(qpdf);
     }
-    while (qpdf_more_warnings(qpdf))
-    {
+    while (qpdf_more_warnings(qpdf)) {
         warnings = 1;
-        printf("warning: %s\n",
-               qpdf_get_error_full_text(qpdf, qpdf_next_warning(qpdf)));
+        printf(
+            "warning: %s\n",
+            qpdf_get_error_full_text(qpdf, qpdf_next_warning(qpdf)));
     }
-    if (qpdf_has_error(qpdf))
-    {
+    if (qpdf_has_error(qpdf)) {
         errors = 1;
-        printf("error: %s\n",
-               qpdf_get_error_full_text(qpdf, qpdf_get_error(qpdf)));
+        printf(
+            "error: %s\n",
+            qpdf_get_error_full_text(qpdf, qpdf_get_error(qpdf)));
     }
     qpdf_cleanup(&qpdf);
-    if (errors)
-    {
+    if (errors) {
         return 2;
-    }
-    else if (warnings)
-    {
+    } else if (warnings) {
         return 3;
     }
 

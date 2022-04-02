@@ -29,16 +29,15 @@
 
 /* Error Codes */
 
-enum qpdf_error_code_e
-{
+enum qpdf_error_code_e {
     qpdf_e_success = 0,
-    qpdf_e_internal,            /* logic/programming error -- indicates bug */
-    qpdf_e_system,              /* I/O error, memory error, etc. */
-    qpdf_e_unsupported,         /* PDF feature not (yet) supported by qpdf */
-    qpdf_e_password,            /* incorrect password for encrypted file */
-    qpdf_e_damaged_pdf,         /* syntax errors or other damage in PDF */
-    qpdf_e_pages,               /* erroneous or unsupported pages structure */
-    qpdf_e_object,              /* type/bounds errors accessing objects */
+    qpdf_e_internal,    /* logic/programming error -- indicates bug */
+    qpdf_e_system,      /* I/O error, memory error, etc. */
+    qpdf_e_unsupported, /* PDF feature not (yet) supported by qpdf */
+    qpdf_e_password,    /* incorrect password for encrypted file */
+    qpdf_e_damaged_pdf, /* syntax errors or other damage in PDF */
+    qpdf_e_pages,       /* erroneous or unsupported pages structure */
+    qpdf_e_object,      /* type/bounds errors accessing objects */
 };
 
 /* Object Types */
@@ -75,62 +74,56 @@ enum qpdf_object_type_e {
 
 /* Write Parameters. See QPDFWriter.hh for details. */
 
-enum qpdf_object_stream_e
-{
-    qpdf_o_disable = 0,         /* disable object streams */
-    qpdf_o_preserve,            /* preserve object streams */
-    qpdf_o_generate             /* generate object streams */
+enum qpdf_object_stream_e {
+    qpdf_o_disable = 0, /* disable object streams */
+    qpdf_o_preserve,    /* preserve object streams */
+    qpdf_o_generate     /* generate object streams */
 };
-enum qpdf_stream_data_e
-{
-    qpdf_s_uncompress = 0,      /* uncompress stream data */
-    qpdf_s_preserve,            /* preserve stream data compression */
-    qpdf_s_compress             /* compress stream data */
+enum qpdf_stream_data_e {
+    qpdf_s_uncompress = 0, /* uncompress stream data */
+    qpdf_s_preserve,       /* preserve stream data compression */
+    qpdf_s_compress        /* compress stream data */
 };
 
 /* Stream data flags */
 
 /* See pipeStreamData in QPDFObjectHandle.hh for details on these flags. */
-enum qpdf_stream_encode_flags_e
-{
-    qpdf_ef_compress  = 1 << 0, /* compress uncompressed streams */
+enum qpdf_stream_encode_flags_e {
+    qpdf_ef_compress = 1 << 0,  /* compress uncompressed streams */
     qpdf_ef_normalize = 1 << 1, /* normalize content stream */
 };
-enum qpdf_stream_decode_level_e
-{
+enum qpdf_stream_decode_level_e {
     /* These must be in order from less to more decoding. */
-    qpdf_dl_none = 0,           /* preserve all stream filters */
-    qpdf_dl_generalized,        /* decode general-purpose filters */
-    qpdf_dl_specialized,        /* also decode other non-lossy filters */
-    qpdf_dl_all                 /* also decode lossy filters */
+    qpdf_dl_none = 0,    /* preserve all stream filters */
+    qpdf_dl_generalized, /* decode general-purpose filters */
+    qpdf_dl_specialized, /* also decode other non-lossy filters */
+    qpdf_dl_all          /* also decode lossy filters */
 };
 
 /* R3 Encryption Parameters */
 
-enum qpdf_r3_print_e
-{
-    qpdf_r3p_full = 0,          /* allow all printing */
-    qpdf_r3p_low,               /* allow only low-resolution printing */
-    qpdf_r3p_none               /* allow no printing */
+enum qpdf_r3_print_e {
+    qpdf_r3p_full = 0, /* allow all printing */
+    qpdf_r3p_low,      /* allow only low-resolution printing */
+    qpdf_r3p_none      /* allow no printing */
 };
 
 /* qpdf_r3_modify_e doesn't allow the full flexibility of the spec. It
  * corresponds to options in Acrobat 5's menus. The new interface in
  * QPDFWriter offers more granularity and no longer uses this type.
  */
-enum qpdf_r3_modify_e           /* Allowed changes: */
+enum qpdf_r3_modify_e /* Allowed changes: */
 {
-    qpdf_r3m_all = 0,           /* All editing */
-    qpdf_r3m_annotate,          /* Comments, fill forms, signing, assembly */
-    qpdf_r3m_form,              /* Fill forms, signing, assembly */
-    qpdf_r3m_assembly,          /* Only document assembly */
-    qpdf_r3m_none               /* No modifications */
+    qpdf_r3m_all = 0,  /* All editing */
+    qpdf_r3m_annotate, /* Comments, fill forms, signing, assembly */
+    qpdf_r3m_form,     /* Fill forms, signing, assembly */
+    qpdf_r3m_assembly, /* Only document assembly */
+    qpdf_r3m_none      /* No modifications */
 };
 
 /* Form field flags from the PDF spec */
 
-enum pdf_form_field_flag_e
-{
+enum pdf_form_field_flag_e {
     /* flags that apply to all form fields */
     ff_all_read_only = 1 << 0,
     ff_all_required = 1 << 1,
@@ -162,8 +155,7 @@ enum pdf_form_field_flag_e
 
 /* Annotation flags from the PDF spec */
 
-enum pdf_annotation_flag_e
-{
+enum pdf_annotation_flag_e {
     an_invisible = 1 << 0,
     an_hidden = 1 << 1,
     an_print = 1 << 2,
@@ -177,8 +169,7 @@ enum pdf_annotation_flag_e
 };
 
 /* Encryption/password status for QPDFJob */
-enum qpdf_encryption_status_e
-{
+enum qpdf_encryption_status_e {
     qpdf_es_encrypted = 1 << 0,
     qpdf_es_password_incorrect = 1 << 1
 };

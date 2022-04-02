@@ -187,18 +187,16 @@ class PointerHolder
         }
         ~Data()
         {
-            if (array)
-            {
-                delete [] this->pointer;
-            }
-            else
-            {
+            if (array) {
+                delete[] this->pointer;
+            } else {
                 delete this->pointer;
             }
         }
         T* pointer;
         bool array;
         int refcount;
+
       private:
         Data(Data const&) = delete;
         Data& operator=(Data const&) = delete;
@@ -208,7 +206,7 @@ class PointerHolder
 #if POINTERHOLDER_TRANSITION >= 1
     explicit
 #endif // POINTERHOLDER_TRANSITION >= 1
-    PointerHolder(T* pointer = 0)
+        PointerHolder(T* pointer = 0)
     {
         this->init(new Data(pointer, false));
     }
@@ -222,16 +220,17 @@ class PointerHolder
     {
         this->copy(rhs);
     }
-    PointerHolder& operator=(PointerHolder const& rhs)
+    PointerHolder&
+    operator=(PointerHolder const& rhs)
     {
-        if (this != &rhs)
-        {
+        if (this != &rhs) {
             this->destroy();
             this->copy(rhs);
         }
         return *this;
     }
-    PointerHolder& operator=(decltype(nullptr))
+    PointerHolder&
+    operator=(decltype(nullptr))
     {
         this->operator=(PointerHolder<T>());
         return *this;
@@ -240,21 +239,25 @@ class PointerHolder
     {
         this->destroy();
     }
-    bool operator==(PointerHolder const& rhs) const
+    bool
+    operator==(PointerHolder const& rhs) const
     {
         return this->data->pointer == rhs.data->pointer;
     }
-    bool operator==(decltype(nullptr)) const
+    bool
+    operator==(decltype(nullptr)) const
     {
         return this->data->pointer == nullptr;
     }
-    bool operator<(PointerHolder const& rhs) const
+    bool
+    operator<(PointerHolder const& rhs) const
     {
         return this->data->pointer < rhs.data->pointer;
     }
 
     // get() is for interface compatibility with std::shared_ptr
-    T* get() const
+    T*
+    get() const
     {
         return this->data->pointer;
     }
@@ -264,70 +267,79 @@ class PointerHolder
 #if POINTERHOLDER_TRANSITION >= 2
     [[deprecated("use PointerHolder<T>::get() instead of getPointer()")]]
 #endif // POINTERHOLDER_TRANSITION >= 2
-    T* getPointer()
+    T*
+    getPointer()
     {
         return this->data->pointer;
     }
 #if POINTERHOLDER_TRANSITION >= 2
     [[deprecated("use PointerHolder<T>::get() instead of getPointer()")]]
 #endif // POINTERHOLDER_TRANSITION >= 2
-    T const* getPointer() const
+    T const*
+    getPointer() const
     {
         return this->data->pointer;
     }
 #if POINTERHOLDER_TRANSITION >= 2
     [[deprecated("use use_count() instead of getRefcount()")]]
 #endif // POINTERHOLDER_TRANSITION >= 2
-    int getRefcount() const
+    int
+    getRefcount() const
     {
         return this->data->refcount;
     }
 
     // use_count() is for compatibility with std::shared_ptr
-    long use_count()
+    long
+    use_count()
     {
         return static_cast<long>(this->data->refcount);
     }
 
-    T const& operator*() const
+    T const&
+    operator*() const
     {
         return *this->data->pointer;
     }
-    T& operator*()
+    T&
+    operator*()
     {
         return *this->data->pointer;
     }
 
-    T const* operator->() const
+    T const*
+    operator->() const
     {
         return this->data->pointer;
     }
-    T* operator->()
+    T*
+    operator->()
     {
         return this->data->pointer;
     }
 
   private:
-    void init(Data* data)
+    void
+    init(Data* data)
     {
         this->data = data;
         ++this->data->refcount;
     }
-    void copy(PointerHolder const& rhs)
+    void
+    copy(PointerHolder const& rhs)
     {
         this->init(rhs.data);
     }
-    void destroy()
+    void
+    destroy()
     {
         bool gone = false;
         {
-            if (--this->data->refcount == 0)
-            {
+            if (--this->data->refcount == 0) {
                 gone = true;
             }
         }
-        if (gone)
-        {
+        if (gone) {
             delete this->data;
         }
     }
@@ -335,7 +347,7 @@ class PointerHolder
     Data* data;
 };
 
-template<typename T, typename... _Args>
+template <typename T, typename... _Args>
 inline PointerHolder<T>
 make_pointer_holder(_Args&&... __args)
 {

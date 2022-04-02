@@ -30,8 +30,7 @@ class Pl_RunLength: public Pipeline
     enum action_e { a_encode, a_decode };
 
     QPDF_DLL
-    Pl_RunLength(char const* identifier, Pipeline* next,
-                 action_e action);
+    Pl_RunLength(char const* identifier, Pipeline* next, action_e action);
     QPDF_DLL
     virtual ~Pl_RunLength();
 

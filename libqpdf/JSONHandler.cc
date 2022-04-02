@@ -1,8 +1,8 @@
 #include <qpdf/JSONHandler.hh>
 
-#include <qpdf/QUtil.hh>
-#include <qpdf/QTC.hh>
 #include <qpdf/QPDFUsage.hh>
+#include <qpdf/QTC.hh>
+#include <qpdf/QUtil.hh>
 
 JSONHandler::JSONHandler() :
     m(new Members())
@@ -70,9 +70,10 @@ JSONHandler::addFallbackDictHandler(std::shared_ptr<JSONHandler> fdh)
 }
 
 void
-JSONHandler::addArrayHandlers(json_handler_t start_fn,
-                              void_handler_t end_fn,
-                              std::shared_ptr<JSONHandler> ah)
+JSONHandler::addArrayHandlers(
+    json_handler_t start_fn,
+    void_handler_t end_fn,
+    std::shared_ptr<JSONHandler> ah)
 {
     this->m->h.array_start_handler = start_fn;
     this->m->h.array_end_handler = end_fn;
@@ -82,69 +83,55 @@ JSONHandler::addArrayHandlers(json_handler_t start_fn,
 void
 JSONHandler::handle(std::string const& path, JSON j)
 {
-    if (this->m->h.any_handler)
-    {
+    if (this->m->h.any_handler) {
         this->m->h.any_handler(path, j);
         return;
     }
     bool handled = false;
     bool bvalue = false;
     std::string s_value;
-    if (this->m->h.null_handler && j.isNull())
-    {
+    if (this->m->h.null_handler && j.isNull()) {
         this->m->h.null_handler(path);
         handled = true;
     }
-    if (this->m->h.string_handler && j.getString(s_value))
-    {
+    if (this->m->h.string_handler && j.getString(s_value)) {
         this->m->h.string_handler(path, s_value);
         handled = true;
     }
-    if (this->m->h.number_handler && j.getNumber(s_value))
-    {
+    if (this->m->h.number_handler && j.getNumber(s_value)) {
         this->m->h.number_handler(path, s_value);
         handled = true;
     }
-    if (this->m->h.bool_handler && j.getBool(bvalue))
-    {
+    if (this->m->h.bool_handler && j.getBool(bvalue)) {
         this->m->h.bool_handler(path, bvalue);
         handled = true;
     }
-    if (this->m->h.dict_start_handler && j.isDictionary())
-    {
+    if (this->m->h.dict_start_handler && j.isDictionary()) {
         this->m->h.dict_start_handler(path, j);
         std::string path_base = path;
-        if (path_base != ".")
-        {
+        if (path_base != ".") {
             path_base += ".";
         }
         j.forEachDictItem([&path, &path_base, this](
                               std::string const& k, JSON v) {
             auto i = this->m->h.dict_handlers.find(k);
-            if (i == this->m->h.dict_handlers.end())
-            {
-                if (this->m->h.fallback_dict_handler.get())
-                {
-                    this->m->h.fallback_dict_handler->handle(
-                        path_base + k, v);
-                }
-                else
-                {
+            if (i == this->m->h.dict_handlers.end()) {
+                if (this->m->h.fallback_dict_handler.get()) {
+                    this->m->h.fallback_dict_handler->handle(path_base + k, v);
+                } else {
                     QTC::TC("libtests", "JSONHandler unexpected key");
-                    usage("JSON handler found unexpected key " + k +
-                          " in object at " + path);
+                    usage(
+                        "JSON handler found unexpected key " + k +
+                        " in object at " + path);
                 }
-            }
-            else
-            {
+            } else {
                 i->second->handle(path_base + k, v);
             }
         });
         this->m->h.dict_end_handler(path);
         handled = true;
     }
-    if (this->m->h.array_start_handler && j.isArray())
-    {
+    if (this->m->h.array_start_handler && j.isArray()) {
         this->m->h.array_start_handler(path, j);
         size_t i = 0;
         j.forEachArrayItem([&i, &path, this](JSON v) {
@@ -156,8 +143,7 @@ JSONHandler::handle(std::string const& path, JSON j)
         handled = true;
     }
 
-    if (! handled)
-    {
+    if (!handled) {
         // It would be nice to include information about what type the
         // object was and what types were allowed, but we're relying
         // on schema validation to make sure input is properly

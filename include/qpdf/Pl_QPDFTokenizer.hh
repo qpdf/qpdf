@@ -24,10 +24,10 @@
 
 #include <qpdf/Pipeline.hh>
 
-#include <qpdf/QPDFTokenizer.hh>
+#include <qpdf/Pl_Buffer.hh>
 #include <qpdf/PointerHolder.hh>
 #include <qpdf/QPDFObjectHandle.hh>
-#include <qpdf/Pl_Buffer.hh>
+#include <qpdf/QPDFTokenizer.hh>
 
 #include <memory>
 
@@ -48,9 +48,10 @@ class Pl_QPDFTokenizer: public Pipeline
     // pipeline that the token filter writes to. If next is not
     // provided, any output written by the filter will be discarded.
     QPDF_DLL
-    Pl_QPDFTokenizer(char const* identifier,
-                     QPDFObjectHandle::TokenFilter* filter,
-                     Pipeline* next = 0);
+    Pl_QPDFTokenizer(
+        char const* identifier,
+        QPDFObjectHandle::TokenFilter* filter,
+        Pipeline* next = 0);
     QPDF_DLL
     virtual ~Pl_QPDFTokenizer();
     QPDF_DLL

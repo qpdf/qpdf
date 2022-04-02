@@ -6,8 +6,8 @@
 #include <qpdf/PointerHolder.hh>
 
 #include <iostream>
-#include <stdlib.h>
 #include <list>
+#include <stdlib.h>
 
 class Object
 {
@@ -21,7 +21,6 @@ class Object
     static int next_id;
     int id;
 };
-
 
 int Object::next_id = 0;
 
@@ -50,21 +49,24 @@ Object::hello() const
 
 typedef PointerHolder<Object> ObjectHolder;
 
-void callHello(ObjectHolder& oh)
+void
+callHello(ObjectHolder& oh)
 {
     oh.getPointer()->hello();
     oh->hello();
     (*oh).hello();
 }
 
-void callHelloWithGet(ObjectHolder const& oh)
+void
+callHelloWithGet(ObjectHolder const& oh)
 {
     oh.get()->hello();
     oh->hello();
     (*oh).hello();
 }
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     std::list<ObjectHolder> ol1;
 
@@ -81,18 +83,15 @@ int main(int argc, char* argv[])
         ObjectHolder oh4;
         ObjectHolder oh5;
         std::cout << "oh5 refcount = " << oh5.getRefcount() << std::endl;
-        if (oh4 == oh5)
-        {
+        if (oh4 == oh5) {
             std::cout << "nulls equal" << std::endl;
         }
         oh3 = oh1;
         oh4 = oh2;
-        if (oh3 == oh4)
-        {
+        if (oh3 == oh4) {
             std::cout << "equal okay" << std::endl;
         }
-        if ((! (oh3 < oh4)) && (! (oh4 < oh3)))
-        {
+        if ((!(oh3 < oh4)) && (!(oh4 < oh3))) {
             std::cout << "less than okay" << std::endl;
         }
         ol1.push_back(oh3);

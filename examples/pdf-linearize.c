@@ -9,18 +9,21 @@
 
 static char const* whoami = 0;
 
-static void usage()
+static void
+usage()
 {
     fprintf(stderr, "Usage: %s infile infile-password outfile\n", whoami);
     exit(2);
 }
 
-static void write_progress(int percent, void* data)
+static void
+write_progress(int percent, void* data)
 {
     printf("%s progress: %d%%\n", (char const*)(data), percent);
 }
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     char* infile = NULL;
     char* password = NULL;
@@ -30,21 +33,15 @@ int main(int argc, char* argv[])
     int errors = 0;
     char* p = 0;
 
-    if ((p = strrchr(argv[0], '/')) != NULL)
-    {
+    if ((p = strrchr(argv[0], '/')) != NULL) {
         whoami = p + 1;
-    }
-    else if ((p = strrchr(argv[0], '\\')) != NULL)
-    {
+    } else if ((p = strrchr(argv[0], '\\')) != NULL) {
         whoami = p + 1;
-    }
-    else
-    {
+    } else {
         whoami = argv[0];
     }
 
-    if (argc != 4)
-    {
+    if (argc != 4) {
         usage();
     }
 
@@ -53,8 +50,7 @@ int main(int argc, char* argv[])
     outfile = argv[3];
 
     if (((qpdf_read(qpdf, infile, password) & QPDF_ERRORS) == 0) &&
-        ((qpdf_init_write(qpdf, outfile) & QPDF_ERRORS) == 0))
-    {
+        ((qpdf_init_write(qpdf, outfile) & QPDF_ERRORS) == 0)) {
         /* Use static ID for testing only. For production, a
          * non-static ID is used. See also
          * qpdf_set_deterministic_ID. */
@@ -63,25 +59,22 @@ int main(int argc, char* argv[])
         qpdf_register_progress_reporter(qpdf, write_progress, infile);
         qpdf_write(qpdf);
     }
-    while (qpdf_more_warnings(qpdf))
-    {
+    while (qpdf_more_warnings(qpdf)) {
         warnings = 1;
-        printf("warning: %s\n",
-               qpdf_get_error_full_text(qpdf, qpdf_next_warning(qpdf)));
+        printf(
+            "warning: %s\n",
+            qpdf_get_error_full_text(qpdf, qpdf_next_warning(qpdf)));
     }
-    if (qpdf_has_error(qpdf))
-    {
+    if (qpdf_has_error(qpdf)) {
         errors = 1;
-        printf("error: %s\n",
-               qpdf_get_error_full_text(qpdf, qpdf_get_error(qpdf)));
+        printf(
+            "error: %s\n",
+            qpdf_get_error_full_text(qpdf, qpdf_get_error(qpdf)));
     }
     qpdf_cleanup(&qpdf);
-    if (errors)
-    {
+    if (errors) {
         return 2;
-    }
-    else if (warnings)
-    {
+    } else if (warnings) {
         return 3;
     }
 

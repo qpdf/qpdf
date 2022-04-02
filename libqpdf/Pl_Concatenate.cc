@@ -33,4 +33,3 @@ Pl_Concatenate::manualFinish()
 {
     getNext()->finish();
 }
-

@@ -5,23 +5,23 @@
 //
 
 #include <iostream>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
+#include <qpdf/Pl_StdioFile.hh>
 #include <qpdf/QPDF.hh>
+#include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QUtil.hh>
-#include <qpdf/QPDFObjectHandle.hh>
-#include <qpdf/Pl_StdioFile.hh>
 
 static char const* whoami = 0;
 
-void usage()
+void
+usage()
 {
     std::cerr << "Usage: " << whoami << " infile" << std::endl
-              << "Applies token filters to infile"
-              << std::endl;
+              << "Applies token filters to infile" << std::endl;
     exit(2);
 }
 
@@ -47,8 +47,7 @@ void
 StringCounter::handleToken(QPDFTokenizer::Token const& token)
 {
     // Count string tokens
-    if (token.getType() == QPDFTokenizer::tt_string)
-    {
+    if (token.getType() == QPDFTokenizer::tt_string) {
         ++this->count;
     }
     // Preserve input verbatim by passing each token to any specified
@@ -71,36 +70,31 @@ StringCounter::getCount() const
     return this->count;
 }
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     whoami = QUtil::getWhoami(argv[0]);
 
-    if (argc != 2)
-    {
+    if (argc != 2) {
         usage();
     }
     char const* infilename = argv[1];
 
-    try
-    {
+    try {
         QPDF pdf;
         pdf.processFile(infilename);
         int pageno = 0;
-        for (auto& page : QPDFPageDocumentHelper(pdf).getAllPages())
-        {
+        for (auto& page : QPDFPageDocumentHelper(pdf).getAllPages()) {
             ++pageno;
             // Pass the contents of a page through our string counter.
             // If it's an even page, capture the output. This
             // illustrates that you may capture any output generated
             // by the filter, or you may ignore it.
             StringCounter counter;
-            if (pageno % 2)
-            {
+            if (pageno % 2) {
                 // Ignore output for odd pages.
                 page.filterContents(&counter);
-            }
-            else
-            {
+            } else {
                 // Write output to stdout for even pages.
                 Pl_StdioFile out("stdout", stdout);
                 std::cout << "% Contents of page " << pageno << std::endl;
@@ -110,9 +104,7 @@ int main(int argc, char* argv[])
             std::cout << "Page " << pageno
                       << ": strings = " << counter.getCount() << std::endl;
         }
-    }
-    catch (std::exception& e)
-    {
+    } catch (std::exception& e) {
         std::cerr << whoami << ": " << e.what() << std::endl;
         exit(2);
     }

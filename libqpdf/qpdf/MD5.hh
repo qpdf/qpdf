@@ -2,10 +2,10 @@
 #define MD5_HH
 
 #include <qpdf/DLL.h>
-#include <qpdf/Types.h>
 #include <qpdf/QPDFCryptoImpl.hh>
-#include <string>
+#include <qpdf/Types.h>
 #include <memory>
+#include <string>
 
 class MD5
 {
@@ -50,15 +50,16 @@ class MD5
     QPDF_DLL
     static std::string getDataChecksum(char const* buf, size_t len);
     QPDF_DLL
-    static std::string getFileChecksum(char const* filename,
-                                       qpdf_offset_t up_to_offset = -1);
+    static std::string
+    getFileChecksum(char const* filename, qpdf_offset_t up_to_offset = -1);
     QPDF_DLL
-    static bool checkDataChecksum(char const* const checksum,
-                                  char const* buf, size_t len);
+    static bool
+    checkDataChecksum(char const* const checksum, char const* buf, size_t len);
     QPDF_DLL
-    static bool checkFileChecksum(char const* const checksum,
-                                  char const* filename,
-                                  qpdf_offset_t up_to_offset = -1);
+    static bool checkFileChecksum(
+        char const* const checksum,
+        char const* filename,
+        qpdf_offset_t up_to_offset = -1);
 
   private:
     void init();

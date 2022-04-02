@@ -3,8 +3,8 @@
 
 #include <qpdf/QPDFObject.hh>
 
-#include <set>
 #include <map>
+#include <set>
 
 #include <qpdf/QPDFObjectHandle.hh>
 

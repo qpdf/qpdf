@@ -22,22 +22,23 @@
 #ifndef QPDFEXC_HH
 #define QPDFEXC_HH
 
+#include <qpdf/Constants.h>
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
-#include <qpdf/Constants.h>
 
-#include <string>
 #include <stdexcept>
+#include <string>
 
 class QPDF_DLL_CLASS QPDFExc: public std::runtime_error
 {
   public:
     QPDF_DLL
-    QPDFExc(qpdf_error_code_e error_code,
-            std::string const& filename,
-            std::string const& object,
-            qpdf_offset_t offset,
-            std::string const& message);
+    QPDFExc(
+        qpdf_error_code_e error_code,
+        std::string const& filename,
+        std::string const& object,
+        qpdf_offset_t offset,
+        std::string const& message);
     QPDF_DLL
     virtual ~QPDFExc() noexcept
     {
@@ -65,10 +66,11 @@ class QPDF_DLL_CLASS QPDFExc: public std::runtime_error
     std::string const& getMessageDetail() const;
 
   private:
-    static std::string createWhat(std::string const& filename,
-                                  std::string const& object,
-                                  qpdf_offset_t offset,
-                                  std::string const& message);
+    static std::string createWhat(
+        std::string const& filename,
+        std::string const& object,
+        qpdf_offset_t offset,
+        std::string const& message);
 
     // This class does not use the Members pattern to avoid needless
     // memory allocations during exception handling.

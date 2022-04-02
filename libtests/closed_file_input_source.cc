@@ -1,20 +1,21 @@
 #include <qpdf/ClosedFileInputSource.hh>
 #include <qpdf/FileInputSource.hh>
 
-#include <stdio.h>
-#include <string.h>
 #include <iostream>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-void check(std::string const& what, bool result)
+void
+check(std::string const& what, bool result)
 {
-    if (! result)
-    {
+    if (!result) {
         std::cout << "FAIL: " << what << std::endl;
     }
 }
 
-void do_tests(InputSource* is)
+void
+do_tests(InputSource* is)
 {
     check("get name", "input" == is->getName());
     check("initial tell", 0 == is->tell());
@@ -59,7 +60,8 @@ void do_tests(InputSource* is)
     check("last offset after read 0", 0 == is->getLastOffset());
 }
 
-int main()
+int
+main()
 {
     // This test is designed to work with a specified input file.
     std::cout << "testing with ClosedFileInputSource\n";

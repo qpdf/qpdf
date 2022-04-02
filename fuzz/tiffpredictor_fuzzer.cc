@@ -26,8 +26,8 @@ void
 FuzzHelper::doChecks()
 {
     Pl_Discard discard;
-    Pl_TIFFPredictor p("decoder", &discard,
-                       Pl_TIFFPredictor::a_decode, 16, 1, 8);
+    Pl_TIFFPredictor p(
+        "decoder", &discard, Pl_TIFFPredictor::a_decode, 16, 1, 8);
     p.write(const_cast<unsigned char*>(data), size);
     p.finish();
 }
@@ -35,17 +35,15 @@ FuzzHelper::doChecks()
 void
 FuzzHelper::run()
 {
-    try
-    {
+    try {
         doChecks();
-    }
-    catch (std::runtime_error const& e)
-    {
+    } catch (std::runtime_error const& e) {
         std::cerr << "runtime_error: " << e.what() << std::endl;
     }
 }
 
-extern "C" int LLVMFuzzerTestOneInput(unsigned char const* data, size_t size)
+extern "C" int
+LLVMFuzzerTestOneInput(unsigned char const* data, size_t size)
 {
     FuzzHelper f(data, size);
     f.run();

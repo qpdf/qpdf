@@ -1,13 +1,13 @@
 #include <qpdf/Pl_PNGFilter.hh>
-#include <qpdf/Pl_TIFFPredictor.hh>
 #include <qpdf/Pl_StdioFile.hh>
-#include <qpdf/QUtil.hh>
+#include <qpdf/Pl_TIFFPredictor.hh>
 #include <qpdf/QIntC.hh>
+#include <qpdf/QUtil.hh>
 
-#include <iostream>
 #include <errno.h>
-#include <string.h>
+#include <iostream>
 #include <stdlib.h>
+#include <string.h>
 
 #ifdef NDEBUG
 // We need assert even in a release build for test code.
@@ -15,53 +15,54 @@
 #endif
 #include <cassert>
 
-void run(char const* filename, char const* filter,
-         bool encode, unsigned int columns,
-         unsigned int bits_per_sample, unsigned int samples_per_pixel)
+void
+run(char const* filename,
+    char const* filter,
+    bool encode,
+    unsigned int columns,
+    unsigned int bits_per_sample,
+    unsigned int samples_per_pixel)
 {
     FILE* in = QUtil::safe_fopen(filename, "rb");
     FILE* o1 = QUtil::safe_fopen("out", "wb");
     Pipeline* out = new Pl_StdioFile("out", o1);
     Pipeline* pl = 0;
-    if (strcmp(filter, "png") == 0)
-    {
+    if (strcmp(filter, "png") == 0) {
         pl = new Pl_PNGFilter(
-            "png", out,
+            "png",
+            out,
             encode ? Pl_PNGFilter::a_encode : Pl_PNGFilter::a_decode,
-            columns, samples_per_pixel, bits_per_sample);
-    }
-    else if (strcmp(filter, "tiff") == 0)
-    {
+            columns,
+            samples_per_pixel,
+            bits_per_sample);
+    } else if (strcmp(filter, "tiff") == 0) {
         pl = new Pl_TIFFPredictor(
-            "png", out,
+            "png",
+            out,
             encode ? Pl_TIFFPredictor::a_encode : Pl_TIFFPredictor::a_decode,
-            columns, samples_per_pixel, bits_per_sample);
-    }
-    else
-    {
+            columns,
+            samples_per_pixel,
+            bits_per_sample);
+    } else {
         std::cerr << "unknown filter " << filter << std::endl;
         exit(2);
     }
     assert((2 * (columns + 1)) < 1024);
     unsigned char buf[1024];
     size_t len;
-    while (true)
-    {
+    while (true) {
         len = fread(buf, 1, (2 * columns) + 1, in);
-        if (len == 0)
-        {
+        if (len == 0) {
             break;
         }
         pl->write(buf, len);
         len = fread(buf, 1, 1, in);
-        if (len == 0)
-        {
+        if (len == 0) {
             break;
         }
         pl->write(buf, len);
         len = fread(buf, 1, 1, in);
-        if (len == 0)
-        {
+        if (len == 0) {
             break;
         }
         pl->write(buf, len);
@@ -76,13 +77,12 @@ void run(char const* filename, char const* filter,
     std::cout << "done" << std::endl;
 }
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
-    if (argc != 7)
-    {
+    if (argc != 7) {
         std::cerr << "Usage: predictor {png|tiff} {en,de}code filename"
-                  << " columns samples-per-pixel bits-per-sample"
-                  << std::endl;
+                  << " columns samples-per-pixel bits-per-sample" << std::endl;
         exit(2);
     }
     char* filter = argv[1];
@@ -92,15 +92,14 @@ int main(int argc, char* argv[])
     int samples_per_pixel = QUtil::string_to_int(argv[5]);
     int bits_per_sample = QUtil::string_to_int(argv[6]);
 
-    try
-    {
-        run(filename, filter, encode,
+    try {
+        run(filename,
+            filter,
+            encode,
             QIntC::to_uint(columns),
             QIntC::to_uint(bits_per_sample),
             QIntC::to_uint(samples_per_pixel));
-    }
-    catch (std::exception& e)
-    {
+    } catch (std::exception& e) {
         std::cout << e.what() << std::endl;
     }
     return 0;

@@ -7,7 +7,8 @@
 #endif
 #include <cassert>
 
-int main()
+int
+main()
 {
     SparseOHArray a;
     assert(a.size() == 0);

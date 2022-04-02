@@ -10,7 +10,8 @@
 #include <assert.h>
 
 #ifndef QPDF_NO_WCHAR_T
-static void wide_test()
+static void
+wide_test()
 {
     wchar_t const* argv[5];
     argv[0] = L"qpdfjob";
@@ -23,7 +24,8 @@ static void wide_test()
 }
 #endif // QPDF_NO_WCHAR_T
 
-static void run_tests()
+static void
+run_tests()
 {
     /* Be sure to use a different output file for each test. */
 
@@ -61,10 +63,10 @@ static void run_tests()
     printf("json error test passed\n");
 }
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
-    if ((argc == 2) && (strcmp(argv[1], "wide") == 0))
-    {
+    if ((argc == 2) && (strcmp(argv[1], "wide") == 0)) {
 #ifndef QPDF_NO_WCHAR_T
         wide_test();
 #else

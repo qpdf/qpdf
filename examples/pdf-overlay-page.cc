@@ -1,11 +1,11 @@
-#include <iostream>
-#include <string.h>
-#include <stdlib.h>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QUtil.hh>
+#include <iostream>
+#include <stdlib.h>
+#include <string.h>
 
 // This program demonstrates use of form XObjects to overlay a page
 // from one file onto all pages of another file. The qpdf program's
@@ -14,19 +14,17 @@
 
 static char const* whoami = 0;
 
-void usage()
+void
+usage()
 {
-    std::cerr << "Usage: " << whoami << " infile pagefile outfile"
-              << std::endl
+    std::cerr << "Usage: " << whoami << " infile pagefile outfile" << std::endl
               << "Stamp page 1 of pagefile on every page of infile,"
-              << " writing to outfile"
-              << std::endl;
+              << " writing to outfile" << std::endl;
     exit(2);
 }
 
-static void stamp_page(char const* infile,
-                       char const* stampfile,
-                       char const* outfile)
+static void
+stamp_page(char const* infile, char const* stampfile, char const* outfile)
 {
     QPDF inpdf;
     inpdf.processFile(infile);
@@ -45,8 +43,8 @@ static void stamp_page(char const* infile,
     std::vector<QPDFPageObjectHelper> pages =
         QPDFPageDocumentHelper(inpdf).getAllPages();
     for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-         iter != pages.end(); ++iter)
-    {
+         iter != pages.end();
+         ++iter) {
         QPDFPageObjectHelper& ph = *iter;
 
         // Find a unique resource name for the new form XObject
@@ -57,11 +55,9 @@ static void stamp_page(char const* infile,
         // Generate content to place the form XObject centered within
         // destination page's trim box.
         QPDFMatrix m;
-        std::string content =
-            ph.placeFormXObject(
-                stamp_fo, name, ph.getTrimBox().getArrayAsRectangle(), m);
-        if (! content.empty())
-        {
+        std::string content = ph.placeFormXObject(
+            stamp_fo, name, ph.getTrimBox().getArrayAsRectangle(), m);
+        if (!content.empty()) {
             // Append the content to the page's content. Surround the
             // original content with q...Q to the new content from the
             // page's original content.
@@ -80,28 +76,25 @@ static void stamp_page(char const* infile,
     }
 
     QPDFWriter w(inpdf, outfile);
-    w.setStaticID(true);        // for testing only
+    w.setStaticID(true); // for testing only
     w.write();
 }
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     whoami = QUtil::getWhoami(argv[0]);
 
-    if (argc != 4)
-    {
+    if (argc != 4) {
         usage();
     }
     char const* infile = argv[1];
     char const* stampfile = argv[2];
     char const* outfile = argv[3];
 
-    try
-    {
+    try {
         stamp_page(infile, stampfile, outfile);
-    }
-    catch (std::exception &e)
-    {
+    } catch (std::exception& e) {
         std::cerr << whoami << ": " << e.what() << std::endl;
         exit(2);
     }

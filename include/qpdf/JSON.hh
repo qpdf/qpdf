@@ -38,12 +38,12 @@
 #include <qpdf/DLL.h>
 #include <qpdf/PointerHolder.hh>
 
-#include <string>
-#include <map>
-#include <vector>
-#include <list>
 #include <functional>
+#include <list>
+#include <map>
 #include <memory>
+#include <string>
+#include <vector>
 
 class JSON
 {
@@ -134,13 +134,12 @@ class JSON
         f_optional = 1 << 0,
     };
     QPDF_DLL
-    bool checkSchema(JSON schema, unsigned long flags,
-                     std::list<std::string>& errors);
+    bool checkSchema(
+        JSON schema, unsigned long flags, std::list<std::string>& errors);
 
     // Same as passing 0 for flags
     QPDF_DLL
     bool checkSchema(JSON schema, std::list<std::string>& errors);
-
 
     // Create a JSON object from a string.
     QPDF_DLL
@@ -198,11 +197,12 @@ class JSON
 
     JSON(std::shared_ptr<JSON_value>);
 
-    static bool
-    checkSchemaInternal(JSON_value* this_v, JSON_value* sch_v,
-                        unsigned long flags,
-                        std::list<std::string>& errors,
-                        std::string prefix);
+    static bool checkSchemaInternal(
+        JSON_value* this_v,
+        JSON_value* sch_v,
+        unsigned long flags,
+        std::list<std::string>& errors,
+        std::string prefix);
 
     class Members
     {
@@ -221,6 +221,5 @@ class JSON
 
     PointerHolder<Members> m;
 };
-
 
 #endif // JSON_HH

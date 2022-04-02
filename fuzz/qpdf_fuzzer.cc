@@ -1,22 +1,30 @@
+#include <qpdf/Buffer.hh>
+#include <qpdf/BufferInputSource.hh>
+#include <qpdf/Pl_Discard.hh>
 #include <qpdf/QPDF.hh>
+#include <qpdf/QPDFAcroFormDocumentHelper.hh>
+#include <qpdf/QPDFOutlineDocumentHelper.hh>
+#include <qpdf/QPDFPageDocumentHelper.hh>
+#include <qpdf/QPDFPageLabelDocumentHelper.hh>
+#include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QUtil.hh>
-#include <qpdf/BufferInputSource.hh>
-#include <qpdf/Buffer.hh>
-#include <qpdf/Pl_Discard.hh>
-#include <qpdf/QPDFPageDocumentHelper.hh>
-#include <qpdf/QPDFPageObjectHelper.hh>
-#include <qpdf/QPDFPageLabelDocumentHelper.hh>
-#include <qpdf/QPDFOutlineDocumentHelper.hh>
-#include <qpdf/QPDFAcroFormDocumentHelper.hh>
 #include <cstdlib>
 
 class DiscardContents: public QPDFObjectHandle::ParserCallbacks
 {
   public:
-    virtual ~DiscardContents() {}
-    virtual void handleObject(QPDFObjectHandle) {}
-    virtual void handleEOF() {}
+    virtual ~DiscardContents()
+    {
+    }
+    virtual void
+    handleObject(QPDFObjectHandle)
+    {
+    }
+    virtual void
+    handleEOF()
+    {
+    }
 };
 
 class FuzzHelper
@@ -66,16 +74,11 @@ FuzzHelper::getWriter(PointerHolder<QPDF> qpdf)
 void
 FuzzHelper::doWrite(PointerHolder<QPDFWriter> w)
 {
-    try
-    {
+    try {
         w->write();
-    }
-    catch (QPDFExc const& e)
-    {
+    } catch (QPDFExc const& e) {
         std::cerr << e.what() << std::endl;
-    }
-    catch (std::runtime_error const& e)
-    {
+    } catch (std::runtime_error const& e) {
         std::cerr << e.what() << std::endl;
     }
 }
@@ -133,14 +136,12 @@ FuzzHelper::testPages()
     std::vector<QPDFPageObjectHelper> pages = pdh.getAllPages();
     DiscardContents discard_contents;
     int pageno = 0;
-    for (std::vector<QPDFPageObjectHelper>::iterator iter =
-             pages.begin();
-         iter != pages.end(); ++iter)
-    {
+    for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
+         iter != pages.end();
+         ++iter) {
         QPDFPageObjectHelper& page(*iter);
         ++pageno;
-        try
-        {
+        try {
             page.coalesceContentStreams();
             page.parseContents(&discard_contents);
             page.getImages();
@@ -153,16 +154,13 @@ FuzzHelper::testPages()
                 afdh.getWidgetAnnotationsForPage(page);
             for (std::vector<QPDFAnnotationObjectHelper>::iterator annot_iter =
                      annotations.begin();
-                 annot_iter != annotations.end(); ++annot_iter)
-            {
+                 annot_iter != annotations.end();
+                 ++annot_iter) {
                 QPDFAnnotationObjectHelper& aoh = *annot_iter;
                 afdh.getFieldForAnnotation(aoh);
             }
-        }
-        catch (QPDFExc& e)
-        {
-            std::cerr << "page " << pageno << ": "
-                      << e.what() << std::endl;
+        } catch (QPDFExc& e) {
+            std::cerr << "page " << pageno << ": " << e.what() << std::endl;
         }
     }
 }
@@ -171,16 +169,15 @@ void
 FuzzHelper::testOutlines()
 {
     PointerHolder<QPDF> q = getQpdf();
-    std::list<std::vector<QPDFOutlineObjectHelper> > queue;
+    std::list<std::vector<QPDFOutlineObjectHelper>> queue;
     QPDFOutlineDocumentHelper odh(*q);
     queue.push_back(odh.getTopLevelOutlines());
-    while (! queue.empty())
-    {
+    while (!queue.empty()) {
         std::vector<QPDFOutlineObjectHelper>& outlines = *(queue.begin());
         for (std::vector<QPDFOutlineObjectHelper>::iterator iter =
                  outlines.begin();
-             iter != outlines.end(); ++iter)
-        {
+             iter != outlines.end();
+             ++iter) {
             QPDFOutlineObjectHelper& ol = *iter;
             ol.getDestPage();
             queue.push_back(ol.getKids());
@@ -208,21 +205,17 @@ FuzzHelper::run()
     // std::runtime_error. Throwing any other kind of exception,
     // segfaulting, or having a memory error (when built with
     // appropriate sanitizers) will all cause abnormal exit.
-    try
-    {
+    try {
         doChecks();
-    }
-    catch (QPDFExc const& e)
-    {
+    } catch (QPDFExc const& e) {
         std::cerr << "QPDFExc: " << e.what() << std::endl;
-    }
-    catch (std::runtime_error const& e)
-    {
+    } catch (std::runtime_error const& e) {
         std::cerr << "runtime_error: " << e.what() << std::endl;
     }
 }
 
-extern "C" int LLVMFuzzerTestOneInput(unsigned char const* data, size_t size)
+extern "C" int
+LLVMFuzzerTestOneInput(unsigned char const* data, size_t size)
 {
 #ifndef _WIN32
     // Used by jpeg library to work around false positives in memory

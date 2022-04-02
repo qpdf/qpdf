@@ -75,5 +75,4 @@ extern "C" {
 }
 #endif
 
-
 #endif /* QPDFJOB_C_H */

@@ -2,12 +2,12 @@
 #define JSONHANDLER_HH
 
 #include <qpdf/DLL.h>
-#include <qpdf/PointerHolder.hh>
 #include <qpdf/JSON.hh>
-#include <string>
-#include <map>
+#include <qpdf/PointerHolder.hh>
 #include <functional>
+#include <map>
 #include <memory>
+#include <string>
 
 // This class allows a sax-like walk through a JSON object with
 // functionality that mostly mirrors QPDFArgParser. It is primarily
@@ -32,14 +32,14 @@ class JSONHandler
     // called. There is no "final" handler -- if the top-level is a
     // dictionary or array, just use its end handler.
 
+    typedef std::function<void(std::string const& path, JSON value)>
+        json_handler_t;
+    typedef std::function<void(std::string const& path)> void_handler_t;
     typedef std::function<void(
-        std::string const& path, JSON value)> json_handler_t;
-    typedef std::function<void(
-        std::string const& path)> void_handler_t;
-    typedef std::function<void(
-        std::string const& path, std::string const& value)> string_handler_t;
-    typedef std::function<void(
-        std::string const& path, bool value)> bool_handler_t;
+        std::string const& path, std::string const& value)>
+        string_handler_t;
+    typedef std::function<void(std::string const& path, bool value)>
+        bool_handler_t;
 
     // If an any handler is added, it will be called for any value
     // including null, and no other handler will be called.
@@ -60,15 +60,16 @@ class JSONHandler
     QPDF_DLL
     void addDictHandlers(json_handler_t start_fn, void_handler_t end_fn);
     QPDF_DLL
-    void addDictKeyHandler(
-        std::string const& key, std::shared_ptr<JSONHandler>);
+    void
+    addDictKeyHandler(std::string const& key, std::shared_ptr<JSONHandler>);
     QPDF_DLL
     void addFallbackDictHandler(std::shared_ptr<JSONHandler>);
 
     QPDF_DLL
-    void addArrayHandlers(json_handler_t start_fn,
-                          void_handler_t end_fn,
-                          std::shared_ptr<JSONHandler> item_handlers);
+    void addArrayHandlers(
+        json_handler_t start_fn,
+        void_handler_t end_fn,
+        std::shared_ptr<JSONHandler> item_handlers);
 
     // Apply handlers recursively to a JSON object.
     QPDF_DLL

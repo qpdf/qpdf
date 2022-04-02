@@ -3,26 +3,26 @@
 #include <qpdf/QPDFNumberTreeObjectHelper.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QUtil.hh>
-#include <iostream>
 #include <cstring>
+#include <iostream>
 
 static char const* whoami = 0;
 
-void usage()
+void
+usage()
 {
-    std::cerr << "Usage: " << whoami << " outfile.pdf"
-              << std::endl
+    std::cerr << "Usage: " << whoami << " outfile.pdf" << std::endl
               << "Create some name/number trees and write to a file"
               << std::endl;
     exit(2);
 }
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     whoami = QUtil::getWhoami(argv[0]);
 
-    if (argc != 2)
-    {
+    if (argc != 2) {
         usage();
     }
 
@@ -62,8 +62,8 @@ int main(int argc, char* argv[])
     name_tree.insert("R", QPDFObjectHandle::newUnicodeString("rook"));
     name_tree.insert("B", QPDFObjectHandle::newUnicodeString("bishop"));
     name_tree.insert("N", QPDFObjectHandle::newUnicodeString("knight"));
-    auto iter = name_tree.insert(
-        "P", QPDFObjectHandle::newUnicodeString("pawn"));
+    auto iter =
+        name_tree.insert("P", QPDFObjectHandle::newUnicodeString("pawn"));
     // Look at the iterator
     std::cout << "just inserted " << iter->first << " -> "
               << iter->second.unparse() << std::endl;
@@ -77,28 +77,24 @@ int main(int argc, char* argv[])
 
     // Use range-for iteration
     std::cout << "Name tree items:" << std::endl;
-    for (auto i: name_tree)
-    {
-        std::cout << "  " << i.first << " -> "
-                  << i.second.unparse() << std::endl;
+    for (auto i : name_tree) {
+        std::cout << "  " << i.first << " -> " << i.second.unparse()
+                  << std::endl;
     }
 
     // This is a small tree, so everything will be at the root. We can
     // look at it using dictionary and array iterators.
     std::cout << "Keys in name tree object:" << std::endl;
     QPDFObjectHandle names;
-    for (auto const& i: name_tree_oh.ditems())
-    {
+    for (auto const& i : name_tree_oh.ditems()) {
         std::cout << i.first << std::endl;
-        if (i.first == "/Names")
-        {
+        if (i.first == "/Names") {
             names = i.second;
         }
     }
     // Values in names array:
     std::cout << "Values in names:" << std::endl;
-    for (auto& i: names.aitems())
-    {
+    for (auto& i : names.aitems()) {
         std::cout << "  " << i.unparse() << std::endl;
     }
 
@@ -112,8 +108,8 @@ int main(int argc, char* argv[])
 
     // 10.2 API
     iter = name_tree.find("Q");
-    std::cout << "Q: " << iter->first << " -> "
-              << iter->second.unparse() << std::endl;
+    std::cout << "Q: " << iter->first << " -> " << iter->second.unparse()
+              << std::endl;
     iter = name_tree.find("W");
     std::cout << "W found: " << (iter != name_tree.end()) << std::endl;
     // Allow find to return predecessor
@@ -146,22 +142,18 @@ int main(int argc, char* argv[])
     auto number_tree_oh = number_tree.getObjectHandle();
     example.replaceKey("/NumberTree", number_tree_oh);
     auto iter2 = number_tree.begin();
-    for (int i = 7; i <= 350; i += 7)
-    {
-        iter2.insertAfter(i, QPDFObjectHandle::newString(
-                              "-" + QUtil::int_to_string(i) + "-"));
+    for (int i = 7; i <= 350; i += 7) {
+        iter2.insertAfter(
+            i,
+            QPDFObjectHandle::newString("-" + QUtil::int_to_string(i) + "-"));
     }
     std::cout << "Numbers:" << std::endl;
     int n = 1;
-    for (auto& i: number_tree)
-    {
+    for (auto& i : number_tree) {
         std::cout << i.first << " -> " << i.second.getUTF8Value();
-        if (n % 5)
-        {
+        if (n % 5) {
             std::cout << ", ";
-        }
-        else
-        {
+        } else {
             std::cout << std::endl;
         }
         ++n;
@@ -171,28 +163,20 @@ int main(int argc, char* argv[])
     // advances. This makes it possible to filter while iterating.
     // Remove all items that are multiples of 5.
     iter2 = number_tree.begin();
-    while (iter2 != number_tree.end())
-    {
-        if (iter2->first % 5 == 0)
-        {
-            iter2.remove();     // also advances
-        }
-        else
-        {
+    while (iter2 != number_tree.end()) {
+        if (iter2->first % 5 == 0) {
+            iter2.remove(); // also advances
+        } else {
             ++iter2;
         }
     }
     std::cout << "Numbers after filtering:" << std::endl;
     n = 1;
-    for (auto& i: number_tree)
-    {
+    for (auto& i : number_tree) {
         std::cout << i.first << " -> " << i.second.getUTF8Value();
-        if (n % 5)
-        {
+        if (n % 5) {
             std::cout << ", ";
-        }
-        else
-        {
+        } else {
             std::cout << std::endl;
         }
         ++n;

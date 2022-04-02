@@ -48,8 +48,7 @@
 #include <qpdf/QPDFXRefEntry.hh>
 
 #define ignore_class(cls)
-#define print_size(cls) \
-    std::cout << #cls << " " << sizeof(cls) << std::endl
+#define print_size(cls) std::cout << #cls << " " << sizeof(cls) << std::endl
 
 // These classes are not really public.
 // ------
@@ -82,7 +81,8 @@ ignore_class(InputSource::Members);
 ignore_class(QUtil);
 ignore_class(QTC);
 
-int main()
+int
+main()
 {
     // Print the size of every class in the public API. This file is
     // read by the check_abi script at the top of the repository as

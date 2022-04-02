@@ -1,21 +1,22 @@
 #include <qpdf/QTC.hh>
 
+#include <qpdf/QUtil.hh>
 #include <set>
 #include <stdio.h>
-#include <qpdf/QUtil.hh>
 
-static bool tc_active(char const* const scope)
+static bool
+tc_active(char const* const scope)
 {
     std::string value;
     return (QUtil::get_env("TC_SCOPE", &value) && (value == scope));
 }
 
-void QTC::TC(char const* const scope, char const* const ccase, int n)
+void
+QTC::TC(char const* const scope, char const* const ccase, int n)
 {
-    static std::set<std::pair<std::string, int> > cache;
+    static std::set<std::pair<std::string, int>> cache;
 
-    if (! tc_active(scope))
-    {
+    if (!tc_active(scope)) {
         return;
     }
 
@@ -25,14 +26,12 @@ void QTC::TC(char const* const scope, char const* const ccase, int n)
 #else
 # define TC_ENV "TC_FILENAME"
 #endif
-    if (! QUtil::get_env(TC_ENV, &filename))
-    {
+    if (!QUtil::get_env(TC_ENV, &filename)) {
         return;
     }
 #undef TC_ENV
 
-    if (cache.count(std::make_pair(ccase, n)))
-    {
+    if (cache.count(std::make_pair(ccase, n))) {
         return;
     }
     cache.insert(std::make_pair(ccase, n));

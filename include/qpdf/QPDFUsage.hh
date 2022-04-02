@@ -24,8 +24,8 @@
 
 #include <qpdf/DLL.h>
 
-#include <string>
 #include <stdexcept>
+#include <string>
 
 class QPDF_DLL_CLASS QPDFUsage: public std::runtime_error
 {

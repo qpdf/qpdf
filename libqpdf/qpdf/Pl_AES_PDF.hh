@@ -13,9 +13,12 @@ class Pl_AES_PDF: public Pipeline
   public:
     QPDF_DLL
     // key should be a pointer to key_bytes bytes of data
-    Pl_AES_PDF(char const* identifier, Pipeline* next,
-               bool encrypt, unsigned char const* key,
-               size_t key_bytes);
+    Pl_AES_PDF(
+        char const* identifier,
+        Pipeline* next,
+        bool encrypt,
+        unsigned char const* key,
+        size_t key_bytes);
     QPDF_DLL
     virtual ~Pl_AES_PDF();
 
@@ -53,7 +56,7 @@ class Pl_AES_PDF: public Pipeline
     bool encrypt;
     bool cbc_mode;
     bool first;
-    size_t offset;              // offset into memory buffer
+    size_t offset; // offset into memory buffer
     std::unique_ptr<unsigned char[]> key;
     size_t key_bytes;
     unsigned char inbuf[buf_size];

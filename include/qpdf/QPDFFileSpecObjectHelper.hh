@@ -26,8 +26,8 @@
 
 #include <qpdf/DLL.h>
 
-#include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFEFStreamObjectHelper.hh>
+#include <qpdf/QPDFObjectHandle.hh>
 
 // This class provides a higher level interface around File
 // Specification dictionaries, which are discussed in section 7.11 of
@@ -77,22 +77,16 @@ class QPDFFileSpecObjectHelper: public QPDFObjectHelper
     // filename, and attach the contents of the specified file as data
     // in an embedded file stream.
     QPDF_DLL
-    static
-    QPDFFileSpecObjectHelper createFileSpec(
-        QPDF& qpdf,
-        std::string const& filename,
-        std::string const& fullpath);
+    static QPDFFileSpecObjectHelper createFileSpec(
+        QPDF& qpdf, std::string const& filename, std::string const& fullpath);
 
     // Create a new filespec as an indirect object with the given
     // unicode filename and embedded file stream. The file name will
     // be used as both /UF and /F. If you need to override, call
     // setFilename.
     QPDF_DLL
-    static
-    QPDFFileSpecObjectHelper createFileSpec(
-        QPDF& qpdf,
-        std::string const& filename,
-        QPDFEFStreamObjectHelper);
+    static QPDFFileSpecObjectHelper createFileSpec(
+        QPDF& qpdf, std::string const& filename, QPDFEFStreamObjectHelper);
 
     QPDF_DLL
     QPDFFileSpecObjectHelper& setDescription(std::string const&);
@@ -103,8 +97,7 @@ class QPDFFileSpecObjectHelper: public QPDFObjectHelper
     // might happen to have.
     QPDF_DLL
     QPDFFileSpecObjectHelper& setFilename(
-        std::string const& unicode_name,
-        std::string const& compat_name = "");
+        std::string const& unicode_name, std::string const& compat_name = "");
 
   private:
     class Members

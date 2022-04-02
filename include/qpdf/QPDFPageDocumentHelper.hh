@@ -22,9 +22,9 @@
 #ifndef QPDFPAGEDOCUMENTHELPER_HH
 #define QPDFPAGEDOCUMENTHELPER_HH
 
+#include <qpdf/Constants.h>
 #include <qpdf/QPDFDocumentHelper.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
-#include <qpdf/Constants.h>
 
 #include <qpdf/DLL.h>
 
@@ -106,8 +106,10 @@ class QPDFPageDocumentHelper: public QPDFDocumentHelper
     // Add new page before or after refpage. See comments for addPage
     // for details about what newpage should be.
     QPDF_DLL
-    void addPageAt(QPDFPageObjectHelper newpage, bool before,
-                   QPDFPageObjectHelper refpage);
+    void addPageAt(
+        QPDFPageObjectHelper newpage,
+        bool before,
+        QPDFPageObjectHelper refpage);
 
     // Remove page from the pdf.
     QPDF_DLL
@@ -126,8 +128,7 @@ class QPDFPageDocumentHelper: public QPDFDocumentHelper
     // those flags.
     QPDF_DLL
     void flattenAnnotations(
-        int required_flags = 0,
-        int forbidden_flags = an_invisible | an_hidden);
+        int required_flags = 0, int forbidden_flags = an_invisible | an_hidden);
 
   private:
     void flattenAnnotationsForPage(

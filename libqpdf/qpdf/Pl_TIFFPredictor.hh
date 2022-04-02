@@ -12,10 +12,13 @@ class Pl_TIFFPredictor: public Pipeline
     enum action_e { a_encode, a_decode };
 
     QPDF_DLL
-    Pl_TIFFPredictor(char const* identifier, Pipeline* next,
-                     action_e action, unsigned int columns,
-                     unsigned int samples_per_pixel = 1,
-                     unsigned int bits_per_sample = 8);
+    Pl_TIFFPredictor(
+        char const* identifier,
+        Pipeline* next,
+        action_e action,
+        unsigned int columns,
+        unsigned int samples_per_pixel = 1,
+        unsigned int bits_per_sample = 8);
     QPDF_DLL
     virtual ~Pl_TIFFPredictor();
 

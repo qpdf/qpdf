@@ -13,10 +13,10 @@
 #endif
 #include <openssl/rand.h>
 #ifdef OPENSSL_IS_BORINGSSL
-#include <openssl/cipher.h>
-#include <openssl/digest.h>
+# include <openssl/cipher.h>
+# include <openssl/digest.h>
 #else
-#include <openssl/evp.h>
+# include <openssl/evp.h>
 #endif
 #if (defined(__GNUC__) || defined(__clang__))
 # pragma GCC diagnostic pop
@@ -38,8 +38,10 @@ class QPDFCrypto_openssl: public QPDFCryptoImpl
     void MD5_digest(MD5_Digest) override;
 
     void RC4_init(unsigned char const* key_data, int key_len = -1) override;
-    void RC4_process(unsigned char* in_data, size_t len,
-                     unsigned char* out_data = 0) override;
+    void RC4_process(
+        unsigned char* in_data,
+        size_t len,
+        unsigned char* out_data = 0) override;
     void RC4_finalize() override;
 
     void SHA2_init(int bits) override;
@@ -48,10 +50,13 @@ class QPDFCrypto_openssl: public QPDFCryptoImpl
     std::string SHA2_digest() override;
 
     void rijndael_init(
-        bool encrypt, unsigned char const* key_data, size_t key_len,
-        bool cbc_mode, unsigned char* cbc_block) override;
-    void rijndael_process(
-        unsigned char* in_data, unsigned char* out_data) override;
+        bool encrypt,
+        unsigned char const* key_data,
+        size_t key_len,
+        bool cbc_mode,
+        unsigned char* cbc_block) override;
+    void
+    rijndael_process(unsigned char* in_data, unsigned char* out_data) override;
     void rijndael_finalize() override;
 
   private:

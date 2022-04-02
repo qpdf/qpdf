@@ -5,22 +5,23 @@
 // QPDFObjectHandle::TokenFilter with filterContents.
 //
 
-#include <iostream>
-#include <string.h>
-#include <stdlib.h>
 #include <algorithm>
 #include <deque>
+#include <iostream>
+#include <stdlib.h>
+#include <string.h>
 
 #include <qpdf/QPDF.hh>
+#include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFPageObjectHelper.hh>
-#include <qpdf/QUtil.hh>
 #include <qpdf/QPDFWriter.hh>
-#include <qpdf/QPDFObjectHandle.hh>
+#include <qpdf/QUtil.hh>
 
 static char const* whoami = 0;
 
-void usage()
+void
+usage()
 {
     std::cerr << "Usage: " << whoami << " infile outfile" << std::endl
               << "Applies token filters to infile and writes outfile"
@@ -52,14 +53,11 @@ StringReverser::handleToken(QPDFTokenizer::Token const& token)
     // strings. It's just intended to give a simple example of a
     // pretty minimal filter and to show an example of writing a
     // constructed token.
-    if (token.getType() == QPDFTokenizer::tt_string)
-    {
+    if (token.getType() == QPDFTokenizer::tt_string) {
         std::string value = token.getValue();
         std::reverse(value.begin(), value.end());
         writeToken(QPDFTokenizer::Token(QPDFTokenizer::tt_string, value));
-    }
-    else
-    {
+    } else {
         writeToken(token);
     }
 }
@@ -90,15 +88,17 @@ class ColorToGray: public QPDFObjectHandle::TokenFilter
 bool
 ColorToGray::isNumeric(QPDFTokenizer::token_type_e token_type)
 {
-    return ((token_type == QPDFTokenizer::tt_integer) ||
-            (token_type == QPDFTokenizer::tt_real));
+    return (
+        (token_type == QPDFTokenizer::tt_integer) ||
+        (token_type == QPDFTokenizer::tt_real));
 }
 
 bool
 ColorToGray::isIgnorable(QPDFTokenizer::token_type_e token_type)
 {
-    return ((token_type == QPDFTokenizer::tt_space) ||
-            (token_type == QPDFTokenizer::tt_comment));
+    return (
+        (token_type == QPDFTokenizer::tt_space) ||
+        (token_type == QPDFTokenizer::tt_comment));
 }
 
 double
@@ -134,33 +134,28 @@ ColorToGray::handleToken(QPDFTokenizer::Token const& token)
     // kinds of operands, replace the command. Flush any additional
     // accumulated tokens to keep the stack only four tokens deep.
 
-    while ((! this->all_stack.empty()) &&
-           isIgnorable(this->all_stack.at(0).getType()))
-    {
+    while ((!this->all_stack.empty()) &&
+           isIgnorable(this->all_stack.at(0).getType())) {
         writeToken(this->all_stack.at(0));
         this->all_stack.pop_front();
     }
     this->all_stack.push_back(token);
     QPDFTokenizer::token_type_e token_type = token.getType();
-    if (! isIgnorable(token_type))
-    {
+    if (!isIgnorable(token_type)) {
         this->stack.push_back(token);
         if ((this->stack.size() == 4) &&
             (token == QPDFTokenizer::Token(QPDFTokenizer::tt_word, "rg")) &&
             (isNumeric(this->stack.at(0).getType())) &&
             (isNumeric(this->stack.at(1).getType())) &&
-            (isNumeric(this->stack.at(2).getType())))
-        {
+            (isNumeric(this->stack.at(2).getType()))) {
             double r = numericValue(this->stack.at(0));
             double g = numericValue(this->stack.at(1));
             double b = numericValue(this->stack.at(2));
             double gray = ((0.3 * r) + (0.59 * b) + (0.11 * g));
-            if (gray > 1.0)
-            {
+            if (gray > 1.0) {
                 gray = 1.0;
             }
-            if (gray < 0.0)
-            {
+            if (gray < 0.0) {
                 gray = 0.0;
             }
             write(QUtil::double_to_string(gray, 3));
@@ -169,8 +164,7 @@ ColorToGray::handleToken(QPDFTokenizer::Token const& token)
             this->all_stack.clear();
         }
     }
-    if (this->stack.size() == 4)
-    {
+    if (this->stack.size() == 4) {
         writeToken(this->all_stack.at(0));
         this->all_stack.pop_front();
         this->stack.pop_front();
@@ -181,33 +175,31 @@ void
 ColorToGray::handleEOF()
 {
     // Flush out any remaining accumulated tokens.
-    while (! this->all_stack.empty())
-    {
+    while (!this->all_stack.empty()) {
         writeToken(this->all_stack.at(0));
         this->all_stack.pop_front();
     }
 }
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     whoami = QUtil::getWhoami(argv[0]);
 
-    if (argc != 3)
-    {
+    if (argc != 3) {
         usage();
     }
     char const* infilename = argv[1];
     char const* outfilename = argv[2];
 
-    try
-    {
+    try {
         QPDF pdf;
         pdf.processFile(infilename);
         std::vector<QPDFPageObjectHelper> pages =
             QPDFPageDocumentHelper(pdf).getAllPages();
         for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-             iter != pages.end(); ++iter)
-        {
+             iter != pages.end();
+             ++iter) {
             // Attach two token filters to each page of this file.
             // When the file is written, or when the pages' contents
             // are retrieved in any other way, the filters will be
@@ -222,11 +214,9 @@ int main(int argc, char* argv[])
         }
 
         QPDFWriter w(pdf, outfilename);
-        w.setStaticID(true);    // for testing only
+        w.setStaticID(true); // for testing only
         w.write();
-    }
-    catch (std::exception& e)
-    {
+    } catch (std::exception& e) {
         std::cerr << whoami << ": " << e.what() << std::endl;
         exit(2);
     }

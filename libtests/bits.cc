@@ -1,8 +1,8 @@
 #include <qpdf/BitStream.hh>
 #include <qpdf/BitWriter.hh>
 #include <qpdf/Pl_Buffer.hh>
-#include <qpdf/QUtil.hh>
 #include <qpdf/QIntC.hh>
+#include <qpdf/QUtil.hh>
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,8 +14,7 @@
 #include <qpdf/bits_functions.hh>
 
 static void
-print_values(long long byte_offset, size_t bit_offset,
-             size_t bits_available)
+print_values(long long byte_offset, size_t bit_offset, size_t bits_available)
 {
     std::cout << "byte offset = " << byte_offset << ", "
               << "bit offset = " << bit_offset << ", "
@@ -23,9 +22,12 @@ print_values(long long byte_offset, size_t bit_offset,
 }
 
 static void
-test_read_bits(unsigned char const* buf,
-               unsigned char const*& p, size_t& bit_offset,
-               size_t& bits_available, size_t bits_wanted)
+test_read_bits(
+    unsigned char const* buf,
+    unsigned char const*& p,
+    size_t& bit_offset,
+    size_t& bits_available,
+    size_t bits_wanted)
 {
     unsigned long result =
         QIntC::to_ulong(read_bits(p, bit_offset, bits_available, bits_wanted));
@@ -36,8 +38,12 @@ test_read_bits(unsigned char const* buf,
 }
 
 static void
-test_write_bits(unsigned char& ch, size_t& bit_offset, unsigned long val,
-                size_t bits, Pl_Buffer* bp)
+test_write_bits(
+    unsigned char& ch,
+    size_t& bit_offset,
+    unsigned long val,
+    size_t bits,
+    Pl_Buffer* bp)
 {
     write_bits(ch, bit_offset, val, bits, bp);
     std::cout << "ch = " << QUtil::uint_to_string_base(ch, 16, 2)
@@ -51,8 +57,7 @@ print_buffer(Pl_Buffer* bp)
     Buffer* b = bp->getBuffer();
     unsigned char const* p = b->getBuffer();
     size_t l = b->getSize();
-    for (unsigned long i = 0; i < l; ++i)
-    {
+    for (unsigned long i = 0; i < l; ++i) {
         std::cout << QUtil::uint_to_string_base(p[i], 16, 2)
                   << ((i == l - 1) ? "\n" : " ");
     }
@@ -69,8 +74,7 @@ test()
     // Read tests
 
     static unsigned char const buf[] = {
-        0xF5, 0x15, 0x65, 0x79, 0x12, 0x89, 0x75, 0x4B
-    };
+        0xF5, 0x15, 0x65, 0x79, 0x12, 0x89, 0x75, 0x4B};
 
     unsigned char const* p = buf;
     size_t bit_offset = 7;
@@ -89,12 +93,9 @@ test()
     test_read_bits(buf, p, bit_offset, bits_available, 0);
     test_read_bits(buf, p, bit_offset, bits_available, 25);
 
-    try
-    {
+    try {
         test_read_bits(buf, p, bit_offset, bits_available, 4);
-    }
-    catch (std::exception& e)
-    {
+    } catch (std::exception& e) {
         std::cout << "exception: " << e.what() << std::endl;
         print_values(p - buf, bit_offset, bits_available);
     }
@@ -179,14 +180,12 @@ test()
     delete bp;
 }
 
-int main()
+int
+main()
 {
-    try
-    {
+    try {
         test();
-    }
-    catch (std::exception& e)
-    {
+    } catch (std::exception& e) {
         std::cout << "unexpected exception: " << e.what() << std::endl;
         exit(2);
     }

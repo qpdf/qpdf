@@ -4,22 +4,21 @@
 // does.
 //
 
+#include <qpdf/QIntC.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFPageDocumentHelper.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QUtil.hh>
-#include <qpdf/QIntC.hh>
 
+#include <cstring>
 #include <iostream>
 #include <stdlib.h>
 #include <string>
-#include <cstring>
 
 static bool static_id = false;
 
-static void process(char const* whoami,
-                    char const* infile,
-                    std::string outprefix)
+static void
+process(char const* whoami, char const* infile, std::string outprefix)
 {
     QPDF inpdf;
     inpdf.processFile(infile);
@@ -29,8 +28,8 @@ static void process(char const* whoami,
         QIntC::to_int(QUtil::uint_to_string(pages.size()).length());
     int pageno = 0;
     for (std::vector<QPDFPageObjectHelper>::iterator iter = pages.begin();
-         iter != pages.end(); ++iter)
-    {
+         iter != pages.end();
+         ++iter) {
         QPDFPageObjectHelper& page(*iter);
         std::string outfile =
             outprefix + QUtil::int_to_string(++pageno, pageno_len) + ".pdf";
@@ -38,8 +37,7 @@ static void process(char const* whoami,
         outpdf.emptyPDF();
         QPDFPageDocumentHelper(outpdf).addPage(page, false);
         QPDFWriter outpdfw(outpdf, outfile.c_str());
-        if (static_id)
-        {
+        if (static_id) {
             // For the test suite, uncompress streams and use static
             // IDs.
             outpdfw.setStaticID(true); // for testing only
@@ -49,34 +47,31 @@ static void process(char const* whoami,
     }
 }
 
-void usage(char const* whoami)
+void
+usage(char const* whoami)
 {
     std::cerr << "Usage: " << whoami << " infile outprefix" << std::endl;
     exit(2);
 }
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     char const* whoami = QUtil::getWhoami(argv[0]);
 
     // For test suite
-    if ((argc > 1) && (strcmp(argv[1], " --static-id") == 0))
-    {
+    if ((argc > 1) && (strcmp(argv[1], " --static-id") == 0)) {
         static_id = true;
         --argc;
         ++argv;
     }
 
-    if (argc != 3)
-    {
+    if (argc != 3) {
         usage(whoami);
     }
-    try
-    {
+    try {
         process(whoami, argv[1], argv[2]);
-    }
-    catch (std::exception const& e)
-    {
+    } catch (std::exception const& e) {
         std::cerr << whoami << ": exception: " << e.what() << std::endl;
         return 2;
     }

@@ -2,8 +2,8 @@
 #define RC4_HH
 
 #include <qpdf/QPDFCryptoImpl.hh>
-#include <memory>
 #include <cstring>
+#include <memory>
 
 class RC4
 {
@@ -14,8 +14,8 @@ class RC4
 
     // out_data = 0 means to encrypt/decrypt in place
     QPDF_DLL
-    void process(unsigned char* in_data, size_t len,
-                 unsigned char* out_data = 0);
+    void
+    process(unsigned char* in_data, size_t len, unsigned char* out_data = 0);
 
   private:
     std::shared_ptr<QPDFCryptoImpl> crypto;

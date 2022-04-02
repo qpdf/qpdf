@@ -1,8 +1,8 @@
 #include <qpdf/QPDF_Name.hh>
 
-#include <string.h>
-#include <stdio.h>
 #include <qpdf/QUtil.hh>
+#include <stdio.h>
+#include <string.h>
 
 QPDF_Name::QPDF_Name(std::string const& name) :
     name(name)
@@ -16,28 +16,21 @@ QPDF_Name::~QPDF_Name()
 std::string
 QPDF_Name::normalizeName(std::string const& name)
 {
-    if (name.empty())
-    {
+    if (name.empty()) {
         return name;
     }
     std::string result;
     result += name.at(0);
-    for (size_t i = 1; i < name.length(); ++i)
-    {
+    for (size_t i = 1; i < name.length(); ++i) {
         char ch = name.at(i);
         // Don't use locale/ctype here; follow PDF spec guidelines.
-        if (ch == '\0')
-        {
+        if (ch == '\0') {
             // QPDFTokenizer embeds a null character to encode an
             // invalid #.
             result += "#";
-        }
-        else if (strchr("#()<>[]{}/%", ch) || (ch < 33) || (ch > 126))
-        {
+        } else if (strchr("#()<>[]{}/%", ch) || (ch < 33) || (ch > 126)) {
             result += "#" + QUtil::hex_encode(std::string(&ch, 1));
-        }
-        else
-        {
+        } else {
             result += ch;
         }
     }

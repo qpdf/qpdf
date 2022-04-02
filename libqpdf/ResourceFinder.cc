@@ -8,8 +8,7 @@ ResourceFinder::ResourceFinder() :
 void
 ResourceFinder::handleObject(QPDFObjectHandle obj, size_t offset, size_t)
 {
-    if (obj.isOperator() && (! this->last_name.empty()))
-    {
+    if (obj.isOperator() && (!this->last_name.empty())) {
         static std::map<std::string, std::string> op_to_rtype = {
             {"CS", "/ColorSpace"},
             {"cs", "/ColorSpace"},
@@ -25,19 +24,15 @@ ResourceFinder::handleObject(QPDFObjectHandle obj, size_t offset, size_t)
         std::string op = obj.getOperatorValue();
         std::string resource_type;
         auto iter = op_to_rtype.find(op);
-        if (iter != op_to_rtype.end())
-        {
+        if (iter != op_to_rtype.end()) {
             resource_type = iter->second;
         }
-        if (! resource_type.empty())
-        {
+        if (!resource_type.empty()) {
             this->names.insert(this->last_name);
-            this->names_by_resource_type[
-                resource_type][this->last_name].insert(this->last_name_offset);
+            this->names_by_resource_type[resource_type][this->last_name].insert(
+                this->last_name_offset);
         }
-    }
-    else if (obj.isName())
-    {
+    } else if (obj.isName()) {
         this->last_name = obj.getName();
         this->last_name_offset = offset;
     }

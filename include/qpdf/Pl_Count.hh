@@ -25,8 +25,8 @@
 // This pipeline is reusable; i.e., it is safe to call write() after
 // calling finish().
 
-#include <qpdf/Types.h>
 #include <qpdf/Pipeline.hh>
+#include <qpdf/Types.h>
 
 class Pl_Count: public Pipeline
 {

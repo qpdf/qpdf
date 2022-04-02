@@ -1,8 +1,8 @@
 #ifndef INSECURERANDOMDATAPROVIDER_HH
 #define INSECURERANDOMDATAPROVIDER_HH
 
-#include <qpdf/RandomDataProvider.hh>
 #include <qpdf/DLL.h>
+#include <qpdf/RandomDataProvider.hh>
 
 class InsecureRandomDataProvider: public RandomDataProvider
 {

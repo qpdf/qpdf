@@ -5,20 +5,21 @@
 class NameTreeDetails: public NNTreeDetails
 {
   public:
-    virtual std::string const& itemsKey() const override
+    virtual std::string const&
+    itemsKey() const override
     {
         static std::string k("/Names");
         return k;
     }
-    virtual bool keyValid(QPDFObjectHandle oh) const override
+    virtual bool
+    keyValid(QPDFObjectHandle oh) const override
     {
         return oh.isString();
     }
-    virtual int compareKeys(
-        QPDFObjectHandle a, QPDFObjectHandle b) const override
+    virtual int
+    compareKeys(QPDFObjectHandle a, QPDFObjectHandle b) const override
     {
-        if (! (keyValid(a) && keyValid(b)))
-        {
+        if (!(keyValid(a) && keyValid(b))) {
             // We don't call this without calling keyValid first
             throw std::logic_error("comparing invalid keys");
         }
@@ -95,14 +96,11 @@ QPDFNameTreeObjectHelper::iterator::operator--()
 void
 QPDFNameTreeObjectHelper::iterator::updateIValue()
 {
-    if (impl->valid())
-    {
+    if (impl->valid()) {
         auto p = *impl;
         this->ivalue.first = p->first.getUTF8Value();
         this->ivalue.second = p->second;
-    }
-    else
-    {
+    } else {
         this->ivalue.first = "";
         this->ivalue.second = QPDFObjectHandle();
     }
@@ -162,26 +160,25 @@ QPDFNameTreeObjectHelper::last() const
 }
 
 QPDFNameTreeObjectHelper::iterator
-QPDFNameTreeObjectHelper::find(std::string const& key,
-                               bool return_prev_if_not_found)
+QPDFNameTreeObjectHelper::find(
+    std::string const& key, bool return_prev_if_not_found)
 {
-    auto i = this->m->impl->find(QPDFObjectHandle::newUnicodeString(key),
-                                 return_prev_if_not_found);
+    auto i = this->m->impl->find(
+        QPDFObjectHandle::newUnicodeString(key), return_prev_if_not_found);
     return iterator(std::make_shared<NNTreeIterator>(i));
 }
 
 QPDFNameTreeObjectHelper::iterator
-QPDFNameTreeObjectHelper::insert(std::string const& key,
-                                 QPDFObjectHandle value)
+QPDFNameTreeObjectHelper::insert(std::string const& key, QPDFObjectHandle value)
 {
-    auto i = this->m->impl->insert(
-        QPDFObjectHandle::newUnicodeString(key), value);
+    auto i =
+        this->m->impl->insert(QPDFObjectHandle::newUnicodeString(key), value);
     return iterator(std::make_shared<NNTreeIterator>(i));
 }
 
 bool
-QPDFNameTreeObjectHelper::remove(std::string const& key,
-                                 QPDFObjectHandle* value)
+QPDFNameTreeObjectHelper::remove(
+    std::string const& key, QPDFObjectHandle* value)
 {
     return this->m->impl->remove(
         QPDFObjectHandle::newUnicodeString(key), value);
@@ -199,8 +196,7 @@ QPDFNameTreeObjectHelper::findObject(
     std::string const& name, QPDFObjectHandle& oh)
 {
     auto i = find(name);
-    if (i == end())
-    {
+    if (i == end()) {
         return false;
     }
     oh = i->second;

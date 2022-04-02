@@ -1,12 +1,12 @@
 #ifndef QPDFCRYPTO_NATIVE_HH
 #define QPDFCRYPTO_NATIVE_HH
 
+#include <qpdf/AES_PDF_native.hh>
 #include <qpdf/DLL.h>
-#include <qpdf/QPDFCryptoImpl.hh>
 #include <qpdf/MD5_native.hh>
+#include <qpdf/QPDFCryptoImpl.hh>
 #include <qpdf/RC4_native.hh>
 #include <qpdf/SHA2_native.hh>
-#include <qpdf/AES_PDF_native.hh>
 #include <memory>
 
 class QPDFCrypto_native: public QPDFCryptoImpl
@@ -25,8 +25,8 @@ class QPDFCrypto_native: public QPDFCryptoImpl
     virtual void MD5_digest(MD5_Digest);
 
     virtual void RC4_init(unsigned char const* key_data, int key_len = -1);
-    virtual void RC4_process(unsigned char* in_data, size_t len,
-                             unsigned char* out_data = 0);
+    virtual void RC4_process(
+        unsigned char* in_data, size_t len, unsigned char* out_data = 0);
     virtual void RC4_finalize();
 
     virtual void SHA2_init(int bits);
@@ -35,10 +35,13 @@ class QPDFCrypto_native: public QPDFCryptoImpl
     virtual std::string SHA2_digest();
 
     virtual void rijndael_init(
-        bool encrypt, unsigned char const* key_data, size_t key_len,
-        bool cbc_mode, unsigned char* cbc_block);
-    virtual void rijndael_process(
-        unsigned char* in_data, unsigned char* out_data);
+        bool encrypt,
+        unsigned char const* key_data,
+        size_t key_len,
+        bool cbc_mode,
+        unsigned char* cbc_block);
+    virtual void
+    rijndael_process(unsigned char* in_data, unsigned char* out_data);
     virtual void rijndael_finalize();
 
   private:

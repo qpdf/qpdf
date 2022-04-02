@@ -1,29 +1,27 @@
 #ifdef _WIN32
 # define WIN32_LEAN_AND_MEAN
-# include <windows.h>
 # include <direct.h>
 # include <io.h>
+# include <windows.h>
 #endif
 
 #include <iostream>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-static void do_copy(FILE* in, FILE* out)
+static void
+do_copy(FILE* in, FILE* out)
 {
-    if ((in == 0) || (out == 0))
-    {
+    if ((in == 0) || (out == 0)) {
         std::cerr << "errors opening files" << std::endl;
         exit(2);
     }
     char buf[10240];
     size_t len = 0;
-    while ((len = fread(buf, 1, sizeof(buf), in)) > 0)
-    {
+    while ((len = fread(buf, 1, sizeof(buf), in)) > 0) {
         fwrite(buf, 1, len, out);
     }
-    if (len != 0)
-    {
+    if (len != 0) {
         std::cerr << "errors reading or writing" << std::endl;
         exit(2);
     }
@@ -33,22 +31,23 @@ static void do_copy(FILE* in, FILE* out)
 
 #ifdef WINDOWS_WMAIN
 
-void copy(wchar_t const* outname)
+void
+copy(wchar_t const* outname)
 {
-#ifdef _MSC_VER
+# ifdef _MSC_VER
     FILE* in = 0;
     _wfopen_s(&in, L"minimal.pdf", L"rb");
     FILE* out = 0;
     _wfopen_s(&out, outname, L"wb");
-#else
+# else
     FILE* in = _wfopen(L"minimal.pdf", L"rb");
     FILE* out = _wfopen(outname, L"wb");
-#endif
+# endif
     do_copy(in, out);
 }
 
-extern "C"
-int wmain(int argc, wchar_t* argv[])
+extern "C" int
+wmain(int argc, wchar_t* argv[])
 {
     // Unicode
     wchar_t const* f1 = L"auto-\xfc.pdf";
@@ -61,14 +60,16 @@ int wmain(int argc, wchar_t* argv[])
 
 #else
 
-void copy(char const* outname)
+void
+copy(char const* outname)
 {
     FILE* in = fopen("minimal.pdf", "rb");
     FILE* out = fopen(outname, "wb");
     do_copy(in, out);
 }
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     // Explicit UTF-8 encoding
     char const* f1 = "auto-\xc3\xbc.pdf";

@@ -2,13 +2,13 @@
 #define QPDFARGPARSER_HH
 
 #include <qpdf/DLL.h>
-#include <memory>
-#include <string>
-#include <set>
-#include <map>
-#include <vector>
 #include <functional>
+#include <map>
+#include <memory>
+#include <set>
 #include <sstream>
+#include <string>
+#include <vector>
 
 // This is not a general-purpose argument parser. It is tightly
 // crafted to work with qpdf. qpdf's command-line syntax is very
@@ -79,8 +79,10 @@ class QPDFArgParser
     void addOptionalParameter(std::string const& arg, param_arg_handler_t);
     QPDF_DLL
     void addChoices(
-        std::string const& arg, param_arg_handler_t,
-        bool required, char const** choices);
+        std::string const& arg,
+        param_arg_handler_t,
+        bool required,
+        char const** choices);
 
     // The default behavior when an invalid choice is specified with
     // an option that takes choices is to list all the choices. This
@@ -137,16 +139,18 @@ class QPDFArgParser
 
     // Add a help topic along with the text for that topic
     QPDF_DLL
-    void addHelpTopic(std::string const& topic,
-                      std::string const& short_text,
-                      std::string const& long_text);
+    void addHelpTopic(
+        std::string const& topic,
+        std::string const& short_text,
+        std::string const& long_text);
 
     // Add help for an option, and associate it with a topic.
     QPDF_DLL
-    void addOptionHelp(std::string const& option_name,
-                       std::string const& topic,
-                       std::string const& short_text,
-                       std::string const& long_text);
+    void addOptionHelp(
+        std::string const& option_name,
+        std::string const& topic,
+        std::string const& short_text,
+        std::string const& long_text);
 
     // Return the help text for a topic or option. Passing a null
     // pointer returns the top-level help information. Passing an
@@ -158,12 +162,14 @@ class QPDFArgParser
     // Convenience methods for adding member functions of a class as
     // handlers.
     template <class T>
-    static bare_arg_handler_t bindBare(void (T::*f)(), T* o)
+    static bare_arg_handler_t
+    bindBare(void (T::*f)(), T* o)
     {
         return std::bind(std::mem_fn(f), o);
     }
     template <class T>
-    static param_arg_handler_t bindParam(void (T::*f)(std::string const&), T* o)
+    static param_arg_handler_t
+    bindParam(void (T::*f)(std::string const&), T* o)
     {
         return std::bind(std::mem_fn(f), o, std::placeholders::_1);
     }
@@ -239,8 +245,8 @@ class QPDFArgParser
     void addOptionsToCompletions(option_table_t&);
     void addChoicesToCompletions(
         option_table_t&, std::string const&, std::string const&);
-    void insertCompletions(
-        option_table_t&, std::string const&, std::string const&);
+    void
+    insertCompletions(option_table_t&, std::string const&, std::string const&);
     void handleCompletion();
 
     void getTopHelp(std::ostringstream&);

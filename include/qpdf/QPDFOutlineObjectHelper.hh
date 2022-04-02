@@ -22,8 +22,8 @@
 #ifndef QPDFOUTLINEOBJECTHELPER_HH
 #define QPDFOUTLINEOBJECTHELPER_HH
 
-#include <qpdf/QPDFObjectHelper.hh>
 #include <qpdf/QPDFObjGen.hh>
+#include <qpdf/QPDFObjectHelper.hh>
 #include <vector>
 
 class QPDFOutlineDocumentHelper;

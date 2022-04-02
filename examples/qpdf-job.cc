@@ -1,34 +1,32 @@
+#include <qpdf/QIntC.hh>
 #include <qpdf/QPDFJob.hh>
 #include <qpdf/QUtil.hh>
-#include <qpdf/QIntC.hh>
 
-#include <iostream>
 #include <cstring>
+#include <iostream>
 
 // This program is a simple demonstration of different ways to use the
 // QPDFJob API.
 
 static char const* whoami = 0;
 
-static void usage()
+static void
+usage()
 {
-    std::cerr
-        << "Usage: " << whoami << std::endl
-        << "This program linearizes the first page of in.pdf to out1.pdf,"
-        << " out2.pdf, and"
-        << std::endl
-        << " out3.pdf, each demonstrating a different way to use the"
-        << " QPDFJob API"
-        << std::endl;
+    std::cerr << "Usage: " << whoami << std::endl
+              << "This program linearizes the first page of in.pdf to out1.pdf,"
+              << " out2.pdf, and" << std::endl
+              << " out3.pdf, each demonstrating a different way to use the"
+              << " QPDFJob API" << std::endl;
     exit(2);
 }
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     whoami = QUtil::getWhoami(argv[0]);
 
-    if (argc != 1)
-    {
+    if (argc != 1) {
         usage();
     }
 
@@ -39,8 +37,7 @@ int main(int argc, char* argv[])
 
     // Note that staticId is used for testing only.
 
-    try
-    {
+    try {
         // Use the config API
         QPDFJob j;
         j.config()
@@ -54,15 +51,12 @@ int main(int argc, char* argv[])
             ->checkConfiguration();
         j.run();
         std::cout << "out1 status: " << j.getExitCode() << std::endl;
-    }
-    catch (std::exception& e)
-    {
+    } catch (std::exception& e) {
         std::cerr << "exception: " << e.what() << std::endl;
         return 2;
     }
 
-    try
-    {
+    try {
         char const* new_argv[] = {
             whoami,
             "in.pdf",
@@ -73,21 +67,17 @@ int main(int argc, char* argv[])
             "1",
             "--",
             "--static-id",
-            nullptr
-        };
+            nullptr};
         QPDFJob j;
         j.initializeFromArgv(new_argv);
         j.run();
         std::cout << "out2 status: " << j.getExitCode() << std::endl;
-    }
-    catch (std::exception& e)
-    {
+    } catch (std::exception& e) {
         std::cerr << "exception: " << e.what() << std::endl;
         return 2;
     }
 
-    try
-    {
+    try {
         // Use the JSON API
         QPDFJob j;
         j.initializeFromJson(R"({
@@ -105,9 +95,7 @@ int main(int argc, char* argv[])
 )");
         j.run();
         std::cout << "out3 status: " << j.getExitCode() << std::endl;
-    }
-    catch (std::exception& e)
-    {
+    } catch (std::exception& e) {
         std::cerr << "exception: " << e.what() << std::endl;
         return 2;
     }

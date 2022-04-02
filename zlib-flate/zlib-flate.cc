@@ -1,17 +1,18 @@
 #include <qpdf/Pl_Flate.hh>
 #include <qpdf/Pl_StdioFile.hh>
-#include <qpdf/QUtil.hh>
 #include <qpdf/QPDF.hh>
+#include <qpdf/QUtil.hh>
 
-#include <stdio.h>
-#include <string.h>
-#include <iostream>
-#include <stdlib.h>
 #include <fcntl.h>
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 static char const* whoami = 0;
 
-void usage()
+void
+usage()
 {
     std::cerr << "Usage: " << whoami << " { -uncompress | -compress[=n] }"
               << std::endl
@@ -19,52 +20,40 @@ void usage()
               << " zlib compression level from" << std::endl
               << "1 to 9 where lower numbers are faster and"
               << " less compressed and higher" << std::endl
-              << "numbers are slower and more compressed"
-              << std::endl;
+              << "numbers are slower and more compressed" << std::endl;
     exit(2);
 }
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
-    if ((whoami = strrchr(argv[0], '/')) == NULL)
-    {
+    if ((whoami = strrchr(argv[0], '/')) == NULL) {
         whoami = argv[0];
-    }
-    else
-    {
+    } else {
         ++whoami;
     }
 
-    if ((argc == 2) && (strcmp(argv[1], "--version") == 0))
-    {
-        std::cout << whoami << " from qpdf version "
-                  << QPDF::QPDFVersion() << std::endl;
+    if ((argc == 2) && (strcmp(argv[1], "--version") == 0)) {
+        std::cout << whoami << " from qpdf version " << QPDF::QPDFVersion()
+                  << std::endl;
         exit(0);
     }
 
-    if (argc != 2)
-    {
+    if (argc != 2) {
         usage();
     }
 
     Pl_Flate::action_e action = Pl_Flate::a_inflate;
 
-    if ((strcmp(argv[1], "-uncompress") == 0))
-    {
+    if ((strcmp(argv[1], "-uncompress") == 0)) {
         // okay
-    }
-    else if ((strcmp(argv[1], "-compress") == 0))
-    {
+    } else if ((strcmp(argv[1], "-compress") == 0)) {
         action = Pl_Flate::a_deflate;
-    }
-    else if ((strncmp(argv[1], "-compress=", 10) == 0))
-    {
+    } else if ((strncmp(argv[1], "-compress=", 10) == 0)) {
         action = Pl_Flate::a_deflate;
         int level = QUtil::string_to_int(argv[1] + 10);
         Pl_Flate::setCompressionLevel(level);
-    }
-    else
-    {
+    } else {
         usage();
     }
 
@@ -79,32 +68,24 @@ int main(int argc, char* argv[])
                   << ", msg = " << msg << std::endl;
     });
 
-    try
-    {
+    try {
         unsigned char buf[10000];
         bool done = false;
-        while (! done)
-        {
+        while (!done) {
             size_t len = fread(buf, 1, sizeof(buf), stdin);
-            if (len <= 0)
-            {
+            if (len <= 0) {
                 done = true;
-            }
-            else
-            {
+            } else {
                 flate->write(buf, len);
             }
         }
         flate->finish();
-    }
-    catch (std::exception& e)
-    {
+    } catch (std::exception& e) {
         std::cerr << whoami << ": " << e.what() << std::endl;
         exit(2);
     }
 
-    if (warn)
-    {
+    if (warn) {
         exit(3);
     }
     return 0;

@@ -28,6 +28,6 @@ namespace QTC
 {
     QPDF_DLL
     void TC(char const* const scope, char const* const ccase, int n = 0);
-};
+}; // namespace QTC
 
 #endif // QTC_HH
