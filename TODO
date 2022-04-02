@@ -60,43 +60,11 @@ Use clang-format-15.
 
   as well as the use of a comment to force a line break.
 
-Tentative .clang-format:
-
-```
----
-Language:        Cpp
-BasedOnStyle:  LLVM
-AlignAfterOpenBracket: AlwaysBreak
-AlignEscapedNewlines: DontAlign
-AllowShortFunctionsOnASingleLine: None
-BinPackArguments: false
-BinPackParameters: false
-BreakConstructorInitializers: BeforeComma
-DeriveLineEnding: false
-PackConstructorInitializers: Never
-IncludeCategories:
-  - Regex:           '^["<](qpdf)/'
-    Priority:        1
-    SortPriority:    0
-    CaseSensitive:   false
-  - Regex:           '.*'
-    Priority:        2
-    SortPriority:    0
-    CaseSensitive:   false
-  - Regex:           '.*'
-    Priority:        1
-    SortPriority:    0
-    CaseSensitive:   false
-IndentCaseBlocks: true
-IndentWidth:     4
-InsertTrailingCommas: Wrapped
-KeepEmptyLinesAtTheStartOfBlocks: false
-PointerAlignment: Left
-```
+https://clang.llvm.org/docs/ClangFormatStyleOptions.html
 
 Remaining work:
 
-* Try to get emacs c-style to match as closely as possible
+* Document .dir-locals.el and how it's close but not perfect
 * Consider blame.ignoreRevsFile if it seems to help
 * Add a `make format` similar to `make spell` (or whatever this ends
   up being with cmake)

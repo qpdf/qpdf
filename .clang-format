@@ -1,0 +1,50 @@
+# -*- yaml -*-
+# This configuration works with clang-format-15.
+# See https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+---
+Language: Cpp
+BasedOnStyle: LLVM
+AlignAfterOpenBracket: AlwaysBreak
+AlignEscapedNewlines: DontAlign
+AlignOperands: DontAlign
+AllowShortFunctionsOnASingleLine: None
+AlwaysBreakAfterReturnType: AllDefinitions
+AlwaysBreakTemplateDeclarations: Yes
+AttributeMacros:
+  - QPDF_DLL
+  - QPDF_DLL_CLASS
+BinPackArguments: false
+BinPackParameters: false
+BraceWrapping:
+  AfterClass:      true
+  AfterFunction:   true
+  AfterNamespace:  true
+  AfterStruct:     true
+  AfterUnion:      true
+BreakBeforeBraces: Custom
+BreakConstructorInitializers: AfterColon
+DeriveLineEnding: false
+PackConstructorInitializers: Never
+IncludeCategories:
+  - Regex:           '^["<](qpdf)/'
+    Priority:        1
+    SortPriority:    0
+    CaseSensitive:   false
+  - Regex:           '.*'
+    Priority:        2
+    SortPriority:    0
+    CaseSensitive:   false
+  - Regex:           '.*'
+    Priority:        1
+    SortPriority:    0
+    CaseSensitive:   false
+IndentCaseBlocks: true
+IndentExternBlock: Indent
+IndentPPDirectives: AfterHash
+IndentWidth: 4
+InsertTrailingCommas: Wrapped
+KeepEmptyLinesAtTheStartOfBlocks: false
+NamespaceIndentation: All
+PointerAlignment: Left
+PPIndentWidth: 1
+SpaceBeforeInheritanceColon: false
