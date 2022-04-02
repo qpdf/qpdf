@@ -1,3 +1,4 @@
+/* clang-format off */
 #define FULL_UNROLL
 
 #include "qpdf/rijndael.h"

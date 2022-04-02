@@ -1,3 +1,5 @@
+// clang-format off
+
 // This file implements a class for computation of MD5 checksums.
 // It is derived from the reference algorithm for MD5 as given in
 // RFC 1321.  The original copyright notice is as follows:

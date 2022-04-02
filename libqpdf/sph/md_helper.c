@@ -1,3 +1,4 @@
+/* clang-format off */
 /* $Id: md_helper.c 216 2010-06-08 09:46:57Z tp $ */
 /*
  * This file contains some functions which implement the external data
