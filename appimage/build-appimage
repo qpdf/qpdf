@@ -21,7 +21,7 @@
 # into the 'CUSTOM_CONFIGURE' environment variable and exporting it
 # before running this script. For example:
 #
-#      export CUSTOM_CONFIGURE=" --enable-test-compare-images [--more-other-options]"
+#      export CUSTOM_CONFIGURE=" -DSOME_OTHER_OPTION=1 [...]"
 #
 # ATTENTION:
 #
@@ -151,7 +151,12 @@ wget -c "https://github.com/probonopd/linuxdeployqt/releases/download/continuous
 chmod a+x linuxdeployqt*.AppImage
 
 # Set up a clean environment:
-unset QTDIR; unset QT_PLUGIN_PATH; unset LD_LIBRARY_PATH
+unset QTDIR; unset QT_PLUGIN_PATH
+
+# Since cmake strips runpath information for executables and we are
+# installing with DESTDIR, we need to set LD_LIBRARY_PATH or else ldd
+# will fail on the resulting executables
+export LD_LIBRARY_PATH=$(dirname $(find $appdir -type l -name libqpdf.so.28))
 
 # Let 'linuxdeployqt' do its first stage of work:
 ./linuxdeployqt*.AppImage appdir/usr/share/applications/*.desktop -bundle-non-qt-libs

@@ -443,6 +443,16 @@ build-appimage, which passes them along to to docker.
 Use -e SKIP_TESTS=1 to skip the test suite.
 Use -ti -e RUN_SHELL=1 to run a shell instead of the build script.
 
+To iterate on the scripts directly in the source tree, you can run
+
+docker build -t qpdfbuild appimage
+docker run --privileged --rm -ti -e SKIP_TESTS=1 -e RUN_SHELL=1 \
+       -v $PWD/..:/tmp/build ${1+"$@"} qpdfbuild
+
+This will put you at a shell prompt inside the container with your
+current directory set to the top of the source tree and your uid equal
+to the owner of the parent directory source tree.
+
 
 LOCAL WINDOWS TESTING PROCEDURE
 
