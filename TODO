@@ -33,6 +33,8 @@ Misc
 * Go through README-maintainer "CODING RULES" and update --
   PointerHolder and other changes will make some of the rules
   obsolete.
+* Have a warn in QPDF that passes its variable arguments onto QPDFExc
+  so you don't have to do warn(QPDFExc(...))
 
 Soon: Break ground on "Document-level work"
 
