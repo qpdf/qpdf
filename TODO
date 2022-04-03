@@ -41,37 +41,56 @@ Soon: Break ground on "Document-level work"
 Code Formatting
 ===============
 
-Use clang-format-15.
+Document about code formatting:
 
-* Put a .clang-format at the top of the repository -- see below for content.
-* Reformat all files:
-
-  for i in  **/*.cc **/*.c **/*.h **/*.hh; do
-     clang-format < $i >| $i.new && mv $i.new $i
-  done
-
-* Carefully inspect the diff. There are some places where a comment to
-  force a line break might be in order. Document use of // line-break
-
+* Use clang-format-15.
 * Update README-maintainer about formatting. Mention
 
   // clang-format off
   // clang-format on
 
-  as well as the use of a comment to force a line break.
+  as well as the use of a comment to force a line break. Convention:
+  // line-break
 
-https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+* .dir-locals.el -- most of the time, emacs's formatting agrees with
+  clang-format. When they differ, clang-format is authoritative.
+  Significant differences:
+  * clang-format-15 bug that when
 
-Remaining work:
+    type function(args)
 
-* Document .dir-locals.el and how it's close but not perfect
+    is longer than 80 characters, the continuation line rule takes
+    precedence over the break after type rule and the function ends
+    getting intended. (Find an example and report.)
+  * Emacs doesn't indent breaking strings concatenated with + over
+    lines but clang-format does. It's clearer with clang-format. To
+    get emacs and clang-format to agree, parenthesize the expression
+    that builds the concatenated string.
+  * With
+
+    long_function(long_function(
+        args)
+
+    clang-format anchors relative to the first function, and emacs
+    anchors relative to the second function. Use
+
+    long_function(
+        // line-break
+	long_function(
+	    args)
+
+    to resolve.
 * Consider blame.ignoreRevsFile if it seems to help
-* Add a `make format` similar to `make spell` (or whatever this ends
-  up being with cmake)
+* Add a script to format the code.
+
+  for i in  **/*.cc **/*.c **/*.h **/*.hh; do
+     clang-format < $i >| $i.new && mv $i.new $i
+  done
+
 * Consider a github action to check formatting. I don't want
   formatting failures to prevent all the tests from being run.
-  Alternatively, add running `make format` as a release preparation
-  check like `make spell`.
+  Alternatively, add running the format script as a release
+  preparation check like running the spell checker.
 
 cmake
 =====
