@@ -257,8 +257,8 @@ QPDFObjectHandle::setObjectDescriptionFromInput(
 {
     object.setObjectDescription(
         context,
-        input->getName() + ", " + description + " at offset " +
-            QUtil::int_to_string(offset));
+        (input->getName() + ", " + description + " at offset " +
+         QUtil::int_to_string(offset)));
 }
 
 bool
@@ -1018,8 +1018,8 @@ QPDFObjectHandle::getKey(std::string const& key)
         if (this->obj->getDescription(qpdf, description)) {
             result.setObjectDescription(
                 qpdf,
-                description + " -> null returned from getting key " + key +
-                    " from non-Dictionary");
+                (description + " -> null returned from getting key " + key +
+                 " from non-Dictionary"));
         }
     }
     return result;

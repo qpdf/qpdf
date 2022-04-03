@@ -45,25 +45,29 @@ process(
 
     // Create an indirect object for the built-in Helvetica font. This
     // uses the qpdf literal syntax introduced in qpdf 10.6.
-    auto f1 = q.makeIndirectObject("<<"
-                                   "  /Type /Font"
-                                   "  /Subtype /Type1"
-                                   "  /Name /F1"
-                                   "  /BaseFont /Helvetica"
-                                   "  /Encoding /WinAnsiEncoding"
-                                   ">>"_qpdf);
+    auto f1 = q.makeIndirectObject(
+        // force line-break
+        "<<"
+        "  /Type /Font"
+        "  /Subtype /Type1"
+        "  /Name /F1"
+        "  /BaseFont /Helvetica"
+        "  /Encoding /WinAnsiEncoding"
+        ">>"_qpdf);
 
     // Create a resources dictionary with fonts. This uses the new
     // parse introduced in qpdf 10.2 that takes a QPDF* and allows
     // indirect object references.
-    auto resources = q.makeIndirectObject(QPDFObjectHandle::parse(
-        &q,
-        "<<"
-        "  /Font <<"
-        "    /F1 " +
-            f1.unparse() +
-            "  >>"
-            ">>"));
+    auto resources = q.makeIndirectObject(
+        // line-break
+        QPDFObjectHandle::parse(
+            &q,
+            ("<<"
+             "  /Font <<"
+             "    /F1 " +
+             f1.unparse() +
+             "  >>"
+             ">>")));
 
     // Create a file spec.
     std::string key = QUtil::path_basename(attachment);
@@ -108,45 +112,45 @@ process(
     apdict.replaceKey("/BBox", "[ 0 0 20 20 ]"_qpdf);
     auto annot = q.makeIndirectObject(QPDFObjectHandle::parse(
         &q,
-        "<<"
-        "  /AP <<"
-        "    /N " +
-            ap.unparse() +
-            "  >>"
-            "  /Contents " +
-            QPDFObjectHandle::newUnicodeString(attachment).unparse() +
-            "  /FS " + fs.getObjectHandle().unparse() + "  /NM " +
-            QPDFObjectHandle::newUnicodeString(attachment).unparse() +
-            "  /Rect [ 72 700 92 720 ]"
-            "  /Subtype /FileAttachment"
-            "  /Type /Annot"
-            ">>"));
+        ("<<"
+         "  /AP <<"
+         "    /N " +
+         ap.unparse() +
+         "  >>"
+         "  /Contents " +
+         QPDFObjectHandle::newUnicodeString(attachment).unparse() + "  /FS " +
+         fs.getObjectHandle().unparse() + "  /NM " +
+         QPDFObjectHandle::newUnicodeString(attachment).unparse() +
+         "  /Rect [ 72 700 92 720 ]"
+         "  /Subtype /FileAttachment"
+         "  /Type /Annot"
+         ">>")));
 
     // Generate contents for the page.
     auto contents = QPDFObjectHandle::newStream(
         &q,
-        "q\n"
-        "BT\n"
-        "  102 700 Td\n"
-        "  /F1 16 Tf\n"
-        "  (Here is an attachment.) Tj\n"
-        "ET\n"
-        "Q\n");
+        ("q\n"
+         "BT\n"
+         "  102 700 Td\n"
+         "  /F1 16 Tf\n"
+         "  (Here is an attachment.) Tj\n"
+         "ET\n"
+         "Q\n"));
 
     // Create the page object.
     auto page = QPDFObjectHandle::parse(
         &q,
-        "<<"
-        "  /Annots [ " +
-            annot.unparse() +
-            " ]"
-            "  /Contents " +
-            contents.unparse() +
-            "  /MediaBox [0 0 612 792]"
-            "  /Resources " +
-            resources.unparse() +
-            "  /Type /Page"
-            ">>");
+        ("<<"
+         "  /Annots [ " +
+         annot.unparse() +
+         " ]"
+         "  /Contents " +
+         contents.unparse() +
+         "  /MediaBox [0 0 612 792]"
+         "  /Resources " +
+         resources.unparse() +
+         "  /Type /Page"
+         ">>"));
 
     // Add the page.
     q.addPage(page, true);

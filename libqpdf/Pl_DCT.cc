@@ -185,8 +185,9 @@ static void
 jpeg_pipeline_dest(
     j_compress_ptr cinfo, unsigned char* outbuffer, size_t size, Pipeline* next)
 {
-    cinfo->dest =
-        static_cast<struct jpeg_destination_mgr*>((*cinfo->mem->alloc_small)(
+    cinfo->dest = static_cast<struct jpeg_destination_mgr*>(
+        // line-break
+        (*cinfo->mem->alloc_small)(
             reinterpret_cast<j_common_ptr>(cinfo),
             JPOOL_PERMANENT,
             sizeof(dct_pipeline_dest)));
@@ -239,10 +240,12 @@ term_buffer_source(j_decompress_ptr)
 static void
 jpeg_buffer_src(j_decompress_ptr cinfo, Buffer* buffer)
 {
-    cinfo->src = reinterpret_cast<jpeg_source_mgr*>((*cinfo->mem->alloc_small)(
-        reinterpret_cast<j_common_ptr>(cinfo),
-        JPOOL_PERMANENT,
-        sizeof(jpeg_source_mgr)));
+    cinfo->src = reinterpret_cast<jpeg_source_mgr*>(
+        // line-break
+        (*cinfo->mem->alloc_small)(
+            reinterpret_cast<j_common_ptr>(cinfo),
+            JPOOL_PERMANENT,
+            sizeof(jpeg_source_mgr)));
 
     jpeg_source_mgr* src = cinfo->src;
     src->init_source = init_buffer_source;

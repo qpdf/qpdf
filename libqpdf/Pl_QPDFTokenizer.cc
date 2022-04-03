@@ -44,8 +44,10 @@ void
 Pl_QPDFTokenizer::finish()
 {
     this->m->buf.finish();
-    auto input = PointerHolder<InputSource>(new BufferInputSource(
-        "tokenizer data", this->m->buf.getBuffer(), true));
+    auto input = PointerHolder<InputSource>(
+        // line-break
+        new BufferInputSource(
+            "tokenizer data", this->m->buf.getBuffer(), true));
 
     while (true) {
         QPDFTokenizer::Token token = this->m->tokenizer.readToken(
@@ -59,8 +61,10 @@ Pl_QPDFTokenizer::finish()
             // Read the space after the ID.
             char ch = ' ';
             input->read(&ch, 1);
-            this->m->filter->handleToken(QPDFTokenizer::Token(
-                QPDFTokenizer::tt_space, std::string(1, ch)));
+            this->m->filter->handleToken(
+                // line-break
+                QPDFTokenizer::Token(
+                    QPDFTokenizer::tt_space, std::string(1, ch)));
             QTC::TC("qpdf", "Pl_QPDFTokenizer found ID");
             this->m->tokenizer.expectInlineImage(input);
         }

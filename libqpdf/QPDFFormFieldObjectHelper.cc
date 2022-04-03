@@ -913,6 +913,8 @@ QPDFFormFieldObjectHelper::generateTextAppearance(
         opt.at(i) = (*encoder)(opt.at(i), '?');
     }
 
-    AS.addTokenFilter(PointerHolder<QPDFObjectHandle::TokenFilter>(
-        new ValueSetter(DA, V, opt, tf, bbox)));
+    AS.addTokenFilter(
+        // line-break
+        PointerHolder<QPDFObjectHandle::TokenFilter>(
+            new ValueSetter(DA, V, opt, tf, bbox)));
 }

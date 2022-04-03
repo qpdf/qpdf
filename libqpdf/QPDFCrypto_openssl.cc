@@ -208,8 +208,10 @@ QPDFCrypto_openssl::rijndael_init(
     }
 
     check_openssl(EVP_CIPHER_CTX_reset(cipher_ctx));
-    check_openssl(EVP_CipherInit_ex(
-        cipher_ctx, cipher, nullptr, key_data, cbc_block, encrypt));
+    check_openssl(
+        // line-break
+        EVP_CipherInit_ex(
+            cipher_ctx, cipher, nullptr, key_data, cbc_block, encrypt));
     check_openssl(EVP_CIPHER_CTX_set_padding(cipher_ctx, 0));
 }
 

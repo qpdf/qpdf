@@ -1110,8 +1110,10 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
                 } else if (ap.second.isDictionary()) {
                     for (auto& ap2 : ap.second.ditems()) {
                         if (ap2.second.isStream()) {
-                            streams.push_back(replace_stream(
-                                ap.second, ap2.first, ap2.second));
+                            streams.push_back(
+                                // line-break
+                                replace_stream(
+                                    ap.second, ap2.first, ap2.second));
                         }
                     }
                 }

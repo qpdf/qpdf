@@ -47,8 +47,10 @@ BitStream::getBitsSigned(size_t nbits)
 int
 BitStream::getBitsInt(size_t nbits)
 {
-    return static_cast<int>(QIntC::to_uint(
-        read_bits(this->p, this->bit_offset, this->bits_available, nbits)));
+    return static_cast<int>(
+        // line-break
+        QIntC::to_uint(
+            read_bits(this->p, this->bit_offset, this->bits_available, nbits)));
 }
 
 void

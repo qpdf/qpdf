@@ -51,7 +51,7 @@ Use clang-format-15.
   done
 
 * Carefully inspect the diff. There are some places where a comment to
-  force a line break might be in order.
+  force a line break might be in order. Document use of // line-break
 
 * Update README-maintainer about formatting. Mention
 

@@ -121,9 +121,12 @@ InputSource::findFirst(
         }
 
         // Search for the first character.
-        if ((p = static_cast<char*>(memchr(
-                 p, start_chars[0], bytes_read - QIntC::to_size(p - buf)))) !=
-            0) {
+        if ((p = static_cast<char*>(
+                 // line-break
+                 memchr(
+                     p,
+                     start_chars[0],
+                     bytes_read - QIntC::to_size(p - buf)))) != 0) {
             if (p == buf) {
                 QTC::TC("libtests", "InputSource found match at buf[0]");
             }

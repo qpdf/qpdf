@@ -2519,10 +2519,12 @@ QPDFJob::handlePageSpecs(
 
         // Read original pages from the PDF, and parse the page range
         // associated with this occurrence of the file.
-        parsed_specs.push_back(QPDFPageData(
-            page_spec.filename,
-            page_spec_qpdfs[page_spec.filename],
-            page_spec.range));
+        parsed_specs.push_back(
+            // line-break
+            QPDFPageData(
+                page_spec.filename,
+                page_spec_qpdfs[page_spec.filename],
+                page_spec.range));
     }
 
     std::map<unsigned long long, bool> remove_unreferenced;
@@ -2581,9 +2583,11 @@ QPDFJob::handlePageSpecs(
                 for (size_t j = 0; j < m->collate; ++j) {
                     if (cur_page + j < page_data.selected_pages.size()) {
                         got_pages = true;
-                        new_parsed_specs.push_back(QPDFPageData(
-                            page_data,
-                            page_data.selected_pages.at(cur_page + j)));
+                        new_parsed_specs.push_back(
+                            // line-break
+                            QPDFPageData(
+                                page_data,
+                                page_data.selected_pages.at(cur_page + j)));
                     }
                 }
             }
@@ -2684,9 +2688,9 @@ QPDFJob::handlePageSpecs(
                         pdf.getFilename(),
                         "",
                         0,
-                        "Exception caught while fixing copied"
-                        " annotations. This may be a qpdf bug. " +
-                            std::string("Exception: ") + e.what()));
+                        ("Exception caught while fixing copied"
+                         " annotations. This may be a qpdf bug. " +
+                         std::string("Exception: ") + e.what())));
                 }
             }
         }
@@ -3060,8 +3064,9 @@ QPDFJob::setWriterOptions(QPDF& pdf, QPDFWriter& w)
         w.forcePDFVersion(version, extension_level);
     }
     if (m->progress && m->outfilename) {
-        w.registerProgressReporter(
-            PointerHolder<QPDFWriter::ProgressReporter>(new ProgressReporter(
+        w.registerProgressReporter(PointerHolder<QPDFWriter::ProgressReporter>(
+            // line-break
+            new ProgressReporter(
                 *(this->m->cout),
                 this->m->message_prefix,
                 m->outfilename.get())));

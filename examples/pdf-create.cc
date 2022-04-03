@@ -180,11 +180,13 @@ add_page(
     size_t width = p->getWidth();
     size_t height = p->getHeight();
     QPDFObjectHandle image = QPDFObjectHandle::newStream(&pdf);
-    auto image_dict = "<<"
-                      " /Type /XObject"
-                      " /Subtype /Image"
-                      " /BitsPerComponent 8"
-                      ">>"_qpdf;
+    auto image_dict =
+        // line-break
+        "<<"
+        " /Type /XObject"
+        " /Subtype /Image"
+        " /BitsPerComponent 8"
+        ">>"_qpdf;
     image_dict.replaceKey("/ColorSpace", newName(color_space));
     image_dict.replaceKey("/Width", newInteger(width));
     image_dict.replaceKey("/Height", newInteger(height));
@@ -352,13 +354,15 @@ create_pdf(char const* filename)
 
     // Add an indirect object to contain a font descriptor for the
     // built-in Helvetica font.
-    QPDFObjectHandle font = pdf.makeIndirectObject("<<"
-                                                   " /Type /Font"
-                                                   " /Subtype /Type1"
-                                                   " /Name /F1"
-                                                   " /BaseFont /Helvetica"
-                                                   " /Encoding /WinAnsiEncoding"
-                                                   ">>"_qpdf);
+    QPDFObjectHandle font = pdf.makeIndirectObject(
+        // line-break
+        "<<"
+        " /Type /Font"
+        " /Subtype /Type1"
+        " /Name /F1"
+        " /BaseFont /Helvetica"
+        " /Encoding /WinAnsiEncoding"
+        ">>"_qpdf);
 
     std::vector<std::string> color_spaces;
     color_spaces.push_back("/DeviceCMYK");

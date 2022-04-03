@@ -21,12 +21,14 @@ warn(QPDF* qpdf, QPDFObjectHandle& node, std::string const& msg)
     // ABI: in qpdf 11, change to a reference.
 
     if (qpdf) {
-        qpdf->warn(QPDFExc(
-            qpdf_e_damaged_pdf,
-            qpdf->getFilename(),
-            get_description(node),
-            0,
-            msg));
+        qpdf->warn(
+            // line-break
+            QPDFExc(
+                qpdf_e_damaged_pdf,
+                qpdf->getFilename(),
+                get_description(node),
+                0,
+                msg));
     }
 }
 
@@ -122,8 +124,8 @@ NNTreeIterator::getNextKid(PathElement& pe, bool backward)
                 warn(
                     impl.qpdf,
                     pe.node,
-                    "skipping over invalid kid at index " +
-                        QUtil::int_to_string(pe.kid_number));
+                    ("skipping over invalid kid at index " +
+                     QUtil::int_to_string(pe.kid_number)));
             }
         } else {
             result = QPDFObjectHandle::newNull();
@@ -179,8 +181,8 @@ NNTreeIterator::increment(bool backward)
                 warn(
                     impl.qpdf,
                     this->node,
-                    "item " + QUtil::int_to_string(this->item_number) +
-                        " has the wrong type");
+                    ("item " + QUtil::int_to_string(this->item_number) +
+                     " has the wrong type"));
             } else {
                 found_valid_key = true;
             }
@@ -708,9 +710,9 @@ NNTreeIterator::deepen(QPDFObjectHandle node, bool first, bool allow_empty)
                     warn(
                         impl.qpdf,
                         node,
-                        "converting kid number " +
-                            QUtil::int_to_string(kid_number) +
-                            " to an indirect object");
+                        ("converting kid number " +
+                         QUtil::int_to_string(kid_number) +
+                         " to an indirect object"));
                     next = impl.qpdf->makeIndirectObject(next);
                     kids.setArrayItem(kid_number, next);
                 } else {
@@ -718,8 +720,8 @@ NNTreeIterator::deepen(QPDFObjectHandle node, bool first, bool allow_empty)
                     warn(
                         impl.qpdf,
                         node,
-                        "kid number " + QUtil::int_to_string(kid_number) +
-                            " is not an indirect object");
+                        ("kid number " + QUtil::int_to_string(kid_number) +
+                         " is not an indirect object"));
                 }
             }
             node = next;
@@ -732,8 +734,8 @@ NNTreeIterator::deepen(QPDFObjectHandle node, bool first, bool allow_empty)
             warn(
                 impl.qpdf,
                 node,
-                "name/number tree node has neither non-empty " +
-                    impl.details.itemsKey() + " nor /Kids");
+                ("name/number tree node has neither non-empty " +
+                 impl.details.itemsKey() + " nor /Kids"));
             failed = true;
             break;
         }
@@ -876,8 +878,8 @@ NNTreeImpl::compareKeyItem(
         error(
             qpdf,
             this->oh,
-            "item at index " + QUtil::int_to_string(2 * idx) +
-                " is not the right type");
+            ("item at index " + QUtil::int_to_string(2 * idx) +
+             " is not the right type"));
     }
     return details.compareKeys(key, items.getArrayItem(2 * idx));
 }

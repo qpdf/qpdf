@@ -31,22 +31,24 @@
 // it, and the C API relies on its being static as well.
 std::string const QPDF::qpdf_version(QPDF_VERSION);
 
-static char const* EMPTY_PDF = "%PDF-1.3\n"
-                               "1 0 obj\n"
-                               "<< /Type /Catalog /Pages 2 0 R >>\n"
-                               "endobj\n"
-                               "2 0 obj\n"
-                               "<< /Type /Pages /Kids [] /Count 0 >>\n"
-                               "endobj\n"
-                               "xref\n"
-                               "0 3\n"
-                               "0000000000 65535 f \n"
-                               "0000000009 00000 n \n"
-                               "0000000058 00000 n \n"
-                               "trailer << /Size 3 /Root 1 0 R >>\n"
-                               "startxref\n"
-                               "110\n"
-                               "%%EOF\n";
+static char const* EMPTY_PDF = (
+    // force line break
+    "%PDF-1.3\n"
+    "1 0 obj\n"
+    "<< /Type /Catalog /Pages 2 0 R >>\n"
+    "endobj\n"
+    "2 0 obj\n"
+    "<< /Type /Pages /Kids [] /Count 0 >>\n"
+    "endobj\n"
+    "xref\n"
+    "0 3\n"
+    "0000000000 65535 f \n"
+    "0000000009 00000 n \n"
+    "0000000058 00000 n \n"
+    "trailer << /Size 3 /Root 1 0 R >>\n"
+    "startxref\n"
+    "110\n"
+    "%%EOF\n");
 
 class InvalidInputSource: public InputSource
 {
@@ -292,10 +294,12 @@ QPDF::processMemoryFile(
     char const* password)
 {
     processInputSource(
-        PointerHolder<InputSource>(new BufferInputSource(
-            description,
-            new Buffer(QUtil::unsigned_char_pointer(buf), length),
-            true)),
+        PointerHolder<InputSource>(
+            // line-break
+            new BufferInputSource(
+                description,
+                new Buffer(QUtil::unsigned_char_pointer(buf), length),
+                true)),
         password);
 }
 
@@ -753,10 +757,10 @@ QPDF::read_xref(qpdf_offset_t xref_offset)
             this->m->file->getName(),
             "",
             0,
-            std::string("reported number of objects (") +
-                QUtil::int_to_string(size) +
-                ") is not one plus the highest object number (" +
-                QUtil::int_to_string(max_obj) + ")"));
+            (std::string("reported number of objects (") +
+             QUtil::int_to_string(size) +
+             ") is not one plus the highest object number (" +
+             QUtil::int_to_string(max_obj) + ")")));
     }
 
     // We no longer need the deleted_objects table, so go ahead and
@@ -1145,8 +1149,8 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
                     this->m->file->getName(),
                     "xref stream",
                     xref_offset,
-                    "Cross-reference stream's /Index's item " +
-                        QUtil::int_to_string(i) + " is not an integer");
+                    ("Cross-reference stream's /Index's item " +
+                     QUtil::int_to_string(i) + " is not an integer"));
             }
         }
         QTC::TC("qpdf", "QPDF xref /Index is array", n_index == 2 ? 0 : 1);
@@ -1165,11 +1169,11 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
                 this->m->file->getName(),
                 "xref stream",
                 xref_offset,
-                "Cross-reference stream claims to contain"
-                " too many entries: " +
-                    QUtil::int_to_string(indx.at(i)) + " " +
-                    QUtil::uint_to_string(max_num_entries) + " " +
-                    QUtil::uint_to_string(num_entries));
+                ("Cross-reference stream claims to contain"
+                 " too many entries: " +
+                 QUtil::int_to_string(indx.at(i)) + " " +
+                 QUtil::uint_to_string(max_num_entries) + " " +
+                 QUtil::uint_to_string(num_entries)));
         }
         num_entries += toS(indx.at(i));
     }
@@ -1187,10 +1191,10 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
             this->m->file->getName(),
             "xref stream",
             xref_offset,
-            "Cross-reference stream data has the wrong size;"
-            " expected = " +
-                QUtil::uint_to_string(expected_size) +
-                "; actual = " + QUtil::uint_to_string(actual_size));
+            ("Cross-reference stream data has the wrong size;"
+             " expected = " +
+             QUtil::uint_to_string(expected_size) +
+             "; actual = " + QUtil::uint_to_string(actual_size)));
         if (expected_size > actual_size) {
             throw x;
         } else {
@@ -1484,8 +1488,10 @@ QPDF::getAllObjects()
          iter != this->m->obj_cache.end();
          ++iter) {
         QPDFObjGen const& og = (*iter).first;
-        result.push_back(QPDFObjectHandle::Factory::newIndirect(
-            this, og.getObj(), og.getGen()));
+        result.push_back(
+            // line-break
+            QPDFObjectHandle::Factory::newIndirect(
+                this, og.getObj(), og.getGen()));
     }
     return result;
 }
@@ -1860,8 +1866,8 @@ QPDF::readObjectAtOffset(
                 this->m->file->getName(),
                 this->m->last_object_description,
                 offset,
-                std::string("expected ") + QUtil::int_to_string(exp_objid) +
-                    " " + QUtil::int_to_string(exp_generation) + " obj");
+                (std::string("expected ") + QUtil::int_to_string(exp_objid) +
+                 " " + QUtil::int_to_string(exp_generation) + " obj"));
             if (try_recovery) {
                 // Will be retried below
                 throw e;
@@ -2003,8 +2009,8 @@ QPDF::resolve(int objid, int generation)
             this->m->file->getName(),
             "",
             this->m->file->getLastOffset(),
-            "loop detected resolving object " + QUtil::int_to_string(objid) +
-                " " + QUtil::int_to_string(generation)));
+            ("loop detected resolving object " + QUtil::int_to_string(objid) +
+             " " + QUtil::int_to_string(generation))));
         return PointerHolder<QPDFObject>(new QPDF_Null);
     }
     ResolveRecorder rr(this, og);
@@ -2040,9 +2046,9 @@ QPDF::resolve(int objid, int generation)
                     this->m->file->getName(),
                     "",
                     0,
-                    "object " + QUtil::int_to_string(objid) + "/" +
-                        QUtil::int_to_string(generation) +
-                        " has unexpected xref entry type");
+                    ("object " + QUtil::int_to_string(objid) + "/" +
+                     QUtil::int_to_string(generation) +
+                     " has unexpected xref entry type"));
             }
         } catch (QPDFExc& e) {
             warn(e);
@@ -2052,9 +2058,9 @@ QPDF::resolve(int objid, int generation)
                 this->m->file->getName(),
                 "",
                 0,
-                "object " + QUtil::int_to_string(objid) + "/" +
-                    QUtil::int_to_string(generation) +
-                    ": error reading object: " + e.what()));
+                ("object " + QUtil::int_to_string(objid) + "/" +
+                 QUtil::int_to_string(generation) +
+                 ": error reading object: " + e.what())));
         }
     }
     if (this->m->obj_cache.count(og) == 0) {
@@ -2069,8 +2075,8 @@ QPDF::resolve(int objid, int generation)
     if (!result->hasDescription()) {
         result->setDescription(
             this,
-            "object " + QUtil::int_to_string(objid) + " " +
-                QUtil::int_to_string(generation));
+            ("object " + QUtil::int_to_string(objid) + " " +
+             QUtil::int_to_string(generation)));
     }
     return result;
 }
@@ -2090,8 +2096,8 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
             this->m->file->getName(),
             this->m->last_object_description,
             this->m->file->getLastOffset(),
-            "supposed object stream " +
-                QUtil::int_to_string(obj_stream_number) + " is not a stream");
+            ("supposed object stream " +
+             QUtil::int_to_string(obj_stream_number) + " is not a stream"));
     }
 
     // For linearization data in the object, use the data from the
@@ -2110,8 +2116,8 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
             this->m->file->getName(),
             this->m->last_object_description,
             this->m->file->getLastOffset(),
-            "supposed object stream " +
-                QUtil::int_to_string(obj_stream_number) + " has wrong type"));
+            ("supposed object stream " +
+             QUtil::int_to_string(obj_stream_number) + " has wrong type")));
     }
 
     if (!(dict.getKey("/N").isInteger() && dict.getKey("/First").isInteger())) {
@@ -2120,8 +2126,8 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
             this->m->file->getName(),
             this->m->last_object_description,
             this->m->file->getLastOffset(),
-            "object stream " + QUtil::int_to_string(obj_stream_number) +
-                " has incorrect keys");
+            ("object stream " + QUtil::int_to_string(obj_stream_number) +
+             " has incorrect keys"));
     }
 
     int n = dict.getKey("/N").getIntValueAsInt();
@@ -2130,10 +2136,12 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
     std::map<int, int> offsets;
 
     PointerHolder<Buffer> bp = obj_stream.getStreamData(qpdf_dl_specialized);
-    auto input = PointerHolder<InputSource>(new BufferInputSource(
-        this->m->file->getName() + " object stream " +
-            QUtil::int_to_string(obj_stream_number),
-        bp.get()));
+    auto input = PointerHolder<InputSource>(
+        // line-break
+        new BufferInputSource(
+            (this->m->file->getName() + " object stream " +
+             QUtil::int_to_string(obj_stream_number)),
+            bp.get()));
 
     for (int i = 0; i < n; ++i) {
         QPDFTokenizer::Token tnum = readToken(input);
@@ -2428,8 +2436,10 @@ QPDF::replaceForeignIndirectObjects(
         result = QPDFObjectHandle::newArray();
         int n = foreign.getArrayNItems();
         for (int i = 0; i < n; ++i) {
-            result.appendItem(replaceForeignIndirectObjects(
-                foreign.getArrayItem(i), obj_copier, false));
+            result.appendItem(
+                // line-break
+                replaceForeignIndirectObjects(
+                    foreign.getArrayItem(i), obj_copier, false));
         }
     } else if (foreign.isDictionary()) {
         QTC::TC("qpdf", "QPDF replace dictionary");
@@ -2800,22 +2810,26 @@ QPDF::pipeStreamData(
     } catch (std::exception& e) {
         if (!suppress_warnings) {
             QTC::TC("qpdf", "QPDF decoding error warning");
-            qpdf_for_warning.warn(QPDFExc(
-                qpdf_e_damaged_pdf,
-                file->getName(),
-                "",
-                file->getLastOffset(),
-                "error decoding stream data for object " +
-                    QUtil::int_to_string(objid) + " " +
-                    QUtil::int_to_string(generation) + ": " + e.what()));
-            if (will_retry) {
-                qpdf_for_warning.warn(QPDFExc(
+            qpdf_for_warning.warn(
+                // line-break
+                QPDFExc(
                     qpdf_e_damaged_pdf,
                     file->getName(),
                     "",
                     file->getLastOffset(),
-                    "stream will be re-processed without"
-                    " filtering to avoid data loss"));
+                    ("error decoding stream data for object " +
+                     QUtil::int_to_string(objid) + " " +
+                     QUtil::int_to_string(generation) + ": " + e.what())));
+            if (will_retry) {
+                qpdf_for_warning.warn(
+                    // line-break
+                    QPDFExc(
+                        qpdf_e_damaged_pdf,
+                        file->getName(),
+                        "",
+                        file->getLastOffset(),
+                        "stream will be re-processed without"
+                        " filtering to avoid data loss"));
             }
         }
     }
