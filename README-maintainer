@@ -453,6 +453,9 @@ This will put you at a shell prompt inside the container with your
 current directory set to the top of the source tree and your uid equal
 to the owner of the parent directory source tree.
 
+Note: this will leave some extra files (like .bash_history) in the
+parent directory of the source tree. You will want to clean those up.
+
 
 LOCAL WINDOWS TESTING PROCEDURE
 
