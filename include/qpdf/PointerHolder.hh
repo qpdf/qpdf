@@ -39,6 +39,8 @@
 # define POINTERHOLDER_TRANSITION 0
 #endif // !defined(POINTERHOLDER_TRANSITION)
 
+#if POINTERHOLDER_TRANSITION < 4
+
 // *** WHAT IS HAPPENING ***
 
 // In qpdf 11, PointerHolder will be replaced with std::shared_ptr
@@ -140,211 +142,94 @@
 // written code. If you are relying on the incorrect behavior, use
 // PointerHolder<T const> instead.
 
-// OLD DOCUMENTATION
-
-// This class is basically std::shared_ptr but predates that by
-// several years.
-
-// This class expects to be initialized with a dynamically allocated
-// object pointer.  It keeps a reference count and deletes this once
-// the reference count goes to zero.  PointerHolder objects are
-// explicitly safe for use in STL containers.
-
-// It is very important that a client who pulls the pointer out of
-// this holder does not let the holder go out of scope until it is
-// finished with the pointer.  It is also important that exactly one
-// instance of this object ever gets initialized with a given pointer.
-// Otherwise, the pointer will be deleted twice, and before that, some
-// objects will be left with a pointer to a deleted object.  In other
-// words, the only legitimate way for two PointerHolder objects to
-// contain the same pointer is for one to be a copy of the other.
-// Copy and assignment semantics are well-defined and essentially
-// allow you to use PointerHolder as a means to get pass-by-reference
-// semantics in a pass-by-value environment without having to worry
-// about memory management details.
-
-// Comparison (== and <) are defined and operate on the internally
-// stored pointers, not on the data.  This makes it possible to store
-// PointerHolder objects in sorted lists or to find them in STL
-// containers just as one would be able to store pointers.  Comparing
-// the underlying pointers provides a well-defined, if not
-// particularly meaningful, ordering.
-
-#include <cstddef>
+# include <cstddef>
+# include <memory>
 
 template <class T>
-class PointerHolder
+class PointerHolder: public std::shared_ptr<T>
 {
-  private:
-    class Data
-    {
-      public:
-        Data(T* pointer, bool array) :
-            pointer(pointer),
-            array(array),
-            refcount(0)
-        {
-        }
-        ~Data()
-        {
-            if (array) {
-                delete[] this->pointer;
-            } else {
-                delete this->pointer;
-            }
-        }
-        T* pointer;
-        bool array;
-        int refcount;
-
-      private:
-        Data(Data const&) = delete;
-        Data& operator=(Data const&) = delete;
-    };
-
   public:
-#if POINTERHOLDER_TRANSITION >= 1
+# if POINTERHOLDER_TRANSITION >= 3
+    [[deprecated("use std::shared_ptr<T> instead")]]
+# endif // POINTERHOLDER_TRANSITION >= 3
+    PointerHolder(std::shared_ptr<T> other) :
+        std::shared_ptr<T>(other)
+    {
+    }
+# if POINTERHOLDER_TRANSITION >= 3
+    [[deprecated("use std::shared_ptr<T> instead")]]
+#  if POINTERHOLDER_TRANSITION >= 1
     explicit
-#endif // POINTERHOLDER_TRANSITION >= 1
-        PointerHolder(T* pointer = 0)
+#  endif // POINTERHOLDER_TRANSITION >= 1
+# endif  // POINTERHOLDER_TRANSITION >= 3
+        PointerHolder(T* pointer = 0) :
+        std::shared_ptr<T>(pointer)
     {
-        this->init(new Data(pointer, false));
     }
-    // Special constructor indicating to free memory with delete []
-    // instead of delete
-    PointerHolder(bool, T* pointer)
+    // Create a shared pointer to an array
+# if POINTERHOLDER_TRANSITION >= 3
+    [[deprecated("use std::shared_ptr<T> instead")]]
+# endif // POINTERHOLDER_TRANSITION >= 3
+    PointerHolder(bool, T* pointer) :
+        std::shared_ptr<T>(pointer, std::default_delete<T[]>())
     {
-        this->init(new Data(pointer, true));
-    }
-    PointerHolder(PointerHolder const& rhs)
-    {
-        this->copy(rhs);
-    }
-    PointerHolder&
-    operator=(PointerHolder const& rhs)
-    {
-        if (this != &rhs) {
-            this->destroy();
-            this->copy(rhs);
-        }
-        return *this;
-    }
-    PointerHolder&
-    operator=(decltype(nullptr))
-    {
-        this->operator=(PointerHolder<T>());
-        return *this;
-    }
-    ~PointerHolder()
-    {
-        this->destroy();
-    }
-    bool
-    operator==(PointerHolder const& rhs) const
-    {
-        return this->data->pointer == rhs.data->pointer;
-    }
-    bool
-    operator==(decltype(nullptr)) const
-    {
-        return this->data->pointer == nullptr;
-    }
-    bool
-    operator<(PointerHolder const& rhs) const
-    {
-        return this->data->pointer < rhs.data->pointer;
     }
 
-    // get() is for interface compatibility with std::shared_ptr
-    T*
-    get() const
-    {
-        return this->data->pointer;
-    }
+    virtual ~PointerHolder() = default;
 
-    // NOTE: The pointer returned by getPointer turns into a pumpkin
-    // when the last PointerHolder that contains it disappears.
-#if POINTERHOLDER_TRANSITION >= 2
+# if POINTERHOLDER_TRANSITION >= 2
     [[deprecated("use PointerHolder<T>::get() instead of getPointer()")]]
-#endif // POINTERHOLDER_TRANSITION >= 2
+# endif // POINTERHOLDER_TRANSITION >= 2
     T*
     getPointer()
     {
-        return this->data->pointer;
+        return this->get();
     }
-#if POINTERHOLDER_TRANSITION >= 2
+# if POINTERHOLDER_TRANSITION >= 2
     [[deprecated("use PointerHolder<T>::get() instead of getPointer()")]]
-#endif // POINTERHOLDER_TRANSITION >= 2
+# endif // POINTERHOLDER_TRANSITION >= 2
     T const*
     getPointer() const
     {
-        return this->data->pointer;
+        return this->get();
     }
-#if POINTERHOLDER_TRANSITION >= 2
-    [[deprecated("use use_count() instead of getRefcount()")]]
-#endif // POINTERHOLDER_TRANSITION >= 2
+
+# if POINTERHOLDER_TRANSITION >= 2
+    [[deprecated("use PointerHolder<T>::get() instead of getPointer()")]]
+# endif // POINTERHOLDER_TRANSITION >= 2
     int
     getRefcount() const
     {
-        return this->data->refcount;
+        return static_cast<int>(this->use_count());
     }
 
-    // use_count() is for compatibility with std::shared_ptr
-    long
-    use_count()
+    PointerHolder&
+    operator=(decltype(nullptr))
     {
-        return static_cast<long>(this->data->refcount);
+        std::shared_ptr<T>::operator=(nullptr);
+        return *this;
     }
-
     T const&
     operator*() const
     {
-        return *this->data->pointer;
+        return *(this->get());
     }
     T&
     operator*()
     {
-        return *this->data->pointer;
+        return *(this->get());
     }
 
     T const*
     operator->() const
     {
-        return this->data->pointer;
+        return this->get();
     }
     T*
     operator->()
     {
-        return this->data->pointer;
+        return this->get();
     }
-
-  private:
-    void
-    init(Data* data)
-    {
-        this->data = data;
-        ++this->data->refcount;
-    }
-    void
-    copy(PointerHolder const& rhs)
-    {
-        this->init(rhs.data);
-    }
-    void
-    destroy()
-    {
-        bool gone = false;
-        {
-            if (--this->data->refcount == 0) {
-                gone = true;
-            }
-        }
-        if (gone) {
-            delete this->data;
-        }
-    }
-
-    Data* data;
 };
 
 template <typename T, typename... _Args>
@@ -361,4 +246,5 @@ make_array_pointer_holder(size_t n)
     return PointerHolder<T>(true, new T[n]);
 }
 
+#endif // POINTERHOLDER_TRANSITION < 4
 #endif // POINTERHOLDER_HH

@@ -30,3 +30,51 @@ destroyed Object, id 6
 destroyed Object, id 5
 destroyed Object, id 3
 destroyed Object, id 1
+compat
+created Object, id 7
+created Object, id 8
+created Object, id 9
+created Object, id 10
+calling Object::hello for 7
+calling Object::hello for 8
+calling Object::hello for 9
+calling Object::hello for 10
+created Object, id 11
+created Object, id 12
+created Object, id 13
+created Object, id 14
+calling Object::hello const for 11
+calling Object::hello const for 12
+calling Object::hello const for 13
+calling Object::hello const for 14
+initialize ph array from shared_ptr
+created Object, id 15
+created Object, id 16
+delete ph array
+destroyed Object, id 16
+destroyed Object, id 15
+initialize sp array from PointerHolder
+created Object, id 17
+created Object, id 18
+delete sp array
+destroyed Object, id 18
+destroyed Object, id 17
+end compat
+destroyed Object, id 14
+destroyed Object, id 13
+destroyed Object, id 12
+destroyed Object, id 11
+destroyed Object, id 10
+destroyed Object, id 9
+destroyed Object, id 8
+destroyed Object, id 7
+containers
+created Object, id 19
+created Object, id 20
+created Object, id 21
+created Object, id 22
+end containers
+destroyed Object, id 21
+destroyed Object, id 22
+destroyed Object, id 19
+destroyed Object, id 20
