@@ -30,6 +30,7 @@ documentation, please visit `https://qpdf.readthedocs.io
    library
    weak-crypto
    json
+   contributing
    design
    qpdf-job
    linearization

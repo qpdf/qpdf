@@ -40,6 +40,7 @@ SET(MANUAL_DEPS
   index.rst
   installation.rst
   json.rst
+  contributing.rst
   library.rst
   license.rst
   linearization.rst

@@ -119,6 +119,10 @@ GOOGLE OSS-FUZZ
 
 CODING RULES
 
+* Code is formatted with clang-format >= 15. See .clang-format and the
+  "Code Formatting" section in manual/contributing.rst for details.
+  See also "CODE FORMATTING" below.
+
 * In a source file, include the header file that declares the source
   class first followed by a blank line. If a config file is needed
   first, put a blank line between that and the header followed by
@@ -562,3 +566,36 @@ The check_abi script is responsible for performing many of these
 steps. See comments in check_abi for additional notes. Running
 "check_abi check-sizes" is run by ctest on Linux when CHECK_SIZES is
 on.
+
+
+CODE FORMATTING
+
+* Emacs doesn't indent breaking strings concatenated with + over
+  lines but clang-format does. It's clearer with clang-format. To
+  get emacs and clang-format to agree, parenthesize the expression
+  that builds the concatenated string.
+
+* With
+
+  long_function(long_function(
+      args)
+
+  clang-format anchors relative to the first function, and emacs
+  anchors relative to the second function. Use
+
+  long_function(
+      // line-break
+      long_function(
+	  args)
+
+  to resolve.
+
+In the revision control history, there is a commit around April 3,
+2022 with the title "Update some code manually to get better
+formatting results" that shows several examples of changing code so
+that clang-format produces several results. (In git this is commit
+77e889495f7c513ba8677df5fe662f08053709eb.)
+
+The commit that has the bulk of the automatic reformatting is
+12f1eb15ca3fed6310402847559a7c99d3c77847. This could go in a
+blame.ignoreRevsFile file for `git blame` if needed.
