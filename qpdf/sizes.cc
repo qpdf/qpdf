@@ -50,28 +50,6 @@
 #define ignore_class(cls)
 #define print_size(cls) std::cout << #cls << " " << sizeof(cls) << std::endl
 
-// These classes are not really public.
-// ------
-ignore_class(BitStream);
-ignore_class(BitWriter);
-ignore_class(CryptoRandomDataProvider);
-ignore_class(InsecureRandomDataProvider);
-ignore_class(JSONHandler);
-ignore_class(MD5);
-ignore_class(Pl_AES_PDF);
-ignore_class(Pl_ASCII85Decoder);
-ignore_class(Pl_ASCIIHexDecoder);
-ignore_class(Pl_LZWDecoder);
-ignore_class(Pl_MD5);
-ignore_class(Pl_PNGFilter);
-ignore_class(Pl_RC4);
-ignore_class(Pl_SHA2);
-ignore_class(Pl_TIFFPredictor);
-ignore_class(QPDFArgParser);
-ignore_class(RC4);
-ignore_class(SecureRandomDataProvider);
-ignore_class(SparseOHArray);
-
 // This is public because of QPDF_DLL_CLASS on InputSource
 // -------
 ignore_class(InputSource::Members);

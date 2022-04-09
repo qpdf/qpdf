@@ -37,7 +37,6 @@ cmake
 =====
 
 * DLL.h
-  * Remove DLL.h and QPDF_DLL* from all private library classes.
   * Change DLL_EXPORT to QPDF_EXPORT. Be sure to call attention to
     this in the release notes. There should be a "migrating to cmake"
     in the manual, and ./configure should draw attention to it.

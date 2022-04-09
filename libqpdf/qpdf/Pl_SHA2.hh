@@ -20,19 +20,12 @@
 class Pl_SHA2: public Pipeline
 {
   public:
-    QPDF_DLL
     Pl_SHA2(int bits = 0, Pipeline* next = 0);
-    QPDF_DLL
     virtual ~Pl_SHA2();
-    QPDF_DLL
     virtual void write(unsigned char*, size_t);
-    QPDF_DLL
     virtual void finish();
-    QPDF_DLL
     void resetBits(int bits);
-    QPDF_DLL
     std::string getHexDigest();
-    QPDF_DLL
     std::string getRawDigest();
 
   private:

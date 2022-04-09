@@ -1,7 +1,6 @@
 #ifndef QPDFCRYPTO_GNUTLS_HH
 #define QPDFCRYPTO_GNUTLS_HH
 
-#include <qpdf/DLL.h>
 #include <qpdf/QPDFCryptoImpl.hh>
 #include <memory>
 
@@ -16,7 +15,6 @@ class QPDFCrypto_gnutls: public QPDFCryptoImpl
   public:
     QPDFCrypto_gnutls();
 
-    QPDF_DLL
     virtual ~QPDFCrypto_gnutls();
 
     virtual void provideRandomData(unsigned char* data, size_t len);

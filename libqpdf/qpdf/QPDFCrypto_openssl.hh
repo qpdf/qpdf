@@ -26,8 +26,6 @@ class QPDFCrypto_openssl: public QPDFCryptoImpl
 {
   public:
     QPDFCrypto_openssl();
-
-    QPDF_DLL
     ~QPDFCrypto_openssl() override;
 
     void provideRandomData(unsigned char* data, size_t len) override;

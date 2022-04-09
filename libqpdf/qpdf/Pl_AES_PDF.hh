@@ -11,7 +11,6 @@
 class Pl_AES_PDF: public Pipeline
 {
   public:
-    QPDF_DLL
     // key should be a pointer to key_bytes bytes of data
     Pl_AES_PDF(
         char const* identifier,
@@ -19,30 +18,22 @@ class Pl_AES_PDF: public Pipeline
         bool encrypt,
         unsigned char const* key,
         size_t key_bytes);
-    QPDF_DLL
     virtual ~Pl_AES_PDF();
 
-    QPDF_DLL
     virtual void write(unsigned char* data, size_t len);
-    QPDF_DLL
     virtual void finish();
 
     // Use zero initialization vector; needed for AESV3
-    QPDF_DLL
     void useZeroIV();
     // Disable padding; needed for AESV3
-    QPDF_DLL
     void disablePadding();
     // Specify an initialization vector, which will not be included in
     // the output.
-    QPDF_DLL
     void setIV(unsigned char const* iv, size_t bytes);
 
     // For testing only; PDF always uses CBC
-    QPDF_DLL
     void disableCBC();
     // For testing only: use a fixed initialization vector for CBC
-    QPDF_DLL
     static void useStaticIV();
 
   private:

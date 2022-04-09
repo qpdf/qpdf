@@ -1,7 +1,6 @@
 #ifndef JSONHANDLER_HH
 #define JSONHANDLER_HH
 
-#include <qpdf/DLL.h>
 #include <qpdf/JSON.hh>
 #include <functional>
 #include <map>
@@ -18,10 +17,7 @@ class JSONHandler
   public:
     // A QPDFUsage exception is thrown if there are any errors
     // validating the JSON object.
-    QPDF_DLL
     JSONHandler();
-
-    QPDF_DLL
     ~JSONHandler() = default;
 
     // Based on the type of handler, expect the object to be of a
@@ -42,36 +38,26 @@ class JSONHandler
 
     // If an any handler is added, it will be called for any value
     // including null, and no other handler will be called.
-    QPDF_DLL
     void addAnyHandler(json_handler_t fn);
 
     // If any of the remaining handlers are registered, each
     // registered handle will be called.
-    QPDF_DLL
     void addNullHandler(void_handler_t fn);
-    QPDF_DLL
     void addStringHandler(string_handler_t fn);
-    QPDF_DLL
     void addNumberHandler(string_handler_t fn);
-    QPDF_DLL
     void addBoolHandler(bool_handler_t fn);
 
-    QPDF_DLL
     void addDictHandlers(json_handler_t start_fn, void_handler_t end_fn);
-    QPDF_DLL
     void
     addDictKeyHandler(std::string const& key, std::shared_ptr<JSONHandler>);
-    QPDF_DLL
     void addFallbackDictHandler(std::shared_ptr<JSONHandler>);
 
-    QPDF_DLL
     void addArrayHandlers(
         json_handler_t start_fn,
         void_handler_t end_fn,
         std::shared_ptr<JSONHandler> item_handlers);
 
     // Apply handlers recursively to a JSON object.
-    QPDF_DLL
     void handle(std::string const& path, JSON j);
 
   private:
@@ -115,7 +101,6 @@ class JSONHandler
         friend class JSONHandler;
 
       public:
-        QPDF_DLL
         ~Members() = default;
 
       private:

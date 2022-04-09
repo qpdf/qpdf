@@ -2,7 +2,6 @@
 #define QPDFCRYPTO_NATIVE_HH
 
 #include <qpdf/AES_PDF_native.hh>
-#include <qpdf/DLL.h>
 #include <qpdf/MD5_native.hh>
 #include <qpdf/QPDFCryptoImpl.hh>
 #include <qpdf/RC4_native.hh>
@@ -14,7 +13,6 @@ class QPDFCrypto_native: public QPDFCryptoImpl
   public:
     QPDFCrypto_native() = default;
 
-    QPDF_DLL
     virtual ~QPDFCrypto_native() = default;
 
     virtual void provideRandomData(unsigned char* data, size_t len);

@@ -1,7 +1,6 @@
 #ifndef QPDFARGPARSER_HH
 #define QPDFARGPARSER_HH
 
-#include <qpdf/DLL.h>
 #include <functional>
 #include <map>
 #include <memory>
@@ -27,18 +26,15 @@ class QPDFArgParser
     // progname_env is used to override argv[0] when figuring out the
     // name of the executable for setting up completion. This may be
     // needed if the program is invoked by a wrapper.
-    QPDF_DLL
     QPDFArgParser(int argc, char const* const argv[], char const* progname_env);
 
     // Calls exit(0) if a help option is given or if in completion
     // mode. If there are argument parsing errors, QPDFUsage is
     // thrown.
-    QPDF_DLL
     void parseArgs();
 
     // Return the program name as the last path element of the program
     // executable.
-    QPDF_DLL
     std::string getProgname();
 
     // Methods for registering arguments. QPDFArgParser starts off
@@ -52,32 +48,23 @@ class QPDFArgParser
     typedef std::function<void()> bare_arg_handler_t;
     typedef std::function<void(std::string const&)> param_arg_handler_t;
 
-    QPDF_DLL
     void selectMainOptionTable();
-    QPDF_DLL
     void selectHelpOptionTable();
-    QPDF_DLL
     void selectOptionTable(std::string const& name);
 
     // Register a new options table. This also selects the option table.
-    QPDF_DLL
     void registerOptionTable(
         std::string const& name, bare_arg_handler_t end_handler);
 
     // Add handlers for options in the current table
 
-    QPDF_DLL
     void addPositional(param_arg_handler_t);
-    QPDF_DLL
     void addBare(std::string const& arg, bare_arg_handler_t);
-    QPDF_DLL
     void addRequiredParameter(
         std::string const& arg,
         param_arg_handler_t,
         char const* parameter_name);
-    QPDF_DLL
     void addOptionalParameter(std::string const& arg, param_arg_handler_t);
-    QPDF_DLL
     void addChoices(
         std::string const& arg,
         param_arg_handler_t,
@@ -88,12 +75,10 @@ class QPDFArgParser
     // an option that takes choices is to list all the choices. This
     // may not be good if there are too many choices, so you can
     // provide your own handler in this case.
-    QPDF_DLL
     void addInvalidChoiceHandler(std::string const& arg, param_arg_handler_t);
 
     // The final check handler is called at the very end of argument
     // parsing.
-    QPDF_DLL
     void addFinalCheck(bare_arg_handler_t);
 
     // Help generation methods
@@ -134,18 +119,15 @@ class QPDFArgParser
 
     // If provided, this footer is appended to all help, separated by
     // a blank line.
-    QPDF_DLL
     void addHelpFooter(std::string const&);
 
     // Add a help topic along with the text for that topic
-    QPDF_DLL
     void addHelpTopic(
         std::string const& topic,
         std::string const& short_text,
         std::string const& long_text);
 
     // Add help for an option, and associate it with a topic.
-    QPDF_DLL
     void addOptionHelp(
         std::string const& option_name,
         std::string const& topic,
@@ -156,7 +138,6 @@ class QPDFArgParser
     // pointer returns the top-level help information. Passing an
     // unknown value returns a string directing the user to run the
     // top-level --help option.
-    QPDF_DLL
     std::string getHelp(std::string const& topic_or_option);
 
     // Convenience methods for adding member functions of a class as
@@ -176,23 +157,19 @@ class QPDFArgParser
 
     // When processing arguments, indicate how many arguments remain
     // after the one whose handler is being called.
-    QPDF_DLL
     int argsLeft() const;
 
     // Indicate whether we are in completion mode.
-    QPDF_DLL
     bool isCompleting() const;
 
     // Insert a completion during argument parsing; useful for
     // customizing completion in the position argument handler. Should
     // only be used in completion mode.
-    QPDF_DLL
     void insertCompletion(std::string const&);
 
     // Throw a Usage exception with the given message. In completion
     // mode, this just exits to prevent errors from partial commands
     // or other error messages from messing up completion.
-    QPDF_DLL
     void usage(std::string const& message);
 
   private:
@@ -259,7 +236,6 @@ class QPDFArgParser
         friend class QPDFArgParser;
 
       public:
-        QPDF_DLL
         ~Members() = default;
 
       private:
