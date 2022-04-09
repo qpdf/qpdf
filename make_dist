@@ -106,7 +106,6 @@ sub get_version_from_cmake
     my $saw_project = 0;
     while (<$fh>)
     {
-        print;
         if (m/project\(qpdf/)
         {
             $saw_project = 1;

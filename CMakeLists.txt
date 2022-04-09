@@ -2,9 +2,10 @@
 cmake_minimum_required(VERSION 3.16)
 
 # make_dist expects the version line to be on a line by itself after
-# the project line.
+# the project line. When updating the version, check make_dist for all
+# the places it has to be updated.
 project(qpdf
-  VERSION 10.6.3
+  VERSION 11.0.0
   LANGUAGES C CXX)
 
 # Enable correct rpath handling for MacOSX
