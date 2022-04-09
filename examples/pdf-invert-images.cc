@@ -41,7 +41,7 @@ class ImageInverter: public QPDFObjectHandle::StreamDataProvider
 
     void registerImage(
         QPDFObjectHandle image,
-        PointerHolder<QPDFObjectHandle::StreamDataProvider> self);
+        std::shared_ptr<QPDFObjectHandle::StreamDataProvider> self);
 
   private:
     std::map<QPDFObjGen, QPDFObjectHandle> copied_images;
@@ -50,14 +50,14 @@ class ImageInverter: public QPDFObjectHandle::StreamDataProvider
 void
 ImageInverter::registerImage(
     QPDFObjectHandle image,
-    PointerHolder<QPDFObjectHandle::StreamDataProvider> self)
+    std::shared_ptr<QPDFObjectHandle::StreamDataProvider> self)
 {
     // replaceStreamData requires a pointer holder to the stream data
     // provider, but there's no way for us to generate one ourselves,
     // so we have to have it handed to us. Don't be tempted to have
-    // the class contain a PointerHolder to itself as a member. Doing
+    // the class contain a std::shared_ptr to itself as a member. Doing
     // this will prevent the class from ever being deleted since the
-    // reference count will never drop to zero (and PointerHolder
+    // reference count will never drop to zero (and std::shared_ptr
     // doesn't have weak references).
 
     QPDFObjGen og(image.getObjGen());
@@ -90,7 +90,7 @@ ImageInverter::provideStreamData(int objid, int generation, Pipeline* pipeline)
     // image data.  Then invert the image data and write the inverted
     // data to the pipeline.
     QPDFObjGen og(objid, generation);
-    PointerHolder<Buffer> data =
+    std::shared_ptr<Buffer> data =
         this->copied_images[og].getStreamData(qpdf_dl_all);
     size_t size = data->getSize();
     unsigned char* buf = data->getBuffer();
@@ -128,7 +128,7 @@ main(int argc, char* argv[])
         qpdf.processFile(infilename, password);
 
         ImageInverter* inv = new ImageInverter;
-        auto p = PointerHolder<QPDFObjectHandle::StreamDataProvider>(inv);
+        auto p = std::shared_ptr<QPDFObjectHandle::StreamDataProvider>(inv);
 
         // For each page...
         std::vector<QPDFPageObjectHelper> pages =

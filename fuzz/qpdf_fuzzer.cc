@@ -34,9 +34,9 @@ class FuzzHelper
     void run();
 
   private:
-    PointerHolder<QPDF> getQpdf();
-    PointerHolder<QPDFWriter> getWriter(PointerHolder<QPDF>);
-    void doWrite(PointerHolder<QPDFWriter> w);
+    std::shared_ptr<QPDF> getQpdf();
+    std::shared_ptr<QPDFWriter> getWriter(std::shared_ptr<QPDF>);
+    void doWrite(std::shared_ptr<QPDFWriter> w);
     void testWrite();
     void testPages();
     void testOutlines();
@@ -52,27 +52,27 @@ FuzzHelper::FuzzHelper(unsigned char const* data, size_t size) :
 {
 }
 
-PointerHolder<QPDF>
+std::shared_ptr<QPDF>
 FuzzHelper::getQpdf()
 {
-    auto is = PointerHolder<InputSource>(
+    auto is = std::shared_ptr<InputSource>(
         new BufferInputSource("fuzz input", &this->input_buffer));
-    auto qpdf = make_pointer_holder<QPDF>();
+    auto qpdf = std::make_shared<QPDF>();
     qpdf->processInputSource(is);
     return qpdf;
 }
 
-PointerHolder<QPDFWriter>
-FuzzHelper::getWriter(PointerHolder<QPDF> qpdf)
+std::shared_ptr<QPDFWriter>
+FuzzHelper::getWriter(std::shared_ptr<QPDF> qpdf)
 {
-    auto w = make_pointer_holder<QPDFWriter>(*qpdf);
+    auto w = std::make_shared<QPDFWriter>(*qpdf);
     w->setOutputPipeline(&this->discard);
     w->setDecodeLevel(qpdf_dl_all);
     return w;
 }
 
 void
-FuzzHelper::doWrite(PointerHolder<QPDFWriter> w)
+FuzzHelper::doWrite(std::shared_ptr<QPDFWriter> w)
 {
     try {
         w->write();
@@ -88,8 +88,8 @@ FuzzHelper::testWrite()
 {
     // Write in various ways to exercise QPDFWriter
 
-    PointerHolder<QPDF> q;
-    PointerHolder<QPDFWriter> w;
+    std::shared_ptr<QPDF> q;
+    std::shared_ptr<QPDFWriter> w;
 
     q = getQpdf();
     w = getWriter(q);
@@ -126,7 +126,7 @@ FuzzHelper::testPages()
 {
     // Parse all content streams, and exercise some helpers that
     // operate on pages.
-    PointerHolder<QPDF> q = getQpdf();
+    std::shared_ptr<QPDF> q = getQpdf();
     QPDFPageDocumentHelper pdh(*q);
     QPDFPageLabelDocumentHelper pldh(*q);
     QPDFOutlineDocumentHelper odh(*q);
@@ -168,7 +168,7 @@ FuzzHelper::testPages()
 void
 FuzzHelper::testOutlines()
 {
-    PointerHolder<QPDF> q = getQpdf();
+    std::shared_ptr<QPDF> q = getQpdf();
     std::list<std::vector<QPDFOutlineObjectHelper>> queue;
     QPDFOutlineDocumentHelper odh(*q);
     queue.push_back(odh.getTopLevelOutlines());

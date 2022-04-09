@@ -5,11 +5,11 @@
 #include <cstring>
 #include <iostream>
 
-static PointerHolder<Buffer>
+static std::shared_ptr<Buffer>
 get_buffer()
 {
     size_t size = 3172;
-    PointerHolder<Buffer> b(new Buffer(size));
+    std::shared_ptr<Buffer> b(new Buffer(size));
     unsigned char* p = b->getBuffer();
     for (size_t i = 0; i < size; ++i) {
         p[i] = static_cast<unsigned char>(i & 0xff);
@@ -20,7 +20,7 @@ get_buffer()
 class Finder: public InputSource::Finder
 {
   public:
-    Finder(PointerHolder<InputSource> is, std::string const& after) :
+    Finder(std::shared_ptr<InputSource> is, std::string const& after) :
         is(is),
         after(after)
     {
@@ -31,7 +31,7 @@ class Finder: public InputSource::Finder
     virtual bool check();
 
   private:
-    PointerHolder<InputSource> is;
+    std::shared_ptr<InputSource> is;
     std::string after;
 };
 
@@ -57,14 +57,14 @@ check(char const* description, bool expected, bool actual)
 int
 main()
 {
-    PointerHolder<Buffer> b1 = get_buffer();
+    std::shared_ptr<Buffer> b1 = get_buffer();
     unsigned char* b = b1->getBuffer();
     // Straddle block boundaries
     memcpy(b + 1022, "potato", 6);
     // Overlap so that the first check() would advance past the start
     // of the next match
     memcpy(b + 2037, "potato potato salad ", 20);
-    auto is = PointerHolder<InputSource>(
+    auto is = std::shared_ptr<InputSource>(
         new BufferInputSource("test buffer input source", b1.get()));
     Finder f1(is, "salad");
     check("find potato salad", true, is->findFirst("potato", 0, 0, f1));

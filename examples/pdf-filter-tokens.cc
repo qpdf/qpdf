@@ -207,10 +207,11 @@ main(int argc, char* argv[])
             // details.
             QPDFPageObjectHelper& page(*iter);
             page.addContentTokenFilter(
-                PointerHolder<QPDFObjectHandle::TokenFilter>(
+                std::shared_ptr<QPDFObjectHandle::TokenFilter>(
                     new StringReverser));
             page.addContentTokenFilter(
-                PointerHolder<QPDFObjectHandle::TokenFilter>(new ColorToGray));
+                std::shared_ptr<QPDFObjectHandle::TokenFilter>(
+                    new ColorToGray));
         }
 
         QPDFWriter w(pdf, outfilename);

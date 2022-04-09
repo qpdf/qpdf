@@ -205,7 +205,7 @@ class StreamReplacer: public QPDFObjectHandle::StreamDataProvider
 
     void registerStream(
         QPDFObjectHandle stream,
-        PointerHolder<QPDFObjectHandle::StreamDataProvider> self);
+        std::shared_ptr<QPDFObjectHandle::StreamDataProvider> self);
 
   private:
     bool maybeReplace(
@@ -283,7 +283,7 @@ StreamReplacer::maybeReplace(
     // make all its decisions from the stream dictionary. However,
     // it's a good idea to make sure we can retrieve the filtered data
     // if we are going to need it later.
-    PointerHolder<Buffer> out;
+    std::shared_ptr<Buffer> out;
     try {
         out = stream.getStreamData();
     } catch (...) {
@@ -321,7 +321,7 @@ StreamReplacer::maybeReplace(
 void
 StreamReplacer::registerStream(
     QPDFObjectHandle stream,
-    PointerHolder<QPDFObjectHandle::StreamDataProvider> self)
+    std::shared_ptr<QPDFObjectHandle::StreamDataProvider> self)
 {
     QPDFObjGen og(stream.getObjGen());
 
@@ -409,10 +409,10 @@ process(
     qpdf.processFile(infilename);
 
     // Create a single StreamReplacer instance. The interface requires
-    // a PointerHolder in various places, so allocate a StreamReplacer
-    // and stash it in a PointerHolder.
+    // a std::shared_ptr in various places, so allocate a StreamReplacer
+    // and stash it in a std::shared_ptr.
     StreamReplacer* replacer = new StreamReplacer(&qpdf);
-    PointerHolder<QPDFObjectHandle::StreamDataProvider> p(replacer);
+    std::shared_ptr<QPDFObjectHandle::StreamDataProvider> p(replacer);
 
     for (auto& o : qpdf.getAllObjects()) {
         if (o.isStream()) {

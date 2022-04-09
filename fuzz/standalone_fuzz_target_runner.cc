@@ -8,7 +8,7 @@ int
 main(int argc, char** argv)
 {
     for (int i = 1; i < argc; i++) {
-        PointerHolder<char> file_buf;
+        std::shared_ptr<char> file_buf;
         size_t size = 0;
         QUtil::read_file_into_memory(argv[i], file_buf, size);
         LLVMFuzzerTestOneInput(

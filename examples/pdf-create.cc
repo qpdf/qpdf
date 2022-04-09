@@ -176,7 +176,7 @@ add_page(
     // with /FlateDecode if we don't provide any other form of
     // compression.
     ImageProvider* p = new ImageProvider(color_space, filter);
-    PointerHolder<QPDFObjectHandle::StreamDataProvider> provider(p);
+    std::shared_ptr<QPDFObjectHandle::StreamDataProvider> provider(p);
     size_t width = p->getWidth();
     size_t height = p->getHeight();
     QPDFObjectHandle image = QPDFObjectHandle::newStream(&pdf);
@@ -296,10 +296,10 @@ check(
             // Check image data
             auto actual_data = image.getStreamData(qpdf_dl_all);
             ImageProvider* p = new ImageProvider(desired_color_space, "null");
-            PointerHolder<QPDFObjectHandle::StreamDataProvider> provider(p);
+            std::shared_ptr<QPDFObjectHandle::StreamDataProvider> provider(p);
             Pl_Buffer b_p("get image data");
             provider->provideStreamData(0, 0, &b_p);
-            PointerHolder<Buffer> desired_data(b_p.getBuffer());
+            std::shared_ptr<Buffer> desired_data(b_p.getBuffer());
 
             if (desired_data->getSize() != actual_data->getSize()) {
                 std::cout << "page " << pageno << ": image data length mismatch"

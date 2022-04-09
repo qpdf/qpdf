@@ -59,8 +59,8 @@ main(int argc, char* argv[])
 
     QUtil::binary_stdout();
     QUtil::binary_stdin();
-    auto out = make_pointer_holder<Pl_StdioFile>("stdout", stdout);
-    auto flate = make_pointer_holder<Pl_Flate>("flate", out.get(), action);
+    auto out = std::make_shared<Pl_StdioFile>("stdout", stdout);
+    auto flate = std::make_shared<Pl_Flate>("flate", out.get(), action);
     bool warn = false;
     flate->setWarnCallback([&warn](char const* msg, int code) {
         warn = true;

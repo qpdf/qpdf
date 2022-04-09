@@ -108,7 +108,7 @@ if(NOT (BUILD_STATIC_LIBS OR BUILD_SHARED_LIBS))
     FATAL_ERROR "At least one of static or shared libraries must be built")
 endif()
 
-add_compile_definitions($<$<COMPILE_LANGUAGE:CXX>:POINTERHOLDER_TRANSITION=2>)
+add_compile_definitions($<$<COMPILE_LANGUAGE:CXX>:POINTERHOLDER_TRANSITION=3>)
 
 enable_testing()
 set(RUN_QTEST perl ${qpdf_SOURCE_DIR}/run-qtest)

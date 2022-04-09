@@ -25,7 +25,7 @@ usage()
 class Finder: public InputSource::Finder
 {
   public:
-    Finder(PointerHolder<InputSource> is, std::string const& str) :
+    Finder(std::shared_ptr<InputSource> is, std::string const& str) :
         is(is),
         str(str)
     {
@@ -36,7 +36,7 @@ class Finder: public InputSource::Finder
     virtual bool check();
 
   private:
-    PointerHolder<InputSource> is;
+    std::shared_ptr<InputSource> is;
     std::string str;
 };
 
@@ -117,7 +117,7 @@ sanitize(std::string const& value)
 static void
 try_skipping(
     QPDFTokenizer& tokenizer,
-    PointerHolder<InputSource> is,
+    std::shared_ptr<InputSource> is,
     size_t max_len,
     char const* what,
     Finder& f)
@@ -132,7 +132,7 @@ try_skipping(
 
 static void
 dump_tokens(
-    PointerHolder<InputSource> is,
+    std::shared_ptr<InputSource> is,
     std::string const& label,
     size_t max_len,
     bool include_ignorable,
@@ -191,12 +191,12 @@ dump_tokens(
 static void
 process(char const* filename, bool include_ignorable, size_t max_len)
 {
-    PointerHolder<InputSource> is;
+    std::shared_ptr<InputSource> is;
 
     // Tokenize file, skipping streams
     FileInputSource* fis = new FileInputSource();
     fis->setFilename(filename);
-    is = PointerHolder<InputSource>(fis);
+    is = std::shared_ptr<InputSource>(fis);
     dump_tokens(is, "FILE", max_len, include_ignorable, true, false);
 
     // Tokenize content streams, skipping inline images
@@ -214,7 +214,7 @@ process(char const* filename, bool include_ignorable, size_t max_len)
         auto content_data = plb.getBufferSharedPointer();
         BufferInputSource* bis =
             new BufferInputSource("content data", content_data.get());
-        is = PointerHolder<InputSource>(bis);
+        is = std::shared_ptr<InputSource>(bis);
         dump_tokens(
             is,
             "PAGE " + QUtil::int_to_string(pageno),
@@ -231,11 +231,11 @@ process(char const* filename, bool include_ignorable, size_t max_len)
          ++iter) {
         if ((*iter).isStream() && (*iter).getDict().getKey("/Type").isName() &&
             (*iter).getDict().getKey("/Type").getName() == "/ObjStm") {
-            PointerHolder<Buffer> b =
+            std::shared_ptr<Buffer> b =
                 (*iter).getStreamData(qpdf_dl_specialized);
             BufferInputSource* bis =
                 new BufferInputSource("object stream data", b.get());
-            is = PointerHolder<InputSource>(bis);
+            is = std::shared_ptr<InputSource>(bis);
             dump_tokens(
                 is,
                 "OBJECT STREAM " + QUtil::int_to_string((*iter).getObjectID()),

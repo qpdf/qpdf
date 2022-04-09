@@ -529,7 +529,7 @@ read_from_file_test()
         fclose(fp);
     }
 
-    PointerHolder<char> buf;
+    std::shared_ptr<char> buf;
     size_t size = 0;
     QUtil::read_file_into_memory("other-file", buf, size);
     std::cout << "read " << size << " bytes" << std::endl;
@@ -595,7 +595,7 @@ assert_no_file(char const* filename)
 void
 rename_delete_test()
 {
-    PointerHolder<char> buf;
+    std::shared_ptr<char> buf;
     size_t size = 0;
 
     try {

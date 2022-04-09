@@ -231,7 +231,7 @@ create_pdf(char const* filename)
         image_dict.replaceKey("/Width", newInteger(width));
         image_dict.replaceKey("/Height", newInteger(height));
         ImageProvider* p = new ImageProvider(pageno);
-        PointerHolder<QPDFObjectHandle::StreamDataProvider> provider(p);
+        std::shared_ptr<QPDFObjectHandle::StreamDataProvider> provider(p);
         image.replaceStreamData(
             provider, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
 
@@ -265,7 +265,7 @@ create_pdf(char const* filename)
 static void
 check_page_contents(size_t pageno, QPDFObjectHandle page)
 {
-    PointerHolder<Buffer> buf = page.getKey("/Contents").getStreamData();
+    std::shared_ptr<Buffer> buf = page.getKey("/Contents").getStreamData();
     std::string actual_contents =
         std::string(reinterpret_cast<char*>(buf->getBuffer()), buf->getSize());
     std::string expected_contents = generate_page_contents(pageno);

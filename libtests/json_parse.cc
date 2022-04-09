@@ -11,7 +11,7 @@ main(int argc, char* argv[])
     }
     char const* filename = argv[1];
     try {
-        PointerHolder<char> buf;
+        std::shared_ptr<char> buf;
         size_t size;
         QUtil::read_file_into_memory(filename, buf, size);
         std::string s(buf.get(), size);

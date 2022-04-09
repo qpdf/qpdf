@@ -49,7 +49,7 @@ usage()
 class Provider: public QPDFObjectHandle::StreamDataProvider
 {
   public:
-    Provider(PointerHolder<Buffer> b) :
+    Provider(std::shared_ptr<Buffer> b) :
         b(b),
         bad_length(false)
     {
@@ -74,7 +74,7 @@ class Provider: public QPDFObjectHandle::StreamDataProvider
     }
 
   private:
-    PointerHolder<Buffer> b;
+    std::shared_ptr<Buffer> b;
     bool bad_length;
 };
 
@@ -151,7 +151,7 @@ class TokenFilter: public QPDFObjectHandle::TokenFilter
 static std::string
 getPageContents(QPDFObjectHandle page)
 {
-    PointerHolder<Buffer> b1 = page.getKey("/Contents").getStreamData();
+    std::shared_ptr<Buffer> b1 = page.getKey("/Contents").getStreamData();
     return std::string(
                reinterpret_cast<char*>(b1->getBuffer()), b1->getSize()) +
         "\0";
@@ -271,14 +271,14 @@ test_0_1(QPDF& pdf, char const* arg2)
         std::cout << "Raw stream data:" << std::endl;
         std::cout.flush();
         QUtil::binary_stdout();
-        auto out = make_pointer_holder<Pl_StdioFile>("raw", stdout);
+        auto out = std::make_shared<Pl_StdioFile>("raw", stdout);
         qtest.pipeStreamData(out.get(), 0, qpdf_dl_none);
 
         std::cout << std::endl << "Uncompressed stream data:" << std::endl;
         if (qtest.pipeStreamData(0, 0, qpdf_dl_all)) {
             std::cout.flush();
             QUtil::binary_stdout();
-            out = make_pointer_holder<Pl_StdioFile>("filtered", stdout);
+            out = std::make_shared<Pl_StdioFile>("filtered", stdout);
             qtest.pipeStreamData(out.get(), 0, qpdf_dl_all);
             std::cout << std::endl << "End of stream data" << std::endl;
         } else {
@@ -316,7 +316,7 @@ test_2(QPDF& pdf, char const* arg2)
     QPDFObjectHandle page = kids.getArrayItem(1); // second page
     QPDFObjectHandle contents = page.getKey("/Contents");
     QUtil::binary_stdout();
-    auto out = make_pointer_holder<Pl_StdioFile>("filtered", stdout);
+    auto out = std::make_shared<Pl_StdioFile>("filtered", stdout);
     contents.pipeStreamData(out.get(), 0, qpdf_dl_generalized);
 }
 
@@ -329,8 +329,7 @@ test_3(QPDF& pdf, char const* arg2)
         std::cout << "-- stream " << i << " --" << std::endl;
         std::cout.flush();
         QUtil::binary_stdout();
-        auto out =
-            make_pointer_holder<Pl_StdioFile>("tokenized stream", stdout);
+        auto out = std::make_shared<Pl_StdioFile>("tokenized stream", stdout);
         stream.pipeStreamData(
             out.get(), qpdf_ef_normalize, qpdf_dl_generalized);
     }
@@ -503,7 +502,7 @@ test_8(QPDF& pdf, char const* arg2)
     // This is a bogus way to use StreamDataProvider, but it does
     // adequately test its functionality.
     Provider* provider = new Provider(b);
-    auto p = PointerHolder<QPDFObjectHandle::StreamDataProvider>(provider);
+    auto p = std::shared_ptr<QPDFObjectHandle::StreamDataProvider>(provider);
     qstream.replaceStreamData(
         p,
         QPDFObjectHandle::newName("/FlateDecode"),
@@ -532,7 +531,7 @@ test_9(QPDF& pdf, char const* arg2)
 {
     QPDFObjectHandle root = pdf.getRoot();
     // Explicitly exercise the Buffer version of newStream
-    auto buf = make_pointer_holder<Buffer>(20U);
+    auto buf = std::make_shared<Buffer>(20U);
     unsigned char* bp = buf->getBuffer();
     memcpy(bp, "data for new stream\n", 20); // no null!
     QPDFObjectHandle qstream = QPDFObjectHandle::newStream(&pdf, buf);
@@ -581,8 +580,8 @@ test_11(QPDF& pdf, char const* arg2)
 {
     QPDFObjectHandle root = pdf.getRoot();
     QPDFObjectHandle qstream = root.getKey("/QStream");
-    PointerHolder<Buffer> b1 = qstream.getStreamData();
-    PointerHolder<Buffer> b2 = qstream.getRawStreamData();
+    std::shared_ptr<Buffer> b1 = qstream.getStreamData();
+    std::shared_ptr<Buffer> b2 = qstream.getRawStreamData();
     if ((b1->getSize() == 7) && (memcmp(b1->getBuffer(), "potato\n", 7) == 0)) {
         std::cout << "filtered stream data okay" << std::endl;
     }
@@ -815,7 +814,7 @@ test_17(QPDF& pdf, char const* arg2)
         QPDFObjectHandle(pages.at(1)).getKey("/Contents").getObjGen());
     pdf.removePage(pages.at(0));
     assert(pages.size() == 2);
-    PointerHolder<Buffer> b =
+    std::shared_ptr<Buffer> b =
         QPDFObjectHandle(pages.at(0)).getKey("/Contents").getStreamData();
     std::string contents = std::string(
         reinterpret_cast<char const*>(b->getBuffer()), b->getSize());
@@ -1039,7 +1038,7 @@ test_27(QPDF& pdf, char const* arg2)
     // also exercise setImmediateCopyFrom.
 
     // Create a provider. The provider stays in scope.
-    PointerHolder<QPDFObjectHandle::StreamDataProvider> p1;
+    std::shared_ptr<QPDFObjectHandle::StreamDataProvider> p1;
     {
         // Local scope
         Pl_Buffer pl("buffer");
@@ -1065,7 +1064,7 @@ test_27(QPDF& pdf, char const* arg2)
         // Make sure some source PDFs are out of scope when we
         // write.
 
-        PointerHolder<QPDFObjectHandle::StreamDataProvider> p2;
+        std::shared_ptr<QPDFObjectHandle::StreamDataProvider> p2;
         // Create another provider. This one will go out of scope
         // along with its containing qpdf, which has
         // setImmediateCopyFrom(true).
@@ -1266,7 +1265,7 @@ test_35(QPDF& pdf, char const* arg2)
 {
     // Extract attachments
 
-    std::map<std::string, PointerHolder<Buffer>> attachments;
+    std::map<std::string, std::shared_ptr<Buffer>> attachments;
     QPDFObjectHandle root = pdf.getRoot();
     QPDFObjectHandle names = root.getKey("/Names");
     QPDFObjectHandle embeddedFiles = names.getKey("/EmbeddedFiles");
@@ -1282,7 +1281,7 @@ test_35(QPDF& pdf, char const* arg2)
             attachments[filename] = stream.getStreamData();
         }
     }
-    for (std::map<std::string, PointerHolder<Buffer>>::iterator iter =
+    for (std::map<std::string, std::shared_ptr<Buffer>>::iterator iter =
              attachments.begin();
          iter != attachments.end();
          ++iter) {
@@ -1421,7 +1420,7 @@ test_41(QPDF& pdf, char const* arg2)
          iter != pages.end();
          ++iter) {
         (*iter).addContentTokenFilter(
-            PointerHolder<QPDFObjectHandle::TokenFilter>(new TokenFilter()));
+            std::shared_ptr<QPDFObjectHandle::TokenFilter>(new TokenFilter()));
     }
     QPDFWriter w(pdf, "a.pdf");
     w.setQDFMode(true);
@@ -2468,12 +2467,12 @@ test_68(QPDF& pdf, char const* arg2)
     } catch (std::exception& e) {
         std::cout << "get unfilterable stream: " << e.what() << std::endl;
     }
-    PointerHolder<Buffer> b1 = qstream.getStreamData(qpdf_dl_all);
+    std::shared_ptr<Buffer> b1 = qstream.getStreamData(qpdf_dl_all);
     if ((b1->getSize() > 10) &&
         (memcmp(b1->getBuffer(), "wwwwwwwww", 9) == 0)) {
         std::cout << "filtered stream data okay" << std::endl;
     }
-    PointerHolder<Buffer> b2 = qstream.getRawStreamData();
+    std::shared_ptr<Buffer> b2 = qstream.getRawStreamData();
     if ((b2->getSize() > 10) &&
         (memcmp(
              b2->getBuffer(), "\xff\xd8\xff\xe0\x00\x10\x4a\x46\x49\x46", 10) ==
@@ -2578,11 +2577,11 @@ test_72(QPDF& pdf, char const* arg2)
         Pl_Buffer b("buffer");
         if (i == 0) {
             fx1.addContentTokenFilter(
-                PointerHolder<QPDFObjectHandle::TokenFilter>(
+                std::shared_ptr<QPDFObjectHandle::TokenFilter>(
                     new TokenFilter()));
         } else {
             fx1.getObjectHandle().addTokenFilter(
-                PointerHolder<QPDFObjectHandle::TokenFilter>(
+                std::shared_ptr<QPDFObjectHandle::TokenFilter>(
                     new TokenFilter()));
         }
         fx1.pipeContents(&b);
@@ -2999,7 +2998,7 @@ test_83(QPDF& pdf, char const* arg2)
     // partial = true, we just use qpdf --job-json-file.
 
     QPDFJob j;
-    PointerHolder<char> file_buf;
+    std::shared_ptr<char> file_buf;
     size_t size;
     QUtil::read_file_into_memory(arg2, file_buf, size);
     try {
@@ -3201,7 +3200,7 @@ runtest(int n, char const* filename1, char const* arg2)
     }
 
     QPDF pdf;
-    PointerHolder<char> file_buf;
+    std::shared_ptr<char> file_buf;
     FILE* filep = 0;
     if (n == 0) {
         pdf.setAttemptRecovery(false);
