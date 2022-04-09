@@ -22,16 +22,16 @@
 #ifndef POINTERHOLDER_HH
 #define POINTERHOLDER_HH
 
+#define POINTERHOLDER_IS_SHARED_POINTER
+
 #ifndef POINTERHOLDER_TRANSITION
 
-// In qpdf 11, #define POINTERHOLDER_IS_SHARED_POINTER
-
-// In qpdf 11, issue a warning:
 // #define POINTERHOLDER_TRANSITION 0 to suppress this warning, and see below.
-// # warn "POINTERHOLDER_TRANSITION is not defined -- see qpdf/PointerHolder.hh"
+// See also https://qpdf.readthedocs.io/en/stable/design.html#smart-pointers
+# warn "POINTERHOLDER_TRANSITION is not defined -- see qpdf/PointerHolder.hh"
 
-// undefined = define as 0; will also issue a warning in qpdf 11
-// 0 = no deprecation warnings
+// undefined = define as 0 and issue a warning
+// 0 = no deprecation warnings, backward-compatible API
 // 1 = make PointerHolder<T>(T*) explicit
 // 2 = warn for use of getPointer() and getRefcount()
 // 3 = warn for all use of PointerHolder
