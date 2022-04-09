@@ -68,7 +68,7 @@ The primary class for interacting with PDF objects is
 ``QPDFObjectHandle``. Instances of this class can be passed around by
 value, copied, stored in containers, etc. with very low overhead. The
 ``QPDFObjectHandle`` object contains an internal shared pointer to an
-underyling ``QPDFObject``. Instances of ``QPDFObjectHandle`` created
+underlying ``QPDFObject``. Instances of ``QPDFObjectHandle`` created
 by reading from a file will always contain a reference back to the
 ``QPDF`` object from which they were created. A ``QPDFObjectHandle``
 may be direct or indirect. If indirect, the ``QPDFObject`` shared

@@ -11,6 +11,7 @@
 # cspell can be installed with `npm install -g cspell`.
 
 # cspell does its own expansion of shell wildcards.
+cd $(dirname $0)
 cspell '**/*.hh' 'include/qpdf/*.h' '**/*.cc' \
        'manual/*.rst' 'manual/*.in' 'manual/_ext/*.py' \
        '**/CMakeLists.txt' ChangeLog 'README*' TODO

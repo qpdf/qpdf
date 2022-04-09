@@ -33,7 +33,7 @@ differences, ``clang-format`` is authoritative. It is not possible to
 make ``cc-mode`` and ``clang-format`` exactly match since the syntax
 parser in emacs is not as sophisticated.
 
-Blocks of code that should not be formatted can be surrouned by the
+Blocks of code that should not be formatted can be surrounded by the
 comments ``// clang-format off`` and ``// clang-format on``. Sometimes
 clang-format tries to combine lines in ways that are undesirable. In
 this case, we follow a convention of adding a comment ``//
