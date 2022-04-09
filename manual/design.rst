@@ -53,13 +53,11 @@ or not if this information is needed. All access to objects deals with
 this transparently. All memory management details are also handled by
 the library.
 
-The ``PointerHolder`` object is used internally by the library to deal
-with memory management. This is basically a smart pointer object very
-similar in spirit to C++-11's ``std::shared_ptr`` object, but predating
-it by several years. This library also makes use of a technique for
-giving fine-grained access to methods in one class to other classes by
-using public subclasses with friends and only private members that in
-turn call private methods of the containing class. See
+Memory is managed mostly with ``std::shared_ptr`` object to minimize
+explicit memory handling. This library also makes use of a technique
+for giving fine-grained access to methods in one class to other
+classes by using public subclasses with friends and only private
+members that in turn call private methods of the containing class. See
 ``QPDFObjectHandle::Factory`` as an example.
 
 The top-level qpdf class is ``QPDF``. A ``QPDF`` object represents a PDF
@@ -68,13 +66,14 @@ files.
 
 The primary class for interacting with PDF objects is
 ``QPDFObjectHandle``. Instances of this class can be passed around by
-value, copied, stored in containers, etc. with very low overhead.
-Instances of ``QPDFObjectHandle`` created by reading from a file will
-always contain a reference back to the ``QPDF`` object from which they
-were created. A ``QPDFObjectHandle`` may be direct or indirect. If
-indirect, the ``QPDFObject`` the ``PointerHolder`` initially points to
-is a null pointer. In this case, the first attempt to access the
-underlying ``QPDFObject`` will result in the ``QPDFObject`` being
+value, copied, stored in containers, etc. with very low overhead. The
+``QPDFObjectHandle`` object contains an internal shared pointer to an
+underyling ``QPDFObject``. Instances of ``QPDFObjectHandle`` created
+by reading from a file will always contain a reference back to the
+``QPDF`` object from which they were created. A ``QPDFObjectHandle``
+may be direct or indirect. If indirect, the ``QPDFObject`` shared
+pointer is initially null. In this case, the first attempt to access
+the underlying ``QPDFObject`` will result in the ``QPDFObject`` being
 resolved via a call to the referenced ``QPDF`` instance. This makes it
 essentially impossible to make coding errors in which certain things
 will work for some PDF files and not for others based on which objects
@@ -248,17 +247,18 @@ During this process, the "``R``" keyword is recognized and an indirect
 
 The ``QPDF::resolve()`` method, which is used to resolve an indirect
 object, may be invoked from the ``QPDFObjectHandle`` class. It first
-checks a cache to see whether this object has already been read. If not,
-it reads the object from the PDF file and caches it. It the returns the
-resulting ``QPDFObjectHandle``. The calling object handle then replaces
-its ``PointerHolder<QDFObject>`` with the one from the newly returned
-``QPDFObjectHandle``. In this way, only a single copy of any direct
-object need exist and clients can access objects transparently without
-knowing or caring whether they are direct or indirect objects.
-Additionally, no object is ever read from the file more than once. That
-means that only the portions of the PDF file that are actually needed
-are ever read from the input file, thus allowing the qpdf package to
-take advantage of this important design goal of PDF files.
+checks a cache to see whether this object has already been read. If
+not, it reads the object from the PDF file and caches it. It the
+returns the resulting ``QPDFObjectHandle``. The calling object handle
+then replaces its ``std::shared_ptr<QDFObject>`` with the one from the
+newly returned ``QPDFObjectHandle``. In this way, only a single copy
+of any direct object need exist and clients can access objects
+transparently without knowing or caring whether they are direct or
+indirect objects. Additionally, no object is ever read from the file
+more than once. That means that only the portions of the PDF file that
+are actually needed are ever read from the input file, thus allowing
+the qpdf package to take advantage of this important design goal of
+PDF files.
 
 If the requested object is inside of an object stream, the object stream
 itself is first read into memory. Then the tokenizer reads objects from
@@ -762,40 +762,47 @@ Smart Pointers
 --------------
 
 This section describes changes to the use of smart pointers that were
-made in qpdf 10.6.0 as well as some planned for 11.0.0.
+made in qpdf 10.6.0 and 11.0.0.
 
-Starting in qpdf 11, ``PointerHolder`` will be replaced with
+In qpdf 11.0.0, ``PointerHolder`` was replaced with
 ``std::shared_ptr`` in qpdf's public API. A backward-compatible
-``PointerHolder`` class will be provided that should make it possible
-for most code to remain unchanged. ``PointerHolder`` may eventually be
+``PointerHolder`` class has been provided that makes it possible for
+most code to remain unchanged. ``PointerHolder`` may eventually be
 removed from qpdf entirely, but this will not happen for a while to
 make it easier for people who need to support multiple versions of
 qpdf.
 
-The ``POINTERHOLDER_TRANSITION`` preprocessor symbol has been
-introduced to help people transition from ``PointerHolder`` to
-``std::shared_ptr``. After qpdf 11 is released, to prepare for a
-future qpdf without ``PointerHolder`` and to let them know that it is
-no longer needed, a warning will be issued if
-``<qpdf/PointerHolder.hh>`` is included, though it will be possible to
-suppress the warning by defining ``POINTERHOLDER_TRANSITION``. In
-10.6.0, there are some steps you can perform to prepare, but no action
-is required.
+In 10.6.0, some enhancements were made to ``PointerHolder`` to ease
+the transition. These intermediate steps are relevant only for
+versions 10.6.0 through 10.6.3 but can still help with incremental
+modification of code.
 
-The remainder of this section describes how to prepare if you want to
-eliminate ``PointerHolder`` from your code or what to do if you want
-to stick with the old interfaces.
+The ``POINTERHOLDER_TRANSITION`` preprocessor symbol was introduced in
+qpdf 10.6.0 to help people transition from ``PointerHolder`` to
+``std::shared_ptr``. If you don't define this, you will get a compiler
+warning. Defining it to any value will suppress the warning. An
+explanation appears below of the different possible values for this
+symbol and what they mean.
 
-Changes in 10.6.0
-~~~~~~~~~~~~~~~~~
+Starting in qpdf 11.0.0, including ``<qpdf/PointerHolder.hh>`` defines
+the symbol ``POINTERHOLDER_IS_SHARED_POINTER``. This can be used with
+conditional compilation to make it possible to support different
+versions of qpdf.
 
-In qpdf 10.6.0, the following changes have been made to
-``PointerHolder`` to make its behavior closer to that of
-``std::shared_ptr``:
+The rest of this section provides the details.
 
-- ``get()`` has been added as an alternative to ``getPointer()``
+Transitional Enhancements to PointerHolder
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- ``use_count()`` has been added as an alternative to ``getRefcount()``
+In qpdf 10.6.0, some changes were to ``PointerHolder`` to make it
+easier to prepare for the transition to ``std::shared_ptr``. These
+enhancements also make it easier to incrementally upgrade your code.
+The following changes were made to ``PointerHolder`` to make its
+behavior closer to that of ``std::shared_ptr``:
+
+- ``get()`` was added as an alternative to ``getPointer()``
+
+- ``use_count()`` was added as an alternative to ``getRefcount()``
 
 - A new global helper function ``make_pointer_holder`` behaves
   similarly to ``std::make_shared``, so you can use
@@ -807,7 +814,7 @@ In qpdf 10.6.0, the following changes have been made to
   counterpart to the newly added ``QUtil::make_shared_array`` method,
   which does the same thing with a ``std::shared_ptr``.
 
-``PointerHolder`` has had a long-standing bug: a ``const
+``PointerHolder`` had a long-standing bug: a ``const
 PointerHolder<T>`` would only provide a ``T const*`` with its
 ``getPointer`` method. This is incorrect and is not how standard
 library C++ smart pointers or regular pointers behave. The correct
@@ -873,16 +880,23 @@ preprocessor symbol or other C++ coding techniques.
   pointer. It also has the seldom-used ``getRefcount()`` method to get
   the reference count. ``std::shared_ptr<T>`` has ``get()`` and
   ``use_count()``. In qpdf 10.6, ``PointerHolder<T>`` also has
-  would not be an issue unless you did this in your own code.
+  ``get()`` and ``use_count()``.
 
 Addressing the Differences
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you need to support versions of qpdf prior to qpdf 10.6, you don't
-*need* to take any action at this time, but it is recommended that you
-at least address the implicit constructor issue since this can be done
-without breaking backward compatibility. (Explicit construction of
-``PointerHolder<T>`` is and always has been allowed.)
+If you are not ready to take action yet, you can ``#define
+POINTERHOLDER_TRANSITION 0`` before including any qpdf header file or
+add the definition of that symbol to your build. This will provide the
+backward-compatible ``PointerHolder`` API without any deprecation
+warnings. This should be a temporary measure as ``PointerHolder`` may
+disappear in the future. If you need to be able to support newer and
+older versions of qpdf, there are other options, explained below.
+
+Note that, even with ``0``, you should rebuild and test your code.
+There may be compiler errors if you have containers of
+``PointerHolder``, but most code should compile without any changes.
+There are no uses of containers of ``PointerHolder`` in qpdf's API.
 
 There are two significant things you can do to minimize the impact of
 switching from ``PointerHolder`` to ``std::shared_ptr``:
@@ -908,31 +922,35 @@ without consulting this manual.
      - meaning
 
    - - undefined
-     - Same as ``0``, but starting with qpdf 11.0, issues a warning
+     - Same as ``0`` but issues a warning
 
    - - ``0``
      - Provide a backward compatible ``PointerHolder`` and suppress
-       all deprecation warnings
+       all deprecation warnings; supports all prior qpdf versions
 
    - - ``1``
-     - Make the ``PointerHolder<T>(T*)`` constructor explicit
+     - Make the ``PointerHolder<T>(T*)`` constructor explicit;
+       resulting code supports all prior qpdf versions
 
    - - ``2``
-     - Deprecate ``getPointer()`` and ``getRefcount()``
+     - Deprecate ``getPointer()`` and ``getRefcount()``; requires
+       qpdf 10.6.0 or later.
 
    - - ``3``
-     - Starting with qpdf 11.0, deprecate all uses of ``PointerHolder``
+     - Deprecate all uses of ``PointerHolder``; requires qpdf 11.0.0
+       or later
 
    - - ``4``
-     - Starting with qpdf 11.0, disable all functionality from
-       ``qpdf/PointerHolder.hh`` so that ``#include``-ing it has no
-       effect.
+     - Disable all functionality from ``qpdf/PointerHolder.hh`` so
+       that ``#include``-ing it has no effect other than defining
+       ``POINTERHOLDER_IS_SHARED_POINTER``; requires qpdf 11.0.0 or
+       later.
 
 Based on the above, here is a procedure for preparing your code. This
 is the procedure that was used for the qpdf code itself.
 
-If you need to support versions of qpdf prior to 10.6, you can still
-do these steps:
+You can do these steps without breaking support for qpdf versions
+before 10.6.0:
 
 - Find all occurrences of ``PointerHolder`` in the code. See whether
   any of them can just be outright replaced with ``std::shared_ptr``
@@ -974,8 +992,9 @@ do these steps:
        auto p = std::unique_ptr<X[]>(new X[n]);
 
 - If a ``PointerHolder<T>`` can't be replaced with a standard library
-  smart pointer, perhaps it can be declared using ``auto`` or
-  ``decltype`` so that, when the qpdf API changes, your code will just
+  smart pointer because it is used with an older qpdf API call,
+  perhaps it can be declared using ``auto`` or ``decltype`` so that,
+  when building with a newer qpdf API changes, your code will just
   need to be recompiled.
 
 - ``#define POINTERHOLDER_TRANSITION 1`` to enable deprecation
@@ -1000,55 +1019,18 @@ do these steps:
     Other examples appear above.
 
 If you need to support older versions of qpdf than 10.6, this is as
-far as you can go until qpdf 11 comes out.
+far as you can go without conditional compilation.
 
-If you only need to support the latest version of qpdf, proceed as
-follows:
-
-- ``#define POINTERHOLDER_TRANSITION 2`` to enable deprecation of
-  ``getPointer()`` and ``getRefcount()``
-
-- Replace ``getPointer()`` with ``get()`` and ``getRefcount()`` with
-  ``use_count()``. These methods were not present prior to 10.6.0.
-
-When you have gotten your code to compile cleanly with
-``POINTERHOLDER_TRANSITION=2``, you are well on your way to being
-ready for eliminating ``PointerHolder`` entirely after qpdf 11 is
-released.
-
-After qpdf 11 is out
-~~~~~~~~~~~~~~~~~~~~
-
-In the 10.6 manual, this section represents a plan and is subject to
-change. However, it has been tested in practice using a version of the
-qpdf 11 ``PointerHolder`` on a branch, so it is likely to be accurate.
-In the meantime, think of this as a preview.
-
-First, make sure you have done the steps in the 10.6 section. (Note:
-once qpdf 11 comes out, the goal is to not have to migrate to 10.6
-first, so it is likely that these sections will be combined.)
-
-If you are explicitly choosing to stick with the backward compatible
-``PointerHolder`` for now, you should define
-``POINTERHOLDER_TRANSITION`` to ``0`` to suppress the warning from
-including ``qpdf/PointerHolder.hh``. Be aware that you may eventually
-have to deal with the transition, though the intention is to leave the
-compatibility layer in place for a while. You should rebuild and test
-your code. There may be compiler errors if you have containers of
-``PointerHolder``, but most code should compile without any changes.
-Even if you have errors, use of ``auto`` or ``decltype`` may enable
-you to write code that works with the old and new API without having
-to use conditional compilation. The
-``POINTERHOLDER_IS_SHARED_POINTER`` is defined in qpdf 11 if you
-``#include <qpdf/PointerHolder.hh>``.
-
-If you want to support older versions of qpdf and still transition so
-that the backward-compatible ``PointerHolder`` is not in use, you can
-separate old code and new code by testing with the
+Starting in qpdf 11.0.0, including ``<qpdf/PointerHolder.hh>`` defines
+the symbol ``POINTERHOLDER_IS_SHARED_POINTER``. If you want to support
+older versions of qpdf and still transition so that the
+backward-compatible ``PointerHolder`` is not in use, you can separate
+old code and new code by testing with the
 ``POINTERHOLDER_IS_SHARED_POINTER`` preprocessor symbol, as in
 
 .. code-block:: c++
 
+   #include <qpdf/PointerHolder.hh>
    #ifdef POINTERHOLDER_IS_SHARED_POINTER
    std::shared_ptr<X> x;
    #else
@@ -1060,6 +1042,7 @@ or
 
 .. code-block:: c++
 
+   #include <qpdf/PointerHolder.hh>
    #ifdef POINTERHOLDER_IS_SHARED_POINTER
    auto x_p = std::make_shared<X>();
    X* x = x_p.get();
@@ -1074,13 +1057,23 @@ If you don't need to support older versions of qpdf, you can proceed
 with these steps without protecting changes with the preprocessor
 symbol. Here are the remaining changes.
 
-- Make sure you have a clean build with ``POINTERHOLDER_TRANSITION``
-  set to ``2``. This means that you are using ``PointerHolder`` in a
-  manner that is API-compatible with ``std::shared_ptr`` in all cases
-  except for array pointers.
+- ``#define POINTERHOLDER_TRANSITION 2`` to enable deprecation of
+  ``getPointer()`` and ``getRefcount()``
+
+- Replace ``getPointer()`` with ``get()`` and ``getRefcount()`` with
+  ``use_count()``. These methods were not present prior to 10.6.0.
+
+When you have gotten your code to compile cleanly with
+``POINTERHOLDER_TRANSITION=2``, you are well on your way to being
+ready for eliminating ``PointerHolder`` entirely. The code at this
+point will not work with any qpdf version prior to 10.6.0.
+
+To support qpdf 11.0.0 and newer and remove ``PointerHolder`` from
+your code, continue with the following steps:
 
 - Replace all occurrences of ``PointerHolder`` with
-  ``std::shared_ptr`` except in ``#include <qpdf/PointerHolder.hh>``
+  ``std::shared_ptr`` except in the literal statement ``#include
+  <qpdf/PointerHolder.hh>``
 
 - Replace all occurrences of ``make_pointer_holder`` with
   ``std::make_shared``

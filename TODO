@@ -5,8 +5,7 @@ Next
 * At next release, hide release-qpdf-10.6.3.0cmake* versions at readthedocs
 
 In order:
-* cmake
-* PointerHolder -> shared_ptr
+* cmake -- remaining steps
 * ABI including --json default is latest
 * json v2
 
@@ -29,9 +28,6 @@ Misc
   --show-encryption could potentially retry with this option if the
   first time doesn't work. Then, with the file open, we can read the
   encryption dictionary normally.
-* Go through README-maintainer "CODING RULES" and update --
-  PointerHolder and other changes will make some of the rules
-  obsolete.
 * Have a warn in QPDF that passes its variable arguments onto QPDFExc
   so you don't have to do warn(QPDFExc(...))
 
@@ -57,6 +53,7 @@ cmake
     QPDF_DLL are public because QPDF_DLL_LOCAL makes the other things
     private. See https://gcc.gnu.org/wiki/Visibility. Make sure this
     is documented.
+  * Update "CODING RULES" in "README-maintainer" - search for QPDF_DLL
 * Nice to have:
   * Split qpdf.test into multiple tests
   * Rework tests so that nothing is written into the source directory.
@@ -500,103 +497,6 @@ Other notes:
   way that works for the qpdf/qpdf repository as well since they are
   very similar.
 
-PointerHolder to std::shared_ptr
-================================
-
-To perform update:
-
-Cherry-pick pointerholder branch commit
-
-Upgrade just the library. This is not necessary, but it's an added
-check that the compatibility code works since it will show that tests,
-examples, and CLI will work properly with the upgraded APIs, which
-provides some assurance that other people will have a smooth time with
-their code.
-
-patrepl s/PointerHolder/std::shared_ptr/g {include,libqpdf}/qpdf/*.hh
-patrepl s/PointerHolder/std::shared_ptr/g libqpdf/*.cc
-patrepl s/make_pointer_holder/std::make_shared/g libqpdf/*.cc
-patrepl s/make_array_pointer_holder/QUtil::make_shared_array/g libqpdf/*.cc
-patrepl s,qpdf/std::shared_ptr,qpdf/PointerHolder, **/*.cc **/*.hh
-git restore include/qpdf/PointerHolder.hh
-cleanpatch
-
-Increase to POINTERHOLDER_TRANSITION=3
-
-make build_libqpdf -- no errors
-
-Drop back to POINTERHOLDER_TRANSITION=2
-
-make check -- everything passes
-
-Then upgrade everything else. It would work to just start here.
-
-Increase to POINTERHOLDER_TRANSITION=3
-
-patrepl s/PointerHolder/std::shared_ptr/g **/*.cc **/*.hh
-patrepl s/make_pointer_holder/std::make_shared/g **/*.cc
-patrepl s/make_array_pointer_holder/QUtil::make_shared_array/g **/*.cc
-patrepl s,qpdf/std::shared_ptr,qpdf/PointerHolder, **/*.cc **/*.hh
-git restore include/qpdf/PointerHolder.hh
-git restore libtests/pointer_holder.cc
-cleanpatch
-
-Remove all references to PointerHolder.hh from everything except
-public headers and pointer_holder.cc.
-
-make check -- everything passes
-
-Increase to POINTERHOLDER_TRANSITION=4
-
-Do a clean build and make check -- everything passes
-
-Final steps:
-
-* Change to POINTERHOLDER_TRANSITION=4
-* Check code formatting
-* std::shared_ptr<Members> m can be replaced with
-  std::shared_ptr<Members> m_ph and Members* m if performance is critical
-* Could try Members indirection with Members* for QPDFObjectHandle
-
-When done:
-
-* Update the smart-pointers section of the manual in design.rst
-* Update comments in PointerHolder.hh
-
-PointerHolder in public API:
-
-  PointerHolder<Buffer> Pl_Buffer::getBufferSharedPointer();
-  PointerHolder<Buffer> QPDFWriter::getBufferSharedPointer();
-  QUtil::read_file_into_memory(
-    char const*, PointerHolder<char>&, unsigned long&)
-  QPDFObjectHandle::addContentTokenFilter(
-    PointerHolder<QPDFObjectHandle::TokenFilter>)
-  QPDFObjectHandle::addTokenFilter(
-    PointerHolder<QPDFObjectHandle::TokenFilter>)
-  QPDFObjectHandle::newStream(
-    QPDF*, PointerHolder<Buffer>)
-  QPDFObjectHandle::parse(
-    PointerHolder<InputSource>, std::string const&,
-    QPDFTokenizer&, bool&, QPDFObjectHandle::StringDecrypter*, QPDF*)
-  QPDFObjectHandle::replaceStreamData(
-    PointerHolder<Buffer>, QPDFObjectHandle const&,
-    QPDFObjectHandle const&)
-  QPDFObjectHandle::replaceStreamData(
-    PointerHolder<QPDFObjectHandle::StreamDataProvider>,
-    QPDFObjectHandle const&, QPDFObjectHandle const&)
-  QPDFTokenizer::expectInlineImage(
-    PointerHolder<InputSource>)
-  QPDFTokenizer::readToken(
-    PointerHolder<InputSource>, std::string const&,
-    bool, unsigned long)
-  QPDF::processInputSource(
-    PointerHolder<InputSource>, char const*)
-  QPDFWriter::registerProgressReporter(
-    PointerHolder<QPDFWriter::ProgressReporter>)
-  QPDFEFStreamObjectHelper::createEFStream(
-    QPDF&, PointerHolder<Buffer>)
-  QPDFPageObjectHelper::addContentTokenFilter(
-    PointerHolder<QPDFObjectHandle::TokenFilter>)
 
 ABI Changes
 ===========
