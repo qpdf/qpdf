@@ -1,0 +1,35 @@
+#!/bin/sh
+
+# Formatting rules are in .clang-format.
+
+# To protect a block of code from automatic formatting, enclose in
+# comments such as
+#
+#  // clang-format off
+#  ...
+#  // clang-format on
+
+# Sometimes, a comment of the form `// line-break` may appear in the
+# code to prevent clang-format from removing an intentional line
+# break.
+
+# For emacs users, the file `.dir-locals.el` configures cc-mode for an
+# indentation style that is close to but not exactly like what
+# clang-format produces. clang-format is authoritative.
+
+# Please see "Code Formatting" in the manual for additional notes.
+
+cd $(dirname $0)
+for i in $(find . -name 'build*' -prune -o '(' \
+		-name '*.hh' -o -name '*.h' -o -name '*.cc' -o -name '*.c' \
+		')' -print); do
+    if clang-format < $i >| $i.new; then
+	if diff -q $i $i.new >/dev/null 2>/dev/null; then
+	    echo "okay:    $i"
+	    rm $i.new
+	else
+	    echo "updated: $i"
+	    mv $i.new $i
+	fi
+    fi
+done
