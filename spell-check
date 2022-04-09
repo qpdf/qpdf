@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 # Use comments starting with cSpell:ignore to ignore certain words for
 # the entire file. For source files, you can put these anywhere. For
@@ -9,6 +9,8 @@
 # that file sorted.
 
 # cspell can be installed with `npm install -g cspell`.
-cspell **/*.hh include/qpdf/*.h **/*.cc \
-       manual/*.rst manual/*.in manual/_ext/*.py \
-       **/CMakeLists.txt ChangeLog README* TODO
+
+# cspell does its own expansion of shell wildcards.
+cspell '**/*.hh' 'include/qpdf/*.h' '**/*.cc' \
+       'manual/*.rst' 'manual/*.in' 'manual/_ext/*.py' \
+       '**/CMakeLists.txt' ChangeLog 'README*' TODO
