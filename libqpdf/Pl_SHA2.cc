@@ -1,6 +1,5 @@
 #include <qpdf/Pl_SHA2.hh>
 
-#include <qpdf/PointerHolder.hh>
 #include <qpdf/QPDFCryptoProvider.hh>
 #include <qpdf/QUtil.hh>
 #include <cstdio>

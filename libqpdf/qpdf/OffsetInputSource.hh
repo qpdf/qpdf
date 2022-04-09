@@ -5,7 +5,6 @@
 // input source but offset a specific number of bytes.
 
 #include <qpdf/InputSource.hh>
-#include <qpdf/PointerHolder.hh>
 
 class OffsetInputSource: public InputSource
 {

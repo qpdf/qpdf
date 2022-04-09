@@ -5,7 +5,6 @@
 
 #include <qpdf/CryptoRandomDataProvider.hh>
 #include <qpdf/Pipeline.hh>
-#include <qpdf/PointerHolder.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFSystemError.hh>
 #include <qpdf/QTC.hh>

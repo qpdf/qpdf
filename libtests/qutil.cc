@@ -1,5 +1,4 @@
 #include <qpdf/Pl_Buffer.hh>
-#include <qpdf/PointerHolder.hh>
 #include <qpdf/QPDFSystemError.hh>
 #include <qpdf/QUtil.hh>
 #include <fcntl.h>

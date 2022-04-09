@@ -1,6 +1,5 @@
 #include <qpdf/Buffer.hh>
 #include <qpdf/BufferInputSource.hh>
-#include <qpdf/PointerHolder.hh>
 #include <qpdf/QPDFTokenizer.hh>
 #include <cstring>
 #include <iostream>

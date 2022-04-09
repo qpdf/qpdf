@@ -1,5 +1,4 @@
 #include <qpdf/Buffer.hh>
-#include <qpdf/PointerHolder.hh>
 #include <qpdf/QPDF.hh>
 #include <qpdf/QPDFObjGen.hh>
 #include <qpdf/QPDFObject.hh>

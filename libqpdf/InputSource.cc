@@ -1,6 +1,5 @@
 #include <qpdf/InputSource.hh>
 
-#include <qpdf/PointerHolder.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QTC.hh>
 #include <stdexcept>

@@ -3,7 +3,6 @@
 
 #include <qpdf/DLL.h>
 #include <qpdf/JSON.hh>
-#include <qpdf/PointerHolder.hh>
 #include <functional>
 #include <map>
 #include <memory>
