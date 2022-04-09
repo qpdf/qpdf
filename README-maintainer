@@ -256,6 +256,10 @@ RELEASE PREPARATION
 
 * Check work `qpdf` project for private issues
 
+* Make sure the code is formatted.
+
+  ./format-code
+
 * Run a spelling checker over the source code to catch errors in
   variable names, strings, and comments.
 
