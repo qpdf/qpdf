@@ -113,7 +113,7 @@ class QPDFFileSpecObjectHelper: public QPDFObjectHelper
         Members(Members const&) = delete;
     };
 
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // QPDFFILESPECOBJECTHELPER_HH

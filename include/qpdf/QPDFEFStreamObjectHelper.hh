@@ -74,7 +74,7 @@ class QPDFEFStreamObjectHelper: public QPDFObjectHelper
     // parameters may be supplied using setters defined below.
     QPDF_DLL
     static QPDFEFStreamObjectHelper
-    createEFStream(QPDF& qpdf, PointerHolder<Buffer> data);
+    createEFStream(QPDF& qpdf, std::shared_ptr<Buffer> data);
     QPDF_DLL
     static QPDFEFStreamObjectHelper
     createEFStream(QPDF& qpdf, std::string const& data);
@@ -116,7 +116,7 @@ class QPDFEFStreamObjectHelper: public QPDFObjectHelper
         Members(Members const&) = delete;
     };
 
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // QPDFEFSTREAMOBJECTHELPER_HH

@@ -108,7 +108,7 @@ class QPDF
     // InputSource and use this method.
     QPDF_DLL
     void
-    processInputSource(PointerHolder<InputSource>, char const* password = 0);
+    processInputSource(std::shared_ptr<InputSource>, char const* password = 0);
 
     // Close or otherwise release the input source. Once this has been
     // called, no other methods of qpdf can be called safely except
@@ -714,7 +714,7 @@ class QPDF
             std::map<int, QPDFXRefEntry> const& xref,
             std::map<int, qpdf_offset_t> const& lengths,
             std::map<int, int> const& obj_renumber,
-            PointerHolder<Buffer>& hint_stream,
+            std::shared_ptr<Buffer>& hint_stream,
             int& S,
             int& O)
         {
@@ -742,14 +742,14 @@ class QPDF
         friend class QPDFObjectHandle;
 
       private:
-        static PointerHolder<QPDFObject>
+        static std::shared_ptr<QPDFObject>
         resolve(QPDF* qpdf, int objid, int generation)
         {
             return qpdf->resolve(objid, generation);
         }
         static bool
         objectChanged(
-            QPDF* qpdf, QPDFObjGen const& og, PointerHolder<QPDFObject>& oph)
+            QPDF* qpdf, QPDFObjGen const& og, std::shared_ptr<QPDFObject>& oph)
         {
             return qpdf->objectChanged(og, oph);
         }
@@ -841,7 +841,7 @@ class QPDF
         {
         }
         ObjCache(
-            PointerHolder<QPDFObject> object,
+            std::shared_ptr<QPDFObject> object,
             qpdf_offset_t end_before_space,
             qpdf_offset_t end_after_space) :
             object(object),
@@ -850,7 +850,7 @@ class QPDF
         {
         }
 
-        PointerHolder<QPDFObject> object;
+        std::shared_ptr<QPDFObject> object;
         qpdf_offset_t end_before_space;
         qpdf_offset_t end_after_space;
     };
@@ -896,8 +896,8 @@ class QPDF
 
       public:
         ForeignStreamData(
-            PointerHolder<EncryptionParameters> encp,
-            PointerHolder<InputSource> file,
+            std::shared_ptr<EncryptionParameters> encp,
+            std::shared_ptr<InputSource> file,
             int foreign_objid,
             int foreign_generation,
             qpdf_offset_t offset,
@@ -905,8 +905,8 @@ class QPDF
             QPDFObjectHandle local_dict);
 
       private:
-        PointerHolder<EncryptionParameters> encp;
-        PointerHolder<InputSource> file;
+        std::shared_ptr<EncryptionParameters> encp;
+        std::shared_ptr<InputSource> file;
         int foreign_objid;
         int foreign_generation;
         qpdf_offset_t offset;
@@ -930,12 +930,12 @@ class QPDF
         void registerForeignStream(
             QPDFObjGen const& local_og, QPDFObjectHandle foreign_stream);
         void registerForeignStream(
-            QPDFObjGen const& local_og, PointerHolder<ForeignStreamData>);
+            QPDFObjGen const& local_og, std::shared_ptr<ForeignStreamData>);
 
       private:
         QPDF& destination_qpdf;
         std::map<QPDFObjGen, QPDFObjectHandle> foreign_streams;
-        std::map<QPDFObjGen, PointerHolder<ForeignStreamData>>
+        std::map<QPDFObjGen, std::shared_ptr<ForeignStreamData>>
             foreign_stream_data;
     };
 
@@ -994,18 +994,18 @@ class QPDF
     void setLastObjectDescription(
         std::string const& description, int objid, int generation);
     QPDFObjectHandle readObject(
-        PointerHolder<InputSource>,
+        std::shared_ptr<InputSource>,
         std::string const& description,
         int objid,
         int generation,
         bool in_object_stream);
     size_t recoverStreamLength(
-        PointerHolder<InputSource> input,
+        std::shared_ptr<InputSource> input,
         int objid,
         int generation,
         qpdf_offset_t stream_offset);
     QPDFTokenizer::Token
-    readToken(PointerHolder<InputSource>, size_t max_len = 0);
+    readToken(std::shared_ptr<InputSource>, size_t max_len = 0);
 
     QPDFObjectHandle readObjectAtOffset(
         bool attempt_recovery,
@@ -1015,8 +1015,8 @@ class QPDF
         int exp_generation,
         int& act_objid,
         int& act_generation);
-    bool objectChanged(QPDFObjGen const& og, PointerHolder<QPDFObject>& oph);
-    PointerHolder<QPDFObject> resolve(int objid, int generation);
+    bool objectChanged(QPDFObjGen const& og, std::shared_ptr<QPDFObject>& oph);
+    std::shared_ptr<QPDFObject> resolve(int objid, int generation);
     void resolveObjectsInStream(int obj_stream_number);
     void stopOnError(std::string const& message);
 
@@ -1031,13 +1031,13 @@ class QPDF
         bool suppress_warnings,
         bool will_retry);
     bool pipeForeignStreamData(
-        PointerHolder<ForeignStreamData>,
+        std::shared_ptr<ForeignStreamData>,
         Pipeline*,
         bool suppress_warnings,
         bool will_retry);
     static bool pipeStreamData(
-        PointerHolder<QPDF::EncryptionParameters> encp,
-        PointerHolder<InputSource> file,
+        std::shared_ptr<QPDF::EncryptionParameters> encp,
+        std::shared_ptr<InputSource> file,
         QPDF& qpdf_for_warning,
         int objid,
         int generation,
@@ -1064,7 +1064,7 @@ class QPDF
         std::map<int, QPDFXRefEntry> const& xref,
         std::map<int, qpdf_offset_t> const& lengths,
         std::map<int, int> const& obj_renumber,
-        PointerHolder<Buffer>& hint_stream,
+        std::shared_ptr<Buffer>& hint_stream,
         int& S,
         int& O);
 
@@ -1089,10 +1089,10 @@ class QPDF
 
     // methods to support encryption -- implemented in QPDF_encryption.cc
     static encryption_method_e
-    interpretCF(PointerHolder<EncryptionParameters> encp, QPDFObjectHandle);
+    interpretCF(std::shared_ptr<EncryptionParameters> encp, QPDFObjectHandle);
     void initializeEncryption();
     static std::string getKeyForObject(
-        PointerHolder<EncryptionParameters> encp,
+        std::shared_ptr<EncryptionParameters> encp,
         int objid,
         int generation,
         bool use_aes);
@@ -1106,8 +1106,8 @@ class QPDF
         EncryptionData const& data,
         bool& perms_valid);
     static void decryptStream(
-        PointerHolder<EncryptionParameters> encp,
-        PointerHolder<InputSource> file,
+        std::shared_ptr<EncryptionParameters> encp,
+        std::shared_ptr<InputSource> file,
         QPDF& qpdf_for_warning,
         Pipeline*& pipeline,
         int objid,
@@ -1522,7 +1522,7 @@ class QPDF
 
         unsigned long long unique_id;
         QPDFTokenizer tokenizer;
-        PointerHolder<InputSource> file;
+        std::shared_ptr<InputSource> file;
         std::string last_object_description;
         bool provided_password_is_hex_key;
         bool ignore_xref_streams;
@@ -1530,7 +1530,7 @@ class QPDF
         std::ostream* out_stream;
         std::ostream* err_stream;
         bool attempt_recovery;
-        PointerHolder<EncryptionParameters> encp;
+        std::shared_ptr<EncryptionParameters> encp;
         std::string pdf_version;
         std::map<QPDFObjGen, QPDFXRefEntry> xref_table;
         std::set<int> deleted_objects;
@@ -1542,7 +1542,7 @@ class QPDF
         bool pushed_inherited_attributes_to_pages;
         std::vector<QPDFExc> warnings;
         std::map<unsigned long long, ObjCopier> object_copiers;
-        PointerHolder<QPDFObjectHandle::StreamDataProvider> copied_streams;
+        std::shared_ptr<QPDFObjectHandle::StreamDataProvider> copied_streams;
         // copied_stream_data_provider is owned by copied_streams
         CopiedStreamDataProvider* copied_stream_data_provider;
         bool reconstructed_xref;
@@ -1590,7 +1590,7 @@ class QPDF
     // Keep all member variables inside the Members object, which we
     // dynamically allocate. This makes it possible to add new private
     // members without breaking binary compatibility.
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // QPDF_HH

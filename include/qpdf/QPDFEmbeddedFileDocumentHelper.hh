@@ -91,7 +91,7 @@ class QPDFEmbeddedFileDocumentHelper: public QPDFDocumentHelper
         std::shared_ptr<QPDFNameTreeObjectHelper> embedded_files;
     };
 
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // QPDFEMBEDDEDFILEDOCUMENTHELPER_HH

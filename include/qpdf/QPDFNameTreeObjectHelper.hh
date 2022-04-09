@@ -204,7 +204,7 @@ class QPDFNameTreeObjectHelper: public QPDFObjectHelper
         std::shared_ptr<NNTreeImpl> impl;
     };
 
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // QPDFNAMETREEOBJECTHELPER_HH

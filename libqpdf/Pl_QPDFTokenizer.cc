@@ -44,7 +44,7 @@ void
 Pl_QPDFTokenizer::finish()
 {
     this->m->buf.finish();
-    auto input = PointerHolder<InputSource>(
+    auto input = std::shared_ptr<InputSource>(
         // line-break
         new BufferInputSource(
             "tokenizer data", this->m->buf.getBuffer(), true));

@@ -64,7 +64,7 @@ class Pl_RunLength: public Pipeline
         unsigned int length;
     };
 
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // PL_RUNLENGTH_HH

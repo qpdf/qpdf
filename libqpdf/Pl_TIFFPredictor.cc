@@ -41,7 +41,7 @@ Pl_TIFFPredictor::Pl_TIFFPredictor(
     }
     this->bytes_per_row = bpr & UINT_MAX;
     this->cur_row =
-        make_array_pointer_holder<unsigned char>(this->bytes_per_row);
+        QUtil::make_shared_array<unsigned char>(this->bytes_per_row);
     memset(this->cur_row.get(), 0, this->bytes_per_row);
 }
 

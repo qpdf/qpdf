@@ -12,7 +12,7 @@ Pl_RC4::Pl_RC4(
     out_bufsize(out_bufsize),
     rc4(key_data, key_len)
 {
-    this->outbuf = make_array_pointer_holder<unsigned char>(out_bufsize);
+    this->outbuf = QUtil::make_shared_array<unsigned char>(out_bufsize);
 }
 
 Pl_RC4::~Pl_RC4()

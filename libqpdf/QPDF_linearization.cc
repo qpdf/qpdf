@@ -2120,7 +2120,7 @@ QPDF::generateHintStream(
     std::map<int, QPDFXRefEntry> const& xref,
     std::map<int, qpdf_offset_t> const& lengths,
     std::map<int, int> const& obj_renumber,
-    PointerHolder<Buffer>& hint_buffer,
+    std::shared_ptr<Buffer>& hint_buffer,
     int& S,
     int& O)
 {

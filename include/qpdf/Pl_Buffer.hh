@@ -59,7 +59,7 @@ class Pl_Buffer: public Pipeline
 
     // Same as getBuffer but wraps the result in a shared pointer.
     QPDF_DLL
-    PointerHolder<Buffer> getBufferSharedPointer();
+    std::shared_ptr<Buffer> getBufferSharedPointer();
 
     // getMallocBuffer behaves in the same was as getBuffer except the
     // buffer is allocated with malloc(), making it suitable for use
@@ -84,11 +84,11 @@ class Pl_Buffer: public Pipeline
         Members(Members const&);
 
         bool ready;
-        PointerHolder<Buffer> data;
+        std::shared_ptr<Buffer> data;
         size_t total_size;
     };
 
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // PL_BUFFER_HH

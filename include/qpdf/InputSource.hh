@@ -114,7 +114,7 @@ class QPDF_DLL_CLASS InputSource
         Members(Members const&);
     };
 
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // QPDF_INPUTSOURCE_HH

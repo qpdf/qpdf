@@ -1879,7 +1879,7 @@ QPDFJob::processFile(
 
 std::shared_ptr<QPDF>
 QPDFJob::processInputSource(
-    PointerHolder<InputSource> is, char const* password, bool used_for_input)
+    std::shared_ptr<InputSource> is, char const* password, bool used_for_input)
 {
     auto f1 = std::mem_fn(&QPDF::processInputSource);
     auto fn = std::bind(f1, std::placeholders::_1, is, std::placeholders::_2);
@@ -2238,7 +2238,7 @@ QPDFJob::handleTransformations(QPDF& pdf)
                     m->oi_min_height,
                     m->oi_min_area,
                     image);
-                PointerHolder<QPDFObjectHandle::StreamDataProvider> sdp(io);
+                std::shared_ptr<QPDFObjectHandle::StreamDataProvider> sdp(io);
                 if (io->evaluate(
                         "image " + name + " on page " +
                         QUtil::int_to_string(pageno))) {
@@ -2494,17 +2494,17 @@ QPDFJob::handlePageSpecs(
                 cout << prefix << ": processing " << page_spec.filename
                      << std::endl;
             });
-            PointerHolder<InputSource> is;
+            std::shared_ptr<InputSource> is;
             ClosedFileInputSource* cis = 0;
             if (!m->keep_files_open) {
                 QTC::TC("qpdf", "QPDFJob keep files open n");
                 cis = new ClosedFileInputSource(page_spec.filename.c_str());
-                is = PointerHolder<InputSource>(cis);
+                is = std::shared_ptr<InputSource>(cis);
                 cis->stayOpen(true);
             } else {
                 QTC::TC("qpdf", "QPDFJob keep files open y");
                 FileInputSource* fis = new FileInputSource();
-                is = PointerHolder<InputSource>(fis);
+                is = std::shared_ptr<InputSource>(fis);
                 fis->setFilename(page_spec.filename.c_str());
             }
             std::shared_ptr<QPDF> qpdf_ph =
@@ -3064,12 +3064,13 @@ QPDFJob::setWriterOptions(QPDF& pdf, QPDFWriter& w)
         w.forcePDFVersion(version, extension_level);
     }
     if (m->progress && m->outfilename) {
-        w.registerProgressReporter(PointerHolder<QPDFWriter::ProgressReporter>(
-            // line-break
-            new ProgressReporter(
-                *(this->m->cout),
-                this->m->message_prefix,
-                m->outfilename.get())));
+        w.registerProgressReporter(
+            std::shared_ptr<QPDFWriter::ProgressReporter>(
+                // line-break
+                new ProgressReporter(
+                    *(this->m->cout),
+                    this->m->message_prefix,
+                    m->outfilename.get())));
     }
 }
 

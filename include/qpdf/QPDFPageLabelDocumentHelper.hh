@@ -96,10 +96,10 @@ class QPDFPageLabelDocumentHelper: public QPDFDocumentHelper
         Members();
         Members(Members const&);
 
-        PointerHolder<QPDFNumberTreeObjectHelper> labels;
+        std::shared_ptr<QPDFNumberTreeObjectHelper> labels;
     };
 
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // QPDFPAGELABELDOCUMENTHELPER_HH

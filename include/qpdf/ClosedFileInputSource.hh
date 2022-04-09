@@ -84,10 +84,10 @@ class ClosedFileInputSource: public InputSource
 
         std::string filename;
         qpdf_offset_t offset;
-        PointerHolder<FileInputSource> fis;
+        std::shared_ptr<FileInputSource> fis;
         bool stay_open;
     };
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // QPDF_CLOSEDFILEINPUTSOURCE_HH

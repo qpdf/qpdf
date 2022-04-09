@@ -915,6 +915,6 @@ QPDFFormFieldObjectHelper::generateTextAppearance(
 
     AS.addTokenFilter(
         // line-break
-        PointerHolder<QPDFObjectHandle::TokenFilter>(
+        std::shared_ptr<QPDFObjectHandle::TokenFilter>(
             new ValueSetter(DA, V, opt, tf, bbox)));
 }

@@ -445,7 +445,7 @@ QUtil::os_wrapper(std::string const& description, int status)
 }
 
 #ifdef _WIN32
-static PointerHolder<wchar_t>
+static std::shared_ptr<wchar_t>
 win_convert_filename(char const* filename)
 {
     // Convert the utf-8 encoded filename argument to wchar_t*. First,
@@ -454,7 +454,7 @@ win_convert_filename(char const* filename)
     std::string u16 = QUtil::utf8_to_utf16(filename);
     size_t len = u16.length();
     size_t wlen = (len / 2) - 1;
-    PointerHolder<wchar_t> wfilenamep(true, new wchar_t[wlen + 1]);
+    auto wfilenamep = QUtil::make_shared_array<wchar_t>(wlen + 1);
     wchar_t* wfilename = wfilenamep.get();
     wfilename[wlen] = 0;
     for (unsigned int i = 2; i < len; i += 2) {
@@ -471,9 +471,9 @@ QUtil::safe_fopen(char const* filename, char const* mode)
 {
     FILE* f = 0;
 #ifdef _WIN32
-    PointerHolder<wchar_t> wfilenamep = win_convert_filename(filename);
+    std::shared_ptr<wchar_t> wfilenamep = win_convert_filename(filename);
     wchar_t* wfilename = wfilenamep.get();
-    PointerHolder<wchar_t> wmodep(true, new wchar_t[strlen(mode) + 1]);
+    auto wmodep = QUtil::make_shared_array<wchar_t>(strlen(mode) + 1);
     wchar_t* wmode = wmodep.get();
     wmode[strlen(mode)] = 0;
     for (size_t i = 0; i < strlen(mode); ++i) {
@@ -612,7 +612,7 @@ void
 QUtil::remove_file(char const* path)
 {
 #ifdef _WIN32
-    PointerHolder<wchar_t> wpath = win_convert_filename(path);
+    std::shared_ptr<wchar_t> wpath = win_convert_filename(path);
     os_wrapper(std::string("remove ") + path, _wunlink(wpath.get()));
 #else
     os_wrapper(std::string("remove ") + path, unlink(path));
@@ -628,8 +628,8 @@ QUtil::rename_file(char const* oldname, char const* newname)
     } catch (QPDFSystemError&) {
         // ignore
     }
-    PointerHolder<wchar_t> wold = win_convert_filename(oldname);
-    PointerHolder<wchar_t> wnew = win_convert_filename(newname);
+    std::shared_ptr<wchar_t> wold = win_convert_filename(oldname);
+    std::shared_ptr<wchar_t> wnew = win_convert_filename(newname);
     os_wrapper(
         std::string("rename ") + oldname + " " + newname,
         _wrename(wold.get(), wnew.get()));
@@ -824,7 +824,7 @@ QUtil::get_env(std::string const& var, std::string* value)
     }
 
     if (value) {
-        PointerHolder<char> t = PointerHolder<char>(true, new char[len + 1]);
+        auto t = QUtil::make_shared_array<char>(len + 1);
         ::GetEnvironmentVariable(var.c_str(), t.get(), len);
         *value = t.get();
     }
@@ -1173,14 +1173,14 @@ QUtil::is_number(char const* p)
 
 void
 QUtil::read_file_into_memory(
-    char const* filename, PointerHolder<char>& file_buf, size_t& size)
+    char const* filename, std::shared_ptr<char>& file_buf, size_t& size)
 {
     FILE* f = safe_fopen(filename, "rb");
     FileCloser fc(f);
     fseek(f, 0, SEEK_END);
     size = QIntC::to_size(QUtil::tell(f));
     fseek(f, 0, SEEK_SET);
-    file_buf = make_array_pointer_holder<char>(size);
+    file_buf = QUtil::make_shared_array<char>(size);
     char* buf_p = file_buf.get();
     size_t bytes_read = 0;
     size_t len = 0;

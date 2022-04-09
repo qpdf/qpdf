@@ -128,7 +128,7 @@ class QPDFWriter
 
     // Return getBuffer() in a shared pointer.
     QPDF_DLL
-    PointerHolder<Buffer> getBufferSharedPointer();
+    std::shared_ptr<Buffer> getBufferSharedPointer();
 
     // Supply your own pipeline object.  Output will be written to
     // this pipeline, and QPDFWriter will call finish() on the
@@ -499,7 +499,7 @@ class QPDFWriter
     // If you want to be notified of progress, derive a class from
     // ProgressReporter and override the reportProgress method.
     QPDF_DLL
-    void registerProgressReporter(PointerHolder<ProgressReporter>);
+    void registerProgressReporter(std::shared_ptr<ProgressReporter>);
 
     // Return the PDF version that will be written into the header.
     // Calling this method does all the preparation for writing, so it
@@ -550,7 +550,7 @@ class QPDFWriter
         friend class QPDFWriter;
 
       public:
-        PipelinePopper(QPDFWriter* qw, PointerHolder<Buffer>* bp = 0) :
+        PipelinePopper(QPDFWriter* qw, std::shared_ptr<Buffer>* bp = 0) :
             qw(qw),
             bp(bp)
         {
@@ -559,7 +559,7 @@ class QPDFWriter
 
       private:
         QPDFWriter* qw;
-        PointerHolder<Buffer>* bp;
+        std::shared_ptr<Buffer>* bp;
         std::string stack_id;
     };
     friend class PipelinePopper;
@@ -567,7 +567,7 @@ class QPDFWriter
     unsigned int bytesNeeded(long long n);
     void writeBinary(unsigned long long val, unsigned int bytes);
     void writeString(std::string const& str);
-    void writeBuffer(PointerHolder<Buffer>&);
+    void writeBuffer(std::shared_ptr<Buffer>&);
     void writeStringQDF(std::string const& str);
     void writeStringNoQDF(std::string const& str);
     void writePad(int nspaces);
@@ -587,7 +587,7 @@ class QPDFWriter
         QPDFObjectHandle stream,
         bool& compress_stream,
         bool& is_metadata,
-        PointerHolder<Buffer>* stream_data);
+        std::shared_ptr<Buffer>* stream_data);
     void unparseObject(
         QPDFObjectHandle object,
         int level,
@@ -791,7 +791,7 @@ class QPDFWriter
         std::map<int, int> object_to_object_stream_no_gen;
 
         // For progress reporting
-        PointerHolder<ProgressReporter> progress_reporter;
+        std::shared_ptr<ProgressReporter> progress_reporter;
         int events_expected;
         int events_seen;
         int next_progress_report;
@@ -800,7 +800,7 @@ class QPDFWriter
     // Keep all member variables inside the Members object, which we
     // dynamically allocate. This makes it possible to add new private
     // members without breaking binary compatibility.
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // QPDFWRITER_HH

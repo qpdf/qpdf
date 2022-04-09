@@ -97,11 +97,11 @@ class QPDFOutlineDocumentHelper: public QPDFDocumentHelper
         std::vector<QPDFOutlineObjectHelper> outlines;
         std::set<QPDFObjGen> seen;
         QPDFObjectHandle dest_dict;
-        PointerHolder<QPDFNameTreeObjectHelper> names_dest;
+        std::shared_ptr<QPDFNameTreeObjectHelper> names_dest;
         std::map<QPDFObjGen, std::vector<QPDFOutlineObjectHelper>> by_page;
     };
 
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // QPDFOUTLINEDOCUMENTHELPER_HH

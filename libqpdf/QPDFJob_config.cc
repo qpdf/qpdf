@@ -685,7 +685,7 @@ QPDFJob::Config::showObject(std::string const& parameter)
 QPDFJob::Config*
 QPDFJob::Config::jobJsonFile(std::string const& parameter)
 {
-    PointerHolder<char> file_buf;
+    std::shared_ptr<char> file_buf;
     size_t size;
     QUtil::read_file_into_memory(parameter.c_str(), file_buf, size);
     try {

@@ -305,7 +305,7 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
         std::map<std::string, std::set<QPDFObjGen>> name_to_fields;
     };
 
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // QPDFACROFORMDOCUMENTHELPER_HH

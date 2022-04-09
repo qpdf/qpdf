@@ -63,7 +63,7 @@ class Pl_StdioFile: public Pipeline
         FILE* file;
     };
 
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // PL_STDIOFILE_HH

@@ -106,8 +106,8 @@ class InvalidInputSource: public InputSource
 };
 
 QPDF::ForeignStreamData::ForeignStreamData(
-    PointerHolder<EncryptionParameters> encp,
-    PointerHolder<InputSource> file,
+    std::shared_ptr<EncryptionParameters> encp,
+    std::shared_ptr<InputSource> file,
     int foreign_objid,
     int foreign_generation,
     qpdf_offset_t offset,
@@ -138,7 +138,7 @@ QPDF::CopiedStreamDataProvider::provideStreamData(
     bool suppress_warnings,
     bool will_retry)
 {
-    PointerHolder<ForeignStreamData> foreign_data =
+    std::shared_ptr<ForeignStreamData> foreign_data =
         this->foreign_stream_data[QPDFObjGen(objid, generation)];
     bool result = false;
     if (foreign_data.get()) {
@@ -165,7 +165,8 @@ QPDF::CopiedStreamDataProvider::registerForeignStream(
 
 void
 QPDF::CopiedStreamDataProvider::registerForeignStream(
-    QPDFObjGen const& local_og, PointerHolder<ForeignStreamData> foreign_stream)
+    QPDFObjGen const& local_og,
+    std::shared_ptr<ForeignStreamData> foreign_stream)
 {
     this->foreign_stream_data[local_og] = foreign_stream;
 }
@@ -249,7 +250,7 @@ QPDF::~QPDF()
     // If two objects are mutually referential (through each object
     // having an array or dictionary that contains an indirect
     // reference to the other), the circular references in the
-    // PointerHolder objects will prevent the objects from being
+    // std::shared_ptr objects will prevent the objects from being
     // deleted.  Walk through all objects in the object cache, which
     // is those objects that we read from the file, and break all
     // resolved references.  At this point, obviously no one is still
@@ -274,7 +275,7 @@ QPDF::processFile(char const* filename, char const* password)
 {
     FileInputSource* fi = new FileInputSource();
     fi->setFilename(filename);
-    processInputSource(PointerHolder<InputSource>(fi), password);
+    processInputSource(std::shared_ptr<InputSource>(fi), password);
 }
 
 void
@@ -283,7 +284,7 @@ QPDF::processFile(
 {
     FileInputSource* fi = new FileInputSource();
     fi->setFile(description, filep, close_file);
-    processInputSource(PointerHolder<InputSource>(fi), password);
+    processInputSource(std::shared_ptr<InputSource>(fi), password);
 }
 
 void
@@ -294,7 +295,7 @@ QPDF::processMemoryFile(
     char const* password)
 {
     processInputSource(
-        PointerHolder<InputSource>(
+        std::shared_ptr<InputSource>(
             // line-break
             new BufferInputSource(
                 description,
@@ -305,7 +306,7 @@ QPDF::processMemoryFile(
 
 void
 QPDF::processInputSource(
-    PointerHolder<InputSource> source, char const* password)
+    std::shared_ptr<InputSource> source, char const* password)
 {
     this->m->file = source;
     parse(password);
@@ -314,7 +315,7 @@ QPDF::processInputSource(
 void
 QPDF::closeInputSource()
 {
-    this->m->file = PointerHolder<InputSource>(new InvalidInputSource());
+    this->m->file = std::shared_ptr<InputSource>(new InvalidInputSource());
 }
 
 void
@@ -425,7 +426,7 @@ QPDF::findHeader()
             // offsets in the file are such that 0 points to the
             // beginning of the header.
             QTC::TC("qpdf", "QPDF global offset");
-            this->m->file = PointerHolder<InputSource>(
+            this->m->file = std::shared_ptr<InputSource>(
                 new OffsetInputSource(this->m->file, global_offset));
         }
     }
@@ -1182,7 +1183,7 @@ QPDF::processXRefStream(qpdf_offset_t xref_offset, QPDFObjectHandle& xref_obj)
     // that this multiplication does not cause an overflow.
     size_t expected_size = entry_size * num_entries;
 
-    PointerHolder<Buffer> bp = xref_obj.getStreamData(qpdf_dl_specialized);
+    std::shared_ptr<Buffer> bp = xref_obj.getStreamData(qpdf_dl_specialized);
     size_t actual_size = bp->getSize();
 
     if (expected_size != actual_size) {
@@ -1516,7 +1517,7 @@ QPDF::setLastObjectDescription(
 
 QPDFObjectHandle
 QPDF::readObject(
-    PointerHolder<InputSource> input,
+    std::shared_ptr<InputSource> input,
     std::string const& description,
     int objid,
     int generation,
@@ -1526,11 +1527,11 @@ QPDF::readObject(
     qpdf_offset_t offset = input->tell();
 
     bool empty = false;
-    PointerHolder<StringDecrypter> decrypter_ph;
+    std::shared_ptr<StringDecrypter> decrypter_ph;
     StringDecrypter* decrypter = 0;
     if (this->m->encp->encrypted && (!in_object_stream)) {
         decrypter_ph =
-            make_pointer_holder<StringDecrypter>(this, objid, generation);
+            std::make_shared<StringDecrypter>(this, objid, generation);
         decrypter = decrypter_ph.get();
     }
     QPDFObjectHandle object = QPDFObjectHandle::parse(
@@ -1706,7 +1707,7 @@ QPDF::findEndstream()
 
 size_t
 QPDF::recoverStreamLength(
-    PointerHolder<InputSource> input,
+    std::shared_ptr<InputSource> input,
     int objid,
     int generation,
     qpdf_offset_t stream_offset)
@@ -1784,7 +1785,7 @@ QPDF::recoverStreamLength(
 }
 
 QPDFTokenizer::Token
-QPDF::readToken(PointerHolder<InputSource> input, size_t max_len)
+QPDF::readToken(std::shared_ptr<InputSource> input, size_t max_len)
 {
     return this->m->tokenizer.readToken(
         input, this->m->last_object_description, true, max_len);
@@ -1971,7 +1972,7 @@ QPDF::readObjectAtOffset(
 }
 
 bool
-QPDF::objectChanged(QPDFObjGen const& og, PointerHolder<QPDFObject>& oph)
+QPDF::objectChanged(QPDFObjGen const& og, std::shared_ptr<QPDFObject>& oph)
 {
     // See if the object cached at og, if any, is the one passed in.
     // QPDFObjectHandle uses this to detect outdated handles to
@@ -1992,7 +1993,7 @@ QPDF::objectChanged(QPDFObjGen const& og, PointerHolder<QPDFObject>& oph)
     return (c->second.object.get() != oph.get());
 }
 
-PointerHolder<QPDFObject>
+std::shared_ptr<QPDFObject>
 QPDF::resolve(int objid, int generation)
 {
     // Check object cache before checking xref table.  This allows us
@@ -2011,7 +2012,7 @@ QPDF::resolve(int objid, int generation)
             this->m->file->getLastOffset(),
             ("loop detected resolving object " + QUtil::int_to_string(objid) +
              " " + QUtil::int_to_string(generation))));
-        return PointerHolder<QPDFObject>(new QPDF_Null);
+        return std::shared_ptr<QPDFObject>(new QPDF_Null);
     }
     ResolveRecorder rr(this, og);
 
@@ -2071,7 +2072,7 @@ QPDF::resolve(int objid, int generation)
             ObjCache(QPDFObjectHandle::ObjAccessor::getObject(oh), -1, -1);
     }
 
-    PointerHolder<QPDFObject> result(this->m->obj_cache[og].object);
+    std::shared_ptr<QPDFObject> result(this->m->obj_cache[og].object);
     if (!result->hasDescription()) {
         result->setDescription(
             this,
@@ -2135,8 +2136,8 @@ QPDF::resolveObjectsInStream(int obj_stream_number)
 
     std::map<int, int> offsets;
 
-    PointerHolder<Buffer> bp = obj_stream.getStreamData(qpdf_dl_specialized);
-    auto input = PointerHolder<InputSource>(
+    std::shared_ptr<Buffer> bp = obj_stream.getStreamData(qpdf_dl_specialized);
+    auto input = std::shared_ptr<InputSource>(
         // line-break
         new BufferInputSource(
             (this->m->file->getName() + " object stream " +
@@ -2496,7 +2497,7 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
         this->m->copied_stream_data_provider =
             new CopiedStreamDataProvider(*this);
         this->m->copied_streams =
-            PointerHolder<QPDFObjectHandle::StreamDataProvider>(
+            std::shared_ptr<QPDFObjectHandle::StreamDataProvider>(
                 this->m->copied_stream_data_provider);
     }
     QPDFObjGen local_og(result.getObjGen());
@@ -2513,7 +2514,7 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
         throw std::logic_error("unable to retrieve underlying"
                                " stream object from foreign stream");
     }
-    PointerHolder<Buffer> stream_buffer = stream->getStreamDataBuffer();
+    std::shared_ptr<Buffer> stream_buffer = stream->getStreamDataBuffer();
     if ((foreign_stream_qpdf->m->immediate_copy_from) &&
         (stream_buffer.get() == 0)) {
         // Pull the stream data into a buffer before attempting
@@ -2527,7 +2528,7 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
             old_dict.getKey("/DecodeParms"));
         stream_buffer = stream->getStreamDataBuffer();
     }
-    PointerHolder<QPDFObjectHandle::StreamDataProvider> stream_provider =
+    std::shared_ptr<QPDFObjectHandle::StreamDataProvider> stream_provider =
         stream->getStreamDataProvider();
     if (stream_buffer.get()) {
         QTC::TC("qpdf", "QPDF copy foreign stream with buffer");
@@ -2543,7 +2544,7 @@ QPDF::copyStreamData(QPDFObjectHandle result, QPDFObjectHandle foreign)
             dict.getKey("/Filter"),
             dict.getKey("/DecodeParms"));
     } else {
-        auto foreign_stream_data = make_pointer_holder<ForeignStreamData>(
+        auto foreign_stream_data = std::make_shared<ForeignStreamData>(
             foreign_stream_qpdf->m->encp,
             foreign_stream_qpdf->m->file,
             foreign.getObjectID(),
@@ -2758,8 +2759,8 @@ QPDF::getCompressibleObjGens()
 
 bool
 QPDF::pipeStreamData(
-    PointerHolder<EncryptionParameters> encp,
-    PointerHolder<InputSource> file,
+    std::shared_ptr<EncryptionParameters> encp,
+    std::shared_ptr<InputSource> file,
     QPDF& qpdf_for_warning,
     int objid,
     int generation,
@@ -2870,7 +2871,7 @@ QPDF::pipeStreamData(
 
 bool
 QPDF::pipeForeignStreamData(
-    PointerHolder<ForeignStreamData> foreign,
+    std::shared_ptr<ForeignStreamData> foreign,
     Pipeline* pipeline,
     bool suppress_warnings,
     bool will_retry)

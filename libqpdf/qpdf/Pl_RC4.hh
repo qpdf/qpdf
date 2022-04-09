@@ -27,7 +27,7 @@ class Pl_RC4: public Pipeline
     virtual void finish();
 
   private:
-    PointerHolder<unsigned char> outbuf;
+    std::shared_ptr<unsigned char> outbuf;
     size_t out_bufsize;
     RC4 rc4;
 };

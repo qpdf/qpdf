@@ -63,7 +63,7 @@ class Pl_Concatenate: public Pipeline
         Members(Members const&);
     };
 
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // PL_CONCATENATE_HH

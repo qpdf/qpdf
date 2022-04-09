@@ -95,7 +95,7 @@ Pl_DCT::finish()
 {
     this->m->buf.finish();
 
-    // Using a PointerHolder<Buffer> here and passing it into compress
+    // Using a std::shared_ptr<Buffer> here and passing it into compress
     // and decompress causes a memory leak with setjmp/longjmp. Just
     // use a pointer and delete it.
     Buffer* b = this->m->buf.getBuffer();

@@ -221,19 +221,19 @@ QPDF_Stream::getLength() const
     return this->length;
 }
 
-PointerHolder<Buffer>
+std::shared_ptr<Buffer>
 QPDF_Stream::getStreamDataBuffer() const
 {
     return this->stream_data;
 }
 
-PointerHolder<QPDFObjectHandle::StreamDataProvider>
+std::shared_ptr<QPDFObjectHandle::StreamDataProvider>
 QPDF_Stream::getStreamDataProvider() const
 {
     return this->stream_provider;
 }
 
-PointerHolder<Buffer>
+std::shared_ptr<Buffer>
 QPDF_Stream::getStreamData(qpdf_stream_decode_level_e decode_level)
 {
     Pl_Buffer buf("stream data buffer");
@@ -251,7 +251,7 @@ QPDF_Stream::getStreamData(qpdf_stream_decode_level_e decode_level)
     return buf.getBufferSharedPointer();
 }
 
-PointerHolder<Buffer>
+std::shared_ptr<Buffer>
 QPDF_Stream::getRawStreamData()
 {
     Pl_Buffer buf("stream data buffer");
@@ -438,7 +438,7 @@ QPDF_Stream::pipeStreamData(
     // objects.
     std::vector<std::shared_ptr<Pipeline>> to_delete;
 
-    PointerHolder<ContentNormalizer> normalizer;
+    std::shared_ptr<ContentNormalizer> normalizer;
     std::shared_ptr<Pipeline> new_pipeline;
     if (filter) {
         if (encode_flags & qpdf_ef_compress) {
@@ -449,7 +449,7 @@ QPDF_Stream::pipeStreamData(
         }
 
         if (encode_flags & qpdf_ef_normalize) {
-            normalizer = make_pointer_holder<ContentNormalizer>();
+            normalizer = std::make_shared<ContentNormalizer>();
             new_pipeline = std::make_shared<Pl_QPDFTokenizer>(
                 "normalizer", normalizer.get(), pipeline);
             to_delete.push_back(new_pipeline);
@@ -586,7 +586,7 @@ QPDF_Stream::pipeStreamData(
 
 void
 QPDF_Stream::replaceStreamData(
-    PointerHolder<Buffer> data,
+    std::shared_ptr<Buffer> data,
     QPDFObjectHandle const& filter,
     QPDFObjectHandle const& decode_parms)
 {
@@ -597,7 +597,7 @@ QPDF_Stream::replaceStreamData(
 
 void
 QPDF_Stream::replaceStreamData(
-    PointerHolder<QPDFObjectHandle::StreamDataProvider> provider,
+    std::shared_ptr<QPDFObjectHandle::StreamDataProvider> provider,
     QPDFObjectHandle const& filter,
     QPDFObjectHandle const& decode_parms)
 {
@@ -608,7 +608,7 @@ QPDF_Stream::replaceStreamData(
 
 void
 QPDF_Stream::addTokenFilter(
-    PointerHolder<QPDFObjectHandle::TokenFilter> token_filter)
+    std::shared_ptr<QPDFObjectHandle::TokenFilter> token_filter)
 {
     this->token_filters.push_back(token_filter);
 }

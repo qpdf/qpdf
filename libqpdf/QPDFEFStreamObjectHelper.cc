@@ -92,7 +92,8 @@ QPDFEFStreamObjectHelper::getChecksum()
 }
 
 QPDFEFStreamObjectHelper
-QPDFEFStreamObjectHelper::createEFStream(QPDF& qpdf, PointerHolder<Buffer> data)
+QPDFEFStreamObjectHelper::createEFStream(
+    QPDF& qpdf, std::shared_ptr<Buffer> data)
 {
     return newFromStream(QPDFObjectHandle::newStream(&qpdf, data));
 }

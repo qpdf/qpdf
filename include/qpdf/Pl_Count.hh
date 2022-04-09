@@ -66,7 +66,7 @@ class Pl_Count: public Pipeline
         unsigned char last_char;
     };
 
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // PL_COUNT_HH

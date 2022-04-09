@@ -219,7 +219,7 @@ class JSON
         std::shared_ptr<JSON_value> value;
     };
 
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // JSON_HH

@@ -48,9 +48,9 @@ Pl_PNGFilter::Pl_PNGFilter(
     }
     this->bytes_per_row = bpr & UINT_MAX;
     this->buf1 =
-        make_array_pointer_holder<unsigned char>(this->bytes_per_row + 1);
+        QUtil::make_shared_array<unsigned char>(this->bytes_per_row + 1);
     this->buf2 =
-        make_array_pointer_holder<unsigned char>(this->bytes_per_row + 1);
+        QUtil::make_shared_array<unsigned char>(this->bytes_per_row + 1);
     memset(this->buf1.get(), 0, this->bytes_per_row + 1);
     memset(this->buf2.get(), 0, this->bytes_per_row + 1);
     this->cur_row = this->buf1.get();

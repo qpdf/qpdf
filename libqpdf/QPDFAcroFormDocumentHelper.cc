@@ -772,7 +772,7 @@ QPDFAcroFormDocumentHelper::adjustAppearanceStream(
             QTC::TC("qpdf", "QPDFAcroFormDocumentHelper AP parse error");
         }
         auto rr = new ResourceReplacer(dr_map, rf.getNamesByResourceType());
-        auto tf = PointerHolder<QPDFObjectHandle::TokenFilter>(rr);
+        auto tf = std::shared_ptr<QPDFObjectHandle::TokenFilter>(rr);
         stream.addTokenFilter(tf);
     } catch (std::exception& e) {
         // No way to reproduce in test suite right now since error
@@ -792,13 +792,13 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
     QPDF* from_qpdf,
     QPDFAcroFormDocumentHelper* from_afdh)
 {
-    PointerHolder<QPDFAcroFormDocumentHelper> afdhph;
+    std::shared_ptr<QPDFAcroFormDocumentHelper> afdhph;
     if (!from_qpdf) {
         // Assume these are from the same QPDF.
         from_qpdf = &this->qpdf;
         from_afdh = this;
     } else if ((from_qpdf != &this->qpdf) && (!from_afdh)) {
-        afdhph = make_pointer_holder<QPDFAcroFormDocumentHelper>(*from_qpdf);
+        afdhph = std::make_shared<QPDFAcroFormDocumentHelper>(*from_qpdf);
         from_afdh = afdhph.get();
     }
     bool foreign = (from_qpdf != &this->qpdf);

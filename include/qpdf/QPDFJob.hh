@@ -453,7 +453,7 @@ class QPDFJob
     std::shared_ptr<QPDF> processFile(
         char const* filename, char const* password, bool used_for_input);
     std::shared_ptr<QPDF> processInputSource(
-        PointerHolder<InputSource> is,
+        std::shared_ptr<InputSource> is,
         char const* password,
         bool used_for_input);
     std::shared_ptr<QPDF> doProcess(

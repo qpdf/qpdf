@@ -225,7 +225,7 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     // stream. Also works on form XObjects.
     QPDF_DLL
     void addContentTokenFilter(
-        PointerHolder<QPDFObjectHandle::TokenFilter> token_filter);
+        std::shared_ptr<QPDFObjectHandle::TokenFilter> token_filter);
 
     // A page's resources dictionary maps names to objects elsewhere
     // in the file. This method walks through a page's contents and
@@ -397,7 +397,7 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
         Members(Members const&);
     };
 
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // QPDFPAGEOBJECTHELPER_HH

@@ -5,7 +5,7 @@
 #include <stdexcept>
 
 OffsetInputSource::OffsetInputSource(
-    PointerHolder<InputSource> proxied, qpdf_offset_t global_offset) :
+    std::shared_ptr<InputSource> proxied, qpdf_offset_t global_offset) :
     proxied(proxied),
     global_offset(global_offset)
 {

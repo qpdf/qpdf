@@ -51,7 +51,7 @@ class QPDFOutlineObjectHelper: public QPDFObjectHelper
     // Return parent pointer. Returns a null pointer if this is a
     // top-level outline.
     QPDF_DLL
-    PointerHolder<QPDFOutlineObjectHelper> getParent();
+    std::shared_ptr<QPDFOutlineObjectHelper> getParent();
 
     // Return children as a list.
     QPDF_DLL
@@ -112,11 +112,11 @@ class QPDFOutlineObjectHelper: public QPDFObjectHelper
         Members(Members const&);
 
         QPDFOutlineDocumentHelper& dh;
-        PointerHolder<QPDFOutlineObjectHelper> parent;
+        std::shared_ptr<QPDFOutlineObjectHelper> parent;
         std::vector<QPDFOutlineObjectHelper> kids;
     };
 
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // QPDFOUTLINEOBJECTHELPER_HH

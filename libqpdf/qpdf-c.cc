@@ -18,7 +18,7 @@
 
 struct _qpdf_error
 {
-    PointerHolder<QPDFExc> exc;
+    std::shared_ptr<QPDFExc> exc;
 };
 
 struct _qpdf_data
@@ -26,10 +26,10 @@ struct _qpdf_data
     _qpdf_data();
     ~_qpdf_data();
 
-    PointerHolder<QPDF> qpdf;
-    PointerHolder<QPDFWriter> qpdf_writer;
+    std::shared_ptr<QPDF> qpdf;
+    std::shared_ptr<QPDFWriter> qpdf_writer;
 
-    PointerHolder<QPDFExc> error;
+    std::shared_ptr<QPDFExc> error;
     _qpdf_error tmp_error;
     std::list<QPDFExc> warnings;
     std::string tmp_string;
@@ -40,12 +40,12 @@ struct _qpdf_data
     unsigned long long size;
     char const* password;
     bool write_memory;
-    PointerHolder<Buffer> output_buffer;
+    std::shared_ptr<Buffer> output_buffer;
 
     // QPDFObjectHandle support
     bool silence_errors;
     bool oh_error_occurred;
-    std::map<qpdf_oh, PointerHolder<QPDFObjectHandle>> oh_cache;
+    std::map<qpdf_oh, std::shared_ptr<QPDFObjectHandle>> oh_cache;
     qpdf_oh next_oh;
     std::set<std::string> cur_iter_dict_keys;
     std::set<std::string>::const_iterator dict_iter;
@@ -111,13 +111,13 @@ static void
 call_init_write(qpdf_data qpdf)
 {
     qpdf->qpdf_writer =
-        make_pointer_holder<QPDFWriter>(*(qpdf->qpdf), qpdf->filename);
+        std::make_shared<QPDFWriter>(*(qpdf->qpdf), qpdf->filename);
 }
 
 static void
 call_init_write_memory(qpdf_data qpdf)
 {
-    qpdf->qpdf_writer = make_pointer_holder<QPDFWriter>(*(qpdf->qpdf));
+    qpdf->qpdf_writer = std::make_shared<QPDFWriter>(*(qpdf->qpdf));
     qpdf->qpdf_writer->setOutputMemory();
 }
 
@@ -144,15 +144,15 @@ trap_errors(qpdf_data qpdf, std::function<void(qpdf_data)> fn)
     try {
         fn(qpdf);
     } catch (QPDFExc& e) {
-        qpdf->error = make_pointer_holder<QPDFExc>(e);
+        qpdf->error = std::make_shared<QPDFExc>(e);
         status |= QPDF_ERRORS;
     } catch (std::runtime_error& e) {
         qpdf->error =
-            make_pointer_holder<QPDFExc>(qpdf_e_system, "", "", 0, e.what());
+            std::make_shared<QPDFExc>(qpdf_e_system, "", "", 0, e.what());
         status |= QPDF_ERRORS;
     } catch (std::exception& e) {
         qpdf->error =
-            make_pointer_holder<QPDFExc>(qpdf_e_internal, "", "", 0, e.what());
+            std::make_shared<QPDFExc>(qpdf_e_internal, "", "", 0, e.what());
         status |= QPDF_ERRORS;
     }
 
@@ -175,7 +175,7 @@ qpdf_init()
 {
     QTC::TC("qpdf", "qpdf-c called qpdf_init");
     qpdf_data qpdf = new _qpdf_data();
-    qpdf->qpdf = make_pointer_holder<QPDF>();
+    qpdf->qpdf = std::make_shared<QPDF>();
     return qpdf;
 }
 
@@ -241,8 +241,7 @@ qpdf_error
 qpdf_next_warning(qpdf_data qpdf)
 {
     if (qpdf_more_warnings(qpdf)) {
-        qpdf->tmp_error.exc =
-            make_pointer_holder<QPDFExc>(qpdf->warnings.front());
+        qpdf->tmp_error.exc = std::make_shared<QPDFExc>(qpdf->warnings.front());
         qpdf->warnings.pop_front();
         QTC::TC("qpdf", "qpdf-c qpdf_next_warning returned warning");
         return &qpdf->tmp_error;
@@ -974,7 +973,7 @@ qpdf_register_progress_reporter(
 {
     QTC::TC("qpdf", "qpdf-c registered progress reporter");
     qpdf->qpdf_writer->registerProgressReporter(
-        PointerHolder<QPDFWriter::ProgressReporter>(
+        std::shared_ptr<QPDFWriter::ProgressReporter>(
             new ProgressReporter(report_progress, data)));
 }
 
@@ -1035,7 +1034,7 @@ static qpdf_oh
 new_object(qpdf_data qpdf, QPDFObjectHandle const& qoh)
 {
     qpdf_oh oh = ++qpdf->next_oh; // never return 0
-    qpdf->oh_cache[oh] = make_pointer_holder<QPDFObjectHandle>(qoh);
+    qpdf->oh_cache[oh] = std::make_shared<QPDFObjectHandle>(qoh);
     return oh;
 }
 

@@ -23,7 +23,8 @@ is_delimiter(char ch)
 class QPDFWordTokenFinder: public InputSource::Finder
 {
   public:
-    QPDFWordTokenFinder(PointerHolder<InputSource> is, std::string const& str) :
+    QPDFWordTokenFinder(
+        std::shared_ptr<InputSource> is, std::string const& str) :
         is(is),
         str(str)
     {
@@ -34,7 +35,7 @@ class QPDFWordTokenFinder: public InputSource::Finder
     virtual bool check();
 
   private:
-    PointerHolder<InputSource> is;
+    std::shared_ptr<InputSource> is;
     std::string str;
 };
 
@@ -503,7 +504,7 @@ QPDFTokenizer::presentEOF()
 }
 
 void
-QPDFTokenizer::expectInlineImage(PointerHolder<InputSource> input)
+QPDFTokenizer::expectInlineImage(std::shared_ptr<InputSource> input)
 {
     if (this->m->state != st_top) {
         throw std::logic_error("QPDFTokenizer::expectInlineImage called"
@@ -514,7 +515,7 @@ QPDFTokenizer::expectInlineImage(PointerHolder<InputSource> input)
 }
 
 void
-QPDFTokenizer::findEI(PointerHolder<InputSource> input)
+QPDFTokenizer::findEI(std::shared_ptr<InputSource> input)
 {
     if (!input.get()) {
         return;
@@ -645,7 +646,7 @@ QPDFTokenizer::betweenTokens()
 
 QPDFTokenizer::Token
 QPDFTokenizer::readToken(
-    PointerHolder<InputSource> input,
+    std::shared_ptr<InputSource> input,
     std::string const& context,
     bool allow_bad,
     size_t max_len)

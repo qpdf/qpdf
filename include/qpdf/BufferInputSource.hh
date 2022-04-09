@@ -73,7 +73,7 @@ class BufferInputSource: public InputSource
         qpdf_offset_t max_offset;
     };
 
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // QPDF_BUFFERINPUTSOURCE_HH

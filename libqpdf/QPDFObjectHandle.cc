@@ -252,7 +252,7 @@ QPDFObjectHandle::setObjectDescriptionFromInput(
     QPDFObjectHandle object,
     QPDF* context,
     std::string const& description,
-    PointerHolder<InputSource> input,
+    std::shared_ptr<InputSource> input,
     qpdf_offset_t offset)
 {
     object.setObjectDescription(
@@ -1337,14 +1337,14 @@ QPDFObjectHandle::replaceDict(QPDFObjectHandle new_dict)
     dynamic_cast<QPDF_Stream*>(obj.get())->replaceDict(new_dict);
 }
 
-PointerHolder<Buffer>
+std::shared_ptr<Buffer>
 QPDFObjectHandle::getStreamData(qpdf_stream_decode_level_e level)
 {
     assertStream();
     return dynamic_cast<QPDF_Stream*>(obj.get())->getStreamData(level);
 }
 
-PointerHolder<Buffer>
+std::shared_ptr<Buffer>
 QPDFObjectHandle::getRawStreamData()
 {
     assertStream();
@@ -1410,7 +1410,7 @@ QPDFObjectHandle::pipeStreamData(
 
 void
 QPDFObjectHandle::replaceStreamData(
-    PointerHolder<Buffer> data,
+    std::shared_ptr<Buffer> data,
     QPDFObjectHandle const& filter,
     QPDFObjectHandle const& decode_parms)
 {
@@ -1426,7 +1426,7 @@ QPDFObjectHandle::replaceStreamData(
     QPDFObjectHandle const& decode_parms)
 {
     assertStream();
-    auto b = make_pointer_holder<Buffer>(data.length());
+    auto b = std::make_shared<Buffer>(data.length());
     unsigned char* bp = b->getBuffer();
     memcpy(bp, data.c_str(), data.length());
     dynamic_cast<QPDF_Stream*>(obj.get())->replaceStreamData(
@@ -1435,7 +1435,7 @@ QPDFObjectHandle::replaceStreamData(
 
 void
 QPDFObjectHandle::replaceStreamData(
-    PointerHolder<StreamDataProvider> provider,
+    std::shared_ptr<StreamDataProvider> provider,
     QPDFObjectHandle const& filter,
     QPDFObjectHandle const& decode_parms)
 {
@@ -1487,7 +1487,7 @@ QPDFObjectHandle::replaceStreamData(
 {
     assertStream();
     auto sdp =
-        PointerHolder<StreamDataProvider>(new FunctionProvider(provider));
+        std::shared_ptr<StreamDataProvider>(new FunctionProvider(provider));
     dynamic_cast<QPDF_Stream*>(obj.get())->replaceStreamData(
         sdp, filter, decode_parms);
 }
@@ -1500,7 +1500,7 @@ QPDFObjectHandle::replaceStreamData(
 {
     assertStream();
     auto sdp =
-        PointerHolder<StreamDataProvider>(new FunctionProvider(provider));
+        std::shared_ptr<StreamDataProvider>(new FunctionProvider(provider));
     dynamic_cast<QPDF_Stream*>(obj.get())->replaceStreamData(
         sdp, filter, decode_parms);
 }
@@ -1694,7 +1694,7 @@ QPDFObjectHandle::coalesceContentStreams()
     QPDFObjectHandle new_contents = newStream(qpdf);
     this->replaceKey("/Contents", new_contents);
 
-    auto provider = PointerHolder<StreamDataProvider>(
+    auto provider = std::shared_ptr<StreamDataProvider>(
         new CoalesceProvider(*this, contents));
     new_contents.replaceStreamData(provider, newNull(), newNull());
 }
@@ -1772,7 +1772,7 @@ QPDFObjectHandle::parse(
     std::string const& object_str,
     std::string const& object_description)
 {
-    auto input = PointerHolder<InputSource>(
+    auto input = std::shared_ptr<InputSource>(
         new BufferInputSource("parsed object", object_str));
     QPDFTokenizer tokenizer;
     bool empty = false;
@@ -1908,13 +1908,13 @@ QPDFObjectHandle::parseContentStream_internal(
 
 void
 QPDFObjectHandle::parseContentStream_data(
-    PointerHolder<Buffer> stream_data,
+    std::shared_ptr<Buffer> stream_data,
     std::string const& description,
     ParserCallbacks* callbacks,
     QPDF* context)
 {
     size_t stream_length = stream_data->getSize();
-    auto input = PointerHolder<InputSource>(
+    auto input = std::shared_ptr<InputSource>(
         new BufferInputSource(description, stream_data.get()));
     QPDFTokenizer tokenizer;
     tokenizer.allowEOF();
@@ -1969,14 +1969,14 @@ QPDFObjectHandle::parseContentStream_data(
 }
 
 void
-QPDFObjectHandle::addContentTokenFilter(PointerHolder<TokenFilter> filter)
+QPDFObjectHandle::addContentTokenFilter(std::shared_ptr<TokenFilter> filter)
 {
     coalesceContentStreams();
     this->getKey("/Contents").addTokenFilter(filter);
 }
 
 void
-QPDFObjectHandle::addTokenFilter(PointerHolder<TokenFilter> filter)
+QPDFObjectHandle::addTokenFilter(std::shared_ptr<TokenFilter> filter)
 {
     assertStream();
     return dynamic_cast<QPDF_Stream*>(obj.get())->addTokenFilter(filter);
@@ -1984,7 +1984,7 @@ QPDFObjectHandle::addTokenFilter(PointerHolder<TokenFilter> filter)
 
 QPDFObjectHandle
 QPDFObjectHandle::parse(
-    PointerHolder<InputSource> input,
+    std::shared_ptr<InputSource> input,
     std::string const& object_description,
     QPDFTokenizer& tokenizer,
     bool& empty,
@@ -1997,7 +1997,7 @@ QPDFObjectHandle::parse(
 
 QPDFObjectHandle
 QPDFObjectHandle::parseInternal(
-    PointerHolder<InputSource> input,
+    std::shared_ptr<InputSource> input,
     std::string const& object_description,
     QPDFTokenizer& tokenizer,
     bool& empty,
@@ -2698,7 +2698,7 @@ QPDFObjectHandle::newStream(QPDF* qpdf)
 }
 
 QPDFObjectHandle
-QPDFObjectHandle::newStream(QPDF* qpdf, PointerHolder<Buffer> data)
+QPDFObjectHandle::newStream(QPDF* qpdf, std::shared_ptr<Buffer> data)
 {
     QTC::TC("qpdf", "QPDFObjectHandle newStream with data");
     QPDFObjectHandle result = newStream(qpdf);
@@ -2836,26 +2836,27 @@ QPDFObjectHandle::copyObject(
     this->objid = 0;
     this->generation = 0;
 
-    PointerHolder<QPDFObject> new_obj;
+    std::shared_ptr<QPDFObject> new_obj;
 
     if (isBool()) {
         QTC::TC("qpdf", "QPDFObjectHandle clone bool");
-        new_obj = PointerHolder<QPDFObject>(new QPDF_Bool(getBoolValue()));
+        new_obj = std::shared_ptr<QPDFObject>(new QPDF_Bool(getBoolValue()));
     } else if (isNull()) {
         QTC::TC("qpdf", "QPDFObjectHandle clone null");
-        new_obj = PointerHolder<QPDFObject>(new QPDF_Null());
+        new_obj = std::shared_ptr<QPDFObject>(new QPDF_Null());
     } else if (isInteger()) {
         QTC::TC("qpdf", "QPDFObjectHandle clone integer");
-        new_obj = PointerHolder<QPDFObject>(new QPDF_Integer(getIntValue()));
+        new_obj = std::shared_ptr<QPDFObject>(new QPDF_Integer(getIntValue()));
     } else if (isReal()) {
         QTC::TC("qpdf", "QPDFObjectHandle clone real");
-        new_obj = PointerHolder<QPDFObject>(new QPDF_Real(getRealValue()));
+        new_obj = std::shared_ptr<QPDFObject>(new QPDF_Real(getRealValue()));
     } else if (isName()) {
         QTC::TC("qpdf", "QPDFObjectHandle clone name");
-        new_obj = PointerHolder<QPDFObject>(new QPDF_Name(getName()));
+        new_obj = std::shared_ptr<QPDFObject>(new QPDF_Name(getName()));
     } else if (isString()) {
         QTC::TC("qpdf", "QPDFObjectHandle clone string");
-        new_obj = PointerHolder<QPDFObject>(new QPDF_String(getStringValue()));
+        new_obj =
+            std::shared_ptr<QPDFObject>(new QPDF_String(getStringValue()));
     } else if (isArray()) {
         QTC::TC("qpdf", "QPDFObjectHandle clone array");
         std::vector<QPDFObjectHandle> items;
@@ -2868,7 +2869,7 @@ QPDFObjectHandle::copyObject(
                     visited, cross_indirect, first_level_only, stop_at_streams);
             }
         }
-        new_obj = PointerHolder<QPDFObject>(new QPDF_Array(items));
+        new_obj = std::shared_ptr<QPDFObject>(new QPDF_Array(items));
     } else if (isDictionary()) {
         QTC::TC("qpdf", "QPDFObjectHandle clone dictionary");
         std::set<std::string> keys = getKeys();
@@ -2883,7 +2884,7 @@ QPDFObjectHandle::copyObject(
                     visited, cross_indirect, first_level_only, stop_at_streams);
             }
         }
-        new_obj = PointerHolder<QPDFObject>(new QPDF_Dictionary(items));
+        new_obj = std::shared_ptr<QPDFObject>(new QPDF_Dictionary(items));
     } else {
         throw std::logic_error("QPDFObjectHandle::makeDirectInternal: "
                                "unknown object type");
@@ -3172,12 +3173,12 @@ QPDFObjectHandle::dereference()
         this->obj = nullptr;
     }
     if (this->obj.get() == 0) {
-        PointerHolder<QPDFObject> obj =
+        std::shared_ptr<QPDFObject> obj =
             QPDF::Resolver::resolve(this->qpdf, this->objid, this->generation);
         if (obj.get() == 0) {
             // QPDF::resolve never returns an uninitialized object, but
             // check just in case.
-            this->obj = PointerHolder<QPDFObject>(new QPDF_Null());
+            this->obj = std::shared_ptr<QPDFObject>(new QPDF_Null());
         } else if (dynamic_cast<QPDF_Reserved*>(obj.get())) {
             // Do not resolve
         } else {

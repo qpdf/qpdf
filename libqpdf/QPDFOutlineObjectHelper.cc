@@ -31,13 +31,13 @@ QPDFOutlineObjectHelper::QPDFOutlineObjectHelper(
     QPDFObjectHandle cur = oh.getKey("/First");
     while (!cur.isNull()) {
         QPDFOutlineObjectHelper new_ooh(cur, dh, 1 + depth);
-        new_ooh.m->parent = make_pointer_holder<QPDFOutlineObjectHelper>(*this);
+        new_ooh.m->parent = std::make_shared<QPDFOutlineObjectHelper>(*this);
         this->m->kids.push_back(new_ooh);
         cur = cur.getKey("/Next");
     }
 }
 
-PointerHolder<QPDFOutlineObjectHelper>
+std::shared_ptr<QPDFOutlineObjectHelper>
 QPDFOutlineObjectHelper::getParent()
 {
     return this->m->parent;

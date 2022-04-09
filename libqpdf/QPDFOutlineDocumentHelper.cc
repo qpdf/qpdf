@@ -100,7 +100,7 @@ QPDFOutlineDocumentHelper::resolveNamedDest(QPDFObjectHandle name)
                 QPDFObjectHandle dests = names.getKey("/Dests");
                 if (dests.isDictionary()) {
                     this->m->names_dest =
-                        make_pointer_holder<QPDFNameTreeObjectHelper>(
+                        std::make_shared<QPDFNameTreeObjectHelper>(
                             dests, this->qpdf);
                 }
             }

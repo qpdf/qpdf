@@ -85,7 +85,7 @@ class Pl_Flate: public Pipeline
         std::function<void(char const*, int)> callback;
     };
 
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // PL_FLATE_HH

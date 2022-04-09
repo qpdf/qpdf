@@ -37,8 +37,8 @@ class QPDF_Stream: public QPDFObject
     // Methods to help QPDF copy foreign streams
     qpdf_offset_t getOffset() const;
     size_t getLength() const;
-    PointerHolder<Buffer> getStreamDataBuffer() const;
-    PointerHolder<QPDFObjectHandle::StreamDataProvider>
+    std::shared_ptr<Buffer> getStreamDataBuffer() const;
+    std::shared_ptr<QPDFObjectHandle::StreamDataProvider>
     getStreamDataProvider() const;
 
     // See comments in QPDFObjectHandle.hh for these methods.
@@ -49,18 +49,18 @@ class QPDF_Stream: public QPDFObject
         qpdf_stream_decode_level_e decode_level,
         bool suppress_warnings,
         bool will_retry);
-    PointerHolder<Buffer> getStreamData(qpdf_stream_decode_level_e);
-    PointerHolder<Buffer> getRawStreamData();
+    std::shared_ptr<Buffer> getStreamData(qpdf_stream_decode_level_e);
+    std::shared_ptr<Buffer> getRawStreamData();
     void replaceStreamData(
-        PointerHolder<Buffer> data,
+        std::shared_ptr<Buffer> data,
         QPDFObjectHandle const& filter,
         QPDFObjectHandle const& decode_parms);
     void replaceStreamData(
-        PointerHolder<QPDFObjectHandle::StreamDataProvider> provider,
+        std::shared_ptr<QPDFObjectHandle::StreamDataProvider> provider,
         QPDFObjectHandle const& filter,
         QPDFObjectHandle const& decode_parms);
     void
-    addTokenFilter(PointerHolder<QPDFObjectHandle::TokenFilter> token_filter);
+    addTokenFilter(std::shared_ptr<QPDFObjectHandle::TokenFilter> token_filter);
 
     void replaceDict(QPDFObjectHandle new_dict);
 
@@ -101,9 +101,9 @@ class QPDF_Stream: public QPDFObject
     QPDFObjectHandle stream_dict;
     qpdf_offset_t offset;
     size_t length;
-    PointerHolder<Buffer> stream_data;
-    PointerHolder<QPDFObjectHandle::StreamDataProvider> stream_provider;
-    std::vector<PointerHolder<QPDFObjectHandle::TokenFilter>> token_filters;
+    std::shared_ptr<Buffer> stream_data;
+    std::shared_ptr<QPDFObjectHandle::StreamDataProvider> stream_provider;
+    std::vector<std::shared_ptr<QPDFObjectHandle::TokenFilter>> token_filters;
 };
 
 #endif // QPDF_STREAM_HH

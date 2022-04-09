@@ -173,7 +173,7 @@ class QPDFTokenizer
     // beginning of the token.
     QPDF_DLL
     Token readToken(
-        PointerHolder<InputSource> input,
+        std::shared_ptr<InputSource> input,
         std::string const& context,
         bool allow_bad = false,
         size_t max_len = 0);
@@ -187,7 +187,7 @@ class QPDFTokenizer
     // tt_inline_image or tt_bad. This is the only way readToken
     // returns a tt_inline_image token.
     QPDF_DLL
-    void expectInlineImage(PointerHolder<InputSource> input);
+    void expectInlineImage(std::shared_ptr<InputSource> input);
 
   private:
     QPDFTokenizer(QPDFTokenizer const&) = delete;
@@ -196,7 +196,7 @@ class QPDFTokenizer
     void resolveLiteral();
     bool isSpace(char);
     bool isDelimiter(char);
-    void findEI(PointerHolder<InputSource> input);
+    void findEI(std::shared_ptr<InputSource> input);
 
     enum state_e {
         st_top,
@@ -246,7 +246,7 @@ class QPDFTokenizer
         bool last_char_was_bs;
         bool last_char_was_cr;
     };
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // QPDFTOKENIZER_HH

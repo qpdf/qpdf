@@ -71,7 +71,7 @@ class FileInputSource: public InputSource
         FILE* file;
     };
 
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // QPDF_FILEINPUTSOURCE_HH

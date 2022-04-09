@@ -56,7 +56,7 @@ class Pl_Discard: public Pipeline
         Members(Members const&);
     };
 
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // PL_DISCARD_HH

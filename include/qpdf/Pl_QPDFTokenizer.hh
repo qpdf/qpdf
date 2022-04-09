@@ -76,7 +76,7 @@ class Pl_QPDFTokenizer: public Pipeline
         QPDFTokenizer tokenizer;
         Pl_Buffer buf;
     };
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // PL_QPDFTOKENIZER_HH

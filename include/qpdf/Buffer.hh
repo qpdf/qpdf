@@ -75,7 +75,7 @@ class Buffer
 
     void copy(Buffer const&);
 
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // BUFFER_HH

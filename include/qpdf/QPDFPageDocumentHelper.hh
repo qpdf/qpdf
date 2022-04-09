@@ -151,7 +151,7 @@ class QPDFPageDocumentHelper: public QPDFDocumentHelper
         Members(Members const&);
     };
 
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // QPDFPAGEDOCUMENTHELPER_HH

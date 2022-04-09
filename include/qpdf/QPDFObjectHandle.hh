@@ -434,7 +434,7 @@ class QPDFObjectHandle
     // objects that are ready from the object's input stream.
     QPDF_DLL
     static QPDFObjectHandle parse(
-        PointerHolder<InputSource> input,
+        std::shared_ptr<InputSource> input,
         std::string const& object_description,
         QPDFTokenizer&,
         bool& empty,
@@ -490,7 +490,7 @@ class QPDFObjectHandle
     // handle the case of pages whose contents are split across
     // multiple streams.
     QPDF_DLL
-    void addTokenFilter(PointerHolder<TokenFilter> token_filter);
+    void addTokenFilter(std::shared_ptr<TokenFilter> token_filter);
 
     // Legacy helpers for parsing content streams. These methods are
     // not going away, but newer code should call the correspond
@@ -506,7 +506,7 @@ class QPDFObjectHandle
     QPDF_DLL
     void pipePageContents(Pipeline* p);
     QPDF_DLL
-    void addContentTokenFilter(PointerHolder<TokenFilter> token_filter);
+    void addContentTokenFilter(std::shared_ptr<TokenFilter> token_filter);
     // End legacy content stream helpers
 
     // Called on a stream to filter the stream as if it were page
@@ -618,11 +618,11 @@ class QPDFObjectHandle
     // uncompressed stream data.  Example programs are provided that
     // illustrate this.
     QPDF_DLL
-    static QPDFObjectHandle newStream(QPDF* qpdf, PointerHolder<Buffer> data);
+    static QPDFObjectHandle newStream(QPDF* qpdf, std::shared_ptr<Buffer> data);
 
     // Create new stream with data from string.  This method will
     // create a copy of the data rather than using the user-provided
-    // buffer as in the PointerHolder<Buffer> version of newStream.
+    // buffer as in the std::shared_ptr<Buffer> version of newStream.
     QPDF_DLL
     static QPDFObjectHandle newStream(QPDF* qpdf, std::string const& data);
 
@@ -1089,12 +1089,12 @@ class QPDFObjectHandle
     // Returns filtered (uncompressed) stream data.  Throws an
     // exception if the stream is filtered and we can't decode it.
     QPDF_DLL
-    PointerHolder<Buffer>
+    std::shared_ptr<Buffer>
     getStreamData(qpdf_stream_decode_level_e level = qpdf_dl_generalized);
 
     // Returns unfiltered (raw) stream data.
     QPDF_DLL
-    PointerHolder<Buffer> getRawStreamData();
+    std::shared_ptr<Buffer> getRawStreamData();
 
     // Write stream data through the given pipeline. A null pipeline
     // value may be used if all you want to do is determine whether a
@@ -1201,13 +1201,13 @@ class QPDFObjectHandle
     // decryption filters have been applied, is as presented.
     QPDF_DLL
     void replaceStreamData(
-        PointerHolder<Buffer> data,
+        std::shared_ptr<Buffer> data,
         QPDFObjectHandle const& filter,
         QPDFObjectHandle const& decode_parms);
 
     // Replace the stream's stream data with the given string.
     // This method will create a copy of the data rather than using
-    // the user-provided buffer as in the PointerHolder<Buffer> version
+    // the user-provided buffer as in the std::shared_ptr<Buffer> version
     // of replaceStreamData.
     QPDF_DLL
     void replaceStreamData(
@@ -1242,7 +1242,7 @@ class QPDFObjectHandle
     // compute the length in advance.
     QPDF_DLL
     void replaceStreamData(
-        PointerHolder<StreamDataProvider> provider,
+        std::shared_ptr<StreamDataProvider> provider,
         QPDFObjectHandle const& filter,
         QPDFObjectHandle const& decode_parms);
 
@@ -1373,7 +1373,7 @@ class QPDFObjectHandle
         friend class QPDF;
 
       private:
-        static PointerHolder<QPDFObject>
+        static std::shared_ptr<QPDFObject>
         getObject(QPDFObjectHandle& o)
         {
             o.dereference();
@@ -1496,10 +1496,10 @@ class QPDFObjectHandle
         QPDFObjectHandle,
         QPDF*,
         std::string const&,
-        PointerHolder<InputSource>,
+        std::shared_ptr<InputSource>,
         qpdf_offset_t);
     static QPDFObjectHandle parseInternal(
-        PointerHolder<InputSource> input,
+        std::shared_ptr<InputSource> input,
         std::string const& object_description,
         QPDFTokenizer& tokenizer,
         bool& empty,
@@ -1510,7 +1510,7 @@ class QPDFObjectHandle
     void parseContentStream_internal(
         std::string const& description, ParserCallbacks* callbacks);
     static void parseContentStream_data(
-        PointerHolder<Buffer>,
+        std::shared_ptr<Buffer>,
         std::string const& description,
         ParserCallbacks* callbacks,
         QPDF* context);
@@ -1527,7 +1527,7 @@ class QPDFObjectHandle
     QPDF* qpdf;
     int objid; // 0 for direct object
     int generation;
-    PointerHolder<QPDFObject> obj;
+    std::shared_ptr<QPDFObject> obj;
     bool reserved;
 };
 
@@ -1629,7 +1629,7 @@ class QPDFObjectHandle::QPDFDictItems
             std::set<std::string>::iterator iter;
             bool is_end;
         };
-        PointerHolder<Members> m;
+        std::shared_ptr<Members> m;
         value_type ivalue;
     };
 
@@ -1727,7 +1727,7 @@ class QPDFObjectHandle::QPDFArrayItems
             int item_number;
             bool is_end;
         };
-        PointerHolder<Members> m;
+        std::shared_ptr<Members> m;
         value_type ivalue;
     };
 

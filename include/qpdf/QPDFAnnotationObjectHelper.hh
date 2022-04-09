@@ -115,7 +115,7 @@ class QPDFAnnotationObjectHelper: public QPDFObjectHelper
         Members(Members const&);
     };
 
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // QPDFANNOTATIONOBJECTHELPER_HH

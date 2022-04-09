@@ -754,7 +754,8 @@ QPDF::recover_encryption_key_with_password(
 }
 
 QPDF::encryption_method_e
-QPDF::interpretCF(PointerHolder<EncryptionParameters> encp, QPDFObjectHandle cf)
+QPDF::interpretCF(
+    std::shared_ptr<EncryptionParameters> encp, QPDFObjectHandle cf)
 {
     if (cf.isName()) {
         std::string filter = cf.getName();
@@ -1079,7 +1080,7 @@ QPDF::initializeEncryption()
 
 std::string
 QPDF::getKeyForObject(
-    PointerHolder<EncryptionParameters> encp,
+    std::shared_ptr<EncryptionParameters> encp,
     int objid,
     int generation,
     bool use_aes)
@@ -1165,7 +1166,7 @@ QPDF::decryptString(std::string& str, int objid, int generation)
         } else {
             QTC::TC("qpdf", "QPDF_encryption rc4 decode string");
             size_t vlen = str.length();
-            // Using PointerHolder guarantees that tmp will
+            // Using std::shared_ptr guarantees that tmp will
             // be freed even if rc4.process throws an exception.
             auto tmp = QUtil::make_unique_cstr(str);
             RC4 rc4(QUtil::unsigned_char_pointer(key), toI(key.length()));
@@ -1188,8 +1189,8 @@ QPDF::decryptString(std::string& str, int objid, int generation)
 
 void
 QPDF::decryptStream(
-    PointerHolder<EncryptionParameters> encp,
-    PointerHolder<InputSource> file,
+    std::shared_ptr<EncryptionParameters> encp,
+    std::shared_ptr<InputSource> file,
     QPDF& qpdf_for_warning,
     Pipeline*& pipeline,
     int objid,

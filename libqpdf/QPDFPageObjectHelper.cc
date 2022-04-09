@@ -556,7 +556,7 @@ QPDFPageObjectHelper::pipeContents(Pipeline* p)
 
 void
 QPDFPageObjectHelper::addContentTokenFilter(
-    PointerHolder<QPDFObjectHandle::TokenFilter> token_filter)
+    std::shared_ptr<QPDFObjectHandle::TokenFilter> token_filter)
 {
     if (this->oh.isFormXObject()) {
         this->oh.addTokenFilter(token_filter);
@@ -776,7 +776,7 @@ QPDFPageObjectHelper::getFormXObjectForPage(bool handle_transformations)
                                 " XObject created from page will not work");
     }
     newdict.replaceKey("/BBox", bbox);
-    auto provider = PointerHolder<QPDFObjectHandle::StreamDataProvider>(
+    auto provider = std::shared_ptr<QPDFObjectHandle::StreamDataProvider>(
         new ContentProvider(this->oh));
     result.replaceStreamData(
         provider, QPDFObjectHandle::newNull(), QPDFObjectHandle::newNull());
@@ -1060,9 +1060,9 @@ QPDFPageObjectHelper::flattenRotation(QPDFAcroFormDocumentHelper* afdh)
         std::vector<QPDFObjectHandle> new_annots;
         std::vector<QPDFObjectHandle> new_fields;
         std::set<QPDFObjGen> old_fields;
-        PointerHolder<QPDFAcroFormDocumentHelper> afdhph;
+        std::shared_ptr<QPDFAcroFormDocumentHelper> afdhph;
         if (!afdh) {
-            afdhph = make_pointer_holder<QPDFAcroFormDocumentHelper>(*qpdf);
+            afdhph = std::make_shared<QPDFAcroFormDocumentHelper>(*qpdf);
             afdh = afdhph.get();
         }
         afdh->transformAnnotations(
@@ -1101,10 +1101,10 @@ QPDFPageObjectHelper::copyAnnotations(
     std::vector<QPDFObjectHandle> new_annots;
     std::vector<QPDFObjectHandle> new_fields;
     std::set<QPDFObjGen> old_fields;
-    PointerHolder<QPDFAcroFormDocumentHelper> afdhph;
-    PointerHolder<QPDFAcroFormDocumentHelper> from_afdhph;
+    std::shared_ptr<QPDFAcroFormDocumentHelper> afdhph;
+    std::shared_ptr<QPDFAcroFormDocumentHelper> from_afdhph;
     if (!afdh) {
-        afdhph = make_pointer_holder<QPDFAcroFormDocumentHelper>(*this_qpdf);
+        afdhph = std::make_shared<QPDFAcroFormDocumentHelper>(*this_qpdf);
         afdh = afdhph.get();
     }
     if (this_qpdf == from_qpdf) {
@@ -1116,8 +1116,7 @@ QPDFPageObjectHelper::copyAnnotations(
                 " is not from the same QPDF as from_page");
         }
     } else {
-        from_afdhph =
-            make_pointer_holder<QPDFAcroFormDocumentHelper>(*from_qpdf);
+        from_afdhph = std::make_shared<QPDFAcroFormDocumentHelper>(*from_qpdf);
         from_afdh = from_afdhph.get();
     }
 

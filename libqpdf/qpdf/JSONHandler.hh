@@ -125,7 +125,7 @@ class JSONHandler
 
         Handlers h;
     };
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // JSONHANDLER_HH

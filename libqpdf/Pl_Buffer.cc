@@ -30,13 +30,13 @@ void
 Pl_Buffer::write(unsigned char* buf, size_t len)
 {
     if (this->m->data.get() == 0) {
-        this->m->data = make_pointer_holder<Buffer>(len);
+        this->m->data = std::make_shared<Buffer>(len);
     }
     size_t cur_size = this->m->data->getSize();
     size_t left = cur_size - this->m->total_size;
     if (left < len) {
         size_t new_size = std::max(this->m->total_size + len, 2 * cur_size);
-        auto b = make_pointer_holder<Buffer>(new_size);
+        auto b = std::make_shared<Buffer>(new_size);
         memcpy(b->getBuffer(), this->m->data->getBuffer(), this->m->total_size);
         this->m->data = b;
     }
@@ -72,14 +72,14 @@ Pl_Buffer::getBuffer()
         unsigned char* p = b->getBuffer();
         memcpy(p, this->m->data->getBuffer(), this->m->total_size);
     }
-    this->m = PointerHolder<Members>(new Members());
+    this->m = std::shared_ptr<Members>(new Members());
     return b;
 }
 
-PointerHolder<Buffer>
+std::shared_ptr<Buffer>
 Pl_Buffer::getBufferSharedPointer()
 {
-    return PointerHolder<Buffer>(getBuffer());
+    return std::shared_ptr<Buffer>(getBuffer());
 }
 
 void
@@ -97,5 +97,5 @@ Pl_Buffer::getMallocBuffer(unsigned char** buf, size_t* len)
     } else {
         *buf = nullptr;
     }
-    this->m = PointerHolder<Members>(new Members());
+    this->m = std::shared_ptr<Members>(new Members());
 }

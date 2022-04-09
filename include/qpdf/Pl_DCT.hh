@@ -106,7 +106,7 @@ class Pl_DCT: public Pipeline
         CompressConfig* config_callback;
     };
 
-    PointerHolder<Members> m;
+    std::shared_ptr<Members> m;
 };
 
 #endif // PL_DCT_HH
