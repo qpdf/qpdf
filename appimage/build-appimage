@@ -156,7 +156,7 @@ unset QTDIR; unset QT_PLUGIN_PATH
 # Since cmake strips runpath information for executables and we are
 # installing with DESTDIR, we need to set LD_LIBRARY_PATH or else ldd
 # will fail on the resulting executables
-export LD_LIBRARY_PATH=$(dirname $(find $appdir -type l -name libqpdf.so.28))
+export LD_LIBRARY_PATH=$(dirname $(find $appdir -type l -name 'libqpdf.so.*'))
 
 # Let 'linuxdeployqt' do its first stage of work:
 ./linuxdeployqt*.AppImage appdir/usr/share/applications/*.desktop -bundle-non-qt-libs
