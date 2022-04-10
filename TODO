@@ -3,9 +3,9 @@ Next
 ====
 
 * At next release, hide release-qpdf-10.6.3.0cmake* versions at readthedocs
+* Stay on top of https://github.com/pikepdf/pikepdf/pull/315
 
 In order:
-* cmake -- remaining steps
 * ABI including --json default is latest
 * json v2
 
@@ -37,13 +37,6 @@ Misc
     source tree.
 
 Soon: Break ground on "Document-level work"
-
-cmake
-=====
-
-* pikepdf
-  * https://github.com/pikepdf/pikepdf/pull/315 -- setup.py + docs
-  * https://github.com/pikepdf/pikepdf/pull/316 -- setup.py only
 
 Output JSON v2
 ==============
