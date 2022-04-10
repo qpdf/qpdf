@@ -1538,8 +1538,16 @@ class QPDFObjectHandle
 
 // If this is causing problems in your code, define
 // QPDF_NO_QPDF_STRING to prevent the declaration from being here.
+
+/* clang-format off */
+// Disable formatting for this declaration: emacs font-lock in cc-mode
+// (as of 28.1) treats the rest of the file as a string if
+// clang-format removes the space after "operator", and as of
+// clang-format 15, there's no way to prevent it from doing so.
 QPDF_DLL
-QPDFObjectHandle operator""_qpdf(char const* v, size_t len);
+QPDFObjectHandle operator ""_qpdf(char const* v, size_t len);
+/* clang-format on */
+
 #endif // QPDF_NO_QPDF_STRING
 
 class QPDFObjectHandle::QPDFDictItems
