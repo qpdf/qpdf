@@ -20,7 +20,8 @@
            )
           )
          )
-         (c-noise-macro-names . ("QPDF_DLL" "QPDF_DLL_CLASS" "QPDF_DLL_LOCAL"))
+         (c-noise-macro-names
+	  . ("QPDF_DLL" "QPDF_DLL_CLASS" "QPDF_DLL_PRIVATE"))
         )
  )
  (c++-mode . ((eval . (progn

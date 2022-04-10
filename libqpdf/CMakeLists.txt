@@ -398,6 +398,9 @@ endif()
 # use PIC for the object library so we don't have to compile twice.
 set(OBJECT_LIB libqpdf_object)
 add_library(${OBJECT_LIB} OBJECT ${libqpdf_SOURCES})
+if(OBJECT_LIB_IS_PIC)
+  target_compile_definitions(${OBJECT_LIB} PRIVATE libqpdf_EXPORTS)
+endif()
 set_target_properties(${OBJECT_LIB} PROPERTIES
   POSITION_INDEPENDENT_CODE ${OBJECT_LIB_IS_PIC})
 target_include_directories(${OBJECT_LIB}
@@ -446,8 +449,6 @@ if(NOT WIN32)
 endif()
 
 if(BUILD_SHARED_LIBS)
-  add_compile_definitions(DLL_EXPORT)
-
   set(SHARED_LIB libqpdf)
   if(OBJECT_LIB_IS_PIC)
     add_library(${SHARED_LIB} SHARED $<TARGET_OBJECTS:libqpdf_object>)
@@ -485,6 +486,7 @@ if(BUILD_SHARED_LIBS)
     SOVERSION ${qpdf_SOVERSION}
     POSITION_INDEPENDENT_CODE ${BUILD_SHARED_LIBS})
 
+  target_compile_definitions(${SHARED_LIB} PRIVATE libqpdf_EXPORTS)
   target_include_directories(${SHARED_LIB}
     SYSTEM PRIVATE ${dep_include_directories})
   target_include_directories(${SHARED_LIB}

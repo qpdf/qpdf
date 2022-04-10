@@ -617,6 +617,14 @@ and cmake options. There are a few exceptions:
   ``QPDF_TEST_COMPARE_IMAGES`` to ``1`` to *enable* image comparison
   tests. Either way, they are off by default.
 
+- Non-user-visible change: the preprocessor symbol that triggers the
+  export of functions into the public ABI (application binary
+  interface) has been changed from ``DLL_EXPORT`` to
+  ``libqpdf_EXPORTS``. This detail is encapsulated in the build and is
+  only relevant to people who are building qpdf on their own or who
+  may have previously needed to work around a collision between qpdf's
+  use of ``DLL_EXPORT`` and someone else's use of the same symbol.
+
 - A handful of options that were specific to autoconf or the old build
   system have been dropped.
 

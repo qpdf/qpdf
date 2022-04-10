@@ -37,9 +37,6 @@ cmake
 =====
 
 * DLL.h
-  * Change DLL_EXPORT to QPDF_EXPORT. Be sure to call attention to
-    this in the release notes. There should be a "migrating to cmake"
-    in the manual, and ./configure should draw attention to it.
   * The effect of QPDF_DLL_CLASS is to export everything in the class,
     not just the vtable. On MSVC, we don't need this as the vtable
     gets exported automatically when needed. With gcc, we need it to
