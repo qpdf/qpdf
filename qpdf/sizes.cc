@@ -33,7 +33,6 @@
 #include <qpdf/QPDFNameTreeObjectHelper.hh>
 #include <qpdf/QPDFNumberTreeObjectHelper.hh>
 #include <qpdf/QPDFObjGen.hh>
-#include <qpdf/QPDFObject.hh>
 #include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QPDFOutlineDocumentHelper.hh>
 #include <qpdf/QPDFOutlineObjectHelper.hh>
@@ -49,10 +48,6 @@
 
 #define ignore_class(cls)
 #define print_size(cls) std::cout << #cls << " " << sizeof(cls) << std::endl
-
-// This is public because of QPDF_DLL_CLASS on InputSource
-// -------
-ignore_class(InputSource::Members);
 
 // These are not classes
 // -------
@@ -105,7 +100,6 @@ main()
     print_size(QPDFNumberTreeObjectHelper);
     print_size(QPDFNumberTreeObjectHelper::iterator);
     print_size(QPDFObjGen);
-    print_size(QPDFObject);
     print_size(QPDFObjectHandle);
     print_size(QPDFObjectHandle::ParserCallbacks);
     print_size(QPDFObjectHandle::QPDFArrayItems);

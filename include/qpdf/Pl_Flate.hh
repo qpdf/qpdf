@@ -30,7 +30,6 @@ class QPDF_DLL_CLASS Pl_Flate: public Pipeline
 {
   public:
     static unsigned int const def_bufsize = 65536;
-    static int compression_level;
 
     enum action_e { a_inflate, a_deflate };
 
@@ -61,9 +60,15 @@ class QPDF_DLL_CLASS Pl_Flate: public Pipeline
     void setWarnCallback(std::function<void(char const*, int)> callback);
 
   private:
+    QPDF_DLL_PRIVATE
     void handleData(unsigned char* data, size_t len, int flush);
+    QPDF_DLL_PRIVATE
     void checkError(char const* prefix, int error_code);
+    QPDF_DLL_PRIVATE
     void warn(char const*, int error_code);
+
+    QPDF_DLL_PRIVATE
+    static int compression_level;
 
     class QPDF_DLL_PRIVATE Members
     {

@@ -68,7 +68,9 @@ class QPDF_DLL_CLASS ClosedFileInputSource: public InputSource
     ClosedFileInputSource(ClosedFileInputSource const&) = delete;
     ClosedFileInputSource& operator=(ClosedFileInputSource const&) = delete;
 
+    QPDF_DLL_PRIVATE
     void before();
+    QPDF_DLL_PRIVATE
     void after();
 
     class QPDF_DLL_PRIVATE Members

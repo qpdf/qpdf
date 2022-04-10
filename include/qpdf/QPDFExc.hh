@@ -66,6 +66,7 @@ class QPDF_DLL_CLASS QPDFExc: public std::runtime_error
     std::string const& getMessageDetail() const;
 
   private:
+    QPDF_DLL_PRIVATE
     static std::string createWhat(
         std::string const& filename,
         std::string const& object,

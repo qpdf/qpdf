@@ -32,7 +32,7 @@
 class QPDF;
 class QPDFObjectHandle;
 
-class QPDF_DLL_CLASS QPDFObject
+class QPDFObject
 {
   public:
     QPDFObject();

@@ -204,6 +204,7 @@ class QPDFObjectHandle
         void writeToken(QPDFTokenizer::Token const&);
 
       private:
+        QPDF_DLL_PRIVATE
         void setPipeline(Pipeline*);
 
         Pipeline* pipeline;

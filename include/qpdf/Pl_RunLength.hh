@@ -40,8 +40,11 @@ class QPDF_DLL_CLASS Pl_RunLength: public Pipeline
     virtual void finish();
 
   private:
+    QPDF_DLL_PRIVATE
     void encode(unsigned char* data, size_t len);
+    QPDF_DLL_PRIVATE
     void decode(unsigned char* data, size_t len);
+    QPDF_DLL_PRIVATE
     void flush_encode();
 
     enum state_e { st_top, st_copying, st_run };

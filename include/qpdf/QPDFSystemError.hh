@@ -47,6 +47,7 @@ class QPDF_DLL_CLASS QPDFSystemError: public std::runtime_error
     int getErrno() const;
 
   private:
+    QPDF_DLL_PRIVATE
     static std::string
     createWhat(std::string const& description, int system_errno);
 

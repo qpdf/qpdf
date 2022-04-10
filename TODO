@@ -30,31 +30,17 @@ Misc
   encryption dictionary normally.
 * Have a warn in QPDF that passes its variable arguments onto QPDFExc
   so you don't have to do warn(QPDFExc(...))
+* Nice to have:
+  * Split qpdf.test into multiple tests
+  * Rework tests so that nothing is written into the source directory.
+  * Ideally then the entire build could be done with a read-only
+    source tree.
 
 Soon: Break ground on "Document-level work"
 
 cmake
 =====
 
-* DLL.h
-  * The effect of QPDF_DLL_CLASS is to export everything in the class,
-    not just the vtable. On MSVC, we don't need this as the vtable
-    gets exported automatically when needed. With gcc, we need it to
-    export typeinfo and vtable. Whenever QPDF_DLL_CLASS is defined,
-    also define QPDF_DLL_LOCAL to __attribute__
-    ((visibility("hidden"))). Then add QPDF_DLL_LOCAL to everything in
-    QPDF_DLL_CLASS that is not marked with QPDF_DLL. The effect is
-    that, with MSVC, only methods are marked QPDF_DLL are public
-    because QPDF_DLL_CLASS is empty. For gcc, only methods marked
-    QPDF_DLL are public because QPDF_DLL_LOCAL makes the other things
-    private. See https://gcc.gnu.org/wiki/Visibility. Make sure this
-    is documented.
-  * Update "CODING RULES" in "README-maintainer" - search for QPDF_DLL
-* Nice to have:
-  * Split qpdf.test into multiple tests
-  * Rework tests so that nothing is written into the source directory.
-  * Ideally then the entire build could be done with a read-only
-    source tree.
 * pikepdf
   * https://github.com/pikepdf/pikepdf/pull/315 -- setup.py + docs
   * https://github.com/pikepdf/pikepdf/pull/316 -- setup.py only

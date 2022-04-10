@@ -70,7 +70,9 @@ class QPDF_DLL_CLASS Pl_DCT: public Pipeline
     virtual void finish();
 
   private:
+    QPDF_DLL_PRIVATE
     void compress(void* cinfo, Buffer*);
+    QPDF_DLL_PRIVATE
     void decompress(void* cinfo, Buffer*);
 
     enum action_e { a_compress, a_decompress };

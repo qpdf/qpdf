@@ -104,7 +104,7 @@ class QPDF_DLL_CLASS InputSource
     qpdf_offset_t last_offset;
 
   private:
-    class Members
+    class QPDF_DLL_PRIVATE Members
     {
         friend class InputSource;
 
