@@ -694,7 +694,7 @@ QPDFJob::Config::jobJsonFile(std::string const& parameter)
         throw std::runtime_error(
             "error with job-json file " + std::string(parameter) + ": " +
             e.what() + "\nRun " + this->o.m->message_prefix +
-            "--job-json-help for information on the file format.");
+            " --job-json-help for information on the file format.");
     }
     return this;
 }
