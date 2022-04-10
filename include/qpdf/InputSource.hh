@@ -30,6 +30,9 @@
 #include <stdio.h>
 #include <string>
 
+// Remember to use QPDF_DLL_CLASS on anything derived from InputSource
+// so it will work with dynamic_cast across the shared object
+// boundary.
 class QPDF_DLL_CLASS InputSource
 {
   public:

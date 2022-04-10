@@ -39,7 +39,7 @@
 
 #include <memory>
 
-class Pl_Buffer: public Pipeline
+class QPDF_DLL_CLASS Pl_Buffer: public Pipeline
 {
   public:
     QPDF_DLL
@@ -71,7 +71,7 @@ class Pl_Buffer: public Pipeline
     void getMallocBuffer(unsigned char** buf, size_t* len);
 
   private:
-    class Members
+    class QPDF_DLL_PRIVATE Members
     {
         friend class Pl_Buffer;
 

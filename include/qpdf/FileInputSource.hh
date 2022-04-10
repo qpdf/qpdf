@@ -24,7 +24,7 @@
 
 #include <qpdf/InputSource.hh>
 
-class FileInputSource: public InputSource
+class QPDF_DLL_CLASS FileInputSource: public InputSource
 {
   public:
     QPDF_DLL
@@ -54,7 +54,7 @@ class FileInputSource: public InputSource
     FileInputSource(FileInputSource const&) = delete;
     FileInputSource& operator=(FileInputSource const&) = delete;
 
-    class Members
+    class QPDF_DLL_PRIVATE Members
     {
         friend class FileInputSource;
 

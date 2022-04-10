@@ -30,7 +30,7 @@
 
 #include <qpdf/Pipeline.hh>
 
-class Pl_Concatenate: public Pipeline
+class QPDF_DLL_CLASS Pl_Concatenate: public Pipeline
 {
   public:
     QPDF_DLL
@@ -50,7 +50,7 @@ class Pl_Concatenate: public Pipeline
     void manualFinish();
 
   private:
-    class Members
+    class QPDF_DLL_PRIVATE Members
     {
         friend class Pl_Concatenate;
 

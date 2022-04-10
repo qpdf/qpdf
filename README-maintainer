@@ -156,9 +156,14 @@ CODING RULES
 
 * Use QPDF_DLL on all methods that are to be exported in the shared
   library/DLL. Use QPDF_DLL_CLASS for all classes whose type
-  information is needed. This is important for exception classes and
-  it seems also for classes that are intended to be subclassed across
-  the shared library boundary.
+  information is needed. This is important for classes that are used
+  as exceptions, subclassed, or tested with dynamic_cast across the
+  the shared object boundary (or "shared library boundary" -- we may
+  use either term in comments and documentation). In particular,
+  anything new derived from Pipeline or InputSource should be marked
+  with QPDF_DLL_CLASS, but we don't need to do it for QPDFObjectHelper
+  or QPDFDocumentHelper subclasses since there's no reason to use
+  dynamic_cast with those.
 
 * Put private member variables in std::shared_ptr<Members> for all
   public classes. Remember to use QPDF_DLL on ~Members(). Exception:

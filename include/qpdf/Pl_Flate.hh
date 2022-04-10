@@ -26,7 +26,7 @@
 #include <functional>
 #include <memory>
 
-class Pl_Flate: public Pipeline
+class QPDF_DLL_CLASS Pl_Flate: public Pipeline
 {
   public:
     static unsigned int const def_bufsize = 65536;
@@ -65,7 +65,7 @@ class Pl_Flate: public Pipeline
     void checkError(char const* prefix, int error_code);
     void warn(char const*, int error_code);
 
-    class Members
+    class QPDF_DLL_PRIVATE Members
     {
         friend class Pl_Flate;
 

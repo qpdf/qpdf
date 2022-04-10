@@ -41,7 +41,7 @@
 // QPDFObjectHandle::addTokenFilter. See QPDFObjectHandle.hh for
 // details.
 
-class Pl_QPDFTokenizer: public Pipeline
+class QPDF_DLL_CLASS Pl_QPDFTokenizer: public Pipeline
 {
   public:
     // Whatever pipeline is provided as "next" will be set as the
@@ -60,7 +60,7 @@ class Pl_QPDFTokenizer: public Pipeline
     virtual void finish();
 
   private:
-    class Members
+    class QPDF_DLL_PRIVATE Members
     {
         friend class Pl_QPDFTokenizer;
 

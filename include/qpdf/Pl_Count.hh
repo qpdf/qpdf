@@ -28,7 +28,7 @@
 #include <qpdf/Pipeline.hh>
 #include <qpdf/Types.h>
 
-class Pl_Count: public Pipeline
+class QPDF_DLL_CLASS Pl_Count: public Pipeline
 {
   public:
     QPDF_DLL
@@ -48,7 +48,7 @@ class Pl_Count: public Pipeline
     unsigned char getLastChar() const;
 
   private:
-    class Members
+    class QPDF_DLL_PRIVATE Members
     {
         friend class Pl_Count;
 

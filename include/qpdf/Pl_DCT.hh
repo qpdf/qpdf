@@ -31,7 +31,7 @@
 // definition of size_t.
 #include <jpeglib.h>
 
-class Pl_DCT: public Pipeline
+class QPDF_DLL_CLASS Pl_DCT: public Pipeline
 {
   public:
     // Constructor for decompressing image data
@@ -75,7 +75,7 @@ class Pl_DCT: public Pipeline
 
     enum action_e { a_compress, a_decompress };
 
-    class Members
+    class QPDF_DLL_PRIVATE Members
     {
         friend class Pl_DCT;
 

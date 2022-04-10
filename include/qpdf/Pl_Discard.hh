@@ -30,7 +30,7 @@
 
 #include <qpdf/Pipeline.hh>
 
-class Pl_Discard: public Pipeline
+class QPDF_DLL_CLASS Pl_Discard: public Pipeline
 {
   public:
     QPDF_DLL
@@ -43,7 +43,7 @@ class Pl_Discard: public Pipeline
     virtual void finish();
 
   private:
-    class Members
+    class QPDF_DLL_PRIVATE Members
     {
         friend class Pl_Discard;
 

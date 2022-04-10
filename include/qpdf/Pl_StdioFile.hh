@@ -32,7 +32,7 @@
 // This pipeline is reusable.
 //
 
-class Pl_StdioFile: public Pipeline
+class QPDF_DLL_CLASS Pl_StdioFile: public Pipeline
 {
   public:
     // f is externally maintained; this class just writes to and
@@ -48,7 +48,7 @@ class Pl_StdioFile: public Pipeline
     virtual void finish();
 
   private:
-    class Members
+    class QPDF_DLL_PRIVATE Members
     {
         friend class Pl_StdioFile;
 

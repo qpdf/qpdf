@@ -3,6 +3,7 @@
 
 #include <qpdf/QPDF.hh>
 
+#include <qpdf/BufferInputSource.hh>
 #include <qpdf/Pl_Buffer.hh>
 #include <qpdf/Pl_Discard.hh>
 #include <qpdf/Pl_Flate.hh>
@@ -2314,8 +2315,9 @@ test_60(QPDF& pdf, char const* arg2)
 static void
 test_61(QPDF& pdf, char const* arg2)
 {
-    // Test to make sure exceptions can be caught properly across
-    // shared library boundaries.
+    // Test to make sure type information is passed across shared
+    // library boundaries. This includes exception handling, dynamic
+    // cast, and subclassing.
     pdf.setAttemptRecovery(false);
     pdf.setSuppressWarnings(true);
     try {
@@ -2338,6 +2340,17 @@ test_61(QPDF& pdf, char const* arg2)
     } catch (std::runtime_error const&) {
         std::cout << "Caught runtime_error as expected" << std::endl;
     }
+
+    // Spot check RTTI for dynamic cast. We intend to have pipelines
+    // and input sources be testable, but adding comprehensive tests
+    // for everything doesn't add value as it wouldn't catch
+    // forgetting QPDF_DLL_CLASS on a new subclass.
+    BufferInputSource b("x", "y");
+    InputSource* is = &b;
+    assert(dynamic_cast<BufferInputSource*>(is) != nullptr);
+    Pl_Discard pd;
+    Pipeline* p = &pd;
+    assert(dynamic_cast<Pl_Discard*>(p) != nullptr);
 }
 
 static void

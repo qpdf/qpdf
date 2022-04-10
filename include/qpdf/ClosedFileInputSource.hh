@@ -35,7 +35,7 @@
 
 class FileInputSource;
 
-class ClosedFileInputSource: public InputSource
+class QPDF_DLL_CLASS ClosedFileInputSource: public InputSource
 {
   public:
     QPDF_DLL
@@ -71,7 +71,7 @@ class ClosedFileInputSource: public InputSource
     void before();
     void after();
 
-    class Members
+    class QPDF_DLL_PRIVATE Members
     {
         friend class ClosedFileInputSource;
 

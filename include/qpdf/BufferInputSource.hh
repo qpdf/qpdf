@@ -25,7 +25,7 @@
 #include <qpdf/Buffer.hh>
 #include <qpdf/InputSource.hh>
 
-class BufferInputSource: public InputSource
+class QPDF_DLL_CLASS BufferInputSource: public InputSource
 {
   public:
     // If own_memory is true, BufferInputSource will delete the buffer
@@ -54,7 +54,7 @@ class BufferInputSource: public InputSource
     virtual void unreadCh(char ch);
 
   private:
-    class Members
+    class QPDF_DLL_PRIVATE Members
     {
         friend class BufferInputSource;
 

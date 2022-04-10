@@ -24,7 +24,7 @@
 
 #include <qpdf/Pipeline.hh>
 
-class Pl_RunLength: public Pipeline
+class QPDF_DLL_CLASS Pl_RunLength: public Pipeline
 {
   public:
     enum action_e { a_encode, a_decode };
@@ -46,7 +46,7 @@ class Pl_RunLength: public Pipeline
 
     enum state_e { st_top, st_copying, st_run };
 
-    class Members
+    class QPDF_DLL_PRIVATE Members
     {
         friend class Pl_RunLength;
 
