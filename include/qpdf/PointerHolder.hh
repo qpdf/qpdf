@@ -43,11 +43,11 @@
 
 // *** WHAT IS HAPPENING ***
 
-// In qpdf 11, PointerHolder will be replaced with std::shared_ptr
-// wherever it appears in the qpdf API. The PointerHolder object will
-// be derived from std::shared_ptr to provide a backward-compatible
-// interface and will be mutually assignable with std::shared_ptr.
-// Code that uses containers of PointerHolder will require adjustment.
+// In qpdf 11, PointerHolder was replaced with std::shared_ptr
+// wherever it appeared in the qpdf API. The PointerHolder object is
+// now derived from std::shared_ptr to provide a backward-compatible
+// interface and is mutually assignable with std::shared_ptr. Code
+// that uses containers of PointerHolder will require adjustment.
 
 // *** HOW TO TRANSITION ***
 
@@ -55,8 +55,9 @@
 // transition your code away from PointerHolder. You can define it
 // before including any qpdf header files or including its definition
 // in your build configuration. If not defined, it automatically gets
-// defined to 0, which enables full backward compatibility. That way,
-// you don't have to take action for your code to continue to work.
+// defined to 0 (with a warning), which enables full backward
+// compatibility. That way, you don't have to take action for your
+// code to continue to work.
 
 // If you want to work gradually to transition your code away from
 // PointerHolder, you can define POINTERHOLDER_TRANSITION and fix the
@@ -64,7 +65,7 @@
 // want to be able to continue to support old qpdf versions at the
 // same time, you can write code like this:
 
-// #ifndef POINTERHOLDER_TRANSITION
+// #ifndef POINTERHOLDER_IS_SHARED_POINTER
 //  ... use PointerHolder as before 10.6
 // #else
 //  ... use PointerHolder or shared_ptr as needed
@@ -74,8 +75,6 @@
 // PointerHolder and std::shared_ptr. The easiest way to transition is
 // to increase POINTERHOLDER_TRANSITION in steps of 1 so that you can
 // test and handle changes incrementally.
-
-// *** Transitions available starting at qpdf 10.6.0 ***
 
 // POINTERHOLDER_TRANSITION = 1
 //
@@ -93,14 +92,15 @@
 //
 // Also defined is a make_pointer_holder method that acts like
 // std::make_shared. You can use this as well, but it is not
-// compatible with qpdf prior to 10.6. Like std::make_shared<T>,
-// make_pointer_holder<T> can only be used when the constructor
-// implied by its arguments is public. If you use this, you should be
-// able to just replace it with std::make_shared when qpdf 11 is out.
+// compatible with qpdf prior to 10.6 and not necessary with qpdf
+// newer than 10.6.3. Like std::make_shared<T>, make_pointer_holder<T>
+// can only be used when the constructor implied by its arguments is
+// public. If you previously used this, you can replace it width
+// std::make_shared now.
 
 // POINTERHOLDER_TRANSITION = 2
 //
-// std::shared_ptr as get() and use_count(). PointerHolder has
+// std::shared_ptr has get() and use_count(). PointerHolder has
 // getPointer() and getRefcount(). In 10.6.0, get() and use_count()
 // were added as well. When POINTERHOLDER_TRANSITION = 2, getPointer()
 // and getRefcount() are deprecated. Fix deprecation warnings by
@@ -112,11 +112,6 @@
 // remaining issues that prevent simple replacement of PointerHolder
 // with std::shared_ptr are shared arrays and containers, and neither
 // of these are used in the qpdf API.
-
-// *** Transitions available starting at qpdf 11.0.0 **
-
-// NOTE: Until qpdf 11 is released, this is a plan and is subject to
-// change. Be sure to check again after qpdf 11 is released.
 
 // POINTERHOLDER_TRANSITION = 3
 //
