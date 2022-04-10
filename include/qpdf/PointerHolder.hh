@@ -28,7 +28,7 @@
 
 // #define POINTERHOLDER_TRANSITION 0 to suppress this warning, and see below.
 // See also https://qpdf.readthedocs.io/en/stable/design.html#smart-pointers
-# warn "POINTERHOLDER_TRANSITION is not defined -- see qpdf/PointerHolder.hh"
+# warning "POINTERHOLDER_TRANSITION is not defined -- see qpdf/PointerHolder.hh"
 
 // undefined = define as 0 and issue a warning
 // 0 = no deprecation warnings, backward-compatible API
