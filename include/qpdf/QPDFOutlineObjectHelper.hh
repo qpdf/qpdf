@@ -105,11 +105,11 @@ class QPDFOutlineObjectHelper: public QPDFObjectHelper
 
       public:
         QPDF_DLL
-        ~Members();
+        ~Members() = default;
 
       private:
         Members(QPDFOutlineDocumentHelper& dh);
-        Members(Members const&);
+        Members(Members const&) = delete;
 
         QPDFOutlineDocumentHelper& dh;
         std::shared_ptr<QPDFOutlineObjectHelper> parent;

@@ -85,9 +85,7 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
     QPDF_DLL
     QPDFAcroFormDocumentHelper(QPDF&);
     QPDF_DLL
-    virtual ~QPDFAcroFormDocumentHelper()
-    {
-    }
+    virtual ~QPDFAcroFormDocumentHelper() = default;
 
     // This class lazily creates an internal cache of the mapping
     // among form fields, annotations, and pages. Methods within this
@@ -291,11 +289,11 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
 
       public:
         QPDF_DLL
-        ~Members();
+        ~Members() = default;
 
       private:
         Members();
-        Members(Members const&);
+        Members(Members const&) = delete;
 
         bool cache_valid;
         std::map<QPDFObjGen, std::vector<QPDFAnnotationObjectHelper>>

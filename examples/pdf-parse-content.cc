@@ -23,10 +23,7 @@ usage()
 class ParserCallbacks: public QPDFObjectHandle::ParserCallbacks
 {
   public:
-    virtual ~ParserCallbacks()
-    {
-    }
-
+    virtual ~ParserCallbacks() = default;
     virtual void contentSize(size_t);
     virtual void handleObject(QPDFObjectHandle, size_t offset, size_t length);
     virtual void handleEOF();

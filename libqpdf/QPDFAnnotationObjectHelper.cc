@@ -6,14 +6,6 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
-QPDFAnnotationObjectHelper::Members::~Members()
-{
-}
-
-QPDFAnnotationObjectHelper::Members::Members()
-{
-}
-
 QPDFAnnotationObjectHelper::QPDFAnnotationObjectHelper(QPDFObjectHandle oh) :
     QPDFObjectHelper(oh)
 {

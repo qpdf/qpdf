@@ -7,10 +7,6 @@ QPDF_Integer::QPDF_Integer(long long val) :
 {
 }
 
-QPDF_Integer::~QPDF_Integer()
-{
-}
-
 std::string
 QPDF_Integer::unparse()
 {

@@ -55,11 +55,8 @@ class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
     [[deprecated("use constructor that takes QPDF&")]] QPDF_DLL
         QPDFNumberTreeObjectHelper(QPDFObjectHandle);
 
-    // ABI: = default
     QPDF_DLL
-    virtual ~QPDFNumberTreeObjectHelper()
-    {
-    }
+    virtual ~QPDFNumberTreeObjectHelper() = default;
 
     // Create an empty number tree
     QPDF_DLL
@@ -217,7 +214,7 @@ class QPDFNumberTreeObjectHelper: public QPDFObjectHelper
 
       public:
         QPDF_DLL
-        ~Members();
+        ~Members() = default;
 
       private:
         Members(QPDFObjectHandle& oh, QPDF*, bool auto_repair);

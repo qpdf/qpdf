@@ -7,7 +7,7 @@ class QPDF_Integer: public QPDFObject
 {
   public:
     QPDF_Integer(long long val);
-    virtual ~QPDF_Integer();
+    virtual ~QPDF_Integer() = default;
     virtual std::string unparse();
     virtual JSON getJSON();
     virtual QPDFObject::object_type_e getTypeCode() const;

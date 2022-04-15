@@ -14,9 +14,7 @@
 class DiscardContents: public QPDFObjectHandle::ParserCallbacks
 {
   public:
-    virtual ~DiscardContents()
-    {
-    }
+    virtual ~DiscardContents() = default;
     virtual void
     handleObject(QPDFObjectHandle)
     {

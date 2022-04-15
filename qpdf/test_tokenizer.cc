@@ -30,9 +30,7 @@ class Finder: public InputSource::Finder
         str(str)
     {
     }
-    virtual ~Finder()
-    {
-    }
+    virtual ~Finder() = default;
     virtual bool check();
 
   private:

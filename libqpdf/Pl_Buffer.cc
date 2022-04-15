@@ -12,10 +12,6 @@ Pl_Buffer::Members::Members() :
 {
 }
 
-Pl_Buffer::Members::~Members()
-{
-}
-
 Pl_Buffer::Pl_Buffer(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next),
     m(new Members())
@@ -24,6 +20,8 @@ Pl_Buffer::Pl_Buffer(char const* identifier, Pipeline* next) :
 
 Pl_Buffer::~Pl_Buffer()
 {
+    // Must be explicit and not inline -- see QPDF_DLL_CLASS in
+    // README-maintainer
 }
 
 void

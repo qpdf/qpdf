@@ -60,11 +60,11 @@ class QPDF_DLL_CLASS BufferInputSource: public InputSource
 
       public:
         QPDF_DLL
-        ~Members();
+        ~Members() = default;
 
       private:
         Members(bool own_memory, std::string const& description, Buffer* buf);
-        Members(Members const&);
+        Members(Members const&) = delete;
 
         bool own_memory;
         std::string description;

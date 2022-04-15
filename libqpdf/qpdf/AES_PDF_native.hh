@@ -15,7 +15,7 @@ class AES_PDF_native
         size_t key_bytes,
         bool cbc_mode,
         unsigned char* cbc_block);
-    ~AES_PDF_native();
+    ~AES_PDF_native() = default;
 
     void update(unsigned char* in_data, unsigned char* out_data);
 

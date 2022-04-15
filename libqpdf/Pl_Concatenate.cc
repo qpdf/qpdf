@@ -1,13 +1,5 @@
 #include <qpdf/Pl_Concatenate.hh>
 
-Pl_Concatenate::Members::Members()
-{
-}
-
-Pl_Concatenate::Members::~Members()
-{
-}
-
 Pl_Concatenate::Pl_Concatenate(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next)
 {
@@ -15,6 +7,8 @@ Pl_Concatenate::Pl_Concatenate(char const* identifier, Pipeline* next) :
 
 Pl_Concatenate::~Pl_Concatenate()
 {
+    // Must be explicit and not inline -- see QPDF_DLL_CLASS in
+    // README-maintainer
 }
 
 void

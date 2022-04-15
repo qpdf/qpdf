@@ -55,11 +55,11 @@ class QPDF_DLL_CLASS Pl_RunLength: public Pipeline
 
       public:
         QPDF_DLL
-        ~Members();
+        ~Members() = default;
 
       private:
         Members(action_e);
-        Members(Members const&);
+        Members(Members const&) = delete;
 
         action_e action;
         state_e state;

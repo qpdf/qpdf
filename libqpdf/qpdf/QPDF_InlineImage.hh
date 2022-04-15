@@ -7,7 +7,7 @@ class QPDF_InlineImage: public QPDFObject
 {
   public:
     QPDF_InlineImage(std::string const& val);
-    virtual ~QPDF_InlineImage();
+    virtual ~QPDF_InlineImage() = default;
     virtual std::string unparse();
     virtual JSON getJSON();
     virtual QPDFObject::object_type_e getTypeCode() const;

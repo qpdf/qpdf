@@ -12,7 +12,7 @@ class QPDF_Array: public QPDFObject
   public:
     QPDF_Array(std::vector<QPDFObjectHandle> const& items);
     QPDF_Array(SparseOHArray const& items);
-    virtual ~QPDF_Array();
+    virtual ~QPDF_Array() = default;
     virtual std::string unparse();
     virtual JSON getJSON();
     virtual QPDFObject::object_type_e getTypeCode() const;

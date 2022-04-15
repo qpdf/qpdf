@@ -36,10 +36,6 @@ AES_PDF_native::AES_PDF_native(
     }
 }
 
-AES_PDF_native::~AES_PDF_native()
-{
-}
-
 void
 AES_PDF_native::update(unsigned char* in_data, unsigned char* out_data)
 {

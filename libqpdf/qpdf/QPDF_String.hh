@@ -10,7 +10,7 @@ class QPDF_String: public QPDFObject
   public:
     QPDF_String(std::string const& val);
     static QPDF_String* new_utf16(std::string const& utf8_val);
-    virtual ~QPDF_String();
+    virtual ~QPDF_String() = default;
     virtual std::string unparse();
     virtual QPDFObject::object_type_e getTypeCode() const;
     virtual char const* getTypeName() const;

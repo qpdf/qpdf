@@ -913,9 +913,7 @@ class QPDF
     {
       public:
         CopiedStreamDataProvider(QPDF& destination_qpdf);
-        virtual ~CopiedStreamDataProvider()
-        {
-        }
+        virtual ~CopiedStreamDataProvider() = default;
         virtual bool provideStreamData(
             int objid,
             int generation,
@@ -940,9 +938,7 @@ class QPDF
 
       public:
         StringDecrypter(QPDF* qpdf, int objid, int gen);
-        virtual ~StringDecrypter()
-        {
-        }
+        virtual ~StringDecrypter() = default;
         virtual void decryptString(std::string& val);
 
       private:
@@ -1381,9 +1377,7 @@ class QPDF
             checker(checker)
         {
         }
-        virtual ~PatternFinder()
-        {
-        }
+        virtual ~PatternFinder() = default;
         virtual bool
         check()
         {
@@ -1509,11 +1503,11 @@ class QPDF
 
       public:
         QPDF_DLL
-        ~Members();
+        ~Members() = default;
 
       private:
         Members();
-        Members(Members const&);
+        Members(Members const&) = delete;
 
         unsigned long long unique_id;
         QPDFTokenizer tokenizer;

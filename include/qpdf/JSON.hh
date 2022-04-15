@@ -150,25 +150,25 @@ class JSON
 
     struct JSON_value
     {
-        virtual ~JSON_value();
+        virtual ~JSON_value() = default;
         virtual std::string unparse(size_t depth) const = 0;
     };
     struct JSON_dictionary: public JSON_value
     {
-        virtual ~JSON_dictionary();
+        virtual ~JSON_dictionary() = default;
         virtual std::string unparse(size_t depth) const;
         std::map<std::string, std::shared_ptr<JSON_value>> members;
     };
     struct JSON_array: public JSON_value
     {
-        virtual ~JSON_array();
+        virtual ~JSON_array() = default;
         virtual std::string unparse(size_t depth) const;
         std::vector<std::shared_ptr<JSON_value>> elements;
     };
     struct JSON_string: public JSON_value
     {
         JSON_string(std::string const& utf8);
-        virtual ~JSON_string();
+        virtual ~JSON_string() = default;
         virtual std::string unparse(size_t depth) const;
         std::string utf8;
         std::string encoded;
@@ -178,20 +178,20 @@ class JSON
         JSON_number(long long val);
         JSON_number(double val);
         JSON_number(std::string const& val);
-        virtual ~JSON_number();
+        virtual ~JSON_number() = default;
         virtual std::string unparse(size_t depth) const;
         std::string encoded;
     };
     struct JSON_bool: public JSON_value
     {
         JSON_bool(bool val);
-        virtual ~JSON_bool();
+        virtual ~JSON_bool() = default;
         virtual std::string unparse(size_t depth) const;
         bool value;
     };
     struct JSON_null: public JSON_value
     {
-        virtual ~JSON_null();
+        virtual ~JSON_null() = default;
         virtual std::string unparse(size_t depth) const;
     };
 
@@ -210,11 +210,11 @@ class JSON
 
       public:
         QPDF_DLL
-        ~Members();
+        ~Members() = default;
 
       private:
         Members(std::shared_ptr<JSON_value>);
-        Members(Members const&);
+        Members(Members const&) = delete;
 
         std::shared_ptr<JSON_value> value;
     };

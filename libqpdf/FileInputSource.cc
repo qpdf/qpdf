@@ -42,6 +42,8 @@ FileInputSource::setFile(char const* description, FILE* filep, bool close_file)
 
 FileInputSource::~FileInputSource()
 {
+    // Must be explicit and not inline -- see QPDF_DLL_CLASS in
+    // README-maintainer
 }
 
 qpdf_offset_t

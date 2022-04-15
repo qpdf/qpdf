@@ -31,10 +31,6 @@ class NameTreeDetails: public NNTreeDetails
 
 static NameTreeDetails name_tree_details;
 
-QPDFNameTreeObjectHelper::Members::~Members()
-{
-}
-
 QPDFNameTreeObjectHelper::Members::Members(
     QPDFObjectHandle& oh, QPDF* q, bool auto_repair) :
     impl(std::make_shared<NNTreeImpl>(name_tree_details, q, oh, auto_repair))
@@ -51,10 +47,6 @@ QPDFNameTreeObjectHelper::QPDFNameTreeObjectHelper(
 QPDFNameTreeObjectHelper::QPDFNameTreeObjectHelper(QPDFObjectHandle oh) :
     QPDFObjectHelper(oh),
     m(new Members(oh, nullptr, false))
-{
-}
-
-QPDFNameTreeObjectHelper::~QPDFNameTreeObjectHelper()
 {
 }
 

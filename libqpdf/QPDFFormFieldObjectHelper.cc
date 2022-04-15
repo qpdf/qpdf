@@ -8,14 +8,6 @@
 #include <qpdf/QUtil.hh>
 #include <stdlib.h>
 
-QPDFFormFieldObjectHelper::Members::~Members()
-{
-}
-
-QPDFFormFieldObjectHelper::Members::Members()
-{
-}
-
 QPDFFormFieldObjectHelper::QPDFFormFieldObjectHelper(QPDFObjectHandle oh) :
     QPDFObjectHelper(oh),
     m(new Members())
@@ -525,9 +517,7 @@ class ValueSetter: public QPDFObjectHandle::TokenFilter
         std::vector<std::string> const& opt,
         double tf,
         QPDFObjectHandle::Rectangle const& bbox);
-    virtual ~ValueSetter()
-    {
-    }
+    virtual ~ValueSetter() = default;
     virtual void handleToken(QPDFTokenizer::Token const&);
     virtual void handleEOF();
     void writeAppearance();

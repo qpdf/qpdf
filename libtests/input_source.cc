@@ -24,9 +24,7 @@ class Finder: public InputSource::Finder
         after(after)
     {
     }
-    virtual ~Finder()
-    {
-    }
+    virtual ~Finder() = default;
     virtual bool check();
 
   private:

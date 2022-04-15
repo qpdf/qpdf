@@ -62,9 +62,7 @@ class QPDFObject
     static constexpr object_type_e ot_operator = ::ot_operator;
     static constexpr object_type_e ot_inlineimage = ::ot_inlineimage;
 
-    virtual ~QPDFObject()
-    {
-    }
+    virtual ~QPDFObject() = default;
     virtual std::string unparse() = 0;
     virtual JSON getJSON() = 0;
 

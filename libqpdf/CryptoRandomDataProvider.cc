@@ -2,14 +2,6 @@
 
 #include <qpdf/QPDFCryptoProvider.hh>
 
-CryptoRandomDataProvider::CryptoRandomDataProvider()
-{
-}
-
-CryptoRandomDataProvider::~CryptoRandomDataProvider()
-{
-}
-
 void
 CryptoRandomDataProvider::provideRandomData(unsigned char* data, size_t len)
 {

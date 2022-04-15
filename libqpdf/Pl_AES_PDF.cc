@@ -35,10 +35,6 @@ Pl_AES_PDF::Pl_AES_PDF(
     std::memset(this->cbc_block, 0, this->buf_size);
 }
 
-Pl_AES_PDF::~Pl_AES_PDF()
-{
-}
-
 void
 Pl_AES_PDF::useZeroIV()
 {

@@ -15,10 +15,6 @@ Pl_ASCIIHexDecoder::Pl_ASCIIHexDecoder(char const* identifier, Pipeline* next) :
     this->inbuf[2] = '\0';
 }
 
-Pl_ASCIIHexDecoder::~Pl_ASCIIHexDecoder()
-{
-}
-
 void
 Pl_ASCIIHexDecoder::write(unsigned char* buf, size_t len)
 {

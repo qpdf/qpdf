@@ -11,10 +11,6 @@ QPDFSystemError::QPDFSystemError(
 {
 }
 
-QPDFSystemError::~QPDFSystemError() noexcept
-{
-}
-
 std::string
 QPDFSystemError::createWhat(std::string const& description, int system_errno)
 {

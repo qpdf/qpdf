@@ -7,7 +7,7 @@ class InsecureRandomDataProvider: public RandomDataProvider
 {
   public:
     InsecureRandomDataProvider();
-    virtual ~InsecureRandomDataProvider();
+    virtual ~InsecureRandomDataProvider() = default;
     virtual void provideRandomData(unsigned char* data, size_t len);
     static RandomDataProvider* getInstance();
 

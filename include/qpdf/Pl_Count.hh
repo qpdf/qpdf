@@ -54,11 +54,11 @@ class QPDF_DLL_CLASS Pl_Count: public Pipeline
 
       public:
         QPDF_DLL
-        ~Members();
+        ~Members() = default;
 
       private:
         Members();
-        Members(Members const&);
+        Members(Members const&) = delete;
 
         // Must be qpdf_offset_t, not size_t, to handle writing more than
         // size_t can handle.

@@ -40,9 +40,7 @@ class QPDFPageDocumentHelper: public QPDFDocumentHelper
     QPDF_DLL
     QPDFPageDocumentHelper(QPDF&);
     QPDF_DLL
-    virtual ~QPDFPageDocumentHelper()
-    {
-    }
+    virtual ~QPDFPageDocumentHelper() = default;
 
     // Traverse page tree, and return all /Page objects wrapped in
     // QPDFPageObjectHelper objects. Unlike with
@@ -144,11 +142,11 @@ class QPDFPageDocumentHelper: public QPDFDocumentHelper
 
       public:
         QPDF_DLL
-        ~Members();
+        ~Members() = default;
 
       private:
-        Members();
-        Members(Members const&);
+        Members() = default;
+        Members(Members const&) = delete;
     };
 
     std::shared_ptr<Members> m;

@@ -9,10 +9,6 @@ JSONHandler::JSONHandler() :
 {
 }
 
-JSONHandler::Members::Members()
-{
-}
-
 void
 JSONHandler::usage(std::string const& msg)
 {

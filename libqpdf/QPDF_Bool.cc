@@ -5,10 +5,6 @@ QPDF_Bool::QPDF_Bool(bool val) :
 {
 }
 
-QPDF_Bool::~QPDF_Bool()
-{
-}
-
 std::string
 QPDF_Bool::unparse()
 {

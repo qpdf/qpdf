@@ -9,10 +9,6 @@ QPDF_Name::QPDF_Name(std::string const& name) :
 {
 }
 
-QPDF_Name::~QPDF_Name()
-{
-}
-
 std::string
 QPDF_Name::normalizeName(std::string const& name)
 {

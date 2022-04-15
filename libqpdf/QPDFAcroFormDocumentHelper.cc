@@ -6,10 +6,6 @@
 #include <qpdf/QUtil.hh>
 #include <qpdf/ResourceFinder.hh>
 
-QPDFAcroFormDocumentHelper::Members::~Members()
-{
-}
-
 QPDFAcroFormDocumentHelper::Members::Members() :
     cache_valid(false)
 {

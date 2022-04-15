@@ -22,7 +22,7 @@ class Pl_PNGFilter: public Pipeline
         unsigned int columns,
         unsigned int samples_per_pixel = 1,
         unsigned int bits_per_sample = 8);
-    virtual ~Pl_PNGFilter();
+    virtual ~Pl_PNGFilter() = default;
 
     virtual void write(unsigned char* data, size_t len);
     virtual void finish();

@@ -165,6 +165,18 @@ CODING RULES
   or QPDFDocumentHelper subclasses since there's no reason to use
   dynamic_cast with those.
 
+  IMPORTANT NOTE ABOUT QPDF_DLL_CLASS: On mingw, the vtable for a
+  class with some virtual methods and no pure virtual methods seems
+  often (always?) not to be generated if the destructor is inline or
+  declared with `= default`. Therefore, for any class that is intended
+  to be used as a base class and doesn't contain any pure virtual
+  methods, you must declare the destructor in the header without
+  `= default` and provide a non-inline implementation in the source
+  file. Add this comment to the implementation:
+
+    // Must be explicit and not inline -- see QPDF_DLL_CLASS in
+    // README-maintainer
+
 * Put private member variables in std::shared_ptr<Members> for all
   public classes. Remember to use QPDF_DLL on ~Members(). Exception:
   indirection through std::shared_ptr<Members> is expensive, so don't

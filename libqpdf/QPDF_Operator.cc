@@ -7,10 +7,6 @@ QPDF_Operator::QPDF_Operator(std::string const& val) :
 {
 }
 
-QPDF_Operator::~QPDF_Operator()
-{
-}
-
 std::string
 QPDF_Operator::unparse()
 {

@@ -17,7 +17,7 @@ class Pl_RC4: public Pipeline
         unsigned char const* key_data,
         int key_len = -1,
         size_t out_bufsize = def_bufsize);
-    virtual ~Pl_RC4();
+    virtual ~Pl_RC4() = default;
 
     virtual void write(unsigned char* data, size_t len);
     virtual void finish();

@@ -22,10 +22,6 @@ Pl_LZWDecoder::Pl_LZWDecoder(
     memset(buf, 0, 3);
 }
 
-Pl_LZWDecoder::~Pl_LZWDecoder()
-{
-}
-
 void
 Pl_LZWDecoder::write(unsigned char* bytes, size_t len)
 {

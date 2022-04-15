@@ -77,11 +77,11 @@ class QPDF_DLL_CLASS Pl_Buffer: public Pipeline
 
       public:
         QPDF_DLL
-        ~Members();
+        ~Members() = default;
 
       private:
         Members();
-        Members(Members const&);
+        Members(Members const&) = delete;
 
         bool ready;
         std::shared_ptr<Buffer> data;

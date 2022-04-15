@@ -29,9 +29,7 @@ class QPDFWordTokenFinder: public InputSource::Finder
         str(str)
     {
     }
-    virtual ~QPDFWordTokenFinder()
-    {
-    }
+    virtual ~QPDFWordTokenFinder() = default;
     virtual bool check();
 
   private:
@@ -94,10 +92,6 @@ QPDFTokenizer::Members::reset()
     string_ignoring_newline = false;
     last_char_was_bs = false;
     last_char_was_cr = false;
-}
-
-QPDFTokenizer::Members::~Members()
-{
 }
 
 QPDFTokenizer::Token::Token(token_type_e type, std::string const& value) :

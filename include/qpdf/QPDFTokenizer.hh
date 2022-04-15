@@ -217,11 +217,11 @@ class QPDFTokenizer
 
       public:
         QPDF_DLL
-        ~Members();
+        ~Members() = default;
 
       private:
         Members();
-        Members(Members const&);
+        Members(Members const&) = delete;
         void reset();
 
         // Lexer state

@@ -8,10 +8,6 @@ Pipeline::Pipeline(char const* identifier, Pipeline* next) :
 {
 }
 
-Pipeline::~Pipeline()
-{
-}
-
 Pipeline*
 Pipeline::getNext(bool allow_null)
 {

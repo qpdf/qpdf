@@ -100,10 +100,6 @@ QPDFWriter::QPDFWriter(
     setOutputFile(description, file, close_file);
 }
 
-QPDFWriter::~QPDFWriter()
-{
-}
-
 void
 QPDFWriter::setOutputFilename(char const* filename)
 {

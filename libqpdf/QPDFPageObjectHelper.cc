@@ -18,9 +18,7 @@ class ContentProvider: public QPDFObjectHandle::StreamDataProvider
         from_page(from_page)
     {
     }
-    virtual ~ContentProvider()
-    {
-    }
+    virtual ~ContentProvider() = default;
     virtual void
     provideStreamData(int objid, int generation, Pipeline* pipeline);
 
@@ -45,9 +43,7 @@ class InlineImageTracker: public QPDFObjectHandle::TokenFilter
 {
   public:
     InlineImageTracker(QPDF*, size_t min_size, QPDFObjectHandle resources);
-    virtual ~InlineImageTracker()
-    {
-    }
+    virtual ~InlineImageTracker() = default;
     virtual void handleToken(QPDFTokenizer::Token const&);
     QPDFObjectHandle convertIIDict(QPDFObjectHandle odict);
 
@@ -228,14 +224,6 @@ InlineImageTracker::handleToken(QPDFTokenizer::Token const& token)
     } else {
         writeToken(token);
     }
-}
-
-QPDFPageObjectHelper::Members::~Members()
-{
-}
-
-QPDFPageObjectHelper::Members::Members()
-{
 }
 
 QPDFPageObjectHelper::QPDFPageObjectHelper(QPDFObjectHandle oh) :

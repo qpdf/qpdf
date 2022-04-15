@@ -5,14 +5,6 @@
 #include <stdexcept>
 #include <string.h>
 
-InputSource::Members::Members()
-{
-}
-
-InputSource::Members::~Members()
-{
-}
-
 void
 InputSource::setLastOffset(qpdf_offset_t offset)
 {

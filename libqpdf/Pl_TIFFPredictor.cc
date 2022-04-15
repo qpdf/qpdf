@@ -45,10 +45,6 @@ Pl_TIFFPredictor::Pl_TIFFPredictor(
     memset(this->cur_row.get(), 0, this->bytes_per_row);
 }
 
-Pl_TIFFPredictor::~Pl_TIFFPredictor()
-{
-}
-
 void
 Pl_TIFFPredictor::write(unsigned char* data, size_t len)
 {

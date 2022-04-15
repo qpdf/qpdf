@@ -35,9 +35,7 @@ usage()
 class StringReverser: public QPDFObjectHandle::TokenFilter
 {
   public:
-    virtual ~StringReverser()
-    {
-    }
+    virtual ~StringReverser() = default;
     virtual void handleToken(QPDFTokenizer::Token const&);
 };
 
@@ -70,9 +68,7 @@ StringReverser::handleToken(QPDFTokenizer::Token const& token)
 class ColorToGray: public QPDFObjectHandle::TokenFilter
 {
   public:
-    virtual ~ColorToGray()
-    {
-    }
+    virtual ~ColorToGray() = default;
     virtual void handleToken(QPDFTokenizer::Token const&);
     virtual void handleEOF();
 

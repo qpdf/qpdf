@@ -32,10 +32,6 @@ class NumberTreeDetails: public NNTreeDetails
 
 static NumberTreeDetails number_tree_details;
 
-QPDFNumberTreeObjectHelper::Members::~Members()
-{
-}
-
 QPDFNumberTreeObjectHelper::Members::Members(
     QPDFObjectHandle& oh, QPDF* q, bool auto_repair) :
     impl(std::make_shared<NNTreeImpl>(number_tree_details, q, oh, auto_repair))

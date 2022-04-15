@@ -3,10 +3,6 @@
 #include <qpdf/QPDFOutlineDocumentHelper.hh>
 #include <qpdf/QTC.hh>
 
-QPDFOutlineObjectHelper::Members::~Members()
-{
-}
-
 QPDFOutlineObjectHelper::Members::Members(QPDFOutlineDocumentHelper& dh) :
     dh(dh)
 {

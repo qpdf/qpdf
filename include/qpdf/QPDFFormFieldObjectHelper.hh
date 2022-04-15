@@ -41,9 +41,7 @@ class QPDFFormFieldObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     QPDFFormFieldObjectHelper(QPDFObjectHandle);
     QPDF_DLL
-    virtual ~QPDFFormFieldObjectHelper()
-    {
-    }
+    virtual ~QPDFFormFieldObjectHelper() = default;
 
     QPDF_DLL
     bool isNull();
@@ -229,11 +227,11 @@ class QPDFFormFieldObjectHelper: public QPDFObjectHelper
 
       public:
         QPDF_DLL
-        ~Members();
+        ~Members() = default;
 
       private:
-        Members();
-        Members(Members const&);
+        Members() = default;
+        Members(Members const&) = delete;
     };
 
     std::shared_ptr<Members> m;

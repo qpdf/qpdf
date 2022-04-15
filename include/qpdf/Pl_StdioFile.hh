@@ -54,11 +54,11 @@ class QPDF_DLL_CLASS Pl_StdioFile: public Pipeline
 
       public:
         QPDF_DLL
-        ~Members();
+        ~Members() = default;
 
       private:
         Members(FILE*);
-        Members(Members const&);
+        Members(Members const&) = delete;
 
         FILE* file;
     };

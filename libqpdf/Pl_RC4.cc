@@ -15,10 +15,6 @@ Pl_RC4::Pl_RC4(
     this->outbuf = QUtil::make_shared_array<unsigned char>(out_bufsize);
 }
 
-Pl_RC4::~Pl_RC4()
-{
-}
-
 void
 Pl_RC4::write(unsigned char* data, size_t len)
 {

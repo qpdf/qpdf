@@ -112,7 +112,7 @@ class QPDFEFStreamObjectHelper: public QPDFObjectHelper
         ~Members() = default;
 
       private:
-        Members();
+        Members() = default;
         Members(Members const&) = delete;
     };
 

@@ -9,10 +9,6 @@ InsecureRandomDataProvider::InsecureRandomDataProvider() :
 {
 }
 
-InsecureRandomDataProvider::~InsecureRandomDataProvider()
-{
-}
-
 void
 InsecureRandomDataProvider::provideRandomData(unsigned char* data, size_t len)
 {

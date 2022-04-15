@@ -19,10 +19,6 @@ QPDFFileSpecObjectHelper::QPDFFileSpecObjectHelper(QPDFObjectHandle oh) :
     }
 }
 
-QPDFFileSpecObjectHelper::Members::Members()
-{
-}
-
 static std::vector<std::string> name_keys = {
     "/UF", "/F", "/Unix", "/DOS", "/Mac"};
 

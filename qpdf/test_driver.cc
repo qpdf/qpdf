@@ -55,9 +55,7 @@ class Provider: public QPDFObjectHandle::StreamDataProvider
         bad_length(false)
     {
     }
-    virtual ~Provider()
-    {
-    }
+    virtual ~Provider() = default;
     virtual void
     provideStreamData(int objid, int generation, Pipeline* p)
     {
@@ -82,10 +80,7 @@ class Provider: public QPDFObjectHandle::StreamDataProvider
 class ParserCallbacks: public QPDFObjectHandle::ParserCallbacks
 {
   public:
-    virtual ~ParserCallbacks()
-    {
-    }
-
+    virtual ~ParserCallbacks() = default;
     virtual void contentSize(size_t size);
     virtual void handleObject(QPDFObjectHandle, size_t, size_t);
     virtual void handleEOF();
@@ -125,12 +120,8 @@ ParserCallbacks::handleEOF()
 class TokenFilter: public QPDFObjectHandle::TokenFilter
 {
   public:
-    TokenFilter()
-    {
-    }
-    virtual ~TokenFilter()
-    {
-    }
+    TokenFilter() = default;
+    virtual ~TokenFilter() = default;
     virtual void
     handleToken(QPDFTokenizer::Token const& t)
     {

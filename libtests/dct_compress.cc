@@ -22,9 +22,7 @@ class Callback: public Pl_DCT::CompressConfig
         called(false)
     {
     }
-    virtual ~Callback()
-    {
-    }
+    virtual ~Callback() = default;
     virtual void apply(jpeg_compress_struct*);
     bool called;
 };

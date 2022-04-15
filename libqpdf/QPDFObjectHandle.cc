@@ -41,6 +41,12 @@ QPDFObjectHandle::StreamDataProvider::StreamDataProvider(bool supports_retry) :
 {
 }
 
+QPDFObjectHandle::StreamDataProvider::~StreamDataProvider()
+{
+    // Must be explicit and not inline -- see QPDF_DLL_CLASS in
+    // README-maintainer
+}
+
 void
 QPDFObjectHandle::StreamDataProvider::provideStreamData(
     int objid, int generation, Pipeline* pipeline)
@@ -77,9 +83,7 @@ class CoalesceProvider: public QPDFObjectHandle::StreamDataProvider
         old_contents(old_contents)
     {
     }
-    virtual ~CoalesceProvider()
-    {
-    }
+    virtual ~CoalesceProvider() = default;
     virtual void
     provideStreamData(int objid, int generation, Pipeline* pipeline);
 

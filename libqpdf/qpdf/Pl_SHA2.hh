@@ -21,7 +21,7 @@ class Pl_SHA2: public Pipeline
 {
   public:
     Pl_SHA2(int bits = 0, Pipeline* next = 0);
-    virtual ~Pl_SHA2();
+    virtual ~Pl_SHA2() = default;
     virtual void write(unsigned char*, size_t);
     virtual void finish();
     void resetBits(int bits);

@@ -42,20 +42,13 @@ class QPDF_DLL_CLASS InputSource
     {
     }
     QPDF_DLL
-    virtual ~InputSource()
-    {
-    }
+    virtual ~InputSource() = default;
 
     class QPDF_DLL_CLASS Finder
     {
       public:
-        Finder()
-        {
-        }
-        virtual ~Finder()
-        {
-        }
-
+        Finder() = default;
+        virtual ~Finder() = default;
         virtual bool check() = 0;
     };
 
@@ -110,11 +103,11 @@ class QPDF_DLL_CLASS InputSource
 
       public:
         QPDF_DLL
-        ~Members();
+        ~Members() = default;
 
       private:
-        Members();
-        Members(Members const&);
+        Members() = default;
+        Members(Members const&) = delete;
     };
 
     std::shared_ptr<Members> m;

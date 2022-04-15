@@ -8,10 +8,6 @@ ContentNormalizer::ContentNormalizer() :
 {
 }
 
-ContentNormalizer::~ContentNormalizer()
-{
-}
-
 void
 ContentNormalizer::handleToken(QPDFTokenizer::Token const& token)
 {

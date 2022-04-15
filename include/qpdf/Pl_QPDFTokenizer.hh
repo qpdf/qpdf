@@ -66,11 +66,11 @@ class QPDF_DLL_CLASS Pl_QPDFTokenizer: public Pipeline
 
       public:
         QPDF_DLL
-        ~Members();
+        ~Members() = default;
 
       private:
         Members();
-        Members(Members const&);
+        Members(Members const&) = delete;
 
         QPDFObjectHandle::TokenFilter* filter;
         QPDFTokenizer tokenizer;

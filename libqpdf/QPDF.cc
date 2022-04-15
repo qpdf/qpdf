@@ -230,10 +230,6 @@ QPDF::Members::Members() :
 {
 }
 
-QPDF::Members::~Members()
-{
-}
-
 QPDF::QPDF() :
     m(new Members())
 {

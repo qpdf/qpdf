@@ -49,11 +49,11 @@ class QPDF_DLL_CLASS Pl_Discard: public Pipeline
 
       public:
         QPDF_DLL
-        ~Members();
+        ~Members() = default;
 
       private:
-        Members();
-        Members(Members const&);
+        Members() = default;
+        Members(Members const&) = delete;
     };
 
     std::shared_ptr<Members> m;

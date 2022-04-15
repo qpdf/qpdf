@@ -10,10 +10,6 @@ Pl_RunLength::Members::Members(action_e action) :
 {
 }
 
-Pl_RunLength::Members::~Members()
-{
-}
-
 Pl_RunLength::Pl_RunLength(
     char const* identifier, Pipeline* next, action_e action) :
     Pipeline(identifier, next),
@@ -23,6 +19,8 @@ Pl_RunLength::Pl_RunLength(
 
 Pl_RunLength::~Pl_RunLength()
 {
+    // Must be explicit and not inline -- see QPDF_DLL_CLASS in
+    // README-maintainer
 }
 
 void

@@ -41,12 +41,8 @@ class QPDF_DLL_CLASS Pl_DCT: public Pipeline
     class QPDF_DLL_CLASS CompressConfig
     {
       public:
-        CompressConfig()
-        {
-        }
-        virtual ~CompressConfig()
-        {
-        }
+        CompressConfig() = default;
+        virtual ~CompressConfig() = default;
         virtual void apply(jpeg_compress_struct*) = 0;
     };
 
@@ -83,7 +79,7 @@ class QPDF_DLL_CLASS Pl_DCT: public Pipeline
 
       public:
         QPDF_DLL
-        ~Members();
+        ~Members() = default;
 
       private:
         Members(
@@ -94,7 +90,7 @@ class QPDF_DLL_CLASS Pl_DCT: public Pipeline
             int components = 1,
             J_COLOR_SPACE color_space = JCS_GRAYSCALE,
             CompressConfig* config_callback = 0);
-        Members(Members const&);
+        Members(Members const&) = delete;
 
         action_e action;
         Pl_Buffer buf;

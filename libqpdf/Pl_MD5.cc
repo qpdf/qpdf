@@ -10,10 +10,6 @@ Pl_MD5::Pl_MD5(char const* identifier, Pipeline* next) :
 {
 }
 
-Pl_MD5::~Pl_MD5()
-{
-}
-
 void
 Pl_MD5::write(unsigned char* buf, size_t len)
 {

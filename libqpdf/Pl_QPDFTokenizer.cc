@@ -12,10 +12,6 @@ Pl_QPDFTokenizer::Members::Members() :
 {
 }
 
-Pl_QPDFTokenizer::Members::~Members()
-{
-}
-
 Pl_QPDFTokenizer::Pl_QPDFTokenizer(
     char const* identifier,
     QPDFObjectHandle::TokenFilter* filter,
@@ -32,6 +28,8 @@ Pl_QPDFTokenizer::Pl_QPDFTokenizer(
 
 Pl_QPDFTokenizer::~Pl_QPDFTokenizer()
 {
+    // Must be explicit and not inline -- see QPDF_DLL_CLASS in
+    // README-maintainer
 }
 
 void

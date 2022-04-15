@@ -80,7 +80,7 @@ class QPDF_DLL_CLASS Pl_Flate: public Pipeline
 
       private:
         Members(size_t out_bufsize, action_e action);
-        Members(Members const&);
+        Members(Members const&) = delete;
 
         std::shared_ptr<unsigned char> outbuf;
         size_t out_bufsize;

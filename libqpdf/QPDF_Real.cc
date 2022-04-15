@@ -13,10 +13,6 @@ QPDF_Real::QPDF_Real(
 {
 }
 
-QPDF_Real::~QPDF_Real()
-{
-}
-
 std::string
 QPDF_Real::unparse()
 {

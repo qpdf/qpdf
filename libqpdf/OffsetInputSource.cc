@@ -17,10 +17,6 @@ OffsetInputSource::OffsetInputSource(
         std::numeric_limits<qpdf_offset_t>::max() - global_offset;
 }
 
-OffsetInputSource::~OffsetInputSource()
-{
-}
-
 qpdf_offset_t
 OffsetInputSource::findAndSkipNextEOL()
 {

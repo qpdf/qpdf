@@ -45,9 +45,7 @@ class QPDFDocumentHelper
     {
     }
     QPDF_DLL
-    virtual ~QPDFDocumentHelper()
-    {
-    }
+    virtual ~QPDFDocumentHelper() = default;
     QPDF_DLL
     QPDF&
     getQPDF()

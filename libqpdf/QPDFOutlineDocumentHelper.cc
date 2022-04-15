@@ -2,14 +2,6 @@
 
 #include <qpdf/QTC.hh>
 
-QPDFOutlineDocumentHelper::Members::~Members()
-{
-}
-
-QPDFOutlineDocumentHelper::Members::Members()
-{
-}
-
 QPDFOutlineDocumentHelper::QPDFOutlineDocumentHelper(QPDF& qpdf) :
     QPDFDocumentHelper(qpdf),
     m(new Members())
@@ -34,10 +26,6 @@ QPDFOutlineDocumentHelper::QPDFOutlineDocumentHelper(QPDF& qpdf) :
             QPDFOutlineObjectHelper::Accessor::create(cur, *this, 1));
         cur = cur.getKey("/Next");
     }
-}
-
-QPDFOutlineDocumentHelper::~QPDFOutlineDocumentHelper()
-{
 }
 
 bool

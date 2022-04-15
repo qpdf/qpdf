@@ -17,10 +17,6 @@ BufferInputSource::Members::Members(
 {
 }
 
-BufferInputSource::Members::~Members()
-{
-}
-
 BufferInputSource::BufferInputSource(
     std::string const& description, Buffer* buf, bool own_memory) :
     m(new Members(own_memory, description, buf))

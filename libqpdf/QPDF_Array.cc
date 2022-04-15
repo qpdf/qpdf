@@ -14,10 +14,6 @@ QPDF_Array::QPDF_Array(SparseOHArray const& items) :
 {
 }
 
-QPDF_Array::~QPDF_Array()
-{
-}
-
 void
 QPDF_Array::releaseResolved()
 {

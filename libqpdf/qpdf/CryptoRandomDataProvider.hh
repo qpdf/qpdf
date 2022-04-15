@@ -6,8 +6,8 @@
 class CryptoRandomDataProvider: public RandomDataProvider
 {
   public:
-    CryptoRandomDataProvider();
-    virtual ~CryptoRandomDataProvider();
+    CryptoRandomDataProvider() = default;
+    virtual ~CryptoRandomDataProvider() = default;
     virtual void provideRandomData(unsigned char* data, size_t len);
     static RandomDataProvider* getInstance();
 };

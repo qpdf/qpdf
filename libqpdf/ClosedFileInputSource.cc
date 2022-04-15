@@ -9,10 +9,6 @@ ClosedFileInputSource::Members::Members(char const* filename) :
 {
 }
 
-ClosedFileInputSource::Members::~Members()
-{
-}
-
 ClosedFileInputSource::ClosedFileInputSource(char const* filename) :
     m(new Members(filename))
 {
@@ -20,6 +16,8 @@ ClosedFileInputSource::ClosedFileInputSource(char const* filename) :
 
 ClosedFileInputSource::~ClosedFileInputSource()
 {
+    // Must be explicit and not inline -- see QPDF_DLL_CLASS in
+    // README-maintainer
 }
 
 void

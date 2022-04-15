@@ -14,10 +14,6 @@ Pl_SHA2::Pl_SHA2(int bits, Pipeline* next) :
     }
 }
 
-Pl_SHA2::~Pl_SHA2()
-{
-}
-
 void
 Pl_SHA2::write(unsigned char* buf, size_t len)
 {

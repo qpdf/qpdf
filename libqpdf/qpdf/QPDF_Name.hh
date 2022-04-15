@@ -7,7 +7,7 @@ class QPDF_Name: public QPDFObject
 {
   public:
     QPDF_Name(std::string const& name);
-    virtual ~QPDF_Name();
+    virtual ~QPDF_Name() = default;
     virtual std::string unparse();
     virtual JSON getJSON();
     virtual QPDFObject::object_type_e getTypeCode() const;

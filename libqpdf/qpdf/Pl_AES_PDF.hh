@@ -18,7 +18,7 @@ class Pl_AES_PDF: public Pipeline
         bool encrypt,
         unsigned char const* key,
         size_t key_bytes);
-    virtual ~Pl_AES_PDF();
+    virtual ~Pl_AES_PDF() = default;
 
     virtual void write(unsigned char* data, size_t len);
     virtual void finish();

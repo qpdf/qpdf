@@ -2,14 +2,6 @@
 
 #include <qpdf/QTC.hh>
 
-QPDFPageLabelDocumentHelper::Members::~Members()
-{
-}
-
-QPDFPageLabelDocumentHelper::Members::Members()
-{
-}
-
 QPDFPageLabelDocumentHelper::QPDFPageLabelDocumentHelper(QPDF& qpdf) :
     QPDFDocumentHelper(qpdf),
     m(new Members())

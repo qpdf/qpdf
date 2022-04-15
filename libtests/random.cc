@@ -7,12 +7,8 @@
 class BogusRandomDataProvider: public RandomDataProvider
 {
   public:
-    virtual ~BogusRandomDataProvider()
-    {
-    }
-    BogusRandomDataProvider()
-    {
-    }
+    virtual ~BogusRandomDataProvider() = default;
+    BogusRandomDataProvider() = default;
     virtual void
     provideRandomData(unsigned char* data, size_t len)
     {

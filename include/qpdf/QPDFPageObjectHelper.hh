@@ -43,9 +43,7 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     QPDFPageObjectHelper(QPDFObjectHandle);
     QPDF_DLL
-    virtual ~QPDFPageObjectHelper()
-    {
-    }
+    virtual ~QPDFPageObjectHelper() = default;
 
     // Works with pages and form XObjects. Return the effective value
     // of this attribute for the page/form XObject. For pages, if the
@@ -384,11 +382,11 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
 
       public:
         QPDF_DLL
-        ~Members();
+        ~Members() = default;
 
       private:
-        Members();
-        Members(Members const&);
+        Members() = default;
+        Members(Members const&) = delete;
     };
 
     std::shared_ptr<Members> m;

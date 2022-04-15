@@ -7,7 +7,7 @@ class QPDF_Bool: public QPDFObject
 {
   public:
     QPDF_Bool(bool val);
-    virtual ~QPDF_Bool();
+    virtual ~QPDF_Bool() = default;
     virtual std::string unparse();
     virtual JSON getJSON();
     virtual QPDFObject::object_type_e getTypeCode() const;

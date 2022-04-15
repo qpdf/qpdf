@@ -26,10 +26,6 @@ QPDF_String::QPDF_String(std::string const& val) :
 {
 }
 
-QPDF_String::~QPDF_String()
-{
-}
-
 QPDF_String*
 QPDF_String::new_utf16(std::string const& utf8_val)
 {

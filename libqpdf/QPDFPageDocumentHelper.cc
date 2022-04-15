@@ -4,14 +4,6 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 
-QPDFPageDocumentHelper::Members::~Members()
-{
-}
-
-QPDFPageDocumentHelper::Members::Members()
-{
-}
-
 QPDFPageDocumentHelper::QPDFPageDocumentHelper(QPDF& qpdf) :
     QPDFDocumentHelper(qpdf)
 {

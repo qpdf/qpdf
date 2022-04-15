@@ -18,7 +18,7 @@ class Pl_TIFFPredictor: public Pipeline
         unsigned int columns,
         unsigned int samples_per_pixel = 1,
         unsigned int bits_per_sample = 8);
-    virtual ~Pl_TIFFPredictor();
+    virtual ~Pl_TIFFPredictor() = default;
 
     virtual void write(unsigned char* data, size_t len);
     virtual void finish();

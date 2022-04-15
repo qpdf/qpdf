@@ -79,7 +79,7 @@ class QPDF_DLL_CLASS ClosedFileInputSource: public InputSource
 
       public:
         QPDF_DLL
-        ~Members();
+        ~Members() = default;
 
       private:
         Members(char const* filename);

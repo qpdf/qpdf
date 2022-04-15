@@ -45,7 +45,7 @@ class QPDFOutlineDocumentHelper: public QPDFDocumentHelper
     QPDF_DLL
     QPDFOutlineDocumentHelper(QPDF&);
     QPDF_DLL
-    virtual ~QPDFOutlineDocumentHelper();
+    virtual ~QPDFOutlineDocumentHelper() = default;
 
     QPDF_DLL
     bool hasOutlines();
@@ -88,11 +88,11 @@ class QPDFOutlineDocumentHelper: public QPDFDocumentHelper
 
       public:
         QPDF_DLL
-        ~Members();
+        ~Members() = default;
 
       private:
-        Members();
-        Members(Members const&);
+        Members() = default;
+        Members(Members const&) = delete;
 
         std::vector<QPDFOutlineObjectHelper> outlines;
         std::set<QPDFObjGen> seen;

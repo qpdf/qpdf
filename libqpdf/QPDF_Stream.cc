@@ -99,10 +99,6 @@ QPDF_Stream::QPDF_Stream(
     setStreamDescription();
 }
 
-QPDF_Stream::~QPDF_Stream()
-{
-}
-
 void
 QPDF_Stream::registerStreamFilter(
     std::string const& filter_name,

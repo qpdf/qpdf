@@ -5,10 +5,6 @@
 #include <cstring>
 #include <stdexcept>
 
-JSON::Members::~Members()
-{
-}
-
 JSON::Members::Members(std::shared_ptr<JSON_value> value) :
     value(value)
 {
@@ -16,14 +12,6 @@ JSON::Members::Members(std::shared_ptr<JSON_value> value) :
 
 JSON::JSON(std::shared_ptr<JSON_value> value) :
     m(new Members(value))
-{
-}
-
-JSON::JSON_value::~JSON_value()
-{
-}
-
-JSON::JSON_dictionary::~JSON_dictionary()
 {
 }
 
@@ -49,10 +37,6 @@ JSON::JSON_dictionary::unparse(size_t depth) const
     }
     result.append(1, '}');
     return result;
-}
-
-JSON::JSON_array::~JSON_array()
-{
 }
 
 std::string
@@ -84,10 +68,6 @@ JSON::JSON_string::JSON_string(std::string const& utf8) :
 {
 }
 
-JSON::JSON_string::~JSON_string()
-{
-}
-
 std::string
 JSON::JSON_string::unparse(size_t) const
 {
@@ -109,10 +89,6 @@ JSON::JSON_number::JSON_number(std::string const& value) :
 {
 }
 
-JSON::JSON_number::~JSON_number()
-{
-}
-
 std::string
 JSON::JSON_number::unparse(size_t) const
 {
@@ -124,18 +100,10 @@ JSON::JSON_bool::JSON_bool(bool val) :
 {
 }
 
-JSON::JSON_bool::~JSON_bool()
-{
-}
-
 std::string
 JSON::JSON_bool::unparse(size_t) const
 {
     return value ? "true" : "false";
-}
-
-JSON::JSON_null::~JSON_null()
-{
 }
 
 std::string

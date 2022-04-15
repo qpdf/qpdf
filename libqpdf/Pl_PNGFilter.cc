@@ -61,10 +61,6 @@ Pl_PNGFilter::Pl_PNGFilter(
         (action == a_encode ? this->bytes_per_row : this->bytes_per_row + 1);
 }
 
-Pl_PNGFilter::~Pl_PNGFilter()
-{
-}
-
 void
 Pl_PNGFilter::write(unsigned char* data, size_t len)
 {

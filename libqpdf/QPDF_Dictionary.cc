@@ -9,10 +9,6 @@ QPDF_Dictionary::QPDF_Dictionary(
 {
 }
 
-QPDF_Dictionary::~QPDF_Dictionary()
-{
-}
-
 void
 QPDF_Dictionary::releaseResolved()
 {

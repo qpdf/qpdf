@@ -64,7 +64,7 @@ class QPDF_DLL_CLASS FileInputSource: public InputSource
 
       private:
         Members(bool close_file);
-        Members(Members const&);
+        Members(Members const&) = delete;
 
         bool close_file;
         std::string filename;

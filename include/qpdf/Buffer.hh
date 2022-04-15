@@ -66,7 +66,7 @@ class Buffer
 
       private:
         Members(size_t size, unsigned char* buf, bool own_memory);
-        Members(Members const&);
+        Members(Members const&) = delete;
 
         bool own_memory;
         size_t size;

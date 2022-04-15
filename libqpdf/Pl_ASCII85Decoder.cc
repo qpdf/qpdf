@@ -12,10 +12,6 @@ Pl_ASCII85Decoder::Pl_ASCII85Decoder(char const* identifier, Pipeline* next) :
     memset(this->inbuf, 117, 5);
 }
 
-Pl_ASCII85Decoder::~Pl_ASCII85Decoder()
-{
-}
-
 void
 Pl_ASCII85Decoder::write(unsigned char* buf, size_t len)
 {

@@ -2,10 +2,6 @@
 
 #include <stdexcept>
 
-QPDF_Reserved::~QPDF_Reserved()
-{
-}
-
 std::string
 QPDF_Reserved::unparse()
 {

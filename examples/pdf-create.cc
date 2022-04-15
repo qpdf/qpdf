@@ -28,7 +28,7 @@ class ImageProvider: public QPDFObjectHandle::StreamDataProvider
 {
   public:
     ImageProvider(std::string const& color_space, std::string const& filter);
-    virtual ~ImageProvider();
+    virtual ~ImageProvider() = default;
     virtual void
     provideStreamData(int objid, int generation, Pipeline* pipeline);
     size_t getWidth() const;
@@ -78,10 +78,6 @@ ImageProvider::ImageProvider(
         stripes.push_back(std::string("\x33", 1));
         stripes.push_back(std::string("\x00", 1));
     }
-}
-
-ImageProvider::~ImageProvider()
-{
 }
 
 size_t

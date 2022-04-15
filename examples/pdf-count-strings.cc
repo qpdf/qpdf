@@ -32,9 +32,7 @@ class StringCounter: public QPDFObjectHandle::TokenFilter
         count(0)
     {
     }
-    virtual ~StringCounter()
-    {
-    }
+    virtual ~StringCounter() = default;
     virtual void handleToken(QPDFTokenizer::Token const&);
     virtual void handleEOF();
     int getCount() const;

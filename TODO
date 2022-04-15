@@ -483,14 +483,10 @@ Comments appear in the code prefixed by "ABI"
 * Switch default --json to latest
 * See where anonymous namespaces can be used to keep things private to
   a source file. Search for `(class|struct)` in **/*.cc.
-* See if we can use constructor delegation instead of init() in
-  classes with overloaded constructors.
 * After removing legacy QPDFNameTreeObjectHelper and
   QPDFNumberTreeObjectHelper constructors, NNTreeImpl can switch to
   having a QPDF reference and assume that the reference is always
   valid.
-* Use `= delete` and `= default` for constructors and destructors
-  where possible
 * Having QPDFObjectHandle setters return Class& to allow for
   use of fluent interfaces. This includes array and dictionary
   mutators.

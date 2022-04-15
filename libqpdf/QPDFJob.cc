@@ -46,9 +46,7 @@ namespace
             size_t oi_min_height,
             size_t oi_min_area,
             QPDFObjectHandle& image);
-        virtual ~ImageOptimizer()
-        {
-        }
+        virtual ~ImageOptimizer() = default;
         virtual void
         provideStreamData(int objid, int generation, Pipeline* pipeline);
         std::shared_ptr<Pipeline>
@@ -66,9 +64,7 @@ namespace
     class DiscardContents: public QPDFObjectHandle::ParserCallbacks
     {
       public:
-        virtual ~DiscardContents()
-        {
-        }
+        virtual ~DiscardContents() = default;
         virtual void
         handleObject(QPDFObjectHandle)
         {
@@ -103,10 +99,7 @@ namespace
             filename(filename)
         {
         }
-        virtual ~ProgressReporter()
-        {
-        }
-
+        virtual ~ProgressReporter() = default;
         virtual void reportProgress(int);
 
       private:

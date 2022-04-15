@@ -33,9 +33,7 @@ class QPDFAnnotationObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     QPDFAnnotationObjectHelper(QPDFObjectHandle);
     QPDF_DLL
-    virtual ~QPDFAnnotationObjectHelper()
-    {
-    }
+    virtual ~QPDFAnnotationObjectHelper() = default;
 
     // This class provides helper methods for annotations. More
     // functionality will likely be added in the future.
@@ -108,11 +106,11 @@ class QPDFAnnotationObjectHelper: public QPDFObjectHelper
 
       public:
         QPDF_DLL
-        ~Members();
+        ~Members() = default;
 
       private:
-        Members();
-        Members(Members const&);
+        Members() = default;
+        Members(Members const&) = delete;
     };
 
     std::shared_ptr<Members> m;

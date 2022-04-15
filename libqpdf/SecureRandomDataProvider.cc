@@ -12,14 +12,6 @@
 # endif
 #endif
 
-SecureRandomDataProvider::SecureRandomDataProvider()
-{
-}
-
-SecureRandomDataProvider::~SecureRandomDataProvider()
-{
-}
-
 #ifdef SKIP_OS_SECURE_RANDOM
 
 void

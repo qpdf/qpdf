@@ -11,7 +11,7 @@ class OffsetInputSource: public InputSource
   public:
     OffsetInputSource(
         std::shared_ptr<InputSource>, qpdf_offset_t global_offset);
-    virtual ~OffsetInputSource();
+    virtual ~OffsetInputSource() = default;
 
     virtual qpdf_offset_t findAndSkipNextEOL();
     virtual std::string const& getName() const;

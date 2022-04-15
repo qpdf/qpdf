@@ -7,10 +7,6 @@ QPDF_InlineImage::QPDF_InlineImage(std::string const& val) :
 {
 }
 
-QPDF_InlineImage::~QPDF_InlineImage()
-{
-}
-
 std::string
 QPDF_InlineImage::unparse()
 {

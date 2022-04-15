@@ -47,10 +47,6 @@ QPDFEmbeddedFileDocumentHelper::QPDFEmbeddedFileDocumentHelper(QPDF& qpdf) :
     }
 }
 
-QPDFEmbeddedFileDocumentHelper::Members::Members()
-{
-}
-
 bool
 QPDFEmbeddedFileDocumentHelper::hasEmbeddedFiles() const
 {

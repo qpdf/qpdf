@@ -62,7 +62,7 @@ class QPDFNameTreeObjectHelper: public QPDFObjectHelper
     static QPDFNameTreeObjectHelper newEmpty(QPDF&, bool auto_repair = true);
 
     QPDF_DLL
-    virtual ~QPDFNameTreeObjectHelper();
+    virtual ~QPDFNameTreeObjectHelper() = default;
 
     // Return whether the number tree has an explicit entry for this
     // number.
@@ -194,7 +194,7 @@ class QPDFNameTreeObjectHelper: public QPDFObjectHelper
 
       public:
         QPDF_DLL
-        ~Members();
+        ~Members() = default;
 
       private:
         Members(QPDFObjectHandle& oh, QPDF*, bool auto_repair);

@@ -75,14 +75,12 @@ class QPDFWriter
     QPDFWriter(QPDF& pdf, char const* description, FILE* file, bool close_file);
 
     QPDF_DLL
-    ~QPDFWriter();
+    ~QPDFWriter() = default;
 
     class QPDF_DLL_CLASS ProgressReporter
     {
       public:
-        virtual ~ProgressReporter()
-        {
-        }
+        virtual ~ProgressReporter() = default;
 
         // This method is called with a value from 0 to 100 to
         // indicate approximate progress through the write process.
@@ -718,7 +716,7 @@ class QPDFWriter
 
       private:
         Members(QPDF& pdf);
-        Members(Members const&);
+        Members(Members const&) = delete;
 
         QPDF& pdf;
         char const* filename;

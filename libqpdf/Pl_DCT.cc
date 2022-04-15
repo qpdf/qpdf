@@ -50,10 +50,6 @@ Pl_DCT::Members::Members(
 {
 }
 
-Pl_DCT::Members::~Members()
-{
-}
-
 Pl_DCT::Pl_DCT(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next),
     m(new Members(a_decompress, "DCT compressed image"))
@@ -82,6 +78,8 @@ Pl_DCT::Pl_DCT(
 
 Pl_DCT::~Pl_DCT()
 {
+    // Must be explicit and not inline -- see QPDF_DLL_CLASS in
+    // README-maintainer
 }
 
 void

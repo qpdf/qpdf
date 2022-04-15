@@ -59,7 +59,7 @@ class QPDF_DLL_CLASS Pipeline
     Pipeline(char const* identifier, Pipeline* next);
 
     QPDF_DLL
-    virtual ~Pipeline();
+    virtual ~Pipeline() = default;
 
     // Subclasses should implement write and finish to do their jobs
     // and then, if they are not end-of-line pipelines, call

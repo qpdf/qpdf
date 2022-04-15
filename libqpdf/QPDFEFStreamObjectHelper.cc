@@ -12,10 +12,6 @@ QPDFEFStreamObjectHelper::QPDFEFStreamObjectHelper(QPDFObjectHandle oh) :
 {
 }
 
-QPDFEFStreamObjectHelper::Members::Members()
-{
-}
-
 QPDFObjectHandle
 QPDFEFStreamObjectHelper::getParam(std::string const& pkey)
 {

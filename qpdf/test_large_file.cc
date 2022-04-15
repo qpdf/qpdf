@@ -66,7 +66,7 @@ class ImageChecker: public Pipeline
 {
   public:
     ImageChecker(size_t n);
-    virtual ~ImageChecker();
+    virtual ~ImageChecker() = default;
     virtual void write(unsigned char* data, size_t len);
     virtual void finish();
 
@@ -81,10 +81,6 @@ ImageChecker::ImageChecker(size_t n) :
     n(n),
     offset(0),
     okay(true)
-{
-}
-
-ImageChecker::~ImageChecker()
 {
 }
 
@@ -114,7 +110,7 @@ class ImageProvider: public QPDFObjectHandle::StreamDataProvider
 {
   public:
     ImageProvider(size_t n);
-    virtual ~ImageProvider();
+    virtual ~ImageProvider() = default;
     virtual void
     provideStreamData(int objid, int generation, Pipeline* pipeline);
 
@@ -124,10 +120,6 @@ class ImageProvider: public QPDFObjectHandle::StreamDataProvider
 
 ImageProvider::ImageProvider(size_t n) :
     n(n)
-{
-}
-
-ImageProvider::~ImageProvider()
 {
 }
 

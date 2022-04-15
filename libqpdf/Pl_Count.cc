@@ -8,10 +8,6 @@ Pl_Count::Members::Members() :
 {
 }
 
-Pl_Count::Members::~Members()
-{
-}
-
 Pl_Count::Pl_Count(char const* identifier, Pipeline* next) :
     Pipeline(identifier, next),
     m(new Members())
@@ -20,6 +16,8 @@ Pl_Count::Pl_Count(char const* identifier, Pipeline* next) :
 
 Pl_Count::~Pl_Count()
 {
+    // Must be explicit and not inline -- see QPDF_DLL_CLASS in
+    // README-maintainer
 }
 
 void

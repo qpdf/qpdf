@@ -64,9 +64,7 @@ class QPDFObjectHandle
         StreamDataProvider(bool supports_retry = false);
 
         QPDF_DLL
-        virtual ~StreamDataProvider()
-        {
-        }
+        virtual ~StreamDataProvider();
         // The implementation of this function must write stream data
         // to the given pipeline. The stream data must conform to
         // whatever filters are explicitly associated with the stream.
@@ -172,13 +170,9 @@ class QPDFObjectHandle
     {
       public:
         QPDF_DLL
-        TokenFilter()
-        {
-        }
+        TokenFilter() = default;
         QPDF_DLL
-        virtual ~TokenFilter()
-        {
-        }
+        virtual ~TokenFilter() = default;
         virtual void handleToken(QPDFTokenizer::Token const&) = 0;
         QPDF_DLL
         virtual void handleEOF();
@@ -216,9 +210,7 @@ class QPDFObjectHandle
     {
       public:
         QPDF_DLL
-        virtual ~StringDecrypter()
-        {
-        }
+        virtual ~StringDecrypter() = default;
         virtual void decryptString(std::string& val) = 0;
     };
 
@@ -229,9 +221,7 @@ class QPDFObjectHandle
     {
       public:
         QPDF_DLL
-        virtual ~ParserCallbacks()
-        {
-        }
+        virtual ~ParserCallbacks() = default;
         // One of the handleObject methods must be overridden.
         QPDF_DLL
         virtual void handleObject(QPDFObjectHandle);

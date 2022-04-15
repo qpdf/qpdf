@@ -24,7 +24,7 @@ struct _qpdf_error
 struct _qpdf_data
 {
     _qpdf_data();
-    ~_qpdf_data();
+    ~_qpdf_data() = default;
 
     std::shared_ptr<QPDF> qpdf;
     std::shared_ptr<QPDFWriter> qpdf_writer;
@@ -57,10 +57,6 @@ _qpdf_data::_qpdf_data() :
     silence_errors(false),
     oh_error_occurred(false),
     next_oh(0)
-{
-}
-
-_qpdf_data::~_qpdf_data()
 {
 }
 
