@@ -530,12 +530,8 @@ class QPDFObjectHandle
     QPDF_DLL
     static QPDFObjectHandle newReal(std::string const& value);
     QPDF_DLL
-    static QPDFObjectHandle newReal(double value, int decimal_places = 0);
-    // ABI: combine with other newReal by adding trim_trailing_zeroes
-    // above as an optional parameter with a default of true.
-    QPDF_DLL
-    static QPDFObjectHandle
-    newReal(double value, int decimal_places, bool trim_trailing_zeroes);
+    static QPDFObjectHandle newReal(
+        double value, int decimal_places = 0, bool trim_trailing_zeroes = true);
     // Note about name objects: qpdf's internal representation of a
     // PDF name is a sequence of bytes, excluding the NUL character,
     // and starting with a slash. Name objects as represented in the
@@ -933,11 +929,8 @@ class QPDFObjectHandle
     QPDF_DLL
     void mergeResources(
         QPDFObjectHandle other,
-        std::map<std::string, std::map<std::string, std::string>>* conflicts);
-    // ABI: eliminate version without conflicts and make conflicts
-    // default to nullptr.
-    QPDF_DLL
-    void mergeResources(QPDFObjectHandle other);
+        std::map<std::string, std::map<std::string, std::string>>* conflicts =
+            nullptr);
 
     // Get all resource names from a resource dictionary. If this
     // object is a dictionary, this method returns a set of all the
@@ -964,12 +957,7 @@ class QPDFObjectHandle
     std::string getUniqueResourceName(
         std::string const& prefix,
         int& min_suffix,
-        std::set<std::string>* resource_names);
-    // ABI: remove this version and make resource_names default to
-    // nullptr.
-    QPDF_DLL
-    std::string
-    getUniqueResourceName(std::string const& prefix, int& min_suffix);
+        std::set<std::string>* resource_names = nullptr);
 
     // Return the QPDF object that owns an indirect object.  Returns
     // null for a direct object.
@@ -1024,12 +1012,7 @@ class QPDFObjectHandle
     // to the original QPDF object after this call completes
     // successfully.
     QPDF_DLL
-    void makeDirect(bool allow_streams);
-    // Zero-arg version is equivalent to makeDirect(false).
-    // ABI: delete zero-arg version of makeDirect, and make
-    // allow_streams default to false.
-    QPDF_DLL
-    void makeDirect();
+    void makeDirect(bool allow_streams = false);
 
     // Mutator methods for array objects
     QPDF_DLL

@@ -53,12 +53,6 @@ QPDF::ObjUser::operator<(ObjUser const& rhs) const
 }
 
 void
-QPDF::optimize(std::map<int, int> const& object_stream_data, bool allow_changes)
-{
-    optimize(object_stream_data, allow_changes, nullptr);
-}
-
-void
 QPDF::optimize(
     std::map<int, int> const& object_stream_data,
     bool allow_changes,

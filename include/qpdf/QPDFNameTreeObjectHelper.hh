@@ -61,7 +61,6 @@ class QPDFNameTreeObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     static QPDFNameTreeObjectHelper newEmpty(QPDF&, bool auto_repair = true);
 
-    // ABI: = default
     QPDF_DLL
     virtual ~QPDFNameTreeObjectHelper();
 

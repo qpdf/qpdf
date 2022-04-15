@@ -1095,12 +1095,6 @@ QPDFObjectHandle::makeResourcesIndirect(QPDF& owning_qpdf)
 }
 
 void
-QPDFObjectHandle::mergeResources(QPDFObjectHandle other)
-{
-    mergeResources(other, nullptr);
-}
-
-void
 QPDFObjectHandle::mergeResources(
     QPDFObjectHandle other,
     std::map<std::string, std::map<std::string, std::string>>* conflicts)
@@ -1222,13 +1216,6 @@ QPDFObjectHandle::getResourceNames()
         }
     }
     return result;
-}
-
-std::string
-QPDFObjectHandle::getUniqueResourceName(
-    std::string const& prefix, int& min_suffix)
-{
-    return getUniqueResourceName(prefix, min_suffix, nullptr);
 }
 
 std::string
@@ -2540,12 +2527,6 @@ QPDFObjectHandle::newReal(std::string const& value)
 }
 
 QPDFObjectHandle
-QPDFObjectHandle::newReal(double value, int decimal_places)
-{
-    return QPDFObjectHandle(new QPDF_Real(value, decimal_places, true));
-}
-
-QPDFObjectHandle
 QPDFObjectHandle::newReal(
     double value, int decimal_places, bool trim_trailing_zeroes)
 {
@@ -2913,12 +2894,6 @@ QPDFObjectHandle::copyStream()
     }
     QPDF::StreamCopier::copyStreamData(getOwningQPDF(), result, *this);
     return result;
-}
-
-void
-QPDFObjectHandle::makeDirect()
-{
-    makeDirect(false);
 }
 
 void

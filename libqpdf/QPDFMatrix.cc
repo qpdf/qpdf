@@ -110,22 +110,10 @@ QPDFMatrix::rotatex90(int angle)
 }
 
 void
-QPDFMatrix::transform(double x, double y, double& xp, double& yp)
-{
-    const_cast<QPDFMatrix const*>(this)->transform(x, y, xp, yp);
-}
-
-void
 QPDFMatrix::transform(double x, double y, double& xp, double& yp) const
 {
     xp = (this->a * x) + (this->c * y) + this->e;
     yp = (this->b * x) + (this->d * y) + this->f;
-}
-
-QPDFObjectHandle::Rectangle
-QPDFMatrix::transformRectangle(QPDFObjectHandle::Rectangle r)
-{
-    return const_cast<QPDFMatrix const*>(this)->transformRectangle(r);
 }
 
 QPDFObjectHandle::Rectangle

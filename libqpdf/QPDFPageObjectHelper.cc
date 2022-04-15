@@ -411,12 +411,6 @@ QPDFPageObjectHelper::getFormXObjects()
 }
 
 void
-QPDFPageObjectHelper::externalizeInlineImages(size_t min_size)
-{
-    externalizeInlineImages(min_size, false);
-}
-
-void
 QPDFPageObjectHelper::externalizeInlineImages(size_t min_size, bool shallow)
 {
     if (shallow) {
@@ -927,12 +921,6 @@ QPDFPageObjectHelper::placeFormXObject(
     cm = getMatrixForFormXObjectPlacement(
         fo, rect, invert_transformations, allow_shrink, allow_expand);
     return ("q\n" + cm.unparse() + " cm\n" + name + " Do\n" + "Q\n");
-}
-
-void
-QPDFPageObjectHelper::flattenRotation()
-{
-    flattenRotation(nullptr);
 }
 
 void

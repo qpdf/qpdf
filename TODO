@@ -481,12 +481,10 @@ Comments appear in the code prefixed by "ABI"
 
 * Search for ABI to find items not listed here.
 * Switch default --json to latest
-* See PointerHolder to std::shared_ptr above.
 * See where anonymous namespaces can be used to keep things private to
   a source file. Search for `(class|struct)` in **/*.cc.
 * See if we can use constructor delegation instead of init() in
   classes with overloaded constructors.
-* Merge two versions of QPDFObjectHandle::makeDirect per comment
 * After removing legacy QPDFNameTreeObjectHelper and
   QPDFNumberTreeObjectHelper constructors, NNTreeImpl can switch to
   having a QPDF reference and assume that the reference is always

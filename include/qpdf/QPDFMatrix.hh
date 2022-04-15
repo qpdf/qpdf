@@ -74,9 +74,6 @@ class QPDFMatrix
     // and take the first and second rows of the result as xp and yp.
     QPDF_DLL
     void transform(double x, double y, double& xp, double& yp) const;
-    // ABI: delete non-const version
-    QPDF_DLL
-    void transform(double x, double y, double& xp, double& yp);
 
     // Transform a rectangle by creating a new rectangle that tightly
     // bounds the polygon resulting from transforming the four
@@ -84,10 +81,6 @@ class QPDFMatrix
     QPDF_DLL
     QPDFObjectHandle::Rectangle
     transformRectangle(QPDFObjectHandle::Rectangle r) const;
-    // ABI: delete non-const version
-    QPDF_DLL
-    QPDFObjectHandle::Rectangle
-    transformRectangle(QPDFObjectHandle::Rectangle r);
 
     // operator== tests for exact equality, not considering deltas for
     // floating point.

@@ -619,13 +619,8 @@ class QPDF
     QPDF_DLL
     void optimize(
         std::map<int, int> const& object_stream_data,
-        bool allow_changes = true);
-    // ABI: make function optional and merge overloaded versions
-    QPDF_DLL
-    void optimize(
-        std::map<int, int> const& object_stream_data,
-        bool allow_changes,
-        std::function<int(QPDFObjectHandle&)> skip_stream_parameters);
+        bool allow_changes = true,
+        std::function<int(QPDFObjectHandle&)> skip_stream_parameters = nullptr);
 
     // Traverse page tree return all /Page objects. It also detects
     // and resolves cases in which the same /Page object is

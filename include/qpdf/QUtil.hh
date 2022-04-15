@@ -51,13 +51,8 @@ namespace QUtil
     std::string
     uint_to_string_base(unsigned long long, int base, int length = 0);
     QPDF_DLL
-    std::string double_to_string(double, int decimal_places = 0);
-    // ABI: combine with other double_to_string by adding
-    // trim_trailing_zeroes above as an optional parameter with a
-    // default of true.
-    QPDF_DLL
-    std::string
-    double_to_string(double, int decimal_places, bool trim_trailing_zeroes);
+    std::string double_to_string(
+        double, int decimal_places = 0, bool trim_trailing_zeroes = true);
 
     // These string to number methods throw std::runtime_error on
     // underflow/overflow.

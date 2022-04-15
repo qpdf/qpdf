@@ -327,12 +327,6 @@ QUtil::uint_to_string_base(unsigned long long num, int base, int length)
 }
 
 std::string
-QUtil::double_to_string(double num, int decimal_places)
-{
-    return double_to_string(num, decimal_places, true);
-}
-
-std::string
 QUtil::double_to_string(
     double num, int decimal_places, bool trim_trailing_zeroes)
 {

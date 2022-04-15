@@ -132,10 +132,7 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     // this behavior. Prior to qpdf 10.1, form XObjects were ignored,
     // but this was considered a bug.
     QPDF_DLL
-    void externalizeInlineImages(size_t min_size, bool shallow);
-    // ABI: make shallow optional (default false) and merge
-    QPDF_DLL
-    void externalizeInlineImages(size_t min_size = 0);
+    void externalizeInlineImages(size_t min_size = 0, bool shallow = false);
 
     // Return the annotations in the page's "/Annots" list, if any. If
     // only_subtype is non-empty, only include annotations of the
@@ -344,10 +341,7 @@ class QPDFPageObjectHelper: public QPDFObjectHelper
     // rotated. If not, one will be created inside the function, which
     // is less efficient.
     QPDF_DLL
-    void flattenRotation();
-    // ABI: merge versions and make afdh default to nullptr
-    QPDF_DLL
-    void flattenRotation(QPDFAcroFormDocumentHelper* afdh);
+    void flattenRotation(QPDFAcroFormDocumentHelper* afdh = nullptr);
 
     // Copy annotations from another page into this page. The other
     // page may be from the same QPDF or from a different QPDF. Each
