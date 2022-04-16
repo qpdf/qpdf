@@ -1144,21 +1144,6 @@ QPDFAcroFormDocumentHelper::transformAnnotations(
 }
 
 void
-QPDFAcroFormDocumentHelper::copyFieldsFromForeignPage(
-    QPDFPageObjectHelper foreign_page,
-    QPDFAcroFormDocumentHelper& foreign_afdh,
-    std::vector<QPDFObjectHandle>* copied_fields)
-{
-    this->qpdf.warn(QPDFExc(
-        qpdf_e_unsupported,
-        "",
-        "",
-        0,
-        "Non-working version of copyFieldsFromForeignPage"
-        " from qpdf 10.2 called; application requires updating"));
-}
-
-void
 QPDFAcroFormDocumentHelper::fixCopiedAnnotations(
     QPDFObjectHandle to_page,
     QPDFObjectHandle from_page,

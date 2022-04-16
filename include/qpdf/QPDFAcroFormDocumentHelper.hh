@@ -248,19 +248,6 @@ class QPDFAcroFormDocumentHelper: public QPDFDocumentHelper
         QPDFAcroFormDocumentHelper& from_afdh,
         std::set<QPDFObjGen>* new_fields = nullptr);
 
-    // copyFieldsFromForeignPage was added in qpdf 10.2 and made to do
-    // nothing in 10.3. It wasn't actually doing the right thing and
-    // would result in broken files in all but the simplest case of a
-    // single page from one file being added to another file, as
-    // happens with qpdf --split-pages.
-    [[deprecated("Use fixCopiedAnnotations instead")]]
-    // ABI: delete this method
-    QPDF_DLL void
-    copyFieldsFromForeignPage(
-        QPDFPageObjectHelper foreign_page,
-        QPDFAcroFormDocumentHelper& foreign_afdh,
-        std::vector<QPDFObjectHandle>* copied_fields = nullptr);
-
   private:
     void analyze();
     void traverseField(

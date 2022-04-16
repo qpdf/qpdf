@@ -64,6 +64,11 @@ For a detailed list of changes, please see the file
 
   - API: breaking changes
 
+    - Remove
+      ``QPDFAcroFormDocumentHelper::copyFieldsFromForeignPage``. This
+      method never worked and only did something in qpdf version
+      10.2.x.
+
   - Other changes
 
     - A new chapter on contributing to qpdf has been added to the
