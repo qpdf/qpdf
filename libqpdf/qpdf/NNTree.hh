@@ -97,10 +97,9 @@ class NNTreeImpl
   public:
     typedef NNTreeIterator iterator;
 
-    // ABI: for qpdf 11, make qpdf a reference
     NNTreeImpl(
         NNTreeDetails const&,
-        QPDF*,
+        QPDF&,
         QPDFObjectHandle&,
         bool auto_repair = true);
     iterator begin();
@@ -132,7 +131,7 @@ class NNTreeImpl
     int compareKeyKid(QPDFObjectHandle& key, QPDFObjectHandle& items, int idx);
 
     NNTreeDetails const& details;
-    QPDF* qpdf;
+    QPDF& qpdf;
     int split_threshold;
     QPDFObjectHandle oh;
     bool auto_repair;

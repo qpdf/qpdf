@@ -21,8 +21,6 @@ insertAfter
 4 (4!)
 /Empty1
 /Empty2
-/Bad1: deprecated API
-Name/Number tree node (object 16): item at index 2 is not the right type
 /Bad1 -- wrong key type
 WARNING: name-tree.pdf (Name/Number tree node (object 16)): attempting to repair after error: name-tree.pdf (Name/Number tree node (object 16)): item at index 2 is not the right type
 WARNING: name-tree.pdf (Name/Number tree node (object 16)): item 2 has the wrong type

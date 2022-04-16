@@ -50,13 +50,6 @@ class QPDFNameTreeObjectHelper: public QPDFObjectHelper
     QPDF_DLL
     QPDFNameTreeObjectHelper(QPDFObjectHandle, QPDF&, bool auto_repair = true);
 
-    // ABI: Legacy Constructor will be removed in QPDF 11. A
-    // QPDFNameTreeObjectHelper constructed in this way can't be
-    // modified or repaired and will silently ignore problems in the
-    // structure.
-    [[deprecated("use constructor that takes QPDF&")]] QPDF_DLL
-        QPDFNameTreeObjectHelper(QPDFObjectHandle);
-
     // Create an empty name tree
     QPDF_DLL
     static QPDFNameTreeObjectHelper newEmpty(QPDF&, bool auto_repair = true);
@@ -197,7 +190,7 @@ class QPDFNameTreeObjectHelper: public QPDFObjectHelper
         ~Members() = default;
 
       private:
-        Members(QPDFObjectHandle& oh, QPDF*, bool auto_repair);
+        Members(QPDFObjectHandle& oh, QPDF&, bool auto_repair);
         Members(Members const&) = delete;
 
         std::shared_ptr<NNTreeImpl> impl;

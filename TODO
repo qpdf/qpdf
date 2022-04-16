@@ -481,10 +481,6 @@ Comments appear in the code prefixed by "ABI"
 * Search for ABI to find items not listed here.
 * See where anonymous namespaces can be used to keep things private to
   a source file. Search for `(class|struct)` in **/*.cc.
-* After removing legacy QPDFNameTreeObjectHelper and
-  QPDFNumberTreeObjectHelper constructors, NNTreeImpl can switch to
-  having a QPDF reference and assume that the reference is always
-  valid.
 * Having QPDFObjectHandle setters return Class& to allow for
   use of fluent interfaces. This includes array and dictionary
   mutators.

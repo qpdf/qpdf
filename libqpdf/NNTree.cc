@@ -16,37 +16,23 @@ get_description(QPDFObjectHandle& node)
 }
 
 static void
-warn(QPDF* qpdf, QPDFObjectHandle& node, std::string const& msg)
+warn(QPDF& qpdf, QPDFObjectHandle& node, std::string const& msg)
 {
-    // ABI: in qpdf 11, change to a reference.
-
-    if (qpdf) {
-        qpdf->warn(
-            // line-break
-            QPDFExc(
-                qpdf_e_damaged_pdf,
-                qpdf->getFilename(),
-                get_description(node),
-                0,
-                msg));
-    }
+    qpdf.warn(
+        // line-break
+        QPDFExc(
+            qpdf_e_damaged_pdf,
+            qpdf.getFilename(),
+            get_description(node),
+            0,
+            msg));
 }
 
 static void
-error(QPDF* qpdf, QPDFObjectHandle& node, std::string const& msg)
+error(QPDF& qpdf, QPDFObjectHandle& node, std::string const& msg)
 {
-    // ABI: in qpdf 11, change to a reference.
-
-    if (qpdf) {
-        throw QPDFExc(
-            qpdf_e_damaged_pdf,
-            qpdf->getFilename(),
-            get_description(node),
-            0,
-            msg);
-    } else {
-        throw std::runtime_error(get_description(node) + ": " + msg);
-    }
+    throw QPDFExc(
+        qpdf_e_damaged_pdf, qpdf.getFilename(), get_description(node), 0, msg);
 }
 
 NNTreeIterator::NNTreeIterator(NNTreeImpl& impl) :
@@ -293,9 +279,6 @@ NNTreeIterator::split(
     //   node: A
     //   item_number: 0
 
-    if (!this->impl.qpdf) {
-        throw std::logic_error("NNTreeIterator::split called with null qpdf");
-    }
     if (!valid()) {
         throw std::logic_error(
             "NNTreeIterator::split called an invalid iterator");
@@ -361,7 +344,7 @@ NNTreeIterator::split(
         // same way.
 
         auto first_node =
-            impl.qpdf->makeIndirectObject(QPDFObjectHandle::newDictionary());
+            impl.qpdf.makeIndirectObject(QPDFObjectHandle::newDictionary());
         first_node.replaceKey(key, first_half);
         QPDFObjectHandle new_kids = QPDFObjectHandle::newArray();
         new_kids.appendItem(first_node);
@@ -397,7 +380,7 @@ NNTreeIterator::split(
 
     // Create a new node to contain the second half
     QPDFObjectHandle second_node =
-        impl.qpdf->makeIndirectObject(QPDFObjectHandle::newDictionary());
+        impl.qpdf.makeIndirectObject(QPDFObjectHandle::newDictionary());
     second_node.replaceKey(key, second_half);
     resetLimits(second_node, parent);
 
@@ -705,7 +688,7 @@ NNTreeIterator::deepen(QPDFObjectHandle node, bool first, bool allow_empty)
             addPathElement(node, kid_number);
             auto next = kids.getArrayItem(kid_number);
             if (!next.isIndirect()) {
-                if (impl.qpdf && impl.auto_repair) {
+                if (impl.auto_repair) {
                     QTC::TC("qpdf", "NNTree fix indirect kid");
                     warn(
                         impl.qpdf,
@@ -713,7 +696,7 @@ NNTreeIterator::deepen(QPDFObjectHandle node, bool first, bool allow_empty)
                         ("converting kid number " +
                          QUtil::int_to_string(kid_number) +
                          " to an indirect object"));
-                    next = impl.qpdf->makeIndirectObject(next);
+                    next = impl.qpdf.makeIndirectObject(next);
                     kids.setArrayItem(kid_number, next);
                 } else {
                     QTC::TC("qpdf", "NNTree warn indirect kid");
@@ -749,7 +732,7 @@ NNTreeIterator::deepen(QPDFObjectHandle node, bool first, bool allow_empty)
 
 NNTreeImpl::NNTreeImpl(
     NNTreeDetails const& details,
-    QPDF* qpdf,
+    QPDF& qpdf,
     QPDFObjectHandle& oh,
     bool auto_repair) :
     details(details),

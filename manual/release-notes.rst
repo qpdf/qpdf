@@ -69,6 +69,10 @@ For a detailed list of changes, please see the file
       method never worked and only did something in qpdf version
       10.2.x.
 
+    - Remove ``QPDFNameTreeObjectHelper`` and
+      ``QPDFNumberTreeObjectHelper`` constructors that don't take a
+      ``QPDF&`` argument.
+
   - Other changes
 
     - A new chapter on contributing to qpdf has been added to the

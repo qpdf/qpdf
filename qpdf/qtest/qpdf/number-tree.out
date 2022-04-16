@@ -29,7 +29,6 @@
 insertAfter
 3 (3!)
 4 (4!)
-/Bad1: deprecated API
 /Bad1
 WARNING: number-tree.pdf (Name/Number tree node (object 14)): name/number tree node has neither non-empty /Nums nor /Kids
 WARNING: number-tree.pdf (Name/Number tree node (object 13)): loop detected while traversing name/number tree

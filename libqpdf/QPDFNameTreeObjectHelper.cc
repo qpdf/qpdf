@@ -32,7 +32,7 @@ class NameTreeDetails: public NNTreeDetails
 static NameTreeDetails name_tree_details;
 
 QPDFNameTreeObjectHelper::Members::Members(
-    QPDFObjectHandle& oh, QPDF* q, bool auto_repair) :
+    QPDFObjectHandle& oh, QPDF& q, bool auto_repair) :
     impl(std::make_shared<NNTreeImpl>(name_tree_details, q, oh, auto_repair))
 {
 }
@@ -40,13 +40,7 @@ QPDFNameTreeObjectHelper::Members::Members(
 QPDFNameTreeObjectHelper::QPDFNameTreeObjectHelper(
     QPDFObjectHandle oh, QPDF& q, bool auto_repair) :
     QPDFObjectHelper(oh),
-    m(new Members(oh, &q, auto_repair))
-{
-}
-
-QPDFNameTreeObjectHelper::QPDFNameTreeObjectHelper(QPDFObjectHandle oh) :
-    QPDFObjectHelper(oh),
-    m(new Members(oh, nullptr, false))
+    m(new Members(oh, q, auto_repair))
 {
 }
 
