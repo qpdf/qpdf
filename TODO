@@ -476,9 +476,9 @@ ABI Changes
 ===========
 
 This is a list of changes to make next time there is an ABI change.
-Comments appear in the code prefixed by "ABI"
+Comments appear in the code prefixed by "ABI". Always Search for ABI
+in source and header files to find items not listed here.
 
-* Search for ABI to find items not listed here.
 * See where anonymous namespaces can be used to keep things private to
   a source file. Search for `(class|struct)` in **/*.cc.
 * Having QPDFObjectHandle setters return Class& to allow for
