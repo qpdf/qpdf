@@ -490,11 +490,6 @@ in source and header files to find items not listed here.
   oh as the new value and returns it.
 * Add default values to the getters, like getIntValue(default_value).
   If a default value is passed in, you never get a type warning.
-* Added QPDFObjectHandle::ParserCallbacks::handleWarning but had to
-  revert because it was not binary compatible. Consider re-adding. The
-  commit that added this comment includes the reverting of the change.
-  The previous commit removes the code that was calling and using
-  handleWarning.
 * Make it easier to deal with objects that should be indirect. Search
   for makeIndirectObject in the code to find patterns. For example, it
   would be nice to have a one-liner for the case of one or all
