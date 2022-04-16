@@ -11,20 +11,23 @@
 #include <qpdf/QUtil.hh>
 #include <qpdf/ResourceFinder.hh>
 
-class ContentProvider: public QPDFObjectHandle::StreamDataProvider
+namespace
 {
-  public:
-    ContentProvider(QPDFObjectHandle from_page) :
-        from_page(from_page)
+    class ContentProvider: public QPDFObjectHandle::StreamDataProvider
     {
-    }
-    virtual ~ContentProvider() = default;
-    virtual void
-    provideStreamData(int objid, int generation, Pipeline* pipeline);
+      public:
+        ContentProvider(QPDFObjectHandle from_page) :
+            from_page(from_page)
+        {
+        }
+        virtual ~ContentProvider() = default;
+        virtual void
+        provideStreamData(int objid, int generation, Pipeline* pipeline);
 
-  private:
-    QPDFObjectHandle from_page;
-};
+      private:
+        QPDFObjectHandle from_page;
+    };
+} // namespace
 
 void
 ContentProvider::provideStreamData(int, int, Pipeline* p)
@@ -39,23 +42,26 @@ ContentProvider::provideStreamData(int, int, Pipeline* p)
     concat.manualFinish();
 }
 
-class InlineImageTracker: public QPDFObjectHandle::TokenFilter
+namespace
 {
-  public:
-    InlineImageTracker(QPDF*, size_t min_size, QPDFObjectHandle resources);
-    virtual ~InlineImageTracker() = default;
-    virtual void handleToken(QPDFTokenizer::Token const&);
-    QPDFObjectHandle convertIIDict(QPDFObjectHandle odict);
+    class InlineImageTracker: public QPDFObjectHandle::TokenFilter
+    {
+      public:
+        InlineImageTracker(QPDF*, size_t min_size, QPDFObjectHandle resources);
+        virtual ~InlineImageTracker() = default;
+        virtual void handleToken(QPDFTokenizer::Token const&);
+        QPDFObjectHandle convertIIDict(QPDFObjectHandle odict);
 
-    QPDF* qpdf;
-    size_t min_size;
-    QPDFObjectHandle resources;
-    std::string dict_str;
-    std::string bi_str;
-    int min_suffix;
-    bool any_images;
-    enum { st_top, st_bi } state;
-};
+        QPDF* qpdf;
+        size_t min_size;
+        QPDFObjectHandle resources;
+        std::string dict_str;
+        std::string bi_str;
+        int min_suffix;
+        bool any_images;
+        enum { st_top, st_bi } state;
+    };
+} // namespace
 
 InlineImageTracker::InlineImageTracker(
     QPDF* qpdf, size_t min_size, QPDFObjectHandle resources) :

@@ -251,22 +251,25 @@ static unsigned short mac_roman_to_unicode[] = {
     0x02c7, // 0xff
 };
 
-class FileCloser
+namespace
 {
-  public:
-    FileCloser(FILE* f) :
-        f(f)
+    class FileCloser
     {
-    }
+      public:
+        FileCloser(FILE* f) :
+            f(f)
+        {
+        }
 
-    ~FileCloser()
-    {
-        fclose(f);
-    }
+        ~FileCloser()
+        {
+            fclose(f);
+        }
 
-  private:
-    FILE* f;
-};
+      private:
+        FILE* f;
+    };
+} // namespace
 
 template <typename T>
 static std::string
@@ -1052,17 +1055,20 @@ QUtil::toUTF16(unsigned long uval)
 
 // Random data support
 
-class RandomDataProviderProvider
+namespace
 {
-  public:
-    RandomDataProviderProvider();
-    void setProvider(RandomDataProvider*);
-    RandomDataProvider* getProvider();
+    class RandomDataProviderProvider
+    {
+      public:
+        RandomDataProviderProvider();
+        void setProvider(RandomDataProvider*);
+        RandomDataProvider* getProvider();
 
-  private:
-    RandomDataProvider* default_provider;
-    RandomDataProvider* current_provider;
-};
+      private:
+        RandomDataProvider* default_provider;
+        RandomDataProvider* current_provider;
+    };
+} // namespace
 
 RandomDataProviderProvider::RandomDataProviderProvider() :
     default_provider(CryptoRandomDataProvider::getInstance()),

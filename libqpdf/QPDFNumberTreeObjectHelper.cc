@@ -3,32 +3,35 @@
 #include <qpdf/NNTree.hh>
 #include <qpdf/QIntC.hh>
 
-class NumberTreeDetails: public NNTreeDetails
+namespace
 {
-  public:
-    virtual std::string const&
-    itemsKey() const override
+    class NumberTreeDetails: public NNTreeDetails
     {
-        static std::string k("/Nums");
-        return k;
-    }
-    virtual bool
-    keyValid(QPDFObjectHandle oh) const override
-    {
-        return oh.isInteger();
-    }
-    virtual int
-    compareKeys(QPDFObjectHandle a, QPDFObjectHandle b) const override
-    {
-        if (!(keyValid(a) && keyValid(b))) {
-            // We don't call this without calling keyValid first
-            throw std::logic_error("comparing invalid keys");
+      public:
+        virtual std::string const&
+        itemsKey() const override
+        {
+            static std::string k("/Nums");
+            return k;
         }
-        auto as = a.getIntValue();
-        auto bs = b.getIntValue();
-        return ((as < bs) ? -1 : (as > bs) ? 1 : 0);
-    }
-};
+        virtual bool
+        keyValid(QPDFObjectHandle oh) const override
+        {
+            return oh.isInteger();
+        }
+        virtual int
+        compareKeys(QPDFObjectHandle a, QPDFObjectHandle b) const override
+        {
+            if (!(keyValid(a) && keyValid(b))) {
+                // We don't call this without calling keyValid first
+                throw std::logic_error("comparing invalid keys");
+            }
+            auto as = a.getIntValue();
+            auto bs = b.getIntValue();
+            return ((as < bs) ? -1 : (as > bs) ? 1 : 0);
+        }
+    };
+} // namespace
 
 static NumberTreeDetails number_tree_details;
 

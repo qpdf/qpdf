@@ -508,29 +508,32 @@ QPDFFormFieldObjectHelper::generateAppearance(QPDFAnnotationObjectHelper& aoh)
     }
 }
 
-class ValueSetter: public QPDFObjectHandle::TokenFilter
+namespace
 {
-  public:
-    ValueSetter(
-        std::string const& DA,
-        std::string const& V,
-        std::vector<std::string> const& opt,
-        double tf,
-        QPDFObjectHandle::Rectangle const& bbox);
-    virtual ~ValueSetter() = default;
-    virtual void handleToken(QPDFTokenizer::Token const&);
-    virtual void handleEOF();
-    void writeAppearance();
+    class ValueSetter: public QPDFObjectHandle::TokenFilter
+    {
+      public:
+        ValueSetter(
+            std::string const& DA,
+            std::string const& V,
+            std::vector<std::string> const& opt,
+            double tf,
+            QPDFObjectHandle::Rectangle const& bbox);
+        virtual ~ValueSetter() = default;
+        virtual void handleToken(QPDFTokenizer::Token const&);
+        virtual void handleEOF();
+        void writeAppearance();
 
-  private:
-    std::string DA;
-    std::string V;
-    std::vector<std::string> opt;
-    double tf;
-    QPDFObjectHandle::Rectangle bbox;
-    enum { st_top, st_bmc, st_emc, st_end } state;
-    bool replaced;
-};
+      private:
+        std::string DA;
+        std::string V;
+        std::vector<std::string> opt;
+        double tf;
+        QPDFObjectHandle::Rectangle bbox;
+        enum { st_top, st_bmc, st_emc, st_end } state;
+        bool replaced;
+    };
+} // namespace
 
 ValueSetter::ValueSetter(
     std::string const& DA,
@@ -701,27 +704,30 @@ ValueSetter::writeAppearance()
     write("ET\nQ\nEMC");
 }
 
-class TfFinder: public QPDFObjectHandle::TokenFilter
+namespace
 {
-  public:
-    TfFinder();
-    virtual ~TfFinder()
+    class TfFinder: public QPDFObjectHandle::TokenFilter
     {
-    }
-    virtual void handleToken(QPDFTokenizer::Token const&);
-    double getTf();
-    std::string getFontName();
-    std::string getDA();
+      public:
+        TfFinder();
+        virtual ~TfFinder()
+        {
+        }
+        virtual void handleToken(QPDFTokenizer::Token const&);
+        double getTf();
+        std::string getFontName();
+        std::string getDA();
 
-  private:
-    double tf;
-    int tf_idx;
-    std::string font_name;
-    double last_num;
-    int last_num_idx;
-    std::string last_name;
-    std::vector<std::string> DA;
-};
+      private:
+        double tf;
+        int tf_idx;
+        std::string font_name;
+        double last_num;
+        int last_num_idx;
+        std::string last_name;
+        std::vector<std::string> DA;
+    };
+} // namespace
 
 TfFinder::TfFinder() :
     tf(11.0),

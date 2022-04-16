@@ -19,38 +19,42 @@
 
 #include <stdexcept>
 
-class SF_Crypt: public QPDFStreamFilter
+namespace
 {
-  public:
-    SF_Crypt() = default;
-    virtual ~SF_Crypt() = default;
-
-    virtual bool
-    setDecodeParms(QPDFObjectHandle decode_parms)
+    class SF_Crypt: public QPDFStreamFilter
     {
-        if (decode_parms.isNull()) {
-            return true;
-        }
-        bool filterable = true;
-        for (auto const& key : decode_parms.getKeys()) {
-            if (((key == "/Type") || (key == "/Name")) &&
-                ((!decode_parms.hasKey("/Type")) ||
-                 decode_parms.isDictionaryOfType("/CryptFilterDecodeParms"))) {
-                // we handle this in decryptStream
-            } else {
-                filterable = false;
+      public:
+        SF_Crypt() = default;
+        virtual ~SF_Crypt() = default;
+
+        virtual bool
+        setDecodeParms(QPDFObjectHandle decode_parms)
+        {
+            if (decode_parms.isNull()) {
+                return true;
             }
+            bool filterable = true;
+            for (auto const& key : decode_parms.getKeys()) {
+                if (((key == "/Type") || (key == "/Name")) &&
+                    ((!decode_parms.hasKey("/Type")) ||
+                     decode_parms.isDictionaryOfType(
+                         "/CryptFilterDecodeParms"))) {
+                    // we handle this in decryptStream
+                } else {
+                    filterable = false;
+                }
+            }
+            return filterable;
         }
-        return filterable;
-    }
 
-    virtual Pipeline*
-    getDecodePipeline(Pipeline*)
-    {
-        // Not used -- handled by pipeStreamData
-        return nullptr;
-    }
-};
+        virtual Pipeline*
+        getDecodePipeline(Pipeline*)
+        {
+            // Not used -- handled by pipeStreamData
+            return nullptr;
+        }
+    };
+} // namespace
 
 std::map<std::string, std::string> QPDF_Stream::filter_abbreviations = {
     // The PDF specification provides these filter abbreviations for

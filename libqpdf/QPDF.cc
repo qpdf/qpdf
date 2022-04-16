@@ -50,60 +50,64 @@ static char const* EMPTY_PDF = (
     "110\n"
     "%%EOF\n");
 
-class InvalidInputSource: public InputSource
+namespace
 {
-  public:
-    virtual ~InvalidInputSource() = default;
-    virtual qpdf_offset_t
-    findAndSkipNextEOL() override
+    class InvalidInputSource: public InputSource
     {
-        throwException();
-        return 0;
-    }
-    virtual std::string const&
-    getName() const override
-    {
-        static std::string name("closed input source");
-        return name;
-    }
-    virtual qpdf_offset_t
-    tell() override
-    {
-        throwException();
-        return 0;
-    }
-    virtual void
-    seek(qpdf_offset_t offset, int whence) override
-    {
-        throwException();
-    }
-    virtual void
-    rewind() override
-    {
-        throwException();
-    }
-    virtual size_t
-    read(char* buffer, size_t length) override
-    {
-        throwException();
-        return 0;
-    }
-    virtual void
-    unreadCh(char ch) override
-    {
-        throwException();
-    }
+      public:
+        virtual ~InvalidInputSource() = default;
+        virtual qpdf_offset_t
+        findAndSkipNextEOL() override
+        {
+            throwException();
+            return 0;
+        }
+        virtual std::string const&
+        getName() const override
+        {
+            static std::string name("closed input source");
+            return name;
+        }
+        virtual qpdf_offset_t
+        tell() override
+        {
+            throwException();
+            return 0;
+        }
+        virtual void
+        seek(qpdf_offset_t offset, int whence) override
+        {
+            throwException();
+        }
+        virtual void
+        rewind() override
+        {
+            throwException();
+        }
+        virtual size_t
+        read(char* buffer, size_t length) override
+        {
+            throwException();
+            return 0;
+        }
+        virtual void
+        unreadCh(char ch) override
+        {
+            throwException();
+        }
 
-  private:
-    void
-    throwException()
-    {
-        throw std::logic_error(
-            "QPDF operation attempted on a QPDF object with no input source."
-            " QPDF operations are invalid before processFile (or another"
-            " process method) or after closeInputSource");
-    }
-};
+      private:
+        void
+        throwException()
+        {
+            throw std::logic_error(
+                "QPDF operation attempted on a QPDF object with no input "
+                "source."
+                " QPDF operations are invalid before processFile (or another"
+                " process method) or after closeInputSource");
+        }
+    };
+} // namespace
 
 QPDF::ForeignStreamData::ForeignStreamData(
     std::shared_ptr<EncryptionParameters> encp,

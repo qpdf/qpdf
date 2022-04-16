@@ -20,22 +20,25 @@ is_delimiter(char ch)
     return (strchr(" \t\n\v\f\r()<>[]{}/%", ch) != 0);
 }
 
-class QPDFWordTokenFinder: public InputSource::Finder
+namespace
 {
-  public:
-    QPDFWordTokenFinder(
-        std::shared_ptr<InputSource> is, std::string const& str) :
-        is(is),
-        str(str)
+    class QPDFWordTokenFinder: public InputSource::Finder
     {
-    }
-    virtual ~QPDFWordTokenFinder() = default;
-    virtual bool check();
+      public:
+        QPDFWordTokenFinder(
+            std::shared_ptr<InputSource> is, std::string const& str) :
+            is(is),
+            str(str)
+        {
+        }
+        virtual ~QPDFWordTokenFinder() = default;
+        virtual bool check();
 
-  private:
-    std::shared_ptr<InputSource> is;
-    std::string str;
-};
+      private:
+        std::shared_ptr<InputSource> is;
+        std::string str;
+    };
+} // namespace
 
 bool
 QPDFWordTokenFinder::check()

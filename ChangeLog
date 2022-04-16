@@ -6,7 +6,8 @@
 	qpdf 11.
 
 	* Perform code cleanup including some source-compatible but not
-	binary compatible changes to function signatures.
+	binary compatible changes to function signatures, use of anonymous
+	namespaces, and use of "= default" and "= delete" in declarations.
 
 2022-04-09  Jay Berkenbilt  <ejb@ql.org>
 

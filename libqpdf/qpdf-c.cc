@@ -60,17 +60,20 @@ _qpdf_data::_qpdf_data() :
 {
 }
 
-class ProgressReporter: public QPDFWriter::ProgressReporter
+namespace
 {
-  public:
-    ProgressReporter(void (*handler)(int, void*), void* data);
-    virtual ~ProgressReporter() = default;
-    virtual void reportProgress(int);
+    class ProgressReporter: public QPDFWriter::ProgressReporter
+    {
+      public:
+        ProgressReporter(void (*handler)(int, void*), void* data);
+        virtual ~ProgressReporter() = default;
+        virtual void reportProgress(int);
 
-  private:
-    void (*handler)(int, void*);
-    void* data;
-};
+      private:
+        void (*handler)(int, void*);
+        void* data;
+    };
+} // namespace
 
 ProgressReporter::ProgressReporter(void (*handler)(int, void*), void* data) :
     handler(handler),

@@ -31,47 +31,54 @@ SecureRandomDataProvider::getInstance()
 
 # ifdef _WIN32
 
-class WindowsCryptProvider
+namespace
 {
-  public:
-    WindowsCryptProvider()
+    class WindowsCryptProvider
     {
-        if (!CryptAcquireContextW(
-                &crypt_prov, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT)) {
-            throw std::runtime_error(
-                "unable to acquire crypt context: " + getErrorMessage());
+      public:
+        WindowsCryptProvider()
+        {
+            if (!CryptAcquireContextW(
+                    &crypt_prov,
+                    NULL,
+                    NULL,
+                    PROV_RSA_FULL,
+                    CRYPT_VERIFYCONTEXT)) {
+                throw std::runtime_error(
+                    "unable to acquire crypt context: " + getErrorMessage());
+            }
         }
-    }
-    ~WindowsCryptProvider()
-    {
-        // Ignore error
-        CryptReleaseContext(crypt_prov, 0);
-    }
+        ~WindowsCryptProvider()
+        {
+            // Ignore error
+            CryptReleaseContext(crypt_prov, 0);
+        }
 
-    HCRYPTPROV crypt_prov;
+        HCRYPTPROV crypt_prov;
 
-  private:
-    std::string
-    getErrorMessage()
-    {
-        DWORD errorMessageID = ::GetLastError();
-        LPSTR messageBuffer = nullptr;
-        size_t size = FormatMessageA(
-            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
-                FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL,
-            errorMessageID,
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            reinterpret_cast<LPSTR>(&messageBuffer),
-            0,
-            NULL);
-        std::string message(messageBuffer, size);
-        LocalFree(messageBuffer);
-        return (
-            "error number " + QUtil::int_to_string_base(errorMessageID, 16) +
-            ": " + message);
-    }
-};
+      private:
+        std::string
+        getErrorMessage()
+        {
+            DWORD errorMessageID = ::GetLastError();
+            LPSTR messageBuffer = nullptr;
+            size_t size = FormatMessageA(
+                FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
+                    FORMAT_MESSAGE_IGNORE_INSERTS,
+                NULL,
+                errorMessageID,
+                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                reinterpret_cast<LPSTR>(&messageBuffer),
+                0,
+                NULL);
+            std::string message(messageBuffer, size);
+            LocalFree(messageBuffer);
+            return (
+                "error number " +
+                QUtil::int_to_string_base(errorMessageID, 16) + ": " + message);
+        }
+    };
+} // namespace
 # endif
 
 void

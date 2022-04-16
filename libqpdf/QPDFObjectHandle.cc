@@ -32,9 +32,12 @@
 #include <stdexcept>
 #include <stdlib.h>
 
-class TerminateParsing
+namespace
 {
-};
+    class TerminateParsing
+    {
+    };
+} // namespace
 
 QPDFObjectHandle::StreamDataProvider::StreamDataProvider(bool supports_retry) :
     supports_retry(supports_retry)
@@ -74,23 +77,26 @@ QPDFObjectHandle::StreamDataProvider::supportsRetry()
     return this->supports_retry;
 }
 
-class CoalesceProvider: public QPDFObjectHandle::StreamDataProvider
+namespace
 {
-  public:
-    CoalesceProvider(
-        QPDFObjectHandle containing_page, QPDFObjectHandle old_contents) :
-        containing_page(containing_page),
-        old_contents(old_contents)
+    class CoalesceProvider: public QPDFObjectHandle::StreamDataProvider
     {
-    }
-    virtual ~CoalesceProvider() = default;
-    virtual void
-    provideStreamData(int objid, int generation, Pipeline* pipeline);
+      public:
+        CoalesceProvider(
+            QPDFObjectHandle containing_page, QPDFObjectHandle old_contents) :
+            containing_page(containing_page),
+            old_contents(old_contents)
+        {
+        }
+        virtual ~CoalesceProvider() = default;
+        virtual void
+        provideStreamData(int objid, int generation, Pipeline* pipeline);
 
-  private:
-    QPDFObjectHandle containing_page;
-    QPDFObjectHandle old_contents;
-};
+      private:
+        QPDFObjectHandle containing_page;
+        QPDFObjectHandle old_contents;
+    };
+} // namespace
 
 void
 CoalesceProvider::provideStreamData(int, int, Pipeline* p)
@@ -167,18 +173,21 @@ QPDFObjectHandle::ParserCallbacks::terminateParsing()
     throw TerminateParsing();
 }
 
-class LastChar: public Pipeline
+namespace
 {
-  public:
-    LastChar(Pipeline* next);
-    virtual ~LastChar() = default;
-    virtual void write(unsigned char* data, size_t len);
-    virtual void finish();
-    unsigned char getLastChar();
+    class LastChar: public Pipeline
+    {
+      public:
+        LastChar(Pipeline* next);
+        virtual ~LastChar() = default;
+        virtual void write(unsigned char* data, size_t len);
+        virtual void finish();
+        unsigned char getLastChar();
 
-  private:
-    unsigned char last_char;
-};
+      private:
+        unsigned char last_char;
+    };
+} // namespace
 
 LastChar::LastChar(Pipeline* next) :
     Pipeline("lastchar", next),
@@ -293,21 +302,24 @@ QPDFObjectHandle::getTypeName()
     }
 }
 
-template <class T>
-class QPDFObjectTypeAccessor
+namespace
 {
-  public:
-    static bool
-    check(QPDFObject* o)
+    template <class T>
+    class QPDFObjectTypeAccessor
     {
-        return (o && dynamic_cast<T*>(o));
-    }
-    static bool
-    check(QPDFObject const* o)
-    {
-        return (o && dynamic_cast<T const*>(o));
-    }
-};
+      public:
+        static bool
+        check(QPDFObject* o)
+        {
+            return (o && dynamic_cast<T*>(o));
+        }
+        static bool
+        check(QPDFObject const* o)
+        {
+            return (o && dynamic_cast<T const*>(o));
+        }
+    };
+} // namespace
 
 bool
 QPDFObjectHandle::isBool()
@@ -1435,40 +1447,46 @@ QPDFObjectHandle::replaceStreamData(
         provider, filter, decode_parms);
 }
 
-class FunctionProvider: public QPDFObjectHandle::StreamDataProvider
+namespace
 {
-  public:
-    FunctionProvider(std::function<void(Pipeline*)> provider) :
-        StreamDataProvider(false),
-        p1(provider),
-        p2(nullptr)
+    class FunctionProvider: public QPDFObjectHandle::StreamDataProvider
     {
-    }
-    FunctionProvider(std::function<bool(Pipeline*, bool, bool)> provider) :
-        StreamDataProvider(true),
-        p1(nullptr),
-        p2(provider)
-    {
-    }
+      public:
+        FunctionProvider(std::function<void(Pipeline*)> provider) :
+            StreamDataProvider(false),
+            p1(provider),
+            p2(nullptr)
+        {
+        }
+        FunctionProvider(std::function<bool(Pipeline*, bool, bool)> provider) :
+            StreamDataProvider(true),
+            p1(nullptr),
+            p2(provider)
+        {
+        }
 
-    virtual void
-    provideStreamData(int, int, Pipeline* pipeline) override
-    {
-        p1(pipeline);
-    }
+        virtual void
+        provideStreamData(int, int, Pipeline* pipeline) override
+        {
+            p1(pipeline);
+        }
 
-    virtual bool
-    provideStreamData(
-        int, int, Pipeline* pipeline, bool suppress_warnings, bool will_retry)
-        override
-    {
-        return p2(pipeline, suppress_warnings, will_retry);
-    }
+        virtual bool
+        provideStreamData(
+            int,
+            int,
+            Pipeline* pipeline,
+            bool suppress_warnings,
+            bool will_retry) override
+        {
+            return p2(pipeline, suppress_warnings, will_retry);
+        }
 
-  private:
-    std::function<void(Pipeline*)> p1;
-    std::function<bool(Pipeline*, bool, bool)> p2;
-};
+      private:
+        std::function<void(Pipeline*)> p1;
+        std::function<bool(Pipeline*, bool, bool)> p2;
+    };
+} // namespace
 
 void
 QPDFObjectHandle::replaceStreamData(

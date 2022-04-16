@@ -14,12 +14,15 @@
 # error "qpdf does not support libjpeg built with BITS_IN_JSAMPLE != 8"
 #endif
 
-struct qpdf_jpeg_error_mgr
+namespace
 {
-    struct jpeg_error_mgr pub;
-    jmp_buf jmpbuf;
-    std::string msg;
-};
+    struct qpdf_jpeg_error_mgr
+    {
+        struct jpeg_error_mgr pub;
+        jmp_buf jmpbuf;
+        std::string msg;
+    };
+} // namespace
 
 static void
 error_handler(j_common_ptr cinfo)
@@ -147,13 +150,16 @@ Pl_DCT::finish()
     }
 }
 
-struct dct_pipeline_dest
+namespace
 {
-    struct jpeg_destination_mgr pub; /* public fields */
-    unsigned char* buffer;
-    size_t size;
-    Pipeline* next;
-};
+    struct dct_pipeline_dest
+    {
+        struct jpeg_destination_mgr pub; /* public fields */
+        unsigned char* buffer;
+        size_t size;
+        Pipeline* next;
+    };
+} // namespace
 
 static void
 init_pipeline_destination(j_compress_ptr)
