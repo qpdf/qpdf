@@ -234,10 +234,7 @@ QPDFJob::Config::json()
 QPDFJob::Config*
 QPDFJob::Config::json(std::string const& parameter)
 {
-    if (parameter.empty()) {
-        // The default value is 1 for backward compatibility.
-        o.m->json_version = 1;
-    } else if (parameter == "latest") {
+    if (parameter.empty() || (parameter == "latest")) {
         o.m->json_version = 1;
     } else {
         o.m->json_version = QUtil::string_to_int(parameter.c_str());

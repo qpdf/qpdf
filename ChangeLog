@@ -1,5 +1,10 @@
 2022-04-16  Jay Berkenbilt  <ejb@ql.org>
 
+	* Breaking CLI change: the default value for --json is now
+	"latest" rather than "1". At this moment, "1" is the latest
+	version, but version "2" will be added before the release of
+	qpdf 11.
+
 	* Perform code cleanup including some source-compatible but not
 	binary compatible changes to function signatures.
 

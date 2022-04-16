@@ -6,7 +6,6 @@ Next
 * Stay on top of https://github.com/pikepdf/pikepdf/pull/315
 
 In order:
-* ABI including --json default is latest
 * json v2
 
 Other (do in any order):
@@ -480,7 +479,6 @@ This is a list of changes to make next time there is an ABI change.
 Comments appear in the code prefixed by "ABI"
 
 * Search for ABI to find items not listed here.
-* Switch default --json to latest
 * See where anonymous namespaces can be used to keep things private to
   a source file. Search for `(class|struct)` in **/*.cc.
 * After removing legacy QPDFNameTreeObjectHelper and

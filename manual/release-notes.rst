@@ -57,6 +57,13 @@ For a detailed list of changes, please see the file
 	``autopkgtest`` framework but can be used by others. See
 	:file:`pkg-test/README.md` for details.
 
+  - CLI: breaking changes
+
+    - The default json output version when :qpdf:ref:`--json` is
+      specified has been changed from ``1`` to ``latest``.
+
+  - API: breaking changes
+
   - Other changes
 
     - A new chapter on contributing to qpdf has been added to the
