@@ -1,3 +1,22 @@
+2022-04-16  Jay Berkenbilt  <ejb@ql.org>
+
+	* Perform code cleanup including some source-compatible but not
+	binary compatible changes to function signatures.
+
+2022-04-09  Jay Berkenbilt  <ejb@ql.org>
+
+	* Replace PointerHolder with std::shared_ptr through the QPDF API.
+	A backward-compatible interface is provided and enabled by default
+	with a warning that can be turned off. See "Smart Pointers" in the
+	"Design and Library Notes" section of the manual for information
+	including a detailed migration process to assist with migrating
+	code that uses the qpdf library.
+
+2022-04-03  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add automatic code formatting with clang-format. See "Code
+	Formatting" in the "Contributing to qpdf" chapter of the manual.
+
 2022-03-19  Jay Berkenbilt  <ejb@ql.org>
 
 	* 10.6.3.0cmake1: unofficial release
