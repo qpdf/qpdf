@@ -1734,7 +1734,8 @@ test_46(QPDF& pdf, char const* arg2)
     }
 
     std::cout << "/Bad1" << std::endl;
-    auto bad1 = QPDFNumberTreeObjectHelper(pdf.getTrailer().getKey("/Bad1"), pdf);
+    auto bad1 =
+        QPDFNumberTreeObjectHelper(pdf.getTrailer().getKey("/Bad1"), pdf);
     assert(bad1.begin() == bad1.end());
     assert(bad1.last() == bad1.end());
 
@@ -3022,6 +3023,24 @@ test_84(QPDF& pdf, char const* arg2)
         assert(false);
     } catch (QPDFUsage& e) {
         std::cout << "usage: " << e.what() << std::endl;
+    }
+
+    std::cout << "output capture" << std::endl;
+    std::ostringstream cout;
+    std::ostringstream cerr;
+    {
+        QPDFJob j;
+        j.setOutputStreams(&cout, &cerr);
+        j.config()
+            ->inputFile("bad2.pdf")
+            ->showObject("4,0")
+            ->checkConfiguration();
+        std::cout << "calling run" << std::endl;
+        j.run();
+        std::cout << "captured stdout" << std::endl;
+        std::cout << cout.str();
+        std::cout << "captured stderr" << std::endl;
+        std::cout << cerr.str();
     }
 }
 

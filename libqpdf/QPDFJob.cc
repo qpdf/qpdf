@@ -703,6 +703,7 @@ QPDFJob::getEncryptionStatus()
 void
 QPDFJob::setQPDFOptions(QPDF& pdf)
 {
+    pdf.setOutputStreams(this->m->cout, this->m->cerr);
     if (m->ignore_xref_streams) {
         pdf.setIgnoreXRefStreams(true);
     }
