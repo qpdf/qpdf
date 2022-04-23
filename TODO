@@ -11,9 +11,6 @@ In order:
 Other (do in any order):
 
 Misc
-* Get rid of "ugly switch statements" in QUtil.cc -- replace with
-  static map initializers. (Search for "ugly switch statements" below
-  as well.)
 * Consider exposing get_next_utf8_codepoint in QUtil
 * Add QUtil::is_explicit_utf8 that does what QPDF_String::getUTF8Val
   does to detect UTF-8 encoded strings per PDF 2.0 spec.
@@ -396,10 +393,9 @@ we might do about it.
 * When mapping characters to widths, we will need to care about
   character encoding. For built-in fonts, we can create a map from
   Unicode code point to width and then go from the font's encoding to
-  unicode to the width. Get rid of "ugly switch statements" in
-  QUtil.cc and replace with static map initializers. See
-  misc/character-encoding/ (not on github) and font metric information
-  for the 14 standard fonts in my local pdf-spec directory.
+  unicode to the width. See misc/character-encoding/ (not on github)
+  and font metric information for the 14 standard fonts in my local
+  pdf-spec directory.
 
 * Once we know about character widths, we can correctly support
   auto-sized variable text fields (0 Tf). If this is fixed, search for
