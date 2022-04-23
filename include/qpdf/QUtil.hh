@@ -268,13 +268,32 @@ namespace QUtil
     QPDF_DLL
     std::string toUTF16(unsigned long uval);
 
+    // If utf8_val.at(pos) points to the beginning of a valid
+    // UTF-8-encoded character, return the codepoint of the character
+    // and set error to false. Otherwise, return 0xfffd and set error
+    // to true. In all cases, pos is advanced to the next position
+    // that may begin a valid character. When the string has been
+    // consumed, pos will be set to the string length. It is an error
+    // to pass a value of pos that is greater than or equal to the
+    // length of the string.
+    QPDF_DLL
+    unsigned long get_next_utf8_codepoint(
+        std::string const& utf8_val, size_t& pos, bool& error);
+
     // Test whether this is a UTF-16 string. This is indicated by
     // first two bytes being 0xFE 0xFF (big-endian) or 0xFF 0xFE
-    // (little-endian). Starting in qpdf 10.6.2, this detects
+    // (little-endian), each of which is the encoding of U+FEFF, the
+    // Unicode marker. Starting in qpdf 10.6.2, this detects
     // little-endian as well as big-endian. Even though the PDF spec
     // doesn't allow little-endian, most readers seem to accept it.
     QPDF_DLL
     bool is_utf16(std::string const&);
+
+    // Test whether this is an explicit UTF-8 string as allowed by the
+    // PDF 2.0 spec. This is indicated by first three bytes being 0xEF
+    // 0xBB 0xBF, which is the UTF-8 encoding of U+FEFF.
+    QPDF_DLL
+    bool is_explicit_utf8(std::string const&);
 
     // Convert a UTF-8 encoded string to UTF-16 big-endian.
     // Unrepresentable code points are converted to U+FFFD.

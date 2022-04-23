@@ -240,6 +240,33 @@ print_utf8(unsigned long val)
         }
     }
     std::cout << std::endl;
+
+    // Boundary conditions for QUtil::get_next_utf8_codepoint, which is
+    // also tested indirectly through test_pdf_unicode.cc.
+    std::string utf8 = "\xcf\x80\xcf\x30\xEF\xBF\x30\x31\xcf";
+    size_t pos = 0;
+    bool error = false;
+    assert(QUtil::get_next_utf8_codepoint(utf8, pos, error) == 0x3c0);
+    assert(pos == 2);
+    assert(!error);
+    assert(QUtil::get_next_utf8_codepoint(utf8, pos, error) == 0xfffd);
+    assert(pos == 3);
+    assert(error);
+    assert(QUtil::get_next_utf8_codepoint(utf8, pos, error) == 0x30);
+    assert(pos == 4);
+    assert(!error);
+    assert(QUtil::get_next_utf8_codepoint(utf8, pos, error) == 0xfffd);
+    assert(pos == 6);
+    assert(error);
+    assert(QUtil::get_next_utf8_codepoint(utf8, pos, error) == 0x30);
+    assert(pos == 7);
+    assert(!error);
+    assert(QUtil::get_next_utf8_codepoint(utf8, pos, error) == 0x31);
+    assert(pos == 8);
+    assert(!error);
+    assert(QUtil::get_next_utf8_codepoint(utf8, pos, error) == 0xfffd);
+    assert(pos == 9);
+    assert(error);
 }
 
 void

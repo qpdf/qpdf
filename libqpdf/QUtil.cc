@@ -1529,10 +1529,11 @@ encode_pdfdoc(unsigned long codepoint)
 }
 
 unsigned long
-get_next_utf8_codepoint(std::string const& utf8_val, size_t& pos, bool& error)
+QUtil::get_next_utf8_codepoint(
+    std::string const& utf8_val, size_t& pos, bool& error)
 {
     size_t len = utf8_val.length();
-    unsigned char ch = static_cast<unsigned char>(utf8_val.at(pos));
+    unsigned char ch = static_cast<unsigned char>(utf8_val.at(pos++));
     error = false;
     if (ch < 128) {
         return static_cast<unsigned long>(ch);
@@ -1547,7 +1548,7 @@ get_next_utf8_codepoint(std::string const& utf8_val, size_t& pos, bool& error)
         bit_check >>= 1;
     }
     if (((bytes_needed > 5) || (bytes_needed < 1)) ||
-        ((pos + bytes_needed) >= len)) {
+        ((pos + bytes_needed) > len)) {
         error = true;
         return 0xfffd;
     }
@@ -1555,11 +1556,11 @@ get_next_utf8_codepoint(std::string const& utf8_val, size_t& pos, bool& error)
     unsigned long codepoint = static_cast<unsigned long>(ch & ~to_clear);
     while (bytes_needed > 0) {
         --bytes_needed;
-        ch = static_cast<unsigned char>(utf8_val.at(++pos));
+        ch = static_cast<unsigned char>(utf8_val.at(pos++));
         if ((ch & 0xc0) != 0x80) {
             --pos;
-            codepoint = 0xfffd;
-            break;
+            error = true;
+            return 0xfffd;
         }
         codepoint <<= 6;
         codepoint += (ch & 0x3f);
@@ -1580,9 +1581,11 @@ transcode_utf8(
         result += "\xfe\xff";
     }
     size_t len = utf8_val.length();
-    for (size_t i = 0; i < len; ++i) {
+    size_t pos = 0;
+    while (pos < len) {
         bool error = false;
-        unsigned long codepoint = get_next_utf8_codepoint(utf8_val, i, error);
+        unsigned long codepoint =
+            QUtil::get_next_utf8_codepoint(utf8_val, pos, error);
         if (error) {
             okay = false;
             if (encoding == e_utf16) {
@@ -1710,6 +1713,15 @@ QUtil::is_utf16(std::string const& val)
          ((val.at(0) == '\xff') && (val.at(1) == '\xfe'))));
 }
 
+bool
+QUtil::is_explicit_utf8(std::string const& val)
+{
+    // QPDF_String.cc knows that this is a 3-byte sequence.
+    return (
+        (val.length() >= 3) && (val.at(0) == '\xef') && (val.at(1) == '\xbb') &&
+        (val.at(2) == '\xbf'));
+}
+
 std::string
 QUtil::utf16_to_utf8(std::string const& val)
 {
@@ -1826,10 +1838,11 @@ QUtil::analyze_encoding(
         return;
     }
     size_t len = val.length();
+    size_t pos = 0;
     bool any_errors = false;
-    for (size_t i = 0; i < len; ++i) {
+    while (pos < len) {
         bool error = false;
-        unsigned long codepoint = get_next_utf8_codepoint(val, i, error);
+        unsigned long codepoint = get_next_utf8_codepoint(val, pos, error);
         if (error) {
             any_errors = true;
         }

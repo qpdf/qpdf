@@ -1,3 +1,14 @@
+2022-04-23  Jay Berkenbilt  <ejb@ql.org>
+
+	* Add new method QUtil::is_explicit_utf8 that tests whether a
+	string is explicitly marked as being UTF-8 encoded, as allowed by
+	the PDF 2.0 spec. Such a string starts with the bytes 0xEF 0xBB
+	0xBF, which is the UTF-8 encoding of U+FEFF.
+
+	* Add new method QUtil::get_next_utf8_codepoint as a low-level
+	helper for iterating through the UTF-8 characters in a byte
+	string.
+
 2022-04-16  Jay Berkenbilt  <ejb@ql.org>
 
 	* Breaking CLI change: the default value for --json is now

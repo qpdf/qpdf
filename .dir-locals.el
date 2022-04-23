@@ -1,4 +1,4 @@
-((nil . ((indent-tabs-mode . t)
+((nil . ((indent-tabs-mode . nil)
          (qpdf-cc-style
           .
           ("qpdf"

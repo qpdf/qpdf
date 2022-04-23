@@ -11,9 +11,6 @@ In order:
 Other (do in any order):
 
 Misc
-* Consider exposing get_next_utf8_codepoint in QUtil
-* Add QUtil::is_explicit_utf8 that does what QPDF_String::getUTF8Val
-  does to detect UTF-8 encoded strings per PDF 2.0 spec.
 * Add an option --ignore-encryption to ignore encryption information
   and treat encrypted files as if they weren't encrypted. This should
   make it possible to solve #598 (--show-encryption without a
