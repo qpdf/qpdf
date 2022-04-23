@@ -10,9 +10,6 @@ AlignOperands: DontAlign
 AllowShortFunctionsOnASingleLine: None
 AlwaysBreakAfterReturnType: AllDefinitions
 AlwaysBreakTemplateDeclarations: Yes
-AttributeMacros:
-  - QPDF_DLL
-  - QPDF_DLL_CLASS
 BinPackArguments: false
 BinPackParameters: false
 BraceWrapping:
