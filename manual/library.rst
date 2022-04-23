@@ -77,6 +77,15 @@ Other Languages
    with PDF files through qpdf's command line interface. For more
    information, please see :ref:`json`.
 
+Wrappers
+   The `qpdf Wiki <https://github.com/qpdf/qpdf/wiki>`__ contains a
+   list of `Wrappers around qpdf
+   <https://github.com/qpdf/qpdf/wiki/qpdf-Wrappers>`__. These may
+   have varying degrees of functionality or completeness. If you know
+   of (or have written) a wrapper that you'd like include, open an
+   issue at https://github.com/qpdf/qpdf/issues/new and ask for it to
+   be added to the list.
+
 .. _unicode-files:
 
 A Note About Unicode File Names
